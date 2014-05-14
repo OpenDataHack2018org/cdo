@@ -188,29 +188,20 @@ void printGridInfo(int vlistID)
 
 	  if ( xsize > 0 && lxcoord )
 	    {
-	      if ( gridtype == GRID_GAUSSIAN_REDUCED )
-		{
-		  fprintf(stdout, "     : points=%d  nlat=%d\n", gridsize, ysize);
-		  fprintf(stdout, "%*s", nbyte0, "");
-		  fprintf(stdout, "longitude : reduced\n");
-		}
-	      else
-		{
-		  xfirst = gridInqXval(gridID, 0);
-		  xlast  = gridInqXval(gridID, xsize-1);
-		  xinc   = gridInqXinc(gridID);
-		  fprintf(stdout, "%*s", nbyte0, "");
-		  fprintf(stdout, "%-9s : %g", xname, xfirst);
-		  if ( xsize > 1 )
-                    {
-                      fprintf(stdout, " to %g", xlast);
-                      if ( IS_NOT_EQUAL(xinc, 0) )
-                        fprintf(stdout, " by %g", xinc);
-                    }
-		  fprintf(stdout, " %s", xunits);
-		  if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
-		  fprintf(stdout, "\n");
-		}
+              xfirst = gridInqXval(gridID, 0);
+              xlast  = gridInqXval(gridID, xsize-1);
+              xinc   = gridInqXinc(gridID);
+              fprintf(stdout, "%*s", nbyte0, "");
+              fprintf(stdout, "%-9s : %g", xname, xfirst);
+              if ( xsize > 1 )
+                {
+                  fprintf(stdout, " to %g", xlast);
+                  if ( IS_NOT_EQUAL(xinc, 0) )
+                    fprintf(stdout, " by %g", xinc);
+                }
+              fprintf(stdout, " %s", xunits);
+              if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
+              fprintf(stdout, "\n");
 	    }
 
 	  if ( ysize > 0 && lycoord )
@@ -408,6 +399,112 @@ void printGridInfo(int vlistID)
         }
     }
 }
+
+static
+void printZaxisInfo(int vlistID)
+{
+  int nzaxis, index;
+  int zaxisID, zaxistype, levelsize, levelID;
+  int ltype;
+  double *levels = NULL;
+  char zaxisname[CDI_MAX_NAME], zname[CDI_MAX_NAME], zunits[CDI_MAX_NAME];
+
+  nzaxis = vlistNzaxis(vlistID);
+  for ( index = 0; index < nzaxis; index++)
+    {
+      double zfirst = 0, zlast = 0, zinc = 0;
+      zaxisID   = vlistZaxis(vlistID, index);
+      zaxistype = zaxisInqType(zaxisID);
+      ltype     = zaxisInqLtype(zaxisID);
+      levelsize = zaxisInqSize(zaxisID);
+      zaxisName(zaxistype, zaxisname);
+      zaxisInqName(zaxisID, zname);
+      zaxisInqUnits(zaxisID, zunits);
+      zunits[12] = 0;
+
+      if ( zaxistype == ZAXIS_GENERIC && ltype != 0 )
+        fprintf(stdout, "  %4d : %-12s (ltype=%3d) :", vlistZaxisIndex(vlistID, zaxisID)+1, zaxisname, ltype);
+      else
+        fprintf(stdout, "  %4d : %-24s :", vlistZaxisIndex(vlistID, zaxisID)+1, zaxisname);
+
+      fprintf(stdout, " levels=%d", levelsize);
+      fprintf(stdout, "\n");
+
+      levels = (double*) malloc(levelsize*sizeof(double));
+      zaxisInqLevels(zaxisID, levels);
+
+      if ( !(zaxistype == ZAXIS_SURFACE && levelsize == 1 && !(fabs(levels[0]) > 0)) )
+        {
+          zfirst = levels[0];
+          zlast  = levels[levelsize-1];
+          if ( levelsize > 2 )
+            {
+              zinc = (levels[levelsize-1] - levels[0]) / (levelsize-1);
+              for ( levelID = 2; levelID < levelsize; ++levelID )
+                if ( fabs(fabs(levels[levelID] - levels[levelID-1]) - zinc) > 0.001*zinc ) break;
+
+              if ( levelID < levelsize ) zinc = 0;
+            }
+
+          fprintf(stdout, "%33s : %g", zname, zfirst);
+          if ( levelsize > 1 )
+            {
+              fprintf(stdout, " to %g", zlast);
+              if ( IS_NOT_EQUAL(zinc, 0) )
+                fprintf(stdout, " by %g", zinc);
+            }
+          fprintf(stdout, " %s", zunits);
+          fprintf(stdout, "\n");
+        }
+
+      free(levels);
+
+      if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
+        {
+          double level1, level2;
+          fprintf(stdout, "%33s : ", "bounds");
+
+          level1 = zaxisInqLbound(zaxisID, 0);
+          level2 = zaxisInqUbound(zaxisID, 0);
+          fprintf(stdout, "%.9g-%.9g", level1, level2);
+          if ( levelsize > 1 )
+            {
+              level1 = zaxisInqLbound(zaxisID, levelsize-1);
+              level2 = zaxisInqUbound(zaxisID, levelsize-1);
+              fprintf(stdout, " to %.9g-%.9g", level1, level2);
+              if ( IS_NOT_EQUAL(zinc, 0) )
+                fprintf(stdout, " by %g", zinc);
+            }
+          fprintf(stdout, " %s", zunits);
+          fprintf(stdout, "\n");
+        }
+
+      if ( zaxistype == ZAXIS_REFERENCE )
+        {
+          int number   = zaxisInqNumber(zaxisID);
+
+          if ( number > 0 )
+            {
+              fprintf(stdout, "%33s : ", "zaxis");
+              fprintf(stdout, "number = %d\n", number);
+            }
+
+          char uuidOfVGrid[17];
+          zaxisInqUUID(zaxisID, uuidOfVGrid);
+          if ( uuidOfVGrid[0] != 0 )
+            {
+              char uuidOfVGridStr[37];
+              uuid2str(uuidOfVGrid, uuidOfVGridStr);
+              if ( uuidOfVGridStr[0] != 0  && strlen(uuidOfVGridStr) == 36 )
+                {
+                  fprintf(stdout, "%33s : ", "uuid");
+                  fprintf(stdout, "%s\n", uuidOfVGridStr);
+                }
+            }
+        }
+    }
+}
+
 /*
  * Local Variables:
  * c-file-style: "Java"

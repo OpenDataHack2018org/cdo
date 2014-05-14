@@ -29,8 +29,6 @@
 
 #include "printinfo.h"
 
-#define MAXCHARS 82
-
 const char * tunit2str(int tunits)
 {
   if      ( tunits == TUNIT_YEAR )    return ("years");
@@ -66,20 +64,14 @@ void *Sinfo(void *argument)
   int varID;
   int gridsize = 0;
   int gridID, zaxisID, code, tabnum, param;
-  int zaxistype, ltype;
   int vdate, vtime;
-  int nrecs, nvars, nzaxis, ntsteps;
-  int levelID, levelsize;
+  int nrecs, nvars, ntsteps;
+  int levelsize;
   int tsID, ntimeout;
   int tsteptype, taxisID;
-  int nbyte, nbyte0;
-  int index;
   char varname[CDI_MAX_NAME];
-  char longname[CDI_MAX_NAME];
-  char units[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  double level;
   char *modelptr, *instptr;
   int streamID = 0;
   int vlistID;
@@ -246,85 +238,15 @@ void *Sinfo(void *argument)
       fprintf(stdout, "   Grid coordinates");
       reset_text_color(stdout);
       fprintf(stdout, " :\n");
+
       printGridInfo(vlistID);
 
-      nzaxis = vlistNzaxis(vlistID);
       set_text_color(stdout, BRIGHT, BLACK);
       fprintf(stdout, "   Vertical coordinates");
       reset_text_color(stdout);
       fprintf(stdout, " :\n");
-      for ( index = 0; index < nzaxis; index++)
-	{
-	  zaxisID   = vlistZaxis(vlistID, index);
-	  zaxistype = zaxisInqType(zaxisID);
-	  ltype     = zaxisInqLtype(zaxisID);
-	  levelsize = zaxisInqSize(zaxisID);
-	  /* zaxisInqLongname(zaxisID, longname); */
-	  zaxisName(zaxistype, longname);
-	  longname[18] = 0;
-	  zaxisInqUnits(zaxisID, units);
-	  units[12] = 0;
-	  if ( zaxistype == ZAXIS_GENERIC && ltype != 0 )
-	    nbyte0    = fprintf(stdout, "  %4d : %-11s  (ltype=%3d) : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, ltype);
-	  else
-	    nbyte0    = fprintf(stdout, "  %4d : %-18s %5s : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, units);
-	  nbyte = nbyte0;
-	  for ( levelID = 0; levelID < levelsize; levelID++ )
-	    {
-	      if ( nbyte > MAXCHARS )
-		{
-		  fprintf(stdout, "\n");
-		  fprintf(stdout, "%*s", nbyte0, "");
-		  nbyte = nbyte0;
-		}
-	      level = zaxisInqLevel(zaxisID, levelID);
-	      nbyte += fprintf(stdout, "%.9g ", level);
-	    }
-	  fprintf(stdout, "\n");
-	  if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
-	    {
-	      double level1, level2;
-	      nbyte = nbyte0;
-	      fprintf(stdout, "%33s : ", "bounds");
-	      for ( levelID = 0; levelID < levelsize; levelID++ )
-		{
-		  if ( nbyte > MAXCHARS )
-		    {
-		      fprintf(stdout, "\n");
-		      fprintf(stdout, "%*s", nbyte0, "");
-		      nbyte = nbyte0;
-		    }
-		  level1 = zaxisInqLbound(zaxisID, levelID);
-		  level2 = zaxisInqUbound(zaxisID, levelID);
-		  nbyte += fprintf(stdout, "%.9g-%.9g ", level1, level2);
-		}
-	      fprintf(stdout, "\n");
-	    }
 
-          if ( zaxistype == ZAXIS_REFERENCE )
-            {
-              int number   = zaxisInqNumber(zaxisID);
-
-              if ( number > 0 )
-                {
-                  fprintf(stdout, "%33s : ", "zaxis");
-                  fprintf(stdout, "number = %d\n", number);
-                }
-
-              char uuidOfVGrid[17];
-              zaxisInqUUID(zaxisID, uuidOfVGrid);
-              if ( uuidOfVGrid[0] != 0 )
-                {
-                  char uuidOfVGridStr[37];
-                  uuid2str(uuidOfVGrid, uuidOfVGridStr);
-                  if ( uuidOfVGridStr[0] != 0  && strlen(uuidOfVGridStr) == 36 )
-                    {
-                      fprintf(stdout, "%33s : ", "uuid");
-                      fprintf(stdout, "%s\n", uuidOfVGridStr);
-                    }
-                }
-            }
-	}
+      printZaxisInfo(vlistID);
 
       taxisID = vlistInqTaxis(vlistID);
       ntsteps = vlistNtsteps(vlistID);
