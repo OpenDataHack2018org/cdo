@@ -1,0 +1,49 @@
+\chapter{\label{openmp}Parallelized operators}
+
+Some of the {\CDO} operators are parallelized with OpenMP.
+To use {\CDO} with multiple OpenMP threads, you have to set the number of threads with the option '-P'.
+Here is an example to distribute the bilinear interpolation on 8 OpenMP threads:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor2}, basicstyle=\ttfamily, columns=flexible]
+   cdo -P 8  remapbil,targetgrid  ifile  ofile
+\end{lstlisting}
+The following {\CDO} operators are parallelized with OpenMP:
+
+\begin{tabular}[t]{|l|>{\columncolor{pcolor1}}l|l|}
+\hline
+\rowcolor{pcolor2}
+%\cellcolor{pcolor2}
+{\bf Module}     &  {\bf Operator} & {\bf Description} \\ \hline
+Detrend      & detrend         & Detrend \\ \hline
+Ensstat      & ensmin          & Ensemble minimum \\ \hline
+Ensstat      & ensmax          & Ensemble maximum \\ \hline
+Ensstat      & enssum          & Ensemble sum \\ \hline
+Ensstat      & ensmean         & Ensemble mean \\ \hline
+Ensstat      & ensavg          & Ensemble average \\ \hline
+Ensstat      & ensvar          & Ensemble variance \\ \hline
+Ensstat      & ensstd          & Ensemble standard deviation \\ \hline
+Ensstat      & enspctl         & Ensemble percentiles \\ \hline
+Fourier      & fourier         & Fourier transformation \\ \hline
+Genweights   & genbil          & Generate bilinear interpolation weights \\ \hline
+Genweights   & genbic          & Generate bicubic interpolation weights \\ \hline
+Genweights   & gendis          & Generate distance-weighted average remap weights \\ \hline
+Genweights   & gennn           & Generate nearest neighbor remap weights \\ \hline
+Genweights   & gencon          & Generate 1st order conservative remap weights \\ \hline
+Genweights   & gencon2         & Generate 2nd order conservative remap weights \\ \hline
+Genweights   & genlaf          & Generate largest area fraction remap weights \\ \hline
+Gridboxstat  & gridboxmin      & Gridbox minimum \\ \hline
+Gridboxstat  & gridboxmax      & Gridbox maximum \\ \hline
+Gridboxstat  & gridboxsum      & Gridbox sum \\ \hline
+Gridboxstat  & gridboxmean     & Gridbox mean \\ \hline
+Gridboxstat  & gridboxavg      & Gridbox average \\ \hline
+Gridboxstat  & gridboxvar      & Gridbox variance \\ \hline
+Gridboxstat  & gridboxstd      & Gridbox standard deviation \\ \hline
+Remapeta     & remapeta        & Remap vertical hybrid level \\ \hline
+Remap        & remapbil        & Bilinear interpolation \\ \hline
+Remap        & remapbic        & Bicubic interpolation \\ \hline
+Remap        & remapdis        & Distance-weighted average remapping \\ \hline
+Remap        & remapnn         & Nearest neighbor remapping \\ \hline
+Remap        & remapcon        & First order conservative remapping \\ \hline
+Remap        & remapcon2       & Second order conservative remapping \\ \hline
+Remap        & remaplaf        & Largest area fraction remapping \\ \hline
+
+\end{tabular}
