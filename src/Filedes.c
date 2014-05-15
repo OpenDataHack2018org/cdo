@@ -84,7 +84,9 @@ static
 void partab(FILE *fp, int vlistID, int option)
 {
   int varID, code, tabnum, tableID, datatype = -1;
+  int param;
   char pstr[32];
+  char paramstr[32];
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
   int natts;
   int nvars;
@@ -135,6 +137,7 @@ void partab(FILE *fp, int vlistID, int option)
       varlongname[0] = 0;
       varunits[0]    = 0;
       code     = vlistInqVarCode(vlistID, varID);
+      param    = vlistInqVarParam(vlistID, varID);
       tableID  = vlistInqVarTable(vlistID, varID);
       tabnum   = tableInqNum(tableID);
       missval  = vlistInqVarMissval(vlistID, varID);
@@ -149,6 +152,11 @@ void partab(FILE *fp, int vlistID, int option)
       fprintf(fp, "  name=%s\n", varname);
       if ( code   > 0 ) fprintf(fp, "  code=%d\n", code);
       if ( tabnum > 0 ) fprintf(fp, "  table=%d\n", tabnum);
+      if ( code   > 0 )
+	{
+	  cdiParamToString(param, paramstr, sizeof(paramstr));
+	  fprintf(fp, "  param=%s\n", paramstr);
+	}
       if ( strlen(varstdname) )
 	fprintf(fp, "  standard_name=%s\n", varstdname);
       if ( strlen(varlongname) )
