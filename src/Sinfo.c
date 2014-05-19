@@ -44,7 +44,7 @@ const char * tunit2str(int tunits)
 }
 
 
-const char * calendar2str(int calendar)
+const char* calendar2str(int calendar)
 {
   if      ( calendar == CALENDAR_STANDARD )  return ("standard");
   else if ( calendar == CALENDAR_PROLEPTIC ) return ("proleptic_gregorian");
@@ -52,6 +52,22 @@ const char * calendar2str(int calendar)
   else if ( calendar == CALENDAR_365DAYS )   return ("365_day");
   else if ( calendar == CALENDAR_366DAYS )   return ("366_day");
   else                                       return ("unknown");
+}
+
+static
+void limit_string_length(char* string)
+{
+  size_t len = strlen(string);
+
+  if ( len > 10 )
+    {
+      for ( size_t i = 3; i < len; ++i )
+	if ( string[i] == ' ' )
+	  {
+	    string[i] = 0;
+	    break;
+	  }
+    }
 }
 
 
@@ -68,6 +84,7 @@ void *Sinfo(void *argument)
   int nvars, ntsteps;
   int levelsize;
   int tsteptype, taxisID;
+  char tmpname[CDI_MAX_NAME];
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
@@ -139,27 +156,17 @@ void *Sinfo(void *argument)
 	  set_text_color(stdout, RESET, BLUE);
 	  /* institute info */
 	  instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
-	  if ( instptr )
-	    fprintf(stdout, "%-8s ", instptr);
-	  else
-	    fprintf(stdout, "unknown  ");
+	  strcpy(tmpname, "unknown");
+	  if ( instptr ) strcpy(tmpname, instptr);
+	  limit_string_length(tmpname);
+	  fprintf(stdout, "%-8s ", tmpname);
 
 	  /* source info */
 	  modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
-	  if ( modelptr )
-	    {
-	      size_t len = strlen(modelptr);
-	      if ( len > 10 )
-		for ( size_t i = 3; i < len; ++i )
-		  if ( modelptr[i] == ' ' )
-		    {
-		      modelptr[i] = 0;
-		      break;
-		    }
-	      fprintf(stdout, "%-8s ", modelptr);
-	    }
-	  else
-	    fprintf(stdout, "unknown  ");
+	  strcpy(tmpname, "unknown");
+	  if ( modelptr ) strcpy(tmpname, modelptr);
+	  limit_string_length(tmpname);
+	  fprintf(stdout, "%-8s ", tmpname);
 
 	  /* tsteptype */
 	  tsteptype = vlistInqVarTsteptype(vlistID, varID);
