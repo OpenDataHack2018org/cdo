@@ -107,8 +107,8 @@ void fft2(double *real, double *imag, int n, int isign)
   if ( isign == -1 )
     for( i =0; i<n; i++)
       {
-        real[i]/=n;
-        imag[i]/=n;
+        real[i] /= n;
+        imag[i] /= n;
       }
 }
 
@@ -124,13 +124,26 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
   
   dimin = nts*fmin / fdata;
   dimax = nts*fmax / fdata;
- 
+  /* 2014/05/19 Uwe Schulzweida
+  dimin = 0;
+  dimax = nts/2.;
+  if ( fmin > 0 ) dimin = nts / ( fmin * fdata);
+  if ( fmax > 0 ) dimax = nts / ( fmax * fdata);
+  */
   imin = dimin<0 ? 0 : (int)floor(dimin);  
   imax = ceil(dimax)>nts/2 ? nts/2 : (int) ceil(dimax);  
+
+  // printf("%d %d %g %g %g %g %g\n", imin, imax, dimin, dimax, fdata, fmin, fmax);
   
   fmasc[imin] = 1;
   for ( i = imin+1; i <= imax; i++ )  
     fmasc[i] = fmasc[nts-i] = 1; 
+  /* 2014/05/19 Uwe Schulzweida
+  fmasc[imin] = 1;
+  fmasc[nts-1] = 1;
+  for ( i = imin+1; i <= imax; i++ )  
+    fmasc[i] = fmasc[nts-1-i] = 1;
+  */
 }
 
 #if defined(HAVE_LIBFFTW3) 
@@ -286,14 +299,13 @@ void *Filter(void *argument)
               printf("    %4.4i-%2.2i-%2.2i\n",     year0,month0,day0);*/
               getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod0, &incunit0);
               incperiod = incperiod0; 
-              if ( incperiod == 0 ) cdoAbort("Time step must be different from zero\n");
+              if ( incperiod == 0 ) cdoAbort("Time step must be different from zero!");
               incunit = incunit0;
               if ( cdoVerbose ) cdoPrint("Time step %i %s", incperiod, tunits[incunit]);
               fdata = 1.*iunits[incunit]/incperiod;
             }
           else 
-            getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod, &incunit);  
-        
+            getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod, &incunit);        
 
 	  if ( incunit0 < 4 && month == 2 && day == 29 && 
 	       ( day0 != day || month0 != month || year0 != year ) )
@@ -303,7 +315,7 @@ void *Filter(void *argument)
 	    }
 
           if ( ! ( incperiod == incperiod0 && incunit == incunit0 ) )
-            cdoWarning("Time increment in step %i (%d%s) differs from step 0 (%d%s)",
+            cdoWarning("Time increment in step %i (%d%s) differs from step 1 (%d%s)!",
 		       tsID, incperiod, tunits[incunit], incperiod0, tunits[incunit0]);        
         }
       tsID++;
@@ -370,7 +382,7 @@ void *Filter(void *argument)
     }      
   }
   
-  create_fmasc(nts, fdata, fmin, fmax, fmasc); 
+  create_fmasc(nts, fdata, fmin, fmax, fmasc);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -457,7 +469,7 @@ void *Filter(void *argument)
   
   streamClose(streamID2);
   streamClose(streamID1);
-  
+
   cdoFinish();
   
   return (0);
