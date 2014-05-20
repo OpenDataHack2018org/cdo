@@ -630,7 +630,7 @@ int checkStreamCnt(void)
   if ( streamOutCnt == -1 )
     {
       streamOutCnt = Process[processID].streamCnt - streamInCnt;
-      if ( streamInCnt < 1 ) cdoAbort("Output streams missing!");
+      if ( streamOutCnt < 1 ) cdoAbort("Output streams missing!");
     }
   // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
 
