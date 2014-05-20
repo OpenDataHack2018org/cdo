@@ -829,6 +829,8 @@ void *Select(void *argument)
 	      copytimestep = FALSE;
 	      timestep = tsID1 + 1;
 
+	      if ( operatorID == SELECT && npar_timestep > 0 && timestep > par_timestep[npar_timestep-1] ) break;
+
 	      vdate = taxisInqVdate(taxisID1);
 	      vtime = taxisInqVtime(taxisID1);
 	      cdiDecodeDate(vdate, &year, &month, &day);
