@@ -763,24 +763,24 @@ void *Select(void *argument)
 
 	  //if ( cdoVerbose ) vlistPrint(vlistID2);
 
-	  nvars2 = vlistNvars(vlistID2);
-
-	  for ( varID = 0; varID < nvars2; ++varID )
-	    if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
-	  if ( varID == nvars2 ) vlistDefNtsteps(vlistID2, 0);
-
 	  taxisID2 = taxisDuplicate(taxisID1);
 	  vlistDefTaxis(vlistID2, taxisID2);
 
 	  ntsteps = vlistNtsteps(vlistID1);
 
-	  if ( ntsteps == 1 )
+	  nvars2 = vlistNvars(vlistID2);
+
+	  if ( ntsteps == 1 && nfiles == 1 )
 	    {
 	      for ( varID = 0; varID < nvars2; ++varID )
-		if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
-	      
+		if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
+
 	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
+
+	  if ( operatorID == SELECT && npar_timestep == 1 ) ntsteps = 1;
+	  
+	  if ( ntsteps == 0 || ntsteps == 1 ) vlistDefNtsteps(vlistID2, ntsteps);
 
 	  if ( ntsteps == 0 && nfiles > 1 )
 	    {	      
