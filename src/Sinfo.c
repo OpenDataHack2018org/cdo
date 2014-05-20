@@ -298,7 +298,7 @@ void *Sinfo(void *argument)
 
 	  set_text_color(stdout, RESET, MAGENTA);
 
-	  printTimesteps(streamID, taxisID);
+	  printTimesteps(streamID, taxisID, cdoVerbose);
 
 	  reset_text_color(stdout);
 	  fprintf(stdout, "\n");

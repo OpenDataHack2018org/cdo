@@ -538,7 +538,7 @@ int printDot(int ndotout, int *nfact, int *ncout)
 }
 
 static
-void printTimesteps(int streamID, int taxisID)
+void printTimesteps(int streamID, int taxisID, int verbose)
 {
   int nrecs;
   int vdate, vtime;
@@ -559,12 +559,13 @@ void printTimesteps(int streamID, int taxisID)
   int ncout = 0;
   int nfact = 1;
   int tsID = 0;
+
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
       vdate = taxisInqVdate(taxisID);
       vtime = taxisInqVtime(taxisID);
 
-      if ( tsID < NUM_TIMESTEP )
+      if ( verbose || tsID < NUM_TIMESTEP )
 	{
 	  ntimeout = printDateTime(ntimeout, vdate, vtime);
 	}
