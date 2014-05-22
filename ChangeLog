@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-05-22  Uwe Schulzweida
+
+	* remap.h: define M_PI [Bug #4845]
+
 2014-05-16  Uwe Schulzweida
 
 	* pstream.h: added include of sys/types [Bug #4810]

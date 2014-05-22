@@ -43,7 +43,7 @@ case "${HOSTNAME}" in
                     --with-udunits2=$HOME/local/udunits-2.1.24 \
                     --with-proj=/opt/local \
                     --with-curl=/opt/local \
-	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -std=c99 -pedantic -O3 -march=native" \
                     LIBS="-L/opt/local/lib -lopenjpeg"
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9 

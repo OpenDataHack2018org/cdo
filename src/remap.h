@@ -7,6 +7,10 @@
 
 #include <math.h>
 
+#ifndef  M_PI
+#define  M_PI        3.14159265358979323846  /* pi */
+#endif
+
 #define  PI       M_PI
 #define  PI2      2.0*PI
 #define  PIH      0.5*PI
@@ -25,8 +29,8 @@
 #define  REMAP_GRID_TYPE_CURVE2D   2
 #define  REMAP_GRID_TYPE_UNSTRUCT  3
 
-#define  REMAP_GRID_BASIS_SRC  1
-#define  REMAP_GRID_BASIS_TGT  2
+#define  REMAP_GRID_BASIS_SRC      1
+#define  REMAP_GRID_BASIS_TGT      2
 
 #define  RESTR_TYPE  int  /* restrict data types: 0 -> double, float; 1 -> int */
 
