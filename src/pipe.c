@@ -20,6 +20,10 @@
 #  include "config.h"
 #endif
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600 /* struct timespec */
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <time.h> // time()

@@ -8,12 +8,12 @@
 #include <math.h>
 
 #ifndef  M_PI
-#define  M_PI        3.14159265358979323846  /* pi */
+#define  M_PI        3.14159265358979323846264338327950288  /* pi */
 #endif
 
 #define  PI       M_PI
-#define  PI2      2.0*PI
-#define  PIH      0.5*PI
+#define  PI2      (2.0*PI)
+#define  PIH      (0.5*PI)
 
 #define  ZERO     0.0
 #define  ONE      1.0
