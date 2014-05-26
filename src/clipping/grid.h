@@ -48,6 +48,14 @@
 #include "math.h"
 #include "grid_cell.h"
 
+#ifndef  M_PI
+#define  M_PI        3.14159265358979323846264338327950288  /* pi */
+#endif
+
+#ifndef  M_PI_2
+#define  M_PI_2      1.57079632679489661923132169163975144  /* pi/2 */
+#endif
+
 #define EARTH_RADIUS 6371.2290
 
 static double const EarthRadius  = EARTH_RADIUS;
