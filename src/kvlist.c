@@ -46,6 +46,10 @@
     valid_max:         1.119e+05
 */
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600 /* strdup */
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

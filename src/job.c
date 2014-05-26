@@ -2,6 +2,10 @@
 #  include "config.h"
 #endif
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600 /* gethostname */
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>

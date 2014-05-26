@@ -15,6 +15,10 @@
   GNU General Public License for more details.
 */
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600 /* ftello */
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>   /* tolower */
