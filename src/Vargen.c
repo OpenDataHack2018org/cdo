@@ -89,7 +89,7 @@ std_atm_pressure(double height)
 
 void *Vargen(void *argument)
 {
-  int RANDOM, SINCOS, CONST, FOR, TOPO, TEMP, MASK, STDATM;
+  int RANDOM, SINCOS, COSHILL, CONST, FOR, TOPO, TEMP, MASK, STDATM;
   int operatorID;
   int streamID;
   int nvars, ntimesteps, nlevels = 1;
@@ -105,14 +105,15 @@ void *Vargen(void *argument)
 
   cdoInitialize(argument);
 
-  RANDOM = cdoOperatorAdd("random", 0, 0, "grid description file or name, <seed>");
-  SINCOS = cdoOperatorAdd("sincos", 0, 0, "grid description file or name");
-  CONST  = cdoOperatorAdd("const",  0, 0, "constant value, grid description file or name");
-  FOR    = cdoOperatorAdd("for",    0, 0, "start, end, <increment>");
-  TOPO   = cdoOperatorAdd("topo",   0, 0, NULL);
-  TEMP   = cdoOperatorAdd("temp",   0, 0, NULL);
-  MASK   = cdoOperatorAdd("mask",   0, 0, NULL);
-  STDATM = cdoOperatorAdd("stdatm", 0, 0, "levels");
+  RANDOM  = cdoOperatorAdd("random",  0, 0, "grid description file or name, <seed>");
+  SINCOS  = cdoOperatorAdd("sincos",  0, 0, "grid description file or name");
+  COSHILL = cdoOperatorAdd("coshill", 0, 0, "grid description file or name");
+  CONST   = cdoOperatorAdd("const",   0, 0, "constant value, grid description file or name");
+  FOR     = cdoOperatorAdd("for",     0, 0, "start, end, <increment>");
+  TOPO    = cdoOperatorAdd("topo",    0, 0, NULL);
+  TEMP    = cdoOperatorAdd("temp",    0, 0, NULL);
+  MASK    = cdoOperatorAdd("mask",    0, 0, NULL);
+  STDATM  = cdoOperatorAdd("stdatm",  0, 0, "levels");
 
   operatorID = cdoOperatorID();
 
@@ -133,7 +134,7 @@ void *Vargen(void *argument)
         }
       srand(seed);
     }
-  else if ( operatorID == SINCOS )
+  else if ( operatorID == SINCOS || operatorID == COSHILL )
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(1);
@@ -261,7 +262,7 @@ void *Vargen(void *argument)
   taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
-  if ( operatorID == RANDOM || operatorID == SINCOS || operatorID == CONST || operatorID == TOPO ||
+  if ( operatorID == RANDOM || operatorID == SINCOS || operatorID == COSHILL || operatorID == CONST || operatorID == TOPO ||
        operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
@@ -305,7 +306,7 @@ void *Vargen(void *argument)
                   for ( i = 0; i < gridsize; i++ )
                     array[i] = rand()/(RAND_MAX+1.0);
                 }
-              else if ( operatorID == SINCOS )
+              else if ( operatorID == SINCOS || operatorID == COSHILL )
                 {
 		  double *xvals = (double*) malloc(gridsize*sizeof(double));
 		  double *yvals = (double*) malloc(gridsize*sizeof(double));
@@ -325,9 +326,15 @@ void *Vargen(void *argument)
 		  gridInqYunits(gridID, units);
 		  grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-                  for ( i = 0; i < gridsize; i++ )
+		  if ( operatorID == SINCOS )
 		    {
-		      array[i] = cos(1.0 * xvals[i]) * sin(2.0 * yvals[i]);
+		      for ( i = 0; i < gridsize; i++ )
+			array[i] = cos(1.0 * xvals[i]) * sin(2.0 * yvals[i]);
+		    }
+		  else if ( operatorID == COSHILL )
+		    {		     
+		      for ( i = 0; i < gridsize; i++ )
+			array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 		    }
 
 		  free(xvals);
