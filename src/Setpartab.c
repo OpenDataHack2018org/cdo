@@ -173,7 +173,7 @@ void *get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
 
 typedef struct
 {
-  int delete;
+  int remove;
   // missing value
   int changemissval;
   double missval_old;
@@ -281,7 +281,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   int nml_cell_methods, nml_cell_measures;
   int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
   int locc, i;
-  int code, out_code, table, ltype, delete;
+  int code, out_code, table, ltype, remove;
   int nml_index = 0;
   int codenum, tabnum, levtype, param;
   int varID, tableID;
@@ -314,7 +314,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_out_code        = namelistAdd(nml, "out_code",        NML_INT,  0, &out_code, 1);
       nml_table           = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
       nml_ltype           = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
-      nml_delete          = namelistAdd(nml, "delete",          NML_INT,  0, &delete, 1);
+      nml_delete          = namelistAdd(nml, "delete",          NML_INT,  0, &remove, 1);
       nml_missval         = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
       nml_factor          = namelistAdd(nml, "factor",          NML_FLT,  0, &factor, 1);
       nml_valid_min       = namelistAdd(nml, "valid_min",       NML_FLT,  0, &valid_min, 1);
@@ -432,7 +432,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		  if ( nml->entry[nml_comment]->occ  ) defineVarAttText(vlistID2, varID, "comment", comment);
 		  if ( nml->entry[nml_cell_methods]->occ  )  defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
 		  if ( nml->entry[nml_cell_measures]->occ  ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
-		  if ( nml->entry[nml_delete]->occ && delete == 1 ) vars[varID].delete = TRUE;
+		  if ( nml->entry[nml_delete]->occ && remove == 1 ) vars[varID].remove = TRUE;
 		  if ( nml->entry[nml_datatype]->occ )
 		    {
 		      int datatype = str2datatype(datatypestr);
@@ -674,7 +674,7 @@ void *Setpartab(void *argument)
       read_partab(ptmode, nvars, vlistID2, vars);
 
       for ( varID = 0; varID < nvars; ++varID )
-	if ( vars[varID].delete ) break;
+	if ( vars[varID].remove ) break;
 
       if ( varID < nvars ) delvars = TRUE;
 
@@ -693,7 +693,7 @@ void *Setpartab(void *argument)
 		{
 		  vlistDefFlag(vlistID1, varID, levID, TRUE);
 		  vlistDefFlag(vlistID2, varID, levID, TRUE);
-		  if ( vars[varID].delete )
+		  if ( vars[varID].remove )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, FALSE);
 		      vlistDefFlag(vlistID2, varID, levID, FALSE);
@@ -739,7 +739,7 @@ void *Setpartab(void *argument)
 
 	  if ( delvars )
 	    {
-	      if ( vars[varID].delete ) continue;
+	      if ( vars[varID].remove ) continue;
 
 	      if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
 		{
