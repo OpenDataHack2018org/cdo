@@ -205,10 +205,11 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
          int result = 1;
          double angle_cd = -1;
          double dot_cd = c[0]*d[0] + c[1]*d[1] + c[2]*d[2];
+	 double an[3] = {-a[0], -a[1], -a[2]};
 
          if (vector_is_between(c, d, a, &angle_cd, dot_cd))
             result |= 1 << 2;
-         if (vector_is_between(c, d, (double[]){-a[0], -a[1], -a[2]}, &angle_cd,
+         if (vector_is_between(c, d, an, &angle_cd,
                                dot_cd)) result |= 1 << 3;
 
          return result;
@@ -228,10 +229,11 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
          double angle_ab = -1;
          double dot_ab = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+	 double cn[3] = {-c[0], -c[1], -c[2]};
 
          if (vector_is_between(a, b, c, &angle_ab, dot_ab))
             result |= 1 << 0;
-         if (vector_is_between(a, b, (double[]){-c[0], -c[1], -c[2]}, &angle_ab,
+         if (vector_is_between(a, b, cn, &angle_ab,
                                dot_ab)) result |= 1 << 1;
 
          return result;
