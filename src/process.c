@@ -52,7 +52,7 @@ typedef struct {
   const char *name;
   const char *enter;
 }
-operator_t;
+oper_t;
 
 typedef struct {
 #if defined(HAVE_LIBPTHREAD)
@@ -80,7 +80,7 @@ typedef struct {
   char       *oargv[MAX_OARGC];
   char        prompt[64];
   short       noper;
-  operator_t  operator[MAX_OPERATOR];
+  oper_t      oper[MAX_OPERATOR];
 }
 process_t;
 
@@ -902,10 +902,10 @@ int cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
 
   if ( operID < MAX_OPERATOR )
     {
-      Process[processID].operator[operID].f1     = f1;
-      Process[processID].operator[operID].f2     = f2;
-      Process[processID].operator[operID].name   = name;
-      Process[processID].operator[operID].enter  = enter;
+      Process[processID].oper[operID].f1     = f1;
+      Process[processID].oper[operID].f2     = f2;
+      Process[processID].oper[operID].name   = name;
+      Process[processID].oper[operID].enter  = enter;
 
       Process[processID].noper++;
     }
@@ -926,8 +926,8 @@ int cdoOperatorID(void)
   if ( Process[processID].noper > 0 )
     {
       for ( operID = 0; operID < Process[processID].noper; operID++ )
-	if ( Process[processID].operator[operID].name )
-	  if ( strcmp(Process[processID].operatorName, Process[processID].operator[operID].name) == 0 ) break;
+	if ( Process[processID].oper[operID].name )
+	  if ( strcmp(Process[processID].operatorName, Process[processID].oper[operID].name) == 0 ) break;
 
       if ( operID == Process[processID].noper )
 	cdoAbort("Operator not callable by this name!");
@@ -945,7 +945,7 @@ int cdoOperatorF1(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].operator[operID].f1);
+  return (Process[processID].oper[operID].f1);
 }
 
 
@@ -953,7 +953,7 @@ int cdoOperatorF2(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].operator[operID].f2);
+  return (Process[processID].oper[operID].f2);
 }
 
 
@@ -961,7 +961,7 @@ const char *cdoOperatorName(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].operator[operID].name);
+  return (Process[processID].oper[operID].name);
 }
 
 
@@ -969,7 +969,7 @@ const char *cdoOperatorEnter(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].operator[operID].enter);
+  return (Process[processID].oper[operID].enter);
 }
 
 
