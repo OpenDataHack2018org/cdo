@@ -715,22 +715,22 @@ static void copy_point_list(struct point_list in, struct point_list * out) {
 
   if (curr == NULL) return;
 
-  struct point_list_element * new = get_free_point_list_element(out);
-  out->first = new;
-  *new = *curr;
+  struct point_list_element * newelem = get_free_point_list_element(out);
+  out->first = newelem;
+  *newelem = *curr;
   curr = curr->next;
 
   do {
 
-    new->next = get_free_point_list_element(out);
-    new = new->next;    
-    *new = *curr;
+    newelem->next = get_free_point_list_element(out);
+    newelem = newelem->next;    
+    *newelem = *curr;
     curr = curr->next;
     
   } while (curr != in.first);
 
-  new->next = out->first;
-  out->last = new;
+  newelem->next = out->first;
+  out->last = newelem;
 }
 
 void cell_clipping(unsigned N,
