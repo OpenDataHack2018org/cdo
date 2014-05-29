@@ -1256,96 +1256,95 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      lrevers = TRUE;
 	    }
 
-          begseg[0] = beglat;
-          begseg[1] = beglon;
-          lbegin = TRUE;
-
           /*
 	    If this is a constant-longitude segment, skip the rest 
 	    since the line integral contribution will be ZERO.
           */
-          if ( IS_NOT_EQUAL(endlon, beglon) )
+          if ( IS_EQUAL(endlon, beglon) ) continue;
+
+          begseg[0] = beglat;
+          begseg[1] = beglon;
+          lbegin = TRUE;
+
+	  num_subseg = 0;
+	  /*
+	    Integrate along this segment, detecting intersections 
+	    and computing the line integral for each sub-segment
+	  */
+	  while ( IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon) )
 	    {
-	      num_subseg = 0;
-	      /*
-		Integrate along this segment, detecting intersections 
-		and computing the line integral for each sub-segment
-	      */
-	      while ( IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon) )
+	      /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
+	      num_subseg++;
+	      if ( num_subseg >= max_subseg )
+		cdoAbort("Integration stalled: num_subseg exceeded limit (grid1[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+			 src_grid_add, beglon, endlon, beglat, endlat);
+
+	      /* Uwe Schulzweida: skip very small regions */
+	      if ( num_subseg%1000 == 0 )
 		{
-		  /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
-		  num_subseg++;
-		  if ( num_subseg >= max_subseg )
-		    cdoAbort("Integration stalled: num_subseg exceeded limit (grid1[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
-			     src_grid_add, beglon, endlon, beglat, endlat);
-
-		  /* Uwe Schulzweida: skip very small regions */
-		  if ( num_subseg%1000 == 0 )
+		  if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
 		    {
-		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
-			{
-			  if ( cdoVerbose )
-			    cdoPrint("Skip very small region (grid1[%d]): lon=%g dlon=%g lat=%g dlat=%g",
-				     src_grid_add, beglon, endlon-beglon, beglat, endlat-beglat);
-			  break;
-			}
+		      if ( cdoVerbose )
+			cdoPrint("Skip very small region (grid1[%d]): lon=%g dlon=%g lat=%g dlat=%g",
+				 src_grid_add, beglon, endlon-beglon, beglat, endlat-beglat);
+		      break;
 		    }
+		}
 
-		  /* Find next intersection of this segment with a gridline on grid 2. */
+	      /* Find next intersection of this segment with a gridline on grid 2. */
 
-		  intersection(&tgt_grid_add, &intrsct_lat, &intrsct_lon, &lcoinc,
-			       beglat, beglon, endlat, endlon, begseg, 
-			       lbegin, lrevers,
-                               num_srch_cells, srch_corners, srch_add,
-			       srch_corner_lat, srch_corner_lon,
-			       &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
-			       &luse_last, &intrsct_x, &intrsct_y,
-			       &avoid_pole_count, &avoid_pole_offset);
+	      intersection(&tgt_grid_add, &intrsct_lat, &intrsct_lon, &lcoinc,
+			   beglat, beglon, endlat, endlon, begseg, 
+			   lbegin, lrevers,
+			   num_srch_cells, srch_corners, srch_add,
+			   srch_corner_lat, srch_corner_lon,
+			   &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
+			   &luse_last, &intrsct_x, &intrsct_y,
+			   &avoid_pole_count, &avoid_pole_offset);
 
-		  lbegin = FALSE;
+	      lbegin = FALSE;
 
-		  /* Compute line integral for this subsegment. */
+	      /* Compute line integral for this subsegment. */
 
-		  if ( tgt_grid_add != -1 )
-		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-				  src_grid->cell_center_lon[src_grid_add], tgt_grid->cell_center_lon[tgt_grid_add]);
-		  else
-		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-				  src_grid->cell_center_lon[src_grid_add], src_grid->cell_center_lon[src_grid_add]);
+	      if ( tgt_grid_add != -1 )
+		line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
+			      src_grid->cell_center_lon[src_grid_add], tgt_grid->cell_center_lon[tgt_grid_add]);
+	      else
+		line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
+			      src_grid->cell_center_lon[src_grid_add], src_grid->cell_center_lon[src_grid_add]);
 
-		  /* If integrating in reverse order, change sign of weights */
+	      /* If integrating in reverse order, change sign of weights */
 
-		  if ( lrevers ) for ( k = 0; k < 6; ++k ) weights[k] = -weights[k];
+	      if ( lrevers ) for ( k = 0; k < 6; ++k ) weights[k] = -weights[k];
 
-		  /*
-		    Store the appropriate addresses and weights. 
-		    Also add contributions to cell areas and centroids.
-		  */
-		  if ( tgt_grid_add != -1 )
-		    if ( src_grid->mask[src_grid_add] )
-		      {
+	      /*
+		Store the appropriate addresses and weights. 
+		Also add contributions to cell areas and centroids.
+	      */
+	      if ( tgt_grid_add != -1 )
+		if ( src_grid->mask[src_grid_add] )
+		  {
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
-			{
-			  if ( remap_store_link_fast )
-			    store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
-			  else
-			    store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
+		    {
+		      if ( remap_store_link_fast )
+			store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
+		      else
+			store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
 
-			  tgt_grid->cell_frac[tgt_grid_add] += weights[3];
-			}
-			src_grid->cell_frac[src_grid_add] += weights[0];
-		      }
+		      tgt_grid->cell_frac[tgt_grid_add] += weights[3];
+		    }
+		    src_grid->cell_frac[src_grid_add] += weights[0];
+		  }
 
-		  src_grid->cell_area[src_grid_add] += weights[0];
-		  src_centroid_lat[src_grid_add] += weights[1];
-		  src_centroid_lon[src_grid_add] += weights[2];
+	      src_grid->cell_area[src_grid_add] += weights[0];
+	      src_centroid_lat[src_grid_add] += weights[1];
+	      src_centroid_lon[src_grid_add] += weights[2];
 
-		  /* Reset beglat and beglon for next subsegment. */
-		  beglat = intrsct_lat;
-		  beglon = intrsct_lon;
-		}
+	      /* Reset beglat and beglon for next subsegment. */
+	      beglat = intrsct_lat;
+	      beglon = intrsct_lon;
 	    }
           /* End of segment */
         }
@@ -1485,99 +1484,98 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      lrevers = TRUE;
 	    }
 
-          begseg[0] = beglat;
-          begseg[1] = beglon;
-          lbegin = TRUE;
-
           /*
 	    If this is a constant-longitude segment, skip the rest 
 	    since the line integral contribution will be ZERO.
           */
-          if ( IS_NOT_EQUAL(endlon, beglon) )
+          if ( IS_EQUAL(endlon, beglon) ) continue;
+
+          begseg[0] = beglat;
+          begseg[1] = beglon;
+          lbegin = TRUE;
+
+	  num_subseg = 0;
+	  /*
+	    Integrate along this segment, detecting intersections 
+	    and computing the line integral for each sub-segment
+	  */
+	  while ( IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon) )
 	    {
-	      num_subseg = 0;
-	      /*
-		Integrate along this segment, detecting intersections 
-		and computing the line integral for each sub-segment
-	      */
-	      while ( IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon) )
+	      /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
+	      num_subseg++;
+	      if ( num_subseg >= max_subseg )
+		cdoAbort("Integration stalled: num_subseg exceeded limit (grid2[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+			 tgt_grid_add, beglon, endlon, beglat, endlat);
+
+	      /* Uwe Schulzweida: skip very small regions */
+	      if ( num_subseg%1000 == 0 )
 		{
-		  /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
-		  num_subseg++;
-		  if ( num_subseg >= max_subseg )
-		    cdoAbort("Integration stalled: num_subseg exceeded limit (grid2[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
-			     tgt_grid_add, beglon, endlon, beglat, endlat);
-
-		  /* Uwe Schulzweida: skip very small regions */
-		  if ( num_subseg%1000 == 0 )
+		  if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
 		    {
-		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
-			{
-			  if ( cdoVerbose )
-			    cdoPrint("Skip very small region (grid2[%d]): lon=%g dlon=%g lat=%g dlat=%g",
-				     tgt_grid_add, beglon, endlon-beglon, beglat, endlat-beglat);
-			  break;
-			}
+		      if ( cdoVerbose )
+			cdoPrint("Skip very small region (grid2[%d]): lon=%g dlon=%g lat=%g dlat=%g",
+				 tgt_grid_add, beglon, endlon-beglon, beglat, endlat-beglat);
+		      break;
 		    }
+		}
 
-		  /* Find next intersection of this segment with a gridline on grid 2. */
+	      /* Find next intersection of this segment with a gridline on grid 2. */
 
-		  intersection(&src_grid_add, &intrsct_lat, &intrsct_lon, &lcoinc,
-			       beglat, beglon, endlat, endlon, begseg,
-			       lbegin, lrevers,
-                               num_srch_cells, srch_corners, srch_add,
-			       srch_corner_lat, srch_corner_lon,
-			       &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
-			       &luse_last, &intrsct_x, &intrsct_y,
-			       &avoid_pole_count, &avoid_pole_offset);
+	      intersection(&src_grid_add, &intrsct_lat, &intrsct_lon, &lcoinc,
+			   beglat, beglon, endlat, endlon, begseg,
+			   lbegin, lrevers,
+			   num_srch_cells, srch_corners, srch_add,
+			   srch_corner_lat, srch_corner_lon,
+			   &last_loc, &lthresh, &intrsct_lat_off, &intrsct_lon_off,
+			   &luse_last, &intrsct_x, &intrsct_y,
+			   &avoid_pole_count, &avoid_pole_offset);
 
-		  lbegin = FALSE;
+	      lbegin = FALSE;
 
-		  /* Compute line integral for this subsegment. */
+	      /* Compute line integral for this subsegment. */
 
-		  if ( src_grid_add != -1 )
-		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-				  src_grid->cell_center_lon[src_grid_add], tgt_grid->cell_center_lon[tgt_grid_add]);
-		  else
-		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
-				  tgt_grid->cell_center_lon[tgt_grid_add], tgt_grid->cell_center_lon[tgt_grid_add]);
+	      if ( src_grid_add != -1 )
+		line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
+			      src_grid->cell_center_lon[src_grid_add], tgt_grid->cell_center_lon[tgt_grid_add]);
+	      else
+		line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
+			      tgt_grid->cell_center_lon[tgt_grid_add], tgt_grid->cell_center_lon[tgt_grid_add]);
 
-		  /* If integrating in reverse order, change sign of weights */
+	      /* If integrating in reverse order, change sign of weights */
 
-		  if ( lrevers ) for ( k = 0; k < 6; ++k ) weights[k] = -weights[k];
+	      if ( lrevers ) for ( k = 0; k < 6; ++k ) weights[k] = -weights[k];
 
-		  /*
-		    Store the appropriate addresses and weights. 
-		    Also add contributions to cell areas and centroids.
-		    If there is a coincidence, do not store weights
-		    because they have been captured in the previous loop.
-		    The source grid mask is the master mask
-		  */
-		  if ( ! lcoinc && src_grid_add != -1 )
-		    if ( src_grid->mask[src_grid_add] )
-		      {
+	      /*
+		Store the appropriate addresses and weights. 
+		Also add contributions to cell areas and centroids.
+		If there is a coincidence, do not store weights
+		because they have been captured in the previous loop.
+		The source grid mask is the master mask
+	      */
+	      if ( ! lcoinc && src_grid_add != -1 )
+		if ( src_grid->mask[src_grid_add] )
+		  {
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
-			{
-			  if ( remap_store_link_fast )
-			    store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
-			  else
-			    store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
+		    {
+		      if ( remap_store_link_fast )
+			store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
+		      else
+			store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
 
-			  src_grid->cell_frac[src_grid_add] += weights[0];
-			}
-			tgt_grid->cell_frac[tgt_grid_add] += weights[3];
-		      }
+		      src_grid->cell_frac[src_grid_add] += weights[0];
+		    }
+		    tgt_grid->cell_frac[tgt_grid_add] += weights[3];
+		  }
 
-		  tgt_grid->cell_area[tgt_grid_add] += weights[3];
-		  tgt_centroid_lat[tgt_grid_add] += weights[4];
-		  tgt_centroid_lon[tgt_grid_add] += weights[5];
+	      tgt_grid->cell_area[tgt_grid_add] += weights[3];
+	      tgt_centroid_lat[tgt_grid_add] += weights[4];
+	      tgt_centroid_lon[tgt_grid_add] += weights[5];
 
-		  /* Reset beglat and beglon for next subsegment. */
-		  beglat = intrsct_lat;
-		  beglon = intrsct_lon;
-		}
+	      /* Reset beglat and beglon for next subsegment. */
+	      beglat = intrsct_lat;
+	      beglon = intrsct_lon;
 	    }
           /* End of segment */
 	}
