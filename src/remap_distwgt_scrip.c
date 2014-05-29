@@ -384,7 +384,7 @@ int cmpwgts(const void *s1, const void *s2)
 }
 
 static
-void sort_dist_adds(int nadds, int src_add[nadds], double wgts[nadds])
+void sort_dist_adds(int nadds, int src_add[], double wgts[])
 {
   int n;
   addwgts_t addwgts[nadds];
