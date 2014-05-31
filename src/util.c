@@ -261,7 +261,7 @@ int get_season_start(void)
 }
 
 
-void get_season_name(const char *seas_name[4])
+void get_season_name(const char *seas_name[])
 {
   long i;
 
