@@ -1468,6 +1468,8 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	{
           next_corn = (corner+1)%tgt_num_cell_corners;
 
+          /* Define endpoints of the current segment */
+
           beglat = tgt_grid->cell_corner_lat[ioffset+corner];
           beglon = tgt_grid->cell_corner_lon[ioffset+corner];
           endlat = tgt_grid->cell_corner_lat[ioffset+next_corn];
