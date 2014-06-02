@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-06-02  Uwe Schulzweida
+
+	* tinfo: added support for forecast time axis
+
 2014-05-22  Uwe Schulzweida
 
 	* remap.h: define M_PI [Bug #4845]

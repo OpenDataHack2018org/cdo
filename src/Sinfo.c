@@ -269,10 +269,8 @@ void *Sinfo(void *argument)
 
 	  if ( taxisID != CDI_UNDEFID )
 	    {
-	      if ( taxisInqType(taxisID) == TAXIS_RELATIVE )
+	      if ( taxisInqType(taxisID) != TAXIS_ABSOLUTE )
 		{
-		  int calendar, tunits;
-
 		  vdate = taxisInqRdate(taxisID);
 		  vtime = taxisInqRtime(taxisID);
 
@@ -281,16 +279,28 @@ void *Sinfo(void *argument)
 
 		  fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 		      
-		  tunits = taxisInqTunit(taxisID);
+		  int tunits = taxisInqTunit(taxisID);
 		  if ( tunits != CDI_UNDEFID )  fprintf(stdout, "  Units = %s", tunit2str(tunits));
 	      
-		  calendar = taxisInqCalendar(taxisID);
+		  int calendar = taxisInqCalendar(taxisID);
 		  if ( calendar != CDI_UNDEFID )  fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
 		  if ( taxisHasBounds(taxisID) )
 		    fprintf(stdout, "  Bounds = true");
 
 		  fprintf(stdout, "\n");
+
+		  if ( taxisInqType(taxisID) == TAXIS_FORECAST )
+		    {
+		      vdate = taxisInqFdate(taxisID);
+		      vtime = taxisInqFtime(taxisID);
+
+		      date2str(vdate, vdatestr, sizeof(vdatestr));
+		      time2str(vtime, vtimestr, sizeof(vtimestr));
+
+		      fprintf(stdout, "     ForecastRefTime = %s %s", vdatestr, vtimestr);
+		      fprintf(stdout, "\n");
+		    }
 		}
 	    }
 
