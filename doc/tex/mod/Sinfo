@@ -61,7 +61,7 @@ This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
    Grid coordinates :
      1 : gaussian              : points=2048 (64x32)  np=16
                      longitude : 0 to 354.375 by 5.625 degrees_east  circular
-                      latitude : 85.7605871 to -85.7605871 degrees_north
+                      latitude : 85.7606 to -85.7606 degrees_north
    Vertical coordinates :
      1 : surface               : levels=1
      2 : pressure              : levels=4
