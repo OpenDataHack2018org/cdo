@@ -187,8 +187,9 @@ void *Timstat(void *argument)
   if ( cdoOperatorF2(operatorID) == 31 ) vlistDefNtsteps(vlistID2, 1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
-  taxis_has_bounds = taxisHasBounds(taxisID1);
   taxisID2 = taxisDuplicate(taxisID1);
+  if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
+  taxis_has_bounds = taxisHasBounds(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

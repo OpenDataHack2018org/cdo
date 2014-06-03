@@ -150,6 +150,7 @@ void *Timstat2(void *argument)
   nrecs3 = nrecs;
   recVarID   = (int*) malloc(nrecs*sizeof(int));
   recLevelID = (int*) malloc(nrecs*sizeof(int));
+
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);
   taxisID3 = taxisDuplicate(taxisID1);
