@@ -126,6 +126,7 @@ void *Consecstat(void *argument)
   int ostreamID, otaxisID, ovlistID, otsID;
   int vdate = 0, vtime = 0;
   int histvdate = 0, histvtime = 0;
+  int i;
   int recID, nrecs;
   int varID, nvars;
   int levelID, nlevels; 
