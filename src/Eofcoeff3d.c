@@ -45,7 +45,7 @@ void *Eofcoeff3d(void * argument)
   int gridsize;
   int i, varID, recID, levelID, tsID, eofID, *varID3;    
   int gridID1, gridID2, gridID3;
-  int nrecs, nvars, nlevs, neof, nchars, nmiss, ngrids; 
+  int nrecs, nvars, nlevs, neof, nchars, nmiss; 
   int reached_eof;
   int streamID1, streamID2, *streamIDs;
   int taxisID1, taxisID2, taxisID3;

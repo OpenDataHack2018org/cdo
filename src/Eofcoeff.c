@@ -41,7 +41,7 @@ void *Eofcoeff(void * argument)
   field_t ***eof;  
   field_t in;  
   field_t out;
-  int operatorID, operfunc;  
+  int operatorID;  
   int gridsize;
   int i, varID, recID, levelID, tsID, eofID;    
   int gridID1, gridID2, gridID3;
@@ -54,7 +54,6 @@ void *Eofcoeff(void * argument)
   cdoInitialize(argument);
   cdoOperatorAdd("eofcoeff",  0,       0, NULL);
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
      
   streamID1 = streamOpenRead(cdoStreamName(0));
   streamID2 = streamOpenRead(cdoStreamName(1));

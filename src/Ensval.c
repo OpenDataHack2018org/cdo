@@ -92,7 +92,7 @@ void *Ensval(void *argument)
   x = NULL;
   val = NULL;
   weights = NULL; 
-  int vlistCheck, gridsizeCheck;
+  //int vlistCheck, gridsizeCheck;
   
   cdoInitialize(argument);
   
