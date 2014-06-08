@@ -40,6 +40,7 @@ void *Diff(void *argument)
   int ndiff;
   int code, param;
   int gridID, zaxisID, vdate, vtime;
+  int checkrel;
   int nrecs, nrecs2;
   int levelID;
   int tsID;
@@ -117,6 +118,8 @@ void *Diff(void *argument)
 	  missval1 = vlistInqVarMissval(vlistID1, varID1);
 	  missval2 = vlistInqVarMissval(vlistID2, varID2);
 
+	  checkrel = gridInqType(gridID) != GRID_SPECTRAL;
+
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  streamReadRecord(streamID1, array1, &nmiss1);
@@ -160,7 +163,7 @@ void *Diff(void *argument)
 
 	  if ( ! cdoSilentMode || cdoVerbose )
 	    {
-	      if ( absm > abslim || relm > rellim || cdoVerbose )
+	      if ( absm > abslim || (checkrel && relm > rellim) || cdoVerbose )
 		{
 		  if ( lhead )
 		    {
@@ -221,8 +224,8 @@ void *Diff(void *argument)
 	    }
 
 	  ngrec++;
-	  if ( absm > abslim  || relm > rellim ) ndrec++;
-	  if ( absm > abslim2 || relm > rellim ) nd2rec++;
+	  if ( absm > abslim  || (checkrel && relm > rellim) ) ndrec++;
+	  if ( absm > abslim2 || (checkrel && relm > rellim) ) nd2rec++;
 	}
       tsID++;
     }
