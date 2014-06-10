@@ -3,6 +3,12 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-06-10  Uwe Schulzweida
+
+	* eof3d: set sum weights to 1 (bug fix)
+	* eofcoeff: remove scaling with grid cell area weights (bug fix)
+	* eofcoeff3d: remove scaling with grid cell area weights (bug fix)
+
 2014-06-02  Uwe Schulzweida
 
 	* tinfo: added support for forecast time axis

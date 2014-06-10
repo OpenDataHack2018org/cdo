@@ -11,7 +11,9 @@ Version 1.6.4 (26 June 2014):
      * diff: print number of different values
    Fixed bugs:
      * filter:
-     * eof:
+     * eof3d: set sum of weights to 1
+     * eofcoeff: remove scaling with grib cell area weights
+     * eofcoeff3d: remove scaling with grib cell area weights
 
 Version 1.6.3 (18 February 2014):
 

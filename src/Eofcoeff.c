@@ -35,25 +35,25 @@ void *Eofcoeff(void * argument)
 {
   char eof_name[8], oname[1024], filesuffix[32];
   const char *refname;
-  double *w;
+  //double *w;
   double missval1 = -999, missval2;
   double *xvals, *yvals;  
   field_t ***eof;  
   field_t in;  
   field_t out;
-  int operatorID;  
+  //int operatorID;  
   int gridsize;
   int i, varID, recID, levelID, tsID, eofID;    
-  int gridID1, gridID2, gridID3;
+  int gridID1, gridID3;
   int nrecs, nvars, nlevs, neof, nchars, nmiss, ngrids; 
   int reached_eof;
   int streamID1, streamID2, *streamIDs;
-  int taxisID1, taxisID2, taxisID3;
+  int taxisID2, taxisID3;
   int vlistID1, vlistID2, vlistID3;
    
   cdoInitialize(argument);
   cdoOperatorAdd("eofcoeff",  0,       0, NULL);
-  operatorID = cdoOperatorID();
+  //operatorID = cdoOperatorID();
      
   streamID1 = streamOpenRead(cdoStreamName(0));
   streamID2 = streamOpenRead(cdoStreamName(1));
@@ -62,16 +62,16 @@ void *Eofcoeff(void * argument)
   vlistID2 = streamInqVlist(streamID2);
   vlistID3 = vlistDuplicate(vlistID2);   
   
-  taxisID1 = vlistInqTaxis(vlistID1);  
+  //taxisID1 = vlistInqTaxis(vlistID1);  
   taxisID2 = vlistInqTaxis(vlistID2); 
   taxisID3 = taxisDuplicate(taxisID2);
   
   gridID1 = vlistInqVarGrid(vlistID1, 0);
-  gridID2 = vlistInqVarGrid(vlistID2, 0);
+  //gridID2 = vlistInqVarGrid(vlistID2, 0);
   
   if ( vlistGridsizeMax(vlistID1)==vlistGridsizeMax(vlistID2) )
     gridsize = vlistGridsizeMax(vlistID1);  
-  else 
+  else
     {
       gridsize = -1;
       cdoAbort ("Gridsize of input files does not match");
@@ -84,8 +84,8 @@ void *Eofcoeff(void * argument)
   nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
   nrecs = vlistNrecs(vlistID1); 
   nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
-  w = (double*) malloc(gridsize*sizeof(double));
-  gridWeights(gridID2, &w[0]);
+  //w = (double*) malloc(gridsize*sizeof(double));
+  //gridWeights(gridID2, w);
   
   
   
