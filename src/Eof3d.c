@@ -466,30 +466,30 @@ void *EOF3d(void * argument)
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(i) default(none) reduction(+:sum) \
-  shared(eigenvectors,weight,pack,varID,eofID,npack,gridsize)
+  shared(eigenvec,weight,pack,npack,gridsize)
 #endif 
 	  for ( i = 0; i < npack; i++ )
 	    // sum +=  weight[pack[i]%gridsize] *
 	    sum +=
-	      eigenvectors[varID][eofID].ptr[pack[i]] *
-	      eigenvectors[varID][eofID].ptr[pack[i]];
+	      eigenvec[pack[i]] *
+	      eigenvec[pack[i]];
 
 	  if ( sum > 0 ) {
 	    sum = sqrt(sum);
 #if defined(_OPENMP)
 #pragma omp parallel for private(i) default(none) \
-  shared(sum,npack,eigenvectors,varID,eofID,pack)
+  shared(sum,npack,eigenvec,pack)
 #endif
 	    for( i = 0; i < npack; i++ )
-	      eigenvectors[varID][eofID].ptr[pack[i]] /= sum;
+	      eigenvec[pack[i]] /= sum;
 	  }
 	  else
 #if defined(_OPENMP)
 #pragma omp parallel for private(i) default(none) \
-  shared(eigenvectors,varID,eofID,pack,missval,npack)
+  shared(eigenvec,pack,missval,npack)
 #endif
 	    for( i = 0; i < npack; i++ )
-	      eigenvectors[varID][eofID].ptr[pack[i]] = missval;
+	      eigenvec[pack[i]] = missval;
 	}     /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
 
       if ( cdoTimer ) timer_stop(timer_post);
