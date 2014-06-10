@@ -157,7 +157,7 @@ void *EOFs(void * argument)
   tsID        = 0;
 
   /* COUNT NUMBER OF TIMESTEPS if EOF_ or EOF_TIME */
-  if ( operfunc == EOF_ || operfunc == EOF_TIME)
+  if ( operfunc == EOF_ || operfunc == EOF_TIME )
     {
       if ( cdoVerbose ) 
 	cdoPrint("Counting timesteps in ifile");
@@ -183,10 +183,11 @@ void *EOFs(void * argument)
       streamID1   = streamOpenRead(cdoStreamName(0));
       vlistID1    = streamInqVlist(streamID1);
       taxisID1    = vlistInqTaxis(vlistID1);
-      if ( nts < gridsize || operfunc == EOF_TIME) {
-         time_space = 1;
-         grid_space = 0;
-       }
+      if ( nts < gridsize || operfunc == EOF_TIME )
+	{
+	  time_space = 1;
+	  grid_space = 0;
+	}
       else
         {
           time_space = 0;
@@ -471,10 +472,10 @@ void *EOFs(void * argument)
             {
               sum_w = 0;
 
-	      pack = (int*) malloc( gridsize * sizeof(int));
-	      miss = (int*) malloc( gridsize * sizeof(int));
+	      pack = (int*) malloc(gridsize*sizeof(int));
+	      miss = (int*) malloc(gridsize*sizeof(int));
 
-              for ( i = 0; i < gridsize ; i++ )
+              for ( i = 0; i < gridsize; i++ )
                 {
 		  if ( datacountv[i] )
 		    {
@@ -572,8 +573,8 @@ void *EOFs(void * argument)
 #else
 		      sum += /*weight[pack[i2]] **/
 #endif
-		      eigenvectors[varID][levelID][i][pack[i2]] *
-		      eigenvectors[varID][levelID][i][pack[i2]];
+			eigenvectors[varID][levelID][i][pack[i2]] *
+			eigenvectors[varID][levelID][i][pack[i2]];
 		    }
 
                   if ( sum > 0 )
@@ -766,4 +767,3 @@ void *EOFs(void * argument)
 
   return (0);
 }
-
