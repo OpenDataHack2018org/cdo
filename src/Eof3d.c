@@ -449,15 +449,17 @@ void *EOF3d(void * argument)
 
       for ( eofID = 0; eofID < n_eig; eofID++ )
 	{
+	  double *eigenvec = eigenvectors[varID][eofID].ptr;
+
 #if defined(_OPENMP)
-#pragma omp parallel for private(i,j,sum) shared(datafields, eigenvectors)
+#pragma omp parallel for private(i,j,sum) shared(datafields, eigenvec)
 #endif 
 	  for ( i = 0; i < npack; i++ )
 	    {
 	      sum = 0;
 	      for ( j = 0; j < nts; j++ )
 		sum += datafields[varID][j].ptr[pack[i]] * cov[eofID][j];
-	      eigenvectors[varID][eofID].ptr[pack[i]] = sum;
+	      eigenvec[pack[i]] = sum;
 	    }
 	  // NORMALIZING
 	  sum = 0;
@@ -584,4 +586,3 @@ void *EOF3d(void * argument)
  
   return (0);
 }
-

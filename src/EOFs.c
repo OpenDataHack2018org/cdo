@@ -531,12 +531,14 @@ void *EOFs(void * argument)
           for (i = 0; i < n; i++) 
             eigenvalues[varID][levelID][i][0] = eigv[i]*sum_w;
 
-          for (i = 0; i < n_eig; i++)
+          for ( i = 0; i < n_eig; i++ )
             {
+	      double *eigenvec = eigenvectors[varID][levelID][i];
+
               if ( grid_space )
 		{
 		  for(j = 0; j < npack; j++)
-		    eigenvectors[varID][levelID][i][pack[j]] = 
+		    eigenvec[pack[j]] = 
 #ifdef OLD_IMPLEMENTATION
 		      cov[i][j] / sqrt(weight[pack[j]]);
 #else
@@ -546,7 +548,7 @@ void *EOFs(void * argument)
               else if ( time_space )
                 {
 #if defined(_OPENMP)
-#pragma omp parallel for private(i2,j,sum) shared(datafieldv,eigenvectors)
+#pragma omp parallel for private(i2,j,sum) shared(datafieldv,eigenvec)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     {
@@ -554,14 +556,14 @@ void *EOFs(void * argument)
                       for ( j = 0; j < nts; j++ )
                         sum += datafieldv[j][pack[i2]] * cov[i][j];
 
-                      eigenvectors[varID][levelID][i][pack[i2]] = sum;
+                      eigenvec[pack[i2]] = sum;
                     }
                   // NORMALIZING
                   sum = 0;
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
-  shared(eigenvectors,weight,pack,varID,levelID,i,npack)
+  shared(eigenvec,weight,pack,npack)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
 		    {
@@ -573,8 +575,8 @@ void *EOFs(void * argument)
 #else
 		      sum += /*weight[pack[i2]] **/
 #endif
-			eigenvectors[varID][levelID][i][pack[i2]] *
-			eigenvectors[varID][levelID][i][pack[i2]];
+			eigenvec[pack[i2]] *
+			eigenvec[pack[i2]];
 		    }
 
                   if ( sum > 0 )
@@ -582,19 +584,19 @@ void *EOFs(void * argument)
                       sum = sqrt(sum);
 #if defined(_OPENMP)
 #pragma omp parallel for private(i2) default(none) \
-  shared(npack,varID,levelID,i,pack,sum,eigenvectors)
+  shared(npack,pack,sum,eigenvec)
 #endif
                       for( i2 = 0; i2 < npack; i2++ )
-                        eigenvectors[varID][levelID][i][pack[i2]] /= sum;
+                        eigenvec[pack[i2]] /= sum;
                     }
                   else
 		    {
 #if defined(_OPENMP)
 #pragma omp parallel for private(i2) default(none) \
-  shared(npack,varID,levelID,i,pack,sum,eigenvectors,missval)
+  shared(npack,pack,eigenvec,missval)
 #endif
 		      for( i2 = 0; i2 < npack; i2++ )
-			eigenvectors[varID][levelID][i][pack[i2]] = missval;
+			eigenvec[pack[i2]] = missval;
 		    }
                 } // else if ( time_space )
             } // for ( i = 0; i < n_eig; i++ )
