@@ -30,7 +30,7 @@
 
 #if defined(_OPENMP)
 #include <omp.h>
-#endif1
+#endif
 
 #include "cdi.h"
 #include "cdo.h"
@@ -452,7 +452,7 @@ void *EOF3d(void * argument)
 	  double *eigenvec = eigenvectors[varID][eofID].ptr;
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(i,j,sum) default(none) shared(datafields, eigenvec)
+#pragma omp parallel for private(i,j,sum) shared(datafields, eigenvec)
 #endif 
 	  for ( i = 0; i < npack; i++ )
 	    {
@@ -470,9 +470,7 @@ void *EOF3d(void * argument)
 #endif 
 	  for ( i = 0; i < npack; i++ )
 	    // sum +=  weight[pack[i]%gridsize] *
-	    sum +=
-	      eigenvec[pack[i]] *
-	      eigenvec[pack[i]];
+	    sum += eigenvec[pack[i]] * eigenvec[pack[i]];
 
 	  if ( sum > 0 ) {
 	    sum = sqrt(sum);
