@@ -235,6 +235,13 @@ void *Ymonstat(void *argument)
       tsID++;
     }
 
+  if ( nmon == 12 )
+    {
+      int smon = 0;
+      for ( month = 1; month <= 12; month++ ) if ( nsets[month] ) smon++;
+      if ( smon == 12 ) for ( month = 1; month <= 12; month++ ) mon[month-1] = month;
+    }
+
   /* sort output time steps */
   /*
   nmon = 0;

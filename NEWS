@@ -9,6 +9,7 @@ Version 1.6.4 (26 June 2014):
      * sealevelpressure: sea level pressure
    Changed operators:
      * diff: print number of different values
+     * Ymonstat: sorts output by month of year
    Fixed bugs:
      * filter:
      * eof3d: set sum of weights to 1
