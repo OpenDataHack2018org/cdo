@@ -152,7 +152,7 @@ void partab(FILE *fp, int vlistID, int option)
       fprintf(fp, "  name=%s\n", varname);
       if ( code   > 0 ) fprintf(fp, "  code=%d\n", code);
       if ( tabnum > 0 ) fprintf(fp, "  table=%d\n", tabnum);
-      if ( code   > 0 )
+      if ( param >= 0 )
 	{
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 	  fprintf(fp, "  param=%s\n", paramstr);

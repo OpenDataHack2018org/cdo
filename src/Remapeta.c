@@ -260,24 +260,28 @@ void *Remapeta(void *argument)
     for ( i = 0; i < nhlevf2+1; ++i )
       cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2/2+i]);
 
+  streamID1 = streamOpenRead(cdoStreamName(0));
+
   if ( operatorArgc() == 2 )
     {
+      int streamID;
+
       lfis2 = TRUE;
       fname = operatorArgv()[1];
       
       argument_t *fileargument = file_argument_new(fname);
-      streamID1 = streamOpenRead(fileargument);
+      streamID = streamOpenRead(fileargument);
       file_argument_free(fileargument);
 
-      vlistID1 = streamInqVlist(streamID1);
+      vlistID1 = streamInqVlist(streamID);
 
-      streamInqRecord(streamID1, &varID, &levelID);
+      streamInqRecord(streamID, &varID, &levelID);
       gridID  = vlistInqVarGrid(vlistID1, varID);
       nfis2gp = gridInqSize(gridID);
 
       fis2 = (double*) malloc(nfis2gp*sizeof(double));
 
-      streamReadRecord(streamID1, fis2, &nmiss);
+      streamReadRecord(streamID, fis2, &nmiss);
 
       if ( nmiss )
 	{
@@ -302,10 +306,8 @@ void *Remapeta(void *argument)
       if ( minval < -1.e10 || maxval > 1.e10 )
 	cdoAbort("%s out of range!", var_stdname(surface_geopotential));
 
-      streamClose(streamID1); 
+      streamClose(streamID); 
     }
-
-  streamID1 = streamOpenRead(cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
