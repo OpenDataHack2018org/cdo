@@ -450,6 +450,29 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
 int timer_remap, timer_remap_init, timer_remap_sort;
 int timer_remap_bil, timer_remap_nn, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 
+static
+void sort_remap_add(remapvars_t *remapvars)
+{
+  if ( cdoTimer ) timer_start(timer_remap_sort);
+  if ( sort_mode == MERGE_SORT )
+    { /* 
+      ** use a combination of the old sort_add and a split and merge approach.
+      ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c. 
+      ** OpenMP parallelism is supported
+      */   
+      sort_iter(remapvars->num_links, remapvars->num_wts,
+		remapvars->tgt_grid_add, remapvars->src_grid_add,
+		remapvars->wts, ompNumThreads);
+    }
+  else
+    { /* use a pure heap sort without any support of parallelism */
+      sort_add(remapvars->num_links, remapvars->num_wts,
+	       remapvars->tgt_grid_add, remapvars->src_grid_add,
+	       remapvars->wts);
+    }
+  if ( cdoTimer ) timer_stop(timer_remap_sort);
+}
+
 
 void *Remap(void *argument)
 {
@@ -648,8 +671,7 @@ void *Remap(void *argument)
       if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = TRUE;
 
       non_global = remap_non_global || !gridIsCircular(gridID1);
-      if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-	   map_type == MAP_TYPE_DISTWGT &&
+      if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&
 	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	    (gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 	    (gridInqType(gridID1) == GRID_LCC) ||
@@ -798,8 +820,7 @@ void *Remap(void *argument)
 
 	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
 	  non_global = remap_non_global || !gridIsCircular(gridID1);
-	  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-	       map_type == MAP_TYPE_DISTWGT  &&
+	  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&
 	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 		(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 		(gridInqType(gridID1) == GRID_LCC) ||
@@ -877,8 +898,7 @@ void *Remap(void *argument)
 		  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
 		  remaps[r].src_grid.non_global = FALSE;
 		  non_global = remap_non_global || !gridIsCircular(gridID1);
-		  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-		       map_type == MAP_TYPE_DISTWGT &&
+		  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&
 		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 			(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 			(gridInqType(gridID1) == GRID_LCC) ||
@@ -961,27 +981,7 @@ void *Remap(void *argument)
 		  if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		    resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
 		  
-		  if ( remaps[r].vars.sort_add )
-		    {
-		      if ( cdoTimer ) timer_start(timer_remap_sort);
-		      if ( sort_mode == MERGE_SORT )
-			{ /* 
-			  ** use a combination of the old sort_add and a split and merge approach.
-			  ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c. 
-			  ** OpenMP parallelism is supported
-			  */   
-			  sort_iter(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-				    remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
-				    remaps[r].vars.wts, ompNumThreads);
-			}
-		      else
-			{ /* use a pure heap sort without any support of parallelism */
-			  sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-				   remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
-				   remaps[r].vars.wts);
-			}
-		      if ( cdoTimer ) timer_stop(timer_remap_sort);
-		    }
+		  if ( remaps[r].vars.sort_add ) sort_remap_add(&remaps[r].vars);
 
 		  if ( lwrite_remap ) goto WRITE_REMAP;
 
