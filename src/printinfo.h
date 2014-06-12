@@ -229,8 +229,7 @@ void printGridInfo(int vlistID)
 	  if ( gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
 	    {
 	      fprintf(stdout, "%33s :", "available");
-	      if ( gridInqXbounds(gridID, NULL) ) fprintf(stdout, " xbounds");
-	      if ( gridInqYbounds(gridID, NULL) ) fprintf(stdout, " ybounds");
+	      if ( gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL) ) fprintf(stdout, " cellbounds");
 	      if ( gridHasArea(gridID) )          fprintf(stdout, " area");
 	      if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
 	      fprintf(stdout, "\n");
@@ -357,14 +356,11 @@ void printGridInfo(int vlistID)
 
       if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED || gridtype == GRID_LCC )
 	{
-	  if ( gridInqXvals(gridID, NULL) || gridInqYvals(gridID, NULL) || gridHasArea(gridID) ||
+	  if ( gridHasArea(gridID) ||
 	       gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
 	    {
 	      fprintf(stdout, "%33s :", "available");
-	      if ( gridInqXvals(gridID, NULL) )   fprintf(stdout, " xvals");
-	      if ( gridInqYvals(gridID, NULL) )   fprintf(stdout, " yvals");
-	      if ( gridInqXbounds(gridID, NULL) ) fprintf(stdout, " xbounds");
-	      if ( gridInqYbounds(gridID, NULL) ) fprintf(stdout, " ybounds");
+	      if ( gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL) ) fprintf(stdout, " cellbounds");
 	      if ( gridHasArea(gridID) )          fprintf(stdout, " area");
 	      if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
 	      fprintf(stdout, "\n");
