@@ -406,7 +406,7 @@ void *Vertint(void *argument)
 
 	  code = echamcode_from_stdname(stdname);
 
-	  if ( code < 0 )
+	  if ( code == -1 )
 	    {
 	      /*                                  ECHAM                            ECMWF       */
 	      if      ( sgeopotID == -1 && (strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0) ) code = gribcodes.geopot;

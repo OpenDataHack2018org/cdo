@@ -194,9 +194,9 @@ void *Remapeta(void *argument)
   int ngrids, gridID, zaxisID;
   int nlevel;
   int nvct1, nvct2 = 0;
-  int geopID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1, presID = -1;
+  int sgeopotID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1, presID = -1;
   int code;
-  char varname[CDI_MAX_NAME];
+  char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
   int taxisID1, taxisID2;
   int lhavevct;
@@ -438,39 +438,38 @@ void *Remapeta(void *argument)
 
       code = vlistInqVarCode(vlistID1, varID);
       /* code = -1; */
-      if ( code <= 0 )
+      if ( code <= 0 || code == 255 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
-
 	  strtolower(varname);
 
-	  if ( nlevel == 1 )
-	    {
-	      if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
-	      else if ( strcmp(varname, "aps")     == 0 ) code = 134;
-	      else if ( strcmp(varname, "ps")      == 0 ) code = 134;
-	      else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
-	    }
+	  vlistInqVarStdname(vlistID1, varID, stdname);
+	  strtolower(stdname);
 
-	  if ( nlevel == nhlevf1 )
+	  code = echamcode_from_stdname(stdname);
+
+	  if ( code == -1 )
 	    {
-	      if      ( strcmp(varname, "t")       == 0 ) code = 130;
-	      else if ( strcmp(varname, "q")       == 0 ) code = 133;
+	      /*                                  ECHAM                            ECMWF       */
+	      if      ( sgeopotID == -1 && (strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0) ) code = 129;
+	      else if ( tempID    == -1 && (strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0) ) code = 130;
+	      else if ( psID      == -1 && (strcmp(varname, "aps")   == 0 || strcmp(varname, "ps"  ) == 0) ) code = 134;
+	      else if ( lnpsID    == -1 && (strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0) ) code = 152;
+	      else if ( sqID      == -1 && (strcmp(varname, "q")     == 0 ) ) code = 133;
 	    }
 	}
 
-      if      ( code == 129 ) geopID    = varID;
-      else if ( code == 130 ) tempID    = varID;
-      else if ( code == 133 ) sqID      = varID;
-      else if ( code == 134 ) psID      = varID;
-      else if ( code == 152 ) lnpsID    = varID;
+      if      ( code == 129 && nlevel == 1       ) sgeopotID = varID;
+      else if ( code == 130 && nlevel == nhlevf1 ) tempID    = varID;
+      else if ( code == 133 && nlevel == nhlevf1 ) sqID      = varID;
+      else if ( code == 134 && nlevel == 1       ) psID      = varID;
+      else if ( code == 152 && nlevel == 1       ) lnpsID    = varID;
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	cdoAbort("Spectral data on model level unsupported!");
 
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
-
 
       if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlevf1 )
 	{
@@ -487,10 +486,11 @@ void *Remapeta(void *argument)
   if ( cdoVerbose )
     {
       cdoPrint("Found:");
-      if ( tempID  != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
-      if ( psID    != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if ( geopID  != -1 ) cdoPrint("  %s", var_stdname(surface_geopotential));
-      if ( sqID    != -1 ) cdoPrint("  %s", var_stdname(specific_humidity));
+      if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
+      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
+      if ( lnpsID    != -1 ) cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
+      if ( sgeopotID != -1 ) cdoPrint("  %s", var_stdname(surface_geopotential));
+      if ( sqID      != -1 ) cdoPrint("  %s", var_stdname(specific_humidity));
     }
 
   if ( tempID != -1 && sqID != -1 )
@@ -559,7 +559,7 @@ void *Remapeta(void *argument)
 	}
     }
 
-  if ( zaxisIDh != -1 && geopID == -1 )
+  if ( zaxisIDh != -1 && sgeopotID == -1 )
     {
       if ( ltq )
 	cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
@@ -604,7 +604,7 @@ void *Remapeta(void *argument)
 
 	  if ( zaxisIDh != -1 )
 	    {
-	      if ( varID == geopID )
+	      if ( varID == sgeopotID )
 		memcpy(fis1, array, ngp*sizeof(double));
 	      else if ( varID == presID )
 		{
@@ -707,9 +707,9 @@ void *Remapeta(void *argument)
       if ( cptop > 0 )
 	nctop = ncctop(cptop, (long) nhlevf2, (long) nhlevf2+1, a2, b2);
 
-      if ( zaxisIDh != -1 && geopID != -1 )
+      if ( zaxisIDh != -1 && sgeopotID != -1 )
 	{
-	  varID   = geopID;
+	  varID   = sgeopotID;
 	  levelID = 0;
 	  setmissval(ngp, imiss, missval, fis2);
 	  streamDefRecord(streamID2, varID, levelID);

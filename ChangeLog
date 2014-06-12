@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-06-12  Uwe Schulzweida
+
+	* remapeta: added support for standard name
+
 2014-06-11  Uwe Schulzweida
 
 	* Ymonstat: sorts output by month of year
