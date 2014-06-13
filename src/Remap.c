@@ -489,6 +489,44 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
 }
 
 static
+int set_remapgrids(int vlistID, int ngrids, int *remapgrids)
+{
+  int index, gridID, gridtype;
+
+  for ( index = 0; index < ngrids; index++ )
+    {
+      remapgrids[index] = TRUE;
+
+      gridID = vlistGrid(vlistID, index);
+      gridtype = gridInqType(gridID);
+
+      if ( gridtype != GRID_LONLAT      &&
+	   gridtype != GRID_GAUSSIAN    &&
+	   gridtype != GRID_LCC         &&
+	   gridtype != GRID_LAEA        &&
+	   gridtype != GRID_SINUSOIDAL  &&
+	   gridtype != GRID_GME         &&
+	   gridtype != GRID_CURVILINEAR &&
+	   gridtype != GRID_UNSTRUCTURED )
+	{
+	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
+	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!", gridNamePtr(gridtype));
+	  else if ( gridtype == GRID_GENERIC && gridInqSize(gridID) == 1 )
+	    remapgrids[index] = FALSE;
+	  else
+	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
+	}
+    }
+
+  for ( index = 0; index < ngrids; index++ )
+    if ( remapgrids[index] == TRUE ) break;
+
+  if ( index == ngrids ) cdoAbort("No remappable grid found!");
+
+  return (index);
+}
+
+static
 int get_norm_opt()
 {
   int norm_opt = NORM_OPT_FRACAREA;
@@ -629,7 +667,7 @@ void *Remap(void *argument)
   int need_gradiants = FALSE;
   int non_global;
   int grid1sizemax;
-  short *remapgrids = NULL;
+  int *remapgrids = NULL;
   char varname[CDI_MAX_NAME];
   double missval;
   double *array1 = NULL, *array2 = NULL;
@@ -683,7 +721,7 @@ void *Remap(void *argument)
 
   if ( operfunc == REMAPXXX )
     {
-      operatorInputArg("grid description file or name, remap file (SCRIP netCDF)");
+      operatorInputArg("grid description file or name, remap weights file (SCRIP netCDF)");
       operatorCheckArgc(2);
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
       remap_file = operatorArgv()[1];
@@ -705,43 +743,13 @@ void *Remap(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids = vlistNgrids(vlistID1);
-  remapgrids = (short*) malloc(ngrids*sizeof(short));
-  for ( index = 0; index < ngrids; index++ )
-    {
-      remapgrids[index] = TRUE;
-
-      gridID1 = vlistGrid(vlistID1, index);
-      gridtype = gridInqType(gridID1);
-
-      if ( gridtype != GRID_LONLAT      &&
-	   gridtype != GRID_GAUSSIAN    &&
-	   gridtype != GRID_LCC         &&
-	   gridtype != GRID_LAEA        &&
-	   gridtype != GRID_SINUSOIDAL  &&
-	   gridtype != GRID_GME         &&
-	   gridtype != GRID_CURVILINEAR &&
-	   gridtype != GRID_UNSTRUCTURED )
-	{
-	  if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
-	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
-		     gridNamePtr(gridInqType(gridID1)));
-	  else if ( gridInqType(gridID1) == GRID_GENERIC && gridInqSize(gridID1) == 1 )
-	    remapgrids[index] = FALSE;
-	  else
-	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
-	}
-
-      if ( remapgrids[index] )
-	vlistChangeGridIndex(vlistID2, index, gridID2);
-    }
-
-  for ( index = 0; index < ngrids; index++ )
-    if ( remapgrids[index] == TRUE ) break;
-
-  if ( index == ngrids )
-    cdoAbort("No remappable grid found!");
-
+  remapgrids = (int*) malloc(ngrids*sizeof(int));
+  index = set_remapgrids(vlistID1, ngrids, remapgrids);
   gridID1 = vlistGrid(vlistID1, index);
+
+  for ( index = 0; index < ngrids; index++ )
+    if ( remapgrids[index] )
+      vlistChangeGridIndex(vlistID2, index, gridID2);
 
   if ( max_remaps == -1 )
     {
@@ -792,13 +800,14 @@ void *Remap(void *argument)
       if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = TRUE;
 
       non_global = remap_non_global || !gridIsCircular(gridID1);
+      gridtype = gridInqType(gridID1);
       if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
-	    (gridInqType(gridID1) == GRID_LONLAT && non_global) ||
-	    (gridInqType(gridID1) == GRID_LCC) ||
-	    (gridInqType(gridID1) == GRID_LAEA) ||
-	    (gridInqType(gridID1) == GRID_SINUSOIDAL) ||
-	    (gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
+	   ((gridtype == GRID_LONLAT && gridIsRotated(gridID1)) ||
+	    (gridtype == GRID_LONLAT && non_global) ||
+	    (gridtype == GRID_LCC) ||
+	    (gridtype == GRID_LAEA) ||
+	    (gridtype == GRID_SINUSOIDAL) ||
+	    (gridtype == GRID_CURVILINEAR && non_global)) )
 	{
 	  remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
 	  remaps[0].src_grid.non_global = TRUE;
@@ -914,13 +923,14 @@ void *Remap(void *argument)
 
 	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
 	  non_global = remap_non_global || !gridIsCircular(gridID1);
+	  gridtype = gridInqType(gridID1);
 	  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
-		(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
-		(gridInqType(gridID1) == GRID_LCC) ||
-		(gridInqType(gridID1) == GRID_LAEA) ||
-		(gridInqType(gridID1) == GRID_SINUSOIDAL) ||
-		(gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
+	       ((gridtype == GRID_LONLAT && gridIsRotated(gridID1)) ||
+		(gridtype == GRID_LONLAT && non_global) ||
+		(gridtype == GRID_LCC) ||
+		(gridtype == GRID_LAEA) ||
+		(gridtype == GRID_SINUSOIDAL) ||
+		(gridtype == GRID_CURVILINEAR && non_global)) )
 	    {
 	      int gridsize_new;
 	      int nx, ny;
@@ -985,13 +995,14 @@ void *Remap(void *argument)
 		  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
 		  remaps[r].src_grid.non_global = FALSE;
 		  non_global = remap_non_global || !gridIsCircular(gridID1);
+		  gridtype = gridInqType(gridID1);
 		  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
-			(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
-			(gridInqType(gridID1) == GRID_LCC) ||
-			(gridInqType(gridID1) == GRID_LAEA) ||
-			(gridInqType(gridID1) == GRID_SINUSOIDAL) ||
-			(gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
+		       ((gridtype == GRID_LONLAT && gridIsRotated(gridID1)) ||
+			(gridtype == GRID_LONLAT && non_global) ||
+			(gridtype == GRID_LCC) ||
+			(gridtype == GRID_LAEA) ||
+			(gridtype == GRID_SINUSOIDAL) ||
+			(gridtype == GRID_CURVILINEAR && non_global)) )
 		    {
 		      remaps[r].src_grid.non_global = TRUE;
 		    }
@@ -999,7 +1010,7 @@ void *Remap(void *argument)
 		    remaps[r].src_grid.luse_cell_area = FALSE;
 		    remaps[r].tgt_grid.luse_cell_area = FALSE;
 		  */
-		  if ( gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == FALSE )
+		  if ( gridtype != GRID_UNSTRUCTURED && lremap_num_srch_bins == FALSE )
 		    {
 		      if ( !remap_extrapolate && map_type == MAP_TYPE_DISTWGT )
 			{
