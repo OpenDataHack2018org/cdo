@@ -213,6 +213,7 @@ int remap_non_global = FALSE;
 int remap_num_srch_bins = 180;
 int lremap_num_srch_bins = FALSE;
 int remap_extrapolate = FALSE;
+int remap_genweights = TRUE;
 int lextrapolate = FALSE;
 int max_remaps = -1;
 int sort_mode = HEAP_SORT;
@@ -420,6 +421,32 @@ void get_remap_env(void)
 	    }
 	}
     }
+
+  envstr = getenv("CDO_REMAP_GENWEIGHTS");
+  if ( envstr )
+    {
+      if ( *envstr )
+	{
+	  if ( memcmp(envstr, "ON", 2) == 0 || memcmp(envstr, "on", 2) == 0 )
+	    {
+	      remap_genweights = TRUE;
+	    }
+	  else if ( memcmp(envstr, "OFF", 3) == 0 || memcmp(envstr, "off", 3) == 0 )
+	    {
+	      remap_genweights = FALSE;
+	    }
+	  else
+	    cdoWarning("Environment variable CDO_REMAP_GENWEIGHTS has wrong value!");
+
+	  if ( cdoVerbose )
+	    {
+	      if ( remap_genweights == TRUE )
+		cdoPrint("Generation of weights enabled!");
+	      else if ( remap_genweights == FALSE )
+		cdoPrint("Generation of weights disabled!");
+	    }
+	}
+    }
 }
 
 static
@@ -551,7 +578,6 @@ void *Remap(void *argument)
   remap_t *remaps = NULL;
   char *envstr;
   char *remap_file = NULL;
-  int remap_weights = 1;
   int lwrite_remap;
 
   if ( cdoTimer )
@@ -813,6 +839,9 @@ void *Remap(void *argument)
       grad1_latlon = (double*) malloc(grid1sizemax*sizeof(double));
     }
 
+  if ( remap_genweights == FALSE && map_type != MAP_TYPE_BILINEAR && map_type != MAP_TYPE_BICUBIC )
+    remap_genweights = TRUE;
+
   array1 = (double*) malloc(grid1sizemax*sizeof(double));
   imask  = (int*) malloc(grid1sizemax*sizeof(int));
 
@@ -1012,7 +1041,7 @@ void *Remap(void *argument)
 	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
-	      if ( remap_weights )
+	      if ( remap_genweights )
 		{
 		  print_remap_info(operfunc, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
 
@@ -1040,7 +1069,7 @@ void *Remap(void *argument)
 		if ( remaps[r].src_grid.vgpm[i] ) array1[j++] = array1[i];
 	    }
 	  
-	  if ( remap_weights )
+	  if ( remap_genweights )
 	    {
 	      if ( need_gradiants )
 		{
