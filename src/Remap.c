@@ -489,6 +489,37 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
 }
 
 static
+int get_norm_opt()
+{
+  int norm_opt = NORM_OPT_FRACAREA;
+  char *envstr = getenv("CDO_REMAP_NORMALIZE_OPT");
+
+  if ( envstr && *envstr )
+    {
+      if      ( memcmp(envstr, "frac", 4) == 0 )
+	norm_opt = NORM_OPT_FRACAREA;
+      else if ( memcmp(envstr, "dest", 4) == 0 )
+	norm_opt = NORM_OPT_DESTAREA;
+      else if ( memcmp(envstr, "none", 4) == 0 )
+	norm_opt = NORM_OPT_NONE;
+      else
+	cdoWarning("CDO_REMAP_NORMALIZE_OPT=%s unsupported!", envstr);
+    }
+
+  if ( cdoVerbose )
+    {
+      if ( norm_opt == NORM_OPT_FRACAREA )
+	cdoPrint("Normalization option: frac");
+      else if ( norm_opt == NORM_OPT_DESTAREA )
+	cdoPrint("Normalization option: dest");
+      else
+	cdoPrint("Normalization option: none");
+    }
+
+  return (norm_opt);
+}
+
+static
 void remap_normalize(int norm_opt, int gridsize, double *array, double missval, remapgrid_t *tgt_grid)
 {
   int i;
@@ -535,6 +566,19 @@ void remap_normalize(int norm_opt, int gridsize, double *array, double missval, 
 
 int timer_remap, timer_remap_init, timer_remap_sort;
 int timer_remap_bil, timer_remap_nn, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
+
+static
+void init_remap_timer(void)
+{
+  timer_remap        = timer_new("remap");
+  timer_remap_init   = timer_new("remap init");
+  timer_remap_sort   = timer_new("remap sort");
+  timer_remap_bil    = timer_new("remap bil");
+  timer_remap_nn     = timer_new("remap nn");
+  timer_remap_con    = timer_new("remap con");
+  timer_remap_con_l1 = timer_new("remap con loop1");
+  timer_remap_con_l2 = timer_new("remap con loop2");
+}
 
 static
 void sort_remap_add(remapvars_t *remapvars)
@@ -591,21 +635,10 @@ void *Remap(void *argument)
   double *array1 = NULL, *array2 = NULL;
   double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;
   remap_t *remaps = NULL;
-  char *envstr;
   char *remap_file = NULL;
   int lwrite_remap;
 
-  if ( cdoTimer )
-    {
-      timer_remap        = timer_new("remap");
-      timer_remap_init   = timer_new("remap init");
-      timer_remap_sort   = timer_new("remap sort");
-      timer_remap_bil    = timer_new("remap bil");
-      timer_remap_nn     = timer_new("remap nn");
-      timer_remap_con    = timer_new("remap con");
-      timer_remap_con_l1 = timer_new("remap con loop1");
-      timer_remap_con_l2 = timer_new("remap con loop2");
-    }
+  if ( cdoTimer ) init_remap_timer();
 
   cdoInitialize(argument);
 
@@ -810,34 +843,7 @@ void *Remap(void *argument)
       get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
     }
 
-  if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONSERV_YAC )
-    {
-      norm_opt = NORM_OPT_FRACAREA;
-
-      envstr = getenv("NORMALIZE_OPT");
-
-      if ( envstr && *envstr )
-        {
-	  if      ( memcmp(envstr, "frac", 4) == 0 )
-	    norm_opt = NORM_OPT_FRACAREA;
-	  else if ( memcmp(envstr, "dest", 4) == 0 )
-	    norm_opt = NORM_OPT_DESTAREA;
-	  else if ( memcmp(envstr, "none", 4) == 0 )
-	    norm_opt = NORM_OPT_NONE;
-	  else
-	    cdoWarning("NORMALIZE_OPT=%s unsupported!", envstr);
-	}
-
-      if ( cdoVerbose )
-        {
-	  if ( norm_opt == NORM_OPT_FRACAREA )
-	    cdoPrint("Normalization option: frac");
-	  else if ( norm_opt == NORM_OPT_DESTAREA )
-	    cdoPrint("Normalization option: dest");
-	  else
-	    cdoPrint("Normalization option: none");
-	}
-    }
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC ) norm_opt = get_norm_opt();
 
   grid1sizemax = vlistGridsizeMax(vlistID1);
 
