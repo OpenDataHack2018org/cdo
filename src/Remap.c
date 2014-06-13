@@ -446,6 +446,50 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
     }
 }
 
+static
+void remap_normalize(int norm_opt, int gridsize, double *array, double missval, remapgrid_t *tgt_grid)
+{
+  int i;
+  double grid_err;
+
+  if ( norm_opt == NORM_OPT_NONE )
+    {
+      for ( i = 0; i < gridsize; i++ )
+	{
+	  if ( !DBL_IS_EQUAL(array[i], missval) )
+	    {
+	      grid_err = tgt_grid->cell_frac[i]*tgt_grid->cell_area[i];
+	      if ( fabs(grid_err) > 0 )
+		array[i] = array[i]/grid_err;
+	      else
+		array[i] = missval;
+	    }
+	}
+    }
+  else if ( norm_opt == NORM_OPT_DESTAREA )
+    {
+      for ( i = 0; i < gridsize; i++ )
+	{
+	  if ( !DBL_IS_EQUAL(array[i], missval) )
+	    {
+	      if ( fabs(tgt_grid->cell_frac[i]) > 0 )
+		array[i] = array[i]/tgt_grid->cell_frac[i];
+	      else
+		array[i] = missval;
+	    }
+	}
+    }
+
+  if ( remap_area_min > 0 )
+    {
+      for ( i = 0; i < gridsize; i++ )
+	{
+	  //printf("%d %g %g\n", i, remaps[r].tgt_grid.cell_frac[i], remaps[r].tgt_grid.cell_area[i]);
+	  if ( tgt_grid->cell_frac[i] < remap_area_min ) array[i] = missval;
+	}
+    }
+}
+
 
 int timer_remap, timer_remap_init, timer_remap_sort;
 int timer_remap_bil, timer_remap_nn, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
@@ -1027,46 +1071,7 @@ void *Remap(void *argument)
 
 	  /* used only to check the result of remapcon */
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
-	    {
-	      double grid2_err;
-
-	      if ( remaps[r].vars.norm_opt == NORM_OPT_NONE )
-		{
-		  for ( i = 0; i < gridsize2; i++ )
-		    {
-		      if ( !DBL_IS_EQUAL(array2[i], missval) )
-			{
-			  grid2_err = remaps[r].tgt_grid.cell_frac[i]*remaps[r].tgt_grid.cell_area[i];
-			  if ( fabs(grid2_err) > 0 )
-			    array2[i] = array2[i]/grid2_err;
-			  else
-			    array2[i] = missval;
-			}
-		    }
-		}
-	      else if ( remaps[r].vars.norm_opt == NORM_OPT_DESTAREA )
-		{
-		  for ( i = 0; i < gridsize2; i++ )
-		    {
-		      if ( !DBL_IS_EQUAL(array2[i], missval) )
-			{
-			  if ( fabs(remaps[r].tgt_grid.cell_frac[i]) > 0 )
-			    array2[i] = array2[i]/remaps[r].tgt_grid.cell_frac[i];
-			  else
-			    array2[i] = missval;
-			}
-		    }
-		}
-
-	      if ( remap_area_min > 0 )
-		{
-		  for ( i = 0; i < gridsize2; i++ )
-		    {
-		      //printf("%d %g %g\n", i, remaps[r].tgt_grid.cell_frac[i], remaps[r].tgt_grid.cell_area[i]);
-		      if ( remaps[r].tgt_grid.cell_frac[i] < remap_area_min ) array2[i] = missval;
-		    }
-		}
-	    }
+	    remap_normalize(remaps[r].vars.norm_opt, gridsize2, array2, missval, &remaps[r].tgt_grid);
 
 	  if ( operfunc == REMAPSUM )
 	    {
