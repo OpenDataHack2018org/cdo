@@ -740,6 +740,9 @@ void *Remap(void *argument)
 	}
     }
 
+  if ( lwrite_remap || operfunc == REMAPXXX || (remap_genweights == FALSE && map_type != MAP_TYPE_BILINEAR && map_type != MAP_TYPE_BICUBIC) )
+    remap_genweights = TRUE;
+
   if ( operfunc == REMAPXXX )
     {
       int gridsize2;
@@ -853,9 +856,6 @@ void *Remap(void *argument)
       grad1_lon    = (double*) malloc(grid1sizemax*sizeof(double));
       grad1_latlon = (double*) malloc(grid1sizemax*sizeof(double));
     }
-
-  if ( remap_genweights == FALSE && map_type != MAP_TYPE_BILINEAR && map_type != MAP_TYPE_BICUBIC )
-    remap_genweights = TRUE;
 
   array1 = (double*) malloc(grid1sizemax*sizeof(double));
   imask  = (int*) malloc(grid1sizemax*sizeof(int));
