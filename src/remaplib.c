@@ -874,6 +874,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 	(gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global)) )
     {
       src_grid->gridID = gridID1 = expand_lonlat_grid(gridID1);
+      reg2d_src_gridID = gridID1;
     }
 
   if ( gridInqType(gridID1) == GRID_UNSTRUCTURED )
