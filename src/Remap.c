@@ -450,6 +450,21 @@ void get_remap_env(void)
 }
 
 static
+void set_halo_to_missval(int nx, int ny, double *array, double missval)
+{
+  int i, j;
+
+  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+0]      = missval;
+  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+1]      = missval;
+  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+2]   = missval;
+  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+3]   = missval;
+  for ( i = 0; i < nx+4; i++ ) array[     0*(nx+4)+i] = missval;
+  for ( i = 0; i < nx+4; i++ ) array[     1*(nx+4)+i] = missval;
+  for ( i = 0; i < nx+4; i++ ) array[(ny+2)*(nx+4)+i] = missval;
+  for ( i = 0; i < nx+4; i++ ) array[(ny+3)*(nx+4)+i] = missval;
+}
+
+static
 void scale_gridbox_area(long gridsize, const double *restrict array1, long gridsize2, double *restrict array2, const double *restrict grid2_area)
 {
   static int lgridboxinfo = TRUE;
@@ -924,14 +939,7 @@ void *Remap(void *argument)
 		for ( i = nx-1; i >= 0; i-- )
 		  array1[(j+2)*(nx+4)+i+2] = array1[j*nx+i];
 
-	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+0]      = missval;
-	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+1]      = missval;
-	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+nx+2]   = missval;
-	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+nx+3]   = missval;
-	      for ( i = 0; i < nx+4; i++ ) array1[     0*(nx+4)+i] = missval;
-	      for ( i = 0; i < nx+4; i++ ) array1[     1*(nx+4)+i] = missval;
-	      for ( i = 0; i < nx+4; i++ ) array1[(ny+2)*(nx+4)+i] = missval;
-	      for ( i = 0; i < nx+4; i++ ) array1[(ny+3)*(nx+4)+i] = missval;
+	      set_halo_to_missval(nx, ny, array1, missval);
 
 	      gridsize = gridsize_new;
 	      nmiss1 += 4*(nx+2) + 4*(ny+2);
