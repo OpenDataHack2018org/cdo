@@ -290,6 +290,9 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
     }
 
   int i, j, ndist = max_add - min_add + 1;
+
+  if ( ndist <= 0 ) return;
+
   double distance;     /* Angular distance */
   double *dist = (double*) malloc(ndist*sizeof(double));
   int    *adds = (int*) malloc(ndist*sizeof(int));
