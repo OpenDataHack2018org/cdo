@@ -401,7 +401,7 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
   private(dst_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(static)
 #endif
@@ -412,11 +412,15 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 #if defined(_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
 #endif
+
+      if ( !cdoSilentMode )
+	{
 #if defined(_OPENMP)
 #pragma omp atomic
 #endif
-      findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
+	  findex++;
+	  if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
+	}
 
       tgt_array[dst_add] = missval;
 
