@@ -113,7 +113,7 @@ void *Vargen(void *argument)
   TOPO    = cdoOperatorAdd("topo",    0, 0, NULL);
   TEMP    = cdoOperatorAdd("temp",    0, 0, NULL);
   MASK    = cdoOperatorAdd("mask",    0, 0, NULL);
-  STDATM  = cdoOperatorAdd("stdatm",  0, 0, "levels");
+  STDATM  = cdoOperatorAdd("stdatm",  0, 0, "height levels [m]");
 
   operatorID = cdoOperatorID();
 
@@ -192,7 +192,7 @@ void *Vargen(void *argument)
       double lon = 0, lat = 0;
       LIST *flist = listNew(FLT_LIST);
 
-      operatorInputArg("levels");
+      operatorInputArg(cdoOperatorEnter(operatorID));
       nlevels = args2fltlist(operatorArgc(), operatorArgv(), flist);
       levels  = (double *) listArrayPtr(flist);
       //listDelete(flist);
