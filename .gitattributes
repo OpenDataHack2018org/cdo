@@ -483,6 +483,8 @@ src/Yseasstat.c -text
 src/Zonstat.c -text
 src/cdo.c -text
 src/cdo.h -text
+src/cdo_getopt.c -text
+src/cdo_getopt.h -text
 src/cdo_int.h -text
 src/cdo_pthread.c -text
 src/cdo_vlist.c -text

@@ -183,10 +183,12 @@ cdo_SOURCES += Adisit.c        \
                cdo_int.h       \
                cdo_pthread.c   \
                cdo_vlist.c     \
+               cdo_getopt.c    \
+               cdo_getopt.h    \
                color.c         \
                color.h         \
                commandline.c   \
-               const.h       \
+               const.h         \
                counter.h       \
                dmemory.h       \
                dtypes.h        \
