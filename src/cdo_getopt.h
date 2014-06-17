@@ -19,11 +19,19 @@
 #define _CDO_GETOPT_H
 
 struct cdo_option {
-  char *name;
-  int   has_arg;
-  int  *flag;
-  int   val;
+  /* name of long option */
+  const char *name;
+  /*
+   * one of no_argument, required_argument, and optional_argument:
+   * whether option takes an argument
+   */
+  int has_arg;
+  /* if not NULL, set *flag to val when option found */
+  int *flag;
+  /* if flag not NULL, value to set *flag to; else return value */
+  int val;
 };
+
 
 #define  no_argument        1   // no argument to the option is expect
 #define  required_argument  2   // an argument to the option is required

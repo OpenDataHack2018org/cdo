@@ -111,6 +111,8 @@ int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
 
+int CDO_netcdf_hdr_pad   = 0;
+
 #define MAX_NUM_VARNAMES 256
 int cdoNumVarnames       = 0;
 char **cdoVarnames       = NULL;
@@ -1068,21 +1070,37 @@ void check_stacksize()
 }
 
 static
+void cdo_set_options(void)
+{
+  if ( Debug )
+    {
+      fprintf(stderr, "CDO_netcdf_hdr_pad  = %d\n", CDO_netcdf_hdr_pad);
+      fprintf(stderr, "\n");
+    }
+  
+  if ( CDO_netcdf_hdr_pad > 0 ) cdiDefGlobal("NETCDF_HDR_PAD", CDO_netcdf_hdr_pad);
+}
+
+static
 void parse_options_long(int argc, char *argv[])
 {
   int c;
-  /*
-  static struct option opt_long[] =
-    {
-      { "netcdf_hdr_pad", required_argument, 0, 0},
-      { "hdr_pad",        required_argument, 0, 0},
-      { "header_pad",     required_argument, 0, 0},
-    }
+  int lnetcdf_hdr_pad;
 
-    int opt_idx=0;*/  /* Index of current long option into opt_lng array */
+  struct cdo_option opt_long[] =
+    {
+      { "netcdf_hdr_pad", required_argument, &lnetcdf_hdr_pad,  1 },
+      { "hdr_pad",        required_argument, &lnetcdf_hdr_pad,  1 },
+      { "header_pad",     required_argument, &lnetcdf_hdr_pad,  1 },
+      { "verbose",              no_argument,             NULL, 'v' },
+      { "version",              no_argument,             NULL, 'V' },
+      { NULL,                             0,             NULL,  0  }
+    };
+
+  /*int opt_idx=0;*/  /* Index of current long option into opt_lng array */
 
   /* Parse command line arguments */
-  while ( 1 )
+  //  while ( 1 )
     {
       /* getopt_long_only() allows one dash to prefix long options */
       //  opt = CDO_getopt_long(argc,argv,opt_sht_lst,opt_lng,&opt_idx);
@@ -1095,10 +1113,22 @@ void parse_options_long(int argc, char *argv[])
       /* Process long options without short option counterparts */
     }
 
-  while ( (c = cdo_getopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ")) != -1 )
+  while ( 1 )
     {
+      lnetcdf_hdr_pad = 0;
+
+      c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ", opt_long, NULL);
+      if ( c == -1 ) break;
+
       switch (c)
 	{
+	case 0:
+	  if ( lnetcdf_hdr_pad )
+	    {
+	      int netcdf_hdr_pad = atoi(CDO_optarg);
+	      if ( netcdf_hdr_pad >= 0 ) CDO_netcdf_hdr_pad = netcdf_hdr_pad;
+	    }
+	  break;
 	case 'a':
 	  cdoDefaultTimeType = TAXIS_ABSOLUTE;
 	  break;
@@ -1413,7 +1443,9 @@ int main(int argc, char *argv[])
 
   get_env_vars();
 
-  parse_options(argc, argv);
+  parse_options_long(argc, argv);
+
+  cdo_set_options();
 
   if ( Debug || Version ) cdo_version();
 
