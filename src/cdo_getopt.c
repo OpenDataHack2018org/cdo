@@ -68,6 +68,7 @@ int cdo_getopt(int argc, char * const *argv, const char *optstring)
 		}
 	    }
 	}
+
       if ( iargc < argc ) break;
     }
 
@@ -110,58 +111,62 @@ int cdo_getopt_internal(int nargc, char * const *nargv, const char *ostr)
   if ( CDO_optreset || !*place )
     {		/* update scanning pointer */
       CDO_optreset = 0;
-      if ( CDO_optind >= nargc || *(place = nargv[CDO_optind]) != '-')
+      if ( CDO_optind >= nargc || *(place = nargv[CDO_optind]) != '-' )
 	{
 	  place = EMSG;
 	  return (-1);
 	}
       
-      if (place[1] && *++place == '-')
+      if ( place[1] && *++place == '-' )
 	{	/* found "--" */
 	  /* ++CDO_optind; */
 	  place = EMSG;
 	  return (-2);
 	}
+
+      if ( place[1] ) return (-1);
     } 
+
   /* option letter okay? */
-  if ((CDO_optopt = (int)*place++) == (int)':' ||
-      !(oli = strchr(ostr, CDO_optopt)))
+  if ( (CDO_optopt = (int)*place++) == (int)':' || !(oli = strchr(ostr, CDO_optopt)) )
     {
-      /*
-       * if the user didn't specify '-' as an option,
-       * assume it means -1.
-       */
-      if (CDO_optopt == (int)'-')
-	return (-1);
-      if (!*place)
-	++CDO_optind;
-      if (CDO_opterr && *ostr != ':')
-	(void)fprintf(stderr,
-		      "%s: illegal option -- %c\n", __progname(nargv[0]), CDO_optopt);
+      /* if the user didn't specify '-' as an option, assume it means -1. */
+      if ( CDO_optopt == (int)'-' ) return (-1);
+
+      if ( !*place ) ++CDO_optind;
+
+      if ( CDO_opterr && *ostr != ':' )
+	(void)fprintf(stderr, "%s: illegal option -- %c\n", __progname(nargv[0]), CDO_optopt);
+
       return (BADCH);
     }
 
-  if (*++oli != ':') {			/* don't need argument */
-    CDO_optarg = NULL;
-    if (!*place)
-      ++CDO_optind;
-  } else {				/* need an argument */
-    if (*place)			/* no white space */
-      CDO_optarg = place;
-    else if (nargc <= ++CDO_optind) {	/* no arg */
+  if ( *++oli != ':' )
+    {		        	/* don't need argument */
+      CDO_optarg = NULL;
+      if (!*place)
+	++CDO_optind;
+    }
+  else
+    {				/* need an argument */
+      if ( *place )		/* no white space */
+	CDO_optarg = place;
+      else if (nargc <= ++CDO_optind)
+	{               	/* no arg */
+	  place = EMSG;
+	  if ( (CDO_opterr) && (*ostr != ':') )
+	    fprintf(stderr, "%s: option requires an argument -- %c\n",
+			         __progname(nargv[0]), CDO_optopt);
+	  return (BADARG);
+	}
+      else  /* white space */
+	CDO_optarg = nargv[CDO_optind];
+
       place = EMSG;
-      if ((CDO_opterr) && (*ostr != ':'))
-	(void)fprintf(stderr,
-		      "%s: option requires an argument -- %c\n",
-		      __progname(nargv[0]), CDO_optopt);
-      return (BADARG);
-    } else				/* white space */
-      CDO_optarg = nargv[CDO_optind];
-    place = EMSG;
-    ++CDO_optind;
-  }
-  
-  return (CDO_optopt);			/* dump back option letter */
+      ++CDO_optind;
+    }
+ 
+  return (CDO_optopt);		/* dump back option letter */
 }
 
 int cdo_getopt_long(int argc, char * const *argv, const char *optstring, const struct cdo_option *longopts, int *longindex)
@@ -178,11 +183,9 @@ int cdo_getopt_long(int argc, char * const *argv, const char *optstring, const s
       char *current_argv = argv[CDO_optind++] + 2, *has_equal;
       int i, current_argv_len, match = -1;
 
-      if (*current_argv == '\0')
-	{
-	  return(-1);
-	}
-      if ((has_equal = strchr(current_argv, '=')) != NULL)
+      if ( *current_argv == '\0' ) return(-1);
+
+      if ( (has_equal = strchr(current_argv, '=')) != NULL )
 	{
 	  current_argv_len = has_equal - current_argv;
 	  has_equal++;
@@ -192,51 +195,46 @@ int cdo_getopt_long(int argc, char * const *argv, const char *optstring, const s
 
       for (i = 0; longopts[i].name; i++)
 	{ 
-	  if (strncmp(current_argv, longopts[i].name, current_argv_len))
+	  if ( strncmp(current_argv, longopts[i].name, current_argv_len) )
 	    continue;
 
-	  if (strlen(longopts[i].name) == (unsigned)current_argv_len)
+	  if ( strlen(longopts[i].name) == (unsigned)current_argv_len )
 	    { 
 	      match = i;
 	      break;
 	    }
-	  if (match == -1)
-	    match = i;
+
+	  if ( match == -1 ) match = i;
 	}
 	
-      if (match != -1)
+      if ( match != -1 )
 	{
-	  if (longopts[match].has_arg == required_argument ||
-	      longopts[match].has_arg == optional_argument)
+	  if ( longopts[match].has_arg == required_argument ||
+	       longopts[match].has_arg == optional_argument )
 	    {
-	      if (has_equal)
+	      if ( has_equal )
 		CDO_optarg = has_equal;
 	      else
 		CDO_optarg = argv[CDO_optind++];
 	    }
 	  
-	  if ((longopts[match].has_arg == required_argument) && (CDO_optarg == NULL))
+	  if ( (longopts[match].has_arg == required_argument) && (CDO_optarg == NULL) )
 	    {
-	      /*
-	       * Missing argument, leading :
-	       * indicates no error should be generated
-	       */
-	      if ((CDO_opterr) && (*optstring != ':'))
-		(void)fprintf(stderr,
-			      "%s: option requires an argument -- %s\n",
-			      __progname(argv[0]), current_argv);
+	      /* Missing argument, leading: indicates no error should be generated */
+	      if ( (CDO_opterr) && (*optstring != ':') )
+		fprintf(stderr, "%s: option requires an argument -- %s\n",
+			        __progname(argv[0]), current_argv);
 	      return (BADARG);
 	    }
 	}
       else
 	{ /* No matching argument */
-	  if ((CDO_opterr) && (*optstring != ':'))
-	    (void)fprintf(stderr,
-			  "%s: illegal option -- %s\n", __progname(argv[0]), current_argv);
+	  if ( (CDO_opterr) && (*optstring != ':') )
+	    fprintf(stderr, "%s: illegal option -- %s\n", __progname(argv[0]), current_argv);
 	  return (BADCH);
 	}
 	
-      if (longopts[match].flag)
+      if ( longopts[match].flag )
 	{
 	  *longopts[match].flag = longopts[match].val;
 	  retval = 0;
@@ -244,8 +242,8 @@ int cdo_getopt_long(int argc, char * const *argv, const char *optstring, const s
       else 
 	retval = longopts[match].val;
   
-      if (longindex) *longindex = match;
+      if ( longindex ) *longindex = match;
     }
   
-  return(retval);
+  return (retval);
 }
