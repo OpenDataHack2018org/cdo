@@ -18,9 +18,18 @@
 #ifndef _CDO_GETOPT_H
 #define _CDO_GETOPT_H
 
-extern int CDO_optind = 1;
-extern char *CDO_optarg;
+struct cdo_option {
+  char *name;
+  int   has_arg;
+  int  *flag;
+  int   val;
+};
 
-int cdo_getopt(int argc, char * const argv[], const char *optstring);
+#define  no_argument        1   // no argument to the option is expect
+#define  required_argument  2   // an argument to the option is required
+#define  optional_argument  3   // an argument to the option may be presented.
+
+int cdo_getopt(int argc, char * const *argv, const char *optstring);
+int cdo_getopt_long(int argc, char * const *argv, const char *optstring, const struct cdo_option *longopts, int *longindex);
 
 #endif  /* _CDO_GETOPT_H */

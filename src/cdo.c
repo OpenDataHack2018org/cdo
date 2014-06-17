@@ -49,6 +49,10 @@
 #include "cdo.h"
 #include "cdo_int.h"
 
+#include "cdo_getopt.h"
+extern int   CDO_optind;
+extern char *CDO_optarg;
+
 
 #if defined(HAVE_LIBPTHREAD)
 #include "pstream_int.h"
@@ -67,9 +71,7 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-
 char CDO_Version[] = "Climate Data Operators version "VERSION" (http://code.zmaw.de/projects/cdo)";
-
 
 char *Progname;
 
@@ -401,57 +403,6 @@ void cdoSetDebug(int level)
   if ( level == 1 || (level & 128) ) pipeDebug(1);
   if ( level == 1 || (level & 256) ) Pthread_debug(1);
 #endif
-}
-
-static int CDO_optind = 1;
-static char *CDO_optarg;
-
-static
-int cdo_getopt(int argc, char * const argv[], const char *optstring)
-{
-  static int optpos = 0;
-  int optval = -1, value;
-  int opthasarg = 0;
-  int optstrlen = strlen(optstring);
-  int iargc;
-
-  CDO_optarg = NULL;
-
-  while ( optpos < optstrlen && CDO_optind < argc )
-    {
-      value = optstring[optpos];
-      optpos++;
-      if ( optstring[optpos] == ':' )
-	{
-	  opthasarg = 1;
-	  optpos++;
-	}
-      else
-	opthasarg = 0;
-
-      for ( iargc = 1; iargc < argc; iargc++ )
-	{
-	  if ( *argv[iargc] == '-' && strlen(argv[iargc]) == 2 )
-	    {
-	      if ( (argv[iargc][1]) == value )
-		{
-		  optval = value;
-		  CDO_optind++;
-		  if ( opthasarg )
-		    {
-		      CDO_optarg = argv[iargc+1];
-		      CDO_optind++;
-		    }
-		  break;
-		}
-	    }
-	}
-      if ( iargc < argc ) break;
-    }
-
-  if ( opthasarg && CDO_optarg == NULL ) optval = ':';
-
-  return (optval);
 }
 
 #undef  IsBigendian
