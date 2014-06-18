@@ -207,11 +207,14 @@ void cdo_usage(void)
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
-  fprintf(stderr, "    -f <format>    Format of the output file. (grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg)\n");
+  fprintf(stderr, "    -f, --format <format>\n");
+  fprintf(stderr, "                   Format of the output file. (grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
-  fprintf(stderr, "    -h             Help information for the operators\n");
-  fprintf(stderr, "    -H             Do not append to netCDF \"history\" global attribute\n");
+  fprintf(stderr, "    -h, --help     Help information for the operators\n");
+  fprintf(stderr, "    --history      Do not append to netCDF \"history\" global attribute\n");
+  fprintf(stderr, "    --netcdf_hdr_pad, --hdr_pad, --header_pad <nbr>\n");
+  fprintf(stderr, "                   Pad netCDF output header with nbr bytes\n");
   /*
   fprintf(stderr, "    -i <inst>      Institution name/file\n");
   fprintf(stderr, "                   Predefined instituts: ");
@@ -230,7 +233,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "    -Q             Alphanumeric sorting of netCDF parameter names\n");
-  fprintf(stderr, "    -R             Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
+  fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
   fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
@@ -242,8 +245,8 @@ void cdo_usage(void)
       fprintf(stderr, " %s", name);
   fprintf(stderr, "\n");
 
-  fprintf(stderr, "    -V             Print the version number\n");
-  fprintf(stderr, "    -v             Print extra details for some operators\n");
+  fprintf(stderr, "    -V, --version  Print the version number\n");
+  fprintf(stderr, "    -v, --verbose  Print extra details for some operators\n");
   fprintf(stderr, "    -W             Print extra warning messages\n");
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
@@ -1125,6 +1128,7 @@ void parse_options_long(int argc, char *argv[])
       { "header_pad",     required_argument, &lnetcdf_hdr_pad,  1 },
       { "hdr_pad",        required_argument, &lnetcdf_hdr_pad,  1 },
       { "format",         required_argument,             NULL, 'f' },
+      { "help",                 no_argument,             NULL, 'h' },
       { "history",              no_argument,             NULL, 'H' },
       { "regular",              no_argument,             NULL, 'R' },
       { "table",          required_argument,             NULL, 't' },

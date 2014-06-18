@@ -4,7 +4,8 @@ CDO NEWS
 Version 1.6.4 (26 June 2014):
 
    New features:
-     * Option -H: Do not append to netCDF "history" global attribute
+     * Option --history: Do not append to netCDF "history" global attribute
+     * Option --netcdf_hdr_pad <nbr>: Pad netCDF output header with nbr bytes
    New operators:
      * sealevelpressure: sea level pressure
    Changed operators:
