@@ -1090,28 +1090,16 @@ void parse_options_long(int argc, char *argv[])
   struct cdo_option opt_long[] =
     {
       { "netcdf_hdr_pad", required_argument, &lnetcdf_hdr_pad,  1 },
-      { "hdr_pad",        required_argument, &lnetcdf_hdr_pad,  1 },
       { "header_pad",     required_argument, &lnetcdf_hdr_pad,  1 },
+      { "hdr_pad",        required_argument, &lnetcdf_hdr_pad,  1 },
+      { "format",         required_argument,             NULL, 'f' },
+      { "history",              no_argument,             NULL, 'H' },
+      { "regular",              no_argument,             NULL, 'R' },
+      { "table",          required_argument,             NULL, 't' },
       { "verbose",              no_argument,             NULL, 'v' },
       { "version",              no_argument,             NULL, 'V' },
       { NULL,                             0,             NULL,  0  }
     };
-
-  /*int opt_idx=0;*/  /* Index of current long option into opt_lng array */
-
-  /* Parse command line arguments */
-  //  while ( 1 )
-    {
-      /* getopt_long_only() allows one dash to prefix long options */
-      //  opt = CDO_getopt_long(argc,argv,opt_sht_lst,opt_lng,&opt_idx);
-      /* NB: access to opt_crr is only valid when long_opt is detected */
-      //  if(opt == EOF) break; /* Parse positional arguments once getopt_long() returns EOF */
-      //  opt_crr=(char *)strdup(opt_lng[opt_idx].name);
-
-      //  if(opt == 0)
-      //	printf("long opt: %s\n", opt_crr);
-      /* Process long options without short option counterparts */
-    }
 
   while ( 1 )
     {
