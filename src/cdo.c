@@ -1081,6 +1081,38 @@ void cdo_set_options(void)
   if ( CDO_netcdf_hdr_pad > 0 ) cdiDefGlobal("NETCDF_HDR_PAD", CDO_netcdf_hdr_pad);
 }
 
+
+long str_to_int(char *intstring)
+{
+  long intval = -1;
+  long fact = 1;
+
+  if ( intstring )
+    {
+      int loop, len;
+
+      len = (int) strlen(intstring);
+      for ( loop = 0; loop < len; loop++ )
+	{
+	  if ( ! isdigit((int) intstring[loop]) )
+	    {
+	      switch ( tolower((int) intstring[loop]) )
+		{
+		case 'k':  fact = 1024;        break;
+		case 'm':  fact = 1048576;     break;
+		case 'g':  fact = 1073741824;  break;
+		default:   fact = 0;           break;
+		}
+	      break;
+	    }
+	}
+
+      if ( fact ) intval = fact*atol(intstring);
+    }
+
+  return (intval);
+}
+
 static
 void parse_options_long(int argc, char *argv[])
 {
@@ -1113,7 +1145,7 @@ void parse_options_long(int argc, char *argv[])
 	case 0:
 	  if ( lnetcdf_hdr_pad )
 	    {
-	      int netcdf_hdr_pad = atoi(CDO_optarg);
+	      int netcdf_hdr_pad = str_to_int(CDO_optarg);
 	      if ( netcdf_hdr_pad >= 0 ) CDO_netcdf_hdr_pad = netcdf_hdr_pad;
 	    }
 	  break;
