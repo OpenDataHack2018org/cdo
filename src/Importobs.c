@@ -237,7 +237,7 @@ void *Importobs(void *argument)
 	  if ( i < xsize && j < ysize && index >= 0 )
 	    {
 	      pstation = station;
-	      while (isalpha(*pstation)) *pstation++;
+	      while (isalpha(*pstation)) pstation++;
 	      // printf("station %s %d\n", pstation, atoi(pstation));
 	      data[index][j*xsize+i] = value;
 	      data[    4][j*xsize+i] = height1;

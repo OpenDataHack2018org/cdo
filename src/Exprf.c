@@ -56,7 +56,7 @@ void *Expr(void *argument)
   int gridsize, nlevel;
   int nmiss;
   int taxisID1, taxisID2;
-  int lwarn = TRUE;
+  //int lwarn = TRUE;
   double missval;
   double *array = NULL;
   double *single1, *single2;
@@ -73,6 +73,8 @@ void *Expr(void *argument)
   EXPRF  = cdoOperatorAdd("exprf",  0, 0, "expr script filename");
   AEXPR  = cdoOperatorAdd("aexpr",  0, 0, "expressions");
   AEXPRF = cdoOperatorAdd("aexprf", 0, 0, "expr script filename");
+
+  UNUSED(AEXPRF);
 
   operatorID = cdoOperatorID();
 

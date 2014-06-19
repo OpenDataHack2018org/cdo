@@ -46,7 +46,6 @@ void *Eofcoeff3d(void * argument)
   int i, varID, recID, levelID, tsID, eofID, *varID3;    
   int gridID1,gridID3;
   int nrecs, nvars, nlevs, neof, nchars, nmiss; 
-  int reached_eof;
   int streamID1, streamID2, *streamIDs;
   int taxisID2, taxisID3;
   int vlistID1, vlistID2, vlistID3;
@@ -103,16 +102,13 @@ void *Eofcoeff3d(void * argument)
   eof = (field_t***) malloc(nvars * sizeof(field_t**));
   for ( varID=0; varID<nvars; varID++)
     eof[varID] = (field_t**) malloc(nlevs*sizeof(field_t*));
-  reached_eof=0;
+
   eofID = 0;
   while ( 1 )       
    {     
      nrecs = streamInqTimestep(streamID1, eofID);
-     if ( nrecs == 0)
-       {
-         reached_eof = 1;
-         break;
-       }
+     if ( nrecs == 0) break;
+
      for ( recID = 0; recID < nrecs; recID++ )
        {         
          streamInqRecord(streamID1, &varID, &levelID);
@@ -199,16 +195,11 @@ void *Eofcoeff3d(void * argument)
     }
   }
 
-  reached_eof=0;
   tsID=0;
   while ( 1 )
     {      
       nrecs = streamInqTimestep(streamID2, tsID);
-      if ( nrecs == 0 )
-        {
-          reached_eof=1;
-          break;
-        }
+      if ( nrecs == 0 ) break;
 
       for ( varID = 0; varID < nvars; varID++ )
 	for ( eofID = 0; eofID < neof; eofID++ ) {

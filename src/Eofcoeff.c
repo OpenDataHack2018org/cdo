@@ -46,7 +46,6 @@ void *Eofcoeff(void * argument)
   int i, varID, recID, levelID, tsID, eofID;    
   int gridID1, gridID3;
   int nrecs, nvars, nlevs, neof, nchars, nmiss, ngrids; 
-  int reached_eof;
   int streamID1, streamID2, *streamIDs;
   int taxisID2, taxisID3;
   int vlistID1, vlistID2, vlistID3;
@@ -82,7 +81,7 @@ void *Eofcoeff(void * argument)
     cdoAbort("Too many grids in input");
   
   nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
-  nrecs = vlistNrecs(vlistID1); 
+  nrecs = vlistNrecs(vlistID1);
   nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
   //w = (double*) malloc(gridsize*sizeof(double));
   //gridWeights(gridID2, w);
@@ -104,16 +103,13 @@ void *Eofcoeff(void * argument)
   eof = (field_t***) malloc(nvars * sizeof(field_t**));
   for ( varID=0; varID<nvars; varID++)
     eof[varID] = (field_t**) malloc(nlevs*sizeof(field_t*));
-  reached_eof=0;
+
   eofID = 0;
   while ( 1 )       
    {     
      nrecs = streamInqTimestep(streamID1, eofID);
-     if ( nrecs == 0)
-       {
-         reached_eof = 1;
-         break;
-       }
+     if ( nrecs == 0) break;
+
      for ( recID = 0; recID < nrecs; recID++ )
        {         
          streamInqRecord(streamID1, &varID, &levelID);
@@ -192,17 +188,11 @@ void *Eofcoeff(void * argument)
   out.nmiss = 0;
   out.ptr = (double*) malloc(1*sizeof(double));
  
-  // 
-  reached_eof=0;
   tsID=0;
   while ( 1 )
     {      
       nrecs = streamInqTimestep(streamID2, tsID);
-      if ( nrecs == 0 )
-        {
-          reached_eof=1;
-          break;
-        }
+      if ( nrecs == 0 ) break;
       
       taxisCopyTimestep(taxisID3, taxisID2);
       /*for ( eofID=0; eofID<neof; eofID++)

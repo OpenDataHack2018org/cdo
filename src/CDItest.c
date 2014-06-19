@@ -49,9 +49,13 @@ void *CDItest(void *argument)
 
   NCOPY = cdoOperatorAdd("ncopy",   0, 0, NULL);
 
+  UNUSED(NCOPY);
+
   //  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   operatorID = cdoOperatorID();
+
+  UNUSED(operatorID);
 
   //  operatorInputArg("Number of copies");
   if ( operatorArgc() == 1 ) max_copy = atoi(operatorArgv()[0]);

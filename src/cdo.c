@@ -1477,7 +1477,10 @@ int main(int argc, char *argv[])
 
   get_env_vars();
 
-  parse_options_long(argc, argv);
+  if ( 1 )
+    parse_options_long(argc, argv);
+  else
+    parse_options(argc, argv);
 
   cdo_set_options();
 

@@ -210,6 +210,8 @@ int import_e5ml(const char *filename, VAR **vars)
       gridtype  = (*vars)[iv].gridtype;
       zaxistype = (*vars)[iv].zaxistype;
 
+      UNUSED(zaxistype);
+
       if ( gridtype == GRID_GAUSSIAN )
 	{
 	  (*vars)[iv].gridID = gridIDgp;
@@ -283,7 +285,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
   int varid, code;
   int ilev;
   int lon, lat;
-  int nlon, nlat, nlev, nlevp1, nvct, nsp, n2, i, nvclev;
+  int nlon, nlat, nlev, nlevp1/*, nvct*/, nsp, n2, i, nvclev;
   int lat_dimid, lon_dimid, nlev_dimid, nlevp1_dimid, nsp_dimid, nvclev_dimid, n2_dimid;
   int gridIDgp = -1, gridIDsp, zaxisIDml = -1;
   int gridtype, zaxistype;
@@ -293,7 +295,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
   const double *vct;
   char atttext[1024];
   size_t attlen;
-  int attint;
+  //int attint;
   char *username;
   char timestr[30];
   time_t date_and_time_in_sec;
@@ -335,6 +337,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
       else if ( gridtype == GRID_SPECTRAL && nsp == 0 )
 	{
 	  gridIDsp = vars[varid].gridID;
+	  UNUSED(gridIDsp);
 	  nsp = gridInqSize(vars[varid].gridID);
 	  nsp = nsp/2;
 	}
@@ -424,7 +427,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vdate", NC_INT, 1, &vdate));
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vtime", NC_INT, 1, &vtime));
 
-  attint = 31;
+  //attint = 31;
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_n", NC_INT, 1, &ntr));
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_m", NC_INT, 1, &ntr));
   nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_k", NC_INT, 1, &ntr));
@@ -482,7 +485,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
 
   /* define model level */
 
-  nvct = nvclev*2;
+  // nvct = nvclev*2;
 
   /* vct   = (double*) malloc(nvct*sizeof(double)); */
 
@@ -747,6 +750,8 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   nce(nc_inq_dimlen(nc_file_id, spc_dimid, &dimlen));
   spc = (int) dimlen;
 
+  UNUSED(spc);
+
   nce(nc_inq_dimid(nc_file_id, "nvclev", &nvclev_dimid));
   nce(nc_inq_dimlen(nc_file_id, nvclev_dimid, &dimlen));
   nvclev = (int) dimlen;
@@ -771,6 +776,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   nce(nc_inq_dimlen(nc_file_id, ilev_dimid, &dimlen));
   ilev = (int) dimlen;
 
+  UNUSED(ilev);
   /*
   nce(nc_inq_dimid(nc_file_id, "surface", &surface_dimid));
   nce(nc_inq_dimlen(nc_file_id, surface_dimid, &surface));
@@ -1083,7 +1089,7 @@ void export_e5res(const char *filename, VAR *vars, int nvars)
   int varid;
   size_t nvals;
   size_t start[4], count[4];
-  int nlon, nlat, nlev, nvct, nfc, i;
+  int nlon, nlat, nlev/*, nvct*/, nfc, i;
   int gridIDgp = -1, zaxisIDml = -1;
   int nc_file_id;
   double *xvals, *yvals;
@@ -1392,7 +1398,7 @@ void export_e5res(const char *filename, VAR *vars, int nvars)
   /* define model level */
 
   nlev = lev;
-  nvct = nvclev*2;
+  //nvct = nvclev*2;
 
   /* vct   = (double*) malloc(nvct*sizeof(double)); */
 

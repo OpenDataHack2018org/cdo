@@ -194,6 +194,8 @@ void *Adisit(void *argument)
   ADISIT = cdoOperatorAdd("adisit", 1, 1, "");
   ADIPOT = cdoOperatorAdd("adipot", 1, 1, "");
 
+  UNUSED(ADIPOT);
+
   operatorID = cdoOperatorID();
 
   if ( operatorArgc() == 1 ) pin = atof(operatorArgv()[0]);

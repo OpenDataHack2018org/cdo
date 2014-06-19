@@ -24,6 +24,9 @@
 #include "util.h"
 #include "text.h"
 
+/* dummy use of unused parameters to silence compiler warnings */
+#define  UNUSED(x) (void)x
+
 #undef   TRUE
 #define  TRUE   1
 #undef   FALSE
