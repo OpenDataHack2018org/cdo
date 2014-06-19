@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-06-19  Uwe Schulzweida
+
+	* added option --use_fftw: used in module filter
+
 2014-06-18  Uwe Schulzweida
 
 	* added option --netcdf_hdr_pad <nbr>: Pad netCDF output header with nbr bytes

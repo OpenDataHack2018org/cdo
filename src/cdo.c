@@ -1121,12 +1121,14 @@ void parse_options_long(int argc, char *argv[])
 {
   int c;
   int lnetcdf_hdr_pad;
+  int luse_fftw;
 
   struct cdo_option opt_long[] =
     {
       { "netcdf_hdr_pad", required_argument, &lnetcdf_hdr_pad,  1 },
       { "header_pad",     required_argument, &lnetcdf_hdr_pad,  1 },
       { "hdr_pad",        required_argument, &lnetcdf_hdr_pad,  1 },
+      { "use_fftw",       required_argument,       &luse_fftw,  1 },
       { "format",         required_argument,             NULL, 'f' },
       { "help",                 no_argument,             NULL, 'h' },
       { "history",              no_argument,             NULL, 'H' },
@@ -1140,6 +1142,7 @@ void parse_options_long(int argc, char *argv[])
   while ( 1 )
     {
       lnetcdf_hdr_pad = 0;
+      luse_fftw = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1151,6 +1154,13 @@ void parse_options_long(int argc, char *argv[])
 	    {
 	      int netcdf_hdr_pad = str_to_int(CDO_optarg);
 	      if ( netcdf_hdr_pad >= 0 ) CDO_netcdf_hdr_pad = netcdf_hdr_pad;
+	    }
+	  else if ( luse_fftw )
+	    {
+	      int use_fftw = str_to_int(CDO_optarg);
+	      if ( use_fftw != 0 && use_fftw != 1 )
+		cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", use_fftw);
+	      CDO_Use_FFTW = use_fftw;
 	    }
 	  break;
 	case 'a':
