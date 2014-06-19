@@ -30,6 +30,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "statistic.h"
 #include "pstream.h"
 
 #if defined(HAVE_LIBFFTW3) 
@@ -38,11 +39,12 @@
 
 
 #define  NALLOC_INC  1000
-#define  PI2         6.2832
+#define  PI2         (2*M_PI)
 #define  HALF        0.5
 
 /* FAST FOURIER TRANSFORMATION (bare) */
-static
+/* not used */
+/*
 void fft2(double *real, double *imag, int n, int isign)
 {
   int nn, mmax, m, j, istep, i;
@@ -52,17 +54,17 @@ void fft2(double *real, double *imag, int n, int isign)
   nn = n << 1;
   j = 1;
   
-  /* BIT Reversion of data */
+  // BIT Reversion of data
   for ( i=1; i<nn; i+=2 )
     {
       if ( j > i ) 
         {        
-          /* swap real part */
+          // swap real part
           tmp = real[j/2]; 
           real[j/2] = real[i/2];          
           real[i/2] = tmp;                    
           
-          /* swap imaginary part */
+          // swap imaginary part
           tmp = imag[j/2]; 
           imag[j/2] = imag[i/2];
           imag[i/2] = tmp;         
@@ -76,7 +78,7 @@ void fft2(double *real, double *imag, int n, int isign)
       j += m;
     }
   
-  /* Danielson-Lanzcos algorithm */
+  // Danielson-Lanzcos algorithm
   mmax = 2;
   while ( nn > mmax )
     {
@@ -103,7 +105,8 @@ void fft2(double *real, double *imag, int n, int isign)
           wi = wi*wpr+wtemp*wpi+wi;
         }
       mmax = istep;      
-    }   
+    }
+
   if ( isign == -1 )
     for( i =0; i<n; i++)
       {
@@ -111,7 +114,7 @@ void fft2(double *real, double *imag, int n, int isign)
         imag[i] /= n;
       }
 }
-
+*/
 
 /* include from Tinfo.c */
 void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit);
@@ -171,14 +174,34 @@ static
 void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 {  
   int i;
+  int lpower2 = FALSE;
+  double *work_r = NULL;
+  double *work_i = NULL;
 
-  fft2(array1, array2, nts, 1);
+  if ( (nts&(nts-1)) == 0 ) lpower2 = TRUE;
+
+  if ( !lpower2 )
+    {
+      work_r = (double*) malloc(nts*sizeof(double));
+      work_i = (double*) malloc(nts*sizeof(double));
+    }
+
+  if ( lpower2 )
+    fft(array1, array2, nts, 1);
+  else
+    ft_r(array1, array2, nts, 1, work_r, work_i);
 
   for ( i = 0; i < nts; i++ )
     if ( ! fmasc[i] )
       array1[i] = array2[i] = 0;
 
-  fft2(array1, array2, nts, -1);
+  if ( lpower2 )
+    fft(array1, array2, nts, -1);
+  else
+    ft_r(array1, array2, nts, -1, work_r, work_i);
+
+  if ( work_r ) free(work_r);
+  if ( work_i ) free(work_i);
   
   return;
 }
@@ -186,7 +209,7 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 
 void *Filter(void *argument)
 {
-  enum {BAND, HIGH, LOW};
+  enum {BANDPASS, HIGHPASS, LOWPASS};
   char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
   int operatorID;
@@ -196,7 +219,7 @@ void *Filter(void *argument)
   int gridID, varID, levelID, recID;
   int tsID;
   int i;
-  int nts,nts2;
+  int nts, nts2;
   int nalloc = 0;
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
@@ -211,17 +234,18 @@ void *Filter(void *argument)
   double fmin = 0, fmax = 0;
   int *fmasc;
   int use_fftw = FALSE;
+  int zero_pad = FALSE;
 #if defined(HAVE_LIBFFTW3) 
   fftw_plan p_T2S, p_S2T;
-  fftw_complex *out_fft;
-  fftw_complex *in_fft;
+  fftw_complex *out_fft = NULL;
+  fftw_complex *in_fft = NULL;
 #endif
   
   cdoInitialize(argument);
 
-  cdoOperatorAdd("bandpass",  BAND,  0, NULL);
-  cdoOperatorAdd("highpass",  HIGH,  0, NULL);
-  cdoOperatorAdd("lowpass" ,  LOW,   0, NULL);
+  cdoOperatorAdd("bandpass",  BANDPASS,  0, NULL);
+  cdoOperatorAdd("highpass",  HIGHPASS,  0, NULL);
+  cdoOperatorAdd("lowpass" ,  LOWPASS,   0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);
@@ -229,12 +253,14 @@ void *Filter(void *argument)
   if ( CDO_Use_FFTW )
     {
 #if defined(HAVE_LIBFFTW3) 
-      if ( cdoVerbose ) cdoPrint("Using fftw lib");
+      if ( cdoVerbose ) cdoPrint("Using fftw3 lib");
       use_fftw = TRUE;
 #else
-      //   cdoAbort("LIBFFTW3 support not compiled in!");
+      if ( cdoVerbose ) cdoPrint("LIBFFTW3 support not compiled in!");
 #endif
     }
+      
+  if ( cdoVerbose && use_fftw  == FALSE ) cdoPrint("Using intrinsic FFT function!");
   
   streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -246,11 +272,7 @@ void *Filter(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   calendar = taxisInqCalendar(taxisID1);  
-  
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  
-  streamDefVlist(streamID2, vlistID2);
-  
+ 
   nvars = vlistNvars(vlistID1);
   
   tsID = 0;    
@@ -260,7 +282,7 @@ void *Filter(void *argument)
         {
           nalloc += NALLOC_INC;
 	  dtinfo = (dtinfo_t*) realloc(dtinfo, nalloc*sizeof(dtinfo_t));
-          vars   = (field_t ***) realloc(vars,   nalloc*sizeof(field_t **));
+          vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
         }
                        
       taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
@@ -322,6 +344,7 @@ void *Filter(void *argument)
     }
   
   nts = tsID;
+  if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
 
   /*  round up nts to next power of two for (better) performance of fast fourier transformation */
 
@@ -330,8 +353,8 @@ void *Filter(void *argument)
 #if defined(HAVE_LIBFFTW3) 
       nts2 = nts;
 
-      out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
       in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
+      out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
 
       p_T2S = fftw_plan_dft_1d(nts, in_fft, out_fft,  1, FFTW_ESTIMATE);
       p_S2T = fftw_plan_dft_1d(nts, out_fft, in_fft, -1, FFTW_ESTIMATE);
@@ -339,13 +362,23 @@ void *Filter(void *argument)
     }
   else
     {
-      nts2 = nts-1;
-      nts2 |= nts2 >> 1;  /* handle  2 bit numbers */
-      nts2 |= nts2 >> 2;  /* handle  4 bit numbers */
-      nts2 |= nts2 >> 4;  /* handle  8 bit numbers */
-      nts2 |= nts2 >> 8;  /* handle 16 bit numbers */
-      nts2 |= nts2 >> 16; /* handle 32 bit numbers */
-      nts2++;
+      if ( zero_pad )
+	{
+	  nts2 = nts-1;
+	  nts2 |= nts2 >> 1;  /* handle  2 bit numbers */
+	  nts2 |= nts2 >> 2;  /* handle  4 bit numbers */
+	  nts2 |= nts2 >> 4;  /* handle  8 bit numbers */
+	  nts2 |= nts2 >> 8;  /* handle 16 bit numbers */
+	  nts2 |= nts2 >> 16; /* handle 32 bit numbers */
+	  nts2++;
+	}
+      else
+	{
+	  nts2 = nts;
+	}
+
+      if ( nts2 > nts )
+	cdoWarning("Filling up time series with zeros (zero-padding). This could produce oscillations in the filtered signal!");
 
       array1 = (double*) malloc(nts2*sizeof(double));
       array2 = (double*) malloc(nts2*sizeof(double));
@@ -357,26 +390,27 @@ void *Filter(void *argument)
 
   switch(operfunc)
   {
-    case BAND: 
+    case BANDPASS: 
     {
-      operatorInputArg("Lower bound of frequency band:");
+      operatorInputArg("lower and upper bound of frequency band");
+      operatorCheckArgc(2);
       fmin = atof(operatorArgv()[0]);
-      
-      operatorInputArg("Upper bound of frequency band:");
       fmax = atof(operatorArgv()[1]);
       break;
     }
-    case HIGH: 
+    case HIGHPASS:
     {              
-      operatorInputArg("Lower bound of frequency pass:");
+      operatorInputArg("lower bound of frequency pass");
+      operatorCheckArgc(1);
       fmin = atof(operatorArgv()[0]);
       fmax = fdata;
       break;
     }
-    case LOW:  
+    case LOWPASS: 
     {
+      operatorInputArg("upper bound of frequency pass");
+      operatorCheckArgc(1);
       fmin = 0;
-      operatorInputArg("Upper bound of frequency pass:");
       fmax = atof(operatorArgv()[0]);
       break;
     }      
@@ -421,8 +455,10 @@ void *Filter(void *argument)
 		  // properly here. 
 
 		  memset(array2, 0, nts2*sizeof(double));
+
 		  for ( tsID = 0; tsID < nts; tsID++ )
-		    array1[tsID] = vars[tsID][varID][levelID].ptr[i];                                         
+		    array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+                                      
 		  /* zero padding up to next power of to */
 		  for ( ; tsID < nts2; tsID++ )                
 		    array1[tsID] = 0;       
@@ -439,6 +475,11 @@ void *Filter(void *argument)
   if ( array1 ) free(array1);
   if ( array2 ) free(array2);
 
+  
+  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  
+  streamDefVlist(streamID2, vlistID2);
+ 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
       taxisDefDTinfo(taxisID2, dtinfo[tsID]);
@@ -464,11 +505,16 @@ void *Filter(void *argument)
       field_free(vars[tsID], vlistID1);
     }
 
-  if ( vars   ) free(vars);
-  if ( dtinfo ) free(dtinfo);
-  
   streamClose(streamID2);
   streamClose(streamID1);
+
+  if ( vars   ) free(vars);
+  if ( dtinfo ) free(dtinfo);
+
+#if defined(HAVE_LIBFFTW3)
+  if ( in_fft  ) free(in_fft);
+  if ( out_fft ) free(out_fft);
+#endif
 
   cdoFinish();
   

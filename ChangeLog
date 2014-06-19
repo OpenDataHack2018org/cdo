@@ -5,6 +5,7 @@
 
 2014-06-19  Uwe Schulzweida
 
+	* Filter: disable zero-padding
 	* added option --use_fftw: used in module filter
 
 2014-06-18  Uwe Schulzweida

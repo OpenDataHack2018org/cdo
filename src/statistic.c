@@ -147,12 +147,14 @@ void heap_sort (double *eig_val, double **a, int n)
 }
 
 
-void make_symmetric_matrix_triangular (double **a, int n,
-				       double *d, double *e, const char *prompt)
+void make_symmetric_matrix_triangular(double **a, int n,
+				      double *d, double *e, const char *prompt)
 {
   int i, j, k;
   double f, g, h, hh, scale;
   
+  UNUSED(prompt);
+
   for (i = n - 1; i >= 1; i--)
     {
       h = scale = 0;
@@ -508,31 +510,36 @@ void lu_backsubstitution (double **a, int n, int *index, double *b)
 }
 
 
-void fft (double *real, double *imag, int n, int sign)
-{				/* n must be a power of 2 */
+void fft(double *real, double *imag, int n, int sign)
+{
+  /* n must be a power of 2 */
   /* sign should be 1 (FT) or -1 (reverse FT) */
   int i, j, j1, j2;
   int bit;
+  int step;
   double temp_r, temp_i, norm;
   double w_r, w_i, ww_r, ww_i;
-  int step;
   
   /* Bit reversal part */
-  for (i = j = 0; i < n; i++)	/* The bit pattern of i and j are reverse */
+  for ( i = j = 0; i < n; i++ )	/* The bit pattern of i and j are reverse */
     {
-      if (i > j)
+      if ( i > j )
         {
+          /* swap real part */
           temp_r = real[i];
           real[i] = real[j];
           real[j] = temp_r;
+
+          /* swap imaginary part */
           temp_i = imag[i];
           imag[i] = imag[j];
           imag[j] = temp_i;
         }
-      for (bit = n >> 1; j & bit; bit >>= 1)
-        j ^= bit;
+
+      for ( bit = n >> 1; j & bit; bit >>= 1 ) j ^= bit;
       j |= bit;
     }
+
   /* Danielson-Lanczos Part */
   for (step = 1; step < n; step <<= 1)
     {
@@ -556,11 +563,12 @@ void fft (double *real, double *imag, int n, int sign)
           ww_i = temp_r * w_i + ww_i * w_r;
         }
     }
-  norm = sqrt (n);
-  for (i = 0; i < n; i++)
+
+  norm = 1./sqrt(n);
+  for ( i = 0; i < n; i++ )
     {
-      real[i] /= norm;
-      imag[i] /= norm;
+      real[i] *= norm;
+      imag[i] *= norm;
     }
 }
 
@@ -602,17 +610,19 @@ void ft (double *real, double *imag, int n, int sign)
       work_r[k] = sum_r;
       work_i[k] = sum_i;
     }
-  norm = sqrt (n);
+
+  norm = 1./sqrt(n);
   for (k = 0; k < n; k++)
     {
-      real[k] = work_r[k] / norm;
-      imag[k] = work_i[k] / norm;
+      real[k] = work_r[k] * norm;
+      imag[k] = work_i[k] * norm;
     }
 }
 
 /* reentrant version of ft */
 void ft_r(double *real, double *imag, int n, int sign, double *work_r, double *work_i)
-{				/* sign should be 1 (FT) or -1 (reverse FT) */
+{
+  /* sign should be 1 (FT) or -1 (reverse FT) */
   int j, k;
   double sum_r, sum_i, norm;
   double w_r, w_i, ww_r, ww_i, temp_r;
@@ -636,11 +646,12 @@ void ft_r(double *real, double *imag, int n, int sign, double *work_r, double *w
       work_r[k] = sum_r;
       work_i[k] = sum_i;
     }
-  norm = sqrt (n);
+
+  norm = 1./sqrt(n);
   for (k = 0; k < n; k++)
     {
-      real[k] = work_r[k] / norm;
-      imag[k] = work_i[k] / norm;
+      real[k] = work_r[k] * norm;
+      imag[k] = work_i[k] * norm;
     }
 }
 
@@ -1303,6 +1314,8 @@ void annihilate_1side(double **M, long i, long j, long k, long n)
   double tmp, *mi=NULL, *mj=NULL;
   //  int first_annihilation = 0;
   long r;
+
+  UNUSED(k);
 
   i--; j--;
 
