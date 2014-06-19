@@ -237,7 +237,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
   fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
-  fprintf(stderr, "    -s             Silent mode\n");
+  fprintf(stderr, "    -s, --silent   Silent mode\n");
   fprintf(stderr, "    -t <partab>    Set default parameter table name or file\n");
   fprintf(stderr, "                   Predefined tables: ");
   for ( id = 0; id < tableInqNumber(); id++ )
@@ -1133,6 +1133,7 @@ void parse_options_long(int argc, char *argv[])
       { "help",                 no_argument,             NULL, 'h' },
       { "history",              no_argument,             NULL, 'H' },
       { "regular",              no_argument,             NULL, 'R' },
+      { "silent",               no_argument,             NULL, 's' },
       { "table",          required_argument,             NULL, 't' },
       { "verbose",              no_argument,             NULL, 'v' },
       { "version",              no_argument,             NULL, 'V' },
