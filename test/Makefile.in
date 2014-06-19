@@ -83,7 +83,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Gridarea.test.in $(srcdir)/Genweights.test.in \
 	$(srcdir)/Remap.test.in $(srcdir)/Select.test.in \
 	$(srcdir)/Spectral.test.in $(srcdir)/Timstat.test.in \
-	$(srcdir)/Vertint.test.in README
+	$(srcdir)/Vertint.test.in $(srcdir)/Detrend.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -95,7 +95,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = Cat.test Gridarea.test Genweights.test Remap.test \
-	Select.test Spectral.test Timstat.test Vertint.test
+	Select.test Spectral.test Timstat.test Vertint.test \
+	Detrend.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -493,7 +494,7 @@ CLEANFILES = `ls *.pyc`
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
                   $(top_srcdir)/config/tap-driver.sh
 
-TESTS = Cat.test Gridarea.test Genweights.test Remap.test \
+TESTS = Cat.test Gridarea.test Detrend.test Genweights.test Remap.test \
         Select.test Spectral.test Timstat.test Vertint.test
 
 
@@ -558,6 +559,8 @@ Spectral.test: $(top_builddir)/config.status $(srcdir)/Spectral.test.in
 Timstat.test: $(top_builddir)/config.status $(srcdir)/Timstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Vertint.test: $(top_builddir)/config.status $(srcdir)/Vertint.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Detrend.test: $(top_builddir)/config.status $(srcdir)/Detrend.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:

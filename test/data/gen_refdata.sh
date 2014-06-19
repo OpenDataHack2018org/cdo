@@ -88,3 +88,12 @@ $CDO select,code=130 $IFILE $OFILE
 OFILE=select5_ref
 $CDO select,level=90000 $IFILE $OFILE
 ########################################################################
+#
+# Detrend
+#
+OFILE=detrend_data
+$CDO $FORMAT -sqr -for,1,100 $OFILE
+IFILE=$OFILE
+OFILE=detrend_ref
+$CDO detrend $IFILE $OFILE
+########################################################################
