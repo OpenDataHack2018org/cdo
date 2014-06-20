@@ -1117,7 +1117,7 @@ long str_to_int(char *intstring)
 }
 
 static
-void parse_options_long(int argc, char *argv[])
+int parse_options_long(int argc, char *argv[])
 {
   int c;
   int lnetcdf_hdr_pad;
@@ -1140,6 +1140,9 @@ void parse_options_long(int argc, char *argv[])
       { NULL,                             0,             NULL,  0  }
     };
 
+  extern int CDO_opterr;
+  CDO_opterr = 1;
+
   while ( 1 )
     {
       lnetcdf_hdr_pad = 0;
@@ -1150,6 +1153,16 @@ void parse_options_long(int argc, char *argv[])
 
       switch (c)
 	{
+	case '?':
+	  //cdo_usage();
+	  //fprintf(stderr, "Illegal option!\n");
+	  return (-1);
+	  break;
+	case ':':
+	  //cdo_usage();
+	  //fprintf(stderr, "Option requires an argument!\n");
+	  return (-1);
+	  break;
 	case 0:
 	  if ( lnetcdf_hdr_pad )
 	    {
@@ -1294,16 +1307,14 @@ void parse_options_long(int argc, char *argv[])
 	case 'z':
 	  defineCompress(CDO_optarg);
           break;
-	case ':':
-	  fprintf(stderr, "\nmissing parameter for one of the options\n\n");	  
-	  Help = 1;
-	  break;
 	}
     }
+
+  return (0);
 }
 
 static
-void parse_options(int argc, char *argv[])
+int parse_options(int argc, char *argv[])
 {
   int c;
 
@@ -1447,6 +1458,8 @@ void parse_options(int argc, char *argv[])
 	  break;
 	}
     }
+
+  return (0);
 }
 
 
@@ -1479,9 +1492,11 @@ int main(int argc, char *argv[])
   get_env_vars();
 
   if ( 1 )
-    parse_options_long(argc, argv);
+    status = parse_options_long(argc, argv);
   else
-    parse_options(argc, argv);
+    status = parse_options(argc, argv);
+
+  if ( status != 0 ) return (-1);
 
   cdo_set_options();
 
