@@ -219,7 +219,7 @@ void *Filter(void *argument)
   int gridID, varID, levelID, recID;
   int tsID;
   int i;
-  int nts, nts2;
+  int nts;
   int nalloc = 0;
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
@@ -351,8 +351,6 @@ void *Filter(void *argument)
   if ( use_fftw )
     {
 #if defined(HAVE_LIBFFTW3) 
-      nts2 = nts;
-
       in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
       out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
 
@@ -362,31 +360,11 @@ void *Filter(void *argument)
     }
   else
     {
-      if ( zero_pad )
-	{
-	  nts2 = nts-1;
-	  nts2 |= nts2 >> 1;  /* handle  2 bit numbers */
-	  nts2 |= nts2 >> 2;  /* handle  4 bit numbers */
-	  nts2 |= nts2 >> 4;  /* handle  8 bit numbers */
-	  nts2 |= nts2 >> 8;  /* handle 16 bit numbers */
-	  nts2 |= nts2 >> 16; /* handle 32 bit numbers */
-	  nts2++;
-	}
-      else
-	{
-	  nts2 = nts;
-	}
-
-      if ( nts2 > nts )
-	cdoWarning("Filling up time series with zeros (zero-padding). This could produce oscillations in the filtered signal!");
-
-      array1 = (double*) malloc(nts2*sizeof(double));
-      array2 = (double*) malloc(nts2*sizeof(double));
-      
-      for ( tsID = 0; tsID < nts2; tsID++ ) array2[tsID] = 0;
+      array1 = (double*) malloc(nts*sizeof(double));
+      array2 = (double*) malloc(nts*sizeof(double));
     }
 
-  fmasc  = (int*) calloc(nts2, sizeof(int));
+  fmasc  = (int*) calloc(nts, sizeof(int));
 
   switch(operfunc)
   {
@@ -450,20 +428,12 @@ void *Filter(void *argument)
 	    {
 	      for ( i = 0; i < gridsize; i++ )  
 		{
-		  // for some reason, the optimization using the complex transform independent of the 
-		  // real one in order to transform two time series at the same time does not work
-		  // properly here. 
-
-		  memset(array2, 0, nts2*sizeof(double));
-
 		  for ( tsID = 0; tsID < nts; tsID++ )
 		    array1[tsID] = vars[tsID][varID][levelID].ptr[i];
-                                      
-		  /* zero padding up to next power of to */
-		  for ( ; tsID < nts2; tsID++ )                
-		    array1[tsID] = 0;       
 
-		  filter_intrinsic(nts2, fmasc, array1, array2);
+		  memset(array2, 0, nts*sizeof(double));
+
+		  filter_intrinsic(nts, fmasc, array1, array2);
 
 		  for ( tsID = 0; tsID < nts; tsID++ )
 		    vars[tsID][varID][levelID].ptr[i] = array1[tsID];  
@@ -475,7 +445,6 @@ void *Filter(void *argument)
   if ( array1 ) free(array1);
   if ( array2 ) free(array2);
 
-  
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   
   streamDefVlist(streamID2, vlistID2);
