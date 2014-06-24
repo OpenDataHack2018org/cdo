@@ -620,7 +620,7 @@ void ft (double *real, double *imag, int n, int sign)
 }
 
 /* reentrant version of ft */
-void ft_r(double *real, double *imag, int n, int sign, double *work_r, double *work_i)
+void ft_r(double * restrict real, double * restrict imag, int n, int sign, double * restrict work_r, double * restrict work_i)
 {
   /* sign should be 1 (FT) or -1 (reverse FT) */
   int j, k;
