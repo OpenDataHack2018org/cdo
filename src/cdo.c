@@ -1122,22 +1122,24 @@ int parse_options_long(int argc, char *argv[])
   int c;
   int lnetcdf_hdr_pad;
   int luse_fftw;
+  int lremap_genweights;
 
   struct cdo_option opt_long[] =
     {
-      { "netcdf_hdr_pad", required_argument, &lnetcdf_hdr_pad,  1 },
-      { "header_pad",     required_argument, &lnetcdf_hdr_pad,  1 },
-      { "hdr_pad",        required_argument, &lnetcdf_hdr_pad,  1 },
-      { "use_fftw",       required_argument,       &luse_fftw,  1 },
-      { "format",         required_argument,             NULL, 'f' },
-      { "help",                 no_argument,             NULL, 'h' },
-      { "history",              no_argument,             NULL, 'H' },
-      { "regular",              no_argument,             NULL, 'R' },
-      { "silent",               no_argument,             NULL, 's' },
-      { "table",          required_argument,             NULL, 't' },
-      { "verbose",              no_argument,             NULL, 'v' },
-      { "version",              no_argument,             NULL, 'V' },
-      { NULL,                             0,             NULL,  0  }
+      { "netcdf_hdr_pad",    required_argument,    &lnetcdf_hdr_pad,  1 },
+      { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1 },
+      { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1 },
+      { "use_fftw",          required_argument,          &luse_fftw,  1 },
+      { "remap_genweights",  required_argument,  &lremap_genweights,  1 },
+      { "format",            required_argument,                NULL, 'f' },
+      { "help",                    no_argument,                NULL, 'h' },
+      { "history",                 no_argument,                NULL, 'H' },
+      { "regular",                 no_argument,                NULL, 'R' },
+      { "silent",                  no_argument,                NULL, 's' },
+      { "table",             required_argument,                NULL, 't' },
+      { "verbose",                 no_argument,                NULL, 'v' },
+      { "version",                 no_argument,                NULL, 'V' },
+      { NULL,                                0,                NULL,  0  }
     };
 
   extern int CDO_opterr;
@@ -1147,6 +1149,7 @@ int parse_options_long(int argc, char *argv[])
     {
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
+      lremap_genweights = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1175,6 +1178,11 @@ int parse_options_long(int argc, char *argv[])
 	      if ( use_fftw != 0 && use_fftw != 1 )
 		cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", use_fftw);
 	      CDO_Use_FFTW = use_fftw;
+	    }
+	  else if ( lremap_genweights )
+	    {
+	      extern int remap_genweights;
+	      remap_genweights = str_to_int(CDO_optarg);
 	    }
 	  break;
 	case 'a':
