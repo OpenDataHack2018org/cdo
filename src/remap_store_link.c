@@ -50,19 +50,20 @@ void grid_store_init(grid_store_t* grid_store, long gridsize)
 void grid_store_delete(grid_store_t* grid_store)
 {
   grid_layer_t *grid_layer, *grid_layer_f;
-  long ilayer;
-  long i, j;
-  long iblk;
+  long j;
+  long nblocks = grid_store->nblocks;
 
-  for ( iblk = 0; iblk < grid_store->nblocks; ++iblk )
+  for ( long iblk = 0; iblk < nblocks; ++iblk )
     {
       j = 0;
       grid_layer = grid_store->layers[iblk];
-      for ( ilayer = 0; ilayer < grid_store->nlayers[iblk]; ++ilayer )
+      long nlayers = grid_store->nlayers[iblk];
+      long blksize =  grid_store->blksize[iblk];
+      for ( long ilayer = 0; ilayer < nlayers; ++ilayer )
 	{
 	  if ( cdoVerbose )
 	    {
-	      for ( i = 0; i < grid_store->blksize[iblk]; ++i )
+	      for ( long i = 0; i < blksize; ++i )
 		if ( grid_layer->grid2_link[i] != -1 ) j++;
 	    }
 	      
@@ -74,9 +75,8 @@ void grid_store_delete(grid_store_t* grid_store)
 
       if ( cdoVerbose )
 	{
-	  fprintf(stderr, "block = %ld nlayers = %d  allocated = %d  used = %ld\n",
-		  iblk+1, grid_store->nlayers[iblk], 
-		  grid_store->nlayers[iblk]*grid_store->blksize[iblk], j);
+	  fprintf(stderr, "block = %ld nlayers = %ld  allocated = %ld  used = %ld\n",
+		  iblk+1, nlayers, nlayers*blksize, j);
 	}
     }
 

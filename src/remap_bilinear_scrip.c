@@ -189,8 +189,8 @@ static
 int cmpwgts(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const addwgts_t *c1 = s1;
-  const addwgts_t *c2 = s2;
+  const addwgts_t* c1 = (const addwgts_t*) s1;
+  const addwgts_t* c2 = (const addwgts_t*) s2;
 
   if      ( c1->add < c2->add ) cmp = -1;
   else if ( c1->add > c2->add ) cmp =  1;

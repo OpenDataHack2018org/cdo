@@ -392,11 +392,11 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   long   tgt_grid_add;       /* current linear address for target grid cell   */
   long   n, k;               /* generic counters                        */
   long   nbins, num_links;
-  double norm_factor = 0;    /* factor for normalizing wts */
   long   num_wts;
   long   max_srch_cells;     /* num cells in restricted search arrays  */
   long   num_srch_cells;     /* num cells in restricted search arrays  */
   long   srch_corners;       /* num of corners of srch cells           */
+  double norm_factor = 0;    /* factor for normalizing wts */
   int*   srch_add;           /* global address of cells in srch arrays */
   int    ompthID, i;
 
@@ -938,3 +938,8 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
 } /* remap_weights_conserv */
+
+
+void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
+{
+} /* remap_conserv */

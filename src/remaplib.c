@@ -1274,8 +1274,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, \
-	 num_wts, dst_array, max_cls)					\
+  shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)					\
   private(i, n, k, ompthID, src_cls, src_wts, ncls, imax, wts) \
   schedule(dynamic,1)
 #endif

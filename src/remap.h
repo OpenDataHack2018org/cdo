@@ -195,6 +195,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
 void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval);
 void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval);
+void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval);
 
 
 void resize_remap_vars(remapvars_t *rv, int increment);
