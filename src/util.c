@@ -148,7 +148,8 @@ void argument_free(argument_t *argument)
     {
       if ( argument->argc )
 	{
-	  for ( int i = 0; i < argument->argc; ++i )
+	  int argc =  argument->argc;
+	  for ( int i = 0; i < argc; ++i )
 	    {
 	      if ( argument->argv[i] )
 		{
