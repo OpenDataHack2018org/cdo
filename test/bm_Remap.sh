@@ -44,8 +44,8 @@ done
 # result on hama: icc 12.1.5
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   1.0    2.2   1.4   295    130
-# curv     51     52   184   305    291
+# reg2d   1.0    2.2   1.3   242    131
+# curv     51     52   175   263    295
 #
 # result on bailung: gcc
 # =================
