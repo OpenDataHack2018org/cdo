@@ -42,79 +42,6 @@
 #define  PI2         (2*M_PI)
 #define  HALF        0.5
 
-/* FAST FOURIER TRANSFORMATION (bare) */
-/* not used */
-/*
-void fft2(double *real, double *imag, int n, int isign)
-{
-  int nn, mmax, m, j, istep, i;
-  double wtemp, wr, wpr, wpi, wi, theta, tempr, tempi, tmp;   
-  
-  if ( n < 2 || (n&(n-1)) ) printf("n must be power of 2\n");
-  nn = n << 1;
-  j = 1;
-  
-  // BIT Reversion of data
-  for ( i=1; i<nn; i+=2 )
-    {
-      if ( j > i ) 
-        {        
-          // swap real part
-          tmp = real[j/2]; 
-          real[j/2] = real[i/2];          
-          real[i/2] = tmp;                    
-          
-          // swap imaginary part
-          tmp = imag[j/2]; 
-          imag[j/2] = imag[i/2];
-          imag[i/2] = tmp;         
-        }
-      m = n;
-      while ( m >= 2 && j > m )
-        {
-          j -= m;
-          m >>= 1;
-        }
-      j += m;
-    }
-  
-  // Danielson-Lanzcos algorithm
-  mmax = 2;
-  while ( nn > mmax )
-    {
-      istep = mmax << 1;
-      theta = isign*(PI2/mmax);
-      wtemp = sin(HALF*theta);
-      wpr = -2.0*wtemp*wtemp;
-      wpi = sin(theta);
-      wr = 1.0;
-      wi = 0.0;
-      for( m = 1; m<mmax; m+=2 )
-        {
-          for ( i = m; i <= nn; i+=istep)
-            {              
-              j=i+mmax;         
-              tempr = wr*real[j/2]-wi*imag[j/2];
-              tempi = wr*imag[j/2]+wi*real[j/2];
-              real[j/2] = real[i/2]-tempr;
-              imag[j/2] = imag[i/2]-tempi;
-              real[i/2] += tempr;
-              imag[i/2] += tempi;       
-            }
-          wr = (wtemp=wr)*wpr-wi*wpi+wr;
-          wi = wi*wpr+wtemp*wpi+wi;
-        }
-      mmax = istep;      
-    }
-
-  if ( isign == -1 )
-    for( i =0; i<n; i++)
-      {
-        real[i] /= n;
-        imag[i] /= n;
-      }
-}
-*/
 
 /* include from Tinfo.c */
 void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit);
@@ -234,7 +161,6 @@ void *Filter(void *argument)
   double fmin = 0, fmax = 0;
   int *fmasc;
   int use_fftw = FALSE;
-  int zero_pad = FALSE;
 #if defined(HAVE_LIBFFTW3) 
   fftw_plan p_T2S, p_S2T;
   fftw_complex *out_fft = NULL;
@@ -346,7 +272,37 @@ void *Filter(void *argument)
   nts = tsID;
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
 
-  /*  round up nts to next power of two for (better) performance of fast fourier transformation */
+  fmasc  = (int*) calloc(nts, sizeof(int));
+
+  switch(operfunc)
+    {
+    case BANDPASS: 
+      {
+	operatorInputArg("lower and upper bound of frequency band");
+	operatorCheckArgc(2);
+	fmin = atof(operatorArgv()[0]);
+	fmax = atof(operatorArgv()[1]);
+	break;
+      }
+    case HIGHPASS:
+      {              
+	operatorInputArg("lower bound of frequency pass");
+	operatorCheckArgc(1);
+	fmin = atof(operatorArgv()[0]);
+	fmax = fdata;
+	break;
+      }
+    case LOWPASS: 
+      {
+	operatorInputArg("upper bound of frequency pass");
+	operatorCheckArgc(1);
+	fmin = 0;
+	fmax = atof(operatorArgv()[0]);
+	break;
+      }
+    }
+  
+  create_fmasc(nts, fdata, fmin, fmax, fmasc);
 
   if ( use_fftw )
     {
@@ -363,38 +319,6 @@ void *Filter(void *argument)
       array1 = (double*) malloc(nts*sizeof(double));
       array2 = (double*) malloc(nts*sizeof(double));
     }
-
-  fmasc  = (int*) calloc(nts, sizeof(int));
-
-  switch(operfunc)
-  {
-    case BANDPASS: 
-    {
-      operatorInputArg("lower and upper bound of frequency band");
-      operatorCheckArgc(2);
-      fmin = atof(operatorArgv()[0]);
-      fmax = atof(operatorArgv()[1]);
-      break;
-    }
-    case HIGHPASS:
-    {              
-      operatorInputArg("lower bound of frequency pass");
-      operatorCheckArgc(1);
-      fmin = atof(operatorArgv()[0]);
-      fmax = fdata;
-      break;
-    }
-    case LOWPASS: 
-    {
-      operatorInputArg("upper bound of frequency pass");
-      operatorCheckArgc(1);
-      fmin = 0;
-      fmax = atof(operatorArgv()[0]);
-      break;
-    }      
-  }
-  
-  create_fmasc(nts, fdata, fmin, fmax, fmasc);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -465,6 +389,7 @@ void *Filter(void *argument)
 		  //fprintf(stderr, "%d %d %d %g\n", tsID, varID, levelID, vars[tsID][varID][levelID].ptr[0]);
 		  streamDefRecord(streamID2, varID, levelID);
                   streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
+
                   free(vars[tsID][varID][levelID].ptr);
 		  vars[tsID][varID][levelID].ptr = NULL;
                 }
