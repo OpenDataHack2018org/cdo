@@ -20,10 +20,10 @@ comment         string   providing clarifying information concerning the variabl
 cell_methods    string   typically providing information concerning calculation of means or climatologies
 cell_measures   string   indicates the names of the variables containing cell areas and volumes.
 missing_value   float    specifying how missing data will be identified
-valid_min       float
-valid_max       float
-ok_min_mean_abs float
-ok_max_mean_abs float
+valid_min       float    minimum valid value
+valid_max       float    maximum valid value
+ok_min_mean_abs float    minimum absolute mean
+ok_max_mean_abs float    maximum absolute mean
 
 Here is an example of a parameter table for one variable:
 
