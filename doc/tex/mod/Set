@@ -5,23 +5,13 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setpartab setcode setparam setname setunit setlevel setltype
+@Operators = setcode setparam setname setunit setlevel setltype
 
 @BeginDescription
 This module sets some field information. Depending on the chosen operator the 
-parameter table, code number, parameter identifier, variable name or level is set.
+code number, parameter identifier, variable name or level is set.
 @EndDescription
 @EndModule
-
-
-@BeginOperator_setpartab
-@Title     = Set parameter table
-@Parameter = table
-
-@BeginDescription
-Sets the parameter table for all variables.
-@EndDescription
-@EndOperator
 
 
 @BeginOperator_setcode
@@ -85,8 +75,6 @@ Sets the GRIB level type of all variables.
 
 
 @BeginParameter
-@Item = table
-STRING   Parameter table file or name
 @Item = code
 INTEGER  Code number
 @Item = param
@@ -98,11 +86,3 @@ FLOAT    New level
 @Item = ltype
 INTEGER  GRIB level type
 @EndParameter
-
-
-@BeginExample
-To assign the parameter table echam5 to the input dataset use:
-@BeginVerbatim
-   cdo setpartab,echam5 ifile ofile
-@EndVerbatim
-@EndExample

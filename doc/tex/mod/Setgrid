@@ -38,7 +38,7 @@ Converts regular grid to curvilinear grid
 @Item = unstructured
 Converts grid type to unstructured grid
 @Item = dereference
-Dereference grid type REFERENCE
+Dereference a reference to a grid
 @Item = regular
 Converts reduced Gaussian grid to regular Gaussian grid
 @EndList
