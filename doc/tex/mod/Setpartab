@@ -10,6 +10,16 @@
 @BeginDescription
 This module sets some field information. Depending on the chosen operator the 
 parameter table, code number, parameter identifier, variable name or level is set.
+
+@BeginTable
+@Item = Entry
+Type    Description
+@Item = name
+WORD    Name of the variable
+@Item = comment
+STRING  Information concerning the variable
+@EndTable
+
 @EndDescription
 @EndModule
 
