@@ -21,6 +21,7 @@ Cond2         Conditional selection
 Condc         Conditional selection
 Comp	      Comparison
 Compc	      Comparison
+Setpartab     Modification
 Set           Modification
 Settime       Modification
 Change        Modification
