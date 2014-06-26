@@ -297,7 +297,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   double *dist = (double*) malloc(ndist*sizeof(double));
   int    *adds = (int*) malloc(ndist*sizeof(int));
 
-#if defined(_OPENMP) && _OPENMP >= 201307
+#if defined(_OPENMP) && _OPENMP >= OPENMP4
 #pragma omp simd
 #endif
   for ( j = 0, i = 0; i < ndist; ++i )
@@ -319,7 +319,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
     }
   ndist = j;
 
-#if defined(_OPENMP) && _OPENMP >= 2013072
+#if defined(_OPENMP) && _OPENMP >= OPENMP4
 #pragma omp simd
 #endif
   for ( j = 0; j < ndist; ++j )
@@ -463,9 +463,12 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
       sinlat = (double*) malloc(ny*sizeof(double));
       sinlon = (double*) malloc(nx*sizeof(double));
 
+      double *center_lon = src_grid->reg2d_center_lon;
+      double *center_lat = src_grid->reg2d_center_lat;
+
       for ( n = 0; n < nx; ++n )
 	{
-	  double rlon = src_grid->reg2d_center_lon[n];
+	  double rlon = center_lon[n];
 	  if ( rlon > PI2  ) rlon -= PI2;
 	  if ( rlon < ZERO ) rlon += PI2;
 	  coslon[n] = cos(rlon);
@@ -473,8 +476,8 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 	}
       for ( n = 0; n < ny; ++n )
 	{
-	  coslat[n] = cos(src_grid->reg2d_center_lat[n]);
-	  sinlat[n] = sin(src_grid->reg2d_center_lat[n]);
+	  coslat[n] = cos(center_lat[n]);
+	  sinlat[n] = sin(center_lat[n]);
 	}
     }
   else
@@ -484,16 +487,18 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
       sinlat = (double*) malloc(src_grid_size*sizeof(double));
       sinlon = (double*) malloc(src_grid_size*sizeof(double));
 
+      double *center_lon = src_grid->cell_center_lon;
+      double *center_lat = src_grid->cell_center_lat;
+
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(src_grid, src_grid_size, coslat, coslon, sinlat, sinlon)
+#pragma omp parallel for default(none) shared(center_lon, center_lat, src_grid_size, coslat, coslon, sinlat, sinlon)
 #endif
       for ( n = 0; n < src_grid_size; ++n )
 	{
-	  coslon[n] = cos(src_grid->cell_center_lon[n]);
-	  sinlon[n] = sin(src_grid->cell_center_lon[n]);
-	  coslat[n] = cos(src_grid->cell_center_lat[n]);
-	  sinlat[n] = sin(src_grid->cell_center_lat[n]);
+	  coslon[n] = cos(center_lon[n]);
+	  sinlon[n] = sin(center_lon[n]);
+	  coslat[n] = cos(center_lat[n]);
+	  sinlat[n] = sin(center_lat[n]);
 	}
     }
 

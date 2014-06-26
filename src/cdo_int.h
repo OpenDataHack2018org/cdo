@@ -35,6 +35,8 @@
 #include "process.h"
 #include "const.h"
 
+#define  OPENMP4  201307
+
 #ifndef strdupx
 #ifndef strdup
 char *strdup(const char *s);
