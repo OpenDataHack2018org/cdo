@@ -1064,6 +1064,7 @@ sub print_description {
 
   $math    = 0;
   $itemize = 0;
+  $table   = 0;
   $doc     = 0;
   $man     = 0;
   $list    = 0;
@@ -1088,6 +1089,13 @@ sub print_description {
     } elsif ( "$kword" eq "\@ENDLIST" ) {
       print TRFILE "\\end{defalist}\n";
       $list = 0;
+    } elsif ( "$kword" eq "\@BEGINTABLE" ) {
+      print TRFILE "\\begin{tabular}[t]{|l|l|l|}\n";
+      print TRFILE "\\hline\n";
+      $table = 1;
+    } elsif ( "$kword" eq "\@ENDTABLE" ) {
+      print TRFILE "\\end{tabular}\n";
+      $table = 0;
     } elsif ( $itemize == 1 && "$kword" eq "\@ITEM" ) {
       ($kopt, $value) = split(/\s*=\s*/, $line, 2);
       $hvalue = $value;
@@ -1162,7 +1170,8 @@ sub print_description {
       $docline = $line;
       if ( $man == 0 ) {
 	if ( $math == 0 && $verb == 0 && $text == 0 ) {
-	  $line =~ s/CDO_PCTL_NBINS/CDO\\_PCTL\\_NBINS/og;
+#	  $line =~ s/CDO_PCTL_NBINS/CDO\\_PCTL\\_NBINS/og;
+	  $line =~ s/_/\\_/og;
 	  $line =~ s/\@newline/ \\\\/og;
 	  $line =~ s/ ifile / {\\tt ifile} /og;
 	  $line =~ s/ ifile1 / {\\tt ifile1} /og;
@@ -1182,6 +1191,7 @@ sub print_description {
 	  $line =~ s/</\$<\$/og;
 	  $line =~ s/>/\$>\$/og;
 	  $line =~ s/%/\\%/og;
+	  if ( $table == 1 ) { $line =~ s/$/ \\\\ \\hline/g; }
 	}
 	print TRFILE "$line\n";
       }

@@ -12,8 +12,8 @@
 @Title     = Sea level pressure
 
 @BeginDescription
-This operator computes the sea level pressure (air\_pressure\_at\_sea\_level). Required input fields
-are surface\_air\_pressure, surface\_geopotential and air\_temperature on hybrid sigma pressure levels.
+This operator computes the sea level pressure (air_pressure_at_sea_level). Required input fields
+are surface_air_pressure, surface_geopotential and air_temperature on hybrid sigma pressure levels.
 @EndDescription
 @EndOperator
 

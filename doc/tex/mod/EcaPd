@@ -10,7 +10,7 @@
 @BeginDescription
 Let @file{ifile} be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),
 then the number of days where RR is at least @math{x} mm is counted. 
-eca\_r10mm and eca\_r20mm are specific ECA operators with a daily precipitation amount of 10 and 20 mm respectively.
+eca_r10mm and eca_r20mm are specific ECA operators with a daily precipitation amount of 10 and 20 mm respectively.
 The date information of a timestep in ofile is the date of the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
@@ -50,7 +50,7 @@ FLOAT   Daily precipitation amount threshold in [mm]
 
 @BeginNote
 Precipitation rates in [mm/s] have to be converted to precipitation amounts (multiply with 86400 s).
-Apart from metadata information the result of eca\_pd,1 and eca\_rr1 is the same.
+Apart from metadata information the result of eca_pd,1 and eca_rr1 is the same.
 @EndNote
 
 

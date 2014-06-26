@@ -5,19 +5,28 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setpartab
+@Operators = setpartab setpartabn
 
 @BeginDescription
 This module sets some field information. Depending on the chosen operator the 
 parameter table, code number, parameter identifier, variable name or level is set.
 
 @BeginTable
-@Item = Entry
-Type    Description
-@Item = name
-WORD    Name of the variable
-@Item = comment
-STRING  Information concerning the variable
+ @bold{Entry}    & @bold{Type} & @bold{Description}      
+ name            & WORD        & Name of the variable
+ out_name        & WORD        & New name of the variable
+ type            & WORD        & Data type (real or double)
+ standard_name   & WORD        & As defined in the CF standard name table
+ long_name       & STRING      & Describing the variable
+ units           & STRING      & Specifying the units for the variable
+ comment         & STRING      & Information concerning the variable
+ cell_methods    & STRING      & Information concerning calculation of means or climatologies
+ cell_measures   & STRING      & Indicates the names of the variables containing cell areas and volumes
+ missing_value   & FLOAT       & Specifying how missing data will be identified
+ valid_min       & FLOAT       & Minimum valid value
+ valid_max       & FLOAT       & Maximum valid value
+ ok_min_mean_abs & FLOAT       & Minimum absolute mean
+ ok_max_mean_abs & FLOAT       & Maximum absolute mean
 @EndTable
 
 @EndDescription
@@ -25,6 +34,16 @@ STRING  Information concerning the variable
 
 
 @BeginOperator_setpartab
+@Title     = Set parameter table
+@Parameter = table
+
+@BeginDescription
+Sets the parameter table for all variables.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setpartabn
 @Title     = Set parameter table
 @Parameter = table
 
