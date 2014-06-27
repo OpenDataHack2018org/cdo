@@ -70,7 +70,6 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 
   if ( bit != 1 )
     {
-      printf("seg_l %d %d %d\n", seg_l, nrec, bit);
       work_r = (double*) malloc(seg_l*sizeof(double));
       work_i = (double*) malloc(seg_l*sizeof(double));
     }
