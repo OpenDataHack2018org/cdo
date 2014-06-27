@@ -52,26 +52,15 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
   
   dimin = nts*fmin / fdata;
   dimax = nts*fmax / fdata;
-  /* 2014/05/19 Uwe Schulzweida
-  dimin = 0;
-  dimax = nts/2.;
-  if ( fmin > 0 ) dimin = nts / ( fmin * fdata);
-  if ( fmax > 0 ) dimax = nts / ( fmax * fdata);
-  */
+
   imin = dimin<0 ? 0 : (int)floor(dimin);  
   imax = ceil(dimax)>nts/2 ? nts/2 : (int) ceil(dimax);  
 
-  // printf("%d %d %g %g %g %g %g\n", imin, imax, dimin, dimax, fdata, fmin, fmax);
+  //  printf("%d %d %g %g %g %g %g\n", imin, imax, dimin, dimax, fdata, fmin, fmax);
   
   fmasc[imin] = 1;
   for ( i = imin+1; i <= imax; i++ )  
     fmasc[i] = fmasc[nts-i] = 1; 
-  /* 2014/05/19 Uwe Schulzweida
-  fmasc[imin] = 1;
-  fmasc[nts-1] = 1;
-  for ( i = imin+1; i <= imax; i++ )  
-    fmasc[i] = fmasc[nts-1-i] = 1;
-  */
 }
 
 #if defined(HAVE_LIBFFTW3) 
@@ -384,7 +373,6 @@ void *Filter(void *argument)
               if ( vars[tsID][varID][levelID].ptr )
                 {
                   nmiss = vars[tsID][varID][levelID].nmiss;
-		  //fprintf(stderr, "%d %d %d %g\n", tsID, varID, levelID, vars[tsID][varID][levelID].ptr[0]);
 		  streamDefRecord(streamID2, varID, levelID);
                   streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 
