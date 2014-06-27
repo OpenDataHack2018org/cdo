@@ -573,8 +573,9 @@ void fft(double *real, double *imag, int n, int sign)
 }
 
 
-void ft (double *real, double *imag, int n, int sign)
-{				/* sign should be 1 (FT) or -1 (reverse FT) */
+void ft(double *real, double *imag, int n, int sign)
+{
+  /* sign should be 1 (FT) or -1 (reverse FT) */
   int j, k;
   static double *work_r = 0, *work_i = 0;
   double sum_r, sum_i, norm;
@@ -627,7 +628,7 @@ void ft_r(double * restrict real, double * restrict imag, int n, int sign, doubl
   double sum_r, sum_i, norm;
   double w_r, w_i, ww_r, ww_i, temp_r;
     
-  for (k = 0; k < n; k++)
+  for ( k = 0; k < n; k++ )
     {
       w_r = cos (2 * M_PI * k / n);
       w_i = sin (2 * M_PI * k / n) * sign;
@@ -635,7 +636,7 @@ void ft_r(double * restrict real, double * restrict imag, int n, int sign, doubl
       ww_i = 0;
       sum_r = 0;
       sum_i = 0;
-      for (j = 0; j < n; j++)
+      for ( j = 0; j < n; j++ )
         {
           sum_r += real[j] * ww_r - imag[j] * ww_i;
           sum_i += real[j] * ww_i + imag[j] * ww_r;
@@ -648,7 +649,7 @@ void ft_r(double * restrict real, double * restrict imag, int n, int sign, doubl
     }
 
   norm = 1./sqrt(n);
-  for (k = 0; k < n; k++)
+  for ( k = 0; k < n; k++ )
     {
       real[k] = work_r[k] * norm;
       imag[k] = work_i[k] * norm;

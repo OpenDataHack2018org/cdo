@@ -40,6 +40,7 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
   int k;
   double sumx, sumkx;
   double a, b;
+  double *work_r = NULL, *work_i = NULL;
   int seg_i, offset;
   int bit;
 
@@ -65,6 +66,13 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
       a = sumx / nrec - b * (nrec - 1) / 2.;
       for (k = 0; k < nrec; k++)
 	data[k] -= a + b * k;
+    }
+
+  if ( bit != 1 )
+    {
+      printf("seg_l %d %d %d\n", seg_l, nrec, bit);
+      work_r = (double*) malloc(seg_l*sizeof(double));
+      work_i = (double*) malloc(seg_l*sizeof(double));
     }
 	
   for (seg_i = 0; seg_i < seg_n; seg_i += 2)
@@ -123,9 +131,9 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 	  imag[k] = 0;
       
       if (bit == 1)	/* seg_l is a power of 2 */
-	fft (real, imag, seg_l, 1);
+	fft(real, imag, seg_l, 1);
       else
-	ft (real, imag, seg_l, 1);
+	ft_r(real, imag, seg_l, 1, work_r, work_i);
 	
       spectrum[0] += real[0] * real[0] + imag[0] * imag[0];
       
@@ -138,6 +146,12 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 	spectrum[seg_l / 2] +=
 	  real[seg_l / 2] * real[seg_l / 2] +
 	  imag[seg_l / 2] * imag[seg_l / 2];
+    }
+
+  if ( bit != 1 )
+    {
+      free(work_r);
+      free(work_i);
     }
 	
   for (k = 0; k <= seg_l / 2; k++)
