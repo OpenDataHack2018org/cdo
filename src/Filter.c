@@ -38,9 +38,7 @@
 #endif
 
 
-#define  NALLOC_INC  1000
-#define  PI2         (2*M_PI)
-#define  HALF        0.5
+#define  NALLOC_INC  1024
 
 
 /* include from Tinfo.c */

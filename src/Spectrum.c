@@ -30,7 +30,7 @@
 #include "statistic.h"
 
 
-#define  NALLOC_INC  1000
+#define  NALLOC_INC  1024
 
 
 static
