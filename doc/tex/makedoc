@@ -1095,6 +1095,7 @@ sub print_description {
       $table = 1;
     } elsif ( "$kword" eq "\@ENDTABLE" ) {
       print TRFILE "\\end{tabular}\n";
+      print TRFILE "\\vspace{2mm}\n";
       $table = 0;
     } elsif ( $itemize == 1 && "$kword" eq "\@ITEM" ) {
       ($kopt, $value) = split(/\s*=\s*/, $line, 2);
