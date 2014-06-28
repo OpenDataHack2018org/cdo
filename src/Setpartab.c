@@ -323,8 +323,8 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
       nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
       nml_ok_max_mean_abs = namelistAdd(nml, "ok_max_mean_abs", NML_FLT,  0, &ok_max_mean_abs, 1);
-      nml_param           = namelistAdd(nml, "param",           NML_FLT , 0, &paramdp, 2);
-      //nml_param           = namelistAdd(nml, "param",           NML_WORD, 0, &paramstr, 1);
+      //nml_param           = namelistAdd(nml, "param",           NML_FLT , 0, &paramdp, 2);
+      nml_param           = namelistAdd(nml, "param",           NML_WORD, 0, &paramstr, 1);
       //   nml_out_param       = namelistAdd(nml, "out_param",       NML_WORD, 0, &out_paramstr, 1);
       nml_chunktype       = namelistAdd(nml, "chunktype",       NML_WORD, 0, &chunktypestr, 1);
       nml_datatype        = namelistAdd(nml, "datatype",        NML_WORD, 0, &datatypestr, 1);

@@ -334,6 +334,19 @@ void rdnlsgl(namelist_t *nml, void *var, int ntyp, int nlen, int *nocc)
 	  ((double *)var)[*nocc] = atof(&nml->line.lineac[nml->line.namitf]);
           *nocc += 1;
 	}
+      else if ( ntyp == NML_WORD )
+	{
+	  int i, len;
+
+	  if ( *nocc < nlen )
+	    {
+	      len = nml->line.namitl - nml->line.namitf + 1;
+	      ((char **)var)[*nocc] = (char*) calloc((size_t)len+1, sizeof(char));
+	      for ( i = 0; i < len; i++ )
+		((char **)var)[*nocc][i] = nml->line.lineac[nml->line.namitf+i];
+	      *nocc += 1;
+	    }
+	}
       else
 	{
           nml->line.nptype = func_2;
