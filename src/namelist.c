@@ -52,13 +52,6 @@ int readline(FILE *fp, char *line, int len);
 #undef   MAX
 #define  MAX(a,b)  ((a) > (b) ? (a) : (b))
 
-struct PGMSTAT
-{
-  int intract;
-};
-
-struct PGMSTAT pgmstat;
-
 
 static void namelist_init(namelist_t *namelist, const char *name)
 {
@@ -227,8 +220,8 @@ int namelistNum(namelist_t *nml, const char *name)
   return (nocc);
 }
 
-
-static void getnite(FILE *nmlfp, namelist_t *nml)
+static
+void getnite(FILE *nmlfp, namelist_t *nml)
 {
   int nst, i, j;
   int linelen;
@@ -239,27 +232,27 @@ static void getnite(FILE *nmlfp, namelist_t *nml)
     {
       for ( i = nst; i < MAX_LINE_LEN; i++ )
 	{
-	  if ( nml->line.linelc[i] == 0 ) break;
+	  char *linelc = nml->line.linelc;
+	  int ch = (int) linelc[i];
 
-          if      (   nml->line.linelc[i] == ' ' ) continue;
-	  else if (   nml->line.linelc[i] == '=' ) continue;
-          else if (   nml->line.linelc[i] == ',' ) continue;
-          else if ( ((nml->line.linelc[i] >= 'a')  &&
-		     (nml->line.linelc[i] <= 'z')) ||
-	             (nml->line.linelc[i] == '_')  ||
-	             (nml->line.linelc[i] == '/')  ||
-	             (nml->line.linelc[i] == '$')  ||
-		     (nml->line.linelc[i] == '&') )
+	  if ( ch == 0 ) break;
+
+          if      (   ch == ' ' ) continue;
+	  else if (   ch == '=' ) continue;
+          else if (   ch == ',' ) continue;
+          else if ( ((ch >= 'a')  && (ch <= 'z')) ||
+	             (ch == '_')  || (ch == '/')  ||
+	             (ch == '$')  || (ch == '&') )
 	    {
 	      nml->line.nptype = NML_KEYWORD;
 	      nml->line.namitf = i;
 	      for ( j = nml->line.namitf+1; j < MAX_LINE_LEN; j++ )
 		{
-		  if ( !(islower((int) nml->line.linelc[j]) ||
-			 (((int) nml->line.linelc[j]) == '_') ||
-			 (((int) nml->line.linelc[j]) == '-') ||
-			 (((int) nml->line.linelc[j]) == '+') ||
-			 isdigit((int) nml->line.linelc[j])) )
+		  if ( !(islower((int) linelc[j]) ||
+			 (((int) linelc[j]) == '_') ||
+			 (((int) linelc[j]) == '-') ||
+			 (((int) linelc[j]) == '+') ||
+			 isdigit((int) linelc[j])) )
 		    {
 		      nml->line.namitl = j - 1;
 		      return;
@@ -268,14 +261,14 @@ static void getnite(FILE *nmlfp, namelist_t *nml)
 	      nml->line.namitl = MAX_LINE_LEN;
 	      return;
 	    }
-          else if ( nml->line.linelc[i] == '\'' ||
-		    nml->line.linelc[i] == '\"' ||
-		    nml->line.linelc[i] == '`')
+          else if ( ch == '\'' ||
+		    ch == '\"' ||
+		    ch == '`')
 	    {
 	      nml->line.nptype = NML_TEXT;
 	      nml->line.namitf = i;
 	      for ( j = nml->line.namitf+1; j < MAX_LINE_LEN; j++ )
-		if (nml->line.linelc[j] == nml->line.linelc[nml->line.namitf])
+		if ( linelc[j] == linelc[nml->line.namitf])
 		  {
  		    nml->line.namitl = j;
 		    return;
@@ -283,21 +276,18 @@ static void getnite(FILE *nmlfp, namelist_t *nml)
 	      nml->line.namitl = MAX_LINE_LEN + 1;
 	      return;
 	    }
-          else if ( (nml->line.linelc[i] >= '0'  &&
-		     nml->line.linelc[i] <= '9') ||
-		     nml->line.linelc[i] == '+'  ||
-		     nml->line.linelc[i] == '-'  ||
-		     nml->line.linelc[i] == '.' )
+          else if ( (ch >= '0'  && ch <= '9') ||
+		     ch == '+'  || ch == '-'  || ch == '.' )
 	    {
 	      nml->line.nptype = NML_NUMBER;
 	      nml->line.namitf = i;
 	      for ( j = i+1; j < MAX_LINE_LEN; j++)
 		{
-		  if ( nml->line.linelc[j] >= '0' && nml->line.linelc[j] <= '9' ) continue;
-	          else if ( nml->line.linelc[j] == '+' ) continue;
-		  else if ( nml->line.linelc[j] == '-' ) continue;
-         	  else if ( nml->line.linelc[j] == '.' ) continue;
-		  else if ( nml->line.linelc[j] == 'e' ) continue;
+		  if ( linelc[j] >= '0' && linelc[j] <= '9' ) continue;
+	          else if ( linelc[j] == '+' ) continue;
+		  else if ( linelc[j] == '-' ) continue;
+         	  else if ( linelc[j] == '.' ) continue;
+		  else if ( linelc[j] == 'e' ) continue;
                   else
 		    {
 		      nml->line.namitl = j - 1;
@@ -324,8 +314,8 @@ static void getnite(FILE *nmlfp, namelist_t *nml)
   nml->line.nptype = NML_NIX;
 }
 
-
-static void rdnlsgl(namelist_t *nml, void *var, int ntyp, int nlen, int *nocc)
+static
+void rdnlsgl(namelist_t *nml, void *var, int ntyp, int nlen, int *nocc)
 {
   if ( nml->line.nptype == NML_NUMBER )
     {
@@ -531,12 +521,6 @@ void namelistRead(FILE *nmlfp, namelist_t *nml)
 	  printf(" * valid parameters and values specified so far are\n");
 
 	  nml_print(nml, PRINT_ALL);
-
-          if ( ! pgmstat.intract )
-	    {
-	      fprintf(stderr, "Namelist error!\n");
-	      return;
-	    }
         }
       else
 	{
@@ -568,8 +552,6 @@ void namelistRead(FILE *nmlfp, namelist_t *nml)
 	  printf(" * valid parameters and values specified so far are\n");
 
 	  nml_print(nml, PRINT_ALL);
-
-	  if ( ! pgmstat.intract ) fprintf(stderr, "Namelist error!\n");
         }
     }
 
