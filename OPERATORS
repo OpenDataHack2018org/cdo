@@ -115,6 +115,7 @@ Operator catalog:
 -------------------------------------------------------------
    Setpartab     setpartabp      Set parameter table
    Setpartab     setpartabn      Set parameter table
+   Set           setpartab       Set parameter table
    Set           setcode         Set code number
    Set           setparam        Set parameter identifier
    Set           setname         Set variable name

@@ -5,13 +5,23 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setcode setparam setname setunit setlevel setltype
+@Operators = setpartab setcode setparam setname setunit setlevel setltype
 
 @BeginDescription
 This module sets some field information. Depending on the chosen operator the 
-code number, parameter identifier, variable name or level is set.
+parameter table, code number, parameter identifier, variable name or level is set.
 @EndDescription
 @EndModule
+
+
+@BeginOperator_setpartab
+@Title     = Set parameter table
+@Parameter = table
+
+@BeginDescription
+Sets the parameter table for all variables.
+@EndDescription
+@EndOperator
 
 
 @BeginOperator_setcode
@@ -75,10 +85,12 @@ Sets the GRIB level type of all variables.
 
 
 @BeginParameter
+@Item = table
+STRING   Parameter table file or name
 @Item = code
 INTEGER  Code number
 @Item = param
-STRING   Parameter identifier (format: code[.tabnum] or num[.cat[.dis]])
+STRING   Parameter identifier (GRIB1: code[.tabnum]; GRIB2: num[.cat[.dis]])
 @Item = name
 STRING   Variable name
 @Item = level

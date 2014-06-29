@@ -389,13 +389,13 @@ void *Maggraph(void *argument);
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
-#define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
+#define  SetOperators           {"setpartab", "setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber", "setgriduri"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
-#define  SetpartabOperators     {"setpartab", "setpartabc", "setpartabp", "setpartabn"}
+#define  SetpartabOperators     {"setpartabc", "setpartabp", "setpartabn"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
