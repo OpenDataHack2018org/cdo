@@ -113,7 +113,7 @@ Operator catalog:
 -------------------------------------------------------------
    Modification
 -------------------------------------------------------------
-   Setpartab     setpartab       Set parameter table
+   Setpartab     setpartabp      Set parameter table
    Setpartab     setpartabn      Set parameter table
    Set           setcode         Set code number
    Set           setparam        Set parameter identifier
