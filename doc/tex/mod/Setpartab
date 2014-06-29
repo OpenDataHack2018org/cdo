@@ -5,7 +5,7 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setpartab setpartabn
+@Operators = setpartabp setpartabn
 
 @BeginDescription
 This module transforms data and metadata of @file{ifile} via a parameter table and writes the result to @file{ofile}.
@@ -18,6 +18,8 @@ The following parameter table entries are supported:
  @bold{Entry}    & @bold{Type} & @bold{Description}      
  name            & WORD        & Name of the variable
  out_name        & WORD        & New name of the variable
+ param           & WORD        & Parameter identifier (GRIB1: code[.tabnum];  GRIB2: num[.cat[.dis]])
+ out_param       & WORD        & New parameter identifier
  type            & WORD        & Data type (real or double)
  standard_name   & WORD        & As defined in the CF standard name table
  long_name       & STRING      & Describing the variable
@@ -31,23 +33,21 @@ The following parameter table entries are supported:
  ok_min_mean_abs & FLOAT       & Minimum absolute mean
  ok_max_mean_abs & FLOAT       & Maximum absolute mean
  factor          & FLOAT       & Scale factor
- code            & INTEGER     & GRIB1 code number
- out_code        & INTEGER     & New GRIB1 code number
  delete          & INTEGER     & Set to 1 to delete variable
 @EndTable
 
 The search key for the variable depends on the operator. Use @oper{setpartabn} to search variables by the name.
-This is typically used for netCDF datasets. The operator @oper{setpartab} searches variables by the code number.
+This is typically used for netCDF datasets. The operator @oper{setpartabp} searches variables by the parameter ID.
 @EndDescription
 @EndModule
 
 
-@BeginOperator_setpartab
+@BeginOperator_setpartabp
 @Title     = Set parameter table
 @Parameter = table
 
 @BeginDescription
-Search variables by code number.
+Search variables by the parameter identifier.
 @EndDescription
 @EndOperator
 
