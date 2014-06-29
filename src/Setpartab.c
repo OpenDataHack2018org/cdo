@@ -45,6 +45,7 @@
 #include "util.h"
 #include "namelist.h"
 
+int stringToParam(const char *paramstr);
 
 typedef enum {CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
 
@@ -257,6 +258,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 		}
 	    }
 #else
+	  UNUSED(name);
 	  if ( lwarn_udunits )
 	    {
 	      cdoWarning("Can't convert units, UDUNITS2 support not compiled in!");
@@ -286,7 +288,6 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   int codenum, tabnum, levtype, param;
   int varID, tableID;
   int num_pt_files;
-  double paramdp[2];
   double missval, factor;
   double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
   char *partab = NULL;
@@ -323,9 +324,8 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
       nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
       nml_ok_max_mean_abs = namelistAdd(nml, "ok_max_mean_abs", NML_FLT,  0, &ok_max_mean_abs, 1);
-      //nml_param           = namelistAdd(nml, "param",           NML_FLT , 0, &paramdp, 2);
       nml_param           = namelistAdd(nml, "param",           NML_WORD, 0, &paramstr, 1);
-      //   nml_out_param       = namelistAdd(nml, "out_param",       NML_WORD, 0, &out_paramstr, 1);
+      nml_out_param       = namelistAdd(nml, "out_param",       NML_WORD, 0, &out_paramstr, 1);
       nml_chunktype       = namelistAdd(nml, "chunktype",       NML_WORD, 0, &chunktypestr, 1);
       nml_datatype        = namelistAdd(nml, "datatype",        NML_WORD, 0, &datatypestr, 1);
       nml_type            = namelistAdd(nml, "type",            NML_WORD, 0, &typestr, 1);
@@ -337,7 +337,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_comment         = namelistAdd(nml, "comment",         NML_TEXT, 0, comment, sizeof(comment));
       nml_cell_methods    = namelistAdd(nml, "cell_methods",    NML_TEXT, 0, cell_methods, sizeof(cell_methods));
       nml_cell_measures   = namelistAdd(nml, "cell_measures",   NML_TEXT, 0, cell_measures, sizeof(cell_measures));
-	      
+
       while ( ! feof(fp) )
 	{
 	  namelistReset(nml);
@@ -392,7 +392,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		      tabnum  = tableInqNum(tableID);
 		      levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
 		      
-		      printf("code = %d  tabnum = %d  ltype = %d\n", codenum, tabnum, levtype);
+		      // printf("code = %d  tabnum = %d  ltype = %d\n", codenum, tabnum, levtype);
 		      
 		      if ( nml->entry[nml_table]->occ == 0 ) table = tabnum;
 		      if ( nml->entry[nml_ltype]->occ == 0 ) ltype = levtype;
@@ -401,28 +401,14 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		    }
 		  else if ( ptmode == PARAMETER_ID )
 		    {
-		      int pnum, pcat, pdis;
+		      int paramid = stringToParam(paramstr);
 
 		      param   = vlistInqVarParam(vlistID2, varID);
-		      codenum = vlistInqVarCode(vlistID2, varID);
-		      tableID = vlistInqVarTable(vlistID2, varID);
-		      tabnum  = tableInqNum(tableID);
 		      levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
 
-		      cdiDecodeParam(param, &pnum, &pcat, &pdis);
-	      
-		      printf("pnum=%d pcat=%d pdis=%d\n", pnum, pcat, pdis);
-		      //	printf("code = %d  tabnum = %d  ltype = %d\n", codenum, tabnum, levtype);
-		      printf("paramstr >%s< >%s<\n", paramstr, out_paramstr);
-		      /*
-		      code  = (int) param_dp;
-		      table = (param_dp-code)*1000;
-		      printf("code = %d  tabnum = %d  ltype = %d\n", code, table, levtype);
-		      */
-		      if ( nml->entry[nml_table]->occ == 0 ) table = tabnum;
 		      if ( nml->entry[nml_ltype]->occ == 0 ) ltype = levtype;
 		  
-		      if ( codenum == code && tabnum == table && levtype == ltype ) break;
+		      if ( param == paramid && levtype == ltype ) break;
 		    }
 		  else if ( ptmode == VARIABLE_NAME )
 		    {
@@ -446,6 +432,8 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		  if ( nml->entry[nml_cell_methods]->occ  ) defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
 		  if ( nml->entry[nml_cell_measures]->occ ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
 		  if ( nml->entry[nml_delete]->occ && remove == 1 ) vars[varID].remove = TRUE;
+		  if ( nml->entry[nml_param]->occ )     vlistDefVarParam(vlistID2, varID, stringToParam(paramstr));
+		  if ( nml->entry[nml_out_param]->occ ) vlistDefVarParam(vlistID2, varID, stringToParam(out_paramstr));
 		  if ( nml->entry[nml_datatype]->occ )
 		    {
 		      int datatype = str2datatype(datatypestr);
@@ -626,7 +614,7 @@ void *Setpartab(void *argument)
 
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
-  if      ( operatorID == SETPARTAB )  ptmode = CODE_NUMBER;
+  if      ( operatorID == SETPARTAB  ) ptmode = CODE_NUMBER;
   else if ( operatorID == SETPARTABC ) ptmode = CODE_NUMBER;
   else if ( operatorID == SETPARTABP ) ptmode = PARAMETER_ID;
   else if ( operatorID == SETPARTABN ) ptmode = VARIABLE_NAME;
@@ -636,7 +624,6 @@ void *Setpartab(void *argument)
       FILE *fp;
       size_t fsize;
       char *parbuf = NULL;
-      size_t nbytes;
 
       partab = operatorArgv()[0];
       fp = fopen(partab, "r");
@@ -646,7 +633,7 @@ void *Setpartab(void *argument)
 	  fsize = (size_t) ftell(fp);
 	  parbuf = (char*) malloc(fsize+1);
 	  fseek(fp, 0L, SEEK_SET);
-	  nbytes = fread(parbuf, fsize, 1, fp);
+	  fread(parbuf, fsize, 1, fp);
 	  parbuf[fsize] = 0;
 	  fseek(fp, 0L, SEEK_SET);
 
