@@ -491,6 +491,7 @@ int expand_lonlat_grid(int gridID)
     {
       gridDefXpole(gridIDnew, gridInqXpole(gridID));
       gridDefYpole(gridIDnew, gridInqYpole(gridID));
+      gridDefAngle(gridIDnew, gridInqAngle(gridID));
     }
 
   return(gridIDnew);

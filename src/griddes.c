@@ -281,6 +281,7 @@ int gridDefine(griddes_t grid)
 	  {
 	    gridDefXpole(gridID, grid.xpole);
 	    gridDefYpole(gridID, grid.ypole);
+	    gridDefAngle(gridID, grid.angle);
 	  }
 
 	if ( grid.mask )
@@ -930,10 +931,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else
 	    cdoAbort("Invalid projection : %s (grid description file: %s)", pline, dname);
 	}
-      else if ( cmpstr(pline, "a", len)  == 0 )
-	{
-	  grid.a = readflt(dname, "a", skipSeparator(pline + len));
-	}
       else if ( cmpstr(pline, "lon_0", len)  == 0 )
 	{
 	  grid.lon_0 = readflt(dname, "lon_0", skipSeparator(pline + len));
@@ -973,6 +970,15 @@ int gridFromFile(FILE *gfp, const char *dname)
 	{
 	  grid.ypole = readflt(dname, "latpole", skipSeparator(pline + len));
 	  grid.isRotated = TRUE;
+	}
+      else if ( cmpstr(pline, "angle", len)  == 0 )
+	{
+	  grid.angle = readflt(dname, "angle", skipSeparator(pline + len));
+	  grid.isRotated = TRUE;
+	}
+      else if ( cmpstr(pline, "a", len)  == 0 )
+	{
+	  grid.a = readflt(dname, "a", skipSeparator(pline + len));
 	}
       else if ( cmpstr(pline, "gridlatlon", len)  == 0 )
 	{

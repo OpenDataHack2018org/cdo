@@ -108,6 +108,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
     {
       gridDefXpole(gridID2, gridInqXpole(gridID1));
       gridDefYpole(gridID2, gridInqYpole(gridID1));
+      gridDefAngle(gridID2, gridInqAngle(gridID1));
     }
 
   lxvals = gridInqXvals(gridID1, NULL);
