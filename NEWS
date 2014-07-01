@@ -11,14 +11,14 @@ Version 1.6.4 (26 June 2014):
      * setpartabp: set parameter table by parameter ID
      * sealevelpressure: sea level pressure
    Changed operators:
+     * Sinfo: changed format of grid and zaxis section
      * Filter: disable zero-padding
      * diff: print number of different values
      * Ymonstat: sorts output by month of year
    Fixed bugs:
-     * Filter:
      * eof3d: set sum of weights to 1
-     * eofcoeff: remove scaling with grib cell area weights
-     * eofcoeff3d: remove scaling with grib cell area weights
+     * eofcoeff: remove scaling with grid cell area weights
+     * eofcoeff3d: remove scaling with grid cell area weights
 
 Version 1.6.3 (18 February 2014):
 
