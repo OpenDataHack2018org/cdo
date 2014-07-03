@@ -5,20 +5,33 @@
 #
 CONFPATH=`echo $0 | cut -c 1-6`
 if [ "$CONFPATH" != "../../" ] ; then
-CONFPATH='./'
+  CONFPATH='./'
 fi
 #
-if test -z "$1" ; then
-  HOSTNAME=`hostname`
-else
-  HOSTNAME=$1
-fi
+COMP=""
+HOSTNAME=`hostname`
+#
+set -x
+while test $# != 0
+do
+  case $1 in
+      CC=?*)
+          COMP=`expr "X$1" : 'X[^=]*=\(.*\)'`
+          ;;
+      *)
+          HOSTNAME=$1
+          ;;
+  esac
+  shift
+done
 #
 set -x
 #
 case "${HOSTNAME}" in
-    icc)
-	${CONFPATH}configure --prefix=$HOME/local \
+# i386-apple-darwin10
+    bailung*|d133*|d134*)
+        if  test "$COMP" = icc ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     --with-jasper=$HOME/local \
                     --with-grib_api=$HOME/local/gribapi-1.10.4 \
@@ -30,10 +43,8 @@ case "${HOSTNAME}" in
                     --with-curl=/opt/local \
 	            CC=icc CFLAGS="-g -Wall -O3 -vec-report2 -march=native -openmp -fp-model source -fast-transcendentals" \
                     LIBS="-L/opt/local/lib -lopenjpeg"
-	;;
-# i386-apple-darwin10
-    bailung*)
-	${CONFPATH}configure --prefix=$HOME/local \
+        else
+	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     --with-jasper=$HOME/local \
                     --with-grib_api=$HOME/local/gribapi-1.10.4 \
@@ -46,10 +57,23 @@ case "${HOSTNAME}" in
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -std=c99 -pedantic -O3 -march=native" \
                     LIBS="-L/opt/local/lib -lopenjpeg"
 #                    --with-libxml2=/usr 
-#                    --with-magics=/Users/m214003/local/magics-2.14.9 
+#                    --with-magics=/Users/m214003/local/magics-2.14.9
+        fi
 	;;
     hama*)
-	${CONFPATH}configure --prefix=$HOME/local \
+        if  test "$COMP" = icc ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    --with-jasper=/opt/local \
+                    --with-grib_api=$HOME/local/gribapi-1.9.16 \
+                    --with-netcdf=/opt/local \
+                    --with-hdf5=/opt/local \
+                    --with-szlib=$HOME/local \
+                    --with-proj=/opt/local \
+                    --with-curl=/opt/local \
+	            CC=icc CFLAGS="-g -Wall -O3 -vec-report2 -march=native -openmp -fp-model source -fast-transcendentals"
+        else
+	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     --with-jasper=/opt/local \
                     --with-grib_api=$HOME/local/gribapi-1.9.16 \
@@ -61,6 +85,7 @@ case "${HOSTNAME}" in
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
+        fi
 	;;
 # ia64-xxx-linux
     ds*)
