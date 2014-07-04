@@ -4,7 +4,7 @@
 #  autoconf 2.68
 #  libtool  2.4.2
 
-AC_INIT([cdo], [1.6.4], [http://code.zmaw.de/projects/cdo])
+AC_INIT([cdo], [1.6.5rc1], [http://code.zmaw.de/projects/cdo])
 
 CONFIG_ABORT=yes
 AC_CONFIG_AUX_DIR(config)
@@ -13,7 +13,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_BUILD
 
 # AM_INIT_AUTOMAKE([foreign -Wall -Werror])
-AM_INIT_AUTOMAKE([foreign -Wall])
+AM_INIT_AUTOMAKE([subdir-objects foreign -Wall])
 AC_CONFIG_HEADERS([src/config.h])
 AM_MAINTAINER_MODE([disable])
 
