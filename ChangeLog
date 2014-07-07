@@ -1,3 +1,7 @@
+2014-07-07  Uwe Schulzweida
+
+	* cat: added progress status
+
 2014-06-30  Uwe Schulzweida
 
 	* using CDI library version 1.6.4
