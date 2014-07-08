@@ -27,6 +27,11 @@
 #  include "config.h"
 #endif
 
+#if defined(_OPENMP)
+#  include <omp.h>
+#endif
+
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -74,8 +79,8 @@ void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_
   for ( i = 0; i < nts; i++ )
     if ( ! fmasc[i] )
       {
-	fft_out[i][0] = 0;
-	fft_out[i][1] = 0;
+        fft_out[i][0] = 0;
+        fft_out[i][1] = 0;
       }
   
   fftw_execute(*p_S2T);
@@ -123,6 +128,7 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 
 void *Filter(void *argument)
 {
+  int ompthID;
   enum {BANDPASS, HIGHPASS, LOWPASS};
   char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
@@ -153,6 +159,12 @@ void *Filter(void *argument)
   fftw_complex *out_fft = NULL;
   fftw_complex *in_fft = NULL;
 #endif
+  typedef struct
+  {
+    double *array1;
+    double *array2;
+  } memory_t;
+  memory_t *ompmem = NULL;
   
   cdoInitialize(argument);
 
@@ -194,7 +206,7 @@ void *Filter(void *argument)
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-	  dtinfo = (dtinfo_t*) realloc(dtinfo, nalloc*sizeof(dtinfo_t));
+          dtinfo = (dtinfo_t*) realloc(dtinfo, nalloc*sizeof(dtinfo_t));
           vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
         }
                        
@@ -216,13 +228,13 @@ void *Filter(void *argument)
       /* get and check time increment */                   
       if ( tsID > 0 )
         {    
-	  juldate_t juldate0, juldate;
-	  double jdelta;
-	  int incperiod = 0;
-	  int year, month, day;
+          juldate_t juldate0, juldate;
+          double jdelta;
+          int incperiod = 0;
+          int year, month, day;
 
           cdiDecodeDate(dtinfo[tsID].v.date,   &year,  &month,  &day);
-	  cdiDecodeDate(dtinfo[tsID-1].v.date, &year0, &month0, &day0);               
+          cdiDecodeDate(dtinfo[tsID-1].v.date, &year0, &month0, &day0);               
 
           juldate0 = juldate_encode(calendar, dtinfo[tsID-1].v.date, dtinfo[tsID-1].v.time);        
           juldate  = juldate_encode(calendar, dtinfo[tsID].v.date, dtinfo[tsID].v.time);         
@@ -242,21 +254,27 @@ void *Filter(void *argument)
           else 
             getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod, &incunit);        
 
-	  if ( incunit0 < 4 && month == 2 && day == 29 && 
-	       ( day0 != day || month0 != month || year0 != year ) )
-	    {
-	      cdoWarning("Filtering of multi-year times series only works properly with 365-day-calendar.");
-	      cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
-	    }
+          if ( incunit0 < 4 && month == 2 && day == 29 && 
+               ( day0 != day || month0 != month || year0 != year ) )
+            {
+              cdoWarning("Filtering of multi-year times series only works properly with 365-day-calendar.");
+              cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
+            }
 
           if ( ! ( incperiod == incperiod0 && incunit == incunit0 ) )
             cdoWarning("Time increment in step %i (%d%s) differs from step 1 (%d%s)!",
-		       tsID, incperiod, tunits[incunit], incperiod0, tunits[incunit0]);        
+                       tsID, incperiod, tunits[incunit], incperiod0, tunits[incunit0]);        
         }
       tsID++;
     }
   
   nts = tsID;
+  ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      ompmem[i].array1 = (double*) malloc(nts*sizeof(double));
+      ompmem[i].array2 = (double*) malloc(nts*sizeof(double));
+    }
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
 
   fmasc  = (int*) calloc(nts, sizeof(int));
@@ -265,27 +283,27 @@ void *Filter(void *argument)
     {
     case BANDPASS: 
       {
-	operatorInputArg("lower and upper bound of frequency band");
-	operatorCheckArgc(2);
-	fmin = atof(operatorArgv()[0]);
-	fmax = atof(operatorArgv()[1]);
-	break;
+        operatorInputArg("lower and upper bound of frequency band");
+        operatorCheckArgc(2);
+        fmin = atof(operatorArgv()[0]);
+        fmax = atof(operatorArgv()[1]);
+        break;
       }
     case HIGHPASS:
       {              
-	operatorInputArg("lower bound of frequency pass");
-	operatorCheckArgc(1);
-	fmin = atof(operatorArgv()[0]);
-	fmax = fdata;
-	break;
+        operatorInputArg("lower bound of frequency pass");
+        operatorCheckArgc(1);
+        fmin = atof(operatorArgv()[0]);
+        fmax = fdata;
+        break;
       }
     case LOWPASS: 
-      {
-	operatorInputArg("upper bound of frequency pass");
-	operatorCheckArgc(1);
-	fmin = 0;
-	fmax = atof(operatorArgv()[0]);
-	break;
+      { 
+        operatorInputArg("upper bound of frequency pass");
+        operatorCheckArgc(1);
+        fmin = 0;
+        fmax = atof(operatorArgv()[0]);
+        break;
       }
     }
   
@@ -315,46 +333,58 @@ void *Filter(void *argument)
       
       for ( levelID = 0; levelID < nlevel; levelID++ )
         {
-	  if ( use_fftw )
-	    {
+          if ( use_fftw )
+            {
 #if defined(HAVE_LIBFFTW3) 
-	      for ( i = 0; i < gridsize; i++ )
-		{
-		  for ( tsID = 0; tsID < nts; tsID++ )                              
-		    {
-		      in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
-		      in_fft[tsID][1] = 0;
-		    }
+              for ( i = 0; i < gridsize; i++ )
+                {
+                  for ( tsID = 0; tsID < nts; tsID++ )                              
+                    {
+                      in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
+                      in_fft[tsID][1] = 0;
+                    }
 
-		  filter_fftw(nts, fmasc, out_fft, &p_T2S, &p_S2T);
-		  
-		  for ( tsID = 0; tsID < nts; tsID++ )
-		    {
-		      vars[tsID][varID][levelID].ptr[i] = in_fft[tsID][0] / nts;  
-		    }
-		}
+                  filter_fftw(nts, fmasc, out_fft, &p_T2S, &p_S2T);
+                  
+                  for ( tsID = 0; tsID < nts; tsID++ )
+                    {
+                      vars[tsID][varID][levelID].ptr[i] = in_fft[tsID][0] / nts;  
+                    }
+                }
 #endif
-	    }
-	  else
-	    {
-	      for ( i = 0; i < gridsize; i++ )  
-		{
-		  for ( tsID = 0; tsID < nts; tsID++ )
-		    array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+            }
+          else
+            {
+#if defined(_OPENMP)
+#pragma omp parallel for default(shared) private(i, ompthID, tsID)
+#endif
+              for ( i = 0; i < gridsize; i++ )  
+                {
+#if defined(_OPENMP)
+              ompthID = omp_get_thread_num();
+#else
+              ompthID = 0;
+#endif
+                  for ( tsID = 0; tsID < nts; tsID++ )
+                    ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-		  memset(array2, 0, nts*sizeof(double));
+                  memset(ompmem[ompthID].array2, 0, nts*sizeof(double));
 
-		  filter_intrinsic(nts, fmasc, array1, array2);
+                  filter_intrinsic(nts, fmasc, ompmem[ompthID].array1, ompmem[ompthID].array2);
 
-		  for ( tsID = 0; tsID < nts; tsID++ )
-		    vars[tsID][varID][levelID].ptr[i] = array1[tsID];  
-		}
-	    }
-	}
+                  for ( tsID = 0; tsID < nts; tsID++ )
+                    vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array1[tsID];
+                }
+            }
+        }
     }
-  
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
+
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      free(ompmem[i].array1);
+      free(ompmem[i].array2);
+    }
+  free(ompmem);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   
@@ -373,11 +403,11 @@ void *Filter(void *argument)
               if ( vars[tsID][varID][levelID].ptr )
                 {
                   nmiss = vars[tsID][varID][levelID].nmiss;
-		  streamDefRecord(streamID2, varID, levelID);
+                  streamDefRecord(streamID2, varID, levelID);
                   streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 
                   free(vars[tsID][varID][levelID].ptr);
-		  vars[tsID][varID][levelID].ptr = NULL;
+                  vars[tsID][varID][levelID].ptr = NULL;
                 }
             }
         }
@@ -385,11 +415,11 @@ void *Filter(void *argument)
       field_free(vars[tsID], vlistID1);
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
-
   if ( vars   ) free(vars);
   if ( dtinfo ) free(dtinfo);
+
+  streamClose(streamID2);
+  streamClose(streamID1);
 
 #if defined(HAVE_LIBFFTW3)
   if ( in_fft  ) free(in_fft);
