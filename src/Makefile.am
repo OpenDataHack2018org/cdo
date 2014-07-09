@@ -54,6 +54,7 @@ cdo_SOURCES += Adisit.c        \
                Gradsdes.c      \
                Gridboxstat.c   \
                Gridcell.c      \
+               Gridsearch.c    \
                Harmonic.c      \
                Hi.c            \
                Histogram.c     \

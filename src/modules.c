@@ -92,6 +92,7 @@ void *Gengrid(void *argument);
 void *Gradsdes(void *argument);
 void *Gridboxstat(void *argument);
 void *Gridcell(void *argument);
+void *Gridsearch(void *argument);
 void *Harmonic(void *argument);
 void *Histogram(void *argument);
 void *Importamsr(void *argument);
@@ -324,6 +325,7 @@ void *Maggraph(void *argument);
 #define  GradsdesOperators      {"gradsdes", "dumpmap"}
 #define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxvar", "gridboxstd"}
 #define  GridcellOperators      {"gridarea", "gridweights", "gridmask", "griddx", "griddy"}
+#define  GridsearchOperators    {"testpointsearch", "testcellsearch"}
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  ImportamsrOperators    {"import_amsr"}
@@ -591,6 +593,7 @@ static modules_t Modules[] =
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,      CDI_REAL,  1,  0 },
   { Gridboxstat,    GridboxstatHelp,   GridboxstatOperators,   CDI_REAL,  1,  1 },
   { Gridcell,       GridcellHelp,      GridcellOperators,      CDI_REAL,  1,  1 },
+  { Gridsearch,     NULL,              GridsearchOperators,    CDI_REAL,  0,  0 },
   { Harmonic,       NULL,              HarmonicOperators,      CDI_REAL,  1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,     CDI_REAL,  1,  1 },
   { Importamsr,     ImportamsrHelp,    ImportamsrOperators,    CDI_REAL,  1,  1 },

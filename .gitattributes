@@ -350,6 +350,7 @@ src/Gengrid.c -text
 src/Gradsdes.c -text
 src/Gridboxstat.c -text
 src/Gridcell.c -text
+src/Gridsearch.c -text
 src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text
