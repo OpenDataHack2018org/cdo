@@ -778,11 +778,12 @@ void *Select(void *argument)
 	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
 
-	  if ( operatorID == SELECT && npar_timestep == 1 ) ntsteps = 1;
+	  int ntsteps2 = ntsteps;
+	  if ( operatorID == SELECT && npar_timestep == 1 ) ntsteps2 = 1;
 	  
-	  if ( ntsteps == 0 || ntsteps == 1 ) vlistDefNtsteps(vlistID2, ntsteps);
+	  if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
 
-	  if ( ntsteps == 0 && nfiles > 1 )
+	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {	      
 	      for ( varID = 0; varID < nvars2; ++varID )
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
