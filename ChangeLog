@@ -1,3 +1,7 @@
+2014-07-12  Uwe Schulzweida
+
+	* select: wrong result when select only one timestep (bug fix)
+
 2014-07-07  Uwe Schulzweida
 
 	* cat: added progress status
