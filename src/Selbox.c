@@ -916,6 +916,11 @@ void *Selbox(void *argument)
 	}
     }
 
+  for ( varID = 0; varID < nvars; varID++ )
+    if ( vars[varID] == TRUE ) break;
+
+  if ( varID >= nvars ) cdoWarning("No variables selected!");
+
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
