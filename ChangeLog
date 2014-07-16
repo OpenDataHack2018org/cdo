@@ -1,3 +1,12 @@
+2014-10-01  Uwe Schulzweida
+
+	* using CDI library version 1.6.5
+	* Version 1.6.5 released
+
+2014-07-12  Uwe Schulzweida
+
+	* sellonlatbox: skip variables with only one grid point
+
 2014-07-12  Uwe Schulzweida
 
 	* select: wrong result when select only one timestep (bug fix)

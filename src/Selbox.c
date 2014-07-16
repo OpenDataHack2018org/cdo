@@ -871,6 +871,9 @@ void *Selbox(void *argument)
 	{
 	  if ( operatorID == SELLONLATBOX )
 	    {
+	      int gridsize = gridInqSize(gridID1);
+	      if ( gridsize == 1 ) continue;
+
 	      if ( gridtype == GRID_UNSTRUCTURED )
 		gridID2 = gencellgrid(gridID1, &sbox[index].nvals, &sbox[index].cellidx);
 	      else
