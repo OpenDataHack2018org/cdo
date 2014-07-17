@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.5
 	* Version 1.6.5 released
 
+2014-07-17  Yvonne Küstermann
+
+	* Filter: OpenMP version
+
 2014-07-12  Uwe Schulzweida
 
 	* sellonlatbox: skip variables with only one grid point
