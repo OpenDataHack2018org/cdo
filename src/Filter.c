@@ -146,29 +146,21 @@ void *Filter(void *argument)
   dtinfo_t *dtinfo = NULL;
   int incperiod0, incunit0, incunit, calendar;
   int year0, month0, day0;
-  double *array1 = NULL, *array2 = NULL;
   double fdata = 0;
   field_t ***vars = NULL;
   double fmin = 0, fmax = 0;
   int *fmasc;
   int use_fftw = FALSE;
-#if defined(HAVE_LIBFFTW3) 
-  fftw_plan p_T2S, p_S2T;
-  fftw_complex *in_fft = NULL;
-  fftw_complex *out_fft = NULL;
-  typedef struct
-  {
-    fftw_complex *in_fft;
-    fftw_complex *out_fft;
-    fftw_plan p_T2S;
-    fftw_plan p_S2T;
-  } memory_tfft;
-  memory_tfft *ompmemfft = NULL;
-#endif
   typedef struct
   {
     double *array1;
     double *array2;
+#if defined(HAVE_LIBFFTW3) 
+    fftw_complex *in_fft;
+    fftw_complex *out_fft;
+    fftw_plan p_T2S;
+    fftw_plan p_S2T;
+#endif
   } memory_t;
   memory_t *ompmem = NULL;
   
@@ -273,25 +265,30 @@ void *Filter(void *argument)
     }
   
   nts = tsID;
-  ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
-  for ( i = 0; i < ompNumThreads; i++ )
-    {
-      ompmem[i].array1 = (double*) malloc(nts*sizeof(double));
-      ompmem[i].array2 = (double*) malloc(nts*sizeof(double));
-    }
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
-#if defined(HAVE_LIBFFTW3) 
-  ompmemfft = (memory_tfft*) malloc(ompNumThreads*sizeof(memory_tfft));
-  for ( i = 0; i < ompNumThreads; i++ )
+
+  if ( use_fftw )
     {
-      ompmemfft[i].in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
-      ompmemfft[i].out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
-      ompmemfft[i].p_T2S  = (fftw_plan) malloc(nts*sizeof(fftw_plan));
-      ompmemfft[i].p_S2T  = (fftw_plan) malloc(nts*sizeof(fftw_plan));
-      ompmemfft[i].p_T2S = fftw_plan_dft_1d(nts, ompmemfft[i].in_fft, ompmemfft[i].out_fft,  1, FFTW_ESTIMATE);
-      ompmemfft[i].p_S2T = fftw_plan_dft_1d(nts, ompmemfft[i].out_fft, ompmemfft[i].in_fft, -1, FFTW_ESTIMATE);
-    }
+#if defined(HAVE_LIBFFTW3) 
+      ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+      for ( i = 0; i < ompNumThreads; i++ )
+	{
+	  ompmem[i].in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
+	  ompmem[i].out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
+	  ompmem[i].p_T2S = fftw_plan_dft_1d(nts, ompmem[i].in_fft, ompmem[i].out_fft,  1, FFTW_ESTIMATE);
+	  ompmem[i].p_S2T = fftw_plan_dft_1d(nts, ompmem[i].out_fft, ompmem[i].in_fft, -1, FFTW_ESTIMATE);
+	}
 #endif
+    }
+  else
+    {
+      ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+      for ( i = 0; i < ompNumThreads; i++ )
+	{
+	  ompmem[i].array1 = (double*) malloc(nts*sizeof(double));
+	  ompmem[i].array2 = (double*) malloc(nts*sizeof(double));
+	}
+    }
 
   fmasc  = (int*) calloc(nts, sizeof(int));
 
@@ -325,21 +322,6 @@ void *Filter(void *argument)
   
   create_fmasc(nts, fdata, fmin, fmax, fmasc);
 
-  if ( use_fftw )
-    {
-#if defined(HAVE_LIBFFTW3) 
-      in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
-      out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
-      p_T2S = fftw_plan_dft_1d(nts, in_fft, out_fft,  1, FFTW_ESTIMATE);
-      p_S2T = fftw_plan_dft_1d(nts, out_fft, in_fft, -1, FFTW_ESTIMATE);
-#endif
-    }
-  else
-    {
-      array1 = (double*) malloc(nts*sizeof(double));
-      array2 = (double*) malloc(nts*sizeof(double));
-    }
-
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -363,17 +345,15 @@ void *Filter(void *argument)
 #endif
                   for ( tsID = 0; tsID < nts; tsID++ )                              
                     {
-                      ompmemfft[ompthID].in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
-                      ompmemfft[ompthID].in_fft[tsID][1] = 0;
-                      in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
-                      in_fft[tsID][1] = 0;
+                      ompmem[ompthID].in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
+                      ompmem[ompthID].in_fft[tsID][1] = 0;
                     }
 
-                  filter_fftw(nts, fmasc, ompmemfft[ompthID].out_fft, &ompmemfft[ompthID].p_T2S, &ompmemfft[ompthID].p_S2T);
+                  filter_fftw(nts, fmasc, ompmem[ompthID].out_fft, &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
                   
                   for ( tsID = 0; tsID < nts; tsID++ )
                     {
-                      vars[tsID][varID][levelID].ptr[i] = ompmemfft[ompthID].in_fft[tsID][0] / nts;  
+                      vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;  
                     }
                 }
 #endif
@@ -404,12 +384,26 @@ void *Filter(void *argument)
         }
     }
 
-  for ( i = 0; i < ompNumThreads; i++ )
+  if ( use_fftw )
     {
-      free(ompmem[i].array1);
-      free(ompmem[i].array2);
+#if defined(HAVE_LIBFFTW3) 
+      for ( i = 0; i < ompNumThreads; i++ )
+	{
+	  free(ompmem[i].in_fft);
+	  free(ompmem[i].out_fft);
+	}
+      free(ompmem);
+#endif
     }
-  free(ompmem);
+  else
+    {
+      for ( i = 0; i < ompNumThreads; i++ )
+	{
+	  free(ompmem[i].array1);
+	  free(ompmem[i].array2);
+	}
+      free(ompmem);
+    }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   
@@ -445,11 +439,6 @@ void *Filter(void *argument)
 
   streamClose(streamID2);
   streamClose(streamID1);
-
-#if defined(HAVE_LIBFFTW3)
-  if ( in_fft  ) free(in_fft);
-  if ( out_fft ) free(out_fft);
-#endif
 
   cdoFinish();
   
