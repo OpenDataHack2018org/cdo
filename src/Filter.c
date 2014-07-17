@@ -61,8 +61,6 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
   imin = dimin<0 ? 0 : (int)floor(dimin);  
   imax = ceil(dimax)>nts/2 ? nts/2 : (int) ceil(dimax);  
 
-  //  printf("%d %d %g %g %g %g %g\n", imin, imax, dimin, dimax, fdata, fmin, fmax);
-  
   fmasc[imin] = 1;
   for ( i = imin+1; i <= imax; i++ )  
     fmasc[i] = fmasc[nts-i] = 1; 
@@ -128,7 +126,7 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 
 void *Filter(void *argument)
 {
-  int ompthID;
+  int ompthID = 1;
   enum {BANDPASS, HIGHPASS, LOWPASS};
   char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
@@ -156,8 +154,16 @@ void *Filter(void *argument)
   int use_fftw = FALSE;
 #if defined(HAVE_LIBFFTW3) 
   fftw_plan p_T2S, p_S2T;
-  fftw_complex *out_fft = NULL;
   fftw_complex *in_fft = NULL;
+  fftw_complex *out_fft = NULL;
+  typedef struct
+  {
+    fftw_complex *in_fft;
+    fftw_complex *out_fft;
+    fftw_plan p_T2S;
+    fftw_plan p_S2T;
+  } memory_tfft;
+  memory_tfft *ompmemfft = NULL;
 #endif
   typedef struct
   {
@@ -242,8 +248,6 @@ void *Filter(void *argument)
           
           if ( tsID == 1 ) 
             {           
-              /*printf("%4i %4.4i-%2.2i-%2.2i\n", tsID, year, month, day);
-              printf("    %4.4i-%2.2i-%2.2i\n",     year0,month0,day0);*/
               getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod0, &incunit0);
               incperiod = incperiod0; 
               if ( incperiod == 0 ) cdoAbort("Time step must be different from zero!");
@@ -276,6 +280,18 @@ void *Filter(void *argument)
       ompmem[i].array2 = (double*) malloc(nts*sizeof(double));
     }
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
+#if defined(HAVE_LIBFFTW3) 
+  ompmemfft = (memory_tfft*) malloc(ompNumThreads*sizeof(memory_tfft));
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      ompmemfft[i].in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
+      ompmemfft[i].out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
+      ompmemfft[i].p_T2S  = (fftw_plan) malloc(nts*sizeof(fftw_plan));
+      ompmemfft[i].p_S2T  = (fftw_plan) malloc(nts*sizeof(fftw_plan));
+      ompmemfft[i].p_T2S = fftw_plan_dft_1d(nts, ompmemfft[i].in_fft, ompmemfft[i].out_fft,  1, FFTW_ESTIMATE);
+      ompmemfft[i].p_S2T = fftw_plan_dft_1d(nts, ompmemfft[i].out_fft, ompmemfft[i].in_fft, -1, FFTW_ESTIMATE);
+    }
+#endif
 
   fmasc  = (int*) calloc(nts, sizeof(int));
 
@@ -314,7 +330,6 @@ void *Filter(void *argument)
 #if defined(HAVE_LIBFFTW3) 
       in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
       out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
-
       p_T2S = fftw_plan_dft_1d(nts, in_fft, out_fft,  1, FFTW_ESTIMATE);
       p_S2T = fftw_plan_dft_1d(nts, out_fft, in_fft, -1, FFTW_ESTIMATE);
 #endif
@@ -336,19 +351,29 @@ void *Filter(void *argument)
           if ( use_fftw )
             {
 #if defined(HAVE_LIBFFTW3) 
+#if defined(_OPENMP)
+#pragma omp parallel for default(shared) private(i, ompthID, tsID)
+#endif
               for ( i = 0; i < gridsize; i++ )
                 {
+#if defined(_OPENMP)
+              ompthID = omp_get_thread_num();
+#else
+              ompthID = 0;
+#endif
                   for ( tsID = 0; tsID < nts; tsID++ )                              
                     {
+                      ompmemfft[ompthID].in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
+                      ompmemfft[ompthID].in_fft[tsID][1] = 0;
                       in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
                       in_fft[tsID][1] = 0;
                     }
 
-                  filter_fftw(nts, fmasc, out_fft, &p_T2S, &p_S2T);
+                  filter_fftw(nts, fmasc, ompmemfft[ompthID].out_fft, &ompmemfft[ompthID].p_T2S, &ompmemfft[ompthID].p_S2T);
                   
                   for ( tsID = 0; tsID < nts; tsID++ )
                     {
-                      vars[tsID][varID][levelID].ptr[i] = in_fft[tsID][0] / nts;  
+                      vars[tsID][varID][levelID].ptr[i] = ompmemfft[ompthID].in_fft[tsID][0] / nts;  
                     }
                 }
 #endif
