@@ -425,8 +425,13 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   src_num_cell_corners = src_grid->num_cell_corners;
   tgt_num_cell_corners = tgt_grid->num_cell_corners;
 
-  enum edge_type great_circle_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
-  enum edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
+  int max_num_cell_corners = src_num_cell_corners;
+  if ( tgt_num_cell_corners > max_num_cell_corners ) max_num_cell_corners = tgt_num_cell_corners;
+
+  enum edge_type great_circle_type[32];
+  for ( int i = 0; i < max_num_cell_corners; ++i ) great_circle_type[i] = GREAT_CIRCLE;
+
+  enum edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
 
   enum edge_type *src_edge_type = great_circle_type;
   enum edge_type *tgt_edge_type = great_circle_type;

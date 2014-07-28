@@ -5,6 +5,7 @@
 
 2014-07-28  Uwe Schulzweida
 
+	* remap_weights_conserv: changed great_circle_type[8] to great_circle_type[32] (bug fix) 
 	* remap_define_grid: bug fix for unstructured grids (ndims[1])
 
 2014-07-17  Yvonne Küstermann
