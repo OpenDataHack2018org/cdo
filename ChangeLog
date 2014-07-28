@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.5
 	* Version 1.6.5 released
 
+2014-07-28  Uwe Schulzweida
+
+	* remap_define_grid: bug fix for unstructured grids (ndims[1])
+
 2014-07-17  Yvonne Küstermann
 
 	* Filter: OpenMP version
