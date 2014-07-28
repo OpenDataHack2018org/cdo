@@ -27,9 +27,6 @@
       Gridboxstat    gridboxvar          Gridbox variance
 */
 
-#if defined(_OPENMP)
-#  include <omp.h>
-#endif
 
 #include <cdi.h>
 #include "cdo.h"
@@ -533,7 +530,6 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   double missval;
   long ig, i, j, ii, jj, index;
   long gridsize;
-  long ompthID;
   field_t *field;
   int isize;
   int useWeight = FALSE;
@@ -570,15 +566,12 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   nlat2 = gridInqYsize(gridID2);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(ig, ilat, ilon, j, jj, i, ii, index, isize, ompthID)
+#pragma omp parallel for default(shared) private(ig, ilat, ilon, j, jj, i, ii, index, isize)
 #endif
   for ( ig = 0; ig < nlat2*nlon2; ++ig )
     {
-#if defined(_OPENMP)
-      ompthID = omp_get_thread_num();
-#else
-      ompthID = 0;
-#endif
+      int ompthID = cdo_omp_get_thread_num();
+
       /*
       int lprogress = 1;
 #if defined(_OPENMP)

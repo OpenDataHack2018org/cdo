@@ -14,10 +14,6 @@
   GNU General Public License for more details.
 */
 
-#if defined(_OPENMP)
-#  include <omp.h>
-#endif
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -384,9 +380,8 @@ int gridGenArea(int gridID, double* area)
   for ( i = 0; i < gridsize; ++i )
     {
       int lprogress = 1;
-#if defined(_OPENMP)
-      if ( omp_get_thread_num() != 0 ) lprogress = 0;
-#endif
+      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
+
 #if defined(_OPENMP)
 #pragma omp atomic
 #endif

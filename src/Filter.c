@@ -27,10 +27,6 @@
 #  include "config.h"
 #endif
 
-#if defined(_OPENMP)
-#  include <omp.h>
-#endif
-
 
 #include <cdi.h>
 #include "cdo.h"
@@ -126,7 +122,6 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 
 void *Filter(void *argument)
 {
-  int ompthID = 1;
   enum {BANDPASS, HIGHPASS, LOWPASS};
   char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
@@ -334,15 +329,12 @@ void *Filter(void *argument)
             {
 #if defined(HAVE_LIBFFTW3) 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, ompthID, tsID)
+#pragma omp parallel for default(shared) private(i, tsID)
 #endif
               for ( i = 0; i < gridsize; i++ )
                 {
-#if defined(_OPENMP)
-              ompthID = omp_get_thread_num();
-#else
-              ompthID = 0;
-#endif
+		  int ompthID = cdo_omp_get_thread_num();
+
                   for ( tsID = 0; tsID < nts; tsID++ )                              
                     {
                       ompmem[ompthID].in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
@@ -361,15 +353,12 @@ void *Filter(void *argument)
           else
             {
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, ompthID, tsID)
+#pragma omp parallel for default(shared) private(i, tsID)
 #endif
               for ( i = 0; i < gridsize; i++ )  
                 {
-#if defined(_OPENMP)
-              ompthID = omp_get_thread_num();
-#else
-              ompthID = 0;
-#endif
+		  int ompthID = cdo_omp_get_thread_num();
+
                   for ( tsID = 0; tsID < nts; tsID++ )
                     ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 

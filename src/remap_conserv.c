@@ -398,7 +398,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   long   srch_corners;       /* num of corners of srch cells           */
   double norm_factor = 0;    /* factor for normalizing wts */
   int*   srch_add;           /* global address of cells in srch arrays */
-  int    ompthID, i;
+  int    i;
 
   /* Variables necessary if segment manages to hit pole */
   double findex = 0;
@@ -517,17 +517,12 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
          rv, cdoVerbose, max_srch_cells2, \
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
 	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2) \
-  private(ompthID, srch_add, tgt_grid_cell, tgt_area, n, k, num_weights, num_srch_cells, max_srch_cells,  \
+  private(srch_add, tgt_grid_cell, tgt_area, n, k, num_weights, num_srch_cells, max_srch_cells,  \
 	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_grid_add, tgt_grid_add, ioffset)
 #endif
   for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
     {
-#if defined(_OPENMP)
-      ompthID = omp_get_thread_num();
-#else
-      ompthID = 0;
-#endif
-
+      int ompthID = cdo_omp_get_thread_num();
       int lprogress = 1;
       if ( ompthID != 0 ) lprogress = 0;
 

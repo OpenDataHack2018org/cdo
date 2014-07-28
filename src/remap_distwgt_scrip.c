@@ -512,9 +512,8 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
   for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
     {
       int lprogress = 1;
-#if defined(_OPENMP)
-      if ( omp_get_thread_num() != 0 ) lprogress = 0;
-#endif
+      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
+
 #if defined(_OPENMP)
 #pragma omp atomic
 #endif

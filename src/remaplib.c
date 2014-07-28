@@ -1248,7 +1248,6 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 #if defined(_OPENMP)
   double **src_cls2;
   double **src_wts2;
-  int ompthID;
 #endif
 
   for ( i = 0; i < dst_size; ++i ) dst_array[i] = missval;
@@ -1276,13 +1275,13 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)					\
-  private(i, n, k, ompthID, src_cls, src_wts, ncls, imax, wts) \
+  private(i, n, k, src_cls, src_wts, ncls, imax, wts) \
   schedule(dynamic,1)
 #endif
   for ( i = 0; i < dst_size; ++i )
     {
 #if defined(_OPENMP)
-      ompthID = omp_get_thread_num();
+      int ompthID = cdo_omp_get_thread_num();
       src_cls = src_cls2[ompthID];
       src_wts = src_wts2[ompthID];
 #endif
