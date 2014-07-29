@@ -323,6 +323,9 @@ static void get_edge_middle_point(double a[3], double b[3],
 
     default:
       abort_message("ERROR: invalid edge type\n", __FILE__, __LINE__);
+      middle[0] = -1; // program should never reach this point
+      middle[1] = -1;
+      middle[2] = -1;
   };
 }
 
@@ -358,7 +361,7 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
                                  prev_tgt_point->edge_type, target_ordering);
 
       double p[3], q[3];
-      int intersect;
+      int intersect = -1;
 
       if ((curr_is_inside + prev_is_inside == 1) ||
           (((prev_src_point->edge_type == LAT_CIRCLE) ^
@@ -418,6 +421,7 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
               break;
             default:
               abort_message("invalid edge type\n", __FILE__, __LINE__);
+              return;
           };
 
           p[0] = temp_src_point->vec_coords[0];
@@ -469,6 +473,7 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
                 break;
               default:
                 abort_message("invalid edge type\n", __FILE__, __LINE__);
+                return;
             };
 
             if (prev_is_closer)
@@ -715,22 +720,22 @@ static void copy_point_list(struct point_list in, struct point_list * out) {
 
   if (curr == NULL) return;
 
-  struct point_list_element * newelem = get_free_point_list_element(out);
-  out->first = newelem;
-  *newelem = *curr;
+  struct point_list_element * new = get_free_point_list_element(out);
+  out->first = new;
+  *new = *curr;
   curr = curr->next;
 
   do {
 
-    newelem->next = get_free_point_list_element(out);
-    newelem = newelem->next;    
-    *newelem = *curr;
+    new->next = get_free_point_list_element(out);
+    new = new->next;    
+    *new = *curr;
     curr = curr->next;
     
   } while (curr != in.first);
 
-  newelem->next = out->first;
-  out->last = newelem;
+  new->next = out->first;
+  out->last = new;
 }
 
 void cell_clipping(unsigned N,
