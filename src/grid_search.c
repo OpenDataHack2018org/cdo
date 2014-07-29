@@ -4,7 +4,7 @@
 
 void grid_search_delete(grid_search_t * search)
 {
-  assert( search->grid_search_delete != NULL );
+  assert( search->vtable->grid_search_delete != NULL );
 
-  search->grid_search_delete(search);
+  search->vtable->grid_search_delete(search);
 }

@@ -1,14 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include "grid_search.h"
 
 
 typedef struct {
-   grid_search_t * vtable;
-   grid_t * bucket_grid;
+   grid_search_vtable_t * vtable;
+  // grid_t * bucket_grid;
    double * bucket_grid_x_coords;
    double * bucket_grid_y_coords;
-   grid_t * grid_data;
+  // grid_t * grid_data;
    unsigned num_buckets[2];
   // struct dep_list bucket_to_cell;
 } bucket_search_t;
@@ -33,7 +34,7 @@ void bucket_search_init(bucket_search_t * bucket_search)
 }
 
 
-grid_search_t * bucket_search_new(grid_t grid_data)
+grid_search_t * bucket_search_new(/*grid_t grid_data*/)
 {
    bucket_search_t * search;
 
@@ -41,5 +42,6 @@ grid_search_t * bucket_search_new(grid_t grid_data)
 
    bucket_search_init(search);
    //   search->vtable = &bucket_search_vtable;
-}
 
+   return ((grid_search_t *) search);
+}
