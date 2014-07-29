@@ -1069,10 +1069,10 @@ void *Remap(void *argument)
 		{
 		  print_remap_info(operfunc, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
 
-		  if      ( map_type == MAP_TYPE_CONSERV   ) scrip_remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-		  else if ( map_type == MAP_TYPE_BILINEAR  ) scrip_remap_weights_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-		  else if ( map_type == MAP_TYPE_BICUBIC   ) scrip_remap_weights_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-		  else if ( map_type == MAP_TYPE_DISTWGT   ) scrip_remap_weights_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  if      ( map_type == MAP_TYPE_CONSERV     ) scrip_remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_BILINEAR    ) scrip_remap_weights_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_BICUBIC     ) scrip_remap_weights_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_DISTWGT     ) scrip_remap_weights_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 		  else if ( map_type == MAP_TYPE_CONSERV_YAC ) remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
 		  if ( remaps[r].vars.num_links != remaps[r].vars.max_links )

@@ -985,29 +985,29 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 #if defined(_OPENMP)
   if ( ompNumThreads > 1 )
     {
-      if      ( map_type == MAP_TYPE_CONSERV   ) rv->sort_add = TRUE;
+      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_BILINEAR  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_BICUBIC   ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_DISTWGT   ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = TRUE;
       else cdoAbort("Unknown mapping method!");
     }
   else
 #endif
     {
-      if      ( map_type == MAP_TYPE_CONSERV   ) rv->sort_add = TRUE;
+      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_BILINEAR  ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BICUBIC   ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_DISTWGT   ) rv->sort_add = FALSE;
+      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = FALSE;
+      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = FALSE;
+      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = FALSE;
       else cdoAbort("Unknown mapping method!");
     }
 
-  if      ( map_type == MAP_TYPE_CONSERV   ) rv->num_wts = 3;
+  if      ( map_type == MAP_TYPE_CONSERV     ) rv->num_wts = 3;
   else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->num_wts = 1;
-  else if ( map_type == MAP_TYPE_BILINEAR  ) rv->num_wts = 1;
-  else if ( map_type == MAP_TYPE_BICUBIC   ) rv->num_wts = 4;
-  else if ( map_type == MAP_TYPE_DISTWGT   ) rv->num_wts = 1;
+  else if ( map_type == MAP_TYPE_BILINEAR    ) rv->num_wts = 1;
+  else if ( map_type == MAP_TYPE_BICUBIC     ) rv->num_wts = 4;
+  else if ( map_type == MAP_TYPE_DISTWGT     ) rv->num_wts = 1;
   else cdoAbort("Unknown mapping method!");
 
    /*
