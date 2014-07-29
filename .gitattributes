@@ -483,6 +483,7 @@ src/Ymonstat.c -text
 src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
+src/bucket_search.c -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
