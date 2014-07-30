@@ -1,22 +1,63 @@
-// gcc -Wall -g -std=c99 bucket_search.c grid_search.c  grid_data.c grid_reg2d.c test_cell_search.c
+/**
+ * @file test_cell_search.c
+ *
+ * @copyright Copyright  (C)  2013 DKRZ, MPI-M
+ *
+ * @version 1.0
+ *
+ * @author Moritz Hanke <hanke@dkrz.de>
+ *         Rene Redler  <rene.redler@mpimet.mpg.de>
+ *
+ */
+/*
+ * Keywords:
+ *
+ * Maintainer: Moritz Hanke <hanke@dkrz.de>
+ *             Rene Redler  <rene.redler@mpimet.mpg.de>
+ *
+ * URL: https://redmine.dkrz.de/doc/YAC/html/index.html
+ *
+ * This file is part of YAC.
+ *
+ * YAC is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * YAC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+ *
+ */
 
+#include <string.h>
 #include <time.h>
 
+#include "tests.h"
 #include "grid_search.h"
-#include "grid_data.h"
-#include "grid_cell.h"
+#include "bucket_search.h"
+#include "sphere_part.h"
+#include "grid.h"
+#include "grid_reg2d.h"
+#include "grid_unstruct.h"
+#include "ensure_array_size.h"
 
 
-typedef grid_search_t * (*grid_search_constructor)(grid_t *);
+typedef struct grid_search * (*grid_search_constructor)(struct grid *);
 
-//void check_dep_lists(struct dep_list * lists);
+void check_dep_lists(struct dep_list * lists);
 
 int main (void) {
 
-   grid_search_constructor grid_search_construct[] = {bucket_search_new/*, sphere_part_search_new*/};
+   grid_search_constructor grid_search_construct[] =
+      {bucket_search_new, sphere_part_search_new};
    unsigned num_grid_search_construct = sizeof(grid_search_construct) /
                                         sizeof(grid_search_construct[0]);
-   /*
+
    {
       //---------------
       // setup
@@ -113,8 +154,7 @@ int main (void) {
       delete_grid(grid_data_a);
       delete_grid(grid_data_b);
    }
-   */
-   /*
+
    {
       //---------------
       // setup
@@ -203,80 +243,66 @@ int main (void) {
       delete_grid(grid_data_a);
       delete_grid(grid_data_b);
    }
-   */
+
    { // test cell search for cyclic grids
       //---------------
       // setup
       //---------------
-      grid_t * grid_a;
+      struct grid * grid_a;
       double coords_x_a[12] = {-180, -150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150};
       double coords_y_a[7] = {-90, -60, -30, 0, 30, 60, 90};
 
       for ( unsigned i = 0; i < 12; ++i ) coords_x_a[i] *= rad;
       for ( unsigned i = 0; i <  7; ++i ) coords_y_a[i] *= rad;
 
-      unsigned nx_a = 12, ny_a = 6;
-      unsigned iscyclic_a = 1;
+      unsigned num_cells_a[2] = {12,6};
+      unsigned cyclic_a[2] = {1,0};
    
-      grid_a = reg2d_grid_new(coords_x_a, coords_y_a, nx_a, ny_a, iscyclic_a);
+      grid_a = reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
 
-      grid_t * grid_b;
+      struct grid * grid_b;
       double coords_x_b[11] = {-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50};
       double coords_y_b[7] = {-30, -20, -10, 0, 10, 20, 30};
 
       for ( unsigned i = 0; i < 11; ++i ) coords_x_b[i] *= rad;
       for ( unsigned i = 0; i <  7; ++i ) coords_y_b[i] *= rad;
 
-      unsigned nx_b = 10, ny_b = 6;
-      unsigned iscyclic_b = 0;
+      unsigned num_cells_b[2] = {10,6};
+      unsigned cyclic_b[2] = {0,0};
    
-      grid_b = reg2d_grid_new(coords_x_b, coords_y_b, nx_b, ny_b, iscyclic_b);
-      /*
+      grid_b = reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
+
       //---------------
       // testing
       //---------------
 
       struct dep_list deps[2];
-      */
-      for (int i = 0; i < num_grid_search_construct; ++i)
-	{
-	  grid_search_t * search = grid_search_construct[i](grid_a);
- 
-	  grid_cell_t cell;
-	  unsigned n_cells = 0, cells_size = 0, *cells = NULL;
 
-	  grid_cell_init(&cell);
+      for (int i = 0; i < num_grid_search_construct; ++i) {
 
-	  unsigned num_grid_cells = get_num_grid_cells(grid_data_b);
-	  for (unsigned i = 0; i < num_grid_cells; ++i)
-	    {
-	      grid_cell_get(grid_data_b, i, &cell);
+         struct grid_search * search = grid_search_construct[i](grid_a);
 
-	      do_cell_search(search, cell, &n_cells, &cells_size, &cells);
-	      printf("i, n_cells, cells_size %d %d %d\n", i, n_cells, cells_size);
-	    }
+         do_cell_search(search, grid_b, deps + i);
 
-	  // test whether the number of found cells is correct
-	  /*
-	  if (deps[i].num_elements != 60)
-	    fprintf(stderr, "error in get_num_elements(deps)\n");
-	  */
-	  grid_search_delete(search);
-	  grid_cell_free(&cell);
-	}
-      /*
+         // test whether the number of found cells is correct
+         if (deps[i].num_elements != 60)
+            PUT_ERR("error in get_num_elements(deps)\n");
+
+         delete_grid_search(search);
+      }
+
       check_dep_lists(deps);
 
       free_dep_list(deps+0);
       free_dep_list(deps+1);
-      */
+
       //---------------
       // cleanup
       //---------------
-      grid_delete(grid_a);
-      grid_delete(grid_b);
+      delete_grid(grid_a);
+      delete_grid(grid_b);
    }
-   /*
+
    { // test cell search for cyclic grids ---> large grids
 
      printf("test cell search for cyclic grids\n");
@@ -361,11 +387,10 @@ int main (void) {
       delete_grid(grid_a);
       delete_grid(grid_b);
    }
-   */
-   return 0;
+
+   return TEST_EXIT_CODE;
 }
 
-   /*
 static int compare_uint(const void * a, const void * b) {
 
   return ((*(unsigned*)a) > (*(unsigned*)b)) -
@@ -402,4 +427,3 @@ void check_dep_lists(struct dep_list * lists) {
 
    free(results[0]), free(results[1]);
 }
-*/
