@@ -366,7 +366,7 @@ int main (void) {
 
          // test whether the number of found cells is correct
 	 printf("deps[i].num_elements %d  ngp %d\n", deps[i].num_elements, nxb*(nyb-1));
-         if (deps[i].num_elements != 60)
+         if (deps[i].num_elements != nxb*(nyb-1))
             PUT_ERR("error in get_num_elements(deps)\n");
 
          delete_grid_search(search);
