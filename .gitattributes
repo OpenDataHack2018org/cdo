@@ -483,7 +483,6 @@ src/Ymonstat.c -text
 src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
-src/bucket_search.c -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
@@ -548,8 +547,6 @@ src/grid_area.c -text
 src/grid_gme.c -text
 src/grid_lcc.c -text
 src/grid_rot.c -text
-src/grid_search.c -text
-src/grid_search.h -text
 src/griddes.c -text
 src/griddes.h -text
 src/griddes_h5.c -text
