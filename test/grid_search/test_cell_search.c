@@ -39,6 +39,7 @@
 
 #include "tests.h"
 #include "grid_search.h"
+#include "reg2d_search.h"
 #include "bucket_search.h"
 #include "sphere_part.h"
 #include "grid.h"
@@ -54,7 +55,7 @@ void check_dep_lists(struct dep_list * lists);
 int main (void) {
 
    grid_search_constructor grid_search_construct[] =
-      {bucket_search_new, sphere_part_search_new};
+      {reg2d_search_new, bucket_search_new, sphere_part_search_new};
    unsigned num_grid_search_construct = sizeof(grid_search_construct) /
                                         sizeof(grid_search_construct[0]);
 
