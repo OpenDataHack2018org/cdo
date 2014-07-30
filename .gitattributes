@@ -686,6 +686,7 @@ test/data/timvar1_ref -text
 test/data/timvar_ref -text
 test/data/ts_mm_5years -text
 test/grid_search/bucket_search.c -text
+test/grid_search/bucket_search.h -text
 test/grid_search/dep_list.h -text
 test/grid_search/ensure_array_size.h -text
 test/grid_search/geometry.h -text
