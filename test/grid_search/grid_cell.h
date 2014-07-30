@@ -33,8 +33,8 @@
 
 #include <stdio.h>
 
-#ifndef _GRID_CELL_H
-#define _GRID_CELL_H
+#ifndef GRID_CELL_H
+#define GRID_CELL_H
 
 enum edge_type {
    GREAT_CIRCLE = 0, //!< great circle
@@ -42,14 +42,14 @@ enum edge_type {
    LON_CIRCLE   = 2, //!< longitude circle
 };
 
-typedef struct grid_cell {
+struct grid_cell {
    double * coordinates_x, * coordinates_y;
    double * coordinates_xyz;
    enum edge_type * edge_type;
    unsigned num_corners;
    unsigned array_size; //!< size in elements of the arrays: coordinates_x,
                         //!< coordinates_y, edge_type and 1/3 of coordinates_xyz
-} grid_cell_t;
+};
 
 /**
  * initiates a grid_cell object
@@ -58,7 +58,7 @@ typedef struct grid_cell {
  * @see free_grid_cell
  * @see get_grid_cell
  */
-void grid_cell_init(grid_cell_t * cell);
+void init_grid_cell(struct grid_cell * cell);
 
 /**
  * copies a given grid cell
@@ -67,13 +67,25 @@ void grid_cell_init(grid_cell_t * cell);
  * @remarks out_cell needs to be a cell that has previously been
  *          initialised or a cell that already contains valid data
  */
-void grid_cell_copy(grid_cell_t in_cell, grid_cell_t * out_cell);
+void copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell);
 
 /**
  * frees all memory associated with a grid_cell object and reinitialised
  * the cell
  * @param[in,out] cell
  */
-void grid_cell_free(grid_cell_t * cell);
+void free_grid_cell(struct grid_cell * cell);
 
-#endif // _GRID_CELL_H
+void pack_grid_cell(struct grid_cell cell, double ** dble_buf,
+                    unsigned dble_buf_offset, unsigned * dble_buf_data_size,
+                    unsigned * dble_buf_size, unsigned ** uint_buf,
+                    unsigned uint_buf_offset, unsigned * uint_buf_data_size,
+                    unsigned * uint_buf_size);
+
+void unpack_grid_cell(struct grid_cell * cell, double * dble_buf,
+                      unsigned * dble_buf_data_size, unsigned * uint_buf,
+                      unsigned * uint_buf_data_size);
+
+void print_grid_cell(FILE * stream, struct grid_cell cell, char * name);
+
+#endif // GRID_CELL_H
