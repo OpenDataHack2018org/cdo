@@ -698,6 +698,8 @@ test/grid_search/grid_reg2d.h -text
 test/grid_search/grid_search.c -text
 test/grid_search/grid_search.h -text
 test/grid_search/grid_search_utils.h -text
+test/grid_search/interval_tree.c -text
+test/grid_search/interval_tree.h -text
 test/grid_search/points.h -text
 test/grid_search/sphere_part.c -text
 test/grid_search/sphere_part.h -text
