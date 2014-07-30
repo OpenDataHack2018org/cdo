@@ -697,7 +697,10 @@ test/grid_search/grid_reg2d.c -text
 test/grid_search/grid_reg2d.h -text
 test/grid_search/grid_search.c -text
 test/grid_search/grid_search.h -text
+test/grid_search/grid_search_utils.h -text
 test/grid_search/points.h -text
+test/grid_search/sphere_part.c -text
+test/grid_search/sphere_part.h -text
 test/grid_search/test1/bucket_search.c -text
 test/grid_search/test1/grid_cell.c -text
 test/grid_search/test1/grid_cell.h -text
