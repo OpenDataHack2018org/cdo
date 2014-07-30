@@ -714,6 +714,7 @@ test/grid_search/test1/grid_search.c -text
 test/grid_search/test1/grid_search.h -text
 test/grid_search/test1/test_cell_search.c -text
 test/grid_search/test_cell_search.c -text
+test/grid_search/tests.h -text
 test/grid_search/utils.h -text
 test/testStreams.py -text
 test/test_Arith.py -text
