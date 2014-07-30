@@ -686,6 +686,7 @@ test/data/timvar1_ref -text
 test/data/timvar_ref -text
 test/data/ts_mm_5years -text
 test/grid_search/bucket_search.c -text
+test/grid_search/dep_list.h -text
 test/grid_search/grid.c -text
 test/grid_search/grid.h -text
 test/grid_search/grid_cell.c -text
@@ -703,6 +704,7 @@ test/grid_search/test1/grid_search.c -text
 test/grid_search/test1/grid_search.h -text
 test/grid_search/test1/test_cell_search.c -text
 test/grid_search/test_cell_search.c -text
+test/grid_search/utils.h -text
 test/testStreams.py -text
 test/test_Arith.py -text
 test/test_Arithc.py -text
