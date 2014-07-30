@@ -701,10 +701,8 @@ test/grid_search/grid.c -text
 test/grid_search/grid.h -text
 test/grid_search/grid_cell.c -text
 test/grid_search/grid_cell.h -text
-test/grid_search/grid_reg2_search.c -text
 test/grid_search/grid_reg2d.c -text
 test/grid_search/grid_reg2d.h -text
-test/grid_search/grid_reg2d_search.h -text
 test/grid_search/grid_search.c -text
 test/grid_search/grid_search.h -text
 test/grid_search/grid_search_utils.c -text
@@ -716,6 +714,8 @@ test/grid_search/interval_tree.c -text
 test/grid_search/interval_tree.h -text
 test/grid_search/points.c -text
 test/grid_search/points.h -text
+test/grid_search/reg2d_search.c -text
+test/grid_search/reg2d_search.h -text
 test/grid_search/search.h -text
 test/grid_search/sphere_part.c -text
 test/grid_search/sphere_part.h -text
