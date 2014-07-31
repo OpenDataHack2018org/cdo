@@ -1,1 +1,8 @@
-gcc *.c -std=c99 -O3 -g -Wall -DVERBOSE
+#!/bin/sh
+SRC="bisection_search.c       ensure_array_size.c      grid_search.c            points.c                 utils.c \
+     bnd_circle.c             find_overlapping_cells.c grid_search_utils.c      reg2d_search.c \
+     bucket_search.c          grid.c                   grid_unstruct.c          sphere_part.c \
+     check_overlap.c          grid_cell.c              intersection.c            \
+     dep_list.c               grid_reg2d.c             interval_tree.c          tests.c"
+#echo $SRC
+gcc $SRC -o test_cell_search test_cell_search.c  -std=c99 -O3 -g -Wall -DVERBOSE -DUWE
