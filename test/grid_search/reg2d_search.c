@@ -86,6 +86,178 @@ static void delete_reg2d_search(struct grid_search * search) {
    free(search);
 }
 
+/**
+* Find the interval i-1 .. i in which an element x fits and return i, the 
+* bigger one of the interval borders or x itself if it is an interval border.
+*
+* If no interval can be found return the length of the array.
+
+* @param *array ascending or descending sorted list
+* @param nelem  length of the sorted list
+* @param x      the element to find a position for 
+*/
+
+
+#ifndef IS_EQUAL
+#  define IS_NOT_EQUAL(x,y) (x < y || y < x)
+#  define IS_EQUAL(x,y)     (!IS_NOT_EQUAL(x,y))
+#endif
+
+static
+long find_element(double x, long nelem, const double *restrict array)
+{
+  long ii;
+  long mid = 0;
+  long first = 1;
+  long last = nelem;
+
+  if ( array[0] < array[nelem-1] ) // ascending order
+    {
+      /* return the length of the array if x is out of bounds */
+      if ( x < array[0] || x > array[nelem-1] ) return (nelem);
+
+      /* search for the interval in which x fits */
+      // implementation: binary search algorithm
+      for ( ii = 1; ii < nelem; ++ii )
+	{
+	  // binary search: divide search room in the middle
+	  // mid = first + ((last - first) >> 1);
+	  // faster!
+	  mid = (first + last) >> 1;
+      
+	  /* return the bigger interval border of the interval in which x fits */
+	  // if ( x >= array[mid-1] && x <= array[mid] ) break;
+	  // faster!
+	  if ( !(x < array[mid-1] || x > array[mid]) ) break;
+
+	  // binary search: ignore half of the search room
+	  if ( x > array[mid] )
+	    first = mid;
+	  else
+	    last = mid;
+	}
+    }
+  else
+    {
+      /* return the length of the array if x is out of bounds */
+      if ( x < array[nelem-1] || x > array[0] ) return (nelem);
+
+      /* search for the interval in which x fits */
+      // implementation: binary search algorithm
+      for ( ii = 1; ii < nelem; ++ii )
+	{
+	  // binary search: divide search room in the middle
+	  // mid = first + ((last - first) >> 1);
+	  // faster!
+	  mid = (first + last) >> 1;
+      
+	  /* return the bigger interval border of the interval in which x fits */
+	  // if ( x >= array[mid] && x <= array[mid-1] ) break;
+	  // faster!
+	  if ( !(x < array[mid] || x > array[mid-1]) ) break;
+
+	  // binary search: ignore half of the search room
+	  if ( x < array[mid] )
+	    first = mid;
+	  else
+	    last = mid;
+	}
+    }
+
+  if ( mid > 1 && IS_EQUAL(x,array[mid-1]) ) mid--;
+
+  return (mid);
+}
+
+/*
+long find_element(double x, long nelem, const double *array)
+{
+  long ii;
+
+  if ( array[0] < array[nelem-1] )
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii-1] && x <= array[ii] ) break;
+    }
+  else
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii] && x <= array[ii-1] ) break;
+    }
+
+  return (ii);
+}
+*/
+
+int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym)
+{
+  int lfound = 0;
+
+  *jj = find_element(y, nym, ym);
+	  
+  if ( *jj < nym )
+    {
+      *ii = find_element(x, nxm, xm);
+	  
+      if ( *ii < nxm ) lfound = 1;
+    }
+
+  return (lfound);
+}
+
+
+int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm)
+{
+  int lfound = 0;
+  int lascend = 0;
+  long i1, i2;
+  *imin = nxm;
+  *imax = -1;
+  
+  if ( xm[0] < xm[nxm-1] ) lascend = 1;
+
+  i1 = find_element(xmin, nxm, xm);
+  i2 = find_element(xmax, nxm, xm);
+      
+  if ( i1 > 0 && i1 < nxm )
+    {
+      lfound = 1;
+
+      if ( lascend )
+	{
+	  if ( i1 > 1 && xmin <= xm[i1-1] ) i1--;
+	  *imin = i1-1;
+	  *imax = i1-1;
+	}
+      else
+	{
+	  if ( i1 < nxm-1 && xmin <= xm[i1] ) i1++;   
+	  *imin = i1-1;
+	  *imax = i1-1;
+	}
+    }
+  
+  if ( i2 > 0 && i2 < nxm )
+    {
+      lfound = 1;
+
+      if ( lascend )
+	{
+	  if ( i2 < nxm-1 && xmax >= xm[i2] ) i2++;   
+	  *imax = i2-1;
+	  if ( *imin == nxm ) *imin = *imax;
+	}
+      else
+	{
+	  if ( i2 > 1 && xmax >= xm[i2-1] ) i2--;
+	  *imin = i2-1;
+	  if ( *imax == -1 ) *imax = *imin;
+	}
+    }
+
+  return (lfound);
+}
+
 // ==============================================================================
 // Creation of the bucket grid
 static
