@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.5
 	* Version 1.6.5 released
 
+2014-08-06  Uwe Schulzweida
+
+	* setpartab: not callable by this name (bug fix)
+
 2014-07-28  Uwe Schulzweida
 
 	* remap_weights_conserv: changed great_circle_type[8] to great_circle_type[32] (bug fix) 

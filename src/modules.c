@@ -391,12 +391,13 @@ void *Maggraph(void *argument);
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
-#define  SetOperators           {"setpartab", "setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
+#define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber", "setgriduri"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
+#define  Setpartab0Operators    {"setpartab"}
 #define  SetpartabOperators     {"setpartabc", "setpartabp", "setpartabn"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
@@ -658,6 +659,7 @@ static modules_t Modules[] =
   { Setgrid,        SetgridHelp,       SetgridOperators,       CDI_BOTH,  1,  1 },
   { Sethalo,        SethaloHelp,       SethaloOperators,       CDI_REAL,  1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,       CDI_REAL,  1,  1 },
+  { Setpartab,      SetHelp,           Setpartab0Operators,    CDI_REAL,  1,  1 },
   { Setpartab,      SetpartabHelp,     SetpartabOperators,     CDI_REAL,  1,  1 },
   { Setrcaname,     NULL,              SetrcanameOperators,    CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       CDI_BOTH,  1,  1 },
