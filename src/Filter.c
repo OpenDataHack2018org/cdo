@@ -333,7 +333,7 @@ void *Filter(void *argument)
 #endif
               for ( i = 0; i < gridsize; i++ )
                 {
-		  int ompthID = cdo_omp_get_thread_num();
+            	  int ompthID = cdo_omp_get_thread_num();
 
                   for ( tsID = 0; tsID < nts; tsID++ )                              
                     {
@@ -357,7 +357,7 @@ void *Filter(void *argument)
 #endif
               for ( i = 0; i < gridsize; i++ )  
                 {
-		  int ompthID = cdo_omp_get_thread_num();
+            	  int ompthID = cdo_omp_get_thread_num();
 
                   for ( tsID = 0; tsID < nts; tsID++ )
                     ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
