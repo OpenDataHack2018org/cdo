@@ -621,6 +621,12 @@ AM_CPPFLAGS
 CLIBS
 CLDFLAGS
 FCFLAGS
+BUILD_AVX2_TESTS_FALSE
+BUILD_AVX2_TESTS_TRUE
+BUILD_AVX_TESTS_FALSE
+BUILD_AVX_TESTS_TRUE
+BUILD_SSE42_TESTS_FALSE
+BUILD_SSE42_TESTS_TRUE
 ENABLE_ALL_STATIC_FALSE
 ENABLE_ALL_STATIC_TRUE
 subdirs
@@ -17329,7 +17335,7 @@ _ACEOF
 fi
 
 #  ----------------------------------------------------------------------
-#  Enable GRIB support
+#  Enable DATA support
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for DATA support" >&5
 $as_echo_n "checking for DATA support... " >&6; }
 # Check whether --enable-data was given.
@@ -17350,6 +17356,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_data" >&5
 $as_echo "$enable_data" >&6; }
 ENABLE_DATA=$enable_data
+
 
 #  ----------------------------------------------------------------------
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
@@ -20457,6 +20464,159 @@ else
 fi
 
 
+
+#  ----------------------------------------------------------------------
+
+# configure code from valgrind
+
+# does the x86/amd64 assembler understand SSE 4.2 instructions?
+# Note, this doesn't generate a C-level symbol.  It generates a
+# automake-level symbol (BUILD_SSE42_TESTS), used in test Makefile.am's
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if x86/amd64 assembler speaks SSE4.2" >&5
+$as_echo_n "checking if x86/amd64 assembler speaks SSE4.2... " >&6; }
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  do { long long int x;
+   __asm__ __volatile__(
+      "crc32q %%r15,%%r15" : : : "r15" );
+   __asm__ __volatile__(
+      "pblendvb (%%rcx), %%xmm11" : : : "memory", "xmm11");
+   __asm__ __volatile__(
+      "aesdec %%xmm2, %%xmm1" : : : "xmm2", "xmm1"); }
+  while (0)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+ac_have_as_sse42=yes
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+ac_have_as_sse42=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+ if test x$ac_have_as_sse42 = xyes; then
+  BUILD_SSE42_TESTS_TRUE=
+  BUILD_SSE42_TESTS_FALSE='#'
+else
+  BUILD_SSE42_TESTS_TRUE='#'
+  BUILD_SSE42_TESTS_FALSE=
+fi
+
+
+
+# does the x86/amd64 assembler understand AVX instructions?
+# Note, this doesn't generate a C-level symbol.  It generates a
+# automake-level symbol (BUILD_AVX_TESTS), used in test Makefile.am's
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if x86/amd64 assembler speaks AVX" >&5
+$as_echo_n "checking if x86/amd64 assembler speaks AVX... " >&6; }
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  do { long long int x;
+   __asm__ __volatile__(
+      "vmovupd (%%rsp), %%ymm7" : : : "xmm7" );
+   __asm__ __volatile__(
+      "vaddpd %%ymm6,%%ymm7,%%ymm8" : : : "xmm6","xmm7","xmm8"); }
+  while (0)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+ac_have_as_avx=yes
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+ac_have_as_avx=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+ if test x$ac_have_as_avx = xyes; then
+  BUILD_AVX_TESTS_TRUE=
+  BUILD_AVX_TESTS_FALSE='#'
+else
+  BUILD_AVX_TESTS_TRUE='#'
+  BUILD_AVX_TESTS_FALSE=
+fi
+
+
+
+# does the x86/amd64 assembler understand AVX2 instructions?
+# Note, this doesn't generate a C-level symbol.  It generates a
+# automake-level symbol (BUILD_AVX2_TESTS), used in test Makefile.am's
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if x86/amd64 assembler speaks AVX2" >&5
+$as_echo_n "checking if x86/amd64 assembler speaks AVX2... " >&6; }
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  do { long long int x;
+   __asm__ __volatile__(
+      "vpsravd (%%rsp), %%ymm8, %%ymm7" : : : "xmm7", "xmm8" );
+   __asm__ __volatile__(
+      "vpaddb %%ymm6,%%ymm7,%%ymm8" : : : "xmm6","xmm7","xmm8"); }
+  while (0)
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+ac_have_as_avx2=yes
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+ac_have_as_avx2=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+ if test x$ac_have_as_avx2 = xyes; then
+  BUILD_AVX2_TESTS_TRUE=
+  BUILD_AVX2_TESTS_FALSE='#'
+else
+  BUILD_AVX2_TESTS_TRUE='#'
+  BUILD_AVX2_TESTS_FALSE=
+fi
+
+
 #  ----------------------------------------------------------------------
 
 
@@ -20677,6 +20837,18 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_ALL_STATIC_TRUE}" && test -z "${ENABLE_ALL_STATIC_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_ALL_STATIC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_SSE42_TESTS_TRUE}" && test -z "${BUILD_SSE42_TESTS_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_SSE42_TESTS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_AVX_TESTS_TRUE}" && test -z "${BUILD_AVX_TESTS_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_AVX_TESTS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BUILD_AVX2_TESTS_TRUE}" && test -z "${BUILD_AVX2_TESTS_FALSE}"; then
+  as_fn_error $? "conditional \"BUILD_AVX2_TESTS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
