@@ -218,6 +218,40 @@ double huiliers_area(int num_corners, double *cell_corner_lon, double *cell_corn
   return (sum);
 }
 
+static
+double huiliers_area2(int num_corners, double *cell_corner_lon, double *cell_corner_lat, double cell_center_lon, double cell_center_lat)
+{
+  if ( num_corners < 3 ) return 0;
+
+  // sum areas around cell
+  double sum = 0.0;
+  double pnt1[3], pnt2[3], pnt3[3];
+
+  lonlat_to_xyz(cell_center_lon, cell_center_lat, pnt1);
+  lonlat_to_xyz(cell_corner_lon[0], cell_corner_lat[0], pnt2);
+
+  for ( int i = 1; i < num_corners; i++ )
+    {
+      if ( IS_EQUAL(cell_corner_lon[i], cell_corner_lon[i-1]) && IS_EQUAL(cell_corner_lat[i], cell_corner_lat[i-1]) ) continue;
+
+      // points that make up a side of cell
+      lonlat_to_xyz(cell_corner_lon[i], cell_corner_lat[i], pnt3);
+ 
+      // compute angle for pnt2
+      sum += tri_area(pnt1, pnt2, pnt3);
+
+      pnt2[0] = pnt3[0]; pnt2[1] = pnt3[1]; pnt2[2] = pnt3[2];
+    }
+
+  if ( !(IS_EQUAL(cell_corner_lon[0], cell_corner_lon[num_corners-1]) && IS_EQUAL(cell_corner_lat[0], cell_corner_lat[num_corners-1])) )
+    {
+      lonlat_to_xyz(cell_corner_lon[0], cell_corner_lat[0], pnt3);
+      sum += tri_area(pnt1, pnt2, pnt3);
+    }
+
+  return (sum);
+}
+
 
 int gridGenArea(int gridID, double* area)
 {
@@ -228,6 +262,8 @@ int gridGenArea(int gridID, double* area)
   long i;
   long nv, gridsize;
   int* grid_mask = NULL;
+  double* grid_center_lon = NULL;
+  double* grid_center_lat = NULL;
   double* grid_corner_lon = NULL;
   double* grid_corner_lat = NULL;
 
@@ -298,6 +334,17 @@ int gridGenArea(int gridID, double* area)
       return (status);
     }
 
+  char xunitstr[CDI_MAX_NAME];
+  char yunitstr[CDI_MAX_NAME];
+  gridInqXunits(gridID, xunitstr);
+  gridInqYunits(gridID, yunitstr);
+
+  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
+  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
+
+  gridInqXvals(gridID, grid_center_lon);
+  gridInqYvals(gridID, grid_center_lat);
+
   grid_corner_lon = (double*) malloc(nv*gridsize*sizeof(double));
   grid_corner_lat = (double*) malloc(nv*gridsize*sizeof(double));
 
@@ -310,30 +357,13 @@ int gridGenArea(int gridID, double* area)
     {
       if ( lgrid_gen_bounds )
 	{
-	  char xunitstr[CDI_MAX_NAME];
-	  char yunitstr[CDI_MAX_NAME];
 	  int nlon = gridInqXsize(gridID);
 	  int nlat = gridInqYsize(gridID);
 	  double dlon = 0;
 	  if ( nlon == 1 ) dlon = 1;
 
-	  double *grid_center_lon = NULL;
-	  double *grid_center_lat = NULL;
-
-	  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
-	  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
-
-	  gridInqXvals(gridID, grid_center_lon);
-	  gridInqYvals(gridID, grid_center_lat);
-
-	  gridInqXunits(gridID, xunitstr);
-	  gridInqYunits(gridID, yunitstr);
-
 	  grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, dlon);
 	  grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
-
-	  free(grid_center_lon);
-	  free(grid_center_lat);
 	}
       else
 	{
@@ -343,28 +373,33 @@ int gridGenArea(int gridID, double* area)
     }
   
   /* Convert lat/lon units if required */
-  {
-    char units[CDI_MAX_NAME];
+  if ( memcmp(xunitstr, "radian", 6) == 0 )
+    {
+      /* No conversion necessary */
+    }
+  else if ( memcmp(xunitstr, "degree", 6) == 0 )
+    {
+      for ( i = 0; i < gridsize; ++i ) grid_center_lon[i] *= DEG2RAD;
+      for ( i = 0; i < gridsize*nv; ++i ) grid_corner_lon[i] *= DEG2RAD;
+    }
+  else
+    {
+      cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
+    }
 
-    gridInqXunits(gridID, units);
-
-    if ( memcmp(units, "radian", 6) == 0 )
-      {
-	/* No conversion necessary */
-      }
-    else if ( memcmp(units, "degree", 6) == 0 )
-      {
-	for ( i = 0; i < gridsize*nv; ++i )
-	  {
-	    grid_corner_lon[i] *= DEG2RAD;
-	    grid_corner_lat[i] *= DEG2RAD;
-	  }
-      }
-    else
-      {
-	cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
-      }
-  }
+  if ( memcmp(yunitstr, "radian", 6) == 0 )
+    {
+      /* No conversion necessary */
+    }
+  else if ( memcmp(yunitstr, "degree", 6) == 0 )
+    {
+      for ( i = 0; i < gridsize; ++i ) grid_center_lat[i] *= DEG2RAD;
+      for ( i = 0; i < gridsize*nv; ++i ) grid_corner_lat[i] *= DEG2RAD;
+    }
+  else
+    {
+      cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
+    }
 
   if ( lgriddestroy ) gridDestroy(gridID);
 
@@ -374,7 +409,7 @@ int gridGenArea(int gridID, double* area)
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
-  shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat) \
+  shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat, grid_center_lon, grid_center_lat) \
   private(i)
 #endif
   for ( i = 0; i < gridsize; ++i )
@@ -390,6 +425,7 @@ int gridGenArea(int gridID, double* area)
 
       //area[i] = cell_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
       area[i] = huiliers_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
+      //area[i] = huiliers_area2(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv, grid_center_lon[i], grid_center_lat[i]);
     }
 
   if ( cdoVerbose )
@@ -399,6 +435,8 @@ int gridGenArea(int gridID, double* area)
       cdoPrint("Total area = %g steradians", total_area);
     }
 
+  free(grid_center_lon);
+  free(grid_center_lat);
   free(grid_corner_lon);
   free(grid_corner_lat);
   if ( grid_mask ) free(grid_mask);
