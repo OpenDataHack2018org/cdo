@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+YACSRC=/Users/m214003/cdt/work/YAC/YAC/src
+#
+FILES="*.c *.h"
+#
+for FILE in $FILES; do
+  echo "process: $FILE"
+  diff $YACSRC/$FILE . 
+done

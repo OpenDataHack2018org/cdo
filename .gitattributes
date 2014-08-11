@@ -495,6 +495,7 @@ src/clipping/area.c -text
 src/clipping/area.h -text
 src/clipping/clipping.c -text
 src/clipping/clipping.h -text
+src/clipping/compare_files -text
 src/clipping/dep_list.h -text
 src/clipping/ensure_array_size.c -text
 src/clipping/ensure_array_size.h -text
