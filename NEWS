@@ -1,6 +1,13 @@
 CDO NEWS
 --------
 
+Version 1.7.0 (01 October 2014):
+
+   New features:
+   Fixed bugs:
+     * gridarea: added support for concave grid cells
+     * select: wrong result when select only one timestep
+
 Version 1.6.4 (26 June 2014):
 
    New features:

@@ -424,8 +424,10 @@ int gridGenArea(int gridID, double* area)
       if ( lprogress ) progressStatus(0, 1, findex/gridsize);
 
       //area[i] = cell_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
-      area[i] = huiliers_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
-      //area[i] = huiliers_area2(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv, grid_center_lon[i], grid_center_lat[i]);
+      if ( nv <= 4 )
+	area[i] = huiliers_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
+      else
+	area[i] = huiliers_area2(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv, grid_center_lon[i], grid_center_lat[i]);
     }
 
   if ( cdoVerbose )
