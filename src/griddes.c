@@ -1838,8 +1838,12 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cdoDebug ) cdoPrint("grid from ASCII file");
 	  gfp = fopen(gridfile, "r");
+	  //size_t buffersize = 20*1024*1024;
+	  //char *buffer = (char*) malloc(buffersize);
+	  //setvbuf(gfp, buffer, _IOFBF, buffersize);
 	  gridID = gridFromFile(gfp, gridfile);
 	  fclose(gfp);
+	  //free(buffer);
 	}
 
       if ( gridID == -1 )
