@@ -576,9 +576,12 @@ void *Select(void *argument)
   streamCnt = cdoStreamCnt();
   nfiles = streamCnt - 1;
 
+  if ( !cdoVerbose && nfiles > 1 ) progressInit();
+
   tsID2 = 0;
   for ( indf = 0; indf < nfiles; indf++ )
     {
+      if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, (indf+1.)/nfiles);
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
 
       streamID1 = streamOpenRead(cdoStreamName(indf));

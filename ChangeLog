@@ -5,6 +5,10 @@
 
 2014-08-11  Uwe Schulzweida
 
+	* select: print progress status
+
+2014-08-10  Uwe Schulzweida
+
 	* gridarea: added support for concave grid cells
 
 2014-08-06  Uwe Schulzweida
