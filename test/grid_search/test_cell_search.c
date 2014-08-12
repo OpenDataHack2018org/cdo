@@ -379,8 +379,8 @@ int main (void) {
 
       check_dep_lists(deps);
 
-      free_dep_list(deps+0);
-      free_dep_list(deps+1);
+      for (int i = 0; i < num_grid_search_construct; ++i)
+	free_dep_list(deps+i);
 
       //---------------
       // cleanup
@@ -422,8 +422,11 @@ void check_dep_lists(struct dep_list * lists) {
       }
 
       for (unsigned j = 0; j < lists[0].num_deps_per_element[i]; ++j)
-         if (results[0][j] != results[1][j])
+	{
+	  //	  printf("%d %d %d\n", lists[0].num_deps_per_element[i], j , results[0][j]);
+	  if (results[0][j] != results[1][j])
             PUT_ERR("dependencies do not match\n");
+	}
    }
 
    free(results[0]), free(results[1]);

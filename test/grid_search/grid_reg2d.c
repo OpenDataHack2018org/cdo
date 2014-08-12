@@ -828,17 +828,9 @@ static void get_grid_cell2_reg2d(struct grid * grid, unsigned cell_index,
                                  struct bounding_circle * bnd_circle) {
 
    get_grid_cell_reg2d(grid, cell_index, cell);
-#ifdef UWE
-   // Uwe Schulzweida
+
    get_cell_bounding_circle_reg_quad(cell->coordinates_xyz+0, cell->coordinates_xyz+3, cell->coordinates_xyz+6,
                                      cell->coordinates_xyz+9, bnd_circle);
-#else   
-   double coords[4][3];
-   for (int i = 0; i < 4; ++i)
-      LLtoXYZ(cell->coordinates_x[i], cell->coordinates_y[i], coords[i]);
-   get_cell_bounding_circle_reg_quad(coords[0], coords[1], coords[2],
-                                     coords[3], bnd_circle);
-#endif
 }
 
 static unsigned const * get_corner_edges_reg2d(struct grid * grid, unsigned corner_index) {

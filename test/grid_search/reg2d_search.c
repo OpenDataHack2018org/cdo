@@ -734,6 +734,7 @@ void reg2d_search_do_cell_search (struct grid_search * search,
    unsigned i, j, k;
 
    num_tgt_grid_cells = get_num_grid_cells(grid_data);
+   printf("reg2d_search_do_cell_search: num_tgt_grid_cells %d\n", num_tgt_grid_cells);
    initial_num_srcs_per_tgt = calloc(num_tgt_grid_cells, sizeof(initial_num_srcs_per_tgt[0]));
    num_src_grid_cells = get_num_grid_cells(reg2d_search->grid_data);
    src_cell_mask = calloc(num_src_grid_cells, sizeof(src_cell_mask[0]));

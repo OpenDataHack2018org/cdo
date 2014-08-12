@@ -5,4 +5,4 @@ SRC="bisection_search.c       ensure_array_size.c      grid_search.c            
      check_overlap.c          grid_cell.c              intersection.c            \
      dep_list.c               grid_reg2d.c             interval_tree.c          tests.c"
 #echo $SRC
-gcc $SRC -o test_cell_search test_cell_search.c  -std=c99 -O3 -g -Wall -DVERBOSE -DUWE
+gcc $SRC -o test_cell_search test_cell_search.c  -std=c99 -O3 -g -Wall -DVERBOSE
