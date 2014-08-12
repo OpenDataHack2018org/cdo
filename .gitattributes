@@ -692,6 +692,7 @@ test/grid_search/bucket_search.c -text
 test/grid_search/bucket_search.h -text
 test/grid_search/check_overlap.c -text
 test/grid_search/comp -text
+test/grid_search/compare_files -text
 test/grid_search/dep_list.c -text
 test/grid_search/dep_list.h -text
 test/grid_search/ensure_array_size.c -text

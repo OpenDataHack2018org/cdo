@@ -105,7 +105,7 @@ unsigned int hash(const char *str);
  * @param[in,out] array array containing a sorted (ascending) list of integers
  * @param[in,out] n     number of entries in array
  */
-static void inline yac_remove_duplicates_int(int * array, unsigned * n) {
+static inline void yac_remove_duplicates_int(int * array, unsigned * n) {
 
    unsigned const N = *n;
    unsigned pos = 0;
@@ -133,7 +133,7 @@ static void inline yac_remove_duplicates_int(int * array, unsigned * n) {
  * @param[in,out] array array containing a sorted (ascending) list of integers
  * @param[in,out] n     number of entries in array
  */
-static void inline yac_remove_duplicates_uint(unsigned * array, unsigned * n) {
+static inline void yac_remove_duplicates_uint(unsigned * array, unsigned * n) {
 
    unsigned const N = *n;
    unsigned pos = 0;
