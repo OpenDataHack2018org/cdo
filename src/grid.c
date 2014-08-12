@@ -169,13 +169,19 @@ void grid_gen_corners(long n, const double* restrict vals, double* restrict corn
 {
   long i;
 
-  for ( i = 0; i < n-1; ++i )
+  if ( n == 1 )
     {
-      corners[i+1] = 0.5*(vals[i] + vals[i+1]);
+      corners[0] = vals[0];
+      corners[1] = vals[0];
     }
+  else
+    {
+      for ( i = 0; i < n-1; ++i )
+	corners[i+1] = 0.5*(vals[i] + vals[i+1]);
 
-  corners[0] = 2*vals[0] - corners[1];
-  corners[n] = 2*vals[n-1] - corners[n-1];
+      corners[0] = 2*vals[0] - corners[1];
+      corners[n] = 2*vals[n-1] - corners[n-1];
+    }
 }
 
 

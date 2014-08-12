@@ -588,13 +588,13 @@ void grid_check_lat_borders_rad(int n, double *ybounds)
 {
   if ( ybounds[0] > ybounds[n-1] )
     {
-      if ( RAD2DEG*ybounds[0]   >  88 ) ybounds[0]   =  PIH;
-      if ( RAD2DEG*ybounds[n-1] < -88 ) ybounds[n-1] = -PIH;
+      if ( RAD2DEG*ybounds[0]   >  PIH ) ybounds[0]   =  PIH;
+      if ( RAD2DEG*ybounds[n-1] < -PIH ) ybounds[n-1] = -PIH;
     }
   else
     {
-      if ( RAD2DEG*ybounds[0]   < -88 ) ybounds[0]   = -PIH;
-      if ( RAD2DEG*ybounds[n-1] >  88 ) ybounds[n-1] =  PIH;
+      if ( RAD2DEG*ybounds[0]   < -PIH ) ybounds[0]   = -PIH;
+      if ( RAD2DEG*ybounds[n-1] >  PIH ) ybounds[n-1] =  PIH;
     }
 }
 
