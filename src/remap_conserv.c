@@ -552,6 +552,10 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 		   tgt_grid_add, RAD2DEG*tgt_cell_bound_box[2],RAD2DEG*tgt_cell_bound_box[3],RAD2DEG*tgt_cell_bound_box[0],RAD2DEG*tgt_cell_bound_box[1] );
 	  num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
 						tgt_cell_bound_box, srch_add);
+
+	  if ( num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1 &&
+	       IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1]) && 
+	       IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]) ) num_srch_cells = 0;
 	}
       else if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	{
@@ -563,6 +567,10 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 		   tgt_grid_add, RAD2DEG*tgt_cell_bound_box[2],RAD2DEG*tgt_cell_bound_box[3],RAD2DEG*tgt_cell_bound_box[0],RAD2DEG*tgt_cell_bound_box[1] );
 	  num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
 						tgt_cell_bound_box, srch_add);
+
+	  if ( num_srch_cells == 1 && src_grid->dims[0] == 1 && src_grid->dims[1] == 1 &&
+	       IS_EQUAL(src_grid->reg2d_corner_lat[0], src_grid->reg2d_corner_lat[1]) && 
+	       IS_EQUAL(src_grid->reg2d_corner_lon[0], src_grid->reg2d_corner_lon[1]) ) num_srch_cells = 0;
 	}
       else
 	{
