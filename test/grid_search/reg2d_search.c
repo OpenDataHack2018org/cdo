@@ -275,6 +275,7 @@ void init_buckets(struct reg2d_search * reg2d_search, double grid_extent[2][2],
                           (grid_extent[1][1] - grid_extent[1][0])),1);
 
    bucket_cells[1] = num_cells / bucket_cells[0];
+   printf("bucket_cells %d %d\n", bucket_cells[0], bucket_cells[1]);
 
 
    // if the grid is cyclic
@@ -300,6 +301,9 @@ void init_buckets(struct reg2d_search * reg2d_search, double grid_extent[2][2],
       coordinates_y[i] = grid_extent[1][0] + dy * i;
    }
    coordinates_y[bucket_cells[1]] = grid_extent[1][1];
+
+   printf("bucket dx %g lon = %g %g ... %g %g\n", dx/rad, coordinates_x[0]/rad, coordinates_x[1]/rad, coordinates_x[bucket_cells[0]-1]/rad, coordinates_x[bucket_cells[0]]/rad);
+   printf("bucket dx %g lat = %g %g ... %g %g\n", dy/rad, coordinates_y[0]/rad, coordinates_y[1]/rad, coordinates_y[bucket_cells[1]-1]/rad, coordinates_y[bucket_cells[1]]/rad);
 
    reg2d_search->num_buckets[0] = bucket_cells[0];
    reg2d_search->num_buckets[1] = bucket_cells[1];

@@ -311,10 +311,10 @@ int main (void) {
       // setup
       //---------------
       struct grid * grid_a;
-#define nxa  720
-#define nya  361
-#define nxb  360
-#define nyb  181
+      const int nxa = 720;
+      const int nya = 361;
+      const int nxb = 360;
+      const int nyb = 181;
       double coords_x_a[nxa];
       double coords_y_a[nya];
 
