@@ -61,6 +61,7 @@ static int _pstream_init = FALSE;
 #include <pthread.h>
 #include "pthread_debug.h"
 
+// TODO: make threadsafe
 static int pthreadScope = 0;
 
 static pthread_mutex_t streamOpenReadMutex  = PTHREAD_MUTEX_INITIALIZER;
@@ -1710,6 +1711,21 @@ void pstreamInqGinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
   pstreamptr = pstream_to_pointer(pstreamID);
 
   streamInqGinfo(pstreamptr->fileID, intnum, fltnum, bignum);
+}
+
+
+void cdoVlistCopyFlag(int vlistID2, int vlistID1)
+{
+#if defined(HAVE_LIBPTHREAD)
+  pthread_mutex_lock(&streamMutex);
+#endif
+
+  vlistCopyFlag(vlistID2, vlistID1);
+
+#if defined(HAVE_LIBPTHREAD)
+  pthread_mutex_unlock(&streamMutex);
+#endif
+
 }
 
 
