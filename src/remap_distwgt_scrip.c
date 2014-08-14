@@ -289,7 +289,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
       nbr_dist[n] = BIGNUM;
     }
 
-  int i, j, ndist = max_add - min_add + 1;
+  int i, ndist = max_add - min_add + 1;
 
   if ( ndist <= 0 ) return;
 
@@ -297,10 +297,11 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   double *dist = (double*) malloc(ndist*sizeof(double));
   int    *adds = (int*) malloc(ndist*sizeof(int));
 
+  int j = 0;
 #if defined(_OPENMP) && _OPENMP >= OPENMP4
 #pragma omp simd
 #endif
-  for ( j = 0, i = 0; i < ndist; ++i )
+  for ( i = 0; i < ndist; ++i )
     {
       nadd = min_add+i;
       /* Find distance to this point */
