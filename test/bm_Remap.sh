@@ -47,7 +47,13 @@ done
 # reg2d   1.0    2.2   1.3   242    131
 # curv     51     52   175   263    295
 #
-# result on bailung: gcc
+# result on bailung: gcc 4.9.1
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.8    1.6   1.0   204    135
+# curv     33     34   103   210    284
+#
+# result on bailung: gcc 4.8.2
 # =================
 #         bil    bic    nn   con   ycon
 # reg2d   0.7    1.5   1.0   205    140
