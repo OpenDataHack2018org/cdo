@@ -33,6 +33,7 @@
  * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
  *
  */
+#include <time.h>
 
 #include "tests.h"
 #include "grid_search.h"
@@ -286,12 +287,16 @@ int main (void) {
 
       double grid_coord_x[] = {0.5*rad, 1.5*rad, 2.5*rad, 3.5*rad, 4.5*rad};
       double grid_coord_y[] = {0.5*rad, 1.5*rad, 2.5*rad, 3.5*rad, 4.5*rad};
+      double points_coord_x[] = {1*rad, 2*rad, 3*rad, 4*rad};
+      double points_coord_y[] = {1*rad, 2*rad, 3*rad, 4*rad};
 
       unsigned num_cells[2] = {4,4};
       unsigned cyclic[2] = {0,0};
       struct grid * reg_grid;
+      struct points points;
 
       reg_grid = reg2d_grid_new(grid_coord_x, grid_coord_y, num_cells, cyclic);
+      // init_points(&points, reg_grid, CELL, points_coord_x, points_coord_y);
 
       // define points that are to be seached for
 
@@ -303,10 +308,10 @@ int main (void) {
       unsigned num_search_points = sizeof(search_points_coord_x) /
                                    sizeof(search_points_coord_x[0]);
 
-      for (int i = 0; i < num_grid_search_construct; ++i) {
+      for (int is = 0; is < num_grid_search_construct; ++is) {
 
          // init search data structure
-         struct grid_search * search = grid_search_construct[i](reg_grid);
+         struct grid_search * search = grid_search_construct[is](reg_grid);
 
          //--------------
          // testing
@@ -324,13 +329,20 @@ int main (void) {
                                 search_points_coord_y[i], &num_deps, &deps_size,
                                 &deps);
 
+	    //  if ( is == 0 )
+	      {
+		printf("search %u  point %2u  ndeps %2u:", is+1, i, num_deps);
+		for ( unsigned j = 0; j < num_deps; ++j )
+		  printf(" %2u", deps[j]);
+		printf("\n");
+	      }
             {
                unsigned ref_num_deps[8] = {0,4,4,0,4,4,4,0};
                unsigned ref_deps[8][4] = {{-1}, {0,1,6,5}, {2,3,8,7},{-1},
                                           {11,12,17,16}, {15,16,21,20},{17,18,23,22},{-1}};
 
                if (num_deps != ref_num_deps[i])
-                  PUT_ERR("error in do_point_search_p3(search_results.num_deps_per_element[i])\n");
+                  PUT_ERR("error in do_point_search_p4(search_results.num_deps_per_element[i])\n");
 
                unsigned num_matches = 0;
 
@@ -340,7 +352,7 @@ int main (void) {
                         ++num_matches;
 
                if (num_matches != ref_num_deps[i])
-                  PUT_ERR("error in do_point_search_p3(get_dependencies_of_element)\n");
+                  PUT_ERR("error in do_point_search_p4(get_dependencies_of_element)\n");
             }
          }
 
@@ -349,6 +361,111 @@ int main (void) {
       }
 
       delete_grid(reg_grid);
+   }
+
+   { // test do_point_search_p4 for cyclic grids ---> large grids
+
+      //-------------------
+      // set up
+      //-------------------
+      struct grid * grid_a;
+      const int nxa = 720*2;
+      const int nya = 361*2;
+      const int nxb = 360*2;
+      const int nyb = 181*2;
+      double coords_x_a[nxa];
+      double coords_y_a[nya];
+
+      for ( unsigned i = 0; i < nxa; ++i ) coords_x_a[i] = -180 + i*360./nxa;
+      for ( unsigned i = 0; i < nya; ++i ) coords_y_a[i] =  -90 + i*360./nxa;
+      // for ( unsigned i = 0; i < nxa; ++i ) printf("xa %d %g\n", i, coords_x_a[i]);
+      // for ( unsigned i = 0; i < nya; ++i ) printf("ya %d %g\n", i, coords_y_a[i]);
+
+      printf("a: %g %g ... %g %g\n", coords_x_a[0], coords_x_a[1], coords_x_a[nxa-2], coords_x_a[nxa-1]);
+
+      for ( unsigned i = 0; i < nxa; ++i ) coords_x_a[i] *= rad;
+      for ( unsigned i = 0; i < nya; ++i ) coords_y_a[i] *= rad;
+
+      unsigned num_cells_a[2] = {nxa,nya-1};
+      unsigned cyclic_a[2] = {1,0};
+   
+      grid_a = reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
+
+      struct grid * grid_b;
+      double coords_x_b[nxb];
+      double coords_y_b[nyb];
+
+      for ( unsigned i = 0; i < nxb; ++i ) coords_x_b[i] = -180 + i*360./nxb;
+      for ( unsigned i = 0; i < nyb; ++i ) coords_y_b[i] =  -90 + i*360./nxb;
+
+      printf("b: %g %g ... %g %g\n", coords_x_b[0], coords_x_b[1], coords_x_b[nxb-2], coords_x_b[nxb-1]);
+
+      for ( unsigned i = 0; i < nxb; ++i ) coords_x_b[i] *= rad;
+      for ( unsigned i = 0; i < nyb; ++i ) coords_y_b[i] *= rad;
+
+      unsigned num_cells_b[2] = {nxb,nyb-1};
+      unsigned cyclic_b[2] = {1,0};
+   
+      grid_b = reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
+
+      unsigned num_search_points = nxb*nyb;
+
+      clock_t start, finish;
+      num_grid_search_construct=1;
+      for (int i = 0; i < num_grid_search_construct; ++i) {
+  	 start = clock();
+
+         // init search data structure
+         struct grid_search * search = grid_search_construct[i](grid_a);
+
+         //--------------
+         // testing
+         //--------------
+
+         unsigned * deps = NULL;
+         unsigned deps_size = 0;
+	 unsigned ix, iy;
+
+         for (int i = 0; i < num_search_points; ++i) {
+
+            unsigned num_deps;
+
+	    iy = i/nxb;
+	    ix = i - iy*nxb;
+
+            // do search
+            do_point_search_p4 (search, coords_x_b[ix], coords_y_b[iy], &num_deps, &deps_size, &deps);
+	    /*
+            {
+               unsigned ref_num_deps[8] = {0,4,4,0,4,4,4,0};
+               unsigned ref_deps[8][4] = {{-1}, {0,1,6,5}, {2,3,8,7},{-1},
+                                          {11,12,17,16}, {15,16,21,20},{17,18,23,22},{-1}};
+
+               if (num_deps != ref_num_deps[i])
+                  PUT_ERR("error in do_point_search_p4(search_results.num_deps_per_element[i])\n");
+
+               unsigned num_matches = 0;
+
+               for (unsigned j = 0; j < ref_num_deps[i]; ++j)
+                  for (unsigned k = 0; k < ref_num_deps[i]; ++k)
+                     if (ref_deps[i][j] == deps[k])
+                        ++num_matches;
+
+               if (num_matches != ref_num_deps[i])
+                  PUT_ERR("error in do_point_search_p4(get_dependencies_of_element)\n");
+            }
+	    */
+         }
+
+         free(deps);
+         delete_grid_search(search);
+
+	 finish = clock();
+	 printf("search %d: %.2f seconds\n", i+1, ((double)(finish-start))/CLOCKS_PER_SEC);
+      }
+
+      delete_grid(grid_a);
+      delete_grid(grid_b);
    }
 
    return TEST_EXIT_CODE;
