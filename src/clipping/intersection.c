@@ -73,21 +73,31 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 /* determines whether p is between a and b
    (a, b, p have the same latitude)*/
 
+/*  I. a_0 * alpha + b_0 * beta = p_0
+   II. a_1 * alpha + b_1 * beta = p_1
+   
+   if alpha > 0 and beta > 0 -> p is between a and b */
+
    if (fabs(fabs(a[2]) - 1.0) < tol) return 1;
 
-   long double a_0 = a[0], a_1 = a[1];
-   long double b_0 = b[0], b_1 = b[1];
-   long double p_0 = p[0], p_1 = p[1];
+   int flag = fabs(a[0]) > fabs(a[1]);
+   double a_0 = a[flag], a_1 = a[flag^1];
+   double b_0 = b[flag], b_1 = b[flag^1];
+   double p_0 = p[flag], p_1 = p[flag^1];
 
-   if (((a_0*p_0+a_1*p_1) < 0) || ((b_0*p_0+b_1*p_1) < 0))
-    return 0;
+   double temp = b_0 - (b_1 * a_0) / a_1;
 
-   double cross_ab = fabs(a_0*b_1-a_1*b_0);
-   double cross_ap = fabs(a_0*p_1-a_1*p_0);
-   double cross_bp = fabs(b_0*p_1-b_1*p_0);
+   // if a and b are nearly identical
+   if (fabs(temp) < tol) return (fabs(a_0 - p_0) < tol) &&
+                                (fabs(a_1 - p_1) < tol);
 
-   // maybe this should be the cross_** should be scaled by z at some point
-   return (cross_ap < cross_ab + tol) && (cross_bp < cross_ab + tol);
+   double beta = (p_0 - (p_1 * a_0) / a_1) / temp;
+
+   if (beta < -tol) return 0;
+
+   double alpha = (p_1 - b_1 * beta) / a_1;
+
+   return alpha > -tol;
 }
 
 /** \brief compute the intersection points of two great circles
