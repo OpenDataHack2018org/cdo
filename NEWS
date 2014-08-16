@@ -6,6 +6,7 @@ Version 1.7.0 (01 October 2014):
    New features:
    Fixed bugs:
      * gridarea: added support for concave grid cells
+     * import_binary: option 365_day_calendar does not work
      * select: wrong result when select only one timestep
 
 Version 1.6.4 (26 June 2014):
