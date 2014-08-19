@@ -4,6 +4,8 @@ CDO NEWS
 Version 1.7.0 (01 October 2014):
 
    New features:
+   Changed operators:
+     * remaplaf: changed weight calculation from SCRIP to YAC
    Fixed bugs:
      * gridarea: added support for concave grid cells
      * import_binary: option 365_day_calendar does not work

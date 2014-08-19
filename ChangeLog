@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.5
 	* Version 1.6.5 released
 
+2014-08-19  Uwe Schulzweida
+
+	* remaplaf: changed weight calculation from SCRIP to YAC
+
 2014-08-16  Uwe Schulzweida
 
 	* import_binary: option 365_day_calendar does not work (big fix)
