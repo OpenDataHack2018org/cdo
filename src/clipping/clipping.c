@@ -88,6 +88,8 @@ static unsigned get_cell_points_ordering(struct point_list * cell);
 static void generate_overlap_cell(struct point_list * list,
                                   struct grid_cell * cell);
 
+static enum cell_type get_cell_type(struct grid_cell target_cell);
+
 /* ------------------------- */
 
 void compute_overlap_areas(unsigned N,
@@ -127,6 +129,124 @@ void compute_overlap_areas(unsigned N,
 #ifdef VERBOSE
   for (unsigned n = 0; n < N; n++)
     printf("overlap area : %lf\n", partial_areas[n]);
+#endif
+}
+
+/* ------------------------- */
+
+void compute_concave_overlap_areas (unsigned N,
+                                    struct grid_cell * source_cell,
+                                    struct grid_cell target_cell,
+                                    double * target_node_x,
+                                    double * target_node_y,
+                                    double * partial_areas) {
+  enum cell_type target_cell_type;
+
+  if ( target_cell.num_corners > 3 )
+    target_cell_type = get_cell_type (target_cell);
+
+  if ( target_cell.num_corners < 4 || target_cell_type == LON_LAT_CELL ) {
+    compute_overlap_areas (N, source_cell, target_cell, partial_areas);
+    return;
+  }
+
+  if ( target_node_x == NULL || target_node_y == NULL )
+    abort_message("ERROR: missing target point coordinates "
+		  "(x_coordinates == NULL || y_coordinates == NULL)",
+		  __FILE__, __LINE__);
+
+  struct grid_cell target_partial_cell =
+    {.coordinates_x   = (double[3]){-1},
+     .coordinates_y   = (double[3]){-1},
+     .coordinates_xyz = (double[3*3]){-1},
+     .edge_type       = (enum edge_type[3]) {GREAT_CIRCLE},
+     .num_corners     = 3};
+
+  static struct grid_cell * overlap_buffer = NULL;
+  static unsigned overlap_buffer_size = 0;
+
+  // ensure that there are enough buffer cells
+
+  if (overlap_buffer_size < N) {
+
+    unsigned old_overlap_buffer_size = overlap_buffer_size;
+
+    ENSURE_ARRAY_SIZE(overlap_buffer, overlap_buffer_size, N);
+
+    for (; old_overlap_buffer_size < overlap_buffer_size;
+         ++old_overlap_buffer_size)
+      init_grid_cell(overlap_buffer + old_overlap_buffer_size);
+  }
+
+  /* Do the clipping and get the cell for the overlapping area */
+
+  for ( unsigned n = 0; n < N; n++) partial_areas[n] = 0.0;
+
+  // common node point to all partial target cells
+  target_partial_cell.coordinates_x[0] = *target_node_x;
+  target_partial_cell.coordinates_y[0] = *target_node_y;
+
+  LLtoXYZ ( *target_node_x, *target_node_y, target_partial_cell.coordinates_xyz );
+
+  for ( unsigned num_corners = 0; num_corners < target_cell.num_corners; ++num_corners ) {
+
+    unsigned corner_a = num_corners;
+    unsigned corner_b = (num_corners+1)%target_cell.num_corners;
+
+    // skip clipping and area calculation for degenerated triangles
+    //
+    // If this is not sufficient, instead we can try something like:
+    //
+    //     struct point_list target_list
+    //     init_point_list(&target_list);
+    //     generate_point_list(&target_list, target_cell);
+    //     struct grid_cell temp_target_cell;
+    //     generate_overlap_cell(target_list, temp_target_cell);
+    //     free_point_list(&target_list);
+    //
+    // and use temp_target_cell for triangulation.
+    //
+    // Compared to the if statement below the alternative seems
+    // to be quite costly.
+
+    if ( ( ( fabs(target_cell.coordinates_xyz[0+3*corner_a]-target_cell.coordinates_xyz[0+3*corner_b]) < tol ) &&
+           ( fabs(target_cell.coordinates_xyz[1+3*corner_a]-target_cell.coordinates_xyz[1+3*corner_b]) < tol ) &&
+           ( fabs(target_cell.coordinates_xyz[2+3*corner_a]-target_cell.coordinates_xyz[2+3*corner_b]) < tol ) ) ||
+    	 ( ( fabs(target_cell.coordinates_xyz[0+3*corner_a]-target_partial_cell.coordinates_xyz[0]) < tol    ) &&
+           ( fabs(target_cell.coordinates_xyz[1+3*corner_a]-target_partial_cell.coordinates_xyz[1]) < tol    ) &&
+           ( fabs(target_cell.coordinates_xyz[2+3*corner_a]-target_partial_cell.coordinates_xyz[2]) < tol    ) ) ||
+         ( ( fabs(target_cell.coordinates_xyz[0+3*corner_b]-target_partial_cell.coordinates_xyz[0]) < tol    ) &&
+           ( fabs(target_cell.coordinates_xyz[1+3*corner_b]-target_partial_cell.coordinates_xyz[1]) < tol    ) &&
+           ( fabs(target_cell.coordinates_xyz[2+3*corner_b]-target_partial_cell.coordinates_xyz[2]) < tol    ) ) )
+       continue;
+
+    target_partial_cell.coordinates_x[1] = target_cell.coordinates_x[corner_a];
+    target_partial_cell.coordinates_y[1] = target_cell.coordinates_y[corner_a];
+    target_partial_cell.coordinates_x[2] = target_cell.coordinates_x[corner_b];
+    target_partial_cell.coordinates_y[2] = target_cell.coordinates_y[corner_b];
+
+    target_partial_cell.coordinates_xyz[0+3*1] = target_cell.coordinates_xyz[0+3*corner_a];
+    target_partial_cell.coordinates_xyz[1+3*1] = target_cell.coordinates_xyz[1+3*corner_a];
+    target_partial_cell.coordinates_xyz[2+3*1] = target_cell.coordinates_xyz[2+3*corner_a];
+    target_partial_cell.coordinates_xyz[0+3*2] = target_cell.coordinates_xyz[0+3*corner_b];
+    target_partial_cell.coordinates_xyz[1+3*2] = target_cell.coordinates_xyz[1+3*corner_b];
+    target_partial_cell.coordinates_xyz[2+3*2] = target_cell.coordinates_xyz[2+3*corner_b];
+
+    cell_clipping ( N, source_cell, target_partial_cell, overlap_buffer);
+
+    /* Get the partial areas for the overlapping regions as sum over the partial target cells. */
+
+    for (unsigned n = 0; n < N; n++) {
+      partial_areas[n] += huiliers_area (overlap_buffer[n]);
+      // we cannot use pole_area because it is rather inaccurate for great circle
+      // edges that are nearly circles of longitude
+      //partial_areas[n] = pole_area (overlap_buffer[n]);
+    }
+  }
+
+#ifdef VERBOSE
+  for (unsigned n = 0; n < N; n++)
+	    printf("overlap area %i: %lf \n", n, partial_areas[n]);
 #endif
 }
 
