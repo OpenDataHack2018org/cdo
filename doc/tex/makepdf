@@ -9,5 +9,5 @@ heading_suffix "}}"
 EOF
 makeindex -s cdo.ist cdo.idx
 pdflatex cdo
-thumbpdf cdo
+#thumbpdf cdo
 pdflatex cdo
