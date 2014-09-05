@@ -166,13 +166,11 @@ int processSelf(void)
 
 int processNums(void)
 {
-  int pnums = 0;
-
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
 
-  pnums = NumProcess;
+  int pnums = NumProcess;
 
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
@@ -184,13 +182,11 @@ int processNums(void)
 
 int processNumsActive(void)
 {
-  int pnums = 0;
-
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
 
-  pnums = NumProcessActive;
+  int pnums = NumProcessActive;
 
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
@@ -210,11 +206,7 @@ void processAddNvals(off_t nvals)
 
 off_t processInqNvals(int processID)
 {
-  off_t nvals = 0;
-
-  nvals = Process[processID].nvals;
-
-  return (nvals);
+  return (Process[processID].nvals);
 }
 
 
