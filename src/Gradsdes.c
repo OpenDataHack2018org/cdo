@@ -933,6 +933,12 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
 }
 
 
+static
+void write_map_grib2(const char *ctlfile, int map_version, int nrecords, int *intnum, float *fltnum, off_t *bignum)
+{
+    // to be implemented
+}
+
 void *Gradsdes(void *argument)
 {
   int GRADSDES, DUMPMAP;
@@ -951,6 +957,7 @@ void *Gradsdes(void *argument)
   int vdate, vtime;
   const char *datfile;
   char ctlfile[1024], *pctlfile;
+  char idxfile[1024], *pidxfile;
   int len;
   char varname[CDI_MAX_NAME];
   FILE *gdp;
@@ -1044,7 +1051,8 @@ void *Gradsdes(void *argument)
 	//	cdoAbort("Unsupported file format: netCDF");
 	;
       else if ( filetype == FILETYPE_GRB2 )
-	cdoAbort("Unsupported file format: GRIB2");
+	//cdoAbort("Unsupported file format: GRIB2");
+	;
       else
 	cdoAbort("Unsupported file format!");
     }
@@ -1125,6 +1133,7 @@ void *Gradsdes(void *argument)
       if ( byteorder == CDI_LITTLEENDIAN ) littleendian = TRUE;
     }
 
+  /* ctl file name */
   strcpy(ctlfile, cdoStreamName(0)->args);
   len = (int) strlen(ctlfile);
   if ( len > 4 )
@@ -1137,10 +1146,13 @@ void *Gradsdes(void *argument)
 	if ( strcmp(&ctlfile[len-4], ".ieg") == 0 ) ctlfile[len-4] = 0;
       if ( filetype == FILETYPE_GRB )
 	if ( strcmp(&ctlfile[len-4], ".grb") == 0 ) ctlfile[len-4] = 0;
+      if ( filetype == FILETYPE_GRB2 )
+	if ( strcmp(&ctlfile[len-5], ".grb2") == 0 ) ctlfile[len-5] = 0;
       if ( filetype == FILETYPE_NC )
 	if ( strcmp(&ctlfile[len-3], ".nc") == 0 ) ctlfile[len-3] = 0;
     }
 
+  /* open ctl file*/
   strcat(ctlfile, ".ctl");
   gdp = fopen(ctlfile, "w");
   if ( gdp == NULL ) cdoAbort("Open failed on %s", ctlfile);
@@ -1163,7 +1175,10 @@ void *Gradsdes(void *argument)
       fprintf(gdp, "DSET  ^%s\n", datfile);
     }
 
-  /* DTYPE */
+  /* 
+   * DTYPE Print fily type
+   * INDEX Print filename of the controlfile .ctl
+   */
   if ( filetype == FILETYPE_GRB )
     {
       fprintf(gdp, "DTYPE  GRIB\n");
@@ -1181,6 +1196,29 @@ void *Gradsdes(void *argument)
 	  else                 pctlfile++;	  
 	  fprintf(gdp, "INDEX  ^%s\n", pctlfile);
 	}
+
+      gridsize = vlistGridsizeMax(vlistID);
+      array = (double*) malloc(gridsize*sizeof(double));
+    }
+  else if ( filetype ==  FILETYPE_GRB2 )
+    {
+      fprintf(gdp, "DTYPE  GRIB2\n");
+
+      strcpy(idxfile, ctlfile);
+      pidxfile = idxfile;
+      len = (int) strlen(pidxfile);
+      strcpy(&pidxfile[len-4], ".idx");
+      
+      if ( datfile[0] == '/' )
+        fprintf(gdp, "INDEX  %s\n", pidxfile);
+      else
+        {
+          pidxfile = strrchr(pidxfile, '/');
+          if ( pidxfile == 0 ) pidxfile = idxfile;
+          else                 pidxfile++;          
+          fprintf(gdp, "INDEX  ^%s\n", pidxfile);
+        }
+
 
       gridsize = vlistGridsizeMax(vlistID);
       array = (double*) malloc(gridsize*sizeof(double));
@@ -1385,6 +1423,11 @@ void *Gradsdes(void *argument)
   if ( filetype == FILETYPE_GRB )
     {
       write_map_grib1(ctlfile, map_version, nrecords, intnum, fltnum, bignum);
+    }
+  if ( filetype == FILETYPE_GRB2 )
+    {
+      cdoAbort("\nThe fileformat GRIB2 is not fully supported yet\nfor the gradsdes operator.\nThe .ctl file %s was generated.\nYou can add the necessary .idx file by running\n\tgribmap -i %s", ctlfile, ctlfile);
+      write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
 
 
