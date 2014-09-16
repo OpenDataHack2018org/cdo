@@ -60,10 +60,8 @@ void *Ydrunstat(void *argument)
 {
   int operatorID;
   int operfunc;
-  int gridsize;
   int varID;
   int recID;
-  int gridID;
   int nrecs, nrecords;
   int levelID;
   int tsID;
@@ -72,10 +70,9 @@ void *Ydrunstat(void *argument)
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int nmiss;
-  int nvars, nlevels;
+  int nvars;
   int *recVarID, *recLevelID;
   int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
-  double missval;
   double divisor;
   field_t ***vars1 = NULL, ***vars2 = NULL;
   datetime_t *datetime;

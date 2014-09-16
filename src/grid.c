@@ -470,7 +470,6 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   double zlat, zlon;
   double xi, xj;
   int projflag, scanflag;
-  int status;
   long i;
   proj_info_t proj;
 
@@ -1470,7 +1469,6 @@ int gridCurvilinearToRegular(int gridID1)
 {
   int gridID2 = -1;
   int gridtype, gridsize;
-  long index;
   long i, j;
   int nx, ny;
   int lx = TRUE, ly = TRUE;

@@ -277,7 +277,7 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
       if ( clon > bound_box[3] ) bound_box[3] = clon;
     }
 
-  if ( fabs(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
+  if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
     {
       bound_box[2] = 0;
       bound_box[3] = RESTR_SCALE(PI2);
