@@ -298,9 +298,6 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   int    *adds = (int*) malloc(ndist*sizeof(int));
 
   int j = 0;
-#if defined(_OPENMP) && _OPENMP >= OPENMP4
-#pragma omp simd
-#endif
   for ( i = 0; i < ndist; ++i )
     {
       nadd = min_add+i;
