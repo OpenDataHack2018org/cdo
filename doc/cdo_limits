@@ -1,3 +1,9 @@
 32-bit integer:
-date     YYYYMMDD -> -214748 < year < 214748
-gridsize          -> max: 2147483647,  65455x32727, res: 612m
+  date     YYYYMMDD -> -214748 < year < 214748
+  gridsize          -> max: 2147483647,  65455x32727, res: 612m
+
+
+GRIB1 standard:
+  max record length: 2**23 - 1 (---> 8388607)
+     P8 : gridsize max: <8388607,    4000x2000
+     P16: gridsize max: <8388607/2,  2880x1440
