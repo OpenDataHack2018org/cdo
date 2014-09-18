@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.5
 	* Version 1.6.5 released
 
+2014-09-18  Uwe Schulzweida
+
+	* gradsdes: added support for option 365_day_calendar
+
 2014-09-16  Uwe Schulzweida
 
 	* remapnn::grid_search_nbr: removed wrong omp simd pragma (bug fix)

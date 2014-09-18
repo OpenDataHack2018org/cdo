@@ -657,7 +657,7 @@ void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
 }
 
 static
-void ctl_options(FILE *gdp, int yrev, int zrev, int sequential, int bigendian, int littleendian, int flt64)
+void ctl_options(FILE *gdp, int yrev, int zrev, int sequential, int bigendian, int littleendian, int flt64, int cal365day)
 {
   /* if ( filetype == FILETYPE_GRB ) zrev = FALSE; */
 
@@ -670,6 +670,7 @@ void ctl_options(FILE *gdp, int yrev, int zrev, int sequential, int bigendian, i
       if ( bigendian )    fprintf(gdp, " big_endian");
       if ( littleendian ) fprintf(gdp, " little_endian");
       if ( flt64 )        fprintf(gdp, " flt64");
+      if ( cal365day )    fprintf(gdp, " 365_day_calendar");
       fprintf(gdp, "\n");
     }
 }
@@ -969,6 +970,7 @@ void *Gradsdes(void *argument)
   int nrecords = 0;
   int bigendian = FALSE, littleendian = FALSE;
   int flt64 = 0;
+  int cal365day = 0;
   int sequential = FALSE;
   char Time[30], Incr[10] = {"1mn"}, *IncrKey[] = {"mn","hr","dy","mo","yr"};
   int isd, imn, ihh, iyy, imm, idd;
@@ -1235,6 +1237,9 @@ void *Gradsdes(void *argument)
 
   taxisID = vlistInqTaxis(vlistID);
 
+  int calendar = taxisInqCalendar(taxisID);
+  if ( calendar == CALENDAR_365DAYS ) cal365day = 1;
+
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
@@ -1410,7 +1415,7 @@ void *Gradsdes(void *argument)
     fprintf(gdp, "TITLE  %s  %dx%d grid\n", datfile, xsize, ysize);
 
   /* OPTIONS */
-  ctl_options(gdp, yrev, zrev, sequential, bigendian, littleendian, flt64);
+  ctl_options(gdp, yrev, zrev, sequential, bigendian, littleendian, flt64, cal365day);
 
   /* UNDEF */
   ctl_undef(gdp, vlistID);
