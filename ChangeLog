@@ -5,6 +5,7 @@
 
 2014-09-19  Uwe Schulzweida
 
+	* --with-fftw3: changed default to no
 	* expand gridfile name parameter [Bug #5196]
 
 2014-09-18  Uwe Schulzweida

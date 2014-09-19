@@ -29,7 +29,8 @@ set -x
 case "${HOSTNAME}" in
 # i386-apple-darwin10
     bailung*|d133*|d134*)
-        CDOLIBS="--with-jasper=$HOME/local \
+        CDOLIBS="--with-fftw3 \
+                 --with-jasper=$HOME/local \
                  --with-grib_api=$HOME/local/gribapi-1.10.4 \
                  --with-netcdf=$HOME/local \
                  --with-hdf5=$HOME/local \
@@ -59,7 +60,8 @@ case "${HOSTNAME}" in
         fi
 	;;
     hama*)
-        CDOLIBS="--with-jasper=/opt/local \
+        CDOLIBS="--with-fftw3 \
+                 --with-jasper=/opt/local \
                  --with-grib_api=$HOME/local/gribapi-1.9.16 \
                  --with-netcdf=/opt/local \
                  --with-hdf5=/opt/local \
@@ -84,18 +86,6 @@ case "${HOSTNAME}" in
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
 	;;
-# ia64-xxx-linux
-    ds*)
-	${CONFPATH}configure --prefix=$HOME/local \
-                    --with-netcdf=/pool/ia64/netcdf/netcdf-3.6.0-p1 \
-                    --with-szlib=$HOME/local \
-                    CC=icc CFLAGS="-g -O2 -Wall -fno-alias -DMIN_BUF_SIZE=4194304"
-	;;
-    wasser*)
-	${CONFPATH}configure --prefix=$HOME/local \
-                    --with-netcdf=/home/dkrz/m214089/local/ia64 \
-                    CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
-	;;
 # x86_64-squeeze-x64-linux
     thunder*)
         CDOLIBS="--with-jasper=/sw/squeeze-x64/jasper-1.900.1-static \
@@ -109,11 +99,18 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --enable-all-static \
+                    --with-fftw3 \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -O3 -vec-report2 -march=native -fp-model source -fast-transcendentals"
+        elif  test "$COMP" = pgcc ; then
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --enable-all-static \
+                    $CDOLIBS \
+	            CC=pgcc CFLAGS="-g -fast"
 	else
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --enable-all-static \
+                    --with-fftw3 \
                     $CDOLIBS \
                     CC=gcc CFLAGS='-g -Wall -O3 -march=native'
 	fi
@@ -130,6 +127,18 @@ case "${HOSTNAME}" in
                     --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
                     --with-proj=/sw/squeeze-x64/proj-4.7.0 \
                     CC=gcc CFLAGS='-g -Wall -O3'
+	;;
+# ia64-xxx-linux
+    ds*)
+	${CONFPATH}configure --prefix=$HOME/local \
+                    --with-netcdf=/pool/ia64/netcdf/netcdf-3.6.0-p1 \
+                    --with-szlib=$HOME/local \
+                    CC=icc CFLAGS="-g -O2 -Wall -fno-alias -DMIN_BUF_SIZE=4194304"
+	;;
+    wasser*)
+	${CONFPATH}configure --prefix=$HOME/local \
+                    --with-netcdf=/home/dkrz/m214089/local/ia64 \
+                    CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
 	;;
 # x86_64-archlinux
     thingol*)

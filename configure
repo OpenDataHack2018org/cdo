@@ -1524,7 +1524,7 @@ Optional Packages:
                           library for grib2 compression; if a directory is
                           given, it will be used as a value for
                           --with-jasper-root
-  --without-fftw3         disable support for fftw3
+  --with-fftw3            enable support for fftw3
   --with-proj=<directory> Specify location of PROJ library for cartographic
                           projections.
   --with-curl=<directory> Specify location of CURL library.
@@ -17378,7 +17378,6 @@ fi
 
 THREADS_INCLUDE=''
 THREADS_LIBS=''
-$as_echo with_threads: $with_threads
 case $with_threads in #(
   no) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking multithreading" >&5
@@ -19447,7 +19446,7 @@ $as_echo_n "checking for FFTW3 support... " >&6; }
 if test "${with_fftw3+set}" = set; then :
   withval=$with_fftw3;
 else
-  with_fftw3=yes
+  with_fftw3=no
 fi
 
 
