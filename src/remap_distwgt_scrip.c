@@ -420,9 +420,6 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
   long tgt_grid_size;
   long n, nadds;
   long dst_add;                   /* destination address                         */
-  int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
-  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
-  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
   double dist_tot;                /* sum of neighbor distances (for normalizing) */
   double *coslat, *sinlat;        /* cosine, sine of grid lats (for distance)    */
   double *coslon, *sinlon;        /* cosine, sine of grid lons (for distance)    */
@@ -494,11 +491,14 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
-  private(dst_add, n, nadds, dist_tot, nbr_add, nbr_dist, nbr_mask, plat, plon) \
+  private(dst_add, n, nadds, dist_tot, plat, plon) \
   schedule(dynamic,1)
 #endif
   for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
     {
+      int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
+      int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
+      double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
