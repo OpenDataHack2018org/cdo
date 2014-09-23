@@ -281,7 +281,7 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
-#pragma omp atomic
+#pragma omp atomic update
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
@@ -413,7 +413,7 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
       if ( !cdoSilentMode )
 	{
 #if defined(_OPENMP)
-#pragma omp atomic
+#pragma omp atomic update
 #endif
 	  findex++;
 	  if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);

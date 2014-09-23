@@ -689,7 +689,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       if ( ompthID != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
-#pragma omp atomic
+#pragma omp atomic update
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);

@@ -214,7 +214,7 @@ void *Ensstat(void *argument)
 	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) )
 		{
 #if defined(_OPENMP)
-#pragma omp atomic
+#pragma omp atomic update
 #endif
 		  nmiss++;
 		}

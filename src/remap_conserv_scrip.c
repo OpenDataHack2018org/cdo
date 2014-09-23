@@ -1175,7 +1175,7 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       if ( ompthID != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
-#pragma omp atomic
+#pragma omp atomic update
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 0.5, findex/src_grid_size);
@@ -1400,7 +1400,7 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       if ( ompthID != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
-#pragma omp atomic
+#pragma omp atomic update
 #endif
       findex++;
       if ( lprogress ) progressStatus(0.5, 0.5, findex/tgt_grid_size);
