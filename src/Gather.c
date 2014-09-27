@@ -42,8 +42,8 @@ static
 int cmpx(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const xyinfo_t *xy1 = s1;
-  const xyinfo_t *xy2 = s2;
+  const xyinfo_t *xy1 = (const xyinfo_t *) s1;
+  const xyinfo_t *xy2 = (const xyinfo_t *) s2;
 
   if      ( xy1->x < xy2->x ) cmp = -1;
   else if ( xy1->x > xy2->x ) cmp =  1;
@@ -55,8 +55,8 @@ static
 int cmpxy_lt(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const xyinfo_t *xy1 = s1;
-  const xyinfo_t *xy2 = s2;
+  const xyinfo_t *xy1 = (const xyinfo_t *) s1;
+  const xyinfo_t *xy2 = (const xyinfo_t *) s2;
 
   if      ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
@@ -68,8 +68,8 @@ static
 int cmpxy_gt(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const xyinfo_t *xy1 = s1;
-  const xyinfo_t *xy2 = s2;
+  const xyinfo_t *xy1 = (const xyinfo_t *) s1;
+  const xyinfo_t *xy2 = (const xyinfo_t *) s2;
 
   if      ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
@@ -137,26 +137,26 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 	  if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
 	}
     }
-  
+  /*
   if ( cdoVerbose )
     for ( fileID = 0; fileID < nfiles; fileID++ )
       printf("1 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  
+  */
   qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
-  
+  /*
   if ( cdoVerbose )
     for ( fileID = 0; fileID < nfiles; fileID++ )
       printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  
+  */
   if ( lsouthnorth )
     qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_lt);  
   else
     qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
-
+  /*
   if ( cdoVerbose )
     for ( fileID = 0; fileID < nfiles; fileID++ )
       printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-
+  */
   nx = 1;
   for ( fileID = 1; fileID < nfiles; fileID++ )
     {
@@ -229,23 +229,21 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   free(xvals2);
   free(yvals2);
 
-  {
-    char string[1024];
-    string[0] = 0;
-    gridID = vlistGrid(ef[0].vlistID, igrid);
-    gridInqXname(gridID, string);
-    gridDefXname(gridID2, string);
-    gridInqYname(gridID, string);
-    gridDefYname(gridID2, string);
-    gridInqXlongname(gridID, string);
-    gridDefXlongname(gridID2, string);
-    gridInqYlongname(gridID, string);
-    gridDefYlongname(gridID2, string);
-    gridInqXunits(gridID, string);
-    gridDefXunits(gridID2, string);
-    gridInqYunits(gridID, string);
-    gridDefYunits(gridID2, string);
-  }
+  char string[1024];
+  string[0] = 0;
+  gridID = vlistGrid(ef[0].vlistID, igrid);
+  gridInqXname(gridID, string);
+  gridDefXname(gridID2, string);
+  gridInqYname(gridID, string);
+  gridDefYname(gridID2, string);
+  gridInqXlongname(gridID, string);
+  gridDefXlongname(gridID2, string);
+  gridInqYlongname(gridID, string);
+  gridDefYlongname(gridID2, string);
+  gridInqXunits(gridID, string);
+  gridDefXunits(gridID2, string);
+  gridInqYunits(gridID, string);
+  gridDefYunits(gridID2, string);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -264,6 +262,7 @@ void *Gather(void *argument)
 {
   int i;
   int nvars;
+  // int nvars2=0;
   int cmpfunc;
   int varID, recID;
   int gridsize = 0;
@@ -271,12 +270,13 @@ void *Gather(void *argument)
   int gridsize2;
   int *gridIDs = NULL;
   int *vars = NULL;
+  //int vars2[512];
   int nrecs, nrecs0;
   int ngrids;
   int levelID;
   int tsID;
   int streamID = 0, streamID2;
-  int vlistID, vlistID1, vlistID2;
+  int vlistID1, vlistID2;
   int nmiss;
   int taxisID1, taxisID2;
   int **gridindex;
@@ -285,6 +285,9 @@ void *Gather(void *argument)
   int fileID, nfiles;
   const char *ofilename;
   ens_file_t *ef = NULL;
+
+  // nvars2 = 1;
+  // vars2[0] = 2;
 
   cdoInitialize(argument);
     
@@ -301,12 +304,8 @@ void *Gather(void *argument)
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID = streamOpenRead(cdoStreamName(fileID));
-
-      vlistID = streamInqVlist(streamID);
-
-      ef[fileID].streamID = streamID;
-      ef[fileID].vlistID  = vlistID;
+      ef[fileID].streamID = streamOpenRead(cdoStreamName(fileID));
+      ef[fileID].vlistID  = streamInqVlist(streamID);
     }
 
   nvars = vlistNvars(ef[0].vlistID);
