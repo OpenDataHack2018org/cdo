@@ -261,58 +261,40 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 void *Gather(void *argument)
 {
   int i;
-  int nvars;
-  // int nvars2=0;
-  int cmpfunc;
   int varID, recID;
-  int gridsize = 0;
-  int gridsizemax = 0;
-  int gridsize2;
-  int *gridIDs = NULL;
-  int *vars = NULL;
-  //int vars2[512];
   int nrecs, nrecs0;
-  int ngrids;
   int levelID;
-  int tsID;
-  int streamID = 0, streamID2;
   int vlistID1, vlistID2;
   int nmiss;
   int taxisID1, taxisID2;
-  int **gridindex;
   double missval;
-  double *array2 = NULL;
-  int fileID, nfiles;
-  const char *ofilename;
-  ens_file_t *ef = NULL;
-
-  // nvars2 = 1;
-  // vars2[0] = 2;
+  int fileID;
 
   cdoInitialize(argument);
     
-  nfiles = cdoStreamCnt() - 1;
+  int nfiles = cdoStreamCnt() - 1;
 
-  ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoStreamName(nfiles)->args;
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExists(ofilename) )
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
+  ens_file_t *ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       ef[fileID].streamID = streamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = streamInqVlist(streamID);
+      ef[fileID].vlistID  = streamInqVlist(ef[fileID].streamID);
     }
 
-  nvars = vlistNvars(ef[0].vlistID);
-  vars  = (int*) malloc(nvars*sizeof(int));
+  int nvars = vlistNvars(ef[0].vlistID);
+  int *vars  = (int*) malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
 
   /* check that the contents is always the same */
+  int cmpfunc;
   if ( nvars == 1 ) 
     cmpfunc = CMP_NAME | CMP_NLEVEL;
   else
@@ -322,7 +304,8 @@ void *Gather(void *argument)
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, cmpfunc);
 
   vlistID1 = ef[0].vlistID;
-  gridsizemax = vlistGridsizeMax(vlistID1);
+  int gridsizemax = vlistGridsizeMax(vlistID1);
+  int gridsize;
   for ( fileID = 1; fileID < nfiles; fileID++ )
     {
       gridsize = vlistGridsizeMax(ef[fileID].vlistID);
@@ -333,9 +316,9 @@ void *Gather(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) malloc(gridsizemax*sizeof(double));
 
-  ngrids = vlistNgrids(ef[0].vlistID);
-  gridIDs = (int*) malloc(ngrids*sizeof(int));
-  gridindex = (int **) malloc(nfiles*sizeof(int *));
+  int ngrids = vlistNgrids(ef[0].vlistID);
+  int *gridIDs = (int*) malloc(ngrids*sizeof(int));
+  int **gridindex = (int **) malloc(nfiles*sizeof(int *));
   for ( fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int*) malloc(gridsizemax*sizeof(int));
 
@@ -356,7 +339,7 @@ void *Gather(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  gridsize2 = 0;
+  int gridsize2 = 0;
   for ( i = 0; i < ngrids; ++i )
     {
       if ( gridIDs[i] != -1 ) 
@@ -382,20 +365,19 @@ void *Gather(void *argument)
 	}
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
       
   streamDefVlist(streamID2, vlistID2);
 	  
-  array2 = (double*) malloc(gridsize2*sizeof(double));
+  double *array2 = (double*) malloc(gridsize2*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   do
     {
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
       for ( fileID = 1; fileID < nfiles; fileID++ )
 	{
-	  streamID = ef[fileID].streamID;
-	  nrecs = streamInqTimestep(streamID, tsID);
+	  nrecs = streamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
 	}
@@ -406,21 +388,19 @@ void *Gather(void *argument)
       
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
-	  streamID = ef[0].streamID;
-	  streamInqRecord(streamID, &varID, &levelID);
+	  streamInqRecord(ef[0].streamID, &varID, &levelID);
 
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  for ( i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(fileID, streamID, nmiss, i)
+#pragma omp parallel for default(shared) private(fileID, nmiss, i)
 #endif
 	  for ( fileID = 0; fileID < nfiles; fileID++ )
 	    {
 	      int varIDx, levelIDx;
-	      streamID = ef[fileID].streamID;
-	      if ( fileID > 0 ) streamInqRecord(streamID, &varIDx, &levelIDx);
-	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
+	      if ( fileID > 0 ) streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
+	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
 
 	      if ( vars[varID] )
 		{
@@ -449,10 +429,7 @@ void *Gather(void *argument)
   while ( nrecs0 > 0 );
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    {
-      streamID = ef[fileID].streamID;
-      streamClose(streamID);
-    }
+    streamClose(ef[fileID].streamID);
 
   streamClose(streamID2);
 
