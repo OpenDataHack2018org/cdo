@@ -263,7 +263,7 @@ void *Gather(void *argument)
   int varID, recID;
   int nrecs, nrecs0;
   int levelID;
-  int vlistID1, vlistID2;
+  int vlistID2;
   int nmiss;
   int taxisID1, taxisID2;
   double missval;
@@ -272,7 +272,6 @@ void *Gather(void *argument)
   cdoInitialize(argument);
     
   int nfiles = cdoStreamCnt() - 1;
-
   const char *ofilename = cdoStreamName(nfiles)->args;
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
@@ -288,15 +287,70 @@ void *Gather(void *argument)
       ef[fileID].vlistID  = streamInqVlist(ef[fileID].streamID);
     }
 
-  int nvars = vlistNvars(ef[0].vlistID);
-  int *vars  = (int*) malloc(nvars*sizeof(int));
-  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+  int vlistID1 = ef[0].vlistID;
+  vlistClearFlag(vlistID1);
 
   /* check that the contents is always the same */
   for ( fileID = 1; fileID < nfiles; fileID++ )
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
+    vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
-  vlistID1 = ef[0].vlistID;
+  int nvars = vlistNvars(vlistID1);
+  int *vars  = (int*) malloc(nvars*sizeof(int));
+  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+  int *vars1  = (int*) malloc(nvars*sizeof(int));
+  for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = FALSE;
+
+  int nsel = operatorArgc();
+  if ( nsel == 0 )
+    {
+      vars1[varID] = TRUE;
+    }
+  else
+    {
+      char **argnames = operatorArgv();
+
+      if ( cdoVerbose )
+	for ( int i = 0; i < nsel; i++ )
+	  fprintf(stderr, "name %d = %s\n", i+1, argnames[i]);
+
+      int *selfound = (int*) malloc(nsel*sizeof(int));
+      for ( int i = 0; i < nsel; i++ ) selfound[i] = FALSE;
+
+      char varname[CDI_MAX_NAME];
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  vlistInqVarName(vlistID1, varID, varname);
+
+	  for ( int isel = 0; isel < nsel; isel++ )
+	    {
+	      if ( strcmp(argnames[isel], varname) == 0 )
+		{
+		  selfound[isel] = TRUE;
+		  vars1[varID] = TRUE;
+		}
+	    }
+	}
+
+      for ( int isel = 0; isel < nsel; isel++ )
+	if ( selfound[isel] == FALSE )
+	  cdoAbort("Variable name %s not found!", argnames[isel]);
+
+      free(selfound);
+    }
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      if ( vars1[varID] == TRUE )
+	{
+	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+	  int nlevs    = zaxisInqSize(zaxisID);
+	  for ( int levID = 0; levID < nlevs; levID++ )
+	    vlistDefFlag(vlistID1, varID, levID, TRUE);
+	}
+    }
+
+  
+
   int gridsizemax = vlistGridsizeMax(vlistID1);
   int gridsize;
   for ( fileID = 1; fileID < nfiles; fileID++ )
@@ -309,7 +363,7 @@ void *Gather(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) malloc(gridsizemax*sizeof(double));
 
-  int ngrids = vlistNgrids(ef[0].vlistID);
+  int ngrids = vlistNgrids(vlistID1);
   int *gridIDs = (int*) malloc(ngrids*sizeof(int));
   int **gridindex = (int **) malloc(nfiles*sizeof(int *));
   for ( fileID = 0; fileID < nfiles; fileID++ )
@@ -345,13 +399,13 @@ void *Gather(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      int gridID = vlistInqVarGrid(ef[0].vlistID, varID);
+      int gridID = vlistInqVarGrid(vlistID1, varID);
 
       for ( int i = 0; i < ngrids; ++i )
 	{
 	  if ( gridIDs[i] != -1 ) 
 	    {
-	      if ( gridID == vlistGrid(ef[0].vlistID, i) )
+	      if ( gridID == vlistGrid(vlistID1, i) )
 	      vars[varID] = TRUE;
 	      break;
 	    }
@@ -434,6 +488,7 @@ void *Gather(void *argument)
 
   free(gridIDs);
   if ( vars   ) free(vars);
+  if ( vars1  ) free(vars1);
 
   cdoFinish();
 
