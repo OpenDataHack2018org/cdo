@@ -260,7 +260,6 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 
 void *Gather(void *argument)
 {
-  int i;
   int varID, recID;
   int nrecs, nrecs0;
   int levelID;
@@ -294,14 +293,8 @@ void *Gather(void *argument)
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
 
   /* check that the contents is always the same */
-  int cmpfunc;
-  if ( nvars == 1 ) 
-    cmpfunc = CMP_NAME | CMP_NLEVEL;
-  else
-    cmpfunc = CMP_NAME | CMP_NLEVEL;
-
   for ( fileID = 1; fileID < nfiles; fileID++ )
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, cmpfunc);
+    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   vlistID1 = ef[0].vlistID;
   int gridsizemax = vlistGridsizeMax(vlistID1);
@@ -323,7 +316,7 @@ void *Gather(void *argument)
     gridindex[fileID] = (int*) malloc(gridsizemax*sizeof(int));
 
   int ginit = FALSE;
-  for ( i = 0; i < ngrids; ++i )
+  for ( int i = 0; i < ngrids; ++i )
     {
       if ( ginit == FALSE )
 	{
@@ -340,7 +333,7 @@ void *Gather(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int gridsize2 = 0;
-  for ( i = 0; i < ngrids; ++i )
+  for ( int i = 0; i < ngrids; ++i )
     {
       if ( gridIDs[i] != -1 ) 
 	{
@@ -354,7 +347,7 @@ void *Gather(void *argument)
     {
       int gridID = vlistInqVarGrid(ef[0].vlistID, varID);
 
-      for ( i = 0; i < ngrids; ++i )
+      for ( int i = 0; i < ngrids; ++i )
 	{
 	  if ( gridIDs[i] != -1 ) 
 	    {
@@ -391,10 +384,10 @@ void *Gather(void *argument)
 	  streamInqRecord(ef[0].streamID, &varID, &levelID);
 
 	  missval = vlistInqVarMissval(vlistID1, varID);
-	  for ( i = 0; i < gridsize2; i++ ) array2[i] = missval;
+	  for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(fileID, nmiss, i)
+#pragma omp parallel for default(shared) private(fileID, nmiss)
 #endif
 	  for ( fileID = 0; fileID < nfiles; fileID++ )
 	    {
@@ -405,7 +398,7 @@ void *Gather(void *argument)
 	      if ( vars[varID] )
 		{
 		  gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
-		  for ( i = 0; i < gridsize; ++i )
+		  for ( int i = 0; i < gridsize; ++i )
 		    array2[gridindex[fileID][i]] = ef[fileID].array[i];
 		}
 	    }
@@ -415,7 +408,7 @@ void *Gather(void *argument)
 	  if ( vars[varID] )
 	    {
 	      nmiss = 0;
-	      for ( i = 0; i < gridsize2; i++ )
+	      for ( int i = 0; i < gridsize2; i++ )
 		if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 	      
 	      streamWriteRecord(streamID2, array2, nmiss);
