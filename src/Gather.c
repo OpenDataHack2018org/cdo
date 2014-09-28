@@ -361,15 +361,19 @@ void *Gather(void *argument)
     ef[fileID].array = (double*) malloc(gridsizemax*sizeof(double));
 
 
-  int vlistID3 = vlistCreate();
-  vlistCopyFlag(vlistID3, vlistID1);
+  int vlistID2 = vlistCreate();
+  vlistCopyFlag(vlistID2, vlistID1);
   if ( cdoVerbose )
     {
       vlistPrint(vlistID1);
-      vlistPrint(vlistID3);
+      vlistPrint(vlistID2);
     }
 
-  int vlistID2 = vlistDuplicate(vlistID1);
+  //int vlistID2 = vlistDuplicate(vlistID1);
+  int nvars2 = vlistNvars(vlistID2);
+  // int *vars  = (int*) malloc(nvars*sizeof(int));
+  //for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+
 
   int ngrids1 = vlistNgrids(vlistID1);
   int ngrids2 = vlistNgrids(vlistID2);
@@ -413,7 +417,7 @@ void *Gather(void *argument)
 	}
     }
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( varID = 0; varID < nvars2; varID++ )
     {
       int gridID = vlistInqVarGrid(vlistID2, varID);
 
@@ -453,45 +457,50 @@ void *Gather(void *argument)
 	{
 	  streamInqRecord(ef[0].streamID, &varID, &levelID);
 	  if ( cdoVerbose && tsID == 0 ) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
+
+	  for ( fileID = 0; fileID < nfiles; fileID++ )
+	    {
+	      int varIDx, levelIDx;
+	      if ( fileID > 0 ) streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
+	    }
+
 	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
 	    {
 	      int varID2   = vlistFindVar(vlistID2, varID);
 	      int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 	      if ( cdoVerbose && tsID == 0 ) printf("varID %d %d levelID %d %d\n", varID, varID2, levelID, levelID2);
-	    }
 
-	  missval = vlistInqVarMissval(vlistID1, varID);
-	  for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
+	      missval = vlistInqVarMissval(vlistID2, varID2);
+	      for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(fileID, nmiss)
 #endif
-	  for ( fileID = 0; fileID < nfiles; fileID++ )
-	    {
-	      int varIDx, levelIDx;
-	      if ( fileID > 0 ) streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
-	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
-
-	      if ( vars[varID] )
+	      for ( fileID = 0; fileID < nfiles; fileID++ )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
-		  for ( int i = 0; i < gridsize; ++i )
-		    array2[gridindex[fileID][i]] = ef[fileID].array[i];
+		  streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
+
+		  if ( vars[varID2] )
+		    {
+		      gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
+		      for ( int i = 0; i < gridsize; ++i )
+			array2[gridindex[fileID][i]] = ef[fileID].array[i];
+		    }
 		}
-	    }
 
-	  streamDefRecord(streamID2, varID, levelID);
+	      streamDefRecord(streamID2, varID2, levelID2);
 
-	  if ( vars[varID] )
-	    {
-	      nmiss = 0;
-	      for ( int i = 0; i < gridsize2; i++ )
-		if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-	      
-	      streamWriteRecord(streamID2, array2, nmiss);
+	      if ( vars[varID2] )
+		{
+		  nmiss = 0;
+		  for ( int i = 0; i < gridsize2; i++ )
+		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+
+		  streamWriteRecord(streamID2, array2, nmiss);
+		}
+	      else
+		streamWriteRecord(streamID2, ef[0].array, 0);
 	    }
-	  else
-	    streamWriteRecord(streamID2, ef[0].array, 0);
 	}
 
       tsID++;
