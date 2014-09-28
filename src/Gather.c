@@ -263,7 +263,6 @@ void *Gather(void *argument)
   int varID, recID;
   int nrecs, nrecs0;
   int levelID;
-  int vlistID2;
   int nmiss;
   int taxisID1, taxisID2;
   double missval;
@@ -303,7 +302,7 @@ void *Gather(void *argument)
   int nsel = operatorArgc();
   if ( nsel == 0 )
     {
-      vars1[varID] = TRUE;
+      for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = TRUE;
     }
   else
     {
@@ -349,11 +348,9 @@ void *Gather(void *argument)
 	}
     }
 
-  
-
-  int gridsizemax = vlistGridsizeMax(vlistID1);
   int gridsize;
-  for ( fileID = 1; fileID < nfiles; fileID++ )
+  int gridsizemax = 0;
+  for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       if ( gridsize > gridsizemax ) gridsizemax = gridsize;
@@ -363,31 +360,50 @@ void *Gather(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) malloc(gridsizemax*sizeof(double));
 
-  int ngrids = vlistNgrids(vlistID1);
-  int *gridIDs = (int*) malloc(ngrids*sizeof(int));
+
+  int vlistID3 = vlistCreate();
+  vlistCopyFlag(vlistID3, vlistID1);
+  if ( cdoVerbose )
+    {
+      vlistPrint(vlistID1);
+      vlistPrint(vlistID3);
+    }
+
+  int vlistID2 = vlistDuplicate(vlistID1);
+
+  int ngrids1 = vlistNgrids(vlistID1);
+  int ngrids2 = vlistNgrids(vlistID2);
+
+  int *gridIDs = (int*) malloc(ngrids2*sizeof(int));
   int **gridindex = (int **) malloc(nfiles*sizeof(int *));
   for ( fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int*) malloc(gridsizemax*sizeof(int));
 
   int ginit = FALSE;
-  for ( int i = 0; i < ngrids; ++i )
+  for ( int i2 = 0; i2 < ngrids2; ++i2 )
     {
+      int i1;
+      for ( i1 = 0; i1 < ngrids1; ++i1 )
+	if ( vlistGrid(vlistID1, i1) == vlistGrid(vlistID2, i2) ) break;
+
+      //   printf("i1 %d i2 %d\n", i1, i2);
+
       if ( ginit == FALSE )
 	{
-	  gridIDs[i] = genGrid(nfiles, ef, gridindex, i);
-	  if ( gridIDs[i] != -1 ) ginit = TRUE;
+	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1);
+	  if ( gridIDs[i2] != -1 ) ginit = TRUE;
 	}
       else
-	gridIDs[i] = genGrid(nfiles, ef, NULL, i);
+	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1);
     }
 
-  vlistID2 = vlistDuplicate(vlistID1);
+
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int gridsize2 = 0;
-  for ( int i = 0; i < ngrids; ++i )
+  for ( int i = 0; i < ngrids2; ++i )
     {
       if ( gridIDs[i] != -1 ) 
 	{
@@ -399,14 +415,14 @@ void *Gather(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      int gridID = vlistInqVarGrid(vlistID1, varID);
+      int gridID = vlistInqVarGrid(vlistID2, varID);
 
-      for ( int i = 0; i < ngrids; ++i )
+      for ( int i = 0; i < ngrids2; ++i )
 	{
 	  if ( gridIDs[i] != -1 ) 
 	    {
-	      if ( gridID == vlistGrid(vlistID1, i) )
-	      vars[varID] = TRUE;
+	      if ( gridID == vlistGrid(vlistID2, i) )
+		vars[varID] = TRUE;
 	      break;
 	    }
 	}
@@ -436,6 +452,13 @@ void *Gather(void *argument)
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
 	  streamInqRecord(ef[0].streamID, &varID, &levelID);
+	  if ( cdoVerbose && tsID == 0 ) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
+	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
+	    {
+	      int varID2   = vlistFindVar(vlistID2, varID);
+	      int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+	      if ( cdoVerbose && tsID == 0 ) printf("varID %d %d levelID %d %d\n", varID, varID2, levelID, levelID2);
+	    }
 
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
