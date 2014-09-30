@@ -1354,7 +1354,7 @@ void *Gradsdes(void *argument)
 
                   index = (tsID*nrecsout + recoffset[varID] + levelID);
 
-                  streamInqGinfo(streamID, &intnum[index], &fltnum[index*3], &bignum[index*2]);
+                  streamInqGRIBinfo(streamID, &intnum[index], &fltnum[index*3], &bignum[index*2]);
 
                   if ( map_version != 4 )
                     {
