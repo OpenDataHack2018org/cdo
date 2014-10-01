@@ -1,10 +1,11 @@
 CDO NEWS
 --------
 
-Version 1.6.5 (01 October 2014):
+Version 1.6.5 (23 October 2014):
 
    New features:
    Changed operators:
+     * cat: added support for option -O (overwrite existing output file)
      * remaplaf: changed calculation of weights from SCRIP to YAC
    Fixed bugs:
      * gridarea: added support for concave grid cells

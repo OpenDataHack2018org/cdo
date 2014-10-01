@@ -66,7 +66,10 @@ void *Cat(void *argument)
 
       if ( indf == 0 )
 	{
-	  if ( fileExists(cdoStreamName(nfiles)->args) )
+	  int file_exists = fileExists(cdoStreamName(nfiles)->args);
+	  if ( cdoOverwriteMode ) file_exists = 0;
+
+	  if ( file_exists )
 	    {
 	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
 

@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.5
 	* Version 1.6.5 released
 
+2014-10-23  Uwe Schulzweida
+
+	* cat: added support for option -O (overwrite existing output file)
+
 2014-09-19  Uwe Schulzweida
 
 	* --with-fftw3: changed default to no
