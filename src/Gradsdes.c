@@ -954,6 +954,30 @@ void rm_ext(char *file, const char *ext)
 }
 
 
+/* 
+ * Return the filetype extension
+ * for a given filetype (int)
+ * TODO this general function should be somewhere else
+ */
+static
+const char *filetypeext(int filetype)
+{
+  switch ( filetype )
+    {
+    case FILETYPE_GRB:  return (".grb");   break;
+    case FILETYPE_GRB2: return (".grb2");  break;
+    case FILETYPE_NC:   return (".nc");    break;
+    case FILETYPE_NC2:  return (".nc2");   break;
+    case FILETYPE_NC4:  return (".nc4");   break;
+    case FILETYPE_NC4C: return (".nc4c");  break;
+    case FILETYPE_SRV:  return (".srv");   break;
+    case FILETYPE_EXT:  return (".ext");   break;
+    case FILETYPE_IEG:  return (".ieg");   break;
+    default:            return ("");
+    }
+}
+
+
 /*
  * Replace or just add file extension:
  * -------------------------------------------------
@@ -962,7 +986,7 @@ void rm_ext(char *file, const char *ext)
  * if the original extension is not the expected one
  */
 static
-void repl_fileextension(char *file, const char *oldext, const char *newext)
+void repl_filetypeext(char *file, const char *oldext, const char *newext)
 {
   // delete original extension if it is the expected one
   rm_ext(file, oldext);
@@ -1178,23 +1202,7 @@ void *Gradsdes(void *argument)
   len = (int) strlen(ctlfile);
       // TODO: that should be wrong for file names like a.nc = 4
   if ( len > 4 )
-    {
-      switch ( filetype )
-        {
-        case FILETYPE_SRV:
-            repl_fileextension(&ctlfile, ".srv", ".ctl"); break;
-        case FILETYPE_EXT:
-            repl_fileextension(&ctlfile, ".ext", ".ctl");   break;
-        case FILETYPE_IEG:
-            repl_fileextension(&ctlfile, ".ieg", ".ctl");   break;
-        case FILETYPE_GRB:
-            repl_fileextension(&ctlfile, ".grb", ".ctl");   break;
-        case FILETYPE_GRB2:
-            repl_fileextension(&ctlfile, ".grb2", ".ctl");  break;
-        case FILETYPE_NC:
-            repl_fileextension(&ctlfile, ".nc", ".ctl");    break;
-        }
-    }
+      repl_filetypeext(&ctlfile, filetypeext(filetype), ".ctl");
 
   /* open ctl file*/
   gdp = fopen(ctlfile, "w");
