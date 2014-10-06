@@ -12,6 +12,8 @@ Merge	      File operations
 Split	      File operations
 Splittime     File operations
 Splitsel      File operations
+Scatter       File operations
+Gather        File operations
 Select        Selection
 Selvar        Selection
 Seltime       Selection

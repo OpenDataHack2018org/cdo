@@ -65,6 +65,8 @@ doc/tex/cdo_ref_over.tex -text
 doc/tex/cdoprog.tex -text
 doc/tex/cleanup -text
 doc/tex/contributors.tex -text
+doc/tex/figures/gather.pdf -text
+doc/tex/figures/scatter.pdf -text
 doc/tex/grid.tex -text
 doc/tex/grids/cell.gmt -text
 doc/tex/grids/cell.grid -text
@@ -153,6 +155,7 @@ doc/tex/mod/Filter -text
 doc/tex/mod/Fldcor -text
 doc/tex/mod/Fldcovar -text
 doc/tex/mod/Fldstat -text
+doc/tex/mod/Gather -text
 doc/tex/mod/Genweights -text
 doc/tex/mod/Gradsdes -text
 doc/tex/mod/Gridboxstat -text
@@ -197,6 +200,7 @@ doc/tex/mod/Rhopot -text
 doc/tex/mod/Rotuv -text
 doc/tex/mod/Runpctl -text
 doc/tex/mod/Runstat -text
+doc/tex/mod/Scatter -text
 doc/tex/mod/Seaspctl -text
 doc/tex/mod/Seasstat -text
 doc/tex/mod/Selbox -text
