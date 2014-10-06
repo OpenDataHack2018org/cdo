@@ -1,0 +1,52 @@
+@BeginModule
+@NewPage
+@Name      = Collgrid
+@Title     = Collect horizontal grid
+@Section   = File operations
+@Class     = File operation
+@Arguments = ifiles ofile
+@Operators = collgrid
+@EndModule
+
+
+@BeginOperator_collgrid
+@Title     = Collect horizontal grid
+@Parameter = [names]
+
+@BeginDescription
+This operator collects the data of the input files to one output file. 
+All input files need to have the same variables and the same number of timesteps on a different
+horizonal grid region. A source region must be a rectilinear longitude/latitude grid box.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter names
+@Item = names
+STRING  Comma separated list of variable names [default: all variables]
+@EndParameter
+
+
+@BeginNote
+This operator needs to open all input files simultaneously.
+The maximum number of open files depents on the operating system!
+@EndNote
+
+
+@BeginExample
+Collect the horizonal grid of 6 input files. Each input file contains a lon/lat region of the target grid: 
+@BeginVerbatim
+   cdo collgrid ifile[1-6] ofile
+@EndVerbatim
+@IfDoc
+Below is a schematic illustration of this example:
+
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{collgrid.pdf}
+
+\vspace{1mm}
+
+On the left side is the data of the six input files and on the right side is the collected data of the output file.
+@EndifDoc
+@EndExample

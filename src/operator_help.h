@@ -396,6 +396,51 @@ static char *SplitselHelp[] = {
     NULL
 };
 
+static char *DistgridHelp[] = {
+    "NAME",
+    "    distgrid - Distribute horizontal grid",
+    "",
+    "SYNOPSIS",
+    "    distgrid,nx[,ny]  ifile obase",
+    "",
+    "DESCRIPTION",
+    "    This operator distributes a dataset into smaller pieces. Each output file contains a different region of the horizontal ",
+    "    source grid. A target grid region contains a regular longitude/latitude box of the source grid. Only rectilinear source ",
+    "    grids are supported by this operator. The number of different regions can be specified with the parameter nx and ny.",
+    "    The output files will be named <obase><xxx><suffix> where suffix is the filename extension derived from the file format. ",
+    "    xxx will have five digits with the number of the target region.",
+    "",
+    "PARAMETER",
+    "    nx  INTEGER  Number of regions in x direction",
+    "    ny  INTEGER  Number of regions in y direction [default: 1]",
+    "",
+    "NOTE",
+    "    This operator needs to open all output files simultaneously.",
+    "    The maximum number of open files depents on the operating system!",
+    NULL
+};
+
+static char *CollgridHelp[] = {
+    "NAME",
+    "    collgrid - Collect horizontal grid",
+    "",
+    "SYNOPSIS",
+    "    collgrid[,names]  ifiles ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator collects the data of the input files to one output file. ",
+    "    All input files need to have the same variables and the same number of timesteps on a different",
+    "    horizonal grid region. A source region must be a rectilinear longitude/latitude grid box.",
+    "",
+    "PARAMETER",
+    "    names  STRING  Comma separated list of variable names [default: all variables]",
+    "",
+    "NOTE",
+    "    This operator needs to open all input files simultaneously.",
+    "    The maximum number of open files depents on the operating system!",
+    NULL
+};
+
 static char *SelectHelp[] = {
     "NAME",
     "    select, delete - Select fields",

@@ -13,7 +13,7 @@ Split	      File operations
 Splittime     File operations
 Splitsel      File operations
 Distgrid      File operations
-Gather        File operations
+Collgrid      File operations
 Select        Selection
 Selvar        Selection
 Seltime       Selection

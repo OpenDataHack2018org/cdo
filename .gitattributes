@@ -92,6 +92,7 @@ doc/tex/mod/Arith -text
 doc/tex/mod/Arithc -text
 doc/tex/mod/Arithdays -text
 doc/tex/mod/Change -text
+doc/tex/mod/Collgrid -text
 doc/tex/mod/Comp -text
 doc/tex/mod/Compc -text
 doc/tex/mod/Cond -text
@@ -155,7 +156,6 @@ doc/tex/mod/Filter -text
 doc/tex/mod/Fldcor -text
 doc/tex/mod/Fldcovar -text
 doc/tex/mod/Fldstat -text
-doc/tex/mod/Gather -text
 doc/tex/mod/Genweights -text
 doc/tex/mod/Gradsdes -text
 doc/tex/mod/Gridboxstat -text
