@@ -28,6 +28,7 @@ cdo_SOURCES += Adisit.c        \
                Derivepar.c     \
                Detrend.c       \
                Diff.c          \
+               Distgrid.c      \
                Duplicate.c     \
                EOFs.c          \
 	       Eof3d.c         \
@@ -102,7 +103,6 @@ cdo_SOURCES += Adisit.c        \
                Rotuv.c         \
                Runpctl.c       \
                Runstat.c       \
-               Scatter.c       \
                Seascount.c     \
                Seaspctl.c      \
                Seasstat.c      \

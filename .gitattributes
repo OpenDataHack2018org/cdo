@@ -328,6 +328,7 @@ src/Deltime.c -text
 src/Derivepar.c -text
 src/Detrend.c -text
 src/Diff.c -text
+src/Distgrid.c -text
 src/Duplicate.c -text
 src/EOFs.c -text
 src/EcaIndices.c -text
@@ -408,7 +409,6 @@ src/Rotuv.c -text
 src/Runpctl.c -text
 src/Runstat.c -text
 src/SSOpar.c -text
-src/Scatter.c -text
 src/Seascount.c -text
 src/Seaspctl.c -text
 src/Seasstat.c -text

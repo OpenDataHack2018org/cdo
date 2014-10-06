@@ -67,6 +67,7 @@ void *Deltime(void *argument);
 void *Derivepar(void *argument);
 void *Detrend(void *argument);
 void *Diff(void *argument);
+void *Distgrid(void *argument);
 void *Duplicate(void *argument);
 void *Echam5ini(void *argument);
 void *Enlarge(void *argument);
@@ -158,7 +159,6 @@ void *Setpartab(void *argument);
 void *Setrcaname(void *argument);
 void *Settime(void *argument);
 void *Setzaxis(void *argument);
-void *Scatter(void *argument);
 void *Showinfo(void *argument);
 void *Sinfo(void *argument);
 void *Smooth9(void *argument);
@@ -297,6 +297,7 @@ void *Maggraph(void *argument);
 #define  DeriveparOperators     {"gheight", "sealevelpressure"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffp", "diffn", "diffc"}
+#define  DistgridOperators      {"distgrid"}
 #define  DuplicateOperators     {"duplicate"}
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
                                  "export_e5ml", "export_e5res"}
@@ -403,7 +404,6 @@ void *Maggraph(void *argument);
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
-#define  ScatterOperators       {"scatter"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
                                  "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
@@ -568,6 +568,7 @@ static modules_t Modules[] =
   { Derivepar,      DeriveparHelp,     DeriveparOperators,     CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },
   { Diff,           DiffHelp,          DiffOperators,          CDI_REAL,  2,  0 },
+  { Distgrid,       DistgridHelp,      DistgridOperators,       CDI_REAL,  1,  1 },
   { Duplicate,      DuplicateHelp,     DuplicateOperators,     CDI_REAL,  1,  1 },
   { Echam5ini,      NULL,              Echam5iniOperators,     CDI_REAL,  1,  1 },
   { Enlarge,        EnlargeHelp,       EnlargeOperators,       CDI_REAL,  1,  1 },
@@ -664,7 +665,6 @@ static modules_t Modules[] =
   { Setrcaname,     NULL,              SetrcanameOperators,    CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       CDI_BOTH,  1,  1 },
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,      CDI_BOTH,  1,  1 },
-  { Scatter,        NULL,              ScatterOperators,       CDI_REAL,  1,  1 },
   { Showinfo,       ShowinfoHelp,      ShowinfoOperators,      CDI_BOTH,  1,  0 },
   { Sinfo,          SinfoHelp,         SinfoOperators,         CDI_BOTH, -1,  0 },
   { Smooth9,        Smooth9Help,       Smooth9Operators,       CDI_REAL,  1,  1 },
@@ -819,6 +819,7 @@ static char *opalias[][2] =
   {"read_e5ml",           "import_e5ml"},
   {"remapcon1",           "remaplaf"   },
   {"remapdis1",           "remapnn"    },
+  {"scatter",             "distgrid"   },
   {"showvar",             "showname"   },
   {"selgridname",         "selgrid"    },
   {"selzaxisname",        "selzaxis"   },
