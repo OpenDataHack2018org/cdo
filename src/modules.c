@@ -54,6 +54,7 @@ void *CDIwrite(void *argument);
 void *Change(void *argument);
 void *Change_e5slm(void *argument);
 void *Cloudlayer(void *argument);
+void *Collgrid(void *argument);
 void *Command(void *argument);
 void *Comp(void *argument);
 void *Compc(void *argument);
@@ -88,7 +89,6 @@ void *Fldrms(void *argument);
 void *Fldstat(void *argument);
 void *Fldstat2(void *argument);
 void *Fourier(void *argument);
-void *Gather(void *argument);
 void *Gengrid(void *argument);
 void *Gradsdes(void *argument);
 void *Gridboxstat(void *argument);
@@ -284,6 +284,7 @@ void *Maggraph(void *argument);
 #define  ChangeOperators        {"chcode", "chtabnum", "chparam", "chname", "chunit", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}
+#define  CollgridOperators      {"collgrid"}
 #define  CommandOperators       {"command", "com", "cmd"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
@@ -321,7 +322,6 @@ void *Maggraph(void *argument);
 #define  FldcorOperators        {"fldcor"}
 #define  FldcovarOperators      {"fldcovar"}
 #define  FourierOperators       {"fourier"}
-#define  GatherOperators        {"gather"}
 #define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes", "dumpmap"}
 #define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxvar", "gridboxstd"}
@@ -555,6 +555,7 @@ static modules_t Modules[] =
   { Change,         ChangeHelp,        ChangeOperators,        CDI_REAL,  1,  1 },
   { Change_e5slm,   NULL,              Change_e5slmOperators,  CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    CDI_REAL,  1,  1 },
+  { Collgrid,       CollgridHelp,      CollgridOperators,      CDI_REAL, -1,  1 },
   { Command,        NULL,              CommandOperators,       CDI_REAL,  1,  0 },
   { Comp,           CompHelp,          CompOperators,          CDI_REAL,  2,  1 },
   { Compc,          CompcHelp,         CompcOperators,         CDI_REAL,  1,  1 },
@@ -590,7 +591,6 @@ static modules_t Modules[] =
   { Fldstat2,       FldcorHelp,        FldcorOperators,        CDI_REAL,  2,  1 },
   { Fldstat2,       FldcovarHelp,      FldcovarOperators,      CDI_REAL,  2,  1 },
   { Fourier,        NULL,              FourierOperators,       CDI_COMP,  1,  1 },
-  { Gather,         NULL,              GatherOperators,        CDI_REAL, -1,  1 },
   { Gengrid,        NULL,              GengridOperators,       CDI_REAL,  2,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,      CDI_REAL,  1,  0 },
   { Gridboxstat,    GridboxstatHelp,   GridboxstatOperators,   CDI_REAL,  1,  1 },
@@ -795,6 +795,7 @@ static char *opalias[][2] =
   {"diffv",               "diffn"      },
   {"covar0",              "timcovar"   },
   {"covar0r",             "fldcovar"   },
+  {"gather",              "collgrid"   },
   {"geopotheight",        "gheight"    },
   {"ggstat",              "info"       },
   {"ggstats",             "sinfo"      },

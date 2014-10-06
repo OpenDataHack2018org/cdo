@@ -116,15 +116,15 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c Change.c \
-	Change_e5slm.c Cloudlayer.c Command.c Comp.c Compc.c \
-	Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c Copy.c \
-	Deltime.c Derivepar.c Detrend.c Diff.c Distgrid.c Duplicate.c \
-	EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
+	Change_e5slm.c Cloudlayer.c Collgrid.c Command.c Comp.c \
+	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
+	Copy.c Deltime.c Derivepar.c Detrend.c Diff.c Distgrid.c \
+	Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
 	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
 	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
-	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c \
-	Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c \
-	Hi.c Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
+	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c Gradsdes.c \
+	Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c Hi.c \
+	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
 	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
@@ -194,7 +194,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-CDItest.$(OBJEXT) cdo-CDIread.$(OBJEXT) \
 	cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) cdo-Change.$(OBJEXT) \
 	cdo-Change_e5slm.$(OBJEXT) cdo-Cloudlayer.$(OBJEXT) \
-	cdo-Command.$(OBJEXT) cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
+	cdo-Collgrid.$(OBJEXT) cdo-Command.$(OBJEXT) \
+	cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
@@ -210,24 +211,23 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Filedes.$(OBJEXT) cdo-Fillmiss.$(OBJEXT) \
 	cdo-Filter.$(OBJEXT) cdo-Fldrms.$(OBJEXT) \
 	cdo-Fldstat.$(OBJEXT) cdo-Fldstat2.$(OBJEXT) \
-	cdo-Fourier.$(OBJEXT) cdo-Gather.$(OBJEXT) \
-	cdo-Gengrid.$(OBJEXT) cdo-Gradsdes.$(OBJEXT) \
-	cdo-Gridboxstat.$(OBJEXT) cdo-Gridcell.$(OBJEXT) \
-	cdo-Gridsearch.$(OBJEXT) cdo-Harmonic.$(OBJEXT) \
-	cdo-Hi.$(OBJEXT) cdo-Histogram.$(OBJEXT) \
-	cdo-Importamsr.$(OBJEXT) cdo-Importbinary.$(OBJEXT) \
-	cdo-Importcmsaf.$(OBJEXT) cdo-Importobs.$(OBJEXT) \
-	cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) cdo-Intgrid.$(OBJEXT) \
-	cdo-Intgridtraj.$(OBJEXT) cdo-Intlevel.$(OBJEXT) \
-	cdo-Intlevel3d.$(OBJEXT) cdo-Intntime.$(OBJEXT) \
-	cdo-Inttime.$(OBJEXT) cdo-Intyear.$(OBJEXT) \
-	cdo-Invert.$(OBJEXT) cdo-Invertlev.$(OBJEXT) \
-	cdo-Isosurface.$(OBJEXT) cdo-Kvl.$(OBJEXT) cdo-Log.$(OBJEXT) \
-	cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) \
-	cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
-	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
-	cdo-Monarith.$(OBJEXT) cdo-Mrotuv.$(OBJEXT) \
-	cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
+	cdo-Fourier.$(OBJEXT) cdo-Gengrid.$(OBJEXT) \
+	cdo-Gradsdes.$(OBJEXT) cdo-Gridboxstat.$(OBJEXT) \
+	cdo-Gridcell.$(OBJEXT) cdo-Gridsearch.$(OBJEXT) \
+	cdo-Harmonic.$(OBJEXT) cdo-Hi.$(OBJEXT) \
+	cdo-Histogram.$(OBJEXT) cdo-Importamsr.$(OBJEXT) \
+	cdo-Importbinary.$(OBJEXT) cdo-Importcmsaf.$(OBJEXT) \
+	cdo-Importobs.$(OBJEXT) cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) \
+	cdo-Intgrid.$(OBJEXT) cdo-Intgridtraj.$(OBJEXT) \
+	cdo-Intlevel.$(OBJEXT) cdo-Intlevel3d.$(OBJEXT) \
+	cdo-Intntime.$(OBJEXT) cdo-Inttime.$(OBJEXT) \
+	cdo-Intyear.$(OBJEXT) cdo-Invert.$(OBJEXT) \
+	cdo-Invertlev.$(OBJEXT) cdo-Isosurface.$(OBJEXT) \
+	cdo-Kvl.$(OBJEXT) cdo-Log.$(OBJEXT) cdo-Maskbox.$(OBJEXT) \
+	cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) \
+	cdo-Mergegrid.$(OBJEXT) cdo-Mergetime.$(OBJEXT) \
+	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
+	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
 	cdo-Nmltest.$(OBJEXT) cdo-Output.$(OBJEXT) \
 	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
@@ -562,22 +562,22 @@ top_srcdir = @top_srcdir@
 #
 cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	CDItest.c CDIread.c CDIwrite.c Cat.c Change.c Change_e5slm.c \
-	Cloudlayer.c Command.c Comp.c Compc.c Complextorect.c Cond.c \
-	Cond2.c Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c \
-	Detrend.c Diff.c Distgrid.c Duplicate.c EOFs.c Eof3d.c \
-	EcaIndices.c Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c \
-	Ensstat3.c Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c \
-	Filedes.c Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c \
-	Fourier.c Gather.c Gengrid.c Gradsdes.c Gridboxstat.c \
-	Gridcell.c Gridsearch.c Harmonic.c Hi.c Histogram.c \
-	Importamsr.c Importbinary.c Importcmsaf.c Importobs.c Info.c \
-	Input.c Intgrid.c Intgridtraj.c Intlevel.c Intlevel3d.c \
-	Intntime.c Inttime.c Intyear.c Invert.c Invertlev.c \
-	Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c Math.c Merge.c \
-	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
-	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pack.c \
-	Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
-	Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
+	Cloudlayer.c Collgrid.c Command.c Comp.c Compc.c \
+	Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c Copy.c \
+	Deltime.c Derivepar.c Detrend.c Diff.c Distgrid.c Duplicate.c \
+	EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
+	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
+	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
+	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c Gradsdes.c \
+	Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c Hi.c \
+	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
+	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
+	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
+	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
+	Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c \
+	Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c \
+	Pack.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
+	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
 	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
@@ -794,6 +794,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Change.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Change_e5slm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Cloudlayer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Collgrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Command.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Comp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Compc.Po@am__quote@
@@ -829,7 +830,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Fldstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Fldstat2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Fourier.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Gather.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Gengrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Gradsdes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Gridboxstat.Po@am__quote@
@@ -1253,6 +1253,20 @@ cdo-Cloudlayer.obj: Cloudlayer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Cloudlayer.c' object='cdo-Cloudlayer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Cloudlayer.obj `if test -f 'Cloudlayer.c'; then $(CYGPATH_W) 'Cloudlayer.c'; else $(CYGPATH_W) '$(srcdir)/Cloudlayer.c'; fi`
+
+cdo-Collgrid.o: Collgrid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Collgrid.o -MD -MP -MF $(DEPDIR)/cdo-Collgrid.Tpo -c -o cdo-Collgrid.o `test -f 'Collgrid.c' || echo '$(srcdir)/'`Collgrid.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Collgrid.Tpo $(DEPDIR)/cdo-Collgrid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Collgrid.c' object='cdo-Collgrid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Collgrid.o `test -f 'Collgrid.c' || echo '$(srcdir)/'`Collgrid.c
+
+cdo-Collgrid.obj: Collgrid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Collgrid.obj -MD -MP -MF $(DEPDIR)/cdo-Collgrid.Tpo -c -o cdo-Collgrid.obj `if test -f 'Collgrid.c'; then $(CYGPATH_W) 'Collgrid.c'; else $(CYGPATH_W) '$(srcdir)/Collgrid.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Collgrid.Tpo $(DEPDIR)/cdo-Collgrid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Collgrid.c' object='cdo-Collgrid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Collgrid.obj `if test -f 'Collgrid.c'; then $(CYGPATH_W) 'Collgrid.c'; else $(CYGPATH_W) '$(srcdir)/Collgrid.c'; fi`
 
 cdo-Command.o: Command.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Command.o -MD -MP -MF $(DEPDIR)/cdo-Command.Tpo -c -o cdo-Command.o `test -f 'Command.c' || echo '$(srcdir)/'`Command.c
@@ -1743,20 +1757,6 @@ cdo-Fourier.obj: Fourier.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Fourier.c' object='cdo-Fourier.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Fourier.obj `if test -f 'Fourier.c'; then $(CYGPATH_W) 'Fourier.c'; else $(CYGPATH_W) '$(srcdir)/Fourier.c'; fi`
-
-cdo-Gather.o: Gather.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Gather.o -MD -MP -MF $(DEPDIR)/cdo-Gather.Tpo -c -o cdo-Gather.o `test -f 'Gather.c' || echo '$(srcdir)/'`Gather.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Gather.Tpo $(DEPDIR)/cdo-Gather.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Gather.c' object='cdo-Gather.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Gather.o `test -f 'Gather.c' || echo '$(srcdir)/'`Gather.c
-
-cdo-Gather.obj: Gather.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Gather.obj -MD -MP -MF $(DEPDIR)/cdo-Gather.Tpo -c -o cdo-Gather.obj `if test -f 'Gather.c'; then $(CYGPATH_W) 'Gather.c'; else $(CYGPATH_W) '$(srcdir)/Gather.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Gather.Tpo $(DEPDIR)/cdo-Gather.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Gather.c' object='cdo-Gather.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Gather.obj `if test -f 'Gather.c'; then $(CYGPATH_W) 'Gather.c'; else $(CYGPATH_W) '$(srcdir)/Gather.c'; fi`
 
 cdo-Gengrid.o: Gengrid.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Gengrid.o -MD -MP -MF $(DEPDIR)/cdo-Gengrid.Tpo -c -o cdo-Gengrid.o `test -f 'Gengrid.c' || echo '$(srcdir)/'`Gengrid.c

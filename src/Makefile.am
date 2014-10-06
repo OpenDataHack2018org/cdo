@@ -15,6 +15,7 @@ cdo_SOURCES += Adisit.c        \
                Change.c        \
                Change_e5slm.c  \
                Cloudlayer.c    \
+               Collgrid.c      \
                Command.c       \
                Comp.c          \
                Compc.c         \
@@ -50,7 +51,6 @@ cdo_SOURCES += Adisit.c        \
                Fldstat.c       \
                Fldstat2.c      \
                Fourier.c       \
-               Gather.c        \
                Gengrid.c       \
                Gradsdes.c      \
                Gridboxstat.c   \

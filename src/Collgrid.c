@@ -152,11 +152,11 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
     qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_lt);  
   else
     qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
-  /*
+
   if ( cdoVerbose )
     for ( fileID = 0; fileID < nfiles; fileID++ )
       printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
+
   nx = 1;
   for ( fileID = 1; fileID < nfiles; fileID++ )
     {
@@ -164,8 +164,23 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       else break;
     }
   ny = nfiles/nx;
+  if ( nx*ny < nfiles ) ny++;
   if ( cdoVerbose ) cdoPrint("nx %d  ny %d", nx, ny);
-
+  /*
+  ny = 1;
+  printf("nfiles = %d\n", nfiles);
+  for ( fileID = 1; fileID < nfiles; fileID++ )
+    {
+      printf("xyinfo[0].x, xyinfo[fileID].x %g %g\n", xyinfo[0].x, xyinfo[fileID].x);
+      printf("xyinfo[0].y, xyinfo[fileID].y %g %g\n", xyinfo[0].y, xyinfo[fileID].y);
+    }
+  for ( fileID = 1; fileID < nfiles; fileID++ )
+    {
+      if ( DBL_IS_EQUAL(xyinfo[0].x, xyinfo[fileID].x) ) ny++;
+      else break;
+    }
+  if ( cdoVerbose ) cdoPrint("nx %d  ny %d", nx, ny);
+  */
   xsize2 = 0;
   for ( i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
   ysize2 = 0;
@@ -258,7 +273,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 }
 
 
-void *Gather(void *argument)
+void *Collgrid(void *argument)
 {
   int varID, recID;
   int nrecs, nrecs0;
