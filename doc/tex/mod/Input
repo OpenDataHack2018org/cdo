@@ -20,8 +20,8 @@ input depends on the chosen operator.
 
 @BeginDescription
 Reads fields with ASCII numbers from standard input and stores them
-in @file{ofile}. The numbers read are exactly that ones which are 
-written out by @mod{output}.
+in @file{ofile}. The numbers read are exactly that ones which are written 
+out by the @mod{output} operator.
 @EndDescription
 @EndOperator
 
@@ -32,7 +32,8 @@ written out by @mod{output}.
 @BeginDescription
 Reads fields with ASCII numbers from standard input and stores them 
 in @file{ofile}. Each field should have a header of 8 integers (SERVICE likely).
-The numbers that are read are exactly that ones which are written out by @mod{outputsrv}.
+The numbers that are read are exactly that ones which are written out by 
+the @mod{outputsrv} operator.
 @EndDescription
 @EndOperator
 
@@ -43,7 +44,8 @@ The numbers that are read are exactly that ones which are written out by @mod{ou
 @BeginDescription
 Read fields with ASCII numbers from standard input and stores them 
 in @file{ofile}. Each field should have header of 4 integers (EXTRA likely).
-The numbers read are exactly that ones which are written out by @mod{outputext}.
+The numbers read are exactly that ones which are written out by 
+the @mod{outputext} operator.
 @EndDescription
 @EndOperator
 
@@ -55,9 +57,8 @@ STRING  Grid description file or name
 
 
 @BeginExample
-Assume an ASCII dataset contains a field on a global regular 
-grid with 32 longitudes and 16 latitudes (512 elements).
-To create a GRIB1 dataset from the ASCII dataset use:
+Assume an ASCII dataset contains a field on a global regular grid with 32 longitudes 
+and 16 latitudes (512 elements). To create a GRIB1 dataset from the ASCII dataset use:
 @BeginVerbatim
    cdo -f grb input,r32x16 ofile.grb < my_ascii_data
 @EndVerbatim
