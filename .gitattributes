@@ -65,8 +65,8 @@ doc/tex/cdo_ref_over.tex -text
 doc/tex/cdoprog.tex -text
 doc/tex/cleanup -text
 doc/tex/contributors.tex -text
-doc/tex/figures/gather.pdf -text
-doc/tex/figures/scatter.pdf -text
+doc/tex/figures/collgrid.pdf -text
+doc/tex/figures/distgrid.pdf -text
 doc/tex/grid.tex -text
 doc/tex/grids/cell.gmt -text
 doc/tex/grids/cell.grid -text
