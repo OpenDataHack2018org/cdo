@@ -164,23 +164,9 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       else break;
     }
   ny = nfiles/nx;
-  if ( nx*ny < nfiles ) ny++;
   if ( cdoVerbose ) cdoPrint("nx %d  ny %d", nx, ny);
-  /*
-  ny = 1;
-  printf("nfiles = %d\n", nfiles);
-  for ( fileID = 1; fileID < nfiles; fileID++ )
-    {
-      printf("xyinfo[0].x, xyinfo[fileID].x %g %g\n", xyinfo[0].x, xyinfo[fileID].x);
-      printf("xyinfo[0].y, xyinfo[fileID].y %g %g\n", xyinfo[0].y, xyinfo[fileID].y);
-    }
-  for ( fileID = 1; fileID < nfiles; fileID++ )
-    {
-      if ( DBL_IS_EQUAL(xyinfo[0].x, xyinfo[fileID].x) ) ny++;
-      else break;
-    }
-  if ( cdoVerbose ) cdoPrint("nx %d  ny %d", nx, ny);
-  */
+  if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) seems to be incomplete!", nfiles);
+ 
   xsize2 = 0;
   for ( i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
   ysize2 = 0;
@@ -378,17 +364,17 @@ void *Collgrid(void *argument)
 
   int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
+  /*
   if ( cdoVerbose )
     {
       vlistPrint(vlistID1);
       vlistPrint(vlistID2);
     }
-
+  */
   //int vlistID2 = vlistDuplicate(vlistID1);
   int nvars2 = vlistNvars(vlistID2);
   // int *vars  = (int*) malloc(nvars*sizeof(int));
   //for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
-
 
   int ngrids1 = vlistNgrids(vlistID1);
   int ngrids2 = vlistNgrids(vlistID2);
