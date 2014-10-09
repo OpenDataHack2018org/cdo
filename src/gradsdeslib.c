@@ -2059,7 +2059,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 
 /* set the global calendar and check if we are trying to change with a new file...
    we do this here to set the calandar for templating */
-  printf("cal365 %d %d \n", cal365, pfi->calendar);
   if (/*mfcmn.*/cal365<0) {
     /*mfcmn.*/cal365=pfi->calendar;
   } else {
