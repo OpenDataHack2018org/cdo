@@ -1,0 +1,60 @@
+\chapter{Introduction}
+
+The Climate Data Operators ({\CDO}) software is a collection of many operators
+for standard processing of climate and forecast model data.
+The operators include simple statistical and arithmetic functions, data selection
+and subsampling tools, and spatial interpolation.
+%{\CDO} is a collection of Operators to manipulate and analyse Climate model Data.
+%There are a lot of operators for doing standard processing like simple statistic,
+%arithmetic, selection and interpolation on datasets from climate and forecast models.
+%The operators are primarily designed to aid manipulation and analysis of gridded scientific data
+{\CDO} was developed to have the same set of processing functions for GRIB \cite{GRIB} and netCDF \cite{netCDF}
+datasets in one package.
+
+The Climate Data Interface \cite{CDI} is used for the fast and file format
+independent access to GRIB and netCDF datasets.
+The local \href{http://www.mpimet.mpg.de/}{MPI-MET} data formats SERVICE, EXTRA and 
+IEG are also supported.
+
+There are some limitations for GRIB and netCDF datasets.
+A GRIB dataset has to be consistent, similar to netCDF.
+That means all time steps need to have the same variables, and
+within a time step each variable may occur only once.
+NetCDF datasets are only supported for the classic data model and arrays up to 4 dimensions.
+These dimensions should only be used by the horizontal and vertical grid and the time.
+The netCDF attributes should follow the
+\href{http://ftp.unidata.ucar.edu/software/netcdf/docs/conventions.html}
+     {GDT, COARDS or CF Conventions}.
+
+The user interface and some operators are similar to the PINGO \cite{PINGO} package.
+% There are also some operators with the same name as in PINGO but with a 
+% different meaning. \htmlref{Appendix A}{appendixpingo} gives an overview of 
+% xsthose operators.
+
+The main {\CDO} features are:
+\begin{itemize}
+\item More than 400 operators available
+\item Modular design and easily extendable with new operators
+\item Very simple UNIX command line interface
+\item A dataset can be processed by several operators,
+      without storing the interim results in files % (No disk I/O).
+\item Most operators handle datasets with missing values
+\item Fast processing of large datasets
+\item Support of many different grid types
+\item Tested on many UNIX/Linux systems, Cygwin, and MacOS-X
+%item Free available and runs on all UNIX platforms.
+\end{itemize}
+
+\input{install}
+
+\input{usage}
+
+\input{grid}
+
+\input{zaxis}
+
+\input{time}
+
+\input{partab}
+
+\input{missval}

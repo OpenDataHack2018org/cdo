@@ -55,9 +55,11 @@ doc/parameter_table -text
 doc/tex/Modules -text
 doc/tex/appendix.tex -text
 doc/tex/bib.tex -text
+doc/tex/bibeca.tex -text
 doc/tex/cdo.tex -text
 doc/tex/cdo_adv.tex -text
 doc/tex/cdo_con.tex -text
+doc/tex/cdo_eca.tex -text
 doc/tex/cdo_int.tex -text
 doc/tex/cdo_openmp.tex -text
 doc/tex/cdo_ref.tex -text
@@ -65,6 +67,8 @@ doc/tex/cdo_ref_over.tex -text
 doc/tex/cdoprog.tex -text
 doc/tex/cleanup -text
 doc/tex/contributors.tex -text
+doc/tex/eca_int.tex -text
+doc/tex/eca_ref.tex -text
 doc/tex/figures/collgrid.pdf -text
 doc/tex/figures/distgrid.pdf -text
 doc/tex/grid.tex -text
@@ -85,6 +89,7 @@ doc/tex/logo/cdo_logo.pdf -text
 doc/tex/makedoc -text
 doc/tex/makehtml -text
 doc/tex/makepdf -text
+doc/tex/makepdfeca -text
 doc/tex/makerefcard -text
 doc/tex/missval.tex -text
 doc/tex/mod/Adisit -text
