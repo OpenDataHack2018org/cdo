@@ -1537,7 +1537,6 @@ static
 void processCloseStreams()
 {
   int nstream = processInqStreamNum();
-  printf("nstream %d\n", nstream);
   for ( int sindex = 0; sindex < nstream; sindex++ )
     {
       int pstreamID = processInqStreamID(sindex);
