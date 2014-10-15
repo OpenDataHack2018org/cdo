@@ -1544,7 +1544,6 @@ void processCloseStreams()
 
       if ( PSTREAM_Debug )
 	Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamID);
-	Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamID);
 
       if ( pstreamptr ) pstreamClose(pstreamID);
     }
