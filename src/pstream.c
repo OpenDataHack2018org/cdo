@@ -1533,12 +1533,28 @@ void cdoInitialize(void *argument)
   processDefArgument(argument);
 }
 
+static
+void processCloseStreams()
+{
+  int nstream = processInqStreamNum();
+  printf("nstream %d\n", nstream);
+  for ( int sindex = 0; sindex < nstream; sindex++ )
+    {
+      int pstreamID = processInqStreamID(sindex);
+      pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
+      if ( PSTREAM_Debug )
+	Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamID);
+	Message("process %d  stream %d  close streamID %d", processSelf(), sindex, pstreamID);
+
+      if ( pstreamptr ) pstreamClose(pstreamID);
+    }
+}
+
 
 void cdoFinish(void)
 {
   int processID = processSelf();
-  int sindex, pstreamID;
-  int nstream;
   INT64 nvals;
   int nvars, ntimesteps;
   char memstring[32] = {""};
@@ -1546,7 +1562,6 @@ void cdoFinish(void)
   double e_utime, e_stime;
   double c_cputime = 0, c_usertime = 0, c_systime = 0;
   double p_cputime = 0, p_usertime = 0, p_systime = 0;
-  pstream_t *pstreamptr;
 
 #if defined(HAVE_LIBPTHREAD)
   if ( PSTREAM_Debug )
@@ -1654,16 +1669,7 @@ void cdoFinish(void)
   fprintf(stderr, "\n");
 #endif
 
-  nstream = processInqStreamNum();
-  for ( sindex = 0; sindex < nstream; sindex++ )
-    {
-      pstreamID = processInqStreamID(sindex);
-      pstreamptr = pstream_to_pointer(pstreamID);
-      if ( PSTREAM_Debug )
-	Message("process %d  stream %d  close streamID %d", processID, sindex, pstreamID);
-
-      if ( pstreamptr ) pstreamClose(pstreamID);
-    }
+  processCloseStreams();
 
   processDelete();
 }
