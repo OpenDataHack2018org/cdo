@@ -48,6 +48,7 @@ void cdoAbort(const char *fmt, ...)
 
   va_end(args);
 
+  if ( _ExitOnError ) pstreamCloseAll();
   if ( _ExitOnError ) exit(EXIT_FAILURE);
 }
 

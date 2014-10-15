@@ -113,10 +113,8 @@ void pstream_list_delete(void)
 
 static
 void pstream_init_pointer(void)
-{
-  int  i;
-  
-  for ( i = 0; i < _pstream_max; i++ )
+{  
+  for ( int i = 0; i < _pstream_max; i++ )
     {
       _pstreamList[i].next = _pstreamList + i + 1;
       _pstreamList[i].idx  = i;
@@ -1533,8 +1531,25 @@ void cdoInitialize(void *argument)
   processDefArgument(argument);
 }
 
+
+void pstreamCloseAll(void)
+{
+  for ( int i = 0; i < _pstream_max; i++ )
+    {
+      pstream_t *pstreamptr = _pstreamList[i].ptr;
+      if ( pstreamptr && pstreamptr->isopen )
+	{
+	  if ( !pstreamptr->ispipe )
+	    {
+	      // printf("open file %s id %d pipe %d\n", pstreamptr->name, pstreamptr->fileID, pstreamptr->ispipe);
+	      streamClose(pstreamptr->fileID);
+	    }
+	}
+    }
+}
+
 static
-void processCloseStreams()
+void processClosePipes(void)
 {
   int nstream = processInqStreamNum();
   for ( int sindex = 0; sindex < nstream; sindex++ )
@@ -1667,7 +1682,7 @@ void cdoFinish(void)
   fprintf(stderr, "\n");
 #endif
 
-  processCloseStreams();
+  processClosePipes();
 
   processDelete();
 }
