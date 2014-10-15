@@ -992,7 +992,7 @@ void repl_filetypeext(char *file, const char *oldext, const char *newext)
   rm_ext(file, oldext);
 
   // add new file extension
-  strcat(file, ".ctl");
+  strcat(file, newext);
 }
 
 
@@ -1199,10 +1199,7 @@ void *Gradsdes(void *argument)
 
   /* ctl file name */
   strcpy(ctlfile, cdoStreamName(0)->args);
-  len = (int) strlen(ctlfile);
-      // TODO: that should be wrong for file names like a.nc = 4
-  if ( len > 4 )
-      repl_filetypeext(&ctlfile, filetypeext(filetype), ".ctl");
+  repl_filetypeext(&ctlfile, filetypeext(filetype), ".ctl");
 
   /* open ctl file*/
   gdp = fopen(ctlfile, "w");
@@ -1235,8 +1232,7 @@ void *Gradsdes(void *argument)
       fprintf(gdp, "DTYPE  GRIB\n");
 
       pctlfile = ctlfile;
-      len = (int) strlen(pctlfile);
-      strcpy(&pctlfile[len-4], ".gmp");
+      repl_filetypeext(pctlfile, ".ctl", ".gmp");
 
       if ( datfile[0] == '/' )
         fprintf(gdp, "INDEX  %s\n", pctlfile);
@@ -1257,8 +1253,7 @@ void *Gradsdes(void *argument)
 
       strcpy(idxfile, ctlfile);
       pidxfile = idxfile;
-      len = (int) strlen(pidxfile);
-      strcpy(&pidxfile[len-4], ".idx");
+      repl_filetypeext(pidxfile, ".ctl", ".idx");
 
       if ( datfile[0] == '/' )
         fprintf(gdp, "INDEX  %s\n", pidxfile);
