@@ -1534,6 +1534,8 @@ void cdoInitialize(void *argument)
 
 void pstreamCloseAll(void)
 {
+  if ( _pstreamList == NULL ) return;
+
   for ( int i = 0; i < _pstream_max; i++ )
     {
       pstream_t *pstreamptr = _pstreamList[i].ptr;
@@ -1541,7 +1543,9 @@ void pstreamCloseAll(void)
 	{
 	  if ( !pstreamptr->ispipe )
 	    {
-	      // printf("open file %s id %d pipe %d\n", pstreamptr->name, pstreamptr->fileID, pstreamptr->ispipe);
+	      if ( PSTREAM_Debug )
+		Message("Close file %s id %d\n", pstreamptr->name, pstreamptr->fileID);
+		Message("Close file %s id %d\n", pstreamptr->name, pstreamptr->fileID);
 	      streamClose(pstreamptr->fileID);
 	    }
 	}
