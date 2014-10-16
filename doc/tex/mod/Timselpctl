@@ -7,7 +7,7 @@
 @Operators = timselpctl
 
 @BeginDescription
-This operator computes percentile values over a selected number of time steps in @file{ifile1}.
+This operator computes percentile values over a selected number of timesteps in @file{ifile1}.
 The algorithm uses histograms with minimum and maximum bounds given in @file{ifile2} and @file{ifile3},
 respectively. The default number of histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files @file{ifile2} and @file{ifile3} 

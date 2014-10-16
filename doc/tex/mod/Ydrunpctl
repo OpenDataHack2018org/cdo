@@ -15,7 +15,7 @@ The algorithm uses histograms with minimum and maximum bounds given in @file{ifi
 respectively. The default number of histogram bins is 101. The default can be overridden
 by setting the environment variable @env{CDO_PCTL_NBINS} to a different value. The files @file{ifile2} 
 and @file{ifile3} should be the result of corresponding @mod{ydrunmin} and @mod{ydrunmax} operations, respectively.
-The date information in an output field is the date of the medium time step in the last 
+The date information in an output field is the date of the timestep in the middle of the last 
 contributing running window.
 Note that the operator have to be applied to a continuous time series of daily measurements 
 in order to yield physically meaningful results. Also note that the output time series begins
