@@ -721,7 +721,7 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
 	    cdoWarning("SZIP compression not available for non GRIB1/netCDF4 data!");
 
 	  if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
-	    cdoWarning("SZIP compression not available for non GRIB2 data!");
+	    cdoWarning("JPEG compression not available for non GRIB2 data!");
 
 	  if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
 	    cdoWarning("Deflate compression not available for non netCDF4 data!");
@@ -1544,8 +1544,7 @@ void pstreamCloseAll(void)
 	  if ( !pstreamptr->ispipe )
 	    {
 	      if ( PSTREAM_Debug )
-		Message("Close file %s id %d\n", pstreamptr->name, pstreamptr->fileID);
-		Message("Close file %s id %d\n", pstreamptr->name, pstreamptr->fileID);
+		Message("Close file %s id %d", pstreamptr->name, pstreamptr->fileID);
 	      streamClose(pstreamptr->fileID);
 	    }
 	}
