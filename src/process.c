@@ -323,11 +323,27 @@ const char *processInqPrompt(void)
 }
 
 #if defined(HAVE_GLOB_H)
+static
+int get_glob_flags(void)
+{
+  int glob_flags = 0;
+
+#if defined (GLOB_NOCHECK)
+  glob_flags |= GLOB_NOCHECK;
+#endif
+#if defined (GLOB_TILDE)
+  glob_flags |= GLOB_TILDE;
+#endif
+
+  return (glob_flags);
+}
+
 /* Convert a wildcard pattern into a list of blank-separated filenames which match the wildcard. */
+static
 argument_t *glob_pattern(const char *restrict wildcard)
 {
   size_t cnt, length = 0;
-  int glob_flags = GLOB_NOCHECK | GLOB_TILDE;
+  int glob_flags = get_glob_flags();
   glob_t glob_results;
   char **p;
   argument_t *argument = NULL;
@@ -568,7 +584,7 @@ char *expand_filename(const char *string)
   if ( find_wildcard(string, strlen(string)) )
     {
 #if defined(HAVE_GLOB_H)
-      int glob_flags = GLOB_NOCHECK | GLOB_TILDE;
+      int glob_flags = get_glob_flags();
       glob_t glob_results;
 
       glob(string, glob_flags, 0, &glob_results);

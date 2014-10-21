@@ -964,12 +964,12 @@ const char *filetypeext(int filetype)
 {
   switch ( filetype )
     {
-    case FILETYPE_GRB:  return (".grb");   break;
-    case FILETYPE_GRB2: return (".grb2");  break;
-    case FILETYPE_NC:   return (".nc");    break;
-    case FILETYPE_NC2:  return (".nc2");   break;
-    case FILETYPE_NC4:  return (".nc4");   break;
-    case FILETYPE_NC4C: return (".nc4c");  break;
+    case FILETYPE_GRB:
+    case FILETYPE_GRB2: return (".grb");   break;
+    case FILETYPE_NC:
+    case FILETYPE_NC2:
+    case FILETYPE_NC4:
+    case FILETYPE_NC4C: return (".nc");    break;
     case FILETYPE_SRV:  return (".srv");   break;
     case FILETYPE_EXT:  return (".ext");   break;
     case FILETYPE_IEG:  return (".ieg");   break;
@@ -1199,7 +1199,7 @@ void *Gradsdes(void *argument)
 
   /* ctl file name */
   strcpy(ctlfile, cdoStreamName(0)->args);
-  repl_filetypeext(&ctlfile, filetypeext(filetype), ".ctl");
+  repl_filetypeext(ctlfile, filetypeext(filetype), ".ctl");
 
   /* open ctl file*/
   gdp = fopen(ctlfile, "w");
