@@ -342,13 +342,11 @@ void *Maggraph(void *argument);
 #define  InttimeOperators       {"inttime"}
 #define  IntntimeOperators      {"intntime"}
 #define  IntyearOperators       {"intyear"}
-#define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", \
-                                 "invertlatdata", "invertlondata"}
+#define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", "invertlatdata", "invertlondata"}
 #define  InvertlevOperators     {"invertlev"}
 #define  IsosurfaceOperators    {"isosurface"}
 #define  KvlOperators           {"read_cmor_table", "conv_cmor_table"}
-#define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", \
-                                 "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
+#define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
@@ -457,8 +455,7 @@ void *Maggraph(void *argument);
 #define  VardupOperators        {"pardup", "parmul"}
 #define  VargenOperators        {"random", "const", "sincos", "coshill", "for", "topo", "temp", "mask", "stdatm"}
 #define  VarrmsOperators        {"varrms"}
-#define  VertintOperators       {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", \
-                                 "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
+#define  VertintOperators       {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertvar", "vertstd"}
 #define  VertwindOperators      {"vertwind"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
