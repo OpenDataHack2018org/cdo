@@ -503,7 +503,7 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
-#pragma omp atomic update
+#include "pragma_omp_atomic_update.h"
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);

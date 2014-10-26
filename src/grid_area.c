@@ -418,7 +418,7 @@ int gridGenArea(int gridID, double* area)
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
-#pragma omp atomic update
+#include "pragma_omp_atomic_update.h"
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize);
