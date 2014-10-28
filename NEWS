@@ -3,7 +3,6 @@ CDO NEWS
 
 Version 1.6.5 (23 October 2014):
 
-   New features:
    New operators:
      * distgrid: distribute horizonal grid
      * collgrid: collect horizontal grid
