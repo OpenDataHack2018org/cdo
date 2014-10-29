@@ -988,6 +988,142 @@ void line_integral(double *weights, double in_phi1, double in_phi2,
 
 }  /* line_integral */
 
+static
+void correct_pole(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv,
+		  double *src_centroid_lat, double *src_centroid_lon,
+		  double *tgt_centroid_lat, double *tgt_centroid_lon,
+		  grid_store_t *grid_store, int *link_add1[2], int *link_add2[2])
+{
+  /*
+     Correct for situations where N/S pole not explicitly included in
+     grid (i.e. as a grid corner point). If pole is missing from only
+     one grid, need to correct only the area and centroid of that 
+     grid.  If missing from both, do complete weight calculation.
+  */
+  long n;
+  long num_wts;
+  long src_grid_size;
+  long tgt_grid_size;
+  long src_grid_add;       /* current linear address for source grid cell   */
+  long tgt_grid_add;       /* current linear address for target grid cell   */
+  double weights[6];       /* local wgt array */
+
+  num_wts = rv->num_wts;
+
+  src_grid_size = src_grid->size;
+  tgt_grid_size = tgt_grid->size;
+
+  /* North Pole */
+  weights[0] =  PI2;
+  weights[1] =  PI*PI;
+  weights[2] =  ZERO;
+  weights[3] =  PI2;
+  weights[4] =  PI*PI;
+  weights[5] =  ZERO;
+
+  src_grid_add = -1;
+  /* pole_loop1 */
+  for ( n = 0; n < src_grid_size; ++n )
+    if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] > ZERO )
+      {
+	src_grid_add = n;
+#ifndef SX
+	break;
+#endif
+      }
+
+  tgt_grid_add = -1;
+  /* pole_loop2 */
+  for ( n = 0; n < tgt_grid_size; ++n )
+    if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] > ZERO )
+      {
+	tgt_grid_add = n;
+#ifndef SX
+	break;
+#endif
+      }
+
+  if ( src_grid_add != -1 )
+    {
+      src_grid->cell_area[src_grid_add] += weights[0];
+      src_centroid_lat[src_grid_add]    += weights[1];
+      src_centroid_lon[src_grid_add]    += weights[2];
+    }
+
+  if ( tgt_grid_add != -1 )
+    {
+      tgt_grid->cell_area[tgt_grid_add] += weights[3];
+      tgt_centroid_lat[tgt_grid_add]    += weights[4];
+      tgt_centroid_lon[tgt_grid_add]    += weights[5];
+    }
+
+  if ( src_grid_add != -1 && tgt_grid_add != -1 )
+    {
+      if ( remap_store_link_fast )
+	store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
+      else
+	store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
+
+      src_grid->cell_frac[src_grid_add] += weights[0];
+      tgt_grid->cell_frac[tgt_grid_add] += weights[3];
+    }
+
+  /* South Pole */
+  weights[0] =  PI2;
+  weights[1] = -PI*PI;
+  weights[2] =  ZERO;
+  weights[3] =  PI2;
+  weights[4] = -PI*PI;
+  weights[5] =  ZERO;
+
+  src_grid_add = -1;
+  /* pole_loop3 */
+  for ( n = 0; n < src_grid_size; ++n )
+    if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] < ZERO )
+      {
+	src_grid_add = n;
+#ifndef SX
+	break;
+#endif
+      }
+
+  tgt_grid_add = -1;
+  /* pole_loop4 */
+  for ( n = 0; n < tgt_grid_size; ++n )
+    if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] < ZERO )
+      {
+	tgt_grid_add = n;
+#ifndef SX
+	break;
+#endif
+      }
+
+  if ( src_grid_add != -1 )
+    {
+      src_grid->cell_area[src_grid_add] += weights[0];
+      src_centroid_lat[src_grid_add]    += weights[1];
+      src_centroid_lon[src_grid_add]    += weights[2];
+    }
+
+  if ( tgt_grid_add != -1 )
+    {
+      tgt_grid->cell_area[tgt_grid_add] += weights[3];
+      tgt_centroid_lat[tgt_grid_add]    += weights[4];
+      tgt_centroid_lon[tgt_grid_add]    += weights[5];
+    }
+
+  if ( src_grid_add != -1 && tgt_grid_add != -1 )
+    {
+      if ( remap_store_link_fast )
+	store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
+      else
+	store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
+
+      src_grid->cell_frac[src_grid_add] += weights[0];
+      tgt_grid->cell_frac[tgt_grid_add] += weights[3];
+    }
+}
+
 /*
   -----------------------------------------------------------------------
 
@@ -1592,116 +1728,11 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
      one grid, need to correct only the area and centroid of that 
      grid.  If missing from both, do complete weight calculation.
   */
+  correct_pole(src_grid, tgt_grid, rv,
+	       src_centroid_lat, src_centroid_lon,
+	       tgt_centroid_lat, tgt_centroid_lon,
+	       grid_store, link_add1, link_add2);
 
-  /* North Pole */
-  weights[0] =  PI2;
-  weights[1] =  PI*PI;
-  weights[2] =  ZERO;
-  weights[3] =  PI2;
-  weights[4] =  PI*PI;
-  weights[5] =  ZERO;
-
-  src_grid_add = -1;
-  /* pole_loop1 */
-  for ( n = 0; n < src_grid_size; ++n )
-    if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] > ZERO )
-      {
-	src_grid_add = n;
-#ifndef SX
-	break;
-#endif
-      }
-
-  tgt_grid_add = -1;
-  /* pole_loop2 */
-  for ( n = 0; n < tgt_grid_size; ++n )
-    if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] > ZERO )
-      {
-	tgt_grid_add = n;
-#ifndef SX
-	break;
-#endif
-      }
-
-  if ( src_grid_add != -1 )
-    {
-      src_grid->cell_area[src_grid_add]     += weights[0];
-      src_centroid_lat[src_grid_add] += weights[1];
-      src_centroid_lon[src_grid_add] += weights[2];
-    }
-
-  if ( tgt_grid_add != -1 )
-    {
-      tgt_grid->cell_area[tgt_grid_add]     += weights[3];
-      tgt_centroid_lat[tgt_grid_add] += weights[4];
-      tgt_centroid_lon[tgt_grid_add] += weights[5];
-    }
-
-  if ( src_grid_add != -1 && tgt_grid_add != -1 )
-    {
-      if ( remap_store_link_fast )
-	store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
-      else
-	store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
-
-      src_grid->cell_frac[src_grid_add] += weights[0];
-      tgt_grid->cell_frac[tgt_grid_add] += weights[3];
-    }
-
-  /* South Pole */
-  weights[0] =  PI2;
-  weights[1] = -PI*PI;
-  weights[2] =  ZERO;
-  weights[3] =  PI2;
-  weights[4] = -PI*PI;
-  weights[5] =  ZERO;
-
-  src_grid_add = -1;
-  /* pole_loop3 */
-  for ( n = 0; n < src_grid_size; ++n )
-    if ( src_grid->cell_area[n] < -THREE*PIH && src_grid->cell_center_lat[n] < ZERO )
-      {
-	src_grid_add = n;
-#ifndef SX
-	break;
-#endif
-      }
-
-  tgt_grid_add = -1;
-  /* pole_loop4 */
-  for ( n = 0; n < tgt_grid_size; ++n )
-    if ( tgt_grid->cell_area[n] < -THREE*PIH && tgt_grid->cell_center_lat[n] < ZERO )
-      {
-	tgt_grid_add = n;
-#ifndef SX
-	break;
-#endif
-      }
-
-  if ( src_grid_add != -1 )
-    {
-      src_grid->cell_area[src_grid_add]     += weights[0];
-      src_centroid_lat[src_grid_add] += weights[1];
-      src_centroid_lon[src_grid_add] += weights[2];
-    }
-
-  if ( tgt_grid_add != -1 )
-    {
-      tgt_grid->cell_area[tgt_grid_add]     += weights[3];
-      tgt_centroid_lat[tgt_grid_add] += weights[4];
-      tgt_centroid_lon[tgt_grid_add] += weights[5];
-    }
-
-  if ( src_grid_add != -1 && tgt_grid_add != -1 )
-    {
-      if ( remap_store_link_fast )
-	store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
-      else
-	store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
-
-      src_grid->cell_frac[src_grid_add] += weights[0];
-      tgt_grid->cell_frac[tgt_grid_add] += weights[3];
-    }
 
   if ( remap_store_link_fast )
     {

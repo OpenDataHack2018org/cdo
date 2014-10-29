@@ -569,31 +569,24 @@ int set_max_remaps(int vlistID)
 }
 
 static
-int get_norm_opt()
+int get_norm_opt(void)
 {
   int norm_opt = NORM_OPT_FRACAREA;
   char *envstr = getenv("CDO_REMAP_NORMALIZE_OPT");
 
   if ( envstr && *envstr )
     {
-      if      ( memcmp(envstr, "frac", 4) == 0 )
-	norm_opt = NORM_OPT_FRACAREA;
-      else if ( memcmp(envstr, "dest", 4) == 0 )
-	norm_opt = NORM_OPT_DESTAREA;
-      else if ( memcmp(envstr, "none", 4) == 0 )
-	norm_opt = NORM_OPT_NONE;
-      else
-	cdoWarning("CDO_REMAP_NORMALIZE_OPT=%s unsupported!", envstr);
+      if      ( memcmp(envstr, "frac", 4) == 0 ) norm_opt = NORM_OPT_FRACAREA;
+      else if ( memcmp(envstr, "dest", 4) == 0 ) norm_opt = NORM_OPT_DESTAREA;
+      else if ( memcmp(envstr, "none", 4) == 0 ) norm_opt = NORM_OPT_NONE;
+      else cdoWarning("CDO_REMAP_NORMALIZE_OPT=%s unsupported!", envstr);
     }
 
   if ( cdoVerbose )
     {
-      if ( norm_opt == NORM_OPT_FRACAREA )
-	cdoPrint("Normalization option: frac");
-      else if ( norm_opt == NORM_OPT_DESTAREA )
-	cdoPrint("Normalization option: dest");
-      else
-	cdoPrint("Normalization option: none");
+      if      ( norm_opt == NORM_OPT_FRACAREA ) cdoPrint("Normalization option: frac");
+      else if ( norm_opt == NORM_OPT_DESTAREA ) cdoPrint("Normalization option: dest");
+      else                                      cdoPrint("Normalization option: none");
     }
 
   return (norm_opt);
@@ -612,8 +605,9 @@ void remap_normalize(int norm_opt, int gridsize, double *array, double missval, 
 	  if ( !DBL_IS_EQUAL(array[i], missval) )
 	    {
 	      grid_err = tgt_grid->cell_frac[i]*tgt_grid->cell_area[i];
+
 	      if ( fabs(grid_err) > 0 )
-		array[i] = array[i]/grid_err;
+		array[i] /= grid_err;
 	      else
 		array[i] = missval;
 	    }
@@ -626,7 +620,7 @@ void remap_normalize(int norm_opt, int gridsize, double *array, double missval, 
 	  if ( !DBL_IS_EQUAL(array[i], missval) )
 	    {
 	      if ( fabs(tgt_grid->cell_frac[i]) > 0 )
-		array[i] = array[i]/tgt_grid->cell_frac[i];
+		array[i] /= tgt_grid->cell_frac[i];
 	      else
 		array[i] = missval;
 	    }
@@ -1183,7 +1177,7 @@ void *Remap(void *argument)
 
   streamClose(streamID2);
 
-  WRITE_REMAP:
+ WRITE_REMAP:
  
   if ( lwrite_remap ) 
     write_remap_scrip(cdoStreamName(1)->args, map_type, submap_type, num_neighbors, remap_order,
