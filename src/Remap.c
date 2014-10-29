@@ -217,7 +217,7 @@ int remap_genweights = TRUE;
 int lextrapolate = FALSE;
 int max_remaps = -1;
 int sort_mode = HEAP_SORT;
-double remap_area_min = 0;
+double remap_frac_min = 0;
 
 
 static
@@ -344,9 +344,9 @@ void get_remap_env(void)
       fval = atof(envstr);
       if ( fval > 0 )
 	{
-	  remap_area_min = fval;
+	  remap_frac_min = fval;
 	  if ( cdoVerbose )
-	    cdoPrint("Set REMAP_AREA_MIN to %g", remap_area_min);
+	    cdoPrint("Set REMAP_AREA_MIN to %g", remap_frac_min);
 	}
     }
 
@@ -627,12 +627,12 @@ void remap_normalize(int norm_opt, int gridsize, double *array, double missval, 
 	}
     }
 
-  if ( remap_area_min > 0 )
+  if ( remap_frac_min > 0 )
     {
       for ( i = 0; i < gridsize; i++ )
 	{
 	  //printf("%d %g %g\n", i, remaps[r].tgt_grid.cell_frac[i], remaps[r].tgt_grid.cell_area[i]);
-	  if ( tgt_grid->cell_frac[i] < remap_area_min ) array[i] = missval;
+	  if ( tgt_grid->cell_frac[i] < remap_frac_min ) array[i] = missval;
 	}
     }
 }
