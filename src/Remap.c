@@ -595,6 +595,7 @@ int get_norm_opt(void)
 static
 void remap_normalize(int norm_opt, int gridsize, double *array, double missval, remapgrid_t *tgt_grid)
 {
+  /* used only to check the result of remapcon */
   int i;
   double grid_err;
 
