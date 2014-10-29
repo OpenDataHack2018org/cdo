@@ -1121,10 +1121,11 @@ void *Remap(void *argument)
 
 	  gridsize2 = gridInqSize(gridID2);
 
-	  /* used only to check the result of remapcon */
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
 	    {
-	      remap_normalize(remaps[r].vars.norm_opt, gridsize2, array2, missval, &remaps[r].tgt_grid);
+	      /* used only to check the result of remapcon */
+	      if ( 0 ) remap_normalize(remaps[r].vars.norm_opt, gridsize2, array2, missval, &remaps[r].tgt_grid);
+
 	      remap_set_frac_min(gridsize2, array2, missval, &remaps[r].tgt_grid);
 	    }
 

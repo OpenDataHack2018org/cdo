@@ -1,3 +1,12 @@
+2015-02-19  Uwe Schulzweida
+
+	* using CDI library version 1.7.0
+	* Version 1.7.0 released
+
+2014-10-29  Uwe Schulzweida
+
+	* remapcon: deactivate call to remap_normalize() (bug fix)
+
 2014-10-26  Uwe Schulzweida
 
 	* replace >#pragma omp atomic update< by >#include "pragma_omp_atomic_update.h"<
