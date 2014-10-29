@@ -626,10 +626,14 @@ void remap_normalize(int norm_opt, int gridsize, double *array, double missval, 
 	    }
 	}
     }
+}
 
+static
+void remap_set_frac_min(int gridsize, double *array, double missval, remapgrid_t *tgt_grid)
+{
   if ( remap_frac_min > 0 )
     {
-      for ( i = 0; i < gridsize; i++ )
+      for ( int i = 0; i < gridsize; i++ )
 	{
 	  //printf("%d %g %g\n", i, remaps[r].tgt_grid.cell_frac[i], remaps[r].tgt_grid.cell_area[i]);
 	  if ( tgt_grid->cell_frac[i] < remap_frac_min ) array[i] = missval;
@@ -1119,7 +1123,10 @@ void *Remap(void *argument)
 
 	  /* used only to check the result of remapcon */
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
-	    remap_normalize(remaps[r].vars.norm_opt, gridsize2, array2, missval, &remaps[r].tgt_grid);
+	    {
+	      remap_normalize(remaps[r].vars.norm_opt, gridsize2, array2, missval, &remaps[r].tgt_grid);
+	      remap_set_frac_min(gridsize2, array2, missval, &remaps[r].tgt_grid);
+	    }
 
 	  if ( operfunc == REMAPSUM )
 	    {
