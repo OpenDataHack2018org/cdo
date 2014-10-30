@@ -532,6 +532,66 @@ int get_lonlat_circle_index(remapgrid_t *remap_grid)
 }
 
 
+
+static
+void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
+{
+  /* Include centroids in weights and normalize using destination area if requested */
+  long n;
+  long num_wts = rv->num_wts;
+  long num_links = rv->num_links;
+  long tgt_grid_add;       /* current linear address for target grid cell   */
+  double norm_factor = 0;  /* factor for normalizing wts */
+
+  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+    {
+#if defined(SX)
+#pragma vdir nodep
+#endif
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(num_wts, num_links, rv, tgt_grid)	\
+  private(n, tgt_grid_add, norm_factor)
+#endif
+      for ( n = 0; n < num_links; ++n )
+	{
+	  tgt_grid_add = rv->tgt_grid_add[n];
+
+          if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_grid_add], 0) )
+	    norm_factor = ONE/tgt_grid->cell_area[tgt_grid_add];
+          else
+            norm_factor = ZERO;
+
+	  rv->wts[n*num_wts] *= norm_factor;
+	}
+    }
+  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+    {
+#if defined(SX)
+#pragma vdir nodep
+#endif
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(num_wts, num_links, rv, tgt_grid)	\
+  private(n, tgt_grid_add, norm_factor)
+#endif
+      for ( n = 0; n < num_links; ++n )
+	{
+	  tgt_grid_add = rv->tgt_grid_add[n];
+
+          if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_grid_add], 0) )
+	    norm_factor = ONE/tgt_grid->cell_frac[tgt_grid_add];
+          else
+            norm_factor = ZERO;
+
+	  rv->wts[n*num_wts] *= norm_factor;
+	}
+    }
+  else if ( rv->norm_opt == NORM_OPT_NONE )
+    {
+    }
+}
+
 void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
@@ -551,7 +611,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   long   max_srch_cells;     /* num cells in restricted search arrays  */
   long   num_srch_cells;     /* num cells in restricted search arrays  */
   long   srch_corners;       /* num of corners of srch cells           */
-  double norm_factor = 0;    /* factor for normalizing wts */
   int*   srch_add;           /* global address of cells in srch arrays */
   int    i;
 
@@ -714,7 +773,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  double tgt_cell_bound_box[4];
 	  boundbox_from_corners_reg2d(tgt_grid_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon, tgt_grid->reg2d_corner_lat, tgt_cell_bound_box);
 	  restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
-	  if ( cdoVerbose )
+	  if ( 0 && cdoVerbose )
 	    printf("bound_box %ld  lon: %g %g lat: %g %g\n",
 		   tgt_grid_add, RAD2DEG*tgt_cell_bound_box[2],RAD2DEG*tgt_cell_bound_box[3],RAD2DEG*tgt_cell_bound_box[0],RAD2DEG*tgt_cell_bound_box[1] );
 	  num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
@@ -729,7 +788,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  double tgt_cell_bound_box[4];
 	  boundbox_from_corners1(tgt_grid_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat, tgt_cell_bound_box);
 	  restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
-	  if ( cdoVerbose )
+	  if ( 0 && cdoVerbose )
 	    printf("bound_box %ld  lon: %g %g lat: %g %g\n",
 		   tgt_grid_add, RAD2DEG*tgt_cell_bound_box[2],RAD2DEG*tgt_cell_bound_box[3],RAD2DEG*tgt_cell_bound_box[0],RAD2DEG*tgt_cell_bound_box[1] );
 	  num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
@@ -750,7 +809,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       sum_srch_cells += num_srch_cells;
 
-      if ( cdoVerbose )
+      if ( 0 && cdoVerbose )
 	printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
 
       if ( num_srch_cells == 0 ) continue;
@@ -952,7 +1011,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	{
 	  src_grid_add = srch_add[n];
 
-	  if ( cdoVerbose )
+	  if ( 0 && cdoVerbose )
 	    printf("tgt_grid_add %ld, src_grid_add %ld,  partial_weights[n] %g, tgt_area  %g\n", tgt_grid_add, src_grid_add, partial_weights[n], tgt_area);
 
 	  // src_grid_add = n;
@@ -991,7 +1050,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       // printf("area %d %g %g\n", tgt_grid_add, tgt_grid->cell_area[tgt_grid_add], tgt_area);
     }
 
-  if ( cdoVerbose )
+  if ( 0 && cdoVerbose )
     {
       printf("sum_srch_cells : %d\n", sum_srch_cells);
       printf("sum_srch_cells2: %d\n", sum_srch_cells2);
@@ -1031,56 +1090,9 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     }
 
   /* Normalize using destination area if requested */
+  normalize_weights(tgt_grid, rv);
 
   num_links = rv->num_links;
-
-  if ( rv->norm_opt == NORM_OPT_DESTAREA )
-    {
-#if defined(SX)
-#pragma vdir nodep
-#endif
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(num_wts, num_links, rv, tgt_grid)	\
-  private(n, tgt_grid_add, norm_factor)
-#endif
-      for ( n = 0; n < num_links; ++n )
-	{
-	  tgt_grid_add = rv->tgt_grid_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_grid_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_area[tgt_grid_add];
-          else
-            norm_factor = ZERO;
-
-	  rv->wts[n*num_wts] *= norm_factor;
-	}
-    }
-  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
-    {
-#if defined(SX)
-#pragma vdir nodep
-#endif
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(num_wts, num_links, rv, tgt_grid)	\
-  private(n, tgt_grid_add, norm_factor)
-#endif
-      for ( n = 0; n < num_links; ++n )
-	{
-	  tgt_grid_add = rv->tgt_grid_add[n];
-
-          if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_grid_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_frac[tgt_grid_add];
-          else
-            norm_factor = ZERO;
-
-	  rv->wts[n*num_wts] *= norm_factor;
-	}
-    }
-  else if ( rv->norm_opt == NORM_OPT_NONE )
-    {
-    }
 
   if ( cdoVerbose )
     cdoPrint("Total number of links = %ld", rv->num_links);

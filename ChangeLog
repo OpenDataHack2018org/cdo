@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2014-10-30  Uwe Schulzweida
+
+	* remapcon: reactivate normalize option destarea
+
 2014-10-29  Uwe Schulzweida
 
 	* remapcon: deactivate call to remap_normalize() (bug fix)
