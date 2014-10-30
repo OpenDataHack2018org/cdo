@@ -5,6 +5,7 @@
 #include "remap_store_link.h"
 
 
+
 /*
     This routine stores the address and weight for this link in the appropriate 
     address and weight arrays and resizes those arrays if necessary.
@@ -301,6 +302,15 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
 #include "clipping/geometry.h"
 
 static
+double gridcell_area(struct grid_cell cell)
+{
+  double area = huiliers_area(cell);
+  area /= (EarthRadius*EarthRadius);
+
+  return (area);
+}
+
+static
 void cdo_compute_overlap_areas(unsigned N,
 			       struct grid_cell *overlap_buffer,
 			       struct grid_cell *source_cells,
@@ -315,7 +325,7 @@ void cdo_compute_overlap_areas(unsigned N,
 
   for ( unsigned n = 0; n < N; n++ )
     {
-      partial_areas[n] = huiliers_area(overlap_buffer[n]);
+      partial_areas[n] = gridcell_area(overlap_buffer[n]);
     }
 
 #ifdef VERBOSE
@@ -455,7 +465,7 @@ void cdo_compute_concave_overlap_areas(unsigned N,
 
       for (unsigned n = 0; n < N; n++)
 	{
-	  partial_areas[n] += huiliers_area (overlap_buffer[n]);
+	  partial_areas[n] += gridcell_area(overlap_buffer[n]);
 	  // we cannot use pole_area because it is rather inaccurate for great circle
 	  // edges that are nearly circles of longitude
 	  //partial_areas[n] = pole_area (overlap_buffer[n]);
@@ -913,7 +923,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  cdo_compute_concave_overlap_areas(num_srch_cells, overlap_buffer, src_grid_cells, *tgt_grid_cell, cell_center_lon, cell_center_lat, partial_areas);
 	}
 
-      tgt_area = huiliers_area(*tgt_grid_cell);
+      tgt_area = gridcell_area(*tgt_grid_cell);
       // tgt_area = cell_area(tgt_grid_cell);
 
       for ( num_weights = 0, n = 0; n < num_srch_cells; ++n )
@@ -933,6 +943,9 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	partial_weights[n] = partial_areas[n] / tgt_area;
 
       correct_weights(num_weights, partial_weights);
+
+      for ( n = 0; n < num_weights; ++n )
+	partial_weights[n] *= tgt_area;
       //#endif
 
       for ( n = 0; n < num_weights; ++n )
@@ -972,9 +985,9 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 		src_grid->cell_area[src_grid_add] += partial_weights[n];
 	      }
 	    }
-
-	  tgt_grid->cell_area[tgt_grid_add] += partial_weights[n];
 	}
+      
+      tgt_grid->cell_area[tgt_grid_add] = tgt_area; 
       // printf("area %d %g %g\n", tgt_grid_add, tgt_grid->cell_area[tgt_grid_add], tgt_area);
     }
 
