@@ -1,6 +1,6 @@
    File format : netCDF
-    -1 : Institut Source   Ttype    Levels Num    Points Num Dtype : Parameter ID
-     1 : unknown  unknown  instant       1   1      2592   1  I16  : -1            
+    -1 : Institut Source   Ttype    Levels Num    Points Num Dtype : Parameter name
+     1 : unknown  unknown  instant       1   1      2592   1  I16  : tem           
    Grid coordinates :
      1 : lonlat                   : points=2592 (72x36)
                               lon : -177.5 to 177.5 by 5 degrees_east  circular

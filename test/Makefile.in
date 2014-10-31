@@ -494,7 +494,7 @@ CLEANFILES = `ls *.pyc`
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
                   $(top_srcdir)/config/tap-driver.sh
 
-TESTS = Cat.test Gridarea.test Detrend.test Genweights.test Remap.test \
+TESTS = Read_netcdf.test Cat.test Gridarea.test Detrend.test Genweights.test Remap.test \
         Select.test Spectral.test Timstat.test Vertint.test
 
 
