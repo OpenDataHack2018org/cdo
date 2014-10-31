@@ -11,11 +11,12 @@ FORMAT="-f srv -b 32"
 IFILES="testfile01"
 for FILE in $IFILES; do
   IFILE=netcdf_${FILE}.nc
-  OFILE=netcdf_${FILE}_sinfo_ref
-  $CDO sinfo $IFILE > $OFILE
-  OFILE=netcdf_${FILE}_info_ref
-  $CDO info $IFILE > $OFILE
+  OFILE=netcdf_${FILE}_sinfon_ref
+  $CDO sinfon $IFILE > $OFILE
+  OFILE=netcdf_${FILE}_infon_ref
+  $CDO infon $IFILE > $OFILE
 done
+exit
 ########################################################################
 #
 # Timstat
