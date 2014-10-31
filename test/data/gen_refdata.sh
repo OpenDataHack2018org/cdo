@@ -1,9 +1,21 @@
 #!/bin/sh
 #
-CDO=cdo
+CDO=cdo-1.6.4
 #
 FORMAT="-f srv -b 32"
 #
+########################################################################
+#
+# Test netCDF files
+#
+IFILES="testfile01"
+for FILE in $IFILES; do
+  IFILE=netcdf_${FILE}.nc
+  OFILE=netcdf_${FILE}_sinfo_ref
+  $CDO sinfo $IFILE > $OFILE
+  OFILE=netcdf_${FILE}_info_ref
+  $CDO info $IFILE > $OFILE
+done
 ########################################################################
 #
 # Timstat

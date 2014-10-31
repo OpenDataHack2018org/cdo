@@ -1,5 +1,6 @@
 INPUTDATA = ts_mm_5years hl_l19.grb t21_geosp_tsurf.grb bathy4.grb pl_data.grb detrend_data
 
+NETCDF_REF   = netcdf_testfile01_sinfo_ref netcdf_testfile01_info_ref
 TIMSTAT_REF  = timmin_ref timmax_ref timsum_ref timavg_ref timmean_ref timstd_ref timstd1_ref timvar_ref timvar1_ref
 SPECTRAL_REF = sp2gp_ref sp2gpl_ref gp2sp_ref gp2spl_ref
 VERTINT_REF  = ml2pl_ref

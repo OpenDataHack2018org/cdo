@@ -677,6 +677,9 @@ test/data/n32_con_ref -text
 test/data/n32_laf_ref -text
 test/data/n32_nn_ref -text
 test/data/n32_ycon_ref -text
+test/data/netcdf_testfile01.nc -text
+test/data/netcdf_testfile01_info_ref -text
+test/data/netcdf_testfile01_sinfo_ref -text
 test/data/pl_data.grb -text
 test/data/select1_ref -text
 test/data/select2_ref -text
