@@ -1379,7 +1379,7 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   if ( cdoTimer ) timer_start(timer_remap_con_l1);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) \
+#pragma omp parallel for default(shared) \
   shared(ompNumThreads, cdoTimer, nbins, num_wts, src_centroid_lon, src_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\
@@ -1604,7 +1604,7 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   findex = 0;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) \
+#pragma omp parallel for default(shared) \
   shared(ompNumThreads, cdoTimer, nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\

@@ -398,11 +398,23 @@ void cdo_compute_concave_overlap_areas(unsigned N,
   if ( target_node_x == NULL || target_node_y == NULL )
     cdoAbort("Internal problem (cdo_compute_concave_overlap_areas): missing target point coordinates!");
   */
+  /*
   struct grid_cell target_partial_cell =
     {.coordinates_x   = (double[3]){-1, -1, -1},
      .coordinates_y   = (double[3]){-1, -1, -1},
      .coordinates_xyz = (double[3*3]){-1, -1, -1},
      .edge_type       = (enum edge_type[3]) {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE},
+     .num_corners     = 3};
+  */
+  double coordinates_x[3] = {-1, -1, -1};
+  double coordinates_y[3] = {-1, -1, -1};
+  double coordinates_xyz[9] = {-1, -1, -1};
+  enum edge_type edge_types[3] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
+  struct grid_cell target_partial_cell =
+    {.coordinates_x   = coordinates_x,
+     .coordinates_y   = coordinates_y,
+     .coordinates_xyz = coordinates_xyz,
+     .edge_type       = edge_types,
      .num_corners     = 3};
 
   /* Do the clipping and get the cell for the overlapping area */
@@ -742,7 +754,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   int sum_srch_cells2 = 0;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) \
+#pragma omp parallel for default(shared) \
   shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, nx, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          rv, cdoVerbose, max_srch_cells2, tgt_num_cell_corners, target_cell_type, \
