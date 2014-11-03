@@ -3,6 +3,11 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2014-10-31  Uwe Schulzweida
+
+	* using CDI library version 1.6.5.1
+	* Version 1.6.5.1 released
+
 2014-10-30  Uwe Schulzweida
 
 	* remapcon: reactivate normalize option destarea
