@@ -265,8 +265,8 @@ int referenceToGrid(int gridID1)
 
       if ( gridID2 != -1 )
 	{
-	  char uuidOfHGrid1[16];
-	  char uuidOfHGrid2[16];
+	  unsigned char uuidOfHGrid1[CDI_UUID_SIZE];
+	  unsigned char uuidOfHGrid2[CDI_UUID_SIZE];
 
 	  memset(uuidOfHGrid1, 0, 16);
 	  memset(uuidOfHGrid2, 0, 16);
