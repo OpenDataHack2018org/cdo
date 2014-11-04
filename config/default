@@ -62,7 +62,7 @@ case "${HOSTNAME}" in
     hama*)
         CDOLIBS="--with-fftw3 \
                  --with-jasper=/opt/local \
-                 --with-grib_api=$HOME/local/gribapi-1.9.16 \
+                 --with-grib_api=$HOME/local/gribapi-1.13.0 \
                  --with-netcdf=/opt/local \
                  --with-hdf5=/opt/local \
                  --with-szlib=$HOME/local \
