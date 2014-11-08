@@ -20765,7 +20765,9 @@ fi
 done
 
 
-ac_config_files="$ac_config_files test/Read_netcdf.test test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test"
+ac_config_files="$ac_config_files test/Read_grib.test test/Read_netcdf.test"
+
+ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test"
 
 ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test"
 
@@ -21920,6 +21922,7 @@ do
     "src/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
+    "test/Read_grib.test") CONFIG_FILES="$CONFIG_FILES test/Read_grib.test" ;;
     "test/Read_netcdf.test") CONFIG_FILES="$CONFIG_FILES test/Read_netcdf.test" ;;
     "test/Cat.test") CONFIG_FILES="$CONFIG_FILES test/Cat.test" ;;
     "test/Gridarea.test") CONFIG_FILES="$CONFIG_FILES test/Gridarea.test" ;;
@@ -23422,6 +23425,7 @@ compiler_lib_search_path=$lt_compiler_lib_search_path_CXX
 _LT_EOF
 
  ;;
+    "test/Read_grib.test":F) chmod a+x "$ac_file" ;;
     "test/Read_netcdf.test":F) chmod a+x "$ac_file" ;;
     "test/Cat.test":F) chmod a+x "$ac_file" ;;
     "test/Gridarea.test":F) chmod a+x "$ac_file" ;;
