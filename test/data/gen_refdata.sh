@@ -6,9 +6,22 @@ FORMAT="-f srv -b 32"
 #
 ########################################################################
 #
+# Test GRIB files
+#
+IFILES="testfile01 testfile02"
+for FILE in $IFILES; do
+  IFILE=grib_${FILE}.grb
+  OFILE=grib_${FILE}_sinfon_ref
+  $CDO sinfo $IFILE > $OFILE
+  OFILE=grib_${FILE}_infon_ref
+  $CDO info $IFILE > $OFILE
+done
+#
+########################################################################
+#
 # Test netCDF files
 #
-IFILES="testfile01"
+IFILES="testfile01 testfile02"
 for FILE in $IFILES; do
   IFILE=netcdf_${FILE}.nc
   OFILE=netcdf_${FILE}_sinfon_ref

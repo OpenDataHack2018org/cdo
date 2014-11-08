@@ -664,6 +664,12 @@ test/data/detrend_ref -text
 test/data/gen_refdata.sh -text
 test/data/gp2sp_ref -text
 test/data/gp2spl_ref -text
+test/data/grib_testfile01.grb -text
+test/data/grib_testfile01_infon_ref -text
+test/data/grib_testfile01_sinfon_ref -text
+test/data/grib_testfile02.grb -text
+test/data/grib_testfile02_infon_ref -text
+test/data/grib_testfile02_sinfon_ref -text
 test/data/hl_l19.grb -text
 test/data/ml2pl_ref -text
 test/data/n16_bic_ref -text
@@ -681,6 +687,9 @@ test/data/n32_ycon_ref -text
 test/data/netcdf_testfile01.nc -text
 test/data/netcdf_testfile01_infon_ref -text
 test/data/netcdf_testfile01_sinfon_ref -text
+test/data/netcdf_testfile02.nc -text
+test/data/netcdf_testfile02_infon_ref -text
+test/data/netcdf_testfile02_sinfon_ref -text
 test/data/pl_data.grb -text
 test/data/select1_ref -text
 test/data/select2_ref -text
