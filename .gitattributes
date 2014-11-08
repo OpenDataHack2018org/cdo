@@ -665,11 +665,11 @@ test/data/gen_refdata.sh -text
 test/data/gp2sp_ref -text
 test/data/gp2spl_ref -text
 test/data/grib_testfile01.grb -text
-test/data/grib_testfile01_infon_ref -text
-test/data/grib_testfile01_sinfon_ref -text
+test/data/grib_testfile01_info_ref -text
+test/data/grib_testfile01_sinfo_ref -text
 test/data/grib_testfile02.grb -text
-test/data/grib_testfile02_infon_ref -text
-test/data/grib_testfile02_sinfon_ref -text
+test/data/grib_testfile02_info_ref -text
+test/data/grib_testfile02_sinfo_ref -text
 test/data/hl_l19.grb -text
 test/data/ml2pl_ref -text
 test/data/n16_bic_ref -text
