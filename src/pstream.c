@@ -971,7 +971,7 @@ int pstreamInqVlist(int pstreamID)
   return (vlistID);
 }
 
-
+static
 const char *cdoComment(void)
 {
   static char comment[256];
@@ -986,6 +986,7 @@ const char *cdoComment(void)
       size = strlen(CDO_Version);
 
       strncat(comment, CDO_Version, size);
+      comment[size] = 0;
     }
 
   return (comment);
