@@ -225,6 +225,9 @@ void filedes(int streamID)
     case FILETYPE_GRB:
       printf("  GRIB data\n");
       break;
+    case FILETYPE_GRB2:
+      printf("  GRIB2 data\n");
+      break;
     case FILETYPE_NC:
       printf("  netCDF data\n");
       break;

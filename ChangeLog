@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2014-11-11  Uwe Schulzweida
+
+	* filesdes: doesn't work for GRIB2 files [Bug #5307]
+
 2014-10-31  Uwe Schulzweida
 
 	* using CDI library version 1.6.5.1
