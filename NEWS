@@ -1,6 +1,12 @@
 CDO NEWS
 --------
 
+Version 1.7.0 (19 February 2015):
+
+   Fixed bugs:
+     * histcount: doesn't recognize missing values
+     * filesdes: doesn't work for GRIB2 files [Bug #5307]
+
 Version 1.6.5 (23 October 2014):
 
    New operators:

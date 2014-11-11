@@ -805,7 +805,7 @@ static char *SetpartabHelp[] = {
     "    ",
     "    The following parameter table entries are supported:",
     "    ",
-    "     Entry    & Type & Description      ",
+    "     Entry           & Type        & Description      ",
     "     name            & WORD        & Name of the variable",
     "     out_name        & WORD        & New name of the variable",
     "     param           & WORD        & Parameter identifier (GRIB1: code[.tabnum];  GRIB2: num[.cat[.dis]])",

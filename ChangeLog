@@ -5,6 +5,7 @@
 
 2014-11-11  Uwe Schulzweida
 
+	* histcount: doesn't recognize missing values (bug fix)
 	* filesdes: doesn't work for GRIB2 files [Bug #5307]
 
 2014-10-31  Uwe Schulzweida

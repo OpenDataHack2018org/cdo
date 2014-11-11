@@ -15,7 +15,7 @@ start with "\&parameter" and to end with "/".
 The following parameter table entries are supported:
 
 @BeginTable
- @bold{Entry}    & @bold{Type} & @bold{Description}      
+ @bold{Entry}           & @bold{Type}        & @bold{Description}      
  name            & WORD        & Name of the variable
  out_name        & WORD        & New name of the variable
  param           & WORD        & Parameter identifier (GRIB1: code[.tabnum];  GRIB2: num[.cat[.dis]])
