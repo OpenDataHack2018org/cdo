@@ -90,7 +90,7 @@ void *Sinfo(void *argument)
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  char *modelptr, *instptr;
+  const char *modelptr, *instptr;
   int streamID = 0;
   int vlistID;
   int datatype;
