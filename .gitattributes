@@ -688,6 +688,7 @@ test/data/n32_ycon_ref -text
 test/data/netcdf_testfile01.nc -text
 test/data/netcdf_testfile01_infon_ref -text
 test/data/netcdf_testfile01_sinfon_ref -text
+test/data/netcdf_testfile01c -text
 test/data/netcdf_testfile02.nc -text
 test/data/netcdf_testfile02_infon_ref -text
 test/data/netcdf_testfile02_sinfon_ref -text
