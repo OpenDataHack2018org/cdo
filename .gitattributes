@@ -688,7 +688,6 @@ test/data/n32_ycon_ref -text
 test/data/netcdf_testfile01.nc -text
 test/data/netcdf_testfile01_infon_ref -text
 test/data/netcdf_testfile01_sinfon_ref -text
-test/data/netcdf_testfile01c -text
 test/data/netcdf_testfile02.nc -text
 test/data/netcdf_testfile02_infon_ref -text
 test/data/netcdf_testfile02_sinfon_ref -text
@@ -701,6 +700,7 @@ test/data/select5_ref -text
 test/data/sp2gp_ref -text
 test/data/sp2gpl_ref -text
 test/data/t21_geosp_tsurf.grb -text
+test/data/testfile01c.nc -text
 test/data/timavg_ref -text
 test/data/timmax_ref -text
 test/data/timmean_ref -text
