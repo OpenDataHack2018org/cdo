@@ -5,7 +5,7 @@ export
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
                   $(top_srcdir)/config/tap-driver.sh
 
-TESTS = Read_grib.test Read_netcdf.test Cat.test Gridarea.test Detrend.test Genweights.test Remap.test \
+TESTS = Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test Genweights.test Remap.test \
         Select.test Spectral.test Timstat.test Vertint.test
 
 #        $(top_srcdir)/test/test_Remap.sh \
