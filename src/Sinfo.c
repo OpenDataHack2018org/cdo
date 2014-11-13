@@ -178,6 +178,7 @@ void *Sinfo(void *argument)
 	  else if ( tsteptype == TSTEP_INSTANT3 ) fprintf(stdout, "%-8s ", "instant");
 	  else if ( tsteptype == TSTEP_MIN      ) fprintf(stdout, "%-8s ", "min");
 	  else if ( tsteptype == TSTEP_MAX      ) fprintf(stdout, "%-8s ", "max");
+	  else if ( tsteptype == TSTEP_AVG      ) fprintf(stdout, "%-8s ", "avg");
 	  else if ( tsteptype == TSTEP_ACCUM    ) fprintf(stdout, "%-8s ", "accum");
 	  else if ( tsteptype == TSTEP_RANGE    ) fprintf(stdout, "%-8s ", "range");
 	  else if ( tsteptype == TSTEP_DIFF     ) fprintf(stdout, "%-8s ", "diff");
