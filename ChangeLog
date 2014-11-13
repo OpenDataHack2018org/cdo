@@ -3,6 +3,11 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2014-11-12  Uwe Schulzweida
+
+	* using CDI library version 1.6.5.2
+	* Version 1.6.5.2 released
+
 2014-11-11  Uwe Schulzweida
 
 	* histcount: doesn't recognize missing values (bug fix)
