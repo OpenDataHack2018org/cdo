@@ -5,8 +5,8 @@ CDO=src/cdo
 #
 RMODS="bil bic nn con ycon"
 #
-#cdo -setrtomiss,0,10000 -topo topo05
-cdo -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
+#$CDO -setrtomiss,0,10000 -topo topo05
+$CDO -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
 #
 IFILE=topo005
 #
@@ -19,7 +19,7 @@ for RMOD in $RMODS; do
     OFILE=${IFILE}_${RMOD}_${OTYPE}
     $CDO remap${RMOD},global_0.5 ${GRIDTYPE} $IFILE ${OFILE}
   done
-  cdo diff ${IFILE}_${RMOD}_?
+  $CDO diff ${IFILE}_${RMOD}_?
 done
 ####################################################
 #
@@ -70,6 +70,19 @@ done
 #         bil    bic    nn   con   ycon
 # reg2d   0.8    1.7   1.1   217    139
 # curv     44     45   117   204    280
+#
+# result on bull: gcc 4.8.2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.8    1.6   1.0   227    134
+# curv     40     40    94   227    275
+#
+#
+# result on bull: icc 14.0.2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.7    1.6   0.9   297    101
+# curv     45     46    96   298    214
 #
 # result on blizzard: (interactiv)
 # ==================
