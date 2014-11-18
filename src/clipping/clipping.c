@@ -461,8 +461,8 @@ static void get_edge_middle_point(double a[3], double b[3],
   };
 }
 
-static struct grid_cell curr_target_cell;
-static struct grid_cell curr_source_cell;
+//static struct grid_cell curr_target_cell;
+//static struct grid_cell curr_source_cell;
 
 /**
  * cell clipping using Sutherland–Hodgman algorithm;
@@ -1015,8 +1015,8 @@ void cell_clipping(unsigned N,
          (fabs(target_cell.coordinates_y[0]) >
           fabs(source_cell[n].coordinates_y[0])))) {
 
-      curr_target_cell = source_cell[n];
-      curr_source_cell = target_cell;
+      // curr_target_cell = source_cell[n];
+      //  curr_source_cell = target_cell;
 
       copy_point_list(target_list, &temp_list);
 
@@ -1051,8 +1051,8 @@ void cell_clipping(unsigned N,
 
     } else {
 
-      curr_target_cell = target_cell;
-      curr_source_cell = source_cell[n];
+      // curr_target_cell = target_cell;
+      //  curr_source_cell = source_cell[n];
 
       point_list_clipping(&source_list, source_ordering,
                           target_list, target_ordering, nct, norm_vec);

@@ -819,7 +819,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 					  tgt_cell_bound_box_r, src_grid->cell_bound_box, src_grid_size, srch_add);
 	}
 
-      sum_srch_cells += num_srch_cells;
+      if ( 0 && cdoVerbose ) sum_srch_cells += num_srch_cells;
 
       if ( 0 && cdoVerbose )
 	printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
@@ -1008,7 +1008,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	    }
 	}
 
-      sum_srch_cells2 += num_weights;
+      if ( 0 && cdoVerbose ) sum_srch_cells2 += num_weights;
 
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] = partial_areas[n] / tgt_area;
