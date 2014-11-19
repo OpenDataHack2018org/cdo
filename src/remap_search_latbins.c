@@ -1,16 +1,46 @@
 #include "cdo.h"
 #include "remap.h"
-
+/*
 #if defined(_OPENMP)
 #  include <omp.h>
 #endif
-
+*/
 
 void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, const restr_t* restrict cell_bound_box, int* restrict bin_addr)
 {
   long n, n2, nele, nele4;
   restr_t cell_bound_box_lat1, cell_bound_box_lat2;
-  /*
+
+  for ( n = 0; n < nbins; ++n )
+    {
+      n2 = n<<1;
+      bin_addr[n2  ] = gridsize;
+      bin_addr[n2+1] = 0;
+    }
+
+  for ( nele = 0; nele < gridsize; ++nele )
+    {
+      nele4 = nele<<2;
+      cell_bound_box_lat1 = cell_bound_box[nele4  ];
+      cell_bound_box_lat2 = cell_bound_box[nele4+1];
+      for ( n = 0; n < nbins; ++n )
+	{
+	  n2 = n<<1;
+	  if ( cell_bound_box_lat1 <= bin_lats[n2+1] &&
+	       cell_bound_box_lat2 >= bin_lats[n2  ] )
+	    {
+	      bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
+	      bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
+	    }
+	}
+    }
+}
+
+/*
+void calc_bin_addr_omp(long gridsize, long nbins, const restr_t* restrict bin_lats, const restr_t* restrict cell_bound_box, int* restrict bin_addr)
+{
+  long n, n2, nele, nele4;
+  restr_t cell_bound_box_lat1, cell_bound_box_lat2;
 #if defined(_OPENMP)
   extern int ompNumThreads;
   restr_t (*omp_bin_addr)[ompNumThreads] = malloc(nbins*sizeof(*omp_bin_addr));
@@ -23,7 +53,7 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, 
 	omp_bin_addr[ompthID][n2+1] = 0;
       }
 #endif
-  */
+
   for ( n = 0; n < nbins; ++n )
     {
       n2 = n<<1;
@@ -31,18 +61,15 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, 
       bin_addr[n2+1] = 0;
     }
 
-  /*
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   private(n, n2, nele4, cell_bound_box_lat1, cell_bound_box_lat2)  \
-  shared(gridsize, nbins, bin_lats, cell_bound_box, bin_addr)
-  //  shared(gridsize, nbins, bin_lats, cell_bound_box, omp_bin_addr)
+  shared(gridsize, nbins, bin_lats, cell_bound_box, omp_bin_addr)
 #endif
-  */
   for ( nele = 0; nele < gridsize; ++nele )
     {
 #if defined(_OPENMP)
-      //      int ompthID = omp_get_thread_num();
+      int ompthID = omp_get_thread_num();
 #endif
       nele4 = nele<<2;
       cell_bound_box_lat1 = cell_bound_box[nele4  ];
@@ -53,19 +80,16 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, 
 	  if ( cell_bound_box_lat1 <= bin_lats[n2+1] &&
 	       cell_bound_box_lat2 >= bin_lats[n2  ] )
 	    {
-	      /*
 #if defined(_OPENMP)
 	      omp_bin_addr[ompthID][n2  ] = MIN(nele, omp_bin_addr[ompthID][n2  ]);
 	      omp_bin_addr[ompthID][n2+1] = MAX(nele, omp_bin_addr[ompthID][n2+1]);
 #else
-	      */
 	      bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
 	      bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
-	      //#endif
+#endif
 	    }
 	}
     }
-  /*
 #if defined(_OPENMP)
   for ( int ompthID = 0; ompthID < ompNumThreads; ++ompthID )
     {
@@ -79,9 +103,8 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, 
 
   free(omp_bin_addr);
 #endif
-  */
 }
-
+*/
 
 void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
 {
