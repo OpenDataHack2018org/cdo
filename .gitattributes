@@ -692,6 +692,7 @@ test/data/netcdf_testfile01_sinfon_ref -text
 test/data/netcdf_testfile02.nc -text
 test/data/netcdf_testfile02_infon_ref -text
 test/data/netcdf_testfile02_sinfon_ref -text
+test/data/pl_data -text
 test/data/pl_data.grb -text
 test/data/select1_ref -text
 test/data/select2_ref -text
