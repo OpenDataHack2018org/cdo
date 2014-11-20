@@ -10,6 +10,7 @@
 
 2014-11-20  Uwe Schulzweida
 
+	* outputtab: added key timestep
 	* selrec: abort if used in combination with other operators
 
 2014-11-19  Uwe Schulzweida

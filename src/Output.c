@@ -54,6 +54,7 @@ void *Output(void *argument)
   int nmiss, nout;
   int nlon, nlat;
   int nelem = 1;
+  int len;
   int index;
   int ndiffgrids;
   const char *format = NULL;
@@ -66,15 +67,14 @@ void *Output(void *argument)
   double missval;
   double lon, lat;
   char name[CDI_MAX_NAME];
-  int len;
   int npar = 0;
   int year, month, day;
   char **parnames = NULL;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
-  int Keylen[]           = {     8,      11,      4,      8,     6,     6,     6,      4,      4,     10,      8,      5,       2,     2 };
-  enum                     {kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  kdate,  ktime,  kyear,  kmonth,  kday };
-  const char *Keynames[] = {"value", "param", "code", "name", "lon", "lat", "lev", "xind", "yind", "date", "time", "year", "month", "day"};
+  int Keylen[]           = {     8,      11,      4,      8,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
+  enum                     {kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
+  const char *Keynames[] = {"value", "param", "code", "name", "lon", "lat", "lev", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
 
 
   cdoInitialize(argument);
@@ -89,6 +89,8 @@ void *Output(void *argument)
   OUTPUTARR = cdoOperatorAdd("outputarr", 0, 0, NULL);
   OUTPUTXYZ = cdoOperatorAdd("outputxyz", 0, 0, NULL);
   OUTPUTTAB = cdoOperatorAdd("outputtab", 0, 0, NULL);
+
+  UNUSED(OUTPUT);
 
   operatorID = cdoOperatorID();
 
@@ -110,7 +112,7 @@ void *Output(void *argument)
 
       if ( cdoVerbose )
 	for ( i = 0; i < npar; i++ )
-	  printf("key %d = %s\n", i+1, parnames[i]);
+	  cdoPrint("key %d = %s", i+1, parnames[i]);
 
       keys = (int*) malloc(npar*sizeof(int));
       nkeys = 0;
@@ -125,7 +127,7 @@ void *Output(void *argument)
 	      if ( strncmp(parnames[i], Keynames[k], len) == 0 )
 		{
 		  keys[nkeys++] = k;
-		  if ( parnames[i][len] && isdigit(parnames[i][len]) ) Keylen[k] = atoi(&parnames[i][len]);
+		  if ( parnames[i][len] == ':' && isdigit(parnames[i][len+1]) ) Keylen[k] = atoi(&parnames[i][len+1]);
 		  break;
 		}
 	    }
@@ -135,7 +137,7 @@ void *Output(void *argument)
  
       if ( cdoVerbose )
 	for ( k = 0; k < nkeys; ++k )
-	  printf("keynr = %d  keyid = %d  keyname = %s\n", k, keys[k], Keynames[keys[k]]);
+	  cdoPrint("keynr = %d  keyid = %d  keylen = %d  keyname = %s", k, keys[k], Keylen[keys[k]], Keynames[keys[k]]);
     }
 
   for ( indf = 0; indf < cdoStreamCnt(); indf++ )
@@ -274,12 +276,11 @@ void *Output(void *argument)
 		}
 	      else if ( operatorID == OUTPUTTAB )
 		{
-		  int xsize, ysize;
 		  int xind, yind;
 		  int l2d = FALSE;
 
-		  xsize = gridInqXsize(gridID);
-		  ysize = gridInqYsize(gridID);
+		  int xsize = gridInqXsize(gridID);
+		  // int ysize = gridInqYsize(gridID);
 		  if ( gridtype == GRID_CURVILINEAR ) l2d = TRUE;
 		      
 		  for ( i = 0; i < gridsize; i++ )
@@ -293,20 +294,21 @@ void *Output(void *argument)
 		      for ( k = 0; k < nkeys; ++k )
 			{
 			  len = Keylen[keys[k]];
-			  if      ( keys[k] == kvalue ) fprintf(stdout, "%*g ", len, array[i]);
-			  else if ( keys[k] == kparam ) fprintf(stdout, "%*s ", len, paramstr);
-			  else if ( keys[k] == kcode  ) fprintf(stdout, "%*d ", len, code);
-			  else if ( keys[k] == kname  ) fprintf(stdout, "%*s ", len, name);
-			  else if ( keys[k] == klon   ) fprintf(stdout, "%*g ", len, lon);
-			  else if ( keys[k] == klat   ) fprintf(stdout, "%*g ", len, lat);
-			  else if ( keys[k] == klev   ) fprintf(stdout, "%*g ", len, level);
-			  else if ( keys[k] == kxind  ) fprintf(stdout, "%*d ", len, xind+1);
-			  else if ( keys[k] == kyind  ) fprintf(stdout, "%*d ", len, yind+1);
-			  else if ( keys[k] == kdate  ) fprintf(stdout, "%*s ", len, vdatestr);
-			  else if ( keys[k] == ktime  ) fprintf(stdout, "%*s ", len, vtimestr);
-			  else if ( keys[k] == kyear  ) fprintf(stdout, "%*d ", len, year);
-			  else if ( keys[k] == kmonth ) fprintf(stdout, "%*d ", len, month);
-			  else if ( keys[k] == kday   ) fprintf(stdout, "%*d ", len, day);
+			  if      ( keys[k] == kvalue    ) fprintf(stdout, "%*g ", len, array[i]);
+			  else if ( keys[k] == kparam    ) fprintf(stdout, "%*s ", len, paramstr);
+			  else if ( keys[k] == kcode     ) fprintf(stdout, "%*d ", len, code);
+			  else if ( keys[k] == kname     ) fprintf(stdout, "%*s ", len, name);
+			  else if ( keys[k] == klon      ) fprintf(stdout, "%*g ", len, lon);
+			  else if ( keys[k] == klat      ) fprintf(stdout, "%*g ", len, lat);
+			  else if ( keys[k] == klev      ) fprintf(stdout, "%*g ", len, level);
+			  else if ( keys[k] == kxind     ) fprintf(stdout, "%*d ", len, xind+1);
+			  else if ( keys[k] == kyind     ) fprintf(stdout, "%*d ", len, yind+1);
+			  else if ( keys[k] == ktimestep ) fprintf(stdout, "%*d ", len, tsID+1);
+			  else if ( keys[k] == kdate     ) fprintf(stdout, "%*s ", len, vdatestr);
+			  else if ( keys[k] == ktime     ) fprintf(stdout, "%*s ", len, vtimestr);
+			  else if ( keys[k] == kyear     ) fprintf(stdout, "%*d ", len, year);
+			  else if ( keys[k] == kmonth    ) fprintf(stdout, "%*d ", len, month);
+			  else if ( keys[k] == kday      ) fprintf(stdout, "%*d ", len, day);
 			}
 		      fprintf(stdout, "\n");
 		    }
