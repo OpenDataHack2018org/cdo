@@ -1490,6 +1490,10 @@ void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 
   pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
   pstreamptr_src  = pstream_to_pointer(pstreamIDsrc);
+
+  if ( pstreamptr_dest->ispipe || pstreamptr_src->ispipe )
+    cdoAbort("This operator can't be combined with other operators!");
+
   /*
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr_dest->ispipe || pstreamptr_src->ispipe )
