@@ -195,6 +195,7 @@ doc/tex/mod/Monstat -text
 doc/tex/mod/Ninfo -text
 doc/tex/mod/Output -text
 doc/tex/mod/Outputgmt -text
+doc/tex/mod/Outputtab -text
 doc/tex/mod/Regres -text
 doc/tex/mod/Remap -text
 doc/tex/mod/Remapeta -text

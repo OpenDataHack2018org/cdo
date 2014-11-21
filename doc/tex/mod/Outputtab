@@ -1,0 +1,80 @@
+@BeginModule
+@NewPage
+@Name      = Outputtab
+@Title     = Table output
+@Section   = Import/Export
+@Arguments = ifiles ofile
+@Operators = outputtab
+
+@BeginDescription
+This operator prints a table of all input datasets to standard output.
+@file{ifiles} is an arbitrary number of input files. All input files need to have 
+the same structure with the same variables on different timesteps.
+All input fields need to have the same horizontal grid.
+
+The contents of the table depends on the chosen paramters. The format of each table
+parameter is keyname[:len]. len is the optional length of a table entry.  
+Here is a list a all valid keynames:
+
+@BeginTable
+ @bold{Keyname}    & @bold{Type}    & @bold{Description}      
+ value      & FLOAT   & Value of the variable [len:8]
+ name       & STRING  & Name of the variable [len:8]
+ param      & STRING  & Parameter ID (GRIB1: code[.tabnum]; GRIB2: num[.cat[.dis]]) [len:11]
+ code       & INTEGER & Code number [len:4]
+ lon        & FLOAT   & Longitude coordinate [len:6]
+ lat        & FLOAT   & Latitude coordinate [len:6]
+ lev        & FLOAT   & Vertical level [len:6]
+ xind       & INTEGER & Grid x index [len:4]
+ yind       & INTEGER & Grid y index [len:4]
+ timestep   & INTEGER & Timestep number [len:6]
+ date       & STRING  & Date (format YYYY-MM-DD) [len:10]
+ time       & STRING  & Time (format hh:mm:ss) [len:8]
+ year       & INTEGER & Year [len:5]
+ month      & INTEGER & Month [len:2]
+ day        & INTEGER & Day [len:2]
+ nohead     & INTEGER & Disable output of header line
+@EndTable
+@EndDescription
+@EndModule
+
+
+@BeginOperator_outputtab
+@Title     = Table output
+@Parameter = params
+@EndOperator
+
+
+@BeginParameter
+@Item = params
+STRING   Comma separated list of keynames, one for each column of the table
+@EndParameter
+
+
+@BeginExample
+To print a table with name, date, lon, lat and value information use: 
+@BeginVerbatim
+cdo  outputtab,name,date,lon,lat,value  ifile
+@EndVerbatim
+Here is an example output of a time series with the yearly mean temperatur at lon=10/lat=53.5:
+@BeginListing
+#   name       date    lon    lat    value 
+   tsurf  1991-12-31     10   53.5  8.83903 
+   tsurf  1992-12-31     10   53.5  8.17439 
+   tsurf  1993-12-31     10   53.5  7.90489 
+   tsurf  1994-12-31     10   53.5  10.0216 
+   tsurf  1995-12-31     10   53.5  9.07798 
+@EndListing
+@C   tsurf  1995-01-31     10   53.5  275.245 
+@C   tsurf  1995-02-28     10   53.5  274.399 
+@C   tsurf  1995-03-31     10   53.5  273.293 
+@C   tsurf  1995-04-30     10   53.5  281.058 
+@C   tsurf  1995-05-31     10   53.5   285.38 
+@C   tsurf  1995-06-30     10   53.5  291.129 
+@C   tsurf  1995-07-31     10   53.5  292.489 
+@C   tsurf  1995-08-31     10   53.5  293.001 
+@C   tsurf  1995-09-30     10   53.5  287.858 
+@C   tsurf  1995-10-31     10   53.5  282.808 
+@C   tsurf  1995-11-30     10   53.5  277.614 
+@C   tsurf  1995-12-31     10   53.5  272.462 
+@EndExample
