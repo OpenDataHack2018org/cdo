@@ -17,7 +17,7 @@ for STAT in $STATS; do
 
   OFILE=stat${STAT}_res
 
-  for VAR in -1000 -77 -1 0 1 77 1000; do
+  for VAR in -777 -1 0 1 777; do
     VAL=1
     CFILE=constval
     $CDO -f srv -b 64 const,$VAL,$IFILE $CFILE
