@@ -20771,7 +20771,7 @@ ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweigh
 
 ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test"
 
-ac_config_files="$ac_config_files test/Detrend.test"
+ac_config_files="$ac_config_files test/Detrend.test test/Arith.test"
 
 ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings"
 
@@ -21934,6 +21934,7 @@ do
     "test/Timstat.test") CONFIG_FILES="$CONFIG_FILES test/Timstat.test" ;;
     "test/Vertint.test") CONFIG_FILES="$CONFIG_FILES test/Vertint.test" ;;
     "test/Detrend.test") CONFIG_FILES="$CONFIG_FILES test/Detrend.test" ;;
+    "test/Arith.test") CONFIG_FILES="$CONFIG_FILES test/Arith.test" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "contrib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;
@@ -23438,6 +23439,7 @@ _LT_EOF
     "test/Timstat.test":F) chmod a+x "$ac_file" ;;
     "test/Vertint.test":F) chmod a+x "$ac_file" ;;
     "test/Detrend.test":F) chmod a+x "$ac_file" ;;
+    "test/Arith.test":F) chmod a+x "$ac_file" ;;
 
   esac
 done # for ac_tag
