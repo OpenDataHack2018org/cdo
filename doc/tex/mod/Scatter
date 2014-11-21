@@ -32,7 +32,7 @@ INTEGER  Number of regions in y direction [default: 1]
 
 @BeginNote
 This operator needs to open all output files simultaneously.
-The maximum number of open files depents on the operating system!
+The maximum number of open files depends on the operating system!
 @EndNote
 
 

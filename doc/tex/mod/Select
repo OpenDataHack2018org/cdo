@@ -69,7 +69,7 @@ INTEGER Comma separated list of timesteps of year.
 
 @BeginExample
 Assume you have 3 inputfiles. Each inputfile contains the same variables for a different time period.
-To select the variable T,U and V on the levels 200,500 and 850 from all 3 input files, use:
+To select the variable T,U and V on the levels 200, 500 and 850 from all 3 input files, use:
 @BeginVerbatim
    cdo select,name=T,U,V,level=200,500,850 ifile1 ifile2 ifile3 ofile
 @EndVerbatim

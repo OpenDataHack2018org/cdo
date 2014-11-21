@@ -29,7 +29,7 @@ STRING  Comma separated list of variable names [default: all variables]
 
 @BeginNote
 This operator needs to open all input files simultaneously.
-The maximum number of open files depents on the operating system!
+The maximum number of open files depends on the operating system!
 @EndNote
 
 

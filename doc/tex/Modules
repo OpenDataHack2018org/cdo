@@ -107,6 +107,7 @@ Importcmsaf   Import/Export
 Importamsr    Import/Export
 Input         Import/Export
 Output        Import/Export
+Outputtab     Import/Export
 Gradsdes      Miscellaneous
 Filter        Miscellaneous
 Gridcell      Miscellaneous

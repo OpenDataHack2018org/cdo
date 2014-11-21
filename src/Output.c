@@ -23,7 +23,7 @@
       Output     outputint       Integer output
       Output     outputsrv       SERVICE output
       Output     outputext       EXTRA output
-      Output     outputtable     Table output
+      Output     outputtab       Table output
 */
 
 #include <ctype.h>
@@ -57,6 +57,7 @@ void *Output(void *argument)
   int len;
   int index;
   int ndiffgrids;
+  int lhead = TRUE;
   const char *format = NULL;
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
@@ -72,9 +73,9 @@ void *Output(void *argument)
   char **parnames = NULL;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
-  int Keylen[]           = {     8,      11,      4,      8,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
-  enum                     {kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
-  const char *Keynames[] = {"value", "param", "code", "name", "lon", "lat", "lev", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
+  int Keylen[]           = {      0,        8,      11,      4,      8,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
+  enum                     {knohead,   kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
+  const char *Keynames[] = {"nohead", "value", "param", "code", "name", "lon", "lat", "lev", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
 
 
   cdoInitialize(argument);
@@ -126,8 +127,12 @@ void *Output(void *argument)
 	      if ( len < 3 ) len = 3;
 	      if ( strncmp(parnames[i], Keynames[k], len) == 0 )
 		{
-		  keys[nkeys++] = k;
-		  if ( parnames[i][len] == ':' && isdigit(parnames[i][len+1]) ) Keylen[k] = atoi(&parnames[i][len+1]);
+		  if ( k == knohead ) lhead = FALSE;
+		  else
+		    {
+		      keys[nkeys++] = k;
+		      if ( parnames[i][len] == ':' && isdigit(parnames[i][len+1]) ) Keylen[k] = atoi(&parnames[i][len+1]);
+		    }
 		  break;
 		}
 	    }
@@ -138,6 +143,18 @@ void *Output(void *argument)
       if ( cdoVerbose )
 	for ( k = 0; k < nkeys; ++k )
 	  cdoPrint("keynr = %d  keyid = %d  keylen = %d  keyname = %s", k, keys[k], Keylen[keys[k]], Keynames[keys[k]]);
+
+      if ( lhead )
+	{
+	  fprintf(stdout, "#");
+	  for ( k = 0; k < nkeys; ++k )
+	    {
+	      len = Keylen[keys[k]];
+	      if ( k == 0 ) len -= 1;
+	      fprintf(stdout, "%*s ", len, Keynames[keys[k]]);
+	    }
+	  fprintf(stdout, "\n");
+	}
     }
 
   for ( indf = 0; indf < cdoStreamCnt(); indf++ )

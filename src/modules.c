@@ -362,7 +362,8 @@ void *Maggraph(void *argument);
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
-                                 "outputfld", "outputarr", "outputxyz", "outputtab"}
+                                 "outputfld", "outputarr", "outputxyz"}
+#define  OutputtabOperators     {"outputtab"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri", "outputvrml"}
 #define  PackOperators          {"pack"}
@@ -627,6 +628,7 @@ static modules_t Modules[] =
   { Ninfo,          NinfoHelp,         NinfoOperators,         CDI_BOTH,  1,  0 },
   { Nmltest,        NULL,              NmltestOperators,       CDI_REAL,  0,  0 },
   { Output,         OutputHelp,        OutputOperators,        CDI_REAL, -1,  0 },
+  { Output,         OutputtabHelp,     OutputtabOperators,     CDI_REAL, -1,  0 },
   { Outputgmt,      NULL,              OutputgmtOperators,     CDI_REAL,  1,  0 },
   { Pack,           NULL,              PackOperators,          CDI_REAL,  1,  1 },
   { Pinfo,          NULL,              PinfoOperators,         CDI_REAL,  1,  1 },
