@@ -91,7 +91,7 @@ void *Histogram(void *argument)
   free(bins);
   zaxisDefLbounds(zaxisID2, fltarr);
   zaxisDefUbounds(zaxisID2, fltarr+1);
-  zaxisDefName(zaxisID2, "bins");
+  zaxisDefName(zaxisID2, "bin");
   zaxisDefLongname(zaxisID2, "histogram bins");
   zaxisDefUnits(zaxisID2, "level");
 
