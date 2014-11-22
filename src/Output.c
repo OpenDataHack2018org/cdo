@@ -73,9 +73,9 @@ void *Output(void *argument)
   char **parnames = NULL;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
-  int Keylen[]           = {      0,        8,      11,      4,      8,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
-  enum                     {knohead,   kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
-  const char *Keynames[] = {"nohead", "value", "param", "code", "name", "lon", "lat", "lev", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
+  int Keylen[]           = {      0,        8,      11,      4,      8,     6,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
+  enum                     {knohead,   kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kbin,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
+  const char *Keynames[] = {"nohead", "value", "param", "code", "name", "lon", "lat", "lev", "bin", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
 
 
   cdoInitialize(argument);
@@ -150,7 +150,7 @@ void *Output(void *argument)
 	  for ( k = 0; k < nkeys; ++k )
 	    {
 	      len = Keylen[keys[k]];
-	      if ( k == 0 ) len -= 1;
+	      //   if ( k == 0 ) len -= 1;
 	      fprintf(stdout, "%*s ", len, Keynames[keys[k]]);
 	    }
 	  fprintf(stdout, "\n");
@@ -318,6 +318,7 @@ void *Output(void *argument)
 			  else if ( keys[k] == klon      ) fprintf(stdout, "%*g ", len, lon);
 			  else if ( keys[k] == klat      ) fprintf(stdout, "%*g ", len, lat);
 			  else if ( keys[k] == klev      ) fprintf(stdout, "%*g ", len, level);
+			  else if ( keys[k] == kbin      ) fprintf(stdout, "%*g ", len, level);
 			  else if ( keys[k] == kxind     ) fprintf(stdout, "%*d ", len, xind+1);
 			  else if ( keys[k] == kyind     ) fprintf(stdout, "%*d ", len, yind+1);
 			  else if ( keys[k] == ktimestep ) fprintf(stdout, "%*d ", len, tsID+1);
