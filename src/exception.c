@@ -34,7 +34,7 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 	  }
 	case FILETYPE_GRB2:
 	  {
-	    fprintf(stderr, "To add GRIB2 support to CDO use: ./configure --with-netcdf=<GRIB_API root directory> ...\n");
+	    fprintf(stderr, "To create a CDO application with GRIB2 support use: ./configure --with-netcdf=<GRIB_API root directory> ...\n");
 	    break;
 	  }
 	case FILETYPE_SRV:
@@ -52,13 +52,13 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 	case FILETYPE_NC:
 	case FILETYPE_NC2:
 	  {
-	    fprintf(stderr, "To add netCDF support to CDO use: ./configure --with-netcdf=<netCDF root directory> ...\n");
+	    fprintf(stderr, "To create a CDO application with netCDF support use: ./configure --with-netcdf=<netCDF root directory> ...\n");
 	    break;
 	  }
 	case FILETYPE_NC4:
 	case FILETYPE_NC4C:
 	  {
-	    fprintf(stderr, "To add netCDF4 support to CDO use: ./configure --with-netcdf=<netCDF4 root directory> ...\n");
+	    fprintf(stderr, "To create a CDO application with netCDF4 support use: ./configure --with-netcdf=<netCDF4 root directory> ...\n");
 	    break;
 	  }
 	default:
