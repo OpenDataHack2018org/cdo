@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.6
 	* Version 1.6.6 released
 
+2014-11-24  Uwe Schulzweida
+
+	* Timstat: added time bounds
+
 2014-11-21  Uwe Schulzweida
 
 	* outputtab: added key nohead and docu
