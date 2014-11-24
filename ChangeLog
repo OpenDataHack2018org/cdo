@@ -5,6 +5,7 @@
 
 2014-11-24  Uwe Schulzweida
 
+	* Seasstat: added support for time bounds
 	* Timstat: added time bounds
 
 2014-11-21  Uwe Schulzweida
