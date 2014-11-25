@@ -461,3 +461,61 @@ off_t filesize(const char *filename)
   
   return pos;
 }
+
+
+/* 
+ * Return the filetype extension (const char)
+ * for a given filetype (int)
+ */
+const char *filetypeext(int filetype)
+{
+  switch ( filetype )
+    {
+    case FILETYPE_GRB: return (".grb");   break;
+    case FILETYPE_GRB2: return (".grb2");   break;
+    case FILETYPE_NC:
+    case FILETYPE_NC2:
+    case FILETYPE_NC4:
+    case FILETYPE_NC4C: return (".nc");    break;
+    case FILETYPE_SRV:  return (".srv");   break;
+    case FILETYPE_EXT:  return (".ext");   break;
+    case FILETYPE_IEG:  return (".ieg");   break;
+    default:            return ("");
+    }
+}
+
+
+/*
+ * Remove file extension:
+ * -------------------------------------------------
+ * Remove file extension if it is the expected one
+ * Do nothing otherwise
+ */
+void rm_filetypeext(char *file, const char *ext)
+{
+  // length of filename
+  int namelen = (int) strlen(file);
+  // length of the original file extension
+  int extlen =  (int) strlen(ext);
+
+  // delete original extension if it is the expected one
+  if ( strcmp(&file[namelen-extlen], ext) == 0 )
+      file[namelen-extlen] = 0;
+}
+
+
+/*
+ * Replace or just add file extension:
+ * -------------------------------------------------
+ * Replace file extension with new one
+ * or just add the new file extension 
+ * if the original extension is not the expected one
+ */
+void repl_filetypeext(char file[], const char *oldext, const char *newext)
+{
+  // delete original extension if it is the expected one
+  rm_filetypeext(file, oldext);
+
+  // add new file extension
+  strcat(file, newext);
+}

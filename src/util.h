@@ -54,4 +54,9 @@ int userFileOverwrite(const char *filename);
 int datatype2str(int datatype, char *datatypestr);
 int str2datatype(const char *datatypestr);
 
+/* filename manipulation */
+const char *filetypeext(int filetype);
+void rm_filetypeext(char *file, const char *ext);
+void repl_filetypeext(char file[], const char *oldext, const char *newext);
+
 #endif  /* _UTIL_H */
