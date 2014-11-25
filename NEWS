@@ -6,6 +6,8 @@ Version 1.6.6 (27 November 2014):
    New operators:
      * outputtab: table output
    Fixed bugs:
+     * option -t table: segmentation fault if parameter table entry longname is missing
+     * merge: check number of timesteps [Bug #5338]
      * seasmean: sets all time_bnds to the same values [Bug #5329]
      * histcount: doesn't recognize missing values
      * filesdes: doesn't work for GRIB2 files [Bug #5307]
