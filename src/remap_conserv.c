@@ -304,10 +304,7 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
 static
 double gridcell_area(struct grid_cell cell)
 {
-  double area = huiliers_area(cell);
-  area /= (EarthRadius*EarthRadius);
-
-  return (area);
+  return huiliers_area(cell);
 }
 
 static
