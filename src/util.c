@@ -466,13 +466,14 @@ off_t filesize(const char *filename)
 /* 
  * Return the filetype extension (const char)
  * for a given filetype (int)
+ * TODO: handle lists of extensions i.e. grb and grb2 for GRIB2-format
  */
 const char *filetypeext(int filetype)
 {
   switch ( filetype )
     {
-    case FILETYPE_GRB: return (".grb");   break;
-    case FILETYPE_GRB2: return (".grb2");   break;
+    case FILETYPE_GRB:
+    case FILETYPE_GRB2: return (".grb");   break;
     case FILETYPE_NC:
     case FILETYPE_NC2:
     case FILETYPE_NC4:
