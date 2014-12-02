@@ -1129,6 +1129,7 @@ int parse_options_long(int argc, char *argv[])
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1 },
       { "use_fftw",          required_argument,          &luse_fftw,  1 },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1 },
+      { "Wno",                     no_argument,           &_Verbose,  0 },
       { "format",            required_argument,                NULL, 'f' },
       { "help",                    no_argument,                NULL, 'h' },
       { "history",                 no_argument,                NULL, 'H' },
