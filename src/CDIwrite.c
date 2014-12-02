@@ -20,6 +20,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 static
@@ -164,7 +165,32 @@ void *CDIwrite(void *argument)
       cdoPrint("nlevs      : %d", nlevs);
       cdoPrint("ntimesteps : %d", ntimesteps);
       cdoPrint("nvars      : %d", nvars);
-    } 
+    }
+
+  double *array = (double*) malloc(gridsize*sizeof(double));
+  double *xvals = (double*) malloc(gridsize*sizeof(double));
+  double *yvals = (double*) malloc(gridsize*sizeof(double));
+
+  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
+
+  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+    gridID = gridToCurvilinear(gridID, 0);
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
+
+  /* Convert lat/lon units if required */
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID, units);
+  grid_to_radian(units, gridsize, xvals, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_radian(units, gridsize, yvals, "grid center lat");
+
+  for ( i = 0; i < gridsize; i++ )
+    array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
+
+  free(xvals);
+  free(yvals);
 
   vars = (double ***) malloc(nvars*sizeof(double **));
   for ( varID = 0; varID < nvars; varID++ )
@@ -174,7 +200,8 @@ void *CDIwrite(void *argument)
 	{
 	  vars[varID][levelID] = (double*) malloc(gridsize*sizeof(double));
 	  for ( i = 0; i < gridsize; ++i )
-	    vars[varID][levelID][i] = varID + rand()/(RAND_MAX+1.0);
+	    vars[varID][levelID][i] = varID + array[i]*(levelID+1);
+	  //    vars[varID][levelID][i] = varID + rand()/(RAND_MAX+1.0);
 	}
     }
 
@@ -271,6 +298,8 @@ void *CDIwrite(void *argument)
       free(vars[varID]);
     }
   free(vars);
+
+  free(array);
 
   if ( farray ) free(farray);
 
