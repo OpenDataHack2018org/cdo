@@ -650,12 +650,15 @@ ENABLE_EXTRA
 ENABLE_SERVICE
 ENABLE_CGRIBEX
 ENABLE_GRIB
+ENABLE_GRIBAPI
 GRIB_API_LIBS
 GRIB_API_INCLUDE
 JASPER_LIBS
 NETCDF_LIBS
 NETCDF_INCLUDE
 NETCDF_ROOT
+ENABLE_NC4
+ENABLE_NC2
 ENABLE_NETCDF
 NC_CONFIG
 HDF5_LIBS
@@ -18643,10 +18646,12 @@ fi
 
 #  ----------------------------------------------------------------------
 #  Compile application with netcdf
-ENABLE_NETCDF=no
 NETCDF_ROOT=''
 NETCDF_INCLUDE=''
 NETCDF_LIBS=''
+ENABLE_NETCDF=no
+ENABLE_NC2=no
+ENABLE_NC4=no
 
 # Check whether --with-netcdf was given.
 if test "${with_netcdf+set}" = set; then :
@@ -18775,6 +18780,7 @@ $as_echo_n "checking netcdf's nc2 support... " >&6; }
 
 $as_echo "#define HAVE_NETCDF2 1" >>confdefs.h
 
+                                          ENABLE_NC2=yes
                                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
@@ -18787,6 +18793,7 @@ $as_echo_n "checking netcdf's nc4 support... " >&6; }
 
 $as_echo "#define HAVE_NETCDF4 1" >>confdefs.h
 
+                                          ENABLE_NC4=yes
                                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
@@ -18935,6 +18942,7 @@ $as_echo_n "checking netcdf's nc2 support... " >&6; }
 
 $as_echo "#define HAVE_NETCDF2 1" >>confdefs.h
 
+                                          ENABLE_NC2=yes
                                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
@@ -18947,6 +18955,7 @@ $as_echo_n "checking netcdf's nc4 support... " >&6; }
 
 $as_echo "#define HAVE_NETCDF4 1" >>confdefs.h
 
+                                          ENABLE_NC4=yes
                                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
@@ -18970,6 +18979,8 @@ $as_echo_n "checking for NETCDF library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi
+
+
 
 
 
@@ -19146,6 +19157,7 @@ fi
 #  Compile application with GRIB_API library (for GRIB2 support)
 GRIB_API_INCLUDE=''
 GRIB_API_LIBS=''
+ENABLE_GRIBAPI=no
 
 # Check whether --with-grib_api was given.
 if test "${with_grib_api+set}" = set; then :
@@ -19224,6 +19236,7 @@ if test "$ac_res" != no; then :
 
 $as_echo "#define HAVE_LIBGRIB_API 1" >>confdefs.h
 
+                                            ENABLE_GRIBAPI=yes
 else
   as_fn_error $? "Could not link to grib_api library" "$LINENO" 5
 fi
@@ -19301,6 +19314,7 @@ if test "$ac_res" != no; then :
 
 $as_echo "#define HAVE_LIBGRIB_API 1" >>confdefs.h
 
+                                                 ENABLE_GRIBAPI=yes
 else
   as_fn_error $? "Could not link to grib_api library" "$LINENO" 5
 fi
@@ -19319,6 +19333,7 @@ $as_echo_n "checking for the GRIB_API library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi
+
 
 
 
@@ -20765,7 +20780,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files test/Read_grib.test test/Read_netcdf.test test/Copy_netcdf.test"
+ac_config_files="$ac_config_files test/File.test test/Read_grib.test test/Read_netcdf.test test/Copy_netcdf.test"
 
 ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test"
 
@@ -21922,6 +21937,7 @@ do
     "src/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
+    "test/File.test") CONFIG_FILES="$CONFIG_FILES test/File.test" ;;
     "test/Read_grib.test") CONFIG_FILES="$CONFIG_FILES test/Read_grib.test" ;;
     "test/Read_netcdf.test") CONFIG_FILES="$CONFIG_FILES test/Read_netcdf.test" ;;
     "test/Copy_netcdf.test") CONFIG_FILES="$CONFIG_FILES test/Copy_netcdf.test" ;;
@@ -23427,6 +23443,7 @@ compiler_lib_search_path=$lt_compiler_lib_search_path_CXX
 _LT_EOF
 
  ;;
+    "test/File.test":F) chmod a+x "$ac_file" ;;
     "test/Read_grib.test":F) chmod a+x "$ac_file" ;;
     "test/Read_netcdf.test":F) chmod a+x "$ac_file" ;;
     "test/Copy_netcdf.test":F) chmod a+x "$ac_file" ;;
