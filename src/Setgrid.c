@@ -321,14 +321,13 @@ void *Setgrid(void *argument)
 	  gridsize = gridInqSize(gridID1);
 	  if ( gridsize == masksize )
 	    {
-	      int *mask;
-	      mask = (int*) malloc(masksize*sizeof(int));
+	      int *mask = (int*) malloc(masksize*sizeof(int));
 	      for ( i = 0; i < masksize; i++ )
 		{
 		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
 		    mask[i] = 0;
 		  else
-		    mask[i] = lround(gridmask[i]);
+		    mask[i] = (int)lround(gridmask[i]);
 		}
 	      gridID2 = gridDuplicate(gridID1);
 	      gridDefMask(gridID2, mask);

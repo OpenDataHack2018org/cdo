@@ -59,7 +59,7 @@ void datetime_avg_dtinfo(int calendar, int ndates, dtinfo_t *dtinfo)
       juldate2 = juldate_encode(calendar, vdate, vtime);
 
       seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldatem = juldate_add_seconds(lround(seconds), juldate1);
+      juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
       juldate_decode(calendar, juldatem, &vdate, &vtime);
     }
   else
@@ -100,7 +100,7 @@ void datetime_avg(int calendar, int ndates, datetime_t *datetime)
       juldate2 = juldate_encode(calendar, vdate, vtime);
 
       seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldatem = juldate_add_seconds(lround(seconds), juldate1);
+      juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
       juldate_decode(calendar, juldatem, &vdate, &vtime);
     }
   else

@@ -135,12 +135,9 @@ static int nlat2nlon(int nlat)
 
 int ngp2ntr(int ngp)
 {
-  int ntr, nlatl, nlonl;
-
-  ntr = lround(sqrt(0.25+ngp)-1.5);
-  nlatl = ntr2nlat_linear(ntr);
-  nlonl = compnlon(nlatl);
-  nlatl = nlonl/2;
+  int ntr   = (int)lround(sqrt(0.25+ngp)-1.5);
+  int nlonl = compnlon(ntr2nlat_linear(ntr));
+  int nlatl = nlonl/2;
 
   ntr = (2*nlatl-1)/2;
 
