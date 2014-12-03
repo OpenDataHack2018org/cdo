@@ -228,6 +228,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -L             Lock IO (sequential access)\n");
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
+  fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
 #if defined(_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
@@ -1129,7 +1130,7 @@ int parse_options_long(int argc, char *argv[])
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1 },
       { "use_fftw",          required_argument,          &luse_fftw,  1 },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1 },
-      { "Wno",                     no_argument,           &_Verbose,  0 },
+      { "no_warnings",             no_argument,           &_Verbose,  0 },
       { "format",            required_argument,                NULL, 'f' },
       { "help",                    no_argument,                NULL, 'h' },
       { "history",                 no_argument,                NULL, 'H' },

@@ -5,8 +5,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "process.h"
-
-static int _ExitOnError   = 1;	/* If set to 1, exit on error       */
+#include "error.h"
 
 void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 {	
@@ -96,19 +95,22 @@ void cdoAbort(const char *fmt, ...)
 
 void cdoWarning(const char *fmt, ...)
 {
-  va_list args;
+  if ( _Verbose )
+    {
+      va_list args;
 
-  va_start(args, fmt);
+      va_start(args, fmt);
 
-  set_text_color(stderr, BRIGHT, YELLOW);
-   fprintf(stderr, "%s (Warning): ", processInqPrompt());
-  reset_text_color(stderr);
-  set_text_color(stderr, RESET, BLACK);
-  vfprintf(stderr, fmt, args);
-  reset_text_color(stderr);
-   fprintf(stderr, "\n");
+      set_text_color(stderr, BRIGHT, YELLOW);
+      fprintf(stderr, "%s (Warning): ", processInqPrompt());
+      reset_text_color(stderr);
+      set_text_color(stderr, RESET, BLACK);
+      vfprintf(stderr, fmt, args);
+      reset_text_color(stderr);
+      fprintf(stderr, "\n");
 
-  va_end(args);
+      va_end(args);
+    }
 }
 
 
