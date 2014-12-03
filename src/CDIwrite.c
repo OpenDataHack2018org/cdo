@@ -98,7 +98,7 @@ void *CDIwrite(void *argument)
   int tsID, varID, levelID;
   int gridsize, i;
   int vlistID;
-  int gridID = -1, zaxisID, taxisID;
+  int zaxisID, taxisID;
   int vdate, vtime, julday;
   int filetype = -1, datatype = -1;
   int irun, nruns = 1;
@@ -145,7 +145,7 @@ void *CDIwrite(void *argument)
   if ( ntimesteps <= 0 ) ntimesteps = 1;
   if ( nvars <= 0 ) nvars = 1;
 
-  gridID   = cdoDefineGrid(gridfile);
+  int gridID = cdoDefineGrid(gridfile);
   gridsize = gridInqSize(gridID);
 
   if ( nlevs == 1 )
@@ -171,19 +171,20 @@ void *CDIwrite(void *argument)
   double *xvals = (double*) malloc(gridsize*sizeof(double));
   double *yvals = (double*) malloc(gridsize*sizeof(double));
 
-  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
+  int gridID2 = gridID;
+  if ( gridInqType(gridID) == GRID_GME ) gridID2 = gridToUnstructured(gridID, 0);
 
   if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
-    gridID = gridToCurvilinear(gridID, 0);
+    gridID2 = gridToCurvilinear(gridID, 0);
 
-  gridInqXvals(gridID, xvals);
-  gridInqYvals(gridID, yvals);
+  gridInqXvals(gridID2, xvals);
+  gridInqYvals(gridID2, yvals);
 
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
-  gridInqXunits(gridID, units);
+  gridInqXunits(gridID2, units);
   grid_to_radian(units, gridsize, xvals, "grid center lon");
-  gridInqYunits(gridID, units);
+  gridInqYunits(gridID2, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
   for ( i = 0; i < gridsize; i++ )
