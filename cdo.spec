@@ -24,11 +24,11 @@ operators available. The following table provides a brief overview of the main c
 Authors:
 --------
     This program was developed at the Max-Planck-Institute for Meteorology.
-    Uwe Schulzweida, Uwe.Schulzweida@zmaw.de, is the main author.
-    Ralf Mueller, Ralf.Mueller@zmaw.de
-    Luis Kornblueh, Luis.Kornblueh@zmaw.de
-    Cedrick Ansorge, Cedrick.Ansorge@zmaw.de
-    Ralf Quast, Ralf.Quast@brockmann-consult.de
+    Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>, is the main author.
+    Ralf Mueller, <ralf.mueller AT mpimet.mpg.de>
+    Luis Kornblueh, <luis.kornblueh AT mpimet.mpg.de>
+    Cedrick Ansorge, <cedrick.ansorge AT mpimet.mpg.de>
+    Ralf Quast, <ralf.quast AT brockmann-consult.de>
     Send questions, comments and bug reports to <http://code.zmaw.de/projects/cdo>
 
 
