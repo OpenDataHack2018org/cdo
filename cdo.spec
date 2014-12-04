@@ -11,7 +11,7 @@ License:        GNU GENERAL PUBLIC LICENSE Version 2, June 1991
 Group:          Productivity/Graphics/Visualization/Other
 Requires:       netcdf
 Autoreqprov:    on
-URL:            http://code.zmaw.de/projects/cdo
+URL:            https://code.zmaw.de/projects/cdo
 Source0:        cdo-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -29,7 +29,7 @@ Authors:
     Luis Kornblueh, <luis.kornblueh AT mpimet.mpg.de>
     Cedrick Ansorge, <cedrick.ansorge AT mpimet.mpg.de>
     Ralf Quast, <ralf.quast AT brockmann-consult.de>
-    Send questions, comments and bug reports to <http://code.zmaw.de/projects/cdo>
+    Send questions, comments and bug reports to <https://code.zmaw.de/projects/cdo>
 
 
 %prep
