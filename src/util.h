@@ -59,4 +59,57 @@ const char *filetypeext(int filetype);
 void rm_filetypeext(char *file, const char *ext);
 void repl_filetypeext(char file[], const char *oldext, const char *newext);
 
+
+/* moved here from cdo.h */
+void    cdiOpenError(int cdiErrno, const char *fmt, const char *path);
+void    cdoAbort(const char *fmt, ...);
+void    cdoWarning(const char *fmt, ...);
+void    cdoPrint(const char *fmt, ...);
+
+int  timer_new(const char *text);
+void timer_report(void);
+void timer_start(int it);
+void timer_stop(int it);
+double timer_val(int it);
+
+
+void    operatorInputArg(const char *enter);
+int     operatorArgc(void);
+char  **operatorArgv(void);
+void    operatorCheckArgc(int numargs);
+
+const argument_t *cdoStreamName(int cnt);
+
+void    cdoInitialize(void *argument);
+void    cdoFinish(void);
+
+int     cdoStreamNumber(void);
+int     cdoStreamCnt(void);
+int     cdoOperatorAdd(const char *name, int func, int intval, const char *enter);
+int     cdoOperatorID(void);
+int     cdoOperatorF1(int operID);
+int     cdoOperatorF2(int operID);
+const char *cdoOperatorName(int operID);
+const char *cdoOperatorEnter(int operID);
+
+int     cdoFiletype(void);
+
+void    cdoInqHistory(int fileID);
+void    cdoDefHistory(int fileID, char *histstring);
+
+int     cdoDefineGrid(const char *gridfile);
+int     cdoDefineZaxis(const char *zaxisfile);
+
+int     vlistInqNWPV(int vlistID, int varID);
+int     vlistIsSzipped(int vlistID);
+
+void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname);
+
+void writeNCgrid(const char *gridfile, int gridID, int *imask);
+void defineZaxis(const char *zaxisarg);
+void cdiDefTableID(int tableID);
+
+int gridFromName(const char *gridname);
+int zaxisFromName(const char *zaxisname);
+
 #endif  /* _UTIL_H */
