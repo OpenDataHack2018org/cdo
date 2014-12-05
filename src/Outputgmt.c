@@ -146,6 +146,21 @@ int intersect(double pix, double piy, double pjx, double pjy,
 }
 
 static
+int check_ncorner(int ncorner, const double *lon_bounds, const double *lat_bounds)
+{
+  int ncorner_new = ncorner;
+  int k;
+
+  for ( k=ncorner-1; k>0; --k )
+    if ( IS_NOT_EQUAL(lon_bounds[k], lon_bounds[k-1]) ||
+	 IS_NOT_EQUAL(lat_bounds[k], lat_bounds[k-1]) ) break;
+
+  if ( k < ncorner-1 ) ncorner_new = k+1;
+
+  return ncorner_new;
+}
+
+static
 void verify_grid(int gridtype, int gridsize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
@@ -212,19 +227,24 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
           if ( nout == 1 )
             {
               fprintf(stdout,"\n CENTER IS OUT OF BOUNDS");
-              fprintf(stdout,"\n                                                  :");
+              fprintf(stdout,"\n                                               :");
               for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "            Corner %2i : ", k);
-              fprintf(stdout,"\n Number  Index  center_lon  center_lat  area*10^6 :");
+                fprintf(stdout, "          Corner %2i : ", k+1);
+              fprintf(stdout,"\n Number  Index center_lon center_lat area*10^6 :");
               for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
+                fprintf(stdout, "   lon_%2.2i    lat_%2.2i : ", k+1, k+1);
               fprintf(stdout, "\n");
             }
           area = PolygonArea(ncorner+1, lon_bounds, lat_bounds,lat);
-          fprintf(stdout, " %6i %6i   %9.4f   %9.4f %10.5f :", 
+          fprintf(stdout, " %6i %6i  %9.4f  %9.4f %9.5f :", 
 		  nout, i+1, lon, lat, area*pow(10,6));
-          for ( k = 0; k < ncorner; k++ )
-            fprintf(stdout, " %9.4f  %9.4f : ", lon_bounds[k], lat_bounds[k]);
+
+	  int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
+
+          for ( k = 0; k < ncorner_new; k++ )
+	    fprintf(stdout, "%9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
+           for ( k = ncorner_new; k < ncorner; k++ )
+	     fprintf(stdout, "     ----      ---- : ");
           fprintf(stdout, "\n");
         }
     }
@@ -261,17 +281,23 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
         {
           if ( nout == 1 )
             {
-              fprintf(stdout,"\n                                       :");
+              fprintf(stdout,"\n                                     :");
               for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "            Corner %2i : ", k);
-              fprintf(stdout,"\n Number  Index  center_lon  center_lat :");
+                fprintf(stdout, "          Corner %2i : ", k+1);
+              fprintf(stdout,"\n Number  Index center_lon center_lat :");
               for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
+                fprintf(stdout, "   lon_%2.2i    lat_%2.2i : ", k+1, k+1);
               fprintf(stdout, "\n");
             }
-          fprintf(stdout, "%6i %6i   %9.4f   %9.4f :", nout, i+1, lon, lat);
-          for ( k = 0; k < ncorner; k++ )
-            fprintf(stdout, " %9.4f  %9.4f : ", lon_bounds[k], lat_bounds[k]);
+          fprintf(stdout, " %6i %6i  %9.4f  %9.4f :", nout, i+1, lon, lat);
+
+	  int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
+
+          for ( k = 0; k < ncorner_new; k++ )
+	    fprintf(stdout, "%9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
+           for ( k = ncorner_new; k < ncorner; k++ )
+	     fprintf(stdout, "     ----      ---- : ");
+
           fprintf(stdout, "\n");
         }
     }
