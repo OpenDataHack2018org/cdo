@@ -597,7 +597,7 @@ void *Outputgmt(void *argument)
   int nmiss;
   int nlon, nlat, nalloc;
   int nlev, lzon = FALSE, lmer = FALSE, lhov = FALSE;
-  int gridcorners = 0, ic;
+  int ncorner = 0, ic;
   int status;
   int lgrid_gen_bounds = FALSE, luse_grid_corner = FALSE;
   int zaxisID, taxisID;
@@ -728,9 +728,9 @@ void *Outputgmt(void *argument)
     }
 
   if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
-    gridcorners = gridInqNvertex(gridID);
+    ncorner = gridInqNvertex(gridID);
   else
-    gridcorners = 4;
+    ncorner = 4;
 
   grid_is_circular = gridIsCircular(gridID);
 
@@ -781,8 +781,8 @@ void *Outputgmt(void *argument)
 
   if ( luse_grid_corner )
     {
-      if ( gridcorners == 0 ) cdoAbort("grid corner missing!");
-      nalloc = gridcorners*gridsize;
+      if ( ncorner == 0 ) cdoAbort("grid corner missing!");
+      nalloc = ncorner*gridsize;
       grid_corner_lat = (double*) realloc(grid_corner_lat, nalloc*sizeof(double));
       grid_corner_lon = (double*) realloc(grid_corner_lon, nalloc*sizeof(double));
 
@@ -808,8 +808,8 @@ void *Outputgmt(void *argument)
 
 
       /* Note: using units from latitude instead from bounds */
-      grid_to_degree(units, gridcorners*gridsize, grid_corner_lon, "grid corner lon");
-      grid_to_degree(units, gridcorners*gridsize, grid_corner_lat, "grid corner lat");
+      grid_to_degree(units, ncorner*gridsize, grid_corner_lon, "grid corner lon");
+      grid_to_degree(units, ncorner*gridsize, grid_corner_lat, "grid corner lat");
 
       if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
 	{
@@ -851,7 +851,7 @@ void *Outputgmt(void *argument)
     }
 
   if ( operatorID == GRIDVERIFY )
-    verify_grid(gridInqType(gridID), gridsize, gridcorners,
+    verify_grid(gridInqType(gridID), gridsize, ncorner,
 		grid_center_lon, grid_center_lat,
 		grid_corner_lon, grid_corner_lat);
 
@@ -1221,11 +1221,13 @@ void *Outputgmt(void *argument)
 		    }
 		  else
 		    {
-		      for ( ic = 0; ic < gridcorners; ic++ )
-			fprintf(stdout, "   %g  %g\n",
-				grid_corner_lon[i*gridcorners+ic], grid_corner_lat[i*gridcorners+ic]);
-		      fprintf(stdout, "   %g  %g\n",
-			      grid_corner_lon[i*gridcorners], grid_corner_lat[i*gridcorners]);
+		      const double *lon_bounds = grid_corner_lon+i*ncorner;
+		      const double *lat_bounds = grid_corner_lat+i*ncorner;
+		      int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
+
+		      for ( ic = 0; ic < ncorner_new; ic++ )
+			fprintf(stdout, "   %g  %g\n", lon_bounds[ic], lat_bounds[ic]);
+		      fprintf(stdout, "   %g  %g\n", lon_bounds[0], lat_bounds[0]);
 		    }
 		}
 	      fprintf(stdout, "\n");
