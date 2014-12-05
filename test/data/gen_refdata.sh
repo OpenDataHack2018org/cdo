@@ -9,7 +9,6 @@ FORMAT="-f srv -b F32"
 # Test File
 #
 $CDO $FORMAT cdiwrite,1,global_10,3,3,3 file_F32_srv_ref
-exit
 #
 ########################################################################
 #
@@ -36,6 +35,7 @@ for FILE in $IFILES; do
   OFILE=netcdf_${FILE}_infon_ref
   $CDO infon $IFILE > $OFILE
 done
+exit
 ########################################################################
 #
 # Timstat
