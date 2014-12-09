@@ -7,6 +7,8 @@
 #include "process.h"
 #include "error.h"
 
+#include "config.h"
+
 void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 {	
   printf("\n");
@@ -50,14 +52,15 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 	  }
 	case FILETYPE_NC:
 	case FILETYPE_NC2:
-	  {
-	    fprintf(stderr, "To create a CDO application with netCDF support use: ./configure --with-netcdf=<netCDF root directory> ...\n");
-	    break;
-	  }
 	case FILETYPE_NC4:
 	case FILETYPE_NC4C:
 	  {
-	    fprintf(stderr, "To create a CDO application with netCDF4 support use: ./configure --with-netcdf=<netCDF4 root directory> ...\n");
+	    const char *ncv = (filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C) ? "4" : ((filetype == FILETYPE_NC2) ? "2" : "");
+#if defined HAVE_LIBNETCDF
+	    fprintf(stderr, "CDO was build with a netCDF version which doesn't support netCDF%s data!\n", ncv);
+#else
+	    fprintf(stderr, "To create a CDO application with netCDF%s support use: ./configure --with-netcdf=<netCDF%s root directory> ...\n", ncv, ncv);
+#endif
 	    break;
 	  }
 	default:
