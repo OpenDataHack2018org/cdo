@@ -321,14 +321,14 @@ void *Intlevel3d(void *argument)
 
   /* Missing values are not allowed for coordinate variables */
   if ( 0 != zlevels_in_miss  )
-    cdoAbort("Input vertical coordinate variables are not allowd to contian missing values.");
+    cdoAbort("Input vertical coordinate variables are not allowd to contain missing values.");
   else
     {
       if ( cdoVerbose ) cdoPrint("Input vertical coordinate has no missing values.");
     }
 
   if ( 0 != zlevels_out_miss )
-    cdoAbort("Output vertical coordinate variables are not allowd to contian missing values.");
+    cdoAbort("Output vertical coordinate variables are not allowd to contain missing values.");
   else
     {
       if ( cdoVerbose ) cdoPrint("Output vertical coordinate has no missing values.");
