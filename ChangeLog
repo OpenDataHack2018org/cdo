@@ -1,7 +1,11 @@
-2014-12-11  Uwe Schulzweida
+2014-12-12  Uwe Schulzweida
 
 	* using CDI library version 1.6.7
 	* Version 1.6.7 released
+
+2014-12-11  Uwe Schulzweida
+
+	* intlevel3d: does not work (bug fix)
 
 2014-12-03  Uwe Schulzweida
 
