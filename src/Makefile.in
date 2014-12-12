@@ -147,21 +147,21 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
 	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
 	cdo_int.h cdo_pthread.c cdo_vlist.c cdo_getopt.c cdo_getopt.h \
-	color.c color.h commandline.c const.h counter.h dmemory.h \
-	dtypes.h ecacore.c ecacore.h ecautil.c ecautil.h error.h \
-	etopo.h temp.h mask.h exception.c expr.c expr.h expr_lex.c \
-	expr_yacc.c expr_yacc.h features.c field.c field.h field2.c \
-	fieldc.c fieldmem.c fieldmer.c fieldzon.c fouriertrans.c \
-	functs.h gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
-	grid_gme.c grid_lcc.c grid_rot.c gridreference.c griddes.c \
-	griddes.h griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h \
-	history.c institution.c interpol.c interpol.h job.c juldate.c \
-	kvlist.c kvlist.h legendre.c list.c list.h merge_sort2.c \
-	merge_sort2.h modules.c modules.h namelist.c namelist.h \
-	normal.c nth_element.c nth_element.h operator_help.h par_io.c \
-	par_io.h percentiles.c percentiles.h pipe.c pipe.h \
-	pragma_omp_atomic_update.h printinfo.h process.c process.h \
-	pstream.c pstream.h pstream_int.h pthread_debug.c \
+	color.c color.h commandline.c const.h counter.h datetimelist.c \
+	datetimelist.h dmemory.h dtypes.h ecacore.c ecacore.h \
+	ecautil.c ecautil.h error.h etopo.h temp.h mask.h exception.c \
+	expr.c expr.h expr_lex.c expr_yacc.c expr_yacc.h features.c \
+	field.c field.h field2.c fieldc.c fieldmem.c fieldmer.c \
+	fieldzon.c fouriertrans.c functs.h gradsdeslib.c gradsdeslib.h \
+	grid.c grid.h grid_area.c grid_gme.c grid_lcc.c grid_rot.c \
+	gridreference.c griddes.c griddes.h griddes_h5.c griddes_nc.c \
+	hetaeta.c hetaeta.h history.c institution.c interpol.c \
+	interpol.h job.c juldate.c kvlist.c kvlist.h legendre.c list.c \
+	list.h merge_sort2.c merge_sort2.h modules.c modules.h \
+	namelist.c namelist.h normal.c nth_element.c nth_element.h \
+	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
+	pipe.c pipe.h pragma_omp_atomic_update.h printinfo.h process.c \
+	process.h pstream.c pstream.h pstream_int.h pthread_debug.c \
 	pthread_debug.h readline.c realtime.c remap.h remaplib.c \
 	remapsort.c remap_scrip_io.c remap_search_reg2d.c \
 	remap_search_latbins.c remap_store_link.c remap_store_link.h \
@@ -274,11 +274,11 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Zonstat.$(OBJEXT) cdo-cdo_pthread.$(OBJEXT) \
 	cdo-cdo_vlist.$(OBJEXT) cdo-cdo_getopt.$(OBJEXT) \
 	cdo-color.$(OBJEXT) cdo-commandline.$(OBJEXT) \
-	cdo-ecacore.$(OBJEXT) cdo-ecautil.$(OBJEXT) \
-	cdo-exception.$(OBJEXT) cdo-expr.$(OBJEXT) \
-	cdo-expr_lex.$(OBJEXT) cdo-expr_yacc.$(OBJEXT) \
-	cdo-features.$(OBJEXT) cdo-field.$(OBJEXT) \
-	cdo-field2.$(OBJEXT) cdo-fieldc.$(OBJEXT) \
+	cdo-datetimelist.$(OBJEXT) cdo-ecacore.$(OBJEXT) \
+	cdo-ecautil.$(OBJEXT) cdo-exception.$(OBJEXT) \
+	cdo-expr.$(OBJEXT) cdo-expr_lex.$(OBJEXT) \
+	cdo-expr_yacc.$(OBJEXT) cdo-features.$(OBJEXT) \
+	cdo-field.$(OBJEXT) cdo-field2.$(OBJEXT) cdo-fieldc.$(OBJEXT) \
 	cdo-fieldmem.$(OBJEXT) cdo-fieldmer.$(OBJEXT) \
 	cdo-fieldzon.$(OBJEXT) cdo-fouriertrans.$(OBJEXT) \
 	cdo-gradsdeslib.$(OBJEXT) cdo-grid.$(OBJEXT) \
@@ -597,21 +597,21 @@ cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
 	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
 	cdo_int.h cdo_pthread.c cdo_vlist.c cdo_getopt.c cdo_getopt.h \
-	color.c color.h commandline.c const.h counter.h dmemory.h \
-	dtypes.h ecacore.c ecacore.h ecautil.c ecautil.h error.h \
-	etopo.h temp.h mask.h exception.c expr.c expr.h expr_lex.c \
-	expr_yacc.c expr_yacc.h features.c field.c field.h field2.c \
-	fieldc.c fieldmem.c fieldmer.c fieldzon.c fouriertrans.c \
-	functs.h gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
-	grid_gme.c grid_lcc.c grid_rot.c gridreference.c griddes.c \
-	griddes.h griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h \
-	history.c institution.c interpol.c interpol.h job.c juldate.c \
-	kvlist.c kvlist.h legendre.c list.c list.h merge_sort2.c \
-	merge_sort2.h modules.c modules.h namelist.c namelist.h \
-	normal.c nth_element.c nth_element.h operator_help.h par_io.c \
-	par_io.h percentiles.c percentiles.h pipe.c pipe.h \
-	pragma_omp_atomic_update.h printinfo.h process.c process.h \
-	pstream.c pstream.h pstream_int.h pthread_debug.c \
+	color.c color.h commandline.c const.h counter.h datetimelist.c \
+	datetimelist.h dmemory.h dtypes.h ecacore.c ecacore.h \
+	ecautil.c ecautil.h error.h etopo.h temp.h mask.h exception.c \
+	expr.c expr.h expr_lex.c expr_yacc.c expr_yacc.h features.c \
+	field.c field.h field2.c fieldc.c fieldmem.c fieldmer.c \
+	fieldzon.c fouriertrans.c functs.h gradsdeslib.c gradsdeslib.h \
+	grid.c grid.h grid_area.c grid_gme.c grid_lcc.c grid_rot.c \
+	gridreference.c griddes.c griddes.h griddes_h5.c griddes_nc.c \
+	hetaeta.c hetaeta.h history.c institution.c interpol.c \
+	interpol.h job.c juldate.c kvlist.c kvlist.h legendre.c list.c \
+	list.h merge_sort2.c merge_sort2.h modules.c modules.h \
+	namelist.c namelist.h normal.c nth_element.c nth_element.h \
+	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
+	pipe.c pipe.h pragma_omp_atomic_update.h printinfo.h process.c \
+	process.h pstream.c pstream.h pstream_int.h pthread_debug.c \
 	pthread_debug.h readline.c realtime.c remap.h remaplib.c \
 	remapsort.c remap_scrip_io.c remap_search_reg2d.c \
 	remap_search_latbins.c remap_store_link.c remap_store_link.h \
@@ -974,6 +974,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-cdo_vlist.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-color.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-commandline.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-datetimelist.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-ecacore.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-ecautil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-exception.Po@am__quote@
@@ -3638,6 +3639,20 @@ cdo-commandline.obj: commandline.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='commandline.c' object='cdo-commandline.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-commandline.obj `if test -f 'commandline.c'; then $(CYGPATH_W) 'commandline.c'; else $(CYGPATH_W) '$(srcdir)/commandline.c'; fi`
+
+cdo-datetimelist.o: datetimelist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-datetimelist.o -MD -MP -MF $(DEPDIR)/cdo-datetimelist.Tpo -c -o cdo-datetimelist.o `test -f 'datetimelist.c' || echo '$(srcdir)/'`datetimelist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-datetimelist.Tpo $(DEPDIR)/cdo-datetimelist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='datetimelist.c' object='cdo-datetimelist.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-datetimelist.o `test -f 'datetimelist.c' || echo '$(srcdir)/'`datetimelist.c
+
+cdo-datetimelist.obj: datetimelist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-datetimelist.obj -MD -MP -MF $(DEPDIR)/cdo-datetimelist.Tpo -c -o cdo-datetimelist.obj `if test -f 'datetimelist.c'; then $(CYGPATH_W) 'datetimelist.c'; else $(CYGPATH_W) '$(srcdir)/datetimelist.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-datetimelist.Tpo $(DEPDIR)/cdo-datetimelist.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='datetimelist.c' object='cdo-datetimelist.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-datetimelist.obj `if test -f 'datetimelist.c'; then $(CYGPATH_W) 'datetimelist.c'; else $(CYGPATH_W) '$(srcdir)/datetimelist.c'; fi`
 
 cdo-ecacore.o: ecacore.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecacore.o -MD -MP -MF $(DEPDIR)/cdo-ecacore.Tpo -c -o cdo-ecacore.o `test -f 'ecacore.c' || echo '$(srcdir)/'`ecacore.c

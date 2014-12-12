@@ -191,6 +191,8 @@ cdo_SOURCES += Adisit.c        \
                commandline.c   \
                const.h         \
                counter.h       \
+               datetimelist.c  \
+               datetimelist.h  \
                dmemory.h       \
                dtypes.h        \
                ecacore.c       \

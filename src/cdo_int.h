@@ -34,6 +34,7 @@
 #include "dmemory.h"
 #include "process.h"
 #include "const.h"
+#include "datetimelist.h"
 
 #define  OPENMP4  201307
 
@@ -138,17 +139,6 @@ const char * calendar2str(int calendar);
 
 
 typedef struct {
-  int   date;
-  int   time;
-} datetime_t;
-
-typedef struct
-{
-  datetime_t v;
-  datetime_t b[2];
-} dtinfo_t;
-
-typedef struct {
   int   julday;
   int   secofday;
 } juldate_t;
@@ -159,12 +149,6 @@ void      juldate_decode(int calendar, juldate_t juldate, int *date, int *time);
 juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1);
 juldate_t juldate_add_seconds(int seconds, juldate_t juldate);
 double    juldate_to_seconds(juldate_t juldate);
-
-void    get_timestat_date(int *tstat_date);
-void    datetime_avg(int dpy, int ndates, datetime_t *datetime);
-void    datetime_avg_dtinfo(int dpy, int ndates, dtinfo_t *dtinfo);
-void    taxisInqDTinfo(int taxisID, dtinfo_t *dtinfo);
-void    taxisDefDTinfo(int taxisID, dtinfo_t dtinfo);
 
 int     days_per_month(int calendar, int year, int month);
 int     days_per_year(int calendar, int year);
