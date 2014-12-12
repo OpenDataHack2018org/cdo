@@ -18,6 +18,8 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+void strtolower(char *str);
+
 typedef struct {
   int    argc;
   int    argl;

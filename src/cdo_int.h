@@ -34,7 +34,8 @@
 #include "dmemory.h"
 #include "process.h"
 #include "const.h"
-#include "datetimelist.h"
+#include "util.h"
+#include "datetime.h"
 
 #define  OPENMP4  201307
 
@@ -107,11 +108,6 @@ char *strdup(const char *s);
 #define  CDO_EXP_LOCAL   1
 #define  CDO_EXP_REMOTE  2
 
-
-enum {DATE_FIRST, DATE_LAST, DATE_MIDDLE};
-
-void strtolower(char *str);
-
 void print_pthread_info(void);
 
 void cdoProcessTime(double *utime, double *stime);
@@ -136,19 +132,6 @@ void time2str(int time, char *timestr, int maxlen);
 
 const char * tunit2str(int tunits);
 const char * calendar2str(int calendar);
-
-
-typedef struct {
-  int   julday;
-  int   secofday;
-} juldate_t;
-
-
-juldate_t juldate_encode(int calendar, int date, int time);
-void      juldate_decode(int calendar, juldate_t juldate, int *date, int *time);
-juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1);
-juldate_t juldate_add_seconds(int seconds, juldate_t juldate);
-double    juldate_to_seconds(juldate_t juldate);
 
 int     days_per_month(int calendar, int year, int month);
 int     days_per_year(int calendar, int year);

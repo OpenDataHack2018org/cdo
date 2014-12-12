@@ -55,7 +55,7 @@ void *Yearmonstat(void *argument)
   char vdatestr[32], vtimestr[32];
   field_t **vars1 = NULL, **samp1 = NULL;
   field_t field;
-  int timestat_date = DATE_MIDDLE;
+  int timestat_date = TIMESTAT_MEAN;
   dtinfo_t dtinfo[13];
 
   cdoInitialize(argument);
@@ -214,9 +214,9 @@ void *Yearmonstat(void *argument)
 	  cdoPrint("%s %s  nsets = %d", vdatestr, vtimestr, nsets);
 	}
 
-      if      ( timestat_date == DATE_MIDDLE ) datetime_avg_dtinfo(calendar, nsets, dtinfo);
-      else if ( timestat_date == DATE_FIRST  ) dtinfo[nsets].v = dtinfo[0].v;
-      else if ( timestat_date == DATE_LAST   ) dtinfo[nsets].v = dtinfo[nsets-1].v;
+      if      ( timestat_date == TIMESTAT_MEAN  ) datetime_avg_dtinfo(calendar, nsets, dtinfo);
+      else if ( timestat_date == TIMESTAT_FIRST ) dtinfo[nsets].v = dtinfo[0].v;
+      else if ( timestat_date == TIMESTAT_LAST  ) dtinfo[nsets].v = dtinfo[nsets-1].v;
 
       if ( taxisHasBounds(taxisID2) )
 	{

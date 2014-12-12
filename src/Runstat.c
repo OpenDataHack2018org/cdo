@@ -35,117 +35,6 @@
 #include "pstream.h"
 
 
-void datetime_avg_dtinfo(int calendar, int ndates, dtinfo_t *dtinfo)
-{
-  int vdate, vtime;
-  juldate_t juldate1, juldate2, juldatem;
-  double seconds;
-  /*
-  for ( i = 0; i < ndates; i++ )
-    fprintf(stdout, "%4d %d %d\n", i+1, dtinfo[i].v.date, dtinfo[i].v.time);
-  */
-  if ( ndates%2 == 0 )
-    {
-      /*
-      vdate = dtinfo[ndates-1].v.date;
-      vtime = dtinfo[ndates-1].v.time;
-      */
-      vdate = dtinfo[ndates/2-1].v.date;
-      vtime = dtinfo[ndates/2-1].v.time;
-      juldate1 = juldate_encode(calendar, vdate, vtime);
-
-      vdate = dtinfo[ndates/2].v.date;
-      vtime = dtinfo[ndates/2].v.time;
-      juldate2 = juldate_encode(calendar, vdate, vtime);
-
-      seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
-      juldate_decode(calendar, juldatem, &vdate, &vtime);
-    }
-  else
-    {
-      vdate = dtinfo[ndates/2].v.date;
-      vtime = dtinfo[ndates/2].v.time;
-    }
-
-  dtinfo[ndates].v.date = vdate;
-  dtinfo[ndates].v.time = vtime;
-  /*
-  fprintf(stdout, "res: %d %d\n\n", dtinfo[ndates].v.date, dtinfo[ndates].v.time);
-  */
-}
-
-
-void datetime_avg(int calendar, int ndates, datetime_t *datetime)
-{
-  int vdate, vtime;
-  juldate_t juldate1, juldate2, juldatem;
-  double seconds;
-  /*
-  for ( i = 0; i < ndates; i++ )
-    fprintf(stdout, "%4d %d %d\n", i+1, datetime[i].date, datetime[i].time);
-  */
-  if ( ndates%2 == 0 )
-    {
-      /*
-      vdate = datetime[ndates-1].date;
-      vtime = datetime[ndates-1].time;
-      */
-      vdate = datetime[ndates/2-1].date;
-      vtime = datetime[ndates/2-1].time;
-      juldate1 = juldate_encode(calendar, vdate, vtime);
-
-      vdate = datetime[ndates/2].date;
-      vtime = datetime[ndates/2].time;
-      juldate2 = juldate_encode(calendar, vdate, vtime);
-
-      seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
-      juldate_decode(calendar, juldatem, &vdate, &vtime);
-    }
-  else
-    {
-      vdate = datetime[ndates/2].date;
-      vtime = datetime[ndates/2].time;
-    }
-
-  datetime[ndates].date = vdate;
-  datetime[ndates].time = vtime;
-  /*
-  fprintf(stdout, "res: %d %d\n\n", datetime[ndates].date, datetime[ndates].time);
-  */
-}
-
-
-void get_timestat_date(int *tstat_date)
-{
-  char *envstr;
-
-  envstr = getenv("TIMESTAT_DATE");
-  if ( envstr == NULL ) envstr = getenv("RUNSTAT_DATE");
-  if ( envstr )
-    {
-      int env_date = -1;
-      char envstrl[8];
-
-      memcpy(envstrl, envstr, 8);
-      envstrl[7] = 0;
-      strtolower(envstrl);
-
-      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = DATE_FIRST;
-      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = DATE_LAST;
-      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = DATE_MIDDLE;
-
-      if ( env_date >= 0 )
-	{
-	  *tstat_date = env_date;
-
-	  if ( cdoVerbose ) cdoPrint("Set TIMESTAT_DATE to %s", envstr);
-	}
-    }
-}
-
-
 void *Runstat(void *argument)
 {
   int operatorID;
@@ -173,7 +62,7 @@ void *Runstat(void *argument)
   int taxisID1, taxisID2;
   int calendar;
   int runstat_nomiss = 0;
-  int timestat_date = DATE_MIDDLE;
+  int timestat_date = TIMESTAT_MEAN;
   char *envstr;
 
   cdoInitialize(argument);
@@ -361,9 +250,9 @@ void *Runstat(void *argument)
 	      }
 	  }
 
-      if      ( timestat_date == DATE_MIDDLE ) datetime_avg_dtinfo(calendar, ndates, dtinfo);
-      else if ( timestat_date == DATE_FIRST  ) dtinfo[ndates].v = dtinfo[0].v;
-      else if ( timestat_date == DATE_LAST   ) dtinfo[ndates].v = dtinfo[ndates-1].v;
+      if      ( timestat_date == TIMESTAT_MEAN  ) datetime_avg_dtinfo(calendar, ndates, dtinfo);
+      else if ( timestat_date == TIMESTAT_FIRST ) dtinfo[ndates].v = dtinfo[0].v;
+      else if ( timestat_date == TIMESTAT_LAST  ) dtinfo[ndates].v = dtinfo[ndates-1].v;
 
       if ( taxisHasBounds(taxisID2) )
 	{

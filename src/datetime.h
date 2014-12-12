@@ -6,6 +6,12 @@
 
 
 typedef struct {
+  int   julday;
+  int   secofday;
+} juldate_t;
+
+
+typedef struct {
   int   date;
   int   time;
 } datetime_t;
@@ -39,6 +45,13 @@ typedef struct
   dtinfo_type *dtinfo;
 } dtlist_type;
 
+
+
+juldate_t juldate_encode(int calendar, int date, int time);
+void      juldate_decode(int calendar, juldate_t juldate, int *date, int *time);
+juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1);
+juldate_t juldate_add_seconds(int seconds, juldate_t juldate);
+double    juldate_to_seconds(juldate_t juldate);
 
 
 void    get_timestat_date(int *tstat_date);
