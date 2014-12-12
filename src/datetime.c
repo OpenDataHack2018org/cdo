@@ -5,6 +5,37 @@
 #include "cdo.h"
 #include "datetime.h"
 
+static int timestat_date = -1;
+
+
+void get_timestat_date(int *tstat_date)
+{
+  char *envstr;
+
+  envstr = getenv("TIMESTAT_DATE");
+  if ( envstr == NULL ) envstr = getenv("RUNSTAT_DATE");
+  if ( envstr )
+    {
+      int env_date = -1;
+      char envstrl[8];
+
+      memcpy(envstrl, envstr, 8);
+      envstrl[7] = 0;
+      strtolower(envstrl);
+
+      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = TIMESTAT_FIRST;
+      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = TIMESTAT_LAST;
+      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = TIMESTAT_MEAN;
+
+      if ( env_date >= 0 )
+	{
+	  *tstat_date = env_date;
+
+	  if ( cdoVerbose ) cdoPrint("Set TIMESTAT_DATE to %s", envstr);
+	}
+    }
+}
+
 
 void taxisInqDTinfo(int taxisID, dtinfo_t *dtinfo)
 {
@@ -37,6 +68,12 @@ void dtlist_init(dtlist_type *dtlist)
   dtlist->calendar = CALENDAR_STANDARD;
   dtlist->stat     = TIMESTAT_LAST;
   dtlist->dtinfo   = NULL;
+
+  if ( timestat_date == -1 )
+    {
+      timestat_date = 0;
+      get_timestat_date(&timestat_date);
+    }
 }
 
 
@@ -141,6 +178,7 @@ void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
     cdoAbort("Internal error; unexpected nsteps!");
 
   int stat = dtlist->stat;
+  if ( timestat_date > 0 ) stat = timestat_date;
 
   if      ( stat == TIMESTAT_MEAN  ) dtlist_mean(dtlist, nsteps);
   else if ( stat == TIMESTAT_FIRST ) dtlist->timestat.v = dtlist->dtinfo[0].v;
@@ -262,33 +300,4 @@ void datetime_avg(int calendar, int ndates, datetime_t *datetime)
   /*
   fprintf(stdout, "res: %d %d\n\n", datetime[ndates].date, datetime[ndates].time);
   */
-}
-
-
-void get_timestat_date(int *tstat_date)
-{
-  char *envstr;
-
-  envstr = getenv("TIMESTAT_DATE");
-  if ( envstr == NULL ) envstr = getenv("RUNSTAT_DATE");
-  if ( envstr )
-    {
-      int env_date = -1;
-      char envstrl[8];
-
-      memcpy(envstrl, envstr, 8);
-      envstrl[7] = 0;
-      strtolower(envstrl);
-
-      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = TIMESTAT_FIRST;
-      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = TIMESTAT_LAST;
-      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = TIMESTAT_MEAN;
-
-      if ( env_date >= 0 )
-	{
-	  *tstat_date = env_date;
-
-	  if ( cdoVerbose ) cdoPrint("Set TIMESTAT_DATE to %s", envstr);
-	}
-    }
 }

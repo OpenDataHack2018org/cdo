@@ -63,8 +63,6 @@ void *Runstat(void *argument)
       if ( envval == 1 ) runstat_nomiss = 1;
     }
 
-  get_timestat_date(&timestat_date);
-
   cdoOperatorAdd("runmin",  func_min,  0, NULL);
   cdoOperatorAdd("runmax",  func_max,  0, NULL);
   cdoOperatorAdd("runsum",  func_sum,  0, NULL);
