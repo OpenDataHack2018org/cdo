@@ -118,6 +118,15 @@ void dtlist_taxisDefTimestep(int taxisID, int tsID, const dtlist_type *dtlist)
 }
 
 
+void dtlist_shift(const dtlist_type *dtlist)
+{
+  for ( size_t inp = 0; inp < dtlist->size-1; inp++ )
+    {
+      dtlist->dtinfo[inp] = dtlist->dtinfo[inp+1];
+    }
+}
+
+
 void datetime_avg_dtinfo(int calendar, int ndates, dtinfo_t *dtinfo)
 {
   int vdate, vtime;
