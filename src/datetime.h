@@ -40,6 +40,8 @@ typedef struct
 {
   size_t       nalloc;
   size_t       size;
+  int          calendar;
+  int          stat;
   int          timestat_date;
   dtinfo_type  timestat;
   dtinfo_type *dtinfo;
@@ -62,5 +64,9 @@ void    taxisDefDTinfo(int taxisID, dtinfo_t dtinfo);
 
 dtlist_type *dtlist_new(void);
 void dtlist_delete(dtlist_type *dtlist);
-void dtlist_taxisInqTimestep(int taxisID, int tsID, dtlist_type *dtlist);
-void dtlist_taxisDefTimestep(int taxisID, int tsID, const dtlist_type *dtlist);
+void dtlist_shift(dtlist_type *dtlist);
+void dtlist_set_stat(dtlist_type *dtlist, int stat);
+void dtlist_set_calendar(dtlist_type *dtlist, int calendar);
+void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID);
+void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID);
+void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps);

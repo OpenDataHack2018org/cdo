@@ -37,37 +37,25 @@
 
 void *Runstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int gridsize, gridsizemax;
+  int gridsize;
   int i;
   int varID;
   int recID;
-  int nrecs, nrecords;
+  int nrecs;
   int levelID;
   int tsID;
   int otsID;
-  int inp, its, ndates = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
+  int inp, its;
   int nmiss;
-  int nvars, nlevel;
-  int *recVarID, *recLevelID;
-  int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
-  int *imask;
-  double missval;
-  double divisor;
-  field_t ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
-  dtinfo_t *dtinfo;
-  int taxisID1, taxisID2;
-  int calendar;
+  int nlevel;
   int runstat_nomiss = 0;
   int timestat_date = TIMESTAT_MEAN;
-  char *envstr;
+  double missval;
+  field_t ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
 
   cdoInitialize(argument);
 
-  envstr = getenv("RUNSTAT_NOMISS");
+  char *envstr = getenv("RUNSTAT_NOMISS");
   if ( envstr )
     {
       char *endptr;
@@ -87,39 +75,40 @@ void *Runstat(void *argument)
   cdoOperatorAdd("runstd",  func_std,  0, NULL);
   cdoOperatorAdd("runstd1", func_std1, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
   operatorInputArg("number of timesteps");
-  ndates = atoi(operatorArgv()[0]);
+  int ndates = atoi(operatorArgv()[0]);
 
-  lmean   = operfunc == func_mean || operfunc == func_avg;
-  lstd    = operfunc == func_std || operfunc == func_std1;
-  lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  divisor = operfunc == func_std1 || operfunc == func_var1;
+  int lmean   = operfunc == func_mean || operfunc == func_avg;
+  int lstd    = operfunc == func_std || operfunc == func_std1;
+  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  double divisor = operfunc == func_std1 || operfunc == func_var1;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  calendar = taxisInqCalendar(taxisID1);
-
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  dtlist_type *dtlist = dtlist_new();
+  dtlist_set_stat(dtlist, timestat_date);
+  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  dtinfo = (dtinfo_t*) malloc((ndates+1)*sizeof(dtinfo_t));
+  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+
   vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   if ( !runstat_nomiss )
     samp1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
@@ -135,15 +124,15 @@ void *Runstat(void *argument)
 	vars2[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
-  gridsizemax = vlistGridsizeMax(vlistID1);
-  imask = (int*) malloc(gridsizemax*sizeof(int));
+  int gridsizemax = vlistGridsizeMax(vlistID1);
+  int *imask = (int*) malloc(gridsizemax*sizeof(int));
 
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) cdoAbort("File has less then %d timesteps!", ndates);
 
-      taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
+      dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
 	
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -250,17 +239,7 @@ void *Runstat(void *argument)
 	      }
 	  }
 
-      if      ( timestat_date == TIMESTAT_MEAN  ) datetime_avg_dtinfo(calendar, ndates, dtinfo);
-      else if ( timestat_date == TIMESTAT_FIRST ) dtinfo[ndates].v = dtinfo[0].v;
-      else if ( timestat_date == TIMESTAT_LAST  ) dtinfo[ndates].v = dtinfo[ndates-1].v;
-
-      if ( taxisHasBounds(taxisID2) )
-	{
-	  dtinfo[ndates].b[0] = dtinfo[0].b[0];
-	  dtinfo[ndates].b[1] = dtinfo[ndates-1].b[1];
-	}
-
-      taxisDefDTinfo(taxisID2, dtinfo[ndates]);
+      dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
       streamDefTimestep(streamID2, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
@@ -276,7 +255,8 @@ void *Runstat(void *argument)
 
       otsID++;
 
-      dtinfo[ndates] = dtinfo[0];
+      dtlist_shift(dtlist);
+
       vars1[ndates] = vars1[0];
       if ( !runstat_nomiss )
 	samp1[ndates] = samp1[0];
@@ -285,7 +265,6 @@ void *Runstat(void *argument)
 
       for ( inp = 0; inp < ndates; inp++ )
 	{
-	  dtinfo[inp] = dtinfo[inp+1];
 	  vars1[inp] = vars1[inp+1];
 	  if ( !runstat_nomiss )
 	    samp1[inp] = samp1[inp+1];
@@ -296,7 +275,7 @@ void *Runstat(void *argument)
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
-      taxisInqDTinfo(taxisID1, &dtinfo[ndates-1]);
+      dtlist_taxisInqTimestep(dtlist, taxisID1, ndates-1);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -366,7 +345,6 @@ void *Runstat(void *argument)
       if ( lvarstd ) field_free(vars2[its], vlistID1);
     }
 
-  free(dtinfo);
   free(vars1);
   if ( !runstat_nomiss ) free(samp1);
   if ( lvarstd ) free(vars2);
@@ -374,6 +352,8 @@ void *Runstat(void *argument)
   if ( recVarID   ) free(recVarID);
   if ( recLevelID ) free(recLevelID);
   if ( imask )      free(imask);
+
+  dtlist_delete(dtlist);
 
   streamClose(streamID2);
   streamClose(streamID1);

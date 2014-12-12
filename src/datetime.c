@@ -32,10 +32,11 @@ void taxisDefDTinfo(int taxisID, dtinfo_t dtinfo)
 
 void dtlist_init(dtlist_type *dtlist)
 {
-  dtlist->nalloc = 0;
-  dtlist->size   = 0;
-  dtlist->timestat_date  = TIMESTAT_LAST;
-  dtlist->dtinfo = NULL;
+  dtlist->nalloc   = 0;
+  dtlist->size     = 0;
+  dtlist->calendar = CALENDAR_STANDARD;
+  dtlist->stat     = TIMESTAT_LAST;
+  dtlist->dtinfo   = NULL;
 }
 
 
@@ -58,7 +59,7 @@ void dtlist_delete(dtlist_type *dtlist)
 }
 
 
-void dtlist_taxisInqTimestep(int taxisID, int tsID, dtlist_type *dtlist)
+void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 {
   size_t NALLOC = 512;
 
@@ -88,22 +89,7 @@ void dtlist_taxisInqTimestep(int taxisID, int tsID, dtlist_type *dtlist)
 }
 
 
-void dtlist_stat_taxisDefTimestep(int taxisID, int nsteps, const dtlist_type *dtlist)
-{
-  if ( (size_t)nsteps != dtlist->size )
-    cdoAbort("Internal error; unexpected nsteps!");
-
-  taxisDefVdate(taxisID, dtlist->timestat.v.date);
-  taxisDefVtime(taxisID, dtlist->timestat.v.time);
-  if ( taxisHasBounds(taxisID) )
-    {
-      taxisDefVdateBounds(taxisID, dtlist->timestat.b[0].date, dtlist->timestat.b[1].date);
-      taxisDefVtimeBounds(taxisID, dtlist->timestat.b[0].time, dtlist->timestat.b[1].time);
-    }
-}
-
-
-void dtlist_taxisDefTimestep(int taxisID, int tsID, const dtlist_type *dtlist)
+void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 {
   if ( tsID < 0 || (size_t)tsID >= dtlist->size )
     cdoAbort("Internal error; tsID out of bounds!");
@@ -118,12 +104,82 @@ void dtlist_taxisDefTimestep(int taxisID, int tsID, const dtlist_type *dtlist)
 }
 
 
-void dtlist_shift(const dtlist_type *dtlist)
+void dtlist_mean(dtlist_type *dtlist, int nsteps)
+{
+  int vdate, vtime;
+
+  if ( nsteps%2 == 0 )
+    {
+      int calendar = dtlist->calendar;
+
+      vdate = dtlist->dtinfo[nsteps/2-1].v.date;
+      vtime = dtlist->dtinfo[nsteps/2-1].v.time;
+      juldate_t juldate1 = juldate_encode(calendar, vdate, vtime);
+
+      vdate = dtlist->dtinfo[nsteps/2].v.date;
+      vtime = dtlist->dtinfo[nsteps/2].v.time;
+      juldate_t juldate2 = juldate_encode(calendar, vdate, vtime);
+
+      double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
+      juldate_t juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
+      juldate_decode(calendar, juldatem, &vdate, &vtime);
+    }
+  else
+    {
+      vdate = dtlist->dtinfo[nsteps/2].v.date;
+      vtime = dtlist->dtinfo[nsteps/2].v.time;
+    }
+
+  dtlist->timestat.v.date = vdate;
+  dtlist->timestat.v.time = vtime;
+}
+
+
+void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
+{
+  if ( (size_t)nsteps != dtlist->size )
+    cdoAbort("Internal error; unexpected nsteps!");
+
+  int stat = dtlist->stat;
+
+  if      ( stat == TIMESTAT_MEAN  ) dtlist_mean(dtlist, nsteps);
+  else if ( stat == TIMESTAT_FIRST ) dtlist->timestat.v = dtlist->dtinfo[0].v;
+  else if ( stat == TIMESTAT_LAST  ) dtlist->timestat.v = dtlist->dtinfo[nsteps-1].v;
+
+  if ( taxisHasBounds(taxisID) )
+    {
+      dtlist->timestat.b[0] = dtlist->dtinfo[0].b[0];
+      dtlist->timestat.b[1] = dtlist->dtinfo[nsteps-1].b[1];
+    }
+
+  taxisDefVdate(taxisID, dtlist->timestat.v.date);
+  taxisDefVtime(taxisID, dtlist->timestat.v.time);
+  if ( taxisHasBounds(taxisID) )
+    {
+      taxisDefVdateBounds(taxisID, dtlist->timestat.b[0].date, dtlist->timestat.b[1].date);
+      taxisDefVtimeBounds(taxisID, dtlist->timestat.b[0].time, dtlist->timestat.b[1].time);
+    }
+}
+
+
+void dtlist_shift(dtlist_type *dtlist)
 {
   for ( size_t inp = 0; inp < dtlist->size-1; inp++ )
     {
       dtlist->dtinfo[inp] = dtlist->dtinfo[inp+1];
     }
+}
+
+
+void dtlist_set_stat(dtlist_type *dtlist, int stat)
+{
+  dtlist->stat = stat;
+}
+
+
+void dtlist_set_calendar(dtlist_type *dtlist, int calendar)
+{
+  dtlist->calendar = calendar;
 }
 
 

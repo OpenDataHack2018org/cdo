@@ -114,7 +114,7 @@ void *Detrend(void *argument)
 	  vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
 	}
 
-      dtlist_taxisInqTimestep(taxisID1, tsID, dtlist);
+      dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
@@ -175,7 +175,7 @@ void *Detrend(void *argument)
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
-      dtlist_taxisDefTimestep(taxisID2, tsID, dtlist);
+      dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
       streamDefTimestep(streamID2, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
