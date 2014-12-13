@@ -37,30 +37,6 @@ void get_timestat_date(int *tstat_date)
 }
 
 
-void taxisInqDTinfo(int taxisID, dtinfo_t *dtinfo)
-{
-  dtinfo->v.date = taxisInqVdate(taxisID);
-  dtinfo->v.time = taxisInqVtime(taxisID);
-  if ( taxisHasBounds(taxisID) )
-    {
-      taxisInqVdateBounds(taxisID, &(dtinfo->b[0].date), &(dtinfo->b[1].date));
-      taxisInqVtimeBounds(taxisID, &(dtinfo->b[0].time), &(dtinfo->b[1].time));
-    }
-}
-
-
-void taxisDefDTinfo(int taxisID, dtinfo_t dtinfo)
-{
-  taxisDefVdate(taxisID, dtinfo.v.date);
-  taxisDefVtime(taxisID, dtinfo.v.time);
-  if ( taxisHasBounds(taxisID) )
-    {
-      taxisDefVdateBounds(taxisID, dtinfo.b[0].date, dtinfo.b[1].date);
-      taxisDefVtimeBounds(taxisID, dtinfo.b[0].time, dtinfo.b[1].time);
-    }
-}
-
-
 void dtlist_init(dtlist_type *dtlist)
 {
   dtlist->nalloc     = 0;
