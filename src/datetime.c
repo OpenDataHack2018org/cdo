@@ -63,11 +63,12 @@ void taxisDefDTinfo(int taxisID, dtinfo_t dtinfo)
 
 void dtlist_init(dtlist_type *dtlist)
 {
-  dtlist->nalloc   = 0;
-  dtlist->size     = 0;
-  dtlist->calendar = CALENDAR_STANDARD;
-  dtlist->stat     = TIMESTAT_LAST;
-  dtlist->dtinfo   = NULL;
+  dtlist->nalloc     = 0;
+  dtlist->size       = 0;
+  dtlist->calendar   = CALENDAR_STANDARD;
+  dtlist->has_bounds = 0;
+  dtlist->stat       = TIMESTAT_LAST;
+  dtlist->dtinfo     = NULL;
 
   if ( timestat_date == -1 )
     {
@@ -111,7 +112,9 @@ void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
   dtlist->dtinfo[tsID].v.date = taxisInqVdate(taxisID);
   dtlist->dtinfo[tsID].v.time = taxisInqVtime(taxisID);
 
-  if ( taxisHasBounds(taxisID) )
+  if ( tsID == 0 && taxisHasBounds(taxisID) ) dtlist->has_bounds = 1;
+
+  if ( dtlist->has_bounds )
     {
       taxisInqVdateBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].date), &(dtlist->dtinfo[tsID].b[1].date));
       taxisInqVtimeBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].time), &(dtlist->dtinfo[tsID].b[1].time));
@@ -133,7 +136,7 @@ void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 
   taxisDefVdate(taxisID, dtlist->dtinfo[tsID].v.date);
   taxisDefVtime(taxisID, dtlist->dtinfo[tsID].v.time);
-  if ( taxisHasBounds(taxisID) )
+  if ( dtlist->has_bounds )
     {
       taxisDefVdateBounds(taxisID, dtlist->dtinfo[tsID].b[0].date, dtlist->dtinfo[tsID].b[1].date);
       taxisDefVtimeBounds(taxisID, dtlist->dtinfo[tsID].b[0].time, dtlist->dtinfo[tsID].b[1].time);
@@ -184,15 +187,20 @@ void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
   else if ( stat == TIMESTAT_FIRST ) dtlist->timestat.v = dtlist->dtinfo[0].v;
   else if ( stat == TIMESTAT_LAST  ) dtlist->timestat.v = dtlist->dtinfo[nsteps-1].v;
 
-  if ( taxisHasBounds(taxisID) )
+  if ( dtlist->has_bounds )
     {
       dtlist->timestat.b[0] = dtlist->dtinfo[0].b[0];
       dtlist->timestat.b[1] = dtlist->dtinfo[nsteps-1].b[1];
     }
+  else
+    {
+      dtlist->timestat.b[0] = dtlist->dtinfo[0].v;
+      dtlist->timestat.b[1] = dtlist->dtinfo[nsteps-1].v;
+    }
 
   taxisDefVdate(taxisID, dtlist->timestat.v.date);
   taxisDefVtime(taxisID, dtlist->timestat.v.time);
-  if ( taxisHasBounds(taxisID) )
+  // if ( dtlist->has_bounds )
     {
       taxisDefVdateBounds(taxisID, dtlist->timestat.b[0].date, dtlist->timestat.b[1].date);
       taxisDefVtimeBounds(taxisID, dtlist->timestat.b[0].time, dtlist->timestat.b[1].time);
@@ -218,6 +226,24 @@ void dtlist_set_stat(dtlist_type *dtlist, int stat)
 void dtlist_set_calendar(dtlist_type *dtlist, int calendar)
 {
   dtlist->calendar = calendar;
+}
+
+
+int dtlist_get_vdate(dtlist_type *dtlist, int tsID)
+{
+  if ( tsID < 0 || (size_t)tsID >= dtlist->size )
+    cdoAbort("Internal error; tsID out of bounds!");
+
+  return dtlist->dtinfo[tsID].v.date;
+}
+
+
+int dtlist_get_vtime(dtlist_type *dtlist, int tsID)
+{
+  if ( tsID < 0 || (size_t)tsID >= dtlist->size )
+    cdoAbort("Internal error; tsID out of bounds!");
+
+  return dtlist->dtinfo[tsID].v.time;
 }
 
 

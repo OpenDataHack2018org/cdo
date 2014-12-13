@@ -125,8 +125,6 @@ void *Filter(void *argument)
   enum {BANDPASS, HIGHPASS, LOWPASS};
   char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
-  int operatorID;
-  int operfunc;
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;
@@ -134,11 +132,8 @@ void *Filter(void *argument)
   int i;
   int nts;
   int nalloc = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
   int nvars, nlevel;
-  dtinfo_t *dtinfo = NULL;
   int incperiod0, incunit0, incunit, calendar;
   int year0, month0, day0;
   double fdata = 0;
@@ -146,6 +141,7 @@ void *Filter(void *argument)
   double fmin = 0, fmax = 0;
   int *fmasc;
   int use_fftw = FALSE;
+  dtlist_type *dtlist = dtlist_new();
   typedef struct
   {
     double *array1;
@@ -165,8 +161,8 @@ void *Filter(void *argument)
   cdoOperatorAdd("highpass",  HIGHPASS,  0, NULL);
   cdoOperatorAdd("lowpass" ,  LOWPASS,   0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc   = cdoOperatorF1(operatorID);
 
   if ( CDO_Use_FFTW )
     {
@@ -180,13 +176,13 @@ void *Filter(void *argument)
       
   if ( cdoVerbose && use_fftw  == FALSE ) cdoPrint("Using intrinsic FFT function!");
   
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   calendar = taxisInqCalendar(taxisID1);  
@@ -199,11 +195,10 @@ void *Filter(void *argument)
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-          dtinfo = (dtinfo_t*) realloc(dtinfo, nalloc*sizeof(dtinfo_t));
           vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
         }
                        
-      taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
+      dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
    
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
            
@@ -221,21 +216,23 @@ void *Filter(void *argument)
       /* get and check time increment */                   
       if ( tsID > 0 )
         {    
-          juldate_t juldate0, juldate;
-          double jdelta;
           int incperiod = 0;
           int year, month, day;
+	  int vdate0 = dtlist_get_vdate(dtlist, tsID-1);
+	  int vdate  = dtlist_get_vdate(dtlist, tsID);
+	  int vtime0 = dtlist_get_vtime(dtlist, tsID-1);
+	  int vtime  = dtlist_get_vtime(dtlist, tsID);
 
-          cdiDecodeDate(dtinfo[tsID].v.date,   &year,  &month,  &day);
-          cdiDecodeDate(dtinfo[tsID-1].v.date, &year0, &month0, &day0);               
+          cdiDecodeDate(vdate0, &year0, &month0, &day0);               
+          cdiDecodeDate(vdate,  &year,  &month,  &day);
 
-          juldate0 = juldate_encode(calendar, dtinfo[tsID-1].v.date, dtinfo[tsID-1].v.time);        
-          juldate  = juldate_encode(calendar, dtinfo[tsID].v.date, dtinfo[tsID].v.time);         
-          jdelta   = juldate_to_seconds(juldate_sub(juldate, juldate0));
+          juldate_t juldate0 = juldate_encode(calendar, vdate0, vtime0);        
+          juldate_t juldate  = juldate_encode(calendar, vdate,  vtime);         
+          double jdelta   = juldate_to_seconds(juldate_sub(juldate, juldate0));
           
           if ( tsID == 1 ) 
             {           
-              getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod0, &incunit0);
+              getTimeInc(jdelta, vdate0, vdate, &incperiod0, &incunit0);
               incperiod = incperiod0; 
               if ( incperiod == 0 ) cdoAbort("Time step must be different from zero!");
               incunit = incunit0;
@@ -243,7 +240,7 @@ void *Filter(void *argument)
               fdata = 1.*iunits[incunit]/incperiod;
             }
           else 
-            getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod, &incunit);        
+            getTimeInc(jdelta, vdate0, vdate, &incperiod, &incunit);        
 
           if ( incunit0 < 4 && month == 2 && day == 29 && 
                ( day0 != day || month0 != month || year0 != year ) )
@@ -394,13 +391,13 @@ void *Filter(void *argument)
       free(ompmem);
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   
   streamDefVlist(streamID2, vlistID2);
  
   for ( tsID = 0; tsID < nts; tsID++ )
     {
-      taxisDefDTinfo(taxisID2, dtinfo[tsID]);
+      dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
       streamDefTimestep(streamID2, tsID);
     
       for ( varID = 0; varID < nvars; varID++ )
@@ -424,7 +421,8 @@ void *Filter(void *argument)
     }
 
   if ( vars   ) free(vars);
-  if ( dtinfo ) free(dtinfo);
+
+  dtlist_delete(dtlist);
 
   streamClose(streamID2);
   streamClose(streamID1);

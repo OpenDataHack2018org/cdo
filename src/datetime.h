@@ -40,6 +40,7 @@ typedef struct
 {
   size_t       nalloc;
   size_t       size;
+  int          has_bounds;
   int          calendar;
   int          stat;
   int          timestat_date;
@@ -67,6 +68,8 @@ void dtlist_delete(dtlist_type *dtlist);
 void dtlist_shift(dtlist_type *dtlist);
 void dtlist_set_stat(dtlist_type *dtlist, int stat);
 void dtlist_set_calendar(dtlist_type *dtlist, int calendar);
+int  dtlist_get_vdate(dtlist_type *dtlist, int tsID);
+int  dtlist_get_vtime(dtlist_type *dtlist, int tsID);
 void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID);
 void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID);
 void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps);
