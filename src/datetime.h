@@ -59,7 +59,6 @@ double    juldate_to_seconds(juldate_t juldate);
 
 void    get_timestat_date(int *tstat_date);
 void    datetime_avg(int dpy, int ndates, datetime_t *datetime);
-void    datetime_avg_dtinfo(int dpy, int ndates, dtinfo_t *dtinfo);
 
 dtlist_type *dtlist_new(void);
 void dtlist_delete(dtlist_type *dtlist);

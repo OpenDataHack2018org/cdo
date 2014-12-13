@@ -223,47 +223,6 @@ int dtlist_get_vtime(dtlist_type *dtlist, int tsID)
 }
 
 
-void datetime_avg_dtinfo(int calendar, int ndates, dtinfo_t *dtinfo)
-{
-  int vdate, vtime;
-  juldate_t juldate1, juldate2, juldatem;
-  double seconds;
-  /*
-  for ( i = 0; i < ndates; i++ )
-    fprintf(stdout, "%4d %d %d\n", i+1, dtinfo[i].v.date, dtinfo[i].v.time);
-  */
-  if ( ndates%2 == 0 )
-    {
-      /*
-      vdate = dtinfo[ndates-1].v.date;
-      vtime = dtinfo[ndates-1].v.time;
-      */
-      vdate = dtinfo[ndates/2-1].v.date;
-      vtime = dtinfo[ndates/2-1].v.time;
-      juldate1 = juldate_encode(calendar, vdate, vtime);
-
-      vdate = dtinfo[ndates/2].v.date;
-      vtime = dtinfo[ndates/2].v.time;
-      juldate2 = juldate_encode(calendar, vdate, vtime);
-
-      seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
-      juldate_decode(calendar, juldatem, &vdate, &vtime);
-    }
-  else
-    {
-      vdate = dtinfo[ndates/2].v.date;
-      vtime = dtinfo[ndates/2].v.time;
-    }
-
-  dtinfo[ndates].v.date = vdate;
-  dtinfo[ndates].v.time = vtime;
-  /*
-  fprintf(stdout, "res: %d %d\n\n", dtinfo[ndates].v.date, dtinfo[ndates].v.time);
-  */
-}
-
-
 void datetime_avg(int calendar, int ndates, datetime_t *datetime)
 {
   int vdate, vtime;
