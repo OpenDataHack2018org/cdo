@@ -99,7 +99,7 @@ void dtlist_delete(dtlist_type *dtlist)
 
 void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
 {
-  size_t NALLOC = 512;
+  size_t NALLOC = 128;
 
   if ( (size_t)tsID >= dtlist->nalloc )
     {
@@ -177,8 +177,8 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
 
 void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
 {
-  if ( (size_t)nsteps != dtlist->size )
-    cdoAbort("Internal error; unexpected nsteps!");
+  if ( (size_t)nsteps > dtlist->size )
+    cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
 
   int stat = dtlist->stat;
   if ( timestat_date > 0 ) stat = timestat_date;

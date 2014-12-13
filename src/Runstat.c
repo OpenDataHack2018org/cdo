@@ -37,6 +37,7 @@
 
 void *Runstat(void *argument)
 {
+  int timestat_date = TIMESTAT_MEAN;
   int gridsize;
   int i;
   int varID;
@@ -49,7 +50,6 @@ void *Runstat(void *argument)
   int nmiss;
   int nlevel;
   int runstat_nomiss = 0;
-  int timestat_date = TIMESTAT_MEAN;
   double missval;
   field_t ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
 
