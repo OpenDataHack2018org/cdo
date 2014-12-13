@@ -97,15 +97,15 @@ void *Runstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  dtlist_type *dtlist = dtlist_new();
-  dtlist_set_stat(dtlist, timestat_date);
-  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
-
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
   int *recVarID   = (int*) malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+
+  dtlist_type *dtlist = dtlist_new();
+  dtlist_set_stat(dtlist, timestat_date);
+  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
   vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   if ( !runstat_nomiss )
