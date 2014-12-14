@@ -42,7 +42,7 @@ void dtlist_init(dtlist_type *dtlist)
   dtlist->nalloc     = 0;
   dtlist->size       = 0;
   dtlist->calendar   = CALENDAR_STANDARD;
-  dtlist->has_bounds = 0;
+  dtlist->has_bounds = -1;
   dtlist->stat       = TIMESTAT_LAST;
   dtlist->dtinfo     = NULL;
 
@@ -88,7 +88,11 @@ void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
   dtlist->dtinfo[tsID].v.date = taxisInqVdate(taxisID);
   dtlist->dtinfo[tsID].v.time = taxisInqVtime(taxisID);
 
-  if ( tsID == 0 && taxisHasBounds(taxisID) ) dtlist->has_bounds = 1;
+  if ( tsID == 0 && dtlist->has_bounds == -1 )
+    {
+      dtlist->has_bounds = 0;
+      if ( taxisHasBounds(taxisID) ) dtlist->has_bounds = 1;
+    }
 
   if ( dtlist->has_bounds )
     {

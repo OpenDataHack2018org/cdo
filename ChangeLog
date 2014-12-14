@@ -1,3 +1,7 @@
+2014-12-14  Uwe Schulzweida
+
+	* Timstat: added support for env. TIMESTAT_DATE
+
 2014-12-13  Uwe Schulzweida
 
 	* Runstat: added time bounds
