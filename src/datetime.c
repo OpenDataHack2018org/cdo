@@ -7,7 +7,7 @@
 
 static int timestat_date = -1;
 
-
+static
 void get_timestat_date(int *tstat_date)
 {
   char *envstr;
@@ -228,16 +228,9 @@ void datetime_avg(int calendar, int ndates, datetime_t *datetime)
   int vdate, vtime;
   juldate_t juldate1, juldate2, juldatem;
   double seconds;
-  /*
-  for ( i = 0; i < ndates; i++ )
-    fprintf(stdout, "%4d %d %d\n", i+1, datetime[i].date, datetime[i].time);
-  */
+
   if ( ndates%2 == 0 )
     {
-      /*
-      vdate = datetime[ndates-1].date;
-      vtime = datetime[ndates-1].time;
-      */
       vdate = datetime[ndates/2-1].date;
       vtime = datetime[ndates/2-1].time;
       juldate1 = juldate_encode(calendar, vdate, vtime);
@@ -258,7 +251,4 @@ void datetime_avg(int calendar, int ndates, datetime_t *datetime)
 
   datetime[ndates].date = vdate;
   datetime[ndates].time = vtime;
-  /*
-  fprintf(stdout, "res: %d %d\n\n", datetime[ndates].date, datetime[ndates].time);
-  */
 }

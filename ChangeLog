@@ -1,3 +1,7 @@
+2014-12-13  Uwe Schulzweida
+
+	* Runstat: added time bounds
+
 2014-12-12  Uwe Schulzweida
 
 	* using CDI library version 1.6.7
