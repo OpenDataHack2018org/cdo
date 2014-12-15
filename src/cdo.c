@@ -1478,12 +1478,11 @@ int main(int argc, char *argv[])
   int status = 0;
   char *operatorName = NULL;
   char *operatorArg = NULL;
-  extern int dmemory_ExitOnError;
   argument_t *argument = NULL;
 
   cdo_init_is_tty();
 
-  dmemory_ExitOnError = 1;
+  memExitOnError();
 
   _Verbose = 1;
 

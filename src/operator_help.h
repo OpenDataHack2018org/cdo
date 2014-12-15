@@ -2059,7 +2059,7 @@ static char *RunstatHelp[] = {
     "    nts  INTEGER  Number of timesteps",
     "",
     "ENVIRONMENT",
-    "    TIMESTAT_DATE",
+    "    CDO_TIMESTAT_DATE",
     "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing timestep in ifile.",
     NULL
 };
@@ -2426,7 +2426,7 @@ static char *YearmonmeanHelp[] = {
     "    o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
     "",
     "ENVIRONMENT",
-    "    TIMESTAT_DATE",
+    "    CDO_TIMESTAT_DATE",
     "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing timestep in ifile.",
     NULL
 };
