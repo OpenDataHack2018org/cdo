@@ -2060,7 +2060,7 @@ static char *RunstatHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_TIMESTAT_DATE",
-    "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing timestep in ifile.",
+    "        Sets the date information in ofile to the \"first\", \"middle\" or \"last\" contributing timestep in ifile.",
     NULL
 };
 
@@ -2427,7 +2427,7 @@ static char *YearmonmeanHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_TIMESTAT_DATE",
-    "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing timestep in ifile.",
+    "        Sets the date information in ofile to the \"first\", \"middle\" or \"last\" contributing timestep in ifile.",
     NULL
 };
 
