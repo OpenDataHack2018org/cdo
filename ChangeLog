@@ -1,5 +1,6 @@
 2014-12-15  Uwe Schulzweida
 
+	* Seasstat: added support for env. TIMESTAT_DATE
 	* Timselstat: added support for env. TIMESTAT_DATE
 
 2014-12-14  Uwe Schulzweida
