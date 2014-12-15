@@ -81,8 +81,6 @@ void *Timstat(void *argument)
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID, recID;
-  int tsID;
-  int otsID;
   long nsets;
   int i;
   int streamID3 = -1;
@@ -94,8 +92,6 @@ void *Timstat(void *argument)
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
   double missval;
-  field_t **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
-  field_t field;
 
   cdoInitialize(argument);
 
@@ -227,16 +223,17 @@ void *Timstat(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
 
-  vars1 = field_malloc(vlistID1, FIELD_PTR);
-  samp1 = field_malloc(vlistID1, FIELD_NONE);
-  if ( lvarstd )
-    vars2 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  field_t **vars2 = NULL;
+  if ( lvarstd ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
-  tsID    = 0;
-  otsID   = 0;
+  int tsID  = 0;
+  int otsID = 0;
   while ( TRUE )
     {
       nsets = 0;
