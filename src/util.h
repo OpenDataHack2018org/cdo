@@ -18,6 +18,8 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+extern char CDO_Version[]; // refactored: moved here from pstream.c
+
 void strtolower(char *str);
 
 typedef struct {

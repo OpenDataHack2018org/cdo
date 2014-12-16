@@ -33,6 +33,8 @@
 #include "modules.h"
 #include "util.h"
 
+char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)"; // refactored: moved here from cdo.c
+
 
 int cdo_omp_get_thread_num(void)
 {

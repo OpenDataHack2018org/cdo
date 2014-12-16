@@ -71,8 +71,6 @@ extern char *CDO_optarg;
 #  define  VERSION  "0.0.1"
 #endif
 
-char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)";
-
 char *Progname;
 
 int ompNumThreads = 1;

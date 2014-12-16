@@ -977,7 +977,6 @@ const char *cdoComment(void)
   static char comment[256];
   static int init = 0;
   int size = 0;
-  extern char CDO_Version[];
 
   if ( ! init )
     {
