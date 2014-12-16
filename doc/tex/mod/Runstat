@@ -184,8 +184,8 @@ INTEGER  Number of timesteps
 
 
 @BeginEnvironment
-@Item = TIMESTAT_DATE
-Sets the date information in ofile to the "first", "last" or "middle" contributing timestep in ifile.
+@Item = CDO_TIMESTAT_DATE
+Sets the date information in ofile to the "first", "middle" or "last" contributing timestep in ifile.
 @EndEnvironment
 
 

@@ -185,6 +185,7 @@ void gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, 
     }
 }
 
+
 void *Intlevel3d(void *argument)
 {
   int INTLEVEL3D, INTLEVELX3D;
@@ -200,7 +201,7 @@ void *Intlevel3d(void *argument)
   int nmiss;
 
   int nlonIn, nlatIn, nlonOut, nlatOut;
-  double *lonIn, *latIn, *lonOut, *latOut;
+  //double *lonIn, *latIn, *lonOut, *latOut;
 
   int zaxisID1 = -1, zaxisID3;
   int gridID3 = -1, gridID, zaxisID;
@@ -264,11 +265,12 @@ void *Intlevel3d(void *argument)
 
     nlonIn  = gridInqXsize(gridID);
     nlatIn  = gridInqYsize(gridID);
+    /*
     lonIn   = (double*) malloc(nlonIn*sizeof(double));
     latIn   = (double*) malloc(nlatIn*sizeof(double));
     gridInqXvals(gridID, lonIn);
     gridInqYvals(gridID, latIn);
-
+    */
     zlevels_in = (double*) malloc(gridsize*(nlevel+2)*sizeof(double));
     nlevi      = nlevel;   /* number of input levels for later use */
     gridsizei  = gridsize; /* horizontal gridsize of input z coordinate */
@@ -299,11 +301,12 @@ void *Intlevel3d(void *argument)
 
     nlonOut = gridInqXsize(gridID);
     nlatOut = gridInqYsize(gridID);
+    /*
     lonOut  = (double*) malloc(nlonOut*sizeof(double));
     latOut  = (double*) malloc(nlatOut*sizeof(double));
     gridInqXvals(gridID, lonOut);
     gridInqYvals(gridID, latOut);
-
+    */
     zlevels_out = (double*) malloc(gridsize*nlevel*sizeof(double));
     nlevo       = nlevel;  /* number of output levels for later use */
     gridsizeo   = gridsize;/* horizontal gridsize of output z coordinate */
@@ -347,9 +350,9 @@ void *Intlevel3d(void *argument)
 
    /* input and output vertical coordinates must have exactly the same horizontal grid */
    if ( nlonIn != nlonOut || 
-        nlatIn != nlatOut ||
+        nlatIn != nlatOut /*||
         memcmp(lonIn,lonOut,nlonIn*sizeof(double)) ||
-        memcmp(latIn,latOut,nlatIn*sizeof(double)) )
+        memcmp(latIn,latOut,nlatIn*sizeof(double))*/ )
      {
        /* i =0; printf ( "lonIn:%g latIn:%g lonOut:%g latOut:%g\n",lonIn[i],latIn[i],lonOut[i],latOut[i] ); */
        cdoAbort("Input and output vertical coordinates do NOT exactly have the same horizontal grid.");
@@ -497,15 +500,16 @@ void *Intlevel3d(void *argument)
         {
           nlonIn  = gridInqXsize(gridID);
           nlatIn  = gridInqYsize(gridID);
+	  /*
           lonIn   = (double*) malloc(nlonIn*sizeof(double));
           latIn   = (double*) malloc(nlatIn*sizeof(double));
           gridInqXvals(gridID, lonIn);
           gridInqYvals(gridID, latIn);
-
+	  */
           if ( nlonIn != nlonOut || 
-               nlatIn != nlatOut ||
+               nlatIn != nlatOut /*||
                memcmp(lonIn,lonOut,nlonIn*sizeof(double)) ||
-               memcmp(latIn,latOut,nlatIn*sizeof(double)) )
+               memcmp(latIn,latOut,nlatIn*sizeof(double))*/ )
             {
               varinterp[varID] = FALSE;
               vardata2[varID]  = vardata1[varID];
