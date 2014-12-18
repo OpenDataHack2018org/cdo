@@ -43,7 +43,6 @@ void *Timselstat(void *argument)
   int nrecs = 0;
   int varID, levelID, recID;
   int tsID;
-  int otsID;
   int nsets;
   int i;
   int nmiss;
@@ -137,7 +136,7 @@ void *Timselstat(void *argument)
       goto LABEL_END;
     }
 
-  otsID   = 0;
+  int otsID   = 0;
   while ( TRUE )
     {
       for ( nsets = 0; nsets < ndates; nsets++ )

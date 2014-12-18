@@ -31,10 +31,9 @@
 
 void *Timselpctl(void *argument)
 {
-  int vdate1 = 0, vtime1 = 0;
+  int timestat_date = TIMESTAT_MEAN;
   int vdate2 = 0, vtime2 = 0;
   int vdate3 = 0, vtime3 = 0;
-  int vdate4 = 0, vtime4 = 0;
   int nrecs = 0;
   int gridID, varID, levelID, recID;
   int tsID;
@@ -53,8 +52,7 @@ void *Timselpctl(void *argument)
   operatorInputArg("percentile number, nsets <,noffset <,nskip>>");
 
   int nargc = operatorArgc();
-  if ( nargc < 2 )
-    cdoAbort("Too few arguments! Need %d found %d.", 2, nargc);
+  if ( nargc < 2 ) cdoAbort("Too few arguments! Need %d found %d.", 2, nargc);
 
   double pn  = atof(operatorArgv()[0]);
   int ndates = atoi(operatorArgv()[1]);
@@ -96,6 +94,10 @@ void *Timselpctl(void *argument)
 
   int *recVarID   = (int*) malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+
+  dtlist_type *dtlist = dtlist_new();
+  dtlist_set_stat(dtlist, timestat_date);
+  dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -175,8 +177,7 @@ void *Timselpctl(void *argument)
 	    nrecs = streamInqTimestep(streamID1, tsID);
 	    if ( nrecs == 0 ) break;
 
-	    vdate1 = taxisInqVdate(taxisID1);
-	    vtime1 = taxisInqVtime(taxisID1);
+	    dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 
 	    for ( recID = 0; recID < nrecs; recID++ )
 	      {
@@ -194,19 +195,10 @@ void *Timselpctl(void *argument)
 		hsetAddVarLevelValues(hset, varID, levelID, &vars1[varID][levelID]);
 	      }
 
-	    vdate4 = vdate1;
-	    vtime4 = vtime1;
 	    tsID++;
 	  }
 
       if ( nrecs == 0 && nsets == 0 ) break;
-
-      if ( vdate2 != vdate4 )
-        cdoAbort("Verification dates at time step %d of %s, %s and %s differ!",
-		 otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
-      if ( vtime2 != vtime4 )
-        cdoAbort("Verification times at time step %d of %s, %s and %s differ!",
-		 otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
 
       for ( varID = 0; varID < nvars; varID++ )
         {
@@ -217,8 +209,7 @@ void *Timselpctl(void *argument)
             hsetGetVarLevelPercentiles(&vars1[varID][levelID], hset, varID, levelID, pn);
         }
 
-      taxisDefVdate(taxisID4, vdate4);
-      taxisDefVtime(taxisID4, vtime4);
+      dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
       streamDefTimestep(streamID4, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
@@ -249,6 +240,8 @@ void *Timselpctl(void *argument)
 
   field_free(vars1, vlistID1);
   hsetDestroy(hset);
+
+  dtlist_delete(dtlist);
 
   if ( field.ptr ) free(field.ptr);
 

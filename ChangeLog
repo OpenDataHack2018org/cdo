@@ -1,5 +1,7 @@
 2014-12-18  Uwe Schulzweida
 
+	* Timselpctl: changed timestat_date to mean
+	* Timselpctl: added support for env. TIMESTAT_DATE
 	* Timselpctl: last output time step is written two times (bug fix)
 	* Timselstat: changed timestat_date to mean
 
