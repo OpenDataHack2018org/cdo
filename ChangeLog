@@ -1,3 +1,7 @@
+2014-12-18  Uwe Schulzweida
+
+	* Timselstat: changed timestat_date to mean
+
 2014-12-16  Uwe Schulzweida
 
 	* intlevel3d: works only for regular grids, grid coordinate check disabled (bug fix)

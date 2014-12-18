@@ -38,7 +38,7 @@
 
 void *Timselstat(void *argument)
 {
-  int timestat_date = TIMESTAT_LAST;
+  int timestat_date = TIMESTAT_MEAN;
   int gridsize;
   int nrecs = 0;
   int varID, levelID, recID;
