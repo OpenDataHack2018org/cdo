@@ -1,5 +1,6 @@
 2014-12-18  Uwe Schulzweida
 
+	* Timselpctl: last output time step is written two times (bug fix)
 	* Timselstat: changed timestat_date to mean
 
 2014-12-16  Uwe Schulzweida

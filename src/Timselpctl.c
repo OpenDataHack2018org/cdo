@@ -31,26 +31,19 @@
 
 void *Timselpctl(void *argument)
 {
-  int gridsize;
   int vdate1 = 0, vtime1 = 0;
   int vdate2 = 0, vtime2 = 0;
   int vdate3 = 0, vtime3 = 0;
   int vdate4 = 0, vtime4 = 0;
-  int nrecs = 0, nrecords;
+  int nrecs = 0;
   int gridID, varID, levelID, recID;
   int tsID;
-  int otsID;
   int nsets = 0;
   int i;
-  int streamID1, streamID2, streamID3, streamID4;
-  int vlistID1, vlistID2, vlistID3, vlistID4, taxisID1, taxisID2, taxisID3, taxisID4;
   int nmiss;
-  int nvars, nlevels;
-  int ndates = 0, noffset = 0, nskip = 0, nargc;
-  int *recVarID, *recLevelID;
+  int nlevels;
   field_t **vars1 = NULL;
   field_t field;
-  double pn;
   HISTOGRAM_SET *hset = NULL;
 
   cdoInitialize(argument);
@@ -59,12 +52,13 @@ void *Timselpctl(void *argument)
 
   operatorInputArg("percentile number, nsets <,noffset <,nskip>>");
 
-  nargc = operatorArgc();
+  int nargc = operatorArgc();
   if ( nargc < 2 )
     cdoAbort("Too few arguments! Need %d found %d.", 2, nargc);
 
-  pn     = atof(operatorArgv()[0]);
-  ndates = atoi(operatorArgv()[1]);
+  double pn  = atof(operatorArgv()[0]);
+  int ndates = atoi(operatorArgv()[1]);
+  int noffset = 0, nskip = 0;
   if ( nargc > 2 ) noffset = atoi(operatorArgv()[2]);
   if ( nargc > 3 ) nskip   = atoi(operatorArgv()[3]);
 
@@ -73,37 +67,37 @@ void *Timselpctl(void *argument)
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
-  streamID3 = streamOpenRead(cdoStreamName(2));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID3 = streamOpenRead(cdoStreamName(2));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = streamInqVlist(streamID3);
-  vlistID4 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = streamInqVlist(streamID3);
+  int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
   vlistCompare(vlistID1, vlistID3, CMP_ALL);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = vlistInqTaxis(vlistID3);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisID3 = vlistInqTaxis(vlistID3);
   /* TODO - check that time axes 2 and 3 are equal */
 
-  taxisID4 = taxisDuplicate(taxisID1);
+  int taxisID4 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
 
   streamDefVlist(streamID4, vlistID4);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
   field_init(&field);
   field.ptr = (double*) malloc(gridsize * sizeof(double));
@@ -142,7 +136,7 @@ void *Timselpctl(void *argument)
       goto LABEL_END;
     }
 
-  otsID = 0;
+  int otsID = 0;
   while ( TRUE )
     {
       nrecs = streamInqTimestep(streamID2, otsID);
@@ -162,6 +156,7 @@ void *Timselpctl(void *argument)
           streamReadRecord(streamID2, vars1[varID][levelID].ptr, &nmiss);
           vars1[varID][levelID].nmiss = nmiss;
         }
+
       for ( recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID3, &varID, &levelID);
@@ -172,36 +167,37 @@ void *Timselpctl(void *argument)
           
           hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID], &field);
         }
-      
+
+      nsets = 0;
       if ( nrecs )
-      for ( nsets = 0; nsets < ndates; nsets++ )
-	{
-	  nrecs = streamInqTimestep(streamID1, tsID);
-	  if ( nrecs == 0 ) break;
+	for ( nsets = 0; nsets < ndates; nsets++ )
+	  {
+	    nrecs = streamInqTimestep(streamID1, tsID);
+	    if ( nrecs == 0 ) break;
 
-	  vdate1 = taxisInqVdate(taxisID1);
-	  vtime1 = taxisInqVtime(taxisID1);
+	    vdate1 = taxisInqVdate(taxisID1);
+	    vtime1 = taxisInqVtime(taxisID1);
 
-	  for ( recID = 0; recID < nrecs; recID++ )
-	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	    for ( recID = 0; recID < nrecs; recID++ )
+	      {
+		streamInqRecord(streamID1, &varID, &levelID);
 
-	      if ( tsID == 0 )
-		{
-		  recVarID[recID]   = varID;
-		  recLevelID[recID] = levelID;
-		}
+		if ( tsID == 0 )
+		  {
+		    recVarID[recID]   = varID;
+		    recLevelID[recID] = levelID;
+		  }
 
-	      streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-	      vars1[varID][levelID].nmiss = nmiss;
+		streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
+		vars1[varID][levelID].nmiss = nmiss;
                   
-              hsetAddVarLevelValues(hset, varID, levelID, &vars1[varID][levelID]);
-	    }
+		hsetAddVarLevelValues(hset, varID, levelID, &vars1[varID][levelID]);
+	      }
 
-	  vdate4 = vdate1;
-	  vtime4 = vtime1;
-	  tsID++;
-	}
+	    vdate4 = vdate1;
+	    vtime4 = vtime1;
+	    tsID++;
+	  }
 
       if ( nrecs == 0 && nsets == 0 ) break;
 
