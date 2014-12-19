@@ -1,3 +1,9 @@
+2014-12-19  Uwe Schulzweida
+
+	* Timpctl: changed timestat_date to mean
+	* Timpctl: added support for env. TIMESTAT_DATE
+	* Timstat: changed timestat_date to mean
+
 2014-12-18  Uwe Schulzweida
 
 	* Timselpctl: changed timestat_date to mean

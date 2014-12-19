@@ -30,6 +30,7 @@
 
 void *Runpctl(void *argument)
 {
+  int timestat_date = TIMESTAT_MEAN;
   int gridsize;
   int varID;
   int recID;
@@ -40,7 +41,6 @@ void *Runpctl(void *argument)
   int i, j, inp, its;
   int nmiss;
   int nlevels;
-  int timestat_date = TIMESTAT_MEAN;
   double missval, val;
   double *array;
   field_t ***vars1 = NULL;
