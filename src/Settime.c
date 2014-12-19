@@ -104,17 +104,12 @@ void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
 
 void *Settime(void *argument)
 {
-  int SETYEAR, SETMON, SETDAY, SETDATE, SETTIME, SETTUNITS;
-  int SETTAXIS, SETREFTIME, SETCALENDAR, SHIFTTIME;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
-  int nrecs, newval = 0, ntsteps, nvars;
+  int nrecs, newval = 0;
   int tsID1, recID, varID, levelID;
-  int vlistID1, vlistID2;
   int vdate, vtime;
   int vdateb[2], vtimeb[2];
   int sdate = 0, stime = 0;
-  int taxisID1, taxisID2 = CDI_UNDEFID;
+  int taxisID2 = CDI_UNDEFID;
   int nmiss;
   int gridsize;
   int tunit = TUNIT_DAY;
@@ -122,7 +117,6 @@ void *Settime(void *argument)
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int day0;
   int taxis_has_bounds, copy_timestep = FALSE;
-  int calendar;
   int newcalendar = CALENDAR_STANDARD;
   // int nargs;
   const char *datestr, *timestr;
@@ -132,18 +126,18 @@ void *Settime(void *argument)
 
   cdoInitialize(argument);
 
-  SETYEAR     = cdoOperatorAdd("setyear",     0,  1, "year");
-  SETMON      = cdoOperatorAdd("setmon",      0,  1, "month");
-  SETDAY      = cdoOperatorAdd("setday",      0,  1, "day");
-  SETDATE     = cdoOperatorAdd("setdate",     0,  1, "date (format: YYYY-MM-DD)");
-  SETTIME     = cdoOperatorAdd("settime",     0,  1, "time (format: hh:mm:ss)");
-  SETTUNITS   = cdoOperatorAdd("settunits",   0,  1, "time units (seconds, minutes, hours, days, months, years)");
-  SETTAXIS    = cdoOperatorAdd("settaxis",    0, -2, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
-  SETREFTIME  = cdoOperatorAdd("setreftime",  0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
-  SETCALENDAR = cdoOperatorAdd("setcalendar", 0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");
-  SHIFTTIME   = cdoOperatorAdd("shifttime",   0,  1, "shift value");
+  int SETYEAR     = cdoOperatorAdd("setyear",      0,  1, "year");
+  int SETMON      = cdoOperatorAdd("setmon",       0,  1, "month");
+  int SETDAY      = cdoOperatorAdd("setday",       0,  1, "day");
+  int SETDATE     = cdoOperatorAdd("setdate",      0,  1, "date (format: YYYY-MM-DD)");
+  int SETTIME     = cdoOperatorAdd("settime",      0,  1, "time (format: hh:mm:ss)");
+  int SETTUNITS   = cdoOperatorAdd("settunits",    0,  1, "time units (seconds, minutes, hours, days, months, years)");
+  int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
+  int SETREFTIME  = cdoOperatorAdd("setreftime",   0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
+  int SETCALENDAR = cdoOperatorAdd("setcalendar",  0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");
+  int SHIFTTIME   = cdoOperatorAdd("shifttime",    0,  1, "shift value");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
   // nargs = cdoOperatorF2(operatorID);
 
   operatorInputArg(cdoOperatorEnter(operatorID));
@@ -265,15 +259,15 @@ void *Settime(void *argument)
       if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", operatorArgv()[0]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
   taxis_has_bounds = taxisHasBounds(taxisID1);
-  ntsteps  = vlistNtsteps(vlistID1);
-  nvars    = vlistNvars(vlistID1);
+  int ntsteps  = vlistNtsteps(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
 
   if ( ntsteps == 1 )
     {
@@ -289,7 +283,7 @@ void *Settime(void *argument)
 	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
     }
 
-  calendar = taxisInqCalendar(taxisID1);
+  int calendar = taxisInqCalendar(taxisID1);
 
   if ( cdoVerbose ) cdoPrint("calendar = %d", calendar);
 
@@ -370,7 +364,7 @@ void *Settime(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
