@@ -37,7 +37,7 @@
 
 void *Seasstat(void *argument)
 {
-  int timestat_date = TIMESTAT_LAST;
+  int timestat_date = TIMESTAT_MEAN;
   int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;

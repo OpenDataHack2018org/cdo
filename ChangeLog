@@ -1,5 +1,6 @@
 2014-12-19  Uwe Schulzweida
 
+	* Seasstat: changed timestat_date to mean
 	* Timpctl: changed timestat_date to mean
 	* Timpctl: added support for env. TIMESTAT_DATE
 	* Timstat: changed timestat_date to mean
