@@ -10,7 +10,8 @@
 @BeginDescription
 This module converts relative divergence and vorticity to U and V wind and vice versa.
 Divergence and vorticity are spherical harmonic coefficients in spectral space and
-U and V are on a regular Gaussian grid.
+U and V are on a regular Gaussian grid. The Gaussian latitude needs to be ordered from
+north to south.
 @EndDescription
 @EndModule
 
