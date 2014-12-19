@@ -74,7 +74,7 @@
 
 void *Timstat(void *argument)
 {
-  int timestat_date = TIMESTAT_LAST;
+  int timestat_date = TIMESTAT_MEAN;
   int cmplen;
   int gridsize;
   int vdate = 0, vtime = 0;
