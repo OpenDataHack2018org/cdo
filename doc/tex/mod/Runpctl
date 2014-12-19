@@ -3,12 +3,12 @@
 @Title     = Running percentile values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile1 ofile
+@Arguments = ifile ofile
 @Operators = runpctl
 
 @BeginDescription
-This module computes running percentiles over a selected number of timesteps in @file{ifile1}.
-The date information in @file{ofile} is the date of the timestep in the middle of the contributing timesteps in @file{ifile1}.
+This module computes running percentiles over a selected number of timesteps in @file{ifile}.
+The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
 @EndDescription
 @EndModule
 

@@ -15,8 +15,7 @@ histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files
 @file{ifile2} and @file{ifile3} should be the result of corresponding
 @mod{monmin} and @mod{monmax} operations, respectively.
-The date information of a timestep in @file{ofile} is the date of the
-last contributing timestep in @file{ifile1}.
+The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile1}.
 @EndDescription
 @EndModule
 

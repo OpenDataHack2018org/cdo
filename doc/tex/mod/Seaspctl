@@ -9,16 +9,13 @@
 
 @BeginDescription
 This operator computes percentiles over all timesteps in @file{ifile1} of the same season.
-The algorithm uses histograms with minimum and maximum bounds given in
-@file{ifile2} and @file{ifile3}, respectively. The default number of
-histogram bins is 101. The default can be overridden by setting the
-environment variable @env{CDO_PCTL_NBINS} to a different value. The files
-@file{ifile2} and @file{ifile3} should be the result of corresponding
-@mod{seasmin} and @mod{seasmax} operations, respectively.
-The date information of a timestep in @file{ofile} is the date of the
-last contributing timestep in @file{ifile1}. Be careful about the first
-and the last output timestep , they may be incorrect values if the seasons
-have incomplete timesteps.
+The algorithm uses histograms with minimum and maximum bounds given in @file{ifile2} and @file{ifile3},
+respectively. The default number of histogram bins is 101. The default can be overridden by setting 
+the environment variable @env{CDO_PCTL_NBINS} to a different value. The files @file{ifile2} and 
+@file{ifile3} should be the result of corresponding @mod{seasmin} and @mod{seasmax} operations, respectively.
+The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile1}.
+Be careful about the first and the last output timestep , they may be incorrect values 
+if the seasons have incomplete timesteps.
 @EndDescription
 @EndModule
 

@@ -1,6 +1,15 @@
 CDO NEWS
 --------
 
+Version 1.6.8 (8 January 2015):
+
+   Changed modules:
+     * TimSTAT, Timpctl, TimselSTAT, Timselpctl, SeasSTAT, Seaspctl:
+       The output time stamp of all operators from the above modules
+       are change from the last to the middle contributing timestep.
+       Use the envirionment variable CDO_TIMESTAT_DATE=last to set
+       the outout time stamp to the last contributing timestep.
+
 Version 1.6.7 (12 December 2014):
 
    Fixed bugs:

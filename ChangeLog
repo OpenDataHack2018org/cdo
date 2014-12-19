@@ -1,16 +1,20 @@
+2015-01-08  Uwe Schulzweida
+
+	* Version 1.6.8 released
+
 2014-12-19  Uwe Schulzweida
 
 	* Seaspctl: changed timestat_date to mean
-	* Seaspctl: added support for env. TIMESTAT_DATE
+	* Seaspctl: added support for env. CDO_TIMESTAT_DATE
 	* Seasstat: changed timestat_date to mean
 	* Timpctl: changed timestat_date to mean
-	* Timpctl: added support for env. TIMESTAT_DATE
+	* Timpctl: added support for env. CDO_TIMESTAT_DATE
 	* Timstat: changed timestat_date to mean
 
 2014-12-18  Uwe Schulzweida
 
 	* Timselpctl: changed timestat_date to mean
-	* Timselpctl: added support for env. TIMESTAT_DATE
+	* Timselpctl: added support for env. CDO_TIMESTAT_DATE
 	* Timselpctl: last output time step is written two times (bug fix)
 	* Timselstat: changed timestat_date to mean
 
@@ -20,12 +24,12 @@
 
 2014-12-15  Uwe Schulzweida
 
-	* Seasstat: added support for env. TIMESTAT_DATE
-	* Timselstat: added support for env. TIMESTAT_DATE
+	* Seasstat: added support for env. CDO_TIMESTAT_DATE
+	* Timselstat: added support for env. CDO_TIMESTAT_DATE
 
 2014-12-14  Uwe Schulzweida
 
-	* Timstat: added support for env. TIMESTAT_DATE
+	* Timstat: added support for env. CDO_TIMESTAT_DATE
 
 2014-12-13  Uwe Schulzweida
 

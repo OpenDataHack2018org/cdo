@@ -16,7 +16,7 @@
 @BeginDescription
 This operator computes the yearly mean of a monthly time series.
 Each month is weighted with the number of days per month. 
-The date information in @file{ofile} is the date of the middle contributing timestep in @file{ifile}.
+The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
 
 @IfMan
 For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is
@@ -35,7 +35,7 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginEnvironment
 @Item = CDO_TIMESTAT_DATE
-Sets the date information in ofile to the "first", "middle" or "last" contributing timestep in ifile.
+Sets the date information in ofile to the "first", "middle" or "last" contributing timestep of ifile.
 @EndEnvironment
 
 
