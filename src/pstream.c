@@ -422,8 +422,8 @@ int pstreamOpenRead(const argument_t *argument)
 	{
 	  pch = &argument->args[i+1];
 	  len -= (i+1);
-	  if ( len && ( memcmp(argument->args, "filelist:", 9) == 0 || 
-			memcmp(argument->args, "flist:", 6) == 0 ) )
+	  if ( len && ( strncmp(argument->args, "filelist:", 9) == 0 || 
+			strncmp(argument->args, "flist:", 6) == 0 ) )
 	    {
 	      for ( i = 0; i < len; i++ ) if ( pch[i] == ',' ) nfiles++;
 
@@ -488,7 +488,7 @@ int pstreamOpenRead(const argument_t *argument)
 		    }
 		}
 	    }
-	  else if ( len && memcmp(argument->args, "ls:", 3) == 0 )
+	  else if ( len && strncmp(argument->args, "ls:", 3) == 0 )
 	    {
 	      char line[4096];
 	      char command[4096];
@@ -636,7 +636,7 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
 
   PSTREAM_INIT();
 
-  ispipe = memcmp(argument->args, "(pipe", 5) == 0;
+  ispipe = strncmp(argument->args, "(pipe", 5) == 0;
 
   if ( ispipe )
     {
@@ -750,7 +750,7 @@ int pstreamOpenAppend(const argument_t *argument)
   int ispipe;
   pstream_t *pstreamptr;
 
-  ispipe = memcmp(argument->args, "(pipe", 5) == 0;
+  ispipe = strncmp(argument->args, "(pipe", 5) == 0;
 
   if ( ispipe )
     {
