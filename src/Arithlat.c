@@ -125,18 +125,7 @@ void *Arithlat(void *argument)
 	      
 	      gridInqXunits(gridID, units);
 
-	      if ( memcmp(units, "degree", 6) == 0 )
-		{
-		  for ( i = 0; i < gridsize; ++i ) scale[i] *= DEG2RAD;
-		}
-	      else if ( memcmp(units, "radian", 6) == 0 )
-		{
-		  /* No conversion necessary */
-		}
-	      else
-		{
-		  cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
-		}
+	      grid_to_radian(units, gridsize, scale, "grid latitudes");
 
 	      if ( operfunc == func_mul )
 		for ( i = 0; i < gridsize; ++i ) scale[i] = cos(scale[i]);
