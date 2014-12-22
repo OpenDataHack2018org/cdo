@@ -39,7 +39,8 @@
 #include "error.h"
 #include "dtypes.h"
 
-#define  cmpstr(s1, s2, len)  (memcmp(s1, s2, len = strlen(s2)))
+//#define  cmpstr(s1, s2, len)  (memcmp(s1, s2, len = strlen(s2)))
+#define  cmpstr(s1, s2, len)  (strncmp(s1, s2, len = strlen(s2)))
 
 /*
 int  extInqPrec(int fileID);
