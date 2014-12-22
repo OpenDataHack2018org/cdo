@@ -588,17 +588,18 @@ void setDefaultFileType(char *filetypestr, int labort)
   if ( filetypestr )
     {
       char *ftstr = filetypestr;
+      size_t len;
 
-      if      ( memcmp(filetypestr, "grb2", 4)  == 0 ) { ftstr += 4; cdoDefaultFileType = FILETYPE_GRB2;}
-      else if ( memcmp(filetypestr, "grb1", 4)  == 0 ) { ftstr += 4; cdoDefaultFileType = FILETYPE_GRB; }
-      else if ( memcmp(filetypestr, "grb",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_GRB; }
-      else if ( memcmp(filetypestr, "nc2",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC2; }
-      else if ( memcmp(filetypestr, "nc4c", 4)  == 0 ) { ftstr += 4; cdoDefaultFileType = FILETYPE_NC4C;}
-      else if ( memcmp(filetypestr, "nc4",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC4; }
-      else if ( memcmp(filetypestr, "nc",   2)  == 0 ) { ftstr += 2; cdoDefaultFileType = FILETYPE_NC;  }
-      else if ( memcmp(filetypestr, "srv",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_SRV; }
-      else if ( memcmp(filetypestr, "ext",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_EXT; }
-      else if ( memcmp(filetypestr, "ieg",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_IEG; }
+      if      ( cmpstrlen(filetypestr, "grb2", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_GRB2;}
+      else if ( cmpstrlen(filetypestr, "grb1", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_GRB; }
+      else if ( cmpstrlen(filetypestr, "grb",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_GRB; }
+      else if ( cmpstrlen(filetypestr, "nc2",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC2; }
+      else if ( cmpstrlen(filetypestr, "nc4c", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC4C;}
+      else if ( cmpstrlen(filetypestr, "nc4",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC4; }
+      else if ( cmpstrlen(filetypestr, "nc",   len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC;  }
+      else if ( cmpstrlen(filetypestr, "srv",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_SRV; }
+      else if ( cmpstrlen(filetypestr, "ext",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_EXT; }
+      else if ( cmpstrlen(filetypestr, "ieg",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_IEG; }
       else
 	{
 	  if ( labort )
@@ -690,22 +691,22 @@ void defineCompress(const char *arg)
 {
   size_t len = strlen(arg);
 
-  if      ( memcmp(arg, "szip", len) == 0 )
+  if      ( strncmp(arg, "szip", len) == 0 )
     {
       cdoCompType  = COMPRESS_SZIP;
       cdoCompLevel = 0;
     }
-  else if ( memcmp(arg, "jpeg", len) == 0 )
+  else if ( strncmp(arg, "jpeg", len) == 0 )
     {
       cdoCompType = COMPRESS_JPEG;
       cdoCompLevel = 0;
     }
-  else if ( memcmp(arg, "gzip", len) == 0 )
+  else if ( strncmp(arg, "gzip", len) == 0 )
     {
       cdoCompType  = COMPRESS_GZIP;
       cdoCompLevel = 6;
     }
-  else if ( memcmp(arg, "zip", 3) == 0 )
+  else if ( strncmp(arg, "zip", 3) == 0 )
     {
       cdoCompType  = COMPRESS_ZIP;
       if ( len == 5 && arg[3] == '_' && isdigit(arg[4]) )
@@ -1490,7 +1491,7 @@ int main(int argc, char *argv[])
 
   Progname = getProgname(argv[0]);
 
-  if ( memcmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
+  if ( strncmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
