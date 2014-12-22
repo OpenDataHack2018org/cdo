@@ -422,21 +422,21 @@ int str2datatype(const char *datatypestr)
   if ( len > 1 )
     {
       int ilen = atoi(datatypestr+1);
-      if      ( memcmp(datatypestr, "P0",  len) == 0 ) datatype = DATATYPE_PACK;
-      else if ( memcmp(datatypestr, "P",     1) == 0 &&
+      if      ( strncmp(datatypestr, "P0",  len) == 0 ) datatype = DATATYPE_PACK;
+      else if ( strncmp(datatypestr, "P",     1) == 0 &&
 		ilen > 0 && ilen <= 32 )               datatype = atoi(datatypestr+1);
-      else if ( memcmp(datatypestr, "C32", len) == 0 ) datatype = DATATYPE_CPX32;
-      else if ( memcmp(datatypestr, "C64", len) == 0 ) datatype = DATATYPE_CPX64;
-      else if ( memcmp(datatypestr, "F32", len) == 0 ) datatype = DATATYPE_FLT32;
-      else if ( memcmp(datatypestr, "F64", len) == 0 ) datatype = DATATYPE_FLT64;
-      else if ( memcmp(datatypestr, "I8",  len) == 0 ) datatype = DATATYPE_INT8;
-      else if ( memcmp(datatypestr, "I16", len) == 0 ) datatype = DATATYPE_INT16;
-      else if ( memcmp(datatypestr, "I32", len) == 0 ) datatype = DATATYPE_INT32;
-      else if ( memcmp(datatypestr, "U8",  len) == 0 ) datatype = DATATYPE_UINT8;
-      else if ( memcmp(datatypestr, "U16", len) == 0 ) datatype = DATATYPE_UINT16;
-      else if ( memcmp(datatypestr, "U32", len) == 0 ) datatype = DATATYPE_UINT32;
-      else if ( memcmp(datatypestr, "real",   len) == 0 ) datatype = DATATYPE_FLT32;
-      else if ( memcmp(datatypestr, "double", len) == 0 ) datatype = DATATYPE_FLT64;
+      else if ( strncmp(datatypestr, "C32", len) == 0 ) datatype = DATATYPE_CPX32;
+      else if ( strncmp(datatypestr, "C64", len) == 0 ) datatype = DATATYPE_CPX64;
+      else if ( strncmp(datatypestr, "F32", len) == 0 ) datatype = DATATYPE_FLT32;
+      else if ( strncmp(datatypestr, "F64", len) == 0 ) datatype = DATATYPE_FLT64;
+      else if ( strncmp(datatypestr, "I8",  len) == 0 ) datatype = DATATYPE_INT8;
+      else if ( strncmp(datatypestr, "I16", len) == 0 ) datatype = DATATYPE_INT16;
+      else if ( strncmp(datatypestr, "I32", len) == 0 ) datatype = DATATYPE_INT32;
+      else if ( strncmp(datatypestr, "U8",  len) == 0 ) datatype = DATATYPE_UINT8;
+      else if ( strncmp(datatypestr, "U16", len) == 0 ) datatype = DATATYPE_UINT16;
+      else if ( strncmp(datatypestr, "U32", len) == 0 ) datatype = DATATYPE_UINT32;
+      else if ( strncmp(datatypestr, "real",   len) == 0 ) datatype = DATATYPE_FLT32;
+      else if ( strncmp(datatypestr, "double", len) == 0 ) datatype = DATATYPE_FLT64;
     }
 
   return (datatype);
