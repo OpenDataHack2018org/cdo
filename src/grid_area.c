@@ -402,34 +402,11 @@ int gridGenArea(int gridID, double* area)
 	}
     }
   
-  /* Convert lat/lon units if required */
-  if ( memcmp(xunitstr, "radian", 6) == 0 )
-    {
-      /* No conversion necessary */
-    }
-  else if ( memcmp(xunitstr, "degree", 6) == 0 )
-    {
-      for ( i = 0; i < gridsize; ++i ) grid_center_lon[i] *= DEG2RAD;
-      for ( i = 0; i < gridsize*nv; ++i ) grid_corner_lon[i] *= DEG2RAD;
-    }
-  else
-    {
-      cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
-    }
+  grid_to_radian(xunitstr, gridsize,    grid_center_lon, "grid1 center longitudes");
+  grid_to_radian(xunitstr, gridsize*nv, grid_corner_lon, "grid1 corner longitudes");
 
-  if ( memcmp(yunitstr, "radian", 6) == 0 )
-    {
-      /* No conversion necessary */
-    }
-  else if ( memcmp(yunitstr, "degree", 6) == 0 )
-    {
-      for ( i = 0; i < gridsize; ++i ) grid_center_lat[i] *= DEG2RAD;
-      for ( i = 0; i < gridsize*nv; ++i ) grid_corner_lat[i] *= DEG2RAD;
-    }
-  else
-    {
-      cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
-    }
+  grid_to_radian(yunitstr, gridsize,    grid_center_lat, "grid1 center latitudes");
+  grid_to_radian(yunitstr, gridsize*nv, grid_corner_lat, "grid1 corner latitudes");
 
   if ( lgriddestroy ) gridDestroy(gridID);
 
