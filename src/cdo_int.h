@@ -55,7 +55,9 @@ char *strdup(const char *s);
 */
 #endif
 
-#define strcompare(s1, s2)  (strncmp(s1, s2, strlen(s2)))
+#define  cmpstr(s1, s2)          (strncmp(s1, s2, strlen(s2)))
+#define  cmpstrlen(s1, s2, len)  (strncmp(s1, s2, len = strlen(s2)))
+
 
 
 /* sxxxYYYYMMDDhhmm0 */
