@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2014-12-26  Uwe Schulzweida
+
+	* sinfo: limit length of model and institute to CDI_MAX_NAME (bug fix)
+
 2014-12-19  Uwe Schulzweida
 
 	* Seaspctl: changed timestat_date to mean
