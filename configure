@@ -17257,6 +17257,17 @@ cat >>confdefs.h <<_ACEOF
 #define HAVE_DECL_ISNAN $ac_have_decl
 _ACEOF
 
+for ac_func in sqrtl
+do :
+  ac_fn_c_check_func "$LINENO" "sqrtl" "ac_cv_func_sqrtl"
+if test "x$ac_cv_func_sqrtl" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SQRTL 1
+_ACEOF
+
+fi
+done
+
 for ac_func in getrlimit
 do :
   ac_fn_c_check_func "$LINENO" "getrlimit" "ac_cv_func_getrlimit"

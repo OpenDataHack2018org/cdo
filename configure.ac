@@ -67,6 +67,7 @@ AC_CHECK_FUNCS(mallinfo)
 # Checks for the availability of ANSI-C99 functions
 AC_CHECK_DECLS([isnan],,,[AC_INCLUDES_DEFAULT
 @%:@include <math.h>])
+AC_CHECK_FUNCS(sqrtl)
 AC_CHECK_FUNCS(getrlimit)
 AC_CHECK_FUNCS(gethostname)
 
