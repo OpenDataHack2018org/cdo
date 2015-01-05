@@ -42,9 +42,10 @@ Math	      Arithmetic
 Arithc        Arithmetic
 Arith	      Arithmetic
 Monarith      Arithmetic
-Ymonarith     Arithmetic
-Ydayarith     Arithmetic
 Yhourarith    Arithmetic
+Ydayarith     Arithmetic
+Ymonarith     Arithmetic
+Yseasarith    Arithmetic
 Arithdays     Arithmetic
 Consecstat    Statistical values
 Ensstat       Statistical values

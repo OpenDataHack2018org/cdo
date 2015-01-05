@@ -264,6 +264,7 @@ doc/tex/mod/Yhourstat -text
 doc/tex/mod/Ymonarith -text
 doc/tex/mod/Ymonpctl -text
 doc/tex/mod/Ymonstat -text
+doc/tex/mod/Yseasarith -text
 doc/tex/mod/Yseaspctl -text
 doc/tex/mod/Yseasstat -text
 doc/tex/mod/Zonstat -text
