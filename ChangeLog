@@ -2,6 +2,13 @@
 
 	* Version 1.6.8 released
 
+2015-01-05  Uwe Schulzweida
+
+	* New operator: yseasadd - Add multi-year seasonal time series
+	* New operator: yseassub - Subtract multi-year seasonal time series
+	* New operator: yseasmul - Multiply multi-year seasonal time series
+	* New operator: yseasdiv - Divide multi-year seasonal time series
+
 2014-12-26  Uwe Schulzweida
 
 	* sinfo: limit length of model and institute to CDI_MAX_NAME (bug fix)
@@ -2083,7 +2090,7 @@
 	* pstream: add function pstreamInqFiletype
 	* Reduced grids: read/write record if -R is used
 	* Version 0.9.5 released
-	
+
 2005-01-03  Uwe Schulzweida
 
 	* using CDI library version 0.8.7

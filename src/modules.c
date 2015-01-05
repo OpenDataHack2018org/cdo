@@ -471,7 +471,7 @@ void *Maggraph(void *argument);
 #define  YdrunstatOperators     {"ydrunmin", "ydrunmax", "ydrunsum", "ydrunmean", "ydrunavg", "ydrunstd", "ydrunstd1", "ydrunvar", "ydrunvar1"}
 #define  YhourarithOperators    {"yhouradd", "yhoursub", "yhourmul", "yhourdiv"}
 #define  YhourstatOperators     {"yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourstd", "yhourstd1", "yhourvar", "yhourvar1"}
-#define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
+#define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv", "yseasadd", "yseassub", "yseasmul", "yseasdiv"}
 #define  YmonpctlOperators      {"ymonpctl"}
 #define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
 #define  YseaspctlOperators     {"yseaspctl"}

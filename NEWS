@@ -3,6 +3,12 @@ CDO NEWS
 
 Version 1.6.8 (8 January 2015):
 
+   New operators:
+     * yseasadd: Add multi-year seasonal time series
+     * yseassub: Subtract multi-year seasonal time series
+     * yseasmul: Multiply multi-year seasonal time series
+     * yseasdiv: Divide multi-year seasonal time series
+
    Changed modules:
      * TimSTAT, Timpctl, TimselSTAT, Timselpctl, SeasSTAT, Seaspctl:
        The output time stamp of all operators from the above modules
