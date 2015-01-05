@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2014 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2015 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -259,7 +259,7 @@ void cdo_usage(void)
   reset_text_color(stderr);
 
   fprintf(stderr, "\n");
-  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2014 Uwe Schulzweida\n", VERSION);
+  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2015 Uwe Schulzweida\n", VERSION);
   //  fprintf(stderr, "  Available from <https://code.zmaw.de/projects/cdo>\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
   fprintf(stderr, "  Report bugs to <https://code.zmaw.de/projects/cdo>\n");
