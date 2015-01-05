@@ -6,6 +6,8 @@
 
 AC_INIT([cdo], [1.6.8], [https://code.zmaw.de/projects/cdo])
 
+AC_DEFINE_UNQUOTED(CDO, ["$PACKAGE_VERSION"], [CDO version])
+
 CONFIG_ABORT=yes
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])

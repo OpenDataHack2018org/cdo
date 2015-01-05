@@ -2563,6 +2563,12 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
+cat >>confdefs.h <<_ACEOF
+#define CDO "$PACKAGE_VERSION"
+_ACEOF
+
+
 CONFIG_ABORT=yes
 ac_aux_dir=
 for ac_dir in config "$srcdir"/config; do
