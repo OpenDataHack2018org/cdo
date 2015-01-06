@@ -1280,7 +1280,7 @@ void *Gradsdes(void *argument)
           if ( iddd < 0 ) iddd *= -1;
           if ( idyy > 0 ) idmm += idyy*12;
 
-          if ( idmn == 0 && idhh == 0 && (iddd == 0 || idd > 27 ) &&
+          if ( /*idmn == 0 && idhh == 0 &&*/ (iddd == 0 || iddd == 1 || idd > 27 ) &&
                idmm > 0 && (mdt == 0 || idmm == mdt) )
             {
               mdt = idmm;
@@ -1290,10 +1290,10 @@ void *Gradsdes(void *argument)
             {
               monavg = FALSE;
             }
-          /*
+	   /*          
           printf("monavg %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d\n",
                  tsID, monavg, mdt, imm , imms, idmm, iyy, iyys, idyy, idd, idds, iddd);
-          */
+	   */
           imns = imn;
           ihhs = ihh;
           idds = idd;
