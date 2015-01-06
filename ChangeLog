@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-01-06  Uwe Schulzweida
+
+	* intersection: use function sqrt(x) if sqrtl(x) is missing
+
 2015-01-05  Uwe Schulzweida
 
 	* New operator: yseasadd - Add multi-year seasonal time series
