@@ -46,7 +46,7 @@
 #include "geometry.h"
 
 #if defined(CDO) && !defined(HAVE_SQRTL)
-#define sqrtl(x) (sqrt((doube)x))
+#define sqrtl(x) (sqrt((double)x))
 #endif
 
 // angle tolerance
