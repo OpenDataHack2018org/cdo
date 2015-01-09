@@ -383,6 +383,10 @@ void check_lon_range(long nlons, double *lons)
 #endif
   for ( n = 0; n < nlons; ++n )
     {
+      // remove missing values
+      if ( lons[n] < -PI2 ) lons[n] = 0;
+      if ( lons[n] > 2*PI2) lons[n] = PI2;
+
       if ( lons[n] > PI2  ) lons[n] -= PI2;
       if ( lons[n] < ZERO ) lons[n] += PI2;
     }
