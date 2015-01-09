@@ -67,9 +67,6 @@ AC_CHECK_HEADERS(glob.h)
 AC_CHECK_FUNCS(mallinfo)
 #  ----------------------------------------------------------------------
 # Checks for the availability of ANSI-C99 functions
-AC_CHECK_DECLS([isnan],,,[AC_INCLUDES_DEFAULT
-@%:@include <math.h>])
-AC_CHECK_FUNCS(sqrtl)
 AC_CHECK_FUNCS(getrlimit)
 AC_CHECK_FUNCS(gethostname)
 
@@ -108,6 +105,11 @@ AC_SUBST([SYSTEM_TYPE],["$ac_cv_build"])
 #  ----------------------------------------------------------------------
 #  Check for math library
 AC_CHECK_LIB([m],[floor])
+#  ----------------------------------------------------------------------
+# Checks for the availability of ANSI-C99 math functions
+AC_CHECK_DECLS([isnan],,,[AC_INCLUDES_DEFAULT
+@%:@include <math.h>])
+AC_CHECK_FUNCS(sqrtl)
 #  ----------------------------------------------------------------------
 #  Enable DATA support
 AC_MSG_CHECKING([for DATA support])
