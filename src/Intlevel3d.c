@@ -31,37 +31,38 @@
 #include "list.h"
 
 /*
- * 3d vertical interpolation routine (see interp_lev() in src/Intlevel.c)
+ * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.c)
  */
 static
-void interp_lev3d(int gridsize, double missval, double *vardata1, double *vardata2,
-	     	  int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
+void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *vardata2,
+		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   int i, ilev;
   int idx1, idx2;
+  int offset;
   double wgt1, wgt2;
   double w1, w2;
   double var1L1, var1L2, *var2;
 
   for ( ilev = 0; ilev < nlev2; ilev++ )
     {
-      var2 = vardata2+(ilev*gridsize);
+      offset = ilev*gridsize;
+      var2 = vardata2 + offset;
 
       for ( i = 0; i < gridsize; i++ )
 	{
-          idx1 = lev_idx1[ilev*gridsize+i];
-          idx2 = lev_idx2[ilev*gridsize+i];
-          wgt1 = lev_wgt1[ilev*gridsize+i];
-          wgt2 = lev_wgt2[ilev*gridsize+i];
+          idx1 = lev_idx1[offset+i];
+          idx2 = lev_idx2[offset+i];
+          wgt1 = lev_wgt1[offset+i];
+          wgt2 = lev_wgt2[offset+i];
 
           /* upper/lower values from input field */
           var1L1 = *(vardata1+idx1);
           var1L2 = *(vardata1+idx2);
 
-          /* if (cdoVerbose) printf("i:%d level %d: idx1=%d idx2=%d (ilev*gridsize+i:%d) wgt1=%g wgt2=%g var1L1:%g var1L2:%g ",
-           *                         i,       ilev, idx1,   idx2,    ilev*gridsize+i,    wgt1,   wgt2,   var1L1,   var1L2);
+          /* if (cdoVerbose) printf("i:%d level %d: idx1=%d idx2=%d (offset+i:%d) wgt1=%g wgt2=%g var1L1:%g var1L2:%g ",
+           *                         i,       ilev, idx1,   idx2,    offset+i,    wgt1,   wgt2,   var1L1,   var1L2);
            */
-
 	  w1 = wgt1;
 	  w2 = wgt2;
 	  if ( DBL_IS_EQUAL(var1L1, missval)  ) w1 = 0;
@@ -100,15 +101,15 @@ void interp_lev3d(int gridsize, double missval, double *vardata1, double *vardat
  * wrt. the given gridsize. They can directly be used to read values from 3d
  * data fields.
  *
- * 3d version of gen_weights() (src/Intlevel.c)
+ * 3d version of vert_gen_weights() (src/Intlevel.c)
  */
 static
-void gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
-                   int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
+void vert_gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
+			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   int i,i1, i2;
-  double val1, val2 = 0;
   int    idx1 = 0, idx2 = 0;
+  double val1, val2 = 0;
 
   for ( i = 0; i < gridsize; i++ )
     {
@@ -120,7 +121,7 @@ void gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, 
             {
               if ( lev1[(i1-1)*gridsize+i] < lev1[i1*gridsize+i] )
                 {
-                  idx1 = (i1 - 1)*gridsize+i;
+                  idx1 = (i1-1)*gridsize+i;
                   idx2 = i1*gridsize+i;
                 }
               else
@@ -177,7 +178,7 @@ void gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, 
    *           printf("\tlev_wgt1:%g\tlev_wgt2:%g\n", lev_wgt1[i2*gridsize+i], lev_wgt2[i2*gridsize+i]);
    *         }
    */
-          /* backshift of the indices because if the two additional levels in input vertical coordinate */
+          /* backshift of the indices because of the two additional levels in input vertical coordinate */
           lev_idx1[i2*gridsize+i] -= gridsize;
           lev_idx2[i2*gridsize+i] -= gridsize;
 
@@ -188,10 +189,6 @@ void gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, 
 
 void *Intlevel3d(void *argument)
 {
-  int INTLEVEL3D, INTLEVELX3D;
-  int operatorID;
-  int streamID0, streamID1, streamID2,streamID3;
-  int vlistID0, vlistID1, vlistID2, vlistID3;
   int gridsize,gridSize,gridsizei,gridsizeo;
   int recID, nrecs;
   int i, offset;
@@ -224,10 +221,10 @@ void *Intlevel3d(void *argument)
 
   cdoInitialize(argument);
 
-  INTLEVEL3D  = cdoOperatorAdd("intlevel3d",  0, 0, NULL);
-  INTLEVELX3D = cdoOperatorAdd("intlevelx3d",  0, 0, NULL);
+  int INTLEVEL3D  = cdoOperatorAdd("intlevel3d",  0, 0, NULL);
+  int INTLEVELX3D = cdoOperatorAdd("intlevelx3d",  0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if      ( operatorID == INTLEVEL3D )  expol = FALSE;
   else if ( operatorID == INTLEVELX3D ) expol = TRUE;
@@ -238,16 +235,16 @@ void *Intlevel3d(void *argument)
   operatorInputArg("filename for vertical source coordinates variable");
   operatorCheckArgc(1);
   argument_t *fileargument = file_argument_new(operatorArgv()[0]);
-  streamID0 = streamOpenRead(fileargument);                     /*  3d vertical input coordinate */
+  int streamID0 = streamOpenRead(fileargument);                     /*  3d vertical input coordinate */
   file_argument_free(fileargument);
-  streamID1 = streamOpenRead(cdoStreamName(0));                 /*  input data */
-  streamID2 = streamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
-  streamID3 = streamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
+  int streamID1 = streamOpenRead(cdoStreamName(0));                 /*  input data */
+  int streamID2 = streamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
+  int streamID3 = streamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
 
-  vlistID0 = streamInqVlist(streamID0);
-  vlistID1 = streamInqVlist(streamID1); taxisID1 = vlistInqTaxis(vlistID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID1);  taxisID3 = taxisDuplicate(taxisID1);
+  int vlistID0 = streamInqVlist(streamID0);
+  int vlistID1 = streamInqVlist(streamID1); taxisID1 = vlistInqTaxis(vlistID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID1);  taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID1);
 
   /*
@@ -432,7 +429,7 @@ void *Intlevel3d(void *argument)
   lev_wgt1 = (double*) malloc(nlevo*gridSize*sizeof(double));
   lev_wgt2 = (double*) malloc(nlevo*gridSize*sizeof(double));
 
-  gen_weights3d(expol, nlevi+2, gridSize, zlevels_in, nlevo, zlevels_out, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
+  vert_gen_weights3d(expol, nlevi+2, gridSize, zlevels_in, nlevo, zlevels_out, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
   /*
    * Copy z-axis information to output z-axis
@@ -566,8 +563,8 @@ void *Intlevel3d(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 	      gridsize = gridInqSize(gridID);
 
-	      interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID],
-			 nlevo, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
+	      vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID],
+				nlevo, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
 	      for ( levelID = 0; levelID < nlevo; levelID++ )
 		{
