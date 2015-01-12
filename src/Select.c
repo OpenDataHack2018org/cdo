@@ -458,9 +458,7 @@ void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *tx
 
 void *Select(void *argument)
 {
-  int SELECT, DELETE;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
+  int streamID2 = CDI_UNDEFID;
   int tsID1, tsID2, nrecs;
   int nvars, nvars2, nlevs;
   int zaxisID, levID;
@@ -470,26 +468,23 @@ void *Select(void *argument)
   int nsel;
   int vdate, vtime;
   int last_year = -999999999;
-  int copytimestep;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   char stdname[CDI_MAX_NAME];
   char **argnames = NULL;
-  int vlistID0 = -1, vlistID1 = -1, vlistID2 = -1;
+  int vlistID0 = -1, vlistID2 = -1;
   int i;
   int result = FALSE;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
-  int streamCnt, nfiles, indf;
   double *array = NULL;
-  int taxisID1, taxisID2 = CDI_UNDEFID;
+  int taxisID2 = CDI_UNDEFID;
   int ntsteps;
   int ltimsel = FALSE;
   int second;
   int npar;
   int *vars = NULL;
-  pml_t *pml;
+
   PML_DEF_INT(timestep_of_year, 4096, "Timestep of year");
   PML_DEF_INT(timestep,         4096, "Timestep");
   PML_DEF_INT(year,             1024, "Year");
@@ -520,12 +515,13 @@ void *Select(void *argument)
 
   cdoInitialize(argument);
 
-  SELECT  = cdoOperatorAdd("select", 0, 0, "parameter list");
-  DELETE  = cdoOperatorAdd("delete", 0, 0, "parameter list");
+  int SELECT  = cdoOperatorAdd("select", 0, 0, "parameter list");
+  int DELETE  = cdoOperatorAdd("delete", 0, 0, "parameter list");
 
+  int lcopy = FALSE;
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -536,7 +532,7 @@ void *Select(void *argument)
     for ( i = 0; i < nsel; i++ )
       printf("name %d = %s\n", i+1, argnames[i]);
 
-  pml = pmlNew("SELECT");
+  pml_t *pml = pmlNew("SELECT");
 
   PML_ADD_INT(pml, timestep_of_year);
   PML_ADD_INT(pml, timestep);
@@ -573,21 +569,21 @@ void *Select(void *argument)
   pmlDelete(pml);
   */
 
-  streamCnt = cdoStreamCnt();
-  nfiles = streamCnt - 1;
+  int streamCnt = cdoStreamCnt();
+  int nfiles = streamCnt - 1;
 
   if ( !cdoVerbose && nfiles > 1 ) progressInit();
 
   tsID2 = 0;
-  for ( indf = 0; indf < nfiles; indf++ )
+  for ( int indf = 0; indf < nfiles; indf++ )
     {
       if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, (indf+1.)/nfiles);
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
 
-      streamID1 = streamOpenRead(cdoStreamName(indf));
+      int streamID1 = streamOpenRead(cdoStreamName(indf));
 
-      vlistID1 = streamInqVlist(streamID1);
-      taxisID1 = vlistInqTaxis(vlistID1);
+      int vlistID1 = streamInqVlist(streamID1);
+      int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
 	{
@@ -828,6 +824,8 @@ void *Select(void *argument)
       tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
+	  int copytimestep = TRUE;
+
 	  if ( ltimsel == TRUE )
 	    {
 	      copytimestep = FALSE;
@@ -865,10 +863,6 @@ void *Select(void *argument)
 		}
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
-	    }
-	  else
-	    {
-	      copytimestep = TRUE;
 	    }
 
 	  if ( copytimestep == TRUE )
