@@ -601,6 +601,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
     }
 }
 
+
 void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
@@ -745,6 +746,71 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       //printf("src_grid   lon: %g %g lat: %g %g\n", RAD2DEG*src_grid_bound_box[2],RAD2DEG*src_grid_bound_box[3],RAD2DEG*src_grid_bound_box[0],RAD2DEG*src_grid_bound_box[1] );
     }
 
+  struct grid_cell* src_grid_cell;
+  struct grid_cell* src_grid_cell2[ompNumThreads];  
+  for ( i = 0; i < ompNumThreads; ++i )
+    {
+      src_grid_cell2[i] = (struct grid_cell*) malloc(sizeof(struct grid_cell));
+      src_grid_cell2[i]->array_size      = src_num_cell_corners;
+      src_grid_cell2[i]->num_corners     = src_num_cell_corners;
+      src_grid_cell2[i]->edge_type       = src_edge_type;
+      src_grid_cell2[i]->coordinates_x   = (double*) malloc(src_num_cell_corners*sizeof(double));
+      src_grid_cell2[i]->coordinates_y   = (double*) malloc(src_num_cell_corners*sizeof(double));
+      src_grid_cell2[i]->coordinates_xyz = (double*) malloc(3*src_num_cell_corners*sizeof(double));
+    }
+
+
+#if defined(_OPENMP)
+#pragma omp parallel for default(shared) \
+  shared(ompNumThreads, src_remap_grid_type, src_grid, src_grid_size, src_grid_cells2) \
+  private(src_grid_cell, src_grid_add)
+#endif
+  for ( src_grid_add = 0; src_grid_add < src_grid_size; ++src_grid_add )
+    {
+      int ompthID = cdo_omp_get_thread_num();
+
+      src_grid_cell = src_grid_cell2[ompthID];
+
+      if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	{
+	  long nx = src_grid->dims[0];
+	  long ix, iy;
+
+	  iy = src_grid_add/nx;
+	  ix = src_grid_add - iy*nx;
+
+	  src_grid_cell->coordinates_x[0] = src_grid->reg2d_corner_lon[ix  ];
+	  src_grid_cell->coordinates_y[0] = src_grid->reg2d_corner_lat[iy  ];
+	  src_grid_cell->coordinates_x[1] = src_grid->reg2d_corner_lon[ix+1];
+	  src_grid_cell->coordinates_y[1] = src_grid->reg2d_corner_lat[iy  ];
+	  src_grid_cell->coordinates_x[2] = src_grid->reg2d_corner_lon[ix+1];
+	  src_grid_cell->coordinates_y[2] = src_grid->reg2d_corner_lat[iy+1];
+	  src_grid_cell->coordinates_x[3] = src_grid->reg2d_corner_lon[ix  ];
+	  src_grid_cell->coordinates_y[3] = src_grid->reg2d_corner_lat[iy+1];
+	}
+      else
+	{
+	  for ( int ic = 0; ic < src_num_cell_corners; ++ic )
+	    {
+	      src_grid_cell->coordinates_x[ic] = src_grid->cell_corner_lon[src_grid_add*src_num_cell_corners+ic];
+	      src_grid_cell->coordinates_y[ic] = src_grid->cell_corner_lat[src_grid_add*src_num_cell_corners+ic];
+	    }
+	}
+      
+      for ( int ic = 0; ic < src_num_cell_corners; ++ic )
+	LLtoXYZ(src_grid_cell->coordinates_x[ic], src_grid_cell->coordinates_y[ic], src_grid_cell->coordinates_xyz+ic*3);
+
+      src_grid->cell_area[src_grid_add] = gridcell_area(*src_grid_cell);
+    }
+
+  for ( i = 0; i < ompNumThreads; ++i )
+    {
+      free(src_grid_cell2[i]->coordinates_x);
+      free(src_grid_cell2[i]->coordinates_y);
+      free(src_grid_cell2[i]->coordinates_xyz);
+      free(src_grid_cell2[i]);
+    }
+
   findex = 0;
 
   int sum_srch_cells = 0;
@@ -752,7 +818,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
-  shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, nx, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
+  shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          rv, cdoVerbose, max_srch_cells2, tgt_num_cell_corners, target_cell_type, \
 	 srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
@@ -1069,12 +1135,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 		  }
 		  tgt_grid->cell_frac[tgt_grid_add] += partial_weights[n];
 		}
-#if defined(_OPENMP)
-#pragma omp critical
-#endif
-	      {
-		src_grid->cell_area[src_grid_add] += partial_weights[n];
-	      }
 	    }
 	}
       
