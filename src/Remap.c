@@ -506,7 +506,7 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
 }
 
 static
-int set_remapgrids(int vlistID, int ngrids, int *remapgrids)
+int set_remapgrids(int filetype, int vlistID, int ngrids, int *remapgrids)
 {
   int index, gridID, gridtype;
 
@@ -527,7 +527,12 @@ int set_remapgrids(int vlistID, int ngrids, int *remapgrids)
 	   gridtype != GRID_UNSTRUCTURED )
 	{
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
-	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!", gridNamePtr(gridtype));
+	    {
+	      if ( !cdoRegulargrid && filetype == FILETYPE_GRB )
+		cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!", gridNamePtr(gridtype));
+	      else
+		cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular grid!", gridNamePtr(gridtype));
+	    }
 	  else if ( gridtype == GRID_GENERIC && gridInqSize(gridID) == 1 )
 	    remapgrids[index] = FALSE;
 	  else
@@ -685,15 +690,11 @@ void sort_remap_add(remapvars_t *remapvars)
 
 void *Remap(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2 = -1;
-  int nrecs, ngrids;
+  int streamID2 = -1;
+  int nrecs;
   int index;
   int tsID, recID, varID, levelID;
   int gridsize, gridsize2;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
   int gridID1 = -1, gridID2;
   int nmiss1, nmiss2, i, j, r = -1;
   int *imask = NULL;
@@ -704,14 +705,12 @@ void *Remap(void *argument)
   int num_neighbors = 4;
   int need_gradiants = FALSE;
   int grid1sizemax;
-  int *remapgrids = NULL;
   char varname[CDI_MAX_NAME];
   double missval;
   double *array1 = NULL, *array2 = NULL;
   double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;
   remap_t *remaps = NULL;
   char *remap_file = NULL;
-  int lwrite_remap;
 
   if ( cdoTimer ) init_remap_timer();
 
@@ -736,9 +735,9 @@ void *Remap(void *argument)
   cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
   cdoOperatorAdd("genycon",      GENYCON,      1, NULL);
 
-  operatorID   = cdoOperatorID();
-  operfunc     = cdoOperatorF1(operatorID);
-  lwrite_remap = cdoOperatorF2(operatorID);
+  int operatorID   = cdoOperatorID();
+  int operfunc     = cdoOperatorF1(operatorID);
+  int lwrite_remap = cdoOperatorF2(operatorID);
 
   remap_set_int(REMAP_WRITE_REMAP, lwrite_remap);
 
@@ -770,18 +769,19 @@ void *Remap(void *argument)
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int filetype = streamInqFiletype(streamID1);
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
-  remapgrids = (int*) malloc(ngrids*sizeof(int));
-  index = set_remapgrids(vlistID1, ngrids, remapgrids);
+  int ngrids = vlistNgrids(vlistID1);
+  int remapgrids[ngrids];
+  index = set_remapgrids(filetype, vlistID1, ngrids, remapgrids);
   gridID1 = vlistGrid(vlistID1, index);
 
   for ( index = 0; index < ngrids; index++ )
@@ -1194,7 +1194,6 @@ void *Remap(void *argument)
 
   streamClose(streamID1);
 
-  if ( remapgrids ) free(remapgrids);
   if ( imask )  free(imask);
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
