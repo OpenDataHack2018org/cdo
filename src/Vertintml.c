@@ -35,7 +35,7 @@
 
 #define  C_EARTH_GRAV    (9.80665)
 
-void *Vertint(void *argument)
+void *Vertintml(void *argument)
 {
   int mode;
   enum {ECHAM_MODE, WMO_MODE};

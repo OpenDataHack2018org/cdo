@@ -141,7 +141,7 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	Subtrend.c Tee.c Templates.c Test.c Tests.c Timcount.c \
 	Timpctl.c Timselpctl.c Timselstat.c Timsort.c Timstat.c \
 	Timstat2.c Timstat3.c Tinfo.c Tocomplex.c Transpose.c Trend.c \
-	Trms.c Tstepcount.c Vardup.c Vargen.c Varrms.c Vertint.c \
+	Trms.c Tstepcount.c Vardup.c Vargen.c Varrms.c Vertintml.c \
 	Vertstat.c Vertwind.c Wct.c Wind.c Writegrid.c Writerandom.c \
 	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
 	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
@@ -261,7 +261,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Transpose.$(OBJEXT) cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
 	cdo-Tstepcount.$(OBJEXT) cdo-Vardup.$(OBJEXT) \
 	cdo-Vargen.$(OBJEXT) cdo-Varrms.$(OBJEXT) \
-	cdo-Vertint.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
+	cdo-Vertintml.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
 	cdo-Vertwind.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) \
 	cdo-Writegrid.$(OBJEXT) cdo-Writerandom.$(OBJEXT) \
 	cdo-YAR.$(OBJEXT) cdo-Yearmonstat.$(OBJEXT) \
@@ -591,7 +591,7 @@ cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	Subtrend.c Tee.c Templates.c Test.c Tests.c Timcount.c \
 	Timpctl.c Timselpctl.c Timselstat.c Timsort.c Timstat.c \
 	Timstat2.c Timstat3.c Tinfo.c Tocomplex.c Transpose.c Trend.c \
-	Trms.c Tstepcount.c Vardup.c Vargen.c Varrms.c Vertint.c \
+	Trms.c Tstepcount.c Vardup.c Vargen.c Varrms.c Vertintml.c \
 	Vertstat.c Vertwind.c Wct.c Wind.c Writegrid.c Writerandom.c \
 	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
 	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
@@ -946,7 +946,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vardup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vargen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Varrms.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertintml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertwind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Wct.Po@am__quote@
@@ -3262,19 +3262,19 @@ cdo-Varrms.obj: Varrms.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Varrms.obj `if test -f 'Varrms.c'; then $(CYGPATH_W) 'Varrms.c'; else $(CYGPATH_W) '$(srcdir)/Varrms.c'; fi`
 
-cdo-Vertint.o: Vertint.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertint.o -MD -MP -MF $(DEPDIR)/cdo-Vertint.Tpo -c -o cdo-Vertint.o `test -f 'Vertint.c' || echo '$(srcdir)/'`Vertint.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vertint.Tpo $(DEPDIR)/cdo-Vertint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertint.c' object='cdo-Vertint.o' libtool=no @AMDEPBACKSLASH@
+cdo-Vertintml.o: Vertintml.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertintml.o -MD -MP -MF $(DEPDIR)/cdo-Vertintml.Tpo -c -o cdo-Vertintml.o `test -f 'Vertintml.c' || echo '$(srcdir)/'`Vertintml.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vertintml.Tpo $(DEPDIR)/cdo-Vertintml.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertintml.c' object='cdo-Vertintml.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertint.o `test -f 'Vertint.c' || echo '$(srcdir)/'`Vertint.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertintml.o `test -f 'Vertintml.c' || echo '$(srcdir)/'`Vertintml.c
 
-cdo-Vertint.obj: Vertint.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertint.obj -MD -MP -MF $(DEPDIR)/cdo-Vertint.Tpo -c -o cdo-Vertint.obj `if test -f 'Vertint.c'; then $(CYGPATH_W) 'Vertint.c'; else $(CYGPATH_W) '$(srcdir)/Vertint.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vertint.Tpo $(DEPDIR)/cdo-Vertint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertint.c' object='cdo-Vertint.obj' libtool=no @AMDEPBACKSLASH@
+cdo-Vertintml.obj: Vertintml.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertintml.obj -MD -MP -MF $(DEPDIR)/cdo-Vertintml.Tpo -c -o cdo-Vertintml.obj `if test -f 'Vertintml.c'; then $(CYGPATH_W) 'Vertintml.c'; else $(CYGPATH_W) '$(srcdir)/Vertintml.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vertintml.Tpo $(DEPDIR)/cdo-Vertintml.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertintml.c' object='cdo-Vertintml.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertint.obj `if test -f 'Vertint.c'; then $(CYGPATH_W) 'Vertint.c'; else $(CYGPATH_W) '$(srcdir)/Vertint.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertintml.obj `if test -f 'Vertintml.c'; then $(CYGPATH_W) 'Vertintml.c'; else $(CYGPATH_W) '$(srcdir)/Vertintml.c'; fi`
 
 cdo-Vertstat.o: Vertstat.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertstat.o -MD -MP -MF $(DEPDIR)/cdo-Vertstat.Tpo -c -o cdo-Vertstat.o `test -f 'Vertstat.c' || echo '$(srcdir)/'`Vertstat.c

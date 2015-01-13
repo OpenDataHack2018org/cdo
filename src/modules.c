@@ -198,7 +198,7 @@ void *Tstepcount(void *argument);
 void *Vardup(void *argument);
 void *Vargen(void *argument);
 void *Varrms(void *argument);
-void *Vertint(void *argument);
+void *Vertintml(void *argument);
 void *Vertstat(void *argument);
 void *Vertwind(void *argument);
 void *Wind(void *argument);
@@ -456,7 +456,7 @@ void *Maggraph(void *argument);
 #define  VardupOperators        {"pardup", "parmul"}
 #define  VargenOperators        {"random", "const", "sincos", "coshill", "for", "topo", "temp", "mask", "stdatm"}
 #define  VarrmsOperators        {"varrms"}
-#define  VertintOperators       {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
+#define  VertintmlOperators     {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertvar", "vertstd"}
 #define  VertwindOperators      {"vertwind"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
@@ -717,7 +717,7 @@ static modules_t Modules[] =
   { Vardup,         NULL,              VardupOperators,        CDI_REAL,  1,  1 },
   { Vargen,         VargenHelp,        VargenOperators,        CDI_REAL,  0,  1 },
   { Varrms,         NULL,              VarrmsOperators,        CDI_REAL,  2,  1 },
-  { Vertint,        IntvertHelp,       VertintOperators,       CDI_REAL,  1,  1 },
+  { Vertintml,      IntvertHelp,       VertintmlOperators,     CDI_REAL,  1,  1 },
   { Vertstat,       VertstatHelp,      VertstatOperators,      CDI_REAL,  1,  1 },
   { Vertwind,       NULL,              VertwindOperators,      CDI_REAL,  1,  1 },
   { Wind,           WindHelp,          WindOperators,          CDI_REAL,  1,  1 },
