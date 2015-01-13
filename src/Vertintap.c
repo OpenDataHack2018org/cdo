@@ -60,6 +60,7 @@ void *Vertintap(void *argument)
   double minval, maxval;
   double missval;
   double *plev = NULL, *vct = NULL;
+  double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   double *hyb_press = NULL;
