@@ -37,23 +37,17 @@
 
 void *Vertint(void *argument)
 {
-  int ML2PL, ML2HL, ML2PLX, ML2HLX;
-  int ML2PL_LP, ML2HL_LP, ML2PLX_LP, ML2HLX_LP;
-  int operatorID;
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
   int gridsize, ngp = 0;
   int recID, nrecs;
   int i, k, offset;
   int tsID, varID, levelID;
-  int nvars;
   int zaxisIDp, zaxisIDh = -1, nzaxis;
   int ngrids, gridID, zaxisID;
-  int nplev, nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel, maxlev;
+  int nplev, nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
   int nvct;
   int sgeopot_needed = FALSE;
@@ -61,43 +55,38 @@ void *Vertint(void *argument)
   int code, param;
   int pnum, pcat, pdis;
   //int sortlevels = TRUE;
-  int **varnmiss = NULL, *pnmiss = NULL;
-  int *varinterp = NULL;
+  int *pnmiss = NULL;
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
-  int *vars = NULL;
   double minval, maxval;
   double missval;
   double *plev = NULL, *phlev = NULL, *vct = NULL;
   double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
-  double **vardata1 = NULL, **vardata2 = NULL;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   double *hyb_press = NULL;
   int Extrapolate = 0;
-  int taxisID1, taxisID2;
   int lhavevct;
   int mono_level;
   int instNum, tableNum;
   int useTable;
-  int operfunc, opertype;
   gribcode_t gribcodes = {0};
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
-  ML2PL  = cdoOperatorAdd("ml2pl",  func_pl, type_lin, "pressure levels in pascal");
-  ML2PLX = cdoOperatorAdd("ml2plx", func_pl, type_lin, "pressure levels in pascal");
-  ML2HL  = cdoOperatorAdd("ml2hl",  func_hl, type_lin, "height levels in meter");
-  ML2HLX = cdoOperatorAdd("ml2hlx", func_hl, type_lin, "height levels in meter");
-  ML2PL_LP  = cdoOperatorAdd("ml2pl_lp",  func_pl, type_log, "pressure levels in pascal");
-  ML2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
-  ML2HL_LP  = cdoOperatorAdd("ml2hl_lp",  func_hl, type_log, "height levels in meter");
-  ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
+  int ML2PL     = cdoOperatorAdd("ml2pl",  func_pl, type_lin, "pressure levels in pascal");
+  int ML2PLX    = cdoOperatorAdd("ml2plx", func_pl, type_lin, "pressure levels in pascal");
+  int ML2HL     = cdoOperatorAdd("ml2hl",  func_hl, type_lin, "height levels in meter");
+  int ML2HLX    = cdoOperatorAdd("ml2hlx", func_hl, type_lin, "height levels in meter");
+  int ML2PL_LP  = cdoOperatorAdd("ml2pl_lp",  func_pl, type_log, "pressure levels in pascal");
+  int ML2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
+  int ML2HL_LP  = cdoOperatorAdd("ml2hl_lp",  func_hl, type_log, "height levels in meter");
+  int ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
-  opertype = cdoOperatorF2(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
+  int opertype = cdoOperatorF2(operatorID);
 
   if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {
@@ -124,13 +113,13 @@ void *Vertint(void *argument)
   nplev = args2fltlist(operatorArgc(), operatorArgv(), flist);
   plev  = (double *) listArrayPtr(flist);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids  = vlistNgrids(vlistID1);
@@ -286,15 +275,15 @@ void *Vertint(void *argument)
 	}
     }
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  vars      = (int*) malloc(nvars*sizeof(int));
-  vardata1  = (double**) malloc(nvars*sizeof(double*));
-  vardata2  = (double**) malloc(nvars*sizeof(double*));
-  varnmiss  = (int**) malloc(nvars*sizeof(int*));
-  varinterp = (int*) malloc(nvars*sizeof(int));
+  int vars[nvars];
+  double *vardata1[nvars];
+  double *vardata2[nvars];
+  int *varnmiss[nvars];
+  int varinterp[nvars];
 
-  maxlev   = nhlevh > nplev ? nhlevh : nplev;
+  int maxlev   = nhlevh > nplev ? nhlevh : nplev;
 
   if ( Extrapolate == 0 )
     pnmiss = (int*) malloc(nplev*sizeof(int));
@@ -513,7 +502,7 @@ void *Vertint(void *argument)
 	cdoPrint("using %s", var_stdname(surface_air_pressure));
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
@@ -708,12 +697,6 @@ void *Vertint(void *argument)
       free(vardata1[varID]);
       if ( varinterp[varID] ) free(vardata2[varID]);
     }
-
-  free(varinterp);
-  free(varnmiss);
-  free(vardata2);
-  free(vardata1);
-  free(vars);
 
   if ( pnmiss     ) free(pnmiss);
 
