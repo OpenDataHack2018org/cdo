@@ -472,6 +472,7 @@ src/Tstepcount.c -text
 src/Vardup.c -text
 src/Vargen.c -text
 src/Varrms.c -text
+src/Vertintap.c -text
 src/Vertintml.c -text
 src/Vertstat.c -text
 src/Vertwind.c -text

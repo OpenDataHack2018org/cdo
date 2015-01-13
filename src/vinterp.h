@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void h2p(double * restrict phlev, const double * restrict hlev, long nphlev);
+void height2pressure(double * restrict phlev, const double * restrict hlev, long nphlev);
 
 void presh(double * restrict fullp, double * halfp, const double *restrict vct,
 	   const double *restrict ps, long nhlev, long ngp);

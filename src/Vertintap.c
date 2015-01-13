@@ -18,8 +18,7 @@
 /*
    This module contains the following operators:
 
-      Vertint    ml2pl           Model to pressure level interpolation
-      Vertint    ml2hl           Model to height level interpolation
+      Vertint    ap2pl           Model air pressure level to pressure level interpolation
 */
 
 
@@ -35,7 +34,7 @@
 
 #define  C_EARTH_GRAV    (9.80665)
 
-void *Vertintml(void *argument)
+void *Vertintap(void *argument)
 {
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
@@ -61,7 +60,6 @@ void *Vertintml(void *argument)
   double minval, maxval;
   double missval;
   double *plev = NULL, *vct = NULL;
-  double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   double *hyb_press = NULL;
@@ -75,20 +73,16 @@ void *Vertintml(void *argument)
 
   cdoInitialize(argument);
 
-  int ML2PL     = cdoOperatorAdd("ml2pl",     func_pl, type_lin, "pressure levels in pascal");
-  int ML2PLX    = cdoOperatorAdd("ml2plx",    func_pl, type_lin, "pressure levels in pascal");
-  int ML2HL     = cdoOperatorAdd("ml2hl",     func_hl, type_lin, "height levels in meter");
-  int ML2HLX    = cdoOperatorAdd("ml2hlx",    func_hl, type_lin, "height levels in meter");
-  int ML2PL_LP  = cdoOperatorAdd("ml2pl_lp",  func_pl, type_log, "pressure levels in pascal");
-  int ML2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
-  int ML2HL_LP  = cdoOperatorAdd("ml2hl_lp",  func_hl, type_log, "height levels in meter");
-  int ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
+  int AP2PL     = cdoOperatorAdd("ml2pl",     func_pl, type_lin, "pressure levels in pascal");
+  int AP2PLX    = cdoOperatorAdd("ml2plx",    func_pl, type_lin, "pressure levels in pascal");
+  int AP2PL_LP  = cdoOperatorAdd("ml2pl_lp",  func_pl, type_log, "pressure levels in pascal");
+  int AP2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
   int opertype = cdoOperatorF2(operatorID);
 
-  if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
+  if ( operatorID == AP2PL || operatorID == AP2PL_LP )
     {
       char *envstr;
       envstr = getenv("EXTRAPOLATE");
@@ -103,7 +97,7 @@ void *Vertintml(void *argument)
 	    }
 	}
     }
-  else if ( operatorID == ML2PLX || operatorID == ML2HLX || operatorID == ML2PLX_LP || operatorID == ML2HLX_LP )
+  else if ( operatorID == AP2PLX || operatorID == AP2PLX_LP )
     {
       Extrapolate = 1;
     }
@@ -217,58 +211,6 @@ void *Vertintml(void *argument)
 	      else
 		{
 		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	  else if ( nlevel == (nvct - 4 - 1) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  int vctsize;
-		  int voff = 4;
-		  
-		  rvct = (double*) malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, rvct);
-
-		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
-		    {
-		      lhavevct = TRUE;
-		      zaxisIDh = zaxisID;
-		      nhlev    = nlevel;
-		      nhlevf   = nhlev;
-		      nhlevh   = nhlev + 1;
-
-		      vctsize = 2*nhlevh;
-		      vct = (double*) malloc(vctsize*sizeof(double));
-
-		      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-
-		      /* calculate VCT for LM */
-
-		      for ( i = 0; i < vctsize/2; i++ )
-			{
-			  if ( rvct[voff+i] >= rvct[voff] && rvct[voff+i] <= rvct[3] )
-			    {
-			      vct[i] = rvct[0]*rvct[voff+i];
-			      vct[vctsize/2+i] = 0;
-			    }
-			  else
-			    {
-			      vct[i] = (rvct[0]*rvct[3]*(1-rvct[voff+i]))/(1-rvct[3]);
-			      vct[vctsize/2+i] = (rvct[voff+i]-rvct[3])/(1-rvct[3]);
-			    }
-			}
-		      
-		      if ( cdoVerbose )
-			{
-			  for ( i = 0; i < vctsize/2; i++ )
-			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
-			}
-		    }
-		}
-	      else
-		{
-		  if ( memcmp(rvct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
 		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 		}
 	    }
@@ -597,23 +539,6 @@ void *Vertintml(void *argument)
 	      nlevel   = zaxisInqSize(zaxisID);
 	      if ( varinterp[varID] )
 		{
-		  /*
-		  if ( nlevel == nhlevh )
-		    {
-		      int i, k;
-		      double *vl1, *vl2;
-
-		      for ( k = 1; k < nlevel; k++ )
-			{
-			  vl1  = vardata1[varID] + gridsize*(k-1);
-			  vl2  = vardata1[varID] + gridsize*(k);
-			  for ( i = 0; i < gridsize; i++ )
-			    vl1[i] = 0.5*(vl1[i] + vl2[i]);
-			}
-		      
-		      nlevel = nhlevf;
-		    }
-		  */
 		  if ( nlevel == nhlevh )
 		    {
 		      hyb_press = half_press;
@@ -705,7 +630,6 @@ void *Vertintml(void *argument)
   if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
   if ( vct        ) free(vct);
-  if ( rvct       ) free(rvct);
 
   listDelete(flist);
 

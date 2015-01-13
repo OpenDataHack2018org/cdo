@@ -25,7 +25,7 @@ double RD            = C_EARTH_RD;
 int Mars = 0;
 
 
-void h2p(double * restrict phlev, const double * restrict hlev, long nphlev)
+void height2pressure(double * restrict phlev, const double * restrict hlev, long nphlev)
 {
   long k;
   double exp_arg;
@@ -37,18 +37,17 @@ void h2p(double * restrict phlev, const double * restrict hlev, long nphlev)
       /*
 	unitsel == 1 : hlev[k] is given in meters
 	unitsel == 2 : hlev[k] is given in kilometers
-	h2p needs meters (MKSC-standard)
+	height2pressure needs meters (MKSC-standard)
       */
 
       exp_arg = height / SCALEHEIGHT;
 
       phlev[k] = SCALESLP * exp(exp_arg);
     }
+}
 
-}  /* h2p */
 
-
-void p2h(double * restrict hlev, const double * restrict plev, long nphlev)
+void pressure2height(double * restrict hlev, const double * restrict plev, long nphlev)
 {
   long  k;
 
@@ -56,8 +55,7 @@ void p2h(double * restrict hlev, const double * restrict plev, long nphlev)
     {
       hlev[k] = log(plev[k]/SCALESLP)*SCALEHEIGHT;
     }
-
-}  /* p2h */
+}
 
 
 void presh(double * restrict fullp, double * halfp, const double *restrict vct,

@@ -159,6 +159,7 @@ cdo_SOURCES += Adisit.c        \
                Vargen.c        \
                Varrms.c        \
                Vertintml.c     \
+               Vertintap.c     \
                Vertstat.c      \
                Vertwind.c      \
                Wct.c           \
