@@ -1135,11 +1135,9 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 		  tgt_grid->cell_frac[tgt_grid_add] += partial_weights[n];
 		}
 #if defined(_OPENMP)
-#pragma omp critical
+#pragma omp atomic
 #endif
-	       {
-		src_grid->cell_area[src_grid_add] += partial_weights[n];
-	       }
+	      src_grid->cell_area[src_grid_add] += partial_weights[n];
 	    }
 	}
       
