@@ -746,6 +746,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       //printf("src_grid   lon: %g %g lat: %g %g\n", RAD2DEG*src_grid_bound_box[2],RAD2DEG*src_grid_bound_box[3],RAD2DEG*src_grid_bound_box[0],RAD2DEG*src_grid_bound_box[1] );
     }
 
+  /*
   struct grid_cell* src_grid_cell;
   struct grid_cell* src_grid_cell2[ompNumThreads];  
   for ( i = 0; i < ompNumThreads; ++i )
@@ -758,7 +759,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       src_grid_cell2[i]->coordinates_y   = (double*) malloc(src_num_cell_corners*sizeof(double));
       src_grid_cell2[i]->coordinates_xyz = (double*) malloc(3*src_num_cell_corners*sizeof(double));
     }
-
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
@@ -810,7 +810,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       free(src_grid_cell2[i]->coordinates_xyz);
       free(src_grid_cell2[i]);
     }
-
+  */
   findex = 0;
 
   int sum_srch_cells = 0;
@@ -1124,7 +1124,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	    {
 	      if ( src_grid->mask[src_grid_add] )
 		{
-
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
@@ -1135,6 +1134,12 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 		  }
 		  tgt_grid->cell_frac[tgt_grid_add] += partial_weights[n];
 		}
+#if defined(_OPENMP)
+#pragma omp critical
+#endif
+	       {
+		src_grid->cell_area[src_grid_add] += partial_weights[n];
+	       }
 	    }
 	}
       
