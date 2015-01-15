@@ -37,6 +37,8 @@
 #define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
+/* added from cdo.h */
+extern char *cdoExpName; // refactor: added keyword extern
 extern int ompNumThreads;
 
 extern int stdin_is_tty;
@@ -76,13 +78,12 @@ extern int cdoDiag;
 
 extern int cdoNumVarnames;
 extern char **cdoVarnames;
+extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 
-int cdo_omp_get_thread_num(void);
 
+/* moved here from *.c */
+extern char CDO_Version[]; // refactor: moved here from pstream.c
 
-extern char CDO_Version[]; // refactored: moved here from pstream.c
-
-void strtolower(char *str);
 
 typedef struct {
   int    argc;
@@ -178,4 +179,9 @@ void cdiDefTableID(int tableID);
 int gridFromName(const char *gridname);
 int zaxisFromName(const char *zaxisname);
 
+/* moved here from cdo.h */
+int cdo_omp_get_thread_num(void);
+void strtolower(char *str);
+
+/* moved here from cdo.c */
 #endif  /* _UTIL_H */
