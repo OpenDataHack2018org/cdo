@@ -8,7 +8,7 @@
 
 /*
     This routine stores the address and weight for this link in the appropriate 
-    address and weight arrays and resizes those arrays if necessary.
+    address and weight and resizes those arrays if necessary.
 */
 static
 void store_link_conserv(remapvars_t* rv, long add1, long add2, double weight)
