@@ -127,7 +127,6 @@ static int numThreads = 0;
 
 int cdoExpMode           = -1;
 char *cdoExpName         = NULL;
-void exp_run(int argc, char *argv[], char *cdoExpName);
 
 
 int timer_total, timer_read, timer_write;
@@ -152,10 +151,6 @@ int timer_total, timer_read, timer_write;
 	      } \
 	  } \
       }
-
-
-void printFeatures(void);
-void printLibraries(void);
 
 
 static
