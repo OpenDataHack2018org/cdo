@@ -11,30 +11,16 @@
     address and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_conserv(remapvars_t* rv, long add1, long add2, long num_wts, double* weights)
+void store_link_conserv(remapvars_t* rv, long add1, long add2, double weight)
 {
   /*
     Input variables:
     int  add1         ! address on source grid
     int  add2         ! address on target grid
-    double weights[]  ! array of remapping weights for this link
+    double weight     ! remapping weight for this link
   */
-  /* Local variables */
-  long nlink; /* link index */
-  long i;
-
-  /*  If all weights are ZERO, do not bother storing the link */
-
-  if ( num_wts == 3 )
-    {
-      if ( IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0) ) return;
-    }
-  else
-    {
-      if ( IS_EQUAL(weights[0], 0) ) return;
-    }
-    
-  nlink = rv->num_links;
+  /* link index */
+  long nlink = rv->num_links;
 
   rv->num_links++;
   if ( rv->num_links >= rv->max_links )
@@ -42,8 +28,7 @@ void store_link_conserv(remapvars_t* rv, long add1, long add2, long num_wts, dou
 
   rv->src_grid_add[nlink] = add1;
   rv->tgt_grid_add[nlink] = add2;
-
-  for ( i = 0; i < num_wts; ++i ) rv->wts[num_wts*nlink+i] = weights[i];	      
+  rv->wts[nlink] = weight;	      
 
 }  /* store_link_conserv */
 
@@ -1107,13 +1092,15 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       for ( n = 0; n < num_weights; ++n )
 	{
+	  double partial_weight = partial_weights[n];
+
 	  src_grid_add = srch_add[n];
 
 	  if ( 0 && cdoVerbose )
 	    printf("tgt_grid_add %ld, src_grid_add %ld,  partial_weights[n] %g, tgt_area  %g\n", tgt_grid_add, src_grid_add, partial_weights[n], tgt_area);
 
 	  // src_grid_add = n;
-	  if ( partial_weights[n] <= 0. ) src_grid_add = -1;
+	  if ( partial_weight <= 0. ) src_grid_add = -1;
 
 	  /*
 	    Store the appropriate addresses and weights. 
@@ -1128,16 +1115,19 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 #pragma omp critical
 #endif
 		  {
-		    store_link_conserv(rv, src_grid_add, tgt_grid_add, num_wts, &partial_weights[n]);
-
-		    src_grid->cell_frac[src_grid_add] += partial_weights[n];
+		    store_link_conserv(rv, src_grid_add, tgt_grid_add, partial_weight);
 		  }
-		  tgt_grid->cell_frac[tgt_grid_add] += partial_weights[n];
+#if defined(_OPENMP)
+#pragma omp atomic
+#endif
+		  src_grid->cell_frac[src_grid_add] += partial_weight;
+		  
+		  tgt_grid->cell_frac[tgt_grid_add] += partial_weight;
 		}
 #if defined(_OPENMP)
 #pragma omp atomic
 #endif
-	      src_grid->cell_area[src_grid_add] += partial_weights[n];
+	      src_grid->cell_area[src_grid_add] += partial_weight;
 	    }
 	}
       

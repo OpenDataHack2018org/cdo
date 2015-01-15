@@ -22,20 +22,18 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weigh
     int src_add[4]    ! addresses on source grid
     double weights[4] ! array of remapping weights for these links
   */
-  long n;
-  long nlink;
-
+  /* link index */
+  long nlink = rv->num_links;
   /*
      Increment number of links and check to see if remap arrays need
      to be increased to accomodate the new link. Then store the link.
   */
-  nlink = rv->num_links;
   rv->num_links += 4;
 
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
 
-  for ( n = 0; n < 4; ++n )
+  for ( long n = 0; n < 4; ++n )
     {
       rv->src_grid_add[nlink+n] = src_add[n];
       rv->tgt_grid_add[nlink+n] = dst_add;
