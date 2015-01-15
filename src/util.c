@@ -526,3 +526,78 @@ void repl_filetypeext(char file[], const char *oldext, const char *newext)
   // add new file extension
   strcat(file, newext);
 }
+
+
+void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname)
+{
+  if ( strncmp(CDO_File_Suffix, "NULL", 4) != 0 )
+    {
+      if ( CDO_File_Suffix[0] != 0 )
+	{
+	  strncat(filesuffix, CDO_File_Suffix, maxlen-1);
+	}
+      else
+	{
+	  int lready = FALSE;
+	  int lcompsz = FALSE;
+	  
+	  if ( filetype == cdoDefaultFileType && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
+	    {
+	      size_t len = 0;
+	      if ( refname != NULL && *refname != 0 && *refname != '-' && *refname != '.' ) len = strlen(refname);
+
+	      if ( len > 2 )
+		{
+		  char *result = strrchr(refname, '.');
+		  if ( result != NULL && result[1] != 0 )
+		    {
+		      int firstchar = tolower(result[1]);
+		      switch (firstchar)
+			{
+			case 'g':
+			  if ( cdoDefaultFileType == FILETYPE_GRB || cdoDefaultFileType == FILETYPE_GRB2 ) lready = TRUE;
+			  break;
+			case 'n':
+			  if ( cdoDefaultFileType == FILETYPE_NC || cdoDefaultFileType == FILETYPE_NC2 ||
+			       cdoDefaultFileType == FILETYPE_NC4 || cdoDefaultFileType == FILETYPE_NC4C ) lready = TRUE;
+			  break;
+			case 's':
+			  if ( cdoDefaultFileType == FILETYPE_SRV ) lready = TRUE;
+			  break;
+			case 'e':
+			  if ( cdoDefaultFileType == FILETYPE_EXT ) lready = TRUE;
+			  break;
+			case 'i':
+			  if ( cdoDefaultFileType == FILETYPE_IEG ) lready = TRUE;
+			  break;
+			}
+		    }
+		  if ( lready )  strncat(filesuffix, result, maxlen-1);
+		}
+	    }
+
+	  if ( !lready )
+	    {
+	      strncat(filesuffix, streamFilesuffix(cdoDefaultFileType), maxlen-1);
+	      if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = TRUE;
+	    }
+
+	  if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == COMPRESS_SZIP ) lcompsz = TRUE;
+	  if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
+	}
+    }
+}
+
+
+int cdoFiletype(void)
+{
+  if ( cdoDefaultFileType == CDI_UNDEFID )
+    {
+      cdoDefaultFileType = FILETYPE_GRB;
+      if ( ! cdoSilentMode )
+	cdoPrint("Set default filetype to GRIB");
+    }
+
+  return (cdoDefaultFileType);
+}
+
