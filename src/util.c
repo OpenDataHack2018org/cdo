@@ -101,9 +101,9 @@ char *getOperatorName(const char *operatorArg)
       commapos = strchr(operatorArg, ',');
 
       if ( commapos )
-	len = commapos - operatorArg;
+        len = commapos - operatorArg;
       else
-	len = strlen(operatorArg);
+        len = strlen(operatorArg);
 
       operatorName = (char*) malloc(len+1);
 
@@ -136,10 +136,10 @@ void file_argument_free(argument_t *argument)
   if ( argument )
     {
       if ( argument->argc )
-	{
-	  assert(argument->argc == 1);
-	  free(argument->argv);
-	}
+        {
+          assert(argument->argc == 1);
+          free(argument->argv);
+        }
       free(argument);
     }
 }
@@ -169,27 +169,27 @@ void argument_free(argument_t *argument)
   if ( argument )
     {
       if ( argument->argc )
-	{
-	  int argc =  argument->argc;
-	  for ( int i = 0; i < argc; ++i )
-	    {
-	      if ( argument->argv[i] )
-		{
-		  free(argument->argv[i]);
-		  argument->argv[i] = NULL;
-		}
-	    }
+        {
+          int argc =  argument->argc;
+          for ( int i = 0; i < argc; ++i )
+            {
+              if ( argument->argv[i] )
+                {
+                  free(argument->argv[i]);
+                  argument->argv[i] = NULL;
+                }
+            }
 
-	  free(argument->argv);
-	  argument->argv = NULL;
-	  argument->argc = 0;
-	}
+          free(argument->argv);
+          argument->argv = NULL;
+          argument->argc = 0;
+        }
 
       if ( argument->args )
-	{
-	  free(argument->args);
-	  argument->args = NULL;
-	}
+        {
+          free(argument->args);
+          argument->args = NULL;
+        }
 
       free(argument);
     }
@@ -219,12 +219,12 @@ char *getFileArg(char *argument)
       blankpos = strchr(argument, ' ');
 
       if ( blankpos )
-	{
-	  parg = blankpos + 1;
-	  len = strlen(parg);
-	  fileArg = (char*) malloc(len+1);
-	  strcpy(fileArg, parg);
-	}
+        {
+          parg = blankpos + 1;
+          len = strlen(parg);
+          fileArg = (char*) malloc(len+1);
+          strcpy(fileArg, parg);
+        }
     }
 
   return (fileArg);
@@ -252,7 +252,7 @@ void strtolower(char *str)
     {
       len = (int) strlen(str);
       for ( i = 0; i < len; i++ )
-	str[i] = tolower((int) str[i]);
+        str[i] = tolower((int) str[i]);
     }
 }
 
@@ -272,12 +272,12 @@ int get_season_start(void)
       else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
       
       if ( cdoVerbose )
-	{
-	  if      ( season_start == START_DEC )
-	    cdoPrint("Set SEASON_START to December");
-	  else if ( season_start == START_JAN )
-	    cdoPrint("Set SEASON_START to January");
-	}
+        {
+          if      ( season_start == START_DEC )
+            cdoPrint("Set SEASON_START to December");
+          else if ( season_start == START_JAN )
+            cdoPrint("Set SEASON_START to January");
+        }
     }
 
   return (season_start);
@@ -326,9 +326,9 @@ int userFileOverwrite(const char *filename)
   if ( len == 3 )
     {
       if ( pline[0] == 'y' && pline[1] == 'e' && pline[2] == 's' )
-	status = 1;
+        status = 1;
       else if ( pline[0] == 'Y' && pline[1] == 'E' && pline[2] == 'S' )
-	status = 1;
+        status = 1;
     }
   else if ( len == 1 )
     {
@@ -424,7 +424,7 @@ int str2datatype(const char *datatypestr)
       int ilen = atoi(datatypestr+1);
       if      ( strncmp(datatypestr, "P0",  len) == 0 ) datatype = DATATYPE_PACK;
       else if ( strncmp(datatypestr, "P",     1) == 0 &&
-		ilen > 0 && ilen <= 32 )               datatype = atoi(datatypestr+1);
+                ilen > 0 && ilen <= 32 )               datatype = atoi(datatypestr+1);
       else if ( strncmp(datatypestr, "C32", len) == 0 ) datatype = DATATYPE_CPX32;
       else if ( strncmp(datatypestr, "C64", len) == 0 ) datatype = DATATYPE_CPX64;
       else if ( strncmp(datatypestr, "F32", len) == 0 ) datatype = DATATYPE_FLT32;
@@ -455,14 +455,14 @@ off_t filesize(const char *filename)
     {
       fp = fopen(filename, "r");
       if ( fp == NULL )
-	{
-	  fprintf(stderr, "Open failed on %s\n", filename);
-	}
+        {
+          fprintf(stderr, "Open failed on %s\n", filename);
+        }
       else
-	{
-	  fseek(fp, 0L, SEEK_END);
-	  pos = ftello(fp);
-	}
+        {
+          fseek(fp, 0L, SEEK_END);
+          pos = ftello(fp);
+        }
     }
   
   return pos;
@@ -533,58 +533,58 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
   if ( strncmp(CDO_File_Suffix, "NULL", 4) != 0 )
     {
       if ( CDO_File_Suffix[0] != 0 )
-	{
-	  strncat(filesuffix, CDO_File_Suffix, maxlen-1);
-	}
+        {
+          strncat(filesuffix, CDO_File_Suffix, maxlen-1);
+        }
       else
-	{
-	  int lready = FALSE;
-	  int lcompsz = FALSE;
-	  
-	  if ( filetype == cdoDefaultFileType && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
-	    {
-	      size_t len = 0;
-	      if ( refname != NULL && *refname != 0 && *refname != '-' && *refname != '.' ) len = strlen(refname);
+        {
+          int lready = FALSE;
+          int lcompsz = FALSE;
+          
+          if ( filetype == cdoDefaultFileType && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
+            {
+              size_t len = 0;
+              if ( refname != NULL && *refname != 0 && *refname != '-' && *refname != '.' ) len = strlen(refname);
 
-	      if ( len > 2 )
-		{
-		  char *result = strrchr(refname, '.');
-		  if ( result != NULL && result[1] != 0 )
-		    {
-		      int firstchar = tolower(result[1]);
-		      switch (firstchar)
-			{
-			case 'g':
-			  if ( cdoDefaultFileType == FILETYPE_GRB || cdoDefaultFileType == FILETYPE_GRB2 ) lready = TRUE;
-			  break;
-			case 'n':
-			  if ( cdoDefaultFileType == FILETYPE_NC || cdoDefaultFileType == FILETYPE_NC2 ||
-			       cdoDefaultFileType == FILETYPE_NC4 || cdoDefaultFileType == FILETYPE_NC4C ) lready = TRUE;
-			  break;
-			case 's':
-			  if ( cdoDefaultFileType == FILETYPE_SRV ) lready = TRUE;
-			  break;
-			case 'e':
-			  if ( cdoDefaultFileType == FILETYPE_EXT ) lready = TRUE;
-			  break;
-			case 'i':
-			  if ( cdoDefaultFileType == FILETYPE_IEG ) lready = TRUE;
-			  break;
-			}
-		    }
-		  if ( lready )  strncat(filesuffix, result, maxlen-1);
-		}
-	    }
+              if ( len > 2 )
+                {
+                  char *result = strrchr(refname, '.');
+                  if ( result != NULL && result[1] != 0 )
+                    {
+                      int firstchar = tolower(result[1]);
+                      switch (firstchar)
+                        {
+                        case 'g':
+                          if ( cdoDefaultFileType == FILETYPE_GRB || cdoDefaultFileType == FILETYPE_GRB2 ) lready = TRUE;
+                          break;
+                        case 'n':
+                          if ( cdoDefaultFileType == FILETYPE_NC || cdoDefaultFileType == FILETYPE_NC2 ||
+                               cdoDefaultFileType == FILETYPE_NC4 || cdoDefaultFileType == FILETYPE_NC4C ) lready = TRUE;
+                          break;
+                        case 's':
+                          if ( cdoDefaultFileType == FILETYPE_SRV ) lready = TRUE;
+                          break;
+                        case 'e':
+                          if ( cdoDefaultFileType == FILETYPE_EXT ) lready = TRUE;
+                          break;
+                        case 'i':
+                          if ( cdoDefaultFileType == FILETYPE_IEG ) lready = TRUE;
+                          break;
+                        }
+                    }
+                  if ( lready )  strncat(filesuffix, result, maxlen-1);
+                }
+            }
 
-	  if ( !lready )
-	    {
-	      strncat(filesuffix, streamFilesuffix(cdoDefaultFileType), maxlen-1);
-	      if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = TRUE;
-	    }
+          if ( !lready )
+            {
+              strncat(filesuffix, streamFilesuffix(cdoDefaultFileType), maxlen-1);
+              if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = TRUE;
+            }
 
-	  if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == COMPRESS_SZIP ) lcompsz = TRUE;
-	  if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
-	}
+          if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == COMPRESS_SZIP ) lcompsz = TRUE;
+          if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
+        }
     }
 }
 
@@ -595,7 +595,7 @@ int cdoFiletype(void)
     {
       cdoDefaultFileType = FILETYPE_GRB;
       if ( ! cdoSilentMode )
-	cdoPrint("Set default filetype to GRIB");
+        cdoPrint("Set default filetype to GRIB");
     }
 
   return (cdoDefaultFileType);
