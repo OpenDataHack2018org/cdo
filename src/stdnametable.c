@@ -17,6 +17,7 @@ stdnametable_t;
 
 const stdnametable_t stdnametable[] = {
   /* varid                       code    name                standard name                 units */
+  { air_pressure,                   1,  "pres",             "air_pressure",               "Pa" },
   { surface_geopotential,         129,  "geosp",            "surface_geopotential",       "m2 s-2" },
   { geopotential,                 129,  "z",                "geopotential",               "m2 s-2" },
   { air_temperature,              130,  "ta",               "air_temperature",            "K" },

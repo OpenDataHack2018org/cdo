@@ -1,7 +1,8 @@
 #ifndef _STDNAMETABLE_H
 #define _STDNAMETABLE_H
 
-enum stdnameid {surface_geopotential,
+enum stdnameid {air_pressure,
+                surface_geopotential,
 		geopotential,
 		air_temperature,
                 specific_humidity,

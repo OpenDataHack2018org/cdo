@@ -60,7 +60,6 @@ void *Vertintap(void *argument)
   double minval, maxval;
   double missval;
   double *plev = NULL, *vct = NULL;
-  double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   double *hyb_press = NULL;
@@ -74,10 +73,10 @@ void *Vertintap(void *argument)
 
   cdoInitialize(argument);
 
-  int AP2PL     = cdoOperatorAdd("ml2pl",     func_pl, type_lin, "pressure levels in pascal");
-  int AP2PLX    = cdoOperatorAdd("ml2plx",    func_pl, type_lin, "pressure levels in pascal");
-  int AP2PL_LP  = cdoOperatorAdd("ml2pl_lp",  func_pl, type_log, "pressure levels in pascal");
-  int AP2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
+  int AP2PL     = cdoOperatorAdd("ap2pl",     func_pl, type_lin, "pressure levels in pascal");
+  int AP2PLX    = cdoOperatorAdd("ap2plx",    func_pl, type_lin, "pressure levels in pascal");
+  int AP2PL_LP  = cdoOperatorAdd("ap2pl_lp",  func_pl, type_log, "pressure levels in pascal");
+  int AP2PLX_LP = cdoOperatorAdd("ap2plx_lp", func_pl, type_log, "pressure levels in pascal");
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
