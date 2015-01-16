@@ -44,15 +44,11 @@
 #define RLIM_T  rlim_t
 #endif
 
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 
 #include "cdo_getopt.h"
-extern int   CDO_optind;
-extern char *CDO_optarg;
-
 
 #if defined(HAVE_LIBPTHREAD)
 #include "pstream_int.h"
@@ -1064,7 +1060,6 @@ int parse_options_long(int argc, char *argv[])
       { NULL,                                0,                NULL,  0  }
     };
 
-  extern int CDO_opterr;
   CDO_opterr = 1;
 
   while ( 1 )
@@ -1103,7 +1098,6 @@ int parse_options_long(int argc, char *argv[])
 	    }
 	  else if ( lremap_genweights )
 	    {
-	      extern int remap_genweights;
 	      remap_genweights = str_to_int(CDO_optarg);
 	    }
 	  break;

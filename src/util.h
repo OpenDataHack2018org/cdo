@@ -36,8 +36,13 @@
 
 #define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
+/* refactor: moved from cdo.c */
+extern int   CDO_optind;
+extern char *CDO_optarg;
+extern int CDO_opterr;
+extern int remap_genweights;
 
-/* added from cdo.h */
+/* refactor: moved from cdo.h */
 extern char *cdoExpName; // refactor: added keyword extern
 extern int ompNumThreads;
 

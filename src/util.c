@@ -37,7 +37,9 @@
 #if ! defined(VERSION)
 #  define  VERSION  "0.0.1"
 #endif
-char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)"; // refactored: moved here from cdo.c
+char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)"; // refactor: moved here from cdo.c
+int CDO_opterr = 0; // refactor: moved here from cdo_getopt.c
+int remap_genweights = TRUE; // refactor: moved here from Remap.c
 
 
 int cdo_omp_get_thread_num(void)

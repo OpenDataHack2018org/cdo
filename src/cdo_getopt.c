@@ -19,12 +19,12 @@
 #include <string.h>
 #include <assert.h>
 #include "cdo_getopt.h"
+#include "util.h"
 
 char *CDO_optarg = NULL;
 int CDO_optind = 1;
-int CDO_optopt = 0;
-int CDO_opterr = 0;
-int CDO_optreset = 0;
+static int CDO_optopt = 0;
+int CDO_optreset = 0; // TODO refactor
 
 int cdo_getopt(int argc, char * const *argv, const char *optstring)
 {

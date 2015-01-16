@@ -213,7 +213,6 @@ int remap_non_global = FALSE;
 int remap_num_srch_bins = 180;
 int lremap_num_srch_bins = FALSE;
 int remap_extrapolate = FALSE;
-int remap_genweights = TRUE;
 int lextrapolate = FALSE;
 int max_remaps = -1;
 int sort_mode = HEAP_SORT;
