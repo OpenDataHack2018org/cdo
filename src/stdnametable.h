@@ -2,6 +2,7 @@
 #define _STDNAMETABLE_H
 
 enum stdnameid {air_pressure,
+		pressure_thickness,
                 surface_geopotential,
 		geopotential,
 		air_temperature,

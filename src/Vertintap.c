@@ -50,7 +50,8 @@ void *Vertintap(void *argument)
   int *vert_index = NULL;
   int nvct;
   int sgeopot_needed = FALSE;
-  int sgeopotID = -1, geopotID = -1, tempID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
+  int apressID = -1, dpressID = -1;
+  int sgeopotID = -1, geopotID = -1, tempID = -1, psID = -1, lnpsID = -1, presID = -1;
   int code, param;
   int pnum, pcat, pdis;
   //int sortlevels = TRUE;
@@ -61,7 +62,7 @@ void *Vertintap(void *argument)
   double missval;
   double *plev = NULL, *vct = NULL;
   double *single1, *single2;
-  double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
+  double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
   double *hyb_press = NULL;
   int Extrapolate = 0;
   int lhavevct;
@@ -253,7 +254,7 @@ void *Vertintap(void *argument)
       vert_index = (int*) malloc(ngp*nplev*sizeof(int));
       ps_prog    = (double*) malloc(ngp*sizeof(double));
       full_press = (double*) malloc(ngp*nhlevf*sizeof(double));
-      half_press = (double*) malloc(ngp*nhlevh*sizeof(double));
+      dpress = (double*) malloc(ngp*nhlevf*sizeof(double));
     }
   else
     cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
@@ -292,78 +293,18 @@ void *Vertintap(void *argument)
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
-      instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
-      tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
       code     = vlistInqVarCode(vlistID1, varID);
       param    = vlistInqVarParam(vlistID1, varID);
 
-      cdiParamToString(param, paramstr, sizeof(paramstr));
-      cdiDecodeParam(param, &pnum, &pcat, &pdis);
-      if ( pdis >= 0 && pdis < 255 ) code = -1;
 
-      if ( useTable )
-	{
-	  if ( tableNum == 2 )
-	    {
-	      mode = WMO_MODE;
-	      wmo_gribcodes(&gribcodes);
-	    }
-	  else if ( tableNum == 128 || tableNum == 0 )
-	    {
-	      mode = ECHAM_MODE;
-	      echam_gribcodes(&gribcodes);
-	    }
-	  else
-	    mode = -1;
-	}
-      else
-	{
-	  mode = ECHAM_MODE;
-	  echam_gribcodes(&gribcodes);
-	}
+      vlistInqVarStdname(vlistID1, varID, stdname);
+      strtolower(stdname);
 
-      if ( cdoVerbose )
-	cdoPrint("Mode = %d  Center = %d  Code = %d  Param = %s", mode, instNum, code, paramstr);
+      if      ( strcmp(stdname, var_stdname(air_pressure))       == 0 ) apressID = varID; 
+      else if ( strcmp(stdname, var_stdname(pressure_thickness)) == 0 ) dpressID = varID; 
+      else if ( strcmp(stdname, var_stdname(air_temperature))    == 0 ) tempID = varID; 
 
-      if ( code <= 0 || code == 255 )
-	{
-	  vlistInqVarName(vlistID1, varID, varname);
-	  strtolower(varname);
-
-	  vlistInqVarStdname(vlistID1, varID, stdname);
-	  strtolower(stdname);
-
-	  code = echamcode_from_stdname(stdname);
-
-	  if ( code == -1 )
-	    {
-	      /*                                  ECHAM                            ECMWF       */
-	      if      ( sgeopotID == -1 && (strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0) ) code = gribcodes.geopot;
-	      else if ( tempID    == -1 && (strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0) ) code = gribcodes.temp;
-	      else if ( psID      == -1 && (strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0) ) code = gribcodes.ps;
-	      else if ( lnpsID    == -1 && (strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0) ) code = gribcodes.lsp;
-	      else if ( geopotID  == -1 && strcmp(stdname, "geopotential_full") == 0 ) code = gribcodes.geopot;
-	      /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
-	    }
-	}
-
-      if ( mode == ECHAM_MODE )
-	{
-	  if      ( code == gribcodes.geopot  && nlevel == 1      ) sgeopotID = varID;
-	  else if ( code == gribcodes.geopot  && nlevel == nhlevf ) geopotID  = varID;
-	  else if ( code == gribcodes.temp    && nlevel == nhlevf ) tempID    = varID;
-	  else if ( code == gribcodes.ps      && nlevel == 1      ) psID      = varID;
-	  else if ( code == gribcodes.lsp     && nlevel == 1      ) lnpsID    = varID;
-	  else if ( code == gribcodes.gheight && nlevel == nhlevf ) gheightID = varID;
-	}
-      else if ( mode == WMO_MODE )
-	{
-	  if      ( code == gribcodes.geopot  && nlevel == 1      ) sgeopotID = varID;
-	  else if ( code == gribcodes.geopot  && nlevel == nhlevf ) geopotID  = varID;
-	  else if ( code == gribcodes.temp    && nlevel == nhlevf ) tempID    = varID;
-	  else if ( code == gribcodes.ps      && nlevel == 1      ) psID      = varID;
-	}
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	cdoAbort("Spectral data on model level unsupported!");
@@ -371,12 +312,8 @@ void *Vertintap(void *argument)
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
 
-      if ( varID == gheightID )
-	vardata1[varID] = (double*) malloc(gridsize*(nlevel+1)*sizeof(double));
-      else
-	vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
+      vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
 
-      /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
       if ( zaxisID == zaxisIDh ||
 	   (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
 	{
@@ -399,15 +336,12 @@ void *Vertintap(void *argument)
   if ( cdoVerbose )
     {
       cdoPrint("Found:");
+      if ( apressID  != -1 ) cdoPrint("  %s", var_stdname(air_pressure));
+      if ( dpressID  != -1 ) cdoPrint("  %s", var_stdname(pressure_thickness));
       if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
-      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if ( lnpsID    != -1 ) cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
-      if ( sgeopotID != -1 ) cdoPrint("  %s", var_stdname(surface_geopotential));
-      if ( geopotID  != -1 ) cdoPrint("  %s", var_stdname(geopotential));
-      if ( gheightID != -1 ) cdoPrint("  %s", var_stdname(geopotential_height));
     }
 
-  if ( tempID != -1 || gheightID != -1 ) sgeopot_needed = TRUE;
+  if ( tempID != -1 ) sgeopot_needed = TRUE;
 
   if ( zaxisIDh != -1 && sgeopot_needed )
     {
@@ -423,25 +357,6 @@ void *Vertintap(void *argument)
 	}
     }
 
-  if ( zaxisIDh != -1 && gheightID != -1 && tempID == -1 )
-    cdoAbort("Temperature not found, needed to compute geopotheight!");
-
-  presID = lnpsID;
-  if ( zaxisIDh != -1 && lnpsID == -1 )
-    {
-      if ( psID == -1 )
-	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
-      else
-	presID = psID;
-    }
-
-  if ( cdoVerbose )
-    {
-      if ( presID == lnpsID )
-	cdoPrint("using LOG(%s)", var_stdname(surface_air_pressure));      
-      else
-	cdoPrint("using %s", var_stdname(surface_air_pressure));
-    }
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -478,44 +393,29 @@ void *Vertintap(void *argument)
 
       if ( zaxisIDh != -1 )
 	{
-	  if ( sgeopot_needed )
+	  if ( dpressID != -1 )
 	    {
-	      if ( sgeopotID != -1 )
-		memcpy(sgeopot, vardata1[sgeopotID], ngp*sizeof(double));
-	      else if ( geopotID != -1 )
-		memcpy(sgeopot, vardata1[geopotID]+ngp*(nhlevf-1), ngp*sizeof(double));
-
-	      /* check range of surface geopot */
-	      if ( sgeopotID != -1 || geopotID != -1 )
-		{
-		  minmaxval(ngp, sgeopot, NULL, &minval, &maxval);
-		  if ( minval < MIN_FIS || maxval > MAX_FIS )
-		    cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
-		  if ( ngp > 1 && minval >= 0 && maxval <= 9000 )
-		    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
-		}
+	      memcpy(dpress, vardata1[dpressID], ngp*nlevel*sizeof(double)); 
+	      for ( i = 0; i < ngp; i++ )  ps_prog[i] = 0;
+	      for ( k = 0; k < nlevel; ++k )
+		for ( i = 0; i < ngp; i++ )
+		  ps_prog[i] += dpress[k*ngp+i];
 	    }
-
-	  if ( lnpsID != -1 )
-	    for ( i = 0; i < ngp; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
-	  else if ( psID != -1 )
-	    memcpy(ps_prog, vardata1[psID], ngp*sizeof(double));
+	  else
+	    {
+	      for ( i = 0; i < ngp; i++ )  ps_prog[i] = 110000;
+	    }
 
 	  /* check range of ps_prog */
 	  minmaxval(ngp, ps_prog, NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
-
-	  presh(full_press, half_press, vct, ps_prog, nhlevf, ngp);
+	  memcpy(full_press, vardata1[apressID], ngp*nlevel*sizeof(double)); 
 
 	  if ( opertype == type_log )
 	    {
 	      for ( i = 0; i < ngp; i++ ) ps_prog[i] = log(ps_prog[i]);
-
-	      for ( k = 0; k < nhlevh; k++ )
-		for ( i = 0; i < ngp; i++ )
-		  half_press[k*ngp+i] = log(half_press[k*ngp+i]);
 
 	      for ( k = 0; k < nhlevf; k++ )
 		for ( i = 0; i < ngp; i++ )
@@ -539,11 +439,7 @@ void *Vertintap(void *argument)
 	      nlevel   = zaxisInqSize(zaxisID);
 	      if ( varinterp[varID] )
 		{
-		  if ( nlevel == nhlevh )
-		    {
-		      hyb_press = half_press;
-		    }
-		  else if ( nlevel == nhlevf )
+		  if ( nlevel == nhlevf )
 		    {
 		      hyb_press = full_press;
 		    }
@@ -560,32 +456,9 @@ void *Vertintap(void *argument)
 			cdoAbort("Missing values unsupported for this operator!");
 		    }
 
-		  if ( varID == tempID )
-		    {
-		      if ( nlevel == nhlevh )
-			cdoAbort("Temperature on half level unsupported!");
-
-		      if ( opertype == type_log && Extrapolate )
-			cdoAbort("Log. extrapolation of temperature unsupported!");
-
-		      interp_T(sgeopot, vardata1[varID], vardata2[varID],
-			       full_press, half_press, vert_index,
-			       plev, nplev, ngp, nlevel, missval);
-		    }
-		  else if ( varID == gheightID )
-		    {
-		      for ( i = 0; i < ngp; ++i )
-			vardata1[varID][ngp*nlevel+i] = sgeopot[i]/C_EARTH_GRAV;
-
-		      interp_Z(sgeopot, vardata1[varID], vardata2[varID],
-			       full_press, half_press, vert_index, vardata1[tempID],
-			       plev, nplev, ngp, nlevel, missval);
-		    }
-		  else
-		    {
-		      interp_X(vardata1[varID], vardata2[varID], hyb_press,
-			       vert_index, plev, nplev, ngp, nlevel, missval);
-		    }
+		  printf("var %d nlevel %d\n", varID, nlevel);
+		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
+			   vert_index, plev, nplev, ngp, nlevel, missval);
 		  
 		  if ( Extrapolate == 0 )
 		    memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
@@ -628,7 +501,7 @@ void *Vertintap(void *argument)
   if ( ps_prog    ) free(ps_prog);
   if ( vert_index ) free(vert_index);
   if ( full_press ) free(full_press);
-  if ( half_press ) free(half_press);
+  if ( dpress )     free(dpress);
   if ( vct        ) free(vct);
 
   listDelete(flist);
