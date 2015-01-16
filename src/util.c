@@ -39,6 +39,8 @@
 #endif
 char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)"; // refactor: moved here from cdo.c
 int CDO_opterr = 0; // refactor: moved here from cdo_getopt.c
+char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.c
+int CDO_optind = 1; // refactor: moved here from cdo_getopt.c
 int remap_genweights = TRUE; // refactor: moved here from Remap.c
 
 

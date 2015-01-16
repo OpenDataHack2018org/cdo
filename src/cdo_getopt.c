@@ -19,12 +19,10 @@
 #include <string.h>
 #include <assert.h>
 #include "cdo_getopt.h"
-#include "util.h"
+#include "util.h" // refactor: necessary for accessing global vars
 
-char *CDO_optarg = NULL;
-int CDO_optind = 1;
 static int CDO_optopt = 0;
-int CDO_optreset = 0; // TODO refactor
+static int CDO_optreset = 0; // TODO refactor: var without semantic effect
 
 int cdo_getopt(int argc, char * const *argv, const char *optstring)
 {
