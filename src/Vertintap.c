@@ -32,44 +32,37 @@
 #include "list.h"
 #include "stdnametable.h"
 
-#define  C_EARTH_GRAV    (9.80665)
 
 void *Vertintap(void *argument)
 {
-  int mode;
   enum {ECHAM_MODE, WMO_MODE};
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
   int gridsize, ngp = 0;
   int recID, nrecs;
   int i, k, offset;
-  int tsID, varID, levelID;
+  int varID, levelID;
   int zaxisIDp, zaxisIDh = -1, nzaxis;
   int ngrids, gridID, zaxisID;
   int nplev, nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
   int nvct;
-  int sgeopot_needed = FALSE;
   int apressID = -1, dpressID = -1;
-  int sgeopotID = -1, geopotID = -1, tempID = -1, psID = -1, lnpsID = -1, presID = -1;
-  int code, param;
-  int pnum, pcat, pdis;
+  int tempID = -1;
+  int param;
   //int sortlevels = TRUE;
   int *pnmiss = NULL;
   char paramstr[32];
-  char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
+  char stdname[CDI_MAX_NAME];
   double minval, maxval;
   double missval;
   double *plev = NULL, *vct = NULL;
   double *single1, *single2;
-  double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
+  double *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
   double *hyb_press = NULL;
   int Extrapolate = 0;
   int lhavevct;
   int mono_level;
-  int instNum, tableNum;
-  int useTable;
-  gribcode_t gribcodes = {0};
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
@@ -254,7 +247,7 @@ void *Vertintap(void *argument)
       vert_index = (int*) malloc(ngp*nplev*sizeof(int));
       ps_prog    = (double*) malloc(ngp*sizeof(double));
       full_press = (double*) malloc(ngp*nhlevf*sizeof(double));
-      dpress = (double*) malloc(ngp*nhlevf*sizeof(double));
+      dpress     = (double*) malloc(ngp*nhlevf*sizeof(double));
     }
   else
     cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
@@ -274,19 +267,6 @@ void *Vertintap(void *argument)
   if ( opertype == type_log )
     for ( k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
-  useTable = FALSE;
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
-      if ( tableNum > 0 && tableNum != 255 )
-	{
-	  useTable = TRUE;
-	  break;
-	}
-    }
-
-  if ( cdoVerbose && useTable ) cdoPrint("Using code tables!");
-
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -294,7 +274,6 @@ void *Vertintap(void *argument)
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
 
-      code     = vlistInqVarCode(vlistID1, varID);
       param    = vlistInqVarParam(vlistID1, varID);
 
 
@@ -341,28 +320,11 @@ void *Vertintap(void *argument)
       if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
     }
 
-  if ( tempID != -1 ) sgeopot_needed = TRUE;
-
-  if ( zaxisIDh != -1 && sgeopot_needed )
-    {
-      sgeopot = (double*) malloc(ngp*sizeof(double));
-      if ( sgeopotID == -1 )
-	{
-	  if ( geopotID == -1 )
-	    cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
-	  else
-	    cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
-
-	  memset(sgeopot, 0, ngp*sizeof(double));
-	}
-    }
-
-
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
@@ -395,9 +357,9 @@ void *Vertintap(void *argument)
 	{
 	  if ( dpressID != -1 )
 	    {
-	      memcpy(dpress, vardata1[dpressID], ngp*nlevel*sizeof(double)); 
+	      memcpy(dpress, vardata1[dpressID], ngp*nhlevf*sizeof(double)); 
 	      for ( i = 0; i < ngp; i++ )  ps_prog[i] = 0;
-	      for ( k = 0; k < nlevel; ++k )
+	      for ( k = 0; k < nhlevf; ++k )
 		for ( i = 0; i < ngp; i++ )
 		  ps_prog[i] += dpress[k*ngp+i];
 	    }
@@ -411,7 +373,7 @@ void *Vertintap(void *argument)
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
-	  memcpy(full_press, vardata1[apressID], ngp*nlevel*sizeof(double)); 
+	  memcpy(full_press, vardata1[apressID], ngp*nhlevf*sizeof(double)); 
 
 	  if ( opertype == type_log )
 	    {
@@ -456,7 +418,6 @@ void *Vertintap(void *argument)
 			cdoAbort("Missing values unsupported for this operator!");
 		    }
 
-		  printf("var %d nlevel %d\n", varID, nlevel);
 		  interp_X(vardata1[varID], vardata2[varID], hyb_press,
 			   vert_index, plev, nplev, ngp, nlevel, missval);
 		  
@@ -497,7 +458,6 @@ void *Vertintap(void *argument)
 
   if ( pnmiss     ) free(pnmiss);
 
-  if ( sgeopot    ) free(sgeopot);
   if ( ps_prog    ) free(ps_prog);
   if ( vert_index ) free(vert_index);
   if ( full_press ) free(full_press);
