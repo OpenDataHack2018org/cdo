@@ -5,6 +5,7 @@
 #include "remap_store_link.h"
 
 
+#define TEST_STORE_LINK 1
 
 /*
     This routine stores the address and weight for this link in the appropriate 
@@ -601,7 +602,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   long   src_grid_add;       /* current linear address for source grid cell   */
   long   tgt_grid_add;       /* current linear address for target grid cell   */
   long   n, k;               /* generic counters                        */
-  long   nbins, num_links;
+  long   nbins;
   long   num_wts;
   long   max_srch_cells;     /* num cells in restricted search arrays  */
   long   num_srch_cells;     /* num cells in restricted search arrays  */
@@ -796,6 +797,25 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       free(src_grid_cell2[i]);
     }
   */
+
+  typedef struct {
+    int src_cell_add;
+    int tgt_cell_add;
+    double weight;
+  } wlinks_t;
+
+  typedef struct {
+    int nlinks;
+    int offset;
+    wlinks_t *wlinks;
+  } wentry_t;
+
+#if defined(TEST_STORE_LINK)
+  wentry_t *warray = (wentry_t *) malloc(tgt_grid_size*sizeof(wentry_t));
+#else
+  wentry_t *warray = NULL;
+#endif
+  
   findex = 0;
 
   int sum_srch_cells = 0;
@@ -806,7 +826,8 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          rv, cdoVerbose, max_srch_cells2, tgt_num_cell_corners, target_cell_type, \
-	 srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
+         warray, \
+         srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size,	\
 	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2) \
   private(srch_add, tgt_grid_cell, tgt_area, n, k, num_weights, num_srch_cells, max_srch_cells,  \
 	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_grid_add, tgt_grid_add, ioffset)
@@ -822,6 +843,11 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
+
+#if defined(TEST_STORE_LINK)
+      warray[tgt_grid_add].nlinks = 0;
+      warray[tgt_grid_add].offset = 0;
+#endif
 
       srch_add = srch_add2[ompthID];
       tgt_grid_cell = tgt_grid_cell2[ompthID];
@@ -1090,46 +1116,94 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	partial_weights[n] *= tgt_area;
       //#endif
 
-      for ( n = 0; n < num_weights; ++n )
+      long num_weights_old = num_weights;
+      for ( num_weights = 0, n = 0; n < num_weights_old; ++n )
 	{
-	  double partial_weight = partial_weights[n];
-
 	  src_grid_add = srch_add[n];
 
 	  if ( 0 && cdoVerbose )
 	    printf("tgt_grid_add %ld, src_grid_add %ld,  partial_weights[n] %g, tgt_area  %g\n", tgt_grid_add, src_grid_add, partial_weights[n], tgt_area);
 
-	  // src_grid_add = n;
-	  if ( partial_weight <= 0. ) src_grid_add = -1;
+	  if ( partial_weights[n] <= 0. ) src_grid_add = -1;
+	  if ( src_grid_add != -1 )
+	    {
+	      partial_weights[num_weights] = partial_weights[n];
+	      srch_add[num_weights] = src_grid_add;
+	      num_weights++;
+	    }
+	}
+
+      for ( n = 0; n < num_weights; ++n )
+	{
+	  double partial_weight = partial_weights[n];
+
+	  src_grid_add = srch_add[n];
+#if defined(_OPENMP)
+#pragma omp atomic
+#endif
+	  src_grid->cell_area[src_grid_add] += partial_weight;
+	}
+
+
+      num_weights_old = num_weights;
+      for ( num_weights = 0, n = 0; n < num_weights_old; ++n )
+	{
+	  src_grid_add = srch_add[n];
 
 	  /*
 	    Store the appropriate addresses and weights. 
 	    Also add contributions to cell areas.
 	    The source grid mask is the master mask
 	  */
-	  if ( src_grid_add != -1 )
+	  if ( src_grid->mask[src_grid_add] )
 	    {
-	      if ( src_grid->mask[src_grid_add] )
-		{
+	      partial_weights[num_weights] = partial_weights[n];
+	      srch_add[num_weights] = src_grid_add;
+	      num_weights++;
+	    }
+	}
+
+      for ( n = 0; n < num_weights; ++n )
+	{
+	  double partial_weight = partial_weights[n];
+
+	  src_grid_add = srch_add[n];
+
+#if defined(_OPENMP)
+#pragma omp atomic
+#endif
+	  src_grid->cell_frac[src_grid_add] += partial_weight;
+		  
+	  tgt_grid->cell_frac[tgt_grid_add] += partial_weight;
+	}
+
+#if defined(TEST_STORE_LINK)
+      warray[tgt_grid_add].wlinks = (wlinks_t *) malloc(num_weights*sizeof(wlinks_t));
+      warray[tgt_grid_add].nlinks = num_weights;
+      for ( n = 0; n < num_weights; ++n )
+	{
+	  double partial_weight = partial_weights[n];
+
+	  src_grid_add = srch_add[n];
+	  warray[tgt_grid_add].wlinks[n].src_cell_add = src_grid_add;
+	  warray[tgt_grid_add].wlinks[n].tgt_cell_add = tgt_grid_add;
+	  warray[tgt_grid_add].wlinks[n].weight       = partial_weight;
+	}
+#else
+      for ( n = 0; n < num_weights; ++n )
+	{
+	  double partial_weight = partial_weights[n];
+
+	  src_grid_add = srch_add[n];
+
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
-		  {
-		    store_link_conserv(rv, src_grid_add, tgt_grid_add, partial_weight);
-		  }
-#if defined(_OPENMP)
-#pragma omp atomic
-#endif
-		  src_grid->cell_frac[src_grid_add] += partial_weight;
-		  
-		  tgt_grid->cell_frac[tgt_grid_add] += partial_weight;
-		}
-#if defined(_OPENMP)
-#pragma omp atomic
-#endif
-	      src_grid->cell_area[src_grid_add] += partial_weight;
-	    }
+	  {
+	    store_link_conserv(rv, src_grid_add, tgt_grid_add, partial_weight);
+	  }
 	}
+#endif
       
       tgt_grid->cell_area[tgt_grid_add] = tgt_area; 
       // printf("area %d %g %g\n", tgt_grid_add, tgt_grid->cell_area[tgt_grid_add], tgt_area);
@@ -1174,10 +1248,45 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       free(srch_add2[i]);
     }
 
+  long nlinks = 0;
+#if defined(TEST_STORE_LINK)
+  for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
+    {
+      if ( warray[tgt_grid_add].nlinks )
+	{
+	  warray[tgt_grid_add].offset = nlinks;
+	  nlinks += warray[tgt_grid_add].nlinks;
+	}
+    }
+
+  rv->max_links = nlinks;
+  rv->num_links = nlinks;
+  if ( nlinks )
+    {
+      rv->src_grid_add = (int*) realloc(rv->src_grid_add, nlinks*sizeof(int));
+      rv->tgt_grid_add = (int*) realloc(rv->tgt_grid_add, nlinks*sizeof(int));
+      rv->wts = (double*) realloc(rv->wts, nlinks*sizeof(double));
+
+      for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
+	{
+	  long num_links = warray[tgt_grid_add].nlinks;
+	  long offset    = warray[tgt_grid_add].offset;
+	  for ( long ilink = 0; ilink < num_links; ++ilink )
+	    {
+	      rv->src_grid_add[offset+ilink] = warray[tgt_grid_add].wlinks[ilink].src_cell_add;
+	      rv->tgt_grid_add[offset+ilink] = warray[tgt_grid_add].wlinks[ilink].tgt_cell_add;
+	      rv->wts[offset+ilink] = warray[tgt_grid_add].wlinks[ilink].weight;
+	    }
+	}
+    }
+#endif
+
+  if ( warray ) free(warray);
+
   /* Normalize using destination area if requested */
   normalize_weights(tgt_grid, rv);
 
-  num_links = rv->num_links;
+  long num_links = rv->num_links;
 
   if ( cdoVerbose )
     cdoPrint("Total number of links = %ld", rv->num_links);
