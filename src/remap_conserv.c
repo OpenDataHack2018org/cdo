@@ -7,6 +7,40 @@
 
 #define TEST_STORE_LINK 1
 
+
+typedef struct
+{
+  int    add;
+  double weight;
+}
+addweight_t;
+
+static
+int cmp_adds(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  const addweight_t* c1 = (const addweight_t*) s1;
+  const addweight_t* c2 = (const addweight_t*) s2;
+
+  if      ( c1->add < c2->add ) cmp = -1;
+  else if ( c1->add > c2->add ) cmp =  1;
+
+  return (cmp);
+}
+
+static
+void sort_adds(int num_weights, addweight_t *addweights)
+{
+  int n;
+
+  for ( n = 1; n < num_weights; ++n )
+    if ( addweights[n].add < addweights[n-1].add ) break;
+  if ( n == num_weights ) return;
+
+  qsort(addweights, num_weights, sizeof(addweight_t), cmp_adds);
+}
+
+
 /*
     This routine stores the address and weight for this link in the appropriate 
     address and weight and resizes those arrays if necessary.
@@ -799,15 +833,9 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   */
 
   typedef struct {
-    int src_cell_add;
-    int tgt_cell_add;
-    double weight;
-  } wlinks_t;
-
-  typedef struct {
     int nlinks;
     int offset;
-    wlinks_t *wlinks;
+    addweight_t *addweights;
   } wentry_t;
 
 #if defined(TEST_STORE_LINK)
@@ -1178,17 +1206,20 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	}
 
 #if defined(TEST_STORE_LINK)
-      warray[tgt_grid_add].wlinks = (wlinks_t *) malloc(num_weights*sizeof(wlinks_t));
-      warray[tgt_grid_add].nlinks = num_weights;
+      addweight_t *addweights = (addweight_t *) malloc(num_weights*sizeof(addweight_t));
       for ( n = 0; n < num_weights; ++n )
 	{
 	  double partial_weight = partial_weights[n];
 
 	  src_grid_add = srch_add[n];
-	  warray[tgt_grid_add].wlinks[n].src_cell_add = src_grid_add;
-	  warray[tgt_grid_add].wlinks[n].tgt_cell_add = tgt_grid_add;
-	  warray[tgt_grid_add].wlinks[n].weight       = partial_weight;
+	  addweights[n].add    = src_grid_add;
+	  addweights[n].weight = partial_weight;
 	}
+
+      sort_adds(num_weights, addweights);
+
+      warray[tgt_grid_add].addweights = addweights;
+      warray[tgt_grid_add].nlinks     = num_weights;
 #else
       for ( n = 0; n < num_weights; ++n )
 	{
@@ -1267,15 +1298,24 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       rv->tgt_grid_add = (int*) realloc(rv->tgt_grid_add, nlinks*sizeof(int));
       rv->wts = (double*) realloc(rv->wts, nlinks*sizeof(double));
 
+#if defined(_OPENMP)
+#pragma omp parallel for default(shared) \
+  shared(rv, warray)		       	\
+  private(tgt_grid_add)
+#endif
       for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
 	{
 	  long num_links = warray[tgt_grid_add].nlinks;
 	  long offset    = warray[tgt_grid_add].offset;
-	  for ( long ilink = 0; ilink < num_links; ++ilink )
+	  if ( num_links )
 	    {
-	      rv->src_grid_add[offset+ilink] = warray[tgt_grid_add].wlinks[ilink].src_cell_add;
-	      rv->tgt_grid_add[offset+ilink] = warray[tgt_grid_add].wlinks[ilink].tgt_cell_add;
-	      rv->wts[offset+ilink] = warray[tgt_grid_add].wlinks[ilink].weight;
+	      for ( long ilink = 0; ilink < num_links; ++ilink )
+		{
+		  rv->src_grid_add[offset+ilink] = warray[tgt_grid_add].addweights[ilink].add;
+		  rv->tgt_grid_add[offset+ilink] = tgt_grid_add;
+		  rv->wts[offset+ilink] = warray[tgt_grid_add].addweights[ilink].weight;
+		}
+	      free(warray[tgt_grid_add].addweights);
 	    }
 	}
     }

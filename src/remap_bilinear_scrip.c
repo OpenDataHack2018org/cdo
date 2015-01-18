@@ -178,7 +178,7 @@ void bilinear_warning(double plon, double plat, double iw, double jw, int* src_a
 
 typedef struct
 {
-  int add;
+  int    add;
   double wgts;
 }
 addwgts_t;
