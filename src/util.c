@@ -44,6 +44,11 @@ int CDO_optind = 1; // refactor: moved here from cdo_getopt.c
 int remap_genweights = TRUE; // refactor: moved here from Remap.c
 
 
+/* refactor: moved here from cdo.c */
+char *Progname;
+
+
+
 int cdo_omp_get_thread_num(void)
 {
   int threadnum = 0;

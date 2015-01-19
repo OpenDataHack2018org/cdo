@@ -306,7 +306,6 @@ const char *processInqOpername(void)
 void processDefPrompt(char *opername)
 {
   int processID = processSelf();
-  extern char *Progname;
 
   if ( processID == 0 )
     sprintf(Process[processID].prompt, "%s %s", Progname, opername);

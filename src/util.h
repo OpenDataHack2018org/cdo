@@ -36,6 +36,9 @@
 
 #define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
+/* refactor: moved here from *.c files */
+extern char *Progname; // process.c defined in cdo.c
+
 /* refactor: moved from cdo.c */
 extern int   CDO_optind;
 extern char *CDO_optarg;
