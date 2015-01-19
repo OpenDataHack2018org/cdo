@@ -769,9 +769,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
 
-      warray[tgt_grid_add].nlinks = 0;
-      warray[tgt_grid_add].offset = 0;
-
       srch_add = srch_add2[ompthID];
       tgt_grid_cell = tgt_grid_cell2[ompthID];
 
@@ -1100,18 +1097,24 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  tgt_grid->cell_frac[tgt_grid_add] += partial_weight;
 	}
 
-      addweight_t *addweights = (addweight_t *) malloc(num_weights*sizeof(addweight_t));
-      for ( n = 0; n < num_weights; ++n )
+      warray[tgt_grid_add].nlinks = 0;
+      warray[tgt_grid_add].offset = 0;
+
+      if ( num_weights )
 	{
-	  addweights[n].add    = srch_add[n];
-	  addweights[n].weight = partial_weights[n];
+	  addweight_t *addweights = (addweight_t *) malloc(num_weights*sizeof(addweight_t));
+	  for ( n = 0; n < num_weights; ++n )
+	    {
+	      addweights[n].add    = srch_add[n];
+	      addweights[n].weight = partial_weights[n];
+	    }
+
+	  sort_adds(num_weights, addweights);
+
+	  warray[tgt_grid_add].addweights = addweights;
+	  warray[tgt_grid_add].nlinks     = num_weights;
 	}
 
-      sort_adds(num_weights, addweights);
-
-      warray[tgt_grid_add].addweights = addweights;
-      warray[tgt_grid_add].nlinks     = num_weights;
-     
       tgt_grid->cell_area[tgt_grid_add] = tgt_area; 
       // printf("area %d %g %g\n", tgt_grid_add, tgt_grid->cell_area[tgt_grid_add], tgt_area);
     }
