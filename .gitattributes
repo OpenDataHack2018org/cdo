@@ -621,6 +621,8 @@ src/remap_search_latbins.c -text
 src/remap_search_reg2d.c -text
 src/remap_store_link.c -text
 src/remap_store_link.h -text
+src/remap_store_link_cnsrv.c -text
+src/remap_store_link_cnsrv.h -text
 src/remaplib.c -text
 src/remapsort.c -text
 src/results_template_parser.c -text

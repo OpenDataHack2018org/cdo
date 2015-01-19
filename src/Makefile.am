@@ -281,6 +281,8 @@ cdo_SOURCES += Adisit.c        \
                remap_search_latbins.c \
                remap_store_link.c \
                remap_store_link.h \
+               remap_store_link_cnsrv.c \
+               remap_store_link_cnsrv.h \
                remap_conserv.c \
                remap_conserv_scrip.c \
                remap_distwgt_scrip.c \

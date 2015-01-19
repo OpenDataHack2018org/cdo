@@ -57,7 +57,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"
-#include "remap_store_link.h"
+#include "remap_store_link_cnsrv.h"
 #include "util.h"  /* progressStatus */
 
 
