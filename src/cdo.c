@@ -67,19 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int cdoCompType          = COMPRESS_NONE;  // compression type
-int cdoCompLevel         = 0;              // compression level
-int cdoChunkType         = CDI_UNDEFID;
-int cdoLogOff            = FALSE;
-int cdoSilentMode        = FALSE;
-int cdoOverwriteMode     = FALSE;
-int cdoBenchmark         = FALSE;
-int cdoTimer             = FALSE;
-int cdoVerbose           = FALSE;
-int cdoDebug             = 0;
-int cdoCompress          = FALSE;
-int cdoInteractive       = FALSE;
-int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
 
 int CDO_netcdf_hdr_pad   = 0;

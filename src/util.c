@@ -78,6 +78,19 @@ int cdoDiag              = FALSE;
 int CDO_Append_History   = TRUE;
 int CDO_Reset_History    = FALSE;
 
+int cdoCompType          = COMPRESS_NONE;  // compression type
+int cdoCompLevel         = 0;              // compression level
+int cdoChunkType         = CDI_UNDEFID;
+int cdoLogOff            = FALSE;
+int cdoSilentMode        = FALSE;
+int cdoOverwriteMode     = FALSE;
+int cdoBenchmark         = FALSE;
+int cdoTimer             = FALSE;
+int cdoVerbose           = FALSE;
+int cdoDebug             = 0;
+int cdoCompress          = FALSE;
+int cdoInteractive       = FALSE;
+int cdoParIO             = FALSE;
 
 
 int cdo_omp_get_thread_num(void)
