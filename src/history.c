@@ -82,8 +82,6 @@ void cdoDefHistory(int fileID, char* histstring)
   char* strtimeptr = NULL;
   char* history = NULL;
   size_t historysize = 0;
-  extern int CDO_Append_History;
-  extern int CDO_Reset_History;
 
   if ( !CDO_Reset_History ) historysize += ghistorysize+1;
 

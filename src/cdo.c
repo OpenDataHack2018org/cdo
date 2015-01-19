@@ -67,8 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int CDO_Append_History   = TRUE;
-int CDO_Reset_History    = FALSE;
 int cdoCompType          = COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
 int cdoChunkType         = CDI_UNDEFID;
