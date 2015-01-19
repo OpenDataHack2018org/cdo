@@ -67,9 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int cdoLockIO            = FALSE;
-int cdoCheckDatarange    = FALSE;
-
 int CDO_Color            = FALSE;
 int CDO_Use_FFTW         = TRUE;
 int cdoDiag              = FALSE;
