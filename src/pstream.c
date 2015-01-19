@@ -940,8 +940,6 @@ int pstreamInqVlist(int pstreamID)
   else
 #endif
     {
-      extern int cdoDefaultTimeType;
-
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
 #if defined(HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
@@ -1356,8 +1354,6 @@ int pstreamInqTimestep(int pstreamID, int tsID)
   else
 #endif
     {
-      extern int cdoDefaultTimeType;
-
       if ( pstreamptr->mfiles ) tsID -= pstreamptr->tsID0;
 
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);

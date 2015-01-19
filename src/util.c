@@ -60,6 +60,8 @@ int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultByteorder  = CDI_UNDEFID;
 int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoDefaultInstID     = CDI_UNDEFID;     // moved here from institution.c, was UNDEFID
+int cdoDefaultTimeType   = CDI_UNDEFID;
+
 
 int cdo_omp_get_thread_num(void)
 {

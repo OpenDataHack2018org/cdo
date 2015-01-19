@@ -67,8 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int cdoDefaultTimeType   = CDI_UNDEFID;
-
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 

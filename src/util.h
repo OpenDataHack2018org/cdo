@@ -58,7 +58,8 @@ extern int cdoDefaultFileType;
 extern int cdoDefaultDataType;
 extern int cdoDefaultByteorder;
 extern int cdoDefaultTableID;
-extern int cdoDefaultInstID;
+extern int cdoDefaultInstID; // refactor: moved here from institution.c
+extern int cdoDefaultTimeType; // refactor: moved here from pstream.c
 
 extern int cdoLockIO;
 extern int cdoCheckDatarange;
