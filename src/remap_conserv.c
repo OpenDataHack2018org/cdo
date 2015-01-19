@@ -2,10 +2,6 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"
-#include "remap_store_link.h"
-
-
-#define TEST_STORE_LINK 1
 
 
 typedef struct
@@ -29,9 +25,9 @@ int cmp_adds(const void *s1, const void *s2)
 }
 
 static
-void sort_adds(int num_weights, addweight_t *addweights)
+void sort_adds(size_t num_weights, addweight_t *addweights)
 {
-  int n;
+  size_t n;
 
   for ( n = 1; n < num_weights; ++n )
     if ( addweights[n].add < addweights[n-1].add ) break;
@@ -39,34 +35,6 @@ void sort_adds(int num_weights, addweight_t *addweights)
 
   qsort(addweights, num_weights, sizeof(addweight_t), cmp_adds);
 }
-
-
-/*
-    This routine stores the address and weight for this link in the appropriate 
-    address and weight and resizes those arrays if necessary.
-*/
-static
-void store_link_conserv(remapvars_t* rv, long add1, long add2, double weight)
-{
-  /*
-    Input variables:
-    int  add1         ! address on source grid
-    int  add2         ! address on target grid
-    double weight     ! remapping weight for this link
-  */
-  /* link index */
-  long nlink = rv->num_links;
-
-  rv->num_links++;
-  if ( rv->num_links >= rv->max_links )
-    resize_remap_vars(rv, rv->resize_increment);
-
-  rv->src_grid_add[nlink] = add1;
-  rv->tgt_grid_add[nlink] = add2;
-  rv->wts[nlink] = weight;	      
-
-}  /* store_link_conserv */
-
 
 
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm);
@@ -629,13 +597,11 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   int    lcheck = TRUE;
 
   long   ioffset;
-  long   src_grid_size;
-  long   tgt_grid_size;
   long   src_num_cell_corners;
   long   tgt_num_cell_corners;
   long   src_grid_add;       /* current linear address for source grid cell   */
   long   tgt_grid_add;       /* current linear address for target grid cell   */
-  long   n, k;               /* generic counters                        */
+  long   k;                  /* generic counters                        */
   long   nbins;
   long   num_wts;
   long   max_srch_cells;     /* num cells in restricted search arrays  */
@@ -646,7 +612,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   /* Variables necessary if segment manages to hit pole */
   double findex = 0;
-  long num_weights = 0;
   long nx = 0, ny = 0;
   int src_remap_grid_type = src_grid->remap_grid_type;
   int tgt_remap_grid_type = tgt_grid->remap_grid_type;
@@ -663,8 +628,8 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   if ( cdoTimer ) timer_start(timer_remap_con);
 
-  src_grid_size = src_grid->size;
-  tgt_grid_size = tgt_grid->size;
+  long src_grid_size = src_grid->size;
+  long tgt_grid_size = tgt_grid->size;
 
   src_num_cell_corners = src_grid->num_cell_corners;
   tgt_num_cell_corners = tgt_grid->num_cell_corners;
@@ -766,83 +731,13 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       //printf("src_grid   lon: %g %g lat: %g %g\n", RAD2DEG*src_grid_bound_box[2],RAD2DEG*src_grid_bound_box[3],RAD2DEG*src_grid_bound_box[0],RAD2DEG*src_grid_bound_box[1] );
     }
 
-  /*
-  struct grid_cell* src_grid_cell;
-  struct grid_cell* src_grid_cell2[ompNumThreads];  
-  for ( i = 0; i < ompNumThreads; ++i )
-    {
-      src_grid_cell2[i] = (struct grid_cell*) malloc(sizeof(struct grid_cell));
-      src_grid_cell2[i]->array_size      = src_num_cell_corners;
-      src_grid_cell2[i]->num_corners     = src_num_cell_corners;
-      src_grid_cell2[i]->edge_type       = src_edge_type;
-      src_grid_cell2[i]->coordinates_x   = (double*) malloc(src_num_cell_corners*sizeof(double));
-      src_grid_cell2[i]->coordinates_y   = (double*) malloc(src_num_cell_corners*sizeof(double));
-      src_grid_cell2[i]->coordinates_xyz = (double*) malloc(3*src_num_cell_corners*sizeof(double));
-    }
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(shared) \
-  shared(ompNumThreads, src_remap_grid_type, src_grid, src_grid_size, src_grid_cells2) \
-  private(src_grid_cell, src_grid_add)
-#endif
-  for ( src_grid_add = 0; src_grid_add < src_grid_size; ++src_grid_add )
-    {
-      int ompthID = cdo_omp_get_thread_num();
-
-      src_grid_cell = src_grid_cell2[ompthID];
-
-      if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	{
-	  long nx = src_grid->dims[0];
-	  long ix, iy;
-
-	  iy = src_grid_add/nx;
-	  ix = src_grid_add - iy*nx;
-
-	  src_grid_cell->coordinates_x[0] = src_grid->reg2d_corner_lon[ix  ];
-	  src_grid_cell->coordinates_y[0] = src_grid->reg2d_corner_lat[iy  ];
-	  src_grid_cell->coordinates_x[1] = src_grid->reg2d_corner_lon[ix+1];
-	  src_grid_cell->coordinates_y[1] = src_grid->reg2d_corner_lat[iy  ];
-	  src_grid_cell->coordinates_x[2] = src_grid->reg2d_corner_lon[ix+1];
-	  src_grid_cell->coordinates_y[2] = src_grid->reg2d_corner_lat[iy+1];
-	  src_grid_cell->coordinates_x[3] = src_grid->reg2d_corner_lon[ix  ];
-	  src_grid_cell->coordinates_y[3] = src_grid->reg2d_corner_lat[iy+1];
-	}
-      else
-	{
-	  for ( int ic = 0; ic < src_num_cell_corners; ++ic )
-	    {
-	      src_grid_cell->coordinates_x[ic] = src_grid->cell_corner_lon[src_grid_add*src_num_cell_corners+ic];
-	      src_grid_cell->coordinates_y[ic] = src_grid->cell_corner_lat[src_grid_add*src_num_cell_corners+ic];
-	    }
-	}
-      
-      for ( int ic = 0; ic < src_num_cell_corners; ++ic )
-	LLtoXYZ(src_grid_cell->coordinates_x[ic], src_grid_cell->coordinates_y[ic], src_grid_cell->coordinates_xyz+ic*3);
-
-      src_grid->cell_area[src_grid_add] = gridcell_area(*src_grid_cell);
-    }
-
-  for ( i = 0; i < ompNumThreads; ++i )
-    {
-      free(src_grid_cell2[i]->coordinates_x);
-      free(src_grid_cell2[i]->coordinates_y);
-      free(src_grid_cell2[i]->coordinates_xyz);
-      free(src_grid_cell2[i]);
-    }
-  */
-
   typedef struct {
     int nlinks;
     int offset;
     addweight_t *addweights;
   } wentry_t;
 
-#if defined(TEST_STORE_LINK)
   wentry_t *warray = (wentry_t *) malloc(tgt_grid_size*sizeof(wentry_t));
-#else
-  wentry_t *warray = NULL;
-#endif
   
   findex = 0;
 
@@ -857,11 +752,13 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
          warray, \
          srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size,	\
 	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2) \
-  private(srch_add, tgt_grid_cell, tgt_area, n, k, num_weights, num_srch_cells, max_srch_cells,  \
+  private(srch_add, tgt_grid_cell, tgt_area, k, num_srch_cells, max_srch_cells,  \
 	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_grid_add, tgt_grid_add, ioffset)
 #endif
   for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
     {
+      double partial_weight;
+      long n, num_weights, num_weights_old;
       int ompthID = cdo_omp_get_thread_num();
       int lprogress = 1;
       if ( ompthID != 0 ) lprogress = 0;
@@ -872,10 +769,8 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
 
-#if defined(TEST_STORE_LINK)
       warray[tgt_grid_add].nlinks = 0;
       warray[tgt_grid_add].offset = 0;
-#endif
 
       srch_add = srch_add2[ompthID];
       tgt_grid_cell = tgt_grid_cell2[ompthID];
@@ -1138,13 +1033,13 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] = partial_areas[n] / tgt_area;
 
-      correct_weights(num_weights, partial_weights);
+      correct_weights((unsigned)num_weights, partial_weights);
 
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] *= tgt_area;
       //#endif
 
-      long num_weights_old = num_weights;
+      num_weights_old = num_weights;
       for ( num_weights = 0, n = 0; n < num_weights_old; ++n )
 	{
 	  src_grid_add = srch_add[n];
@@ -1163,9 +1058,10 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       for ( n = 0; n < num_weights; ++n )
 	{
-	  double partial_weight = partial_weights[n];
+	  partial_weight = partial_weights[n];
 
 	  src_grid_add = srch_add[n];
+
 #if defined(_OPENMP)
 #pragma omp atomic
 #endif
@@ -1193,8 +1089,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       for ( n = 0; n < num_weights; ++n )
 	{
-	  double partial_weight = partial_weights[n];
-
+	  partial_weight = partial_weights[n];
 	  src_grid_add = srch_add[n];
 
 #if defined(_OPENMP)
@@ -1205,37 +1100,18 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  tgt_grid->cell_frac[tgt_grid_add] += partial_weight;
 	}
 
-#if defined(TEST_STORE_LINK)
       addweight_t *addweights = (addweight_t *) malloc(num_weights*sizeof(addweight_t));
       for ( n = 0; n < num_weights; ++n )
 	{
-	  double partial_weight = partial_weights[n];
-
-	  src_grid_add = srch_add[n];
-	  addweights[n].add    = src_grid_add;
-	  addweights[n].weight = partial_weight;
+	  addweights[n].add    = srch_add[n];
+	  addweights[n].weight = partial_weights[n];
 	}
 
       sort_adds(num_weights, addweights);
 
       warray[tgt_grid_add].addweights = addweights;
       warray[tgt_grid_add].nlinks     = num_weights;
-#else
-      for ( n = 0; n < num_weights; ++n )
-	{
-	  double partial_weight = partial_weights[n];
-
-	  src_grid_add = srch_add[n];
-
-#if defined(_OPENMP)
-#pragma omp critical
-#endif
-	  {
-	    store_link_conserv(rv, src_grid_add, tgt_grid_add, partial_weight);
-	  }
-	}
-#endif
-      
+     
       tgt_grid->cell_area[tgt_grid_add] = tgt_area; 
       // printf("area %d %g %g\n", tgt_grid_add, tgt_grid->cell_area[tgt_grid_add], tgt_area);
     }
@@ -1247,6 +1123,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     }
 
   /* Finished with all cells: deallocate search arrays */
+  long n;
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
@@ -1280,7 +1157,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     }
 
   long nlinks = 0;
-#if defined(TEST_STORE_LINK)
+
   for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
     {
       if ( warray[tgt_grid_add].nlinks )
@@ -1296,11 +1173,11 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     {
       rv->src_grid_add = (int*) realloc(rv->src_grid_add, nlinks*sizeof(int));
       rv->tgt_grid_add = (int*) realloc(rv->tgt_grid_add, nlinks*sizeof(int));
-      rv->wts = (double*) realloc(rv->wts, nlinks*sizeof(double));
+      rv->wts          = (double*) realloc(rv->wts, nlinks*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
-  shared(rv, warray)		       	\
+  shared(rv, warray)		       	 \
   private(tgt_grid_add)
 #endif
       for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
@@ -1319,7 +1196,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	    }
 	}
     }
-#endif
 
   if ( warray ) free(warray);
 
