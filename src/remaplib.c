@@ -118,8 +118,8 @@ void remapVarsFree(remapvars_t *rv)
 
       rv->sort_add = FALSE;
 
-      free(rv->src_grid_add);
-      free(rv->tgt_grid_add);
+      free(rv->src_cell_add);
+      free(rv->tgt_cell_add);
       free(rv->wts);
 
       if ( rv->links.option == TRUE )
@@ -987,8 +987,8 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
     {
       rv->pinit = TRUE;
 
-      rv->src_grid_add = NULL;
-      rv->tgt_grid_add = NULL;
+      rv->src_cell_add = NULL;
+      rv->tgt_cell_add = NULL;
       rv->wts          = NULL;
     }
 
@@ -1035,8 +1035,8 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 
   /*  Allocate address and weight arrays for mapping 1 */
 
-  rv->src_grid_add = (int*) realloc(rv->src_grid_add, rv->max_links*sizeof(int));
-  rv->tgt_grid_add = (int*) realloc(rv->tgt_grid_add, rv->max_links*sizeof(int));
+  rv->src_cell_add = (int*) realloc(rv->src_cell_add, rv->max_links*sizeof(int));
+  rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
 
   rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
 
@@ -1068,8 +1068,8 @@ void resize_remap_vars(remapvars_t *rv, int increment)
 
   if ( rv->max_links )
     {
-      rv->src_grid_add = (int*) realloc(rv->src_grid_add, rv->max_links*sizeof(int));
-      rv->tgt_grid_add = (int*) realloc(rv->tgt_grid_add, rv->max_links*sizeof(int));
+      rv->src_cell_add = (int*) realloc(rv->src_cell_add, rv->max_links*sizeof(int));
+      rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
 
       rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
     }
@@ -1523,7 +1523,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 #if defined(SX)
 #pragma vdir nodep
 #endif
-  for ( n = 0; n < rv.num_links; ++n ) tgt_count[rv.tgt_grid_add[n]]++;
+  for ( n = 0; n < rv.num_links; ++n ) tgt_count[rv.tgt_cell_add[n]]++;
 
   imin = INT_MAX;
   imax = INT_MIN;
@@ -1791,13 +1791,13 @@ void reorder_links(remapvars_t *rv)
   lastval = -1;
   for ( n = 0; n < num_links; n++ )
     {
-      if ( rv->tgt_grid_add[n] == lastval ) nval++;
+      if ( rv->tgt_cell_add[n] == lastval ) nval++;
       else
 	{
 	  if ( nval > num_blks ) num_blks = nval;
 	  nval = 1;
 	  max_links++;
-	  lastval = rv->tgt_grid_add[n];
+	  lastval = rv->tgt_cell_add[n];
 	}
     }
 
@@ -1829,17 +1829,17 @@ void reorder_links(remapvars_t *rv)
 
       for ( n = 0; n < num_links; n++ )
 	{
-	  if ( rv->tgt_grid_add[n] == lastval ) nval++;
+	  if ( rv->tgt_cell_add[n] == lastval ) nval++;
 	  else
 	    {
 	      nval = 1;
-	      lastval = rv->tgt_grid_add[n];
+	      lastval = rv->tgt_cell_add[n];
 	    }
 	  
 	  if ( nval == j+1 )
 	    {
-	      rv->links.dst_add[j][nlinks] = rv->tgt_grid_add[n];
-	      rv->links.src_add[j][nlinks] = rv->src_grid_add[n];
+	      rv->links.dst_add[j][nlinks] = rv->tgt_cell_add[n];
+	      rv->links.src_add[j][nlinks] = rv->src_cell_add[n];
 	      rv->links.w_index[j][nlinks] = n;
 	      nlinks++;
 	    }

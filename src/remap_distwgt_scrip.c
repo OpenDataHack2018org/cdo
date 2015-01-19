@@ -353,8 +353,8 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
 
-  rv->src_grid_add[nlink] = add1;
-  rv->tgt_grid_add[nlink] = add2;
+  rv->src_cell_add[nlink] = add1;
+  rv->tgt_cell_add[nlink] = add2;
   rv->wts[nlink]          = weights;
 
 } /* store_link_nbr */

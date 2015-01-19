@@ -38,8 +38,8 @@ void store_link_bicub(remapvars_t *rv, int dst_add, int src_add[4], double weigh
 
   for ( n = 0; n < 4; ++n )
     {
-      rv->src_grid_add[nlink+n] = src_add[n];
-      rv->tgt_grid_add[nlink+n] = dst_add;
+      rv->src_cell_add[nlink+n] = src_add[n];
+      rv->tgt_cell_add[nlink+n] = dst_add;
       for ( k = 0; k < 4; ++k )
 	rv->wts[4*(nlink+n)+k] = weights[k][n];
     }

@@ -84,8 +84,8 @@ void yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
   if ( rv->num_links >= rv->max_links )
     resize_remap_vars(rv, rv->resize_increment);
 
-  rv->src_grid_add[nlink] = add1;
-  rv->tgt_grid_add[nlink] = add2;
+  rv->src_cell_add[nlink] = add1;
+  rv->tgt_cell_add[nlink] = add2;
 
   rv->wts[nlink] = weight;
 }
@@ -371,7 +371,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 
   if ( cdoTimer ) timer_start(timer_yar_remap);
   yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
-	    remap.vars.num_wts, remap.vars.tgt_grid_add, remap.vars.src_grid_add, array1);
+	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
   nmiss = 0;
@@ -675,7 +675,7 @@ void yar_remap_con(field_t *field1, field_t *field2)
 
   if ( cdoTimer ) timer_start(timer_yar_remap);
   yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
-	    remap.vars.num_wts, remap.vars.tgt_grid_add, remap.vars.src_grid_add, array1);
+	    remap.vars.num_wts, remap.vars.tgt_cell_add, remap.vars.src_cell_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
   nmiss = 0;

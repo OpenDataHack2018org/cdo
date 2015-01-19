@@ -138,8 +138,8 @@ typedef struct {
   int      norm_opt;         /* option for normalization (conserv only)  */
   int      resize_increment; /* default amount to increase array size    */
 
-  int*     src_grid_add;     /* source grid address for each link        */
-  int*     tgt_grid_add;     /* target grid address for each link        */
+  int*     src_cell_add;     /* source grid address for each link        */
+  int*     tgt_cell_add;     /* target grid address for each link        */
 
   double*  wts;              /* map weights for each link [max_links*num_wts] */
 
@@ -215,7 +215,7 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weigh
 
 void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, const restr_t* restrict cell_bound_box, int* restrict bin_addr);
 void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type);
-long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr2,
+long get_srch_cells(long tgt_cell_add, long nbins, int *bin_addr1, int *bin_addr2,
 		    restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, long src_grid_size, int *srch_add);
 
 int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,

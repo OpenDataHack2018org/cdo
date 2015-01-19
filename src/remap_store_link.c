@@ -132,7 +132,7 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
 	{
 	  break;
 	}
-      else if ( add1 == rv->src_grid_add[nlink] )
+      else if ( add1 == rv->src_cell_add[nlink] )
 	{
 	  lstore_link = TRUE;
 	  break;
@@ -176,8 +176,8 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
   if ( rv->num_links >= rv->max_links )
     resize_remap_vars(rv, rv->resize_increment);
 
-  rv->src_grid_add[nlink] = add1;
-  rv->tgt_grid_add[nlink] = add2;
+  rv->src_cell_add[nlink] = add1;
+  rv->tgt_cell_add[nlink] = add2;
 
   for ( i = 0; i < num_wts; ++i ) rv->wts[num_wts*nlink+i] = weights[i];	      
 
@@ -228,8 +228,8 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 	estrip = MIN(max_link-strip+1, STRIPLENGTH);
 	for ( nlink = 0; nlink < estrip; ++nlink )
 	  {
-	    if ( add2 == rv->tgt_grid_add[strip+nlink] &&
-		 add1 == rv->src_grid_add[strip+nlink] )
+	    if ( add2 == rv->tgt_cell_add[strip+nlink] &&
+		 add1 == rv->src_cell_add[strip+nlink] )
 	      ilink = strip + nlink;
 	  }
 	if (ilink != (max_link + 1)) break;
@@ -242,8 +242,8 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
     long ilink = max_link + 1;
     for ( nlink = min_link; nlink <= max_link; ++nlink )
       {
-	if ( add2 == rv->tgt_grid_add[nlink] )
-	  if ( add1 == rv->src_grid_add[nlink] ) ilink = nlink;
+	if ( add2 == rv->tgt_cell_add[nlink] )
+	  if ( add1 == rv->src_cell_add[nlink] ) ilink = nlink;
       }
     if ( ilink != (max_link + 1) ) nlink = ilink;
   }
@@ -251,8 +251,8 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 #else
   for ( nlink = min_link; nlink <= max_link; ++nlink )
     {
-      if ( add2 == rv->tgt_grid_add[nlink] )
-	if ( add1 == rv->src_grid_add[nlink] ) break;
+      if ( add2 == rv->tgt_cell_add[nlink] )
+	if ( add1 == rv->src_cell_add[nlink] ) break;
     }
 #endif
 
@@ -276,8 +276,8 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
   if ( rv->num_links >= rv->max_links )
     resize_remap_vars(rv, rv->resize_increment);
 
-  rv->src_grid_add[nlink] = add1;
-  rv->tgt_grid_add[nlink] = add2;
+  rv->src_cell_add[nlink] = add1;
+  rv->tgt_cell_add[nlink] = add2;
 
   rv->wts[3*nlink  ] = weights[0];
   rv->wts[3*nlink+1] = weights[1];

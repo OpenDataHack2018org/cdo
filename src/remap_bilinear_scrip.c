@@ -35,8 +35,8 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weigh
 
   for ( long n = 0; n < 4; ++n )
     {
-      rv->src_grid_add[nlink+n] = src_add[n];
-      rv->tgt_grid_add[nlink+n] = dst_add;
+      rv->src_cell_add[nlink+n] = src_add[n];
+      rv->tgt_cell_add[nlink+n] = dst_add;
       rv->wts         [nlink+n] = weights[n];
     }
 

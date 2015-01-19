@@ -674,13 +674,13 @@ void sort_remap_add(remapvars_t *remapvars)
       ** OpenMP parallelism is supported
       */   
       sort_iter(remapvars->num_links, remapvars->num_wts,
-		remapvars->tgt_grid_add, remapvars->src_grid_add,
+		remapvars->tgt_cell_add, remapvars->src_cell_add,
 		remapvars->wts, ompNumThreads);
     }
   else
     { /* use a pure heap sort without any support of parallelism */
       sort_add(remapvars->num_links, remapvars->num_wts,
-	       remapvars->tgt_grid_add, remapvars->src_grid_add,
+	       remapvars->tgt_cell_add, remapvars->src_cell_add,
 	       remapvars->wts);
     }
   if ( cdoTimer ) timer_stop(timer_remap_sort);
@@ -1103,13 +1103,13 @@ void *Remap(void *argument)
 
 	      if ( operfunc == REMAPLAF )
 		remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-			  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
+			  remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add, array1);
 	      else if ( operfunc == REMAPSUM )
 		remap_sum(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-			  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
+			  remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add, array1);
 	      else
 		remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		      remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
+		      remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add,
 		      array1, grad1_lat, grad1_lon, grad1_latlon, remaps[r].vars.links);
 	    }
 	  else
