@@ -115,22 +115,22 @@ static int numThreads = 0;
 
 #define PRINT_RLIMIT(resource) \
       { \
-	int status; \
-	struct rlimit rlim; \
-	status = getrlimit(resource, &rlim); \
-	if ( status == 0 ) \
-	  { \
-	    if ( sizeof(RLIM_T) > sizeof(long) ) \
-	      { \
-		fprintf(stderr, "CUR %-15s = %llu\n", #resource, (long long) rlim.rlim_cur); \
-		fprintf(stderr, "MAX %-15s = %llu\n", #resource, (long long) rlim.rlim_max); \
-	      } \
-	    else \
-	      { \
-		fprintf(stderr, "CUR %-15s = %lu\n", #resource, (long) rlim.rlim_cur); \
-		fprintf(stderr, "MAX %-15s = %lu\n", #resource, (long) rlim.rlim_max); \
-	      } \
-	  } \
+        int status; \
+        struct rlimit rlim; \
+        status = getrlimit(resource, &rlim); \
+        if ( status == 0 ) \
+          { \
+            if ( sizeof(RLIM_T) > sizeof(long) ) \
+              { \
+                fprintf(stderr, "CUR %-15s = %llu\n", #resource, (long long) rlim.rlim_cur); \
+                fprintf(stderr, "MAX %-15s = %llu\n", #resource, (long long) rlim.rlim_max); \
+              } \
+            else \
+              { \
+                fprintf(stderr, "CUR %-15s = %lu\n", #resource, (long) rlim.rlim_cur); \
+                fprintf(stderr, "MAX %-15s = %lu\n", #resource, (long) rlim.rlim_max); \
+              } \
+          } \
       }
 
 
@@ -262,40 +262,40 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
     {
       int lprint;
       while ( *phelp )
-	{
-	  lprint = TRUE;
-	  if ( *phelp[0] == '\0' )
-	    if ( *(phelp+1) )
-	      if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
-	  
-	  if ( lprint )
-	    {
-	      if ( COLOR_STDOUT )
-		{
-		  if ( (strcmp(*phelp, "NAME")        == 0) ||
-		       (strcmp(*phelp, "SYNOPSIS")    == 0) ||
-		       (strcmp(*phelp, "DESCRIPTION") == 0) ||
-		       (strcmp(*phelp, "OPERATORS")   == 0) ||
-		       (strcmp(*phelp, "ENVIRONMENT") == 0) ||
-		       (strcmp(*phelp, "PARAMETER")   == 0) ||
-		       (strcmp(*phelp, "EXAMPLES")    == 0) )
-		    {
-		      set_text_color(stdout, BRIGHT, BLACK);
-		      fprintf(stdout, "%s", *phelp);
-		      reset_text_color(stdout);
-		      fprintf(stdout, "\n");
-		    }
-		  else
-		    fprintf(stdout, "%s\n", *phelp);
-		}
-	      else
-		{
-		  fprintf(stdout, "%s\n", *phelp);
-		}
-	    }
+        {
+          lprint = TRUE;
+          if ( *phelp[0] == '\0' )
+            if ( *(phelp+1) )
+              if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
+          
+          if ( lprint )
+            {
+              if ( COLOR_STDOUT )
+                {
+                  if ( (strcmp(*phelp, "NAME")        == 0) ||
+                       (strcmp(*phelp, "SYNOPSIS")    == 0) ||
+                       (strcmp(*phelp, "DESCRIPTION") == 0) ||
+                       (strcmp(*phelp, "OPERATORS")   == 0) ||
+                       (strcmp(*phelp, "ENVIRONMENT") == 0) ||
+                       (strcmp(*phelp, "PARAMETER")   == 0) ||
+                       (strcmp(*phelp, "EXAMPLES")    == 0) )
+                    {
+                      set_text_color(stdout, BRIGHT, BLACK);
+                      fprintf(stdout, "%s", *phelp);
+                      reset_text_color(stdout);
+                      fprintf(stdout, "\n");
+                    }
+                  else
+                    fprintf(stdout, "%s\n", *phelp);
+                }
+              else
+                {
+                  fprintf(stdout, "%s\n", *phelp);
+                }
+            }
 
-	  phelp++;
-	}
+          phelp++;
+        }
     }
 }
 
@@ -365,92 +365,92 @@ void setDefaultDataType(char *datatypestr)
     {
       nbits = atoi(datatypestr);
       if ( nbits < 10 )
-	datatypestr += 1;
+        datatypestr += 1;
       else
-	datatypestr += 2;
+        datatypestr += 2;
 
       if ( dtype == -1 )
-	{
-	  if      ( nbits > 0 && nbits < 32 ) cdoDefaultDataType = nbits;
-	  else if ( nbits == 32 )
-	    {
-	      if ( cdoDefaultFileType == FILETYPE_GRB )
-		cdoDefaultDataType = DATATYPE_PACK32;
-	      else
-		cdoDefaultDataType = DATATYPE_FLT32;
-	    }
-	  else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
-	  else
-	    {
-	      fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-	      fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb/grb2.\n");
-	      exit(EXIT_FAILURE);
-	    }
-	}
+        {
+          if      ( nbits > 0 && nbits < 32 ) cdoDefaultDataType = nbits;
+          else if ( nbits == 32 )
+            {
+              if ( cdoDefaultFileType == FILETYPE_GRB )
+                cdoDefaultDataType = DATATYPE_PACK32;
+              else
+                cdoDefaultDataType = DATATYPE_FLT32;
+            }
+          else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
+          else
+            {
+              fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
+              fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb/grb2.\n");
+              exit(EXIT_FAILURE);
+            }
+        }
       else
-	{
-	  if ( dtype == D_INT )
-	    {
-	      if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_INT8;
-	      else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_INT16;
-	      else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_INT32;
-	      else
-		{
-		  fprintf(stderr, "Unsupported number of bits = %d for datatype INT!\n", nbits);
-		  exit(EXIT_FAILURE);
-		}
-	    }
-	  else if ( dtype == D_UINT )
-	    {
-	      if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_UINT8;
-	      else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_UINT16;
-	      else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_UINT32;
-	      else
-		{
-		  fprintf(stderr, "Unsupported number of bits = %d for datatype UINT!\n", nbits);
-		  exit(EXIT_FAILURE);
-		}
-	    }
-	  else if ( dtype == D_FLT )
-	    {
-	      if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_FLT32;
-	      else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
-	      else
-		{
-		  fprintf(stderr, "Unsupported number of bits = %d for datatype FLT!\n", nbits);
-		  exit(EXIT_FAILURE);
-		}
-	    }
-	  else if ( dtype == D_CPX )
-	    {
-	      if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_CPX32;
-	      else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_CPX64;
-	      else
-		{
-		  fprintf(stderr, "Unsupported number of bits = %d for datatype CPX!\n", nbits);
-		  exit(EXIT_FAILURE);
-		}
-	    }
-	}
+        {
+          if ( dtype == D_INT )
+            {
+              if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_INT8;
+              else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_INT16;
+              else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_INT32;
+              else
+                {
+                  fprintf(stderr, "Unsupported number of bits = %d for datatype INT!\n", nbits);
+                  exit(EXIT_FAILURE);
+                }
+            }
+          else if ( dtype == D_UINT )
+            {
+              if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_UINT8;
+              else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_UINT16;
+              else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_UINT32;
+              else
+                {
+                  fprintf(stderr, "Unsupported number of bits = %d for datatype UINT!\n", nbits);
+                  exit(EXIT_FAILURE);
+                }
+            }
+          else if ( dtype == D_FLT )
+            {
+              if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_FLT32;
+              else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
+              else
+                {
+                  fprintf(stderr, "Unsupported number of bits = %d for datatype FLT!\n", nbits);
+                  exit(EXIT_FAILURE);
+                }
+            }
+          else if ( dtype == D_CPX )
+            {
+              if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_CPX32;
+              else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_CPX64;
+              else
+                {
+                  fprintf(stderr, "Unsupported number of bits = %d for datatype CPX!\n", nbits);
+                  exit(EXIT_FAILURE);
+                }
+            }
+        }
     }
 
   if ( *datatypestr != 0 )
     {
       if ( *datatypestr == 'l' || *datatypestr == 'L' )
-	{
-	  if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
-	  datatypestr++;
-	}
+        {
+          if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
+          datatypestr++;
+        }
       else if ( *datatypestr == 'b' || *datatypestr == 'B' )
-	{
-	  if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
-	  datatypestr++;
-	}
+        {
+          if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
+          datatypestr++;
+        }
       else
-	{
-	  fprintf(stderr, "Unsupported character in number of bytes: >%s< !\n", datatypestr);
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr, "Unsupported character in number of bytes: >%s< !\n", datatypestr);
+          exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -471,30 +471,30 @@ void setDefaultDataTypeByte(char *datatypestr)
       else if ( datatype == 4 ) cdoDefaultDataType = DATATYPE_FLT32;
       else if ( datatype == 8 ) cdoDefaultDataType = DATATYPE_FLT64;
       else
-	{
-	  fprintf(stderr, "Unsupported datatype %d!\n", datatype);
-	  fprintf(stderr, "Use 4/8 for filetype nc/srv/ext/ieg and 1/2/3 for grb/grb2.\n");
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr, "Unsupported datatype %d!\n", datatype);
+          fprintf(stderr, "Use 4/8 for filetype nc/srv/ext/ieg and 1/2/3 for grb/grb2.\n");
+          exit(EXIT_FAILURE);
+        }
     }
 
   if ( *datatypestr != 0 )
     {
       if ( *datatypestr == 'l' || *datatypestr == 'L' )
-	{
-	  if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
-	  datatypestr++;
-	}
+        {
+          if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
+          datatypestr++;
+        }
       else if ( *datatypestr == 'b' || *datatypestr == 'B' )
-	{
-	  if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
-	  datatypestr++;
-	}
+        {
+          if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
+          datatypestr++;
+        }
       else
-	{
-	  fprintf(stderr, "Unsupported character in number of bytes: %s!\n", datatypestr);
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr, "Unsupported character in number of bytes: %s!\n", datatypestr);
+          exit(EXIT_FAILURE);
+        }
     }
 }
 
@@ -517,36 +517,36 @@ void setDefaultFileType(char *filetypestr, int labort)
       else if ( cmpstrlen(filetypestr, "ext",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_EXT; }
       else if ( cmpstrlen(filetypestr, "ieg",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_IEG; }
       else
-	{
-	  if ( labort )
-	    {
-	      fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-	      fprintf(stderr, "Available filetypes: grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg\n");
-	      exit(EXIT_FAILURE);
-	    }
-	  else
-	    {
-	      return;
-	    }
-	}
+        {
+          if ( labort )
+            {
+              fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
+              fprintf(stderr, "Available filetypes: grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg\n");
+              exit(EXIT_FAILURE);
+            }
+          else
+            {
+              return;
+            }
+        }
 
       if ( cdoDefaultFileType != CDI_UNDEFID && *ftstr != 0 )
-	{
-	  if ( *ftstr == '_' )
-	    {
-	      ftstr++;
+        {
+          if ( *ftstr == '_' )
+            {
+              ftstr++;
 
-	      setDefaultDataType(ftstr);
-	    }
-	  else
-	    {
-	      fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
-	      fprintf(stderr, "Use format[_nbits] with:\n");
-	      fprintf(stderr, "    format = grb, grb2, nc, nc2, nc4, nc4c, srv, ext or ieg\n");
-	      fprintf(stderr, "    nbits  = 32/64 for grb2/nc/nc2/nc4/nc4c/srv/ext/ieg; 1 - 24 for grb/grb2\n");
-	      exit(EXIT_FAILURE);
-	    }
-	}
+              setDefaultDataType(ftstr);
+            }
+          else
+            {
+              fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
+              fprintf(stderr, "Use format[_nbits] with:\n");
+              fprintf(stderr, "    format = grb, grb2, nc, nc2, nc4, nc4c, srv, ext or ieg\n");
+              fprintf(stderr, "    nbits  = 32/64 for grb2/nc/nc2/nc4/nc4c/srv/ext/ieg; 1 - 24 for grb/grb2\n");
+              exit(EXIT_FAILURE);
+            }
+        }
     }
 }
 
@@ -614,9 +614,9 @@ void defineCompress(const char *arg)
     {
       cdoCompType  = COMPRESS_ZIP;
       if ( len == 5 && arg[3] == '_' && isdigit(arg[4]) )
-	cdoCompLevel = atoi(&arg[4]);
+        cdoCompLevel = atoi(&arg[4]);
       else
-	cdoCompLevel = 1;
+        cdoCompLevel = 1;
     }
   else
     {
@@ -660,19 +660,19 @@ void defineVarnames(const char *arg)
 
       commapos = pbuf;
       while ( (commapos = strchr(commapos, ',')) != NULL )
-	{
-	  *commapos++ = '\0';
-	  if ( strlen(commapos) )
-	    {
-	      if ( cdoNumVarnames >= MAX_NUM_VARNAMES )
-		cdoAbort("Too many variable names (limit=%d)!", MAX_NUM_VARNAMES);
+        {
+          *commapos++ = '\0';
+          if ( strlen(commapos) )
+            {
+              if ( cdoNumVarnames >= MAX_NUM_VARNAMES )
+                cdoAbort("Too many variable names (limit=%d)!", MAX_NUM_VARNAMES);
 
-	      cdoVarnames[cdoNumVarnames++] = commapos;
-	    }
-	}
+              cdoVarnames[cdoNumVarnames++] = commapos;
+            }
+        }
       /*
       for ( int i = 0; i < cdoNumVarnames; ++i )
-	printf("varname %d: %s\n", i+1, cdoVarnames[i]);
+        printf("varname %d: %s\n", i+1, cdoVarnames[i]);
       */
     }
 }
@@ -687,49 +687,49 @@ void get_env_vars(void)
     {
       size_t len = strlen(envstr);
       if ( len > 0 )
-	{
-	  len += 2;
-	  cdoGridSearchDir = (char*) malloc(len);
-	  memcpy(cdoGridSearchDir, envstr, len-1);
-	  if ( cdoGridSearchDir[len-3] != '/' )
-	    {
-	      cdoGridSearchDir[len-2] = '/';
-	      cdoGridSearchDir[len-1] = 0;
-	    }
-	}
+        {
+          len += 2;
+          cdoGridSearchDir = (char*) malloc(len);
+          memcpy(cdoGridSearchDir, envstr, len-1);
+          if ( cdoGridSearchDir[len-3] != '/' )
+            {
+              cdoGridSearchDir[len-2] = '/';
+              cdoGridSearchDir[len-1] = 0;
+            }
+        }
     }
 
   envstr = getenv("CDO_LOG_OFF");
   if ( envstr )
     {
       if ( atoi(envstr) == 1 )
-	{
-	  cdoLogOff = TRUE;
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
-	}
+        {
+          cdoLogOff = TRUE;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
+        }
     }
 
   envstr = getenv("CDO_DISABLE_HISTORY");
   if ( envstr )
     {
       if ( atoi(envstr) == 1 )
-	{
-	  CDO_Reset_History = TRUE;
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_DISABLE_HISTORY = %s\n", envstr);
-	}
+        {
+          CDO_Reset_History = TRUE;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_DISABLE_HISTORY = %s\n", envstr);
+        }
     }
 
   envstr = getenv("CDO_RESET_HISTORY");
   if ( envstr )
     {
       if ( atoi(envstr) == 1 )
-	{
-	  CDO_Reset_History = TRUE;
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_RESET_HISTORY = %s\n", envstr);
-	}
+        {
+          CDO_Reset_History = TRUE;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_RESET_HISTORY = %s\n", envstr);
+        }
     }
 
   CDO_File_Suffix[0] = 0;
@@ -738,33 +738,33 @@ void get_env_vars(void)
   if ( envstr )
     {
       if ( envstr[0] )
-	{
-	  strncat(CDO_File_Suffix, envstr, sizeof(CDO_File_Suffix)-1);
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_FILE_SUFFIX = %s\n", envstr);
-	}
+        {
+          strncat(CDO_File_Suffix, envstr, sizeof(CDO_File_Suffix)-1);
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_FILE_SUFFIX = %s\n", envstr);
+        }
     }
 
   envstr = getenv("CDO_DISABLE_FILESUFFIX");
   if ( envstr )
     {
       if ( atoi(envstr) == 1 )
-	{
-	  strcat(CDO_File_Suffix, "NULL");
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
-	}
+        {
+          strcat(CDO_File_Suffix, "NULL");
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
+        }
     }
 
   envstr = getenv("CDO_DIAG");
   if ( envstr )
     {
       if ( atoi(envstr) == 1 )
-	{
-	  cdoDiag = TRUE;
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_DIAG = %s\n", envstr);
-	}
+        {
+          cdoDiag = TRUE;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_DIAG = %s\n", envstr);
+        }
     }
 
   envstr = getenv("CDO_USE_FFTW");
@@ -772,11 +772,11 @@ void get_env_vars(void)
     {
       int ival = atoi(envstr);
       if ( ival == 0 || ival == 1 )
-	{
-	  CDO_Use_FFTW = ival;
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_Use_FFTW = %s\n", envstr);
-	}
+        {
+          CDO_Use_FFTW = ival;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_Use_FFTW = %s\n", envstr);
+        }
     }
 
   envstr = getenv("CDO_COLOR");
@@ -784,25 +784,25 @@ void get_env_vars(void)
     {
       int ival = atoi(envstr);
       if ( ival == 0 || ival == 1 )
-	{
-	  CDO_Color = ival;
-	  if ( cdoVerbose )
-	    fprintf(stderr, "CDO_COLOR = %s\n", envstr);
-	}
+        {
+          CDO_Color = ival;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_COLOR = %s\n", envstr);
+        }
     }
   else
     {
       if ( CDO_Color == FALSE )
-	{
-	  char *username;
-	  username = getenv("LOGNAME");
-	  if ( username == NULL )
-	    {
-	      username = getenv("USER");
-	      if ( username == NULL ) username = "unknown";
-	    }
-	  if ( strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0 ) CDO_Color = TRUE;
-	}
+        {
+          char *username;
+          username = getenv("LOGNAME");
+          if ( username == NULL )
+            {
+              username = getenv("USER");
+              if ( username == NULL ) username = "unknown";
+            }
+          if ( strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0 ) CDO_Color = TRUE;
+        }
     }
 }
 
@@ -951,23 +951,23 @@ void check_stacksize()
 
     if ( status == 0 )
       {
-	if ( min_stack_size > rlim.rlim_max ) min_stack_size = rlim.rlim_max;
-	if ( rlim.rlim_cur < min_stack_size )
-	  {
-	    rlim.rlim_cur = min_stack_size;
+        if ( min_stack_size > rlim.rlim_max ) min_stack_size = rlim.rlim_max;
+        if ( rlim.rlim_cur < min_stack_size )
+          {
+            rlim.rlim_cur = min_stack_size;
 
-	    status = setrlimit(RLIMIT_STACK, &rlim);
-	    if ( Debug )
-	      {
-		if ( status == 0 )
-		  {
-		    fprintf(stderr, "Set stack size to %ld\n", (long) min_stack_size);
-		    PRINT_RLIMIT(RLIMIT_STACK);
-		  }
-		else
-		  fprintf(stderr, "Set stack size to %ld failed!\n", (long) min_stack_size);
-	      }
-	  }
+            status = setrlimit(RLIMIT_STACK, &rlim);
+            if ( Debug )
+              {
+                if ( status == 0 )
+                  {
+                    fprintf(stderr, "Set stack size to %ld\n", (long) min_stack_size);
+                    PRINT_RLIMIT(RLIMIT_STACK);
+                  }
+                else
+                  fprintf(stderr, "Set stack size to %ld failed!\n", (long) min_stack_size);
+              }
+          }
       }
   }
 #endif
@@ -998,19 +998,19 @@ long str_to_int(char *intstring)
 
       len = (int) strlen(intstring);
       for ( loop = 0; loop < len; loop++ )
-	{
-	  if ( ! isdigit((int) intstring[loop]) )
-	    {
-	      switch ( tolower((int) intstring[loop]) )
-		{
-		case 'k':  fact = 1024;        break;
-		case 'm':  fact = 1048576;     break;
-		case 'g':  fact = 1073741824;  break;
-		default:   fact = 0;           break;
-		}
-	      break;
-	    }
-	}
+        {
+          if ( ! isdigit((int) intstring[loop]) )
+            {
+              switch ( tolower((int) intstring[loop]) )
+                {
+                case 'k':  fact = 1024;        break;
+                case 'm':  fact = 1048576;     break;
+                case 'g':  fact = 1073741824;  break;
+                default:   fact = 0;           break;
+                }
+              break;
+            }
+        }
 
       if ( fact ) intval = fact*atol(intstring);
     }
@@ -1057,166 +1057,166 @@ int parse_options_long(int argc, char *argv[])
       if ( c == -1 ) break;
 
       switch (c)
-	{
-	case '?':
-	  //cdo_usage();
-	  //fprintf(stderr, "Illegal option!\n");
-	  return (-1);
-	  break;
-	case ':':
-	  //cdo_usage();
-	  //fprintf(stderr, "Option requires an argument!\n");
-	  return (-1);
-	  break;
-	case 0:
-	  if ( lnetcdf_hdr_pad )
-	    {
-	      int netcdf_hdr_pad = str_to_int(CDO_optarg);
-	      if ( netcdf_hdr_pad >= 0 ) CDO_netcdf_hdr_pad = netcdf_hdr_pad;
-	    }
-	  else if ( luse_fftw )
-	    {
-	      int use_fftw = str_to_int(CDO_optarg);
-	      if ( use_fftw != 0 && use_fftw != 1 )
-		cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", use_fftw);
-	      CDO_Use_FFTW = use_fftw;
-	    }
-	  else if ( lremap_genweights )
-	    {
-	      remap_genweights = str_to_int(CDO_optarg);
-	    }
-	  break;
-	case 'a':
-	  cdoDefaultTimeType = TAXIS_ABSOLUTE;
-	  break;
-	case 'b':
-	  setDefaultDataType(CDO_optarg);
-	  break;
-	case 'B':
-	  cdoBenchmark = TRUE;
-	  break;
-	case 'C':
-	  CDO_Color = TRUE;
-	  break;
-	case 'c':
-	  cdoCheckDatarange = TRUE;
-	  break;
-	case 'd':
-	  Debug = 1;
-	  break;
-	case 'D':
-	  Debug = 1;
-	  DebugLevel = atoi(CDO_optarg);
-	  break;
-	case 'e':
-	  {
+        {
+        case '?':
+          //cdo_usage();
+          //fprintf(stderr, "Illegal option!\n");
+          return (-1);
+          break;
+        case ':':
+          //cdo_usage();
+          //fprintf(stderr, "Option requires an argument!\n");
+          return (-1);
+          break;
+        case 0:
+          if ( lnetcdf_hdr_pad )
+            {
+              int netcdf_hdr_pad = str_to_int(CDO_optarg);
+              if ( netcdf_hdr_pad >= 0 ) CDO_netcdf_hdr_pad = netcdf_hdr_pad;
+            }
+          else if ( luse_fftw )
+            {
+              int use_fftw = str_to_int(CDO_optarg);
+              if ( use_fftw != 0 && use_fftw != 1 )
+                cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", use_fftw);
+              CDO_Use_FFTW = use_fftw;
+            }
+          else if ( lremap_genweights )
+            {
+              remap_genweights = str_to_int(CDO_optarg);
+            }
+          break;
+        case 'a':
+          cdoDefaultTimeType = TAXIS_ABSOLUTE;
+          break;
+        case 'b':
+          setDefaultDataType(CDO_optarg);
+          break;
+        case 'B':
+          cdoBenchmark = TRUE;
+          break;
+        case 'C':
+          CDO_Color = TRUE;
+          break;
+        case 'c':
+          cdoCheckDatarange = TRUE;
+          break;
+        case 'd':
+          Debug = 1;
+          break;
+        case 'D':
+          Debug = 1;
+          DebugLevel = atoi(CDO_optarg);
+          break;
+        case 'e':
+          {
 #if defined(HAVE_GETHOSTNAME)
-	  char host[1024];
-	  gethostname(host, sizeof(host));
-	  cdoExpName = CDO_optarg;
-	  /* printf("host: %s %s\n", host, cdoExpName); */
-	  if ( strcmp(host, cdoExpName) == 0 )
-	    cdoExpMode = CDO_EXP_REMOTE;
-	  else
+          char host[1024];
+          gethostname(host, sizeof(host));
+          cdoExpName = CDO_optarg;
+          /* printf("host: %s %s\n", host, cdoExpName); */
+          if ( strcmp(host, cdoExpName) == 0 )
+            cdoExpMode = CDO_EXP_REMOTE;
+          else
             cdoExpMode = CDO_EXP_LOCAL;
 #else
           fprintf(stderr, "Function gethostname not available!\n");
-	  exit(EXIT_FAILURE);
+          exit(EXIT_FAILURE);
 #endif
           break;
-	  }
-	case 'f':
-	  setDefaultFileType(CDO_optarg, 1);
-	  break;
-	case 'g':
-	  defineGrid(CDO_optarg);
-	  break;
-	case 'h':	
-	  Help = 1;
-	  break;
-	case 'H':	
-	  CDO_Append_History = FALSE;
-	  break;
-	case 'i':
-	  defineInstitution(CDO_optarg);
-	  break;
-	case 'k':
-	  defineChunktype(CDO_optarg);
-	  break;
-	case 'L':	
-	  cdoLockIO = TRUE;
-	  break;
-	case 'l':
-	  defineZaxis(CDO_optarg);
-	  break;
-	case 'm':
-	  cdiDefMissval(atof(CDO_optarg));
-	  break;
-	case 'M':
-	  cdiDefGlobal("HAVE_MISSVAL", TRUE);
-	  break;
-	case 'n':
-	  defineVarnames(CDO_optarg);
-	  break;
-	case 'O':
-	  cdoOverwriteMode = TRUE;
-	  break;
-	case 'P':
-	  if ( *CDO_optarg < '1' || *CDO_optarg > '9' )
-	    {
-	      fprintf(stderr, "Unexpected character in number of OpenMP threads (-P <nthreads>): %s!\n", CDO_optarg);
-	      exit(EXIT_FAILURE);
-	    }
-	  numThreads = atoi(CDO_optarg);
-	  break;
-	case 'p':
-	  fprintf(stderr, "CDO option -p is obsolete and will be removed in the next release, please switch to -b <bits>!\n");
-	  setDefaultDataTypeByte(CDO_optarg);
-	  break;
-	case 'Q':
-	  cdiDefGlobal("SORTNAME", TRUE);
-	  break;
-	case 'R':
-	  cdoRegulargrid = TRUE;
-	  cdiDefGlobal("REGULARGRID", TRUE);
-	  break;
-	case 'r':
-	  cdoDefaultTimeType = TAXIS_RELATIVE;
-	  break;
-	case 'S':
-	  cdoDiag = TRUE;
-	  break;
-	case 's':
-	  cdoSilentMode = TRUE;
-	  break;
-	case 'T':
-	  cdoTimer = TRUE;
-	  break;
-	case 't':
-	  cdoDefaultTableID = defineTable(CDO_optarg);
-	  break;
-	case 'u':
-	  cdoInteractive = TRUE;
-	  break;
-	case 'V':
-	  Version = 1;
-	  break;
-	case 'v':
-	  cdoVerbose = TRUE;
-	  break;
-	case 'W': /* Warning messages */
-	  _Verbose = 1;
-	  break;
-	case 'X': /* multi threaded I/O */
-	  cdoParIO = TRUE;
-	  break;
-	case 'Z':
-	  cdoCompress = TRUE;
+          }
+        case 'f':
+          setDefaultFileType(CDO_optarg, 1);
           break;
-	case 'z':
-	  defineCompress(CDO_optarg);
+        case 'g':
+          defineGrid(CDO_optarg);
           break;
-	}
+        case 'h':        
+          Help = 1;
+          break;
+        case 'H':        
+          CDO_Append_History = FALSE;
+          break;
+        case 'i':
+          defineInstitution(CDO_optarg);
+          break;
+        case 'k':
+          defineChunktype(CDO_optarg);
+          break;
+        case 'L':        
+          cdoLockIO = TRUE;
+          break;
+        case 'l':
+          defineZaxis(CDO_optarg);
+          break;
+        case 'm':
+          cdiDefMissval(atof(CDO_optarg));
+          break;
+        case 'M':
+          cdiDefGlobal("HAVE_MISSVAL", TRUE);
+          break;
+        case 'n':
+          defineVarnames(CDO_optarg);
+          break;
+        case 'O':
+          cdoOverwriteMode = TRUE;
+          break;
+        case 'P':
+          if ( *CDO_optarg < '1' || *CDO_optarg > '9' )
+            {
+              fprintf(stderr, "Unexpected character in number of OpenMP threads (-P <nthreads>): %s!\n", CDO_optarg);
+              exit(EXIT_FAILURE);
+            }
+          numThreads = atoi(CDO_optarg);
+          break;
+        case 'p':
+          fprintf(stderr, "CDO option -p is obsolete and will be removed in the next release, please switch to -b <bits>!\n");
+          setDefaultDataTypeByte(CDO_optarg);
+          break;
+        case 'Q':
+          cdiDefGlobal("SORTNAME", TRUE);
+          break;
+        case 'R':
+          cdoRegulargrid = TRUE;
+          cdiDefGlobal("REGULARGRID", TRUE);
+          break;
+        case 'r':
+          cdoDefaultTimeType = TAXIS_RELATIVE;
+          break;
+        case 'S':
+          cdoDiag = TRUE;
+          break;
+        case 's':
+          cdoSilentMode = TRUE;
+          break;
+        case 'T':
+          cdoTimer = TRUE;
+          break;
+        case 't':
+          cdoDefaultTableID = defineTable(CDO_optarg);
+          break;
+        case 'u':
+          cdoInteractive = TRUE;
+          break;
+        case 'V':
+          Version = 1;
+          break;
+        case 'v':
+          cdoVerbose = TRUE;
+          break;
+        case 'W': /* Warning messages */
+          _Verbose = 1;
+          break;
+        case 'X': /* multi threaded I/O */
+          cdoParIO = TRUE;
+          break;
+        case 'Z':
+          cdoCompress = TRUE;
+          break;
+        case 'z':
+          defineCompress(CDO_optarg);
+          break;
+        }
     }
 
   return (0);
@@ -1230,142 +1230,142 @@ int parse_options(int argc, char *argv[])
   while ( (c = cdo_getopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ")) != -1 )
     {
       switch (c)
-	{
-	case 'a':
-	  cdoDefaultTimeType = TAXIS_ABSOLUTE;
-	  break;
-	case 'b':
-	  setDefaultDataType(CDO_optarg);
-	  break;
-	case 'B':
-	  cdoBenchmark = TRUE;
-	  break;
-	case 'C':
-	  CDO_Color = TRUE;
-	  break;
-	case 'c':
-	  cdoCheckDatarange = TRUE;
-	  break;
-	case 'd':
-	  Debug = 1;
-	  break;
-	case 'D':
-	  Debug = 1;
-	  DebugLevel = atoi(CDO_optarg);
-	  break;
-	case 'e':
-	  {
+        {
+        case 'a':
+          cdoDefaultTimeType = TAXIS_ABSOLUTE;
+          break;
+        case 'b':
+          setDefaultDataType(CDO_optarg);
+          break;
+        case 'B':
+          cdoBenchmark = TRUE;
+          break;
+        case 'C':
+          CDO_Color = TRUE;
+          break;
+        case 'c':
+          cdoCheckDatarange = TRUE;
+          break;
+        case 'd':
+          Debug = 1;
+          break;
+        case 'D':
+          Debug = 1;
+          DebugLevel = atoi(CDO_optarg);
+          break;
+        case 'e':
+          {
 #if defined(HAVE_GETHOSTNAME)
-	  char host[1024];
-	  gethostname(host, sizeof(host));
-	  cdoExpName = CDO_optarg;
-	  /* printf("host: %s %s\n", host, cdoExpName); */
-	  if ( strcmp(host, cdoExpName) == 0 )
-	    cdoExpMode = CDO_EXP_REMOTE;
-	  else
+          char host[1024];
+          gethostname(host, sizeof(host));
+          cdoExpName = CDO_optarg;
+          /* printf("host: %s %s\n", host, cdoExpName); */
+          if ( strcmp(host, cdoExpName) == 0 )
+            cdoExpMode = CDO_EXP_REMOTE;
+          else
             cdoExpMode = CDO_EXP_LOCAL;
 #else
           fprintf(stderr, "Function gethostname not available!\n");
-	  exit(EXIT_FAILURE);
+          exit(EXIT_FAILURE);
 #endif
           break;
-	  }
-	case 'f':
-	  setDefaultFileType(CDO_optarg, 1);
-	  break;
-	case 'g':
-	  defineGrid(CDO_optarg);
-	  break;
-	case 'h':	
-	  Help = 1;
-	  break;
-	case 'H':	
-	  CDO_Append_History = FALSE;
-	  break;
-	case 'i':
-	  defineInstitution(CDO_optarg);
-	  break;
-	case 'k':
-	  defineChunktype(CDO_optarg);
-	  break;
-	case 'L':	
-	  cdoLockIO = TRUE;
-	  break;
-	case 'l':
-	  defineZaxis(CDO_optarg);
-	  break;
-	case 'm':
-	  cdiDefMissval(atof(CDO_optarg));
-	  break;
-	case 'M':
-	  cdiDefGlobal("HAVE_MISSVAL", TRUE);
-	  break;
-	case 'n':
-	  defineVarnames(CDO_optarg);
-	  break;
-	case 'O':
-	  cdoOverwriteMode = TRUE;
-	  break;
-	case 'P':
-	  if ( *CDO_optarg < '1' || *CDO_optarg > '9' )
-	    {
-	      fprintf(stderr, "Unexpected character in number of OpenMP threads (-P <nthreads>): %s!\n", CDO_optarg);
-	      exit(EXIT_FAILURE);
-	    }
-	  numThreads = atoi(CDO_optarg);
-	  break;
-	case 'p':
-	  fprintf(stderr, "CDO option -p is obsolete and will be removed in the next release, please switch to -b <bits>!\n");
-	  setDefaultDataTypeByte(CDO_optarg);
-	  break;
-	case 'Q':
-	  cdiDefGlobal("SORTNAME", TRUE);
-	  break;
-	case 'R':
-	  cdoRegulargrid = TRUE;
-	  cdiDefGlobal("REGULARGRID", TRUE);
-	  break;
-	case 'r':
-	  cdoDefaultTimeType = TAXIS_RELATIVE;
-	  break;
-	case 'S':
-	  cdoDiag = TRUE;
-	  break;
-	case 's':
-	  cdoSilentMode = TRUE;
-	  break;
-	case 'T':
-	  cdoTimer = TRUE;
-	  break;
-	case 't':
-	  cdoDefaultTableID = defineTable(CDO_optarg);
-	  break;
-	case 'u':
-	  cdoInteractive = TRUE;
-	  break;
-	case 'V':
-	  Version = 1;
-	  break;
-	case 'v':
-	  cdoVerbose = TRUE;
-	  break;
-	case 'W': /* Warning messages */
-	  _Verbose = 1;
-	  break;
-	case 'X': /* multi threaded I/O */
-	  cdoParIO = TRUE;
-	  break;
-	case 'Z':
-	  cdoCompress = TRUE;
+          }
+        case 'f':
+          setDefaultFileType(CDO_optarg, 1);
           break;
-	case 'z':
-	  defineCompress(CDO_optarg);
+        case 'g':
+          defineGrid(CDO_optarg);
           break;
-	case ':':
-	  fprintf(stderr, "\nmissing parameter for one of the options\n\n");	  
-	  Help = 1;
-	  break;
-	}
+        case 'h':        
+          Help = 1;
+          break;
+        case 'H':        
+          CDO_Append_History = FALSE;
+          break;
+        case 'i':
+          defineInstitution(CDO_optarg);
+          break;
+        case 'k':
+          defineChunktype(CDO_optarg);
+          break;
+        case 'L':        
+          cdoLockIO = TRUE;
+          break;
+        case 'l':
+          defineZaxis(CDO_optarg);
+          break;
+        case 'm':
+          cdiDefMissval(atof(CDO_optarg));
+          break;
+        case 'M':
+          cdiDefGlobal("HAVE_MISSVAL", TRUE);
+          break;
+        case 'n':
+          defineVarnames(CDO_optarg);
+          break;
+        case 'O':
+          cdoOverwriteMode = TRUE;
+          break;
+        case 'P':
+          if ( *CDO_optarg < '1' || *CDO_optarg > '9' )
+            {
+              fprintf(stderr, "Unexpected character in number of OpenMP threads (-P <nthreads>): %s!\n", CDO_optarg);
+              exit(EXIT_FAILURE);
+            }
+          numThreads = atoi(CDO_optarg);
+          break;
+        case 'p':
+          fprintf(stderr, "CDO option -p is obsolete and will be removed in the next release, please switch to -b <bits>!\n");
+          setDefaultDataTypeByte(CDO_optarg);
+          break;
+        case 'Q':
+          cdiDefGlobal("SORTNAME", TRUE);
+          break;
+        case 'R':
+          cdoRegulargrid = TRUE;
+          cdiDefGlobal("REGULARGRID", TRUE);
+          break;
+        case 'r':
+          cdoDefaultTimeType = TAXIS_RELATIVE;
+          break;
+        case 'S':
+          cdoDiag = TRUE;
+          break;
+        case 's':
+          cdoSilentMode = TRUE;
+          break;
+        case 'T':
+          cdoTimer = TRUE;
+          break;
+        case 't':
+          cdoDefaultTableID = defineTable(CDO_optarg);
+          break;
+        case 'u':
+          cdoInteractive = TRUE;
+          break;
+        case 'V':
+          Version = 1;
+          break;
+        case 'v':
+          cdoVerbose = TRUE;
+          break;
+        case 'W': /* Warning messages */
+          _Verbose = 1;
+          break;
+        case 'X': /* multi threaded I/O */
+          cdoParIO = TRUE;
+          break;
+        case 'Z':
+          cdoCompress = TRUE;
+          break;
+        case 'z':
+          defineCompress(CDO_optarg);
+          break;
+        case ':':
+          fprintf(stderr, "\nmissing parameter for one of the options\n\n");
+          Help = 1;
+          break;
+        }
     }
 
   return (0);
@@ -1444,11 +1444,11 @@ int main(int argc, char *argv[])
   else
     {
       if ( ! Version && ! Help )
-	{
-	  fprintf(stderr, "\nNo operator given!\n\n");
-	  cdo_usage();
-	  status = 1;
-	}
+        {
+          fprintf(stderr, "\nNo operator given!\n\n");
+          cdo_usage();
+          status = 1;
+        }
 
       if ( Help ) cdo_usage();
       lstop = TRUE;

@@ -37,14 +37,20 @@
 #if ! defined(VERSION)
 #  define  VERSION  "0.0.1"
 #endif
+ 
+
+/* refactor: moved here from *.c */
+
 char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)"; // refactor: moved here from cdo.c
-int CDO_opterr = 0; // refactor: moved here from cdo_getopt.c
+int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.c
 char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.c
-int CDO_optind = 1; // refactor: moved here from cdo_getopt.c
+int CDO_optind = 1;      // refactor: moved here from cdo_getopt.c
+
 int remap_genweights = TRUE; // refactor: moved here from Remap.c
 
 
 /* refactor: moved here from cdo.c */
+
 char *Progname;
 
 int ompNumThreads = 1;
@@ -61,6 +67,7 @@ int cdoDefaultByteorder  = CDI_UNDEFID;
 int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoDefaultInstID     = CDI_UNDEFID;     // moved here from institution.c, was UNDEFID
 int cdoDefaultTimeType   = CDI_UNDEFID;
+
 
 
 int cdo_omp_get_thread_num(void)
