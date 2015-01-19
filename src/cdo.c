@@ -67,11 +67,7 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int cdoDefaultFileType   = CDI_UNDEFID;
-int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
-int cdoDefaultByteorder  = CDI_UNDEFID;
-int cdoDefaultTableID    = CDI_UNDEFID;
 
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;

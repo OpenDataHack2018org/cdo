@@ -55,6 +55,10 @@ int stderr_is_tty = 0;
 
 char* cdoGridSearchDir   = NULL;
 
+int cdoDefaultFileType   = CDI_UNDEFID;
+int cdoDefaultDataType   = CDI_UNDEFID;
+int cdoDefaultByteorder  = CDI_UNDEFID;
+int cdoDefaultTableID    = CDI_UNDEFID;
 
 int cdo_omp_get_thread_num(void)
 {
