@@ -29,8 +29,6 @@
 #define UNDEFID  CDI_UNDEFID
 #endif
 
-int cdoDefaultInstID = UNDEFID;
-
 static
 int readInstitution(const char *instfile)
 {

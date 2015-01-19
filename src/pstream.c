@@ -407,7 +407,6 @@ int pstreamOpenRead(const argument_t *argument)
     }
   else
     {
-      extern int cdoDefaultFileType/*, cdoDefaultInstID*/;
       size_t len, i;
       int nfiles = 1, j;
       char *filename = NULL;
@@ -654,7 +653,6 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
     }
   else
     {
-      /* extern int cdoDefaultInstID; */
       char *filename = (char*) malloc(strlen(argument->args)+1);
 
       pstreamptr = pstream_new_entry();
