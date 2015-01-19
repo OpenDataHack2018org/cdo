@@ -1450,7 +1450,6 @@ void pstreamDefTimestep(int pstreamID, int tsID)
   else
 #endif
     {
-      extern int cdoDefaultTimeType;
       if ( tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID )
 	{
 	  int taxisID, vlistID;
@@ -1645,7 +1644,6 @@ void cdoFinish(void)
       int mu[] = {'b', 'k', 'm', 'g', 't'};
       int muindex = 0;
       long memmax;
-      extern int cdoLogOff;
 
       memmax = memTotal();
       while ( memmax > 9999 )
