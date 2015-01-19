@@ -1137,6 +1137,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	      free(overlap_buffer2[i][n].coordinates_x);
 	      free(overlap_buffer2[i][n].coordinates_y);
 	      if ( overlap_buffer2[i][n].coordinates_xyz ) free(overlap_buffer2[i][n].coordinates_xyz);
+	      if ( overlap_buffer2[i][n].edge_type ) free(overlap_buffer2[i][n].edge_type);
 	    }
 	}
       for ( n = 0; n < max_srch_cells2[i]; n++ )
