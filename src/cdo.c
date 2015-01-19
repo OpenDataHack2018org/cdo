@@ -67,7 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-char* cdoGridSearchDir   = NULL;
 int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;

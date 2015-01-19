@@ -196,7 +196,6 @@ int referenceToGrid(int gridID1)
       status = search_file("./", gridpath);
       if ( status != 0 )
 	{
-	  extern char *cdoGridSearchDir;
 	  if ( cdoGridSearchDir != NULL)
 	    {
 	      strcpy(gridpath, cdoGridSearchDir);

@@ -53,6 +53,7 @@ int stdin_is_tty  = 0;
 int stdout_is_tty = 0;
 int stderr_is_tty = 0;
 
+char* cdoGridSearchDir   = NULL;
 
 
 int cdo_omp_get_thread_num(void)

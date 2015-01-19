@@ -38,6 +38,7 @@
 
 /* refactor: moved here from *.c files */
 extern char *Progname; // process.c defined in cdo.c
+extern char *cdoGridSearchDir; // gridreference.c defined in cd.c
 
 /* refactor: moved from cdo.c */
 extern int   CDO_optind;
