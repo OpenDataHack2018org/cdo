@@ -67,9 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int CDO_Color            = FALSE;
-int CDO_Use_FFTW         = TRUE;
-int cdoDiag              = FALSE;
 int CDO_Append_History   = TRUE;
 int CDO_Reset_History    = FALSE;
 int cdoCompType          = COMPRESS_NONE;  // compression type

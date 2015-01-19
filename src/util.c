@@ -71,6 +71,11 @@ int cdoDefaultTimeType   = CDI_UNDEFID;
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 
+int CDO_Color            = FALSE;
+int CDO_Use_FFTW         = TRUE;
+int cdoDiag              = FALSE;
+
+
 
 
 int cdo_omp_get_thread_num(void)
