@@ -67,10 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int stdin_is_tty  = 0;
-int stdout_is_tty = 0;
-int stderr_is_tty = 0;
-
 char* cdoGridSearchDir   = NULL;
 int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
