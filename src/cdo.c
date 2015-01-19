@@ -67,8 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int ompNumThreads = 1;
-
 int stdin_is_tty  = 0;
 int stdout_is_tty = 0;
 int stderr_is_tty = 0;

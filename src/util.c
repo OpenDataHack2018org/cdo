@@ -47,6 +47,8 @@ int remap_genweights = TRUE; // refactor: moved here from Remap.c
 /* refactor: moved here from cdo.c */
 char *Progname;
 
+int ompNumThreads = 1;
+
 
 
 int cdo_omp_get_thread_num(void)
