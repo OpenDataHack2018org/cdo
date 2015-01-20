@@ -201,8 +201,7 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoVerbose, weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
-  private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
-  schedule(dynamic,1)
+  private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
@@ -330,8 +329,7 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon, findex) \
-  private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
-  schedule(dynamic,1)
+  private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
