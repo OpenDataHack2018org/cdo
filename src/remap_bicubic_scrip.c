@@ -2,6 +2,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"
+#include "remap_store_link.h"
 
 
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
@@ -97,7 +98,7 @@ void bicubic_warning(void)
 
 typedef struct
 {
-  int add;
+  int    add;
   double wgts[4];
 }
 addwgts_t;

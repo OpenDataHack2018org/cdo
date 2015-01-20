@@ -2,6 +2,8 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"
+#include "remap_store_link.h"
+
 
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 /*                                                                         */
@@ -329,84 +331,6 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
 }  /*  grid_search_nbr  */
 
 /*
-  This routine stores the address and weight for this link in the appropriate 
-  address and weight arrays and resizes those arrays if necessary.
-*/
-static
-void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
-{
-  /*
-    Input variables:
-    int  add1         ! address on source grid
-    int  add2         ! address on target grid
-    double weights    ! remapping weight for this link
-  */
-  long nlink;
-
-  /*
-     Increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link. Then store the link.
-  */
-  nlink = rv->num_links;
-  rv->num_links++;
-
-  if ( rv->num_links >= rv->max_links ) 
-    resize_remap_vars(rv, rv->resize_increment);
-
-  rv->src_cell_add[nlink] = add1;
-  rv->tgt_cell_add[nlink] = add2;
-  rv->wts[nlink]          = weights;
-
-} /* store_link_nbr */
-
-typedef struct
-{
-  int add;
-  double wgts;
-}
-addwgts_t;
-
-static
-int cmpwgts(const void *s1, const void *s2)
-{
-  int cmp = 0;
-  const addwgts_t *c1 = s1;
-  const addwgts_t *c2 = s2;
-
-  if      ( c1->add < c2->add ) cmp = -1;
-  else if ( c1->add > c2->add ) cmp =  1;
-
-  return (cmp);
-}
-
-static
-void sort_dist_adds(int nadds, int src_add[], double wgts[])
-{
-  int n;
-  addwgts_t addwgts[nadds];
-
-  if ( nadds <= 1 ) return;
-
-  for ( n = 1; n < nadds; ++n )
-    if ( src_add[n] < src_add[n-1] ) break;
-  if ( n == nadds ) return;
-
-  for ( n = 0; n < nadds; ++n )
-    {
-      addwgts[n].add  = src_add[n];
-      addwgts[n].wgts = wgts[n];
-    }
-
-  qsort(addwgts, nadds, sizeof(addwgts_t), cmpwgts);
-
-  for ( n = 0; n < nadds; ++n )
-    {
-      src_add[n] = addwgts[n].add;
-      wgts[n]    = addwgts[n].wgts;
-    }  
-}
-
-/*
   -----------------------------------------------------------------------------------------
 
    This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
@@ -416,11 +340,8 @@ void sort_dist_adds(int nadds, int src_add[], double wgts[])
 void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*  Local variables */
-
-  long src_grid_size;
-  long tgt_grid_size;
   long n, nadds;
-  long dst_add;                   /* destination address                         */
+  long tgt_cell_add;                   /* destination address                         */
   double dist_tot;                /* sum of neighbor distances (for normalizing) */
   double *coslat, *sinlat;        /* cosine, sine of grid lats (for distance)    */
   double *coslon, *sinlon;        /* cosine, sine of grid lons (for distance)    */
@@ -434,8 +355,10 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 
   /* Compute mappings from source to target grid */
 
-  src_grid_size = src_grid->size;
-  tgt_grid_size = tgt_grid->size;
+  long src_grid_size = src_grid->size;
+  long tgt_grid_size = tgt_grid->size;
+
+  weightlinks_t *weightlinks = (weightlinks_t *) malloc(tgt_grid_size*sizeof(weightlinks_t));
 
   /* Compute cos, sin of lat/lon on source grid for distance calculations */
 
@@ -491,11 +414,11 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
   /* Loop over destination grid  */
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
-  private(dst_add, n, nadds, dist_tot, plat, plon) \
+  shared(ompNumThreads, cdoTimer, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
+  private(tgt_cell_add, n, nadds, dist_tot, plat, plon) \
   schedule(dynamic,1)
 #endif
-  for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
+  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
       int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
@@ -509,10 +432,12 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
 
-      if ( ! tgt_grid->mask[dst_add] ) continue;
+      weightlinks[tgt_cell_add].nlinks = 0;	
+
+      if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 	
-      plat = tgt_grid->cell_center_lat[dst_add];
-      plon = tgt_grid->cell_center_lon[dst_add];
+      plat = tgt_grid->cell_center_lat[tgt_cell_add];
+      plon = tgt_grid->cell_center_lon[tgt_cell_add];
 
       /* Find nearest grid points on source grid and distances to each point */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -530,7 +455,7 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
       dist_tot = 0.;
       for ( n = 0; n < num_neighbors; ++n )
 	{
-	  // printf("dst_add %ld %ld %d %g\n", dst_add, n, nbr_add[n], nbr_dist[n]);
+	  // printf("tgt_cell_add %ld %ld %d %g\n", tgt_cell_add, n, nbr_add[n], nbr_dist[n]);
 	  nbr_mask[n] = FALSE;
 
 	  /* Uwe Schulzweida: check if nbr_add is valid */
@@ -554,25 +479,20 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 	      nbr_add[nadds]  = nbr_add[n];
 	      nadds++;
 
-	      tgt_grid->cell_frac[dst_add] = ONE;
+	      tgt_grid->cell_frac[tgt_cell_add] = ONE;
 	    }
 	}
 
-      sort_dist_adds(nadds, nbr_add, nbr_dist);
-
-      for ( n = 0; n < nadds; ++n )
-	{
-#if defined(_OPENMP)
-#pragma omp critical
-#endif
-	      store_link_nbr(rv, nbr_add[n], dst_add, nbr_dist[n]);
-	}
-
-    } /* for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add ) */
+      store_weightlinks(nadds, nbr_add, nbr_dist, tgt_cell_add, weightlinks);
+    }
 
   free(coslat);
   free(coslon);
   free(sinlat);
   free(sinlon);
+
+  weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
+
+  if ( weightlinks ) free(weightlinks);
 
 }  /* scrip_remap_weights_distwgt */

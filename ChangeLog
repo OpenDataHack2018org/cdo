@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-01-20  Uwe Schulzweida
+
+	* remap: replaced critical section with store_link() by store_weightlinks()
+
 2015-01-06  Uwe Schulzweida
 
 	* intersection: use function sqrt(x) if sqrtl(x) is missing
