@@ -903,6 +903,7 @@ void print_system_info()
   fprintf(stderr, "\n");
 }
 
+
 static
 void check_stacksize()
 {
@@ -941,6 +942,7 @@ void check_stacksize()
 #endif
 }
 
+
 static
 void cdo_set_options(void)
 {
@@ -954,6 +956,7 @@ void cdo_set_options(void)
 }
 
 
+static
 long str_to_int(char *intstring)
 {
   long intval = -1;
@@ -984,6 +987,7 @@ long str_to_int(char *intstring)
 
   return (intval);
 }
+
 
 static
 int parse_options_long(int argc, char *argv[])
