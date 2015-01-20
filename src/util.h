@@ -41,6 +41,7 @@ extern char *Progname; // refactor:  process.c defined in cdo.c
 extern char *cdoGridSearchDir; // refactor: gridreference.c defined in cd.c
 extern int CDO_Append_History; // refactor: history.c defined in cdo.c
 extern int CDO_Reset_History;  // refactor: history.c defined in cdo.c
+extern int timer_read, timer_write; // refactor: both pstream.c and CDIread.c CDIwrite.c defined in cdo.c
 
 /* refactor: moved from cdo.c */
 extern int   CDO_optind;

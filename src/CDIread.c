@@ -95,7 +95,6 @@ void *CDIread(void *argument)
   double tw, tw0, t0, twsum = 0;
   float *farray = NULL;
   double *darray = NULL;
-  extern int timer_read;
 
   sinfo[0] = 0;
 

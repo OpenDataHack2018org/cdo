@@ -111,7 +111,6 @@ void *CDIwrite(void *argument)
   double tw, tw0, t0, twsum = 0;
   double ***vars = NULL;
   float *farray = NULL;
-  extern int timer_write;
 
   srand(seed);
   sinfo[0] = 0;

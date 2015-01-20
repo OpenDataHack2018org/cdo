@@ -69,20 +69,15 @@
 
 int cdoRegulargrid       = FALSE;
 
-static int CDO_netcdf_hdr_pad   = 0;
-
 #define MAX_NUM_VARNAMES 256
-
-
-
-int timer_total, timer_read, timer_write;
-
 
 static int Debug = 0;
 static int Version = 0;
 static int Help = 0;
 static int DebugLevel = 0;
 static int numThreads = 0;
+static int timer_total;
+static int CDO_netcdf_hdr_pad   = 0;
 
 
 #define PRINT_RLIMIT(resource) \

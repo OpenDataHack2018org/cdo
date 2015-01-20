@@ -100,6 +100,9 @@ char CDO_File_Suffix[32];
 int cdoExpMode           = -1;
 char *cdoExpName         = NULL;
 
+int timer_read, timer_write;
+
+
 
 int cdo_omp_get_thread_num(void)
 {

@@ -45,8 +45,6 @@ int pclose(FILE *stream);
 #include "dmemory.h"
 
 
-extern int timer_read, timer_write;
-
 static int PSTREAM_Debug = 0;
 
 #define  MAX_PSTREAMS  4096
