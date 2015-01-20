@@ -18,7 +18,7 @@ int cmp_adds(const void *s1, const void *s2)
 }
 
 static
-void sort_adds(size_t num_weights, addweight_t *addweights)
+void sort_addweights(size_t num_weights, addweight_t *addweights)
 {
   size_t n;
 
@@ -27,6 +27,32 @@ void sort_adds(size_t num_weights, addweight_t *addweights)
   if ( n == num_weights ) return;
 
   qsort(addweights, num_weights, sizeof(addweight_t), cmp_adds);
+}
+
+
+void sort_add_and_wgts(size_t num_weights, int *src_add, double *wgts)
+{
+  size_t n;
+
+  for ( n = 1; n < num_weights; ++n )
+    if ( src_add[n] < src_add[n-1] ) break;
+  if ( n == num_weights ) return;
+
+  addweight_t addweights[num_weights];
+
+  for ( n = 0; n < num_weights; ++n )
+    {
+      addweights[n].add    = src_add[n];
+      addweights[n].weight = wgts[n];
+    }
+
+  qsort(addweights, num_weights, sizeof(addweight_t), cmp_adds);
+
+  for ( n = 0; n < num_weights; ++n )
+    {
+      src_add[n] = addweights[n].add;
+      wgts[n]    = addweights[n].weight;
+    }  
 }
 
 
@@ -44,7 +70,7 @@ void store_weightlinks(long num_weights, int *srch_add, double *weights, long ce
 	  addweights[n].weight = weights[n];
 	}
 
-      sort_adds(num_weights, addweights);
+      sort_addweights(num_weights, addweights);
 
       weightlinks[cell_add].addweights = addweights;
       weightlinks[cell_add].nlinks     = num_weights;

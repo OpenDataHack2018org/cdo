@@ -139,6 +139,39 @@ void set_source_data(double * source_data, double init_value,
 }
 
 
+/*
+  This routine stores the address and weight for four links associated with one destination
+  point in the appropriate address and weight arrays and resizes those arrays if necessary.
+*/
+static
+void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4])
+{
+  /*
+    Input variables:
+    int dst_add       ! address on destination grid
+    int src_add[4]    ! addresses on source grid
+    double weights[4] ! array of remapping weights for these links
+  */
+  /* link index */
+  long nlink = rv->num_links;
+  /*
+     Increment number of links and check to see if remap arrays need
+     to be increased to accomodate the new link. Then store the link.
+  */
+  rv->num_links += 4;
+
+  if ( rv->num_links >= rv->max_links ) 
+    resize_remap_vars(rv, rv->resize_increment);
+
+  for ( long n = 0; n < 4; ++n )
+    {
+      rv->src_cell_add[nlink+n] = src_add[n];
+      rv->tgt_cell_add[nlink+n] = dst_add;
+      rv->wts         [nlink+n] = weights[n];
+    }
+
+} /* store_link_bilin */
+
 void yar_remap_bil(field_t *field1, field_t *field2)
 {
   int nlonIn, nlatIn;

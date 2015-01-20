@@ -999,7 +999,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
     {
       if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = FALSE;
       else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = TRUE;
       else cdoAbort("Unknown mapping method!");

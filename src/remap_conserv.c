@@ -579,7 +579,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   int    i;
 
   /* Variables necessary if segment manages to hit pole */
-  double findex = 0;
   long nx = 0, ny = 0;
   int src_remap_grid_type = src_grid->remap_grid_type;
   int tgt_remap_grid_type = tgt_grid->remap_grid_type;
@@ -701,10 +700,12 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   weightlinks_t *weightlinks = (weightlinks_t *) malloc(tgt_grid_size*sizeof(weightlinks_t));
   
-  findex = 0;
+  double findex = 0;
 
   int sum_srch_cells = 0;
   int sum_srch_cells2 = 0;
+
+  /* Loop over destination grid */
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
@@ -730,6 +731,8 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 #endif
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
+
+      weightlinks[tgt_cell_add].nlinks = 0;	
 
       srch_add = srch_add2[ompthID];
       tgt_grid_cell = tgt_grid_cell2[ompthID];

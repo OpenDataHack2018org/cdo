@@ -211,8 +211,6 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type, int *num_neighbors,
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
-void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4]);
-
 void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, const restr_t* restrict cell_bound_box, int* restrict bin_addr);
 void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type);
 long get_srch_cells(long tgt_cell_add, long nbins, int *bin_addr1, int *bin_addr2,
