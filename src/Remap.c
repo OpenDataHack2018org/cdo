@@ -1074,10 +1074,10 @@ void *Remap(void *argument)
 		  else if ( map_type == MAP_TYPE_DISTWGT     ) scrip_remap_weights_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 		  else if ( map_type == MAP_TYPE_CONSERV_YAC ) remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
-		  if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
+		  if ( map_type == MAP_TYPE_CONSERV && remaps[r].vars.num_links != remaps[r].vars.max_links )
 		    resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
 		  
-		  if ( remaps[r].vars.sort_add ) sort_remap_add(&remaps[r].vars);
+		  if ( map_type == MAP_TYPE_CONSERV ) sort_remap_add(&remaps[r].vars);
 
 		  if ( lwrite_remap ) goto WRITE_REMAP;
 

@@ -11,42 +11,6 @@
 /*                                                                         */
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
-/*
-  This routine stores the address and weight for four links associated with one destination 
-  point in the appropriate address and weight arrays and resizes those arrays if necessary.
-*/
-static
-void store_link_bicub(remapvars_t *rv, int dst_add, int src_add[4], double weights[4][4])
-{
-  /*
-    Input variables:
-    int dst_add          ! address on destination grid
-    int src_add[4]       ! addresses on source grid
-    double weights[4][4] ! array of remapping weights for these links
-  */
-  long n, k;
-  long nlink;
-
-  /*
-     Increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link. Then store the link.
-  */
-  nlink = rv->num_links;
-  rv->num_links += 4;
-
-  if ( rv->num_links >= rv->max_links ) 
-    resize_remap_vars(rv, rv->resize_increment);
-
-  for ( n = 0; n < 4; ++n )
-    {
-      rv->src_cell_add[nlink+n] = src_add[n];
-      rv->tgt_cell_add[nlink+n] = dst_add;
-      for ( k = 0; k < 4; ++k )
-	rv->wts[4*(nlink+n)+k] = weights[k][n];
-    }
-
-} /* store_link_bicub */
-
 static
 void set_bicubic_weights(double iw, double jw, double wgts[4][4])
 {

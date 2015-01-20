@@ -1034,11 +1034,13 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   rv->resize_increment = (int) (0.1 * MAX(src_grid_size, tgt_grid_size));
 
   /*  Allocate address and weight arrays for mapping 1 */
+  if ( map_type == MAP_TYPE_CONSERV )
+    {
+      rv->src_cell_add = (int*) realloc(rv->src_cell_add, rv->max_links*sizeof(int));
+      rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
 
-  rv->src_cell_add = (int*) realloc(rv->src_cell_add, rv->max_links*sizeof(int));
-  rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
-
-  rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
+      rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
+    }
 
   rv->links.option    = FALSE;
   rv->links.max_links = 0;
@@ -1166,19 +1168,19 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 	{
 	  for ( n = 0; n < num_links; ++n )
 	    {
-	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n] +
-                                       src_grad1[src_add[n]]*map_wts[num_wts*n+1] +
-                                       src_grad2[src_add[n]]*map_wts[num_wts*n+2];
+	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[3*n] +
+                                       src_grad1[src_add[n]]*map_wts[3*n+1] +
+                                       src_grad2[src_add[n]]*map_wts[3*n+2];
 	    }
 	}
       else if ( num_wts == 4 )
 	{
       	  for ( n = 0; n < num_links; ++n )
 	    {
-              dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n] +
-                                       src_grad1[src_add[n]]*map_wts[num_wts*n+1] +
-                                       src_grad2[src_add[n]]*map_wts[num_wts*n+2] +
-                                       src_grad3[src_add[n]]*map_wts[num_wts*n+3];
+              dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[4*n] +
+                                       src_grad1[src_add[n]]*map_wts[4*n+1] +
+                                       src_grad2[src_add[n]]*map_wts[4*n+2] +
+                                       src_grad3[src_add[n]]*map_wts[4*n+3];
 	    }
 	}
     }
