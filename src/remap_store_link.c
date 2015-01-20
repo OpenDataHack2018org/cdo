@@ -81,7 +81,7 @@ void sort_add_and_wgts(size_t num_weights, int *src_add, double *wgts)
 }
 
 
-void sort_add_and_wgts4(size_t num_weights, int *src_add, double *wgts[4])
+void sort_add_and_wgts4(size_t num_weights, int *src_add, double wgts[4][4])
 {
   size_t n;
 

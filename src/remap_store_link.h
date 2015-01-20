@@ -32,7 +32,7 @@ void store_weightlinks4(long num_weights, int *srch_add, double weights[4][4], l
 void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, remapvars_t *rv);
 void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, remapvars_t *rv);
 void sort_add_and_wgts(size_t num_weights, int *src_add, double *wgts);
-void sort_add_and_wgts4(size_t num_weights, int *src_add, double *wgts[4]);
+void sort_add_and_wgts4(size_t num_weights, int *src_add, double wgts[4][4]);
 
 
 #endif  /* _REMAP_STORE_LINK */
