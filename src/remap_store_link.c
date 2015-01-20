@@ -94,10 +94,8 @@ void sort_add_and_wgts4(size_t num_weights, int *src_add, double *wgts[4])
   for ( n = 0; n < num_weights; ++n )
     {
       addweights[n].add       = src_add[n];
-      addweights[n].weight[0] = wgts[0][n];
-      addweights[n].weight[1] = wgts[1][n];
-      addweights[n].weight[2] = wgts[2][n];
-      addweights[n].weight[3] = wgts[3][n];
+      for ( long k = 0; k < 4; ++k )
+	addweights[n].weight[k] = wgts[k][n];
     }
 
   qsort(addweights, num_weights, sizeof(addweight4_t), cmp_adds4);
@@ -105,10 +103,8 @@ void sort_add_and_wgts4(size_t num_weights, int *src_add, double *wgts[4])
   for ( n = 0; n < num_weights; ++n )
     {
       src_add[n] = addweights[n].add;
-      wgts[0][n] = addweights[n].weight[0];
-      wgts[1][n] = addweights[n].weight[1];
-      wgts[2][n] = addweights[n].weight[2];
-      wgts[3][n] = addweights[n].weight[3];
+      for ( long k = 0; k < 4; ++k )
+	wgts[k][n] = addweights[n].weight[k];
     }  
 }
 
@@ -135,7 +131,7 @@ void store_weightlinks(long num_weights, int *srch_add, double *weights, long ce
 }
 
 
-void store_weightlinks4(long num_weights, int *srch_add, double *weights[4], long cell_add, weightlinks4_t *weightlinks)
+void store_weightlinks4(long num_weights, int *srch_add, double weights[4][4], long cell_add, weightlinks4_t *weightlinks)
 {
   weightlinks[cell_add].nlinks = 0;
   weightlinks[cell_add].offset = 0;
@@ -146,10 +142,8 @@ void store_weightlinks4(long num_weights, int *srch_add, double *weights[4], lon
       for ( long n = 0; n < num_weights; ++n )
 	{
 	  addweights[n].add       = srch_add[n];
-	  addweights[n].weight[0] = weights[0][n];
-	  addweights[n].weight[1] = weights[1][n];
-	  addweights[n].weight[2] = weights[2][n];
-	  addweights[n].weight[3] = weights[3][n];
+	  for ( long k = 0; k < 4; ++k )
+	    addweights[n].weight[k] = weights[k][n];
 	}
 
       sort_addweights4(num_weights, addweights);
@@ -160,7 +154,7 @@ void store_weightlinks4(long num_weights, int *srch_add, double *weights[4], lon
 }
 
 
-void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks,  remapvars_t *rv)
+void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, remapvars_t *rv)
 {
   long tgt_cell_add;
   long nlinks = 0;
@@ -206,7 +200,7 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks,  rem
 }
 
 
-void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks,  remapvars_t *rv)
+void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, remapvars_t *rv)
 {
   long tgt_cell_add;
   long nlinks = 0;
@@ -243,10 +237,8 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks,  r
 		{
 		  rv->src_cell_add[offset+ilink] = weightlinks[tgt_cell_add].addweights[ilink].add;
 		  rv->tgt_cell_add[offset+ilink] = tgt_cell_add;
-		  rv->wts[(offset+ilink)*4+0] = weightlinks[tgt_cell_add].addweights[ilink].weight[0];
-		  rv->wts[(offset+ilink)*4+1] = weightlinks[tgt_cell_add].addweights[ilink].weight[1];
-		  rv->wts[(offset+ilink)*4+2] = weightlinks[tgt_cell_add].addweights[ilink].weight[2];
-		  rv->wts[(offset+ilink)*4+3] = weightlinks[tgt_cell_add].addweights[ilink].weight[3];
+		  for ( long k = 0; k < 4; ++k )
+		    rv->wts[(offset+ilink)*4+k] = weightlinks[tgt_cell_add].addweights[ilink].weight[k];
 		}
 	      free(weightlinks[tgt_cell_add].addweights);
 	    }

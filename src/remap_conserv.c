@@ -709,7 +709,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
-  shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
+  shared(ompNumThreads, lyac, nbins, num_wts, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          rv, cdoVerbose, max_srch_cells2, tgt_num_cell_corners, target_cell_type, \
          weightlinks, \

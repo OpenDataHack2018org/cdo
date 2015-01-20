@@ -194,7 +194,7 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
+  shared(ompNumThreads, cdoVerbose, weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
   private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(static)
 #endif
@@ -298,7 +298,6 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
   double src_lons[4];            /*  longitudes of four bilinear corners    */
   double wgts[4];                /*  bilinear weights for four corners      */
   double plat, plon;             /*  lat/lon coords of destination point    */
-  double findex = 0;
   extern int timer_remap_bil;
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -315,15 +314,16 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
   if ( src_grid->rank != 2 )
     cdoAbort("Can not do bilinear interpolation when source grid rank != 2"); 
 
+  double findex = 0;
+
   /* Loop over destination grid */
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
+  shared(ompNumThreads, cdoVerbose, cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
   private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(static)
 #endif
-  /* grid_loop1 */
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       int lprogress = 1;
@@ -404,7 +404,7 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 	      bilinear_remap(&tgt_array[tgt_cell_add], src_array, wgts, src_add);
 	    }
         }
-    } /* grid_loop1 */
+    }
 
   if ( cdoTimer ) timer_stop(timer_remap_bil);
 } /* scrip_remap_bilinear */
