@@ -118,9 +118,9 @@ void remapVarsFree(remapvars_t *rv)
 
       rv->sort_add = FALSE;
 
-      free(rv->src_cell_add);
-      free(rv->tgt_cell_add);
-      free(rv->wts);
+      if ( rv->src_cell_add ) free(rv->src_cell_add);
+      if ( rv->tgt_cell_add ) free(rv->tgt_cell_add);
+      if ( rv->wts ) free(rv->wts);
 
       if ( rv->links.option == TRUE )
 	{

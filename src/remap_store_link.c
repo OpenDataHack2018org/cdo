@@ -172,9 +172,9 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
   rv->num_links = nlinks;
   if ( nlinks )
     {
-      rv->src_cell_add = (int*) realloc(rv->src_cell_add, nlinks*sizeof(int));
-      rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, nlinks*sizeof(int));
-      rv->wts          = (double*) realloc(rv->wts, nlinks*sizeof(double));
+      rv->src_cell_add = (int*) malloc(nlinks*sizeof(int));
+      rv->tgt_cell_add = (int*) malloc(nlinks*sizeof(int));
+      rv->wts          = (double*) malloc(nlinks*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
@@ -218,9 +218,9 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
   rv->num_links = nlinks;
   if ( nlinks )
     {
-      rv->src_cell_add = (int*) realloc(rv->src_cell_add, nlinks*sizeof(int));
-      rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, nlinks*sizeof(int));
-      rv->wts          = (double*) realloc(rv->wts, 4*nlinks*sizeof(double));
+      rv->src_cell_add = (int*) malloc(nlinks*sizeof(int));
+      rv->tgt_cell_add = (int*) malloc(nlinks*sizeof(int));
+      rv->wts          = (double*) malloc(4*nlinks*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \

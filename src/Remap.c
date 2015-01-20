@@ -1077,7 +1077,7 @@ void *Remap(void *argument)
 		  if ( map_type == MAP_TYPE_CONSERV && remaps[r].vars.num_links != remaps[r].vars.max_links )
 		    resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
 		  
-		  if ( map_type == MAP_TYPE_CONSERV ) sort_remap_add(&remaps[r].vars);
+		  if ( remaps[r].vars.sort_add ) sort_remap_add(&remaps[r].vars);
 
 		  if ( lwrite_remap ) goto WRITE_REMAP;
 
