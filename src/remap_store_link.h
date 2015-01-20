@@ -14,9 +14,22 @@ typedef struct {
   addweight_t *addweights;
 } weightlinks_t;
 
+typedef struct
+{
+  int    add;
+  double weight[4];
+} addweight4_t;
+
+typedef struct {
+  int nlinks;
+  int offset;
+  addweight4_t *addweights;
+} weightlinks4_t;
+
 void store_weightlinks(long num_weights, int *srch_add, double *weights, long cell_add, weightlinks_t *weightlinks);
 void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks,  remapvars_t *rv);
 void sort_add_and_wgts(size_t num_weights, int *src_add, double *wgts);
+void sort_add_and_wgts4(size_t num_weights, int *src_add, double *wgts[4]);
 
 
 #endif  /* _REMAP_STORE_LINK */
