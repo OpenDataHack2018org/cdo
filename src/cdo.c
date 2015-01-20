@@ -69,7 +69,7 @@
 
 int cdoRegulargrid       = FALSE;
 
-int CDO_netcdf_hdr_pad   = 0;
+static int CDO_netcdf_hdr_pad   = 0;
 
 #define MAX_NUM_VARNAMES 256
 int cdoNumVarnames       = 0;
