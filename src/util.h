@@ -193,11 +193,11 @@ void cdiDefTableID(int tableID);
 int gridFromName(const char *gridname);
 int zaxisFromName(const char *zaxisname);
 
-/* moved here from cdo.h */
+/* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
 void strtolower(char *str);
 
-/* moved here from cdo.c */
+/* refactor: moved here from cdo.c */
 void exp_run(int argc, char *argv[], char *cdoExpName); // job.c
 void printFeatures(void); // features.c
 void printLibraries(void);  // features.c  
