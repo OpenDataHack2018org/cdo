@@ -95,7 +95,7 @@ void sort_add_and_wgts4(size_t num_weights, int *src_add, double wgts[4][4])
     {
       addweights[n].add       = src_add[n];
       for ( long k = 0; k < 4; ++k )
-	addweights[n].weight[k] = wgts[k][n];
+	addweights[n].weight[k] = wgts[n][k];
     }
 
   qsort(addweights, num_weights, sizeof(addweight4_t), cmp_adds4);
@@ -104,7 +104,7 @@ void sort_add_and_wgts4(size_t num_weights, int *src_add, double wgts[4][4])
     {
       src_add[n] = addweights[n].add;
       for ( long k = 0; k < 4; ++k )
-	wgts[k][n] = addweights[n].weight[k];
+	wgts[n][k] = addweights[n].weight[k];
     }  
 }
 
@@ -143,7 +143,7 @@ void store_weightlinks4(long num_weights, int *srch_add, double weights[4][4], l
 	{
 	  addweights[n].add       = srch_add[n];
 	  for ( long k = 0; k < 4; ++k )
-	    addweights[n].weight[k] = weights[k][n];
+	    addweights[n].weight[k] = weights[n][k];
 	}
 
       sort_addweights4(num_weights, addweights);
@@ -224,7 +224,7 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
-  shared(rv, weightlinks)		       	 \
+  shared(rv, weightlinks)		 \
   private(tgt_cell_add)
 #endif
       for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )

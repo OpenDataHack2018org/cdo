@@ -15,20 +15,20 @@ static
 void set_bicubic_weights(double iw, double jw, double wgts[4][4])
 {
   wgts[0][0] = (1.-jw*jw*(3.-2.*jw))  * (1.-iw*iw*(3.-2.*iw));
-  wgts[0][1] = (1.-jw*jw*(3.-2.*jw))  *     iw*iw*(3.-2.*iw);
-  wgts[0][2] =     jw*jw*(3.-2.*jw)   *     iw*iw*(3.-2.*iw);
-  wgts[0][3] =     jw*jw*(3.-2.*jw)   * (1.-iw*iw*(3.-2.*iw));
-  wgts[1][0] = (1.-jw*jw*(3.-2.*jw))  *     iw*(iw-1.)*(iw-1.);
+  wgts[1][0] = (1.-jw*jw*(3.-2.*jw))  *     iw*iw*(3.-2.*iw);
+  wgts[2][0] =     jw*jw*(3.-2.*jw)   *     iw*iw*(3.-2.*iw);
+  wgts[3][0] =     jw*jw*(3.-2.*jw)   * (1.-iw*iw*(3.-2.*iw));
+  wgts[0][1] = (1.-jw*jw*(3.-2.*jw))  *     iw*(iw-1.)*(iw-1.);
   wgts[1][1] = (1.-jw*jw*(3.-2.*jw))  *     iw*iw*(iw-1.);
-  wgts[1][2] =     jw*jw*(3.-2.*jw)   *     iw*iw*(iw-1.);
-  wgts[1][3] =     jw*jw*(3.-2.*jw)   *     iw*(iw-1.)*(iw-1.);
-  wgts[2][0] =     jw*(jw-1.)*(jw-1.) * (1.-iw*iw*(3.-2.*iw));
-  wgts[2][1] =     jw*(jw-1.)*(jw-1.) *     iw*iw*(3.-2.*iw);
+  wgts[2][1] =     jw*jw*(3.-2.*jw)   *     iw*iw*(iw-1.);
+  wgts[3][1] =     jw*jw*(3.-2.*jw)   *     iw*(iw-1.)*(iw-1.);
+  wgts[0][2] =     jw*(jw-1.)*(jw-1.) * (1.-iw*iw*(3.-2.*iw));
+  wgts[1][2] =     jw*(jw-1.)*(jw-1.) *     iw*iw*(3.-2.*iw);
   wgts[2][2] =     jw*jw*(jw-1.)      *     iw*iw*(3.-2.*iw);
-  wgts[2][3] =     jw*jw*(jw-1.)      * (1.-iw*iw*(3.-2.*iw));
-  wgts[3][0] =     iw*(iw-1.)*(iw-1.) *     jw*(jw-1.)*(jw-1.);
-  wgts[3][1] =     iw*iw*(iw-1.)      *     jw*(jw-1.)*(jw-1.);
-  wgts[3][2] =     iw*iw*(iw-1.)      *     jw*jw*(jw-1.);
+  wgts[3][2] =     jw*jw*(jw-1.)      * (1.-iw*iw*(3.-2.*iw));
+  wgts[0][3] =     iw*(iw-1.)*(iw-1.) *     jw*(jw-1.)*(jw-1.);
+  wgts[1][3] =     iw*iw*(iw-1.)      *     jw*(jw-1.)*(jw-1.);
+  wgts[2][3] =     iw*iw*(iw-1.)      *     jw*jw*(jw-1.);
   wgts[3][3] =     iw*(iw-1.)*(iw-1.) *     jw*jw*(jw-1.);
 }
 
@@ -41,10 +41,10 @@ void renormalize_weights(const double src_lats[4], double wgts[4][4])
   double sum_wgts = 0.0; /* sum of weights for normalization */
   /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
   for ( n = 0; n < 4; ++n ) sum_wgts  += fabs(src_lats[n]);
-  for ( n = 0; n < 4; ++n ) wgts[0][n] = fabs(src_lats[n])/sum_wgts;
-  for ( n = 0; n < 4; ++n ) wgts[1][n] = 0.;
-  for ( n = 0; n < 4; ++n ) wgts[2][n] = 0.;
-  for ( n = 0; n < 4; ++n ) wgts[3][n] = 0.;
+  for ( n = 0; n < 4; ++n ) wgts[n][0] = fabs(src_lats[n])/sum_wgts;
+  for ( n = 0; n < 4; ++n ) wgts[n][1] = 0.;
+  for ( n = 0; n < 4; ++n ) wgts[n][2] = 0.;
+  for ( n = 0; n < 4; ++n ) wgts[n][3] = 0.;
 }
 
 static
@@ -66,10 +66,10 @@ void bicubic_remap(double* restrict tgt_point, const double* restrict src_array,
 {
   *tgt_point = 0.;
   for ( int n = 0; n < 4; ++n )
-    *tgt_point += src_array[src_add[n]]*wgts[0][n] +
-                      grad1[src_add[n]]*wgts[1][n] +
-                      grad2[src_add[n]]*wgts[2][n] +
-                      grad3[src_add[n]]*wgts[3][n];  
+    *tgt_point += src_array[src_add[n]]*wgts[n][0] +
+                      grad1[src_add[n]]*wgts[n][1] +
+                      grad2[src_add[n]]*wgts[n][2] +
+                      grad3[src_add[n]]*wgts[n][3];  
 }
 
 /*
