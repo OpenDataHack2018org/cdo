@@ -67,8 +67,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-int cdoRegulargrid       = FALSE;
-
 #define MAX_NUM_VARNAMES 256
 
 static int Debug = 0;

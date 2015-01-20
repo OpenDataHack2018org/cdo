@@ -41,17 +41,16 @@
 
 /* refactor: moved here from *.c */
 
-char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)"; // refactor: moved here from cdo.c
 int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.c
 char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.c
 int CDO_optind = 1;      // refactor: moved here from cdo_getopt.c
-
-int remap_genweights = TRUE; // refactor: moved here from Remap.c
+int remap_genweights = TRUE;  // refactor: moved here from Remap.c
 
 
 /* refactor: moved here from cdo.c */
 
 char *Progname;
+char CDO_Version[] = "Climate Data Operators version "VERSION" (https://code.zmaw.de/projects/cdo)"; // refactor: moved here from cdo.c
 
 int ompNumThreads = 1;
 
@@ -80,6 +79,7 @@ int CDO_Reset_History    = FALSE;
 
 int cdoCompType          = COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
+int cdoDebug             = 0;
 int cdoChunkType         = CDI_UNDEFID;
 int cdoLogOff            = FALSE;
 int cdoSilentMode        = FALSE;
@@ -87,10 +87,10 @@ int cdoOverwriteMode     = FALSE;
 int cdoBenchmark         = FALSE;
 int cdoTimer             = FALSE;
 int cdoVerbose           = FALSE;
-int cdoDebug             = 0;
 int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
+int cdoRegulargrid       = FALSE;
 
 int cdoNumVarnames       = 0;
 char **cdoVarnames       = NULL;
