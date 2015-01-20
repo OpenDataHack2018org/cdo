@@ -341,12 +341,11 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 {
   /*  Local variables */
   long n, nadds;
-  long tgt_cell_add;                   /* destination address                         */
+  long tgt_cell_add;              /* destination address                         */
   double dist_tot;                /* sum of neighbor distances (for normalizing) */
   double *coslat, *sinlat;        /* cosine, sine of grid lats (for distance)    */
   double *coslon, *sinlon;        /* cosine, sine of grid lons (for distance)    */
   double plat, plon;              /* lat/lon coords of destination point         */
-  double findex = 0;
   int remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -412,6 +411,9 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
     }
 
   /* Loop over destination grid  */
+
+  double findex = 0;
+
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \

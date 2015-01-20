@@ -150,7 +150,8 @@ void bilinear_remap(double* restrict tgt_point, const double* restrict src_array
 {
   // *tgt_point = 0.;
   // for ( int n = 0; n < 4; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
-  *tgt_point = src_array[src_add[0]]*wgts[0] + src_array[src_add[1]]*wgts[1] + src_array[src_add[2]]*wgts[2] + src_array[src_add[3]]*wgts[3];
+  *tgt_point = src_array[src_add[0]]*wgts[0] + src_array[src_add[1]]*wgts[1]
+             + src_array[src_add[2]]*wgts[2] + src_array[src_add[3]]*wgts[3];
 }
 
 /*
@@ -164,7 +165,7 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
 {
   /*   Local variables */
   int  search_result;
-  long tgt_cell_add;                  /*  destination addresss                   */
+  long tgt_cell_add;             /*  destination addresss                   */
   int src_add[4];                /*  address for the four source points     */
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
@@ -292,7 +293,7 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
   /*   Local variables */
   int  search_result;
   long tgt_grid_size;
-  long tgt_cell_add;                  /*  destination addresss */
+  long tgt_cell_add;             /*  destination addresss                   */
   int src_add[4];                /*  address for the four source points     */
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */

@@ -178,15 +178,15 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
-  shared(rv, weightlinks)		       	 \
+  shared(rv, weightlinks)		 \
   private(tgt_cell_add)
 #endif
       for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
 	{
 	  long num_links = weightlinks[tgt_cell_add].nlinks;
-	  long offset    = weightlinks[tgt_cell_add].offset;
 	  if ( num_links )
 	    {
+	      long offset    = weightlinks[tgt_cell_add].offset;
 	      for ( long ilink = 0; ilink < num_links; ++ilink )
 		{
 		  rv->src_cell_add[offset+ilink] = weightlinks[tgt_cell_add].addweights[ilink].add;
@@ -230,17 +230,18 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
       for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
 	{
 	  long num_links = weightlinks[tgt_cell_add].nlinks;
-	  long offset    = weightlinks[tgt_cell_add].offset;
 	  if ( num_links )
 	    {
+	      long offset    = weightlinks[tgt_cell_add].offset;
+	      addweight4_t *addweights = weightlinks[tgt_cell_add].addweights;
 	      for ( long ilink = 0; ilink < num_links; ++ilink )
 		{
-		  rv->src_cell_add[offset+ilink] = weightlinks[tgt_cell_add].addweights[ilink].add;
+		  rv->src_cell_add[offset+ilink] = addweights[ilink].add;
 		  rv->tgt_cell_add[offset+ilink] = tgt_cell_add;
 		  for ( long k = 0; k < 4; ++k )
-		    rv->wts[(offset+ilink)*4+k] = weightlinks[tgt_cell_add].addweights[ilink].weight[k];
+		    rv->wts[(offset+ilink)*4+k] = addweights[ilink].weight[k];
 		}
-	      free(weightlinks[tgt_cell_add].addweights);
+	      free(addweights);
 	    }
 	}
     }

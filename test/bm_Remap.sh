@@ -38,8 +38,8 @@ done
 # result on hama2: gcc 4.9.2
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   0.5    1.2   0.7   152    112
-# curv     27     27    70   152    197
+# reg2d   0.6    1.3   0.7   151     86
+# curv     26     27    71   152    172
 #
 # CDO 1.6.4
 #
