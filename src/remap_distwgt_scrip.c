@@ -415,8 +415,7 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
-  private(tgt_cell_add, n, nadds, dist_tot, plat, plon) \
-  schedule(dynamic,1)
+  private(tgt_cell_add, n, nadds, dist_tot, plat, plon)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
