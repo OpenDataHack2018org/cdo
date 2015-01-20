@@ -72,14 +72,7 @@ int cdoRegulargrid       = FALSE;
 static int CDO_netcdf_hdr_pad   = 0;
 
 #define MAX_NUM_VARNAMES 256
-int cdoNumVarnames       = 0;
-char **cdoVarnames       = NULL;
 
-char CDO_File_Suffix[32];
-
-
-int cdoExpMode           = -1;
-char *cdoExpName         = NULL;
 
 
 int timer_total, timer_read, timer_write;

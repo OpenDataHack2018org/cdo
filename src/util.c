@@ -92,6 +92,14 @@ int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 
+int cdoNumVarnames       = 0;
+char **cdoVarnames       = NULL;
+
+char CDO_File_Suffix[32];
+
+int cdoExpMode           = -1;
+char *cdoExpName         = NULL;
+
 
 int cdo_omp_get_thread_num(void)
 {
