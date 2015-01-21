@@ -55,29 +55,21 @@ struct tm datetime_to_tm(int date, int time)
 
 void *Splittime(void *argument)
 {
-  int SPLITHOUR, SPLITDAY, SPLITMON, SPLITSEAS;
-  int operatorID;
-  int operfunc, operintval;
-  int nchars;
-  int streamID1, streamID2;
+  int streamID2;
   int varID;
   int nrecs;
   int tsID, recID, levelID;
-  int vlistID1, vlistID2;
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   char filesuffix[32];
   char filename[8192];
-  const char *refname;
   int index = 0;
   int i;
-  int taxisID1, taxisID2;
   int vdate, vtime;
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
   int gridID;
-  int nvars, nlevel;
-  int nconst;
+  int nlevel;
   double *array = NULL;
   field_t **vars = NULL;
   int season_start;
@@ -88,17 +80,17 @@ void *Splittime(void *argument)
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
-  SPLITHOUR = cdoOperatorAdd("splithour", func_time, 10000, NULL);
-  SPLITDAY  = cdoOperatorAdd("splitday",  func_date,     1, NULL);
-  SPLITMON  = cdoOperatorAdd("splitmon",  func_date,   100, NULL);
-  SPLITSEAS = cdoOperatorAdd("splitseas", func_date,   100, NULL);
+  int SPLITHOUR = cdoOperatorAdd("splithour", func_time, 10000, NULL);
+  int SPLITDAY  = cdoOperatorAdd("splitday",  func_date,     1, NULL);
+  int SPLITMON  = cdoOperatorAdd("splitmon",  func_date,   100, NULL);
+  int SPLITSEAS = cdoOperatorAdd("splitseas", func_date,   100, NULL);
 
   UNUSED(SPLITDAY);
   UNUSED(SPLITHOUR);
 
-  operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorF1(operatorID);
-  operintval = cdoOperatorF2(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc   = cdoOperatorF1(operatorID);
+  int operintval = cdoOperatorF2(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -113,19 +105,19 @@ void *Splittime(void *argument)
   for ( i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
   for ( i = 0; i < MAX_STREAMS; i++ ) tsIDs[i] = 0;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   strcpy(filename, cdoStreamName(1)->args);
-  nchars = strlen(filename);
+  int nchars = strlen(filename);
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
 
@@ -136,8 +128,8 @@ void *Splittime(void *argument)
       array = (double*) malloc(gridsize*sizeof(double));
     }
 
-  nvars = vlistNvars(vlistID1);
-  nconst = 0;
+  int nvars = vlistNvars(vlistID1);
+  int nconst = 0;
   for ( varID = 0; varID < nvars; varID++ )
     if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) nconst++;
 
