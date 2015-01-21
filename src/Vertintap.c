@@ -320,6 +320,8 @@ void *Vertintap(void *argument)
       if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
     }
 
+  if ( apressID == -1 )  cdoAbort("%s not found!", var_stdname(air_pressure));
+
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
