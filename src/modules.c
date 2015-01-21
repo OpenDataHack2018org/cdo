@@ -417,7 +417,7 @@ void *Maggraph(void *argument);
 #define  SplitrecOperators      {"splitrec"}
 #define  SplitselOperators      {"splitsel"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}
-#define  SplityearOperators     {"splityear"}
+#define  SplityearOperators     {"splityear", "splityearmon"}
 #define  SSOparOperators        {"ssopar"}
 #define  SubtrendOperators      {"subtrend"}
 #define  TeeOperators           {"tee"}

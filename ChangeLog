@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-01-21  Uwe Schulzweida
+
+	* New operator: splityearmon
+
 2015-01-20  Uwe Schulzweida
 
 	* remap: replaced critical section with store_link() by store_weightlinks()

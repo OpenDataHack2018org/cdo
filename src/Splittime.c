@@ -72,8 +72,6 @@ void *Splittime(void *argument)
   int nlevel;
   double *array = NULL;
   field_t **vars = NULL;
-  int season_start;
-  const char *seas_name[4];
   const char *format = NULL;
 
   cdoInitialize(argument);
@@ -99,7 +97,8 @@ void *Splittime(void *argument)
       if ( operatorArgc() == 1 ) format = operatorArgv()[0];
     }
 
-  season_start = get_season_start();
+  int season_start = get_season_start();
+  const char *seas_name[4];
   get_season_name(seas_name);
 
   for ( i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
