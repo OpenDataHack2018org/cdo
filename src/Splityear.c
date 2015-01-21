@@ -31,20 +31,16 @@
 
 void *Splityear(void *argument)
 {
-  int nchars;
-  int streamID1, streamID2 = -1;
+  int streamID2 = -1;
   int varID;
   int nrecs;
   int tsID, tsID2, recID, levelID;
-  int vlistID1, vlistID2;
   char filesuffix[32];
   char filename[8192];
-  const char *refname;
   int vdate;
   int day;
   int year1, year2;
   int mon1, mon2;
-  int taxisID1, taxisID2;
   int lcopy = FALSE;
   int gridsize;
   int ic = 0;
@@ -60,15 +56,15 @@ void *Splityear(void *argument)
 
   memset(cyear, 0, MAX_YEARS*sizeof(int));
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
   strcpy(filename, cdoStreamName(1)->args);
-  nchars = strlen(filename);
+  int nchars = strlen(filename);
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
 
@@ -79,8 +75,8 @@ void *Splityear(void *argument)
       array = (double*) malloc(gridsize*sizeof(double));
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   year1 = -1;
