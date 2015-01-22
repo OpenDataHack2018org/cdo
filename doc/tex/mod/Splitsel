@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Splitsel
 @Title     = Split selected timesteps
 @Section   = File operations
