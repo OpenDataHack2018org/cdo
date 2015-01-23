@@ -1,7 +1,7 @@
 /*
   This is a C library of the Fortran SCRIP version 1.4
 
-  ===>>> Please send bug reports to <https://code.zmaw.de/projects/cdo> <<<===
+  ===>>> Please send bug reports to <http://www.mpimet.mpg.de/cdo> <<<===
 
   Spherical Coordinate Remapping and Interpolation Package (SCRIP)
   ================================================================
