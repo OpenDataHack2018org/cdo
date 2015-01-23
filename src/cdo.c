@@ -201,9 +201,9 @@ void cdo_usage(void)
 
   fprintf(stderr, "\n");
   fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2015 Uwe Schulzweida\n", VERSION);
-  //  fprintf(stderr, "  Available from <http://www.mpimet.mpg.de/cdo>\n");
+  //  fprintf(stderr, "  Available from <http://mpimet.mpg.de/cdo>\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
-  fprintf(stderr, "  Report bugs to <http://www.mpimet.mpg.de/cdo>\n");
+  fprintf(stderr, "  Report bugs to <http://mpimet.mpg.de/cdo>\n");
 }
 
 static
