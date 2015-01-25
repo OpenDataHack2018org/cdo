@@ -46,11 +46,17 @@ done
 #
 # CDO 1.6.8 ----------------------------------------
 #
-# result on hama2: gcc 4.9.2
+# result on hama2: gcc 4.9.2 sse3
 # =================
 #         bil    bic    nn   con   ycon
 # reg2d   0.6    1.3   0.7   151     86
 # curv     26     27    71   152    172
+#
+# result on hama2: icc 15.0.1 avx2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.6    1.3   0.8   125     92
+# curv     21     22    65   123    161
 #
 # result on bailung: gcc 4.9.1
 # =================
