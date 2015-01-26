@@ -20,6 +20,8 @@ AC_CONFIG_HEADERS([src/config.h])
 AM_MAINTAINER_MODE([disable])
 
 # Set up libtool.
+AM_PROG_AR
+#
 AC_MSG_NOTICE([setting up libtool])
 LT_INIT
 
