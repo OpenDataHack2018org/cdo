@@ -15,6 +15,7 @@
 /cdo.settings.in -text
 /cdo.spec -text
 /cdo.spec.in -text
+config/ar-lib -text
 config/compile -text
 config/config.guess -text
 config/config.sub -text
