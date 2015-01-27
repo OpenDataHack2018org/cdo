@@ -1,6 +1,10 @@
-2015-01-22  Uwe Schulzweida
+2015-02-12  Uwe Schulzweida
 
 	* Version 1.6.8 released
+
+2015-01-27  Uwe Schulzweida
+
+	* remapnn: Segmentation fault for extrapolation of regular 2D source grids  (bug fix)
 
 2015-01-21  Uwe Schulzweida
 

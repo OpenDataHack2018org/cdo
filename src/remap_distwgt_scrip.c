@@ -240,10 +240,26 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
   else if ( src_grid->lextrapolate )
     {
       int search_result;
-      search_result = grid_search_reg2d_nn(nx, ny, nbr_add, nbr_dist, plat, plon, src_center_lat, src_center_lon);
-      
+
+      if ( num_neighbors < 4 )
+	{
+	  int nbr4_add[4];
+	  double nbr4_dist[4];
+	  for ( n = 0; n < num_neighbors; ++n ) nbr4_add[n] = -1;
+	  search_result = grid_search_reg2d_nn(nx, ny, nbr4_add, nbr4_dist, plat, plon, src_center_lat, src_center_lon);
+	  if ( search_result < 0 )
+	    {
+	      for ( n = 0; n < num_neighbors; ++n ) nbr_add[n]  = nbr4_add[n];
+	      for ( n = 0; n < num_neighbors; ++n ) nbr_dist[n] = nbr4_dist[n];
+	    }
+	}
+      else
+	{
+	  search_result = grid_search_reg2d_nn(nx, ny, nbr_add, nbr_dist, plat, plon, src_center_lat, src_center_lon);
+	}
+
       if ( search_result >= 0 )
-	for ( n = 0; n < 4; ++n ) nbr_add[n] = -1;
+	for ( n = 0; n < num_neighbors; ++n ) nbr_add[n] = -1;
     }
 }  /*  grid_search_nbr_reg2d  */
 

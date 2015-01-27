@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.6.8 (8 January 2015):
+Version 1.6.8 (12 February 2015):
 
    New operators:
      * splityearmon: Split in years and months
@@ -16,6 +16,9 @@ Version 1.6.8 (8 January 2015):
        are changed from the last to the middle contributing timestep.
        Use the envirionment variable CDO_TIMESTAT_DATE=last to set
        the outout time stamp to the last contributing timestep.
+
+   Fixed bugs:
+     * remapnn: Segmentation fault for extrapolation of regular 2D source grids
 
 Version 1.6.7 (12 December 2014):
 
