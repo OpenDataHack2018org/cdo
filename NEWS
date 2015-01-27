@@ -18,7 +18,7 @@ Version 1.6.8 (12 February 2015):
        the outout time stamp to the last contributing timestep.
 
    Fixed bugs:
-     * remapnn: Segmentation fault for extrapolation of regular 2D source grids
+     * remapnn: Segmentation fault for extrapolation of regular 2D source grids [Bug #5448]
 
 Version 1.6.7 (12 December 2014):
 
