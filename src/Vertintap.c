@@ -276,7 +276,6 @@ void *Vertintap(void *argument)
 
       param    = vlistInqVarParam(vlistID1, varID);
 
-
       vlistInqVarStdname(vlistID1, varID, stdname);
       strtolower(stdname);
 
@@ -322,6 +321,12 @@ void *Vertintap(void *argument)
 
   if ( apressID == -1 )  cdoAbort("%s not found!", var_stdname(air_pressure));
 
+  for ( varID = 0; varID < nvars; ++varID )
+    {
+      if ( varinterp[varID] == TRUE && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+    }
+
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
@@ -330,6 +335,12 @@ void *Vertintap(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
+      for ( varID = 0; varID < nvars; ++varID )
+	{
+	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
+	    varnmiss[varID][levelID] = 0;
+	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
@@ -352,8 +363,12 @@ void *Vertintap(void *argument)
 	  single1  = vardata1[varID] + offset;
 
 	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+
 	  vars[varID] = TRUE;
 	}
+
+      for ( varID = 0; varID < nvars; varID++ )
+	if ( varinterp[varID] == TRUE ) vars[varID] = TRUE;
 
       if ( zaxisIDh != -1 )
 	{
