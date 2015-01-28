@@ -828,7 +828,7 @@ void print_system_info()
   fprintf(stderr, "HAVE_MEMORY_H\n");
 #endif
   fprintf(stderr, "\n");
-      
+
 #if defined(_OPENACC)
   fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
 #endif
@@ -863,6 +863,9 @@ void print_system_info()
 #endif
 #if defined(FP_FAST_FMA)
   fprintf(stderr, "FP_FAST_FMA         = defined\n");
+#endif
+#if defined(__FAST_MATH__)
+  fprintf(stderr, "__FAST_MATH__       = defined\n");
 #endif
   fprintf(stderr, "\n");
 
