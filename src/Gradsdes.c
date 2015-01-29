@@ -1290,10 +1290,10 @@ void *Gradsdes(void *argument)
             {
               monavg = FALSE;
             }
-	   /*          
+          /*          
           printf("monavg %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d\n",
                  tsID, monavg, mdt, imm , imms, idmm, iyy, iyys, idyy, idd, idds, iddd);
-	   */
+          */
           imns = imn;
           ihhs = ihh;
           idds = idd;
