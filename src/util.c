@@ -636,7 +636,17 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
                           break;
                         }
                     }
-                  if ( lready )  strncat(filesuffix, result, maxlen-1);
+
+                  //if ( lready )  strncat(filesuffix, result, maxlen-1);
+		  if ( lready && ((len=strlen(result)) < (maxlen-1)) )
+		    {
+		      while ( len-- )
+			{
+			  if ( *result == '.' || isalnum(*result) ) 
+			    strncat(filesuffix, result, 1);
+			  result++;
+			}
+		    }
                 }
             }
 

@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-01-30  Uwe Schulzweida
+
+        * cdoGenFileSuffix: filter wildcard characters
+
 2015-01-27  Uwe Schulzweida
 
 	* remapnn: Segmentation fault for extrapolation of regular 2D source grids [Bug #5448]
