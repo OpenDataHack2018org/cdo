@@ -93,7 +93,7 @@ $CDO sp2gpl $IFILE $OFILE
 cdo -f grb setrtomiss,0,10000  -gridboxmean,8,8 -topo bathy4.grb
 #
 GRIDS="n16 n32"
-RMODS="bil bic nn con laf"
+RMODS="bil bic dis nn con laf"
 IFILE=bathy4.grb
 for GRID in $GRIDS; do
   for RMOD in $RMODS; do

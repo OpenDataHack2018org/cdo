@@ -691,12 +691,14 @@ test/data/ml2pl_ref -text
 test/data/n16_bic_ref -text
 test/data/n16_bil_ref -text
 test/data/n16_con_ref -text
+test/data/n16_dis_ref -text
 test/data/n16_laf_ref -text
 test/data/n16_nn_ref -text
 test/data/n16_ycon_ref -text
 test/data/n32_bic_ref -text
 test/data/n32_bil_ref -text
 test/data/n32_con_ref -text
+test/data/n32_dis_ref -text
 test/data/n32_laf_ref -text
 test/data/n32_nn_ref -text
 test/data/n32_ycon_ref -text
