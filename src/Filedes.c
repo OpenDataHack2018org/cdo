@@ -324,12 +324,12 @@ void *Filedes(void *argument)
       int opt = 0;
       if ( operatorID == GRIDDES ) opt = 1;
       for ( index = 0; index < ngrids; index++ )
-	gridPrint(vlistGrid(vlistID, index), opt);
+	gridPrint(vlistGrid(vlistID, index), index+1, opt);
     }
   else if ( operatorID == ZAXISDES )
     {
       for ( index = 0; index < nzaxis; index++ )
-	zaxisPrint(vlistZaxis(vlistID, index));
+	zaxisPrint(vlistZaxis(vlistID, index), index+1);
     }
   else if ( operatorID == VCT || operatorID == VCT2 )
     {

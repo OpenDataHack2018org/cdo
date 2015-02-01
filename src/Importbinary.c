@@ -246,10 +246,10 @@ void *Importbinary(void *argument)
   if ( nvars == 0 ) cdoAbort("No variables found!");
 
   gridID = define_grid(&pfi);
-  if ( cdoVerbose ) gridPrint(gridID, 1);
+  if ( cdoVerbose ) gridPrint(gridID, gridID, 1);
 
   zaxisID = define_level(&pfi, 0);
-  if ( cdoVerbose ) zaxisPrint(zaxisID);
+  if ( cdoVerbose ) zaxisPrint(zaxisID, zaxisID);
 
   zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
   zaxisDefLevels(zaxisIDsfc, &sfclevel);
