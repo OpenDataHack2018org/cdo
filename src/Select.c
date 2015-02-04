@@ -392,10 +392,8 @@ int pmlRead(pml_t *pml, int argc, char **argv)
 
 int par_check_int(int npar, int *parlist, int *flaglist, int par)
 {
-  int i, found;
-
-  found = 0;
-  for ( i = 0; i < npar; i++ )
+  int found = 0;
+  for ( int i = 0; i < npar; i++ )
     if ( par == parlist[i] ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
   return (found);
@@ -404,10 +402,8 @@ int par_check_int(int npar, int *parlist, int *flaglist, int par)
 
 int par_check_flt(int npar, double *parlist, int *flaglist, double par)
 {
-  int i, found;
-
-  found = 0;
-  for ( i = 0; i < npar; i++ )
+  int found = 0;
+  for ( int i = 0; i < npar; i++ )
     if ( fabs(par - parlist[i]) < 1.e-4 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
   return (found);
@@ -416,11 +412,10 @@ int par_check_flt(int npar, double *parlist, int *flaglist, double par)
 
 int par_check_word(int npar, char **parlist, int *flaglist, char *par)
 {
-  int i, found;
-
-  found = 0;
-  for ( i = 0; i < npar; i++ )
-    if ( strcmp(par, parlist[i]) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+  int found = 0;
+  for ( int i = 0; i < npar; i++ )
+    if ( wildcardmatch(parlist[i], par) ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+  //  if ( strcmp(par, parlist[i]) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
   return (found);
 }
@@ -428,9 +423,7 @@ int par_check_word(int npar, char **parlist, int *flaglist, char *par)
 
 void par_check_int_flag(int npar, int *parlist, int *flaglist, const char *txt)
 {
-  int i;
-
-  for ( i = 0; i < npar; ++i )
+  for ( int i = 0; i < npar; ++i )
     if ( flaglist[i] == FALSE )
       cdoWarning("%s >%d< not found!", txt, parlist[i]);
 }
@@ -438,9 +431,7 @@ void par_check_int_flag(int npar, int *parlist, int *flaglist, const char *txt)
 
 void par_check_flt_flag(int npar, double *parlist, int *flaglist, const char *txt)
 {
-  int i;
-
-  for ( i = 0; i < npar; ++i )
+  for ( int i = 0; i < npar; ++i )
     if ( flaglist[i] == FALSE )
       cdoWarning("%s >%g< not found!", txt, parlist[i]);
 }
@@ -448,9 +439,7 @@ void par_check_flt_flag(int npar, double *parlist, int *flaglist, const char *tx
 
 void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *txt)
 {
-  int i;
-
-  for ( i = 0; i < npar; ++i )
+  for ( int i = 0; i < npar; ++i )
     if ( flaglist[i] == FALSE )
       cdoWarning("%s >%s< not found!", txt, parlist[i]);
 }
