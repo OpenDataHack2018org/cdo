@@ -202,4 +202,6 @@ void exp_run(int argc, char *argv[], char *cdoExpName); // job.c
 void printFeatures(void); // features.c
 void printLibraries(void);  // features.c  
 
+int wildcardmatch(const char *w, const char *s);
+
 #endif  /* _UTIL_H */

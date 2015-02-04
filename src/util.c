@@ -103,6 +103,31 @@ char *cdoExpName         = NULL;
 int timer_read, timer_write;
 
 
+// The wildcardmatch function checks if two given strings match. 
+// The first string may contain wildcard characters
+// * --> Matches with 0 or more instances of any character or set of characters.
+// ? --> Matches with any one character.
+// source code from http://www.geeksforgeeks.org/wildcard-character-matching/
+int wildcardmatch(const char *w, const char *s)
+{
+    // If we reach at the end of both strings, we are done
+    if ( *w == '\0' && *s == '\0' ) return 1;
+ 
+    // Make sure that the characters after '*' are present in second string.
+    // This function assumes that the first string will not contain two consecutive '*'
+    if ( *w == '*' && *(w+1) != '\0' && *s == '\0' ) return 0;
+ 
+    // If the first string contains '?', or current characters of both strings match
+    if ( *w == '?' || *w == *s ) return wildcardmatch(w+1, s+1);
+ 
+    // If there is *, then there are two possibilities
+    // a) We consider current character of second string
+    // b) We ignore current character of second string.
+    if ( *w == '*' ) return wildcardmatch(w+1, s) || wildcardmatch(w, s+1);
+
+    return 0;
+}
+
 
 int cdo_omp_get_thread_num(void)
 {
