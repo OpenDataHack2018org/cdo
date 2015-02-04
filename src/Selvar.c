@@ -199,7 +199,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == SELNAME )
 		{
-		  if ( strcmp(argnames[isel], varname) == 0 )
+		  if ( wildcardmatch(argnames[isel], varname) )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;

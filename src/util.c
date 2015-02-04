@@ -118,7 +118,7 @@ int wildcardmatch(const char *w, const char *s)
     if ( *w == '*' && *(w+1) != '\0' && *s == '\0' ) return 0;
  
     // If the first string contains '?', or current characters of both strings match
-    if ( *w == '?' || *w == *s ) return wildcardmatch(w+1, s+1);
+    if ( (*w == '?' && *s != '\0') || *w == *s ) return wildcardmatch(w+1, s+1);
  
     // If there is *, then there are two possibilities
     // a) We consider current character of second string
