@@ -131,10 +131,9 @@ void *Cloudlayer(void *argument)
   int varID, levelID;
   int zrev = FALSE;
   int nvars;
-  int gridsize, i;
+  int i;
   int offset;
   int nmiss;
-  int ngp = 0, ngrids;
   int aclcac_code;
   int aclcacID = -1;
   int nvars2 = 0;
@@ -166,27 +165,7 @@ void *Cloudlayer(void *argument)
 
   vlistID1 = streamInqVlist(streamID1);
 
-  ngrids  = vlistNgrids(vlistID1);
-  for ( i = 0; i < ngrids; i++ )
-    {
-      gridID = vlistGrid(vlistID1, i);
-      if ( gridInqType(gridID) != GRID_SPECTRAL )
-	{
-	  ngp = gridInqSize(gridID);
-	  break;
-	}
-    }
-
-  /* check gridsize */
-  for ( i = 0; i < ngrids; i++ )
-    {
-      gridID = vlistGrid(vlistID1, i);
-      if ( gridInqType(gridID) != GRID_SPECTRAL )
-	{
-	  if ( ngp != gridInqSize(gridID) )
-	    cdoAbort("Grids have different size!");
-	}
-    }
+  int gridsize = vlist_check_gridsize(vlistID1);
 
   aclcac_code = 223;
 
@@ -195,7 +174,6 @@ void *Cloudlayer(void *argument)
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
 
       code = vlistInqVarCode(vlistID1, varID);
@@ -230,7 +208,6 @@ void *Cloudlayer(void *argument)
   gridID  = vlistInqVarGrid(vlistID1, aclcacID);
   zaxisID = vlistInqVarZaxis(vlistID1, aclcacID);
 
-  gridsize = gridInqSize(gridID);
   nlevel = zaxisInqSize(zaxisID);
   nhlev  = nlevel+1;
 
