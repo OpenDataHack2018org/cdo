@@ -42,7 +42,7 @@ void *Vertintml(void *argument)
   enum {ECHAM_MODE, WMO_MODE};
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
-  int gridsize, ngp;
+  int gridsize;
   int recID, nrecs;
   int i, k, offset;
   int tsID, varID, levelID;
@@ -86,8 +86,8 @@ void *Vertintml(void *argument)
   int ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
 
   int operatorID = cdoOperatorID();
-  int operfunc = cdoOperatorF1(operatorID);
-  int opertype = cdoOperatorF2(operatorID);
+  int operfunc   = cdoOperatorF1(operatorID);
+  int opertype   = cdoOperatorF2(operatorID);
 
   if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {
@@ -123,7 +123,7 @@ void *Vertintml(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngp = vlist_inq_gridsize(vlistID1);
+  gridsize = vlist_check_gridsize(vlistID1);
 
   if ( operfunc == func_hl )
     zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
@@ -287,12 +287,12 @@ void *Vertintml(void *argument)
 	}
     }
 
-  if ( zaxisIDh != -1 && ngp > 0 )
+  if ( zaxisIDh != -1 && gridsize > 0 )
     {
-      vert_index = (int*) malloc(ngp*nplev*sizeof(int));
-      ps_prog    = (double*) malloc(ngp*sizeof(double));
-      full_press = (double*) malloc(ngp*nhlevf*sizeof(double));
-      half_press = (double*) malloc(ngp*nhlevh*sizeof(double));
+      vert_index = (int*) malloc(gridsize*nplev*sizeof(int));
+      ps_prog    = (double*) malloc(gridsize*sizeof(double));
+      full_press = (double*) malloc(gridsize*nhlevf*sizeof(double));
+      half_press = (double*) malloc(gridsize*nhlevh*sizeof(double));
     }
   else
     cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
@@ -329,7 +329,7 @@ void *Vertintml(void *argument)
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
+      // gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
       instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
@@ -450,7 +450,7 @@ void *Vertintml(void *argument)
 
   if ( zaxisIDh != -1 && sgeopot_needed )
     {
-      sgeopot = (double*) malloc(ngp*sizeof(double));
+      sgeopot = (double*) malloc(gridsize*sizeof(double));
       if ( sgeopotID == -1 )
 	{
 	  if ( geopotID == -1 )
@@ -458,7 +458,7 @@ void *Vertintml(void *argument)
 	  else
 	    cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
 
-	  memset(sgeopot, 0, ngp*sizeof(double));
+	  memset(sgeopot, 0, gridsize*sizeof(double));
 	}
     }
 
@@ -498,7 +498,7 @@ void *Vertintml(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  //gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	  nlevel   = zaxisInqSize(zaxisID);
 	  /*
@@ -520,51 +520,51 @@ void *Vertintml(void *argument)
 	  if ( sgeopot_needed )
 	    {
 	      if ( sgeopotID != -1 )
-		memcpy(sgeopot, vardata1[sgeopotID], ngp*sizeof(double));
+		memcpy(sgeopot, vardata1[sgeopotID], gridsize*sizeof(double));
 	      else if ( geopotID != -1 )
-		memcpy(sgeopot, vardata1[geopotID]+ngp*(nhlevf-1), ngp*sizeof(double));
+		memcpy(sgeopot, vardata1[geopotID]+gridsize*(nhlevf-1), gridsize*sizeof(double));
 
 	      /* check range of surface geopot */
 	      if ( sgeopotID != -1 || geopotID != -1 )
 		{
-		  minmaxval(ngp, sgeopot, NULL, &minval, &maxval);
+		  minmaxval(gridsize, sgeopot, NULL, &minval, &maxval);
 		  if ( minval < MIN_FIS || maxval > MAX_FIS )
 		    cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
-		  if ( ngp > 1 && minval >= 0 && maxval <= 9000 )
+		  if ( gridsize > 1 && minval >= 0 && maxval <= 9000 )
 		    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
 		}
 	    }
 
 	  if ( lnpsID != -1 )
-	    for ( i = 0; i < ngp; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
+	    for ( i = 0; i < gridsize; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
 	  else if ( psID != -1 )
-	    memcpy(ps_prog, vardata1[psID], ngp*sizeof(double));
+	    memcpy(ps_prog, vardata1[psID], gridsize*sizeof(double));
 
 	  /* check range of ps_prog */
-	  minmaxval(ngp, ps_prog, NULL, &minval, &maxval);
+	  minmaxval(gridsize, ps_prog, NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 
-	  presh(full_press, half_press, vct, ps_prog, nhlevf, ngp);
+	  presh(full_press, half_press, vct, ps_prog, nhlevf, gridsize);
 
 	  if ( opertype == type_log )
 	    {
-	      for ( i = 0; i < ngp; i++ ) ps_prog[i] = log(ps_prog[i]);
+	      for ( i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
 
 	      for ( k = 0; k < nhlevh; k++ )
-		for ( i = 0; i < ngp; i++ )
-		  half_press[k*ngp+i] = log(half_press[k*ngp+i]);
+		for ( i = 0; i < gridsize; i++ )
+		  half_press[k*gridsize+i] = log(half_press[k*gridsize+i]);
 
 	      for ( k = 0; k < nhlevf; k++ )
-		for ( i = 0; i < ngp; i++ )
-		  full_press[k*ngp+i] = log(full_press[k*ngp+i]);
+		for ( i = 0; i < gridsize; i++ )
+		  full_press[k*gridsize+i] = log(full_press[k*gridsize+i]);
 	    }
 
-	  genind(vert_index, plev, full_press, ngp, nplev, nhlevf);
+	  genind(vert_index, plev, full_press, gridsize, nplev, nhlevf);
 
 	  if ( Extrapolate == 0 )
-	    genindmiss(vert_index, plev, ngp, nplev, ps_prog, pnmiss);
+	    genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -574,7 +574,7 @@ void *Vertintml(void *argument)
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	      missval  = vlistInqVarMissval(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
+	      //gridsize = gridInqSize(gridID);
 	      nlevel   = zaxisInqSize(zaxisID);
 	      if ( varinterp[varID] )
 		{
@@ -626,21 +626,21 @@ void *Vertintml(void *argument)
 
 		      interp_T(sgeopot, vardata1[varID], vardata2[varID],
 			       full_press, half_press, vert_index,
-			       plev, nplev, ngp, nlevel, missval);
+			       plev, nplev, gridsize, nlevel, missval);
 		    }
 		  else if ( varID == gheightID )
 		    {
-		      for ( i = 0; i < ngp; ++i )
-			vardata1[varID][ngp*nlevel+i] = sgeopot[i]/C_EARTH_GRAV;
+		      for ( i = 0; i < gridsize; ++i )
+			vardata1[varID][gridsize*nlevel+i] = sgeopot[i]/C_EARTH_GRAV;
 
 		      interp_Z(sgeopot, vardata1[varID], vardata2[varID],
 			       full_press, half_press, vert_index, vardata1[tempID],
-			       plev, nplev, ngp, nlevel, missval);
+			       plev, nplev, gridsize, nlevel, missval);
 		    }
 		  else
 		    {
 		      interp_X(vardata1[varID], vardata2[varID], hyb_press,
-			       vert_index, plev, nplev, ngp, nlevel, missval);
+			       vert_index, plev, nplev, gridsize, nlevel, missval);
 		    }
 		  
 		  if ( Extrapolate == 0 )
@@ -656,7 +656,7 @@ void *Vertintml(void *argument)
 	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		  //gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 		  offset   = gridsize*levelID;
 		  single2  = vardata2[varID] + offset;
 		  streamDefRecord(streamID2, varID, levelID);

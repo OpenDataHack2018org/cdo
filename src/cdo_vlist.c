@@ -319,7 +319,7 @@ int vlistInqNWPV(int vlistID, int varID)
 }
 
 
-int vlist_inq_gridsize(int vlistID)
+int vlist_check_gridsize(int vlistID)
 {
   int lerror = FALSE;
   int ngrids = vlistNgrids(vlistID);

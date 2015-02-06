@@ -183,7 +183,7 @@ int     cdoDefineZaxis(const char *zaxisfile);
 
 int     vlistInqNWPV(int vlistID, int varID);
 int     vlistIsSzipped(int vlistID);
-int     vlist_inq_gridsize(int vlistID);
+int     vlist_check_gridsize(int vlistID);
 
 
 void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname);
