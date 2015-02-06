@@ -35,18 +35,19 @@
 
 #define  C_EARTH_GRAV    (9.80665)
 
+
 void *Vertintml(void *argument)
 {
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
-  int gridsize, ngp = 0;
+  int gridsize, ngp;
   int recID, nrecs;
   int i, k, offset;
   int tsID, varID, levelID;
   int zaxisIDp, zaxisIDh = -1, nzaxis;
-  int ngrids, gridID, zaxisID;
+  int gridID, zaxisID;
   int nplev, nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
   int nvct;
@@ -122,27 +123,7 @@ void *Vertintml(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids  = vlistNgrids(vlistID1);
-  for ( i = 0; i < ngrids; i++ )
-    {
-      gridID = vlistGrid(vlistID1, i);
-      if ( gridInqType(gridID) != GRID_SPECTRAL )
-	{
-	  ngp = gridInqSize(gridID);
-	  break;
-	}
-    }
-
-  /* check gridsize */
-  for ( i = 0; i < ngrids; i++ )
-    {
-      gridID = vlistGrid(vlistID1, i);
-      if ( gridInqType(gridID) != GRID_SPECTRAL )
-	{
-	  if ( ngp != gridInqSize(gridID) )
-	    cdoAbort("Grids have different size!");
-	}
-    }
+  ngp = vlist_inq_gridsize(vlistID1);
 
   if ( operfunc == func_hl )
     zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);

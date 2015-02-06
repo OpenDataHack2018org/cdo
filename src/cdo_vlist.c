@@ -317,3 +317,37 @@ int vlistInqNWPV(int vlistID, int varID)
 
   return (nwpv);
 }
+
+
+int vlist_inq_gridsize(int vlistID)
+{
+  int lerror = FALSE;
+  int ngrids = vlistNgrids(vlistID);
+  int gridID = vlistGrid(vlistID, 0);
+  int ngp    = gridInqSize(gridID);
+
+  /* check gridsize */
+  for ( int index = 0; index < ngrids; ++index )
+    {
+      gridID = vlistGrid(vlistID, index);
+      if ( ngp != gridInqSize(gridID) )
+	{
+	  lerror = TRUE;
+	  break;
+	}
+    }
+
+  if ( lerror )
+    {
+      cdoPrint("This operator requires all variables on the same horizontal grid.");
+      cdoPrint("Horizontal grids found:");
+      for ( int index = 0; index < ngrids; ++index )
+	{
+	  gridID = vlistGrid(vlistID, index);
+	  cdoPrint("  grid=%d  type=%s  points=%d", index+1, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID));
+	}
+      cdoAbort("The input stream contains variables on different horizontal grids!");
+    }
+
+  return ngp;
+}
