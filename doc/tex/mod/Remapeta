@@ -31,7 +31,7 @@ But in the free atmosphere above a certain n (n=0.8 defining the top of the PBL)
 is done linearly. After the interpolation both profiles are merged. With the resulting 
 temperature/pressure correction the hydrostatic equation is integrated again and adjusted to the 
 reference level finding the final surface pressure correction. A more detailed description of
-the interpolation can be found in @cite{INTERA}. All input fields have to be on the same horizontal grid.
+the interpolation can be found in @cite{INTERA}. This operator requires all variables on the same horizontal grid.
 @EndDescription
 @EndModule
 
