@@ -2,6 +2,9 @@ CLEANFILES =
 
 export
 
+# COLOR ALWAYS also if no color capable terminal detected
+#     this is needed i.e. to run the tests via a oneline ssh cmd:
+#     ssh host '... make check'
 AM_COLOR_TESTS=always
 
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
