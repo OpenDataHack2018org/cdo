@@ -164,11 +164,10 @@ void *Rhopot(void *argument)
   int nrecs;
   int tsID, recID, varID, levelID;
   int nlevel1, nlevel2;
-  int gridsize;
-  int nvars, code, gridID, zaxisID;
+  int nvars, code, zaxisID;
   int vlistID1, vlistID2;
   int offset;
-  int ngrids, nlevel;
+  int nlevel;
   int i;
   int nmiss;
   int toID = -1, saoID = -1, thoID = -1;
@@ -191,8 +190,6 @@ void *Rhopot(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID  = vlistInqVarGrid(vlistID1, varID);
-
       code = vlistInqVarCode(vlistID1, varID);
 
       if ( code <= 0 )
@@ -226,17 +223,8 @@ void *Rhopot(void *argument)
     }
   if ( toID  == -1 ) cdoAbort("In-situ temperature not found!");
 
-  ngrids = vlistNgrids(vlistID1);
-  gridID = vlistGrid(vlistID1, 0);
-  gridsize = gridInqSize(gridID);
-
-  /* check gridsize */
-  for ( i = 1; i < ngrids; i++ )
-    {
-      gridID = vlistGrid(vlistID1, i);
-      if ( gridsize != gridInqSize(gridID) )
-	cdoAbort("Grids have different size!");
-    }
+  int gridID = vlistGrid(vlistID1, 0);
+  int gridsize = vlist_check_gridsize(vlistID1);
 
   zaxisID = vlistInqVarZaxis(vlistID1, saoID);
   nlevel1 = zaxisInqSize(zaxisID);
