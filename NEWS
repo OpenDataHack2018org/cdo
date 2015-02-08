@@ -1,8 +1,10 @@
 CDO NEWS
 --------
 
-Version 1.6.8 (12 February 2015):
+Version 1.6.8 (12 March 2015):
 
+   New features:
+     * select: added wildcard support for parameter name
    New operators:
      * splityearmon: Split in years and months
      * yseasadd: Add multi-year seasonal time series
@@ -18,6 +20,7 @@ Version 1.6.8 (12 February 2015):
        the outout time stamp to the last contributing timestep.
 
    Fixed bugs:
+     * grib2 output: segfaults when writing grib2 files [Bug #5351]
      * remapnn: Segmentation fault for extrapolation of regular 2D source grids [Bug #5448]
 
 Version 1.6.7 (12 December 2014):
