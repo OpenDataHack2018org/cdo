@@ -296,11 +296,8 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   get_restrict_add(src_grid, plat, src_bin_add, &min_add, &max_add);
 
   /* Initialize distance and address arrays */
-  for ( n = 0; n < num_neighbors; ++n )
-    {
-      nbr_add[n]  = -1;
-      nbr_dist[n] = BIGNUM;
-    }
+  for ( n = 0; n < num_neighbors; ++n ) nbr_add[n]  = -1;
+  for ( n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
 
   int i, ndist = max_add - min_add + 1;
 
@@ -331,6 +328,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   ndist = j;
 
 #if defined(_OPENMP) && _OPENMP >= OPENMP4
+  //#pragma omp simd aligned(dist:16)
 #pragma omp simd
 #endif
   for ( j = 0; j < ndist; ++j )

@@ -75,7 +75,7 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O3 -vec-report2 -march=native -openmp -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O3 -qopt-report=5 -march=native -openmp -fp-model source -fast-transcendentals"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -104,7 +104,7 @@ case "${HOSTNAME}" in
                     --enable-all-static \
                     --with-fftw3 \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O3 -vec-report2 -march=native -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O3 -qopt-report=5 -march=native -fp-model source -fast-transcendentals"
         elif  test "$COMP" = pgcc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --enable-all-static \
@@ -126,7 +126,7 @@ case "${HOSTNAME}" in
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O3 -vec-report2 -march=native -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O3 -qopt-report=5 -march=native -fp-model source -fast-transcendentals"
 	else
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
