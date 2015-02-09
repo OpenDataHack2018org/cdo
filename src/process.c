@@ -631,10 +631,6 @@ int expand_wildcards(int processID, int streamCnt)
             }
           
           Process[processID].streamCnt = streamCnt;
-          /*
-          for ( i = 0; i < Process[processID].streamCnt; ++i )
-            printf("expand_wildcards: ostream %d <%s>\n", i+1, Process[processID].streamNames[i].args);
-          */
         }
 
       free(glob_arg);
