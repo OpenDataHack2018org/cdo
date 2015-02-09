@@ -34,6 +34,45 @@
 #include "pstream.h"
 
 
+#define IS_SURFACE_LEVEL(zaxisID)  (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
+
+static
+int getSurfaceID(int vlistID)
+{
+  int surfID = -1;
+  int zaxisID;
+  int nzaxis = vlistNzaxis(vlistID);
+
+  for ( int index = 0; index < nzaxis; ++index )
+    {
+      zaxisID = vlistZaxis(vlistID, index);
+      if ( IS_SURFACE_LEVEL(zaxisID) )
+	{
+	  surfID = vlistZaxis(vlistID, index);
+	  break;
+	}
+    }
+
+  if ( surfID == -1 ) surfID = zaxisCreate(ZAXIS_SURFACE, 1);
+
+  return surfID;
+}
+
+static
+void setSurfaceID(int vlistID, int surfID)
+{
+  int zaxisID;
+  int nzaxis = vlistNzaxis(vlistID);
+
+  for ( int index = 0; index < nzaxis; ++index )
+    {
+      zaxisID = vlistZaxis(vlistID, index);
+      if ( zaxisID != surfID || !IS_SURFACE_LEVEL(zaxisID) )
+	vlistChangeZaxisIndex(vlistID, index, surfID);
+    }
+}
+
+
 void *Vertstat(void *argument)
 {
   int recID, nrecs;
@@ -45,13 +84,23 @@ void *Vertstat(void *argument)
   field_t *vars1 = NULL, *vars2 = NULL, *samp1 = NULL;
   field_t field;
   int needWeights = FALSE;
+  typedef struct {
+    int zaxisID;
+    int numlevel;
+    int hasbounds;
+    double *levels;
+    double *lbounds;
+    double *ubounds;
+    double *weights;
+  }
+  vert_t;
 
   cdoInitialize(argument);
 
   cdoOperatorAdd("vertmin",  func_min,  0, NULL);
   cdoOperatorAdd("vertmax",  func_max,  0, NULL);
   cdoOperatorAdd("vertsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("vertint",  func_sum,  0, NULL);
+  int VERTINT = cdoOperatorAdd("vertint",  func_sum,  0, NULL);
   cdoOperatorAdd("vertmean", func_mean, 0, NULL);
   cdoOperatorAdd("vertavg",  func_avg,  0, NULL);
   cdoOperatorAdd("vertvar",  func_var,  0, NULL);
@@ -59,6 +108,8 @@ void *Vertstat(void *argument)
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
+
+  if ( operatorID == VERTINT ) needWeights = TRUE;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -76,11 +127,50 @@ void *Vertstat(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
-  int nzaxis  = vlistNzaxis(vlistID1);
-  for ( i = 0; i < nzaxis; i++ )
-    if ( zaxisInqSize(vlistZaxis(vlistID1, i)) > 1 )
-      vlistChangeZaxisIndex(vlistID2, i, zaxisID);
+  int surfID = getSurfaceID(vlistID1);
+  setSurfaceID(vlistID2, surfID);
+
+  int nzaxis = vlistNzaxis(vlistID1);
+  int nlev, zaxisID;
+  vert_t vert[nzaxis];
+  if ( needWeights )
+    {
+      for ( int index = 0; index < nzaxis; ++index )
+	{
+	  zaxisID = vlistZaxis(vlistID1, index);
+	  nlev = zaxisInqSize(zaxisID);
+	  vert[index].numlevel = 0;
+	  vert[index].zaxisID  = zaxisID;
+	  vert[index].hasbounds = FALSE;
+	  if ( nlev > 1 )
+	    {
+	      vert[index].numlevel = nlev;
+	      vert[index].levels  = (double *) malloc(nlev*sizeof(double));
+	      vert[index].lbounds = (double *) malloc(nlev*sizeof(double));
+	      vert[index].ubounds = (double *) malloc(nlev*sizeof(double));
+	      vert[index].weights = (double *) malloc(nlev*sizeof(double));
+	      zaxisInqLevels(zaxisID, vert[index].levels);
+	      if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
+		{
+		  vert[index].hasbounds = TRUE;
+		  zaxisInqLbounds(zaxisID, vert[index].lbounds);
+		  zaxisInqUbounds(zaxisID, vert[index].ubounds);  
+		}
+	    }
+	}
+      for ( int index = 0; index < nzaxis; ++index )
+	{
+	  nlev = vert[index].numlevel;
+	  if ( nlev > 1 )
+	    {
+	      printf("zaxisID=%d  nlev=%d\n", vert[index].zaxisID, nlev);
+	      printf("levels=");
+	      for ( i = 0; i < nlev; ++i )
+		printf("%g ", vert[index].levels[i]);
+	      printf("\n");
+	    }
+	}
+    }
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -238,6 +328,22 @@ void *Vertstat(void *argument)
   if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
   if ( field.ptr ) free(field.ptr);
+
+  if ( needWeights )
+    {
+      for ( int index = 0; index < nzaxis; ++index )
+	{
+	  nlev = vert[index].numlevel;
+	  if ( nlev > 1 )
+	    {
+	      free(vert[index].levels);
+	      free(vert[index].lbounds);
+	      free(vert[index].ubounds);
+	      free(vert[index].weights);
+	    }
+	}
+    }
+
 
   streamClose(streamID2);
   streamClose(streamID1);
