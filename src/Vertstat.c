@@ -36,62 +36,57 @@
 
 void *Vertstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
-  int gridsize;
   int recID, nrecs;
   int gridID;
   int i;
-  int tsID, varID, levelID;
-  int nmiss, nvars;
-  int zaxisID, nzaxis;
+  int varID, levelID;
+  int nmiss;
   double missval;
   field_t *vars1 = NULL, *vars2 = NULL, *samp1 = NULL;
   field_t field;
-  int taxisID1, taxisID2;
+  int needWeights = FALSE;
 
   cdoInitialize(argument);
 
   cdoOperatorAdd("vertmin",  func_min,  0, NULL);
   cdoOperatorAdd("vertmax",  func_max,  0, NULL);
   cdoOperatorAdd("vertsum",  func_sum,  0, NULL);
+  cdoOperatorAdd("vertint",  func_sum,  0, NULL);
   cdoOperatorAdd("vertmean", func_mean, 0, NULL);
   cdoOperatorAdd("vertavg",  func_avg,  0, NULL);
   cdoOperatorAdd("vertvar",  func_var,  0, NULL);
   cdoOperatorAdd("vertstd",  func_std,  0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc   = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
   vlistClearFlag(vlistID1);
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
-  nzaxis  = vlistNzaxis(vlistID1);
+  int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+  int nzaxis  = vlistNzaxis(vlistID1);
   for ( i = 0; i < nzaxis; i++ )
     if ( zaxisInqSize(vlistZaxis(vlistID1, i)) > 1 )
       vlistChangeZaxisIndex(vlistID2, i, zaxisID);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
@@ -128,7 +123,7 @@ void *Vertstat(void *argument)
 	}
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
