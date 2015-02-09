@@ -64,6 +64,7 @@ AC_CHECK_HEADERS(sys/resource.h)
 AC_CHECK_HEADERS(sys/times.h)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(glob.h)
+AC_CHECK_HEADERS(wordexp.h)
 #  ----------------------------------------------------------------------
 # Checks for the availability of functions
 AC_CHECK_FUNCS(mallinfo)

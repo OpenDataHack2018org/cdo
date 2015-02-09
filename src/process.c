@@ -29,6 +29,9 @@
 #if defined(HAVE_GLOB_H)
 #include <glob.h>
 #endif
+#if defined(HAVE_WORDEXP_H)
+#include <wordexp.h>
+#endif
 
 #include "cdo.h"
 #include "cdo_int.h"
@@ -337,33 +340,36 @@ int get_glob_flags(void)
   return (glob_flags);
 }
 
-/* Convert a wildcard pattern into a list of blank-separated filenames which match the wildcard. */
+/* Convert a shell pattern into a list of filenames. */
 static
-argument_t *glob_pattern(const char *restrict wildcard)
+argument_t *glob_pattern(const char *restrict string)
 {
   size_t cnt, length = 0;
-  int glob_flags = get_glob_flags();
-  glob_t glob_results;
+  int flags = WRDE_UNDEF;
   char **p;
+
+  wordexp_t glob_results;
   argument_t *argument = NULL;
 
-  glob(wildcard, glob_flags, 0, &glob_results);
+  // glob the input argument or do even more shell magic
+  wordexp(string, &glob_results, flags);
 
   /* How much space do we need?  */
-  for ( p = glob_results.gl_pathv, cnt = glob_results.gl_pathc; cnt; p++, cnt-- )
+  for ( p = glob_results.we_wordv, cnt = glob_results.we_wordc; cnt; p++, cnt-- )
     length += strlen(*p) + 1;
 
   /* Allocate the space and generate the list.  */
-  argument = argument_new(glob_results.gl_pathc, length);
+  argument = argument_new(glob_results.we_wordc, length);
 
-  for ( cnt = 0; cnt < glob_results.gl_pathc; cnt++ )
+  // put all generated filenames into the argument_t data structure
+  for ( cnt = 0; cnt < glob_results.we_wordc; cnt++ )
     {
-      argument->argv[cnt] = strdupx(glob_results.gl_pathv[cnt]);
-      strcat(argument->args, glob_results.gl_pathv[cnt]);
-      if ( cnt < glob_results.gl_pathc-1 ) strcat(argument->args, " ");
+      argument->argv[cnt] = strdupx(glob_results.we_wordv[cnt]);
+      strcat(argument->args, glob_results.we_wordv[cnt]);
+      if ( cnt < glob_results.we_wordc-1 ) strcat(argument->args, " ");
     }
 
-  globfree(&glob_results);
+  wordfree(&glob_results);
 
   return argument;
 }
@@ -602,44 +608,42 @@ int expand_wildcards(int processID, int streamCnt)
 {
   const char *streamname0 = Process[processID].streamNames[0].args;
 
-  if ( find_wildcard(streamname0, strlen(streamname0)) )
+#if defined(HAVE_WORDEXP_H)
+  argument_t *glob_arg = glob_pattern(streamname0);
+
+  if ( glob_arg->argc > 1 )
     {
-#if defined(HAVE_GLOB_H)
-      argument_t *glob_arg = glob_pattern(streamname0);
+      int i;
+      streamCnt = streamCnt - 1 + glob_arg->argc;
 
-      if ( strcmp(streamname0, glob_arg->args) != 0 )
-        {
-          int i;
-          streamCnt = streamCnt - 1 + glob_arg->argc;
+      free(Process[processID].streamNames[0].argv);
+      free(Process[processID].streamNames[0].args);
 
-          free(Process[processID].streamNames[0].argv);
-          free(Process[processID].streamNames[0].args);
-
-          Process[processID].streamNames = (argument_t*) realloc(Process[processID].streamNames, streamCnt*sizeof(argument_t));
-              
-          // move output streams to the end
-          for ( i = 1; i < Process[processID].streamCnt; ++i )
-            Process[processID].streamNames[i+glob_arg->argc-1] = Process[processID].streamNames[i];
-
-          for ( i = 0; i < glob_arg->argc; ++i )
-            {
-              Process[processID].streamNames[i].argv    = (char **) malloc(sizeof(char *));
-              Process[processID].streamNames[i].argc    = 1;
-              Process[processID].streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
-              Process[processID].streamNames[i].args    = strdupx(glob_arg->argv[i]);
-            }
+      Process[processID].streamNames = (argument_t*) realloc(Process[processID].streamNames, streamCnt*sizeof(argument_t));
           
-          Process[processID].streamCnt = streamCnt;
-        }
+      // move output streams to the end
+      for ( i = 1; i < Process[processID].streamCnt; ++i )
+        Process[processID].streamNames[i+glob_arg->argc-1] = Process[processID].streamNames[i];
 
-      free(glob_arg);
-#else
-      cdoAbort("Wildcards support not compiled in!");
-#endif
+      for ( i = 0; i < glob_arg->argc; ++i )
+        {
+          Process[processID].streamNames[i].argv    = (char **) malloc(sizeof(char *));
+          Process[processID].streamNames[i].argc    = 1;
+          Process[processID].streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
+          Process[processID].streamNames[i].args    = strdupx(glob_arg->argv[i]);
+        }
+      
+      Process[processID].streamCnt = streamCnt;
     }
+
+  free(glob_arg);
+#else
+  cdoAbort("Wildcards support not compiled in!");
+#endif
 
   return 1;
 }
+
 
 static
 int checkStreamCnt(void)
