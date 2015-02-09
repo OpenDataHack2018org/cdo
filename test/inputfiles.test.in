@@ -1,0 +1,45 @@
+#! @SHELL@
+
+# Checks whether cdo handles the inputargument right,
+# most of the operators accept only one input argument.
+# If you want to feed several inputfiles you can escape the files
+# to make them one argument.
+
+echo 1..4 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO='cdo'
+test -n "$DATAPATH" || DATAPATH=./data
+#
+IFILE1="$DATAPATH/*.grb"
+IFILE2="$DATAPATH/bathy4.grb"
+#IFILE3="$DATAPATH/grib_testfile01.grb $DATAPATH/bathy4.grb"
+CDOOUT=cout
+CDOERR=cerr
+#
+NTEST=1
+#
+for OPERATOR in info sinfo; do
+  for IFILE in "$IFILE1" "$IFILE2"; do
+    RSTAT=0
+    CDOTEST="$OPERATOR '$IFILE'"
+    echo "Running test: $NTEST"
+
+    ENABLED_TEST=yes
+
+    CDOCOMMAND="$CDO ${OPERATOR} '$IFILE'"
+    echo "$CDOCOMMAND"
+
+    eval $CDOCOMMAND  > $CDOOUT 2> $CDOERR
+    test $? -eq 0 || let RSTAT+=1
+    cat $CDOOUT $CDOERR
+ 
+    test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+    test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+ 
+    let NTEST+=1
+  done
+done
+#
+rm -f $CDOOUT $CDOERR
+#
+exit 0

@@ -12,7 +12,8 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 
 # tests which should pass
 TESTS = File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test \
-        Genweights.test Remap.test Select.test Spectral.test Timstat.test Vertint.test Arith.test
+        Genweights.test Remap.test Select.test Spectral.test Timstat.test Vertint.test Arith.test \
+        inputfiles.test
 
 # tests which should fail
 XFAIL_TESTS = 

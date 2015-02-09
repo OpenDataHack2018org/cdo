@@ -779,6 +779,7 @@ test/grid_search/tests.c -text
 test/grid_search/tests.h -text
 test/grid_search/utils.c -text
 test/grid_search/utils.h -text
+test/inputfiles.test.in -text
 test/testStreams.py -text
 test/test_Arith.py -text
 test/test_Arithc.py -text

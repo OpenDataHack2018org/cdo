@@ -21025,6 +21025,8 @@ ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timst
 
 ac_config_files="$ac_config_files test/Detrend.test test/Arith.test"
 
+ac_config_files="$ac_config_files test/inputfiles.test"
+
 ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings"
 
 cat >confcache <<\_ACEOF
@@ -22188,6 +22190,7 @@ do
     "test/Vertint.test") CONFIG_FILES="$CONFIG_FILES test/Vertint.test" ;;
     "test/Detrend.test") CONFIG_FILES="$CONFIG_FILES test/Detrend.test" ;;
     "test/Arith.test") CONFIG_FILES="$CONFIG_FILES test/Arith.test" ;;
+    "test/inputfiles.test") CONFIG_FILES="$CONFIG_FILES test/inputfiles.test" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "contrib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;
@@ -23694,6 +23697,7 @@ _LT_EOF
     "test/Vertint.test":F) chmod a+x "$ac_file" ;;
     "test/Detrend.test":F) chmod a+x "$ac_file" ;;
     "test/Arith.test":F) chmod a+x "$ac_file" ;;
+    "test/inputfiles.test":F) chmod a+x "$ac_file" ;;
 
   esac
 done # for ac_tag

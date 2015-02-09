@@ -623,7 +623,6 @@ int expand_wildcards(int processID, int streamCnt)
 
           for ( i = 0; i < glob_arg->argc; ++i )
             {
-              // printf("add %d %s\n", i, glob_arg->argv[i]);
               Process[processID].streamNames[i].argv    = (char **) malloc(sizeof(char *));
               Process[processID].streamNames[i].argc    = 1;
               Process[processID].streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
