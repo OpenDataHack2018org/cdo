@@ -611,7 +611,10 @@ int expand_wildcards(int processID, int streamCnt)
 #if defined(HAVE_WORDEXP_H)
   argument_t *glob_arg = glob_pattern(streamname0);
 
-  if ( glob_arg->argc > 1 )
+  // skip if the input argument starts with an operator (starts with -)
+  // otherwise adapt streams if there are several files (>1)
+  // in case of one filename skip, no adaption needed
+  if ( glob_arg->argc > 1 && glob_arg->argv[0][0] != '-' )
     {
       int i;
       streamCnt = streamCnt - 1 + glob_arg->argc;
