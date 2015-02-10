@@ -72,6 +72,59 @@ void setSurfaceID(int vlistID, int surfID)
     }
 }
 
+static
+void getLayerThickness(int zaxisID, int nlev, double *weights)
+{
+  int i;
+  double *levels  = (double *) malloc(nlev*sizeof(double));
+  double *lbounds = (double *) malloc(nlev*sizeof(double));
+  double *ubounds = (double *) malloc(nlev*sizeof(double));
+
+  zaxisInqLevels(zaxisID, levels);
+  if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
+    {
+      zaxisInqLbounds(zaxisID, lbounds);
+      zaxisInqUbounds(zaxisID, ubounds);  
+    }
+  else
+    {
+      lbounds[0] = levels[0];
+      ubounds[nlev-1] = levels[nlev-1];
+      for ( i = 0; i < nlev-1; ++i )
+	{
+	  double bound = 0.5*(levels[i] + levels[i+1]);
+	  lbounds[i+1] = bound;
+	  ubounds[i]   = bound;
+	}		  
+    }
+
+  for ( i = 0; i < nlev; ++i ) weights[i] = fabs(ubounds[i]-lbounds[i]);
+
+  double wsum = 0;
+  for ( i = 0; i < nlev; ++i ) wsum += weights[i];
+  /*
+    for ( i = 0; i < nlev; ++i ) weights[i] /= wsum;
+  */
+
+  if ( cdoVerbose )
+    {
+      printf("zaxisID=%d  nlev=%d\n", zaxisID, nlev);
+      printf("levels=");
+      for ( i = 0; i < nlev; ++i ) printf("%g ", levels[i]);
+      printf("\n");
+      printf("bounds=");
+      for ( i = 0; i < nlev; ++i ) printf("%g/%g ", lbounds[i], ubounds[i]);
+      printf("\n");
+      printf("weights=");
+      for ( i = 0; i < nlev; ++i ) printf("%g ", weights[i]);
+      printf("\n");
+      printf("weight sum: %g\n", wsum);
+    }
+
+  free(levels);
+  free(lbounds);
+  free(ubounds);
+}
 
 void *Vertstat(void *argument)
 {
@@ -87,24 +140,20 @@ void *Vertstat(void *argument)
   typedef struct {
     int zaxisID;
     int numlevel;
-    int hasbounds;
-    double *levels;
-    double *lbounds;
-    double *ubounds;
     double *weights;
   }
   vert_t;
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("vertmin",  func_min,  0, NULL);
-  cdoOperatorAdd("vertmax",  func_max,  0, NULL);
-  cdoOperatorAdd("vertsum",  func_sum,  0, NULL);
+                cdoOperatorAdd("vertmin",  func_min,  0, NULL);
+                cdoOperatorAdd("vertmax",  func_max,  0, NULL);
+                cdoOperatorAdd("vertsum",  func_sum,  0, NULL);
   int VERTINT = cdoOperatorAdd("vertint",  func_sum,  0, NULL);
-  cdoOperatorAdd("vertmean", func_mean, 0, NULL);
-  cdoOperatorAdd("vertavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("vertvar",  func_var,  0, NULL);
-  cdoOperatorAdd("vertstd",  func_std,  0, NULL);
+                cdoOperatorAdd("vertmean", func_mean, 0, NULL);
+                cdoOperatorAdd("vertavg",  func_avg,  0, NULL);
+                cdoOperatorAdd("vertvar",  func_var,  0, NULL);
+                cdoOperatorAdd("vertstd",  func_std,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
@@ -141,33 +190,11 @@ void *Vertstat(void *argument)
 	  nlev = zaxisInqSize(zaxisID);
 	  vert[index].numlevel = 0;
 	  vert[index].zaxisID  = zaxisID;
-	  vert[index].hasbounds = FALSE;
 	  if ( nlev > 1 )
 	    {
 	      vert[index].numlevel = nlev;
-	      vert[index].levels  = (double *) malloc(nlev*sizeof(double));
-	      vert[index].lbounds = (double *) malloc(nlev*sizeof(double));
-	      vert[index].ubounds = (double *) malloc(nlev*sizeof(double));
 	      vert[index].weights = (double *) malloc(nlev*sizeof(double));
-	      zaxisInqLevels(zaxisID, vert[index].levels);
-	      if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
-		{
-		  vert[index].hasbounds = TRUE;
-		  zaxisInqLbounds(zaxisID, vert[index].lbounds);
-		  zaxisInqUbounds(zaxisID, vert[index].ubounds);  
-		}
-	    }
-	}
-      for ( int index = 0; index < nzaxis; ++index )
-	{
-	  nlev = vert[index].numlevel;
-	  if ( nlev > 1 )
-	    {
-	      printf("zaxisID=%d  nlev=%d\n", vert[index].zaxisID, nlev);
-	      printf("levels=");
-	      for ( i = 0; i < nlev; ++i )
-		printf("%g ", vert[index].levels[i]);
-	      printf("\n");
+	      getLayerThickness(zaxisID, nlev, vert[index].weights); 
 	    }
 	}
     }
@@ -190,11 +217,13 @@ void *Vertstat(void *argument)
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
       gridsize = gridInqSize(gridID);
+      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
       missval  = vlistInqVarMissval(vlistID1, varID);
 
       field_init(&vars1[varID]);
       field_init(&samp1[varID]);
       vars1[varID].grid    = gridID;
+      vars1[varID].zaxis   = zaxisID;
       vars1[varID].nsamp   = 0;
       vars1[varID].nmiss   = 0;
       vars1[varID].missval = missval;
@@ -223,12 +252,26 @@ void *Vertstat(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
+
           vars1[varID].nsamp++;
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  gridsize = gridInqSize(vars1[varID].grid);
+	  zaxisID = vars1[varID].zaxis;
+
+	  double vweight = 1.e30;
+	  if ( operatorID == VERTINT && !IS_SURFACE_LEVEL(zaxisID) )
+	    for ( int index = 0; index < nzaxis; ++index )
+	      if ( vert[index].zaxisID == zaxisID )
+		{
+		  vweight = vert[index].weights[levelID];
+		  break;
+		}
+
 	  if ( levelID == 0 )
 	    {
 	      streamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
 	      vars1[varID].nmiss = nmiss;
+
+	      if ( vweight < 1.e30 ) farcmul(&vars1[varID], vweight);
 
 	      if ( operfunc == func_std || operfunc == func_var )
 		farmoq(&vars2[varID], vars1[varID]);
@@ -250,6 +293,8 @@ void *Vertstat(void *argument)
 	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
 	      field.grid    = vars1[varID].grid;
 	      field.missval = vars1[varID].missval;
+
+	      if ( vweight < 1.e30 ) farcmul(&field, vweight);
 
 	      if ( field.nmiss > 0 || samp1[varID].ptr )
 		{
@@ -330,20 +375,8 @@ void *Vertstat(void *argument)
   if ( field.ptr ) free(field.ptr);
 
   if ( needWeights )
-    {
-      for ( int index = 0; index < nzaxis; ++index )
-	{
-	  nlev = vert[index].numlevel;
-	  if ( nlev > 1 )
-	    {
-	      free(vert[index].levels);
-	      free(vert[index].lbounds);
-	      free(vert[index].ubounds);
-	      free(vert[index].weights);
-	    }
-	}
-    }
-
+    for ( int index = 0; index < nzaxis; ++index )
+      if ( vert[index].numlevel > 1 )  free(vert[index].weights);
 
   streamClose(streamID2);
   streamClose(streamID1);
