@@ -24,9 +24,14 @@ int get_alignment(double *ptr)
 int main(void)
 {
   int nelem = 97;
+  double *array1, *array2;
 
-  double *array1 = (double *) malloc(nelem*sizeof(double));
-  double *array2 = (double *) malloc(nelem*sizeof(double));
+  malloc(nelem*sizeof(double));
+  //array1 = (double *) malloc(nelem*sizeof(double));
+  posix_memalign(&array1, 32, nelem*sizeof(double));
+  malloc(nelem*sizeof(double));
+  //array2 = (double *) malloc(nelem*sizeof(double));
+  posix_memalign(&array2, 32, nelem*sizeof(double));
 
   printf("mem alignment: %d %d\n", get_alignment(array1), get_alignment(array2));
 
