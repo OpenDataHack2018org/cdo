@@ -9,14 +9,12 @@
 
 @BeginDescription
 This operator writes a certain percentile of each day of year in @file{ifile1} to @file{ofile}.
-The algorithm uses histograms with minimum and maximum bounds given in
-@file{ifile2} and @file{ifile3}, respectively. The default number of
-histogram bins is 101. The default can be overridden by setting the
-environment variable @env{CDO_PCTL_NBINS} to a different value. The files
-@file{ifile2} and @file{ifile3} should be the result of corresponding
-@mod{ydaymin} and @mod{ydaymax} operations, respectively.
-The date information in an output field is the date of the last
-contributing input field.
+The algorithm uses histograms with minimum and maximum bounds given in @file{ifile2} and
+@file{ifile3}, respectively. The default number of histogram bins is 101. The default can be
+overridden by setting the environment variable @env{CDO_PCTL_NBINS} to a different value.
+The files @file{ifile2} and @file{ifile3} should be the result of corresponding @mod{ydaymin} and
+@mod{ydaymax} operations, respectively.
+The date information in an output field is the date of the last contributing input field.
 @EndModule
 
 
