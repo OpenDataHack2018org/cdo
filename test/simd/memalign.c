@@ -1,3 +1,4 @@
+// aligned access gives 3-5% speedup
 // icc -std=c99 -O2 -xCORE-AVX2 -qopt-report=5 -openmp memalign.c fun.c
 // gcc -std=c99 -O3 -march=native -ftree-vectorize -fdump-tree-vect-blocks -fopt-info-optimized -fopenmp memalign.c fun.c
 

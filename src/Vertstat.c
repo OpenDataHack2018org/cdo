@@ -21,6 +21,7 @@
       Vertstat   vertmin         Vertical minimum
       Vertstat   vertmax         Vertical maximum
       Vertstat   vertsum         Vertical sum
+      Vertstat   vertint         Vertical integral
       Vertstat   vertmean        Vertical mean
       Vertstat   vertavg         Vertical average
       Vertstat   vertvar         Vertical variance
@@ -73,12 +74,13 @@ void setSurfaceID(int vlistID, int surfID)
 }
 
 static
-void getLayerThickness(int zaxisID, int nlev, double *weights)
+void getLayerThickness(int index, int zaxisID, int nlev, double *weights)
 {
   int i;
-  double *levels  = (double *) malloc(nlev*sizeof(double));
-  double *lbounds = (double *) malloc(nlev*sizeof(double));
-  double *ubounds = (double *) malloc(nlev*sizeof(double));
+  double *levels    = (double *) malloc(nlev*sizeof(double));
+  double *lbounds   = (double *) malloc(nlev*sizeof(double));
+  double *ubounds   = (double *) malloc(nlev*sizeof(double));
+  double *thickness = (double *) malloc(nlev*sizeof(double));
 
   zaxisInqLevels(zaxisID, levels);
   if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
@@ -88,7 +90,7 @@ void getLayerThickness(int zaxisID, int nlev, double *weights)
     }
   else
     {
-      lbounds[0] = levels[0];
+      lbounds[0]      = levels[0];
       ubounds[nlev-1] = levels[nlev-1];
       for ( i = 0; i < nlev-1; ++i )
 	{
@@ -98,32 +100,29 @@ void getLayerThickness(int zaxisID, int nlev, double *weights)
 	}		  
     }
 
-  for ( i = 0; i < nlev; ++i ) weights[i] = fabs(ubounds[i]-lbounds[i]);
+  for ( i = 0; i < nlev; ++i ) thickness[i] = fabs(ubounds[i]-lbounds[i]);
 
+  for ( i = 0; i < nlev; ++i ) weights[i] = thickness[i];
+  
   double wsum = 0;
   for ( i = 0; i < nlev; ++i ) wsum += weights[i];
+
   /*
     for ( i = 0; i < nlev; ++i ) weights[i] /= wsum;
   */
 
   if ( cdoVerbose )
     {
-      printf("zaxisID=%d  nlev=%d\n", zaxisID, nlev);
-      printf("levels=");
-      for ( i = 0; i < nlev; ++i ) printf("%g ", levels[i]);
-      printf("\n");
-      printf("bounds=");
-      for ( i = 0; i < nlev; ++i ) printf("%g/%g ", lbounds[i], ubounds[i]);
-      printf("\n");
-      printf("weights=");
-      for ( i = 0; i < nlev; ++i ) printf("%g ", weights[i]);
-      printf("\n");
-      printf("weight sum: %g\n", wsum);
+      cdoPrint("zaxisID=%d  nlev=%d  weightsum=%g", index, nlev, wsum);
+      printf("    level     bounds   thickness  weight\n");
+      for ( i = 0; i < nlev; ++i )
+	printf("   %6g  %6g/%-6g  %6g  %6g\n", levels[i], lbounds[i], ubounds[i], thickness[i], weights[i]);
     }
 
   free(levels);
   free(lbounds);
   free(ubounds);
+  free(thickness);
 }
 
 void *Vertstat(void *argument)
@@ -190,11 +189,11 @@ void *Vertstat(void *argument)
 	  nlev = zaxisInqSize(zaxisID);
 	  vert[index].numlevel = 0;
 	  vert[index].zaxisID  = zaxisID;
-	  if ( nlev > 1 )
+	  // if ( nlev > 1 )
 	    {
 	      vert[index].numlevel = nlev;
 	      vert[index].weights = (double *) malloc(nlev*sizeof(double));
-	      getLayerThickness(zaxisID, nlev, vert[index].weights); 
+	      getLayerThickness(index, zaxisID, nlev, vert[index].weights); 
 	    }
 	}
     }
@@ -257,8 +256,9 @@ void *Vertstat(void *argument)
 	  gridsize = gridInqSize(vars1[varID].grid);
 	  zaxisID = vars1[varID].zaxis;
 
-	  double vweight = 1.e30;
-	  if ( operatorID == VERTINT && !IS_SURFACE_LEVEL(zaxisID) )
+	  double vweight = 1.0;
+	  //	  if ( operatorID == VERTINT && !IS_SURFACE_LEVEL(zaxisID) )
+	  if ( operatorID == VERTINT )
 	    for ( int index = 0; index < nzaxis; ++index )
 	      if ( vert[index].zaxisID == zaxisID )
 		{
@@ -271,7 +271,7 @@ void *Vertstat(void *argument)
 	      streamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
 	      vars1[varID].nmiss = nmiss;
 
-	      if ( vweight < 1.e30 ) farcmul(&vars1[varID], vweight);
+	      if ( operatorID == VERTINT && IS_NOT_EQUAL(vweight, 1.0) ) farcmul(&vars1[varID], vweight);
 
 	      if ( operfunc == func_std || operfunc == func_var )
 		farmoq(&vars2[varID], vars1[varID]);
