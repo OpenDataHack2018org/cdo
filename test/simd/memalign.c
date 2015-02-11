@@ -1,4 +1,4 @@
-// icc -std=c99 -O3 -march=native -qopt-report=5 -openmp memalign.c fun.c
+// icc -std=c99 -O2 -xCORE-AVX2 -qopt-report=5 -openmp memalign.c fun.c
 // gcc -std=c99 -O3 -march=native -ftree-vectorize -fdump-tree-vect-blocks -fopt-info-optimized -fopenmp memalign.c fun.c
 
 #ifndef _XOPEN_SOURCE
@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 void fun1(int nelem, double *restrict array1, double *restrict array2);
+void fun2(int nelem, double *restrict array1, double *restrict array2, double *restrict array3);
 
 void print_opt(void)
 {
@@ -71,9 +72,12 @@ int main(void)
 
   for ( int i = 0; i < nelem; ++i ) array1[i] = 0;
   for ( int i = 0; i < nelem; ++i ) array2[i] = 1;
-
+  /*
   for ( int i = 0; i < 200000000; ++i )
     fun1(nelem, array1, array2);
+  */
+  for ( int i = 0; i < 200000000; ++i )
+    fun2(nelem, array1, array2, array2);
 
   free(array1);
   free(array2);
