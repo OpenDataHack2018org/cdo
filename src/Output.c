@@ -106,7 +106,7 @@ void *Output(void *argument)
     {
       operatorInputArg("keys to print");
  
-      int npar     = operatorArgc();
+      int npar = operatorArgc();
       char **parnames = operatorArgv();
 
       if ( cdoVerbose )
