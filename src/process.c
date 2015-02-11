@@ -339,7 +339,9 @@ int get_glob_flags(void)
 
   return (glob_flags);
 }
+#endif
 
+#if defined(HAVE_WORDEXP_H)
 /* Convert a shell pattern into a list of filenames. */
 static
 argument_t *glob_pattern(const char *restrict string)
