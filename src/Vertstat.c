@@ -74,8 +74,9 @@ void setSurfaceID(int vlistID, int surfID)
 }
 
 static
-void getLayerThickness(int index, int zaxisID, int nlev, double *weights)
+int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *weights)
 {
+  int status = 0;
   int i;
   double *levels    = (double *) malloc(nlev*sizeof(double));
   double *lbounds   = (double *) malloc(nlev*sizeof(double));
@@ -85,11 +86,13 @@ void getLayerThickness(int index, int zaxisID, int nlev, double *weights)
   zaxisInqLevels(zaxisID, levels);
   if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
     {
+      status = 1;
       zaxisInqLbounds(zaxisID, lbounds);
-      zaxisInqUbounds(zaxisID, ubounds);  
+      zaxisInqUbounds(zaxisID, ubounds);
     }
-  else
+  else if ( genbounds )
     {
+      status = 2;
       lbounds[0]      = levels[0];
       ubounds[nlev-1] = levels[nlev-1];
       for ( i = 0; i < nlev-1; ++i )
@@ -99,7 +102,15 @@ void getLayerThickness(int index, int zaxisID, int nlev, double *weights)
 	  ubounds[i]   = bound;
 	}		  
     }
-
+  else
+    {
+      for ( i = 0; i < nlev; ++i )
+	{
+	  lbounds[i] = 0.;
+	  ubounds[i] = 1.;
+	}
+    }
+  
   for ( i = 0; i < nlev; ++i ) thickness[i] = fabs(ubounds[i]-lbounds[i]);
 
   for ( i = 0; i < nlev; ++i ) weights[i] = thickness[i];
@@ -114,16 +125,19 @@ void getLayerThickness(int index, int zaxisID, int nlev, double *weights)
   if ( cdoVerbose )
     {
       cdoPrint("zaxisID=%d  nlev=%d  weightsum=%g", index, nlev, wsum);
-      printf("    level     bounds   thickness  weight\n");
+      printf("         level     bounds   thickness  weight\n");
       for ( i = 0; i < nlev; ++i )
-	printf("   %6g  %6g/%-6g  %6g  %6g\n", levels[i], lbounds[i], ubounds[i], thickness[i], weights[i]);
+	printf("   %3d  %6g  %6g/%-6g  %6g  %6g\n", i+1, levels[i], lbounds[i], ubounds[i], thickness[i], weights[i]);
     }
 
   free(levels);
   free(lbounds);
   free(ubounds);
   free(thickness);
+
+  return status;
 }
+
 
 void *Vertstat(void *argument)
 {
@@ -138,6 +152,7 @@ void *Vertstat(void *argument)
   int needWeights = FALSE;
   typedef struct {
     int zaxisID;
+    int status;
     int numlevel;
     double *weights;
   }
@@ -183,17 +198,31 @@ void *Vertstat(void *argument)
   vert_t vert[nzaxis];
   if ( needWeights )
     {
+      int genbounds = FALSE;
+      int npar = operatorArgc();
+      if ( npar > 0 )
+	{
+	  char **parnames = operatorArgv();
+
+	  if ( cdoVerbose )
+	    for ( i = 0; i < npar; i++ )
+	      cdoPrint("key %d = %s", i+1, parnames[i]);
+
+	  if ( strcmp(parnames[0], "genbounds") == 0 ) genbounds = TRUE;
+	}
+      
       for ( int index = 0; index < nzaxis; ++index )
 	{
 	  zaxisID = vlistZaxis(vlistID1, index);
 	  nlev = zaxisInqSize(zaxisID);
 	  vert[index].numlevel = 0;
+	  vert[index].status   = 0;
 	  vert[index].zaxisID  = zaxisID;
 	  // if ( nlev > 1 )
 	    {
 	      vert[index].numlevel = nlev;
 	      vert[index].weights = (double *) malloc(nlev*sizeof(double));
-	      getLayerThickness(index, zaxisID, nlev, vert[index].weights); 
+	      vert[index].status = getLayerThickness(genbounds, index, zaxisID, nlev, vert[index].weights); 
 	    }
 	}
     }
@@ -259,12 +288,22 @@ void *Vertstat(void *argument)
 	  double vweight = 1.0;
 	  //	  if ( operatorID == VERTINT && !IS_SURFACE_LEVEL(zaxisID) )
 	  if ( operatorID == VERTINT )
-	    for ( int index = 0; index < nzaxis; ++index )
-	      if ( vert[index].zaxisID == zaxisID )
-		{
-		  vweight = vert[index].weights[levelID];
-		  break;
-		}
+	    {
+	      for ( int index = 0; index < nzaxis; ++index )
+		if ( vert[index].zaxisID == zaxisID )
+		  {
+		    vweight = vert[index].weights[levelID];
+		    
+		    if ( vert[index].status == 0 && tsID == 0 && levelID == 0 )
+		      {
+			char varname[CDI_MAX_NAME];
+			vlistInqVarName(vlistID1, varID, varname);
+			cdoWarning("Using constant vertical weights for variable %s!", varname);
+		      }
+
+		    break;
+		  }
+	    }
 
 	  if ( levelID == 0 )
 	    {

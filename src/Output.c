@@ -68,9 +68,7 @@ void *Output(void *argument)
   double missval;
   double lon, lat;
   char name[CDI_MAX_NAME];
-  int npar = 0;
   int year, month, day;
-  char **parnames = NULL;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
   int Keylen[]           = {      0,        8,      11,      4,      8,     6,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
@@ -108,8 +106,8 @@ void *Output(void *argument)
     {
       operatorInputArg("keys to print");
  
-      npar     = operatorArgc();
-      parnames = operatorArgv();
+      int npar     = operatorArgc();
+      char **parnames = operatorArgv();
 
       if ( cdoVerbose )
 	for ( i = 0; i < npar; i++ )
