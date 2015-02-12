@@ -642,9 +642,6 @@ int expand_wildcards(int processID, int streamCnt)
     }
 
   free(glob_arg);
-#else
-if ( find_wildcard(streamname0, strlen(streamname0)) )
-    cdoAbort("Wildcards support not compiled in (wordexp.h)!");
 #endif
 
   return 1;
