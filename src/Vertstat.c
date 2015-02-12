@@ -209,6 +209,7 @@ void *Vertstat(void *argument)
 	      cdoPrint("key %d = %s", i+1, parnames[i]);
 
 	  if ( strcmp(parnames[0], "genbounds") == 0 ) genbounds = TRUE;
+	  else cdoAbort("Parameter >%s< unsupported!", parnames[0]);
 	}
       
       for ( int index = 0; index < nzaxis; ++index )
