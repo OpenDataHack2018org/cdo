@@ -64,6 +64,18 @@ done
 # reg2d   0.7    1.6   1.0   202    143
 # curv     33     34   103   208    273
 #
+# result on pitpull: gcc 4.8.2 avx2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.7    1.4   0.8   175    106
+# curv     29     30    69   175    210
+#
+# result on pitbull: icc 15.0.1 avx2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.6    1.4   0.8   144     78
+# curv     23     24    67   144    154
+#
 # CDO 1.6.4 ----------------------------------------
 #
 # result on hama: gcc 4.9.1
