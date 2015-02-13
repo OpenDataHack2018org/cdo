@@ -18,8 +18,8 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
   if [ "$GRIDTYPE" != "regular" ]; then SETGRID="-setgridtype,$GRIDTYPE"; fi
   for GRID in $GRIDS; do
 # remaplaf: sort could give different results"
-    RMODS="bil bic dis con ycon"
-    if [ "$GRIDTYPE" = "unstructured" ]; then RMODS="dis con ycon"; fi
+    RMODS="bil bic con ycon"
+    if [ "$GRIDTYPE" = "unstructured" ]; then RMODS="con ycon"; fi
     for RMOD in $RMODS; do
       RSTAT=0
       OFILE=${GRID}_${RMOD}
