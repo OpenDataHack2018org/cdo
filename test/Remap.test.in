@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..26 # Number of tests to be executed.
+echo 1..20 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
