@@ -119,18 +119,20 @@ case "${HOSTNAME}" in
 	fi
 	;;
 # x86_64-unknown-linux-gnu
-    btlogin*)
-        CDOLIBS=""
-
+    btc*)
         if  test "$COMP" = icc ; then
           ${CONFPATH}configure --prefix=$HOME/local \
+                    --with-grib_api=/lustre/sw/rhel6-x64/grib_api/grib_api-1.13.0-intel15 \
+	            --with-netcdf=/lustre/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-intel15 \
+                    --with-hdf5=/lustre/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-intel15 \
                     --with-fftw3 \
-                    $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O3 -qopt-report=5 -march=native -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O3 -qopt-report=5 -xCORE-AVX2 -fp-model source -fast-transcendentals"
 	else
           ${CONFPATH}configure --prefix=$HOME/local \
+                    --with-grib_api=/lustre/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48 \
+	            --with-netcdf=/lustre/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-gcc48 \
+                    --with-hdf5=/lustre/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48 \
                     --with-fftw3 \
-                    $CDOLIBS \
                     CC=gcc CFLAGS='-g -Wall -O3 -march=native'
 	fi
 	;;
