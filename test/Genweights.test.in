@@ -1,5 +1,9 @@
 #! @SHELL@
+if [ "$USER" = "m214003" ]; then
+echo 1..32 # Number of tests to be executed.
+else
 echo 1..20 # Number of tests to be executed.
+fi
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -20,6 +24,7 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
 # remaplaf: sort could give different results"
     RMODS="bil bic con ycon"
     if [ "$GRIDTYPE" = "unstructured" ]; then RMODS="con ycon"; fi
+    if [ "$USER" = "m214003" ]; then RMODS="dis nn $RMODS"; fi
     for RMOD in $RMODS; do
       RSTAT=0
       OFILE=${GRID}_${RMOD}
