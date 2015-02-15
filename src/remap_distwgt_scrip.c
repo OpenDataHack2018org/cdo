@@ -327,7 +327,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
     }
   ndist = j;
 
-#if defined(_OPENMP) && _OPENMP >= OPENMP4
+#if defined(HAVE_OPENMP4)
   //#pragma omp simd aligned(dist:16)
 #pragma omp simd
 #endif

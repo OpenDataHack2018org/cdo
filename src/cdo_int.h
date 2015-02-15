@@ -38,6 +38,10 @@
 #include "datetime.h"
 
 #define  OPENMP4  201307
+#if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4
+#define  HAVE_OPENMP4  1
+#endif
+
 
 #ifndef strdupx
 #ifndef strdup
