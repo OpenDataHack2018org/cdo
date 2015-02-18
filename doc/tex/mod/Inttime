@@ -30,8 +30,7 @@ The user has to define the start date/time with an optional increment.
 
 @BeginDescription
 This operator performs linear interpolation between timesteps.
-The user has to define the number of timesteps from one timestep
-to the next.
+The user has to define the number of timesteps from one timestep to the next.
 @EndDescription
 @EndOperator
 

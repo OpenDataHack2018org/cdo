@@ -277,7 +277,7 @@ static char *MergeHelp[] = {
     "",
     "ENVIRONMENT",
     "    SKIP_SAME_TIME",
-    "        If set to 1, skips all timesteps with a double entry of the same timestamp.",
+    "        If set to 1, skips all consecutive timesteps with a double entry of the same timestamp.",
     NULL
 };
 
@@ -1009,10 +1009,11 @@ static char *SetgridHelp[] = {
     "                 as the size of the target grid description.",
     "    setgridtype  Set grid type",
     "                 Sets the grid type of all input fields. The following grid types are available:",
-    "                 curvilinear "    "                 Converts regular grid to curvilinear grid",
-    "                 unstructured"    "                 Converts grid type to unstructured grid",
+    "                 curvilinear "    "                 Converts a regular grid to a curvilinear grid",
+    "                 unstructured"    "                 Converts a regular or curvilinear grid to an unstructured grid",
     "                 dereference "    "                 Dereference a reference to a grid",
-    "                 regular     "    "                 Converts reduced Gaussian grid to regular Gaussian grid",
+    "                 regular     "    "                 Converts a reduced Gaussian grid to a regular Gaussian grid",
+    "                 lonlat      "    "                 Converts a regular lonlat grid stored as a curvilinear grid back to a lonlat grid",
     "    setgridarea  Set grid cell area",
     "                 Sets the grid cell area. The parameter gridarea is the path to a data file,",
     "                 the first field is used as grid cell area. The input fields need to have the same",
@@ -1021,7 +1022,7 @@ static char *SetgridHelp[] = {
     "",
     "PARAMETER",
     "    grid      STRING  Grid description file or name",
-    "    gridtype  STRING  Grid type (curvilinear, unstructured, regular or dereference)",
+    "    gridtype  STRING  Grid type (curvilinear, unstructured, regular, lonlat or dereference)",
     "    gridarea  STRING  Data file, the first field is used as grid cell area",
     NULL
 };
@@ -3627,8 +3628,7 @@ static char *InttimeHelp[] = {
     "              The user has to define the start date/time with an optional increment.",
     "    intntime  Interpolation between timesteps",
     "              This operator performs linear interpolation between timesteps.",
-    "              The user has to define the number of timesteps from one timestep",
-    "              to the next.",
+    "              The user has to define the number of timesteps from one timestep to the next.",
     "",
     "PARAMETER",
     "    date  STRING  Start date (format YYYY-MM-DD)",
