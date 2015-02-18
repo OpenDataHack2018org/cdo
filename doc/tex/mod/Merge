@@ -42,7 +42,7 @@ and all timesteps are sorted by date and time.
 
 @BeginEnvironment
 @Item = SKIP_SAME_TIME
-If set to 1, skips all timesteps with a double entry of the same timestamp.
+If set to 1, skips all consecutive timesteps with a double entry of the same timestamp.
 @EndEnvironment
 
 

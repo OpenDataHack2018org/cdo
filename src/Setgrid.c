@@ -283,7 +283,17 @@ void *Setgrid(void *argument)
 	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_CURVILINEAR )
 		{
 		  gridID2 = gridCurvilinearToRegular(gridID1);
-		  if ( gridID2 == -1 ) cdoAbort("No regular grid found!");
+		  if ( gridID2 == -1 ) cdoWarning("Conversion of curvilinear grid to regular grid failed!");
+ 		}
+	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_UNSTRUCTURED )
+		{
+		  gridID2 = -1;
+		  if ( gridID2 == -1 ) cdoWarning("Conversion of unstructured grid to regular grid failed!");
+ 		}
+	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_GENERIC )
+		{
+		  gridID2 = -1;
+		  if ( gridID2 == -1 ) cdoWarning("Conversion of generic grid to regular grid failed!");
  		}
 	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_LONLAT )
 		{
