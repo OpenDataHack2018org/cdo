@@ -242,10 +242,11 @@ void *Filter(void *argument)
           else 
             getTimeInc(jdelta, vdate0, vdate, &incperiod, &incunit);        
 
-          if ( incunit0 < 4 && month == 2 && day == 29 && 
+          if ( calendar != CALENDAR_360DAYS && calendar != CALENDAR_365DAYS && calendar != CALENDAR_366DAYS &&
+	       incunit0 < 4 && month == 2 && day == 29 && 
                ( day0 != day || month0 != month || year0 != year ) )
             {
-              cdoWarning("Filtering of multi-year times series only works properly with 365-day-calendar.");
+              cdoWarning("Filtering of multi-year times series only works properly with standard calendar.");
               cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
             }
 
