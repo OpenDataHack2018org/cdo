@@ -246,7 +246,7 @@ void *Filter(void *argument)
 	       incunit0 < 4 && month == 2 && day == 29 && 
                ( day0 != day || month0 != month || year0 != year ) )
             {
-              cdoWarning("Filtering of multi-year times series only works properly with standard calendar.");
+              cdoWarning("Filtering of multi-year times series doesn't works properly with a standard calendar.");
               cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
             }
 
