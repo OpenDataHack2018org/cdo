@@ -180,7 +180,7 @@ void *Rhopot(void *argument)
 
   cdoInitialize(argument);
 
-  if ( operatorArgc() == 1 ) pin = atof(operatorArgv()[0]);
+  if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
   streamID1 = streamOpenRead(cdoStreamName(0));
 

@@ -153,8 +153,8 @@ void *Cloudlayer(void *argument)
     {
       operatorCheckArgc(2);
       nvars2 = 1;
-      pmin = atof(operatorArgv()[0]);
-      pmax = atof(operatorArgv()[1]);
+      pmin = parameter2double(operatorArgv()[0]);
+      pmax = parameter2double(operatorArgv()[1]);
     }
   else
     {

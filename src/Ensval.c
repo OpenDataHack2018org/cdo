@@ -111,7 +111,7 @@ void *Ensval(void *argument)
   else if ( operfunc == BRS )  {
     operatorInputArg("Threshold for Brier score?");
     operatorCheckArgc(1);
-    brs_thresh = atof(operatorArgv()[0]);
+    brs_thresh = parameter2double(operatorArgv()[0]);
     nostreams = 4;
 
     fprintf(stderr,"brs_thres %10.6f\n",brs_thresh);

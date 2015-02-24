@@ -431,10 +431,10 @@ void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11
 
   operatorCheckArgc(argc_offset+4);
 
-  xlon1 = atof(operatorArgv()[argc_offset+0]);
-  xlon2 = atof(operatorArgv()[argc_offset+1]);
-  xlat1 = atof(operatorArgv()[argc_offset+2]);
-  xlat2 = atof(operatorArgv()[argc_offset+3]);
+  xlon1 = parameter2double(operatorArgv()[argc_offset+0]);
+  xlon2 = parameter2double(operatorArgv()[argc_offset+1]);
+  xlat1 = parameter2double(operatorArgv()[argc_offset+2]);
+  xlat2 = parameter2double(operatorArgv()[argc_offset+3]);
 
   gridtype = gridInqType(gridID1);
 
@@ -598,10 +598,10 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
   operatorCheckArgc(argc_offset+4);
 
-  xlon1 = atof(operatorArgv()[argc_offset+0]);
-  xlon2 = atof(operatorArgv()[argc_offset+1]);
-  xlat1 = atof(operatorArgv()[argc_offset+2]);
-  xlat2 = atof(operatorArgv()[argc_offset+3]);
+  xlon1 = parameter2double(operatorArgv()[argc_offset+0]);
+  xlon2 = parameter2double(operatorArgv()[argc_offset+1]);
+  xlat1 = parameter2double(operatorArgv()[argc_offset+2]);
+  xlat2 = parameter2double(operatorArgv()[argc_offset+3]);
 
   if ( xlon1 >= xlon2 ) { x = xlon1; xlon1 = xlon2; xlon2 = x; }
   if ( xlat1 >= xlat2 ) { x = xlat1; xlat1 = xlat2; xlat2 = x; }

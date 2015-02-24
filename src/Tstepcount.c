@@ -77,7 +77,7 @@ void *Tstepcount(void *argument)
 
   cdoInitialize(argument);
 
-  if ( operatorArgc() == 1 ) refval = atof(operatorArgv()[0]);
+  if ( operatorArgc() == 1 ) refval = parameter2double(operatorArgv()[0]);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 

@@ -100,7 +100,7 @@ void *Set(void *argument)
     }
   else if ( operatorID == SETLEVEL )
     {
-      newlevel = atof(operatorArgv()[0]);
+      newlevel = parameter2double(operatorArgv()[0]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));

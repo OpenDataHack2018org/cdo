@@ -97,7 +97,7 @@ void *Arithc(void *argument)
   operfunc = cdoOperatorF1(operatorID);
 
   operatorInputArg(cdoOperatorEnter(operatorID));
-  rconst = atof(operatorArgv()[0]);
+  rconst = parameter2double(operatorArgv()[0]);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 

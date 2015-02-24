@@ -53,7 +53,7 @@ void timpctl(int operatorID)
   HISTOGRAM_SET *hset = NULL;
   
   operatorInputArg("percentile number");
-  double pn = atof(operatorArgv()[0]);
+  double pn = parameter2double(operatorArgv()[0]);
       
   if ( !(pn >= 0 && pn <= 100) )
     cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);

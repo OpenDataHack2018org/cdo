@@ -198,7 +198,7 @@ void *Adisit(void *argument)
 
   operatorID = cdoOperatorID();
 
-  if ( operatorArgc() == 1 ) pin = atof(operatorArgv()[0]);
+  if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
   streamID1 = streamOpenRead(cdoStreamName(0));
 

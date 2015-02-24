@@ -105,7 +105,7 @@ void *Isosurface(void *argument)
 
   operatorCheckArgc(1);
 
-  isoval = atof(operatorArgv()[0]);
+  isoval = parameter2double(operatorArgv()[0]);
 
   if ( cdoVerbose ) cdoPrint("Isoval: %g\n", isoval);
 

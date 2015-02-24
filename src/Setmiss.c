@@ -72,7 +72,7 @@ void *Setmiss(void *argument)
   if ( operatorID == SETMISSVAL )
     {
       operatorCheckArgc(1);
-      missval2 = atof(operatorArgv()[0]);
+      missval2 = parameter2double(operatorArgv()[0]);
     }
   else if ( operatorID == SETCTOMISS || operatorID == SETMISSTOC )
     {
@@ -87,13 +87,13 @@ void *Setmiss(void *argument)
 	}
       else
       */
-	rconst = atof(operatorArgv()[0]);
+	rconst = parameter2double(operatorArgv()[0]);
     }
   else
     {
       operatorCheckArgc(2);
-      rmin = atof(operatorArgv()[0]);
-      rmax = atof(operatorArgv()[1]);
+      rmin = parameter2double(operatorArgv()[0]);
+      rmax = parameter2double(operatorArgv()[1]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));

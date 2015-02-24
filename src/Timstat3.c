@@ -66,8 +66,8 @@ void *Timstat3(void *argument)
 
   operatorInputArg("constant and risk (e.g. 0.05)");
   operatorCheckArgc(2);
-  rconst = atof(operatorArgv()[0]);
-  risk   = atof(operatorArgv()[1]);
+  rconst = parameter2double(operatorArgv()[0]);
+  risk   = parameter2double(operatorArgv()[1]);
 
   if ( operatorID == VARQUOT2TEST )
     {

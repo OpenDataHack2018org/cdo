@@ -54,7 +54,7 @@ void *Timselpctl(void *argument)
   int nargc = operatorArgc();
   if ( nargc < 2 ) cdoAbort("Too few arguments! Need %d found %d.", 2, nargc);
 
-  double pn  = atof(operatorArgv()[0]);
+  double pn  = parameter2double(operatorArgv()[0]);
   int ndates = atoi(operatorArgv()[1]);
   int noffset = 0, nskip = 0;
   if ( nargc > 2 ) noffset = atoi(operatorArgv()[2]);

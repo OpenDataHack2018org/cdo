@@ -68,7 +68,7 @@ void *Diff(void *argument)
 
   operatorID = cdoOperatorID();
 
-  if ( operatorArgc() == 1 ) abslim = atof(operatorArgv()[0]);
+  if ( operatorArgc() == 1 ) abslim = parameter2double(operatorArgv()[0]);
   if ( abslim < -1.e33 || abslim > 1.e+33 ) cdoAbort("Abs. limit out of range\n");
 
   streamID1 = streamOpenRead(cdoStreamName(0));

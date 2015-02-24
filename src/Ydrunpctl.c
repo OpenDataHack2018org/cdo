@@ -59,7 +59,7 @@ void *Ydrunpctl(void *argument)
 
   operatorInputArg("percentile number, number of timesteps");
   operatorCheckArgc(2);
-  double pn  = atof(operatorArgv()[0]);
+  double pn  = parameter2double(operatorArgv()[0]);
   int ndates = atoi(operatorArgv()[1]);
 
   if ( !(pn > 0 && pn < 100) )

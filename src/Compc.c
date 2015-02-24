@@ -63,7 +63,7 @@ void *Compc(void *argument)
   operatorID = cdoOperatorID();
 
   operatorInputArg("constant value");
-  rc = atof(operatorArgv()[0]);
+  rc = parameter2double(operatorArgv()[0]);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 

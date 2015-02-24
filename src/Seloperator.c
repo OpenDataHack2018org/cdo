@@ -48,7 +48,7 @@ void *Seloperator(void *argument)
   sltype = atoi(operatorArgv()[1]);
 
   if ( operatorArgc() == 3 )
-    slevel = atof(operatorArgv()[2]);
+    slevel = parameter2double(operatorArgv()[2]);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 

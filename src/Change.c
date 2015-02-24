@@ -97,23 +97,23 @@ void *Change(void *argument)
     {
       if ( nch%2 ) cdoAbort("Odd number of input arguments!");
       for ( i = 0; i < nch; i++ )
-	chlevels[i] = atof(operatorArgv()[i]);
+	chlevels[i] = parameter2double(operatorArgv()[i]);
     }
   else if ( operatorID == CHLEVELC )
     {
       operatorCheckArgc(3);
       
       chcode = atoi(operatorArgv()[0]);
-      chlevels[0] = atof(operatorArgv()[1]);
-      chlevels[1] = atof(operatorArgv()[2]);
+      chlevels[0] = parameter2double(operatorArgv()[1]);
+      chlevels[1] = parameter2double(operatorArgv()[2]);
     }
   else if ( operatorID == CHLEVELV )
     {
       operatorCheckArgc(3);
       
       chname = operatorArgv()[0];
-      chlevels[0] = atof(operatorArgv()[1]);
-      chlevels[1] = atof(operatorArgv()[2]);
+      chlevels[0] = parameter2double(operatorArgv()[1]);
+      chlevels[1] = parameter2double(operatorArgv()[2]);
     }
   else if ( operatorID == CHLTYPE )                  
     {

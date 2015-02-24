@@ -140,7 +140,7 @@ void *Consecstat(void *argument)
   operatorID = cdoOperatorID();
 
   if ( operatorID == CONSECSUM )
-    if ( operatorArgc() > 0 ) refval = atof(operatorArgv()[0]);
+    if ( operatorArgc() > 0 ) refval = parameter2double(operatorArgv()[0]);
 
   istreamID = streamOpenRead(cdoStreamName(0));
 

@@ -345,8 +345,8 @@ void *Intgrid(void *argument)
     {
       operatorInputArg("longitude and latitude");
       operatorCheckArgc(2);
-      slon = atof(operatorArgv()[0]);
-      slat = atof(operatorArgv()[1]);
+      slon = parameter2double(operatorArgv()[0]);
+      slat = parameter2double(operatorArgv()[1]);
       gridID2 = gridCreate(GRID_LONLAT, 1);
       gridDefXsize(gridID2, 1);
       gridDefYsize(gridID2, 1);

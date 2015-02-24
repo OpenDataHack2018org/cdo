@@ -84,7 +84,7 @@ void *Math(void *argument)
   if ( operfunc == POW )
     {
       operatorInputArg("value");
-      rc = atof(operatorArgv()[0]);
+      rc = parameter2double(operatorArgv()[0]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));

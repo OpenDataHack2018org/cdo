@@ -142,7 +142,7 @@ int datelist(LIST *flist)
 	}
       else if ( strchr(operatorArgv()[i], '-') == NULL )
 	{
-	  fval = atof(operatorArgv()[i]);
+	  fval = parameter2double(operatorArgv()[i]);
 	  listSetFlt(flist, i, fval);
 	}
       else

@@ -76,9 +76,9 @@ void *Splitsel(void *argument)
 /*   if ( nargc > 2 ) nskip   = atoi(operatorArgv()[2]); */
 /*   printf("%s %s %s\n", operatorArgv()[0],operatorArgv()[1],operatorArgv()[2]); */
   ndates = noffset = nskip = 0.0;
-  ndates = atof(operatorArgv()[0]);
-  if ( nargc > 1 ) noffset = atof(operatorArgv()[1]);
-  if ( nargc > 2 ) nskip   = atof(operatorArgv()[2]);
+  ndates = parameter2double(operatorArgv()[0]);
+  if ( nargc > 1 ) noffset = parameter2double(operatorArgv()[1]);
+  if ( nargc > 2 ) nskip   = parameter2double(operatorArgv()[2]);
 
   if ( cdoVerbose ) cdoPrint("nsets = %f, noffset = %f, nskip = %f", ndates, noffset, nskip);
 

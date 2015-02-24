@@ -145,7 +145,7 @@ void *Vargen(void *argument)
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(2);
-      rconst   = atof(operatorArgv()[0]);
+      rconst   = parameter2double(operatorArgv()[0]);
       gridfile = operatorArgv()[1];
       gridID   = cdoDefineGrid(gridfile);
     }
@@ -172,10 +172,10 @@ void *Vargen(void *argument)
       if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
       if ( operatorArgc() > 3 ) cdoAbort("Too many arguments!");
 
-      rstart = atof(operatorArgv()[0]);
-      rstop  = atof(operatorArgv()[1]);
+      rstart = parameter2double(operatorArgv()[0]);
+      rstop  = parameter2double(operatorArgv()[1]);
       if ( operatorArgc() == 3 )
-        rinc = atof(operatorArgv()[2]);
+        rinc = parameter2double(operatorArgv()[2]);
       else
         rinc = 1;
 
