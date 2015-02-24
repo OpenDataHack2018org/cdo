@@ -346,6 +346,19 @@ void strtolower(char *str)
 }
 
 
+double parameter2double(const char *string)
+{
+  char *endptr = NULL;
+
+  double fval = strtod(string, &endptr);
+
+  if ( *endptr != 0 )
+    cdoAbort("Invalid character in parameter >%s< at position %d!", string, (int)(endptr-string+1));
+
+  return (fval);
+}
+
+
 const char *seas_name_dec[4] = {"DJF", "MAM", "JJA", "SON"};
 const char *seas_name_jan[4] = {"JFM", "AMJ", "JAS", "OND"};
 

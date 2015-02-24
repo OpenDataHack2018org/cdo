@@ -47,18 +47,18 @@ void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incu
 
 static
 void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
-{
-  double dimin, dimax;
-  int i, imin, imax;
-  
-  dimin = nts*fmin / fdata;
-  dimax = nts*fmax / fdata;
+{  
+  double dimin = nts*fmin / fdata;
+  double dimax = nts*fmax / fdata;
 
-  imin = dimin<0 ? 0 : (int)floor(dimin);  
-  imax = ceil(dimax)>nts/2 ? nts/2 : (int) ceil(dimax);  
+  int imin = dimin<0 ? 0 : (int)floor(dimin);  
+  int imax = ceil(dimax)>nts/2 ? nts/2 : (int) ceil(dimax);
+
+  if ( imin < 0 || imin >= nts ) cdoAbort("Parameter fmin=%g out of bounds (1-%d)!", nts);
+  if ( imax < 0 || imax >= nts ) cdoAbort("Parameter fmax=%g out of bounds (1-%d)!", nts);
 
   fmasc[imin] = 1;
-  for ( i = imin+1; i <= imax; i++ )  
+  for ( int i = imin+1; i <= imax; i++ )  
     fmasc[i] = fmasc[nts-i] = 1; 
 }
 
@@ -139,7 +139,6 @@ void *Filter(void *argument)
   double fdata = 0;
   field_t ***vars = NULL;
   double fmin = 0, fmax = 0;
-  int *fmasc;
   int use_fftw = FALSE;
   dtlist_type *dtlist = dtlist_new();
   typedef struct
@@ -283,7 +282,7 @@ void *Filter(void *argument)
 	}
     }
 
-  fmasc  = (int*) calloc(nts, sizeof(int));
+  int *fmasc = (int*) calloc(nts, sizeof(int));
 
   switch(operfunc)
     {
@@ -291,15 +290,15 @@ void *Filter(void *argument)
       {
         operatorInputArg("lower and upper bound of frequency band");
         operatorCheckArgc(2);
-        fmin = atof(operatorArgv()[0]);
-        fmax = atof(operatorArgv()[1]);
+        fmin = parameter2double(operatorArgv()[0]);
+        fmax = parameter2double(operatorArgv()[1]);
         break;
       }
     case HIGHPASS:
       {              
         operatorInputArg("lower bound of frequency pass");
         operatorCheckArgc(1);
-        fmin = atof(operatorArgv()[0]);
+        fmin = parameter2double(operatorArgv()[0]);
         fmax = fdata;
         break;
       }
@@ -308,10 +307,12 @@ void *Filter(void *argument)
         operatorInputArg("upper bound of frequency pass");
         operatorCheckArgc(1);
         fmin = 0;
-        fmax = atof(operatorArgv()[0]);
+        fmax = parameter2double(operatorArgv()[0]);
         break;
       }
     }
+
+  if ( cdoVerbose ) cdoPrint("fmin=%g  fmax=%g", fmin, fmax);
   
   create_fmasc(nts, fdata, fmin, fmax, fmasc);
 
