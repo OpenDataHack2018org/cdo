@@ -120,7 +120,6 @@ void *Settime(void *argument)
   int newcalendar = CALENDAR_STANDARD;
   // int nargs;
   const char *datestr, *timestr;
-  char *rstr;
   juldate_t juldate;
   double *array = NULL;
 
@@ -158,8 +157,7 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  sdate = (int)strtol(datestr, &rstr, 10);
-	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", datestr);
+	  sdate = parameter2int(datestr);
 	}
 
       if ( strchr(timestr, ':') )
@@ -169,14 +167,13 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  stime = (int)strtol(timestr, &rstr, 10);
-	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", timestr);
+	  stime = parameter2int(timestr);
 	}
 
       if ( operatorArgc() == 3 )
 	{
 	  const char *timeunits = operatorArgv()[2];
-	  incperiod = (int)strtol(timeunits, NULL, 10);
+	  incperiod = parameter2int(timeunits);
 	  if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
 	  while ( isdigit((int) *timeunits) ) timeunits++;
 
@@ -196,8 +193,7 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  newval = (int)strtol(datestr, &rstr, 10);
-	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", datestr);
+	  newval = parameter2int(datestr);
 	}
     }
   else if ( operatorID == SETTIME )
@@ -212,14 +208,13 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  newval = (int)strtol(timestr, &rstr, 10);
-	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", timestr);
+	  newval = parameter2int(timestr);
 	}
     }
   else if ( operatorID == SHIFTTIME )
     {
       const char *timeunits = operatorArgv()[0];
-      incperiod = (int)strtol(timeunits, NULL, 10);
+      incperiod = parameter2int(timeunits);
       if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
       while ( isdigit((int) *timeunits) ) timeunits++;
 
@@ -255,8 +250,7 @@ void *Settime(void *argument)
     }
   else
     {
-      newval = (int)strtol(operatorArgv()[0], &rstr, 10);
-      if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", operatorArgv()[0]);
+      newval = parameter2int(operatorArgv()[0]);
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));

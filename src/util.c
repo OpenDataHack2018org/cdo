@@ -353,7 +353,8 @@ double parameter2double(const char *string)
   double fval = strtod(string, &endptr);
 
   if ( *endptr != 0 )
-    cdoAbort("Invalid character in parameter >%s< at position %d!", string, (int)(endptr-string+1));
+    cdoAbort("Float parameter >%s< contains invalid character at position %d!",
+	     string, (int)(endptr-string+1));
 
   return (fval);
 }
@@ -366,7 +367,8 @@ int parameter2int(const char *string)
   int ival = (int) strtol(string, &endptr, 10);
 
   if ( *endptr != 0 )
-    cdoAbort("Invalid character in parameter >%s< at position %d!", string, (int)(endptr-string+1));
+    cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
+	     string, (int)(endptr-string+1));
 
   return (ival);
 }
