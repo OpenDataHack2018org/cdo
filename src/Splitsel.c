@@ -71,9 +71,9 @@ void *Splitsel(void *argument)
   if ( nargc < 1 )
     cdoAbort("Too few arguments! Need %d found %d.", 1, nargc);
 
-/*   ndates = atoi(operatorArgv()[0]); */
-/*   if ( nargc > 1 ) noffset = atoi(operatorArgv()[1]); */
-/*   if ( nargc > 2 ) nskip   = atoi(operatorArgv()[2]); */
+/*   ndates = parameter2int(operatorArgv()[0]); */
+/*   if ( nargc > 1 ) noffset = parameter2int(operatorArgv()[1]); */
+/*   if ( nargc > 2 ) nskip   = parameter2int(operatorArgv()[2]); */
 /*   printf("%s %s %s\n", operatorArgv()[0],operatorArgv()[1],operatorArgv()[2]); */
   ndates = noffset = nskip = 0.0;
   ndates = parameter2double(operatorArgv()[0]);

@@ -62,7 +62,7 @@ void *Vardup(void *argument)
   else if ( operatorID == PARMUL )
     {
       operatorInputArg("number of multiply");
-      nmul = atoi(operatorArgv()[0]);
+      nmul = parameter2int(operatorArgv()[0]);
     }
   else
     cdoAbort("operator not implemented!");

@@ -665,10 +665,10 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
 
   operatorCheckArgc(argc_offset+4);
 
-  *lon11 = atoi(operatorArgv()[argc_offset+0]);
-  *lon12 = atoi(operatorArgv()[argc_offset+1]);
-  *lat1  = atoi(operatorArgv()[argc_offset+2]);
-  *lat2  = atoi(operatorArgv()[argc_offset+3]);
+  *lon11 = parameter2int(operatorArgv()[argc_offset+0]);
+  *lon12 = parameter2int(operatorArgv()[argc_offset+1]);
+  *lat1  = parameter2int(operatorArgv()[argc_offset+2]);
+  *lat2  = parameter2int(operatorArgv()[argc_offset+3]);
 
   if ( *lat1 > *lat2 )
     {

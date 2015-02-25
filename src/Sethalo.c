@@ -379,8 +379,8 @@ int genindexgrid(int gridID1, int *lhalo, int *rhalo)
 
   operatorCheckArgc(2);
 
-  *lhalo = atoi(operatorArgv()[0]);
-  *rhalo = atoi(operatorArgv()[1]);
+  *lhalo = parameter2int(operatorArgv()[0]);
+  *rhalo = parameter2int(operatorArgv()[1]);
 
   nlon1 = gridInqXsize(gridID1);
 

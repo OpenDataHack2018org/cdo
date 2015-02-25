@@ -120,7 +120,7 @@ void *Rotuv(void *argument)
     {
       lvar = FALSE;
       for ( i = 0; i < nch; i++ )
-	chcodes[i] = atoi(operatorArgv()[i]);
+	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
   else
     {

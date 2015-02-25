@@ -51,8 +51,8 @@ void *Runpctl(void *argument)
 
   operatorInputArg("percentile number, number of timesteps");
   operatorCheckArgc(2);
-  int pn     = atoi(operatorArgv()[0]);
-  int ndates = atoi(operatorArgv()[1]);
+  int pn     = parameter2int(operatorArgv()[0]);
+  int ndates = parameter2int(operatorArgv()[1]);
 
   if ( pn < 1 || pn > 99 )
     cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);

@@ -352,7 +352,7 @@ void *EcaCwdi(void *argument)
   cdoInitialize(argument);
   cdoOperatorAdd("eca_cwdi", 0, 31, NULL);
 
-  if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
+  if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = parameter2double(operatorArgv()[1]);
   
   longname = (char*) malloc(strlen(CWDI_LONGNAME) + 80);
@@ -394,7 +394,7 @@ void *EcaCwfi(void *argument)
   cdoInitialize(argument);
   cdoOperatorAdd("eca_cwfi", 0, 31, NULL);
 
-  if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
+  if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
 
   longname = (char*) malloc(strlen(CWFI_LONGNAME) + 40);
   sprintf(longname, CWFI_LONGNAME, argN);
@@ -494,7 +494,7 @@ void *EcaGsl(void *argument)
   cdoInitialize(argument);
   cdoOperatorAdd("eca_gsl", 0, 10, NULL);
   
-  if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
+  if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = parameter2double(operatorArgv()[1]);
   if ( operatorArgc() > 2 ) minLandFraction = parameter2double(operatorArgv()[2]);
 
@@ -573,7 +573,7 @@ void *EcaHwdi(void *argument)
   cdoInitialize(argument);
   cdoOperatorAdd("eca_hwdi", 0, 31, NULL);
 
-  if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
+  if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = parameter2double(operatorArgv()[1]);
   
   longname = (char*) malloc(strlen(HWDI_LONGNAME) + 80);
@@ -615,7 +615,7 @@ void *EcaHwfi(void *argument)
   cdoInitialize(argument);
   cdoOperatorAdd("eca_hwfi", 0, 31, NULL);
 
-  if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
+  if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
 
   longname = (char*) malloc(strlen(HWFI_LONGNAME) + 40);
   sprintf(longname, HWFI_LONGNAME, argN);

@@ -44,8 +44,8 @@ void *Seloperator(void *argument)
 
   operatorInputArg("code, ltype, level");
 
-  scode  = atoi(operatorArgv()[0]);
-  sltype = atoi(operatorArgv()[1]);
+  scode  = parameter2int(operatorArgv()[0]);
+  sltype = parameter2int(operatorArgv()[1]);
 
   if ( operatorArgc() == 3 )
     slevel = parameter2double(operatorArgv()[2]);

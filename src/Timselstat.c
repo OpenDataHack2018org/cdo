@@ -68,10 +68,10 @@ void *Timselstat(void *argument)
   operatorInputArg("nsets <noffset <nskip>>");
 
   int nargc  = operatorArgc();
-  int ndates = atoi(operatorArgv()[0]);
+  int ndates = parameter2int(operatorArgv()[0]);
   int noffset = 0, nskip = 0;
-  if ( nargc > 1 ) noffset = atoi(operatorArgv()[1]);
-  if ( nargc > 2 ) nskip   = atoi(operatorArgv()[2]);
+  if ( nargc > 1 ) noffset = parameter2int(operatorArgv()[1]);
+  if ( nargc > 2 ) nskip   = parameter2int(operatorArgv()[2]);
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 

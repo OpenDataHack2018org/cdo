@@ -67,23 +67,19 @@ void *Zonstat(void *argument)
   cdoOperatorAdd("zonavg",   func_avg,   0, NULL);
   cdoOperatorAdd("zonvar",   func_var,   0, NULL);
   cdoOperatorAdd("zonstd",   func_std,   0, NULL);
-  /* RQ */
   cdoOperatorAdd("zonpctl",  func_pctl,  0, NULL);
-  /* QR */
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
 
-  /* RQ */
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
-      pn = atoi(operatorArgv()[0]);
+      pn = parameter2int(operatorArgv()[0]);
       
       if ( pn < 1 || pn > 99 )
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
     }
-  /* QR */
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 

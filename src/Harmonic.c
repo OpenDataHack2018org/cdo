@@ -58,8 +58,8 @@ void *Harmonic(void *argument)
 
   operatorCheckArgc(2);
 
-  n_out = atoi(operatorArgv()[0]);
-  n     = atoi(operatorArgv()[1]);
+  n_out = parameter2int(operatorArgv()[0]);
+  n     = parameter2int(operatorArgv()[1]);
 
   if ( n_out > 9 ) cdoAbort("Maximum number of wave numbers is 9!");
 

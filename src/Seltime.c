@@ -59,7 +59,7 @@ int seaslist(LIST *ilist)
   if ( isdigit(*operatorArgv()[0]))
     for ( i = 0; i < nsel; i++ )
       {
-	ival = atoi(operatorArgv()[i]);
+	ival = parameter2int(operatorArgv()[i]);
 	if      ( ival == 1 || ival == 13 ) seas[0] = TRUE;
 	else if ( ival == 2 || ival == 14 ) seas[1] = TRUE;
 	else if ( ival == 3 || ival == 15 ) seas[2] = TRUE;
@@ -271,7 +271,7 @@ void *Seltime(void *argument)
 	    }
 	  else
 	    {
-	      listSetInt(ilist, i, atoi(operatorArgv()[i]));
+	      listSetInt(ilist, i, parameter2int(operatorArgv()[i]));
 	    }
 	}
     }

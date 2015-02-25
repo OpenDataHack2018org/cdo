@@ -640,7 +640,7 @@ void *Outputgmt(void *argument)
     {
       operatorInputArg("increment");
       operatorCheckArgc(1);
-      ninc  = atoi(operatorArgv()[0]);
+      ninc = parameter2int(operatorArgv()[0]);
       if ( ninc < 1 ) cdoAbort("Increment must be greater than 0!");
     }
 

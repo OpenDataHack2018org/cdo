@@ -146,7 +146,7 @@ void *Sort(void *argument)
 
   if ( operatorID == SORTLEVEL && operatorArgc() == 1 )
     {
-      int iarg = atoi(operatorArgv()[0]);
+      int iarg = parameter2int(operatorArgv()[0]);
       if ( iarg < 0 ) cmpvarlev = cmpvarlevelrev;
     }
 

@@ -120,7 +120,7 @@ void *Fldstat(void *argument)
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
-      pn = atoi(operatorArgv()[0]);
+      pn = parameter2int(operatorArgv()[0]);
       
       if ( pn < 1 || pn > 99 )
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);

@@ -77,7 +77,7 @@ void *Runstat(void *argument)
   int operfunc = cdoOperatorF1(operatorID);
 
   operatorInputArg("number of timesteps");
-  int ndates = atoi(operatorArgv()[0]);
+  int ndates = parameter2int(operatorArgv()[0]);
 
   int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;

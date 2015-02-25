@@ -1022,7 +1022,7 @@ void *Gradsdes(void *argument)
 
   if ( operatorArgc() == 1 )
     {
-      map_version = atoi(operatorArgv()[0]);
+      map_version = parameter2int(operatorArgv()[0]);
       if ( map_version != 1 && map_version != 2 && map_version != 4 )
         cdoAbort("map_version=%d unsupported!", map_version);
     }

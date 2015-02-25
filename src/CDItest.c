@@ -58,7 +58,7 @@ void *CDItest(void *argument)
   UNUSED(operatorID);
 
   //  operatorInputArg("Number of copies");
-  if ( operatorArgc() == 1 ) max_copy = atoi(operatorArgv()[0]);
+  if ( operatorArgc() == 1 ) max_copy = parameter2int(operatorArgv()[0]);
 
   processStartTime(&s_utime, &s_stime);
 

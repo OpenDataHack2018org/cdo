@@ -80,7 +80,7 @@ void *Set(void *argument)
   operatorInputArg(cdoOperatorEnter(operatorID));
   if ( operatorID == SETCODE || operatorID == SETLTYPE )
     {
-      newval = atoi(operatorArgv()[0]);
+      newval = parameter2int(operatorArgv()[0]);
     }
   else if ( operatorID == SETPARAM )
     {
@@ -96,7 +96,7 @@ void *Set(void *argument)
     }
   else if ( operatorID == SETTABNUM )
     {
-      tabnum = atoi(operatorArgv()[0]);
+      tabnum = parameter2int(operatorArgv()[0]);
     }
   else if ( operatorID == SETLEVEL )
     {

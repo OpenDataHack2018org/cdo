@@ -129,11 +129,11 @@ void *CDIwrite(void *argument)
   if ( operatorArgc() > 5 ) cdoAbort("Too many arguments!");
 
   gridfile = defaultgrid;
-  if ( operatorArgc() >= 1 ) nruns = atol(operatorArgv()[0]);
+  if ( operatorArgc() >= 1 ) nruns = parameter2int(operatorArgv()[0]);
   if ( operatorArgc() >= 2 ) gridfile = operatorArgv()[1];
-  if ( operatorArgc() >= 3 ) nlevs = atol(operatorArgv()[2]);
-  if ( operatorArgc() >= 4 ) ntimesteps = atol(operatorArgv()[3]);
-  if ( operatorArgc() >= 5 ) nvars = atol(operatorArgv()[4]);
+  if ( operatorArgc() >= 3 ) nlevs = parameter2int(operatorArgv()[2]);
+  if ( operatorArgc() >= 4 ) ntimesteps = parameter2int(operatorArgv()[3]);
+  if ( operatorArgc() >= 5 ) nvars = parameter2int(operatorArgv()[4]);
 
   if ( nruns <  0 ) nruns = 0;
   if ( nruns > 99 ) nruns = 99;

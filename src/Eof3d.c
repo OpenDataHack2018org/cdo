@@ -111,7 +111,7 @@ void *EOF3d(void * argument)
   operfunc    = cdoOperatorF1(operatorID);
 
   operatorInputArg("Number of eigen functions to write out");
-  n_eig       = atoi(operatorArgv()[0]);
+  n_eig       = parameter2int(operatorArgv()[0]);
 
   envstr = getenv("CDO_SVD_MODE");
 

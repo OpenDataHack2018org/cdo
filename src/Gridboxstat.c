@@ -576,8 +576,8 @@ void *Gridboxstat(void *argument)
 
   operatorInputArg("xinc, yinc");
   operatorCheckArgc(2);
-  xinc = atoi(operatorArgv()[0]);
-  yinc = atoi(operatorArgv()[1]);
+  xinc = parameter2int(operatorArgv()[0]);
+  yinc = parameter2int(operatorArgv()[1]);
 
   cdoOperatorAdd("gridboxmin",  func_min,  0, NULL);
   cdoOperatorAdd("gridboxmax",  func_max,  0, NULL);

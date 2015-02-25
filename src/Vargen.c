@@ -127,8 +127,7 @@ void *Vargen(void *argument)
       gridID   = cdoDefineGrid(gridfile);
       if ( operatorArgc() == 2 )
         {
-          long idum;
-          idum = atol(operatorArgv()[1]);
+          int idum = parameter2int(operatorArgv()[1]);
           if ( idum >= 0 && idum < 0x7FFFFFFF )
             seed = idum;
         }

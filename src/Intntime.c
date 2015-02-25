@@ -57,7 +57,7 @@ void *Intntime(void *argument)
   operatorInputArg("number of timesteps between 2 timesteps");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
-  numts = atoi(operatorArgv()[0]);
+  numts = parameter2int(operatorArgv()[0]);
   if ( numts < 2 ) cdoAbort("parameter must be greater than 1!");
 
   streamID1 = streamOpenRead(cdoStreamName(0));

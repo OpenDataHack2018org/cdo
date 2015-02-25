@@ -101,7 +101,7 @@ void *Ensstat3(void *argument)
 
   if ( operfunc == func_roc ) {
     operatorInputArg("Number of eigen functions to write out");
-    nbins       = atoi(operatorArgv()[0]);
+    nbins       = parameter2int(operatorArgv()[0]);
   }
   
   nfiles = cdoStreamCnt() - 1;

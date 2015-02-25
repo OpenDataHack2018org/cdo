@@ -247,10 +247,10 @@ void *Spectrum(void *argument)
 
   operatorCheckArgc(4);
 
-  detrend = atoi(operatorArgv()[0]);
-  seg_l = atoi(operatorArgv()[1]);
-  seg_n = atoi(operatorArgv()[2]);
-  which_window = atoi(operatorArgv()[3]);
+  detrend = parameter2int(operatorArgv()[0]);
+  seg_l = parameter2int(operatorArgv()[1]);
+  seg_n = parameter2int(operatorArgv()[2]);
+  which_window = parameter2int(operatorArgv()[3]);
 
   if ( detrend < 0 || detrend > 3 )
     cdoAbort("Illegal value for detrend (=%d)!",detrend);

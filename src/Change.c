@@ -85,7 +85,7 @@ void *Change(void *argument)
     {
       if ( nch%2 ) cdoAbort("Odd number of input arguments!");
       for ( i = 0; i < nch; i++ )
-	chints[i] = atoi(operatorArgv()[i]);
+	chints[i] = parameter2int(operatorArgv()[i]);
     }
   else if ( operatorID == CHPARAM || operatorID == CHNAME || operatorID == CHUNIT )
     {
@@ -103,7 +103,7 @@ void *Change(void *argument)
     {
       operatorCheckArgc(3);
       
-      chcode = atoi(operatorArgv()[0]);
+      chcode = parameter2int(operatorArgv()[0]);
       chlevels[0] = parameter2double(operatorArgv()[1]);
       chlevels[1] = parameter2double(operatorArgv()[2]);
     }
@@ -119,7 +119,7 @@ void *Change(void *argument)
     {
       if ( nch%2 ) cdoAbort("Odd number of input arguments!");
       for ( i = 0; i < nch; i++ )
-	chltypes[i] = atoi(operatorArgv()[i]);
+	chltypes[i] = parameter2int(operatorArgv()[i]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));

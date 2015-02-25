@@ -44,7 +44,7 @@ void *Duplicate(void *argument)
   cdoInitialize(argument);
 
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
-  else if ( operatorArgc() == 1 ) ndup = atoi(operatorArgv()[0]);
+  else if ( operatorArgc() == 1 ) ndup = parameter2int(operatorArgv()[0]);
 
   if ( cdoVerbose ) cdoPrint("ndup = %d\n", ndup);
 

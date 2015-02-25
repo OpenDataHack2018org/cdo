@@ -359,6 +359,19 @@ double parameter2double(const char *string)
 }
 
 
+int parameter2int(const char *string)
+{
+  char *endptr = NULL;
+
+  int ival = (int) strtol(string, &endptr, 10);
+
+  if ( *endptr != 0 )
+    cdoAbort("Invalid character in parameter >%s< at position %d!", string, (int)(endptr-string+1));
+
+  return (ival);
+}
+
+
 const char *seas_name_dec[4] = {"DJF", "MAM", "JJA", "SON"};
 const char *seas_name_jan[4] = {"JFM", "AMJ", "JAS", "OND"};
 

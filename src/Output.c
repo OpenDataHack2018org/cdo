@@ -100,7 +100,7 @@ void *Output(void *argument)
       if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
       format = operatorArgv()[0];
-      if ( operatorArgc() == 2 ) nelem  = atoi(operatorArgv()[1]);
+      if ( operatorArgc() == 2 ) nelem = parameter2int(operatorArgv()[1]);
     }
   else if ( operatorID == OUTPUTTAB )
     {

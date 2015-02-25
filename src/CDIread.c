@@ -111,7 +111,7 @@ void *CDIread(void *argument)
 
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
-  if ( operatorArgc() == 1 ) nruns = atol(operatorArgv()[0]);
+  if ( operatorArgc() == 1 ) nruns = parameter2int(operatorArgv()[0]);
 
   if ( nruns <  0 ) nruns = 0;
   if ( nruns > 99 ) nruns = 99;

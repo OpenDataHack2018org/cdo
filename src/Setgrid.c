@@ -170,8 +170,8 @@ void *Setgrid(void *argument)
     {
       if ( operatorArgc() >= 1 && operatorArgc() <= 2 )
 	{
-	  number = atoi(operatorArgv()[0]);
-	  if ( operatorArgc() == 2 ) position = atoi(operatorArgv()[1]);
+	  number = parameter2int(operatorArgv()[0]);
+	  if ( operatorArgc() == 2 ) position = parameter2int(operatorArgv()[1]);
 	}
       else
 	{

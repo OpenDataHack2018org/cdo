@@ -56,7 +56,7 @@ void *Fourier(void *argument)
   cdoInitialize(argument);
 
   operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
-  sign = atoi(operatorArgv()[0]);
+  sign = parameter2int(operatorArgv()[0]);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 

@@ -188,7 +188,7 @@ void *Spectral(void *argument)
       if ( gridID1 != -1 )
 	{
 	  if ( !isdigit(operatorArgv()[0][0]) ) cdoAbort("parameter truncation must comprise only digits [0-9]!");
-	  int ntr = atoi(operatorArgv()[0]);
+	  int ntr = parameter2int(operatorArgv()[0]);
 	  int nsp = (ntr+1)*(ntr+2);
 	  gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
 	  gridDefTrunc(gridIDsp, ntr);
