@@ -10,12 +10,13 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include "cdo_int.h"
 
 #define  FNORM_PRECISION  1e-12
 #define  MAX_JACOBI_ITER  12
 
 int jacobi_1side(double **M, double *A, long n);
-void annihilate_1side(double **M, long i, long j, long k, long n);
+void annihilate_1side(double **M, long i, long j, long n);
 
 int n_finished;
 
@@ -1308,41 +1309,44 @@ void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, 
 /* changes columns i and j, this can be carried out for n/2 pairs of columns at     */
 /* the same time.                                                                   */
 /* ******************************************************************************** */
-void annihilate_1side(double **M, long i, long j, long k, long n)
+void annihilate_1side(double **M, long i, long j, long n)
 {
 
   double tk, ck, sk, alpha=0, beta=0, gamma=0, zeta=0;
-  double tmp, *mi=NULL, *mj=NULL;
   //  int first_annihilation = 0;
   long r;
 
-  UNUSED(k);
-
   i--; j--;
 
-  mi = (double*) malloc(n*sizeof(double));
-  mj = (double*) malloc(n*sizeof(double));
+  double *restrict mi = (double*) malloc(n*sizeof(double));
+  double *restrict mj = (double*) malloc(n*sizeof(double));
 
   if ( ! mj || ! mi) 
-    fprintf(stderr, 
-	    "ERROR: allocation error - cannot allocate memory\n"
-	    "ERROR: check stacksize and physically available memory\n");
+    fprintf(stderr, "ERROR: allocation error - cannot allocate memory\n"
+	            "ERROR: check stacksize and physically available memory\n");
 
   if ( j < i ) { int tmp = i; i = j; j = tmp; }
   
-  for ( r=0; r<n; r++ ) {
-      alpha += M[j][r]*M[j][r];
-      beta  += M[i][r]*M[i][r];
-      gamma += M[i][r]*M[j][r];
-  }
+  double *restrict Mi = M[i];
+  double *restrict Mj = M[j];
+
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
+  for ( r = 0; r < n; r++ )
+    {
+      alpha += Mj[r]*Mj[r];
+      beta  += Mi[r]*Mi[r];
+      gamma += Mi[r]*Mj[r];
+    }
 
   // 2011-08-15 Cedrick Ansorge: bug fix
   //  tmp = fabs(gamma/sqrt(alpha/beta));
-  tmp = fabs(gamma/sqrt(alpha*beta));
+  double tmp = fabs(gamma/sqrt(alpha*beta));
 
   if ( tmp < fnorm_precision ) {
 #if defined(_OPENMP)
-    #pragma omp critical 
+#pragma omp critical 
 #endif
     {
       n_finished++;
@@ -1354,20 +1358,19 @@ void annihilate_1side(double **M, long i, long j, long k, long n)
   
   zeta = (beta-alpha)/(2.*gamma);  // tan(2*theta)
   tk = 1./(fabs(zeta)+sqrt(1.+zeta*zeta)); 
-  tk = zeta>0? tk : -tk;       // = cot(2*theta)
-  ck = 1./sqrt(1.+tk*tk);      // = cos(theta)
-  sk = ck*tk;                  // = sin(theta)
+  tk = zeta>0? tk : -tk;           // = cot(2*theta)
+  ck = 1./sqrt(1.+tk*tk);          // = cos(theta)
+  sk = ck*tk;                      // = sin(theta)
   
   // calculate a_i,j - tilde
-  for ( r=0; r<n; r++ ) {
-    mi[r] =  ck*M[i][r]  + sk*M[j][r];
-    mj[r] = -sk*M[i][r]  + ck*M[j][r];
-  }
-  
-  for ( r=0; r<n; r++ ) {
-    M[i][r] = mi[r];
-    M[j][r] = mj[r];
-  }
+  for ( r = 0; r < n; r++ )
+    {
+      mi[r] =  ck*Mi[r]  + sk*Mj[r];
+      mj[r] = -sk*Mi[r]  + ck*Mj[r];
+    }
+
+  for ( r = 0; r < n; r++ ) Mi[r] = mi[r];
+  for ( r = 0; r < n; r++ ) Mj[r] = mj[r];
 
   free(mi);
   free(mj);
@@ -1431,31 +1434,31 @@ int jacobi_1side(double **M, double *A, long n)
   while ( n_iter < max_jacobi_iter && n_finished < count ) {
     n_finished = 0;
     if ( n%2 == 1 ) {
-      for(m=0;m<n;m++) {
+      for ( m = 0; m < n; m++ ) {
 #if defined(_OPENMP)
-	#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
+#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
 #endif
-        for(i=0;i<n/2;i++) {
+        for ( i = 0; i < n/2; i++) {
           idx = m*(n/2)+i;
 	  i_ann = annihilations[idx][0];
 	  j_ann = annihilations[idx][1];
-          if ( i_ann != j_ann && i_ann && j_ann ) 
-	    annihilate_1side(M,i_ann,j_ann,0,n);
+          if ( i_ann != j_ann && i_ann && j_ann )
+	    annihilate_1side(M, i_ann, j_ann, n);
 	}
       }
     }
     else { // n%2 == 0                                                                               
-      for(m=0;m<n;m++) {
+      for( m = 0; m < n; m++) {
 #if defined(_OPENMP)
-	#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
+#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
 #endif
-        for(i=0;i<n/2-(m%2);i++) {
+        for( i = 0; i < n/2-(m%2); i++) {
 	  idx = m/2 * ( n/2 + n/2-1);
           if ( m % 2 ) idx += n/2;
 	  i_ann = annihilations[idx+i][0];
 	  j_ann = annihilations[idx+i][1];
           if ( i_ann && j_ann && i_ann != j_ann ) 
-	    annihilate_1side(M,i_ann,j_ann,0,n);
+	    annihilate_1side(M, i_ann, j_ann, n);
         }
       }
     }
@@ -1463,7 +1466,7 @@ int jacobi_1side(double **M, double *A, long n)
   }
 
   if ( cdoVerbose ) 
-    cdoPrint("Finished one-sided jacobi scheme for eigenvalue computation after %i iterations",n_iter);
+    cdoPrint("Finished one-sided jacobi scheme for eigenvalue computation after %i iterations", n_iter);
 
   //  fprintf(stderr,"finished after %i sweeps (n_finished %i)\n",n_iter,n_finished);
 
