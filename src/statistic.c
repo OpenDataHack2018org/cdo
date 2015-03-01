@@ -85,6 +85,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
         a[i][j] = a[j][i];
         a[j][i] = temp;
       }
+  
   heap_sort (eig_val, a, n);
 }
 
@@ -1296,7 +1297,7 @@ void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, 
       eigen_solution_of_symmetric_matrix(M,A,n1,n2,func);
     }
   else
-    jacobi_1side(M,A,n1);
+    jacobi_1side(M, A, n1);
 
   return;
 }

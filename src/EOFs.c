@@ -49,26 +49,15 @@ void *EOFs(void * argument)
 
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2, streamID3;
-  long gridsize;
   long i, ii, j, i1, i2, j1, j2;
-  int vdate = 0, vtime = 0;
-  int nrecs, nvars, nlevs=0 ;
+  int nlevs=0 ;
   int nmiss;
   int tsID;
   int varID, recID, levelID;
-  int vlistID1, vlistID2 = -1, vlistID3 = -1;
-  int taxisID1, taxisID2, taxisID3;
-  int gridID1, gridID2, gridID3;
-  int ngrids;
-  int reached_eof;
   int npack=0, nts=0;
   int *pack, *miss;
   int *datacountv;
-  int ***datacounts;
-  int n_eig, n=0;
+  int n=0;
   int grid_space=0, time_space=0;
   int missval_warning=0;
   int timer_init = 0, timer_alloc = 0, timer_read = 0, timer_cov = 0, timer_eig = 0, timer_post = 0, timer_write = 0, timer_finish = 0;
@@ -76,7 +65,6 @@ void *EOFs(void * argument)
   int calendar = CALENDAR_STANDARD;
   juldate_t juldate;
 
-  double *weight;
   double sum_w;
   double sum;
   double missval=0;
@@ -85,9 +73,6 @@ void *EOFs(void * argument)
 
   double *df1p, *df2p;
   double **datafieldv = NULL;
-  double ****datafields = NULL;
-  double ****eigenvectors = NULL, ****eigenvalues = NULL;
-  double *in = NULL;
 
   enum T_EIGEN_MODE eigen_mode = JACOBI;
 
@@ -107,15 +92,15 @@ void *EOFs(void * argument)
   
   cdoInitialize(argument);
 
-  cdoOperatorAdd("eof",       EOF_,       0, NULL);
-  cdoOperatorAdd("eoftime",   EOF_TIME,   0, NULL);
-  cdoOperatorAdd("eofspatial",EOF_SPATIAL,0, NULL);
+  cdoOperatorAdd("eof",        EOF_,        0, NULL);
+  cdoOperatorAdd("eoftime",    EOF_TIME,    0, NULL);
+  cdoOperatorAdd("eofspatial", EOF_SPATIAL, 0, NULL);
 
-  operatorID  = cdoOperatorID();
-  operfunc    = cdoOperatorF1(operatorID);
+  int operatorID  = cdoOperatorID();
+  int operfunc    = cdoOperatorF1(operatorID);
 
   operatorInputArg("Number of eigen functions to write out");
-  n_eig       = parameter2int(operatorArgv()[0]);
+  int n_eig       = parameter2int(operatorArgv()[0]);
 
   envstr = getenv("CDO_SVD_MODE");
   
@@ -136,48 +121,41 @@ void *EOFs(void * argument)
 	     envstr?"Environment":" default");
   
 
-  streamID1   = streamOpenRead(cdoStreamName(0));
-  vlistID1    = streamInqVlist(streamID1);
-  taxisID1    = vlistInqTaxis(vlistID1);
-  gridID1     = vlistInqVarGrid(vlistID1, 0);
-  gridsize    = vlistGridsizeMax(vlistID1);
-  nvars       = vlistNvars(vlistID1);
-  nrecs       = vlistNrecs(vlistID1);
+  int streamID1  = streamOpenRead(cdoStreamName(0));
+  int vlistID1   = streamInqVlist(streamID1);
+  int taxisID1   = vlistInqTaxis(vlistID1);
+  int gridID1    = vlistInqVarGrid(vlistID1, 0);
+  long gridsize  = vlistGridsizeMax(vlistID1);
+  int nvars      = vlistNvars(vlistID1);
+  int nrecs      = vlistNrecs(vlistID1);
 
-  weight      = (double*) malloc(gridsize*sizeof(double));
+  double *weight = (double*) malloc(gridsize*sizeof(double));
   if ( WEIGHTS )
     gridWeights(gridID1, &weight[0]);
   else
-    for(i=0;i<gridsize;i++) 
-      weight[i]=1;
+    for( i = 0; i < gridsize; i++) weight[i] = 1;
 
   /*  eigenvalues */
 
-  reached_eof = 0;
-  tsID        = 0;
+  tsID = 0;
 
   /* COUNT NUMBER OF TIMESTEPS if EOF_ or EOF_TIME */
   if ( operfunc == EOF_ || operfunc == EOF_TIME )
     {
-      if ( cdoVerbose ) 
+      if ( cdoVerbose )
 	cdoPrint("Counting timesteps in ifile");
       
       while ( TRUE )
         {
-          if ( reached_eof ) continue;
           nrecs = streamInqTimestep(streamID1, tsID);
-          if ( nrecs == 0 ) {
-              reached_eof = 1;
-              break;
-            }
+          if ( nrecs == 0 )  break;
           tsID++;
         }
 
-      if ( cdoVerbose ) 
-	cdoPrint("Counted %i timeSteps",tsID);
+      if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", tsID);
 
       nts         = tsID;
-      reached_eof = 0;
+
       //TODO close on streamID1 ??  streamClose(streamID1);
       streamClose(streamID1);
       streamID1   = streamOpenRead(cdoStreamName(0));
@@ -234,15 +212,14 @@ void *EOFs(void * argument)
 	     n_eig,n,grid_space==1?"grid_space" : "time_space");
 
   if ( cdoTimer ) timer_stop(timer_init);
-  
   if ( cdoTimer ) timer_start(timer_alloc);
 
   /* allocation of temporary fields and output structures */
-  in           = (double*) malloc(gridsize*sizeof(double));
-  datafields   = (double ****) malloc(nvars*sizeof(double ***));
-  datacounts   = (int ***) malloc(nvars*sizeof(int **));
-  eigenvectors = (double ****) malloc(nvars*sizeof(double ***));
-  eigenvalues  = (double ****) malloc(nvars*sizeof(double ***));
+  double *in              = (double *) malloc(gridsize*sizeof(double));
+  int ***datacounts       = (int ***) malloc(nvars*sizeof(int **));
+  double ****datafields   = (double ****) malloc(nvars*sizeof(double ***));
+  double ****eigenvectors = (double ****) malloc(nvars*sizeof(double ***));
+  double ****eigenvalues  = (double ****) malloc(nvars*sizeof(double ***));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -251,8 +228,8 @@ void *EOFs(void * argument)
       nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval             = vlistInqVarMissval(vlistID1, varID);
 
+      datacounts[varID]   = (int **) malloc(nlevs*sizeof(int* ));
       datafields[varID]   = (double ***) malloc(nlevs*sizeof(double **));
-      datacounts[varID]   = (int* *) malloc(nlevs*sizeof(int* ));
       eigenvectors[varID] = (double ***) malloc(nlevs*sizeof(double **));
       eigenvalues[varID]  = (double ***) malloc(nlevs*sizeof(double **));
 
@@ -260,14 +237,11 @@ void *EOFs(void * argument)
         {
           if ( grid_space )
             {
-              datafields[varID][levelID]            = (double **) malloc(1*sizeof(double *));
-              //datafields[varID][levelID][0].grid    = gridID1;
-              //datafields[varID][levelID][0].nmiss   = 0;
-              //datafields[varID][levelID][0].missval = missval;
-              datafields[varID][levelID][0]     = (double*) malloc(gridsize*gridsize*sizeof(double));
+              datafields[varID][levelID]    = (double **) malloc(1*sizeof(double *));
+              datafields[varID][levelID][0] = (double*) malloc(gridsize*gridsize*sizeof(double));
 
-              datacounts[varID][levelID]            = (int*) malloc(gridsize*gridsize*sizeof(int));
-	      for ( i = 0; i<gridsize*gridsize; i++ )
+              datacounts[varID][levelID]    = (int*) malloc(gridsize*gridsize*sizeof(int));
+	      for ( i = 0; i < gridsize*gridsize; i++ )
 		{
 		  datacounts[varID][levelID][i] = 0;
 		  datafields[varID][levelID][0][i] = 0;            
@@ -278,15 +252,12 @@ void *EOFs(void * argument)
               datafields[varID][levelID] = (double **) malloc(nts*sizeof(double *));
               for ( tsID = 0; tsID < nts; tsID++ )
                 {
-                  //datafields[varID][levelID][tsID].grid    = gridID1;
-                  //datafields[varID][levelID][tsID].nmiss   = 0;
-                  //datafields[varID][levelID][tsID].missval = missval;
-                  datafields[varID][levelID][tsID]    = (double*) malloc(gridsize*sizeof(double));
+                  datafields[varID][levelID][tsID] = (double *) malloc(gridsize*sizeof(double));
                   for ( i = 0; i < gridsize; ++i )
                     datafields[varID][levelID][tsID][i] = 0;
                 }
-              datacounts[varID][levelID] = (int*) malloc(gridsize*sizeof(int));	      
-	      for(i=0;i<gridsize;i++)
+              datacounts[varID][levelID] = (int *) malloc(gridsize*sizeof(int));	      
+	      for ( i = 0; i < gridsize; i++ )
 		datacounts[varID][levelID][i] = 0;
             }
 
@@ -318,16 +289,8 @@ void *EOFs(void * argument)
   /* read the data and create covariance matrices for each var & level */
   while ( TRUE )
     {
-      if ( reached_eof ) continue;
       nrecs = streamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 )
-        {
-          reached_eof = 1;
-          break;
-        }
-
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      if ( nrecs == 0 ) break;
 
       for ( recID = 0; recID < nrecs; recID++ )
         {
@@ -389,8 +352,7 @@ void *EOFs(void * argument)
       tsID++;
     }
 
-  if ( tsID == 1 )
-    cdoAbort("File consists of only one timestep!");
+  if ( tsID == 1 ) cdoAbort("File consists of only one timestep!");
 
   if ( grid_space )
     for ( i1 = 0; i1 < gridsize; ++i1 )
@@ -455,13 +417,13 @@ void *EOFs(void * argument)
 	      if ( npack )
 		{
 		  cov = (double **) malloc(npack*sizeof(double *));
-		  for (i1 = 0; i1 < npack; i1++ )
-		    cov[i1] = (double*) malloc(npack*sizeof(double));
-		  eigv = (double*) malloc(npack*sizeof(double));
+		  for ( i1 = 0; i1 < npack; i1++ )
+		    cov[i1] = (double *) malloc(npack*sizeof(double));
+		  eigv = (double *) malloc(npack*sizeof(double));
 		}
 
-              for (i1 = 0; i1 < npack; i1++)
-		for (i2 = i1; i2 < npack; i2++ )
+              for ( i1 = 0; i1 < npack; i1++ )
+		for ( i2 = i1; i2 < npack; i2++ )
 		  if ( datacountv[pack[i1]*gridsize+pack[i2]] )
 		    cov[i2][i1] = cov[i1][i2] =
 		      datafieldv[0][pack[i1]*gridsize+pack[i2]]*   // covariance
@@ -488,10 +450,10 @@ void *EOFs(void * argument)
 	      if ( cdoVerbose )
 		cdoPrint("allocating cov with %i x %i elements | npack=%i",nts,nts,npack);
 
-              cov = (double**) malloc(nts*sizeof(double*));
-              for ( j1 = 0; j1 < nts; j1++)
-                cov[j1] = (double*) malloc(nts*sizeof(double));
-	      eigv = (double*) malloc(nts*sizeof(double));
+              cov = (double **) malloc(nts*sizeof(double *));
+              for ( j1 = 0; j1 < nts; j1++ )
+                cov[j1] = (double *) malloc(nts*sizeof(double));
+	      eigv = (double *) malloc(nts*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)
@@ -517,12 +479,12 @@ void *EOFs(void * argument)
 
           /* SOLVE THE EIGEN PROBLEM */
 	  if ( cdoTimer ) timer_start(timer_eig);
-	  
+
 	  if ( eigen_mode == JACOBI ) 
 	    // TODO: use return status (>0 okay, -1 did not converge at all) 
-	    parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,__func__);
+	    parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
 	  else 
-	    eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,__func__);
+	    eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
 
 	  if ( cdoTimer ) timer_stop(timer_eig);
 	  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
@@ -537,7 +499,7 @@ void *EOFs(void * argument)
 
               if ( grid_space )
 		{
-		  for(j = 0; j < npack; j++)
+		  for( j = 0; j < npack; j++ )
 		    eigenvec[pack[j]] = 
 #ifdef OLD_IMPLEMENTATION
 		      cov[i][j] / sqrt(weight[pack[j]]);
@@ -548,7 +510,7 @@ void *EOFs(void * argument)
               else if ( time_space )
                 {
 #if defined(_OPENMP)
-#pragma omp parallel for private(i2,j,sum) shared(datafieldv,eigenvec)
+#pragma omp parallel for private(i2,j,sum) shared(datafieldv, eigenvec)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     {
@@ -575,8 +537,7 @@ void *EOFs(void * argument)
 #else
 		      sum += /*weight[pack[i2]] **/
 #endif
-			eigenvec[pack[i2]] *
-			eigenvec[pack[i2]];
+			eigenvec[pack[i2]] * eigenvec[pack[i2]];
 		    }
 
                   if ( sum > 0 )
@@ -616,37 +577,35 @@ void *EOFs(void * argument)
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
   /* eigenvalues */
-  streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  vlistID2    = vlistDuplicate(vlistID1);
-  taxisID2    = taxisDuplicate(taxisID1);
+  int vlistID2    = vlistDuplicate(vlistID1);
+  int taxisID2    = taxisDuplicate(taxisID1);
   taxisDefRdate(taxisID2, 0);
   taxisDefRtime(taxisID2, 0);
   vlistDefTaxis(vlistID2, taxisID2);
-  gridID2     = gridCreate(GRID_LONLAT, 1);
+  int gridID2     = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   xvals    = 0;
   yvals    = 0;
   gridDefXvals(gridID2, &xvals);
   gridDefYvals(gridID2, &yvals);
-  ngrids   = vlistNgrids(vlistID2);
+  int ngrids   = vlistNgrids(vlistID2);
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
   /*  eigenvectors */
-  streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  vlistID3    = vlistDuplicate(vlistID1);
-  taxisID3    = taxisDuplicate(taxisID1);
-  gridID3     = gridDuplicate(gridID1);
+  int vlistID3    = vlistDuplicate(vlistID1);
+  int taxisID3    = taxisDuplicate(taxisID1);
   taxisDefRdate(taxisID3, 0);
   taxisDefRtime(taxisID3, 0);
   vlistDefTaxis(vlistID3, taxisID3);
 
 
-  if ( cdoVerbose )
-    cdoPrint("Initialized streams");
+  if ( cdoVerbose ) cdoPrint("Initialized streams");
 
   if ( cdoTimer ) timer_start(timer_write);
 
@@ -655,8 +614,8 @@ void *EOFs(void * argument)
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
 
-  vdate = 10101;
-  vtime = 0;
+  int vdate = 10101;
+  int vtime = 0;
   juldate = juldate_encode(calendar, vdate, vtime);
   for ( tsID = 0; tsID < n; tsID++ )
     {
@@ -711,7 +670,7 @@ void *EOFs(void * argument)
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       gridsize =  gridInqSize(vlistInqVarGrid(vlistID1, varID));
       
-      for(levelID = 0; levelID < nlevs; levelID++)
+      for( levelID = 0; levelID < nlevs; levelID++ )
         {
 	  int n_use = time_space == 1? nts : gridsize;
           for(i = 0; i < n_use; i++)
@@ -722,27 +681,29 @@ void *EOFs(void * argument)
 	      if (eigenvalues[varID][levelID][i])
 		free(eigenvalues[varID][levelID][i]);
 	    }
+	  
 	  if ( grid_space ) 
 	    free(datafields[varID][levelID][0]);
 	  else if ( time_space )
 	    for (tsID=0; tsID<nts; tsID++ )
 	      free(datafields[varID][levelID][tsID]);
-          free(eigenvectors[varID][levelID]);
-          free(eigenvalues[varID][levelID]);
+
           free(datacounts[varID][levelID]);
 	  free(datafields[varID][levelID]);
+          free(eigenvectors[varID][levelID]);
+          free(eigenvalues[varID][levelID]);
         }
-      free(eigenvectors[varID]);
-      free(eigenvalues[varID]);
+      
       free(datafields[varID]);
       free(datacounts[varID]);
-
+      free(eigenvectors[varID]);
+      free(eigenvalues[varID]);
     }
 
-  free(eigenvectors);
-  free(eigenvalues);
   free(datafields);
   free(datacounts);
+  free(eigenvectors);
+  free(eigenvalues);
   free(in);
   free(weight);
 
@@ -751,15 +712,12 @@ void *EOFs(void * argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  //  vlistDestroy(vlistID1);
-  //  vlistDestroy(vlistID2);
-  //  vlistDestroy(vlistID3);
+  vlistDestroy(vlistID2);
+  vlistDestroy(vlistID3);
 
   gridDestroy(gridID1);
   gridDestroy(gridID2);
-  gridDestroy(gridID3);
 
-  //  taxisDestroy(taxisID1);
   //  taxisDestroy(taxisID2);
   //  taxisDestroy(taxisID3);
 
