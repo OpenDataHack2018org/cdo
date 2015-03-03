@@ -452,7 +452,7 @@ void *EOFs(void * argument)
 	    // TODO: use return status (>0 okay, -1 did not converge at all) 
 	    parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
 	  else 
-	    eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
+	    eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
 
 	  if ( cdoTimer ) timer_stop(timer_eig);
 	  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */

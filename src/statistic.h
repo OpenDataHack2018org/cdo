@@ -2,7 +2,7 @@
 
 #define _STATISTIC_H
 
-void eigen_solution_of_symmetric_matrix (double **a, double *eig_val, int n, int n_eig, const char *prompt);
+void eigen_solution_of_symmetric_matrix (double **a, double *eig_val, int n, const char *prompt);
 int solution_of_linear_equation (double **a, double *b, int n);
 int inverse_of_matrix (double **a, double **b, int n);
 void fft(double *real, double *imag, int n, int sign);

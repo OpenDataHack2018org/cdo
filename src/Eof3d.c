@@ -391,7 +391,7 @@ void *EOF3d(void * argument)
       if ( eigen_mode == JACOBI ) 
 	parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
       else 
-	eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
+	eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
       /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
 
       if ( cdoVerbose ) 

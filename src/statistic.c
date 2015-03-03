@@ -46,11 +46,9 @@ int max_jacobi_iter;
 #endif
 
 
-void make_symmetric_matrix_triangular (double **a, int n,
-                                       double *d, double *e, const char *prompt);
+void make_symmetric_matrix_triangular (double **a, int n, double *d, double *e, const char *prompt);
 double pythagoras (double a, double b);
-void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
-                                          double **a, int n_eig, const char *prompt);
+void eigen_solution_of_triangular_matrix (double *d, double *e, int n, double **a, const char *prompt);
 int lu_decomposition (double **a, int n, int *index, int *sign);
 void lu_backsubstitution (double **a, int n, int *index, double *b);
 
@@ -63,7 +61,7 @@ static double beta_help (double a, double b, double x, const char *prompt);
 
 
 void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
-					 int n, int n_eig, const char *prompt)
+					 int n, const char *prompt)
 /* After return the rows (!!!) of a are the eigenvectors */
 {
   double *e;
@@ -74,7 +72,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
   
   make_symmetric_matrix_triangular (a, n, eig_val, e, prompt);
   
-  eigen_solution_of_triangular_matrix (eig_val, e, n, a, n_eig, prompt);
+  eigen_solution_of_triangular_matrix (eig_val, e, n, a, prompt);
   
   free (e);
 
@@ -276,7 +274,7 @@ double pythagoras (double a, double b)
 #define MAX_ITER 1000
 
 void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
-					  double **a, int n_eig, const char *prompt)
+					  double **a, const char *prompt)
 {
   int i, k, l, m, iter;
   double b, c, f, g, p, r, s;
@@ -286,7 +284,7 @@ void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
     e[i - 1] = e[i];
   
   e[n - 1] = 0;
-  for (l = 0; l < n_eig; l++)
+  for (l = 0; l < n; l++)
     {
       iter = 0;
       while (1)
