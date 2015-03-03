@@ -144,9 +144,11 @@ void *EOFs(void * argument)
 
       //TODO close on streamID1 ??  streamClose(streamID1);
       streamClose(streamID1);
+
       streamID1   = streamOpenRead(cdoStreamName(0));
       vlistID1    = streamInqVlist(streamID1);
       taxisID1    = vlistInqTaxis(vlistID1);
+
       if ( nts < gridsize || operfunc == EOF_TIME )
 	{
 	  time_space = 1;
@@ -469,18 +471,30 @@ void *EOFs(void * argument)
 		  /*
 		  double sumw= 0;
 		  for ( j = 0; j < npack; j++ ) sumw += sqrt(weight[pack[j]]);
-		  printf("sumw %g\n", sumw);
+		  printf("sumw %g %g\n", sumw, 1./sumw);
 		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[j]];
-		  printf("sumw %g\n", sumw);
+		  for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[j]*gridsize+pack[i]];
+		  printf("dat %g %g\n", sumw, 1./sumw);
+		  sumw= 0;
+		  for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[i]*gridsize+pack[j]]* weight[pack[j]];
+		  printf("dat %g %g\n", sumw, 1./sumw);
+		  sumw= 0;
+		  for ( j = 0; j < npack; j++ ) sumw += datacountv[pack[j]*gridsize+pack[i]];
+		  printf("cou %g %g\n", sumw, 1./sumw);
+		  sumw= 0;
+		  for ( j = 0; j < npack; j++ ) sumw += cov[i][j];
+		  printf("cov %g %g\n", sumw, 1./sumw);
+		  sumw= 0;
+		  for ( j = 0; j < npack; j++ ) sumw += cov[i][j] * weight[pack[j]];
+		  printf("cov %g %g\n", sumw, 1./sumw);
 		  */
 		  for ( j = 0; j < npack; j++ )
 		    eigenvec[pack[j]] = 
 #ifdef OLD_IMPLEMENTATION
 		      cov[i][j] / sqrt(weight[pack[j]]);
 #else
-		      cov[i][j] /*/ sqrt(weight[pack[j]])*/;
-		  // cov[i][j] / (sqrt(weight[pack[j]])*29.15);
+		      cov[i][j];
+		  // cov[i][j] / (sqrt(weight[pack[j]])*29.144);
 #endif
 		}
               else if ( time_space )

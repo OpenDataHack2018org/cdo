@@ -58,8 +58,7 @@ void *EOF3d(void * argument)
   int nmiss,ngrids,n=0,nlevs=0,npack=0,nts=0;
   int offset;
   int *pack;
-  int timer_init = 0, timer_alloc = 0, timer_read = 0, timer_cov = 0;
-  int timer_eig = 0, timer_post = 0, timer_write = 0, timer_finish = 0;
+  int timer_cov = 0, timer_eig = 0;
   int *varID2;
 
   int calendar = CALENDAR_STANDARD;
@@ -75,18 +74,11 @@ void *EOF3d(void * argument)
   enum T_EIGEN_MODE eigen_mode = JACOBI;
 
 
-  if ( cdoTimer ) {
-    timer_init = timer_new("Timeof init");
-    timer_alloc= timer_new("Timeof alloc");
-    timer_read = timer_new("Timeof read");
-    timer_cov  = timer_new("Timeof cov");
-    timer_eig  = timer_new("Timeof eig");
-    timer_post = timer_new("Timeof post");
-    timer_write= timer_new("Timeof write");
-    timer_finish=timer_new("Timeof finish");
-
-    timer_start(timer_init);
-  }
+  if ( cdoTimer )
+    {
+      timer_cov  = timer_new("Timeof cov");
+      timer_eig  = timer_new("Timeof eig");
+    }
 
   cdoInitialize(argument);
   cdoOperatorAdd("eof3d",        EOF3D_,        0, NULL);
@@ -112,7 +104,7 @@ void *EOF3d(void * argument)
   }
 
   if ( cdoVerbose ) 
-    cdoPrint("Set eigen_mode to %s\n",eigen_mode == JACOBI? "jacobi" : "danielson_lanczos");
+    cdoPrint("Set eigen_mode to %s",eigen_mode == JACOBI? "jacobi" : "danielson_lanczos");
 
 #if defined(_OPENMP)
   if ( omp_get_max_threads() > 1 && eigen_mode == DANIELSON_LANCZOS )  {
@@ -137,52 +129,6 @@ void *EOF3d(void * argument)
     for( i = 0; i < gridsize; i++) weight[i] = 1;
 
   /*  eigenvalues */
-  int streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  int taxisID2    = taxisDuplicate(taxisID1);
-
-  int gridID2     = gridCreate(GRID_LONLAT, 1);
-  gridDefXsize(gridID2, 1);
-  gridDefYsize(gridID2, 1);
-  xvals       = (double*) malloc(1*sizeof(double));
-  yvals       = (double*) malloc(1*sizeof(double));
-  zvals       = (double*) malloc(1*sizeof(double));
-  xvals[0]    = 0;
-  yvals[0]    = 0;
-  zvals[0]    = 0;
-  gridDefXvals(gridID2, xvals);
-  gridDefYvals(gridID2, yvals);
-
-  int zaxisID2 = zaxisCreate(ZAXIS_GENERIC,1);
-  zaxisDefLevels(zaxisID2,zvals);
-  zaxisDefName(zaxisID2,"zaxis_Reduced");
-  zaxisDefLongname(zaxisID2,"Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
-
-  int vlistID2 = vlistCreate();
-  taxisDefRdate(taxisID2, 0);
-  taxisDefRtime(taxisID2, 0);
-  vlistDefTaxis(vlistID2, taxisID2);
-
-  varID2 = (int*) malloc(nvars*sizeof(int));
-  for ( varID=0; varID<nvars; varID++ )
-    varID2[varID] = vlistDefVar(vlistID2, gridID2, zaxisID2, TSTEP_INSTANT);
-  ngrids      = vlistNgrids(vlistID2);
-  for ( i = 0; i < ngrids; i++ )
-    vlistChangeGridIndex(vlistID2, i, gridID2);
-
-  int streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  int vlistID3    = vlistDuplicate(vlistID1);
-  int taxisID3    = taxisDuplicate(taxisID1);
-  taxisDefRdate(taxisID3, 0);
-  taxisDefRtime(taxisID3, 0);
-  vlistDefTaxis(vlistID3, taxisID3);
-  
-
-  if ( cdoVerbose )
-    cdoPrint("Initialized streams");
-
-  /*  eigenvalues */
 
   tsID = 0;
 
@@ -199,7 +145,12 @@ void *EOF3d(void * argument)
     }
 
   nts         = tsID;
+
+  streamClose(streamID1);
+
   streamID1   = streamOpenRead(cdoStreamName(0));
+  vlistID1    = streamInqVlist(streamID1);
+  taxisID1    = vlistInqTaxis(vlistID1);
 
   /* reset the requested number of eigen-function to the maximum if neccessary */
   if ( n_eig > nts )
@@ -209,13 +160,10 @@ void *EOF3d(void * argument)
       cdoWarning("Setting n_eig to %i.", nts);
       n_eig = nts;
     }
+
   n = nts;
 
-  if ( cdoVerbose ) 
-    cdoPrint("counted %i timesteps",n);
-
-  if ( cdoTimer ) timer_stop(timer_init);
-  if ( cdoTimer ) timer_start(timer_alloc);
+  if ( cdoVerbose )  cdoPrint("counted %i timesteps",n);
 
   /* allocation of temporary fields and output structures */
   double *in       = (double *) malloc(gridsize*sizeof(double));
@@ -264,9 +212,6 @@ void *EOF3d(void * argument)
     cdoPrint("allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%i for processing in %s",
 	     nts,n,gridsize,"time_space");
   
-  if ( cdoTimer ) timer_stop(timer_alloc);
-
-  if ( cdoTimer ) timer_start(timer_read);
   tsID = 0;
 
   /* read the data and create covariance matrices for each var & level */
@@ -278,6 +223,7 @@ void *EOF3d(void * argument)
       for ( recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
+
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
           missval = vlistInqVarMissval(vlistID1, varID);
@@ -310,8 +256,6 @@ void *EOF3d(void * argument)
     cdoPrint("Read data for %i variables",nvars);
   
   pack = (int*) malloc(temp_size*sizeof(int)); //TODO
-
-  if ( cdoTimer ) timer_stop(timer_read);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -401,7 +345,6 @@ void *EOF3d(void * argument)
 	eigenvalues[varID][eofID][0] = eigv[eofID];
       
       if ( cdoTimer ) timer_stop(timer_eig);
-      if ( cdoTimer ) timer_start(timer_post);
 
       for ( eofID = 0; eofID < n_eig; eofID++ )
 	{
@@ -450,8 +393,6 @@ void *EOF3d(void * argument)
 	    }
 	}     /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
 
-      if ( cdoTimer ) timer_stop(timer_post);
-
       if ( eigv ) free(eigv);
       for ( i=0; i<n; i++ )
 	if ( cov[i] ) 
@@ -460,10 +401,48 @@ void *EOF3d(void * argument)
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
+  /*  eigenvalues */
+  int streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  if ( cdoTimer ) timer_start(timer_write);
+  int taxisID2    = taxisDuplicate(taxisID1);
 
-  cdoPrint("Started writing");
+  int gridID2     = gridCreate(GRID_LONLAT, 1);
+  gridDefXsize(gridID2, 1);
+  gridDefYsize(gridID2, 1);
+  xvals       = (double*) malloc(1*sizeof(double));
+  yvals       = (double*) malloc(1*sizeof(double));
+  zvals       = (double*) malloc(1*sizeof(double));
+  xvals[0]    = 0;
+  yvals[0]    = 0;
+  zvals[0]    = 0;
+  gridDefXvals(gridID2, xvals);
+  gridDefYvals(gridID2, yvals);
+
+  int zaxisID2 = zaxisCreate(ZAXIS_GENERIC,1);
+  zaxisDefLevels(zaxisID2,zvals);
+  zaxisDefName(zaxisID2,"zaxis_Reduced");
+  zaxisDefLongname(zaxisID2,"Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
+
+  int vlistID2 = vlistCreate();
+  taxisDefRdate(taxisID2, 0);
+  taxisDefRtime(taxisID2, 0);
+  vlistDefTaxis(vlistID2, taxisID2);
+
+  varID2 = (int*) malloc(nvars*sizeof(int));
+  for ( varID=0; varID<nvars; varID++ )
+    varID2[varID] = vlistDefVar(vlistID2, gridID2, zaxisID2, TSTEP_INSTANT);
+  ngrids      = vlistNgrids(vlistID2);
+  for ( i = 0; i < ngrids; i++ )
+    vlistChangeGridIndex(vlistID2, i, gridID2);
+
+  int streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+
+  int vlistID3    = vlistDuplicate(vlistID1);
+  int taxisID3    = taxisDuplicate(taxisID1);
+  taxisDefRdate(taxisID3, 0);
+  taxisDefRtime(taxisID3, 0);
+  vlistDefTaxis(vlistID3, taxisID3);
+
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
 
@@ -509,12 +488,6 @@ void *EOF3d(void * argument)
         } // for ( varID = 0; ... )
     } // for ( tsID = 0; ... )
 
-  if ( cdoTimer ) timer_stop(timer_write);
-  
-  if ( cdoTimer ) timer_start(timer_finish);
-
-  cdoPrint("Started cleanup in eof3d");
-  
   for ( varID = 0; varID < nvars; varID++)
     {
       for( i = 0; i < nts; i++)
@@ -540,8 +513,6 @@ void *EOF3d(void * argument)
   streamClose(streamID3);
   streamClose(streamID2);
   streamClose(streamID1);
-
-  if ( cdoTimer ) timer_stop(timer_finish);
   
   cdoFinish();
  
