@@ -450,7 +450,7 @@ void *EOFs(void * argument)
 
 	  if ( eigen_mode == JACOBI ) 
 	    // TODO: use return status (>0 okay, -1 did not converge at all) 
-	    parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
+	    parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
 	  else 
 	    eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
 

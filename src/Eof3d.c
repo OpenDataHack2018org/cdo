@@ -389,7 +389,7 @@ void *EOF3d(void * argument)
 	cdoPrint("Processed correlation matrix for var %2i | npack: %4i",varID,n);
 
       if ( eigen_mode == JACOBI ) 
-	parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
+	parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
       else 
 	eigen_solution_of_symmetric_matrix(cov, eigv, n, n, __func__);
       /* NOW: cov contains the eigenvectors, eigv the eigenvalues */

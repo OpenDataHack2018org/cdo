@@ -1262,9 +1262,9 @@ double fisher(double m, double n, double x, const char *prompt)
 /* ******************************************************************************** */
 
 
-void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, int n2, const char func[])
+void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n, const char func[])
 {
-  func = "statistics-module";
+  UNUSED(func);
 
   char *envstr;
   /* Get Environment variables if set */
@@ -1288,16 +1288,8 @@ void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, 
     cdoPrint("Using FNORM_PRECISION %g from %s",
 	     fnorm_precision,envstr?"Environment":"default");
 
-  if ( n1 != n2 )
-    {
-      fprintf(stderr, 
-	      "WARNING: Parallel eigenvalue computation of non-squared matrices\n"
-	      "         Not implemented yet.\n"
-	      "         Using sequential algorithm");                              
-      eigen_solution_of_symmetric_matrix(M,A,n1,n2,func);
-    }
-  else
-    jacobi_1side(M, A, n1);
+  // eigen_solution_of_symmetric_matrix(M, A, n, func);
+  jacobi_1side(M, A, n);
 
   return;
 }
