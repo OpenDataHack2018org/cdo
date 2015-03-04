@@ -69,8 +69,18 @@ void *EOFs(void * argument)
   double *df1p, *df2p;
 
   enum T_EIGEN_MODE eigen_mode = JACOBI;
-
-  if ( cdoTimer )
+#ifdef EOFDATA
+  typedef struct {
+    int init;
+    int n;
+    int npack;
+    int *pack;
+    double *covar_array;
+    double **covar;
+  }
+  eofdata_t;
+#endif
+ if ( cdoTimer )
     {
       timer_cov  = timer_new("Timeof cov");
       timer_eig  = timer_new("Timeof eig");
@@ -98,7 +108,7 @@ void *EOFs(void * argument)
     cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
     cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
     cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
-    envstr=NULL;
+    envstr = NULL;
   }
 
   if ( cdoVerbose ) 
@@ -115,11 +125,18 @@ void *EOFs(void * argument)
   int nvars      = vlistNvars(vlistID1);
   int nrecs      = vlistNrecs(vlistID1);
 
-  double *weight = (double*) malloc(gridsize*sizeof(double));
+  int ngrids = vlistNgrids(vlistID1);
+  for ( int index = 1; index < ngrids; index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
+      {
+	cdoAbort("Too many different grids!");
+      }
+
+  double *weight = (double *) malloc(gridsize*sizeof(double));
   if ( WEIGHTS )
     gridWeights(gridID1, weight);
   else
-    for( i = 0; i < gridsize; i++) weight[i] = 1;
+    for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
 
   /*  eigenvalues */
 
@@ -201,6 +218,9 @@ void *EOFs(void * argument)
 
   /* allocation of temporary fields and output structures */
   double *in              = (double *) malloc(gridsize*sizeof(double));
+#ifdef EOFDATA
+  eofdata_t **eofdata     = (eofdata_t **) malloc(nvars*sizeof(eofdata_t*));
+#endif
   int ***datacounts       = (int ***) malloc(nvars*sizeof(int **));
   double ****datafields   = (double ****) malloc(nvars*sizeof(double ***));
   double ****eigenvectors = (double ****) malloc(nvars*sizeof(double ***));
@@ -213,13 +233,20 @@ void *EOFs(void * argument)
       nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval             = vlistInqVarMissval(vlistID1, varID);
 
-      datacounts[varID]   = (int **) malloc(nlevs*sizeof(int* ));
+#ifdef EOFDATA
+      eofdata[varID]      = (eofdata_t *) malloc(nlevs*sizeof(eofdata_t));
+#endif
+      datacounts[varID]   = (int **) malloc(nlevs*sizeof(int *));
       datafields[varID]   = (double ***) malloc(nlevs*sizeof(double **));
       eigenvectors[varID] = (double ***) malloc(nlevs*sizeof(double **));
       eigenvalues[varID]  = (double ***) malloc(nlevs*sizeof(double **));
 
       for ( levelID = 0; levelID < nlevs; ++levelID )
         {
+#ifdef EOFDATA
+	  eofdata[varID][levelID].init = 0;
+	  eofdata[varID][levelID].pack = NULL;
+#endif
           if ( grid_space )
             {
               datafields[varID][levelID]    = (double **) malloc(1*sizeof(double *));
@@ -267,6 +294,12 @@ void *EOFs(void * argument)
   if ( cdoVerbose )
     cdoPrint("Allocated eigenvalue/eigenvector structures with nts=%i gridsize=%i", nts, gridsize);
 
+#ifdef EOFDATA
+  int ipack, jpack;
+  int npack;
+  int *pack;
+  double **covar;
+#endif
   tsID = 0;
 
   /* read the data and create covariance matrices for each var & level */
@@ -280,18 +313,90 @@ void *EOFs(void * argument)
           int i2;
 
           streamInqRecord(streamID1, &varID, &levelID);
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-
-          missval = vlistInqVarMissval(vlistID1, varID);
           streamReadRecord(streamID1, in, &nmiss);
 
-          if ( grid_space )
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          missval = vlistInqVarMissval(vlistID1, varID);
+#ifdef EOFDATA
+	  if ( !eofdata[varID][levelID].init )
+	    {
+	      pack = (int *) malloc(gridsize*sizeof(int));
+	      npack = 0;
+	      
+	      for ( i = 0; i < gridsize; ++i )
+		{
+		  if ( !DBL_IS_EQUAL(weight[i], 0) && !DBL_IS_EQUAL(weight[i], missval) &&
+		       !DBL_IS_EQUAL(in[i], missval) )
+		    pack[npack++] = i;
+		}
+	      
+	      eofdata[varID][levelID].npack = npack;
+	      eofdata[varID][levelID].pack  = pack;
+	    }
+	  else
+	    {
+	      npack = eofdata[varID][levelID].npack;
+	      pack  = eofdata[varID][levelID].pack;
+	    }
+
+	  ipack = 0;
+	  for ( i = 0; i < gridsize; ++i )
+	    {
+	      if ( !DBL_IS_EQUAL(weight[i], 0) && !DBL_IS_EQUAL(weight[i], missval) &&
+		   !DBL_IS_EQUAL(in[i], missval) && pack[ipack] != i )
+		{
+		  cdoAbort("Missing values unsupported!");
+		}
+	      else if ( DBL_IS_EQUAL(in[i], missval) && pack[ipack] == i )
+		{
+		  cdoAbort("Missing values unsupported!");
+		}
+	      ipack++;
+	    }
+
+	  if ( !eofdata[varID][levelID].init )
+	    {
+	      int n;
+	      
+	      if      ( grid_space ) n = npack;
+	      else if ( time_space ) n = nts;
+	      
+	      double *covar_array = (double *) malloc(n*n*sizeof(double));
+	      covar = (double **) malloc(n*sizeof(double *));
+	      for ( i = 0; i < n; ++i ) covar[i] = covar_array + n*i;
+	      for ( i = 0; i < n; ++i )
+		{
+		  // work[0][i] = 0;
+		  for ( j = 0; j < n; ++j ) covar[i][j] = 0;
+		}
+
+	      eofdata[varID][levelID].n           = n;
+	      eofdata[varID][levelID].covar_array = covar_array;
+	      eofdata[varID][levelID].covar       = covar;
+	    }
+	  else
+	    {
+	      covar = eofdata[varID][levelID].covar;
+	    }
+#endif
+	  if ( grid_space )
             {
+#ifdef EOFDATA
+#if defined(_OPENMP)
+#pragma omp parallel for private(ipack, jpack) default(shared)
+#endif
+	      for ( ipack = 0; ipack < npack; ++ipack )
+		{
+		  // work[0][ipack] += in[0][pack[ipack]];
+		  for ( jpack = ipack; jpack < npack; ++jpack )
+		    covar[ipack][jpack] += in[pack[ipack]] * in[pack[jpack]];
+		}
+#endif
 	      // This could be done in parallel to save lots of time
 #if defined(_OPENMP)
-#pragma omp parallel for private(i1,i2) default(shared)
+#pragma omp parallel for private(i1, i2) default(shared)
 #endif
-              for ( i1 = 0; i1 < gridsize; i1++ )
+	      for ( i1 = 0; i1 < gridsize; i1++ )
                 {
                   for ( i2 = i1; i2 < gridsize; i2++ )
                     {
@@ -331,6 +436,9 @@ void *EOFs(void * argument)
 		    }
 		}
 	    }
+#ifdef EOFDATA  
+	  eofdata[varID][levelID].init = 1;
+#endif
         }
       tsID++;
     }
@@ -397,7 +505,30 @@ void *EOFs(void * argument)
 		  eigv = (double *) malloc(npack*sizeof(double));
 		}
 
-              for ( i1 = 0; i1 < npack; i1++ )
+#ifdef EOFDATA
+	      covar = eofdata[varID][levelID].covar;
+
+	      for ( ipack = 0; ipack < npack; ++ipack )
+		{
+		  i = pack[ipack];
+		  for ( jpack = 0; jpack < npack; ++jpack)
+		    {
+		      if ( jpack < ipack )
+			{
+			  covar[ipack][jpack] = covar[jpack][ipack];
+			}
+		      else
+			{
+			  j = pack[jpack];
+			  covar[ipack][jpack] = 
+			    covar[ipack][jpack] *   // covariance
+			    sqrt(weight[i]) * sqrt(weight[j]) / sum_w /       // weights
+			    (datacountv[i*gridsize+j]);   // number of data contributing
+			}
+		    }
+		}
+#endif
+	      for ( i1 = 0; i1 < npack; i1++ )
 		for ( i2 = i1; i2 < npack; i2++ )
 		  if ( datacountv[pack[i1]*gridsize+pack[i2]] )
 		    cov[i2][i1] = cov[i1][i2] =
@@ -575,7 +706,6 @@ void *EOFs(void * argument)
   yvals    = 0;
   gridDefXvals(gridID2, &xvals);
   gridDefYvals(gridID2, &yvals);
-  int ngrids   = vlistNgrids(vlistID2);
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
@@ -660,14 +790,24 @@ void *EOFs(void * argument)
 	  free(datafields[varID][levelID]);
           free(eigenvectors[varID][levelID]);
           free(eigenvalues[varID][levelID]);
+#ifdef EOFDATA
+	  if ( eofdata[varID][levelID].pack ) free(eofdata[varID][levelID].pack);
+	  if ( eofdata[varID][levelID].covar_array) free(eofdata[varID][levelID].covar_array);
+#endif
         }
       
+#ifdef EOFDATA
+      free(eofdata[varID]);
+#endif
       free(datafields[varID]);
       free(datacounts[varID]);
       free(eigenvectors[varID]);
       free(eigenvalues[varID]);
     }
 
+#ifdef EOFDATA
+  free(eofdata);
+#endif
   free(datafields);
   free(datacounts);
   free(eigenvectors);
