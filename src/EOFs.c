@@ -448,212 +448,6 @@ void *EOFs(void * argument)
 	  datafields[varID][levelID][0][i1*gridsize+i2] = datafields[varID][levelID][0][i2*gridsize+i1];
         }
 
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      char vname[256];
-      vlistInqVarName(vlistID1, varID, vname);
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-
-      if ( cdoVerbose )
-	cdoPrint("Calculating covar matrices for %i levels of var%i (%s)", nlevs, varID, vname);
-
-      for ( levelID = 0; levelID < nlevs; levelID++ )
-        {
-	  if ( cdoTimer ) timer_start(timer_cov);
-
-	  if ( cdoVerbose ) cdoPrint("processing level %i",levelID);
-
-          int i2;
-
-	  double **datafieldv = datafields[varID][levelID];
-
-          /*double **cov  = NULL;*/ // TODO covariance matrix / eigenvectors after solving
-          double *eigv  = NULL; // TODO eigenvalues
-
-	  npack = eofdata[varID][levelID].npack;
-	  pack  = eofdata[varID][levelID].pack;
-
-	  double sum_w = 0;
-
-          if ( grid_space )
-            {
-              for ( i1 = 0; i1 < npack; i1++ ) sum_w += weight[pack[i1]];
-
-	      if ( npack )
-		{
-		  eigv = (double *) malloc(npack*sizeof(double));
-		}
-
-#ifdef EOFDATA
-	      covar = eofdata[varID][levelID].covar;
-
-	      for ( ipack = 0; ipack < npack; ++ipack )
-		{
-		  i = pack[ipack];
-		  for ( jpack = 0; jpack < npack; ++jpack)
-		    {
-		      if ( jpack < ipack )
-			{
-			  covar[ipack][jpack] = covar[jpack][ipack];
-			}
-		      else
-			{
-			  j = pack[jpack];
-			  covar[ipack][jpack] = 
-			    covar[ipack][jpack] *   // covariance
-			    sqrt(weight[i]) * sqrt(weight[j]) / sum_w /       // weights
-			    nts;   // number of data contributing
-			}
-		    }
-		}
-#endif
-            }
-          else if ( time_space )
-            {
-              for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
-
-	      if ( cdoVerbose )
-		cdoPrint("allocating covar with %i x %i elements | npack=%i", nts, nts, npack);
-
-	      covar_array = (double *) malloc(nts*nts*sizeof(double));
-	      covar = (double **) malloc(nts*sizeof(double *));
-	      for ( i = 0; i < nts; ++i ) covar[i] = covar_array + nts*i;
-
-	      eigv = (double *) malloc(nts*sizeof(double));
-
-#if defined(_OPENMP)
-#pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)
-#endif
-              for ( j1 = 0; j1 < nts; j1++ )
-		for ( j2 = j1; j2 < nts; j2++ )
-		  {
-		    sum = 0;
-		    df1p = datafieldv[j1];
-		    df2p = datafieldv[j2];
-		    for ( i = 0; i < npack; i++ )
-		      {
-			sum += weight[pack[i]]*df1p[pack[i]]*df2p[pack[i]];
-		      }
-		    covar[j2][j1] = covar[j1][j2] = sum / sum_w / nts;
-		  }
-
-	      if ( cdoVerbose )
-		cdoPrint("finished calculation of covar-matrix for var %s", vname);
-            }
-
-	  if ( cdoTimer ) timer_stop(timer_cov);
-
-          /* SOLVE THE EIGEN PROBLEM */
-	  if ( cdoTimer ) timer_start(timer_eig);
-
-	  if ( eigen_mode == JACOBI ) 
-	    // TODO: use return status (>0 okay, -1 did not converge at all) 
-	    parallel_eigen_solution_of_symmetric_matrix(covar, eigv, n, __func__);
-	  else 
-	    eigen_solution_of_symmetric_matrix(covar, eigv, n, __func__);
-
-	  if ( cdoTimer ) timer_stop(timer_eig);
-	  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
-	  
-          for ( i = 0; i < n; i++ ) 
-            eigenvalues[varID][levelID][i][0] = eigv[i]*sum_w;
-
-          for ( i = 0; i < n_eig; i++ )
-            {
-	      double *eigenvec = eigenvectors[varID][levelID][i];
-
-              if ( grid_space )
-		{
-		  /*
-		  double sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += sqrt(weight[pack[j]]);
-		  printf("sumw %g %g\n", sumw, 1./sumw);
-		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[j]*gridsize+pack[i]];
-		  printf("dat %g %g\n", sumw, 1./sumw);
-		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[i]*gridsize+pack[j]]* weight[pack[j]];
-		  printf("dat %g %g\n", sumw, 1./sumw);
-		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += covar[i][j];
-		  printf("cov %g %g\n", sumw, 1./sumw);
-		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += covar[i][j] * weight[pack[j]];
-		  printf("cov %g %g\n", sumw, 1./sumw);
-		  */
-		  for ( j = 0; j < npack; j++ )
-		    eigenvec[pack[j]] = 
-#ifdef OLD_IMPLEMENTATION
-		      covar[i][j] / sqrt(weight[pack[j]]);
-#else
-		      covar[i][j];
-		  // covar[i][j] / (sqrt(weight[pack[j]])*29.144);
-#endif
-		}
-              else if ( time_space )
-                {
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2,j,sum) shared(datafieldv, eigenvec)
-#endif
-                  for ( i2 = 0; i2 < npack; i2++ )
-                    {
-                      sum = 0;
-                      for ( j = 0; j < nts; j++ )
-                        sum += datafieldv[j][pack[i2]] * covar[i][j];
-
-                      eigenvec[pack[i2]] = sum;
-                    }
-
-                  // NORMALIZING
-                  sum = 0;
-
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
-  shared(eigenvec,weight,pack,npack)
-#endif
-                  for ( i2 = 0; i2 < npack; i2++ )
-		    {
-		      /* 
-		      ** do not need to account for weights as eigenvectors are non-weighted                                   
-		      */ 
-#ifdef OLD_IMPLEMENTATION
-		      sum += weight[pack[i2]] *
-#else
-		      sum += /*weight[pack[i2]] **/
-#endif
-			eigenvec[pack[i2]] * eigenvec[pack[i2]];
-		    }
-
-                  if ( sum > 0 )
-                    {
-                      sum = sqrt(sum);
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none)  shared(npack,pack,sum,eigenvec)
-#endif
-                      for( i2 = 0; i2 < npack; i2++ ) eigenvec[pack[i2]] /= sum;
-                    }
-                  else
-		    {
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none)  shared(npack,pack,eigenvec,missval)
-#endif
-		      for( i2 = 0; i2 < npack; i2++ ) eigenvec[pack[i2]] = missval;
-		    }
-                } // else if ( time_space )
-            } // for ( i = 0; i < n_eig; i++ )
-
-	  if ( time_space )
-	    {
-	      free(covar);
-	      free(covar_array);
-	    }
-	  if ( eigv ) free(eigv);
-
-        } // for ( levelID = 0; levelID < nlevs; levelID++ )
-    } // for ( varID = 0; varID < nvars; varID++ )
-
-
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
   /* eigenvalues */
@@ -689,6 +483,8 @@ void *EOFs(void * argument)
   int vdate = 10101;
   int vtime = 0;
   juldate = juldate_encode(calendar, vdate, vtime);
+
+  // TODO n=nts n=npack<----1!!!
   for ( tsID = 0; tsID < n; tsID++ )
     {
       juldate = juldate_add_seconds(60, juldate);
@@ -706,10 +502,212 @@ void *EOFs(void * argument)
         }
 
       for ( varID = 0; varID < nvars; varID++ )
-        {
-          nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-          for ( levelID = 0; levelID < nlevs; levelID++ )
-            {
+	{
+	  char vname[256];
+	  vlistInqVarName(vlistID1, varID, vname);
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+
+	  if ( cdoVerbose )
+	    cdoPrint("Calculating covar matrices for %i levels of var%i (%s)", nlevs, varID, vname);
+
+	  for ( levelID = 0; levelID < nlevs; levelID++ )
+	    {
+	      int i2;
+
+	      double **datafieldv = datafields[varID][levelID];
+
+	      /*double **cov  = NULL;*/ // TODO covariance matrix / eigenvectors after solving
+
+	      npack = eofdata[varID][levelID].npack;
+	      pack  = eofdata[varID][levelID].pack;
+
+	      double sum_w = 0;
+
+	      if ( tsID == 0 )
+		{
+		  double *eigv  = NULL; // TODO eigenvalues
+		  
+		  if ( cdoTimer ) timer_start(timer_cov);
+
+		  if ( cdoVerbose ) cdoPrint("processing level %i",levelID);
+
+		  if ( grid_space )
+		    {
+		      for ( i1 = 0; i1 < npack; i1++ ) sum_w += weight[pack[i1]];
+
+		      if ( npack )
+			{
+			  eigv = (double *) malloc(npack*sizeof(double));
+			}
+
+#ifdef EOFDATA
+		      covar = eofdata[varID][levelID].covar;
+
+		      for ( ipack = 0; ipack < npack; ++ipack )
+			{
+			  i = pack[ipack];
+			  for ( jpack = 0; jpack < npack; ++jpack)
+			    {
+			      if ( jpack < ipack )
+				{
+				  covar[ipack][jpack] = covar[jpack][ipack];
+				}
+			      else
+				{
+				  j = pack[jpack];
+				  covar[ipack][jpack] = 
+				    covar[ipack][jpack] *   // covariance
+				    sqrt(weight[i]) * sqrt(weight[j]) / sum_w /       // weights
+				    nts;   // number of data contributing
+				}
+			    }
+			}
+#endif
+		    }
+		  else if ( time_space )
+		    {
+		      for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
+		      
+		      if ( cdoVerbose )
+			cdoPrint("allocating covar with %i x %i elements | npack=%i", nts, nts, npack);
+
+		      covar_array = (double *) malloc(nts*nts*sizeof(double));
+		      covar = (double **) malloc(nts*sizeof(double *));
+		      for ( i = 0; i < nts; ++i ) covar[i] = covar_array + nts*i;
+
+		      eigv = (double *) malloc(nts*sizeof(double));
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)
+#endif
+		      for ( j1 = 0; j1 < nts; j1++ )
+			for ( j2 = j1; j2 < nts; j2++ )
+			  {
+			    sum = 0;
+			    df1p = datafieldv[j1];
+			    df2p = datafieldv[j2];
+			    for ( i = 0; i < npack; i++ )
+			      {
+				sum += weight[pack[i]]*df1p[pack[i]]*df2p[pack[i]];
+			      }
+			    covar[j2][j1] = covar[j1][j2] = sum / sum_w / nts;
+			  }
+		      
+		      if ( cdoVerbose )
+			cdoPrint("finished calculation of covar-matrix for var %s", vname);
+		    }
+
+		  if ( cdoTimer ) timer_stop(timer_cov);
+
+		  /* SOLVE THE EIGEN PROBLEM */
+		  if ( cdoTimer ) timer_start(timer_eig);
+
+		  if ( eigen_mode == JACOBI ) 
+		    // TODO: use return status (>0 okay, -1 did not converge at all) 
+		    parallel_eigen_solution_of_symmetric_matrix(covar, eigv, n, __func__);
+		  else 
+		    eigen_solution_of_symmetric_matrix(covar, eigv, n, __func__);
+
+		  if ( cdoTimer ) timer_stop(timer_eig);
+		  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
+	  
+		  for ( i = 0; i < n; i++ ) 
+		    eigenvalues[varID][levelID][i][0] = eigv[i]*sum_w;
+
+		  if ( eigv ) free(eigv);
+
+		  for ( i = 0; i < n_eig; i++ )
+		    {
+		      double *eigenvec = eigenvectors[varID][levelID][i];
+
+		      if ( grid_space )
+			{
+			  /*
+			    double sumw= 0;
+			    for ( j = 0; j < npack; j++ ) sumw += sqrt(weight[pack[j]]);
+			    printf("sumw %g %g\n", sumw, 1./sumw);
+			    sumw= 0;
+			    for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[j]*gridsize+pack[i]];
+			    printf("dat %g %g\n", sumw, 1./sumw);
+			    sumw= 0;
+			    for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[i]*gridsize+pack[j]]* weight[pack[j]];
+			    printf("dat %g %g\n", sumw, 1./sumw);
+			    sumw= 0;
+			    for ( j = 0; j < npack; j++ ) sumw += covar[i][j];
+			    printf("cov %g %g\n", sumw, 1./sumw);
+			    sumw= 0;
+			    for ( j = 0; j < npack; j++ ) sumw += covar[i][j] * weight[pack[j]];
+			    printf("cov %g %g\n", sumw, 1./sumw);
+			  */
+			  for ( j = 0; j < npack; j++ )
+			    eigenvec[pack[j]] = 
+#ifdef OLD_IMPLEMENTATION
+			      covar[i][j] / sqrt(weight[pack[j]]);
+#else
+		              covar[i][j];
+		      // covar[i][j] / (sqrt(weight[pack[j]])*29.144);
+#endif
+			}
+		      else if ( time_space )
+			{
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2,j,sum) shared(datafieldv, eigenvec)
+#endif
+			  for ( i2 = 0; i2 < npack; i2++ )
+			    {
+			      sum = 0;
+			      for ( j = 0; j < nts; j++ )
+				sum += datafieldv[j][pack[i2]] * covar[i][j];
+
+			      eigenvec[pack[i2]] = sum;
+			    }
+
+			  // NORMALIZING
+			  sum = 0;
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
+  shared(eigenvec,weight,pack,npack)
+#endif
+			  for ( i2 = 0; i2 < npack; i2++ )
+			    {
+			      /* 
+			      ** do not need to account for weights as eigenvectors are non-weighted                                   
+			      */ 
+#ifdef OLD_IMPLEMENTATION
+			      sum += weight[pack[i2]] *
+#else
+				sum += /*weight[pack[i2]] **/
+#endif
+				eigenvec[pack[i2]] * eigenvec[pack[i2]];
+			    }
+
+			  if ( sum > 0 )
+			    {
+			      sum = sqrt(sum);
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2) default(none)  shared(npack,pack,sum,eigenvec)
+#endif
+			      for( i2 = 0; i2 < npack; i2++ ) eigenvec[pack[i2]] /= sum;
+			    }
+			  else
+			    {
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2) default(none)  shared(npack,pack,eigenvec,missval)
+#endif
+			      for( i2 = 0; i2 < npack; i2++ ) eigenvec[pack[i2]] = missval;
+			    }
+			} // else if ( time_space )
+		    } // for ( i = 0; i < n_eig; i++ )
+		  
+		  if ( time_space )
+		    {
+		      free(covar);
+		      free(covar_array);
+		    }
+		} // tsID == 0
+
               if ( tsID < n_eig )
                 {
                   nmiss = 0;
@@ -719,19 +717,20 @@ void *EOFs(void * argument)
                   streamDefRecord(streamID3, varID, levelID);
                   streamWriteRecord(streamID3, eigenvectors[varID][levelID][tsID], nmiss);
                 }
-
+	      
               if ( DBL_IS_EQUAL(eigenvalues[varID][levelID][tsID][0], missval) ) nmiss = 1;
               else nmiss = 0;
               streamDefRecord(streamID2, varID, levelID);
               streamWriteRecord(streamID2, eigenvalues[varID][levelID][tsID], nmiss);
-            }
-        }
+	      
+	    } // for ( levelID = 0; levelID < nlevs; levelID++ )
+	} // for ( varID = 0; varID < nvars; varID++ )
     }
-  
+
   for ( varID = 0; varID < nvars; varID++)
     {
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      gridsize =  gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       
       for( levelID = 0; levelID < nlevs; levelID++ )
         {
