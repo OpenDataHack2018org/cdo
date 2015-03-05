@@ -3230,7 +3230,7 @@ static char *EOFsHelp[] = {
     "    After execution ofile1 will contain all eigen-values and ofile2 the",
     "    eigenvectors e_j. All EOFs and eigen-values are computed. However, only the first ",
     "    neof EOFs are written to ofile2. Nonetheless, ofile1 contains all eigen-values. ",
-    "    Note, thate the resulting EOF in ofile2 is e_j and thus not weighted for consistency.",
+    "    Note, that the resulting EOF in ofile2 is e_j and thus not weighted for consistency.",
     "    ",
     "    Missing values are not fully supported. Support is only checked for non-changing",
     "    masks of missing values in time. Although there still will be results, they are",
