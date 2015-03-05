@@ -28,6 +28,7 @@
  * number of contributing values during summation.
  */
 
+#define EOFDATA
 //#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
@@ -54,7 +55,7 @@ void *EOFs(void * argument)
   int nmiss;
   int tsID;
   int varID, recID, levelID;
-  int nts=0;
+  int nts = 0;
   int n=0;
   int grid_space=0, time_space=0;
   int missval_warning=0;
@@ -147,17 +148,20 @@ void *EOFs(void * argument)
     {
       if ( cdoVerbose )
 	cdoPrint("Counting timesteps in ifile");
-      
-      while ( TRUE )
-        {
-          nrecs = streamInqTimestep(streamID1, tsID);
-          if ( nrecs == 0 )  break;
-          tsID++;
-        }
 
-      if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", tsID);
+      nts = vlistNtsteps(vlistID1);
+      if ( nts == -1 )
+	{
+	  while ( TRUE )
+	    {
+	      nrecs = streamInqTimestep(streamID1, tsID);
+	      if ( nrecs == 0 )  break;
+	      tsID++;
+	    }
 
-      nts         = tsID;
+	  nts = tsID;
+	  if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
+	}
 
       //TODO close on streamID1 ??  streamClose(streamID1);
       streamClose(streamID1);
@@ -246,6 +250,8 @@ void *EOFs(void * argument)
 #ifdef EOFDATA
 	  eofdata[varID][levelID].init = 0;
 	  eofdata[varID][levelID].pack = NULL;
+	  eofdata[varID][levelID].covar_array = NULL;
+	  eofdata[varID][levelID].covar = NULL;
 #endif
           if ( grid_space )
             {
@@ -298,8 +304,10 @@ void *EOFs(void * argument)
   int ipack, jpack;
   int npack;
   int *pack;
-  double **covar;
 #endif
+  double *covar_array = NULL;
+  double **covar = NULL;
+
   tsID = 0;
 
   /* read the data and create covariance matrices for each var & level */
@@ -353,34 +361,28 @@ void *EOFs(void * argument)
 		}
 	      ipack++;
 	    }
-
-	  if ( !eofdata[varID][levelID].init )
-	    {
-	      int n;
-	      
-	      if      ( grid_space ) n = npack;
-	      else if ( time_space ) n = nts;
-	      
-	      double *covar_array = (double *) malloc(n*n*sizeof(double));
-	      covar = (double **) malloc(n*sizeof(double *));
-	      for ( i = 0; i < n; ++i ) covar[i] = covar_array + n*i;
-	      for ( i = 0; i < n; ++i )
-		{
-		  // work[0][i] = 0;
-		  for ( j = 0; j < n; ++j ) covar[i][j] = 0;
-		}
-
-	      eofdata[varID][levelID].n           = n;
-	      eofdata[varID][levelID].covar_array = covar_array;
-	      eofdata[varID][levelID].covar       = covar;
-	    }
-	  else
-	    {
-	      covar = eofdata[varID][levelID].covar;
-	    }
 #endif
 	  if ( grid_space )
             {
+	      if ( !eofdata[varID][levelID].init )
+		{
+		  double *covar_array = (double *) malloc(npack*npack*sizeof(double));
+		  covar = (double **) malloc(npack*sizeof(double *));
+		  for ( i = 0; i < npack; ++i ) covar[i] = covar_array + npack*i;
+		  for ( i = 0; i < npack; ++i )
+		    {
+		      // work[0][i] = 0;
+		      for ( j = 0; j < npack; ++j ) covar[i][j] = 0;
+		    }
+
+		  eofdata[varID][levelID].n           = npack;
+		  eofdata[varID][levelID].covar_array = covar_array;
+		  eofdata[varID][levelID].covar       = covar;
+		}
+	      else
+		{
+		  covar = eofdata[varID][levelID].covar;
+		}
 #ifdef EOFDATA
 #if defined(_OPENMP)
 #pragma omp parallel for private(ipack, jpack) default(shared)
@@ -440,8 +442,11 @@ void *EOFs(void * argument)
 	  eofdata[varID][levelID].init = 1;
 #endif
         }
+
       tsID++;
     }
+
+  if ( grid_space ) nts = tsID;
 
   if ( tsID == 1 ) cdoAbort("File consists of only one timestep!");
 
@@ -465,7 +470,7 @@ void *EOFs(void * argument)
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
       if ( cdoVerbose )
-	cdoPrint("Calculating cov matrices for %i levels of var%i (%s)", nlevs, varID, vname);
+	cdoPrint("Calculating covar matrices for %i levels of var%i (%s)", nlevs, varID, vname);
 
       for ( levelID = 0; levelID < nlevs; levelID++ )
         {
@@ -476,32 +481,21 @@ void *EOFs(void * argument)
           int i2;
 
 	  double **datafieldv = datafields[varID][levelID];
-	  int *datacountv = datacounts[varID][levelID];
 
-          double **cov  = NULL; // TODO covariance matrix / eigenvectors after solving
+          /*double **cov  = NULL;*/ // TODO covariance matrix / eigenvectors after solving
           double *eigv  = NULL; // TODO eigenvalues
 
-	  int *pack = (int *) malloc(gridsize*sizeof(int));
-          int npack = 0;    // TODO already set to 0
-          double sum_w = 0;
+	  npack = eofdata[varID][levelID].npack;
+	  pack  = eofdata[varID][levelID].pack;
+
+	  double sum_w = 0;
 
           if ( grid_space )
             {
-              for ( i1 = 0; i1 < gridsize; i1++ )
-                {
-		  if ( datacountv[i1*gridsize + i1] > 1 ) 
-		    pack[npack++] = i1;
-                }
+              for ( i1 = 0; i1 < npack; i1++ ) sum_w += weight[pack[i1]];
 
-              for ( i1 = 0; i1 < npack; i1++ )
-                sum_w += weight[pack[i1]];
-
-	      n = npack;
 	      if ( npack )
 		{
-		  cov = (double **) malloc(npack*sizeof(double *));
-		  for ( i1 = 0; i1 < npack; i1++ )
-		    cov[i1] = (double *) malloc(npack*sizeof(double));
 		  eigv = (double *) malloc(npack*sizeof(double));
 		}
 
@@ -523,37 +517,23 @@ void *EOFs(void * argument)
 			  covar[ipack][jpack] = 
 			    covar[ipack][jpack] *   // covariance
 			    sqrt(weight[i]) * sqrt(weight[j]) / sum_w /       // weights
-			    (datacountv[i*gridsize+j]);   // number of data contributing
+			    nts;   // number of data contributing
 			}
 		    }
 		}
 #endif
-	      for ( i1 = 0; i1 < npack; i1++ )
-		for ( i2 = i1; i2 < npack; i2++ )
-		  if ( datacountv[pack[i1]*gridsize+pack[i2]] )
-		    cov[i2][i1] = cov[i1][i2] =
-		      datafieldv[0][pack[i1]*gridsize+pack[i2]]*   // covariance
-		      sqrt(weight[pack[i1]]) * sqrt(weight[pack[i2]]) / sum_w /       // weights
-		      (datacountv[pack[i1]*gridsize+pack[i2]]);   // number of data contributing
             }
           else if ( time_space )
             {
-              for ( i = 0; i < gridsize; i++ )
-                {
-		  if ( datacountv[i] )
-		    {
-		      pack[npack] = i;
-		      npack++;
-		      sum_w += weight[i];
-		    }
-		}
+              for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
 
 	      if ( cdoVerbose )
-		cdoPrint("allocating cov with %i x %i elements | npack=%i", nts, nts, npack);
+		cdoPrint("allocating covar with %i x %i elements | npack=%i", nts, nts, npack);
 
-              cov = (double **) malloc(nts*sizeof(double *));
-              for ( j1 = 0; j1 < nts; j1++ )
-                cov[j1] = (double *) malloc(nts*sizeof(double));
+	      covar_array = (double *) malloc(nts*nts*sizeof(double));
+	      covar = (double **) malloc(nts*sizeof(double *));
+	      for ( i = 0; i < nts; ++i ) covar[i] = covar_array + nts*i;
+
 	      eigv = (double *) malloc(nts*sizeof(double));
 
 #if defined(_OPENMP)
@@ -569,11 +549,11 @@ void *EOFs(void * argument)
 		      {
 			sum += weight[pack[i]]*df1p[pack[i]]*df2p[pack[i]];
 		      }
-		    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
+		    covar[j2][j1] = covar[j1][j2] = sum / sum_w / nts;
 		  }
 
 	      if ( cdoVerbose )
-		cdoPrint("finished calculation of cov-matrix for var %s",&vname[0]);
+		cdoPrint("finished calculation of covar-matrix for var %s", vname);
             }
 
 	  if ( cdoTimer ) timer_stop(timer_cov);
@@ -583,9 +563,9 @@ void *EOFs(void * argument)
 
 	  if ( eigen_mode == JACOBI ) 
 	    // TODO: use return status (>0 okay, -1 did not converge at all) 
-	    parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
+	    parallel_eigen_solution_of_symmetric_matrix(covar, eigv, n, __func__);
 	  else 
-	    eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
+	    eigen_solution_of_symmetric_matrix(covar, eigv, n, __func__);
 
 	  if ( cdoTimer ) timer_stop(timer_eig);
 	  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
@@ -610,22 +590,19 @@ void *EOFs(void * argument)
 		  for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[i]*gridsize+pack[j]]* weight[pack[j]];
 		  printf("dat %g %g\n", sumw, 1./sumw);
 		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += datacountv[pack[j]*gridsize+pack[i]];
-		  printf("cou %g %g\n", sumw, 1./sumw);
-		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += cov[i][j];
+		  for ( j = 0; j < npack; j++ ) sumw += covar[i][j];
 		  printf("cov %g %g\n", sumw, 1./sumw);
 		  sumw= 0;
-		  for ( j = 0; j < npack; j++ ) sumw += cov[i][j] * weight[pack[j]];
+		  for ( j = 0; j < npack; j++ ) sumw += covar[i][j] * weight[pack[j]];
 		  printf("cov %g %g\n", sumw, 1./sumw);
 		  */
 		  for ( j = 0; j < npack; j++ )
 		    eigenvec[pack[j]] = 
 #ifdef OLD_IMPLEMENTATION
-		      cov[i][j] / sqrt(weight[pack[j]]);
+		      covar[i][j] / sqrt(weight[pack[j]]);
 #else
-		      cov[i][j];
-		  // cov[i][j] / (sqrt(weight[pack[j]])*29.144);
+		      covar[i][j];
+		  // covar[i][j] / (sqrt(weight[pack[j]])*29.144);
 #endif
 		}
               else if ( time_space )
@@ -637,7 +614,7 @@ void *EOFs(void * argument)
                     {
                       sum = 0;
                       for ( j = 0; j < nts; j++ )
-                        sum += datafieldv[j][pack[i2]] * cov[i][j];
+                        sum += datafieldv[j][pack[i2]] * covar[i][j];
 
                       eigenvec[pack[i2]] = sum;
                     }
@@ -680,10 +657,12 @@ void *EOFs(void * argument)
                 } // else if ( time_space )
             } // for ( i = 0; i < n_eig; i++ )
 
+	  if ( time_space )
+	    {
+	      free(covar);
+	      free(covar_array);
+	    }
 	  if ( eigv ) free(eigv);
-	  for ( i=0; i<n; i++ ) if ( cov[i] ) free(cov[i]);
-	  if ( cov ) free(cov);
-	  if ( pack ) free(pack);
 
         } // for ( levelID = 0; levelID < nlevs; levelID++ )
     } // for ( varID = 0; varID < nvars; varID++ )
@@ -792,7 +771,8 @@ void *EOFs(void * argument)
           free(eigenvalues[varID][levelID]);
 #ifdef EOFDATA
 	  if ( eofdata[varID][levelID].pack ) free(eofdata[varID][levelID].pack);
-	  if ( eofdata[varID][levelID].covar_array) free(eofdata[varID][levelID].covar_array);
+	  if ( eofdata[varID][levelID].covar_array ) free(eofdata[varID][levelID].covar_array);
+	  if ( eofdata[varID][levelID].covar ) free(eofdata[varID][levelID].covar);
 #endif
         }
       
