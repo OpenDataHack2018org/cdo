@@ -197,6 +197,7 @@ void make_symmetric_matrix_triangular(double **a, int n, double *d, double *e)
         }
       else
         e[i] = a[i][i - 1];
+
       d[i] = h;
     }
   
