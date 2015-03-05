@@ -101,9 +101,9 @@ void *EOFs(void * argument)
 
   envstr = getenv("CDO_SVD_MODE");
   
-  if ( envstr && !strncmp(envstr,"danielson_lanczos",17) ) 
+  if ( envstr && !strncmp(envstr, "danielson_lanczos", 17) ) 
     eigen_mode = DANIELSON_LANCZOS;
-  else if ( envstr && ! strncmp(envstr,"jacobi",6 ) )
+  else if ( envstr && ! strncmp(envstr, "jacobi", 6) )
     eigen_mode = JACOBI;
   else if ( envstr ) {
     cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
