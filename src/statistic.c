@@ -46,7 +46,7 @@ int max_jacobi_iter;
 #endif
 
 
-void make_symmetric_matrix_triangular (double **a, int n, double *d, double *e, const char *prompt);
+void make_symmetric_matrix_triangular (double **a, int n, double *d, double *e);
 double pythagoras (double a, double b);
 void eigen_solution_of_triangular_matrix (double *d, double *e, int n, double **a, const char *prompt);
 int lu_decomposition (double **a, int n, int *index, int *sign);
@@ -70,7 +70,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
   
   e = (double*) malloc(n * sizeof(double));
   
-  make_symmetric_matrix_triangular (a, n, eig_val, e, prompt);
+  make_symmetric_matrix_triangular (a, n, eig_val, e);
   
   eigen_solution_of_triangular_matrix (eig_val, e, n, a, prompt);
   
@@ -147,15 +147,12 @@ void heap_sort (double *eig_val, double **a, int n)
 }
 
 
-void make_symmetric_matrix_triangular(double **a, int n,
-				      double *d, double *e, const char *prompt)
+void make_symmetric_matrix_triangular(double **a, int n, double *d, double *e)
 {
   int i, j, k;
   double f, g, h, hh, scale;
-  
-  UNUSED(prompt);
-
-  for (i = n - 1; i >= 1; i--)
+ 
+  for ( i = n - 1; i >= 1; i-- )
     {
       h = scale = 0;
       if (i > 1)
@@ -201,51 +198,23 @@ void make_symmetric_matrix_triangular(double **a, int n,
       else
         e[i] = a[i][i - 1];
       d[i] = h;
-      /*
-       if (user_asked)
-       {
-       lock ();
-       fprintf (stderr,
-		   "%s: Status: Computing eigen solution pass 1 of 3"
-		   " cycle %ld of %ld.\n",
-		   prompt, (long) (n - i), (long) (n - 1));
-       fflush (stderr);
-       unlock ();
-       user_asked = FALSE;
-       }
-       */
     }
   
   d[0] = e[0] = 0;
-  for (i = 0; i < n; i++)
+  for ( i = 0; i < n; i++ )
     {
       if ( fabs(d[i]) > 0 )
         {
-          for (j = 0; j < i; j++)
+          for ( j = 0; j < i; j++ )
             {
               g = 0;
-              for (k = 0; k < i; k++)
-                g += a[i][k] * a[k][j];
-              for (k = 0; k < i; k++)
-                a[k][j] -= g * a[k][i];
+              for ( k = 0; k < i; k++ )  g += a[i][k] * a[k][j];
+              for ( k = 0; k < i; k++ )  a[k][j] -= g * a[k][i];
             }
         }
       d[i] = a[i][i];
       a[i][i] = 1;
-      for (j = 0; j < i; j++)
-        a[j][i] = a[i][j] = 0;
-      /*
-       if (user_asked)
-       {
-       lock ();
-       fprintf (stderr,
-		   "%s: Status: Computing eigen solution pass 2 of 3"
-		   " cycle %ld of %ld.\n", prompt, (long) (i + 1), (long) n);
-       fflush (stderr);
-       unlock ();
-       user_asked = FALSE;
-       }
-       */
+      for ( j = 0; j < i; j++ ) a[j][i] = a[i][j] = 0;
     }
 }
 
