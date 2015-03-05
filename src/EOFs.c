@@ -225,7 +225,6 @@ void *EOFs(void * argument)
 #ifdef EOFDATA
   eofdata_t **eofdata     = (eofdata_t **) malloc(nvars*sizeof(eofdata_t*));
 #endif
-  int ***datacounts       = (int ***) malloc(nvars*sizeof(int **));
   double ****datafields   = (double ****) malloc(nvars*sizeof(double ***));
   double ****eigenvectors = (double ****) malloc(nvars*sizeof(double ***));
   double ****eigenvalues  = (double ****) malloc(nvars*sizeof(double ***));
@@ -240,7 +239,6 @@ void *EOFs(void * argument)
 #ifdef EOFDATA
       eofdata[varID]      = (eofdata_t *) malloc(nlevs*sizeof(eofdata_t));
 #endif
-      datacounts[varID]   = (int **) malloc(nlevs*sizeof(int *));
       datafields[varID]   = (double ***) malloc(nlevs*sizeof(double **));
       eigenvectors[varID] = (double ***) malloc(nlevs*sizeof(double **));
       eigenvalues[varID]  = (double ***) malloc(nlevs*sizeof(double **));
@@ -258,10 +256,8 @@ void *EOFs(void * argument)
               datafields[varID][levelID]    = (double **) malloc(1*sizeof(double *));
               datafields[varID][levelID][0] = (double*) malloc(gridsize*gridsize*sizeof(double));
 
-              datacounts[varID][levelID]    = (int*) malloc(gridsize*gridsize*sizeof(int));
 	      for ( i = 0; i < gridsize*gridsize; i++ )
 		{
-		  datacounts[varID][levelID][i] = 0;
 		  datafields[varID][levelID][0][i] = 0;            
 		}
 	    }
@@ -274,9 +270,6 @@ void *EOFs(void * argument)
                   for ( i = 0; i < gridsize; ++i )
                     datafields[varID][levelID][tsID][i] = 0;
                 }
-              datacounts[varID][levelID] = (int *) malloc(gridsize*sizeof(int));	      
-	      for ( i = 0; i < gridsize; i++ )
-		datacounts[varID][levelID][i] = 0;
             }
 
           eigenvectors[varID][levelID] = (double **) malloc(n_eig*sizeof(double *));
@@ -407,7 +400,6 @@ void *EOFs(void * argument)
 			    ( ! DBL_IS_EQUAL(in[i2], missval) )) )
                         {
                           datafields[varID][levelID][0][i1*gridsize+i2] += in[i1]*in[i2];
-                          datacounts[varID][levelID][i1*gridsize+i2]++;
                         }
                       else if ( missval_warning == 0 )
                         {
@@ -424,7 +416,6 @@ void *EOFs(void * argument)
 		  if ( ! DBL_IS_EQUAL(in[i], missval ) )
 		    {
 		      datafields[varID][levelID][tsID][i] = in[i];
-		      datacounts[varID][levelID][i]++;
 		    }
 		  else
 		    {
@@ -454,13 +445,8 @@ void *EOFs(void * argument)
     for ( i1 = 0; i1 < gridsize; ++i1 )
       for ( i2 = 0; i2 < i1; ++i2 )
         {
-          datafields[varID][levelID][0][i1*gridsize+i2] = datafields[varID][levelID][0][i2*gridsize+i1];
-          datacounts[varID][levelID][i1*gridsize+i2]    = datacounts[varID][levelID][i2*gridsize+i1];
+	  datafields[varID][levelID][0][i1*gridsize+i2] = datafields[varID][levelID][0][i2*gridsize+i1];
         }
-
-  /*
-  pack = (int*) malloc(gridsize*sizeof(int)); //TODO
-  */
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -765,7 +751,6 @@ void *EOFs(void * argument)
 	    for (tsID=0; tsID<nts; tsID++ )
 	      free(datafields[varID][levelID][tsID]);
 
-          free(datacounts[varID][levelID]);
 	  free(datafields[varID][levelID]);
           free(eigenvectors[varID][levelID]);
           free(eigenvalues[varID][levelID]);
@@ -780,7 +765,6 @@ void *EOFs(void * argument)
       free(eofdata[varID]);
 #endif
       free(datafields[varID]);
-      free(datacounts[varID]);
       free(eigenvectors[varID]);
       free(eigenvalues[varID]);
     }
@@ -789,7 +773,6 @@ void *EOFs(void * argument)
   free(eofdata);
 #endif
   free(datafields);
-  free(datacounts);
   free(eigenvectors);
   free(eigenvalues);
   free(in);
