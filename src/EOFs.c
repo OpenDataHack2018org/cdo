@@ -59,37 +59,33 @@ static
 void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const int *restrict pack, const double *restrict weight,
 		       double **covar, double **data, double missval)
 {
-  int i, j;
-  int i2;
-  double sum;
-
 #if defined(_OPENMP)
-#pragma omp parallel for private(i,j,sum) shared(tsID, data, out)
+#pragma omp parallel for shared(tsID, data, out)
 #endif
-  for ( i = 0; i < npack; ++i )
+  for ( int i = 0; i < npack; ++i )
     {
-      sum = 0;
-      for ( j = 0; j < nts; ++j )
+      double sum = 0;
+      for ( int j = 0; j < nts; ++j )
 	sum += data[j][i] * covar[tsID][j];
       
       out[pack[i]] = sum;
     }
   /*
-  for ( j = 0; j < nts; ++j )
+  for ( int j = 0; j < nts; ++j )
     {
-      for ( i = 0; i < npack; ++i )
+      for ( int i = 0; i < npack; ++i )
 	out[pack[i]] += data[j][i] * covar[tsID][j];
     }
   */
 
   // Normalizing
-  sum = 0;
+  double sum = 0;
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
+#pragma omp parallel for default(none) reduction(+:sum)	\
   shared(out,weight,pack,npack)
 #endif
-  for ( i = 0; i < npack; ++i )
+  for ( int i = 0; i < npack; ++i )
     {
       // do not need to account for weights as eigenvectors are non-weighted                                   
 #ifdef OLD_IMPLEMENTATION
@@ -104,16 +100,16 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
     {
       sum = sqrt(sum);
 #if defined(_OPENMP)
-#pragma omp parallel for private(i) default(none)  shared(npack,pack,sum,out)
+#pragma omp parallel for default(none)  shared(npack,pack,sum,out)
 #endif
-      for ( i = 0; i < npack; ++i ) out[pack[i]] /= sum;
+      for ( int i = 0; i < npack; ++i ) out[pack[i]] /= sum;
     }
   else
     {
 #if defined(_OPENMP)
-#pragma omp parallel for private(i) default(none)  shared(npack,pack,out,missval)
+#pragma omp parallel for default(none)  shared(npack,pack,out,missval)
 #endif
-      for ( i = 0; i < npack; ++i ) out[pack[i]] = missval;
+      for ( int i = 0; i < npack; ++i ) out[pack[i]] = missval;
     }
 }
 
@@ -124,21 +120,20 @@ void *EOFs(void * argument)
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
   long i, j, i1, j1, j2;
-  int nlevs=0 ;
+  int nlevs = 0 ;
   int nmiss;
   int tsID;
   int varID, recID, levelID;
   int nts = 0;
-  int n=0;
-  int grid_space=0, time_space=0;
-  int missval_warning=0;
+  int n = 0;
+  int grid_space = 0, time_space = 0;
   int timer_cov = 0, timer_eig = 0;
 
   int calendar = CALENDAR_STANDARD;
   juldate_t juldate;
 
   double sum;
-  double missval=0;
+  double missval = 0;
   double xvals, yvals;
   double *df1p, *df2p;
 
@@ -191,8 +186,7 @@ void *EOFs(void * argument)
   if ( cdoVerbose ) 
     cdoPrint("Using CDO_SVD_MODE '%s' from %s",
 	     eigen_mode==JACOBI?"jacobi":"danielson_lanczos",
-	     envstr?"Environment":" default");
-  
+	     envstr?"Environment":" default");  
 
   int streamID1  = streamOpenRead(cdoStreamName(0));
   int vlistID1   = streamInqVlist(streamID1);
@@ -498,7 +492,6 @@ void *EOFs(void * argument)
 
 	  for ( levelID = 0; levelID < nlevs; levelID++ )
 	    {
-	      int i2;
 	      double **datafieldv = eofdata[varID][levelID].data;
 
 	      npack = eofdata[varID][levelID].npack;
@@ -569,17 +562,20 @@ void *EOFs(void * argument)
 #pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)
 #endif
 		      for ( j1 = 0; j1 < nts; j1++ )
-			for ( j2 = j1; j2 < nts; j2++ )
-			  {
-			    sum = 0;
-			    df1p = datafieldv[j1];
-			    df2p = datafieldv[j2];
-			    for ( i = 0; i < npack; i++ )
-			      {
-				sum += weight[pack[i]]*df1p[i]*df2p[i];
-			      }
-			    covar[j2][j1] = covar[j1][j2] = sum / sum_w / nts;
-			  }
+			{
+			  for ( j2 = 0; j2 < j1; j2++ ) covar[j1][j2] = covar[j2][j1];
+			  for ( j2 = j1; j2 < nts; j2++ )
+			    {
+			      sum = 0;
+			      df1p = datafieldv[j1];
+			      df2p = datafieldv[j2];
+			      for ( i = 0; i < npack; i++ )
+				{
+				  sum += weight[pack[i]]*df1p[i]*df2p[i];
+				}
+			      covar[j1][j2] = sum / sum_w / nts;
+			    }
+			}
 		      
 		      if ( cdoVerbose )
 			cdoPrint("finished calculation of covar-matrix for var %s", vname);
