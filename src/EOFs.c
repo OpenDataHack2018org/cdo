@@ -28,7 +28,6 @@
  * number of contributing values during summation.
  */
 
-#define EOFDATA
 //#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
@@ -70,7 +69,7 @@ void *EOFs(void * argument)
   double *df1p, *df2p;
 
   enum T_EIGEN_MODE eigen_mode = JACOBI;
-#ifdef EOFDATA
+
   typedef struct {
     int init;
     int first_call;
@@ -82,7 +81,7 @@ void *EOFs(void * argument)
     double **covar;
   }
   eofdata_t;
-#endif
+
  if ( cdoTimer )
     {
       timer_cov  = timer_new("Timeof cov");
@@ -224,9 +223,7 @@ void *EOFs(void * argument)
 
   /* allocation of temporary fields and output structures */
   double *in              = (double *) malloc(gridsize*sizeof(double));
-#ifdef EOFDATA
   eofdata_t **eofdata     = (eofdata_t **) malloc(nvars*sizeof(eofdata_t*));
-#endif
   double ****datafields   = (double ****) malloc(nvars*sizeof(double ***));
 
   for ( varID = 0; varID < nvars; ++varID )
@@ -236,21 +233,18 @@ void *EOFs(void * argument)
       nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval             = vlistInqVarMissval(vlistID1, varID);
 
-#ifdef EOFDATA
       eofdata[varID]      = (eofdata_t *) malloc(nlevs*sizeof(eofdata_t));
-#endif
       datafields[varID]   = (double ***) malloc(nlevs*sizeof(double **));
 
       for ( levelID = 0; levelID < nlevs; ++levelID )
         {
-#ifdef EOFDATA
 	  eofdata[varID][levelID].init = 0;
 	  eofdata[varID][levelID].first_call = TRUE;
 	  eofdata[varID][levelID].pack = NULL;
 	  eofdata[varID][levelID].eig_val = NULL;
 	  eofdata[varID][levelID].covar_array = NULL;
 	  eofdata[varID][levelID].covar = NULL;
-#endif
+
           if ( grid_space )
             {
               datafields[varID][levelID]    = (double **) malloc(1*sizeof(double *));
@@ -277,11 +271,9 @@ void *EOFs(void * argument)
   if ( cdoVerbose )
     cdoPrint("Allocated eigenvalue/eigenvector structures with nts=%i gridsize=%i", nts, gridsize);
 
-#ifdef EOFDATA
   int ipack, jpack;
   int npack;
   int *pack;
-#endif
   double *covar_array = NULL;
   double **covar = NULL;
 
@@ -302,7 +294,6 @@ void *EOFs(void * argument)
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           missval = vlistInqVarMissval(vlistID1, varID);
-#ifdef EOFDATA
 	  if ( !eofdata[varID][levelID].init )
 	    {
 	      pack = (int *) malloc(gridsize*sizeof(int));
@@ -338,7 +329,7 @@ void *EOFs(void * argument)
 		}
 	      ipack++;
 	    }
-#endif
+
 	  if ( grid_space )
             {
 	      if ( !eofdata[varID][levelID].init )
@@ -360,7 +351,6 @@ void *EOFs(void * argument)
 		{
 		  covar = eofdata[varID][levelID].covar;
 		}
-#ifdef EOFDATA
 #if defined(_OPENMP)
 #pragma omp parallel for private(ipack, jpack) default(shared)
 #endif
@@ -370,7 +360,6 @@ void *EOFs(void * argument)
 		  for ( jpack = ipack; jpack < npack; ++jpack )
 		    covar[ipack][jpack] += in[pack[ipack]] * in[pack[jpack]];
 		}
-#endif
 	      // This could be done in parallel to save lots of time
 #if defined(_OPENMP)
 #pragma omp parallel for private(i1, i2) default(shared)
@@ -413,9 +402,8 @@ void *EOFs(void * argument)
 		    }
 		}
 	    }
-#ifdef EOFDATA  
+
 	  eofdata[varID][levelID].init = 1;
-#endif
         }
 
       tsID++;
@@ -500,8 +488,6 @@ void *EOFs(void * argument)
 	      int i2;
 	      double **datafieldv = datafields[varID][levelID];
 
-	      /*double **cov  = NULL;*/ // TODO covariance matrix / eigenvectors after solving
-
 	      npack = eofdata[varID][levelID].npack;
 	      pack  = eofdata[varID][levelID].pack;
 
@@ -528,7 +514,6 @@ void *EOFs(void * argument)
 			  eofdata[varID][levelID].eig_val = eig_val;
 			}
 
-#ifdef EOFDATA
 		      covar = eofdata[varID][levelID].covar;
 
 		      for ( ipack = 0; ipack < npack; ++ipack )
@@ -550,7 +535,6 @@ void *EOFs(void * argument)
 				}
 			    }
 			}
-#endif
 		    }
 		  else if ( time_space )
 		    {
@@ -726,23 +710,18 @@ void *EOFs(void * argument)
 	      free(datafields[varID][levelID][tsID]);
 
 	  free(datafields[varID][levelID]);
-#ifdef EOFDATA
+
 	  if ( eofdata[varID][levelID].pack ) free(eofdata[varID][levelID].pack);
 	  if ( eofdata[varID][levelID].eig_val ) free(eofdata[varID][levelID].eig_val);
 	  if ( eofdata[varID][levelID].covar_array ) free(eofdata[varID][levelID].covar_array);
 	  if ( eofdata[varID][levelID].covar ) free(eofdata[varID][levelID].covar);
-#endif
         }
       
-#ifdef EOFDATA
       free(eofdata[varID]);
-#endif
       free(datafields[varID]);
     }
 
-#ifdef EOFDATA
   free(eofdata);
-#endif
   free(datafields);
   free(in);
   free(weight);
