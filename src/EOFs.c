@@ -57,7 +57,7 @@ void scale_eigvec_grid(double *restrict out, int tsID, int npack, const int *res
 
 static
 void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const int *restrict pack, const double *restrict weight,
-		       double **covar, double **data, double missval)
+		       double **covar, double **data, double missval, double sum_w)
 {
 #if defined(_OPENMP)
 #pragma omp parallel for shared(tsID, data, out)
@@ -98,7 +98,7 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
 
   if ( sum > 0 )
     {
-      sum = sqrt(sum);
+      sum = sqrt(sum/sum_w);
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)  shared(npack,pack,sum,out)
 #endif
@@ -135,7 +135,6 @@ void *EOFs(void * argument)
   double sum;
   double missval = 0;
   double xvals, yvals;
-  double *df1p, *df2p;
 
   enum T_EIGEN_MODE eigen_mode = JACOBI;
 
@@ -322,6 +321,7 @@ void *EOFs(void * argument)
   int ipack, jpack;
   double *covar_array = NULL;
   double **covar = NULL;
+  double sum_w = 0;
 
   tsID = 0;
 
@@ -347,6 +347,9 @@ void *EOFs(void * argument)
 		       !DBL_IS_EQUAL(in[i], missval) )
 		    pack[npack++] = i;
 		}
+
+	      sum_w = 0;
+	      for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
 	    }
 
 	  ipack = 0;
@@ -492,13 +495,9 @@ void *EOFs(void * argument)
 		  if ( cdoTimer ) timer_start(timer_cov);
 
 		  if ( cdoVerbose ) cdoPrint("processing level %i",levelID);
-
-		  double sum_w = 0;
 		  
 		  if ( grid_space )
 		    {
-		      for ( i1 = 0; i1 < npack; i1++ ) sum_w += weight[pack[i1]];
-
 		      if ( npack )
 			{
 			  eig_val = (double *) malloc(npack*sizeof(double));
@@ -528,9 +527,7 @@ void *EOFs(void * argument)
 			}
 		    }
 		  else if ( time_space )
-		    {
-		      for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
-		      
+		    {		      
 		      if ( cdoVerbose )
 			cdoPrint("allocating covar with %i x %i elements | npack=%i", nts, nts, npack);
 
@@ -544,7 +541,7 @@ void *EOFs(void * argument)
 		      eofdata[varID][levelID].covar       = covar;
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)
+#pragma omp parallel for private(j1, j2, i, sum) default(shared) schedule(dynamic)
 #endif
 		      for ( j1 = 0; j1 < nts; j1++ )
 			{
@@ -552,8 +549,8 @@ void *EOFs(void * argument)
 			  for ( j2 = j1; j2 < nts; j2++ )
 			    {
 			      sum = 0;
-			      df1p = data[j1];
-			      df2p = data[j2];
+			      double *df1p = data[j1];
+			      double *df2p = data[j2];
 			      for ( i = 0; i < npack; i++ )
 				{
 				  sum += weight[pack[i]]*df1p[i]*df2p[i];
@@ -582,7 +579,7 @@ void *EOFs(void * argument)
 
 		  for ( i = 0; i < gridsize; ++i ) out[i] = missval;
 	  
-		  for ( i = 0; i < n; i++ ) eig_val[i] *= sum_w;
+		  // for ( i = 0; i < n; i++ ) eig_val[i] *= sum_w;
 		} // first_call
 	      else
 		{
@@ -593,7 +590,7 @@ void *EOFs(void * argument)
               if ( tsID < n_eig )
                 {
 		  if      ( grid_space ) scale_eigvec_grid(out, tsID, npack, pack, weight, covar);
-		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, data, missval);
+		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, data, missval, sum_w);
 
                   nmiss = 0;
                   for ( i = 0; i < gridsize; i++ ) if ( DBL_IS_EQUAL(out[i], missval) ) nmiss++;
