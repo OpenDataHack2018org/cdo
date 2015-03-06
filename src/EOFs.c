@@ -61,11 +61,10 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
   int i, j;
   int i2;
   double sum;
-  /*
+
 #if defined(_OPENMP)
-#pragma omp parallel for private(i2,j,sum) shared(datafieldv, out)
+#pragma omp parallel for private(i,j,sum) shared(tsID, datafieldv, out)
 #endif
-  */
   for ( i = 0; i < npack; ++i )
     {
       sum = 0;
@@ -82,40 +81,38 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
     }
   */
 
-  // NORMALIZING
+  // Normalizing
   sum = 0;
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
   shared(out,weight,pack,npack)
 #endif
-  for ( i2 = 0; i2 < npack; i2++ )
+  for ( i = 0; i < npack; ++i )
     {
-      /* 
-      ** do not need to account for weights as eigenvectors are non-weighted                                   
-      */ 
+      // do not need to account for weights as eigenvectors are non-weighted                                   
 #ifdef OLD_IMPLEMENTATION
-      sum += weight[pack[i2]] *
+      sum += weight[pack[i]] *
 #else
-      sum += /*weight[pack[i2]] **/
+      sum += /*weight[pack[i]] **/
 #endif
-	out[pack[i2]] * out[pack[i2]];
+	out[pack[i]] * out[pack[i]];
     }
 
   if ( sum > 0 )
     {
       sum = sqrt(sum);
 #if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none)  shared(npack,pack,sum,out)
+#pragma omp parallel for private(i) default(none)  shared(npack,pack,sum,out)
 #endif
-      for ( i2 = 0; i2 < npack; i2++ ) out[pack[i2]] /= sum;
+      for ( i = 0; i < npack; ++i ) out[pack[i]] /= sum;
     }
   else
     {
 #if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none)  shared(npack,pack,out,missval)
+#pragma omp parallel for private(i) default(none)  shared(npack,pack,out,missval)
 #endif
-      for ( i2 = 0; i2 < npack; i2++ ) out[pack[i2]] = missval;
+      for ( i = 0; i < npack; ++i ) out[pack[i]] = missval;
     }
 }
 
