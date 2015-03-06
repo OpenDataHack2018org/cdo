@@ -43,6 +43,82 @@ enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
+static
+void scale_eigvec_grid(double *restrict out, int tsID, int npack, const int *restrict pack, const double *restrict weight, double **covar)
+{
+  for ( int i = 0; i < npack; ++i )
+    out[pack[i]] = 
+#ifdef OLD_IMPLEMENTATION
+      covar[tsID][i] / sqrt(weight[pack[i]]);
+#else
+      covar[tsID][i];
+#endif
+}
+
+static
+void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const int *restrict pack, const double *restrict weight, double **covar, double **datafieldv, double missval)
+{
+  int i, j;
+  int i2;
+  double sum;
+  /*
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2,j,sum) shared(datafieldv, out)
+#endif
+  */
+  for ( i = 0; i < npack; ++i )
+    {
+      sum = 0;
+      for ( j = 0; j < nts; ++j )
+	sum += datafieldv[j][pack[i]] * covar[tsID][j];
+      
+      out[pack[i]] = sum;
+    }
+  /*
+  for ( j = 0; j < nts; ++j )
+    {
+      for ( i = 0; i < npack; ++i )
+	out[pack[i]] += datafieldv[j][pack[i]] * covar[tsID][j];
+    }
+  */
+
+  // NORMALIZING
+  sum = 0;
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
+  shared(out,weight,pack,npack)
+#endif
+  for ( i2 = 0; i2 < npack; i2++ )
+    {
+      /* 
+      ** do not need to account for weights as eigenvectors are non-weighted                                   
+      */ 
+#ifdef OLD_IMPLEMENTATION
+      sum += weight[pack[i2]] *
+#else
+      sum += /*weight[pack[i2]] **/
+#endif
+	out[pack[i2]] * out[pack[i2]];
+    }
+
+  if ( sum > 0 )
+    {
+      sum = sqrt(sum);
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2) default(none)  shared(npack,pack,sum,out)
+#endif
+      for ( i2 = 0; i2 < npack; i2++ ) out[pack[i2]] /= sum;
+    }
+  else
+    {
+#if defined(_OPENMP)
+#pragma omp parallel for private(i2) default(none)  shared(npack,pack,out,missval)
+#endif
+      for ( i2 = 0; i2 < npack; i2++ ) out[pack[i2]] = missval;
+    }
+}
+
 void *EOFs(void * argument)
 {
   char *envstr;
@@ -560,78 +636,8 @@ void *EOFs(void * argument)
                 {
 		  i = tsID;
 
-		  if ( grid_space )
-		    {
-		      /*
-			double sumw= 0;
-			for ( j = 0; j < npack; j++ ) sumw += sqrt(weight[pack[j]]);
-			printf("sumw %g %g\n", sumw, 1./sumw);
-			sumw= 0;
-			for ( j = 0; j < npack; j++ ) sumw += covar[i][j];
-			printf("cov %g %g\n", sumw, 1./sumw);
-			sumw= 0;
-			for ( j = 0; j < npack; j++ ) sumw += covar[i][j] * weight[pack[j]];
-			printf("cov %g %g\n", sumw, 1./sumw);
-		      */
-		      for ( j = 0; j < npack; j++ )
-			out[pack[j]] = 
-#ifdef OLD_IMPLEMENTATION
-			  covar[i][j] / sqrt(weight[pack[j]]);
-#else
-		          covar[i][j];
-			  // covar[i][j] / (sqrt(weight[pack[j]])*29.144);
-#endif
-		    }
-		  else if ( time_space )
-		    {
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2,j,sum) shared(datafieldv, out)
-#endif
-		      for ( i2 = 0; i2 < npack; i2++ )
-			{
-			  sum = 0;
-			  for ( j = 0; j < nts; j++ )
-			    sum += datafieldv[j][pack[i2]] * covar[i][j];
-			  
-			  out[pack[i2]] = sum;
-			}
-
-		      // NORMALIZING
-		      sum = 0;
-
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
-  shared(out,weight,pack,npack)
-#endif
-		      for ( i2 = 0; i2 < npack; i2++ )
-			{
-			  /* 
-			  ** do not need to account for weights as eigenvectors are non-weighted                                   
-			  */ 
-#ifdef OLD_IMPLEMENTATION
-			  sum += weight[pack[i2]] *
-#else
-			  sum += /*weight[pack[i2]] **/
-#endif
-			    out[pack[i2]] * out[pack[i2]];
-			}
-
-		      if ( sum > 0 )
-			{
-			  sum = sqrt(sum);
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none)  shared(npack,pack,sum,out)
-#endif
-			  for ( i2 = 0; i2 < npack; i2++ ) out[pack[i2]] /= sum;
-			}
-		      else
-			{
-#if defined(_OPENMP)
-#pragma omp parallel for private(i2) default(none)  shared(npack,pack,out,missval)
-#endif
-			  for ( i2 = 0; i2 < npack; i2++ ) out[pack[i2]] = missval;
-			}
-		    } // else if ( time_space )
+		  if      ( grid_space ) scale_eigvec_grid(out, tsID, npack, pack, weight, covar);
+		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, datafieldv, missval);
 
                   nmiss = 0;
                   for ( i = 0; i < gridsize; i++ )
