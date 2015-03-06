@@ -44,12 +44,12 @@ enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 static
-void scale_eigvec_grid(double *restrict out, int tsID, int npack, const int *restrict pack, const double *restrict weight, double **covar)
+void scale_eigvec_grid(double *restrict out, int tsID, int npack, const int *restrict pack, const double *restrict weight, double **covar, double sum_w)
 {
   for ( int i = 0; i < npack; ++i )
     out[pack[i]] = 
 #ifdef OLD_IMPLEMENTATION
-      covar[tsID][i] / sqrt(weight[pack[i]]);
+      covar[tsID][i] / sqrt(weight[pack[i]]/sum_w);
 #else
       covar[tsID][i];
 #endif
@@ -376,7 +376,6 @@ void *EOFs(void * argument)
 		  for ( i = 0; i < npack; ++i ) covar[i] = covar_array + npack*i;
 		  for ( i = 0; i < npack; ++i )
 		    {
-		      // work[0][i] = 0;
 		      for ( j = 0; j < npack; ++j ) covar[i][j] = 0;
 		    }
 
@@ -392,7 +391,6 @@ void *EOFs(void * argument)
 #endif
 	      for ( ipack = 0; ipack < npack; ++ipack )
 		{
-		  // work[0][ipack] += in[0][pack[ipack]];
 		  for ( jpack = ipack; jpack < npack; ++jpack )
 		    covar[ipack][jpack] += in[pack[ipack]] * in[pack[jpack]];
 		}
@@ -589,7 +587,7 @@ void *EOFs(void * argument)
 
               if ( tsID < n_eig )
                 {
-		  if      ( grid_space ) scale_eigvec_grid(out, tsID, npack, pack, weight, covar);
+		  if      ( grid_space ) scale_eigvec_grid(out, tsID, npack, pack, weight, covar, sum_w);
 		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, data, missval, sum_w);
 
                   nmiss = 0;
