@@ -416,7 +416,7 @@ void *EOFs(void * argument)
 	    }
           else if ( time_space )
 	    {
-	      double data = (double *) malloc(npack*sizeof(double));
+	      double *data = (double *) malloc(npack*sizeof(double));
 	      eofdata[varID][levelID].data[tsID] = data;
 
 	      for ( ipack = 0; ipack < npack; ipack++ )
@@ -647,7 +647,7 @@ void *EOFs(void * argument)
 	  if ( time_space && eofdata[varID][levelID].data )
 	    {
 	      for ( tsID = 0; tsID < nts; tsID++ )
-		if ( free(eofdata[varID][levelID].data[tsID]) eofdata[varID][levelID].data[tsID]);
+		if ( eofdata[varID][levelID].data[tsID] ) free(eofdata[varID][levelID].data[tsID]);
 	      free(eofdata[varID][levelID].data);
 	    }
 	}
