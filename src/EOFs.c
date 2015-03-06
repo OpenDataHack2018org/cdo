@@ -28,7 +28,7 @@
  * number of contributing values during summation.
  */
 
-#define OLD_IMPLEMENTATION
+//#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
 #include <limits.h>  // LONG_MAX
@@ -142,9 +142,6 @@ void *EOFs(void * argument)
   typedef struct {
     int init;
     int first_call;
-    int n;
-    int npack;
-    int *pack;
     double *eig_val;
     double *covar_array;
     double **covar;
@@ -291,6 +288,8 @@ void *EOFs(void * argument)
 	     n_eig,n,grid_space==1?"grid_space" : "time_space");
 
   /* allocation of temporary fields and output structures */
+  int npack = -1;
+  int *pack            = (int *) malloc(gridsize*sizeof(int));
   double *in           = (double *) malloc(gridsize*sizeof(double));
   eofdata_t **eofdata  = (eofdata_t **) malloc(nvars*sizeof(eofdata_t*));
 
@@ -307,7 +306,6 @@ void *EOFs(void * argument)
         {
 	  eofdata[varID][levelID].init = 0;
 	  eofdata[varID][levelID].first_call = TRUE;
-	  eofdata[varID][levelID].pack = NULL;
 	  eofdata[varID][levelID].eig_val = NULL;
 	  eofdata[varID][levelID].covar_array = NULL;
 	  eofdata[varID][levelID].covar = NULL;
@@ -322,8 +320,6 @@ void *EOFs(void * argument)
     cdoPrint("Allocated eigenvalue/eigenvector structures with nts=%i gridsize=%i", nts, gridsize);
 
   int ipack, jpack;
-  int npack;
-  int *pack;
   double *covar_array = NULL;
   double **covar = NULL;
 
@@ -342,25 +338,15 @@ void *EOFs(void * argument)
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
           missval = vlistInqVarMissval(vlistID1, varID);
-	  if ( !eofdata[varID][levelID].init )
+	  if ( npack == -1 )
 	    {
-	      pack = (int *) malloc(gridsize*sizeof(int));
 	      npack = 0;
-	      
 	      for ( i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(weight[i], 0) && !DBL_IS_EQUAL(weight[i], missval) &&
 		       !DBL_IS_EQUAL(in[i], missval) )
 		    pack[npack++] = i;
 		}
-	      
-	      eofdata[varID][levelID].npack = npack;
-	      eofdata[varID][levelID].pack  = pack;
-	    }
-	  else
-	    {
-	      npack = eofdata[varID][levelID].npack;
-	      pack  = eofdata[varID][levelID].pack;
 	    }
 
 	  ipack = 0;
@@ -381,6 +367,7 @@ void *EOFs(void * argument)
             {
 	      if ( !eofdata[varID][levelID].init )
 		{
+		  n = npack;
 		  double *covar_array = (double *) malloc(npack*npack*sizeof(double));
 		  covar = (double **) malloc(npack*sizeof(double *));
 		  for ( i = 0; i < npack; ++i ) covar[i] = covar_array + npack*i;
@@ -390,7 +377,6 @@ void *EOFs(void * argument)
 		      for ( j = 0; j < npack; ++j ) covar[i][j] = 0;
 		    }
 
-		  eofdata[varID][levelID].n           = npack;
 		  eofdata[varID][levelID].covar_array = covar_array;
 		  eofdata[varID][levelID].covar       = covar;
 		}
@@ -466,8 +452,10 @@ void *EOFs(void * argument)
   double *out = in;
   double *eig_val = NULL;
 
-  printf("n=%d\n", n);
-  for ( tsID = 0; tsID < n; tsID++ )
+  int nts_out = nts;
+  if ( grid_space ) nts_out = npack;
+
+  for ( tsID = 0; tsID < nts_out; tsID++ )
     {
       juldate = juldate_add_seconds(60, juldate);
       juldate_decode(calendar, juldate, &vdate, &vtime);
@@ -493,9 +481,6 @@ void *EOFs(void * argument)
 	  for ( levelID = 0; levelID < nlevs; levelID++ )
 	    {
 	      double **data = eofdata[varID][levelID].data;
-
-	      npack = eofdata[varID][levelID].npack;
-	      pack  = eofdata[varID][levelID].pack;
 
 	      if ( eofdata[varID][levelID].first_call )
 		{
@@ -586,8 +571,6 @@ void *EOFs(void * argument)
 		  /* SOLVE THE EIGEN PROBLEM */
 		  if ( cdoTimer ) timer_start(timer_eig);
 
-		  n = eofdata[varID][levelID].n;
-
 		  if ( eigen_mode == JACOBI ) 
 		    // TODO: use return status (>0 okay, -1 did not converge at all) 
 		    parallel_eigen_solution_of_symmetric_matrix(covar, eig_val, n, __func__);
@@ -633,7 +616,6 @@ void *EOFs(void * argument)
       
       for( levelID = 0; levelID < nlevs; levelID++ )
         { 	  
-	  if ( eofdata[varID][levelID].pack ) free(eofdata[varID][levelID].pack);
 	  if ( eofdata[varID][levelID].eig_val ) free(eofdata[varID][levelID].eig_val);
 	  if ( eofdata[varID][levelID].covar_array ) free(eofdata[varID][levelID].covar_array);
 	  if ( eofdata[varID][levelID].covar ) free(eofdata[varID][levelID].covar);
@@ -650,6 +632,7 @@ void *EOFs(void * argument)
 
   free(eofdata);
   free(in);
+  free(pack);
   free(weight);
 
   streamClose(streamID3);
