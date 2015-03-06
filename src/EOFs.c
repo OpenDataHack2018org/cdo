@@ -28,7 +28,7 @@
  * number of contributing values during summation.
  */
 
-#define OLD_IMPLEMENTATION
+//#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
 #include <limits.h>  // LONG_MAX
@@ -113,13 +113,14 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
     }
 }
 
+
 void *EOFs(void * argument)
 {
   char *envstr;
 
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
-  long i, j, i1, j1, j2;
+  int i, j, j1, j2;
   int nlevs = 0 ;
   int nmiss;
   int tsID;
@@ -188,7 +189,7 @@ void *EOFs(void * argument)
   int vlistID1   = streamInqVlist(streamID1);
   int taxisID1   = vlistInqTaxis(vlistID1);
   int gridID1    = vlistInqVarGrid(vlistID1, 0);
-  long gridsize  = vlistGridsizeMax(vlistID1);
+  int gridsize  = vlistGridsizeMax(vlistID1);
   int nvars      = vlistNvars(vlistID1);
   int nrecs      = vlistNrecs(vlistID1);
 
