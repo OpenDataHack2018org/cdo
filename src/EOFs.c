@@ -49,7 +49,7 @@ void *EOFs(void * argument)
 
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
-  long i, ii, j, i1, i2, j1, j2;
+  long i, j, i1, j1, j2;
   int nlevs=0 ;
   int nmiss;
   int tsID;
@@ -79,6 +79,7 @@ void *EOFs(void * argument)
     double *eig_val;
     double *covar_array;
     double **covar;
+    double **data;
   }
   eofdata_t;
 
@@ -222,19 +223,17 @@ void *EOFs(void * argument)
 	     n_eig,n,grid_space==1?"grid_space" : "time_space");
 
   /* allocation of temporary fields and output structures */
-  double *in              = (double *) malloc(gridsize*sizeof(double));
-  eofdata_t **eofdata     = (eofdata_t **) malloc(nvars*sizeof(eofdata_t*));
-  double ****datafields   = (double ****) malloc(nvars*sizeof(double ***));
+  double *in           = (double *) malloc(gridsize*sizeof(double));
+  eofdata_t **eofdata  = (eofdata_t **) malloc(nvars*sizeof(eofdata_t*));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridID1             = vlistInqVarGrid(vlistID1, varID);
-      gridsize            = vlistGridsizeMax(vlistID1);
-      nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      missval             = vlistInqVarMissval(vlistID1, varID);
+      gridID1  = vlistInqVarGrid(vlistID1, varID);
+      gridsize = vlistGridsizeMax(vlistID1);
+      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      missval  = vlistInqVarMissval(vlistID1, varID);
 
-      eofdata[varID]      = (eofdata_t *) malloc(nlevs*sizeof(eofdata_t));
-      datafields[varID]   = (double ***) malloc(nlevs*sizeof(double **));
+      eofdata[varID] = (eofdata_t *) malloc(nlevs*sizeof(eofdata_t));
 
       for ( levelID = 0; levelID < nlevs; ++levelID )
         {
@@ -244,25 +243,16 @@ void *EOFs(void * argument)
 	  eofdata[varID][levelID].eig_val = NULL;
 	  eofdata[varID][levelID].covar_array = NULL;
 	  eofdata[varID][levelID].covar = NULL;
+	  eofdata[varID][levelID].data = NULL;
 
-          if ( grid_space )
+	  if ( time_space )
             {
-              datafields[varID][levelID]    = (double **) malloc(1*sizeof(double *));
-              datafields[varID][levelID][0] = (double*) malloc(gridsize*gridsize*sizeof(double));
-
-	      for ( i = 0; i < gridsize*gridsize; i++ )
-		{
-		  datafields[varID][levelID][0][i] = 0;            
-		}
-	    }
-          else if ( time_space )
-            {
-              datafields[varID][levelID] = (double **) malloc(nts*sizeof(double *));
+              eofdata[varID][levelID].data = (double **) malloc(nts*sizeof(double *));
               for ( tsID = 0; tsID < nts; tsID++ )
                 {
-                  datafields[varID][levelID][tsID] = (double *) malloc(gridsize*sizeof(double));
+                  eofdata[varID][levelID].data[tsID] = (double *) malloc(gridsize*sizeof(double));
                   for ( i = 0; i < gridsize; ++i )
-                    datafields[varID][levelID][tsID][i] = 0;
+                    eofdata[varID][levelID].data[tsID][i] = 0;
                 }
             }
         }
@@ -287,8 +277,6 @@ void *EOFs(void * argument)
 
       for ( recID = 0; recID < nrecs; recID++ )
         {
-          int i2;
-
           streamInqRecord(streamID1, &varID, &levelID);
           streamReadRecord(streamID1, in, &nmiss);
 
@@ -367,7 +355,7 @@ void *EOFs(void * argument)
 		{
 		  if ( ! DBL_IS_EQUAL(in[i], missval ) )
 		    {
-		      datafields[varID][levelID][tsID][i] = in[i];
+		      eofdata[varID][levelID].data[tsID][i] = in[i];
 		    }
 		  else
 		    {
@@ -377,7 +365,7 @@ void *EOFs(void * argument)
 			  cdoWarning("Does not work with changing locations of missing values in time.");
 			  missval_warning = 1;
 			}
-		      datafields[varID][levelID][tsID][i] = 0;
+		      eofdata[varID][levelID].data[tsID][i] = 0;
 		    }
 		}
 	    }
@@ -458,7 +446,7 @@ void *EOFs(void * argument)
 	  for ( levelID = 0; levelID < nlevs; levelID++ )
 	    {
 	      int i2;
-	      double **datafieldv = datafields[varID][levelID];
+	      double **datafieldv = eofdata[varID][levelID].data;
 
 	      npack = eofdata[varID][levelID].npack;
 	      pack  = eofdata[varID][levelID].pack;
@@ -669,30 +657,23 @@ void *EOFs(void * argument)
       
       for( levelID = 0; levelID < nlevs; levelID++ )
         { 	  
-	  if ( time_space )
-	    for (tsID=0; tsID<nts; tsID++ )
-	      free(datafields[varID][levelID][tsID]);
-
-	  if ( time_space )
-	    free(datafields[varID][levelID]);
-
 	  if ( eofdata[varID][levelID].pack ) free(eofdata[varID][levelID].pack);
 	  if ( eofdata[varID][levelID].eig_val ) free(eofdata[varID][levelID].eig_val);
 	  if ( eofdata[varID][levelID].covar_array ) free(eofdata[varID][levelID].covar_array);
 	  if ( eofdata[varID][levelID].covar ) free(eofdata[varID][levelID].covar);
-        }
+	  if ( time_space && eofdata[varID][levelID].data )
+	    {
+	      for ( tsID = 0; tsID < nts; tsID++ ) free(eofdata[varID][levelID].data[tsID]);
+	      free(eofdata[varID][levelID].data);
+	    }
+	}
       
       free(eofdata[varID]);
-      if ( time_space )
-	free(datafields[varID]);
     }
 
   free(eofdata);
-  if ( time_space )
-    free(datafields);
   free(in);
   free(weight);
-
 
   streamClose(streamID3);
   streamClose(streamID2);
@@ -701,7 +682,6 @@ void *EOFs(void * argument)
   vlistDestroy(vlistID2);
   vlistDestroy(vlistID3);
 
-  gridDestroy(gridID1);
   gridDestroy(gridID2);
 
   //  taxisDestroy(taxisID2);
