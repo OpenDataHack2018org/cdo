@@ -360,28 +360,7 @@ void *EOFs(void * argument)
 		  for ( jpack = ipack; jpack < npack; ++jpack )
 		    covar[ipack][jpack] += in[pack[ipack]] * in[pack[jpack]];
 		}
-	      // This could be done in parallel to save lots of time
-#if defined(_OPENMP)
-#pragma omp parallel for private(i1, i2) default(shared)
-#endif
-	      for ( i1 = 0; i1 < gridsize; i1++ )
-                {
-                  for ( i2 = i1; i2 < gridsize; i2++ )
-                    {
-                      if ( nmiss == 0 ||
-			   (( ! DBL_IS_EQUAL(in[i1], missval) ) &&
-			    ( ! DBL_IS_EQUAL(in[i2], missval) )) )
-                        {
-                          datafields[varID][levelID][0][i1*gridsize+i2] += in[i1]*in[i2];
-                        }
-                      else if ( missval_warning == 0 )
-                        {
-			  cdoWarning("Missing value support not checked for this operator!\n");
-			  missval_warning = 1; 
-			}
-                    }
-                }
-            }
+	    }
           else if ( time_space )
 	    {
 	      for ( i = 0; i < gridsize; ++i )
@@ -412,13 +391,6 @@ void *EOFs(void * argument)
   if ( grid_space ) nts = tsID;
 
   if ( tsID == 1 ) cdoAbort("File consists of only one timestep!");
-
-  if ( grid_space )
-    for ( i1 = 0; i1 < gridsize; ++i1 )
-      for ( i2 = 0; i2 < i1; ++i2 )
-        {
-	  datafields[varID][levelID][0][i1*gridsize+i2] = datafields[varID][levelID][0][i2*gridsize+i1];
-        }
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
@@ -607,12 +579,6 @@ void *EOFs(void * argument)
 			for ( j = 0; j < npack; j++ ) sumw += sqrt(weight[pack[j]]);
 			printf("sumw %g %g\n", sumw, 1./sumw);
 			sumw= 0;
-			for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[j]*gridsize+pack[i]];
-			printf("dat %g %g\n", sumw, 1./sumw);
-			sumw= 0;
-			for ( j = 0; j < npack; j++ ) sumw += datafieldv[0][pack[i]*gridsize+pack[j]]* weight[pack[j]];
-			printf("dat %g %g\n", sumw, 1./sumw);
-			sumw= 0;
 			for ( j = 0; j < npack; j++ ) sumw += covar[i][j];
 			printf("cov %g %g\n", sumw, 1./sumw);
 			sumw= 0;
@@ -703,13 +669,12 @@ void *EOFs(void * argument)
       
       for( levelID = 0; levelID < nlevs; levelID++ )
         { 	  
-	  if ( grid_space ) 
-	    free(datafields[varID][levelID][0]);
-	  else if ( time_space )
+	  if ( time_space )
 	    for (tsID=0; tsID<nts; tsID++ )
 	      free(datafields[varID][levelID][tsID]);
 
-	  free(datafields[varID][levelID]);
+	  if ( time_space )
+	    free(datafields[varID][levelID]);
 
 	  if ( eofdata[varID][levelID].pack ) free(eofdata[varID][levelID].pack);
 	  if ( eofdata[varID][levelID].eig_val ) free(eofdata[varID][levelID].eig_val);
@@ -718,11 +683,13 @@ void *EOFs(void * argument)
         }
       
       free(eofdata[varID]);
-      free(datafields[varID]);
+      if ( time_space )
+	free(datafields[varID]);
     }
 
   free(eofdata);
-  free(datafields);
+  if ( time_space )
+    free(datafields);
   free(in);
   free(weight);
 
