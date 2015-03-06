@@ -28,7 +28,7 @@
  * number of contributing values during summation.
  */
 
-//#define OLD_IMPLEMENTATION
+#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
 #include <limits.h>  // LONG_MAX
@@ -453,7 +453,7 @@ void *EOFs(void * argument)
   double *eig_val = NULL;
 
   int nts_out = nts;
-  if ( grid_space ) nts_out = npack;
+  if ( npack < nts ) nts_out = npack;
 
   for ( tsID = 0; tsID < nts_out; tsID++ )
     {
