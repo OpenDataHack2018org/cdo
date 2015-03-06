@@ -56,20 +56,21 @@ void scale_eigvec_grid(double *restrict out, int tsID, int npack, const int *res
 }
 
 static
-void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const int *restrict pack, const double *restrict weight, double **covar, double **datafieldv, double missval)
+void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const int *restrict pack, const double *restrict weight,
+		       double **covar, double **data, double missval)
 {
   int i, j;
   int i2;
   double sum;
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(i,j,sum) shared(tsID, datafieldv, out)
+#pragma omp parallel for private(i,j,sum) shared(tsID, data, out)
 #endif
   for ( i = 0; i < npack; ++i )
     {
       sum = 0;
       for ( j = 0; j < nts; ++j )
-	sum += datafieldv[j][pack[i]] * covar[tsID][j];
+	sum += data[j][i] * covar[tsID][j];
       
       out[pack[i]] = sum;
     }
@@ -77,7 +78,7 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
   for ( j = 0; j < nts; ++j )
     {
       for ( i = 0; i < npack; ++i )
-	out[pack[i]] += datafieldv[j][pack[i]] * covar[tsID][j];
+	out[pack[i]] += data[j][i] * covar[tsID][j];
     }
   */
 
@@ -319,15 +320,7 @@ void *EOFs(void * argument)
 	  eofdata[varID][levelID].data = NULL;
 
 	  if ( time_space )
-            {
-              eofdata[varID][levelID].data = (double **) malloc(nts*sizeof(double *));
-              for ( tsID = 0; tsID < nts; tsID++ )
-                {
-                  eofdata[varID][levelID].data[tsID] = (double *) malloc(gridsize*sizeof(double));
-                  for ( i = 0; i < gridsize; ++i )
-                    eofdata[varID][levelID].data[tsID][i] = 0;
-                }
-            }
+	    eofdata[varID][levelID].data = (double **) malloc(nts*sizeof(double *));
         }
     }
 
@@ -380,7 +373,7 @@ void *EOFs(void * argument)
 	  for ( i = 0; i < gridsize; ++i )
 	    {
 	      if ( !DBL_IS_EQUAL(weight[i], 0) && !DBL_IS_EQUAL(weight[i], missval) &&
-		   !DBL_IS_EQUAL(in[i], missval) && pack[ipack] != i )
+		   !DBL_IS_EQUAL(in[i], missval) && pack[ipack++] != i )
 		{
 		  cdoAbort("Missing values unsupported!");
 		}
@@ -388,7 +381,6 @@ void *EOFs(void * argument)
 		{
 		  cdoAbort("Missing values unsupported!");
 		}
-	      ipack++;
 	    }
 
 	  if ( grid_space )
@@ -424,23 +416,11 @@ void *EOFs(void * argument)
 	    }
           else if ( time_space )
 	    {
-	      for ( i = 0; i < gridsize; ++i )
-		{
-		  if ( ! DBL_IS_EQUAL(in[i], missval ) )
-		    {
-		      eofdata[varID][levelID].data[tsID][i] = in[i];
-		    }
-		  else
-		    {
-		      if ( missval_warning == 0 )
-			{
-			  cdoWarning("Missing Value Support not Checked for this Operator!");
-			  cdoWarning("Does not work with changing locations of missing values in time.");
-			  missval_warning = 1;
-			}
-		      eofdata[varID][levelID].data[tsID][i] = 0;
-		    }
-		}
+	      double data = (double *) malloc(npack*sizeof(double));
+	      eofdata[varID][levelID].data[tsID] = data;
+
+	      for ( ipack = 0; ipack < npack; ipack++ )
+		data[ipack] = in[pack[ipack]];
 	    }
 
 	  eofdata[varID][levelID].init = 1;
@@ -596,7 +576,7 @@ void *EOFs(void * argument)
 			    df2p = datafieldv[j2];
 			    for ( i = 0; i < npack; i++ )
 			      {
-				sum += weight[pack[i]]*df1p[pack[i]]*df2p[pack[i]];
+				sum += weight[pack[i]]*df1p[i]*df2p[i];
 			      }
 			    covar[j2][j1] = covar[j1][j2] = sum / sum_w / nts;
 			  }
@@ -666,7 +646,8 @@ void *EOFs(void * argument)
 	  if ( eofdata[varID][levelID].covar ) free(eofdata[varID][levelID].covar);
 	  if ( time_space && eofdata[varID][levelID].data )
 	    {
-	      for ( tsID = 0; tsID < nts; tsID++ ) free(eofdata[varID][levelID].data[tsID]);
+	      for ( tsID = 0; tsID < nts; tsID++ )
+		if ( free(eofdata[varID][levelID].data[tsID]) eofdata[varID][levelID].data[tsID]);
 	      free(eofdata[varID][levelID].data);
 	    }
 	}
