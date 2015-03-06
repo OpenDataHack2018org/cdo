@@ -28,7 +28,7 @@
  * number of contributing values during summation.
  */
 
-//#define OLD_IMPLEMENTATION
+#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
 #include <limits.h>  // LONG_MAX
@@ -466,7 +466,7 @@ void *EOFs(void * argument)
   double *out = in;
   double *eig_val = NULL;
 
-  // TODO n=nts n=npack<----1!!!
+  printf("n=%d\n", n);
   for ( tsID = 0; tsID < n; tsID++ )
     {
       juldate = juldate_add_seconds(60, juldate);
@@ -492,12 +492,10 @@ void *EOFs(void * argument)
 
 	  for ( levelID = 0; levelID < nlevs; levelID++ )
 	    {
-	      double **datafieldv = eofdata[varID][levelID].data;
+	      double **data = eofdata[varID][levelID].data;
 
 	      npack = eofdata[varID][levelID].npack;
 	      pack  = eofdata[varID][levelID].pack;
-
-	      double sum_w = 0;
 
 	      if ( eofdata[varID][levelID].first_call )
 		{
@@ -510,6 +508,8 @@ void *EOFs(void * argument)
 
 		  if ( cdoVerbose ) cdoPrint("processing level %i",levelID);
 
+		  double sum_w = 0;
+		  
 		  if ( grid_space )
 		    {
 		      for ( i1 = 0; i1 < npack; i1++ ) sum_w += weight[pack[i1]];
@@ -567,8 +567,8 @@ void *EOFs(void * argument)
 			  for ( j2 = j1; j2 < nts; j2++ )
 			    {
 			      sum = 0;
-			      df1p = datafieldv[j1];
-			      df2p = datafieldv[j2];
+			      df1p = data[j1];
+			      df2p = data[j2];
 			      for ( i = 0; i < npack; i++ )
 				{
 				  sum += weight[pack[i]]*df1p[i]*df2p[i];
@@ -585,6 +585,8 @@ void *EOFs(void * argument)
 
 		  /* SOLVE THE EIGEN PROBLEM */
 		  if ( cdoTimer ) timer_start(timer_eig);
+
+		  n = eofdata[varID][levelID].n;
 
 		  if ( eigen_mode == JACOBI ) 
 		    // TODO: use return status (>0 okay, -1 did not converge at all) 
@@ -607,14 +609,11 @@ void *EOFs(void * argument)
 
               if ( tsID < n_eig )
                 {
-		  i = tsID;
-
 		  if      ( grid_space ) scale_eigvec_grid(out, tsID, npack, pack, weight, covar);
-		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, datafieldv, missval);
+		  else if ( time_space ) scale_eigvec_time(out, tsID, nts, npack, pack, weight, covar, data, missval);
 
                   nmiss = 0;
-                  for ( i = 0; i < gridsize; i++ )
-                    if ( DBL_IS_EQUAL(out[i], missval) ) nmiss++;
+                  for ( i = 0; i < gridsize; i++ ) if ( DBL_IS_EQUAL(out[i], missval) ) nmiss++;
 
                   streamDefRecord(streamID3, varID, levelID);
                   streamWriteRecord(streamID3, out, nmiss);
@@ -624,15 +623,13 @@ void *EOFs(void * argument)
               if ( DBL_IS_EQUAL(eig_val[tsID], missval) ) nmiss = 1;
               streamDefRecord(streamID2, varID, levelID);
               streamWriteRecord(streamID2, &eig_val[tsID], nmiss);
-	      
 	    } // loop nlevs
 	} // loop nvars
     }
 
   for ( varID = 0; varID < nvars; varID++)
     {
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       
       for( levelID = 0; levelID < nlevs; levelID++ )
         { 	  
