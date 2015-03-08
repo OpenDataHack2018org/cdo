@@ -226,7 +226,7 @@ AC_PROG_AWK
 AC_CONFIG_FILES([test/File.test test/Read_grib.test test/Read_netcdf.test test/Copy_netcdf.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/Detrend.test test/Arith.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Detrend.test test/Arith.test test/Gradsdes.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/inputfiles.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings])
 AC_OUTPUT
