@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-03-12  Uwe Schulzweida
+
+	* setpartabp, setpartabn: added optional parameter convert to convert the units
+
 2015-02-04  Uwe Schulzweida
 
 	* select: added wildcard support for parameter name and param

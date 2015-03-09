@@ -11,14 +11,14 @@ Version 1.6.8 (12 March 2015):
      * yseassub: Subtract multi-year seasonal time series
      * yseasmul: Multiply multi-year seasonal time series
      * yseasdiv: Divide multi-year seasonal time series
-
-   Changed modules:
+   Changed operators:
+     * setpartabp, setpartabn: added optional parameter convert to convert the units.
+       Units are not converted anymore if this parameter is not set!
      * TimSTAT, Timpctl, TimselSTAT, Timselpctl, SeasSTAT, Seaspctl:
        The output time stamp of all operators from the above modules
        are changed from the last to the middle contributing timestep.
        Use the envirionment variable CDO_TIMESTAT_DATE=last to set
        the outout time stamp to the last contributing timestep.
-
    Fixed bugs:
      * grib2 output: segfaults when writing grib2 files [Bug #5351]
      * remapnn: Segmentation fault for extrapolation of regular 2D source grids [Bug #5448]

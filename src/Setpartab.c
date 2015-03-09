@@ -174,6 +174,7 @@ void *get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
 
 typedef struct
 {
+  int convert;
   int remove;
   // missing value
   int changemissval;
@@ -201,7 +202,6 @@ typedef struct
   void *ut_converter;
 } var_t;
 
-int lwarn_udunits = TRUE;
 
 static
 void defineVarAttText(int vlistID2, int varID, const char *attname, const char *atttext)
@@ -211,7 +211,58 @@ void defineVarAttText(int vlistID2, int varID, const char *attname, const char *
 }
 
 static
-void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *name)
+void convertVarUnits(var_t *vars, int varID, char *name)
+{
+  if ( vars[varID].convert == FALSE ) vars[varID].changeunits = FALSE;
+
+  if ( vars[varID].changeunits == TRUE )
+    {
+      char *units = vars[varID].units;
+      char *units_old = vars[varID].units_old;
+#if defined(HAVE_UDUNITS2)
+      int status;
+      UDUNITS_INIT();
+      UDUNITS_LOCK();
+      vars[varID].ut_converter = get_converter(units_old, units, &status);
+      UDUNITS_UNLOCK();
+      if ( vars[varID].ut_converter == NULL )
+	{
+	  if ( status == -2 )
+	    {
+	      if ( cdoVerbose )
+		cdoPrint("%s - not converted from  [%s] to [%s], units are equal!", name, units_old, units);
+	    }
+	  else if ( status == -3 )
+	    {
+	      cdoWarning("%s - converting units from [%s] to [%s] failed, not convertible!", name, units_old, units);
+	    }
+	  else
+	    cdoWarning("%s - converting units from [%s] to [%s] failed!", name, units_old, units);
+	  vars[varID].changeunits = FALSE;
+	}
+      else
+	{
+	  // if ( cdoVerbose )
+	    {
+	      char buf[64];
+	      cv_get_expression(vars[varID].ut_converter, buf, 64, name);
+	      cdoPrint("%s - convert units from [%s] to [%s] (expression: %s).", name, units_old, units, buf);
+	    }
+	}
+#else
+      static int lwarn_udunits = TRUE;
+      if ( lwarn_udunits )
+	{
+	  cdoWarning("%s - converting units from [%s] to [%s] failed, UDUNITS2 support not compiled in!", name,units_old, units));
+	  vars[varID].changeunits = FALSE;
+	  lwarn_udunits = FALSE;
+	}
+#endif
+    }
+}
+
+static
+void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units)
 {
   char units_old[CDI_MAX_NAME];
   size_t len1, len2;
@@ -227,45 +278,6 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 	  vars[varID].changeunits = TRUE;
 	  strcpy(vars[varID].units_old, units_old);
 	  strcpy(vars[varID].units, units);
-#if defined(HAVE_UDUNITS2)
-	  int status;
-	  UDUNITS_INIT();
-	  UDUNITS_LOCK();
-	  vars[varID].ut_converter = get_converter(units_old, units, &status);
-	  UDUNITS_UNLOCK();
-	  if ( vars[varID].ut_converter == NULL )
-	    {
-	      if ( status == -2 )
-		{
-		  if ( cdoVerbose )
-		    cdoPrint("%s - not converted from  [%s] to [%s], units are equal!", name, units_old, units);
-		}
-	      else if ( status == -3 )
-		{
-		  cdoWarning("%s - converting units from [%s] to [%s] failed, not convertible!", name, units_old, units);
-		}
-	      else
-		cdoWarning("%s - converting units from [%s] to [%s] failed!", name, units_old, units);
-	      vars[varID].changeunits = FALSE;
-	    }
-	  else
-	    {
-	      if ( cdoVerbose )
-		{
-		  char buf[64];
-		  cv_get_expression(vars[varID].ut_converter, buf, 64, name);
-		  cdoPrint("%s - convert units from [%s] to [%s] (expression: %s).", name, units_old, units, buf);
-		}
-	    }
-#else
-	  UNUSED(name);
-	  if ( lwarn_udunits )
-	    {
-	      cdoWarning("Can't convert units, UDUNITS2 support not compiled in!");
-	      vars[varID].changeunits = FALSE;
-	      lwarn_udunits = FALSE;
-	    }
-#endif
 	}
 
       vlistDefVarUnits(vlistID2, varID, units);
@@ -279,11 +291,11 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   FILE *fp;
   namelist_t *nml;
   int nml_code, nml_out_code, nml_table, nml_param, nml_out_param, nml_chunktype, nml_datatype, nml_type, nml_name, nml_out_name, nml_stdname;
-  int nml_longname, nml_units, nml_comment, nml_ltype, nml_delete, nml_missval, nml_factor;
+  int nml_longname, nml_units, nml_comment, nml_ltype, nml_delete, nml_convert, nml_missval, nml_factor;
   int nml_cell_methods, nml_cell_measures;
   int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
   int locc, i;
-  int code, out_code, table, ltype, remove;
+  int code, out_code, table, ltype, remove, convert;
   int nml_index = 0;
   int codenum, tabnum, levtype, param;
   int varID, tableID;
@@ -301,7 +313,8 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   char varname[CDI_MAX_NAME];
   char comment[1024] = "";
 
-  num_pt_files = operatorArgc();
+  //num_pt_files = operatorArgc();
+  num_pt_files = 1;
 
   for ( int fileID = 0; fileID < num_pt_files; ++fileID )
     {
@@ -318,6 +331,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_table           = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
       nml_ltype           = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
       nml_delete          = namelistAdd(nml, "delete",          NML_INT,  0, &remove, 1);
+      nml_convert         = namelistAdd(nml, "convert",         NML_INT,  0, &convert, 1);
       nml_missval         = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
       nml_factor          = namelistAdd(nml, "factor",          NML_FLT,  0, &factor, 1);
       nml_valid_min       = namelistAdd(nml, "valid_min",       NML_FLT,  0, &valid_min, 1);
@@ -419,19 +433,20 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 
 	      if ( varID < nvars )
 		{
-		  if ( nml->entry[nml_code]->occ     ) vlistDefVarCode(vlistID2, varID, code);
-		  if ( nml->entry[nml_out_code]->occ ) vlistDefVarCode(vlistID2, varID, out_code);
-		  if ( nml->entry[nml_name]->occ     ) strcpy(vars[varID].name, name);
-		  if ( nml->entry[nml_name]->occ     ) vlistDefVarName(vlistID2, varID, name);
-		  if ( nml->entry[nml_out_name]->occ ) vlistDefVarName(vlistID2, varID, out_name);
-		  if ( nml->entry[nml_out_name]->occ ) defineVarAttText(vlistID2, varID, "original_name", vars[varID].name);
-		  if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
-		  if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
-		  if ( nml->entry[nml_units]->occ    ) defineVarUnits(vars, vlistID2, varID, units, name);
-		  if ( nml->entry[nml_comment]->occ  ) defineVarAttText(vlistID2, varID, "comment", comment);
+		  if ( nml->entry[nml_code]->occ     )  vlistDefVarCode(vlistID2, varID, code);
+		  if ( nml->entry[nml_out_code]->occ )  vlistDefVarCode(vlistID2, varID, out_code);
+		  if ( nml->entry[nml_name]->occ     )  strcpy(vars[varID].name, name);
+		  if ( nml->entry[nml_name]->occ     )  vlistDefVarName(vlistID2, varID, name);
+		  if ( nml->entry[nml_out_name]->occ )  vlistDefVarName(vlistID2, varID, out_name);
+		  if ( nml->entry[nml_out_name]->occ )  defineVarAttText(vlistID2, varID, "original_name", vars[varID].name);
+		  if ( nml->entry[nml_stdname]->occ  )  vlistDefVarStdname(vlistID2, varID, stdname);
+		  if ( nml->entry[nml_longname]->occ )  vlistDefVarLongname(vlistID2, varID, longname);
+		  if ( nml->entry[nml_units]->occ    )  defineVarUnits(vars, vlistID2, varID, units);
+		  if ( nml->entry[nml_comment]->occ  )  defineVarAttText(vlistID2, varID, "comment", comment);
 		  if ( nml->entry[nml_cell_methods]->occ  ) defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
 		  if ( nml->entry[nml_cell_measures]->occ ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
 		  if ( nml->entry[nml_delete]->occ && remove == 1 ) vars[varID].remove = TRUE;
+		  if ( nml->entry[nml_convert]->occ )   vars[varID].convert = convert==0 ? FALSE : TRUE;
 		  if ( nml->entry[nml_param]->occ )     vlistDefVarParam(vlistID2, varID, stringToParam(paramstr));
 		  if ( nml->entry[nml_out_param]->occ ) vlistDefVarParam(vlistID2, varID, stringToParam(out_paramstr));
 		  if ( nml->entry[nml_datatype]->occ )
@@ -659,6 +674,9 @@ void *Setpartab(void *argument)
   var_t *vars = (var_t *) malloc(nvars*sizeof(var_t));
   memset(vars, 0, nvars*sizeof(var_t));
 
+  if ( convert_data )
+    for ( varID = 0; varID < nvars; ++varID ) vars[varID].convert = TRUE;
+
   if ( tableformat == 0 )
     {
       for ( varID = 0; varID < nvars; varID++ )
@@ -677,6 +695,7 @@ void *Setpartab(void *argument)
 	{
 	  int levID, nlevs, zaxisID;
 	  int vlistIDx;
+
 	  vlistClearFlag(vlistID1);
 	  vlistClearFlag(vlistID2);
 
@@ -703,6 +722,9 @@ void *Setpartab(void *argument)
 
 	  vlistID2 = vlistIDx;
 	}
+
+      for ( varID = 0; varID < nvars; ++varID )
+	convertVarUnits(vars, varID, vars[varID].name);
     }
 
   int taxisID1 = vlistInqTaxis(vlistID1);

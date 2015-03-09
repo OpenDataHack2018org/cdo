@@ -799,7 +799,7 @@ static char *SetpartabHelp[] = {
     "    setpartabp, setpartabn - Set parameter table",
     "",
     "SYNOPSIS",
-    "    <operator>,table  ifile ofile",
+    "    <operator>,table[,convert]  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module transforms data and metadata of ifile via a parameter table and writes the result to ofile.",
@@ -827,6 +827,7 @@ static char *SetpartabHelp[] = {
     "     ok_max_mean_abs & FLOAT       & Maximum absolute mean",
     "     factor          & FLOAT       & Scale factor",
     "     delete          & INTEGER     & Set to 1 to delete variable",
+    "     convert         & INTEGER     & Set to 1 to convert the unit if necessary",
     "    ",
     "    The search key for the variable depends on the operator. Use setpartabn to search variables by the name.",
     "    This is typically used for netCDF datasets. The operator setpartabp searches variables by the parameter ID.",
@@ -838,7 +839,8 @@ static char *SetpartabHelp[] = {
     "                Search variables by name.",
     "",
     "PARAMETER",
-    "    table  STRING   Parameter table file or name",
+    "    table    STRING   Parameter table file or name",
+    "    convert  STRING   Converts the units if necessary",
     NULL
 };
 
