@@ -581,39 +581,29 @@ void check_data(int vlistID2, int varID2, int varID, var_t *vars, long gridsize,
 
 void *Setpartab(void *argument)
 {
-  int SETPARTAB, SETPARTABN, SETPARTABC, SETPARTABP;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
-  int nrecs, nvars;
-  int tsID1, recID, varID, levelID;
+  int nrecs;
+  int recID, varID, levelID;
   int varID2, levelID2;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
   int nmiss;
   int delvars = FALSE;
-  long gridsize;
   int tableID = -1;
   int tableformat = 0;
-  char *partab = NULL;
   double missval;
-  double *array = NULL;
-  var_t *vars = NULL;
-  pt_mode_t ptmode = CODE_NUMBER;
-
 
   cdoInitialize(argument);
 
-  SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table name");
-  SETPARTABC = cdoOperatorAdd("setpartabc", 0, 0, "parameter table name");
-  SETPARTABP = cdoOperatorAdd("setpartabp", 0, 0, "parameter table name");
-  SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
+  int SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table name");
+  int SETPARTABC = cdoOperatorAdd("setpartabc", 0, 0, "parameter table name");
+  int SETPARTABP = cdoOperatorAdd("setpartabp", 0, 0, "parameter table name");
+  int SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
+  pt_mode_t ptmode = CODE_NUMBER;
   if      ( operatorID == SETPARTAB  ) ptmode = CODE_NUMBER;
   else if ( operatorID == SETPARTABC ) ptmode = CODE_NUMBER;
   else if ( operatorID == SETPARTABP ) ptmode = PARAMETER_ID;
@@ -621,17 +611,13 @@ void *Setpartab(void *argument)
 
   if ( ptmode == CODE_NUMBER )
     {
-      FILE *fp;
-      size_t fsize;
-      char *parbuf = NULL;
-
-      partab = operatorArgv()[0];
-      fp = fopen(partab, "r");
+      char *partab = operatorArgv()[0];
+      FILE *fp = fopen(partab, "r");
       if ( fp != NULL )
 	{
 	  fseek(fp, 0L, SEEK_END);
-	  fsize = (size_t) ftell(fp);
-	  parbuf = (char*) malloc(fsize+1);
+	  size_t fsize = (size_t) ftell(fp);
+	  char *parbuf = (char *) malloc(fsize+1);
 	  fseek(fp, 0L, SEEK_SET);
 	  fread(parbuf, fsize, 1, fp);
 	  parbuf[fsize] = 0;
@@ -654,14 +640,14 @@ void *Setpartab(void *argument)
       tableformat = 1;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
   /* vlistPrint(vlistID2);*/
 
-  nvars = vlistNvars(vlistID2);
-  vars = (var_t*) malloc(nvars*sizeof(var_t));
+  int nvars = vlistNvars(vlistID2);
+  var_t *vars = (var_t *) malloc(nvars*sizeof(var_t));
   memset(vars, 0, nvars*sizeof(var_t));
 
   if ( tableformat == 0 )
@@ -710,20 +696,20 @@ void *Setpartab(void *argument)
 	}
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   /* vlistPrint(vlistID2);*/
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  long gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double *) malloc(gridsize*sizeof(double));
 
-  tsID1 = 0;
+  int tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
