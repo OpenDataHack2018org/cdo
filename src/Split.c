@@ -44,16 +44,13 @@ void gen_filename(char *filename, int swap_obase, const char *obase, const char 
 
 void *Split(void *argument)
 {
-  int SPLITCODE, SPLITPARAM, SPLITNAME, SPLITLEVEL, SPLITGRID, SPLITZAXIS, SPLITTABNUM;
-  int operatorID;
   int nchars = 0;
-  int streamID1;
   int varID;
   int code, tabnum, param;
-  int nrecs, nvars, nzaxis, nlevs;
-  int tsID, recID, levelID, zaxisID, levID;
+  int nlevs;
+  int recID, levelID, zaxisID, levID;
   int varID2, levelID2;
-  int vlistID1, vlistID2;
+  int vlistID2;
   int *vlistIDs = NULL, *streamIDs = NULL;
   int  itmp[999];
   double ftmp[999];
@@ -67,21 +64,20 @@ void *Split(void *argument)
   int gridsize;
   int nmiss;
   int swap_obase = FALSE;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
-  SPLITCODE   = cdoOperatorAdd("splitcode",   0, 0, NULL);
-  SPLITPARAM  = cdoOperatorAdd("splitparam",  0, 0, NULL);
-  SPLITNAME   = cdoOperatorAdd("splitname",   0, 0, NULL);
-  SPLITLEVEL  = cdoOperatorAdd("splitlevel",  0, 0, NULL);
-  SPLITGRID   = cdoOperatorAdd("splitgrid",   0, 0, NULL);
-  SPLITZAXIS  = cdoOperatorAdd("splitzaxis",  0, 0, NULL);
-  SPLITTABNUM = cdoOperatorAdd("splittabnum", 0, 0, NULL);
+  int SPLITCODE   = cdoOperatorAdd("splitcode",   0, 0, NULL);
+  int SPLITPARAM  = cdoOperatorAdd("splitparam",  0, 0, NULL);
+  int SPLITNAME   = cdoOperatorAdd("splitname",   0, 0, NULL);
+  int SPLITLEVEL  = cdoOperatorAdd("splitlevel",  0, 0, NULL);
+  int SPLITGRID   = cdoOperatorAdd("splitgrid",   0, 0, NULL);
+  int SPLITZAXIS  = cdoOperatorAdd("splitzaxis",  0, 0, NULL);
+  int SPLITTABNUM = cdoOperatorAdd("splittabnum", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorArgc() == 1 )
     if ( memcmp("swap", operatorArgv()[0], 4) == 0 ) swap_obase = TRUE;
@@ -90,13 +86,13 @@ void *Split(void *argument)
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  nvars  = vlistNvars(vlistID1);
-  nrecs  = vlistNrecs(vlistID1);
-  nzaxis = vlistNzaxis(vlistID1);
+  int nvars  = vlistNvars(vlistID1);
+  int nrecs  = vlistNrecs(vlistID1);
+  int nzaxis = vlistNzaxis(vlistID1);
 
   if ( swap_obase == 0 )
     {
@@ -475,14 +471,15 @@ void *Split(void *argument)
       cdoAbort("not implemented!");
     }
 
+  double *array = NULL;
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double *) malloc(gridsize*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       for ( index = 0; index < nsplit; index++ )
