@@ -34,6 +34,7 @@ The following parameter table entries are supported:
  ok_max_mean_abs & FLOAT       & Maximum absolute mean
  factor          & FLOAT       & Scale factor
  delete          & INTEGER     & Set to 1 to delete variable
+ convert         & INTEGER     & Set to 1 to convert the unit if necessary
 @EndTable
 
 The search key for the variable depends on the operator. Use @oper{setpartabn} to search variables by the name.
@@ -44,7 +45,7 @@ This is typically used for netCDF datasets. The operator @oper{setpartabp} searc
 
 @BeginOperator_setpartabp
 @Title     = Set parameter table
-@Parameter = table
+@Parameter = table [convert]
 
 @BeginDescription
 Search variables by the parameter identifier.
@@ -54,7 +55,7 @@ Search variables by the parameter identifier.
 
 @BeginOperator_setpartabn
 @Title     = Set parameter table
-@Parameter = table
+@Parameter = table [convert]
 
 @BeginDescription
 Search variables by name.
@@ -65,6 +66,8 @@ Search variables by name.
 @BeginParameter
 @Item = table
 STRING   Parameter table file or name
+@Item = convert
+STRING   Converts the units if necessary
 @EndParameter
 
 
@@ -76,6 +79,7 @@ prompt> cat mypartab
   name            = t
   out_name        = ta
   standard_name   = air_temperature
+  convert         = 1
   units           = "K"
   missing_value   = 1e+20
   valid_min       = 157.1
@@ -88,7 +92,7 @@ To apply this parameter table to a dataset use:
 cdo setpartabn,mypartab  ifile  ofile
 @EndVerbatim
 This command renames the variable @bold{t} to @bold{ta}. The standard name of this variable is set to @bold{air_temperature} and 
-the units is set to [@bold{K}] (converts the units if necessary). The missing value will be set to @bold{1e+20}. 
+the unit is set to [@bold{K}] (converts the unit if necessary). The missing value will be set to @bold{1e+20}. 
 In addition it will be checked whether the values of the variable are in the range of @bold{157.1} to @bold{336.3}.
 
 @EndExample
