@@ -80,7 +80,10 @@ void *Split(void *argument)
   int operatorID = cdoOperatorID();
 
   if ( operatorArgc() == 1 )
-    if ( memcmp("swap", operatorArgv()[0], 4) == 0 ) swap_obase = TRUE;
+    {
+      if ( strcmp("swap", operatorArgv()[0]) == 0 ) swap_obase = TRUE;
+      else cdoAbort("Unknown parameter: >%s<", operatorArgv()[0]); 
+    }
 
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
