@@ -29,14 +29,14 @@ test $? -eq 0 || let RSTAT+=1
 diff $DATAPATH/$RFILE1  $RFILE1 > $CDOOUT 2> $CDOERR
 test $? -eq 0 || let RSTAT+=1
 
+test -s $CDOOUT && let RSTAT+=1
 test -s $CDOERR && let RSTAT+=1
 cat $CDOOUT $CDOERR
 
 cmp -s $DATAPATH/$RFILE2  $RFILE2
-echo status=$?
 test $? -eq 0 || let RSTAT+=1
 
-#rm -f $OFILE $RFILE1 $RFILE2
+rm -f $OFILE $RFILE1 $RFILE2
 
 test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
 test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
