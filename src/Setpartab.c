@@ -253,7 +253,7 @@ void convertVarUnits(var_t *vars, int varID, char *name)
       static int lwarn_udunits = TRUE;
       if ( lwarn_udunits )
 	{
-	  cdoWarning("%s - converting units from [%s] to [%s] failed, UDUNITS2 support not compiled in!", name,units_old, units));
+	  cdoWarning("%s - converting units from [%s] to [%s] failed, UDUNITS2 support not compiled in!", name,units_old, units);
 	  vars[varID].changeunits = FALSE;
 	  lwarn_udunits = FALSE;
 	}
