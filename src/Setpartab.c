@@ -588,6 +588,7 @@ void *Setpartab(void *argument)
   int delvars = FALSE;
   int tableID = -1;
   int tableformat = 0;
+  int convert_data = FALSE;
   double missval;
 
   cdoInitialize(argument);
@@ -602,6 +603,14 @@ void *Setpartab(void *argument)
   operatorInputArg(cdoOperatorEnter(operatorID));
 
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
+
+  if ( operatorArgc() == 2 )
+    {
+      if ( strcmp("convert", operatorArgv()[1]) == 0 ) convert_data = TRUE;
+      else cdoAbort("Unknown parameter: >%s<", operatorArgv()[1]); 
+    }
+
+  if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
 
   pt_mode_t ptmode = CODE_NUMBER;
   if      ( operatorID == SETPARTAB  ) ptmode = CODE_NUMBER;
