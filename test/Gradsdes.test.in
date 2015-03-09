@@ -36,7 +36,7 @@ cmp -s $DATAPATH/$RFILE2  $RFILE2
 echo status=$?
 test $? -eq 0 || let RSTAT+=1
 
-#rm -f $RFILE1 $RFILE2
+#rm -f $OFILE $RFILE1 $RFILE2
 
 test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
 test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
