@@ -116,8 +116,6 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
 
 void *EOFs(void * argument)
 {
-  char *envstr;
-
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
 
   int i, j, j1, j2;
@@ -136,8 +134,6 @@ void *EOFs(void * argument)
   double sum;
   double missval = 0;
   double xvals, yvals;
-
-  enum T_EIGEN_MODE eigen_mode = JACOBI;
 
   typedef struct {
     int init;
@@ -161,14 +157,15 @@ void *EOFs(void * argument)
   cdoOperatorAdd("eoftime",    EOF_TIME,    0, NULL);
   cdoOperatorAdd("eofspatial", EOF_SPATIAL, 0, NULL);
 
-  int operatorID  = cdoOperatorID();
-  int operfunc    = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc   = cdoOperatorF1(operatorID);
 
   operatorInputArg("Number of eigen functions to write out");
-  int n_eig       = parameter2int(operatorArgv()[0]);
+  int n_eig      = parameter2int(operatorArgv()[0]);
 
-  envstr = getenv("CDO_SVD_MODE");
+  char *envstr = getenv("CDO_SVD_MODE");
   
+  enum T_EIGEN_MODE eigen_mode = JACOBI;
   if ( envstr && !strncmp(envstr, "danielson_lanczos", 17) ) 
     eigen_mode = DANIELSON_LANCZOS;
   else if ( envstr && ! strncmp(envstr, "jacobi", 6) )
@@ -185,13 +182,13 @@ void *EOFs(void * argument)
 	     eigen_mode==JACOBI?"jacobi":"danielson_lanczos",
 	     envstr?"Environment":" default");  
 
-  int streamID1  = streamOpenRead(cdoStreamName(0));
-  int vlistID1   = streamInqVlist(streamID1);
-  int taxisID1   = vlistInqTaxis(vlistID1);
-  int gridID1    = vlistInqVarGrid(vlistID1, 0);
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int vlistID1  = streamInqVlist(streamID1);
+  int taxisID1  = vlistInqTaxis(vlistID1);
+  int gridID1   = vlistInqVarGrid(vlistID1, 0);
   int gridsize  = vlistGridsizeMax(vlistID1);
-  int nvars      = vlistNvars(vlistID1);
-  int nrecs      = vlistNrecs(vlistID1);
+  int nvars     = vlistNvars(vlistID1);
+  int nrecs     = vlistNrecs(vlistID1);
 
   int ngrids = vlistNgrids(vlistID1);
   for ( int index = 1; index < ngrids; index++ )
@@ -206,15 +203,14 @@ void *EOFs(void * argument)
   else
     for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
 
-  /*  eigenvalues */
+  /* eigenvalues */
 
   tsID = 0;
 
   /* COUNT NUMBER OF TIMESTEPS if EOF_ or EOF_TIME */
   if ( operfunc == EOF_ || operfunc == EOF_TIME )
     {
-      if ( cdoVerbose )
-	cdoPrint("Counting timesteps in ifile");
+      if ( cdoVerbose ) cdoPrint("Counting timesteps in ifile");
 
       nts = vlistNtsteps(vlistID1);
       if ( nts == -1 )
@@ -230,7 +226,6 @@ void *EOFs(void * argument)
 	  if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
 	}
 
-      //TODO close on streamID1 ??  streamClose(streamID1);
       streamClose(streamID1);
 
       streamID1   = streamOpenRead(cdoStreamName(0));
@@ -436,10 +431,10 @@ void *EOFs(void * argument)
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
   /*  eigenvectors */
-  int streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  int vlistID3    = vlistDuplicate(vlistID1);
-  int taxisID3    = taxisDuplicate(taxisID1);
+  int vlistID3  = vlistDuplicate(vlistID1);
+  int taxisID3  = taxisDuplicate(taxisID1);
   taxisDefRdate(taxisID3, 0);
   taxisDefRtime(taxisID3, 0);
   vlistDefTaxis(vlistID3, taxisID3);
