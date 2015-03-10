@@ -2,6 +2,11 @@
 
 	* Version 1.6.8 released
 
+2015-03-11  Uwe Schulzweida
+
+	* eofspatial: removed scaling with grid cell area weights (bug fix)
+	* eoftime: removed scaling with grid cell area weights (bug fix)
+
 2015-03-10  Uwe Schulzweida
 
 	* ensSTAT: added optional parameter count to count the number of valid values

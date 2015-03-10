@@ -512,10 +512,15 @@ void *EOFs(void * argument)
 			      else
 				{
 				  j = pack[jpack];
+#ifdef OLD_IMPLEMENTATION
 				  covar[ipack][jpack] = 
 				    covar[ipack][jpack] *   // covariance
 				    sqrt(weight[i]) * sqrt(weight[j]) / sum_w /       // weights
 				    nts;   // number of data contributing
+#else
+				  covar[ipack][jpack] = 
+				    covar[ipack][jpack] / nts;   // number of data contributing
+#endif
 				}
 			    }
 			}
@@ -545,11 +550,15 @@ void *EOFs(void * argument)
 			      sum = 0;
 			      double *df1p = data[j1];
 			      double *df2p = data[j2];
+#ifdef OLD_IMPLEMENTATION
 			      for ( i = 0; i < npack; i++ )
-				{
-				  sum += weight[pack[i]]*df1p[i]*df2p[i];
-				}
+				sum += weight[pack[i]]*df1p[i]*df2p[i];
 			      covar[j1][j2] = sum / sum_w / nts;
+#else
+			      for ( i = 0; i < npack; i++ )
+				sum += df1p[i]*df2p[i];
+			      covar[j1][j2] = sum / nts;
+#endif
 			    }
 			}
 		      
