@@ -73,6 +73,8 @@ void *Ensstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
+  int argc = operatorArgc();
+  int nargc = argc;
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
@@ -80,12 +82,19 @@ void *Ensstat(void *argument)
       
       if ( pn < 1 || pn > 99 )
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+      argc--;
+    }
+
+  int count_data = FALSE;
+  if ( argc == 1 )
+    {
+      if ( strcmp("count", operatorArgv()[nargc-1]) == 0 ) count_data = TRUE;
+      else cdoAbort("Unknown parameter: >%s<", operatorArgv()[nargc-1]); 
     }
     
   int nfiles = cdoStreamCnt() - 1;
 
-  if ( cdoVerbose )
-    cdoPrint("Ensemble over %d files.", nfiles);
+  if ( cdoVerbose ) cdoPrint("Ensemble over %d files.", nfiles);
 
   const char *ofilename = cdoStreamName(nfiles)->args;
 
@@ -103,8 +112,7 @@ void *Ensstat(void *argument)
       field[i].size   = nfiles;
       field[i].ptr    = (double*) malloc(nfiles*sizeof(double));
       field[i].weight = (double*) malloc(nfiles*sizeof(double));
-      for ( fileID = 0; fileID < nfiles; fileID++ )
-	field[i].weight[fileID] = 1;
+      for ( fileID = 0; fileID < nfiles; fileID++ ) field[i].weight[fileID] = 1;
     }
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
@@ -123,16 +131,36 @@ void *Ensstat(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
-	  
   int gridsize = vlistGridsizeMax(vlistID1);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) malloc(gridsize*sizeof(double));
 
   double *array2 = (double *) malloc(gridsize*sizeof(double));
+
+  int nvars = vlistNvars(vlistID2);
+  double *count2 = NULL;
+  if ( count_data )
+    {
+      count2 = (double *) malloc(gridsize*sizeof(double));
+      for ( varID = 0; varID < nvars; ++varID )
+	{
+	  char name[CDI_MAX_NAME];
+	  vlistInqVarName(vlistID2, varID, name);
+	  strcat(name, "_count");
+	  gridID = vlistInqVarGrid(vlistID2, varID);
+	  int zaxisID = vlistInqVarZaxis(vlistID2, varID);
+	  int tsteptype = vlistInqVarTsteptype(vlistID2, varID);
+	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, tsteptype);
+	  vlistDefVarName(vlistID2, cvarID, name);
+	  vlistDefVarDatatype(vlistID2, cvarID, DATATYPE_INT16);
+	  if ( cvarID != (varID+nvars) ) cdoAbort("Internal error, varIDs do not match!");
+	}
+    }
+
+  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+
+  streamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
   do
@@ -204,10 +232,18 @@ void *Ensstat(void *argument)
 #endif
 		  nmiss++;
 		}
+
+	      if ( count_data ) count2[i] = nfiles - field[ompthID].nmiss;
 	    }
 
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, array2, nmiss);
+
+	  if ( count_data )
+	    {
+	      streamDefRecord(streamID2, varID+nvars, levelID);
+	      streamWriteRecord(streamID2, count2, 0);
+	    }
 	}
 
       tsID++;
@@ -224,6 +260,7 @@ void *Ensstat(void *argument)
 
   if ( ef ) free(ef);
   if ( array2 ) free(array2);
+  if ( count2 ) free(count2);
 
   for ( i = 0; i < ompNumThreads; i++ )
     {

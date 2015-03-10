@@ -603,7 +603,6 @@ void *Setpartab(void *argument)
   int delvars = FALSE;
   int tableID = -1;
   int tableformat = 0;
-  int convert_data = FALSE;
   double missval;
 
   cdoInitialize(argument);
@@ -619,6 +618,7 @@ void *Setpartab(void *argument)
 
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
+  int convert_data = FALSE;
   if ( operatorArgc() == 2 )
     {
       if ( strcmp("convert", operatorArgv()[1]) == 0 ) convert_data = TRUE;
