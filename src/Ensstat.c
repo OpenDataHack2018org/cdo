@@ -40,31 +40,21 @@
 
 void *Ensstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
   int i;
   int varID, recID;
-  int gridsize = 0;
   int gridID;
   int nrecs, nrecs0;
   int levelID;
-  int tsID;
-  int streamID = 0, streamID2;
-  int vlistID, vlistID1, vlistID2;
+  int streamID = 0;
   int nmiss;
-  int taxisID1, taxisID2;
+  int fileID;
   double missval;
-  double *array2 = NULL;
-  field_t *field;
-  int fileID, nfiles;
-  const char *ofilename;
   typedef struct
   {
     int streamID;
     int vlistID;
     double *array;
   } ens_file_t;
-  ens_file_t *ef = NULL;
   int pn = 0;
 
   cdoInitialize(argument);
@@ -80,8 +70,8 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("ensvar1", func_var1, 0, NULL);
   cdoOperatorAdd("enspctl", func_pctl, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
   if ( operfunc == func_pctl )
     {
@@ -92,21 +82,21 @@ void *Ensstat(void *argument)
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
     }
     
-  nfiles = cdoStreamCnt() - 1;
+  int nfiles = cdoStreamCnt() - 1;
 
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files.", nfiles);
 
-  ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoStreamName(nfiles)->args;
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExists(ofilename) )
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
+  ens_file_t *ef = (ens_file_t *) malloc(nfiles*sizeof(ens_file_t));
 
-  field = (field_t*) malloc(ompNumThreads*sizeof(field_t));
+  field_t *field = (field_t *) malloc(ompNumThreads*sizeof(field_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);
@@ -119,36 +109,32 @@ void *Ensstat(void *argument)
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID = streamOpenRead(cdoStreamName(fileID));
-
-      vlistID = streamInqVlist(streamID);
-
-      ef[fileID].streamID = streamID;
-      ef[fileID].vlistID = vlistID;
+      ef[fileID].streamID = streamOpenRead(cdoStreamName(fileID));
+      ef[fileID].vlistID  = streamInqVlist(ef[fileID].streamID);
     }
 
   /* check that the contents is always the same */
   for ( fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
-  vlistID1 = ef[0].vlistID;
-  vlistID2 = vlistDuplicate(vlistID1);
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID1 = ef[0].vlistID;
+  int vlistID2 = vlistDuplicate(vlistID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 	  
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) malloc(gridsize*sizeof(double));
 
-  array2 = (double*) malloc(gridsize*sizeof(double));
+  double *array2 = (double *) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   do
     {
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
@@ -229,10 +215,7 @@ void *Ensstat(void *argument)
   while ( nrecs0 > 0 );
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    {
-      streamID = ef[fileID].streamID;
-      streamClose(streamID);
-    }
+    streamClose(ef[fileID].streamID);
 
   streamClose(streamID2);
 
