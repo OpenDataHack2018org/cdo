@@ -2,7 +2,11 @@
 
 	* Version 1.6.8 released
 
-2015-03-12  Uwe Schulzweida
+2015-03-10  Uwe Schulzweida
+
+	* ensSTAT: added optional parameter count to count the number of valid values
+
+2015-03-09  Uwe Schulzweida
 
 	* setpartabp, setpartabn: added optional parameter convert to convert the units
 
