@@ -17407,6 +17407,18 @@ fi
 
 done
 
+for ac_header in fnmatch.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "fnmatch.h" "ac_cv_header_fnmatch_h" "$ac_includes_default"
+if test "x$ac_cv_header_fnmatch_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_FNMATCH_H 1
+_ACEOF
+
+fi
+
+done
+
 for ac_header in wordexp.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "wordexp.h" "ac_cv_header_wordexp_h" "$ac_includes_default"

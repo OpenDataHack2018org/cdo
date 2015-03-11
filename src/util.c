@@ -19,9 +19,18 @@
 #define _XOPEN_SOURCE 600 /* ftello */
 #endif
 
+#if defined(HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
 #if defined(_OPENMP)
 #  include <omp.h>
 #endif
+
+#if defined(HAVE_FNMATCH_H)
+#include <fnmatch.h>
+#endif
+
 
 #include <stdio.h>
 #include <string.h>
@@ -103,6 +112,12 @@ char *cdoExpName         = NULL;
 int timer_read, timer_write;
 
 
+#if defined(HAVE_FNMATCH_H)
+int wildcardmatch(const char *pattern, const char *string)
+{
+  return !fnmatch(pattern, string, 0);
+}
+#else
 // The wildcardmatch function checks if two given strings match. 
 // The first string may contain wildcard characters
 // * --> Matches with 0 or more instances of any character or set of characters.
@@ -127,7 +142,7 @@ int wildcardmatch(const char *w, const char *s)
 
     return 0;
 }
-
+#endif
 
 int cdo_omp_get_thread_num(void)
 {

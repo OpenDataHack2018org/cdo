@@ -4,6 +4,7 @@
 
 2015-03-11  Uwe Schulzweida
 
+	* wildcardmatch(): use fnmatch() if available
 	* eofspatial: removed scaling with grid cell area weights (bug fix)
 	* eoftime: removed scaling with grid cell area weights (bug fix)
 
