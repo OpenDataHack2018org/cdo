@@ -287,7 +287,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == DELPARAM )
 		{
-		  if ( strcmp(argnames[isel], varname) == 0 )
+		  if ( strcmp(argnames[isel], paramstr) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, FALSE);
 		      selfound[isel] = TRUE;
