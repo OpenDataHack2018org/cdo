@@ -115,7 +115,7 @@ int timer_read, timer_write;
 #if defined(HAVE_FNMATCH_H)
 int wildcardmatch(const char *pattern, const char *string)
 {
-  return !fnmatch(pattern, string, 0);
+  return fnmatch(pattern, string, 0);
 }
 #else
 // The wildcardmatch function checks if two given strings match. 
@@ -126,11 +126,11 @@ int wildcardmatch(const char *pattern, const char *string)
 int wildcardmatch(const char *w, const char *s)
 {
     // If we reach at the end of both strings, we are done
-    if ( *w == '\0' && *s == '\0' ) return 1;
+    if ( *w == '\0' && *s == '\0' ) return 0;
  
     // Make sure that the characters after '*' are present in second string.
     // This function assumes that the first string will not contain two consecutive '*'
-    if ( *w == '*' && *(w+1) != '\0' && *s == '\0' ) return 0;
+    if ( *w == '*' && *(w+1) != '\0' && *s == '\0' ) return 1;
  
     // If the first string contains '?', or current characters of both strings match
     if ( (*w == '?' && *s != '\0') || *w == *s ) return wildcardmatch(w+1, s+1);
@@ -140,7 +140,7 @@ int wildcardmatch(const char *w, const char *s)
     // b) We ignore current character of second string.
     if ( *w == '*' ) return wildcardmatch(w+1, s) || wildcardmatch(w, s+1);
 
-    return 0;
+    return 1;
 }
 #endif
 

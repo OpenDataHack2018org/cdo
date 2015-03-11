@@ -199,7 +199,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == SELNAME )
 		{
-		  if ( wildcardmatch(argnames[isel], varname) )
+		  if ( wildcardmatch(argnames[isel], varname) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;
@@ -279,7 +279,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == DELNAME )
 		{
-		  if ( strcmp(argnames[isel], varname) == 0 )
+		  if ( wildcardmatch(argnames[isel], varname) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, FALSE);
 		      selfound[isel] = TRUE;
@@ -287,7 +287,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == DELPARAM )
 		{
-		  if ( strcmp(argnames[isel], paramstr) == 0 )
+		  if ( strcmp(argnames[isel], varname) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, FALSE);
 		      selfound[isel] = TRUE;

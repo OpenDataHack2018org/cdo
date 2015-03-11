@@ -414,8 +414,7 @@ int par_check_word(int npar, char **parlist, int *flaglist, char *par)
 {
   int found = 0;
   for ( int i = 0; i < npar; i++ )
-    if ( wildcardmatch(parlist[i], par) ) { found = 1; flaglist[i] = TRUE;/* break;*/}
-  //  if ( strcmp(par, parlist[i]) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+    if ( wildcardmatch(parlist[i], par) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
   return (found);
 }
