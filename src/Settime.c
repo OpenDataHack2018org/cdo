@@ -146,6 +146,7 @@ void *Settime(void *argument)
   if ( operatorID == SETTAXIS || operatorID == SETREFTIME )
     {
       if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
+      if ( operatorArgc() > 3 ) cdoAbort("Too many arguments!");
 
       datestr = operatorArgv()[0];
       timestr = operatorArgv()[1];
@@ -184,7 +185,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETDATE )
     {
-      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
+      operatorCheckArgc(1);
       datestr = operatorArgv()[0];
       if ( strchr(datestr, '-') )
 	{
@@ -198,7 +199,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETTIME )
     {
-      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
+      operatorCheckArgc(1);
       timestr = operatorArgv()[0];
 
       if ( strchr(timestr, ':') )
@@ -213,6 +214,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SHIFTTIME )
     {
+      operatorCheckArgc(1);
       const char *timeunits = operatorArgv()[0];
       incperiod = (int)strtol(timeunits, NULL, 10);
       if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
@@ -225,6 +227,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETTUNITS )
     {
+      operatorCheckArgc(1);
       int idum;
       const char *timeunits = operatorArgv()[0];
       incperiod = 0;
@@ -232,6 +235,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETCALENDAR )
     {
+      operatorCheckArgc(1);
       char *cname = operatorArgv()[0];
       strtolower(cname);
       size_t len = strlen(cname);
@@ -250,6 +254,7 @@ void *Settime(void *argument)
     }
   else
     {
+      operatorCheckArgc(1);
       newval = parameter2int(operatorArgv()[0]);
     }
 
