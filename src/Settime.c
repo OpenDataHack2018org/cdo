@@ -214,7 +214,7 @@ void *Settime(void *argument)
   else if ( operatorID == SHIFTTIME )
     {
       const char *timeunits = operatorArgv()[0];
-      incperiod = parameter2int(timeunits);
+      incperiod = (int)strtol(timeunits, NULL, 10);
       if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
       while ( isdigit((int) *timeunits) ) timeunits++;
 
