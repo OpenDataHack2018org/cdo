@@ -173,7 +173,7 @@ void *Settime(void *argument)
       if ( operatorArgc() == 3 )
 	{
 	  const char *timeunits = operatorArgv()[2];
-	  incperiod = parameter2int(timeunits);
+	  incperiod = (int)strtol(timeunits, NULL, 10);
 	  if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
 	  while ( isdigit((int) *timeunits) ) timeunits++;
 
