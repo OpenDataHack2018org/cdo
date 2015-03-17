@@ -354,12 +354,16 @@ argument_t *glob_pattern(const char *restrict string)
   argument_t *argument = NULL;
 
   // glob the input argument or do even more shell magic
+  //printf("string >%s<\n", string);
   wordexp(string, &glob_results, flags);
 
   /* How much space do we need?  */
+  //printf("glob_results.we_wordc %d\n", glob_results.we_wordc);
   for ( p = glob_results.we_wordv, cnt = glob_results.we_wordc; cnt; p++, cnt-- )
-    length += strlen(*p) + 1;
-
+    {
+      //  printf("cnt %d p %d\n", cnt, p);
+      length += strlen(*p) + 1;
+    }
   /* Allocate the space and generate the list.  */
   argument = argument_new(glob_results.we_wordc, length);
 
@@ -697,7 +701,6 @@ int checkStreamCnt(void)
   if ( Process[processID].streamCnt < streamCnt )
     cdoAbort("Too few streams specified!"
              " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
-
 
   for ( i = streamInCnt; i < streamCnt; i++ )
     {
