@@ -353,6 +353,8 @@ void dumpmap()
         }
     }
 
+  UNUSED(nbytes);
+
   fclose(mapfp);
 
   printf("hinum: %d\n", indx.hinum);
@@ -933,34 +935,26 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
   fclose(mapfp);
 }
 
-
+/*
 static
 void write_map_grib2(const char *ctlfile, int map_version, int nrecords, int *intnum, float *fltnum, off_t *bignum)
 {
-    // to be implemented
 }
+*/
 
 void *Gradsdes(void *argument)
 {
-  int streamID = 0;
   int gridID = -1;
   int gridtype = -1;
-  int nvars, ngrids;
-  int nvarsout;
-  int ntsteps;
   int index;
-  int vlistID, tsID, varID;
+  int varID;
   int recID, levelID;
-  int filetype, byteorder;
-  int taxisID, nrecs;
+  int nrecs;
   int vdate, vtime;
   char *idxfile = NULL;
   char varname[CDI_MAX_NAME];
-  FILE *gdp;
   int yrev = FALSE;
   int zrev = FALSE;
-  int xsize = 0, ysize = 0;
-  int res;
   int xyheader = 0;
   int nrecords = 0;
   int bigendian = FALSE, littleendian = FALSE;
@@ -978,11 +972,8 @@ void *Gradsdes(void *argument)
   int nmiss;
   int prec;
   int map_version = 2;
-  int nrecsout = 0;
   int maxrecs = 0;
   int monavg = -1;
-  int *vars = NULL;
-  int *recoffset = NULL;
   int *intnum = NULL;
   float *fltnum = NULL;
   off_t *bignum = NULL;
@@ -1031,16 +1022,16 @@ void *Gradsdes(void *argument)
     cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The size of off_t is %ld.",
              map_version, sizeof(off_t));
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
 
-  vlistID = streamInqVlist(streamID);
+  int vlistID = streamInqVlist(streamID);
 
-  nvars   = vlistNvars(vlistID);
-  ntsteps = vlistNtsteps(vlistID);
-  ngrids  = vlistNgrids(vlistID);
+  int nvars   = vlistNvars(vlistID);
+  int ntsteps = vlistNtsteps(vlistID);
+  int ngrids  = vlistNgrids(vlistID);
 
-  filetype  = streamInqFiletype(streamID);
-  byteorder = streamInqByteorder(streamID);
+  int filetype  = streamInqFiletype(streamID);
+  int byteorder = streamInqByteorder(streamID);
 
   if ( filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 ) filetype = FILETYPE_NC;
 
@@ -1073,10 +1064,10 @@ void *Gradsdes(void *argument)
     cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   /* select all variables with used gridID */
-  vars = (int*) malloc(nvars*sizeof(int));
-  recoffset = (int*) malloc(nvars*sizeof(int));
-  nvarsout = 0;
-  nrecsout = 0;
+  int *vars = (int*) malloc(nvars*sizeof(int));
+  int *recoffset = (int*) malloc(nvars*sizeof(int));
+  int nvarsout = 0;
+  int nrecsout = 0;
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( vlistInqVarGrid(vlistID, varID) == gridID )
@@ -1139,7 +1130,7 @@ void *Gradsdes(void *argument)
   repl_filetypeext(ctlfile, filetypeext(filetype), ".ctl");
 
   /* open ctl file*/
-  gdp = fopen(ctlfile, "w");
+  FILE *gdp = fopen(ctlfile, "w");
   if ( gdp == NULL ) cdoAbort("Open failed on %s", ctlfile);
 
   /* VERSION */
@@ -1208,11 +1199,11 @@ void *Gradsdes(void *argument)
 
   /* TIME */
 
-  taxisID = vlistInqTaxis(vlistID);
+  int taxisID = vlistInqTaxis(vlistID);
 
   if ( taxisInqCalendar(taxisID) == CALENDAR_365DAYS ) cal365day = 1;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
       vdate = taxisInqVdate(taxisID);
@@ -1368,17 +1359,17 @@ void *Gradsdes(void *argument)
         }
     }
 
-  sprintf (Time, "%02d:%02dZ%02d%s%04d", ihh0, imn0, idd0, cmons[imm0-1], iyy0);
-  sprintf (Incr, "%d%s", dt, IncrKey[iik]);
+  sprintf(Time, "%02d:%02dZ%02d%s%04d", ihh0, imn0, idd0, cmons[imm0-1], iyy0);
+  sprintf(Incr, "%d%s", dt, IncrKey[iik]);
 
-  fprintf (gdp, "TDEF %d LINEAR %s %s\n", tsID, Time, Incr);
+  fprintf(gdp, "TDEF %d LINEAR %s %s\n", tsID, Time, Incr);
 
   /* TITLE */
 
-  xsize  = gridInqXsize(gridID);
-  ysize  = gridInqYsize(gridID);
+  int xsize  = gridInqXsize(gridID);
+  int ysize  = gridInqYsize(gridID);
 
-  res = 0;
+  int res = 0;
   if ( gridtype == GRID_GAUSSIAN ) res = nlat2ntr(ysize);
 
   if ( res )
@@ -1404,7 +1395,7 @@ void *Gradsdes(void *argument)
   if ( filetype == FILETYPE_GRB2 )
     {
       cdoAbort("\nThe fileformat GRIB2 is not fully supported yet\nfor the gradsdes operator.\nThe .ctl file %s was generated.\nYou can add the necessary .idx file by running\n\tgribmap -i %s", ctlfile, ctlfile);
-      write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum, bignum);
+      // write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
 
   streamClose(streamID);
