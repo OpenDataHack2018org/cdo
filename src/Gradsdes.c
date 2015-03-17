@@ -31,8 +31,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
-//#include <string.h> // necessary for compatability? GNU basename
-#include "libgen.h" // posix basename POSIX.1-2001
 
 
 /*
@@ -944,8 +942,6 @@ void write_map_grib2(const char *ctlfile, int map_version, int nrecords, int *in
 
 void *Gradsdes(void *argument)
 {
-  int GRADSDES, DUMPMAP;
-  int operatorID;
   int streamID = 0;
   int gridID = -1;
   int gridtype = -1;
@@ -958,9 +954,7 @@ void *Gradsdes(void *argument)
   int filetype, byteorder;
   int taxisID, nrecs;
   int vdate, vtime;
-  const char *datfile;
-  char ctlfile[1024];
-  char idxfile[1024];
+  char *idxfile = NULL;
   char varname[CDI_MAX_NAME];
   FILE *gdp;
   int yrev = FALSE;
@@ -997,16 +991,17 @@ void *Gradsdes(void *argument)
 
   cdoInitialize(argument);
 
-  GRADSDES  = cdoOperatorAdd("gradsdes",  0, 0, NULL);
-  DUMPMAP   = cdoOperatorAdd("dumpmap",   0, 0, NULL);
+  int GRADSDES = cdoOperatorAdd("gradsdes",  0, 0, NULL);
+  int DUMPMAP  = cdoOperatorAdd("dumpmap",   0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  UNUSED(GRADSDES);
 
-  strcpy(ctlfile, cdoStreamName(0)->args);
-  char relpath_sign = '^';
-  if ( ctlfile[0] == '/' )
-    relpath_sign = '\0';
-  datfile = cdoStreamName(0)->args;
+  int operatorID = cdoOperatorID();
+
+  const char *datfile = cdoStreamName(0)->args;
+  size_t len = strlen(datfile);
+  char *ctlfile = (char *) malloc(len+10);
+  strcpy(ctlfile, datfile);
 
   if ( cdoStreamName(0)->args[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
@@ -1014,7 +1009,6 @@ void *Gradsdes(void *argument)
   if ( operatorID == DUMPMAP )
     {
       dumpmap();
-
       goto END_LABEL;
     }
 
@@ -1036,7 +1030,6 @@ void *Gradsdes(void *argument)
   if ( map_version == 4 && sizeof(off_t) != 8 )
     cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The size of off_t is %ld.",
              map_version, sizeof(off_t));
-
 
   streamID = streamOpenRead(cdoStreamName(0));
 
@@ -1159,9 +1152,15 @@ void *Gradsdes(void *argument)
 #endif
   */
   /* DSET */
-  if ( relpath_sign ) 
-      datfile = basename((char *) datfile);
-  fprintf(gdp, "DSET  %c%s\n", relpath_sign, datfile);
+  if ( datfile[0] == '/' )
+    fprintf(gdp, "DSET  %s\n", datfile);
+  else
+    {
+      datfile = strrchr(datfile, '/');
+      if ( datfile == 0 ) datfile = cdoStreamName(0)->args;
+      else                datfile++;
+      fprintf(gdp, "DSET  ^%s\n", datfile);
+    }
 
   /*
    * DTYPE Print file type
@@ -1169,8 +1168,7 @@ void *Gradsdes(void *argument)
    */
   if ( filetype == FILETYPE_GRB ||  filetype == FILETYPE_GRB2 )
     {
-
-      strcpy(idxfile, ctlfile);
+      idxfile = strdup(ctlfile);
       char *pidxfile = idxfile;
 
       // print GRIB[12] file type
@@ -1179,19 +1177,23 @@ void *Gradsdes(void *argument)
         {
           fprintf(gdp, "DTYPE  GRIB\n");
           repl_filetypeext(idxfile, ".ctl", ".gmp");
-          write_map_grib1(idxfile, map_version, nrecords, intnum, fltnum, bignum);
         }
       else if ( filetype == FILETYPE_GRB2 )
         {
           fprintf(gdp, "DTYPE  GRIB2\n");
           repl_filetypeext(pidxfile, ".ctl", ".idx");
-          // TODO: write_map_grib2();
         }
 
       // print file name of index file
-      if ( relpath_sign ) 
-          pidxfile = basename((char *) pidxfile);
-      fprintf(gdp, "INDEX  %c%s\n", relpath_sign, pidxfile);
+      if ( datfile[0] == '/' )
+        fprintf(gdp, "INDEX  %s\n", pidxfile);
+      else
+        {
+          pidxfile = strrchr(pidxfile, '/');
+          if ( pidxfile == 0 ) pidxfile = idxfile;
+          else                 pidxfile++;
+          fprintf(gdp, "INDEX  ^%s\n", pidxfile);
+        }
 
       gridsize = vlistGridsizeMax(vlistID);
       array = (double*) malloc(gridsize*sizeof(double));
@@ -1397,6 +1399,7 @@ void *Gradsdes(void *argument)
   /* INDEX file */
   if ( filetype == FILETYPE_GRB )
     {
+      write_map_grib1(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
   if ( filetype == FILETYPE_GRB2 )
     {
@@ -1404,8 +1407,10 @@ void *Gradsdes(void *argument)
       write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
 
-
   streamClose(streamID);
+
+  if ( ctlfile ) free(ctlfile);
+  if ( idxfile ) free(idxfile);
 
   if ( vars ) free(vars);
   if ( recoffset ) free(recoffset);
