@@ -88,7 +88,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Spectral.test.in $(srcdir)/Timstat.test.in \
 	$(srcdir)/Vertint.test.in $(srcdir)/Detrend.test.in \
 	$(srcdir)/Arith.test.in $(srcdir)/Gradsdes.test.in \
-	$(srcdir)/inputfiles.test.in README
+	$(srcdir)/wildcard.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -102,7 +102,7 @@ CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Cat.test Gridarea.test Genweights.test \
 	Remap.test Select.test Spectral.test Timstat.test Vertint.test \
-	Detrend.test Arith.test Gradsdes.test inputfiles.test
+	Detrend.test Arith.test Gradsdes.test wildcard.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -512,7 +512,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 # tests which should pass
 TESTS = File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test \
         Genweights.test Remap.test Select.test Spectral.test Timstat.test Vertint.test Arith.test \
-        Gradsdes.test inputfiles.test
+        Gradsdes.test wildcard.test
 
 
 #        $(top_srcdir)/test/test_Remap.sh \
@@ -591,7 +591,7 @@ Arith.test: $(top_builddir)/config.status $(srcdir)/Arith.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Gradsdes.test: $(top_builddir)/config.status $(srcdir)/Gradsdes.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-inputfiles.test: $(top_builddir)/config.status $(srcdir)/inputfiles.test.in
+wildcard.test: $(top_builddir)/config.status $(srcdir)/wildcard.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:

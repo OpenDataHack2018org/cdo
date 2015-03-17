@@ -782,7 +782,6 @@ test/grid_search/tests.c -text
 test/grid_search/tests.h -text
 test/grid_search/utils.c -text
 test/grid_search/utils.h -text
-test/inputfiles.test.in -text
 test/simd/fun.c -text
 test/simd/memalign.c -text
 test/testStreams.py -text
@@ -794,3 +793,4 @@ test/test_diff.py -text
 test/test_info.py -text
 test/test_intgridbil.py -text
 test/test_operators -text
+test/wildcard.test.in -text
