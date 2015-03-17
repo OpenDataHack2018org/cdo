@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.6.8 (12 March 2015):
+Version 1.6.8 (26 March 2015):
 
    New features:
      * select, delete: added wildcard support for parameter name
