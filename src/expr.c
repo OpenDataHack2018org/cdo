@@ -25,7 +25,6 @@
 #define  MVCOMPNE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPNE(x,y))
 #define  MVCOMPEQ(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPEQ(x,y))
 
-static double f_abs(double x)  { return (fabs(x));  }
 static double f_int(double x)  { return ((int)(x)); }
 static double f_nint(double x) { return (round(x)); }
 static double f_sqr(double x)  { return (x*x);      }
@@ -40,7 +39,7 @@ func_t;
 static func_t fun_sym_tbl[] =
 {
   /* scalar functions */
-  {0, "abs",   f_abs},
+  {0, "abs",   fabs},
   {0, "floor", floor},
   {0, "ceil",  ceil},
   {0, "int",   f_int},
@@ -85,13 +84,16 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 
   p->type = typeCon;
 
+  double cval1 = p1->u.con.value;
+  double cval2 = p2->u.con.value;
+
   switch ( oper )
     {
-    case '+':  p->u.con.value = p1->u.con.value + p2->u.con.value; break;
-    case '-':  p->u.con.value = p1->u.con.value - p2->u.con.value; break;
-    case '*':  p->u.con.value = p1->u.con.value * p2->u.con.value; break;
-    case '/':  p->u.con.value = p1->u.con.value / p2->u.con.value; break;
-    case '^':  p->u.con.value = pow(p1->u.con.value, p2->u.con.value); break;
+    case '+':  cval1 = cval1 + cval2; break;
+    case '-':  cval1 = cval1 - cval2; break;
+    case '*':  cval1 = cval1 * cval2; break;
+    case '/':  cval1 = cval1 / cval2; break;
+    case '^':  cval1 = pow(cval1, cval2); break;
     default:   cdoAbort("%s: operator %c unsupported!", __func__, oper); break;
     }
 
@@ -343,72 +345,39 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       if ( nlev2 == 1 ) loff2 = 0;
       else              loff2 = k*ngp;
 
+      const double *restrict idat1 = p1->data+loff1;
+      const double *restrict idat2 = p2->data+loff2;
+      double *restrict odat = p->data+loff;
+      int nmiss = nmiss1 > 0 || nmiss2 > 0;
+
       switch ( oper )
 	{
 	case '+':
-	  if ( nmiss1 > 0 || nmiss2 > 0 )
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = ADD(p1->data[i+loff1], p2->data[i+loff2]);
-	    }
-	  else
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = p1->data[i+loff1] + p2->data[i+loff2];
-	    }
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = ADD(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] + idat2[i];
 	  break;
 	case '-':
-	  if ( nmiss1 > 0 || nmiss2 > 0 )
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = SUB(p1->data[i+loff1], p2->data[i+loff2]);
-	    }
-	  else
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = p1->data[i+loff1] - p2->data[i+loff2];
-	    }
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = SUB(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] - idat2[i];
 	  break;
 	case '*':
-	  if ( nmiss1 > 0 || nmiss2 > 0 )
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = MUL(p1->data[i+loff1], p2->data[i+loff2]);
-	    }
-	  else
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = p1->data[i+loff1] * p2->data[i+loff2];
-	    }
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MUL(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] * idat2[i];
 	  break;
 	case '/':
-	  if ( nmiss1 > 0 || nmiss2 > 0 )
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = DIV(p1->data[i+loff1], p2->data[i+loff2]);
-	    }
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = DIV(idat1[i], idat2[i]);
 	  else
 	    {
-	      for ( i = 0; i < ngp; i++ )
+	      for ( i = 0; i < ngp; ++i )
 		{
-		  if ( IS_EQUAL(p2->data[i+loff2], 0.) )
-		    p->data[i+loff] = missval1;
-		  else
-		    p->data[i+loff] = p1->data[i+loff1] / p2->data[i+loff2];
+		  if ( IS_EQUAL(idat2[i], 0.) ) odat[i] = missval1;
+		  else                          odat[i] = idat1[i] / idat2[i];
 		}
 	    }
 	  break;
 	case '^':
-	  if ( nmiss1 > 0 || nmiss2 > 0 )
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = POW(p1->data[i+loff1], p2->data[i+loff2]);
-	    }
-	  else
-	    {
-	      for ( i = 0; i < ngp; i++ )
-		p->data[i+loff] = pow(p1->data[i+loff1], p2->data[i+loff2]);
-	    }
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = POW(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] = pow(idat1[i], idat2[i]);
 	  break;
 	default:
 	  cdoAbort("%s: operator %c unsupported!", __func__, oper);
@@ -854,7 +823,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 		{
 		  parse_arg->gridID2  = vlistInqVarGrid(parse_arg->vlistID2, varID);
 		  parse_arg->zaxisID2 = vlistInqVarZaxis(parse_arg->vlistID2, varID);
-		  parse_arg->tsteptype2  = vlistInqVarTsteptype(parse_arg->vlistID2, varID);
+		  parse_arg->tsteptype2 = vlistInqVarTsteptype(parse_arg->vlistID2, varID);
 		  missval  = vlistInqVarMissval(parse_arg->vlistID2, varID);
 	      
 		  p->gridID  = parse_arg->gridID2;
