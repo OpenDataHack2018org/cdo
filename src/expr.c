@@ -101,15 +101,16 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 {
-  long i;
   int gridID   = p2->gridID;
   int zaxisID  = p2->zaxisID;
   int nmiss    = p2->nmiss;
   double missval1 = p2->missval;
   double missval2 = p2->missval;
 
-  long ngp  = gridInqSize(gridID);
-  long nlev = zaxisInqSize(zaxisID);
+  int ngp  = gridInqSize(gridID);
+  int nlev = zaxisInqSize(zaxisID);
+  long n   = ngp*nlev;
+  long i;
 
   nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
@@ -120,63 +121,55 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   p->zaxisID  = zaxisID;
   p->missval  = missval1;
 
-  p->data = (double*) malloc(ngp*nlev*sizeof(double));
+  p->data = (double*) malloc(n*sizeof(double));
+  double *restrict odat = p->data;
+  const double *restrict idat = p2->data;
+  double cval = p1->u.con.value;
 
   switch ( oper )
     {
     case '+':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = ADD(p1->u.con.value, p2->data[i]);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = p1->u.con.value + p2->data[i];
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = ADD(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] = cval + idat[i];
       break;
     case '-':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = SUB(p1->u.con.value, p2->data[i]);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = p1->u.con.value - p2->data[i];
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = SUB(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] = cval - idat[i];
       break;
     case '*':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = MUL(p1->u.con.value, p2->data[i]);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = p1->u.con.value * p2->data[i];
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MUL(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] = cval * idat[i];
       break;
     case '/':
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = DIV(p1->u.con.value, p2->data[i]);
-	}
+      for ( i=0; i<n; ++i ) odat[i] = DIV(cval, idat[i]);
       break;
     case '^':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = POW(p1->u.con.value, p2->data[i]);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = pow(p1->u.con.value, p2->data[i]);
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POW(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] = pow(cval, idat[i]);
+      break;
+    case '<':
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLT(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPLT(cval, idat[i]);
+      break;
+    case '>':
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGT(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPGT(cval, idat[i]);
+      break;
+    case LE:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLE(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPLE(cval, idat[i]);
+      break;
+    case GE:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGE(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPGE(cval, idat[i]);
+      break;
+    case NE:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPNE(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPNE(cval, idat[i]);
+      break;
+    case EQ:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPEQ(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPEQ(cval, idat[i]);
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
@@ -184,7 +177,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
     }
 
   nmiss = 0;
-  for ( i = 0; i < ngp*nlev; i++ )
+  for ( i = 0; i < n; i++ )
     if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
 
   p->nmiss = nmiss;
@@ -197,16 +190,16 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 {
-  long i;
   int gridID   = p1->gridID;
   int zaxisID  = p1->zaxisID;
   int nmiss    = p1->nmiss;
   double missval1 = p1->missval;
   double missval2 = p1->missval;
 
-  long ngp  = gridInqSize(gridID);
-  long nlev = zaxisInqSize(zaxisID);
-  long n    = ngp*nlev;
+  int ngp  = gridInqSize(gridID);
+  int nlev = zaxisInqSize(zaxisID);
+  long n   = ngp*nlev;
+  long i;
 
   nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
@@ -225,64 +218,24 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   switch ( oper )
     {
     case '+':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = ADD(p1->data[i], p2->u.con.value);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = p1->data[i] + p2->u.con.value;
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = ADD(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] = idat[i] + cval;
       break;
     case '-':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = SUB(p1->data[i], p2->u.con.value);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = p1->data[i] - p2->u.con.value;
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = SUB(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] = idat[i] - cval;
       break;
     case '*':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = MUL(p1->data[i], p2->u.con.value);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = p1->data[i] * p2->u.con.value;
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MUL(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] = idat[i] * cval;
       break;
     case '/':
-      if ( nmiss > 0 || IS_EQUAL(p2->u.con.value, 0) )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = DIV(p1->data[i], p2->u.con.value);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = p1->data[i] / p2->u.con.value;
-	}
+      if ( nmiss || IS_EQUAL(cval, 0) ) for ( i=0; i<n; ++i ) odat[i] = DIV(idat[i], cval);
+      else                              for ( i=0; i<n; ++i ) odat[i] = idat[i] / cval;
       break;
     case '^':
-      if ( nmiss > 0 )
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = POW(p1->data[i], p2->u.con.value);
-	}
-      else
-	{
-	  for ( i = 0; i < ngp*nlev; i++ )
-	    p->data[i] = pow(p1->data[i], p2->u.con.value);
-	}
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POW(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] = pow(idat[i], cval);
       break;
     case '<':
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLT(idat[i], cval);
@@ -314,7 +267,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
     }
 
   nmiss = 0;
-  for ( i = 0; i < ngp*nlev; i++ )
+  for ( i = 0; i < n; i++ )
     if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
 
   p->nmiss = nmiss;
