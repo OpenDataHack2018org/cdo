@@ -16,10 +16,14 @@
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
 #define    COMPLE(x,y)  ((x) <= (y) ? 1 : 0)
 #define    COMPGE(x,y)  ((x) >= (y) ? 1 : 0)
+#define    COMPNE(x,y)  (IS_NOT_EQUAL(x,y) ? 1 : 0)
+#define    COMPEQ(x,y)  (IS_EQUAL(x,y) ? 1 : 0)
 #define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
 #define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
 #define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))
 #define  MVCOMPGE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGE(x,y))
+#define  MVCOMPNE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPNE(x,y))
+#define  MVCOMPEQ(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPEQ(x,y))
 
 static double f_abs(double x)  { return (fabs(x));  }
 static double f_int(double x)  { return ((int)(x)); }
@@ -295,6 +299,14 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
     case GE:
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGE(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPGE(idat[i], cval);
+      break;
+    case NE:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPNE(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPNE(idat[i], cval);
+      break;
+    case EQ:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPEQ(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPEQ(idat[i], cval);
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
