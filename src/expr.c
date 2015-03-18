@@ -12,6 +12,10 @@
 #include "expr.h"
 #include "expr_yacc.h"
 
+#define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
+#define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
+#define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
+#define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
 
 static double f_abs(double x)  { return (fabs(x));  }
 static double f_int(double x)  { return ((int)(x)); }
@@ -194,6 +198,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 
   long ngp  = gridInqSize(gridID);
   long nlev = zaxisInqSize(zaxisID);
+  long n    = ngp*nlev;
 
   nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
@@ -204,7 +209,10 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   p->zaxisID  = zaxisID;
   p->missval  = missval1;
 
-  p->data = (double*) malloc(ngp*nlev*sizeof(double));
+  p->data = (double*) malloc(n*sizeof(double));
+  double *restrict odat = p->data;
+  const double *restrict idat = p1->data;
+  double cval = p2->u.con.value;
 
   switch ( oper )
     {
@@ -267,6 +275,14 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 	  for ( i = 0; i < ngp*nlev; i++ )
 	    p->data[i] = pow(p1->data[i], p2->u.con.value);
 	}
+      break;
+    case '<':
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLT(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] = COMPLT(idat[i], cval);
+      break;
+    case '>':
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGT(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] = COMPGT(idat[i], cval);
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
