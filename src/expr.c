@@ -14,8 +14,12 @@
 
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
+#define    COMPLE(x,y)  ((x) <= (y) ? 1 : 0)
+#define    COMPGE(x,y)  ((x) >= (y) ? 1 : 0)
 #define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
 #define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
+#define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))
+#define  MVCOMPGE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGE(x,y))
 
 static double f_abs(double x)  { return (fabs(x));  }
 static double f_int(double x)  { return ((int)(x)); }
@@ -278,11 +282,19 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
       break;
     case '<':
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLT(idat[i], cval);
-      else         for ( i=0; i<n; ++i ) odat[i] = COMPLT(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPLT(idat[i], cval);
       break;
     case '>':
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGT(idat[i], cval);
-      else         for ( i=0; i<n; ++i ) odat[i] = COMPGT(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPGT(idat[i], cval);
+      break;
+    case LE:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLE(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPLE(idat[i], cval);
+      break;
+    case GE:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGE(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPGE(idat[i], cval);
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
@@ -921,8 +933,8 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 		  case '/':  printf("\tdiv\n"); break;
 		  case '<':  printf("\tcompLT\n"); break;
 		  case '>':  printf("\tcompGT\n"); break;
-		  case GE:   printf("\tcompGE\n"); break;
 		  case LE:   printf("\tcompLE\n"); break;
+		  case GE:   printf("\tcompGE\n"); break;
 		  case NE:   printf("\tcompNE\n"); break;
 		  case EQ:   printf("\tcompEQ\n"); break;
 		  }
