@@ -354,17 +354,15 @@ argument_t *glob_pattern(const char *restrict string)
   argument_t *argument = NULL;
 
   // glob the input argument or do even more shell magic
-  //printf("string >%s<\n", string);
   wordexp(string, &glob_results, flags);
 
-  /* How much space do we need?  */
-  //printf("glob_results.we_wordc %d\n", glob_results.we_wordc);
+  // How much space do we need?
   for ( p = glob_results.we_wordv, cnt = glob_results.we_wordc; cnt; p++, cnt-- )
     {
-      //  printf("cnt %d p %d\n", cnt, p);
       length += strlen(*p) + 1;
     }
-  /* Allocate the space and generate the list.  */
+
+  // Allocate the space and generate the list.
   argument = argument_new(glob_results.we_wordc, length);
 
   // put all generated filenames into the argument_t data structure
@@ -613,6 +611,8 @@ static
 int expand_wildcards(int processID, int streamCnt)
 {
   const char *streamname0 = Process[processID].streamNames[0].args;
+
+  if ( streamname0[0] == '-' ) return 1;
 
 #if defined(HAVE_WORDEXP_H)
   argument_t *glob_arg = glob_pattern(streamname0);

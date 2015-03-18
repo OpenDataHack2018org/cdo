@@ -634,22 +634,15 @@ nodeType *ex_fun(char *fun, nodeType *p1)
 static
 nodeType *ex_uminus_var(nodeType *p1)
 {
-  nodeType *p;
-  long ngp, i;
-  long nlev;
-  int nmiss;
-  int gridID, zaxisID;
-  double missval;
+  int gridID  = p1->gridID;
+  int zaxisID = p1->zaxisID;
+  int nmiss   = p1->nmiss;
+  double missval = p1->missval;
 
-  gridID   = p1->gridID;
-  zaxisID  = p1->zaxisID;
-  nmiss    = p1->nmiss;
-  missval  = p1->missval;
+  long ngp  = gridInqSize(gridID);
+  long nlev = zaxisInqSize(zaxisID);
 
-  ngp  = gridInqSize(gridID);
-  nlev = zaxisInqSize(zaxisID);
-
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -662,12 +655,12 @@ nodeType *ex_uminus_var(nodeType *p1)
 
   if ( nmiss > 0 )
     {
-      for ( i = 0; i < ngp*nlev; i++ )
+      for ( long i = 0; i < ngp*nlev; i++ )
 	p->data[i] = DBL_IS_EQUAL(p1->data[i], missval) ? missval : -(p1->data[i]);
     }
   else
     {
-      for ( i = 0; i < ngp*nlev; i++ )
+      for ( long i = 0; i < ngp*nlev; i++ )
 	p->data[i] = -(p1->data[i]);
     }
 
