@@ -1,5 +1,6 @@
 /*
-Operatoren: +, -, *, \
+Arithmetic operators: +, -, *, \, ^
+Logic operators: <, >, <=, >=, !=, ==
 Functions: abs, sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
 Functions: min, max, avg, std, var
 Constansts: M_PI, M_E
@@ -20,15 +21,21 @@ Each individual assignment statement have to end with a semi-colon.
 @IfMan
 The basic arithmetic operations addition +, subtraction -, multiplication *,
 division / and exponentiation ^ can be used.
+Available logical operators are <, >, <=, >=, != and ==.
 @EndifMan
 @IfDoc
 The basic arithmetic operations addition \begin{math}+\end{math}, subtraction \begin{math}-\end{math}, multiplication \begin{math}*\end{math},
 division \begin{math}/\end{math} and exponentiation \^\  can be used.
+Available logical operators are <, >, <=, >=, != and ==.
 @EndifDoc
 The following intrinsic functions are available:
 @BeginList log10(x)
 @Item = abs(x)
 Absolute value of x
+@Item = floor(x)
+Round to largest integral value not greater than x
+@Item = ceil(x)
+Round to smallest integral value not less than x
 @Item = int(x)
 Integer value of x
 @Item = nint(x)
@@ -89,10 +96,9 @@ STRING  File with processing instructions
 
 
 @BeginExample
-Assume an input dataset contains at least the variables 'aprl', 'aprc'
-and 'ts'. To create a new variable 'var1' with the sum
-of 'aprl' and 'aprc' and a variable 'var2' which convert
-the temperature 'ts' from Kelvin to Celsius use:
+Assume an input dataset contains at least the variables 'aprl', 'aprc' and 'ts'.
+To create a new variable 'var1' with the sum of 'aprl' and 'aprc' and a variable 'var2'
+which convert the temperature 'ts' from Kelvin to Celsius use:
 @BeginVerbatim
    cdo expr,'var1=aprl+aprc;var2=ts-273.15;' ifile ofile
 @EndVerbatim

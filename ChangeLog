@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-03-18  Uwe Schulzweida
+
+	* expr: added support for logical operators <, >, <=, >=, !=, ==
+
 2015-03-17  Uwe Schulzweida
 
 	* gradsdes: grib index file is empty (introduced in 1.6.7)
