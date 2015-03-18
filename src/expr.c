@@ -15,7 +15,7 @@
 
 static double f_abs(double x)  { return (fabs(x));  }
 static double f_int(double x)  { return ((int)(x)); }
-static double f_nint(double x) { return (round(x));  }
+static double f_nint(double x) { return (round(x)); }
 static double f_sqr(double x)  { return (x*x);      }
 
 typedef struct {
@@ -69,9 +69,7 @@ static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
 static
 nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p;
-
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type = typeCon;
 
@@ -91,23 +89,17 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p;
-  long ngp, i;
-  long nlev;
-  int nmiss;
-  int gridID, zaxisID;
-  double missval1, missval2;
+  long i;
+  int gridID   = p2->gridID;
+  int zaxisID  = p2->zaxisID;
+  int nmiss    = p2->nmiss;
+  double missval1 = p2->missval;
+  double missval2 = p2->missval;
 
-  gridID   = p2->gridID;
-  zaxisID  = p2->zaxisID;
-  nmiss    = p2->nmiss;
-  missval1 = p2->missval;
-  missval2 = p2->missval;
+  long ngp  = gridInqSize(gridID);
+  long nlev = zaxisInqSize(zaxisID);
 
-  ngp  = gridInqSize(gridID);
-  nlev = zaxisInqSize(zaxisID);
-
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -193,23 +185,17 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p;
-  long ngp, i;
-  long nlev;
-  int nmiss;
-  int gridID, zaxisID;
-  double missval1, missval2;
+  long i;
+  int gridID   = p1->gridID;
+  int zaxisID  = p1->zaxisID;
+  int nmiss    = p1->nmiss;
+  double missval1 = p1->missval;
+  double missval2 = p1->missval;
 
-  gridID   = p1->gridID;
-  zaxisID  = p1->zaxisID;
-  nmiss    = p1->nmiss;
-  missval1 = p1->missval;
-  missval2 = p1->missval;
+  long ngp  = gridInqSize(gridID);
+  long nlev = zaxisInqSize(zaxisID);
 
-  ngp  = gridInqSize(gridID);
-  nlev = zaxisInqSize(zaxisID);
-
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -301,30 +287,28 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p;
-  long ngp, ngp1, ngp2, i;
-  long nlev, nlev1, nlev2, k;
+  long i;
+  long nlev, k;
   long loff, loff1, loff2;
-  int nmiss, nmiss1, nmiss2;
-  double missval1, missval2;
+  int nmiss;
 
-  nmiss1   = p1->nmiss;
-  nmiss2   = p2->nmiss;
-  missval1 = p1->missval;
-  missval2 = p2->missval;
+  int nmiss1   = p1->nmiss;
+  int nmiss2   = p2->nmiss;
+  double missval1 = p1->missval;
+  double missval2 = p2->missval;
 
-  ngp1 = gridInqSize(p1->gridID);
-  ngp2 = gridInqSize(p2->gridID);
+  long ngp1 = gridInqSize(p1->gridID);
+  long ngp2 = gridInqSize(p2->gridID);
 
   if ( ngp1 != ngp2 )
-    cdoAbort("Number of grid points differ. ngp1 = %d, ngp2 = %d", ngp1, ngp2);
+    cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
 
-  ngp = ngp1;
+  long ngp = ngp1;
 
-  nlev1 = zaxisInqSize(p1->zaxisID);
-  nlev2 = zaxisInqSize(p2->zaxisID);
+  long nlev1 = zaxisInqSize(p1->zaxisID);
+  long nlev2 = zaxisInqSize(p2->zaxisID);
 
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -514,11 +498,10 @@ nodeType *expr(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *ex_fun_con(char *fun, nodeType *p1)
 {
-  nodeType *p;
   int i;
   int funcID = -1;
 
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type = typeCon;
 
@@ -541,23 +524,17 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
 static
 nodeType *ex_fun_var(char *fun, nodeType *p1)
 {
-  nodeType *p;
-  long ngp, i;
-  long nlev;
-  int gridID, zaxisID;
+  long i;
   int funcID = -1;
-  int nmiss;
-  double missval;
+  int gridID  = p1->gridID;
+  int zaxisID = p1->zaxisID;
+  int nmiss   = p1->nmiss;
+  double missval = p1->missval;
 
-  gridID  = p1->gridID;
-  zaxisID = p1->zaxisID;
-  nmiss   = p1->nmiss;
-  missval = p1->missval;
+  long ngp  = gridInqSize(gridID);
+  long nlev = zaxisInqSize(zaxisID);
 
-  ngp  = gridInqSize(gridID);
-  nlev = zaxisInqSize(zaxisID);
-
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -672,9 +649,7 @@ nodeType *ex_uminus_var(nodeType *p1)
 static
 nodeType *ex_uminus_con(nodeType *p1)
 {
-  nodeType *p;
-
-  p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
   p->type = typeCon;
 
@@ -707,8 +682,6 @@ nodeType *ex_uminus(nodeType *p1)
 
 int exNode(nodeType *p, parse_parm_t *parse_arg)
 {
-  int k;              /* child number */
-
   if ( ! p ) return(0);
 
   /* node is leaf */
@@ -718,7 +691,7 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
     }
 
   /* node has children */
-  for ( k = 0; k < p->u.opr.nops; k++ )
+  for ( int k = 0; k < p->u.opr.nops; k++ )
     {
       exNode(p->u.opr.op[k], parse_arg);
     }
