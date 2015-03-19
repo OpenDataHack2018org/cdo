@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-03-19  Uwe Schulzweida
+
+	* remapycon:  correct weights only for norm_opt=fracarea
+
 2015-03-18  Uwe Schulzweida
 
 	* expr: added support for logical operators <, >, <=, >=, !=, ==

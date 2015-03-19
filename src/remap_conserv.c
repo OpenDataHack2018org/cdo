@@ -995,7 +995,8 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] = partial_areas[n] / tgt_area;
 
-      correct_weights((unsigned)num_weights, partial_weights);
+      if ( rv->norm_opt == NORM_OPT_FRACAREA )
+	correct_weights((unsigned)num_weights, partial_weights);
 
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] *= tgt_area;
