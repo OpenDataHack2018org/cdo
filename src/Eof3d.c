@@ -44,8 +44,6 @@ enum T_EIGEN_MODE get_eigenmode(void);
 enum T_WEIGHT_MODE get_weightmode(void);
 
 
-#define WEIGHTS 1
-
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 void *EOF3d(void * argument)
@@ -57,7 +55,6 @@ void *EOF3d(void * argument)
   int missval_warning=0;
   int nmiss,ngrids,n=0,nlevs=0,npack=0,nts=0;
   int offset;
-  int *pack;
   int timer_cov = 0, timer_eig = 0;
   int *varID2;
 
@@ -244,7 +241,7 @@ void *EOF3d(void * argument)
   if ( cdoVerbose ) 
     cdoPrint("Read data for %i variables",nvars);
   
-  pack = (int*) malloc(temp_size*sizeof(int)); //TODO
+  int *pack = (int*) malloc(temp_size*sizeof(int)); //TODO
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -259,7 +256,7 @@ void *EOF3d(void * argument)
 	cdoPrint("Calculating covariance matrix and SVD for var%i (%s)",varID,vname);
       }
 
-      npack        = 0;    // TODO already set to 0
+      npack = 0;    // TODO already set to 0
 
       if ( cdoTimer ) timer_start(timer_cov);
       
@@ -500,6 +497,9 @@ void *EOF3d(void * argument)
   free(eigenvectors);
   free(eigenvalues);
   free(in);
+
+  free(pack);
+  free(weight);
 
   streamClose(streamID3);
   streamClose(streamID2);
