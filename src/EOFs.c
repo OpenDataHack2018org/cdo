@@ -242,6 +242,7 @@ void *EOFs(void * argument)
 	  cdoWarning("Using constant grid cell area weights!");
 	}
     }
+
   /* eigenvalues */
 
   tsID = 0;

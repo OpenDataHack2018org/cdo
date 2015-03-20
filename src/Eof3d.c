@@ -41,6 +41,8 @@
 
 
 enum T_EIGEN_MODE get_eigenmode(void);
+enum T_WEIGHT_MODE get_weightmode(void);
+
 
 #define WEIGHTS 1
 
@@ -88,6 +90,7 @@ void *EOF3d(void * argument)
   int n_eig       = parameter2int(operatorArgv()[0]);
 
   enum T_EIGEN_MODE eigen_mode = get_eigenmode();
+  enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
   int streamID1  = streamOpenRead(cdoStreamName(0));
   int vlistID1   = streamInqVlist(streamID1);
@@ -97,35 +100,46 @@ void *EOF3d(void * argument)
   int nvars      = vlistNvars(vlistID1);
   int nrecs      = vlistNrecs(vlistID1);
 
-  double *weight = (double*) malloc(gridsize*sizeof(double));
-  if ( WEIGHTS )
-      gridWeights(gridID1, &weight[0]);
-  else
-    for( i = 0; i < gridsize; i++) weight[i] = 1;
+  double *weight = (double *) malloc(gridsize*sizeof(double));
+  for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
+
+  if ( weight_mode == WEIGHT_ON )
+    {
+      int wstatus = gridWeights(gridID1, weight);
+      if ( wstatus != 0  )
+	{
+	  weight_mode = WEIGHT_OFF;
+	  cdoWarning("Using constant grid cell area weights!");
+	}
+    }
 
   /*  eigenvalues */
-
-  tsID = 0;
 
   if ( operfunc == EOF3D_SPATIAL )
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
 
+  tsID = 0;
 
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
-  while ( TRUE )
+  nts = vlistNtsteps(vlistID1);
+  if ( nts == -1 )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 ) break;
-      tsID++;
+      while ( TRUE )
+	{
+	  nrecs = streamInqTimestep(streamID1, tsID);
+	  if ( nrecs == 0 )  break;
+	  tsID++;
+	}
+      
+      nts = tsID;
+      if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
     }
-
-  nts         = tsID;
 
   streamClose(streamID1);
 
-  streamID1   = streamOpenRead(cdoStreamName(0));
-  vlistID1    = streamInqVlist(streamID1);
-  taxisID1    = vlistInqTaxis(vlistID1);
+  streamID1 = streamOpenRead(cdoStreamName(0));
+  vlistID1  = streamInqVlist(streamID1);
+  taxisID1  = vlistInqTaxis(vlistID1);
 
   /* reset the requested number of eigen-function to the maximum if neccessary */
   if ( n_eig > nts )
@@ -246,20 +260,23 @@ void *EOF3d(void * argument)
       }
 
       npack        = 0;    // TODO already set to 0
-      sum_w        = 0;
 
       if ( cdoTimer ) timer_start(timer_cov);
       
-      // sum_w = 0;
-      sum_w = 1;
       for ( i = 0; i < temp_size ; i++ )
 	{
 	  if ( datacounts[varID][i] > 1)
 	    {
 	      pack[npack] = i;
 	      npack++;
-	      //  sum_w += weight[i%gridsize];
 	    }
+	}
+
+      sum_w = 1;
+      if ( weight_mode == WEIGHT_ON )
+	{
+	  sum_w = 0;
+	  for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
 	}
 
       if ( npack < 1 ) {
@@ -291,7 +308,6 @@ void *EOF3d(void * argument)
 	    df1p = datafields[varID][j1];
 	    df2p = datafields[varID][j2];
 	    for ( i = 0; i < npack; i++ )
-	      //  sum += df1p[pack[i]]*df2p[pack[i]];
 	      sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
 	    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 	  }
@@ -344,8 +360,8 @@ void *EOF3d(void * argument)
   shared(eigenvec,weight,pack,npack,gridsize)
 #endif 
 	  for ( i = 0; i < npack; i++ )
-	    // sum +=  weight[pack[i]%gridsize] *
-	    sum += eigenvec[pack[i]] * eigenvec[pack[i]];
+	    sum +=  weight[pack[i]%gridsize] *
+	            eigenvec[pack[i]] * eigenvec[pack[i]];
 
 	  if ( sum > 0 )
 	    {
