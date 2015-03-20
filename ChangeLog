@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-03-20  Uwe Schulzweida
+
+	* Remap: renamed env. variable CDO_REMAP_NORMALIZE_OPT to CDO_REMAP_NORM
+
 2015-03-19  Uwe Schulzweida
 
 	* remapycon:  correct weights only for norm_opt=fracarea
