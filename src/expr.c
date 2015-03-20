@@ -379,6 +379,30 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = POW(idat1[i], idat2[i]);
 	  else         for ( i=0; i<ngp; ++i ) odat[i] = pow(idat1[i], idat2[i]);
 	  break;
+	case '<':
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLT(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLT(idat1[i], idat2[i]);
+	  break;
+	case '>':
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPGT(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPGT(idat1[i], idat2[i]);
+	  break;
+	case LE:
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLE(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLE(idat1[i], idat2[i]);
+	  break;
+	case GE:
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPGE(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPGE(idat1[i], idat2[i]);
+	  break;
+	case NE:
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPNE(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPNE(idat1[i], idat2[i]);
+	  break;
+	case EQ:
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPEQ(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPEQ(idat1[i], idat2[i]);
+	  break;
 	default:
 	  cdoAbort("%s: operator %c unsupported!", __func__, oper);
           break;
