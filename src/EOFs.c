@@ -31,6 +31,10 @@
 //#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
+
 #include <limits.h>  // LONG_MAX
 #include <cdi.h>
 #include "cdo.h"
@@ -38,8 +42,6 @@
 #include "pstream.h"
 #include "grid.h"
 #include "statistic.h"
-
-enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
@@ -114,6 +116,37 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
 }
 
 
+enum T_EIGEN_MODE get_eigenmode(void)
+{
+  char *envstr = getenv("CDO_SVD_MODE");
+  
+  enum T_EIGEN_MODE eigen_mode = JACOBI;
+  if ( envstr && !strncmp(envstr, "danielson_lanczos", 17) ) 
+    eigen_mode = DANIELSON_LANCZOS;
+  else if ( envstr && ! strncmp(envstr, "jacobi", 6) )
+    eigen_mode = JACOBI;
+  else if ( envstr ) {
+    cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
+    cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
+    cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
+  }
+
+  if ( cdoVerbose ) 
+    cdoPrint("Using CDO_SVD_MODE '%s' from %s",
+	     eigen_mode==JACOBI?"jacobi":"danielson_lanczos",
+	     envstr?"Environment":" default");  
+
+#if defined(_OPENMP)
+  if ( omp_get_max_threads() > 1 && eigen_mode == DANIELSON_LANCZOS )  {
+    cdoWarning("Requested parallel computation with %i Threads ",omp_get_max_threads());
+    cdoWarning("  but environmental setting CDO_SVD_MODE causes sequential ");
+    cdoWarning("  Singular value decomposition");
+  }
+#endif 
+
+  return eigen_mode;
+}
+
 void *EOFs(void * argument)
 {
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
@@ -162,25 +195,8 @@ void *EOFs(void * argument)
 
   operatorInputArg("Number of eigen functions to write out");
   int n_eig      = parameter2int(operatorArgv()[0]);
-
-  char *envstr = getenv("CDO_SVD_MODE");
   
-  enum T_EIGEN_MODE eigen_mode = JACOBI;
-  if ( envstr && !strncmp(envstr, "danielson_lanczos", 17) ) 
-    eigen_mode = DANIELSON_LANCZOS;
-  else if ( envstr && ! strncmp(envstr, "jacobi", 6) )
-    eigen_mode = JACOBI;
-  else if ( envstr ) {
-    cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
-    cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
-    cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
-    envstr = NULL;
-  }
-
-  if ( cdoVerbose ) 
-    cdoPrint("Using CDO_SVD_MODE '%s' from %s",
-	     eigen_mode==JACOBI?"jacobi":"danielson_lanczos",
-	     envstr?"Environment":" default");  
+  enum T_EIGEN_MODE eigen_mode = get_eigenmode();
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int vlistID1  = streamInqVlist(streamID1);
@@ -228,9 +244,9 @@ void *EOFs(void * argument)
 
       streamClose(streamID1);
 
-      streamID1   = streamOpenRead(cdoStreamName(0));
-      vlistID1    = streamInqVlist(streamID1);
-      taxisID1    = vlistInqTaxis(vlistID1);
+      streamID1 = streamOpenRead(cdoStreamName(0));
+      vlistID1  = streamInqVlist(streamID1);
+      taxisID1  = vlistInqTaxis(vlistID1);
 
       if ( nts < gridsize || operfunc == EOF_TIME )
 	{
@@ -264,8 +280,7 @@ void *EOFs(void * argument)
     }
   else if ( grid_space )
     {
-      if ( ((double)gridsize)*gridsize > (double)LONG_MAX )
-	cdoAbort("Grid space to large!");
+      if ( ((double)gridsize)*gridsize > (double)LONG_MAX ) cdoAbort("Grid space too large!");
 
       if ( n_eig > gridsize )
         {

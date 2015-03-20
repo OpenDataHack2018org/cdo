@@ -40,7 +40,7 @@
 #include "statistic.h"
 
 
-enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
+enum T_EIGEN_MODE get_eigenmode(void);
 
 #define WEIGHTS 1
 
@@ -48,8 +48,6 @@ enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 
 void *EOF3d(void * argument)
 {
-  char *envstr;
-
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
   int temp_size = 0;
@@ -71,8 +69,6 @@ void *EOF3d(void * argument)
   double *xvals, *yvals, *zvals;
   double *df1p, *df2p;
 
-  enum T_EIGEN_MODE eigen_mode = JACOBI;
-
 
   if ( cdoTimer )
     {
@@ -91,28 +87,7 @@ void *EOF3d(void * argument)
   operatorInputArg("Number of eigen functions to write out");
   int n_eig       = parameter2int(operatorArgv()[0]);
 
-  envstr = getenv("CDO_SVD_MODE");
-
-  if ( envstr &&! strncmp(envstr,"danielson_lanczos",17) )
-    eigen_mode = DANIELSON_LANCZOS;
-  else if ( envstr && ! strncmp(envstr,"jacobi",6) )
-    eigen_mode = JACOBI;
-  else if ( envstr ) {
-    cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
-    cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
-    cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
-  }
-
-  if ( cdoVerbose ) 
-    cdoPrint("Set eigen_mode to %s",eigen_mode == JACOBI? "jacobi" : "danielson_lanczos");
-
-#if defined(_OPENMP)
-  if ( omp_get_max_threads() > 1 && eigen_mode == DANIELSON_LANCZOS )  {
-    cdoWarning("Requested parallel computation with %i Threads ",omp_get_max_threads());
-    cdoWarning("  but environmental setting CDO_SVD_MODE causes sequential ");
-    cdoWarning("  Singular value decomposition");
-  }
-#endif 
+  enum T_EIGEN_MODE eigen_mode = get_eigenmode();
 
   int streamID1  = streamOpenRead(cdoStreamName(0));
   int vlistID1   = streamInqVlist(streamID1);

@@ -263,7 +263,7 @@ void *Specinfo(void *argument)
 
   len = strlen(operatorArgv()[0]);
 
-  if ( (len+1) >= 128 ) cdoAbort("Parameter string to large!");
+  if ( (len+1) >= 128 ) cdoAbort("Parameter string too large!");
 
   for ( i = 0; i < len; i++ ) arg[i] = toupper(operatorArgv()[0][i]);
   arg[len] = 0;
