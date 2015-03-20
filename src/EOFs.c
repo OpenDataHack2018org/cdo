@@ -28,9 +28,6 @@
  * number of contributing values during summation.
  */
 
-//#define OLD_IMPLEMENTATION
-#define WEIGHTS 1
-
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
@@ -49,12 +46,7 @@ static
 void scale_eigvec_grid(double *restrict out, int tsID, int npack, const int *restrict pack, const double *restrict weight, double **covar, double sum_w)
 {
   for ( int i = 0; i < npack; ++i )
-    out[pack[i]] = 
-#ifdef OLD_IMPLEMENTATION
-      covar[tsID][i] / sqrt(weight[pack[i]]/sum_w);
-#else
-      covar[tsID][i];
-#endif
+    out[pack[i]] = covar[tsID][i] / sqrt(weight[pack[i]]/sum_w);
 }
 
 static
@@ -90,12 +82,7 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
   for ( int i = 0; i < npack; ++i )
     {
       // do not need to account for weights as eigenvectors are non-weighted                                   
-#ifdef OLD_IMPLEMENTATION
-      sum += weight[pack[i]] *
-#else
-      sum += /*weight[pack[i]] **/
-#endif
-	out[pack[i]] * out[pack[i]];
+      sum += weight[pack[i]] * out[pack[i]] * out[pack[i]];
     }
 
   if ( sum > 0 )
@@ -118,18 +105,22 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
 
 enum T_EIGEN_MODE get_eigenmode(void)
 {
-  char *envstr = getenv("CDO_SVD_MODE");
-  
   enum T_EIGEN_MODE eigen_mode = JACOBI;
-  if ( envstr && !strncmp(envstr, "danielson_lanczos", 17) ) 
-    eigen_mode = DANIELSON_LANCZOS;
-  else if ( envstr && ! strncmp(envstr, "jacobi", 6) )
-    eigen_mode = JACOBI;
-  else if ( envstr ) {
-    cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
-    cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
-    cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
-  }
+
+  char *envstr = getenv("CDO_SVD_MODE");  
+  if ( envstr )
+    {
+      if ( !strncmp(envstr, "danielson_lanczos", 17) ) 
+	eigen_mode = DANIELSON_LANCZOS;
+      else if ( !strncmp(envstr, "jacobi", 6) )
+	eigen_mode = JACOBI;
+      else
+	{
+	  cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are", envstr);
+	  cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
+	  cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
+	}
+    }
 
   if ( cdoVerbose ) 
     cdoPrint("Using CDO_SVD_MODE '%s' from %s",
@@ -146,6 +137,31 @@ enum T_EIGEN_MODE get_eigenmode(void)
 
   return eigen_mode;
 }
+
+
+enum T_WEIGHT_MODE get_weightmode(void)
+{  
+  enum T_WEIGHT_MODE weight_mode = WEIGHT_OFF;
+
+  char *envstr = getenv("CDO_WEIGHT_MODE");
+  if ( envstr )
+    {
+      if ( !strncmp(envstr, "off", 3) ) 
+	weight_mode = WEIGHT_OFF;
+      else if ( !strncmp(envstr, "on", 2) )
+	weight_mode = WEIGHT_ON;
+      else
+	cdoWarning("Unknown environmental setting %s for CDO_WEIGHT_MODE. Available options are: on/off", envstr);
+    }
+
+  if ( cdoVerbose ) 
+    cdoPrint("Using CDO_WEIGHT_MODE '%s' from %s",
+	     weight_mode==WEIGHT_OFF?"off":"on",
+	     envstr?"Environment":" default");  
+
+  return weight_mode;
+}
+
 
 void *EOFs(void * argument)
 {
@@ -178,7 +194,7 @@ void *EOFs(void * argument)
   }
   eofdata_t;
 
- if ( cdoTimer )
+  if ( cdoTimer )
     {
       timer_cov  = timer_new("Timeof cov");
       timer_eig  = timer_new("Timeof eig");
@@ -197,6 +213,7 @@ void *EOFs(void * argument)
   int n_eig      = parameter2int(operatorArgv()[0]);
   
   enum T_EIGEN_MODE eigen_mode = get_eigenmode();
+  enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int vlistID1  = streamInqVlist(streamID1);
@@ -214,11 +231,17 @@ void *EOFs(void * argument)
       }
 
   double *weight = (double *) malloc(gridsize*sizeof(double));
-  if ( WEIGHTS )
-    gridWeights(gridID1, weight);
-  else
-    for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
+  for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
 
+  if ( weight_mode == WEIGHT_ON )
+    {
+      int wstatus = gridWeights(gridID1, weight);
+      if ( wstatus != 0  )
+	{
+	  weight_mode = WEIGHT_OFF;
+	  cdoWarning("Using constant grid cell area weights!");
+	}
+    }
   /* eigenvalues */
 
   tsID = 0;
@@ -332,7 +355,7 @@ void *EOFs(void * argument)
   int ipack, jpack;
   double *covar_array = NULL;
   double **covar = NULL;
-  double sum_w = 0;
+  double sum_w = 1.;
 
   tsID = 0;
 
@@ -359,8 +382,11 @@ void *EOFs(void * argument)
 		    pack[npack++] = i;
 		}
 
-	      sum_w = 0;
-	      for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
+	      if ( weight_mode == WEIGHT_ON )
+		{
+		  sum_w = 0;
+		  for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
+		}
 	    }
 
 	  ipack = 0;
@@ -527,15 +553,10 @@ void *EOFs(void * argument)
 			      else
 				{
 				  j = pack[jpack];
-#ifdef OLD_IMPLEMENTATION
 				  covar[ipack][jpack] = 
 				    covar[ipack][jpack] *   // covariance
 				    sqrt(weight[i]) * sqrt(weight[j]) / sum_w /       // weights
 				    nts;   // number of data contributing
-#else
-				  covar[ipack][jpack] = 
-				    covar[ipack][jpack] / nts;   // number of data contributing
-#endif
 				}
 			    }
 			}
@@ -565,15 +586,9 @@ void *EOFs(void * argument)
 			      sum = 0;
 			      double *df1p = data[j1];
 			      double *df2p = data[j2];
-#ifdef OLD_IMPLEMENTATION
 			      for ( i = 0; i < npack; i++ )
 				sum += weight[pack[i]]*df1p[i]*df2p[i];
 			      covar[j1][j2] = sum / sum_w / nts;
-#else
-			      for ( i = 0; i < npack; i++ )
-				sum += df1p[i]*df2p[i];
-			      covar[j1][j2] = sum / nts;
-#endif
 			    }
 			}
 		      
