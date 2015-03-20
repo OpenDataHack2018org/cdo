@@ -5,6 +5,7 @@
 2015-03-20  Uwe Schulzweida
 
 	* Remap: renamed env. variable CDO_REMAP_NORMALIZE_OPT to CDO_REMAP_NORM
+	* Remap: renamed env. variable  CDO_REMAP_SEARCH_RADIUS to CDO_REMAP_RADIUS
 
 2015-03-19  Uwe Schulzweida
 

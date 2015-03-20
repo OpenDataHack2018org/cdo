@@ -18,8 +18,7 @@ This operator remaps all input fields to a new horizontal grid. The remap type a
 the interpolation weights of one input grid are read from a netCDF file. More weights 
 are computed if the input fields are on different grids. The netCDF file with the 
 weights should follow the @ref{SCRIP} convention. Normally these weights come from 
-a previous call to module @mod{GENWEIGHTS} or were created by the original
-SCRIP package.
+a previous call to module @mod{GENWEIGHTS} or were created by the original SCRIP package.
 @EndDescription
 @EndOperator
 
@@ -46,7 +45,7 @@ By default the extrapolation is enabled for remapdis, remapnn and for circular g
 @Item = REMAP_AREA_MIN
 This variable is used to set the minimum destination area fraction. The default
 of this variable is 0.0.
-@Item = CDO_REMAP_SEARCH_RADIUS
+@Item = CDO_REMAP_RADIUS
 Remap search radius in degree, default 180 degree.
 @EndEnvironment
 
