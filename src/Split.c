@@ -33,6 +33,19 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+void create_uuid(unsigned char uuid[CDI_UUID_SIZE]);
+void uuid2str(const unsigned char *uuid, char *uuidstr);
+
+
+#define UUIDSTR_SIZE (CDI_UUID_SIZE*2 + 4)
+
+static
+void get_uuid(char uuidstr[UUIDSTR_SIZE])
+{
+  unsigned char uuid[CDI_UUID_SIZE];
+  create_uuid(uuid);
+  uuid2str(uuid, uuidstr);
+}
 
 static
 void gen_filename(char *filename, int swap_obase, const char *obase, const char *suffix)
@@ -64,6 +77,7 @@ void *Split(void *argument)
   int gridsize;
   int nmiss;
   int swap_obase = FALSE;
+  const char *uuid_attribute = NULL;
 
   cdoInitialize(argument);
 
@@ -79,13 +93,14 @@ void *Split(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorArgc() == 1 )
+  for( i = 0; i < operatorArgc(); ++i )
     {
-      if ( strcmp("swap", operatorArgv()[0]) == 0 ) swap_obase = TRUE;
+      if ( strcmp("swap", operatorArgv()[i]) == 0 )
+          swap_obase = TRUE;
+      else if ( strncmp("uuid=", operatorArgv()[i], 5 ) == 0 )
+          uuid_attribute = operatorArgv()[i] + 5;
       else cdoAbort("Unknown parameter: >%s<", operatorArgv()[0]); 
     }
-
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -170,8 +185,6 @@ void *Split(void *argument)
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
-
-	  streamDefVlist(streamIDs[index], vlistIDs[index]);
 	}
       if ( codes ) free(codes);
     }
@@ -229,8 +242,6 @@ void *Split(void *argument)
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
-
-	  streamDefVlist(streamIDs[index], vlistIDs[index]);
 	}
       if ( params ) free(params);
     }
@@ -283,8 +294,6 @@ void *Split(void *argument)
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
-
-	  streamDefVlist(streamIDs[index], vlistIDs[index]);
 	}
       if ( tabnums ) free(tabnums);
     }
@@ -320,8 +329,6 @@ void *Split(void *argument)
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
-
-	  streamDefVlist(streamIDs[index], vlistID2);
 	}
     }
   else if ( operatorID == SPLITLEVEL )
@@ -375,8 +382,6 @@ void *Split(void *argument)
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
-
-	  streamDefVlist(streamIDs[index], vlistID2);
 	}
       if ( levels ) free(levels);
     }
@@ -420,8 +425,6 @@ void *Split(void *argument)
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
-
-	  streamDefVlist(streamIDs[index], vlistID2);
 	}
       if ( gridIDs ) free(gridIDs);
     }
@@ -464,14 +467,25 @@ void *Split(void *argument)
 	  argument_t *fileargument = file_argument_new(filename);
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
-
-	  streamDefVlist(streamIDs[index], vlistID2);
 	}
       if ( zaxisIDs ) free(zaxisIDs);
     }
   else
     {
       cdoAbort("not implemented!");
+    }
+
+  for ( index = 0; index < nsplit; index++ )
+    {
+      if ( uuid_attribute )
+        {
+          char uuidstr[UUIDSTR_SIZE];
+          get_uuid(uuidstr);
+          vlistDefAttTxt(vlistIDs[index], CDI_GLOBAL, uuid_attribute, 
+                         UUIDSTR_SIZE, uuidstr);
+        }
+
+      streamDefVlist(streamIDs[index], vlistIDs[index]);
     }
 
   double *array = NULL;

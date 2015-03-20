@@ -13,7 +13,6 @@
 /acinclude.m4 -text
 /aclocal.m4 -text
 /cdo.settings.in -text
-/cdo.spec -text
 /cdo.spec.in -text
 config/ar-lib -text
 config/compile -text
