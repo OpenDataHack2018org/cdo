@@ -11,13 +11,14 @@
 This module splits @file{ifile} into pieces. The output files will be named @file{<obase><xxx><suffix>}
 where @file{suffix} is the filename extension derived from the file format. @file{xxx} and the contents 
 of the output files depends on the chosen operator. 
+params is a comma separated list of processing parameters.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_splitcode
 @Title     = Split code numbers
-@Parameter = [swap] [uuid=<attname>]
+@Parameter = [params]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different code number.
@@ -28,7 +29,7 @@ Splits a dataset into pieces, one for each different code number.
 
 @BeginOperator_splitparam
 @Title     = Split parameter identifiers
-@Parameter = [swap] [uuid=<attname>]
+@Parameter = [params]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different parameter identifier.
@@ -39,7 +40,7 @@ Splits a dataset into pieces, one for each different parameter identifier.
 
 @BeginOperator_splitname
 @Title     = Split variable names
-@Parameter = [swap] [uuid=<attname>]
+@Parameter = [params]
 
 @BeginDescription
 Splits a dataset into pieces, one for each variable name.
@@ -50,7 +51,7 @@ Splits a dataset into pieces, one for each variable name.
 
 @BeginOperator_splitlevel
 @Title     = Split levels
-@Parameter = [swap] [uuid=<attname>]
+@Parameter = [params]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different level.
@@ -61,7 +62,7 @@ Splits a dataset into pieces, one for each different level.
 
 @BeginOperator_splitgrid
 @Title     = Split grids
-@Parameter = [swap] [uuid=<attname>]
+@Parameter = [params]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different grid.
@@ -72,7 +73,7 @@ Splits a dataset into pieces, one for each different grid.
 
 @BeginOperator_splitzaxis
 @Title     = Split z-axes
-@Parameter = [swap] [uuid=<attname>]
+@Parameter = [params]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different z-axis.
@@ -83,7 +84,7 @@ Splits a dataset into pieces, one for each different z-axis.
 
 @BeginOperator_splittabnum
 @Title     = Split parameter table numbers
-@Parameter = [swap] [uuid=<attname>]
+@Parameter = [params]
 
 @BeginDescription
 Splits a dataset into pieces, one for each GRIB1 parameter table number.
@@ -93,7 +94,7 @@ Splits a dataset into pieces, one for each GRIB1 parameter table number.
 
 @c @BeginOperator_splitrec
 @c @Title     = Split records
-@c Parameter = [swap]
+@c Parameter = [params]
 
 @c @BeginDescription
 @c Splits a dataset into pieces, one for each record.
@@ -104,8 +105,8 @@ Splits a dataset into pieces, one for each GRIB1 parameter table number.
 @BeginParameter
 @Item = swap
 STRING  Swap the position of obase and xxx in the output filename
-@Item uuid=<attname>
-STRING  Add UUID as a global attribute <attname> to each output file
+@Item = uuid=<attname>
+STRING  Add a UUID as global attribute <attname> to each output file
 @EndParameter
 
 
