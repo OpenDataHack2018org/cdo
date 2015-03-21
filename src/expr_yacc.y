@@ -1,3 +1,4 @@
+/* bison --output=expr_yacc.c expr_yacc.y */
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +25,7 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 
 %}
 
-%pure_parser
+%pure-parser
 %parse-param {parse_parm_t *parse_arg}
 %parse-param {void *scanner}
 %lex-param {parse_parm_t *parse_arg}
@@ -183,7 +184,7 @@ void freeNode(nodeType *p)
 
 void yyerror(void *parse_arg, void *scanner, char *s)
 {
-  fprintf(stdout, "%s\n", s);
+  fprintf(stdout, "%s (%p %p)\n", s, parse_arg, scanner);
 }
 /*
 int main(void)
