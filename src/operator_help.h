@@ -1269,7 +1269,7 @@ static char *ExprHelp[] = {
     "    Each individual assignment statement have to end with a semi-colon.",
     "    The basic arithmetic operations addition +, subtraction -, multiplication *,",
     "    division / and exponentiation ^ can be used.",
-    "    Available logical operators are <, >, <=, >=, != and ==.",
+    "    Available logical operators are <, >, <=, >=, !=, == and <=>.",
     "    The following intrinsic functions are available:",
     "    abs(x)  "    "    Absolute value of x",
     "    floor(x)"    "    Round to largest integral value not greater than x",
