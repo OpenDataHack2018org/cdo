@@ -1,4 +1,4 @@
-/* bison --output=expr_yacc.c expr_yacc.y */
+/* bison -y -o expr_yacc.c -d expr_yacc.y */
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +36,7 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %token <varnm>  VARIABLE
 %token <fname>  FUNCTION
 
-%left GE LE EQ NE '>' '<' '='
+%left LEG GE LE EQ NE '>' '<' '='
 %left '+' '-'
 %left '*' '/'
 %right  '^'
@@ -79,10 +79,11 @@ expr:
         | expr '<' expr           { $$ = expr_opr('<', 2, $1, $3); }
         | expr '>' expr           { $$ = expr_opr('>', 2, $1, $3); }
         | expr '^' expr           { $$ = expr_opr('^', 2, $1, $3); }
-        | expr GE expr            { $$ = expr_opr(GE, 2, $1, $3); }
-        | expr LE expr            { $$ = expr_opr(LE, 2, $1, $3); }
-        | expr NE expr            { $$ = expr_opr(NE, 2, $1, $3); }
-        | expr EQ expr            { $$ = expr_opr(EQ, 2, $1, $3); }
+        | expr GE  expr           { $$ = expr_opr(GE,  2, $1, $3); }
+        | expr LE  expr           { $$ = expr_opr(LE,  2, $1, $3); }
+        | expr NE  expr           { $$ = expr_opr(NE,  2, $1, $3); }
+        | expr EQ  expr           { $$ = expr_opr(EQ,  2, $1, $3); }
+        | expr LEG expr           { $$ = expr_opr(LEG, 2, $1, $3); }
         | '(' expr ')'            { $$ = $2; }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }
         ;
@@ -182,9 +183,9 @@ void freeNode(nodeType *p)
   free (p);
 }
 
-void yyerror(void *parse_arg, void *scanner, char *s)
+void yyerror(void *parse_arg, void *scanner, char *errstr)
 {
-  fprintf(stdout, "%s (%p %p)\n", s, parse_arg, scanner);
+  fprintf(stdout, "%s!\n", errstr);
 }
 /*
 int main(void)
