@@ -487,7 +487,8 @@ goto find_rule; \
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 #line 1 "expr_lex.l"
-#line 2 "expr_lex.l"
+/* flex --outfile=expr_lex.c expr_lex.l */
+#line 3 "expr_lex.l"
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -510,7 +511,7 @@ goto find_rule; \
    LPH [A-Za-z_] Alphabetic character
    LPHDGT [A-Za-z0-9_] Alphanumeric character
    XPN [eE][+-]?[0-9]+ Real number Exponent */
-#line 514 "expr_lex.c"
+#line 515 "expr_lex.c"
 
 #define INITIAL 0
 
@@ -756,10 +757,10 @@ YY_DECL
 	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-#line 35 "expr_lex.l"
+#line 36 "expr_lex.l"
 
 
-#line 763 "expr_lex.c"
+#line 764 "expr_lex.c"
 
     yylval = yylval_param;
 
@@ -875,12 +876,12 @@ do_action:	/* This label is used only to access EOF actions. */
 	{ /* beginning of action switch */
 case 1:
 YY_RULE_SETUP
-#line 37 "expr_lex.l"
+#line 38 "expr_lex.l"
 ; /* ignore comments */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 39 "expr_lex.l"
+#line 40 "expr_lex.l"
 {
                 yylval->cvalue = M_PI;
                 return CONSTANT;
@@ -888,7 +889,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 44 "expr_lex.l"
+#line 45 "expr_lex.l"
 {
                 yylval->cvalue = M_E;
                 return CONSTANT;
@@ -896,7 +897,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 49 "expr_lex.l"
+#line 50 "expr_lex.l"
 {
                /* constant */
                /* NB: Tempted to prepend lexer expressions for floats and doubles with [+-]? 
@@ -908,7 +909,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 59 "expr_lex.l"
+#line 60 "expr_lex.l"
 {
                 yylval->fname = (char *) strdupx(yytext);
                 return FUNCTION;
@@ -916,7 +917,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 65 "expr_lex.l"
+#line 66 "expr_lex.l"
 {
                 yylval->varnm = (char *) strdupx(yytext);
                 return VARIABLE;
@@ -924,48 +925,48 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 71 "expr_lex.l"
+#line 72 "expr_lex.l"
 {
                 return *yytext;
              }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 75 "expr_lex.l"
+#line 76 "expr_lex.l"
 return GE;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 76 "expr_lex.l"
+#line 77 "expr_lex.l"
 return LE;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 77 "expr_lex.l"
+#line 78 "expr_lex.l"
 return EQ;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 78 "expr_lex.l"
+#line 79 "expr_lex.l"
 return NE;
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 80 "expr_lex.l"
+#line 81 "expr_lex.l"
 ;       /* ignore whitespace */
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 82 "expr_lex.l"
+#line 83 "expr_lex.l"
 yyerror(NULL, NULL, "Unknown character");
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 83 "expr_lex.l"
+#line 84 "expr_lex.l"
 ECHO;
 	YY_BREAK
-#line 969 "expr_lex.c"
+#line 970 "expr_lex.c"
 			case YY_STATE_EOF(INITIAL):
 				yyterminate();
 
@@ -2065,7 +2066,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 83 "expr_lex.l"
+#line 84 "expr_lex.l"
 
 
 
