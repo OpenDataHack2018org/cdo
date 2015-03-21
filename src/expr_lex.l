@@ -1,3 +1,4 @@
+/* flex --outfile=expr_lex.c expr_lex.l */
 %{
 #include <string.h>
 #include <stdlib.h>
