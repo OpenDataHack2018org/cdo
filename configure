@@ -657,6 +657,7 @@ JASPER_LIBS
 NETCDF_LIBS
 NETCDF_INCLUDE
 NETCDF_ROOT
+ENABLE_NC4HDF5
 ENABLE_NC4
 ENABLE_NC2
 ENABLE_NETCDF
@@ -18913,6 +18914,7 @@ NETCDF_LIBS=''
 ENABLE_NETCDF=no
 ENABLE_NC2=no
 ENABLE_NC4=no
+ENABLE_NC4HDF5=no
 
 # Check whether --with-netcdf was given.
 if test "${with_netcdf+set}" = set; then :
@@ -18996,7 +18998,68 @@ else
   as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
 fi
 
+
+		            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing H5TS_mutex_lock" >&5
+$as_echo_n "checking for library containing H5TS_mutex_lock... " >&6; }
+if ${ac_cv_search_H5TS_mutex_lock+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char H5TS_mutex_lock ();
+int
+main ()
+{
+return H5TS_mutex_lock ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' netcdf; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_H5TS_mutex_lock=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_H5TS_mutex_lock+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_H5TS_mutex_lock+:} false; then :
+
+else
+  ac_cv_search_H5TS_mutex_lock=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_H5TS_mutex_lock" >&5
+$as_echo "$ac_cv_search_H5TS_mutex_lock" >&6; }
+ac_res=$ac_cv_search_H5TS_mutex_lock
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_NC4HDF5_THREADSAFE 1" >>confdefs.h
+
+fi
+
+
                             NETCDF_LIBS=" -lnetcdf"
+
                             # Extract the first word of "nc-config", so it can be a program name with args.
 set dummy nc-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -19055,6 +19118,19 @@ $as_echo_n "checking netcdf's nc4 support... " >&6; }
 $as_echo "#define HAVE_NETCDF4 1" >>confdefs.h
 
                                           ENABLE_NC4=yes
+                                          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+			           { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's nc4/hdf5 support" >&5
+$as_echo_n "checking netcdf's nc4/hdf5 support... " >&6; }
+                                   if test "x$($NC_CONFIG --has-hdf5)" = "xyes"; then :
+
+$as_echo "#define HAVE_NC4HDF5 1" >>confdefs.h
+
+                                          ENABLE_NC4HDF5=yes
                                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
@@ -19142,6 +19218,66 @@ else
   as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
 fi
 
+
+				 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing H5TS_mutex_lock" >&5
+$as_echo_n "checking for library containing H5TS_mutex_lock... " >&6; }
+if ${ac_cv_search_H5TS_mutex_lock+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char H5TS_mutex_lock ();
+int
+main ()
+{
+return H5TS_mutex_lock ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' netcdf; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib -lhdf5_hl -lhdf5 $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_H5TS_mutex_lock=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_H5TS_mutex_lock+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_H5TS_mutex_lock+:} false; then :
+
+else
+  ac_cv_search_H5TS_mutex_lock=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_H5TS_mutex_lock" >&5
+$as_echo "$ac_cv_search_H5TS_mutex_lock" >&6; }
+ac_res=$ac_cv_search_H5TS_mutex_lock
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_NC4HDF5_THREADSAFE 1" >>confdefs.h
+
+fi
+
+
                                  NETCDF_LIBS=" -L$NETCDF_ROOT/lib -lnetcdf"
                                  NETCDF_INCLUDE=" -I$NETCDF_ROOT/include"
 
@@ -19223,6 +19359,19 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
+			           { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's nc4/hdf5 support" >&5
+$as_echo_n "checking netcdf's nc4/hdf5 support... " >&6; }
+                                   if test "x$($NC_CONFIG --has-hdf5)" = "xyes"; then :
+
+$as_echo "#define HAVE_NC4HDF5 1" >>confdefs.h
+
+                                          ENABLE_NC4HDF5=yes
+                                          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find nc-config! go on with default configuration" >&5
 $as_echo "Could not find nc-config! go on with default configuration" >&6; }
@@ -19240,6 +19389,7 @@ $as_echo_n "checking for NETCDF library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi
+
 
 
 

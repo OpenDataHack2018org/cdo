@@ -4,6 +4,10 @@
 
 2015-03-21  Uwe Schulzweida
 
+	* configure: check whether netCDF4/HDF5 is threadsafe
+
+2015-03-21  Uwe Schulzweida
+
 	* expr: added support for logical operator <=>
 
 2015-03-20  Uwe Schulzweida
