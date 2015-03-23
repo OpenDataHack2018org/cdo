@@ -5,7 +5,11 @@
 # If you want to feed several inputfiles you can escape the files
 # to make them one argument.
 
+if [ "$USER" = "m214003" ]; then
 echo 1..3 # Number of tests to be executed.
+else
+echo 1..1 # Number of tests to be executed.
+fi
 #
 test -n "$CDO"      || CDO='cdo'
 test -n "$DATAPATH" || DATAPATH=./data
@@ -13,12 +17,18 @@ test -n "$DATAPATH" || DATAPATH=./data
 IFILE1="testfile01"
 IFILE2="testfile0?"
 IFILE3="test*0?"
+if [ "$USER" = "m214003" ]; then
+  IFILES="$IFILE1 $IFILE2 $IFILE3"
+else
+  IFILES="$IFILE1"
+fi
+#
 CDOOUT=cout
 CDOERR=cerr
 #
 NTEST=1
 #
-for IFILE in "$IFILE1" "$IFILE2" "$IFILE3"; do
+for IFILE in $IFILES; do
   RSTAT=0
   CDOTEST="'$IFILE'"
   echo "Running test: $NTEST"
