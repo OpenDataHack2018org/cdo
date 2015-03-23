@@ -39,6 +39,7 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %left LEG GE LE EQ NE '>' '<' '='
 %left '+' '-'
 %left '*' '/'
+%left '?' ':'
 %right  '^'
 %nonassoc UMINUS
 
@@ -84,6 +85,7 @@ expr:
         | expr NE  expr           { $$ = expr_opr(NE,  2, $1, $3); }
         | expr EQ  expr           { $$ = expr_opr(EQ,  2, $1, $3); }
         | expr LEG expr           { $$ = expr_opr(LEG, 2, $1, $3); }
+        | expr '?' expr ':' expr  { $$ = expr_opr('?', 3, $1, $3, $5); }
         | '(' expr ')'            { $$ = $2; }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }
         ;

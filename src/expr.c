@@ -305,8 +305,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   long ngp1 = gridInqSize(p1->gridID);
   long ngp2 = gridInqSize(p2->gridID);
 
-  if ( ngp1 != ngp2 )
-    cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
+  if ( ngp1 != ngp2 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
 
   long ngp = ngp1;
 
@@ -679,6 +678,83 @@ nodeType *ex_uminus(nodeType *p1)
   return (p);
 }
 
+static
+nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
+{
+  if ( cdoVerbose ) printf("\t %s ? %s : %s\n", p1->u.var.nm, p2->u.var.nm, p3->u.var.nm);
+
+  if ( p1->type == typeCon ) cdoAbort("First expression is a constant but must be a variable!");
+  if ( p2->type == typeCon ) cdoAbort("Second expression is a constant but must be a variable!");
+  if ( p2->type == typeCon ) cdoAbort("Third expression is a constant but must be a variable!");
+
+  int nmiss1 = p1->nmiss;
+  double missval1 = p1->missval;
+  double missval2 = p2->missval;
+  double missval3 = p3->missval;
+
+  long ngp1 = gridInqSize(p1->gridID);
+  long ngp2 = gridInqSize(p2->gridID);
+  long ngp3 = gridInqSize(p3->gridID);
+
+  if ( ngp1 != ngp2 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
+  if ( ngp1 != ngp3 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp3 = %ld", ngp1, ngp3);
+
+  long ngp = ngp1;
+
+  long nlev1 = zaxisInqSize(p1->zaxisID);
+  long nlev2 = zaxisInqSize(p2->zaxisID);
+  long nlev3 = zaxisInqSize(p3->zaxisID);
+
+  if ( nlev1 != nlev2 ) cdoAbort("Number of levels differ. nlev1 = %ld, nlev2 = %ld", nlev1, nlev2);
+  if ( nlev1 != nlev3 ) cdoAbort("Number of levels differ. nlev1 = %ld, nlev3 = %ld", nlev1, nlev3);
+
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+
+  p->type     = typeVar;
+  p->tmpvar   = 1;
+  p->u.var.nm = strdupx("tmp");
+
+  long nlev = nlev1;
+  p->gridID  = p1->gridID;
+  p->zaxisID = p1->zaxisID;
+  p->missval = p1->missval;
+
+  p->data = (double*) malloc(ngp*nlev*sizeof(double));
+
+  long loff, loff1, loff2, loff3;
+
+  for ( long k = 0; k < nlev; ++k )
+    {
+      loff = k*ngp;
+
+      if ( nlev1 == 1 ) loff1 = 0;
+      else              loff1 = k*ngp;
+
+      if ( nlev2 == 1 ) loff2 = 0;
+      else              loff2 = k*ngp;
+
+      if ( nlev3 == 1 ) loff3 = 0;
+      else              loff3 = k*ngp;
+
+      const double *restrict idat1 = p1->data+loff1;
+      const double *restrict idat2 = p2->data+loff2;
+      const double *restrict idat3 = p3->data+loff3;
+      double *restrict odat = p->data+loff;
+
+      for ( long i = 0; i < ngp; ++i ) 
+	{
+	  if ( nmiss1 && DBL_IS_EQUAL(idat1[i],missval1) )
+	    odat[i] = missval1;
+	  else if ( IS_NOT_EQUAL(idat1[i], 0) )
+	    odat[i] = DBL_IS_EQUAL(idat2[i],missval2) ? missval1 : idat2[i];
+	  else
+	    odat[i] = DBL_IS_EQUAL(idat3[i],missval3) ? missval1 : idat3[i];
+	}
+    }
+
+  return (p);
+}
+
 
 int exNode(nodeType *p, parse_parm_t *parse_arg)
 {
@@ -888,6 +964,24 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  else
 	    {
 	      rnode = ex_uminus(expr_run(p->u.opr.op[0], parse_arg));
+	    }
+
+	  break;
+        case '?':    
+	  if ( parse_arg->init )
+	    {
+	      expr_run(p->u.opr.op[0], parse_arg);
+	      expr_run(p->u.opr.op[1], parse_arg);
+	      expr_run(p->u.opr.op[2], parse_arg);
+
+	      if ( parse_arg->debug )
+		printf("\t?:\n");
+	    }
+	  else
+	    {
+	      rnode = ex_ifelse(expr_run(p->u.opr.op[0], parse_arg),
+			        expr_run(p->u.opr.op[1], parse_arg),
+			        expr_run(p->u.opr.op[2], parse_arg));
 	    }
 
 	  break;
