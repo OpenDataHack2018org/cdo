@@ -153,10 +153,6 @@ AC_ARG_WITH([netcdf],
                                            [AC_DEFINE([HAVE_LIBNETCDF],[1],[Define to 1 for NETCDF support])
                                             ENABLE_NETCDF=yes],
                                            [AC_MSG_ERROR([Could not link to netcdf library])])
-
-		            AC_SEARCH_LIBS([H5TS_mutex_lock], [netcdf],
-			    	           [AC_DEFINE([HAVE_NC4HDF5_THREADSAFE],[1],[Define to 1 for NETCDF4/HDF5 threadsafe support])])
-
                             NETCDF_LIBS=" -lnetcdf"
 			    
                             AC_CHECK_PROG(NC_CONFIG,nc-config,nc-config)
@@ -187,11 +183,6 @@ AC_ARG_WITH([netcdf],
                                                 [AC_DEFINE([HAVE_LIBNETCDF],[1],[Define to 1 for NETCDF support])
                                                  ENABLE_NETCDF=yes],
                                                 [AC_MSG_ERROR([Could not link to netcdf library])])
-
-				 AC_SEARCH_LIBS([H5TS_mutex_lock], [netcdf],
-                   		                [AC_DEFINE([HAVE_NC4HDF5_THREADSAFE],[1],[Define to 1 for NETCDF4/HDF5 threadsafe support])],,
-						[-lhdf5_hl -lhdf5])
-
                                  NETCDF_LIBS=" -L$NETCDF_ROOT/lib -lnetcdf"
                                  NETCDF_INCLUDE=" -I$NETCDF_ROOT/include"
 
@@ -221,6 +212,12 @@ AC_ARG_WITH([netcdf],
                                 [AC_MSG_NOTICE([$with_netcdf is not a directory! NETCDF suppressed])])])],
             [AC_MSG_CHECKING([for NETCDF library])
              AC_MSG_RESULT([suppressed])])
+
+AS_IF([test "x$ENABLE_NC4HDF5" = "xyes"],
+      [AC_SEARCH_LIBS([H5TS_mutex_lock], [netcdf],
+               [AC_DEFINE([HAVE_NC4HDF5_THREADSAFE],[1],[Define to 1 for NETCDF4/HDF5 threadsafe support])],,
+	       [-lhdf5_hl -lhdf5])])
+
 AC_SUBST([ENABLE_NETCDF])
 AC_SUBST([ENABLE_NC2])
 AC_SUBST([ENABLE_NC4])
