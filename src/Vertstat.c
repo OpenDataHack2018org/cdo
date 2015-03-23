@@ -84,13 +84,7 @@ int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *w
   double *thickness = (double *) malloc(nlev*sizeof(double));
 
   zaxisInqLevels(zaxisID, levels);
-  if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
-    {
-      status = 1;
-      zaxisInqLbounds(zaxisID, lbounds);
-      zaxisInqUbounds(zaxisID, ubounds);
-    }
-  else if ( genbounds )
+  if ( genbounds )
     {
       status = 2;
       lbounds[0]      = levels[0];
@@ -101,6 +95,12 @@ int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *w
 	  lbounds[i+1] = bound;
 	  ubounds[i]   = bound;
 	}		  
+    }
+  else if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
+    {
+      status = 1;
+      zaxisInqLbounds(zaxisID, lbounds);
+      zaxisInqUbounds(zaxisID, ubounds);
     }
   else
     {
@@ -287,19 +287,20 @@ void *Vertstat(void *argument)
 	  zaxisID = vars1[varID].zaxis;
 
 	  double vweight = 1.0;
-	  //	  if ( operatorID == VERTINT && !IS_SURFACE_LEVEL(zaxisID) )
-	  if ( operatorID == VERTINT )
+	  if ( operatorID == VERTINT && !IS_SURFACE_LEVEL(zaxisID) )
 	    {
 	      for ( int index = 0; index < nzaxis; ++index )
 		if ( vert[index].zaxisID == zaxisID )
-		  {
-		    vweight = vert[index].weights[levelID];
-		    
+		  {		    
 		    if ( vert[index].status == 0 && tsID == 0 && levelID == 0 )
 		      {
 			char varname[CDI_MAX_NAME];
 			vlistInqVarName(vlistID1, varID, varname);
 			cdoWarning("Using constant vertical weights for variable %s!", varname);
+		      }
+		    else
+		      {
+			vweight = vert[index].weights[levelID];
 		      }
 
 		    break;
@@ -334,7 +335,7 @@ void *Vertstat(void *argument)
 	      field.grid    = vars1[varID].grid;
 	      field.missval = vars1[varID].missval;
 
-	      if ( vweight < 1.e30 ) farcmul(&field, vweight);
+	      if ( operatorID == VERTINT && IS_NOT_EQUAL(vweight, 1.0) ) farcmul(&field, vweight);
 
 	      if ( field.nmiss > 0 || samp1[varID].ptr )
 		{
