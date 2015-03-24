@@ -42,32 +42,22 @@ int isnan(const double x);
 
 void *Setmiss(void *argument)
 {
-  int SETMISSVAL, SETCTOMISS, SETMISSTOC, SETRTOMISS, SETVRANGE;
-  int operatorID;
-  int streamID1, streamID2;
-  int gridsize;
   int nrecs, recID;
-  int nvars;
-  int tsID;
   int varID, levelID;
-  int vlistID1, vlistID2;
   int nmiss;
   int i;
-  int calendar;
   double missval, missval2 = 0;
   double rconst = 0, rmin = 0, rmax = 0;
-  double *array;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
-  SETMISSVAL   = cdoOperatorAdd("setmissval",    0, 0, "missing value");
-  SETCTOMISS   = cdoOperatorAdd("setctomiss",    0, 0, "constant");
-  SETMISSTOC   = cdoOperatorAdd("setmisstoc",    0, 0, "constant");
-  SETRTOMISS   = cdoOperatorAdd("setrtomiss",    0, 0, "range (min, max)");
-  SETVRANGE    = cdoOperatorAdd("setvrange",     0, 0, "range (min, max)");
+  int SETMISSVAL = cdoOperatorAdd("setmissval", 0, 0, "missing value");
+  int SETCTOMISS = cdoOperatorAdd("setctomiss", 0, 0, "constant");
+  int SETMISSTOC = cdoOperatorAdd("setmisstoc", 0, 0, "constant");
+  int SETRTOMISS = cdoOperatorAdd("setrtomiss", 0, 0, "range (min, max)");
+  int SETVRANGE  = cdoOperatorAdd("setvrange",  0, 0, "range (min, max)");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == SETMISSVAL )
     {
@@ -87,7 +77,7 @@ void *Setmiss(void *argument)
 	}
       else
       */
-	rconst = parameter2double(operatorArgv()[0]);
+      rconst = parameter2double(operatorArgv()[0]);
     }
   else
     {
@@ -96,22 +86,33 @@ void *Setmiss(void *argument)
       rmax = parameter2double(operatorArgv()[1]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
-
-  calendar = taxisInqCalendar(taxisID1);  
 
   if ( operatorID == SETMISSVAL )
     {
-      nvars = vlistNvars(vlistID2);
+      int nvars = vlistNvars(vlistID2);
       for ( varID = 0; varID < nvars; varID++ )
 	vlistDefVarMissval(vlistID2, varID, missval2);
+    }
+  else if ( operatorID == SETMISSTOC )
+    {
+      int nvars = vlistNvars(vlistID2);
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  missval = vlistInqVarMissval(vlistID2, varID);
+	  if ( DBL_IS_EQUAL(rconst, missval) )
+	    {
+	      cdoWarning("Missing value and constant have the same value!");
+	      break;
+	    }
+	}
     }
 
   /*
@@ -126,15 +127,15 @@ void *Setmiss(void *argument)
 	vlistDefAttFlt(vlistID2, varID, "valid_range", DATATYPE_FLT64, 2, range);
     }
   */
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

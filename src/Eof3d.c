@@ -40,16 +40,14 @@
 #include "statistic.h"
 
 
-enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
+enum T_EIGEN_MODE get_eigenmode(void);
+enum T_WEIGHT_MODE get_weightmode(void);
 
-#define WEIGHTS 1
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 void *EOF3d(void * argument)
 {
-  char *envstr;
-
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
   int temp_size = 0;
@@ -57,7 +55,6 @@ void *EOF3d(void * argument)
   int missval_warning=0;
   int nmiss,ngrids,n=0,nlevs=0,npack=0,nts=0;
   int offset;
-  int *pack;
   int timer_cov = 0, timer_eig = 0;
   int *varID2;
 
@@ -70,8 +67,6 @@ void *EOF3d(void * argument)
   double *eigv;
   double *xvals, *yvals, *zvals;
   double *df1p, *df2p;
-
-  enum T_EIGEN_MODE eigen_mode = JACOBI;
 
 
   if ( cdoTimer )
@@ -91,28 +86,8 @@ void *EOF3d(void * argument)
   operatorInputArg("Number of eigen functions to write out");
   int n_eig       = parameter2int(operatorArgv()[0]);
 
-  envstr = getenv("CDO_SVD_MODE");
-
-  if ( envstr &&! strncmp(envstr,"danielson_lanczos",17) )
-    eigen_mode = DANIELSON_LANCZOS;
-  else if ( envstr && ! strncmp(envstr,"jacobi",6) )
-    eigen_mode = JACOBI;
-  else if ( envstr ) {
-    cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
-    cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
-    cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
-  }
-
-  if ( cdoVerbose ) 
-    cdoPrint("Set eigen_mode to %s",eigen_mode == JACOBI? "jacobi" : "danielson_lanczos");
-
-#if defined(_OPENMP)
-  if ( omp_get_max_threads() > 1 && eigen_mode == DANIELSON_LANCZOS )  {
-    cdoWarning("Requested parallel computation with %i Threads ",omp_get_max_threads());
-    cdoWarning("  but environmental setting CDO_SVD_MODE causes sequential ");
-    cdoWarning("  Singular value decomposition");
-  }
-#endif 
+  enum T_EIGEN_MODE eigen_mode = get_eigenmode();
+  enum T_WEIGHT_MODE weight_mode = get_weightmode();
 
   int streamID1  = streamOpenRead(cdoStreamName(0));
   int vlistID1   = streamInqVlist(streamID1);
@@ -122,35 +97,46 @@ void *EOF3d(void * argument)
   int nvars      = vlistNvars(vlistID1);
   int nrecs      = vlistNrecs(vlistID1);
 
-  double *weight = (double*) malloc(gridsize*sizeof(double));
-  if ( WEIGHTS )
-      gridWeights(gridID1, &weight[0]);
-  else
-    for( i = 0; i < gridsize; i++) weight[i] = 1;
+  double *weight = (double *) malloc(gridsize*sizeof(double));
+  for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
+
+  if ( weight_mode == WEIGHT_ON )
+    {
+      int wstatus = gridWeights(gridID1, weight);
+      if ( wstatus != 0  )
+	{
+	  weight_mode = WEIGHT_OFF;
+	  cdoWarning("Using constant grid cell area weights!");
+	}
+    }
 
   /*  eigenvalues */
-
-  tsID = 0;
 
   if ( operfunc == EOF3D_SPATIAL )
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
 
+  tsID = 0;
 
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
-  while ( TRUE )
+  nts = vlistNtsteps(vlistID1);
+  if ( nts == -1 )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 ) break;
-      tsID++;
+      while ( TRUE )
+	{
+	  nrecs = streamInqTimestep(streamID1, tsID);
+	  if ( nrecs == 0 )  break;
+	  tsID++;
+	}
+      
+      nts = tsID;
+      if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
     }
-
-  nts         = tsID;
 
   streamClose(streamID1);
 
-  streamID1   = streamOpenRead(cdoStreamName(0));
-  vlistID1    = streamInqVlist(streamID1);
-  taxisID1    = vlistInqTaxis(vlistID1);
+  streamID1 = streamOpenRead(cdoStreamName(0));
+  vlistID1  = streamInqVlist(streamID1);
+  taxisID1  = vlistInqTaxis(vlistID1);
 
   /* reset the requested number of eigen-function to the maximum if neccessary */
   if ( n_eig > nts )
@@ -255,7 +241,7 @@ void *EOF3d(void * argument)
   if ( cdoVerbose ) 
     cdoPrint("Read data for %i variables",nvars);
   
-  pack = (int*) malloc(temp_size*sizeof(int)); //TODO
+  int *pack = (int*) malloc(temp_size*sizeof(int)); //TODO
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -270,21 +256,24 @@ void *EOF3d(void * argument)
 	cdoPrint("Calculating covariance matrix and SVD for var%i (%s)",varID,vname);
       }
 
-      npack        = 0;    // TODO already set to 0
-      sum_w        = 0;
+      npack = 0;    // TODO already set to 0
 
       if ( cdoTimer ) timer_start(timer_cov);
       
-      // sum_w = 0;
-      sum_w = 1;
       for ( i = 0; i < temp_size ; i++ )
 	{
 	  if ( datacounts[varID][i] > 1)
 	    {
 	      pack[npack] = i;
 	      npack++;
-	      //  sum_w += weight[i%gridsize];
 	    }
+	}
+
+      sum_w = 1;
+      if ( weight_mode == WEIGHT_ON )
+	{
+	  sum_w = 0;
+	  for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
 	}
 
       if ( npack < 1 ) {
@@ -316,7 +305,6 @@ void *EOF3d(void * argument)
 	    df1p = datafields[varID][j1];
 	    df2p = datafields[varID][j2];
 	    for ( i = 0; i < npack; i++ )
-	      //  sum += df1p[pack[i]]*df2p[pack[i]];
 	      sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
 	    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 	  }
@@ -369,8 +357,8 @@ void *EOF3d(void * argument)
   shared(eigenvec,weight,pack,npack,gridsize)
 #endif 
 	  for ( i = 0; i < npack; i++ )
-	    // sum +=  weight[pack[i]%gridsize] *
-	    sum += eigenvec[pack[i]] * eigenvec[pack[i]];
+	    sum +=  weight[pack[i]%gridsize] *
+	            eigenvec[pack[i]] * eigenvec[pack[i]];
 
 	  if ( sum > 0 )
 	    {
@@ -509,6 +497,9 @@ void *EOF3d(void * argument)
   free(eigenvectors);
   free(eigenvalues);
   free(in);
+
+  free(pack);
+  free(weight);
 
   streamClose(streamID3);
   streamClose(streamID2);

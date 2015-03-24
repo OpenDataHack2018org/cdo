@@ -69,6 +69,8 @@ char *strdup(const char *s);
 #define  SET_DATE(dtstr, date, time)      (sprintf(dtstr, "%*d%*d", DATE_LEN-6, date, 6, time))
 #define  DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
+enum T_WEIGHT_MODE {WEIGHT_OFF, WEIGHT_ON};
+enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
 
 #if defined(__xlC__) /* performance problems on IBM */
 #ifndef DBL_IS_NAN

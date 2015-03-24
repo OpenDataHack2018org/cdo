@@ -1214,8 +1214,10 @@ sub print_description {
 	$docline =~ s/\\/\\\\/og;
 #	$docline =~ s/%/\\%/og;
 	$docline =~ s/"/\\"/og;
+	$ospace = $nspace;
+	if ( $list == 1 ) {$ospace=0;}
 	if ( $help_print == 1 ) {
-	  printf HELPFILE ("    \"    %*s%s\",\n", $nspace, "", $docline);
+	  printf HELPFILE ("    \"    %*s%s\",\n", $ospace, "", $docline);
 	}
       }
     }

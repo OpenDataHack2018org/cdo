@@ -1,3 +1,4 @@
+/* flex -oexpr_lex.c expr_lex.l */
 %{
 #include <string.h>
 #include <stdlib.h>
@@ -68,10 +69,11 @@ M_E          {
              }
 
 
-[-()<>=+*/;{}^.] {
+[-()<>=+*/;{}^.?:] {
                 return *yytext;
              }
 
+"<=>"           return LEG;
 ">="            return GE;
 "<="            return LE;
 "=="            return EQ;

@@ -136,6 +136,12 @@
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
+/* Define to 1 for NETCDF4/HDF5 support */
+#undef HAVE_NC4HDF5
+
+/* Define to 1 for NETCDF4/HDF5 threadsafe support */
+#undef HAVE_NC4HDF5_THREADSAFE
+
 /* Define to 1 for NETCDF2 support */
 #undef HAVE_NETCDF2
 

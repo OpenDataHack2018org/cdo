@@ -1,6 +1,6 @@
 /*
 Arithmetic operators: +, -, *, \, ^
-Logic operators: <, >, <=, >=, !=, ==
+Logic operators: <, >, <=, >=, !=, ==, <=>
 Functions: abs, sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
 Functions: min, max, avg, std, var
 Constansts: M_PI, M_E
@@ -21,12 +21,12 @@ Each individual assignment statement have to end with a semi-colon.
 @IfMan
 The basic arithmetic operations addition +, subtraction -, multiplication *,
 division / and exponentiation ^ can be used.
-Available logical operators are <, >, <=, >=, != and ==.
+Available logical operators are <, >, <=, >=, !=, == and <=>.
 @EndifMan
 @IfDoc
 The basic arithmetic operations addition \begin{math}+\end{math}, subtraction \begin{math}-\end{math}, multiplication \begin{math}*\end{math},
 division \begin{math}/\end{math} and exponentiation \^\  can be used.
-Available logical operators are <, >, <=, >=, != and ==.
+Available logical operators are <, >, <=, >=, !=, == and <=>.
 @EndifDoc
 The following intrinsic functions are available:
 @BeginList log10(x)

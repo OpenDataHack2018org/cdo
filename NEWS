@@ -5,7 +5,7 @@ Version 1.6.8 (26 March 2015):
 
    New features:
      * select, delete: added wildcard support for parameter name
-     * expr: added support for logical operators <, >, <=, >=, !=, ==
+     * expr: added support for logical operators <, >, <=, >=, !=, ==, <=>
    New operators:
      * splityearmon: Split in years and months
      * yseasadd: Add multi-year seasonal time series

@@ -316,25 +316,25 @@ void get_remap_env(void)
 
   remap_set_threshhold(remap_threshhold);
 
-  envstr = getenv("CDO_REMAP_SEARCH_RADIUS");
+  envstr = getenv("CDO_REMAP_RADIUS");
   if ( envstr )
     {
       double fval;
       fval = atof(envstr);
       if ( fval < 0 || fval > 180 )
 	{
-	  cdoAbort("CDO_REMAP_SEARCH_RADIUS=%g out of bounds (0-180)", fval);
+	  cdoAbort("CDO_REMAP_RADIUS=%g out of bounds (0-180)", fval);
 	}
       else
 	{
 	  remap_search_radius = fval;
 	  if ( cdoVerbose )
-	    cdoPrint("Set CDO_REMAP_SEARCH_RADIUS to %g", remap_search_radius);
+	    cdoPrint("Set CDO_REMAP_RADIUS to %g", remap_search_radius);
 	}
     }
   
   if ( cdoVerbose )
-    cdoPrint("remap_search_radius = %g", remap_search_radius);
+    cdoPrint("remap_radius = %g", remap_search_radius);
 
   envstr = getenv("REMAP_AREA_MIN");
   if ( envstr )
@@ -576,14 +576,24 @@ static
 int get_norm_opt(void)
 {
   int norm_opt = NORM_OPT_FRACAREA;
-  char *envstr = getenv("CDO_REMAP_NORMALIZE_OPT");
+  char *envstr;
 
+  envstr = getenv("CDO_REMAP_NORMALIZE_OPT"); // obsolate
   if ( envstr && *envstr )
     {
       if      ( memcmp(envstr, "frac", 4) == 0 ) norm_opt = NORM_OPT_FRACAREA;
       else if ( memcmp(envstr, "dest", 4) == 0 ) norm_opt = NORM_OPT_DESTAREA;
       else if ( memcmp(envstr, "none", 4) == 0 ) norm_opt = NORM_OPT_NONE;
       else cdoWarning("CDO_REMAP_NORMALIZE_OPT=%s unsupported!", envstr);
+    }
+
+  envstr = getenv("CDO_REMAP_NORM");
+  if ( envstr && *envstr )
+    {
+      if      ( memcmp(envstr, "frac", 4) == 0 ) norm_opt = NORM_OPT_FRACAREA;
+      else if ( memcmp(envstr, "dest", 4) == 0 ) norm_opt = NORM_OPT_DESTAREA;
+      else if ( memcmp(envstr, "none", 4) == 0 ) norm_opt = NORM_OPT_NONE;
+      else cdoWarning("CDO_REMAP_NORM=%s unsupported!", envstr);
     }
 
   if ( cdoVerbose )

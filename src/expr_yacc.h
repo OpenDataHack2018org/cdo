@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+/* A Bison parser, made by GNU Bison 2.7.12-4996.  */
 
 /* Bison interface for Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -53,7 +53,8 @@ extern int yydebug;
      EQ = 262,
      LE = 263,
      GE = 264,
-     UMINUS = 265
+     LEG = 265,
+     UMINUS = 266
    };
 #endif
 /* Tokens.  */
@@ -64,7 +65,8 @@ extern int yydebug;
 #define EQ 262
 #define LE 263
 #define GE 264
-#define UMINUS 265
+#define LEG 265
+#define UMINUS 266
 
 
 
