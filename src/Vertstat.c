@@ -154,7 +154,6 @@ void *Vertstat(void *argument)
   int varID, levelID;
   int nmiss;
   double missval;
-  field_t field;
   typedef struct {
     int zaxisID;
     int status;
@@ -240,6 +239,7 @@ void *Vertstat(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
 
@@ -332,7 +332,7 @@ void *Vertstat(void *argument)
 	      if ( nmiss > 0 || samp1[varID].ptr || needWeights )
 		{
 		  if ( samp1[varID].ptr == NULL )
-		    samp1[varID].ptr = (double*) malloc(gridsize*sizeof(double));
+		    samp1[varID].ptr = (double *) malloc(gridsize*sizeof(double));
 
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[varID].ptr[i], vars1[varID].missval) )
