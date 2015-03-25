@@ -13,6 +13,7 @@ Version 1.6.8 (26 March 2015):
      * yseasmul: Multiply multi-year seasonal time series
      * yseasdiv: Divide multi-year seasonal time series
    Changed operators:
+     * vertmean, vertavg: changed to weighted means if layer bounds are available
      * setpartabp, setpartabn: added optional parameter convert to convert the units.
        Units are not converted anymore if this parameter is not set!
      * TimSTAT, Timpctl, TimselSTAT, Timselpctl, SeasSTAT, Seaspctl:
