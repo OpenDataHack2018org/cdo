@@ -19,8 +19,11 @@ Version 1.6.8 (26 March 2015):
      * TimSTAT, Timpctl, TimselSTAT, Timselpctl, SeasSTAT, Seaspctl:
        The output time stamp of all operators from the above modules
        are changed from the last to the middle contributing timestep.
-       Use the envirionment variable CDO_TIMESTAT_DATE=last to set
+       Use the environment variable CDO_TIMESTAT_DATE=last to set
        the outout time stamp to the last contributing timestep.
+     * eof, eof3d: use area weights instead of no weights
+       Use the environment variable CDO_WEIGHT_MODE=off to switch back to
+       the non weighted version
    Fixed bugs:
      * gradsdes: grib index file is empty (introduced in 1.6.7)
      * grib2 output: segfaults when writing grib2 files [Bug #5351]
