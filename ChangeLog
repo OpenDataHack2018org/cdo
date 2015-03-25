@@ -4,6 +4,7 @@
 
 2015-03-25  Uwe Schulzweida
 
+	* expr: added support for operator ?: (short ifelse)
 	* eof, eof3d: use area weights instead of no weights
 	* vertmean, vertavg: changed to weighted means if layer bounds are available
 

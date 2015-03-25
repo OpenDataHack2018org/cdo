@@ -683,30 +683,75 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 {
   if ( cdoVerbose ) printf("\t %s ? %s : %s\n", p1->u.var.nm, p2->u.var.nm, p3->u.var.nm);
 
-  if ( p1->type == typeCon ) cdoAbort("First expression is a constant but must be a variable!");
-  if ( p2->type == typeCon ) cdoAbort("Second expression is a constant but must be a variable!");
-  if ( p2->type == typeCon ) cdoAbort("Third expression is a constant but must be a variable!");
+  if ( p1->type == typeCon ) cdoAbort("expr?expr:expr: First expression is a constant but must be a variable!");
 
   int nmiss1 = p1->nmiss;
-  double missval1 = p1->missval;
-  double missval2 = p2->missval;
-  double missval3 = p3->missval;
-
   long ngp1 = gridInqSize(p1->gridID);
-  long ngp2 = gridInqSize(p2->gridID);
-  long ngp3 = gridInqSize(p3->gridID);
-
-  if ( ngp1 != ngp2 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
-  if ( ngp1 != ngp3 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp3 = %ld", ngp1, ngp3);
+  long nlev1 = zaxisInqSize(p1->zaxisID);
+  double missval1 = p1->missval;
+  double *pdata1 = p1->data;
 
   long ngp = ngp1;
+  long nlev = nlev1;
+  nodeType *px = p1;
 
-  long nlev1 = zaxisInqSize(p1->zaxisID);
-  long nlev2 = zaxisInqSize(p2->zaxisID);
-  long nlev3 = zaxisInqSize(p3->zaxisID);
+  double missval2 = missval1;
+  double *pdata2;
+  long ngp2 = 1;
+  long nlev2 = 1;
+  
+  if ( p2->type == typeCon )
+    {
+      pdata2 = &p2->u.con.value;
+    }
+  else
+    {
+      ngp2 = gridInqSize(p2->gridID);
+      nlev2 = zaxisInqSize(p2->zaxisID);
+      missval2 = p2->missval;
+      pdata2 = p2->data;
+      if ( ngp2 > 1 && ngp2 != ngp1 )
+	cdoAbort("expr?expr:expr: Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
+      if ( nlev2 > 1 && nlev2 != nlev )
+	{
+	  if ( nlev == 1 )
+	    {
+	      nlev = nlev2;
+	      px = p2;
+	    }
+	  else
+	    cdoAbort("expr?expr:expr: Number of levels differ. nlev = %ld, nlev2 = %ld", nlev, nlev2);
+	}
+    }
 
-  if ( nlev1 != nlev2 ) cdoAbort("Number of levels differ. nlev1 = %ld, nlev2 = %ld", nlev1, nlev2);
-  if ( nlev1 != nlev3 ) cdoAbort("Number of levels differ. nlev1 = %ld, nlev3 = %ld", nlev1, nlev3);
+  double missval3 = missval1;
+  double *pdata3;
+  long ngp3 = 1;
+  long nlev3 = 1;
+  
+  if ( p3->type == typeCon )
+    {
+      pdata3 = &p3->u.con.value;
+    }
+  else
+    {
+      ngp3 = gridInqSize(p3->gridID);
+      nlev3 = zaxisInqSize(p3->zaxisID);
+      missval3 = p3->missval;
+      pdata3 = p3->data;
+      if ( ngp3 > 1 && ngp3 != ngp1 )
+	cdoAbort("expr?expr:expr: Number of grid points differ. ngp1 = %ld, ngp3 = %ld", ngp1, ngp3);
+      if ( nlev3 > 1 && nlev3 != nlev )
+	{
+	  if ( nlev == 1 )
+	    {
+	      nlev = nlev3;
+	      px = p3;
+	    }
+	  else
+	    cdoAbort("expr?expr:expr: Number of levels differ. nlev = %ld, nlev3 = %ld", nlev, nlev3);
+	}
+    }
 
   nodeType *p = (nodeType*) malloc(sizeof(nodeType));
 
@@ -714,10 +759,9 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
   p->tmpvar   = 1;
   p->u.var.nm = strdupx("tmp");
 
-  long nlev = nlev1;
-  p->gridID  = p1->gridID;
-  p->zaxisID = p1->zaxisID;
-  p->missval = p1->missval;
+  p->gridID  = px->gridID;
+  p->zaxisID = px->zaxisID;
+  p->missval = px->missval;
 
   p->data = (double*) malloc(ngp*nlev*sizeof(double));
 
@@ -736,19 +780,24 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
       if ( nlev3 == 1 ) loff3 = 0;
       else              loff3 = k*ngp;
 
-      const double *restrict idat1 = p1->data+loff1;
-      const double *restrict idat2 = p2->data+loff2;
-      const double *restrict idat3 = p3->data+loff3;
+      const double *restrict idat1 = pdata1+loff1;
+      const double *restrict idat2 = pdata2+loff2;
+      const double *restrict idat3 = pdata3+loff3;
       double *restrict odat = p->data+loff;
 
+      double ival2 = idat2[0];
+      double ival3 = idat3[0];
       for ( long i = 0; i < ngp; ++i ) 
 	{
-	  if ( nmiss1 && DBL_IS_EQUAL(idat1[i],missval1) )
+	  if ( ngp2 > 1 ) ival2 = idat2[i];
+	  if ( ngp3 > 1 ) ival3 = idat3[i];
+
+	  if ( nmiss1 && DBL_IS_EQUAL(idat1[i], missval1) )
 	    odat[i] = missval1;
 	  else if ( IS_NOT_EQUAL(idat1[i], 0) )
-	    odat[i] = DBL_IS_EQUAL(idat2[i],missval2) ? missval1 : idat2[i];
+	    odat[i] = DBL_IS_EQUAL(ival2, missval2) ? missval1 : ival2;
 	  else
-	    odat[i] = DBL_IS_EQUAL(idat3[i],missval3) ? missval1 : idat3[i];
+	    odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;
 	}
     }
 
