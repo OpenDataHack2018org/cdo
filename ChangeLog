@@ -2,6 +2,10 @@
 
 	* Version 1.6.8 released
 
+2015-03-26  Uwe Schulzweida
+
+	* gradsdes: added support for option 360_day_calendar
+
 2015-03-25  Uwe Schulzweida
 
 	* expr: added support for operator ?: (short ifelse)
