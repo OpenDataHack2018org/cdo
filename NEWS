@@ -25,7 +25,7 @@ Version 1.6.8 (26 March 2015):
        The output time stamp of all operators from the above modules
        are changed from the last to the middle contributing timestep.
        Use the environment variable CDO_TIMESTAT_DATE=last to set
-       the outout time stamp to the last contributing timestep.
+       the output time stamp to the last contributing timestep.
      * eof, eof3d: use area weights instead of no weights
        Use the environment variable CDO_WEIGHT_MODE=off to switch back to
        the non weighted version
