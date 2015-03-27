@@ -89,7 +89,7 @@ prompt> cat mypartab
 
 To apply this parameter table to a dataset use:
 @BeginVerbatim
-cdo setpartabn,mypartab  ifile  ofile
+cdo setpartabn,mypartab,convert  ifile  ofile
 @EndVerbatim
 This command renames the variable @bold{t} to @bold{ta}. The standard name of this variable is set to @bold{air_temperature} and 
 the unit is set to [@bold{K}] (converts the unit if necessary). The missing value will be set to @bold{1e+20}. 
