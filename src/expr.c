@@ -18,14 +18,18 @@
 #define    COMPGE(x,y)  ((x) >= (y) ? 1 : 0)
 #define    COMPNE(x,y)  (IS_NOT_EQUAL(x,y) ? 1 : 0)
 #define    COMPEQ(x,y)  (IS_EQUAL(x,y) ? 1 : 0)
-#define    COMPLEG(x,y) ((x) < (y) ? -1 : ((x) > (y) ? 1 : 0))
+#define   COMPLEG(x,y)  ((x) < (y) ? -1 : ((x) > (y) ? 1 : 0))
+#define   COMPAND(x,y)  (IS_NOT_EQUAL(x,0) && IS_NOT_EQUAL(y,0) ? 1 : 0)
+#define    COMPOR(x,y)  (IS_NOT_EQUAL(x,0) || IS_NOT_EQUAL(y,0) ? 1 : 0)
 #define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
 #define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
 #define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))
 #define  MVCOMPGE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGE(x,y))
 #define  MVCOMPNE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPNE(x,y))
 #define  MVCOMPEQ(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPEQ(x,y))
-#define  MVCOMPLEG(x,y) (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLEG(x,y))
+#define MVCOMPLEG(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLEG(x,y))
+#define MVCOMPAND(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPAND(x,y))
+#define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
 static double f_int(double x)  { return ((int)(x)); }
 static double f_nint(double x) { return (round(x)); }
@@ -179,6 +183,13 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLEG(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPLEG(cval, idat[i]);
       break;
+    case AND:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPAND(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPAND(cval, idat[i]);
+    case OR:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPOR(cval, idat[i]);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPOR(cval, idat[i]);
+      break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
       break;
@@ -273,6 +284,14 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLEG(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPLEG(idat[i], cval);
       break;
+    case AND:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPAND(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPAND(idat[i], cval);
+      break;
+    case OR:
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPOR(idat[i], cval);
+      else         for ( i=0; i<n; ++i ) odat[i] =   COMPOR(idat[i], cval);
+      break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
       break;
@@ -297,8 +316,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   long loff, loff1, loff2;
   int nmiss;
 
-  int nmiss1   = p1->nmiss;
-  int nmiss2   = p2->nmiss;
+  int nmiss1 = p1->nmiss;
+  int nmiss2 = p2->nmiss;
   double missval1 = p1->missval;
   double missval2 = p2->missval;
 
@@ -416,8 +435,16 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLEG(idat1[i], idat2[i]);
 	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLEG(idat1[i], idat2[i]);
 	  break;
+	case AND:
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPAND(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPAND(idat1[i], idat2[i]);
+	  break;
+	case OR:
+	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPOR(idat1[i], idat2[i]);
+	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPOR(idat1[i], idat2[i]);
+	  break;
 	default:
-	  cdoAbort("%s: operator %c unsupported!", __func__, oper);
+	  cdoAbort("%s: operator %d (%c) unsupported!", __func__, (int)oper, oper);
           break;
 	}
     }
@@ -1053,6 +1080,8 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 		  case NE:   printf("\tcompNE\n"); break;
 		  case EQ:   printf("\tcompEQ\n"); break;
 		  case LEG:  printf("\tcompLEG\n"); break;
+		  case AND:  printf("\tcompAND\n"); break;
+		  case OR:   printf("\tcompOR\n"); break;
 		  }
 	    }
 	  else

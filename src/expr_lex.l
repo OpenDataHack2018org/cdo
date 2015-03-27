@@ -78,6 +78,8 @@ M_E          {
 "<="            return LE;
 "=="            return EQ;
 "!="            return NE;
+"&&"            return AND;
+"||"            return OR;
 
 [ \t\n]+        ;       /* ignore whitespace */
 

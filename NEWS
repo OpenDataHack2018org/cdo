@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.6.9 (26 September 2015):
+
+   New features:
+     * expr: added support for operator ?:,&&,||
+
 Version 1.6.8 (26 March 2015):
 
    New features:

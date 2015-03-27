@@ -1,3 +1,7 @@
+2015-09-26  Uwe Schulzweida
+
+	* expr: added support for operator ?:,&&,||
+
 2015-03-26  Uwe Schulzweida
 
 	* Version 1.6.8 released

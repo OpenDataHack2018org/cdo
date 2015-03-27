@@ -1,4 +1,7 @@
 set cdoCmpl = (\
+- \
+- \
+- \
 L \
 M \
 O \
@@ -29,6 +32,10 @@ adisit \
 aexpr \
 aexprf \
 anomaly \
+ap2pl \
+ap2pl_lp \
+ap2plx \
+ap2plx_lp \
 asin \
 atan \
 atan2 \
@@ -54,16 +61,17 @@ chunit \
 chvar \
 cloudlayer \
 cmd \
+collgrid \
 com \
 command \
 complextorect \
 consecsum \
 consects \
 const \
-contour \
 conv_cmor_table \
 copy \
 cos \
+coshill \
 covar0 \
 covar0r \
 dayavg \
@@ -93,6 +101,7 @@ diffc \
 diffn \
 diffp \
 diffv \
+distgrid \
 div \
 divc \
 divcoslat \
@@ -206,21 +215,20 @@ genbic \
 genbil \
 gencon \
 gencon2 \
-gencons \
 gendis \
 gengrid \
 genlaf \
 gennn \
+genycon \
 geopotheight \
 ggstat \
 ggstats \
+gheight \
 globavg \
 gp2fc \
 gp2sp \
 gp2spl \
 gradsdes \
-graph \
-grfill \
 gridarea \
 gridboxavg \
 gridboxmax \
@@ -423,7 +431,6 @@ remapbil \
 remapcon \
 remapcon1 \
 remapcon2 \
-remapcons \
 remapdis \
 remapdis1 \
 remapeta \
@@ -432,6 +439,7 @@ remapeta_z \
 remaplaf \
 remapnn \
 remapsum \
+remapycon \
 replace \
 retocomplex \
 rhopot \
@@ -533,7 +541,6 @@ setvar \
 setvrange \
 setyear \
 setzaxis \
-shaded \
 shifttime \
 showcode \
 showdate \
@@ -570,6 +577,7 @@ sp2fc \
 sp2gp \
 sp2gpl \
 sp2sp \
+spartab \
 spcut \
 specinfo \
 spectrum \
@@ -588,6 +596,7 @@ splitsel \
 splittabnum \
 splitvar \
 splityear \
+splityearmon \
 splitzaxis \
 sqr \
 sqrt \
@@ -595,7 +604,6 @@ ssopar \
 stdatm \
 stimelogo \
 strbre \
-stream \
 strgal \
 strwin \
 studentt \
@@ -610,7 +618,9 @@ template1 \
 template2 \
 test \
 test2 \
+testcellsearch \
 testdata \
+testpointsearch \
 thinout \
 timavg \
 timcor \
@@ -653,8 +663,8 @@ varquot2test \
 varrms \
 vct \
 vct2 \
-vector \
 vertavg \
+vertint \
 vertmax \
 vertmean \
 vertmin \
@@ -734,12 +744,16 @@ ymonsub \
 ymonsum \
 ymonvar \
 ymonvar1 \
+yseasadd \
 yseasavg \
+yseasdiv \
 yseasmax \
 yseasmean \
 yseasmin \
+yseasmul \
 yseaspctl \
 yseasstd \
+yseassub \
 yseassum \
 yseasvar \
 zaxisdes \
