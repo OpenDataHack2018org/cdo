@@ -1089,6 +1089,10 @@ sub print_description {
     } elsif ( "$kword" eq "\@ENDLIST" ) {
       print TRFILE "\\end{defalist}\n";
       $list = 0;
+    } elsif ( "$kword" eq "\@BEGINTABLE4" ) {
+      print TRFILE "\\begin{tabular}[t]{|l|l|l|l|}\n";
+      print TRFILE "\\hline\n";
+      $table = 1;
     } elsif ( "$kword" eq "\@BEGINTABLE" ) {
       print TRFILE "\\begin{tabular}[t]{|l|l|l|}\n";
       print TRFILE "\\hline\n";
@@ -1191,6 +1195,8 @@ sub print_description {
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  $line =~ s/</\$<\$/og;
 	  $line =~ s/>/\$>\$/og;
+	  $line =~ s/\\or/\$||\$/og;
+	  $line =~ s/\\and/\\&\\&/og;
 	  $line =~ s/%/\\%/og;
 	  if ( $table == 1 ) { $line =~ s/$/ \\\\ \\hline/g; }
 	}
@@ -1211,6 +1217,8 @@ sub print_description {
 	$docline =~ s/\\_/_/g;
 	$docline =~ s/\\cite//og;
 	$docline =~ s/\\neq/!=/og;
+	$docline =~ s/\\and/&&/og;
+	$docline =~ s/\\or/||/og;
 	$docline =~ s/\\/\\\\/og;
 #	$docline =~ s/%/\\%/og;
 	$docline =~ s/"/\\"/og;

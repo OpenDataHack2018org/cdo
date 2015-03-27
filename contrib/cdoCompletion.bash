@@ -1,4 +1,7 @@
 complete -W "
+-- \
+-- \
+-- \
 -L \
 -M \
 -O \
@@ -29,6 +32,10 @@ adisit -adisit \
 aexpr -aexpr \
 aexprf -aexprf \
 anomaly -anomaly \
+ap2pl -ap2pl \
+ap2pl_lp -ap2pl_lp \
+ap2plx -ap2plx \
+ap2plx_lp -ap2plx_lp \
 asin -asin \
 atan -atan \
 atan2 -atan2 \
@@ -54,16 +61,17 @@ chunit -chunit \
 chvar -chvar \
 cloudlayer -cloudlayer \
 cmd -cmd \
+collgrid -collgrid \
 com -com \
 command -command \
 complextorect -complextorect \
 consecsum -consecsum \
 consects -consects \
 const -const \
-contour -contour \
 conv_cmor_table -conv_cmor_table \
 copy -copy \
 cos -cos \
+coshill -coshill \
 covar0 -covar0 \
 covar0r -covar0r \
 dayavg -dayavg \
@@ -93,6 +101,7 @@ diffc -diffc \
 diffn -diffn \
 diffp -diffp \
 diffv -diffv \
+distgrid -distgrid \
 div -div \
 divc -divc \
 divcoslat -divcoslat \
@@ -206,21 +215,20 @@ genbic -genbic \
 genbil -genbil \
 gencon -gencon \
 gencon2 -gencon2 \
-gencons -gencons \
 gendis -gendis \
 gengrid -gengrid \
 genlaf -genlaf \
 gennn -gennn \
+genycon -genycon \
 geopotheight -geopotheight \
 ggstat -ggstat \
 ggstats -ggstats \
+gheight -gheight \
 globavg -globavg \
 gp2fc -gp2fc \
 gp2sp -gp2sp \
 gp2spl -gp2spl \
 gradsdes -gradsdes \
-graph -graph \
-grfill -grfill \
 gridarea -gridarea \
 gridboxavg -gridboxavg \
 gridboxmax -gridboxmax \
@@ -423,7 +431,6 @@ remapbil -remapbil \
 remapcon -remapcon \
 remapcon1 -remapcon1 \
 remapcon2 -remapcon2 \
-remapcons -remapcons \
 remapdis -remapdis \
 remapdis1 -remapdis1 \
 remapeta -remapeta \
@@ -432,6 +439,7 @@ remapeta_z -remapeta_z \
 remaplaf -remaplaf \
 remapnn -remapnn \
 remapsum -remapsum \
+remapycon -remapycon \
 replace -replace \
 retocomplex -retocomplex \
 rhopot -rhopot \
@@ -533,7 +541,6 @@ setvar -setvar \
 setvrange -setvrange \
 setyear -setyear \
 setzaxis -setzaxis \
-shaded -shaded \
 shifttime -shifttime \
 showcode -showcode \
 showdate -showdate \
@@ -570,6 +577,7 @@ sp2fc -sp2fc \
 sp2gp -sp2gp \
 sp2gpl -sp2gpl \
 sp2sp -sp2sp \
+spartab -spartab \
 spcut -spcut \
 specinfo -specinfo \
 spectrum -spectrum \
@@ -588,6 +596,7 @@ splitsel -splitsel \
 splittabnum -splittabnum \
 splitvar -splitvar \
 splityear -splityear \
+splityearmon -splityearmon \
 splitzaxis -splitzaxis \
 sqr -sqr \
 sqrt -sqrt \
@@ -595,7 +604,6 @@ ssopar -ssopar \
 stdatm -stdatm \
 stimelogo -stimelogo \
 strbre -strbre \
-stream -stream \
 strgal -strgal \
 strwin -strwin \
 studentt -studentt \
@@ -610,7 +618,9 @@ template1 -template1 \
 template2 -template2 \
 test -test \
 test2 -test2 \
+testcellsearch -testcellsearch \
 testdata -testdata \
+testpointsearch -testpointsearch \
 thinout -thinout \
 timavg -timavg \
 timcor -timcor \
@@ -653,8 +663,8 @@ varquot2test -varquot2test \
 varrms -varrms \
 vct -vct \
 vct2 -vct2 \
-vector -vector \
 vertavg -vertavg \
+vertint -vertint \
 vertmax -vertmax \
 vertmean -vertmean \
 vertmin -vertmin \
@@ -734,12 +744,16 @@ ymonsub -ymonsub \
 ymonsum -ymonsum \
 ymonvar -ymonvar \
 ymonvar1 -ymonvar1 \
+yseasadd -yseasadd \
 yseasavg -yseasavg \
+yseasdiv -yseasdiv \
 yseasmax -yseasmax \
 yseasmean -yseasmean \
 yseasmin -yseasmin \
+yseasmul -yseasmul \
 yseaspctl -yseaspctl \
 yseasstd -yseasstd \
+yseassub -yseassub \
 yseassum -yseassum \
 yseasvar -yseasvar \
 zaxisdes -zaxisdes \

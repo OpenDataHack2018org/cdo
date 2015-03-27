@@ -36,11 +36,13 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %token <varnm>  VARIABLE
 %token <fname>  FUNCTION
 
-%left LEG GE LE EQ NE '>' '<' '='
+%left LEG GE LE EQ NE '>' '<'
 %left '+' '-'
 %left '*' '/'
-%left '?' ':'
-%right  '^'
+%left AND OR
+%right '='
+%right '?' ':'
+%right '^'
 %nonassoc UMINUS
 
 %type <nPtr> stmt expr stmt_list
@@ -85,6 +87,8 @@ expr:
         | expr NE  expr           { $$ = expr_opr(NE,  2, $1, $3); }
         | expr EQ  expr           { $$ = expr_opr(EQ,  2, $1, $3); }
         | expr LEG expr           { $$ = expr_opr(LEG, 2, $1, $3); }
+        | expr AND expr           { $$ = expr_opr(AND, 2, $1, $3); }
+        | expr OR  expr           { $$ = expr_opr(OR,  2, $1, $3); }
         | expr '?' expr ':' expr  { $$ = expr_opr('?', 3, $1, $3, $5); }
         | '(' expr ')'            { $$ = $2; }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }

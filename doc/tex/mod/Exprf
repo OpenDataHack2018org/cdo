@@ -18,16 +18,29 @@ Constansts: M_PI, M_E
 @BeginDescription
 This module arithmetically processes every timestep of the input dataset.
 Each individual assignment statement have to end with a semi-colon.
-@IfMan
-The basic arithmetic operations addition +, subtraction -, multiplication *,
-division / and exponentiation ^ can be used.
-Available logical operators are <, >, <=, >=, !=, == and <=>.
-@EndifMan
-@IfDoc
-The basic arithmetic operations addition \begin{math}+\end{math}, subtraction \begin{math}-\end{math}, multiplication \begin{math}*\end{math},
-division \begin{math}/\end{math} and exponentiation \^\  can be used.
-Available logical operators are <, >, <=, >=, !=, == and <=>.
-@EndifDoc
+
+The following operators are supported:
+
+@BeginTable4
+ @bold{Operator}   & @bold{Meaning}             & @bold{Example}   & @bold{Result} 
+     =      & assignment          & x = y     & Assigns y to x
+     +      & addition            & x + y     & Sum of x and y
+     -      & subtraction         & x - y     & Difference of x and y    
+     *      & multiplication      & x * y     & Product of x and y 
+     /      & division            & x / y     & Quotient of x and y
+     \^\    & exponentiation      & x\^\ y    & Exponentiates x with y 
+     ==     & equal to            & x == y    & 1, if x equal to y; else 0
+     !=     & not equal to        & x != y    & 1, if x not equal to y; else 0
+     >      & greater than        & x > y     & 1, if x greater than y; else 0
+     <      & less than           & x < y     & 1, if x less than y; else 0
+     >=     & greater equal       & x >= y    & 1, if x greater equal y; else 0
+     <=     & less equal          & x <= y    & 1, if x less equal y; else 0
+     <=>    & less equal greater  & x <=> y   & -1, if x less y; 1, if x greater y; else 0 
+     \&\&   & logical AND         & x \&\& y  & 1, if x and y not equal 0; else 0
+     \or     & logical OR          & x \or y   & 1, if x or y not equal 0; else 0
+     ?:     & ternary conditional & x ? y : z & y, if x not equal 0, else z 
+@EndTable
+
 The following intrinsic functions are available:
 @BeginList log10(x)
 @Item = abs(x)

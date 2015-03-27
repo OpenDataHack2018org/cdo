@@ -9,11 +9,11 @@
 
 @BeginDescription
 This module calculates the time series of the principal coefficients for given EOF
-(empirical orthogonal functions) and data. Time steps in @file{ifile1} are 
-assumed to be the EOFs, Time steps in @file{ifile2} are assumed to be the
-time series. Weights are taken into account, which is why EOF output is @bold{not} weighted. 
-Note, that this operator calculates a weighted dot product of the fields in
-@file{ifile1} and @file{ifile2}.
+(empirical orthogonal functions) and data. Time steps in @file{ifile1} are assumed to be the EOFs,
+time steps in @file{ifile2} are assumed to be the time series.
+@C Weights are taken into account, which is why EOF output is @bold{not} weighted.
+Note, that this operator calculates a weighted dot product of the fields in @file{ifile1} and @file{ifile2}.
+For consistency set the environment variable @env{CDO_WEIGHT_MODE=off} when using @mod{eof} or @mod{eof3d}.
 @IfDoc
 Given a set of EOFs @math{e_j} and a time series of data @math{z(t)} 
 with @math{p} entries for each timestep from which @math{e_j} have been calculated, this 
@@ -32,9 +32,9 @@ with~\sum_{t=1}^{n}o_j(t)=0\forall j\in\{1,\ldots,p\}.
 @EndifDoc
 
 There will be a separate file containing a time series of principal coefficients
-with time information from @file{ifile2} for each EOF in @file{ifile1}. Output files
-will be numbered as @file{<obase><neof><suffix>} where @file{neof+1} is the number of the
-EOF (timestep) in @file{ifile1} and @file{suffix} is the filename extension derived from the file format. 
+with time information from @file{ifile2} for each EOF in @file{ifile1}. Output files will be
+numbered as @file{<obase><neof><suffix>} where @file{neof+1} is the number of the EOF (timestep)
+in @file{ifile1} and @file{suffix} is the filename extension derived from the file format. 
 @EndDescription
 @EndModule
 
@@ -53,19 +53,19 @@ Set this variable to NULL to disable the adding of a file suffix.
 
 
 @BeginExample
-To calculate principal coefficients of the first 40 EOFs of @file{anom_file}, 
-and write them to files beginning with obase, use:
+To calculate principal coefficients of the first 40 EOFs of @file{anom_file}, and write
+them to files beginning with obase, use:
 @BeginVerbatim
+   export CDO_WEIGHT_MODE=off
    cdo eof,40 anom_file eval_file eof_file
    cdo eofcoeff eof_file anom_file obase
 @EndVerbatim
-The principal coefficients of the first EOF will be in the file
-@file{obase000000.nc} (and so forth for higher EOFs, 
-@math{n}th EOF will be in @file{obase<n-1>}).
+The principal coefficients of the first EOF will be in the file @file{obase000000.nc}
+(and so forth for higher EOFs, @math{n}th EOF will be in @file{obase<n-1>}).
 
-If the dataset @file{ifile} does not containt anomalies, process them first,
-and use:
+If the dataset @file{ifile} does not containt anomalies, process them first, and use:
 @BeginVerbatim
+   export CDO_WEIGHT_MODE=off
    cdo sub ifile -timmean ifile anom_file	
    cdo eof,40 anom_file eval_file eof_file
    cdo eofcoeff eof_file anom_file obase	

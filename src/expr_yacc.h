@@ -54,7 +54,9 @@ extern int yydebug;
      LE = 263,
      GE = 264,
      LEG = 265,
-     UMINUS = 266
+     OR = 266,
+     AND = 267,
+     UMINUS = 268
    };
 #endif
 /* Tokens.  */
@@ -66,7 +68,9 @@ extern int yydebug;
 #define LE 263
 #define GE 264
 #define LEG 265
-#define UMINUS 266
+#define OR 266
+#define AND 267
+#define UMINUS 268
 
 
 
