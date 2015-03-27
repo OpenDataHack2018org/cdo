@@ -1,5 +1,6 @@
-2015-09-26  Uwe Schulzweida
+2015-03-27  Uwe Schulzweida
 
+	* Fldstat: added parameter noweights to use constant grid cell area weights
 	* expr: added support for operator ?:,&&,||
 
 2015-03-26  Uwe Schulzweida

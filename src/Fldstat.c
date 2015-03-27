@@ -126,10 +126,26 @@ void *Fldstat(void *argument)
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
     }
 
+  int useweights = TRUE;
+
   if ( operfunc == func_mean || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std ||
        operfunc == func_var1 || operfunc == func_std1 )
-    needWeights = TRUE;
+    {
+      needWeights = TRUE;
+      unsigned npar = operatorArgc();
+      if ( npar > 0 )
+	{
+	  char **parnames = operatorArgv();
+
+	  if ( cdoVerbose )
+	    for ( unsigned i = 0; i < npar; i++ )
+	      cdoPrint("key %u = %s", i+1, parnames[i]);
+
+	  if ( strcmp(parnames[0], "noweights") == 0 ) useweights = FALSE;
+	  else cdoAbort("Parameter >%s< unsupported! Supported parameter are: noweights", parnames[0]);
+	}
+    }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -163,7 +179,14 @@ void *Fldstat(void *argument)
   field.ptr    = (double*) malloc(lim*sizeof(double));
   field.weight = NULL;
   if ( needWeights )
-    field.weight = (double*) malloc(lim*sizeof(double));
+    {
+      field.weight = (double*) malloc(lim*sizeof(double));
+      if ( !useweights )
+	{
+	  cdoPrint("Using constant grid cell area weights!");
+	  for ( int i = 0; i < lim; ++i ) field.weight[i] = 1;
+	}
+    }
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -194,14 +217,14 @@ void *Fldstat(void *argument)
 	    {
 	      lastgrid = field.grid;
 	      field.weight[0] = 1;
-	      if ( field.size > 1 )
+	      if ( useweights && field.size > 1 )
 		{
-		  int wstatus = gridWeights(field.grid, field.weight);
+		  int wstatus = wstatus = gridWeights(field.grid, field.weight);
 		  if ( wstatus != 0 && tsID == 0 && levelID == 0 )
 		    {
 		      char varname[CDI_MAX_NAME];
 		      vlistInqVarName(vlistID1, varID, varname);
-		      cdoWarning("Using constant grid cell area weights for variable %s!", varname);
+		      cdoWarning("Grid cell bounds not available, using constant grid cell area weights for variable %s!", varname);
 		    }
 		}
 	    }
