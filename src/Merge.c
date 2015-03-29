@@ -128,18 +128,15 @@ int vlistConstVars(int vlistID)
 
 void *Merge(void *argument)
 {
-  int streamID1 = -1, streamID2 = -1;
+  int streamID1 = -1;
   int varID, varID2;
   int nrecs = 0;
   int recID, levelID, levelID2;
   int index;
-  int vlistID1 = -1, vlistID2;
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
-  int taxisID1, taxisID2;
   //int skip_same_var = FALSE;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
@@ -185,11 +182,11 @@ void *Merge(void *argument)
       vlistIDs[index]  = streamInqVlist(streamID1);
     }
 
-  vlistID1 = vlistIDs[0];
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID1 = vlistIDs[0];
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
 
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
   vlistCopy(vlistID2, vlistIDs[0]);
   for ( index = 1; index < nmerge; index++ )
     {
@@ -231,11 +228,12 @@ void *Merge(void *argument)
       vlistPrint(vlistID2);
     }
        
-  streamID2 = streamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
   streamDefVlist(streamID2, vlistID2);
 
+  double *array = NULL;
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID2);
