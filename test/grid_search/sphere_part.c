@@ -157,11 +157,11 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
    struct grid_cell cell;
    struct bounding_circle bnd_circle;
 
-   init_grid_cell(&cell);
+   yac_init_grid_cell(&cell);
 
    for (i = 0; i < num_cell_ids; ++i) {
 
-      get_grid_cell2(grid, local_cell_ids[i], &cell, &bnd_circle);
+      yac_get_grid_cell2(grid, local_cell_ids[i], &cell, &bnd_circle);
 
       balance_point[0] += bnd_circle.base_vector[0];
       balance_point[1] += bnd_circle.base_vector[1];
@@ -190,7 +190,7 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
 
    for (i = 0; i < num_cell_ids; ++i) {
 
-      get_grid_cell2(grid, local_cell_ids[i], &cell, &bnd_circle);
+      yac_get_grid_cell2(grid, local_cell_ids[i], &cell, &bnd_circle);
 
       // get angle between the norm vector of the great circle and the base
       // point of the bounding circle
@@ -243,7 +243,7 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
             struct interval iv;
             unsigned cell_idx = I[i];
 
-            get_grid_cell2(grid, I[i], &cell, &bnd_circle);
+            yac_get_grid_cell2(grid, I[i], &cell, &bnd_circle);
             crossproduct_ld(parent_node->gc_norm_vector,
                          bnd_circle.base_vector, GCp);
             crossproduct_ld(GCp, parent_node->gc_norm_vector, bVp);
@@ -261,15 +261,15 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
          parent_node->I.ivt.head_node = realloc(parent_node->I.ivt.head_node,
             I_size * sizeof(*(parent_node->I.ivt.head_node)));
 
-         generate_interval_tree(parent_node->I.ivt.head_node,
-                                parent_node->I.ivt.num_nodes);
+         yac_generate_interval_tree(parent_node->I.ivt.head_node,
+                                    parent_node->I.ivt.num_nodes);
          parent_node->flags |= I_IS_INTERVAL_TREE;
       } else
          parent_node->I.list = realloc(I, I_size * sizeof(unsigned));
    } else
       parent_node->I.list = NULL;
 
-   free_grid_cell(&cell);
+   yac_free_grid_cell(&cell);
 
    // check whether the lists are small enough (if not -> partition again)
    if (U_size <= threshold) {
@@ -299,7 +299,7 @@ static void partition_data (struct grid * grid, unsigned * local_cell_ids,
    }
 }
 
-struct grid_search * sphere_part_search_new (struct grid * grid) {
+struct grid_search * yac_sphere_part_search_new (struct grid * grid) {
 
    struct sphere_part_search * search = malloc(1 * sizeof(*search));
 
@@ -313,7 +313,7 @@ struct grid_search * sphere_part_search_new (struct grid * grid) {
    unsigned * local_cell_ids;
    unsigned num_grid_cells;
 
-   num_grid_cells = get_num_grid_cells(grid);
+   num_grid_cells = yac_get_num_grid_cells(grid);
    local_cell_ids = malloc(num_grid_cells * sizeof(*local_cell_ids));
 
    unsigned i;
@@ -391,8 +391,8 @@ static void search_bnd_circle(struct sphere_part_node * node,
 
          search_interval_tree_buffer->num_overlaps = 0;
 
-         search_interval_tree(node->I.ivt.head_node, node->I.ivt.num_nodes,
-                              search_interval, search_interval_tree_buffer);
+         yac_search_interval_tree(node->I.ivt.head_node, node->I.ivt.num_nodes,
+                                  search_interval, search_interval_tree_buffer);
 
          ENSURE_ARRAY_SIZE(*overlap_cells, *overlap_cells_array_size,
                            *num_overlap_cells +
@@ -476,8 +476,8 @@ static void search_point(struct sphere_part_node * node,
 
          search_interval_tree_buffer->num_overlaps = 0;
 
-         search_interval_tree(node->I.ivt.head_node, node->I.ivt.num_nodes,
-                              search_interval, search_interval_tree_buffer);
+         yac_search_interval_tree(node->I.ivt.head_node, node->I.ivt.num_nodes,
+                                  search_interval, search_interval_tree_buffer);
 
          ENSURE_ARRAY_SIZE(*overlap_cells, *overlap_cells_array_size,
                            *num_overlap_cells +
@@ -509,7 +509,7 @@ static void sphere_part_do_cell_search(struct grid_search * search,
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
    struct sphere_part_node * base_node = &(sp_search->base_node);
 
-   unsigned num_cells = get_num_grid_cells(grid_data);
+   unsigned num_cells = yac_get_num_grid_cells(grid_data);
 
    unsigned * temp_search_results = NULL;
    unsigned temp_search_results_array_size = 0;
@@ -519,8 +519,8 @@ static void sphere_part_do_cell_search(struct grid_search * search,
    struct grid_cell cell_a, cell_b;
    struct bounding_circle circle_a, circle_b;
 
-   init_grid_cell(&cell_a);
-   init_grid_cell(&cell_b);
+   yac_init_grid_cell(&cell_a);
+   yac_init_grid_cell(&cell_b);
 
    struct overlaps search_interval_tree_buffer = {0, 0, NULL};
 
@@ -532,7 +532,7 @@ static void sphere_part_do_cell_search(struct grid_search * search,
 
    for (i = 0; i < num_cells; ++i) {
 
-      get_grid_cell2(grid_data, i, &cell_a, &circle_a);
+      yac_get_grid_cell2(grid_data, i, &cell_a, &circle_a);
 
       num_temp_search_results = 0;
 
@@ -548,10 +548,10 @@ static void sphere_part_do_cell_search(struct grid_search * search,
 
       for (j = 0; j < num_temp_search_results; ++j) {
 
-         get_grid_cell2(sp_search->grid_data, temp_search_results[j],
-                        &cell_b, &circle_b);
+         yac_get_grid_cell2(sp_search->grid_data, temp_search_results[j],
+                            &cell_b, &circle_b);
 
-         if (check_overlap_cells2(cell_a, circle_a, cell_b, circle_b)) {
+         if (yac_check_overlap_cells2(cell_a, circle_a, cell_b, circle_b)) {
 
             tgt_src_dependencies[total_num_dependencies++] =
                temp_search_results[j];
@@ -560,16 +560,16 @@ static void sphere_part_do_cell_search(struct grid_search * search,
       }
    }
 
-   free_grid_cell(&cell_a);
-   free_grid_cell(&cell_b);
+   yac_free_grid_cell(&cell_a);
+   yac_free_grid_cell(&cell_b);
    free(temp_search_results);
    free(search_interval_tree_buffer.overlap_iv);
 
    tgt_src_dependencies = realloc(tgt_src_dependencies, total_num_dependencies *
                                   sizeof(tgt_src_dependencies));
-   init_dep_list(tgt_to_src_cells);
-   set_dependencies(tgt_to_src_cells, num_cells, num_src_per_tgt_cell,
-                    tgt_src_dependencies);
+   yac_init_dep_list(tgt_to_src_cells);
+   yac_set_dependencies(tgt_to_src_cells, num_cells, num_src_per_tgt_cell,
+                        tgt_src_dependencies);
 }
 
 static void sphere_part_do_cell_search_single(struct grid_search * search,
@@ -583,7 +583,7 @@ static void sphere_part_do_cell_search_single(struct grid_search * search,
 
    struct bounding_circle circle_a;
 
-   get_cell_bounding_circle(cell, &circle_a);
+   yac_get_cell_bounding_circle(cell, &circle_a);
 
    struct overlaps search_interval_tree_buffer = {0, 0, NULL};
 
@@ -599,20 +599,20 @@ static void sphere_part_do_cell_search_single(struct grid_search * search,
    struct grid_cell cell_b;
    struct bounding_circle circle_b;
 
-   init_grid_cell(&cell_b);
+   yac_init_grid_cell(&cell_b);
 
    for (unsigned j = 0; j < *n_cells; ++j) {
 
-      get_grid_cell2(sp_search->grid_data, (*cells)[j],
-                     &cell_b, &circle_b);
+      yac_get_grid_cell2(sp_search->grid_data, (*cells)[j],
+                         &cell_b, &circle_b);
 
-      if (check_overlap_cells2(cell, circle_a, cell_b, circle_b))
+      if (yac_check_overlap_cells2(cell, circle_a, cell_b, circle_b))
          (*cells)[n_cells_final++] = (*cells)[j];
    }
 
    *n_cells = n_cells_final;
 
-   free_grid_cell(&cell_b);
+   yac_free_grid_cell(&cell_b);
    free(search_interval_tree_buffer.overlap_iv);
 }
 
@@ -623,7 +623,7 @@ static void sphere_part_do_point_search_c(struct grid_search * search,
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
    struct sphere_part_node * base_node = &(sp_search->base_node);
 
-   unsigned num_corners = get_num_grid_corners(grid_data);
+   unsigned num_corners = yac_get_num_grid_corners(grid_data);
 
    unsigned * temp_search_results = NULL;
    unsigned temp_search_results_array_size = 0;
@@ -633,7 +633,7 @@ static void sphere_part_do_point_search_c(struct grid_search * search,
    struct grid_cell cell;
    struct bounding_circle bnd_circle;
 
-   init_grid_cell(&cell);
+   yac_init_grid_cell(&cell);
 
    struct overlaps search_interval_tree_buffer = {0, 0, NULL};
 
@@ -645,8 +645,8 @@ static void sphere_part_do_point_search_c(struct grid_search * search,
 
    for (i = 0; i < num_corners; ++i) {
 
-      struct point point = {.lon = get_corner_x_coord(grid_data, i),
-                            .lat = get_corner_y_coord(grid_data, i)};
+      struct point point = {.lon = yac_get_corner_x_coord(grid_data, i),
+                            .lat = yac_get_corner_y_coord(grid_data, i)};
       double point_3d[3];
 
       LLtoXYZ(point.lon, point.lat, point_3d);
@@ -664,10 +664,10 @@ static void sphere_part_do_point_search_c(struct grid_search * search,
 
       for (j = 0; j < num_temp_search_results; ++j) {
 
-         get_grid_cell2(sp_search->grid_data, temp_search_results[j],
-                        &cell, &bnd_circle);
+         yac_get_grid_cell2(sp_search->grid_data, temp_search_results[j],
+                            &cell, &bnd_circle);
 
-         if (point_in_cell2(point, point_3d, cell, bnd_circle)) {
+         if (yac_point_in_cell2(point, point_3d, cell, bnd_circle)) {
 
             tgt_src_dependencies[total_num_dependencies++] =
                temp_search_results[j];
@@ -676,15 +676,15 @@ static void sphere_part_do_point_search_c(struct grid_search * search,
       }
    }
 
-   free_grid_cell(&cell);
+   yac_free_grid_cell(&cell);
    free(temp_search_results);
    free(search_interval_tree_buffer.overlap_iv);
 
    tgt_src_dependencies = realloc(tgt_src_dependencies, total_num_dependencies *
                                   sizeof(tgt_src_dependencies));
-   init_dep_list(tgt_to_src_cells);
-   set_dependencies(tgt_to_src_cells, num_corners, num_src_per_tgt_corner,
-                    tgt_src_dependencies);
+   yac_init_dep_list(tgt_to_src_cells);
+   yac_set_dependencies(tgt_to_src_cells, num_corners, num_src_per_tgt_corner,
+                        tgt_src_dependencies);
 }
 
 static void sphere_part_do_point_search_c2(struct grid_search * search,
@@ -704,7 +704,7 @@ static void sphere_part_do_point_search_c2(struct grid_search * search,
    struct grid_cell cell;
    struct bounding_circle bnd_circle;
 
-   init_grid_cell(&cell);
+   yac_init_grid_cell(&cell);
 
    struct overlaps search_interval_tree_buffer = {0, 0, NULL};
 
@@ -735,10 +735,10 @@ static void sphere_part_do_point_search_c2(struct grid_search * search,
 
       for (j = 0; j < num_temp_search_results; ++j) {
 
-         get_grid_cell2(sp_search->grid_data, temp_search_results[j],
-                        &cell, &bnd_circle);
+         yac_get_grid_cell2(sp_search->grid_data, temp_search_results[j],
+                            &cell, &bnd_circle);
 
-         if (point_in_cell2(point, point_3d, cell, bnd_circle)) {
+         if (yac_point_in_cell2(point, point_3d, cell, bnd_circle)) {
 
             tgt_src_dependencies[total_num_dependencies++] =
                temp_search_results[j];
@@ -747,15 +747,15 @@ static void sphere_part_do_point_search_c2(struct grid_search * search,
       }
    }
 
-   free_grid_cell(&cell);
+   yac_free_grid_cell(&cell);
    free(temp_search_results);
    free(search_interval_tree_buffer.overlap_iv);
 
    tgt_src_dependencies = realloc(tgt_src_dependencies, total_num_dependencies *
                                   sizeof(tgt_src_dependencies));
-   init_dep_list(tgt_to_src_cells);
-   set_dependencies(tgt_to_src_cells, num_points, num_src_per_tgt_corner,
-                    tgt_src_dependencies);
+   yac_init_dep_list(tgt_to_src_cells);
+   yac_set_dependencies(tgt_to_src_cells, num_points, num_src_per_tgt_corner,
+                        tgt_src_dependencies);
 }
 
 static void sphere_part_do_point_search_p(struct grid_search * search,
@@ -764,8 +764,8 @@ static void sphere_part_do_point_search_p(struct grid_search * search,
 
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
 
-   grid_search_utils_do_point_search_p(search, sp_search->grid_data, grid_data,
-                                       target_to_src_points);
+   yac_grid_search_utils_do_point_search_p(search, sp_search->grid_data, grid_data,
+                                           target_to_src_points);
 }
 
 static void sphere_part_do_point_search_p2(struct grid_search * search,
@@ -776,9 +776,9 @@ static void sphere_part_do_point_search_p2(struct grid_search * search,
 
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
 
-   grid_search_utils_do_point_search_p2(search, sp_search->grid_data,
-                                        x_coordinates, y_coordinates,
-                                        num_points, target_to_src_points);
+   yac_grid_search_utils_do_point_search_p2(search, sp_search->grid_data,
+                                            x_coordinates, y_coordinates,
+                                            num_points, target_to_src_points);
 }
 
 static void sphere_part_do_point_search_p3(struct grid_search * search,
@@ -788,9 +788,9 @@ static void sphere_part_do_point_search_p3(struct grid_search * search,
                                            struct dep_list * target_to_src_points,
                                            struct points * points) {
 
-   grid_search_utils_do_point_search_p3(search, x_coordinates, y_coordinates,
-                                        num_points, target_to_src_points,
-                                        points);
+   yac_grid_search_utils_do_point_search_p3(search, x_coordinates, y_coordinates,
+                                            num_points, target_to_src_points,
+                                            points);
 }
 
 
@@ -803,9 +803,9 @@ static void sphere_part_do_point_search_p4 (struct grid_search * search,
 
    struct sphere_part_search * sp_search = (struct sphere_part_search *)search;
 
-   grid_search_utils_do_point_search_p4(search, sp_search->grid_data,
-                                        x_coordinate, y_coordinate, n_points,
-                                        points_size, points);
+   yac_grid_search_utils_do_point_search_p4(search, sp_search->grid_data,
+                                            x_coordinate, y_coordinate, n_points,
+                                            points_size, points);
 }
 
 static void free_sphere_part_tree (struct sphere_part_node * tree) {
@@ -836,7 +836,7 @@ static void delete_sphere_part_search(struct grid_search * search) {
 }
 
 #ifdef SPHERE_PART_DEBUG
-struct sphere_part_node * get_sphere_part_tree(struct grid_search * search) {
+struct sphere_part_node * yac_get_sphere_part_tree(struct grid_search * search) {
 
    return &(((struct sphere_part_search *)search)->base_node);
 }

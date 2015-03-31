@@ -39,11 +39,11 @@
 
 #include "grid.h"
 
-struct grid * reg2d_grid_new(double * coordinates_x, double * coordinates_y,
-                             unsigned const num_cells[2],
-                             unsigned const cyclic[2]);
+struct grid * yac_reg2d_grid_new(double * coordinates_x, double * coordinates_y,
+                                 unsigned const num_cells[2],
+                                 unsigned const cyclic[2]);
 
-struct grid * unpack_reg2d_grid(double * dble_buf, unsigned * dble_buf_data_size,
-                                unsigned * uint_buf, unsigned * uint_buf_data_size);
+struct grid * yac_unpack_reg2d_grid(double * dble_buf, unsigned * dble_buf_data_size,
+                                    unsigned * uint_buf, unsigned * uint_buf_data_size);
 
 #endif // GRID_REG2D_H

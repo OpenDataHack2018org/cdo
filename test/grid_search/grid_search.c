@@ -31,103 +31,103 @@
 #include "grid_search.h"
 #include "utils.h"
 
-void do_cell_search (struct grid_search * search, struct grid * grid_data,
-                     struct dep_list * tgt_to_src_cells) {
+void yac_do_cell_search (struct grid_search * search, struct grid * grid_data,
+                         struct dep_list * tgt_to_src_cells) {
 
    if (search->vtable->do_cell_search == NULL)
-      abort_message("ERROR: routine not implemented: do_cell_search",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_cell_search",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_cell_search(search, grid_data, tgt_to_src_cells);
 }
 
-void do_cell_search_single (struct grid_search * search,
-                            struct grid_cell grid_cell,
-                            unsigned * n_cells, unsigned * cells_size,
-                            unsigned ** cells) {
+void yac_do_cell_search_single (struct grid_search * search,
+                                struct grid_cell grid_cell,
+                                unsigned * n_cells, unsigned * cells_size,
+                                unsigned ** cells) {
 
    if (search->vtable->do_cell_search_single == NULL)
-      abort_message("ERROR: routine not implemented: do_cell_search_single",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_cell_search_single",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_cell_search_single(search, grid_cell, n_cells,
                                          cells_size, cells);
 }
 
-void do_point_search_c (struct grid_search * search, struct grid * grid_data,
-                        struct dep_list * tgt_to_src_cells) {
+void yac_do_point_search_c (struct grid_search * search, struct grid * grid_data,
+                            struct dep_list * tgt_to_src_cells) {
 
    if (search->vtable->do_point_search_c == NULL)
-      abort_message("ERROR: routine not implemented: do_point_search_c",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_point_search_c",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_point_search_c(search, grid_data, tgt_to_src_cells);
 }
 
-void do_point_search_c2 (struct grid_search * search, double * x_coordinates,
-                         double * y_coordinates, unsigned num_points,
-                         struct dep_list * tgt_to_src_cells) {
+void yac_do_point_search_c2 (struct grid_search * search, double * x_coordinates,
+                             double * y_coordinates, unsigned num_points,
+                             struct dep_list * tgt_to_src_cells) {
 
    if (search->vtable->do_point_search_c2 == NULL)
-      abort_message("ERROR: routine not implemented: do_point_search_c2",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_point_search_c2",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_point_search_c2(search, x_coordinates, y_coordinates,
                                      num_points, tgt_to_src_cells);
 }
 
-void do_point_search_p (struct grid_search * search, struct grid * grid_data,
-                        struct dep_list * target_to_src_points) {
+void yac_do_point_search_p (struct grid_search * search, struct grid * grid_data,
+                            struct dep_list * target_to_src_points) {
 
    if (search->vtable->do_point_search_p == NULL)
-      abort_message("ERROR: routine not implemented: do_point_search_p",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_point_search_p",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_point_search_p(search, grid_data, target_to_src_points);
 }
 
-void do_point_search_p2 (struct grid_search * search, double * x_coordinates,
-                         double * y_coordinates, unsigned num_points,
-                         struct dep_list * target_to_src_points) {
+void yac_do_point_search_p2 (struct grid_search * search, double * x_coordinates,
+                             double * y_coordinates, unsigned num_points,
+                             struct dep_list * target_to_src_points) {
 
    if (search->vtable->do_point_search_p2 == NULL)
-      abort_message("ERROR: routine not implemented: do_point_search_p2",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_point_search_p2",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_point_search_p2(search, x_coordinates, y_coordinates, 
                                      num_points, target_to_src_points);
 }
 
-void do_point_search_p3 (struct grid_search * search, double * x_coordinates,
-                         double * y_coordinates, unsigned num_points,
-                         struct dep_list * target_to_src_points,
-                         struct points * points) {
+void yac_do_point_search_p3 (struct grid_search * search, double * x_coordinates,
+                             double * y_coordinates, unsigned num_points,
+                             struct dep_list * target_to_src_points,
+                             struct points * points) {
 
    if (search->vtable->do_point_search_p3 == NULL)
-      abort_message("ERROR: routine not implemented: do_point_search_p3",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_point_search_p3",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_point_search_p3(search, x_coordinates, y_coordinates, 
                                       num_points, target_to_src_points, points);
 }
 
-void do_point_search_p4 (struct grid_search * search, double x_coordinate,
-                         double y_coordinate, unsigned * n_points,
-                         unsigned * points_size, unsigned ** points) {
+void yac_do_point_search_p4 (struct grid_search * search, double x_coordinate,
+                             double y_coordinate, unsigned * n_points,
+                             unsigned * points_size, unsigned ** points) {
 
    if (search->vtable->do_point_search_p4 == NULL)
-      abort_message("ERROR: routine not implemented: do_point_search_p4",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: do_point_search_p4",
+                                 __FILE__, __LINE__);
 
    search->vtable->do_point_search_p4(search, x_coordinate, y_coordinate,
                                       n_points, points_size, points);
 }
 
-void delete_grid_search (struct grid_search * search) {
+void yac_delete_grid_search (struct grid_search * search) {
 
    if (search->vtable->delete_grid_search == NULL)
-      abort_message("ERROR: routine not implemented: delete_grid_search",
-                    __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: routine not implemented: delete_grid_search",
+                                 __FILE__, __LINE__);
 
    search->vtable->delete_grid_search(search);
 }

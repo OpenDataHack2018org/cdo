@@ -81,8 +81,8 @@ static void delete_reg2d_search(struct grid_search * search) {
 
    free(reg2d_search->bucket_grid_x_coords);
    free(reg2d_search->bucket_grid_y_coords);
-   delete_grid(reg2d_search->bucket_grid);
-   free_dep_list(&(reg2d_search->bucket_to_cell));
+   yac_delete_grid(reg2d_search->bucket_grid);
+   yac_free_dep_list(&(reg2d_search->bucket_to_cell));
    free(search);
 }
 
@@ -313,10 +313,10 @@ void init_buckets(struct reg2d_search * reg2d_search, double grid_extent[2][2],
 
    // register the bucket grid as a regular grid in lon and lat
 
-   reg2d_search->bucket_grid = reg2d_grid_new(coordinates_x, coordinates_y,
-                                               bucket_cells, cyclic);
+   reg2d_search->bucket_grid = yac_reg2d_grid_new(coordinates_x, coordinates_y,
+						  bucket_cells, cyclic);
 
-   init_dep_list(&reg2d_search->bucket_to_cell);
+   yac_init_dep_list(&reg2d_search->bucket_to_cell);
 }
 
 // ==============================================================================
@@ -334,26 +334,26 @@ void search_on_bucket_grid (struct reg2d_search * reg2d_search, struct grid * gr
    double const * x_coords;
    double const * y_coords;
 
-   x_coords = get_x_coords(grid_data);
-   y_coords = get_y_coords(grid_data);
+   x_coords = yac_get_x_coords(grid_data);
+   y_coords = yac_get_y_coords(grid_data);
 
-   num_x_coords = get_size_x_coords(grid_data);
-   num_y_coords = get_size_y_coords(grid_data);
+   num_x_coords = yac_get_size_x_coords(grid_data);
+   num_y_coords = yac_get_size_y_coords(grid_data);
 
    found_x    = malloc (num_x_coords * sizeof(*found_x));
    found_y    = malloc (num_y_coords * sizeof(*found_y));
    position_x = malloc (num_x_coords * sizeof(*position_x));
    position_y = malloc (num_y_coords * sizeof(*position_y));
 
-   bisection_search(x_coords, num_x_coords, 
-            reg2d_search->bucket_grid_x_coords, 
-            reg2d_search->num_buckets[0]+1, 
-            position_x, found_x, 2*M_PI);
+   yac_bisection_search(x_coords, num_x_coords, 
+			reg2d_search->bucket_grid_x_coords, 
+			reg2d_search->num_buckets[0]+1, 
+			position_x, found_x, 2*M_PI);
 
-   bisection_search(y_coords, num_y_coords, 
-            reg2d_search->bucket_grid_y_coords, 
-            reg2d_search->num_buckets[1]+1, 
-            position_y, found_y, 0);
+   yac_bisection_search(y_coords, num_y_coords, 
+			reg2d_search->bucket_grid_y_coords, 
+			reg2d_search->num_buckets[1]+1, 
+			position_y, found_y, 0);
 
    //----------------------------------------------
    // generate initial cell->bucket dependency list
@@ -371,7 +371,7 @@ void search_on_bucket_grid (struct reg2d_search * reg2d_search, struct grid * gr
 
    unsigned i, j, k, num_corners;
 
-   num_cells = get_num_grid_cells(grid_data);
+   num_cells = yac_get_num_grid_cells(grid_data);
    cell_to_bucket_dependencies_size = num_cells * 4;
    cell_to_bucket_dependencies = malloc (cell_to_bucket_dependencies_size *
                                          sizeof (cell_to_bucket_dependencies[0]));
@@ -382,10 +382,10 @@ void search_on_bucket_grid (struct reg2d_search * reg2d_search, struct grid * gr
    // for all cells
    for (i = 0; i < num_cells; ++i) {
 
-      num_corners = get_num_cell_corners(grid_data, i);
+      num_corners = yac_get_num_cell_corners(grid_data, i);
 
-      curr_x_coords = get_cell_x_coord_indices(grid_data, i);
-      curr_y_coords = get_cell_y_coord_indices(grid_data, i);
+      curr_x_coords = yac_get_cell_x_coord_indices(grid_data, i);
+      curr_y_coords = yac_get_cell_y_coord_indices(grid_data, i);
 
       for (j = 0; j < num_corners; ++j) {
 
@@ -473,7 +473,7 @@ void search_on_bucket_grid (struct reg2d_search * reg2d_search, struct grid * gr
                reg2d_search->num_buckets[0];
 
          if (num_matching_buckets > 4)
-            abort_message("ERROR: too many matching buckets\n", __FILE__, __LINE__);
+            yac_internal_abort_message("ERROR: too many matching buckets\n", __FILE__, __LINE__);
 
          ENSURE_ARRAY_SIZE(cell_to_bucket_dependencies,
                            cell_to_bucket_dependencies_size,
@@ -492,22 +492,22 @@ void search_on_bucket_grid (struct reg2d_search * reg2d_search, struct grid * gr
                                             num_total_dependencies *
                                             sizeof(*cell_to_bucket_dependencies));
 
-   init_dep_list(&initial_cell_to_bucket);
-   set_dependencies(&initial_cell_to_bucket, num_cells, num_buckets_per_cell,
-                    cell_to_bucket_dependencies);
+   yac_init_dep_list(&initial_cell_to_bucket);
+   yac_set_dependencies(&initial_cell_to_bucket, num_cells, num_buckets_per_cell,
+			cell_to_bucket_dependencies);
 
    //----------------------------------------------
    // generate cell->bucket dependency list
    //----------------------------------------------
 
-   init_dep_list(cell_to_bucket);
-   find_overlapping_cells (grid_data, reg2d_search->bucket_grid,
-                           initial_cell_to_bucket, cell_to_bucket);
+   yac_init_dep_list(cell_to_bucket);
+   yac_find_overlapping_cells (grid_data, reg2d_search->bucket_grid,
+			       initial_cell_to_bucket, cell_to_bucket);
    //-------------
    // free memory
    //-------------
 
-   free_dep_list(&initial_cell_to_bucket);
+   yac_free_dep_list(&initial_cell_to_bucket);
    free(found_x); free(found_y); free(position_x); free(position_y);
 }
 
@@ -524,15 +524,15 @@ void search_on_bucket_grid_single (struct reg2d_search * reg2d_search,
    int found_y[grid_cell.num_corners];
    int position_y[grid_cell.num_corners];
 
-   bisection_search(grid_cell.coordinates_x, grid_cell.num_corners, 
-                    reg2d_search->bucket_grid_x_coords, 
-                    reg2d_search->num_buckets[0]+1, 
-                    position_x, found_x, 2*M_PI);
+   yac_bisection_search(grid_cell.coordinates_x, grid_cell.num_corners, 
+			reg2d_search->bucket_grid_x_coords, 
+			reg2d_search->num_buckets[0]+1, 
+			position_x, found_x, 2*M_PI);
 
-   bisection_search(grid_cell.coordinates_y, grid_cell.num_corners, 
-                    reg2d_search->bucket_grid_y_coords, 
-                    reg2d_search->num_buckets[1]+1, 
-                    position_y, found_y, 0);
+   yac_bisection_search(grid_cell.coordinates_y, grid_cell.num_corners, 
+			reg2d_search->bucket_grid_y_coords, 
+			reg2d_search->num_buckets[1]+1, 
+			position_y, found_y, 0);
 
    //----------------------------------------------
    // generate initial cell->bucket dependency list
@@ -626,7 +626,7 @@ void search_on_bucket_grid_single (struct reg2d_search * reg2d_search,
             reg2d_search->num_buckets[0];
 
       if (num_matching_buckets > 4)
-         abort_message("ERROR: too many matching buckets\n", __FILE__, __LINE__);
+	yac_internal_abort_message("ERROR: too many matching buckets\n", __FILE__, __LINE__);
 
       ENSURE_ARRAY_SIZE(buckets, buckets_size,
                         num_buckets+num_matching_buckets);
@@ -641,10 +641,10 @@ void search_on_bucket_grid_single (struct reg2d_search * reg2d_search,
 
    struct bounding_circle bnd_circle;
 
-   get_cell_bounding_circle(grid_cell, &bnd_circle);
-   find_overlapping_cells_s (grid_cell, bnd_circle, reg2d_search->bucket_grid,
-                             buckets, num_buckets, deps, deps_size, num_deps,
-                             src_index, tgts_already_touched, stack, stack_size);
+   yac_get_cell_bounding_circle(grid_cell, &bnd_circle);
+   yac_find_overlapping_cells_s (grid_cell, bnd_circle, reg2d_search->bucket_grid,
+				 buckets, num_buckets, deps, deps_size, num_deps,
+				 src_index, tgts_already_touched, stack, stack_size);
 
    free(buckets);
 }
@@ -662,19 +662,19 @@ struct grid_search * reg2d_search_new (struct grid * grid_data) {
 
    double grid_extent[2][2];
 
-   if (get_num_grid_corners(grid_data) == 0)
-      abort_message("ERROR: reg2d_search_new empty input grid\n",
-                    __FILE__, __LINE__);
+   if (yac_get_num_grid_corners(grid_data) == 0)
+      yac_internal_abort_message("ERROR: reg2d_search_new empty input grid\n",
+				 __FILE__, __LINE__);
 
    //-------------------------
    // initiate the search data
    //-------------------------
 
-   get_2d_grid_extent(grid_data, grid_extent);
+   yac_get_2d_grid_extent(grid_data, grid_extent);
 
    search->grid_data = grid_data;
 
-   init_buckets (search, grid_extent, get_num_grid_cells(grid_data));
+   init_buckets (search, grid_extent, yac_get_num_grid_cells(grid_data));
 
    //----------------------------------------------
    // generate cell->bucket dependency list
@@ -688,13 +688,13 @@ struct grid_search * reg2d_search_new (struct grid * grid_data) {
    // generate bucket->cell dependency list
    //----------------------------------------------
 
-   invert_dep_list(cell_to_bucket, &search->bucket_to_cell);
+   yac_invert_dep_list(cell_to_bucket, &search->bucket_to_cell);
 
    //-------------
    // free memory
    //-------------
    
-   free_dep_list(&cell_to_bucket);
+   yac_free_dep_list(&cell_to_bucket);
 
    return (struct grid_search *)search;
 }
@@ -737,10 +737,10 @@ void reg2d_search_do_cell_search (struct grid_search * search,
 
    unsigned i, j, k;
 
-   num_tgt_grid_cells = get_num_grid_cells(grid_data);
+   num_tgt_grid_cells = yac_get_num_grid_cells(grid_data);
    printf("reg2d_search_do_cell_search: num_tgt_grid_cells %d\n", num_tgt_grid_cells);
    initial_num_srcs_per_tgt = calloc(num_tgt_grid_cells, sizeof(initial_num_srcs_per_tgt[0]));
-   num_src_grid_cells = get_num_grid_cells(reg2d_search->grid_data);
+   num_src_grid_cells = yac_get_num_grid_cells(reg2d_search->grid_data);
    src_cell_mask = calloc(num_src_grid_cells, sizeof(src_cell_mask[0]));
 
    num_total_initial_tgt_to_src_deps = 0;
@@ -750,7 +750,7 @@ void reg2d_search_do_cell_search (struct grid_search * search,
    // for all target grid cells
    for (i = 0; i < num_tgt_grid_cells; ++i) {
 
-      curr_buckets = get_dependencies_of_element(tgt_to_bucket, i);
+      curr_buckets = yac_get_dependencies_of_element(tgt_to_bucket, i);
 
       // for all matching bucket grid cells of the current tgt grid cell
       for (j = 0; j < tgt_to_bucket.num_deps_per_element[i]; ++j) {
@@ -760,7 +760,7 @@ void reg2d_search_do_cell_search (struct grid_search * search,
          if (curr_bucket >= reg2d_search->bucket_to_cell.num_elements)
             continue;
 
-         curr_src_cells = get_dependencies_of_element(
+         curr_src_cells = yac_get_dependencies_of_element(
             (reg2d_search->bucket_to_cell), curr_bucket);
 
          // for all src grid cells that overlap with the current bucket cell
@@ -781,24 +781,24 @@ void reg2d_search_do_cell_search (struct grid_search * search,
       } // (j = 0; j < tgt_to_bucket.num_deps_per_element[i]; ++j)
    } // (i = 0; i < num_tgt_grid_cells; ++i)
 
-   init_dep_list(&initial_tgt_to_src);
-   set_dependencies(&initial_tgt_to_src, num_tgt_grid_cells, initial_num_srcs_per_tgt,
-                    initial_tgt_to_src_dependencies);
+   yac_init_dep_list(&initial_tgt_to_src);
+   yac_set_dependencies(&initial_tgt_to_src, num_tgt_grid_cells, initial_num_srcs_per_tgt,
+			initial_tgt_to_src_dependencies);
 
    //----------------------------------------------
    // generate actual src to tgt grid dependencies
    //----------------------------------------------
 
-   find_overlapping_cells(grid_data, reg2d_search->grid_data,
-                          initial_tgt_to_src, tgt_to_src_cells);
+   yac_find_overlapping_cells(grid_data, reg2d_search->grid_data,
+			      initial_tgt_to_src, tgt_to_src_cells);
    //-------------
    // free memory
    //-------------
 
    free(src_cell_mask);
 
-   free_dep_list(&tgt_to_bucket);
-   free_dep_list(&initial_tgt_to_src);
+   yac_free_dep_list(&tgt_to_bucket);
+   yac_free_dep_list(&initial_tgt_to_src);
 }
 
 static
@@ -815,8 +815,8 @@ void reg2d_search_do_cell_search_single (struct grid_search * search,
 
    unsigned * cell_to_bucket = NULL, cell_to_bucket_size = 0, num_buckets = 0;
    unsigned * helper_array =
-      calloc(MAX(get_num_grid_cells(reg2d_search->bucket_grid),
-                 get_num_grid_cells(reg2d_search->grid_data)),
+      calloc(MAX(yac_get_num_grid_cells(reg2d_search->bucket_grid),
+                 yac_get_num_grid_cells(reg2d_search->grid_data)),
              sizeof(*helper_array));
    unsigned * stack = NULL;
    unsigned stack_size = 0;
@@ -847,7 +847,7 @@ void reg2d_search_do_cell_search_single (struct grid_search * search,
       if (curr_bucket >= reg2d_search->bucket_to_cell.num_elements)
          continue;
 
-      curr_src_cells = get_dependencies_of_element(
+      curr_src_cells = yac_get_dependencies_of_element(
          (reg2d_search->bucket_to_cell), curr_bucket);
 
       // for all src grid cells that overlap with the current bucket cell
@@ -871,11 +871,11 @@ void reg2d_search_do_cell_search_single (struct grid_search * search,
 
    struct bounding_circle bnd_circle;
 
-   get_cell_bounding_circle(cell, &bnd_circle);
-   find_overlapping_cells_s (cell, bnd_circle, reg2d_search->grid_data,
-                             initial_tgt_to_src_cells, initial_num_cells,
-                             cells, cells_size, n_cells, 3, helper_array,
-                             &stack, &stack_size);
+   yac_get_cell_bounding_circle(cell, &bnd_circle);
+   yac_find_overlapping_cells_s (cell, bnd_circle, reg2d_search->grid_data,
+				 initial_tgt_to_src_cells, initial_num_cells,
+				 cells, cells_size, n_cells, 3, helper_array,
+				 &stack, &stack_size);
                              
    //-------------
    // free memory
@@ -906,26 +906,26 @@ void reg2d_search_do_point_search_c (struct grid_search * search,
    double const * x_coords;
    double const * y_coords;
 
-   x_coords = get_x_coords(grid_data);
-   y_coords = get_y_coords(grid_data);
+   x_coords = yac_get_x_coords(grid_data);
+   y_coords = yac_get_y_coords(grid_data);
 
-   num_x_coords = get_size_x_coords(grid_data);
-   num_y_coords = get_size_y_coords(grid_data);
+   num_x_coords = yac_get_size_x_coords(grid_data);
+   num_y_coords = yac_get_size_y_coords(grid_data);
 
    found_x    = malloc (num_x_coords * sizeof(*found_x));
    found_y    = malloc (num_y_coords * sizeof(*found_y));
    position_x = malloc (num_x_coords * sizeof(*position_x));
    position_y = malloc (num_y_coords * sizeof(*position_y));
 
-   bisection_search(x_coords, num_x_coords, 
-            reg2d_search->bucket_grid_x_coords, 
-            reg2d_search->num_buckets[0]+1, 
-            position_x, found_x, 2*M_PI);
+   yac_bisection_search(x_coords, num_x_coords, 
+			reg2d_search->bucket_grid_x_coords, 
+			reg2d_search->num_buckets[0]+1, 
+			position_x, found_x, 2*M_PI);
 
-   bisection_search(y_coords, num_y_coords, 
-            reg2d_search->bucket_grid_y_coords, 
-            reg2d_search->num_buckets[1]+1, 
-            position_y, found_y, 0);
+   yac_bisection_search(y_coords, num_y_coords, 
+			reg2d_search->bucket_grid_y_coords, 
+			reg2d_search->num_buckets[1]+1, 
+			position_y, found_y, 0);
 
    //----------------------------------------------------------
    // use inital cell-to-bucket-results to find the find the
@@ -942,18 +942,18 @@ void reg2d_search_do_point_search_c (struct grid_search * search,
    unsigned * num_src_per_tgt;
    unsigned num_total_dependencies;
 
-   num_tgt_corners = get_num_grid_corners(grid_data);
+   num_tgt_corners = yac_get_num_grid_corners(grid_data);
    num_total_dependencies = 0;
    num_src_per_tgt = calloc (num_tgt_corners, sizeof (num_src_per_tgt[0]));
    tgt_to_src_cell = malloc (num_tgt_corners * sizeof (tgt_to_src_cell[0]));
 
-   init_grid_cell(&src_cell);
+   yac_init_grid_cell(&src_cell);
 
    // for all corners of the target grid
    for (i = 0; i < num_tgt_corners; ++i) {
 
-      curr_corner_index_x = get_corner_x_coord_index(grid_data, i);
-      curr_corner_index_y = get_corner_y_coord_index(grid_data, i);
+      curr_corner_index_x = yac_get_corner_x_coord_index(grid_data, i);
+      curr_corner_index_y = yac_get_corner_y_coord_index(grid_data, i);
 
       // if the current target corner was not found on the source grid
       if (!found_x[curr_corner_index_x] || !found_y[curr_corner_index_y]) continue; // continue with next corner
@@ -966,13 +966,12 @@ void reg2d_search_do_point_search_c (struct grid_search * search,
       if (curr_bucket >= reg2d_search->bucket_to_cell.num_elements)
          continue;
 
-      curr_src_cells = get_dependencies_of_element(
-         (reg2d_search->bucket_to_cell), curr_bucket);
+      curr_src_cells = yac_get_dependencies_of_element((reg2d_search->bucket_to_cell), curr_bucket);
       // for all source cells associated with the current bucket cell
       for (j = 0; j < reg2d_search->bucket_to_cell.num_deps_per_element[curr_bucket]; ++j) {
 
-         get_grid_cell(reg2d_search->grid_data, curr_src_cells[j],
-                       &src_cell);
+	yac_get_grid_cell(reg2d_search->grid_data, curr_src_cells[j],
+			  &src_cell);
 
          struct point tgt_point;
          double tgt_coords[3];
@@ -983,7 +982,7 @@ void reg2d_search_do_point_search_c (struct grid_search * search,
          LLtoXYZ(tgt_point.lon, tgt_point.lat, tgt_coords);
 
          // if the target point is within the current source cell
-         if (point_in_cell(tgt_point, tgt_coords, src_cell)) {
+         if (yac_point_in_cell(tgt_point, tgt_coords, src_cell)) {
 
             num_src_per_tgt[i] = 1;
             tgt_to_src_cell[num_total_dependencies++] = curr_src_cells[j];
@@ -995,12 +994,12 @@ void reg2d_search_do_point_search_c (struct grid_search * search,
    tgt_to_src_cell = realloc (tgt_to_src_cell, num_total_dependencies *
                               sizeof(tgt_to_src_cell[0]));
 
-   set_dependencies(tgt_to_src_cells, num_tgt_corners, num_src_per_tgt, tgt_to_src_cell);
+   yac_set_dependencies(tgt_to_src_cells, num_tgt_corners, num_src_per_tgt, tgt_to_src_cell);
    //-------------
    // free memory
    //-------------
 
-   free_grid_cell(&src_cell);
+   yac_free_grid_cell(&src_cell);
    free(found_x); free(found_y); free(position_x); free(position_y);
 }
 
@@ -1025,15 +1024,15 @@ void reg2d_search_do_point_search_c2 (struct grid_search * search,
    position_x = malloc (num_points * sizeof(*position_x));
    position_y = malloc (num_points * sizeof(*position_y));
 
-   bisection_search(x_coordinates, num_points, 
-            reg2d_search->bucket_grid_x_coords, 
-            reg2d_search->num_buckets[0]+1, 
-            position_x, found_x, 2*M_PI);
+   yac_bisection_search(x_coordinates, num_points, 
+			reg2d_search->bucket_grid_x_coords, 
+			reg2d_search->num_buckets[0]+1, 
+			position_x, found_x, 2*M_PI);
 
-   bisection_search(y_coordinates, num_points, 
-            reg2d_search->bucket_grid_y_coords, 
-            reg2d_search->num_buckets[1]+1, 
-            position_y, found_y, 0);
+   yac_bisection_search(y_coordinates, num_points, 
+			reg2d_search->bucket_grid_y_coords, 
+			reg2d_search->num_buckets[1]+1, 
+			position_y, found_y, 0);
 
    //----------------------------------------------------------
    // use initial cell-to-bucket-results to find the find the
@@ -1052,7 +1051,7 @@ void reg2d_search_do_point_search_c2 (struct grid_search * search,
    num_src_per_tgt = calloc (num_points, sizeof (num_src_per_tgt[0]));
    tgt_to_src_cell = malloc (num_points * sizeof (tgt_to_src_cell[0]));
 
-   init_grid_cell(&src_cell);
+   yac_init_grid_cell(&src_cell);
 
    // for all corners of the target grid
    for (i = 0; i < num_points; ++i) {
@@ -1067,13 +1066,13 @@ void reg2d_search_do_point_search_c2 (struct grid_search * search,
       if (curr_bucket >= reg2d_search->bucket_to_cell.num_elements)
          continue;
 
-      curr_src_cells = get_dependencies_of_element(
+      curr_src_cells = yac_get_dependencies_of_element(
          reg2d_search->bucket_to_cell, curr_bucket);
       // for all source cells associated with the current bucket cell
       for (j = 0; j < reg2d_search->bucket_to_cell.num_deps_per_element[curr_bucket]; ++j) {
 
-         get_grid_cell(reg2d_search->grid_data, curr_src_cells[j],
-                       &src_cell);
+         yac_get_grid_cell(reg2d_search->grid_data, curr_src_cells[j],
+			   &src_cell);
 
          struct point tgt_point;
          double tgt_coords[3];
@@ -1084,7 +1083,7 @@ void reg2d_search_do_point_search_c2 (struct grid_search * search,
          LLtoXYZ(tgt_point.lon, tgt_point.lat, tgt_coords);
 
          // if the target point is within the current source cell
-         if (point_in_cell(tgt_point, tgt_coords, src_cell)) {
+         if (yac_point_in_cell(tgt_point, tgt_coords, src_cell)) {
 
             num_src_per_tgt[i] = 1;
             tgt_to_src_cell[num_total_dependencies++] = curr_src_cells[j];
@@ -1096,12 +1095,12 @@ void reg2d_search_do_point_search_c2 (struct grid_search * search,
    tgt_to_src_cell = realloc (tgt_to_src_cell, num_total_dependencies *
                               sizeof(tgt_to_src_cell[0]));
 
-   set_dependencies(tgt_to_src_cells, num_points, num_src_per_tgt, tgt_to_src_cell);
+   yac_set_dependencies(tgt_to_src_cells, num_points, num_src_per_tgt, tgt_to_src_cell);
    //-------------
    // free memory
    //-------------
 
-   free_grid_cell(&src_cell);
+   yac_free_grid_cell(&src_cell);
    free(found_x); free(found_y); free(position_x); free(position_y);
 }
 
@@ -1113,8 +1112,8 @@ void reg2d_search_do_point_search_p (struct grid_search * search,
 
    struct reg2d_search * reg2d_search = (struct reg2d_search *)search;
 
-   grid_search_utils_do_point_search_p(search, reg2d_search->grid_data,
-                                       grid_data, target_to_src_points);
+   yac_grid_search_utils_do_point_search_p(search, reg2d_search->grid_data,
+					   grid_data, target_to_src_points);
 }
 
 static
@@ -1125,9 +1124,9 @@ void reg2d_search_do_point_search_p2 (struct grid_search * search,
 
    struct reg2d_search * reg2d_search = (struct reg2d_search *)search;
 
-   grid_search_utils_do_point_search_p2(search, reg2d_search->grid_data,
-                                        x_coordinates, y_coordinates,
-                                        num_points, target_to_src_points);
+   yac_grid_search_utils_do_point_search_p2(search, reg2d_search->grid_data,
+					    x_coordinates, y_coordinates,
+					    num_points, target_to_src_points);
 }
 
 static
@@ -1137,9 +1136,9 @@ void reg2d_search_do_point_search_p3 (struct grid_search * search,
                                        struct dep_list * target_to_src_points,
                                        struct points * points) {
 
-   grid_search_utils_do_point_search_p3(search, x_coordinates, y_coordinates,
-                                        num_points, target_to_src_points,
-                                        points);
+   yac_grid_search_utils_do_point_search_p3(search, x_coordinates, y_coordinates,
+					    num_points, target_to_src_points,
+					    points);
 }
 
 static
@@ -1150,7 +1149,7 @@ void reg2d_search_do_point_search_p4 (struct grid_search * search,
 
    struct reg2d_search * reg2d_search = (struct reg2d_search *)search;
 
-   grid_search_utils_do_point_search_p4(search, reg2d_search->grid_data,
-                                        x_coordinate, y_coordinate, n_points,
-                                        points_size, points);
+   yac_grid_search_utils_do_point_search_p4(search, reg2d_search->grid_data,
+					    x_coordinate, y_coordinate, n_points,
+					    points_size, points);
 }

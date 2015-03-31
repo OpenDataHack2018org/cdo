@@ -34,15 +34,15 @@
 #include <stdlib.h>
 #include "ensure_array_size.h"
 
-void find_overlapping_cells_s (struct grid_cell src_cell,
-                               struct bounding_circle src_bnd_circle,
-                               struct grid * tgt_grid,
-                               unsigned const * initial_dep,
-                               unsigned num_initial_deps, unsigned ** deps,
-                               unsigned * deps_size, unsigned * num_deps,
-                               unsigned src_index,
-                               unsigned * tgts_already_touched,
-                               unsigned ** stack, unsigned * stack_size) {
+void yac_find_overlapping_cells_s (struct grid_cell src_cell,
+                                   struct bounding_circle src_bnd_circle,
+                                   struct grid * tgt_grid,
+                                   unsigned const * initial_dep,
+                                   unsigned num_initial_deps, unsigned ** deps,
+                                   unsigned * deps_size, unsigned * num_deps,
+                                   unsigned src_index,
+                                   unsigned * tgts_already_touched,
+                                   unsigned ** stack, unsigned * stack_size) {
 
    struct bounding_circle tgt_bnd_circle;
 
@@ -55,9 +55,9 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
    // allocates memory and initialises it with 0
    *num_deps = 0;
 
-   init_grid_cell (&tgt_grid_cell);
+   yac_init_grid_cell (&tgt_grid_cell);
 
-   struct dep_list tgt_cell_neigh_dep = get_cell_neigh_dep_list(tgt_grid);
+   struct dep_list tgt_cell_neigh_dep = yac_get_cell_neigh_dep_list(tgt_grid);
 
    //check whether the current stack can hold the initial number of tgt cells
    ENSURE_ARRAY_SIZE(*stack, *stack_size, num_initial_deps);
@@ -77,14 +77,14 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
       // pop top element of stack
       tgt_index = (*stack)[--num_elements_on_stack];
 
-      get_grid_cell2 (tgt_grid, tgt_index, &tgt_grid_cell, &tgt_bnd_circle);
+      yac_get_grid_cell2 (tgt_grid, tgt_index, &tgt_grid_cell, &tgt_bnd_circle);
 
       // check overlap between src and tgt cell
       // TODO: this check needs to be revisited because it has problems at the
       //       poles and does not take different properties of regular and
       //       unstructured grids into account
-      if (check_overlap_cells2(src_cell, src_bnd_circle,
-                               tgt_grid_cell, tgt_bnd_circle)) {
+      if (yac_check_overlap_cells2(src_cell, src_bnd_circle,
+                                   tgt_grid_cell, tgt_bnd_circle)) {
 
          //check whether the current dependency list can hold another dependency
          ENSURE_ARRAY_SIZE(*deps, *deps_size, *num_deps+1);
@@ -97,7 +97,7 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
          ENSURE_ARRAY_SIZE(*stack, *stack_size, num_elements_on_stack + 
                            tgt_cell_neigh_dep.num_deps_per_element[tgt_index]);
          // add neighbours to stack
-         curr_tgt_neighs = get_dependencies_of_element(tgt_cell_neigh_dep, tgt_index);
+         curr_tgt_neighs = yac_get_dependencies_of_element(tgt_cell_neigh_dep, tgt_index);
          for (int i = 0; i < tgt_cell_neigh_dep.num_deps_per_element[tgt_index]; ++i) {
 
             if (tgts_already_touched[curr_tgt_neighs[i]] != src_index + 1) {
@@ -111,12 +111,12 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
    *deps = realloc (*deps, *num_deps * sizeof (**deps));
    *deps_size = *num_deps;
 
-   free_grid_cell(&tgt_grid_cell);
+   yac_free_grid_cell(&tgt_grid_cell);
 }
 
-void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
-                             struct dep_list initial_src_to_tgt_dep, 
-                             struct dep_list * src_to_tgt_dep) {
+void yac_find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
+                                 struct dep_list initial_src_to_tgt_dep,
+                                 struct dep_list * src_to_tgt_dep) {
 
    unsigned src_index;
    unsigned num_tgt_cells, num_src_cells;
@@ -135,8 +135,8 @@ void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
 
    unsigned * tgts_already_touched;
 
-   num_tgt_cells = get_num_grid_cells (tgt_grid);
-   num_src_cells = get_num_grid_cells (src_grid);
+   num_tgt_cells = yac_get_num_grid_cells (tgt_grid);
+   num_src_cells = yac_get_num_grid_cells (src_grid);
 
    // allocates memory and initialises it with 0
    num_tgt_per_src_cell = calloc (num_src_cells, sizeof (num_tgt_per_src_cell[0]));
@@ -145,17 +145,17 @@ void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
 
    num_total_deps = 0;
 
-   init_grid_cell (&src_grid_cell);
+   yac_init_grid_cell (&src_grid_cell);
 
    // for all src cells
    for (src_index = 0; src_index < num_src_cells; ++src_index) {
 
       struct bounding_circle src_bnd_circle;
-      get_grid_cell2 (src_grid, src_index, &src_grid_cell, &src_bnd_circle);
+      yac_get_grid_cell2 (src_grid, src_index, &src_grid_cell, &src_bnd_circle);
 
       // search for overlapping cells
-      find_overlapping_cells_s(src_grid_cell, src_bnd_circle, tgt_grid,
-         get_dependencies_of_element(initial_src_to_tgt_dep, src_index),
+      yac_find_overlapping_cells_s(src_grid_cell, src_bnd_circle, tgt_grid,
+         yac_get_dependencies_of_element(initial_src_to_tgt_dep, src_index),
          initial_src_to_tgt_dep.num_deps_per_element[src_index],
          &curr_src_tgt_dependencies, &curr_src_tgt_dependencies_size,
          num_tgt_per_src_cell + src_index, src_index, tgts_already_touched,
@@ -174,11 +174,11 @@ void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
    src_tgt_dependencies = realloc (src_tgt_dependencies,
       num_total_deps * sizeof (src_tgt_dependencies[0]));
 
-   init_dep_list(src_to_tgt_dep);
-   set_dependencies(src_to_tgt_dep, num_src_cells, num_tgt_per_src_cell,
-                    src_tgt_dependencies);
+   yac_init_dep_list(src_to_tgt_dep);
+   yac_set_dependencies(src_to_tgt_dep, num_src_cells, num_tgt_per_src_cell,
+                        src_tgt_dependencies);
 
-   free_grid_cell(&src_grid_cell);
+   yac_free_grid_cell(&src_grid_cell);
    free(curr_src_tgt_dependencies);
    free(stack);
    free(tgts_already_touched);

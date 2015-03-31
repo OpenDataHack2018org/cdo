@@ -32,7 +32,7 @@ tree_part(struct interval_node intervals[], size_t num_nodes)
 }
 
 void
-generate_interval_tree(struct interval_node intervals[], size_t num_nodes)
+yac_generate_interval_tree(struct interval_node intervals[], size_t num_nodes)
 {
   qsort(intervals, num_nodes, sizeof(intervals[0]),
         (int(*)(const void *, const void*))iv_compar);
@@ -70,8 +70,8 @@ search_interval_tree_(struct interval_node tree[], size_t num_nodes,
 }
 
 void
-search_interval_tree(struct interval_node tree[], size_t num_nodes,
-                     struct interval query, struct overlaps *overlaps)
+yac_search_interval_tree(struct interval_node tree[], size_t num_nodes,
+                         struct interval query, struct overlaps *overlaps)
 {
   search_interval_tree_(tree, num_nodes, query, overlaps, 0);
 }

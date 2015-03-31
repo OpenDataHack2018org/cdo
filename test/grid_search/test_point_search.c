@@ -48,7 +48,7 @@ typedef struct grid_search * (*grid_search_constructor)(struct grid *);
 int main (void) {
 
    grid_search_constructor grid_search_construct[] =
-      {bucket_search_new, sphere_part_search_new};
+      {yac_bucket_search_new, yac_sphere_part_search_new};
    unsigned num_grid_search_construct = sizeof(grid_search_construct) /
                                         sizeof(grid_search_construct[0]);
 
@@ -73,17 +73,17 @@ int main (void) {
    struct dep_list cell_to_vertex_a, cell_to_vertex_b;
 
    { // set up grid data
-   init_dep_list(&cell_to_vertex_a);
-   set_dependencies(&cell_to_vertex_a, 4, num_corners_per_cell, cell_vertices);
+   yac_init_dep_list(&cell_to_vertex_a);
+   yac_set_dependencies(&cell_to_vertex_a, 4, num_corners_per_cell, cell_vertices);
 
-   grid_data_a = unstruct_grid_new(vertex_coordinates_x[0], vertex_coordinates_y[0], 
-                                   9, cell_to_vertex_a);
+   grid_data_a = yac_unstruct_grid_new(vertex_coordinates_x[0], vertex_coordinates_y[0], 
+				       9, cell_to_vertex_a);
 
-   init_dep_list(&cell_to_vertex_b);
-   set_dependencies(&cell_to_vertex_b, 4, num_corners_per_cell, cell_vertices);
+   yac_init_dep_list(&cell_to_vertex_b);
+   yac_set_dependencies(&cell_to_vertex_b, 4, num_corners_per_cell, cell_vertices);
 
-   grid_data_b = unstruct_grid_new(vertex_coordinates_x[1], vertex_coordinates_y[1], 
-                                   9, cell_to_vertex_b);
+   grid_data_b = yac_unstruct_grid_new(vertex_coordinates_x[1], vertex_coordinates_y[1], 
+				       9, cell_to_vertex_b);
    }
 
    //---------------
@@ -98,14 +98,14 @@ int main (void) {
 
          search = grid_search_construct[i](grid_data_a);
 
-         do_point_search_c(search, grid_data_b, &deps);
+         yac_do_point_search_c(search, grid_data_b, &deps);
 
          {
             unsigned ref_num_deps[9] = {1,1,0,1,1,0,0,0,0};
             unsigned ref_deps[9] = {0,1,-1,2,3,-1,-1,-1,-1};
             unsigned i;
 
-            if (get_total_num_dependencies(deps) != 4)
+            if (yac_get_total_num_dependencies(deps) != 4)
                PUT_ERR("error in do_point_search_c(get_total_num_dependencies(deps))\n");
 
             for (i = 0; i < 9; ++i)
@@ -116,14 +116,14 @@ int main (void) {
 
                if (deps.num_deps_per_element[i] == 0) continue;
 
-               if (get_dependencies_of_element(deps,i)[0] !=
+               if (yac_get_dependencies_of_element(deps,i)[0] !=
                    ref_deps[i])
                   PUT_ERR("error in do_point_search_c(get_dependencies_of_element)\n");
             }
          }
 
-         free_dep_list(&deps);
-         delete_grid_search(search);
+         yac_free_dep_list(&deps);
+         yac_delete_grid_search(search);
       }
    }
 
@@ -136,7 +136,7 @@ int main (void) {
 
          search = grid_search_construct[i](grid_data_a);
 
-         do_point_search_p(search, grid_data_b, &deps);
+         yac_do_point_search_p(search, grid_data_b, &deps);
 
          {
             unsigned ref_num_deps[9] = {4,4,0,4,4,0,0,0,0};
@@ -145,7 +145,7 @@ int main (void) {
                                        {0,0,0,0}, {0,0,0,0}, {0,0,0,0}};
             unsigned i, j, k;
 
-            if (get_total_num_dependencies(deps) != 16)
+            if (yac_get_total_num_dependencies(deps) != 16)
                PUT_ERR("error in do_point_search_p(get_total_num_dependencies(deps))\n");
 
             for (i = 0; i < 9; ++i)
@@ -156,7 +156,7 @@ int main (void) {
             unsigned num_matches;
             for (i = 0; i < 9; ++i) {
 
-               curr_src_corners = get_dependencies_of_element(deps,i);
+               curr_src_corners = yac_get_dependencies_of_element(deps,i);
 
                num_matches = 0;
 
@@ -170,13 +170,13 @@ int main (void) {
             }
          }
 
-         free_dep_list(&deps);
-         delete_grid_search(search);
+         yac_free_dep_list(&deps);
+         yac_delete_grid_search(search);
       }
    }
 
-   delete_grid(grid_data_a);
-   delete_grid(grid_data_b);
+   yac_delete_grid(grid_data_a);
+   yac_delete_grid(grid_data_b);
 
    { // test do_point_search_p3
 
@@ -206,8 +206,8 @@ int main (void) {
       struct grid * reg_grid;
       struct points points;
 
-      reg_grid = reg2d_grid_new(grid_coord_x, grid_coord_y, num_cells, cyclic);
-      init_points(&points, reg_grid, CELL, points_coord_x, points_coord_y);
+      reg_grid = yac_reg2d_grid_new(grid_coord_x, grid_coord_y, num_cells, cyclic);
+      yac_init_points(&points, reg_grid, CELL, points_coord_x, points_coord_y);
 
       // define points that are to be seached for
 
@@ -235,8 +235,8 @@ int main (void) {
          struct dep_list search_results;
 
          // do search
-         do_point_search_p3 (search, search_points_coord_x, search_points_coord_y,
-                             num_search_points, &search_results, &points);
+         yac_do_point_search_p3 (search, search_points_coord_x, search_points_coord_y,
+				 num_search_points, &search_results, &points);
 
          {
             unsigned ref_num_deps[8] = {0,4,4,0,4,4,4,0};
@@ -244,8 +244,8 @@ int main (void) {
                                        {11,12,17,16}, {15,16,21,20},{17,18,23,22},{-1}};
             unsigned i, j, k;
 
-            if (get_total_num_dependencies(search_results) != 20)
-               PUT_ERR("error in do_point_search_p3(get_total_num_dependencies(search_results))\n");
+            if (yac_get_total_num_dependencies(search_results) != 20)
+               PUT_ERR("error in do_point_search_p3(yac_get_total_num_dependencies(search_results))\n");
 
             for (i = 0; i < 7; ++i)
                if (search_results.num_deps_per_element[i] != ref_num_deps[i])
@@ -255,7 +255,7 @@ int main (void) {
             unsigned num_matches;
             for (i = 0; i < 7; ++i) {
 
-               curr_src_corners = get_dependencies_of_element(search_results,i);
+               curr_src_corners = yac_get_dependencies_of_element(search_results,i);
 
                num_matches = 0;
 
@@ -269,12 +269,12 @@ int main (void) {
             }
          }
 
-         free_dep_list(&search_results);
-         delete_grid_search(search);
+         yac_free_dep_list(&search_results);
+         yac_delete_grid_search(search);
       }
 
-      delete_grid(reg_grid);
-      free_points(&points);
+      yac_delete_grid(reg_grid);
+      yac_free_points(&points);
    }
 
    { // test do_point_search_p4
@@ -295,8 +295,8 @@ int main (void) {
       struct grid * reg_grid;
       struct points points;
 
-      reg_grid = reg2d_grid_new(grid_coord_x, grid_coord_y, num_cells, cyclic);
-      // init_points(&points, reg_grid, CELL, points_coord_x, points_coord_y);
+      reg_grid = yac_reg2d_grid_new(grid_coord_x, grid_coord_y, num_cells, cyclic);
+      // yac_init_points(&points, reg_grid, CELL, points_coord_x, points_coord_y);
 
       // define points that are to be seached for
 
@@ -325,9 +325,9 @@ int main (void) {
             unsigned num_deps;
 
             // do search
-            do_point_search_p4 (search, search_points_coord_x[i],
-                                search_points_coord_y[i], &num_deps, &deps_size,
-                                &deps);
+            yac_do_point_search_p4 (search, search_points_coord_x[i],
+				    search_points_coord_y[i], &num_deps, &deps_size,
+				    &deps);
 
 	    //  if ( is == 0 )
 	      {
@@ -357,10 +357,10 @@ int main (void) {
          }
 
          free(deps);
-         delete_grid_search(search);
+         yac_delete_grid_search(search);
       }
 
-      delete_grid(reg_grid);
+      yac_delete_grid(reg_grid);
    }
 
    { // test do_point_search_p4 for cyclic grids ---> large grids
@@ -389,7 +389,7 @@ int main (void) {
       unsigned num_cells_a[2] = {nxa,nya-1};
       unsigned cyclic_a[2] = {1,0};
    
-      grid_a = reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
+      grid_a = yac_reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
 
       struct grid * grid_b;
       double coords_x_b[nxb];
@@ -406,7 +406,7 @@ int main (void) {
       unsigned num_cells_b[2] = {nxb,nyb-1};
       unsigned cyclic_b[2] = {1,0};
    
-      grid_b = reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
+      grid_b = yac_reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
 
       unsigned num_search_points = nxb*nyb;
 
@@ -434,7 +434,7 @@ int main (void) {
 	    ix = i - iy*nxb;
 
             // do search
-            do_point_search_p4 (search, coords_x_b[ix], coords_y_b[iy], &num_deps, &deps_size, &deps);
+            yac_do_point_search_p4 (search, coords_x_b[ix], coords_y_b[iy], &num_deps, &deps_size, &deps);
 	    /*
             {
                unsigned ref_num_deps[8] = {0,4,4,0,4,4,4,0};
@@ -458,14 +458,14 @@ int main (void) {
          }
 
          free(deps);
-         delete_grid_search(search);
+         yac_delete_grid_search(search);
 
 	 finish = clock();
 	 printf("search %d: %.2f seconds\n", i+1, ((double)(finish-start))/CLOCKS_PER_SEC);
       }
 
-      delete_grid(grid_a);
-      delete_grid(grid_b);
+      yac_delete_grid(grid_a);
+      yac_delete_grid(grid_b);
    }
 
    return TEST_EXIT_CODE;

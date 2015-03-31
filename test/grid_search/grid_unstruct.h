@@ -36,10 +36,10 @@
 
 #include "grid.h"
 
-struct grid * unstruct_grid_new(double * coordinates_x, double * coordinates_y,
-                                unsigned num_vertices, struct dep_list cell_to_vertex);
+struct grid * yac_unstruct_grid_new(double * coordinates_x, double * coordinates_y,
+                                    unsigned num_vertices, struct dep_list cell_to_vertex);
 
-struct grid * unpack_unstruct_grid(double * dble_buf, unsigned * dble_buf_data_size,
-                                   unsigned * uint_buf, unsigned * uint_buf_data_size);
+struct grid * yac_unpack_unstruct_grid(double * dble_buf, unsigned * dble_buf_data_size,
+                                       unsigned * uint_buf, unsigned * uint_buf_data_size);
 
 #endif // GRID_UNSTRUCT_H
