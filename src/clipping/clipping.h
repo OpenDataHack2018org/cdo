@@ -61,15 +61,23 @@
   * \remark source and target cells have to be convex
   * \remark cells in overlap_buffer can be concave
   * \remark overlap_buffer must contain valid grid_cells (have to be initialised
-  *         using \ref init_grid_cell; initialisation have to be done only once,
+  *         using \ref yac_init_grid_cell; initialisation have to be done only once,
   *         in consecutive calls, the cells can be reused with have to be
   *         reinitialised)
   *
  **/
-void cell_clipping ( unsigned N,
-                     struct grid_cell * source_cell,
-                     struct grid_cell target_cell,
-                     struct grid_cell * overlap_buffer );
+void yac_cell_clipping (unsigned N,
+                        struct grid_cell * source_cell,
+                        struct grid_cell target_cell,
+                        struct grid_cell * overlap_buffer);
+
+/** \example test_partial_areas.c
+ * This contains examples on how to use \ref yac_compute_overlap_areas.
+ */
+
+/** \example test_compute_overlap_area.c
+ * This contains examples on how to use \ref yac_compute_overlap_areas.
+ */
 
 /**
   * \brief calculates partial areas for all overlapping parts of the source
@@ -99,10 +107,10 @@ void cell_clipping ( unsigned N,
   * \remark source and target cell have to be convex
   *
  **/
-void compute_overlap_areas(unsigned N,
-                           struct grid_cell * source_cell,
-                           struct grid_cell target_cell,
-                           double * partial_areas);
+void yac_compute_overlap_areas (unsigned N,
+                                struct grid_cell * source_cell,
+                                struct grid_cell target_cell,
+                                double * partial_areas);
 
 /**
   * \brief calculates partial areas for all overlapping parts of the source
@@ -132,12 +140,12 @@ void compute_overlap_areas(unsigned N,
   * \remark source and target cell have to be convex
   *
  **/
-void compute_concave_overlap_areas (unsigned N,
-                                    struct grid_cell * source_cell,
-                                    struct grid_cell target_cell,
-                                    double * target_node_x,
-                                    double * target_node_y,
-                                    double * partial_areas);
+void yac_compute_concave_overlap_areas (unsigned N,
+                                        struct grid_cell * source_cell,
+                                        struct grid_cell target_cell,
+                                        double * target_node_x,
+                                        double * target_node_y,
+                                        double * partial_areas);
 /**
   * \brief correct interpolation weights
   *
@@ -147,6 +155,6 @@ void compute_concave_overlap_areas (unsigned N,
   * @param[out] weight            list of N partial weights
   *
  **/
-void correct_weights ( unsigned N, double * weight );
+void yac_correct_weights (unsigned N, double * weight);
 
 #endif // CLIPPING_H

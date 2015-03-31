@@ -1,3 +1,9 @@
+2015-10-26  Uwe Schulzweida
+
+	* using CDI library version 1.6.9
+	* Version 1.6.9 released
+	* clipping: update to YAC version 1.0.3
+
 2015-03-27  Uwe Schulzweida
 
 	* Fldstat: added parameter noweights to use constant grid cell area weights

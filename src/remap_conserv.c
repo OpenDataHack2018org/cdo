@@ -260,7 +260,7 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
 static
 double gridcell_area(struct grid_cell cell)
 {
-  return huiliers_area(cell);
+  return yac_huiliers_area(cell);
 }
 
 static
@@ -272,7 +272,7 @@ void cdo_compute_overlap_areas(unsigned N,
 {
   /* Do the clipping and get the cell for the overlapping area */
 
-  cell_clipping(N, source_cells, target_cell, overlap_buffer);
+  yac_cell_clipping(N, source_cells, target_cell, overlap_buffer);
 
   /* Get the partial areas for the overlapping regions */
 
@@ -356,13 +356,13 @@ void cdo_compute_concave_overlap_areas(unsigned N,
     {.coordinates_x   = (double[3]){-1, -1, -1},
      .coordinates_y   = (double[3]){-1, -1, -1},
      .coordinates_xyz = (double[3*3]){-1, -1, -1},
-     .edge_type       = (enum edge_type[3]) {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE},
+     .edge_type       = (enum yac_edge_type[3]) {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE},
      .num_corners     = 3};
   */
   double coordinates_x[3] = {-1, -1, -1};
   double coordinates_y[3] = {-1, -1, -1};
   double coordinates_xyz[9] = {-1, -1, -1};
-  enum edge_type edge_types[3] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
+  enum yac_edge_type edge_types[3] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
   struct grid_cell target_partial_cell =
     {.coordinates_x   = coordinates_x,
      .coordinates_y   = coordinates_y,
@@ -424,7 +424,7 @@ void cdo_compute_concave_overlap_areas(unsigned N,
       target_partial_cell.coordinates_xyz[1+3*2] = target_cell.coordinates_xyz[1+3*corner_b];
       target_partial_cell.coordinates_xyz[2+3*2] = target_cell.coordinates_xyz[2+3*corner_b];
 
-      cell_clipping(N, source_cell, target_partial_cell, overlap_buffer);
+      yac_cell_clipping(N, source_cell, target_partial_cell, overlap_buffer);
 
       /* Get the partial areas for the overlapping regions as sum over the partial target cells. */
 
@@ -604,13 +604,13 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   int max_num_cell_corners = src_num_cell_corners;
   if ( tgt_num_cell_corners > max_num_cell_corners ) max_num_cell_corners = tgt_num_cell_corners;
 
-  enum edge_type great_circle_type[32];
+  enum yac_edge_type great_circle_type[32];
   for ( int i = 0; i < max_num_cell_corners; ++i ) great_circle_type[i] = GREAT_CIRCLE;
 
-  enum edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
+  enum yac_edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
 
-  enum edge_type *src_edge_type = great_circle_type;
-  enum edge_type *tgt_edge_type = great_circle_type;
+  enum yac_edge_type *src_edge_type = great_circle_type;
+  enum yac_edge_type *tgt_edge_type = great_circle_type;
 
   enum cell_type target_cell_type = UNDEF_CELL;
 
@@ -996,7 +996,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	partial_weights[n] = partial_areas[n] / tgt_area;
 
       if ( rv->norm_opt == NORM_OPT_FRACAREA )
-	correct_weights((unsigned)num_weights, partial_weights);
+	yac_correct_weights((unsigned)num_weights, partial_weights);
 
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] *= tgt_area;
