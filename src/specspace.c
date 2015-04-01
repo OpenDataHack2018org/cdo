@@ -175,19 +175,14 @@ void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
 
 void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  int ntr, nlat, nlon, nfc;
-  int nlev = 1;
-  int waves;
-  double *fpwork;
-    
-  ntr  = gridInqTrunc(gridIDout);
-  nlon = gridInqXsize(gridIDin);
-  nlat = gridInqYsize(gridIDin);
+  int nlev  = 1;
+  int ntr   = gridInqTrunc(gridIDout);
+  int nlon  = gridInqXsize(gridIDin);
+  int nlat  = gridInqYsize(gridIDin);
+  int waves = ntr + 1;
+  int nfc   = waves * 2;
 
-  waves = ntr + 1;
-  nfc   = waves * 2;
-
-  fpwork = (double*) malloc(nlat*nfc*nlev*sizeof(double));
+  double *fpwork = (double*) malloc(nlat*nfc*nlev*sizeof(double));
 
   gp2fc(sptrans->trig, sptrans->ifax, arrayIn, fpwork, nlat, nlon, nlev, nfc);
   fc2sp(fpwork, arrayOut, sptrans->pold, nlev, nlat, nfc, ntr);
@@ -198,19 +193,14 @@ void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
    
 void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  int ntr, nlat, nlon, nfc;
-  int nlev = 1;
-  int waves;
-  double *fpwork;
-    
-  ntr  = gridInqTrunc(gridIDin);
-  nlon = gridInqXsize(gridIDout);
-  nlat = gridInqYsize(gridIDout);
+  int nlev  = 1;
+  int ntr   = gridInqTrunc(gridIDin);
+  int nlon  = gridInqXsize(gridIDout);
+  int nlat  = gridInqYsize(gridIDout);
+  int waves = ntr + 1;
+  int nfc   = waves * 2;
 
-  waves = ntr + 1;
-  nfc   = waves * 2;
-
-  fpwork = (double*) malloc(nlat*nfc*nlev*sizeof(double));
+  double *fpwork = (double*) malloc(nlat*nfc*nlev*sizeof(double));
 
   sp2fc(arrayIn, fpwork, sptrans->poli, nlev, nlat, nfc, ntr);
   fc2gp(sptrans->trig, sptrans->ifax, fpwork, arrayOut, nlat, nlon, nlev, nfc);
@@ -221,15 +211,11 @@ void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 
 void four2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  int ntr, nlat, nfc;
-  int nlev = 1;
-  int waves;
-    
-  ntr  = gridInqTrunc(gridIDout);
-  nlat = sptrans->nlat;
-
-  waves = ntr + 1;
-  nfc   = waves * 2;
+  int nlev  = 1;
+  int ntr   = gridInqTrunc(gridIDout);
+  int nlat  = sptrans->nlat;
+  int waves = ntr + 1;
+  int nfc   = waves * 2;
 
   fc2sp(arrayIn, arrayOut, sptrans->pold, nlev, nlat, nfc, ntr);
 }
@@ -237,15 +223,11 @@ void four2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 
 void spec2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  int ntr, nlat, nfc;
-  int nlev = 1;
-  int waves;
-    
-  ntr  = gridInqTrunc(gridIDin);
-  nfc  = gridInqSize(gridIDout);
-  nlat = nfc2nlat(nfc, ntr);
-
-  waves = ntr + 1;
+  int nlev  = 1;
+  int ntr   = gridInqTrunc(gridIDin);
+  int nfc   = gridInqSize(gridIDout);
+  int nlat  = nfc2nlat(nfc, ntr);
+  int waves = ntr + 1;
   nfc   = waves * 2;
 
   sp2fc(arrayIn, arrayOut, sptrans->poli, nlev, nlat, nfc, ntr);
@@ -254,16 +236,12 @@ void spec2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 
 void four2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  int ntr, nlat, nlon, nfc;
-  int nlev = 1;
-  int waves;
-
-  ntr  = gridInqTrunc(gridIDin);
-  nlon = gridInqXsize(gridIDout);
-  nlat = gridInqYsize(gridIDout);
-
-  waves = ntr + 1;
-  nfc   = waves * 2;
+  int nlev  = 1;
+  int ntr   = gridInqTrunc(gridIDin);
+  int nlon  = gridInqXsize(gridIDout);
+  int nlat  = gridInqYsize(gridIDout);
+  int waves = ntr + 1;
+  int nfc   = waves * 2;
 
   fc2gp(sptrans->trig, sptrans->ifax, arrayIn, arrayOut, nlat, nlon, nlev, nfc);
 }
@@ -271,16 +249,12 @@ void four2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 
 void grid2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  int nlat, nlon, nfc, ntr;
-  int nlev = 1;
-  int waves;
-
-  ntr  = gridInqTrunc(gridIDout);
-  nlon = gridInqXsize(gridIDin);
-  nlat = gridInqYsize(gridIDin);
-
-  waves = ntr + 1;
-  nfc   = waves * 2;
+  int nlev  = 1;
+  int ntr   = gridInqTrunc(gridIDout);
+  int nlon  = gridInqXsize(gridIDin);
+  int nlat  = gridInqYsize(gridIDin);
+  int waves = ntr + 1;
+  int nfc   = waves * 2;
 
   gp2fc(sptrans->trig, sptrans->ifax, arrayIn, arrayOut, nlat, nlon, nlev, nfc);
 }
@@ -288,10 +262,8 @@ void grid2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 
 void spec2spec(int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  int ntrIn, ntrOut;
-
-  ntrIn  = gridInqTrunc(gridIDin);
-  ntrOut = gridInqTrunc(gridIDout);
+  int ntrIn  = gridInqTrunc(gridIDin);
+  int ntrOut = gridInqTrunc(gridIDout);
 
   sp2sp(arrayIn, ntrIn, arrayOut, ntrOut);
 }
@@ -299,9 +271,7 @@ void spec2spec(int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 
 void speccut(int gridIDin, double *arrayIn, double *arrayOut, int *waves)
 {
-  int ntr;
-
-  ntr = gridInqTrunc(gridIDin);
+  int ntr = gridInqTrunc(gridIDin);
 
   spcut(arrayIn, arrayOut, ntr, waves);
 }
@@ -309,16 +279,13 @@ void speccut(int gridIDin, double *arrayIn, double *arrayOut, int *waves)
 
 SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
 {
-  SPTRANS *sptrans;
-  int nsp;
-
-  sptrans = (SPTRANS*) malloc(sizeof(SPTRANS));
+  SPTRANS *sptrans = (SPTRANS*) malloc(sizeof(SPTRANS));
 
   sptrans->nlon = nlon;
   sptrans->nlat = nlat;
   sptrans->ntr  = ntr;
 
-  nsp = (ntr + 1)*(ntr + 2);
+  int nsp = (ntr + 1)*(ntr + 2);
   sptrans->poldim = nsp / 2 * nlat;
 
   sptrans->trig = (double*) malloc(nlon * sizeof(double));
@@ -369,14 +336,11 @@ void sptrans_delete(SPTRANS *sptrans)
 
 DVTRANS *dvtrans_new(int ntr)
 {
-  DVTRANS *dvtrans;
-  int dimsp;
-
-  dvtrans = (DVTRANS*) malloc(sizeof(DVTRANS));
+  DVTRANS *dvtrans = (DVTRANS*) malloc(sizeof(DVTRANS));
 
   dvtrans->ntr = ntr;
 
-  dimsp = (ntr + 1)*(ntr + 2);
+  int dimsp = (ntr + 1)*(ntr + 2);
   dvtrans->fdim = dimsp / 2;
 
   dvtrans->f1 = (double*) malloc(dvtrans->fdim * sizeof(double));
@@ -609,25 +573,20 @@ void trans_uv2dv(SPTRANS *sptrans, int nlev,
 		 int gridID1, double *gu, double *gv,
 		 int gridID2, double *sd, double *svo)
 {
-  int ntr, nlat, nlon, nfc;
-  int waves;
-  double *fpwork1, *fpwork2;
-
   if ( gridInqType(gridID1) != GRID_GAUSSIAN )
     Error("unexpected grid1 type: %s instead of Gaussian", gridNamePtr(gridInqType(gridID1)));
 
   if ( gridInqType(gridID2) != GRID_SPECTRAL )
     Error("unexpected grid2 type: %s instead of spectral", gridNamePtr(gridInqType(gridID2)));
     
-  ntr  = gridInqTrunc(gridID2);
-  nlon = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
+  int ntr   = gridInqTrunc(gridID2);
+  int nlon  = gridInqXsize(gridID1);
+  int nlat  = gridInqYsize(gridID1);
+  int waves = ntr + 1;
+  int nfc   = waves * 2;
 
-  waves = ntr + 1;
-  nfc   = waves * 2;
-
-  fpwork1 = (double*) malloc(nlat*nfc*nlev*sizeof(double));
-  fpwork2 = (double*) malloc(nlat*nfc*nlev*sizeof(double));
+  double *fpwork1 = (double*) malloc(nlat*nfc*nlev*sizeof(double));
+  double *fpwork2 = (double*) malloc(nlat*nfc*nlev*sizeof(double));
 
   gp2fc(sptrans->trig, sptrans->ifax, gu, fpwork1, nlat, nlon, nlev, nfc);
   gp2fc(sptrans->trig, sptrans->ifax, gv, fpwork2, nlat, nlon, nlev, nfc);
@@ -646,33 +605,25 @@ void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev,
 		 int gridID1, double *sd, double *svo,
 		 int gridID2, double *gu, double *gv)
 {
-  int ntr, nlat, nlon, nfc;
-  int waves;
-  int dimsp;
-  double *fpwork;
-  double *su, *sv;
-
   if ( gridInqType(gridID1) != GRID_SPECTRAL )
     Warning("unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
 
   if ( gridInqType(gridID2) != GRID_GAUSSIAN )
     Warning("unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
 
-  ntr  = gridInqTrunc(gridID1);
-  nlon = gridInqXsize(gridID2);
-  nlat = gridInqYsize(gridID2);
+  int ntr   = gridInqTrunc(gridID1);
+  int nlon  = gridInqXsize(gridID2);
+  int nlat  = gridInqYsize(gridID2);
+  int waves = ntr + 1;
+  int nfc   = waves * 2;
+  int dimsp = (ntr + 1)*(ntr + 2);
 
-  waves = ntr + 1;
-  nfc   = waves * 2;
-
-  dimsp = (ntr + 1)*(ntr + 2);
-
-  su = gu;
-  sv = gv;
+  double *su = gu;
+  double *sv = gv;
 
   dv2uv(sd, svo, su, sv, dvtrans->f1, dvtrans->f2, ntr, dimsp, nlev);
 
-  fpwork = (double*) malloc(nlat*nfc*nlev*sizeof(double));
+  double *fpwork = (double*) malloc(nlat*nfc*nlev*sizeof(double));
 
   sp2fc(su, fpwork, sptrans->poli, nlev, nlat, nfc, ntr);
   scaluv(fpwork, sptrans->rcoslat, nlat, nfc*nlev);

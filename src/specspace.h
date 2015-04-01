@@ -1,3 +1,5 @@
+#ifndef _SPECSPACE_H
+#define _SPECSPACE_H
 
 typedef struct {
   long nlon;
@@ -58,8 +60,9 @@ void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlo
 void sp2sp(double *arrayIn, int ntrIn, double *arrayOut, int ntrOut);
 void spcut(double *arrayIn, double *arrayOut, int ntr, int *waves);
 
-void phcs(double *pnm, double *hnm, int waves, double pmu,
-	  double *ztemp1, double *ztemp2);
+void phcs(double *pnm, double *hnm, int waves, double pmu, double *ztemp1, double *ztemp2);
 void jspleg1(double *pleg, double plat, int ntr, double *work);
 
 void fft_set(double *trigs, long *ifax, long n);
+
+#endif
