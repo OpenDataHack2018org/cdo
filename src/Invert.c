@@ -314,42 +314,31 @@ void invertLatData(double *array1, double *array2, int gridID1)
 
 void *Invert(void *argument)
 {
-  int INVERTLAT, INVERTLON, INVERTLATDES, INVERTLONDES, INVERTLATDATA, INVERTLONDATA;
-  int operatorID;
-  int operfunc1, operfunc2;
-  int streamID1, streamID2;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
+  int recID, varID, levelID;
   int gridID1;
   int nmiss;
-  double *array1, *array2;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
-  INVERTLAT     = cdoOperatorAdd("invertlat",     func_all, 0, NULL);
-  INVERTLON     = cdoOperatorAdd("invertlon",     func_all, 0, NULL);
-  INVERTLATDES  = cdoOperatorAdd("invertlatdes",  func_hrd, 0, NULL);
-  INVERTLONDES  = cdoOperatorAdd("invertlondes",  func_hrd, 0, NULL);
-  INVERTLATDATA = cdoOperatorAdd("invertlatdata", func_fld, 0, NULL);
-  INVERTLONDATA = cdoOperatorAdd("invertlondata", func_fld, 0, NULL);
+  cdoOperatorAdd("invertlat",     func_all, func_lat, NULL);
+  cdoOperatorAdd("invertlon",     func_all, func_lon, NULL);
+  cdoOperatorAdd("invertlatdes",  func_hrd, func_lat, NULL);
+  cdoOperatorAdd("invertlondes",  func_hrd, func_lon, NULL);
+  cdoOperatorAdd("invertlatdata", func_fld, func_lat, NULL);
+  cdoOperatorAdd("invertlondata", func_fld, func_lon, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc1 = cdoOperatorF1(operatorID);
-  if ( operatorID == INVERTLAT || operatorID == INVERTLATDES || operatorID == INVERTLATDATA )
-    operfunc2 = func_lat;
-  else
-    operfunc2 = func_lon;
+  int operatorID = cdoOperatorID();
+  int operfunc1 = cdoOperatorF1(operatorID);
+  int operfunc2 = cdoOperatorF2(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( operfunc1 == func_all || operfunc1 == func_hrd )
@@ -360,16 +349,16 @@ void *Invert(void *argument)
 	invertLonDes(vlistID2);
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) malloc(gridsize*sizeof(double));
+  double *array2 = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

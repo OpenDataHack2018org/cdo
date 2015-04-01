@@ -81,7 +81,7 @@ void *Input(void *argument)
   int vlistID = -1;
   int nmiss = 0;
   int i;
-  int code = 0, code0 = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
+  int code = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
   int output_filetype = FILETYPE_GRB;
   int rval;
   int ihead[8];
@@ -157,7 +157,6 @@ void *Input(void *argument)
 	  
 	  if ( nrecs == 0 )
 	    {
-	      code0 = code;
 	      levels[0] = level;
 	      gridsize0 = gridsize;
 
@@ -204,7 +203,6 @@ void *Input(void *argument)
 
 	  if ( nrecs == 0 )
 	    {
-	      code0 = code;
 	      levels[0] = level;
 	      gridsize0 = gridsize;
 	  

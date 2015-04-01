@@ -57,6 +57,8 @@ void *Pinfo(void *argument)
   PINFO  = cdoOperatorAdd("pinfo",  0, 0, NULL);
   PINFOV = cdoOperatorAdd("pinfov", 0, 0, NULL);
 
+  UNUSED(PINFO);
+
   operatorID = cdoOperatorID();
 
   streamID1 = streamOpenRead(cdoStreamName(0));

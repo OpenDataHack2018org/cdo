@@ -2,6 +2,7 @@
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES =            \
                cdo_int.h       \
+               compare.h       \
                cdo_pthread.c   \
                cdo_vlist.c     \
                cdo_getopt.c    \

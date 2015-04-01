@@ -189,6 +189,8 @@ void *Intlevel(void *argument)
   int INTLEVEL   = cdoOperatorAdd("intlevel",  0, 0, NULL);
   int INTLEVELX  = cdoOperatorAdd("intlevelx", 0, 0, NULL);
 
+  UNUSED(INTLEVEL);
+
   int operatorID = cdoOperatorID();
 
   if ( operatorID == INTLEVELX ) expol = TRUE;
