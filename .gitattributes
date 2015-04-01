@@ -312,6 +312,7 @@ m4/ltsugar.m4 -text
 m4/ltversion.m4 -text
 m4/lt~obsolete.m4 -text
 src/Adisit.c -text
+src/Afterburner.c -text
 src/Arith.c -text
 src/Arithc.c -text
 src/Arithdays.c -text
