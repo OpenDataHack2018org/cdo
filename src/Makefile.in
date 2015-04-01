@@ -166,17 +166,17 @@ am__v_lt_0 = --silent
 am__v_lt_1 = 
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
-	Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c Change.c \
-	Change_e5slm.c Cloudlayer.c Collgrid.c Command.c Comp.c \
-	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
-	Copy.c Deltime.c Derivepar.c Detrend.c Diff.c Distgrid.c \
-	Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
-	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
-	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
-	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c Gradsdes.c \
-	Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c Hi.c \
-	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
+am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
+	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
+	Change.c Change_e5slm.c Cloudlayer.c Collgrid.c Command.c \
+	Comp.c Compc.c Complextorect.c Cond.c Cond2.c Condc.c \
+	Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c Diff.c \
+	Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
+	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
+	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
+	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c \
+	Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c \
+	Hi.c Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
 	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
@@ -212,13 +212,13 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 @ENABLE_MAGICS_TRUE@	cdo-StringUtilities.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-CdoMagicsMapper.$(OBJEXT)
 am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
-	cdo-Arith.$(OBJEXT) cdo-Arithc.$(OBJEXT) \
-	cdo-Arithdays.$(OBJEXT) cdo-Arithlat.$(OBJEXT) \
-	cdo-CDItest.$(OBJEXT) cdo-CDIread.$(OBJEXT) \
-	cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) cdo-Change.$(OBJEXT) \
-	cdo-Change_e5slm.$(OBJEXT) cdo-Cloudlayer.$(OBJEXT) \
-	cdo-Collgrid.$(OBJEXT) cdo-Command.$(OBJEXT) \
-	cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
+	cdo-Afterburner.$(OBJEXT) cdo-Arith.$(OBJEXT) \
+	cdo-Arithc.$(OBJEXT) cdo-Arithdays.$(OBJEXT) \
+	cdo-Arithlat.$(OBJEXT) cdo-CDItest.$(OBJEXT) \
+	cdo-CDIread.$(OBJEXT) cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) \
+	cdo-Change.$(OBJEXT) cdo-Change_e5slm.$(OBJEXT) \
+	cdo-Cloudlayer.$(OBJEXT) cdo-Collgrid.$(OBJEXT) \
+	cdo-Command.$(OBJEXT) cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
@@ -574,17 +574,17 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	clipping/grid_cell.h clipping/intersection.c clipping/utils.c \
 	clipping/utils.h
 #
-cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
-	CDItest.c CDIread.c CDIwrite.c Cat.c Change.c Change_e5slm.c \
-	Cloudlayer.c Collgrid.c Command.c Comp.c Compc.c \
-	Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c Copy.c \
-	Deltime.c Derivepar.c Detrend.c Diff.c Distgrid.c Duplicate.c \
-	EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
-	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
-	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
-	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c Gradsdes.c \
-	Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c Hi.c \
-	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
+cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
+	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
+	Change.c Change_e5slm.c Cloudlayer.c Collgrid.c Command.c \
+	Comp.c Compc.c Complextorect.c Cond.c Cond2.c Condc.c \
+	Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c Diff.c \
+	Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
+	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
+	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
+	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c \
+	Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c \
+	Hi.c Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
 	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
@@ -784,6 +784,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Adisit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Afterburner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arith.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithdays.Po@am__quote@
@@ -1671,6 +1672,20 @@ cdo-Adisit.obj: Adisit.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Adisit.c' object='cdo-Adisit.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Adisit.obj `if test -f 'Adisit.c'; then $(CYGPATH_W) 'Adisit.c'; else $(CYGPATH_W) '$(srcdir)/Adisit.c'; fi`
+
+cdo-Afterburner.o: Afterburner.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Afterburner.o -MD -MP -MF $(DEPDIR)/cdo-Afterburner.Tpo -c -o cdo-Afterburner.o `test -f 'Afterburner.c' || echo '$(srcdir)/'`Afterburner.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Afterburner.Tpo $(DEPDIR)/cdo-Afterburner.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Afterburner.c' object='cdo-Afterburner.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Afterburner.o `test -f 'Afterburner.c' || echo '$(srcdir)/'`Afterburner.c
+
+cdo-Afterburner.obj: Afterburner.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Afterburner.obj -MD -MP -MF $(DEPDIR)/cdo-Afterburner.Tpo -c -o cdo-Afterburner.obj `if test -f 'Afterburner.c'; then $(CYGPATH_W) 'Afterburner.c'; else $(CYGPATH_W) '$(srcdir)/Afterburner.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Afterburner.Tpo $(DEPDIR)/cdo-Afterburner.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Afterburner.c' object='cdo-Afterburner.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Afterburner.obj `if test -f 'Afterburner.c'; then $(CYGPATH_W) 'Afterburner.c'; else $(CYGPATH_W) '$(srcdir)/Afterburner.c'; fi`
 
 cdo-Arith.o: Arith.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Arith.o -MD -MP -MF $(DEPDIR)/cdo-Arith.Tpo -c -o cdo-Arith.o `test -f 'Arith.c' || echo '$(srcdir)/'`Arith.c

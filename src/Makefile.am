@@ -147,6 +147,7 @@ bin_PROGRAMS = cdo
 #
 cdo_SOURCES  = cdo.c
 cdo_SOURCES += Adisit.c        \
+               Afterburner.c   \
                Arith.c         \
                Arithc.c        \
                Arithdays.c     \
