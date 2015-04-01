@@ -48,7 +48,7 @@ void *Vertintml(void *argument)
   int tsID, varID, levelID;
   int zaxisIDp, zaxisIDh = -1, nzaxis;
   int gridID, zaxisID;
-  int nplev, nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
+  int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
   int nvct;
   int sgeopot_needed = FALSE;
@@ -61,7 +61,7 @@ void *Vertintml(void *argument)
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double minval, maxval;
   double missval;
-  double *plev = NULL, *vct = NULL;
+  double *vct = NULL;
   double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
@@ -111,9 +111,22 @@ void *Vertintml(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  nplev = args2fltlist(operatorArgc(), operatorArgv(), flist);
-  plev  = (double *) listArrayPtr(flist);
-
+  int nplev = 0;
+  double *plev = NULL;
+  if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
+    {
+      double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
+                         15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
+      nplev = sizeof(stdlev)/sizeof(*stdlev);
+      plev  = (double *) malloc(nplev*sizeof(double));
+      for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+    }
+  else
+    {
+      nplev = args2fltlist(operatorArgc(), operatorArgv(), flist);
+      plev  = (double *) listArrayPtr(flist);
+    }
+  
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
   int vlistID1 = streamInqVlist(streamID1);

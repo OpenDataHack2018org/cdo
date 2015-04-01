@@ -163,10 +163,7 @@ static
 int getDate(const char *name)
 {
   int date = 0;
-  size_t len;
   char *pname;
-
-  len = strlen(name);
 
   pname = strchr(name, '_');
 

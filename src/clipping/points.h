@@ -40,7 +40,7 @@
 
 #include "grid.h"
 
-enum location {
+enum yac_location {
 
    CELL =   0,
    CORNER = 1,
@@ -49,7 +49,7 @@ enum location {
 
 struct points {
 
-   enum location location;
+   enum yac_location location;
 
    double * coordinates_x, * coordinates_y;
 
@@ -58,7 +58,7 @@ struct points {
    struct grid * point_grid;
 };
 
-enum location get_location(int const location);
+enum yac_location yac_get_location(int const location);
 
 /**
  * initialises a struct points
@@ -73,8 +73,8 @@ enum location get_location(int const location);
  * \remarks - for EDGE points the coordinates need to have an entry for each edge (in
  *            the order of the local ids)
  */
-void init_points(struct points * points, struct grid * base_grid, enum location location,
-                 double * coordinates_x, double * coordinates_y);
+void yac_init_points(struct points * points, struct grid * base_grid, enum yac_location location,
+                     double * coordinates_x, double * coordinates_y);
 
 /**
  * returns a grid that has the points defined by the struct points as corners
@@ -83,21 +83,21 @@ void init_points(struct points * points, struct grid * base_grid, enum location 
  *
  * \remarks does not work for EDGE
  */
-struct grid * get_point_grid(struct points * points);
-struct grid * get_base_grid(struct points * points);
+struct grid * yac_get_point_grid(struct points * points);
+struct grid * yac_get_base_grid(struct points * points);
 
-void get_coordinate_array_sizes (struct grid * grid, enum location location, unsigned * sizes);
+void yac_get_coordinate_array_sizes (struct grid * grid, enum yac_location location, unsigned * sizes);
 
 /**
  * returns the number of points in the struct points
  * @param[in] points
  * @return number of points
  */
-unsigned get_data_size(struct points points);
+unsigned yac_get_data_size(struct points points);
 
-void get_point_coordinates (struct points * points, unsigned local_point_id,
-                            double * coordinates);
+void yac_get_point_coordinates (struct points * points, unsigned local_point_id,
+                                double * coordinates);
 
-void free_points(struct points * points);
+void yac_free_points(struct points * points);
 
 #endif // POINTS_H

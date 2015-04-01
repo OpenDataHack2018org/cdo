@@ -35,31 +35,31 @@
 #include "grid.h"
 #include "geometry.h"
 
-void grid_search_utils_do_point_search_p(struct grid_search * search,
-                                         struct grid * search_grid_data,
-                                         struct grid * grid_data,
-                                         struct dep_list * target_to_src_points);
+void yac_grid_search_utils_do_point_search_p(struct grid_search * search,
+                                             struct grid * search_grid_data,
+                                             struct grid * grid_data,
+                                             struct dep_list * target_to_src_points);
 
-void grid_search_utils_do_point_search_p2(struct grid_search * search,
-                                          struct grid * search_grid_data,
-                                          double * x_coordinates,
-                                          double * y_coordinates,
-                                          unsigned num_points,
-                                          struct dep_list * target_to_src_points);
+void yac_grid_search_utils_do_point_search_p2(struct grid_search * search,
+                                              struct grid * search_grid_data,
+                                              double * x_coordinates,
+                                              double * y_coordinates,
+                                              unsigned num_points,
+                                              struct dep_list * target_to_src_points);
 
-void grid_search_utils_do_point_search_p3(struct grid_search * search,
-                                          double * x_coordinates,
-                                          double * y_coordinates,
-                                          unsigned num_points,
-                                          struct dep_list * target_to_src_points,
-                                          struct points * points);
+void yac_grid_search_utils_do_point_search_p3(struct grid_search * search,
+                                              double * x_coordinates,
+                                              double * y_coordinates,
+                                              unsigned num_points,
+                                              struct dep_list * target_to_src_points,
+                                              struct points * points);
 
-void grid_search_utils_do_point_search_p4 (struct grid_search * search,
-                                           struct grid * search_grid_data,
-                                           double x_coordinate,
-                                           double y_coordinate,
-                                           unsigned * n_points,
-                                           unsigned * points_size,
-                                           unsigned ** points);
+void yac_grid_search_utils_do_point_search_p4 (struct grid_search * search,
+                                               struct grid * search_grid_data,
+                                               double x_coordinate,
+                                               double y_coordinate,
+                                               unsigned * n_points,
+                                               unsigned * points_size,
+                                               unsigned ** points);
 
 #endif // GRID_SEARCH_UTILS_H

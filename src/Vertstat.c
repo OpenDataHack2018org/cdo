@@ -203,13 +203,13 @@ void *Vertstat(void *argument)
   if ( needWeights )
     {
       int genbounds = FALSE;
-      int npar = operatorArgc();
+      unsigned npar = operatorArgc();
       if ( npar > 0 )
 	{
 	  char **parnames = operatorArgv();
 
 	  if ( cdoVerbose )
-	    for ( i = 0; i < npar; i++ )
+	    for ( unsigned i = 0; i < npar; i++ )
 	      cdoPrint("key %d = %s", i+1, parnames[i]);
 
 	  if ( strcmp(parnames[0], "genbounds") == 0 ) genbounds = TRUE;

@@ -90,59 +90,46 @@ void invertLevDes(int vlistID)
 
 void *Invertlev(void *argument)
 {
-  int INVERTLEV;
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
-  int nrecs, nvars;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
+  int nrecs;
+  int recID, varID, levelID;
   int nmiss;
-  int **varnmiss;
-  double *array;
-  double **vardata;
-  int taxisID1, taxisID2;
-  int lcopy = FALSE;
   int nlev, nlevel;
   int gridID, zaxisID, zaxistype, offset;
+  int lcopy = FALSE;
   int linvert = FALSE;
 
   cdoInitialize(argument);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  INVERTLEV     = cdoOperatorAdd("invertlev",     func_all, 0, NULL);
+  cdoOperatorAdd("invertlev",     func_all, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc   = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  if ( operfunc == func_all || operfunc == func_hrd )
-    {
-      invertLevDes(vlistID2);
-    }
+  if ( operfunc == func_all || operfunc == func_hrd ) invertLevDes(vlistID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) malloc(gridsize*sizeof(double));
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  vardata  = (double**) malloc(nvars*sizeof(double*));
-  varnmiss = (int**) malloc(nvars*sizeof(int*));
+  double **vardata  = (double**) malloc(nvars*sizeof(double*));
+  int **varnmiss = (int**) malloc(nvars*sizeof(int*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -167,7 +154,7 @@ void *Invertlev(void *argument)
 
   if ( linvert == FALSE ) cdoWarning("No variables with invertable levels found!");
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

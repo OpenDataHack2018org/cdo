@@ -28,6 +28,7 @@
 #include <math.h>
 #include <float.h>
 
+#include "compare.h"
 #include "timebase.h"
 #include "field.h"
 #include "functs.h"
@@ -71,32 +72,6 @@ char *strdup(const char *s);
 
 enum T_WEIGHT_MODE {WEIGHT_OFF, WEIGHT_ON};
 enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
-
-#if defined(__xlC__) /* performance problems on IBM */
-#ifndef DBL_IS_NAN
-#  define DBL_IS_NAN(x)     ((x) != (x))
-#endif
-#else
-#ifndef DBL_IS_NAN
-#if defined(HAVE_DECL_ISNAN)
-#  define DBL_IS_NAN(x)     (isnan(x))
-#elif defined(FP_NAN)
-#  define DBL_IS_NAN(x)     (fpclassify(x) == FP_NAN)
-#else
-#  define DBL_IS_NAN(x)     ((x) != (x))
-#endif
-#endif
-#endif
-
-#ifndef DBL_IS_EQUAL
-/*#define DBL_IS_EQUAL(x,y) (!(x < y || y < x)) */
-#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
-#endif
-
-#ifndef IS_EQUAL
-#  define IS_NOT_EQUAL(x,y) (x < y || y < x)
-#  define IS_EQUAL(x,y)     (!IS_NOT_EQUAL(x,y))
-#endif
 
 
 #ifndef  M_LN10

@@ -415,7 +415,7 @@ void eca2(const ECA_REQUEST_2 *request)
   long nsets;
   int i;
   int istreamID1, istreamID2, ostreamID;
-  int ivlistID1, ivlistID2, ovlistID, itaxisID1, itaxisID2, otaxisID;
+  int ivlistID1, ivlistID2, ovlistID, itaxisID1, otaxisID;
   int nlevels;
   int *recVarID, *recLevelID;
   double missval1, missval2;
@@ -466,7 +466,6 @@ void eca2(const ECA_REQUEST_2 *request)
   if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID1 = vlistInqTaxis(ivlistID1);
-  itaxisID2 = vlistInqTaxis(ivlistID2);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
   //  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);

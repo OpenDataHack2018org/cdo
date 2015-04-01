@@ -32,7 +32,7 @@
 
 #include "grid_search.h"
 
-struct grid_search * bucket_search_new (struct grid * grid_data);
+struct grid_search * yac_bucket_search_new (struct grid * grid_data);
 
 #endif
  

@@ -70,7 +70,7 @@ static unsigned get_num_cell_edges_reg2d(struct grid * grid, unsigned cell_index
 static unsigned const * get_corner_edges_reg2d(struct grid * grid, unsigned corner_index);
 static unsigned const * get_cell_edge_indices_reg2d(struct grid * grid,
                                                     unsigned cell_index);
-static enum edge_type get_edge_type_reg2d(struct grid * grid, unsigned edge_index);
+static enum yac_edge_type get_edge_type_reg2d(struct grid * grid, unsigned edge_index);
 static unsigned const * get_cell_corner_indices_reg2d(struct grid * grid,
                                                       unsigned cell_index);
 static unsigned const * get_corner_cell_indices_reg2d(struct grid * grid,
@@ -84,7 +84,7 @@ static unsigned get_corner_y_coord_index_reg2d(struct grid * grid, unsigned corn
 static double get_corner_x_coord_reg2d(struct grid * grid, unsigned corner_index);
 static double get_corner_y_coord_reg2d(struct grid * grid, unsigned corner_index);
 static int get_aux_grid_cell_reg2d(struct grid * grid, unsigned corner_index,
-                                   unsigned * cell_indices, enum edge_type * edge_type);
+                                   unsigned * cell_indices, enum yac_edge_type * edge_type);
 static struct dep_list get_cell_neigh_dep_list_reg2d(struct grid * grid);
 static void get_boundary_corners_reg2d(struct grid * grid, unsigned * bnd_corners,
                                        unsigned * num_bnd_corners);
@@ -101,7 +101,7 @@ static void pack_grid_reg2d(struct grid * grid, double ** dble_buf,
                             unsigned * dble_buf_size, unsigned ** uint_buf,
                             unsigned uint_buf_offset, unsigned * uint_buf_data_size,
                             unsigned * uint_buf_size);
-struct grid_search * get_grid_search_reg2d(struct grid * grid);
+static struct grid_search * get_grid_search_reg2d(struct grid * grid);
 static void delete_grid_reg2d(struct grid * grid);
 
 static struct grid_vtable reg2d_grid_vtable = {
@@ -294,7 +294,7 @@ static unsigned get_corner_y_coord_index_reg2d(struct grid * grid, unsigned corn
 }
 
 static int get_aux_grid_cell_reg2d(struct grid * grid, unsigned corner_index,
-                                   unsigned * cell_indices, enum edge_type * edge_type) {
+                                   unsigned * cell_indices, enum yac_edge_type * edge_type) {
 
    struct reg2d_grid * reg2d_grid;
 
@@ -721,7 +721,7 @@ static void generate_cell_neigh_dep_reg2d(struct grid * grid) {
       }
    }
 
-   set_dependencies (&(reg2d_grid->cell_to_neigh), num_cells, num_neigh_per_cell,
+   yac_set_dependencies (&(reg2d_grid->cell_to_neigh), num_cells, num_neigh_per_cell,
                      cell_neigh_dependencies);
 }
 
@@ -829,8 +829,8 @@ static void get_grid_cell2_reg2d(struct grid * grid, unsigned cell_index,
 
    get_grid_cell_reg2d(grid, cell_index, cell);
 
-   get_cell_bounding_circle_reg_quad(cell->coordinates_xyz+0, cell->coordinates_xyz+3, cell->coordinates_xyz+6,
-                                     cell->coordinates_xyz+9, bnd_circle);
+   yac_get_cell_bounding_circle_reg_quad(cell->coordinates_xyz+0, cell->coordinates_xyz+3, cell->coordinates_xyz+6,
+                                         cell->coordinates_xyz+9, bnd_circle);
 }
 
 static unsigned const * get_corner_edges_reg2d(struct grid * grid, unsigned corner_index) {
@@ -955,7 +955,7 @@ static unsigned const * get_cell_edge_indices_reg2d(struct grid * grid,
    return edges;
 }
 
-static enum edge_type get_edge_type_reg2d(struct grid * grid, unsigned edge_index) {
+static enum yac_edge_type get_edge_type_reg2d(struct grid * grid, unsigned edge_index) {
 
    struct reg2d_grid * reg2d_grid;
 
@@ -1120,7 +1120,7 @@ static void get_2d_grid_extent_reg2d(struct grid * grid, double (* extent)[2]) {
 
    extent[1][0] = extent[1][1] = reg2d_grid->cell_corners_y[0];
 
-   for (i = 1; i < get_size_y_coords(grid); ++i) {
+   for (i = 1; i < yac_get_size_y_coords(grid); ++i) {
 
       if (extent[1][0] > reg2d_grid->cell_corners_y[i])
           extent[1][0] = reg2d_grid->cell_corners_y[i];
@@ -1142,10 +1142,10 @@ static void get_2d_grid_extent_reg2d(struct grid * grid, double (* extent)[2]) {
       unsigned corner_stack_size;
       
       corner_stack_size = 0;
-      corner_stack = malloc(get_num_grid_corners(grid) * sizeof(corner_stack[0]));
+      corner_stack = malloc(yac_get_num_grid_corners(grid) * sizeof(corner_stack[0]));
 
       corner_stack[corner_stack_size++] = 0;
-      extent[0][0] = extent[0][1] = reg2d_grid->cell_corners_x[get_corner_x_coord_index(grid, 0)];
+      extent[0][0] = extent[0][1] = reg2d_grid->cell_corners_x[yac_get_corner_x_coord_index(grid, 0)];
 
       unsigned curr_corner;
       unsigned const * curr_neigh_corners;
@@ -1160,7 +1160,7 @@ static void get_2d_grid_extent_reg2d(struct grid * grid, double (* extent)[2]) {
          double edge_angle;
          double edge_x_coord[2];
 
-         edge_x_coord[0] =reg2d_grid->cell_corners_x[get_corner_x_coord_index(grid, curr_corner)];
+         edge_x_coord[0] =reg2d_grid->cell_corners_x[yac_get_corner_x_coord_index(grid, curr_corner)];
 
          for (i = 0; i < curr_num_neigh_corners; ++i) {
 
@@ -1206,7 +1206,7 @@ static void get_2d_grid_extent_reg2d(struct grid * grid, double (* extent)[2]) {
 
    struct grid_cell cell;
 
-   init_grid_cell(&cell);
+   yac_init_grid_cell(&cell);
 
    // test whether the grid data includes the pole
    for (i = 0; i < get_num_grid_cells_reg2d(grid); ++i) {
@@ -1215,7 +1215,7 @@ static void get_2d_grid_extent_reg2d(struct grid * grid, double (* extent)[2]) {
       get_grid_cell_reg2d(grid, i, &cell);
 
       // check the cell
-      if (cell_covers_pole(cell.num_corners, cell.coordinates_x, cell.coordinates_y)) {
+      if (yac_cell_covers_pole(cell.num_corners, cell.coordinates_x, cell.coordinates_y)) {
 
          if (cell.coordinates_y[0] > 0)
             extent[1][1] = M_PI_2;
@@ -1224,7 +1224,7 @@ static void get_2d_grid_extent_reg2d(struct grid * grid, double (* extent)[2]) {
       }
    } // i
 
-   free_grid_cell(&cell);
+   yac_free_grid_cell(&cell);
 }
 
 static struct grid * generate_cell_grid_reg2d(struct grid * grid, double * coordinates_x, 
@@ -1240,7 +1240,7 @@ static struct grid * generate_cell_grid_reg2d(struct grid * grid, double * coord
    if (reg2d_grid->cyclic[0])
       num_cells[0]++;
 
-   return reg2d_grid_new(coordinates_x, coordinates_y, num_cells, reg2d_grid->cyclic);
+   return yac_reg2d_grid_new(coordinates_x, coordinates_y, num_cells, reg2d_grid->cyclic);
 }
 
 static struct grid * copy_grid_reg2d(struct grid * grid) {
@@ -1250,7 +1250,7 @@ static struct grid * copy_grid_reg2d(struct grid * grid) {
    struct reg2d_grid * copy = malloc(1 * sizeof(*copy));
 
    copy->vtable = &reg2d_grid_vtable;
-   init_dep_list(&copy->cell_to_neigh);
+   yac_init_dep_list(&copy->cell_to_neigh);
 
    unsigned x_coords_size = get_size_x_coords_reg2d(grid) * sizeof(*copy->cell_corners_x);
    unsigned y_coords_size = get_size_y_coords_reg2d(grid) * sizeof(*copy->cell_corners_y);
@@ -1308,7 +1308,7 @@ static void pack_grid_reg2d(struct grid * grid, double ** dble_buf,
    dble_buf_offset += size_x_coords;
    memcpy((*dble_buf)+dble_buf_offset, reg2d_grid->cell_corners_y, size_y_coords * sizeof(**dble_buf));
 
-   (*uint_buf)[uint_buf_offset+0] = hash("REG2D");
+   (*uint_buf)[uint_buf_offset+0] = yac_hash("REG2D");
    (*uint_buf)[uint_buf_offset+1] = reg2d_grid->num_cells[0];
    (*uint_buf)[uint_buf_offset+2] = reg2d_grid->num_cells[1];
    (*uint_buf)[uint_buf_offset+3] = reg2d_grid->cyclic[0];
@@ -1318,8 +1318,8 @@ static void pack_grid_reg2d(struct grid * grid, double ** dble_buf,
    *uint_buf_data_size = required_uint_buf_size;
 }
 
-struct grid * unpack_reg2d_grid(double * dble_buf, unsigned * dble_buf_data_size,
-                                unsigned * uint_buf, unsigned * uint_buf_data_size) {
+struct grid * yac_unpack_reg2d_grid(double * dble_buf, unsigned * dble_buf_data_size,
+                                    unsigned * uint_buf, unsigned * uint_buf_data_size) {
 
    unsigned num_cells[2], cyclic[2];
 
@@ -1343,7 +1343,7 @@ struct grid * unpack_reg2d_grid(double * dble_buf, unsigned * dble_buf_data_size
 
    struct reg2d_grid * reg2d_grid;
 
-   reg2d_grid = (struct reg2d_grid *)reg2d_grid_new(cell_corners_x, cell_corners_y, num_cells, cyclic);
+   reg2d_grid = (struct reg2d_grid *)yac_reg2d_grid_new(cell_corners_x, cell_corners_y, num_cells, cyclic);
 
    *dble_buf_data_size = size_x_coords + size_y_coords;
    *uint_buf_data_size = 5;
@@ -1360,7 +1360,7 @@ static void delete_grid_reg2d(struct grid * grid) {
 
    reg2d_grid = (struct reg2d_grid *)grid;
 
-   free_dep_list(&(reg2d_grid->cell_to_neigh));
+   yac_free_dep_list(&(reg2d_grid->cell_to_neigh));
    if (!reg2d_grid->cell_corners_x_by_user)
       free(reg2d_grid->cell_corners_x);
    if (!reg2d_grid->cell_corners_y_by_user)
@@ -1371,7 +1371,7 @@ static void delete_grid_reg2d(struct grid * grid) {
    free(reg2d_grid->cos_cell_corners_y);
 
    if (reg2d_grid->grid_search != NULL)
-      delete_grid_search(reg2d_grid->grid_search);
+      yac_delete_grid_search(reg2d_grid->grid_search);
 
    free(reg2d_grid);
 }
@@ -1388,7 +1388,7 @@ static struct grid * generate_subgrid_reg2d(struct grid * grid,
    reg2d_grid = (struct reg2d_grid *)grid;
 
    if (num_local_cells == 0)
-      abort_message ( "ERROR: cells need to be defined.", __FILE__, __LINE__ );
+      yac_internal_abort_message ( "ERROR: cells need to be defined.", __FILE__, __LINE__ );
 
    // compute the index range of the subgrid
 
@@ -1440,7 +1440,7 @@ static struct grid * generate_subgrid_reg2d(struct grid * grid,
 
    struct grid * subgrid;
 
-   subgrid = reg2d_grid_new(cell_x_coords, cell_y_coords, num_cells, cyclic);
+   subgrid = yac_reg2d_grid_new(cell_x_coords, cell_y_coords, num_cells, cyclic);
 
    ((struct reg2d_grid *)subgrid)->cell_corners_x_by_user = 1 == 0;
    ((struct reg2d_grid *)subgrid)->cell_corners_y_by_user = 1 == 0;
@@ -1484,7 +1484,7 @@ static struct grid * generate_subgrid_reg2d(struct grid * grid,
    free(edge_mask);
 
    if (k != get_num_grid_edges_reg2d(subgrid))
-      abort_message ( "ERROR: Number of edges does not match.", __FILE__, __LINE__ );
+      yac_internal_abort_message ( "ERROR: Number of edges does not match.", __FILE__, __LINE__ );
 
    k = 0;
 
@@ -1499,15 +1499,15 @@ static struct grid * generate_subgrid_reg2d(struct grid * grid,
    return subgrid;
 }
 
-struct grid * reg2d_grid_new(double * coordinates_x, double * coordinates_y,
-                             unsigned const num_cells[2], unsigned const cyclic[2]) {
+struct grid * yac_reg2d_grid_new(double * coordinates_x, double * coordinates_y,
+                                 unsigned const num_cells[2], unsigned const cyclic[2]) {
 
    struct reg2d_grid * reg2d_grid;
 
    reg2d_grid = malloc(1 * sizeof(*reg2d_grid));
 
    reg2d_grid->vtable = &reg2d_grid_vtable;
-   init_dep_list(&reg2d_grid->cell_to_neigh);
+   yac_init_dep_list(&reg2d_grid->cell_to_neigh);
 
    reg2d_grid->cell_corners_x = coordinates_x;
    reg2d_grid->cell_corners_y = coordinates_y;
@@ -1556,14 +1556,14 @@ struct grid * reg2d_grid_new(double * coordinates_x, double * coordinates_y,
    return (struct grid *) reg2d_grid;
 }
 
-struct grid_search * get_grid_search_reg2d(struct grid * grid) {
+static struct grid_search * get_grid_search_reg2d(struct grid * grid) {
 
    struct reg2d_grid * reg2d_grid;
 
    reg2d_grid = (struct reg2d_grid *)grid;
 
    if (reg2d_grid->grid_search == NULL)
-      reg2d_grid->grid_search = sphere_part_search_new(grid);
+      reg2d_grid->grid_search = yac_sphere_part_search_new(grid);
 
    return reg2d_grid->grid_search;
 }

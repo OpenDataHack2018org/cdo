@@ -36,7 +36,7 @@
 #ifndef GRID_CELL_H
 #define GRID_CELL_H
 
-enum edge_type {
+enum yac_edge_type {
    GREAT_CIRCLE = 0, //!< great circle
    LAT_CIRCLE   = 1, //!< latitude circle
    LON_CIRCLE   = 2, //!< longitude circle
@@ -45,7 +45,7 @@ enum edge_type {
 struct grid_cell {
    double * coordinates_x, * coordinates_y;
    double * coordinates_xyz;
-   enum edge_type * edge_type;
+   enum yac_edge_type * edge_type;
    unsigned num_corners;
    unsigned array_size; //!< size in elements of the arrays: coordinates_x,
                         //!< coordinates_y, edge_type and 1/3 of coordinates_xyz
@@ -58,7 +58,7 @@ struct grid_cell {
  * @see free_grid_cell
  * @see get_grid_cell
  */
-void init_grid_cell(struct grid_cell * cell);
+void yac_init_grid_cell(struct grid_cell * cell);
 
 /**
  * copies a given grid cell
@@ -67,25 +67,13 @@ void init_grid_cell(struct grid_cell * cell);
  * @remarks out_cell needs to be a cell that has previously been
  *          initialised or a cell that already contains valid data
  */
-void copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell);
+void yac_copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell);
 
 /**
  * frees all memory associated with a grid_cell object and reinitialised
  * the cell
  * @param[in,out] cell
  */
-void free_grid_cell(struct grid_cell * cell);
-
-void pack_grid_cell(struct grid_cell cell, double ** dble_buf,
-                    unsigned dble_buf_offset, unsigned * dble_buf_data_size,
-                    unsigned * dble_buf_size, unsigned ** uint_buf,
-                    unsigned uint_buf_offset, unsigned * uint_buf_data_size,
-                    unsigned * uint_buf_size);
-
-void unpack_grid_cell(struct grid_cell * cell, double * dble_buf,
-                      unsigned * dble_buf_data_size, unsigned * uint_buf,
-                      unsigned * uint_buf_data_size);
-
-void print_grid_cell(FILE * stream, struct grid_cell cell, char * name);
+void yac_free_grid_cell(struct grid_cell * cell);
 
 #endif // GRID_CELL_H

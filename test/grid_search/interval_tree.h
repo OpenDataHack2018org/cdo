@@ -30,6 +30,10 @@
  * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
  */
 
+/** \example test_interval_tree.c
+ * This contains a test of the interval_tree.
+ */
+
 #ifndef INTERVAL_TREE_H
 #define INTERVAL_TREE_H
 
@@ -55,7 +59,7 @@ struct interval_node
 };
 
 void
-generate_interval_tree(struct interval_node intervals[], size_t num_nodes);
+yac_generate_interval_tree(struct interval_node intervals[], size_t num_nodes);
 
 struct overlaps
 {
@@ -64,7 +68,7 @@ struct overlaps
 };
 
 void
-search_interval_tree(struct interval_node tree[], size_t num_nodes,
-                     struct interval query, struct overlaps *overlaps);
+yac_search_interval_tree(struct interval_node tree[], size_t num_nodes,
+                         struct interval query, struct overlaps *overlaps);
 
 #endif

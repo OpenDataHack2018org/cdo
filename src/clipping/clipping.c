@@ -55,7 +55,7 @@ enum cell_type {
 struct point_list_element {
 
   double vec_coords[3];
-  enum edge_type edge_type; // type of edge with next corner
+  enum yac_edge_type edge_type; // type of edge with next corner
   int to_be_removed;
   struct point_list_element * next;
 };
@@ -92,10 +92,10 @@ static enum cell_type get_cell_type(struct grid_cell target_cell);
 
 /* ------------------------- */
 
-void compute_overlap_areas(unsigned N,
-                           struct grid_cell * source_cell,
-                           struct grid_cell target_cell,
-                           double * partial_areas) {
+void yac_compute_overlap_areas (unsigned N,
+                                struct grid_cell * source_cell,
+                                struct grid_cell target_cell,
+                                double * partial_areas) {
 
   static struct grid_cell * overlap_buffer = NULL;
   static unsigned overlap_buffer_size = 0;
@@ -110,17 +110,17 @@ void compute_overlap_areas(unsigned N,
 
     for (; old_overlap_buffer_size < overlap_buffer_size;
          ++old_overlap_buffer_size)
-      init_grid_cell(overlap_buffer + old_overlap_buffer_size);
+      yac_init_grid_cell(overlap_buffer + old_overlap_buffer_size);
   }
 
   /* Do the clipping and get the cell for the overlapping area */
 
-  cell_clipping ( N, source_cell, target_cell, overlap_buffer);
+  yac_cell_clipping ( N, source_cell, target_cell, overlap_buffer);
 
   /* Get the partial areas for the overlapping regions */
 
   for (unsigned n = 0; n < N; n++) {
-    partial_areas[n] = huiliers_area (overlap_buffer[n]);
+    partial_areas[n] = yac_huiliers_area (overlap_buffer[n]);
     // we cannot use pole_area because it is rather inaccurate for great circle
     // edges that are nearly circles of longitude
     //partial_areas[n] = pole_area (overlap_buffer[n]);
@@ -134,32 +134,32 @@ void compute_overlap_areas(unsigned N,
 
 /* ------------------------- */
 
-void compute_concave_overlap_areas (unsigned N,
-                                    struct grid_cell * source_cell,
-                                    struct grid_cell target_cell,
-                                    double * target_node_x,
-                                    double * target_node_y,
-                                    double * partial_areas) {
+void yac_compute_concave_overlap_areas (unsigned N,
+                                        struct grid_cell * source_cell,
+                                        struct grid_cell target_cell,
+                                        double * target_node_x,
+                                        double * target_node_y,
+                                        double * partial_areas) {
   enum cell_type target_cell_type;
 
   if ( target_cell.num_corners > 3 )
     target_cell_type = get_cell_type (target_cell);
 
   if ( target_cell.num_corners < 4 || target_cell_type == LON_LAT_CELL ) {
-    compute_overlap_areas (N, source_cell, target_cell, partial_areas);
+    yac_compute_overlap_areas (N, source_cell, target_cell, partial_areas);
     return;
   }
 
   if ( target_node_x == NULL || target_node_y == NULL )
-    abort_message("ERROR: missing target point coordinates "
-		  "(x_coordinates == NULL || y_coordinates == NULL)",
-		  __FILE__, __LINE__);
+    yac_internal_abort_message("ERROR: missing target point coordinates "
+                               "(x_coordinates == NULL || y_coordinates == NULL)",
+                               __FILE__ , __LINE__);
 
   struct grid_cell target_partial_cell =
     {.coordinates_x   = (double[3]){-1},
      .coordinates_y   = (double[3]){-1},
      .coordinates_xyz = (double[3*3]){-1},
-     .edge_type       = (enum edge_type[3]) {GREAT_CIRCLE},
+     .edge_type       = (enum yac_edge_type[3]) {GREAT_CIRCLE},
      .num_corners     = 3};
 
   static struct grid_cell * overlap_buffer = NULL;
@@ -175,7 +175,7 @@ void compute_concave_overlap_areas (unsigned N,
 
     for (; old_overlap_buffer_size < overlap_buffer_size;
          ++old_overlap_buffer_size)
-      init_grid_cell(overlap_buffer + old_overlap_buffer_size);
+      yac_init_grid_cell(overlap_buffer + old_overlap_buffer_size);
   }
 
   /* Do the clipping and get the cell for the overlapping area */
@@ -232,12 +232,12 @@ void compute_concave_overlap_areas (unsigned N,
     target_partial_cell.coordinates_xyz[1+3*2] = target_cell.coordinates_xyz[1+3*corner_b];
     target_partial_cell.coordinates_xyz[2+3*2] = target_cell.coordinates_xyz[2+3*corner_b];
 
-    cell_clipping ( N, source_cell, target_partial_cell, overlap_buffer);
+    yac_cell_clipping ( N, source_cell, target_partial_cell, overlap_buffer);
 
     /* Get the partial areas for the overlapping regions as sum over the partial target cells. */
 
     for (unsigned n = 0; n < N; n++) {
-      partial_areas[n] += huiliers_area (overlap_buffer[n]);
+      partial_areas[n] += yac_huiliers_area (overlap_buffer[n]);
       // we cannot use pole_area because it is rather inaccurate for great circle
       // edges that are nearly circles of longitude
       //partial_areas[n] = pole_area (overlap_buffer[n]);
@@ -264,8 +264,8 @@ static void compute_norm_vector(double a[], double b[], double norm[]) {
   if ((fabs(norm[0]) < tol) &&
       (fabs(norm[1]) < tol) &&
       (fabs(norm[2]) < tol))
-    abort_message("ERROR: a and b are identical -> no norm vector\n",
-                  __FILE__, __LINE__);
+    yac_internal_abort_message("ERROR: a and b are identical -> no norm vector\n",
+                               __FILE__, __LINE__);
 
   double scale = 1.0 / sqrt(norm[0] * norm[0] + norm[1] * norm[1] + norm[2] * norm[2]);
 
@@ -310,7 +310,7 @@ static unsigned is_inside_gc(double point[], double norm_vec[]) {
   dot = dotproduct(point, norm_vec);
 
   // if the point is on the line
-  if (fabs(dot) <= angle_tol * 1e-3)
+  if (fabs(dot) <= yac_angle_tol * 1e-3)
     return 2;
 
   return dot < 0;
@@ -320,12 +320,12 @@ static unsigned is_inside_latc(double point[], double z) {
 
   double temp = fabs(point[2] + z);
 
-  if (fabs(1.0 - temp) <= angle_tol * 1e-3) return 2;
+  if (fabs(1.0 - temp) <= yac_angle_tol * 1e-3) return 2;
   else return temp < 1.0;
 }
 
 static unsigned is_inside(double point[], double help_vec[],
-                          enum edge_type edge_type,
+                          enum yac_edge_type edge_type,
                           unsigned cell_points_ordering) {
 
   unsigned ret_val = 0;
@@ -340,7 +340,7 @@ static unsigned is_inside(double point[], double help_vec[],
       ret_val = is_inside_latc(point, help_vec[2]);
       break;
     default:
-      abort_message("invalid edge type\n", __FILE__, __LINE__);
+      yac_internal_abort_message("invalid edge type\n", __FILE__, __LINE__);
   };
 
   if (ret_val == 2) return 2;
@@ -425,8 +425,8 @@ static void get_edge_middle_point_gc(double a[3], double b[3],
   middle[2] *= scale;
 }
 
-static void get_edge_middle_point(double a[3], double b[3],
-                                  enum edge_type edge_type, double middle[3]) {
+static void get_edge_middle_point (double a[3], double b[3],
+                                   enum yac_edge_type edge_type, double middle[3]) {
 
   switch (edge_type) {
 
@@ -442,7 +442,7 @@ static void get_edge_middle_point(double a[3], double b[3],
       break;
 
     default:
-      abort_message("ERROR: invalid edge type\n", __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: invalid edge type\n", __FILE__, __LINE__);
       middle[0] = -1; // program should never reach this point
       middle[1] = -1;
       middle[2] = -1;
@@ -450,11 +450,11 @@ static void get_edge_middle_point(double a[3], double b[3],
 }
 
 /**
- * cell clipping using Sutherland–Hodgman algorithm;
+ * cell clipping using Sutherland-Hodgman algorithm;
  */
-void point_list_clipping(struct point_list * source_list, int source_ordering,
-                         struct point_list target_list, int target_ordering,
-                         unsigned nct, double * tgt_edge_norm_vec) {
+static void point_list_clipping (struct point_list * source_list, int source_ordering,
+                                 struct point_list target_list, int target_ordering,
+                                 unsigned nct, double * tgt_edge_norm_vec) {
 
   struct {
     double * edge_norm_vec;
@@ -516,13 +516,13 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
            (prev_is_inside + curr_is_inside < 4))) {
 
         // get intersection points
-        intersect = intersect_vec(prev_src_point->edge_type,
-                                  prev_src_point->vec_coords,
-                                  curr_src_point->vec_coords,
-                                  tgt_points[i].point->edge_type,
-                                  tgt_points[i].point->vec_coords,
-                                  tgt_points[i].point->next->vec_coords,
-                                  p, q);
+        intersect = yac_intersect_vec(prev_src_point->edge_type,
+                                      prev_src_point->vec_coords,
+                                      curr_src_point->vec_coords,
+                                      tgt_points[i].point->edge_type,
+                                      tgt_points[i].point->vec_coords,
+                                      tgt_points[i].point->next->vec_coords,
+                                      p, q);
 
         // if both edges are on an identical great circle
         if ((intersect != -1) && (intersect & (1 << 4))) {
@@ -567,7 +567,7 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
                 prev_src_point:curr_src_point;
               break;
             default:
-              abort_message("invalid edge type\n", __FILE__, __LINE__);
+              yac_internal_abort_message("invalid edge type\n", __FILE__, __LINE__);
               return;
           };
 
@@ -582,14 +582,14 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
           if (!((prev_src_point->edge_type == LAT_CIRCLE) ^
                 (tgt_points[i].point->edge_type == LAT_CIRCLE))) {
 
-            abort_message("ERROR: ...this should not have happened...\n",
-                          __FILE__, __LINE__);
+            yac_internal_abort_message("ERROR: ...this should not have happened...\n",
+                                       __FILE__, __LINE__);
           }
 
-          if (((get_vector_angle(prev_src_point->vec_coords, p) < angle_tol) &&
-               (get_vector_angle(curr_src_point->vec_coords, q) < angle_tol)) ||
-              ((get_vector_angle(prev_src_point->vec_coords, q) < angle_tol) &&
-               (get_vector_angle(curr_src_point->vec_coords, p) < angle_tol))) {
+          if (((get_vector_angle(prev_src_point->vec_coords, p) < yac_angle_tol) &&
+               (get_vector_angle(curr_src_point->vec_coords, q) < yac_angle_tol)) ||
+              ((get_vector_angle(prev_src_point->vec_coords, q) < yac_angle_tol) &&
+               (get_vector_angle(curr_src_point->vec_coords, p) < yac_angle_tol))) {
 
             prev_is_inside = 2;
             curr_is_inside = 2;
@@ -619,7 +619,7 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
                                   tgt_points[i].edge_norm_vec[2]));
                 break;
               default:
-                abort_message("invalid edge type\n", __FILE__, __LINE__);
+                yac_internal_abort_message("invalid edge type\n", __FILE__, __LINE__);
                 return;
             };
 
@@ -716,7 +716,7 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
 
             int p_is_first = get_vector_angle(prev_src_point->vec_coords, p) <
                              get_vector_angle(prev_src_point->vec_coords, q);
-            enum edge_type prev_src_point_edge_type =
+            enum yac_edge_type prev_src_point_edge_type =
               prev_src_point->edge_type;
 
             intersect_points[!p_is_first]->vec_coords[0] = p[0];
@@ -759,7 +759,7 @@ void point_list_clipping(struct point_list * source_list, int source_ordering,
                     break;
                   default:
                     norm_vec[0] = 0.0, norm_vec[1] = 0.0, norm_vec[2] = 0.0;
-                    abort_message("invalid edge type\n", __FILE__, __LINE__);
+                    yac_internal_abort_message("invalid edge type\n", __FILE__, __LINE__);
                 };
 
                 tgt_edge_inside_src = is_inside(edge_middle, norm_vec,
@@ -882,10 +882,10 @@ static void copy_point_list(struct point_list in, struct point_list * out) {
   out->last = new;
 }
 
-void cell_clipping(unsigned N,
-                   struct grid_cell * source_cell,
-                   struct grid_cell target_cell,
-                   struct grid_cell * overlap_buffer) {
+void yac_cell_clipping (unsigned N,
+                        struct grid_cell * source_cell,
+                        struct grid_cell target_cell,
+                        struct grid_cell * overlap_buffer) {
 
   unsigned ncs;               /* number of vertices of source cell */
   unsigned nct;               /* number of vertices of target cell */
@@ -900,9 +900,9 @@ void cell_clipping(unsigned N,
   enum cell_type tgt_cell_type = get_cell_type(target_cell);
 
   if (tgt_cell_type == MIXED_CELL)
-    abort_message("invalid target cell type (cell contains edges consisting "
-                  "of great circles and circles of latitude)\n", __FILE__,
-                  __LINE__);
+    yac_internal_abort_message("invalid target cell type (cell contains edges consisting "
+                               "of great circles and circles of latitude)\n",
+			       __FILE__, __LINE__);
 
   init_point_list(&temp_list);
 
@@ -946,7 +946,7 @@ void cell_clipping(unsigned N,
                             norm_vec + 3 * i);
         break;
       default:
-        abort_message("invalid edge type\n", __FILE__, __LINE__);
+        yac_internal_abort_message("invalid edge type\n", __FILE__, __LINE__);
     };
     prev_tgt_point = curr_tgt_point;
     curr_tgt_point = curr_tgt_point->next;
@@ -965,9 +965,9 @@ void cell_clipping(unsigned N,
     enum cell_type src_cell_type = get_cell_type(source_cell[n]);
 
     if (src_cell_type == MIXED_CELL)
-      abort_message("invalid source cell type (cell contains edges consisting "
-                    "of great circles and circles of latitude)\n", __FILE__,
-                    __LINE__);
+      yac_internal_abort_message("invalid source cell type (cell contains edges consisting "
+                                 "of great circles and circles of latitude)\n",
+                                 __FILE__, __LINE__);
 
     if (source_cell[n].num_corners < 2)
       continue;
@@ -1021,7 +1021,7 @@ void cell_clipping(unsigned N,
                                        temp_norm_vec + 3 * i);
             break;
           default:
-            abort_message("invalid edge type\n", __FILE__, __LINE__);
+            yac_internal_abort_message("invalid edge type\n", __FILE__, __LINE__);
         };
         src_point = src_point->next;
       }
@@ -1051,7 +1051,7 @@ void cell_clipping(unsigned N,
 
 /* ---------------------------------------------------- */
 
-void correct_weights ( unsigned nSourceCells, double * weight ) {
+void yac_correct_weights ( unsigned nSourceCells, double * weight ) {
 
   static unsigned maxIter = 10; // number of iterations to get better accuracy of the weights
   static double const tol = 1.0e-15;
@@ -1092,7 +1092,7 @@ void correct_weights ( unsigned nSourceCells, double * weight ) {
 static unsigned get_cell_points_ordering(struct point_list * cell) {
 
   if ((cell->first == NULL) || (cell->first == cell->last))
-    abort_message("ERROR: invalid cell\n", __FILE__, __LINE__);
+    yac_internal_abort_message("ERROR: invalid cell\n", __FILE__, __LINE__);
 
   double norm_vec[3];
   struct point_list_element * curr = cell->first;
@@ -1102,7 +1102,7 @@ static unsigned get_cell_points_ordering(struct point_list * cell) {
   curr = curr->next;
 
   if (curr->next == cell->first)
-    abort_message("ERROR: invalid cell\n", __FILE__, __LINE__);
+    yac_internal_abort_message("ERROR: invalid cell\n", __FILE__, __LINE__);
 
   do {
     curr = curr->next;
@@ -1114,8 +1114,8 @@ static unsigned get_cell_points_ordering(struct point_list * cell) {
 
   } while (curr != cell->first);
 
-  abort_message("ERROR: could not determine order of points in cell\n",
-                __FILE__, __LINE__);
+  yac_internal_abort_message("ERROR: could not determine order of points in cell\n",
+                             __FILE__, __LINE__);
 
   return -1;
 }

@@ -3,11 +3,8 @@
 #include <string.h>
 #include <math.h>
 
-#include "cdo_int.h" // IS_EQUAL
-
-#ifndef _VINTERP_H
-#  include "vinterp.h"
-#endif
+#include "compare.h"
+#include "vinterp.h"
 
 #define  SCALEHEIGHT     (-7000.)
 #define  SCALESLP        (101325.0)
@@ -461,8 +458,8 @@ void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *v
            */
 	  w1 = wgt1;
 	  w2 = wgt2;
-	  if ( DBL_IS_EQUAL(var1L1, missval)  ) w1 = 0;
-	  if ( DBL_IS_EQUAL(var1L2, missval)  ) w2 = 0;
+	  if ( DBL_IS_EQUAL(var1L1, missval) ) w1 = 0;
+	  if ( DBL_IS_EQUAL(var1L2, missval) ) w2 = 0;
 
 	  if ( IS_EQUAL(w1, 0) && IS_EQUAL(w2, 0) )
 	    {
@@ -490,6 +487,8 @@ void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *v
     }
 }
 
+#if defined(CDO)
+#include "util.h"
 /*
  * Create weights for the 3d vertical coordinate
  *
@@ -672,3 +671,4 @@ void vert_gen_weights3d1d(int expol, int nlev1, int gridsize, double *lev1, int 
         }
     }
 }
+#endif

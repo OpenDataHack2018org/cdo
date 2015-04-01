@@ -68,7 +68,7 @@ static unsigned get_num_cell_edges_unstruct(struct grid * grid, unsigned cell_in
 static unsigned const * get_corner_edges_unstruct(struct grid * grid, unsigned corner_index);
 static unsigned const * get_cell_edge_indices_unstruct(struct grid * grid,
                                                        unsigned cell_index);
-static enum edge_type get_edge_type_unstruct(struct grid * grid, unsigned edge_index);
+static enum yac_edge_type get_edge_type_unstruct(struct grid * grid, unsigned edge_index);
 static unsigned const * get_cell_corner_indices_unstruct(struct grid * grid,
                                                          unsigned cell_index);
 static unsigned const * get_corner_cell_indices_unstruct(struct grid * grid,
@@ -82,7 +82,7 @@ static unsigned get_corner_y_coord_index_unstruct(struct grid * grid, unsigned c
 static double get_corner_x_coord_unstruct(struct grid * grid, unsigned corner_index);
 static double get_corner_y_coord_unstruct(struct grid * grid, unsigned corner_index);
 static int get_aux_grid_cell_unstruct(struct grid * grid, unsigned corner_index,
-                                      unsigned * cell_indices, enum edge_type * edge_type);
+                                      unsigned * cell_indices, enum yac_edge_type * edge_type);
 static struct dep_list get_cell_neigh_dep_list_unstruct(struct grid * grid);
 static void get_boundary_corners_unstruct(struct grid * grid, unsigned * bnd_corners,
                                           unsigned * num_bnd_corners);
@@ -100,7 +100,7 @@ static void pack_grid_unstruct(struct grid * grid, double ** dble_buf,
                                unsigned * dble_buf_size, unsigned ** uint_buf,
                                unsigned uint_buf_offset, unsigned * uint_buf_data_size,
                                unsigned * uint_buf_size);
-struct grid_search * get_grid_search_unstruct(struct grid * grid);
+static struct grid_search * get_grid_search_unstruct(struct grid * grid);
 static void delete_grid_unstruct(struct grid * grid);
 
 static struct grid_vtable unstruct_grid_vtable = {
@@ -210,7 +210,7 @@ static unsigned const * get_cell_x_coord_indices_unstruct (struct grid * grid,
 
    unstruct_grid = (struct unstruct_grid *)grid;
 
-   return get_dependencies_of_element(
+   return yac_get_dependencies_of_element(
       unstruct_grid->cell_to_vertex, cell_index);
 }
 
@@ -357,7 +357,7 @@ static void generate_unstruct_edges(struct grid * grid) {
    unsigned * num_edges_per_corner;
    unsigned * edge_list;
 
-   init_dep_list(&(unstruct_grid->corner_to_corner));
+   yac_init_dep_list(&(unstruct_grid->corner_to_corner));
 
    num_corners = get_num_grid_corners_unstruct(grid);
    num_edges_per_corner = calloc (num_corners, sizeof (num_edges_per_corner[0]));
@@ -378,7 +378,7 @@ static void generate_unstruct_edges(struct grid * grid) {
 
       // get the corners of the current cell
       curr_cell_corners =
-         get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
+         yac_get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
 
       // for all corners of the current cell
       for (j = 0; j < unstruct_grid->cell_to_vertex.num_deps_per_element[i] - 1; ++j) {
@@ -427,7 +427,7 @@ static void generate_unstruct_edges(struct grid * grid) {
 
       // get the corners of the current cell
       curr_cell_corners =
-         get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
+         yac_get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
 
       // for all corners of the current cell
       for (j = 0; j < unstruct_grid->cell_to_vertex.num_deps_per_element[i] - 1; ++j) {
@@ -503,10 +503,10 @@ static void generate_unstruct_edges(struct grid * grid) {
 
    edge_list = realloc(temp_edge_list, num_edges * sizeof (*edge_list));
 
-   set_dependencies(&(unstruct_grid->corner_to_corner), num_corners,
-                    num_edges_per_corner, edge_list);
-   invert_dep_list(unstruct_grid->corner_to_corner,
-                   &(unstruct_grid->inv_corner_to_corner));
+   yac_set_dependencies(&(unstruct_grid->corner_to_corner), num_corners,
+                        num_edges_per_corner, edge_list);
+   yac_invert_dep_list(unstruct_grid->corner_to_corner,
+                     &(unstruct_grid->inv_corner_to_corner));
 }
 
 // inserts an element into an array and increases the corresponding size
@@ -550,7 +550,7 @@ static void generate_cell_neigh_dep_unstruct(struct grid * grid) {
    struct dep_list vertex_to_cell;
 
    // generate a vertex to cell mapping
-   invert_dep_list(unstruct_grid->cell_to_vertex, &vertex_to_cell);
+   yac_invert_dep_list(unstruct_grid->cell_to_vertex, &vertex_to_cell);
 
    unsigned total_num_neighs;
    unsigned num_cells;
@@ -575,7 +575,7 @@ static void generate_cell_neigh_dep_unstruct(struct grid * grid) {
       unsigned const * curr_corners;
 
       curr_num_corners = unstruct_grid->cell_to_vertex.num_deps_per_element[i];
-      curr_corners = get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
+      curr_corners = yac_get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
 
       // for all corners of the current cell
       for (j = 0; j < curr_num_corners; ++j) {
@@ -584,7 +584,7 @@ static void generate_cell_neigh_dep_unstruct(struct grid * grid) {
          unsigned const * curr_cells;
 
          curr_num_cells = vertex_to_cell.num_deps_per_element[curr_corners[j]];
-         curr_cells = get_dependencies_of_element(vertex_to_cell, curr_corners[j]);
+         curr_cells = yac_get_dependencies_of_element(vertex_to_cell, curr_corners[j]);
 
          // for all cells associated to this corner
          for (k = 0; k < curr_num_cells; ++k) {
@@ -605,10 +605,10 @@ static void generate_cell_neigh_dep_unstruct(struct grid * grid) {
    cell_neigh_dependencies = realloc (cell_neigh_dependencies, total_num_neighs *
                                       sizeof(cell_neigh_dependencies[0]));
 
-   set_dependencies (&(unstruct_grid->cell_to_neigh), num_cells, num_neigh_per_cell,
-                     cell_neigh_dependencies);
+   yac_set_dependencies (&(unstruct_grid->cell_to_neigh), num_cells, num_neigh_per_cell,
+                         cell_neigh_dependencies);
 
-   free_dep_list(&vertex_to_cell);
+   yac_free_dep_list(&vertex_to_cell);
 }
 
 static unsigned get_num_grid_edges_unstruct(struct grid * grid) {
@@ -620,7 +620,7 @@ static unsigned get_num_grid_edges_unstruct(struct grid * grid) {
    if (unstruct_grid->corner_to_corner.num_elements == 0)
       generate_unstruct_edges (grid);
 
-   return get_total_num_dependencies(unstruct_grid->corner_to_corner);
+   return yac_get_total_num_dependencies(unstruct_grid->corner_to_corner);
 }
 
 static unsigned get_num_corner_edges_unstruct(struct grid * grid, unsigned corner_index) {
@@ -657,7 +657,7 @@ static void get_boundary_corners_unstruct(struct grid * grid, unsigned * bnd_cor
 
    unsigned * num_cells_per_edge; // contains the number cell associated with each edge
 
-   num_cells_per_edge = calloc (get_num_grid_edges(grid),
+   num_cells_per_edge = calloc (yac_get_num_grid_edges(grid),
                                 sizeof (num_cells_per_edge[0]));
 
    //---------------------------------------------
@@ -669,9 +669,9 @@ static void get_boundary_corners_unstruct(struct grid * grid, unsigned * bnd_cor
    unsigned const * curr_cell_corners;
    
    // for all cells
-   for (i = 0; i < get_num_grid_cells(grid); ++i) {
+   for (i = 0; i < yac_get_num_grid_cells(grid); ++i) {
 
-      curr_cell_corners = get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
+      curr_cell_corners = yac_get_dependencies_of_element(unstruct_grid->cell_to_vertex, i);
 
       k = unstruct_grid->cell_to_vertex.num_deps_per_element[i] - 1;
       // for all corners of the current cell
@@ -679,12 +679,12 @@ static void get_boundary_corners_unstruct(struct grid * grid, unsigned * bnd_cor
 
          if (curr_cell_corners[k] < curr_cell_corners[j]) {
 
-            ++num_cells_per_edge[get_dependency_index (unstruct_grid->corner_to_corner,
-                                                       curr_cell_corners[k], curr_cell_corners[j])];
+            ++num_cells_per_edge[yac_get_dependency_index (unstruct_grid->corner_to_corner,
+                                                           curr_cell_corners[k], curr_cell_corners[j])];
          } else {
 
-            ++num_cells_per_edge[get_dependency_index (unstruct_grid->corner_to_corner,
-                                                       curr_cell_corners[j], curr_cell_corners[k])];
+            ++num_cells_per_edge[yac_get_dependency_index (unstruct_grid->corner_to_corner,
+                                                           curr_cell_corners[j], curr_cell_corners[k])];
          }
       }
    }
@@ -693,12 +693,12 @@ static void get_boundary_corners_unstruct(struct grid * grid, unsigned * bnd_cor
 
    temp_num_bnd_corners = 0;
    // for all edges
-   for (i = 0; i < get_num_grid_edges(grid); ++i) {
+   for (i = 0; i < yac_get_num_grid_edges(grid); ++i) {
 
       if (num_cells_per_edge[i] == 1) {
 
-         get_dependency(unstruct_grid->corner_to_corner, i,
-                        &corner_a, &corner_b);
+         yac_get_dependency(unstruct_grid->corner_to_corner, i,
+                            &corner_a, &corner_b);
 
          insertion_sort(corner_a, bnd_corners, &temp_num_bnd_corners);
          insertion_sort(corner_b, bnd_corners, &temp_num_bnd_corners);
@@ -736,7 +736,7 @@ static void get_grid_cell_unstruct(struct grid * grid, unsigned cell_index,
    unsigned i;
    unsigned const * curr_vertex;
 
-   curr_vertex = get_dependencies_of_element (
+   curr_vertex = yac_get_dependencies_of_element (
       unstruct_grid->cell_to_vertex, cell_index);
 
    for (i = 0; i < cell->num_corners; ++i) {
@@ -759,12 +759,12 @@ static void get_grid_cell2_unstruct(struct grid * grid, unsigned cell_index,
 
    get_grid_cell_unstruct(grid, cell_index, cell);
    if (cell->num_corners == 3) {
-      get_cell_bounding_circle_unstruct_triangle(cell->coordinates_xyz + 0*3,
-                                                 cell->coordinates_xyz + 1*3,
-                                                 cell->coordinates_xyz + 2*3,
-                                                 bnd_circle);
+      yac_get_cell_bounding_circle_unstruct_triangle(cell->coordinates_xyz + 0*3,
+                                                     cell->coordinates_xyz + 1*3,
+                                                     cell->coordinates_xyz + 2*3,
+                                                     bnd_circle);
    } else
-      get_cell_bounding_circle(*cell, bnd_circle);
+      yac_get_cell_bounding_circle(*cell, bnd_circle);
 }
 
 static unsigned const * get_corner_edges_unstruct(struct grid * grid, unsigned corner_index) {
@@ -793,13 +793,13 @@ static unsigned const * get_corner_edges_unstruct(struct grid * grid, unsigned c
    unsigned curr_num_edges;
 
    curr_num_edges = unstruct_grid->inv_corner_to_corner.num_deps_per_element[corner_index];
-   curr_edges = get_dependencies_of_element(unstruct_grid->inv_corner_to_corner, corner_index);
+   curr_edges = yac_get_dependencies_of_element(unstruct_grid->inv_corner_to_corner, corner_index);
 
    for (i = 0; i < curr_num_edges; ++i)
       corners[i] = curr_edges[i];
 
    curr_num_edges = unstruct_grid->corner_to_corner.num_deps_per_element[corner_index];
-   curr_edges = get_dependencies_of_element(unstruct_grid->corner_to_corner, corner_index);
+   curr_edges = yac_get_dependencies_of_element(unstruct_grid->corner_to_corner, corner_index);
 
    for (j = 0; j < curr_num_edges; ++j)
       corners[i+j] = curr_edges[j];
@@ -814,7 +814,7 @@ static unsigned const * get_cell_corner_indices_unstruct(struct grid * grid,
 
    unstruct_grid = (struct unstruct_grid *)grid;
 
-   return get_dependencies_of_element(
+   return yac_get_dependencies_of_element(
       unstruct_grid->cell_to_vertex, cell_index);
 }
 
@@ -824,7 +824,7 @@ static unsigned const * get_corner_cell_indices_unstruct(struct grid * grid, uns
 
    unstruct_grid = (struct unstruct_grid *)grid;
 
-   return get_dependencies_of_element(
+   return yac_get_dependencies_of_element(
       unstruct_grid->vertex_to_cell, corner_index);
 }
 
@@ -859,28 +859,28 @@ static unsigned const * get_cell_edge_indices_unstruct(struct grid * grid, unsig
    for (i = 0; i < num_edges-1; ++i) {
 
       if (curr_cell_corners[i] > curr_cell_corners[i+1])
-         edges[i] = get_dependency_index(unstruct_grid->corner_to_corner,
-                                         curr_cell_corners[i+1],
-                                         curr_cell_corners[i]);
+         edges[i] = yac_get_dependency_index(unstruct_grid->corner_to_corner,
+                                             curr_cell_corners[i+1],
+                                             curr_cell_corners[i]);
       else
-         edges[i] = get_dependency_index(unstruct_grid->corner_to_corner,
-                                         curr_cell_corners[i],
-                                         curr_cell_corners[i+1]);
+         edges[i] = yac_get_dependency_index(unstruct_grid->corner_to_corner,
+                                             curr_cell_corners[i],
+                                             curr_cell_corners[i+1]);
    }
 
    if (curr_cell_corners[num_edges-1] > curr_cell_corners[0])
-      edges[num_edges-1] = get_dependency_index(unstruct_grid->corner_to_corner,
-                                                curr_cell_corners[0],
-                                                curr_cell_corners[num_edges-1]);
+      edges[num_edges-1] = yac_get_dependency_index(unstruct_grid->corner_to_corner,
+                                                    curr_cell_corners[0],
+                                                    curr_cell_corners[num_edges-1]);
    else
-      edges[num_edges-1] = get_dependency_index(unstruct_grid->corner_to_corner,
-                                                curr_cell_corners[num_edges-1],
-                                                curr_cell_corners[0]);
+      edges[num_edges-1] = yac_get_dependency_index(unstruct_grid->corner_to_corner,
+                                                    curr_cell_corners[num_edges-1],
+                                                    curr_cell_corners[0]);
 
    return edges;
 }
 
-static enum edge_type get_edge_type_unstruct(struct grid * grid, unsigned edge_index) {
+static enum yac_edge_type get_edge_type_unstruct(struct grid * grid, unsigned edge_index) {
 
    return GREAT_CIRCLE;
 }
@@ -890,7 +890,7 @@ static void get_2d_grid_extent_unstruct(struct grid * grid, double (* extent)[2]
    double const tol = 1.0e-12;
    struct bounding_circle circle;
 
-   get_grid_bounding_circle(grid, &circle);
+   yac_get_grid_bounding_circle(grid, &circle);
 
    // check if the grid covers the whole sphere
    if (circle.inc_angle - tol >= M_PI) {
@@ -936,8 +936,8 @@ static struct grid * generate_cell_grid_unstruct(struct grid * grid,
    // construct corner to cell dependency list
    struct dep_list corner_to_cell;
 
-   init_dep_list(&corner_to_cell);
-   invert_dep_list(unstruct_grid->cell_to_vertex, &corner_to_cell);
+   yac_init_dep_list(&corner_to_cell);
+   yac_invert_dep_list(unstruct_grid->cell_to_vertex, &corner_to_cell);
 
    // generate neighbour dependency list if it does no yet exist
    // struct dep_list * cell_to_neigh;
@@ -963,7 +963,7 @@ static struct grid * generate_cell_grid_unstruct(struct grid * grid,
    edge_to_cell = NULL;
    num_cell_per_edge = NULL;
 
-   num_corners_per_cell = malloc (get_num_grid_corners(grid) *
+   num_corners_per_cell = malloc (yac_get_num_grid_corners(grid) *
                                   sizeof (num_corners_per_cell[0]));
    num_total_cells = 0;
    cell_corner_dependencies = NULL;
@@ -1001,7 +1001,7 @@ static struct grid * generate_cell_grid_unstruct(struct grid * grid,
 
       // gets all cells that have the current corner (i) on their boundary definition
       num_curr_adjacent_cells = corner_to_cell.num_deps_per_element[i];
-      curr_adjacent_cells = get_dependencies_of_element(corner_to_cell, i);
+      curr_adjacent_cells = yac_get_dependencies_of_element(corner_to_cell, i);
          
       // for all cell adjacent to the current corner
       for (j = 0; j < num_curr_adjacent_cells; ++j) {
@@ -1011,7 +1011,7 @@ static struct grid * generate_cell_grid_unstruct(struct grid * grid,
 
          // gets the corners of the current cell (curr_adjacent_cells[j])
          num_curr_corners_of_cell = unstruct_grid->cell_to_vertex.num_deps_per_element[curr_adjacent_cells[j]];
-         curr_corners_of_cell = get_dependencies_of_element (
+         curr_corners_of_cell = yac_get_dependencies_of_element (
             unstruct_grid->cell_to_vertex, curr_adjacent_cells[j]);
 
          // for all corners of the current cell
@@ -1119,22 +1119,22 @@ static struct grid * generate_cell_grid_unstruct(struct grid * grid,
                                       num_total_cell_corner_dependencies *
                                       sizeof (cell_corner_dependencies[0]));
 
-   init_dep_list(&cell_to_vertex);
-   set_dependencies(&cell_to_vertex, num_total_cells, num_corners_per_cell,
-                    cell_corner_dependencies);
+   yac_init_dep_list(&cell_to_vertex);
+   yac_set_dependencies(&cell_to_vertex, num_total_cells, num_corners_per_cell,
+                        cell_corner_dependencies);
 
-   struct unstruct_grid * cell_grid = (struct unstruct_grid *)unstruct_grid_new(
+   struct unstruct_grid * cell_grid = (struct unstruct_grid *)yac_unstruct_grid_new(
       coordinates_x, coordinates_y, get_num_grid_cells_unstruct(grid), cell_to_vertex);
 
    cell_grid->cell_to_vertex_by_user = 1 == 0;
 
-   free_dep_list(&corner_to_cell);
+   yac_free_dep_list(&corner_to_cell);
 
    return (struct grid *)cell_grid;
 }
 
 static int get_aux_grid_cell_unstruct(struct grid * grid, unsigned corner_index,
-                                      unsigned * cell_indices, enum edge_type * edge_type) {
+                                      unsigned * cell_indices, enum yac_edge_type * edge_type) {
 
    struct unstruct_grid * unstruct_grid;
 
@@ -1164,7 +1164,7 @@ static int get_aux_grid_cell_unstruct(struct grid * grid, unsigned corner_index,
 
    // gets all cells that have the given corner on their boundary definition
    num_adjacent_cells = unstruct_grid->vertex_to_cell.num_deps_per_element[corner_index];
-   adjacent_cells = get_dependencies_of_element(unstruct_grid->vertex_to_cell, corner_index);
+   adjacent_cells = yac_get_dependencies_of_element(unstruct_grid->vertex_to_cell, corner_index);
       
    // for all cell adjacent to the given corner
    for (j = 0; j < num_adjacent_cells; ++j) {
@@ -1174,7 +1174,7 @@ static int get_aux_grid_cell_unstruct(struct grid * grid, unsigned corner_index,
 
       // gets the corners of the current cell (adjacent_cells[j])
       num_curr_corners_of_cell = unstruct_grid->cell_to_vertex.num_deps_per_element[adjacent_cells[j]];
-      curr_corners_of_cell = get_dependencies_of_element (
+      curr_corners_of_cell = yac_get_dependencies_of_element (
          unstruct_grid->cell_to_vertex, adjacent_cells[j]);
 
       // for all corners of the current cell
@@ -1286,11 +1286,11 @@ static struct grid * copy_grid_unstruct(struct grid * grid) {
 
    num_vertices = get_num_grid_corners_unstruct(grid);
 
-   init_dep_list(&cell_to_vertex);
-   copy_dep_list(unstruct_grid->cell_to_vertex, &cell_to_vertex);
+   yac_init_dep_list(&cell_to_vertex);
+   yac_copy_dep_list(unstruct_grid->cell_to_vertex, &cell_to_vertex);
 
-   copy = (struct unstruct_grid *)unstruct_grid_new(coordinates_x, coordinates_y,
-                                                    num_vertices, cell_to_vertex);
+   copy = (struct unstruct_grid *)yac_unstruct_grid_new(coordinates_x, coordinates_y,
+                                                        num_vertices, cell_to_vertex);
 
    copy->cell_to_vertex_by_user = 1 == 0;
    copy->cell_corners_x_by_user = 1 == 0;
@@ -1320,17 +1320,17 @@ static void pack_grid_unstruct(struct grid * grid, double ** dble_buf,
 
    ENSURE_ARRAY_SIZE(*uint_buf, *uint_buf_size, uint_buf_offset+2);
 
-   (*uint_buf)[uint_buf_offset+0] = hash("UNSTRUCT");
+   (*uint_buf)[uint_buf_offset+0] = yac_hash("UNSTRUCT");
    (*uint_buf)[uint_buf_offset+1] = unstruct_grid->num_vertices;
 
-   pack_dep_list(unstruct_grid->cell_to_vertex, uint_buf,
-                 uint_buf_offset+2, uint_buf_data_size, uint_buf_size);
+   yac_pack_dep_list(unstruct_grid->cell_to_vertex, uint_buf,
+                     uint_buf_offset+2, uint_buf_data_size, uint_buf_size);
 
    *uint_buf_data_size += 2;
 }
 
-struct grid * unpack_unstruct_grid(double * dble_buf, unsigned * dble_buf_data_size,
-                                   unsigned * uint_buf, unsigned * uint_buf_data_size) {
+struct grid * yac_unpack_unstruct_grid(double * dble_buf, unsigned * dble_buf_data_size,
+                                       unsigned * uint_buf, unsigned * uint_buf_data_size) {
 
    unsigned num_vertices = uint_buf[1];
 
@@ -1346,16 +1346,16 @@ struct grid * unpack_unstruct_grid(double * dble_buf, unsigned * dble_buf_data_s
 
    struct dep_list cell_to_vertex;
 
-   unpack_dep_list(&cell_to_vertex, uint_buf+2, uint_buf_data_size);
+   yac_unpack_dep_list(&cell_to_vertex, uint_buf+2, uint_buf_data_size);
 
    *uint_buf_data_size += 2;
 
    struct unstruct_grid * unstruct_grid;
 
-   unstruct_grid = (struct unstruct_grid *)unstruct_grid_new(cell_corners_x,
-                                                             cell_corners_y,
-                                                             num_vertices,
-                                                             cell_to_vertex);
+   unstruct_grid = (struct unstruct_grid *)yac_unstruct_grid_new(cell_corners_x,
+                                                                 cell_corners_y,
+                                                                 num_vertices,
+                                                                 cell_to_vertex);
 
    unstruct_grid->cell_to_vertex_by_user = 1 == 0;
    unstruct_grid->cell_corners_x_by_user = 1 == 0;
@@ -1370,12 +1370,12 @@ static void delete_grid_unstruct(struct grid * grid) {
 
    unstruct_grid = (struct unstruct_grid *)grid;
 
-   free_dep_list(&(unstruct_grid->cell_to_neigh));
+   yac_free_dep_list(&(unstruct_grid->cell_to_neigh));
    if (!unstruct_grid->cell_to_vertex_by_user)
-      free_dep_list(&(unstruct_grid->cell_to_vertex));
-   free_dep_list(&(unstruct_grid->vertex_to_cell));
-   free_dep_list(&(unstruct_grid->corner_to_corner));
-   free_dep_list(&(unstruct_grid->inv_corner_to_corner));
+      yac_free_dep_list(&(unstruct_grid->cell_to_vertex));
+   yac_free_dep_list(&(unstruct_grid->vertex_to_cell));
+   yac_free_dep_list(&(unstruct_grid->corner_to_corner));
+   yac_free_dep_list(&(unstruct_grid->inv_corner_to_corner));
 
    if (!unstruct_grid->cell_corners_x_by_user)
       free(unstruct_grid->cell_corners_x);
@@ -1384,7 +1384,7 @@ static void delete_grid_unstruct(struct grid * grid) {
    free(unstruct_grid->cell_corners_xyz);
 
    if (unstruct_grid->grid_search != NULL)
-      delete_grid_search(unstruct_grid->grid_search);
+      yac_delete_grid_search(unstruct_grid->grid_search);
 
    free(unstruct_grid);
 }
@@ -1419,7 +1419,7 @@ static struct grid * generate_subgrid_unstruct(struct grid * grid,
    unsigned * corner_mask;
    unsigned num_grid_corners;
 
-   num_grid_corners = get_num_grid_corners(grid);
+   num_grid_corners = yac_get_num_grid_corners(grid);
 
    // an unsigned normally has 32 bit -> for a grid with 128 corners we need a
    // corner_mask with an array size of 4
@@ -1503,8 +1503,8 @@ static struct grid * generate_subgrid_unstruct(struct grid * grid,
 
    struct dep_list cell_to_corner;
 
-   set_dependencies(&cell_to_corner, num_local_cells, num_corners_per_cell,
-                    cell_to_corner_dep);
+   yac_set_dependencies(&cell_to_corner, num_local_cells, num_corners_per_cell,
+                        cell_to_corner_dep);
 
    // get the corner coordinates of the subgrid
 
@@ -1523,9 +1523,9 @@ static struct grid * generate_subgrid_unstruct(struct grid * grid,
 
    struct unstruct_grid * subgrid;
 
-   subgrid = (struct unstruct_grid *)unstruct_grid_new(cell_corners_x, cell_corners_y,
-                                                       num_subgrid_corners,
-                                                       cell_to_corner);
+   subgrid = (struct unstruct_grid *)yac_unstruct_grid_new(cell_corners_x, cell_corners_y,
+                                                           num_subgrid_corners,
+                                                           cell_to_corner);
 
    subgrid->cell_corners_x_by_user = 1 == 0;
    subgrid->cell_corners_y_by_user = 1 == 0;
@@ -1559,22 +1559,22 @@ static struct grid * generate_subgrid_unstruct(struct grid * grid,
       unsigned const * subgrid_edges;
       unsigned num_curr_subgrid_edges;
 
-      subgrid_edges = get_dependencies_of_element(subgrid->corner_to_corner, i);
+      subgrid_edges = yac_get_dependencies_of_element(subgrid->corner_to_corner, i);
       num_curr_subgrid_edges = subgrid->corner_to_corner.num_deps_per_element[i];
 
       for (j = 0; j < num_curr_subgrid_edges; ++j) {
 
-         (*local_edge_ids)[k++] = get_dependency_index(unstruct_grid->corner_to_corner,
-                                                       (*local_corner_ids)[i],
-                                                       (*local_corner_ids)[subgrid_edges[j]]);
+         (*local_edge_ids)[k++] = yac_get_dependency_index(unstruct_grid->corner_to_corner,
+                                                           (*local_corner_ids)[i],
+                                                           (*local_corner_ids)[subgrid_edges[j]]);
       }
    }
 
    return (struct grid *)subgrid;
 }
 
-struct grid * unstruct_grid_new(double * coordinates_x, double * coordinates_y,
-                                unsigned num_vertices, struct dep_list cell_to_vertex) {
+struct grid * yac_unstruct_grid_new(double * coordinates_x, double * coordinates_y,
+                                    unsigned num_vertices, struct dep_list cell_to_vertex) {
 
    struct unstruct_grid * unstruct_grid;
 
@@ -1582,7 +1582,7 @@ struct grid * unstruct_grid_new(double * coordinates_x, double * coordinates_y,
 
    unstruct_grid->vtable = &unstruct_grid_vtable;
 
-   init_dep_list(&(unstruct_grid->cell_to_neigh));
+   yac_init_dep_list(&(unstruct_grid->cell_to_neigh));
 
    unstruct_grid->cell_corners_x = coordinates_x;
    unstruct_grid->cell_corners_y = coordinates_y;
@@ -1595,11 +1595,11 @@ struct grid * unstruct_grid_new(double * coordinates_x, double * coordinates_y,
               unstruct_grid->cell_corners_xyz + i * 3);
 
    unstruct_grid->cell_to_vertex = cell_to_vertex;
-   invert_dep_list(cell_to_vertex, &(unstruct_grid->vertex_to_cell));
+   yac_invert_dep_list(cell_to_vertex, &(unstruct_grid->vertex_to_cell));
    unstruct_grid->num_vertices = num_vertices;
 
-   init_dep_list(&(unstruct_grid->corner_to_corner));
-   init_dep_list(&(unstruct_grid->inv_corner_to_corner));
+   yac_init_dep_list(&(unstruct_grid->corner_to_corner));
+   yac_init_dep_list(&(unstruct_grid->inv_corner_to_corner));
 
    unstruct_grid->cell_to_vertex_by_user = 1 == 1;
    unstruct_grid->cell_corners_x_by_user = 1 == 1;
@@ -1610,14 +1610,14 @@ struct grid * unstruct_grid_new(double * coordinates_x, double * coordinates_y,
    return (struct grid *)unstruct_grid;
 }
 
-struct grid_search * get_grid_search_unstruct(struct grid * grid) {
+static struct grid_search * get_grid_search_unstruct(struct grid * grid) {
 
    struct unstruct_grid * unstruct_grid;
 
    unstruct_grid = (struct unstruct_grid *)grid;
 
    if (unstruct_grid->grid_search == NULL)
-      unstruct_grid->grid_search = sphere_part_search_new(grid);
+      unstruct_grid->grid_search = yac_sphere_part_search_new(grid);
 
    return unstruct_grid->grid_search;
 }

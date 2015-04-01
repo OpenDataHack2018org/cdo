@@ -26,8 +26,7 @@ void dumplogo(const char *logfilename, int dumptype);
 
 void *Log(void *argument)
 {
-  int DUMPLOGS, DAYLOGS, MONLOGS, DUMPLOGO;
-  int SNAMELOGO, SCALLLOGO, SMEMLOGO, STIMELOGO, SPERCLOGO;
+  int DUMPLOGS, DAYLOGS, MONLOGS;
   int operatorID, operfunc;
   int dumptype;
 
@@ -36,12 +35,12 @@ void *Log(void *argument)
   DUMPLOGS  = cdoOperatorAdd("dumplogs",   0, 0, NULL);
   DAYLOGS   = cdoOperatorAdd("daylogs",    0, 0, NULL);
   MONLOGS   = cdoOperatorAdd("monlogs",    0, 0, NULL);
-  DUMPLOGO  = cdoOperatorAdd("dumplogo",   1, 0, NULL);
-  SNAMELOGO = cdoOperatorAdd("snamelogo",  1, 1, NULL);
-  SCALLLOGO = cdoOperatorAdd("scalllogo",  1, 2, NULL);
-  SMEMLOGO  = cdoOperatorAdd("smemlogo",   1, 3, NULL);
-  STIMELOGO = cdoOperatorAdd("stimelogo",  1, 4, NULL);
-  SPERCLOGO = cdoOperatorAdd("sperclogo",  1, 5, NULL);
+              cdoOperatorAdd("dumplogo",   1, 0, NULL);
+              cdoOperatorAdd("snamelogo",  1, 1, NULL);
+              cdoOperatorAdd("scalllogo",  1, 2, NULL);
+              cdoOperatorAdd("smemlogo",   1, 3, NULL);
+              cdoOperatorAdd("stimelogo",  1, 4, NULL);
+              cdoOperatorAdd("sperclogo",  1, 5, NULL);
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);

@@ -46,7 +46,7 @@
 
 // an area of 20m x 20m on the Earth Surface is equivalent to an area on the unit sphere:
 
-double area_tol () {
+double yac_area_tol () {
   return 0.02 / EarthRadius;
 }
 
@@ -55,13 +55,13 @@ static inline double scalar_product(double a[], double b[]);
 static inline double inner_angle ( double plat, double plon,
                                    double qlon, double qlat );
 
-static double partial_area ( double a_lon, double a_lat,
+static double yac_partial_area ( double a_lon, double a_lat,
                              double b_lon, double b_lat,
                              double c_lon, double c_lat );
 
 /* ----------------------------------- */
 
-double cell_approx_area ( struct grid_cell cell ) {
+double yac_cell_approx_area ( struct grid_cell cell ) {
 
   /* adopted from Robert.G. Chamberlain and William.H. Duquette */
 
@@ -82,7 +82,7 @@ double cell_approx_area ( struct grid_cell cell ) {
 
 /* ----------------------------------- */
 
-double triangle_area ( struct grid_cell cell ) {
+double yac_triangle_area ( struct grid_cell cell ) {
 
   /* taken from the ICON code, mo_base_geometry.f90
      provided by Luis Kornblueh, MPI-M. */
@@ -165,7 +165,7 @@ double triangle_area ( struct grid_cell cell ) {
 
 /* ----------------------------------- */
 
-double cell_area ( struct grid_cell cell ) {
+double yac_cell_area ( struct grid_cell cell ) {
 
   /* generalised version based on the ICON code, mo_base_geometry.f90
      provided by Luis Kornblueh, MPI-M. */
@@ -246,7 +246,7 @@ double cell_area ( struct grid_cell cell ) {
 
 /* ----------------------------------- */
 
-double girards_area ( struct grid_cell cell  ) {
+double yac_girards_area ( struct grid_cell cell  ) {
 
   /* Bevis and Cambareri, 1987
 
@@ -266,11 +266,11 @@ double girards_area ( struct grid_cell cell  ) {
   double * theta = malloc ( M * sizeof(theta[0]) );
 
   for ( m = 0; m < M; m++ ) {
-     theta[m] = partial_area(cell.coordinates_x[(m+1)%M], cell.coordinates_y[(m+1)%M],
+     theta[m] = yac_partial_area(cell.coordinates_x[(m+1)%M], cell.coordinates_y[(m+1)%M],
                              cell.coordinates_x[(m+2)%M], cell.coordinates_y[(m+2)%M],
                              cell.coordinates_x[m%M], cell.coordinates_y[m%M]);
      if ( theta[m] < tol ) {
-       area = cell3d_area ( cell );
+       area = yac_planar_3dcell_area ( cell );
        return area;
      }
   }
@@ -288,110 +288,12 @@ double girards_area ( struct grid_cell cell  ) {
 
   free ( theta );
 
-  if ( area <= 0.0 ) area = cell3d_area ( cell );
+  if ( area <= 0.0 ) area = yac_planar_3dcell_area ( cell );
 
   return area;
 }
 
 /* ----------------------------------- */
-
-double cell3d_area( struct grid_cell cell ) {
-
-   /* http://geomalgorithms.com/a01-_area.html */
-
-   int const M = cell.num_corners;
-   double area = 0.0;
-
-   if (M < 3) return 0.0;  // a degenerated cell
-
-   double an, ax, ay, az; // abs value of normal and its coords
-
-   int  coord;           // coord to ignore: 1=x[1], 2=x[2], 3=x[3]
-
-   double * V[cell.num_corners];
-   double Norm[3];
-   double edge[2][3];
-
-   for (int i = 0; i < cell.num_corners; ++i)
-      V[i] = cell.coordinates_xyz + i * 3;
-
-   /* compute normal vector */
-   edge[0][0] = V[0][0] - V[1][0];
-   edge[0][1] = V[0][1] - V[1][1];
-   edge[0][2] = V[0][2] - V[1][2];
-   edge[1][0] = V[0][0] - V[2][0];
-   edge[1][1] = V[0][1] - V[2][1];
-   edge[1][2] = V[0][2] - V[2][2];
-
-   crossproduct_ld(edge[0], edge[1], Norm);
-
-   /* select largest abs coordinate to ignore for projection */
-   ax = (Norm[0]>0 ? Norm[0] : -Norm[0]);    // abs x-coord
-   ay = (Norm[1]>0 ? Norm[1] : -Norm[1]);    // abs y-coord
-   az = (Norm[2]>0 ? Norm[2] : -Norm[2]);    // abs z-coord
-
-   coord = 3;                    // ignore z-coord x[2]
-   if (ax > ay) {
-       if (ax > az) coord = 1;   // ignore x-coord x[0]
-   }
-   else if (ay > az) coord = 2;  // ignore y-coord x[1]
-
-   /* compute area of the 2D projection
-
-      fabs is used to remain independent from
-      cyclic or anticyclic ordering of vertices */
-
-   for (int i = 1; i<M; i++) {
-        switch (coord) {
-          case 1:
-            area += fabs(V[i%M][1] * (V[(i+1)%M][2] - V[(i-1)%M][2]));
-            continue;
-          case 2:
-            area += fabs(V[i%M][0] * (V[(i+1)%M][2] - V[(i-1)%M][2]));
-            continue;
-          case 3:
-            area += fabs(V[i%M][0] * (V[(i+1)%M][1] - V[(i-1)%M][1]));
-            continue;
-        }
-    }
-    switch (coord) {    // wrap-around term
-      case 1:
-        area += fabs(V[0][1] * (V[1][2] - V[M-1][2]));
-        break;
-      case 2:
-        area += fabs(V[0][0] * (V[1][2] - V[M-1][2]));
-        break;
-      case 3:
-        area += fabs(V[0][0] * (V[1][1] - V[M-1][1]));
-        break;
-    }
-
-    /* scale to get area before projection */
-    an = sqrt( ax*ax + ay*ay + az*az); // length of normal vector
-    switch (coord) {
-      case 1:
-        if ( ax > 0 )
-                area *= (an / (2*ax));
-        else
-          area = 0.0;
-              break;
-      case 2:
-        if ( ay > 0 )
-          area *= (an / (2*ay));
-        else
-          area = 0.0;
-              break;
-      case 3:
-        if ( az > 0 )
-          area *= (an / (2*az));
-        else
-          area = 0.0;
-        break;
-    }
-
-    // return area * EarthRadius * EarthRadius;
-    return area;
-}
 
 /** area of a spherical triangle based on L'Huilier's Theorem
   *
@@ -454,6 +356,8 @@ tri_area(double u[3], double v[3], double w[3]) {
   return fabs(4.0 * atan(sqrt(fabs(t))));
 }
 
+/* ----------------------------------- */
+
 static inline int compute_norm_vector(double a[], double b[], double norm[]) {
 
   crossproduct_ld(a, b, norm);
@@ -478,8 +382,8 @@ lat_edge_correction(double base_point[3], double a[3], double b[3],
   double const tol = 1e-8;
 
   if (fabs(a[2] - b[2]) > tol)
-    abort_message("ERROR: latitude of both corners is not identical\n",
-                  __FILE__, __LINE__);
+    yac_internal_abort_message("ERROR: latitude of both corners is not identical\n",
+                                __FILE__, __LINE__);
 
   double h = fabs(a[2]);
 
@@ -497,7 +401,7 @@ lat_edge_correction(double base_point[3], double a[3], double b[3],
   double middle_lat[3] = {a[0]+b[0], a[1]+b[1], a[2]};
   double scale = sqrt(middle_lat[0]*middle_lat[0]+middle_lat[1]*middle_lat[1]);
 
-  if (scale == 0) abort_message("internal error", __FILE__, __LINE__);
+  if (scale == 0) yac_internal_abort_message("internal error", __FILE__, __LINE__);
 
   scale = sqrt(1.0 - a[2]*a[2]) / scale;
 
@@ -536,7 +440,7 @@ lat_edge_correction(double base_point[3], double a[3], double b[3],
   }
 }
 
-double pole_area ( struct grid_cell cell ) {
+double yac_pole_area ( struct grid_cell cell ) {
 
   double area = 0.0;
 
@@ -604,11 +508,33 @@ double pole_area ( struct grid_cell cell ) {
 
     } else {
 
-      abort_message("ERROR: unsupported edge type\n", __FILE__, __LINE__);
+      yac_internal_abort_message("ERROR: unsupported edge type\n", __FILE__, __LINE__);
     }
   }
   // return fabs(area) * EarthRadius * EarthRadius;
   return fabs(area);
+}
+
+double yac_planar_3dcell_area (struct grid_cell cell) {
+
+ /*
+  * source code is originally based on http://gaim.umbc.edu/2010/06/03/polygon-area/
+  *
+  */
+
+  double area = 0.0;
+  double norm[3] = {0,0,0};
+
+  if (cell.num_corners < 3) return area;
+
+  for ( int i0=cell.num_corners-1, i1=0;  i1<cell.num_corners; i0=i1, ++i1) {
+    norm[0] += cell.coordinates_xyz[1+i0*3]*cell.coordinates_xyz[2+i1*3] - cell.coordinates_xyz[1+i1*3]*cell.coordinates_xyz[2+i0*3];
+    norm[1] += cell.coordinates_xyz[2+i0*3]*cell.coordinates_xyz[0+i1*3] - cell.coordinates_xyz[2+i1*3]*cell.coordinates_xyz[0+i0*3];
+    norm[2] += cell.coordinates_xyz[0+i0*3]*cell.coordinates_xyz[1+i1*3] - cell.coordinates_xyz[0+i1*3]*cell.coordinates_xyz[1+i0*3];
+  };
+
+  return area = 0.5 * sqrt(norm[0]*norm[0] + norm[1]*norm[1] + norm[2]*norm[2] );
+
 }
 
  /*
@@ -619,7 +545,7 @@ double pole_area ( struct grid_cell cell ) {
   * grid cell edges (great circle and circle of latitude)
   *
   */
-double huiliers_area(struct grid_cell cell) {
+double yac_huiliers_area (struct grid_cell cell) {
 
   if (cell.num_corners < 2) return 0;
 
@@ -680,9 +606,9 @@ double huiliers_area(struct grid_cell cell) {
 
 /* ----------------------------------- */
 
-double partial_area ( double a_lon, double a_lat,
-                      double b_lon, double b_lat,
-                      double c_lon, double c_lat ) {
+double yac_partial_area ( double a_lon, double a_lat,
+                          double b_lon, double b_lat,
+                          double c_lon, double c_lat ) {
 
   double theta;
   double angle_f;

@@ -55,7 +55,7 @@ void check_dep_lists(struct dep_list * lists);
 int main (void) {
 
    grid_search_constructor grid_search_construct[] =
-      {reg2d_search_new, bucket_search_new, sphere_part_search_new};
+      {reg2d_search_new, yac_bucket_search_new, yac_sphere_part_search_new};
    unsigned num_grid_search_construct = sizeof(grid_search_construct) /
                                         sizeof(grid_search_construct[0]);
 
@@ -83,17 +83,17 @@ int main (void) {
       struct dep_list deps;
 
       // set up grid data
-      init_dep_list(&cell_to_vertex_a);
-      set_dependencies(&cell_to_vertex_a, 4, num_corners_per_cell, cell_vertices);
+      yac_init_dep_list(&cell_to_vertex_a);
+      yac_set_dependencies(&cell_to_vertex_a, 4, num_corners_per_cell, cell_vertices);
 
-      grid_data_a = unstruct_grid_new(vertex_coordinates_x[0], vertex_coordinates_y[0], 
-                                      9, cell_to_vertex_a);
+      grid_data_a = yac_unstruct_grid_new(vertex_coordinates_x[0], vertex_coordinates_y[0], 
+					  9, cell_to_vertex_a);
 
-      init_dep_list(&cell_to_vertex_b);
-      set_dependencies(&cell_to_vertex_b, 4, num_corners_per_cell, cell_vertices);
+      yac_init_dep_list(&cell_to_vertex_b);
+      yac_set_dependencies(&cell_to_vertex_b, 4, num_corners_per_cell, cell_vertices);
 
-      grid_data_b = unstruct_grid_new(vertex_coordinates_x[1], vertex_coordinates_y[1], 
-                                      9, cell_to_vertex_b);
+      grid_data_b = yac_unstruct_grid_new(vertex_coordinates_x[1], vertex_coordinates_y[1], 
+					  9, cell_to_vertex_b);
 
       //---------------
       // testing
@@ -103,7 +103,7 @@ int main (void) {
 
          struct grid_search * search = grid_search_construct[i](grid_data_a);
       
-         do_cell_search(search, grid_data_b, &deps);
+         yac_do_cell_search(search, grid_data_b, &deps);
 
          // test whether the search returned something in deps
          if (deps.num_elements == 0 || deps.num_deps_per_element == NULL || 
@@ -130,7 +130,7 @@ int main (void) {
             for (unsigned i = 0; i < 4; ++i) {
 
                curr_num_deps = 0;
-               curr_deps = get_dependencies_of_element(deps, i);
+               curr_deps = yac_get_dependencies_of_element(deps, i);
 
                for (unsigned j = 0; j < deps.num_deps_per_element[i]; ++j) {
                   for (unsigned k = 0; k < deps.num_deps_per_element[i]; ++k) {
@@ -148,12 +148,12 @@ int main (void) {
       // cleanup
       //---------------
 
-         free_dep_list(&deps);
-         delete_grid_search(search);
+         yac_free_dep_list(&deps);
+         yac_delete_grid_search(search);
       }
 
-      delete_grid(grid_data_a);
-      delete_grid(grid_data_b);
+      yac_delete_grid(grid_data_a);
+      yac_delete_grid(grid_data_b);
    }
 
    {
@@ -180,17 +180,17 @@ int main (void) {
       unsigned j, k;
 
       // set up grid data
-      init_dep_list(&cell_to_vertex_a);
-      set_dependencies(&cell_to_vertex_a, 4, num_corners_per_cell, cell_vertices);
+      yac_init_dep_list(&cell_to_vertex_a);
+      yac_set_dependencies(&cell_to_vertex_a, 4, num_corners_per_cell, cell_vertices);
 
-      grid_data_a = unstruct_grid_new(vertex_coordinates_x[0], vertex_coordinates_y[0], 
-                                      9, cell_to_vertex_a);
+      grid_data_a = yac_unstruct_grid_new(vertex_coordinates_x[0], vertex_coordinates_y[0], 
+					  9, cell_to_vertex_a);
 
-      init_dep_list(&cell_to_vertex_b);
-      set_dependencies(&cell_to_vertex_b, 4, num_corners_per_cell, cell_vertices);
+      yac_init_dep_list(&cell_to_vertex_b);
+      yac_set_dependencies(&cell_to_vertex_b, 4, num_corners_per_cell, cell_vertices);
 
-      grid_data_b = unstruct_grid_new(vertex_coordinates_x[1], vertex_coordinates_y[1], 
-                                      9, cell_to_vertex_b);
+      grid_data_b = yac_unstruct_grid_new(vertex_coordinates_x[1], vertex_coordinates_y[1], 
+					  9, cell_to_vertex_b);
 
       //---------------
       // testing
@@ -203,13 +203,13 @@ int main (void) {
          struct grid_cell cell;
          unsigned n_cells = 0, cells_size = 0, *cells = NULL;
 
-         init_grid_cell(&cell);
+         yac_init_grid_cell(&cell);
 
-         for (unsigned i = 0; i < get_num_grid_cells(grid_data_b); ++i) {
+         for (unsigned i = 0; i < yac_get_num_grid_cells(grid_data_b); ++i) {
 
-            get_grid_cell(grid_data_b, i, &cell);
+            yac_get_grid_cell(grid_data_b, i, &cell);
 
-            do_cell_search_single(search, cell, &n_cells, &cells_size, &cells);
+            yac_do_cell_search_single(search, cell, &n_cells, &cells_size, &cells);
 
             { // test whether the number of overlaps is correct
                unsigned ref_num_deps_per_element[4] = {4,2,2,1};
@@ -236,13 +236,13 @@ int main (void) {
       // cleanup
       //---------------
 
-         delete_grid_search(search);
+         yac_delete_grid_search(search);
          free(cells);
-         free_grid_cell(&cell);
+         yac_free_grid_cell(&cell);
       }
 
-      delete_grid(grid_data_a);
-      delete_grid(grid_data_b);
+      yac_delete_grid(grid_data_a);
+      yac_delete_grid(grid_data_b);
    }
 
    { // test cell search for cyclic grids
@@ -259,7 +259,7 @@ int main (void) {
       unsigned num_cells_a[2] = {12,6};
       unsigned cyclic_a[2] = {1,0};
    
-      grid_a = reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
+      grid_a = yac_reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
 
       struct grid * grid_b;
       double coords_x_b[11] = {-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50};
@@ -271,7 +271,7 @@ int main (void) {
       unsigned num_cells_b[2] = {10,6};
       unsigned cyclic_b[2] = {0,0};
    
-      grid_b = reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
+      grid_b = yac_reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
 
       //---------------
       // testing
@@ -283,25 +283,25 @@ int main (void) {
 
          struct grid_search * search = grid_search_construct[i](grid_a);
 
-         do_cell_search(search, grid_b, deps + i);
+         yac_do_cell_search(search, grid_b, deps + i);
 
          // test whether the number of found cells is correct
          if (deps[i].num_elements != 60)
             PUT_ERR("error in get_num_elements(deps)\n");
 
-         delete_grid_search(search);
+         yac_delete_grid_search(search);
       }
 
       check_dep_lists(deps);
 
-      free_dep_list(deps+0);
-      free_dep_list(deps+1);
+      yac_free_dep_list(deps+0);
+      yac_free_dep_list(deps+1);
 
       //---------------
       // cleanup
       //---------------
-      delete_grid(grid_a);
-      delete_grid(grid_b);
+      yac_delete_grid(grid_a);
+      yac_delete_grid(grid_b);
    }
 
    { // test cell search for cyclic grids ---> large grids
@@ -331,7 +331,7 @@ int main (void) {
       unsigned num_cells_a[2] = {nxa,nya-1};
       unsigned cyclic_a[2] = {1,0};
    
-      grid_a = reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
+      grid_a = yac_reg2d_grid_new(coords_x_a, coords_y_a, num_cells_a, cyclic_a);
 
       struct grid * grid_b;
       double coords_x_b[nxb];
@@ -348,7 +348,7 @@ int main (void) {
       unsigned num_cells_b[2] = {nxb,nyb-1};
       unsigned cyclic_b[2] = {1,0};
    
-      grid_b = reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
+      grid_b = yac_reg2d_grid_new(coords_x_b, coords_y_b, num_cells_b, cyclic_b);
 
       //---------------
       // testing
@@ -363,14 +363,14 @@ int main (void) {
 
          struct grid_search * search = grid_search_construct[i](grid_a);
 
-         do_cell_search(search, grid_b, deps + i);
+         yac_do_cell_search(search, grid_b, deps + i);
 
          // test whether the number of found cells is correct
 	 printf("deps[i].num_elements %d  ngp %d\n", deps[i].num_elements, nxb*(nyb-1));
          if (deps[i].num_elements != nxb*(nyb-1))
             PUT_ERR("error in get_num_elements(deps)\n");
 
-         delete_grid_search(search);
+         yac_delete_grid_search(search);
 
 	 finish = clock();
 	 printf("search %d: %.2f seconds\n", i+1, ((double)(finish-start))/CLOCKS_PER_SEC);
@@ -380,13 +380,13 @@ int main (void) {
       check_dep_lists(deps);
 
       for (int i = 0; i < num_grid_search_construct; ++i)
-	free_dep_list(deps+i);
+	yac_free_dep_list(deps+i);
 
       //---------------
       // cleanup
       //---------------
-      delete_grid(grid_a);
-      delete_grid(grid_b);
+      yac_delete_grid(grid_a);
+      yac_delete_grid(grid_b);
    }
 
    return TEST_EXIT_CODE;
@@ -415,7 +415,7 @@ void check_dep_lists(struct dep_list * lists) {
 
          ENSURE_ARRAY_SIZE(results[j], results_size[j],
                            lists[j].num_deps_per_element[i]);
-         memcpy(results[j], get_dependencies_of_element(lists[j],i),
+         memcpy(results[j], yac_get_dependencies_of_element(lists[j],i),
                 lists[j].num_deps_per_element[i] * sizeof(**results));
          qsort(results[j], lists[j].num_deps_per_element[i], sizeof(**results),
                compare_uint);

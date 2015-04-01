@@ -70,7 +70,7 @@ struct grid_search {
 };
 
 /** \example test_cell_search.c
- * These are some examples on how to use \ref do_cell_search.
+ * These are some examples on how to use \ref yac_do_cell_search.
  */
 
 /**
@@ -80,8 +80,8 @@ struct grid_search {
  * @param[out] tgt_to_src_cells dependency containing the mapping of target to
  *                              source cells
  */
-void do_cell_search (struct grid_search * search, struct grid * grid_data,
-                     struct dep_list * tgt_to_src_cells);
+void yac_do_cell_search (struct grid_search * search, struct grid * grid_data,
+                         struct dep_list * tgt_to_src_cells);
 
 /**
  * does a cell search for a single cell \n determines for the target cell all
@@ -96,10 +96,10 @@ void do_cell_search (struct grid_search * search, struct grid * grid_data,
  *          C-standard memory allocation routine \n in case *cells is not NULL
  *          cells_size must contain the number of elements that fit into *cells
  */
-void do_cell_search_single (struct grid_search * search,
-                            struct grid_cell grid_cell,
-                            unsigned * n_cells, unsigned * cells_size,
-                            unsigned ** cells); 
+void yac_do_cell_search_single (struct grid_search * search,
+                                struct grid_cell grid_cell,
+                                unsigned * n_cells, unsigned * cells_size,
+                                unsigned ** cells);
 
 /** \example test_point_search.c
  * This contains examples on how to use the point search.
@@ -112,8 +112,8 @@ void do_cell_search_single (struct grid_search * search,
  * @param[out] tgt_to_src_cells dependency list that contains for every target
  *                              grid corner the respective source cell index
  */
-void do_point_search_c (struct grid_search * search, struct grid * grid_data,
-                        struct dep_list * tgt_to_src_cells);
+void yac_do_point_search_c (struct grid_search * search, struct grid * grid_data,
+                            struct dep_list * tgt_to_src_cells);
 
 /**
  * does a point search \n searches for every target point the source cell into
@@ -126,9 +126,9 @@ void do_point_search_c (struct grid_search * search, struct grid * grid_data,
  * @param[out] tgt_to_src_cells dependency list that contains for every target
  *                              point the respective source cell index
  */
-void do_point_search_c2 (struct grid_search * search, double * x_coordinates,
-                         double * y_coordinates, unsigned num_points,
-                         struct dep_list * tgt_to_src_cells);
+void yac_do_point_search_c2 (struct grid_search * search, double * x_coordinates,
+                             double * y_coordinates, unsigned num_points,
+                             struct dep_list * tgt_to_src_cells);
 /**
  * does a point search \n searches for source cells that matches the target corners
  * @param[in]  search               grid search object
@@ -137,8 +137,8 @@ void do_point_search_c2 (struct grid_search * search, double * x_coordinates,
  *                                  grid corner the source grid corner indices of
  *                                  the matching cell
  */
-void do_point_search_p (struct grid_search * search, struct grid * grid_data,
-                        struct dep_list * target_to_src_points);
+void yac_do_point_search_p (struct grid_search * search, struct grid * grid_data,
+                            struct dep_list * target_to_src_points);
 
 /**
  * does a point search\n searches for every target point the source cell into
@@ -152,9 +152,9 @@ void do_point_search_p (struct grid_search * search, struct grid * grid_data,
  *                                  the source points, that build the source cell into
  *                                  which the respective target point falls
  */
-void do_point_search_p2 (struct grid_search * search, double * x_coordinates,
-                         double * y_coordinates, unsigned num_points,
-                         struct dep_list * target_to_src_points);
+void yac_do_point_search_p2 (struct grid_search * search, double * x_coordinates,
+                             double * y_coordinates, unsigned num_points,
+                             struct dep_list * target_to_src_points);
 /**
  * does a point search\n searches for every source cell that matches the target corners\n
  * (source cells are built from the provided point set) \n
@@ -171,10 +171,10 @@ void do_point_search_p2 (struct grid_search * search, double * x_coordinates,
  *                                  (points can have location type CELL or CORNER)
  * @see global_search_new
  */
-void do_point_search_p3 (struct grid_search * search, double * x_coordinates,
-                         double * y_coordinates, unsigned num_points,
-                         struct dep_list * target_to_src_points,
-                         struct points * points);
+void yac_do_point_search_p3 (struct grid_search * search, double * x_coordinates,
+                             double * y_coordinates, unsigned num_points,
+                             struct dep_list * target_to_src_points,
+                             struct points * points);
 
 /**
  * does a point search\n searches for the target point the matching source cell\n
@@ -191,14 +191,14 @@ void do_point_search_p3 (struct grid_search * search, double * x_coordinates,
  *          C-standard memory allocation routine \n in case *cells is not NULL
  *          cells_size must contain the number of elements that fit into *cells
  */
-void do_point_search_p4 (struct grid_search * search, double x_coordinate,
-                         double y_coordinate, unsigned * n_points,
-                         unsigned * points_size, unsigned ** points);
+void yac_do_point_search_p4 (struct grid_search * search, double x_coordinate,
+                             double y_coordinate, unsigned * n_points,
+                             unsigned * points_size, unsigned ** points);
 
 /**
  * frees all memory associated with a grid search object
  * @param[in,out] search grid search object
  */
-void delete_grid_search(struct grid_search * search);
+void yac_delete_grid_search(struct grid_search * search);
 
 #endif

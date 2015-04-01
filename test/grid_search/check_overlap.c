@@ -78,22 +78,22 @@ static inline void get_edge(struct grid_cell const cell, unsigned edge_index,
 }
 
 // checks whether a point is within a cell
-int point_in_cell (struct point point, double point_coords[3],
-                   struct grid_cell cell) {
+int yac_point_in_cell (struct point point, double point_coords[3],
+                       struct grid_cell cell) {
 
    struct bounding_circle bnd_circle;
-   get_cell_bounding_circle(cell, &bnd_circle);
+   yac_get_cell_bounding_circle(cell, &bnd_circle);
 
-   return point_in_cell2(point, point_coords, cell, bnd_circle);
+   return yac_point_in_cell2(point, point_coords, cell, bnd_circle);
 }
 
 // checks whether a point is within a cell
-int point_in_cell2 (struct point point, double point_coords[3],
-                    struct grid_cell cell, struct bounding_circle bnd_circle) {
+int yac_point_in_cell2 (struct point point, double point_coords[3],
+                        struct grid_cell cell, struct bounding_circle bnd_circle) {
 
    // check whether the point is within the bounding circle of the cell;
 
-   if (!point_in_bounding_circle_vec(point_coords, &bnd_circle))
+   if (!yac_point_in_bounding_circle_vec(point_coords, &bnd_circle))
       return 1 == 0;
 
    double second_point[3];
@@ -127,8 +127,8 @@ int point_in_cell2 (struct point point, double point_coords[3],
       int ret_value;
       double p[3], q[3];
 
-      ret_value = intersect_vec(cell.edge_type[i], a, b, LON_CIRCLE,
-                                point_coords, second_point, p, q);
+      ret_value = yac_intersect_vec(cell.edge_type[i], a, b, LON_CIRCLE,
+                                    point_coords, second_point, p, q);
 
       // if both edges do not intersect
       if ((ret_value == -1) || (ret_value == 0)) continue;
@@ -196,8 +196,8 @@ static inline int inside (struct grid_cell const cell_a,
       point.lon = cell_b.coordinates_x[i];
       point.lat = cell_b.coordinates_y[i];
    
-      if (point_in_cell2(point, cell_b.coordinates_xyz + i * 3,
-                         cell_a, circle_a))
+      if (yac_point_in_cell2(point, cell_b.coordinates_xyz + i * 3,
+                             cell_a, circle_a))
          return 1;
    }
 
@@ -232,7 +232,7 @@ static inline int exact (struct grid_cell const cell_a,
 /** \brief simple test to identify whether cells are given on a regular longitude-latitude grid 
  *
  **/
-unsigned is_regular_cell(struct grid_cell const cell) {
+unsigned yac_is_regular_cell(struct grid_cell const cell) {
 
    return (cell.num_corners == 4) &&
           (cell.edge_type[0] == LAT_CIRCLE) &&
@@ -244,8 +244,8 @@ unsigned is_regular_cell(struct grid_cell const cell) {
 /** \brief checks overlap of two cells defined on a regular longitude-latitude grid 
  *
  **/
-unsigned regular_cells_intersect(struct grid_cell const cell_a, 
-                                 struct grid_cell const cell_b) {
+unsigned yac_regular_cells_intersect(struct grid_cell const cell_a, 
+                                     struct grid_cell const cell_b) {
 
    double lon_diff_a, lon_diff_b;
 
@@ -290,16 +290,16 @@ unsigned regular_cells_intersect(struct grid_cell const cell_a,
  * should be below PI/2 in lon and lat direction
  *
  **/
-int check_overlap_cells (struct grid_cell const cell_a,
-                         struct grid_cell const cell_b) {
+int yac_check_overlap_cells (struct grid_cell const cell_a,
+                             struct grid_cell const cell_b) {
 
    struct bounding_circle circle_a, circle_b;
 
    // get the bounding circles of both cells
-   get_cell_bounding_circle(cell_a, &circle_a);
-   get_cell_bounding_circle(cell_b, &circle_b);
+   yac_get_cell_bounding_circle(cell_a, &circle_a);
+   yac_get_cell_bounding_circle(cell_b, &circle_b);
 
-   return check_overlap_cells2(cell_a, circle_a, cell_b, circle_b);
+   return yac_check_overlap_cells2(cell_a, circle_a, cell_b, circle_b);
 }
 
 /** \brief checks whether two cells overlap
@@ -308,23 +308,23 @@ int check_overlap_cells (struct grid_cell const cell_a,
  * should be below PI/2 in lon and lat direction
  *
  **/
-int check_overlap_cells2 (struct grid_cell const cell_a,
-                          struct bounding_circle circle_a,
-                          struct grid_cell const cell_b,
-                          struct bounding_circle circle_b) {
+int yac_check_overlap_cells2 (struct grid_cell const cell_a,
+                              struct bounding_circle circle_a,
+                              struct grid_cell const cell_b,
+                              struct bounding_circle circle_b) {
 
    unsigned i, j;
 
    // check whether the cells have the potential to overlap
-   if (!extents_overlap(&circle_a, &circle_b)) return 0;
+   if (!yac_extents_overlap(&circle_a, &circle_b)) return 0;
 
    // Test for exact matches
    if (exact (cell_a, cell_b)) return 1;
 
    // check for the special case of two regular cells
-   if (is_regular_cell(cell_a) && is_regular_cell(cell_b)) {
+   if (yac_is_regular_cell(cell_a) && yac_is_regular_cell(cell_b)) {
 
-      return regular_cells_intersect(cell_a, cell_b);
+      return yac_regular_cells_intersect(cell_a, cell_b);
 
    } else {
 
@@ -342,7 +342,7 @@ int check_overlap_cells2 (struct grid_cell const cell_a,
             get_edge(cell_a, i, &edge_a, &a, &b);
             get_edge(cell_b, j, &edge_b, &c, &d);
 
-            if (do_intersect (edge_a, a, b, edge_b, c, d)) return 1;
+            if (yac_do_intersect (edge_a, a, b, edge_b, c, d)) return 1;
          }
       }
    }

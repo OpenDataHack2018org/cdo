@@ -526,6 +526,7 @@ src/clipping/utils.h -text
 src/color.c -text
 src/color.h -text
 src/commandline.c -text
+src/compare.h -text
 src/config.h.in -text
 src/const.h -text
 src/counter.h -text

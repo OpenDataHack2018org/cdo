@@ -29,6 +29,11 @@
  * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
  */
 
+/** \example test_sphere_part.c
+* This contains a test of the sphere_part grid search algorithm.
+*/
+
+
 #ifndef SPHERE_PART_H
 #define SPHERE_PART_H
 
@@ -36,7 +41,7 @@
 #include "interval_tree.h"
 #include "grid_search.h"
 
-enum node_flags {
+enum yac_node_flags {
    U_IS_LEAF = 1,
    T_IS_LEAF = 2,
    I_IS_INTERVAL_TREE = 4,
@@ -69,7 +74,7 @@ struct sphere_part_node {
 
 #define SPHERE_PART_DEBUG
 #ifdef SPHERE_PART_DEBUG
-struct sphere_part_node * get_sphere_part_tree(struct grid_search * search);
+struct sphere_part_node * yac_get_sphere_part_tree(struct grid_search * search);
 #endif
 
 /**
@@ -97,9 +102,9 @@ struct sphere_part_node * get_sphere_part_tree(struct grid_search * search);
  * -# Compute great circle L with base plane collinear to |c p| and orthogonal to v
  * -# Partition data
  *    -# Set I to subset of S intersecting L
- *    -# Set T to subset of S\I with positive scalar product to normal vector of L
+ *    -# Set T to subset of S/I with positive scalar product to normal vector of L
  *       - Ti = recurspart(T, norm(L)) if |T| > threshold t else Ti = list(T)
- *    -# Set U to subset of S\I with negative scalar product to normal vector of L
+ *    -# Set U to subset of S/I with negative scalar product to normal vector of L
  *       - Ui = recurspart(U, norm(L)) if |U| > threshold t else Ui = list(U)
  * -# return node(list(I), Ti, Ui, L, alpha=angle over L containing I)
  *
@@ -128,7 +133,7 @@ struct sphere_part_node * get_sphere_part_tree(struct grid_search * search);
  * - returns list of matching polygons
  */
 
-struct grid_search * sphere_part_search_new (struct grid * grid_data);
+struct grid_search * yac_sphere_part_search_new (struct grid * grid_data);
  
  #endif // SPHERE_PART_H
  

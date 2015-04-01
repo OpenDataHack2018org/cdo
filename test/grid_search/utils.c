@@ -37,7 +37,7 @@
 static void ** pointer_lookup_table = NULL;
 static unsigned pointer_lookup_table_size = 0;
 
-unsigned pointer_to_unique_id(void * pointer) {
+unsigned yac_pointer_to_unique_id(void * pointer) {
 
    pointer_lookup_table = realloc (pointer_lookup_table,
       ++pointer_lookup_table_size * sizeof(pointer_lookup_table[0]));
@@ -47,7 +47,7 @@ unsigned pointer_to_unique_id(void * pointer) {
    return pointer_lookup_table_size - 1;
 }
 
-void * unique_id_to_pointer(unsigned id) {
+void * yac_unique_id_to_pointer(unsigned id) {
 
    if (id < pointer_lookup_table_size)
       return pointer_lookup_table[id];
@@ -55,14 +55,14 @@ void * unique_id_to_pointer(unsigned id) {
       return NULL;
 }
 
-void free_pointer_unique_lookup() {
+void yac_free_pointer_unique_lookup() {
 
   free(pointer_lookup_table);
   pointer_lookup_table = NULL;
   pointer_lookup_table_size = 0;
 }
 
-void abort_message ( char * text, char * file, int line )
+void yac_internal_abort_message ( char * text, char * file, int line )
 {
   fprintf(stderr, "%s \n", text); 
   fprintf(stderr, "Aborting in file %s, line %i ...\n", file, line );
@@ -70,7 +70,7 @@ void abort_message ( char * text, char * file, int line )
 }
 
 void yac_abort_message ( char * text, char * file, int line ) {
-	abort_message ( text, file, line );
+	yac_internal_abort_message ( text, file, line );
 }
 
 /* ------------------------------------
@@ -95,7 +95,7 @@ unsigned long hash(const char *str) {
 #define NHASH 29989 //Use a prime number!
 #define MULT 31
 
-unsigned int hash(const char *str) {
+unsigned int yac_hash(const char *str) {
   unsigned int h = 0;
   for(; *str; str++)
     h = MULT * h + *str;

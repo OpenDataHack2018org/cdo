@@ -48,7 +48,7 @@
  *    - neighbour cell ids (cell 0 -> neighbours 1, 2, 3; cell 1 -> neighbours 0, 2, 3; 2 -> 0, 1, 3; 3 -> 0, 1, 2)
  *
  * The element index (in the example the cell index) goes from 0 to n-1, where n is the total number of elements in the dependency list.\n
- * The dependencies can have any valid unsigned integer number. However, one has to be careful when using \ref invert_dep_list, because if the values of the dependencies are to big the resulting dependency list can be big.
+ * The dependencies can have any valid unsigned integer number. However, one has to be careful when using \ref yac_invert_dep_list, because if the values of the dependencies are to big the resulting dependency list can be big.
  */
 struct dep_list {
    unsigned num_elements;           //!< total number of elements in the dependency list
@@ -69,14 +69,14 @@ struct dep_list {
  * initialises a dependency list, can be used in order to avoid memory access violations
  * @param[in,out] list dependency list that is to be initialised
  */
-void init_dep_list (struct dep_list * list);
+void yac_init_dep_list (struct dep_list * list);
 
 /**
  * initialises an empty dependency list, can be used if the dependencies themselves are not know a priori
  * @param[in,out] list dependency list that is to be initialised
  * @param[in] num_elements number of elements in the dependency list
  */
-void init_empty_dep_list(struct dep_list * list, unsigned num_elements);
+void yac_init_empty_dep_list(struct dep_list * list, unsigned num_elements);
 
 /**
  * initialises dependency list and sets the dependencies (a previous call to init_dep_list is not mandatory)
@@ -85,10 +85,10 @@ void init_empty_dep_list(struct dep_list * list, unsigned num_elements);
  * @param[in] num_deps_per_element array of size num_elements that contains for each element the number of associated dependencies
  * @param[in] dependencies array that contains all dependencies, entries 0 to num_deps_per_element[0]-1 contain dependencies for element 0, entries num_deps_per_element[0] to num_deps_per_element[0]+num_deps_per_element[1]-1 contain the dependencies for element 1, etc.
  *
- * \remark This routine makes no copy of the array passed to it. The array are assumed to be on the heap and will be freed by a call to \ref free_dep_list.
+ * \remark This routine makes no copy of the array passed to it. The array are assumed to be on the heap and will be freed by a call to \ref yac_free_dep_list.
  */
-void set_dependencies (struct dep_list * list, unsigned num_elements,
-                       unsigned * num_deps_per_element, unsigned * dependencies);
+void yac_set_dependencies (struct dep_list * list, unsigned num_elements,
+                           unsigned * num_deps_per_element, unsigned * dependencies);
 /**
  * adds dependencies to an existing dependency list
  * @param[in,out] list dependency list to be edited
@@ -96,8 +96,8 @@ void set_dependencies (struct dep_list * list, unsigned num_elements,
  * @param[in] num_dependencies number of dependencies to be added
  * @param[in] dependencies array containing the dependencies, which are supposed to be added to the list
  */
-void add_dependencies (struct dep_list * list, unsigned element,
-                       unsigned num_dependencies, unsigned * dependencies);
+void yac_add_dependencies (struct dep_list * list, unsigned element,
+                           unsigned num_dependencies, unsigned * dependencies);
 
 /**
  * gets all dependencies for a given element
@@ -107,14 +107,14 @@ void add_dependencies (struct dep_list * list, unsigned element,
  *
  * \remark the number of dependencies for the respective element can be retrieved from list.num_deps_per_element[index]
  */
-unsigned const * get_dependencies_of_element (struct dep_list list, unsigned index);
+unsigned const * yac_get_dependencies_of_element (struct dep_list list, unsigned index);
 
 /**
  * gets the total number of dependencies stored in the given list
  * @param[in] list dependency list
  * @return total number of dependencies in list
  */
-unsigned get_total_num_dependencies(struct dep_list list);
+unsigned yac_get_total_num_dependencies(struct dep_list list);
 
 /**
  * gets the position of a dependency for a given element in the dep_list::dependencies array
@@ -123,7 +123,7 @@ unsigned get_total_num_dependencies(struct dep_list list);
  * @param[in] dependency dependency of provided element
  * @return position of dependency in dep_list::dependencies array \n -1 in case index and/or dependency is invalid
  */
-unsigned get_dependency_index(struct dep_list list, unsigned index, unsigned dependency);
+unsigned yac_get_dependency_index(struct dep_list list, unsigned index, unsigned dependency);
 
 /**
  * gets the position of the first dependency of an element in the dep_list::dependencies array
@@ -131,7 +131,7 @@ unsigned get_dependency_index(struct dep_list list, unsigned index, unsigned dep
  * @param[in] index element index
  * @return position of the first dependency of an element in the dep_list::dependencies array
  */
-unsigned get_dependency_offset(struct dep_list list, unsigned index);
+unsigned yac_get_dependency_offset(struct dep_list list, unsigned index);
 
 /**
  * search for a given dependency in a dependency list
@@ -139,7 +139,7 @@ unsigned get_dependency_offset(struct dep_list list, unsigned index);
  * @param[in] dependency dependency that is to be searched for
  * @return 0 if the list does not contain the respective dependency
  */
-unsigned list_contains_dependency(struct dep_list list, unsigned dependency);
+unsigned yac_list_contains_dependency(struct dep_list list, unsigned dependency);
 
 /**
  * gets the element and dependency associated to a given position in the dep_list::dependencies array
@@ -148,15 +148,15 @@ unsigned list_contains_dependency(struct dep_list list, unsigned dependency);
  * @param[out] index element index associated to dep_index
  * @param[out] dependency dependency associated to dep_index
  */
-void get_dependency(struct dep_list list, unsigned dep_index,
-                    unsigned * index, unsigned * dependency);
+void yac_get_dependency(struct dep_list list, unsigned dep_index,
+                        unsigned * index, unsigned * dependency);
 
 /**
  * generates an inverted dependency list
  * @param[in] dep dependency list that is to be inverted
  * @param[out] inv_dep inverted version of dep (initialising inv_dep is no required)
  */
-void invert_dep_list(struct dep_list dep, struct dep_list * inv_dep);
+void yac_invert_dep_list(struct dep_list dep, struct dep_list * inv_dep);
 
 /**
  * removes all dependencies of the provided elements
@@ -165,8 +165,8 @@ void invert_dep_list(struct dep_list dep, struct dep_list * inv_dep);
  * @param[in] num_elements number of indices in element_indices array
  * \remark element indices == -1 are being ignored
  */
-void remove_dependencies_of_elements(struct dep_list * dep, unsigned * element_indices,
-                                     unsigned num_elements);
+void yac_remove_dependencies_of_elements(struct dep_list * dep, unsigned * element_indices,
+                                         unsigned num_elements);
 
 /**
  * removes all given dependencies
@@ -175,15 +175,15 @@ void remove_dependencies_of_elements(struct dep_list * dep, unsigned * element_i
  * @param[in] num_dependencies number of dependencies in dependencies array
  * \remark dependencies == -1 are being ignored
  */
-void remove_dependencies(struct dep_list * dep, unsigned * dependencies,
-                         unsigned num_dependencies);
+void yac_remove_dependencies(struct dep_list * dep, unsigned * dependencies,
+                             unsigned num_dependencies);
 
 /**
  * makes a copy of a dependency list
  * @param[in] src source dependency list
  * @param[out] tgt target dependency list (initialising tgt is not required)
  */
-void copy_dep_list(struct dep_list src, struct dep_list * tgt);
+void yac_copy_dep_list(struct dep_list src, struct dep_list * tgt);
 
 /**
  * packs a dependency list into a buffer that can be sent to other processes via the MPI library for example
@@ -193,23 +193,23 @@ void copy_dep_list(struct dep_list src, struct dep_list * tgt);
  * @param[out] data_size size of the data the is added to the buffer
  * @param[in,out] buf_size size of the buffer (this is being updated if necessary)
  * \remark *buf == NULL and *buf_size=0 are valid input values
- * @see unpack_dep_list
+ * @see \ref yac_unpack_dep_list
  */
-void pack_dep_list(struct dep_list list, unsigned ** buf, unsigned offset,
-                   unsigned * data_size, unsigned * buf_size);
+void yac_pack_dep_list(struct dep_list list, unsigned ** buf, unsigned offset,
+                       unsigned * data_size, unsigned * buf_size);
 /**
  * unpacks a packed dependency list
  * @param[out] list dependency into which the unpacked data is to be written (initialising is not required)
  * @param[in] buf buffer containing packed dependency list
  * @param[out] data_size size of the data the was occupied by the packed dependency list
- * @see pack_dep_list
+ * @see yac_pack_dep_list
  */
-void unpack_dep_list(struct dep_list * list, unsigned * buf, unsigned * data_size);
+void yac_unpack_dep_list(struct dep_list * list, unsigned * buf, unsigned * data_size);
 
 /**
  * frees a dependency list
  * @param[in,out] list dependency list to be freed
  */
-void free_dep_list(struct dep_list * list);
+void yac_free_dep_list(struct dep_list * list);
 
 #endif // DEP_LIST_H

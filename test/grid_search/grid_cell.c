@@ -42,7 +42,7 @@
 #include "ensure_array_size.h"
 #include "geometry.h"
 
-void init_grid_cell(struct grid_cell * cell) {
+void yac_init_grid_cell(struct grid_cell * cell) {
 
    cell->coordinates_x = NULL;
    cell->coordinates_y = NULL;
@@ -52,7 +52,7 @@ void init_grid_cell(struct grid_cell * cell) {
    cell->array_size = 0;
 }
 
-void copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell) {
+void yac_copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell) {
 
    if (in_cell.num_corners > out_cell->array_size) {
 
@@ -82,117 +82,12 @@ void copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell) {
    out_cell->num_corners = in_cell.num_corners;
 }
 
-void free_grid_cell(struct grid_cell * cell) {
+void yac_free_grid_cell(struct grid_cell * cell) {
 
    if (cell->coordinates_x != NULL) free(cell->coordinates_x);
    if (cell->coordinates_y != NULL) free(cell->coordinates_y);
    if (cell->coordinates_xyz != NULL) free(cell->coordinates_xyz);
    if (cell->edge_type != NULL) free(cell->edge_type);
 
-   init_grid_cell(cell);
-}
-
-void pack_grid_cell(struct grid_cell cell, double ** dble_buf,
-                    unsigned dble_buf_offset, unsigned * dble_buf_data_size,
-                    unsigned * dble_buf_size, unsigned ** uint_buf,
-                    unsigned uint_buf_offset, unsigned * uint_buf_data_size,
-                    unsigned * uint_buf_size) {
-
-   unsigned required_dble_buf_size, required_uint_buf_size;
-
-   required_dble_buf_size = 2 * cell.num_corners;
-   required_uint_buf_size = cell.num_corners + 1;
-
-   ENSURE_ARRAY_SIZE(*dble_buf, *dble_buf_size, dble_buf_offset+required_dble_buf_size);
-   ENSURE_ARRAY_SIZE(*uint_buf, *uint_buf_size, uint_buf_offset+required_uint_buf_size);
-
-   memcpy((*dble_buf)+dble_buf_offset, cell.coordinates_x, cell.num_corners * sizeof(double));
-   memcpy((*dble_buf)+dble_buf_offset+cell.num_corners, cell.coordinates_y,
-          cell.num_corners * sizeof(double));
-
-   *dble_buf_data_size = required_dble_buf_size;
-
-   (*uint_buf)[uint_buf_offset] = cell.num_corners;
-
-   unsigned i;
-   for (i = 1; i <= cell.num_corners; ++i)
-      (*uint_buf)[uint_buf_offset+i] = cell.edge_type[i-1];
-
-   *uint_buf_data_size = required_uint_buf_size;
-}
-
-void unpack_grid_cell(struct grid_cell * cell, double * dble_buf,
-                      unsigned * dble_buf_data_size, unsigned * uint_buf,
-                      unsigned * uint_buf_data_size) {
-
-   unsigned num_corners;
-
-   num_corners = *uint_buf;
-   uint_buf++;
-
-   *dble_buf_data_size = 2 * num_corners;
-   *uint_buf_data_size = num_corners + 1;
-
-   if (num_corners > cell->array_size) {
-      cell->coordinates_x = realloc(cell->coordinates_x,
-                                    num_corners *
-                                    sizeof(cell->coordinates_x[0]));
-      cell->coordinates_y = realloc(cell->coordinates_y,
-                                    num_corners *
-                                    sizeof(cell->coordinates_y[0]));
-      cell->coordinates_xyz = realloc(cell->coordinates_xyz,
-                                      3 * num_corners *
-                                      sizeof(cell->coordinates_xyz[0]));
-      cell->edge_type = realloc(cell->edge_type,
-                                num_corners * sizeof(cell->edge_type[0]));
-      cell->array_size = num_corners;
-   }
-
-   cell->num_corners = num_corners;
-   memcpy(cell->coordinates_x, dble_buf, num_corners * sizeof(double));
-   memcpy(cell->coordinates_y, dble_buf+num_corners, num_corners * sizeof(double));
-
-   for (unsigned i = 0; i < num_corners; ++i) {
-     cell->edge_type[i] = (enum edge_type)uint_buf[i];
-     LLtoXYZ(cell->coordinates_x[i], cell->coordinates_y[i],
-             cell->coordinates_xyz + 3*i);
-   }
-}
-
-void print_grid_cell(FILE * stream, struct grid_cell cell, char * name) {
-
-  char * out = NULL;
-  unsigned out_array_size = 0;
-  unsigned out_size = 0;
-
-  if (name != NULL) {
-
-    out_size = strlen(name) + 1 + 1 + 1;
-    ENSURE_ARRAY_SIZE(out, out_array_size, out_size);
-
-    strcpy(out, name);
-    strcat(out, ":\n");
-  }
-
-  for (unsigned i = 0; i < cell.num_corners; ++i) {
-
-    char buffer[1024];
-
-    sprintf(buffer, "%d x %.16f y %.16f %s\n", i, cell.coordinates_x[i],
-           cell.coordinates_y[i],
-           (cell.edge_type[i] == LAT_CIRCLE)?("LAT_CIRCLE"):
-           ((cell.edge_type[i] == LON_CIRCLE)?("LON_CIRCLE"):
-                                              ("GREAT_CIRCLE")));
-
-    out_size += strlen(buffer);
-
-    ENSURE_ARRAY_SIZE(out, out_array_size, out_size);
-
-    strcat(out, buffer);
-  }
-
-  if (out != NULL)
-    fputs(out, stream);
-
-  free(out);
+   yac_init_grid_cell(cell);
 }

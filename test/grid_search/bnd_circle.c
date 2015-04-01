@@ -45,7 +45,7 @@
 
 static double const tol = 1.0e-12;
 
-double get_point_angle(struct point * a, struct point * b) {
+double yac_get_point_angle(struct point * a, struct point * b) {
 
   /* method 1*/
   // return acos(sin(a->lat)*sin(b->lat)+cos(a->lat)*cos(b->lat)*cos(a->lon-b->lon));
@@ -58,7 +58,7 @@ double get_point_angle(struct point * a, struct point * b) {
 
 // this routine computes the distance between two points in rad
 // be careful when using this routine for small angles, because it is very inaccurate
-double get_dist(double a_lon, double a_lat, double b_lon, double b_lat) {
+double yac_get_dist(double a_lon, double a_lat, double b_lon, double b_lat) {
 
    // this formula is very inaccurate for small distances
    double temp;
@@ -118,26 +118,26 @@ static void normalise_vector(double v[]) {
 
 // computes the circumscribe circle of a quad on the sphere
 // it is assumed that the edges are circles of longitude and latitude
-void get_cell_circumscribe_circle_reg_quad(
+void yac_get_cell_circumscribe_circle_reg_quad(
    double a[3], double b[3], double c[3], double d[3],
    struct bounding_circle * bnd_circle) {
 
-   get_cell_circumscribe_circle_unstruct_triangle(a, b, c, bnd_circle);
+   yac_get_cell_circumscribe_circle_unstruct_triangle(a, b, c, bnd_circle);
 }
 
 // computes the bounding circle of a quad on the sphere
 // it is assumed that the edges are circles of longitude and latitude
-void get_cell_bounding_circle_reg_quad(
+void yac_get_cell_bounding_circle_reg_quad(
    double a[3], double b[3], double c[3], double d[3],
    struct bounding_circle * bnd_circle) {
 
-   get_cell_circumscribe_circle_unstruct_triangle(a, b, c, bnd_circle);
+   yac_get_cell_circumscribe_circle_unstruct_triangle(a, b, c, bnd_circle);
    bnd_circle->inc_angle += tol;
 }
 
 // computes the circumscribe circle of a triangle on the sphere
 // it is assumed that all edges are great circles
-void get_cell_circumscribe_circle_unstruct_triangle(
+void yac_get_cell_circumscribe_circle_unstruct_triangle(
    double a[3], double b[3], double c[3],
    struct bounding_circle * bnd_circle) {
 
@@ -172,7 +172,7 @@ void get_cell_circumscribe_circle_unstruct_triangle(
 
 // computes the bounding circle of a triangle on the sphere
 // it is assumed that all edges are great circles
-void get_cell_bounding_circle_unstruct_triangle(
+void yac_get_cell_bounding_circle_unstruct_triangle(
    double a[3], double b[3], double c[3],
    struct bounding_circle * bnd_circle) {
 
@@ -229,7 +229,7 @@ void get_cell_bounding_circle_unstruct_triangle(
          longest_edge = NULL;
          longest_edge_length = 0.0;
          other_point = NULL;
-         abort_message("internal error", __FILE__, __LINE__);
+         yac_internal_abort_message("internal error", __FILE__, __LINE__);
          // this function should never reach this point...
    };
 
@@ -259,13 +259,13 @@ void get_cell_bounding_circle_unstruct_triangle(
 
    // else compute circumscribe circle for all three points
    }  else {
-      get_cell_circumscribe_circle_unstruct_triangle(a, b, c, bnd_circle);
+      yac_get_cell_circumscribe_circle_unstruct_triangle(a, b, c, bnd_circle);
       bnd_circle->inc_angle += tol;
    }
 }
 
-void get_cell_bounding_circle(struct grid_cell cell,
-                              struct bounding_circle * bnd_circle) {
+void yac_get_cell_bounding_circle(struct grid_cell cell,
+                                  struct bounding_circle * bnd_circle) {
 
    unsigned i;
    double middle_point[3];
@@ -409,12 +409,12 @@ static void merge_bounding_circles(struct bounding_circle * dest_circle,
    }
 }
 
-void get_grid_bounding_circle(struct grid * grid,
-                              struct bounding_circle * bnd_circle) {
+void yac_get_grid_bounding_circle(struct grid * grid,
+                                  struct bounding_circle * bnd_circle) {
 
    unsigned num_grid_cells;
 
-   num_grid_cells = get_num_grid_cells(grid);
+   num_grid_cells = yac_get_num_grid_cells(grid);
 
    if (num_grid_cells == 0) {
 
@@ -424,11 +424,11 @@ void get_grid_bounding_circle(struct grid * grid,
 
    struct grid_cell cell;
 
-   init_grid_cell(&cell);
+   yac_init_grid_cell(&cell);
 
-   get_grid_cell(grid, 0, &cell);
+   yac_get_grid_cell(grid, 0, &cell);
 
-   get_cell_bounding_circle(cell, bnd_circle);
+   yac_get_cell_bounding_circle(cell, bnd_circle);
 
    unsigned i;
    struct bounding_circle curr_bnd_circle;
@@ -436,8 +436,8 @@ void get_grid_bounding_circle(struct grid * grid,
 
    for (i = 1; i < num_grid_cells; ++i) {
 
-      get_grid_cell(grid, i, &cell);
-      get_cell_bounding_circle(cell, &curr_bnd_circle);
+      yac_get_grid_cell(grid, i, &cell);
+      yac_get_cell_bounding_circle(cell, &curr_bnd_circle);
 
       // check whether the bounding circle of the cell is within the current
       // global bounding circle
@@ -451,14 +451,14 @@ void get_grid_bounding_circle(struct grid * grid,
       }
    }
 
-   free_grid_cell(&cell);
+   yac_free_grid_cell(&cell);
 
    XYZtoLL(bnd_circle->base_vector, bnd_circle->base_point+0,
            bnd_circle->base_point+1);
 }
 
-unsigned extents_overlap(struct bounding_circle * extent_a,
-                         struct bounding_circle * extent_b) {
+unsigned yac_extents_overlap(struct bounding_circle * extent_a,
+                             struct bounding_circle * extent_b) {
 
    double angle;
 
@@ -467,8 +467,8 @@ unsigned extents_overlap(struct bounding_circle * extent_a,
    return angle - tol <= extent_a->inc_angle + extent_b->inc_angle;
 }
 
-unsigned point_in_bounding_circle(struct point point,
-                                  struct bounding_circle * bnd_circle) {
+unsigned yac_point_in_bounding_circle(struct point point,
+                                      struct bounding_circle * bnd_circle) {
 
    double point_vector[3];
 
@@ -478,22 +478,22 @@ unsigned point_in_bounding_circle(struct point point,
           get_vector_angle(bnd_circle->base_vector, point_vector);
 }
 
-unsigned point_in_bounding_circle_vec(double point_vector[3],
-                                      struct bounding_circle * bnd_circle) {
+unsigned yac_point_in_bounding_circle_vec(double point_vector[3],
+                                          struct bounding_circle * bnd_circle) {
 
    return bnd_circle->inc_angle + tol >=
           get_vector_angle(bnd_circle->base_vector, point_vector);
 }
 
-void get_matching_grid_cells(struct grid * grid, struct bounding_circle extent,
-                             struct grid_cell ** matching_cells,
-                             unsigned * curr_matching_cells_array_size,
-                             unsigned ** local_ids, unsigned * curr_local_ids_array_size,
-                             unsigned * num_matching_cells, unsigned offset) {
+void yac_get_matching_grid_cells(struct grid * grid, struct bounding_circle extent,
+                                 struct grid_cell ** matching_cells,
+                                 unsigned * curr_matching_cells_array_size,
+                                 unsigned ** local_ids, unsigned * curr_local_ids_array_size,
+                                 unsigned * num_matching_cells, unsigned offset) {
 
    unsigned num_grid_cells;
 
-   num_grid_cells = get_num_grid_cells(grid);
+   num_grid_cells = yac_get_num_grid_cells(grid);
 
    unsigned i, j;
    struct grid_cell cell;
@@ -501,24 +501,24 @@ void get_matching_grid_cells(struct grid * grid, struct bounding_circle extent,
 
    *num_matching_cells = 0;
 
-   init_grid_cell(&cell);
+   yac_init_grid_cell(&cell);
 
    for (i = 0; i < num_grid_cells; ++i) {
 
-      get_grid_cell(grid, i, &cell);
+      yac_get_grid_cell(grid, i, &cell);
 
       for (j = 0; j < cell.num_corners; ++j) {
 
-         dist = get_dist(cell.coordinates_x[j], cell.coordinates_y[j],
-                         extent.base_point[0], extent.base_point[1]);
+         dist = yac_get_dist(cell.coordinates_x[j], cell.coordinates_y[j],
+                             extent.base_point[0], extent.base_point[1]);
 
          if (dist - tol <= extent.inc_angle) {
 
             if (matching_cells != NULL) {
                ENSURE_ARRAY_SIZE(*matching_cells, *curr_matching_cells_array_size,
                                  *num_matching_cells + offset + 1);
-               copy_grid_cell(cell, (*matching_cells) + offset +
-                                    *num_matching_cells);
+               yac_copy_grid_cell(cell, (*matching_cells) + offset +
+                                  *num_matching_cells);
             }
 
             if (local_ids != NULL) {
@@ -533,5 +533,5 @@ void get_matching_grid_cells(struct grid * grid, struct bounding_circle extent,
          }
       }
    }
-   free_grid_cell(&cell);
+   yac_free_grid_cell(&cell);
 }

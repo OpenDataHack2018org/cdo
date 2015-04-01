@@ -37,13 +37,17 @@
  * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
  */
 
+/** \example test_geometry.c
+ * This contains some tests for basic routines of \ref geometry.h.
+ */
+
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
 #include "grid.h"
 #include "utils.h"
 
-extern const double angle_tol;
+extern const double yac_angle_tol;
 
 struct line {
    struct {
@@ -58,7 +62,7 @@ struct point {
 
 struct edge {
    struct point points[2];
-   enum edge_type edge_type;
+   enum yac_edge_type edge_type;
 };
 
 /**
@@ -85,8 +89,8 @@ struct bounding_circle {
  * @return 0 if both cells do not overlap
  * @see check_overlap_cells
  */
-int check_overlap_cells (struct grid_cell const cell_a, 
-                         struct grid_cell const cell_b);
+int yac_check_overlap_cells (struct grid_cell const cell_a, 
+                             struct grid_cell const cell_b);
 
 /**
  * checks whether two cells overlap \n
@@ -97,10 +101,10 @@ int check_overlap_cells (struct grid_cell const cell_a,
  * @return 0 if both cells do not overlap
  * @see check_overlap_cells
  */
-int check_overlap_cells2 (struct grid_cell const cell_a,
-                          struct bounding_circle circle_a,
-                          struct grid_cell const cell_b,
-                          struct bounding_circle circle_b);
+int yac_check_overlap_cells2 (struct grid_cell const cell_a,
+                              struct bounding_circle circle_a,
+                              struct grid_cell const cell_b,
+                              struct bounding_circle circle_b);
 
 /** \example test_point_in_cell.c
  * This contains examples on how to use point_in_cell.
@@ -113,12 +117,8 @@ int check_overlap_cells2 (struct grid_cell const cell_a,
  * @param[in] cell
  * @return 0 if the point is not in the cell
  */
-int point_in_cell (struct point point, double point_coords[3],
-                   struct grid_cell cell);
-
-/** \example test_point_in_cell.c
- * This contains examples on how to use point_in_cell.
- */
+int yac_point_in_cell (struct point point, double point_coords[3],
+                       struct grid_cell cell);
 
 /**
  * checks whether a given point is within a given cell \n
@@ -128,8 +128,8 @@ int point_in_cell (struct point point, double point_coords[3],
  * @param[in] bnd_circle
  * @return 0 if the point is not in the cell
  */
-int point_in_cell2 (struct point point,  double point_coords[3],
-                    struct grid_cell cell, struct bounding_circle bnd_circle);
+int yac_point_in_cell2 (struct point point,  double point_coords[3],
+                        struct grid_cell cell, struct bounding_circle bnd_circle);
 
 /**
  * computes the angle between two longitude coordinates (in rad) \n
@@ -155,9 +155,9 @@ static inline double get_angle (double a_lon, double b_lon) {
  * @param[in] initial_src_to_tgt_dep dependency list containing for each source cell a list of target cell that might overlap
  * @param[out] src_to_tgt_dep dependency list containing the result of the search
  */
-void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
-                             struct dep_list initial_src_to_tgt_dep, 
-                             struct dep_list * src_to_tgt_dep);
+void yac_find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
+                                 struct dep_list initial_src_to_tgt_dep,
+                                 struct dep_list * src_to_tgt_dep);
 
 /**
  * searches for all overlapping cells of a given grid that overlap with a
@@ -187,15 +187,15 @@ void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
  * @remarks the user is responsible to free the memory associated with deps
  *          and stack
  */
-void find_overlapping_cells_s (struct grid_cell src_cell,
-                               struct bounding_circle src_bnd_circle,
-                               struct grid * tgt_grid,
-                               unsigned const * initial_dep,
-                               unsigned num_initial_deps, unsigned ** deps,
-                               unsigned * deps_size, unsigned * num_deps,
-                               unsigned src_index,
-                               unsigned * tgts_already_touched,
-                               unsigned ** stack, unsigned * stack_size);
+void yac_find_overlapping_cells_s (struct grid_cell src_cell,
+                                   struct bounding_circle src_bnd_circle,
+                                   struct grid * tgt_grid,
+                                   unsigned const * initial_dep,
+                                   unsigned num_initial_deps, unsigned ** deps,
+                                   unsigned * deps_size, unsigned * num_deps,
+                                   unsigned src_index,
+                                   unsigned * tgts_already_touched,
+                                   unsigned ** stack, unsigned * stack_size);
 
 /** \example test_gcxgc.c
  * This contains examples on how to use gcxgc and gcxgc_vec
@@ -218,8 +218,8 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
  *
  * \remark the user can provide NULL for p and/or q in that case the intersection points will not be returned
  */
-int gcxgc (struct edge edge_a, struct edge edge_b,
-           struct point * p, struct point * q);
+int yac_gcxgc (struct edge edge_a, struct edge edge_b,
+               struct point * p, struct point * q);
 
 /**
  * computes the intersection points of two great circles \n
@@ -240,8 +240,8 @@ int gcxgc (struct edge edge_a, struct edge edge_b,
  *
  * \remark the user can provide NULL for p and/or q in that case the intersection points will not be returned
  */
- int gcxgc_vec (double a[3], double b[3], double c[3], double d[3],
-                double p[3], double q[3]);
+ int yac_gcxgc_vec (double a[3], double b[3], double c[3], double d[3],
+                    double p[3], double q[3]);
 
 /** \example test_loncxlatc.c
  * This contains examples on loncxlatc and loncxlatc_vec
@@ -260,8 +260,8 @@ int gcxgc (struct edge edge_a, struct edge edge_b,
  *      - 3rd bit will be set if p is between c and d
  *      - 4th bit will be set if q is between c and d
  **/
-int loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
-                   double p[3], double q[3]);
+int yac_loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
+                       double p[3], double q[3]);
 
 /** \brief compute the intersection point of a meridian and a parallel
  *
@@ -276,8 +276,8 @@ int loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
  *      - 3rd bit will be set if p is between c and d
  *      - 4th bit will be set if q is between c and d
  **/
-int loncxlatc (struct edge edge_a, struct edge edge_b,
-               struct point * p, struct point * q);
+int yac_loncxlatc (struct edge edge_a, struct edge edge_b,
+                   struct point * p, struct point * q);
 
 /** \example test_latcxlatc.c
  * This contains examples on latcxlatc and latcxlatc_vec
@@ -296,8 +296,8 @@ int loncxlatc (struct edge edge_a, struct edge edge_b,
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of latitude
  **/
-int latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
-                   double p[3], double q[3]);
+int yac_latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
+                       double p[3], double q[3]);
 
 /** \brief compute the intersection point two circles of latitude
  *
@@ -312,8 +312,8 @@ int latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of latitude
  **/
-int latcxlatc (struct edge edge_a, struct edge edge_b,
-               struct point * p, struct point * q);
+int yac_latcxlatc (struct edge edge_a, struct edge edge_b,
+                   struct point * p, struct point * q);
 
 /** \example test_loncxlonc.c
  * This contains examples on loncxlonc loncxlonc_vec
@@ -332,8 +332,8 @@ int latcxlatc (struct edge edge_a, struct edge edge_b,
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of longitude
  **/
-int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
-                   double p[3], double q[3]);
+int yac_loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
+                       double p[3], double q[3]);
 
 /** \brief compute the intersection point two circles of longitude
  *
@@ -348,8 +348,8 @@ int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of longitude
  **/
-int loncxlonc (struct edge edge_a, struct edge edge_b,
-               struct point * p, struct point * q);
+int yac_loncxlonc (struct edge edge_a, struct edge edge_b,
+                   struct point * p, struct point * q);
 
 /** \example test_gcxlatc.c
  * This contains examples on gcxlatc and gcxlatc_vec.
@@ -374,8 +374,8 @@ int loncxlonc (struct edge edge_a, struct edge edge_b,
  * \remarks if the two circles only have one intersection point,
  *          p and q will be identically, but only the p bits will be set
  */
-int gcxlatc (struct edge edge_a, struct edge edge_b,
-             struct point * p, struct point * q);
+int yac_gcxlatc (struct edge edge_a, struct edge edge_b,
+                 struct point * p, struct point * q);
 
 /**
  * compute the intersection points of a great circles
@@ -398,8 +398,8 @@ int gcxlatc (struct edge edge_a, struct edge edge_b,
  * \remarks if the two circles only have one intersection point,
  *          p and q will be identically, but only the p bits will be set
  */
-int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
-                double p[3], double q[3]);
+int yac_gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
+                    double p[3], double q[3]);
 
 /**
  * computes the intersection points of two edges
@@ -413,8 +413,8 @@ int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
  *          the intersection point is returned
  * \remarks only one intersection is returned even if the edges intersect twice
  */
-int intersect (struct edge const edge_a, struct edge const edge_b,
-               struct point * intersection);
+int yac_intersect (struct edge const edge_a, struct edge const edge_b,
+                   struct point * intersection);
 
 /**
  * computes the intersection points of two edges
@@ -438,12 +438,12 @@ int intersect (struct edge const edge_a, struct edge const edge_b,
  * \remarks if the two circles only have one intersection point,
  *          p and q will be identically, but only the p bits will be set
  */
-int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
-                   enum edge_type edge_type_b, double c[3], double d[3],
-                   double p[3], double q[3]);
+int yac_intersect_vec (enum yac_edge_type edge_type_a, double a[3], double b[3],
+                       enum yac_edge_type edge_type_b, double c[3], double d[3],
+                       double p[3], double q[3]);
 
 /** \example test_cell_bnd_circle.c
- * These are some examples on how to use \ref get_cell_bounding_circle.
+ * These are some examples on how to use \ref yac_get_cell_bounding_circle.
  */
 
 /**
@@ -451,8 +451,8 @@ int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
  * @param[in] cell grid cell (coordinates have to be in radian)
  * @param[out] bnd_circle bounding circle of the grid cell
  */
-void get_cell_bounding_circle(struct grid_cell cell,
-                              struct bounding_circle * bnd_circle);
+void yac_get_cell_bounding_circle(struct grid_cell cell,
+                                  struct bounding_circle * bnd_circle);
 
 /**
  * computes the circumscribe circle for a triangle on the sphere
@@ -462,7 +462,7 @@ void get_cell_bounding_circle(struct grid_cell cell,
  * @param[out] bnd_circle circumscribe circle
  * @remark it is assumed that all three edges of the triangle are great circles
  */
-void get_cell_circumscribe_circle_unstruct_triangle(
+void yac_get_cell_circumscribe_circle_unstruct_triangle(
    double a[3], double b[3], double c[3], struct bounding_circle * bnd_circle);
 
 /**
@@ -473,7 +473,7 @@ void get_cell_circumscribe_circle_unstruct_triangle(
  * @param[out] bnd_circle bounding circle
  * @remark it is assumed that all three edges of the triangle are great circles
  */
-void get_cell_bounding_circle_unstruct_triangle(
+void yac_get_cell_bounding_circle_unstruct_triangle(
    double a[3], double b[3], double c[3], struct bounding_circle * bnd_circle);
 
 /**
@@ -486,7 +486,7 @@ void get_cell_bounding_circle_unstruct_triangle(
  * @remark it is assumed that all edges of the quad are either circles of
  *         longitude or latitude
  */
-void get_cell_circumscribe_circle_reg_quad(
+void yac_get_cell_circumscribe_circle_reg_quad(
    double a[3], double b[3], double c[3], double d[3],
    struct bounding_circle * bnd_circle);
 
@@ -500,12 +500,12 @@ void get_cell_circumscribe_circle_reg_quad(
  * @remark it is assumed that all edges of the quad are either circles of
  *         longitude or latitude
  */
-void get_cell_bounding_circle_reg_quad(
+void yac_get_cell_bounding_circle_reg_quad(
    double a[3], double b[3], double c[3], double d[3],
    struct bounding_circle * bnd_circle);
 
 /** \example test_grid_bnd_circle.c
- * These are some examples on how to use \ref get_grid_bounding_circle.
+ * These are some examples on how to use \ref yac_get_grid_bounding_circle.
  */
 
 /**
@@ -513,8 +513,8 @@ void get_cell_bounding_circle_reg_quad(
  * @param[in] grid
  * @param[out] bnd_circle bounding circle of the grid
  */
-void get_grid_bounding_circle(struct grid * grid,
-                              struct bounding_circle * bnd_circle);
+void yac_get_grid_bounding_circle(struct grid * grid,
+                                  struct bounding_circle * bnd_circle);
 
 /**
  * gets all cells of a grid that have an overlap with the area defined by the given bounding circle
@@ -531,11 +531,11 @@ void get_grid_bounding_circle(struct grid * grid,
  * \remark *local_ids == NULL and *curr_local_ids_array_size == 0 are valid input values
  * \remark if matching_cells == NULL or local_ids == NULL the respective data is not returned by this routine
  */
-void get_matching_grid_cells(struct grid * grid, struct bounding_circle extent,
-                             struct grid_cell ** matching_cells,
-                             unsigned * curr_matching_cells_array_size,
-                             unsigned ** local_ids, unsigned * curr_local_ids_array_size,
-                             unsigned * num_matching_cells, unsigned offset);
+void yac_get_matching_grid_cells(struct grid * grid, struct bounding_circle extent,
+                                 struct grid_cell ** matching_cells,
+                                 unsigned * curr_matching_cells_array_size,
+                                 unsigned ** local_ids, unsigned * curr_local_ids_array_size,
+                                 unsigned * num_matching_cells, unsigned offset);
 
 /**
  * checks whether two extents overlap
@@ -543,8 +543,8 @@ void get_matching_grid_cells(struct grid * grid, struct bounding_circle extent,
  * @param[in] extent_b bounding circle
  * @return 0 if the bounding circles do not overlap
  */
-unsigned extents_overlap(struct bounding_circle * extent_a,
-                         struct bounding_circle * extent_b);
+unsigned yac_extents_overlap(struct bounding_circle * extent_a,
+                             struct bounding_circle * extent_b);
 
 /**
  * checks whether a point is within a bounding circle
@@ -552,8 +552,8 @@ unsigned extents_overlap(struct bounding_circle * extent_a,
  * @param[in] bnd_circle bounding circle
  * @return 0 if point is not within the bounding circle
  */
-unsigned point_in_bounding_circle(struct point point,
-                                  struct bounding_circle * bnd_circle);
+unsigned yac_point_in_bounding_circle(struct point point,
+                                      struct bounding_circle * bnd_circle);
 
 /**
  * checks whether a point is within a bounding circle
@@ -561,8 +561,8 @@ unsigned point_in_bounding_circle(struct point point,
  * @param[in] bnd_circle bounding circle
  * @return 0 if point is not within the bounding circle
  */
-unsigned point_in_bounding_circle_vec(double point_vector[3],
-                                      struct bounding_circle * bnd_circle);
+unsigned yac_point_in_bounding_circle_vec(double point_vector[3],
+                                          struct bounding_circle * bnd_circle);
 
 /**
  * converts lon-lat coordinates into xyz ones
@@ -703,7 +703,7 @@ static inline int points_are_identically(double * a, double * b) {
       // for very small angles: asin(alpha) = ~alpha   (alpha in rad)
       return sqrt(cross_ab[0]*cross_ab[0] +
                   cross_ab[1]*cross_ab[1] +
-                  cross_ab[2]*cross_ab[2]) < angle_tol;
+                  cross_ab[2]*cross_ab[2]) < yac_angle_tol;
    }
 }
 
@@ -713,7 +713,7 @@ static inline int points_are_identically(double * a, double * b) {
  * @param[in] b point coordinates of point b (in rad)
  * @return great circle distance in rad between both points
  */
-double get_point_angle(struct point * a, struct point * b);
+double yac_get_point_angle(struct point * a, struct point * b);
 
 /**
  * determines whether two edges intersect
@@ -726,7 +726,7 @@ double get_point_angle(struct point * a, struct point * b);
  * @return 0 if edges do not intersect\n
  *         1 if edges intersect
  */
-int do_intersect (struct edge edge_a, double a[3], double b[3],
-                  struct edge edge_b, double c[3], double d[3]);
+int yac_do_intersect (struct edge edge_a, double a[3], double b[3],
+                      struct edge edge_b, double c[3], double d[3]);
 
 #endif // GEOMETRY_H

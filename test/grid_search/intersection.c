@@ -34,6 +34,10 @@
  * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -41,8 +45,12 @@
 #include "utils.h"
 #include "geometry.h"
 
+#if defined(CDO) && !defined(HAVE_SQRTL)
+#define sqrtl(x) (sqrt((double)x))
+#endif
+
 // angle tolerance
-const double angle_tol = 1e-9;
+const double yac_angle_tol = 1e-9;
 static double const tol = 1.0e-10;
 
 static int vector_is_between (double a[], double b[], double p[],
@@ -65,7 +73,7 @@ static int vector_is_between (double a[], double b[], double p[],
 
    return fabs(get_vector_angle(a, p) +
                get_vector_angle(b, p) -
-               *angle_ab) < angle_tol;
+               *angle_ab) < yac_angle_tol;
 }
 
 static int vector_is_between_lat (double a[], double b[], double p[]) {
@@ -73,21 +81,31 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 /* determines whether p is between a and b
    (a, b, p have the same latitude)*/
 
+/*  I. a_0 * alpha + b_0 * beta = p_0
+   II. a_1 * alpha + b_1 * beta = p_1
+   
+   if alpha > 0 and beta > 0 -> p is between a and b */
+
    if (fabs(fabs(a[2]) - 1.0) < tol) return 1;
 
-   long double a_0 = a[0], a_1 = a[1];
-   long double b_0 = b[0], b_1 = b[1];
-   long double p_0 = p[0], p_1 = p[1];
+   int flag = fabs(a[0]) > fabs(a[1]);
+   double a_0 = a[flag], a_1 = a[flag^1];
+   double b_0 = b[flag], b_1 = b[flag^1];
+   double p_0 = p[flag], p_1 = p[flag^1];
 
-   if (((a_0*p_0+a_1*p_1) < 0) || ((b_0*p_0+b_1*p_1) < 0))
-    return 0;
+   double temp = b_0 - (b_1 * a_0) / a_1;
 
-   double cross_ab = fabs(a_0*b_1-a_1*b_0);
-   double cross_ap = fabs(a_0*p_1-a_1*p_0);
-   double cross_bp = fabs(b_0*p_1-b_1*p_0);
+   // if a and b are nearly identical
+   if (fabs(temp) < tol) return (fabs(a_0 - p_0) < tol) &&
+                                (fabs(a_1 - p_1) < tol);
 
-   // maybe this should be the cross_** should be scaled by z at some point
-   return (cross_ap < cross_ab + tol) && (cross_bp < cross_ab + tol);
+   double beta = (p_0 - (p_1 * a_0) / a_1) / temp;
+
+   if (beta < -tol) return 0;
+
+   double alpha = (p_1 - b_1 * beta) / a_1;
+
+   return alpha > -tol;
 }
 
 /** \brief compute the intersection points of two great circles
@@ -107,8 +125,8 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
   * - http://www.geoclub.de/viewtopic.php?f=54&t=29689
   **/
 
- int gcxgc (struct edge edge_a, struct edge edge_b,
-            struct point * p, struct point * q) {
+ int yac_gcxgc (struct edge edge_a, struct edge edge_b,
+                struct point * p, struct point * q) {
 
    double a[3], b[3], c[3], d[3], p_[3], q_[3];
 
@@ -117,7 +135,7 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
    LLtoXYZ( edge_b.points[0].lon, edge_b.points[0].lat, c);
    LLtoXYZ( edge_b.points[1].lon, edge_b.points[1].lat, d);
 
-   int ret_val =  gcxgc_vec(a, b, c, d, p_, q_);
+   int ret_val =  yac_gcxgc_vec(a, b, c, d, p_, q_);
 
    if (p != NULL) XYZtoLL(p_, &(p->lon), &(p->lat));
    if (q != NULL) XYZtoLL(q_, &(q->lon), &(q->lat));
@@ -141,8 +159,8 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
   * based on
   * - http://www.geoclub.de/viewtopic.php?f=54&t=29689
   **/
- int gcxgc_vec (double a[3], double b[3], double c[3], double d[3],
-                double p[3], double q[3]) {
+ int yac_gcxgc_vec (double a[3], double b[3], double c[3], double d[3],
+                    double p[3], double q[3]) {
 
    double length_cross_ab, length_cross_cd, length_cross_abxcd;
    long double cross_ab[3], cross_cd[3], cross_abxcd[3];
@@ -221,8 +239,9 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
             if (vector_is_between(c, d, a, &angle_cd, dot_cd))
                result |= 1 << 2;
-            if (vector_is_between(c, d, (double[]){-a[0], -a[1], -a[2]}, &angle_cd,
-                                  dot_cd)) result |= 1 << 3;
+            double tvec[] = {-a[0], -a[1], -a[2]};
+            if (vector_is_between(c, d, tvec, &angle_cd, dot_cd))
+	       result |= 1 << 3;
 
             return result;
          }
@@ -253,8 +272,9 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
             if (vector_is_between(a, b, c, &angle_ab, dot_ab))
                result |= 1 << 0;
-            if (vector_is_between(a, b, (double[]){-c[0], -c[1], -c[2]}, &angle_ab,
-                                  dot_ab)) result |= 1 << 1;
+	    double tvec[] = {-c[0], -c[1], -c[2]};
+            if (vector_is_between(a, b, tvec, &angle_ab, dot_ab))
+	       result |= 1 << 1;
 
             return result;
          }
@@ -319,7 +339,7 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
             q[0] = a[0], q[1] = a[1], q[2] = a[2];
             break;
          default:
-            abort_message("internal error", __FILE__, __LINE__);
+            yac_internal_abort_message("internal error", __FILE__, __LINE__);
       }
 
       ret_value |= 1 + 2 + 4 + 8;
@@ -366,6 +386,7 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
     return result;
 }
 
+static
 int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
 
    double length_cross_ab, length_cross_cd, length_cross_abxcd;
@@ -515,8 +536,8 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of latitude
  **/
-int latcxlatc (struct edge edge_a, struct edge edge_b,
-               struct point * p, struct point * q) {
+int yac_latcxlatc (struct edge edge_a, struct edge edge_b,
+                   struct point * p, struct point * q) {
 
    // two circles of latitude can only intersect if they are on the same latitude
    if (fabs(edge_a.points[0].lat - edge_b.points[0].lat) > tol)
@@ -601,7 +622,7 @@ int latcxlatc (struct edge edge_a, struct edge edge_b,
          if (q != NULL) *q = edge_a.points[0];
          break;
       default:
-         abort_message("internal error", __FILE__, __LINE__);
+         yac_internal_abort_message("internal error", __FILE__, __LINE__);
    }
 
    if (angle_ab < tol || angle_cd < tol)
@@ -625,8 +646,8 @@ int latcxlatc (struct edge edge_a, struct edge edge_b,
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of latitude
  **/
-int latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
-                   double p[3], double q[3]) {
+int yac_latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
+                       double p[3], double q[3]) {
 
    // two circles of latitude can only intersect if they are on the same latitude
    if (fabs(a[2] - c[2]) > tol)
@@ -657,7 +678,7 @@ int latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
       if (b_between_cd) q[0] = b[0], q[1] = b[1], q[2] = b[2];
       else if (c_between_ab) q[0] = c[0], q[1] = c[1], q[2] = c[2];
       else if (d_between_ab) q[0] = d[0], q[1] = d[1], q[2] = d[2];
-      else abort_message("internal error", __FILE__, __LINE__);
+      else yac_internal_abort_message("internal error", __FILE__, __LINE__);
 
    } else if (b_between_cd) {
 
@@ -667,7 +688,7 @@ int latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
 
       if (c_between_ab) q[0] = c[0], q[1] = c[1], q[2] = c[2];
       else if (d_between_ab) q[0] = d[0], q[1] = d[1], q[2] = d[2];
-      else abort_message("internal error", __FILE__, __LINE__);
+      else yac_internal_abort_message("internal error", __FILE__, __LINE__);
 
    } else if (c_between_ab && d_between_ab) {
 
@@ -729,8 +750,8 @@ static int latcxlatc_(struct edge edge_a, struct edge edge_b) {
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of longitude
  **/
-int loncxlonc (struct edge edge_a, struct edge edge_b,
-               struct point * p, struct point * q) {
+int yac_loncxlonc (struct edge edge_a, struct edge edge_b,
+                   struct point * p, struct point * q) {
 
    double angle_ab = fabs(get_angle(edge_a.points[0].lon, edge_a.points[1].lon));
    double angle_ac = fabs(get_angle(edge_a.points[0].lon, edge_b.points[0].lon));
@@ -822,7 +843,7 @@ int loncxlonc (struct edge edge_a, struct edge edge_b,
             if (q != NULL) *q = edge_a.points[0];
             break;
          default:
-            abort_message("internal error", __FILE__, __LINE__);
+            yac_internal_abort_message("internal error", __FILE__, __LINE__);
       }
       ret_value |= 1 + 2 + 4 + 8;
 
@@ -873,8 +894,8 @@ int loncxlonc (struct edge edge_a, struct edge edge_b,
  *      - 4th bit will be set if q is between c and d
  *      - 5th bit will be set if both edges are on the same circle of longitude
  **/
-int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
-                   double p[3], double q[3]) {
+int yac_loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
+                       double p[3], double q[3]) {
 
    int ret_value = 0;
 
@@ -990,7 +1011,7 @@ int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
             q[0] = a[0], q[1] = a[1], q[2] = a[2];
             break;
          default:
-            abort_message("internal error", __FILE__, __LINE__);
+            yac_internal_abort_message("internal error", __FILE__, __LINE__);
       }
 
    } else {
@@ -1017,6 +1038,7 @@ int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
    return ret_value;
 }
 
+static
 int loncxlonc_ (struct edge edge_a, struct edge edge_b) {
 
    // if edge goes across pole
@@ -1102,8 +1124,8 @@ int loncxlonc_ (struct edge edge_a, struct edge edge_b) {
  *      - 3rd bit will be set if p is between c and d
  *      - 4th bit will be set if q is between c and d
  **/
-int loncxlatc (struct edge edge_a, struct edge edge_b,
-               struct point * p, struct point * q) {
+int yac_loncxlatc (struct edge edge_a, struct edge edge_b,
+                   struct point * p, struct point * q) {
 
    double lon_a, lat_a[2];
    double lon_b[2], lat_b;
@@ -1205,8 +1227,8 @@ int loncxlatc (struct edge edge_a, struct edge edge_b,
  *      - 3rd bit will be set if p is between c and d
  *      - 4th bit will be set if q is between c and d
  **/
-int loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
-                   double p[3], double q[3]) {
+int yac_loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
+                       double p[3], double q[3]) {
 
    unsigned ret_value;
 
@@ -1219,7 +1241,7 @@ int loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
        (fabs(fabs(a[2]) - 1.0) > tol) &&
        (fabs(fabs(b[2]) - 1.0) > tol)) {
 
-      abort_message("edge is not a circle of longitude", __FILE__, __LINE__);
+      yac_internal_abort_message("edge is not a circle of longitude", __FILE__, __LINE__);
    }
 
    unsigned ab_goes_across_pole;
@@ -1410,8 +1432,8 @@ static int loncxlatc_ (struct edge edge_a, struct edge edge_b) {
  *   based on
  *   - http://geospatialmethods.org/spheres/GCIntersect.html
  **/
-int gcxlatc(struct edge edge_a, struct edge edge_b,
-            struct point * p, struct point * q) {
+int yac_gcxlatc(struct edge edge_a, struct edge edge_b,
+                struct point * p, struct point * q) {
 
    // if the great circle is nearly a lon circle, then the accuracy of the normal
    // computation gets messy, therefore we handle it as a lon circle...
@@ -1421,7 +1443,7 @@ int gcxlatc(struct edge edge_a, struct edge edge_b,
       edge_a.points[0].lon = edge_a.points[1].lon = (edge_a.points[0].lon + edge_a.points[1].lon) / 2.0;
       edge_a.edge_type = LON_CIRCLE;
 
-      return loncxlatc(edge_a, edge_b, p, q);
+      return yac_loncxlatc(edge_a, edge_b, p, q);
    }
 
    // if the great circle is the equator, we handle the great circle as a circle of latitude
@@ -1429,7 +1451,7 @@ int gcxlatc(struct edge edge_a, struct edge edge_b,
 
       edge_a.points[0].lat = edge_a.points[1].lat = 0;
       edge_a.edge_type = LAT_CIRCLE;
-      return latcxlatc(edge_a, edge_b, p, q);
+      return yac_latcxlatc(edge_a, edge_b, p, q);
    }
 
    double a[3], b[3], c[3], d[3], p_[3], q_[3];
@@ -1439,7 +1461,7 @@ int gcxlatc(struct edge edge_a, struct edge edge_b,
    LLtoXYZ(edge_b.points[0].lon, edge_b.points[0].lat, c);
    LLtoXYZ(edge_b.points[1].lon, edge_b.points[1].lat, d);
 
-   int ret_value = gcxlatc_vec(a, b, c, d, p_, q_);
+   int ret_value = yac_gcxlatc_vec(a, b, c, d, p_, q_);
 
    if (ret_value == -1) return -1;
 
@@ -1467,8 +1489,8 @@ int gcxlatc(struct edge edge_a, struct edge edge_b,
  *          p and q will be identically, but only the p bits will be set
  **/
 
-int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
-                double p[3], double q[3]) {
+int yac_gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
+                    double p[3], double q[3]) {
 
    unsigned result = 0;
 
@@ -1482,14 +1504,14 @@ int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
    // if the great circle is the equator
    if (fabs(a[2]) < tol && fabs(b[2]) < tol) {
 
-      return latcxlatc_vec(a, b, c, d, p, q);
+      return yac_latcxlatc_vec(a, b, c, d, p, q);
 
    // if the great circle is  a circle of longitude
    } else if (scale < tol || fabs(cross_ab[2]/scale) < tol ||
               fabs(fabs(a[2])-1.0) < 1e-13 ||
               fabs(fabs(b[2])-1.0) < 1e-13) {
 
-      return loncxlatc_vec(a, b, c, d, p, q);
+      return yac_loncxlatc_vec(a, b, c, d, p, q);
    }
 
    double t[3], s[3];
@@ -1527,9 +1549,6 @@ int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
       s[1] = a[1] - scale * b[1];
    }
 
-   if (fabs(s[0]) < tol && fabs(s[1]) < tol)
-      abort_message("internal error", __FILE__, __LINE__);
-
    {
       // the intersection of the planes of both circles is defined by:
       // x = t + n * s
@@ -1540,6 +1559,9 @@ int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
       double a_ = s[0] * s[0] + s[1] * s[1];
       double b_ = 2.0 * (t[0] * s[0] + t[1] * s[1]);
       double c_ = t[0] * t[0] + t[1] * t[1] + c[2] * c[2] - 1.0;
+
+      if (a_ == 0.0)
+         yac_internal_abort_message("internal error", __FILE__, __LINE__);
 
       double temp = b_ * b_ - 4.0 * a_ * c_;
 
@@ -1581,7 +1603,8 @@ int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
    return result;
 }
 
-static int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
+static
+int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
 
    double angle_ab = get_vector_angle(a, b);
    double angle_cd = get_vector_angle(c, d);
@@ -1646,7 +1669,7 @@ static int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
    }
 
    if (fabs(s[0]) < tol && fabs(s[1]) < tol)
-      abort_message("internal error", __FILE__, __LINE__);
+      yac_internal_abort_message("internal error", __FILE__, __LINE__);
 
    {
       // the intersection of the planes of both circles is defined by:
@@ -1699,8 +1722,8 @@ static int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
    }
 }
 
-int intersect (struct edge const edge_a, struct edge const edge_b,
-               struct point * intersection) {
+int yac_intersect (struct edge const edge_a, struct edge const edge_b,
+                   struct point * intersection) {
 
    int switch_edges;
 
@@ -1711,12 +1734,12 @@ int intersect (struct edge const edge_a, struct edge const edge_b,
    // if both edges are on circles of latitude
    if (edge_a.edge_type == LAT_CIRCLE && edge_b.edge_type == LAT_CIRCLE) {
 
-      intersect_func = latcxlatc;
+      intersect_func = yac_latcxlatc;
 
    // if both edges are on circle of longitude
    } else if (edge_a.edge_type == LON_CIRCLE && edge_b.edge_type == LON_CIRCLE) {
 
-      intersect_func = loncxlonc;
+      intersect_func = yac_loncxlonc;
 
    // if both edges are on great circles
    } else if ((edge_a.edge_type == GREAT_CIRCLE &&
@@ -1726,37 +1749,37 @@ int intersect (struct edge const edge_a, struct edge const edge_b,
        (edge_a.edge_type == GREAT_CIRCLE &&
         edge_b.edge_type == LON_CIRCLE)) {
 
-      intersect_func = gcxgc;
+      intersect_func = yac_gcxgc;
 
    // if one edge a is on a great circle and edge b on a circle of latitude
    } else if (edge_a.edge_type == GREAT_CIRCLE &&
               edge_b.edge_type == LAT_CIRCLE) {
 
-      intersect_func = gcxlatc;
+      intersect_func = yac_gcxlatc;
 
    // if one edge a is on a circle of latitude and edge b on a great circle
    } else if (edge_a.edge_type == LAT_CIRCLE &&
               edge_b.edge_type == GREAT_CIRCLE ) {
 
       switch_edges = 1;
-      intersect_func = gcxlatc;
+      intersect_func = yac_gcxlatc;
 
    // if one edge a is on a circle of longitude and edge b on a circle of latitude
    } else if (edge_a.edge_type == LON_CIRCLE &&
               edge_b.edge_type == LAT_CIRCLE) {
 
-      intersect_func = loncxlatc;
+      intersect_func = yac_loncxlatc;
 
    // if one edge a is on a circle of latitude and edge b on a circle of longitude
    } else if (edge_a.edge_type == LAT_CIRCLE &&
               edge_b.edge_type == LON_CIRCLE ) {
 
       switch_edges = 1;
-      intersect_func = loncxlatc;
+      intersect_func = yac_loncxlatc;
 
    } else {
 
-      abort_message ( "ERROR: unknown edge type.", __FILE__, __LINE__ );
+      yac_internal_abort_message ( "ERROR: unknown edge type.", __FILE__, __LINE__ );
       exit(EXIT_FAILURE);
    }
 
@@ -1791,9 +1814,9 @@ int intersect (struct edge const edge_a, struct edge const edge_b,
    return 0;
 }
 
-int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
-                   enum edge_type edge_type_b, double c[3], double d[3],
-                   double p[3], double q[3]) {
+int yac_intersect_vec (enum yac_edge_type edge_type_a, double a[3], double b[3],
+                       enum yac_edge_type edge_type_b, double c[3], double d[3],
+                       double p[3], double q[3]) {
 
    int switch_edges;
 
@@ -1805,13 +1828,13 @@ int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
    if (edge_type_a == LAT_CIRCLE &&
        edge_type_b == LAT_CIRCLE) {
 
-      intersect_func = latcxlatc_vec;
+      intersect_func = yac_latcxlatc_vec;
 
    // if both edges are on circle of longitude
    } else if (edge_type_a == LON_CIRCLE &&
               edge_type_b == LON_CIRCLE) {
 
-      intersect_func = loncxlonc_vec;
+      intersect_func = yac_loncxlonc_vec;
 
    // if both edges are on great circles
    } else if ((edge_type_a == GREAT_CIRCLE &&
@@ -1821,37 +1844,37 @@ int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
               (edge_type_a == GREAT_CIRCLE &&
                edge_type_b == LON_CIRCLE)) {
 
-      intersect_func = gcxgc_vec;
+      intersect_func = yac_gcxgc_vec;
 
    // if one edge a is on a great circle and edge b on a circle of latitude
    } else if (edge_type_a == GREAT_CIRCLE &&
               edge_type_b == LAT_CIRCLE) {
 
-      intersect_func = gcxlatc_vec;
+      intersect_func = yac_gcxlatc_vec;
 
    // if one edge a is on a circle of latitude and edge b on a great circle
    } else if (edge_type_a == LAT_CIRCLE &&
               edge_type_b == GREAT_CIRCLE ) {
 
       switch_edges = 1;
-      intersect_func = gcxlatc_vec;
+      intersect_func = yac_gcxlatc_vec;
 
    // if one edge a is on a circle of longitude and edge b on a circle of latitude
    } else if (edge_type_a == LON_CIRCLE &&
               edge_type_b == LAT_CIRCLE) {
 
-      intersect_func = loncxlatc_vec;
+      intersect_func = yac_loncxlatc_vec;
 
    // if one edge a is on a circle of latitude and edge b on a circle of longitude
    } else if (edge_type_a == LAT_CIRCLE &&
               edge_type_b == LON_CIRCLE ) {
 
       switch_edges = 1;
-      intersect_func = loncxlatc_vec;
+      intersect_func = yac_loncxlatc_vec;
 
    } else {
 
-      abort_message ( "ERROR: unknown edge type.", __FILE__, __LINE__ );
+      yac_internal_abort_message ( "ERROR: unknown edge type.", __FILE__, __LINE__ );
       exit(EXIT_FAILURE);
    }
 
@@ -1869,8 +1892,8 @@ int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
    return ret_value;
 }
 
-int do_intersect (struct edge edge_a, double a[3], double b[3],
-                  struct edge edge_b, double c[3], double d[3]) {
+int yac_do_intersect (struct edge edge_a, double a[3], double b[3],
+                      struct edge edge_b, double c[3], double d[3]) {
 
    int flag = ((edge_a.edge_type == LAT_CIRCLE)   << 0) |
               ((edge_a.edge_type == LON_CIRCLE)   << 1) |
@@ -1898,7 +1921,7 @@ int do_intersect (struct edge edge_a, double a[3], double b[3],
       case ((1 << 2) | (1 << 3)):
          return gcxlatc_vec_(a, b, c, d);
       default:
-         abort_message ( "ERROR: unknown edge type.", __FILE__, __LINE__ );
+         yac_internal_abort_message ( "ERROR: unknown edge type.", __FILE__, __LINE__ );
          exit(EXIT_FAILURE);
    };
 }

@@ -53,10 +53,10 @@
  *
  **/
 
-void bisection_search (double const * data, unsigned data_length, 
-                       double const * axis_data, unsigned axis_length, 
-                       int * restrict position, int * restrict found,
-                       double period) {
+void yac_bisection_search (double const * data, unsigned data_length, 
+                           double const * axis_data, unsigned axis_length,
+                           int * restrict position, int * restrict found,
+                           double period) {
 
    int upper, lower, middle;
    unsigned i;
@@ -149,9 +149,9 @@ void bisection_search (double const * data, unsigned data_length,
  *
  **/
 
-void bisection_search_int ( int const * data, unsigned data_length,
-                            int const * axis_data, unsigned axis_length,
-                            int * restrict position, int * restrict found) {
+void yac_bisection_search_int (int const * data, unsigned data_length,
+                               int const * axis_data, unsigned axis_length,
+                               int * restrict position, int * restrict found) {
   int upper, lower, middle;
   unsigned i;
 

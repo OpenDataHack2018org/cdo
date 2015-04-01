@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void init_dep_list (struct dep_list * list) {
+void yac_init_dep_list (struct dep_list * list) {
 
    list->num_elements = 0;
    list->num_deps_per_element = NULL;
@@ -44,7 +44,7 @@ void init_dep_list (struct dep_list * list) {
    list->prescan = NULL;
 }
 
-void init_empty_dep_list(struct dep_list * list, unsigned num_elements) {
+void yac_init_empty_dep_list(struct dep_list * list, unsigned num_elements) {
 
    list->num_elements = num_elements;
    list->num_deps_per_element = calloc(num_elements, sizeof(*(list->num_deps_per_element)));
@@ -52,6 +52,7 @@ void init_empty_dep_list(struct dep_list * list, unsigned num_elements) {
    list->prescan = calloc(num_elements, sizeof(*(list->prescan)));
 }
 
+static
 void generate_prescan (struct dep_list * list) {
 
    unsigned i, num_total_deps;
@@ -70,10 +71,10 @@ void generate_prescan (struct dep_list * list) {
    }
 }
 
-void set_dependencies (struct dep_list * list, unsigned num_elements,
-                       unsigned * num_deps_per_element, unsigned * dependencies) {
+void yac_set_dependencies (struct dep_list * list, unsigned num_elements,
+                           unsigned * num_deps_per_element, unsigned * dependencies) {
 
-   init_dep_list(list);
+   yac_init_dep_list(list);
    list->num_elements         = num_elements;
    list->num_deps_per_element = num_deps_per_element;
    list->dependencies         = dependencies;
@@ -81,19 +82,19 @@ void set_dependencies (struct dep_list * list, unsigned num_elements,
    generate_prescan(list);
 }
 
-void add_dependencies (struct dep_list * list, unsigned element,
-                       unsigned num_dependencies, unsigned * dependencies) {
+void yac_add_dependencies (struct dep_list * list, unsigned element,
+                           unsigned num_dependencies, unsigned * dependencies) {
 
    if ((list->num_elements == 0) || (list->num_elements <= element)) {
 
-      abort_message ( "ERROR: Wrong umber of elements in list out of range", __FILE__, __LINE__ );
+      yac_internal_abort_message ( "ERROR: Wrong umber of elements in list out of range", __FILE__, __LINE__ );
 
    }
 
    unsigned * new_dependencies;
    unsigned new_size, old_total_num_deps;
 
-   old_total_num_deps = get_total_num_dependencies(*list);
+   old_total_num_deps = yac_get_total_num_dependencies(*list);
    new_size = old_total_num_deps + num_dependencies;
 
    new_dependencies = malloc(new_size * sizeof(*new_dependencies));
@@ -123,14 +124,14 @@ void add_dependencies (struct dep_list * list, unsigned element,
       list->prescan[i] += num_dependencies;
 }
 
-void invert_dep_list(struct dep_list dep, struct dep_list * inv_dep) {
+void yac_invert_dep_list(struct dep_list dep, struct dep_list * inv_dep) {
 
    unsigned i, j, num_total_deps;
    unsigned max_index;
    unsigned const * curr_element_deps;
    unsigned * curr_num_deps_per_element;
 
-   init_dep_list(inv_dep);
+   yac_init_dep_list(inv_dep);
 
    if (dep.num_elements == 0) return;
 
@@ -185,12 +186,12 @@ void invert_dep_list(struct dep_list dep, struct dep_list * inv_dep) {
    free (curr_num_deps_per_element);
 }
 
-unsigned const * get_dependencies_of_element (struct dep_list list, unsigned index) {
+unsigned const * yac_get_dependencies_of_element (struct dep_list list, unsigned index) {
 
    return list.dependencies + list.prescan[index];
 }
 
-unsigned get_total_num_dependencies(struct dep_list list) {
+unsigned yac_get_total_num_dependencies(struct dep_list list) {
 
    if (list.num_elements == 0)
       return 0;
@@ -198,7 +199,7 @@ unsigned get_total_num_dependencies(struct dep_list list) {
       return list.prescan[list.num_elements-1] + list.num_deps_per_element[list.num_elements-1];
 }
 
-unsigned get_dependency_index(struct dep_list list, unsigned index, unsigned dependency) {
+unsigned yac_get_dependency_index(struct dep_list list, unsigned index, unsigned dependency) {
 
    unsigned i;
 
@@ -211,16 +212,16 @@ unsigned get_dependency_index(struct dep_list list, unsigned index, unsigned dep
    return -1;
 }
 
-unsigned get_dependency_offset(struct dep_list list, unsigned index) {
+unsigned yac_get_dependency_offset(struct dep_list list, unsigned index) {
 
    return list.prescan[index];
 }
 
-unsigned list_contains_dependency(struct dep_list list, unsigned dependency) {
+unsigned yac_list_contains_dependency(struct dep_list list, unsigned dependency) {
 
    unsigned i, num_dependencies;
 
-   num_dependencies = get_total_num_dependencies(list);
+   num_dependencies = yac_get_total_num_dependencies(list);
 
    for (i = 0; i < num_dependencies; ++i)
       if (list.dependencies[i] == dependency)
@@ -229,12 +230,12 @@ unsigned list_contains_dependency(struct dep_list list, unsigned dependency) {
    return 1 == 0;
 }
 
-void get_dependency(struct dep_list list, unsigned dep_index, unsigned * index,
-                    unsigned * dependency) {
+void yac_get_dependency(struct dep_list list, unsigned dep_index, unsigned * index,
+                        unsigned * dependency) {
 
    unsigned i;
 
-   if (dep_index >= get_total_num_dependencies(list)) {
+   if (dep_index >= yac_get_total_num_dependencies(list)) {
       *index = -1;
       *dependency = -1;
       return;
@@ -249,7 +250,7 @@ void get_dependency(struct dep_list list, unsigned dep_index, unsigned * index,
    *dependency = list.dependencies[dep_index];
 }
 
-void copy_dep_list(struct dep_list src, struct dep_list * tgt) {
+void yac_copy_dep_list(struct dep_list src, struct dep_list * tgt) {
 
    unsigned num_total_deps;
 
@@ -276,16 +277,16 @@ void copy_dep_list(struct dep_list src, struct dep_list * tgt) {
       memcpy(dependencies, src.dependencies, 
              num_total_deps * sizeof (dependencies[0]));
 
-      set_dependencies(tgt, src.num_elements, num_deps_per_element, dependencies);
+      yac_set_dependencies(tgt, src.num_elements, num_deps_per_element, dependencies);
    }
 }
 
-void pack_dep_list(struct dep_list list, unsigned ** buf, unsigned offset,
-                   unsigned * data_size, unsigned * buf_size) {
+void yac_pack_dep_list(struct dep_list list, unsigned ** buf, unsigned offset,
+                       unsigned * data_size, unsigned * buf_size) {
 
    unsigned total_num_dependencies;
 
-   total_num_dependencies = get_total_num_dependencies(list);
+   total_num_dependencies = yac_get_total_num_dependencies(list);
 
    *data_size = 1 + list.num_elements + total_num_dependencies;
 
@@ -298,7 +299,7 @@ void pack_dep_list(struct dep_list list, unsigned ** buf, unsigned offset,
    }
 }
 
-void unpack_dep_list(struct dep_list * list, unsigned * buf, unsigned * data_size) {
+void yac_unpack_dep_list(struct dep_list * list, unsigned * buf, unsigned * data_size) {
 
    unsigned i;
    unsigned total_num_dependencies = 0;
@@ -316,28 +317,28 @@ void unpack_dep_list(struct dep_list * list, unsigned * buf, unsigned * data_siz
       dependencies = malloc(total_num_dependencies * sizeof(*dependencies));
       memcpy(dependencies, buf+1+buf[0], total_num_dependencies * sizeof(*dependencies));
 
-      set_dependencies(list, buf[0], num_deps_per_element, dependencies);
+      yac_set_dependencies(list, buf[0], num_deps_per_element, dependencies);
    } else {
 
-      init_dep_list(list);
+      yac_init_dep_list(list);
    }
 
    *data_size = 1 + list->num_elements + total_num_dependencies;
 }
 
-void free_dep_list(struct dep_list * list) {
+void yac_free_dep_list(struct dep_list * list) {
 
    if (list != NULL) {
       if (list->num_deps_per_element != NULL) free (list->num_deps_per_element);
       if (list->dependencies != NULL) free (list->dependencies);
       if (list->prescan != NULL) free (list->prescan);
 
-      init_dep_list(list);
+      yac_init_dep_list(list);
    }
 }
 
-void remove_dependencies_of_elements(struct dep_list * dep, unsigned * element_indices,
-                                     unsigned num_elements) {
+void yac_remove_dependencies_of_elements(struct dep_list * dep, unsigned * element_indices,
+                                         unsigned num_elements) {
 
    unsigned i, j;
 
@@ -368,20 +369,20 @@ void remove_dependencies_of_elements(struct dep_list * dep, unsigned * element_i
       }
    }
 
-   dep->dependencies = realloc(dep->dependencies, get_total_num_dependencies(*dep) *
+   dep->dependencies = realloc(dep->dependencies, yac_get_total_num_dependencies(*dep) *
                                sizeof(dep->dependencies[0]));
 
    free(old_prescan);
 }
 
-void remove_dependencies(struct dep_list * dep, unsigned * dependencies,
-                         unsigned num_dependencies) {
+void yac_remove_dependencies(struct dep_list * dep, unsigned * dependencies,
+                             unsigned num_dependencies) {
 
    unsigned i, j, k, l;
    unsigned num_total_deps;
    unsigned curr_num_deps_per_element;
 
-   num_total_deps = get_total_num_dependencies(*dep);
+   num_total_deps = yac_get_total_num_dependencies(*dep);
 
    l = 0;
 
@@ -420,6 +421,6 @@ void remove_dependencies(struct dep_list * dep, unsigned * dependencies,
    dep->prescan = NULL;
    generate_prescan(dep);
 
-   dep->dependencies = realloc(dep->dependencies, get_total_num_dependencies(*dep) *
+   dep->dependencies = realloc(dep->dependencies, yac_get_total_num_dependencies(*dep) *
                                sizeof(dep->dependencies[0]));
 }

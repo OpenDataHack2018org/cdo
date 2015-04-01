@@ -42,7 +42,7 @@
   *
   **/
 
-double area_tol();
+double yac_area_tol();
 
 /** \brief Calculate the area of a cell on a unit sphere
   *
@@ -96,7 +96,7 @@ double area_tol();
   *
  **/
 
-double cell_approx_area ( struct grid_cell cell );
+double yac_cell_approx_area ( struct grid_cell cell );
 
 /** \brief Calculate the area of a triangle on a unit sphere
   *
@@ -130,7 +130,7 @@ double cell_approx_area ( struct grid_cell cell );
   *
   **/
 
-double triangle_area ( struct grid_cell cell );
+double yac_triangle_area ( struct grid_cell cell );
 
 /** \brief Calculate the area of a cell on a unit sphere
   *
@@ -159,7 +159,7 @@ double triangle_area ( struct grid_cell cell );
   *
   **/
 
-double cell_area ( struct grid_cell cell );
+double yac_cell_area ( struct grid_cell cell );
 
 /** \brief Calculate the area of a cell on a unit sphere
   *
@@ -183,12 +183,9 @@ double cell_area ( struct grid_cell cell );
   *
   *  S = [ Theta - (n-2) * pi ] * R*R
   *
-  *  \todo
-  *  - implement an alternative for very small elements
-  *
   *  This algorithm does not work for very small elements. In this case negative
   *  areas are delivered which are set to zero currently. An alternative would be
-  *  to transform the coordinates into the cartesian space, ignore the curvature
+  *  to transform the coordinates into the s space, ignore the curvature
   *  of the edges (as they can be neglected for small elements) and calculate the
   *  area of a plane triangle.
   *
@@ -201,7 +198,7 @@ double cell_area ( struct grid_cell cell );
   *  @return area of the cell
   *
   **/
-double girards_area ( struct grid_cell cell );
+double yac_girards_area ( struct grid_cell cell );
 
 /** \brief Calculate the area of a cell in a 3d plane on a unit sphere
   *
@@ -219,24 +216,21 @@ double girards_area ( struct grid_cell cell );
   *
   **/
 
-double cell3d_area( struct grid_cell cell );
+double yac_pole_area ( struct grid_cell cell );
 
-/** \brief Calculate the area of a cell on a unit sphere
+/**
+  * \brief Area calculation on a unit sphere of a planar polygon in 3D
   *
-  * based on:
+  * (http://gaim.umbc.edu/2010/06/03/polygon-area)\n
   *
-  * Robert.G. Chamberlain, William.H. Duquette
-  * Jet Propulsion Laboratory
-  * Some Algorithms for Polygons on a Sphere.
-  * Association of American Geographers Annual Meeting San Francisco, California
-  * 17 - 21 April 2007
-  * http://trs-new.jpl.nasa.gov/dspace/bitstream/2014/40409/1/07-03.pdf
+  * This area calculation works for any planar polygon (concave or convex)
+  * with non-intersecting edges in 3D. It requires vertex coordinates in
+  * Carthesian space. In our case this is applicable for very
+  * small elements on the sphere.
   *
-  * uses different formula to compute the area of the pole triangles
-  *
-  * \todo enable routine to be able to handle latitude circle edges
   */
-double pole_area ( struct grid_cell cell );
+
+double yac_planar_3dcell_area (struct grid_cell cell);
 
 /**
   * \brief Area calculation on a unit sphere taken from ESMF based on L'Huilier's Theorem
@@ -248,8 +242,10 @@ double pole_area ( struct grid_cell cell );
   * The cell in split up into triangles that all have one corner in common,
   * then the area for each of the triangle is computed and summed up to build
   * the area of the cell. L'Huilier's Theorem is used to compute the area of
-  * the triangles.
+  * the triangles. This seems to be sufficiently accurate for elements on the
+  * Earth surface with edge lengths of approx. 100 m and gives results comparable
+  * to our implementation of Huilier's algorithm for edge lengths of up to 1 km.
   */
-double huiliers_area(struct grid_cell cell);
+double yac_huiliers_area(struct grid_cell cell);
 
 #endif // AREA_H

@@ -33,7 +33,7 @@
 void *Seaspctl(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int vdate1 = 0, vtime1 = 0;
+  int vdate1 = 0;
   int vdate2 = 0, vtime2 = 0;
   int vdate3 = 0, vtime3 = 0;
   int nrecs;
@@ -162,7 +162,6 @@ void *Seaspctl(void *argument)
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 	  vdate1 = dtlist_get_vdate(dtlist, nsets);
-	  vtime1 = dtlist_get_vtime(dtlist, nsets);
 
 	  cdiDecodeDate(vdate1, &year, &month, &day);
 	  if ( month < 0 || month > 16 )

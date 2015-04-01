@@ -242,10 +242,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 
 void *Info(void *argument)
 {
-  int INFO, INFOP, INFON, INFOC, MAP;
-  int operatorID;
   int i;
-  int indf, indg;
   int varID, recID;
   int gridsize = 0;
   int gridID, zaxisID;
@@ -253,9 +250,6 @@ void *Info(void *argument)
   int vdate, vtime;
   int nrecs;
   int levelID;
-  int tsID, taxisID;
-  int streamID = 0;
-  int vlistID;
   int nmiss;
   int number;
   int ivals = 0, nvals = 0;
@@ -264,36 +258,38 @@ void *Info(void *argument)
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
   double missval;
-  double *array = NULL;
   double level;
   double arrmin = 0, arrmax = 0, arrmean = 0, arrvar = 0;
 
   cdoInitialize(argument);
 
-  INFO  = cdoOperatorAdd("info",  0, 0, NULL);
-  INFOP = cdoOperatorAdd("infop", 0, 0, NULL);
-  INFON = cdoOperatorAdd("infon", 0, 0, NULL);
-  INFOC = cdoOperatorAdd("infoc", 0, 0, NULL);
-  MAP   = cdoOperatorAdd("map",   0, 0, NULL);
+  int INFO  = cdoOperatorAdd("info",  0, 0, NULL);
+  int INFOP = cdoOperatorAdd("infop", 0, 0, NULL);
+  int INFON = cdoOperatorAdd("infon", 0, 0, NULL);
+  int INFOC = cdoOperatorAdd("infoc", 0, 0, NULL);
+  int MAP   = cdoOperatorAdd("map",   0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  UNUSED(INFO);
+  UNUSED(INFOP);
 
-  for ( indf = 0; indf < cdoStreamCnt(); indf++ )
+  int operatorID = cdoOperatorID();
+
+  for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      streamID = streamOpenRead(cdoStreamName(indf));
+      int streamID = streamOpenRead(cdoStreamName(indf));
 
-      vlistID = streamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
+      int taxisID = vlistInqTaxis(vlistID);
 
       if ( vlistNvars(vlistID) == 0 ) continue;
 
       gridsize = vlistGridsizeMax(vlistID);
       if ( vlistNumber(vlistID) != CDI_REAL ) gridsize *= 2;
 
-      array = (double*) malloc(gridsize*sizeof(double));
+      double *array = (double*) malloc(gridsize*sizeof(double));
 
-      indg = 0;
-      tsID = 0;
-      taxisID = vlistInqTaxis(vlistID);
+      int indg = 0;
+      int tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	{
 	  vdate = taxisInqVdate(taxisID);
@@ -487,6 +483,7 @@ void *Info(void *argument)
 	    }
 	  tsID++;
 	}
+
       streamClose(streamID);
 
       if ( array ) free(array);

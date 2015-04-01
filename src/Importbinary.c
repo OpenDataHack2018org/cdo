@@ -349,9 +349,11 @@ void *Importbinary(void *argument)
       pvar++;
     }
 
+  int calendar = CALENDAR_STANDARD;
+
   taxisID = taxisCreate(TAXIS_RELATIVE);
 
-  taxisDefCalendar(taxisID, CALENDAR_STANDARD);
+  taxisDefCalendar(taxisID, calendar);
 
   vlistDefTaxis(vlistID, taxisID);
 
