@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <stdlib.h> /* malloc zhlp3 */
 
 
 void jspleg1(double *pleg, double plat, int ktrunc, double *work)
