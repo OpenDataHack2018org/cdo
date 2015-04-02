@@ -689,6 +689,8 @@ void *Seltime(void *argument)
 
   vlistDestroy(vlistID2);
 
+  if ( tsID2 == 0 ) cdoAbort("No timesteps selected!");
+
   cdoFinish();
 
   return (NULL);
