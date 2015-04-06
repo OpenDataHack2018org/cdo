@@ -26,7 +26,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "vinterp.h"
+#include "after_vertint.h"
 #include "stdnametable.h"
 
 #define  C_RKBOL         (1.380658e-23)     /* Boltzmann constant in J/K   */

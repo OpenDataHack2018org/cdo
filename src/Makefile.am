@@ -9,6 +9,8 @@ libcdo_la_SOURCES =            \
                cdo_getopt.h    \
                after_sptrans.c \
                after_fctrans.c \
+               after_vertint.c \
+               after_vertint.h \
                color.c         \
                color.h         \
                commandline.c   \
@@ -122,8 +124,6 @@ libcdo_la_SOURCES =            \
                userlog.c       \
                util.c          \
                util.h          \
-               vinterp.c       \
-               vinterp.h       \
                zaxis.c
 libcdo_la_SOURCES +=           \
                clipping/clipping.c           \

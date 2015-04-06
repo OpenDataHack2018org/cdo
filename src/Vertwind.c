@@ -27,7 +27,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "vinterp.h"
+#include "after_vertint.h"
 
 
 #define R  287.07  /* spezielle Gaskonstante fuer Luft */

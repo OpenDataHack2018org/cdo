@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include "compare.h"
-#include "vinterp.h"
+#include "after_vertint.h"
 
 #define  SCALEHEIGHT     (-7000.)
 #define  SCALESLP        (101325.0)

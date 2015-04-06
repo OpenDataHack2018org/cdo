@@ -21,7 +21,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "vinterp.h"
+#include "after_vertint.h"
 
 
 #define  SCALESLP        (101325.0)
