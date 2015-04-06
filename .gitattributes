@@ -499,6 +499,7 @@ src/Ymonstat.c -text
 src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
+src/after_fctrans.c -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
@@ -557,7 +558,6 @@ src/fieldc.c -text
 src/fieldmem.c -text
 src/fieldmer.c -text
 src/fieldzon.c -text
-src/fouriertrans.c -text
 src/functs.h -text
 src/gradsdeslib.c -text
 src/gradsdeslib.h -text

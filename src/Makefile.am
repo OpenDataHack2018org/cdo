@@ -7,6 +7,7 @@ libcdo_la_SOURCES =            \
                cdo_vlist.c     \
                cdo_getopt.c    \
                cdo_getopt.h    \
+               after_fctrans.c \
                color.c         \
                color.h         \
                commandline.c   \
@@ -38,7 +39,6 @@ libcdo_la_SOURCES =            \
                fieldmem.c      \
                fieldmer.c      \
                fieldzon.c      \
-               fouriertrans.c  \
                functs.h        \
                gradsdeslib.c   \
                gradsdeslib.h   \
