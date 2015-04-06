@@ -7,6 +7,7 @@ libcdo_la_SOURCES =            \
                cdo_vlist.c     \
                cdo_getopt.c    \
                cdo_getopt.h    \
+               after_sptrans.c \
                after_fctrans.c \
                color.c         \
                color.h         \
@@ -63,7 +64,6 @@ libcdo_la_SOURCES =            \
                juldate.c       \
                kvlist.c        \
                kvlist.h        \
-               legendre.c      \
                list.c          \
                list.h          \
 	       merge_sort2.c   \

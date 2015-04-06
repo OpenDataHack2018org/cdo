@@ -500,6 +500,7 @@ src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
 src/after_fctrans.c -text
+src/after_sptrans.c -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
@@ -582,7 +583,6 @@ src/job.c -text
 src/juldate.c -text
 src/kvlist.c -text
 src/kvlist.h -text
-src/legendre.c -text
 src/list.c -text
 src/list.h -text
 src/magics_template_parser.c -text
