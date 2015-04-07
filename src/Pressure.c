@@ -29,7 +29,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "vinterp.h"
+#include "after_vertint.h"
 #include "list.h"
 #include "stdnametable.h"
 

@@ -312,6 +312,7 @@ m4/ltsugar.m4 -text
 m4/ltversion.m4 -text
 m4/lt~obsolete.m4 -text
 src/Adisit.c -text
+src/Afterburner.c -text
 src/Arith.c -text
 src/Arithc.c -text
 src/Arithdays.c -text
@@ -498,6 +499,10 @@ src/Ymonstat.c -text
 src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
+src/after_fctrans.c -text
+src/after_sptrans.c -text
+src/after_vertint.c -text
+src/after_vertint.h -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
@@ -556,7 +561,6 @@ src/fieldc.c -text
 src/fieldmem.c -text
 src/fieldmer.c -text
 src/fieldzon.c -text
-src/fouriertrans.c -text
 src/functs.h -text
 src/gradsdeslib.c -text
 src/gradsdeslib.h -text
@@ -581,7 +585,6 @@ src/job.c -text
 src/juldate.c -text
 src/kvlist.c -text
 src/kvlist.h -text
-src/legendre.c -text
 src/list.c -text
 src/list.h -text
 src/magics_template_parser.c -text
@@ -648,8 +651,6 @@ src/timer.c -text
 src/userlog.c -text
 src/util.c -text
 src/util.h -text
-src/vinterp.c -text
-src/vinterp.h -text
 src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text

@@ -7,6 +7,10 @@ libcdo_la_SOURCES =            \
                cdo_vlist.c     \
                cdo_getopt.c    \
                cdo_getopt.h    \
+               after_sptrans.c \
+               after_fctrans.c \
+               after_vertint.c \
+               after_vertint.h \
                color.c         \
                color.h         \
                commandline.c   \
@@ -38,7 +42,6 @@ libcdo_la_SOURCES =            \
                fieldmem.c      \
                fieldmer.c      \
                fieldzon.c      \
-               fouriertrans.c  \
                functs.h        \
                gradsdeslib.c   \
                gradsdeslib.h   \
@@ -63,7 +66,6 @@ libcdo_la_SOURCES =            \
                juldate.c       \
                kvlist.c        \
                kvlist.h        \
-               legendre.c      \
                list.c          \
                list.h          \
 	       merge_sort2.c   \
@@ -122,8 +124,6 @@ libcdo_la_SOURCES =            \
                userlog.c       \
                util.c          \
                util.h          \
-               vinterp.c       \
-               vinterp.h       \
                zaxis.c
 libcdo_la_SOURCES +=           \
                clipping/clipping.c           \
@@ -147,6 +147,7 @@ bin_PROGRAMS = cdo
 #
 cdo_SOURCES  = cdo.c
 cdo_SOURCES += Adisit.c        \
+               Afterburner.c   \
                Arith.c         \
                Arithc.c        \
                Arithdays.c     \

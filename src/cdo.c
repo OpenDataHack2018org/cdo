@@ -133,8 +133,7 @@ void cdo_version(void)
 static
 void cdo_usage(void)
 {
-  int id = 0;
-  char *name;
+  const char *name;
 
   /*  fprintf(stderr, "%s\n", CDO_Version);*/
   /*  fprintf(stderr, "\n");*/
@@ -157,7 +156,7 @@ void cdo_usage(void)
   /*
   fprintf(stderr, "    -i <inst>      Institution name/file\n");
   fprintf(stderr, "                   Predefined instituts: ");
-  for ( id = 0; id < institutInqNumber; id++ )
+  for ( int id = 0; id < institutInqNumber; id++ )
     if ( (name = institutInqNamePtr(id)) )
       fprintf(stderr, " %s", name);
   fprintf(stderr, "\n");
@@ -180,7 +179,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -s, --silent   Silent mode\n");
   fprintf(stderr, "    -t <partab>    Set default parameter table name or file\n");
   fprintf(stderr, "                   Predefined tables: ");
-  for ( id = 0; id < tableInqNumber(); id++ )
+  for ( int id = 0; id < tableInqNumber(); id++ )
     if ( (name = tableInqNamePtr(id)) )
       fprintf(stderr, " %s", name);
   fprintf(stderr, "\n");

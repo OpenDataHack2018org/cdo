@@ -46,16 +46,14 @@ static
 int seaslist(LIST *ilist)
 {
   int i;
-  int nsel;
   char Seas[3];
   int seas[4] = {FALSE, FALSE, FALSE, FALSE};
   int imon[17]; /* 1-16 ! */
   int ival;
   size_t len;
-  int season_start;
 
-  season_start = get_season_start();
-  nsel = operatorArgc();
+  int season_start = get_season_start();
+  int nsel = operatorArgc();
   if ( isdigit(*operatorArgv()[0]))
     for ( i = 0; i < nsel; i++ )
       {
@@ -120,18 +118,16 @@ int seaslist(LIST *ilist)
 static
 int datelist(LIST *flist)
 {
-  int nsel;
   int i;
-  int status;
   int set2 = TRUE;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   double fval = 0;
 
-  nsel = operatorArgc();
+  int nsel = operatorArgc();
   if ( nsel < 1 ) cdoAbort("Too few arguments!");
   for ( i = 0; i < nsel; i++)
     {
-      if      ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
+      if ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
 	{
 	  if ( i == 0 )
 	    fval = -99999999999.;
@@ -150,8 +146,8 @@ int datelist(LIST *flist)
 	  year = 1; month = 1; day = 1; hour = 0; minute = 0, second = 0;
 	  if ( strchr(operatorArgv()[i], 'T') )
 	    {
-	      status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
-			      &year, &month, &day, &hour, &minute, &second);
+	      sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
+		     &year, &month, &day, &hour, &minute, &second);
 	      fval = cdiEncodeTime(hour, minute, second);
 	      if ( fabs(fval) > 0 ) fval /= 1000000;
 	      fval += cdiEncodeDate(year, month, day);
@@ -160,7 +156,7 @@ int datelist(LIST *flist)
 	    }
 	  else
 	    {
-	      status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
+	      sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
 	      fval = cdiEncodeDate(year, month, day);
 	      
 	      if ( nsel > 1 && i > 0 ) fval += 0.999;
@@ -183,36 +179,28 @@ int datelist(LIST *flist)
 
 void *Seltime(void *argument)
 {
-  int SELTIMESTEP, SELDATE, SELTIME, SELHOUR, SELDAY, SELMON, SELYEAR, SELSEAS, SELSMON;
-  int operatorID;
-  int operfunc, intval;
-  int moddat[NOPERATORS];
-  int streamID1, streamID2 = -1;
-  int tsID, tsID2, nrecs;
+  int streamID2 = -1;
+  int nrecs;
   int recID, varID, levelID;
-  int *intarr, nsel = 0, selival;
-  int vlistID1 = -1, vlistID2 = -1;
-  int taxisID1, taxisID2;
+  int nsel = 0, selival;
   int vdate, vtime;
   int copytimestep;
   int copy_nts2 = FALSE;
   int i, isel;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
-  int lnts1;
   int ncts = 0, nts, it;
   int *selfound = NULL;
   int hour = 0, minute = 0, second = 0;
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
-  double selfval = 0, *fltarr;
+  double selfval = 0;
   double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
   int gridID;
-  int nvars, nlevel, ntsteps;
-  int nconst, lconstout = FALSE;
+  int nlevel;
+  int lconstout = FALSE;
   int process_nts1 = FALSE, process_nts2 = FALSE;
   int *vdate_list = NULL, *vtime_list = NULL;
   double *single;
@@ -220,16 +208,17 @@ void *Seltime(void *argument)
 
   cdoInitialize(argument);
 
-  SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     1, "timesteps");
-  SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 1, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
-  SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm:ss)");
-  SELHOUR     = cdoOperatorAdd("selhour",     func_time, 10000, "hours");
-  SELDAY      = cdoOperatorAdd("selday",      func_date,     1, "days");
-  SELMON      = cdoOperatorAdd("selmon",      func_date,   100, "months");
-  SELYEAR     = cdoOperatorAdd("selyear",     func_date, 10000, "years");
-  SELSEAS     = cdoOperatorAdd("selseas",     func_date,   100, "seasons");
-  SELSMON     = cdoOperatorAdd("selsmon",     func_date,   100, "month[,nts1[,nts2]]");
+  int SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     1, "timesteps");
+  int SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 1, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
+  int SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm:ss)");
+  int SELHOUR     = cdoOperatorAdd("selhour",     func_time, 10000, "hours");
+  int SELDAY      = cdoOperatorAdd("selday",      func_date,     1, "days");
+  int SELMON      = cdoOperatorAdd("selmon",      func_date,   100, "months");
+  int SELYEAR     = cdoOperatorAdd("selyear",     func_date, 10000, "years");
+  int SELSEAS     = cdoOperatorAdd("selseas",     func_date,   100, "seasons");
+  int SELSMON     = cdoOperatorAdd("selsmon",     func_date,   100, "month[,nts1[,nts2]]");
 
+  int moddat[NOPERATORS];
   moddat[SELTIMESTEP] =          1;
   /*  moddat[SELDATE]     = 1000000000; */
   moddat[SELDATE]     =          0;
@@ -241,11 +230,12 @@ void *Seltime(void *argument)
   moddat[SELSEAS]     =        100;
   moddat[SELSMON]     =        100;
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  operfunc = cdoOperatorF1(operatorID);
-  intval   = cdoOperatorF2(operatorID);
+  int operfunc = cdoOperatorF1(operatorID);
+  int intval   = cdoOperatorF2(operatorID);
 
+  int lcopy = FALSE;
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   operatorInputArg(cdoOperatorEnter(operatorID));
@@ -282,8 +272,8 @@ void *Seltime(void *argument)
 
   if ( nsel < 1 ) cdoAbort("No timestep selected!");
 
-  intarr = (int *) listArrayPtr(ilist);
-  fltarr = (double *) listArrayPtr(flist);
+  int *intarr = (int *) listArrayPtr(ilist);
+  double *fltarr = (double *) listArrayPtr(flist);
 
   if ( operatorID == SELSMON )
     {
@@ -305,16 +295,16 @@ void *Seltime(void *argument)
       for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( nsel == 1 && operfunc == func_step )  vlistDefNtsteps(vlistID2,  1);
   else                                       vlistDefNtsteps(vlistID2, -1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( ! lcopy )
@@ -324,7 +314,7 @@ void *Seltime(void *argument)
       array = (double*) malloc(gridsize*sizeof(double));
     }
 
-  ntsteps = vlistNtsteps(vlistID1);
+  int ntsteps = vlistNtsteps(vlistID1);
 
   /* add support for negative timestep values */
   if ( operatorID == SELTIMESTEP && ntsteps > 0 )
@@ -349,12 +339,12 @@ void *Seltime(void *argument)
 	  cdoPrint("intarr entry: %d %d", i+1, intarr[i]);
     }
 
-  nvars = vlistNvars(vlistID1);
-  nconst = 0;
+  int nvars = vlistNvars(vlistID1);
+  int nconst = 0;
   for ( varID = 0; varID < nvars; varID++ )
     if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) nconst++;
       
-  lnts1 = operatorID == SELSMON && nts1 > 0;
+  int lnts1 = operatorID == SELSMON && nts1 > 0;
 
   if ( lnts1 || nconst )
     {
@@ -370,7 +360,7 @@ void *Seltime(void *argument)
 
       vars  = (field_t ***) malloc(nts1*sizeof(field_t **));
 
-      for ( tsID = 0; tsID < nts1; tsID++ )
+      for ( int tsID = 0; tsID < nts1; tsID++ )
 	{
 	  vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
@@ -391,8 +381,8 @@ void *Seltime(void *argument)
 	}
     }
 
-  tsID  = 0;
-  tsID2 = 0;
+  int tsID  = 0;
+  int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
@@ -688,6 +678,8 @@ void *Seltime(void *argument)
     }
 
   vlistDestroy(vlistID2);
+
+  if ( tsID2 == 0 ) cdoAbort("No timesteps selected!");
 
   cdoFinish();
 

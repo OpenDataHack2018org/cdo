@@ -915,6 +915,8 @@ void *Select(void *argument)
   if ( array ) free(array);
   if ( vars ) free(vars);
 
+  if ( tsID2 == 0 ) cdoAbort("No timesteps selected!");
+
   cdoFinish();
 
   return (NULL);

@@ -117,25 +117,24 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcdo_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
-	libcdo_la-cdo_getopt.lo libcdo_la-color.lo \
+	libcdo_la-cdo_getopt.lo libcdo_la-after_sptrans.lo \
+	libcdo_la-after_fctrans.lo libcdo_la-color.lo \
 	libcdo_la-commandline.lo libcdo_la-datetime.lo \
 	libcdo_la-ecacore.lo libcdo_la-ecautil.lo \
 	libcdo_la-exception.lo libcdo_la-expr.lo libcdo_la-expr_lex.lo \
 	libcdo_la-expr_yacc.lo libcdo_la-features.lo \
 	libcdo_la-field.lo libcdo_la-field2.lo libcdo_la-fieldc.lo \
 	libcdo_la-fieldmem.lo libcdo_la-fieldmer.lo \
-	libcdo_la-fieldzon.lo libcdo_la-fouriertrans.lo \
-	libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
-	libcdo_la-grid_area.lo libcdo_la-grid_gme.lo \
+	libcdo_la-fieldzon.lo libcdo_la-gradsdeslib.lo \
+	libcdo_la-grid.lo libcdo_la-grid_area.lo libcdo_la-grid_gme.lo \
 	libcdo_la-grid_lcc.lo libcdo_la-grid_rot.lo \
 	libcdo_la-gridreference.lo libcdo_la-griddes.lo \
 	libcdo_la-griddes_h5.lo libcdo_la-griddes_nc.lo \
 	libcdo_la-hetaeta.lo libcdo_la-history.lo \
 	libcdo_la-institution.lo libcdo_la-interpol.lo \
 	libcdo_la-job.lo libcdo_la-juldate.lo libcdo_la-kvlist.lo \
-	libcdo_la-legendre.lo libcdo_la-list.lo \
-	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
-	libcdo_la-namelist.lo libcdo_la-normal.lo \
+	libcdo_la-list.lo libcdo_la-merge_sort2.lo \
+	libcdo_la-modules.lo libcdo_la-namelist.lo libcdo_la-normal.lo \
 	libcdo_la-nth_element.lo libcdo_la-par_io.lo \
 	libcdo_la-percentiles.lo libcdo_la-pipe.lo \
 	libcdo_la-process.lo libcdo_la-pstream.lo \
@@ -152,7 +151,7 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
 	libcdo_la-table.lo libcdo_la-text.lo libcdo_la-timer.lo \
-	libcdo_la-userlog.lo libcdo_la-util.lo libcdo_la-vinterp.lo \
+	libcdo_la-userlog.lo libcdo_la-util.lo libcdo_la-after_vertint.lo \
 	libcdo_la-zaxis.lo clipping/libcdo_la-clipping.lo \
 	clipping/libcdo_la-area.lo \
 	clipping/libcdo_la-ensure_array_size.lo \
@@ -166,17 +165,17 @@ am__v_lt_0 = --silent
 am__v_lt_1 = 
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
-	Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c Change.c \
-	Change_e5slm.c Cloudlayer.c Collgrid.c Command.c Comp.c \
-	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
-	Copy.c Deltime.c Derivepar.c Detrend.c Diff.c Distgrid.c \
-	Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
-	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
-	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
-	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c Gradsdes.c \
-	Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c Hi.c \
-	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
+am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
+	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
+	Change.c Change_e5slm.c Cloudlayer.c Collgrid.c Command.c \
+	Comp.c Compc.c Complextorect.c Cond.c Cond2.c Condc.c \
+	Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c Diff.c \
+	Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
+	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
+	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
+	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c \
+	Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c \
+	Hi.c Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
 	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
@@ -212,13 +211,13 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 @ENABLE_MAGICS_TRUE@	cdo-StringUtilities.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-CdoMagicsMapper.$(OBJEXT)
 am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
-	cdo-Arith.$(OBJEXT) cdo-Arithc.$(OBJEXT) \
-	cdo-Arithdays.$(OBJEXT) cdo-Arithlat.$(OBJEXT) \
-	cdo-CDItest.$(OBJEXT) cdo-CDIread.$(OBJEXT) \
-	cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) cdo-Change.$(OBJEXT) \
-	cdo-Change_e5slm.$(OBJEXT) cdo-Cloudlayer.$(OBJEXT) \
-	cdo-Collgrid.$(OBJEXT) cdo-Command.$(OBJEXT) \
-	cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
+	cdo-Afterburner.$(OBJEXT) cdo-Arith.$(OBJEXT) \
+	cdo-Arithc.$(OBJEXT) cdo-Arithdays.$(OBJEXT) \
+	cdo-Arithlat.$(OBJEXT) cdo-CDItest.$(OBJEXT) \
+	cdo-CDIread.$(OBJEXT) cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) \
+	cdo-Change.$(OBJEXT) cdo-Change_e5slm.$(OBJEXT) \
+	cdo-Cloudlayer.$(OBJEXT) cdo-Collgrid.$(OBJEXT) \
+	cdo-Command.$(OBJEXT) cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
@@ -542,20 +541,20 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
-	cdo_getopt.c cdo_getopt.h color.c color.h commandline.c \
-	const.h counter.h datetime.c datetime.h dmemory.h dtypes.h \
-	ecacore.c ecacore.h ecautil.c ecautil.h error.h etopo.h temp.h \
-	mask.h exception.c expr.c expr.h expr_lex.c expr_yacc.c \
-	expr_yacc.h features.c field.c field.h field2.c fieldc.c \
-	fieldmem.c fieldmer.c fieldzon.c fouriertrans.c functs.h \
-	gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
+	cdo_getopt.c cdo_getopt.h after_sptrans.c after_fctrans.c \
+	color.c color.h commandline.c const.h counter.h datetime.c \
+	datetime.h dmemory.h dtypes.h ecacore.c ecacore.h ecautil.c \
+	ecautil.h error.h etopo.h temp.h mask.h exception.c expr.c \
+	expr.h expr_lex.c expr_yacc.c expr_yacc.h features.c field.c \
+	field.h field2.c fieldc.c fieldmem.c fieldmer.c fieldzon.c \
+	functs.h gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
 	grid_gme.c grid_lcc.c grid_rot.c gridreference.c griddes.c \
 	griddes.h griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h \
 	history.c institution.c interpol.c interpol.h job.c juldate.c \
-	kvlist.c kvlist.h legendre.c list.c list.h merge_sort2.c \
-	merge_sort2.h modules.c modules.h namelist.c namelist.h \
-	normal.c nth_element.c nth_element.h operator_help.h par_io.c \
-	par_io.h percentiles.c percentiles.h pipe.c pipe.h \
+	kvlist.c kvlist.h list.c list.h merge_sort2.c merge_sort2.h \
+	modules.c modules.h namelist.c namelist.h normal.c \
+	nth_element.c nth_element.h operator_help.h par_io.c par_io.h \
+	percentiles.c percentiles.h pipe.c pipe.h \
 	pragma_omp_atomic_update.h printinfo.h process.c process.h \
 	pstream.c pstream.h pstream_int.h pthread_debug.c \
 	pthread_debug.h readline.c realtime.c remap.h remaplib.c \
@@ -566,7 +565,7 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	remap_bicubic_scrip.c remap_bilinear_scrip.c stdnametable.c \
 	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
 	table.c text.c text.h timebase.h timer.c userlog.c util.c \
-	util.h vinterp.c vinterp.h zaxis.c clipping/clipping.c \
+	util.h after_vertint.c after_vertint.h zaxis.c clipping/clipping.c \
 	clipping/clipping.h clipping/area.c clipping/area.h \
 	clipping/ensure_array_size.c clipping/ensure_array_size.h \
 	clipping/geometry_tools.c clipping/geometry.h clipping/grid.h \
@@ -574,17 +573,17 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	clipping/grid_cell.h clipping/intersection.c clipping/utils.c \
 	clipping/utils.h
 #
-cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
-	CDItest.c CDIread.c CDIwrite.c Cat.c Change.c Change_e5slm.c \
-	Cloudlayer.c Collgrid.c Command.c Comp.c Compc.c \
-	Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c Copy.c \
-	Deltime.c Derivepar.c Detrend.c Diff.c Distgrid.c Duplicate.c \
-	EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
-	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
-	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
-	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c Gradsdes.c \
-	Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c Hi.c \
-	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
+cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
+	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
+	Change.c Change_e5slm.c Cloudlayer.c Collgrid.c Command.c \
+	Comp.c Compc.c Complextorect.c Cond.c Cond2.c Condc.c \
+	Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c Diff.c \
+	Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
+	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
+	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
+	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c \
+	Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c \
+	Hi.c Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
 	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
@@ -784,6 +783,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Adisit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Afterburner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arith.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithdays.Po@am__quote@
@@ -971,6 +971,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-results_template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdotest-cdotest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-after_fctrans.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-after_sptrans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_getopt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_pthread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_vlist.Plo@am__quote@
@@ -990,7 +992,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldmem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldmer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fieldzon.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-fouriertrans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-gradsdeslib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_area.Plo@am__quote@
@@ -1008,7 +1009,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-job.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-juldate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kvlist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-legendre.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-merge_sort2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-modules.Plo@am__quote@
@@ -1043,7 +1043,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-timer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-userlog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-vinterp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-after_vertint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-area.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-clipping.Plo@am__quote@
@@ -1097,6 +1097,20 @@ libcdo_la-cdo_getopt.lo: cdo_getopt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cdo_getopt.c' object='libcdo_la-cdo_getopt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-cdo_getopt.lo `test -f 'cdo_getopt.c' || echo '$(srcdir)/'`cdo_getopt.c
+
+libcdo_la-after_sptrans.lo: after_sptrans.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-after_sptrans.lo -MD -MP -MF $(DEPDIR)/libcdo_la-after_sptrans.Tpo -c -o libcdo_la-after_sptrans.lo `test -f 'after_sptrans.c' || echo '$(srcdir)/'`after_sptrans.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-after_sptrans.Tpo $(DEPDIR)/libcdo_la-after_sptrans.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='after_sptrans.c' object='libcdo_la-after_sptrans.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-after_sptrans.lo `test -f 'after_sptrans.c' || echo '$(srcdir)/'`after_sptrans.c
+
+libcdo_la-after_fctrans.lo: after_fctrans.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-after_fctrans.lo -MD -MP -MF $(DEPDIR)/libcdo_la-after_fctrans.Tpo -c -o libcdo_la-after_fctrans.lo `test -f 'after_fctrans.c' || echo '$(srcdir)/'`after_fctrans.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-after_fctrans.Tpo $(DEPDIR)/libcdo_la-after_fctrans.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='after_fctrans.c' object='libcdo_la-after_fctrans.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-after_fctrans.lo `test -f 'after_fctrans.c' || echo '$(srcdir)/'`after_fctrans.c
 
 libcdo_la-color.lo: color.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-color.lo -MD -MP -MF $(DEPDIR)/libcdo_la-color.Tpo -c -o libcdo_la-color.lo `test -f 'color.c' || echo '$(srcdir)/'`color.c
@@ -1209,13 +1223,6 @@ libcdo_la-fieldzon.lo: fieldzon.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fieldzon.c' object='libcdo_la-fieldzon.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-fieldzon.lo `test -f 'fieldzon.c' || echo '$(srcdir)/'`fieldzon.c
-
-libcdo_la-fouriertrans.lo: fouriertrans.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-fouriertrans.lo -MD -MP -MF $(DEPDIR)/libcdo_la-fouriertrans.Tpo -c -o libcdo_la-fouriertrans.lo `test -f 'fouriertrans.c' || echo '$(srcdir)/'`fouriertrans.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-fouriertrans.Tpo $(DEPDIR)/libcdo_la-fouriertrans.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fouriertrans.c' object='libcdo_la-fouriertrans.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-fouriertrans.lo `test -f 'fouriertrans.c' || echo '$(srcdir)/'`fouriertrans.c
 
 libcdo_la-gradsdeslib.lo: gradsdeslib.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-gradsdeslib.lo -MD -MP -MF $(DEPDIR)/libcdo_la-gradsdeslib.Tpo -c -o libcdo_la-gradsdeslib.lo `test -f 'gradsdeslib.c' || echo '$(srcdir)/'`gradsdeslib.c
@@ -1335,13 +1342,6 @@ libcdo_la-kvlist.lo: kvlist.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kvlist.c' object='libcdo_la-kvlist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-kvlist.lo `test -f 'kvlist.c' || echo '$(srcdir)/'`kvlist.c
-
-libcdo_la-legendre.lo: legendre.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-legendre.lo -MD -MP -MF $(DEPDIR)/libcdo_la-legendre.Tpo -c -o libcdo_la-legendre.lo `test -f 'legendre.c' || echo '$(srcdir)/'`legendre.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-legendre.Tpo $(DEPDIR)/libcdo_la-legendre.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='legendre.c' object='libcdo_la-legendre.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-legendre.lo `test -f 'legendre.c' || echo '$(srcdir)/'`legendre.c
 
 libcdo_la-list.lo: list.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-list.lo -MD -MP -MF $(DEPDIR)/libcdo_la-list.Tpo -c -o libcdo_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
@@ -1581,12 +1581,12 @@ libcdo_la-util.lo: util.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-util.lo `test -f 'util.c' || echo '$(srcdir)/'`util.c
 
-libcdo_la-vinterp.lo: vinterp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-vinterp.lo -MD -MP -MF $(DEPDIR)/libcdo_la-vinterp.Tpo -c -o libcdo_la-vinterp.lo `test -f 'vinterp.c' || echo '$(srcdir)/'`vinterp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-vinterp.Tpo $(DEPDIR)/libcdo_la-vinterp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='vinterp.c' object='libcdo_la-vinterp.lo' libtool=yes @AMDEPBACKSLASH@
+libcdo_la-after_vertint.lo: after_vertint.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-after_vertint.lo -MD -MP -MF $(DEPDIR)/libcdo_la-after_vertint.Tpo -c -o libcdo_la-after_vertint.lo `test -f 'after_vertint.c' || echo '$(srcdir)/'`after_vertint.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-after_vertint.Tpo $(DEPDIR)/libcdo_la-after_vertint.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='after_vertint.c' object='libcdo_la-after_vertint.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-vinterp.lo `test -f 'vinterp.c' || echo '$(srcdir)/'`vinterp.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-after_vertint.lo `test -f 'after_vertint.c' || echo '$(srcdir)/'`after_vertint.c
 
 libcdo_la-zaxis.lo: zaxis.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-zaxis.lo -MD -MP -MF $(DEPDIR)/libcdo_la-zaxis.Tpo -c -o libcdo_la-zaxis.lo `test -f 'zaxis.c' || echo '$(srcdir)/'`zaxis.c
@@ -1671,6 +1671,20 @@ cdo-Adisit.obj: Adisit.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Adisit.c' object='cdo-Adisit.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Adisit.obj `if test -f 'Adisit.c'; then $(CYGPATH_W) 'Adisit.c'; else $(CYGPATH_W) '$(srcdir)/Adisit.c'; fi`
+
+cdo-Afterburner.o: Afterburner.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Afterburner.o -MD -MP -MF $(DEPDIR)/cdo-Afterburner.Tpo -c -o cdo-Afterburner.o `test -f 'Afterburner.c' || echo '$(srcdir)/'`Afterburner.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Afterburner.Tpo $(DEPDIR)/cdo-Afterburner.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Afterburner.c' object='cdo-Afterburner.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Afterburner.o `test -f 'Afterburner.c' || echo '$(srcdir)/'`Afterburner.c
+
+cdo-Afterburner.obj: Afterburner.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Afterburner.obj -MD -MP -MF $(DEPDIR)/cdo-Afterburner.Tpo -c -o cdo-Afterburner.obj `if test -f 'Afterburner.c'; then $(CYGPATH_W) 'Afterburner.c'; else $(CYGPATH_W) '$(srcdir)/Afterburner.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Afterburner.Tpo $(DEPDIR)/cdo-Afterburner.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Afterburner.c' object='cdo-Afterburner.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Afterburner.obj `if test -f 'Afterburner.c'; then $(CYGPATH_W) 'Afterburner.c'; else $(CYGPATH_W) '$(srcdir)/Afterburner.c'; fi`
 
 cdo-Arith.o: Arith.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Arith.o -MD -MP -MF $(DEPDIR)/cdo-Arith.Tpo -c -o cdo-Arith.o `test -f 'Arith.c' || echo '$(srcdir)/'`Arith.c
