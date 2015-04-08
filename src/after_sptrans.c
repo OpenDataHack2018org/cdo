@@ -362,8 +362,9 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
 
   for ( jgl = 0; jgl < nlat/2; jgl++ )
     {
-      jspleg1(pnm, gmu[jgl], ntr, work);
       double zgwt = gwt[jgl];
+
+      jspleg1(pnm, gmu[jgl], ntr, work);
 
       latn = jgl;
       isp = 0;
