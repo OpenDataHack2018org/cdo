@@ -12,7 +12,11 @@
 
 #define  SQUARE_RADIUS   (-PlanetRadius * PlanetRadius)
 #define  C_EARTH_RADIUS  (6371000.0)
-double PlanetRadius = C_EARTH_RADIUS;
+static double PlanetRadius = C_EARTH_RADIUS;
+
+void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pol2,
+		       double *restrict pol3, double *restrict coslat, double *restrict rcoslat, int flag);
+void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict rcoslat);
 
 
 void geninx(long ntr, double *f, double *g)
@@ -38,138 +42,6 @@ void geninx(long ntr, double *f, double *g)
 	    }
 	}
     }
-}
-
-
-void legini_old(int ntr, int nlat, double *poli, double *pold,
-		double *pol2, double *pol3, double *coslat, double *rcoslat, int flag)
-{
-  int waves, dimsp;
-  int jgl, jm, jn;
-  int jsp;
-  int pdim;
-  double *gmu, *gwt, *pnm;
-  double *hnm, gmusq, *ztemp1, *ztemp2;
-
-  waves =  ntr + 1;
-  dimsp = (ntr + 1) * (ntr + 2);
-  pdim  = dimsp / 2 * nlat;
-
-  gmu  = (double*) malloc(nlat * sizeof(double));
-  gwt  = (double*) malloc(nlat * sizeof(double));
-
-  gaussaw(gmu, gwt, nlat);
-
-#if ! defined(_OPENMP)
-  pnm    = (double*) malloc(dimsp * sizeof(double));
-  hnm    = (double*) malloc(dimsp * sizeof(double));
-  ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
-  ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
-#endif
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(jm, jn, jsp, gmusq, hnm, pnm, ztemp1, ztemp2)
-#endif
-  for ( jgl = 0; jgl < nlat; jgl++ )
-    {
-#if defined(_OPENMP)
-      pnm    = (double*) malloc(dimsp * sizeof(double));
-      hnm    = (double*) malloc(dimsp * sizeof(double));
-      ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
-      ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
-#endif
-      gmusq = 1.0 - gmu[jgl]*gmu[jgl];
-      coslat[jgl] =  sqrt(gmusq);
-      rcoslat[jgl] = 1.0 / coslat[jgl];
-
-      phcs(pnm, hnm, waves, gmu[jgl], ztemp1, ztemp2);
-
-      jsp = jgl;
-      for ( jm = 0; jm < waves; jm++ )
-	for ( jn = 0; jn < waves - jm; jn++ )
-	  {
-	              poli[jsp] = pnm[jm*waves+jn] * 2.0;
-	              pold[jsp] = pnm[jm*waves+jn] * gwt[jgl];
-	    if (flag) pol2[jsp] = hnm[jm*waves+jn] * gwt[jgl] /
-                                  (PlanetRadius    * gmusq);
-	    if (flag) pol3[jsp] = pnm[jm*waves+jn] * gwt[jgl] * jm /
-                                  (PlanetRadius    * gmusq);
-	    jsp += nlat;
-	  }
-#if defined(_OPENMP)
-      free(ztemp2);
-      free(ztemp1);
-      free(pnm);
-      free(hnm);
-#endif
-    }
-
-#if ! defined(_OPENMP)
-  free(ztemp2);
-  free(ztemp1);
-  free(pnm);
-  free(hnm);
-#endif
-  free(gwt);
-  free(gmu);
-}
-
-
-void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
-{
-  int waves, dimsp, dimpnm;
-  int jgl, jm, jn, is;
-  int isp, latn, lats;
-  double *gmu, *gwt, *pnm, *work;
-
-  waves  =  ntr + 1;
-  dimsp  = (ntr + 1)*(ntr + 2);
-  dimpnm = (ntr + 1)*(ntr + 4)/2;
-
-  gmu  = (double*) malloc(nlat * sizeof(double));
-  gwt  = (double*) malloc(nlat * sizeof(double));
-  pnm  = (double*) malloc(dimpnm * sizeof(double));
-  work = (double*) malloc(3*waves * sizeof(double));
-
-  gaussaw(gmu, gwt, nlat);
-  for ( jgl = 0; jgl < nlat; jgl++ ) gwt[jgl] *= 0.5;
-
-  for ( jgl = 0; jgl < nlat; jgl++ )
-    rcoslat[jgl] = 1.0 / sqrt(1.0 - gmu[jgl]*gmu[jgl]);
-
-  for ( jgl = 0; jgl < nlat/2; jgl++ )
-    {
-      jspleg1(pnm, gmu[jgl], ntr, work);
-
-      latn = jgl;
-      isp = 0;
-      for ( jm = 0; jm < waves; jm++ )
-	{
-#if defined(SX)
-#pragma vdir nodep
-#endif
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
-	  for ( jn = 0; jn < waves - jm; jn++ )
-	    {
-	      is = (jn+1)%2 * 2 - 1;
-	      lats = latn - jgl + nlat - jgl - 1;
-	      poli[latn] = pnm[isp];
-	      pold[latn] = pnm[isp] * gwt[jgl];
-	      poli[lats] = pnm[isp] * is;
-	      pold[lats] = pnm[isp] * gwt[jgl] * is;
-	      latn += nlat;
-	      isp++;
-	    }
-	  isp++;
-	}
-    }
-
-  free(work);
-  free(pnm);
-  free(gwt);
-  free(gmu);
 }
 
 
@@ -308,10 +180,10 @@ SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
   sptrans->rcoslat = (double*) malloc(nlat * sizeof(double));
 
   if ( flag )
-    legini_old(ntr, nlat, sptrans->poli, sptrans->pold,
-	       sptrans->pol2, sptrans->pol3, sptrans->coslat, sptrans->rcoslat, flag);
+    after_legini_full(ntr, nlat, sptrans->poli, sptrans->pold,
+		      sptrans->pol2, sptrans->pol3, sptrans->coslat, sptrans->rcoslat, flag);
   else
-    legini(ntr, nlat, sptrans->poli, sptrans->pold, sptrans->rcoslat);
+    after_legini(ntr, nlat, sptrans->poli, sptrans->pold, sptrans->rcoslat);
 
   return (sptrans);
 }

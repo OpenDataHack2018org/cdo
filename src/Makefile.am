@@ -7,6 +7,7 @@ libcdo_la_SOURCES =            \
                cdo_vlist.c     \
                cdo_getopt.c    \
                cdo_getopt.h    \
+               cdo_history.c   \
                after_sptrans.c \
                after_fctrans.c \
                after_vertint.c \
@@ -58,7 +59,6 @@ libcdo_la_SOURCES =            \
                griddes_nc.c    \
                hetaeta.c       \
                hetaeta.h       \
-               history.c       \
                institution.c   \
                interpol.c      \
                interpol.h      \

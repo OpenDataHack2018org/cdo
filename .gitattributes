@@ -507,6 +507,7 @@ src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
 src/cdo_getopt.h -text
+src/cdo_history.c -text
 src/cdo_int.h -text
 src/cdo_pthread.c -text
 src/cdo_vlist.c -text
@@ -577,7 +578,6 @@ src/griddes_nc.c -text
 src/gridreference.c -text
 src/hetaeta.c -text
 src/hetaeta.h -text
-src/history.c -text
 src/institution.c -text
 src/interpol.c -text
 src/interpol.h -text
