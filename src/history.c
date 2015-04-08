@@ -27,6 +27,7 @@ static size_t ghistorysize = 0;
 
 static char strtime[32];
 
+static
 void init_strtime()
 {
   time_t tp;
@@ -41,7 +42,7 @@ void init_strtime()
     }
 }
 
-
+static
 char *get_strtimeptr()
 {
   if ( strlen(strtime) == 0 )
