@@ -4,20 +4,11 @@
 #include <math.h>
 
 #include "compare.h"
+#include "constants.h"
 #include "after_vertint.h"
 
 #define  SCALEHEIGHT     (-7000.)
 #define  SCALESLP        (101325.0)
-
-#define  C_EARTH_GRAV    (9.80665)
-#define  C_RKBOL         (1.380658e-23)     /* Boltzmann constant in J/K   */
-#define  C_RNAVO         (6.0221367e+23)    /* Avogadro constant in 1/mol  */
-#define  C_RMD           (28.9644)          /* molecular weight of dry air */
-#define  C_R             (C_RKBOL * C_RNAVO)
-#define  C_EARTH_RD      (1000. * C_R / C_RMD)
-
-double Grav          = C_EARTH_GRAV;
-double RD            = C_EARTH_RD;
 
 int Mars = 0;
 
@@ -149,14 +140,14 @@ void extra_P(double * restrict slp, const double * restrict halfp, const double 
   double zlapse = 0.0065;
   long j;
 
-  zrg = 1.0 / Grav;
+  zrg = 1.0 / PlanetGrav;
 
   for ( j = 0; j < ngp; ++j )
     {
       if ( geop[j] < 0.0001 && geop[j] > -0.0001 ) slp[j] = halfp[j];
       else
 	{
-	  alpha = RD * zlapse * zrg;
+	  alpha = PlanetRD * zlapse * zrg;
 	  tstar = (1.0 + alpha * (halfp[j]/fullp[j] - 1.0)) * temp[j];
 
 	  if ( tstar < 255.0 ) tstar = 0.5 * (255.0 + tstar);
@@ -171,9 +162,9 @@ void extra_P(double * restrict slp, const double * restrict halfp, const double 
 	  if ( tmsl-tstar < 0.000001 && tstar-tmsl < 0.000001 )
 	    alpha = 0.0;
 	  else if ( geop[j] > 0.0001 || geop[j] < -0.0001 )
-	    alpha = RD * (tmsl-tstar) / geop[j];
+	    alpha = PlanetRD * (tmsl-tstar) / geop[j];
 
-	  zprt   = geop[j] / (RD * tstar);
+	  zprt   = geop[j] / (PlanetRD * tstar);
 	  zprtal = zprt * alpha;
 	  slp[j] = halfp[j] * exp(zprt*(1.0-zprtal*(0.5-zprtal/3.0)));
 	}
@@ -189,8 +180,8 @@ double extra_T(double pres, double halfp, double fullp, double geop, double temp
   double zrg;
   double zlapse = 0.0065;
 
-  zrg   = 1.0 / Grav;
-  tstar = (1.0 + zlapse * RD * zrg * (halfp/fullp - 1.0)) * temp;
+  zrg   = 1.0 / PlanetGrav;
+  tstar = (1.0 + zlapse * PlanetRD * zrg * (halfp/fullp - 1.0)) * temp;
   ztsz  = tstar;
   z1    = tstar + zlapse * zrg * geop;
 
@@ -206,13 +197,13 @@ double extra_T(double pres, double halfp, double fullp, double geop, double temp
 
   if ( ztmsl > 290.5 && tstar <= 290.5 ) ztmsl=290.5;
 
-  zalph = RD*zlapse*zrg;
+  zalph = PlanetRD*zlapse*zrg;
 
   if ( ztmsl-tstar < 0.000001 && tstar-ztmsl < 0.000001 ) zalph=0.0;
 
   if ( (ztmsl-tstar > 0.000001 || tstar-ztmsl > 0.000001 ) &&
        (geop > 0.0001 || geop < -0.0001) )
-    zalph = RD*(ztmsl-tstar)/geop;
+    zalph = PlanetRD*(ztmsl-tstar)/geop;
 
   if ( pres <= halfp )
     peval = ((halfp-pres)*temp+ (pres-fullp)*tstar)/ (halfp-fullp);
@@ -231,9 +222,9 @@ double extra_T(double pres, double halfp, double fullp, double geop, double temp
       if ( (ztmsl-tstar) < 0.000001 )
 	zalph = 0.;
       else if (geop > 0.0001 || geop < -0.0001)
-	zalph = RD*(ztmsl-tstar)/geop;
+	zalph = PlanetRD*(ztmsl-tstar)/geop;
       else
-	zalph = RD*zlapse*zrg;
+	zalph = PlanetRD*zlapse*zrg;
 
       zalp  = zalph*log(pres/halfp);
       peval = tstar*(1.0+zalp*(1.0+zalp*(0.5+0.16666666667*zalp)));
@@ -252,8 +243,8 @@ double extra_Z(double pres, double halfp, double fullp, double geop, double temp
   double zlapse = 0.0065;
   double ztlim = 290.5;
 
-  zrg   = 1.0 / Grav;
-  alpha = RD * zlapse * zrg;
+  zrg   = 1.0 / PlanetGrav;
+  alpha = PlanetRD * zlapse * zrg;
   tstar = (1.0 + alpha * (halfp/fullp - 1.0)) * temp;
 
   if ( tstar < 255.0 ) tstar = 0.5 * (255.0 + tstar);
@@ -271,12 +262,12 @@ double extra_Z(double pres, double halfp, double fullp, double geop, double temp
   if ( tmsl-tstar < 0.000001 && tstar-tmsl < 0.000001 )
     alpha = 0.0;
   else if ( geop > 0.0001 || geop < -0.0001 )
-    alpha = RD * (tmsl-tstar) / geop;
+    alpha = PlanetRD * (tmsl-tstar) / geop;
 
   zalp   = log(pres/halfp);
   zalpal = zalp * alpha;
 
-  return ((geop - RD*tstar*zalp*(1.0 + zalpal*(0.5 + zalpal/6.0)))*zrg);
+  return ((geop - PlanetRD*tstar*zalp*(1.0 + zalpal*(0.5 + zalpal/6.0)))*zrg);
 }  /* extra_Z */
 
 
