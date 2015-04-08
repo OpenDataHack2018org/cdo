@@ -12,6 +12,8 @@ libcdo_la_SOURCES =            \
                after_fctrans.c \
                after_vertint.c \
                after_vertint.h \
+               constants.h     \
+               constants.c     \
                color.c         \
                color.h         \
                commandline.c   \

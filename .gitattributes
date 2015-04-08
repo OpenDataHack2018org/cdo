@@ -535,6 +535,8 @@ src/commandline.c -text
 src/compare.h -text
 src/config.h.in -text
 src/const.h -text
+src/constants.c -text
+src/constants.h -text
 src/counter.h -text
 src/datetime.c -text
 src/datetime.h -text
