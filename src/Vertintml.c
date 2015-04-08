@@ -32,8 +32,7 @@
 #include "after_vertint.h"
 #include "list.h"
 #include "stdnametable.h"
-
-#define  C_EARTH_GRAV    (9.80665)
+#include "constants.h"
 
 
 void *Vertintml(void *argument)
@@ -644,7 +643,7 @@ void *Vertintml(void *argument)
 		  else if ( varID == gheightID )
 		    {
 		      for ( i = 0; i < gridsize; ++i )
-			vardata1[varID][gridsize*nlevel+i] = sgeopot[i]/C_EARTH_GRAV;
+			vardata1[varID][gridsize*nlevel+i] = sgeopot[i]/PlanetGrav;
 
 		      interp_Z(sgeopot, vardata1[varID], vardata2[varID],
 			       full_press, half_press, vert_index, vardata1[tempID],
