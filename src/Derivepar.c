@@ -28,23 +28,7 @@
 #include "pstream.h"
 #include "after_vertint.h"
 #include "stdnametable.h"
-
-#define  C_RKBOL         (1.380658e-23)     /* Boltzmann constant in J/K   */
-#define  C_RNAVO         (6.0221367e+23)    /* Avogadro constant in 1/mol  */
-#define  C_RMD           (28.9644)          /* molecular weight of dry air */
-#define  C_RMV           (18.0153)          /* molecular weight of water vapor */
-#define  C_R             (C_RKBOL * C_RNAVO)
-#define  C_RV            (1000. * C_R / C_RMV)
-
-#define  C_EARTH_GRAV    (9.80665)
-#define  C_RKBOL         (1.380658e-23)     /* Boltzmann constant in J/K   */
-#define  C_RNAVO         (6.0221367e+23)    /* Avogadro constant in 1/mol  */
-#define  C_RMD           (28.9644)          /* molecular weight of dry air */
-#define  C_R             (C_RKBOL * C_RNAVO)
-#define  C_EARTH_RD      (1000. * C_R / C_RMD)
-
-static double Grav          = C_EARTH_GRAV;
-static double RD            = C_EARTH_RD;
+#include "constants.h"
 
 static
 void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev)
@@ -54,6 +38,9 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor
   double zrg;
   double z2log2;
   double *geopl, *gtl, *gql, *phl;
+  double Grav          = C_EARTH_GRAV;
+  double RD            = C_EARTH_RD;
+
 
   z2log2 = 2.0 * log(2.0);
   vtmp   = (C_RV / RD) - 1.0;
