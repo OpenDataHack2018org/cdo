@@ -3,9 +3,7 @@
 #include <string.h>
 #include <math.h>
 
-#define  SQUARE_RADIUS   (-PlanetRadius * PlanetRadius)
-#define  C_EARTH_RADIUS  (6371000.0)
-static double PlanetRadius = C_EARTH_RADIUS;
+#include "constants.h"
 
 void gaussaw(double *pa, double *pw, int nlat);
 
