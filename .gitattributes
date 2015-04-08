@@ -504,6 +504,8 @@ src/after_fctrans.c -text
 src/after_sptrans.c -text
 src/after_vertint.c -text
 src/after_vertint.h -text
+src/afterburner.h -text
+src/afterburnerlib.c -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text

@@ -22,6 +22,7 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
 		       double *restrict pol2, double *restrict pol3, double *restrict coslat);
 void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat);
 
+
 void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   int nlev  = 1;
