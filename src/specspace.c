@@ -8,11 +8,9 @@
 #include "specspace.h"
 #include "error.h"
 #include "grid.h"
-
+#include "constants.h"
 
 #define  SQUARE_RADIUS   (-PlanetRadius * PlanetRadius)
-#define  C_EARTH_RADIUS  (6371000.0)
-static double PlanetRadius = C_EARTH_RADIUS;
 
 void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pol2,
 		       double *restrict pol3, double *restrict coslat, double *restrict rcoslat, int flag);
