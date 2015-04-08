@@ -35,6 +35,7 @@
 #include "pstream.h"
 #include "list.h"
 #include "grid.h"
+#include "constants.h"
 #include "stdnametable.h"
 
 
@@ -63,9 +64,8 @@
 #define T_DELTA          (75.0)
 #define SCALEHEIGHT   (10000.0)   /* [m] */
 #define P_ZERO         (1013.25)  /* surface pressure [hPa] */
-#define C_EARTH_GRAV      (9.80665)
-#define C_R             (287.05)  /*  specific gas constant for air */
-static double TMP4PRESSURE = (C_EARTH_GRAV*SCALEHEIGHT)/(C_R*T_ZERO);
+#define CC_R             (287.05)  /* specific gas constant for air */
+static double TMP4PRESSURE = (C_EARTH_GRAV*SCALEHEIGHT)/(CC_R*T_ZERO);
 
 static double
 std_atm_temperatur(double height)
