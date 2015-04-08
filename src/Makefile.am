@@ -10,6 +10,7 @@ libcdo_la_SOURCES =            \
                cdo_history.c   \
                after_sptrans.c \
                after_fctrans.c \
+               after_dvtrans.c \
                after_vertint.c \
                after_vertint.h \
                constants.h     \

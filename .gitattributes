@@ -499,6 +499,7 @@ src/Ymonstat.c -text
 src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
+src/after_dvtrans.c -text
 src/after_fctrans.c -text
 src/after_sptrans.c -text
 src/after_vertint.c -text
