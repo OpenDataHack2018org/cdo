@@ -263,59 +263,65 @@ void phcs(double *pnm, double *hnm, int waves, double pmu,
 }
 
 
-void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pol2,
-		       double *restrict pol3, double *restrict coslat, double *restrict rcoslat, int flag)
+void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
+		       double *restrict pol2, double *restrict pol3, double *restrict coslat)
 {
-  int waves, dimsp;
   int jgl, jm, jn;
   int jsp;
-  double *gmu, *gwt, *pnm;
-  double *hnm, gmusq, *ztemp1, *ztemp2;
+  double gmusq;
 
-  waves =  ntr + 1;
-  dimsp = (ntr + 1) * (ntr + 2);
+  int waves =  ntr + 1;
+  int dimsp = (ntr + 1) * (ntr + 2);
 
-  gmu  = (double*) malloc(nlat * sizeof(double));
-  gwt  = (double*) malloc(nlat * sizeof(double));
+  double *gmu = (double*) malloc(nlat * sizeof(double));
+  double *gwt = (double*) malloc(nlat * sizeof(double));
 
   gaussaw(gmu, gwt, nlat);
 
 #if ! defined(_OPENMP)
-  pnm    = (double*) malloc(dimsp * sizeof(double));
-  hnm    = (double*) malloc(dimsp * sizeof(double));
-  ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
-  ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
+  double *pnm    = (double*) malloc(dimsp * sizeof(double));
+  double *hnm    = (double*) malloc(dimsp * sizeof(double));
+  double *ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
+  double *ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
 #endif
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(jm, jn, jsp, gmusq, hnm, pnm, ztemp1, ztemp2)
+#pragma omp parallel for default(shared) private(jm, jn, jsp, gmusq)
 #endif
   for ( jgl = 0; jgl < nlat; jgl++ )
     {
 #if defined(_OPENMP)
-      pnm    = (double*) malloc(dimsp * sizeof(double));
-      hnm    = (double*) malloc(dimsp * sizeof(double));
-      ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
-      ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
+      double *pnm    = (double*) malloc(dimsp * sizeof(double));
+      double *hnm    = (double*) malloc(dimsp * sizeof(double));
+      double *ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
+      double *ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
 #endif
       gmusq = 1.0 - gmu[jgl]*gmu[jgl];
-      coslat[jgl] =  sqrt(gmusq);
-      rcoslat[jgl] = 1.0 / coslat[jgl];
+      coslat[jgl] = sqrt(gmusq);
 
       phcs(pnm, hnm, waves, gmu[jgl], ztemp1, ztemp2);
+
+      double zgwt = gwt[jgl];
+      double zrafgmusqr = 1./(PlanetRadius * gmusq);
+      double zradsqrtgmusqr = 1./(-PlanetRadius * sqrt(gmusq));
+
+      const int lpold = pold != NULL;
+      const int lpdev = pdev != NULL;
+      const int lpol2 = pol2 != NULL;
+      const int lpol3 = pol3 != NULL;
 
       jsp = jgl;
       for ( jm = 0; jm < waves; jm++ )
 	for ( jn = 0; jn < waves - jm; jn++ )
 	  {
-	              poli[jsp] = pnm[jm*waves+jn] * 2.0;
-	              pold[jsp] = pnm[jm*waves+jn] * gwt[jgl];
-	    if (flag) pol2[jsp] = hnm[jm*waves+jn] * gwt[jgl] /
-                                  (PlanetRadius    * gmusq);
-	    if (flag) pol3[jsp] = pnm[jm*waves+jn] * gwt[jgl] * jm /
-                                  (PlanetRadius    * gmusq);
+	               poli[jsp] = pnm[jm*waves+jn] * 2.0;
+	    if (lpold) pold[jsp] = pnm[jm*waves+jn] * zgwt;
+	    if (lpdev) pdev[jsp] = hnm[jm*waves+jn] * 2.0 * zradsqrtgmusqr;
+	    if (lpol2) pol2[jsp] = hnm[jm*waves+jn] * zgwt * zrafgmusqr;
+	    if (lpol3) pol3[jsp] = pnm[jm*waves+jn] * zgwt * jm * zrafgmusqr;
 	    jsp += nlat;
 	  }
+      
 #if defined(_OPENMP)
       free(ztemp2);
       free(ztemp1);
@@ -335,30 +341,29 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
 }
 
 
-void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict rcoslat)
+void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat)
 {
-  int waves, dimpnm;
   int jgl, jm, jn, is;
   int isp, latn, lats;
-  double *gmu, *gwt, *pnm, *work;
 
-  waves  =  ntr + 1;
-  dimpnm = (ntr + 1)*(ntr + 4)/2;
+  int waves  =  ntr + 1;
+  int dimpnm = (ntr + 1)*(ntr + 4)/2;
 
-  gmu  = (double*) malloc(nlat * sizeof(double));
-  gwt  = (double*) malloc(nlat * sizeof(double));
-  pnm  = (double*) malloc(dimpnm * sizeof(double));
-  work = (double*) malloc(3*waves * sizeof(double));
+  double *gmu  = (double*) malloc(nlat * sizeof(double));
+  double *gwt  = (double*) malloc(nlat * sizeof(double));
+  double *pnm  = (double*) malloc(dimpnm * sizeof(double));
+  double *work = (double*) malloc(3*waves * sizeof(double));
 
   gaussaw(gmu, gwt, nlat);
-  for ( jgl = 0; jgl < nlat; jgl++ ) gwt[jgl] *= 0.5;
+  for ( jgl = 0; jgl < nlat; ++jgl ) gwt[jgl] *= 0.5;
 
-  for ( jgl = 0; jgl < nlat; jgl++ )
-    rcoslat[jgl] = 1.0 / sqrt(1.0 - gmu[jgl]*gmu[jgl]);
+  for ( jgl = 0; jgl < nlat; ++jgl )
+    coslat[jgl] = sqrt(1.0 - gmu[jgl]*gmu[jgl]);
 
   for ( jgl = 0; jgl < nlat/2; jgl++ )
     {
       jspleg1(pnm, gmu[jgl], ntr, work);
+      double zgwt = gwt[jgl];
 
       latn = jgl;
       isp = 0;
@@ -375,9 +380,9 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
 	      is = (jn+1)%2 * 2 - 1;
 	      lats = latn - jgl + nlat - jgl - 1;
 	      poli[latn] = pnm[isp];
-	      pold[latn] = pnm[isp] * gwt[jgl];
+	      pold[latn] = pnm[isp] * zgwt;
 	      poli[lats] = pnm[isp] * is;
-	      pold[lats] = pnm[isp] * gwt[jgl] * is;
+	      pold[lats] = pnm[isp] * zgwt * is;
 	      latn += nlat;
 	      isp++;
 	    }

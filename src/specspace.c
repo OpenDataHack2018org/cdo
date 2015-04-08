@@ -12,9 +12,9 @@
 
 #define  SQUARE_RADIUS   (-PlanetRadius * PlanetRadius)
 
-void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pol2,
-		       double *restrict pol3, double *restrict coslat, double *restrict rcoslat, int flag);
-void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict rcoslat);
+void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
+		       double *restrict pol2, double *restrict pol3, double *restrict coslat);
+void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat);
 
 
 void geninx(long ntr, double *f, double *g)
@@ -163,6 +163,7 @@ SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
 
   sptrans->poli = (double*) malloc(sptrans->poldim * sizeof(double));
   sptrans->pold = (double*) malloc(sptrans->poldim * sizeof(double));
+  
   if ( flag )
     {
       sptrans->pol2 = (double*) malloc(sptrans->poldim * sizeof(double));
@@ -178,10 +179,13 @@ SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
   sptrans->rcoslat = (double*) malloc(nlat * sizeof(double));
 
   if ( flag )
-    after_legini_full(ntr, nlat, sptrans->poli, sptrans->pold,
-		      sptrans->pol2, sptrans->pol3, sptrans->coslat, sptrans->rcoslat, flag);
+    after_legini_full(ntr, nlat, sptrans->poli, sptrans->pold, NULL,
+		      sptrans->pol2, sptrans->pol3, sptrans->coslat);
   else
-    after_legini(ntr, nlat, sptrans->poli, sptrans->pold, sptrans->rcoslat);
+    after_legini(ntr, nlat, sptrans->poli, sptrans->pold, sptrans->coslat);
+
+  for ( int jgl = 0; jgl < nlat; ++jgl )
+    sptrans->rcoslat[jgl] = 1.0 / sptrans->coslat[jgl];
 
   return (sptrans);
 }
