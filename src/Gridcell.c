@@ -29,7 +29,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
-
+#include "constants.h"
 
 static
 double orthodrome(double px1, double py1, double px2, double py2)
@@ -52,8 +52,6 @@ void *Gridcell(void *argument)
   int tsID, varID, levelID, taxisID;
   long i, gridsize;
   double *array = NULL;
-  double  EarthRadius = 6371000; /* default radius of the earth in m */
-  double PlanetRadius = EarthRadius;
 
   cdoInitialize(argument);
 

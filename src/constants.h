@@ -11,11 +11,11 @@
 #define  C_RV            (1000. * C_R / C_RMV)
 
 #define  C_EARTH_RD      (1000. * C_R / C_RMD)
-#define  C_EARTH_RADIUS  (6371000.0)
+#define  C_EARTH_RADIUS  (6371000.0)        /* radius of the Earth in m */
 #define  C_EARTH_GRAV    (9.80665)
 
 #define  C_MARS_RD       (189.0 )
-#define  C_MARS_RADIUS   (3400000.0)
+#define  C_MARS_RADIUS   (3400000.0)        /* radius of the Mars in m */
 #define  C_MARS_GRAV     (3.7)
 
 #define  C_RG            (1.0 / PlanetGrav)
