@@ -1,5 +1,5 @@
-#ifndef _AFTER_H
-#define _AFTER_H
+#ifndef _AFTERBURNER_H
+#define _AFTERBURNER_H
 
 /* =============================================== */
 /* These include files should be standard on all   */
@@ -28,23 +28,12 @@
 #  include "dmemory.h"
 #endif
 
-#define FT_GRIB  1
-#define FT_SERV  2
-#define FT_CDF   3
-
 #ifndef TRUE
 #define TRUE  1
 #endif
 #ifndef FALSE
 #define FALSE 0
 #endif
-
-#ifndef M_PI
-#define M_PI        3.14159265358979323846
-#endif
-
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 #define MaxLevel 1024
 
@@ -85,6 +74,8 @@ struct Control
   int    ivlistID;
   int    ovlistID;
   int    ovlistID2;
+  int    taxisID;
+  int    taxisID2;
 
   struct Date NextDate;
   struct Date NewDate;
@@ -173,7 +164,6 @@ struct Variable
 };
 
 /* FFT */
-
 void fft_set(double *trigs, long *ifax, long n);
 void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlon, long nlev, long nfc);
 void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlon, long nlev, long nfc);
@@ -184,20 +174,12 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 void fc2sp(double *fa, double *sa, double *poli, int klev, int nlat, int nfc, int nt);
 
 /* Physc */
-
 void dv2ps(const double * restrict div, double * restrict pot, long nlev, long ntr);
-void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g,
-           int nt, int nsp, int nlev);
+void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g, int nt, int nsp, int nlev);
 void scaluv(double *fu, double rclat[], int nlat, int lot);
 void uv2dv(double *fu, double *fv, double *sd, double *sv,
            double *pol2, double *pol3, int klev, int nlat, int nt);
 void geninx(long ntr, double *f, double *g);
-
-void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev);
-void LayerWater (double *ww, double *ll, double pmax, double pmin,
-                 int DimGP, int HalfLevels, double *vct);
-void LayerCloud (double *cc, double *ll, double pmax, double pmin,
-                 int DimGP, int HalfLevels, double *vct);
 
 #define    LOW_CLOUD   34
 #define    MID_CLOUD   35
@@ -252,12 +234,6 @@ void LayerCloud (double *cc, double *ll, double pmax, double pmin,
 #define       THETAH  279
 #define       THETAF  280
 
-void *FreeMemory(void *ptr);
-double *alloc_dp(int words, char *array_name);
-
-void after_copy_array(void *destination, void *source, int words);
-void after_zero_array(double *field, int words);
-
 void after_read_vct(const char *vctfile, double **vct, int *nvct);
 
 void after_gp2sp(struct Control *globs, struct Variable *vars, int ccode);
@@ -277,5 +253,6 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 void  after_AnalysisDependencies(struct Variable *vars, int ncodes);
 void  after_EchamDependencies(struct Variable *vars, int ncodes, int type, int source);
 
+void after_legini_setup(struct Control *globs, struct Variable *vars);
 
 #endif /*  afterburner.h  */

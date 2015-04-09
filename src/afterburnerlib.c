@@ -12,6 +12,10 @@
 int afterDebug = 0;
 int labort_after = TRUE;
 
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
+
 static
 char *FieldName(int code, const char *text)
 {
@@ -23,6 +27,7 @@ char *FieldName(int code, const char *text)
 }
 
 /* Free array space */
+static
 void *FreeMemory(void *ptr)
 {
   free(ptr);
@@ -81,6 +86,7 @@ void FreeSamp(struct Variable *vars)
 }
 
 /* alloc_dp - Allocate space for double array */
+static
 double *alloc_dp(int words, char *array_name)
 {
   double *result = NULL;
@@ -95,14 +101,15 @@ double *alloc_dp(int words, char *array_name)
   return(result);
 }
 
-
 /* after_copy_array - Copy array of type double */
+static
 void after_copy_array(void *destination, void *source, int words)
 {
    memcpy(destination, source, words*sizeof(double));
 }
 
 /* after_zero_array -  Set array of type double to zero */
+static
 void after_zero_array(double *field, int words)
 {
    memset((char *)field, 0, words*sizeof(double));
@@ -2828,4 +2835,54 @@ void after_EchamDependencies(struct Variable *vars, int ncodes, int type, int so
      vars[PS_PROG].comp = TRUE;
 
    CheckDependencies(vars, 0);
+}
+
+void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
+		       double *restrict pol2, double *restrict pol3, double *restrict coslat);
+void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat);
+
+void after_legini_setup(struct Control *globs, struct Variable *vars)
+{
+  int ntr   = globs->Truncation;
+  int nlat  = globs->Latitudes;
+  int dimsp = (ntr + 1) * (ntr + 2);
+  int pdim  = dimsp / 2 * nlat;
+
+  globs->poli = (double *) malloc(pdim*sizeof(double));
+  
+  if ( ! globs->AnalysisData )
+    {
+      if ( globs->Type >= 20 )  globs->pold = (double *) malloc(pdim*sizeof(double));
+      if ( vars[DPSDY].needed ) globs->pdev = (double *) malloc(pdim*sizeof(double));
+    }
+  
+  if ( (vars[DIVERGENCE].needed || vars[VORTICITY].needed ||
+	vars[VELOPOT].needed || vars[STREAM].needed ) && globs->Type > 20 )
+    {
+      globs->pol2 = (double *) malloc(pdim*sizeof(double));
+      globs->pol3 = (double *) malloc(pdim*sizeof(double));
+    }
+
+  if ( globs->AnalysisData && (globs->Type == 70) && globs->Gaussian && !globs->Spectral )
+    {
+      if ( globs->poli ) { free(globs->poli); globs->poli = NULL;}
+      if ( globs->pol2 ) { free(globs->pol2); globs->pol2 = NULL;}
+      if ( globs->pol3 ) { free(globs->pol3); globs->pol3 = NULL;}
+      return;
+    }
+
+  int flag = 1;
+  //if ( globs->poli && globs->pold && globs->pdev == NULL && globs->pol2 == NULL && globs->pol3 == NULL ) flag = 0;
+
+  if ( flag )
+    after_legini_full(ntr, nlat, globs->poli, globs->pold, globs->pdev,
+		      globs->pol2, globs->pol3, globs->coslat);
+  else
+    after_legini(ntr, nlat, globs->poli, globs->pold, globs->coslat);
+
+  for ( int jgl = 0; jgl < nlat; ++jgl )
+    globs->rcoslat[jgl] = 1.0 / globs->coslat[jgl];
+  
+  for ( int jgl = 0; jgl < nlat; ++jgl )
+    globs->DerivationFactor[jgl] = globs->rcoslat[jgl] / PlanetRadius;
 }
