@@ -9,6 +9,9 @@
 #include "compare.h"
 #include "after_vertint.h"
 
+int afterDebug = 0;
+int labort_after = TRUE;
+
 static
 char *FieldName(int code, const char *text)
 {
@@ -516,10 +519,7 @@ void after_FCsh2FCrh(struct Control *globs, struct Variable *vars)
 static
 void CheckAnalyses(struct Variable *vars)
 {
-  int code;
-  extern int labort_after;
-
-  for ( code = 0; code < 272; code++ )
+  for ( int code = 0; code < 272; code++ )
     if ( vars[code].needed      && 
 	 code != DIVERGENCE    &&
 	 code != VORTICITY     &&
@@ -1512,11 +1512,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
 static
 void CheckContent(struct Variable *vars, int timestep)
 {
-  int code;
-  extern int labort_after;
-  /*  extern int NumLevelRequest; */
-
-  for ( code = 0; code < 272; code++ )
+  for ( int code = 0; code < 272; code++ )
     {
       /*  if ( code == GEOPOTENTIAL ) continue; */
       if ( code ==          SLP ) continue;
@@ -2576,8 +2572,6 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 static
 void MakeDependencies(struct Variable *vars, int varcode, int depcode)
 {
-  extern int afterDebug;
-
   if ( vars[varcode].needed && ! vars[varcode].detected )
     {
       vars[depcode].needed = TRUE;
