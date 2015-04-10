@@ -165,7 +165,7 @@ struct Variable
 
 /* FFT */
 void fft_set(double *trigs, long *ifax, long n);
-void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlon, long nlev, long nfc);
+void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon, long nlev, long nfc);
 void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlon, long nlev, long nfc);
 
 /* Convert Spectral Array to new resolution */
