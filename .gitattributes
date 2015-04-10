@@ -501,6 +501,7 @@ src/Yseasstat.c -text
 src/Zonstat.c -text
 src/after_dvtrans.c -text
 src/after_fctrans.c -text
+src/after_namelist.c -text
 src/after_sptrans.c -text
 src/after_vertint.c -text
 src/after_vertint.h -text
@@ -656,6 +657,7 @@ src/timer.c -text
 src/userlog.c -text
 src/util.c -text
 src/util.h -text
+src/vct_l191.h -text
 src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text

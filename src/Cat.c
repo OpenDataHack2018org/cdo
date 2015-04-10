@@ -34,7 +34,6 @@ void *Cat(void *argument)
   int nrecs;
   int tsID1, tsID2 = 0, recID, varID, levelID;
   int vlistID1, vlistID2 = CDI_UNDEFID;
-  int streamCnt, nfiles, indf;
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int lcopy = FALSE;
   int gridsize;
@@ -51,10 +50,10 @@ void *Cat(void *argument)
   timer_cat = timer_new("cat");
   if ( cdoTimer ) timer_start(timer_cat);
 
-  streamCnt = cdoStreamCnt();
-  nfiles = streamCnt - 1;
+  int streamCnt = cdoStreamCnt();
+  int nfiles = streamCnt - 1;
 
-  for ( indf = 0; indf < nfiles; indf++ )
+  for ( int indf = 0; indf < nfiles; ++indf )
     {
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
       if ( cdoTimer ) tw0 = timer_val(timer_cat);

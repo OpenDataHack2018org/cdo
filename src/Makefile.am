@@ -13,8 +13,10 @@ libcdo_la_SOURCES =            \
                after_dvtrans.c \
                after_vertint.c \
                after_vertint.h \
+               after_namelist.c\
                afterburnerlib.c\
                afterburner.h   \
+               vct_l191.h      \
                constants.h     \
                constants.c     \
                color.c         \
