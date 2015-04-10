@@ -147,5 +147,7 @@ char *expand_filename(const char *string);
 
 double parameter2double(const char *string);
 int    parameter2int(const char *string);
+int    parameter2intlist(const char *string);
+
 
 #endif  /* _CDO_INT_H */
