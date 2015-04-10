@@ -1050,7 +1050,7 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor
   double vtmp;
   double zrg;
   double z2log2;
-  double *geopl, *gtl, *gql, *phl;
+  double *restrict geopl, *restrict gtl, *restrict gql, *restrict phl;
 
   z2log2 = 2.0 * log(2.0);
   vtmp   = (C_RV / PlanetRD) - 1.0;
