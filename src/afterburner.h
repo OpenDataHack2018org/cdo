@@ -52,6 +52,8 @@ struct Date
 
 struct Control
 {
+  int    Verbose;
+ 
   int    Mean;
   int    MeanCount0;
   int    MeanCount;

@@ -38,7 +38,7 @@ int scan_par_obsolate(char *namelist, char *name, int def)
 }
 
 
-int scan_par(char *namelist, char *name, int def)
+int scan_par(int verbose, char *namelist, char *name, int def)
 {
   char *cp;
   int value;
@@ -48,15 +48,18 @@ int scan_par(char *namelist, char *name, int def)
   if ( cp == NULL ) value = def;
   else              value = atoi (cp);
 
-  fprintf(stdout, " %16.16s = %6d ", name, value);
-  if ( value == def ) fprintf(stdout, " (default)\n");
-  else                fprintf(stdout, "          \n");
-
+  if ( verbose )
+    {
+      fprintf(stdout, " %16.16s = %6d ", name, value);
+      if ( value == def ) fprintf(stdout, " (default)\n");
+      else                fprintf(stdout, "          \n");
+    }
+  
   return (value);
 }
 
 
-int scan_time(char *namelist, int *hours, int max_hours)
+int scan_time(int verbose, char *namelist, int *hours, int max_hours)
 {
   char *cp, *icp;
   int time;
@@ -66,7 +69,7 @@ int scan_time(char *namelist, int *hours, int max_hours)
   if ( cp == NULL )
     {
       hours[nrqh++] = -1;
-      fprintf(stdout, " %16.16s = all\n","timesel");
+      if ( verbose ) fprintf(stdout, " %16.16s = all\n","timesel");
       return (nrqh);
     }
 
@@ -79,10 +82,13 @@ int scan_time(char *namelist, int *hours, int max_hours)
       time = (int) strtol (cp, &icp, 10);
     }
 
-  fprintf(stdout, " %16.16s = ", "timesel");
-  for ( time = 0; time < nrqh; ++time ) fprintf(stdout, " %02d", hours[time]);
-  fprintf(stdout, "\n");
-
+  if ( verbose )
+    {
+      fprintf(stdout, " %16.16s = ", "timesel");
+      for ( time = 0; time < nrqh; ++time ) fprintf(stdout, " %02d", hours[time]);
+      fprintf(stdout, "\n");
+    }
+  
   return (nrqh);
 }
 

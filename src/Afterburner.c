@@ -43,8 +43,8 @@ void afterDefHistory(int fileID, char *histstring);
 
 int   scan_par_obsolate(char *namelist, char *name, int def);
 void  scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCodes);
-int   scan_par(char *namelist, char *name, int def);
-int   scan_time(char *namelist, int *hours, int max_hours);
+int   scan_par(int verbose, char *namelist, char *name, int def);
+int   scan_time(int verbose, char *namelist, int *hours, int max_hours);
 void  scan_darray(char *namelist, char *name, double *values, int maxValues, int *numValues);
 
 long  get_nfft(void);
@@ -741,7 +741,7 @@ void after_setLevel(struct Control *globs)
     if ( zaxisInqType(iVertID) == ZAXIS_HYBRID && globs->Type > 20 )
       Lhybrid2pressure = TRUE;
 
-  lprintf(stdout);
+  if ( globs->Verbose ) lprintf(stdout);
 
   if ( globs->NumLevelRequest == 0 )
     {
@@ -772,10 +772,13 @@ void after_setLevel(struct Control *globs)
 	    }
 	  else
 	    {
-	      if ( zaxisInqType(iVertID) == ZAXIS_HYBRID )
-		fprintf(stdout," All detected hybrid level selected:\n");
-	      else
-		fprintf(stdout," All detected pressure level selected:\n");
+	      if ( globs->Verbose )
+		{
+		  if ( zaxisInqType(iVertID) == ZAXIS_HYBRID )
+		    fprintf(stdout," All detected hybrid level selected:\n");
+		  else
+		    fprintf(stdout," All detected pressure level selected:\n");
+		}
 	      globs->NumLevelRequest = globs->NumLevelFound;
 	      for ( l = 0; l < globs->NumLevelRequest; l++ ) globs->LevelRequest[l] = LevelFound[l];
 	      oVertID = iVertID;
@@ -787,16 +790,16 @@ void after_setLevel(struct Control *globs)
     {
       if ( iVertID == -1 )
 	{
-	  fprintf(stdout," No level detected\n");
+	  if ( globs->Verbose )	fprintf(stdout," No level detected\n");
 	  checkLevel = FALSE;
 	}
       else if ( globs->NumLevelRequest == 1 && IS_EQUAL(globs->LevelRequest[0], 0) )
 	{
-	  fprintf(stdout," No level selected\n");
+	  if ( globs->Verbose ) fprintf(stdout," No level selected\n");
 	  globs->NumLevelRequest = 0;
 	  checkLevel = FALSE;
 	}
-      else
+      else if ( globs->Verbose )
 	{
 	  if ( Lhybrid2pressure )
 	    {
@@ -820,7 +823,7 @@ void after_setLevel(struct Control *globs)
 	}
     }
 
-  if ( iVertID != -1 )
+  if ( globs->Verbose && iVertID != -1 )
     for ( l = 0; l < globs->NumLevelRequest; l++ )
       fprintf(stdout, "  Level %2d = %13.4f\n", l+1, globs->LevelRequest[l]);
 
@@ -833,8 +836,8 @@ void after_setLevel(struct Control *globs)
 	  for ( l = k+1; l < globs->NumLevelRequest; l++ )
 	    if ( removeLevel[l] == FALSE && IS_EQUAL(level, globs->LevelRequest[l]) )
 	      {
-		fprintf(stdout, "  Level %2d = %13.4f double request\n",
-			l+1, globs->LevelRequest[l]);
+		if ( globs->Verbose )
+		  fprintf(stdout, "  Level %2d = %13.4f double request\n", l+1, globs->LevelRequest[l]);
 		removeLevel[l] = TRUE;
 	      }
 	}
@@ -872,7 +875,7 @@ void after_setLevel(struct Control *globs)
 	  if ( l != globs->NumLevelRequest )
 	    {
 	      extern int labort_after;
-	      lprintf(stdout);
+	      if ( globs->Verbose ) lprintf(stdout);
 	      if ( labort_after )
 		Error( "Inconsistent or invalid level list!");
 	      else
@@ -883,7 +886,7 @@ void after_setLevel(struct Control *globs)
 	}
     }
 
-  lprintf(stdout);
+  if ( globs->Verbose ) lprintf(stdout);
 }
 
 static
@@ -1077,57 +1080,60 @@ void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, 
   char *name, *longname;
   int varID;
 
-  lprintf(stdout);
+  if ( globs->Verbose ) lprintf(stdout);
 
   if ( numCodes == 0 )
     {
-      fprintf(stdout, " All detected codes selected:\n");
+      if ( globs->Verbose ) fprintf(stdout, " All detected codes selected:\n");
       
       for ( code = 0; code < maxCodes; code++ )
 	if ( vars[code].detected ) vars[code].selected = 1;
     }
-  else
+  else if ( globs->Verbose )
     fprintf(stdout, " Selected codes:\n");
- 
-  fprintf(stdout, "  Table Code Name              Longname\n");
-  fprintf(stdout, "  ----- ---- ----              --------\n");
 
-  for ( code = 0; code < maxCodes; code++ )
-    if ( vars[code].selected )
-      {
-	table    = 0;
-	name     = NULL;
-	longname = NULL;
-	varID    = vars[code].ivarID;
-	if ( varID == CDI_UNDEFID )
+  if ( globs->Verbose )
+    {
+      fprintf(stdout, "  Table Code Name              Longname\n");
+      fprintf(stdout, "  ----- ---- ----              --------\n");
+  
+      for ( code = 0; code < maxCodes; code++ )
+	if ( vars[code].selected )
 	  {
-	    modelID  = vlistInqVarModel(globs->ivlistID, 0);
-	    table    = 128;
-	    tableID  = tableInq(modelID, table, NULL);
-	    vars[code].tableID = tableID;
+	    table    = 0;
+	    name     = NULL;
+	    longname = NULL;
+	    varID    = vars[code].ivarID;
+	    if ( varID == CDI_UNDEFID )
+	      {
+		modelID  = vlistInqVarModel(globs->ivlistID, 0);
+		table    = 128;
+		tableID  = tableInq(modelID, table, NULL);
+		vars[code].tableID = tableID;
+	      }
+	    else
+	      {
+		tableID  = vlistInqVarTable(globs->ivlistID, varID);
+		table    = tableInqNum(tableID);
+		name     = vlistInqVarNamePtr(globs->ivlistID, varID);
+		longname = vlistInqVarLongnamePtr(globs->ivlistID, varID);
+	      }
+	    if ( name     == NULL )     name = tableInqParNamePtr(tableID, code);
+	    if ( longname == NULL ) longname = tableInqParLongnamePtr(tableID, code);
+	    
+	    fprintf(stdout, " %5d", table);
+	    fprintf(stdout, " %4d", code);
+	    if ( name == NULL )
+	      fprintf(stdout, "  var%d", code);
+	    else
+	      {
+		fprintf(stdout, "  %-16s", name);
+		if ( longname != NULL )
+		  fprintf(stdout, "  %s", longname);
+	      }
+	    fprintf(stdout, "\n");
 	  }
-	else
-	  {
-	    tableID  = vlistInqVarTable(globs->ivlistID, varID);
-	    table    = tableInqNum(tableID);
-	    name     = vlistInqVarNamePtr(globs->ivlistID, varID);
-	    longname = vlistInqVarLongnamePtr(globs->ivlistID, varID);
-	  }
-	if ( name     == NULL )     name = tableInqParNamePtr(tableID, code);
-	if ( longname == NULL ) longname = tableInqParLongnamePtr(tableID, code);
-
-	fprintf(stdout, " %5d", table);
-	fprintf(stdout, " %4d", code);
-	if ( name == NULL )
-	  fprintf(stdout, "  var%d", code);
-	else
-	  {
-	    fprintf(stdout, "  %-16s", name);
-	    if ( longname != NULL )
-	      fprintf(stdout, "  %s", longname);
-	  }
-	fprintf(stdout, "\n");
-      }
+    }
 }
 
 static
@@ -1218,19 +1224,22 @@ void after_parini(struct Control *globs, struct Variable *vars)
       lprintf(stderr);
     }
 
-  lprintf(stdout);
-  fprintf(stdout, " Namelist:\n");
+  if ( globs->Verbose )
+    {
+      lprintf(stdout);
+      fprintf(stdout, " Namelist:\n");
+    }
+  
+  globs->Type           = scan_par(globs->Verbose, namelist, "type",  0);
+  globs->Multi          = scan_par(globs->Verbose, namelist, "multi", 0);
+  globs->Mean           = scan_par(globs->Verbose, namelist, "mean",  0);
+  globs->OutputInterval = scan_par(globs->Verbose, namelist, "interval", MONTHLY_INTERVAL);
 
-  globs->Type           = scan_par(namelist, "type",  0);
-  globs->Multi          = scan_par(namelist, "multi", 0);
-  globs->Mean           = scan_par(namelist, "mean",  0);
-  globs->OutputInterval = scan_par(namelist, "interval", MONTHLY_INTERVAL);
-
-  int fileFormat     = scan_par(namelist, "format", 0);
+  int fileFormat     = scan_par(globs->Verbose, namelist, "format", 0);
   int gribFormat     = scan_par_obsolate(namelist, "grib",   0);
   int cdfFormat      = scan_par_obsolate(namelist, "netcdf", 0);
 
-  if ( gribFormat && cdfFormat ) Error( "GRIB or netCDF ?");
+  if ( gribFormat && cdfFormat ) Error( "GRIB or netCDF?");
 
   switch ( fileFormat )
     {
@@ -1246,7 +1255,7 @@ void after_parini(struct Control *globs, struct Variable *vars)
   if ( gribFormat )  ofiletype = FILETYPE_GRB;
   if ( cdfFormat  )  ofiletype = FILETYPE_NC;
 
-  int precision = scan_par(namelist, "precision", 0);
+  int precision = scan_par(globs->Verbose, namelist, "precision", 0);
   if ( precision )
     switch ( precision )
       {
@@ -1259,10 +1268,10 @@ void after_parini(struct Control *globs, struct Variable *vars)
       }
 
 
-  globs->unitsel        = scan_par(namelist, "unitsel",  0);
-  globs->DayIn          = scan_par(namelist, "dayinc",  30);
-  globs->Extrapolate    = scan_par(namelist, "extrapolate",  1);
-  globs->Szip           = scan_par(namelist, "szip",  0);
+  globs->unitsel        = scan_par(globs->Verbose, namelist, "unitsel",  0);
+  globs->DayIn          = scan_par(globs->Verbose, namelist, "dayinc",  30);
+  globs->Extrapolate    = scan_par(globs->Verbose, namelist, "extrapolate",  1);
+  globs->Szip           = scan_par(globs->Verbose, namelist, "szip",  0);
   int mars              = scan_par_obsolate(namelist, "mars", 0);
 
   if ( globs->Multi ) --globs->Multi;
@@ -1276,7 +1285,7 @@ void after_parini(struct Control *globs, struct Variable *vars)
       PlanetRadius = C_MARS_RADIUS;
     }
 
-  nrqh = scan_time(namelist, hours, MaxHours);
+  nrqh = scan_time(globs->Verbose, namelist, hours, MaxHours);
   scan_code(namelist, vars, MaxCodes, &globs->NumCodesRequest);
 
   scan_darray(namelist, "level", globs->LevelRequest, MaxLevel, &globs->NumLevelRequest);
@@ -1284,7 +1293,7 @@ void after_parini(struct Control *globs, struct Variable *vars)
     if ( IS_EQUAL(globs->LevelRequest[0], -1) )
       globs->NumLevelRequest = 0;
 
-  lprintf(stdout);
+  if ( globs->Verbose ) lprintf(stdout);
 
   after_checkNamelist(globs);
 }
@@ -1320,13 +1329,15 @@ void after_dimcalc(struct Control *globs)
   if ( globs->AnalysisData )
     fprintf(stdout, " Found Ana or Re-Ana Data\n");
 
-  fprintf(stdout, " Dimensions:\n");
-
-  fprintf(stdout, "  Truncation        = %4d\n", globs->Truncation);
-  fprintf(stdout, "  Levels            = %4d\n", globs->NumLevel);
-  fprintf(stdout, "  Latitudes         = %4d\n", globs->Latitudes);
-  fprintf(stdout, "  Longitudes        = %4d\n", globs->Longitudes);
-  lprintf(stdout);
+  if ( globs->Verbose )
+    {
+      fprintf(stdout, " Dimensions:\n");
+      fprintf(stdout, "  Truncation        = %4d\n", globs->Truncation);
+      fprintf(stdout, "  Levels            = %4d\n", globs->NumLevel);
+      fprintf(stdout, "  Latitudes         = %4d\n", globs->Latitudes);
+      fprintf(stdout, "  Longitudes        = %4d\n", globs->Longitudes);
+      lprintf(stdout);
+    }
 }
 
 /* ----------------------------------------------------------- */
@@ -1340,7 +1351,6 @@ void after_precntl(struct Control *globs, struct Variable *vars)
   int gridID, zaxisID, varID, timeID;
   int i, index, leveltype, gridtype;
   int datasize, numlevel;
-  int instID, modelID;
   int vertfound = 0;
   int nhzaxis = 0;
   int FieldDim = 0;
@@ -1349,8 +1359,6 @@ void after_precntl(struct Control *globs, struct Variable *vars)
   int ngrids  = vlistNgrids(globs->ivlistID);
   int nverts  = vlistNzaxis(globs->ivlistID);
   int ntsteps = vlistNtsteps(globs->ivlistID);
-
-  instID = vlistInqInstitut(globs->ivlistID);
 
   if ( globs->Debug )
     {
@@ -1502,35 +1510,38 @@ void after_precntl(struct Control *globs, struct Variable *vars)
   if ( globs->Debug )
     fprintf(stderr," CODE CHECK\n");
 
-  instID  = vlistInqVarInstitut(globs->ivlistID, 0);
-  modelID = vlistInqVarModel(globs->ivlistID, 0);
-
-  lprintf(stdout);
-  fprintf(stdout, " Institute : ");
-  if ( instID == CDI_UNDEFID )
-    fprintf(stdout, "unknown\n");
-  else
+  if ( globs->Verbose )
     {
-      if ( institutInqLongnamePtr(instID) )
-	fprintf(stdout, "%s\n", institutInqLongnamePtr(instID));
+      int instID  = vlistInqVarInstitut(globs->ivlistID, 0);
+      int modelID = vlistInqVarModel(globs->ivlistID, 0);
+
+      lprintf(stdout);
+      fprintf(stdout, " Institute : ");
+      if ( instID == CDI_UNDEFID )
+	fprintf(stdout, "unknown\n");
       else
-	fprintf(stdout, "name unknown\n");
-    }
-
-  fprintf(stdout, " Source    : ");
-  if ( modelID == CDI_UNDEFID )
-    fprintf(stdout, "unknown\n");
-  else
-    {
-      if ( modelInqNamePtr(modelID) )
 	{
-	  if ( strncmp(modelInqNamePtr(modelID), "ECHAM5", 6) == 0 ) Source = S_ECHAM5;
-	  fprintf(stdout, "%s\n", modelInqNamePtr(modelID));
+	  if ( institutInqLongnamePtr(instID) )
+	    fprintf(stdout, "%s\n", institutInqLongnamePtr(instID));
+	  else
+	    fprintf(stdout, "name unknown\n");
 	}
-      else
-	fprintf(stdout, "name unknown\n");
-    }
 
+      fprintf(stdout, " Source    : ");
+      if ( modelID == CDI_UNDEFID )
+	fprintf(stdout, "unknown\n");
+      else
+	{
+	  if ( modelInqNamePtr(modelID) )
+	    {
+	      if ( strncmp(modelInqNamePtr(modelID), "ECHAM5", 6) == 0 ) Source = S_ECHAM5;
+	      fprintf(stdout, "%s\n", modelInqNamePtr(modelID));
+	    }
+	  else
+	    fprintf(stdout, "name unknown\n");
+	}
+    }
+  
   for ( varID = 0; varID < nvars; varID++ )
     {
       vlistInqVar(globs->ivlistID, varID, &gridID, &zaxisID, &timeID);
@@ -1586,7 +1597,6 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
   int ivarID, instID, modelID, tableID;
   char *name, *longname, *units;
   char histstring[99];
-  int testmode = 0;
   int datatype;
 
   sprintf(histstring, "afterburner version %s  type = %d", VERSION, globs->Type);
@@ -1597,8 +1607,8 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
   if ( globs->Mean >= 2 ) afterDefHistory(globs->ostreamID2, histstring);
 #endif
 
-  if ( globs->Debug || testmode ) lprintf(stdout);
-  if ( globs->Debug || testmode )
+  if ( globs->Debug ) lprintf(stdout);
+  if ( globs->Debug )
     for ( code = 0; code < MaxCodes; code++ )
       if ( vars[code].detected )
 	{
@@ -1610,8 +1620,8 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	}
 
 
-  if ( globs->Debug || testmode ) lprintf(stdout);
-  if ( globs->Debug || testmode )
+  if ( globs->Debug ) lprintf(stdout);
+  if ( globs->Debug )
     for ( code = 0; code < MaxCodes; code++ )
       if ( vars[code].needed )
 	{
@@ -1701,8 +1711,8 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	  }
       }
 
-  if ( globs->Debug || testmode ) lprintf(stdout);
-  if ( globs->Debug || testmode )
+  if ( globs->Debug ) lprintf(stdout);
+  if ( globs->Debug )
     for ( code = 0; code < MaxCodes; code++ )
       if ( vars[code].selected )
 	{
@@ -2152,6 +2162,8 @@ int afterburner(int argc, char *argv[])
   struct Control *globs = (struct Control *) malloc(sizeof(struct Control));
   after_control_init(globs);
 
+  globs->Verbose = 1;
+
   /* --------------------- */
   /*  options & filenames  */
   /* --------------------- */
@@ -2179,7 +2191,7 @@ int afterburner(int argc, char *argv[])
   if ( numThreads <= 0 ) numThreads = 1;
   omp_set_num_threads(numThreads);
   if ( omp_get_max_threads() > omp_get_num_procs() )
-    fprintf(stdout, " Number of threads is greater than number of CPUs=%d!\n", omp_get_num_procs());
+    fprintf(stdout, " Number of threads is greater than number of Cores=%d!\n", omp_get_num_procs());
   fprintf(stdout, " OpenMP:  num_procs = %d  max_threads = %d\n", omp_get_num_procs(), omp_get_max_threads());
 #else
   if ( numThreads > 0 )
@@ -2287,10 +2299,14 @@ void *Afterburner(void *argument)
   struct Control *globs = (struct Control *) malloc(sizeof(struct Control));
   after_control_init(globs);
 
+  globs->Verbose = cdoVerbose;
+
   struct Variable vars[MaxCodes+5];
   for ( int code = 0; code < MaxCodes+5; code++ ) after_variable_init(&vars[code]);
 
   after_parini(globs, vars); /* read namelist parameter */
+
+  if ( cdoDefaultFileType != CDI_UNDEFID ) ofiletype = cdoDefaultFileType;
 
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
