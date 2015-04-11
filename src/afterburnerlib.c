@@ -662,10 +662,15 @@ void after_processPL(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].spectral )
-	      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].spectral, 0);
-	    else
-	      Error("Code %d not available on spectral space!", code);
+	    if ( ! vars[code].spectral ) Error("Code %d not available on spectral space!", code);
+	      
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimSP;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].spectral+offset, 0);
+	      }	      
 	  }
 
       FreeSpectral(vars);
@@ -733,10 +738,15 @@ void after_processPL(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
-	      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].fourier, 0);
-	    else
-	      Error("Code %d not available on fourier space!", code);
+	    if ( ! vars[code].fourier ) Error("Code %d not available on fourier space!", code);
+
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, 0);
+	      }	      
 	  }
 
       FreeFourier(vars);
@@ -752,17 +762,15 @@ void after_processPL(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
+	    if ( ! vars[code].fourier ) Error("Code %d not available on zonal mean!", code);
+
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
 	      {
-		nlevel = zaxisInqSize(vars[code].ozaxisID);
-		for ( lindex = 0; lindex < nlevel; lindex++ )
-		  {
-		    offset = lindex*globs->DimFC;
-		    streamWriteVarSlice(globs->ostreamID, vars[code].ovarID, lindex, vars[code].fourier+offset, 0);
-		  }
-	      }
-	    else
-	      Error("Code %d not available on zonal mean!", code);
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, 0);
+	      }	      
 	  }
 
       FreeFourier(vars);
@@ -888,10 +896,21 @@ void after_processPL(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( globs->Mean != 2 )
-	      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].mean, vars[code].nmiss);
-	    if ( globs->Mean >= 2 )
-	      streamWriteVar(globs->ostreamID2, vars[code].ovarID2, vars[code].variance, vars[code].nmiss);
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimGP;
+		if ( globs->Mean != 2 )
+		  {
+		    streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		    streamWriteRecord(globs->ostreamID, vars[code].mean+offset, vars[code].nmiss);
+		  }
+		if ( globs->Mean >= 2 )
+		  {
+		    streamDefRecord(globs->ostreamID2, vars[code].ovarID2, lindex);
+		    streamWriteRecord(globs->ostreamID2, vars[code].variance+offset, vars[code].nmiss);
+		  }
+	      }
 	  }
 
       FreeSamp(vars);
@@ -907,7 +926,15 @@ void after_processPL(struct Control *globs, struct Variable *vars)
     {
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
-	  streamWriteVar(globs->ostreamID, vars[code].ovarID, vars[code].grid, vars[code].nmiss);
+	  {
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimGP;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].grid+offset, vars[code].nmiss);
+	      }
+	  }
 
       FreeGrid(vars);
       return;
@@ -1602,7 +1629,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 {
   int code,l,i;
   long fieldSize = 0;
-  int lindex, ilevel, nlevel;
+  int lindex, nlevel;
   int offset;
   int leveltype;
   int nmiss;
@@ -1650,8 +1677,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 
        if ( vars[DIVERGENCE].spectral == NULL ) after_gp2sp(globs, vars, DIVERGENCE);
 
-       dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral,
-	     vars[DIVERGENCE].hlev, globs->Truncation);
+       dv2ps(vars[DIVERGENCE].spectral, vars[VELOPOT].spectral, vars[DIVERGENCE].hlev, globs->Truncation);
      }
 
    if ( vars[STREAM].comp && globs->Type < 30 )
@@ -1681,24 +1707,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].spectral )
+	    if ( ! vars[code].spectral ) Error("Code %d not available on spectral space!", code);
+
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
 	      {
-		leveltype = zaxisInqType(vars[code].ozaxisID);
-		if ( (leveltype == ZAXIS_HYBRID) && (vars[code].ozaxisID != vars[code].izaxisID) )
-		  {
-		    nlevel = zaxisInqSize(vars[code].ozaxisID);
-		    for ( lindex = 0; lindex < nlevel; lindex++ )
-		      {
-			ilevel = (int) zaxisInqLevel(vars[code].ozaxisID, lindex);
-			offset = (ilevel-1)*globs->DimSP;
-			streamWriteVarSlice(globs->ostreamID, vars[code].ovarID, lindex, vars[code].spectral+offset, 0);
-		      }
-		  }
-		else
-		  streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].spectral, 0);
+		offset = lindex*globs->DimSP;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].spectral+offset, 0);
 	      }
-	    else
-	      Error("Code %d not available on spectral space!", code);
 	  }
 
       FreeSpectral(vars);
@@ -1767,10 +1784,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
-	      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].fourier, 0);
-	    else
-	      Error("Code %d not available on fourier space!", code);
+	    if ( ! vars[code].fourier ) Error("Code %d not available on fourier space!", code);
+	    
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, 0);
+	      }
 	  }
 
       FreeFourier(vars);
@@ -1786,31 +1808,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
+	    if ( ! vars[code].fourier ) Error("Code %d not available on zonal mean!", code);
+
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
 	      {
-		leveltype = zaxisInqType(vars[code].ozaxisID);
-		if ( (leveltype == ZAXIS_HYBRID) && (vars[code].ozaxisID != vars[code].izaxisID) )
-		  {
-		    nlevel = zaxisInqSize(vars[code].ozaxisID);
-		    for ( lindex = 0; lindex < nlevel; lindex++ )
-		      {
-			ilevel = (int) zaxisInqLevel(vars[code].ozaxisID, lindex);
-			offset = (ilevel-1)*globs->DimFC;
-			streamWriteVarSlice(globs->ostreamID, vars[code].ovarID, lindex, vars[code].fourier+offset, 0);
-		      }
-		  }
-		else
-		  {
-		    nlevel = zaxisInqSize(vars[code].ozaxisID);
-		    for ( lindex = 0; lindex < nlevel; lindex++ )
-		      {
-			offset = lindex*globs->DimFC;
-			streamWriteVarSlice(globs->ostreamID, vars[code].ovarID, lindex, vars[code].fourier+offset, 0);
-		      }
-		  }
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, 0);
 	      }
-	    else
-	      Error("Code %d not available on zonal mean!", code);
 	  }
 
       FreeFourier(vars);
@@ -1939,28 +1945,20 @@ void after_processML(struct Control *globs, struct Variable *vars)
 		if ( vars[code].hybrid == NULL )
 		  Error("Internal problem. Code %d not allocated!", code);
 
-		leveltype = zaxisInqType(vars[code].ozaxisID);
-		if ( (leveltype == ZAXIS_HYBRID) && (vars[code].ozaxisID != vars[code].izaxisID) )
+		nlevel = zaxisInqSize(vars[code].ozaxisID);
+		for ( lindex = 0; lindex < nlevel; lindex++ )
 		  {
-		    nlevel = zaxisInqSize(vars[code].ozaxisID);
-		    for ( lindex = 0; lindex < nlevel; lindex++ )
-		      {
-			ilevel = (int) zaxisInqLevel(vars[code].ozaxisID, lindex);
-			offset = (ilevel-1)*globs->DimGP;
-			if ( globs->Mean != 2 )
-			  streamWriteVarSlice(globs->ostreamID,  vars[code].ovarID,  lindex,
-					      vars[code].hybrid+offset, vars[code].nmiss);
-			if ( globs->Mean >= 2 )
-			  streamWriteVarSlice(globs->ostreamID2, vars[code].ovarID2, lindex,
-					      vars[code].variance+offset, vars[code].nmiss);
-		      }
-		  }
-		else
-		  {
+		    offset = lindex*globs->DimGP;
 		    if ( globs->Mean != 2 )
-		      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].hybrid, vars[code].nmiss);
+		      {
+			streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+			streamWriteRecord(globs->ostreamID, vars[code].hybrid+offset, vars[code].nmiss);
+		      }
 		    if ( globs->Mean >= 2 )
-		      streamWriteVar(globs->ostreamID2, vars[code].ovarID2, vars[code].variance, vars[code].nmiss);
+		      {
+			streamDefRecord(globs->ostreamID2, vars[code].ovarID2, lindex);
+			streamWriteRecord(globs->ostreamID2, vars[code].variance+offset, vars[code].nmiss);
+		      }
 		  }
 	      }
 
@@ -2061,9 +2059,18 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected && vars[code].grid )
 	  {
-	    streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].grid, vars[code].nmiss);
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimGP;
+		if ( globs->Mean != 2 )
+		  {
+		    streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		    streamWriteRecord(globs->ostreamID, vars[code].grid+offset, vars[code].nmiss);
+		  }
+	      }
 	  }
-
+      
       FreeGrid(vars);
       return;
     }
@@ -2135,10 +2142,21 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected && vars[code].mean )
 	  {
-	    if ( globs->Mean != 2 )
-	      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].mean, vars[code].nmiss);
-	    if ( globs->Mean >= 2 )
-	      streamWriteVar(globs->ostreamID2, vars[code].ovarID2, vars[code].variance, vars[code].nmiss);
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimGP;
+		if ( globs->Mean != 2 )
+		  {
+		    streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		    streamWriteRecord(globs->ostreamID, vars[code].mean+offset, vars[code].nmiss);
+		  }
+		if ( globs->Mean >= 2 )
+		  {
+		    streamDefRecord(globs->ostreamID2, vars[code].ovarID2, lindex);
+		    streamWriteRecord(globs->ostreamID2, vars[code].variance+offset, vars[code].nmiss);
+		  }
+	      }
 	  }
 
       FreeSamp(vars);
@@ -2200,10 +2218,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
-	      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].fourier, vars[code].nmiss);
-	    else
-	      Error("Code %d not available on fourier space!", code);
+	    if ( ! vars[code].fourier ) Error("Code %d not available on fourier space!", code);
+	    
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, vars[code].nmiss);
+	      }
 	  }
 
       FreeFourier(vars);
@@ -2219,17 +2242,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
+	    if ( ! vars[code].fourier ) Error("Code %d not available on zonal mean!", code);
+
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
 	      {
-		nlevel = zaxisInqSize(vars[code].ozaxisID);
-		for ( lindex = 0; lindex < nlevel; lindex++ )
-		  {
-		    offset = lindex*globs->DimFC;
-		    streamWriteVarSlice(globs->ostreamID, vars[code].ovarID, lindex, vars[code].fourier+offset, vars[code].nmiss);
-		  }
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, vars[code].nmiss);
 	      }
-	    else
-	      Error("Code %d not available on zonal mean!", code);
 	  }
 
       FreeFourier(vars);
@@ -2310,7 +2331,13 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected && vars[code].spectral )
 	  {
-	    streamWriteVar(globs->ostreamID, vars[code].ovarID, vars[code].spectral, vars[code].nmiss);
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimSP;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].spectral+offset, 0);
+	      }	      
 	  }
 
       FreeSpectral(vars);
@@ -2326,11 +2353,11 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for (code = 0; code < MaxCodes; code++)
       if (vars[code].needed && vars[code].spectral)
 	{
-	  if (vars[code].fourier == NULL) {
-            fieldSize = vars[code].plev * globs->DimFC;
-            vars[code].fourier = alloc_dp(fieldSize,
-                                          FieldName(code,"fourier"));
-	  }
+	  if (vars[code].fourier == NULL)
+	    {
+	      fieldSize = vars[code].plev * globs->DimFC;
+	      vars[code].fourier = alloc_dp(fieldSize, FieldName(code,"fourier"));
+	    }
 	  sp2fc(vars[code].spectral,vars[code].fourier,globs->poli,
 		vars[code].plev,globs->Latitudes,globs->Fouriers,globs->Truncation);
 	}
@@ -2351,10 +2378,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
-	      streamWriteVar(globs->ostreamID,  vars[code].ovarID,  vars[code].fourier, 0);
-	    else
-	      Error("Code %d not available on fourier space!", code);
+	    if ( ! vars[code].fourier ) Error("Code %d not available on fourier space!", code);
+
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, 0);
+	      }	      
 	  }
 
       FreeFourier(vars);
@@ -2370,17 +2402,15 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    if ( vars[code].fourier )
+	    if ( ! vars[code].fourier ) Error("Code %d not available on zonal mean!", code);
+
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
 	      {
-		nlevel = zaxisInqSize(vars[code].ozaxisID);
-		for ( lindex = 0; lindex < nlevel; lindex++ )
-		  {
-		    offset = lindex*globs->DimFC;
-		    streamWriteVarSlice(globs->ostreamID, vars[code].ovarID, lindex, vars[code].fourier+offset, vars[code].nmiss);
-		  }
-	      }
-	    else
-	      Error("Code %d not available on zonal mean!", code);
+		offset = lindex*globs->DimFC;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].fourier+offset, vars[code].nmiss);
+	      }	      
 	  }
 
       FreeFourier(vars);
@@ -2416,7 +2446,13 @@ void after_processML(struct Control *globs, struct Variable *vars)
       for ( code = 0; code < MaxCodes; code++ )
 	if ( vars[code].selected )
 	  {
-	    streamWriteVar(globs->ostreamID, vars[code].ovarID, vars[code].grid, vars[code].nmiss);
+	    nlevel = zaxisInqSize(vars[code].ozaxisID);
+	    for ( lindex = 0; lindex < nlevel; lindex++ )
+	      {
+		offset = lindex*globs->DimGP;
+		streamDefRecord(globs->ostreamID, vars[code].ovarID, lindex);
+		streamWriteRecord(globs->ostreamID, vars[code].grid+offset, vars[code].nmiss);
+	      }
 	  }
 
       FreeSamp(vars);
