@@ -619,6 +619,7 @@ src/process.h -text
 src/pstream.c -text
 src/pstream.h -text
 src/pstream_int.h -text
+src/pstream_write.h -text
 src/pthread_debug.c -text
 src/pthread_debug.h -text
 src/readline.c -text
