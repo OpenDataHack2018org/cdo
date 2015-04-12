@@ -350,6 +350,9 @@ int after_setNextDate(struct Control *globs)
 	}
       if ( nrecs == 0 ) break;
 
+#if defined(CDO)
+      //      processDefTimesteps(globs->istreamID);
+#endif
       vdate = taxisInqVdate(globs->taxisID);
       vtime = taxisInqVtime(globs->taxisID);
 
@@ -2100,6 +2103,10 @@ void after_processing(struct Control *globs, struct Variable *vars)
 #else
   if ( globs->ostreamID2 != CDI_UNDEFID ) streamClose(globs->ostreamID2);
   if ( globs->ostreamID  != CDI_UNDEFID ) streamClose(globs->ostreamID);
+#endif
+#if defined(CDO)
+  processDefVarNum(vlistNvars(globs->ivlistID), globs->istreamID);
+  processAddNvals(streamNvals(globs->istreamID));
 #endif
   streamClose(globs->istreamID);
 
