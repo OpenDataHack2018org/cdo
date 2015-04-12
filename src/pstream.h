@@ -18,9 +18,10 @@
 #ifndef _PSTREAM_H
 #define _PSTREAM_H
 
+#include "pstream_write.h"
+
 #include <sys/types.h> /* off_t */
 
-#define  streamOpenWrite          pstreamOpenWrite
 #define  streamOpenRead           pstreamOpenRead
 #define  streamOpenAppend         pstreamOpenAppend
 #define  streamClose              pstreamClose
@@ -29,16 +30,11 @@
 #define  streamInqByteorder       pstreamInqByteorder
 
 #define  streamInqVlist           pstreamInqVlist
-#define  streamDefVlist           pstreamDefVlist
 
-#define  streamDefTimestep        pstreamDefTimestep
 #define  streamInqTimestep        pstreamInqTimestep
 
-#define  streamDefRecord          pstreamDefRecord
 #define  streamInqRecord          pstreamInqRecord
 
-#define  streamWriteRecord        pstreamWriteRecord
-#define  streamWriteRecordF       pstreamWriteRecordF
 #define  streamReadRecord         pstreamReadRecord
 
 #define  streamCopyRecord         pstreamCopyRecord
@@ -48,7 +44,6 @@
 #define  vlistCopyFlag            cdoVlistCopyFlag
 
 
-int     pstreamOpenWrite(const argument_t *argument, int filetype);
 int     pstreamOpenRead(const argument_t *argument);
 int     pstreamOpenAppend(const argument_t *argument);
 void    pstreamClose(int pstreamID);
@@ -56,24 +51,17 @@ void    pstreamClose(int pstreamID);
 int     pstreamInqFiletype(int pstreamID);
 int     pstreamInqByteorder(int pstreamID);
 
-void    pstreamDefVlist(int pstreamID, int vlistID);
 int     pstreamInqVlist(int pstreamID);
 
-void    pstreamDefTimestep(int pstreamID, int tsID);
 int     pstreamInqTimestep(int pstreamID, int tsID);
 
-void    pstreamDefRecord(int pstreamID, int  varID, int  levelID);
 int     pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
-void    pstreamWriteRecord(int pstreamID, double *data, int nmiss);
-void    pstreamWriteRecordF(int pstreamID, float *data, int nmiss);
 void    pstreamReadRecord(int pstreamID, double *data, int *nmiss);
 void    pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
 void    pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
 
 void    cdoVlistCopyFlag(int vlistID2, int vlistID1);
-
-
 
 #endif  /* _PSTREAM_H */

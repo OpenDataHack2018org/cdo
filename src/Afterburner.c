@@ -1,4 +1,4 @@
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
 
@@ -7,8 +7,7 @@
 #if defined(CDO)
 #include "cdo.h"
 #include "cdo_int.h"
-//#include "pstream.h"
-#include "util.h"
+#include "pstream_write.h"
 #endif
 
 #if defined(AFTERBURNER)
@@ -77,6 +76,8 @@ static char **ifiles;
 static char *ifile  = NULL;
 static char *ofile  = NULL;
 static char *ofile2 = NULL;
+
+static int ofileidx = 0;
 
 static int specGridID  = -1;
 static int gaussGridID = -1;
@@ -1942,8 +1943,12 @@ void after_processing(struct Control *globs, struct Variable *vars)
 {
   int i;
 
+  //#if defined(_PSTREAM_H)
+  //  globs->istreamID = streamOpenRead(cdoStreamName(0));
+  //#else
   globs->istreamID = streamOpenRead(ifile);
   if ( globs->istreamID < 0 ) cdiError(globs->istreamID, "Open failed on %s", ifile);
+  //#endif
 
   globs->ivlistID = streamInqVlist(globs->istreamID);
   globs->taxisID  = vlistInqTaxis(globs->ivlistID);
@@ -1951,8 +1956,12 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   if ( globs->Mean != 2 )
     {
-      globs->ostreamID  = streamOpenWrite(ofile,  ofiletype);
+#if defined(_PSTREAM_WRITE_H)
+      globs->ostreamID = streamOpenWrite(cdoStreamName(ofileidx), ofiletype);
+#else
+      globs->ostreamID = streamOpenWrite(ofile, ofiletype);
       if ( globs->ostreamID < 0 ) cdiError(globs->ostreamID, "Open failed on %s", ofile);
+#endif
 
       if ( globs->Szip ) streamDefCompType(globs->ostreamID, COMPRESS_SZIP);
 
@@ -2085,8 +2094,13 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   after_control(globs, vars);
 
+#if defined(_PSTREAM_WRITE_H)
+  if ( globs->ostreamID2 != CDI_UNDEFID ) pstreamClose(globs->ostreamID2);
+  if ( globs->ostreamID  != CDI_UNDEFID ) pstreamClose(globs->ostreamID);
+#else
   if ( globs->ostreamID2 != CDI_UNDEFID ) streamClose(globs->ostreamID2);
   if ( globs->ostreamID  != CDI_UNDEFID ) streamClose(globs->ostreamID);
+#endif
   streamClose(globs->istreamID);
 
   if ( globs->rcoslat )          free(globs->rcoslat);
@@ -2310,6 +2324,8 @@ void *Afterburner(void *argument)
 
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
+
+  ofileidx = nfiles;
 
   ifile = cdoStreamName(0)->args;
   ofile = cdoStreamName(nfiles)->args;

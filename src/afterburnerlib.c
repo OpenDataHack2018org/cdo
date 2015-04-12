@@ -3,6 +3,14 @@
 
 #include "cdi.h"
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#if defined(CDO)
+#include "cdo_int.h"
+#include "pstream_write.h"
+#endif
+#endif
+
 #include "error.h"
 #include "afterburner.h"
 #include "constants.h"

@@ -97,6 +97,7 @@ libcdo_la_SOURCES =            \
                process.h       \
                pstream.c       \
                pstream.h       \
+               pstream_write.h \
                pstream_int.h   \
                pthread_debug.c \
                pthread_debug.h \
