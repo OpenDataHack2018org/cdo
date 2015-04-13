@@ -389,7 +389,7 @@ void *Maggraph(void *argument);
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
 #define  SelectOperators        {"select", "delete"}
 #define  SelvarOperators        {"selparam", "selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
-                                 "selzaxis", "seltabnum", "delparam", "delcode", "delname", "selltype"}
+                                 "selzaxis", "selzaxisname", "seltabnum", "delparam", "delcode", "delname", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
@@ -830,7 +830,6 @@ static char *opalias[][2] =
   {"scatter",             "distgrid"   },
   {"showvar",             "showname"   },
   {"selgridname",         "selgrid"    },
-  {"selzaxisname",        "selzaxis"   },
   {"selvar",              "selname"    },
   {"setvar",              "setname"    },
   {"setpartabv",          "setpartabn" },

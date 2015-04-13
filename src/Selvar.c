@@ -59,6 +59,7 @@ void *Selvar(void *argument)
   char varname[CDI_MAX_NAME];
   char stdname[CDI_MAX_NAME];
   char gridname[CDI_MAX_NAME];
+  char zaxistypename[CDI_MAX_NAME];
   char zaxisname[CDI_MAX_NAME];
   char **argnames = NULL;
   int isel;
@@ -67,25 +68,30 @@ void *Selvar(void *argument)
   int gridsize;
   int nmiss;
   double *array = NULL;
-  int ltype;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
-  int SELPARAM     = cdoOperatorAdd("selparam",     0, 0, "parameters");
-  int SELCODE      = cdoOperatorAdd("selcode",      0, 0, "code numbers");
-  int SELNAME      = cdoOperatorAdd("selname",      0, 0, "variable names");
-  int SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 0, "standard names");
-  int SELLEVEL     = cdoOperatorAdd("sellevel",     0, 0, "levels");
-  int SELLEVIDX    = cdoOperatorAdd("sellevidx",    0, 0, "index of levels");
-  int SELGRID      = cdoOperatorAdd("selgrid",      0, 0, "list of grid names or numbers");
-  int SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 0, "list of zaxis names or numbers");
-  int SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 0, "table numbers");
-  int DELPARAM     = cdoOperatorAdd("delparam",     0, 0, "parameter");
-  int DELCODE      = cdoOperatorAdd("delcode",      0, 0, "code numbers");
-  int DELNAME      = cdoOperatorAdd("delname",      0, 0, "variable names");
-  int SELLTYPE     = cdoOperatorAdd("selltype",     0, 0, "GRIB level types"); 
+# define INVERTS_SELECTION(id) (cdoOperatorF2(id) & 1)
+# define TAKES_STRINGS(id) (cdoOperatorF2(id) & 2)
+# define TAKES_INTEGERS(id) (cdoOperatorF2(id) & 4)
+# define TAKES_FLOATS(id) (cdoOperatorF2(id) & 8)
+
+  int SELPARAM     = cdoOperatorAdd("selparam",     0, 2, "parameters");
+  int SELCODE      = cdoOperatorAdd("selcode",      0, 4, "code numbers");
+  int SELNAME      = cdoOperatorAdd("selname",      0, 2, "variable names");
+  int SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 2, "standard names");
+  int SELLEVEL     = cdoOperatorAdd("sellevel",     0, 8, "levels");
+  int SELLEVIDX    = cdoOperatorAdd("sellevidx",    0, 4, "index of levels");
+  int SELGRID      = cdoOperatorAdd("selgrid",      0, 4|2, "list of grid names or numbers");
+  int SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 4|2, "list of zaxis types or numbers");
+  int SELZAXISNAME = cdoOperatorAdd("selzaxisname", 0, 2, "list of zaxis names");
+  int SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 4, "table numbers");
+  int DELPARAM     = cdoOperatorAdd("delparam",     0, 2|1, "parameter");
+  int DELCODE      = cdoOperatorAdd("delcode",      0, 1, "code numbers");
+  int DELNAME      = cdoOperatorAdd("delname",      0, 2|1, "variable names");
+  int SELLTYPE     = cdoOperatorAdd("selltype",     0, 4, "GRIB level types"); 
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -93,11 +99,9 @@ void *Selvar(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  int intlist = FALSE;
-  int byname  = TRUE;
+  int args_are_numeric = operatorArgc() > 0 && isdigit(*operatorArgv()[0]);
 
-  if ( operatorID == SELPARAM || operatorID == DELPARAM || operatorID == SELNAME || operatorID == DELNAME || 
-       operatorID == SELSTDNAME || operatorID == SELGRID || operatorID == SELZAXIS )
+  if ( TAKES_STRINGS(operatorID) && !( TAKES_INTEGERS(operatorID) && args_are_numeric ) )
     {
       nsel     = operatorArgc();
       argnames = operatorArgv();
@@ -105,17 +109,8 @@ void *Selvar(void *argument)
       if ( cdoVerbose )
 	for ( i = 0; i < nsel; i++ )
 	  fprintf(stderr, "name %d = %s\n", i+1, argnames[i]);
-
-      if ( operatorID == SELGRID || operatorID == SELZAXIS )
-	{
-	  if ( nsel > 0 && isdigit(*argnames[0]) )
-	    {
-	      intlist = TRUE;
-	      byname  = FALSE;
-	    }
-	}
     }
-  else if ( operatorID == SELLEVEL )
+  else if ( TAKES_FLOATS(operatorID) )
     {
       nsel = args2fltlist(operatorArgc(), operatorArgv(), flist);
       fltarr = (double *) listArrayPtr(flist);
@@ -125,11 +120,6 @@ void *Selvar(void *argument)
 	  printf("flt %d = %g\n", i+1, fltarr[i]);
     }
   else
-    {
-      intlist = TRUE;
-    }
-
-  if ( intlist )
     {
       nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
       intarr = (int *) listArrayPtr(ilist);
@@ -168,7 +158,8 @@ void *Selvar(void *argument)
       zaxisidx = vlistZaxisIndex(vlistID1, zaxisID);
       nlevs    = zaxisInqSize(zaxisID);
       gridName(gridInqType(gridID), gridname);
-      zaxisName(zaxisInqType(zaxisID), zaxisname);
+      zaxisInqName(zaxisID, zaxisname);
+      zaxisName(zaxisInqType(zaxisID), zaxistypename);
 
       cdiParamToString(param, paramstr, sizeof(paramstr));
 
@@ -183,126 +174,74 @@ void *Selvar(void *argument)
 	    {
 	      if ( operatorID == SELCODE )
 		{
-		  if ( intarr[isel] == code )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = intarr[isel] == code;
 		}
 	      else if ( operatorID == SELPARAM )
 		{
-		  if ( strcmp(argnames[isel], paramstr) == 0 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = strcmp(argnames[isel], paramstr) == 0;
 		}
 	      else if ( operatorID == SELNAME )
 		{
-		  if ( wildcardmatch(argnames[isel], varname) == 0 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = wildcardmatch(argnames[isel], varname) == 0;
 		}
 	      else if ( operatorID == SELSTDNAME )
 		{
-		  if ( strcmp(argnames[isel], stdname) == 0 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = strcmp(argnames[isel], stdname) == 0;
 		}
 	      else if ( operatorID == SELLEVEL )
 		{
-		  if ( fabs(fltarr[isel] - level) < 0.0001 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = fabs(fltarr[isel] - level) < 0.0001;
 		}
 	      else if ( operatorID == SELLEVIDX )
 		{
-		  if ( intarr[isel] == (levID+1) )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = intarr[isel] == (levID+1);
 		}
-	      else if ( operatorID == SELGRID && byname == FALSE )
+	      else if ( operatorID == SELGRID && args_are_numeric )
 		{
-		  if ( intarr[isel] == (grididx+1) )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = intarr[isel] == (grididx+1);
 		}
-	      else if ( operatorID == SELGRID && byname == TRUE )
+	      else if ( operatorID == SELGRID && !args_are_numeric )
 		{
-		  if ( memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0;
 		}
-	      else if ( operatorID == SELZAXIS && byname == FALSE )
+	      else if ( operatorID == SELZAXIS && args_are_numeric )
 		{
-		  if ( intarr[isel] == (zaxisidx+1) )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = intarr[isel] == (zaxisidx+1);
 		}
-	      else if ( operatorID == SELZAXIS && byname == TRUE )
+	      else if ( operatorID == SELZAXIS && !args_are_numeric )
 		{
-		  if ( memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = memcmp(argnames[isel], zaxistypename, strlen(argnames[isel])) == 0;
+		}
+	      else if ( operatorID == SELZAXISNAME )
+		{
+		  selfound[isel] = memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0;
 		}
 	      else if ( operatorID == SELTABNUM )
 		{
-		  if ( intarr[isel] == tabnum )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = intarr[isel] == tabnum;
 		}
 	      else if ( operatorID == DELCODE )
 		{
-		  if ( intarr[isel] == code )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, FALSE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = intarr[isel] == code;
 		}
 	      else if ( operatorID == DELNAME )
 		{
-		  if ( wildcardmatch(argnames[isel], varname) == 0 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, FALSE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = wildcardmatch(argnames[isel], varname) == 0;
 		}
 	      else if ( operatorID == DELPARAM )
 		{
-		  if ( strcmp(argnames[isel], paramstr) == 0 )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, FALSE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = strcmp(argnames[isel], paramstr) == 0;
 		}
 	      else if ( operatorID == SELLTYPE )
 		{
-		  ltype = zaxis2ltype(zaxisID);
-
-		  if ( intarr[isel] == ltype )
-		    {
-		      vlistDefFlag(vlistID1, varID, levID, TRUE);
-		      selfound[isel] = TRUE;
-		    }
+		  selfound[isel] = intarr[isel] == zaxis2ltype(zaxisID);
 		}
+
+	      if ( selfound[isel] )
+	        {
+		  vlistDefFlag(vlistID1, varID, levID, !INVERTS_SELECTION(operatorID));
+	        }
+
 	    }
 	}
     }
@@ -347,19 +286,23 @@ void *Selvar(void *argument)
 	    {
 	      cdoWarning("Level index %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELGRID && byname == FALSE )
+	  else if ( operatorID == SELGRID && args_are_numeric )
 	    {
 	      cdoWarning("Grid %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELGRID && byname == TRUE )
+	  else if ( operatorID == SELGRID && !args_are_numeric )
 	    {
 	      cdoWarning("Grid name %s not found!", argnames[isel]);
 	    }
-	  else if ( operatorID == SELZAXIS && byname == FALSE )
+	  else if ( operatorID == SELZAXIS && args_are_numeric )
 	    {
 	      cdoWarning("Zaxis %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELZAXIS && byname == TRUE )
+	  else if ( operatorID == SELZAXIS && !args_are_numeric )
+	    {
+	      cdoWarning("Zaxis type %s not found!", argnames[isel]);
+	    }
+	  else if ( operatorID == SELZAXISNAME )
 	    {
 	      cdoWarning("Zaxis name %s not found!", argnames[isel]);
 	    }
