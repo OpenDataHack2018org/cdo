@@ -96,6 +96,7 @@ doc/tex/makepdfeca -text
 doc/tex/makerefcard -text
 doc/tex/missval.tex -text
 doc/tex/mod/Adisit -text
+doc/tex/mod/Afterburner -text
 doc/tex/mod/Arith -text
 doc/tex/mod/Arithc -text
 doc/tex/mod/Arithdays -text
