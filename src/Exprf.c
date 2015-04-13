@@ -43,13 +43,12 @@ Constansts: M_PI, M_E
 
 void *Expr(void *argument)
 {
-  int EXPR, EXPRF, AEXPR, AEXPRF;
   int operatorID;
   char *exprs = NULL;
   const char *exprf = NULL;
   int streamID1, streamID2 = CDI_UNDEFID;
   int offset;
-  int nrecs, nvars, nvars2;
+  int nrecs, nvars, nvars1, nvars2;
   int gridID, zaxisID;
   int tsID, recID, varID, levelID;
   int vlistID1, vlistID2;
@@ -69,18 +68,20 @@ void *Expr(void *argument)
   yylex_init(&scanner);
   yyset_extra(&parse_arg, scanner);
 
-  EXPR   = cdoOperatorAdd("expr",   0, 0, "expressions");
-  EXPRF  = cdoOperatorAdd("exprf",  0, 0, "expr script filename");
-  AEXPR  = cdoOperatorAdd("aexpr",  0, 0, "expressions");
-  AEXPRF = cdoOperatorAdd("aexprf", 0, 0, "expr script filename");
 
-  UNUSED(AEXPRF);
+# define REPLACES_VARIABLES(id) cdoOperatorF1(id)
+# define READS_COMMAND_LINE(id) cdoOperatorF2(id)
+
+  cdoOperatorAdd("expr",   1, 1, "expressions");
+  cdoOperatorAdd("exprf",  1, 0, "expr script filename");
+  cdoOperatorAdd("aexpr",  0, 1, "expressions");
+  cdoOperatorAdd("aexprf", 0, 0, "expr script filename");
 
   operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == EXPR || operatorID == AEXPR )
+  if ( READS_COMMAND_LINE(operatorID) )
     {
       size_t slen;
 
@@ -126,12 +127,18 @@ void *Expr(void *argument)
 
   vlistID1 = streamInqVlist(streamID1);
 
-  nvars = vlistNvars(vlistID1);
+  nvars1 = vlistNvars(vlistID1);
 
-  if ( operatorID == EXPR || operatorID == EXPRF )
-    vlistID2 = vlistCreate();
+  if ( REPLACES_VARIABLES(operatorID) )
+    {
+      vlistID2 = vlistCreate();
+      nvars = 0;
+    }
   else
-    vlistID2 = vlistDuplicate(vlistID1);
+    {
+      vlistID2 = vlistDuplicate(vlistID1);
+      nvars = nvars1;
+    }
 
   parse_arg.init = 1;
   parse_arg.vlistID1 = vlistID1;
@@ -142,8 +149,10 @@ void *Expr(void *argument)
   parse_arg.gridID2  = -1;
   parse_arg.zaxisID2 = -1;
   parse_arg.tsteptype2  = -1;
-  for ( varID = 0; varID < nvars; varID++ )
-    parse_arg.var_needed[varID] = FALSE;
+   
+  /* Set all input variables to 'needed' if replacing is switched off */
+  for ( varID = 0; varID < nvars1; varID++ )
+    parse_arg.var_needed[varID] = ! REPLACES_VARIABLES(operatorID);
 
   yy_scan_string(exprs, scanner);
   yyparse(&parse_arg, scanner);
@@ -156,7 +165,7 @@ void *Expr(void *argument)
   if ( cdoVerbose ) vlistPrint(vlistID2);
 
   if ( cdoVerbose )
-    for ( varID = 0; varID < nvars; varID++ )
+    for ( varID = 0; varID < nvars1; varID++ )
       if ( parse_arg.var_needed[varID] )
 	printf("Needed var: %d %s\n", varID, parse_arg.var[varID]);
 
@@ -168,10 +177,10 @@ void *Expr(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  parse_arg.vardata1 = (double**) malloc(nvars*sizeof(double*));
+  parse_arg.vardata1 = (double**) malloc(nvars1*sizeof(double*));
   parse_arg.vardata2 = (double**) malloc(nvars2*sizeof(double*));
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( varID = 0; varID < nvars1; varID++ )
     {
       gridID  = vlistInqVarGrid(vlistID1, varID);
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
@@ -185,7 +194,12 @@ void *Expr(void *argument)
 	parse_arg.vardata1[varID] = NULL;
     }
 
-  for ( varID = 0; varID < nvars2; varID++ )
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      parse_arg.vardata2[varID] = parse_arg.vardata1[varID];
+    }
+
+  for ( varID = nvars; varID < nvars2; varID++ )
     {
       gridID  = vlistInqVarGrid(vlistID2, varID);
       zaxisID = vlistInqVarZaxis(vlistID2, varID);
@@ -228,7 +242,7 @@ void *Expr(void *argument)
 	    }
 	}
 
-      for ( varID = 0; varID < nvars2; varID++ )
+      for ( varID = nvars; varID < nvars2; varID++ )
 	{
 	  gridID   = vlistInqVarGrid(vlistID2, varID);
 	  zaxisID  = vlistInqVarZaxis(vlistID2, varID);

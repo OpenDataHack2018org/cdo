@@ -999,13 +999,13 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 		printf("\tpop var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
 
 	      nvars = vlistNvars(parse_arg->vlistID2);
-	      for ( varID = 0; varID < nvars; varID++ )
+	      for ( varID = nvars-1; varID >= 0; varID-- )
 		{
 		  vlistInqVarName(parse_arg->vlistID2, varID, varname);
 		  if ( strcmp(varname, p->u.opr.op[0]->u.var.nm) == 0 ) break;
 		}
 
-	      if ( varID == nvars )
+	      if ( varID < 0 )
 		{
 		  cdoAbort("Variable >%s< not found!", p->u.opr.op[0]->u.var.nm);
 		}
