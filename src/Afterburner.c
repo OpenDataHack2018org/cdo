@@ -1207,17 +1207,26 @@ void after_parini(struct Control *globs, struct Variable *vars)
 {
   char namelist[65536];
 
-  if ( stdin_is_tty )
-    fprintf(stdout, "\nEnter namelist parameter:\n");
-
-  fseek(stdin, 0L, SEEK_END);
-  long length = ftell(stdin);
-  if (length == 0L)
+  if ( stdin_is_tty ) 
     {
-      fprintf(stderr,"\n stdin not connected\n");
-      after_usage();
+#if defined(CDO)
+      fprintf(stderr, "Default namelist: \n");
+      fprintf(stderr, "  TYPE = 0, CODE = -1, LEVEL = -1, MULTI = 0, DAYIN = 30, MEAN = 0, TIMESEL = -1, UNITSEL = 0\n");
+#endif
+      fprintf(stdout, "Enter namelist parameter:\n");
     }
-  fseek(stdin,0L,SEEK_SET);
+  else
+    {
+      fseek(stdin, 0L, SEEK_END);
+      long length = ftell(stdin);
+      if ( length == 0L )
+	{
+	  fprintf(stderr,"\n stdin not connected\n");
+	  after_usage();
+	}
+      fseek(stdin, 0L, SEEK_SET);
+    }
+
   int i = 1;
   namelist[0] = ' ';
   int c = getchar();
@@ -1233,11 +1242,11 @@ void after_parini(struct Control *globs, struct Variable *vars)
       c = getchar();
     }
   namelist[i] = 0;
+
   if ( globs->Debug )
     {
       lprintf(stderr);
-      fprintf(stderr,"  Length of namelist:%4d bytes\n",
-	      (int) strlen(namelist));
+      fprintf(stderr,"  Length of namelist:%4d bytes\n", (int) strlen(namelist));
 
       for (i = 0; i < (int)strlen(namelist); i += 60)
 	fprintf(stderr,"  namelist[%02d]=%-60.60s\n", i, namelist+i);
