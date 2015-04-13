@@ -67,6 +67,8 @@ int stdin_is_tty  = 0;  /* true if stdin  is character device */
 int stdout_is_tty = 0;  /* true if stdout is character device */
 #endif
 
+static int lstdout = 1;
+ 
 static int Source = 0;
 
 static int ofiletype = -1;
@@ -156,18 +158,21 @@ void after_PostProcess(struct Control *globs)
 {
   if ( globs->EndOfInterval )
     {
-      if      ( globs->OutputInterval == DAILY_INTERVAL )
-	fprintf(stdout, " Processed Day %2d  Month %2d  Year %04d",
-		globs->OldDate.dy, globs->OldDate.mo, globs->OldDate.yr);
-      else if ( globs->OutputInterval == MONTHLY_INTERVAL )
-	fprintf(stdout, " Processed Month %2d  Year %04d", globs->OldDate.mo, globs->OldDate.yr);
-      else if ( globs->OutputInterval == UNLIM_INTERVAL )
-	fprintf(stdout, " Processed range from %6.4d-%2.2d-%2.2d to %6.4d-%2.2d-%2.2d",
-		globs->StartDate.yr, globs->StartDate.mo, globs->StartDate.dy,
-		globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy);
+      if ( lstdout )
+	{
+	  if      ( globs->OutputInterval == DAILY_INTERVAL )
+	    fprintf(stdout, " Processed Day %2d  Month %2d  Year %04d",
+		    globs->OldDate.dy, globs->OldDate.mo, globs->OldDate.yr);
+	  else if ( globs->OutputInterval == MONTHLY_INTERVAL )
+	    fprintf(stdout, " Processed Month %2d  Year %04d", globs->OldDate.mo, globs->OldDate.yr);
+	  else if ( globs->OutputInterval == UNLIM_INTERVAL )
+	    fprintf(stdout, " Processed range from %6.4d-%2.2d-%2.2d to %6.4d-%2.2d-%2.2d",
+		    globs->StartDate.yr, globs->StartDate.mo, globs->StartDate.dy,
+		    globs->OldDate.yr, globs->OldDate.mo, globs->OldDate.dy);
 
-      if ( globs->Mean ) fprintf(stdout, "  (Mean of %3d Terms)\n", globs->MeanCount);
-      else               fprintf(stdout, "   Terms %3d\n", globs->MeanCount);
+	  if ( globs->Mean ) fprintf(stdout, "  (Mean of %3d Terms)\n", globs->MeanCount);
+	  else               fprintf(stdout, "   Terms %3d\n", globs->MeanCount);
+	}
 
       globs->EndOfInterval = FALSE;
       globs->MeanCount = 0;
@@ -342,7 +347,7 @@ int after_setNextDate(struct Control *globs)
       nrecs = streamInqTimestep(globs->istreamID, TsID);
       if ( nrecs == 0 && ( globs->Multi > 0 || globs->Nfiles > 0 ) )
 	{
-	  after_printProcessStatus(-1);
+	  if ( lstdout ) after_printProcessStatus(-1);
 
 	  after_SwitchFile(globs);
 	 
@@ -698,9 +703,9 @@ void after_control(struct Control *globs, struct Variable *vars)
 
       after_setEndOfInterval(globs, nrecs);
       
-      after_printProcessStatus(TsID);
+      if ( lstdout ) after_printProcessStatus(TsID);
 
-      if ( globs->EndOfInterval ) after_printProcessStatus(-1);
+      if ( lstdout && globs->EndOfInterval ) after_printProcessStatus(-1);
       
       if ( globs->Mean == 0 || globs->EndOfInterval ) after_defineNextTimestep(globs);
 
@@ -757,7 +762,7 @@ void after_setLevel(struct Control *globs)
     {
       if ( iVertID == -1 )
 	{
-	  fprintf(stdout," No level detected\n");
+	  if ( globs->Verbose ) fprintf(stdout," No level detected\n");
 	}
       else
 	{
@@ -2347,6 +2352,8 @@ int afterburner(int argc, char *argv[])
 void *Afterburner(void *argument)
 {
   cdoInitialize(argument);
+
+  lstdout = !cdoSilentMode;
 
   struct Control *globs = (struct Control *) malloc(sizeof(struct Control));
   after_control_init(globs);
