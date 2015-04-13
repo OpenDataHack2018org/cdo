@@ -31,6 +31,7 @@ test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 #
 let NTEST+=1
 rm -f $OFILE
+rm -f $CDOOUT $CDOERR
 ######################################################
 IFILE=$DATAPATH/gp2sp_ref
 RFILE=$DATAPATH/sp2gp_ref
@@ -53,6 +54,7 @@ test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 #
 let NTEST+=1
 rm -f $OFILE
+rm -f $CDOOUT $CDOERR
 ######################################################
 IFILE=$DATAPATH/t21_geosp_tsurf.grb
 RFILE=$DATAPATH/gp2spl_ref
@@ -74,6 +76,7 @@ test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 #
 let NTEST+=1
 rm -f $OFILE
+rm -f $CDOOUT $CDOERR
 ######################################################
 IFILE=$DATAPATH/gp2spl_ref
 RFILE=$DATAPATH/sp2gpl_ref
@@ -95,5 +98,6 @@ test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 #
 let NTEST+=1
 rm -f $OFILE
+rm -f $CDOOUT $CDOERR
 #
 exit 0

@@ -662,6 +662,7 @@ src/vct_l191.h -text
 src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text
+test/Afterburner.test.in -text
 test/Arith.test.in -text
 test/Cat.test.in -text
 test/Copy_netcdf.test.in -text

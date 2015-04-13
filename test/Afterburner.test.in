@@ -1,0 +1,36 @@
+#! @SHELL@
+echo 1..1 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+test -n "$DATAPATH" || DATAPATH=./data
+#
+CDOOUT=cout
+CDOERR=cerr
+FORMAT=""
+NTEST=1
+######################################################
+IFILE=$DATAPATH/gp2sp_ref
+RFILE=$DATAPATH/sp2gp_ref
+OFILE=sp2gp_res
+#
+RSTAT=0
+SELECT="TYPE=20 FORMAT=1"
+CDOTEST="$SELECT"
+CDOCOMMAND="$CDO $FORMAT after $IFILE $OFILE"
+echo "$CDOCOMMAND"
+echo $SELECT | $CDOCOMMAND
+test $? -eq 0 || let RSTAT+=1
+#
+$CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+test $? -eq 0 || let RSTAT+=1
+test -s $CDOOUT && let RSTAT+=1
+cat $CDOOUT $CDOERR
+#
+test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+#
+let NTEST+=1
+rm -f $OFILE
+rm -f $CDOOUT $CDOERR
+#
+exit 0
