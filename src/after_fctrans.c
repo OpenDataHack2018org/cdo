@@ -2102,20 +2102,17 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
   return 0;
 }
 
-
-
 /* ====================== */
 /* Fast Fourier Transform */
 /* ====================== */
-void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlon, long nlev, long nfc)
+void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, double *restrict gp, long nlat, long nlon, long nlev, long nfc)
 {
-  long lot, fou, ia, ifac, jump, k, la;
-  long lat, lev, lon, nfax, rix, wix;
-  double *wfc, *wgp, *wpt;
+  long fou, ia, ifac, k, la;
+  long lat, lev, lon, rix, wix;
+  double *wpt;
   long nx, nblox, nvex, nvex0, nb;
   long istart, i, j, ibase, jbase, jj, ii, ix;
   long *istartv;
-
 
   /* fc2gp performs fourier to gridpoint transforms using           */
   /* multiple fast fourier transform of length nlon                 */
@@ -2132,14 +2129,14 @@ void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlo
 
   if ( ifax[9] != nlon ) fprintf(stderr, "fc2gp: wrong initialization!\n");
 
-  nfax = ifax[0];
+  long nfax = ifax[0];
 
-  jump = (nlon + 2);
-  lot  = nlev * nlat;
+  long jump = (nlon + 2);
+  long lot  = nlev * nlat;
 
-  wfc = (double*) malloc(lot*jump*sizeof(double));
+  double *restrict wfc = (double*) malloc(lot*jump*sizeof(double));
 #if ! defined(_OPENMP)
-  wgp = (double*) malloc(lot*jump*sizeof(double));
+  double *restrict wgp = (double*) malloc(lot*jump*sizeof(double));
 #endif
 
   for ( lev = 0; lev < nlev; ++lev )
@@ -2149,12 +2146,10 @@ void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlo
 #endif
       for ( lat = 0; lat < nlat; ++lat )
 	{
-	  wix = jump * (lat + lev * nlat);
-	  rix = lat + lev * nlat * nfc;
-	  for ( fou = 0; fou < nfc; ++fou )
-	    wfc[wix + fou] = fc[rix + fou * nlat];
-	  for ( fou = nfc; fou < jump; ++fou )
-	    wfc[wix + fou] = 0.0;
+	  wix = jump * (lat + lev*nlat);
+	  rix = lat + lev*nlat*nfc;
+	  for ( fou = 0;   fou < nfc;  ++fou ) wfc[wix + fou] = fc[rix + fou*nlat];
+	  for ( fou = nfc; fou < jump; ++fou ) wfc[wix + fou] = 0.0;
 	  /*	  wfc[wix + 1] = 0.5 * wfc[wix]; */
 	}
     }
@@ -2176,12 +2171,12 @@ void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlo
     }
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(istart, nvex, ix, ii, jj, i, j, k, ia, la, ifac, ibase, jbase, wgp)
+#pragma omp parallel for default(shared) private(istart, nvex, ix, ii, jj, i, j, k, ia, la, ifac, ibase, jbase)
 #endif
   for ( nb = 0; nb < nblox; nb++ )
     {
 #if defined(_OPENMP)
-      wgp = (double*) malloc(lot*jump*sizeof(double));
+      double *restrict wgp = (double*) malloc(lot*jump*sizeof(double));
 #endif
       istart = istartv[nb];
       if ( nb == 0 ) nvex = nvex0;

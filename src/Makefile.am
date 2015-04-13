@@ -7,10 +7,18 @@ libcdo_la_SOURCES =            \
                cdo_vlist.c     \
                cdo_getopt.c    \
                cdo_getopt.h    \
+               cdo_history.c   \
                after_sptrans.c \
                after_fctrans.c \
+               after_dvtrans.c \
                after_vertint.c \
                after_vertint.h \
+               after_namelist.c\
+               afterburnerlib.c\
+               afterburner.h   \
+               vct_l191.h      \
+               constants.h     \
+               constants.c     \
                color.c         \
                color.h         \
                commandline.c   \
@@ -58,7 +66,6 @@ libcdo_la_SOURCES =            \
                griddes_nc.c    \
                hetaeta.c       \
                hetaeta.h       \
-               history.c       \
                institution.c   \
                interpol.c      \
                interpol.h      \
@@ -90,6 +97,7 @@ libcdo_la_SOURCES =            \
                process.h       \
                pstream.c       \
                pstream.h       \
+               pstream_write.h \
                pstream_int.h   \
                pthread_debug.c \
                pthread_debug.h \

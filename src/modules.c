@@ -547,7 +547,7 @@ static modules_t Modules[] =
                                                                type       in  out
   */
   { Adisit,         AdisitHelp,        AdisitOperators,        CDI_REAL,  1,  1 },
-  { Afterburner,    NULL,              AfterburnerOperators,   CDI_REAL, -1,  1 },
+  { Afterburner,    AfterburnerHelp,   AfterburnerOperators,   CDI_REAL, -1,  1 },
   { Arith,          ArithHelp,         ArithOperators,         CDI_REAL,  2,  1 },
   { Arithc,         ArithcHelp,        ArithcOperators,        CDI_REAL,  1,  1 },
   { Arithdays,      ArithdaysHelp,     ArithdaysOperators,     CDI_REAL,  1,  1 },

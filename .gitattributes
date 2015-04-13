@@ -96,6 +96,7 @@ doc/tex/makepdfeca -text
 doc/tex/makerefcard -text
 doc/tex/missval.tex -text
 doc/tex/mod/Adisit -text
+doc/tex/mod/Afterburner -text
 doc/tex/mod/Arith -text
 doc/tex/mod/Arithc -text
 doc/tex/mod/Arithdays -text
@@ -499,14 +500,19 @@ src/Ymonstat.c -text
 src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
+src/after_dvtrans.c -text
 src/after_fctrans.c -text
+src/after_namelist.c -text
 src/after_sptrans.c -text
 src/after_vertint.c -text
 src/after_vertint.h -text
+src/afterburner.h -text
+src/afterburnerlib.c -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
 src/cdo_getopt.h -text
+src/cdo_history.c -text
 src/cdo_int.h -text
 src/cdo_pthread.c -text
 src/cdo_vlist.c -text
@@ -534,6 +540,8 @@ src/commandline.c -text
 src/compare.h -text
 src/config.h.in -text
 src/const.h -text
+src/constants.c -text
+src/constants.h -text
 src/counter.h -text
 src/datetime.c -text
 src/datetime.h -text
@@ -577,7 +585,6 @@ src/griddes_nc.c -text
 src/gridreference.c -text
 src/hetaeta.c -text
 src/hetaeta.h -text
-src/history.c -text
 src/institution.c -text
 src/interpol.c -text
 src/interpol.h -text
@@ -613,6 +620,7 @@ src/process.h -text
 src/pstream.c -text
 src/pstream.h -text
 src/pstream_int.h -text
+src/pstream_write.h -text
 src/pthread_debug.c -text
 src/pthread_debug.h -text
 src/readline.c -text
@@ -651,9 +659,11 @@ src/timer.c -text
 src/userlog.c -text
 src/util.c -text
 src/util.h -text
+src/vct_l191.h -text
 src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text
+test/Afterburner.test.in -text
 test/Arith.test.in -text
 test/Cat.test.in -text
 test/Copy_netcdf.test.in -text

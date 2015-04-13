@@ -86,9 +86,9 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Gridarea.test.in $(srcdir)/Genweights.test.in \
 	$(srcdir)/Remap.test.in $(srcdir)/Select.test.in \
 	$(srcdir)/Spectral.test.in $(srcdir)/Timstat.test.in \
-	$(srcdir)/Vertint.test.in $(srcdir)/Detrend.test.in \
-	$(srcdir)/Arith.test.in $(srcdir)/Gradsdes.test.in \
-	$(srcdir)/wildcard.test.in README
+	$(srcdir)/Vertint.test.in $(srcdir)/Afterburner.test.in \
+	$(srcdir)/Detrend.test.in $(srcdir)/Arith.test.in \
+	$(srcdir)/Gradsdes.test.in $(srcdir)/wildcard.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -102,7 +102,8 @@ CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Cat.test Gridarea.test Genweights.test \
 	Remap.test Select.test Spectral.test Timstat.test Vertint.test \
-	Detrend.test Arith.test Gradsdes.test wildcard.test
+	Afterburner.test Detrend.test Arith.test Gradsdes.test \
+	wildcard.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -512,7 +513,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 
 # tests which should pass
 TESTS = File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test \
-        Genweights.test Remap.test Select.test Spectral.test Timstat.test Vertint.test Arith.test \
+        Genweights.test Remap.test Select.test Spectral.test Timstat.test Vertint.test Afterburner.test Arith.test \
         Gradsdes.test wildcard.test
 
 
@@ -585,6 +586,8 @@ Spectral.test: $(top_builddir)/config.status $(srcdir)/Spectral.test.in
 Timstat.test: $(top_builddir)/config.status $(srcdir)/Timstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Vertint.test: $(top_builddir)/config.status $(srcdir)/Vertint.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Afterburner.test: $(top_builddir)/config.status $(srcdir)/Afterburner.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Detrend.test: $(top_builddir)/config.status $(srcdir)/Detrend.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

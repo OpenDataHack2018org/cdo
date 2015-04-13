@@ -19,6 +19,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <float.h>
+#include "cdo_int.h"
 #include "dmemory.h"
 #include "list.h"
 
@@ -128,10 +129,9 @@ int get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
       if ( ! (isdigit(intstr[i]) || intstr[i] == '-') )
 	{
 	  if ( intstr[i] == '/' )
-	    ival = atoi(intstr+i+1);
+	    ival = parameter2intlist(intstr+i+1);
 	  else
-	    fprintf(stderr, "Syntax error in >%.*s<! Character %c not allowed.\n",
-		    iend, intstr, intstr[i]);
+	    fprintf(stderr, "Syntax error in >%.*s<! Character %c not allowed.\n", iend, intstr, intstr[i]);
 	  break;
 	}
     }
@@ -148,7 +148,7 @@ void split_intstring(const char *intstr, int *first, int *last, int *inc)
   int istrlen;
 
   istrlen = strlen(intstr);
-  *first = atoi(intstr);
+  *first = parameter2intlist(intstr);
   *last  = *first;
   *inc   = 1;
 
@@ -214,7 +214,7 @@ int args2fltlist(int argc, char **argv, LIST *list)
 	    tmp_val = -DBL_MAX;
 	  else  
 	  */                                    
-	    tmp_val = atof(argv[iarg]);
+	    tmp_val = parameter2double(argv[iarg]);
 
 	  listSetFlt(list, nint++, tmp_val);
 	}

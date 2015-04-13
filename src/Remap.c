@@ -779,6 +779,8 @@ void *Remap(void *argument)
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
     }
 
+  if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
+
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int filetype = streamInqFiletype(streamID1);
 

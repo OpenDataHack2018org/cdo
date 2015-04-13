@@ -1,0 +1,34 @@
+@BeginModule
+@NewPage
+@Name      = Afterburner
+@Title     = ECHAM standard post processor
+@Section   = Miscellaneous
+@Arguments = ifiles ofile
+@Operators = after
+@EndModule
+
+
+@BeginOperator_after
+@Title     = ECHAM standard post processor
+
+@BeginDescription
+The "afterburner" is the standard post processor for ECHAM data which provides the following operations:
+@BeginItemize
+@Item = Extract specified variables and levels
+@Item = Compute derived variables
+@Item = Transform spectral data to Gaussian grid representation
+@Item = Vertical interpolation to pressure levels or height
+@Item = Compute temporal means
+@EndItemize
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To interpolate ECHAM hybrid model level data to pressure levels of 925, 850, 500 and 200 hPa, use:
+@BeginVerbatim
+   cdo after ifile ofile << EON
+      TYPE=30  LEVEL=92500,85000,50000,20000
+   EON
+@EndVerbatim
+@EndExample

@@ -1,8 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
+#include "constants.h"
 
+void gaussaw(double *pa, double *pw, int nlat);
+
+static
 void jspleg1(double *pleg, double plat, int ktrunc, double *work)
 {
   /*
@@ -139,7 +144,7 @@ void jspleg1(double *pleg, double plat, int ktrunc, double *work)
 /* phcs - Compute values of Legendre polynomials */
 /*        and their meridional derivatives       */
 /* ============================================= */
-
+static
 void phcs(double *pnm, double *hnm, int waves, double pmu,
 	  double *ztemp1, double *ztemp2)
 {
@@ -255,6 +260,141 @@ void phcs(double *pnm, double *hnm, int waves, double pmu,
       pnm += waves;
       hnm += waves;
     }
+}
+
+
+void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
+		       double *restrict pol2, double *restrict pol3, double *restrict coslat)
+{
+  int jgl, jm, jn;
+  int jsp;
+  double gmusq;
+
+  int waves =  ntr + 1;
+  int dimsp = (ntr + 1) * (ntr + 2);
+
+  double *gmu = (double*) malloc(nlat * sizeof(double));
+  double *gwt = (double*) malloc(nlat * sizeof(double));
+
+  gaussaw(gmu, gwt, nlat);
+
+#if ! defined(_OPENMP)
+  double *pnm    = (double*) malloc(dimsp * sizeof(double));
+  double *hnm    = (double*) malloc(dimsp * sizeof(double));
+  double *ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
+  double *ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
+#endif
+
+#if defined(_OPENMP)
+#pragma omp parallel for default(shared) private(jm, jn, jsp, gmusq)
+#endif
+  for ( jgl = 0; jgl < nlat; jgl++ )
+    {
+#if defined(_OPENMP)
+      double *pnm    = (double*) malloc(dimsp * sizeof(double));
+      double *hnm    = (double*) malloc(dimsp * sizeof(double));
+      double *ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
+      double *ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
+#endif
+      gmusq = 1.0 - gmu[jgl]*gmu[jgl];
+      coslat[jgl] = sqrt(gmusq);
+
+      phcs(pnm, hnm, waves, gmu[jgl], ztemp1, ztemp2);
+
+      double zgwt = gwt[jgl];
+      double zrafgmusqr = 1./(PlanetRadius * gmusq);
+      double zradsqrtgmusqr = 1./(-PlanetRadius * sqrt(gmusq));
+
+      const int lpold = pold != NULL;
+      const int lpdev = pdev != NULL;
+      const int lpol2 = pol2 != NULL;
+      const int lpol3 = pol3 != NULL;
+
+      jsp = jgl;
+      for ( jm = 0; jm < waves; jm++ )
+	for ( jn = 0; jn < waves - jm; jn++ )
+	  {
+	               poli[jsp] = pnm[jm*waves+jn] * 2.0;
+	    if (lpold) pold[jsp] = pnm[jm*waves+jn] * zgwt;
+	    if (lpdev) pdev[jsp] = hnm[jm*waves+jn] * 2.0 * zradsqrtgmusqr;
+	    if (lpol2) pol2[jsp] = hnm[jm*waves+jn] * zgwt * zrafgmusqr;
+	    if (lpol3) pol3[jsp] = pnm[jm*waves+jn] * zgwt * jm * zrafgmusqr;
+	    jsp += nlat;
+	  }
+      
+#if defined(_OPENMP)
+      free(ztemp2);
+      free(ztemp1);
+      free(pnm);
+      free(hnm);
+#endif
+    }
+
+#if ! defined(_OPENMP)
+  free(ztemp2);
+  free(ztemp1);
+  free(pnm);
+  free(hnm);
+#endif
+  free(gwt);
+  free(gmu);
+}
+
+
+void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat)
+{
+  int jgl, jm, jn, is;
+  int isp, latn, lats;
+
+  int waves  =  ntr + 1;
+  int dimpnm = (ntr + 1)*(ntr + 4)/2;
+
+  double *gmu  = (double*) malloc(nlat * sizeof(double));
+  double *gwt  = (double*) malloc(nlat * sizeof(double));
+  double *pnm  = (double*) malloc(dimpnm * sizeof(double));
+  double *work = (double*) malloc(3*waves * sizeof(double));
+
+  gaussaw(gmu, gwt, nlat);
+  for ( jgl = 0; jgl < nlat; ++jgl ) gwt[jgl] *= 0.5;
+
+  for ( jgl = 0; jgl < nlat; ++jgl )
+    coslat[jgl] = sqrt(1.0 - gmu[jgl]*gmu[jgl]);
+
+  for ( jgl = 0; jgl < nlat/2; jgl++ )
+    {
+      double zgwt = gwt[jgl];
+
+      jspleg1(pnm, gmu[jgl], ntr, work);
+
+      latn = jgl;
+      isp = 0;
+      for ( jm = 0; jm < waves; jm++ )
+	{
+#if defined(SX)
+#pragma vdir nodep
+#endif
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
+	  for ( jn = 0; jn < waves - jm; jn++ )
+	    {
+	      is = (jn+1)%2 * 2 - 1;
+	      lats = latn - jgl + nlat - jgl - 1;
+	      poli[latn] = pnm[isp];
+	      pold[latn] = pnm[isp] * zgwt;
+	      poli[lats] = pnm[isp] * is;
+	      pold[lats] = pnm[isp] * zgwt * is;
+	      latn += nlat;
+	      isp++;
+	    }
+	  isp++;
+	}
+    }
+
+  free(work);
+  free(pnm);
+  free(gwt);
+  free(gmu);
 }
 
 
