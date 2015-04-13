@@ -77,6 +77,7 @@ Operator catalog:
    Selvar        sellevidx       Select levels by index
    Selvar        selgrid         Select grids
    Selvar        selzaxis        Select z-axes
+   Selvar        selzaxisname    Select z-axes by name
    Selvar        selltype        Select GRIB level types
    Selvar        seltabnum       Select parameter table numbers
    Seltime       seltimestep     Select timesteps
