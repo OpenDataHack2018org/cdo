@@ -166,6 +166,8 @@ Operator catalog:
 -------------------------------------------------------------
    Exprf         expr            Evaluate expressions
    Exprf         exprf           Evaluate expressions from script file
+   Exprf         aexpr           Evaluate expressions and append results
+   Exprf         aexprf          Evaluate expression script and append results
    Math          abs             Absolute value
    Math          int             Integer value
    Math          nint            Nearest integer value

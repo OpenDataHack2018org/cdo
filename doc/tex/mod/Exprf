@@ -13,7 +13,7 @@ Constansts: M_PI, M_E
 @Section   = Arithmetic
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = expr exprf
+@Operators = expr exprf aexpr aexprf
 
 @BeginDescription
 This module arithmetically processes every timestep of the input dataset.
@@ -100,9 +100,29 @@ Contrary to @oper{expr} the processing instructions are read from a file.
 @EndOperator
 
 
+@BeginOperator_aexpr
+@Title     = Evaluate expressions and append results
+@Parameter = instr
+
+@BeginDescription
+Same as @oper{expr}, but keep input variables and append results
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_aexprf
+@Title     = Evaluate expression script and append results
+@Parameter = filename
+
+@BeginDescription
+Same as @oper{exprf}, but keep input variables and append results
+@EndDescription
+@EndOperator
+
+
 @BeginParameter
 @Item = instr
-STRING  Processing instructions (without spaces!)
+STRING  Processing instructions (need to be 'quoted' in most cases)
 @Item = filename
 STRING  File with processing instructions
 @EndParameter
