@@ -35,7 +35,9 @@
 #define CLOCKS_PER_SEC 1000000
 #endif
 
+#if defined(AFTERBURNER)
 static double starttime = 0.0;
+#endif
 
 void afterInqHistory(int fileID);
 void afterDefHistory(int fileID, char *histstring);
@@ -75,7 +77,9 @@ static char *filename;
 static char **ifiles;
 static char *ifile  = NULL;
 static char *ofile  = NULL;
+#if defined(AFTERBURNER)
 static char *ofile2 = NULL;
+#endif
 
 static int ofileidx = 0;
 
@@ -487,6 +491,7 @@ void after_defineNextTimestep(struct Control *globs)
       streamDefTimestep(globs->ostreamID,  otsID);
     }
 
+#if defined(AFTERBURNER)
   if ( globs->Mean >= 2 )
     {
       if ( otsID == 0 )
@@ -497,6 +502,7 @@ void after_defineNextTimestep(struct Control *globs)
       taxisDefNumavg(globs->taxisID2, globs->MeanCount+1);
       streamDefTimestep(globs->ostreamID2, otsID);
     }
+#endif
 
   otsID++;
 }
@@ -1100,31 +1106,36 @@ void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, 
     {
       fprintf(stdout, "  Table Code Name              Longname\n");
       fprintf(stdout, "  ----- ---- ----              --------\n");
-  
-      for ( code = 0; code < maxCodes; code++ )
-	if ( vars[code].selected )
+    }
+
+  for ( code = 0; code < maxCodes; code++ )
+    if ( vars[code].selected )
+      {
+	table    = 0;
+	name     = NULL;
+	longname = NULL;
+	varID    = vars[code].ivarID;
+
+	if ( varID == CDI_UNDEFID )
 	  {
-	    table    = 0;
-	    name     = NULL;
-	    longname = NULL;
-	    varID    = vars[code].ivarID;
-	    if ( varID == CDI_UNDEFID )
-	      {
-		modelID  = vlistInqVarModel(globs->ivlistID, 0);
-		table    = 128;
-		tableID  = tableInq(modelID, table, NULL);
-		vars[code].tableID = tableID;
-	      }
-	    else
-	      {
-		tableID  = vlistInqVarTable(globs->ivlistID, varID);
-		table    = tableInqNum(tableID);
-		name     = vlistInqVarNamePtr(globs->ivlistID, varID);
-		longname = vlistInqVarLongnamePtr(globs->ivlistID, varID);
-	      }
-	    if ( name     == NULL )     name = tableInqParNamePtr(tableID, code);
-	    if ( longname == NULL ) longname = tableInqParLongnamePtr(tableID, code);
-	    
+	    modelID  = vlistInqVarModel(globs->ivlistID, 0);
+	    table    = 128;
+	    tableID  = tableInq(modelID, table, NULL);
+
+	    vars[code].tableID = tableID;
+	  }
+	else
+	  {
+	    tableID  = vlistInqVarTable(globs->ivlistID, varID);
+	    table    = tableInqNum(tableID);
+	    name     = vlistInqVarNamePtr(globs->ivlistID, varID);
+	    longname = vlistInqVarLongnamePtr(globs->ivlistID, varID);
+	  }
+	if ( name     == NULL )     name = (char*) tableInqParNamePtr(tableID, code);
+	if ( longname == NULL ) longname = (char*) tableInqParLongnamePtr(tableID, code);
+	
+	if ( globs->Verbose )
+	  {
 	    fprintf(stdout, " %5d", table);
 	    fprintf(stdout, " %4d", code);
 	    if ( name == NULL )
@@ -1132,12 +1143,12 @@ void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, 
 	    else
 	      {
 		fprintf(stdout, "  %-16s", name);
-		if ( longname != NULL )
-		  fprintf(stdout, "  %s", longname);
+	    if ( longname != NULL )
+	      fprintf(stdout, "  %s", longname);
 	      }
 	    fprintf(stdout, "\n");
 	  }
-    }
+      }
 }
 
 static
@@ -1239,20 +1250,30 @@ void after_parini(struct Control *globs, struct Variable *vars)
   globs->Mean           = scan_par(globs->Verbose, namelist, "mean",  0);
   globs->OutputInterval = scan_par(globs->Verbose, namelist, "interval", MONTHLY_INTERVAL);
 
-  int fileFormat     = scan_par(globs->Verbose, namelist, "format", 0);
-  int gribFormat     = scan_par_obsolate(namelist, "grib",   0);
-  int cdfFormat      = scan_par_obsolate(namelist, "netcdf", 0);
+#if defined(CDO)
+  if ( globs->Mean >= 2 )
+    cdoAbort("Namelist parameter MEAN=%d out of bounds (0:1)", globs->Mean);
+#endif
+
+  int fileFormat = scan_par(globs->Verbose, namelist, "format", -1);
+  int gribFormat = scan_par_obsolate(namelist, "grib",   0);
+  int cdfFormat  = scan_par_obsolate(namelist, "netcdf", 0);
 
   if ( gribFormat && cdfFormat ) Error( "GRIB or netCDF?");
 
   switch ( fileFormat )
     {
-    case 0: ofiletype = FILETYPE_SRV;  break;
-    case 1: ofiletype = FILETYPE_GRB;  break;
-    case 2: ofiletype = FILETYPE_NC;   break;
-    case 3: ofiletype = FILETYPE_EXT;  break;
-    case 4: ofiletype = FILETYPE_NC2;  break;
-    case 6: ofiletype = FILETYPE_NC4;  break;
+#if defined(CDO)
+    case -1: ofiletype = -1;            break;
+#else
+    case -1: ofiletype = FILETYPE_SRV;  break;
+#endif
+    case  0: ofiletype = FILETYPE_SRV;  break;
+    case  1: ofiletype = FILETYPE_GRB;  break;
+    case  2: ofiletype = FILETYPE_NC;   break;
+    case  3: ofiletype = FILETYPE_EXT;  break;
+    case  4: ofiletype = FILETYPE_NC2;  break;
+    case  6: ofiletype = FILETYPE_NC4;  break;
     default: Error( "unknown file format %d", fileFormat);
     }
 
@@ -1728,6 +1749,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	}
 }
 
+#if defined(AFTERBURNER)
 static
 void after_readVct(struct Control *globs, const char *vctfile)
 {
@@ -1755,7 +1777,9 @@ void after_readVct(struct Control *globs, const char *vctfile)
 
   fclose(fp);
 }
+#endif
 
+#if defined(AFTERBURNER)
 static
 void after_version(void)
 {
@@ -1782,6 +1806,7 @@ void after_version(void)
   cdiPrintVersion();
   fprintf(stderr, "\n");
 }
+#endif
 
 static
 void after_control_init(struct Control *globs)
@@ -1820,14 +1845,13 @@ void after_variable_init(struct Variable *vars)
   vars->tableID  = -1;
 }
 
+#if defined(AFTERBURNER)
 static
 void after_printCodes(void)
 {
-  int code, i;
   int tableID = tableInq(-1, 128, "echam4");
   int ncodes;
   int codes[] = {34,35,36,131,132,135,148,149,151,156,157,259,260,261,262,263,264,268,269,270,271,275};
-  char *name, *longname;
 
   ncodes = sizeof(codes)/sizeof(codes[0]);
 
@@ -1836,11 +1860,11 @@ void after_printCodes(void)
   fprintf(stdout, "  Code Name              Longname\n");
   fprintf(stdout, "  ---- ----              --------\n");
 
-  for ( i = 0; i < ncodes; i++ )
+  for ( int i = 0; i < ncodes; i++ )
     {
-      code     = codes[i];
-      name     = tableInqParNamePtr(tableID, code);
-      longname = tableInqParLongnamePtr(tableID, code);
+      int code     = codes[i];
+      const char *name     = tableInqParNamePtr(tableID, code);
+      const char *longname = tableInqParLongnamePtr(tableID, code);
 
       fprintf(stdout, " %4d", code);
       if ( name == NULL )
@@ -1856,11 +1880,13 @@ void after_printCodes(void)
 
   lprintf(stdout);
 }
+#endif
 
 /* =============================================== */
 /* procstat   - appends info about memory usage    */
 /*              and time consumption               */
 /* =============================================== */
+#if defined(AFTERBURNER)
 static
 void after_procstat(char *procpath, int truncation)
 {
@@ -1940,6 +1966,7 @@ void after_procstat(char *procpath, int truncation)
   else
     fprintf(stdout, " ----------------\n");
 }
+#endif
 
 static
 void after_processing(struct Control *globs, struct Variable *vars)
@@ -1952,6 +1979,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
   globs->istreamID = streamOpenRead(ifile);
   if ( globs->istreamID < 0 ) cdiError(globs->istreamID, "Open failed on %s", ifile);
   //#endif
+  if ( ofiletype == -1 ) ofiletype = streamInqFiletype(globs->istreamID);
 
   globs->ivlistID = streamInqVlist(globs->istreamID);
   globs->taxisID  = vlistInqTaxis(globs->ivlistID);
@@ -1970,6 +1998,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
       globs->ovlistID = vlistCreate();
     }
+#if defined(AFTERBURNER)
   if ( globs->Mean >= 2 )
     {
       globs->ostreamID2 = streamOpenWrite(ofile2, ofiletype);
@@ -1979,6 +2008,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
       globs->ovlistID2 = vlistCreate();
     }
+#endif
 
   /* ---------------- */
   /*  pre-processing  */
@@ -2098,7 +2128,6 @@ void after_processing(struct Control *globs, struct Variable *vars)
   after_control(globs, vars);
 
 #if defined(_PSTREAM_WRITE_H)
-  if ( globs->ostreamID2 != CDI_UNDEFID ) pstreamClose(globs->ostreamID2);
   if ( globs->ostreamID  != CDI_UNDEFID ) pstreamClose(globs->ostreamID);
 #else
   if ( globs->ostreamID2 != CDI_UNDEFID ) streamClose(globs->ostreamID2);
@@ -2125,6 +2154,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 extern char *optarg;
 extern int optind, opterr, optopt;
 
+#if defined(AFTERBURNER)
 static
 int afterburner(int argc, char *argv[])
 {
@@ -2311,6 +2341,7 @@ int afterburner(int argc, char *argv[])
 
   return(0);
 }
+#endif
 
 #if defined(CDO)
 void *Afterburner(void *argument)
