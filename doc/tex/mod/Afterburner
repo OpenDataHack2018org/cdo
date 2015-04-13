@@ -20,6 +20,37 @@ The "afterburner" is the standard post processor for ECHAM data which provides t
 @Item = Vertical interpolation to pressure levels or height
 @Item = Compute temporal means
 @EndItemize
+This operator reads selection parameters as namelist from stdin.
+Use the UNIX redirection "< namelistfile" to read the namelist from file.
+
+Namelist parameter and there defaults:
+@BeginListing
+  TYPE=0, CODE=-1, LEVEL=-1, MEAN=0, INTERVAL=0, TIMESEL=-1, UNITSEL=0, EXTRAPOLATE=0
+@EndListing
+
+TYPE controls the transformation and vertical interpolation. Transforming spectral data to Gaussian grid representation
+and vertical interpolation to pressure levels or height are performed in a chain of steps. The TYPE parameter may be used 
+to stop the chain at a certain step. Valid values are:
+
+@BeginListing
+  TYPE  =  0 : Hybrid             level spectral coefficients
+  TYPE  = 10 : Hybrid             level fourier  coefficients
+  TYPE  = 11 : Hybrid             level zonal mean sections
+  TYPE  = 20 : Hybrid             level gauss grids
+  TYPE  = 30 : Pressure or Height level gauss grids
+  TYPE  = 40 : Pressure or Height level fourier  coefficients
+  TYPE  = 41 : Pressure or Height level zonal mean sections
+  TYPE  = 50 : Pressure or Height level spectral coefficients
+  TYPE  = 60 : Pressure or Height level fourier  coefficients
+  TYPE  = 61 : Pressure or Height level zonal mean sections
+  TYPE  = 70 : Pressure or Height level gauss grids
+@EndListing
+
+
+Vorticity, divergence, streamfunction and velocity potential need special treatment in the vertical transformation.
+They are not available as types 30, 40 and 41. If you select one of these combinations, type is automatically
+switched to the equivalent types 70, 60 and 61. The type of all other variables will be switched too, because 
+the type is a global parameter.
 @EndDescription
 @EndOperator
 
