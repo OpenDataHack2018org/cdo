@@ -483,6 +483,7 @@ Operator catalog:
    Miscellaneous
 -------------------------------------------------------------
    Gradsdes      gradsdes        GrADS data descriptor file
+   Afterburner   after           ECHAM standard post processor
    Filter        bandpass        Bandpass filtering
    Filter        lowpass         Lowpass filtering
    Filter        highpass        Highpass filtering

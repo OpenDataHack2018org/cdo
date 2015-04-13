@@ -4021,6 +4021,24 @@ static char *GradsdesHelp[] = {
     NULL
 };
 
+static char *AfterburnerHelp[] = {
+    "NAME",
+    "    after - ECHAM standard post processor",
+    "",
+    "SYNOPSIS",
+    "    after  ifiles ofile",
+    "",
+    "DESCRIPTION",
+    "    The \"afterburner\" is the standard post processor for ECHAM data which provides the following operations:",
+    "    - Extract specified variables and levels",
+    "    - Compute derived variables",
+    "    - Transform spectral data to Gaussian grid representation",
+    "    - Vertical interpolation to pressure levels or height",
+    "    - Compute temporal means",
+    "    - Write data in GRIB, NetCDF, SERVICE or EXTRA format",
+    NULL
+};
+
 static char *FilterHelp[] = {
     "NAME",
     "    bandpass, lowpass, highpass - Time series filtering",
