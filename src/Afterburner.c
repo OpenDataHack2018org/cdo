@@ -770,7 +770,7 @@ void after_setLevel(struct Control *globs)
 	    {
 	      if ( globs->unitsel == 0 )
 		{
-		  fprintf(stdout," Default pressure level selected:\n");
+		  if ( globs->Verbose ) fprintf(stdout," Default pressure level selected:\n");
 		  globs->NumLevelRequest = numplevelDefault;
 		  for ( l = 0; l < globs->NumLevelRequest; l++ ) globs->LevelRequest[l] = plevelDefault[l];
 		  oVertID = zaxisCreate(ZAXIS_PRESSURE, globs->NumLevelRequest);
@@ -778,7 +778,7 @@ void after_setLevel(struct Control *globs)
 		}
 	      else
 		{
-		  fprintf(stdout," Default height level selected:\n");
+		  if ( globs->Verbose ) fprintf(stdout," Default height level selected:\n");
 		  globs->NumLevelRequest = numhlevelDefault;
 		  for ( l = 0; l < globs->NumLevelRequest; l++ ) globs->LevelRequest[l] = hlevelDefault[l];
 		  oVertID = zaxisCreate(ZAXIS_HEIGHT, globs->NumLevelRequest);
