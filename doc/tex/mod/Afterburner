@@ -12,48 +12,101 @@
 @Title     = ECHAM standard post processor
 
 @BeginDescription
-The "afterburner" is the standard post processor for ECHAM data which provides the following operations:
+The "afterburner" is the standard post processor for @cite{ECHAM} data which provides the following operations:
+
 @BeginItemize
 @Item = Extract specified variables and levels
 @Item = Compute derived variables
 @Item = Transform spectral data to Gaussian grid representation
-@Item = Vertical interpolation to pressure levels or height
+@Item = Vertical interpolation to pressure levels
 @Item = Compute temporal means
 @EndItemize
-This operator reads selection parameters as namelist from stdin.
-Use the UNIX redirection "< namelistfile" to read the namelist from file.
 
+This operator reads selection parameters as namelist from stdin.
+Use the UNIX redirection "<namelistfile" to read the namelist from file.
+@EndDescription
+@EndOperator
+
+@BeginNamelist
 Namelist parameter and there defaults:
 @BeginListing
-  TYPE=0, CODE=-1, LEVEL=-1, MEAN=0, INTERVAL=0, TIMESEL=-1, UNITSEL=0, EXTRAPOLATE=0
+  TYPE=0, CODE=-1, LEVEL=-1, INTERVAL=0, MEAN=0, EXTRAPOLATE=0
 @EndListing
 
-TYPE controls the transformation and vertical interpolation. Transforming spectral data to Gaussian grid representation
-and vertical interpolation to pressure levels or height are performed in a chain of steps. The TYPE parameter may be used 
-to stop the chain at a certain step. Valid values are:
+@boldtt{TYPE} controls the transformation and vertical interpolation. Transforming spectral data to Gaussian grid
+representation and vertical interpolation to pressure levels are performed in a chain of steps.
+The @boldtt{TYPE} parameter may be used to stop the chain at a certain step. Valid values are:
 
 @BeginListing
-  TYPE  =  0 : Hybrid             level spectral coefficients
-  TYPE  = 10 : Hybrid             level fourier  coefficients
-  TYPE  = 11 : Hybrid             level zonal mean sections
-  TYPE  = 20 : Hybrid             level gauss grids
-  TYPE  = 30 : Pressure or Height level gauss grids
-  TYPE  = 40 : Pressure or Height level fourier  coefficients
-  TYPE  = 41 : Pressure or Height level zonal mean sections
-  TYPE  = 50 : Pressure or Height level spectral coefficients
-  TYPE  = 60 : Pressure or Height level fourier  coefficients
-  TYPE  = 61 : Pressure or Height level zonal mean sections
-  TYPE  = 70 : Pressure or Height level gauss grids
+  TYPE  =  0 : Hybrid   level spectral coefficients
+  TYPE  = 10 : Hybrid   level fourier  coefficients
+  TYPE  = 11 : Hybrid   level zonal mean sections
+  TYPE  = 20 : Hybrid   level gauss grids
+  TYPE  = 30 : Pressure level gauss grids
+  TYPE  = 40 : Pressure level fourier  coefficients
+  TYPE  = 41 : Pressure level zonal mean sections
+  TYPE  = 50 : Pressure level spectral coefficients
+  TYPE  = 60 : Pressure level fourier  coefficients
+  TYPE  = 61 : Pressure level zonal mean sections
+  TYPE  = 70 : Pressure level gauss grids
 @EndListing
-
 
 Vorticity, divergence, streamfunction and velocity potential need special treatment in the vertical transformation.
 They are not available as types 30, 40 and 41. If you select one of these combinations, type is automatically
 switched to the equivalent types 70, 60 and 61. The type of all other variables will be switched too, because 
 the type is a global parameter.
-@EndDescription
-@EndOperator
 
+@boldtt{CODE} selects the variables by the ECHAM GRIB1 code number (1-255). The default value @boldtt{-1} processes all detected codes.
+Derived variables computed by the afterburner:
+
+@BeginTable5
+@bold{Code}  & @bold{Name}      & @bold{Longname}                       & @bold{Level}       & @bold{Needed Codes/Computation}
+ 34   & low_cld   & low cloud                      & single      & 223 on modellevel  
+ 35   & mid_cld   & mid cloud                      & single      & 223 on modellevel  
+ 36   & hih_cld   & high cloud                     & single      & 223 on modellevel  
+ 131  & u         & u-velocity                     & atm (ml+pl) & 138, 155           
+ 132  & v         & v-velocity                     & atm (ml+pl) & 138, 155           
+ 135  & omega     & vertical velocity              & atm (ml+pl) & 138, 152, 155      
+ 148  & stream    & streamfunction                 & atm (ml+pl) & 131, 132           
+ 149  & velopot   & velocity potential             & atm (ml+pl) & 131, 132           
+ 151  & slp       & mean sea level pressure        & surface     & 129, 130, 152       
+ 156  & geopoth   & geopotential height            & atm (ml+pl) & 129, 130, 133, 152 
+ 157  & rhumidity & relative humidity              & atm (ml+pl) & 130, 133, 152      
+ 189  & sclfs     & surface solar cloud forcing    & surface     & 176-185            
+ 190  & tclfs     & surface thermal cloud forcing  & surface     & 177-186            
+ 191  & sclf0     & top solar cloud forcing        & surface     & 178-187             
+ 192  & tclf0     & top thermal cloud forcing      & surface     & 179-188            
+ 259  & windspeed & windspeed                      & atm (ml+pl) & sqrt(u*u+v*v)      
+ 260  & precip    & total precipitation            & surface     & 142+143            
+@EndTable
+
+@boldtt{LEVEL} selects the hybrid or pressure levels. The allowed values depends on the parameter @boldtt{TYPE}.
+The default value @boldtt{-1} processes all detected levels.
+
+@boldtt{INTERVAL} selects the processing interval. The default value @boldtt{0} process data on monthly intervals.
+@boldtt{INTERVAL=1} sets the interval to daily.
+
+@boldtt{MEAN=1} compute and write monthly or daily mean fields. The default value @boldtt{0} writes out all timesteps.
+
+@boldtt{EXTRAPOLATE=0} switch of the extrapolation of missing values during the interpolation from model to pressure
+level (only available with @boldtt{MEAN=0} and @boldtt{TYPE=30}). The default value @boldtt{1} extrapolate missing values.
+
+Possible combinations of TYPE, CODE and MEAN:
+
+@BeginTable
+      @bold{TYPE}   & @bold{CODE}                    & @bold{MEAN}
+    0/10/11  & 130  temperature        &  0
+    0/10/11  & 131  u-velocity         &  0
+    0/10/11  & 132  v-velocity         &  0
+    0/10/11  & 133  specific humidity  &  0
+    0/10/11  & 138  vorticity          &  0
+    0/10/11  & 148  streamfunction     &  0
+    0/10/11  & 149  velocity potential &  0
+    0/10/11  & 152  LnPs               &  0
+    0/10/11  & 155  divergence         &  0
+     >11     & all codes               &  0/1
+@EndTable
+@EndNamelist
 
 @BeginExample
 To interpolate ECHAM hybrid model level data to pressure levels of 925, 850, 500 and 200 hPa, use:

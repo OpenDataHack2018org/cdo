@@ -532,9 +532,7 @@ while (<MOFILE>) {
 
     print TRFILE "\n\\subsection*{Description}\n\n";
     if ( $#moddeslines >= 0 ) {
-      print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
-      print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+      begin_minipage();
     }
 
     # Add list of variables created by this operator. This can only be done for eca_* operators
@@ -551,8 +549,7 @@ while (<MOFILE>) {
     print_description(@moddeslines);
 
     if ( $#moddeslines >= 0 ) {
-      print TRFILE "\\end{minipage}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+      end_minipage();
     }
 
     if ( $#hkeys > 0 ) {
@@ -561,9 +558,7 @@ while (<MOFILE>) {
       print TRFILE "\n\\subsection*{Operators}\n\n";
     }
     else {
-      print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
-      print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+      begin_minipage();
     }
 
     $opercnt = 0;
@@ -722,10 +717,40 @@ while (<MOFILE>) {
       print TRFILE "\\end{defalist2}\n";
     }
     else {
-      print TRFILE "\\end{minipage}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+      end_minipage();
     }
 
+#   Namelist
+    
+    undef @deslines;
+    $lblock = 0;
+    foreach $tag (@doclines) {
+      ($kword) = split(" ", $tag);
+      $kword = uc($kword);
+      if ( $lblock == 0 ) {
+        if ( "$kword" eq "\@BEGINNAMELIST" ) {
+          $lblock = 1;
+          next;
+        }
+      }
+      if ( $lblock == 1 ) {
+        if ( "$kword" eq "\@ENDNAMELIST" ) { last; }
+        push(@deslines, $tag);
+      }
+    }
+    
+    if ( $lblock == 1 ) {
+      print HELPFILE "    \"\",\n";
+      print HELPFILE "    \"NAMELIST\",\n";
+      
+      print TRFILE "\n\\subsection*{Namelist}\n\n";
+      begin_minipage();
+
+      print_description(@deslines);
+      
+      end_minipage();
+    }
+    
 #   Parameter
 
     undef @parlines;
@@ -768,9 +793,7 @@ while (<MOFILE>) {
       print HELPFILE "    \"PARAMETER\",\n";
 
       print TRFILE "\n\\subsection*{Parameter}\n\n";
-      print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
-      print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+      begin_minipage();
       print TRFILE "\\begin{defalist}{\\sl $maxitem \\ }\n";
 
       $lines = 0;
@@ -805,8 +828,7 @@ while (<MOFILE>) {
 	}
       }
       print TRFILE "\\end{defalist}\n";
-      print TRFILE "\\end{minipage}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+      end_minipage();
     }
 
 #   Environment
@@ -851,9 +873,7 @@ while (<MOFILE>) {
       print HELPFILE "    \"ENVIRONMENT\",\n";
 
       print TRFILE "\n\\subsection*{Environment}\n\n";
-      print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
-      print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+      begin_minipage();
       print TRFILE "\\begin{defalist}{\\tt $maxitem \\ }\n";
 
       foreach $tag (@parlines) {
@@ -888,8 +908,7 @@ while (<MOFILE>) {
 	}
       }
       print TRFILE "\\end{defalist}\n";
-      print TRFILE "\\end{minipage}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+      end_minipage();
     }
 
 #   Note
@@ -916,17 +935,14 @@ while (<MOFILE>) {
       print HELPFILE "    \"NOTE\",\n";
 
       print TRFILE "\n\\subsection*{Note}\n\n";
-      print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
-      print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+      begin_minipage();
 
       $help_spaces = 0;
       $help_print = 1;
       print_description(@parlines);
       $help_print = 1;
 
-      print TRFILE "\\end{minipage}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+      end_minipage();
     }
 
 #   Example
@@ -950,17 +966,14 @@ while (<MOFILE>) {
 
     if ( $lblock == 1 ) {
       print TRFILE "\n\\subsection*{Example}\n\n";
-      print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
-      print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+      begin_minipage();
 
       $help_spaces = 0;
       $help_print = 0;
       print_description(@parlines);
       $help_print = 1;
 
-      print TRFILE "\\end{minipage}\n";
-      print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+      end_minipage();
     }
 
 #   See also
@@ -1089,6 +1102,10 @@ sub print_description {
     } elsif ( "$kword" eq "\@ENDLIST" ) {
       print TRFILE "\\end{defalist}\n";
       $list = 0;
+    } elsif ( "$kword" eq "\@BEGINTABLE5" ) {
+      print TRFILE "\\begin{tabular}[t]{|l|l|l|l|l|}\n";
+      print TRFILE "\\hline\n";
+      $table = 1;
     } elsif ( "$kword" eq "\@BEGINTABLE4" ) {
       print TRFILE "\\begin{tabular}[t]{|l|l|l|l|}\n";
       print TRFILE "\\hline\n";
@@ -1191,6 +1208,7 @@ sub print_description {
 	  $line =~ s/\@ref\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@env\{([^}]*)\}/{\\tt \1}/og;
 	  $line =~ s/\@cite\{([^}]*)\}/\\cite{\1}/og;
+	  $line =~ s/\@boldtt\{([^}]*)\}/{\\ttfamily \\bfseries \1}/og;
 	  $line =~ s/\@bold\{([^}]*)\}/{\\bf \1}/og;
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  $line =~ s/</\$<\$/og;
@@ -1212,6 +1230,7 @@ sub print_description {
 	$docline =~ s/\@ref\{([^}]*)\}/\1/og;
 	$docline =~ s/\@env\{([^}]*)\}/\1/og;
 	$docline =~ s/\@cite\{([^}]*)\}/\1/og;
+	$docline =~ s/\@boldtt\{([^}]*)\}/\1/og;
 	$docline =~ s/\@bold\{([^}]*)\}/\1/og;
 	$docline =~ s/\@celsius/°C/og;
 	$docline =~ s/\\_/_/g;
@@ -1230,4 +1249,24 @@ sub print_description {
       }
     }
   }
+}
+
+sub begin_minipage {
+  print TRFILE "\\vspace{-1.5ex}\n";
+  print TRFILE "\\begin{addmargin}[8mm]{0mm}\n";
+}
+
+sub end_minipage {
+  print TRFILE "\\end{addmargin}\n";
+}
+
+sub begin_minipage_old {
+  print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
+  print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
+  print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+}
+
+sub end_minipage_old {
+  print TRFILE "\\end{minipage}\n";
+  print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
 }
