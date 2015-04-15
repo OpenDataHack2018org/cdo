@@ -172,74 +172,76 @@ void *Selvar(void *argument)
 
 	  for ( isel = 0; isel < nsel; isel++ )
 	    {
+              int found = 0;
 	      if ( operatorID == SELCODE )
 		{
-		  selfound[isel] = intarr[isel] == code;
+		  found = intarr[isel] == code;
 		}
 	      else if ( operatorID == SELPARAM )
 		{
-		  selfound[isel] = strcmp(argnames[isel], paramstr) == 0;
+		  found = strcmp(argnames[isel], paramstr) == 0;
 		}
 	      else if ( operatorID == SELNAME )
 		{
-		  selfound[isel] = wildcardmatch(argnames[isel], varname) == 0;
+		  found = wildcardmatch(argnames[isel], varname) == 0;
 		}
 	      else if ( operatorID == SELSTDNAME )
 		{
-		  selfound[isel] = strcmp(argnames[isel], stdname) == 0;
+		  found = strcmp(argnames[isel], stdname) == 0;
 		}
 	      else if ( operatorID == SELLEVEL )
 		{
-		  selfound[isel] = fabs(fltarr[isel] - level) < 0.0001;
+		  found = fabs(fltarr[isel] - level) < 0.0001;
 		}
 	      else if ( operatorID == SELLEVIDX )
 		{
-		  selfound[isel] = intarr[isel] == (levID+1);
+		  found = intarr[isel] == (levID+1);
 		}
 	      else if ( operatorID == SELGRID && args_are_numeric )
 		{
-		  selfound[isel] = intarr[isel] == (grididx+1);
+		  found = intarr[isel] == (grididx+1);
 		}
 	      else if ( operatorID == SELGRID && !args_are_numeric )
 		{
-		  selfound[isel] = memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0;
+		  found = memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0;
 		}
 	      else if ( operatorID == SELZAXIS && args_are_numeric )
 		{
-		  selfound[isel] = intarr[isel] == (zaxisidx+1);
+		  found = intarr[isel] == (zaxisidx+1);
 		}
 	      else if ( operatorID == SELZAXIS && !args_are_numeric )
 		{
-		  selfound[isel] = memcmp(argnames[isel], zaxistypename, strlen(argnames[isel])) == 0;
+		  found = memcmp(argnames[isel], zaxistypename, strlen(argnames[isel])) == 0;
 		}
 	      else if ( operatorID == SELZAXISNAME )
 		{
-		  selfound[isel] = memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0;
+		  found = memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0;
 		}
 	      else if ( operatorID == SELTABNUM )
 		{
-		  selfound[isel] = intarr[isel] == tabnum;
+		  found = intarr[isel] == tabnum;
 		}
 	      else if ( operatorID == DELCODE )
 		{
-		  selfound[isel] = intarr[isel] == code;
+		  found = intarr[isel] == code;
 		}
 	      else if ( operatorID == DELNAME )
 		{
-		  selfound[isel] = wildcardmatch(argnames[isel], varname) == 0;
+		  found = wildcardmatch(argnames[isel], varname) == 0;
 		}
 	      else if ( operatorID == DELPARAM )
 		{
-		  selfound[isel] = strcmp(argnames[isel], paramstr) == 0;
+		  found = strcmp(argnames[isel], paramstr) == 0;
 		}
 	      else if ( operatorID == SELLTYPE )
 		{
-		  selfound[isel] = intarr[isel] == zaxis2ltype(zaxisID);
+		  found = intarr[isel] == zaxis2ltype(zaxisID);
 		}
 
-	      if ( selfound[isel] )
+	      if ( found )
 	        {
 		  vlistDefFlag(vlistID1, varID, levID, !INVERTS_SELECTION(operatorID));
+		  selfound[isel] = TRUE;
 	        }
 
 	    }
