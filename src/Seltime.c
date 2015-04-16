@@ -125,6 +125,7 @@ int datelist(LIST *flist)
 
   int nsel = operatorArgc();
   if ( nsel < 1 ) cdoAbort("Too few arguments!");
+  if ( nsel > 2 ) cdoAbort("Too many arguments!");
   for ( i = 0; i < nsel; i++)
     {
       if ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
