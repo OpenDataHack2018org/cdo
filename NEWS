@@ -5,6 +5,7 @@ Version 1.6.9 (26 September 2015):
 
    New features:
      * expr: added support for operator ?:,&&,||
+     * select: added parameter startdate, enddate 
    New operators:
      * after: ECHAM standard post processor
 

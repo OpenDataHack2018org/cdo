@@ -29,6 +29,7 @@
 #include "util.h"
 //#include "list.h"
 
+double datestr_to_double(const char *datestr);
 
 #define  PML_INT         1
 #define  PML_FLT         2
@@ -465,13 +466,15 @@ void *Select(void *argument)
   int result = FALSE;
   int gridsize;
   int nmiss;
-  double *array = NULL;
   int taxisID2 = CDI_UNDEFID;
   int ntsteps;
   int ltimsel = FALSE;
   int second;
   int npar;
   int *vars = NULL;
+  double *array = NULL;
+  double fstartdate = -99999999999.;
+  double fenddate   = -99999999999.;
 
   PML_DEF_INT(timestep_of_year, 4096, "Timestep of year");
   PML_DEF_INT(timestep,         4096, "Timestep");
@@ -486,6 +489,8 @@ void *Select(void *argument)
   PML_DEF_FLT(level,            1024, "Level");
   PML_DEF_WORD(name,            1024, "Variable name");
   PML_DEF_WORD(param,           1024, "Parameter");
+  PML_DEF_WORD(startdate,          1, "Start date");
+  PML_DEF_WORD(enddate,            1, "End date");
 
   PML_INIT_INT(timestep_of_year);
   PML_INIT_INT(timestep);
@@ -500,6 +505,8 @@ void *Select(void *argument)
   PML_INIT_FLT(level);
   PML_INIT_WORD(name);
   PML_INIT_WORD(param);
+  PML_INIT_WORD(startdate);
+  PML_INIT_WORD(enddate);
 
   cdoInitialize(argument);
 
@@ -535,6 +542,8 @@ void *Select(void *argument)
   PML_ADD_FLT(pml, level);
   PML_ADD_WORD(pml, name);
   PML_ADD_WORD(pml, param);
+  PML_ADD_WORD(pml, startdate);
+  PML_ADD_WORD(pml, enddate);
 
   pmlRead(pml, nsel, argnames);
 
@@ -553,6 +562,8 @@ void *Select(void *argument)
   PML_NUM(pml, level);
   PML_NUM(pml, name);
   PML_NUM(pml, param);
+  PML_NUM(pml, startdate);
+  PML_NUM(pml, enddate);
   /*
   pmlDelete(pml);
   */
@@ -698,6 +709,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
 
+	  if ( npar_startdate || npar_enddate ) ltimsel = TRUE;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;
 
 	  npar = 0;
@@ -784,8 +796,8 @@ void *Select(void *argument)
 		  if ( par_timestep[i] < 0 )
 		    {
 		      if ( cdoVerbose )
-			cdoPrint("timestep %d changed to %d", par_timestep[i], ntsteps + 1 + par_timestep[i]);
-		      par_timestep[i] = ntsteps + 1 + par_timestep[i];
+			cdoPrint("timestep %d changed to %d", par_timestep[i], par_timestep[i] + ntsteps + 1 );
+		      par_timestep[i] += ntsteps + 1;
 		    }
 		}
 	    }
@@ -796,6 +808,11 @@ void *Select(void *argument)
 	      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 	      array = (double*) malloc(gridsize*sizeof(double));
 	    }
+
+	  startdate = par_startdate[0];
+	  enddate   = par_enddate[0];
+	  if ( npar_startdate ) fstartdate = datestr_to_double(startdate);
+	  if ( npar_enddate   ) fenddate   = datestr_to_double(enddate);
 	}
       else
 	{
@@ -809,6 +826,7 @@ void *Select(void *argument)
 	  goto END_LABEL;
 	}
 
+      int lstop = FALSE;
       tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
@@ -819,10 +837,15 @@ void *Select(void *argument)
 	      copytimestep = FALSE;
 	      timestep = tsID1 + 1;
 
-	      if ( operatorID == SELECT && npar_timestep > 0 && timestep > par_timestep[npar_timestep-1] ) break;
+	      if ( operatorID == SELECT && npar_timestep > 0 && timestep > par_timestep[npar_timestep-1] )
+		{
+		  lstop = TRUE;
+		  break;
+		}
 
 	      vdate = taxisInqVdate(taxisID1);
 	      vtime = taxisInqVtime(taxisID1);
+
 	      cdiDecodeDate(vdate, &year, &month, &day);
 	      cdiDecodeTime(vtime, &hour, &minute, &second);
 
@@ -848,6 +871,39 @@ void *Select(void *argument)
 		  if ( npar_minute == 0 || (npar_minute && PAR_CHECK_INT(minute)) ) lminute = TRUE;
 
 		  if ( lyear && lmonth && lday && lhour && lminute ) copytimestep = TRUE;
+		}
+
+	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
+
+	      if ( npar_enddate )
+		{
+		  if ( fdate > fenddate )
+		    {
+		      flag_enddate[0] = TRUE;
+		      copytimestep = FALSE;
+		      if ( operatorID == SELECT )
+			{
+			  lstop = TRUE;
+			  break;
+			}
+		    }
+		  else
+		    {
+		      copytimestep = TRUE;
+		    }
+		}
+
+	      if ( npar_startdate )
+		{
+		  if ( fdate < fstartdate )
+		    {
+		      copytimestep = FALSE;
+		    }
+		  else
+		    {
+		      flag_startdate[0] = TRUE;
+		      copytimestep = TRUE;
+		    }
 		}
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
@@ -893,6 +949,8 @@ void *Select(void *argument)
 	}
       
       streamClose(streamID1);
+
+      if ( lstop ) break;
     }
 
  END_LABEL:
@@ -904,6 +962,8 @@ void *Select(void *argument)
   PAR_CHECK_INT_FLAG(day);
   PAR_CHECK_INT_FLAG(hour);
   PAR_CHECK_INT_FLAG(minute);
+  PAR_CHECK_WORD_FLAG(startdate);
+  PAR_CHECK_WORD_FLAG(enddate);
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);
 

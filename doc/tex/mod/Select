@@ -50,6 +50,10 @@ INTEGER Comma separated list of GRIB level types.
 INTEGER Comma separated list of index of levels.
 @Item = level
 FLOAT   Comma separated list of vertical levels.
+@Item = startdate
+STRING  Start date (format YYYY-MM-DDThh:mm:ss).
+@Item = enddate
+STRING  End date (format YYYY-MM-DDThh:mm:ss).
 @Item = minute
 INTEGER Comma separated list of minutes.
 @Item = hour

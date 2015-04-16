@@ -115,18 +115,43 @@ int seaslist(LIST *ilist)
   return (nsel);
 }
 
+
+double datestr_to_double(const char *datestr)
+{
+  int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
+  double fval = 0;
+
+  if ( strchr(datestr, '-') == NULL )
+    {
+      fval = parameter2double(datestr);
+    }
+  else if ( strchr(datestr, 'T') )
+    {
+      sscanf(datestr, "%d-%d-%dT%d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+      fval = cdiEncodeTime(hour, minute, second);
+      if ( fabs(fval) > 0 ) fval /= 1000000;
+      fval += cdiEncodeDate(year, month, day);
+    }
+  else
+    {
+      sscanf(datestr, "%d-%d-%d", &year, &month, &day);
+      fval = cdiEncodeDate(year, month, day);
+    }
+
+  return fval;
+}
+
 static
 int datelist(LIST *flist)
 {
-  int i;
   int set2 = TRUE;
-  int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   double fval = 0;
 
   int nsel = operatorArgc();
   if ( nsel < 1 ) cdoAbort("Too few arguments!");
   if ( nsel > 2 ) cdoAbort("Too many arguments!");
-  for ( i = 0; i < nsel; i++)
+
+  for ( int i = 0; i < nsel; i++ )
     {
       if ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
 	{
@@ -137,34 +162,16 @@ int datelist(LIST *flist)
 
 	  listSetFlt(flist, i,  fval);
 	}
-      else if ( strchr(operatorArgv()[i], '-') == NULL )
-	{
-	  fval = parameter2double(operatorArgv()[i]);
-	  listSetFlt(flist, i, fval);
-	}
       else
 	{
-	  year = 1; month = 1; day = 1; hour = 0; minute = 0, second = 0;
+	  fval = datestr_to_double(operatorArgv()[i]);
 	  if ( strchr(operatorArgv()[i], 'T') )
-	    {
-	      sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
-		     &year, &month, &day, &hour, &minute, &second);
-	      fval = cdiEncodeTime(hour, minute, second);
-	      if ( fabs(fval) > 0 ) fval /= 1000000;
-	      fval += cdiEncodeDate(year, month, day);
-	      listSetFlt(flist, i, fval);
-	      set2 = FALSE;
-	    }
-	  else
-	    {
-	      sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
-	      fval = cdiEncodeDate(year, month, day);
-	      
-	      if ( nsel > 1 && i > 0 ) fval += 0.999;
-
-	      listSetFlt(flist, i, fval);
-	    }
+	    set2 = FALSE;
+	  else if ( nsel > 1 && i > 0 )
+	    fval += 0.999;
 	}
+
+      listSetFlt(flist, i, fval);
     }
 
   if ( nsel == 1 && set2 == TRUE )
