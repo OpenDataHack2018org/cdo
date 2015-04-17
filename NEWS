@@ -11,6 +11,8 @@ Version 1.6.9 (26 September 2015):
      * aexpr: Evaluate expressions and append results
      * aexprf: Evaluate expression script and append results
      * selzaxisname: Select z-axes by name
+   Fixed bugs:
+     * seltimestep: abort if none of the selected timesteps are found
 
 Version 1.6.8 (26 March 2015):
 
