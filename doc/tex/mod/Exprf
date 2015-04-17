@@ -28,7 +28,7 @@ The following operators are supported:
      -      & subtraction         & x - y     & Difference of x and y    
      *      & multiplication      & x * y     & Product of x and y 
      /      & division            & x / y     & Quotient of x and y
-     \^\    & exponentiation      & x\^\ y    & Exponentiates x with y 
+     \exp      & exponentiation      & x \exp y     & Exponentiates x with y 
      ==     & equal to            & x == y    & 1, if x equal to y; else 0
      !=     & not equal to        & x != y    & 1, if x not equal to y; else 0
      >      & greater than        & x > y     & 1, if x greater than y; else 0
@@ -36,8 +36,8 @@ The following operators are supported:
      >=     & greater equal       & x >= y    & 1, if x greater equal y; else 0
      <=     & less equal          & x <= y    & 1, if x less equal y; else 0
      <=>    & less equal greater  & x <=> y   & -1, if x less y; 1, if x greater y; else 0 
-     \&\&   & logical AND         & x \&\& y  & 1, if x and y not equal 0; else 0
-     \or     & logical OR          & x \or y   & 1, if x or y not equal 0; else 0
+     \and     & logical AND         & x \and y    & 1, if x and y not equal 0; else 0
+     \or     & logical OR          & x \or y    & 1, if x or y not equal 0; else 0
      ?:     & ternary conditional & x ? y : z & y, if x not equal 0, else z 
 @EndTable
 
@@ -91,7 +91,7 @@ The processing instructions are read from the parameter.
 
 
 @BeginOperator_exprf
-@Title     = Evaluate expressions from script file
+@Title     = Evaluate expressions script
 @Parameter = filename
 
 @BeginDescription

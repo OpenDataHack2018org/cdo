@@ -12,7 +12,7 @@ This module selects some fields from @file{ifiles} and writes them to @file{ofil
 @file{ifiles} is an arbitrary number of input files. All input files need to have 
 the same structure with the same variables on different timesteps.
 The fields selected depends on the chosen parameters. Parameter is a comma
-separated list of key-value pairs.
+separated list of key-value pairs. Wildcards can be used for string parameter.
 @EndDescription
 @EndModule
 
@@ -50,6 +50,8 @@ INTEGER Comma separated list of GRIB level types.
 INTEGER Comma separated list of index of levels.
 @Item = level
 FLOAT   Comma separated list of vertical levels.
+@Item = date
+STRING  Comma separated list of dates (format YYYY-MM-DDThh:mm:ss).
 @Item = startdate
 STRING  Start date (format YYYY-MM-DDThh:mm:ss).
 @Item = enddate

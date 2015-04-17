@@ -59,7 +59,7 @@ void *Showinfo(void *argument)
   char varname[CDI_MAX_NAME];
   char stdname[CDI_MAX_NAME];
   char varunits[CDI_MAX_NAME];
-  char vdatestr[32], vtimestr[32];
+  char vdatetimestr[64], vdatestr[32], vtimestr[32];
 
   cdoInitialize(argument);
 
@@ -185,9 +185,8 @@ void *Showinfo(void *argument)
 	    vdate = taxisInqVdate(taxisID);
 	    vtime = taxisInqVtime(taxisID);
 
-	    date2str(vdate, vdatestr, sizeof(vdatestr));
-	    time2str(vtime, vtimestr, sizeof(vtimestr));
-	    fprintf(stdout, " %sT%s", vdatestr, vtimestr);
+	    datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
+	    fprintf(stdout, " %s", vdatetimestr);
 
 	    tsID++;
 	    nout++;

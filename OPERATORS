@@ -166,7 +166,7 @@ Operator catalog:
    Arithmetic
 -------------------------------------------------------------
    Exprf         expr            Evaluate expressions
-   Exprf         exprf           Evaluate expressions from script file
+   Exprf         exprf           Evaluate expressions script
    Exprf         aexpr           Evaluate expressions and append results
    Exprf         aexprf          Evaluate expression script and append results
    Math          abs             Absolute value

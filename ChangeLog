@@ -4,9 +4,19 @@
 	* Version 1.6.9 released
 	* clipping: update to YAC version 1.0.3
 
+2015-04-17  Uwe Schulzweida
+
+	* Select: added parameter date
+
 2015-04-16  Uwe Schulzweida
 
 	* Select: added parameter startdate, enddate
+
+2015-04-13  Karl-Hermann Wieners
+
+	* New operator: aexpr -  Evaluate expressions and append results
+	* New operator: aexprf  - Evaluate expression script and append results
+	* New operator: selzaxisname  - Select z-axes by name
 
 2015-04-10  Uwe Schulzweida
 

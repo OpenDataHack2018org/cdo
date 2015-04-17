@@ -1213,8 +1213,9 @@ sub print_description {
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  $line =~ s/</\$<\$/og;
 	  $line =~ s/>/\$>\$/og;
-	  $line =~ s/\\or/\$||\$/og;
+	  $line =~ s/\\exp/\\^\\/og;
 	  $line =~ s/\\and/\\&\\&/og;
+	  $line =~ s/\\or/\$||\$/og;
 	  $line =~ s/%/\\%/og;
 	  if ( $table == 1 ) { $line =~ s/$/ \\\\ \\hline/g; }
 	}
@@ -1236,6 +1237,7 @@ sub print_description {
 	$docline =~ s/\\_/_/g;
 	$docline =~ s/\\cite//og;
 	$docline =~ s/\\neq/!=/og;
+	$docline =~ s/\\exp/^/og;
 	$docline =~ s/\\and/&&/og;
 	$docline =~ s/\\or/||/og;
 	$docline =~ s/\\/\\\\/og;

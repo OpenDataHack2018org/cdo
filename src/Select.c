@@ -73,6 +73,7 @@ static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 #define PAR_CHECK_INT(name)           par_check_int(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_FLT(name)           par_check_flt(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_WORD(name)          par_check_word(npar_##name, par_##name, flag_##name, name)
+#define PAR_CHECK_DATE(name)          par_check_date(npar_##name, par_##name, flag_##name, name)
 
 #define MAX_PLIST_ENTRY  256
 #define MAX_PML_ENTRY    256
@@ -421,6 +422,24 @@ int par_check_word(int npar, char **parlist, int *flaglist, char *par)
 }
 
 
+int par_check_date(int npar, char **parlist, int *flaglist, char *par)
+{
+  int found = 0;
+  char wcdate[512];
+
+  if ( *par == ' ' ) ++par;
+
+  for ( int i = 0; i < npar; i++ )
+    {
+      strcpy(wcdate, parlist[i]);
+      strcat(wcdate, "*");
+      if ( wildcardmatch(wcdate, par) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+    }
+
+  return (found);
+}
+
+
 void par_check_int_flag(int npar, int *parlist, int *flaglist, const char *txt)
 {
   for ( int i = 0; i < npar; ++i )
@@ -491,6 +510,7 @@ void *Select(void *argument)
   PML_DEF_WORD(param,           1024, "Parameter");
   PML_DEF_WORD(startdate,          1, "Start date");
   PML_DEF_WORD(enddate,            1, "End date");
+  PML_DEF_WORD(date,            1024, "Date");
 
   PML_INIT_INT(timestep_of_year);
   PML_INIT_INT(timestep);
@@ -507,6 +527,7 @@ void *Select(void *argument)
   PML_INIT_WORD(param);
   PML_INIT_WORD(startdate);
   PML_INIT_WORD(enddate);
+  PML_INIT_WORD(date);
 
   cdoInitialize(argument);
 
@@ -544,6 +565,7 @@ void *Select(void *argument)
   PML_ADD_WORD(pml, param);
   PML_ADD_WORD(pml, startdate);
   PML_ADD_WORD(pml, enddate);
+  PML_ADD_WORD(pml, date);
 
   pmlRead(pml, nsel, argnames);
 
@@ -564,6 +586,7 @@ void *Select(void *argument)
   PML_NUM(pml, param);
   PML_NUM(pml, startdate);
   PML_NUM(pml, enddate);
+  PML_NUM(pml, date);
   /*
   pmlDelete(pml);
   */
@@ -709,7 +732,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
 
-	  if ( npar_startdate || npar_enddate ) ltimsel = TRUE;
+	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = TRUE;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;
 
 	  npar = 0;
@@ -860,7 +883,7 @@ void *Select(void *argument)
 	      if ( npar_timestep && PAR_CHECK_INT(timestep) ) copytimestep = TRUE;
 	      if ( npar_timestep_of_year && PAR_CHECK_INT(timestep_of_year) ) copytimestep = TRUE;
 
-	      if ( !copytimestep && npar_timestep == 0 && npar_timestep_of_year == 0 )
+	      if ( !copytimestep && npar_date == 0 && npar_timestep == 0 && npar_timestep_of_year == 0 )
 		{
 		  int lyear = 0, lmonth = 0, lday = 0, lhour = 0, lminute = 0;
 
@@ -905,6 +928,15 @@ void *Select(void *argument)
 		      copytimestep = TRUE;
 		    }
 		}
+
+              
+              if ( npar_date )
+                {
+                  char vdatetimestr[64];
+                  datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
+                  date = vdatetimestr;
+                  if ( PAR_CHECK_DATE(date) ) copytimestep = TRUE;
+                }
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
 	    }
@@ -955,6 +987,8 @@ void *Select(void *argument)
 
  END_LABEL:
 
+  if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, 1);    
+
   PAR_CHECK_INT_FLAG(timestep_of_year);
   PAR_CHECK_INT_FLAG(timestep);
   PAR_CHECK_INT_FLAG(year);
@@ -964,6 +998,7 @@ void *Select(void *argument)
   PAR_CHECK_INT_FLAG(minute);
   PAR_CHECK_WORD_FLAG(startdate);
   PAR_CHECK_WORD_FLAG(enddate);
+  PAR_CHECK_WORD_FLAG(date);
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);
 

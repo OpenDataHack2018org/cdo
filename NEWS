@@ -4,10 +4,13 @@ CDO NEWS
 Version 1.6.9 (26 September 2015):
 
    New features:
+     * select: added parameter date, startdate, enddate 
      * expr: added support for operator ?:,&&,||
-     * select: added parameter startdate, enddate 
    New operators:
      * after: ECHAM standard post processor
+     * aexpr: Evaluate expressions and append results
+     * aexprf: Evaluate expression script and append results
+     * selzaxisname: Select z-axes by name
 
 Version 1.6.8 (26 March 2015):
 
