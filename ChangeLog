@@ -7,6 +7,7 @@
 2015-04-21  Uwe Schulzweida
 
 	* New operator: genlevelbounds - Generate level bounds
+	* Added option --reduce_dim to reduce dimension (Timstat, Fldstat)
 
 2015-04-17  Uwe Schulzweida
 

@@ -36,21 +36,19 @@
 
 #define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
-/* refactor: moved here from *.c files */
-extern char *Progname; // refactor:  process.c defined in cdo.c
-extern char *cdoGridSearchDir; // refactor: gridreference.c defined in cd.c
-extern int CDO_Append_History; // refactor: history.c defined in cdo.c
-extern int CDO_Reset_History;  // refactor: history.c defined in cdo.c
+extern char *Progname;
+extern char *cdoGridSearchDir;
+extern int CDO_Reduce_Dim;
+extern int CDO_Append_History;
+extern int CDO_Reset_History;
 extern int timer_read, timer_write; // refactor: both pstream.c and CDIread.c CDIwrite.c defined in cdo.c
 
-/* refactor: moved from cdo.c */
 extern int   CDO_optind;
 extern char *CDO_optarg;
 extern int CDO_opterr;
 extern int remap_genweights;
 
-/* refactor: moved from cdo.h */
-extern char *cdoExpName; // refactor: added keyword extern
+extern char *cdoExpName;
 extern int ompNumThreads;
 
 extern int stdin_is_tty;
@@ -61,8 +59,8 @@ extern int cdoDefaultFileType;
 extern int cdoDefaultDataType;
 extern int cdoDefaultByteorder;
 extern int cdoDefaultTableID;
-extern int cdoDefaultInstID; // refactor: moved here from institution.c
-extern int cdoDefaultTimeType; // refactor: moved here from pstream.c
+extern int cdoDefaultInstID;
+extern int cdoDefaultTimeType;
 extern int cdoLogOff;
 
 extern int cdoLockIO;

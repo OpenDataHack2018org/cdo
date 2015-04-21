@@ -93,10 +93,8 @@ void *Fldstat(void *argument)
   int index;
   int recID, nrecs;
   int varID, levelID;
-  int lim;
   int needWeights = FALSE;
   int nmiss;
-  double slon, slat;
   double sglval;
   field_t field;
   int pn = 0;
@@ -156,13 +154,22 @@ void *Fldstat(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  slon = 0;
-  slat = 0;
-  gridID2 = gridCreate(GRID_LONLAT, 1);
-  gridDefXsize(gridID2, 1);
-  gridDefYsize(gridID2, 1);
-  gridDefXvals(gridID2, &slon);
-  gridDefYvals(gridID2, &slat);
+  if ( CDO_Reduce_Dim )
+    {
+      gridID2 = gridCreate(GRID_GENERIC, 1);
+      gridDefXsize(gridID2, 0);
+      gridDefYsize(gridID2, 0);
+    }
+  else
+    {
+      double slon = 0;
+      double slat = 0;
+      gridID2 = gridCreate(GRID_LONLAT, 1);
+      gridDefXsize(gridID2, 1);
+      gridDefYsize(gridID2, 1);
+      gridDefXvals(gridID2, &slon);
+      gridDefYvals(gridID2, &slat);
+    }
 
   int ngrids = vlistNgrids(vlistID1);
 
@@ -175,7 +182,7 @@ void *Fldstat(void *argument)
 
   field_init(&field);
 
-  lim = vlistGridsizeMax(vlistID1);
+  int lim = vlistGridsizeMax(vlistID1);
   field.ptr    = (double*) malloc(lim*sizeof(double));
   field.weight = NULL;
   if ( needWeights )

@@ -75,7 +75,6 @@
 void *Timstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int cmplen;
   int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
@@ -95,15 +94,15 @@ void *Timstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timmin",    func_min,  31, NULL);
-  cdoOperatorAdd("timmax",    func_max,  31, NULL);
-  cdoOperatorAdd("timsum",    func_sum,  31, NULL);
-  cdoOperatorAdd("timmean",   func_mean, 31, NULL);
-  cdoOperatorAdd("timavg",    func_avg,  31, NULL);
-  cdoOperatorAdd("timvar",    func_var,  31, NULL);
-  cdoOperatorAdd("timvar1",   func_var1, 31, NULL);
-  cdoOperatorAdd("timstd",    func_std,  31, NULL);
-  cdoOperatorAdd("timstd1",   func_std1, 31, NULL);
+  cdoOperatorAdd("timmin",    func_min,  DATE_LEN, NULL);
+  cdoOperatorAdd("timmax",    func_max,  DATE_LEN, NULL);
+  cdoOperatorAdd("timsum",    func_sum,  DATE_LEN, NULL);
+  cdoOperatorAdd("timmean",   func_mean, DATE_LEN, NULL);
+  cdoOperatorAdd("timavg",    func_avg,  DATE_LEN, NULL);
+  cdoOperatorAdd("timvar",    func_var,  DATE_LEN, NULL);
+  cdoOperatorAdd("timvar1",   func_var1, DATE_LEN, NULL);
+  cdoOperatorAdd("timstd",    func_std,  DATE_LEN, NULL);
+  cdoOperatorAdd("timstd1",   func_std1, DATE_LEN, NULL);
   cdoOperatorAdd("yearmin",   func_min,  10, NULL);
   cdoOperatorAdd("yearmax",   func_max,  10, NULL);
   cdoOperatorAdd("yearsum",   func_sum,  10, NULL);
@@ -142,7 +141,8 @@ void *Timstat(void *argument)
   cdoOperatorAdd("hourstd1",  func_std1,  4, NULL);
 
   int operatorID = cdoOperatorID();
-  int operfunc = cdoOperatorF1(operatorID);
+  int operfunc   = cdoOperatorF1(operatorID);
+  int comparelen = cdoOperatorF2(operatorID);
 
   int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
@@ -165,26 +165,30 @@ void *Timstat(void *argument)
 	cdoAbort("Too many arguments!");
     }
 
-  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
+  int cmplen = DATE_LEN - comparelen;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
   int vlistID1 = streamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( cdoOperatorF2(operatorID) == 31 ) vlistDefNtsteps(vlistID2, 1);
+  if ( cmplen == 0 ) vlistDefNtsteps(vlistID2, 1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
+
+  if ( cmplen == 0 && CDO_Reduce_Dim )
+    for ( varID = 0; varID < nvars; ++varID )
+      vlistDefVarTsteptype(vlistID2, varID, TSTEP_CONSTANT);
+
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
-
-  int nvars    = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
 
   if ( cdoDiag )
     {

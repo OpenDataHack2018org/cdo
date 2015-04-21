@@ -6,6 +6,7 @@ Version 1.6.9 (26 September 2015):
    New features:
      * select: added parameter date, startdate, enddate 
      * expr: added support for operator ?:,&&,||
+     * option --reduce_dim: reduce dimension (Timstat, Fldstat)
    New operators:
      * after: ECHAM standard post processor
      * aexpr: Evaluate expressions and append results

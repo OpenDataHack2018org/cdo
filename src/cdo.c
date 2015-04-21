@@ -1005,6 +1005,7 @@ int parse_options_long(int argc, char *argv[])
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1 },
       { "use_fftw",          required_argument,          &luse_fftw,  1 },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1 },
+      { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1 },
       { "no_warnings",             no_argument,           &_Verbose,  0 },
       { "format",            required_argument,                NULL, 'f' },
       { "help",                    no_argument,                NULL, 'h' },
@@ -1358,6 +1359,7 @@ int main(int argc, char *argv[])
   memExitOnError();
 
   _Verbose = 1;
+  CDO_Reduce_Dim = 0;
 
   /* mallopt(M_MMAP_MAX, 0); */
  
