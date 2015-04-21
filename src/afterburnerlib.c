@@ -23,6 +23,12 @@ int labort_after = TRUE;
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
+/*
+#if defined(CDO)
+#undef  Error
+#define Error(...)  (cdoAbort(__VA_ARGS__))
+#endif
+*/
 
 static
 char *FieldName(int code, const char *text)

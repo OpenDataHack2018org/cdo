@@ -14,6 +14,7 @@ Version 1.6.9 (26 September 2015):
      * selzaxisname: Select z-axes by name
      * genlevelbounds: Generate level bounds
    Fixed bugs:
+     * Ensstat: added support for different missing values
      * seltimestep: abort if none of the selected timesteps are found
 
 Version 1.6.8 (26 March 2015):

@@ -53,6 +53,7 @@ void *Ensstat(void *argument)
   {
     int streamID;
     int vlistID;
+    double missval;
     double *array;
   } ens_file_t;
   int pn = 0;
@@ -197,6 +198,7 @@ void *Ensstat(void *argument)
 	      streamID = ef[fileID].streamID;
 	      streamInqRecord(streamID, &varID, &levelID);
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
+              ef[fileID].missval = vlistInqVarMissval(ef[fileID].vlistID, varID);
 	    }
 
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -207,7 +209,7 @@ void *Ensstat(void *argument)
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i, fileID)
 #endif
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( i = 0; i < gridsize; ++i )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 
@@ -216,9 +218,12 @@ void *Ensstat(void *argument)
 	      for ( fileID = 0; fileID < nfiles; fileID++ )
 		{
 		  field[ompthID].ptr[fileID] = ef[fileID].array[i];
-		  if ( DBL_IS_EQUAL(field[ompthID].ptr[fileID], missval) )
-		    field[ompthID].nmiss++;
-		}
+		  if ( DBL_IS_EQUAL(field[ompthID].ptr[fileID], ef[fileID].missval) )
+                    {
+                      field[ompthID].ptr[fileID] = missval;
+                      field[ompthID].nmiss++;
+                    }
+                }
 
 	      if ( operfunc == func_pctl )
 	        array2[i] = fldpctl(field[ompthID], pn);

@@ -8,6 +8,7 @@
 
 	* New operator: genlevelbounds - Generate level bounds
 	* Added option --reduce_dim to reduce dimension (Timstat, Fldstat)
+	* Ensstat: added support for different missing values (bug fix)
 
 2015-04-17  Uwe Schulzweida
 
