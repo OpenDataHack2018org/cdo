@@ -4,6 +4,10 @@
 	* Version 1.6.9 released
 	* clipping: update to YAC version 1.0.3
 
+2015-04-21  Uwe Schulzweida
+
+	* New operator: genlevelbounds - Generate level bounds
+
 2015-04-17  Uwe Schulzweida
 
 	* Select: added parameter date

@@ -1,11 +1,15 @@
 @BeginModule
 @NewPage
 @Name      = Setzaxis
-@Title     = Set z-axis type
+@Title     = Set z-axis information
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setzaxis
+@Operators = setzaxis genlevelbounds
+
+@BeginDescription
+This module modifies the metadata of the vertical grid.
+@EndDescription
 @EndModule
 
 
@@ -14,8 +18,17 @@
 @Parameter = zaxis
 
 @BeginDescription
-This operator sets the z-axis description of all variables with the
-same number of level as the new z-axis.
+This operator sets the z-axis description of all variables with the same number of level as the new z-axis.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_genlevelbounds
+@Title     = Generate level bounds
+@Parameter = [zbot] [ztop]
+
+@BeginDescription
+Generates the layer bounds of the z-axis.
 @EndDescription
 @EndOperator
 
@@ -23,4 +36,8 @@ same number of level as the new z-axis.
 @BeginParameter
 @Item = zaxis
 STRING  Z-axis description file or name of the target z-axis
+@Item = zbot
+FLOAT   Specifying the bottom of the vertical column. Must have the same units as z-axis. 
+@Item = ztop
+FLOAT   Specifying the top of the vertical column. Must have the same units as z-axis. 
 @EndParameter

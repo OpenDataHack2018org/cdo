@@ -26,46 +26,80 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds);
+
+int getkeyval_dp(const char *keyval, const char *key, double *val)
+{
+  int status = 0;
+  size_t keylen = strlen(key);
+
+  if ( strncmp(keyval, key, keylen) == 0 )
+    {
+      const char *pkv = keyval+keylen;
+      if ( pkv[0] == '=' && pkv[1] != 0 )
+        {
+          *val = parameter2double(&pkv[1]);
+          status = 1;
+        }
+      else
+        {
+          cdoAbort("Syntax error for parameter %s!", keyval);
+        }
+    }
+
+  return status;
+}
+
 
 void *Setzaxis(void *argument)
 {
-  int SETZAXIS;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
+  int recID, varID, levelID;
   int zaxisID1, zaxisID2 = -1;
   int nzaxis, index;
-  int gridsize;
   int nmiss;
   int found;
-  double *array = NULL;
+  int lztop = FALSE, lzbot = FALSE;
+  double ztop = 0, zbot = 0;
 
   cdoInitialize(argument);
 
-  SETZAXIS = cdoOperatorAdd("setzaxis",     0, 0, "zaxis description file");
+  int SETZAXIS       = cdoOperatorAdd("setzaxis",        0, 0, "zaxis description file");
+  int GENLEVELBOUNDS = cdoOperatorAdd("genlevelbounds",  0, 0, NULL);
 
-  operatorID = cdoOperatorID();
-
-  operatorInputArg(cdoOperatorEnter(operatorID));  
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == SETZAXIS )
     {
+      operatorInputArg(cdoOperatorEnter(operatorID));  
+      operatorCheckArgc(1);
       zaxisID2 = cdoDefineZaxis(operatorArgv()[0]);
     }
+  else if ( operatorID == GENLEVELBOUNDS )
+    { 
+      unsigned npar = operatorArgc();
+      char **parnames = operatorArgv();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+      for ( unsigned i = 0; i < npar; i++ )
+        {
+          if ( cdoVerbose ) cdoPrint("keyval[%d]: %s", i+1, parnames[i]);
+          
+          if      ( !lzbot && getkeyval_dp(parnames[i], "zbot", &zbot) ) lzbot = TRUE;
+          else if ( !lztop && getkeyval_dp(parnames[i], "ztop", &ztop) ) lztop = TRUE;
+          else cdoAbort("Parameter >%s< unsupported! Supported parameter are: zbot, ztop", parnames[i]);
+        }
+    }
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   if ( operatorID == SETZAXIS )
     {
@@ -83,14 +117,44 @@ void *Setzaxis(void *argument)
 	}
       if ( ! found ) cdoWarning("No zaxis with %d levels found!", zaxisInqSize(zaxisID2));
     }
+  else if ( operatorID == GENLEVELBOUNDS )
+    {
+      nzaxis = vlistNzaxis(vlistID1);
+      for ( index = 0; index < nzaxis; index++ )
+	{
+	  zaxisID1 = vlistZaxis(vlistID1, index);
+          int nlev = zaxisInqSize(zaxisID1);
+          double *levels  = (double *) malloc(nlev*sizeof(double));
+          double *lbounds = (double *) malloc(nlev*sizeof(double));
+          double *ubounds = (double *) malloc(nlev*sizeof(double));
+
+          if ( nlev > 1 )
+            {
+              zaxisInqLevels(zaxisID1, levels);
+              zaxisID2 = zaxisDuplicate(zaxisID1);
+
+              genLayerBounds(nlev, levels, lbounds, ubounds);
+
+              if ( lzbot ) lbounds[0] = zbot;
+              if ( lztop ) ubounds[nlev-1] = ztop;
+              zaxisDefLbounds(zaxisID2, lbounds);
+              zaxisDefUbounds(zaxisID2, ubounds);
+	      vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
+            }
+
+          free(levels);
+          free(lbounds);
+          free(ubounds);
+	}
+    }
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

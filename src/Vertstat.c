@@ -73,6 +73,27 @@ void setSurfaceID(int vlistID, int surfID)
     }
 }
 
+
+void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds)
+{
+  if ( nlev == 1 )
+    {
+      lbounds[0] = 0.;
+      ubounds[0] = 1.;
+    }
+  else
+    {
+      lbounds[0]      = levels[0];
+      ubounds[nlev-1] = levels[nlev-1];
+      for ( int i = 0; i < nlev-1; ++i )
+        {
+          double bound = 0.5*(levels[i] + levels[i+1]);
+          lbounds[i+1] = bound;
+          ubounds[i]   = bound;
+        }
+    }
+}
+
 static
 int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
 {
@@ -86,22 +107,7 @@ int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *t
   if ( genbounds )
     {
       status = 2;
-      if ( nlev == 1 )
-	{
-	  lbounds[0] = 0.;
-	  ubounds[0] = 1.;
-	}
-      else
-	{
-	  lbounds[0]      = levels[0];
-	  ubounds[nlev-1] = levels[nlev-1];
-	  for ( i = 0; i < nlev-1; ++i )
-	    {
-	      double bound = 0.5*(levels[i] + levels[i+1]);
-	      lbounds[i+1] = bound;
-	      ubounds[i]   = bound;
-	    }
-	}
+      genLayerBounds(nlev, levels, lbounds, ubounds);
     }
   else if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
     {

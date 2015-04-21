@@ -93,7 +93,7 @@ case "${HOSTNAME}" in
 # x86_64-squeeze-x64-linux
     thunder*)
         CDOLIBS="--with-jasper=/sw/squeeze-x64/jasper-1.900.1-static \
-                    --with-grib_api=/sw/squeeze-x64/grib_api-1.9.9-static \
+                    --with-grib_api=/sw/squeeze-x64/grib_api-1.13.0-static-gccsys \
                     --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
                     --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
                     --with-szlib=/sw/squeeze-x64/szip-2.1 \
@@ -102,7 +102,6 @@ case "${HOSTNAME}" in
 
         if  test "$COMP" = icc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
-                    --enable-all-static \
                     --with-fftw3 \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -fp-model source -fast-transcendentals"

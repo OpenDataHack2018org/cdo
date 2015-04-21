@@ -1040,17 +1040,25 @@ static char *SetgridHelp[] = {
 
 static char *SetzaxisHelp[] = {
     "NAME",
-    "    setzaxis - Set z-axis type",
+    "    setzaxis, genlevelbounds - Set z-axis information",
     "",
     "SYNOPSIS",
     "    setzaxis,zaxis  ifile ofile",
+    "    genlevelbounds[,zbot[,ztop]]  ifile ofile",
     "",
     "DESCRIPTION",
-    "    This operator sets the z-axis description of all variables with the",
-    "    same number of level as the new z-axis.",
+    "    This module modifies the metadata of the vertical grid.",
+    "",
+    "OPERATORS",
+    "    setzaxis        Set z-axis",
+    "                    This operator sets the z-axis description of all variables with the same number of level as the new z-axis.",
+    "    genlevelbounds  Generate level bounds",
+    "                    Generates the layer bounds of the z-axis.",
     "",
     "PARAMETER",
     "    zaxis  STRING  Z-axis description file or name of the target z-axis",
+    "    zbot   FLOAT   Specifying the bottom of the vertical column. Must have the same units as z-axis. ",
+    "    ztop   FLOAT   Specifying the top of the vertical column. Must have the same units as z-axis. ",
     NULL
 };
 

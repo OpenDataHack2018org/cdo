@@ -11,6 +11,7 @@ Version 1.6.9 (26 September 2015):
      * aexpr: Evaluate expressions and append results
      * aexprf: Evaluate expression script and append results
      * selzaxisname: Select z-axes by name
+     * genlevelbounds: Generate level bounds
    Fixed bugs:
      * seltimestep: abort if none of the selected timesteps are found
 

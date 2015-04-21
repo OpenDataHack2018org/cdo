@@ -147,6 +147,7 @@ Operator catalog:
    Setgrid       setgridtype     Set grid type
    Setgrid       setgridarea     Set grid cell area
    Setzaxis      setzaxis        Set z-axis
+   Setzaxis      genlevelbounds  Generate level bounds
    Setgatt       setgatt         Set global attribute
    Setgatt       setgatts        Set global attributes
    Invert        invertlat       Invert latitudes
