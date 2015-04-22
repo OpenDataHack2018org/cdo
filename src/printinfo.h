@@ -3,6 +3,14 @@
 
 void uuid2str(const unsigned char uuid[CDI_UUID_SIZE], char *uuidstr);
 
+static inline
+int cdiUUIDIsNull(const unsigned char uuid[CDI_UUID_SIZE])
+{
+  static unsigned char uuid_nil[CDI_UUID_SIZE];
+  return !memcmp(uuid, uuid_nil, CDI_UUID_SIZE);
+}
+
+
 void datetime2str(int date, int time, char *datetimestr, int maxlen)
 {
   int year, month, day;
@@ -238,7 +246,7 @@ void printGridInfo(int vlistID)
 	      latpole = gridInqYpole(gridID);
 	      angle   = gridInqAngle(gridID);
 	      fprintf(stdout, "%33s : lon=%g  lat=%g", "northpole", lonpole, latpole);
-	      if ( angle > 0 ) fprintf(stdout, "  angle=%g", angle);
+	      if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%g", angle);
 	      fprintf(stdout, "\n");
 	    }
 
@@ -384,7 +392,7 @@ void printGridInfo(int vlistID)
 	}
 
       gridInqUUID(gridID, uuidOfHGrid);
-      if ( uuidOfHGrid[0] != 0 )
+      if ( !cdiUUIDIsNull(uuidOfHGrid) )
         {
           char uuidOfHGridStr[37];
           uuid2str(uuidOfHGrid, uuidOfHGridStr);
@@ -487,7 +495,7 @@ void printZaxisInfo(int vlistID)
 
           unsigned char uuidOfVGrid[CDI_UUID_SIZE];
           zaxisInqUUID(zaxisID, uuidOfVGrid);
-          if ( uuidOfVGrid[0] != 0 )
+          if ( !cdiUUIDIsNull(uuidOfVGrid) )
             {
               char uuidOfVGridStr[37];
               uuid2str(uuidOfVGrid, uuidOfVGridStr);
