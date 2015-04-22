@@ -28,8 +28,12 @@ test $? -eq 0 || let RSTAT+=1
 #cp $DATAPATH/pl_data.ctl pl_data.ctl
 #cp $DATAPATH/pl_data.gmp pl_data.gmp
 
-diff $DATAPATH/$RFILE1  $RFILE1 > $CDOOUT 2> $CDOERR
+head -12 $DATAPATH/$RFILE1 > h1
+head -12 $RFILE1 > h2
+#diff $DATAPATH/$RFILE1  $RFILE1 > $CDOOUT 2> $CDOERR
+diff h1  h2 > $CDOOUT 2> $CDOERR
 test $? -eq 0 || let RSTAT+=1
+rm -f h1 h2
 
 test -s $CDOOUT && let RSTAT+=1
 test -s $CDOERR && let RSTAT+=1
