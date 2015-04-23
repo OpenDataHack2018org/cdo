@@ -175,6 +175,7 @@ Keyword           & Datatype     & Description \\ \hline
 \bf{yvals}        & FLOAT ARRAY  & Y values of the grid cell center.\\
 \bf{xnpole}       & FLOAT        & X value of the north pole (rotated grid). \\
 \bf{ynpole}       & FLOAT        & Y value of the north pole (rotated grid). \\
+\bf{angle}        & FLOAT        & Angle of the rotated north pole (default: 0). \\
 \bf{nvertex}      & INTEGER      & Number of the vertices for all grid cells. \\
 \bf{xbounds}      & FLOAT ARRAY  & X bounds of each gridbox. \\
 \bf{ybounds}      & FLOAT ARRAY  & Y bounds of each gridbox. \\
@@ -234,6 +235,8 @@ yvals      & ysize & ysize & gridsize & gridsize \\
 xnpole     & 0     &       &          &          \\
 \hline
 ynpole     & 90    &       &          &          \\
+\hline
+angle       & 0    &       &          &          \\
 \hline
 nvertex    & 2 & 2 & 4 & {\bf nv} \\
 \hline
