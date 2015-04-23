@@ -68,9 +68,6 @@ void *Ydrunstat(void *argument)
   int nmiss;
   int vdate, vtime;
   int dayoy;
-  field_t ***vars1 = NULL, ***vars2 = NULL;
-  datetime_t *datetime;
-  YDAY_STATS *stats;
     
   cdoInitialize(argument);
 
@@ -114,10 +111,11 @@ void *Ydrunstat(void *argument)
   int *recVarID   = (int*) malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) malloc(nrecords*sizeof(int));
 
-  datetime = (datetime_t*) malloc((ndates+1)*sizeof(datetime_t));
+  datetime_t *datetime = (datetime_t*) malloc((ndates+1)*sizeof(datetime_t));
   
-  stats = ydstatCreate(vlistID1);
-  vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
+  YDAY_STATS *stats = ydstatCreate(vlistID1);
+  field_t ***vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
+  field_t ***vars2 = NULL;
   if ( lvarstd )
     vars2 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   
@@ -246,6 +244,7 @@ void *Ydrunstat(void *argument)
       }
 
   ydstatFinalize(stats, operfunc);
+
   otsID = 0;
 
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
@@ -257,8 +256,8 @@ void *Ydrunstat(void *argument)
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
-	    varID    = recVarID[recID];
-	    levelID  = recLevelID[recID];
+	    varID   = recVarID[recID];
+	    levelID = recLevelID[recID];
 
 	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 

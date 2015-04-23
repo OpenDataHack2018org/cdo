@@ -30,6 +30,14 @@
 
 #define NDAY 373
 
+static
+int getmonthday(int date)
+{
+  int year, month, day;
+  cdiDecodeDate(date, &year, &month, &day);
+  return month*100+day;
+}
+
 
 void *Ydrunpctl(void *argument)
 {
@@ -263,16 +271,34 @@ void *Ydrunpctl(void *argument)
       nsets[dayoy] += ndates;
       tsID++;
     }
+  /*
+  int outyear = 1e9;
+  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+    if ( nsets[dayoy] )
+      {
+	int year, month, day;
+	cdiDecodeDate(vdates1[dayoy], &year, &month, &day);
+	if ( year < outyear ) outyear = year;
+      }
 
+  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+    if ( nsets[dayoy] )
+      {
+	int year, month, day;
+	cdiDecodeDate(vdates1[dayoy], &year, &month, &day);
+	vdates1[dayoy] = cdiEncodeDate(outyear, month, day);
+      }
+  */
   otsID = 0;
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( nsets[dayoy] )
       {
-        if ( vdates1[dayoy] != vdates2[dayoy] )
+        if ( getmonthday(vdates1[dayoy]) != getmonthday(vdates2[dayoy]) )
           cdoAbort("Verification dates for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
+        /*
         if ( vtimes1[dayoy] != vtimes2[dayoy] )
           cdoAbort("Verification times for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
-
+        */
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;

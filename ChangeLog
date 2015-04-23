@@ -1,8 +1,12 @@
-2015-10-26  Uwe Schulzweida
+2015-10-28  Uwe Schulzweida
 
 	* using CDI library version 1.6.9
 	* Version 1.6.9 released
 	* clipping: update to YAC version 1.0.3
+
+2015-04-23  Uwe Schulzweida
+
+	* ydrunpctl: does not work in combination with ydrunmin/ydrunmax (bug fix)
 
 2015-04-21  Uwe Schulzweida
 
