@@ -215,7 +215,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == SELZAXISNAME )
 		{
-		  found = memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0;
+		  found = wildcardmatch(argnames[isel], zaxisname) == 0;
 		}
 	      else if ( operatorID == SELTABNUM )
 		{
