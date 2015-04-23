@@ -179,7 +179,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == SELPARAM )
 		{
-		  found = strcmp(argnames[isel], paramstr) == 0;
+		  found = wildcardmatch(argnames[isel], paramstr) == 0;
 		}
 	      else if ( operatorID == SELNAME )
 		{
