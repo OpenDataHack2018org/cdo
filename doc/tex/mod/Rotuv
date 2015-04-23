@@ -1,6 +1,6 @@
 @BeginModule
 @NewPage
-@Name      = Rotuv
+@Name      = Rotuvb
 @Title     = Rotation
 @Section   = Miscellaneous
 @Arguments = ifile ofile

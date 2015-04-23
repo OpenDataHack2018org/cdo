@@ -647,7 +647,7 @@ static modules_t Modules[] =
   { Replace,        ReplaceHelp,       ReplaceOperators,       CDI_REAL,  2,  1 },
   { Replacevalues,  ReplacevaluesHelp, ReplacevaluesOperators, CDI_REAL,  1,  1 },
   { Rhopot,         RhopotHelp,        RhopotOperators,        CDI_REAL,  1,  1 },
-  { Rotuv,          RotuvHelp,         RotuvOperators,         CDI_REAL,  1,  1 },
+  { Rotuv,          RotuvbHelp,        RotuvOperators,         CDI_REAL,  1,  1 },
   { Runpctl,        RunpctlHelp,       RunpctlOperators,       CDI_REAL,  1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,       CDI_REAL,  1,  1 },
   { Seascount,      NULL,              SeascountOperators,     CDI_BOTH,  1,  1 },

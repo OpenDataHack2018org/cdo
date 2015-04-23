@@ -4324,7 +4324,7 @@ static char *VargenHelp[] = {
     NULL
 };
 
-static char *RotuvHelp[] = {
+static char *RotuvbHelp[] = {
     "NAME",
     "    rotuvb - Rotation",
     "",
