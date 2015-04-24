@@ -8,6 +8,11 @@
 #if defined(CDO)
 #include "cdo_int.h"
 #include "pstream_write.h"
+#else
+#define  OPENMP4  201307
+#if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4
+#define  HAVE_OPENMP4  1
+#endif
 #endif
 #endif
 
@@ -23,12 +28,6 @@ int labort_after = TRUE;
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
-/*
-#if defined(CDO)
-#undef  Error
-#define Error(...)  (cdoAbort(__VA_ARGS__))
-#endif
-*/
 
 static
 char *FieldName(int code, const char *text)
@@ -1085,7 +1084,7 @@ void Omega(double *omega_in, double *divergence, double *u_wind, double *v_wind,
 }
 
 
-void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev)
+void MakeGeopotHeight(double *geop, double *gt, double *gq, double *ph, int nhor, int nlev)
 {
   int i, j;
   double vtmp;
@@ -1127,18 +1126,27 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor
     }
   else    /* No humidity */
     {
-      for ( j = nlev ; j > 1 ; j-- ) 
+      geopl = geop + nhor;
+      phl   = ph   + nhor;
+      
+      for ( j = nlev ; j > 1 ; j-- )
 #if defined (SX)
 #pragma vdir nodep
 #endif
-	for ( i = nhor * (j-1) ; i < nhor * j ; i++ )
-	  geop[i] = geop[i+nhor] + PlanetRD * gt[i] * log(ph[i+nhor] / ph[i]);
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
+        for ( i = nhor * (j-1) ; i < nhor * j ; i++ )
+          geop[i] = geopl[i] + PlanetRD * gt[i] * log(phl[i] / ph[i]);
 
 #if defined (SX)
 #pragma vdir nodep
 #endif
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
       for ( i = 0; i < nhor; i++ )
-	geop[i] = geop[i+nhor] + PlanetRD * gt[i] * z2log2;
+	geop[i] = geopl[i] + PlanetRD * gt[i] * z2log2;
     }
 
 #if defined (SX)
