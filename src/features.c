@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "cdo_int.h" // HAVE_OPENMP4
+
 void printFeatures(void)
 {
   fprintf(stderr, "Features:");
@@ -29,6 +31,9 @@ void printFeatures(void)
 #endif
 #if defined(_OPENMP)
   fprintf(stderr, " OpenMP");
+#if defined(HAVE_OPENMP4)
+  fprintf(stderr, "4");
+#endif
 #endif
 #if  defined(HAVE_NETCDF4)
   fprintf(stderr, " NC4");

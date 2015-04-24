@@ -526,7 +526,6 @@ src/clipping/dep_list.h -text
 src/clipping/ensure_array_size.c -text
 src/clipping/ensure_array_size.h -text
 src/clipping/geometry.h -text
-src/clipping/geometry_tools.c -text
 src/clipping/grid.h -text
 src/clipping/grid_cell.c -text
 src/clipping/grid_cell.h -text

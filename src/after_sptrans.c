@@ -5,6 +5,11 @@
 
 #include "constants.h"
 
+#define  OPENMP4  201307
+#if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4
+#define  HAVE_OPENMP4  1
+#endif
+
 void gaussaw(double *pa, double *pw, int nlat);
 
 static
@@ -399,21 +404,21 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
 
 
 /* to slow for nec, 2.0 instead of 2.3 GFlops ( vector length too small ) */
-void sp2fctest(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc, int nt)
+void sp2fctest(const double *sa, double *fa, const double *poli, int nlev, int nlat, int nfc, int nt)
 {
-  int lev, jm, jn, latn, lats, nsp2, is;
+  int lev, jm, jn, latn, lats, is;
   double sar, sai;
-  double *far, *fai, *pol;
-  double *sal, *fal;
+  double saris, saiis;
   double pval;
+  double *restrict far, *restrict fai;
 
-  nsp2 = (nt+1)*(nt+2);
+  long nsp2 = (nt+1)*(nt+2);
 
   for ( lev = 0; lev < nlev; lev++ )
     {
-      pol = poli;
-      fal = fa + lev*nfc*nlat;
-      sal = sa + lev*nsp2;
+      const double *restrict pol = poli;
+      const double *restrict sal = sa + lev*nsp2;
+      double *fal = fa + lev*nfc*nlat;
       memset(fal, 0, nfc*nlat*sizeof(double));
 
       for ( jm = 0; jm <= nt; jm++ )
@@ -423,10 +428,15 @@ void sp2fctest(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc
 	      is = (jn+1)%2 * 2 - 1;
 	      sar = *sal++;
 	      sai = *sal++;
+              saris = sar*is;
+              saiis = sai*is;
 	      far = fal;
 	      fai = fal + nlat;
 #if defined(SX)
 #pragma vdir nodep
+#endif
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
 #endif
 	      for ( latn = 0; latn < nlat/2; latn++ )
 		{
@@ -434,8 +444,8 @@ void sp2fctest(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc
 		  pval = pol[latn];
 		  far[latn] += pval * sar;
 		  fai[latn] += pval * sai;
-		  far[lats] += pval * sar * is;
-		  fai[lats] += pval * sai * is;
+		  far[lats] += pval * saris;
+		  fai[lats] += pval * saiis;
 		}
 	      pol += nlat;
 	    }
@@ -447,24 +457,21 @@ void sp2fctest(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc
 
 void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nlat, long nfc, long nt)
 {
-  long lev, jmm, jfc, lat, nsp2;
-  double sar, sai;
-  double *fal;
-  double * restrict far, * restrict fai;
-  const double * restrict pol;
-  const double * restrict sal;
-
-  nsp2 = (nt+1)*(nt+2);
+  long nsp2 = (nt+1)*(nt+2);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(jmm, jfc, lat, pol, sar, sai, sal, far, fai, fal)
+#pragma omp parallel for default(shared)
 #endif
-  for ( lev = 0; lev < nlev; lev++ )
+  for ( long lev = 0; lev < nlev; lev++ )
     {
-      pol = poli;
-      fal = fa + lev*nfc*nlat;
-      sal = sa + lev*nsp2;
+      const double *restrict pol = poli;
+      const double *restrict sal = sa + lev*nsp2;
+      double *fal = fa + lev*nfc*nlat;
       memset(fal, 0, nfc*nlat*sizeof(double));
+
+      double *restrict far, *restrict fai;
+      double sar, sai;
+      long jmm, jfc, lat;
 
       for ( jmm = 0; jmm <= nt; jmm++ )
 	{
@@ -489,24 +496,22 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 
 void fc2sp(double *fa, double *sa, double *poli, int nlev, int nlat, int nfc, int nt)
 {
-  int lev, jmm, jfc, lat, nsp2;
-  double sar, sai;
-  const double * restrict far;
-  const double * restrict fai;
-  const double * restrict pol;
-  double *sal;
-  double *fal;
-
-  nsp2 = (nt+1)*(nt+2);
+  int nsp2 = (nt+1)*(nt+2);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(jmm, jfc, lat, pol, sar, sai, sal, far, fai, fal)
+#pragma omp parallel for default(shared)
 #endif
-  for ( lev = 0; lev < nlev; lev++ )
+  for ( int lev = 0; lev < nlev; lev++ )
     {
-      pol = poli;
-      fal = fa + lev*nfc*nlat;
-      sal = sa + lev*nsp2;
+      const double *restrict pol = poli;
+      double *fal = fa + lev*nfc*nlat;
+      double *sal = sa + lev*nsp2;
+
+      const double *restrict far;
+      const double *restrict fai;
+      double sar, sai;
+      int jmm, jfc, lat;
+
       for ( jmm = 0; jmm <= nt; jmm++ )
 	{
 	  for ( jfc = jmm; jfc <= nt; jfc++ )
@@ -515,6 +520,9 @@ void fc2sp(double *fa, double *sa, double *poli, int nlev, int nlat, int nfc, in
 	      fai = fal + nlat;
 	      sar = 0.0;
 	      sai = 0.0;
+#if defined(HAVE_OPENMP4)
+#pragma omp simd reduction(+:sar) reduction(+:sai)
+#endif
 	      for ( lat = 0; lat < nlat; lat++ )
 		{
 		  sar += pol[lat] * far[lat];
