@@ -156,7 +156,6 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-userlog.lo libcdo_la-util.lo libcdo_la-zaxis.lo \
 	clipping/libcdo_la-clipping.lo clipping/libcdo_la-area.lo \
 	clipping/libcdo_la-ensure_array_size.lo \
-	clipping/libcdo_la-geometry_tools.lo \
 	clipping/libcdo_la-grid_cell.lo \
 	clipping/libcdo_la-intersection.lo clipping/libcdo_la-utils.lo
 libcdo_la_OBJECTS = $(am_libcdo_la_OBJECTS)
@@ -571,9 +570,9 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	text.h timebase.h timer.c userlog.c util.c util.h zaxis.c \
 	clipping/clipping.c clipping/clipping.h clipping/area.c \
 	clipping/area.h clipping/ensure_array_size.c \
-	clipping/ensure_array_size.h clipping/geometry_tools.c \
-	clipping/geometry.h clipping/grid.h clipping/points.h \
-	clipping/dep_list.h clipping/grid_cell.c clipping/grid_cell.h \
+	clipping/ensure_array_size.h clipping/geometry.h \
+	clipping/grid.h clipping/points.h clipping/dep_list.h \
+	clipping/grid_cell.c clipping/grid_cell.h \
 	clipping/intersection.c clipping/utils.c clipping/utils.h
 #
 cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
@@ -698,8 +697,6 @@ clipping/libcdo_la-clipping.lo: clipping/$(am__dirstamp) \
 clipping/libcdo_la-area.lo: clipping/$(am__dirstamp) \
 	clipping/$(DEPDIR)/$(am__dirstamp)
 clipping/libcdo_la-ensure_array_size.lo: clipping/$(am__dirstamp) \
-	clipping/$(DEPDIR)/$(am__dirstamp)
-clipping/libcdo_la-geometry_tools.lo: clipping/$(am__dirstamp) \
 	clipping/$(DEPDIR)/$(am__dirstamp)
 clipping/libcdo_la-grid_cell.lo: clipping/$(am__dirstamp) \
 	clipping/$(DEPDIR)/$(am__dirstamp)
@@ -1055,7 +1052,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-area.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-clipping.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-ensure_array_size.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-geometry_tools.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-grid_cell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-intersection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-utils.Plo@am__quote@
@@ -1650,13 +1646,6 @@ clipping/libcdo_la-ensure_array_size.lo: clipping/ensure_array_size.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='clipping/ensure_array_size.c' object='clipping/libcdo_la-ensure_array_size.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o clipping/libcdo_la-ensure_array_size.lo `test -f 'clipping/ensure_array_size.c' || echo '$(srcdir)/'`clipping/ensure_array_size.c
-
-clipping/libcdo_la-geometry_tools.lo: clipping/geometry_tools.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT clipping/libcdo_la-geometry_tools.lo -MD -MP -MF clipping/$(DEPDIR)/libcdo_la-geometry_tools.Tpo -c -o clipping/libcdo_la-geometry_tools.lo `test -f 'clipping/geometry_tools.c' || echo '$(srcdir)/'`clipping/geometry_tools.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) clipping/$(DEPDIR)/libcdo_la-geometry_tools.Tpo clipping/$(DEPDIR)/libcdo_la-geometry_tools.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='clipping/geometry_tools.c' object='clipping/libcdo_la-geometry_tools.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o clipping/libcdo_la-geometry_tools.lo `test -f 'clipping/geometry_tools.c' || echo '$(srcdir)/'`clipping/geometry_tools.c
 
 clipping/libcdo_la-grid_cell.lo: clipping/grid_cell.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT clipping/libcdo_la-grid_cell.lo -MD -MP -MF clipping/$(DEPDIR)/libcdo_la-grid_cell.Tpo -c -o clipping/libcdo_la-grid_cell.lo `test -f 'clipping/grid_cell.c' || echo '$(srcdir)/'`clipping/grid_cell.c
