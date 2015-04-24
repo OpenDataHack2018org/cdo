@@ -2272,14 +2272,12 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 }
 
 
-void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlon, long nlev, long nfc)
+void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict fc, long nlat, long nlon, long nlev, long nfc)
 {
   long lot, fou, ia, ifac, jump, k, la;
   long lat, lev, lon, nfax, rix, wix;
-  double *wfc, *wgp, *wpt;
   long nx, nblox, nvex, nb;
   long istart, i, j, ibase, jbase, jj, ii, ix, iz;
-
 
   /* gp2fc performs gridpoint to fourier transforms using           */
   /* multiple fast fourier transform of length nlon                 */
@@ -2301,14 +2299,14 @@ void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlo
   jump = (nlon + 2);
   lot  = nlev * nlat;
 
-  wfc = (double*) malloc(lot * jump * sizeof(double));
-  wgp = (double*) malloc(lot * jump * sizeof(double));
+  double *restrict wfc = (double*) malloc(lot * jump * sizeof(double));
+  double *restrict wgp = (double*) malloc(lot * jump * sizeof(double));
 
   rix = 0;
   wix = 0;
   for ( j = 0; j < lot; ++j )
     {
-      for (lon = 0; lon < nlon; ++lon)
+      for ( lon = 0; lon < nlon; ++lon )
 	wgp[wix + lon] = gp[rix + lon];
       wgp[wix + nlon] = 0.0;
       wgp[wix + nlon + 1] = 0.0;
@@ -2386,7 +2384,8 @@ void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlo
       nvex = NFFT;
     }
 
-  wpt = wgp;
+  const double *restrict wpt;
+  double *restrict fct;
 
   for ( lev = 0; lev < nlev; ++lev )
     {
@@ -2394,10 +2393,12 @@ void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlo
 	{
 	  rix = jump * (lat + lev * nlat);
 	  wix = lat + lev * nlat * nfc;
-	  fc[wix] = wpt[rix];
-	  fc[wix + nlat] = 0.0;
+          wpt = wgp + rix;
+          fct = fc + wix;
+	  fct[0] = wpt[0];
+	  fct[nlat] = 0.0;
 	  for ( fou = 2; fou < nfc; ++fou )
-	    fc[wix + fou * nlat] = wpt[rix + fou];
+	    fct[fou*nlat] = wpt[fou];
 	}
     }
 
