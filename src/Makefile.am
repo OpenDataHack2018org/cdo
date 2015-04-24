@@ -140,7 +140,6 @@ libcdo_la_SOURCES +=           \
                clipping/area.h               \
                clipping/ensure_array_size.c  \
                clipping/ensure_array_size.h  \
-               clipping/geometry_tools.c     \
                clipping/geometry.h           \
                clipping/grid.h               \
                clipping/points.h             \
