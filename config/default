@@ -80,7 +80,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=clang CFLAGS="-g -Wall -O3"
+	            CC=clang CFLAGS="-g -Wall -Ofast -march=native"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
