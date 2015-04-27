@@ -222,7 +222,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/centos58-x64/hdf5-1.8.10-patch1 \
                     --with-udunits2=/sw/centos58-x64/udunits-2.1.19 \
                     --with-jasper=/sw/centos58-x64/jasper-1.900.1 \
-                    --with-grib_api=/sw/centos58-x64/grib_api-1.9.0-static \
+                    --with-grib_api=/sw/centos58-x64/grib_api-1.12.3 \
                     --with-netcdf=/sw/centos58-x64/netcdf-4.2.1.1 \
                     --with-szlib=/sw/centos58-x64/szip-2.1 \
                     --with-zlib=/usr \
