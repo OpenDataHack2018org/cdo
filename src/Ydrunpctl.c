@@ -56,7 +56,7 @@ void *Ydrunpctl(void *argument)
   datetime_t *datetime;
   int vdate, vtime;
   int vdates1[NDAY], vtimes1[NDAY];
-  int vdates2[NDAY], vtimes2[NDAY];
+  int vdates2[NDAY] /*, vtimes2[NDAY]*/;
   int nsets[NDAY];
   int year, month, day, dayoy;
   field_t field;
@@ -152,7 +152,7 @@ void *Ydrunpctl(void *argument)
 	cdoAbort("Day %d out of range!", dayoy);
 
       vdates2[dayoy] = vdate;
-      vtimes2[dayoy] = vtime;
+      //vtimes2[dayoy] = vtime;
 
       if ( vars2[dayoy] == NULL )
 	{
