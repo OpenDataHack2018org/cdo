@@ -107,12 +107,10 @@ case "${HOSTNAME}" in
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -fp-model source -fast-transcendentals"
         elif  test "$COMP" = pgcc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
-                    --enable-all-static \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -fast"
 	else
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
-                    --enable-all-static \
                     --with-fftw3 \
                     $CDOLIBS \
                     CC=gcc CFLAGS='-g -Wall -O3'
@@ -183,7 +181,7 @@ case "${HOSTNAME}" in
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.4-threadsafe \
                     --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
                     --with-szlib=/sw/etch-ia32/szip-2.1 \
-                    --with-proj=/sw/etch-ia32/proj-4.6.0 \
+                    --withroj=/sw/etch-ia32/proj-4.6.0 \
 	            --enable-all-static CC=icc CFLAGS="-g -fast -openmp" AR=xiar LD=xild
 #	            CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2"
     ;;
