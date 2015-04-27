@@ -30,7 +30,6 @@
 void *Smooth9(void *argument)
 {
   int operatorID;
-  int operfunc;
   int streamID1, streamID2;
   int gridsize;
   int gridID;
@@ -55,7 +54,6 @@ void *Smooth9(void *argument)
   cdoOperatorAdd("smooth9",   0,   0, NULL);
  
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 

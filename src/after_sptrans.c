@@ -481,6 +481,11 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 	      sai = *sal++;
 	      far = fal;
 	      fai = fal + nlat;
+              /* unaligned loop start
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
+              */
 	      for ( lat = 0; lat < nlat; lat++ )
 		{
 		  far[lat] += pol[lat] * sar;
