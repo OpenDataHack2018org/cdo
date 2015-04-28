@@ -946,12 +946,13 @@ int check_range(long n, double *vals, double valid_min, double valid_max)
 int gridToCurvilinear(int gridID1, int lbounds)
 {
   int gridID2;
-  int gridtype, gridsize;
+  int gridtype;
+  size_t gridsize;
   long index;
 
   gridtype = gridInqType(gridID1);
-  gridsize = gridInqSize(gridID1);
-  gridID2  = gridCreate(GRID_CURVILINEAR, gridsize);
+  gridsize = (size_t) gridInqSize(gridID1);
+  gridID2  = gridCreate(GRID_CURVILINEAR, (int) gridsize);
   gridDefPrec(gridID2, DATATYPE_FLT32);
 	  
   switch (gridtype)
