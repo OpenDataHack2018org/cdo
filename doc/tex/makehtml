@@ -1,3 +1,7 @@
 #!/bin/sh
 if [ ! -d ../html ];then mkdir ../html ;fi
 htlatex cdo.tex "html" "" -d../html/
+cd ../html
+tidy cdo.html > index.html
+cp ../*pdf .
+zip cdo-doc.zip *.*
