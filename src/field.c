@@ -191,6 +191,7 @@ double fldmin(field_t field)
   else
     {
       rmin = array[0];
+      //#pragma simd reduction(min:rmin) 
       for ( i = 1; i < len; i++ ) 
 	if ( array[i] < rmin )  rmin = array[i];
     }
