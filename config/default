@@ -147,20 +147,16 @@ case "${HOSTNAME}" in
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
 	;;
 # x86_64-archlinux
-    thingol*)
+    nearly*)
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
                     --enable-maintainer-mode \
-	            --with-netcdf=$HOME/src/cdo/branches/libs4cdo/build-dev \
-	              --with-hdf5=$HOME/src/cdo/branches/libs4cdo/build-dev \
-                     --with-szlib=$HOME/src/cdo/branches/libs4cdo/build-dev \
-                  --with-grib_api=$HOME/src/cdo/branches/libs4cdo/build-dev \
-                    --with-jasper=$HOME/src/cdo/branches/libs4cdo/build-dev \
-                    --with-magics=$HOME/src/cdo/branches/libs4cdo/build-dev \
-                    --with-libxml2=/usr \
+	            --with-netcdf \
+	              --with-hdf5 \
+                     --with-szlib \
+                  --with-grib_api \
                       --with-pic \
-                      CC=gcc CFLAGS="-g -Wall -O2 -DWITH_DATA" \
-                      LDFLAGS='-L/home/ram/local/netcdf-4.1.2/lib -L/usr/lib64 -L/usr/lib -lhdf5_hl -lhdf5  -lz -lm -lhdf5_hl -lhdf5 -lz  -lcurl -L/usr/local/lib64 -L/usr/X11R6/lib64 -lpangocairo-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lcairo   -lexpat -lpthread -lfontconfig -lz -lgd -lproj -lgrib_api -lpng -lxml2 -lm -ljasper -lopenjpeg   -L/home/ram/local/netcdf-4.1.2/lib -lnetcdf_c++ -lnetcdf  -lcurl  -lstdc++ -lgfortran'
+                      CC=gcc CFLAGS="-g -Wall -O2 -DWITH_DATA" LIBS=-lopenjpeg
 	;;
 # standard workstations at MPI-M x86_64-lenny
     mpipc* )
