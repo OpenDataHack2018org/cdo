@@ -67,6 +67,7 @@ void *Selvar(void *argument)
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
+  int gridnum = 0;
   double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
@@ -78,20 +79,20 @@ void *Selvar(void *argument)
 # define TAKES_INTEGERS(id) (cdoOperatorF2(id) & 4)
 # define TAKES_FLOATS(id) (cdoOperatorF2(id) & 8)
 
-  int SELPARAM     = cdoOperatorAdd("selparam",     0, 2, "parameters");
-  int SELCODE      = cdoOperatorAdd("selcode",      0, 4, "code numbers");
-  int SELNAME      = cdoOperatorAdd("selname",      0, 2, "variable names");
-  int SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 2, "standard names");
-  int SELLEVEL     = cdoOperatorAdd("sellevel",     0, 8, "levels");
-  int SELLEVIDX    = cdoOperatorAdd("sellevidx",    0, 4, "index of levels");
+  int SELPARAM     = cdoOperatorAdd("selparam",     0, 2,   "parameters");
+  int SELCODE      = cdoOperatorAdd("selcode",      0, 4,   "code numbers");
+  int SELNAME      = cdoOperatorAdd("selname",      0, 2,   "variable names");
+  int SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 2,   "standard names");
+  int SELLEVEL     = cdoOperatorAdd("sellevel",     0, 8,   "levels");
+  int SELLEVIDX    = cdoOperatorAdd("sellevidx",    0, 4,   "index of levels");
   int SELGRID      = cdoOperatorAdd("selgrid",      0, 4|2, "list of grid names or numbers");
   int SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 4|2, "list of zaxis types or numbers");
-  int SELZAXISNAME = cdoOperatorAdd("selzaxisname", 0, 2, "list of zaxis names");
-  int SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 4, "table numbers");
+  int SELZAXISNAME = cdoOperatorAdd("selzaxisname", 0, 2,   "list of zaxis names");
+  int SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 4,   "table numbers");
   int DELPARAM     = cdoOperatorAdd("delparam",     0, 2|1, "parameter");
-  int DELCODE      = cdoOperatorAdd("delcode",      0, 1, "code numbers");
+  int DELCODE      = cdoOperatorAdd("delcode",      0, 1,   "code numbers");
   int DELNAME      = cdoOperatorAdd("delname",      0, 2|1, "variable names");
-  int SELLTYPE     = cdoOperatorAdd("selltype",     0, 4, "GRIB level types"); 
+  int SELLTYPE     = cdoOperatorAdd("selltype",     0, 4,   "GRIB level types"); 
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -142,9 +143,31 @@ void *Selvar(void *argument)
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
   int vlistID1 = streamInqVlist(streamID1);
+  int nvars = vlistNvars(vlistID1);
+
+  if ( operatorID == SELGRID && !args_are_numeric && nsel == 1 && strncmp(argnames[0], "var=", 4) == 0 )
+    {
+      const char *gridvarname = argnames[0] + 4;
+
+      if ( *gridvarname == 0 ) cdoAbort("Variable name missing!", gridvarname);
+      
+      for ( varID = 0; varID < nvars; varID++ )
+        {
+          vlistInqVarName(vlistID1, varID, varname);
+          if ( strcmp(varname, gridvarname) == 0 )
+            {
+              gridID = vlistInqVarGrid(vlistID1, varID);
+              gridnum = 1 + vlistGridIndex(vlistID1, gridID);
+              args_are_numeric = TRUE;
+              intarr = &gridnum;
+              break;
+            }
+        }
+
+      if ( !gridnum ) cdoAbort("Variable %s not found!", gridvarname);
+    }
 
   vlistClearFlag(vlistID1);
-  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
       vlistInqVarName(vlistID1, varID, varname);

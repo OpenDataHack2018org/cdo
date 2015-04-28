@@ -1,4 +1,8 @@
-2015-10-28  Uwe Schulzweida
+2015-04-28  Uwe Schulzweida
+
+	* selgrid: added parameter type var=varname to select all variables with the same grid as varname
+
+2015-04-28  Uwe Schulzweida
 
 	* using CDI library version 1.6.9
 	* Version 1.6.9 released

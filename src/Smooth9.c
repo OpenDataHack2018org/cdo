@@ -54,6 +54,7 @@ void *Smooth9(void *argument)
   cdoOperatorAdd("smooth9",   0,   0, NULL);
  
   operatorID = cdoOperatorID();
+  UNUSED(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 
