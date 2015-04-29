@@ -43,7 +43,7 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
                     LIBS="-L/opt/local/lib -lopenjpeg" \
-	            CC=icc CFLAGS="-g -Wall -O2 -vec-report2 -march=native -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O2 -vec-report2 -march=native"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -76,7 +76,7 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -openmp -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -openmp"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -104,7 +104,7 @@ case "${HOSTNAME}" in
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --with-fftw3 \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = pgcc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     $CDOLIBS \
@@ -124,7 +124,7 @@ case "${HOSTNAME}" in
 	            --with-netcdf=/lustre/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-intel15 \
                     --with-hdf5=/lustre/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-intel15 \
                     --with-fftw3 \
-	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -xCORE-AVX2 -fp-model source -fast-transcendentals"
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -xCORE-AVX2"
 	else
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-grib_api=/lustre/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48 \
