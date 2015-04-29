@@ -292,7 +292,6 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 {
   /*   Local variables */
   int  search_result;
-  long tgt_grid_size;
   long tgt_cell_add;             /*  destination addresss                   */
   int src_add[4];                /*  address for the four source points     */
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
@@ -308,7 +307,7 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 
   progressInit();
 
-  tgt_grid_size = tgt_grid->size;
+  long tgt_grid_size = tgt_grid->size;
 
   /* Compute mappings from source to target grid */
 
@@ -343,8 +342,20 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 
-      plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      plon = tgt_grid->cell_center_lon[tgt_cell_add];
+      if ( tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+        {
+          long nx = tgt_grid->dims[0];
+	  long iy = tgt_cell_add/nx;
+	  long ix = tgt_cell_add - iy*nx;
+
+          plat = tgt_grid->reg2d_center_lat[iy];
+          plon = tgt_grid->reg2d_center_lon[ix];
+        }
+      else
+        {
+          plat = tgt_grid->cell_center_lat[tgt_cell_add];
+          plon = tgt_grid->cell_center_lon[tgt_cell_add];
+        }
 
       /* Find nearest square of grid points on source grid  */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )

@@ -161,6 +161,7 @@ remap_t;
 #define  REMAP_WRITE_REMAP      2
 #define  REMAP_MAX_ITER         3
 #define  REMAP_NUM_SRCH_BINS    4
+#define  REMAP_GENWEIGHTS       5
 
 void remap_set_threshhold(double threshhold);
 void remap_set_int(int remapvar, int value);

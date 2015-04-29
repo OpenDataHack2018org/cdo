@@ -217,7 +217,7 @@ int lextrapolate = FALSE;
 int max_remaps = -1;
 int sort_mode = HEAP_SORT;
 double remap_frac_min = 0;
-
+int remap_genweights = TRUE;
 
 static
 void get_remap_env(void)
@@ -879,6 +879,8 @@ void *Remap(void *argument)
   if ( remap_genweights == FALSE && map_type != MAP_TYPE_BILINEAR && map_type != MAP_TYPE_BICUBIC && map_type != MAP_TYPE_CONSERV_YAC )
     remap_genweights = TRUE;
 
+  remap_set_int(REMAP_GENWEIGHTS, remap_genweights);
+
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC ) norm_opt = get_norm_opt();
 
   grid1sizemax = vlistGridsizeMax(vlistID1);
@@ -1076,10 +1078,10 @@ void *Remap(void *argument)
 	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
+              print_remap_info(operfunc, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
+
 	      if ( remap_genweights )
 		{
-		  print_remap_info(operfunc, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
-
 		  if      ( map_type == MAP_TYPE_CONSERV     ) scrip_remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 		  else if ( map_type == MAP_TYPE_BILINEAR    ) scrip_remap_weights_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 		  else if ( map_type == MAP_TYPE_BICUBIC     ) scrip_remap_weights_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);

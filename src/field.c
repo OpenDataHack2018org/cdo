@@ -175,7 +175,7 @@ double fldmin(field_t field)
   const size_t len     = field.size;
   const int    nmiss   = field.nmiss;
   const double missval = field.missval;
-  double *array  = field.ptr;
+  const double *restrict array  = field.ptr;
   double rmin = 0;
 
   if ( nmiss > 0 )

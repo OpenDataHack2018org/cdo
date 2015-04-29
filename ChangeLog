@@ -1,3 +1,7 @@
+2015-04-29  Uwe Schulzweida
+
+	* remapbil: optimized version without weights
+
 2015-04-28  Uwe Schulzweida
 
 	* selgrid: added parameter type var=varname to select all variables with the same grid as varname

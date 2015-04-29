@@ -128,14 +128,11 @@ void boundbox_from_corners_reg2d(long grid_add, const int *restrict grid_dims, c
 				 const double *restrict corner_lat, double *restrict bound_box)
 {
   long nx = grid_dims[0];
-  long ix, iy;
-  double clat1, clat2;
+  long iy = grid_add/nx;
+  long ix = grid_add - iy*nx;
 
-  iy = grid_add/nx;
-  ix = grid_add - iy*nx;
-
-  clat1 = corner_lat[iy  ];
-  clat2 = corner_lat[iy+1];
+  double clat1 = corner_lat[iy  ];
+  double clat2 = corner_lat[iy+1];
 
   if ( clat2 > clat1 )
     {
@@ -788,10 +785,8 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       if ( tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	{
 	  long nx = tgt_grid->dims[0];
-	  long ix, iy;
-
-	  iy = tgt_cell_add/nx;
-	  ix = tgt_cell_add - iy*nx;
+	  long iy = tgt_cell_add/nx;
+	  long ix = tgt_cell_add - iy*nx;
 
 	  tgt_grid_cell->coordinates_x[0] = tgt_grid->reg2d_corner_lon[ix  ];
 	  tgt_grid_cell->coordinates_y[0] = tgt_grid->reg2d_corner_lat[iy  ];

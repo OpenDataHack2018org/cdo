@@ -65,6 +65,7 @@
 
 
 
+static int  remap_gen_weights     = TRUE;
 static int  remap_write_remap     = FALSE;
 static int  remap_num_srch_bins   = 180;
 #define  DEFAULT_MAX_ITER  100
@@ -76,6 +77,7 @@ void remap_set_int(int remapvar, int value)
   else if ( remapvar == REMAP_WRITE_REMAP     ) remap_write_remap     = value;
   else if ( remapvar == REMAP_MAX_ITER        ) remap_max_iter        = value;
   else if ( remapvar == REMAP_NUM_SRCH_BINS   ) remap_num_srch_bins   = value;
+  else if ( remapvar == REMAP_GENWEIGHTS      ) remap_gen_weights     = value;
   else      cdoAbort("Unsupported remap variable (%d)!", remapvar);
 }
 
@@ -855,7 +857,13 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
       // src_grid->remap_grid_type = 0;
     }
 
-  if ( map_type == MAP_TYPE_CONSERV_YAC && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+  if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && map_type == MAP_TYPE_CONSERV_YAC )
+    {
+      if ( IS_REG2D_GRID(gridID2) ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      // else src_grid->remap_grid_type = -1;
+    }
+
+  if ( remap_gen_weights == FALSE && map_type == MAP_TYPE_BILINEAR )
     {
       if ( IS_REG2D_GRID(gridID2) ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // else src_grid->remap_grid_type = -1;

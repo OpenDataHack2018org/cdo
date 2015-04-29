@@ -53,7 +53,6 @@
 int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.c
 char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.c
 int CDO_optind = 1;      // refactor: moved here from cdo_getopt.c
-int remap_genweights = TRUE;  // refactor: moved here from Remap.c
 
 
 /* refactor: moved here from cdo.c */
