@@ -27,7 +27,6 @@ libcdo_la_SOURCES =            \
                datetime.c      \
                datetime.h      \
                dmemory.h       \
-               dtypes.h        \
                ecacore.c       \
                ecacore.h       \
                ecautil.c       \

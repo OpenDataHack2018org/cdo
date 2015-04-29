@@ -29,7 +29,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-
+#include <limits.h>
 
 #include <cdi.h>
 #include "cdo.h"
@@ -37,7 +37,6 @@
 #include "grid.h"
 #include "griddes.h"
 #include "error.h"
-#include "dtypes.h"
 
 /*
 int  extInqPrec(int fileID);

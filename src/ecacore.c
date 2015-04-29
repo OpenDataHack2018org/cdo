@@ -23,7 +23,6 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
-#include "dtypes.h"
 #include "ecacore.h"
 #include "ecautil.h"
 

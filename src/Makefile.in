@@ -546,10 +546,10 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	after_vertint.h after_namelist.c afterburnerlib.c \
 	afterburner.h vct_l191.h constants.h constants.c color.c \
 	color.h commandline.c const.h counter.h datetime.c datetime.h \
-	dmemory.h dtypes.h ecacore.c ecacore.h ecautil.c ecautil.h \
-	error.h etopo.h temp.h mask.h exception.c expr.c expr.h \
-	expr_lex.c expr_yacc.c expr_yacc.h features.c field.c field.h \
-	field2.c fieldc.c fieldmem.c fieldmer.c fieldzon.c functs.h \
+	dmemory.h ecacore.c ecacore.h ecautil.c ecautil.h error.h \
+	etopo.h temp.h mask.h exception.c expr.c expr.h expr_lex.c \
+	expr_yacc.c expr_yacc.h features.c field.c field.h field2.c \
+	fieldc.c fieldmem.c fieldmer.c fieldzon.c functs.h \
 	gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
 	grid_gme.c grid_lcc.c grid_rot.c gridreference.c griddes.c \
 	griddes.h griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h \

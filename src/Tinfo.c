@@ -25,7 +25,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "dtypes.h"
 
 
 #define MAX_GAPS   64

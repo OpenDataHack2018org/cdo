@@ -35,7 +35,6 @@ int pclose(FILE *stream);
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "dtypes.h"
 #include "modules.h"
 #include "pstream_int.h"
 #include "cdo_int.h"
@@ -112,7 +111,7 @@ void pstream_list_delete(void)
 static
 void pstream_init_pointer(void)
 {  
-  for ( int i = 0; i < _pstream_max; i++ )
+  for ( int i = 0; i < _pstream_max; ++i )
     {
       _pstreamList[i].next = _pstreamList + i + 1;
       _pstreamList[i].idx  = i;
@@ -149,8 +148,7 @@ pstream_t *pstream_to_pointer(int idx)
 static
 int pstream_from_pointer(pstream_t *ptr)
 {
-  int      idx = -1;
-  pstreamPtrToIdx *newptr;
+  int idx = -1;
 
   if ( ptr )
     {
@@ -158,7 +156,7 @@ int pstream_from_pointer(pstream_t *ptr)
 
       if ( _pstreamAvail )
 	{
-	  newptr        = _pstreamAvail;
+	  pstreamPtrToIdx *newptr = _pstreamAvail;
 	  _pstreamAvail = _pstreamAvail->next;
 	  newptr->next  = 0;
 	  idx	        = newptr->idx;
@@ -208,9 +206,7 @@ void pstream_init_entry(pstream_t *pstreamptr)
 static
 pstream_t *pstream_new_entry(void)
 {
-  pstream_t *pstreamptr;
-
-  pstreamptr = (pstream_t*) malloc(sizeof(pstream_t));
+  pstream_t *pstreamptr = (pstream_t*) malloc(sizeof(pstream_t));
 
   if ( pstreamptr ) pstream_init_entry(pstreamptr);
 
@@ -220,9 +216,7 @@ pstream_t *pstream_new_entry(void)
 static
 void pstream_delete_entry(pstream_t *pstreamptr)
 {
-  int idx;
-
-  idx = pstreamptr->self;
+  int idx = pstreamptr->self;
 
   PSTREAM_LOCK();
 
@@ -241,14 +235,12 @@ void pstream_delete_entry(pstream_t *pstreamptr)
 static
 void pstream_initialize(void)
 {
-  char *env;
-
 #if defined(HAVE_LIBPTHREAD)
   /* initialize global API mutex lock */
   pthread_mutex_init(&_pstream_mutex, NULL);
 #endif
 
-  env = getenv("PSTREAM_DEBUG");
+  char *env = getenv("PSTREAM_DEBUG");
   if ( env ) PSTREAM_Debug = atoi(env);
 
   env = getenv("PSTREAM_MAX");
@@ -268,10 +260,10 @@ void pstream_initialize(void)
 static
 int pstreamFindID(const char *name)
 {
-  int pstreamID;
   pstream_t *pstreamptr;
+  int pstreamID;
 
-  for ( pstreamID = 0; pstreamID < _pstream_max; pstreamID++ )
+  for ( pstreamID = 0; pstreamID < _pstream_max; ++pstreamID )
     {
       pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -288,9 +280,7 @@ int pstreamFindID(const char *name)
 
 int pstreamIsPipe(int pstreamID)
 {
-  pstream_t *pstreamptr;
-
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
   return (pstreamptr->ispipe);
 }
@@ -298,19 +288,14 @@ int pstreamIsPipe(int pstreamID)
 
 int pstreamOpenRead(const argument_t *argument)
 {
-  int ispipe = FALSE;
-  int fileID;
-  int pstreamID;
-  pstream_t *pstreamptr;
-
   PSTREAM_INIT();
 
-  pstreamptr = pstream_new_entry();
+  pstream_t *pstreamptr = pstream_new_entry();
   if ( ! pstreamptr ) Error("No memory");
 
-  pstreamID = pstreamptr->self;
+  int pstreamID = pstreamptr->self;
 
-  ispipe = argument->args[0] == '-';
+  int ispipe = argument->args[0] == '-';
   /*
   printf("pstreamOpenRead: args >%s<\n", argument->args);
   for ( int i = 0; i < argument->argc; ++i )
@@ -538,7 +523,7 @@ int pstreamOpenRead(const argument_t *argument)
       else
 	pthread_mutex_lock(&streamOpenReadMutex);
 #endif
-      fileID = streamOpenRead(filename);
+      int fileID = streamOpenRead(filename);
       if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", filename);
 
       if ( cdoDefaultFileType == CDI_UNDEFID )
@@ -626,14 +611,12 @@ void query_user_exit(const char *argument)
 
 int pstreamOpenWrite(const argument_t *argument, int filetype)
 {
-  int fileID;
   int pstreamID = -1;
-  int ispipe;
   pstream_t *pstreamptr;
 
   PSTREAM_INIT();
 
-  ispipe = strncmp(argument->args, "(pipe", 5) == 0;
+  int ispipe = strncmp(argument->args, "(pipe", 5) == 0;
 
   if ( ispipe )
     {
@@ -679,7 +662,7 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
       else
 	pthread_mutex_lock(&streamOpenWriteMutex);
 #endif
-      fileID = streamOpenWrite(argument->args, filetype);
+      int fileID = streamOpenWrite(argument->args, filetype);
 #if defined(HAVE_LIBPTHREAD)
       if ( cdoLockIO )
 	pthread_mutex_unlock(&streamMutex);
@@ -741,12 +724,9 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
 
 int pstreamOpenAppend(const argument_t *argument)
 {
-  int fileID;
   int pstreamID = -1;
-  int ispipe;
-  pstream_t *pstreamptr;
 
-  ispipe = strncmp(argument->args, "(pipe", 5) == 0;
+  int ispipe = strncmp(argument->args, "(pipe", 5) == 0;
 
   if ( ispipe )
     {
@@ -757,7 +737,7 @@ int pstreamOpenAppend(const argument_t *argument)
     {
       char *filename = (char*) malloc(strlen(argument->args)+1);
 
-      pstreamptr = pstream_new_entry();
+      pstream_t *pstreamptr = pstream_new_entry();
       if ( ! pstreamptr ) Error("No memory");
 
       pstreamID = pstreamptr->self;
@@ -771,7 +751,7 @@ int pstreamOpenAppend(const argument_t *argument)
       else
 	pthread_mutex_lock(&streamOpenReadMutex);
 #endif
-      fileID = streamOpenAppend(argument->args);
+      int fileID = streamOpenAppend(argument->args);
 #if defined(HAVE_LIBPTHREAD)
       if ( cdoLockIO )
 	pthread_mutex_unlock(&streamMutex);
@@ -797,9 +777,7 @@ int pstreamOpenAppend(const argument_t *argument)
 
 void pstreamClose(int pstreamID)
 {
-  pstream_t *pstreamptr;
-
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
   if ( pstreamptr == NULL )
     Error("Internal problem, stream %d not open!", pstreamID);
@@ -923,10 +901,9 @@ void pstreamClose(int pstreamID)
 
 int pstreamInqVlist(int pstreamID)
 {
-  int vlistID;
-  pstream_t *pstreamptr;
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-  pstreamptr = pstream_to_pointer(pstreamID);
+  int vlistID;
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -970,13 +947,12 @@ const char *cdoComment(void)
 {
   static char comment[256];
   static int init = 0;
-  int size = 0;
 
   if ( ! init )
     {
       init = 1;
 
-      size = strlen(CDO_Version);
+      int size = strlen(CDO_Version);
 
       strncat(comment, CDO_Version, size);
       comment[size] = 0;
@@ -988,12 +964,7 @@ const char *cdoComment(void)
 static
 void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 {
-  int varID, nvars;
-  int laddoffset, lscalefactor;
-  int datatype, filetype;
-  varlist_t *varlist;
-
-  filetype = pstreamptr->filetype;
+  int filetype = pstreamptr->filetype;
 
   if ( pstreamptr->vlistID != -1 )
     cdoAbort("Internal problem, vlist already defined!");
@@ -1001,10 +972,10 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
   if ( pstreamptr->varlist != NULL )
     cdoAbort("Internal problem, varlist already allocated!");
 
-  nvars = vlistNvars(vlistID);
-  varlist = (varlist_t*) malloc(nvars*sizeof(varlist_t));
+  int nvars = vlistNvars(vlistID);
+  varlist_t *varlist = (varlist_t*) malloc(nvars*sizeof(varlist_t));
 
-  for ( varID = 0; varID < nvars; ++varID )
+  for ( int varID = 0; varID < nvars; ++varID )
     {
       varlist[varID].gridsize    = gridInqSize(vlistInqVarGrid(vlistID, varID));
       varlist[varID].datatype    = vlistInqVarDatatype(vlistID, varID);
@@ -1014,10 +985,10 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 
       varlist[varID].check_datarange = FALSE;
 
-      laddoffset   = IS_NOT_EQUAL(varlist[varID].addoffset, 0);
-      lscalefactor = IS_NOT_EQUAL(varlist[varID].scalefactor, 1);
+      int laddoffset   = IS_NOT_EQUAL(varlist[varID].addoffset, 0);
+      int lscalefactor = IS_NOT_EQUAL(varlist[varID].scalefactor, 1);
 
-      datatype = varlist[varID].datatype;
+      int datatype = varlist[varID].datatype;
 
       if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
 	{
@@ -1055,9 +1026,7 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 
 void pstreamDefVlist(int pstreamID, int vlistID)
 {
-  pstream_t *pstreamptr;
-
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -1173,11 +1142,9 @@ void pstreamDefRecord(int pstreamID, int varID, int levelID)
 
 void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 {
-  pstream_t *pstreamptr;
-
   if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -1200,21 +1167,16 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 
 void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int nmiss)
 {
-  long i, ivals, gridsize;
-  int datatype;
-  double missval, addoffset, scalefactor;
-  double arrmin, arrmax, smin, smax;
-  double vmin = 0, vmax = 0;
+  long i;
+  long   gridsize    = pstreamptr->varlist[varID].gridsize;
+  int    datatype    = pstreamptr->varlist[varID].datatype;
+  double missval     = pstreamptr->varlist[varID].missval;
+  double addoffset   = pstreamptr->varlist[varID].addoffset;
+  double scalefactor = pstreamptr->varlist[varID].scalefactor;
 
-  gridsize    = pstreamptr->varlist[varID].gridsize;
-  datatype    = pstreamptr->varlist[varID].datatype;
-  missval     = pstreamptr->varlist[varID].missval;
-  addoffset   = pstreamptr->varlist[varID].addoffset;
-  scalefactor = pstreamptr->varlist[varID].scalefactor;
-
-  ivals   = 0;
-  arrmin  =  1.e300;
-  arrmax  = -1.e300;
+  long ivals   = 0;
+  double arrmin  =  1.e300;
+  double arrmax  = -1.e300;
   if ( nmiss > 0 )
     {
       for ( i = 0; i < gridsize; ++i )
@@ -1239,8 +1201,8 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
 
   if ( ivals > 0 )
     {
-      smin = (arrmin - addoffset)/scalefactor;
-      smax = (arrmax - addoffset)/scalefactor;
+      double smin = (arrmin - addoffset)/scalefactor;
+      double smax = (arrmax - addoffset)/scalefactor;
 
       if ( datatype == DATATYPE_INT8  || datatype == DATATYPE_UINT8 ||
 	   datatype == DATATYPE_INT16 || datatype == DATATYPE_UINT16 )
@@ -1248,6 +1210,8 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
 	  smin = (int) round(smin);
 	  smax = (int) round(smax);
 	}
+
+      double vmin = 0, vmax = 0;
 
       if      ( datatype == DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }
       else if ( datatype == DATATYPE_UINT8  ) { vmin =           0.; vmax =        255.; }
@@ -1269,11 +1233,9 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
 
 void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 {
-  pstream_t *pstreamptr;
+  if ( data == NULL ) cdoAbort("Data pointer not allocated (%s)!", __func__);
 
-  if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamWriteRecord)!");
-
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -1305,11 +1267,9 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 
 void pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
 {
-  pstream_t *pstreamptr;
+  if ( data == NULL ) cdoAbort("Data pointer not allocated (%s)!", __func__);
 
-  if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamWriteRecord)!");
-
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -1341,10 +1301,9 @@ void pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
 
 int pstreamInqTimestep(int pstreamID, int tsID)
 {
-  int nrecs = 0;
-  pstream_t *pstreamptr;
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-  pstreamptr = pstream_to_pointer(pstreamID);
+  int nrecs = 0;
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -1438,9 +1397,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 
 void pstreamDefTimestep(int pstreamID, int tsID)
 {
-  pstream_t *pstreamptr;
-
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -1473,13 +1430,11 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 
 void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 {
-  pstream_t *pstreamptr_dest, *pstreamptr_src;
-
   if ( PSTREAM_Debug )
     Message("pstreamIDdest = %d  pstreamIDsrc = %d", pstreamIDdest, pstreamIDsrc);
 
-  pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
-  pstreamptr_src  = pstream_to_pointer(pstreamIDsrc);
+  pstream_t *pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
+  pstream_t *pstreamptr_src  = pstream_to_pointer(pstreamIDsrc);
 
   if ( pstreamptr_dest->ispipe || pstreamptr_src->ispipe )
     cdoAbort("This operator can't be combined with other operators!");
@@ -1567,7 +1522,6 @@ void processClosePipes(void)
 void cdoFinish(void)
 {
   int processID = processSelf();
-  INT64 nvals;
   int nvars, ntimesteps;
   char memstring[32] = {""};
   double s_utime, s_stime;
@@ -1580,7 +1534,7 @@ void cdoFinish(void)
     Message("process %d  thread %ld", processID, pthread_self());
 #endif
 
-  nvals = processInqNvals(processID);
+  int64_t nvals = processInqNvals(processID);
   nvars = processInqVarNum();
   ntimesteps = processInqTimesteps();
 
@@ -1591,13 +1545,13 @@ void cdoFinish(void)
       reset_text_color(stderr);
       if ( nvals > 0 )
 	{
-	  if ( sizeof(INT64) > sizeof(long) )
+	  if ( sizeof(int64_t) > sizeof(long) )
 #if defined(_WIN32)
 	    fprintf(stderr, "Processed %I64d value%s from %d variable%s",
 #else
 	    fprintf(stderr, "Processed %jd value%s from %d variable%s",
 #endif
-		    nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
+		    (intmax_t) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
 	  else
 	    fprintf(stderr, "Processed %ld value%s from %d variable%s",
 		    (long) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
@@ -1688,11 +1642,10 @@ void cdoFinish(void)
 
 int pstreamInqFiletype(int pstreamID)
 {
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
   int filetype;
-  pstream_t *pstreamptr;
-
-  pstreamptr = pstream_to_pointer(pstreamID);
-
+  
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
     filetype = pstreamptr->filetype;
@@ -1706,10 +1659,9 @@ int pstreamInqFiletype(int pstreamID)
 
 int pstreamInqByteorder(int pstreamID)
 {
-  int byteorder;
-  pstream_t *pstreamptr;
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-  pstreamptr = pstream_to_pointer(pstreamID);
+  int byteorder;
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -1723,9 +1675,7 @@ int pstreamInqByteorder(int pstreamID)
 
 void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
 {
-  pstream_t *pstreamptr;
-
-  pstreamptr = pstream_to_pointer(pstreamID);
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
   streamInqGRIBinfo(pstreamptr->fileID, intnum, fltnum, bignum);
 }

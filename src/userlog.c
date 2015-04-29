@@ -14,7 +14,6 @@
 #include <stdlib.h>  /* qsort */
 
 #include "cdo.h"
-#include "dtypes.h"
 #include "process.h"
 
 #if ! defined(VERSION)
@@ -277,14 +276,14 @@ int flt2ibm(float x, unsigned char *ibm) {
                                       ((int)xb[1]<<16) + \
                                       ((int)xb[2]<<8)  + \
                                       ((int)xb[3])))
-#define  GET_UINT8(xb)        ((INT64) (((INT64)xb[0]<<56) + \
-                                        ((INT64)xb[1]<<48) + \
-                                        ((INT64)xb[2]<<40) + \
-                                        ((INT64)xb[3]<<32) + \
-                                        ((INT64)xb[4]<<24) + \
-                                        ((INT64)xb[5]<<16) + \
-                                        ((INT64)xb[6]<<8)  + \
-					((INT64)xb[7])))
+#define  GET_UINT8(xb)        ((int64_t) (((int64_t)xb[0]<<56) + \
+                                         ((int64_t)xb[1]<<48) + \
+                                         ((int64_t)xb[2]<<40) + \
+                                         ((int64_t)xb[3]<<32) + \
+                                         ((int64_t)xb[4]<<24) + \
+                                         ((int64_t)xb[5]<<16) + \
+                                         ((int64_t)xb[6]<<8)  + \
+					 ((int64_t)xb[7])))
 
 #define  PUT_UINT4(xb, iv)    ((*(xb)   = (iv) >> 24), \
                                (*(xb+1) = (iv) >> 16), \
@@ -317,7 +316,7 @@ void cdologs(int noper)
   int date = 0, ncdo = 0, nhours = 0;
   int date0 = 0, ncdo0, noper0, nhours0;
   double cputime0;
-  INT64 nvals0;
+  int64_t nvals0;
   unsigned char logbuf[LOGSSIZE];
   unsigned char *logdate   =  logbuf;
   unsigned char *logncdo   = &logbuf[4];
@@ -463,7 +462,7 @@ void dumplogs(const char *logfilename)
   int nlogs;
   int i;
   double cputime0;
-  INT64 nvals0;
+  int64_t nvals0;
   unsigned char logbuf[LOGSSIZE];
   unsigned char *logdate   =  logbuf;
   unsigned char *logncdo   = &logbuf[4];
@@ -513,7 +512,7 @@ void dumplogs(const char *logfilename)
 	  nvals0   = GET_UINT8(lognvals);
 	  nhours0  = GET_UINT4(lognhours);
 
-	  if ( sizeof(INT64) > sizeof(long) )
+	  if ( sizeof(int64_t) > sizeof(long) )
 	    fprintf(stdout, "%8d %10d %10d %19lld %10d %8.2f\n",
 		    date0, ncdo0, noper0, (long long)nvals0, nhours0, cputime0);
 	  else
@@ -541,7 +540,7 @@ void daylogs(const char *logfilename)
   int nlogs;
   int i;
   double cputime0;
-  INT64 nvals0;
+  int64_t nvals0;
   unsigned char logbuf[LOGSSIZE];
   unsigned char *logdate   =  logbuf;
   unsigned char *logncdo   = &logbuf[4];
@@ -610,7 +609,7 @@ void monlogs(const char *logfilename)
   int nlogs;
   int i;
   double cputime0;
-  INT64 nvals0;
+  int64_t nvals0;
   unsigned char logbuf[LOGSSIZE];
   unsigned char *logdate   =  logbuf;
   unsigned char *logncdo   = &logbuf[4];
@@ -706,7 +705,7 @@ void cdologo(int noper)
   int nhours = 0;
   int nhours0 = 0;
   double cputime0 = 0;
-  INT64 nvals0 = 0;
+  int64_t nvals0 = 0;
   unsigned char logbuf[LOGOSIZE];
   unsigned char *logname   =  logbuf;
   unsigned char *lognocc   = &logbuf[16];
@@ -844,7 +843,7 @@ void cdologo(int noper)
 typedef struct
 {
   int      nocc;
-  INT64    nvals;
+  int64_t  nvals;
   double   time;
   double   perc;
   char     name[128];
@@ -924,7 +923,7 @@ void dumplogo(const char *logfilename, int dumptype)
   int i;
   int mem;
   double cputime0;
-  INT64 nvals0;
+  int64_t nvals0;
   unsigned char logbuf[LOGOSIZE];
   unsigned char *logname   =  logbuf;
   unsigned char *lognocc   = &logbuf[16];
@@ -999,7 +998,7 @@ void dumplogo(const char *logfilename, int dumptype)
       for ( i = 0; i < nlogs; i++ )
 	{
 	  mem = (int)(8*logInfo[i]->nvals/(1024*1024*1024));
-	  if ( sizeof(INT64) > sizeof(long) )
+	  if ( sizeof(int64_t) > sizeof(long) )
 	    fprintf(stdout, "%4d  %-16s %12d %12d %12.3f %12.3f\n", i+1, logInfo[i]->name, 
 		    logInfo[i]->nocc, mem, logInfo[i]->time, logInfo[i]->perc);
 	  else
