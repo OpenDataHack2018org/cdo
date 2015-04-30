@@ -1,4 +1,0 @@
-Intel icc compiler:
-===================
-  * 'make check' failed on pio_write_run and pio_write_deco2d_run
-    - solution: use CFLAGS="-fp-model source"
