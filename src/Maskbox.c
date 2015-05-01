@@ -235,45 +235,35 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 
 void *Maskbox(void *argument)
 {
-  int MASKLONLATBOX, MASKINDEXBOX, MASKREGION;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, nvars;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
+  int nrecs;
+  int recID, varID, levelID;
   int gridID = -1;
-  int index, ngrids, gridtype;
+  int index, gridtype = -1;
   int nmiss;
-  int *vars;
   int i, i2;
-  int ndiffgrids;
   int lat1, lat2, lon11, lon12, lon21, lon22;
   int number = 0, nfiles;
   double missval;
-  int *mask;
-  double *array;
-  int taxisID1, taxisID2;
   double *xcoords, *ycoords;
   FILE *fp;
   const char *polyfile;
 
   cdoInitialize(argument);
 
-  MASKLONLATBOX = cdoOperatorAdd("masklonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
-  MASKINDEXBOX  = cdoOperatorAdd("maskindexbox",  0, 0, "index of first and last longitude and index of first and last latitude");
-  MASKREGION    = cdoOperatorAdd("maskregion",    0, 0, "limiting coordinates of the region");
+  int MASKLONLATBOX = cdoOperatorAdd("masklonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
+  int MASKINDEXBOX  = cdoOperatorAdd("maskindexbox",  0, 0, "index of first and last longitude and index of first and last latitude");
+  int MASKREGION    = cdoOperatorAdd("maskregion",    0, 0, "limiting coordinates of the region");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  ngrids = vlistNgrids(vlistID1);
-  ndiffgrids = 0;
+  int ngrids = vlistNgrids(vlistID1);
+  int ndiffgrids = 0;
   for ( index = 1; index < ngrids; index++ )
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
       ndiffgrids++;
@@ -297,14 +287,14 @@ void *Maskbox(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  nvars = vlistNvars(vlistID1);
-  vars  = (int*) malloc(nvars*sizeof(int));
+  int nvars = vlistNvars(vlistID1);
+  int *vars = (int *) malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( gridID == vlistInqVarGrid(vlistID1, varID) )
@@ -313,19 +303,27 @@ void *Maskbox(void *argument)
 	vars[varID] = FALSE;
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = gridInqSize(gridID);
-  array = (double*) malloc( gridsize*sizeof(double));
-  mask  = (int*) malloc( gridsize*sizeof(int));
-  for( i=0;  i < gridsize; i++) mask[i] = 1;
+  int gridsize = gridInqSize(gridID);
+  double *array = (double *) malloc(gridsize*sizeof(double));
+  int *mask  = (int *) malloc(gridsize*sizeof(int));
+  for ( i = 0;  i < gridsize; ++i ) mask[i] = 1;
  
   if ( operatorID == MASKLONLATBOX )
     {
-      genlonlatbox(0, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
-      maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+      if ( gridtype == GRID_CURVILINEAR )
+        {
+          genlonlatbox(0, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
+          maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+        }
+      else
+        {
+          genlonlatbox(0, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
+          maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+        }
     }
   if ( operatorID == MASKINDEXBOX )
     {
@@ -357,7 +355,7 @@ void *Maskbox(void *argument)
       if ( ycoords ) free ( ycoords );
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

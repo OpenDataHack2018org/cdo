@@ -66,8 +66,8 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   double *pxvals2 = NULL, *pyvals2 = NULL;
   double *pxbounds2 = NULL, *pybounds2 = NULL;
 
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
+  int nlon = gridInqXsize(gridID1);
+  int nlat = gridInqYsize(gridID1);
 
   int nlon21 = lon12 - lon11 + 1;
   int nlon22 = lon22 - lon21 + 1;
@@ -113,16 +113,16 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
     {
       if ( lxvals && lyvals )
 	{
-	  xvals1 = (double*) malloc(nlon1*nlat1*sizeof(double));
-	  yvals1 = (double*) malloc(nlon1*nlat1*sizeof(double));
+	  xvals1 = (double*) malloc(nlon*nlat*sizeof(double));
+	  yvals1 = (double*) malloc(nlon*nlat*sizeof(double));
 	  xvals2 = (double*) malloc(nlon2*nlat2*sizeof(double));
 	  yvals2 = (double*) malloc(nlon2*nlat2*sizeof(double));
 	}
     }
   else
     {
-      if ( lxvals ) xvals1 = (double*) malloc(nlon1*sizeof(double));
-      if ( lyvals ) yvals1 = (double*) malloc(nlat1*sizeof(double));
+      if ( lxvals ) xvals1 = (double*) malloc(nlon*sizeof(double));
+      if ( lyvals ) yvals1 = (double*) malloc(nlat*sizeof(double));
       if ( lxvals ) xvals2 = (double*) malloc(nlon2*sizeof(double));
       if ( lyvals ) yvals2 = (double*) malloc(nlat2*sizeof(double));
     }
@@ -140,13 +140,13 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 	  {
 	    for ( ilon = lon21; ilon <= lon22; ilon++ )
 	      {
-		*pxvals2++ = xvals1[ilat*nlon1 + ilon];
-		*pyvals2++ = yvals1[ilat*nlon1 + ilon];
+		*pxvals2++ = xvals1[ilat*nlon + ilon];
+		*pyvals2++ = yvals1[ilat*nlon + ilon];
 	      }
 	    for ( ilon = lon11; ilon <= lon12; ilon++ )
 	      {
-		*pxvals2++ = xvals1[ilat*nlon1 + ilon];
-		*pyvals2++ = yvals1[ilat*nlon1 + ilon];
+		*pxvals2++ = xvals1[ilat*nlon + ilon];
+		*pyvals2++ = yvals1[ilat*nlon + ilon];
 	      }
 	  }
     }
@@ -177,15 +177,15 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
     {
       if ( gridtype == GRID_CURVILINEAR )
 	{
-	  xbounds1 = (double*) malloc(4*nlon1*nlat1*sizeof(double));
-	  ybounds1 = (double*) malloc(4*nlon1*nlat1*sizeof(double));
+	  xbounds1 = (double*) malloc(4*nlon*nlat*sizeof(double));
+	  ybounds1 = (double*) malloc(4*nlon*nlat*sizeof(double));
 	  xbounds2 = (double*) malloc(4*nlon2*nlat2*sizeof(double));
 	  ybounds2 = (double*) malloc(4*nlon2*nlat2*sizeof(double));
 	}
       else
 	{
-	  xbounds1 = (double*) malloc(2*nlon1*sizeof(double));
-	  ybounds1 = (double*) malloc(2*nlat1*sizeof(double));
+	  xbounds1 = (double*) malloc(2*nlon*sizeof(double));
+	  ybounds1 = (double*) malloc(2*nlat*sizeof(double));
 	  xbounds2 = (double*) malloc(2*nlon2*sizeof(double));
 	  ybounds2 = (double*) malloc(2*nlat2*sizeof(double));
 	}
@@ -203,13 +203,13 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 	    {
 	      for ( ilon = 4*lon21; ilon < 4*(lon22+1); ilon++ )
 		{
-		  *pxbounds2++ = xbounds1[4*ilat*nlon1 + ilon];
-		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
+		  *pxbounds2++ = xbounds1[4*ilat*nlon + ilon];
+		  *pybounds2++ = ybounds1[4*ilat*nlon + ilon];
 		}
 	      for ( ilon = 4*lon11; ilon < 4*(lon12+1); ilon++ )
 		{
-		  *pxbounds2++ = xbounds1[4*ilat*nlon1 + ilon];
-		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
+		  *pxbounds2++ = xbounds1[4*ilat*nlon + ilon];
+		  *pybounds2++ = ybounds1[4*ilat*nlon + ilon];
 		}
 	    }
 	}
@@ -339,10 +339,32 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 }
 
 
-void genlonlatbox_reg(double xlon1, double xlon2, double xlat1, double xlat2,
-		      int nlon1, int nlat1, double *xvals1, double *yvals1,
+void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
 		      int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
+  int ilon, ilat;
+
+  int nlon = gridInqXsize(gridID);
+  int nlat = gridInqYsize(gridID);
+
+  double *xvals = (double*) malloc(nlon*sizeof(double));
+  double *yvals = (double*) malloc(nlat*sizeof(double));
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
+
+  char xunits[CDI_MAX_NAME];
+  char yunits[CDI_MAX_NAME];
+  gridInqXunits(gridID, xunits);
+  gridInqYunits(gridID, yunits);
+
+  double xfact = 1, yfact = 1;
+  if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
+  if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
+
+  for ( ilat = 0; ilat < nlat; ilat++ ) yvals[ilat] *= yfact;
+  for ( ilon = 0; ilon < nlon; ilon++ ) xvals[ilon] *= xfact;
+
   if ( IS_NOT_EQUAL(xlon1, xlon2) )
     {
       xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
@@ -353,59 +375,183 @@ void genlonlatbox_reg(double xlon1, double xlon2, double xlat1, double xlat2,
       xlon2 += 0.00001;
     }
 
-  xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
-  xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
+  xlon2 -= 360 * floor ((xlon1 - xvals[0]) / 360);
+  xlon1 -= 360 * floor ((xlon1 - xvals[0]) / 360);
 
-  // while ( nlon1 == 1 || (xvals1[nlon1-1] - xvals1[0]) >= 360 ) nlon1--;
+  // while ( nlon == 1 || (xvals[nlon-1] - xvals[0]) >= 360 ) nlon--;
 
-  for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
-  for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
+  for ( *lon21 = 0; *lon21 < nlon && xvals[*lon21] < xlon1; (*lon21)++ );
+  for ( *lon22 = *lon21; *lon22 < nlon && xvals[*lon22] < xlon2; (*lon22)++ );
 
-  if ( *lon22 >= nlon1 || xvals1[*lon22] > xlon2 ) (*lon22)--;
+  if ( *lon22 >= nlon || xvals[*lon22] > xlon2 ) (*lon22)--;
 
   xlon1 -= 360;
   xlon2 -= 360;
 
-  for ( *lon11 = 0; xvals1[*lon11] < xlon1; (*lon11)++ );
-  for ( *lon12 = *lon11; *lon12 < nlon1 && xvals1[*lon12] < xlon2; (*lon12)++ );
+  for ( *lon11 = 0; xvals[*lon11] < xlon1; (*lon11)++ );
+  for ( *lon12 = *lon11; *lon12 < nlon && xvals[*lon12] < xlon2; (*lon12)++ );
   
   // (*lon12)--;
-  if ( *lon12 >= nlon1 || xvals1[*lon12] > xlon2 ) (*lon12)--;
+  if ( *lon12 >= nlon || xvals[*lon12] > xlon2 ) (*lon12)--;
   if ( *lon12 >= 0 )
-    if ( IS_EQUAL(xvals1[*lon12], xvals1[*lon21]) ) (*lon12)--;
+    if ( IS_EQUAL(xvals[*lon12], xvals[*lon21]) ) (*lon12)--;
 
   if ( *lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0 )
     cdoAbort("Longitudinal dimension is too small!");
   
-  if ( yvals1[0] > yvals1[nlat1 - 1] )
+  if ( yvals[0] > yvals[nlat - 1] )
     {
       if ( xlat1 > xlat2 )
 	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat1; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat2; (*lat2)-- );
+	  for ( *lat1 = 0; *lat1 < nlat && yvals[*lat1] > xlat1; (*lat1)++ );
+	  for ( *lat2 = nlat - 1; *lat2 && yvals[*lat2] < xlat2; (*lat2)-- );
 	}
       else
 	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat2; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat1; (*lat2)-- );
+	  for ( *lat1 = 0; *lat1 < nlat && yvals[*lat1] > xlat2; (*lat1)++ );
+	  for ( *lat2 = nlat - 1; *lat2 && yvals[*lat2] < xlat1; (*lat2)-- );
 	}
     }
   else
     {
       if ( xlat1 < xlat2 )
 	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat1; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat2; (*lat2)-- );
+	  for ( *lat1 = 0; *lat1 < nlat && yvals[*lat1] < xlat1; (*lat1)++ );
+	  for ( *lat2 = nlat - 1; *lat2 && yvals[*lat2] > xlat2; (*lat2)-- );
 	}
       else
 	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat2; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat1; (*lat2)-- );
+	  for ( *lat1 = 0; *lat1 < nlat && yvals[*lat1] < xlat2; (*lat1)++ );
+	  for ( *lat2 = nlat - 1; *lat2 && yvals[*lat2] > xlat1; (*lat2)-- );
 	}
     }
-  
+
+  free(xvals);
+  free(yvals);
+
   if ( *lat2 - *lat1 + 1 <= 0 )
     cdoAbort("Latitudinal dimension is too small!");
+}
+
+
+void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
+                       int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+{
+  int ilon, ilat;
+  
+  int nlon = gridInqXsize(gridID);
+  int nlat = gridInqYsize(gridID);
+  int gridsize = nlon*nlat;
+
+  int grid_is_circular = gridIsCircular(gridID);
+
+  double *xvals = (double *) malloc(gridsize*sizeof(double));
+  double *yvals = (double *) malloc(gridsize*sizeof(double));
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
+
+  char xunits[CDI_MAX_NAME];
+  char yunits[CDI_MAX_NAME];
+  gridInqXunits(gridID, xunits);
+  gridInqYunits(gridID, yunits);
+
+  double xfact = 1, yfact = 1;
+  if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
+  if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
+
+  double xval, yval, xfirst, xlast, ylast;
+  int lp2 = FALSE;
+
+  if ( xlon1 > xlon2 ) 
+    cdoAbort("The second longitude have to be greater than the first one!");
+
+  if ( xlat1 > xlat2 )
+    {
+      double xtemp = xlat1;
+      xlat1 = xlat2;
+      xlat2 = xtemp;
+    }
+	  
+  *lat1 = nlat-1;
+  *lat2 = 0;
+  *lon11 = 0;
+  *lon12 = -1;
+  *lon21 = nlon-1;
+  *lon22 = 0;
+
+  for ( ilat = 0; ilat < nlat; ilat++ )
+    {
+      xlast = xfact * xvals[ilat*nlon + nlon-1];
+      ylast = yfact * yvals[ilat*nlon + nlon-1];
+      if ( ylast >= xlat1 && ylast <= xlat2 )
+        if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
+          {
+            *lon11 = nlon-1;
+            *lon12 = 0;
+            lp2 = TRUE;
+          }
+    }
+
+  for ( ilat = 0; ilat < nlat; ilat++ )
+    {
+      for ( ilon = 0; ilon < nlon; ilon++ )
+        {
+          xval = xvals[ilat*nlon + ilon];
+          yval = yvals[ilat*nlon + ilon];
+
+          xval *= xfact;
+          yval *= yfact;
+
+          if ( yval >= xlat1 && yval <= xlat2 )
+            {
+              if ( lp2 )
+                {
+                  xfirst = xfact * xvals[ilat*nlon];
+                  if ( xfirst < xlon1 ) xfirst = xlon1;
+                  
+                  xlast = xfact * xvals[ilat*nlon + nlon-1];
+                  if ( xlast > xlon2 ) xlast = xlon2;
+
+                  if ( xval >= xlon1 && xval <= xlast )
+                    {
+                      if ( ilon < *lon21 ) *lon21 = ilon;
+                      if ( ilon > *lon22 ) *lon22 = ilon;
+                      if ( ilat < *lat1 ) *lat1 = ilat;
+                      if ( ilat > *lat2 ) *lat2 = ilat;
+                    }
+                  else if ( xval >= xfirst && xval <= xlon2 )
+                    {
+                      if ( ilon < *lon11 ) *lon11 = ilon;
+                      if ( ilon > *lon12 ) *lon12 = ilon;
+                      if ( ilat < *lat1 ) *lat1 = ilat;
+                      if ( ilat > *lat2 ) *lat2 = ilat;
+                    }
+                }
+              else
+                {
+                  if ( ((xval     >= xlon1 && xval     <= xlon2) ||
+                        (xval-360 >= xlon1 && xval-360 <= xlon2) ||
+                        (xval+360 >= xlon1 && xval+360 <= xlon2)) )
+                    {
+                      if ( ilon < *lon21 ) *lon21 = ilon;
+                      if ( ilon > *lon22 ) *lon22 = ilon;
+                      if ( ilat < *lat1 ) *lat1 = ilat;
+                      if ( ilat > *lat2 ) *lat2 = ilat;
+                    }
+                }
+            }
+        }
+    }
+
+  // printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d\n", *lon11, *lon12, *lon21, *lon22, *lat1, *lat2);
+  if ( *lon12 == 0 && *lon11 > 0 ) *lon11 = -1;
+
+  if ( *lat2 - *lat1 + 1 <= 0 )
+    cdoAbort("Latitudinal dimension is too small!");
+
+  free(xvals);
+  free(yvals);
 }
 
 
@@ -439,148 +585,21 @@ void getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat
 }
 
 
-void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+void genlonlatbox(int argc_offset, int gridID, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int ilon, ilat;
-
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(argc_offset, &xlon1, &xlon2, &xlat1, &xlat2);
 
-  int gridtype = gridInqType(gridID1);
-
-  int nlon1 = gridInqXsize(gridID1);
-  int nlat1 = gridInqYsize(gridID1);
-
-  int grid_is_circular = gridIsCircular(gridID1);
-
-  double *xvals1, *yvals1;
-  if ( gridtype == GRID_CURVILINEAR )
-    {
-      xvals1 = (double*) malloc(nlon1*nlat1*sizeof(double));
-      yvals1 = (double*) malloc(nlon1*nlat1*sizeof(double));
-    }
-  else
-    {
-      xvals1 = (double*) malloc(nlon1*sizeof(double));
-      yvals1 = (double*) malloc(nlat1*sizeof(double));
-    }
-
-  gridInqXvals(gridID1, xvals1);
-  gridInqYvals(gridID1, yvals1);
-
-  char xunits[CDI_MAX_NAME];
-  char yunits[CDI_MAX_NAME];
-  gridInqXunits(gridID1, xunits);
-  gridInqYunits(gridID1, yunits);
-
-  double xfact = 1, yfact = 1;
-  if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
-  if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
+  int gridtype = gridInqType(gridID);
 
   if ( gridtype == GRID_CURVILINEAR )
     {
-      double xval, yval, xfirst, xlast, ylast;
-      int lp2 = FALSE;
-
-      if ( xlon1 > xlon2 ) 
-	cdoAbort("The second longitude have to be greater than the first one!");
-
-      if ( xlat1 > xlat2 )
-	{
-	  double xtemp = xlat1;
-	  xlat1 = xlat2;
-	  xlat2 = xtemp;
-	}
-	  
-      *lat1 = nlat1-1;
-      *lat2 = 0;
-      *lon11 = 0;
-      *lon12 = -1;
-      *lon21 = nlon1-1;
-      *lon22 = 0;
-
-      for ( ilat = 0; ilat < nlat1; ilat++ )
-	{
-	  xlast = xfact * xvals1[ilat*nlon1 + nlon1-1];
-	  ylast = yfact * yvals1[ilat*nlon1 + nlon1-1];
-	  if ( ylast >= xlat1 && ylast <= xlat2 )
-	    if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
-	      {
-		*lon11 = nlon1-1;
-		*lon12 = 0;
-		lp2 = TRUE;
-	      }
-	}
-
-      for ( ilat = 0; ilat < nlat1; ilat++ )
-	{
-	  for ( ilon = 0; ilon < nlon1; ilon++ )
-	    {
-	      xval = xvals1[ilat*nlon1 + ilon];
-	      yval = yvals1[ilat*nlon1 + ilon];
-
-	      xval *= xfact;
-	      yval *= yfact;
-
-	      if ( yval >= xlat1 && yval <= xlat2 )
-		{
-		  if ( lp2 )
-		    {
-		      xfirst = xfact * xvals1[ilat*nlon1];
-		      if ( xfirst < xlon1 ) xfirst = xlon1;
-
-		      xlast = xfact * xvals1[ilat*nlon1 + nlon1-1];
-		      if ( xlast > xlon2 ) xlast = xlon2;
-
-		      if ( xval >= xlon1 && xval <= xlast )
-			{
-			  if ( ilon < *lon21 ) *lon21 = ilon;
-			  if ( ilon > *lon22 ) *lon22 = ilon;
-			  if ( ilat < *lat1 ) *lat1 = ilat;
-			  if ( ilat > *lat2 ) *lat2 = ilat;
-			}
-		      else if ( xval >= xfirst && xval <= xlon2 )
-			{
-			  if ( ilon < *lon11 ) *lon11 = ilon;
-			  if ( ilon > *lon12 ) *lon12 = ilon;
-			  if ( ilat < *lat1 ) *lat1 = ilat;
-			  if ( ilat > *lat2 ) *lat2 = ilat;
-			}
-		    }
-		  else
-		    {
-		      if ( ((xval     >= xlon1 && xval     <= xlon2) ||
-			    (xval-360 >= xlon1 && xval-360 <= xlon2) ||
-			    (xval+360 >= xlon1 && xval+360 <= xlon2)) )
-			{
-			  if ( ilon < *lon21 ) *lon21 = ilon;
-			  if ( ilon > *lon22 ) *lon22 = ilon;
-			  if ( ilat < *lat1 ) *lat1 = ilat;
-			  if ( ilat > *lat2 ) *lat2 = ilat;
-			}
-		    }
-		}
-	    }
-	}
-
-      // printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d\n", *lon11, *lon12, *lon21, *lon22, *lat1, *lat2);
-      if ( *lon12 == 0 && *lon11 > 0 ) *lon11 = -1;
-
-      if ( *lat2 - *lat1 + 1 <= 0 )
-	cdoAbort("Latitudinal dimension is too small!");
+      genlonlatbox_curv(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
     }
   else
     {
-      for ( ilat = 0; ilat < nlat1; ilat++ ) yvals1[ilat] *= yfact;
-      for ( ilon = 0; ilon < nlon1; ilon++ ) xvals1[ilon] *= xfact;
-
-      genlonlatbox_reg(xlon1, xlon2, xlat1, xlat2,
-		       nlon1, nlat1, xvals1, yvals1,
-		       lat1, lat2, lon11, lon12, lon21, lon22);
+      genlonlatbox_reg(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
     }
-
-  free(xvals1);
-  free(yvals1);
 }
 
 static
@@ -599,7 +618,7 @@ static
 int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 {
   int gridtype, gridID2;
-  double *xvals1, *yvals1;
+  double *xvals, *yvals;
   double xlon1, xlon2, xlat1, xlat2, x, xval, yval;
   int i, gridsize1;
   int nvals = 0;
@@ -626,11 +645,11 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
   if ( gridtype != GRID_UNSTRUCTURED ) cdoAbort("Internal problem, wrong grid type!");
 
-  xvals1 = (double*) malloc(gridsize1*sizeof(double));
-  yvals1 = (double*) malloc(gridsize1*sizeof(double));
+  xvals = (double*) malloc(gridsize1*sizeof(double));
+  yvals = (double*) malloc(gridsize1*sizeof(double));
 
-  gridInqXvals(gridID1, xvals1);
-  gridInqYvals(gridID1, yvals1);
+  gridInqXvals(gridID1, xvals);
+  gridInqYvals(gridID1, yvals);
 
   gridInqXunits(gridID1, xunits);
   gridInqYunits(gridID1, yunits);
@@ -642,8 +661,8 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   *cellidx = NULL;
   for ( i = 0; i < gridsize1; ++i )
     {
-      xval = xvals1[i]*xfact;
-      yval = yvals1[i]*yfact;
+      xval = xvals[i]*xfact;
+      yval = yvals[i]*yfact;
       if ( yval >= xlat1 && yval <= xlat2 )
 	if ( (xval >= xlon1 && xval <= xlon2) ||
 	     (xval+360 >= xlon1 && xval+360 <= xlon2) ||
@@ -663,8 +682,8 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
   *gridsize2 = nvals;
 
-  free(xvals1);
-  free(yvals1);
+  free(xvals);
+  free(yvals);
 
   gridID2 = gengridcell(gridID1, *gridsize2, *cellidx);
 
@@ -674,7 +693,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
 void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int nlon1, nlat1;
+  int nlon, nlat;
   int temp;
 
   operatorCheckArgc(argc_offset+4);
@@ -691,38 +710,38 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
       *lat2 = temp;
     }
 
-  nlon1 = gridInqXsize(gridID1);
-  nlat1 = gridInqYsize(gridID1);
+  nlon = gridInqXsize(gridID1);
+  nlat = gridInqYsize(gridID1);
 
   if ( *lat1 < 1 )
     {
       cdoWarning("First latitude index out of range, set to 1!");
       *lat1 = 1;
     }
-  if ( *lat2 > nlat1 )
+  if ( *lat2 > nlat )
     {
-      cdoWarning("First latitude index out of range, set to %d!", nlat1);
-      *lat1 = nlat1;
+      cdoWarning("First latitude index out of range, set to %d!", nlat);
+      *lat1 = nlat;
     }
   if ( *lat2 < 1 )
     {
       cdoWarning("First latitude index out of range, set to 1!");
       *lat2 = 1;
     }
-  if ( *lat2 > nlat1 )
+  if ( *lat2 > nlat )
     {
-      cdoWarning("Last latitude index out of range, set to %d!", nlat1);
-      *lat2 = nlat1;
+      cdoWarning("Last latitude index out of range, set to %d!", nlat);
+      *lat2 = nlat;
     }
   if ( *lon11 < 1 )
     {
       cdoWarning("First longitude index out of range, set to 1!");
       *lon11 = 1;
     }
-  if ( *lon12 > nlon1+1 )
+  if ( *lon12 > nlon+1 )
     {
-      cdoWarning("Last longitude index out of range, set to %d!", nlon1);
-      *lon12 = nlon1;
+      cdoWarning("Last longitude index out of range, set to %d!", nlon);
+      *lon12 = nlon;
     }
 
   (*lon11)--;
@@ -733,15 +752,15 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
   if ( *lon11 > *lon12 )
     {
       *lon21 = *lon11;
-      *lon22 = nlon1 - 1;
+      *lon22 = nlon - 1;
       *lon11 = 0;
     }
   else
     {
-      if ( *lon12 > nlon1-1 )
+      if ( *lon12 > nlon-1 )
 	{
 	  *lon21 = *lon11;
-	  *lon22 = nlon1 - 1;
+	  *lon22 = nlon - 1;
 	  *lon11 = 0;
 	  *lon12 = 0;
 	}
@@ -769,10 +788,10 @@ static
 void window(int nwpv, double *array1, int gridID1, double *array2,
 	    long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  long nlon1;
+  long nlon;
   long ilat, ilon;
 
-  nlon1 = gridInqXsize(gridID1);
+  nlon = gridInqXsize(gridID1);
 
   if ( nwpv == 2 )
     {
@@ -780,13 +799,13 @@ void window(int nwpv, double *array1, int gridID1, double *array2,
 	{
 	  for ( ilon = lon21; ilon <= lon22; ilon++ )
 	    {
-	      *array2++ = array1[ilat*nlon1*2 + ilon*2];
-	      *array2++ = array1[ilat*nlon1*2 + ilon*2+1];
+	      *array2++ = array1[ilat*nlon*2 + ilon*2];
+	      *array2++ = array1[ilat*nlon*2 + ilon*2+1];
 	    }
 	  for ( ilon = lon11; ilon <= lon12; ilon++ )
 	    {
-	      *array2++ = array1[ilat*nlon1*2 + ilon*2];
-	      *array2++ = array1[ilat*nlon1*2 + ilon*2+1];
+	      *array2++ = array1[ilat*nlon*2 + ilon*2];
+	      *array2++ = array1[ilat*nlon*2 + ilon*2+1];
 	    }
 	}
     }
@@ -795,9 +814,9 @@ void window(int nwpv, double *array1, int gridID1, double *array2,
       for ( ilat = lat1; ilat <= lat2; ilat++ )
 	{
 	  for ( ilon = lon21; ilon <= lon22; ilon++ )
-	    *array2++ = array1[ilat*nlon1 + ilon];
+	    *array2++ = array1[ilat*nlon + ilon];
 	  for ( ilon = lon11; ilon <= lon12; ilon++ )
-	    *array2++ = array1[ilat*nlon1 + ilon];
+	    *array2++ = array1[ilat*nlon + ilon];
 	}
     }
 }
