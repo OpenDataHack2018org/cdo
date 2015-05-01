@@ -54,12 +54,7 @@ void correct_xvals(long nlon, long inc, double *xvals)
 static
 int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
-  int gridtype, gridID2;
-  int nlon1, nlat1;
-  int nlon2, nlat2;
-  int nlon21, nlon22;
   int i;
-  int prec;
   int ilat, ilon;
   int lxvals, lyvals;
   char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
@@ -71,18 +66,18 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   double *pxvals2 = NULL, *pyvals2 = NULL;
   double *pxbounds2 = NULL, *pybounds2 = NULL;
 
-  nlon1 = gridInqXsize(gridID1);
-  nlat1 = gridInqYsize(gridID1);
+  int nlon1 = gridInqXsize(gridID1);
+  int nlat1 = gridInqYsize(gridID1);
 
-  nlon21 = lon12 - lon11 + 1;
-  nlon22 = lon22 - lon21 + 1;
-  nlon2 = nlon21 + nlon22;
-  nlat2 = lat2 - lat1 + 1;
+  int nlon21 = lon12 - lon11 + 1;
+  int nlon22 = lon22 - lon21 + 1;
+  int nlon2 = nlon21 + nlon22;
+  int nlat2 = lat2 - lat1 + 1;
 
-  gridtype = gridInqType(gridID1);
-  prec     = gridInqPrec(gridID1);
+  int gridtype = gridInqType(gridID1);
+  int prec     = gridInqPrec(gridID1);
 
-  gridID2 = gridCreate(gridtype, nlon2*nlat2);
+  int gridID2 = gridCreate(gridtype, nlon2*nlat2);
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
@@ -247,10 +242,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 static
 int gengridcell(int gridID1, int gridsize2, int *cellidx)
 {
-  int gridtype, gridID2;
-  int gridsize1;
   int i, k, nv;
-  int prec;
   char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
   char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
@@ -258,14 +250,14 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
   double *xbounds1 = NULL, *ybounds1 = NULL;
   double *xbounds2 = NULL, *ybounds2 = NULL;
 
-  gridsize1 = gridInqSize(gridID1);
+  int gridsize1 = gridInqSize(gridID1);
 
   /* printf("gridsize1 = %d, gridsize2 = %d\n", gridsize1, gridsize2); */
 
-  gridtype = gridInqType(gridID1);
-  prec     = gridInqPrec(gridID1);
+  int gridtype = gridInqType(gridID1);
+  int prec     = gridInqPrec(gridID1);
 
-  gridID2 = gridCreate(gridtype, gridsize2);
+  int gridID2 = gridCreate(gridtype, gridsize2);
 
   gridDefPrec(gridID2, prec);
 
@@ -417,32 +409,51 @@ void genlonlatbox_reg(double xlon1, double xlon2, double xlat1, double xlat2,
 }
 
 
+void getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1, double *xlat2)
+{
+  int lset = FALSE;
+  int nargc = operatorArgc() - argc_offset;
+
+  if ( nargc == 1 )
+    {
+      const char *gridname = operatorArgv()[argc_offset+0];
+      if ( strcmp(gridname, "europe") == 0 )
+        {
+          *xlon1 = -30;
+          *xlon2 =  60;
+          *xlat1 =  30;
+          *xlat2 =  80;
+          lset = TRUE;
+        }
+    }
+
+  if ( !lset )
+    {
+      operatorCheckArgc(argc_offset+4);
+
+      *xlon1 = parameter2double(operatorArgv()[argc_offset+0]);
+      *xlon2 = parameter2double(operatorArgv()[argc_offset+1]);
+      *xlat1 = parameter2double(operatorArgv()[argc_offset+2]);
+      *xlat2 = parameter2double(operatorArgv()[argc_offset+3]);
+    }
+}
+
+
 void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   int ilon, ilat;
-  int nlon1, nlat1;
-  int gridtype;
+
+  double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
+  getlonlatparams(argc_offset, &xlon1, &xlon2, &xlat1, &xlat2);
+
+  int gridtype = gridInqType(gridID1);
+
+  int nlon1 = gridInqXsize(gridID1);
+  int nlat1 = gridInqYsize(gridID1);
+
+  int grid_is_circular = gridIsCircular(gridID1);
+
   double *xvals1, *yvals1;
-  double xlon1, xlon2, xlat1, xlat2;
-  int grid_is_circular;
-  char xunits[CDI_MAX_NAME];
-  char yunits[CDI_MAX_NAME];
-  double xfact = 1, yfact = 1;
-
-  operatorCheckArgc(argc_offset+4);
-
-  xlon1 = parameter2double(operatorArgv()[argc_offset+0]);
-  xlon2 = parameter2double(operatorArgv()[argc_offset+1]);
-  xlat1 = parameter2double(operatorArgv()[argc_offset+2]);
-  xlat2 = parameter2double(operatorArgv()[argc_offset+3]);
-
-  gridtype = gridInqType(gridID1);
-
-  nlon1 = gridInqXsize(gridID1);
-  nlat1 = gridInqYsize(gridID1);
-
-  grid_is_circular = gridIsCircular(gridID1);
-
   if ( gridtype == GRID_CURVILINEAR )
     {
       xvals1 = (double*) malloc(nlon1*nlat1*sizeof(double));
@@ -457,9 +468,12 @@ void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11
   gridInqXvals(gridID1, xvals1);
   gridInqYvals(gridID1, yvals1);
 
+  char xunits[CDI_MAX_NAME];
+  char yunits[CDI_MAX_NAME];
   gridInqXunits(gridID1, xunits);
   gridInqYunits(gridID1, yunits);
 
+  double xfact = 1, yfact = 1;
   if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
   if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
 
@@ -811,53 +825,44 @@ void window_cell(int nwpv, double *array1, int gridID1, double *array2, long gri
 
 void *Selbox(void *argument)
 {
-  int SELLONLATBOX, SELINDEXBOX;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, nvars;
-  int tsID, recID, varID, levelID;
-  int gridsize, gridsize2;
-  int vlistID1, vlistID2;
+  int nrecs;
+  int recID, varID, levelID;
   int gridID1 = -1, gridID2;
-  int index, ngrids, gridtype = -1;
+  int index, gridtype = -1;
   int nmiss;
-  int *vars = NULL;
   int i;
   int nwpv; // number of words per value; real:1  complex:2
   double missval;
-  double *array1 = NULL, *array2 = NULL;
-  int taxisID1, taxisID2;
   typedef struct {
     int gridID1, gridID2;
     int *cellidx, nvals;
     int lat1, lat2, lon11, lon12, lon21, lon22; 
   } sbox_t;
-  sbox_t *sbox = NULL;
 
   cdoInitialize(argument);
 
-  SELLONLATBOX = cdoOperatorAdd("sellonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
-  SELINDEXBOX  = cdoOperatorAdd("selindexbox",  0, 0, "index of first and last longitude and index of first and last latitude");
+  int SELLONLATBOX = cdoOperatorAdd("sellonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
+  int SELINDEXBOX  = cdoOperatorAdd("selindexbox",  0, 0, "index of first and last longitude and index of first and last latitude");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  nvars = vlistNvars(vlistID1);
-  vars  = (int*) malloc(nvars*sizeof(int));
+  int nvars = vlistNvars(vlistID1);
+  int *vars  = (int *) malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
 
-  ngrids = vlistNgrids(vlistID1);
-  sbox = (sbox_t*) malloc(ngrids*sizeof(sbox_t));
+  int ngrids = vlistNgrids(vlistID1);
+  sbox_t *sbox = (sbox_t *) malloc(ngrids*sizeof(sbox_t));
 
   for ( index = 0; index < ngrids; index++ )
     {
@@ -921,19 +926,19 @@ void *Selbox(void *argument)
 
   if ( varID >= nvars ) cdoWarning("No variables selected!");
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array1 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) malloc(gridsize*sizeof(double));
 
-  gridsize2 = vlistGridsizeMax(vlistID2);
+  int gridsize2 = vlistGridsizeMax(vlistID2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
-  array2 = (double*) malloc(gridsize2*sizeof(double));
+  double *array2 = (double*) malloc(gridsize2*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
