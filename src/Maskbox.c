@@ -118,17 +118,120 @@ static
 void maskbox(int *mask, int gridID,
 	     int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
-  int nlon, nlat;
-  int ilat, ilon;
+  int nlon = gridInqXsize(gridID);
+  int nlat = gridInqYsize(gridID);
 
-  nlon = gridInqXsize(gridID);
-  nlat = gridInqYsize(gridID);
-
-  for ( ilat = 0; ilat < nlat; ilat++ )
-    for ( ilon = 0; ilon < nlon; ilon++ )
+  for ( int ilat = 0; ilat < nlat; ilat++ )
+    for ( int ilon = 0; ilon < nlon; ilon++ )
       if (  (lat1 <= ilat && ilat <= lat2 && 
 	      ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) )
 	mask[nlon*ilat + ilon] = 0;
+}
+
+void getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1, double *xlat2);
+void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
+                       int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+
+static
+void maskbox_curv(int *mask, int gridID)
+{
+  double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
+  getlonlatparams(0, &xlon1, &xlon2, &xlat1, &xlat2);
+
+  int nlon = gridInqXsize(gridID);
+  int nlat = gridInqYsize(gridID);
+
+  int gridsize = nlon*nlat;
+
+  int grid_is_circular = gridIsCircular(gridID);
+
+  double *xvals = (double *) malloc(gridsize*sizeof(double));
+  double *yvals = (double *) malloc(gridsize*sizeof(double));
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
+
+  char xunits[CDI_MAX_NAME];
+  char yunits[CDI_MAX_NAME];
+  gridInqXunits(gridID, xunits);
+  gridInqYunits(gridID, yunits);
+
+  double xfact = 1, yfact = 1;
+  if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
+  if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
+
+  double xval, yval, xfirst, xlast, ylast;
+  int lp2 = FALSE;
+
+  if ( xlon1 > xlon2 ) 
+    cdoAbort("The second longitude have to be greater than the first one!");
+
+  if ( xlat1 > xlat2 )
+    {
+      double xtemp = xlat1;
+      xlat1 = xlat2;
+      xlat2 = xtemp;
+    }
+
+  int ilat, ilon;
+  
+  for ( ilat = 0; ilat < nlat; ilat++ )
+    {
+      xlast = xfact * xvals[ilat*nlon + nlon-1];
+      ylast = yfact * yvals[ilat*nlon + nlon-1];
+      if ( ylast >= xlat1 && ylast <= xlat2 )
+        if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
+          {
+            lp2 = TRUE;
+          }
+    }
+
+  for ( ilat = 0; ilat < nlat; ilat++ )
+    {
+      for ( ilon = 0; ilon < nlon; ilon++ )
+        {
+          mask[nlon*ilat + ilon] = 1;
+
+          xval = xvals[ilat*nlon + ilon];
+          yval = yvals[ilat*nlon + ilon];
+
+          xval *= xfact;
+          yval *= yfact;
+
+          if ( yval >= xlat1 && yval <= xlat2 )
+            {
+              if ( lp2 )
+                {
+                  xfirst = xfact * xvals[ilat*nlon];
+                  if ( xfirst < xlon1 ) xfirst = xlon1;
+                  
+                  xlast = xfact * xvals[ilat*nlon + nlon-1];
+                  if ( xlast > xlon2 ) xlast = xlon2;
+
+                  if ( xval >= xlon1 && xval <= xlast )
+                    {
+                      mask[nlon*ilat + ilon] = 0;
+                    }
+                  else if ( xval >= xfirst && xval <= xlon2 )
+                    {
+                      mask[nlon*ilat + ilon] = 0;
+                    }
+                }
+              else
+                {
+                  if ( ((xval     >= xlon1 && xval     <= xlon2) ||
+                        (xval-360 >= xlon1 && xval-360 <= xlon2) ||
+                        (xval+360 >= xlon1 && xval+360 <= xlon2)) )
+                    {
+                      mask[nlon*ilat + ilon] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+  free(xvals);
+  free(yvals);
 }
 
 static
@@ -316,8 +419,7 @@ void *Maskbox(void *argument)
     {
       if ( gridtype == GRID_CURVILINEAR )
         {
-          genlonlatbox(0, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
-          maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+          maskbox_curv(mask, gridID);
         }
       else
         {

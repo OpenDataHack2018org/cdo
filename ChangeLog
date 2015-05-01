@@ -1,3 +1,7 @@
+2015-05-01  Uwe Schulzweida
+
+	* masklonlatbox: added support for curvilinear grids
+
 2015-04-29  Uwe Schulzweida
 
 	* remapbil: optimized version without weights
