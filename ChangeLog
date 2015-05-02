@@ -1,3 +1,7 @@
+2015-05-02  Uwe Schulzweida
+
+	* sqr: added support for complex numbers
+
 2015-05-01  Uwe Schulzweida
 
 	* masklonlatbox: added support for curvilinear grids

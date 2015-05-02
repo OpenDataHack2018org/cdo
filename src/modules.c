@@ -623,7 +623,7 @@ static modules_t Modules[] =
   { Maskbox,        MaskboxHelp,       MaskboxOperators,       CDI_REAL,  1,  1 },
   { Maskbox,        MaskregionHelp,    MaskregionOperators,    CDI_REAL,  1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,       CDI_REAL,  1,  1 },
-  { Math,           MathHelp,          MathOperators,          CDI_REAL,  1,  1 },
+  { Math,           MathHelp,          MathOperators,          CDI_BOTH,  1,  1 },
   { Merge,          MergeHelp,         MergeOperators,         CDI_REAL, -1,  1 },
   { Mergetime,      MergeHelp,         MergetimeOperators,     CDI_REAL, -1,  1 },
   { Mergegrid,      MergegridHelp,     MergegridOperators,     CDI_REAL,  2,  1 },
