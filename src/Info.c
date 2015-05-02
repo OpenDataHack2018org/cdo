@@ -385,15 +385,11 @@ void *Info(void *argument)
 			  arrvar  = array[0];
 			  arrmin  = array[0];
 			  arrmax  = array[0];
-			  /*
-#pragma omp parallel for default(none) shared(arrmin, arrmax, array, gridsize)	\
-                                       reduction(+:arrmean, arrvar)
-			  */
+                          // #pragma omp parallel for default(none) shared(arrmin, arrmax, array, gridsize) reduction(+:arrmean, arrvar)
+                          // #pragma omp simd reduction(+:arrmean) reduction(min:arrmin) reduction(max:arrmax) aligned(array:16)
 			  for ( i = 1; i < gridsize; i++ )
 			    {
-			      /* #pragma omp critical */
 			      if ( array[i] < arrmin ) arrmin = array[i];
-			      /* #pragma omp critical */
 			      if ( array[i] > arrmax ) arrmax = array[i];
 			      arrmean += array[i];
 			      // arrvar  += array[i]*array[i];
