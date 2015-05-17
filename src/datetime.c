@@ -12,7 +12,7 @@ void get_timestat_date(int *tstat_date)
 {
   char *envstr;
 
-  envstr = getenv("TIMESTAT_DATE");
+  envstr = getenv("CDO_TIMESTAT_DATE");
   if ( envstr == NULL ) envstr = getenv("RUNSTAT_DATE");
   if ( envstr )
     {
@@ -31,7 +31,7 @@ void get_timestat_date(int *tstat_date)
 	{
 	  *tstat_date = env_date;
 
-	  if ( cdoVerbose ) cdoPrint("Set TIMESTAT_DATE to %s", envstr);
+	  if ( cdoVerbose ) cdoPrint("Set CDO_TIMESTAT_DATE to %s", envstr);
 	}
     }
 }

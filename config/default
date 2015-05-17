@@ -61,8 +61,6 @@ case "${HOSTNAME}" in
 	;;
     hama*)
 #        CDOLIBS="--with-fftw3 \
-#                 --with-jasper=/opt/local \
-#                 --with-grib_api=$HOME/local/gribapi-1.13.0 \
 #                 --with-netcdf=/opt/local \
 #                 --with-hdf5=/opt/local \
 #                 --with-szlib=$HOME/local \
@@ -85,7 +83,7 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -fstack-protector"
+	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -Wa,-q"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi

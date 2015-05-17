@@ -1,6 +1,9 @@
 CDO NEWS
 --------
 
+   Fixed bugs:
+     * env. CDO_TIMESTAT_DATE does not work [Bug #5758]
+
 Version 1.6.9 (28 April 2015):
 
    New features:
