@@ -78,6 +78,8 @@ void *Splittime(void *argument)
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
+  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+
   int SPLITHOUR = cdoOperatorAdd("splithour", func_time, 10000, NULL);
   int SPLITDAY  = cdoOperatorAdd("splitday",  func_date,     1, NULL);
   int SPLITMON  = cdoOperatorAdd("splitmon",  func_date,   100, NULL);
@@ -89,8 +91,6 @@ void *Splittime(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
   int operintval = cdoOperatorF2(operatorID);
-
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   if ( operatorID == SPLITMON )
     {
@@ -149,8 +149,8 @@ void *Splittime(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  field_init(&vars[varID][levelID]);
-		  vars[varID][levelID].grid    = gridID;
-		  vars[varID][levelID].ptr     = (double*) malloc(gridsize*sizeof(double));
+		  vars[varID][levelID].grid = gridID;
+		  vars[varID][levelID].ptr  = (double*) malloc(gridsize*sizeof(double));
 		}
 	    }
 	}
@@ -263,6 +263,7 @@ void *Splittime(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
+
 	  if ( lcopy && !(tsID == 0 && nconst) )
 	    {
 	      streamCopyRecord(streamID2, streamID1);
@@ -314,7 +315,7 @@ void *Splittime(void *argument)
 	    }
 	}
 
-      if ( vars  ) free(vars);
+      if ( vars ) free(vars);
     }
 
   vlistDestroy(vlistID2);

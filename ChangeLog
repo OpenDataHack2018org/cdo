@@ -1,3 +1,12 @@
+2015-10-28  Uwe Schulzweida
+
+	* using CDI library version 1.7.0
+	* Version 1.7.0 released
+
+2015-05-18  Uwe Schulzweida
+
+        * splityear*: support for constant fields is missing [Bug #5759]
+
 2015-05-17  Uwe Schulzweida
 
 	* env. CDO_TIMESTAT_DATE does not work [Bug #5758]

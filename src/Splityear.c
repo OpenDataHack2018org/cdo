@@ -47,7 +47,10 @@ void *Splityear(void *argument)
   int ic = 0;
   int cyear[MAX_YEARS];
   int nmiss;
+  int gridID;
+  int nlevel;
   double *array = NULL;
+  field_t **vars = NULL;
 
   cdoInitialize(argument);
 
@@ -55,11 +58,10 @@ void *Splityear(void *argument)
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  int SPLITYEAR    = cdoOperatorAdd("splityear",     func_date, 10000, NULL);
-  int SPLITYEARMON = cdoOperatorAdd("splityearmon",  func_date,   100, NULL);
+  int SPLITYEAR    = cdoOperatorAdd("splityear",     0, 10000, NULL);
+  int SPLITYEARMON = cdoOperatorAdd("splityearmon",  0,   100, NULL);
   
   int operatorID = cdoOperatorID();
-  int operfunc   = cdoOperatorF1(operatorID);
   int operintval = cdoOperatorF2(operatorID);
 
   memset(cyear, 0, MAX_YEARS*sizeof(int));
@@ -69,6 +71,10 @@ void *Splityear(void *argument)
   int vlistID1 = streamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
+
   strcpy(filename, cdoStreamName(1)->args);
   int nchars = strlen(filename);
 
@@ -76,16 +82,41 @@ void *Splityear(void *argument)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
 
-  if ( ! lcopy )
+  // if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double*) malloc(gridsize*sizeof(double));
     }
 
-  int taxisID1 = vlistInqTaxis(vlistID1);
-  int taxisID2 = taxisDuplicate(taxisID1);
-  vlistDefTaxis(vlistID2, taxisID2);
+  int nvars = vlistNvars(vlistID1);
+  int nconst = 0;
+  for ( varID = 0; varID < nvars; varID++ )
+    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) nconst++;
+
+  if ( nconst )
+    {
+      vars = (field_t **) malloc(nvars*sizeof(field_t *));
+
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+	    {
+	      gridID  = vlistInqVarGrid(vlistID1, varID);
+	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      gridsize = gridInqSize(gridID);
+		  
+	      vars[varID] = (field_t*) malloc(nlevel*sizeof(field_t));
+
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		{
+		  field_init(&vars[varID][levelID]);
+		  vars[varID][levelID].grid = gridID;
+		  vars[varID][levelID].ptr  = (double*) malloc(gridsize*sizeof(double));
+		}
+	    }
+	}
+    }
 
   int index1 = - 1<<31;
   int index2;
@@ -160,14 +191,31 @@ void *Splityear(void *argument)
 	}
       
       taxisCopyTimestep(taxisID2, taxisID1);
+      streamDefTimestep(streamID2, tsID2);
 
-      streamDefTimestep(streamID2, tsID2++);
+      if ( tsID > 0 && tsID2 == 0 && nconst )
+	{
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+		{
+		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		  for ( levelID = 0; levelID < nlevel; levelID++ )
+		    {
+		      streamDefRecord(streamID2, varID, levelID);
+		      nmiss = vars[varID][levelID].nmiss;
+		      streamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
+		    }
+		}
+	    }
+	}
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
-	  if ( lcopy )
+
+	  if ( lcopy && !(tsID == 0 && nconst) )
 	    {
 	      streamCopyRecord(streamID2, streamID1);
 	    }
@@ -175,17 +223,46 @@ void *Splityear(void *argument)
 	    {
 	      streamReadRecord(streamID1, array, &nmiss);
 	      streamWriteRecord(streamID2, array, nmiss);
+
+	      if ( tsID == 0 && nconst )
+		{
+		  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+		    {
+		      gridID  = vlistInqVarGrid(vlistID1, varID);
+		      gridsize = gridInqSize(gridID);
+		      memcpy(vars[varID][levelID].ptr, array, gridsize*sizeof(double));
+		      vars[varID][levelID].nmiss = nmiss;
+		    }
+		}
 	    }
 	}
 
+      tsID2++;
       tsID++;
     }
 
   streamClose(streamID1);
   streamClose(streamID2);
  
-  if ( ! lcopy )
-    if ( array ) free(array);
+  if ( array ) free(array);
+
+  if ( nconst )
+    {
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  if ( vlistInqVarTsteptype(vlistID2, varID) == TSTEP_CONSTANT )
+	    {
+	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		if ( vars[varID][levelID].ptr )
+		  free(vars[varID][levelID].ptr);
+
+	      free(vars[varID]);
+	    }
+	}
+
+      if ( vars ) free(vars);
+    }
 
   cdoFinish();
 

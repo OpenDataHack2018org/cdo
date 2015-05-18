@@ -1,8 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.7.0 (28 October 2015):
+
    Fixed bugs:
      * env. CDO_TIMESTAT_DATE does not work [Bug #5758]
+     * splityear*: support for constant fields is missing [Bug #5759]
 
 Version 1.6.9 (28 April 2015):
 
