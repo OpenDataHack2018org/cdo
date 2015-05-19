@@ -96,24 +96,16 @@ double covariance_s(const double * restrict in0, const double * restrict in1,
 
 void *Fldstat2(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2, streamID3;
-  int vlistID1, vlistID2, vlistID3;
   int gridID, lastgridID = -1;
   int gridID3;
   int wstatus = FALSE;
-  int index, ngrids;
+  int index;
   int recID, nrecs, nrecs2;
-  int tsID, varID, levelID;
-  long gridsize;
+  int varID, levelID;
   int needWeights = TRUE;
   int nmiss1, nmiss2, nmiss3;
-  int taxisID1, taxisID3;
   double missval1, missval2;
-  double slon, slat;
   double sglval;
-  double *array1, *array2, *weight;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);
@@ -121,48 +113,57 @@ void *Fldstat2(void *argument)
   cdoOperatorAdd("fldcor",   func_cor,   0, NULL);
   cdoOperatorAdd("fldcovar", func_covar, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  slon = 0;
-  slat = 0;
-  gridID3 = gridCreate(GRID_LONLAT, 1);
-  gridDefXsize(gridID3, 1);
-  gridDefYsize(gridID3, 1);
-  gridDefXvals(gridID3, &slon);
-  gridDefYvals(gridID3, &slat);
+  if ( CDO_Reduce_Dim )
+    {
+      gridID3 = gridCreate(GRID_GENERIC, 1);
+      gridDefXsize(gridID3, 0);
+      gridDefYsize(gridID3, 0);
+    }
+  else
+    {
+      double slon = 0;
+      double slat = 0;
+      gridID3 = gridCreate(GRID_LONLAT, 1);
+      gridDefXsize(gridID3, 1);
+      gridDefYsize(gridID3, 1);
+      gridDefXvals(gridID3, &slon);
+      gridDefYvals(gridID3, &slat);
+    }
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
 
   for ( index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID3, index, gridID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
-  weight = NULL;
+  double *array1 = (double*) malloc(gridsize*sizeof(double));
+  double *array2 = (double*) malloc(gridsize*sizeof(double));
+  double *weight = NULL;
   if ( needWeights )
     weight = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       nrecs2 = streamInqTimestep(streamID2, tsID);
