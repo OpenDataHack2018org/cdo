@@ -32,7 +32,7 @@
 #undef   MAX
 #define  MAX(a,b)  ((a) > (b) ? (a) : (b))
 
-#define  ADD_PLURAL(n)  ((n)>1 ? "s" : "")
+#define  ADD_PLURAL(n)  ((n)!=1 ? "s" : "")
 
 #define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 

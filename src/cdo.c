@@ -20,7 +20,7 @@
 #endif
 
 #ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* gethostname */
+//#define _XOPEN_SOURCE 600 /* gethostname */
 #endif
 
 #include <limits.h>
@@ -75,7 +75,8 @@ static int Help = 0;
 static int DebugLevel = 0;
 static int numThreads = 0;
 static int timer_total;
-static int CDO_netcdf_hdr_pad   = 0;
+static int CDO_netcdf_hdr_pad = 0;
+static int CDO_Rusage = 0;
 
 
 #define PRINT_RLIMIT(resource) \
@@ -1007,6 +1008,7 @@ int parse_options_long(int argc, char *argv[])
       { "use_fftw",          required_argument,          &luse_fftw,  1 },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1 },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1 },
+      { "rusage",                  no_argument,         &CDO_Rusage,  1 },
       { "no_warnings",             no_argument,           &_Verbose,  0 },
       { "format",            required_argument,                NULL, 'f' },
       { "help",                    no_argument,                NULL, 'h' },
@@ -1345,6 +1347,28 @@ int parse_options(int argc, char *argv[])
   return (0);
 }
 
+static
+void cdo_rusage(void)
+{
+#if defined(HAVE_SYS_RESOURCE_H) && defined(RUSAGE_SELF)
+  struct rusage ru;
+  int status = getrusage(RUSAGE_SELF, &ru);
+
+  double ut = ru.ru_utime.tv_sec + 0.000001 * ru.ru_utime.tv_usec;
+  double st = ru.ru_stime.tv_sec + 0.000001 * ru.ru_stime.tv_usec;
+
+  fprintf(stderr, "  User time:     %.3f seconds\n", ut);
+  fprintf(stderr, "  System time:   %.3f seconds\n", st);
+  fprintf(stderr, "  Total time:    %.3f seconds\n", ut+st);
+  fprintf(stderr, "  Memory usage:  %.2f MBytes\n", ru.ru_maxrss/(1024.*1024.));
+  fprintf(stderr, "  Page reclaims: %5ld page%s\n", ru.ru_minflt, ADD_PLURAL(ru.ru_minflt));
+  fprintf(stderr, "  Page faults:   %5ld page%s\n", ru.ru_majflt, ADD_PLURAL(ru.ru_majflt));
+  fprintf(stderr, "  Swaps:         %5ld\n", ru.ru_nswap);
+  fprintf(stderr, "  Disk read:     %5ld block%s\n", ru.ru_inblock, ADD_PLURAL(ru.ru_inblock));
+  fprintf(stderr, "  Disk Write:    %5ld block%s\n", ru.ru_oublock, ADD_PLURAL(ru.ru_oublock));
+#endif
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -1471,6 +1495,8 @@ int main(int argc, char *argv[])
   /* malloc_stats(); */
 
   if ( cdoGridSearchDir ) free(cdoGridSearchDir);
+
+  if ( CDO_Rusage ) cdo_rusage();
 
   return (status);
 }
