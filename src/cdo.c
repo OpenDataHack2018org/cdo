@@ -172,6 +172,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "    -Q             Alphanumeric sorting of netCDF parameter names\n");
+  fprintf(stderr, "    --reduce_dim   Reduce netCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
