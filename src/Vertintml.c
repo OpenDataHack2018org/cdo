@@ -541,9 +541,9 @@ void *Vertintml(void *argument)
 		{
 		  minmaxval(gridsize, sgeopot, NULL, &minval, &maxval);
 		  if ( minval < MIN_FIS || maxval > MAX_FIS )
-		    cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
+		    cdoWarning("Surface geopotential out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID+1);
 		  if ( gridsize > 1 && minval >= 0 && maxval <= 9000 )
-		    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
+		    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID+1);
 		}
 	    }
 
@@ -555,7 +555,7 @@ void *Vertintml(void *argument)
 	  /* check range of ps_prog */
 	  minmaxval(gridsize, ps_prog, NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
-	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+	    cdoWarning("Surface pressure out of range (min=%g max=%g) [timestep:%d]!", minval, maxval, tsID+1);
 
 
 	  presh(full_press, half_press, vct, ps_prog, nhlevf, gridsize);
