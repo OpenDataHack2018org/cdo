@@ -540,7 +540,7 @@ static
 void CheckAnalyses(struct Variable *vars)
 {
   for ( int code = 0; code < 272; code++ )
-    if ( vars[code].needed      && 
+    if ( vars[code].needed     && 
 	 code != DIVERGENCE    &&
 	 code != VORTICITY     &&
 	 code != STREAM        &&
@@ -1223,8 +1223,6 @@ void LayerCloud(double *cc, double *ll, double pmax, double pmin,
 /* Grid Point Computations */
 void after_EchamCompGP(struct Control *globs, struct Variable *vars)
 {
-  int l;
-
   if ( vars[GEOPOTHEIGHT].comp || vars[SLP].comp || vars[THETAF].needed ||
        vars[HALF_PRESS].needed || vars[RHUMIDITY].comp || vars[OMEGA].comp ||
        globs->Type >= 30 )
@@ -1273,7 +1271,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
     }
 
   if ( vars[DPSDX].needed || vars[DPSDY].needed )
-    for (l = 0; l < globs->DimGP; l++)
+    for ( int l = 0; l < globs->DimGP; l++ )
       {
 	vars[DPSDX].hybrid[l] *= vars[PS_PROG].hybrid[l];
 	vars[DPSDY].hybrid[l] *= vars[PS_PROG].hybrid[l];
@@ -1324,7 +1322,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
       vars[PS].plev = 1;
       vars[PS].sfit = TRUE; /* ??? */
       vars[PS].hybrid = alloc_dp(globs->DimGP, "vars[PS].hybrid");
-      for (l = 0; l < globs->DimGP; l++) vars[PS].hybrid[l] = exp(vars[LNPS].hybrid[l]);
+      for ( int l = 0; l < globs->DimGP; l++ ) vars[PS].hybrid[l] = exp(vars[LNPS].hybrid[l]);
     }
 
   if ( vars[SLP].comp )
@@ -2045,7 +2043,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 			     vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vert_index,
 			     pressureLevel, globs->NumLevelRequest, globs->DimGP, globs->NumLevel, vars[code].missval);
 		  }
-		else if ( code == GEOPOTHEIGHT )
+		else if ( code == GEOPOTHEIGHT && vars[GEOPOTHEIGHT].hlev == (globs->NumLevel+1) )
 		  {
 		    if ( vars[TEMPERATURE].hybrid == NULL ) Error("Code  130 not found!");
 		    interp_Z(globs->Orography, vars[GEOPOTHEIGHT].hybrid, vars[GEOPOTHEIGHT].grid,

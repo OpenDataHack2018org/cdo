@@ -2,6 +2,7 @@
 #include <stdlib.h> /* exit */
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 
 #include "compare.h"
 #include "constants.h"
@@ -276,18 +277,15 @@ void interp_X(const double * restrict gt, double *pt, const double * restrict hy
 {
   long lp, i;
   long nl, nh;
-  const int *nxl;
-  double *ptl;
-  double pres;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, pres, nl, nh, nxl, ptl)
+#pragma omp parallel for default(shared) private(i, nl, nh)
 #endif
   for ( lp = 0; lp < nplev; lp++ )
     {
-      pres = plev[lp];
-      nxl  = nx + lp*ngp;
-      ptl  = pt + lp*ngp;
+      double pres = plev[lp];
+      const int *nxl  = nx + lp*ngp;
+      double *ptl  = pt + lp*ngp;
       for ( i = 0; i < ngp; i++ )
 	{
 	  if ( nxl[i] == -1 )
@@ -297,10 +295,11 @@ void interp_X(const double * restrict gt, double *pt, const double * restrict hy
 	      nl = nxl[i] * ngp + i;
 	      nh = nl + ngp;
 	      if ( nh >= ngp*nhlev )
-		ptl[i] = gt[nl];
+		ptl[i] =  gt[nl];
 	      else
 		ptl[i] =  gt[nl] + (pres-hyb_press[nl])
-		       * (gt[nh] - gt[nl]) / (hyb_press[nh] - hyb_press[nl]);
+		       * (gt[nh] - gt[nl])
+                       / (hyb_press[nh] - hyb_press[nl]);
 	    }
 	}
     }
@@ -313,18 +312,15 @@ void interp_T(const double * restrict geop, const double * restrict gt, double *
 {
   long lp, i;
   long nl, nh;
-  const int *nxl;
-  double *ptl;
-  double pres;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, pres, nl, nh, nxl, ptl)
+#pragma omp parallel for default(shared) private(i, nl, nh)
 #endif
   for ( lp = 0; lp < nplev; lp++ )
     {
-      pres = plev[lp];
-      nxl  = nx + lp*ngp;
-      ptl  = pt + lp*ngp;
+      double pres = plev[lp];
+      const int *nxl  = nx + lp*ngp;
+      double *ptl  = pt + lp*ngp;
 #if defined(CRAY)
 #pragma _CRI inline extra_T
 #endif
@@ -366,18 +362,21 @@ void interp_Z(const double * restrict geop, const double * restrict gz, double *
 {
   long lp, i;
   long nl, nh;
-  const int *nxl;
-  double *pzl;
-  double pres;
+
+  assert(geop != NULL);
+  assert(gz != NULL);
+  assert(pz != NULL);
+  assert(fullp != NULL);
+  assert(halfp != NULL);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, pres, nl, nh, nxl, pzl)
+#pragma omp parallel for default(shared) private(i, nl, nh)
 #endif
   for ( lp = 0; lp < nplev; lp++ )
     {
-      pres = plev[lp];
-      nxl  = nx + lp*ngp;
-      pzl  = pz + lp*ngp;
+      double pres = plev[lp];
+      const int *nxl  = nx + lp*ngp;
+      double *pzl  = pz + lp*ngp;
 #if defined(CRAY)
 #pragma _CRI inline extra_Z
 #endif

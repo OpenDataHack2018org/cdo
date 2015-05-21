@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-05-21  Uwe Schulzweida
+
+	* after: use vertical interpolation interp_Z() only for GEOPOTHEIGHT on full 3d hybrid levels
+
 2015-05-19  Uwe Schulzweida
 
         * Fldstat2: added support for option --reduce_dim
