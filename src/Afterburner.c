@@ -743,9 +743,8 @@ void after_setLevel(struct Control *globs)
   double level;
   int checkLevel = TRUE;
   int numplevelDefault;  /* default pressure level */
-  long plevelDefault[] = { 100000, 92500, 85000, 70000, 60000, 50000,  \
-			    40000, 30000, 25000, 20000, 15000, 10000,  \
-			     7000,  5000,  3000,  2000, 1000 };
+  long plevelDefault[] = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
+                            10000,  7000,  5000,  3000,  2000, 1000 };
   int numhlevelDefault;  /* default height level */
   long hlevelDefault[] = {  0, 1000, 2000, 5000, 10000, 15000, 20000, 25000, 30000 };
 

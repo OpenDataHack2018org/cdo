@@ -114,9 +114,13 @@ void *Vertintml(void *argument)
   double *plev = NULL;
   if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
     {
+      /*
       double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
-                         15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
-      nplev = sizeof(stdlev)/sizeof(*stdlev);
+                          15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
+      */
+      double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
+                          10000,  7000,  5000,  3000,  2000, 1000 };
+        nplev = sizeof(stdlev)/sizeof(*stdlev);
       plev  = (double *) malloc(nplev*sizeof(double));
       for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
     }
@@ -475,7 +479,7 @@ void *Vertintml(void *argument)
     }
 
   if ( zaxisIDh != -1 && gheightID != -1 && tempID == -1 )
-    cdoAbort("Temperature not found, needed to compute geopotheight!");
+    cdoAbort("Temperature not found, needed for vertical interpolation of geopotheight!");
 
   presID = lnpsID;
   if ( zaxisIDh != -1 && lnpsID == -1 )
