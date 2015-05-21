@@ -5,7 +5,7 @@
 
 2015-05-21  Uwe Schulzweida
 
-	* after: use vertical interpolation interp_Z() only for GEOPOTHEIGHT on full 3d hybrid levels
+	* after: extent incomming GEOPOTHEIGHT on full 3d hybrid levels to half 3d hybrid levels (bug fix)
 
 2015-05-19  Uwe Schulzweida
 

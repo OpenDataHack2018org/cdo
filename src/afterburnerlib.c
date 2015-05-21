@@ -1269,6 +1269,14 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
 
       vars[HUMIDITY].needed = vars[HUMIDITY].selected;
     }
+  else if ( vars[GEOPOTHEIGHT].hybrid && vars[GEOPOTHEIGHT].hlev == globs->NumLevel )
+    {
+      vars[GEOPOTHEIGHT].hlev = globs->NumLevel+1;
+      vars[GEOPOTHEIGHT].sfit = TRUE;
+      vars[GEOPOTHEIGHT].hybrid = realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP+globs->DimGP)*sizeof(double));
+      after_copy_array(vars[GEOPOTHEIGHT].hybrid+globs->Dim3GP, globs->Orography, globs->DimGP);
+      for ( int i = 0; i < globs->DimGP; i++ ) vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP+i] /= PlanetGrav;
+    }
 
   if ( vars[DPSDX].needed || vars[DPSDY].needed )
     for ( int l = 0; l < globs->DimGP; l++ )
@@ -2043,7 +2051,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 			     vars[FULL_PRESS].hybrid, vars[HALF_PRESS].hybrid, globs->vert_index,
 			     pressureLevel, globs->NumLevelRequest, globs->DimGP, globs->NumLevel, vars[code].missval);
 		  }
-		else if ( code == GEOPOTHEIGHT && vars[GEOPOTHEIGHT].hlev == (globs->NumLevel+1) )
+		else if ( code == GEOPOTHEIGHT )
 		  {
 		    if ( vars[TEMPERATURE].hybrid == NULL ) Error("Code  130 not found!");
 		    interp_Z(globs->Orography, vars[GEOPOTHEIGHT].hybrid, vars[GEOPOTHEIGHT].grid,
