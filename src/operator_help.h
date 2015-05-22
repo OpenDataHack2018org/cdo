@@ -2475,7 +2475,7 @@ static char *MonpctlHelp[] = {
     NULL
 };
 
-static char *YearmonmeanHelp[] = {
+static char *YearmonstatHelp[] = {
     "NAME",
     "    yearmonmean - Yearly mean from monthly data",
     "",
@@ -2585,8 +2585,8 @@ static char *YearpctlHelp[] = {
 
 static char *SeasstatHelp[] = {
     "NAME",
-    "    seasmin, seasmax, seassum, seasmean, seasavg, seasvar, seasstd - ",
-    "    Seasonal statistical values",
+    "    seasmin, seasmax, seassum, seasmean, seasavg, seasstd, seasstd1, seasvar, ",
+    "    seasvar1 - Seasonal statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  ifile ofile",
@@ -2620,14 +2620,22 @@ static char *SeasstatHelp[] = {
     "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is",
     "              ",
     "              o(t,x) = avg{i(t',x), t1 < t' <= tn}",
-    "    seasvar   Seasonal variance",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is",
-    "              ",
-    "              o(t,x) = var{i(t',x), t1 < t' <= tn}",
     "    seasstd   Seasonal standard deviation",
-    "              For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is",
+    "              Divisor is n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is",
     "              ",
     "              o(t,x) = std{i(t',x), t1 < t' <= tn}",
+    "    seasstd1  Seasonal standard deviation",
+    "              Divisor is (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is",
+    "              ",
+    "              o(t,x) = std1{i(t',x), t1 < t' <= tn}",
+    "    seasvar   Seasonal variance",
+    "              Divisor is n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is",
+    "              ",
+    "              o(t,x) = var{i(t',x), t1 < t' <= tn}",
+    "    seasvar1  Seasonal variance",
+    "              Divisor is (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is",
+    "              ",
+    "              o(t,x) = var1{i(t',x), t1 < t' <= tn}",
     NULL
 };
 
@@ -2908,8 +2916,8 @@ static char *YmonpctlHelp[] = {
 
 static char *YseasstatHelp[] = {
     "NAME",
-    "    yseasmin, yseasmax, yseassum, yseasmean, yseasavg, yseasvar, yseasstd - ",
-    "    Multi-year seasonal statistical values",
+    "    yseasmin, yseasmax, yseassum, yseasmean, yseasavg, yseasstd, yseasstd1, ",
+    "    yseasvar, yseasvar1 - Multi-year seasonal statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  ifile ofile",
@@ -2946,16 +2954,26 @@ static char *YseasstatHelp[] = {
     "               o(2,x) = avg{i(t,x), month(i(t)) = 03, 04, 05}",
     "               o(3,x) = avg{i(t,x), month(i(t)) = 06, 07, 08}",
     "               o(4,x) = avg{i(t,x), month(i(t)) = 09, 10, 11}",
-    "    yseasvar   Multi-year seasonal variance",
-    "               o(1,x) = var{i(t,x), month(i(t)) = 12, 01, 02}",
-    "               o(2,x) = var{i(t,x), month(i(t)) = 03, 04, 05}",
-    "               o(3,x) = var{i(t,x), month(i(t)) = 06, 07, 08}",
-    "               o(4,x) = var{i(t,x), month(i(t)) = 09, 10, 11}",
     "    yseasstd   Multi-year seasonal standard deviation",
     "               o(1,x) = std{i(t,x), month(i(t)) = 12, 01, 02}",
     "               o(2,x) = std{i(t,x), month(i(t)) = 03, 04, 05}",
     "               o(3,x) = std{i(t,x), month(i(t)) = 06, 07, 08}",
     "               o(4,x) = std{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasstd1  Multi-year seasonal standard deviation",
+    "               o(1,x) = std1{i(t,x), month(i(t)) = 12, 01, 02}",
+    "               o(2,x) = std1{i(t,x), month(i(t)) = 03, 04, 05}",
+    "               o(3,x) = std1{i(t,x), month(i(t)) = 06, 07, 08}",
+    "               o(4,x) = std1{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasvar   Multi-year seasonal variance",
+    "               o(1,x) = var{i(t,x), month(i(t)) = 12, 01, 02}",
+    "               o(2,x) = var{i(t,x), month(i(t)) = 03, 04, 05}",
+    "               o(3,x) = var{i(t,x), month(i(t)) = 06, 07, 08}",
+    "               o(4,x) = var{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseasvar1  Multi-year seasonal variance",
+    "               o(1,x) = var1{i(t,x), month(i(t)) = 12, 01, 02}",
+    "               o(2,x) = var1{i(t,x), month(i(t)) = 03, 04, 05}",
+    "               o(3,x) = var1{i(t,x), month(i(t)) = 06, 07, 08}",
+    "               o(4,x) = var1{i(t,x), month(i(t)) = 09, 10, 11}",
     NULL
 };
 

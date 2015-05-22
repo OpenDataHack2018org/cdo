@@ -356,8 +356,10 @@ Operator catalog:
    Seasstat      seassum         Seasonal sum
    Seasstat      seasmean        Seasonal mean
    Seasstat      seasavg         Seasonal average
-   Seasstat      seasvar         Seasonal variance
    Seasstat      seasstd         Seasonal standard deviation
+   Seasstat      seasstd1        Seasonal standard deviation
+   Seasstat      seasvar         Seasonal variance
+   Seasstat      seasvar1        Seasonal variance
    Seaspctl      seaspctl        Seasonal percentiles
    Yhourstat     yhourmin        Multi-year hourly minimum
    Yhourstat     yhourmax        Multi-year hourly maximum
@@ -393,8 +395,10 @@ Operator catalog:
    Yseasstat     yseassum        Multi-year seasonal sum
    Yseasstat     yseasmean       Multi-year seasonal mean
    Yseasstat     yseasavg        Multi-year seasonal average
-   Yseasstat     yseasvar        Multi-year seasonal variance
    Yseasstat     yseasstd        Multi-year seasonal standard deviation
+   Yseasstat     yseasstd1       Multi-year seasonal standard deviation
+   Yseasstat     yseasvar        Multi-year seasonal variance
+   Yseasstat     yseasvar1       Multi-year seasonal variance
    Yseaspctl     yseaspctl       Multi-year seasonal percentiles
    Ydrunstat     ydrunmin        Multi-year daily running minimum
    Ydrunstat     ydrunmax        Multi-year daily running maximum

@@ -1,6 +1,6 @@
 @BeginModule
 @NewPage
-@Name      = Yearmonmean
+@Name      = Yearmonstat
 @Title     = Yearly mean from monthly data
 @Section   = Statistical values
 @Class     = Statistic
