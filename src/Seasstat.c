@@ -24,7 +24,9 @@
       Seasstat   seasmean        Seasonal mean
       Seasstat   seasavg         Seasonal average
       Seasstat   seasvar         Seasonal variance
+      Seasstat   seasvar1        Seasonal variance [Divisor is (n-1)]
       Seasstat   seasstd         Seasonal standard deviation
+      Seasstat   seasstd1        Seasonal standard deviation [Divisor is (n-1)]
 */
 
 
@@ -44,8 +46,6 @@ void *Seasstat(void *argument)
   int vdate1 = 0, vtime1 = 0;
   int nrecs;
   int varID, levelID, recID;
-  int tsID;
-  int otsID;
   long nsets;
   int i;
   int year, month, day, seas, seas0 = 0;
@@ -53,9 +53,6 @@ void *Seasstat(void *argument)
   int nlevel;
   int newseas, oldmon = 0, newmon;
   int nseason = 0;
-  field_t **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
-  field_t field;
-  int season_start;
   const char *seas_name[4];
 
   cdoInitialize(argument);
@@ -66,13 +63,20 @@ void *Seasstat(void *argument)
   cdoOperatorAdd("seasmean", func_mean, 0, NULL);
   cdoOperatorAdd("seasavg",  func_avg,  0, NULL);
   cdoOperatorAdd("seasvar",  func_var,  0, NULL);
+  cdoOperatorAdd("seasvar1", func_var1, 0, NULL);
   cdoOperatorAdd("seasstd",  func_std,  0, NULL);
+  cdoOperatorAdd("seasstd1", func_std1, 0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  season_start = get_season_start();
+  int season_start = get_season_start();
   get_season_name(seas_name);
+
+  int lmean   = operfunc == func_mean || operfunc == func_avg;
+  int lstd    = operfunc == func_std || operfunc == func_std1;
+  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  double divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -100,16 +104,17 @@ void *Seasstat(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
 
-  vars1 = field_malloc(vlistID1, FIELD_PTR);
-  samp1 = field_malloc(vlistID1, FIELD_NONE);
-  if ( operfunc == func_std || operfunc == func_var )
-    vars2 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **vars2 = NULL;
+  if ( lvarstd ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
-  tsID    = 0;
-  otsID   = 0;
+  int tsID    = 0;
+  int otsID   = 0;
   while ( TRUE )
     {
       nsets = 0;
@@ -211,7 +216,7 @@ void *Seasstat(void *argument)
 			  samp1[varID][levelID].ptr[i]++;
 		    }
 
-		  if ( operfunc == func_std || operfunc == func_var )
+		  if ( lvarstd )
 		    {
 		      farsumq(&vars2[varID][levelID], field);
 		      farsum(&vars1[varID][levelID], field);
@@ -223,7 +228,7 @@ void *Seasstat(void *argument)
 		}
 	    }
 
-	  if ( nsets == 0 && (operfunc == func_std || operfunc == func_var) )
+	  if ( nsets == 0 && lvarstd )
 	    for ( varID = 0; varID < nvars; varID++ )
 	      {
 		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
@@ -240,7 +245,7 @@ void *Seasstat(void *argument)
 
       if ( nrecs == 0 && nsets == 0 ) break;
 
-      if ( operfunc == func_mean || operfunc == func_avg )
+      if ( lmean )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
@@ -253,7 +258,7 @@ void *Seasstat(void *argument)
 		  fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
 	      }
 	  }
-      else if ( operfunc == func_std || operfunc == func_var )
+      else if ( lvarstd )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
@@ -262,18 +267,17 @@ void *Seasstat(void *argument)
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
 		  {
-		    if ( operfunc == func_std )
-		      farcstd(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		    if ( lstd )
+		      farcstdx(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
 		    else
-		      farcvar(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		      farcvarx(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
 		  }
 		else
 		  {
-		    farinv(&samp1[varID][levelID]);
-		    if ( operfunc == func_std )
-		      farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
+		    if ( lstd )
+		      farstdx(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
 		    else
-		      farvar(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
+		      farvarx(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
 		  }
 	      }
 	  }
@@ -287,8 +291,7 @@ void *Seasstat(void *argument)
 	  date2str(vdate1, vdatestr1, sizeof(vdatestr1));
 	  time2str(vtime1, vtimestr1, sizeof(vtimestr1));
 	  cdoPrint("season %3d %3s start %s %s end %s %s ntimesteps %d", 
-		   nseason, seas_name[seas0],
-		   vdatestr0, vtimestr0, vdatestr1, vtimestr1, nsets);
+		   nseason, seas_name[seas0], vdatestr0, vtimestr0, vdatestr1, vtimestr1, nsets);
 	}
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
@@ -320,7 +323,7 @@ void *Seasstat(void *argument)
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if ( operfunc == func_std || operfunc == func_var ) field_free(vars2, vlistID1);
+  if ( lvarstd ) field_free(vars2, vlistID1);
 
   if ( field.ptr ) free(field.ptr);
 

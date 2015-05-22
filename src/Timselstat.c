@@ -39,7 +39,6 @@
 void *Timselstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int gridsize;
   int nrecs = 0;
   int varID, levelID, recID;
   int tsID;
@@ -47,8 +46,6 @@ void *Timselstat(void *argument)
   int i;
   int nmiss;
   int nlevel;
-  field_t **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
-  field_t field;
 
   cdoInitialize(argument);
 
@@ -103,15 +100,16 @@ void *Timselstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
 
-  vars1 = field_malloc(vlistID1, FIELD_PTR);
-  samp1 = field_malloc(vlistID1, FIELD_NONE);
-  if ( lvarstd )
-    vars2 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **vars2 = NULL;
+  if ( lvarstd ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   for ( tsID = 0; tsID < noffset; tsID++ )
     {

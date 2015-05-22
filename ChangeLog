@@ -3,6 +3,11 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-05-22  Uwe Schulzweida
+
+	* New operator: seasvar1  - Seasonal variance [Divisor is (n-1)]
+	* New operator: seasstd1  - Seasonal standard deviation [Divisor is (n-1)]
+
 2015-05-21  Uwe Schulzweida
 
 	* after: extent incomming GEOPOTHEIGHT on full 3d hybrid levels to half 3d hybrid levels (bug fix)
