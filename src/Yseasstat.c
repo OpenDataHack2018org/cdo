@@ -24,7 +24,9 @@
       Yseasstat  yseasmean       Multi-year seasonally mean
       Yseasstat  yseasavg        Multi-year seasonally average
       Yseasstat  yseasvar        Multi-year seasonally variance
+      Yseasstat  yseasvar1       Multi-year seasonally variance [Divisor is (n-1)]
       Yseasstat  yseasstd        Multi-year seasonally standard deviation
+      Yseasstat  yseasstd1       Multi-year seasonally standard deviation [Divisor is (n-1)]
 */
 
 #include <cdi.h>
@@ -61,28 +63,18 @@ void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 
 void *Yseasstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int gridsize;
   int i;
   int varID;
   int recID;
   int vdate, vtime;
   int year, month, day, seas;
-  int nrecs, nrecords;
+  int nrecs;
   int levelID;
-  int tsID;
-  int otsID;
   long nsets[NSEAS];
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
-  int *recVarID, *recLevelID;
+  int nlevel;
   date_time_t datetime[NSEAS];
   field_t **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
-  field_t field;
-  int season_start;
 
   cdoInitialize(argument);
 
@@ -92,12 +84,14 @@ void *Yseasstat(void *argument)
   cdoOperatorAdd("yseasmean", func_mean, 0, NULL);
   cdoOperatorAdd("yseasavg",  func_avg,  0, NULL);
   cdoOperatorAdd("yseasvar",  func_var,  0, NULL);
+  cdoOperatorAdd("yseasvar1", func_var1, 0, NULL);
   cdoOperatorAdd("yseasstd",  func_std,  0, NULL);
+  cdoOperatorAdd("yseasstd1", func_std1, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  season_start = get_season_start();
+  int season_start = get_season_start();
   for ( seas = 0; seas < NSEAS; seas++ )
     {
       vars1[seas]  = NULL;
@@ -108,32 +102,39 @@ void *Yseasstat(void *argument)
       datetime[seas].vtime = 0;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int lmean   = operfunc == func_mean || operfunc == func_avg;
+  int lstd    = operfunc == func_std || operfunc == func_std1;
+  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  double divisor = operfunc == func_std1 || operfunc == func_var1;
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
+
+  field_t field;
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
-  otsID = 0;
+  int tsID = 0;
+  int otsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
@@ -166,7 +167,7 @@ void *Yseasstat(void *argument)
 	{
 	  vars1[seas] = field_malloc(vlistID1, FIELD_PTR);
 	  samp1[seas] = field_malloc(vlistID1, FIELD_NONE);
-	  if ( operfunc == func_std || operfunc == func_var )
+	  if ( lvarstd )
 	    vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
 	}
 
@@ -220,7 +221,7 @@ void *Yseasstat(void *argument)
 		      samp1[seas][varID][levelID].ptr[i]++;
 		}
 
-	      if ( operfunc == func_std || operfunc == func_var )
+	      if ( lvarstd )
 		{
 		  farsumq(&vars2[seas][varID][levelID], field);
 		  farsum(&vars1[seas][varID][levelID], field);
@@ -232,11 +233,10 @@ void *Yseasstat(void *argument)
 	    }
 	}
 
-      if ( nsets[seas] == 0 && (operfunc == func_std || operfunc == func_var) )
+      if ( nsets[seas] == 0 && lvarstd )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      farmoq(&vars2[seas][varID][levelID], vars1[seas][varID][levelID]);
@@ -249,11 +249,11 @@ void *Yseasstat(void *argument)
   for ( seas = 0; seas < NSEAS; seas++ )
     if ( nsets[seas] )
       {
-	if ( operfunc == func_mean || operfunc == func_avg )
+	if ( lmean )
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  if ( samp1[seas][varID][levelID].ptr == NULL )
@@ -262,27 +262,26 @@ void *Yseasstat(void *argument)
 		    fardiv(&vars1[seas][varID][levelID], samp1[seas][varID][levelID]);
 		}
 	    }
-	else if ( operfunc == func_std || operfunc == func_var )
+	else if ( lvarstd )
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  if ( samp1[seas][varID][levelID].ptr == NULL )
 		    {
-		      if ( operfunc == func_std )
-			farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+		      if ( lstd )
+			farcstdx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
 		      else
-			farcvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+			farcvarx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
 		    }
 		  else
 		    {
-		      farinv(&samp1[seas][varID][levelID]);
-		      if ( operfunc == func_std )
-			farstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID]);
+		      if ( lstd )
+			farstdx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
 		      else
-			farvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID]);
+			farvarx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
 		    }
 		}
 	    }
@@ -312,7 +311,7 @@ void *Yseasstat(void *argument)
 	{
 	  field_free(vars1[seas], vlistID1);
 	  field_free(samp1[seas], vlistID1);
-	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[seas]);
+	  if ( lvarstd ) free(vars2[seas]);
 	}
     }
 

@@ -224,7 +224,7 @@ void *Timselstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
@@ -237,7 +237,7 @@ void *Timselstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
