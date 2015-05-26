@@ -265,8 +265,10 @@ Operator catalog:
    Merstat       mersum          Meridional sum
    Merstat       mermean         Meridional mean
    Merstat       meravg          Meridional average
-   Merstat       mervar          Meridional variance
    Merstat       merstd          Meridional standard deviation
+   Merstat       merstd1         Meridional standard deviation
+   Merstat       mervar          Meridional variance
+   Merstat       mervar1         Meridional variance
    Merstat       merpctl         Meridional percentiles
    Gridboxstat   gridboxmin      Gridbox minimum
    Gridboxstat   gridboxmax      Gridbox maximum

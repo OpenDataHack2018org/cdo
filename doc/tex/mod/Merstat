@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = mermin mermax mersum mermean meravg mervar merstd merpctl
+@Operators = mermin mermax mersum mermean meravg merstd merstd1 mervar mervar1 merpctl
 
 @BeginDescription
 This module computes meridional statistical values of the input fields.
@@ -65,7 +65,16 @@ For every longitude the area weighted average over all latitudes is computed.
 @Title     = Meridional variance
 
 @BeginDescription
-For every longitude the variance over all latitudes is computed.
+For every longitude the variance over all latitudes is computed. Divisor is n.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_mervar1
+@Title     = Meridional variance
+
+@BeginDescription
+For every longitude the variance over all latitudes is computed. Divisor is (n-1).
 @EndDescription
 @EndOperator
 
@@ -74,7 +83,16 @@ For every longitude the variance over all latitudes is computed.
 @Title     = Meridional standard deviation
 
 @BeginDescription
-For every longitude the standard deviation over all latitudes is computed.
+For every longitude the standard deviation over all latitudes is computed. Divisor is n.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_merstd1
+@Title     = Meridional standard deviation
+
+@BeginDescription
+For every longitude the standard deviation over all latitudes is computed. Divisor is (n-1).
 @EndDescription
 @EndOperator
 

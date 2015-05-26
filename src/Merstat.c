@@ -24,7 +24,9 @@
       Merstat    mermean         Meridional mean
       Merstat    meravg          Meridional average
       Merstat    merstd          Meridional standard deviation
+      Merstat    merstd          Meridional standard deviation [Divisor is (n-1)]
       Merstat    mervar          Meridional variance
+      Merstat    mervar          Meridional variance [Divisor is (n-1)]
       Merstat    merpctl         Meridional percentiles
 */
 
@@ -38,22 +40,13 @@
 
 void *Merstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
   int gridID1, gridID2 = -1, lastgrid = -1;
   int wstatus = FALSE;
-  int nlonmax;
-  int index, ngrids;
+  int index;
   int recID, nrecs;
-  int tsID, varID, levelID;
-  int lim;
-  int ndiffgrids;
-  int taxisID1, taxisID2;
+  int varID, levelID;
   int needWeights = FALSE;
   int pn = 0;
-  field_t field1, field2;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);
@@ -64,11 +57,13 @@ void *Merstat(void *argument)
   cdoOperatorAdd("mermean", func_mean, 0, NULL);
   cdoOperatorAdd("meravg",  func_avg,  0, NULL);
   cdoOperatorAdd("mervar",  func_var,  0, NULL);
+  cdoOperatorAdd("mervar1", func_var1, 0, NULL);
   cdoOperatorAdd("merstd",  func_std,  0, NULL);
+  cdoOperatorAdd("merstd1", func_std1, 0, NULL);
   cdoOperatorAdd("merpctl", func_pctl, 0, NULL);
  
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
   /* RQ */
   if ( operfunc == func_pctl )
@@ -82,20 +77,21 @@ void *Merstat(void *argument)
   /* QR */
 
   if ( operfunc == func_mean || operfunc == func_avg ||
-       operfunc == func_var  || operfunc == func_std )
+       operfunc == func_var  || operfunc == func_std ||
+       operfunc == func_var1 || operfunc == func_std1 )
     needWeights = TRUE;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
-  ndiffgrids = 0;
+  int ngrids = vlistNgrids(vlistID1);
+  int ndiffgrids = 0;
   for ( index = 1; index < ngrids; index++ )
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
       ndiffgrids++;
@@ -118,17 +114,18 @@ void *Merstat(void *argument)
 
   vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
   gridID1 = vlistInqVarGrid(vlistID1, 0);
-  nlonmax = gridInqXsize(gridID1); /* max nlon ? */
+  int nlonmax = gridInqXsize(gridID1); /* max nlon ? */
+  int lim = vlistGridsizeMax(vlistID1);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
 
-  lim = vlistGridsizeMax(vlistID1);
   field1.ptr    = (double*) malloc(lim*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )
@@ -137,7 +134,7 @@ void *Merstat(void *argument)
   field2.ptr  = (double*) malloc(nlonmax*sizeof(double));
   field2.grid = gridID2;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

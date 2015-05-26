@@ -18,9 +18,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include <cdi.h>
-/* RQ */
 #include "nth_element.h"
-/* QR */
 
 
 void zonfun(field_t field1, field_t *field2, int function)
@@ -365,10 +363,10 @@ void zonvar(field_t field1, field_t *field2)
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
-  long nx = gridInqXsize(grid);
-  long ny = gridInqYsize(grid);
+  int nx = gridInqXsize(grid);
+  int ny = gridInqYsize(grid);
 
-  for ( long j = 0; j < ny; j++ )
+  for ( int j = 0; j < ny; j++ )
     {
       prevarsum_zon(array+j*nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq, &rsumwq);
 
@@ -394,10 +392,10 @@ void zonvar1(field_t field1, field_t *field2)
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
-  long nx = gridInqXsize(grid);
-  long ny = gridInqYsize(grid);
+  int nx = gridInqXsize(grid);
+  int ny = gridInqYsize(grid);
 
-  for ( long j = 0; j < ny; j++ )
+  for ( int j = 0; j < ny; j++ )
     {
       prevarsum_zon(array+j*nx, nx, nmiss, missval1, &rsum, &rsumw, &rsumq, &rsumwq);
 

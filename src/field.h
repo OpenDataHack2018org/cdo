@@ -117,7 +117,9 @@ void mersum(field_t field1, field_t *field2);
 void meravg(field_t field1, field_t *field2);
 void mermean(field_t field1, field_t *field2);
 void merstd(field_t field1, field_t *field2);
+void merstd1(field_t field1, field_t *field2);
 void mervar(field_t field1, field_t *field2);
+void mervar1(field_t field1, field_t *field2);
 void merpctl(field_t field1, field_t *field2, const int k);
 
 void fldrms(field_t field1, field_t field2, field_t *field3);

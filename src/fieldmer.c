@@ -18,9 +18,8 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include <cdi.h>
-/* RQ */
 #include "nth_element.h"
-/* QR */
+
 
 void merfun(field_t field1, field_t *field2, int function)
 {
@@ -30,7 +29,9 @@ void merfun(field_t field1, field_t *field2, int function)
   else if ( function == func_mean ) mermean(field1, field2);  
   else if ( function == func_avg )  meravg(field1, field2);  
   else if ( function == func_std )  merstd(field1, field2);  
+  else if ( function == func_std1 ) merstd1(field1, field2);  
   else if ( function == func_var )  mervar(field1, field2);
+  else if ( function == func_var1 ) mervar1(field1, field2);
   else cdoAbort("function %d not implemented!", function);
 }
 
@@ -262,10 +263,42 @@ void meravg(field_t field1, field_t *field2)
   field2->nmiss  = rnmiss;
 }
 
+static
+void prevarsum_mer(const double *restrict array, const double *restrict w, int nx, int ny, int nmiss, 
+	       double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
+{ 
+  *rsum   = 0;
+  *rsumq  = 0;
+  *rsumw  = 0;
+  *rsumwq = 0;
+
+  if ( nmiss > 0 )
+    {
+      for ( int j = 0; j < ny; j++ )
+        if ( !DBL_IS_EQUAL(array[j*nx], missval) &&
+             !DBL_IS_EQUAL(w[j*nx], missval) )
+          {
+            *rsum   += w[j*nx] * array[j*nx];
+            *rsumq  += w[j*nx] * array[j*nx] * array[j*nx];
+            *rsumw  += w[j*nx];
+            *rsumwq += w[j*nx] * w[j*nx];
+          }
+    }
+  else
+    {
+      for ( int j = 0; j < ny; j++ )
+        {
+          *rsum   += w[j*nx] * array[j*nx];
+          *rsumq  += w[j*nx] * array[j*nx] * array[j*nx];
+          *rsumw  += w[j*nx];
+          *rsumwq += w[j*nx] * w[j*nx];
+        }
+    }
+}
+
 
 void mervar(field_t field1, field_t *field2)
 {
-  long   i, j, nx, ny;
   int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
@@ -275,37 +308,12 @@ void mervar(field_t field1, field_t *field2)
   double rsum = 0, rsumw = 0, rvar = 0;
   double rsumq = 0, rsumwq = 0;
 
-  nx    = gridInqXsize(grid);
-  ny    = gridInqYsize(grid);
+  int nx = gridInqXsize(grid);
+  int ny = gridInqYsize(grid);
 
-  for ( i = 0; i < nx; i++ )
+  for ( int i = 0; i < nx; i++ )
     {
-      rsum   = 0;
-      rsumq  = 0;
-      rsumw  = 0;
-      rsumwq = 0;
-      if ( nmiss > 0 )
-	{
-	  for ( j = 0; j < ny; j++ )
-	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) &&
-		 !DBL_IS_EQUAL(w[j*nx+i], missval) )
-	      {
-		rsum   += w[j*nx+i] * array[j*nx+i];
-		rsumq  += w[j*nx+i] * array[j*nx+i] * array[j*nx+i];
-		rsumw  += w[j*nx+i];
-		rsumwq += w[j*nx+i] * w[j*nx+i];
-	      }
-	}
-      else
-	{
-	  for ( j = 0; j < ny; j++ )
-	    {
-	      rsum   += w[j*nx+i] * array[j*nx+i];
-	      rsumq  += w[j*nx+i] * array[j*nx+i] * array[j*nx+i];
-	      rsumw  += w[j*nx+i];
-	      rsumwq += w[j*nx+i] * w[j*nx+i];
-	    }
-	}
+      prevarsum_mer(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
       rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
       if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
@@ -319,32 +327,76 @@ void mervar(field_t field1, field_t *field2)
 }
 
 
+void mervar1(field_t field1, field_t *field2)
+{
+  int    rnmiss = 0;
+  int    grid    = field1.grid;
+  int    nmiss   = field1.nmiss;
+  double missval = field1.missval;
+  double *array  = field1.ptr;
+  double *w      = field1.weight;
+  double rsum = 0, rsumw = 0, rvar = 0;
+  double rsumq = 0, rsumwq = 0;
+
+  int nx = gridInqXsize(grid);
+  int ny = gridInqYsize(grid);
+
+  for ( int i = 0; i < nx; i++ )
+    {
+      prevarsum_mer(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+
+      rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
+      if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+
+      if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
+
+      field2->ptr[i] = rvar;
+    }
+
+  field2->nmiss  = rnmiss;
+}
+
+
 void merstd(field_t field1, field_t *field2)
 {
-  long   i, nx;
   int    rnmiss = 0;
   int    grid    = field1.grid;
   double missval = field1.missval;
-  double rvar, rstd;
+  double rstd;
 
-  nx    = gridInqXsize(grid);
+  int nx = gridInqXsize(grid);
 
   mervar(field1, field2);
 
-  for ( i = 0; i < nx; i++ )
+  for ( int i = 0; i < nx; i++ )
     {
-      rvar = field2->ptr[i];
+      rstd = var_to_std(field2->ptr[i], missval);
 
-      if ( DBL_IS_EQUAL(rvar, missval) || rvar < 0 )
-	{
-	  rstd = missval;
-	}
-      else
-	{
-	  rstd = IS_NOT_EQUAL(rvar, 0) ? sqrt(rvar) : 0;
-	}
+      if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
 
-      if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
+      field2->ptr[i] = rstd;
+    }
+
+  field2->nmiss  = rnmiss;
+}
+
+
+void merstd1(field_t field1, field_t *field2)
+{
+  int    rnmiss = 0;
+  int    grid    = field1.grid;
+  double missval = field1.missval;
+  double rstd;
+
+  int nx = gridInqXsize(grid);
+
+  mervar1(field1, field2);
+
+  for ( int i = 0; i < nx; i++ )
+    {
+      rstd = var_to_std(field2->ptr[i], missval);
+
+      if ( DBL_IS_EQUAL(rstd, missval) ) rnmiss++;
 
       field2->ptr[i] = rstd;
     }
