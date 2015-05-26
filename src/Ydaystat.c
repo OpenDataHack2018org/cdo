@@ -248,16 +248,16 @@ void *Ydaystat(void *argument)
 		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
 		    {
 		      if ( lstd )
-			farcstdx(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], nsets[dayoy], divisor);
+			farcstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], nsets[dayoy], divisor);
 		      else
-			farcvarx(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], nsets[dayoy], divisor);
+			farcvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], nsets[dayoy], divisor);
 		    }
 		  else
 		    {
 		      if ( lstd )
-			farstdx(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID], divisor);
+			farstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID], divisor);
 		      else
-			farvarx(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID], divisor);
+			farvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID], divisor);
 		    }
 		}
 	    }

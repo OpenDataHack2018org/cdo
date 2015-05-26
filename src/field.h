@@ -152,14 +152,10 @@ void farmul(field_t *field1, field_t field2);
 void fardiv(field_t *field1, field_t field2);
 void farmin(field_t *field1, field_t field2);
 void farmax(field_t *field1, field_t field2);
-void farvar(field_t *field1, field_t field2, field_t field3);
-void farstd(field_t *field1, field_t field2, field_t field3);
-void farvarx(field_t *field1, field_t field2, field_t field3, const double divisor);
-void farstdx(field_t *field1, field_t field2, field_t field3, const double divisor);
-void farcvar(field_t *field1, field_t field2, const double rconst1);
-void farcstd(field_t *field1, field_t field2, const double rconst1);
-void farcvarx(field_t *field1, field_t field2, const double rconst1, const double divisor);
-void farcstdx(field_t *field1, field_t field2, const double rconst1, const double divisor);
+void farvar(field_t *field1, field_t field2, field_t field3, const double divisor);
+void farstd(field_t *field1, field_t field2, field_t field3, const double divisor);
+void farcvar(field_t *field1, field_t field2, const double rconst1, const double divisor);
+void farcstd(field_t *field1, field_t field2, const double rconst1, const double divisor);
 void farmoq(field_t *field1, field_t field2);
 void faratan2(field_t *field1, field_t field2);
 

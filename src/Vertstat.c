@@ -408,16 +408,16 @@ void *Vertstat(void *argument)
 		  if ( samp1[varID].ptr == NULL )
 		    {
 		      if ( lstd )
-			farcstdx(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
+			farcstd(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
 		      else
-			farcvarx(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
+			farcvar(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
 		    }
 		  else
 		    {
 		      if ( lstd )
-			farstdx(&vars1[varID], vars2[varID], samp1[varID], divisor);
+			farstd(&vars1[varID], vars2[varID], samp1[varID], divisor);
 		      else
-			farvarx(&vars1[varID], vars2[varID], samp1[varID], divisor);
+			farvar(&vars1[varID], vars2[varID], samp1[varID], divisor);
 		    }
 		}
 

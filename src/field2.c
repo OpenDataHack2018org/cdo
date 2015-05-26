@@ -456,8 +456,8 @@ void farmax(field_t *field1, field_t field2)
     }
 }
 
-
-void farvar(field_t *field1, field_t field2, field_t field3)
+// not used
+void farvar0(field_t *field1, field_t field2, field_t field3)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -512,7 +512,7 @@ void farvar(field_t *field1, field_t field2, field_t field3)
 }
 
 
-void farvarx(field_t *field1, field_t field2, field_t field3, const double divisor)
+void farvar(field_t *field1, field_t field2, field_t field3, const double divisor)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -548,8 +548,8 @@ void farvarx(field_t *field1, field_t field2, field_t field3, const double divis
       }
 }
 
-
-void farstd(field_t *field1, field_t field2, field_t field3)
+// not used
+void farstd0(field_t *field1, field_t field2, field_t field3)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -565,7 +565,7 @@ void farstd(field_t *field1, field_t field2, field_t field3)
   if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  farvar(field1, field2, field3);
+  farvar0(field1, field2, field3);
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
@@ -581,7 +581,7 @@ void farstd(field_t *field1, field_t field2, field_t field3)
 }
 
 
-void farstdx(field_t *field1, field_t field2, field_t field3, const double divisor)
+void farstd(field_t *field1, field_t field2, field_t field3, const double divisor)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -597,7 +597,7 @@ void farstdx(field_t *field1, field_t field2, field_t field3, const double divis
   if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  farvarx(field1, field2, field3, divisor);
+  farvar(field1, field2, field3, divisor);
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
@@ -612,8 +612,8 @@ void farstdx(field_t *field1, field_t field2, field_t field3, const double divis
       }
 }
 
-
-void farcvar(field_t *field1, field_t field2, const double rconst1)
+// not used
+void farcvar0(field_t *field1, field_t field2, const double rconst1)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -668,7 +668,7 @@ void farcvar(field_t *field1, field_t field2, const double rconst1)
 }
 
 
-void farcvarx(field_t *field1, field_t field2, const double rconst1, const double divisor)
+void farcvar(field_t *field1, field_t field2, const double rconst1, const double divisor)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -703,8 +703,8 @@ void farcvarx(field_t *field1, field_t field2, const double rconst1, const doubl
       }
 }
 
-
-void farcstd(field_t *field1, field_t field2, const double rconst1)
+// not used
+void farcstd0(field_t *field1, field_t field2, const double rconst1)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -720,7 +720,7 @@ void farcstd(field_t *field1, field_t field2, const double rconst1)
   if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  farcvar(field1, field2, rconst1);
+  farcvar0(field1, field2, rconst1);
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
@@ -736,7 +736,7 @@ void farcstd(field_t *field1, field_t field2, const double rconst1)
 }
 
 
-void farcstdx(field_t *field1, field_t field2, const double rconst1, const double divisor)
+void farcstd(field_t *field1, field_t field2, const double rconst1, const double divisor)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
@@ -752,7 +752,7 @@ void farcstdx(field_t *field1, field_t field2, const double rconst1, const doubl
   if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  farcvarx(field1, field2, rconst1, divisor);
+  farcvar(field1, field2, rconst1, divisor);
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )

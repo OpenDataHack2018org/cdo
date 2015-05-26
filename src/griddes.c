@@ -1113,6 +1113,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 
 	  if ( grid.nvertex == 0 )
 	    {
+	      if ( grid.type == GRID_LONLAT      ) grid.nvertex = 2;
 	      if ( grid.type == GRID_CURVILINEAR ) grid.nvertex = 4;
 	    }
 
@@ -1156,6 +1157,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 
 	  if ( grid.nvertex == 0 )
 	    {
+	      if ( grid.type == GRID_LONLAT      ) grid.nvertex = 2;
 	      if ( grid.type == GRID_CURVILINEAR ) grid.nvertex = 4;
 	    }
 

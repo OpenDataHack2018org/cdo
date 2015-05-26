@@ -243,16 +243,16 @@ void *Timselstat(void *argument)
 		if ( samp1[varID][levelID].ptr == NULL )
 		  {
 		    if ( lstd )
-		      farcstdx(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
+		      farcstd(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
 		    else
-		      farcvarx(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
+		      farcvar(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
 		  }
 		else
 		  {
 		    if ( lstd )
-		      farstdx(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
+		      farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
 		    else
-		      farvarx(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
+		      farvar(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
 		  }
 	      }
 	  }

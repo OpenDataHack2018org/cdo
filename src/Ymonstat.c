@@ -289,16 +289,16 @@ void *Ymonstat(void *argument)
 		if ( samp1[month][varID][levelID].ptr == NULL )
 		  {
 		    if ( lstd )
-		      farcstdx(&vars1[month][varID][levelID], vars2[month][varID][levelID], nsets[month], divisor);
+		      farcstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], nsets[month], divisor);
 		    else
-		      farcvarx(&vars1[month][varID][levelID], vars2[month][varID][levelID], nsets[month], divisor);
+		      farcvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], nsets[month], divisor);
 		  }
 		else
 		  {
 		    if ( lstd )
-		      farstdx(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID], divisor);
+		      farstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID], divisor);
 		    else
-		      farvarx(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID], divisor);
+		      farvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID], divisor);
 		  }
 	      }
 	  }

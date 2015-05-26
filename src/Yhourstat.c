@@ -265,16 +265,16 @@ void *Yhourstat(void *argument)
 		  if ( samp1[houroy][varID][levelID].ptr == NULL )
 		    {
 		      if ( lstd )
-			farcstdx(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], nsets[houroy], divisor);
+			farcstd(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], nsets[houroy], divisor);
 		      else
-			farcvarx(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], nsets[houroy], divisor);
+			farcvar(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], nsets[houroy], divisor);
 		    }
 		  else
 		    {
 		      if ( lstd )
-			farstdx(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], samp1[houroy][varID][levelID], divisor);
+			farstd(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], samp1[houroy][varID][levelID], divisor);
 		      else
-			farvarx(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], samp1[houroy][varID][levelID], divisor);
+			farvar(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], samp1[houroy][varID][levelID], divisor);
 		    }
 		}
 	    }

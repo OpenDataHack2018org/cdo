@@ -272,16 +272,16 @@ void *Yseasstat(void *argument)
 		  if ( samp1[seas][varID][levelID].ptr == NULL )
 		    {
 		      if ( lstd )
-			farcstdx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
+			farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
 		      else
-			farcvarx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
+			farcvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], nsets[seas], divisor);
 		    }
 		  else
 		    {
 		      if ( lstd )
-			farstdx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
+			farstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
 		      else
-			farvarx(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
+			farvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID], divisor);
 		    }
 		}
 	    }

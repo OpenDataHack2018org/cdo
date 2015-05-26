@@ -223,16 +223,16 @@ void *Runstat(void *argument)
 		if ( runstat_nomiss )
 		  {
 		    if ( lstd )
-		      farcstdx(&vars1[0][varID][levelID], vars2[0][varID][levelID], ndates, divisor);
+		      farcstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], ndates, divisor);
 		    else
-		      farcvarx(&vars1[0][varID][levelID], vars2[0][varID][levelID], ndates, divisor);
+		      farcvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], ndates, divisor);
 		  }
 		else
 		  {
 		    if ( lstd )
-		      farstdx(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID], divisor);
+		      farstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID], divisor);
 		    else
-		      farvarx(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID], divisor);
+		      farvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID], divisor);
 		  }
 	      }
 	  }
