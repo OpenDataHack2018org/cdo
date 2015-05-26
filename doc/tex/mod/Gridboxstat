@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = gridboxmin gridboxmax gridboxsum gridboxmean gridboxavg gridboxvar gridboxstd
+@Operators = gridboxmin gridboxmax gridboxsum gridboxmean gridboxavg gridboxstd gridboxstd1 gridboxvar gridboxvar1
 
 @BeginDescription
 This module computes statistical values over surrounding grid boxes.
@@ -21,6 +21,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 @Parameter = nx ny
 
 @BeginDescription
+Minimum value of the selected grid boxes.
 @EndDescription
 @EndOperator
 
@@ -30,6 +31,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 @Parameter = nx ny
 
 @BeginDescription
+Maximum value of the selected grid boxes.
 @EndDescription
 @EndOperator
 
@@ -39,6 +41,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 @Parameter = nx ny
 
 @BeginDescription
+Sum of the selected grid boxes.
 @EndDescription
 @EndOperator
 
@@ -48,6 +51,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 @Parameter = nx ny
 
 @BeginDescription
+Mean of the selected grid boxes.
 @EndDescription
 @EndOperator
 
@@ -57,6 +61,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 @Parameter = nx ny
 
 @BeginDescription
+Average of the selected grid boxes.
 @EndDescription
 @EndOperator
 
@@ -66,6 +71,17 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 @Parameter = nx ny
 
 @BeginDescription
+Variance of the selected grid boxes. Divisor is n.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxvar1
+@Title     = Gridbox variance
+@Parameter = nx ny
+
+@BeginDescription
+Variance of the selected grid boxes. Divisor is (n-1).
 @EndDescription
 @EndOperator
 
@@ -75,6 +91,17 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 @Parameter = nx ny
 
 @BeginDescription
+Standard deviation of the selected grid boxes. Divisor is n.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxstd1
+@Title     = Gridbox standard deviation
+@Parameter = nx ny
+
+@BeginDescription
+Standard deviation of the selected grid boxes. Divisor is (n-1).
 @EndDescription
 @EndOperator
 

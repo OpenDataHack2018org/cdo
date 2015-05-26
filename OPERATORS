@@ -275,8 +275,10 @@ Operator catalog:
    Gridboxstat   gridboxsum      Gridbox sum
    Gridboxstat   gridboxmean     Gridbox mean
    Gridboxstat   gridboxavg      Gridbox average
-   Gridboxstat   gridboxvar      Gridbox variance
    Gridboxstat   gridboxstd      Gridbox standard deviation
+   Gridboxstat   gridboxstd1     Gridbox standard deviation
+   Gridboxstat   gridboxvar      Gridbox variance
+   Gridboxstat   gridboxvar1     Gridbox variance
    Vertstat      vertmin         Vertical minimum
    Vertstat      vertmax         Vertical maximum
    Vertstat      vertsum         Vertical sum

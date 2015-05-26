@@ -24,7 +24,9 @@
       Gridboxstat    gridboxmean         Gridbox mean
       Gridboxstat    gridboxavg          Gridbox average
       Gridboxstat    gridboxstd          Gridbox standard deviation
+      Gridboxstat    gridboxstd1         Gridbox standard deviation [Divisor is (n-1)]
       Gridboxstat    gridboxvar          Gridbox variance
+      Gridboxstat    gridboxvar1         Gridbox variance [Divisor is (n-1)]
 */
 
 
@@ -469,7 +471,7 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   */
   if ( field1->weight ) useWeight = TRUE;
 
-  gridsize      = xinc*yinc;
+  gridsize = xinc*yinc;
   field = (field_t*) malloc(ompNumThreads*sizeof(field_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
@@ -555,29 +557,20 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
 
 void *Gridboxstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
   int lastgrid = -1;
   int wstatus = FALSE;
-  int index, ngrids;
+  int index;
   int recID, nrecs;
-  int tsID, varID, levelID;
+  int varID, levelID;
   int needWeights = FALSE;
-  int gridID1, gridID2;
-  int gridsize1, gridsize2;
-  int taxisID1, taxisID2;
-  int xinc, yinc;
-  field_t field1, field2;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);
 
   operatorInputArg("xinc, yinc");
   operatorCheckArgc(2);
-  xinc = parameter2int(operatorArgv()[0]);
-  yinc = parameter2int(operatorArgv()[1]);
+  int xinc = parameter2int(operatorArgv()[0]);
+  int yinc = parameter2int(operatorArgv()[1]);
 
   cdoOperatorAdd("gridboxmin",  func_min,  0, NULL);
   cdoOperatorAdd("gridboxmax",  func_max,  0, NULL);
@@ -585,53 +578,57 @@ void *Gridboxstat(void *argument)
   cdoOperatorAdd("gridboxmean", func_mean, 0, NULL);
   cdoOperatorAdd("gridboxavg",  func_avg,  0, NULL);
   cdoOperatorAdd("gridboxvar",  func_var,  0, NULL);
+  cdoOperatorAdd("gridboxvar1", func_var1, 0, NULL);
   cdoOperatorAdd("gridboxstd",  func_std,  0, NULL);
+  cdoOperatorAdd("gridboxstd1", func_std1, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
   if ( operfunc == func_mean || operfunc == func_avg ||
-       operfunc == func_var  || operfunc == func_std )
+       operfunc == func_var  || operfunc == func_std ||
+       operfunc == func_var1 || operfunc == func_std1 )
     needWeights = TRUE;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   if ( ngrids > 1 )  cdoAbort("Too many different grids!");
 
-  gridID1 = vlistGrid(vlistID1, 0);
+  int gridID1 = vlistGrid(vlistID1, 0);
   if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
     cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
-  gridID2 = genBoxGrid(gridID1, xinc, yinc);
+  int gridID2 = genBoxGrid(gridID1, xinc, yinc);
   for ( index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
 
-  gridsize1 = gridInqSize(gridID1);
+  int gridsize1 = gridInqSize(gridID1);
   field1.ptr    = (double*) malloc(gridsize1*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )
     field1.weight = (double*) malloc(gridsize1*sizeof(double));
 
-  gridsize2 = gridInqSize(gridID2);
+  int gridsize2 = gridInqSize(gridID2);
   field2.ptr    = (double*) malloc(gridsize2*sizeof(double));
   field2.weight = NULL;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
