@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = vertmin vertmax vertsum vertmean vertavg vertvar vertstd
+@Operators = vertmin vertmax vertsum vertmean vertavg vertstd vertstd1 vertvar vertvar1
 
 @BeginDescription
 This module computes statistical values over all levels of the input variables.
@@ -64,7 +64,16 @@ For every gridpoint the layer weighted average over all levels is computed.
 @Title     = Vertical variance
 
 @BeginDescription
-For every gridpoint the variance over all levels is computed.
+For every gridpoint the variance over all levels is computed. Divisor is n.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertvar1
+@Title     = Vertical variance
+
+@BeginDescription
+For every gridpoint the variance over all levels is computed. Divisor is (n-1).
 @EndDescription
 @EndOperator
 
@@ -73,7 +82,16 @@ For every gridpoint the variance over all levels is computed.
 @Title     = Vertical standard deviation
 
 @BeginDescription
-For every gridpoint the standard deviation over all levels is computed.
+For every gridpoint the standard deviation over all levels is computed. Divisor is n.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertstd1
+@Title     = Vertical standard deviation
+
+@BeginDescription
+For every gridpoint the standard deviation over all levels is computed. Divisor is (n-1).
 @EndDescription
 @EndOperator
 

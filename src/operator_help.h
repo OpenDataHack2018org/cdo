@@ -1977,8 +1977,8 @@ static char *GridboxstatHelp[] = {
 
 static char *VertstatHelp[] = {
     "NAME",
-    "    vertmin, vertmax, vertsum, vertmean, vertavg, vertvar, vertstd - ",
-    "    Vertical statistical values",
+    "    vertmin, vertmax, vertsum, vertmean, vertavg, vertstd, vertstd1, vertvar, ",
+    "    vertvar1 - Vertical statistical values",
     "",
     "SYNOPSIS",
     "    <operator>  ifile ofile",
@@ -1999,10 +1999,14 @@ static char *VertstatHelp[] = {
     "              For every gridpoint the layer weighted mean over all levels is computed.",
     "    vertavg   Vertical average",
     "              For every gridpoint the layer weighted average over all levels is computed.",
-    "    vertvar   Vertical variance",
-    "              For every gridpoint the variance over all levels is computed.",
     "    vertstd   Vertical standard deviation",
-    "              For every gridpoint the standard deviation over all levels is computed.",
+    "              For every gridpoint the standard deviation over all levels is computed. Divisor is n.",
+    "    vertstd1  Vertical standard deviation",
+    "              For every gridpoint the standard deviation over all levels is computed. Divisor is (n-1).",
+    "    vertvar   Vertical variance",
+    "              For every gridpoint the variance over all levels is computed. Divisor is n.",
+    "    vertvar1  Vertical variance",
+    "              For every gridpoint the variance over all levels is computed. Divisor is (n-1).",
     NULL
 };
 

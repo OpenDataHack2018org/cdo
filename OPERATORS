@@ -284,8 +284,10 @@ Operator catalog:
    Vertstat      vertsum         Vertical sum
    Vertstat      vertmean        Vertical mean
    Vertstat      vertavg         Vertical average
-   Vertstat      vertvar         Vertical variance
    Vertstat      vertstd         Vertical standard deviation
+   Vertstat      vertstd1        Vertical standard deviation
+   Vertstat      vertvar         Vertical variance
+   Vertstat      vertvar1        Vertical variance
    Timselstat    timselmin       Time range minimum
    Timselstat    timselmax       Time range maximum
    Timselstat    timselsum       Time range sum

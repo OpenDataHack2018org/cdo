@@ -5,6 +5,8 @@
 
 2015-05-26  Uwe Schulzweida
 
+	* New operator: vertstd1  - Vertical standard deviation [Divisor is (n-1)]
+	* New operator: vertvar1  - Vartical variance [Divisor is (n-1)]
 	* New operator: gridboxstd1 - Gridbox standard deviation [Divisor is (n-1)]
 	* New operator: gridboxvar1 - Gridbox variance [Divisor is (n-1)]
 	* New operator: merstd1  - Meridional standard deviation [Divisor is (n-1)]

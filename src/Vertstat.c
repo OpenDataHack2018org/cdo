@@ -25,7 +25,9 @@
       Vertstat   vertmean        Vertical mean
       Vertstat   vertavg         Vertical average
       Vertstat   vertvar         Vertical variance
+      Vertstat   vertvar1        Vertical variance [Divisor is (n-1)]
       Vertstat   vertstd         Vertical standard deviation
+      Vertstat   vertstd1        Vertical standard deviation [Divisor is (n-1)]
 */
 
 
@@ -178,11 +180,18 @@ void *Vertstat(void *argument)
   int VERTMEAN = cdoOperatorAdd("vertmean", func_mean, 1, NULL);
   int VERTAVG  = cdoOperatorAdd("vertavg",  func_avg,  1, NULL);
                  cdoOperatorAdd("vertvar",  func_var,  0, NULL);
+                 cdoOperatorAdd("vertvar1", func_var1, 0, NULL);
                  cdoOperatorAdd("vertstd",  func_std,  0, NULL);
+                 cdoOperatorAdd("vertstd1", func_std1, 0, NULL);
 
   int operatorID  = cdoOperatorID();
   int operfunc    = cdoOperatorF1(operatorID);
   int needWeights = cdoOperatorF2(operatorID);
+
+  int lmean   = operfunc == func_mean || operfunc == func_avg;
+  int lstd    = operfunc == func_std || operfunc == func_std1;
+  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  double divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -252,7 +261,7 @@ void *Vertstat(void *argument)
   field_t *vars1 = (field_t*) malloc(nvars*sizeof(field_t));
   field_t *samp1 = (field_t*) malloc(nvars*sizeof(field_t));
   field_t *vars2 = NULL;
-  if ( operfunc == func_std || operfunc == func_var )
+  if ( lvarstd )
     vars2 = (field_t*) malloc(nvars*sizeof(field_t));
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -274,7 +283,7 @@ void *Vertstat(void *argument)
       samp1[varID].nmiss   = 0;
       samp1[varID].missval = missval;
       samp1[varID].ptr     = NULL;
-      if ( operfunc == func_std || operfunc == func_var )
+      if ( lvarstd )
 	{
 	  field_init(&vars2[varID]);
 	  vars2[varID].grid    = gridID;
@@ -332,7 +341,7 @@ void *Vertstat(void *argument)
 	      if ( (operatorID == VERTMEAN || operatorID == VERTAVG) && IS_NOT_EQUAL(layer_weight, 1.0) )
 		farcmul(&vars1[varID], layer_weight);
 
-	      if ( operfunc == func_std || operfunc == func_var )
+	      if ( lvarstd )
 		farmoq(&vars2[varID], vars1[varID]);
 
 	      if ( nmiss > 0 || samp1[varID].ptr || needWeights )
@@ -371,7 +380,7 @@ void *Vertstat(void *argument)
 		      samp1[varID].ptr[i] += layer_weight;
 		}
 
-	      if ( operfunc == func_std || operfunc == func_var )
+	      if ( lvarstd )
 		{
 		  farsumq(&vars2[varID], field);
 		  farsum(&vars1[varID], field);
@@ -387,29 +396,28 @@ void *Vertstat(void *argument)
 	{
 	  if ( vars1[varID].nsamp )
 	    {
-	      if ( operfunc == func_mean || operfunc == func_avg )
+	      if ( lmean )
 		{
 		  if ( samp1[varID].ptr == NULL )
 		    farcmul(&vars1[varID], 1.0/vars1[varID].nsamp);
 		  else
 		    fardiv(&vars1[varID], samp1[varID]);
 		}
-	      else if ( operfunc == func_std || operfunc == func_var )
+	      else if ( lvarstd )
 		{
 		  if ( samp1[varID].ptr == NULL )
 		    {
-		      if ( operfunc == func_std )
-			farcstd(&vars1[varID], vars2[varID], 1.0/vars1[varID].nsamp);
+		      if ( lstd )
+			farcstdx(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
 		      else
-			farcvar(&vars1[varID], vars2[varID], 1.0/vars1[varID].nsamp);
+			farcvarx(&vars1[varID], vars2[varID], vars1[varID].nsamp, divisor);
 		    }
 		  else
 		    {
-		      farinv(&samp1[varID]);
-		      if ( operfunc == func_std )
-			farstd(&vars1[varID], vars2[varID], samp1[varID]);
+		      if ( lstd )
+			farstdx(&vars1[varID], vars2[varID], samp1[varID], divisor);
 		      else
-			farvar(&vars1[varID], vars2[varID], samp1[varID]);
+			farvarx(&vars1[varID], vars2[varID], samp1[varID], divisor);
 		    }
 		}
 
@@ -426,12 +434,12 @@ void *Vertstat(void *argument)
     {
       free(vars1[varID].ptr);
       if ( samp1[varID].ptr ) free(samp1[varID].ptr);
-      if ( operfunc == func_std || operfunc == func_var ) free(vars2[varID].ptr);
+      if ( lvarstd ) free(vars2[varID].ptr);
     }
 
   free(vars1);
   free(samp1);
-  if ( operfunc == func_std || operfunc == func_var ) free(vars2);
+  if ( lvarstd ) free(vars2);
 
   if ( field.ptr ) free(field.ptr);
 
