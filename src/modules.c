@@ -481,7 +481,7 @@ void *Maggraph(void *argument);
 #define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
 #define  YseaspctlOperators     {"yseaspctl"}
 #define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd", "yseasstd1", "yseasvar", "yseasvar1"}
-#define  ZonstatOperators       {"zonmin", "zonmax", "zonrange", "zonsum", "zonmean", "zonavg", "zonvar", "zonstd", "zonpctl"}
+#define  ZonstatOperators       {"zonmin", "zonmax", "zonrange", "zonsum", "zonmean", "zonavg", "zonstd", "zonstd1", "zonvar", "zonvar1", "zonpctl"}
 
 #define  EcaCfdOperators        {"eca_cfd"}
 #define  EcaCsuOperators        {"eca_csu"}

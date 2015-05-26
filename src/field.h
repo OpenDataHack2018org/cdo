@@ -18,6 +18,8 @@
 #ifndef _FIELD_H
 #define _FIELD_H
 
+double var_to_std(double rvar, double missval);
+
 #define  FIELD_NONE 0
 #define  FIELD_ALL  1
 #define  FIELD_PTR  2
@@ -81,9 +83,7 @@ double fldstd(field_t field);
 double fldstd1(field_t field);
 double fldvar(field_t field);
 double fldvar1(field_t field);
-/* RQ */
 double fldpctl(field_t field, const int k);
-/* QR */
 void   fldunm(field_t *field);
 int    fldhvs(field_t *field, const size_t nlevels);
 
@@ -103,10 +103,10 @@ void zonsum(field_t field1, field_t *field2);
 void zonavg(field_t field1, field_t *field2);
 void zonmean(field_t field1, field_t *field2);
 void zonstd(field_t field1, field_t *field2);
+void zonstd1(field_t field1, field_t *field2);
 void zonvar(field_t field1, field_t *field2);
-/* RQ */
+void zonvar1(field_t field1, field_t *field2);
 void zonpctl(field_t field1, field_t *field2, const int k);
-/* QR */
 
 /* fieldmer.c */
 
@@ -118,9 +118,7 @@ void meravg(field_t field1, field_t *field2);
 void mermean(field_t field1, field_t *field2);
 void merstd(field_t field1, field_t *field2);
 void mervar(field_t field1, field_t *field2);
-/* RQ */
 void merpctl(field_t field1, field_t *field2, const int k);
-/* QR */
 
 void fldrms(field_t field1, field_t field2, field_t *field3);
 

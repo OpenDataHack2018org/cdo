@@ -255,8 +255,10 @@ Operator catalog:
    Zonstat       zonsum          Zonal sum
    Zonstat       zonmean         Zonal mean
    Zonstat       zonavg          Zonal average
-   Zonstat       zonvar          Zonal variance
    Zonstat       zonstd          Zonal standard deviation
+   Zonstat       zonstd1         Zonal standard deviation
+   Zonstat       zonvar          Zonal variance
+   Zonstat       zonvar1         Zonal variance
    Zonstat       zonpctl         Zonal percentiles
    Merstat       mermin          Meridional minimum
    Merstat       mermax          Meridional maximum

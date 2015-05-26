@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = zonmin zonmax zonsum zonmean zonavg zonvar zonstd zonpctl
+@Operators = zonmin zonmax zonsum zonmean zonavg zonstd zonstd1 zonvar zonvar1 zonpctl
 
 @BeginDescription
 This module computes zonal statistical values of the input fields.
@@ -65,7 +65,16 @@ For every latitude the average over all longitudes is computed.
 @Title     = Zonal variance
 
 @BeginDescription
-For every latitude the variance over all longitudes is computed.
+For every latitude the variance over all longitudes is computed. Divisor is n.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonvar1
+@Title     = Zonal variance
+
+@BeginDescription
+For every latitude the variance over all longitudes is computed. Divisor is (n-1).
 @EndDescription
 @EndOperator
 
@@ -74,7 +83,16 @@ For every latitude the variance over all longitudes is computed.
 @Title     = Zonal standard deviation
 
 @BeginDescription
-For every latitude the standard deviation over all longitudes is computed.
+For every latitude the standard deviation over all longitudes is computed. Divisor is n. 
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonstd1
+@Title     = Zonal standard deviation
+
+@BeginDescription
+For every latitude the standard deviation over all longitudes is computed. Divisor is (n-1). 
 @EndDescription
 @EndOperator
 

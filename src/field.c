@@ -331,7 +331,7 @@ double fldavg(field_t field)
 }
 
 static
-void prevarsum(const double *restrict array, const double *restrict w, size_t len, const int nmiss, 
+void prevarsum(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
 	       double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 { 
   size_t i;
@@ -369,12 +369,12 @@ double fldvar(field_t field)
   const double missval = field.missval;
   double *array  = field.ptr;
   double *w      = field.weight;
-  double rsum, rsumw, rvar;
+  double rsum, rsumw;
   double rsumq, rsumwq;
 
   prevarsum(array, w, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-  rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
+  double rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
   return (rvar);
@@ -388,24 +388,21 @@ double fldvar1(field_t field)
   const double missval = field.missval;
   double *array  = field.ptr;
   double *w      = field.weight;
-  double rsum, rsumw, rvar;
+  double rsum, rsumw;
   double rsumq, rsumwq;
 
   prevarsum(array, w, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
-  rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
+  double rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
   return (rvar);
 }
 
 
-double fldstd(field_t field)
+double var_to_std(double rvar, double missval)
 {
-  const double missval = field.missval;
-  double rvar, rstd;
-
-  rvar = fldvar(field);
+  double rstd;
 
   if ( DBL_IS_EQUAL(rvar, missval) || rvar < 0 )
     {
@@ -416,27 +413,18 @@ double fldstd(field_t field)
       rstd = IS_NOT_EQUAL(rvar, 0) ? sqrt(rvar) : 0;
     }
 
-  return (rstd);
+  return rstd;
+}
+
+double fldstd(field_t field)
+{
+  return var_to_std(fldvar(field), field.missval);
 }
 
 
 double fldstd1(field_t field)
 {
-  const double missval = field.missval;
-  double rvar, rstd;
-
-  rvar = fldvar1(field);
-
-  if ( DBL_IS_EQUAL(rvar, missval) || rvar < 0 )
-    {
-      rstd = missval;
-    }
-  else
-    {
-      rstd = IS_NOT_EQUAL(rvar, 0) ? sqrt(rvar) : 0;
-    }
-
-  return (rstd);
+  return var_to_std(fldvar1(field), field.missval);
 }
 
 

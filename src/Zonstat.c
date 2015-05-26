@@ -25,7 +25,9 @@
       Zonstat    zonmean         Zonal mean
       Zonstat    zonavg          Zonal average
       Zonstat    zonstd          Zonal standard deviation
+      Zonstat    zonstd1         Zonal standard deviation [Divisor is (n-1)]
       Zonstat    zonvar          Zonal variance
+      Zonstat    zonvar1         Zonal variance [Divisor is (n-1)]
       Zonstat    zonpctl         Zonal percentiles
 */
 
@@ -33,29 +35,18 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "grid.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 void *Zonstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
   int gridID1 = -1, gridID2 = -1;
   int zongridID = -1;
-  int nlatmax;
-  int index, ngrids;
+  int index;
   int recID, nrecs;
-  int tsID, varID, levelID;
-  int lim;
-  int ndiffgrids;
-  int taxisID1, taxisID2;
-  field_t field1, field2;
-  /* RQ */
+  int varID, levelID;
   int pn = 0;
-  /* QR */
 
   cdoInitialize(argument);
 
@@ -66,11 +57,13 @@ void *Zonstat(void *argument)
   cdoOperatorAdd("zonmean",  func_mean,  0, NULL);
   cdoOperatorAdd("zonavg",   func_avg,   0, NULL);
   cdoOperatorAdd("zonvar",   func_var,   0, NULL);
+  cdoOperatorAdd("zonvar1",  func_var1,  0, NULL);
   cdoOperatorAdd("zonstd",   func_std,   0, NULL);
+  cdoOperatorAdd("zonstd1",  func_std1,  0, NULL);
   cdoOperatorAdd("zonpctl",  func_pctl,  0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
   if ( operfunc == func_pctl )
     {
@@ -81,16 +74,16 @@ void *Zonstat(void *argument)
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   for ( index = 0; index < ngrids; index++ )
     {
       if ( gridInqXsize(vlistGrid(vlistID1, index)) > 1 ) 
@@ -103,7 +96,7 @@ void *Zonstat(void *argument)
 	}
     }
 
-  ndiffgrids = 0;
+  int ndiffgrids = 0;
   for ( index = 0; index < ngrids; index++ )
     {
       if ( zongridID != -1 && zongridID == vlistGrid(vlistID1, index) ) continue;
@@ -136,21 +129,23 @@ void *Zonstat(void *argument)
   for ( index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
   gridID1 = vlistInqVarGrid(vlistID1, 0);
-  nlatmax = gridInqYsize(gridID1); /* max nlat ? */
+  int nlatmax = gridInqYsize(gridID1); /* max nlat ? */
 
-  lim = vlistGridsizeMax(vlistID1);
+  int lim = vlistGridsizeMax(vlistID1);
+
+  field_t field1, field2;
   field_init(&field2);
   field_init(&field2);
   field1.ptr  = (double*) malloc(lim*sizeof(double));
   field2.ptr  = (double*) malloc(nlatmax*sizeof(double));
   field2.grid = gridID2;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
