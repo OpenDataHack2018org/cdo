@@ -1008,6 +1008,12 @@ void *Remap(void *argument)
 	      else
 		{
 		  r = nremaps - 1;
+                  remapVarsFree(&remaps[r].vars);
+                  remapGridFree(&remaps[r].src_grid);
+                  remapGridFree(&remaps[r].tgt_grid);
+                  remaps[r].gridID   = -1;
+                  remaps[r].gridsize = 0;
+                  remaps[r].nmiss    = 0;
 		}
 
 	      if ( remaps[r].gridID != gridID1 )
