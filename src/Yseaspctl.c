@@ -214,7 +214,8 @@ void *Yseaspctl(void *argument)
     if ( nsets[seas] )
       {
         if ( getmonthday(datetime1[seas].vdate) != getmonthday(datetime2[seas].vdate) )
-          cdoAbort("Verification dates for season %d of %s, %s and %s are different!", seas, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
+          cdoAbort("Verification dates for season %d of %s, %s and %s are different!",
+                   seas, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
