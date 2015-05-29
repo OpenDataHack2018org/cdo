@@ -30,6 +30,7 @@
 
 #define  NDAY       373
 
+int getmonthday(int date);
 
 void *Ydaypctl(void *argument)
 {

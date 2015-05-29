@@ -406,27 +406,33 @@ int parameter2intlist(const char *string)
 const char *seas_name_dec[4] = {"DJF", "MAM", "JJA", "SON"};
 const char *seas_name_jan[4] = {"JFM", "AMJ", "JAS", "OND"};
 
+static int season_start = START_DEC;
+
 int get_season_start(void)
 {
-  int season_start = START_DEC;
-  char *envstr;
+  static int lgetenv = TRUE;
 
-  envstr = getenv("CDO_SEASON_START");
-  if ( envstr )
+  if ( lgetenv )
     {
-      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
-      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
-      
-      if ( cdoVerbose )
+      lgetenv = FALSE;
+  
+      char *envstr = getenv("CDO_SEASON_START");
+      if ( envstr )
         {
-          if      ( season_start == START_DEC )
-            cdoPrint("Set SEASON_START to December");
-          else if ( season_start == START_JAN )
-            cdoPrint("Set SEASON_START to January");
+          if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
+          else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
+      
+          if ( cdoVerbose )
+            {
+              if      ( season_start == START_DEC )
+                cdoPrint("Set SEASON_START to December");
+              else if ( season_start == START_JAN )
+                cdoPrint("Set SEASON_START to January");
+            }
         }
     }
 
-  return (season_start);
+  return season_start;
 }
 
 
@@ -440,6 +446,33 @@ void get_season_name(const char *seas_name[])
     for ( i = 0; i < 4; ++i ) seas_name[i] = seas_name_jan[i];
 }
 
+
+int month_to_season(int month)
+{
+  int season_start = get_season_start();
+  int seas = -1;
+
+  if ( month < 0 || month > 16 ) cdoAbort("Month %d out of range!", month);
+
+  if ( season_start == START_DEC )
+    {
+      if ( month <= 12 )
+        seas = (month % 12) / 3;
+      else
+        seas = month - 13;
+    }
+  else
+    {
+      if ( month <= 12 )
+        seas = (month - 1) / 3;
+      else
+        seas = month - 13;
+    }
+
+  if ( seas < 0 || seas > 3 ) cdoAbort("Season %d out of range!", seas+1);
+
+  return seas;
+}
 
 //#include <sys/types.h>
 #include <sys/stat.h>

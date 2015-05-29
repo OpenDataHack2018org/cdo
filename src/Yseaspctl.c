@@ -30,85 +30,90 @@
 
 #define  NSEAS       4
 
+typedef struct {
+  int vdate;
+  int vtime;
+}
+date_time_t;
+
+void set_date(int vdate_new, int vtime_new, date_time_t *datetime);
+
+int getmonthday(int date);
+
 void *Yseaspctl(void *argument)
 {
-  int gridsize;
   int varID;
   int recID;
   int gridID;
   int vdate, vtime;
   int year, month, day, seas;
-  int nrecs, nrecords;
+  int nrecs;
   int levelID;
-  int tsID;
-  int otsID;
   long nsets[NSEAS];
-  int streamID1, streamID2, streamID3, streamID4;
-  int vlistID1, vlistID2, vlistID3, vlistID4, taxisID1, taxisID2, taxisID3, taxisID4;
   int nmiss;
-  int nvars, nlevels;
-  int *recVarID, *recLevelID;
-  int vdates1[NSEAS], vtimes1[NSEAS];
-  int vdates2[NSEAS], vtimes2[NSEAS];
+  int nlevels;
+  date_time_t datetime1[NSEAS], datetime2[NSEAS];
   field_t **vars1[NSEAS];
-  field_t field;
-  double pn;
   HISTOGRAM_SET *hsets[NSEAS];
-  int season_start;
 
   cdoInitialize(argument);
   cdoOperatorAdd("yseaspctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number");
-  pn = parameter2double(operatorArgv()[0]);
+  double pn = parameter2double(operatorArgv()[0]);
       
   if ( !(pn > 0 && pn < 100) )
     cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
 
-  season_start = get_season_start();
   for ( seas = 0; seas < NSEAS; seas++ )
     {
       vars1[seas] = NULL;
       hsets[seas] = NULL;
       nsets[seas] = 0;
+      datetime1[seas].vdate = 0;
+      datetime1[seas].vtime = 0;
+      datetime2[seas].vdate = 0;
+      datetime2[seas].vtime = 0;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
-  streamID3 = streamOpenRead(cdoStreamName(2));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID3 = streamOpenRead(cdoStreamName(2));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = streamInqVlist(streamID3);
-  vlistID4 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = streamInqVlist(streamID3);
+  int vlistID4 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
   vlistCompare(vlistID1, vlistID3, CMP_ALL);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = vlistInqTaxis(vlistID3);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisID3 = vlistInqTaxis(vlistID3);
   /* TODO - check that time axes 2 and 3 are equal */
 
-  taxisID4 = taxisDuplicate(taxisID1);
+  int taxisID4 = taxisDuplicate(taxisID1);
   if ( taxisHasBounds(taxisID4) ) taxisDeleteBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
-  streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
+  int streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
 
   streamDefVlist(streamID4, vlistID4);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
+
+  field_t field;
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != streamInqTimestep(streamID3, tsID) )
@@ -123,29 +128,10 @@ void *Yseaspctl(void *argument)
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
-      if ( month < 0 || month > 16 )
-	cdoAbort("Month %d out of range!", month);
 
-      if ( season_start == START_DEC )
-	{
-	  if ( month <= 12 )
-	    seas = (month % 12) / 3;
-	  else
-	    seas = month - 13;
-	}
-      else
-	{
-	  if ( month <= 12 )
-	    seas = (month - 1) / 3;
-	  else
-	    seas = month - 13;
-	}
+      seas = month_to_season(month);
 
-      if ( seas < 0 || seas > 3 )
-	cdoAbort("Season %d out of range!", seas+1);
-
-      vdates2[seas] = vdate;
-      vtimes2[seas] = vtime;
+      set_date(vdate, vtime, &datetime2[seas]);
 
       if ( vars1[seas] == NULL )
 	{
@@ -198,8 +184,7 @@ void *Yseaspctl(void *argument)
       if ( seas < 0 || seas > 3 )
 	cdoAbort("Season %d out of range!", seas+1);
 
-      vdates1[seas] = vdate;
-      vtimes1[seas] = vtime;
+      set_date(vdate, vtime, &datetime1[seas]);
 
       if ( vars1[seas] == NULL )
         cdoAbort("No data for season %d in %s and %s", seas, cdoStreamName(1)->args, cdoStreamName(2)->args);
@@ -224,14 +209,12 @@ void *Yseaspctl(void *argument)
       tsID++;
     }
 
-  otsID = 0;
+  int otsID = 0;
   for ( seas = 0; seas < NSEAS; seas++ )
     if ( nsets[seas] )
       {
-        if ( vdates1[seas] != vdates2[seas] )
+        if ( getmonthday(datetime1[seas].vdate) != getmonthday(datetime2[seas].vdate) )
           cdoAbort("Verification dates for season %d of %s, %s and %s are different!", seas, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
-        if ( vtimes1[seas] != vtimes2[seas] )
-          cdoAbort("Verification times for season %d of %s, %s and %s are different!", seas, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
@@ -242,8 +225,8 @@ void *Yseaspctl(void *argument)
 	      hsetGetVarLevelPercentiles(&vars1[seas][varID][levelID], hsets[seas], varID, levelID, pn);
 	  }
 
-	taxisDefVdate(taxisID4, vdates1[seas]);
-	taxisDefVtime(taxisID4, vtimes1[seas]);
+	taxisDefVdate(taxisID4, datetime1[seas].vdate);
+	taxisDefVtime(taxisID4, datetime1[seas].vtime);
 	streamDefTimestep(streamID4, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )

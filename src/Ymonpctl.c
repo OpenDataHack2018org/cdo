@@ -29,6 +29,14 @@
 
 #define  NMONTH     17
 
+static
+int getmonth(int date)
+{
+  int year, month, day;
+  cdiDecodeDate(date, &year, &month, &day);
+  return month;
+}
+
 void *Ymonpctl(void *argument)
 {
   int gridsize;
@@ -48,7 +56,7 @@ void *Ymonpctl(void *argument)
   int nvars, nlevels;
   int *recVarID, *recLevelID;
   int vdates1[NMONTH], vtimes1[NMONTH];
-  int vdates2[NMONTH], vtimes2[NMONTH];
+  int vdates2[NMONTH];
   field_t **vars1[NMONTH];
   field_t field;
   double pn;
@@ -124,7 +132,6 @@ void *Ymonpctl(void *argument)
 	cdoAbort("Month %d out of range!", month);
 
       vdates2[month] = vdate;
-      vtimes2[month] = vtime;
 
       if ( vars1[month] == NULL )
 	{
@@ -202,10 +209,9 @@ void *Ymonpctl(void *argument)
   for ( month = 0; month < NMONTH; month++ )
     if ( nsets[month] )
       {
-        if ( vdates1[month] != vdates2[month] )
-          cdoAbort("Verification dates for month %d of %s, %s and %s are different!", month, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
-        if ( vtimes1[month] != vtimes2[month] )
-          cdoAbort("Verification times for month %d of %s, %s and %s are different!", month, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
+        if ( getmonth(vdates1[month]) != getmonth(vdates2[month]) )
+          cdoAbort("Verification dates for month %d of %s, %s and %s are different!",
+                   month, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

@@ -36,34 +36,6 @@
 
 #define  MAX_MON    12
 
-static
-int month_to_season(int mon)
-{
-  int seas = -1;
-
-  switch ( mon )
-    {
-    case 12:
-    case  1:
-    case  2:
-      seas = 0; break;
-    case  3:
-    case  4:
-    case  5:
-      seas = 1; break;
-    case  6:
-    case  7:
-    case  8:
-      seas = 2; break;
-    case  9:
-    case 10:
-    case 11:
-      seas = 3; break;
-    }
-
-  return seas;
-}
-
 
 void *Ymonarith(void *argument)
 {

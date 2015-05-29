@@ -120,6 +120,7 @@ char *getFileArg(char *argument);
 enum {START_DEC, START_JAN};
 int get_season_start(void);
 void get_season_name(const char *seas_name[]);
+int month_to_season(int month);
 
 void init_is_tty(void);
 

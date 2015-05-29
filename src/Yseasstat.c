@@ -44,8 +44,6 @@ typedef struct {
 }
 date_time_t;
 
-
-static 
 void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 {
   int year, month, day;
@@ -91,7 +89,6 @@ void *Yseasstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int season_start = get_season_start();
   for ( seas = 0; seas < NSEAS; seas++ )
     {
       vars1[seas]  = NULL;
@@ -140,26 +137,8 @@ void *Yseasstat(void *argument)
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
       cdiDecodeDate(vdate, &year, &month, &day);
-      if ( month < 0 || month > 16 )
-	cdoAbort("Month %d out of range!", month);
 
-      if ( season_start == START_DEC )
-	{
-	  if ( month <= 12 )
-	    seas = (month % 12) / 3;
-	  else
-	    seas = month - 13;
-	}
-      else
-	{
-	  if ( month <= 12 )
-	    seas = (month - 1) / 3;
-	  else
-	    seas = month - 13;
-	}
-
-      if ( seas < 0 || seas > 3 )
-	cdoAbort("Season %d out of range!", seas+1);
+      seas = month_to_season(month); 
 
       set_date(vdate, vtime, &datetime[seas]);
 

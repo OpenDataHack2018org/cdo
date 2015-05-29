@@ -93,30 +93,11 @@ void *Seascount(void *argument)
           vdate = taxisInqVdate(taxisID1);
           vtime = taxisInqVtime(taxisID1);
 	  cdiDecodeDate(vdate, &year, &month, &day);
-          if ( month < 0 || month > 16 )
-            cdoAbort("Month %d out of range!", month);
 
 	  newmon = month;
+	  if ( season_start == START_DEC && newmon == 12 ) newmon = 0;
 
-	  if ( season_start == START_DEC )
-	    {
-	      if ( newmon == 12 ) newmon = 0;
-
-	      if ( month <= 12 )
-		seas = (month % 12) / 3;
-	      else
-		seas = month - 13;
-	    }
-	  else
-	    {
-	      if ( month <= 12 )
-		seas = (month - 1) / 3;
-	      else
-		seas = month - 13;
-	    }
-
-          if ( seas < 0 || seas > 3 )
-            cdoAbort("Season %d out of range!", seas+1);
+          seas = month_to_season(month);
 
           if ( nsets == 0 )
             {

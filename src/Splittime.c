@@ -97,7 +97,6 @@ void *Splittime(void *argument)
       if ( operatorArgc() == 1 ) format = operatorArgv()[0];
     }
 
-  int season_start = get_season_start();
   const char *seas_name[4];
   get_season_name(seas_name);
 
@@ -167,29 +166,7 @@ void *Splittime(void *argument)
 	  index = (vdate/operintval)%100;
 	  if ( index < 0 ) index = -index;
 
-	  if ( operatorID == SPLITSEAS )
-	    {
-	      if ( index < 0 || index > 16 )
-		cdoAbort("Month %d out of range!", index);
-
-	      if ( season_start == START_DEC )
-		{
-		  if ( index <= 12 )
-		    index = (index % 12) / 3;
-		  else
-		    index = index - 13;
-		}
-	      else
-		{
-		  if ( index <= 12 )
-		    index = (index - 1) / 3;
-		  else
-		    index = index - 13;
-		}
-	      
-	      if ( index < 0 || index > 3 )
-		cdoAbort("Season %d out of range!", index+1);
-	    }
+	  if ( operatorID == SPLITSEAS ) index = month_to_season(index);
 	}
       else if ( operfunc == func_time )
 	{

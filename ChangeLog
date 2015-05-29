@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-05-29  Uwe Schulzweida
+
+	* yseaspctl: check of verification date failed [Bug #5810]
+
 2015-05-28  Uwe Schulzweida
 
 	* Remap: fixed memory leak for r=max_remaps-1

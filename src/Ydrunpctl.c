@@ -30,7 +30,6 @@
 
 #define NDAY 373
 
-static
 int getmonthday(int date)
 {
   int year, month, day;
@@ -294,11 +293,9 @@ void *Ydrunpctl(void *argument)
     if ( nsets[dayoy] )
       {
         if ( getmonthday(vdates1[dayoy]) != getmonthday(vdates2[dayoy]) )
-          cdoAbort("Verification dates for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
-        /*
-        if ( vtimes1[dayoy] != vtimes2[dayoy] )
-          cdoAbort("Verification times for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
-        */
+          cdoAbort("Verification dates for day %d of %s, %s and %s are different!",
+                   dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
+
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
