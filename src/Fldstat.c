@@ -93,7 +93,6 @@ void *Fldstat(void *argument)
   int index;
   int recID, nrecs;
   int varID, levelID;
-  int needWeights = FALSE;
   int nmiss;
   double sglval;
   field_t field;
@@ -104,16 +103,17 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldmin",  func_min,  0, NULL);
   cdoOperatorAdd("fldmax",  func_max,  0, NULL);
   cdoOperatorAdd("fldsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("fldmean", func_mean, 0, NULL);
-  cdoOperatorAdd("fldavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("fldstd",  func_std,  0, NULL);
-  cdoOperatorAdd("fldstd1", func_std1, 0, NULL);
-  cdoOperatorAdd("fldvar",  func_var,  0, NULL);
-  cdoOperatorAdd("fldvar1", func_var1, 0, NULL);
+  cdoOperatorAdd("fldmean", func_mean, 1, NULL);
+  cdoOperatorAdd("fldavg",  func_avg,  1, NULL);
+  cdoOperatorAdd("fldstd",  func_std,  1, NULL);
+  cdoOperatorAdd("fldstd1", func_std1, 1, NULL);
+  cdoOperatorAdd("fldvar",  func_var,  1, NULL);
+  cdoOperatorAdd("fldvar1", func_var1, 1, NULL);
   cdoOperatorAdd("fldpctl", func_pctl, 0, NULL);
 
-  int operatorID = cdoOperatorID();
-  int operfunc = cdoOperatorF1(operatorID);
+  int operatorID  = cdoOperatorID();
+  int operfunc    = cdoOperatorF1(operatorID);
+  int needWeights = cdoOperatorF2(operatorID);
 
   if ( operfunc == func_pctl )
     {
@@ -126,11 +126,8 @@ void *Fldstat(void *argument)
 
   int useweights = TRUE;
 
-  if ( operfunc == func_mean || operfunc == func_avg ||
-       operfunc == func_var  || operfunc == func_std ||
-       operfunc == func_var1 || operfunc == func_std1 )
+  if ( needWeights )
     {
-      needWeights = TRUE;
       unsigned npar = operatorArgc();
       if ( npar > 0 )
 	{

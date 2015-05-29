@@ -177,8 +177,8 @@ void *Vertstat(void *argument)
                  cdoOperatorAdd("vertmax",  func_max,  0, NULL);
                  cdoOperatorAdd("vertsum",  func_sum,  0, NULL);
   int VERTINT  = cdoOperatorAdd("vertint",  func_sum,  1, NULL);
-  int VERTMEAN = cdoOperatorAdd("vertmean", func_mean, 1, NULL);
-  int VERTAVG  = cdoOperatorAdd("vertavg",  func_avg,  1, NULL);
+                 cdoOperatorAdd("vertmean", func_mean, 1, NULL);
+                 cdoOperatorAdd("vertavg",  func_avg,  1, NULL);
                  cdoOperatorAdd("vertvar",  func_var,  0, NULL);
                  cdoOperatorAdd("vertvar1", func_var1, 0, NULL);
                  cdoOperatorAdd("vertstd",  func_std,  0, NULL);
@@ -192,6 +192,8 @@ void *Vertstat(void *argument)
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   double divisor = operfunc == func_std1 || operfunc == func_var1;
+
+  int applyWeights = lmean;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -338,8 +340,7 @@ void *Vertstat(void *argument)
 	      vars1[varID].nmiss = nmiss;
 
 	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&vars1[varID], layer_thickness);
-	      if ( (operatorID == VERTMEAN || operatorID == VERTAVG) && IS_NOT_EQUAL(layer_weight, 1.0) )
-		farcmul(&vars1[varID], layer_weight);
+	      if ( applyWeights && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&vars1[varID], layer_weight);
 
 	      if ( lvarstd )
 		farmoq(&vars2[varID], vars1[varID]);
@@ -363,8 +364,7 @@ void *Vertstat(void *argument)
 	      field.missval = vars1[varID].missval;
 
 	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&field, layer_thickness);
-	      if ( (operatorID == VERTMEAN || operatorID == VERTAVG) && IS_NOT_EQUAL(layer_weight, 1.0) )
-		 farcmul(&field, layer_weight);
+	      if ( applyWeights && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&field, layer_weight);
 
 	      if ( field.nmiss > 0 || samp1[varID].ptr )
 		{
