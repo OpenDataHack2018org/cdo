@@ -10,7 +10,7 @@ FORMATS="srv ext ieg grb grb2 nc nc2 nc4"
 #
 NTEST=1
 #
-for OPERATOR in write read; do
+for OPERATOR in write copy; do
   for FORMAT in $FORMATS; do
     RSTAT=0
 
@@ -65,20 +65,26 @@ for OPERATOR in write read; do
           test $? -eq 0 || let RSTAT+=1
           test -s $FILE || let RSTAT+=1
           cat $CDOOUT $CDOERR
+
+          $CDO diff,0.0001 $FILE $RFILE > $CDOOUT 2> $CDOERR
+          test $? -eq 0 || let RSTAT+=1
+          test -s $CDOOUT && let RSTAT+=1
+          cat $CDOOUT $CDOERR
         else
-          CDOCOMMAND="$CDO cdi${OPERATOR} $FILE"
+          OFILE=file_${DATATYPE}_${FORMAT}_res
+          CDOCOMMAND="$CDO ${OPERATOR} $FILE $OFILE"
           echo "$CDOCOMMAND"
 
           $CDOCOMMAND  > $CDOOUT 2> $CDOERR
           test $? -eq 0 || let RSTAT+=1
           cat $CDOOUT $CDOERR
 
-          $CDO diff,0.0001 $FILE $RFILE > $CDOOUT 2> $CDOERR
+          $CDO diff,0.0001 $FILE $OFILE > $CDOOUT 2> $CDOERR
           test $? -eq 0 || let RSTAT+=1
           test -s $CDOOUT && let RSTAT+=1
           cat $CDOOUT $CDOERR
 
-	  rm -f $FILE
+	  rm -f $FILE $OFILE
         fi
       done
 

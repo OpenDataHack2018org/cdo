@@ -89,7 +89,6 @@ void *CDIread(void *argument)
   int filetype = -1, datatype = -1;
   int irun, nruns = 1;
   char sinfo[64];
-  char *envstr;
   off_t nvalues = 0;
   double file_size = 0, data_size = 0;
   double tw, tw0, t0, twsum = 0;
@@ -100,7 +99,7 @@ void *CDIread(void *argument)
 
   cdoInitialize(argument);
 
-  envstr = getenv("MEMTYPE");
+  char *envstr = getenv("MEMTYPE");
   if ( envstr )
     {
       if      ( strcmp(envstr, "float")  == 0 ) memtype = MEMTYPE_FLOAT;
@@ -116,11 +115,7 @@ void *CDIread(void *argument)
   if ( nruns <  0 ) nruns = 0;
   if ( nruns > 99 ) nruns = 99;
 
-  if ( cdoVerbose )
-    {
-      cdoPrint("nruns      : %d", nruns);
-    } 
-
+  if ( cdoVerbose ) cdoPrint("nruns      : %d", nruns);
 
   // vlistDefNtsteps(vlistID, 1);
 
