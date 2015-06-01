@@ -68,6 +68,12 @@ void arradd(const size_t n, double * restrict a, const double * restrict b)
 #endif
 }
 
+static
+void arraddw(const size_t n, double * restrict a, const double * restrict b, double w)
+{
+  for ( size_t i = 0; i < n; i++ ) a[i] += w*b[i];
+}
+
 
 void faradd(field_t *field1, field_t field2)
 {
@@ -145,6 +151,49 @@ void farsum(field_t *field1, field_t field2)
   else
     {
       arradd(len, array1, array2);
+    }
+}
+
+
+void farsumw(field_t *field1, field_t field2, double w)
+{
+  size_t   i, len;
+  int          nwpv     = field1->nwpv;
+  const int    grid1    = field1->grid;
+  const int    nmiss1   = field1->nmiss;
+  const double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  /*  double *weight1 = field1->weight; */
+  const int    grid2    = field2.grid;
+  const int    nmiss2   = field2.nmiss;
+  const double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
+
+  len = (size_t) (nwpv*gridInqSize(grid1));
+
+  if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  if ( nmiss1 > 0 || nmiss2 > 0 )
+    {
+      for ( i = 0; i < len; i++ )
+	if ( !DBL_IS_EQUAL(array2[i], missval2) )
+	  {
+	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
+	      array1[i] += w*array2[i];
+	    else
+	      array1[i] = w*array2[i];
+	  }
+
+      field1->nmiss = 0;
+      for ( i = 0; i < len; i++ )
+	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+    }
+  else
+    {
+      arraddw(len, array1, array2, w);
     }
 }
 
@@ -243,6 +292,50 @@ void farsumq(field_t *field1, field_t field2)
     {
       for ( i = 0; i < len; i++ ) 
 	array1[i] += array2[i]*array2[i];
+    }
+}
+
+
+void farsumqw(field_t *field1, field_t field2, double w)
+{
+  size_t   i, len;
+  int          nwpv     = field1->nwpv;
+  const int    grid1    = field1->grid;
+  const int    nmiss1   = field1->nmiss;
+  const double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  /*  double *weight1 = field1->weight; */
+  const int    grid2    = field2.grid;
+  const int    nmiss2   = field2.nmiss;
+  const double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
+
+  len = (size_t) (nwpv*gridInqSize(grid1));
+
+  if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  if ( nmiss1 > 0 || nmiss2 > 0 )
+    {
+      for ( i = 0; i < len; i++ )
+	if ( !DBL_IS_EQUAL(array2[i], missval2) )
+	  {
+	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
+	      array1[i] += w*array2[i]*array2[i];
+	    else
+	      array1[i] = w*array2[i]*array2[i];
+	  }
+
+      field1->nmiss = 0;
+      for ( i = 0; i < len; i++ )
+	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+    }
+  else
+    {
+      for ( i = 0; i < len; i++ ) 
+	array1[i] += w*array2[i]*array2[i];
     }
 }
 
@@ -803,6 +896,45 @@ void farmoq(field_t *field1, field_t field2)
     {
       for ( i = 0; i < len; i++ ) 
 	array1[i] = array2[i]*array2[i];
+    }
+}
+
+
+void farmoqw(field_t *field1, field_t field2, double w)
+{
+  size_t   i, len;
+  int          nwpv     = field1->nwpv;
+  const int    grid1    = field1->grid;
+  const double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  const int    grid2    = field2.grid;
+  const int    nmiss2   = field2.nmiss;
+  double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
+
+  len = (size_t) (nwpv*gridInqSize(grid1));
+
+  if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  if ( nmiss2 > 0 )
+    {
+      for ( i = 0; i < len; i++ )
+	if ( !DBL_IS_EQUAL(array2[i], missval2) )
+	  array1[i] = w*array2[i]*array2[i];
+	else
+	  array1[i] = missval1;
+
+      field1->nmiss = 0;
+      for ( i = 0; i < len; i++ )
+	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+    }
+  else
+    {
+      for ( i = 0; i < len; i++ ) 
+	array1[i] = w*array2[i]*array2[i];
     }
 }
 

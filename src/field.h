@@ -145,7 +145,9 @@ void farfun(field_t *field1, field_t field2, const int function);
 
 void faradd(field_t *field1, field_t field2);
 void farsum(field_t *field1, field_t field2);
+void farsumw(field_t *field1, field_t field2, double w);
 void farsumq(field_t *field1, field_t field2);
+void farsumqw(field_t *field1, field_t field2, double w);
 void farsumtr(field_t *field1, field_t field2, const double refval);
 void farsub(field_t *field1, field_t field2);
 void farmul(field_t *field1, field_t field2);
@@ -157,6 +159,7 @@ void farstd(field_t *field1, field_t field2, field_t field3, const double diviso
 void farcvar(field_t *field1, field_t field2, const double rconst1, const double divisor);
 void farcstd(field_t *field1, field_t field2, const double rconst1, const double divisor);
 void farmoq(field_t *field1, field_t field2);
+void farmoqw(field_t *field1, field_t field2, double w);
 void faratan2(field_t *field1, field_t field2);
 
 /* RQ */

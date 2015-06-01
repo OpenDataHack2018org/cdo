@@ -179,10 +179,10 @@ void *Vertstat(void *argument)
   int VERTINT  = cdoOperatorAdd("vertint",  func_sum,  1, NULL);
                  cdoOperatorAdd("vertmean", func_mean, 1, NULL);
                  cdoOperatorAdd("vertavg",  func_avg,  1, NULL);
-                 cdoOperatorAdd("vertvar",  func_var,  0, NULL);
-                 cdoOperatorAdd("vertvar1", func_var1, 0, NULL);
-                 cdoOperatorAdd("vertstd",  func_std,  0, NULL);
-                 cdoOperatorAdd("vertstd1", func_std1, 0, NULL);
+                 cdoOperatorAdd("vertvar",  func_var,  1, NULL);
+                 cdoOperatorAdd("vertvar1", func_var1, 1, NULL);
+                 cdoOperatorAdd("vertstd",  func_std,  1, NULL);
+                 cdoOperatorAdd("vertstd1", func_std1, 1, NULL);
 
   int operatorID  = cdoOperatorID();
   int operfunc    = cdoOperatorF1(operatorID);
@@ -193,7 +193,7 @@ void *Vertstat(void *argument)
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   double divisor = operfunc == func_std1 || operfunc == func_var1;
 
-  int applyWeights = lmean;
+  //int applyWeights = lmean;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -340,10 +340,20 @@ void *Vertstat(void *argument)
 	      vars1[varID].nmiss = nmiss;
 
 	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&vars1[varID], layer_thickness);
-	      if ( applyWeights && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&vars1[varID], layer_weight);
+	      if ( lmean && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&vars1[varID], layer_weight);
 
 	      if ( lvarstd )
-		farmoq(&vars2[varID], vars1[varID]);
+                {
+                  if ( IS_NOT_EQUAL(layer_weight, 1.0) )
+                    {
+                      farmoqw(&vars2[varID], vars1[varID], layer_weight);
+                      farcmul(&vars1[varID], layer_weight);
+                    }
+                  else
+                    {
+                      farmoq(&vars2[varID], vars1[varID]);
+                    }
+                }
 
 	      if ( nmiss > 0 || samp1[varID].ptr || needWeights )
 		{
@@ -364,7 +374,7 @@ void *Vertstat(void *argument)
 	      field.missval = vars1[varID].missval;
 
 	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&field, layer_thickness);
-	      if ( applyWeights && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&field, layer_weight);
+	      if ( lmean && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&field, layer_weight);
 
 	      if ( field.nmiss > 0 || samp1[varID].ptr )
 		{
@@ -382,8 +392,16 @@ void *Vertstat(void *argument)
 
 	      if ( lvarstd )
 		{
-		  farsumq(&vars2[varID], field);
-		  farsum(&vars1[varID], field);
+                  if ( IS_NOT_EQUAL(layer_weight, 1.0) )
+                    {
+                      farsumqw(&vars2[varID], field, layer_weight);
+                      farsumw(&vars1[varID], field, layer_weight);
+                    }
+                  else
+                    {
+                      farsumq(&vars2[varID], field);
+                      farsum(&vars1[varID], field);
+                    }
 		}
 	      else
 		{
