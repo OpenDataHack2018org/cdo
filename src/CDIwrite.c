@@ -105,7 +105,6 @@ void *CDIwrite(void *argument)
   unsigned int seed = 1;
   const char *gridfile;
   char sinfo[64];
-  char *envstr;
   off_t nvalues = 0;
   double file_size = 0, data_size = 0;
   double tw, tw0, t0, twsum = 0;
@@ -117,7 +116,7 @@ void *CDIwrite(void *argument)
 
   cdoInitialize(argument);
 
-  envstr = getenv("MEMTYPE");
+  char *envstr = getenv("MEMTYPE");
   if ( envstr )
     {
       if      ( strcmp(envstr, "float")  == 0 ) memtype = MEMTYPE_FLOAT;
@@ -212,7 +211,7 @@ void *CDIwrite(void *argument)
   for ( i = 0; i < nvars; ++i )
     {
       varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
-      vlistDefVarCode(vlistID, varID, varID+1);
+      vlistDefVarParam(vlistID, varID, cdiEncodeParam(varID+1, 255, 255));
       //    vlistDefVarName(vlistID, varID, );
     }
 

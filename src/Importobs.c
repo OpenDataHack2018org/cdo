@@ -33,12 +33,12 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
   int  code[]  = {11, 17, 33, 34, 1, 2/*, 3*/};
   char *name[]  = {"temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/};
   char *units[] = {"Celsius", "", "m/s", "m/s", "m", "hPa" /*, ""*/};
-  int i, varID;
+  int varID;
 
-  for ( i = 0; i < nvars; ++i )
+  for ( int i = 0; i < nvars; ++i )
     {
       varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
-      vlistDefVarCode(vlistID, varID, code[i]);
+      vlistDefVarParam(vlistID, varID, cdiEncodeParam(code[i], 255, 255));
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
       vlistDefVarDatatype(vlistID, varID, DATATYPE_FLT32);
@@ -48,31 +48,26 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 static
 void init_data(int vlistID, int nvars, double *data[])
 {
-  int varID, i, gridsize;
+  int gridsize;
   double missval;
 
-  for ( varID = 0; varID < nvars; ++varID )
+  for ( int varID = 0; varID < nvars; ++varID )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       missval  = vlistInqVarMissval(vlistID, varID);
       
-      for ( i = 0; i < gridsize; ++i )
-	{
-	  data[varID][i] = missval;
-	}
+      for ( int i = 0; i < gridsize; ++i ) data[varID][i] = missval;
     } 
 }
 
 static
 void write_data(int streamID, int vlistID, int nvars, double *data[])
 {
-  int i;
-  int varID;
   int nmiss;
   int gridsize;
   double missval;
 
-  for ( varID = 0; varID < nvars; ++varID )
+  for ( int varID = 0; varID < nvars; ++varID )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
       missval  = vlistInqVarMissval(vlistID, varID);
@@ -80,7 +75,7 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
       streamDefRecord(streamID, varID, 0);
 
       nmiss = 0;
-      for ( i = 0; i < gridsize; ++i )
+      for ( int i = 0; i < gridsize; ++i )
 	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
       
       streamWriteRecord(streamID, data[varID], nmiss);
@@ -90,11 +85,9 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
 static
 int getDate(const char *name)
 {
+  char *pname = strchr(name, '_');
+
   int date = 0;
-  char *pname;
-
-  pname = strchr(name, '_');
-
   if ( pname ) date = atoi(pname+1);
 
   return(date);
@@ -104,19 +97,11 @@ int getDate(const char *name)
 
 void *Importobs(void *argument)
 {
-  int operatorID;
   char line[MAX_LINE_LEN];
-  int streamID;
-  int tsID;
-  int gridID, zaxisID, taxisID, vlistID;
   int i, j;
   int nvars = MAX_VARS;
-  int vdate = 0, vtime = 0;
-  int vdate0 = 0, vtime0 = 0;
-  int gridsize, xsize, ysize;
-  double *xvals = NULL, *yvals = NULL;
+  int vtime = 0;
   double *data[MAX_VARS];
-  FILE *fp;
   char dummy[32], station[32], datetime[32];
   float lat, lon, height1, pressure, height2, value;
   double latmin = 90, latmax = -90, lonmin = 360, lonmax = -360;
@@ -129,23 +114,23 @@ void *Importobs(void *argument)
 
   cdoOperatorAdd("import_obs",     0, 0, "grid description file or name");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));  
 
-  gridID = cdoDefineGrid(operatorArgv()[0]);
+  int gridID = cdoDefineGrid(operatorArgv()[0]);
 
   if ( gridInqType(gridID) != GRID_LONLAT ) 
     cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID)));
 
-  gridsize = gridInqSize(gridID);
-  xsize = gridInqXsize(gridID);
-  ysize = gridInqYsize(gridID);
+  int gridsize = gridInqSize(gridID);
+  int xsize = gridInqXsize(gridID);
+  int ysize = gridInqYsize(gridID);
 
   // printf("gridsize=%d, xsize=%d, ysize=%d\n", gridsize, xsize, ysize);
 
-  xvals = (double*) malloc(gridsize*sizeof(double));
-  yvals = (double*) malloc(gridsize*sizeof(double));
+  double *xvals = (double*) malloc(gridsize*sizeof(double));
+  double *yvals = (double*) malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -159,100 +144,100 @@ void *Importobs(void *argument)
     grid_to_degree(units, gridsize, yvals, "grid center lat");
   }
 
-  fp = fopen(cdoStreamName(0)->args, "r");
+  FILE *fp = fopen(cdoStreamName(0)->args, "r");
   if ( fp == NULL ) { perror(cdoStreamName(0)->args); exit(EXIT_FAILURE); }
 
-  vdate = getDate(cdoStreamName(0)->args);
+  int vdate = getDate(cdoStreamName(0)->args);
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+  int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
-  taxisID = taxisCreate(TAXIS_ABSOLUTE);
+  int taxisID = taxisCreate(TAXIS_ABSOLUTE);
 
-  vlistID = vlistCreate();
+  int vlistID = vlistCreate();
   vlistDefTaxis(vlistID, taxisID);
 
+  for ( i = 0; i < nvars; ++i ) data[i] = (double*) malloc(gridsize*sizeof(double));
+
+  init_vars(vlistID, gridID, zaxisID, nvars);
+
+  streamDefVlist(streamID, vlistID);
+
+  int vdate0 = 0;
+  int vtime0 = 0;
+  //ntime = 0;
+  int tsID = 0;
+  while ( readline(fp, line, MAX_LINE_LEN) )
     {
-      for ( i = 0; i < nvars; ++i ) data[i] = (double*) malloc(gridsize*sizeof(double));
+      sscanf(line, "%s %s %s %g %g %g %d %g %g %g", 
+             dummy, station, datetime, &lat, &lon, &height1, &code, &pressure, &height2, &value);
+      sscanf(datetime, "%d_%d", &vdate, &vtime);
 
-      init_vars(vlistID, gridID, zaxisID, nvars);
+      if ( vdate != vdate0 || vtime != vtime0 )
+        {
+          if ( tsID > 0 ) write_data(streamID, vlistID, nvars, data);
 
-      streamDefVlist(streamID, vlistID);
-
-      vdate0 = 0;
-      vtime0 = 0;
-      //ntime = 0;
-      tsID = 0;
-      while ( readline(fp, line, MAX_LINE_LEN) )
-	{
-	  sscanf(line, "%s %s %s %g %g %g %d %g %g %g", 
-		 dummy, station, datetime, &lat, &lon, &height1, &code, &pressure, &height2, &value);
-	  sscanf(datetime, "%d_%d", &vdate, &vtime);
-
-	  if ( vdate != vdate0 || vtime != vtime0 )
-	    {
-	      if ( tsID > 0 ) write_data(streamID, vlistID, nvars, data);
-
-	      vdate0 = vdate;
-	      vtime0 = vtime;
-	      /*
-	      printf("%s %d %d %g %g %g %d %g %g %g\n", 
-		     station, vdate, vtime, lat, lon, height1, code, pressure, height2, value);	    
-	      */
-	      taxisDefVdate(taxisID, vdate);
-	      taxisDefVtime(taxisID, vtime);
-	      streamDefTimestep(streamID, tsID);
+          vdate0 = vdate;
+          vtime0 = vtime;
+          /*
+            printf("%s %d %d %g %g %g %d %g %g %g\n", 
+            station, vdate, vtime, lat, lon, height1, code, pressure, height2, value);	    
+          */
+          taxisDefVdate(taxisID, vdate);
+          taxisDefVtime(taxisID, vtime);
+          streamDefTimestep(streamID, tsID);
       
-	      init_data(vlistID, nvars, data);
+          init_data(vlistID, nvars, data);
 
-	      tsID++;
-	    }
+          tsID++;
+        }
 
-	  if ( lon < lonmin ) lonmin = lon;
-	  if ( lon > lonmax ) lonmax = lon;
-	  if ( lat < latmin ) latmin = lat;
-	  if ( lat > latmax ) latmax = lat;
+      if ( lon < lonmin ) lonmin = lon;
+      if ( lon > lonmax ) lonmax = lon;
+      if ( lat < latmin ) latmin = lat;
+      if ( lat > latmax ) latmax = lat;
 
-	  dy =  yvals[1] - yvals[0];
-	  for ( j = 0; j < ysize; ++j )
-	    if ( lat >= (yvals[j]-dy/2) && lat < (yvals[j]+dy/2) )  break;
+      dy =  yvals[1] - yvals[0];
+      for ( j = 0; j < ysize; ++j )
+        if ( lat >= (yvals[j]-dy/2) && lat < (yvals[j]+dy/2) )  break;
 
-	  dx =  xvals[1] - xvals[0];
-	  if ( lon < (xvals[0] - dx/2) && lon < 0 ) lon+=360;
-	  for ( i = 0; i < xsize; ++i )
-	    if ( lon >= (xvals[i]-dx/2) && lon < (xvals[i]+dx/2) )  break;
+      dx =  xvals[1] - xvals[0];
+      if ( lon < (xvals[0] - dx/2) && lon < 0 ) lon+=360;
+      for ( i = 0; i < xsize; ++i )
+        if ( lon >= (xvals[i]-dx/2) && lon < (xvals[i]+dx/2) )  break;
 	  
-	  index = -1;
-	  if ( code == 11 ) index = 0;
-	  if ( code == 17 ) index = 1;
-	  if ( code == 33 ) index = 2;
-	  if ( code == 34 ) index = 3;
+      index = -1;
+      if ( code == 11 ) index = 0;
+      if ( code == 17 ) index = 1;
+      if ( code == 33 ) index = 2;
+      if ( code == 34 ) index = 3;
 
-	  //printf("%d %d %d %g %g %g %g\n", i, j, index, dx, dy, lon, lat);
-	  if ( i < xsize && j < ysize && index >= 0 )
-	    {
-	      pstation = station;
-	      while (isalpha(*pstation)) pstation++;
-	      // printf("station %s %d\n", pstation, atoi(pstation));
-	      data[index][j*xsize+i] = value;
-	      data[    4][j*xsize+i] = height1;
-	      data[    5][j*xsize+i] = pressure;
-	      // data[    6][j*xsize+i] = atoi(pstation);
-	    }
+      //printf("%d %d %d %g %g %g %g\n", i, j, index, dx, dy, lon, lat);
+      if ( i < xsize && j < ysize && index >= 0 )
+        {
+          pstation = station;
+          while (isalpha(*pstation)) pstation++;
+          // printf("station %s %d\n", pstation, atoi(pstation));
+          data[index][j*xsize+i] = value;
+          data[    4][j*xsize+i] = height1;
+          data[    5][j*xsize+i] = pressure;
+          // data[    6][j*xsize+i] = atoi(pstation);
+        }
 
-	  /*
-	  printf("%s %d %d %g %g %g %d %g %g %g\n", 
-		 station, vdate, vtime, lat, lon, height1, code, pressure, height2, value);
-	  */
-	}
-
-      write_data(streamID, vlistID, nvars, data);
-
-      for ( i = 0; i < nvars; ++i ) free(data[i]);
+      /*
+        printf("%s %d %d %g %g %g %d %g %g %g\n", 
+        station, vdate, vtime, lat, lon, height1, code, pressure, height2, value);
+      */
     }
-  printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax, latmin, latmax);
+
+  write_data(streamID, vlistID, nvars, data);
+
+  for ( i = 0; i < nvars; ++i ) free(data[i]);
+
+  if ( cdoVerbose )
+    printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax, latmin, latmax);
 
   processDefVarNum(vlistNvars(vlistID), streamID);
 

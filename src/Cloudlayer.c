@@ -122,19 +122,13 @@ void pl_index(int *kmax, int *kmin, double pmax, double pmin, long nlevs, double
 
 void *Cloudlayer(void *argument)
 {
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
-  int gridID, zaxisID, tsID;
-  int surfaceID;
-  int nlevel, nhlev, nlevs, nrecs, recID, code;
+  int gridID, zaxisID;
+  int nlevel, nlevs, nrecs, recID, code;
   int varID, levelID;
   int zrev = FALSE;
-  int nvars;
   int i;
   int offset;
   int nmiss;
-  int aclcac_code;
   int aclcacID = -1;
   int nvars2 = 0;
   int aclcac_code_found = 0;
@@ -142,9 +136,7 @@ void *Cloudlayer(void *argument)
   char varname[CDI_MAX_NAME];
   double sfclevel = 0;
   double *plevs = NULL;
-  double *aclcac = NULL;
   double *cloud[NVARS];
-  double missval;
   double pmin = 0, pmax = 0;
 
   cdoInitialize(argument);
@@ -161,15 +153,15 @@ void *Cloudlayer(void *argument)
       nvars2 = NVARS;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  aclcac_code = 223;
+  int aclcac_code = 223;
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; ++varID )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -204,14 +196,14 @@ void *Cloudlayer(void *argument)
 	cdoAbort("Cloud cover (parameter 223) not found!");
     }
 
-  missval = vlistInqVarMissval(vlistID1, aclcacID);
+  double missval = vlistInqVarMissval(vlistID1, aclcacID);
   gridID  = vlistInqVarGrid(vlistID1, aclcacID);
   zaxisID = vlistInqVarZaxis(vlistID1, aclcacID);
 
   nlevel = zaxisInqSize(zaxisID);
-  nhlev  = nlevel+1;
+  int nhlev  = nlevel+1;
 
-  aclcac = (double*) malloc(gridsize*nlevel*sizeof(double));
+  double *aclcac = (double*) malloc(gridsize*nlevel*sizeof(double));
   for ( varID = 0; varID < nvars2; ++varID )
     cloud[varID] = (double*) malloc(gridsize*sizeof(double));
 
@@ -286,15 +278,15 @@ void *Cloudlayer(void *argument)
     cdoAbort("Unsupported Z-Axis type!");
 
 
-  surfaceID = zaxisCreate(ZAXIS_SURFACE, 1);
+  int surfaceID = zaxisCreate(ZAXIS_SURFACE, 1);
   zaxisDefLevels(surfaceID, &sfclevel);
 
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
 
   if ( nvars2 == 1 )
     {
       varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
-      vlistDefVarCode(vlistID2, varID, 33);
+      vlistDefVarParam(vlistID2, varID, cdiEncodeParam(33, 128, 255));
       vlistDefVarName(vlistID2, varID, "cld_lay");
       vlistDefVarLongname(vlistID2, varID, "cloud layer");
       vlistDefVarMissval(vlistID2, varID, missval);
@@ -302,33 +294,33 @@ void *Cloudlayer(void *argument)
   else
     {
       varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
-      vlistDefVarCode(vlistID2, varID, 34);
+      vlistDefVarParam(vlistID2, varID, cdiEncodeParam(34, 128, 255));
       vlistDefVarName(vlistID2, varID, "low_cld");
       vlistDefVarLongname(vlistID2, varID, "low cloud");
       vlistDefVarMissval(vlistID2, varID, missval);
 
       varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
-      vlistDefVarCode(vlistID2, varID, 35);
+      vlistDefVarParam(vlistID2, varID, cdiEncodeParam(35, 128, 255));
       vlistDefVarName(vlistID2, varID, "mid_cld");
       vlistDefVarLongname(vlistID2, varID, "mid cloud");
       vlistDefVarMissval(vlistID2, varID, missval);
 
       varID = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
-      vlistDefVarCode(vlistID2, varID, 36);
+      vlistDefVarParam(vlistID2, varID, cdiEncodeParam(36, 128, 255));
       vlistDefVarName(vlistID2, varID, "hih_cld");
       vlistDefVarLongname(vlistID2, varID, "high cloud");
       vlistDefVarMissval(vlistID2, varID, missval);
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

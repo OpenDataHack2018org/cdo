@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-06-03  Uwe Schulzweida
+
+	* setpartabn: replace vlistDefVarCode() by vlistDefVarParam()
+
 2015-06-01  Uwe Schulzweida
 
 	* vertvar, vertstd: changed to weighted var/std if layer bounds are available

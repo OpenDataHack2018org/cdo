@@ -30,30 +30,21 @@
 
 void *Vardup(void *argument)
 {
-  int PARDUP, PARMUL;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, nrecords;
-  int tsID, recID, varID, varID2, levelID;
-  int gridsize, i;
-  int vlistID1, vlistID2;
+  int nrecs;
+  int recID, varID, varID2, levelID;
+  int i;
   long offset;
   int nmul = 0;
   int nmiss;
-  int nvars, nlevel;
-  int *recVarID, *recLevelID;
-  int **varnmiss;
+  int nlevel;
   double *single;
-  double **vardata;
-  double *array;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
-  PARDUP = cdoOperatorAdd("pardup", 0, 0, NULL);
-  PARMUL = cdoOperatorAdd("parmul", 0, 0, NULL);
+  int PARDUP = cdoOperatorAdd("pardup", 0, 0, NULL);
+  int PARMUL = cdoOperatorAdd("parmul", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == PARDUP )
     {
@@ -67,25 +58,25 @@ void *Vardup(void *argument)
   else
     cdoAbort("operator not implemented!");
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array    = (double*) malloc(gridsize*sizeof(double));
-  vardata  = (double **) malloc(nvars*sizeof(double *));
-  varnmiss = (int **) malloc(nvars*sizeof(int *));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array    = (double*) malloc(gridsize*sizeof(double));
+  double **vardata = (double **) malloc(nvars*sizeof(double *));
+  int **varnmiss   = (int **) malloc(nvars*sizeof(int *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -99,14 +90,14 @@ void *Vardup(void *argument)
     {
       vlistCat(vlistID2, vlistID1);
       for ( varID = 0; varID < nvars; varID++ )
-	vlistDefVarCode(vlistID2, varID+nvars*i, -(varID+nvars*i+1));
+	vlistDefVarParam(vlistID2, varID+nvars*i, cdiEncodeParam(-(varID+nvars*i+1), 255, 255));
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -152,8 +143,8 @@ void *Vardup(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  for ( varID = 0; varID < nvars; varID++ )  free(vardata[varID]);
-  for ( varID = 0; varID < nvars; varID++ )  free(varnmiss[varID]);
+  for ( varID = 0; varID < nvars; varID++ ) free(vardata[varID]);
+  for ( varID = 0; varID < nvars; varID++ ) free(varnmiss[varID]);
   free(vardata);
   free(varnmiss);
   free(array);

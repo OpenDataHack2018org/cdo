@@ -89,33 +89,28 @@ std_atm_pressure(double height)
 
 void *Vargen(void *argument)
 {
-  int RANDOM, SINCOS, COSHILL, CONST, FOR, TOPO, TEMP, MASK, STDATM;
-  int operatorID;
-  int streamID;
-  int nvars, ntimesteps, nlevels = 1;
-  int tsID, varID, varID2 = -1, levelID;
-  int gridsize, i;
-  int vlistID;
-  int gridID = -1, zaxisID, taxisID;
-  int vdate, vtime, julday;
-  const char *gridfile;
+  int ntimesteps, nlevels = 1;
+  int varID, varID2 = -1, levelID;
+  int i;
+  int gridID = -1, zaxisID;
+  int vdate, vtime;
   double rval, rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
-  double *array, *levels = NULL;
+  double *levels = NULL;
 
   cdoInitialize(argument);
 
-  RANDOM  = cdoOperatorAdd("random",  0, 0, "grid description file or name, <seed>");
-  SINCOS  = cdoOperatorAdd("sincos",  0, 0, "grid description file or name");
-  COSHILL = cdoOperatorAdd("coshill", 0, 0, "grid description file or name");
-  CONST   = cdoOperatorAdd("const",   0, 0, "constant value, grid description file or name");
-  FOR     = cdoOperatorAdd("for",     0, 0, "start, end, <increment>");
-  TOPO    = cdoOperatorAdd("topo",    0, 0, NULL);
-  TEMP    = cdoOperatorAdd("temp",    0, 0, NULL);
-  MASK    = cdoOperatorAdd("mask",    0, 0, NULL);
-  STDATM  = cdoOperatorAdd("stdatm",  0, 0, "height levels [m]");
+  int RANDOM  = cdoOperatorAdd("random",  0, 0, "grid description file or name, <seed>");
+  int SINCOS  = cdoOperatorAdd("sincos",  0, 0, "grid description file or name");
+  int COSHILL = cdoOperatorAdd("coshill", 0, 0, "grid description file or name");
+  int CONST   = cdoOperatorAdd("const",   0, 0, "constant value, grid description file or name");
+  int FOR     = cdoOperatorAdd("for",     0, 0, "start, end, <increment>");
+  int TOPO    = cdoOperatorAdd("topo",    0, 0, NULL);
+  int TEMP    = cdoOperatorAdd("temp",    0, 0, NULL);
+  int MASK    = cdoOperatorAdd("mask",    0, 0, NULL);
+  int STDATM  = cdoOperatorAdd("stdatm",  0, 0, "height levels [m]");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == RANDOM )
     {
@@ -123,7 +118,7 @@ void *Vargen(void *argument)
       operatorInputArg(cdoOperatorEnter(operatorID));
       if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
       if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
-      gridfile = operatorArgv()[0];
+      const char *gridfile = operatorArgv()[0];
       gridID   = cdoDefineGrid(gridfile);
       if ( operatorArgc() == 2 )
         {
@@ -137,7 +132,7 @@ void *Vargen(void *argument)
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(1);
-      gridfile = operatorArgv()[0];
+      const char *gridfile = operatorArgv()[0];
       gridID   = cdoDefineGrid(gridfile);
     }
   else if ( operatorID == CONST )
@@ -145,7 +140,7 @@ void *Vargen(void *argument)
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(2);
       rconst   = parameter2double(operatorArgv()[0]);
-      gridfile = operatorArgv()[1];
+      const char *gridfile = operatorArgv()[1];
       gridID   = cdoDefineGrid(gridfile);
     }
   else if ( operatorID == TOPO || operatorID == TEMP || operatorID == MASK )
@@ -219,12 +214,12 @@ void *Vargen(void *argument)
       nlevels = 1;
     }
 
-  vlistID = vlistCreate();
+  int vlistID = vlistCreate();
 
-  if ( operatorID == FOR )
-    varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
-  else
-    varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_CONSTANT);
+  int tsteptype = TSTEP_CONSTANT;
+  if ( operatorID == FOR ) tsteptype = TSTEP_INSTANT;
+
+  varID = vlistDefVar(vlistID, gridID, zaxisID, tsteptype);
   /*
      For the standard atmosphere two output variables are generated: pressure and
      temperatur. The first (varID) is pressure, second (varID2) is temperatur.
@@ -239,12 +234,13 @@ void *Vargen(void *argument)
   if ( operatorID == STDATM )
     {
       vlistDefVarName(vlistID    , varID , "P");
-      vlistDefVarCode(vlistID    , varID , 1);
+      vlistDefVarParam(vlistID   , varID , cdiEncodeParam(1, 255, 255));
       vlistDefVarStdname(vlistID , varID , "air_pressure");
       vlistDefVarLongname(vlistID, varID , "pressure");
       vlistDefVarUnits(vlistID   , varID , "hPa");
+
       vlistDefVarName(vlistID    , varID2, "T");
-      vlistDefVarCode(vlistID    , varID2, 130);
+      vlistDefVarParam(vlistID   , varID2, cdiEncodeParam(130, 128, 255));
       vlistDefVarStdname(vlistID , varID2, var_stdname(air_temperature));
       vlistDefVarLongname(vlistID, varID2, "temperature");
       vlistDefVarUnits(vlistID   , varID2, "K");
@@ -252,25 +248,23 @@ void *Vargen(void *argument)
   else
     {
       vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
-      if ( operatorID == TOPO )
-	vlistDefVarUnits(vlistID, varID , "m");	
-      if ( operatorID == TEMP )
-	vlistDefVarUnits(vlistID, varID , "K");	
+      if ( operatorID == TOPO ) vlistDefVarUnits(vlistID, varID , "m");	
+      if ( operatorID == TEMP ) vlistDefVarUnits(vlistID, varID , "K");	
     }
 
-  taxisID = taxisCreate(TAXIS_RELATIVE);
+  int taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
   if ( operatorID == RANDOM || operatorID == SINCOS || operatorID == COSHILL || operatorID == CONST || operatorID == TOPO ||
        operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
-  streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
+  int streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
 
   streamDefVlist(streamID, vlistID);
 
-  gridsize = gridInqSize(gridID);
-  array = (double*) malloc(gridsize*sizeof(double));
+  int gridsize = gridInqSize(gridID);
+  double *array = (double*) malloc(gridsize*sizeof(double));
 
   if ( operatorID == FOR )
     ntimesteps = 1.001 + ((rstop-rstart)/rinc);
@@ -280,11 +274,11 @@ void *Vargen(void *argument)
       ntimesteps = 1;
     }
 
-  julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
+  int julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
 
-  nvars = vlistNvars(vlistID);
+  int nvars = vlistNvars(vlistID);
 
-  for ( tsID = 0; tsID < ntimesteps; tsID++ )
+  for ( int tsID = 0; tsID < ntimesteps; tsID++ )
     {
       rval  = rstart + rinc*tsID;
       vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);

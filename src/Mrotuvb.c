@@ -257,7 +257,6 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 }
 
 
-
 void *Mrotuvb(void *argument)
 {
   int streamID1, streamID2, streamID3;

@@ -38,7 +38,7 @@ void *Pressure(void *argument)
 {
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
-  int geop_code = 0, temp_code = 0, ps_code = 0, lsp_code = 0;
+  int ps_code = 0, lsp_code = 0;
   int streamID2;
   int vlistID2;
   int recID, nrecs;
@@ -46,10 +46,10 @@ void *Pressure(void *argument)
   int tsID, varID, levelID;
   int nvars;
   int zaxisIDp, zaxisIDh = -1, nzaxis;
-  int ngrids, gridID, zaxisID;
-  int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
+  int gridID, zaxisID;
+  int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel = 0;
   int nvct;
-  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, pvarID = -1;
+  int psID = -1, lnpsID = -1, pvarID = -1;
   int code, param;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
@@ -246,15 +246,11 @@ void *Pressure(void *argument)
 	  if ( tableNum == 2 )
 	    {
 	      mode = WMO_MODE;
-	      geop_code  =   6;
-	      temp_code  =  11;
 	      ps_code    =   1;
 	    }
 	  else if ( tableNum == 128 )
 	    {
 	      mode = ECHAM_MODE;
-	      geop_code  = 129;
-	      temp_code  = 130;
 	      ps_code    = 134;
 	      lsp_code   = 152;
 	    }
@@ -264,8 +260,6 @@ void *Pressure(void *argument)
       else
 	{
 	  mode = ECHAM_MODE;
-	  geop_code  = 129;
-	  temp_code  = 130;
 	  ps_code    = 134;
 	  lsp_code   = 152;
 	}
@@ -290,17 +284,13 @@ void *Pressure(void *argument)
 
       if ( mode == ECHAM_MODE )
 	{
-	  if      ( code == geop_code  && nlevel == 1     ) geopID  = varID;
-	  else if ( code == temp_code  && nlevel == nhlev ) tempID  = varID;
-	  else if ( code == ps_code    && nlevel == 1     ) psID    = varID;
+	  if      ( code == ps_code    && nlevel == 1     ) psID    = varID;
 	  else if ( code == lsp_code   && nlevel == 1     ) lnpsID  = varID;
 	  /* else if ( code == 156 ) gheightID = varID; */
 	}
       else if ( mode == WMO_MODE )
 	{
-	  if      ( code == geop_code  && nlevel == 1     ) geopID  = varID;
-	  else if ( code == temp_code  && nlevel == nhlev ) tempID  = varID;
-	  else if ( code == ps_code    && nlevel == 1     ) psID    = varID;
+	  if ( code == ps_code    && nlevel == 1     ) psID    = varID;
 	}
     }
 
@@ -331,7 +321,7 @@ void *Pressure(void *argument)
 
   vlistID2 = vlistCreate();
   varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TSTEP_INSTANT);
-  vlistDefVarCode(vlistID2, varID, 1);
+  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(1, 255, 255));
   vlistDefVarName(vlistID2, varID, "pressure");
   vlistDefVarStdname(vlistID2, varID, "air_pressure");
   vlistDefVarUnits(vlistID2, varID, "Pa");
@@ -394,7 +384,7 @@ void *Pressure(void *argument)
 
 	  pout = deltap;
 	}
-      else
+      else if ( operatorID == PRESSURE_HL )
 	{
 	  nlevel = nhlevh;
 	  pout = half_press;

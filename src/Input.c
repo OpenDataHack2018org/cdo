@@ -68,15 +68,12 @@ static int input_darray(int nval, double *array)
 
 void *Input(void *argument)
 {
-  int INPUT, INPUTSRV, INPUTEXT;
-  int operatorID;
   int varID = 0;
   int nlevs = 1;
   int gridsize0 = 0, gridsize = 0;
   int gridID = -1, zaxisID, vdate = 0, vtime = 0;
-  int nrecs;
   int levelID;
-  int tsID, taxisID = 0;
+  int taxisID = 0;
   int streamID = -1;
   int vlistID = -1;
   int nmiss = 0;
@@ -91,11 +88,11 @@ void *Input(void *argument)
 
   cdoInitialize(argument);
 
-  INPUT    = cdoOperatorAdd("input",    0, 0, NULL);
-  INPUTSRV = cdoOperatorAdd("inputsrv", 0, 0, NULL);
-  INPUTEXT = cdoOperatorAdd("inputext", 0, 0, NULL);
+  int INPUT    = cdoOperatorAdd("input",    0, 0, NULL);
+  int INPUTSRV = cdoOperatorAdd("inputsrv", 0, 0, NULL);
+  int INPUTEXT = cdoOperatorAdd("inputext", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == INPUT )
     {
@@ -105,9 +102,9 @@ void *Input(void *argument)
     }
 
   levels[0] = 0;
-  nrecs = 0;
+  int nrecs = 0;
 
-  tsID = 0;
+  int tsID = 0;
   while ( TRUE )
     {
       if ( operatorID == INPUT )
@@ -234,7 +231,7 @@ void *Input(void *argument)
 
 	  vlistID = vlistCreate();
 	  varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
-	  vlistDefVarCode(vlistID, varID, code);
+	  vlistDefVarParam(vlistID, varID, cdiEncodeParam(code, 255, 255));
 
 	  missval = vlistInqVarMissval(vlistID, varID);
 
