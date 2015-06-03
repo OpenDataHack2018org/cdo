@@ -53,7 +53,7 @@ enum cmp_flag {
   CMP_GRID     = 4,
   CMP_NLEVEL   = 8,
   CMP_GRIDSIZE = 16,
-  CMP_HRD      = CMP_CODE | CMP_GRIDSIZE,
+  CMP_HRD      = CMP_NAME | CMP_GRIDSIZE,
   CMP_DIM      =            CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID,
   CMP_ALL      = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID
 };
