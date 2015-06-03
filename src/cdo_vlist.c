@@ -177,10 +177,6 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
     {
       if ( nvars > 1 )
 	{
-	  if ( flag & CMP_CODE )
-	    if ( vlistInqVarCode(vlistID1, varID) != vlistInqVarCode(vlistID2, varID) )
-	      cdoAbort("Input streams have different structure!");
-
 	  if ( flag & CMP_NAME )
 	    {
 	      char name1[CDI_MAX_NAME], name2[CDI_MAX_NAME];

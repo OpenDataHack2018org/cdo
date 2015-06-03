@@ -48,11 +48,10 @@
 #define  func_lat      99
 
 enum cmp_flag {
-  CMP_CODE     = 1,
-  CMP_NAME     = 2,
-  CMP_GRID     = 4,
-  CMP_NLEVEL   = 8,
-  CMP_GRIDSIZE = 16,
+  CMP_NAME     = 1,
+  CMP_GRID     = 2,
+  CMP_NLEVEL   = 4,
+  CMP_GRIDSIZE = 8,
   CMP_HRD      = CMP_NAME | CMP_GRIDSIZE,
   CMP_DIM      =            CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID,
   CMP_ALL      = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID
