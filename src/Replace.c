@@ -31,67 +31,48 @@
 
 void *Replace(void *argument)
 {
-  int varID;
-  int varID1, nvars1;
-  int varID2, nvars2;
+  int varID, varID1, varID2;
   int nrecs = 0;
-  int tsID, recID, levelID, levelID2;
+  int recID, levelID, levelID2;
   int nrecs2;
   int nchvars = 0;
   int idx;
-  int streamID1, streamID2, streamID3;
-  int vlistID1 , vlistID2, vlistID3;
-  int code1 = 0, code2;
   int nlevel1, nlevel2;
   char varname1[CDI_MAX_NAME], varname2[CDI_MAX_NAME];
-  int gridsize;
   int nmiss;
-  int taxisID1, taxisID3;
+  int gridsize;
   int offset;
-  int nts2;
   int varlist1[MAX_VARS], varlist2[MAX_VARS];
   int **varlevel = NULL;
   int **varnmiss2 = NULL;
   double **vardata2 = NULL;
-  double *array = NULL, *parray;
+  double *parray;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
 
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID2 = streamInqVlist(streamID2);
 
   /* compare all variables in vlistID2 */
 
-  nvars1 = vlistNvars(vlistID1);
-  nvars2 = vlistNvars(vlistID2);
+  int nvars1 = vlistNvars(vlistID1);
+  int nvars2 = vlistNvars(vlistID2);
 
   for ( varID2 = 0; varID2 < nvars2; varID2++ )
     {
-      code2 = vlistInqVarCode(vlistID2, varID2);
       vlistInqVarName(vlistID2, varID2, varname2);
 
       for ( varID1 = 0; varID1 < nvars1; varID1++ )
 	{
-	  code1 = vlistInqVarCode(vlistID1, varID1);
 	  vlistInqVarName(vlistID1, varID1, varname1);
 	  if ( strcmp(varname1, varname2) == 0 ) break;
-	}
-
-      if ( code2 > 0 && varID1 == nvars1 )
-	{
-	  for ( varID1 = 0; varID1 < nvars1; varID1++ )
-	    {
-	      code1 = vlistInqVarCode(vlistID1, varID1);
-	      vlistInqVarName(vlistID1, varID1, varname1);
-	      if ( code1 == code2 ) break;
-	    }
 	}
 
       if ( varID1 < nvars1 )
@@ -110,9 +91,7 @@ void *Replace(void *argument)
 	  if ( nlevel1 < nlevel2 )
 	    cdoAbort("Variables have different number of levels!");
 
-	  if ( cdoVerbose )
-	    cdoPrint("Variable %s (code %d) replaced by  %s (code %d)",
-		     varname1, code1, varname2, code2);
+	  if ( cdoVerbose ) cdoPrint("Variable %s replaced.", varname1);
 
 	  varlist1[nchvars] = varID1;
 	  varlist2[nchvars] = varID2;
@@ -121,7 +100,7 @@ void *Replace(void *argument)
 	}
       else
 	{
-	  cdoPrint("Variable %s (code %d) not found!", varname2, code2);
+	  cdoPrint("Variable %s not found!", varname2);
 	}
     }
 
@@ -173,19 +152,19 @@ void *Replace(void *argument)
 	}
     }
 
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   vlistDefTaxis(vlistID3, taxisID3);
   streamDefVlist(streamID3, vlistID3);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) malloc(gridsize*sizeof(double));
 
-  nts2 = vlistNtsteps(vlistID2);
+  int nts2 = vlistNtsteps(vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID3, taxisID1);

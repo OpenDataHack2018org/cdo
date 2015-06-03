@@ -5,6 +5,7 @@
 
 2015-06-03  Uwe Schulzweida
 
+	* replace: removed check of parameter number
 	* setpartabn: replace vlistDefVarCode() by vlistDefVarParam()
 
 2015-06-01  Uwe Schulzweida
