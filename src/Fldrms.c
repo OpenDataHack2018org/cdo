@@ -33,8 +33,6 @@ void *Fldrms(void *argument)
   int streamID1, streamID2, streamID3;
   int vlistID1, vlistID2, vlistID3;
   int gridID1, gridID2, gridID3, lastgrid = -1;
-  int wstatus = FALSE;
-  int code = 0, oldcode = 0;
   int index, ngrids;
   int recID, nrecs;
   int tsID, varID, levelID;
@@ -130,14 +128,22 @@ void *Fldrms(void *argument)
 
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
-	  if ( needWeights && field1.grid != lastgrid )
+
+          if ( needWeights && field1.grid != lastgrid )
 	    {
 	      lastgrid = field1.grid;
-	      wstatus = gridWeights(field1.grid, field1.weight);
+	      field1.weight[0] = 1;
+	      if ( field1.size > 1 )
+		{
+		  int wstatus = gridWeights(field1.grid, field1.weight);
+		  if ( wstatus != 0 && tsID == 0 && levelID == 0 )
+		    {
+		      char varname[CDI_MAX_NAME];
+		      vlistInqVarName(vlistID1, varID, varname);
+		      cdoWarning("Grid cell bounds not available, using constant grid cell area weights for variable %s!", varname);
+		    }
+		}
 	    }
-	  code = vlistInqVarCode(vlistID1, varID);
-	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
-	    cdoWarning("Using constant area weights for code %d!", oldcode=code);
 
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 	  field2.missval = vlistInqVarMissval(vlistID1, varID);
