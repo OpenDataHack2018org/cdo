@@ -225,7 +225,7 @@ void *Showinfo(void *argument)
       
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  param   = vlistInqVarParam(vlistID, varID);
+	  param = vlistInqVarParam(vlistID, varID);
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  fprintf(stdout, " %s", paramstr);

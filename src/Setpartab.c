@@ -265,11 +265,10 @@ static
 void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units)
 {
   char units_old[CDI_MAX_NAME];
-  size_t len1, len2;
 
   vlistInqVarUnits(vlistID2, varID, units_old);
-  len1 = strlen(units_old);
-  len2 = strlen(units);
+  size_t len1 = strlen(units_old);
+  size_t len2 = strlen(units);
 
   if ( strcmp(units, units_old) != 0 )
     {
@@ -433,8 +432,10 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 
 	      if ( varID < nvars )
 		{
-		  if ( nml->entry[nml_code]->occ     )  vlistDefVarCode(vlistID2, varID, code);
-		  if ( nml->entry[nml_out_code]->occ )  vlistDefVarCode(vlistID2, varID, out_code);
+                  int pnum, ptab, pdum;
+                  cdiDecodeParam(vlistInqVarParam(vlistID2, varID), &pnum, &ptab, &pdum);
+		  if ( nml->entry[nml_code]->occ     )  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(code, ptab, 255));
+		  if ( nml->entry[nml_out_code]->occ )  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(out_code, ptab, 255));
 		  if ( nml->entry[nml_name]->occ     )  strcpy(vars[varID].name, name);
 		  if ( nml->entry[nml_name]->occ     )  vlistDefVarName(vlistID2, varID, name);
 		  if ( nml->entry[nml_out_name]->occ )  vlistDefVarName(vlistID2, varID, out_name);
