@@ -2,6 +2,7 @@ complete -W "
 -- \
 -- \
 -- \
+-- \
 -L \
 -M \
 -O \
@@ -31,6 +32,8 @@ adipot -adipot \
 adisit -adisit \
 aexpr -aexpr \
 aexprf -aexprf \
+after -after \
+afterburner -afterburner \
 anomaly -anomaly \
 ap2pl -ap2pl \
 ap2pl_lp -ap2pl_lp \
@@ -218,6 +221,7 @@ gencon2 -gencon2 \
 gendis -gendis \
 gengrid -gengrid \
 genlaf -genlaf \
+genlevelbounds -genlevelbounds \
 gennn -gennn \
 genycon -genycon \
 geopotheight -geopotheight \
@@ -235,8 +239,10 @@ gridboxmax -gridboxmax \
 gridboxmean -gridboxmean \
 gridboxmin -gridboxmin \
 gridboxstd -gridboxstd \
+gridboxstd1 -gridboxstd1 \
 gridboxsum -gridboxsum \
 gridboxvar -gridboxvar \
+gridboxvar1 -gridboxvar1 \
 griddes -griddes \
 griddes2 -griddes2 \
 griddx -griddx \
@@ -339,8 +345,10 @@ mermean -mermean \
 mermin -mermin \
 merpctl -merpctl \
 merstd -merstd \
+merstd1 -merstd1 \
 mersum -mersum \
 mervar -mervar \
+mervar1 -mervar1 \
 min -min \
 ml2hl -ml2hl \
 ml2hl_lp -ml2hl_lp \
@@ -464,8 +472,10 @@ seasmean -seasmean \
 seasmin -seasmin \
 seaspctl -seaspctl \
 seasstd -seasstd \
+seasstd1 -seasstd1 \
 seassum -seassum \
 seasvar -seasvar \
+seasvar1 -seasvar1 \
 seinfo -seinfo \
 seinfoc -seinfoc \
 seinfon -seinfon \
@@ -669,8 +679,10 @@ vertmax -vertmax \
 vertmean -vertmean \
 vertmin -vertmin \
 vertstd -vertstd \
+vertstd1 -vertstd1 \
 vertsum -vertsum \
 vertvar -vertvar \
+vertvar1 -vertvar1 \
 vertwind -vertwind \
 vlist -vlist \
 wct -wct \
@@ -753,9 +765,11 @@ yseasmin -yseasmin \
 yseasmul -yseasmul \
 yseaspctl -yseaspctl \
 yseasstd -yseasstd \
+yseasstd1 -yseasstd1 \
 yseassub -yseassub \
 yseassum -yseassum \
 yseasvar -yseasvar \
+yseasvar1 -yseasvar1 \
 zaxisdes -zaxisdes \
 zonavg -zonavg \
 zonmax -zonmax \
@@ -764,6 +778,8 @@ zonmin -zonmin \
 zonpctl -zonpctl \
 zonrange -zonrange \
 zonstd -zonstd \
+zonstd1 -zonstd1 \
 zonsum -zonsum \
 zonvar -zonvar \
+zonvar1 -zonvar1 \
 " -f cdo

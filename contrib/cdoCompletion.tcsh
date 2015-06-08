@@ -2,6 +2,7 @@ set cdoCmpl = (\
 - \
 - \
 - \
+- \
 L \
 M \
 O \
@@ -31,6 +32,8 @@ adipot \
 adisit \
 aexpr \
 aexprf \
+after \
+afterburner \
 anomaly \
 ap2pl \
 ap2pl_lp \
@@ -218,6 +221,7 @@ gencon2 \
 gendis \
 gengrid \
 genlaf \
+genlevelbounds \
 gennn \
 genycon \
 geopotheight \
@@ -235,8 +239,10 @@ gridboxmax \
 gridboxmean \
 gridboxmin \
 gridboxstd \
+gridboxstd1 \
 gridboxsum \
 gridboxvar \
+gridboxvar1 \
 griddes \
 griddes2 \
 griddx \
@@ -339,8 +345,10 @@ mermean \
 mermin \
 merpctl \
 merstd \
+merstd1 \
 mersum \
 mervar \
+mervar1 \
 min \
 ml2hl \
 ml2hl_lp \
@@ -464,8 +472,10 @@ seasmean \
 seasmin \
 seaspctl \
 seasstd \
+seasstd1 \
 seassum \
 seasvar \
+seasvar1 \
 seinfo \
 seinfoc \
 seinfon \
@@ -669,8 +679,10 @@ vertmax \
 vertmean \
 vertmin \
 vertstd \
+vertstd1 \
 vertsum \
 vertvar \
+vertvar1 \
 vertwind \
 vlist \
 wct \
@@ -753,9 +765,11 @@ yseasmin \
 yseasmul \
 yseaspctl \
 yseasstd \
+yseasstd1 \
 yseassub \
 yseassum \
 yseasvar \
+yseasvar1 \
 zaxisdes \
 zonavg \
 zonmax \
@@ -764,6 +778,8 @@ zonmin \
 zonpctl \
 zonrange \
 zonstd \
+zonstd1 \
 zonsum \
 zonvar \
+zonvar1 \
 ); complete cdo 'c/-/$cdoCmpl/' 'n/*/f/'
