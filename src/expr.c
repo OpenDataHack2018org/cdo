@@ -103,6 +103,8 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
     default:   cdoAbort("%s: operator %c unsupported!", __func__, oper); break;
     }
 
+  p->u.con.value = cval1;
+
   return (p);
 }
 

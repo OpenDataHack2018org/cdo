@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-06-10  Karl-Hermann Wieners
+
+	* expr: operators return 0 for arithmetics on constants [Bug #5875]
+
 2015-06-03  Uwe Schulzweida
 
 	* removed flag CMP_CODE

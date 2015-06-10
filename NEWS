@@ -13,6 +13,7 @@ Version 1.7.0 (28 October 2015):
    Changed operators:
      * vertvar, vertstd: changed to weighted var/std if layer bounds are available
    Fixed bugs:
+     * expr: operators return 0 for arithmetics on constants [Bug #5875]
      * env. CDO_TIMESTAT_DATE does not work [Bug #5758]
      * splityear*: support for constant fields is missing [Bug #5759]
      * yseaspctl: check of verification date failed [Bug #5810]
