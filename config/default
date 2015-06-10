@@ -69,7 +69,8 @@ case "${HOSTNAME}" in
         CDOLIBS="--with-fftw3 \
                  --with-grib_api=$HOME/local/gribapi-1.13.0 \
                  --with-netcdf=$HOME/local \
-                 --with-hdf5=$HOME/local"
+                 --with-hdf5=$HOME/local \
+                 --with-proj=/opt/local"
 
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \

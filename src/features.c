@@ -2,6 +2,10 @@
 #  include "config.h"
 #endif
 
+#if defined(HAVE_HDF5_H)
+#include <hdf5.h>
+#endif
+
 #if defined(HAVE_ZLIB_H)
 #include <zlib.h>
 #endif
@@ -34,6 +38,9 @@ void printFeatures(void)
 #if defined(HAVE_OPENMP4)
   fprintf(stderr, "4");
 #endif
+#endif
+#if  defined(HAVE_LIBHDF5)
+  fprintf(stderr, " HDF5");
 #endif
 #if  defined(HAVE_NETCDF4)
   fprintf(stderr, " NC4");
@@ -97,6 +104,18 @@ void printFeatures(void)
 void printLibraries(void)
 {
   fprintf(stderr, "Libraries:");
+#if  defined(HAVE_LIBHDF5)
+  fprintf(stderr, " HDF5");
+#if  defined(H5_VERS_MAJOR)
+  unsigned h5h_majnum = H5_VERS_MAJOR, h5h_minnum = H5_VERS_MINOR, h5h_relnum = H5_VERS_RELEASE;
+  fprintf(stderr, "/%u.%u.%u", h5h_majnum, h5h_minnum, h5h_relnum);
+
+  unsigned h5l_majnum, h5l_minnum, h5l_relnum;
+  H5get_libversion(&h5l_majnum, &h5l_minnum, &h5l_relnum);
+  if ( (h5h_majnum != h5l_majnum) || (h5h_minnum != h5l_minnum) || (h5h_relnum != h5l_relnum) )
+    fprintf(stderr, "(%u.%u.%u)", h5l_majnum, h5l_minnum, h5l_relnum);
+#endif
+#endif
   /*
 #if defined(HAVE_LIBZ)
   {
