@@ -10,6 +10,7 @@ fi
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
+ABSLIMMAX=0.0001
 CDOOUT=cout
 CDOERR=cerr
 FORMAT=""
@@ -27,7 +28,7 @@ echo "$CDOCOMMAND"
 echo $SELECT | $CDOCOMMAND
 test $? -eq 0 || let RSTAT+=1
 #
-$CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+$CDO diff,$ABSLIMMAX $OFILE $RFILE > $CDOOUT 2> $CDOERR
 test $? -eq 0 || let RSTAT+=1
 test -s $CDOOUT && let RSTAT+=1
 cat $CDOOUT $CDOERR
@@ -63,7 +64,7 @@ $CDOCOMMAND << EOR
 EOR
 test $? -eq 0 || let RSTAT+=1
 #
-$CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+$CDO diff,$ABSLIMMAX $OFILE $RFILE > $CDOOUT 2> $CDOERR
 test $? -eq 0 || let RSTAT+=1
 test -s $CDOOUT && let RSTAT+=1
 cat $CDOOUT $CDOERR
@@ -94,7 +95,7 @@ $CDOCOMMAND << EOR
 EOR
 test $? -eq 0 || let RSTAT+=1
 #
-$CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+$CDO diff,$ABSLIMMAX $OFILE $RFILE > $CDOOUT 2> $CDOERR
 test $? -eq 0 || let RSTAT+=1
 test -s $CDOOUT && let RSTAT+=1
 cat $CDOOUT $CDOERR
@@ -125,7 +126,7 @@ $CDOCOMMAND << EOR
 EOR
 test $? -eq 0 || let RSTAT+=1
 #
-$CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+$CDO diff,$ABSLIMMAX $OFILE $RFILE > $CDOOUT 2> $CDOERR
 test $? -eq 0 || let RSTAT+=1
 test -s $CDOOUT && let RSTAT+=1
 cat $CDOOUT $CDOERR
