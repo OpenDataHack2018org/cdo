@@ -119,6 +119,7 @@ void *Diff(void *argument)
 	  missval2 = vlistInqVarMissval(vlistID2, varID2);
 
 	  checkrel = gridInqType(gridID) != GRID_SPECTRAL;
+          checkrel = FALSE;
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
