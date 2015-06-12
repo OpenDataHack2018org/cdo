@@ -30,24 +30,16 @@
 
 void *Diff(void *argument)
 {
-  int DIFF, DIFFP, DIFFN, DIFFC;
-  int operatorID;
   int lhead = TRUE;
   int i;
-  int indg;
   int varID1, varID2, recID;
-  int gridsize;
   int ndiff;
   int code, param;
-  int gridID, zaxisID, vdate, vtime;
+  int gridID, zaxisID;
   int checkrel;
   int nrecs, nrecs2;
   int levelID;
-  int tsID;
   int dsgn, zero;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
-  int taxisID;
   int nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[CDI_MAX_NAME];
@@ -57,46 +49,42 @@ void *Diff(void *argument)
   double abslim = 0., abslim2 = 1.e-3, rellim = 0.5;
   double absm, relm;
   double missval1, missval2;
-  double *array1, *array2;
 
   cdoInitialize(argument);
 
-  DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);
-  DIFFP = cdoOperatorAdd("diffp", 0, 0, NULL);
-  DIFFN = cdoOperatorAdd("diffn", 0, 0, NULL);
-  DIFFC = cdoOperatorAdd("diffc", 0, 0, NULL);
+  int DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);
+  int DIFFP = cdoOperatorAdd("diffp", 0, 0, NULL);
+  int DIFFN = cdoOperatorAdd("diffn", 0, 0, NULL);
+  int DIFFC = cdoOperatorAdd("diffc", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorArgc() == 1 ) abslim = parameter2double(operatorArgv()[0]);
   if ( abslim < -1.e33 || abslim > 1.e+33 ) cdoAbort("Abs. limit out of range\n");
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) malloc(gridsize*sizeof(double));
+  double *array2 = (double*) malloc(gridsize*sizeof(double));
 
-  indg = 0;
-  tsID = 0;
-  taxisID = vlistInqTaxis(vlistID1);
+  int indg = 0;
+  int tsID = 0;
+  int taxisID = vlistInqTaxis(vlistID1);
   while ( TRUE )
     {
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs > 0 )
 	{
-	  vdate = taxisInqVdate(taxisID);
-	  vtime = taxisInqVtime(taxisID);
-	  
-	  date2str(vdate, vdatestr, sizeof(vdatestr));
-	  time2str(vtime, vtimestr, sizeof(vtimestr));
+	  date2str(taxisInqVdate(taxisID), vdatestr, sizeof(vdatestr));
+	  time2str(taxisInqVtime(taxisID), vtimestr, sizeof(vtimestr));
 	}
 
       nrecs2 = streamInqTimestep(streamID2, tsID);
@@ -256,5 +244,5 @@ void *Diff(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }
