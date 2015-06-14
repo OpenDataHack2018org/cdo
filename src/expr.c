@@ -466,23 +466,20 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 static
 void ex_copy(nodeType *p2, nodeType *p1)
 {
-  long ngp, ngp1, ngp2, i;
-  long nlev;
+  long i;
 
-  if ( cdoVerbose )
-    printf("\tcopy %s\n", p1->u.var.nm);
+  if ( cdoVerbose ) printf("\tcopy %s\n", p1->u.var.nm);
 
-  ngp1 = gridInqSize(p1->gridID);
-  ngp2 = gridInqSize(p2->gridID);
+  long ngp1 = gridInqSize(p1->gridID);
+  long ngp2 = gridInqSize(p2->gridID);
 
   if ( ngp1 != ngp2 )
     cdoAbort("Number of grid points differ. ngp1 = %d, ngp2 = %d", ngp1, ngp2);
 
-  ngp = ngp2;
-  nlev = zaxisInqSize(p2->zaxisID);
+  long ngp = ngp2;
+  long nlev = zaxisInqSize(p2->zaxisID);
 
-  for ( i = 0; i < ngp*nlev; i++ )
-    p2->data[i] = p1->data[i];
+  for ( i = 0; i < ngp*nlev; i++ ) p2->data[i] = p1->data[i];
 
   p2->missval = p1->missval;
   p2->nmiss   = p1->nmiss;
