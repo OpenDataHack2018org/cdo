@@ -903,7 +903,7 @@ int pstreamInqVlist(int pstreamID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-  int vlistID;
+  int vlistID = -1;
 
 #if defined(HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
@@ -925,6 +925,10 @@ int pstreamInqVlist(int pstreamID)
 #endif
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
 
+      int nsubtypes = vlistNsubtypes(vlistID);
+      if ( nsubtypes > 0 )
+        cdoWarning("Subtypes are unsupported, the processing results are possibly wrong!");
+
       if ( cdoDefaultTimeType != CDI_UNDEFID )
 	taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
 
@@ -939,7 +943,7 @@ int pstreamInqVlist(int pstreamID)
 
   processDefVarNum(vlistNvars(vlistID), pstreamID);
 
-  return (vlistID);
+  return vlistID;
 }
 
 static

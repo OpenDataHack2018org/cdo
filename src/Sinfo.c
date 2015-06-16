@@ -77,14 +77,11 @@ void limit_string_length(char* string, size_t maxlen)
 void *Sinfo(void *argument)
 {
   enum {func_generic, func_param, func_name, func_code};
-  int operatorID;
-  int operfunc, lensemble;
-  int indf;
   int varID;
   int gridsize = 0;
   int gridID, zaxisID, code, tabnum, param;
   int vdate, vtime;
-  int nvars, ntsteps;
+  int ntsteps;
   int levelsize;
   int tsteptype, taxisID;
   char tmpname[CDI_MAX_NAME];
@@ -108,12 +105,12 @@ void *Sinfo(void *argument)
   cdoOperatorAdd("seinfon", func_name,    1, NULL);
   cdoOperatorAdd("seinfoc", func_code,    1, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  operfunc  = cdoOperatorF1(operatorID);
-  lensemble = cdoOperatorF2(operatorID);
+  int operfunc  = cdoOperatorF1(operatorID);
+  int lensemble = cdoOperatorF2(operatorID);
 
-  for ( indf = 0; indf < cdoStreamCnt(); indf++ )
+  for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
       streamID = streamOpenRead(cdoStreamName(indf));
 
@@ -125,9 +122,14 @@ void *Sinfo(void *argument)
       fprintf(stdout, " : ");
       printFiletype(streamID, vlistID);
 
+      int nvars = vlistNvars(vlistID);
+      int nsubtypes = vlistNsubtypes(vlistID);
+
       set_text_color(stdout, BRIGHT, BLACK);
       if ( lensemble )
 	fprintf(stdout, "%6d : Institut Source   Ttype    Einfo Levels Num    Points Num Dtype : ",  -(indf+1));
+      else if ( nsubtypes > 0 )
+	fprintf(stdout, "%6d : Institut Source   Ttype    Subtypes Levels Num    Points Num Dtype : ",  -(indf+1));
       else
 	fprintf(stdout, "%6d : Institut Source   Ttype    Levels Num    Points Num Dtype : ",  -(indf+1));
 
@@ -138,8 +140,6 @@ void *Sinfo(void *argument)
       if ( cdoVerbose ) fprintf(stdout, " : Extra" );              
       reset_text_color(stdout);
       fprintf(stdout, "\n" );              
-
-      nvars = vlistNvars(vlistID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -194,6 +194,14 @@ void *Sinfo(void *argument)
 	      else
 		fprintf(stdout, "--/-- ");
 	    }
+
+          if ( nsubtypes > 0 )
+            {
+              int subtypeID = vlistInqVarSubtype(vlistID, varID);
+              int subtypesize = subtypeInqSize(subtypeID);
+              fprintf(stdout, " %6d  ", subtypesize);
+              fprintf(stdout, "%3d ", vlistSubtypeIndex(vlistID, subtypeID) + 1);
+            }
 
 	  /* layer info */
 	  levelsize = zaxisInqSize(zaxisID);
@@ -259,6 +267,14 @@ void *Sinfo(void *argument)
       fprintf(stdout, " :\n");
 
       printZaxisInfo(vlistID);
+
+      if ( nsubtypes > 0 )
+        {
+          fprintf(stdout, "   Subtypes");
+          fprintf(stdout, " :\n");
+
+          printSubtypeInfo(vlistID);
+        }
 
       taxisID = vlistInqTaxis(vlistID);
       ntsteps = vlistNtsteps(vlistID);

@@ -407,14 +407,13 @@ void printGridInfo(int vlistID)
 static
 void printZaxisInfo(int vlistID)
 {
-  int nzaxis, index;
   int zaxisID, zaxistype, levelsize, levelID;
   int ltype;
   double *levels = NULL;
   char zaxisname[CDI_MAX_NAME], zname[CDI_MAX_NAME], zunits[CDI_MAX_NAME];
 
-  nzaxis = vlistNzaxis(vlistID);
-  for ( index = 0; index < nzaxis; index++)
+  int nzaxis = vlistNzaxis(vlistID);
+  for ( int index = 0; index < nzaxis; index++)
     {
       double zfirst = 0, zlast = 0, zinc = 0;
       zaxisID   = vlistZaxis(vlistID, index);
@@ -509,6 +508,21 @@ void printZaxisInfo(int vlistID)
     }
 }
 
+static
+void printSubtypeInfo(int vlistID)
+{
+  int nsubtypes = vlistNsubtypes(vlistID);
+  for ( int index = 0; index < nsubtypes; index++)
+    {
+      int subtypeID = vlistSubtype(vlistID, index);
+      int subtypesize = subtypeInqSize(subtypeID);
+      // subtypePrint(subtypeID);
+      fprintf(stdout, "  %4d : %-24s :", vlistSubtypeIndex(vlistID, subtypeID)+1, "tiles");
+      fprintf(stdout, " ntiles=%d", subtypesize);
+      fprintf(stdout, "\n");
+
+    }
+}
 
 static
 int printDateTime(int ntimeout, int vdate, int vtime)
