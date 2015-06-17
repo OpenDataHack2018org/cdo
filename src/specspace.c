@@ -16,7 +16,6 @@ void uv2dv(double *fu, double *fv, double *sd, double *sv,
            double *pol2, double *pol3, int klev, int nlat, int nt);
 void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g,
 	   int nt, int nsp, int nlev);
-void dv2ps(const double * restrict div, double * restrict pot, long nlev, long ntr);
 
 void after_legini_full(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict pdev,
 		       double *restrict pol2, double *restrict pol3, double *restrict coslat);

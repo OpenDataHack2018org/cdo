@@ -5,7 +5,7 @@
 
 #define  SQUARE_RADIUS   (-PlanetRadius * PlanetRadius)
 
-void dv2ps(const double * restrict div, double * restrict pot, long nlev, long ntr)
+void dv2ps(const double *restrict div, double *restrict pot, long nlev, long ntr)
 {
   long l, m, n;
   double fact;
