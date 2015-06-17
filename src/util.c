@@ -478,21 +478,21 @@ int month_to_season(int month)
 #include <sys/stat.h>
 //#include <unistd.h>
 
-int fileExists(const char *filename)
+int fileExists(const char *restrict filename)
 {
   int status = 0;
   struct stat buf;
 
   if ( stat(filename, &buf) == 0 )
     {
-      if ( buf.st_size > 0 ) status = 1;
+      if ( S_ISREG(buf.st_mode) && buf.st_size > 0 ) status = 1;
     }
 
-  return (status);
+  return status;
 }
 
 
-int userFileOverwrite(const char *filename)
+int userFileOverwrite(const char *restrict filename)
 {
   int status = 0, len;
   char line[1024], *pline;
@@ -622,9 +622,8 @@ int str2datatype(const char *datatypestr)
 }
 
 
-off_t filesize(const char *filename)
+off_t filesize(const char *restrict filename)
 {
-  FILE *fp;
   off_t pos = 0;
 
   if ( filename[0] == '(' && filename[1] == 'p' )
@@ -632,6 +631,7 @@ off_t filesize(const char *filename)
     }
   else
     {
+      FILE *fp = NULL;
       fp = fopen(filename, "r");
       if ( fp == NULL )
         {

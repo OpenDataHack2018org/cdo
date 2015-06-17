@@ -142,7 +142,8 @@ void job_submit(const char *expname, const char *jobfilename, const char *jobnam
 
 void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval);
 
-off_t filesize(const char *filename);
+FILE *fopen_read(const char *restrict filename);
+off_t filesize(const char *restrict filename);
 
 char *expand_filename(const char *string);
 

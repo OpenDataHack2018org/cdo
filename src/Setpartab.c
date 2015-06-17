@@ -318,7 +318,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   for ( int fileID = 0; fileID < num_pt_files; ++fileID )
     {
       partab = operatorArgv()[fileID];
-      fp = fopen(partab, "r");
+      if ( fileExists(partab) ) fp = fopen(partab, "r");
       if ( fp == NULL ) cdoAbort("Open failed on parameter table %d file name %s!", fileID+1, partab);
 
       nml_index = 0;
@@ -637,7 +637,8 @@ void *Setpartab(void *argument)
   if ( ptmode == CODE_NUMBER )
     {
       char *partab = operatorArgv()[0];
-      FILE *fp = fopen(partab, "r");
+      FILE *fp = NULL;
+      if ( fileExists(partab) ) fp = fopen(partab, "r");
       if ( fp != NULL )
 	{
 	  fseek(fp, 0L, SEEK_END);

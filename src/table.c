@@ -25,21 +25,15 @@
 #include "error.h"
 
 
-#ifndef  UNDEFID
-#define  UNDEFID  CDI_UNDEFID
-#endif
-
-
 int defineTable(char *tablearg)
 {
-  char *tablename;
-  int tableID = UNDEFID;
+  int tableID = CDI_UNDEFID;
 
-  tablename = tablearg;
+  char *tablename = tablearg;
 
-  tableID = tableRead(tablename);
+  if ( fileExists(tablename) ) tableID = tableRead(tablename);
 
-  if ( tableID == UNDEFID )
+  if ( tableID == CDI_UNDEFID )
     {
       char *tablepath = getenv("CD_TABLEPATH");
 
@@ -51,15 +45,15 @@ int defineTable(char *tablearg)
 	  strcpy(tablefile, tablepath);
 	  strcat(tablefile, "/");
 	  strcat(tablefile, tablename);
-	  tableID = tableRead(tablefile);
+	  if ( fileExists(tablename) ) tableID = tableRead(tablefile);
 	  free(tablefile);
 	}
     }
 
-  if ( tableID == UNDEFID )
+  if ( tableID == CDI_UNDEFID )
     tableID = tableInq(-1, 0, tablename);
 
-  if ( tableID == UNDEFID )
+  if ( tableID == CDI_UNDEFID )
     Error("table <%s> not found", tablename);
 
   return (tableID);
