@@ -226,23 +226,24 @@ void *Ydrunstat(void *argument)
       tsID++;
     }
 
+  /*
+  // set the year to the minimum of years found on output timestep
   int outyear = 1e9;
+  int year, month, day;
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( stats->nsets[dayoy] )
       {
-	int year, month, day;
 	cdiDecodeDate(stats->vdate[dayoy], &year, &month, &day);
 	if ( year < outyear ) outyear = year;
       }
-
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( stats->nsets[dayoy] )
       {
-	int year, month, day;
 	cdiDecodeDate(stats->vdate[dayoy], &year, &month, &day);
-	stats->vdate[dayoy] = cdiEncodeDate(outyear, month, day);
+        // printf("vdates[%d] = %d  nsets = %d\n", dayoy, stats->vdate[dayoy], stats->nsets[dayoy]);
+	if ( year > outyear ) stats->vdate[dayoy] = cdiEncodeDate(outyear, month, day);
       }
-
+  */
   ydstatFinalize(stats, operfunc);
 
   otsID = 0;

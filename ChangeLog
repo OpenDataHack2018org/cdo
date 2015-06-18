@@ -5,6 +5,7 @@
 
 2015-06-18  Uwe Schulzweida
 
+	* Ydrunstat: don't set the year to the minimum of years found on output timestep
 	* Ydaystat: set the year to the minimum of years found on output timestep
 
 2015-06-17  Uwe Schulzweida
