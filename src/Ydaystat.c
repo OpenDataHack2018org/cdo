@@ -214,18 +214,18 @@ void *Ydaystat(void *argument)
     }
 
   // set the year to the minimum of years found on output timestep
-  int yearmin = 999999999;
+  int outyear = 1e9;
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( nsets[dayoy] )
       {
         cdiDecodeDate(vdates[dayoy], &year, &month, &day);
-        if ( year < yearmin ) yearmin = year;
+        if ( year < outyear ) outyear = year;
       }
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( nsets[dayoy] )
       {
         cdiDecodeDate(vdates[dayoy], &year, &month, &day);
-        if ( year > yearmin ) vdates[dayoy] = cdiEncodeDate(yearmin, month, day);
+        if ( year > outyear ) vdates[dayoy] = cdiEncodeDate(outyear, month, day);
         //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy], nsets[dayoy]);
       }
 
