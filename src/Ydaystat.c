@@ -40,29 +40,18 @@
 
 void *Ydaystat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int gridsize;
   int i;
   int varID;
   int recID;
   int vdate, vtime;
   int year, month, day, dayoy;
-  int nrecs, nrecords;
+  int nrecs;
   int levelID;
-  int tsID;
-  int otsID;
   long nsets[NDAY];
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
-  int *recVarID, *recLevelID;
+  int nlevel;
   int vdates[NDAY], vtimes[NDAY];
-  int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
-  double divisor;
   field_t **vars1[NDAY], **vars2[NDAY], **samp1[NDAY];
-  field_t field;
 
   cdoInitialize(argument);
 
@@ -76,13 +65,13 @@ void *Ydaystat(void *argument)
   cdoOperatorAdd("ydaystd",  func_std,  0, NULL);
   cdoOperatorAdd("ydaystd1", func_std1, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  lmean   = operfunc == func_mean || operfunc == func_avg;
-  lstd    = operfunc == func_std || operfunc == func_std1;
-  lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  divisor = operfunc == func_std1 || operfunc == func_var1;
+  int lmean   = operfunc == func_mean || operfunc == func_avg;
+  int lstd    = operfunc == func_std || operfunc == func_std1;
+  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  double divisor = operfunc == func_std1 || operfunc == func_var1;
 
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     {
@@ -92,32 +81,34 @@ void *Ydaystat(void *argument)
       nsets[dayoy] = 0;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
+
+  field_t field;
   field_init(&field);
   field.ptr = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
-  otsID = 0;
+  int tsID = 0;
+  int otsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
@@ -222,6 +213,22 @@ void *Ydaystat(void *argument)
       tsID++;
     }
 
+  // set the year to the minimum of years found on output timestep
+  int yearmin = 999999999;
+  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+    if ( nsets[dayoy] )
+      {
+        cdiDecodeDate(vdates[dayoy], &year, &month, &day);
+        if ( year < yearmin ) yearmin = year;
+      }
+  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+    if ( nsets[dayoy] )
+      {
+        cdiDecodeDate(vdates[dayoy], &year, &month, &day);
+        if ( year > yearmin ) vdates[dayoy] = cdiEncodeDate(yearmin, month, day);
+        //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy], nsets[dayoy]);
+      }
+
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( nsets[dayoy] )
       {
@@ -268,8 +275,8 @@ void *Ydaystat(void *argument)
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
-	    varID    = recVarID[recID];
-	    levelID  = recLevelID[recID];
+	    varID   = recVarID[recID];
+	    levelID = recLevelID[recID];
 
 	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 

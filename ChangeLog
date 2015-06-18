@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-06-18  Uwe Schulzweida
+
+	* Ydaystat: set the year to the minimum of years found on output timestep
+
 2015-06-17  Uwe Schulzweida
 
 	* bug fix if table filename is a directory [Bug #5891]
