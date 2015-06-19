@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-06-19  Uwe Schulzweida
+
+        * for: added docu
+
 2015-06-18  Uwe Schulzweida
 
 	* Ydrunstat: don't set the year to the minimum of years found on output timestep

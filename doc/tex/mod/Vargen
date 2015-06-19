@@ -3,11 +3,10 @@
 @Title     = Generate a field
 @Section   = Miscellaneous
 @Arguments = ofile
-@Operators = const random stdatm
+@Operators = const random for stdatm
 
 @BeginDescription
-Generates a dataset with one or more fields. The field size is specified by the user given grid description.
-According to the chosen operator all field elements are constant or filled with random numbers.
+Generates a dataset with one or more fields
 @EndDescription
 @EndModule
 
@@ -28,6 +27,17 @@ Creates a constant field. All field elements of the grid have the same value.
 
 @BeginDescription
 Creates a field with rectangularly distrubuted random numbers in the interval [0,1].
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_for
+@Title     = Create a time series
+@Parameter = start end [inc]
+
+@BeginDescription
+Creates a time series with field size 1 and field elements beginning with a start value in time step 1
+which is increased from one time step to the next.
 @EndDescription
 @EndOperator
 
@@ -82,14 +92,6 @@ stratosphere and other effects of the upper atmosphere are not taken into
 account.
 @EndDescription
 
-@BeginExample
-To create a standard atmosphere dataset on a given horizontal grid:
-@BeginVerbatim
-   cdo enlarge,gridfile -stdatm,10000,8000,5000,3000,2000,1000,500,200,0 ofile
-@EndVerbatim
-@EndExample
-@EndOperator
-
 @BeginParameter
 @Item = const
 FLOAT   Constant
@@ -97,6 +99,20 @@ FLOAT   Constant
 INTEGER The seed for a new sequence of pseudo-random numbers [default: 1]
 @Item = grid
 STRING  Target grid description file or name
+@Item = start
+FLOAT   Start value of the loop
+@Item = end
+FLOAT   End value of the loop
+@Item = inc
+FLOAT   Increment of the loop [default: 1]
 @Item = levels
 FLOAT   Target levels in metre above surface
 @EndParameter
+
+@BeginExample
+To create a standard atmosphere dataset on a given horizontal grid:
+@BeginVerbatim
+   cdo enlarge,gridfile -stdatm,10000,8000,5000,3000,2000,1000,500,200,0 ofile
+@EndVerbatim
+@EndExample
+@EndOperator
