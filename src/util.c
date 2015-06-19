@@ -622,29 +622,20 @@ int str2datatype(const char *datatypestr)
 }
 
 
-off_t filesize(const char *restrict filename)
+off_t fileSize(const char *restrict filename)
 {
-  off_t pos = 0;
+  off_t filesize = 0;
 
   if ( filename[0] == '(' && filename[1] == 'p' )
     {
     }
   else
     {
-      FILE *fp = NULL;
-      fp = fopen(filename, "r");
-      if ( fp == NULL )
-        {
-          fprintf(stderr, "Open failed on %s\n", filename);
-        }
-      else
-        {
-          fseek(fp, 0L, SEEK_END);
-          pos = ftello(fp);
-        }
+      struct stat buf;
+      if ( stat(filename, &buf) == 0 ) filesize = buf.st_size;
     }
   
-  return pos;
+  return filesize;
 }
 
 

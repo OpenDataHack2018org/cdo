@@ -179,7 +179,7 @@ void *CDIread(void *argument)
       tw = timer_val(timer_read) - tw0;
       twsum += tw;
 
-      file_size = (double) filesize(cdoStreamName(0)->args);
+      file_size = (double) fileSize(cdoStreamName(0)->args);
 
       if ( nruns > 1 ) sprintf(sinfo, "(run %d)", irun+1);
 

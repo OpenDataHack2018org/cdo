@@ -1013,7 +1013,7 @@ void *Gradsdes(void *argument)
     }
   else
     {
-      if ( filesize(cdoStreamName(0)->args) > 2147483647L ) map_version = 4;
+      if ( fileSize(cdoStreamName(0)->args) > 2147483647L ) map_version = 4;
     }
 
   if ( cdoVerbose ) cdoPrint("GrADS GRIB map version: %d", map_version);

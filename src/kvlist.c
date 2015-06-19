@@ -276,17 +276,14 @@ void *kvlParseFile(const char *filename)
 
   assert(filename != NULL);
 
+  filesize = fileSize(filename);
+
   fp = fopen(filename, "r");
   if ( fp == NULL )
     {
       fprintf(stderr, "Open failed on %s: %s\n", filename, strerror(errno));
       return (kvl);
     }
-
-  /* file size */
-  fseek(fp, 0L, SEEK_END);
-  filesize = (size_t) ftell(fp);
-  fseek(fp, 0L, SEEK_SET);
 
   buffer = (char*) malloc(filesize);
   nitems = fread(buffer, 1, filesize, fp);

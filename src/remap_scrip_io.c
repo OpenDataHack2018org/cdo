@@ -153,16 +153,13 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
     cdoAbort("Number of remap links is 0, no remap weights found!");
 
   {
-    size_t filesize;
-    size_t nele1, nele2;
-
-    nele1 = 4*8 + 4;
-    nele2 = 4*8 + 4;
+    size_t nele1 = 4*8 + 4;
+    size_t nele2 = 4*8 + 4;
     if ( src_grid.lneed_cell_corners ) nele1 += src_grid.num_cell_corners*2*8;
     if ( tgt_grid.lneed_cell_corners ) nele2 += tgt_grid.num_cell_corners*2*8;
-    filesize = src_grid.size*(nele1) +
-               tgt_grid.size*(nele2) +
-               rv.num_links*(4 + 4 + rv.num_wts*8);
+    size_t filesize = src_grid.size*(nele1) +
+                      tgt_grid.size*(nele2) +
+                      rv.num_links*(4 + 4 + rv.num_wts*8);
 
     if ( cdoVerbose )
       cdoPrint("Filesize for remap weights: ~%lu", (unsigned long) filesize);
