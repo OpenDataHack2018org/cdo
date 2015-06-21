@@ -588,6 +588,8 @@ src/interpol.c -text
 src/interpol.h -text
 src/job.c -text
 src/juldate.c -text
+src/kdtree.c -text
+src/kdtree.h -text
 src/kvlist.c -text
 src/kvlist.h -text
 src/list.c -text

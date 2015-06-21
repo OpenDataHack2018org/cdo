@@ -70,6 +70,8 @@ libcdo_la_SOURCES =            \
                interpol.h      \
                job.c           \
                juldate.c       \
+               kdtree.c        \
+               kdtree.h        \
                kvlist.c        \
                kvlist.h        \
                list.c          \

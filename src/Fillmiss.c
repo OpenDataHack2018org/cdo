@@ -27,26 +27,27 @@
 #include "pstream.h"
 #include "grid.h"
 
+#include "kdtree.h"
+#include "clipping/geometry.h"
+
 
 void fillmiss(field_t *field1, field_t *field2, int nfill)
 {
-  int gridID, nx, ny, i, j;
-  int nmiss1, nmiss2 = 0;
+  int nx, ny, i, j;
+  int nmiss2 = 0;
   int kr, ku, kl, ko;
   int ir, iu, il, io;
   int kh, kv, k1, k2, kk;
   int globgrid = FALSE,gridtype;
   double s1, s2;
   double xr, xu, xl, xo;
-  double missval;
-  double *array1, *array2;
   double **matrix1, **matrix2;
 
-  gridID   = field1->grid;
-  nmiss1   = field1->nmiss;
-  missval  = field1->missval;
-  array1   = field1->ptr;
-  array2   = field2->ptr;
+  int gridID = field1->grid;
+  int nmiss1 = field1->nmiss;
+  double missval  = field1->missval;
+  double *array1  = field1->ptr;
+  double *array2  = field2->ptr;
 
   nx       = gridInqXsize(gridID);
   ny       = gridInqYsize(gridID);
@@ -143,6 +144,7 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
   free(matrix2);
   free(matrix1);
 }
+
 
 void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
 {
@@ -268,34 +270,129 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
 }
 
 
+void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
+{
+  int gridID = field1->grid;
+  double missval  = field1->missval;
+  double *array1  = field1->ptr;
+  double *array2  = field2->ptr;
+
+  unsigned gridsize = gridInqSize(gridID);
+
+  double *xvals = (double*) malloc(gridsize*sizeof(double));
+  double *yvals = (double*) malloc(gridsize*sizeof(double));
+  unsigned *index = (unsigned*) malloc(gridsize*sizeof(unsigned));
+
+  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
+
+  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+    gridID = gridToCurvilinear(gridID, 0);
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
+
+  /* Convert lat/lon units if required */
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID, units);
+  grid_to_radian(units, gridsize, xvals, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_radian(units, gridsize, yvals, "grid center lat");
+
+
+  double pos[3];
+  double pos2[3];
+  struct kdtree *pointTree;
+  struct kdres *presults;
+  /*
+  pointTree = kd_create(2);
+  for ( unsigned i = 0; i < gridsize; ++i ) 
+    {
+      if ( !DBL_IS_EQUAL(array1[i], missval) )
+        {
+          index[i] = i;
+          pos[0] = xvals[i]; pos[1] = yvals[i];
+          kd_insert(pointTree, pos, &index[i]);
+        }
+    }
+
+  for ( unsigned i = 0; i < gridsize; ++i )
+    {
+      if ( DBL_IS_EQUAL(array1[i], missval) )
+        {
+          pos[0] = xvals[i]; pos[1] = yvals[i];
+          presults = kd_nearest(pointTree, pos);
+          unsigned *index = (unsigned*) kd_res_item(presults, pos2);
+          array2[i] = array1[*index];
+        }
+      else
+        {
+          array2[i] = array1[i];
+        }
+    }
+
+  kd_free(pointTree);
+  */
+
+  pointTree = kd_create(3);
+  for ( unsigned i = 0; i < gridsize; ++i ) 
+    {
+      if ( !DBL_IS_EQUAL(array1[i], missval) )
+        {
+          index[i] = i;
+          LLtoXYZ(xvals[i], yvals[i], pos);
+          kd_insert(pointTree, pos, &index[i]);
+        }
+    }
+
+  for ( unsigned i = 0; i < gridsize; ++i )
+    {
+      if ( DBL_IS_EQUAL(array1[i], missval) )
+        {
+          LLtoXYZ(xvals[i], yvals[i], pos);
+          presults = kd_nearest(pointTree, pos);
+          unsigned *index = (unsigned*) kd_res_item(presults, pos2);
+          array2[i] = array1[*index];
+        }
+      else
+        {
+          array2[i] = array1[i];
+        }
+    }
+
+  kd_free(pointTree);
+
+  free(xvals);
+  free(yvals);
+}
+
+
 void *Fillmiss(void *argument)
 {
-  int FILLMISS,FILLMISSONESTEP;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, ngrids;
-  int index;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
-  int gridID1 = -1;
-  field_t field1, field2;
-  int taxisID1, taxisID2;
+  int gridID;
+  int nrecs;
+  int recID, varID, levelID;
   int nmiss, i, nfill = 1;
   void (*fill_method) (field_t *fin , field_t *fout , int);
 
   cdoInitialize(argument);
 
-  FILLMISS        = cdoOperatorAdd("fillmiss"  ,  0, 0, "nfill");
-  FILLMISSONESTEP = cdoOperatorAdd("fillmiss2" ,  0, 0, "nfill");
-  operatorID      = cdoOperatorID();
+  int FILLMISS        = cdoOperatorAdd("fillmiss"   ,  0, 0, "nfill");
+  int FILLMISSONESTEP = cdoOperatorAdd("fillmiss2"  ,  0, 0, "nfill");
+  int FILLMISSNN      = cdoOperatorAdd("fillmissnn" ,  0, 0, "nfill");
+
+  int operatorID      = cdoOperatorID();
+
   if ( operatorID == FILLMISS )
      {
        fill_method = &fillmiss;
      }
-  else
+  else if ( operatorID == FILLMISSONESTEP )
      {
        fill_method = &fillmiss_one_step;
+     }
+  else if ( operatorID == FILLMISSNN )
+     {
+       fill_method = &fillmiss_nn;
      }
 
   /* Argument handling */
@@ -315,37 +412,28 @@ void *Fillmiss(void *argument)
       cdoAbort("Too many arguments!");
   }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
-    {
-      gridID1 = vlistGrid(vlistID1, index);
-
-      if ( gridInqType(gridID1) == GRID_GME ||
-	   gridInqType(gridID1) == GRID_UNSTRUCTURED )
-	cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
-    }
-
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr   = (double*) malloc(gridsize*sizeof(double));
-  field2.ptr   = (double*) malloc(gridsize*sizeof(double));
+  field1.ptr = (double*) malloc(gridsize*sizeof(double));
+  field2.ptr = (double*) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -357,23 +445,37 @@ void *Fillmiss(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
 
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-
-	  field2.grid    = field1.grid;
-	  field2.nmiss   = 0;
-	  field2.missval = field1.missval;
-
-	  fill_method(&field1, &field2, nfill);
-
-	  gridsize = gridInqSize(field2.grid);
-	  nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
-
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, field2.ptr, nmiss);
-	}
+
+          if ( field1.nmiss == 0 )
+            {
+              streamWriteRecord(streamID2, field1.ptr, 0);
+            }
+          else
+            {
+              gridID = vlistInqVarGrid(vlistID1, varID);
+
+              if ( gridInqType(gridID) == GRID_GME ||
+                   gridInqType(gridID) == GRID_UNSTRUCTURED )
+                cdoAbort("%s data unsupported!", gridNamePtr(gridInqType(gridID)) );
+                
+              field1.grid    = gridID;
+              field1.missval = vlistInqVarMissval(vlistID1, varID);
+
+              field2.grid    = field1.grid;
+              field2.nmiss   = 0;
+              field2.missval = field1.missval;
+
+              fill_method(&field1, &field2, nfill);
+
+              gridsize = gridInqSize(field2.grid);
+              nmiss = 0;
+              for ( i = 0; i < gridsize; ++i )
+                if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
+              
+              streamWriteRecord(streamID2, field2.ptr, nmiss);
+            }
+        }
       tsID++;
     }
 
