@@ -87,16 +87,62 @@ std_atm_pressure(double height)
   return (P_ZERO * exp((-1)*TMP4PRESSURE*log((exp(height/SCALEHEIGHT)*T_ZERO + T_DELTA)/(T_ZERO + T_DELTA))));
 }
 
+int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym);
+
+void remap_nn_reg2d(int nx, int ny, double *restrict data, int gridID, double *array)
+{
+  int gridsize = gridInqSize(gridID);
+  double *xvals = (double*) malloc(gridsize*sizeof(double));
+  double *yvals = (double*) malloc(gridsize*sizeof(double));
+
+  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
+
+  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+    gridID = gridToCurvilinear(gridID, 0);
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
+
+  /* Convert lat/lon units if required */
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID, units);
+  grid_to_degree(units, gridsize, xvals, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_degree(units, gridsize, yvals, "grid center lat");
+
+  int ii, jj;
+  double xval, yval;
+  for ( int i = 0; i < gridsize; i++ )
+    {
+      xval = xvals[i];
+      yval = yvals[i];
+      if ( xval >=  180 ) xval -= 360;
+      if ( xval <  -180 ) xval += 360;
+      ii = (xval + 180)*2;
+      jj = (yval +  90)*2;
+      if ( ii > nx ) ii = nx;
+      if ( jj > ny ) jj = ny;
+      array[i] = data[jj*nx+ii];
+    }
+
+  free(xvals);
+  free(yvals);
+}
+
+
 void *Vargen(void *argument)
 {
   int ntimesteps, nlevels = 1;
   int varID, varID2 = -1, levelID;
   int i;
-  int gridID = -1, zaxisID;
+  int gridID = -1, gridIDdata = -1, zaxisID;
   int vdate, vtime;
   double rval, rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
   double *levels = NULL;
+  double lon[720], lat[360];
+  int nlon = 720;
+  int nlat = 360;
 
   cdoInitialize(argument);
 
@@ -118,13 +164,11 @@ void *Vargen(void *argument)
       operatorInputArg(cdoOperatorEnter(operatorID));
       if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
       if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
-      const char *gridfile = operatorArgv()[0];
-      gridID   = cdoDefineGrid(gridfile);
+      gridID = cdoDefineGrid(operatorArgv()[0]);
       if ( operatorArgc() == 2 )
         {
           int idum = parameter2int(operatorArgv()[1]);
-          if ( idum >= 0 && idum < 0x7FFFFFFF )
-            seed = idum;
+          if ( idum >= 0 && idum < 0x7FFFFFFF ) seed = idum;
         }
       srand(seed);
     }
@@ -132,32 +176,30 @@ void *Vargen(void *argument)
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(1);
-      const char *gridfile = operatorArgv()[0];
-      gridID   = cdoDefineGrid(gridfile);
+      gridID = cdoDefineGrid(operatorArgv()[0]);
     }
   else if ( operatorID == CONST )
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(2);
-      rconst   = parameter2double(operatorArgv()[0]);
-      const char *gridfile = operatorArgv()[1];
-      gridID   = cdoDefineGrid(gridfile);
+      rconst = parameter2double(operatorArgv()[0]);
+      gridID = cdoDefineGrid(operatorArgv()[1]);
     }
   else if ( operatorID == TOPO || operatorID == TEMP || operatorID == MASK )
     {
-      int nlon, nlat, i;
-      double lon[720], lat[360];
-      nlon = 720;
-      nlat = 360;
-      gridID = gridCreate(GRID_LONLAT, nlon*nlat);
-      gridDefXsize(gridID, nlon);
-      gridDefYsize(gridID, nlat);
+      gridIDdata = gridCreate(GRID_LONLAT, nlon*nlat);
+      gridDefXsize(gridIDdata, nlon);
+      gridDefYsize(gridIDdata, nlat);
 
-      for ( i = 0; i < nlon; i++ ) lon[i] = -179.75 + i*0.5;
-      for ( i = 0; i < nlat; i++ ) lat[i] = -89.75 + i*0.5;
+      for ( int i = 0; i < nlon; i++ ) lon[i] = -179.75 + i*0.5;
+      for ( int i = 0; i < nlat; i++ ) lat[i] = -89.75 + i*0.5;
 
-      gridDefXvals(gridID, lon);
-      gridDefYvals(gridID, lat);
+      gridDefXvals(gridIDdata, lon);
+      gridDefYvals(gridIDdata, lat);
+
+      gridID = gridIDdata;
+
+      if ( operatorArgc() == 1 ) gridID = cdoDefineGrid(operatorArgv()[0]);
     }
   else if ( operatorID == FOR )
     {
@@ -255,8 +297,8 @@ void *Vargen(void *argument)
   int taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
-  if ( operatorID == RANDOM || operatorID == SINCOS || operatorID == COSHILL || operatorID == CONST || operatorID == TOPO ||
-       operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
+  if ( operatorID == RANDOM || operatorID == SINCOS || operatorID == COSHILL || operatorID == CONST ||
+       operatorID == TOPO || operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
   int streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
@@ -264,8 +306,15 @@ void *Vargen(void *argument)
   streamDefVlist(streamID, vlistID);
 
   int gridsize = gridInqSize(gridID);
+  int datasize = gridsize;
   double *array = (double*) malloc(gridsize*sizeof(double));
-
+  double *data = array;
+  if ( gridID != gridIDdata && gridIDdata != -1 )
+    {
+      datasize = gridInqSize(gridIDdata);
+      data = (double*) malloc(datasize*sizeof(double));
+    }
+  
   if ( operatorID == FOR )
     ntimesteps = 1.001 + ((rstop-rstart)/rinc);
   else
@@ -341,8 +390,8 @@ void *Vargen(void *argument)
               else if ( operatorID == TOPO )
                 {
 #if defined(ENABLE_DATA)
-                  for ( i = 0; i < gridsize; i++ )
-                    array[i] = etopo[i]/etopo_scale - etopo_offset;
+                  for ( i = 0; i < datasize; i++ )
+                    data[i] = etopo[i]/etopo_scale - etopo_offset;
 #else
                   cdoAbort("Operator support disabled!");
 #endif
@@ -350,8 +399,8 @@ void *Vargen(void *argument)
               else if ( operatorID == TEMP )
                 {
 #if defined(ENABLE_DATA)
-                  for ( i = 0; i < gridsize; i++ )
-                    array[i] = temp[i]/temp_scale - temp_offset;
+                  for ( i = 0; i < datasize; i++ )
+                    data[i] = temp[i]/temp_scale - temp_offset;
 #else
                   cdoAbort("Operator support disabled!");
 #endif
@@ -359,8 +408,8 @@ void *Vargen(void *argument)
               else if ( operatorID == MASK )
                 {
 #if defined(ENABLE_DATA)
-                  for ( i = 0; i < gridsize; i++ )
-                    array[i] = mask[i]/mask_scale - mask_offset;
+                  for ( i = 0; i < datasize; i++ )
+                    data[i] = mask[i]/mask_scale - mask_offset;
 #else
                   cdoAbort("Operator support disabled!");
 #endif
@@ -372,6 +421,11 @@ void *Vargen(void *argument)
               else if ( operatorID == STDATM )
                 {
                   array[0] = (varID == varID2) ? std_atm_temperatur(levels[levelID]) : std_atm_pressure(levels[levelID]);
+                }
+
+              if ( gridID != gridIDdata && (operatorID == TOPO || operatorID == TEMP || operatorID == MASK) )
+                {
+                  remap_nn_reg2d(nlon, nlat, data, gridID, array);
                 }
 
               streamWriteRecord(streamID, array, 0);

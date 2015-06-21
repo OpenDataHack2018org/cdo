@@ -2,7 +2,6 @@
 #include "remap.h"
 
 
-long find_element(double x, long nelem, const double *restrict array);
 int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym);
 
 
@@ -120,23 +119,21 @@ int grid_search_reg2d(remapgrid_t *src_grid, int *restrict src_add, double *rest
   */
   /*  Local variables */
   int search_result = 0;
-  int lfound;
   long n;
-  long nx, nxm, ny;
   long ii, iix, jj;
 
   for ( n = 0; n < 4; ++n ) src_add[n] = 0;
 
-  nx = src_grid_dims[0];
-  ny = src_grid_dims[1];
+  long nx = src_grid_dims[0];
+  long ny = src_grid_dims[1];
 
-  nxm = nx;
+  long nxm = nx;
   if ( src_grid->is_cyclic ) nxm++;
 
   if ( /*plon < 0   &&*/ plon < src_center_lon[0]     ) plon += PI2;
   if ( /*plon > PI2 &&*/ plon > src_center_lon[nxm-1] ) plon -= PI2;
 
-  lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
+  int lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
 
   if ( lfound )
     {
