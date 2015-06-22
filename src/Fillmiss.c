@@ -19,6 +19,7 @@
    This module contains the following operators:
 
 */
+#include <time.h> // clock()
 
 #include <cdi.h>
 #include <cdi.h>
@@ -269,13 +270,22 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
   free(matrix1);
 }
 
+static double dist_sq( double *a1, double *a2, int dims ) {
+  double dist_sq = 0, diff;
+  while( --dims >= 0 ) {
+    diff = (a1[dims] - a2[dims]);
+    dist_sq += diff*diff;
+  }
+  return dist_sq;
+}
+
 
 void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
 {
   int gridID = field1->grid;
-  double missval  = field1->missval;
-  double *array1  = field1->ptr;
-  double *array2  = field2->ptr;
+  double missval = field1->missval;
+  double *array1 = field1->ptr;
+  double *array2 = field2->ptr;
 
   unsigned gridsize = gridInqSize(gridID);
 
@@ -332,6 +342,9 @@ void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
 
   kd_free(pointTree);
   */
+  clock_t start, finish;
+
+  start = clock();
 
   pointTree = kd_create(3);
   for ( unsigned i = 0; i < gridsize; ++i ) 
@@ -343,7 +356,14 @@ void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
           kd_insert(pointTree, pos, &index[i]);
         }
     }
+  
+  finish = clock();
 
+  printf("kd_tree created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+
+  start = clock();
+
+#pragma omp parallel for private(pos, pos2, presults) shared(array1, array2, xvals, yvals)
   for ( unsigned i = 0; i < gridsize; ++i )
     {
       if ( DBL_IS_EQUAL(array1[i], missval) )
@@ -358,6 +378,38 @@ void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
           array2[i] = array1[i];
         }
     }
+  /*
+  double radius = 5.*M_PI/180.;
+  
+  for ( unsigned i = 0; i < gridsize; ++i )
+    {
+      if ( DBL_IS_EQUAL(array1[i], missval) )
+        {
+          LLtoXYZ(xvals[i], yvals[i], pos);
+          presults = kd_nearest_range(pointTree, pos, radius);
+          int nvals = kd_res_size(presults);
+          double dist = 0;
+          double val = 0;
+          while( !kd_res_end( presults ) )
+            {
+              unsigned *index = (unsigned*) kd_res_item(presults, pos2);
+              val += array1[*index];
+              dist = sqrt( dist_sq( pos, pos2, 3 ) );
+              printf( "found %d results: dist %g index %u\n", nvals, dist, *index);
+              kd_res_next( presults );
+            }
+          kd_res_free( presults );
+          array2[i] = val/nvals;
+        }
+      else
+        {
+          array2[i] = array1[i];
+        }
+    }
+  */
+  finish = clock();
+
+  printf("kd_tree nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
   kd_free(pointTree);
 
