@@ -23,10 +23,6 @@
 //#define _XOPEN_SOURCE 600 /* gethostname */
 #endif
 
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
