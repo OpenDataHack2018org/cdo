@@ -1424,7 +1424,13 @@ int main(int argc, char *argv[])
   if ( ompNumThreads < numThreads )
     fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", ompNumThreads);
   if ( cdoVerbose )
-    fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d\n", omp_get_num_procs(), omp_get_max_threads());
+    {
+      fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d", omp_get_num_procs(), omp_get_max_threads());
+#if defined(HAVE_OPENMP4)
+      fprintf(stderr, "  num_devices = %d", omp_get_num_devices());
+#endif
+      fprintf(stderr, "\n");
+    }
 #else
   if ( numThreads > 0 )
     {
