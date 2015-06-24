@@ -19,8 +19,10 @@
 #include "cdo_int.h"
 #include <cdi.h>
 
+#if 0
 #ifdef __SSE2__
 #include <emmintrin.h>
+#endif
 #endif
 
 void farfun(field_t *field1, field_t field2, const int function)
