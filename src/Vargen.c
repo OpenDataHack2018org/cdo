@@ -437,6 +437,7 @@ void *Vargen(void *argument)
 
   vlistDestroy(vlistID);
 
+  if ( gridID != gridIDdata && gridIDdata != -1 ) free(data);
   if ( array ) free(array);
   if ( levels ) free(levels); 
 
