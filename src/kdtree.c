@@ -35,6 +35,8 @@ OF SUCH DAMAGE.
 #include <malloc.h>
 #endif
 
+#define NO_ALLOCA
+
 #ifdef USE_LIST_NODE_ALLOCATOR
 
 #ifndef NO_PTHREADS
