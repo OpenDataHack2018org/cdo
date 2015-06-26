@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-06-26  Uwe Schulzweida
+
+	* remapdis: fixed seg fault on blizzard with large target grid (possibly compiler bug)
+
 2015-06-21  Uwe Schulzweida
 
 	* topo, temp, mask: added optional parameter for target grid
