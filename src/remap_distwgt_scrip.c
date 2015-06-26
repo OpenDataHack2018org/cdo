@@ -424,6 +424,10 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 	}
     }
 
+  int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
+  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
+  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+
   /* Loop over destination grid  */
 
   double findex = 0;
@@ -431,13 +435,10 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
-  private(tgt_cell_add, n, nadds, dist_tot, plat, plon)
+  private(tgt_cell_add, n, nadds, dist_tot, plat, plon, nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-      int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
-      int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
-      double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
