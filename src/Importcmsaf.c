@@ -89,7 +89,7 @@ void print_filter(hid_t dset_id, char *varname)
 
   for ( idx = 0; idx < nfilter; idx++ )
     {
-      filter = H5Pget_filter(plist, idx, &flags, &cd_nelmts, &cd_values, 
+      filter = H5Pget_filter(plist, idx, &flags, &cd_nelmts, &cd_values,
 			     pnamelen, pname);
       cdoPrint("Dataset %s: filter %d =  %s", varname, idx+1, pname);
     }
@@ -222,7 +222,7 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
 }
 
 static
-int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
+int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax,
 		      double dx, double dy, double p1, double p2, double p3, double p4)
 {
   int gridID;
@@ -257,7 +257,7 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
 }
 
 static
-int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
+int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax,
 		double dx, double dy, double a, double lon0, double lat0)
 {
   int gridID;
@@ -434,9 +434,9 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   H5Tclose(fltarr_tid);
 
   if ( cdoVerbose )
-    cdoPrint("  Projection: name=%s\n\t\t\tellipsoid=%s\n\t\t\tparameter=%g %g %g %g %g %g",  
-	     proj.name, proj.ellipsoid, 
-	     proj.parameter[0], proj.parameter[1], proj.parameter[2], 
+    cdoPrint("  Projection: name=%s\n\t\t\tellipsoid=%s\n\t\t\tparameter=%g %g %g %g %g %g",
+	     proj.name, proj.ellipsoid,
+	     proj.parameter[0], proj.parameter[1], proj.parameter[2],
 	     proj.parameter[3], proj.parameter[4], proj.parameter[5]);
 
   region_tid = H5Tcreate(H5T_COMPOUND, sizeof(region_t));
@@ -450,7 +450,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   region_id = H5Dopen(grp_id, "Region");
   if ( region_id < 0 )
     region_id = H5Dopen(grp_id, "region");
-  
+
   if ( region_id < 0 )
     memset(&region, 0, sizeof(region_t));
   else
@@ -467,7 +467,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
       if ( cdoVerbose ) cdoPrint("  Swap xmin/xmax");
     }
 
-  if ( cdoVerbose ) 
+  if ( cdoVerbose )
     cdoPrint("  Region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g",
 	     region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy);
 
@@ -488,7 +488,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
        (int)region.ymin == 8887500 && (int)region.ymax == 8887500 &&
        (int)region.dx == 15000 && (int)region.dy  == 15000 )
     {
-       region.xmax = 8887500.0;
+       region.xmax =  8887500.0;
        region.ymin = -8887500.0;
        if ( cdoVerbose )
          cdoPrint("  Corrected region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g",
@@ -500,14 +500,14 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
     }
 
   if (nx == 298 && ny == 371 &&
-      (int)region.xmin == -6709222 &&  (int)region.xmax == 6709222 &&
+      (int)region.xmin == -6709222 && (int)region.xmax == 6709222 &&
       (int)region.ymin == -6664078 && (int)region.ymax == 9984898 &&
       (int)region.dx == 45000 && (int)region.dy  == 45000 )
     {
         region.xmin = -6705000;
-        region.xmax = 6705000;
+        region.xmax =  6705000;
         region.ymin = -6705000;
-        region.ymax = 9990000;      
+        region.ymax =  9990000;
         cdoPrint("  Corrected region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g",
                region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy);
 
@@ -516,15 +516,15 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
         if ( cdoVerbose ) cdoPrint("  Corrected size: xsize=%d  ysize=%d", xsize, ysize);
     }
 
-  if ( strcmp(proj.name, "sinusoidal") != 0  && 
+  if ( strcmp(proj.name, "sinusoidal") != 0  &&
        ( (nx == xsize && ny == ysize &&
-	  (int)region.xmin == -8887500 && (int)region.xmax == 8887500 && 
-	  (int)region.ymin == -8887500 && (int)region.ymax == 8887500 && 
+	  (int)region.xmin == -8887500 && (int)region.xmax == 8887500 &&
+	  (int)region.ymin == -8887500 && (int)region.ymax == 8887500 &&
 	  (int)region.dx == 15000 && (int)region.dy  == 15000 )
 	 ||
 	 (nx == xsize && ny == ysize &&
-	  (int)region.xmin == -5827500 && (int)region.xmax == 5827500 && 
-	  (int)region.ymin ==  3307500 && (int)region.ymax == 8887500 && 
+	  (int)region.xmin == -5827500 && (int)region.xmax == 5827500 &&
+	  (int)region.ymin ==  3307500 && (int)region.ymax == 8887500 &&
 	  (int)region.dx == 15000 && (int)region.dy  == 15000 )
 	 ||
 	 (nx == xsize && ny == ysize &&
@@ -540,7 +540,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 	 (nx == 298 && ny == 371 &&
 	  (int)region.xmin == -6709222 && (int)region.xmax == 6709222 &&
 	  (int)region.ymin == -6664078 && (int)region.ymax == 9984898 &&
-	  (int)region.dx == 45000 && (int)region.dy  == 45000 ) 
+	  (int)region.dx == 45000 && (int)region.dy  == 45000 )
 	 ||
 	 (nx == xsize && ny == ysize &&
 	  (int)region.xmin == -6705000 && (int)region.xmax == 6705000 &&
@@ -550,25 +550,25 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
       if ( cdoVerbose ) cdoPrint("Replacing incorrect projection parameters for sinusoidal products:");
       strcpy(proj.ellipsoid, "WGS-84");
       strcpy(proj.name, "sinusoidal");
-      proj.parameter[0] = 0.0; 
+      proj.parameter[0] = 0.0;
       proj.parameter[1] = 0.0;
-      proj.parameter[2] = 0.0; 
-      proj.parameter[3] = 0.0;  
-      proj.parameter[4] = -99.99;      
-      proj.parameter[5] = -99.99;          
-      if ( cdoVerbose ) 
-	  cdoPrint("proj1 = %g, proj2 = %g, proj3 = %g, proj4 = %g,",  
-		   proj.parameter[0], proj.parameter[1],  
+      proj.parameter[2] = 0.0;
+      proj.parameter[3] = 0.0;
+      proj.parameter[4] = -99.99;
+      proj.parameter[5] = -99.99;
+      if ( cdoVerbose )
+	  cdoPrint("proj1 = %g, proj2 = %g, proj3 = %g, proj4 = %g,",
+		   proj.parameter[0], proj.parameter[1],
 		   proj.parameter[2], proj.parameter[3]);
     }
 
-  if ( nx == xsize && ny == ysize && 
-       strcmp(proj.name, "sinusoidal") == 0 && 
+  if ( nx == xsize && ny == ysize &&
+       strcmp(proj.name, "sinusoidal") == 0 &&
        strcmp(proj.ellipsoid, "WGS-84") == 0  )
     {
-      gridID = defSinusoidalGrid(nx, ny, region.xmin, region.xmax, region.ymin, region.ymax, 
+      gridID = defSinusoidalGrid(nx, ny, region.xmin, region.xmax, region.ymin, region.ymax,
 				 region.dx, region.dy,
-				 proj.parameter[0], proj.parameter[1], 
+				 proj.parameter[0], proj.parameter[1],
 				 proj.parameter[2], proj.parameter[3]);
     }
   /* modification by Frank Kaspar */
@@ -595,17 +595,17 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
             memcmp(proj.ellipsoid, "Sphere", 6) == 0 )
     {
       double c0  = 0.001*sqrt(proj.parameter[5]);       /* nominal spatial resolution */
-      double lts = proj.parameter[3];      
+      double lts = proj.parameter[3];
       double re  = proj.parameter[4]/1000;  /* Earth radius [km]*/
-      if ( cdoVerbose ) cdoPrint("  c0 = %g, lts = %g, re = %g", c0, lts, re); 
+      if ( cdoVerbose ) cdoPrint("  c0 = %g, lts = %g, re = %g", c0, lts, re);
       gridID = defLonLatGrid(nx, ny, c0, lts, re);
     }
   else if ( nx == 386 && ny == 162 )
     {
       double c0  = 90;       /* nominal spatial resolution */
-      double lts = 30;      
+      double lts = 30;
       double re  = 6371.228;  /* Earth radius [km]*/
-      if ( cdoVerbose ) cdoPrint("  c0 = %g, lts = %g, re = %g", c0, lts, re); 
+      if ( cdoVerbose ) cdoPrint("  c0 = %g, lts = %g, re = %g", c0, lts, re);
       gridID = defLonLatGrid(nx, ny, c0, lts, re);
     }
 
@@ -742,10 +742,10 @@ int read_region(hid_t loc_id, int nx, int ny)
   */
 
   if ( nfound == 4 &&
-       nx == region.xsize && ny == region.ysize && 
+       nx == region.xsize && ny == region.ysize &&
        strcmp(proj, "laea") == 0 )
     {
-      gridID = defLaeaGrid(nx, ny, xmin, xmax, ymin, ymax, 
+      gridID = defLaeaGrid(nx, ny, xmin, xmax, ymin, ymax,
 			   dx, dy, a, lon0, lat0);
     }
 
@@ -756,7 +756,7 @@ static
 void read_dataset(hid_t loc_id, const char *name, void *opdata)
 {
   hid_t dset_id, type_id;
-  hid_t   dataspace;   
+  hid_t   dataspace;
   hsize_t dims_out[9];  /* dataset dimensions           */
   herr_t  status;	/* Generic return value		*/
   hid_t   attr, atype, atype_mem;
@@ -790,7 +790,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   strcpy(varname, name);
 
   dset_id = H5Dopen(loc_id, varname);
-  
+
   type_id = H5Dget_type(dset_id);  /* get datatype*/
 
   type_class = H5Tget_class(type_id);
@@ -860,7 +860,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
     if ( isdigit(varname[len-1]) && memcmp(varname, "Data", 4) != 0 )
       {
 	if ( nt > 1 ) cdoAbort("Combination of nlevel > 1 and ntime > 1 not implemented!");
-       
+
 	nz = atoi(&varname[len-1]);
 	varname[len-1] = 0;
       }
@@ -1056,7 +1056,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	  H5Aclose(attr);
 	  H5Tclose(atype);
 	}
-      
+
       offset = gridsize*(nz-1);
       array  = ((datasets_t *) opdata)->obj[nset].array;
       array  = (double*) realloc(array, gridsize*nz*nt*sizeof(double));
@@ -1113,7 +1113,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    cdoWarning("Scalefactor changes over levels!");
 
 	  if ( lmissval && !DBL_IS_EQUAL(((datasets_t *) opdata)->obj[nset].missval, missval) )
-	    cdoWarning("Missing value changes over levels!");	       
+	    cdoWarning("Missing value changes over levels!");
 	}
 
       if ( nz == 1 ) ((datasets_t *) opdata)->nsets++;
@@ -1122,7 +1122,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       memset(mask, 0, gridsize*nt*sizeof(short));
 
       nmiss  = 0;
- 
+
       minval =  1e35;
       maxval = -1e35;
       for ( i = 0; i < gridsize*nt; i++ )
@@ -1152,7 +1152,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       lscalefactor = IS_NOT_EQUAL(scalefactor, 1);
 
       if ( laddoffset || lscalefactor )
-	{	  
+	{
 	  for ( i = 0; i < gridsize*nt; i++ )
 	    if ( !DBL_IS_EQUAL(array[i], missval) )
 	      {
@@ -1167,7 +1167,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		mask[i] = 1;
 	      }
 	}
-	    
+
       minval =  1e35;
       maxval = -1e35;
       for ( i = 0; i < gridsize*nt; i++ )
@@ -1210,7 +1210,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       ((datasets_t *) opdata)->obj[nset].scale    = scalefactor;
       ((datasets_t *) opdata)->obj[nset].missval  = missval;
 
-      free(mask); 
+      free(mask);
       mask = NULL;
     }
   else
@@ -1242,7 +1242,7 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a group", name);
     if ( strcmp(name, "Data") == 0 )
       {
-	((datasets_t *) opdata)->mergelevel = TRUE;	
+	((datasets_t *) opdata)->mergelevel = TRUE;
 	H5Giterate(loc_id, name, NULL, obj_info, opdata);
       }
     else if ( strcmp(name, "Geolocation") == 0 )
@@ -1254,7 +1254,7 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
 	((datasets_t *) opdata)->lmetadata = TRUE;
       }
     break;
-  case H5G_DATASET: 
+  case H5G_DATASET:
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a dataset", name);
     if ( strstr(name, "PALETTE") )
       {
@@ -1271,7 +1271,7 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
 	read_dataset(loc_id, name, opdata);
       }
     break;
-  case H5G_TYPE: 
+  case H5G_TYPE:
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a named datatype", name);
     if ( strcmp(name, "ProjType") == 0 )
       {
@@ -1320,23 +1320,23 @@ void get_global_att(hid_t file_id, const char *obj_path, int vlistID)
 	{
 	  H5Aread(attr, atype_mem, attstring);
 	  vlistDefAttTxt(vlistID, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
-	} 
+	}
       else if ( type_class == H5T_INTEGER )
 	{
 	  H5Aread(attr, H5T_NATIVE_INT, &attint);
 	  vlistDefAttInt(vlistID, CDI_GLOBAL, attname, DATATYPE_INT32, 1, &attint);
-	} 
+	}
       else if ( type_class == H5T_FLOAT )
 	{
 	  H5Aread(attr, H5T_NATIVE_DOUBLE, &attflt);
 	  vlistDefAttFlt(vlistID, CDI_GLOBAL, attname, DATATYPE_FLT64, 1, &attflt);
-	} 
+	}
       H5Tclose(atype_mem);
       H5Aclose(attr);
       H5Tclose(atype);
     }
 
-  if ( grp_id >= 0 ) H5Gclose(grp_id);	
+  if ( grp_id >= 0 ) H5Gclose(grp_id);
 
 }
 
@@ -1398,7 +1398,7 @@ void dsets_init(datasets_t *dsets)
       dsets->obj[i].loffset     = 0;
       dsets->obj[i].lmissval    = 0;
       dsets->obj[i].missval     = cdiInqMissval();
-      dsets->obj[i].array       = NULL;   
+      dsets->obj[i].array       = NULL;
     }
 }
 #endif
@@ -1456,7 +1456,7 @@ void *Importcmsaf(void *argument)
   if ( nt > 1 )
     {
       vtimes = (int*) malloc(nt*sizeof(int));
-      
+
       for ( i = 0; i < nt; ++i ) vtimes[i] = i*10000 + 45*100;
 
       if ( dsets.obj[ivar].time )
@@ -1479,7 +1479,7 @@ void *Importcmsaf(void *argument)
 
   if ( cdoVerbose )
     for ( ivar = 0; ivar < dsets.nsets; ++ivar )
-      cdoPrint(" Var %d %-20s %dx%d nlev = %d nts = %d", 
+      cdoPrint(" Var %d %-20s %dx%d nlev = %d nts = %d",
 	       ivar, dsets.obj[ivar].name, nx, ny, nz, dsets.obj[ivar].nt);
 
   for ( ivar = 1; ivar < dsets.nsets; ++ivar )
@@ -1498,7 +1498,7 @@ void *Importcmsaf(void *argument)
     {
       gridID = read_region(file_id, nx, ny);
     }
-  
+
   if ( gridID == -1 )
     {
       gridID = gridCreate(GRID_GENERIC, gridsize);
@@ -1542,9 +1542,9 @@ void *Importcmsaf(void *argument)
       if ( dsets.obj[ivar].units )
 	vlistDefVarUnits(vlistID, varID,  dsets.obj[ivar].units);
       if ( dsets.obj[ivar].title )
-	vlistDefAttTxt(vlistID, varID, "title", (int)strlen(dsets.obj[ivar].title), 
+	vlistDefAttTxt(vlistID, varID, "title", (int)strlen(dsets.obj[ivar].title),
 		       dsets.obj[ivar].title);
-	
+
       /*
       vlistDefVarUnits(vlistID, varID, units[i]);
       */
@@ -1580,7 +1580,7 @@ void *Importcmsaf(void *argument)
 	  varID   = ivar;
 
 	  if ( tsID > 0 && dsets.obj[ivar].nt == 1 ) continue;
-	  
+
 	  gridsize = dsets.obj[ivar].gridsize;
 	  missval  = dsets.obj[ivar].missval;
 
@@ -1589,7 +1589,7 @@ void *Importcmsaf(void *argument)
 	      offset = gridsize*levelID;
 	      if ( nz == 1 ) offset = gridsize*tsID;
 	      array  = dsets.obj[ivar].array+offset;
-	      
+
 	      nmiss  = 0;
 	      minval =  1e35;
 	      maxval = -1e35;
