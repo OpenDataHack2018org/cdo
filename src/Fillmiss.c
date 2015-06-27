@@ -280,7 +280,7 @@ static double dist_sq( double *a1, double *a2, int dims ) {
 }
 
 
-void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
+void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 {
   int gridID = field1->grid;
   double missval = field1->missval;
@@ -359,7 +359,7 @@ void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
   
   finish = clock();
 
-  printf("kd_tree created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+  if ( cdoVerbose ) printf("kd_tree created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
   start = clock();
 
@@ -409,7 +409,7 @@ void fillmiss_nn(field_t *field1, field_t *field2, int maxfill)
   */
   finish = clock();
 
-  printf("kd_tree nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+  if ( cdoVerbose ) printf("kd_tree nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
   kd_free(pointTree);
 
@@ -430,7 +430,7 @@ void *Fillmiss(void *argument)
 
   int FILLMISS        = cdoOperatorAdd("fillmiss"   ,  0, 0, "nfill");
   int FILLMISSONESTEP = cdoOperatorAdd("fillmiss2"  ,  0, 0, "nfill");
-  int FILLMISSNN      = cdoOperatorAdd("fillmissnn" ,  0, 0, "nfill");
+  int SETMISSTONN     = cdoOperatorAdd("setmisstonn" , 0, 0, "nfill");
 
   int operatorID      = cdoOperatorID();
 
@@ -442,9 +442,9 @@ void *Fillmiss(void *argument)
      {
        fill_method = &fillmiss_one_step;
      }
-  else if ( operatorID == FILLMISSNN )
+  else if ( operatorID == SETMISSTONN )
      {
-       fill_method = &fillmiss_nn;
+       fill_method = &setmisstonn;
      }
 
   /* Argument handling */

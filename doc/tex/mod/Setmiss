@@ -4,7 +4,7 @@
 @Title     = Set missing value
 @Section   = Modification
 @Arguments = ifile ofile
-@Operators = setmissval setctomiss setmisstoc setrtomiss setvrange
+@Operators = setmissval setctomiss setmisstoc setrtomiss setvrange setmisstonn
 
 @BeginDescription
 This module sets part of a field to missing value or missing values
@@ -122,6 +122,30 @@ o(t,x) = \left\{
 \begin{array}{cll}
  \mbox{miss}   & \mbox{if} \;\; i(t,x) < \mbox{\sl rmin} \vee i(t,x) > \mbox{\sl rmax}  \\
  i(t,x) & \mbox{if} \;\; i(t,x) \geq \mbox{\sl rmin} \wedge i(t,x) \leq \mbox{\sl rmax}  \\
+\end{array}   \right.
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setmisstonn
+@Title     = Set missing value to nearest neightbour
+
+@BeginDescription
+Set all missing values to the nearest non missing value.
+@IfMan
+         / i(t,y) if i(t,x) EQ miss AND i(t,y) NE miss
+o(t,x) = 
+         \ i(t,x) if i(t,x) NE miss
+@EndifMan
+@IfDoc
+
+@BeginMath
+o(t,x) = \left\{
+\begin{array}{cll}
+ i(t,y) & \mbox{if} \;\; i(t,x) \geq \mbox{miss} \wedge i(t,y) \neq \mbox{miss}  \\
+ i(t,x) & \mbox{if} \;\; i(t,x) \neq \mbox{miss}  \\
 \end{array}   \right.
 @EndMath
 @EndifDoc

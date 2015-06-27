@@ -4,6 +4,7 @@ CDO NEWS
 Version 1.7.0 (28 October 2015):
 
    New operators:
+     * setmisstonn: Set missing value to nearest neightbour
      * vertstd1: Vertical standard deviation [Divisor is (n-1)]
      * vertvar1: Vertical variance [Divisor is (n-1)]
      * seasvar1: Seasonal variance [Divisor is (n-1)]

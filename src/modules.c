@@ -318,7 +318,7 @@ void *Maggraph(void *argument);
 #define  FCOperators            {"fc2sp", "sp2fc", "fc2gp", "gp2fc"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "pardes", \
                                  "vlist", "partab", "partab2", "spartab"}
-#define  FillmissOperators      {"fillmiss", "fillmiss2", "fillmissnn"}
+#define  FillmissOperators      {"fillmiss", "fillmiss2"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
@@ -400,6 +400,7 @@ void *Maggraph(void *argument);
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber", "setgriduri"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
+#define  SetmisstonnOperators   {"setmisstonn"}
 #define  Setpartab0Operators    {"setpartab"}
 #define  SetpartabOperators     {"setpartabc", "setpartabp", "setpartabn"}
 #define  SetrcanameOperators    {"setrcaname"}
@@ -665,6 +666,7 @@ static modules_t Modules[] =
   { Setgrid,        SetgridHelp,       SetgridOperators,       CDI_BOTH,  1,  1 },
   { Sethalo,        SethaloHelp,       SethaloOperators,       CDI_REAL,  1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,       CDI_REAL,  1,  1 },
+  { Fillmiss,       SetmissHelp,       SetmisstonnOperators,   CDI_REAL,  1,  1 },
   { Setpartab,      SetHelp,           Setpartab0Operators,    CDI_REAL,  1,  1 },
   { Setpartab,      SetpartabHelp,     SetpartabOperators,     CDI_REAL,  1,  1 },
   { Setrcaname,     NULL,              SetrcanameOperators,    CDI_REAL,  1,  1 },
