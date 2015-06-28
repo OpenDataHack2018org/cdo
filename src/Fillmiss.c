@@ -28,7 +28,7 @@
 #include "pstream.h"
 #include "grid.h"
 
-#include "kdtree.h"
+#include "grid_search.h"
 #include "clipping/geometry.h"
 
 
@@ -291,7 +291,6 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   double *xvals = (double*) malloc(gridsize*sizeof(double));
   double *yvals = (double*) malloc(gridsize*sizeof(double));
-  unsigned *index = (unsigned*) malloc(gridsize*sizeof(unsigned));
 
   if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
 
@@ -308,70 +307,47 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-
-  double pos[3];
-  double pos2[3];
-  struct kdtree *pointTree;
-  struct kdres *presults;
-  /*
-  pointTree = kd_create(2);
-  for ( unsigned i = 0; i < gridsize; ++i ) 
-    {
-      if ( !DBL_IS_EQUAL(array1[i], missval) )
-        {
-          index[i] = i;
-          pos[0] = xvals[i]; pos[1] = yvals[i];
-          kd_insert(pointTree, pos, &index[i]);
-        }
-    }
-
-  for ( unsigned i = 0; i < gridsize; ++i )
-    {
-      if ( DBL_IS_EQUAL(array1[i], missval) )
-        {
-          pos[0] = xvals[i]; pos[1] = yvals[i];
-          presults = kd_nearest(pointTree, pos);
-          unsigned *index = (unsigned*) kd_res_item(presults, pos2);
-          array2[i] = array1[*index];
-        }
-      else
-        {
-          array2[i] = array1[i];
-        }
-    }
-
-  kd_free(pointTree);
-  */
   clock_t start, finish;
 
   start = clock();
 
-  pointTree = kd_create(3);
+  double *lons = (double*) malloc(gridsize*sizeof(double));
+  double *lats = (double*) malloc(gridsize*sizeof(double));
+  unsigned *index = (unsigned*) calloc(1, gridsize*sizeof(unsigned));
+
+  unsigned n = 0;
   for ( unsigned i = 0; i < gridsize; ++i ) 
     {
       if ( !DBL_IS_EQUAL(array1[i], missval) )
         {
-          index[i] = i;
-          LLtoXYZ(xvals[i], yvals[i], pos);
-          kd_insert(pointTree, pos, &index[i]);
+          lons[n] = xvals[i];
+          lats[n] = yvals[i];
+          index[n] = i;
+          n++;
         }
     }
+
+  struct gridsearch *gs = gridsearch_index_create(n, lons, lats, index);
+
+  free(lons);
+  free(lats);
+  free(index);
   
   finish = clock();
 
-  if ( cdoVerbose ) printf("kd_tree created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+  if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
   start = clock();
 
-#pragma omp parallel for private(pos, pos2, presults) shared(array1, array2, xvals, yvals)
+  void *gs_result;
+#pragma omp parallel for private(gs_result) shared(array1, array2, xvals, yvals)
   for ( unsigned i = 0; i < gridsize; ++i )
     {
       if ( DBL_IS_EQUAL(array1[i], missval) )
         {
-          LLtoXYZ(xvals[i], yvals[i], pos);
-          presults = kd_nearest(pointTree, pos);
-          unsigned *index = (unsigned*) kd_res_item(presults, pos2);
-          array2[i] = array1[*index];
+          gs_result = gridsearch_nearest(gs, xvals[i], yvals[i]);
+          unsigned index = gridsearch_item(gs_result);
+          array2[i] = array1[index];
         }
       else
         {
@@ -409,9 +385,9 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   */
   finish = clock();
 
-  if ( cdoVerbose ) printf("kd_tree nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+  if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
-  kd_free(pointTree);
+  gridsearch_delete(gs);
 
   free(xvals);
   free(yvals);

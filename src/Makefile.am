@@ -72,6 +72,10 @@ libcdo_la_SOURCES =            \
                juldate.c       \
                kdtree.c        \
                kdtree.h        \
+               kdtree_fast.c   \
+               kdtree_fast.h   \
+               grid_search.c   \
+               grid_search.h   \
                kvlist.c        \
                kvlist.h        \
                list.c          \

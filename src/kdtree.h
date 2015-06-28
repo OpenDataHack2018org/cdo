@@ -44,15 +44,9 @@ void kd_free(struct kdtree *tree);
 /* remove all the elements from the tree */
 void kd_clear(struct kdtree *tree);
 
-/* if called with non-null 2nd argument, the function provided
- * will be called on data pointers (see kd_insert) when nodes
- * are to be removed from the tree.
- */
-void kd_data_destructor(struct kdtree *tree, void (*destr)(void*));
-
-/* insert a node, specifying its position, and optional data */
-int kd_insert(struct kdtree *tree, const double *pos, void *data);
-int kd_insert3(struct kdtree *tree, double x, double y, double z, void *data);
+/* insert a node, specifying its position, and optional index */
+int kd_insert(struct kdtree *tree, const double *pos, unsigned index);
+int kd_insert3(struct kdtree *tree, double x, double y, double z, unsigned index);
 
 /* Find the nearest node from a given point.
  *
@@ -102,14 +96,14 @@ int kd_res_end(struct kdres *set);
  */
 int kd_res_next(struct kdres *set);
 
-/* returns the data pointer (can be null) of the current result set item
+/* returns the index of the current result set item
  * and optionally sets its position to the pointers(s) if not null.
  */
-void *kd_res_item(struct kdres *set, double *pos);
-void *kd_res_item3(struct kdres *set, double *x, double *y, double *z);
+unsigned kd_res_item(struct kdres *set, double *pos);
+unsigned kd_res_item3(struct kdres *set, double *x, double *y, double *z);
 
 /* equivalent to kd_res_item(set, 0) */
-void *kd_res_item_data(struct kdres *set);
+unsigned kd_res_item_index(struct kdres *set);
 
 
 #ifdef __cplusplus

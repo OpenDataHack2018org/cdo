@@ -26,15 +26,13 @@ OF SUCH DAMAGE.
 */
 /* single nearest neighbor search written by Tamas Nepusz <tamas@cs.rhul.ac.uk> */
 /* U. Schulzweida, 20150627: removed float interface, set MAX_DIM=3 */
+/* U. Schulzweida, 20150628: changed void *data to unsiged index */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "kdtree.h"
 
-#if defined(WIN32) || defined(__WIN32__)
-#include <malloc.h>
-#endif
 
 #define MAX_DIM 3
 
@@ -47,7 +45,7 @@ struct kdhyperrect {
 struct kdnode {
 	double pos[MAX_DIM];
 	int dir;
-	void *data;
+	unsigned index;
 
 	struct kdnode *left, *right;	/* negative/positive side */
 };
@@ -62,7 +60,6 @@ struct kdtree {
 	int dim;
 	struct kdnode *root;
 	struct kdhyperrect *rect;
-	void (*destr)(void*);
 };
 
 struct kdres {
@@ -74,8 +71,7 @@ struct kdres {
 #define SQ(x)			((x) * (x))
 
 
-static void clear_rec(struct kdnode *node, void (*destr)(void*));
-static int insert_rec(struct kdnode **node, const double *pos, void *data, int dir, int dim);
+static int insert_rec(struct kdnode **node, const double *pos, unsigned index, int dir, int dim);
 static int rlist_insert(struct res_node *list, struct kdnode *item, double dist_sq);
 static void clear_results(struct kdres *set);
 
@@ -99,7 +95,6 @@ struct kdtree *kd_create(int k)
 
 	tree->dim = k;
 	tree->root = 0;
-	tree->destr = 0;
 	tree->rect = 0;
 
 	return tree;
@@ -113,22 +108,20 @@ void kd_free(struct kdtree *tree)
 	}
 }
 
-static void clear_rec(struct kdnode *node, void (*destr)(void*))
+static void clear_rec(struct kdnode *node)
 {
 	if(!node) return;
 
-	clear_rec(node->left, destr);
-	clear_rec(node->right, destr);
+	clear_rec(node->left);
+	clear_rec(node->right);
 	
-	if(destr) {
-		destr(node->data);
-	}
 	free(node);
 }
 
+
 void kd_clear(struct kdtree *tree)
 {
-	clear_rec(tree->root, tree->destr);
+	clear_rec(tree->root);
 	tree->root = 0;
 
 	if (tree->rect) {
@@ -137,13 +130,8 @@ void kd_clear(struct kdtree *tree)
 	}
 }
 
-void kd_data_destructor(struct kdtree *tree, void (*destr)(void*))
-{
-	tree->destr = destr;
-}
 
-
-static int insert_rec(struct kdnode **nptr, const double *pos, void *data, int dir, int dim)
+static int insert_rec(struct kdnode **nptr, const double *pos, unsigned index, int dir, int dim)
 {
 	int new_dir;
 	struct kdnode *node;
@@ -153,7 +141,7 @@ static int insert_rec(struct kdnode **nptr, const double *pos, void *data, int d
 			return -1;
 		}
 		memcpy(node->pos, pos, dim * sizeof *node->pos);
-		node->data = data;
+		node->index = index;
 		node->dir = dir;
 		node->left = node->right = 0;
 		*nptr = node;
@@ -163,14 +151,14 @@ static int insert_rec(struct kdnode **nptr, const double *pos, void *data, int d
 	node = *nptr;
 	new_dir = (node->dir + 1) % dim;
 	if(pos[node->dir] < node->pos[node->dir]) {
-		return insert_rec(&(*nptr)->left, pos, data, new_dir, dim);
+		return insert_rec(&(*nptr)->left, pos, index, new_dir, dim);
 	}
-	return insert_rec(&(*nptr)->right, pos, data, new_dir, dim);
+	return insert_rec(&(*nptr)->right, pos, index, new_dir, dim);
 }
 
-int kd_insert(struct kdtree *tree, const double *pos, void *data)
+int kd_insert(struct kdtree *tree, const double *pos, unsigned index)
 {
-	if (insert_rec(&tree->root, pos, data, 0, tree->dim)) {
+	if (insert_rec(&tree->root, pos, index, 0, tree->dim)) {
 		return -1;
 	}
 
@@ -184,13 +172,13 @@ int kd_insert(struct kdtree *tree, const double *pos, void *data)
 }
 
 
-int kd_insert3(struct kdtree *tree, double x, double y, double z, void *data)
+int kd_insert3(struct kdtree *tree, double x, double y, double z, unsigned index)
 {
 	double buf[3];
 	buf[0] = x;
 	buf[1] = y;
 	buf[2] = z;
-	return kd_insert(tree, buf, data);
+	return kd_insert(tree, buf, index);
 }
 
 static
@@ -487,18 +475,18 @@ int kd_res_next(struct kdres *rset)
 	return rset->riter != 0;
 }
 
-void *kd_res_item(struct kdres *rset, double *pos)
+unsigned kd_res_item(struct kdres *rset, double *pos)
 {
 	if(rset->riter) {
 		if(pos) {
 			memcpy(pos, rset->riter->item->pos, rset->tree->dim * sizeof *pos);
 		}
-		return rset->riter->item->data;
+		return rset->riter->item->index;
 	}
 	return 0;
 }
 
-void *kd_res_item3(struct kdres *rset, double *x, double *y, double *z)
+unsigned kd_res_item3(struct kdres *rset, double *x, double *y, double *z)
 {
 	if(rset->riter) {
 		if(*x) *x = rset->riter->item->pos[0];
@@ -508,7 +496,7 @@ void *kd_res_item3(struct kdres *rset, double *x, double *y, double *z)
 	return 0;
 }
 
-void *kd_res_item_data(struct kdres *set)
+unsigned kd_res_item_index(struct kdres *set)
 {
 	return kd_res_item(set, 0);
 }

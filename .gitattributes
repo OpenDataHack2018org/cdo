@@ -576,6 +576,8 @@ src/grid_area.c -text
 src/grid_gme.c -text
 src/grid_lcc.c -text
 src/grid_rot.c -text
+src/grid_search.c -text
+src/grid_search.h -text
 src/griddes.c -text
 src/griddes.h -text
 src/griddes_h5.c -text
@@ -590,6 +592,8 @@ src/job.c -text
 src/juldate.c -text
 src/kdtree.c -text
 src/kdtree.h -text
+src/kdtree_fast.c -text
+src/kdtree_fast.h -text
 src/kvlist.c -text
 src/kvlist.h -text
 src/list.c -text
