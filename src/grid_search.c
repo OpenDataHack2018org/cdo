@@ -41,7 +41,7 @@ struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lo
 #pragma omp simd
   for ( unsigned i = 0; i < n; i++ ) 
     {
-      LLtoXYZ(lons[i], lats[i], kdarray[i].xyz);
+      LLtoXYZ(lons[index[i]], lats[index[i]], kdarray[i].xyz);
       kdarray[i].index = index[i];
     }
 
@@ -54,7 +54,7 @@ struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lo
 
   for ( unsigned i = 0; i < n; i++ ) 
     {
-      LLtoXYZ(lons[i], lats[i], pos);
+      LLtoXYZ(lons[index[i]], lats[index[i]], pos);
       kd_insert(gs->kdt, pos, index[i]);
     }
 

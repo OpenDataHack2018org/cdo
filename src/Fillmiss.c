@@ -311,27 +311,33 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
-  double *lons = (double*) malloc(gridsize*sizeof(double));
-  double *lats = (double*) malloc(gridsize*sizeof(double));
-  unsigned *index = (unsigned*) calloc(1, gridsize*sizeof(unsigned));
+  unsigned nmiss = field1->nmiss;
+  unsigned nvals = gridsize - nmiss;
 
-  unsigned n = 0;
+  unsigned *mindex = (unsigned*) calloc(1, nmiss*sizeof(unsigned));
+  unsigned *vindex = (unsigned*) calloc(1, nvals*sizeof(unsigned));
+
+  unsigned nv = 0, nm = 0;
   for ( unsigned i = 0; i < gridsize; ++i ) 
     {
-      if ( !DBL_IS_EQUAL(array1[i], missval) )
+      if ( DBL_IS_EQUAL(array1[i], missval) )
         {
-          lons[n] = xvals[i];
-          lats[n] = yvals[i];
-          index[n] = i;
-          n++;
+          mindex[nm] = i;
+          nm++;
+        }
+      else
+        {
+          array2[i] = array1[i];
+          vindex[nv] = i;
+          nv++;
         }
     }
 
-  struct gridsearch *gs = gridsearch_index_create(n, lons, lats, index);
+  if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
+  
+  struct gridsearch *gs = gridsearch_index_create(nvals, xvals, yvals, vindex);
 
-  free(lons);
-  free(lats);
-  free(index);
+  free(vindex);
   
   finish = clock();
 
@@ -340,20 +346,16 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   start = clock();
 
   void *gs_result;
-#pragma omp parallel for private(gs_result) shared(array1, array2, xvals, yvals)
-  for ( unsigned i = 0; i < gridsize; ++i )
+#pragma omp parallel for private(gs_result) shared(mindex, array1, array2, xvals, yvals)
+  for ( unsigned i = 0; i < nmiss; ++i )
     {
-      if ( DBL_IS_EQUAL(array1[i], missval) )
-        {
-          gs_result = gridsearch_nearest(gs, xvals[i], yvals[i]);
-          unsigned index = gridsearch_item(gs_result);
-          array2[i] = array1[index];
-        }
-      else
-        {
-          array2[i] = array1[i];
-        }
+      gs_result = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]]);
+      unsigned index = gridsearch_item(gs_result);
+      array2[mindex[i]] = array1[index];
     }
+
+  free(mindex);
+
   /*
   double radius = 5.*M_PI/180.;
   
