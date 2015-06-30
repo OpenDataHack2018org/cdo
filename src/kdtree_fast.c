@@ -77,28 +77,28 @@ int visited;
 void nearest(struct kd_node_t *root, double *xyz, int i, int dim,
              struct kd_node_t **best, double *best_dist)
 {
-	double d, dx, dx2;
+  double d, dx, dx2;
  
-	if (!root) return;
-	d = dist(root->xyz, xyz, dim);
-	dx = root->xyz[i] - xyz[i];
-	dx2 = dx * dx;
+  if (!root) return;
+  d = dist(root->xyz, xyz, dim);
+  dx = root->xyz[i] - xyz[i];
+  dx2 = dx * dx;
  
-	visited ++;
+  visited ++;
  
-	if (!*best || d < *best_dist) {
-		*best_dist = d;
-		*best = root;
-	}
+  if (!*best || d < *best_dist) {
+    *best_dist = d;
+    *best = root;
+  }
  
-	/* if chance of exact match is high */
-	if (!*best_dist) return;
+  /* if chance of exact match is high */
+  if (!*best_dist) return;
  
-	if (++i >= dim) i = 0;
+  if ( ++i >= dim ) i = 0;
  
-	nearest(dx > 0 ? root->left : root->right, xyz, i, dim, best, best_dist);
-	if (dx2 >= *best_dist) return;
-	nearest(dx > 0 ? root->right : root->left, xyz, i, dim, best, best_dist);
+  nearest(dx > 0 ? root->left : root->right, xyz, i, dim, best, best_dist);
+  if ( dx2 >= *best_dist ) return;
+  nearest(dx > 0 ? root->right : root->left, xyz, i, dim, best, best_dist);
 }
 
 
