@@ -72,18 +72,8 @@ int *fill_vars(int vlistID)
 
 void *Arithc(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
-  int gridsize, i;
   int nrecs, recID;
-  int tsID;
   int varID, levelID;
-  int vlistID1, vlistID2;
-  double rconst;
-  field_t field;
-  int taxisID1, taxisID2;
-  int *vars = NULL;
 
   cdoInitialize(argument);
 
@@ -93,34 +83,35 @@ void *Arithc(void *argument)
   cdoOperatorAdd("divc", func_div, 0, "constant value");
   cdoOperatorAdd("mod",  func_mod, 0, "divisor");
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
   operatorInputArg(cdoOperatorEnter(operatorID));
-  rconst = parameter2double(operatorArgv()[0]);
+  double rconst = parameter2double(operatorArgv()[0]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  vars = fill_vars(vlistID1);
+  int *vars = fill_vars(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
   field_init(&field);
   field.ptr    = (double*) malloc(gridsize*sizeof(double));
   field.weight = NULL;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -142,7 +133,7 @@ void *Arithc(void *argument)
 	      /* recalculate number of missing values */
 	      gridsize = gridInqSize(field.grid);
 	      field.nmiss = 0;
-	      for ( i = 0; i < gridsize; ++i )
+	      for ( int i = 0; i < gridsize; ++i )
 		if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
 	    }
 
