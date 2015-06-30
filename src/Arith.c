@@ -63,6 +63,7 @@ void *Arith(void *argument)
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
+  operatorCheckArgc(0);
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int streamID2 = streamOpenRead(cdoStreamName(1));
