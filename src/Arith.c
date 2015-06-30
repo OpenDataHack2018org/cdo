@@ -35,11 +35,8 @@
 
 void *Arith(void *argument)
 {
-  int operatorID;
-  int operfunc;
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
-  int streamIDx1, streamIDx2, streamID1, streamID2, streamID3;
   int gridsize;
   int nrecs, nrecs2, nvars = 0, nlev, recID;
   int nlevels2 = 1;
@@ -48,10 +45,7 @@ void *Arith(void *argument)
   int varID2, levelID2;
   int offset;
   int lfill1, lfill2;
-  int ntsteps1, ntsteps2;
-  int vlistIDx1, vlistIDx2, vlistID1, vlistID2, vlistID3;
-  int taxisIDx1, taxisID1, taxisID2, taxisID3;
-  field_t *fieldx1, *fieldx2, field1, field2;
+  int streamID3, vlistID3, taxisID3;
   int *varnmiss2 = NULL;
   int **varnmiss = NULL;
   double *vardata2 = NULL;
@@ -67,31 +61,33 @@ void *Arith(void *argument)
   cdoOperatorAdd("max",   func_max,   0, NULL);
   cdoOperatorAdd("atan2", func_atan2, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  streamIDx1 = streamID1;
-  streamIDx2 = streamID2;
-  fieldx1 = &field1;
-  fieldx2 = &field2;
+  int streamIDx1 = streamID1;
+  int streamIDx2 = streamID2;
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistIDx1 = vlistID1;
-  vlistIDx2 = vlistID2;
+  field_t field1, field2;
+  field_t *fieldx1 = &field1;
+  field_t *fieldx2 = &field2;
+
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistIDx1 = vlistID1;
+  int vlistIDx2 = vlistID2;
 
   if ( cdoVerbose ) vlistPrint(vlistID1);
   if ( cdoVerbose ) vlistPrint(vlistID2);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisIDx1 = taxisID1;
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisIDx1 = taxisID1;
 
-  ntsteps1 = vlistNtsteps(vlistID1);
-  ntsteps2 = vlistNtsteps(vlistID2);
+  int ntsteps1 = vlistNtsteps(vlistID1);
+  int ntsteps2 = vlistNtsteps(vlistID2);
   if ( ntsteps1 == 0 ) ntsteps1 = 1;
   if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
