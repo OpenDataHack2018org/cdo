@@ -36,15 +36,6 @@ contrib/cdoCompletion.zsh -text
 contrib/conda/build.sh -text
 contrib/conda/meta.yaml -text
 contrib/makecompl.rb -text
-contrib/python/cdo.py -text
-contrib/python/setup.py -text
-contrib/python/test/cdo.py -text
-contrib/python/test/test_cdo.py -text
-contrib/ruby/ChangeLog -text
-contrib/ruby/README.rdoc -text
-contrib/ruby/gemspec -text
-contrib/ruby/lib/cdo.rb -text
-contrib/ruby/test/test_cdo.rb -text
 doc/Doxyfile -text
 doc/cdo-poster.pdf -text
 doc/cdo.pdf -text
