@@ -226,6 +226,32 @@ AC_SUBST([NETCDF_ROOT])
 AC_SUBST([NETCDF_INCLUDE])
 AC_SUBST([NETCDF_LIBS])
 #  ----------------------------------------------------------------------
+#  Link application with CMOR library
+CMOR_LIBS=''
+AC_ARG_WITH([cmor],
+            [AS_HELP_STRING([--with-cmor=<directory>],
+                            [Specify location of CMOR library.])],
+            [AS_CASE(["$with_cmor"],
+                     [no],[AC_MSG_CHECKING([for cmor library])
+                           AC_MSG_RESULT([suppressed])],
+                     [yes],[AC_CHECK_HEADERS([cmor.h])
+                            AC_SEARCH_LIBS([cmor_load_table],[cmor],[AC_DEFINE([HAVE_LIBCMOR],[1],[Define to 1 for CMOR support])],
+                                           [AC_MSG_ERROR([Could not link to cmor library!])])
+                            AC_SUBST([CMOR_LIBS],[" -lcmor"])],
+                     [*],[CMOR_ROOT=$with_cmor
+                          AS_IF([test -d "$CMOR_ROOT"],
+                                [LDFLAGS="$LDFLAGS -L$CMOR_ROOT/lib"
+                                 CPPFLAGS="$CPPFLAGS -I$CMOR_ROOT/include"
+                                 AC_SEARCH_LIBS([cmor_load_table],
+                                                [cmor],
+                                                [AC_DEFINE([HAVE_LIBCMOR],[1],[Define to 1 for CMOR support])],
+                                                [AC_MSG_ERROR([Could not link to cmor library!])])
+                                 CMOR_LIBS=" -L$CMOR_ROOT/lib -lcmor"],
+                                [AC_MSG_ERROR([$CMOR_ROOT is not a directory! CMOR suppressed])])])],
+            [AC_MSG_CHECKING([for the CMOR library])
+             AC_MSG_RESULT([suppressed])])
+AC_SUBST([CMOR_LIBS])
+#  ----------------------------------------------------------------------
 #  Link application with JASPER library (needed for GRIB2 compression)
 JASPER_LIBS=''
 AC_ARG_WITH([jasper],
@@ -242,7 +268,7 @@ AC_ARG_WITH([jasper],
                           AS_IF([test -d "$JASPER_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$JASPER_ROOT/lib"
                                  CPPFLAGS="$CPPFLAGS -I$JASPER_ROOT/include"
-                                 AC_SEARCH_LIBS([jas_stream_memopen],
+                                 AC_SEARCH_LIBS([jas_init],
                                                 [jasper],
                                                 [AC_DEFINE([HAVE_LIBJASPER],[1],[Define to 1 for JPEG compression for GRIB2])],
                                                 [AC_MSG_ERROR([Could not link to jasper library! Required for GRIB_API])])

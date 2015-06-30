@@ -65,6 +65,7 @@ case "${HOSTNAME}" in
 #                 --with-hdf5=/opt/local \
 #                 --with-szlib=$HOME/local \
 #                 --with-proj=/opt/local \
+#                 --with-cmor=/Users/m214003/work/CMOR \
 #                 --with-curl=/opt/local"
         CDOLIBS="--with-fftw3 \
                  --with-grib_api=$HOME/local/gribapi-1.13.0 \

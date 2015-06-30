@@ -12,6 +12,9 @@
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA
 
+/* Define to 1 if you have the <cmor.h> header file. */
+#undef HAVE_CMOR_H
+
 /* Define to 1 if you have the <curl/curl.h> header file. */
 #undef HAVE_CURL_CURL_H
 
@@ -54,6 +57,9 @@
 
 /* Define to 1 for GRIB1 decoding/encoding with cgribex */
 #undef HAVE_LIBCGRIBEX
+
+/* Define to 1 for CMOR support */
+#undef HAVE_LIBCMOR
 
 /* Define to 1 for CURL support */
 #undef HAVE_LIBCURL
@@ -254,11 +260,6 @@
 
 /* Version number of package */
 #undef VERSION
-
-/* Enable large inode numbers on Mac OS X 10.5.  */
-#ifndef _DARWIN_USE_64_BIT_INODE
-# define _DARWIN_USE_64_BIT_INODE 1
-#endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS
