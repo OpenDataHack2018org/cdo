@@ -90,6 +90,27 @@ case "${HOSTNAME}" in
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
 	;;
+    daint*)
+        CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1"
+
+        if  test "$COMP" = icc ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    $CDOLIBS \
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -openmp"
+        elif  test "$COMP" = pgcc ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=pgcc CFLAGS="-g -O2 -march=native"
+        elif  test "$COMP" = cc ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=pgcc CFLAGS="-g -O2 -march=native"
+        else
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    $CDOLIBS \
+	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -Wa,-q"
+        fi
+	;;
 # x86_64-squeeze-x64-linux
     thunder*)
         CDOLIBS="--with-jasper=/sw/squeeze-x64/jasper-1.900.1-static \
