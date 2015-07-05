@@ -91,21 +91,23 @@ case "${HOSTNAME}" in
         fi
 	;;
     daint*)
-        CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1"
-
         if  test "$COMP" = icc ; then
+          CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/INTEL/14.0"
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -openmp"
         elif  test "$COMP" = pgcc ; then
+          CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/PGI/15.3"
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -O2 -march=native"
         elif  test "$COMP" = cc ; then
+          CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/CRAY/8.3"
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -O2 -march=native"
         else
+          CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/GNU/4.9"
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
 	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -Wa,-q"
