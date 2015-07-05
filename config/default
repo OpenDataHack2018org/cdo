@@ -100,12 +100,12 @@ case "${HOSTNAME}" in
           CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/PGI/15.3"
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=pgcc CFLAGS="-g -O2 -march=native"
+	            CC=pgcc CFLAGS="-g -O2"
         elif  test "$COMP" = cray ; then
           CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/CRAY/8.3"
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=cc CFLAGS="-g -O2 -march=native"
+	            CC=cc CFLAGS="-g -O2"
         else
           CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/GNU/4.9"
 	  ${CONFPATH}configure --prefix=$HOME/local \
