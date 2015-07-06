@@ -98,7 +98,7 @@ case "${HOSTNAME}" in
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -openmp"
         elif  test "$COMP" = pgcc ; then
           CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/PGI/15.3"
-	  ${CONFPATH}configure  \
+	  ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -O2"
         elif  test "$COMP" = cray ; then

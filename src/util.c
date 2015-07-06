@@ -146,13 +146,11 @@ int wildcardmatch(const char *w, const char *s)
 
 int cdo_omp_get_thread_num(void)
 {
-  int threadnum = 0;
-
 #if defined(_OPENMP)
-  threadnum = omp_get_thread_num();
+  return omp_get_thread_num();
+#else
+  return 0;
 #endif
-
-  return (threadnum);
 }
 
 
