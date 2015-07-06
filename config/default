@@ -105,7 +105,7 @@ case "${HOSTNAME}" in
           CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/CRAY/8.3"
 	  ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \
-	            CC=cc CFLAGS="-g -O2"
+	            CC=cc CFLAGS="-g -O2 -h noomp"
         else
           CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/GNU/4.9"
 	  ${CONFPATH}configure --prefix=$HOME/local \
