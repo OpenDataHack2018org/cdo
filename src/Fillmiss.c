@@ -287,6 +287,8 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   double *array1 = field1->ptr;
   double *array2 = field2->ptr;
 
+  UNUSED(maxfill);
+
   unsigned gridsize = gridInqSize(gridID);
 
   double *xvals = (double*) malloc(gridsize*sizeof(double));
@@ -402,7 +404,7 @@ void *Fillmiss(void *argument)
   int nrecs;
   int recID, varID, levelID;
   int nmiss, i, nfill = 1;
-  void (*fill_method) (field_t *fin , field_t *fout , int);
+  void (*fill_method) (field_t *fin , field_t *fout , int) = NULL;
 
   cdoInitialize(argument);
 
@@ -485,8 +487,9 @@ void *Fillmiss(void *argument)
             {
               gridID = vlistInqVarGrid(vlistID1, varID);
 
-              if ( gridInqType(gridID) == GRID_GME ||
-                   gridInqType(gridID) == GRID_UNSTRUCTURED )
+              if ( operatorID != SETMISSTONN && 
+                   (gridInqType(gridID) == GRID_GME ||
+                    gridInqType(gridID) == GRID_UNSTRUCTURED) )
                 cdoAbort("%s data unsupported!", gridNamePtr(gridInqType(gridID)) );
                 
               field1.grid    = gridID;
