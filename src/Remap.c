@@ -204,6 +204,48 @@ void print_remap_info(int operfunc, remapgrid_t *src_grid, remapgrid_t *tgt_grid
   cdoPrint(line);
 }
 
+static
+void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_grid, int nmiss)
+{
+  char line[256];
+  char tmpstr[256];
+
+  line[0] = 0;
+  /*
+  if      ( operfunc == REMAPBIL  || operfunc == GENBIL  )  strcpy(line, "SCRIP bilinear");
+  else if ( operfunc == REMAPBIC  || operfunc == GENBIC  )  strcpy(line, "SCRIP bicubic");
+  else if ( operfunc == REMAPNN   || operfunc == GENNN   )  strcpy(line, "SCRIP nearest neighbor");
+  else if ( operfunc == REMAPDIS  || operfunc == GENDIS  )  strcpy(line, "SCRIP distance-weighted average");
+  else if ( operfunc == REMAPCON  || operfunc == GENCON  )  strcpy(line, "SCRIP first order conservative");
+  else if ( operfunc == REMAPCON2 || operfunc == GENCON2 )  strcpy(line, "SCRIP second order conservative");
+  else if ( operfunc == REMAPLAF  || operfunc == GENLAF  )  strcpy(line, "YAC largest area fraction");
+  else if ( operfunc == REMAPYCON || operfunc == GENYCON )  strcpy(line, "YAC first order conservative");
+  else                                                      strcpy(line, "Unknown");
+
+  strcat(line, " remap weights from ");
+  */
+  strcat(line, "Remap weights from ");
+  strcat(line, remap_file);
+  strcat(line, " not used, ");
+  strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
+  if ( src_grid->rank == 2 )
+    sprintf(tmpstr, " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
+  else
+    sprintf(tmpstr, " (%d)", src_grid->dims[0]);
+  strcat(line, tmpstr);
+  strcat(line, " grid");
+
+  if ( nmiss > 0 )
+    {
+      sprintf(tmpstr, " with mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      strcat(line, tmpstr);
+    }
+
+  strcat(line, " not found!");
+
+  cdoWarning(line);
+}
+
 
 double remap_threshhold = 2;
 double remap_search_radius = 180;
@@ -748,6 +790,7 @@ void *Remap(void *argument)
   int operatorID   = cdoOperatorID();
   int operfunc     = cdoOperatorF1(operatorID);
   int lwrite_remap = cdoOperatorF2(operatorID);
+  int lremapxxx    = operfunc == REMAPXXX;
 
   remap_set_int(REMAP_WRITE_REMAP, lwrite_remap);
 
@@ -765,7 +808,7 @@ void *Remap(void *argument)
 	cdoPrint("Extrapolation disabled!");
     }
 
-  if ( operfunc == REMAPXXX )
+  if ( lremapxxx )
     {
       operatorInputArg("grid description file or name, remap weights file (SCRIP netCDF)");
       operatorCheckArgc(2);
@@ -807,16 +850,17 @@ void *Remap(void *argument)
       remaps = (remap_t*) malloc(max_remaps*sizeof(remap_t));
       for ( r = 0; r < max_remaps; r++ )
 	{
+	  remaps[r].nused    = 0;
 	  remaps[r].gridID   = -1;
 	  remaps[r].gridsize = 0;
 	  remaps[r].nmiss    = 0;
 	}
     }
 
-  if ( lwrite_remap || operfunc == REMAPXXX )
+  if ( lwrite_remap || lremapxxx )
     remap_genweights = TRUE;
 
-  if ( operfunc == REMAPXXX )
+  if ( lremapxxx )
     {
       int gridsize2;
 
@@ -824,9 +868,8 @@ void *Remap(void *argument)
 		       &remap_order, &remaps[0].src_grid, &remaps[0].tgt_grid, &remaps[0].vars);
       nremaps = 1;
       gridsize = remaps[0].src_grid.size;
-      remaps[0].gridID = gridID1;
+      remaps[0].gridID   = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
-      remaps[0].nmiss = 0;
 
       if ( map_type == MAP_TYPE_DISTWGT && !lextrapolate ) remap_extrapolate = TRUE;
       if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = TRUE;
@@ -1114,6 +1157,8 @@ void *Remap(void *argument)
 	  
 	  if ( remap_genweights )
 	    {
+              remaps[r].nused++;
+
 	      if ( need_gradiants )
 		{
 		  if ( remaps[r].src_grid.rank != 2 && remap_order == 2 )
@@ -1224,6 +1269,9 @@ void *Remap(void *argument)
 
   if ( max_remaps > 0 )
     {
+      if ( lremapxxx && remap_genweights && remaps[0].nused == 0 )
+        print_remap_warning(remap_file, operfunc, &remaps[0].src_grid, remaps[0].nmiss);
+      
       for ( r = 0; r < nremaps; r++ )
 	{
 	  remapVarsFree(&remaps[r].vars);

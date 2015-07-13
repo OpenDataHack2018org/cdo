@@ -148,6 +148,7 @@ typedef struct {
 remapvars_t;
 
 typedef struct {
+  int      nused;
   int      gridID;
   int      gridsize;
   int      nmiss;
