@@ -120,13 +120,12 @@ case "${HOSTNAME}" in
 	;;
 # x86_64-squeeze-x64-linux
     thunder*)
-        CDOLIBS="--with-jasper=/sw/squeeze-x64/jasper-1.900.1-static \
-                    --with-grib_api=/sw/squeeze-x64/grib_api-1.13.0-static-gccsys \
-                    --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
-                    --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
-                    --with-szlib=/sw/squeeze-x64/szip-2.1 \
-                    --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
-                    --with-proj=/sw/squeeze-x64/proj-4.7.0"
+        CDOLIBS="--with-grib_api=/sw/squeeze-x64/grib_api-1.13.0-static-gccsys \
+                 --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
+                 --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
+                 --with-szlib=/sw/squeeze-x64/szip-2.1 \
+                 --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
+                 --with-proj=/sw/squeeze-x64/proj-4.7.0"
 
         if  test "$COMP" = icc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
