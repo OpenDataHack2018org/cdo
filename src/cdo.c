@@ -23,7 +23,7 @@
 //#define _XOPEN_SOURCE 600 /* gethostname */
 #endif
 
-#include <ctype.h>
+//#include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
 #if defined(HAVE_GETRLIMIT)
@@ -1410,6 +1410,15 @@ int main(int argc, char *argv[])
   check_stacksize();
 
   if ( Debug ) print_pthread_info();
+
+#if defined(_OPENMP)
+  if ( Debug )
+    {
+      fprintf(stderr, "OMP num procs       = %d\n", omp_get_num_procs());
+      fprintf(stderr, "OMP max threads     = %d\n", omp_get_max_threads());
+      fprintf(stderr, "OMP num threads     = %d\n", numThreads);
+    }
+#endif
 
 #if defined(_OPENMP)
   if ( numThreads <= 0 ) numThreads = 1;

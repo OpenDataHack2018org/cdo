@@ -20,6 +20,7 @@ Selects a box of the rectangularly understood field. All input fields need to ha
 @BeginDescription
 Selects a regular longitude/latitude box. The user has to give the longitudes and latitudes of the 
 edges of the box. Considered are only those grid cells with the grid center inside the lon/lat box.
+For rotated lon/lat grids the parameter needs to be rotated coordinates.
 @EndDescription
 @EndOperator
 
