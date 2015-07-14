@@ -23,7 +23,7 @@
 //#define _XOPEN_SOURCE 600 /* gethostname */
 #endif
 
-//#include <ctype.h>
+#include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
 #if defined(HAVE_GETRLIMIT)
@@ -772,10 +772,8 @@ void get_env_vars(void)
 static
 void print_system_info()
 {
-  char *envstr;
+  const char *envstr;
 
-  if ( DebugLevel == 0 ) DebugLevel = 1;
-  cdoSetDebug(DebugLevel);
   fprintf(stderr, "\n");
   fprintf(stderr, "CDO_Color           = %d\n", CDO_Color);
   fprintf(stderr, "CDO_Reset_History   = %d\n", CDO_Reset_History);
@@ -1412,17 +1410,26 @@ int main(int argc, char *argv[])
   if ( Debug ) print_pthread_info();
 
 #if defined(_OPENMP)
+  if ( numThreads <= 0 ) numThreads = 1;
+  omp_set_num_threads(numThreads);
+
   if ( Debug )
     {
       fprintf(stderr, "OMP num procs       = %d\n", omp_get_num_procs());
       fprintf(stderr, "OMP max threads     = %d\n", omp_get_max_threads());
-      fprintf(stderr, "OMP num threads     = %d\n", numThreads);
-    }
+      fprintf(stderr, "OMP num threads     = %d\n", omp_get_num_threads());
+      fprintf(stderr, "OMP num threads     = %d\n", omp_get_num_threads());
+      fprintf(stderr, "OMP thread limit    = %d\n", omp_get_thread_limit());
+      omp_sched_t kind;
+      int modifer;
+      omp_get_schedule(&kind, &modifer);
+      fprintf(stderr, "OMP schedule        = %d (1:static; 2:dynamic; 3:guided; 4:auto)\n", (int) kind);
+#if defined(HAVE_OPENMP4)
+      fprintf(stderr, "OMP proc bind       = %d (0:false; 1:true; 2:master; 3:close; 4:spread)\n", (int) omp_get_proc_bind());
+      fprintf(stderr, "OMP num devices     = %d\n", omp_get_num_devices());
 #endif
+    }
 
-#if defined(_OPENMP)
-  if ( numThreads <= 0 ) numThreads = 1;
-  omp_set_num_threads(numThreads);
   ompNumThreads = omp_get_max_threads();
   if ( omp_get_max_threads() > omp_get_num_procs() )
     fprintf(stderr, "Warning: Number of OMP threads is greater than number of Cores=%d!\n", omp_get_num_procs());
@@ -1480,6 +1487,12 @@ int main(int argc, char *argv[])
     }
   else
     {
+      if ( Debug )
+        {
+          if ( DebugLevel == 0 ) DebugLevel = 1;
+          cdoSetDebug(DebugLevel);
+         }
+
       timer_total      = timer_new("total");
       timer_read       = timer_new("read");
       timer_write      = timer_new("write");
