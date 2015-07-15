@@ -85,32 +85,34 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   int gridID;
   int gridID2 = -1;
   int gridtype = -1;
-  int *xsize, *ysize;
   int *xoff, *yoff;
   int xsize2, ysize2;
   int idx;
   int nx, ny, ix, iy, i, j, ij, offset;
-  double **xvals, **yvals;
+  int lregular = TRUE;
   double *xvals2, *yvals2;
-  xyinfo_t *xyinfo;
 
   gridID   = vlistGrid(ef[0].vlistID, igrid);
   gridtype = gridInqType(gridID);
   if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
     return (gridID2);
 
-  xsize = (int*) malloc(nfiles*sizeof(int));
-  ysize = (int*) malloc(nfiles*sizeof(int));
-  xyinfo = (xyinfo_t*) malloc(nfiles*sizeof(xyinfo_t));
-  xvals = (double**) malloc(nfiles*sizeof(double*));
-  yvals = (double**) malloc(nfiles*sizeof(double*));
+  int *xsize = (int*) malloc(nfiles*sizeof(int));
+  int *ysize = (int*) malloc(nfiles*sizeof(int));
+  xyinfo_t *xyinfo = (xyinfo_t*) malloc(nfiles*sizeof(xyinfo_t));
+  double **xvals = (double**) malloc(nfiles*sizeof(double*));
+  double **yvals = (double**) malloc(nfiles*sizeof(double*));
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       gridID   = vlistGrid(ef[fileID].vlistID, igrid);
       gridtype = gridInqType(gridID);
-      if ( !(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ||
-	    (gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0)) )
+      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ||
+	    (gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0) )
+        lregular = TRUE;
+      else if ( gridtype == GRID_CURVILINEAR )
+        lregular = FALSE;
+      else
 	cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
       xsize[fileID] = gridInqXsize(gridID);
@@ -121,8 +123,17 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       if ( xsize != gridInqXsize(gridID) ) cdoAbort("xsize differ!");
       if ( ysize != gridInqYsize(gridID) ) cdoAbort("ysize differ!");
       */
-      xvals[fileID] = (double*) malloc(xsize[fileID]*sizeof(double));
-      yvals[fileID] = (double*) malloc(ysize[fileID]*sizeof(double));
+      if ( lregular )
+        {
+          xvals[fileID] = (double*) malloc(xsize[fileID]*sizeof(double));
+          yvals[fileID] = (double*) malloc(ysize[fileID]*sizeof(double));
+        }
+      else
+        {
+          xvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
+          yvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
+        }
+        
       gridInqXvals(gridID, xvals[fileID]);
       gridInqYvals(gridID, yvals[fileID]);
 
@@ -173,9 +184,17 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   for ( j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
   if ( cdoVerbose ) cdoPrint("xsize2 %d  ysize2 %d", xsize2, ysize2);
 
-  xvals2 = (double*) malloc(xsize2*sizeof(double));
-  yvals2 = (double*) malloc(ysize2*sizeof(double));
-
+  if ( lregular )
+    {
+      xvals2 = (double*) malloc(xsize2*sizeof(double));
+      yvals2 = (double*) malloc(ysize2*sizeof(double));
+    }
+  else
+    {
+      xvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
+      yvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
+    }
+    
   xoff = (int*) malloc((nx+1)*sizeof(int));
   yoff = (int*) malloc((ny+1)*sizeof(int));
 
@@ -183,7 +202,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   for ( i = 0; i < nx; ++i )
     {
       idx = xyinfo[i].id;
-      memcpy(xvals2+xoff[i], xvals[idx], xsize[idx]*sizeof(double));
+      if ( lregular ) memcpy(xvals2+xoff[i], xvals[idx], xsize[idx]*sizeof(double));
       xoff[i+1] = xoff[i] + xsize[idx];
     }
 
@@ -191,7 +210,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   for ( j = 0; j < ny; ++j )
     {
       idx = xyinfo[j*nx].id;
-      memcpy(yvals2+yoff[j], yvals[idx], ysize[idx]*sizeof(double));
+      if ( lregular ) memcpy(yvals2+yoff[j], yvals[idx], ysize[idx]*sizeof(double));
       yoff[j+1] = yoff[j] + ysize[idx];
     }
 
@@ -212,6 +231,11 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 	  for ( j = 0; j < ysize[idx]; ++j )
 	    for ( i = 0; i < xsize[idx]; ++i )
 	      {
+                if ( !lregular )
+                  {
+                    xvals2[offset+j*xsize2+i] = xvals[idx][ij];
+                    yvals2[offset+j*xsize2+i] = yvals[idx][ij];
+                  }
 		gridindex[idx][ij++] = offset+j*xsize2+i;
 	      }
 	}
@@ -265,7 +289,6 @@ void *Collgrid(void *argument)
   int nrecs, nrecs0;
   int levelID;
   int nmiss;
-  int taxisID1, taxisID2;
   double missval;
   int fileID;
 
@@ -403,8 +426,8 @@ void *Collgrid(void *argument)
     }
 
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int gridsize2 = 0;
