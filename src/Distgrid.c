@@ -27,25 +27,38 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	      int **gridindex, int *ogridsize, int nsplit)
 {
   int gridID2;
-  int gridtype;
-  int nx, ny;
   int gridsize2;
-  int index, i, j, ix, iy, offset;
-  int *xlsize = NULL, *ylsize = NULL;
-  double *xvals = NULL, *yvals = NULL;
+  int i, j, ix, iy, offset;
 
-  gridtype = gridInqType(gridID1);
-  if ( !(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC) )
+  int gridtype = gridInqType(gridID1);
+  int lregular = TRUE;
+  if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC )
+    lregular = TRUE;
+  else if ( gridtype == GRID_CURVILINEAR )
+    lregular = FALSE;
+  else
     cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
-  nx = gridInqXsize(gridID1);
-  ny = gridInqYsize(gridID1);
+  int nx = gridInqXsize(gridID1);
+  int ny = gridInqYsize(gridID1);
 
-  xvals = (double*) malloc(nx*sizeof(double));
-  yvals = (double*) malloc(ny*sizeof(double));
-
-  xlsize = (int*) malloc(nxblocks*sizeof(int));
-  ylsize = (int*) malloc(nyblocks*sizeof(int));
+  double *xvals = NULL, *yvals = NULL;
+  double *xvals2 = NULL, *yvals2 = NULL;
+  if ( lregular )
+    {
+      xvals = (double*) malloc(nx*sizeof(double));
+      yvals = (double*) malloc(ny*sizeof(double));
+    }
+  else
+    {
+      xvals = (double*) malloc(nx*ny*sizeof(double));
+      yvals = (double*) malloc(nx*ny*sizeof(double));
+      xvals2 = (double*) malloc(nxvals*nyvals*sizeof(double));
+      yvals2 = (double*) malloc(nxvals*nyvals*sizeof(double));      
+    }
+  
+  int *xlsize = (int*) malloc(nxblocks*sizeof(int));
+  int *ylsize = (int*) malloc(nyblocks*sizeof(int));
 
   gridInqXvals(gridID1, xvals);
   gridInqYvals(gridID1, yvals);
@@ -58,7 +71,7 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
   if ( ny%nyblocks != 0 ) ylsize[nyblocks-1] = ny - (nyblocks-1)*nyvals;
   if ( cdoVerbose ) for ( iy = 0; iy < nyblocks; ++iy ) cdoPrint("yblock %d: %d", iy, ylsize[iy]);
 
-  index = 0;
+  int index = 0;
   for ( iy = 0; iy < nyblocks; ++iy )
     for ( ix = 0; ix < nxblocks; ++ix )
       {
@@ -74,6 +87,11 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	    for ( i = 0; i < xlsize[ix]; ++i )
 	      {
 	       	// printf(">> %d %d %d\n", j, i, offset + j*nx + i);
+                if ( !lregular )
+                  {
+                    xvals2[gridsize2] = xvals[offset + j*nx + i];
+                    yvals2[gridsize2] = yvals[offset + j*nx + i];
+                  }
 		gridindex[index][gridsize2++] = offset + j*nx + i;
 	      }
 	  }
@@ -82,9 +100,18 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	gridID2 = gridCreate(gridtype, gridsize2);
 	gridDefXsize(gridID2, xlsize[ix]);
 	gridDefYsize(gridID2, ylsize[iy]);
-	gridDefXvals(gridID2, xvals+ix*nxvals);
-	gridDefYvals(gridID2, yvals+iy*nyvals);
 
+        if ( lregular )
+          {
+            gridDefXvals(gridID2, xvals+ix*nxvals);
+            gridDefYvals(gridID2, yvals+iy*nyvals);
+          }
+        else
+          {
+            gridDefXvals(gridID2, xvals2);
+            gridDefYvals(gridID2, yvals2);
+          }
+        
 	gridIDs[index] = gridID2;
 	ogridsize[index] = gridsize2;
 
@@ -93,6 +120,8 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	  cdoAbort("Internal problem, index exceeded bounds!");
       }
 
+  if ( xvals2 ) free(xvals2);
+  if ( yvals2 ) free(yvals2);
   free(xvals);
   free(yvals);
   free(xlsize);
@@ -162,7 +191,7 @@ void *Distgrid(void *argument)
     {
       gridID1 = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
-      if ( gridtype == GRID_LONLAT   || gridtype == GRID_GAUSSIAN ||
+      if ( gridtype == GRID_LONLAT   || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
 	  (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) )
 	   break;
     }

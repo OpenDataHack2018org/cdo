@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-07-15  Uwe Schulzweida
+
+	* distgrid: added support for curvilinear grids
+
 2015-06-27  Uwe Schulzweida
 
 	* New operator: setmisstonn - Set missing value to nearest neightbour

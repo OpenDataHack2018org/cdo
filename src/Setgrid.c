@@ -88,6 +88,7 @@ void *Setgrid(void *argument)
       if      ( strcmp(gridname, "curvilinear") == 0 )   gridtype = GRID_CURVILINEAR;
       else if ( strcmp(gridname, "cell") == 0 )          gridtype = GRID_UNSTRUCTURED;
       else if ( strcmp(gridname, "unstructured") == 0 )  gridtype = GRID_UNSTRUCTURED;
+      else if ( strcmp(gridname, "generic") == 0 )       gridtype = GRID_GENERIC;
       else if ( strcmp(gridname, "dereference") == 0 )   ldereference = 1;
       else if ( strcmp(gridname, "lonlat") == 0 )        gridtype = GRID_LONLAT;
       else if ( strcmp(gridname, "gaussian") == 0 )      gridtype = GRID_GAUSSIAN;
