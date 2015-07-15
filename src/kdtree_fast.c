@@ -74,8 +74,8 @@ struct kd_node_t *make_tree(struct kd_node_t *t, int len, int i, int dim)
 /* global variable, so sue me */
 int visited;
  
-void nearest(struct kd_node_t *root, double *xyz, int i, int dim,
-             struct kd_node_t **best, double *best_dist)
+void kd_find_nearest(struct kd_node_t *root, double *xyz, int i, int dim,
+                     struct kd_node_t **best, double *best_dist)
 {
   double d, dx, dx2;
  
@@ -96,9 +96,9 @@ void nearest(struct kd_node_t *root, double *xyz, int i, int dim,
  
   if ( ++i >= dim ) i = 0;
  
-  nearest(dx > 0 ? root->left : root->right, xyz, i, dim, best, best_dist);
+  kd_find_nearest(dx > 0 ? root->left : root->right, xyz, i, dim, best, best_dist);
   if ( dx2 >= *best_dist ) return;
-  nearest(dx > 0 ? root->right : root->left, xyz, i, dim, best, best_dist);
+  kd_find_nearest(dx > 0 ? root->right : root->left, xyz, i, dim, best, best_dist);
 }
 
 
@@ -107,7 +107,7 @@ void *kd_nearest(struct kd_node_t *root, double *xyz)
   struct kd_node_t *found = NULL;
   double dist;
 
-  nearest(root, xyz, 0, 3, &found, &dist);
+  kd_find_nearest(root, xyz, 0, 3, &found, &dist);
 
   return (void *) found;
 }
@@ -140,7 +140,7 @@ int main(void)
  
 	visited = 0;
 	found = 0;
-	nearest(root, &this, 0, 2, &found, &best_dist);
+	kd_find_nearest(root, &this, 0, 2, &found, &best_dist);
  
 	printf(">> WP tree\nsearching for (%g, %g)\n"
 		"found (%g, %g) dist %g\nseen %d nodes\n\n",
@@ -156,7 +156,7 @@ int main(void)
  
 	visited = 0;
 	found = 0;
-	nearest(root, &this, 0, 3, &found, &best_dist);
+	kd_find_nearest(root, &this, 0, 3, &found, &best_dist);
  
 	printf(">> Million tree\nsearching for (%g, %g, %g)\n"
 		"found (%g, %g, %g) dist %g\nseen %d nodes\n",
@@ -178,7 +178,7 @@ int main(void)
 		found = 0;
 		visited = 0;
 		rand_pt(this);
-		nearest(root, &this, 0, 3, &found, &best_dist);
+		kd_find_nearest(root, &this, 0, 3, &found, &best_dist);
 		sum += visited;
 	}
 	printf("\n>> Million tree\n"

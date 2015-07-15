@@ -10,8 +10,8 @@ struct kd_node_t {
 };
 
 struct kd_node_t *make_tree(struct kd_node_t *t, int len, int i, int dim);
-void nearest(struct kd_node_t *root, double *xyz, int i, int dim,
-             struct kd_node_t **best, double *best_dist);
+void kd_find_nearest(struct kd_node_t *root, double *xyz, int i, int dim,
+                     struct kd_node_t **best, double *best_dist);
 void *kd_nearest(struct kd_node_t *root, double *xyz);
 unsigned kd_item(struct kd_node_t *result);
 
