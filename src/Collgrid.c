@@ -87,8 +87,9 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   int gridID2 = -1;
   int idx;
   int nx, ny, ix, iy, i, j, ij, offset;
-  int lregular = TRUE;
-  double *xvals2, *yvals2;
+  int lregular = FALSE;
+  int lcurvilinear = FALSE;
+  double *xvals2 = NULL, *yvals2 = NULL;
 
   int gridID   = vlistGrid(ef[0].vlistID, igrid);
   int gridtype = gridInqType(gridID);
@@ -105,11 +106,12 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
     {
       gridID   = vlistGrid(ef[fileID].vlistID, igrid);
       gridtype = gridInqType(gridID);
-      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ||
-	    (gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0) )
+      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
         lregular = TRUE;
       else if ( gridtype == GRID_CURVILINEAR )
-        lregular = FALSE;
+        lcurvilinear = TRUE;
+      else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 )
+        ;
       else
 	cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
@@ -121,25 +123,35 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
           xvals[fileID] = (double*) malloc(xsize[fileID]*sizeof(double));
           yvals[fileID] = (double*) malloc(ysize[fileID]*sizeof(double));
         }
-      else
+      else if ( lcurvilinear )
         {
           xvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
           yvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
         }
+      else
+        {
+          xvals[fileID] = NULL;
+          yvals[fileID] = NULL;
+        }
         
-      gridInqXvals(gridID, xvals[fileID]);
-      gridInqYvals(gridID, yvals[fileID]);
-
+      if ( lregular || lcurvilinear )
+        {
+          gridInqXvals(gridID, xvals[fileID]);
+          gridInqYvals(gridID, yvals[fileID]);
+        }
       // printf("fileID %d, gridID %d\n", fileID, gridID);
 
-      xyinfo[fileID].x  = xvals[fileID][0];
-      xyinfo[fileID].y  = yvals[fileID][0];
-      xyinfo[fileID].id = fileID;
+      if ( lregular )
+        {
+          xyinfo[fileID].x  = xvals[fileID][0];
+          xyinfo[fileID].y  = yvals[fileID][0];
+          xyinfo[fileID].id = fileID;
 
-      if ( ysize[fileID] > 1 )
-	{
-	  if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
-	}
+          if ( ysize[fileID] > 1 )
+            {
+              if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
+            }
+        }
     }
 
   if ( cdoVerbose )
@@ -173,7 +185,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   else
     {
       nx = nxblocks;
-      if ( nx <= 0 ) cdoAbort("Parameter nxblocks missing!");
+      if ( nx <= 0 ) cdoAbort("Parameter nx missing!");
     }
 
   ny = nfiles/nx;
@@ -190,7 +202,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
       xvals2 = (double*) malloc(xsize2*sizeof(double));
       yvals2 = (double*) malloc(ysize2*sizeof(double));
     }
-  else
+  else if ( lcurvilinear )
     {
       xvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
       yvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
@@ -232,7 +244,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 	  for ( j = 0; j < ysize[idx]; ++j )
 	    for ( i = 0; i < xsize[idx]; ++i )
 	      {
-                if ( !lregular )
+                if ( lcurvilinear )
                   {
                     xvals2[offset+j*xsize2+i] = xvals[idx][ij];
                     yvals2[offset+j*xsize2+i] = yvals[idx][ij];
@@ -245,15 +257,18 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   gridID2 = gridCreate(gridtype, xsize2*ysize2);
   gridDefXsize(gridID2, xsize2);
   gridDefYsize(gridID2, ysize2);
-  gridDefXvals(gridID2, xvals2);
-  gridDefYvals(gridID2, yvals2);
+  if ( lregular || lcurvilinear )
+    {
+      gridDefXvals(gridID2, xvals2);
+      gridDefYvals(gridID2, yvals2);
+    }
 
   free(xoff);
   free(yoff);
   free(xsize);
   free(ysize);
-  free(xvals2);
-  free(yvals2);
+  if ( xvals2 ) free(xvals2);
+  if ( yvals2 ) free(yvals2);
 
   char string[1024];
   string[0] = 0;
@@ -273,8 +288,8 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      free(xvals[fileID]);
-      free(yvals[fileID]);
+      if ( xvals[fileID] ) free(xvals[fileID]);
+      if ( yvals[fileID] ) free(yvals[fileID]);
     }
   free(xvals);
   free(yvals);
