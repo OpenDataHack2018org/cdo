@@ -15,6 +15,8 @@
   GNU General Public License for more details.
 */
 
+#include <ctype.h>
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -48,7 +50,7 @@ int cmpx(const void *s1, const void *s2)
   if      ( xy1->x < xy2->x ) cmp = -1;
   else if ( xy1->x > xy2->x ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -61,7 +63,7 @@ int cmpxy_lt(const void *s1, const void *s2)
   if      ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -74,28 +76,24 @@ int cmpxy_gt(const void *s1, const void *s2)
   if      ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
-int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
+int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks)
 {
   int lsouthnorth = TRUE;
   int fileID;
-  int gridID;
   int gridID2 = -1;
-  int gridtype = -1;
-  int *xoff, *yoff;
-  int xsize2, ysize2;
   int idx;
   int nx, ny, ix, iy, i, j, ij, offset;
   int lregular = TRUE;
   double *xvals2, *yvals2;
 
-  gridID   = vlistGrid(ef[0].vlistID, igrid);
-  gridtype = gridInqType(gridID);
+  int gridID   = vlistGrid(ef[0].vlistID, igrid);
+  int gridtype = gridInqType(gridID);
   if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
-    return (gridID2);
+    return gridID2;
 
   int *xsize = (int*) malloc(nfiles*sizeof(int));
   int *ysize = (int*) malloc(nfiles*sizeof(int));
@@ -117,12 +115,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 
       xsize[fileID] = gridInqXsize(gridID);
       ysize[fileID] = gridInqYsize(gridID);
-      /*
-      if ( xsize == 0 ) xsize = gridInqXsize(gridID);
-      if ( ysize == 0 ) ysize = gridInqYsize(gridID);
-      if ( xsize != gridInqXsize(gridID) ) cdoAbort("xsize differ!");
-      if ( ysize != gridInqYsize(gridID) ) cdoAbort("ysize differ!");
-      */
+
       if ( lregular )
         {
           xvals[fileID] = (double*) malloc(xsize[fileID]*sizeof(double));
@@ -148,39 +141,47 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 	  if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
 	}
     }
-  /*
+
   if ( cdoVerbose )
     for ( fileID = 0; fileID < nfiles; fileID++ )
       printf("1 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
-  qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
-  /*
-  if ( cdoVerbose )
-    for ( fileID = 0; fileID < nfiles; fileID++ )
-      printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
-  if ( lsouthnorth )
-    qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_lt);  
-  else
-    qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
 
-  if ( cdoVerbose )
-    for ( fileID = 0; fileID < nfiles; fileID++ )
-      printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-
-  nx = 1;
-  for ( fileID = 1; fileID < nfiles; fileID++ )
+  if ( lregular )
     {
-      if ( DBL_IS_EQUAL(xyinfo[0].y, xyinfo[fileID].y) ) nx++;
-      else break;
+      qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
+
+      if ( cdoVerbose )
+        for ( fileID = 0; fileID < nfiles; fileID++ )
+          printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
+
+      if ( lsouthnorth )
+        qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_lt);  
+      else
+        qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
+
+      if ( cdoVerbose )
+        for ( fileID = 0; fileID < nfiles; fileID++ )
+          printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
+
+      nx = 1;
+      for ( fileID = 1; fileID < nfiles; fileID++ )
+        {
+          if ( DBL_IS_EQUAL(xyinfo[0].y, xyinfo[fileID].y) ) nx++;
+          else break;
+        }
     }
+  else
+    {
+      nx = nxblocks;
+      if ( nx <= 0 ) cdoAbort("Parameter nxblocks missing!");
+    }
+
   ny = nfiles/nx;
-  if ( cdoVerbose ) cdoPrint("nx %d  ny %d", nx, ny);
-  if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) seems to be incomplete!", nfiles);
+  if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) and number of blocks (%dx%d) differ!", nfiles, nx, ny);
  
-  xsize2 = 0;
+  int xsize2 = 0;
   for ( i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
-  ysize2 = 0;
+  int ysize2 = 0;
   for ( j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
   if ( cdoVerbose ) cdoPrint("xsize2 %d  ysize2 %d", xsize2, ysize2);
 
@@ -195,8 +196,8 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       yvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
     }
     
-  xoff = (int*) malloc((nx+1)*sizeof(int));
-  yoff = (int*) malloc((ny+1)*sizeof(int));
+  int *xoff = (int*) malloc((nx+1)*sizeof(int));
+  int *yoff = (int*) malloc((ny+1)*sizeof(int));
 
   xoff[0] = 0;
   for ( i = 0; i < nx; ++i )
@@ -279,18 +280,19 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   free(yvals);
   free(xyinfo);
 
-  return (gridID2);
+  return gridID2;
 }
 
 
 void *Collgrid(void *argument)
 {
+  int nxblocks = 1;
   int varID, recID;
   int nrecs, nrecs0;
   int levelID;
   int nmiss;
-  double missval;
   int fileID;
+  double missval;
 
   cdoInitialize(argument);
     
@@ -324,6 +326,19 @@ void *Collgrid(void *argument)
   for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = FALSE;
 
   int nsel = operatorArgc();
+
+  if ( nsel > 0 )
+    {
+      int len = (int) strlen(operatorArgv()[0]);
+      while ( --len >= 0 && isdigit(operatorArgv()[0][len]) ) ;
+
+      if ( len == -1 )
+        {
+          nsel--;
+          nxblocks = parameter2int(operatorArgv()[0]);
+        }
+    }
+
   if ( nsel == 0 )
     {
       for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = TRUE;
@@ -418,11 +433,11 @@ void *Collgrid(void *argument)
 
       if ( ginit == FALSE )
 	{
-	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1);
+	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1, nxblocks);
 	  if ( gridIDs[i2] != -1 ) ginit = TRUE;
 	}
       else
-	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1);
+	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1, nxblocks);
     }
 
 
@@ -548,5 +563,5 @@ void *Collgrid(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

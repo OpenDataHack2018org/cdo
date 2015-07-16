@@ -5,6 +5,7 @@ Version 1.7.0 (28 October 2015):
 
    New features:
      * distgrid: added support for curvilinear grids
+     * collgrid: added support for curvilinear grids
    New operators:
      * setmisstonn: Set missing value to nearest neightbour
      * vertstd1: Vertical standard deviation [Divisor is (n-1)]

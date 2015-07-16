@@ -1418,7 +1418,6 @@ int main(int argc, char *argv[])
       fprintf(stderr, "OMP num procs       = %d\n", omp_get_num_procs());
       fprintf(stderr, "OMP max threads     = %d\n", omp_get_max_threads());
       fprintf(stderr, "OMP num threads     = %d\n", omp_get_num_threads());
-      fprintf(stderr, "OMP num threads     = %d\n", omp_get_num_threads());
       fprintf(stderr, "OMP thread limit    = %d\n", omp_get_thread_limit());
       omp_sched_t kind;
       int modifer;

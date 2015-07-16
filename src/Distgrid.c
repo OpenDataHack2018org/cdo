@@ -20,7 +20,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-#define  MAX_BLOCKS  16384
+#define  MAX_BLOCKS  65536
 
 static
 void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, int nyblocks,
@@ -131,9 +131,7 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 static
 void window_cell(double *array1, double *array2, long gridsize2, int *cellidx)
 {
-  long i;
-
-  for ( i = 0; i < gridsize2; ++i )
+  for ( long i = 0; i < gridsize2; ++i )
     array2[i] = array1[cellidx[i]];
 }
 
@@ -148,44 +146,36 @@ typedef struct
 
 void *Distgrid(void *argument)
 {
-  int nchars;
-  int streamID1;
-  int *vlistIDs = NULL, *streamIDs = NULL;
-  int gridID1 = -1, varID;
-  int nrecs, ngrids;
-  int tsID, recID, levelID;
-  int vlistID1;
+  int gridID1;
+  int varID;
+  int nrecs;
+  int recID, levelID;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
   int index;
-  int nsplit;
-  int xinc = 1, yinc = 1;
-  int gridsize, gridsize2max;
   int gridtype = -1;
   int nmiss;
-  int nxblocks = 1, nyblocks = 1;
-  int nx, ny, i;
+  int i;
   double missval;
-  double *array1 = NULL, *array2 = NULL;
-  sgrid_t *grids;
 
   cdoInitialize(argument);
 
   operatorInputArg("nxblocks, [nyblocks]");
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
-  nxblocks = parameter2int(operatorArgv()[0]);
+  int nxblocks = parameter2int(operatorArgv()[0]);
+  int nyblocks = 1;
   if ( operatorArgc() == 2 ) nyblocks = parameter2int(operatorArgv()[1]);
 
   if ( nxblocks <= 0 ) cdoAbort("nxblocks has to be greater than 0!");
   if ( nyblocks <= 0 ) cdoAbort("nyblocks has to be greater than 0!");
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
 
   for ( index = 0; index < ngrids; index++ )
     {
@@ -200,9 +190,9 @@ void *Distgrid(void *argument)
     cdoAbort("No Lon/Lat, Gaussian or Generic grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   gridID1 = vlistGrid(vlistID1, 0);
-  gridsize = gridInqSize(gridID1);
-  nx = gridInqXsize(gridID1);
-  ny = gridInqYsize(gridID1);
+  int gridsize = gridInqSize(gridID1);
+  int nx = gridInqXsize(gridID1);
+  int ny = gridInqYsize(gridID1);
   for ( i = 1; i < ngrids; i++ )
     {
       gridID1 = vlistGrid(vlistID1, i);
@@ -221,21 +211,21 @@ void *Distgrid(void *argument)
       nyblocks = ny;
     }
 
-  xinc = nx/nxblocks;
-  yinc = ny/nyblocks;
+  int xinc = nx/nxblocks;
+  int yinc = ny/nyblocks;
 
   if ( nx%xinc != 0 ) xinc++;
   if ( ny%yinc != 0 ) yinc++;
 
-  nsplit = nxblocks*nyblocks;
+  int nsplit = nxblocks*nyblocks;
   if ( nsplit > MAX_BLOCKS ) cdoAbort("Too many blocks (max = %d)!", MAX_BLOCKS);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) malloc(gridsize*sizeof(double));
 
-  vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-  streamIDs = (int*) malloc(nsplit*sizeof(int));
+  int *vlistIDs  = (int*) malloc(nsplit*sizeof(int));
+  int *streamIDs = (int*) malloc(nsplit*sizeof(int));
 
-  grids = (sgrid_t*) malloc(ngrids*sizeof(sgrid_t));
+  sgrid_t *grids = (sgrid_t*) malloc(ngrids*sizeof(sgrid_t));
   for ( i = 0; i < ngrids; i++ )
     {  
       gridID1 = vlistGrid(vlistID1, i);
@@ -265,14 +255,14 @@ void *Distgrid(void *argument)
 	vlistChangeGridIndex(vlistIDs[index], i, grids[i].gridIDs[index]);
     }
 
-  gridsize2max = 0;
+  int gridsize2max = 0;
   for ( index = 0; index < nsplit; index++ )
     if ( grids[0].gridsize[index] > gridsize2max ) gridsize2max = grids[0].gridsize[index];
 
-  array2 = (double*) malloc(gridsize2max*sizeof(double));
+  double *array2 = (double*) malloc(gridsize2max*sizeof(double));
 
   strcpy(filename, cdoStreamName(1)->args);
-  nchars = strlen(filename);
+  int nchars = strlen(filename);
 
   refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
@@ -292,7 +282,7 @@ void *Distgrid(void *argument)
     }
 
   if ( ngrids > 1 ) cdoPrint("Bausstelle: number of different grids > 1!");
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       for ( index = 0; index < nsplit; index++ )
@@ -352,5 +342,5 @@ void *Distgrid(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }
