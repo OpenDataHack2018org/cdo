@@ -1,7 +1,7 @@
 #ifndef _GRID_SEARCH_H_
 #define _GRID_SEARCH_H_
 
-//#define KDTREE_FAST
+#define KDTREE_FAST
 
 #if defined(KDTREE_FAST)
 #include "kdtree_fast.h"
