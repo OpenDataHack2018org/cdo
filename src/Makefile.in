@@ -195,11 +195,11 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Timpctl.c Timselpctl.c Timselstat.c Timsort.c Timstat.c \
 	Timstat2.c Timstat3.c Tinfo.c Tocomplex.c Transpose.c Trend.c \
 	Trms.c Tstepcount.c Vardup.c Vargen.c Varrms.c Vertintml.c \
-	Vertintap.c Vertstat.c Vertwind.c Wct.c Wind.c Writegrid.c \
-	Writerandom.c YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c \
-	Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c \
-	Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c \
-	Zonstat.c cdo.h Magplot.c Magvector.c Maggraph.c \
+	Vertintap.c Vertstat.c Vertcum.c Vertwind.c Wct.c Wind.c \
+	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
+	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
+	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
+	Yseasstat.c Zonstat.c cdo.h Magplot.c Magvector.c Maggraph.c \
 	template_parser.h template_parser.c results_template_parser.h \
 	results_template_parser.c magics_template_parser.h \
 	magics_template_parser.c StringUtilities.h StringUtilities.c \
@@ -285,16 +285,17 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Tstepcount.$(OBJEXT) cdo-Vardup.$(OBJEXT) \
 	cdo-Vargen.$(OBJEXT) cdo-Varrms.$(OBJEXT) \
 	cdo-Vertintml.$(OBJEXT) cdo-Vertintap.$(OBJEXT) \
-	cdo-Vertstat.$(OBJEXT) cdo-Vertwind.$(OBJEXT) \
-	cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) cdo-Writegrid.$(OBJEXT) \
-	cdo-Writerandom.$(OBJEXT) cdo-YAR.$(OBJEXT) \
-	cdo-Yearmonstat.$(OBJEXT) cdo-Ydayarith.$(OBJEXT) \
-	cdo-Ydaypctl.$(OBJEXT) cdo-Ydaystat.$(OBJEXT) \
-	cdo-Ydrunpctl.$(OBJEXT) cdo-Ydrunstat.$(OBJEXT) \
-	cdo-Yhourarith.$(OBJEXT) cdo-Yhourstat.$(OBJEXT) \
-	cdo-Ymonarith.$(OBJEXT) cdo-Ymonpctl.$(OBJEXT) \
-	cdo-Ymonstat.$(OBJEXT) cdo-Yseaspctl.$(OBJEXT) \
-	cdo-Yseasstat.$(OBJEXT) cdo-Zonstat.$(OBJEXT) $(am__objects_1)
+	cdo-Vertstat.$(OBJEXT) cdo-Vertcum.$(OBJEXT) \
+	cdo-Vertwind.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) \
+	cdo-Writegrid.$(OBJEXT) cdo-Writerandom.$(OBJEXT) \
+	cdo-YAR.$(OBJEXT) cdo-Yearmonstat.$(OBJEXT) \
+	cdo-Ydayarith.$(OBJEXT) cdo-Ydaypctl.$(OBJEXT) \
+	cdo-Ydaystat.$(OBJEXT) cdo-Ydrunpctl.$(OBJEXT) \
+	cdo-Ydrunstat.$(OBJEXT) cdo-Yhourarith.$(OBJEXT) \
+	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
+	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
+	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
+	cdo-Zonstat.$(OBJEXT) $(am__objects_1)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
 cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -607,11 +608,11 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Timpctl.c Timselpctl.c Timselstat.c Timsort.c Timstat.c \
 	Timstat2.c Timstat3.c Tinfo.c Tocomplex.c Transpose.c Trend.c \
 	Trms.c Tstepcount.c Vardup.c Vargen.c Varrms.c Vertintml.c \
-	Vertintap.c Vertstat.c Vertwind.c Wct.c Wind.c Writegrid.c \
-	Writerandom.c YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c \
-	Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c \
-	Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c \
-	Zonstat.c cdo.h $(am__append_1)
+	Vertintap.c Vertstat.c Vertcum.c Vertwind.c Wct.c Wind.c \
+	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
+	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
+	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
+	Yseasstat.c Zonstat.c cdo.h $(am__append_1)
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
 cdo_LDFLAGS = $(am__append_2)
@@ -947,6 +948,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vardup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vargen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Varrms.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertcum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertintap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertintml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertstat.Po@am__quote@
@@ -3935,6 +3937,20 @@ cdo-Vertstat.obj: Vertstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertstat.c' object='cdo-Vertstat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertstat.obj `if test -f 'Vertstat.c'; then $(CYGPATH_W) 'Vertstat.c'; else $(CYGPATH_W) '$(srcdir)/Vertstat.c'; fi`
+
+cdo-Vertcum.o: Vertcum.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertcum.o -MD -MP -MF $(DEPDIR)/cdo-Vertcum.Tpo -c -o cdo-Vertcum.o `test -f 'Vertcum.c' || echo '$(srcdir)/'`Vertcum.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vertcum.Tpo $(DEPDIR)/cdo-Vertcum.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertcum.c' object='cdo-Vertcum.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertcum.o `test -f 'Vertcum.c' || echo '$(srcdir)/'`Vertcum.c
+
+cdo-Vertcum.obj: Vertcum.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertcum.obj -MD -MP -MF $(DEPDIR)/cdo-Vertcum.Tpo -c -o cdo-Vertcum.obj `if test -f 'Vertcum.c'; then $(CYGPATH_W) 'Vertcum.c'; else $(CYGPATH_W) '$(srcdir)/Vertcum.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vertcum.Tpo $(DEPDIR)/cdo-Vertcum.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertcum.c' object='cdo-Vertcum.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertcum.obj `if test -f 'Vertcum.c'; then $(CYGPATH_W) 'Vertcum.c'; else $(CYGPATH_W) '$(srcdir)/Vertcum.c'; fi`
 
 cdo-Vertwind.o: Vertwind.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vertwind.o -MD -MP -MF $(DEPDIR)/cdo-Vertwind.Tpo -c -o cdo-Vertwind.o `test -f 'Vertwind.c' || echo '$(srcdir)/'`Vertwind.c

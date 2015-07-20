@@ -202,6 +202,7 @@ void *Varrms(void *argument);
 void *Vertintml(void *argument);
 void *Vertintap(void *argument);
 void *Vertstat(void *argument);
+void *Vertcum(void *argument);
 void *Vertwind(void *argument);
 void *Wind(void *argument);
 void *Writegrid(void *argument);
@@ -463,6 +464,7 @@ void *Maggraph(void *argument);
 #define  VertintmlOperators     {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
 #define  VertintapOperators     {"ap2pl", "ap2plx", "ap2pl_lp", "ap2plx_lp"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertint", "vertmean", "vertavg", "vertstd", "vertstd1", "vertvar", "vertvar1"}
+#define  VertcumOperators       {"vertcum", "vertcumhl"}
 #define  VertwindOperators      {"vertwind"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
@@ -727,6 +729,7 @@ static modules_t Modules[] =
   { Vertintml,      IntvertHelp,       VertintmlOperators,     CDI_REAL,  1,  1 },
   { Vertintap,      NULL,              VertintapOperators,     CDI_REAL,  1,  1 },
   { Vertstat,       VertstatHelp,      VertstatOperators,      CDI_REAL,  1,  1 },
+  { Vertcum,        NULL,              VertcumOperators,       CDI_REAL,  1,  1 },
   { Vertwind,       NULL,              VertwindOperators,      CDI_REAL,  1,  1 },
   { Wind,           WindHelp,          WindOperators,          CDI_REAL,  1,  1 },
   { Writegrid,      NULL,              WritegridOperators,     CDI_REAL,  1,  1 },  /* no cdi output */
