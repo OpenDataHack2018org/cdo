@@ -1,3 +1,5 @@
+// Code from http://rosettacode.org/wiki/K-d_tree#C
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,8 +76,8 @@ struct kd_node_t *make_tree(struct kd_node_t *t, int len, int i, int dim)
 /* global variable, so sue me */
 int visited;
  
-void nearest(struct kd_node_t *root, double *xyz, int i, int dim,
-             struct kd_node_t **best, double *best_dist)
+void kd_find_nearest(struct kd_node_t *root, double *xyz, int i, int dim,
+                     struct kd_node_t **best, double *best_dist)
 {
   double d, dx, dx2;
  
@@ -84,7 +86,7 @@ void nearest(struct kd_node_t *root, double *xyz, int i, int dim,
   dx = root->xyz[i] - xyz[i];
   dx2 = dx * dx;
  
-  visited ++;
+  visited++;
  
   if (!*best || d < *best_dist) {
     *best_dist = d;
@@ -96,9 +98,9 @@ void nearest(struct kd_node_t *root, double *xyz, int i, int dim,
  
   if ( ++i >= dim ) i = 0;
  
-  nearest(dx > 0 ? root->left : root->right, xyz, i, dim, best, best_dist);
+  kd_find_nearest(dx > 0 ? root->left : root->right, xyz, i, dim, best, best_dist);
   if ( dx2 >= *best_dist ) return;
-  nearest(dx > 0 ? root->right : root->left, xyz, i, dim, best, best_dist);
+  kd_find_nearest(dx > 0 ? root->right : root->left, xyz, i, dim, best, best_dist);
 }
 
 
@@ -107,7 +109,7 @@ void *kd_nearest(struct kd_node_t *root, double *xyz)
   struct kd_node_t *found = NULL;
   double dist;
 
-  nearest(root, xyz, 0, 3, &found, &dist);
+  kd_find_nearest(root, xyz, 0, 3, &found, &dist);
 
   return (void *) found;
 }
@@ -125,14 +127,14 @@ unsigned kd_item(struct kd_node_t *result)
 #ifdef XXX
 #define N 1000000
 #define rand1()	(rand() / (double)RAND_MAX)
-#define rand_pt(v) { v.xyz[0] = rand1(); v.xyz[1] = rand1(); v.xyz[2] = rand1(); }
+#define rand_pt(xyz) { xyz[0] = rand1(); xyz[1] = rand1(); xyz[2] = rand1(); }
 int main(void)
 {
 	int i;
 	struct kd_node_t wp[] = {
 		{{2, 3}}, {{5, 4}}, {{9, 6}}, {{4, 7}}, {{8, 1}}, {{7, 2}}
 	};
-	struct kd_node_t this = {{9, 2}};
+	double xyz[3] = {9, 2};
 	struct kd_node_t *root, *found, *million;
 	double best_dist;
  
@@ -140,27 +142,27 @@ int main(void)
  
 	visited = 0;
 	found = 0;
-	nearest(root, &this, 0, 2, &found, &best_dist);
+	kd_find_nearest(root, xyz, 0, 2, &found, &best_dist);
  
 	printf(">> WP tree\nsearching for (%g, %g)\n"
 		"found (%g, %g) dist %g\nseen %d nodes\n\n",
-		this.xyz[0], this.xyz[1],
+		xyz[0], xyz[1],
 		found->xyz[0], found->xyz[1], sqrt(best_dist), visited);
  
 	million = calloc(N, sizeof(struct kd_node_t));
 	srand(time(0));
-	for (i = 0; i < N; i++) rand_pt(million[i]);
+	for (i = 0; i < N; i++) rand_pt(million[i].xyz);
  
 	root = make_tree(million, N, 0, 3);
-	rand_pt(this);
+	rand_pt(xyz);
  
 	visited = 0;
 	found = 0;
-	nearest(root, &this, 0, 3, &found, &best_dist);
+	kd_find_nearest(root, xyz, 0, 3, &found, &best_dist);
  
 	printf(">> Million tree\nsearching for (%g, %g, %g)\n"
 		"found (%g, %g, %g) dist %g\nseen %d nodes\n",
-		this.xyz[0], this.xyz[1], this.xyz[2],
+		xyz[0], xyz[1], xyz[2],
 		found->xyz[0], found->xyz[1], found->xyz[2],
 		sqrt(best_dist), visited);
  
@@ -177,8 +179,8 @@ int main(void)
 	for (i = 0; i < test_runs; i++) {
 		found = 0;
 		visited = 0;
-		rand_pt(this);
-		nearest(root, &this, 0, 3, &found, &best_dist);
+		rand_pt(xyz);
+		kd_find_nearest(root, xyz, 0, 3, &found, &best_dist);
 		sum += visited;
 	}
 	printf("\n>> Million tree\n"

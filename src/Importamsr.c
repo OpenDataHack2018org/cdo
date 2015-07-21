@@ -165,7 +165,7 @@ int getDate(const char *name)
   int date = 0;
   char *pname;
 
-  pname = strchr(name, '_');
+  pname = (char *)strchr(name, '_');
 
   if ( pname ) date = atoi(pname+1);
 

@@ -317,6 +317,7 @@ cdo_SOURCES += Adisit.c        \
                Vertintml.c     \
                Vertintap.c     \
                Vertstat.c      \
+               Vertcum.c       \
                Vertwind.c      \
                Wct.c           \
                Wind.c          \

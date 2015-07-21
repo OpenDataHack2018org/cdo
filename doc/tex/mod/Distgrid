@@ -15,10 +15,11 @@
 
 @BeginDescription
 This operator distributes a dataset into smaller pieces. Each output file contains a different region of the horizontal 
-source grid. A target grid region contains a regular longitude/latitude box of the source grid. Only rectilinear source 
-grids are supported by this operator. The number of different regions can be specified with the parameter @var{nx} and @var{ny}.
-The output files will be named <obase><xxx><suffix> where suffix is the filename extension derived from the file format. 
-xxx will have five digits with the number of the target region.
+source grid. A target grid region contains a structured longitude/latitude box of the source grid. Only rectilinear and
+curvilinear source grids are supported by this operator.
+The number of different regions can be specified with the parameter @var{nx} and @var{ny}. The output files will be named 
+<obase><xxx><suffix> where suffix is the filename extension derived from the file format. xxx will have five digits with 
+the number of the target region.
 @EndDescription
 @EndOperator
 

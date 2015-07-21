@@ -3,6 +3,14 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-07-21  Uwe Schulzweida
+
+	* tinfo: optimize calculation of monthly and yearly increment
+
+2015-07-16  Uwe Schulzweida
+
+	* collgrid: added support for curvilinear grids
+
 2015-06-27  Uwe Schulzweida
 
 	* New operator: setmisstonn - Set missing value to nearest neightbour

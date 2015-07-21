@@ -1000,7 +1000,8 @@ void *Gradsdes(void *argument)
   if ( operatorID == DUMPMAP )
     {
       dumpmap();
-      goto END_LABEL;
+      cdoFinish();
+      return (0);
     }
 
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");

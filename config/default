@@ -49,6 +49,11 @@ case "${HOSTNAME}" in
                     $CDOLIBS \
                     LIBS="-L/opt/local/lib -lopenjpeg" \
 	            CC=clang CFLAGS="-g -Wall -O3"
+        elif  test "$COMP" = g++ ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+                    LIBS="-L/opt/local/lib -lopenjpeg" \
+	            CC=g++ CFLAGS="-g -std=c++14 -Drestrict= -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
@@ -115,13 +120,12 @@ case "${HOSTNAME}" in
 	;;
 # x86_64-squeeze-x64-linux
     thunder*)
-        CDOLIBS="--with-jasper=/sw/squeeze-x64/jasper-1.900.1-static \
-                    --with-grib_api=/sw/squeeze-x64/grib_api-1.13.0-static-gccsys \
-                    --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
-                    --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
-                    --with-szlib=/sw/squeeze-x64/szip-2.1 \
-                    --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
-                    --with-proj=/sw/squeeze-x64/proj-4.7.0"
+        CDOLIBS="--with-grib_api=/sw/squeeze-x64/grib_api-1.13.0-static-gccsys \
+                 --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
+                 --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
+                 --with-szlib=/sw/squeeze-x64/szip-2.1 \
+                 --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
+                 --with-proj=/sw/squeeze-x64/proj-4.7.0"
 
         if  test "$COMP" = icc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
@@ -137,6 +141,28 @@ case "${HOSTNAME}" in
                     --with-fftw3 \
                     $CDOLIBS \
                     CC=gcc CFLAGS='-g -Wall -O3'
+	fi
+	;;
+# mistral
+    mlogin*)
+        CDOLIBS="--with-grib_api=/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48 \
+                    --with-netcdf=/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-gcc48 \
+                    --with-hdf5=/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48"
+
+        if  test "$COMP" = icc ; then
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/mistral \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = pgcc ; then
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/mistral \
+                    $CDOLIBS \
+	            CC=pgcc CFLAGS="-g -fast"
+	else
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/mistral \
+                    --with-fftw3 \
+                    $CDOLIBS \
+                    CC=gcc CFLAGS='-g -Wall -O3 -march=native'
 	fi
 	;;
 # x86_64-unknown-linux-gnu

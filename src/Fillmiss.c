@@ -291,6 +291,9 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   unsigned gridsize = gridInqSize(gridID);
 
+  unsigned nmiss = field1->nmiss;
+  unsigned nvals = gridsize - nmiss;
+
   double *xvals = (double*) malloc(gridsize*sizeof(double));
   double *yvals = (double*) malloc(gridsize*sizeof(double));
 
@@ -309,15 +312,11 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-  clock_t start, finish;
+  unsigned *mindex = NULL;
+  unsigned *vindex = NULL;
 
-  start = clock();
-
-  unsigned nmiss = field1->nmiss;
-  unsigned nvals = gridsize - nmiss;
-
-  unsigned *mindex = (unsigned*) calloc(1, nmiss*sizeof(unsigned));
-  unsigned *vindex = (unsigned*) calloc(1, nvals*sizeof(unsigned));
+  if ( nmiss ) mindex = (unsigned*) calloc(1, nmiss*sizeof(unsigned));
+  if ( nvals ) vindex = (unsigned*) calloc(1, nvals*sizeof(unsigned));
 
   unsigned nv = 0, nm = 0;
   for ( unsigned i = 0; i < gridsize; ++i ) 
@@ -336,10 +335,14 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
     }
 
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
-  
+
+  clock_t start, finish;
+
+  start = clock();
+
   struct gridsearch *gs = gridsearch_index_create(nvals, xvals, yvals, vindex);
 
-  free(vindex);
+  if ( vindex ) free(vindex);
   
   finish = clock();
 
@@ -347,16 +350,21 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
+  unsigned index;
   void *gs_result;
-#pragma omp parallel for private(gs_result) shared(mindex, array1, array2, xvals, yvals)
+#pragma omp parallel for private(gs_result) shared(mindex, array1, array2, xvals, yvals) private(index)
   for ( unsigned i = 0; i < nmiss; ++i )
     {
       gs_result = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]]);
-      unsigned index = gridsearch_item(gs_result);
+      if ( gs_result ) 
+        index = gridsearch_item(gs_result);
+      else
+        index = mindex[i];
+
       array2[mindex[i]] = array1[index];
     }
 
-  free(mindex);
+  if ( mindex ) free(mindex);
 
   /*
   double radius = 5.*M_PI/180.;

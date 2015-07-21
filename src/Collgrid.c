@@ -15,6 +15,8 @@
   GNU General Public License for more details.
 */
 
+#include <ctype.h>
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -48,7 +50,7 @@ int cmpx(const void *s1, const void *s2)
   if      ( xy1->x < xy2->x ) cmp = -1;
   else if ( xy1->x > xy2->x ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -61,7 +63,7 @@ int cmpxy_lt(const void *s1, const void *s2)
   if      ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -74,116 +76,146 @@ int cmpxy_gt(const void *s1, const void *s2)
   if      ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
   else if ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
-int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
+int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks)
 {
   int lsouthnorth = TRUE;
   int fileID;
-  int gridID;
   int gridID2 = -1;
-  int gridtype = -1;
-  int *xsize, *ysize;
-  int *xoff, *yoff;
-  int xsize2, ysize2;
   int idx;
   int nx, ny, ix, iy, i, j, ij, offset;
-  double **xvals, **yvals;
-  double *xvals2, *yvals2;
-  xyinfo_t *xyinfo;
+  int lregular = FALSE;
+  int lcurvilinear = FALSE;
+  double *xvals2 = NULL, *yvals2 = NULL;
 
-  gridID   = vlistGrid(ef[0].vlistID, igrid);
-  gridtype = gridInqType(gridID);
+  int gridID   = vlistGrid(ef[0].vlistID, igrid);
+  int gridtype = gridInqType(gridID);
   if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
-    return (gridID2);
+    return gridID2;
 
-  xsize = (int*) malloc(nfiles*sizeof(int));
-  ysize = (int*) malloc(nfiles*sizeof(int));
-  xyinfo = (xyinfo_t*) malloc(nfiles*sizeof(xyinfo_t));
-  xvals = (double**) malloc(nfiles*sizeof(double*));
-  yvals = (double**) malloc(nfiles*sizeof(double*));
+  int *xsize = (int*) malloc(nfiles*sizeof(int));
+  int *ysize = (int*) malloc(nfiles*sizeof(int));
+  xyinfo_t *xyinfo = (xyinfo_t*) malloc(nfiles*sizeof(xyinfo_t));
+  double **xvals = (double**) malloc(nfiles*sizeof(double*));
+  double **yvals = (double**) malloc(nfiles*sizeof(double*));
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       gridID   = vlistGrid(ef[fileID].vlistID, igrid);
       gridtype = gridInqType(gridID);
-      if ( !(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ||
-	    (gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0)) )
+      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
+        lregular = TRUE;
+      else if ( gridtype == GRID_CURVILINEAR )
+        lcurvilinear = TRUE;
+      else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 )
+        ;
+      else
 	cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
       xsize[fileID] = gridInqXsize(gridID);
       ysize[fileID] = gridInqYsize(gridID);
-      /*
-      if ( xsize == 0 ) xsize = gridInqXsize(gridID);
-      if ( ysize == 0 ) ysize = gridInqYsize(gridID);
-      if ( xsize != gridInqXsize(gridID) ) cdoAbort("xsize differ!");
-      if ( ysize != gridInqYsize(gridID) ) cdoAbort("ysize differ!");
-      */
-      xvals[fileID] = (double*) malloc(xsize[fileID]*sizeof(double));
-      yvals[fileID] = (double*) malloc(ysize[fileID]*sizeof(double));
-      gridInqXvals(gridID, xvals[fileID]);
-      gridInqYvals(gridID, yvals[fileID]);
 
+      if ( lregular )
+        {
+          xvals[fileID] = (double*) malloc(xsize[fileID]*sizeof(double));
+          yvals[fileID] = (double*) malloc(ysize[fileID]*sizeof(double));
+        }
+      else if ( lcurvilinear )
+        {
+          xvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
+          yvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
+        }
+      else
+        {
+          xvals[fileID] = NULL;
+          yvals[fileID] = NULL;
+        }
+        
+      if ( lregular || lcurvilinear )
+        {
+          gridInqXvals(gridID, xvals[fileID]);
+          gridInqYvals(gridID, yvals[fileID]);
+        }
       // printf("fileID %d, gridID %d\n", fileID, gridID);
 
-      xyinfo[fileID].x  = xvals[fileID][0];
-      xyinfo[fileID].y  = yvals[fileID][0];
-      xyinfo[fileID].id = fileID;
+      if ( lregular )
+        {
+          xyinfo[fileID].x  = xvals[fileID][0];
+          xyinfo[fileID].y  = yvals[fileID][0];
+          xyinfo[fileID].id = fileID;
 
-      if ( ysize[fileID] > 1 )
-	{
-	  if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
-	}
+          if ( ysize[fileID] > 1 )
+            {
+              if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
+            }
+        }
     }
-  /*
+
   if ( cdoVerbose )
     for ( fileID = 0; fileID < nfiles; fileID++ )
       printf("1 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
-  qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
-  /*
-  if ( cdoVerbose )
-    for ( fileID = 0; fileID < nfiles; fileID++ )
-      printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
-  if ( lsouthnorth )
-    qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_lt);  
-  else
-    qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
 
-  if ( cdoVerbose )
-    for ( fileID = 0; fileID < nfiles; fileID++ )
-      printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-
-  nx = 1;
-  for ( fileID = 1; fileID < nfiles; fileID++ )
+  if ( lregular )
     {
-      if ( DBL_IS_EQUAL(xyinfo[0].y, xyinfo[fileID].y) ) nx++;
-      else break;
+      qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
+
+      if ( cdoVerbose )
+        for ( fileID = 0; fileID < nfiles; fileID++ )
+          printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
+
+      if ( lsouthnorth )
+        qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_lt);  
+      else
+        qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
+
+      if ( cdoVerbose )
+        for ( fileID = 0; fileID < nfiles; fileID++ )
+          printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
+
+      nx = 1;
+      for ( fileID = 1; fileID < nfiles; fileID++ )
+        {
+          if ( DBL_IS_EQUAL(xyinfo[0].y, xyinfo[fileID].y) ) nx++;
+          else break;
+        }
     }
+  else
+    {
+      nx = nxblocks;
+      if ( nx <= 0 ) cdoAbort("Parameter nx missing!");
+    }
+
   ny = nfiles/nx;
-  if ( cdoVerbose ) cdoPrint("nx %d  ny %d", nx, ny);
-  if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) seems to be incomplete!", nfiles);
+  if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) and number of blocks (%dx%d) differ!", nfiles, nx, ny);
  
-  xsize2 = 0;
+  int xsize2 = 0;
   for ( i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
-  ysize2 = 0;
+  int ysize2 = 0;
   for ( j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
   if ( cdoVerbose ) cdoPrint("xsize2 %d  ysize2 %d", xsize2, ysize2);
 
-  xvals2 = (double*) malloc(xsize2*sizeof(double));
-  yvals2 = (double*) malloc(ysize2*sizeof(double));
-
-  xoff = (int*) malloc((nx+1)*sizeof(int));
-  yoff = (int*) malloc((ny+1)*sizeof(int));
+  if ( lregular )
+    {
+      xvals2 = (double*) malloc(xsize2*sizeof(double));
+      yvals2 = (double*) malloc(ysize2*sizeof(double));
+    }
+  else if ( lcurvilinear )
+    {
+      xvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
+      yvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
+    }
+    
+  int *xoff = (int*) malloc((nx+1)*sizeof(int));
+  int *yoff = (int*) malloc((ny+1)*sizeof(int));
 
   xoff[0] = 0;
   for ( i = 0; i < nx; ++i )
     {
       idx = xyinfo[i].id;
-      memcpy(xvals2+xoff[i], xvals[idx], xsize[idx]*sizeof(double));
+      if ( lregular ) memcpy(xvals2+xoff[i], xvals[idx], xsize[idx]*sizeof(double));
       xoff[i+1] = xoff[i] + xsize[idx];
     }
 
@@ -191,7 +223,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   for ( j = 0; j < ny; ++j )
     {
       idx = xyinfo[j*nx].id;
-      memcpy(yvals2+yoff[j], yvals[idx], ysize[idx]*sizeof(double));
+      if ( lregular ) memcpy(yvals2+yoff[j], yvals[idx], ysize[idx]*sizeof(double));
       yoff[j+1] = yoff[j] + ysize[idx];
     }
 
@@ -212,6 +244,11 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 	  for ( j = 0; j < ysize[idx]; ++j )
 	    for ( i = 0; i < xsize[idx]; ++i )
 	      {
+                if ( lcurvilinear )
+                  {
+                    xvals2[offset+j*xsize2+i] = xvals[idx][ij];
+                    yvals2[offset+j*xsize2+i] = yvals[idx][ij];
+                  }
 		gridindex[idx][ij++] = offset+j*xsize2+i;
 	      }
 	}
@@ -220,15 +257,18 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   gridID2 = gridCreate(gridtype, xsize2*ysize2);
   gridDefXsize(gridID2, xsize2);
   gridDefYsize(gridID2, ysize2);
-  gridDefXvals(gridID2, xvals2);
-  gridDefYvals(gridID2, yvals2);
+  if ( lregular || lcurvilinear )
+    {
+      gridDefXvals(gridID2, xvals2);
+      gridDefYvals(gridID2, yvals2);
+    }
 
   free(xoff);
   free(yoff);
   free(xsize);
   free(ysize);
-  free(xvals2);
-  free(yvals2);
+  if ( xvals2 ) free(xvals2);
+  if ( yvals2 ) free(yvals2);
 
   char string[1024];
   string[0] = 0;
@@ -248,26 +288,26 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      free(xvals[fileID]);
-      free(yvals[fileID]);
+      if ( xvals[fileID] ) free(xvals[fileID]);
+      if ( yvals[fileID] ) free(yvals[fileID]);
     }
   free(xvals);
   free(yvals);
   free(xyinfo);
 
-  return (gridID2);
+  return gridID2;
 }
 
 
 void *Collgrid(void *argument)
 {
+  int nxblocks = 1;
   int varID, recID;
   int nrecs, nrecs0;
   int levelID;
   int nmiss;
-  int taxisID1, taxisID2;
-  double missval;
   int fileID;
+  double missval;
 
   cdoInitialize(argument);
     
@@ -301,6 +341,19 @@ void *Collgrid(void *argument)
   for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = FALSE;
 
   int nsel = operatorArgc();
+
+  if ( nsel > 0 )
+    {
+      int len = (int) strlen(operatorArgv()[0]);
+      while ( --len >= 0 && isdigit(operatorArgv()[0][len]) ) ;
+
+      if ( len == -1 )
+        {
+          nsel--;
+          nxblocks = parameter2int(operatorArgv()[0]);
+        }
+    }
+
   if ( nsel == 0 )
     {
       for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = TRUE;
@@ -395,16 +448,16 @@ void *Collgrid(void *argument)
 
       if ( ginit == FALSE )
 	{
-	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1);
+	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1, nxblocks);
 	  if ( gridIDs[i2] != -1 ) ginit = TRUE;
 	}
       else
-	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1);
+	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1, nxblocks);
     }
 
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   int gridsize2 = 0;
@@ -525,5 +578,5 @@ void *Collgrid(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

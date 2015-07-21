@@ -85,7 +85,7 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
 static
 int getDate(const char *name)
 {
-  char *pname = strchr(name, '_');
+  char *pname = (char *)strchr(name, '_');
 
   int date = 0;
   if ( pname ) date = atoi(pname+1);
