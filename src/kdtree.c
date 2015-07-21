@@ -89,7 +89,7 @@ struct kdtree *kd_create(int k)
 {
   struct kdtree *tree;
 
-  if(!(tree = malloc(sizeof *tree)))  return 0;
+  if(!(tree = (struct kdtree *)malloc(sizeof *tree)))  return 0;
 
   tree->dim = k;
   tree->root = 0;
@@ -138,7 +138,7 @@ static int insert_rec(struct kdnode **nptr, const double *pos, unsigned index, i
 
   if (!*nptr)
     {
-      if(!(node = malloc(sizeof *node)))  return -1;
+      if(!(node = (struct kdnode *)malloc(sizeof *node)))  return -1;
 
       memcpy(node->pos, pos, dim * sizeof *node->pos);
       node->index = index;
@@ -335,10 +335,10 @@ struct kdres *kd_nearest(struct kdtree *kd, const double *pos)
   if (!kd->rect) return 0;
 
   /* Allocate result set */
-  if(!(rset = malloc(sizeof *rset))) {
+  if(!(rset = (struct kdres *)malloc(sizeof *rset))) {
     return 0;
   }
-  if(!(rset->rlist = alloc_resnode())) {
+  if(!(rset->rlist = (struct res_node *)alloc_resnode())) {
     free(rset);
     return 0;
   }
@@ -418,10 +418,10 @@ struct kdres *kd_nearest_range(struct kdtree *kd, const double *pos, double rang
   int ret;
   struct kdres *rset;
 
-  if(!(rset = malloc(sizeof *rset))) {
+  if(!(rset = (struct kdres *)malloc(sizeof *rset))) {
     return 0;
   }
-  if(!(rset->rlist = alloc_resnode())) {
+  if(!(rset->rlist = (struct res_node *)alloc_resnode())) {
     free(rset);
     return 0;
   }
@@ -506,7 +506,7 @@ static struct kdhyperrect* hyperrect_create(int dim, const double *min, const do
   size_t size = dim * sizeof(double);
   struct kdhyperrect* rect = 0;
 
-  if (!(rect = malloc(sizeof(struct kdhyperrect)))) {
+  if (!(rect = (struct kdhyperrect *)malloc(sizeof(struct kdhyperrect)))) {
     return 0;
   }
 
@@ -564,7 +564,7 @@ static int rlist_insert(struct res_node *list, struct kdnode *item, double dist_
 {
   struct res_node *rnode;
 
-  if(!(rnode = alloc_resnode())) {
+  if(!(rnode = (struct res_node *)alloc_resnode())) {
     return -1;
   }
   rnode->item = item;

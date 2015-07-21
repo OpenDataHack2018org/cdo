@@ -417,7 +417,7 @@ char *getOperatorArg(const char *xoperator)
 
   if ( xoperator )
     {
-      commapos = strchr(xoperator, ',');
+      commapos = (char *)strchr(xoperator, ',');
 
       if ( commapos )
         {

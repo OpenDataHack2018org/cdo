@@ -263,7 +263,7 @@ double yac_girards_area ( struct grid_cell cell  ) {
   int M = cell.num_corners;
   if (M < 3) return area;  // a degenerate cell
 
-  double * theta = malloc ( M * sizeof(theta[0]) );
+  double * theta = (double *)malloc ( M * sizeof(theta[0]) );
 
   for ( m = 0; m < M; m++ ) {
      theta[m] = yac_partial_area(cell.coordinates_x[(m+1)%M], cell.coordinates_y[(m+1)%M],

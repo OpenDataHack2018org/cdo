@@ -200,7 +200,7 @@ char *getOperatorName(const char *operatorArg)
     {
       if ( operatorArg[0] == '-' ) operatorArg++;
 
-      commapos = strchr(operatorArg, ',');
+      commapos = (char *)strchr(operatorArg, ',');
 
       if ( commapos )
         len = commapos - operatorArg;
@@ -716,7 +716,7 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
 
               if ( len > 2 )
                 {
-                  char *result = strrchr(refname, '.');
+                  char *result = (char *)strrchr(refname, '.');
                   if ( result != NULL && result[1] != 0 )
                     {
                       int firstchar = tolower(result[1]);

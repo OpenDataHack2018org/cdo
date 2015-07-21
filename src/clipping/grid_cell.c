@@ -60,13 +60,13 @@ void yac_copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell) {
       free(out_cell->coordinates_y);
       free(out_cell->coordinates_xyz);
       free(out_cell->edge_type);
-      out_cell->coordinates_x = malloc(in_cell.num_corners *
+      out_cell->coordinates_x = (double *)malloc(in_cell.num_corners *
                                        sizeof(*(out_cell->coordinates_x)));
-      out_cell->coordinates_y = malloc(in_cell.num_corners *
+      out_cell->coordinates_y = (double *)malloc(in_cell.num_corners *
                                        sizeof(*(out_cell->coordinates_y)));
-      out_cell->coordinates_xyz = malloc(3 * in_cell.num_corners *
+      out_cell->coordinates_xyz = (double *)malloc(3 * in_cell.num_corners *
                                          sizeof(*(out_cell->coordinates_xyz)));
-      out_cell->edge_type = malloc(in_cell.num_corners *
+      out_cell->edge_type = (enum yac_edge_type *)malloc(in_cell.num_corners *
                                    sizeof(*(out_cell->edge_type)));
       out_cell->array_size = in_cell.num_corners;
    }
