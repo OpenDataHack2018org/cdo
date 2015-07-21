@@ -1425,7 +1425,9 @@ int main(int argc, char *argv[])
       fprintf(stderr, "OMP schedule        = %d (1:static; 2:dynamic; 3:guided; 4:auto)\n", (int) kind);
 #if defined(HAVE_OPENMP4)
       fprintf(stderr, "OMP proc bind       = %d (0:false; 1:true; 2:master; 3:close; 4:spread)\n", (int) omp_get_proc_bind());
+#if !defined(__ICC)
       fprintf(stderr, "OMP num devices     = %d\n", omp_get_num_devices());
+#endif
 #endif
     }
 
@@ -1438,7 +1440,9 @@ int main(int argc, char *argv[])
     {
       fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d", omp_get_num_procs(), omp_get_max_threads());
 #if defined(HAVE_OPENMP4)
+#if !defined(__ICC)
       fprintf(stderr, "  num_devices = %d", omp_get_num_devices());
+#endif
 #endif
       fprintf(stderr, "\n");
     }
