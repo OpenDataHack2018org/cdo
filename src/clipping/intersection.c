@@ -1916,7 +1916,7 @@ int yac_do_intersect (struct edge edge_a, double a[3], double b[3],
          return loncxlatc_(edge_a, edge_b);
       case ((1 << 1) | (1 << 4)):
 #if defined(CDO)
-        yac_internal_abort_message ( "flag not supported in CDO.", __FILE__, __LINE__ );
+         yac_internal_abort_message ( "flag not supported in CDO.", __FILE__, __LINE__ );
 #else
          return loncxlonc_(edge_a, edge_b);
 #endif
