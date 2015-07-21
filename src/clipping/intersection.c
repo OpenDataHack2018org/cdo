@@ -1038,6 +1038,7 @@ int yac_loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
    return ret_value;
 }
 
+#if !defined(CDO) 
 static
 int loncxlonc_ (struct edge edge_a, struct edge edge_b) {
 
@@ -1110,6 +1111,7 @@ int loncxlonc_ (struct edge edge_a, struct edge edge_b) {
           ((angle_ac + angle_ad) < angle_cd) ||
           ((angle_bc + angle_bd) < angle_cd);
 }
+#endif
 
 /** \brief compute the intersection point of a meridian and a parallel
  *
@@ -1913,7 +1915,11 @@ int yac_do_intersect (struct edge edge_a, double a[3], double b[3],
       case ((1 << 1) | (1 << 3)):
          return loncxlatc_(edge_a, edge_b);
       case ((1 << 1) | (1 << 4)):
+#if defined(CDO)
+        yac_internal_abort_message ( "flag not supported in CDO.", __FILE__, __LINE__ );
+#else
          return loncxlonc_(edge_a, edge_b);
+#endif
       case ((1 << 1) | (1 << 5)):
       case ((1 << 2) | (1 << 4)):
       case ((1 << 2) | (1 << 5)):
