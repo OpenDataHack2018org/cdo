@@ -161,7 +161,7 @@ void bilinear_remap(double* restrict tgt_point, const double* restrict src_array
 
   -----------------------------------------------------------------------
 */
-void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, remapvars_t* rv)
+void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*   Local variables */
   int  search_result;
@@ -288,7 +288,7 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
 
   -----------------------------------------------------------------------
 */
-void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
+void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array, double *restrict tgt_array, double missval)
 {
   /*   Local variables */
   int  search_result;

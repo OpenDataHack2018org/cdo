@@ -350,12 +350,17 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
+  double search_radius = M_PI;
+  double range = SQR(2*search_radius);
+
   unsigned index;
   void *gs_result;
-#pragma omp parallel for private(gs_result) shared(mindex, array1, array2, xvals, yvals) private(index)
+#pragma omp parallel for private(gs_result, index) shared(mindex, array1, array2, xvals, yvals, range)
   for ( unsigned i = 0; i < nmiss; ++i )
     {
-      gs_result = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]]);
+      double prange = range;
+
+      gs_result = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
       if ( gs_result ) 
         index = gridsearch_item(gs_result);
       else

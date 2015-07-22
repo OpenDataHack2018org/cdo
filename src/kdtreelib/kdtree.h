@@ -3,6 +3,7 @@
  */
 
 /*
+  Code from: https://github.com/joergdietrich/libkdtree
   Uwe Schulzweida, 20150720: changed data pointer to unsigned int
                              changed *point to point[KD_MAX_DIM]
                              changed *location to location[KD_MAX_DIM]

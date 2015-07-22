@@ -21,7 +21,6 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 
 struct gridsearch {
   unsigned n;
-
   struct kdNode *kdt;
 };
 
@@ -142,25 +141,32 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
 
 void gridsearch_delete(struct gridsearch *gs)
 {
-  kd_destroyTree(gs->kdt);
+  if ( gs )
+    {
+      kd_destroyTree(gs->kdt);
   
-  free(gs);
+      free(gs);
+    }
 }
 
-#define SQR(a) ((a)*(a))
 
-void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat)
+void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange)
 {
   if ( gs->kdt == NULL ) return NULL;
   
   float point[3];
-  float range0 = SQR(2 * M_PI);     /* This has to be bigger than the presumed
-                                     * maximum distance to the NN but smaller
-                                     * than once around the sphere. The content
-                                     * of this variable is replaced with the
-                                     * distance to the NN squared. */
-  //range0 = SQR(1./180. * M_PI);;
+  float range0;
+  if ( prange )
+    range0 = *prange;
+  else
+    range0 = SQR(2 * M_PI);     /* This has to be bigger than the presumed
+                                 * maximum distance to the NN but smaller
+                                 * than once around the sphere. The content
+                                 * of this variable is replaced with the
+                                 * distance to the NN squared. */
+
   float range = range0;
+
 #if defined(KD_SEARCH_SPH)
   point[0] = lon;
   point[1] = lat;
@@ -171,9 +177,11 @@ void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat)
 
   kdNode *node = kd_nearest(gs->kdt, point, &range, 3);
   // printf("range %g %g %g %p\n", lon, lat, range, node);
+#endif
 
   if ( !(range < range0) ) node = NULL;
-#endif
+  if ( prange ) *prange = range;
+
   return (void *) node;
 }
 

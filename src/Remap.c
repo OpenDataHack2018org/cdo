@@ -919,7 +919,9 @@ void *Remap(void *argument)
       get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
     }
 
-  if ( remap_genweights == FALSE && map_type != MAP_TYPE_BILINEAR && map_type != MAP_TYPE_BICUBIC && map_type != MAP_TYPE_CONSERV_YAC )
+  if ( remap_genweights == FALSE &&
+       map_type != MAP_TYPE_BILINEAR && map_type != MAP_TYPE_BICUBIC &&
+       map_type != MAP_TYPE_DISTWGT  && map_type != MAP_TYPE_CONSERV_YAC )
     remap_genweights = TRUE;
 
   remap_set_int(REMAP_GENWEIGHTS, remap_genweights);
@@ -1182,6 +1184,7 @@ void *Remap(void *argument)
 	    {
 	      if      ( map_type == MAP_TYPE_BILINEAR    ) scrip_remap_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
 	      else if ( map_type == MAP_TYPE_BICUBIC     ) scrip_remap_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
+              else if ( map_type == MAP_TYPE_DISTWGT     ) scrip_remap_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
 	      else if ( map_type == MAP_TYPE_CONSERV_YAC ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
 	    }
 

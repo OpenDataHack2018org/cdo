@@ -135,7 +135,6 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-griddes_h5.lo libcdo_la-griddes_nc.lo \
 	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
 	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
-	libcdo_la-kdtree.lo libcdo_la-kdtree_fast.lo \
 	libcdo_la-grid_search.lo libcdo_la-kvlist.lo libcdo_la-list.lo \
 	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
 	libcdo_la-namelist.lo libcdo_la-normal.lo \
@@ -562,14 +561,13 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
 	grid_gme.c grid_lcc.c grid_rot.c gridreference.c griddes.c \
 	griddes.h griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h \
-	institution.c interpol.c interpol.h job.c juldate.c kdtree.c \
-	kdtree.h kdtree_fast.c kdtree_fast.h grid_search.c \
-	grid_search.h kvlist.c kvlist.h list.c list.h merge_sort2.c \
-	merge_sort2.h modules.c modules.h namelist.c namelist.h \
-	normal.c nth_element.c nth_element.h operator_help.h par_io.c \
-	par_io.h percentiles.c percentiles.h pipe.c pipe.h \
-	pragma_omp_atomic_update.h printinfo.h process.c process.h \
-	pstream.c pstream.h pstream_write.h pstream_int.h \
+	institution.c interpol.c interpol.h job.c juldate.c \
+	grid_search.c grid_search.h kvlist.c kvlist.h list.c list.h \
+	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
+	namelist.h normal.c nth_element.c nth_element.h \
+	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
+	pipe.c pipe.h pragma_omp_atomic_update.h printinfo.h process.c \
+	process.h pstream.c pstream.h pstream_write.h pstream_int.h \
 	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
 	remaplib.c remapsort.c remap_scrip_io.c remap_search_reg2d.c \
 	remap_search_latbins.c remap_store_link.c remap_store_link.h \
@@ -1048,8 +1046,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-interpol.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-job.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-juldate.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kdtree.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kdtree_fast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kvlist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-merge_sort2.Plo@am__quote@
@@ -1416,20 +1412,6 @@ libcdo_la-juldate.lo: juldate.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='juldate.c' object='libcdo_la-juldate.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-juldate.lo `test -f 'juldate.c' || echo '$(srcdir)/'`juldate.c
-
-libcdo_la-kdtree.lo: kdtree.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-kdtree.lo -MD -MP -MF $(DEPDIR)/libcdo_la-kdtree.Tpo -c -o libcdo_la-kdtree.lo `test -f 'kdtree.c' || echo '$(srcdir)/'`kdtree.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-kdtree.Tpo $(DEPDIR)/libcdo_la-kdtree.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtree.c' object='libcdo_la-kdtree.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-kdtree.lo `test -f 'kdtree.c' || echo '$(srcdir)/'`kdtree.c
-
-libcdo_la-kdtree_fast.lo: kdtree_fast.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-kdtree_fast.lo -MD -MP -MF $(DEPDIR)/libcdo_la-kdtree_fast.Tpo -c -o libcdo_la-kdtree_fast.lo `test -f 'kdtree_fast.c' || echo '$(srcdir)/'`kdtree_fast.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-kdtree_fast.Tpo $(DEPDIR)/libcdo_la-kdtree_fast.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtree_fast.c' object='libcdo_la-kdtree_fast.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-kdtree_fast.lo `test -f 'kdtree_fast.c' || echo '$(srcdir)/'`kdtree_fast.c
 
 libcdo_la-grid_search.lo: grid_search.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_search.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_search.Tpo -c -o libcdo_la-grid_search.lo `test -f 'grid_search.c' || echo '$(srcdir)/'`grid_search.c
