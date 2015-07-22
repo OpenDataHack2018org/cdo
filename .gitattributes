@@ -586,6 +586,15 @@ src/kdtree.c -text
 src/kdtree.h -text
 src/kdtree_fast.c -text
 src/kdtree_fast.h -text
+src/kdtreelib/COPYING.DJ -text
+src/kdtreelib/kdtree.h -text
+src/kdtreelib/kdtree_cartesian.c -text
+src/kdtreelib/kdtree_common.c -text
+src/kdtreelib/kdtree_spherical.c -text
+src/kdtreelib/pmergesort.c -text
+src/kdtreelib/pqueue.c -text
+src/kdtreelib/pqueue.h -text
+src/kdtreelib/qsort.c -text
 src/kvlist.c -text
 src/kvlist.h -text
 src/list.c -text
