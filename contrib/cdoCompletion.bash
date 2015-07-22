@@ -527,6 +527,7 @@ sethalo -sethalo \
 setlevel -setlevel \
 setltype -setltype \
 setmisstoc -setmisstoc \
+setmisstonn -setmisstonn \
 setmissval -setmissval \
 setmon -setmon \
 setname -setname \
@@ -674,6 +675,8 @@ varrms -varrms \
 vct -vct \
 vct2 -vct2 \
 vertavg -vertavg \
+vertcum -vertcum \
+vertcumhl -vertcumhl \
 vertint -vertint \
 vertmax -vertmax \
 vertmean -vertmean \

@@ -527,6 +527,7 @@ sethalo \
 setlevel \
 setltype \
 setmisstoc \
+setmisstonn \
 setmissval \
 setmon \
 setname \
@@ -674,6 +675,8 @@ varrms \
 vct \
 vct2 \
 vertavg \
+vertcum \
+vertcumhl \
 vertint \
 vertmax \
 vertmean \

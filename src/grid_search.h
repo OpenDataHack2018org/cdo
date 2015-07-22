@@ -1,14 +1,6 @@
 #ifndef _GRID_SEARCH_H_
 #define _GRID_SEARCH_H_
 
-//#define KDTREE_FAST
-
-#if defined(KDTREE_FAST)
-#include "kdtree_fast.h"
-#else
-#include "kdtree.h"
-#endif
-
 struct gridsearch;
 
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);

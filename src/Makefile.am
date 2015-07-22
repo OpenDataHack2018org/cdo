@@ -139,6 +139,15 @@ libcdo_la_SOURCES =            \
                util.h          \
                zaxis.c
 libcdo_la_SOURCES +=           \
+               kdtreelib/kdtree.h            \
+               kdtreelib/kdtree_cartesian.c  \
+               kdtreelib/kdtree_common.c     \
+               kdtreelib/kdtree_spherical.c  \
+               kdtreelib/pmergesort.c        \
+               kdtreelib/pqueue.c            \
+               kdtreelib/pqueue.h            \
+               kdtreelib/qsort.c
+libcdo_la_SOURCES +=           \
                clipping/clipping.c           \
                clipping/clipping.h           \
                clipping/area.c               \
