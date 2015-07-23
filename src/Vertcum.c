@@ -193,7 +193,7 @@ void *Vertcum(void *argument)
                 }
             }
 
-          if ( operatorID == VERTCUMHL && nlevs2 == nlevshl )
+          if ( 0 && operatorID == VERTCUMHL && nlevs2 == nlevshl )
             {
               double *var1 = vardata2[varID][nlevs2-1];
               for ( levelID = 0; levelID < nlevs2; ++levelID )

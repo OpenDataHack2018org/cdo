@@ -498,6 +498,18 @@ void *Vertintml(void *argument)
 	cdoPrint("using %s", var_stdname(surface_air_pressure));
     }
 
+  // check VCT
+  if ( zaxisIDh != -1 )
+    {
+      double suma = 0, sumb = 0;
+      for ( i = 0; i < nhlevh; i++ )
+        {
+          suma += vct[i];
+          sumb += vct[i+nhlevh];
+        }
+      if ( !(suma>0&&sumb>0) ) cdoWarning("VCT is empty!");
+    }
+
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);

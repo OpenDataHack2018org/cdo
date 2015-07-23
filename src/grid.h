@@ -29,7 +29,7 @@ void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast, double y
 
 int  gridWeights(int gridID, double *weights);
 int  gridGenArea(int gridID, double *area);
-void gaussaw(double pa[], double pw[], int nlat);
+void gaussaw(double *pa, double *pw, int nlat);
 
 int referenceToGrid(int gridID);
 int gridToZonal(int gridID);
