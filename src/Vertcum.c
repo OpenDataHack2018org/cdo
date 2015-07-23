@@ -111,6 +111,7 @@ void *Vertcum(void *argument)
                       nlevshl = nlevs+1;
 
                       double *vct = (double*) malloc(nvct*sizeof(double));
+                      zaxisInqVct(zaxisID, vct);
 
                       zaxisIDhl = zaxisCreate(ZAXIS_HYBRID_HALF, nlevshl);
                       double levels[nlevshl];
@@ -193,7 +194,7 @@ void *Vertcum(void *argument)
                 }
             }
 
-          if ( 0 && operatorID == VERTCUMHL && nlevs2 == nlevshl )
+          if ( operatorID == VERTCUMHL && nlevs2 == nlevshl )
             {
               double *var1 = vardata2[varID][nlevs2-1];
               for ( levelID = 0; levelID < nlevs2; ++levelID )
