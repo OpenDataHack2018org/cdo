@@ -376,7 +376,7 @@ void grid_search_nbr_new(struct gridsearch *gs, int num_neighbors, int *restrict
   for ( n = 0; n < num_neighbors; ++n ) nbr_add[n]  = -1;
   for ( n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
 
-  int ndist = 1;
+  int ndist = num_neighbors;
   double distance;     /* Angular distance */
   double *dist = (double*) malloc(ndist*sizeof(double));
   int    *adds = (int*) malloc(ndist*sizeof(int));
@@ -384,24 +384,39 @@ void grid_search_nbr_new(struct gridsearch *gs, int num_neighbors, int *restrict
   double range = SQR(2*search_radius);
 
   int j = 0;
-  void *gs_result = gridsearch_nearest(gs, plon, plat, &range);
+  //  void *gs_result = gridsearch_nearest(gs, plon, plat, &range);
+  struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, num_neighbors);
   if ( gs_result )
     {
-      unsigned nadd = gridsearch_item(gs_result);
+      unsigned nadd;
+      struct resItem *p;
+      while ( pqremove_min(gs_result, &p) )
+        {
+          //  fprintf(stdout, " index : %d\tdist: %g\n", p->node->index, p->dist_sq);
+
+          nadd = p->node->index;
       
-      distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
-	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
-      if ( distance >  1. ) distance =  1.;
+          distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
+                     (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
+          if ( distance >  1. ) distance =  1.;
 
-      //  printf("nadd %d dist %g search_radius %g acosdis %g sqrtrange %g\n", nadd, distance, search_radius, acos(distance), sqrt(range));
-      if ( distance >= cos_search_radius )
-	{
-	  dist[j] = distance;
-	  adds[j] = nadd;
-          j++;
-	}
+          printf("j: %d nadd %d dist %g search_radius %g acosdis %g sqrtrange %g\n", j+1, nadd, distance, search_radius, acos(distance), sqrt(p->dist_sq));
+          if ( distance >= cos_search_radius )
+            {
+              dist[j] = distance;
+              adds[j] = nadd;
+              j++;
+            }
+
+          /* Free the result node taken from the heap  */
+          free(p);
+        }
+
+      /* free the heap */
+      free(gs_result->d);
+      /* and free the heap information structure  */
+      free(gs_result);
     }
-
   ndist = j;
 
 #if defined(HAVE_OPENMP4)
@@ -678,7 +693,7 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
   struct gridsearch *gs = NULL;
-  if ( remap_grid_type != REMAP_GRID_TYPE_REG2D && num_neighbors == 1 )
+  if ( remap_grid_type != REMAP_GRID_TYPE_REG2D && num_neighbors < 5 )
     {
       gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
     }
@@ -724,7 +739,7 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
 			      src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
       else
         {
-          if ( num_neighbors == 1 )
+          if ( num_neighbors < 5 )
             grid_search_nbr_new(gs, num_neighbors, nbr_add, nbr_dist, plat, plon,
                                 sinlat, coslat, sinlon, coslon);
           else

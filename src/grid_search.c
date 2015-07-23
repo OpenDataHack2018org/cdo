@@ -186,6 +186,35 @@ void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *
 }
 
 
+struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, unsigned nnn)
+{
+  if ( gs->kdt == NULL ) return NULL;
+  
+  float point[3];
+  float range0;
+  if ( prange )
+    range0 = *prange;
+  else
+    range0 = SQR(2 * M_PI);     /* This has to be bigger than the presumed
+                                 * maximum distance to the NN but smaller
+                                 * than once around the sphere. The content
+                                 * of this variable is replaced with the
+                                 * distance to the NN squared. */
+
+  float range = range0;
+
+  LLtoXYZ_f(lon, lat, point);
+
+  struct pqueue *result = kd_qnearest(gs->kdt, point, &range, nnn, 3);
+  // printf("range %g %g %g %p\n", lon, lat, range, node);
+
+  if ( !(range < range0) ) result = NULL;
+  if ( prange ) *prange = range;
+
+  return result;
+}
+
+
 unsigned gridsearch_item(void *gs_result)
 {
   unsigned index = 0;
