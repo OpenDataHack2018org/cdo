@@ -5,6 +5,7 @@
 
 2015-07-27  Uwe Schulzweida
 
+	* removed configure option --with-jasper
 	* remapnn/dis: replaced scrip search by kdtree
 
 2015-07-23  Uwe Schulzweida
