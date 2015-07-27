@@ -145,16 +145,16 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48"
 
         if  test "$COMP" = icc ; then
-          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/mistral \
+          ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = pgcc ; then
-          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/mistral \
+          ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -fast"
 	else
-          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/mistral \
+          ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
                     $CDOLIBS \
                     CC=gcc CFLAGS='-g -Wall -O3 -march=native'
