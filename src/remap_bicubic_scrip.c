@@ -79,7 +79,7 @@ void bicubic_remap(double* restrict tgt_point, const double* restrict src_array,
 
   -----------------------------------------------------------------------
 */
-void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*   Local variables */
   int  search_result;

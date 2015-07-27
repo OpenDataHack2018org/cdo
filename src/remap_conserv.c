@@ -555,7 +555,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 }
 
 
-void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
 
