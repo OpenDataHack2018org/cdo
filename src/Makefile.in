@@ -148,8 +148,7 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-remap_search_latbins.lo \
 	libcdo_la-remap_store_link.lo \
 	libcdo_la-remap_store_link_cnsrv.lo libcdo_la-remap_conserv.lo \
-	libcdo_la-remap_conserv_scrip.lo \
-	libcdo_la-remap_distwgt_scrip.lo \
+	libcdo_la-remap_conserv_scrip.lo libcdo_la-remap_distwgt.lo \
 	libcdo_la-remap_bicubic_scrip.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
@@ -571,7 +570,7 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	remaplib.c remapsort.c remap_scrip_io.c remap_search_reg2d.c \
 	remap_search_latbins.c remap_store_link.c remap_store_link.h \
 	remap_store_link_cnsrv.c remap_store_link_cnsrv.h \
-	remap_conserv.c remap_conserv_scrip.c remap_distwgt_scrip.c \
+	remap_conserv.c remap_conserv_scrip.c remap_distwgt.c \
 	remap_bicubic_scrip.c remap_bilinear_scrip.c stdnametable.c \
 	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
 	table.c text.c text.h timebase.h timer.c userlog.c util.c \
@@ -1064,7 +1063,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_bilinear_scrip.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_conserv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_conserv_scrip.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_distwgt_scrip.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_distwgt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_scrip_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_search_latbins.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_search_reg2d.Plo@am__quote@
@@ -1587,12 +1586,12 @@ libcdo_la-remap_conserv_scrip.lo: remap_conserv_scrip.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-remap_conserv_scrip.lo `test -f 'remap_conserv_scrip.c' || echo '$(srcdir)/'`remap_conserv_scrip.c
 
-libcdo_la-remap_distwgt_scrip.lo: remap_distwgt_scrip.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-remap_distwgt_scrip.lo -MD -MP -MF $(DEPDIR)/libcdo_la-remap_distwgt_scrip.Tpo -c -o libcdo_la-remap_distwgt_scrip.lo `test -f 'remap_distwgt_scrip.c' || echo '$(srcdir)/'`remap_distwgt_scrip.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-remap_distwgt_scrip.Tpo $(DEPDIR)/libcdo_la-remap_distwgt_scrip.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remap_distwgt_scrip.c' object='libcdo_la-remap_distwgt_scrip.lo' libtool=yes @AMDEPBACKSLASH@
+libcdo_la-remap_distwgt.lo: remap_distwgt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-remap_distwgt.lo -MD -MP -MF $(DEPDIR)/libcdo_la-remap_distwgt.Tpo -c -o libcdo_la-remap_distwgt.lo `test -f 'remap_distwgt.c' || echo '$(srcdir)/'`remap_distwgt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-remap_distwgt.Tpo $(DEPDIR)/libcdo_la-remap_distwgt.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remap_distwgt.c' object='libcdo_la-remap_distwgt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-remap_distwgt_scrip.lo `test -f 'remap_distwgt_scrip.c' || echo '$(srcdir)/'`remap_distwgt_scrip.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-remap_distwgt.lo `test -f 'remap_distwgt.c' || echo '$(srcdir)/'`remap_distwgt.c
 
 libcdo_la-remap_bicubic_scrip.lo: remap_bicubic_scrip.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-remap_bicubic_scrip.lo -MD -MP -MF $(DEPDIR)/libcdo_la-remap_bicubic_scrip.Tpo -c -o libcdo_la-remap_bicubic_scrip.lo `test -f 'remap_bicubic_scrip.c' || echo '$(srcdir)/'`remap_bicubic_scrip.c

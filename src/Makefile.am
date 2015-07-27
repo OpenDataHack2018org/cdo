@@ -116,7 +116,7 @@ libcdo_la_SOURCES =            \
                remap_store_link_cnsrv.h \
                remap_conserv.c \
                remap_conserv_scrip.c \
-               remap_distwgt_scrip.c \
+               remap_distwgt.c \
                remap_bicubic_scrip.c \
                remap_bilinear_scrip.c \
                stdnametable.c  \
