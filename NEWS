@@ -7,7 +7,7 @@ Version 1.7.0 (28 October 2015):
      * distgrid: added support for curvilinear grids
      * collgrid: added support for curvilinear grids
    New operators:
-     * setmisstonn: Set missing value to nearest neightbour
+     * setmisstonn: Set missing value to nearest neightbor
      * vertstd1: Vertical standard deviation [Divisor is (n-1)]
      * vertvar1: Vertical variance [Divisor is (n-1)]
      * seasvar1: Seasonal variance [Divisor is (n-1)]
@@ -15,6 +15,7 @@ Version 1.7.0 (28 October 2015):
      * yseasvar1: Multi-year seasonally variance [Divisor is (n-1)]
      * yseasstd1: Multi-year seasonally standard deviation [Divisor is (n-1)]
    Changed operators:
+     * remapnn, remapdis: replaced scrip search by kdtree (optimization)
      * vertvar, vertstd: changed to weighted var/std if layer bounds are available
    Fixed bugs:
      * cdo -t table_file does not complain if table_file is a directory [Bug #5891]

@@ -1267,7 +1267,7 @@ static char *SetmissHelp[] = {
     "                          / miss   if i(t,x) LT rmin OR  i(t,x) GT rmax",
     "                 o(t,x) = ",
     "                          \\ i(t,x) if i(t,x) GE rmin AND i(t,x) LE rmax",
-    "    setmisstonn  Set missing value to nearest neightbour",
+    "    setmisstonn  Set missing value to nearest neightbor",
     "                 Set all missing values to the nearest non missing value.",
     "                          / i(t,y) if i(t,x) EQ miss AND i(t,y) NE miss",
     "                 o(t,x) = ",
@@ -4670,12 +4670,12 @@ static char *FillmissHelp[] = {
     "",
     "OPERATORS",
     "    fillmiss   Fill missing values",
-    "               Fill missing values by bilinear interpolation of the neightbours.",
+    "               Fill missing values by bilinear interpolation of the neightbors.",
     "    fillmiss2  Fill missing values",
-    "               Fill missing values by using the neares value from up/down/left/right neightbours. ",
+    "               Fill missing values by using the neares value from up/down/left/right neightbors. ",
     "",
     "PARAMETER",
-    "    maxiter  INTEGER  Number of iterations to perform this nearest neightbours replacement",
+    "    maxiter  INTEGER  Number of iterations to perform this nearest neightbors replacement",
     NULL
 };
 

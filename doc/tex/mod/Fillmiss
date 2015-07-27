@@ -13,7 +13,7 @@
 @Title     = Fill missing values
 
 @BeginDescription
-Fill missing values by bilinear interpolation of the neightbours.
+Fill missing values by bilinear interpolation of the neightbors.
 @EndDescription
 @EndOperator
 
@@ -23,12 +23,12 @@ Fill missing values by bilinear interpolation of the neightbours.
 @Parameter = [maxiter]
 
 @BeginDescription
-Fill missing values by using the neares value from up/down/left/right neightbours. 
+Fill missing values by using the neares value from up/down/left/right neightbors. 
 @EndDescription
 @EndOperator
 
 
 @BeginParameter
 @Item = maxiter
-INTEGER  Number of iterations to perform this nearest neightbours replacement
+INTEGER  Number of iterations to perform this nearest neightbors replacement
 @EndParameter
