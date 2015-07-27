@@ -2,9 +2,17 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "dmemory.h"
 #include "util.h"
 #include "grid_search.h"
-#include "kdtreelib/kdtree.h"
+
+
+#ifndef  M_PI
+#define  M_PI        3.14159265358979323846264338327950288  /* pi */
+#endif
+
+#define  PI       M_PI
+#define  PI2      (2.0*PI)
 
 
 #define KDTREELIB
@@ -19,17 +27,54 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 }
 
 
-struct gridsearch {
-  unsigned n;
-  struct kdNode *kdt;
-};
+struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats)
+{
+  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
 
+  gs->nx = nx;
+  gs->ny = ny;
+
+  double *reg2d_center_lon = (double *) malloc((nx+1)*sizeof(double));
+  double *reg2d_center_lat = (double *) malloc(ny*sizeof(double));
+
+  memcpy(reg2d_center_lon, lons, (nx+1)*sizeof(double));
+  memcpy(reg2d_center_lat, lats, ny*sizeof(double));
+
+  double *coslon = (double *) malloc(nx*sizeof(double));
+  double *sinlon = (double *) malloc(nx*sizeof(double));
+  double *coslat = (double *) malloc(ny*sizeof(double));
+  double *sinlat = (double *) malloc(ny*sizeof(double));
+
+  for ( unsigned n = 0; n < nx; ++n )
+    {
+      double rlon = lons[n];
+      if ( rlon > PI2 ) rlon -= PI2;
+      if ( rlon < 0   ) rlon += PI2;
+      coslon[n] = cos(rlon);
+      sinlon[n] = sin(rlon);
+    }
+  for ( unsigned n = 0; n < ny; ++n )
+    {
+      coslat[n] = cos(lats[n]);
+      sinlat[n] = sin(lats[n]);
+    }
+
+  gs->reg2d_center_lon = reg2d_center_lon;
+  gs->reg2d_center_lat = reg2d_center_lat;
+
+  gs->coslon = coslon;
+  gs->sinlon = sinlon;
+  gs->coslat = coslat;
+  gs->sinlat = sinlat;
+
+  return gs;
+}
 
 struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
 {
-  struct gridsearch *gs = (struct gridsearch *) malloc(sizeof(struct gridsearch));
+  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+
   gs->n = n;
-  gs->kdt = NULL;
 
   if ( n == 0 ) return gs;
 
@@ -84,9 +129,9 @@ struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lo
 
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs = (struct gridsearch *) malloc(sizeof(struct gridsearch));
+  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+
   gs->n = n;
-  gs->kdt = NULL;
 
   if ( n == 0 ) return gs;
 
@@ -143,8 +188,16 @@ void gridsearch_delete(struct gridsearch *gs)
 {
   if ( gs )
     {
-      kd_destroyTree(gs->kdt);
-  
+      if ( gs->kdt ) kd_destroyTree(gs->kdt);
+      
+      if ( gs->reg2d_center_lon ) free(gs->reg2d_center_lon);
+      if ( gs->reg2d_center_lat ) free(gs->reg2d_center_lat);
+
+      if ( gs->coslat ) free(gs->coslat);
+      if ( gs->coslon ) free(gs->coslon);
+      if ( gs->sinlat ) free(gs->sinlat);
+      if ( gs->sinlon ) free(gs->sinlon);
+
       free(gs);
     }
 }
@@ -164,7 +217,6 @@ void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *
                                  * than once around the sphere. The content
                                  * of this variable is replaced with the
                                  * distance to the NN squared. */
-
   float range = range0;
 
 #if defined(KD_SEARCH_SPH)
@@ -200,7 +252,6 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
                                  * than once around the sphere. The content
                                  * of this variable is replaced with the
                                  * distance to the NN squared. */
-
   float range = range0;
 
   LLtoXYZ_f(lon, lat, point);

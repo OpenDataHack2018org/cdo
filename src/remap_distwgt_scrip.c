@@ -13,46 +13,6 @@
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 static
-void get_restrict_add(remapgrid_t *src_grid, double plat, const int *restrict src_bin_add, int *minadd, int *maxadd)
-{
-  int n, n2;
-  int min_add = 0, max_add = 0, nm1, np1;
-  int nbins;
-  restr_t rlat;
-  restr_t *bin_lats = src_grid->bin_lats;
-
-  nbins = src_grid->num_srch_bins;
-
-  rlat = RESTR_SCALE(plat);
-
-  for ( n = 0; n < nbins; ++n )
-    {
-      n2 = n<<1;
-      if ( rlat >= bin_lats[n2  ] && rlat <= bin_lats[n2+1] )
-	{
-	  min_add = src_bin_add[n2  ];
-	  max_add = src_bin_add[n2+1];
-
-	  nm1 = MAX(n-1, 0);
-	  np1 = MIN(n+1, nbins-1);
-
-	  min_add = MIN(min_add, src_bin_add[2*nm1  ]);
-	  max_add = MAX(max_add, src_bin_add[2*nm1+1]);
-	  min_add = MIN(min_add, src_bin_add[2*np1  ]);
-	  max_add = MAX(max_add, src_bin_add[2*np1+1]);
-	}
-    }
-
-  *minadd = min_add;
-  *maxadd = max_add;
-  /*
-  if ( cdoVerbose )
-    printf("plon %g plat %g min_add %ld max_add %ld diff %ld\n",
-	   plon, plat, min_add, max_add, max_add-min_add);
-  */
-}
-
-static
 void nbr_store_distance(int nadd, double distance, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist)
 {
   if ( num_neighbors == 1 )
@@ -102,7 +62,6 @@ void nbr_check_distance(int num_neighbors, const int *restrict nbr_add, double *
     }
 }
 
-
 static
 double get_search_radius(void)
 {
@@ -123,11 +82,8 @@ double get_search_radius(void)
    point and computes a distance to each of the neighbors.
 */
 static
-void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr_add, double *restrict nbr_dist, 
-			   double plat, double plon, const int *restrict src_grid_dims,
-			   const double *restrict sinlat, const double *restrict coslat,
-			   const double *restrict sinlon, const double *restrict coslon,
-			   const double *restrict src_center_lat, const double *restrict src_center_lon)
+void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t *src_grid, int *restrict nbr_add, double *restrict nbr_dist, 
+			   double plat, double plon, const int *restrict src_grid_dims)
 {
   /*
     Output variables:
@@ -143,7 +99,6 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
   /*  Local variables */
   int lfound;
   int n, nadd;
-  int nx, nxm, ny;
   long ii, jj;
   int i, j, ix;
   int src_add[25];
@@ -154,10 +109,17 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
   double coslon_dst = cos(plon);  // cos(lon)  of the search point
   double sinlat_dst = sin(plat);  // sin(lat)  of the search point
   double sinlon_dst = sin(plon);  // sin(lon)  of the search point
-  nx = src_grid_dims[0];
-  ny = src_grid_dims[1];
+  double *restrict coslon = gs->coslon;
+  double *restrict sinlon = gs->sinlon;
+  double *restrict coslat = gs->coslat;
+  double *restrict sinlat = gs->sinlat;
+  double *restrict src_center_lon = gs->reg2d_center_lon;
+  double *restrict src_center_lat = gs->reg2d_center_lat;
 
-  nxm = nx;
+  long nx = src_grid_dims[0];
+  long ny = src_grid_dims[1];
+
+  long nxm = nx;
   if ( src_grid->is_cyclic ) nxm++;
 
   if ( plon < src_center_lon[0]     ) plon += PI2;
@@ -218,13 +180,10 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 	  /* Find distance to this point */
 	  distance =  sinlat_dst*sinlat[iy] + coslat_dst*coslat[iy]*
 	             (coslon_dst*coslon[ix] + sinlon_dst*sinlon[ix]);
-	  /*
-	  distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
-	             (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
-	  */
+
 	  /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
 	                                 otherwise the result of acos(distance) is NaN */
-	  if ( distance >  1. ) distance =  1.;
+	  if ( distance > 1. ) distance =  1.;
 
 	  if ( distance >= cos_search_radius )
 	    {
@@ -264,10 +223,7 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 }  /*  grid_search_nbr_reg2d  */
 
 static
-void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr_add, double *restrict nbr_dist, 
-		     double plat, double plon, const int *restrict src_bin_add,
-		     const double *restrict sinlat, const double *restrict coslat,
-		     const double *restrict sinlon, const double *restrict coslon)
+void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plat, double plon)
 {
   /*
     Output variables:
@@ -277,62 +233,59 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
 
     Input variables:
 
-    int src_bin_add[][2]  ! search bins for restricting search
-
     double plat,         ! latitude  of the search point
     double plon,         ! longitude of the search point
   */
   /*  Local variables */
-  int n, nadd;
-  int min_add, max_add;
-  double cos_search_radius = cos(get_search_radius());
-  double coslat_dst = cos(plat);  // cos(lat)  of the search point
-  double coslon_dst = cos(plon);  // cos(lon)  of the search point
-  double sinlat_dst = sin(plat);  // sin(lat)  of the search point
-  double sinlon_dst = sin(plon);  // sin(lon)  of the search point
-  /* Loop over source grid and find nearest neighbors                         */
-  /* restrict the search using search bins expand the bins to catch neighbors */
-
-  get_restrict_add(src_grid, plat, src_bin_add, &min_add, &max_add);
+  int n;
+  double search_radius = get_search_radius();
 
   /* Initialize distance and address arrays */
   for ( n = 0; n < num_neighbors; ++n ) nbr_add[n]  = -1;
   for ( n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
 
-  int i, ndist = max_add - min_add + 1;
-
-  if ( ndist <= 0 ) return;
-
-  double distance;     /* Angular distance */
+  int ndist = num_neighbors;
+  ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
   double *dist = (double*) malloc(ndist*sizeof(double));
   int    *adds = (int*) malloc(ndist*sizeof(int));
 
+  const double range0 = SQR(2*search_radius);
+  double range = range0;
+
   int j = 0;
-  for ( i = 0; i < ndist; ++i )
+  //void *gs_result = gridsearch_nearest(gs, plon, plat, &range);
+  struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, ndist);
+  if ( gs_result )
     {
-      nadd = min_add+i;
-      /* Find distance to this point */
-      distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
-	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
-      /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
-                                     otherwise the result of acos(distance) is NaN */
-      if ( distance >  1. ) distance =  1.;
+      unsigned nadd;
+      /*
+        nadd = gridsearch_item(gs_result);
+          if ( range < range0 )
+            {
+              dist[j] = sqrt(range);
+              adds[j] = nadd;
+              j++;
+            }
+      */
+      struct resItem *p;
+      while ( pqremove_min(gs_result, &p) )
+        {
+          nadd  = p->node->index;
+          range = p->dist_sq;
+          free(p); // Free the result node taken from the heap
 
-      if ( distance >= cos_search_radius )
-	{
-	  dist[j] = distance;
-	  adds[j] = nadd;
-	  j++;
-	}
+          if ( range < range0 )
+            {
+              dist[j] = sqrt(range);
+              adds[j] = nadd;
+              j++;
+            }
+        }
+      free(gs_result->d); // free the heap
+      free(gs_result);    // and free the heap information structure
     }
-  ndist = j;
 
-#if defined(HAVE_OPENMP4)
-  //#pragma omp simd aligned(dist:16)
-#pragma omp simd
-#endif
-  for ( j = 0; j < ndist; ++j )
-    dist[j] = acos(dist[j]);
+  ndist = j;
 
   for ( j = 0; j < ndist; ++j )
     nbr_store_distance(adds[j], dist[j], num_neighbors, nbr_add, nbr_dist);
@@ -343,97 +296,6 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
 }  /*  grid_search_nbr  */
-
-static
-void grid_search_nbr_new(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, 
-                         double plat, double plon,
-                         const double *restrict sinlat, const double *restrict coslat,
-                         const double *restrict sinlon, const double *restrict coslon)
-{
-  /*
-    Output variables:
-
-    int nbr_add[num_neighbors]     ! address of each of the closest points
-    double nbr_dist[num_neighbors] ! distance to each of the closest points
-
-    Input variables:
-
-    int src_bin_add[][2]  ! search bins for restricting search
-
-    double plat,         ! latitude  of the search point
-    double plon,         ! longitude of the search point
-  */
-  /*  Local variables */
-  int n;
-  double search_radius = get_search_radius();
-  double cos_search_radius = cos(search_radius);
-  double coslat_dst = cos(plat);  // cos(lat)  of the search point
-  double coslon_dst = cos(plon);  // cos(lon)  of the search point
-  double sinlat_dst = sin(plat);  // sin(lat)  of the search point
-  double sinlon_dst = sin(plon);  // sin(lon)  of the search point  
-
-  /* Initialize distance and address arrays */
-  for ( n = 0; n < num_neighbors; ++n ) nbr_add[n]  = -1;
-  for ( n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
-
-  int ndist = num_neighbors;
-  double distance;     /* Angular distance */
-  double *dist = (double*) malloc(ndist*sizeof(double));
-  int    *adds = (int*) malloc(ndist*sizeof(int));
-
-  double range = SQR(2*search_radius);
-
-  int j = 0;
-  //  void *gs_result = gridsearch_nearest(gs, plon, plat, &range);
-  struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, num_neighbors);
-  if ( gs_result )
-    {
-      unsigned nadd;
-      struct resItem *p;
-      while ( pqremove_min(gs_result, &p) )
-        {
-          //  fprintf(stdout, " index : %d\tdist: %g\n", p->node->index, p->dist_sq);
-
-          nadd = p->node->index;
-      
-          distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
-                     (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
-          if ( distance >  1. ) distance =  1.;
-
-          printf("j: %d nadd %d dist %g search_radius %g acosdis %g sqrtrange %g\n", j+1, nadd, distance, search_radius, acos(distance), sqrt(p->dist_sq));
-          if ( distance >= cos_search_radius )
-            {
-              dist[j] = distance;
-              adds[j] = nadd;
-              j++;
-            }
-
-          /* Free the result node taken from the heap  */
-          free(p);
-        }
-
-      /* free the heap */
-      free(gs_result->d);
-      /* and free the heap information structure  */
-      free(gs_result);
-    }
-  ndist = j;
-
-#if defined(HAVE_OPENMP4)
-#pragma omp simd
-#endif
-  for ( j = 0; j < ndist; ++j )
-    dist[j] = acos(dist[j]);
-
-  for ( j = 0; j < ndist; ++j )
-    nbr_store_distance(adds[j], dist[j], num_neighbors, nbr_add, nbr_dist);
-
-  free(adds);
-  free(dist);
-
-  nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
-
-}  /*  grid_search_nbr_new  */
 
 /*
   -----------------------------------------------------------------------------------------
@@ -448,8 +310,6 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
   long n, nadds;
   long tgt_cell_add;              /* destination address                         */
   double dist_tot;                /* sum of neighbor distances (for normalizing) */
-  double *coslat, *sinlat;        /* cosine, sine of grid lats (for distance)    */
-  double *coslon, *sinlon;        /* cosine, sine of grid lons (for distance)    */
   double plat, plon;              /* lat/lon coords of destination point         */
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -461,63 +321,20 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 
   long src_grid_size = src_grid->size;
   long tgt_grid_size = tgt_grid->size;
+  long nx = src_grid->dims[0];
+  long ny = src_grid->dims[1];
 
   weightlinks_t *weightlinks = (weightlinks_t *) malloc(tgt_grid_size*sizeof(weightlinks_t));
-
-  /* Compute cos, sin of lat/lon on source grid for distance calculations */
-
-  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    {
-      long nx = src_grid->dims[0];
-      long ny = src_grid->dims[1];
-
-      coslat = (double*) malloc(ny*sizeof(double));
-      coslon = (double*) malloc(nx*sizeof(double));
-      sinlat = (double*) malloc(ny*sizeof(double));
-      sinlon = (double*) malloc(nx*sizeof(double));
-
-      double *center_lon = src_grid->reg2d_center_lon;
-      double *center_lat = src_grid->reg2d_center_lat;
-
-      for ( n = 0; n < nx; ++n )
-	{
-	  double rlon = center_lon[n];
-	  if ( rlon > PI2  ) rlon -= PI2;
-	  if ( rlon < ZERO ) rlon += PI2;
-	  coslon[n] = cos(rlon);
-	  sinlon[n] = sin(rlon);
-	}
-      for ( n = 0; n < ny; ++n )
-	{
-	  coslat[n] = cos(center_lat[n]);
-	  sinlat[n] = sin(center_lat[n]);
-	}
-    }
-  else
-    {
-      coslat = (double*) malloc(src_grid_size*sizeof(double));
-      coslon = (double*) malloc(src_grid_size*sizeof(double));
-      sinlat = (double*) malloc(src_grid_size*sizeof(double));
-      sinlon = (double*) malloc(src_grid_size*sizeof(double));
-
-      double *center_lon = src_grid->cell_center_lon;
-      double *center_lat = src_grid->cell_center_lat;
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(center_lon, center_lat, src_grid_size, coslat, coslon, sinlat, sinlon)
-#endif
-      for ( n = 0; n < src_grid_size; ++n )
-	{
-	  coslon[n] = cos(center_lon[n]);
-	  sinlon[n] = sin(center_lon[n]);
-	  coslat[n] = cos(center_lat[n]);
-	  sinlat[n] = sin(center_lat[n]);
-	}
-    }
 
   int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
   int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+
+  struct gridsearch *gs = NULL;
+  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+    gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+  else
+    gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
   /* Loop over destination grid  */
 
@@ -525,7 +342,7 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoSilentMode, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
+  shared(ompNumThreads, cdoSilentMode, gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   private(tgt_cell_add, n, nadds, dist_tot, plat, plon, nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
@@ -551,14 +368,10 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 
       /* Find nearest grid points on source grid and distances to each point */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	grid_search_nbr_reg2d(num_neighbors, src_grid, nbr_add, nbr_dist, 
-			      plat, plon, src_grid->dims,
-			      sinlat, coslat, sinlon, coslon,
-			      src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add, nbr_dist, 
+			      plat, plon, src_grid->dims);
       else
-	grid_search_nbr(num_neighbors, src_grid, nbr_add, nbr_dist, 
-			plat, plon, src_grid->bin_addr,
-			sinlat, coslat, sinlon, coslon);
+        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plat, plon);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
 
@@ -596,10 +409,7 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
       store_weightlinks(nadds, nbr_add, nbr_dist, tgt_cell_add, weightlinks);
     }
 
-  free(coslat);
-  free(coslon);
-  free(sinlat);
-  free(sinlon);
+  if ( gs ) gridsearch_delete(gs);
 
   weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
 
@@ -621,8 +431,6 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
   long n, nadds;
   long tgt_cell_add;              /* destination address                         */
   double dist_tot;                /* sum of neighbor distances (for normalizing) */
-  double *coslat, *sinlat;        /* cosine, sine of grid lats (for distance)    */
-  double *coslon, *sinlon;        /* cosine, sine of grid lons (for distance)    */
   double plat, plon;              /* lat/lon coords of destination point         */
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -634,69 +442,26 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
 
   long src_grid_size = src_grid->size;
   long tgt_grid_size = tgt_grid->size;
-
-  weightlinks_t *weightlinks = (weightlinks_t *) malloc(tgt_grid_size*sizeof(weightlinks_t));
-
-  /* Compute cos, sin of lat/lon on source grid for distance calculations */
-
-  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    {
-      long nx = src_grid->dims[0];
-      long ny = src_grid->dims[1];
-
-      coslat = (double*) malloc(ny*sizeof(double));
-      coslon = (double*) malloc(nx*sizeof(double));
-      sinlat = (double*) malloc(ny*sizeof(double));
-      sinlon = (double*) malloc(nx*sizeof(double));
-
-      double *center_lon = src_grid->reg2d_center_lon;
-      double *center_lat = src_grid->reg2d_center_lat;
-
-      for ( n = 0; n < nx; ++n )
-	{
-	  double rlon = center_lon[n];
-	  if ( rlon > PI2  ) rlon -= PI2;
-	  if ( rlon < ZERO ) rlon += PI2;
-	  coslon[n] = cos(rlon);
-	  sinlon[n] = sin(rlon);
-	}
-      for ( n = 0; n < ny; ++n )
-	{
-	  coslat[n] = cos(center_lat[n]);
-	  sinlat[n] = sin(center_lat[n]);
-	}
-    }
-  else
-    {
-      coslat = (double*) malloc(src_grid_size*sizeof(double));
-      coslon = (double*) malloc(src_grid_size*sizeof(double));
-      sinlat = (double*) malloc(src_grid_size*sizeof(double));
-      sinlon = (double*) malloc(src_grid_size*sizeof(double));
-
-      double *center_lon = src_grid->cell_center_lon;
-      double *center_lat = src_grid->cell_center_lat;
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(center_lon, center_lat, src_grid_size, coslat, coslon, sinlat, sinlon)
-#endif
-      for ( n = 0; n < src_grid_size; ++n )
-	{
-	  coslon[n] = cos(center_lon[n]);
-	  sinlon[n] = sin(center_lon[n]);
-	  coslat[n] = cos(center_lat[n]);
-	  sinlat[n] = sin(center_lat[n]);
-	}
-    }
+  long nx = src_grid->dims[0];
+  long ny = src_grid->dims[1];
 
   int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
   int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
+  clock_t start;
+
+  start = clock();
+
   struct gridsearch *gs = NULL;
-  if ( remap_grid_type != REMAP_GRID_TYPE_REG2D && num_neighbors < 5 )
-    {
-      gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
-    }
+  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+    gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+  else
+    gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+
+  if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(clock()-start))/CLOCKS_PER_SEC);
+
+  start = clock();
 
   /* Loop over destination grid  */
 
@@ -704,7 +469,7 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoSilentMode, gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
+  shared(ompNumThreads, cdoSilentMode, gs, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   shared(src_array, tgt_array, missval) \
   private(tgt_cell_add, n, nadds, dist_tot, plat, plon, nbr_mask, nbr_add, nbr_dist)
 #endif
@@ -724,8 +489,6 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
       
       tgt_array[tgt_cell_add] = missval;
 
-      weightlinks[tgt_cell_add].nlinks = 0;	
-
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 	
       plat = tgt_grid->cell_center_lat[tgt_cell_add];
@@ -733,20 +496,10 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
 
       /* Find nearest grid points on source grid and distances to each point */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	grid_search_nbr_reg2d(num_neighbors, src_grid, nbr_add, nbr_dist, 
-			      plat, plon, src_grid->dims,
-			      sinlat, coslat, sinlon, coslon,
-			      src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add, nbr_dist, 
+			      plat, plon, src_grid->dims);
       else
-        {
-          if ( num_neighbors < 5 )
-            grid_search_nbr_new(gs, num_neighbors, nbr_add, nbr_dist, plat, plon,
-                                sinlat, coslat, sinlon, coslon);
-          else
-            grid_search_nbr(num_neighbors, src_grid, nbr_add, nbr_dist, 
-                            plat, plon, src_grid->bin_addr,
-                            sinlat, coslat, sinlon, coslon);
-        }
+        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plat, plon);
       
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
 
@@ -783,16 +536,11 @@ void scrip_remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *
 
       if ( nadds > 1 ) sort_add_and_wgts(nadds, nbr_add, nbr_dist);
 
-      distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbr_dist, nbr_add);
+      if ( nadds ) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbr_dist, nbr_add);
     }
-
-  free(coslat);
-  free(coslon);
-  free(sinlat);
-  free(sinlon);
 
   if ( gs ) gridsearch_delete(gs);
 
-  if ( weightlinks ) free(weightlinks);
+  if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(clock()-start))/CLOCKS_PER_SEC);
 
 }  /* scrip_remap_distwgt */
