@@ -30,7 +30,6 @@ case "${HOSTNAME}" in
 # i386-apple-darwin10
     bailung*|d133*|d134*)
         CDOLIBS="--with-fftw3 \
-                 --with-jasper=$HOME/local \
                  --with-grib_api=$HOME/local/gribapi-1.12.3 \
                  --with-netcdf=$HOME/local \
                  --with-hdf5=$HOME/local \
@@ -42,23 +41,19 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-                    LIBS="-L/opt/local/lib -lopenjpeg" \
 	            CC=icc CFLAGS="-g -Wall -O2 -vec-report2 -march=native"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-                    LIBS="-L/opt/local/lib -lopenjpeg" \
 	            CC=clang CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = g++ ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-                    LIBS="-L/opt/local/lib -lopenjpeg" \
 	            CC=g++ CFLAGS="-g -std=c++14 -Drestrict= -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-                    LIBS="-L/opt/local/lib -lopenjpeg" \
 	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector"
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
@@ -266,7 +261,6 @@ case "${HOSTNAME}" in
                     --with-proj=/sw/centos58-x64/proj-4.7.0 \
                     --with-hdf5=/sw/centos58-x64/hdf5-1.8.10-patch1 \
                     --with-udunits2=/sw/centos58-x64/udunits-2.1.19 \
-                    --with-jasper=/sw/centos58-x64/jasper-1.900.1 \
                     --with-grib_api=/sw/centos58-x64/grib_api-1.12.3 \
                     --with-netcdf=/sw/centos58-x64/netcdf-4.2.1.1 \
                     --with-szlib=/sw/centos58-x64/szip-2.1 \

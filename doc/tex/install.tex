@@ -22,7 +22,7 @@ libraries should be installed:
       This is needed to process netCDF \cite{netCDF} files with {\CDO}. 
 \item The ECMWF \href{http://www.ecmwf.int/products/data/software/grib_api.html}{GRIB\_API}
       ({\tt http://www.ecmwf.int/products/data/software/grib\_api.html})
-      version 1.9.5 or higher.
+      version 1.12 or higher.
       This library is needed to process GRIB2 files with {\CDO}. 
 \item HDF5 \href{http://www.hdfgroup.org/doc_resource/SZIP}{szip} library
       ({\tt http://www.hdfgroup.org/doc\_resource/SZIP})
@@ -77,12 +77,10 @@ Compilation is done by performing the following steps:
 ./configure --with-netcdf=<netCDF root directory>
 \end{verbatim}
 
-\item The GRIB2 configuration depends on the GRIB\_API installation!
-Here is an example GRIB2 configuration with a JASPER enabled GRIB\_API version:
+\item and with GRIB\_API:
  
 \begin{verbatim}
-./configure --with-grib_api=<GRIB_API root directory> \
-            --with-jasper=<JASPER root directory>
+./configure --with-grib_api=<GRIB_API root directory>
 \end{verbatim}
 
 %%You have to specify also the location of the SZLIB if HDF5 was build with SZLIB support.\\

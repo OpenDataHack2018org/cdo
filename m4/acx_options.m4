@@ -143,23 +143,23 @@ ENABLE_NC2=no
 ENABLE_NC4=no
 ENABLE_NC4HDF5=no
 AC_ARG_WITH([netcdf],
-            [AS_HELP_STRING([--with-netcdf=<yes|no|directory> (default=no)],[location of netcdf library (lib and include subdirs)])],
+            [AS_HELP_STRING([--with-netcdf=<yes|no|directory> (default=no)],[location of netCDF library (lib and include subdirs)])],
             [AS_CASE(["$with_netcdf"],
-                     [no],[AC_MSG_CHECKING([for netcdf library])
+                     [no],[AC_MSG_CHECKING([for netCDF library])
                            AC_MSG_RESULT([suppressed])],
                      [yes],[AC_CHECK_HEADERS([netcdf.h])
                             AC_SEARCH_LIBS([nc_open],
                                            [netcdf],
-                                           [AC_DEFINE([HAVE_LIBNETCDF],[1],[Define to 1 for NETCDF support])
+                                           [AC_DEFINE([HAVE_LIBNETCDF],[1],[Define to 1 for netCDF support])
                                             ENABLE_NETCDF=yes],
-                                           [AC_MSG_ERROR([Could not link to netcdf library])])
+                                           [AC_MSG_ERROR([Could not link to netCDF library])])
                             NETCDF_LIBS=" -lnetcdf"
 			    
                             AC_CHECK_PROG(NC_CONFIG,nc-config,nc-config)
                             AS_IF([test "x$NC_CONFIG" != "x"],
                                   [AC_MSG_CHECKING([netcdf's nc2 support])
                                    AS_IF([test "x$($NC_CONFIG --has-nc2)" = "xyes"],
-                                         [AC_DEFINE([HAVE_NETCDF2],[1],[Define to 1 for NETCDF2 support])
+                                         [AC_DEFINE([HAVE_NETCDF2],[1],[Define to 1 for netCDF2 support])
                                           ENABLE_NC2=yes
                                           AC_MSG_RESULT([yes])],[AC_MSG_RESULT([no])])
                                    AC_MSG_CHECKING([netcdf's nc4 support])
@@ -252,39 +252,12 @@ AC_ARG_WITH([cmor],
              AC_MSG_RESULT([suppressed])])
 AC_SUBST([CMOR_LIBS])
 #  ----------------------------------------------------------------------
-#  Link application with JASPER library (needed for GRIB2 compression)
-JASPER_LIBS=''
-AC_ARG_WITH([jasper],
-            [AS_HELP_STRING([--with-jasper=<directory>],
-                            [Specify location of JASPER library. You must specify its location if GRIB_API was built with JASPER.])],
-            [AS_CASE(["$with_jasper"],
-                     [no],[AC_MSG_CHECKING([for jasper library])
-                           AC_MSG_RESULT([suppressed])],
-                     [yes],[AC_CHECK_HEADERS([jasper.h])
-                            AC_SEARCH_LIBS([jas_init],[jasper],[AC_DEFINE([HAVE_LIBJASPER],[1],[Define to 1 for JPEG compression for GRIB2])],
-                                           [AC_MSG_ERROR([Could not link to jasper library! Required for GRIB_API])])
-                            AC_SUBST([JASPER_LIBS],[" -ljasper"])],
-                     [*],[JASPER_ROOT=$with_jasper
-                          AS_IF([test -d "$JASPER_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$JASPER_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$JASPER_ROOT/include"
-                                 AC_SEARCH_LIBS([jas_init],
-                                                [jasper],
-                                                [AC_DEFINE([HAVE_LIBJASPER],[1],[Define to 1 for JPEG compression for GRIB2])],
-                                                [AC_MSG_ERROR([Could not link to jasper library! Required for GRIB_API])])
-                                 JASPER_LIBS=" -L$JASPER_ROOT/lib -ljasper"],
-                                [AC_MSG_ERROR([$JASPER_ROOT is not a directory! JASPER suppressed])])])],
-            [AC_MSG_CHECKING([for the JASPER library])
-             AC_MSG_RESULT([suppressed])])
-AC_SUBST([JASPER_LIBS])
-#  ----------------------------------------------------------------------
 #  Compile application with GRIB_API library (for GRIB2 support)
 GRIB_API_INCLUDE=''
 GRIB_API_LIBS=''
 ENABLE_GRIBAPI=no
 AC_ARG_WITH([grib_api],
-            [AS_HELP_STRING([--with-grib_api=<yes|no|directory>],
-                            [library for grib2 compression; if a directory is given, it will be used as a value for --with-jasper-root])],
+            [AS_HELP_STRING([--with-grib_api=<yes|no|directory> (default=no)],[location of GRIB_API library (lib and include subdirs)])],
             [AS_CASE(["$with_grib_api"],
                      [no],[AC_MSG_CHECKING([for GRIB_API library])
                            AC_MSG_RESULT([suppressed])],
