@@ -27,6 +27,7 @@ LT_INIT
 
 # Check building environment
 AC_CHECK_TOOL([CC],[gcc],[:])
+AC_CHECK_TOOL([CXX],[g++],[:])
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
 AC_C_RESTRICT
