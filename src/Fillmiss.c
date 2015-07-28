@@ -340,7 +340,9 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
-  struct gridsearch *gs = gridsearch_index_create(nvals, xvals, yvals, vindex);
+  gridsearch_set_method(GS_KDTREE);
+
+  struct gridsearch *gs = gridsearch_index_create_nn(nvals, xvals, yvals, vindex);
 
   if ( vindex ) free(vindex);
   
@@ -354,17 +356,13 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   double range = SQR(2*search_radius);
 
   unsigned index;
-  void *gs_result;
-#pragma omp parallel for private(gs_result, index) shared(mindex, array1, array2, xvals, yvals, range)
+#pragma omp parallel for private(index) shared(mindex, array1, array2, xvals, yvals, range)
   for ( unsigned i = 0; i < nmiss; ++i )
     {
       double prange = range;
 
-      gs_result = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
-      if ( gs_result ) 
-        index = gridsearch_item(gs_result);
-      else
-        index = mindex[i];
+      index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
+      if ( index == GS_NOT_FOUND ) index = mindex[i];
 
       array2[mindex[i]] = array1[index];
     }

@@ -15,12 +15,20 @@
 #define  PI2      (2.0*PI)
 
 
+static int gridsearch_method_nn = GS_KDTREE;
+
 static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 {
    double cos_lat = cos(lat);
    xyz[0] = cos_lat * cos(lon);
    xyz[1] = cos_lat * sin(lon);
    xyz[2] = sin(lat);
+}
+
+
+void gridsearch_set_method(int method)
+{
+  gridsearch_method_nn = method;
 }
 
 
@@ -67,14 +75,9 @@ struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const doubl
   return gs;
 }
 
-struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
+
+struct kdNode *kdtree_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
 {
-  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
-
-  gs->n = n;
-
-  if ( n == 0 ) return gs;
-
   struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
   // see  example_cartesian.c
   if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
@@ -94,9 +97,38 @@ struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lo
       pointlist[i].index = index[i];
     }
 
-  gs->kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
-   if ( pointlist ) free(pointlist);
- 
+  struct kdNode *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
+  if ( pointlist ) free(pointlist);
+
+   return kdt;
+}
+
+
+struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
+{
+  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+
+  gs->n = n;
+  if ( n == 0 ) return gs;
+
+  gs->kdt = kdtree_index_create(n, lons, lats, index);
+
+  return gs;
+}
+
+
+struct gridsearch *gridsearch_index_create_nn(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
+{
+  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+
+  gs->method_nn = gridsearch_method_nn;
+  gs->n = n;
+  if ( n == 0 ) return gs;
+
+  if ( gs->method_nn == GS_KDTREE )
+    gs->kdt = kdtree_index_create(n, lons, lats, index);
+  // else if ( gridsearch_method_nn == GS_NEARPT3 )
+   
   return gs;
 }
 
@@ -154,9 +186,9 @@ void gridsearch_delete(struct gridsearch *gs)
 }
 
 
-void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange)
+kdNode *kdtree_nearest(kdNode *kdt, double lon, double lat, double *prange)
 {
-  if ( gs->kdt == NULL ) return NULL;
+  if ( kdt == NULL ) return NULL;
   
   float point[3];
   float range0;
@@ -172,13 +204,27 @@ void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *
 
   LLtoXYZ_f(lon, lat, point);
 
-  kdNode *node = kd_nearest(gs->kdt, point, &range, 3);
+  kdNode *node = kd_nearest(kdt, point, &range, 3);
   // printf("range %g %g %g %p\n", lon, lat, range, node);
 
   if ( !(range < range0) ) node = NULL;
   if ( prange ) *prange = range;
 
-  return (void *) node;
+  return node;
+}
+
+
+unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *prange)
+{
+  unsigned index = GS_NOT_FOUND;
+
+  if ( gs->kdt )
+    {
+      kdNode *node = kdtree_nearest(gs->kdt, lon, lat, prange);
+      if ( node ) index = (int) node->index;
+    }
+
+  return index;
 }
 
 

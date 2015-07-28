@@ -509,6 +509,7 @@ src/cdo_int.h -text
 src/cdo_pthread.c -text
 src/cdo_vlist.c -text
 src/cdotest.c -text
+src/cellsearchorder.h -text
 src/clipping/area.c -text
 src/clipping/area.h -text
 src/clipping/clipping.c -text
@@ -604,6 +605,9 @@ src/modules.c -text
 src/modules.h -text
 src/namelist.c -text
 src/namelist.h -text
+src/nearpt3c.cc -text
+src/nearpt3c.h -text
+src/nearpt3x.h -text
 src/normal.c -text
 src/nth_element.c -text
 src/nth_element.h -text
