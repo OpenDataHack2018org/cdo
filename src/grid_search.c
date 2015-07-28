@@ -15,9 +15,6 @@
 #define  PI2      (2.0*PI)
 
 
-#define KDTREELIB
-//#define KD_SEARCH_SPH
-
 static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 {
    double cos_lat = cos(lat);
@@ -79,28 +76,6 @@ struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lo
   if ( n == 0 ) return gs;
 
   struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
-#if defined(KD_SEARCH_SPH)
-  // see  example_spherical.c
-  if ( cdoVerbose) printf("kdtree lib init 2D: n=%d\n", n);
-  float min[2], max[2];
-  min[0] = min[1] =  1e9;
-  max[0] = max[1] = -1e9;
-  float *restrict point;
-  for ( unsigned i = 0; i < n; i++ ) 
-    {
-      point = pointlist[i].point;
-      point[0] = lons[index[i]];
-      point[1] = lats[index[i]];
-      for ( unsigned j = 0; j < 2; ++j )
-        {
-          min[j] = point[j] < min[j] ? point[j] : min[j];
-          max[j] = point[j] > max[j] ? point[j] : max[j];
-        }
-      pointlist[i].index = index[i];
-    }
-
-  gs->kdt = kd_sph_buildTree(pointlist, n, min, max, 1);
-#else
   // see  example_cartesian.c
   if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
   float min[3], max[3];
@@ -120,7 +95,6 @@ struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lo
     }
 
   gs->kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
-#endif
    if ( pointlist ) free(pointlist);
  
   return gs;
@@ -136,28 +110,6 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
   if ( n == 0 ) return gs;
 
   struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
-#if defined(KD_SEARCH_SPH)
-  // see  example_spherical.c
-  if ( cdoVerbose) printf("kdtree lib init 2D: n=%d\n", n);
-  float min[2], max[2];
-  min[0] = min[1] =  1e9;
-  max[0] = max[1] = -1e9;
-  float *restrict point;
-  for ( unsigned i = 0; i < n; i++ ) 
-    {
-      point = pointlist[i].point;
-      point[0] = lons[i];
-      point[1] = lats[i];
-      for ( unsigned j = 0; j < 2; ++j )
-        {
-          min[j] = point[j] < min[j] ? point[j] : min[j];
-          max[j] = point[j] > max[j] ? point[j] : max[j];
-        }
-      pointlist[i].index = i;
-    }
-
-  gs->kdt = kd_sph_buildTree(pointlist, n, min, max, 1);
-#else
   // see  example_cartesian.c
   if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
   float min[3], max[3];
@@ -177,8 +129,7 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
     }
 
   gs->kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
-#endif
-   if ( pointlist ) free(pointlist);
+  if ( pointlist ) free(pointlist);
  
   return gs;
 }
@@ -219,17 +170,10 @@ void *gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *
                                  * distance to the NN squared. */
   float range = range0;
 
-#if defined(KD_SEARCH_SPH)
-  point[0] = lon;
-  point[1] = lat;
-
-  kdNode *node = kd_sph_nearest(gs->kdt, point, &range);
-#else
   LLtoXYZ_f(lon, lat, point);
 
   kdNode *node = kd_nearest(gs->kdt, point, &range, 3);
   // printf("range %g %g %g %p\n", lon, lat, range, node);
-#endif
 
   if ( !(range < range0) ) node = NULL;
   if ( prange ) *prange = range;
