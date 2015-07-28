@@ -340,11 +340,10 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
-  gridsearch_set_method(GS_KDTREE);
+  //gridsearch_set_method(GS_KDTREE);
+  gridsearch_set_method(GS_NEARPT3);
 
   struct gridsearch *gs = gridsearch_index_create_nn(nvals, xvals, yvals, vindex);
-
-  if ( vindex ) free(vindex);
   
   finish = clock();
 
@@ -363,11 +362,13 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
       index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
       if ( index == GS_NOT_FOUND ) index = mindex[i];
+      else                         index = vindex[index];
 
       array2[mindex[i]] = array1[index];
     }
 
   if ( mindex ) free(mindex);
+  if ( vindex ) free(vindex);
 
   /*
   double radius = 5.*M_PI/180.;

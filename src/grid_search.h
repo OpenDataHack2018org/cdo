@@ -3,8 +3,10 @@
 
 #include <limits.h>
 #include "kdtreelib/kdtree.h"
+#include "nearpt3c.h"
 
 #define GS_NOT_FOUND  INT_MAX
+
 
 enum T_GRIDSEARCH_METHOD_NN  {GS_KDTREE=1, GS_NEARPT3};
 
@@ -12,6 +14,10 @@ struct gridsearch {
   int method_nn;
   unsigned n;
   unsigned nx, ny;
+
+  void *nearpt3;
+  Coord_T **pts;
+
   struct kdNode *kdt;
   // reg2d search
   double *reg2d_center_lon, *reg2d_center_lat;
