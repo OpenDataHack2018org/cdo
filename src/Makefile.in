@@ -306,7 +306,8 @@ cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(cdo_LDFLAGS) $(LDFLAGS) -o $@
 am_cdotest_OBJECTS = cdotest-cdotest.$(OBJEXT)
 cdotest_OBJECTS = $(am_cdotest_OBJECTS)
-cdotest_DEPENDENCIES = $(cdo_LDADD)
+am__DEPENDENCIES_1 = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdotest_DEPENDENCIES = $(am__DEPENDENCIES_1)
 cdotest_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(cdotest_LDFLAGS) $(LDFLAGS) -o $@
@@ -638,7 +639,7 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
 	Yseasstat.c Zonstat.c cdo.h $(am__append_1)
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
-cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la -lstdc++
 cdo_LDFLAGS = $(am__append_2)
 libcdo_la_CPPFLAGS = $(cdo_CPPFLAGS)
 cdotest_SOURCES = cdo_int.h	\

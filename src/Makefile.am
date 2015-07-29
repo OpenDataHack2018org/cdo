@@ -368,7 +368,7 @@ cdo_SOURCES += Magplot.c       \
 endif
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
-cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la -lstdc++
 cdo_LDFLAGS  =
 
 if ENABLE_ALL_STATIC
