@@ -10,15 +10,30 @@
 
 enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_KDTREE, GS_NEARPT3};
 
+struct gsFull {
+  unsigned n;
+  const double *plons;
+  const double *plats;
+  float **pts;
+};
+
+struct gsNear {
+  unsigned n;
+  Coord_T **pts;
+  void *nearpt3;
+};
+
 struct gridsearch {
   int method_nn;
   unsigned n;
   unsigned nx, ny;
 
-  void *nearpt3;
-  Coord_T **pts;
+  struct gsNear *near;
 
   struct kdNode *kdt;
+
+  struct gsFull *full;
+
   // reg2d search
   double *reg2d_center_lon, *reg2d_center_lat;
   double *coslat, *sinlat;   // cosine, sine of grid lats (for distance)

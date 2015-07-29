@@ -270,15 +270,6 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
   free(matrix1);
 }
 
-static double dist_sq( double *a1, double *a2, int dims ) {
-  double dist_sq = 0, diff;
-  while( --dims >= 0 ) {
-    diff = (a1[dims] - a2[dims]);
-    dist_sq += diff*diff;
-  }
-  return dist_sq;
-}
-
 
 void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 {
@@ -371,6 +362,8 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
       index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
       if ( index == GS_NOT_FOUND ) index = mindex[i];
       else                         index = vindex[index];
+
+      // printf("%u %u %d\n", i, index, (int)(prange*100000));
 
       array2[mindex[i]] = array1[index];
     }

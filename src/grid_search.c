@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 #include <math.h>
 
 #include "dmemory.h"
@@ -28,12 +29,9 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 
 void gridsearch_set_method(const char *methodstr)
 {
-  if      ( strcmp(methodstr, "kdtree") == 0 )
-    gridsearch_method_nn = GS_KDTREE;
-  else if ( strcmp(methodstr, "nearpt3") == 0 )
-    gridsearch_method_nn = GS_NEARPT3;
-  else if ( strcmp(methodstr, "full") == 0 )
-    gridsearch_method_nn = GS_FULL;
+  if      ( strcmp(methodstr, "kdtree")  == 0 ) gridsearch_method_nn = GS_KDTREE;
+  else if ( strcmp(methodstr, "nearpt3") == 0 ) gridsearch_method_nn = GS_NEARPT3;
+  else if ( strcmp(methodstr, "full")    == 0 ) gridsearch_method_nn = GS_FULL;
   else
     cdoAbort("gridsearch method %s not available!\n", methodstr);
 }
@@ -83,7 +81,7 @@ struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const doubl
 }
 
 
-struct kdNode *kdtree_create(unsigned n, const double *restrict lons, const double *restrict lats)
+struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const double *restrict lats)
 {
   struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
   // see  example_cartesian.c
@@ -116,8 +114,26 @@ struct kdNode *kdtree_create(unsigned n, const double *restrict lons, const doub
 //#define SCALE(x) (0.5+(x+1)*32000)
 //#define SCALE(x) (x)
 
-void *nearpt3_create(unsigned n, const double *restrict lons, const double *restrict lats)
+
+void gs_destroy_nearpt3(struct gsNear *near)
 {
+  if ( near )
+    {
+      if ( near->pts )
+        {
+          unsigned n = near->n;
+          for ( unsigned i = 0; i < n; i++ ) free(near->pts[i]);
+          free(near->pts);
+        }
+
+      free(near);
+    }
+}
+
+struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const double *restrict lats)
+{
+  struct gsNear *near = (struct gsNear *) calloc(1, sizeof(struct gsNear));
+
   float point[3];
   Coord_T *pp;
   Coord_T **p = (Coord_T **) malloc(n*sizeof(Coord_T *));
@@ -135,9 +151,59 @@ void *nearpt3_create(unsigned n, const double *restrict lons, const double *rest
       p[i] = pp;
     }
 
-  void *nearpt3 = nearpt3_preprocess(n, p);
+  near->n = n;
+  near->pts = p;
+  near->nearpt3 = nearpt3_preprocess(n, p);
 
-  return nearpt3;
+  return near;
+}
+
+
+void gs_destroy_full(struct gsFull *full)
+{
+  if ( full )
+    {
+      if ( full->pts )
+        {
+          unsigned n = full->n;
+          for ( unsigned i = 0; i < n; i++ ) free(full->pts[i]);
+          free(full->pts);
+        }
+
+      free(full);
+    }
+}
+
+
+struct gsFull *gs_create_full(unsigned n, const double *restrict lons, const double *restrict lats)
+{
+  struct gsFull *full = (struct gsFull *) calloc(1, sizeof(struct gsFull));
+
+  full->n = n;
+  full->plons = lons;
+  full->plats = lats;
+
+  float point[3];
+  float *pp;
+  float **p = (float **) malloc(n*sizeof(float *));
+
+  for ( unsigned i = 0; i < n; i++ )
+    {
+
+      pp = (float *) malloc(3*sizeof(float));
+
+      LLtoXYZ_f(lons[i], lats[i], point);
+
+      pp[0] = point[0];
+      pp[1] = point[1];
+      pp[2] = point[2];
+      
+      p[i] = pp;
+    }
+  
+  full->pts = p;
+
+  return full;
 }
 
 
@@ -149,7 +215,7 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
 
   if ( n == 0 ) return gs;
 
-   gs->kdt = kdtree_create(n, lons, lats);
+   gs->kdt = gs_create_kdtree(n, lons, lats);
 
   return gs;
 }
@@ -163,10 +229,9 @@ struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons,
   gs->n = n;
   if ( n == 0 ) return gs;
 
-  if ( gs->method_nn == GS_KDTREE )
-    gs->kdt = kdtree_create(n, lons, lats);
-  else if ( gridsearch_method_nn == GS_NEARPT3 )
-    gs->nearpt3 = nearpt3_create(n, lons, lats);
+  if      ( gs->method_nn == GS_KDTREE  ) gs->kdt  = gs_create_kdtree(n, lons, lats);
+  else if ( gs->method_nn == GS_NEARPT3 ) gs->near = gs_create_nearpt3(n, lons, lats);
+  else if ( gs->method_nn == GS_FULL    ) gs->full = gs_create_full(n, lons, lats);
 
   return gs;
 }
@@ -186,32 +251,36 @@ void gridsearch_delete(struct gridsearch *gs)
       if ( gs->sinlat ) free(gs->sinlat);
       if ( gs->sinlon ) free(gs->sinlon);
 
-      if ( gs->pts )
-        {
-          unsigned n = gs->n;
-          for ( unsigned i = 0; i < n; i++ ) free(gs->pts[i]);
-          free(gs->pts);
-        }
+      if ( gs->near ) gs_destroy_nearpt3(gs->near);
+      if ( gs->full ) gs_destroy_full(gs->full);
 
       free(gs);
     }
 }
 
+static
+double gs_set_range(double *prange)
+{
+  double range;
 
-kdNode *kdtree_nearest(kdNode *kdt, double lon, double lat, double *prange)
+  if ( prange )
+    range = *prange;
+  else
+    range = SQR(2 * M_PI);     /* This has to be bigger than the presumed
+                                * maximum distance to the NN but smaller
+                                * than once around the sphere. The content
+                                * of this variable is replaced with the
+                                * distance to the NN squared. */
+  return range;
+}
+
+
+kdNode *gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
 {
   if ( kdt == NULL ) return NULL;
   
   float point[3];
-  float range0;
-  if ( prange )
-    range0 = *prange;
-  else
-    range0 = SQR(2 * M_PI);     /* This has to be bigger than the presumed
-                                 * maximum distance to the NN but smaller
-                                 * than once around the sphere. The content
-                                 * of this variable is replaced with the
-                                 * distance to the NN squared. */
+  float range0 = gs_set_range(prange);
   float range = range0;
 
   LLtoXYZ_f(lon, lat, point);
@@ -226,20 +295,12 @@ kdNode *kdtree_nearest(kdNode *kdt, double lon, double lat, double *prange)
 }
 
 
-unsigned nearpt3_nearest(void *nearpt3, double lon, double lat, double *prange)
+unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *prange)
 {
-  if ( nearpt3 == NULL ) return GS_NOT_FOUND;
+  if ( near == NULL ) return GS_NOT_FOUND;
   
   float point[3];
-  float range0;
-  if ( prange )
-    range0 = *prange;
-  else
-    range0 = SQR(2 * M_PI);     /* This has to be bigger than the presumed
-                                 * maximum distance to the NN but smaller
-                                 * than once around the sphere. The content
-                                 * of this variable is replaced with the
-                                 * distance to the NN squared. */
+  float range0 = gs_set_range(prange);
   float range = range0;
 
   LLtoXYZ_f(lon, lat, point);
@@ -249,7 +310,7 @@ unsigned nearpt3_nearest(void *nearpt3, double lon, double lat, double *prange)
   q[1] = SCALE(point[1]);
   q[2] = SCALE(point[2]);
 
-  unsigned index = nearpt3_query(nearpt3, q);
+  unsigned index = nearpt3_query(near->nearpt3, q);
 
   // printf("range %g %g %g %u\n", lon, lat, range, index);
   // printf("index %u\n", index);
@@ -257,6 +318,60 @@ unsigned nearpt3_nearest(void *nearpt3, double lon, double lat, double *prange)
   // if ( !(range < range0) ) node = NULL;
   // if ( prange ) *prange = range;
 
+  return index;
+}
+
+static
+double square(const double x)
+{
+  return x*x;
+}
+
+static
+double distance(const float *restrict a, const float *restrict b)
+{
+  return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
+}
+
+
+unsigned gs_nearest_full(struct  gsFull *full, double lon, double lat, double *prange)
+{
+  if ( full == NULL ) return GS_NOT_FOUND;
+  
+  float point[3];
+  float range0 = gs_set_range(prange);
+  float range = range0;
+
+  LLtoXYZ_f(lon, lat, point);
+
+  float q[3];
+  q[0] = point[0];
+  q[1] = point[1];
+  q[2] = point[2];
+
+  unsigned n = full->n;
+  float **pts = full->pts;
+  int closestpt = -1;
+  double dist = DBL_MAX;
+  for ( int i = 0; i < n; i++ )
+    {
+      double d = distance(q, pts[i]);
+      if ( closestpt < 0 || d < dist || (d==dist && i < closestpt) )
+        {
+          dist = d;
+          closestpt = i;
+          // printf("%d %g %g %d index %d %g\n", n, lon, lat, i, closestpt, dist);
+        }
+    }
+
+  unsigned index = GS_NOT_FOUND;
+
+  if ( closestpt >= 0 )
+    {
+      *prange = dist;
+      index = (unsigned) closestpt;
+    }
+  
   return index;
 }
 
@@ -269,12 +384,16 @@ unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, doubl
     {
       if ( gs->method_nn == GS_KDTREE )
         {
-          kdNode *node = kdtree_nearest(gs->kdt, lon, lat, prange);
+          kdNode *node = gs_nearest_kdtree(gs->kdt, lon, lat, prange);
           if ( node ) index = (int) node->index;
         }
       else if ( gs->method_nn == GS_NEARPT3 )
         {
-          index = nearpt3_nearest(gs->nearpt3, lon, lat, prange);
+          index = gs_nearest_nearpt3(gs->near, lon, lat, prange);
+        }
+      else if ( gs->method_nn == GS_FULL )
+        {
+          index = gs_nearest_full(gs->full, lon, lat, prange);
         }
       else
         {
@@ -291,15 +410,7 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
   if ( gs->kdt == NULL ) return NULL;
   
   float point[3];
-  float range0;
-  if ( prange )
-    range0 = *prange;
-  else
-    range0 = SQR(2 * M_PI);     /* This has to be bigger than the presumed
-                                 * maximum distance to the NN but smaller
-                                 * than once around the sphere. The content
-                                 * of this variable is replaced with the
-                                 * distance to the NN squared. */
+  float range0 = gs_set_range(prange);
   float range = range0;
 
   LLtoXYZ_f(lon, lat, point);
