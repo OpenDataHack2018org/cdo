@@ -76,35 +76,6 @@ struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const doubl
 }
 
 
-struct kdNode *kdtree_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
-{
-  struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
-  // see  example_cartesian.c
-  if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
-  float min[3], max[3];
-  min[0] = min[1] = min[2] =  1e9;
-  max[0] = max[1] = max[2] = -1e9;
-  float *restrict point;
-  for ( unsigned i = 0; i < n; i++ ) 
-    {
-      point = pointlist[i].point;
-      LLtoXYZ_f(lons[index[i]], lats[index[i]], point);
-      for ( unsigned j = 0; j < 3; ++j )
-        {
-          min[j] = point[j] < min[j] ? point[j] : min[j];
-          max[j] = point[j] > max[j] ? point[j] : max[j];
-        }
-      // pointlist[i].index = index[i];
-      pointlist[i].index = i;
-    }
-
-  struct kdNode *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
-  if ( pointlist ) free(pointlist);
-
-  return kdt;
-}
-
-
 struct kdNode *kdtree_create(unsigned n, const double *restrict lons, const double *restrict lats)
 {
   struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
@@ -160,61 +131,6 @@ void *nearpt3_create(unsigned n, const double *restrict lons, const double *rest
   void *nearpt3 = nearpt3_preprocess(n, p);
 
   return nearpt3;
-}
-
-
-void *nearpt3_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
-{
-  float point[3];
-  Coord_T *pp;
-  Coord_T **p = (Coord_T **) malloc(n*sizeof(Coord_T *));
-  for ( unsigned i = 0; i < n; i++ )
-    {
-
-      pp = (Coord_T *) malloc(3*sizeof(Coord_T));
-
-      LLtoXYZ_f(lons[index[i]], lats[index[i]], point);
- 
-      pp[0] = SCALE(point[0]);
-      pp[1] = SCALE(point[1]);
-      pp[2] = SCALE(point[2]);
-      
-      p[i] = pp;
-    }
-
-  void *nearpt3 = nearpt3_preprocess(n, p);
-
-  return nearpt3;
-}
-
-
-struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
-{
-  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
-
-  gs->n = n;
-  if ( n == 0 ) return gs;
-
-  gs->kdt = kdtree_index_create(n, lons, lats, index);
-
-  return gs;
-}
-
-
-struct gridsearch *gridsearch_index_create_nn(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
-{
-  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
-
-  gs->method_nn = gridsearch_method_nn;
-  gs->n = n;
-  if ( n == 0 ) return gs;
-
-  if ( gs->method_nn == GS_KDTREE )
-    gs->kdt = kdtree_index_create(n, lons, lats, index);
-  else if ( gridsearch_method_nn == GS_NEARPT3 )
-    gs->nearpt3 = nearpt3_index_create(n, lons, lats, index);
-   
-  return gs;
 }
 
 

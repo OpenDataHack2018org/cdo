@@ -30,8 +30,6 @@ void gridsearch_set_method(int method);
 struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats);
-struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index);
-struct gridsearch *gridsearch_index_create_nn(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index);
 void gridsearch_delete(struct gridsearch *gs);
 unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
 struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, unsigned nnn);
