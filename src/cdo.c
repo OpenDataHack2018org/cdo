@@ -74,6 +74,7 @@ static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 
+void gridsearch_set_method(const char *methodstr);
 
 #define PRINT_RLIMIT(resource) \
       { \
@@ -992,6 +993,7 @@ int parse_options_long(int argc, char *argv[])
   int c;
   int lnetcdf_hdr_pad;
   int luse_fftw;
+  int lgridsearchnn;
   int lremap_genweights;
 
   struct cdo_option opt_long[] =
@@ -1000,6 +1002,7 @@ int parse_options_long(int argc, char *argv[])
       { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1  },
       { "use_fftw",          required_argument,          &luse_fftw,  1  },
+      { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
@@ -1022,6 +1025,7 @@ int parse_options_long(int argc, char *argv[])
     {
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
+      lgridsearchnn = 0;
       lremap_genweights = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhLMOQRrsSTuVvWXZ", opt_long, NULL);
@@ -1051,6 +1055,10 @@ int parse_options_long(int argc, char *argv[])
               if ( use_fftw != 0 && use_fftw != 1 )
                 cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", use_fftw);
               CDO_Use_FFTW = use_fftw;
+            }
+          else if ( lgridsearchnn )
+            {
+              gridsearch_set_method(CDO_optarg);
             }
           else if ( lremap_genweights )
             {

@@ -349,9 +349,6 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
-  gridsearch_set_method(GS_KDTREE);
-  //gridsearch_set_method(GS_NEARPT3);
-
   struct gridsearch *gs = NULL;
 
   if ( nmiss ) gs = gridsearch_create_nn(nvals, lons, lats);

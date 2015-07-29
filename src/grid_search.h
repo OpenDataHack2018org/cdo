@@ -26,7 +26,6 @@ struct gridsearch {
 };
 
 
-void gridsearch_set_method(int method);
 struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats);

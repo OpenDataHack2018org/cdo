@@ -26,9 +26,16 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 }
 
 
-void gridsearch_set_method(int method)
+void gridsearch_set_method(const char *methodstr)
 {
-  gridsearch_method_nn = method;
+  if      ( strcmp(methodstr, "kdtree") == 0 )
+    gridsearch_method_nn = GS_KDTREE;
+  else if ( strcmp(methodstr, "nearpt3") == 0 )
+    gridsearch_method_nn = GS_NEARPT3;
+  else if ( strcmp(methodstr, "full") == 0 )
+    gridsearch_method_nn = GS_FULL;
+  else
+    cdoAbort("gridsearch method %s not available!\n", methodstr);
 }
 
 

@@ -382,10 +382,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
     gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else if ( num_neighbors == 1 )
-    {
-      //gridsearch_set_method(GS_NEARPT3);
-      gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
-    }
+    gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
@@ -485,10 +482,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
     gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else if ( num_neighbors == 1 )
-    {
-      //gridsearch_set_method(GS_NEARPT3);
-      gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
-    }
+    gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
