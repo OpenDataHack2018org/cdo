@@ -8,7 +8,7 @@
 #define GS_NOT_FOUND  INT_MAX
 
 
-enum T_GRIDSEARCH_METHOD_NN  {GS_KDTREE=1, GS_NEARPT3};
+enum T_GRIDSEARCH_METHOD_NN  {GS_FULL=1, GS_KDTREE, GS_NEARPT3};
 
 struct gridsearch {
   int method_nn;
@@ -29,11 +29,11 @@ struct gridsearch {
 void gridsearch_set_method(int method);
 struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);
+struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index);
 struct gridsearch *gridsearch_index_create_nn(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index);
 void gridsearch_delete(struct gridsearch *gs);
 unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, double *range);
-unsigned gridsearch_item(void *gs_result);
 struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat, double *prange, unsigned nnn);
 
 #endif

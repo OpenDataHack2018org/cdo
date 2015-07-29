@@ -101,12 +101,46 @@ struct kdNode *kdtree_index_create(unsigned n, const double *restrict lons, cons
   struct kdNode *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
   if ( pointlist ) free(pointlist);
 
-   return kdt;
+  return kdt;
 }
 
 
-void *nearpt3_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
+struct kdNode *kdtree_create(unsigned n, const double *restrict lons, const double *restrict lats)
 {
+  struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
+  // see  example_cartesian.c
+  if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
+  float min[3], max[3];
+  min[0] = min[1] = min[2] =  1e9;
+  max[0] = max[1] = max[2] = -1e9;
+  float *restrict point;
+  for ( unsigned i = 0; i < n; i++ ) 
+    {
+      point = pointlist[i].point;
+      LLtoXYZ_f(lons[i], lats[i], point);
+      for ( unsigned j = 0; j < 3; ++j )
+        {
+          min[j] = point[j] < min[j] ? point[j] : min[j];
+          max[j] = point[j] > max[j] ? point[j] : max[j];
+        }
+      pointlist[i].index = i;
+    }
+
+  struct kdNode *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
+  if ( pointlist ) free(pointlist);
+
+  return kdt;
+}
+
+#define SCALE(x) (0.5+(x+1)*32000)
+//#define SCALE(x) (0.5+(x)*32000)
+//#define SCALE(x) (0.5+(x+1)*32000000)
+//#define SCALE(x) (0.5+(x+1)*32000)
+//#define SCALE(x) (x)
+
+void *nearpt3_create(unsigned n, const double *restrict lons, const double *restrict lats)
+{
+  float point[3];
   Coord_T *pp;
   Coord_T **p = (Coord_T **) malloc(n*sizeof(Coord_T *));
   for ( unsigned i = 0; i < n; i++ )
@@ -114,7 +148,36 @@ void *nearpt3_index_create(unsigned n, const double *restrict lons, const double
 
       pp = (Coord_T *) malloc(3*sizeof(Coord_T));
 
-      LLtoXYZ_f(lons[index[i]], lats[index[i]], pp);
+      LLtoXYZ_f(lons[i], lats[i], point);
+
+      pp[0] = SCALE(point[0]);
+      pp[1] = SCALE(point[1]);
+      pp[2] = SCALE(point[2]);
+      
+      p[i] = pp;
+    }
+
+  void *nearpt3 = nearpt3_preprocess(n, p);
+
+  return nearpt3;
+}
+
+
+void *nearpt3_index_create(unsigned n, const double *restrict lons, const double *restrict lats, const unsigned *restrict index)
+{
+  float point[3];
+  Coord_T *pp;
+  Coord_T **p = (Coord_T **) malloc(n*sizeof(Coord_T *));
+  for ( unsigned i = 0; i < n; i++ )
+    {
+
+      pp = (Coord_T *) malloc(3*sizeof(Coord_T));
+
+      LLtoXYZ_f(lons[index[i]], lats[index[i]], point);
+ 
+      pp[0] = SCALE(point[0]);
+      pp[1] = SCALE(point[1]);
+      pp[2] = SCALE(point[2]);
       
       p[i] = pp;
     }
@@ -163,28 +226,25 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
 
   if ( n == 0 ) return gs;
 
-  struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
-  // see  example_cartesian.c
-  if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
-  float min[3], max[3];
-  min[0] = min[1] = min[2] =  1e9;
-  max[0] = max[1] = max[2] = -1e9;
-  float *restrict point;
-  for ( unsigned i = 0; i < n; i++ ) 
-    {
-      point = pointlist[i].point;
-      LLtoXYZ_f(lons[i], lats[i], point);
-      for ( unsigned j = 0; j < 3; ++j )
-        {
-          min[j] = point[j] < min[j] ? point[j] : min[j];
-          max[j] = point[j] > max[j] ? point[j] : max[j];
-        }
-      pointlist[i].index = i;
-    }
+   gs->kdt = kdtree_create(n, lons, lats);
 
-  gs->kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
-  if ( pointlist ) free(pointlist);
- 
+  return gs;
+}
+
+
+struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats)
+{
+  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+
+  gs->method_nn = gridsearch_method_nn;
+  gs->n = n;
+  if ( n == 0 ) return gs;
+
+  if ( gs->method_nn == GS_KDTREE )
+    gs->kdt = kdtree_create(n, lons, lats);
+  else if ( gridsearch_method_nn == GS_NEARPT3 )
+    gs->nearpt3 = nearpt3_create(n, lons, lats);
+
   return gs;
 }
 
@@ -261,9 +321,15 @@ unsigned nearpt3_nearest(void *nearpt3, double lon, double lat, double *prange)
 
   LLtoXYZ_f(lon, lat, point);
 
-  unsigned index = nearpt3_query(nearpt3, point);
+  Coord_T q[3];
+  q[0] = SCALE(point[0]);
+  q[1] = SCALE(point[1]);
+  q[2] = SCALE(point[2]);
 
-  // printf("range %g %g %g %p\n", lon, lat, range, node);
+  unsigned index = nearpt3_query(nearpt3, q);
+
+  // printf("range %g %g %g %u\n", lon, lat, range, index);
+  // printf("index %u\n", index);
 
   // if ( !(range < range0) ) node = NULL;
   // if ( prange ) *prange = range;
@@ -286,6 +352,10 @@ unsigned gridsearch_nearest(struct gridsearch *gs, double lon, double lat, doubl
       else if ( gs->method_nn == GS_NEARPT3 )
         {
           index = nearpt3_nearest(gs->nearpt3, lon, lat, prange);
+        }
+      else
+        {
+          cdoAbort("gridsearch_nearest::method_nn undefined!");
         }
     }
 
@@ -318,16 +388,4 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
   if ( prange ) *prange = range;
 
   return result;
-}
-
-
-unsigned gridsearch_item(void *gs_result)
-{
-  unsigned index = 0;
-
-  if ( gs_result == NULL ) return 0;
-
-  index = ((kdNode *) gs_result)->index;
-  
-  return index;
 }

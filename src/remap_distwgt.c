@@ -297,38 +297,45 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
   double range = range0;
 
   int j = 0;
-  //void *gs_result = gridsearch_nearest(gs, plon, plat, &range);
-  struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, ndist);
-  if ( gs_result )
-    {
-      unsigned nadd;
-      /*
-        nadd = gridsearch_item(gs_result);
-          if ( range < range0 )
-            {
-              dist[j] = sqrt(range);
-              adds[j] = nadd;
-              j++;
-            }
-      */
-      struct resItem *p;
-      while ( pqremove_min(gs_result, &p) )
-        {
-          nadd  = p->node->index;
-          range = p->dist_sq;
-          free(p); // Free the result node taken from the heap
 
-          if ( range < range0 )
+  if ( num_neighbors == 1 )
+    {
+      unsigned nadd = gridsearch_nearest(gs, plon, plat, &range);
+      if ( nadd != GS_NOT_FOUND )
+        {
+          //if ( range < range0 )
             {
               dist[j] = sqrt(range);
               adds[j] = nadd;
               j++;
             }
         }
-      free(gs_result->d); // free the heap
-      free(gs_result);    // and free the heap information structure
     }
-
+  else
+    {
+      struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, ndist);
+      if ( gs_result )
+        {
+          unsigned nadd;
+          struct resItem *p;
+          while ( pqremove_min(gs_result, &p) )
+            {
+              nadd  = p->node->index;
+              range = p->dist_sq;
+              free(p); // Free the result node taken from the heap
+              
+              if ( range < range0 )
+                {
+                  dist[j] = sqrt(range);
+                  adds[j] = nadd;
+                  j++;
+                }
+            }
+          free(gs_result->d); // free the heap
+          free(gs_result);    // and free the heap information structure
+        }
+    }
+  
   ndist = j;
 
   for ( j = 0; j < ndist; ++j )
@@ -374,6 +381,11 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
   struct gridsearch *gs = NULL;
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
     gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+  else if ( num_neighbors == 1 )
+    {
+      //gridsearch_set_method(GS_NEARPT3);
+      gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    }
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
@@ -472,6 +484,11 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   struct gridsearch *gs = NULL;
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
     gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+  else if ( num_neighbors == 1 )
+    {
+      //gridsearch_set_method(GS_NEARPT3);
+      gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+    }
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 

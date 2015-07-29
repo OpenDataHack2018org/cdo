@@ -1,5 +1,7 @@
-//typedef unsigned short int Coord_T;
-typedef float Coord_T;
+typedef unsigned short int Coord_T;
+//typedef short int Coord_T;
+//typedef unsigned int Coord_T;
+//typedef float Coord_T;
 
 #if defined(__cplusplus)
 extern "C" {

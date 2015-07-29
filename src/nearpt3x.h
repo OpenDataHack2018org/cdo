@@ -10,7 +10,8 @@
 // nearpt3 AT wrfranklin.org (Plaintext preferred; attachments deprecated)
 // http://www.ecse.rpi.edu/Homepages/wrf/
 
-// U. Schulzweida: replace boost arrays by C arrays
+// Uwe Schulzweida: replaced boost arrays by C arrays
+//                  replaced boost vector by C arrays
 
 
 #include <algorithm>
@@ -471,8 +472,9 @@ namespace nearpt3 {   // start of namespace nearpt3
     g->cells = new int[nfixpts];
 
     // Set the last point of each cell to count how many points have been inserted into that cell so far. 
-
-    for (int i=1; i<= g->ng3; i++) (g->cells)[(g->base)[i]-1] = 0;
+    for (int i=1; i<= g->ng3; i++)
+      if ( (g->base)[i]-1 >= 0 ) // Uwe Schulzweida: check bounds
+        (g->cells)[(g->base)[i]-1] = 0;
 
     // Insert the points into the grid.
 
