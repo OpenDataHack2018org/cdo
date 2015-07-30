@@ -322,13 +322,13 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
 }
 
 static
-double square(const double x)
+float square(const float x)
 {
   return x*x;
 }
 
 static
-double distance(const float *restrict a, const float *restrict b)
+float distance(const float *restrict a, const float *restrict b)
 {
   return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
 }
@@ -352,11 +352,11 @@ unsigned gs_nearest_full(struct  gsFull *full, double lon, double lat, double *p
   unsigned n = full->n;
   float **pts = full->pts;
   int closestpt = -1;
-  double dist = DBL_MAX;
+  float dist = FLT_MAX;
   for ( int i = 0; i < n; i++ )
     {
-      double d = distance(q, pts[i]);
-      if ( closestpt < 0 || d < dist || (d==dist && i < closestpt) )
+      float d = distance(q, pts[i]);
+      if ( closestpt < 0 || d < dist || (d<=dist && i < closestpt) )
         {
           dist = d;
           closestpt = i;
