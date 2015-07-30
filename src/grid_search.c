@@ -127,8 +127,7 @@ void gs_destroy_nearpt3(struct gsNear *near)
     {
       if ( near->pts )
         {
-          unsigned n = near->n;
-          for ( unsigned i = 0; i < n; i++ ) free(near->pts[i]);
+          free(near->pts[0]);
           free(near->pts);
         }
 
@@ -141,20 +140,19 @@ struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const 
 {
   struct gsNear *near = (struct gsNear *) calloc(1, sizeof(struct gsNear));
 
-  float point[3];
-  Coord_T *pp;
   Coord_T **p = (Coord_T **) malloc(n*sizeof(Coord_T *));
+  p[0] = (Coord_T *) malloc(3*n*sizeof(Coord_T));
+  for ( unsigned i = 1; i < n; i++ ) p[i] = p[0] + i*3;
+
+  float point[3];
+
   for ( unsigned i = 0; i < n; i++ )
     {
-      pp = (Coord_T *) malloc(3*sizeof(Coord_T));
-
       LLtoXYZ_f(lons[i], lats[i], point);
 
-      pp[0] = NPT3SCALE(point[0]);
-      pp[1] = NPT3SCALE(point[1]);
-      pp[2] = NPT3SCALE(point[2]);
-      
-      p[i] = pp;
+      p[i][0] = NPT3SCALE(point[0]);
+      p[i][1] = NPT3SCALE(point[1]);
+      p[i][2] = NPT3SCALE(point[2]);
     }
 
   near->n = n;
@@ -173,8 +171,7 @@ void gs_destroy_full(struct gsFull *full)
     {
       if ( full->pts )
         {
-          unsigned n = full->n;
-          for ( unsigned i = 0; i < n; i++ ) free(full->pts[i]);
+          free(full->pts[0]);
           free(full->pts);
         }
 
@@ -187,28 +184,18 @@ struct gsFull *gs_create_full(unsigned n, const double *restrict lons, const dou
 {
   struct gsFull *full = (struct gsFull *) calloc(1, sizeof(struct gsFull));
 
-  full->n = n;
-  full->plons = lons;
-  full->plats = lats;
-
-  float point[3];
-  float *pp;
   float **p = (float **) malloc(n*sizeof(float *));
+  p[0] = (float *) malloc(3*n*sizeof(float));
+  for ( unsigned i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
   for ( unsigned i = 0; i < n; i++ )
     {
-
-      pp = (float *) malloc(3*sizeof(float));
-
-      LLtoXYZ_f(lons[i], lats[i], point);
-
-      pp[0] = point[0];
-      pp[1] = point[1];
-      pp[2] = point[2];
-      
-      p[i] = pp;
+      LLtoXYZ_f(lons[i], lats[i], p[i]);
     }
   
+  full->n = n;
+  full->plons = lons;
+  full->plats = lats;
   full->pts = p;
 
   return full;
