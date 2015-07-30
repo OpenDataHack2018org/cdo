@@ -12,8 +12,21 @@
 
    ********************************************************************* */
 
+
+static
+float square(const float x)
+{
+  return x*x;
+}
+
+static
+float kd_dist_sq(const float *restrict a, const float *restrict b, int dim)
+{
+  return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
+}
+
 inline float
-kd_dist_sq(float *x, float *y, int dim)
+kd_dist_sq_ori(float *x, float *y, int dim)
 {
     int i;
     float dsq = 0;

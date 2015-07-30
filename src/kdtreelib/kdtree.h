@@ -93,7 +93,6 @@ struct resItem **pqpeek_max(struct pqueue *q, struct resItem **d);
 void *kd_malloc(size_t size, const char *msg);
 int kd_isleaf(struct kdNode *n);
 /* Cartesian */
-float kd_dist_sq(float *x, float *y, int dim);
 float kd_sqr(float a);
 float kd_min(float x, float y);
 /* Spherical */
