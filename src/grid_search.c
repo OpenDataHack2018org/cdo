@@ -103,6 +103,9 @@ struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const d
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
   float *restrict point;
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
   for ( unsigned i = 0; i < n; i++ ) 
     {
       point = pointlist[i].point;
