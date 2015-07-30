@@ -129,6 +129,7 @@ void gs_destroy_nearpt3(struct gsNear *near)
 {
   if ( near )
     {
+      if ( near->nearpt3 ) nearpt3_destroy(near->nearpt3);
       if ( near->pts )
         {
           free(near->pts[0]);

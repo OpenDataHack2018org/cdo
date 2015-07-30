@@ -511,6 +511,13 @@ namespace nearpt3 {   // start of namespace nearpt3
   }    // preprocess
 
 
+  template <typename Coord_T>
+  void Destroy( Grid_T<Coord_T> *g ) { // Destroy
+    delete(g->cells);
+    delete(g->base);
+    delete(g);
+  }
+
   // QUERY:  Return the id of the closest fixed point to query point iq.
 
   template <typename Coord_T>
