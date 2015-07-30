@@ -3,6 +3,7 @@
 #include <float.h>
 #include <math.h>
 
+#include "cdo_int.h"
 #include "dmemory.h"
 #include "util.h"
 #include "grid_search.h"
@@ -146,6 +147,9 @@ struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const 
 
   float point[3];
 
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
   for ( unsigned i = 0; i < n; i++ )
     {
       LLtoXYZ_f(lons[i], lats[i], point);
@@ -188,6 +192,9 @@ struct gsFull *gs_create_full(unsigned n, const double *restrict lons, const dou
   p[0] = (float *) malloc(3*n*sizeof(float));
   for ( unsigned i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
   for ( unsigned i = 0; i < n; i++ )
     {
       LLtoXYZ_f(lons[i], lats[i], p[i]);
