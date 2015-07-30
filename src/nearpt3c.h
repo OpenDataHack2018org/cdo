@@ -1,7 +1,10 @@
-typedef unsigned short int Coord_T;
+//typedef unsigned short int Coord_T;
 //typedef short int Coord_T;
 //typedef unsigned int Coord_T;
-//typedef float Coord_T;
+typedef float Coord_T;
+
+#define NPT3SFACT 32000
+#define NPT3SCALE(x) (0.5+(x+1)*NPT3SFACT)
 
 #if defined(__cplusplus)
 extern "C" {

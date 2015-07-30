@@ -994,6 +994,7 @@ int parse_options_long(int argc, char *argv[])
   int lnetcdf_hdr_pad;
   int luse_fftw;
   int lgridsearchnn;
+  int lgridsearchradius;
   int lremap_genweights;
 
   struct cdo_option opt_long[] =
@@ -1003,6 +1004,7 @@ int parse_options_long(int argc, char *argv[])
       { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1  },
       { "use_fftw",          required_argument,          &luse_fftw,  1  },
       { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
+      { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
@@ -1026,6 +1028,7 @@ int parse_options_long(int argc, char *argv[])
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
       lgridsearchnn = 0;
+      lgridsearchradius = 0;
       lremap_genweights = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhLMOQRrsSTuVvWXZ", opt_long, NULL);
@@ -1059,6 +1062,15 @@ int parse_options_long(int argc, char *argv[])
           else if ( lgridsearchnn )
             {
               gridsearch_set_method(CDO_optarg);
+            }
+          else if ( lgridsearchradius )
+            {
+              extern double remap_search_radius;
+              double fval = atof(CDO_optarg);
+              if ( fval < 0 || fval > 180 )
+                cdoAbort("gridsearchradius=%g out of bounds (0-180)", fval);
+              else
+                remap_search_radius = fval;
             }
           else if ( lremap_genweights )
             {

@@ -19,6 +19,8 @@ struct gsFull {
 
 struct gsNear {
   unsigned n;
+  const double *plons;
+  const double *plats;
   Coord_T **pts;
   void *nearpt3;
 };

@@ -352,8 +352,9 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
+  extern double remap_search_radius;
   double findex = 0;
-  double search_radius = M_PI;
+  double search_radius = remap_search_radius*DEG2RAD;
   double range = SQR(2*search_radius);
 
   unsigned index;

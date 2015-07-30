@@ -26,6 +26,18 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
    xyz[2] = sin(lat);
 }
 
+static
+float square(const float x)
+{
+  return x*x;
+}
+
+static
+float distance(const float *restrict a, const float *restrict b)
+{
+  return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
+}
+
 
 void gridsearch_set_method(const char *methodstr)
 {
@@ -108,12 +120,6 @@ struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const d
   return kdt;
 }
 
-#define SCALE(x) (0.5+(x+1)*32000)
-//#define SCALE(x) (0.5+(x)*32000)
-//#define SCALE(x) (0.5+(x+1)*32000000)
-//#define SCALE(x) (0.5+(x+1)*32000)
-//#define SCALE(x) (x)
-
 
 void gs_destroy_nearpt3(struct gsNear *near)
 {
@@ -144,14 +150,16 @@ struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const 
 
       LLtoXYZ_f(lons[i], lats[i], point);
 
-      pp[0] = SCALE(point[0]);
-      pp[1] = SCALE(point[1]);
-      pp[2] = SCALE(point[2]);
+      pp[0] = NPT3SCALE(point[0]);
+      pp[1] = NPT3SCALE(point[1]);
+      pp[2] = NPT3SCALE(point[2]);
       
       p[i] = pp;
     }
 
   near->n = n;
+  near->plons = lons;
+  near->plats = lats;
   near->pts = p;
   near->nearpt3 = nearpt3_preprocess(n, p);
 
@@ -279,14 +287,13 @@ kdNode *gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
 {
   if ( kdt == NULL ) return NULL;
   
-  float point[3];
   float range0 = gs_set_range(prange);
   float range = range0;
 
+  float point[3];
   LLtoXYZ_f(lon, lat, point);
 
   kdNode *node = kd_nearest(kdt, point, &range, 3);
-  // printf("range %g %g %g %p\n", lon, lat, range, node);
 
   if ( !(range < range0) ) node = NULL;
   if ( prange ) *prange = range;
@@ -297,79 +304,69 @@ kdNode *gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
 
 unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double *prange)
 {
-  if ( near == NULL ) return GS_NOT_FOUND;
+  unsigned index = GS_NOT_FOUND;
+  if ( near == NULL ) return index;
   
-  float point[3];
   float range0 = gs_set_range(prange);
-  float range = range0;
 
+  float point[3];
   LLtoXYZ_f(lon, lat, point);
 
   Coord_T q[3];
-  q[0] = SCALE(point[0]);
-  q[1] = SCALE(point[1]);
-  q[2] = SCALE(point[2]);
+  q[0] = NPT3SCALE(point[0]);
+  q[1] = NPT3SCALE(point[1]);
+  q[2] = NPT3SCALE(point[2]);
 
-  unsigned index = nearpt3_query(near->nearpt3, q);
+  int closestpt = nearpt3_query(near->nearpt3, q);
 
-  // printf("range %g %g %g %u\n", lon, lat, range, index);
-  // printf("index %u\n", index);
-
-  // if ( !(range < range0) ) node = NULL;
-  // if ( prange ) *prange = range;
+  if ( closestpt >= 0 )
+    {
+      float point0[3];
+      LLtoXYZ_f(near->plons[closestpt], near->plats[closestpt], point0);
+      
+      float range = distance(point, point0);
+      if ( range < range0 )
+        {
+           index = (unsigned) closestpt;
+           *prange = range;
+        }
+    }
 
   return index;
-}
-
-static
-float square(const float x)
-{
-  return x*x;
-}
-
-static
-float distance(const float *restrict a, const float *restrict b)
-{
-  return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
 }
 
 
 unsigned gs_nearest_full(struct  gsFull *full, double lon, double lat, double *prange)
 {
-  if ( full == NULL ) return GS_NOT_FOUND;
+  unsigned index = GS_NOT_FOUND;
+  if ( full == NULL ) return index;
   
-  float point[3];
   float range0 = gs_set_range(prange);
-  float range = range0;
 
+  float point[3];
   LLtoXYZ_f(lon, lat, point);
 
-  float q[3];
-  q[0] = point[0];
-  q[1] = point[1];
-  q[2] = point[2];
-
-  unsigned n = full->n;
+  int n = full->n;
   float **pts = full->pts;
   int closestpt = -1;
   float dist = FLT_MAX;
   for ( int i = 0; i < n; i++ )
     {
-      float d = distance(q, pts[i]);
+      float d = distance(point, pts[i]);
       if ( closestpt < 0 || d < dist || (d<=dist && i < closestpt) )
         {
           dist = d;
           closestpt = i;
-          // printf("%d %g %g %d index %d %g\n", n, lon, lat, i, closestpt, dist);
         }
     }
 
-  unsigned index = GS_NOT_FOUND;
-
   if ( closestpt >= 0 )
     {
-      *prange = dist;
-      index = (unsigned) closestpt;
+      if ( dist < range0 )
+        {
+          *prange = dist;
+          index = (unsigned) closestpt;
+        }
     }
   
   return index;
