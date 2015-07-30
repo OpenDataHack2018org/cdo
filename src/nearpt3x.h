@@ -12,6 +12,7 @@
 
 // Uwe Schulzweida: replaced boost arrays by C arrays
 //                  replaced boost vector by C arrays
+//                  changed square and Distance2 to float
 
 
 #include <algorithm>
@@ -61,12 +62,12 @@ namespace nearpt3 {   // start of namespace nearpt3
     static const int Cells_Checked_to_Closest_Point_Per_Query_Size(5000);
 #endif
 
-  double square(const double x) {
+  float square(const float x) {
     return x*x;
   }
 
   template <typename Coord_T>
-  double Distance2(const Coord_T a[3], const Coord_T b[3]) {
+  float Distance2(const Coord_T a[3], const Coord_T b[3]) {
     return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
   }
 
@@ -290,13 +291,13 @@ namespace nearpt3 {   // start of namespace nearpt3
   querythiscell(const Cell3 thiscell, const Coord_T querypt[3], 
 		int &closestpt, double &dist2) {
     closestpt = -1;
-    dist2 = DBL_MAX;
+    dist2 = FLT_MAX;
     int ic = cellid_to_int(thiscell);
     const int ppc = N_Points_in_This_Cell(ic);
     for (int i=0; i<ppc; i++) {
       const int ip = base[ic]+i;
-      const double d2 = Distance2(pts[cells[ip]], querypt);
-      if (d2 < dist2 || (d2==dist2 && cells[ip]<closestpt)) {
+      const double d2 = (double) Distance2(pts[cells[ip]], querypt);
+      if (d2 < dist2 || (d2<=dist2 && cells[ip]<closestpt)) {
 	dist2 = d2;
 	closestpt = cells[ip];
       }
@@ -319,10 +320,10 @@ namespace nearpt3 {   // start of namespace nearpt3
     if (npitc<=0) return -1;   // Are there any points in this cell?
     // Find the closest point in this cell.
     int closestpt = -1;
-    double dist2 = DBL_MAX;
+    double dist2 = FLT_MAX;
     for (int i=base[queryint]; i<base[queryint+1]; i++) {
-      const double d2 = Distance2(pts[cells[i]], q);
-      if (d2 < dist2 || (d2==dist2 && cells[i]<closestpt)) {
+      const double d2 = (double) Distance2(pts[cells[i]], q);
+      if (d2 < dist2 || (d2<=dist2 && cells[i]<closestpt)) {
 	dist2 = d2;
 	closestpt = cells[i];
       }
@@ -363,7 +364,7 @@ namespace nearpt3 {   // start of namespace nearpt3
 	const int i1 = i01 + hicell[2];
 	const int hibase=base[i1+1];
 	for (int i=base[i0]; i<hibase; i++) {
-	  const double d2 = Distance2(pts[cells[i]], q);
+	  const double d2 = (double) Distance2(pts[cells[i]], q);
 	  if (d2 < dist2 || (d2==dist2 && cells[i]<closestpt)) {
 	    dist2 = d2;
 	    closestpt = cells[i];
@@ -614,7 +615,7 @@ namespace nearpt3 {   // start of namespace nearpt3
     }
     // No nearby points, so exhaustively search over all the fixed points.   
     for (int i=0; i< g->nfixpts; i++) {
-      double d = Distance2(q, g->pts[i]);
+      double d = (double) Distance2(q, g->pts[i]);
       if (d< dist || (d==dist && i < closestpt)) {
 	dist = d;
 	closestpt = i;
