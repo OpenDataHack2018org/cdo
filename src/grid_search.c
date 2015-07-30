@@ -136,6 +136,7 @@ void gs_destroy_nearpt3(struct gsNear *near)
     }
 }
 
+
 struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const double *restrict lats)
 {
   struct gsNear *near = (struct gsNear *) calloc(1, sizeof(struct gsNear));
@@ -145,7 +146,6 @@ struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const 
   Coord_T **p = (Coord_T **) malloc(n*sizeof(Coord_T *));
   for ( unsigned i = 0; i < n; i++ )
     {
-
       pp = (Coord_T *) malloc(3*sizeof(Coord_T));
 
       LLtoXYZ_f(lons[i], lats[i], point);
