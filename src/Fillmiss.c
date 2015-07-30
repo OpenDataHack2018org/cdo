@@ -348,15 +348,30 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
+  progressInit();
+
   start = clock();
 
+  double findex = 0;
   double search_radius = M_PI;
   double range = SQR(2*search_radius);
 
   unsigned index;
-#pragma omp parallel for private(index) shared(mindex, array1, array2, xvals, yvals, range)
+#pragma omp parallel for private(index) shared(cdoSilentMode, findex, mindex, array1, array2, xvals, yvals, range)
   for ( unsigned i = 0; i < nmiss; ++i )
     {
+      int lprogress = 1;
+      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
+
+      if ( !cdoSilentMode )
+	{
+#if defined(_OPENMP)
+#include "pragma_omp_atomic_update.h"
+#endif
+          findex++;
+          if ( lprogress ) progressStatus(0, 1, findex/nmiss);
+        }
+
       double prange = range;
 
       index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);

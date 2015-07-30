@@ -392,7 +392,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoSilentMode, gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
+  shared(cdoSilentMode, gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   private(tgt_cell_add, nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
@@ -496,7 +496,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoSilentMode, gs, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
+  shared(cdoSilentMode, gs, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   shared(src_array, tgt_array, missval) \
   private(tgt_cell_add, nbr_mask, nbr_add, nbr_dist)
 #endif
