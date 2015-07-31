@@ -11,7 +11,6 @@
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
-#include "util.h"  /* progressStatus */
 
 /* #define  BABY_STEP  0.001 */ /* original value */
 #define  BABY_STEP  0.001
@@ -1380,7 +1379,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
-  shared(ompNumThreads, nbins, num_wts, src_centroid_lon, src_centroid_lat, \
+  shared(nbins, num_wts, src_centroid_lon, src_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\
 	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
@@ -1393,14 +1392,12 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   for ( src_cell_add = 0; src_cell_add < src_grid_size; ++src_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
-      int lprogress = 1;
-      if ( ompthID != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
       findex++;
-      if ( lprogress ) progressStatus(0, 0.5, findex/src_grid_size);
+      if ( ompthID == 0 ) progressStatus(0, 0.5, findex/src_grid_size);
 
       srch_add = srch_add2[ompthID];
 
@@ -1605,7 +1602,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
-  shared(ompNumThreads, nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
+  shared(nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
@@ -1618,14 +1615,12 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       int ompthID = cdo_omp_get_thread_num();
-      int lprogress = 1;
-      if ( ompthID != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
       findex++;
-      if ( lprogress ) progressStatus(0.5, 0.5, findex/tgt_grid_size);
+      if ( ompthID == 0 ) progressStatus(0.5, 0.5, findex/tgt_grid_size);
 
       srch_add = srch_add2[ompthID];
 

@@ -392,22 +392,16 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(cdoSilentMode, gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
+  shared(gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   private(tgt_cell_add, nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-      int lprogress = 1;
-      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
-
-      if ( !cdoSilentMode )
-	{
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
-          findex++;
-          if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
-        }
+      findex++;
+      if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
       
       weightlinks[tgt_cell_add].nlinks = 0;	
 
@@ -496,23 +490,17 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(cdoSilentMode, gs, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
+  shared(gs, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   shared(src_array, tgt_array, missval) \
   private(tgt_cell_add, nbr_mask, nbr_add, nbr_dist)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-      int lprogress = 1;
-      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
-
-      if ( !cdoSilentMode )
-	{
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
-          findex++;
-          if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
-        }
+      findex++;
+      if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
       
       tgt_array[tgt_cell_add] = missval;
 

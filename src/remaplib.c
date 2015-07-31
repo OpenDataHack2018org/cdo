@@ -58,7 +58,6 @@
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
-#include "util.h"  /* progressStatus */
 
 
 #define IS_REG2D_GRID(gridID)  (!gridIsRotated(gridID) && (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN))
