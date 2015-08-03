@@ -30,18 +30,18 @@ case "${HOSTNAME}" in
 # i386-apple-darwin10
     bailung*|d133*|d134*)
         CDOLIBS="--with-fftw3 \
-                 --with-grib_api=$HOME/local/gribapi-1.12.3 \
-                 --with-netcdf=$HOME/local \
-                 --with-hdf5=$HOME/local \
-                 --with-szlib=$HOME/local \
-                 --with-udunits2=$HOME/local/udunits-2.1.24 \
-                 --with-proj=/opt/local \
+                 --with-grib_api=$HOME/local/grib_api-1.13.1 \
+                 --with-netcdf=$HOME/local/netcdf-c-4.3.3.1-threadsafe \
+                 --with-hdf5=$HOME/local/hdf5-1.8.15-threadsafe \
+                 --with-udunits2=/opt/local \
                  --with-curl=/opt/local"
+#                 --with-proj=/opt/local \
+#                 --with-szlib=$HOME/local \
 
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O2 -vec-report2 -march=native"
+	            CC=icc CFLAGS="-g -Wall -O2 -vec-report2 -march=native" CXX=icpc CXXFLAGS=$CFLAGS
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
