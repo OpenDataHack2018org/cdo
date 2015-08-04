@@ -29,7 +29,8 @@ set -x
 case "${HOSTNAME}" in
 # i386-apple-darwin10
     bailung*|d133*|d134*)
-        CDOLIBS="--with-fftw3 \
+        CDOLIBS="--enable-nearpt3 \
+                 --with-fftw3 \
                  --with-grib_api=$HOME/local/grib_api-1.13.1 \
                  --with-netcdf=$HOME/local/netcdf-c-4.3.3.1-threadsafe \
                  --with-hdf5=$HOME/local/hdf5-1.8.15-threadsafe \

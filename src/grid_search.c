@@ -1,3 +1,7 @@
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
@@ -129,7 +133,9 @@ void gs_destroy_nearpt3(struct gsNear *near)
 {
   if ( near )
     {
+#if defined(ENABLE_NEARPT3)
       if ( near->nearpt3 ) nearpt3_destroy(near->nearpt3);
+#endif
       if ( near->pts )
         {
           free(near->pts[0]);
@@ -167,8 +173,12 @@ struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const 
   near->plons = lons;
   near->plats = lats;
   near->pts = p;
+#if defined(ENABLE_NEARPT3)
   near->nearpt3 = nearpt3_preprocess(n, p);
-
+#else
+  cdoAbort("nearpt3 support not compiled in!");
+#endif
+  
   return near;
 }
 
@@ -315,6 +325,7 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
   q[1] = NPT3SCALE(point[1]);
   q[2] = NPT3SCALE(point[2]);
 
+#if defined(ENABLE_NEARPT3)
   int closestpt = nearpt3_query(near->nearpt3, q);
 
   if ( closestpt >= 0 )
@@ -329,6 +340,7 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
            *prange = range;
         }
     }
+#endif
 
   return index;
 }

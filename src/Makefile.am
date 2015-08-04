@@ -135,11 +135,6 @@ libcdo_la_SOURCES =            \
                util.h          \
                zaxis.c
 libcdo_la_SOURCES +=           \
-               nearpt3x.h      \
-               nearpt3c.h      \
-               nearpt3c.cc     \
-               cellsearchorder.h
-libcdo_la_SOURCES +=           \
                kdtreelib/kdtree.h            \
                kdtreelib/kdtree_cartesian.c  \
                kdtreelib/kdtree_common.c     \
@@ -350,6 +345,14 @@ cdo_SOURCES += Adisit.c        \
                Zonstat.c       \
                cdo.h
 
+
+if ENABLE_NEARPT3
+cdo_SOURCES +=           \
+               nearpt3x.h      \
+               nearpt3c.h      \
+               nearpt3c.cc     \
+               cellsearchorder.h
+endif
 
 if ENABLE_MAGICS
 cdo_SOURCES += Magplot.c       \

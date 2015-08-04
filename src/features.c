@@ -30,6 +30,12 @@
 void printFeatures(void)
 {
   fprintf(stderr, "Features:");
+#if defined(ENABLE_DATA)
+  fprintf(stderr, " DATA");
+#endif
+#if defined(ENABLE_NEARPT3)
+  fprintf(stderr, " nearpt3");
+#endif
 #if defined(HAVE_LIBPTHREAD)
   fprintf(stderr, " PTHREADS");
 #endif
