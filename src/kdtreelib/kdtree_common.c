@@ -8,8 +8,8 @@
 
 
 extern int pmergesort(void *base, size_t nmemb, size_t size,
-                      int (*compar) (const void *, const void *, int axis),
-                      int axis, int max_threads);
+                      int (*compar) (const void *, const void *),
+                      int max_threads);
 
 
 /* ********************************************************************
@@ -86,23 +86,7 @@ kd_printTree(struct kdNode *node)
    Functions for building and destroying trees 
 
    ******************************************************************** */
-static int
-_compPoints(const void *p1, const void *p2, int axis)
-{
-    struct kd_point *a = (struct kd_point *) p1;
-    struct kd_point *b = (struct kd_point *) p2;
 
-    if      (a->point[axis] > b->point[axis]) return  1;
-    else if (a->point[axis] < b->point[axis]) return -1;
-    else
-      {
-        if      ( a->index > b->index ) return  1;
-        else if ( a->index < b->index ) return -1;
-
-        return 0;
-      }
-}
-/*
 static int
 _compPoints0(const void *p1, const void *p2)
 {
@@ -153,7 +137,7 @@ _compPoints2(const void *p1, const void *p2)
         return 0;
       }
 }
-*/
+
 void *
 kd_doBuildTree(void *threadarg)
 {
@@ -194,16 +178,12 @@ kd_doBuildTree(void *threadarg)
      * If this iteration is allowed to start more threads, we first
      * use them to parallelize the sorting 
      */
-    /*
-    if ( max_threads == 1 )
-      {
-        if      ( sortaxis == 0 ) qsort(points, nPoints, sizeof(struct kd_point), _compPoints0);
-        else if ( sortaxis == 1 ) qsort(points, nPoints, sizeof(struct kd_point), _compPoints1);
-        else if ( sortaxis == 2 ) qsort(points, nPoints, sizeof(struct kd_point), _compPoints2);
-      }
-    else
-    */
-    pmergesort(points, nPoints, sizeof(struct kd_point), _compPoints, sortaxis, max_threads);
+    int (*qcomp) (const void *, const void *);
+    if      ( sortaxis == 0 ) qcomp = _compPoints0;
+    else if ( sortaxis == 1 ) qcomp = _compPoints1;
+    else if ( sortaxis == 2 ) qcomp = _compPoints2;
+
+    pmergesort(points, nPoints, sizeof(struct kd_point), qcomp, max_threads);
     pivot = nPoints / 2;
     if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)
         return NULL;

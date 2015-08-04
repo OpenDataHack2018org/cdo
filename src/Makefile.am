@@ -141,8 +141,7 @@ libcdo_la_SOURCES +=           \
                kdtreelib/kdtree_spherical.c  \
                kdtreelib/pmergesort.c        \
                kdtreelib/pqueue.c            \
-               kdtreelib/pqueue.h            \
-               kdtreelib/qsort.c
+               kdtreelib/pqueue.h
 libcdo_la_SOURCES +=           \
                clipping/clipping.c           \
                clipping/clipping.h           \

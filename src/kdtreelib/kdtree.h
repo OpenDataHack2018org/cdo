@@ -10,6 +10,7 @@
                              changed *min to min[KD_MAX_DIM]
                              changed *max to max[KD_MAX_DIM]
                              _compPoints: compare index if points[axis] are equal
+                             replace qsortR by libc:qsort (speedup 25%)
 */
 #ifndef _KDTREE_H_
 #define _KDTREE_H_

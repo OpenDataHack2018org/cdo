@@ -10,30 +10,25 @@ typedef struct param_t {
     size_t first;
     size_t nmemb;
     size_t size;
-    int (*cmp) (const void *, const void *, int axis);
-    int axis;
+    int (*cmp) (const void *, const void *);
     int max_threads;
 } param_t;
-
-extern void qsortR(const void *base0, size_t n, size_t size,
-                   int (*compar) (const void *, const void *, int axis),
-                   int axis);
 
 
 void pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                     size_t nmemb, size_t size,
-                    int (*cmp) (const void *, const void *, int),
-                    int axis, int max_threads);
+                    int (*cmp) (const void *, const void *),
+                    int max_threads);
 int pmergesort(void *base, size_t nmemb, size_t size,
-               int (*compar) (const void *, const void *, int),
-               int axis, int max_threads);
+               int (*compar) (const void *, const void *),
+               int max_threads);
 void *mergesort_t(void *args);
 
 
 int
 pmergesort(void *base, size_t nmemb, size_t size,
-           int (*compar) (const void *, const void *, int),
-           int axis, int max_threads)
+           int (*compar) (const void *, const void *),
+           int max_threads)
 {
     void *tmp;
     param_t args;
@@ -48,7 +43,6 @@ pmergesort(void *base, size_t nmemb, size_t size,
     args.nmemb = nmemb;
     args.size = size;
     args.cmp = compar;
-    args.axis = axis;
     args.max_threads = max_threads;
 
     mergesort_t(&args);
@@ -60,8 +54,8 @@ pmergesort(void *base, size_t nmemb, size_t size,
 void
 pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                size_t nmemb, size_t size,
-               int (*cmp) (const void *, const void *, int),
-               int axis, int max_threads)
+               int (*cmp) (const void *, const void *),
+               int max_threads)
 {
 
     p->a = a;
@@ -70,7 +64,6 @@ pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
     p->nmemb = nmemb;
     p->size = size;
     p->cmp = cmp;
-    p->axis = axis;
     p->max_threads = max_threads;
 }
 
@@ -88,13 +81,13 @@ mergesort_t(void *args)
          * Reached maximum number of threads allocated to this
          * branch. Proceed with sequential sort of this chunk. 
          */
-        qsortR(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp, mya->axis);
+        qsort(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp);
     } else {
         /*
          * Start two new threads, each sorting half of array a 
          */
         pm_buildparams(&larg, mya->a, mya->b, mya->first, mya->nmemb / 2,
-                       mya->size, mya->cmp, mya->axis, mya->max_threads / 2);
+                       mya->size, mya->cmp, mya->max_threads / 2);
         /*
          * Recursively sort the left half 
          */
@@ -105,7 +98,7 @@ mergesort_t(void *args)
 
         pm_buildparams(&rarg, mya->a, mya->b, mya->first + mya->nmemb / 2,
                        mya->nmemb - mya->nmemb / 2, mya->size,
-                       mya->cmp, mya->axis, mya->max_threads / 2);
+                       mya->cmp, mya->max_threads / 2);
         /*
          * Recursively sort the right half 
          */
@@ -144,7 +137,7 @@ mergesort_t(void *args)
              * element 
              */
             else if (mya->cmp(mya->a + li * mya->size,
-                              mya->a + ri * mya->size, mya->axis) < 1) {
+                              mya->a + ri * mya->size) < 1) {
                 memcpy(mya->b + i * mya->size, mya->a + li * mya->size,
                        mya->size);
                 li++;

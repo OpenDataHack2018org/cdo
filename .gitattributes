@@ -591,7 +591,6 @@ src/kdtreelib/kdtree_spherical.c -text
 src/kdtreelib/pmergesort.c -text
 src/kdtreelib/pqueue.c -text
 src/kdtreelib/pqueue.h -text
-src/kdtreelib/qsort.c -text
 src/kvlist.c -text
 src/kvlist.h -text
 src/list.c -text
