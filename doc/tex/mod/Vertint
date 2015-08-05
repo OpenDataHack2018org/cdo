@@ -1,6 +1,6 @@
 @BeginModule
 @NewPage
-@Name      = Intvert
+@Name      = Vertintml
 @Title     = Vertical interpolation
 @Section   = Interpolation
 @Class     = Interpolation
@@ -8,7 +8,7 @@
 @Operators = ml2pl ml2hl
 
 @BeginDescription
-Interpolate 3D variables on hybrid model levels to pressure or height levels.
+Interpolate 3D variables on hybrid sigma pressure level to pressure or height levels.
 The input file should contain the log. surface pressure or the surface pressure.
 To interpolate the temperature, the surface geopotential is also needed.
 The pressure, temperature, and surface geopotential are identified by their GRIB1 code number
@@ -26,7 +26,7 @@ to extrapolate missing values. This operator requires all variables on the same 
 @Parameter = plevels
 
 @BeginDescription
-Interpolates 3D variables on hybrid model levels to pressure levels.
+Interpolates 3D variables on hybrid sigma pressure level to pressure level.
 @EndDescription
 @EndOperator
 
@@ -36,7 +36,7 @@ Interpolates 3D variables on hybrid model levels to pressure levels.
 @Parameter = hlevels
 
 @BeginDescription
-Interpolates 3D variables on hybrid model levels to height levels.
+Interpolates 3D variables on hybrid sigma pressure level to height level.
 The procedure is the same as for the operator @oper{mh2pl} except for
 the pressure levels being calculated from the heights by:
 @math{plevel = 101325*exp(hlevel/-7000)}

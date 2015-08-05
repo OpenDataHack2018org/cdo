@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-08-05  Uwe Schulzweida
+
+	* ap2pl: changed to generalized height
+
 2015-07-27  Uwe Schulzweida
 
 	* removed configure option --with-jasper

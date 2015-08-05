@@ -42,7 +42,7 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O2 -vec-report2 -march=native" CXX=icpc CXXFLAGS=$CFLAGS
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -68,7 +68,8 @@ case "${HOSTNAME}" in
 #                 --with-proj=/opt/local \
 #                 --with-cmor=/Users/m214003/work/CMOR \
 #                 --with-curl=/opt/local"
-        CDOLIBS="--with-fftw3 \
+        CDOLIBS="--enable-nearpt3 \
+                 --with-fftw3 \
                  --with-grib_api=$HOME/local/gribapi-1.13.0 \
                  --with-netcdf=$HOME/local \
                  --with-hdf5=$HOME/local \
@@ -77,7 +78,7 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native -openmp"
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \

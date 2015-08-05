@@ -3618,7 +3618,7 @@ static char *RemapetaHelp[] = {
     NULL
 };
 
-static char *IntvertHelp[] = {
+static char *VertintmlHelp[] = {
     "NAME",
     "    ml2pl, ml2hl - Vertical interpolation",
     "",
@@ -3627,7 +3627,7 @@ static char *IntvertHelp[] = {
     "    ml2hl,hlevels  ifile ofile",
     "",
     "DESCRIPTION",
-    "    Interpolate 3D variables on hybrid model levels to pressure or height levels.",
+    "    Interpolate 3D variables on hybrid sigma pressure level to pressure or height levels.",
     "    The input file should contain the log. surface pressure or the surface pressure.",
     "    To interpolate the temperature, the surface geopotential is also needed.",
     "    The pressure, temperature, and surface geopotential are identified by their GRIB1 code number",
@@ -3639,9 +3639,9 @@ static char *IntvertHelp[] = {
     "",
     "OPERATORS",
     "    ml2pl  Model to pressure level interpolation",
-    "           Interpolates 3D variables on hybrid model levels to pressure levels.",
+    "           Interpolates 3D variables on hybrid sigma pressure level to pressure level.",
     "    ml2hl  Model to height level interpolation",
-    "           Interpolates 3D variables on hybrid model levels to height levels.",
+    "           Interpolates 3D variables on hybrid sigma pressure level to height level.",
     "           The procedure is the same as for the operator mh2pl except for",
     "           the pressure levels being calculated from the heights by:",
     "           plevel = 101325*exp(hlevel/-7000)",
@@ -3669,6 +3669,27 @@ static char *IntvertHelp[] = {
     "    In case this operator complains about not finding any data on hybrid model levels you may wish",
     "    to use the setzaxis command to generate a zaxis description which conforms to the ECHAM convention.",
     "    See section \"1.4 Z-axis description\" for an example how to define a hybrid Z-axis.",
+    NULL
+};
+
+static char *VertintapHelp[] = {
+    "NAME",
+    "    ap2pl - Vertical interpolation",
+    "",
+    "SYNOPSIS",
+    "    ap2pl,plevels  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Interpolate 3D variables on hybrid sigma height coordinates to pressure levels.",
+    "    The input file must contain the 3D air pressure. The air pressure is identified",
+    "    by the netCDF CF standard name air_pressure.",
+    "    This operator requires all variables on the same horizontal grid.",
+    "",
+    "PARAMETER",
+    "    plevels  FLOAT  Pressure levels in pascal",
+    "",
+    "NOTE",
+    "    This is a specific implememtation for netCDF files from the ICON model, it may not work with data from other sources.",
     NULL
 };
 
