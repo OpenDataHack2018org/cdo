@@ -115,8 +115,7 @@ void remapVarsFree(remapvars_t *rv)
 
   if ( rv->pinit == TRUE )
     {
-      rv->pinit = FALSE;
-
+      rv->pinit    = FALSE;
       rv->sort_add = FALSE;
 
       if ( rv->src_cell_add ) free(rv->src_cell_add);
