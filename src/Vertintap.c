@@ -38,15 +38,12 @@ int is_height_axis(int zaxisID, int nlevel)
   int isheight = FALSE;
   if ( nlevel > 1 )
     {
-      if ( zaxisInqType(zaxisID) == ZAXIS_GENERIC )
+      if ( zaxisInqType(zaxisID) == ZAXIS_REFERENCE )
         {
           char units[CDI_MAX_NAME];
           char stdname[CDI_MAX_NAME];
-          // *units = 0;
-          // *stdname = 0;
           zaxisInqUnits(zaxisID, units);
           zaxisInqStdname(zaxisID, stdname);
-          printf("stdname %s %s\n", stdname, units);
           if ( strcmp(stdname, "height") == 0 && *units == 0 )
             isheight = TRUE;
         }
