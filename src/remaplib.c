@@ -1141,6 +1141,20 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 		}
 	    }
 	}
+      else if ( num_wts == 1 )
+	{
+#ifdef SX
+#pragma cdir nodep
+#endif
+#if defined(_OPENMP)
+#pragma omp parallel for default(none)          \
+  shared(num_links, dst_array, src_array, map_wts, dst_add, src_add) private(n)
+#endif
+	  for ( n = 0; n < num_links; ++n )
+	    {
+	      dst_array[dst_add[n]] = src_array[src_add[n]]*map_wts[n];
+	    }
+	}
       else
 	{
 	  for ( n = 0; n < num_links; ++n )

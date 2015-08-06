@@ -431,6 +431,8 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
       store_weightlinks(nadds, nbr_add, nbr_dist, tgt_cell_add, weightlinks);
     }
 
+  progressStatus(0, 1, 1);
+
   if ( gs ) gridsearch_delete(gs);
 
   weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
@@ -531,6 +533,8 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
 
       if ( nadds ) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbr_dist, nbr_add);
     }
+
+  progressStatus(0, 1, 1);
 
   if ( gs ) gridsearch_delete(gs);
 
