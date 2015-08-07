@@ -41,7 +41,6 @@ void *Vertintml(void *argument)
   enum {ECHAM_MODE, WMO_MODE};
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
-  int gridsize;
   int recID, nrecs;
   int i, k, offset;
   int tsID, varID, levelID;
@@ -66,7 +65,6 @@ void *Vertintml(void *argument)
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   double *hyb_press = NULL;
   int Extrapolate = 0;
-  int lhavevct;
   int mono_level;
   int instNum, tableNum;
   int useTable;
@@ -90,17 +88,13 @@ void *Vertintml(void *argument)
 
   if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {
-      char *envstr;
-      envstr = getenv("EXTRAPOLATE");
+      char *envstr = getenv("EXTRAPOLATE");
 
-      if ( envstr )
+      if ( envstr && isdigit((int) envstr[0]) )
 	{
-	  if ( isdigit((int) envstr[0]) )
-	    {
-	      Extrapolate = atoi(envstr);
-	      if ( Extrapolate == 1 )
-		cdoPrint("Extrapolation of missing values enabled!");
-	    }
+          Extrapolate = atoi(envstr);
+          if ( Extrapolate == 1 )
+            cdoPrint("Extrapolation of missing values enabled!");
 	}
     }
   else if ( operatorID == ML2PLX || operatorID == ML2HLX || operatorID == ML2PLX_LP || operatorID == ML2HLX_LP )
@@ -120,7 +114,7 @@ void *Vertintml(void *argument)
       */
       double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
                           10000,  7000,  5000,  3000,  2000, 1000 };
-        nplev = sizeof(stdlev)/sizeof(*stdlev);
+      nplev = sizeof(stdlev)/sizeof(*stdlev);
       plev  = (double *) malloc(nplev*sizeof(double));
       for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
     }
@@ -139,7 +133,7 @@ void *Vertintml(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  gridsize = vlist_check_gridsize(vlistID1);
+  int gridsize = vlist_check_gridsize(vlistID1);
 
   if ( operfunc == func_hl )
     zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
@@ -148,7 +142,7 @@ void *Vertintml(void *argument)
 
   zaxisDefLevels(zaxisIDp, plev);
   nzaxis  = vlistNzaxis(vlistID1);
-  lhavevct = FALSE;
+  int lhavevct = FALSE;
   for ( i = 0; i < nzaxis; i++ )
     {
       /* mono_level = FALSE; */
@@ -159,10 +153,9 @@ void *Vertintml(void *argument)
       if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
 	   nlevel > 1 )
 	{
-	  double *level;
-	  int l;
-	  level = (double*) malloc(nlevel*sizeof(double));
+	  double *level = (double *) malloc(nlevel*sizeof(double));
 	  zaxisInqLevels(zaxisID, level);
+	  int l;
 	  for ( l = 0; l < nlevel; l++ )
 	    {
 	      if ( (l+1) != (int) (level[l]+0.5) ) break;
@@ -289,7 +282,7 @@ void *Vertintml(void *argument)
   if ( zaxisIDh != -1 )
     {
       int nlev = zaxisInqSize(zaxisIDh);
-      if ( nlev != nhlev ) cdoAbort("Internal error, wrong numner of hybrid level!");
+      if ( nlev != nhlev ) cdoAbort("Internal error, wrong number of hybrid level!");
       double levels[nlev];
       zaxisInqLevels(zaxisIDh, levels);
 
@@ -496,6 +489,18 @@ void *Vertintml(void *argument)
 	cdoPrint("using LOG(%s)", var_stdname(surface_air_pressure));      
       else
 	cdoPrint("using %s", var_stdname(surface_air_pressure));
+    }
+
+  // check VCT
+  if ( zaxisIDh != -1 )
+    {
+      double suma = 0, sumb = 0;
+      for ( i = 0; i < nhlevh; i++ )
+        {
+          suma += vct[i];
+          sumb += vct[i+nhlevh];
+        }
+      if ( !(suma>0&&sumb>0) ) cdoWarning("VCT is empty!");
     }
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

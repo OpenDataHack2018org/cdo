@@ -270,15 +270,6 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
   free(matrix1);
 }
 
-static double dist_sq( double *a1, double *a2, int dims ) {
-  double dist_sq = 0, diff;
-  while( --dims >= 0 ) {
-    diff = (a1[dims] - a2[dims]);
-    dist_sq += diff*diff;
-  }
-  return dist_sq;
-}
-
 
 void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 {
@@ -314,10 +305,17 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   unsigned *mindex = NULL;
   unsigned *vindex = NULL;
+  double *lons = NULL;
+  double *lats = NULL;
 
-  if ( nmiss ) mindex = (unsigned*) calloc(1, nmiss*sizeof(unsigned));
-  if ( nvals ) vindex = (unsigned*) calloc(1, nvals*sizeof(unsigned));
-
+  if ( nmiss ) mindex = (unsigned *) calloc(1, nmiss*sizeof(unsigned));
+  if ( nvals )
+    {
+      vindex = (unsigned *) calloc(1, nvals*sizeof(unsigned));
+      lons   = (double *) malloc(nvals*sizeof(double));
+      lats   = (double *) malloc(nvals*sizeof(double));
+    }
+  
   unsigned nv = 0, nm = 0;
   for ( unsigned i = 0; i < gridsize; ++i ) 
     {
@@ -329,6 +327,8 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
       else
         {
           array2[i] = array1[i];
+          lons[nv] = xvals[i];
+          lats[nv] = yvals[i];
           vindex[nv] = i;
           nv++;
         }
@@ -340,67 +340,55 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
-  struct gridsearch *gs = gridsearch_index_create(nvals, xvals, yvals, vindex);
+  struct gridsearch *gs = NULL;
 
-  if ( vindex ) free(vindex);
+  if ( nmiss ) gs = gridsearch_create_nn(nvals, lons, lats);
   
   finish = clock();
 
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
+  progressInit();
+
   start = clock();
 
+  extern double remap_search_radius;
+  double findex = 0;
+  double search_radius = remap_search_radius*DEG2RAD;
+  double range = SQR(2*search_radius);
+
   unsigned index;
-  void *gs_result;
-#pragma omp parallel for private(gs_result) shared(mindex, array1, array2, xvals, yvals) private(index)
+#pragma omp parallel for private(index) shared(findex, mindex, array1, array2, xvals, yvals, range)
   for ( unsigned i = 0; i < nmiss; ++i )
     {
-      gs_result = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]]);
-      if ( gs_result ) 
-        index = gridsearch_item(gs_result);
-      else
-        index = mindex[i];
+#if defined(_OPENMP)
+#include "pragma_omp_atomic_update.h"
+#endif
+      findex++;
+      if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/nmiss);
+
+      double prange = range;
+
+      index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
+      if ( index == GS_NOT_FOUND ) index = mindex[i];
+      else                         index = vindex[index];
+
+      // printf("%u %u %d\n", i, index, (int)(prange*100000));
 
       array2[mindex[i]] = array1[index];
     }
 
   if ( mindex ) free(mindex);
+  if ( vindex ) free(vindex);
 
-  /*
-  double radius = 5.*M_PI/180.;
-  
-  for ( unsigned i = 0; i < gridsize; ++i )
-    {
-      if ( DBL_IS_EQUAL(array1[i], missval) )
-        {
-          LLtoXYZ(xvals[i], yvals[i], pos);
-          presults = kd_nearest_range(pointTree, pos, radius);
-          int nvals = kd_res_size(presults);
-          double dist = 0;
-          double val = 0;
-          while( !kd_res_end( presults ) )
-            {
-              unsigned *index = (unsigned*) kd_res_item(presults, pos2);
-              val += array1[*index];
-              dist = sqrt( dist_sq( pos, pos2, 3 ) );
-              printf( "found %d results: dist %g index %u\n", nvals, dist, *index);
-              kd_res_next( presults );
-            }
-          kd_res_free( presults );
-          array2[i] = val/nvals;
-        }
-      else
-        {
-          array2[i] = array1[i];
-        }
-    }
-  */
   finish = clock();
 
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
-  gridsearch_delete(gs);
+  if ( gs ) gridsearch_delete(gs);
 
+  if ( lons ) free(lons);
+  if ( lats ) free(lats);
   free(xvals);
   free(yvals);
 }

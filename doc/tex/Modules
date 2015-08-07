@@ -97,6 +97,7 @@ Genweights    Interpolation
 Remap         Interpolation
 Remapeta      Interpolation
 Vertint       Interpolation
+Vertintap     Interpolation
 Intlevel      Interpolation
 Intlevel3d    Interpolation
 Inttime       Interpolation

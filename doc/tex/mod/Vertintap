@@ -1,0 +1,40 @@
+@BeginModule
+@Name      = Vertintap
+@Title     = Vertical interpolation
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = ap2pl
+
+@BeginDescription
+Interpolate 3D variables on hybrid sigma height coordinates to pressure levels.
+The input file must contain the 3D air pressure. The air pressure is identified
+by the netCDF CF standard name air_pressure.
+This operator requires all variables on the same horizontal grid.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_ap2pl
+@Title     = Model to pressure level interpolation
+@Parameter = plevels
+@EndOperator
+
+
+@BeginParameter
+@Item = plevels
+FLOAT  Pressure levels in pascal
+@EndParameter
+
+
+@BeginNote
+This is a specific implememtation for netCDF files from the ICON model, it may not work with data from other sources.
+@EndNote
+
+
+@BeginExample
+To interpolate 3D variables on hybrid sigma height level to pressure levels of 925, 850, 500 and 200 hPa use:
+@BeginVerbatim
+   cdo ap2pl,92500,85000,50000,20000 ifile ofile
+@EndVerbatim
+@EndExample

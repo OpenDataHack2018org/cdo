@@ -80,7 +80,13 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cdo$(EXEEXT)
-@ENABLE_MAGICS_TRUE@am__append_1 = Magplot.c       \
+@ENABLE_NEARPT3_TRUE@am__append_1 = \
+@ENABLE_NEARPT3_TRUE@               nearpt3x.h      \
+@ENABLE_NEARPT3_TRUE@               nearpt3c.h      \
+@ENABLE_NEARPT3_TRUE@               nearpt3c.cc     \
+@ENABLE_NEARPT3_TRUE@               cellsearchorder.h
+
+@ENABLE_MAGICS_TRUE@am__append_2 = Magplot.c       \
 @ENABLE_MAGICS_TRUE@               Magvector.c     \
 @ENABLE_MAGICS_TRUE@               Maggraph.c      \
 @ENABLE_MAGICS_TRUE@               template_parser.h   \
@@ -94,9 +100,9 @@ bin_PROGRAMS = cdo$(EXEEXT)
 @ENABLE_MAGICS_TRUE@               CdoMagicsMapper.h   \
 @ENABLE_MAGICS_TRUE@               CdoMagicsMapper.c
 
-@ENABLE_ALL_STATIC_TRUE@am__append_2 = -all-static
-noinst_PROGRAMS = cdotest$(EXEEXT)
 @ENABLE_ALL_STATIC_TRUE@am__append_3 = -all-static
+noinst_PROGRAMS = cdotest$(EXEEXT)
+@ENABLE_ALL_STATIC_TRUE@am__append_4 = -all-static
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/config.h.in $(top_srcdir)/config/mkinstalldirs \
@@ -135,7 +141,6 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-griddes_h5.lo libcdo_la-griddes_nc.lo \
 	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
 	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
-	libcdo_la-kdtree.lo libcdo_la-kdtree_fast.lo \
 	libcdo_la-grid_search.lo libcdo_la-kvlist.lo libcdo_la-list.lo \
 	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
 	libcdo_la-namelist.lo libcdo_la-normal.lo \
@@ -149,14 +154,18 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-remap_search_latbins.lo \
 	libcdo_la-remap_store_link.lo \
 	libcdo_la-remap_store_link_cnsrv.lo libcdo_la-remap_conserv.lo \
-	libcdo_la-remap_conserv_scrip.lo \
-	libcdo_la-remap_distwgt_scrip.lo \
+	libcdo_la-remap_conserv_scrip.lo libcdo_la-remap_distwgt.lo \
 	libcdo_la-remap_bicubic_scrip.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
 	libcdo_la-table.lo libcdo_la-text.lo libcdo_la-timer.lo \
 	libcdo_la-userlog.lo libcdo_la-util.lo libcdo_la-zaxis.lo \
-	clipping/libcdo_la-clipping.lo clipping/libcdo_la-area.lo \
+	kdtreelib/libcdo_la-kdtree_cartesian.lo \
+	kdtreelib/libcdo_la-kdtree_common.lo \
+	kdtreelib/libcdo_la-kdtree_spherical.lo \
+	kdtreelib/libcdo_la-pmergesort.lo \
+	kdtreelib/libcdo_la-pqueue.lo clipping/libcdo_la-clipping.lo \
+	clipping/libcdo_la-area.lo \
 	clipping/libcdo_la-ensure_array_size.lo \
 	clipping/libcdo_la-grid_cell.lo \
 	clipping/libcdo_la-intersection.lo clipping/libcdo_la-utils.lo
@@ -199,12 +208,14 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
 	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
 	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
-	Yseasstat.c Zonstat.c cdo.h Magplot.c Magvector.c Maggraph.c \
+	Yseasstat.c Zonstat.c cdo.h nearpt3x.h nearpt3c.h nearpt3c.cc \
+	cellsearchorder.h Magplot.c Magvector.c Maggraph.c \
 	template_parser.h template_parser.c results_template_parser.h \
 	results_template_parser.c magics_template_parser.h \
 	magics_template_parser.c StringUtilities.h StringUtilities.c \
 	CdoMagicsMapper.h CdoMagicsMapper.c
-@ENABLE_MAGICS_TRUE@am__objects_1 = cdo-Magplot.$(OBJEXT) \
+@ENABLE_NEARPT3_TRUE@am__objects_1 = cdo-nearpt3c.$(OBJEXT)
+@ENABLE_MAGICS_TRUE@am__objects_2 = cdo-Magplot.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-Magvector.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-Maggraph.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-template_parser.$(OBJEXT) \
@@ -295,15 +306,16 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
 	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
 	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
-	cdo-Zonstat.$(OBJEXT) $(am__objects_1)
+	cdo-Zonstat.$(OBJEXT) $(am__objects_1) $(am__objects_2)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
-cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(cdo_LDFLAGS) $(LDFLAGS) -o $@
+cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(cdo_LDFLAGS) $(LDFLAGS) -o $@
 am_cdotest_OBJECTS = cdotest-cdotest.$(OBJEXT)
 cdotest_OBJECTS = $(am_cdotest_OBJECTS)
-cdotest_DEPENDENCIES = $(cdo_LDADD)
+am__DEPENDENCIES_1 = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdotest_DEPENDENCIES = $(am__DEPENDENCIES_1)
 cdotest_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(cdotest_LDFLAGS) $(LDFLAGS) -o $@
@@ -341,6 +353,24 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS)
+AM_V_CXX = $(am__v_CXX_@AM_V@)
+am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
+am__v_CXX_0 = @echo "  CXX     " $@;
+am__v_CXX_1 = 
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+am__v_CXXLD_1 = 
 SOURCES = $(libcdo_la_SOURCES) $(cdo_SOURCES) $(cdotest_SOURCES)
 DIST_SOURCES = $(libcdo_la_SOURCES) $(am__cdo_SOURCES_DIST) \
 	$(cdotest_SOURCES)
@@ -414,6 +444,7 @@ ENABLE_IEG = @ENABLE_IEG@
 ENABLE_NC2 = @ENABLE_NC2@
 ENABLE_NC4 = @ENABLE_NC4@
 ENABLE_NC4HDF5 = @ENABLE_NC4HDF5@
+ENABLE_NEARPT3 = @ENABLE_NEARPT3@
 ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
 EXEEXT = @EXEEXT@
@@ -431,7 +462,6 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
-JASPER_LIBS = @JASPER_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
@@ -557,24 +587,26 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
 	grid_gme.c grid_lcc.c grid_rot.c gridreference.c griddes.c \
 	griddes.h griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h \
-	institution.c interpol.c interpol.h job.c juldate.c kdtree.c \
-	kdtree.h kdtree_fast.c kdtree_fast.h grid_search.c \
-	grid_search.h kvlist.c kvlist.h list.c list.h merge_sort2.c \
-	merge_sort2.h modules.c modules.h namelist.c namelist.h \
-	normal.c nth_element.c nth_element.h operator_help.h par_io.c \
-	par_io.h percentiles.c percentiles.h pipe.c pipe.h \
-	pragma_omp_atomic_update.h printinfo.h process.c process.h \
-	pstream.c pstream.h pstream_write.h pstream_int.h \
+	institution.c interpol.c interpol.h job.c juldate.c \
+	grid_search.c grid_search.h kvlist.c kvlist.h list.c list.h \
+	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
+	namelist.h normal.c nth_element.c nth_element.h \
+	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
+	pipe.c pipe.h pragma_omp_atomic_update.h printinfo.h process.c \
+	process.h pstream.c pstream.h pstream_write.h pstream_int.h \
 	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
 	remaplib.c remapsort.c remap_scrip_io.c remap_search_reg2d.c \
 	remap_search_latbins.c remap_store_link.c remap_store_link.h \
 	remap_store_link_cnsrv.c remap_store_link_cnsrv.h \
-	remap_conserv.c remap_conserv_scrip.c remap_distwgt_scrip.c \
+	remap_conserv.c remap_conserv_scrip.c remap_distwgt.c \
 	remap_bicubic_scrip.c remap_bilinear_scrip.c stdnametable.c \
 	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
 	table.c text.c text.h timebase.h timer.c userlog.c util.c \
-	util.h zaxis.c clipping/clipping.c clipping/clipping.h \
-	clipping/area.c clipping/area.h clipping/ensure_array_size.c \
+	util.h zaxis.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
+	kdtreelib/kdtree_common.c kdtreelib/kdtree_spherical.c \
+	kdtreelib/pmergesort.c kdtreelib/pqueue.c kdtreelib/pqueue.h \
+	clipping/clipping.c clipping/clipping.h clipping/area.c \
+	clipping/area.h clipping/ensure_array_size.c \
 	clipping/ensure_array_size.h clipping/geometry.h \
 	clipping/grid.h clipping/points.h clipping/dep_list.h \
 	clipping/grid_cell.c clipping/grid_cell.h \
@@ -612,17 +644,17 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
 	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
 	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
-	Yseasstat.c Zonstat.c cdo.h $(am__append_1)
+	Yseasstat.c Zonstat.c cdo.h $(am__append_1) $(am__append_2)
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
-cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
-cdo_LDFLAGS = $(am__append_2)
+cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la -lstdc++
+cdo_LDFLAGS = $(am__append_3)
 libcdo_la_CPPFLAGS = $(cdo_CPPFLAGS)
 cdotest_SOURCES = cdo_int.h	\
 	           cdotest.c
 
 cdotest_LDADD = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
-cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_3)
+cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_4)
 
 #cdo-userlog.o: userlog.c config.h
 #	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
@@ -634,7 +666,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .cc .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -691,6 +723,22 @@ clean-noinstLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
+kdtreelib/$(am__dirstamp):
+	@$(MKDIR_P) kdtreelib
+	@: > kdtreelib/$(am__dirstamp)
+kdtreelib/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) kdtreelib/$(DEPDIR)
+	@: > kdtreelib/$(DEPDIR)/$(am__dirstamp)
+kdtreelib/libcdo_la-kdtree_cartesian.lo: kdtreelib/$(am__dirstamp) \
+	kdtreelib/$(DEPDIR)/$(am__dirstamp)
+kdtreelib/libcdo_la-kdtree_common.lo: kdtreelib/$(am__dirstamp) \
+	kdtreelib/$(DEPDIR)/$(am__dirstamp)
+kdtreelib/libcdo_la-kdtree_spherical.lo: kdtreelib/$(am__dirstamp) \
+	kdtreelib/$(DEPDIR)/$(am__dirstamp)
+kdtreelib/libcdo_la-pmergesort.lo: kdtreelib/$(am__dirstamp) \
+	kdtreelib/$(DEPDIR)/$(am__dirstamp)
+kdtreelib/libcdo_la-pqueue.lo: kdtreelib/$(am__dirstamp) \
+	kdtreelib/$(DEPDIR)/$(am__dirstamp)
 clipping/$(am__dirstamp):
 	@$(MKDIR_P) clipping
 	@: > clipping/$(am__dirstamp)
@@ -773,7 +821,7 @@ clean-noinstPROGRAMS:
 
 cdo$(EXEEXT): $(cdo_OBJECTS) $(cdo_DEPENDENCIES) $(EXTRA_cdo_DEPENDENCIES) 
 	@rm -f cdo$(EXEEXT)
-	$(AM_V_CCLD)$(cdo_LINK) $(cdo_OBJECTS) $(cdo_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(cdo_LINK) $(cdo_OBJECTS) $(cdo_LDADD) $(LIBS)
 
 cdotest$(EXEEXT): $(cdotest_OBJECTS) $(cdotest_DEPENDENCIES) $(EXTRA_cdotest_DEPENDENCIES) 
 	@rm -f cdotest$(EXEEXT)
@@ -783,6 +831,8 @@ mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f clipping/*.$(OBJEXT)
 	-rm -f clipping/*.lo
+	-rm -f kdtreelib/*.$(OBJEXT)
+	-rm -f kdtreelib/*.lo
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -974,6 +1024,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Zonstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-cdo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-magics_template_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-nearpt3c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-results_template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdotest-cdotest.Po@am__quote@
@@ -1020,8 +1071,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-interpol.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-job.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-juldate.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kdtree.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kdtree_fast.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kvlist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-merge_sort2.Plo@am__quote@
@@ -1041,7 +1090,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_bilinear_scrip.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_conserv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_conserv_scrip.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_distwgt_scrip.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_distwgt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_scrip_io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_search_latbins.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_search_reg2d.Plo@am__quote@
@@ -1064,6 +1113,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-grid_cell.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-intersection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-utils.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-kdtree_cartesian.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-kdtree_common.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-kdtree_spherical.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-pmergesort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-pqueue.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1383,20 +1437,6 @@ libcdo_la-juldate.lo: juldate.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-juldate.lo `test -f 'juldate.c' || echo '$(srcdir)/'`juldate.c
 
-libcdo_la-kdtree.lo: kdtree.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-kdtree.lo -MD -MP -MF $(DEPDIR)/libcdo_la-kdtree.Tpo -c -o libcdo_la-kdtree.lo `test -f 'kdtree.c' || echo '$(srcdir)/'`kdtree.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-kdtree.Tpo $(DEPDIR)/libcdo_la-kdtree.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtree.c' object='libcdo_la-kdtree.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-kdtree.lo `test -f 'kdtree.c' || echo '$(srcdir)/'`kdtree.c
-
-libcdo_la-kdtree_fast.lo: kdtree_fast.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-kdtree_fast.lo -MD -MP -MF $(DEPDIR)/libcdo_la-kdtree_fast.Tpo -c -o libcdo_la-kdtree_fast.lo `test -f 'kdtree_fast.c' || echo '$(srcdir)/'`kdtree_fast.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-kdtree_fast.Tpo $(DEPDIR)/libcdo_la-kdtree_fast.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtree_fast.c' object='libcdo_la-kdtree_fast.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-kdtree_fast.lo `test -f 'kdtree_fast.c' || echo '$(srcdir)/'`kdtree_fast.c
-
 libcdo_la-grid_search.lo: grid_search.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_search.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_search.Tpo -c -o libcdo_la-grid_search.lo `test -f 'grid_search.c' || echo '$(srcdir)/'`grid_search.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_search.Tpo $(DEPDIR)/libcdo_la-grid_search.Plo
@@ -1572,12 +1612,12 @@ libcdo_la-remap_conserv_scrip.lo: remap_conserv_scrip.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-remap_conserv_scrip.lo `test -f 'remap_conserv_scrip.c' || echo '$(srcdir)/'`remap_conserv_scrip.c
 
-libcdo_la-remap_distwgt_scrip.lo: remap_distwgt_scrip.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-remap_distwgt_scrip.lo -MD -MP -MF $(DEPDIR)/libcdo_la-remap_distwgt_scrip.Tpo -c -o libcdo_la-remap_distwgt_scrip.lo `test -f 'remap_distwgt_scrip.c' || echo '$(srcdir)/'`remap_distwgt_scrip.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-remap_distwgt_scrip.Tpo $(DEPDIR)/libcdo_la-remap_distwgt_scrip.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remap_distwgt_scrip.c' object='libcdo_la-remap_distwgt_scrip.lo' libtool=yes @AMDEPBACKSLASH@
+libcdo_la-remap_distwgt.lo: remap_distwgt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-remap_distwgt.lo -MD -MP -MF $(DEPDIR)/libcdo_la-remap_distwgt.Tpo -c -o libcdo_la-remap_distwgt.lo `test -f 'remap_distwgt.c' || echo '$(srcdir)/'`remap_distwgt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-remap_distwgt.Tpo $(DEPDIR)/libcdo_la-remap_distwgt.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remap_distwgt.c' object='libcdo_la-remap_distwgt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-remap_distwgt_scrip.lo `test -f 'remap_distwgt_scrip.c' || echo '$(srcdir)/'`remap_distwgt_scrip.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-remap_distwgt.lo `test -f 'remap_distwgt.c' || echo '$(srcdir)/'`remap_distwgt.c
 
 libcdo_la-remap_bicubic_scrip.lo: remap_bicubic_scrip.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-remap_bicubic_scrip.lo -MD -MP -MF $(DEPDIR)/libcdo_la-remap_bicubic_scrip.Tpo -c -o libcdo_la-remap_bicubic_scrip.lo `test -f 'remap_bicubic_scrip.c' || echo '$(srcdir)/'`remap_bicubic_scrip.c
@@ -1655,6 +1695,41 @@ libcdo_la-zaxis.lo: zaxis.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='zaxis.c' object='libcdo_la-zaxis.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-zaxis.lo `test -f 'zaxis.c' || echo '$(srcdir)/'`zaxis.c
+
+kdtreelib/libcdo_la-kdtree_cartesian.lo: kdtreelib/kdtree_cartesian.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kdtreelib/libcdo_la-kdtree_cartesian.lo -MD -MP -MF kdtreelib/$(DEPDIR)/libcdo_la-kdtree_cartesian.Tpo -c -o kdtreelib/libcdo_la-kdtree_cartesian.lo `test -f 'kdtreelib/kdtree_cartesian.c' || echo '$(srcdir)/'`kdtreelib/kdtree_cartesian.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) kdtreelib/$(DEPDIR)/libcdo_la-kdtree_cartesian.Tpo kdtreelib/$(DEPDIR)/libcdo_la-kdtree_cartesian.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtreelib/kdtree_cartesian.c' object='kdtreelib/libcdo_la-kdtree_cartesian.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kdtreelib/libcdo_la-kdtree_cartesian.lo `test -f 'kdtreelib/kdtree_cartesian.c' || echo '$(srcdir)/'`kdtreelib/kdtree_cartesian.c
+
+kdtreelib/libcdo_la-kdtree_common.lo: kdtreelib/kdtree_common.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kdtreelib/libcdo_la-kdtree_common.lo -MD -MP -MF kdtreelib/$(DEPDIR)/libcdo_la-kdtree_common.Tpo -c -o kdtreelib/libcdo_la-kdtree_common.lo `test -f 'kdtreelib/kdtree_common.c' || echo '$(srcdir)/'`kdtreelib/kdtree_common.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) kdtreelib/$(DEPDIR)/libcdo_la-kdtree_common.Tpo kdtreelib/$(DEPDIR)/libcdo_la-kdtree_common.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtreelib/kdtree_common.c' object='kdtreelib/libcdo_la-kdtree_common.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kdtreelib/libcdo_la-kdtree_common.lo `test -f 'kdtreelib/kdtree_common.c' || echo '$(srcdir)/'`kdtreelib/kdtree_common.c
+
+kdtreelib/libcdo_la-kdtree_spherical.lo: kdtreelib/kdtree_spherical.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kdtreelib/libcdo_la-kdtree_spherical.lo -MD -MP -MF kdtreelib/$(DEPDIR)/libcdo_la-kdtree_spherical.Tpo -c -o kdtreelib/libcdo_la-kdtree_spherical.lo `test -f 'kdtreelib/kdtree_spherical.c' || echo '$(srcdir)/'`kdtreelib/kdtree_spherical.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) kdtreelib/$(DEPDIR)/libcdo_la-kdtree_spherical.Tpo kdtreelib/$(DEPDIR)/libcdo_la-kdtree_spherical.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtreelib/kdtree_spherical.c' object='kdtreelib/libcdo_la-kdtree_spherical.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kdtreelib/libcdo_la-kdtree_spherical.lo `test -f 'kdtreelib/kdtree_spherical.c' || echo '$(srcdir)/'`kdtreelib/kdtree_spherical.c
+
+kdtreelib/libcdo_la-pmergesort.lo: kdtreelib/pmergesort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kdtreelib/libcdo_la-pmergesort.lo -MD -MP -MF kdtreelib/$(DEPDIR)/libcdo_la-pmergesort.Tpo -c -o kdtreelib/libcdo_la-pmergesort.lo `test -f 'kdtreelib/pmergesort.c' || echo '$(srcdir)/'`kdtreelib/pmergesort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) kdtreelib/$(DEPDIR)/libcdo_la-pmergesort.Tpo kdtreelib/$(DEPDIR)/libcdo_la-pmergesort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtreelib/pmergesort.c' object='kdtreelib/libcdo_la-pmergesort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kdtreelib/libcdo_la-pmergesort.lo `test -f 'kdtreelib/pmergesort.c' || echo '$(srcdir)/'`kdtreelib/pmergesort.c
+
+kdtreelib/libcdo_la-pqueue.lo: kdtreelib/pqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kdtreelib/libcdo_la-pqueue.lo -MD -MP -MF kdtreelib/$(DEPDIR)/libcdo_la-pqueue.Tpo -c -o kdtreelib/libcdo_la-pqueue.lo `test -f 'kdtreelib/pqueue.c' || echo '$(srcdir)/'`kdtreelib/pqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) kdtreelib/$(DEPDIR)/libcdo_la-pqueue.Tpo kdtreelib/$(DEPDIR)/libcdo_la-pqueue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtreelib/pqueue.c' object='kdtreelib/libcdo_la-pqueue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kdtreelib/libcdo_la-pqueue.lo `test -f 'kdtreelib/pqueue.c' || echo '$(srcdir)/'`kdtreelib/pqueue.c
 
 clipping/libcdo_la-clipping.lo: clipping/clipping.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT clipping/libcdo_la-clipping.lo -MD -MP -MF clipping/$(DEPDIR)/libcdo_la-clipping.Tpo -c -o clipping/libcdo_la-clipping.lo `test -f 'clipping/clipping.c' || echo '$(srcdir)/'`clipping/clipping.c
@@ -4358,12 +4433,51 @@ cdotest-cdotest.obj: cdotest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdotest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdotest-cdotest.obj `if test -f 'cdotest.c'; then $(CYGPATH_W) 'cdotest.c'; else $(CYGPATH_W) '$(srcdir)/cdotest.c'; fi`
 
+.cc.o:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
+
+.cc.obj:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cc.lo:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+cdo-nearpt3c.o: nearpt3c.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-nearpt3c.o -MD -MP -MF $(DEPDIR)/cdo-nearpt3c.Tpo -c -o cdo-nearpt3c.o `test -f 'nearpt3c.cc' || echo '$(srcdir)/'`nearpt3c.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-nearpt3c.Tpo $(DEPDIR)/cdo-nearpt3c.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nearpt3c.cc' object='cdo-nearpt3c.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-nearpt3c.o `test -f 'nearpt3c.cc' || echo '$(srcdir)/'`nearpt3c.cc
+
+cdo-nearpt3c.obj: nearpt3c.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-nearpt3c.obj -MD -MP -MF $(DEPDIR)/cdo-nearpt3c.Tpo -c -o cdo-nearpt3c.obj `if test -f 'nearpt3c.cc'; then $(CYGPATH_W) 'nearpt3c.cc'; else $(CYGPATH_W) '$(srcdir)/nearpt3c.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-nearpt3c.Tpo $(DEPDIR)/cdo-nearpt3c.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nearpt3c.cc' object='cdo-nearpt3c.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-nearpt3c.obj `if test -f 'nearpt3c.cc'; then $(CYGPATH_W) 'nearpt3c.cc'; else $(CYGPATH_W) '$(srcdir)/nearpt3c.cc'; fi`
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf clipping/.libs clipping/_libs
+	-rm -rf kdtreelib/.libs kdtreelib/_libs
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -4483,6 +4597,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f clipping/$(DEPDIR)/$(am__dirstamp)
 	-rm -f clipping/$(am__dirstamp)
+	-rm -f kdtreelib/$(DEPDIR)/$(am__dirstamp)
+	-rm -f kdtreelib/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -4493,7 +4609,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libtool \
 	clean-noinstLTLIBRARIES clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR) clipping/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) clipping/$(DEPDIR) kdtreelib/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
@@ -4539,7 +4655,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR) clipping/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) clipping/$(DEPDIR) kdtreelib/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

@@ -12,6 +12,9 @@
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA
 
+/* Define to 1 for nearpt3 support */
+#undef ENABLE_NEARPT3
+
 /* Define to 1 if you have the <cmor.h> header file. */
 #undef HAVE_CMOR_H
 
@@ -52,9 +55,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the <jasper.h> header file. */
-#undef HAVE_JASPER_H
-
 /* Define to 1 for GRIB1 decoding/encoding with cgribex */
 #undef HAVE_LIBCGRIBEX
 
@@ -81,9 +81,6 @@
 
 /* Define to 1 for IEG interface */
 #undef HAVE_LIBIEG
-
-/* Define to 1 for JPEG compression for GRIB2 */
-#undef HAVE_LIBJASPER
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
@@ -260,6 +257,11 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Enable large inode numbers on Mac OS X 10.5.  */
+#ifndef _DARWIN_USE_64_BIT_INODE
+# define _DARWIN_USE_64_BIT_INODE 1
+#endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS

@@ -74,6 +74,7 @@ static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 
+void gridsearch_set_method(const char *methodstr);
 
 #define PRINT_RLIMIT(resource) \
       { \
@@ -992,21 +993,26 @@ int parse_options_long(int argc, char *argv[])
   int c;
   int lnetcdf_hdr_pad;
   int luse_fftw;
+  int lgridsearchnn;
+  int lgridsearchradius;
   int lremap_genweights;
 
   struct cdo_option opt_long[] =
     {
-      { "netcdf_hdr_pad",    required_argument,    &lnetcdf_hdr_pad,  1 },
-      { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1 },
-      { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1 },
-      { "use_fftw",          required_argument,          &luse_fftw,  1 },
-      { "remap_genweights",  required_argument,  &lremap_genweights,  1 },
-      { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1 },
-      { "rusage",                  no_argument,         &CDO_Rusage,  1 },
-      { "no_warnings",             no_argument,           &_Verbose,  0 },
+      { "netcdf_hdr_pad",    required_argument,    &lnetcdf_hdr_pad,  1  },
+      { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
+      { "hdr_pad",           required_argument,    &lnetcdf_hdr_pad,  1  },
+      { "use_fftw",          required_argument,          &luse_fftw,  1  },
+      { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
+      { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
+      { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
+      { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
+      { "rusage",                  no_argument,         &CDO_Rusage,  1  },
+      { "no_warnings",             no_argument,           &_Verbose,  0  },
       { "format",            required_argument,                NULL, 'f' },
       { "help",                    no_argument,                NULL, 'h' },
-      { "history",                 no_argument,                NULL, 'H' },
+      { "history",                 no_argument, &CDO_Append_History,  0  },
+      { "no_history",              no_argument, &CDO_Append_History,  0  },
       { "regular",                 no_argument,                NULL, 'R' },
       { "silent",                  no_argument,                NULL, 's' },
       { "table",             required_argument,                NULL, 't' },
@@ -1021,9 +1027,11 @@ int parse_options_long(int argc, char *argv[])
     {
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
+      lgridsearchnn = 0;
+      lgridsearchradius = 0;
       lremap_genweights = 0;
 
-      c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ", opt_long, NULL);
+      c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhLMOQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
 
       switch (c)
@@ -1050,6 +1058,19 @@ int parse_options_long(int argc, char *argv[])
               if ( use_fftw != 0 && use_fftw != 1 )
                 cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", use_fftw);
               CDO_Use_FFTW = use_fftw;
+            }
+          else if ( lgridsearchnn )
+            {
+              gridsearch_set_method(CDO_optarg);
+            }
+          else if ( lgridsearchradius )
+            {
+              extern double remap_search_radius;
+              double fval = atof(CDO_optarg);
+              if ( fval < 0 || fval > 180 )
+                cdoAbort("gridsearchradius=%g out of bounds (0-180)", fval);
+              else
+                remap_search_radius = fval;
             }
           else if ( lremap_genweights )
             {
@@ -1103,9 +1124,6 @@ int parse_options_long(int argc, char *argv[])
           break;
         case 'h':        
           Help = 1;
-          break;
-        case 'H':        
-          CDO_Append_History = FALSE;
           break;
         case 'i':
           defineInstitution(CDO_optarg);

@@ -58,7 +58,6 @@
 #include "grid.h"
 #include "remap.h"
 #include "remap_store_link_cnsrv.h"
-#include "util.h"  /* progressStatus */
 
 
 #define IS_REG2D_GRID(gridID)  (!gridIsRotated(gridID) && (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN))
@@ -940,22 +939,6 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
       src_grid->gridID = gridID1 = expand_curvilinear_grid(gridID1);
     }
 
-  if ( map_type == MAP_TYPE_DISTWGT )
-    {
-      if ( gridInqType(src_grid->gridID) == GRID_UNSTRUCTURED )
-	{
-	  src_grid->luse_cell_corners  = TRUE;
-	  src_grid->lneed_cell_corners = FALSE; /* full grid search */
-	}
-      /* not used !
-      if ( gridInqType(tgt_grid->gridID) == GRID_UNSTRUCTURED )
-	{
-	  tgt_grid->luse_cell_corners  = TRUE;
-	  tgt_grid->lneed_cell_corners = FALSE;
-	}
-      */
-    }
-
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     remap_define_grid(map_type, gridID1, src_grid);
 
@@ -970,7 +953,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
     {
       remap_define_reg2d(reg2d_src_gridID, src_grid);
     }
-  else
+  else if ( map_type != MAP_TYPE_DISTWGT )
     {
       cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
       cell_bounding_boxes(tgt_grid, REMAP_GRID_BASIS_TGT);

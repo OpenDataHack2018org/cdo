@@ -72,10 +72,10 @@ void *Vertcum(void *argument)
 
   cdoInitialize(argument);
 
-  int VERTCUM   = cdoOperatorAdd("vertcum",    0,  0, NULL);
+                  cdoOperatorAdd("vertcum",    0,  0, NULL);
   int VERTCUMHL = cdoOperatorAdd("vertcumhl",  0,  0, NULL);
 
-  int operatorID  = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -83,7 +83,6 @@ void *Vertcum(void *argument)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int nvars = vlistNvars(vlistID1);
-  int vars[nvars];
   int *varnmiss[nvars];
   double **vardata1[nvars];
   double **vardata2[nvars];
@@ -111,6 +110,7 @@ void *Vertcum(void *argument)
                       nlevshl = nlevs+1;
 
                       double *vct = (double*) malloc(nvct*sizeof(double));
+                      zaxisInqVct(zaxisID, vct);
 
                       zaxisIDhl = zaxisCreate(ZAXIS_HYBRID_HALF, nlevshl);
                       double levels[nlevshl];
@@ -233,8 +233,8 @@ void *Vertcum(void *argument)
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+      nlevs  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      nlevs2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
       for ( levelID = 0; levelID < nlevs; ++levelID ) free(vardata1[varID][levelID]);
       for ( levelID = 0; levelID < nlevs2; ++levelID ) free(vardata2[varID][levelID]);
       free(vardata1[varID]);

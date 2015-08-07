@@ -3,6 +3,19 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-08-05  Uwe Schulzweida
+
+	* ap2pl: changed to generalized height
+
+2015-07-27  Uwe Schulzweida
+
+	* removed configure option --with-jasper
+	* remapnn/dis: replaced scrip search by kdtree
+
+2015-07-23  Uwe Schulzweida
+
+	* changed option --history to --no_history
+
 2015-07-21  Uwe Schulzweida
 
 	* tinfo: optimize calculation of monthly and yearly increment

@@ -161,7 +161,7 @@ void bilinear_remap(double* restrict tgt_point, const double* restrict src_array
 
   -----------------------------------------------------------------------
 */
-void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, remapvars_t* rv)
+void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*   Local variables */
   int  search_result;
@@ -195,20 +195,17 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoVerbose, weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
+  shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
   private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(static)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-      int lprogress = 1;
-      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
-
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
       findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
+      if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
 
       weightlinks[tgt_cell_add].nlinks = 0;	
 
@@ -288,7 +285,7 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
 
   -----------------------------------------------------------------------
 */
-void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
+void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double *restrict src_array, double *restrict tgt_array, double missval)
 {
   /*   Local variables */
   int  search_result;
@@ -320,23 +317,17 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoVerbose, cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
+  shared(cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
   private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(static)
 #endif
   for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
-      int lprogress = 1;
-      if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
-
-      if ( !cdoSilentMode )
-	{
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
-	  findex++;
-	  if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
-	}
+      findex++;
+      if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
 
       tgt_array[tgt_cell_add] = missval;
 

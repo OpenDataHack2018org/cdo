@@ -70,10 +70,6 @@ libcdo_la_SOURCES =            \
                interpol.h      \
                job.c           \
                juldate.c       \
-               kdtree.c        \
-               kdtree.h        \
-               kdtree_fast.c   \
-               kdtree_fast.h   \
                grid_search.c   \
                grid_search.h   \
                kvlist.c        \
@@ -120,7 +116,7 @@ libcdo_la_SOURCES =            \
                remap_store_link_cnsrv.h \
                remap_conserv.c \
                remap_conserv_scrip.c \
-               remap_distwgt_scrip.c \
+               remap_distwgt.c \
                remap_bicubic_scrip.c \
                remap_bilinear_scrip.c \
                stdnametable.c  \
@@ -138,6 +134,14 @@ libcdo_la_SOURCES =            \
                util.c          \
                util.h          \
                zaxis.c
+libcdo_la_SOURCES +=           \
+               kdtreelib/kdtree.h            \
+               kdtreelib/kdtree_cartesian.c  \
+               kdtreelib/kdtree_common.c     \
+               kdtreelib/kdtree_spherical.c  \
+               kdtreelib/pmergesort.c        \
+               kdtreelib/pqueue.c            \
+               kdtreelib/pqueue.h
 libcdo_la_SOURCES +=           \
                clipping/clipping.c           \
                clipping/clipping.h           \
@@ -341,6 +345,14 @@ cdo_SOURCES += Adisit.c        \
                cdo.h
 
 
+if ENABLE_NEARPT3
+cdo_SOURCES +=           \
+               nearpt3x.h      \
+               nearpt3c.h      \
+               nearpt3c.cc     \
+               cellsearchorder.h
+endif
+
 if ENABLE_MAGICS
 cdo_SOURCES += Magplot.c       \
                Magvector.c     \
@@ -358,7 +370,7 @@ cdo_SOURCES += Magplot.c       \
 endif
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
-cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la -lstdc++
 cdo_LDFLAGS  =
 
 if ENABLE_ALL_STATIC

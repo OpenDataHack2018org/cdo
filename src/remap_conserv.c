@@ -555,7 +555,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 }
 
 
-void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
 
@@ -720,14 +720,12 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       double partial_weight;
       long n, num_weights, num_weights_old;
       int ompthID = cdo_omp_get_thread_num();
-      int lprogress = 1;
-      if ( ompthID != 0 ) lprogress = 0;
 
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
       findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
+      if ( ompthID == 0 ) progressStatus(0, 1, findex/tgt_grid_size);
 
       weightlinks[tgt_cell_add].nlinks = 0;	
 
