@@ -43,6 +43,14 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
+        elif  test "$COMP" = icpc ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = clang++ ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=clang++ CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
