@@ -240,7 +240,7 @@ void *Ydaystat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
-		    farcmul(&vars1[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		    farcdiv(&vars1[dayoy][varID][levelID], (double)nsets[dayoy]);
 		  else
 		    fardiv(&vars1[dayoy][varID][levelID], samp1[dayoy][varID][levelID]);
 		}

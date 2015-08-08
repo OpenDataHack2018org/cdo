@@ -250,7 +250,7 @@ void *Yhourstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  if ( samp1[houroy][varID][levelID].ptr == NULL )
-		    farcmul(&vars1[houroy][varID][levelID], 1.0/nsets[houroy]);
+		    farcdiv(&vars1[houroy][varID][levelID], (double)nsets[houroy]);
 		  else
 		    fardiv(&vars1[houroy][varID][levelID], samp1[houroy][varID][levelID]);
 		}

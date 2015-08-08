@@ -236,7 +236,7 @@ void *Yseasstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  if ( samp1[seas][varID][levelID].ptr == NULL )
-		    farcmul(&vars1[seas][varID][levelID], 1.0/nsets[seas]);
+		    farcdiv(&vars1[seas][varID][levelID], (double)nsets[seas]);
 		  else
 		    fardiv(&vars1[seas][varID][levelID], samp1[seas][varID][levelID]);
 		}

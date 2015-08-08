@@ -417,7 +417,7 @@ void *Vertstat(void *argument)
 	      if ( lmean )
 		{
 		  if ( samp1[varID].ptr == NULL )
-		    farcmul(&vars1[varID], 1.0/vars1[varID].nsamp);
+		    farcdiv(&vars1[varID], (double)vars1[varID].nsamp);
 		  else
 		    fardiv(&vars1[varID], samp1[varID]);
 		}

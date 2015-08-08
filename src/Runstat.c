@@ -208,7 +208,7 @@ void *Runstat(void *argument)
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( runstat_nomiss )
-		  farcmul(&vars1[0][varID][levelID], 1.0/ndates);
+		  farcdiv(&vars1[0][varID][levelID], (double)ndates);
 		else
 		  fardiv(&vars1[0][varID][levelID], samp1[0][varID][levelID]);
 	      }
