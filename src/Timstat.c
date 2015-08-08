@@ -206,6 +206,7 @@ void *Timstat(void *argument)
       for ( varID = 0; varID < nvars; ++varID )
 	{
 	  vlistDefVarDatatype(vlistID3, varID, DATATYPE_INT32);
+	  vlistDefVarMissval(vlistID3, varID, -1);
 	  vlistDefVarUnits(vlistID3, varID, "");
 	  vlistDefVarAddoffset(vlistID3, varID, 0);
 	  vlistDefVarScalefactor(vlistID3, varID, 1);
