@@ -25,11 +25,9 @@ static
 void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
 {
   if ( ysize > 1 )
-    {
-      double *yvals1, *yvals2;
-      
-      yvals1 = (double*) malloc(ysize*sizeof(double));
-      yvals2 = (double*) malloc(ysize*sizeof(double));
+    {      
+      double *yvals1 = (double*) malloc(ysize*sizeof(double));
+      double *yvals2 = (double*) malloc(ysize*sizeof(double));
 
       gridInqYvals(gridID1, yvals1);
       gridInqYvals(gridID2, yvals2);
@@ -63,10 +61,8 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
 {
   if ( xsize > 1 )
     {
-      double *xvals1, *xvals2;
-
-      xvals1 = (double*) malloc(xsize*sizeof(double));
-      xvals2 = (double*) malloc(xsize*sizeof(double));
+      double *xvals1 = (double*) malloc(xsize*sizeof(double));
+      double *xvals2 = (double*) malloc(xsize*sizeof(double));
 
       gridInqXvals(gridID1, xvals1);
       gridInqXvals(gridID2, xvals2);
@@ -86,16 +82,12 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
 static
 void compare_grid_unstructured(int gridID1, int gridID2)
 {
-  double *xvals1, *xvals2;
-  double *yvals1, *yvals2;
-  int gridsize;
+  int gridsize = gridInqSize(gridID1);
 
-  gridsize = gridInqSize(gridID1);
-
-  xvals1 = (double*) malloc(gridsize*sizeof(double));
-  xvals2 = (double*) malloc(gridsize*sizeof(double));
-  yvals1 = (double*) malloc(gridsize*sizeof(double));
-  yvals2 = (double*) malloc(gridsize*sizeof(double));
+  double *xvals1 = (double*) malloc(gridsize*sizeof(double));
+  double *xvals2 = (double*) malloc(gridsize*sizeof(double));
+  double *yvals1 = (double*) malloc(gridsize*sizeof(double));
+  double *yvals2 = (double*) malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID1, xvals1);
   gridInqXvals(gridID2, xvals2);
@@ -119,14 +111,13 @@ static
 void compareGrids(int gridID1, int gridID2)
 {
   /* compare grids of first variable */
-  int xsize, ysize;
 
   if ( gridInqType(gridID1) == gridInqType(gridID2) )
     {
       if ( gridInqType(gridID1) == GRID_GAUSSIAN || gridInqType(gridID1) == GRID_LONLAT )
 	{
-	  xsize = gridInqXsize(gridID1);
-	  ysize = gridInqYsize(gridID1);
+	  int xsize = gridInqXsize(gridID1);
+	  int ysize = gridInqYsize(gridID1);
 		
 	  if ( ysize == gridInqYsize(gridID2) )
 	    compare_lat_reg2d(ysize, gridID1, gridID2);
@@ -153,16 +144,16 @@ void compareGrids(int gridID1, int gridID2)
 static
 int cmpnames(const void *s1, const void *s2)
 {
-  const char *name1 = s1;
-  const char *name2 = s2;
+  const char *name1 = (const char *)s1;
+  const char *name2 = (const char *)s2;
 
-  return (strcmp(name1, name2));
+  return strcmp(name1, name2);
 }
 
 
 void vlistCompare(int vlistID1, int vlistID2, int flag)
 {
-  int varID, nvars;
+  int varID;
   int lchecknames = FALSE;
 
   if ( vlistNvars(vlistID1) != vlistNvars(vlistID2) )
@@ -171,7 +162,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
   if ( vlistNrecs(vlistID1) != vlistNrecs(vlistID2) )
     cdoAbort("Input streams have different number of records per timestep!");
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -240,11 +231,11 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 
 int vlistCompareX(int vlistID1, int vlistID2, int flag)
 {
-  int varID, nvars, nvars2, nlevels2;
+  int varID;
 
-  nvars = vlistNvars(vlistID1);
-  nvars2 = vlistNvars(vlistID2);
-  nlevels2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, 0));
+  int nvars = vlistNvars(vlistID1);
+  int nvars2 = vlistNvars(vlistID2);
+  int nlevels2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, 0));
 
   if ( nvars2 != 1 )
     cdoAbort("Internal problem, vlistCompareX() called with unexpected vlistID2 argument!");
@@ -276,20 +267,18 @@ int vlistCompareX(int vlistID1, int vlistID2, int flag)
       compareGrids(gridID1, gridID2);
     }
 
-  return (nlevels2);
+  return nlevels2;
 }
 
 
 int vlistIsSzipped(int vlistID)
 {
   int lszip = FALSE;
-  int nvars, varID, comptype;
+  int nvars = vlistNvars(vlistID);
 
-  nvars = vlistNvars(vlistID);
-
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( int varID = 0; varID < nvars; varID++ )
     {						
-      comptype = vlistInqVarCompType(vlistID, varID);
+      int comptype = vlistInqVarCompType(vlistID, varID);
       if ( comptype == COMPRESS_SZIP )
 	{
 	  lszip = TRUE;
@@ -297,7 +286,7 @@ int vlistIsSzipped(int vlistID)
 	}
     }      
 
-  return (lszip);
+  return lszip;
 }
 
 
@@ -311,7 +300,7 @@ int vlistInqNWPV(int vlistID, int varID)
   else
     nwpv = 1;
 
-  return (nwpv);
+  return nwpv;
 }
 
 

@@ -268,12 +268,6 @@ void *Splittime(void *argument)
     }
 
   streamClose(streamID1);
-
-  for ( index = 0; index < MAX_STREAMS; index++ )
-    {
-      streamID2 = streamIDs[index];
-      if ( streamID2 >= 0 ) streamClose(streamID2);
-    }
  
   if ( array ) free(array);
 
@@ -293,6 +287,12 @@ void *Splittime(void *argument)
 	}
 
       if ( vars ) free(vars);
+    }
+
+  for ( index = 0; index < MAX_STREAMS; index++ )
+    {
+      streamID2 = streamIDs[index];
+      if ( streamID2 >= 0 ) streamClose(streamID2);
     }
 
   vlistDestroy(vlistID2);
