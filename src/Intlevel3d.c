@@ -409,7 +409,7 @@ void *Intlevel3d(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 	      gridsize = gridInqSize(gridID);
 
-	      vert_interp_lev3d(expol, gridsize, missval, vardata1[varID], vardata2[varID],
+	      vert_interp_lev3d(gridsize, missval, vardata1[varID], vardata2[varID],
 				nlevo, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
 	      for ( levelID = 0; levelID < nlevo; levelID++ )

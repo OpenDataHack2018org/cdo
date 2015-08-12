@@ -417,7 +417,7 @@ void interp_Z(const double * restrict geop, const double * restrict gz, double *
 /*
  * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.c)
  */
-void vert_interp_lev3d(int lexpol, int gridsize, double missval, double *vardata1, double *vardata2,
+void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *vardata2,
 		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   int i, ilev;
@@ -474,43 +474,6 @@ void vert_interp_lev3d(int lexpol, int gridsize, double missval, double *vardata
 	      var2[i] = var1L1*w1 + var1L2*w2;
 	    }
 	}
-    }
-
-  if ( lexpol )
-    {
-      /*
-      printf("lexpol nlev2 %d!\n", nlev2);
-      for ( i = 0; i < gridsize; i++ )
-	{
-          if ( DBL_IS_EQUAL(vardata2[i], missval) )
-            {
-              for ( ilev = 1; ilev < nlev2; ilev++ )
-                {
-                  if ( !DBL_IS_EQUAL(vardata2[ilev*gridsize+i], missval) ) break;
-                }
-              if ( ilev < nlev2 )
-                {
-                  for ( int k = 0; k < ilev; k++ )
-                    vardata2[k*gridsize+i] = vardata2[ilev*gridsize+i];
-                }
-            }
-        }      
-      for ( i = 0; i < gridsize; i++ )
-	{
-          if ( DBL_IS_EQUAL(vardata2[(nlev2-1)*gridsize+i], missval) )
-            {
-              for ( ilev = nlev2-2; ilev >= 0; ilev-- )
-                {
-                  if ( !DBL_IS_EQUAL(vardata2[ilev*gridsize+i], missval) ) break;
-                }
-              if ( ilev >= 0 )
-                {
-                  for ( int k = nlev2-1; k > ilev; k-- )
-                    vardata2[k*gridsize+i] = vardata2[ilev*gridsize+i];
-                }
-            }
-        }
-      */
     }
 }
 

@@ -26,7 +26,7 @@ void interp_X(const double * restrict gt, double *pt, const double * restrict hy
 	      const double * restrict plev, long nplev, long ngp, long nhlev, double missval);
 
 
-void vert_interp_lev3d(int lexpol, int gridsize, double missval, double *vardata1, double *vardata2,
+void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *vardata2,
 		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
 void vert_gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
