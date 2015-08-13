@@ -151,7 +151,7 @@ void *Settime(void *argument)
       datestr = operatorArgv()[0];
       timestr = operatorArgv()[1];
 
-      if ( strchr(datestr, '-') )
+      if ( strchr(datestr+1, '-') )
 	{
 	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
 	  sdate = cdiEncodeDate(year, month, day);
