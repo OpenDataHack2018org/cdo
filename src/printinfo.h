@@ -6,8 +6,10 @@ void uuid2str(const unsigned char uuid[CDI_UUID_SIZE], char *uuidstr);
 static inline
 int cdiUUIDIsNull(const unsigned char uuid[CDI_UUID_SIZE])
 {
-  static unsigned char uuid_nil[CDI_UUID_SIZE];
-  return !memcmp(uuid, uuid_nil, CDI_UUID_SIZE);
+  int isNull = 1;
+  for (size_t i = 0; i < CDI_UUID_SIZE; ++i)
+    isNull &= (uuid[i] == 0);
+  return isNull;
 }
 
 
