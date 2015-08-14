@@ -16,14 +16,11 @@ int cdiUUIDIsNull(const unsigned char uuid[CDI_UUID_SIZE])
 void datetime2str(int date, int time, char *datetimestr, int maxlen)
 {
   int year, month, day;
-  int hour, minute, second;
-  int len;
-
   cdiDecodeDate(date, &year, &month, &day);
+  int hour, minute, second;
   cdiDecodeTime(time, &hour, &minute, &second);
 
-  len = sprintf(datetimestr, DATE_FORMAT "T" TIME_FORMAT, year, month, day, hour, minute, second);
-
+  int len = sprintf(datetimestr, DATE_FORMAT "T" TIME_FORMAT, year, month, day, hour, minute, second);
   if ( len > ( maxlen-1) )
     fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
@@ -32,12 +29,9 @@ void datetime2str(int date, int time, char *datetimestr, int maxlen)
 void date2str(int date, char *datestr, int maxlen)
 {
   int year, month, day;
-  int len;
-
   cdiDecodeDate(date, &year, &month, &day);
 
-  len = sprintf(datestr, DATE_FORMAT, year, month, day);
-
+  int len = sprintf(datestr, DATE_FORMAT, year, month, day);
   if ( len > ( maxlen-1) )
     fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
@@ -46,12 +40,9 @@ void date2str(int date, char *datestr, int maxlen)
 void time2str(int time, char *timestr, int maxlen)
 {
   int hour, minute, second;
-  int len;
-
   cdiDecodeTime(time, &hour, &minute, &second);
 
-  len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
-
+  int len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
   if ( len > ( maxlen-1) )
     fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
@@ -59,9 +50,7 @@ void time2str(int time, char *timestr, int maxlen)
 
 void printFiletype(int streamID, int vlistID)
 {
-  int filetype;
-
-  filetype = streamInqFiletype(streamID);
+  int filetype = streamInqFiletype(streamID);
 
   switch ( filetype )
     {
@@ -134,12 +123,9 @@ void printFiletype(int streamID, int vlistID)
 
   if ( filetype == FILETYPE_GRB2 )
     {
-      int nvars, varID;
       int comptype;
-
-      nvars = vlistNvars(vlistID);
-
-      for ( varID = 0; varID < nvars; varID++ )
+      int nvars = vlistNvars(vlistID);
+      for ( int varID = 0; varID < nvars; varID++ )
 	{
 	  comptype = vlistInqVarCompType(vlistID, varID);
 	  if ( comptype )
@@ -484,6 +470,21 @@ void printZaxisInfo(int vlistID)
           fprintf(stdout, "\n");
         }
 
+      if ( zaxistype == ZAXIS_HYBRID )
+        {
+          char psname[CDI_MAX_NAME];
+          psname[0] = 0;
+          zaxisInqPsName(zaxisID, psname);
+          int vctsize = zaxisInqVctSize(zaxisID);
+          if ( vctsize || psname[0] )
+            {
+	      fprintf(stdout, "%33s :", "available");
+              if ( vctsize   ) fprintf(stdout, " vct");
+              if ( psname[0] ) fprintf(stdout, "  ps: %s", psname);
+              fprintf(stdout, "\n");
+            }
+        }
+
       if ( zaxistype == ZAXIS_REFERENCE )
         {
           int number   = zaxisInqNumber(zaxisID);
@@ -522,7 +523,6 @@ void printSubtypeInfo(int vlistID)
       fprintf(stdout, "  %4d : %-24s :", vlistSubtypeIndex(vlistID, subtypeID)+1, "tiles");
       fprintf(stdout, " ntiles=%d", subtypesize);
       fprintf(stdout, "\n");
-
     }
 }
 
@@ -551,7 +551,6 @@ int printDateTime(int ntimeout, int vdate, int vtime)
 static
 int printDot(int ndotout, int *nfact, int *ncout)
 {
-
   //printf("ncout %d %d %d\n",*ncout, (*ncout)%(*nfact), *nfact);
   if ( (*ncout)%(*nfact) == 0 )
     {
@@ -570,7 +569,7 @@ int printDot(int ndotout, int *nfact, int *ncout)
 
   (*ncout)++;
 
-  return (ndotout);
+  return ndotout;
 }
 
 static
