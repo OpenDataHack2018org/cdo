@@ -464,6 +464,31 @@ void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *tx
 }
 
 
+int vlist_get_psvarid(int nvars, int vlistID, int zaxisID)
+{
+  int psvarid = -1;
+  char name[CDI_MAX_NAME];
+  char psname[CDI_MAX_NAME];
+  psname[0] = 0;
+  zaxisInqPsName(zaxisID, psname);
+
+  if ( psname[0] )
+    {
+      for ( int varID = 0; varID < nvars; ++varID )
+        {
+          vlistInqVarName(vlistID, varID, name);
+          if ( strcmp(name, psname) == 0 )
+            {
+              psvarid = varID;
+              break;
+            }
+        }
+    }
+  
+  return psvarid;
+}
+
+
 void *Select(void *argument)
 {
   int streamID2 = CDI_UNDEFID;
@@ -473,13 +498,11 @@ void *Select(void *argument)
   int varID2, levelID2;
   int recID, varID, levelID;
   int iparam;
-  int nsel;
   int vdate, vtime;
   int last_year = -999999999;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   char stdname[CDI_MAX_NAME];
-  char **argnames = NULL;
   int vlistID0 = -1, vlistID2 = -1;
   int i;
   int result = FALSE;
@@ -541,8 +564,8 @@ void *Select(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  nsel     = operatorArgc();
-  argnames = operatorArgv();
+  int nsel = operatorArgc();
+  char **argnames = operatorArgv();
 
   if ( cdoVerbose )
     for ( i = 0; i < nsel; i++ )
@@ -687,6 +710,19 @@ void *Select(void *argument)
 		    }
 		}
 	    }
+
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      if ( vars[varID] )
+		{
+		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
+                  if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+                    {
+                      int psvarid = vlist_get_psvarid(nvars, vlistID1, zaxisID);
+                      if ( psvarid != -1 && !vars[psvarid] ) vars[psvarid] = TRUE;
+                    }
+                }
+            }
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {

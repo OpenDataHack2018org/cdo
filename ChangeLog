@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-08-14  Uwe Schulzweida
+
+	* select: select also ps for variables on hybrid sigma pressure levels
+
 2015-08-12  Uwe Schulzweida
 
 	* selmon: does not work with negative years (bug fix) [report: Tim Brücher]
