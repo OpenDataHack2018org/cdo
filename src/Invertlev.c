@@ -28,60 +28,55 @@
 #include "error.h"
 
 
-
 static
 void invertLevDes(int vlistID)
 {
-  int index, nzaxis;
-  int zaxisID1, zaxisID2;
-  int nlev;
-  int ilev;
-  int zaxistype;
-  double *yv1, *yv2;
-  double *yb1, *yb2;
-
-  nzaxis = vlistNzaxis(vlistID);
-  for ( index = 0; index < nzaxis; index++ )
+  int nzaxis = vlistNzaxis(vlistID);
+  for ( int index = 0; index < nzaxis; index++ )
     {
-      zaxisID1 = vlistZaxis(vlistID, index);
-      zaxisID2 = zaxisDuplicate(zaxisID1);
+      int zaxisID1 = vlistZaxis(vlistID, index);
+      int zaxisID2 = zaxisDuplicate(zaxisID1);
+      int zaxistype = zaxisInqType(zaxisID1);
 
-      zaxistype = zaxisInqType(zaxisID1);
-
-      nlev = zaxisInqSize(zaxisID1);
-
-      if ( nlev < 2 || zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF ) continue;
+      int nlev = zaxisInqSize(zaxisID1);
+      if ( nlev <= 1 ) continue;
 
       /* if ( zaxisInqLevels(zaxisID1, NULL) ) */
 	{
-
-	  yv1 = (double*) malloc(nlev*sizeof(double));
-	  yv2 = (double*) malloc(nlev*sizeof(double));
-
+	  double yv1[nlev], yv2[nlev];
 	  zaxisInqLevels(zaxisID1, yv1);
-	  for ( ilev = 0; ilev < nlev; ++ilev ) yv2[nlev-ilev-1] = yv1[ilev];
+	  for ( int ilev = 0; ilev < nlev; ++ilev ) yv2[nlev-ilev-1] = yv1[ilev];
 	  zaxisDefLevels(zaxisID2, yv2);
-
-	  if ( yv2 ) free(yv2);
-	  if ( yv1 ) free(yv1);
 	}
 
       if ( zaxisInqLbounds(zaxisID1, NULL) && zaxisInqUbounds(zaxisID1, NULL) )
 	{
-	  yb1 = (double*) malloc(nlev*sizeof(double));
-	  yb2 = (double*) malloc(nlev*sizeof(double));
-
+	  double yb1[nlev], yb2[nlev];
 	  zaxisInqLbounds(zaxisID1, yb1);
-	  for ( ilev = 0; ilev < nlev; ++ilev ) yb2[nlev-ilev-1] = yb1[ilev];
+	  for ( int ilev = 0; ilev < nlev; ++ilev ) yb2[nlev-ilev-1] = yb1[ilev];
 	  zaxisDefLbounds(zaxisID2, yb2);
 
 	  zaxisInqUbounds(zaxisID1, yb1);
-	  for ( ilev = 0; ilev < nlev; ++ilev ) yb2[nlev-ilev-1] = yb1[ilev];
+	  for ( int ilev = 0; ilev < nlev; ++ilev ) yb2[nlev-ilev-1] = yb1[ilev];
 	  zaxisDefUbounds(zaxisID2, yb2);
-
-	  if ( yb2 ) free(yb2);
-	  if ( yb1 ) free(yb1);
 	}
+
+      if ( zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF )
+        {
+          int vctsize = zaxisInqVctSize(zaxisID1);		
+          if ( vctsize && vctsize%2 == 0 )
+            {
+              double vct1[vctsize];
+              double vct2[vctsize];
+              zaxisInqVct(zaxisID1, vct1);
+              for ( int i = 0; i < vctsize/2; ++i )
+                {
+                  vct2[vctsize/2-1-i] = vct1[i];
+                  vct2[vctsize-1-i]   = vct1[vctsize/2+i];
+                }
+              zaxisDefVct(zaxisID2, vctsize, vct2);
+            }
+        }
 
       vlistChangeZaxis(vlistID, zaxisID1, zaxisID2);
     }
@@ -94,7 +89,7 @@ void *Invertlev(void *argument)
   int recID, varID, levelID;
   int nmiss;
   int nlev, nlevel;
-  int gridID, zaxisID, zaxistype, offset;
+  int gridID, zaxisID, offset;
   int lcopy = FALSE;
   int linvert = FALSE;
 
@@ -102,7 +97,7 @@ void *Invertlev(void *argument)
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  cdoOperatorAdd("invertlev",     func_all, 0, NULL);
+  cdoOperatorAdd("invertlev", func_all, 0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
@@ -136,10 +131,9 @@ void *Invertlev(void *argument)
       gridID    = vlistInqVarGrid(vlistID1, varID);
       zaxisID   = vlistInqVarZaxis(vlistID1, varID);
       gridsize  = gridInqSize(gridID);
-      zaxistype = zaxisInqType(zaxisID);
       nlev      = zaxisInqSize(zaxisID);
 
-      if ( nlev < 2 || zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF )
+      if ( nlev <= 1 )
 	{
 	  vardata[varID]  = NULL;
 	  varnmiss[varID] = NULL;
@@ -203,8 +197,7 @@ void *Invertlev(void *argument)
 		{
 		  streamDefRecord(streamID2, varID, levelID);
 
-		  offset   = gridsize*(nlevel-levelID-1);
-
+		  offset = gridsize*(nlevel-levelID-1);
 		  nmiss = varnmiss[varID][nlevel-levelID-1];
 
 		  streamWriteRecord(streamID2, vardata[varID]+offset, nmiss);
@@ -234,5 +227,5 @@ void *Invertlev(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }
