@@ -43,8 +43,8 @@ void *Vertintml(void *argument)
   enum {type_lin, type_log};
   int recID, nrecs;
   int i, k, offset;
-  int tsID, varID, levelID;
-  int zaxisIDp, zaxisIDh = -1, nzaxis;
+  int varID, levelID;
+  int zaxisIDp, zaxisIDh = -1;
   int gridID, zaxisID;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
@@ -70,6 +70,8 @@ void *Vertintml(void *argument)
   int useTable;
   gribcode_t gribcodes = {0};
   LIST *flist = listNew(FLT_LIST);
+  char psname[CDI_MAX_NAME];
+  psname[0] = 0;
 
   cdoInitialize(argument);
 
@@ -141,7 +143,7 @@ void *Vertintml(void *argument)
     zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
 
   zaxisDefLevels(zaxisIDp, plev);
-  nzaxis  = vlistNzaxis(vlistID1);
+  int nzaxis  = vlistNzaxis(vlistID1);
   int lhavevct = FALSE;
   for ( i = 0; i < nzaxis; i++ )
     {
@@ -175,8 +177,8 @@ void *Vertintml(void *argument)
 		  zaxisIDh = zaxisID;
 		  nhlev    = nlevel;
 		  nhlevf   = nhlev;
-		  nhlevh   = nhlevf + 1;
-	      
+		  nhlevh   = nhlev + 1;
+
 		  vct = (double*) malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 
@@ -265,11 +267,27 @@ void *Vertintml(void *argument)
     }
 
   int linvertvct = FALSE;
-  if ( lhavevct && nvct%2 == 0 )
+  if ( lhavevct && nvct && nvct%2 == 0 )
     {
-      for ( i = nvct/2 ; i < nvct; i++ )
+      zaxisInqPsName(zaxisID, psname);
+
+      for ( i = nvct/2+1; i < nvct; i++ )
+        if ( vct[i] > vct[i-1] ) break;
+
+      if ( i == nvct ) linvertvct = TRUE;
+    }
+
+  if ( cdoVerbose ) cdoPrint("linvertvct = %d", linvertvct);
+  if ( cdoVerbose ) cdoPrint("psname = %s", psname);
+
+  if ( linvertvct )
+    {
+      double vctbuf[nvct];
+      memcpy(vctbuf, vct, nvct*sizeof(double));
+      for ( i = 0; i < nvct/2; i++ )
         {
-          printf("i %d %g\n", i, vct[i]);
+          vct[nvct/2-1-i] = vctbuf[i];
+          vct[nvct-1-i] = vctbuf[i+nvct/2];
         }
     }
 
@@ -515,7 +533,7 @@ void *Vertintml(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
@@ -537,6 +555,9 @@ void *Vertintml(void *argument)
 	      printf("levelID %d\n", levelID);
 	    }
 	  */
+          if ( linvertvct && zaxisIDh != -1 && zaxisID == zaxisIDh )
+            levelID = nlevel-1-levelID;
+
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
 
