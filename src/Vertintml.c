@@ -48,7 +48,7 @@ void *Vertintml(void *argument)
   int gridID, zaxisID;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
-  int nvct;
+  int nvct = 0;
   int sgeopot_needed = FALSE;
   int sgeopotID = -1, geopotID = -1, tempID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
   int code, param;
@@ -153,7 +153,7 @@ void *Vertintml(void *argument)
       if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
 	   nlevel > 1 )
 	{
-	  double *level = (double *) malloc(nlevel*sizeof(double));
+	  double level[nlevel];
 	  zaxisInqLevels(zaxisID, level);
 	  int l;
 	  for ( l = 0; l < nlevel; l++ )
@@ -161,7 +161,6 @@ void *Vertintml(void *argument)
 	      if ( (l+1) != (int) (level[l]+0.5) ) break;
 	    }
 	  if ( l == nlevel ) mono_level = TRUE; 
-	  free(level);
 	}
 
       if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
@@ -263,6 +262,15 @@ void *Vertintml(void *argument)
 		}
 	    }
 	}
+    }
+
+  int linvertvct = FALSE;
+  if ( lhavevct && nvct%2 == 0 )
+    {
+      for ( i = nvct/2 ; i < nvct; i++ )
+        {
+          printf("i %d %g\n", i, vct[i]);
+        }
     }
 
   int nvars = vlistNvars(vlistID1);
