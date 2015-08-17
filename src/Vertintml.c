@@ -70,8 +70,6 @@ void *Vertintml(void *argument)
   int useTable;
   gribcode_t gribcodes = {0};
   LIST *flist = listNew(FLT_LIST);
-  char psname[CDI_MAX_NAME];
-  psname[0] = 0;
 
   cdoInitialize(argument);
 
@@ -266,10 +264,11 @@ void *Vertintml(void *argument)
 	}
     }
 
+  int psvarID = -1;
   int linvertvct = FALSE;
   if ( lhavevct && nvct && nvct%2 == 0 )
     {
-      zaxisInqPsName(zaxisID, psname);
+      psvarID = vlist_get_psvarid(vlistID1, zaxisIDh);
 
       for ( i = nvct/2+1; i < nvct; i++ )
         if ( vct[i] > vct[i-1] ) break;
@@ -278,7 +277,6 @@ void *Vertintml(void *argument)
     }
 
   if ( cdoVerbose ) cdoPrint("linvertvct = %d", linvertvct);
-  if ( cdoVerbose ) cdoPrint("psname = %s", psname);
 
   if ( linvertvct )
     {
@@ -501,7 +499,9 @@ void *Vertintml(void *argument)
     cdoAbort("Temperature not found, needed for vertical interpolation of geopotheight!");
 
   presID = lnpsID;
-  if ( zaxisIDh != -1 && lnpsID == -1 )
+  if ( psvarID != -1 ) presID = psvarID;
+
+  if ( zaxisIDh != -1 && presID == -1 )
     {
       if ( psID == -1 )
 	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
@@ -511,10 +511,11 @@ void *Vertintml(void *argument)
 
   if ( cdoVerbose )
     {
+      vlistInqVarName(vlistID1, presID, varname);
       if ( presID == lnpsID )
-	cdoPrint("using LOG(%s)", var_stdname(surface_air_pressure));      
+        cdoPrint("using LOG(%s) from %s", var_stdname(surface_air_pressure), varname);
       else
-	cdoPrint("using %s", var_stdname(surface_air_pressure));
+        cdoPrint("using %s from %s", var_stdname(surface_air_pressure), varname);
     }
 
   // check VCT
@@ -585,10 +586,10 @@ void *Vertintml(void *argument)
 		}
 	    }
 
-	  if ( lnpsID != -1 )
+	  if ( presID == lnpsID )
 	    for ( i = 0; i < gridsize; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
-	  else if ( psID != -1 )
-	    memcpy(ps_prog, vardata1[psID], gridsize*sizeof(double));
+	  else if ( presID != -1 )
+	    memcpy(ps_prog, vardata1[presID], gridsize*sizeof(double));
 
 	  /* check range of ps_prog */
 	  minmaxval(gridsize, ps_prog, NULL, &minval, &maxval);

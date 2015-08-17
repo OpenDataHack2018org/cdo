@@ -464,7 +464,7 @@ void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *tx
 }
 
 
-int vlist_get_psvarid(int nvars, int vlistID, int zaxisID)
+int vlist_get_psvarid(int vlistID, int zaxisID)
 {
   int psvarid = -1;
   char name[CDI_MAX_NAME];
@@ -474,6 +474,7 @@ int vlist_get_psvarid(int nvars, int vlistID, int zaxisID)
 
   if ( psname[0] )
     {
+      int nvars = vlistNvars(vlistID);
       for ( int varID = 0; varID < nvars; ++varID )
         {
           vlistInqVarName(vlistID, varID, name);
@@ -483,6 +484,8 @@ int vlist_get_psvarid(int nvars, int vlistID, int zaxisID)
               break;
             }
         }
+      if ( cdoVerbose && psvarid == -1 )
+        cdoWarning("Surface pressure variable not found - %s", psname);
     }
   
   return psvarid;
@@ -718,7 +721,7 @@ void *Select(void *argument)
 		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
                   if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
                     {
-                      int psvarid = vlist_get_psvarid(nvars, vlistID1, zaxisID);
+                      int psvarid = vlist_get_psvarid(vlistID1, zaxisID);
                       if ( psvarid != -1 && !vars[psvarid] ) vars[psvarid] = TRUE;
                     }
                 }
