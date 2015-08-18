@@ -362,6 +362,7 @@ void *Vertintap(void *argument)
     }
 
   if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
+  if ( zaxisIDh != -1 && dpressID == -1 ) cdoWarning("Surface pressure not found - set to 110000!");
 
   for ( varID = 0; varID < nvars; ++varID )
     {
