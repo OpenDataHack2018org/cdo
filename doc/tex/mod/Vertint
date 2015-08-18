@@ -58,26 +58,6 @@ If set to 1 extrapolate missing values.
 @EndEnvironment
 
 
-@BeginNote
-The netCDF CF convention for vertical hybrid coordinates is not supported, yet!
-The vertical coordinate definition of a netCDF file has to follow the ECHAM convention.
-This means:
-@BeginItemize
-@Item = the dimension of the full level coordinate and the corresponding variable is called mlev,
-@Item = the dimension of the half level coordinate and the corresponding variable is called ilev (ilev must have one element more than mlev)
-@Item = the hybrid vertical coefficient a is given in units of Pa and called hyai (hyam for level midpoints)
-@Item = the hybrid vertical coefficient b is given in units of 1 and called hybi (hybm for level midpoints)
-@Item = the mlev variable has a borders attribute containing the character string 'ilev'
-@EndItemize
-
-Use the @mod{sinfo} command to test if your vertical coordinate system is recognized as hybrid system.
-
-In case this operator complains about not finding any data on hybrid model levels you may wish
-to use the @mod{setzaxis} command to generate a zaxis description which conforms to the ECHAM convention.
-See section "1.4 Z-axis description" for an example how to define a hybrid Z-axis.
-@EndNote
-
-
 @BeginExample
 To interpolate hybrid model level data to pressure levels of 925, 850, 500 and 200 hPa use:
 @BeginVerbatim

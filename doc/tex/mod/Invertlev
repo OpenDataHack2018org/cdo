@@ -7,7 +7,7 @@
 @Operators = invertlev
 
 @BeginDescription
-This operator inverts the levels of all non hybrid 3D variables.
+This operator inverts the levels of all 3D variables.
 @EndDescription
 @EndModule
 
