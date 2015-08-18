@@ -74,7 +74,7 @@ void *Vertintap(void *argument)
   int *vert_index = NULL;
   int nvct;
   int apressID = -1, dpressID = -1;
-  int tempID = -1;
+  int psID = -1, tempID = -1;
   int param;
   //int sortlevels = TRUE;
   int *pnmiss = NULL;
@@ -329,9 +329,10 @@ void *Vertintap(void *argument)
       vlistInqVarStdname(vlistID1, varID, stdname);
       strtolower(stdname);
 
-      if      ( strcmp(stdname, var_stdname(air_pressure))       == 0 ) apressID = varID; 
-      else if ( strcmp(stdname, var_stdname(pressure_thickness)) == 0 ) dpressID = varID; 
-      else if ( strcmp(stdname, var_stdname(air_temperature))    == 0 ) tempID = varID; 
+      if      ( strcmp(stdname, var_stdname(surface_air_pressure)) == 0 ) psID = varID; 
+      else if ( strcmp(stdname, var_stdname(air_pressure))         == 0 ) apressID = varID; 
+      else if ( strcmp(stdname, var_stdname(pressure_thickness))   == 0 ) dpressID = varID; 
+      else if ( strcmp(stdname, var_stdname(air_temperature))      == 0 ) tempID = varID; 
 
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
@@ -356,13 +357,15 @@ void *Vertintap(void *argument)
   if ( cdoVerbose )
     {
       cdoPrint("Found:");
+      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
       if ( apressID  != -1 ) cdoPrint("  %s", var_stdname(air_pressure));
       if ( dpressID  != -1 ) cdoPrint("  %s", var_stdname(pressure_thickness));
       if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
     }
 
   if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
-  if ( zaxisIDh != -1 && dpressID == -1 ) cdoWarning("Surface pressure not found - set to 110000!");
+  if ( zaxisIDh != -1 && psID == -1 && dpressID )
+    cdoWarning("Surface pressure not found - set to upper level of %s!", var_stdname(air_pressure));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -414,7 +417,11 @@ void *Vertintap(void *argument)
 
       if ( zaxisIDh != -1 )
 	{
-	  if ( dpressID != -1 )
+	  if ( psID != -1 )
+	    {
+	      memcpy(ps_prog, vardata1[psID], gridsize*sizeof(double)); 
+	    }
+          else if ( dpressID != -1 )
 	    {
 	      memcpy(dpress, vardata1[dpressID], gridsize*nhlevf*sizeof(double)); 
 	      for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
@@ -424,7 +431,8 @@ void *Vertintap(void *argument)
 	    }
 	  else
 	    {
-	      for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
+	      memcpy(ps_prog, vardata1[apressID]+gridsize*(nhlevf-1), gridsize*sizeof(double)); 
+	      //for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 110000;
 	    }
 
 	  /* check range of ps_prog */

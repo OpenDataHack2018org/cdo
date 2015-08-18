@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-08-18  Uwe Schulzweida
+
+        * ap2pl: use upper level of air_pressure if surface pressure not found
+
 2015-08-14  Uwe Schulzweida
 
 	* select: select also ps for variables on hybrid sigma pressure levels
