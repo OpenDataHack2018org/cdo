@@ -922,7 +922,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   return;
 }
 
-/*
+#if defined(TEST_HETAETA)
 int main (int argc, char *argv[])
 {
   double a2[41] = {
@@ -1107,4 +1107,4 @@ int main (int argc, char *argv[])
 
   return 0;
 }
-*/
+#endif

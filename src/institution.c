@@ -38,11 +38,10 @@ int readInstitution(const char *instfile)
   int nvar = 0, maxvar = 4;
   char name[1024], longname[1024];
   int center = UNDEFID, subcenter = UNDEFID;
-  FILE *instfp;
 
-  instfp = fopen(instfile, "r");
+  FILE *instfp = fopen(instfile, "r");
 
-  if ( instfp == NULL ) return (instID);
+  if ( instfp == NULL ) return instID;
 
   while ( readline(instfp, line, 1024) )
     {
@@ -92,18 +91,14 @@ int readInstitution(const char *instfile)
   if ( instID == UNDEFID )
     instID = institutDef(center, subcenter, name, longname);
 
-  return (instID);
+  return instID;
 }
 
 
 void defineInstitution(char *instarg)
 {
-  char *instname;
-  int instID;
-
-  instname = instarg;
-
-  instID = readInstitution(instname);
+  char *instname = instarg;
+  int instID = readInstitution(instname);
 
   if ( instID == UNDEFID )
     instID = institutInq(0, 0, instname, NULL);

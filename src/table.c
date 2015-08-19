@@ -28,7 +28,6 @@
 int defineTable(char *tablearg)
 {
   int tableID = CDI_UNDEFID;
-
   char *tablename = tablearg;
 
   if ( fileExists(tablename) ) tableID = tableRead(tablename);
@@ -36,17 +35,14 @@ int defineTable(char *tablearg)
   if ( tableID == CDI_UNDEFID )
     {
       char *tablepath = getenv("CD_TABLEPATH");
-
       if ( tablepath )
 	{
-	  char *tablefile = NULL;
 	  int len = sizeof(tablepath) + sizeof(tablename) + 3;
-	  tablefile = (char*) malloc(len);
+	  char *tablefile[len];
 	  strcpy(tablefile, tablepath);
 	  strcat(tablefile, "/");
 	  strcat(tablefile, tablename);
 	  if ( fileExists(tablename) ) tableID = tableRead(tablefile);
-	  free(tablefile);
 	}
     }
 
@@ -56,5 +52,5 @@ int defineTable(char *tablearg)
   if ( tableID == CDI_UNDEFID )
     Error("table <%s> not found", tablename);
 
-  return (tableID);
+  return tableID;
 }

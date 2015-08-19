@@ -124,7 +124,6 @@ void *Split(void *argument)
   
   if ( operatorID == SPLITCODE )
     {
-      int *codes = NULL;
       nsplit = 0;
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -139,9 +138,9 @@ void *Split(void *argument)
 	    }
 	}
 
-      codes     = (int*) malloc(nsplit*sizeof(int));
       vlistIDs  = (int*) malloc(nsplit*sizeof(int));
       streamIDs = (int*) malloc(nsplit*sizeof(int));
+      int codes[nsplit];
       memcpy(codes, itmp, nsplit*sizeof(int));
 
       for ( index = 0; index < nsplit; index++ )
@@ -186,12 +185,10 @@ void *Split(void *argument)
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
-      if ( codes ) free(codes);
     }
   else if ( operatorID == SPLITPARAM )
     {
       char paramstr[32];
-      int *params = NULL;
       nsplit = 0;
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -206,9 +203,9 @@ void *Split(void *argument)
 	    }
 	}
 
-      params    = (int*) malloc(nsplit*sizeof(int));
       vlistIDs  = (int*) malloc(nsplit*sizeof(int));
       streamIDs = (int*) malloc(nsplit*sizeof(int));
+      int params[nsplit];
       memcpy(params, itmp, nsplit*sizeof(int));
 
       for ( index = 0; index < nsplit; index++ )
@@ -243,11 +240,9 @@ void *Split(void *argument)
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
-      if ( params ) free(params);
     }
   else if ( operatorID == SPLITTABNUM )
     {
-      int *tabnums = NULL;
       nsplit = 0;
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -262,9 +257,9 @@ void *Split(void *argument)
 	    }
 	}
 
-      tabnums   = (int*) malloc(nsplit*sizeof(int));
       vlistIDs  = (int*) malloc(nsplit*sizeof(int));
       streamIDs = (int*) malloc(nsplit*sizeof(int));
+      int tabnums[nsplit];
       memcpy(tabnums, itmp, nsplit*sizeof(int));
 
       for ( index = 0; index < nsplit; index++ )
@@ -295,7 +290,6 @@ void *Split(void *argument)
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
-      if ( tabnums ) free(tabnums);
     }
   else if ( operatorID == SPLITNAME )
     {
@@ -333,7 +327,7 @@ void *Split(void *argument)
     }
   else if ( operatorID == SPLITLEVEL )
     {
-      double level, *levels = NULL;
+      double level;
       nzaxis = vlistNzaxis(vlistID1);
       nsplit = 0;
       for ( index = 0; index < nzaxis; index++ )
@@ -350,9 +344,9 @@ void *Split(void *argument)
 	    }
 	}
 
-      levels    = (double*) malloc(nsplit*sizeof(double));
       vlistIDs  = (int*) malloc(nsplit*sizeof(int));
       streamIDs = (int*) malloc(nsplit*sizeof(int));
+      double levels[nsplit];
       memcpy(levels, ftmp, nsplit*sizeof(double));
 
       for ( index = 0; index < nsplit; index++ )
@@ -383,18 +377,16 @@ void *Split(void *argument)
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
-      if ( levels ) free(levels);
     }
   else if ( operatorID == SPLITGRID )
     {
-      int gridID, *gridIDs = NULL;
+      int gridID;
 
       nsplit = vlistNgrids(vlistID1);
 
-      gridIDs   = (int*) malloc(nsplit*sizeof(int));
       vlistIDs  = (int*) malloc(nsplit*sizeof(int));
       streamIDs = (int*) malloc(nsplit*sizeof(int));
-
+      int gridIDs[nsplit];
       for ( index = 0; index < nsplit; index++ )
 	gridIDs[index] = vlistGrid(vlistID1, index);
 
@@ -426,18 +418,16 @@ void *Split(void *argument)
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
-      if ( gridIDs ) free(gridIDs);
     }
   else if ( operatorID == SPLITZAXIS )
     {
-      int zaxisID, *zaxisIDs = NULL;
+      int zaxisID;
 
       nsplit = vlistNzaxis(vlistID1);
 
-      zaxisIDs  = (int*) malloc(nsplit*sizeof(int));
       vlistIDs  = (int*) malloc(nsplit*sizeof(int));
       streamIDs = (int*) malloc(nsplit*sizeof(int));
-
+      int zaxisIDs[nsplit];
       for ( index = 0; index < nsplit; index++ )
 	zaxisIDs[index] = vlistZaxis(vlistID1, index);
 
@@ -468,7 +458,6 @@ void *Split(void *argument)
 	  streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 	}
-      if ( zaxisIDs ) free(zaxisIDs);
     }
   else
     {
