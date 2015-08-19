@@ -109,32 +109,10 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 }
 
 static
-nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
+void oper_expr_con_var(int oper, int nmiss, long n, double missval1, double missval2,
+                       double *restrict odat, double cval, const double *restrict idat)
 {
-  int gridID   = p2->gridID;
-  int zaxisID  = p2->zaxisID;
-  int nmiss    = p2->nmiss;
-  double missval1 = p2->missval;
-  double missval2 = p2->missval;
-
-  int ngp  = gridInqSize(gridID);
-  int nlev = zaxisInqSize(zaxisID);
-  long n   = ngp*nlev;
   long i;
-
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
-
-  p->type     = typeVar;
-  p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
-  p->gridID   = gridID;
-  p->zaxisID  = zaxisID;
-  p->missval  = missval1;
-
-  p->data = (double*) malloc(n*sizeof(double));
-  double *restrict odat = p->data;
-  const double *restrict idat = p2->data;
-  double cval = p1->u.con.value;
 
   switch ( oper )
     {
@@ -196,45 +174,13 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
       break;
     }
-
-  nmiss = 0;
-  for ( i = 0; i < n; i++ )
-    if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
-
-  p->nmiss = nmiss;
-
-  if ( p2->tmpvar ) free(p2->data);
-
-  return (p);
 }
 
 static
-nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
+void oper_expr_var_con(int oper, int nmiss, long n, double missval1, double missval2,
+                       double *restrict odat, const double *restrict idat, double cval)
 {
-  int gridID   = p1->gridID;
-  int zaxisID  = p1->zaxisID;
-  int nmiss    = p1->nmiss;
-  double missval1 = p1->missval;
-  double missval2 = p1->missval;
-
-  int ngp  = gridInqSize(gridID);
-  int nlev = zaxisInqSize(zaxisID);
-  long n   = ngp*nlev;
   long i;
-
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
-
-  p->type     = typeVar;
-  p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
-  p->gridID   = gridID;
-  p->zaxisID  = zaxisID;
-  p->missval  = missval1;
-
-  p->data = (double*) malloc(n*sizeof(double));
-  double *restrict odat = p->data;
-  const double *restrict idat = p1->data;
-  double cval = p2->u.con.value;
 
   switch ( oper )
     {
@@ -298,6 +244,155 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
       break;
     }
+}
+
+static
+void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double missval2,
+                       double *restrict odat, const double *restrict idat1, const double *restrict idat2)
+{
+  long i;
+
+  switch ( oper )
+    {
+    case '+':
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = ADD(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] + idat2[i];
+      break;
+    case '-':
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = SUB(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] - idat2[i];
+      break;
+    case '*':
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MUL(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] * idat2[i];
+      break;
+    case '/':
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = DIV(idat1[i], idat2[i]);
+      else
+        {
+          for ( i = 0; i < ngp; ++i )
+            {
+              if ( IS_EQUAL(idat2[i], 0.) ) odat[i] = missval1;
+              else                          odat[i] = idat1[i] / idat2[i];
+            }
+        }
+      break;
+    case '^':
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = POW(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] = pow(idat1[i], idat2[i]);
+      break;
+    case '<':
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLT(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLT(idat1[i], idat2[i]);
+      break;
+    case '>':
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPGT(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPGT(idat1[i], idat2[i]);
+      break;
+    case LE:
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLE(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLE(idat1[i], idat2[i]);
+      break;
+    case GE:
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPGE(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPGE(idat1[i], idat2[i]);
+      break;
+    case NE:
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPNE(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPNE(idat1[i], idat2[i]);
+      break;
+    case EQ:
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPEQ(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPEQ(idat1[i], idat2[i]);
+      break;
+    case LEG:
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLEG(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLEG(idat1[i], idat2[i]);
+      break;
+    case AND:
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPAND(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPAND(idat1[i], idat2[i]);
+      break;
+    case OR:
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPOR(idat1[i], idat2[i]);
+      else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPOR(idat1[i], idat2[i]);
+      break;
+    default:
+      cdoAbort("%s: operator %d (%c) unsupported!", __func__, (int)oper, oper);
+      break;
+    }
+}
+
+static
+nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
+{
+  int gridID   = p2->gridID;
+  int zaxisID  = p2->zaxisID;
+  int nmiss    = p2->nmiss;
+  double missval1 = p2->missval;
+  double missval2 = p2->missval;
+
+  int ngp  = gridInqSize(gridID);
+  int nlev = zaxisInqSize(zaxisID);
+  long n   = ngp*nlev;
+  long i;
+
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+
+  p->type     = typeVar;
+  p->tmpvar   = 1;
+  p->u.var.nm = strdupx("tmp");
+  p->gridID   = gridID;
+  p->zaxisID  = zaxisID;
+  p->missval  = missval1;
+
+  p->data = (double*) malloc(n*sizeof(double));
+  double *restrict odat = p->data;
+  const double *restrict idat = p2->data;
+  double cval = p1->u.con.value;
+
+  oper_expr_con_var(oper, nmiss, n, missval1, missval2, odat, cval, idat);
+
+  nmiss = 0;
+  for ( i = 0; i < n; i++ )
+    if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
+
+  p->nmiss = nmiss;
+
+  if ( p2->tmpvar ) free(p2->data);
+
+  return (p);
+}
+
+static
+nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
+{
+  int gridID   = p1->gridID;
+  int zaxisID  = p1->zaxisID;
+  int nmiss    = p1->nmiss;
+  double missval1 = p1->missval;
+  double missval2 = p1->missval;
+
+  int ngp  = gridInqSize(gridID);
+  int nlev = zaxisInqSize(zaxisID);
+  long n   = ngp*nlev;
+  long i;
+
+  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+
+  p->type     = typeVar;
+  p->tmpvar   = 1;
+  p->u.var.nm = strdupx("tmp");
+  p->gridID   = gridID;
+  p->zaxisID  = zaxisID;
+  p->missval  = missval1;
+
+  p->data = (double*) malloc(n*sizeof(double));
+  double *restrict odat = p->data;
+  const double *restrict idat = p1->data;
+  double cval = p2->u.con.value;
+
+  oper_expr_var_con(oper, nmiss, n, missval1, missval2, odat, idat, cval);
 
   nmiss = 0;
   for ( i = 0; i < n; i++ )
@@ -326,7 +421,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   long ngp1 = gridInqSize(p1->gridID);
   long ngp2 = gridInqSize(p2->gridID);
 
-  if ( ngp1 != ngp2 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
+  if ( ngp1 != ngp2 && ngp2 != 1 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
 
   long ngp = ngp1;
 
@@ -370,85 +465,20 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       loff = k*ngp;
 
       if ( nlev1 == 1 ) loff1 = 0;
-      else              loff1 = k*ngp;
+      else              loff1 = k*ngp1;
 
       if ( nlev2 == 1 ) loff2 = 0;
-      else              loff2 = k*ngp;
+      else              loff2 = k*ngp2;
 
       const double *restrict idat1 = p1->data+loff1;
       const double *restrict idat2 = p2->data+loff2;
       double *restrict odat = p->data+loff;
       int nmiss = nmiss1 > 0 || nmiss2 > 0;
 
-      switch ( oper )
-	{
-	case '+':
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = ADD(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] + idat2[i];
-	  break;
-	case '-':
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = SUB(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] - idat2[i];
-	  break;
-	case '*':
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MUL(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] * idat2[i];
-	  break;
-	case '/':
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = DIV(idat1[i], idat2[i]);
-	  else
-	    {
-	      for ( i = 0; i < ngp; ++i )
-		{
-		  if ( IS_EQUAL(idat2[i], 0.) ) odat[i] = missval1;
-		  else                          odat[i] = idat1[i] / idat2[i];
-		}
-	    }
-	  break;
-	case '^':
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = POW(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] = pow(idat1[i], idat2[i]);
-	  break;
-	case '<':
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLT(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLT(idat1[i], idat2[i]);
-	  break;
-	case '>':
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPGT(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPGT(idat1[i], idat2[i]);
-	  break;
-	case LE:
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLE(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLE(idat1[i], idat2[i]);
-	  break;
-	case GE:
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPGE(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPGE(idat1[i], idat2[i]);
-	  break;
-	case NE:
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPNE(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPNE(idat1[i], idat2[i]);
-	  break;
-	case EQ:
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPEQ(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPEQ(idat1[i], idat2[i]);
-	  break;
-	case LEG:
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLEG(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLEG(idat1[i], idat2[i]);
-	  break;
-	case AND:
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPAND(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPAND(idat1[i], idat2[i]);
-	  break;
-	case OR:
-	  if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPOR(idat1[i], idat2[i]);
-	  else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPOR(idat1[i], idat2[i]);
-	  break;
-	default:
-	  cdoAbort("%s: operator %d (%c) unsupported!", __func__, (int)oper, oper);
-          break;
-	}
+      if ( ngp2 == 1 )
+        oper_expr_var_con(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2[0]);
+      else
+        oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
     }
 
   nmiss = 0;

@@ -36,10 +36,9 @@ FILE *old, *new;
 static
 long int_index(long n, double *x1, double x2)
 {
-  long klo, khi, k;
-
-  klo = 0;
-  khi = n-1;
+  long k;
+  long klo = 0;
+  long khi = n-1;
 
   while ( khi-klo > 1 )
     {
@@ -56,24 +55,21 @@ long int_index(long n, double *x1, double x2)
   */
   /* printf("%d %d %g %g %g\n", klo, khi, x1[klo], x1[klo+1], x2); */
 
-  return (klo);
+  return klo;
 }
 
 static
 double esat(double temperature)
 {
   double zes;
-  double es;
-  double tc;
-
-  tc = temperature-273.16;
+  double tc = temperature-273.16;
 
   if ( tc < 0.0 )
     zes = 21.8745584*tc / (temperature-7.66);
   else
     zes = 17.2693882*tc / (temperature-35.86);
 
-  es = 610.78*exp(zes);
+  double es = 610.78*exp(zes);
 
   return es;
 }
@@ -103,19 +99,17 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
   long k, iv, ijk, ijk1, ijk2;
   long jlev = 0, jlevr, jnop;
   long klo;
-  long nlev1p1, nlev2p1;
   long jjblt;
   double zq1, zt1;
   double zdff, zdffl, ztv, zb, zbb, zc, zps;
   double zsump, zsumpp, zsumt, zsumtp;
   double dfi, fiadj = 0, dteta = 0;
   double pbl_lim, pbl_lim_need;
-  double rair_d_cpair;
 
-  rair_d_cpair = rair/cpair;
+  double rair_d_cpair = rair/cpair;
 
-  nlev1p1 = nlev1+1;
-  nlev2p1 = nlev2+1;
+  long nlev1p1 = nlev1+1;
+  long nlev2p1 = nlev2+1;
 
   /******* initialise atmospheric fields in old system */
   
@@ -464,8 +458,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
              const double *restrict fis2, double *restrict ps2, 
              double *restrict t2, double *restrict q2,
 	     int nvars, double *restrict *restrict vars1, double *restrict *restrict vars2,
-	     double *restrict tscor, double *restrict pscor,
-	     double *restrict secor)
+	     double *restrict tscor, double *restrict pscor, double *restrict secor)
 {
   double epsm1i;
   long jblt;
@@ -473,29 +466,18 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   long jlev = 0;
   double *zt2 = NULL, *zq2 = NULL;
   double /* *etah1,*/ *ph1, *lnph1, *fi1;
-  double *af1, *bf1, *etaf1, *pf1, *lnpf1;
+  double *pf1, *lnpf1;
   double *tv1, *theta1, *rh1;
-  double *etah2, *ph2, *lnph2, *fi2;
-  double *af2, *bf2, *etaf2, *pf2/*, *lnpf2*/;
+  double *ph2, *lnph2, *fi2;
+  double *pf2/*, *lnpf2*/;
   double *zvar;
   double *rh_pbl = NULL;
   double *theta_pbl = NULL;
   double *rh2;
-  double *w1, *w2;
   double *wgt;
   long *idx;
-  long *jl1, *jl2;
-  long nlev1p1;
-  long nlev2p1;
   int lpsmod = 1;
 #if defined(_OPENMP)
-  double **zt2_2, **zq2_2;
-  double **ph1_2, **lnph1_2, **fi1_2, **pf1_2, **lnpf1_2, **tv1_2, **theta1_2, **rh1_2, **zvar_2;
-  double **ph2_2, **lnph2_2, **fi2_2, **pf2_2;
-  double **rh_pbl_2, **theta_pbl_2, **rh2_2;
-  double **wgt_2;
-  double ***vars_pbl_2;
-  long **idx_2;
   long i;
   extern int ompNumThreads;
   double *vars_pbl[MAX_VARS];
@@ -509,42 +491,38 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   new = fopen("new.dat","w");
 #endif
 
-  nlev1p1 = nlev1+1;
-  nlev2p1 = nlev2+1;
+  long nlev1p1 = nlev1+1;
+  long nlev2p1 = nlev2+1;
 
 #if defined(_OPENMP)
-  ph1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  lnph1_2  = (double **) malloc(ompNumThreads*sizeof(double *));
-  fi1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  double *ph1_2[ompNumThreads];
+  double *lnph1_2[ompNumThreads];
+  double *fi1_2[ompNumThreads];
 
-  pf1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  lnpf1_2  = (double **) malloc(ompNumThreads*sizeof(double *));
-  tv1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  theta1_2 = (double **) malloc(ompNumThreads*sizeof(double *));
-  rh1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  zvar_2   = (double **) malloc(ompNumThreads*sizeof(double *));
+  double *pf1_2[ompNumThreads];
+  double *lnpf1_2[ompNumThreads];
+  double *tv1_2[ompNumThreads];
+  double *theta1_2[ompNumThreads];
+  double *rh1_2[ompNumThreads];
+  double *zvar_2[ompNumThreads];
 
-  ph2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  lnph2_2  = (double **) malloc(ompNumThreads*sizeof(double *));
-  fi2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  double *ph2_2[ompNumThreads];
+  double *lnph2_2[ompNumThreads];
+  double *fi2_2[ompNumThreads];
 
-  pf2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  rh2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  wgt_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  idx_2    = (long **) malloc(ompNumThreads*sizeof(long *));
+  double *pf2_2[ompNumThreads];
+  double *rh2_2[ompNumThreads];
+  double *wgt_2[ompNumThreads];
+  long   *idx_2[ompNumThreads];
 
-  if ( ltq )
-    {
-      zt2_2       = (double **) malloc(ompNumThreads*sizeof(double *));
-      zq2_2       = (double **) malloc(ompNumThreads*sizeof(double *));
-      rh_pbl_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-      theta_pbl_2 = (double **) malloc(ompNumThreads*sizeof(double *));
-    }
+  // if ( ltq )
+  double *zt2_2[ompNumThreads];
+  double *zq2_2[ompNumThreads];
+  double *rh_pbl_2[ompNumThreads];
+  double *theta_pbl_2[ompNumThreads];
 
-  if ( nvars > 0 )
-    {
-      vars_pbl_2  = (double ***) malloc(ompNumThreads*sizeof(double **));
-    }
+  // if ( nvars > 0 )
+  double **vars_pbl_2[ompNumThreads];
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
@@ -627,21 +605,20 @@ void hetaeta(int ltq, int ngp, const int *imiss,
     }
 #endif
   
-  af1    = (double*) malloc(nlev1*sizeof(double));
-  bf1    = (double*) malloc(nlev1*sizeof(double));
-  etaf1  = (double*) malloc(nlev1*sizeof(double));
+  double af1[nlev1];
+  double bf1[nlev1];
+  double etaf1[nlev1];
 
-  etah2  = (double*) malloc(nlev2p1*sizeof(double));
+  double etah2[nlev2p1];
 
-  af2    = (double*) malloc(nlev2*sizeof(double));
-  bf2    = (double*) malloc(nlev2*sizeof(double));
-  etaf2  = (double*) malloc(nlev2*sizeof(double));
+  double af2[nlev2];
+  double bf2[nlev2];
+  double etaf2[nlev2];
 
-  w1     = (double*) malloc(nlev2*sizeof(double));
-  w2     = (double*) malloc(nlev2*sizeof(double));
-  jl1    = (long*) malloc(nlev2*sizeof(long));
-  jl2    = (long*) malloc(nlev2*sizeof(long));
-
+  double w1[nlev2];
+  double w2[nlev2];
+  long jl1[nlev2];
+  long jl2[nlev2];
 
   /******* set coordinate system ETA's, A's, B's
 	   calculate half and full level ETA
@@ -831,39 +808,6 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	  free(vars_pbl_2[i]);
 	}
     }
-
-  free(ph1_2);
-  free(lnph1_2);
-  free(fi1_2);
-
-  free(pf1_2);
-  free(lnpf1_2);
-  free(tv1_2);
-  free(theta1_2);
-  free(rh1_2);
-  free(zvar_2);
-
-  free(ph2_2);
-  free(lnph2_2);
-  free(fi2_2);
-
-  free(pf2_2);
-  free(rh2_2);
-  free(wgt_2);
-  free(idx_2);
-
-  if ( ltq )
-    {
-      free(zt2_2);
-      free(zq2_2);
-      free(rh_pbl_2);
-      free(theta_pbl_2);
-    }
-
-  if ( nvars > 0 )
-    {
-      free(vars_pbl_2);
-    }
 #else
   /* free(etah1); */     
   free(ph1);    
@@ -904,27 +848,17 @@ void hetaeta(int ltq, int ngp, const int *imiss,
     }
 #endif
 
-  free(af1);    
-  free(bf1);    
-  free(etaf1);  
-
-  free(etah2);
-
-  free(af2);       
-  free(bf2);       
-  free(etaf2);     
-
-  free(w1);       
-  free(w2);       
-  free(jl1);      
-  free(jl2);      
-
   return;
 }
 
 #if defined(TEST_HETAETA)
+#define NGP  (512*1024)
+int ompNumThreads = 2;
+
 int main (int argc, char *argv[])
 {
+  printf("NGP = %d\n", NGP);
+
   double a2[41] = {
        0.00000000000000000,       2000.00000000000000000,       4000.00000000000000000,
     6000.00000000000000000,       8000.00000000000000000,       9976.13671875000000000,
@@ -1011,43 +945,37 @@ int main (int argc, char *argv[])
     0.0,  0.0,  0.4445496,  0.0,  0.0,  0.001098633} ;
 
   double ifis1 = 9.121094, ips1 = 102511.8;
-
-  double *fis1, *ps1;
-  double *fis2, *ps2;
   
-  double *t1, *q1, *u1, *v1, *cl1, *ci1, *cc1;
-  double *t2, *q2, *u2, *v2, *cl2, *ci2, *cc2;
   double *vars1[5];
   double *vars2[5];
 
-  double *tscor, *pscor, *secor; 
   int ij, k;
   int ltq = 1;
 
-  fis1 = (double*) malloc(NGP*sizeof(double));
-  ps1  = (double*) malloc(NGP*sizeof(double));
-  fis2 = (double*) malloc(NGP*sizeof(double));
-  ps2  = (double*) malloc(NGP*sizeof(double));
+  double *fis1 = (double*) malloc(NGP*sizeof(double));
+  double *ps1  = (double*) malloc(NGP*sizeof(double));
+  double *fis2 = (double*) malloc(NGP*sizeof(double));
+  double *ps2  = (double*) malloc(NGP*sizeof(double));
 
-  tscor  = (double*) malloc(NGP*sizeof(double));
-  pscor  = (double*) malloc(NGP*sizeof(double));
-  secor  = (double*) malloc(NGP*sizeof(double));
+  double *tscor  = (double*) malloc(NGP*sizeof(double));
+  double *pscor  = (double*) malloc(NGP*sizeof(double));
+  double *secor  = (double*) malloc(NGP*sizeof(double));
 
-  t1  = (double*) malloc(NGP*19*sizeof(double));
-  q1  = (double*) malloc(NGP*19*sizeof(double));
-  u1  = (double*) malloc(NGP*19*sizeof(double));
-  v1  = (double*) malloc(NGP*19*sizeof(double));
-  cl1 = (double*) malloc(NGP*19*sizeof(double));
-  ci1 = (double*) malloc(NGP*19*sizeof(double));
-  cc1 = (double*) malloc(NGP*19*sizeof(double));
+  double *t1  = (double*) malloc(NGP*19*sizeof(double));
+  double *q1  = (double*) malloc(NGP*19*sizeof(double));
+  double *u1  = (double*) malloc(NGP*19*sizeof(double));
+  double *v1  = (double*) malloc(NGP*19*sizeof(double));
+  double *cl1 = (double*) malloc(NGP*19*sizeof(double));
+  double *ci1 = (double*) malloc(NGP*19*sizeof(double));
+  double *cc1 = (double*) malloc(NGP*19*sizeof(double));
 
-  t2  = (double*) malloc(NGP*40*sizeof(double));
-  q2  = (double*) malloc(NGP*40*sizeof(double));
-  u2  = (double*) malloc(NGP*40*sizeof(double));
-  v2  = (double*) malloc(NGP*40*sizeof(double));
-  cl2 = (double*) malloc(NGP*40*sizeof(double));
-  ci2 = (double*) malloc(NGP*40*sizeof(double));
-  cc2 = (double*) malloc(NGP*40*sizeof(double));
+  double *t2  = (double*) malloc(NGP*40*sizeof(double));
+  double *q2  = (double*) malloc(NGP*40*sizeof(double));
+  double *u2  = (double*) malloc(NGP*40*sizeof(double));
+  double *v2  = (double*) malloc(NGP*40*sizeof(double));
+  double *cl2 = (double*) malloc(NGP*40*sizeof(double));
+  double *ci2 = (double*) malloc(NGP*40*sizeof(double));
+  double *cc2 = (double*) malloc(NGP*40*sizeof(double));
 
   for ( ij = 0; ij < NGP; ++ij )
     {
@@ -1079,13 +1007,10 @@ int main (int argc, char *argv[])
   vars2[3] = ci2;
   vars2[4] = cc2;
 
-  for ( ij = 0; ij < NGP; ++ij )
-    {
-      fis2[ij] = fis1[ij];
-    }
+  for ( ij = 0; ij < NGP; ++ij ) fis2[ij] = fis1[ij];
 
   if ( ltq )
-    hetaeta(ltq, NGP,
+    hetaeta(ltq, NGP, NULL,
 	    19, a1, b1,
 	    fis1, ps1,
 	    t1, q1,
@@ -1095,7 +1020,7 @@ int main (int argc, char *argv[])
 	    5, vars1, vars2,
 	    tscor, pscor, secor);
   else
-    hetaeta(ltq, NGP,
+    hetaeta(ltq, NGP, NULL,
 	    19, a1, b1,
 	    fis1, ps1,
 	    NULL, NULL,
@@ -1104,6 +1029,20 @@ int main (int argc, char *argv[])
 	    NULL, NULL,
 	    5, vars1, vars2,
 	    NULL, NULL, NULL);
+
+  double ot2[40] = {
+    224.226, 212.75, 209.616, 208.895, 210.468, 213.454, 218.091, 220.49, 220.977, 221.114,
+    220.731, 220.803, 223.595, 226.547, 230.566, 234.99, 239.411, 243.722, 248.125, 252.164,
+    256.221, 259.499, 262.082, 264.584, 266.487, 268.319, 269.761, 270.879, 271.881, 273.501,
+    274.932, 276.493, 278.199, 279.638, 280.811, 281.746, 282.613, 283.479, 284.087, 284.343};
+
+  int lerror = 0;
+  for ( k = 0; k < 40; ++k )
+    if ( fabs(t2[k*NGP]-ot2[k]) > 0.001 ) lerror=1;
+
+  if ( lerror )
+    for ( k = 0; k < 40; ++k )
+      printf("%d %g %g %g\n", k, t2[k*NGP], ot2[k], fabs(t2[k*NGP]-ot2[k]));
 
   return 0;
 }

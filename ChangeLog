@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-08-19  Uwe Schulzweida
+
+	* expr: added support for calculations with var1[n] and var2[1]
+
 2015-08-18  Uwe Schulzweida
 
         * ap2pl: use upper level of air_pressure if surface pressure not found
