@@ -138,6 +138,7 @@ void farcsub(field_t *field, const double rconst);
 void farmod(field_t *field, const double divisor);
 
 void farinv(field_t *field);
+void farround(field_t *field);
 
 /* field2.c */
 

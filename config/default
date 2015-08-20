@@ -35,14 +35,22 @@ case "${HOSTNAME}" in
                  --with-netcdf=$HOME/local/netcdf-c-4.3.3.1-threadsafe \
                  --with-hdf5=$HOME/local/hdf5-1.8.15-threadsafe \
                  --with-udunits2=/opt/local \
-                 --with-curl=/opt/local"
-#                 --with-proj=/opt/local \
-#                 --with-szlib=$HOME/local \
+                 --with-curl=/opt/local \
+                 --with-proj=/opt/local \
+                 --with-szlib=$HOME/local"
 
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
+        elif  test "$COMP" = icpc ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=icpc CFLAGS="-g -Wall -O2 -Drestrict= -qopt-report=5 -march=native"
+        elif  test "$COMP" = clang++ ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=clang++ CFLAGS="-g -Wall -O3 -Drestrict="
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \

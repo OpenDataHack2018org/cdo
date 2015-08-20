@@ -40,8 +40,6 @@
 #include "list.h"
 
 
-#define  NOPERATORS  32
-
 static
 int seaslist(LIST *ilist)
 {
@@ -216,32 +214,19 @@ void *Seltime(void *argument)
 
   cdoInitialize(argument);
 
-  int SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     1, "timesteps");
-  int SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 1, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
-  int SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm:ss)");
-  int SELHOUR     = cdoOperatorAdd("selhour",     func_time, 10000, "hours");
-  int SELDAY      = cdoOperatorAdd("selday",      func_date,     1, "days");
-  int SELMON      = cdoOperatorAdd("selmon",      func_date,   100, "months");
-  int SELYEAR     = cdoOperatorAdd("selyear",     func_date, 10000, "years");
-  int SELSEAS     = cdoOperatorAdd("selseas",     func_date,   100, "seasons");
-  int SELSMON     = cdoOperatorAdd("selsmon",     func_date,   100, "month[,nts1[,nts2]]");
-
-  int moddat[NOPERATORS];
-  moddat[SELTIMESTEP] =          1;
-  /*  moddat[SELDATE]     = 1000000000; */
-  moddat[SELDATE]     =          0;
-  moddat[SELTIME]     =    1000000;
-  moddat[SELHOUR]     =      10000;
-  moddat[SELDAY]      =        100;
-  moddat[SELMON]      =        100;
-  moddat[SELYEAR]     = 1000000000;
-  moddat[SELSEAS]     =        100;
-  moddat[SELSMON]     =        100;
+  int SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     0, "timesteps");
+  int SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 0, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
+  int SELTIME     = cdoOperatorAdd("seltime",     func_time,     0, "times (format hh:mm:ss)");
+  int SELHOUR     = cdoOperatorAdd("selhour",     func_time,     0, "hours");
+  int SELDAY      = cdoOperatorAdd("selday",      func_date,     0, "days");
+  int SELMON      = cdoOperatorAdd("selmon",      func_date,     0, "months");
+  int SELYEAR     = cdoOperatorAdd("selyear",     func_date,     0, "years");
+  int SELSEAS     = cdoOperatorAdd("selseas",     func_date,     0, "seasons");
+  int SELSMON     = cdoOperatorAdd("selsmon",     func_date,     0, "month[,nts1[,nts2]]");
 
   int operatorID = cdoOperatorID();
 
   int operfunc = cdoOperatorF1(operatorID);
-  int intval   = cdoOperatorF2(operatorID);
 
   int lcopy = FALSE;
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
@@ -406,11 +391,18 @@ void *Seltime(void *argument)
 	}
       else if ( operfunc == func_date )
 	{
-	  selival = (vdate/intval)%moddat[operatorID];
+          int year, month, day;
+          cdiDecodeDate(vdate, &year, &month, &day);
+          if      ( operatorID == SELYEAR ) selival = year;
+          else if ( operatorID == SELDAY  ) selival = day;
+          else                              selival = month;
 	}
       else if ( operfunc == func_time )
 	{
-	  selival = (vtime/intval)%moddat[operatorID];
+          int hour, minute, second;
+          cdiDecodeTime(vtime, &hour, &minute, &second);
+          if      ( operatorID == SELHOUR ) selival = hour;
+          else if ( operatorID == SELTIME ) selival = vtime;
 	}
       else if ( operfunc == func_datetime )
 	{

@@ -58,7 +58,7 @@ int CDO_optind = 1;      // refactor: moved here from cdo_getopt.c
 /* refactor: moved here from cdo.c */
 
 char *Progname;
-char CDO_Version[] = "Climate Data Operators version "VERSION" (http://mpimet.mpg.de/cdo)"; // refactor: moved here from cdo.c
+char CDO_Version[] = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)"; // refactor: moved here from cdo.c
 
 int ompNumThreads = 1;
 

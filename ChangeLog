@@ -3,6 +3,18 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-08-14  Uwe Schulzweida
+
+	* select: select also ps for variables on hybrid sigma pressure levels
+
+2015-08-12  Uwe Schulzweida
+
+	* selmon: does not work with negative years (bug fix) [report: Tim Brücher]
+
+2015-08-08  Uwe Schulzweida
+
+        * replaced farcmul(array, 1./nsets) by farcdiv(array, (double)nsets) to get exactly the same result with and without missvals
+
 2015-08-05  Uwe Schulzweida
 
 	* ap2pl: changed to generalized height

@@ -115,8 +115,7 @@ void remapVarsFree(remapvars_t *rv)
 
   if ( rv->pinit == TRUE )
     {
-      rv->pinit = FALSE;
-
+      rv->pinit    = FALSE;
       rv->sort_add = FALSE;
 
       if ( rv->src_cell_add ) free(rv->src_cell_add);
@@ -721,6 +720,8 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 
   if ( remap_write_remap == FALSE && grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
 
+  if ( !(gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL)) )
+    cdoAbort("Grid cell center coordinates missing!");
 
   gridInqXvals(gridID, grid->cell_center_lon);
   gridInqYvals(gridID, grid->cell_center_lat);
@@ -731,7 +732,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 
   if ( grid->lneed_cell_corners )
     {
-      if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
+      if ( gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL) )
 	{
 	  gridInqXbounds(gridID, grid->cell_corner_lon);
 	  gridInqYbounds(gridID, grid->cell_corner_lat);
@@ -743,7 +744,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 	}
       else
 	{
-	  cdoAbort("Grid corner missing!");
+	  cdoAbort("Grid cell corner coordinates missing!");
 	}
     }
 

@@ -3689,7 +3689,7 @@ static char *VertintapHelp[] = {
     "    plevels  FLOAT  Pressure levels in pascal",
     "",
     "NOTE",
-    "    This is a specific implememtation for netCDF files from the ICON model, it may not work with data from other sources.",
+    "    This is a specific implementation for netCDF files from the ICON model, it may not work with data from other sources.",
     NULL
 };
 

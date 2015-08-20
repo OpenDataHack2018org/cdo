@@ -206,6 +206,7 @@ void *Timstat(void *argument)
       for ( varID = 0; varID < nvars; ++varID )
 	{
 	  vlistDefVarDatatype(vlistID3, varID, DATATYPE_INT32);
+	  vlistDefVarMissval(vlistID3, varID, -1);
 	  vlistDefVarUnits(vlistID3, varID, "");
 	  vlistDefVarAddoffset(vlistID3, varID, 0);
 	  vlistDefVarScalefactor(vlistID3, varID, 1);
@@ -339,10 +340,13 @@ void *Timstat(void *argument)
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
-		  farcmul(&vars1[varID][levelID], 1.0/nsets);
+		  farcdiv(&vars1[varID][levelID], (double)nsets);
 		else
-		  fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
-	      }
+                  {
+                    //   farround(&samp1[varID][levelID]); not necessary
+                    fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
+                  }
+              }
 	  }
       else if ( lvarstd )
 	for ( varID = 0; varID < nvars; varID++ )

@@ -195,7 +195,7 @@ void *Yearmonstat(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      if ( samp1[varID][levelID].ptr == NULL )
-		farcmul(&vars1[varID][levelID], 1.0/dsets);
+		farcdiv(&vars1[varID][levelID], dsets);
 	      else
 		fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
 	    }

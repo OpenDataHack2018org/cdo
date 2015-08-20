@@ -18,7 +18,7 @@ extern int pmergesort(void *base, size_t nmemb, size_t size,
 
    ********************************************************************* */
 
-inline void *
+void *
 kd_malloc(size_t size, const char *msg)
 {
     void *ptr;
@@ -27,13 +27,13 @@ kd_malloc(size_t size, const char *msg)
     return ptr;
 }
 
-inline float
+float
 kd_sqr(float x)
 {
     return x == 0.0 ? 0.0 : x * x;
 }
 
-inline int
+int
 kd_isleaf(struct kdNode *n)
 {
     return (n->left || n->right) ? 0 : 1;

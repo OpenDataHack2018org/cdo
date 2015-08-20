@@ -31,10 +31,10 @@
 
 void *Mergetime(void *argument)
 {
-  int streamID1, streamID2 = CDI_UNDEFID;
+  int streamID1;
   int tsID2 = 0, recID, varID, levelID;
   int vlistID1, vlistID2;
-  int nfiles, fileID;
+  int fileID;
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int lcopy = FALSE;
   int gridsize;
@@ -44,7 +44,6 @@ void *Mergetime(void *argument)
   int next_fileID;
   int skip_same_time = FALSE;
   int process_timestep;
-  const char *ofilename;
   double *array = NULL;
   typedef struct
   {
@@ -56,7 +55,6 @@ void *Mergetime(void *argument)
     int vtime;
     int nrecs;
   } sfile_t;
-  sfile_t *sf = NULL;
 
   cdoInitialize(argument);
 
@@ -78,9 +76,9 @@ void *Mergetime(void *argument)
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  nfiles = cdoStreamCnt() - 1;
+  int nfiles = cdoStreamCnt() - 1;
 
-  sf = (sfile_t*) malloc(nfiles*sizeof(sfile_t));
+  sfile_t *sf = (sfile_t*) malloc(nfiles*sizeof(sfile_t));
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -118,14 +116,14 @@ void *Mergetime(void *argument)
 	}
     }
 
-  ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoStreamName(nfiles)->args;
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExists(ofilename) )
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
   if ( ! lcopy )
     {

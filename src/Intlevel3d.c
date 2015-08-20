@@ -68,7 +68,7 @@ void *Intlevel3d(void *argument)
   cdoInitialize(argument);
 
   int INTLEVEL3D  = cdoOperatorAdd("intlevel3d",  0, 0, NULL);
-  int INTLEVELX3D = cdoOperatorAdd("intlevelx3d",  0, 0, NULL);
+  int INTLEVELX3D = cdoOperatorAdd("intlevelx3d", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
 
@@ -311,7 +311,7 @@ void *Intlevel3d(void *argument)
 
   streamDefVlist(streamID3, vlistID3);
 
-  maxlev   = nlevi > nlevo ? nlevi : nlevo;
+  maxlev    = nlevi > nlevo ? nlevi : nlevo;
   nvars     = vlistNvars(vlistID1);
   vars      = (int*) malloc(nvars*sizeof(int));
   vardata1  = (double**) malloc(nvars*sizeof(double*)); /* input                                         */

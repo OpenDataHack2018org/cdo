@@ -274,7 +274,7 @@ void *Ymonstat(void *argument)
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[month][varID][levelID].ptr == NULL )
-		  farcmul(&vars1[month][varID][levelID], 1.0/nsets[month]);
+		  farcdiv(&vars1[month][varID][levelID], (double)nsets[month]);
 		else
 		  fardiv(&vars1[month][varID][levelID], samp1[month][varID][levelID]);
 	      }

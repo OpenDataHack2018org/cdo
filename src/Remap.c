@@ -1041,8 +1041,11 @@ void *Remap(void *argument)
 	      if ( gridID1 == remaps[r].gridID && nmiss1 == remaps[r].nmiss )
 		{
 		  if ( memcmp(imask, remaps[r].src_grid.mask, remaps[r].src_grid.size*sizeof(int)) == 0 )
-		    break;
-		}	      
+                    {
+                      remaps[r].nused++;
+                      break;
+                    }
+                }
 	    }
 
 	  if ( cdoVerbose && r >= 0 ) cdoPrint("Using remap %d", r);
@@ -1056,10 +1059,20 @@ void *Remap(void *argument)
 		}
 	      else
 		{
+                  /*
 		  r = nremaps - 1;
                   remapVarsFree(&remaps[r].vars);
                   remapGridFree(&remaps[r].src_grid);
                   remapGridFree(&remaps[r].tgt_grid);
+                  */
+                  int n0 = 0;
+                  if ( max_remaps > 1 && remaps[0].nused > remaps[1].nused ) n0 = 1;
+                  remapVarsFree(&remaps[n0].vars);
+                  remapGridFree(&remaps[n0].src_grid);
+                  remapGridFree(&remaps[n0].tgt_grid);
+                  for ( r = n0+1; r < nremaps; r++ ) memcpy(&remaps[r-1], &remaps[r], sizeof(remap_t));
+                  r = nremaps - 1;
+                  remaps[r].nused    = 0;
                   remaps[r].gridID   = -1;
                   remaps[r].gridsize = 0;
                   remaps[r].nmiss    = 0;

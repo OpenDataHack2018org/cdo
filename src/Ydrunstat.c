@@ -445,7 +445,7 @@ void ydstatFinalize(YDAY_STATS *stats, int operfunc)
 	          if ( vlistInqVarTsteptype(stats->vlist, varID) == TSTEP_CONSTANT ) continue;
 	          nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
 	          for ( levelID = 0; levelID < nlevels; levelID++ )
-		    farcmul(&stats->vars1[dayoy][varID][levelID], 1.0 / stats->nsets[dayoy]);
+		    farcdiv(&stats->vars1[dayoy][varID][levelID], (double) stats->nsets[dayoy]);
 	        }
 	      break;
 	      
