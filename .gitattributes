@@ -584,7 +584,6 @@ src/interpol.c -text
 src/interpol.h -text
 src/job.c -text
 src/juldate.c -text
-src/kdtree.c -text
 src/kdtreelib/COPYING.DJ -text
 src/kdtreelib/kdtree.h -text
 src/kdtreelib/kdtree_cartesian.c -text
