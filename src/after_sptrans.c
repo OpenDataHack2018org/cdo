@@ -10,7 +10,7 @@
 #define  HAVE_OPENMP4  1
 #endif
 
-void gaussaw(double *pa, double *pw, int nlat);
+void gaussaw(double *pa, double *pw, size_t nlat);
 
 static
 void jspleg1(double *pleg, double plat, int ktrunc, double *work)

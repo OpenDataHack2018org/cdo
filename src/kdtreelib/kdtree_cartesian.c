@@ -89,7 +89,7 @@ kd_buildTree(struct kd_point *points, unsigned long nPoints,
     struct kdNode *tree;
 
     my_data = kd_buildArg(points, nPoints, min, max, 0, max_threads, dim);
-    tree = kd_doBuildTree(my_data);
+    tree = (kdNode *)kd_doBuildTree(my_data);
     free(my_data);
     return tree;
 }
@@ -353,7 +353,7 @@ kd_check_dist(struct kdNode *node, float *p,
 
     dist_sq = kd_dist_sq(node->location, p, dim);
     if (dist_sq < *max_dist_sq && kd_isleaf(node)) {
-        if ((point = kd_malloc(sizeof(struct resItem), "kd_doQnearest: "))
+        if ((point = (struct resItem *) kd_malloc(sizeof(struct resItem), "kd_doQnearest: "))
             == NULL)
             return 0;
         point->node = node;
@@ -480,7 +480,7 @@ kd_doRange(struct kdNode *node, float *p, float *max_dist_sq,
 
     dist_sq = kd_dist_sq(node->location, p, dim);
     if (dist_sq < *max_dist_sq && kd_isleaf(node)) {
-        if ((point = kd_malloc(sizeof(struct resItem), "kd_doRange:"))
+        if ((point = (struct resItem *)kd_malloc(sizeof(struct resItem), "kd_doRange:"))
             == NULL)
             return 0;
         point->node = node;
@@ -513,7 +513,7 @@ kd_doRange(struct kdNode *node, float *p, float *max_dist_sq,
         dist_sq = kd_dist_sq(node->location, p, dim);
 
         if (dist_sq < *max_dist_sq && kd_isleaf(node)) {
-            if ((point = kd_malloc(sizeof(struct resItem), "kd_doRange: "))
+            if ((point = (struct resItem *)kd_malloc(sizeof(struct resItem), "kd_doRange: "))
                 == NULL)
                 return 0;
             point->node = node;

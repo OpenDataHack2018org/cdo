@@ -126,7 +126,7 @@ int cdo_getopt_internal(int nargc, char * const *nargv, const char *ostr)
     } 
 
   /* option letter okay? */
-  if ( (CDO_optopt = (int)*place++) == (int)':' || !(oli = strchr(ostr, CDO_optopt)) )
+  if ( (CDO_optopt = (int)*place++) == (int)':' || !(oli = (char *)strchr(ostr, CDO_optopt)) )
     {
       /* if the user didn't specify '-' as an option, assume it means -1. */
       if ( CDO_optopt == (int)'-' ) return (-1);

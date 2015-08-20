@@ -155,6 +155,17 @@ void yac_compute_concave_overlap_areas (unsigned N,
                                "(x_coordinates == NULL || y_coordinates == NULL)",
                                __FILE__ , __LINE__);
 
+#ifdef __cplusplus
+  double init_value[3] = {-1};
+  double init_2d_array_value[3*3] = {-1};
+  enum yac_edge_type edge_type_init_value[3]= {GREAT_CIRCLE};
+  struct grid_cell target_partial_cell;
+    target_partial_cell.coordinates_x    = init_value;
+     target_partial_cell.coordinates_y   = init_value;
+     target_partial_cell.coordinates_xyz = init_2d_array_value;
+     target_partial_cell.edge_type       = edge_type_init_value;
+     target_partial_cell.num_corners     = 3;
+#else
   struct grid_cell target_partial_cell =
     {.coordinates_x   = (double[3]){-1},
      .coordinates_y   = (double[3]){-1},
@@ -162,6 +173,7 @@ void yac_compute_concave_overlap_areas (unsigned N,
      .edge_type       = (enum yac_edge_type[3]) {GREAT_CIRCLE},
      .num_corners     = 3};
 
+#endif
   static struct grid_cell * overlap_buffer = NULL;
   static unsigned overlap_buffer_size = 0;
 
@@ -864,22 +876,22 @@ static void copy_point_list(struct point_list in, struct point_list * out) {
 
   if (curr == NULL) return;
 
-  struct point_list_element * new = get_free_point_list_element(out);
-  out->first = new;
-  *new = *curr;
+  struct point_list_element * new_point_list = get_free_point_list_element(out);
+  out->first = new_point_list;
+  *new_point_list = *curr;
   curr = curr->next;
 
   do {
 
-    new->next = get_free_point_list_element(out);
-    new = new->next;
-    *new = *curr;
+    new_point_list->next = get_free_point_list_element(out);
+    new_point_list = new_point_list->next;
+    *new_point_list = *curr;
     curr = curr->next;
 
   } while (curr != in.first);
 
-  new->next = out->first;
-  out->last = new;
+  new_point_list->next = out->first;
+  out->last = new_point_list;
 }
 
 void yac_cell_clipping (unsigned N,
@@ -928,7 +940,7 @@ void yac_cell_clipping (unsigned N,
     prev_tgt_point = prev_tgt_point->next;
   } while (prev_tgt_point != target_list.first);
 
-  norm_vec = malloc(3 * nct * sizeof(*norm_vec));
+  norm_vec = (double *)malloc(3 * nct * sizeof(*norm_vec));
 
   // compute norm vectors for all edges
   // or for lat circle edges a special z value
@@ -1271,13 +1283,13 @@ get_free_point_list_element(struct point_list * list) {
 
     for (int i = 0; i < 7; ++i) {
 
-      element = malloc(1 * sizeof(*element));
+      element = (struct point_list_element *)malloc(1 * sizeof(*element));
 
       element->next = list->free_elements;
       list->free_elements = element;
     }
 
-    element = malloc(1 * sizeof(*element));
+    element = (struct point_list_element *)malloc(1 * sizeof(*element));
 
   } else {
 
@@ -1381,10 +1393,10 @@ static void generate_overlap_cell(struct point_list * list,
     free(cell->coordinates_y);
     free(cell->coordinates_xyz);
     free(cell->edge_type);
-    cell->coordinates_x = malloc(num_edges * sizeof(*cell->coordinates_x));
-    cell->coordinates_y = malloc(num_edges * sizeof(*cell->coordinates_y));
-    cell->coordinates_xyz = malloc(3 * num_edges * sizeof(*cell->coordinates_xyz));
-    cell->edge_type = malloc(num_edges * sizeof(*cell->edge_type));
+    cell->coordinates_x = (double *)malloc(num_edges * sizeof(*cell->coordinates_x));
+    cell->coordinates_y = (double *)malloc(num_edges * sizeof(*cell->coordinates_y));
+    cell->coordinates_xyz = (double *)malloc(3 * num_edges * sizeof(*cell->coordinates_xyz));
+    cell->edge_type = (enum yac_edge_type *)malloc(num_edges * sizeof(*cell->edge_type));
     cell->array_size = num_edges;
   }
   cell->num_corners = num_edges;

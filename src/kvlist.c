@@ -56,7 +56,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <assert.h>
-
+#include "cdo_int.h"
 
 #define MAX_KVLISTS    4096
 #define MAX_KVELEMENTS 1024

@@ -854,8 +854,8 @@ static
 int cmplognocc(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const loginfo_t *x = s1;
-  const loginfo_t *y = s2;
+  const loginfo_t *x = (const loginfo_t *) s1;
+  const loginfo_t *y = (const loginfo_t *) s2;
 
   if      ( x->nocc < y->nocc ) cmp =  1;
   else if ( x->nocc > y->nocc ) cmp = -1;
@@ -867,8 +867,8 @@ static
 int cmplognvals(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const loginfo_t *x = s1;
-  const loginfo_t *y = s2;
+  const loginfo_t *x = (const loginfo_t *) s1;
+  const loginfo_t *y = (const loginfo_t *) s2;
 
   if      ( x->nvals < y->nvals ) cmp =  1;
   else if ( x->nvals > y->nvals ) cmp = -1;
@@ -880,8 +880,8 @@ static
 int cmplogtime(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const loginfo_t *x = s1;
-  const loginfo_t *y = s2;
+  const loginfo_t *x = (const loginfo_t *) s1;
+  const loginfo_t *y = (const loginfo_t *) s2;
 
   if      ( x->time < y->time ) cmp =  1;
   else if ( x->time > y->time ) cmp = -1;
@@ -893,8 +893,8 @@ static
 int cmplogperc(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const loginfo_t *x = s1;
-  const loginfo_t *y = s2;
+  const loginfo_t *x = (const loginfo_t *) s1;
+  const loginfo_t *y = (const loginfo_t *) s2;
 
   if      ( x->perc < y->perc ) cmp =  1;
   else if ( x->perc > y->perc ) cmp = -1;
@@ -905,8 +905,8 @@ int cmplogperc(const void *s1, const void *s2)
 static
 int cmplogname(const void *s1, const void *s2)
 {
-  const loginfo_t *x = s1;
-  const loginfo_t *y = s2;
+  const loginfo_t *x = (const loginfo_t *)s1;
+  const loginfo_t *y = (const loginfo_t *)s2;
 
   return (strcmp(x->name, y->name));
 }

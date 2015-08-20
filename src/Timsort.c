@@ -34,8 +34,8 @@ static
 int cmpdarray(const void *s1, const void *s2)
 {
   int cmp = 0;
-  const double *x = s1;
-  const double *y = s2;
+  const double *x = (double *)s1;
+  const double *y = (double *)s2;
 
   if      ( *x < *y ) cmp = -1;
   else if ( *x > *y ) cmp =  1;

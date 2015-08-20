@@ -58,8 +58,8 @@ pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                int max_threads)
 {
 
-    p->a = a;
-    p->b = b;
+    p->a = (char *)a;
+    p->b = (char *)b;
     p->first = first;
     p->nmemb = nmemb;
     p->size = size;

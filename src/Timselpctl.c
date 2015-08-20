@@ -132,13 +132,13 @@ void *Timselpctl(void *argument)
 	}
     }
 
+  int otsID = 0;
   if ( tsID < noffset )
     {
       cdoWarning("noffset is larger than number of timesteps!");
       goto LABEL_END;
     }
 
-  int otsID = 0;
   while ( TRUE )
     {
       nrecs = streamInqTimestep(streamID2, otsID);

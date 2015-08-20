@@ -55,7 +55,7 @@ void FreeSpectral(struct Variable *vars)
 
   for ( code = MaxCodes-1; code >= 0; --code )
     if ( vars[code].spectral )
-      vars[code].spectral = FreeMemory(vars[code].spectral);
+      vars[code].spectral = (double *)FreeMemory(vars[code].spectral);
 }
 
 static
@@ -65,7 +65,7 @@ void FreeFourier(struct Variable *vars)
 
   for ( code = 0; code < MaxCodes; code++ )
     if ( vars[code].fourier )
-      vars[code].fourier = FreeMemory(vars[code].fourier);
+      vars[code].fourier = (double *)FreeMemory(vars[code].fourier);
 }
 
 static
@@ -75,7 +75,7 @@ void FreeHybrid(struct Variable *vars)
 
   for ( code = 0; code < MaxCodes; code++ )
     if ( vars[code].hybrid )
-      vars[code].hybrid = FreeMemory(vars[code].hybrid);
+      vars[code].hybrid = (double *)FreeMemory(vars[code].hybrid);
 }
 
 static
@@ -85,7 +85,7 @@ void FreeGrid(struct Variable *vars)
 
   for ( code = 0; code < MaxCodes; code++ )
     if ( vars[code].grid )
-      vars[code].grid = FreeMemory(vars[code].grid);
+      vars[code].grid = (double *)FreeMemory(vars[code].grid);
 }
 
 static
@@ -95,7 +95,7 @@ void FreeSamp(struct Variable *vars)
 
   for ( code = 0; code < MaxCodes; code++ )
     if ( vars[code].samp )
-      vars[code].samp = FreeMemory(vars[code].samp);
+      vars[code].samp = (int *)FreeMemory(vars[code].samp);
 }
 
 /* alloc_dp - Allocate space for double array */
@@ -464,9 +464,9 @@ void after_FCrh2FCsh(struct Control *globs, struct Variable *vars)
    after_GP2FC(vars[HUMIDITY].grid, vars[HUMIDITY].fourier,
 	       globs->Latitudes, globs->Longitudes, vars[HUMIDITY].plev, globs->Fouriers);
 
-   vars[HUMIDITY].grid    = FreeMemory(vars[HUMIDITY].grid);
-   vars[RHUMIDITY].grid   = FreeMemory(vars[RHUMIDITY].grid);
-   vars[TEMPERATURE].grid = FreeMemory(vars[TEMPERATURE].grid);
+   vars[HUMIDITY].grid    = (double *)FreeMemory(vars[HUMIDITY].grid);
+   vars[RHUMIDITY].grid   = (double *)FreeMemory(vars[RHUMIDITY].grid);
+   vars[TEMPERATURE].grid = (double *)FreeMemory(vars[TEMPERATURE].grid);
 }
 
 
@@ -492,8 +492,8 @@ void after_SPuv2SPdv(struct Control *globs, struct Variable *vars)
    uv2dv(vars[U_WIND].fourier, vars[V_WIND].fourier, Div, Vor,
          globs->pol2, globs->pol3, globs->NumLevelRequest, globs->Latitudes, globs->Truncation);
 
-   vars[U_WIND].fourier = FreeMemory(vars[U_WIND].fourier);
-   vars[V_WIND].fourier = FreeMemory(vars[V_WIND].fourier);
+   vars[U_WIND].fourier = (double *)FreeMemory(vars[U_WIND].fourier);
+   vars[V_WIND].fourier = (double *)FreeMemory(vars[V_WIND].fourier);
 
    for (i = 0; i < globs->NumLevelRequest; ++i) {
       sp2sp(Div, globs->Truncation, DivOut, globs->Truncation);
@@ -530,9 +530,9 @@ void after_FCsh2FCrh(struct Control *globs, struct Variable *vars)
    after_GP2FC(vars[RHUMIDITY].grid, vars[RHUMIDITY].fourier,
 	       globs->Latitudes, globs->Longitudes, vars[RHUMIDITY].plev, globs->Fouriers);
 
-   vars[HUMIDITY].grid    = FreeMemory(vars[HUMIDITY].grid);
-   vars[RHUMIDITY].grid   = FreeMemory(vars[RHUMIDITY].grid);
-   vars[TEMPERATURE].grid = FreeMemory(vars[TEMPERATURE].grid);
+   vars[HUMIDITY].grid    = (double *)FreeMemory(vars[HUMIDITY].grid);
+   vars[RHUMIDITY].grid   = (double *)FreeMemory(vars[RHUMIDITY].grid);
+   vars[TEMPERATURE].grid = (double *)FreeMemory(vars[TEMPERATURE].grid);
 }
 /* ENDE HUMTEST */
 
@@ -1241,7 +1241,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
 	    globs->NumLevel, globs->DimGP);
     }
 
-  if ( globs->unitsel > 2 ) vars[FULL_PRESS].hybrid = FreeMemory(vars[FULL_PRESS].hybrid);
+  if ( globs->unitsel > 2 ) vars[FULL_PRESS].hybrid = (double *)FreeMemory(vars[FULL_PRESS].hybrid);
 
   if ( vars[THETAF].needed )
     {
@@ -1273,7 +1273,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
     {
       vars[GEOPOTHEIGHT].hlev = globs->NumLevel+1;
       vars[GEOPOTHEIGHT].sfit = TRUE;
-      vars[GEOPOTHEIGHT].hybrid = realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP+globs->DimGP)*sizeof(double));
+      vars[GEOPOTHEIGHT].hybrid = (double *)realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP+globs->DimGP)*sizeof(double));
       after_copy_array(vars[GEOPOTHEIGHT].hybrid+globs->Dim3GP, globs->Orography, globs->DimGP);
       for ( int i = 0; i < globs->DimGP; i++ ) vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP+i] /= PlanetGrav;
     }
@@ -1721,10 +1721,10 @@ void after_processML(struct Control *globs, struct Variable *vars)
      }
 
    if ( vars[VORTICITY].spectral && !vars[VORTICITY].needed )
-        vars[VORTICITY].spectral = FreeMemory(vars[VORTICITY].spectral);
+        vars[VORTICITY].spectral = (double *)FreeMemory(vars[VORTICITY].spectral);
 
    if ( vars[DIVERGENCE].spectral && !vars[DIVERGENCE].needed )
-        vars[DIVERGENCE].spectral = FreeMemory(vars[DIVERGENCE].spectral);
+        vars[DIVERGENCE].spectral = (double *)FreeMemory(vars[DIVERGENCE].spectral);
 
   /* --------------------------- */
   /*  Output of spectral fields  */
@@ -1768,7 +1768,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 		      vars[code].hlev, globs->Latitudes, globs->Fouriers, globs->Truncation);
 	      }
 	    if ( code != LNPS )
-	      vars[code].spectral = FreeMemory(vars[code].spectral);
+	      vars[code].spectral = (double *)FreeMemory(vars[code].spectral);
 	  }
 
       /*    if (globs->Type < 60) globs->poli = FreeMemory(globs->poli); */
@@ -1868,7 +1868,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 		after_FC2GP(vars[code].fourier,vars[code].hybrid,
 			    globs->Latitudes,globs->Longitudes,vars[code].hlev,globs->Fouriers);
 	      }
-	    vars[code].fourier = FreeMemory(vars[code].fourier);
+	    vars[code].fourier = (double *)FreeMemory(vars[code].fourier);
 	  }
 
       if ( vars[PS_PROG].comp && vars[PS_PROG].hybrid == NULL )
@@ -2068,7 +2068,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 		if ( ! globs->Extrapolate ) vars[code].nmiss = nmiss;
 
 		if ( code != TEMPERATURE )
-		  vars[code].hybrid = FreeMemory(vars[code].hybrid);
+		  vars[code].hybrid = (double *)FreeMemory(vars[code].hybrid);
 	      }
 	  }
     }
@@ -2076,7 +2076,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
   vars[TEMPERATURE].needed = vars[TEMPERATURE].selected;
   FreeHybrid(vars);
   if ( vars[HALF_PRESS].hybrid )
-    vars[HALF_PRESS].hybrid = FreeMemory(vars[HALF_PRESS].hybrid);
+    vars[HALF_PRESS].hybrid = (double *)FreeMemory(vars[HALF_PRESS].hybrid);
 
   /* -------------------------------- */
   /*  Output of pressure level grids  */
@@ -2201,8 +2201,8 @@ void after_processML(struct Control *globs, struct Variable *vars)
     for ( code = 0; code < MaxCodes; code++ )
       if ( vars[code].mean )
 	{
-	  if ( vars[code].variance ) vars[code].variance = FreeMemory(vars[code].variance);
-	  if ( vars[code].grid )     vars[code].grid     = FreeMemory(vars[code].grid);
+	  if ( vars[code].variance ) vars[code].variance = (double *)FreeMemory(vars[code].variance);
+	  if ( vars[code].grid )     vars[code].grid     = (double *)FreeMemory(vars[code].grid);
 	  vars[code].grid = vars[code].mean;
 	  vars[code].mean = NULL;
 	}
@@ -2229,13 +2229,13 @@ void after_processML(struct Control *globs, struct Variable *vars)
 			globs->Latitudes, globs->Longitudes, vars[code].plev, globs->Fouriers);
 
 	    if ( vars[code].grid && (vars[code].sfit || globs->Type < 70) )
-	      vars[code].grid = FreeMemory(vars[code].grid);
+	      vars[code].grid = (double *)FreeMemory(vars[code].grid);
 	  }
     }
 
   for (code = 0; code < MaxCodes; code++)
     if (vars[code].grid && (vars[code].sfit || globs->Type < 70))
-      vars[code].grid = FreeMemory(vars[code].grid);
+      vars[code].grid = (double *)FreeMemory(vars[code].grid);
 
   /* -------------------------- */
   /*  Output of fourier fields  */
@@ -2348,7 +2348,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
 
   for ( code = 0; code < MaxCodes; code++ )
     if ( vars[code].fourier && (vars[code].sfit || globs->Type < 61) )
-      vars[code].fourier = FreeMemory(vars[code].fourier);
+      vars[code].fourier = (double *)FreeMemory(vars[code].fourier);
 
   /* --------------------------- */
   /*  Output of spectral fields  */

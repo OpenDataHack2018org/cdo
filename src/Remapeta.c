@@ -22,6 +22,7 @@
 
 #include <ctype.h>
 
+#include "hetaeta.h"
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -29,7 +30,6 @@
 #include "after_vertint.h"
 #include "list.h"
 #include "stdnametable.h"
-#include "hetaeta.h"
 
 
 static 

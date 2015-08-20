@@ -92,7 +92,7 @@ int y_is_gauss(double *gridyvals, int ysize)
       double *yvals, *yw;
       yvals = (double*) malloc(ysize*sizeof(double));
       yw    = (double*) malloc(ysize*sizeof(double));
-      gaussaw(yvals, yw, ysize);
+      gaussaw(yvals, yw, (size_t)ysize);
       free(yw);
       for ( i = 0; i < (int) ysize; i++ )
 	yvals[i] = asin(yvals[i])/M_PI*180.0;
@@ -138,7 +138,7 @@ int define_grid(dsets_t *pfi)
 
   if ( pfi->yrflg ) rev_vals(yvals, ny);
 
-  if ( pfi->linear[1] == 0 ) lgauss = y_is_gauss(yvals, ny);
+  if ( pfi->linear[1] == 0 ) lgauss = y_is_gauss(yvals, (size_t)ny);
 
   if ( lgauss ) gridtype = GRID_GAUSSIAN;
   else          gridtype = GRID_LONLAT;
@@ -501,21 +501,21 @@ void *Importbinary(void *argument)
 
 	      /* convert */
 	      if (var_dfrm[recID] == 1) {
-		unsigned char *carray = (void*)(rec + recoffset);
+		unsigned char *carray = (unsigned char *)(rec + recoffset);
 		for (i = 0; i < gridsize; ++i) array[i] = (double) carray[i];
 	      }
 	      else if (var_dfrm[recID] == 2) {
-		unsigned short *sarray = (void*)(rec + recoffset);
+		unsigned short *sarray = (unsigned short *)(rec + recoffset);
 	        if (pfi.bswap) gabswp2(sarray, gridsize);
 		for (i = 0; i < gridsize; ++i) array[i] = (double) sarray[i];
 	      }
 	      else if (var_dfrm[recID] == -2) {
-		short *sarray = (void*)(rec + recoffset);
+		short *sarray = (short *)(rec + recoffset);
 	        if (pfi.bswap) gabswp2(sarray, gridsize);
 		for (i = 0; i < gridsize; ++i) array[i] = (double) sarray[i];
 	      }
 	      else if (var_dfrm[recID] == 4) {
-		int *iarray = (void*)(rec + recoffset);
+		int *iarray = (int *)(rec + recoffset);
 	        if (pfi.bswap) gabswp(iarray, gridsize);
 		for (i = 0; i < gridsize; ++i) array[i] = (double) iarray[i];
 	      }

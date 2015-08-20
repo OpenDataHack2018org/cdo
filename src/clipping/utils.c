@@ -39,7 +39,7 @@ static unsigned pointer_lookup_table_size = 0;
 
 unsigned yac_pointer_to_unique_id(void * pointer) {
 
-   pointer_lookup_table = realloc (pointer_lookup_table,
+   pointer_lookup_table = (void **)realloc (pointer_lookup_table,
       ++pointer_lookup_table_size * sizeof(pointer_lookup_table[0]));
 
    pointer_lookup_table[pointer_lookup_table_size-1] = pointer;

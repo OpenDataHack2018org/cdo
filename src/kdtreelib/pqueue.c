@@ -373,10 +373,10 @@ pqinit(struct pqueue *q, uint32_t n)
 {
     struct pqueue *tmp = q;
 
-    if (!q && !(q = malloc(sizeof(struct pqueue)))) {
+    if (!q && !(q = (pqueue *)malloc(sizeof(struct pqueue)))) {
         return NULL;
     }
-    if (!(q->d = malloc(sizeof(struct resItem *) * n))) {
+    if (!(q->d = (struct resItem **)malloc(sizeof(struct resItem *) * n))) {
         if (!tmp)
             free(q);
         return NULL;
@@ -413,7 +413,7 @@ pqinsert(struct pqueue *q, struct resItem *d)
      */
     if (q->size >= q->avail) {
         newsize = q->size + q->step;
-        if (!(tmp = realloc(q->d, sizeof(struct resItem *) * newsize))) {
+        if (!(tmp = (struct resItem **)realloc(q->d, sizeof(struct resItem *) * newsize))) {
             return 0;
         };
         q->d = tmp;

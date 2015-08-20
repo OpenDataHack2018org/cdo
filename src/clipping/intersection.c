@@ -1378,25 +1378,23 @@ static int loncxlatc_ (struct edge edge_a, struct edge edge_b) {
    if (fabs(get_angle(edge_a.points[0].lon, edge_a.points[1].lon)) > tol) {
 
       double lat = (edge_a.points[0].lat > 0)?M_PI_2:-M_PI_2;
-
+    
+      struct edge edge_new_1;
+      edge_new_1.edge_type = LON_CIRCLE;
+      edge_new_1.points[0] = edge_a.points[0];
+      edge_new_1.points[1].lon = edge_a.points[0].lon;
+      edge_new_1.points[1].lat = lat;
+      
+      struct edge edge_new_2;
+      edge_new_2.edge_type = LON_CIRCLE;
+      edge_new_2.points[0] = edge_a.points[1];
+      edge_new_2.points[1].lon = edge_a.points[1].lon;
+      edge_new_2.points[1].lat = lat;
       return
-         loncxlatc_(
-            (struct edge){
-               .edge_type = LON_CIRCLE,
-               .points = {{.lon = edge_a.points[0].lon,
-                           .lat = edge_a.points[0].lat},
-                          {.lon = edge_a.points[0].lon,
-                           .lat = lat}}}, edge_b)
+         loncxlatc_(edge_new_1, edge_b)
          ||
-         loncxlatc_(
-            (struct edge){
-               .edge_type = LON_CIRCLE,
-               .points = {{.lon = edge_a.points[1].lon,
-                           .lat = edge_a.points[1].lat},
-                          {.lon = edge_a.points[1].lon,
-                           .lat = lat}}}, edge_b);
+         loncxlatc_(edge_new_2, edge_b);
    }
-
    // if edge b is at the pole
    if (fabs(fabs(edge_b.points[0].lat) - M_PI_2) < tol) {
 

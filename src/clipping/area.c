@@ -263,7 +263,7 @@ double yac_girards_area ( struct grid_cell cell  ) {
   int M = cell.num_corners;
   if (M < 3) return area;  // a degenerate cell
 
-  double * theta = malloc ( M * sizeof(theta[0]) );
+  double * theta = (double *)malloc ( M * sizeof(theta[0]) );
 
   for ( m = 0; m < M; m++ ) {
      theta[m] = yac_partial_area(cell.coordinates_x[(m+1)%M], cell.coordinates_y[(m+1)%M],
@@ -393,7 +393,7 @@ lat_edge_correction(double base_point[3], double a[3], double b[3],
 
   double lat_area = fabs((1.0 - h) * get_angle(lon_a, lon_b));
 
-  double pole[3] = {0, 0, (a[2] >= 0.0)?1:-1};
+  double pole[3] = {0, 0, (a[2] >= 0.0)?1.0:-1.0};
   double gc_area = tri_area(a, b, pole);
 
   double correction = MAX(lat_area - gc_area, 0.0);
@@ -420,7 +420,7 @@ lat_edge_correction(double base_point[3], double a[3], double b[3],
   if (fabs(scalar_base) < 1e-11) {
 
     double norm_middle[3];
-    double pole[3] = {0,0,((a[2]>0)?1:-1)};
+    double pole[3] = {0,0,((a[2]>0)?1.0:-1.0)};
 
     if (compute_norm_vector(middle_lat, pole, norm_middle)) return 0.0;
 
@@ -450,7 +450,7 @@ double yac_pole_area ( struct grid_cell cell ) {
 
   int closer_to_south_pole = cell.coordinates_y[0] < 0;
 
-  double pole_vec[3] = {0, 0, (closer_to_south_pole)?-1:1};
+  double pole_vec[3] = {0, 0, (closer_to_south_pole)?-1.0:1.0};
 
   // it would also be possible to use the equator instead
   // of the poles as the baseline

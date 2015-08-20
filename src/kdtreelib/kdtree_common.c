@@ -18,7 +18,7 @@ extern int pmergesort(void *base, size_t nmemb, size_t size,
 
    ********************************************************************* */
 
-inline void *
+void *
 kd_malloc(size_t size, const char *msg)
 {
     void *ptr;
@@ -27,13 +27,13 @@ kd_malloc(size_t size, const char *msg)
     return ptr;
 }
 
-inline float
+float
 kd_sqr(float x)
 {
     return x == 0.0 ? 0.0 : x * x;
 }
 
-inline int
+int
 kd_isleaf(struct kdNode *n)
 {
     return (n->left || n->right) ? 0 : 1;
@@ -201,7 +201,7 @@ kd_doBuildTree(void *threadarg)
     if (max_threads > 1) {
         pthread_create(&threads[0], &attr, kd_doBuildTree, (void *) argleft);
     } else {
-        node->left = kd_doBuildTree((void *) argleft);
+        node->left = (kdNode *)kd_doBuildTree((void *) argleft);
         free(argleft);
         if (!node->left) {
             kd_destroyTree(node);
@@ -222,7 +222,7 @@ kd_doBuildTree(void *threadarg)
     if (max_threads > 1) {
         pthread_create(&threads[1], &attr, kd_doBuildTree, (void *) argright);
     } else {
-        node->right = kd_doBuildTree((void *) argright);
+        node->right = (kdNode *)kd_doBuildTree((void *) argright);
         free(argright);
         if (!node->right) {
             kd_destroyTree(node);
@@ -230,9 +230,9 @@ kd_doBuildTree(void *threadarg)
         }
     }
     if (max_threads > 1) {
-        pthread_join(threads[0], (void *) (&node->left));
+        pthread_join(threads[0], (void **) (&node->left));
         free(argleft);
-        pthread_join(threads[1], (void *) (&node->right));
+        pthread_join(threads[1], (void **) (&node->right));
         free(argright);
         if (!node->left || !node->right) {
             kd_destroyTree(node);
@@ -259,7 +259,7 @@ kd_buildArg(struct kd_point *points,
 {
     struct kd_thread_data *d;
 
-    if ((d = kd_malloc(sizeof(kd_thread_data), "kd_thread_data")) == NULL)
+    if ((d = (kd_thread_data *)kd_malloc(sizeof(kd_thread_data), "kd_thread_data")) == NULL)
         return NULL;
     d->points = points;
     d->nPoints = nPoints;
@@ -278,7 +278,7 @@ kd_allocNode(struct kd_point *points, unsigned long pivot,
 {
     struct kdNode *node;
 
-    if ((node = kd_malloc(sizeof(kdNode), "kd_allocNode (node): ")) == NULL)
+    if ((node = (kdNode *)kd_malloc(sizeof(kdNode), "kd_allocNode (node): ")) == NULL)
         return NULL;
     node->split = axis;
     memcpy(node->location, points[pivot].point, dim * sizeof(float));
@@ -325,7 +325,7 @@ kd_insertResTree(struct kdNode *node, struct pqueue *res)
     if (!kd_insertResTree(node->left, res))
         return 0;
     if (kd_isleaf(node)) {
-        if ((point = kd_malloc(sizeof(struct resItem), "kd_insertResTree: "))
+        if ((point = (struct resItem *)kd_malloc(sizeof(struct resItem), "kd_insertResTree: "))
             == NULL)
             return 0;
 
