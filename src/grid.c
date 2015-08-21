@@ -503,13 +503,11 @@ static
 void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
-  projPJ   *libProj;
   char *params[20];
-  int nbpar=0;
   projUV data, res;
   long i;
 
-  nbpar = 0;
+  int nbpar = 0;
   params[nbpar++] = (char*) "proj=sinu";
   params[nbpar++] = (char*) "ellps=WGS84";
 
@@ -517,22 +515,24 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
     for ( i = 0; i < nbpar; ++i )
       cdoPrint("Proj.param[%ld] = %s", i+1, params[i]);
 
-  libProj = pj_init(nbpar, params);
-  if ( !libProj )
+  projPJ proj = pj_init(nbpar, params);
+  if ( !proj )
     cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
-  /* libProj->over = 1; */		/* allow longitude > 180° */
+  /* proj->over = 1; */		/* allow longitude > 180° */
 
   for ( i = 0; i < gridsize; i++ )
     {
       data.u = xvals[i];
       data.v = yvals[i];
-      res = pj_inv(data, libProj);
+      res = pj_inv(data, proj);
       xvals[i] = res.u*RAD2DEG;
       yvals[i] = res.v*RAD2DEG;
       if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
       if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
     }
+
+  pj_free(proj);
 #else
   cdoAbort("proj4 support not compiled in!");
 #endif
@@ -542,16 +542,14 @@ static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
-  projPJ   *libProj;
   char *params[20];
-  int nbpar=0;
   projUV data, res;
   double a, lon_0, lat_0;
   long i;
 
   gridInqLaea(gridID, &a , &lon_0, &lat_0);
 
-  nbpar = 0;
+  int nbpar = 0;
   params[nbpar++] = gen_param("proj=laea");
   if ( a > 0 ) params[nbpar++] = gen_param("a=%g", a);
   params[nbpar++] = gen_param("lon_0=%g", lon_0);
@@ -561,24 +559,26 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
     for ( i = 0; i < nbpar; ++i )
       cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
 
-  libProj = pj_init(nbpar, &params[0]);
-  if ( !libProj )
+  projPJ proj = pj_init(nbpar, &params[0]);
+  if ( !proj )
     cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
   for ( i = 0; i < nbpar; ++i ) free(params[i]);
 
-  /* libProj->over = 1; */		/* allow longitude > 180° */
+  /* proj->over = 1; */		/* allow longitude > 180° */
 
   for ( i = 0; i < gridsize; i++ )
     {
       data.u = xvals[i];
       data.v = yvals[i];
-      res = pj_inv(data, libProj);
+      res = pj_inv(data, proj);
       xvals[i] = res.u*RAD2DEG;
       yvals[i] = res.v*RAD2DEG;
       if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
       if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
     }
+
+  pj_free(proj);
 #else
   cdoAbort("proj4 support not compiled in!");
 #endif
@@ -588,16 +588,14 @@ static
 void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
-  projPJ   *libProj;
   char *params[20];
-  int nbpar=0;
   projUV data, res;
   double a, lon_0, lat_0, lat_1, lat_2;
   long i;
 
   gridInqLcc2(gridID, &a , &lon_0, &lat_0, &lat_1, &lat_2);
 
-  nbpar = 0;
+  int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
   if ( a > 0 ) params[nbpar++] = gen_param("a=%g", a);
   params[nbpar++] = gen_param("lon_0=%g", lon_0);
@@ -609,22 +607,24 @@ void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
     for ( i = 0; i < nbpar; ++i )
       cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
   
-  libProj = pj_init(nbpar, &params[0]);
-  if ( !libProj )
+  projPJ proj = pj_init(nbpar, &params[0]);
+  if ( !proj )
     cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
   for ( i = 0; i < nbpar; ++i ) free(params[i]);
 
-  /* libProj->over = 1; */		/* allow longitude > 180° */
+  /* proj->over = 1; */		/* allow longitude > 180° */
   
   for ( i = 0; i < gridsize; i++ )
     {
       data.u = xvals[i];
       data.v = yvals[i];
-      res = pj_inv(data, libProj);
+      res = pj_inv(data, proj);
       xvals[i] = res.u*RAD2DEG;
       yvals[i] = res.v*RAD2DEG;
     }
+
+  pj_free(proj);
 #else
   cdoAbort("proj4 support not compiled in!");
 #endif
