@@ -245,7 +245,7 @@ void convertVarUnits(var_t *vars, int varID, char *name)
 	  // if ( cdoVerbose )
 	    {
 	      char buf[64];
-	      cv_get_expression(vars[varID].ut_converter, buf, 64, name);
+	      cv_get_expression((const cv_converter*)vars[varID].ut_converter, buf, 64, name);
 	      cdoPrint("%s - convert units from [%s] to [%s] (expression: %s).", name, units_old, units, buf);
 	    }
 	}
@@ -799,7 +799,7 @@ void *Setpartab(void *argument)
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) )
 		    {
-		      array[i] = cv_convert_double(vars[varID].ut_converter, array[i]);
+		      array[i] = cv_convert_double((const cv_converter*)vars[varID].ut_converter, array[i]);
 		      if ( ut_get_status() != UT_SUCCESS ) nerr++;
 		    }
 		}
@@ -827,7 +827,7 @@ void *Setpartab(void *argument)
   UDUNITS_LOCK();
 
   for ( varID = 0; varID < nvars; varID++ )
-    if ( vars[varID].ut_converter ) cv_free(vars[varID].ut_converter);
+    if ( vars[varID].ut_converter ) cv_free((cv_converter*)vars[varID].ut_converter);
 
   if ( ut_read )
     { 
