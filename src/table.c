@@ -38,7 +38,7 @@ int defineTable(char *tablearg)
       if ( tablepath )
 	{
 	  int len = sizeof(tablepath) + sizeof(tablename) + 3;
-	  char *tablefile[len];
+	  char tablefile[len];
 	  strcpy(tablefile, tablepath);
 	  strcat(tablefile, "/");
 	  strcat(tablefile, tablename);
