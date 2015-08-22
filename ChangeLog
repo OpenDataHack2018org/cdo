@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-08-22  Uwe Schulzweida
+
+	* src/Makefile.am: removed -lstd++ (bug fix)
+
 2015-08-19  Uwe Schulzweida
 
 	* expr: added support for calculations with var1[n] and var2[1]
