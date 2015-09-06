@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-09-06  Uwe Schulzweida
+
+	* Select: set default time of enddate to 23:59:59
+
 2015-08-22  Uwe Schulzweida
 
 	* src/Makefile.am: removed -lstd++ (bug fix)

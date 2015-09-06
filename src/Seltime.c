@@ -114,10 +114,12 @@ int seaslist(LIST *ilist)
 }
 
 
-double datestr_to_double(const char *datestr)
+double datestr_to_double(const char *datestr, int opt)
 {
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   double fval = 0;
+
+  if ( opt ) {hour = 23; minute = 59; second = 59;}
 
   if ( strchr(datestr, '-') == NULL )
     {
@@ -133,7 +135,9 @@ double datestr_to_double(const char *datestr)
   else
     {
       sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-      fval = cdiEncodeDate(year, month, day);
+      fval = cdiEncodeTime(hour, minute, second);
+      if ( fabs(fval) > 0 ) fval /= 1000000;
+      fval += cdiEncodeDate(year, month, day);
     }
 
   return fval;
@@ -162,7 +166,7 @@ int datelist(LIST *flist)
 	}
       else
 	{
-	  fval = datestr_to_double(operatorArgv()[i]);
+	  fval = datestr_to_double(operatorArgv()[i], 0);
 	  if ( strchr(operatorArgv()[i], 'T') )
 	    set2 = FALSE;
 	  else if ( nsel > 1 && i > 0 )

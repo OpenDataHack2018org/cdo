@@ -29,7 +29,7 @@
 #include "util.h"
 //#include "list.h"
 
-double datestr_to_double(const char *datestr);
+double datestr_to_double(const char *datestr, int opt);
 
 #define  PML_INT         1
 #define  PML_FLT         2
@@ -873,8 +873,8 @@ void *Select(void *argument)
 
 	  startdate = par_startdate[0];
 	  enddate   = par_enddate[0];
-	  if ( npar_startdate ) fstartdate = datestr_to_double(startdate);
-	  if ( npar_enddate   ) fenddate   = datestr_to_double(enddate);
+	  if ( npar_startdate ) fstartdate = datestr_to_double(startdate, 0);
+	  if ( npar_enddate   ) fenddate   = datestr_to_double(enddate, 1);
 	}
       else
 	{
@@ -1036,7 +1036,8 @@ void *Select(void *argument)
   PAR_CHECK_INT_FLAG(hour);
   PAR_CHECK_INT_FLAG(minute);
   PAR_CHECK_WORD_FLAG(startdate);
-  PAR_CHECK_WORD_FLAG(enddate);
+  UNUSED(str_enddate);
+  //  PAR_CHECK_WORD_FLAG(enddate);
   PAR_CHECK_WORD_FLAG(date);
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);
