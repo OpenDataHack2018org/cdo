@@ -46,7 +46,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=icpc CFLAGS="-g -Wall -O2 -Drestrict= -qopt-report=5 -march=native"
+	            CC=icpc CFLAGS="-g -std=c++11 -Wall -O2 -Drestrict= -qopt-report=5 -march=native"
         elif  test "$COMP" = clang++ ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
