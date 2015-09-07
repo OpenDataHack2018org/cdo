@@ -100,13 +100,11 @@ pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int processCreate(void)
 {
-  int processID;
-
 #if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
 
-  processID = NumProcess++;
+  int processID = NumProcess++;
   NumProcessActive++;
 
 #if defined(HAVE_LIBPTHREAD)
@@ -135,7 +133,7 @@ int processCreate(void)
 
   Process[processID].noper        = 0;
 
-  return (processID);
+  return processID;
 }
 
 
@@ -163,7 +161,7 @@ int processSelf(void)
 
 #endif
 
-  return (processID);
+  return processID;
 }
 
 
@@ -179,7 +177,7 @@ int processNums(void)
   pthread_mutex_unlock(&processMutex);  
 #endif
 
-  return (pnums);
+  return pnums;
 }
 
 
@@ -195,7 +193,7 @@ int processNumsActive(void)
   pthread_mutex_unlock(&processMutex);  
 #endif
 
-  return (pnums);
+  return pnums;
 }
 
 
@@ -209,20 +207,19 @@ void processAddNvals(off_t nvals)
 
 off_t processInqNvals(int processID)
 {
-  return (Process[processID].nvals);
+  return Process[processID].nvals;
 }
 
 
 void processAddStream(int streamID)
 {
   int processID = processSelf();
-  int sindex;
 
   if ( pstreamIsPipe(streamID) ) Process[processID].nchild++;
-  sindex = Process[processID].nstream++;
+  int sindex = Process[processID].nstream++;
 
   if ( sindex >= MAX_STREAM )
-    Error("limit of %d streams per process reached (processID = %d)!", MAX_STREAM, processID);
+    Error("Limit of %d streams per process reached (processID = %d)!", MAX_STREAM, processID);
 
   Process[processID].streams[sindex] = streamID;
 }
@@ -230,6 +227,7 @@ void processAddStream(int streamID)
 
 void processDelStream(int streamID)
 {
+  UNUSED(streamID);
 }
 
 
@@ -241,7 +239,7 @@ void processDefCputime(int processID, double cputime)
 
 double processInqCputime(int processID)
 {
-  return (Process[processID].cputime);
+  return Process[processID].cputime;
 }
 
 
@@ -272,7 +270,7 @@ int processInqStreamNum(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].nstream);
+  return Process[processID].nstream;
 }
 
 
@@ -280,7 +278,7 @@ int processInqChildNum(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].nchild);
+  return Process[processID].nchild;
 }
 
 
@@ -294,7 +292,7 @@ int processInqStreamID(int streamindex)
 
 const char *processInqOpername2(int processID)
 {
-  return (Process[processID].operatorName);
+  return Process[processID].operatorName;
 }
 
 
@@ -302,7 +300,7 @@ const char *processInqOpername(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].operatorName);
+  return Process[processID].operatorName;
 }
 
 
@@ -337,7 +335,7 @@ int get_glob_flags(void)
   glob_flags |= GLOB_TILDE;
 #endif
 
-  return (glob_flags);
+  return glob_flags;
 }
 #endif
 
@@ -382,11 +380,10 @@ argument_t *glob_pattern(const char *restrict string)
 int cdoStreamCnt(void)
 {
   int processID = processSelf();
-  int cnt;
 
-  cnt = Process[processID].streamCnt;
+  int cnt = Process[processID].streamCnt;
 
-  return (cnt);
+  return cnt;
 }
 
 
@@ -397,7 +394,7 @@ const argument_t *cdoStreamName(int cnt)
   if ( cnt > Process[processID].streamCnt || cnt < 0 )
     Error("count %d out of range!", cnt);
 
-  return (&(Process[processID].streamNames[cnt]));
+  return &(Process[processID].streamNames[cnt]);
 }
 
 
@@ -405,23 +402,21 @@ const char *processOperator(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].xoperator);
+  return Process[processID].xoperator;
 }
 
 static
 char *getOperatorArg(const char *xoperator)
 {
-  char *commapos;
   char *operatorArg = NULL;
-  size_t len;
 
   if ( xoperator )
     {
-      commapos = (char *)strchr(xoperator, ',');
+      char *commapos = (char *)strchr(xoperator, ',');
 
       if ( commapos )
         {
-          len = strlen(commapos+1);
+          size_t len = strlen(commapos+1);
           if ( len )
             {
               operatorArg = (char*) malloc(len+1);
@@ -430,7 +425,7 @@ char *getOperatorArg(const char *xoperator)
         }
     }
 
-  return (operatorArg);
+  return operatorArg;
 }
 
 static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams);
@@ -438,17 +433,12 @@ static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams);
 static
 int getGlobArgc(int argc, char *argv[], int globArgc)
 {
-  int streamInCnt;
-  int streamOutCnt;
-  char *opername;
-  char *comma_position;
-
-  opername = &argv[globArgc][1];
-  comma_position = strchr(opername, ',');
+  char *opername = &argv[globArgc][1];
+  char *comma_position = strchr(opername, ',');
   if ( comma_position ) *comma_position = 0;
 
-  streamInCnt  = operatorStreamInCnt(opername);
-  streamOutCnt = operatorStreamOutCnt(opername);
+  int streamInCnt  = operatorStreamInCnt(opername);
+  int streamOutCnt = operatorStreamOutCnt(opername);
 
   if ( streamInCnt == -1 ) streamInCnt = 1;
 
@@ -461,7 +451,7 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
     globArgc = skipInputStreams(argc, argv, globArgc, streamInCnt);
   if ( comma_position ) *comma_position = ',';
 
-  return (globArgc);
+  return globArgc;
 }
 
 static
@@ -484,7 +474,7 @@ int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
       nstreams--;
     }
 
-  return (globArgc);
+  return globArgc;
 }
 
 static
@@ -505,7 +495,7 @@ int getStreamCnt(int argc, char *argv[])
       streamCnt++;
     }
 
-  return (streamCnt);
+  return streamCnt;
 }
 
 static
@@ -721,18 +711,14 @@ int checkStreamCnt(void)
   if ( streamInCnt == 1 && streamInCnt0 == -1 )
     status = expand_wildcards(processID, streamCnt);
 
-  return (status);
+  return status;
 }
 
 static
 void setStreams(int argc, char *argv[])
 {
   int processID = processSelf();
-  int streamCnt;
-  int status;
-  int i;
-
-  streamCnt = getStreamCnt(argc, argv);
+  int streamCnt = getStreamCnt(argc, argv);
 
   Process[processID].nvals = 0;
   Process[processID].nvars = 0;
@@ -741,7 +727,7 @@ void setStreams(int argc, char *argv[])
   Process[processID].streamCnt  = 0; /* filled in setStreamNames */
   if ( streamCnt )
     Process[processID].streamNames = (argument_t*) malloc(streamCnt*sizeof(argument_t));
-  for ( i = 0; i < streamCnt; i++ )
+  for ( int i = 0; i < streamCnt; i++ )
     {
       Process[processID].streamNames[i].argc = 0;
       Process[processID].streamNames[i].argv = NULL;
@@ -750,7 +736,7 @@ void setStreams(int argc, char *argv[])
 
   setStreamNames(argc, argv);
 
-  status = checkStreamCnt();
+  int status = checkStreamCnt();
 
   if ( status == 0 && Process[processID].streamCnt != streamCnt )
     Error("Internal problem with stream count %d %d", Process[processID].streamCnt, streamCnt);
@@ -806,6 +792,7 @@ void processDefVarNum(int nvars, int streamID)
 {
   int processID = processSelf();
 
+  UNUSED(streamID);
   /*  if ( streamID == Process[processID].streams[0] ) */
     Process[processID].nvars += nvars;
 }
@@ -815,13 +802,15 @@ int processInqVarNum(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].nvars);
+  return Process[processID].nvars;
 }
 
 
 void processDefTimesteps(int streamID)
 {
   int processID = processSelf();
+  
+  UNUSED(streamID);
   /*
   int i;
   printf("streamID %d %d %d %d\n", streamID, Process[processID].streams[0], Process[processID].streams[1], processID);
@@ -838,7 +827,7 @@ int processInqTimesteps(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].ntimesteps);
+  return Process[processID].ntimesteps;
 }
 
 
@@ -864,7 +853,7 @@ int operatorArgc(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].oargc);
+  return Process[processID].oargc;
 }
 
 
@@ -872,7 +861,7 @@ char **operatorArgv(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].oargv);
+  return Process[processID].oargv;
 }
 
 
@@ -891,9 +880,8 @@ void operatorCheckArgc(int numargs)
 void operatorInputArg(const char *enter)
 {
   int processID = processSelf();
-  int oargc;
 
-  oargc = Process[processID].oargc;
+  int oargc = Process[processID].oargc;
 
   if ( oargc == 0 )
     {
@@ -956,21 +944,17 @@ int cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
   int processID = processSelf();
   int operID = Process[processID].noper;
 
-  if ( operID < MAX_OPERATOR )
-    {
-      Process[processID].oper[operID].f1     = f1;
-      Process[processID].oper[operID].f2     = f2;
-      Process[processID].oper[operID].name   = name;
-      Process[processID].oper[operID].enter  = enter;
+  if ( operID >= MAX_OPERATOR )
+    cdoAbort("Maximum number of %d operators reached!", MAX_OPERATOR);
 
-      Process[processID].noper++;
-    }
-  else
-    {
-      cdoAbort("Maximum of %d operators reached!", MAX_OPERATOR);
-    }
+  Process[processID].oper[operID].f1     = f1;
+  Process[processID].oper[operID].f2     = f2;
+  Process[processID].oper[operID].name   = name;
+  Process[processID].oper[operID].enter  = enter;
 
-  return (operID);
+  Process[processID].noper++;
+
+  return operID;
 }
 
 
@@ -993,7 +977,7 @@ int cdoOperatorID(void)
       cdoAbort("Operator not initialized!");
     }
 
-  return (operID);
+  return operID;
 }
 
 
@@ -1001,7 +985,7 @@ int cdoOperatorF1(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].oper[operID].f1);
+  return Process[processID].oper[operID].f1;
 }
 
 
@@ -1009,7 +993,7 @@ int cdoOperatorF2(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].oper[operID].f2);
+  return Process[processID].oper[operID].f2;
 }
 
 
@@ -1017,7 +1001,7 @@ const char *cdoOperatorName(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].oper[operID].name);
+  return Process[processID].oper[operID].name;
 }
 
 
@@ -1025,7 +1009,7 @@ const char *cdoOperatorEnter(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].oper[operID].enter);
+  return Process[processID].oper[operID].enter;
 }
 
 
@@ -1033,5 +1017,5 @@ int cdoStreamNumber()
 {
   int processID = processSelf();
 
-  return (operatorStreamNumber(Process[processID].operatorName));
+  return operatorStreamNumber(Process[processID].operatorName);
 }
