@@ -80,13 +80,15 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cdo$(EXEEXT)
-@ENABLE_NEARPT3_TRUE@am__append_1 = \
-@ENABLE_NEARPT3_TRUE@               nearpt3x.h      \
-@ENABLE_NEARPT3_TRUE@               nearpt3c.h      \
-@ENABLE_NEARPT3_TRUE@               nearpt3c.cc     \
-@ENABLE_NEARPT3_TRUE@               cellsearchorder.h
 
-@ENABLE_MAGICS_TRUE@am__append_2 = Magplot.c       \
+#if ENABLE_NEARPT3
+#cdo_SOURCES +=           \
+#               nearpt3x.h      \
+#               nearpt3c.h      \
+#               nearpt3c.cc     \
+#               cellsearchorder.h
+#endif
+@ENABLE_MAGICS_TRUE@am__append_1 = Magplot.c       \
 @ENABLE_MAGICS_TRUE@               Magvector.c     \
 @ENABLE_MAGICS_TRUE@               Maggraph.c      \
 @ENABLE_MAGICS_TRUE@               template_parser.h   \
@@ -100,9 +102,9 @@ bin_PROGRAMS = cdo$(EXEEXT)
 @ENABLE_MAGICS_TRUE@               CdoMagicsMapper.h   \
 @ENABLE_MAGICS_TRUE@               CdoMagicsMapper.c
 
-@ENABLE_ALL_STATIC_TRUE@am__append_3 = -all-static
+@ENABLE_ALL_STATIC_TRUE@am__append_2 = -all-static
 noinst_PROGRAMS = cdotest$(EXEEXT)
-@ENABLE_ALL_STATIC_TRUE@am__append_4 = -all-static
+@ENABLE_ALL_STATIC_TRUE@am__append_3 = -all-static
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/config.h.in $(top_srcdir)/config/mkinstalldirs \
@@ -208,14 +210,12 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
 	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
 	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
-	Yseasstat.c Zonstat.c cdo.h nearpt3x.h nearpt3c.h nearpt3c.cc \
-	cellsearchorder.h Magplot.c Magvector.c Maggraph.c \
+	Yseasstat.c Zonstat.c cdo.h Magplot.c Magvector.c Maggraph.c \
 	template_parser.h template_parser.c results_template_parser.h \
 	results_template_parser.c magics_template_parser.h \
 	magics_template_parser.c StringUtilities.h StringUtilities.c \
 	CdoMagicsMapper.h CdoMagicsMapper.c
-@ENABLE_NEARPT3_TRUE@am__objects_1 = cdo-nearpt3c.$(OBJEXT)
-@ENABLE_MAGICS_TRUE@am__objects_2 = cdo-Magplot.$(OBJEXT) \
+@ENABLE_MAGICS_TRUE@am__objects_1 = cdo-Magplot.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-Magvector.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-Maggraph.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-template_parser.$(OBJEXT) \
@@ -306,12 +306,12 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
 	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
 	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
-	cdo-Zonstat.$(OBJEXT) $(am__objects_1) $(am__objects_2)
+	cdo-Zonstat.$(OBJEXT) $(am__objects_1)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
-cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(cdo_LDFLAGS) $(LDFLAGS) -o $@
+cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(cdo_LDFLAGS) $(LDFLAGS) -o $@
 am_cdotest_OBJECTS = cdotest-cdotest.$(OBJEXT)
 cdotest_OBJECTS = $(am_cdotest_OBJECTS)
 cdotest_DEPENDENCIES = $(cdo_LDADD)
@@ -352,24 +352,6 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CXXFLAGS) $(CXXFLAGS)
-AM_V_CXX = $(am__v_CXX_@AM_V@)
-am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
-am__v_CXX_0 = @echo "  CXX     " $@;
-am__v_CXX_1 = 
-CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
-am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
-am__v_CXXLD_0 = @echo "  CXXLD   " $@;
-am__v_CXXLD_1 = 
 SOURCES = $(libcdo_la_SOURCES) $(cdo_SOURCES) $(cdotest_SOURCES)
 DIST_SOURCES = $(libcdo_la_SOURCES) $(am__cdo_SOURCES_DIST) \
 	$(cdotest_SOURCES)
@@ -443,7 +425,6 @@ ENABLE_IEG = @ENABLE_IEG@
 ENABLE_NC2 = @ENABLE_NC2@
 ENABLE_NC4 = @ENABLE_NC4@
 ENABLE_NC4HDF5 = @ENABLE_NC4HDF5@
-ENABLE_NEARPT3 = @ENABLE_NEARPT3@
 ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
 EXEEXT = @EXEEXT@
@@ -643,17 +624,17 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
 	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
 	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
-	Yseasstat.c Zonstat.c cdo.h $(am__append_1) $(am__append_2)
+	Yseasstat.c Zonstat.c cdo.h $(am__append_1)
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
-cdo_LDFLAGS = $(am__append_3)
+cdo_LDFLAGS = $(am__append_2)
 libcdo_la_CPPFLAGS = $(cdo_CPPFLAGS)
 cdotest_SOURCES = cdo_int.h	\
 	           cdotest.c
 
 cdotest_LDADD = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
-cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_4)
+cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_3)
 
 #cdo-userlog.o: userlog.c config.h
 #	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
@@ -665,7 +646,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cc .lo .o .obj
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -820,7 +801,7 @@ clean-noinstPROGRAMS:
 
 cdo$(EXEEXT): $(cdo_OBJECTS) $(cdo_DEPENDENCIES) $(EXTRA_cdo_DEPENDENCIES) 
 	@rm -f cdo$(EXEEXT)
-	$(AM_V_CXXLD)$(cdo_LINK) $(cdo_OBJECTS) $(cdo_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(cdo_LINK) $(cdo_OBJECTS) $(cdo_LDADD) $(LIBS)
 
 cdotest$(EXEEXT): $(cdotest_OBJECTS) $(cdotest_DEPENDENCIES) $(EXTRA_cdotest_DEPENDENCIES) 
 	@rm -f cdotest$(EXEEXT)
@@ -1023,7 +1004,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Zonstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-cdo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-magics_template_parser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-nearpt3c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-results_template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdotest-cdotest.Po@am__quote@
@@ -4431,44 +4411,6 @@ cdotest-cdotest.obj: cdotest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cdotest.c' object='cdotest-cdotest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdotest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdotest-cdotest.obj `if test -f 'cdotest.c'; then $(CYGPATH_W) 'cdotest.c'; else $(CYGPATH_W) '$(srcdir)/cdotest.c'; fi`
-
-.cc.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
-
-.cc.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.cc.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
-
-cdo-nearpt3c.o: nearpt3c.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-nearpt3c.o -MD -MP -MF $(DEPDIR)/cdo-nearpt3c.Tpo -c -o cdo-nearpt3c.o `test -f 'nearpt3c.cc' || echo '$(srcdir)/'`nearpt3c.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-nearpt3c.Tpo $(DEPDIR)/cdo-nearpt3c.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nearpt3c.cc' object='cdo-nearpt3c.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-nearpt3c.o `test -f 'nearpt3c.cc' || echo '$(srcdir)/'`nearpt3c.cc
-
-cdo-nearpt3c.obj: nearpt3c.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cdo-nearpt3c.obj -MD -MP -MF $(DEPDIR)/cdo-nearpt3c.Tpo -c -o cdo-nearpt3c.obj `if test -f 'nearpt3c.cc'; then $(CYGPATH_W) 'nearpt3c.cc'; else $(CYGPATH_W) '$(srcdir)/nearpt3c.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-nearpt3c.Tpo $(DEPDIR)/cdo-nearpt3c.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nearpt3c.cc' object='cdo-nearpt3c.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cdo-nearpt3c.obj `if test -f 'nearpt3c.cc'; then $(CYGPATH_W) 'nearpt3c.cc'; else $(CYGPATH_W) '$(srcdir)/nearpt3c.cc'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

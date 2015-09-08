@@ -344,14 +344,13 @@ cdo_SOURCES += Adisit.c        \
                Zonstat.c       \
                cdo.h
 
-
-if ENABLE_NEARPT3
-cdo_SOURCES +=           \
-               nearpt3x.h      \
-               nearpt3c.h      \
-               nearpt3c.cc     \
-               cellsearchorder.h
-endif
+#if ENABLE_NEARPT3
+#cdo_SOURCES +=           \
+#               nearpt3x.h      \
+#               nearpt3c.h      \
+#               nearpt3c.cc     \
+#               cellsearchorder.h
+#endif
 
 if ENABLE_MAGICS
 cdo_SOURCES += Magplot.c       \

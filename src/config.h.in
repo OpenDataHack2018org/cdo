@@ -12,9 +12,6 @@
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA
 
-/* Define to 1 for nearpt3 support */
-#undef ENABLE_NEARPT3
-
 /* Define to 1 if you have the <cmor.h> header file. */
 #undef HAVE_CMOR_H
 

@@ -676,9 +676,6 @@ PTHREAD_LIBS
 PTHREAD_CC
 ax_pthread_config
 ENABLE_DATA
-ENABLE_NEARPT3_FALSE
-ENABLE_NEARPT3_TRUE
-ENABLE_NEARPT3
 SYSTEM_TYPE
 HOST_NAME
 USER_NAME
@@ -821,7 +818,6 @@ with_sysroot
 enable_libtool_lock
 enable_openmp
 enable_largefile
-enable_nearpt3
 enable_data
 with_threads
 with_zlib
@@ -1493,7 +1489,6 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-openmp        do not use OpenMP
   --disable-largefile     omit support for large files
-  --enable-nearpt3        nearpt3 support [default=no]
   --enable-data           DATA support [default=yes]
   --enable-grib           GRIB support [default=yes]
   --enable-cgribex        Use the CGRIBEX library [default=yes]
@@ -17695,32 +17690,14 @@ done
 
 #  ----------------------------------------------------------------------
 #  Enable NEARPT3 support
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for nearpt3 support" >&5
-$as_echo_n "checking for nearpt3 support... " >&6; }
-# Check whether --enable-nearpt3 was given.
-if test "${enable_nearpt3+set}" = set; then :
-  enableval=$enable_nearpt3;
-fi
-
-if test "x$enable_nearpt3" = "xyes"; then :
-
-
-$as_echo "#define ENABLE_NEARPT3 1" >>confdefs.h
-
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_nearpt3" >&5
-$as_echo "$enable_nearpt3" >&6; }
-ENABLE_NEARPT3=$enable_nearpt3
-
- if test x$enable_nearpt3 = 'xyes'; then
-  ENABLE_NEARPT3_TRUE=
-  ENABLE_NEARPT3_FALSE='#'
-else
-  ENABLE_NEARPT3_TRUE='#'
-  ENABLE_NEARPT3_FALSE=
-fi
-
+# AC_MSG_CHECKING([for nearpt3 support])
+# AC_ARG_ENABLE([nearpt3], AS_HELP_STRING([--enable-nearpt3],[nearpt3 support [default=no]]))
+# AS_IF([test "x$enable_nearpt3" = "xyes"], [
+#   AC_DEFINE(ENABLE_NEARPT3, [1], [Define to 1 for nearpt3 support])
+# ])
+# AC_MSG_RESULT([$enable_nearpt3])
+# AC_SUBST([ENABLE_NEARPT3],[$enable_nearpt3])
+# AM_CONDITIONAL([ENABLE_NEARPT3],[test x$enable_nearpt3 = 'xyes'])
 #  ----------------------------------------------------------------------
 #  Enable DATA support
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for DATA support" >&5
@@ -21402,10 +21379,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_NEARPT3_TRUE}" && test -z "${ENABLE_NEARPT3_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_NEARPT3\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_MAGICS_TRUE}" && test -z "${ENABLE_MAGICS_FALSE}"; then
