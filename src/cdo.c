@@ -744,6 +744,18 @@ void get_env_vars(void)
         }
     }
 
+  envstr = getenv("CDO_VERSION_INFO");
+  if ( envstr )
+    {
+      int ival = atoi(envstr);
+      if ( ival == 0 || ival == 1 )
+        {
+          CDO_Version_Info = ival;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_Version_Info = %s\n", envstr);
+        }
+    }
+
   envstr = getenv("CDO_COLOR");
   if ( envstr )
     {

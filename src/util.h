@@ -90,15 +90,14 @@ extern int cdoExpMode;
 
 extern int CDO_Color;
 extern int CDO_Use_FFTW;
+extern int CDO_Version_Info;
 extern int cdoDiag;
 
 extern int cdoNumVarnames;
 extern char **cdoVarnames;
 extern char CDO_File_Suffix[32]; // refactor: added keyword extern
 
-
-/* moved here from *.c */
-extern char CDO_Version[]; // refactor: moved here from pstream.c
+extern const char *CDO_Version;
 
 
 typedef struct {

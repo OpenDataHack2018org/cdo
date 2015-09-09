@@ -962,7 +962,7 @@ const char *cdoComment(void)
       comment[size] = 0;
     }
 
-  return (comment);
+  return comment;
 }
 
 static
@@ -1067,7 +1067,8 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 	    vlistDefVarChunkType(vlistID, varID, cdoChunkType);
 	}
 
-      vlistDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment());
+      if ( CDO_Version_Info )
+        vlistDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment());
 
 #if defined(_OPENMP)
       if ( ompNumThreads > 1 )

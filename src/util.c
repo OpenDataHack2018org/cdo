@@ -58,7 +58,7 @@ int CDO_optind = 1;      // refactor: moved here from cdo_getopt.c
 /* refactor: moved here from cdo.c */
 
 char *Progname;
-char CDO_Version[] = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)"; // refactor: moved here from cdo.c
+const char *CDO_Version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
 
 int ompNumThreads = 1;
 
@@ -66,7 +66,7 @@ int stdin_is_tty  = 0;
 int stdout_is_tty = 0;
 int stderr_is_tty = 0;
 
-char* cdoGridSearchDir   = NULL;
+char *cdoGridSearchDir   = NULL;
 
 int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
@@ -80,6 +80,7 @@ int cdoCheckDatarange    = FALSE;
 
 int CDO_Color            = FALSE;
 int CDO_Use_FFTW         = TRUE;
+int CDO_Version_Info     = TRUE;
 int cdoDiag              = FALSE;
 
 int CDO_Reduce_Dim       = FALSE;
