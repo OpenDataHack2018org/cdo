@@ -80,7 +80,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cdo$(EXEEXT)
-
 #if ENABLE_NEARPT3
 #cdo_SOURCES +=           \
 #               nearpt3x.h      \
@@ -210,11 +209,12 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
 	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
 	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
-	Yseasstat.c Zonstat.c cdo.h Magplot.c Magvector.c Maggraph.c \
-	template_parser.h template_parser.c results_template_parser.h \
-	results_template_parser.c magics_template_parser.h \
-	magics_template_parser.c StringUtilities.h StringUtilities.c \
-	CdoMagicsMapper.h CdoMagicsMapper.c
+	Yseasstat.c Zonstat.c cdo.h nearpt3c.h Magplot.c Magvector.c \
+	Maggraph.c template_parser.h template_parser.c \
+	results_template_parser.h results_template_parser.c \
+	magics_template_parser.h magics_template_parser.c \
+	StringUtilities.h StringUtilities.c CdoMagicsMapper.h \
+	CdoMagicsMapper.c
 @ENABLE_MAGICS_TRUE@am__objects_1 = cdo-Magplot.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-Magvector.$(OBJEXT) \
 @ENABLE_MAGICS_TRUE@	cdo-Maggraph.$(OBJEXT) \
@@ -624,7 +624,7 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Writegrid.c Writerandom.c YAR.c Yearmonstat.c Ydayarith.c \
 	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
 	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
-	Yseasstat.c Zonstat.c cdo.h $(am__append_1)
+	Yseasstat.c Zonstat.c cdo.h nearpt3c.h $(am__append_1)
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
 cdo_LDFLAGS = $(am__append_2)

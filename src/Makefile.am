@@ -344,6 +344,7 @@ cdo_SOURCES += Adisit.c        \
                Zonstat.c       \
                cdo.h
 
+cdo_SOURCES += nearpt3c.h
 #if ENABLE_NEARPT3
 #cdo_SOURCES +=           \
 #               nearpt3x.h      \

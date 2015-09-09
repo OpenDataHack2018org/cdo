@@ -697,6 +697,18 @@ void get_env_vars(void)
         }
     }
 
+  envstr = getenv("CDO_HISTORY_INFO");
+  if ( envstr )
+    {
+      int ival = atoi(envstr);
+      if ( ival == 0 || ival == 1 )
+        {
+          CDO_Append_History = ival;
+          if ( cdoVerbose )
+            fprintf(stderr, "CDO_HISTORY_INFO = %s\n", envstr);
+        }
+    }
+
   CDO_File_Suffix[0] = 0;
 
   envstr = getenv("CDO_FILE_SUFFIX");
@@ -1379,18 +1391,21 @@ void cdo_rusage(void)
   struct rusage ru;
   int status = getrusage(RUSAGE_SELF, &ru);
 
-  double ut = ru.ru_utime.tv_sec + 0.000001 * ru.ru_utime.tv_usec;
-  double st = ru.ru_stime.tv_sec + 0.000001 * ru.ru_stime.tv_usec;
+  if ( status == 0 )
+    {
+      double ut = ru.ru_utime.tv_sec + 0.000001 * ru.ru_utime.tv_usec;
+      double st = ru.ru_stime.tv_sec + 0.000001 * ru.ru_stime.tv_usec;
 
-  fprintf(stderr, "  User time:     %.3f seconds\n", ut);
-  fprintf(stderr, "  System time:   %.3f seconds\n", st);
-  fprintf(stderr, "  Total time:    %.3f seconds\n", ut+st);
-  fprintf(stderr, "  Memory usage:  %.2f MBytes\n", ru.ru_maxrss/(1024.*1024.));
-  fprintf(stderr, "  Page reclaims: %5ld page%s\n", ru.ru_minflt, ADD_PLURAL(ru.ru_minflt));
-  fprintf(stderr, "  Page faults:   %5ld page%s\n", ru.ru_majflt, ADD_PLURAL(ru.ru_majflt));
-  fprintf(stderr, "  Swaps:         %5ld\n", ru.ru_nswap);
-  fprintf(stderr, "  Disk read:     %5ld block%s\n", ru.ru_inblock, ADD_PLURAL(ru.ru_inblock));
-  fprintf(stderr, "  Disk Write:    %5ld block%s\n", ru.ru_oublock, ADD_PLURAL(ru.ru_oublock));
+      fprintf(stderr, "  User time:     %.3f seconds\n", ut);
+      fprintf(stderr, "  System time:   %.3f seconds\n", st);
+      fprintf(stderr, "  Total time:    %.3f seconds\n", ut+st);
+      fprintf(stderr, "  Memory usage:  %.2f MBytes\n", ru.ru_maxrss/(1024.*1024.));
+      fprintf(stderr, "  Page reclaims: %5ld page%s\n", ru.ru_minflt, ADD_PLURAL(ru.ru_minflt));
+      fprintf(stderr, "  Page faults:   %5ld page%s\n", ru.ru_majflt, ADD_PLURAL(ru.ru_majflt));
+      fprintf(stderr, "  Swaps:         %5ld\n", ru.ru_nswap);
+      fprintf(stderr, "  Disk read:     %5ld block%s\n", ru.ru_inblock, ADD_PLURAL(ru.ru_inblock));
+      fprintf(stderr, "  Disk Write:    %5ld block%s\n", ru.ru_oublock, ADD_PLURAL(ru.ru_oublock));
+    }
 #endif
 }
 
