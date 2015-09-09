@@ -348,21 +348,21 @@ int pstreamOpenRead(const argument_t *argument)
 	cdoPrint("Started child process \"%s\".", newarg+1);
 
       status = pthread_attr_init(&attr);
-      if ( status ) SysError("pthread_attr_init failed for '%s'\n", newarg+1);
+      if ( status ) SysError("pthread_attr_init failed for '%s'", newarg+1);
       status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-      if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'\n", newarg+1);
+      if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'", newarg+1);
       /*
       param.sched_priority = 0;
       status = pthread_attr_setschedparam(&attr, &param);
-      if ( status ) SysError("pthread_attr_setschedparam failed for '%s'\n", newarg+1);
+      if ( status ) SysError("pthread_attr_setschedparam failed for '%s'", newarg+1);
       */
       /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
-      /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'\n", newarg+1); */
+      /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'", newarg+1); */
 
       pthread_attr_getscope(&attr, &pthreadScope);
 
       /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
-      /* if ( status ) SysError("pthread_attr_setscope failed for '%s'\n", newarg+1); */
+      /* if ( status ) SysError("pthread_attr_setscope failed for '%s'", newarg+1); */
       /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
       /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
 
@@ -377,7 +377,7 @@ int pstreamOpenRead(const argument_t *argument)
       if ( rval != 0 )
 	{
 	  errno = rval;
-	  SysError("pthread_create failed for '%s'\n", newarg+1);
+	  SysError("pthread_create failed for '%s'", newarg+1);
 	}
 
       /* free(operatorName); */
@@ -856,7 +856,7 @@ void pstreamClose(int pstreamID)
   else
     {
       if ( PSTREAM_Debug )
-	Message("%s fileID %d\n", pstreamptr->name, pstreamptr->fileID);
+	Message("%s fileID %d", pstreamptr->name, pstreamptr->fileID);
 
       if ( pstreamptr->mode == 'r' )
 	{

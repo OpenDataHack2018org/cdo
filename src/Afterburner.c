@@ -528,7 +528,7 @@ void after_setEndOfInterval(struct Control *globs, int nrecs)
       else if ( globs->OutputInterval == UNLIM_INTERVAL )
 	globs->EndOfInterval = FALSE;
       else
-	Error( "output interval %d not implemented!\n", globs->OutputInterval);
+	Error( "output interval %d not implemented!", globs->OutputInterval);
     }
 }
 
@@ -1428,7 +1428,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
     }
 
   if ( globs->Truncation == 0 && globs->Latitudes == 0 )
-    Error("Unsupported file structure!\n");
+    Error("Unsupported file structure!");
 
   if ( globs->Truncation == 0 )
     {
@@ -1607,7 +1607,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
     }
 
   if ( globs->Debug )
-    Message( "FieldDim = %d\n", FieldDim);
+    Message( "FieldDim = %d", FieldDim);
 
   globs->Field = (double *) malloc(FieldDim*sizeof(double));
 
@@ -2237,7 +2237,7 @@ int afterburner(int argc, char *argv[])
     switch (c)
       {
       case 'a': globs->AnalysisData = 1; break;
-      case 'b': Message( "option -b not longer needed!\n"); break;
+      case 'b': Message( "option -b not longer needed!"); break;
       case 'c': after_printCodes(); break;
       case 'd': globs->Debug = 1; break;
       case 'p': ParallelRead = TRUE; break;
