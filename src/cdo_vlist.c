@@ -93,10 +93,12 @@ void compare_grid_unstructured(int gridID1, int gridID2)
   gridInqXvals(gridID2, xvals2);
   gridInqYvals(gridID1, yvals1);
   gridInqYvals(gridID2, yvals2);
-		  
-  for ( int i = 0; i < gridsize; ++i )
-    if ( fabs(xvals1[i] - xvals2[i]) > 1.e-5 || fabs(yvals1[i] - yvals2[i]) > 1.e-5 )
+
+  int inc = gridsize > 10000 ? gridsize/1000 : 1;
+  for ( int i = 0; i < gridsize; i += inc )
+    if ( fabs(xvals1[i] - xvals2[i]) > 2.e-5 || fabs(yvals1[i] - yvals2[i]) > 2.e-5 )
       {
+        // printf("%g %g %g %g %g %g\n", xvals1[i], xvals2[i], yvals1[i], yvals2[i], xvals1[i] - xvals2[i], yvals1[i] - yvals2[i]);
 	cdoWarning("Geographic location of some grid points differ!");
 	break;
       }
