@@ -32,9 +32,9 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
   if ( lamrot > 180.0 ) lamrot -= 360.0;
   zlamrot = DEG2RAD*lamrot;
 
-  if ( polgam > 0 )
+  if ( fabs(polgam) > 0 )
     {
-      zgam  = DEG2RAD*polgam;
+      zgam  = -DEG2RAD*polgam;
       zarg1 = sin(zlampol) *                                               
  	    (- zsinpol*cos(zphirot) * (cos(zlamrot)*cos(zgam) - sin(zlamrot)*sin(zgam)) 
  	     + zcospol*sin(zphirot))                                              
@@ -90,9 +90,9 @@ double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
   if ( lamrot > 180.0 ) lamrot -= 360.0;
   zlamrot   = DEG2RAD*lamrot;
 
-  if ( polgam > 0 )
+  if ( fabs(polgam) > 0 )
     {
-      zgam = DEG2RAD*polgam;
+      zgam = -DEG2RAD*polgam;
       zarg = zsinpol*sin(zphirot) +
              zcospol*cos(zphirot)*(cos(zlamrot)*cos(zgam) - sin(zgam)*sin(zlamrot));
     }
