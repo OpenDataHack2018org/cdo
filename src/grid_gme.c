@@ -580,9 +580,9 @@ void xd(double *p, int kip1s, int kip1e, int kip2s, int kip2e, int knd,
   tmp9 = pxinfo.dim[1].mult;
   tmp10 = pxinfo.dim[2].mult;
   tmp8 = pxinfo.offset;
-  tmp1 = pxinfo.dim[0].extent;
-  tmp2 = pxinfo.dim[1].extent;
-  tmp6 = pxinfo.dim[2].extent;
+  //tmp1 = pxinfo.dim[0].extent;
+  //tmp2 = pxinfo.dim[1].extent;
+  //tmp6 = pxinfo.dim[2].extent;
   
   for(jd = 1;jd <= knd;jd++) {
     for(j2 = kip2s;j2 <= kip2e;j2++) {
@@ -989,7 +989,7 @@ void initmask(int *mask, int ni, int nd)
 {
   int jd;
 
-  int tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8, tmp9;
+  int tmp1, tmp2, /*tmp3, tmp4, tmp5,*/ tmp6, tmp7, tmp8, tmp9;
 
   int *ptmp1;
   char *ptmp2;
@@ -1019,9 +1019,9 @@ void initmask(int *mask, int ni, int nd)
   maskinfo.dim[2].extent = tmp1;
   maskinfo.dim[2].mult = tmp2;
   maskinfo.offset -= maskinfo.dim[2].mult;
-  tmp4 = maskinfo.dim[1].mult;
-  tmp5 = maskinfo.dim[2].mult;
-  tmp3 = maskinfo.offset;
+  //tmp4 = maskinfo.dim[1].mult;
+  //tmp5 = maskinfo.dim[2].mult;
+  //tmp3 = maskinfo.offset;
   tmp1 = maskinfo.dim[0].extent;
   tmp2 = maskinfo.dim[1].extent;
   tmp9 = maskinfo.dim[2].extent;

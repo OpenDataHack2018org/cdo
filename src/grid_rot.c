@@ -182,13 +182,12 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
     u      : zonaler wind im geographischen system
     v      : merid. wind im geographischen system
   */
-  double zpolphi, zpollam, zrla, zphi, pollamd, zrlas, zarg, zbeta;
+  double zpolphi, zpollam, zrla, pollamd, zrlas, zarg, zbeta;
 
   /* umrechnung von grad in bogenmass */
   zpolphi = polphi*DEG2RAD;
   zpollam = pollam*DEG2RAD;
   zrla    = rla   *DEG2RAD;
-  zphi    = phi   *DEG2RAD;
   pollamd = pollam;
   if ( pollamd < 0.0 ) pollamd += 360.0;
 

@@ -189,8 +189,6 @@ void *FC(void *argument)
 	    }
 
 	  gridID2 = gridIDfc;
-	  nfc  = gridInqSize(gridID2);
-
 	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
  	}
     }

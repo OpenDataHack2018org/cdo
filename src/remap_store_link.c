@@ -63,21 +63,24 @@ void sort_add_and_wgts(size_t num_weights, int *src_add, double *wgts)
     if ( src_add[n] < src_add[n-1] ) break;
   if ( n == num_weights ) return;
 
-  addweight_t addweights[num_weights];
-
-  for ( n = 0; n < num_weights; ++n )
+  if ( num_weights )
     {
-      addweights[n].add    = src_add[n];
-      addweights[n].weight = wgts[n];
+      addweight_t addweights[num_weights];
+
+      for ( n = 0; n < num_weights; ++n )
+        {
+          addweights[n].add    = src_add[n];
+          addweights[n].weight = wgts[n];
+        }
+
+      qsort(addweights, num_weights, sizeof(addweight_t), cmp_adds);
+
+      for ( n = 0; n < num_weights; ++n )
+        {
+          src_add[n] = addweights[n].add;
+          wgts[n]    = addweights[n].weight;
+        }  
     }
-
-  qsort(addweights, num_weights, sizeof(addweight_t), cmp_adds);
-
-  for ( n = 0; n < num_weights; ++n )
-    {
-      src_add[n] = addweights[n].add;
-      wgts[n]    = addweights[n].weight;
-    }  
 }
 
 
@@ -89,23 +92,26 @@ void sort_add_and_wgts4(size_t num_weights, int *src_add, double wgts[4][4])
     if ( src_add[n] < src_add[n-1] ) break;
   if ( n == num_weights ) return;
 
-  addweight4_t addweights[num_weights];
-
-  for ( n = 0; n < num_weights; ++n )
+  if ( num_weights )
     {
-      addweights[n].add       = src_add[n];
-      for ( long k = 0; k < 4; ++k )
-	addweights[n].weight[k] = wgts[n][k];
+      addweight4_t addweights[num_weights];
+
+      for ( n = 0; n < num_weights; ++n )
+        {
+          addweights[n].add       = src_add[n];
+          for ( long k = 0; k < 4; ++k )
+            addweights[n].weight[k] = wgts[n][k];
+        }
+
+      qsort(addweights, num_weights, sizeof(addweight4_t), cmp_adds4);
+
+      for ( n = 0; n < num_weights; ++n )
+        {
+          src_add[n] = addweights[n].add;
+          for ( long k = 0; k < 4; ++k )
+            wgts[n][k] = addweights[n].weight[k];
+        }
     }
-
-  qsort(addweights, num_weights, sizeof(addweight4_t), cmp_adds4);
-
-  for ( n = 0; n < num_weights; ++n )
-    {
-      src_add[n] = addweights[n].add;
-      for ( long k = 0; k < 4; ++k )
-	wgts[n][k] = addweights[n].weight[k];
-    }  
 }
 
 

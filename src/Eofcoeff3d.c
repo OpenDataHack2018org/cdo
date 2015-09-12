@@ -82,7 +82,6 @@ void *Eofcoeff3d(void * argument)
     cdoAbort("Too many grids in input");
   
   nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
-  nrecs = vlistNrecs(vlistID1); 
   nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
   //w = (double*) malloc(gridsize*sizeof(double));
   //gridWeights(gridID2, w);
@@ -162,7 +161,6 @@ void *Eofcoeff3d(void * argument)
   
   // open streams for eofcoeff output
   streamIDs = (int*) malloc(neof*sizeof(int)); 
-  eofID = 0;
   for ( eofID = 0; eofID < neof; eofID++)
     {
       oname[nchars] = '\0';                       

@@ -208,8 +208,6 @@ void *Adisit(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID  = vlistInqVarGrid(vlistID1, varID);
-
       code = vlistInqVarCode(vlistID1, varID);
 
       if ( code <= 0 )

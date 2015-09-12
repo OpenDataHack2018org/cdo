@@ -109,8 +109,6 @@ void *Split(void *argument)
   int vlistID1 = streamInqVlist(streamID1);
 
   int nvars  = vlistNvars(vlistID1);
-  int nrecs  = vlistNrecs(vlistID1);
-  int nzaxis = vlistNzaxis(vlistID1);
 
   if ( swap_obase == 0 )
     {
@@ -328,7 +326,7 @@ void *Split(void *argument)
   else if ( operatorID == SPLITLEVEL )
     {
       double level;
-      nzaxis = vlistNzaxis(vlistID1);
+      int nzaxis = vlistNzaxis(vlistID1);
       nsplit = 0;
       for ( index = 0; index < nzaxis; index++ )
 	{
@@ -485,6 +483,7 @@ void *Split(void *argument)
       array = (double *) malloc(gridsize*sizeof(double));
     }
 
+  int nrecs;
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {

@@ -34,7 +34,6 @@ void *Gengrid(void *argument)
   int gridID1, gridID2, gridID3;
   int zaxisID3;
   int datatype;
-  int nrecs;
   int tsID, varID, levelID;
   int gridsize, i;
   int xsize, ysize;
@@ -65,10 +64,6 @@ void *Gengrid(void *argument)
   array1 = (double*) malloc(gridsize*sizeof(double));
   array2 = (double*) malloc(gridsize*sizeof(double));
   array3 = (double*) malloc(gridsize*sizeof(double));
-
-  tsID = 0;
-  nrecs = streamInqTimestep(streamID1, tsID);
-  nrecs = streamInqTimestep(streamID2, tsID);
 
   streamInqRecord(streamID1, &varID, &levelID);
   streamReadRecord(streamID1, array1, &nmiss1);

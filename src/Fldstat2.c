@@ -105,7 +105,7 @@ void *Fldstat2(void *argument)
   int needWeights = TRUE;
   int nmiss1, nmiss2, nmiss3;
   double missval1, missval2;
-  double sglval;
+  double sglval = 0;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);

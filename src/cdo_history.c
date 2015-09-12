@@ -78,10 +78,9 @@ void cdoInqHistory(int fileID)
 }
 
 
-void cdoDefHistory(int fileID, char* histstring)
+void cdoDefHistory(int fileID, char *histstring)
 {
-  char* strtimeptr = NULL;
-  char* history = NULL;
+  char *strtimeptr = NULL;
   size_t historysize = 0;
 
   if ( !CDO_Reset_History ) historysize += ghistorysize+1;
@@ -94,25 +93,22 @@ void cdoDefHistory(int fileID, char* histstring)
 
   if ( historysize )
     {
-      history = (char*) malloc(historysize);
+      char *history = (char*) malloc(historysize);
       history[0] = 0;
-    }
 
-  if ( CDO_Append_History )
-    {
-      strcpy(history, strtimeptr);
-      strcat(history, histstring);
-    }
+      if ( CDO_Append_History )
+        {
+          if ( strtimeptr ) strcpy(history, strtimeptr);
+          strcat(history, histstring);
+        }
 
-  if ( !CDO_Reset_History )
-    if ( ghistory )
-      {
-	if ( CDO_Append_History ) strcat(history, "\n");
-	strcat(history, ghistory);
-      }
+      if ( !CDO_Reset_History )
+        if ( ghistory )
+          {
+            if ( CDO_Append_History ) strcat(history, "\n");
+            strcat(history, ghistory);
+          }
   
-  if ( historysize )
-    {
       streamDefHistory(fileID, strlen(history), history);
       free(history);
     }

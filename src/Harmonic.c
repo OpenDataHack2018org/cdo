@@ -145,7 +145,6 @@ void *Harmonic(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  offset   = gridsize*levelID;
 
 	  streamReadRecord(streamID1, array, &nmiss);

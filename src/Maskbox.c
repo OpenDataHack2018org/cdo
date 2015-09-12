@@ -46,7 +46,6 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
   while ( readline(fp, line, MAX_LINE) )
     {
       i = 0;
-      xcoord = 0;
       if ( line[0] == '#' ) 
          { 
            jumpedlines++;

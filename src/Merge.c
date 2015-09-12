@@ -200,7 +200,6 @@ void *Merge(void *argument)
   int numconst = 0;
   for ( index = 0; index < nmerge; index++ )
     {
-      streamID1 = streamIDs[index];
       vlistID1  = vlistIDs[index];
       numsteps[index] = vlistNtsteps(vlistID1);
       if ( numsteps[index] == 0 ) numsteps[index] = 1;

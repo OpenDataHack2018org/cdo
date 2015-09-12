@@ -910,7 +910,6 @@ int operatorInqModID(char *operatorName)
     {
       for ( i = 0; i < NumModules; i++ )
 	{
-	  j = 0;
 	  for ( j = 0; j < MAX_MOD_OPERATORS; j++ )
 	    {
 	      if ( Modules[i].operators[j] == NULL ) break;
@@ -933,10 +932,9 @@ int operatorInqModID(char *operatorName)
 
   if ( modID == -1 )
     {
-      FILE *fp;
       int nbyte;
       int error = TRUE;
-      fp = fopen(operatorName, "r");
+      FILE *fp = fopen(operatorName, "r");
       if ( fp )
 	{
 	  fclose(fp);

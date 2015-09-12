@@ -198,14 +198,6 @@ double extra_T(double pres, double halfp, double fullp, double geop, double temp
 
   if ( ztmsl > 290.5 && tstar <= 290.5 ) ztmsl=290.5;
 
-  zalph = PlanetRD*zlapse*zrg;
-
-  if ( ztmsl-tstar < 0.000001 && tstar-ztmsl < 0.000001 ) zalph=0.0;
-
-  if ( (ztmsl-tstar > 0.000001 || tstar-ztmsl > 0.000001 ) &&
-       (geop > 0.0001 || geop < -0.0001) )
-    zalph = PlanetRD*(ztmsl-tstar)/geop;
-
   if ( pres <= halfp )
     peval = ((halfp-pres)*temp+ (pres-fullp)*tstar)/ (halfp-fullp);
   else

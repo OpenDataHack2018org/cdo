@@ -751,21 +751,16 @@ void *Remapeta(void *argument)
 	{
 	  varID = varids[iv];
 
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
 	  if ( operatorID == REMAPETAS )
 	    {
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      vert_sum(sum1, vars1[iv], gridsize, nhlevf1);
-
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      vert_sum(sum2, vars2[iv], gridsize, nhlevf2);
 	    }
 	  else if ( operatorID == REMAPETAZ )
 	    {
 	      int k;
-
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
 	      presh(NULL, half_press1, vct1, ps1, nhlevf1, gridsize);
 	      for ( k = 0; k < nhlevf1; ++k )
@@ -775,8 +770,6 @@ void *Remapeta(void *argument)
 		    deltap1[k*gridsize+i] = log(deltap1[k*gridsize+i]);
 		  }
 	      vert_sumw(sum1, vars1[iv], gridsize, nhlevf1, deltap1);
-
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
 	      presh(NULL, half_press2, vct2, ps1, nhlevf2, gridsize);
 	      for ( k = 0; k < nhlevf2; ++k )

@@ -237,8 +237,8 @@ void *Intntime(void *argument)
 	  vardata2[varID] = vardatap;
 	}
 
-      vdate1 = vdate2;
-      vtime1 = vtime2;
+      //vdate1 = vdate2;
+      //vtime1 = vtime2;
       juldate1 = juldate2;
     }
 

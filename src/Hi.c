@@ -97,7 +97,7 @@ void *Hi(void *argument)
   int varID1, varID2, varID3, varID4;
   int levelID1, levelID2, levelID3;
   int vlistID1, vlistID2, vlistID3, vlistID4;
-  int taxisID1, taxisID2, taxisID3, taxisID4;
+  int taxisID1, /*taxisID2, taxisID3,*/ taxisID4;
   field_t field1, field2, field3;
 
   cdoInitialize(argument);
@@ -112,8 +112,8 @@ void *Hi(void *argument)
   vlistID3 = streamInqVlist(streamID3);
 
   taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = vlistInqTaxis(vlistID3);
+  //taxisID2 = vlistInqTaxis(vlistID2);
+  //taxisID3 = vlistInqTaxis(vlistID3);
 
   vlistCompare(vlistID1, vlistID2, CMP_DIM);
   vlistCompare(vlistID1, vlistID3, CMP_DIM);

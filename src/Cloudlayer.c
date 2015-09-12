@@ -164,10 +164,7 @@ void *Cloudlayer(void *argument)
   int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      nlevel   = zaxisInqSize(zaxisID);
-
       code = vlistInqVarCode(vlistID1, varID);
 
       if ( code <= 0 )

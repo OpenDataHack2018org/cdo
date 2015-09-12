@@ -91,11 +91,10 @@ void *EOF3d(void * argument)
 
   int streamID1  = streamOpenRead(cdoStreamName(0));
   int vlistID1   = streamInqVlist(streamID1);
-  int taxisID1   = vlistInqTaxis(vlistID1);
   int gridID1    = vlistInqVarGrid(vlistID1, 0);
   long gridsize  = vlistGridsizeMax(vlistID1);
   int nvars      = vlistNvars(vlistID1);
-  int nrecs      = vlistNrecs(vlistID1);
+  int nrecs;
 
   double *weight = (double *) malloc(gridsize*sizeof(double));
   for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
@@ -136,7 +135,7 @@ void *EOF3d(void * argument)
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   vlistID1  = streamInqVlist(streamID1);
-  taxisID1  = vlistInqTaxis(vlistID1);
+  int taxisID1  = vlistInqTaxis(vlistID1);
 
   /* reset the requested number of eigen-function to the maximum if neccessary */
   if ( n_eig > nts )
@@ -160,7 +159,6 @@ void *EOF3d(void * argument)
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridID1             = vlistInqVarGrid(vlistID1, varID);
       gridsize            = vlistGridsizeMax(vlistID1);
       nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       temp_size           = gridsize * nlevs;

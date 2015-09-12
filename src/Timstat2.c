@@ -188,6 +188,8 @@ void *Timstat2(void *argument)
       vtime = taxisInqVtime(taxisID1);
 
       nrecs2 = streamInqTimestep(streamID2, tsID);
+      if ( nrecs != nrecs2 )
+        cdoWarning("Input streams have different number of records!");
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{

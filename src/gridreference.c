@@ -30,6 +30,7 @@
 /*
  * callback function for curl for writing the network retrieved grid file
  */
+#if defined(HAVE_LIBCURL)
 static
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
@@ -37,6 +38,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
   written = fwrite(ptr, size, nmemb, stream);
   return written;
 }
+#endif
 
 /* code from grid_tools.2 */
 int download_gridfile(const char *restrict uri, const char *restrict basename)

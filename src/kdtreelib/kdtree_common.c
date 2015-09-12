@@ -181,7 +181,7 @@ kd_doBuildTree(void *threadarg)
     int (*qcomp) (const void *, const void *);
     if      ( sortaxis == 0 ) qcomp = _compPoints0;
     else if ( sortaxis == 1 ) qcomp = _compPoints1;
-    else if ( sortaxis == 2 ) qcomp = _compPoints2;
+    else                      qcomp = _compPoints2;
 
     pmergesort(points, nPoints, sizeof(struct kd_point), qcomp, max_threads);
     pivot = nPoints / 2;

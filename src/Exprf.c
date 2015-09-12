@@ -227,7 +227,6 @@ void *Expr(void *argument)
 	  if ( parse_arg.var_needed[varID] )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      offset   = gridsize*levelID;
 	      single1  = parse_arg.vardata1[varID] + offset;
 	      streamReadRecord(streamID1, single1, &nmiss);

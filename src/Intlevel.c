@@ -349,7 +349,6 @@ void *Intlevel(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
 	  

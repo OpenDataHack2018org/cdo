@@ -41,10 +41,10 @@
 void *Ensstat(void *argument)
 {
   int i;
-  int varID, recID;
+  int varID = 0, recID;
   int gridID;
   int nrecs, nrecs0;
-  int levelID;
+  int levelID = 0;
   int streamID = 0;
   int nmiss;
   int fileID;

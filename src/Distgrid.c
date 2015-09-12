@@ -228,7 +228,6 @@ void *Distgrid(void *argument)
   sgrid_t *grids = (sgrid_t*) malloc(ngrids*sizeof(sgrid_t));
   for ( i = 0; i < ngrids; i++ )
     {  
-      gridID1 = vlistGrid(vlistID1, i);
       grids[i].gridID    = vlistGrid(vlistID1, i);
       grids[i].gridIDs   = (int*) malloc(nsplit*sizeof(int));
       grids[i].gridsize  = (int*) malloc(nsplit*sizeof(int));

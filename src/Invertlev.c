@@ -162,9 +162,7 @@ void *Invertlev(void *argument)
 	  if ( vardata[varID] )
 	    {    
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	      gridsize = gridInqSize(gridID);
-	      nlevel   = zaxisInqSize(zaxisID);
 	      offset   = gridsize*levelID;
 
 	      streamReadRecord(streamID1, vardata[varID]+offset, &nmiss);

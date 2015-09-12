@@ -259,7 +259,8 @@ void *Info(void *argument)
   char vdatestr[32], vtimestr[32];
   double missval;
   double level;
-  double arrmin = 0, arrmax = 0, arrmean = 0, arrvar = 0;
+  double arrmin = 0, arrmax = 0, arrmean = 0;
+  // double arrvar = 0;
 
   cdoInitialize(argument);
 
@@ -362,7 +363,7 @@ void *Info(void *argument)
 			{
 			  ivals   = 0;
 			  arrmean = 0;
-			  arrvar  = 0;
+			  //arrvar  = 0;
 			  arrmin  =  1.e300;
 			  arrmax  = -1.e300;
 			  for ( i = 0; i < gridsize; ++i )
@@ -372,7 +373,7 @@ void *Info(void *argument)
 				  if ( array[i] < arrmin ) arrmin = array[i];
 				  if ( array[i] > arrmax ) arrmax = array[i];
 				  arrmean += array[i];
-				  arrvar  += array[i]*array[i];
+				  //arrvar  += array[i]*array[i];
 				  ivals++;
 				}
 			    }
@@ -382,7 +383,7 @@ void *Info(void *argument)
 		      else
 			{
 			  arrmean = array[0];
-			  arrvar  = array[0];
+			  //arrvar  = array[0];
 			  arrmin  = array[0];
 			  arrmax  = array[0];
                           // #pragma omp parallel for default(none) shared(arrmin, arrmax, array, gridsize) reduction(+:arrmean, arrvar)

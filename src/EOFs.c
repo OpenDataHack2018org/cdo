@@ -221,7 +221,7 @@ void *EOFs(void * argument)
   int gridID1   = vlistInqVarGrid(vlistID1, 0);
   int gridsize  = vlistGridsizeMax(vlistID1);
   int nvars     = vlistNvars(vlistID1);
-  int nrecs     = vlistNrecs(vlistID1);
+  int nrecs;
 
   int ngrids = vlistNgrids(vlistID1);
   for ( int index = 1; index < ngrids; index++ )
@@ -329,7 +329,6 @@ void *EOFs(void * argument)
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridID1  = vlistInqVarGrid(vlistID1, varID);
       gridsize = vlistGridsizeMax(vlistID1);
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval  = vlistInqVarMissval(vlistID1, varID);

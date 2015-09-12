@@ -324,8 +324,6 @@ void *Vertintap(void *argument)
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
       nlevel   = zaxisInqSize(zaxisID);
 
-      param    = vlistInqVarParam(vlistID1, varID);
-
       vlistInqVarStdname(vlistID1, varID, stdname);
       strtolower(stdname);
 
@@ -395,9 +393,9 @@ void *Vertintap(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
+	  /*
 	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	  nlevel   = zaxisInqSize(zaxisID);
-	  /*
 	  if ( sortlevels && zaxisIDh != -1 && zaxisID == zaxisIDh && nlevel == nhlev )
 	    {
 	      levelID = (int) (zaxisInqLevel(zaxisIDh, levelID)-1);
@@ -461,7 +459,6 @@ void *Vertintap(void *argument)
 	{
 	  if ( vars[varID] )
 	    {
-	      gridID   = vlistInqVarGrid(vlistID1, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 	      nlevel   = zaxisInqSize(zaxisID);

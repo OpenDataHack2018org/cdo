@@ -409,7 +409,6 @@ void *Collgrid(void *argument)
       gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       if ( gridsize > gridsizemax ) gridsizemax = gridsize;
     }
-  gridsize = gridsizemax;
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) malloc(gridsizemax*sizeof(double));

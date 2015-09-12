@@ -132,7 +132,7 @@ void *Timstat3(void *argument)
       gridsize = vlistGridsizeMax(vlistID[0]);
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID[0], varID));
       missval  = missval1 = vlistInqVarMissval(vlistID[0], varID);
-      missval2 = vlistInqVarMissval(vlistID[1], varID); 
+      // missval2 = vlistInqVarMissval(vlistID[1], varID); 
 
       for ( iw = 0; iw < NFWORK; ++iw )
 	fwork[iw][varID] = (field_t*) malloc(nlevs*sizeof(field_t));

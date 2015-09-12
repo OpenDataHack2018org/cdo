@@ -106,7 +106,7 @@ void *Diff(void *argument)
 	  missval1 = vlistInqVarMissval(vlistID1, varID1);
 	  missval2 = vlistInqVarMissval(vlistID2, varID2);
 
-	  checkrel = gridInqType(gridID) != GRID_SPECTRAL;
+	  //checkrel = gridInqType(gridID) != GRID_SPECTRAL;
           checkrel = FALSE;
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
