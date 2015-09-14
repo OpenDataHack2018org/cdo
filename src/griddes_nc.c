@@ -108,10 +108,10 @@ int gridFromNCfile(const char *gridfile)
 
       /* allocate grid coordinates and read data */
 
-      grid.xvals   = (double*) malloc(grid.size*sizeof(double));
-      grid.yvals   = (double*) malloc(grid.size*sizeof(double));
-      grid.xbounds = (double*) malloc(grid.nvertex*grid.size*sizeof(double));
-      grid.ybounds = (double*) malloc(grid.nvertex*grid.size*sizeof(double));
+      grid.xvals   = (double*) Malloc(grid.size*sizeof(double));
+      grid.yvals   = (double*) Malloc(grid.size*sizeof(double));
+      grid.xbounds = (double*) Malloc(grid.nvertex*grid.size*sizeof(double));
+      grid.ybounds = (double*) Malloc(grid.nvertex*grid.size*sizeof(double));
 
       nce(nc_inq_vartype(nc_file_id, nc_gridlat_id, &xtype));
       if ( xtype == NC_FLOAT )  grid.prec = DATATYPE_FLT32;
@@ -132,14 +132,14 @@ int gridFromNCfile(const char *gridfile)
       if ( nc_inq_varid(nc_file_id, "grid_imask", &nc_gridmask_id) == NC_NOERR )
 	{
 	  int i;
-	  grid.mask = (int*) malloc(grid.size*sizeof(int));
+	  grid.mask = (int*) Malloc(grid.size*sizeof(int));
 	  nce(nc_get_var_int(nc_file_id, nc_gridmask_id, grid.mask));
 	  for ( i = 0; i < grid.size; ++i )
 	    if ( grid.mask[i] != 1 ) break;
 
 	  if ( i == grid.size )
 	    {
-	      free(grid.mask);
+	      Free(grid.mask);
 	      grid.mask = NULL;
 	    }
 	}
@@ -308,7 +308,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 
   nce(nc_put_var_int(nc_file_id, nc_grdimask_id, grid_imask));
 
-  vals = (double*) malloc(gridInqNvertex(gridID)*gridsize*sizeof(double));
+  vals = (double*) Malloc(gridInqNvertex(gridID)*gridsize*sizeof(double));
 
   gridInqYvals(gridID, vals);
   nce(nc_put_var_double(nc_file_id, nc_gridlat_id, vals));
@@ -322,7 +322,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   gridInqXbounds(gridID, vals);
   nce(nc_put_var_double(nc_file_id, nc_gridclon_id, vals));
 
-  free(vals);
+  Free(vals);
 
   nce(nc_close(nc_file_id));
 

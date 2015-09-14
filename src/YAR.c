@@ -217,15 +217,15 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
   gridsize1 = gridInqSize(gridIDin);
-  lonIn = (double*) malloc(nlonIn*sizeof(double));
-  latIn = (double*) malloc(nlatIn*sizeof(double));
+  lonIn = (double*) Malloc(nlonIn*sizeof(double));
+  latIn = (double*) Malloc(nlatIn*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
   for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
   for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
 
-  xlonIn = (double*) malloc((nlonIn+1)*sizeof(double));
-  xlatIn = (double*) malloc((nlatIn+1)*sizeof(double));
+  xlonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
+  xlatIn = (double*) Malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = xlonIn[1] - xlonIn[0];
@@ -242,15 +242,15 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
   gridsize2 = gridInqSize(gridIDout);
-  lonOut = (double*) malloc(nlonOut*sizeof(double));
-  latOut = (double*) malloc(nlatOut*sizeof(double));
+  lonOut = (double*) Malloc(nlonOut*sizeof(double));
+  latOut = (double*) Malloc(nlatOut*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
   for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
   for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
 
-  xlonOut = (double*) malloc((nlonOut+1)*sizeof(double));
-  xlatOut = (double*) malloc((nlatOut+1)*sizeof(double));
+  xlonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
+  xlatOut = (double*) Malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = xlonOut[1] - xlonOut[0];
@@ -413,7 +413,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 
   field2->nmiss = nmiss;
 
-  // if (array) free(array);
+  // if (array) Free(array);
   //free(lonIn);
   //free(latIn);
   //free(lonOut);
@@ -466,12 +466,12 @@ void yar_remap_con(field_t *field1, field_t *field2)
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
   gridsize1 = gridInqSize(gridIDin);
-  lonIn = (double*) malloc((nlonIn+1)*sizeof(double));
-  latIn = (double*) malloc((nlatIn+1)*sizeof(double));
+  lonIn = (double*) Malloc((nlonIn+1)*sizeof(double));
+  latIn = (double*) Malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
-  xlonIn = (double*) malloc((nlonIn)*sizeof(double));
-  xlatIn = (double*) malloc((nlatIn)*sizeof(double));
+  xlonIn = (double*) Malloc((nlonIn)*sizeof(double));
+  xlatIn = (double*) Malloc((nlatIn)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = lonIn[1] - lonIn[0];
@@ -488,12 +488,12 @@ void yar_remap_con(field_t *field1, field_t *field2)
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
   gridsize2 = gridInqSize(gridIDout);
-  lonOut = (double*) malloc((nlonOut+1)*sizeof(double));
-  latOut = (double*) malloc((nlatOut+1)*sizeof(double));
+  lonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
+  latOut = (double*) Malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
-  xlonOut = (double*) malloc((nlonOut+1)*sizeof(double));
-  xlatOut = (double*) malloc((nlatOut+1)*sizeof(double));
+  xlonOut = (double*) Malloc((nlonOut+1)*sizeof(double));
+  xlatOut = (double*) Malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = lonOut[1] - lonOut[0];
@@ -573,20 +573,20 @@ void yar_remap_con(field_t *field1, field_t *field2)
   double const epsilon = 1.0e-10; // relative precision 
 
   double *weight;
-  weight = (double*) malloc(gridsize1*sizeof(double));
+  weight = (double*) Malloc(gridsize1*sizeof(double));
 
   double tgt_area;
   double *area;
-  area = (double*) malloc(gridsize1*sizeof(double));
+  area = (double*) Malloc(gridsize1*sizeof(double));
 
   struct grid_cell *SourceCell;
-  SourceCell = (struct grid_cell*) malloc(gridsize1  * sizeof(struct grid_cell));
+  SourceCell = (struct grid_cell*) Malloc(gridsize1  * sizeof(struct grid_cell));
 
   for ( int n = 0; n <  gridsize1; n++ ) {
     SourceCell[n].num_corners   = 4;
     SourceCell[n].edge_type     = quad_type;
-    SourceCell[n].coordinates_x = (double*) malloc( 4 * sizeof(double));
-    SourceCell[n].coordinates_y = (double*) malloc( 4 * sizeof(double));
+    SourceCell[n].coordinates_x = (double*) Malloc( 4 * sizeof(double));
+    SourceCell[n].coordinates_y = (double*) Malloc( 4 * sizeof(double));
   }
 
   struct grid_cell  TargetCell;
@@ -594,8 +594,8 @@ void yar_remap_con(field_t *field1, field_t *field2)
   TargetCell.num_corners   = 4;
   TargetCell.edge_type     = quad_type;
 
-  TargetCell.coordinates_x = (double*) malloc( 4 * sizeof(double));
-  TargetCell.coordinates_y = (double*) malloc( 4 * sizeof(double));
+  TargetCell.coordinates_x = (double*) Malloc( 4 * sizeof(double));
+  TargetCell.coordinates_y = (double*) Malloc( 4 * sizeof(double));
 
   unsigned const * curr_deps;
   //struct polygons polygons;
@@ -725,8 +725,8 @@ void yar_remap_con(field_t *field1, field_t *field2)
   delete_grid(source_grid);
   delete_grid(target_grid);
 
-  free(weight);
-  free(area);
+  Free(weight);
+  Free(area);
 
   //free(lonIn);
   //free(latIn);
@@ -806,10 +806,10 @@ void *YAR(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array1   = (double*) malloc(gridsize*sizeof(double));
+  array1   = (double*) Malloc(gridsize*sizeof(double));
 
   gridsize = gridInqSize(gridID2);
-  array2   = (double*) malloc(gridsize*sizeof(double));
+  array2   = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -852,8 +852,8 @@ void *YAR(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
   cdoFinish();
 

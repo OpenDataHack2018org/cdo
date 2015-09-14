@@ -106,7 +106,7 @@ void *Tstepcount(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+	  vars  = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       vdate = taxisInqVdate(taxisID1);
@@ -119,7 +119,7 @@ void *Tstepcount(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -129,10 +129,10 @@ void *Tstepcount(void *argument)
 
   nts = tsID;
 
-  mem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+  mem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      mem[i].array1 = (double*) malloc(nts*sizeof(double));
+      mem[i].array1 = (double*) Malloc(nts*sizeof(double));
     }
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -162,9 +162,9 @@ void *Tstepcount(void *argument)
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      free(mem[i].array1);
+      Free(mem[i].array1);
     }
-  free(mem);
+  Free(mem);
 
   taxisDefVdate(taxisID2, vdate);
   taxisDefVtime(taxisID2, vtime);
@@ -191,7 +191,7 @@ void *Tstepcount(void *argument)
 
   for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
 
-  if ( vars  ) free(vars);
+  if ( vars  ) Free(vars);
 
   streamClose(streamID2);
   streamClose(streamID1);

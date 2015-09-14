@@ -68,7 +68,7 @@ void *Splitrec(void *argument)
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
     }
 
   index = 0;
@@ -123,7 +123,7 @@ void *Splitrec(void *argument)
   streamClose(streamID1);
 
   if ( ! lcopy )
-    if ( array ) free(array);
+    if ( array ) Free(array);
 
   cdoFinish();
 

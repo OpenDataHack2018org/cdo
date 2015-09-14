@@ -119,12 +119,12 @@ void *Invertlev(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int nvars = vlistNvars(vlistID1);
 
-  double **vardata  = (double**) malloc(nvars*sizeof(double*));
-  int **varnmiss = (int**) malloc(nvars*sizeof(int*));
+  double **vardata  = (double**) Malloc(nvars*sizeof(double*));
+  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -141,8 +141,8 @@ void *Invertlev(void *argument)
       else
 	{
 	  linvert = TRUE;
-	  vardata[varID]  = (double*) malloc(gridsize*nlev*sizeof(double));
-	  varnmiss[varID] = (int*) malloc(nlev*sizeof(int));
+	  vardata[varID]  = (double*) Malloc(gridsize*nlev*sizeof(double));
+	  varnmiss[varID] = (int*) Malloc(nlev*sizeof(int));
 	}
     }
 
@@ -209,19 +209,19 @@ void *Invertlev(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( vardata[varID] )
 	{
-	  free(varnmiss[varID]);
-	  free(vardata[varID]);
+	  Free(varnmiss[varID]);
+	  Free(vardata[varID]);
 	}
     }
 
-  free(varnmiss);
-  free(vardata);
+  Free(varnmiss);
+  Free(vardata);
 
   cdoFinish();
 

@@ -99,12 +99,12 @@ void *Fldrms(void *argument)
   field_init(&field3);
 
   lim = vlistGridsizeMax(vlistID1);
-  field1.ptr    = (double*) malloc(lim*sizeof(double));
+  field1.ptr    = (double*) Malloc(lim*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )
-    field1.weight = (double*) malloc(lim*sizeof(double));
+    field1.weight = (double*) Malloc(lim*sizeof(double));
 
-  field2.ptr    = (double*) malloc(lim*sizeof(double));
+  field2.ptr    = (double*) Malloc(lim*sizeof(double));
   field2.weight = NULL;
 
   field3.ptr  = &sglval;
@@ -161,9 +161,9 @@ void *Fldrms(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( field1.ptr )    free(field1.ptr);
-  if ( field1.weight ) free(field1.weight);
-  if ( field2.ptr )    free(field2.ptr);
+  if ( field1.ptr )    Free(field1.ptr);
+  if ( field1.weight ) Free(field1.weight);
+  if ( field2.ptr )    Free(field2.ptr);
 
   cdoFinish();
 

@@ -46,19 +46,19 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
   double *xvals2 = NULL, *yvals2 = NULL;
   if ( lregular )
     {
-      xvals = (double*) malloc(nx*sizeof(double));
-      yvals = (double*) malloc(ny*sizeof(double));
+      xvals = (double*) Malloc(nx*sizeof(double));
+      yvals = (double*) Malloc(ny*sizeof(double));
     }
   else
     {
-      xvals = (double*) malloc(nx*ny*sizeof(double));
-      yvals = (double*) malloc(nx*ny*sizeof(double));
-      xvals2 = (double*) malloc(nxvals*nyvals*sizeof(double));
-      yvals2 = (double*) malloc(nxvals*nyvals*sizeof(double));      
+      xvals = (double*) Malloc(nx*ny*sizeof(double));
+      yvals = (double*) Malloc(nx*ny*sizeof(double));
+      xvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));
+      yvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));      
     }
   
-  int *xlsize = (int*) malloc(nxblocks*sizeof(int));
-  int *ylsize = (int*) malloc(nyblocks*sizeof(int));
+  int *xlsize = (int*) Malloc(nxblocks*sizeof(int));
+  int *ylsize = (int*) Malloc(nyblocks*sizeof(int));
 
   gridInqXvals(gridID1, xvals);
   gridInqYvals(gridID1, yvals);
@@ -78,7 +78,7 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	offset = iy*nyvals*nx + ix*nxvals;
 
 	gridsize2 = xlsize[ix]*ylsize[iy];
-	gridindex[index] = (int*) malloc(gridsize2*sizeof(int));
+	gridindex[index] = (int*) Malloc(gridsize2*sizeof(int));
 
 	gridsize2 = 0;
         // printf("iy %d, ix %d offset %d\n", iy, ix,  offset);
@@ -120,12 +120,12 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	  cdoAbort("Internal problem, index exceeded bounds!");
       }
 
-  if ( xvals2 ) free(xvals2);
-  if ( yvals2 ) free(yvals2);
-  free(xvals);
-  free(yvals);
-  free(xlsize);
-  free(ylsize);
+  if ( xvals2 ) Free(xvals2);
+  if ( yvals2 ) Free(yvals2);
+  Free(xvals);
+  Free(yvals);
+  Free(xlsize);
+  Free(ylsize);
 }
 
 static
@@ -220,18 +220,18 @@ void *Distgrid(void *argument)
   int nsplit = nxblocks*nyblocks;
   if ( nsplit > MAX_BLOCKS ) cdoAbort("Too many blocks (max = %d)!", MAX_BLOCKS);
 
-  double *array1 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
-  int *vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-  int *streamIDs = (int*) malloc(nsplit*sizeof(int));
+  int *vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+  int *streamIDs = (int*) Malloc(nsplit*sizeof(int));
 
-  sgrid_t *grids = (sgrid_t*) malloc(ngrids*sizeof(sgrid_t));
+  sgrid_t *grids = (sgrid_t*) Malloc(ngrids*sizeof(sgrid_t));
   for ( i = 0; i < ngrids; i++ )
     {  
       grids[i].gridID    = vlistGrid(vlistID1, i);
-      grids[i].gridIDs   = (int*) malloc(nsplit*sizeof(int));
-      grids[i].gridsize  = (int*) malloc(nsplit*sizeof(int));
-      grids[i].gridindex = (int**) malloc(nsplit*sizeof(int*));
+      grids[i].gridIDs   = (int*) Malloc(nsplit*sizeof(int));
+      grids[i].gridsize  = (int*) Malloc(nsplit*sizeof(int));
+      grids[i].gridindex = (int**) Malloc(nsplit*sizeof(int*));
 
       for ( index = 0; index < nsplit; index++ ) grids[i].gridindex[index] = NULL;
     }
@@ -258,7 +258,7 @@ void *Distgrid(void *argument)
   for ( index = 0; index < nsplit; index++ )
     if ( grids[0].gridsize[index] > gridsize2max ) gridsize2max = grids[0].gridsize[index];
 
-  double *array2 = (double*) malloc(gridsize2max*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize2max*sizeof(double));
 
   strcpy(filename, cdoStreamName(1)->args);
   int nchars = strlen(filename);
@@ -320,24 +320,24 @@ void *Distgrid(void *argument)
       vlistDestroy(vlistIDs[index]);
     }
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
+  if ( array1 ) Free(array1);
+  if ( array2 ) Free(array2);
 
-  if ( vlistIDs  ) free(vlistIDs);
-  if ( streamIDs ) free(streamIDs);
+  if ( vlistIDs  ) Free(vlistIDs);
+  if ( streamIDs ) Free(streamIDs);
 
   for ( i = 0; i < ngrids; i++ )
     {
       for ( index = 0; index < nsplit; index++ )
 	gridDestroy(grids[i].gridIDs[index]);
-      free(grids[i].gridIDs);
-      free(grids[i].gridsize);
+      Free(grids[i].gridIDs);
+      Free(grids[i].gridsize);
 
       for ( index = 0; index < nsplit; index++ )
 	free(grids[i].gridindex[index]);
-      free(grids[i].gridindex);
+      Free(grids[i].gridindex);
     }
-  free(grids);
+  Free(grids);
 
   cdoFinish();
 

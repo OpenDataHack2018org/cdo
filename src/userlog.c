@@ -2,8 +2,9 @@
 #  include "config.h"
 #endif
 
-#include <stdio.h>
-#include <string.h>
+#include "cdo_int.h"
+#include "process.h"
+
 #include <time.h>
 /* #include <pwd.h> */
 #include <sys/types.h>
@@ -11,10 +12,6 @@
 #include <unistd.h>  /* write, close */
 #include <fcntl.h>
 #include <errno.h>
-#include <stdlib.h>  /* qsort */
-
-#include "cdo.h"
-#include "process.h"
 
 #if ! defined(VERSION)
 #  define  VERSION  "0.0.1"
@@ -497,7 +494,7 @@ void dumplogs(const char *logfilename)
 
   if ( bufsize > 0 )
     {
-      buffer = (unsigned char*) malloc(bufsize);
+      buffer = (unsigned char*) Malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
@@ -520,7 +517,7 @@ void dumplogs(const char *logfilename)
 		    date0, ncdo0, noper0, (long)nvals0, nhours0, cputime0);
 	}
 
-      free(buffer);
+      Free(buffer);
     }
 
   close(logfileno);
@@ -570,7 +567,7 @@ void daylogs(const char *logfilename)
 
   if ( bufsize > 0 )
     {
-      buffer = (unsigned char*) malloc(bufsize);
+      buffer = (unsigned char*) Malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
@@ -590,7 +587,7 @@ void daylogs(const char *logfilename)
 		  date0, noper0, (int)(8*nvals0/(1024*1024)), (int) (nhours0*3600.+cputime0));
 	}
 
-      free(buffer);
+      Free(buffer);
     }
 
   close(logfileno);
@@ -642,7 +639,7 @@ void monlogs(const char *logfilename)
 
   if ( bufsize > 0 )
     {
-      buffer = (unsigned char*) malloc(bufsize);
+      buffer = (unsigned char*) Malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
@@ -680,7 +677,7 @@ void monlogs(const char *logfilename)
       fprintf(stdout, "%6d   %12u %12d %12d\n",
 	      ymon0, noper, (int)(8*size/(1024*1024*1024)), (int) (cputime/3600));
       
-      free(buffer);
+      Free(buffer);
     }
 
   close(logfileno);
@@ -771,7 +768,7 @@ void cdologo(int noper)
   bufsize = (size_t) filestat.st_size;
 
   newbufsize = bufsize + noper*logsize;
-  buffer = (unsigned char*) malloc(newbufsize);
+  buffer = (unsigned char*) Malloc(newbufsize);
   if ( bufsize > 0 )
     status = (int) read(logfileno, buffer, bufsize);
 
@@ -819,7 +816,7 @@ void cdologo(int noper)
   status = (int) lseek(logfileno, 0, SEEK_SET);
   status = (int) write(logfileno, buffer, bufsize);
 
-  free(buffer);
+  Free(buffer);
 
  endlabel:
 
@@ -959,14 +956,14 @@ void dumplogo(const char *logfilename, int dumptype)
   if ( bufsize > 0 )
     {
       fprintf(stdout, "# num name                     call        mem [GB]    time [h]     perc [s]\n");
-      buffer = (unsigned char*) malloc(bufsize);
+      buffer = (unsigned char*) Malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
       nlogs = bufsize / logsize;
 
-      logInfo    = (loginfo_t **) malloc(nlogs*sizeof(loginfo_t *));
-      logInfo[0] = (loginfo_t*) malloc(nlogs*sizeof(loginfo_t));
+      logInfo    = (loginfo_t **) Malloc(nlogs*sizeof(loginfo_t *));
+      logInfo[0] = (loginfo_t*) Malloc(nlogs*sizeof(loginfo_t));
       for ( i = 1; i < nlogs; i++ ) logInfo[i] = logInfo[0] + i;
 
       for ( i = 0; i < nlogs; i++ )
@@ -1006,9 +1003,9 @@ void dumplogo(const char *logfilename, int dumptype)
 		    logInfo[i]->nocc, mem, logInfo[i]->time, logInfo[i]->perc);
 	}
 
-      free(logInfo[0]);
-      free(logInfo);
-      free(buffer);
+      Free(logInfo[0]);
+      Free(logInfo);
+      Free(buffer);
     }
 
   close(logfileno);

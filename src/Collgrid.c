@@ -96,11 +96,11 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
     return gridID2;
 
-  int *xsize = (int*) malloc(nfiles*sizeof(int));
-  int *ysize = (int*) malloc(nfiles*sizeof(int));
-  xyinfo_t *xyinfo = (xyinfo_t*) malloc(nfiles*sizeof(xyinfo_t));
-  double **xvals = (double**) malloc(nfiles*sizeof(double*));
-  double **yvals = (double**) malloc(nfiles*sizeof(double*));
+  int *xsize = (int*) Malloc(nfiles*sizeof(int));
+  int *ysize = (int*) Malloc(nfiles*sizeof(int));
+  xyinfo_t *xyinfo = (xyinfo_t*) Malloc(nfiles*sizeof(xyinfo_t));
+  double **xvals = (double**) Malloc(nfiles*sizeof(double*));
+  double **yvals = (double**) Malloc(nfiles*sizeof(double*));
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -120,13 +120,13 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
       if ( lregular )
         {
-          xvals[fileID] = (double*) malloc(xsize[fileID]*sizeof(double));
-          yvals[fileID] = (double*) malloc(ysize[fileID]*sizeof(double));
+          xvals[fileID] = (double*) Malloc(xsize[fileID]*sizeof(double));
+          yvals[fileID] = (double*) Malloc(ysize[fileID]*sizeof(double));
         }
       else if ( lcurvilinear )
         {
-          xvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
-          yvals[fileID] = (double*) malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
+          xvals[fileID] = (double*) Malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
+          yvals[fileID] = (double*) Malloc(xsize[fileID]*ysize[fileID]*sizeof(double));
         }
       else
         {
@@ -199,17 +199,17 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
   if ( lregular )
     {
-      xvals2 = (double*) malloc(xsize2*sizeof(double));
-      yvals2 = (double*) malloc(ysize2*sizeof(double));
+      xvals2 = (double*) Malloc(xsize2*sizeof(double));
+      yvals2 = (double*) Malloc(ysize2*sizeof(double));
     }
   else if ( lcurvilinear )
     {
-      xvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
-      yvals2 = (double*) malloc(xsize2*ysize2*sizeof(double));
+      xvals2 = (double*) Malloc(xsize2*ysize2*sizeof(double));
+      yvals2 = (double*) Malloc(xsize2*ysize2*sizeof(double));
     }
     
-  int *xoff = (int*) malloc((nx+1)*sizeof(int));
-  int *yoff = (int*) malloc((ny+1)*sizeof(int));
+  int *xoff = (int*) Malloc((nx+1)*sizeof(int));
+  int *yoff = (int*) Malloc((ny+1)*sizeof(int));
 
   xoff[0] = 0;
   for ( i = 0; i < nx; ++i )
@@ -263,12 +263,12 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
       gridDefYvals(gridID2, yvals2);
     }
 
-  free(xoff);
-  free(yoff);
-  free(xsize);
-  free(ysize);
-  if ( xvals2 ) free(xvals2);
-  if ( yvals2 ) free(yvals2);
+  Free(xoff);
+  Free(yoff);
+  Free(xsize);
+  Free(ysize);
+  if ( xvals2 ) Free(xvals2);
+  if ( yvals2 ) Free(yvals2);
 
   char string[1024];
   string[0] = 0;
@@ -288,12 +288,12 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      if ( xvals[fileID] ) free(xvals[fileID]);
-      if ( yvals[fileID] ) free(yvals[fileID]);
+      if ( xvals[fileID] ) Free(xvals[fileID]);
+      if ( yvals[fileID] ) Free(yvals[fileID]);
     }
-  free(xvals);
-  free(yvals);
-  free(xyinfo);
+  Free(xvals);
+  Free(yvals);
+  Free(xyinfo);
 
   return gridID2;
 }
@@ -319,7 +319,7 @@ void *Collgrid(void *argument)
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ens_file_t *ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
+  ens_file_t *ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -335,9 +335,9 @@ void *Collgrid(void *argument)
     vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   int nvars = vlistNvars(vlistID1);
-  int *vars  = (int*) malloc(nvars*sizeof(int));
+  int *vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
-  int *vars1  = (int*) malloc(nvars*sizeof(int));
+  int *vars1  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = FALSE;
 
   int nsel = operatorArgc();
@@ -366,7 +366,7 @@ void *Collgrid(void *argument)
 	for ( int i = 0; i < nsel; i++ )
 	  fprintf(stderr, "name %d = %s\n", i+1, argnames[i]);
 
-      int *selfound = (int*) malloc(nsel*sizeof(int));
+      int *selfound = (int*) Malloc(nsel*sizeof(int));
       for ( int i = 0; i < nsel; i++ ) selfound[i] = FALSE;
 
       char varname[CDI_MAX_NAME];
@@ -388,7 +388,7 @@ void *Collgrid(void *argument)
 	if ( selfound[isel] == FALSE )
 	  cdoAbort("Variable name %s not found!", argnames[isel]);
 
-      free(selfound);
+      Free(selfound);
     }
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -411,7 +411,7 @@ void *Collgrid(void *argument)
     }
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = (double*) malloc(gridsizemax*sizeof(double));
+    ef[fileID].array = (double*) Malloc(gridsizemax*sizeof(double));
 
 
   int vlistID2 = vlistCreate();
@@ -425,16 +425,16 @@ void *Collgrid(void *argument)
   */
   //int vlistID2 = vlistDuplicate(vlistID1);
   int nvars2 = vlistNvars(vlistID2);
-  // int *vars  = (int*) malloc(nvars*sizeof(int));
+  // int *vars  = (int*) Malloc(nvars*sizeof(int));
   //for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
 
   int ngrids1 = vlistNgrids(vlistID1);
   int ngrids2 = vlistNgrids(vlistID2);
 
-  int *gridIDs = (int*) malloc(ngrids2*sizeof(int));
-  int **gridindex = (int **) malloc(nfiles*sizeof(int *));
+  int *gridIDs = (int*) Malloc(ngrids2*sizeof(int));
+  int **gridindex = (int **) Malloc(nfiles*sizeof(int *));
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    gridindex[fileID] = (int*) malloc(gridsizemax*sizeof(int));
+    gridindex[fileID] = (int*) Malloc(gridsizemax*sizeof(int));
 
   int ginit = FALSE;
   for ( int i2 = 0; i2 < ngrids2; ++i2 )
@@ -489,7 +489,7 @@ void *Collgrid(void *argument)
       
   streamDefVlist(streamID2, vlistID2);
 	  
-  double *array2 = (double*) malloc(gridsize2*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
   int tsID = 0;
   do
@@ -566,14 +566,14 @@ void *Collgrid(void *argument)
   streamClose(streamID2);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    if ( ef[fileID].array ) free(ef[fileID].array);
+    if ( ef[fileID].array ) Free(ef[fileID].array);
 
-  if ( ef ) free(ef);
-  if ( array2 ) free(array2);
+  if ( ef ) Free(ef);
+  if ( array2 ) Free(array2);
 
-  free(gridIDs);
-  if ( vars   ) free(vars);
-  if ( vars1  ) free(vars1);
+  Free(gridIDs);
+  if ( vars   ) Free(vars);
+  if ( vars1  ) Free(vars1);
 
   cdoFinish();
 

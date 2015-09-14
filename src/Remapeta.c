@@ -111,7 +111,7 @@ double *vctFromFile(const char *filename, int *nvct)
   fp = fopen(filename, "r");
   if ( fp == NULL ) { perror(filename); exit(EXIT_FAILURE); }
 
-  vct2 = (double*) malloc(maxvct*sizeof(double));
+  vct2 = (double*) Malloc(maxvct*sizeof(double));
 
   while ( readline(fp, line, 1024) )
     {
@@ -141,7 +141,7 @@ double *vctFromFile(const char *filename, int *nvct)
   for ( i = 0; i < nlevh2+1; ++i )
     vct2[i+nvct2/2] = vct2[i+maxvct/2];
   
-  vct2 = (double*) realloc(vct2, nvct2*sizeof(double));
+  vct2 = (double*) Realloc(vct2, nvct2*sizeof(double));
 
   *nvct = nvct2;
 
@@ -279,7 +279,7 @@ void *Remapeta(void *argument)
       gridID  = vlistInqVarGrid(vlistID1, varID);
       nfis2gp = gridInqSize(gridID);
 
-      fis2 = (double*) malloc(nfis2gp*sizeof(double));
+      fis2 = (double*) Malloc(nfis2gp*sizeof(double));
 
       streamReadRecord(streamID, fis2, &nmiss);
 
@@ -323,10 +323,10 @@ void *Remapeta(void *argument)
   int gridsize = vlist_check_gridsize(vlistID1);
 
   zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nhlevf2);
-  lev2 = (double*) malloc(nhlevf2*sizeof(double));
+  lev2 = (double*) Malloc(nhlevf2*sizeof(double));
   for ( i = 0; i < nhlevf2; ++i ) lev2[i] = i+1;
   zaxisDefLevels(zaxisID2, lev2);
-  free(lev2);
+  Free(lev2);
 
   if ( nvct2 == 0 ) cdoAbort("Internal problem, vct2 undefined!");
   zaxisDefVct(zaxisID2, nvct2, vct2);
@@ -363,7 +363,7 @@ void *Remapeta(void *argument)
                       if ( cdoVerbose )
                         cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf1   = %d", zaxisIDh, nlevel);
  
-		      vct1 = (double*) malloc(nvct1*sizeof(double));
+		      vct1 = (double*) Malloc(nvct1*sizeof(double));
 		      zaxisInqVct(zaxisID, vct1);
 		      
 		      vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
@@ -492,50 +492,50 @@ void *Remapeta(void *argument)
 
   if ( operatorID == REMAPETAS || operatorID == REMAPETAZ)
     {
-      sum1 = (double*) malloc(gridsize*sizeof(double));
-      sum2 = (double*) malloc(gridsize*sizeof(double));
+      sum1 = (double*) Malloc(gridsize*sizeof(double));
+      sum2 = (double*) Malloc(gridsize*sizeof(double));
     }
 
   if ( operatorID == REMAPETAZ )
     {
-      deltap1 = (double*) malloc(gridsize*nhlevf1*sizeof(double));
-      deltap2 = (double*) malloc(gridsize*nhlevf2*sizeof(double));
-      half_press1 = (double*) malloc(gridsize*(nhlevf1+1)*sizeof(double));
-      half_press2 = (double*) malloc(gridsize*(nhlevf2+1)*sizeof(double));
+      deltap1 = (double*) Malloc(gridsize*nhlevf1*sizeof(double));
+      deltap2 = (double*) Malloc(gridsize*nhlevf2*sizeof(double));
+      half_press1 = (double*) Malloc(gridsize*(nhlevf1+1)*sizeof(double));
+      half_press2 = (double*) Malloc(gridsize*(nhlevf2+1)*sizeof(double));
     }
 
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
-  fis1  = (double*) malloc(gridsize*sizeof(double));
-  ps1   = (double*) malloc(gridsize*sizeof(double));
+  fis1  = (double*) Malloc(gridsize*sizeof(double));
+  ps1   = (double*) Malloc(gridsize*sizeof(double));
 
-  if ( lfis2 == FALSE ) fis2  = (double*) malloc(gridsize*sizeof(double));
+  if ( lfis2 == FALSE ) fis2  = (double*) Malloc(gridsize*sizeof(double));
   if ( lfis2 == TRUE && gridsize != nfis2gp ) cdoAbort("Orographies have different grid size!");
 
-  ps2   = (double*) malloc(gridsize*sizeof(double));
+  ps2   = (double*) Malloc(gridsize*sizeof(double));
 
   if ( ltq )
     {
-      tscor = (double*) malloc(gridsize*sizeof(double));
-      pscor = (double*) malloc(gridsize*sizeof(double));
-      secor = (double*) malloc(gridsize*sizeof(double));
+      tscor = (double*) Malloc(gridsize*sizeof(double));
+      pscor = (double*) Malloc(gridsize*sizeof(double));
+      secor = (double*) Malloc(gridsize*sizeof(double));
 
-      t1    = (double*) malloc(gridsize*nhlevf1*sizeof(double));
-      q1    = (double*) malloc(gridsize*nhlevf1*sizeof(double));
+      t1    = (double*) Malloc(gridsize*nhlevf1*sizeof(double));
+      q1    = (double*) Malloc(gridsize*nhlevf1*sizeof(double));
 
-      t2    = (double*) malloc(gridsize*nhlevf2*sizeof(double));
-      q2    = (double*) malloc(gridsize*nhlevf2*sizeof(double));
+      t2    = (double*) Malloc(gridsize*nhlevf2*sizeof(double));
+      q2    = (double*) Malloc(gridsize*nhlevf2*sizeof(double));
     }
 
   if ( nvars3D )
     {
-      vars1  = (double**) malloc(nvars*sizeof(double*));
-      vars2  = (double**) malloc(nvars*sizeof(double*));
+      vars1  = (double**) Malloc(nvars*sizeof(double*));
+      vars2  = (double**) Malloc(nvars*sizeof(double*));
 
       for ( varID = 0; varID < nvars3D; ++varID )
 	{
-	  vars1[varID] = (double*) malloc(gridsize*nhlevf1*sizeof(double));
-	  vars2[varID] = (double*) malloc(gridsize*nhlevf2*sizeof(double));
+	  vars1[varID] = (double*) Malloc(gridsize*nhlevf1*sizeof(double));
+	  vars2[varID] = (double*) Malloc(gridsize*nhlevf2*sizeof(double));
 	}
     }
 
@@ -813,43 +813,43 @@ void *Remapeta(void *argument)
     {
       for ( varID = 0; varID < nvars3D; varID++ )
 	{
-	  free(vars2[varID]);
-	  free(vars1[varID]);
+	  Free(vars2[varID]);
+	  Free(vars1[varID]);
 	}
-      free(vars2);
-      free(vars1);
+      Free(vars2);
+      Free(vars1);
     }
 
   if ( ltq )
     {
-      free(q2);
-      free(t2);
-      free(q1);
-      free(t1);
-      free(secor);
-      free(pscor);
-      free(tscor);
+      Free(q2);
+      Free(t2);
+      Free(q1);
+      Free(t1);
+      Free(secor);
+      Free(pscor);
+      Free(tscor);
     }
 
-  if ( imiss ) free(imiss);
+  if ( imiss ) Free(imiss);
 
-  free(ps2);
-  free(fis2);
-  free(ps1);
-  free(fis1);
+  Free(ps2);
+  Free(fis2);
+  Free(ps1);
+  Free(fis1);
 
-  if ( sum1 ) free(sum1);
-  if ( sum2 ) free(sum2);
+  if ( sum1 ) Free(sum1);
+  if ( sum2 ) Free(sum2);
 
-  if ( deltap1 ) free(deltap1);
-  if ( deltap2 ) free(deltap2);
+  if ( deltap1 ) Free(deltap1);
+  if ( deltap2 ) Free(deltap2);
 
-  if ( half_press1 ) free(half_press1);
-  if ( half_press2 ) free(half_press2);
+  if ( half_press1 ) Free(half_press1);
+  if ( half_press2 ) Free(half_press2);
 
-  free(array);
-  free(vct2);
-  if ( vct1 ) free(vct1);
+  Free(array);
+  Free(vct2);
+  if ( vct1 ) Free(vct1);
 
   cdoFinish();
 

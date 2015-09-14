@@ -152,7 +152,7 @@ void *Derivepar(void *argument)
                       if ( cdoVerbose )
                         cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf   = %d", zaxisIDh, nlevel);
  
-		      vct = (double*) malloc(nvct*sizeof(double));
+		      vct = (double*) Malloc(nvct*sizeof(double));
 		      zaxisInqVct(zaxisID, vct);
 
 		      if ( cdoVerbose )
@@ -283,32 +283,32 @@ void *Derivepar(void *argument)
 
   if ( tempID == -1 ) cdoAbort("%s not found!", var_stdname(air_temperature));
 
-  array   = (double*) malloc(gridsize*sizeof(double));
-  sgeopot = (double*) malloc(gridsize*sizeof(double));
-  ps      = (double*) malloc(gridsize*sizeof(double));
-  temp    = (double*) malloc(gridsize*nhlevf*sizeof(double));
+  array   = (double*) Malloc(gridsize*sizeof(double));
+  sgeopot = (double*) Malloc(gridsize*sizeof(double));
+  ps      = (double*) Malloc(gridsize*sizeof(double));
+  temp    = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
-  // lwater = (double*) malloc(gridsize*nhlevf*sizeof(double));
-  // iwater = (double*) malloc(gridsize*nhlevf*sizeof(double));
+  // lwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  // iwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
-  half_press = (double*) malloc(gridsize*(nhlevf+1)*sizeof(double));
+  half_press = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
 
   if ( operatorID == GHEIGHT )
     {
       if ( humID == -1 )
 	cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
       else
-	hum    = (double*) malloc(gridsize*nhlevf*sizeof(double));
+	hum    = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
-      gheight = (double*) malloc(gridsize*(nhlevf+1)*sizeof(double));
+      gheight = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
     }
   
   if ( operatorID == SEALEVELPRESSURE )
     {
-      full_press   = (double*) malloc(gridsize*nhlevf*sizeof(double));
+      full_press   = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
       surfaceID = zaxisFromName("surface");
-      sealevelpressure = (double*) malloc(gridsize*sizeof(double));
+      sealevelpressure = (double*) Malloc(gridsize*sizeof(double));
     }
 
   if ( zaxisIDh != -1 && sgeopotID == -1 )
@@ -493,18 +493,18 @@ void *Derivepar(void *argument)
 
   vlistDestroy(vlistID2);
 
-  free(ps);
-  free(sgeopot);
-  free(temp);
-  if ( gheight ) free(gheight);
-  if ( sealevelpressure ) free(sealevelpressure);
-  if ( hum ) free(hum);
+  Free(ps);
+  Free(sgeopot);
+  Free(temp);
+  if ( gheight ) Free(gheight);
+  if ( sealevelpressure ) Free(sealevelpressure);
+  if ( hum ) Free(hum);
 
-  if ( full_press ) free(full_press);
-  if ( half_press ) free(half_press);
+  if ( full_press ) Free(full_press);
+  if ( half_press ) Free(half_press);
 
-  free(array);
-  if ( vct ) free(vct);
+  Free(array);
+  if ( vct ) Free(vct);
 
   cdoFinish();
 

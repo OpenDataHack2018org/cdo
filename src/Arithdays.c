@@ -116,7 +116,7 @@ void *Arithdays(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
 
   field_init(&field);
-  field.ptr    = (double*) malloc(gridsize*sizeof(double));
+  field.ptr    = (double*) Malloc(gridsize*sizeof(double));
   field.weight = NULL;
 
   tsID = 0;
@@ -165,7 +165,7 @@ void *Arithdays(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
   cdoFinish();
 

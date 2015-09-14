@@ -126,12 +126,12 @@ void *Ymonstat(void *argument)
   nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
   field_init(&field);
-  field.ptr = (double*) malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
   otsID = 0;
@@ -179,7 +179,7 @@ void *Ymonstat(void *argument)
 	      if ( nmiss > 0 || samp1[month][varID][levelID].ptr )
 		{
 		  if ( samp1[month][varID][levelID].ptr == NULL )
-		    samp1[month][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+		    samp1[month][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[month][varID][levelID].ptr[i],
@@ -199,7 +199,7 @@ void *Ymonstat(void *argument)
 		{
 		  if ( samp1[month][varID][levelID].ptr == NULL )
 		    {
-		      samp1[month][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+		      samp1[month][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 		      for ( i = 0; i < gridsize; i++ )
 			samp1[month][varID][levelID].ptr[i] = nsets[month];
 		    }
@@ -334,10 +334,10 @@ void *Ymonstat(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   cdoFinish();
 

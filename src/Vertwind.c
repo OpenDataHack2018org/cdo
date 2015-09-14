@@ -121,14 +121,14 @@ void *Vertwind(void *argument)
 
   gridsize = gridInqSize(gridID);
   nlevel = zaxisInqSize(zaxisID);
-  level  = (double*) malloc(nlevel*sizeof(double));
+  level  = (double*) Malloc(nlevel*sizeof(double));
   zaxisInqLevels(zaxisID, level);
 
-  temp    = (double*) malloc(gridsize*nlevel*sizeof(double));
-  sq      = (double*) malloc(gridsize*nlevel*sizeof(double));
-  omega   = (double*) malloc(gridsize*nlevel*sizeof(double));
-  wms     = (double*) malloc(gridsize*nlevel*sizeof(double));
-  fpress  = (double*) malloc(gridsize*nlevel*sizeof(double));
+  temp    = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  sq      = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  omega   = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  wms     = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  fpress  = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
 
   if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
@@ -142,13 +142,13 @@ void *Vertwind(void *argument)
     }
   else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
     {
-      ps_prog = (double*) malloc(gridsize*sizeof(double));
-      hpress  = (double*) malloc(gridsize*(nlevel+1)*sizeof(double));
+      ps_prog = (double*) Malloc(gridsize*sizeof(double));
+      hpress  = (double*) Malloc(gridsize*(nlevel+1)*sizeof(double));
   
       nvct = zaxisInqVctSize(zaxisID);
       if ( nlevel == (nvct/2 - 1) )
 	{
-	  vct = (double*) malloc(nvct*sizeof(double));
+	  vct = (double*) Malloc(nvct*sizeof(double));
 	  zaxisInqVct(zaxisID, vct);
 	}
       else
@@ -258,17 +258,17 @@ void *Vertwind(void *argument)
  
   vlistDestroy(vlistID2);
 
-  free(temp);
-  free(sq);
-  free(omega);
-  free(wms);
-  free(fpress);
+  Free(temp);
+  Free(sq);
+  Free(omega);
+  Free(wms);
+  Free(fpress);
 
-  if ( ps_prog ) free(ps_prog);
-  if ( hpress )  free(hpress);
-  if ( vct ) free(vct);
+  if ( ps_prog ) Free(ps_prog);
+  if ( hpress )  Free(hpress);
+  if ( vct ) Free(vct);
 
-  free(level);
+  Free(level);
 
   cdoFinish();
 

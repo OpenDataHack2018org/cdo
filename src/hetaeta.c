@@ -8,10 +8,7 @@
 #  include <omp.h>
 #endif
 
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-
+#include "cdo_int.h"
 #include "hetaeta.h"
 
 const double ap0  = 100000.0;
@@ -526,32 +523,32 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      ph1_2[i]    = (double*) malloc(nlev1p1*sizeof(double));
-      lnph1_2[i]  = (double*) malloc(nlev1p1*sizeof(double));
-      fi1_2[i]    = (double*) malloc(nlev1p1*sizeof(double));
+      ph1_2[i]    = (double*) Malloc(nlev1p1*sizeof(double));
+      lnph1_2[i]  = (double*) Malloc(nlev1p1*sizeof(double));
+      fi1_2[i]    = (double*) Malloc(nlev1p1*sizeof(double));
 
-      pf1_2[i]    = (double*) malloc(nlev1*sizeof(double));
-      lnpf1_2[i]  = (double*) malloc(nlev1*sizeof(double));
-      tv1_2[i]    = (double*) malloc(nlev1*sizeof(double));
-      theta1_2[i] = (double*) malloc(nlev1*sizeof(double));
-      rh1_2[i]    = (double*) malloc(nlev1*sizeof(double));
-      zvar_2[i]   = (double*) malloc(nlev1*sizeof(double));
+      pf1_2[i]    = (double*) Malloc(nlev1*sizeof(double));
+      lnpf1_2[i]  = (double*) Malloc(nlev1*sizeof(double));
+      tv1_2[i]    = (double*) Malloc(nlev1*sizeof(double));
+      theta1_2[i] = (double*) Malloc(nlev1*sizeof(double));
+      rh1_2[i]    = (double*) Malloc(nlev1*sizeof(double));
+      zvar_2[i]   = (double*) Malloc(nlev1*sizeof(double));
 
-      ph2_2[i]    = (double*) malloc(nlev2p1*sizeof(double));
-      lnph2_2[i]  = (double*) malloc(nlev2p1*sizeof(double));
-      fi2_2[i]    = (double*) malloc(nlev2p1*sizeof(double));
+      ph2_2[i]    = (double*) Malloc(nlev2p1*sizeof(double));
+      lnph2_2[i]  = (double*) Malloc(nlev2p1*sizeof(double));
+      fi2_2[i]    = (double*) Malloc(nlev2p1*sizeof(double));
 
-      pf2_2[i]    = (double*) malloc(nlev2*sizeof(double));
-      rh2_2[i]    = (double*) malloc(nlev2*sizeof(double));
-      wgt_2[i]    = (double*) malloc(nlev2*sizeof(double));
-      idx_2[i]    = (long*) malloc(nlev2*sizeof(long));
+      pf2_2[i]    = (double*) Malloc(nlev2*sizeof(double));
+      rh2_2[i]    = (double*) Malloc(nlev2*sizeof(double));
+      wgt_2[i]    = (double*) Malloc(nlev2*sizeof(double));
+      idx_2[i]    = (long*) Malloc(nlev2*sizeof(long));
 
       if ( ltq )
 	{
-	  zt2_2[i]       = (double*) malloc(nlev2*sizeof(double));
-	  zq2_2[i]       = (double*) malloc(nlev2*sizeof(double));
-	  rh_pbl_2[i]    = (double*) malloc(nlev2*sizeof(double));
-	  theta_pbl_2[i] = (double*) malloc(nlev2*sizeof(double));
+	  zt2_2[i]       = (double*) Malloc(nlev2*sizeof(double));
+	  zq2_2[i]       = (double*) Malloc(nlev2*sizeof(double));
+	  rh_pbl_2[i]    = (double*) Malloc(nlev2*sizeof(double));
+	  theta_pbl_2[i] = (double*) Malloc(nlev2*sizeof(double));
 	}
 
       if ( nvars > 0 )
@@ -561,47 +558,47 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	      fprintf(stderr, "Too many vars (max = %d)!\n", MAX_VARS);
 	      exit(-1);
 	    }
-	  vars_pbl_2[i]  = (double **) malloc(nvars*sizeof(double *));
+	  vars_pbl_2[i]  = (double **) Malloc(nvars*sizeof(double *));
 	  for ( iv = 0; iv < nvars; ++iv )
-	    vars_pbl_2[i][iv] = (double*) malloc(nlev2*sizeof(double));
+	    vars_pbl_2[i][iv] = (double*) Malloc(nlev2*sizeof(double));
 	}
     }
 #else
-  /* etah1  = (double*) malloc(nlev1p1*sizeof(double)); */
-  ph1    = (double*) malloc(nlev1p1*sizeof(double));
-  lnph1  = (double*) malloc(nlev1p1*sizeof(double));
-  fi1    = (double*) malloc(nlev1p1*sizeof(double));
+  /* etah1  = (double*) Malloc(nlev1p1*sizeof(double)); */
+  ph1    = (double*) Malloc(nlev1p1*sizeof(double));
+  lnph1  = (double*) Malloc(nlev1p1*sizeof(double));
+  fi1    = (double*) Malloc(nlev1p1*sizeof(double));
 
-  pf1    = (double*) malloc(nlev1*sizeof(double));
-  lnpf1  = (double*) malloc(nlev1*sizeof(double));
-  tv1    = (double*) malloc(nlev1*sizeof(double));
-  theta1 = (double*) malloc(nlev1*sizeof(double));
-  rh1    = (double*) malloc(nlev1*sizeof(double));
-  zvar   = (double*) malloc(nlev1*sizeof(double));
+  pf1    = (double*) Malloc(nlev1*sizeof(double));
+  lnpf1  = (double*) Malloc(nlev1*sizeof(double));
+  tv1    = (double*) Malloc(nlev1*sizeof(double));
+  theta1 = (double*) Malloc(nlev1*sizeof(double));
+  rh1    = (double*) Malloc(nlev1*sizeof(double));
+  zvar   = (double*) Malloc(nlev1*sizeof(double));
 
-  ph2    = (double*) malloc(nlev2p1*sizeof(double));
-  lnph2  = (double*) malloc(nlev2p1*sizeof(double));
-  fi2    = (double*) malloc(nlev2p1*sizeof(double));
+  ph2    = (double*) Malloc(nlev2p1*sizeof(double));
+  lnph2  = (double*) Malloc(nlev2p1*sizeof(double));
+  fi2    = (double*) Malloc(nlev2p1*sizeof(double));
 
-  pf2    = (double*) malloc(nlev2*sizeof(double));
-  /* lnpf2  = (double*) malloc(nlev2*sizeof(double)); */
-  rh2    = (double*) malloc(nlev2*sizeof(double));
-  wgt    = (double*) malloc(nlev2*sizeof(double));
-  idx    = (long*) malloc(nlev2*sizeof(long));
+  pf2    = (double*) Malloc(nlev2*sizeof(double));
+  /* lnpf2  = (double*) Malloc(nlev2*sizeof(double)); */
+  rh2    = (double*) Malloc(nlev2*sizeof(double));
+  wgt    = (double*) Malloc(nlev2*sizeof(double));
+  idx    = (long*) Malloc(nlev2*sizeof(long));
 
   if ( ltq )
     {
-      zt2       = (double*) malloc(nlev2*sizeof(double));
-      zq2       = (double*) malloc(nlev2*sizeof(double));
-      rh_pbl    = (double*) malloc(nlev2*sizeof(double));
-      theta_pbl = (double*) malloc(nlev2*sizeof(double));
+      zt2       = (double*) Malloc(nlev2*sizeof(double));
+      zq2       = (double*) Malloc(nlev2*sizeof(double));
+      rh_pbl    = (double*) Malloc(nlev2*sizeof(double));
+      theta_pbl = (double*) Malloc(nlev2*sizeof(double));
     }
 
   if ( nvars > 0 )
     {
-      vars_pbl  = (double **) malloc(nvars*sizeof(double *));
+      vars_pbl  = (double **) Malloc(nvars*sizeof(double *));
       for ( iv = 0; iv < nvars; ++iv )
-	vars_pbl[iv] = (double*) malloc(nlev2*sizeof(double));
+	vars_pbl[iv] = (double*) Malloc(nlev2*sizeof(double));
     }
 #endif
   
@@ -771,72 +768,72 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 #if defined(_OPENMP)
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      free(ph1_2[i]);    
-      free(lnph1_2[i]);  
-      free(fi1_2[i]);    
+      Free(ph1_2[i]);    
+      Free(lnph1_2[i]);  
+      Free(fi1_2[i]);    
 
-      free(pf1_2[i]);    
-      free(lnpf1_2[i]);  
-      free(tv1_2[i]);    
-      free(theta1_2[i]); 
-      free(rh1_2[i]);    
-      free(zvar_2[i]);    
+      Free(pf1_2[i]);    
+      Free(lnpf1_2[i]);  
+      Free(tv1_2[i]);    
+      Free(theta1_2[i]); 
+      Free(rh1_2[i]);    
+      Free(zvar_2[i]);    
 
-      free(ph2_2[i]);       
-      free(lnph2_2[i]);     
-      free(fi2_2[i]);
+      Free(ph2_2[i]);       
+      Free(lnph2_2[i]);     
+      Free(fi2_2[i]);
 
-      free(pf2_2[i]);       
-      /* free(lnpf2_2[i]); */
-      free(rh2_2[i]);      
-      free(wgt_2[i]); 
-      free(idx_2[i]); 
+      Free(pf2_2[i]);       
+      /* Free(lnpf2_2[i]); */
+      Free(rh2_2[i]);      
+      Free(wgt_2[i]); 
+      Free(idx_2[i]); 
 
       if ( ltq )
 	{
-	  free(zt2_2[i]); 
-	  free(zq2_2[i]); 
-	  free(rh_pbl_2[i]); 
-	  free(theta_pbl_2[i]); 
+	  Free(zt2_2[i]); 
+	  Free(zq2_2[i]); 
+	  Free(rh_pbl_2[i]); 
+	  Free(theta_pbl_2[i]); 
 	}   
 
       if ( nvars > 0 )
 	{
 	  for ( iv = 0; iv < nvars; ++iv )
-	    free(vars_pbl_2[i][iv]);
+	    Free(vars_pbl_2[i][iv]);
 	  
-	  free(vars_pbl_2[i]);
+	  Free(vars_pbl_2[i]);
 	}
     }
 #else
-  /* free(etah1); */     
-  free(ph1);    
-  free(lnph1);  
-  free(fi1);    
+  /* Free(etah1); */     
+  Free(ph1);    
+  Free(lnph1);  
+  Free(fi1);    
 
-  free(pf1);    
-  free(lnpf1);  
-  free(tv1);    
-  free(theta1); 
-  free(rh1);    
-  free(zvar);    
+  Free(pf1);    
+  Free(lnpf1);  
+  Free(tv1);    
+  Free(theta1); 
+  Free(rh1);    
+  Free(zvar);    
 
-  free(ph2);       
-  free(lnph2);     
-  free(fi2);
+  Free(ph2);       
+  Free(lnph2);     
+  Free(fi2);
 
-  free(pf2);       
-  /* free(lnpf2); */
-  free(rh2);      
-  free(wgt); 
-  free(idx); 
+  Free(pf2);       
+  /* Free(lnpf2); */
+  Free(rh2);      
+  Free(wgt); 
+  Free(idx); 
 
   if ( ltq )
     {
-      free(zt2); 
-      free(zq2); 
-      free(rh_pbl); 
-      free(theta_pbl); 
+      Free(zt2); 
+      Free(zq2); 
+      Free(rh_pbl); 
+      Free(theta_pbl); 
     }   
 
   if ( nvars > 0 )
@@ -844,7 +841,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
       for ( iv = 0; iv < nvars; ++iv )
 	free(vars_pbl[iv]);
 
-      free(vars_pbl);
+      Free(vars_pbl);
     }
 #endif
 
@@ -952,30 +949,30 @@ int main (int argc, char *argv[])
   int ij, k;
   int ltq = 1;
 
-  double *fis1 = (double*) malloc(NGP*sizeof(double));
-  double *ps1  = (double*) malloc(NGP*sizeof(double));
-  double *fis2 = (double*) malloc(NGP*sizeof(double));
-  double *ps2  = (double*) malloc(NGP*sizeof(double));
+  double *fis1 = (double*) Malloc(NGP*sizeof(double));
+  double *ps1  = (double*) Malloc(NGP*sizeof(double));
+  double *fis2 = (double*) Malloc(NGP*sizeof(double));
+  double *ps2  = (double*) Malloc(NGP*sizeof(double));
 
-  double *tscor  = (double*) malloc(NGP*sizeof(double));
-  double *pscor  = (double*) malloc(NGP*sizeof(double));
-  double *secor  = (double*) malloc(NGP*sizeof(double));
+  double *tscor  = (double*) Malloc(NGP*sizeof(double));
+  double *pscor  = (double*) Malloc(NGP*sizeof(double));
+  double *secor  = (double*) Malloc(NGP*sizeof(double));
 
-  double *t1  = (double*) malloc(NGP*19*sizeof(double));
-  double *q1  = (double*) malloc(NGP*19*sizeof(double));
-  double *u1  = (double*) malloc(NGP*19*sizeof(double));
-  double *v1  = (double*) malloc(NGP*19*sizeof(double));
-  double *cl1 = (double*) malloc(NGP*19*sizeof(double));
-  double *ci1 = (double*) malloc(NGP*19*sizeof(double));
-  double *cc1 = (double*) malloc(NGP*19*sizeof(double));
+  double *t1  = (double*) Malloc(NGP*19*sizeof(double));
+  double *q1  = (double*) Malloc(NGP*19*sizeof(double));
+  double *u1  = (double*) Malloc(NGP*19*sizeof(double));
+  double *v1  = (double*) Malloc(NGP*19*sizeof(double));
+  double *cl1 = (double*) Malloc(NGP*19*sizeof(double));
+  double *ci1 = (double*) Malloc(NGP*19*sizeof(double));
+  double *cc1 = (double*) Malloc(NGP*19*sizeof(double));
 
-  double *t2  = (double*) malloc(NGP*40*sizeof(double));
-  double *q2  = (double*) malloc(NGP*40*sizeof(double));
-  double *u2  = (double*) malloc(NGP*40*sizeof(double));
-  double *v2  = (double*) malloc(NGP*40*sizeof(double));
-  double *cl2 = (double*) malloc(NGP*40*sizeof(double));
-  double *ci2 = (double*) malloc(NGP*40*sizeof(double));
-  double *cc2 = (double*) malloc(NGP*40*sizeof(double));
+  double *t2  = (double*) Malloc(NGP*40*sizeof(double));
+  double *q2  = (double*) Malloc(NGP*40*sizeof(double));
+  double *u2  = (double*) Malloc(NGP*40*sizeof(double));
+  double *v2  = (double*) Malloc(NGP*40*sizeof(double));
+  double *cl2 = (double*) Malloc(NGP*40*sizeof(double));
+  double *ci2 = (double*) Malloc(NGP*40*sizeof(double));
+  double *cc2 = (double*) Malloc(NGP*40*sizeof(double));
 
   for ( ij = 0; ij < NGP; ++ij )
     {

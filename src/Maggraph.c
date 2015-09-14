@@ -170,7 +170,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	  mag_setc ("output_format", DEVICE );
 	}
 	
-      free( split_str );
+      Free( split_str );
     }
 
   if ( DBG )
@@ -256,20 +256,20 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   if ( stat == TRUE )
     {
 	/* if all files are of same number of steps, only one date_time_str array is being used */
-        date_time_str[0] = (char **) malloc( ntime_steps*sizeof(char *)); 
+        date_time_str[0] = (char **) Malloc( ntime_steps*sizeof(char *)); 
 	
-	date_time   = (double*) malloc( ntime_steps*sizeof(double));
-	mean_val    = (double*) malloc( ntime_steps*sizeof(double));
-	std_dev_val = (double*) malloc( ntime_steps*sizeof(double));
-	spread_min  = (double*) malloc( ntime_steps*sizeof(double));
-	spread_max  = (double*) malloc( ntime_steps*sizeof(double));
+	date_time   = (double*) Malloc( ntime_steps*sizeof(double));
+	mean_val    = (double*) Malloc( ntime_steps*sizeof(double));
+	std_dev_val = (double*) Malloc( ntime_steps*sizeof(double));
+	spread_min  = (double*) Malloc( ntime_steps*sizeof(double));
+	spread_max  = (double*) Malloc( ntime_steps*sizeof(double));
 	
 	for ( tsID = 0; tsID < ntime_steps; ++tsID )
 	  {
 	    date_time[tsID] = tsID+1;
 	    date2str(vdate[0][tsID], vdatestr, sizeof(vdatestr));
 	    time2str(vtime[0][tsID], vtimestr, sizeof(vtimestr));
-	    date_time_str[0][tsID] = (char*) malloc(256);
+	    date_time_str[0][tsID] = (char*) Malloc(256);
 	    sprintf(date_time_str[0][tsID], "%s %s", vdatestr, vtimestr);
 	    mean_val[tsID] = 0.;
 	    std_dev_val[tsID] = 0.;
@@ -358,8 +358,8 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	{
 	  if ( DBG )
 	    fprintf(stderr,"FILE  %ld\n", fileID );
-	  date_time             = (double*) malloc( nts[fileID]*sizeof(double));
-	  date_time_str[fileID] = (char **) malloc( nts[fileID]*sizeof(char *));
+	  date_time             = (double*) Malloc( nts[fileID]*sizeof(double));
+	  date_time_str[fileID] = (char **) Malloc( nts[fileID]*sizeof(char *));
 	  
 	  for ( tsID = 0; tsID <  nts[fileID]; ++tsID )
 	    {
@@ -367,7 +367,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	      date2str(vdate[fileID][tsID], vdatestr, sizeof(vdatestr));
 	      time2str(vtime[fileID][tsID], vtimestr, sizeof(vtimestr));
 	      
-	      date_time_str[fileID][tsID] = (char*) malloc(256);
+	      date_time_str[fileID][tsID] = (char*) Malloc(256);
 	      sprintf(date_time_str[fileID][tsID], "%s %s", vdatestr, vtimestr);
 	      if ( DBG )
 		fprintf( stderr,"%s %s %s\n", vdatestr, vtimestr, date_time_str[fileID][tsID] );
@@ -377,7 +377,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	      if( datatab[fileID][tsID] > max_val )
 	        max_val = datatab[ fileID ][ tsID ];	
 	    }
-	  free( date_time );
+	  Free( date_time );
 	  
 	  if( fileID == 0 )
 	    {
@@ -461,7 +461,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
     num_years  = atoi( split_str[0] );
     num_months = atoi( split_str[1] );
     num_days   = atoi( split_str[2] );
-    free( split_str  );
+    Free( split_str  );
     
     split_str_count = StringSplitWithSeperator( min_date_time_str, sep_char, &split_str );
     num_years -= atoi( split_str[0] );
@@ -478,7 +478,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	else if( num_months == 1 )
 	  num_days += ( 31- atoi( split_str[2] ) );
       }
-    free( split_str );
+    Free( split_str );
     
     if( DBG )
       fprintf(stderr," %d %d\n", num_years, num_months );
@@ -668,7 +668,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
     }
   
   
-  lines[0] = (char*) malloc(1024);
+  lines[0] = (char*) Malloc(1024);
   /* To be obtained from Meta Data */
   /*sprintf( lines[0],"%s","ExpID : " );*/ 
   /*sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );*/
@@ -691,11 +691,11 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
   if ( stat == TRUE )
     {
-      free( date_time );
-      free( mean_val );
-      free( std_dev_val );
-      free( spread_min );
-      free( spread_max );
+      Free( date_time );
+      Free( mean_val );
+      Free( std_dev_val );
+      Free( spread_min );
+      Free( spread_max );
     }
   
   
@@ -722,7 +722,7 @@ int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char
     split_str_count2 = StringSplitWithSeperator( datetimestr2, sep_char, &split_str2 );
   else
     {
-      free( split_str1 );
+      Free( split_str1 );
       return -999;
     }
   
@@ -734,13 +734,13 @@ int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char
     }
   else
     {
-      free( split_str1 );
-      free( split_str2 );
+      Free( split_str1 );
+      Free( split_str2 );
       return -999;
     }
   
-  free( split_str1 );
-  free( split_str2 );
+  Free( split_str1 );
+  Free( split_str2 );
   
   for ( i = 0;i < 3 ; i++ )
     {
@@ -824,10 +824,10 @@ void *Maggraph(void *argument)
        fprintf( stderr," files %s\n",ofilename );
     }
 	
-  datatab = (double **) malloc(nfiles*sizeof(double *));
-  vdate   = (int **) malloc(nfiles*sizeof(int *));
-  vtime   = (int **) malloc(nfiles*sizeof(int *));
-  nts     = (long*) malloc(nfiles*sizeof(long));
+  datatab = (double **) Malloc(nfiles*sizeof(double *));
+  vdate   = (int **) Malloc(nfiles*sizeof(int *));
+  vtime   = (int **) Malloc(nfiles*sizeof(int *));
+  nts     = (long*) Malloc(nfiles*sizeof(long));
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -876,9 +876,9 @@ void *Maggraph(void *argument)
 	  if ( tsID == 0 )
 	    {
 	      nts_alloc += NINC_ALLOC;
-	      datatab[ fileID ] = (double*) malloc( nts_alloc*sizeof(double));
-	      vdate[ fileID ]   = (int*) malloc(  nts_alloc*sizeof(int));
-	      vtime[ fileID ]   = (int*) malloc(  nts_alloc*sizeof(int));
+	      datatab[ fileID ] = (double*) Malloc( nts_alloc*sizeof(double));
+	      vdate[ fileID ]   = (int*) Malloc(  nts_alloc*sizeof(int));
+	      vtime[ fileID ]   = (int*) Malloc(  nts_alloc*sizeof(int));
 	    }
 		
 	  nts[ fileID ]++;
@@ -886,9 +886,9 @@ void *Maggraph(void *argument)
 	  if ( nts[ fileID ] > nts_alloc )
 	    {
 	      nts_alloc += NINC_ALLOC;
-	      datatab[ fileID ] = (double*) realloc(datatab[fileID], nts_alloc*sizeof(double));
-	      vdate[ fileID ]   = (int*) realloc(vdate[fileID], nts_alloc*sizeof(int));
-	      vtime[ fileID ]   = (int*) realloc(vtime[fileID], nts_alloc*sizeof(int));
+	      datatab[ fileID ] = (double*) Realloc(datatab[fileID], nts_alloc*sizeof(double));
+	      vdate[ fileID ]   = (int*) Realloc(vdate[fileID], nts_alloc*sizeof(int));
+	      vtime[ fileID ]   = (int*) Realloc(vtime[fileID], nts_alloc*sizeof(int));
 	    }
 	  
 	  streamInqRecord( streamID, &varID, &levelID );
@@ -939,14 +939,14 @@ void *Maggraph(void *argument)
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      if ( datatab[fileID] ) free(datatab[fileID]);
+      if ( datatab[fileID] ) Free(datatab[fileID]);
     }
 
-  free(datatab);
+  Free(datatab);
 
 
-  if ( vdate ) free(vdate);
-  if ( vtime ) free(vtime);
+  if ( vdate ) Free(vdate);
+  if ( vtime ) Free(vtime);
 
   cdoFinish();
 
@@ -1065,7 +1065,7 @@ void VerifyGraphParameters( int num_param, char **param_names )
 	  halt_flag = TRUE;
 	  fprintf( stderr,"Invalid parameter specification  '%s'!\n", param_names[i] );
 	}
-      free( split_str );
+      Free( split_str );
     }
       
     if( halt_flag == TRUE )

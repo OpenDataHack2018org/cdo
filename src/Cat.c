@@ -114,7 +114,7 @@ void *Cat(void *argument)
 	  if ( ! lcopy )
 	    {
 	      gridsize = vlistGridsizeMax(vlistID1);
-	      array = (double*) malloc(gridsize*sizeof(double));
+	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
 	}
       else
@@ -166,7 +166,7 @@ void *Cat(void *argument)
  
   if ( cdoTimer ) timer_stop(timer_cat);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   cdoFinish();
 

@@ -144,8 +144,8 @@ void maskbox_curv(int *mask, int gridID)
 
   int grid_is_circular = gridIsCircular(gridID);
 
-  double *xvals = (double *) malloc(gridsize*sizeof(double));
-  double *yvals = (double *) malloc(gridsize*sizeof(double));
+  double *xvals = (double *) Malloc(gridsize*sizeof(double));
+  double *yvals = (double *) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -229,8 +229,8 @@ void maskbox_curv(int *mask, int gridID)
         }
     }
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 }
 
 static
@@ -247,8 +247,8 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
   nlon = gridInqXsize(gridID);
   nlat = gridInqYsize(gridID);
 
-  xvals = (double*) malloc(nlon*sizeof(double));
-  yvals = (double*) malloc(nlat*sizeof(double));
+  xvals = (double*) Malloc(nlon*sizeof(double));
+  yvals = (double*) Malloc(nlat*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);  
@@ -330,8 +330,8 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 	}
     }
       
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 }
 
 
@@ -396,7 +396,7 @@ void *Maskbox(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  int *vars = (int *) malloc(nvars*sizeof(int));
+  int *vars = (int *) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( gridID == vlistInqVarGrid(vlistID1, varID) )
@@ -410,8 +410,8 @@ void *Maskbox(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   int gridsize = gridInqSize(gridID);
-  double *array = (double *) malloc(gridsize*sizeof(double));
-  int *mask  = (int *) malloc(gridsize*sizeof(int));
+  double *array = (double *) Malloc(gridsize*sizeof(double));
+  int *mask  = (int *) Malloc(gridsize*sizeof(int));
   for ( i = 0;  i < gridsize; ++i ) mask[i] = 1;
  
   if ( operatorID == MASKLONLATBOX )
@@ -433,8 +433,8 @@ void *Maskbox(void *argument)
     }
   if ( operatorID == MASKREGION )
     {
-      xcoords = (double*) malloc( MAX_VALS*sizeof(double));
-      ycoords = (double*) malloc( MAX_VALS*sizeof(double));
+      xcoords = (double*) Malloc( MAX_VALS*sizeof(double));
+      ycoords = (double*) Malloc( MAX_VALS*sizeof(double));
       nfiles = operatorArgc();
      
       for ( i2 = 0; i2 < nfiles; i2++ )
@@ -492,9 +492,9 @@ void *Maskbox(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( vars  ) free(vars);
-  if ( array ) free(array);
-  if ( mask )  free(mask);
+  if ( vars  ) Free(vars);
+  if ( array ) Free(array);
+  if ( mask )  Free(mask);
 
   cdoFinish();
 

@@ -187,7 +187,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
   long tgt_grid_size = tgt_grid->size;
 
-  weightlinks_t *weightlinks = (weightlinks_t *) malloc(tgt_grid_size*sizeof(weightlinks_t));
+  weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
 
   double findex = 0;
 
@@ -273,7 +273,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
   weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
 
-  if ( weightlinks ) free(weightlinks);
+  if ( weightlinks ) Free(weightlinks);
 
   if ( cdoTimer ) timer_stop(timer_remap_bil);
 } /* scrip_remap_weights_bilinear */

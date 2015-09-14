@@ -129,8 +129,8 @@ void *Importobs(void *argument)
 
   // printf("gridsize=%d, xsize=%d, ysize=%d\n", gridsize, xsize, ysize);
 
-  double *xvals = (double*) malloc(gridsize*sizeof(double));
-  double *yvals = (double*) malloc(gridsize*sizeof(double));
+  double *xvals = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -159,7 +159,7 @@ void *Importobs(void *argument)
   int vlistID = vlistCreate();
   vlistDefTaxis(vlistID, taxisID);
 
-  for ( i = 0; i < nvars; ++i ) data[i] = (double*) malloc(gridsize*sizeof(double));
+  for ( i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
 
   init_vars(vlistID, gridID, zaxisID, nvars);
 
@@ -234,7 +234,7 @@ void *Importobs(void *argument)
 
   write_data(streamID, vlistID, nvars, data);
 
-  for ( i = 0; i < nvars; ++i ) free(data[i]);
+  for ( i = 0; i < nvars; ++i ) Free(data[i]);
 
   if ( cdoVerbose )
     printf("lonmin=%g, lonmax=%g, latmin=%g, latmax=%g\n", lonmin, lonmax, latmin, latmax);
@@ -250,8 +250,8 @@ void *Importobs(void *argument)
   zaxisDestroy(zaxisID);
   taxisDestroy(taxisID);
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
   cdoFinish();
 

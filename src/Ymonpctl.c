@@ -106,12 +106,12 @@ void *Ymonpctl(void *argument)
   nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
   field_init(&field);
-  field.ptr = (double*) malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
@@ -249,10 +249,10 @@ void *Ymonpctl(void *argument)
 	}
     }
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   streamClose(streamID4);
   streamClose(streamID3);

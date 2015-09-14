@@ -102,11 +102,11 @@ void *Copy(void *argument)
 	  streamDefVlist(streamID2, vlistID2);
 
 	  gridsize = vlistGridsizeMax(vlistID1);
-	  array = (double*) malloc(gridsize*sizeof(double));
+	  array = (double*) Malloc(gridsize*sizeof(double));
 	  if ( cdoParIO )
 	    {
 	      fprintf(stderr, "Parallel reading enabled!\n");
-	      parIO.array = (double*) malloc(gridsize*sizeof(double));
+	      parIO.array = (double*) Malloc(gridsize*sizeof(double));
 	      parIO.array_size = gridsize;
 	    }
 	}
@@ -165,7 +165,7 @@ void *Copy(void *argument)
 
   streamClose(streamID2);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
   if ( vlistID2 != CDI_UNDEFID ) vlistDestroy(vlistID2);
 
   cdoFinish();

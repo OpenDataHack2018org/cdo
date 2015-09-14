@@ -158,7 +158,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
            if( !strcmp( split_str[0],"step_freq" ) )
 	     fprintf( stderr,"STEP_FREQ %d\n",STEP_FREQ );
 
-           free( split_str );
+           Free( split_str );
         }
     }
 
@@ -449,7 +449,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   mag_text();
 
   if( LEV_LIST ) 
-    free( LEV_LIST );
+    Free( LEV_LIST );
 
 
 }
@@ -549,9 +549,9 @@ void *Magplot(void *argument)
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
 
-  array           = (double*) malloc(gridsize*sizeof(double));
-  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
-  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
+  array           = (double*) Malloc(gridsize*sizeof(double));
+  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
@@ -678,9 +678,9 @@ void *Magplot(void *argument)
 
   streamClose(streamID);
 
-  if ( array  ) free(array);
-  if ( grid_center_lon ) free(grid_center_lon);
-  if ( grid_center_lat ) free(grid_center_lat);
+  if ( array  ) Free(array);
+  if ( grid_center_lon ) Free(grid_center_lon);
+  if ( grid_center_lat ) Free(grid_center_lat);
 
 /*   quit_XMLtemplate_parser( ); */
 
@@ -931,12 +931,12 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 			  if( syntax == TRUE )
 			    {
 	                       NUM_LEVELS = split_str_count;
-	                       LEV_LIST = (double*) malloc( sizeof( double ) * split_str_count );
+	                       LEV_LIST = (double*) Malloc( sizeof( double ) * split_str_count );
 			       for( k = 0; k < split_str_count; k++ )
 		                 {
 		                    LEV_LIST[k] = atof( split_str1[k] );
 		                 }
-	                       free( split_str1 );
+	                       Free( split_str1 );
 	                    }
 			  }
 		      }
@@ -991,7 +991,7 @@ int checkcolour( char *colour_in )
 	if( strchr( colour_in,';') == NULL || strstr( colour_in,"RGB(") == NULL )
 	  {
 	    cdoWarning( "Found 'RGB=true',Specify Colour in 'RGB(r;g;b)' ( where r,g,b in [0.0,1.0] ) format!" );
-	    free( split_str );
+	    Free( split_str );
 	    return 1;
 	  }
 	  
@@ -1020,7 +1020,7 @@ int checkcolour( char *colour_in )
 	if(  split_str_count != 3 ) 
 	  {
 	    cdoWarning( " Colour specified in Improper format!" );
-	    free( split_str );
+	    Free( split_str );
 	    return 1;
 	  }
     
@@ -1032,7 +1032,7 @@ int checkcolour( char *colour_in )
 	    rgb_values[0] + rgb_values[1] + rgb_values[2] < 0.0f 	   )
 	  {
 	    cdoWarning( " RGB Colour specified with Improper values!" );
-	    free( split_str );
+	    Free( split_str );
 	    return 1;
 	  }
 	  
@@ -1043,7 +1043,7 @@ int checkcolour( char *colour_in )
 	if( strchr( colour_in,';') != NULL || strstr( colour_in,"RGB(") != NULL )
 	  {
 	    cdoWarning( "Found Colour with 'RGB(r;g;b)' format, set parameter RGB='true' !" );
-	    free( split_str );
+	    Free( split_str );
 	    return 1;
 	  }
 	  
@@ -1096,12 +1096,12 @@ int ReadColourTable ( char *filepath )
       }
     
     USR_COLOUR_COUNT = 0;
-    USR_COLOUR_TABLE = ( char **) malloc( num_colors * sizeof( char* ));
-    temp_table  = ( char **) malloc( num_colors * sizeof( char* ));
+    USR_COLOUR_TABLE = ( char **) Malloc( num_colors * sizeof( char* ));
+    temp_table  = ( char **) Malloc( num_colors * sizeof( char* ));
     
     for( i =0; i < num_colors; i++ )
       {
-         temp_table[i] = ( char *) malloc(  256 * sizeof( char ));
+         temp_table[i] = ( char *) Malloc(  256 * sizeof( char ));
 	 fscanf( fp, "%s", temp_table[i] );
 	 if( DBG )
 	   fprintf( stdout, "%s\n", temp_table[i] );

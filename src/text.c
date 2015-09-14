@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include "cdo.h"
+#include "cdo_int.h"
 
 
 void set_text_color(FILE *fp, int attr, int fg)

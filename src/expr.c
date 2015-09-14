@@ -86,7 +86,7 @@ static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
 static
 nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type = typeCon;
 
@@ -337,7 +337,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   long n   = ngp*nlev;
   long i;
 
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -346,7 +346,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   p->zaxisID  = zaxisID;
   p->missval  = missval1;
 
-  p->data = (double*) malloc(n*sizeof(double));
+  p->data = (double*) Malloc(n*sizeof(double));
   double *restrict odat = p->data;
   const double *restrict idat = p2->data;
   double cval = p1->u.con.value;
@@ -359,7 +359,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 
   p->nmiss = nmiss;
 
-  if ( p2->tmpvar ) free(p2->data);
+  if ( p2->tmpvar ) Free(p2->data);
 
   return (p);
 }
@@ -378,7 +378,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   long n   = ngp*nlev;
   long i;
 
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -387,7 +387,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   p->zaxisID  = zaxisID;
   p->missval  = missval1;
 
-  p->data = (double*) malloc(n*sizeof(double));
+  p->data = (double*) Malloc(n*sizeof(double));
   double *restrict odat = p->data;
   const double *restrict idat = p1->data;
   double cval = p2->u.con.value;
@@ -400,7 +400,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 
   p->nmiss = nmiss;
 
-  if ( p1->tmpvar ) free(p1->data);
+  if ( p1->tmpvar ) Free(p1->data);
 
   return (p);
 }
@@ -428,7 +428,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   long nlev1 = zaxisInqSize(p1->zaxisID);
   long nlev2 = zaxisInqSize(p2->zaxisID);
 
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -458,7 +458,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       p->missval = p1->missval;
     }
 
-  p->data = (double*) malloc(ngp*nlev*sizeof(double));
+  p->data = (double*) Malloc(ngp*nlev*sizeof(double));
 
   for ( k = 0; k < nlev; k++ )
     {
@@ -487,8 +487,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 
   p->nmiss = nmiss;
 
-  if ( p1->tmpvar ) free(p1->data);
-  if ( p2->tmpvar ) free(p2->data);
+  if ( p1->tmpvar ) Free(p1->data);
+  if ( p2->tmpvar ) Free(p2->data);
 
   return (p);
 }
@@ -556,7 +556,7 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
   int i;
   int funcID = -1;
 
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type = typeCon;
 
@@ -589,7 +589,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
   long ngp  = gridInqSize(gridID);
   long nlev = zaxisInqSize(zaxisID);
 
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -598,7 +598,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
   p->zaxisID  = zaxisID;
   p->missval  = missval;
 
-  p->data = (double*) malloc(ngp*nlev*sizeof(double));
+  p->data = (double*) Malloc(ngp*nlev*sizeof(double));
 
   for ( i = 0; i < NumFunc; i++)
     if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
@@ -637,7 +637,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 
   p->nmiss = nmiss;
 
-  if ( p1->tmpvar ) free(p1->data);
+  if ( p1->tmpvar ) Free(p1->data);
 
   return (p);
 }
@@ -674,7 +674,7 @@ nodeType *ex_uminus_var(nodeType *p1)
   long ngp  = gridInqSize(gridID);
   long nlev = zaxisInqSize(zaxisID);
 
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -683,7 +683,7 @@ nodeType *ex_uminus_var(nodeType *p1)
   p->zaxisID  = zaxisID;
   p->missval  = missval;
 
-  p->data = (double*) malloc(ngp*nlev*sizeof(double));
+  p->data = (double*) Malloc(ngp*nlev*sizeof(double));
 
   if ( nmiss > 0 )
     {
@@ -704,7 +704,7 @@ nodeType *ex_uminus_var(nodeType *p1)
 static
 nodeType *ex_uminus_con(nodeType *p1)
 {
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type = typeCon;
 
@@ -809,7 +809,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 	}
     }
 
-  nodeType *p = (nodeType*) malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->tmpvar   = 1;
@@ -819,7 +819,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
   p->zaxisID = px->zaxisID;
   p->missval = px->missval;
 
-  p->data = (double*) malloc(ngp*nlev*sizeof(double));
+  p->data = (double*) Malloc(ngp*nlev*sizeof(double));
 
   long loff, loff1, loff2, loff3;
 
@@ -1053,7 +1053,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 
 		  ex_copy(p, rnode);
 
-		  if ( rnode->tmpvar ) free(rnode->data);
+		  if ( rnode->tmpvar ) Free(rnode->data);
 		}
 	    }
 

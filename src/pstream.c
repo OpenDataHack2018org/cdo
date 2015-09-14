@@ -99,13 +99,13 @@ void pstream_list_new(void)
 {
   assert(_pstreamList == NULL);
 
-  _pstreamList = (pstreamPtrToIdx*) malloc(_pstream_max*sizeof(pstreamPtrToIdx));
+  _pstreamList = (pstreamPtrToIdx*) Malloc(_pstream_max*sizeof(pstreamPtrToIdx));
 }
 
 static
 void pstream_list_delete(void)
 {
-  if ( _pstreamList ) free(_pstreamList);
+  if ( _pstreamList ) Free(_pstreamList);
 }
 
 static
@@ -206,7 +206,7 @@ void pstream_init_entry(pstream_t *pstreamptr)
 static
 pstream_t *pstream_new_entry(void)
 {
-  pstream_t *pstreamptr = (pstream_t*) malloc(sizeof(pstream_t));
+  pstream_t *pstreamptr = (pstream_t*) Malloc(sizeof(pstream_t));
 
   if ( pstreamptr ) pstream_init_entry(pstreamptr);
 
@@ -220,7 +220,7 @@ void pstream_delete_entry(pstream_t *pstreamptr)
 
   PSTREAM_LOCK();
 
-  free(pstreamptr);
+  Free(pstreamptr);
 
   _pstreamList[idx].next = _pstreamAvail;
   _pstreamList[idx].ptr  = 0;
@@ -307,7 +307,7 @@ int pstreamOpenRead(const argument_t *argument)
       char *operatorArg;
       char *operatorName;
       char *newarg;
-      char *pipename = (char*) malloc(16);
+      char *pipename = (char*) Malloc(16);
       int rval;
       pthread_t thrID;
       pthread_attr_t attr;
@@ -315,17 +315,17 @@ int pstreamOpenRead(const argument_t *argument)
       size_t len;
       size_t stacksize;
       int status;
-      argument_t *newargument = (argument_t*) malloc(sizeof(argument_t));
+      argument_t *newargument = (argument_t*) Malloc(sizeof(argument_t));
 
       newargument->argc = argument->argc + 1;
-      newargument->argv = (char **) malloc(newargument->argc*sizeof(char *));
+      newargument->argv = (char **) Malloc(newargument->argc*sizeof(char *));
       memcpy(newargument->argv, argument->argv, argument->argc*sizeof(char *));
 
       operatorArg  = argument->argv[0];
       operatorName = getOperatorName(operatorArg);
 
       len = strlen(argument->args);
-      newarg = (char*) malloc(len+16);
+      newarg = (char*) Malloc(len+16);
       strcpy(newarg, argument->args);
       sprintf(pipename, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
       newarg[len] = ' ';
@@ -380,7 +380,7 @@ int pstreamOpenRead(const argument_t *argument)
 	  SysError("pthread_create failed for '%s'", newarg+1);
 	}
 
-      /* free(operatorName); */
+      /* Free(operatorName); */
       processAddStream(pstreamID);
       /*      pipeInqInfo(pstreamID); */
       if ( PSTREAM_Debug ) Message("pipe %s", pipename);
@@ -436,7 +436,7 @@ int pstreamOpenRead(const argument_t *argument)
 		  if ( nfiles == 0 ) cdoAbort("No imput file found in %s", pch);
 
 		  pstreamptr->mfiles = nfiles;
-		  pstreamptr->mfnames = (char **) malloc(nfiles*sizeof(char *));
+		  pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
 		  
 		  rewind(fp);
 
@@ -457,7 +457,7 @@ int pstreamOpenRead(const argument_t *argument)
 		  char line[65536];
 
 		  pstreamptr->mfiles = nfiles;
-		  pstreamptr->mfnames = (char **) malloc(nfiles*sizeof(char *));
+		  pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
 		  
 		  strcpy(line, pch);
 		  for ( i = 0; i < len; i++ ) if ( line[i] == ',' ) line[i] = 0;
@@ -494,7 +494,7 @@ int pstreamOpenRead(const argument_t *argument)
 	      pclose(pfp);
 
 	      pstreamptr->mfiles = nfiles;
-	      pstreamptr->mfnames = (char **) malloc(nfiles*sizeof(char *));
+	      pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
 
 	      for ( j = 0; j < nfiles; j++ )
 		pstreamptr->mfnames[j] = fnames[j];
@@ -504,14 +504,14 @@ int pstreamOpenRead(const argument_t *argument)
       if ( pstreamptr->mfiles )
 	{
 	  len = strlen(pstreamptr->mfnames[0]);
-	  filename = (char*) malloc(len+1);
+	  filename = (char*) Malloc(len+1);
 	  strcpy(filename, pstreamptr->mfnames[0]);
 	  pstreamptr->nfiles = 1;
 	}
       else
 	{
 	  len = strlen(argument->args);
-	  filename = (char*) malloc(len+1);
+	  filename = (char*) Malloc(len+1);
 	  strcpy(filename, argument->args);
 	}
 
@@ -634,7 +634,7 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
     }
   else
     {
-      char *filename = (char*) malloc(strlen(argument->args)+1);
+      char *filename = (char*) Malloc(strlen(argument->args)+1);
 
       pstreamptr = pstream_new_entry();
       if ( ! pstreamptr ) Error("No memory");
@@ -735,7 +735,7 @@ int pstreamOpenAppend(const argument_t *argument)
     }
   else
     {
-      char *filename = (char*) malloc(strlen(argument->args)+1);
+      char *filename = (char*) Malloc(strlen(argument->args)+1);
 
       pstream_t *pstreamptr = pstream_new_entry();
       if ( ! pstreamptr ) Error("No memory");
@@ -813,13 +813,13 @@ void pstreamClose(int pstreamID)
 	  pthread_join(pstreamptr->wthreadID, NULL);
 
 	  pthread_mutex_lock(pipe->mutex);
-	  if ( pstreamptr->name ) free(pstreamptr->name);
+	  if ( pstreamptr->name ) Free(pstreamptr->name);
 	  if ( pstreamptr->argument )
 	    {
 	      argument_t *argument = (argument_t *) (pstreamptr->argument);
-	      if ( argument->argv ) free(argument->argv);
-	      if ( argument->args ) free(argument->args);
-	      free(argument);
+	      if ( argument->argv ) Free(argument->argv);
+	      if ( argument->args ) Free(argument->args);
+	      Free(argument);
 	    }
 	  vlistDestroy(pstreamptr->vlistID);
 	  pthread_mutex_unlock(pipe->mutex);
@@ -884,13 +884,13 @@ void pstreamClose(int pstreamID)
 
       if ( pstreamptr->name )
 	{
-	  free(pstreamptr->name);
+	  Free(pstreamptr->name);
 	  pstreamptr->name = NULL;
 	}
 
       if ( pstreamptr->varlist )
 	{
-	  free(pstreamptr->varlist);
+	  Free(pstreamptr->varlist);
 	  pstreamptr->varlist = NULL;
 	}
 
@@ -977,7 +977,7 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
     cdoAbort("Internal problem, varlist already allocated!");
 
   int nvars = vlistNvars(vlistID);
-  varlist_t *varlist = (varlist_t*) malloc(nvars*sizeof(varlist_t));
+  varlist_t *varlist = (varlist_t*) Malloc(nvars*sizeof(varlist_t));
 
   for ( int varID = 0; varID < nvars; ++varID )
     {
@@ -1343,7 +1343,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  streamClose(pstreamptr->fileID);
 
 	  len = strlen(pstreamptr->mfnames[nfile]);
-	  filename = (char*) malloc(len+1);
+	  filename = (char*) Malloc(len+1);
 	  strcpy(filename, pstreamptr->mfnames[nfile]);
 	  pstreamptr->nfiles++;
 
@@ -1370,7 +1370,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 #endif
 	  if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", filename);
 
-	  free(pstreamptr->name);
+	  Free(pstreamptr->name);
 
 	  pstreamptr->name   = filename;
 	  pstreamptr->fileID = fileID;

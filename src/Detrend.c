@@ -111,7 +111,7 @@ void *Detrend(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+	  vars   = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
@@ -123,7 +123,7 @@ void *Detrend(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -133,11 +133,11 @@ void *Detrend(void *argument)
 
   nts = tsID;
 
-  ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+  ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      ompmem[i].array1 = (double*) malloc(nts*sizeof(double));
-      ompmem[i].array2 = (double*) malloc(nts*sizeof(double));
+      ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
+      ompmem[i].array2 = (double*) Malloc(nts*sizeof(double));
     }
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -168,10 +168,10 @@ void *Detrend(void *argument)
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      free(ompmem[i].array1);
-      free(ompmem[i].array2);
+      Free(ompmem[i].array1);
+      Free(ompmem[i].array2);
     }
-  free(ompmem);
+  Free(ompmem);
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
@@ -188,7 +188,7 @@ void *Detrend(void *argument)
 		  nmiss = vars[tsID][varID][levelID].nmiss;
 		  streamDefRecord(streamID2, varID, levelID);
 		  streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
-		  free(vars[tsID][varID][levelID].ptr);
+		  Free(vars[tsID][varID][levelID].ptr);
 		  vars[tsID][varID][levelID].ptr = NULL;
 		}
 	    }
@@ -197,7 +197,7 @@ void *Detrend(void *argument)
       field_free(vars[tsID], vlistID1);
     }
 
-  if ( vars  ) free(vars);
+  if ( vars  ) Free(vars);
 
   dtlist_delete(dtlist);
 

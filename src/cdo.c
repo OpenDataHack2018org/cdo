@@ -535,19 +535,19 @@ int getMemAlignment(void)
 
   for ( i = 0; i < NTESTS; ++i )
     {
-      ptr[i] = (double*) malloc(tsize[i]);
+      ptr[i] = (double*) Malloc(tsize[i]);
       iptr = (int64_t) ptr[i];
       for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
     }
-  for ( i = 0; i < NTESTS; ++i ) free(ptr[i]);
+  for ( i = 0; i < NTESTS; ++i ) Free(ptr[i]);
 
   for ( i = NTESTS-1; i >= 0; i-- )
     {
-      ptr[i] = (double*)malloc(tsize[i]+5);
+      ptr[i] = (double*) Malloc(tsize[i]+5);
       iptr = (int64_t) ptr[i];
       for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
     }
-  for ( i = 0; i < NTESTS; ++i ) free(ptr[i]);
+  for ( i = 0; i < NTESTS; ++i ) Free(ptr[i]);
 
   for ( k = 0; k < 4; ++k ) if ( ma_result[k] ) ma = ma_check[k];
 
@@ -618,7 +618,7 @@ void defineVarnames(const char *arg)
     {
       char *commapos;
       
-      cdoVarnames = (char **) malloc(MAX_NUM_VARNAMES*sizeof(char *));
+      cdoVarnames = (char **) Malloc(MAX_NUM_VARNAMES*sizeof(char *));
 
       pbuf = strdup(arg+istart);
       cdoVarnames[cdoNumVarnames++] = pbuf;    
@@ -654,7 +654,7 @@ void get_env_vars(void)
       if ( len > 0 )
         {
           len += 2;
-          cdoGridSearchDir = (char*) malloc(len);
+          cdoGridSearchDir = (char*) Malloc(len);
           memcpy(cdoGridSearchDir, envstr, len-1);
           if ( cdoGridSearchDir[len-3] != '/' )
             {
@@ -1559,15 +1559,15 @@ int main(int argc, char *argv[])
 
   if ( cdoVarnames )
     {
-      if ( cdoNumVarnames ) free(cdoVarnames[0]);
-      free(cdoVarnames);
+      if ( cdoNumVarnames ) Free(cdoVarnames[0]);
+      Free(cdoVarnames);
     }
 
-  /* problems with alias!!! if ( operatorName ) free(operatorName); */ 
+  /* problems with alias!!! if ( operatorName ) Free(operatorName); */ 
 
   /* malloc_stats(); */
 
-  if ( cdoGridSearchDir ) free(cdoGridSearchDir);
+  if ( cdoGridSearchDir ) Free(cdoGridSearchDir);
 
   if ( CDO_Rusage ) cdo_rusage();
 

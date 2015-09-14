@@ -109,12 +109,12 @@ void *Intlevel3d(void *argument)
     nlonIn  = gridInqXsize(gridID);
     nlatIn  = gridInqYsize(gridID);
     /*
-    lonIn   = (double*) malloc(nlonIn*sizeof(double));
-    latIn   = (double*) malloc(nlatIn*sizeof(double));
+    lonIn   = (double*) Malloc(nlonIn*sizeof(double));
+    latIn   = (double*) Malloc(nlatIn*sizeof(double));
     gridInqXvals(gridID, lonIn);
     gridInqYvals(gridID, latIn);
     */
-    zlevels_in = (double*) malloc(gridsize*(nlevel+2)*sizeof(double));
+    zlevels_in = (double*) Malloc(gridsize*(nlevel+2)*sizeof(double));
     nlevi      = nlevel;   /* number of input levels for later use */
     gridsizei  = gridsize; /* horizontal gridsize of input z coordinate */
     nrecs      = streamInqTimestep(streamID0, 0);
@@ -145,12 +145,12 @@ void *Intlevel3d(void *argument)
     nlonOut = gridInqXsize(gridID);
     nlatOut = gridInqYsize(gridID);
     /*
-    lonOut  = (double*) malloc(nlonOut*sizeof(double));
-    latOut  = (double*) malloc(nlatOut*sizeof(double));
+    lonOut  = (double*) Malloc(nlonOut*sizeof(double));
+    latOut  = (double*) Malloc(nlatOut*sizeof(double));
     gridInqXvals(gridID, lonOut);
     gridInqYvals(gridID, latOut);
     */
-    zlevels_out = (double*) malloc(gridsize*nlevel*sizeof(double));
+    zlevels_out = (double*) Malloc(gridsize*nlevel*sizeof(double));
     nlevo       = nlevel;  /* number of output levels for later use */
     gridsizeo   = gridsize;/* horizontal gridsize of output z coordinate */
     nrecs       = streamInqTimestep(streamID2, 0);
@@ -270,10 +270,10 @@ void *Intlevel3d(void *argument)
   /*
    * Create weights for later interpolation - assumption: input vertical correct is constant in time
    */
-  lev_idx1 = (int*) malloc(nlevo*gridSize*sizeof(int));
-  lev_idx2 = (int*) malloc(nlevo*gridSize*sizeof(int));
-  lev_wgt1 = (double*) malloc(nlevo*gridSize*sizeof(double));
-  lev_wgt2 = (double*) malloc(nlevo*gridSize*sizeof(double));
+  lev_idx1 = (int*) Malloc(nlevo*gridSize*sizeof(int));
+  lev_idx2 = (int*) Malloc(nlevo*gridSize*sizeof(int));
+  lev_wgt1 = (double*) Malloc(nlevo*gridSize*sizeof(double));
+  lev_wgt2 = (double*) Malloc(nlevo*gridSize*sizeof(double));
 
   vert_gen_weights3d(expol, nlevi+2, gridSize, zlevels_in, nlevo, zlevels_out, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
@@ -281,7 +281,7 @@ void *Intlevel3d(void *argument)
    * Copy z-axis information to output z-axis
    */
   zaxisID3 = zaxisCreate(zaxisInqType(zaxisID1), nlevo);
-  lev2 = (double*) malloc(nlevo*sizeof(double));
+  lev2 = (double*) Malloc(nlevo*sizeof(double));
   /* fill values with its indices */
   for (i=0;i<nlevo;i++)
     lev2[i] = (double) i;
@@ -313,11 +313,11 @@ void *Intlevel3d(void *argument)
 
   maxlev    = nlevi > nlevo ? nlevi : nlevo;
   nvars     = vlistNvars(vlistID1);
-  vars      = (int*) malloc(nvars*sizeof(int));
-  vardata1  = (double**) malloc(nvars*sizeof(double*)); /* input                                         */
-  vardata2  = (double**) malloc(nvars*sizeof(double*)); /* output                                        */
-  varnmiss  = (int**) malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
-  varinterp = (int*) malloc(nvars*sizeof(int));     /* marker for variables to be interpolated       */
+  vars      = (int*) Malloc(nvars*sizeof(int));
+  vardata1  = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
+  vardata2  = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
+  varnmiss  = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
+  varinterp = (int*) Malloc(nvars*sizeof(int));     /* marker for variables to be interpolated       */
 
   /* by default no variable should be interpolated */
   for ( i = 0; i < nvars; i++ )
@@ -332,7 +332,7 @@ void *Intlevel3d(void *argument)
 
       vlistInqVarName(vlistID1, varID, varname);
 
-      vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
+      vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
       /*  variabls for interpolation:
        *  * have the required vertical axis, i.e. the correct number of levels (nlevi)
@@ -344,8 +344,8 @@ void *Intlevel3d(void *argument)
           nlonIn  = gridInqXsize(gridID);
           nlatIn  = gridInqYsize(gridID);
 	  /*
-          lonIn   = (double*) malloc(nlonIn*sizeof(double));
-          latIn   = (double*) malloc(nlatIn*sizeof(double));
+          lonIn   = (double*) Malloc(nlonIn*sizeof(double));
+          latIn   = (double*) Malloc(nlatIn*sizeof(double));
           gridInqXvals(gridID, lonIn);
           gridInqYvals(gridID, latIn);
 	  */
@@ -356,14 +356,14 @@ void *Intlevel3d(void *argument)
             {
               varinterp[varID] = FALSE;
               vardata2[varID]  = vardata1[varID];
-              varnmiss[varID]  = (int*) malloc(nlevel*sizeof(int));
+              varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
               if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
             }
           else
             {
               varinterp[varID] = TRUE;
-              vardata2[varID]  = (double*) malloc(gridsize*nlevo*sizeof(double));
-              varnmiss[varID]  = (int*) malloc(maxlev*sizeof(int));
+              vardata2[varID]  = (double*) Malloc(gridsize*nlevo*sizeof(double));
+              varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
               memset(varnmiss[varID], 0, maxlev*sizeof(int));
             }
         }
@@ -371,7 +371,7 @@ void *Intlevel3d(void *argument)
         {
           varinterp[varID] = FALSE;
           vardata2[varID]  = vardata1[varID];
-          varnmiss[varID]  = (int*) malloc(nlevel*sizeof(int));
+          varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
           if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
         }
       }
@@ -466,22 +466,22 @@ void *Intlevel3d(void *argument)
   nvars     = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(varnmiss[varID]);
-      free(vardata1[varID]);
-      if ( varinterp[varID] ) free(vardata2[varID]);
+      Free(varnmiss[varID]);
+      Free(vardata1[varID]);
+      if ( varinterp[varID] ) Free(vardata2[varID]);
     } 
 
 
-  free(varinterp);
-  free(varnmiss);
-  free(vardata2);
-  free(vardata1);
-  free(vars);
+  Free(varinterp);
+  Free(varnmiss);
+  Free(vardata2);
+  Free(vardata1);
+  Free(vars);
 
-  free(lev_idx1);
-  free(lev_idx2);
-  free(lev_wgt1);
-  free(lev_wgt2);
+  Free(lev_idx1);
+  Free(lev_idx2);
+  Free(lev_wgt1);
+  Free(lev_wgt2);
 
   streamClose(streamID0);
   streamClose(streamID1);

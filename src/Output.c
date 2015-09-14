@@ -113,7 +113,7 @@ void *Output(void *argument)
 	for ( i = 0; i < npar; i++ )
 	  cdoPrint("key %d = %s", i+1, parnames[i]);
 
-      keys = (int*) malloc(npar*sizeof(int));
+      keys = (int*) Malloc(npar*sizeof(int));
       nkeys = 0;
       nKeys = sizeof(Keynames)/sizeof(char *);
       for ( i = 0; i < npar; i++ )
@@ -173,7 +173,7 @@ void *Output(void *argument)
       gridsize = gridInqSize(gridID);
       gridtype = gridInqType(gridID);
 
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
 
       if ( operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ || operatorID == OUTPUTTAB )
 	{
@@ -184,8 +184,8 @@ void *Output(void *argument)
 
 	  gridtype = gridInqType(gridID);
 
-	  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
-	  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
+	  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+	  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
 	  gridInqXvals(gridID, grid_center_lon);
 	  gridInqYvals(gridID, grid_center_lat);
 
@@ -449,12 +449,12 @@ void *Output(void *argument)
 	}
       streamClose(streamID);
 
-      if ( array ) free(array);
-      if ( grid_center_lon ) free(grid_center_lon);
-      if ( grid_center_lat ) free(grid_center_lat);
+      if ( array ) Free(array);
+      if ( grid_center_lon ) Free(grid_center_lon);
+      if ( grid_center_lat ) Free(grid_center_lat);
     }
 
-  if ( keys ) free(keys);
+  if ( keys ) Free(keys);
 
   cdoFinish();
 

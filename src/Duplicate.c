@@ -86,9 +86,9 @@ void *Duplicate(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vdate = (int*) realloc(vdate, nalloc*sizeof(int));
-	  vtime = (int*) realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
+	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
+	  vars  = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);
@@ -101,7 +101,7 @@ void *Duplicate(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -137,9 +137,9 @@ void *Duplicate(void *argument)
 
   for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
 
-  if ( vars  ) free(vars);
-  if ( vdate ) free(vdate);
-  if ( vtime ) free(vtime);
+  if ( vars  ) Free(vars);
+  if ( vdate ) Free(vdate);
+  if ( vtime ) Free(vtime);
 
   streamClose(streamID2);
   streamClose(streamID1);

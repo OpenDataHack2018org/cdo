@@ -70,15 +70,15 @@ void *Regres(void *argument)
 
   nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
 
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) malloc(gridsize*sizeof(double));
+  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   for ( w = 0; w < nwork; w++ )
     work[w] = field_calloc(vlistID1, FIELD_PTR);
@@ -168,11 +168,11 @@ void *Regres(void *argument)
 
   for ( w = 0; w < nwork; w++ ) field_free(work[w], vlistID1);
 
-  if ( field1.ptr ) free(field1.ptr);
-  if ( field2.ptr ) free(field2.ptr);
+  if ( field1.ptr ) Free(field1.ptr);
+  if ( field2.ptr ) Free(field2.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   streamClose(streamID3);
   /* streamClose(streamID2); */

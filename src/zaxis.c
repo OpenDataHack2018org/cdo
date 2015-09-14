@@ -110,17 +110,17 @@ int zaxisDefine(zaxis_t zaxis)
   if ( zaxis.vals )
     {
       zaxisDefLevels(zaxisID, zaxis.vals);
-      free(zaxis.vals);
+      Free(zaxis.vals);
     }
   if ( zaxis.lbounds )
     {
       zaxisDefLbounds(zaxisID, zaxis.lbounds);
-      free(zaxis.lbounds);
+      Free(zaxis.lbounds);
     }
   if ( zaxis.ubounds )
     {
       zaxisDefUbounds(zaxisID, zaxis.ubounds);
-      free(zaxis.ubounds);
+      Free(zaxis.ubounds);
     }
 
   if ( zaxis.name[0] )     zaxisDefName(zaxisID, zaxis.name);
@@ -237,7 +237,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	    {
 	      pline = skipSeparator(pline + len);
 	  
-	      zaxis.vals = (double*) malloc(zaxis.size*sizeof(double));
+	      zaxis.vals = (double*) Malloc(zaxis.size*sizeof(double));
 	      for ( i = 0; i < zaxis.size; i++ )
 		{
 		  pline = skipSeparator(pline);
@@ -271,7 +271,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	    {
 	      pline = skipSeparator(pline + len);
 	  
-	      zaxis.vct = (double*) malloc(zaxis.vctsize*sizeof(double));
+	      zaxis.vct = (double*) Malloc(zaxis.vctsize*sizeof(double));
 	      for ( i = 0; i < zaxis.vctsize; i++ )
 		{
 		  pline = skipSeparator(pline);
@@ -305,7 +305,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	    {
 	      pline = skipSeparator(pline + len);
 	  
-	      zaxis.lbounds = (double*) malloc(zaxis.size*sizeof(double));
+	      zaxis.lbounds = (double*) Malloc(zaxis.size*sizeof(double));
 	      for ( i = 0; i < zaxis.size; i++ )
 		{
 		  pline = skipSeparator(pline);
@@ -339,7 +339,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	    {
 	      pline = skipSeparator(pline + len);
 	  
-	      zaxis.ubounds = (double*) malloc(zaxis.size*sizeof(double));
+	      zaxis.ubounds = (double*) Malloc(zaxis.size*sizeof(double));
 	      for ( i = 0; i < zaxis.size; i++ )
 		{
 		  pline = skipSeparator(pline);
@@ -387,7 +387,7 @@ int zaxisFromName(const char *zaxisname)
     {
       zaxis.type = ZAXIS_SURFACE;
       zaxis.size = 1;
-      zaxis.vals = (double*) malloc(zaxis.size*sizeof(double));
+      zaxis.vals = (double*) Malloc(zaxis.size*sizeof(double));
       zaxis.vals[0] = 0;
     }
 

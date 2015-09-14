@@ -319,7 +319,7 @@ int gridGenArea(int gridID, double* area)
 	{
 	  lgriddestroy = TRUE;
 	  gridID = gridToUnstructured(gridID, 1);
-	  grid_mask = (int*) malloc(gridsize*sizeof(int));
+	  grid_mask = (int*) Malloc(gridsize*sizeof(int));
 	  gridInqMaskGME(gridID, grid_mask);
 	}
       else
@@ -369,14 +369,14 @@ int gridGenArea(int gridID, double* area)
   gridInqXunits(gridID, xunitstr);
   gridInqYunits(gridID, yunitstr);
 
-  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
-  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
+  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID, grid_center_lon);
   gridInqYvals(gridID, grid_center_lat);
 
-  grid_corner_lon = (double*) malloc(nv*gridsize*sizeof(double));
-  grid_corner_lat = (double*) malloc(nv*gridsize*sizeof(double));
+  grid_corner_lon = (double*) Malloc(nv*gridsize*sizeof(double));
+  grid_corner_lat = (double*) Malloc(nv*gridsize*sizeof(double));
 
   if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
     {
@@ -444,11 +444,11 @@ int gridGenArea(int gridID, double* area)
       cdoPrint("Total area = %g steradians", total_area);
     }
 
-  free(grid_center_lon);
-  free(grid_center_lat);
-  free(grid_corner_lon);
-  free(grid_corner_lat);
-  if ( grid_mask ) free(grid_mask);
+  Free(grid_center_lon);
+  Free(grid_center_lat);
+  Free(grid_corner_lon);
+  Free(grid_corner_lat);
+  if ( grid_mask ) Free(grid_mask);
 
   return (status);
 }

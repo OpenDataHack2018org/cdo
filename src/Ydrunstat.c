@@ -108,16 +108,16 @@ void *Ydrunstat(void *argument)
 
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  datetime_t *datetime = (datetime_t*) malloc((ndates+1)*sizeof(datetime_t));
+  datetime_t *datetime = (datetime_t*) Malloc((ndates+1)*sizeof(datetime_t));
   
   YDAY_STATS *stats = ydstatCreate(vlistID1);
-  field_t ***vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
+  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
   field_t ***vars2 = NULL;
   if ( lvarstd )
-    vars2 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
+    vars2 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
   
   for ( its = 0; its < ndates; its++ )
     {
@@ -277,13 +277,13 @@ void *Ydrunstat(void *argument)
     }
   
   ydstatDestroy(stats);
-  free(vars1);
-  if ( lvarstd ) free(vars2);
+  Free(vars1);
+  if ( lvarstd ) Free(vars2);
 
-  if ( datetime ) free(datetime);
+  if ( datetime ) Free(datetime);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   streamClose(streamID2);
   streamClose(streamID1);
@@ -298,7 +298,7 @@ YDAY_STATS *ydstatCreate(int vlistID)
 {
   int dayoy;
   
-  YDAY_STATS *stats = (YDAY_STATS*) malloc(sizeof(YDAY_STATS));
+  YDAY_STATS *stats = (YDAY_STATS*) Malloc(sizeof(YDAY_STATS));
   
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     {
@@ -330,10 +330,10 @@ void ydstatDestroy(YDAY_STATS *stats)
                 {
               	  nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
               	  for ( levelID = 0; levelID < nlevels; levelID++ )
-              	    free(stats->vars1[dayoy][varID][levelID].ptr);
-              	  free(stats->vars1[dayoy][varID]);
+              	    Free(stats->vars1[dayoy][varID][levelID].ptr);
+              	  Free(stats->vars1[dayoy][varID]);
                 }
-              free(stats->vars1[dayoy]);
+              Free(stats->vars1[dayoy]);
             }
           if ( stats->vars2[dayoy] != NULL )
             {
@@ -341,13 +341,13 @@ void ydstatDestroy(YDAY_STATS *stats)
                 {
               	  nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
               	  for ( levelID = 0; levelID < nlevels; levelID++ )
-              	    free(stats->vars2[dayoy][varID][levelID].ptr);
-              	  free(stats->vars2[dayoy][varID]);
+              	    Free(stats->vars2[dayoy][varID][levelID].ptr);
+              	  Free(stats->vars2[dayoy][varID]);
                 }
-              free(stats->vars2[dayoy]);
+              Free(stats->vars2[dayoy]);
             }
         }
-      free(stats);    
+      Free(stats);    
     }
 }
 

@@ -114,7 +114,7 @@ void *Setgrid(void *argument)
 
       gridID = vlistInqVarGrid(vlistID, varID);
       areasize = gridInqSize(gridID);
-      areaweight = (double*) malloc(areasize*sizeof(double));
+      areaweight = (double*) Malloc(areasize*sizeof(double));
   
       streamReadRecord(streamID, areaweight, &nmiss);
 
@@ -158,7 +158,7 @@ void *Setgrid(void *argument)
       missval  = vlistInqVarMissval(vlistID, varID);
       gridID   = vlistInqVarGrid(vlistID, varID);
       masksize = gridInqSize(gridID);
-      gridmask = (double*) malloc(masksize*sizeof(double));
+      gridmask = (double*) Malloc(masksize*sizeof(double));
   
       streamReadRecord(streamID, gridmask, &nmiss);
 
@@ -276,7 +276,7 @@ void *Setgrid(void *argument)
 		  if ( ligme )
 		    {
 		      grid2_nvgp = gridInqSize(gridID2);
-		      grid2_vgpm = (int*) malloc(grid2_nvgp*sizeof(int));
+		      grid2_vgpm = (int*) Malloc(grid2_nvgp*sizeof(int));
 		      gridInqMaskGME(gridID2, grid2_vgpm);
 		      gridCompress(gridID2);
 		    }
@@ -332,7 +332,7 @@ void *Setgrid(void *argument)
 	  gridsize = gridInqSize(gridID1);
 	  if ( gridsize == masksize )
 	    {
-	      int *mask = (int*) malloc(masksize*sizeof(int));
+	      int *mask = (int*) Malloc(masksize*sizeof(int));
 	      for ( i = 0; i < masksize; i++ )
 		{
 		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
@@ -343,7 +343,7 @@ void *Setgrid(void *argument)
 	      gridID2 = gridDuplicate(gridID1);
 	      gridDefMask(gridID2, mask);
 	      vlistChangeGridIndex(vlistID2, index, gridID2);
-	      free(mask);
+	      Free(mask);
 	    }
 	}
     }
@@ -370,7 +370,7 @@ void *Setgrid(void *argument)
     gridsize = vlistGridsizeMax(vlistID1);
 
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -412,10 +412,10 @@ void *Setgrid(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( gridmask ) free(gridmask);
-  if ( areaweight ) free(areaweight);
-  if ( array ) free(array);
-  if ( grid2_vgpm ) free(grid2_vgpm);
+  if ( gridmask ) Free(gridmask);
+  if ( areaweight ) Free(areaweight);
+  if ( array ) Free(array);
+  if ( grid2_vgpm ) Free(grid2_vgpm);
 
   cdoFinish();
 

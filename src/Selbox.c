@@ -113,18 +113,18 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
     {
       if ( lxvals && lyvals )
 	{
-	  xvals1 = (double*) malloc(nlon*nlat*sizeof(double));
-	  yvals1 = (double*) malloc(nlon*nlat*sizeof(double));
-	  xvals2 = (double*) malloc(nlon2*nlat2*sizeof(double));
-	  yvals2 = (double*) malloc(nlon2*nlat2*sizeof(double));
+	  xvals1 = (double*) Malloc(nlon*nlat*sizeof(double));
+	  yvals1 = (double*) Malloc(nlon*nlat*sizeof(double));
+	  xvals2 = (double*) Malloc(nlon2*nlat2*sizeof(double));
+	  yvals2 = (double*) Malloc(nlon2*nlat2*sizeof(double));
 	}
     }
   else
     {
-      if ( lxvals ) xvals1 = (double*) malloc(nlon*sizeof(double));
-      if ( lyvals ) yvals1 = (double*) malloc(nlat*sizeof(double));
-      if ( lxvals ) xvals2 = (double*) malloc(nlon2*sizeof(double));
-      if ( lyvals ) yvals2 = (double*) malloc(nlat2*sizeof(double));
+      if ( lxvals ) xvals1 = (double*) Malloc(nlon*sizeof(double));
+      if ( lyvals ) yvals1 = (double*) Malloc(nlat*sizeof(double));
+      if ( lxvals ) xvals2 = (double*) Malloc(nlon2*sizeof(double));
+      if ( lyvals ) yvals2 = (double*) Malloc(nlat2*sizeof(double));
     }
 
   pxvals2 = xvals2;
@@ -168,26 +168,26 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   if ( xvals2 ) gridDefXvals(gridID2, xvals2);
   if ( yvals2 ) gridDefYvals(gridID2, yvals2);
 
-  if ( xvals1 ) free(xvals1);
-  if ( yvals1 ) free(yvals1);
-  if ( xvals2 ) free(xvals2);
-  if ( yvals2 ) free(yvals2);
+  if ( xvals1 ) Free(xvals1);
+  if ( yvals1 ) Free(yvals1);
+  if ( xvals2 ) Free(xvals2);
+  if ( yvals2 ) Free(yvals2);
 
   if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
     {
       if ( gridtype == GRID_CURVILINEAR )
 	{
-	  xbounds1 = (double*) malloc(4*nlon*nlat*sizeof(double));
-	  ybounds1 = (double*) malloc(4*nlon*nlat*sizeof(double));
-	  xbounds2 = (double*) malloc(4*nlon2*nlat2*sizeof(double));
-	  ybounds2 = (double*) malloc(4*nlon2*nlat2*sizeof(double));
+	  xbounds1 = (double*) Malloc(4*nlon*nlat*sizeof(double));
+	  ybounds1 = (double*) Malloc(4*nlon*nlat*sizeof(double));
+	  xbounds2 = (double*) Malloc(4*nlon2*nlat2*sizeof(double));
+	  ybounds2 = (double*) Malloc(4*nlon2*nlat2*sizeof(double));
 	}
       else
 	{
-	  xbounds1 = (double*) malloc(2*nlon*sizeof(double));
-	  ybounds1 = (double*) malloc(2*nlat*sizeof(double));
-	  xbounds2 = (double*) malloc(2*nlon2*sizeof(double));
-	  ybounds2 = (double*) malloc(2*nlat2*sizeof(double));
+	  xbounds1 = (double*) Malloc(2*nlon*sizeof(double));
+	  ybounds1 = (double*) Malloc(2*nlat*sizeof(double));
+	  xbounds2 = (double*) Malloc(2*nlon2*sizeof(double));
+	  ybounds2 = (double*) Malloc(2*nlat2*sizeof(double));
 	}
 
       pxbounds2 = xbounds2;
@@ -230,10 +230,10 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
       gridDefXbounds(gridID2, xbounds2);
       gridDefYbounds(gridID2, ybounds2);
 
-      free(xbounds1);
-      free(ybounds1);
-      free(xbounds2);
-      free(ybounds2);
+      Free(xbounds1);
+      Free(ybounds1);
+      Free(xbounds2);
+      Free(ybounds2);
     }
 
   return (gridID2);
@@ -277,10 +277,10 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 
   if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
     {
-      xvals1 = (double*) malloc(gridsize1*sizeof(double));
-      yvals1 = (double*) malloc(gridsize1*sizeof(double));
-      xvals2 = (double*) malloc(gridsize2*sizeof(double));
-      yvals2 = (double*) malloc(gridsize2*sizeof(double));
+      xvals1 = (double*) Malloc(gridsize1*sizeof(double));
+      yvals1 = (double*) Malloc(gridsize1*sizeof(double));
+      xvals2 = (double*) Malloc(gridsize2*sizeof(double));
+      yvals2 = (double*) Malloc(gridsize2*sizeof(double));
 
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
@@ -297,20 +297,20 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
 
-      free(xvals1);
-      free(yvals1);
-      free(xvals2);
-      free(yvals2);
+      Free(xvals1);
+      Free(yvals1);
+      Free(xvals2);
+      Free(yvals2);
     }
 
   if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
     {
       nv = gridInqNvertex(gridID1);
 
-      xbounds1 = (double*) malloc(nv*gridsize1*sizeof(double));
-      ybounds1 = (double*) malloc(nv*gridsize1*sizeof(double));
-      xbounds2 = (double*) malloc(nv*gridsize2*sizeof(double));
-      ybounds2 = (double*) malloc(nv*gridsize2*sizeof(double));
+      xbounds1 = (double*) Malloc(nv*gridsize1*sizeof(double));
+      ybounds1 = (double*) Malloc(nv*gridsize1*sizeof(double));
+      xbounds2 = (double*) Malloc(nv*gridsize2*sizeof(double));
+      ybounds2 = (double*) Malloc(nv*gridsize2*sizeof(double));
 
       gridInqXbounds(gridID1, xbounds1);
       gridInqYbounds(gridID1, ybounds1);
@@ -329,10 +329,10 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
       gridDefXbounds(gridID2, xbounds2);
       gridDefYbounds(gridID2, ybounds2);
 
-      free(xbounds1);
-      free(ybounds1);
-      free(xbounds2);
-      free(ybounds2);
+      Free(xbounds1);
+      Free(ybounds1);
+      Free(xbounds2);
+      Free(ybounds2);
     }
 
   return (gridID2);
@@ -347,8 +347,8 @@ void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, doub
   int nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
 
-  double *xvals = (double*) malloc(nlon*sizeof(double));
-  double *yvals = (double*) malloc(nlat*sizeof(double));
+  double *xvals = (double*) Malloc(nlon*sizeof(double));
+  double *yvals = (double*) Malloc(nlat*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -426,8 +426,8 @@ void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, doub
 	}
     }
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
   if ( *lat2 - *lat1 + 1 <= 0 )
     cdoAbort("Latitudinal dimension is too small!");
@@ -445,8 +445,8 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
 
   int grid_is_circular = gridIsCircular(gridID);
 
-  double *xvals = (double *) malloc(gridsize*sizeof(double));
-  double *yvals = (double *) malloc(gridsize*sizeof(double));
+  double *xvals = (double *) Malloc(gridsize*sizeof(double));
+  double *yvals = (double *) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -550,8 +550,8 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
   if ( *lat2 - *lat1 + 1 <= 0 )
     cdoAbort("Latitudinal dimension is too small!");
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 }
 
 
@@ -645,8 +645,8 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
   if ( gridtype != GRID_UNSTRUCTURED ) cdoAbort("Internal problem, wrong grid type!");
 
-  xvals = (double*) malloc(gridsize1*sizeof(double));
-  yvals = (double*) malloc(gridsize1*sizeof(double));
+  xvals = (double*) Malloc(gridsize1*sizeof(double));
+  yvals = (double*) Malloc(gridsize1*sizeof(double));
 
   gridInqXvals(gridID1, xvals);
   gridInqYvals(gridID1, yvals);
@@ -672,7 +672,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 	    if ( nvals > maxcell )
 	      {
 		maxcell += cellinc;
-		*cellidx = (int*) realloc(*cellidx, maxcell*sizeof(int));
+		*cellidx = (int*) Realloc(*cellidx, maxcell*sizeof(int));
 	      }
 	    (*cellidx)[nvals-1] = i;
 	  }
@@ -682,8 +682,8 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
   *gridsize2 = nvals;
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
   gridID2 = gengridcell(gridID1, *gridsize2, *cellidx);
 
@@ -877,11 +877,11 @@ void *Selbox(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  int *vars  = (int *) malloc(nvars*sizeof(int));
+  int *vars  = (int *) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
 
   int ngrids = vlistNgrids(vlistID1);
-  sbox_t *sbox = (sbox_t *) malloc(ngrids*sizeof(sbox_t));
+  sbox_t *sbox = (sbox_t *) Malloc(ngrids*sizeof(sbox_t));
 
   for ( index = 0; index < ngrids; index++ )
     {
@@ -951,11 +951,11 @@ void *Selbox(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array1 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   int gridsize2 = vlistGridsizeMax(vlistID2);
   if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
-  double *array2 = (double*) malloc(gridsize2*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -1013,18 +1013,18 @@ void *Selbox(void *argument)
 
   vlistDestroy(vlistID2);
 
-  if ( vars   ) free(vars);
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  if ( vars   ) Free(vars);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
   if ( sbox )
     {
       if ( operatorID == SELLONLATBOX  && gridtype == GRID_UNSTRUCTURED )
 	{
 	  for ( index = 0; index < ngrids; index++ )
-	    if ( sbox[index].cellidx ) free(sbox[index].cellidx);
+	    if ( sbox[index].cellidx ) Free(sbox[index].cellidx);
 	}
-      free(sbox);
+      Free(sbox);
     }
 
   cdoFinish();

@@ -15,6 +15,7 @@
   GNU General Public License for more details.
 */
 
+#include <stdlib.h>
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -26,8 +27,8 @@ void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
 {
   if ( ysize > 1 )
     {      
-      double *yvals1 = (double*) malloc(ysize*sizeof(double));
-      double *yvals2 = (double*) malloc(ysize*sizeof(double));
+      double *yvals1 = (double*) Malloc(ysize*sizeof(double));
+      double *yvals2 = (double*) Malloc(ysize*sizeof(double));
 
       gridInqYvals(gridID1, yvals1);
       gridInqYvals(gridID2, yvals2);
@@ -51,8 +52,8 @@ void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
 	      }
 	}
 
-      free(yvals1);
-      free(yvals2);
+      Free(yvals1);
+      Free(yvals2);
     }
 }
 
@@ -61,8 +62,8 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
 {
   if ( xsize > 1 )
     {
-      double *xvals1 = (double*) malloc(xsize*sizeof(double));
-      double *xvals2 = (double*) malloc(xsize*sizeof(double));
+      double *xvals1 = (double*) Malloc(xsize*sizeof(double));
+      double *xvals2 = (double*) Malloc(xsize*sizeof(double));
 
       gridInqXvals(gridID1, xvals1);
       gridInqXvals(gridID2, xvals2);
@@ -74,8 +75,8 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
 	    break;
 	  }
       
-      free(xvals1);
-      free(xvals2);
+      Free(xvals1);
+      Free(xvals2);
     }
 }
 
@@ -84,10 +85,10 @@ void compare_grid_unstructured(int gridID1, int gridID2)
 {
   int gridsize = gridInqSize(gridID1);
 
-  double *xvals1 = (double*) malloc(gridsize*sizeof(double));
-  double *xvals2 = (double*) malloc(gridsize*sizeof(double));
-  double *yvals1 = (double*) malloc(gridsize*sizeof(double));
-  double *yvals2 = (double*) malloc(gridsize*sizeof(double));
+  double *xvals1 = (double*) Malloc(gridsize*sizeof(double));
+  double *xvals2 = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals1 = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals2 = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID1, xvals1);
   gridInqXvals(gridID2, xvals2);
@@ -103,10 +104,10 @@ void compare_grid_unstructured(int gridID1, int gridID2)
 	break;
       }
       
-  free(xvals1);
-  free(xvals2);
-  free(yvals1); 
-  free(yvals2); 
+  Free(xvals1);
+  Free(xvals2);
+  Free(yvals1); 
+  Free(yvals2); 
 }
 
 static

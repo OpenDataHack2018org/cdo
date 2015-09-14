@@ -126,12 +126,12 @@ void *Merstat(void *argument)
   field_init(&field1);
   field_init(&field2);
 
-  field1.ptr    = (double*) malloc(lim*sizeof(double));
+  field1.ptr    = (double*) Malloc(lim*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )
-    field1.weight = (double*) malloc(lim*sizeof(double));
+    field1.weight = (double*) Malloc(lim*sizeof(double));
 
-  field2.ptr  = (double*) malloc(nlonmax*sizeof(double));
+  field2.ptr  = (double*) Malloc(nlonmax*sizeof(double));
   field2.grid = gridID2;
 
   int tsID = 0;
@@ -174,9 +174,9 @@ void *Merstat(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( field1.ptr )    free(field1.ptr);
-  if ( field1.weight ) free(field1.weight);
-  if ( field2.ptr )    free(field2.ptr);
+  if ( field1.ptr )    Free(field1.ptr);
+  if ( field1.weight ) Free(field1.weight);
+  if ( field2.ptr )    Free(field2.ptr);
 
   cdoFinish();
 

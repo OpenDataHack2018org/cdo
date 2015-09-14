@@ -147,12 +147,12 @@ void *Arith(void *argument)
 
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) malloc(gridsize*sizeof(double));
+  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
   if ( filltype == FILL_VAR || filltype == FILL_VARTS )
     {
-      vardata2 = (double*) malloc(gridsize*nlevels2*sizeof(double));
-      varnmiss2 = (int*) malloc(nlevels2*sizeof(int));
+      vardata2 = (double*) Malloc(gridsize*nlevels2*sizeof(double));
+      varnmiss2 = (int*) Malloc(nlevels2*sizeof(int));
     }
 
   if ( cdoVerbose ) cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
@@ -180,14 +180,14 @@ void *Arith(void *argument)
       if ( filltype == FILL_TS )
 	{
 	  nvars  = vlistNvars(vlistIDx2);
-	  vardata  = (double **) malloc(nvars*sizeof(double *));
-	  varnmiss = (int **) malloc(nvars*sizeof(int *));
+	  vardata  = (double **) Malloc(nvars*sizeof(double *));
+	  varnmiss = (int **) Malloc(nvars*sizeof(int *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-	      vardata[varID]  = (double*) malloc(nlev*gridsize*sizeof(double));
-	      varnmiss[varID] = (int*) malloc(nlev*sizeof(int));
+	      vardata[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
+	      varnmiss[varID] = (int*) Malloc(nlev*sizeof(int));
 	    }
 	}
     }
@@ -325,18 +325,18 @@ void *Arith(void *argument)
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  free(vardata[varID]);
-	  free(varnmiss[varID]);
+	  Free(vardata[varID]);
+	  Free(varnmiss[varID]);
 	}
 
-      free(vardata);
-      free(varnmiss);
+      Free(vardata);
+      Free(varnmiss);
     }
 
-  if ( field1.ptr ) free(field1.ptr);
-  if ( field2.ptr ) free(field2.ptr);
-  if ( vardata2   ) free(vardata2);
-  if ( varnmiss2  ) free(varnmiss2);
+  if ( field1.ptr ) Free(field1.ptr);
+  if ( field2.ptr ) Free(field2.ptr);
+  if ( vardata2   ) Free(vardata2);
+  if ( varnmiss2  ) Free(varnmiss2);
 
   cdoFinish();
 

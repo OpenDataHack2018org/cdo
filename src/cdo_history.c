@@ -56,7 +56,7 @@ void cdoInqHistory(int fileID)
 {
   if ( ghistory )
     {
-      free(ghistory);
+      Free(ghistory);
       ghistorysize = 0;
       ghistory = NULL;
     }
@@ -65,7 +65,7 @@ void cdoInqHistory(int fileID)
   if ( ghistorysize > 0 )
     {
       size_t len;
-      ghistory = (char*) malloc(ghistorysize+1);
+      ghistory = (char*) Malloc(ghistorysize+1);
       ghistory[ghistorysize] = 0;
       streamInqHistoryString(fileID, ghistory);
       len = strlen(ghistory);
@@ -93,7 +93,7 @@ void cdoDefHistory(int fileID, char *histstring)
 
   if ( historysize )
     {
-      char *history = (char*) malloc(historysize);
+      char *history = (char*) Malloc(historysize);
       history[0] = 0;
 
       if ( CDO_Append_History )
@@ -110,6 +110,6 @@ void cdoDefHistory(int fileID, char *histstring)
           }
   
       streamDefHistory(fileID, strlen(history), history);
-      free(history);
+      Free(history);
     }
 }

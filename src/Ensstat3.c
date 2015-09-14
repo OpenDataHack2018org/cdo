@@ -117,20 +117,20 @@ void *Ensstat3(void *argument)
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
+  ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
 
   /* *************************************************** */
   /* should each thread be allocating memory locally???? */
   /* ("first touch strategy")                            */
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
-  field = (field_t*) malloc(ompNumThreads*sizeof(field_t));
+  field = (field_t*) Malloc(ompNumThreads*sizeof(field_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);
       field[i].size   = nfiles;
-      field[i].ptr    = (double*) malloc(nfiles*sizeof(double));
-      field[i].weight = (double*) malloc(nfiles*sizeof(double));
+      field[i].ptr    = (double*) Malloc(nfiles*sizeof(double));
+      field[i].weight = (double*) Malloc(nfiles*sizeof(double));
       for ( fileID = 0; fileID < nfiles; fileID++ )
 	field[i].weight[fileID] = 1;
     }
@@ -152,9 +152,9 @@ void *Ensstat3(void *argument)
   vlistID1 = ef[0].vlistID;
   vlistID2 = vlistCreate();
   nvars = vlistNvars(vlistID1);
-  varID2 = (int*) malloc(nvars*sizeof(int));
+  varID2 = (int*) Malloc(nvars*sizeof(int));
 
-  levs = (double*) calloc(nfiles, sizeof(double));
+  levs = (double*) Calloc(nfiles, sizeof(double));
   zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nfiles);
   for ( i=0; i<nfiles; i++ )
     levs[i] = i;
@@ -208,37 +208,37 @@ void *Ensstat3(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = (double*) malloc(gridsize*sizeof(double));
+    ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
 
   if ( operfunc == func_rank && datafunc == SPACE ) 
     { /*need to memorize data for entire grid before writing          */
-      array2 = (int**) malloc((nfiles+1)*sizeof(int*));
+      array2 = (int**) Malloc((nfiles+1)*sizeof(int*));
       for ( binID=0; binID<nfiles; binID++ ) 
-	array2[binID] = (int*) calloc( gridsize, sizeof(int));
+	array2[binID] = (int*) Calloc( gridsize, sizeof(int));
     }
   else if ( operfunc == func_rank )
     {  /* can process data separately for each timestep and only need */
        /* to cumulate values over the grid                            */
-      array2    = (int **) malloc( (nfiles+1)*sizeof(int *));
+      array2    = (int **) Malloc( (nfiles+1)*sizeof(int *));
       for ( binID=0; binID<nfiles; binID++ )
-	array2[binID] = (int*) calloc( 1, sizeof(int));
+	array2[binID] = (int*) Calloc( 1, sizeof(int));
     }
 
   if ( operfunc == func_roc ) {
-    ctg_tab = (int**) malloc((nbins+1)*sizeof(int*));
+    ctg_tab = (int**) Malloc((nbins+1)*sizeof(int*));
     hist =    (int*) malloc ( nbins*sizeof(int));
-    uThresh = (double*) malloc( nbins*sizeof(double));
-    lThresh = (double*) malloc( nbins*sizeof(double));
-    roc     = (double**) malloc((nbins+1)*sizeof(double*));
+    uThresh = (double*) Malloc( nbins*sizeof(double));
+    lThresh = (double*) Malloc( nbins*sizeof(double));
+    roc     = (double**) Malloc((nbins+1)*sizeof(double*));
     
     for  ( i=0; i<nbins; i++ ) {
-      ctg_tab[i] = (int*) calloc( 4,sizeof(int));
-      roc[i]     = (double*) calloc( 2,sizeof(double));
+      ctg_tab[i] = (int*) Calloc( 4,sizeof(int));
+      roc[i]     = (double*) Calloc( 2,sizeof(double));
       uThresh[i] = ((double)i+1)/nbins;
       lThresh[i] = (double)i/nbins;
     }
-    ctg_tab[nbins] = (int*) calloc(4,sizeof(int));
-    roc[nbins]     = (double*) calloc(2,sizeof(double));
+    ctg_tab[nbins] = (int*) Calloc(4,sizeof(int));
+    roc[nbins]     = (double*) Calloc(2,sizeof(double));
   }
   
   
@@ -439,7 +439,7 @@ void *Ensstat3(void *argument)
       int osize = gridsize;
 
       if ( datafunc == TIME ) osize = 1;
-      tmpdoub = (double*) malloc(osize*sizeof(double));
+      tmpdoub = (double*) Malloc(osize*sizeof(double));
 
       for ( binID = 0; binID < nfiles; binID++ )
 	{
@@ -450,7 +450,7 @@ void *Ensstat3(void *argument)
 	  streamWriteRecord(streamID2, tmpdoub, nmiss);
 	}
 
-      free(tmpdoub);
+      Free(tmpdoub);
     }
   else if ( operfunc == func_roc ) {
     fprintf(stdout, "#             :     TP     FP     FN     TN         TPR        FPR\n");
@@ -488,22 +488,22 @@ void *Ensstat3(void *argument)
     streamClose(streamID2);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    if ( ef[fileID].array ) free(ef[fileID].array);
+    if ( ef[fileID].array ) Free(ef[fileID].array);
 
-  if ( ef ) free(ef);
+  if ( ef ) Free(ef);
   if ( array2 ) {
     for (binID=0; binID<nfiles; binID++ )
-      free(array2[binID]);
-    free(array2);
+      Free(array2[binID]);
+    Free(array2);
   }
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      if ( field[i].ptr    ) free(field[i].ptr);
-      if ( field[i].weight ) free(field[i].weight);
+      if ( field[i].ptr    ) Free(field[i].ptr);
+      if ( field[i].weight ) Free(field[i].weight);
     }
   
-  if ( field ) free(field);
+  if ( field ) Free(field);
   
   cdoFinish();
   

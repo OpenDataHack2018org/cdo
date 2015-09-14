@@ -70,8 +70,8 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 
   if ( bit != 1 )
     {
-      work_r = (double*) malloc(seg_l*sizeof(double));
-      work_i = (double*) malloc(seg_l*sizeof(double));
+      work_r = (double*) Malloc(seg_l*sizeof(double));
+      work_i = (double*) Malloc(seg_l*sizeof(double));
     }
 	
   for (seg_i = 0; seg_i < seg_n; seg_i += 2)
@@ -149,8 +149,8 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 
   if ( bit != 1 )
     {
-      free(work_r);
-      free(work_i);
+      Free(work_r);
+      Free(work_i);
     }
 	
   for (k = 0; k <= seg_l / 2; k++)
@@ -207,9 +207,9 @@ void *Spectrum(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vdate = (int*) realloc(vdate, nalloc*sizeof(int));
-	  vtime = (int*) realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
+	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
+	  vars  = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);
@@ -222,7 +222,7 @@ void *Spectrum(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 
@@ -264,15 +264,15 @@ void *Spectrum(void *argument)
 
   nfreq = seg_l/2 + 1;
 
-  vars2 = (field_t ***) malloc(nfreq*sizeof(field_t **));
+  vars2 = (field_t ***) Malloc(nfreq*sizeof(field_t **));
   for ( freq = 0; freq < nfreq; freq++ )
     vars2[freq] = field_malloc(vlistID1, FIELD_PTR);
 
-  array1  = (double*) malloc(nts   * sizeof(double));
-  array2  = (double*) malloc(nfreq * sizeof(double));
-  real    = (double*) malloc(seg_l * sizeof(double));
-  imag    = (double*) malloc(seg_l * sizeof(double));
-  window  = (double*) malloc(seg_l * sizeof(double));
+  array1  = (double*) Malloc(nts   * sizeof(double));
+  array2  = (double*) Malloc(nfreq * sizeof(double));
+  real    = (double*) Malloc(seg_l * sizeof(double));
+  imag    = (double*) Malloc(seg_l * sizeof(double));
+  window  = (double*) Malloc(seg_l * sizeof(double));
   	   
   switch (which_window)
     {
@@ -328,8 +328,8 @@ void *Spectrum(void *argument)
 	}
     }
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
+  if ( array1 ) Free(array1);
+  if ( array2 ) Free(array2);
 
   for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
 
@@ -356,10 +356,10 @@ void *Spectrum(void *argument)
       field_free(vars2[tsID], vlistID1);
     }
 
-  if ( vars  ) free(vars);
-  if ( vars2 ) free(vars2);
-  if ( vdate ) free(vdate);
-  if ( vtime ) free(vtime);
+  if ( vars  ) Free(vars);
+  if ( vars2 ) Free(vars2);
+  if ( vdate ) Free(vdate);
+  if ( vtime ) Free(vtime);
 
   streamClose(streamID2);
   streamClose(streamID1);

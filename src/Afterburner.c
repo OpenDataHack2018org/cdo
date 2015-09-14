@@ -1486,7 +1486,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 
 	      iVertID = zaxisID;
 	      globs->NumLevelFound = numlevel;
-	      LevelFound = (double *) malloc(globs->NumLevelFound*sizeof(double));
+	      LevelFound = (double *) Malloc(globs->NumLevelFound*sizeof(double));
 	      for ( l = 0; l < globs->NumLevelFound; l++ )
 		LevelFound[l] = (int) zaxisInqLevel(zaxisID, l);
 
@@ -1500,7 +1500,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 
 			  if ( globs->vct == NULL )
 			    {
-			      globs->vct = (double *) malloc(globs->nvct*sizeof(double));
+			      globs->vct = (double *) Malloc(globs->nvct*sizeof(double));
 			      memcpy(globs->vct, zaxisInqVctPtr(zaxisID), globs->nvct*sizeof(double));
 			    }
 			}
@@ -1510,7 +1510,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 			    {
 			      fprintf(stderr," Using internal VCT for L191\n");
 			      globs->nvct = (191+1)*2;
-			      globs->vct = (double *) malloc(globs->nvct*sizeof(double));
+			      globs->vct = (double *) Malloc(globs->nvct*sizeof(double));
 			      memcpy(globs->vct, VCT_L191, globs->nvct*sizeof(double));
 			      zaxisDefVct(zaxisID, globs->nvct, globs->vct);
 			    }
@@ -1609,7 +1609,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
   if ( globs->Debug )
     Message( "FieldDim = %d", FieldDim);
 
-  globs->Field = (double *) malloc(FieldDim*sizeof(double));
+  globs->Field = (double *) Malloc(FieldDim*sizeof(double));
 
   if ( globs->Debug )
     for ( code = 0; code < MaxCodes; code++ )
@@ -1776,7 +1776,7 @@ void after_readVct(struct Control *globs, const char *vctfile)
   while ( fgets(line, 1023, fp) ) globs->nvct++;
 
   globs->nvct *= 2;
-  globs->vct = (double *) malloc(globs->nvct*sizeof(double));
+  globs->vct = (double *) Malloc(globs->nvct*sizeof(double));
 
   rewind(fp);
   for ( i = 0; i < globs->nvct/2; i++ )
@@ -2057,9 +2057,9 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   after_dimcalc(globs);
 
-  globs->rcoslat          = (double *) malloc(globs->Latitudes*sizeof(double));
-  globs->coslat           = (double *) malloc(globs->Latitudes*sizeof(double));
-  globs->DerivationFactor = (double *) malloc(globs->Latitudes*sizeof(double));
+  globs->rcoslat          = (double *) Malloc(globs->Latitudes*sizeof(double));
+  globs->coslat           = (double *) Malloc(globs->Latitudes*sizeof(double));
+  globs->DerivationFactor = (double *) Malloc(globs->Latitudes*sizeof(double));
 
   if ( globs->Type < 50 && globs->AnalysisData )
     {
@@ -2123,8 +2123,8 @@ void after_processing(struct Control *globs, struct Variable *vars)
   /*  if ( vars[U_WIND].needed || vars[V_WIND].needed ) */
   if ( vars[U_WIND].comp || vars[V_WIND].comp )
     {
-      globs->dv2uv_f1 = (double *) malloc(globs->DimSP_half*sizeof(double));
-      globs->dv2uv_f2 = (double *) malloc(globs->DimSP_half*sizeof(double));
+      globs->dv2uv_f1 = (double *) Malloc(globs->DimSP_half*sizeof(double));
+      globs->dv2uv_f2 = (double *) Malloc(globs->DimSP_half*sizeof(double));
       geninx(globs->Truncation, globs->dv2uv_f1, globs->dv2uv_f2);
     }
 
@@ -2152,16 +2152,16 @@ void after_processing(struct Control *globs, struct Variable *vars)
 #endif
   streamClose(globs->istreamID);
 
-  if ( globs->rcoslat )          free(globs->rcoslat);
-  if ( globs->coslat )           free(globs->coslat);
-  if ( globs->DerivationFactor ) free(globs->DerivationFactor);
+  if ( globs->rcoslat )          Free(globs->rcoslat);
+  if ( globs->coslat )           Free(globs->coslat);
+  if ( globs->DerivationFactor ) Free(globs->DerivationFactor);
 
-  if ( globs->Field ) free(globs->Field);
+  if ( globs->Field ) Free(globs->Field);
 
-  if ( globs->poli ) free(globs->poli);
-  if ( globs->pold ) free(globs->pold);
-  if ( globs->pdev ) free(globs->pdev);
-  if ( globs->pol2 ) free(globs->pol2);  if ( globs->pol3 ) free(globs->pol3);
+  if ( globs->poli ) Free(globs->poli);
+  if ( globs->pold ) Free(globs->pold);
+  if ( globs->pdev ) Free(globs->pdev);
+  if ( globs->pol2 ) Free(globs->pol2);  if ( globs->pol3 ) Free(globs->pol3);
 }
 
 extern char *optarg;
@@ -2223,7 +2223,7 @@ int afterburner(int argc, char *argv[])
       fclose(fp);
     }
 
-  struct Control *globs = (struct Control *) malloc(sizeof(struct Control));
+  struct Control *globs = (struct Control *) Malloc(sizeof(struct Control));
   after_control_init(globs);
 
   globs->Verbose = 1;
@@ -2319,7 +2319,7 @@ int afterburner(int argc, char *argv[])
       if ( globs->Multi > 0 )
 	Error( "Namelist parameter MULTI works only with one inputfile");
 
-      ifiles = (char **) malloc(globs->Nfiles*sizeof(char*));
+      ifiles = (char **) Malloc(globs->Nfiles*sizeof(char*));
       for ( i = 0; i < globs->Nfiles; i++ )
 	ifiles[i] = argv[--fargcn];
     }
@@ -2350,7 +2350,7 @@ int afterburner(int argc, char *argv[])
 
   FreeMean(vars);
 
-  free(globs);
+  Free(globs);
 
   return(0);
 }
@@ -2363,7 +2363,7 @@ void *Afterburner(void *argument)
 
   lstdout = !cdoSilentMode;
 
-  struct Control *globs = (struct Control *) malloc(sizeof(struct Control));
+  struct Control *globs = (struct Control *) Malloc(sizeof(struct Control));
   after_control_init(globs);
 
   globs->Verbose = cdoVerbose;
@@ -2389,7 +2389,7 @@ void *Afterburner(void *argument)
       if ( globs->Multi > 0 )
 	Error( "Namelist parameter MULTI works only with one inputfile");
 
-      ifiles = (char **) malloc(globs->Nfiles*sizeof(char*));
+      ifiles = (char **) Malloc(globs->Nfiles*sizeof(char*));
       for ( int i = 0; i < globs->Nfiles; ++i )
 	ifiles[i] = cdoStreamName(--nfiles)->args;
       for ( int i = 0; i < globs->Nfiles; ++i ) printf("files %d %s\n", i+1, ifiles[i]);
@@ -2399,7 +2399,7 @@ void *Afterburner(void *argument)
 
   FreeMean(vars);
 
-  free(globs);
+  Free(globs);
 
   cdoFinish();
 

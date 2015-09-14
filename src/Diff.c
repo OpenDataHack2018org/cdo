@@ -72,8 +72,8 @@ void *Diff(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double*) malloc(gridsize*sizeof(double));
-  double *array2 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
   int indg = 0;
   int tsID = 0;
@@ -239,8 +239,8 @@ void *Diff(void *argument)
   streamClose(streamID1);
   streamClose(streamID2);
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
+  if ( array1 ) Free(array1);
+  if ( array2 ) Free(array2);
 
   cdoFinish();
 

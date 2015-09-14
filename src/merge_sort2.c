@@ -71,7 +71,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
 	     "       in this implementation of merge sort\n");
     }
 
-  idx = (long*) malloc(num_links*sizeof(long));
+  idx = (long*) Malloc(num_links*sizeof(long));
 
   /* SPLIT AND SORT THE DATA FRAGMENTS */
   add_srt[0] = 0;                  add_srt[1] = num_links/nsplit;
@@ -127,7 +127,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
     //    merge_time += end-start;
   }
 
-  tmp = (double*) malloc(num_links*sizeof(double));
+  tmp = (double*) Malloc(num_links*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for if ( depth < par_depth /* && num_links > 4096*/ ) \
@@ -138,8 +138,8 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   
   memcpy(add1,tmp,num_links*sizeof(double));
   
-  free(tmp);
-  free(idx);
+  Free(tmp);
+  Free(idx);
 
   tmp=NULL;
 

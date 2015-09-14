@@ -157,11 +157,11 @@ void *Fldstat2(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array1 = (double*) malloc(gridsize*sizeof(double));
-  double *array2 = (double*) malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
   double *weight = NULL;
   if ( needWeights )
-    weight = (double*) malloc(gridsize*sizeof(double));
+    weight = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -225,9 +225,9 @@ void *Fldstat2(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
-  if ( weight ) free(weight);
+  if ( array1 ) Free(array1);
+  if ( array2 ) Free(array2);
+  if ( weight ) Free(weight);
 
   cdoFinish();
 

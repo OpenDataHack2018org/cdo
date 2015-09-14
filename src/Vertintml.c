@@ -115,7 +115,7 @@ void *Vertintml(void *argument)
       double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
                           10000,  7000,  5000,  3000,  2000, 1000 };
       nplev = sizeof(stdlev)/sizeof(*stdlev);
-      plev  = (double *) malloc(nplev*sizeof(double));
+      plev  = (double *) Malloc(nplev*sizeof(double));
       for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
     }
   else
@@ -177,7 +177,7 @@ void *Vertintml(void *argument)
 		  nhlevf   = nhlev;
 		  nhlevh   = nhlev + 1;
 
-		  vct = (double*) malloc(nvct*sizeof(double));
+		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
@@ -198,7 +198,7 @@ void *Vertintml(void *argument)
 		  nhlevf   = nhlev - 1;
 		  nhlevh   = nhlev;
 	      
-		  vct = (double*) malloc(nvct*sizeof(double));
+		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
@@ -216,7 +216,7 @@ void *Vertintml(void *argument)
 		  int vctsize;
 		  int voff = 4;
 		  
-		  rvct = (double*) malloc(nvct*sizeof(double));
+		  rvct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, rvct);
 
 		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
@@ -228,7 +228,7 @@ void *Vertintml(void *argument)
 		      nhlevh   = nhlev + 1;
 
 		      vctsize = 2*nhlevh;
-		      vct = (double*) malloc(vctsize*sizeof(double));
+		      vct = (double*) Malloc(vctsize*sizeof(double));
 
 		      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 
@@ -300,7 +300,7 @@ void *Vertintml(void *argument)
   int maxlev   = nhlevh > nplev ? nhlevh : nplev;
 
   if ( Extrapolate == 0 )
-    pnmiss = (int*) malloc(nplev*sizeof(int));
+    pnmiss = (int*) Malloc(nplev*sizeof(int));
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -322,10 +322,10 @@ void *Vertintml(void *argument)
 
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
-      vert_index = (int*) malloc(gridsize*nplev*sizeof(int));
-      ps_prog    = (double*) malloc(gridsize*sizeof(double));
-      full_press = (double*) malloc(gridsize*nhlevf*sizeof(double));
-      half_press = (double*) malloc(gridsize*nhlevh*sizeof(double));
+      vert_index = (int*) Malloc(gridsize*nplev*sizeof(int));
+      ps_prog    = (double*) Malloc(gridsize*sizeof(double));
+      full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+      half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
     }
   else
     cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
@@ -444,17 +444,17 @@ void *Vertintml(void *argument)
 	cdoAbort("Spectral data unsupported!");
 
       if ( varID == gheightID )
-	vardata1[varID] = (double*) malloc(gridsize*(nlevel+1)*sizeof(double));
+	vardata1[varID] = (double*) Malloc(gridsize*(nlevel+1)*sizeof(double));
       else
-	vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
+	vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
       /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
       if ( zaxisID == zaxisIDh ||
 	   (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
 	{
 	  varinterp[varID] = TRUE;
-	  vardata2[varID]  = (double*) malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (int*) malloc(maxlev*sizeof(int));
+	  vardata2[varID]  = (double*) Malloc(gridsize*nplev*sizeof(double));
+	  varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
 	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
 	}
       else
@@ -464,7 +464,7 @@ void *Vertintml(void *argument)
 		       varID+1, paramstr, nlevel);
 	  varinterp[varID] = FALSE;
 	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = (int*) malloc(nlevel*sizeof(int));
+	  varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
 	}
     }
 
@@ -483,7 +483,7 @@ void *Vertintml(void *argument)
 
   if ( zaxisIDh != -1 && sgeopot_needed )
     {
-      sgeopot = (double*) malloc(gridsize*sizeof(double));
+      sgeopot = (double*) Malloc(gridsize*sizeof(double));
       if ( sgeopotID == -1 )
 	{
 	  if ( geopotID == -1 )
@@ -724,20 +724,20 @@ void *Vertintml(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(varnmiss[varID]);
-      free(vardata1[varID]);
-      if ( varinterp[varID] ) free(vardata2[varID]);
+      Free(varnmiss[varID]);
+      Free(vardata1[varID]);
+      if ( varinterp[varID] ) Free(vardata2[varID]);
     }
 
-  if ( pnmiss     ) free(pnmiss);
+  if ( pnmiss     ) Free(pnmiss);
 
-  if ( sgeopot    ) free(sgeopot);
-  if ( ps_prog    ) free(ps_prog);
-  if ( vert_index ) free(vert_index);
-  if ( full_press ) free(full_press);
-  if ( half_press ) free(half_press);
-  if ( vct        ) free(vct);
-  if ( rvct       ) free(rvct);
+  if ( sgeopot    ) Free(sgeopot);
+  if ( ps_prog    ) Free(ps_prog);
+  if ( vert_index ) Free(vert_index);
+  if ( full_press ) Free(full_press);
+  if ( half_press ) Free(half_press);
+  if ( vct        ) Free(vct);
+  if ( rvct       ) Free(rvct);
 
   listDelete(flist);
 

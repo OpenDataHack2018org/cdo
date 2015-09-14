@@ -46,7 +46,7 @@ LIST *listNew(int type)
     }
   else
     {
-      list = (LIST*) malloc(sizeof(LIST));
+      list = (LIST*) Malloc(sizeof(LIST));
       listInit(list, type);
     }
 
@@ -58,8 +58,8 @@ void listDelete(LIST *list)
 {
   if ( list )
     {
-      if ( list->array ) free(list->array);
-      free(list);
+      if ( list->array ) Free(list->array);
+      Free(list);
     }
 }
 
@@ -76,9 +76,9 @@ static void listCheck(LIST *list, int num)
     {
       list->nalloc += list->allinc;
       if ( list->type == INT_LIST )
-	list->array = (int*) realloc(list->array, list->nalloc*sizeof(int));
+	list->array = (int*) Realloc(list->array, list->nalloc*sizeof(int));
       else
-	list->array = (double*) realloc(list->array, list->nalloc*sizeof(double));
+	list->array = (double*) Realloc(list->array, list->nalloc*sizeof(double));
     }
 }
 

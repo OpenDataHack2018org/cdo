@@ -130,7 +130,7 @@ void *Gridcell(void *argument)
 
 
   gridsize = gridInqSize(gridID);
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
 
   if ( operatorID == GRIDAREA )
@@ -178,7 +178,7 @@ void *Gridcell(void *argument)
   else if ( operatorID == GRIDMASK )
     {
       int *mask;
-      mask = (int*) malloc(gridsize*sizeof(int));
+      mask = (int*) Malloc(gridsize*sizeof(int));
       if ( gridInqMask(gridID, NULL) )
 	{
 	  gridInqMask(gridID, mask);
@@ -189,7 +189,7 @@ void *Gridcell(void *argument)
 	}
 
       for ( i = 0; i < gridsize; ++i ) array[i] = mask[i];
-      free(mask);
+      Free(mask);
     }
   else if ( operatorID == GRIDDX || operatorID == GRIDDY )
     {
@@ -211,8 +211,8 @@ void *Gridcell(void *argument)
 	  xsize = gridInqXsize(gridID);
 	  ysize = gridInqYsize(gridID);
 
-	  xv = (double*) malloc(gridsize*sizeof(double));
-	  yv = (double*) malloc(gridsize*sizeof(double));
+	  xv = (double*) Malloc(gridsize*sizeof(double));
+	  yv = (double*) Malloc(gridsize*sizeof(double));
 
 	  gridInqXvals(gridID, xv);
 	  gridInqYvals(gridID, yv);
@@ -273,8 +273,8 @@ void *Gridcell(void *argument)
 		  }
 	    }
 
-	  free(xv);
-	  free(yv);
+	  Free(xv);
+	  Free(yv);
 	}
       else
 	{
@@ -302,7 +302,7 @@ void *Gridcell(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   cdoFinish();
 

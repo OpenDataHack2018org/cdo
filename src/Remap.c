@@ -851,7 +851,7 @@ void *Remap(void *argument)
 
   if ( max_remaps > 0 )
     {
-      remaps = (remap_t*) malloc(max_remaps*sizeof(remap_t));
+      remaps = (remap_t*) Malloc(max_remaps*sizeof(remap_t));
       for ( r = 0; r < max_remaps; r++ )
 	{
 	  remaps[r].nused    = 0;
@@ -901,7 +901,7 @@ void *Remap(void *argument)
 	  int gridID2_gme;
 	  int isize = 0;
 	  remaps[0].tgt_grid.nvgp = gridInqSize(gridID2);
-	  remaps[0].tgt_grid.vgpm = (int*) realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2)*sizeof(int));
+	  remaps[0].tgt_grid.vgpm = (int*) Realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2)*sizeof(int));
 	  gridID2_gme = gridToUnstructured(gridID2, 1);
 	  gridInqMaskGME(gridID2_gme, remaps[0].tgt_grid.vgpm);
 	  for ( i = 0; i < gridsize2; ++i )
@@ -945,16 +945,16 @@ void *Remap(void *argument)
 
   if ( need_gradiants )
     {
-      grad1_lat    = (double*) malloc(grid1sizemax*sizeof(double));
-      grad1_lon    = (double*) malloc(grid1sizemax*sizeof(double));
-      grad1_latlon = (double*) malloc(grid1sizemax*sizeof(double));
+      grad1_lat    = (double*) Malloc(grid1sizemax*sizeof(double));
+      grad1_lon    = (double*) Malloc(grid1sizemax*sizeof(double));
+      grad1_latlon = (double*) Malloc(grid1sizemax*sizeof(double));
     }
 
-  array1 = (double*) malloc(grid1sizemax*sizeof(double));
-  imask  = (int*) malloc(grid1sizemax*sizeof(int));
+  array1 = (double*) Malloc(grid1sizemax*sizeof(double));
+  imask  = (int*) Malloc(grid1sizemax*sizeof(int));
 
   gridsize = gridInqSize(gridID2);
-  array2   = (double*) malloc(gridsize*sizeof(double));
+  array2   = (double*) Malloc(gridsize*sizeof(double));
 
   if ( ! lwrite_remap )
     {
@@ -1009,14 +1009,14 @@ void *Remap(void *argument)
 	      if ( gridsize_new > grid1sizemax )
 		{
 		  grid1sizemax = gridsize_new;
-		  array1 = (double*) realloc(array1, grid1sizemax*sizeof(double));
-		  imask  = (int*) realloc(imask, grid1sizemax*sizeof(int));
+		  array1 = (double*) Realloc(array1, grid1sizemax*sizeof(double));
+		  imask  = (int*) Realloc(imask, grid1sizemax*sizeof(int));
 
 		  if ( need_gradiants )
 		    {
-		      grad1_lat    = (double*) realloc(grad1_lat, grid1sizemax*sizeof(double));
-		      grad1_lon    = (double*) realloc(grad1_lon, grid1sizemax*sizeof(double));
-		      grad1_latlon = (double*) realloc(grad1_latlon, grid1sizemax*sizeof(double));
+		      grad1_lat    = (double*) Realloc(grad1_lat, grid1sizemax*sizeof(double));
+		      grad1_lon    = (double*) Realloc(grad1_lon, grid1sizemax*sizeof(double));
+		      grad1_latlon = (double*) Realloc(grad1_latlon, grid1sizemax*sizeof(double));
 		    }
 		}
 	      
@@ -1279,13 +1279,13 @@ void *Remap(void *argument)
 
   streamClose(streamID1);
 
-  if ( imask )  free(imask);
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  if ( imask )  Free(imask);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
-  if ( grad1_latlon ) free(grad1_latlon);
-  if ( grad1_lon ) free(grad1_lon);
-  if ( grad1_lat ) free(grad1_lat);
+  if ( grad1_latlon ) Free(grad1_latlon);
+  if ( grad1_lon ) Free(grad1_lon);
+  if ( grad1_lat ) Free(grad1_lat);
 
   if ( max_remaps > 0 )
     {
@@ -1299,7 +1299,7 @@ void *Remap(void *argument)
 	  remapGridFree(&remaps[r].tgt_grid);
 	}
       
-      if ( remaps ) free(remaps);
+      if ( remaps ) Free(remaps);
     }
 
   cdoFinish();

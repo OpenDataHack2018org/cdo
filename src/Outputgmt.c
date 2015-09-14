@@ -177,7 +177,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
   double lon_bounds[mnv], lat_bounds[mnv];
   double area, sumarea;
 
-  alone_cell = (int*) malloc(gridsize*ncorner*sizeof(int));
+  alone_cell = (int*) Malloc(gridsize*ncorner*sizeof(int));
 
   check_corners = 0; /* don't execute corner checking (last loop) */
   nout = 0;
@@ -462,7 +462,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
 	cdoWarning("%d of %d corners are lonely on the grid!", nout, gridsize*ncorner);
     }
 
-  free(alone_cell);
+  Free(alone_cell);
 }
 
 
@@ -696,7 +696,7 @@ void *Outputgmt(void *argument)
 
   if ( gridInqMaskGME(gridID, NULL) )
     {
-      grid_mask = (int*) malloc(gridsize*sizeof(int));
+      grid_mask = (int*) Malloc(gridsize*sizeof(int));
       gridInqMaskGME(gridID, grid_mask);
     }
 
@@ -734,8 +734,8 @@ void *Outputgmt(void *argument)
 
   grid_is_circular = gridIsCircular(gridID);
 
-  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
-  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
+  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
@@ -756,8 +756,8 @@ void *Outputgmt(void *argument)
 
       gridsize2 = nlat*(nlon+1);
 
-      grid_center_lat2 = (double*) malloc(gridsize2*sizeof(double));
-      grid_center_lon2 = (double*) malloc(gridsize2*sizeof(double));
+      grid_center_lat2 = (double*) Malloc(gridsize2*sizeof(double));
+      grid_center_lon2 = (double*) Malloc(gridsize2*sizeof(double));
 
       make_cyclic(grid_center_lat, grid_center_lat2, nlon, nlat);
       make_cyclic(grid_center_lon, grid_center_lon2, nlon, nlat);
@@ -773,9 +773,9 @@ void *Outputgmt(void *argument)
       plat = grid_center_lat2;
     }
 
-  zaxis_center_lev = (double*) malloc(nlev*sizeof(double));
-  zaxis_lower_lev  = (double*) malloc(nlev*sizeof(double));
-  zaxis_upper_lev  = (double*) malloc(nlev*sizeof(double));
+  zaxis_center_lev = (double*) Malloc(nlev*sizeof(double));
+  zaxis_lower_lev  = (double*) Malloc(nlev*sizeof(double));
+  zaxis_upper_lev  = (double*) Malloc(nlev*sizeof(double));
 
   zaxisInqLevels(zaxisID, zaxis_center_lev);
 
@@ -783,8 +783,8 @@ void *Outputgmt(void *argument)
     {
       if ( ncorner == 0 ) cdoAbort("grid corner missing!");
       nalloc = ncorner*gridsize;
-      grid_corner_lat = (double*) realloc(grid_corner_lat, nalloc*sizeof(double));
-      grid_corner_lon = (double*) realloc(grid_corner_lon, nalloc*sizeof(double));
+      grid_corner_lat = (double*) Realloc(grid_corner_lat, nalloc*sizeof(double));
+      grid_corner_lon = (double*) Realloc(grid_corner_lon, nalloc*sizeof(double));
 
       if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
 	{
@@ -833,21 +833,21 @@ void *Outputgmt(void *argument)
 	}
     }
 
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
   parray = array;
 						
   if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
     {
-      array2 = (double*) malloc(nlat*(nlon+1)*sizeof(double));
+      array2 = (double*) Malloc(nlat*(nlon+1)*sizeof(double));
       parray = array2;
     }
 
   if ( operatorID == OUTPUTVECTOR )
     {
-      uf    = (double*) malloc(gridsize*sizeof(double));
-      vf    = (double*) malloc(gridsize*sizeof(double));
-      alpha = (double*) malloc(gridsize*sizeof(double));
-      auv   = (double*) malloc(gridsize*sizeof(double));
+      uf    = (double*) Malloc(gridsize*sizeof(double));
+      vf    = (double*) Malloc(gridsize*sizeof(double));
+      alpha = (double*) Malloc(gridsize*sizeof(double));
+      auv   = (double*) Malloc(gridsize*sizeof(double));
     }
 
   if ( operatorID == GRIDVERIFY )
@@ -1241,19 +1241,19 @@ void *Outputgmt(void *argument)
 
   streamClose(streamID);
 
-  if ( array  ) free(array);
-  if ( array2 ) free(array2);
-  if ( grid_mask ) free(grid_mask);
-  if ( grid_center_lon ) free(grid_center_lon);
-  if ( grid_center_lat ) free(grid_center_lat);
-  if ( grid_center_lon2 ) free(grid_center_lon2);
-  if ( grid_center_lat2 ) free(grid_center_lat2);
-  if ( grid_corner_lon ) free(grid_corner_lon);
-  if ( grid_corner_lat ) free(grid_corner_lat);
+  if ( array  ) Free(array);
+  if ( array2 ) Free(array2);
+  if ( grid_mask ) Free(grid_mask);
+  if ( grid_center_lon ) Free(grid_center_lon);
+  if ( grid_center_lat ) Free(grid_center_lat);
+  if ( grid_center_lon2 ) Free(grid_center_lon2);
+  if ( grid_center_lat2 ) Free(grid_center_lat2);
+  if ( grid_corner_lon ) Free(grid_corner_lon);
+  if ( grid_corner_lat ) Free(grid_corner_lat);
 
-  free(zaxis_center_lev);
-  free(zaxis_lower_lev);
-  free(zaxis_upper_lev);
+  Free(zaxis_center_lev);
+  Free(zaxis_lower_lev);
+  Free(zaxis_upper_lev);
 
   cdoFinish();
 

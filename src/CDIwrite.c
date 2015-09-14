@@ -165,9 +165,9 @@ void *CDIwrite(void *argument)
       cdoPrint("nvars      : %d", nvars);
     }
 
-  double *array = (double*) malloc(gridsize*sizeof(double));
-  double *xvals = (double*) malloc(gridsize*sizeof(double));
-  double *yvals = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *xvals = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
   int gridID2 = gridID;
   if ( gridInqType(gridID) == GRID_GME ) gridID2 = gridToUnstructured(gridID, 0);
@@ -188,23 +188,23 @@ void *CDIwrite(void *argument)
   for ( i = 0; i < gridsize; i++ )
     array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
-  vars = (double ***) malloc(nvars*sizeof(double **));
+  vars = (double ***) Malloc(nvars*sizeof(double **));
   for ( varID = 0; varID < nvars; varID++ )
     {
-      vars[varID] = (double **) malloc(nlevs*sizeof(double *));
+      vars[varID] = (double **) Malloc(nlevs*sizeof(double *));
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  vars[varID][levelID] = (double*) malloc(gridsize*sizeof(double));
+	  vars[varID][levelID] = (double*) Malloc(gridsize*sizeof(double));
 	  for ( i = 0; i < gridsize; ++i )
 	    vars[varID][levelID][i] = varID + array[i]*(levelID+1);
 	  //    vars[varID][levelID][i] = varID + rand()/(RAND_MAX+1.0);
 	}
     }
 
-  if ( memtype == MEMTYPE_FLOAT ) farray = (float*) malloc(gridsize*sizeof(float));
+  if ( memtype == MEMTYPE_FLOAT ) farray = (float*) Malloc(gridsize*sizeof(float));
 
   vlistID = vlistCreate();
 
@@ -293,14 +293,14 @@ void *CDIwrite(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      for ( levelID = 0; levelID < nlevs; levelID++ ) free(vars[varID][levelID]);
-      free(vars[varID]);
+      for ( levelID = 0; levelID < nlevs; levelID++ ) Free(vars[varID][levelID]);
+      Free(vars[varID]);
     }
-  free(vars);
+  Free(vars);
 
-  free(array);
+  Free(array);
 
-  if ( farray ) free(farray);
+  if ( farray ) Free(farray);
 
   cdoFinish();
 

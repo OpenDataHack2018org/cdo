@@ -68,7 +68,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
   int i, j;
   double temp;
   
-  e = (double*) malloc(n * sizeof(double));
+  e = (double*) Malloc(n * sizeof(double));
   
   make_symmetric_matrix_triangular (a, n, eig_val, e);
   
@@ -335,7 +335,7 @@ int solution_of_linear_equation (double **a, double *b, int n)
   int sign;
   int not_singular;
   
-  index = (int*) malloc(n * sizeof(int));
+  index = (int*) Malloc(n * sizeof(int));
   
   not_singular = lu_decomposition (a, n, index, &sign);
   
@@ -356,8 +356,8 @@ int inverse_of_matrix (double **a, double **b, int n)
   int not_singular;
   double *col;
   
-  index = (int*) malloc(n * sizeof(int));
-  col = (double*) malloc(n * sizeof(double));
+  index = (int*) Malloc(n * sizeof(int));
+  col = (double*) Malloc(n * sizeof(double));
   
   not_singular = lu_decomposition (a, n, index, &sign);
   
@@ -387,7 +387,7 @@ int lu_decomposition (double **a, int n, int *index, int *sign)
   double big, sum, temp;
   double *v;
   
-  v = (double*) malloc(n * sizeof(double));
+  v = (double*) Malloc(n * sizeof(double));
   *sign = 1;
   for (i = 0; i < n; i++)
     {
@@ -553,12 +553,12 @@ void ft(double *real, double *imag, int n, int sign)
   
   if (!work_r)
     {
-      work_r = (double*) malloc(n * sizeof(double));
+      work_r = (double*) Malloc(n * sizeof(double));
       /* free_at_exit (work_r); */
     }
   if (!work_i)
     {
-      work_i = (double*) malloc(n * sizeof(double));
+      work_i = (double*) Malloc(n * sizeof(double));
       /* free_at_exit (work_i); */
     }
   
@@ -1279,8 +1279,8 @@ void annihilate_1side(double **M, long i, long j, long n)
 
   i--; j--;
 
-  double *restrict mi = (double*) malloc(n*sizeof(double));
-  double *restrict mj = (double*) malloc(n*sizeof(double));
+  double *restrict mi = (double*) Malloc(n*sizeof(double));
+  double *restrict mj = (double*) Malloc(n*sizeof(double));
 
   if ( ! mj || ! mi) 
     fprintf(stderr, "ERROR: allocation error - cannot allocate memory\n"
@@ -1312,8 +1312,8 @@ void annihilate_1side(double **M, long i, long j, long n)
     {
       n_finished++;
     }
-    free(mi);
-    free(mj);
+    Free(mi);
+    Free(mj);
     return;
   }
   
@@ -1333,8 +1333,8 @@ void annihilate_1side(double **M, long i, long j, long n)
   for ( r = 0; r < n; r++ ) Mi[r] = mi[r];
   for ( r = 0; r < n; r++ ) Mj[r] = mj[r];
 
-  free(mi);
-  free(mj);
+  Free(mi);
+  Free(mj);
 
   return;
 }
@@ -1351,8 +1351,8 @@ int jacobi_1side(double **M, double *A, long n)
 
   if ( n > 0 )
     {
-      annihilations_buff = (int*) malloc(n*n*2*sizeof(int));
-      annihilations = (int**) malloc((n*n)*sizeof(int*));
+      annihilations_buff = (int*) Malloc(n*n*2*sizeof(int));
+      annihilations = (int**) Malloc((n*n)*sizeof(int*));
     }
 
   for(i=0;i<n*n;i++)
@@ -1462,8 +1462,8 @@ int jacobi_1side(double **M, double *A, long n)
 
   heap_sort(A,M,n);
   
-  if ( annihilations      ) free(annihilations);
-  if ( annihilations_buff ) free(annihilations_buff);
+  if ( annihilations      ) Free(annihilations);
+  if ( annihilations_buff ) Free(annihilations_buff);
   
   return n_iter;
 }

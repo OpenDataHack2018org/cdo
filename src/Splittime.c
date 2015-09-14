@@ -123,7 +123,7 @@ void *Splittime(void *argument)
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
     }
 
   int nvars = vlistNvars(vlistID1);
@@ -133,7 +133,7 @@ void *Splittime(void *argument)
 
   if ( nconst )
     {
-      vars = (field_t **) malloc(nvars*sizeof(field_t *));
+      vars = (field_t **) Malloc(nvars*sizeof(field_t *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -143,13 +143,13 @@ void *Splittime(void *argument)
 	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      gridsize = gridInqSize(gridID);
 		  
-	      vars[varID] = (field_t*) malloc(nlevel*sizeof(field_t));
+	      vars[varID] = (field_t*) Malloc(nlevel*sizeof(field_t));
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  field_init(&vars[varID][levelID]);
 		  vars[varID][levelID].grid = gridID;
-		  vars[varID][levelID].ptr  = (double*) malloc(gridsize*sizeof(double));
+		  vars[varID][levelID].ptr  = (double*) Malloc(gridsize*sizeof(double));
 		}
 	    }
 	}
@@ -269,7 +269,7 @@ void *Splittime(void *argument)
 
   streamClose(streamID1);
  
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   if ( nconst )
     {
@@ -280,13 +280,13 @@ void *Splittime(void *argument)
 	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		if ( vars[varID][levelID].ptr )
-		  free(vars[varID][levelID].ptr);
+		  Free(vars[varID][levelID].ptr);
 
-	      free(vars[varID]);
+	      Free(vars[varID]);
 	    }
 	}
 
-      if ( vars ) free(vars);
+      if ( vars ) Free(vars);
     }
 
   for ( index = 0; index < MAX_STREAMS; index++ )

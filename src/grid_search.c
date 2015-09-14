@@ -56,21 +56,21 @@ void gridsearch_set_method(const char *methodstr)
 
 struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
   gs->nx = nx;
   gs->ny = ny;
 
-  double *reg2d_center_lon = (double *) malloc((nx+1)*sizeof(double));
-  double *reg2d_center_lat = (double *) malloc(ny*sizeof(double));
+  double *reg2d_center_lon = (double *) Malloc((nx+1)*sizeof(double));
+  double *reg2d_center_lat = (double *) Malloc(ny*sizeof(double));
 
   memcpy(reg2d_center_lon, lons, (nx+1)*sizeof(double));
   memcpy(reg2d_center_lat, lats, ny*sizeof(double));
 
-  double *coslon = (double *) malloc(nx*sizeof(double));
-  double *sinlon = (double *) malloc(nx*sizeof(double));
-  double *coslat = (double *) malloc(ny*sizeof(double));
-  double *sinlat = (double *) malloc(ny*sizeof(double));
+  double *coslon = (double *) Malloc(nx*sizeof(double));
+  double *sinlon = (double *) Malloc(nx*sizeof(double));
+  double *coslat = (double *) Malloc(ny*sizeof(double));
+  double *sinlat = (double *) Malloc(ny*sizeof(double));
 
   for ( unsigned n = 0; n < nx; ++n )
     {
@@ -100,7 +100,7 @@ struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const doubl
 
 struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const double *restrict lats)
 {
-  struct kd_point *pointlist = (struct kd_point *) malloc(n * sizeof(struct kd_point));  
+  struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));  
   // see  example_cartesian.c
   if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
   float min[3], max[3];
@@ -123,7 +123,7 @@ struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const d
     }
 
   struct kdNode *kdt = kd_buildTree(pointlist, n, min, max, 3, ompNumThreads);
-  if ( pointlist ) free(pointlist);
+  if ( pointlist ) Free(pointlist);
 
   return kdt;
 }
@@ -138,21 +138,21 @@ void gs_destroy_nearpt3(struct gsNear *near)
 #endif
       if ( near->pts )
         {
-          free(near->pts[0]);
-          free(near->pts);
+          Free(near->pts[0]);
+          Free(near->pts);
         }
 
-      free(near);
+      Free(near);
     }
 }
 
 
 struct gsNear *gs_create_nearpt3(unsigned n, const double *restrict lons, const double *restrict lats)
 {
-  struct gsNear *near = (struct gsNear *) calloc(1, sizeof(struct gsNear));
+  struct gsNear *near = (struct gsNear *) Calloc(1, sizeof(struct gsNear));
 
-  Coord_T **p = (Coord_T **) malloc(n*sizeof(Coord_T *));
-  p[0] = (Coord_T *) malloc(3*n*sizeof(Coord_T));
+  Coord_T **p = (Coord_T **) Malloc(n*sizeof(Coord_T *));
+  p[0] = (Coord_T *) Malloc(3*n*sizeof(Coord_T));
   for ( unsigned i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
   float point[3];
@@ -189,21 +189,21 @@ void gs_destroy_full(struct gsFull *full)
     {
       if ( full->pts )
         {
-          free(full->pts[0]);
-          free(full->pts);
+          Free(full->pts[0]);
+          Free(full->pts);
         }
 
-      free(full);
+      Free(full);
     }
 }
 
 
 struct gsFull *gs_create_full(unsigned n, const double *restrict lons, const double *restrict lats)
 {
-  struct gsFull *full = (struct gsFull *) calloc(1, sizeof(struct gsFull));
+  struct gsFull *full = (struct gsFull *) Calloc(1, sizeof(struct gsFull));
 
-  float **p = (float **) malloc(n*sizeof(float *));
-  p[0] = (float *) malloc(3*n*sizeof(float));
+  float **p = (float **) Malloc(n*sizeof(float *));
+  p[0] = (float *) Malloc(3*n*sizeof(float));
   for ( unsigned i = 1; i < n; i++ ) p[i] = p[0] + i*3;
 
 #if defined(HAVE_OPENMP4)
@@ -225,7 +225,7 @@ struct gsFull *gs_create_full(unsigned n, const double *restrict lons, const dou
 
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
   gs->n = n;
 
@@ -239,7 +239,7 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
 
 struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats)
 {
-  struct gridsearch *gs = (struct gridsearch *) calloc(1, sizeof(struct gridsearch));
+  struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
   gs->method_nn = gridsearch_method_nn;
   gs->n = n;
@@ -259,18 +259,18 @@ void gridsearch_delete(struct gridsearch *gs)
     {
       if ( gs->kdt ) kd_destroyTree(gs->kdt);
       
-      if ( gs->reg2d_center_lon ) free(gs->reg2d_center_lon);
-      if ( gs->reg2d_center_lat ) free(gs->reg2d_center_lat);
+      if ( gs->reg2d_center_lon ) Free(gs->reg2d_center_lon);
+      if ( gs->reg2d_center_lat ) Free(gs->reg2d_center_lat);
 
-      if ( gs->coslat ) free(gs->coslat);
-      if ( gs->coslon ) free(gs->coslon);
-      if ( gs->sinlat ) free(gs->sinlat);
-      if ( gs->sinlon ) free(gs->sinlon);
+      if ( gs->coslat ) Free(gs->coslat);
+      if ( gs->coslon ) Free(gs->coslon);
+      if ( gs->sinlat ) Free(gs->sinlat);
+      if ( gs->sinlon ) Free(gs->sinlon);
 
       if ( gs->near ) gs_destroy_nearpt3(gs->near);
       if ( gs->full ) gs_destroy_full(gs->full);
 
-      free(gs);
+      Free(gs);
     }
 }
 

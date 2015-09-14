@@ -474,7 +474,7 @@ void zonpctl(field_t field1, field_t *field2, int p)
   
   if ( nmiss > 0 )
     {
-      array2 = (double*) malloc(nx*sizeof(double));
+      array2 = (double*) Malloc(nx*sizeof(double));
       
       for ( j = 0; j < ny; j++ )
         {
@@ -493,7 +493,7 @@ void zonpctl(field_t field1, field_t *field2, int p)
             }
         }
         
-      free(array2);
+      Free(array2);
     }
   else
     {

@@ -247,7 +247,7 @@ void *Adisit(void *argument)
   if ( nlevel1 != nlevel2 ) cdoAbort("temperature and salinity have different number of levels!");
   nlevel = nlevel1;
 
-  pressure = (double*) malloc(nlevel*sizeof(double));
+  pressure = (double*) Malloc(nlevel*sizeof(double));
   zaxisInqLevels(zaxisID, pressure);
 
   if ( pin >= 0 ) 
@@ -265,9 +265,9 @@ void *Adisit(void *argument)
   field_init(&tho);
   field_init(&sao);
   field_init(&tis);
-  tho.ptr = (double*) malloc(gridsize*nlevel*sizeof(double));
-  sao.ptr = (double*) malloc(gridsize*nlevel*sizeof(double));
-  tis.ptr = (double*) malloc(gridsize*nlevel*sizeof(double));
+  tho.ptr = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  sao.ptr = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  tis.ptr = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
   tho.nmiss = 0;
   sao.nmiss = 0;
@@ -373,10 +373,10 @@ void *Adisit(void *argument)
 
   vlistDestroy(vlistID2);
 
-  free(pressure);
-  free(tis.ptr);
-  free(tho.ptr);
-  free(sao.ptr);
+  Free(pressure);
+  Free(tis.ptr);
+  Free(tho.ptr);
+  Free(sao.ptr);
 
   cdoFinish();
 

@@ -96,8 +96,8 @@ void *Timstat3(void *argument)
   int nvars = vlistNvars(vlistID[0]);
   int nrecs = vlistNrecs(vlistID[0]);
   int nrecs3 = nrecs;
-  int *recVarID   = (int*) malloc(nrecs*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecs*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecs*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecs*sizeof(int));
 
   int taxisID1 = vlistInqTaxis(vlistID[0]);
   int taxisID3 = taxisDuplicate(taxisID1);
@@ -112,19 +112,19 @@ void *Timstat3(void *argument)
   for ( i = 0; i < NIN; ++i )
     {
       field_init(&in[i]);
-      in[i].ptr = (double*) malloc(gridsize*sizeof(double));
+      in[i].ptr = (double*) Malloc(gridsize*sizeof(double));
     }
 				 
   for ( i = 0; i < NOUT; ++i )
     {
       field_init(&out[i]);
-      out[i].ptr = (double*) malloc(gridsize*sizeof(double));
+      out[i].ptr = (double*) Malloc(gridsize*sizeof(double));
     }
 				 
   for ( iw = 0; iw < NFWORK; ++iw )
-    fwork[iw] = (field_t **) malloc(nvars*sizeof(field_t *));
+    fwork[iw] = (field_t **) Malloc(nvars*sizeof(field_t *));
   for ( iw = 0; iw < NIWORK; ++iw )
-    iwork[iw] = (int ***) malloc(nvars*sizeof(int **));
+    iwork[iw] = (int ***) Malloc(nvars*sizeof(int **));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -135,9 +135,9 @@ void *Timstat3(void *argument)
       // missval2 = vlistInqVarMissval(vlistID[1], varID); 
 
       for ( iw = 0; iw < NFWORK; ++iw )
-	fwork[iw][varID] = (field_t*) malloc(nlevs*sizeof(field_t));
+	fwork[iw][varID] = (field_t*) Malloc(nlevs*sizeof(field_t));
       for ( iw = 0; iw < NIWORK; ++iw )
-	iwork[iw][varID] = (int **) malloc(nlevs*sizeof(int *));  
+	iwork[iw][varID] = (int **) Malloc(nlevs*sizeof(int *));  
 
       for ( levelID = 0; levelID < nlevs; ++levelID )
 	{
@@ -147,13 +147,13 @@ void *Timstat3(void *argument)
 	      fwork[iw][varID][levelID].grid    = gridID;
 	      fwork[iw][varID][levelID].nmiss   = 0;
 	      fwork[iw][varID][levelID].missval = missval;
-	      fwork[iw][varID][levelID].ptr     = (double*) malloc(gridsize*sizeof(double));
+	      fwork[iw][varID][levelID].ptr     = (double*) Malloc(gridsize*sizeof(double));
 	      memset(fwork[iw][varID][levelID].ptr, 0, gridsize*sizeof(double));
 	    }
 
 	  for ( iw = 0; iw < NIWORK; ++iw )
 	    {
-	      iwork[iw][varID][levelID] = (int*) malloc(gridsize*sizeof(int));
+	      iwork[iw][varID][levelID] = (int*) Malloc(gridsize*sizeof(int));
 	      memset(iwork[iw][varID][levelID], 0, gridsize*sizeof(int));
 	    }
 	}
@@ -322,28 +322,28 @@ void *Timstat3(void *argument)
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  for ( iw = 0; iw < NFWORK; ++iw )
-	    free(fwork[iw][varID][levelID].ptr);
+	    Free(fwork[iw][varID][levelID].ptr);
 	  for ( iw = 0; iw < NIWORK; ++iw )
-	    free(iwork[iw][varID][levelID]);
+	    Free(iwork[iw][varID][levelID]);
 	}
     
-      for ( iw = 0; iw < NFWORK; ++iw ) free(fwork[iw][varID]);
-      for ( iw = 0; iw < NIWORK; ++iw ) free(iwork[iw][varID]);
+      for ( iw = 0; iw < NFWORK; ++iw ) Free(fwork[iw][varID]);
+      for ( iw = 0; iw < NIWORK; ++iw ) Free(iwork[iw][varID]);
     }
 
-  for ( iw = 0; iw < NFWORK; iw++ ) free(fwork[iw]);
-  for ( iw = 0; iw < NIWORK; iw++ ) free(iwork[iw]);
+  for ( iw = 0; iw < NFWORK; iw++ ) Free(fwork[iw]);
+  for ( iw = 0; iw < NIWORK; iw++ ) Free(iwork[iw]);
 
 
   streamClose(streamID3);
   for ( is = 0; is < NIN; ++is )
     streamClose(streamID[is]);
 
-  for ( i = 0; i < NIN; ++i ) free(in[i].ptr);
-  for ( i = 0; i < NOUT; ++i ) free(out[i].ptr);
+  for ( i = 0; i < NIN; ++i ) Free(in[i].ptr);
+  for ( i = 0; i < NOUT; ++i ) Free(out[i].ptr);
 
-  free(recVarID);
-  free(recLevelID);
+  Free(recVarID);
+  Free(recLevelID);
     
   cdoFinish();   
  

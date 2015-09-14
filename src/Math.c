@@ -100,8 +100,8 @@ void *Math(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
+  array2 = (double*) Malloc(gridsize*sizeof(double));
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -230,8 +230,8 @@ void *Math(void *argument)
 
   vlistDestroy(vlistID2);
 
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
   cdoFinish();
 

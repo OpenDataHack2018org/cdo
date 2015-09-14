@@ -100,7 +100,7 @@ void *Replacevalues(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -171,7 +171,7 @@ void *Replacevalues(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   listDelete(flist);
 

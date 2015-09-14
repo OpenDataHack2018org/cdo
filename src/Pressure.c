@@ -93,14 +93,14 @@ void *Pressure(void *argument)
 	{
 	  double *level;
 	  int l;
-	  level = (double*) malloc(nlevel*sizeof(double));
+	  level = (double*) Malloc(nlevel*sizeof(double));
 	  zaxisInqLevels(zaxisID, level);
 	  for ( l = 0; l < nlevel; l++ )
 	    {
 	      if ( (l+1) != (int) (level[l]+0.5) ) break;
 	    }
 	  if ( l == nlevel ) mono_level = TRUE; 
-	  free(level);
+	  Free(level);
 	}
 
       if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
@@ -117,7 +117,7 @@ void *Pressure(void *argument)
 		  nhlevf   = nhlev;
 		  nhlevh   = nhlevf + 1;
 	      
-		  vct = (double*) malloc(nvct*sizeof(double));
+		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 		}
 	    }
@@ -131,7 +131,7 @@ void *Pressure(void *argument)
 		  nhlevf   = nhlev - 1;
 		  nhlevh   = nhlev;
 	      
-		  vct = (double*) malloc(nvct*sizeof(double));
+		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 		}
 	    }
@@ -143,7 +143,7 @@ void *Pressure(void *argument)
 		  int voff = 4;
 		  double *rvct = NULL;
 
-		  rvct = (double*) malloc(nvct*sizeof(double));
+		  rvct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID,rvct);
 
 		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
@@ -155,7 +155,7 @@ void *Pressure(void *argument)
 		      nhlevh   = nhlev + 1;
 
 		      vctsize = 2*nhlevh;
-		      vct = (double*) malloc(vctsize*sizeof(double));
+		      vct = (double*) Malloc(vctsize*sizeof(double));
 
 		      /* calculate VCT for LM */
 
@@ -179,7 +179,7 @@ void *Pressure(void *argument)
 			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
 			}
 		    }
-		  free(rvct);
+		  Free(rvct);
 		}
 	    }
 	}
@@ -190,10 +190,10 @@ void *Pressure(void *argument)
 
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
-      ps_prog    = (double*) malloc(gridsize*sizeof(double));
-      deltap     = (double*) malloc(gridsize*nhlevf*sizeof(double));
-      full_press = (double*) malloc(gridsize*nhlevf*sizeof(double));
-      half_press = (double*) malloc(gridsize*nhlevh*sizeof(double));
+      ps_prog    = (double*) Malloc(gridsize*sizeof(double));
+      deltap     = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+      full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+      half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
     }
   else
     cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
@@ -206,10 +206,10 @@ void *Pressure(void *argument)
   {
     double *level;
     int l;
-    level = (double*) malloc(nhlevh*sizeof(double));
+    level = (double*) Malloc(nhlevh*sizeof(double));
     for ( l = 0; l < nhlevh; l++ ) level[l] = l+1;
     zaxisDefLevels(zaxisIDp, level);
-    free(level);
+    Free(level);
   }
 
   zaxisDefVct(zaxisIDp, 2*nhlevh, vct);
@@ -316,7 +316,7 @@ void *Pressure(void *argument)
   if ( gridInqType(gridID) == GRID_SPECTRAL )
     cdoAbort("%s on spectral representation not supported!", var_stdname(surface_air_pressure));
 
-  pdata = (double*) malloc(gridsize*sizeof(double));
+  pdata = (double*) Malloc(gridsize*sizeof(double));
 
 
   vlistID2 = vlistCreate();
@@ -404,12 +404,12 @@ void *Pressure(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( pdata      ) free(pdata);
-  if ( ps_prog    ) free(ps_prog);
-  if ( deltap     ) free(deltap);
-  if ( full_press ) free(full_press);
-  if ( half_press ) free(half_press);
-  if ( vct        ) free(vct);
+  if ( pdata      ) Free(pdata);
+  if ( ps_prog    ) Free(ps_prog);
+  if ( deltap     ) Free(deltap);
+  if ( full_press ) Free(full_press);
+  if ( half_press ) Free(half_press);
+  if ( vct        ) Free(vct);
 
   cdoFinish();
 

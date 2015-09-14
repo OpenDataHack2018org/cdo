@@ -106,9 +106,9 @@ void *Replace(void *argument)
 
   if ( nchvars )
     {
-      vardata2  = (double **) malloc(nchvars*sizeof(double *));
-      varnmiss2 = (int **) malloc(nchvars*sizeof(int *));
-      varlevel  = (int **) malloc(nchvars*sizeof(int *));
+      vardata2  = (double **) Malloc(nchvars*sizeof(double *));
+      varnmiss2 = (int **) Malloc(nchvars*sizeof(int *));
+      varlevel  = (int **) Malloc(nchvars*sizeof(int *));
       for ( idx = 0; idx < nchvars; idx++ )
 	{
 	  varID1 = varlist1[idx];
@@ -116,17 +116,17 @@ void *Replace(void *argument)
 	  nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 	  nlevel2  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
-	  vardata2[idx]  = (double*) malloc(nlevel2*gridsize*sizeof(double));
-	  varnmiss2[idx] = (int*) malloc(nlevel2*sizeof(int));
-	  varlevel[idx] = (int*) malloc(nlevel1*sizeof(int));
+	  vardata2[idx]  = (double*) Malloc(nlevel2*gridsize*sizeof(double));
+	  varnmiss2[idx] = (int*) Malloc(nlevel2*sizeof(int));
+	  varlevel[idx] = (int*) Malloc(nlevel1*sizeof(int));
 	  /*
 	  for ( levelID = 0; levelID < nlevel1; levelID++ )
 	    varlevel[idx][levelID] = levelID;
 	  */
 	  if ( nlevel2 <= nlevel1 )
 	    {
-	      double *level1 = (double*) malloc(nlevel1*sizeof(double));
-	      double *level2 = (double*) malloc(nlevel2*sizeof(double));
+	      double *level1 = (double*) Malloc(nlevel1*sizeof(double));
+	      double *level2 = (double*) Malloc(nlevel2*sizeof(double));
 	      zaxisInqLevels(vlistInqVarZaxis(vlistID1, varID1), level1);
 	      zaxisInqLevels(vlistInqVarZaxis(vlistID2, varID2), level2);
 
@@ -146,8 +146,8 @@ void *Replace(void *argument)
 		  if ( l1 == nlevel1 ) cdoWarning("Level %g not found!", level2[l2]);
 		}
 
-	      free(level1);
-	      free(level2);
+	      Free(level1);
+	      Free(level2);
 	    }
 	}
     }
@@ -160,7 +160,7 @@ void *Replace(void *argument)
   streamDefVlist(streamID3, vlistID3);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int nts2 = vlistNtsteps(vlistID2);
 
@@ -231,17 +231,17 @@ void *Replace(void *argument)
     {
       for ( idx = 0; idx < nchvars; idx++ )
 	{
-	  free(vardata2[idx]);
-	  free(varnmiss2[idx]);
-	  free(varlevel[idx]);
+	  Free(vardata2[idx]);
+	  Free(varnmiss2[idx]);
+	  Free(varlevel[idx]);
 	}
 
-      free(vardata2);
-      free(varnmiss2);
-      free(varlevel);
+      Free(vardata2);
+      Free(varnmiss2);
+      Free(varlevel);
     }
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   cdoFinish();
 

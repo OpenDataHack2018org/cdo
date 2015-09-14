@@ -122,7 +122,7 @@ void store_weightlinks(long num_weights, int *srch_add, double *weights, long ce
 
   if ( num_weights )
     {
-      addweight_t *addweights = (addweight_t *) malloc(num_weights*sizeof(addweight_t));
+      addweight_t *addweights = (addweight_t *) Malloc(num_weights*sizeof(addweight_t));
       for ( long n = 0; n < num_weights; ++n )
 	{
 	  addweights[n].add    = srch_add[n];
@@ -144,7 +144,7 @@ void store_weightlinks4(long num_weights, int *srch_add, double weights[4][4], l
 
   if ( num_weights )
     {
-      addweight4_t *addweights = (addweight4_t *) malloc(num_weights*sizeof(addweight4_t));
+      addweight4_t *addweights = (addweight4_t *) Malloc(num_weights*sizeof(addweight4_t));
       for ( long n = 0; n < num_weights; ++n )
 	{
 	  addweights[n].add       = srch_add[n];
@@ -178,9 +178,9 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
   rv->num_links = nlinks;
   if ( nlinks )
     {
-      rv->src_cell_add = (int*) malloc(nlinks*sizeof(int));
-      rv->tgt_cell_add = (int*) malloc(nlinks*sizeof(int));
-      rv->wts          = (double*) malloc(nlinks*sizeof(double));
+      rv->src_cell_add = (int*) Malloc(nlinks*sizeof(int));
+      rv->tgt_cell_add = (int*) Malloc(nlinks*sizeof(int));
+      rv->wts          = (double*) Malloc(nlinks*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
@@ -199,7 +199,7 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
 		  rv->tgt_cell_add[offset+ilink] = tgt_cell_add;
 		  rv->wts[offset+ilink] = weightlinks[tgt_cell_add].addweights[ilink].weight;
 		}
-	      free(weightlinks[tgt_cell_add].addweights);
+	      Free(weightlinks[tgt_cell_add].addweights);
 	    }
 	}
     }
@@ -224,9 +224,9 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
   rv->num_links = nlinks;
   if ( nlinks )
     {
-      rv->src_cell_add = (int*) malloc(nlinks*sizeof(int));
-      rv->tgt_cell_add = (int*) malloc(nlinks*sizeof(int));
-      rv->wts          = (double*) malloc(4*nlinks*sizeof(double));
+      rv->src_cell_add = (int*) Malloc(nlinks*sizeof(int));
+      rv->tgt_cell_add = (int*) Malloc(nlinks*sizeof(int));
+      rv->wts          = (double*) Malloc(4*nlinks*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) \
@@ -247,7 +247,7 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
 		  for ( long k = 0; k < 4; ++k )
 		    rv->wts[(offset+ilink)*4+k] = addweights[ilink].weight[k];
 		}
-	      free(addweights);
+	      Free(addweights);
 	    }
 	}
     }

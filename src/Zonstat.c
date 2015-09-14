@@ -141,8 +141,8 @@ void *Zonstat(void *argument)
   field_t field1, field2;
   field_init(&field2);
   field_init(&field2);
-  field1.ptr  = (double*) malloc(lim*sizeof(double));
-  field2.ptr  = (double*) malloc(nlatmax*sizeof(double));
+  field1.ptr  = (double*) Malloc(lim*sizeof(double));
+  field2.ptr  = (double*) Malloc(nlatmax*sizeof(double));
   field2.grid = gridID2;
 
   int tsID = 0;
@@ -183,8 +183,8 @@ void *Zonstat(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( field1.ptr ) free(field1.ptr);
-  if ( field2.ptr ) free(field2.ptr);
+  if ( field1.ptr ) Free(field1.ptr);
+  if ( field2.ptr ) Free(field2.ptr);
 
   cdoFinish();
 

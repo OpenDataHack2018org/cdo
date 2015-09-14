@@ -3,6 +3,10 @@
 #include <string.h>
 #include <math.h>
 
+#ifndef _DMEMORY_H
+#  include "dmemory.h"
+#endif
+
 #include "constants.h"
 
 #define  OPENMP4  201307
@@ -278,16 +282,16 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
   int waves =  ntr + 1;
   int dimsp = (ntr + 1) * (ntr + 2);
 
-  double *gmu = (double*) malloc(nlat * sizeof(double));
-  double *gwt = (double*) malloc(nlat * sizeof(double));
+  double *gmu = (double*) Malloc(nlat * sizeof(double));
+  double *gwt = (double*) Malloc(nlat * sizeof(double));
 
   gaussaw(gmu, gwt, nlat);
 
 #if ! defined(_OPENMP)
-  double *pnm    = (double*) malloc(dimsp * sizeof(double));
-  double *hnm    = (double*) malloc(dimsp * sizeof(double));
-  double *ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
-  double *ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
+  double *pnm    = (double*) Malloc(dimsp * sizeof(double));
+  double *hnm    = (double*) Malloc(dimsp * sizeof(double));
+  double *ztemp1 = (double*) Malloc((waves<<1) * sizeof(double));
+  double *ztemp2 = (double*) Malloc((waves<<1) * sizeof(double));
 #endif
 
 #if defined(_OPENMP)
@@ -296,10 +300,10 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
   for ( jgl = 0; jgl < nlat; jgl++ )
     {
 #if defined(_OPENMP)
-      double *pnm    = (double*) malloc(dimsp * sizeof(double));
-      double *hnm    = (double*) malloc(dimsp * sizeof(double));
-      double *ztemp1 = (double*) malloc((waves<<1) * sizeof(double));
-      double *ztemp2 = (double*) malloc((waves<<1) * sizeof(double));
+      double *pnm    = (double*) Malloc(dimsp * sizeof(double));
+      double *hnm    = (double*) Malloc(dimsp * sizeof(double));
+      double *ztemp1 = (double*) Malloc((waves<<1) * sizeof(double));
+      double *ztemp2 = (double*) Malloc((waves<<1) * sizeof(double));
 #endif
       gmusq = 1.0 - gmu[jgl]*gmu[jgl];
       coslat[jgl] = sqrt(gmusq);
@@ -328,21 +332,21 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
 	  }
       
 #if defined(_OPENMP)
-      free(ztemp2);
-      free(ztemp1);
-      free(pnm);
-      free(hnm);
+      Free(ztemp2);
+      Free(ztemp1);
+      Free(pnm);
+      Free(hnm);
 #endif
     }
 
 #if ! defined(_OPENMP)
-  free(ztemp2);
-  free(ztemp1);
-  free(pnm);
-  free(hnm);
+  Free(ztemp2);
+  Free(ztemp1);
+  Free(pnm);
+  Free(hnm);
 #endif
-  free(gwt);
-  free(gmu);
+  Free(gwt);
+  Free(gmu);
 }
 
 
@@ -354,10 +358,10 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
   int waves  =  ntr + 1;
   int dimpnm = (ntr + 1)*(ntr + 4)/2;
 
-  double *gmu  = (double*) malloc(nlat * sizeof(double));
-  double *gwt  = (double*) malloc(nlat * sizeof(double));
-  double *pnm  = (double*) malloc(dimpnm * sizeof(double));
-  double *work = (double*) malloc(3*waves * sizeof(double));
+  double *gmu  = (double*) Malloc(nlat * sizeof(double));
+  double *gwt  = (double*) Malloc(nlat * sizeof(double));
+  double *pnm  = (double*) Malloc(dimpnm * sizeof(double));
+  double *work = (double*) Malloc(3*waves * sizeof(double));
 
   gaussaw(gmu, gwt, nlat);
   for ( jgl = 0; jgl < nlat; ++jgl ) gwt[jgl] *= 0.5;
@@ -396,10 +400,10 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
 	}
     }
 
-  free(work);
-  free(pnm);
-  free(gwt);
-  free(gmu);
+  Free(work);
+  Free(pnm);
+  Free(gwt);
+  Free(gmu);
 }
 
 

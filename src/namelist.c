@@ -15,12 +15,7 @@
   GNU General Public License for more details.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdarg.h>
-
+#include "cdo_int.h"
 #include "namelist.h"
 
 #if ! defined(strdup)
@@ -65,7 +60,7 @@ namelist_t *namelistNew(const char *name)
 {
   namelist_t *namelist;
 
-  namelist = (namelist_t*) malloc(sizeof(namelist_t));
+  namelist = (namelist_t*) Malloc(sizeof(namelist_t));
 
   namelist_init(namelist, name);
 
@@ -81,22 +76,22 @@ void namelistDelete(namelist_t *nml)
     {
       for ( i = 0; i < nml->size; i++ )
 	{
-	  if ( nml->entry[i]->name ) free(nml->entry[i]->name);
+	  if ( nml->entry[i]->name ) Free(nml->entry[i]->name);
 	  if ( nml->entry[i]->type == NML_WORD )
 	    for ( iocc = 0; iocc < nml->entry[i]->occ; iocc++ )
 	      {
 		if ( ((char **)nml->entry[i]->ptr)[iocc] )
 		  {
-		    free(((char **)nml->entry[i]->ptr)[iocc]);
+		    Free(((char **)nml->entry[i]->ptr)[iocc]);
 		    ((char **)nml->entry[i]->ptr)[iocc] = NULL;
 		  }
 	      }
 
-	  free(nml->entry[i]);
+	  Free(nml->entry[i]);
 	}
       
-      if ( nml->name ) free(nml->name);
-      free(nml);
+      if ( nml->name ) Free(nml->name);
+      Free(nml);
     }
 }
 
@@ -114,7 +109,7 @@ void namelistReset(namelist_t *nml)
 	      {
 		if ( ((char **)nml->entry[i]->ptr)[iocc] )
 		  {
-		    free(((char **)nml->entry[i]->ptr)[iocc]);
+		    Free(((char **)nml->entry[i]->ptr)[iocc]);
 		    ((char **)nml->entry[i]->ptr)[iocc] = NULL;
 		  }
 	      }
@@ -181,7 +176,7 @@ int namelistAdd(namelist_t *nml, const char *name, int type, int dis, void *ptr,
       return (-1);
     }
 
-  nml_entry = (nml_entry_t*) malloc(sizeof(nml_entry_t));
+  nml_entry = (nml_entry_t*) Malloc(sizeof(nml_entry_t));
 
   nml_entry->name = strdup(name);
   nml_entry->type = type;
@@ -341,7 +336,7 @@ void rdnlsgl(namelist_t *nml, void *var, int ntyp, int nlen, int *nocc)
 	  if ( *nocc < nlen )
 	    {
 	      len = nml->line.namitl - nml->line.namitf + 1;
-	      ((char **)var)[*nocc] = (char*) calloc((size_t)len+1, sizeof(char));
+	      ((char **)var)[*nocc] = (char*) Calloc((size_t)len+1, sizeof(char));
 	      for ( i = 0; i < len; i++ )
 		((char **)var)[*nocc][i] = nml->line.lineac[nml->line.namitf+i];
 	      *nocc += 1;
@@ -384,7 +379,7 @@ void rdnlsgl(namelist_t *nml, void *var, int ntyp, int nlen, int *nocc)
       if ( *nocc < nlen )
 	{
 	  len = nml->line.namitl - nml->line.namitf + 1;
-	  ((char **)var)[*nocc] = (char*) calloc((size_t)len+1, sizeof(char));
+	  ((char **)var)[*nocc] = (char*) Calloc((size_t)len+1, sizeof(char));
 	  for ( i = 0; i < len; i++ )
 	    ((char **)var)[*nocc][i] = nml->line.lineac[nml->line.namitf+i];
 	  *nocc += 1;

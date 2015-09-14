@@ -95,8 +95,8 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 
   if ( !lpower2 )
     {
-      work_r = (double*) malloc(nts*sizeof(double));
-      work_i = (double*) malloc(nts*sizeof(double));
+      work_r = (double*) Malloc(nts*sizeof(double));
+      work_i = (double*) Malloc(nts*sizeof(double));
     }
 
   if ( lpower2 )
@@ -113,8 +113,8 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
   else
     ft_r(array1, array2, nts, -1, work_r, work_i);
 
-  if ( work_r ) free(work_r);
-  if ( work_i ) free(work_i);
+  if ( work_r ) Free(work_r);
+  if ( work_i ) Free(work_i);
   
   return;
 }
@@ -194,7 +194,7 @@ void *Filter(void *argument)
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-          vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+          vars   = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
         }
                        
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
@@ -206,7 +206,7 @@ void *Filter(void *argument)
           streamInqRecord(streamID1, &varID, &levelID);
           gridID   = vlistInqVarGrid(vlistID1, varID);
           gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
           streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
           if ( nmiss ) cdoAbort("Missing value support for operators in module Filter not added yet!");
@@ -262,11 +262,11 @@ void *Filter(void *argument)
   if ( use_fftw )
     {
 #if defined(HAVE_LIBFFTW3) 
-      ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+      ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
       for ( i = 0; i < ompNumThreads; i++ )
 	{
-	  ompmem[i].in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
-	  ompmem[i].out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
+	  ompmem[i].in_fft  = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
+	  ompmem[i].out_fft = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
 	  ompmem[i].p_T2S = fftw_plan_dft_1d(nts, ompmem[i].in_fft, ompmem[i].out_fft,  1, FFTW_ESTIMATE);
 	  ompmem[i].p_S2T = fftw_plan_dft_1d(nts, ompmem[i].out_fft, ompmem[i].in_fft, -1, FFTW_ESTIMATE);
 	}
@@ -274,15 +274,15 @@ void *Filter(void *argument)
     }
   else
     {
-      ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+      ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
       for ( i = 0; i < ompNumThreads; i++ )
 	{
-	  ompmem[i].array1 = (double*) malloc(nts*sizeof(double));
-	  ompmem[i].array2 = (double*) malloc(nts*sizeof(double));
+	  ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
+	  ompmem[i].array2 = (double*) Malloc(nts*sizeof(double));
 	}
     }
 
-  int *fmasc = (int*) calloc(nts, sizeof(int));
+  int *fmasc = (int*) Calloc(nts, sizeof(int));
 
   switch(operfunc)
     {
@@ -377,20 +377,20 @@ void *Filter(void *argument)
 #if defined(HAVE_LIBFFTW3) 
       for ( i = 0; i < ompNumThreads; i++ )
 	{
-	  free(ompmem[i].in_fft);
-	  free(ompmem[i].out_fft);
+	  Free(ompmem[i].in_fft);
+	  Free(ompmem[i].out_fft);
 	}
-      free(ompmem);
+      Free(ompmem);
 #endif
     }
   else
     {
       for ( i = 0; i < ompNumThreads; i++ )
 	{
-	  free(ompmem[i].array1);
-	  free(ompmem[i].array2);
+	  Free(ompmem[i].array1);
+	  Free(ompmem[i].array2);
 	}
-      free(ompmem);
+      Free(ompmem);
     }
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -413,7 +413,7 @@ void *Filter(void *argument)
                   streamDefRecord(streamID2, varID, levelID);
                   streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 
-                  free(vars[tsID][varID][levelID].ptr);
+                  Free(vars[tsID][varID][levelID].ptr);
                   vars[tsID][varID][levelID].ptr = NULL;
                 }
             }
@@ -422,7 +422,7 @@ void *Filter(void *argument)
       field_free(vars[tsID], vlistID1);
     }
 
-  if ( vars   ) free(vars);
+  if ( vars   ) Free(vars);
 
   dtlist_delete(dtlist);
 

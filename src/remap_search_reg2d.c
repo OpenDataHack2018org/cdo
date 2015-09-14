@@ -1,4 +1,4 @@
-#include "cdo.h"
+#include "cdo_int.h"
 #include "remap.h"
 
 
@@ -43,7 +43,7 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restri
 	}
     }
 
-  sincoslon = (double*) malloc(nx*sizeof(double));
+  sincoslon = (double*) Malloc(nx*sizeof(double));
 
   for ( ii = 0; ii < nx; ++ii )
     sincoslon[ii] = coslon_dst*cos(src_center_lon[ii]) + sinlon_dst*sin(src_center_lon[ii]);
@@ -85,7 +85,7 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restri
 	}
     }
 
-  free(sincoslon);
+  Free(sincoslon);
 
   for ( n = 0; n < 4; ++n ) nbr_dist[n] = ONE/(nbr_dist[n] + TINY);
   distance = 0.0;

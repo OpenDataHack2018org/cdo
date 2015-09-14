@@ -66,7 +66,7 @@ void *Smooth9(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   nvars = vlistNvars(vlistID1);
-  varIDs  = (int*) malloc(nvars*sizeof(int)); 
+  varIDs  = (int*) Malloc(nvars*sizeof(int)); 
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -86,9 +86,9 @@ void *Smooth9(void *argument)
     }
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize *sizeof(double));
-  mask   = (int*) malloc(gridsize *sizeof(int));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
+  array2 = (double*) Malloc(gridsize *sizeof(double));
+  mask   = (int*) Malloc(gridsize *sizeof(int));
  
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -301,9 +301,9 @@ void *Smooth9(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  free(varIDs);
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  Free(varIDs);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
   cdoFinish();
 

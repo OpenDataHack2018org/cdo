@@ -180,11 +180,11 @@ void *Fldstat(void *argument)
   field_init(&field);
 
   int lim = vlistGridsizeMax(vlistID1);
-  field.ptr    = (double*) malloc(lim*sizeof(double));
+  field.ptr    = (double*) Malloc(lim*sizeof(double));
   field.weight = NULL;
   if ( needWeights )
     {
-      field.weight = (double*) malloc(lim*sizeof(double));
+      field.weight = (double*) Malloc(lim*sizeof(double));
       if ( !useweights )
 	{
 	  cdoPrint("Using constant grid cell area weights!");
@@ -260,8 +260,8 @@ void *Fldstat(void *argument)
 
   vlistDestroy(vlistID2);
 
-  if ( field.ptr )    free(field.ptr);
-  if ( field.weight ) free(field.weight);
+  if ( field.ptr )    Free(field.ptr);
+  if ( field.weight ) Free(field.weight);
 
   cdoFinish();
 

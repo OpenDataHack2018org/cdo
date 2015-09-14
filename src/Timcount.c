@@ -86,14 +86,14 @@ void *Timcount(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   nrecords = vlistNrecs(vlistID1);
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field_init(&field);
-  field.ptr = (double*) malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   vars1 = field_malloc(vlistID1, FIELD_PTR);
 
@@ -168,10 +168,10 @@ void *Timcount(void *argument)
 
   field_free(vars1, vlistID1);
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   streamClose(streamID2);
   streamClose(streamID1);

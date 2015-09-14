@@ -43,7 +43,7 @@ char *FieldName(int code, const char *text)
 static
 void *FreeMemory(void *ptr)
 {
-  free(ptr);
+  Free(ptr);
 
   return (NULL);
 }
@@ -106,7 +106,7 @@ double *alloc_dp(int words, char *array_name)
 
   if ( words > 0 )
     {
-      result = (double *) malloc(words * sizeof(double));
+      result = (double *) Malloc(words * sizeof(double));
 
       if ( result == NULL ) SysError(array_name, "No Memory!");
     }
@@ -264,7 +264,7 @@ void after_read_vct(const char *vctfile, double **vct, int *nvct)
   while ( fgets(line, 1023, fp) ) nvct++;
 
   *nvct *= 2;
-  *vct = (double *) malloc(*nvct*sizeof(double));
+  *vct = (double *) Malloc(*nvct*sizeof(double));
 
   rewind(fp);
   for ( int i = 0; i < *nvct/2; i++ )
@@ -315,7 +315,7 @@ void after_GP2FC(double *gp, double *fc, long nlat, long nlon, long nlev, long n
   if ( ifax[9] != nlon )
     {
       if ( trig ) free (trig);
-      trig = (double *) malloc(nlon * sizeof(double));
+      trig = (double *) Malloc(nlon * sizeof(double));
       fft_set (trig, ifax, nlon);
     }
 
@@ -331,7 +331,7 @@ void after_FC2GP(double *fc, double *gp, long nlat, long nlon, long nlev, long n
   if ( ifax[9] != nlon )
     {
       if ( trig ) free (trig);
-      trig = (double *) malloc(nlon * sizeof(double));
+      trig = (double *) Malloc(nlon * sizeof(double));
       fft_set (trig, ifax, nlon);
     }
 
@@ -1273,7 +1273,7 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
     {
       vars[GEOPOTHEIGHT].hlev = globs->NumLevel+1;
       vars[GEOPOTHEIGHT].sfit = TRUE;
-      vars[GEOPOTHEIGHT].hybrid = (double *)realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP+globs->DimGP)*sizeof(double));
+      vars[GEOPOTHEIGHT].hybrid = (double *) Realloc(vars[GEOPOTHEIGHT].hybrid, (globs->Dim3GP+globs->DimGP)*sizeof(double));
       after_copy_array(vars[GEOPOTHEIGHT].hybrid+globs->Dim3GP, globs->Orography, globs->DimGP);
       for ( int i = 0; i < globs->DimGP; i++ ) vars[GEOPOTHEIGHT].hybrid[globs->Dim3GP+i] /= PlanetGrav;
     }
@@ -2004,7 +2004,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
   if ( globs->Type >= 30 )
     {
       if ( globs->vert_index == NULL )
-	globs->vert_index = (int *) malloc(globs->NumLevelRequest*globs->DimGP*sizeof(int));
+	globs->vert_index = (int *) Malloc(globs->NumLevelRequest*globs->DimGP*sizeof(int));
 
       if ( globs->unitsel )
 	{
@@ -2022,7 +2022,7 @@ void after_processML(struct Control *globs, struct Variable *vars)
       nmiss = 0;
       if ( ! globs->Extrapolate )
 	{
-	  if ( globs->pnmiss == NULL ) globs->pnmiss = (int *) malloc(globs->NumLevelRequest*sizeof(int));  
+	  if ( globs->pnmiss == NULL ) globs->pnmiss = (int *) Malloc(globs->NumLevelRequest*sizeof(int));  
 	  genindmiss(globs->vert_index, pressureLevel, globs->DimGP, globs->NumLevelRequest, vars[PS_PROG].hybrid, globs->pnmiss);
 	  for ( i = 0; i < globs->NumLevelRequest; i++ ) nmiss += globs->pnmiss[i];
 	}
@@ -2562,7 +2562,7 @@ void after_AnalysisAddRecord(struct Control *globs, struct Variable *vars, int c
 	  int i;
 	  if ( vars[code].samp == NULL )
 	    {
-	      vars[code].samp = (int *) malloc(dataSize*sizeof(int));
+	      vars[code].samp = (int *) Malloc(dataSize*sizeof(int));
 	      for ( i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
 	    }
 
@@ -2625,7 +2625,7 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
 	  int i;
 	  if ( vars[code].samp == NULL )
 	    {
-	      vars[code].samp = (int *) malloc(dataSize*sizeof(int));
+	      vars[code].samp = (int *) Malloc(dataSize*sizeof(int));
 	      for ( i = 0; i < dataSize; i++ ) vars[code].samp[i] = globs->MeanCount0;
 	    }
 
@@ -2912,26 +2912,26 @@ void after_legini_setup(struct Control *globs, struct Variable *vars)
   int dimsp = (ntr + 1) * (ntr + 2);
   int pdim  = dimsp / 2 * nlat;
 
-  globs->poli = (double *) malloc(pdim*sizeof(double));
+  globs->poli = (double *) Malloc(pdim*sizeof(double));
   
   if ( ! globs->AnalysisData )
     {
-      if ( globs->Type >= 20 )  globs->pold = (double *) malloc(pdim*sizeof(double));
-      if ( vars[DPSDY].needed ) globs->pdev = (double *) malloc(pdim*sizeof(double));
+      if ( globs->Type >= 20 )  globs->pold = (double *) Malloc(pdim*sizeof(double));
+      if ( vars[DPSDY].needed ) globs->pdev = (double *) Malloc(pdim*sizeof(double));
     }
   
   if ( (vars[DIVERGENCE].needed || vars[VORTICITY].needed ||
 	vars[VELOPOT].needed || vars[STREAM].needed ) && globs->Type > 20 )
     {
-      globs->pol2 = (double *) malloc(pdim*sizeof(double));
-      globs->pol3 = (double *) malloc(pdim*sizeof(double));
+      globs->pol2 = (double *) Malloc(pdim*sizeof(double));
+      globs->pol3 = (double *) Malloc(pdim*sizeof(double));
     }
 
   if ( globs->AnalysisData && (globs->Type == 70) && globs->Gaussian && !globs->Spectral )
     {
-      if ( globs->poli ) { free(globs->poli); globs->poli = NULL;}
-      if ( globs->pol2 ) { free(globs->pol2); globs->pol2 = NULL;}
-      if ( globs->pol3 ) { free(globs->pol3); globs->pol3 = NULL;}
+      if ( globs->poli ) { Free(globs->poli); globs->poli = NULL;}
+      if ( globs->pol2 ) { Free(globs->pol2); globs->pol2 = NULL;}
+      if ( globs->pol3 ) { Free(globs->pol3); globs->pol3 = NULL;}
       return;
     }
 

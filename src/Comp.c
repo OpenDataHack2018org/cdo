@@ -112,9 +112,9 @@ void *Comp(void *argument)
 
   gridsize = vlistGridsizeMax(vlistIDx1);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
-  array3 = (double*) malloc(gridsize*sizeof(double));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
+  array2 = (double*) Malloc(gridsize*sizeof(double));
+  array3 = (double*) Malloc(gridsize*sizeof(double));
 
   arrayx1 = array1;
   arrayx2 = array2;
@@ -143,12 +143,12 @@ void *Comp(void *argument)
       if ( filltype == FILL_TS )
 	{
 	  nvars  = vlistNvars(vlistIDx2);
-	  vardata  = (double **) malloc(nvars*sizeof(double *));
+	  vardata  = (double **) Malloc(nvars*sizeof(double *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-	      vardata[varID]  = (double*) malloc(nlev*gridsize*sizeof(double));
+	      vardata[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
 	    }
 	}
     }
@@ -288,13 +288,13 @@ void *Comp(void *argument)
 
   if ( vardata )
     {
-      for ( varID = 0; varID < nvars; varID++ ) free(vardata[varID]);
-      free(vardata);
+      for ( varID = 0; varID < nvars; varID++ ) Free(vardata[varID]);
+      Free(vardata);
     }
 
-  if ( array3 ) free(array3);
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  if ( array3 ) Free(array3);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
   cdoFinish();
 

@@ -37,8 +37,8 @@ void transxy(int gridID, double *array1, double *array2)
   nx = gridInqXsize(gridID);
   ny = gridInqYsize(gridID);
 
-  a2D1 = (double **) malloc(ny*sizeof(double *));
-  a2D2 = (double **) malloc(nx*sizeof(double *));
+  a2D1 = (double **) Malloc(ny*sizeof(double *));
+  a2D2 = (double **) Malloc(nx*sizeof(double *));
 
   for ( j = 0; j < ny; ++j ) a2D1[j] = array1+j*nx;
   for ( i = 0; i < nx; ++i ) a2D2[i] = array2+i*ny;
@@ -47,8 +47,8 @@ void transxy(int gridID, double *array1, double *array2)
     for ( i = 0; i < nx; ++i )
       a2D2[i][j] = a2D1[j][i];
 
-  free(a2D1);
-  free(a2D2);
+  Free(a2D1);
+  Free(a2D2);
 }
 
 
@@ -98,8 +98,8 @@ void *Transpose(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
+  array2 = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -126,8 +126,8 @@ void *Transpose(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  free(array1);
-  free(array2);
+  Free(array1);
+  Free(array2);
 
   cdoFinish();
 

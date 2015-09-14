@@ -648,10 +648,10 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   /* Allocate address and weight arrays for mapping 1 */
 
-  rv->src_cell_add = (int*) malloc(rv->num_links*sizeof(int));
-  rv->tgt_cell_add = (int*) malloc(rv->num_links*sizeof(int));
+  rv->src_cell_add = (int*) Malloc(rv->num_links*sizeof(int));
+  rv->tgt_cell_add = (int*) Malloc(rv->num_links*sizeof(int));
 
-  rv->wts = (double*) malloc(rv->num_wts*rv->num_links*sizeof(double));
+  rv->wts = (double*) Malloc(rv->num_wts*rv->num_links*sizeof(double));
 
   /* Get variable ids */
 

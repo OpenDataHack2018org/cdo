@@ -1,13 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
+#if defined(HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
 #include <stdarg.h>
 #include <errno.h>
 #include <cdi.h>
 #include "cdo.h"
+#include "cdo_int.h"
 #include "process.h"
 #include "error.h"
 
-#include "config.h"
 
 void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 {	

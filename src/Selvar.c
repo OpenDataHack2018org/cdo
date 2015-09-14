@@ -132,7 +132,7 @@ void *Selvar(void *argument)
 
   if ( nsel )
     {
-      selfound = (int*) malloc(nsel*sizeof(int));
+      selfound = (int*) Malloc(nsel*sizeof(int));
       for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
     }
 
@@ -366,7 +366,7 @@ void *Selvar(void *argument)
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
     }
 
   int tsID = 0;
@@ -406,9 +406,9 @@ void *Selvar(void *argument)
   vlistDestroy(vlistID2);
 
   if ( ! lcopy )
-    if ( array ) free(array);
+    if ( array ) Free(array);
 
-  if ( selfound ) free(selfound);
+  if ( selfound ) Free(selfound);
 
   listDelete(ilist);
   listDelete(flist);

@@ -79,7 +79,7 @@ void *CDItest(void *argument)
       streamDefVlist(streamID2, vlistID2);
 
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
 
       tsID1 = 0;
       tsID2 = 0;
@@ -114,7 +114,7 @@ void *CDItest(void *argument)
       vlistDestroy(vlistID2);
       taxisDestroy(taxisID2);
 
-      if ( array ) free(array);
+      if ( array ) Free(array);
 
       n++;
 

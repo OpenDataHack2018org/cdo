@@ -58,8 +58,8 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
   if ( !(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) )
     cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
-  matrix1 = (double **) malloc(ny * sizeof(double *));
-  matrix2 = (double **) malloc(ny * sizeof(double *));
+  matrix1 = (double **) Malloc(ny * sizeof(double *));
+  matrix2 = (double **) Malloc(ny * sizeof(double *));
 
   for ( j = 0; j < ny; j++ )
     {
@@ -142,8 +142,8 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
 
   if ( nmiss1 != nmiss2 ) cdoAbort("found only %d of %d missing values!", nmiss2, nmiss1);
 
-  free(matrix2);
-  free(matrix1);
+  Free(matrix2);
+  Free(matrix1);
 }
 
 
@@ -168,8 +168,8 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
   nx  = gridInqXsize(gridID);
   ny  = gridInqYsize(gridID);
 
-  matrix1 = (double **) malloc(ny * sizeof(double *));
-  matrix2 = (double **) malloc(ny * sizeof(double *));
+  matrix1 = (double **) Malloc(ny * sizeof(double *));
+  matrix2 = (double **) Malloc(ny * sizeof(double *));
 
   for ( j = 0; j < ny; j++ ) { matrix1[j] = array1 + j*nx; matrix2[j] = array2 + j*nx; }
 
@@ -266,8 +266,8 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
   for ( j = 0; j < ny; j++ ) for ( i = 0; i < nx; i++ ) matrix1[j][i] = matrix2[j][i];
   }
 
-  free(matrix2);
-  free(matrix1);
+  Free(matrix2);
+  Free(matrix1);
 }
 
 
@@ -285,8 +285,8 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   unsigned nmiss = field1->nmiss;
   unsigned nvals = gridsize - nmiss;
 
-  double *xvals = (double*) malloc(gridsize*sizeof(double));
-  double *yvals = (double*) malloc(gridsize*sizeof(double));
+  double *xvals = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
   if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
 
@@ -308,12 +308,12 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   double *lons = NULL;
   double *lats = NULL;
 
-  if ( nmiss ) mindex = (unsigned *) calloc(1, nmiss*sizeof(unsigned));
+  if ( nmiss ) mindex = (unsigned *) Calloc(1, nmiss*sizeof(unsigned));
   if ( nvals )
     {
-      vindex = (unsigned *) calloc(1, nvals*sizeof(unsigned));
-      lons   = (double *) malloc(nvals*sizeof(double));
-      lats   = (double *) malloc(nvals*sizeof(double));
+      vindex = (unsigned *) Calloc(1, nvals*sizeof(unsigned));
+      lons   = (double *) Malloc(nvals*sizeof(double));
+      lats   = (double *) Malloc(nvals*sizeof(double));
     }
   
   unsigned nv = 0, nm = 0;
@@ -378,8 +378,8 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
       array2[mindex[i]] = array1[index];
     }
 
-  if ( mindex ) free(mindex);
-  if ( vindex ) free(vindex);
+  if ( mindex ) Free(mindex);
+  if ( vindex ) Free(vindex);
 
   finish = clock();
 
@@ -387,10 +387,10 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   if ( gs ) gridsearch_delete(gs);
 
-  if ( lons ) free(lons);
-  if ( lats ) free(lats);
-  free(xvals);
-  free(yvals);
+  if ( lons ) Free(lons);
+  if ( lats ) Free(lats);
+  Free(xvals);
+  Free(yvals);
 }
 
 
@@ -458,8 +458,8 @@ void *Fillmiss(void *argument)
   field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) malloc(gridsize*sizeof(double));
+  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -511,8 +511,8 @@ void *Fillmiss(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( field2.ptr ) free(field2.ptr);
-  if ( field1.ptr ) free(field1.ptr);
+  if ( field2.ptr ) Free(field2.ptr);
+  if ( field1.ptr ) Free(field1.ptr);
 
   cdoFinish();
 

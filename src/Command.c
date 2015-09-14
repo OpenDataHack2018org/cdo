@@ -308,10 +308,10 @@ void command_init()
   UNUSED(taxisID);
 
   gridsize = vlistGridsizeMax(gl_vlistID);
-  gl_data = (double*) malloc(gridsize*sizeof(double));
+  gl_data = (double*) Malloc(gridsize*sizeof(double));
 
   gl_nvars = vlistNvars(gl_vlistID);
-  all_vars = (vars_t*) malloc(gl_nvars*sizeof(vars_t));
+  all_vars = (vars_t*) Malloc(gl_nvars*sizeof(vars_t));
 
   for ( varID = 0; varID < gl_nvars; ++varID )
     {
@@ -374,8 +374,8 @@ void *Command(void *argument)
   
   streamClose(gl_streamID);
 
-  if ( gl_data ) free(gl_data);
-  if ( all_vars ) free(all_vars);
+  if ( gl_data ) Free(gl_data);
+  if ( all_vars ) Free(all_vars);
   
   cdoProcessTime(&e_utime, &e_stime);
 

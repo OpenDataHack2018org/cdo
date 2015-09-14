@@ -134,8 +134,8 @@ void *CDIread(void *argument)
 	  
       gridsize = vlistGridsizeMax(vlistID);
       
-      if ( darray == NULL ) darray = (double*) malloc(gridsize*sizeof(double));
-      if ( farray == NULL && memtype == MEMTYPE_FLOAT ) farray = (float*) malloc(gridsize*sizeof(float));
+      if ( darray == NULL ) darray = (double*) Malloc(gridsize*sizeof(double));
+      if ( farray == NULL && memtype == MEMTYPE_FLOAT ) farray = (float*) Malloc(gridsize*sizeof(float));
 
       t0 = timer_val(timer_read);
 
@@ -189,8 +189,8 @@ void *CDIread(void *argument)
   if ( nruns > 1 )
     print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size, file_size, twsum/nruns);
 
-  if ( darray ) free(darray);
-  if ( farray ) free(farray);
+  if ( darray ) Free(darray);
+  if ( farray ) Free(farray);
 
   cdoFinish();
 

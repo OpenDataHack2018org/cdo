@@ -103,7 +103,7 @@ void *Deltime(void *argument)
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
     }
       
   nfound = 0;
@@ -158,7 +158,7 @@ void *Deltime(void *argument)
     cdoWarning("Day %d%s not found!", dday, cmons[dmon]);
 
   if ( ! lcopy )
-    if ( array ) free(array);
+    if ( array ) Free(array);
 
   vlistDestroy(vlistID2);
 

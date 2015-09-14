@@ -42,10 +42,10 @@ void data_treat(double *zdata, double *xdata, double *ydata, long nx, long ny)
   int *iscale = NULL;
   long i, j;
 
-  zwork  = (double*) malloc(3*nx*ny*sizeof(double));
-  xwork  = (double*) malloc(3*nx*sizeof(double));
-  xscale = (double*) malloc(ny*sizeof(double));
-  iscale = (int*) malloc(ny*sizeof(int));
+  zwork  = (double*) Malloc(3*nx*ny*sizeof(double));
+  xwork  = (double*) Malloc(3*nx*sizeof(double));
+  xscale = (double*) Malloc(ny*sizeof(double));
+  iscale = (int*) Malloc(ny*sizeof(int));
 
   double pi2 = 2*acos(-1.);
   for ( i = 0; i < nx; ++i )
@@ -97,10 +97,10 @@ void data_treat(double *zdata, double *xdata, double *ydata, long nx, long ny)
   ENDDO
   */
 
-  free(zwork);
-  free(xwork);
-  free(xscale);
-  free(iscale);
+  Free(zwork);
+  Free(xwork);
+  Free(xscale);
+  Free(iscale);
 } // data_treat
 
 static
@@ -762,7 +762,7 @@ void *SSOpar(void *argument)
                       if ( cdoVerbose )
                         cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf   = %d", zaxisIDh, nlevel);
  
-		      vct = (double*) malloc(nvct*sizeof(double));
+		      vct = (double*) Malloc(nvct*sizeof(double));
 		      zaxisInqVct(zaxisID, vct);
 
 		      if ( cdoVerbose )
@@ -844,18 +844,18 @@ void *SSOpar(void *argument)
 
   if ( tempID == -1 ) cdoAbort("Temperature not found!");
 
-  array  = (double*) malloc(gridsize*sizeof(double));
+  array  = (double*) Malloc(gridsize*sizeof(double));
 
-  geop   = (double*) malloc(gridsize*sizeof(double));
-  ps     = (double*) malloc(gridsize*sizeof(double));
+  geop   = (double*) Malloc(gridsize*sizeof(double));
+  ps     = (double*) Malloc(gridsize*sizeof(double));
 
-  temp   = (double*) malloc(gridsize*nhlevf*sizeof(double));
-  hum    = (double*) malloc(gridsize*nhlevf*sizeof(double));
-  lwater = (double*) malloc(gridsize*nhlevf*sizeof(double));
-  iwater = (double*) malloc(gridsize*nhlevf*sizeof(double));
+  temp   = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  hum    = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  lwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  iwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
-  half_press   = (double*) malloc(gridsize*(nhlevf+1)*sizeof(double));
-  geopotheight = (double*) malloc(gridsize*(nhlevf+1)*sizeof(double));
+  half_press   = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
+  geopotheight = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
 
   if ( zaxisIDh != -1 && geopID == -1 )
     {
@@ -976,16 +976,16 @@ void *SSOpar(void *argument)
 
   vlistDestroy(vlistID2);
 
-  free(ps);
-  free(geop);
-  free(temp);
-  free(geopotheight);
-  if ( hum ) free(hum);
+  Free(ps);
+  Free(geop);
+  Free(temp);
+  Free(geopotheight);
+  if ( hum ) Free(hum);
 
-  if ( half_press ) free(half_press);
+  if ( half_press ) Free(half_press);
 
-  free(array);
-  if ( vct ) free(vct);
+  Free(array);
+  if ( vct ) Free(vct);
 
   cdoFinish();
 

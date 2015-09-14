@@ -290,8 +290,8 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 
   int ndist = num_neighbors;
   ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
-  double *dist = (double *) malloc(ndist*sizeof(double));
-  int    *adds = (int *) malloc(ndist*sizeof(int));
+  double *dist = (double *) Malloc(ndist*sizeof(double));
+  int    *adds = (int *) Malloc(ndist*sizeof(int));
 
   const double range0 = SQR(2*search_radius);
   double range = range0;
@@ -322,7 +322,7 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
             {
               nadd  = p->node->index;
               range = p->dist_sq;
-              free(p); // Free the result node taken from the heap
+              Free(p); // Free the result node taken from the heap
               
               if ( range < range0 )
                 {
@@ -331,8 +331,8 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
                   j++;
                 }
             }
-          free(gs_result->d); // free the heap
-          free(gs_result);    // and free the heap information structure
+          Free(gs_result->d); // free the heap
+          Free(gs_result);    // and free the heap information structure
         }
     }
   
@@ -341,8 +341,8 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
   for ( j = 0; j < ndist; ++j )
     nbr_store_distance(adds[j], dist[j], num_neighbors, nbr_add, nbr_dist);
 
-  free(adds);
-  free(dist);
+  Free(adds);
+  Free(dist);
 
   nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
@@ -372,7 +372,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
   unsigned nx = src_grid->dims[0];
   unsigned ny = src_grid->dims[1];
 
-  weightlinks_t *weightlinks = (weightlinks_t *) malloc(tgt_grid_size*sizeof(weightlinks_t));
+  weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
 
   int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
   int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
@@ -437,7 +437,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
 
   weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
 
-  if ( weightlinks ) free(weightlinks);
+  if ( weightlinks ) Free(weightlinks);
 
 }  /* scrip_remap_weights_distwgt */
 

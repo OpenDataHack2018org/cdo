@@ -639,13 +639,13 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   struct grid_cell* tgt_grid_cell2[ompNumThreads];  
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      tgt_grid_cell2[i] = (struct grid_cell*) malloc(sizeof(struct grid_cell));
+      tgt_grid_cell2[i] = (struct grid_cell*) Malloc(sizeof(struct grid_cell));
       tgt_grid_cell2[i]->array_size      = tgt_num_cell_corners;
       tgt_grid_cell2[i]->num_corners     = tgt_num_cell_corners;
       tgt_grid_cell2[i]->edge_type       = tgt_edge_type;
-      tgt_grid_cell2[i]->coordinates_x   = (double*) malloc(tgt_num_cell_corners*sizeof(double));
-      tgt_grid_cell2[i]->coordinates_y   = (double*) malloc(tgt_num_cell_corners*sizeof(double));
-      tgt_grid_cell2[i]->coordinates_xyz = (double*) malloc(3*tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_x   = (double*) Malloc(tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_y   = (double*) Malloc(tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_xyz = (double*) Malloc(3*tgt_num_cell_corners*sizeof(double));
     }
 
   struct grid_cell* src_grid_cells;
@@ -674,7 +674,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   int* srch_add2[ompNumThreads];
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int*) malloc(src_grid_size*sizeof(int));
+    srch_add2[i] = (int*) Malloc(src_grid_size*sizeof(int));
 
   srch_corners = src_num_cell_corners;
 
@@ -695,7 +695,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       //printf("src_grid   lon: %g %g lat: %g %g\n", RAD2DEG*src_grid_bound_box[2],RAD2DEG*src_grid_bound_box[3],RAD2DEG*src_grid_bound_box[0],RAD2DEG*src_grid_bound_box[1] );
     }
 
-  weightlinks_t *weightlinks = (weightlinks_t *) malloc(tgt_grid_size*sizeof(weightlinks_t));
+  weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
   
   double findex = 0;
 
@@ -834,11 +834,11 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       if ( num_srch_cells > max_srch_cells )
 	{
-	  partial_areas   = (double*) realloc(partial_areas,   num_srch_cells*sizeof(double));
-	  partial_weights = (double*) realloc(partial_weights, num_srch_cells*sizeof(double));
+	  partial_areas   = (double*) Realloc(partial_areas,   num_srch_cells*sizeof(double));
+	  partial_weights = (double*) Realloc(partial_weights, num_srch_cells*sizeof(double));
 
-	  overlap_buffer = (struct grid_cell*) realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
-	  src_grid_cells = (struct grid_cell*) realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
+	  overlap_buffer = (struct grid_cell*) Realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
+	  src_grid_cells = (struct grid_cell*) Realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
 
 	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {
@@ -855,9 +855,9 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	      src_grid_cells[n].array_size      = srch_corners;
 	      src_grid_cells[n].num_corners     = srch_corners;
 	      src_grid_cells[n].edge_type       = src_edge_type;
-	      src_grid_cells[n].coordinates_x   = (double*) malloc(srch_corners*sizeof(double));
-	      src_grid_cells[n].coordinates_y   = (double*) malloc(srch_corners*sizeof(double));
-	      src_grid_cells[n].coordinates_xyz = (double*) malloc(3*srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_x   = (double*) Malloc(srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_y   = (double*) Malloc(srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_xyz = (double*) Malloc(3*srch_corners*sizeof(double));
 	    }
 
 	  max_srch_cells = num_srch_cells;
@@ -1077,35 +1077,35 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	{
 	  if ( overlap_buffer2[i][n].array_size > 0 )
 	    {
-	      free(overlap_buffer2[i][n].coordinates_x);
-	      free(overlap_buffer2[i][n].coordinates_y);
-	      if ( overlap_buffer2[i][n].coordinates_xyz ) free(overlap_buffer2[i][n].coordinates_xyz);
-	      if ( overlap_buffer2[i][n].edge_type ) free(overlap_buffer2[i][n].edge_type);
+	      Free(overlap_buffer2[i][n].coordinates_x);
+	      Free(overlap_buffer2[i][n].coordinates_y);
+	      if ( overlap_buffer2[i][n].coordinates_xyz ) Free(overlap_buffer2[i][n].coordinates_xyz);
+	      if ( overlap_buffer2[i][n].edge_type ) Free(overlap_buffer2[i][n].edge_type);
 	    }
 	}
       for ( n = 0; n < max_srch_cells2[i]; n++ )
 	{
-	  free(src_grid_cells2[i][n].coordinates_x);
-	  free(src_grid_cells2[i][n].coordinates_y);
-	  free(src_grid_cells2[i][n].coordinates_xyz);
+	  Free(src_grid_cells2[i][n].coordinates_x);
+	  Free(src_grid_cells2[i][n].coordinates_y);
+	  Free(src_grid_cells2[i][n].coordinates_xyz);
 	}
-      free(src_grid_cells2[i]);
-      free(overlap_buffer2[i]);
+      Free(src_grid_cells2[i]);
+      Free(overlap_buffer2[i]);
 
-      free(partial_areas2[i]);
-      free(partial_weights2[i]);
+      Free(partial_areas2[i]);
+      Free(partial_weights2[i]);
 
-      free(tgt_grid_cell2[i]->coordinates_x);
-      free(tgt_grid_cell2[i]->coordinates_y);
-      free(tgt_grid_cell2[i]->coordinates_xyz);
-      free(tgt_grid_cell2[i]);
+      Free(tgt_grid_cell2[i]->coordinates_x);
+      Free(tgt_grid_cell2[i]->coordinates_y);
+      Free(tgt_grid_cell2[i]->coordinates_xyz);
+      Free(tgt_grid_cell2[i]);
 
-      free(srch_add2[i]);
+      Free(srch_add2[i]);
     }
 
   weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
 
-  if ( weightlinks ) free(weightlinks);
+  if ( weightlinks ) Free(weightlinks);
 
   /* Normalize using destination area if requested */
   normalize_weights(tgt_grid, rv);

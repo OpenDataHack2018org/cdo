@@ -107,7 +107,7 @@ void *Seloperator(void *argument)
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
     }
 
   tsID = 0;
@@ -148,7 +148,7 @@ void *Seloperator(void *argument)
   vlistDestroy(vlistID2);
 
   if ( ! lcopy )
-    if ( array ) free(array);
+    if ( array ) Free(array);
 
   cdoFinish();
 

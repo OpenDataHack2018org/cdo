@@ -1,3 +1,6 @@
+#ifndef _DATETIME_H
+#define _DATETIME_H
+
 #include <stdio.h>
 
 #define  TIMESTAT_FIRST  1
@@ -61,3 +64,5 @@ int  dtlist_get_vtime(dtlist_type *dtlist, int tsID);
 void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID);
 void dtlist_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int tsID);
 void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps);
+
+#endif  /* _DATETIME_H */

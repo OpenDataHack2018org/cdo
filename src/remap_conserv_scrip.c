@@ -103,8 +103,8 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 
   /* Convert coordinates */
 
-  srch_corner_x = (double*) malloc(srch_corners*num_srch_cells*sizeof(double));
-  srch_corner_y = (double*) malloc(srch_corners*num_srch_cells*sizeof(double));
+  srch_corner_x = (double*) Malloc(srch_corners*num_srch_cells*sizeof(double));
+  srch_corner_y = (double*) Malloc(srch_corners*num_srch_cells*sizeof(double));
 
   if ( beglat > ZERO )
     {
@@ -275,8 +275,8 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 
       if ( s1 >= ONE )
 	{
-          free(srch_corner_y);
-          free(srch_corner_x);
+          Free(srch_corner_y);
+          Free(srch_corner_x);
           *luse_last = FALSE;
           return;
 	}
@@ -421,8 +421,8 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 
     } /* intrsct_loop */
 
-  free(srch_corner_y);
-  free(srch_corner_x);
+  Free(srch_corner_y);
+  Free(srch_corner_x);
 
   /*
      If segment manages to cross over pole, shift the beginning 
@@ -1292,7 +1292,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( remap_store_link_fast )
     {
-      grid_store = (grid_store_t*) malloc(sizeof(grid_store_t));
+      grid_store = (grid_store_t*) Malloc(sizeof(grid_store_t));
       grid_store_init(grid_store, tgt_grid->size);
     }
 
@@ -1312,10 +1312,10 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( ! remap_store_link_fast )
     {
-      link_add1[0] = (int*) malloc(src_grid_size*sizeof(int));
-      link_add1[1] = (int*) malloc(src_grid_size*sizeof(int));
-      link_add2[0] = (int*) malloc(tgt_grid_size*sizeof(int));
-      link_add2[1] = (int*) malloc(tgt_grid_size*sizeof(int));
+      link_add1[0] = (int*) Malloc(src_grid_size*sizeof(int));
+      link_add1[1] = (int*) Malloc(src_grid_size*sizeof(int));
+      link_add2[0] = (int*) Malloc(tgt_grid_size*sizeof(int));
+      link_add2[1] = (int*) Malloc(tgt_grid_size*sizeof(int));
 
 #if defined(SX)
 #pragma vdir nodep
@@ -1338,10 +1338,10 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   /* Initialize centroid arrays */
 
-  src_centroid_lat = (double*) malloc(src_grid_size*sizeof(double));
-  src_centroid_lon = (double*) malloc(src_grid_size*sizeof(double));
-  tgt_centroid_lat = (double*) malloc(tgt_grid_size*sizeof(double));
-  tgt_centroid_lon = (double*) malloc(tgt_grid_size*sizeof(double));
+  src_centroid_lat = (double*) Malloc(src_grid_size*sizeof(double));
+  src_centroid_lon = (double*) Malloc(src_grid_size*sizeof(double));
+  tgt_centroid_lat = (double*) Malloc(tgt_grid_size*sizeof(double));
+  tgt_centroid_lon = (double*) Malloc(tgt_grid_size*sizeof(double));
 
   for ( n = 0; n < src_grid_size; ++n )
     {
@@ -1371,7 +1371,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
     max_srch_cells2[i] = 0;
 
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int*) malloc(tgt_grid_size*sizeof(int));
+    srch_add2[i] = (int*) Malloc(tgt_grid_size*sizeof(int));
 
   srch_corners    = tgt_num_cell_corners;
 
@@ -1420,8 +1420,8 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
       if ( num_srch_cells > max_srch_cells )
 	{
-	  srch_corner_lat = (double*) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
-	  srch_corner_lon = (double*) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lat = (double*) Realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = (double*) Realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
 
 	  max_srch_cells  = num_srch_cells;
 
@@ -1570,12 +1570,12 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      free(srch_corner_lon2[i]);
-      free(srch_corner_lat2[i]);
+      Free(srch_corner_lon2[i]);
+      Free(srch_corner_lat2[i]);
     }
 
   for ( i = 0; i < ompNumThreads; ++i )
-    free(srch_add2[i]);
+    Free(srch_add2[i]);
 
   /* Integrate around each cell on target grid */
 
@@ -1589,7 +1589,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
     max_srch_cells2[i] = 0;
 
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int*) malloc(src_grid_size*sizeof(int));
+    srch_add2[i] = (int*) Malloc(src_grid_size*sizeof(int));
 
   srch_corners    = src_num_cell_corners;
   max_srch_cells  = 0;
@@ -1643,8 +1643,8 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
       if ( num_srch_cells > max_srch_cells )
 	{
-	  srch_corner_lat = (double*) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
-	  srch_corner_lon = (double*) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lat = (double*) Realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = (double*) Realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
 
 	  max_srch_cells  = num_srch_cells;
 
@@ -1796,12 +1796,12 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      free(srch_corner_lon2[i]);
-      free(srch_corner_lat2[i]);
+      Free(srch_corner_lon2[i]);
+      Free(srch_corner_lat2[i]);
     }
 
   for ( i = 0; i < ompNumThreads; ++i )
-    free(srch_add2[i]);
+    Free(srch_add2[i]);
 
   /*
      Correct for situations where N/S pole not explicitly included in
@@ -1818,7 +1818,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   if ( remap_store_link_fast )
     {
       grid_store_delete(grid_store);
-      free(grid_store);
+      Free(grid_store);
     }
 
 
@@ -1954,17 +1954,17 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	}
     } // lcheck
 
-  free(src_centroid_lat);
-  free(src_centroid_lon);
-  free(tgt_centroid_lat);
-  free(tgt_centroid_lon);
+  Free(src_centroid_lat);
+  Free(src_centroid_lon);
+  Free(tgt_centroid_lat);
+  Free(tgt_centroid_lon);
 
   if ( ! remap_store_link_fast )
     {
-      free(link_add1[0]);
-      free(link_add1[1]);
-      free(link_add2[0]);
-      free(link_add2[1]);
+      Free(link_add1[0]);
+      Free(link_add1[1]);
+      Free(link_add2[0]);
+      Free(link_add2[1]);
     }
 
   if ( cdoTimer ) timer_stop(timer_remap_con);

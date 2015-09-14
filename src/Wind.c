@@ -304,19 +304,19 @@ void *Wind(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) malloc(gridsize*sizeof(double));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( varID1 != -1 && varID2 != -1 )
     {
       nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 
       gridsize = gridInqSize(gridID1);
-      ivar1 = (double*) malloc(nlev*gridsize*sizeof(double));
-      ivar2 = (double*) malloc(nlev*gridsize*sizeof(double));
+      ivar1 = (double*) Malloc(nlev*gridsize*sizeof(double));
+      ivar2 = (double*) Malloc(nlev*gridsize*sizeof(double));
   
       gridsize = gridInqSize(gridID2);
-      ovar1 = (double*) malloc(nlev*gridsize*sizeof(double));
-      ovar2 = (double*) malloc(nlev*gridsize*sizeof(double));
+      ovar1 = (double*) Malloc(nlev*gridsize*sizeof(double));
+      ovar2 = (double*) Malloc(nlev*gridsize*sizeof(double));
     }
 
   tsID = 0;
@@ -409,12 +409,12 @@ void *Wind(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array1 ) free(array1);
+  if ( array1 ) Free(array1);
 
-  if ( ivar1 ) free(ivar1);
-  if ( ivar2 ) free(ivar2);
-  if ( ovar1 ) free(ovar1);
-  if ( ovar2 ) free(ovar2);
+  if ( ivar1 ) Free(ivar1);
+  if ( ivar2 ) Free(ivar2);
+  if ( ovar1 ) Free(ovar1);
+  if ( ovar2 ) Free(ovar2);
 
   sptrans_delete(sptrans);
   if ( dvtrans ) dvtrans_delete(dvtrans);

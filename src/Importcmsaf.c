@@ -175,10 +175,10 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
       return(-1);
     }
 
-  xvals = (double*) malloc(nx*sizeof(double));
-  yvals = (double*) malloc(ny*sizeof(double));
-  xbounds = (double*) malloc(nx*2*sizeof(double));
-  ybounds = (double*) malloc(nx*2*sizeof(double));
+  xvals = (double*) Malloc(nx*sizeof(double));
+  yvals = (double*) Malloc(ny*sizeof(double));
+  xbounds = (double*) Malloc(nx*2*sizeof(double));
+  ybounds = (double*) Malloc(nx*2*sizeof(double));
 
   for ( i = 0; i < nx; ++i )
     {
@@ -213,10 +213,10 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   gridDefXbounds(gridID, xbounds);
   gridDefYbounds(gridID, ybounds);
   */
-  free(xvals);
-  free(yvals);
-  free(xbounds);
-  free(ybounds);
+  Free(xvals);
+  Free(yvals);
+  Free(xbounds);
+  Free(ybounds);
 
   return (gridID);
 }
@@ -229,8 +229,8 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   int i;
   double *xvals, *yvals;
 
-  xvals = (double*) malloc(nx*sizeof(double));
-  yvals = (double*) malloc(ny*sizeof(double));
+  xvals = (double*) Malloc(nx*sizeof(double));
+  yvals = (double*) Malloc(ny*sizeof(double));
 
   for ( i = 0; i < nx; ++i )
     {
@@ -250,8 +250,8 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   gridDefXvals(gridID, xvals);
   gridDefYvals(gridID, yvals);
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
   return (gridID);
 }
@@ -264,8 +264,8 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
   int i;
   double *xvals, *yvals;
 
-  xvals = (double*) malloc(nx*sizeof(double));
-  yvals = (double*) malloc(ny*sizeof(double));
+  xvals = (double*) Malloc(nx*sizeof(double));
+  yvals = (double*) Malloc(ny*sizeof(double));
 
   for ( i = 0; i < nx; ++i )
     {
@@ -287,8 +287,8 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
 
   gridDefLaea(gridID, a, lon0, lat0);
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
   return (gridID);
 }
@@ -402,7 +402,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   H5Tinsert(proj_tid, "Reference ellipsoid", HOFFSET(proj_t, ellipsoid), str_tid);
   H5Tinsert(proj_tid, "Projection parameter", HOFFSET(proj_t, parameter), fltarr_tid);
 
-  if ( projection_name ) free(projection_name);
+  if ( projection_name ) Free(projection_name);
 
   grp_id = H5Gopen(loc_id, "Geolocation");
 
@@ -1059,7 +1059,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       offset = gridsize*(nz-1);
       array  = ((datasets_t *) opdata)->obj[nset].array;
-      array  = (double*) realloc(array, gridsize*nz*nt*sizeof(double));
+      array  = (double*) Realloc(array, gridsize*nz*nt*sizeof(double));
       ((datasets_t *) opdata)->obj[nset].array    = array;
       array  = array+offset;
 
@@ -1069,12 +1069,12 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    {
 	      float *farray;
 	      int i;
-	      farray = (float*) malloc(gridsize*nt*sizeof(float));
+	      farray = (float*) Malloc(gridsize*nt*sizeof(float));
 	      status = H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, farray);
 	      if ( status < 0 )
 		cdoAbort("Reading of NATIVE_FLOAT variable %s failed!", varname);
 	      for ( i = 0; i < gridsize*nt; ++i ) array[i] = farray[i];
-	      free(farray);
+	      Free(farray);
 	    }
 	  else
 	    {
@@ -1086,12 +1086,12 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       else
 	{
 	  int *iarray, i;
-	  iarray = (int*) malloc(gridsize*nt*sizeof(int));
+	  iarray = (int*) Malloc(gridsize*nt*sizeof(int));
 	  status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
 	  if ( status < 0 )
 	    cdoAbort("Reading of NATIVE_INT variable %s failed!", varname);
 	  for ( i = 0; i < gridsize*nt; ++i ) array[i] = iarray[i];
-	  free(iarray);
+	  Free(iarray);
 	}
 
       ((datasets_t *) opdata)->obj[nset].name     = strdup(varname);
@@ -1118,7 +1118,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if ( nz == 1 ) ((datasets_t *) opdata)->nsets++;
 
-      mask = (short*) malloc(gridsize*nt*sizeof(short));
+      mask = (short*) Malloc(gridsize*nt*sizeof(short));
       memset(mask, 0, gridsize*nt*sizeof(short));
 
       nmiss  = 0;
@@ -1210,7 +1210,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       ((datasets_t *) opdata)->obj[nset].scale    = scalefactor;
       ((datasets_t *) opdata)->obj[nset].missval  = missval;
 
-      free(mask);
+      Free(mask);
       mask = NULL;
     }
   else
@@ -1455,7 +1455,7 @@ void *Importcmsaf(void *argument)
 
   if ( nt > 1 )
     {
-      vtimes = (int*) malloc(nt*sizeof(int));
+      vtimes = (int*) Malloc(nt*sizeof(int));
 
       for ( i = 0; i < nt; ++i ) vtimes[i] = i*10000 + 45*100;
 
@@ -1511,11 +1511,11 @@ void *Importcmsaf(void *argument)
   else
     {
       double *levels;
-      levels = (double*) malloc(nz*sizeof(double));
+      levels = (double*) Malloc(nz*sizeof(double));
       for ( i = 0; i < nz; ++i ) levels[i] = i+1;
       zaxisID = zaxisCreate(ZAXIS_GENERIC, nz);
       zaxisDefLevels(zaxisID, levels);
-      free(levels);
+      Free(levels);
     }
 
   vlistID = vlistCreate();
@@ -1633,9 +1633,9 @@ void *Importcmsaf(void *argument)
   taxisDestroy(taxisID);
 
   for ( ivar = 0; ivar < dsets.nsets; ++ivar )
-    free(dsets.obj[ivar].array);
+    Free(dsets.obj[ivar].array);
 
-  if ( vtimes ) free(vtimes);
+  if ( vtimes ) Free(vtimes);
 
   cdoFinish();
 #else

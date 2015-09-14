@@ -287,7 +287,7 @@ void *Info(void *argument)
       gridsize = vlistGridsizeMax(vlistID);
       if ( vlistNumber(vlistID) != CDI_REAL ) gridsize *= 2;
 
-      double *array = (double*) malloc(gridsize*sizeof(double));
+      double *array = (double*) Malloc(gridsize*sizeof(double));
 
       int indg = 0;
       int tsID = 0;
@@ -483,7 +483,7 @@ void *Info(void *argument)
 
       streamClose(streamID);
 
-      if ( array ) free(array);
+      if ( array ) Free(array);
     }
 
   cdoFinish();

@@ -210,7 +210,7 @@ void *Spectral(void *argument)
 	  maxntr = 1+gridInqTrunc(gridID1);
 	  ncut = args2intlist(operatorArgc(), operatorArgv(), ilist);
 	  wnums = (int *) listArrayPtr(ilist);
-	  waves = (int*) malloc(maxntr*sizeof(int));
+	  waves = (int*) Malloc(maxntr*sizeof(int));
 	  for ( i = 0; i < maxntr; i++ ) waves[i] = 1;
 	  for ( i = 0; i < ncut; i++ )
 	    {
@@ -227,7 +227,7 @@ void *Spectral(void *argument)
     }
 
   nvars = vlistNvars(vlistID2);
-  vars  = (int*) malloc(nvars*sizeof(int));
+  vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
@@ -243,12 +243,12 @@ void *Spectral(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) malloc(gridsize*sizeof(double));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( gridID2 != -1 )
     {
       gridsize = gridInqSize(gridID2);
-      array2 = (double*) malloc(gridsize*sizeof(double));
+      array2 = (double*) Malloc(gridsize*sizeof(double));
     }
 
   tsID = 0;
@@ -300,10 +300,10 @@ void *Spectral(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
-  if ( vars )   free(vars);
-  if ( waves )  free(waves);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
+  if ( vars )   Free(vars);
+  if ( waves )  Free(waves);
 
   listDelete(ilist);
 

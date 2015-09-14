@@ -99,8 +99,8 @@ void *Yhourarith(void *argument)
 
   field_init(&field1);
   field_init(&field2);
-  field1.ptr = (double*) malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) malloc(gridsize*sizeof(double));
+  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);
@@ -124,15 +124,15 @@ void *Yhourarith(void *argument)
       houroy = hour_of_year(vdate, vtime);
       if ( vardata2[houroy] != NULL ) cdoAbort("Hour of year %d already allocatd!", houroy);
 
-      vardata2[houroy]  = (double **) malloc(nvars*sizeof(double *));
-      varnmiss2[houroy] = (int **) malloc(nvars*sizeof(int *));
+      vardata2[houroy]  = (double **) Malloc(nvars*sizeof(double *));
+      varnmiss2[houroy] = (int **) Malloc(nvars*sizeof(int *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  vardata2[houroy][varID]  = (double*) malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[houroy][varID] = (int*) malloc(nlev*sizeof(int));
+	  vardata2[houroy][varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
+	  varnmiss2[houroy][varID] = (int*) Malloc(nlev*sizeof(int));
 	}
 
       for ( recID = 0; recID < nrecs; recID++ )
@@ -197,16 +197,16 @@ void *Yhourarith(void *argument)
       {
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
-	    free(vardata2[houroy][varID]);
-	    free(varnmiss2[houroy][varID]);
+	    Free(vardata2[houroy][varID]);
+	    Free(varnmiss2[houroy][varID]);
 	  }
 
 	free(vardata2[houroy]);
 	free(varnmiss2[houroy]);
       }
 
-  if ( field1.ptr ) free(field1.ptr);
-  if ( field2.ptr ) free(field2.ptr);
+  if ( field1.ptr ) Free(field1.ptr);
+  if ( field2.ptr ) Free(field2.ptr);
 
   cdoFinish();
 

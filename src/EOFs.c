@@ -230,7 +230,7 @@ void *EOFs(void * argument)
 	cdoAbort("Too many different grids!");
       }
 
-  double *weight = (double *) malloc(gridsize*sizeof(double));
+  double *weight = (double *) Malloc(gridsize*sizeof(double));
   for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
 
   if ( weight_mode == WEIGHT_ON )
@@ -323,9 +323,9 @@ void *EOFs(void * argument)
 
   /* allocation of temporary fields and output structures */
   int npack = -1;
-  int *pack            = (int *) malloc(gridsize*sizeof(int));
-  double *in           = (double *) malloc(gridsize*sizeof(double));
-  eofdata_t **eofdata  = (eofdata_t **) malloc(nvars*sizeof(eofdata_t*));
+  int *pack            = (int *) Malloc(gridsize*sizeof(int));
+  double *in           = (double *) Malloc(gridsize*sizeof(double));
+  eofdata_t **eofdata  = (eofdata_t **) Malloc(nvars*sizeof(eofdata_t*));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -333,7 +333,7 @@ void *EOFs(void * argument)
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval  = vlistInqVarMissval(vlistID1, varID);
 
-      eofdata[varID] = (eofdata_t *) malloc(nlevs*sizeof(eofdata_t));
+      eofdata[varID] = (eofdata_t *) Malloc(nlevs*sizeof(eofdata_t));
 
       for ( levelID = 0; levelID < nlevs; ++levelID )
         {
@@ -345,7 +345,7 @@ void *EOFs(void * argument)
 	  eofdata[varID][levelID].data = NULL;
 
 	  if ( time_space )
-	    eofdata[varID][levelID].data = (double **) malloc(nts*sizeof(double *));
+	    eofdata[varID][levelID].data = (double **) Malloc(nts*sizeof(double *));
         }
     }
 
@@ -408,8 +408,8 @@ void *EOFs(void * argument)
 	      if ( !eofdata[varID][levelID].init )
 		{
 		  n = npack;
-		  double *covar_array = (double *) malloc(npack*npack*sizeof(double));
-		  covar = (double **) malloc(npack*sizeof(double *));
+		  double *covar_array = (double *) Malloc(npack*npack*sizeof(double));
+		  covar = (double **) Malloc(npack*sizeof(double *));
 		  for ( i = 0; i < npack; ++i ) covar[i] = covar_array + npack*i;
 		  for ( i = 0; i < npack; ++i )
 		    {
@@ -434,7 +434,7 @@ void *EOFs(void * argument)
 	    }
           else if ( time_space )
 	    {
-	      double *data = (double *) malloc(npack*sizeof(double));
+	      double *data = (double *) Malloc(npack*sizeof(double));
 	      eofdata[varID][levelID].data[tsID] = data;
 
 	      for ( ipack = 0; ipack < npack; ipack++ )
@@ -535,7 +535,7 @@ void *EOFs(void * argument)
 		    {
 		      if ( npack )
 			{
-			  eig_val = (double *) malloc(npack*sizeof(double));
+			  eig_val = (double *) Malloc(npack*sizeof(double));
 			  eofdata[varID][levelID].eig_val = eig_val;
 			}
 
@@ -566,11 +566,11 @@ void *EOFs(void * argument)
 		      if ( cdoVerbose )
 			cdoPrint("allocating covar with %i x %i elements | npack=%i", nts, nts, npack);
 
-		      covar_array = (double *) malloc(nts*nts*sizeof(double));
-		      covar = (double **) malloc(nts*sizeof(double *));
+		      covar_array = (double *) Malloc(nts*nts*sizeof(double));
+		      covar = (double **) Malloc(nts*sizeof(double *));
 		      for ( i = 0; i < nts; ++i ) covar[i] = covar_array + nts*i;
 
-		      eig_val = (double *) malloc(nts*sizeof(double));
+		      eig_val = (double *) Malloc(nts*sizeof(double));
 		      eofdata[varID][levelID].eig_val     = eig_val;
 		      eofdata[varID][levelID].covar_array = covar_array;
 		      eofdata[varID][levelID].covar       = covar;
@@ -646,24 +646,24 @@ void *EOFs(void * argument)
       
       for( levelID = 0; levelID < nlevs; levelID++ )
         { 	  
-	  if ( eofdata[varID][levelID].eig_val ) free(eofdata[varID][levelID].eig_val);
-	  if ( eofdata[varID][levelID].covar_array ) free(eofdata[varID][levelID].covar_array);
-	  if ( eofdata[varID][levelID].covar ) free(eofdata[varID][levelID].covar);
+	  if ( eofdata[varID][levelID].eig_val ) Free(eofdata[varID][levelID].eig_val);
+	  if ( eofdata[varID][levelID].covar_array ) Free(eofdata[varID][levelID].covar_array);
+	  if ( eofdata[varID][levelID].covar ) Free(eofdata[varID][levelID].covar);
 	  if ( time_space && eofdata[varID][levelID].data )
 	    {
 	      for ( tsID = 0; tsID < nts; tsID++ )
-		if ( eofdata[varID][levelID].data[tsID] ) free(eofdata[varID][levelID].data[tsID]);
-	      free(eofdata[varID][levelID].data);
+		if ( eofdata[varID][levelID].data[tsID] ) Free(eofdata[varID][levelID].data[tsID]);
+	      Free(eofdata[varID][levelID].data);
 	    }
 	}
       
-      free(eofdata[varID]);
+      Free(eofdata[varID]);
     }
 
-  free(eofdata);
-  free(in);
-  free(pack);
-  free(weight);
+  Free(eofdata);
+  Free(in);
+  Free(pack);
+  Free(weight);
 
   streamClose(streamID3);
   streamClose(streamID2);

@@ -68,25 +68,25 @@ void *Intntime(void *argument)
   nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
-  nmiss1   = (int **) malloc(nvars*sizeof(int *));
-  nmiss2   = (int **) malloc(nvars*sizeof(int *));
-  vardata1 = (double **) malloc(nvars*sizeof(double *));
-  vardata2 = (double **) malloc(nvars*sizeof(double *));
+  nmiss1   = (int **) Malloc(nvars*sizeof(int *));
+  nmiss2   = (int **) Malloc(nvars*sizeof(int *));
+  vardata1 = (double **) Malloc(nvars*sizeof(double *));
+  vardata2 = (double **) Malloc(nvars*sizeof(double *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      nmiss1[varID]   = (int*) malloc(nlevel*sizeof(int));
-      nmiss2[varID]   = (int*) malloc(nlevel*sizeof(int));
-      vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
-      vardata2[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
+      nmiss1[varID]   = (int*) Malloc(nlevel*sizeof(int));
+      nmiss2[varID]   = (int*) Malloc(nlevel*sizeof(int));
+      vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
+      vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
   taxisID1 = vlistInqTaxis(vlistID1);
@@ -244,18 +244,18 @@ void *Intntime(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(nmiss1[varID]);
-      free(nmiss2[varID]);
-      free(vardata1[varID]);
-      free(vardata2[varID]);
+      Free(nmiss1[varID]);
+      Free(nmiss2[varID]);
+      Free(vardata1[varID]);
+      Free(vardata2[varID]);
     }
 
-  free(nmiss1);
-  free(nmiss2);
-  free(vardata1);
-  free(vardata2);
+  Free(nmiss1);
+  Free(nmiss2);
+  Free(vardata1);
+  Free(vardata2);
 
-  if ( array )  free(array);
+  if ( array )  Free(array);
 
   streamClose(streamID2);
   streamClose(streamID1);

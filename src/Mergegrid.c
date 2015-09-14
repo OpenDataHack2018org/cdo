@@ -70,13 +70,13 @@ void gen_index(int gridID1, int gridID2, int *index)
       if ( ! (gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)) )
 	cdoAbort("Grid 2 has no values!");
 
-      xvals1 = (double*) malloc(nlon1*sizeof(double));
-      yvals1 = (double*) malloc(nlat1*sizeof(double));
-      xvals2 = (double*) malloc(nlon2*sizeof(double));
-      yvals2 = (double*) malloc(nlat2*sizeof(double));
+      xvals1 = (double*) Malloc(nlon1*sizeof(double));
+      yvals1 = (double*) Malloc(nlat1*sizeof(double));
+      xvals2 = (double*) Malloc(nlon2*sizeof(double));
+      yvals2 = (double*) Malloc(nlat2*sizeof(double));
 
-      xindex = (int*) malloc(nlon2*sizeof(int));
-      yindex = (int*) malloc(nlat2*sizeof(int));
+      xindex = (int*) Malloc(nlon2*sizeof(int));
+      yindex = (int*) Malloc(nlat2*sizeof(int));
 
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
@@ -155,12 +155,12 @@ void gen_index(int gridID1, int gridID2, int *index)
 	  }
 
 
-      free(xindex);
-      free(yindex);
-      free(xvals1);
-      free(yvals1);
-      free(xvals2);
-      free(yvals2);
+      Free(xindex);
+      Free(yindex);
+      Free(xvals1);
+      Free(yvals1);
+      Free(xvals2);
+      Free(yvals2);
     }
   else
     cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype1));
@@ -219,9 +219,9 @@ void *Mergegrid(void *argument)
   gridsize1 = gridInqSize(gridID1);
   gridsize2 = gridInqSize(gridID2);
 
-  array1 = (double*) malloc(gridsize1*sizeof(double));
-  array2 = (double*) malloc(gridsize2*sizeof(double));
-  gindex = (int*) malloc(gridsize2*sizeof(int));
+  array1 = (double*) Malloc(gridsize1*sizeof(double));
+  array2 = (double*) Malloc(gridsize2*sizeof(double));
+  gindex = (int*) Malloc(gridsize2*sizeof(int));
 
   gen_index(gridID1, gridID2, gindex);
 
@@ -284,9 +284,9 @@ void *Mergegrid(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
  
-  if ( gindex ) free(gindex);
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  if ( gindex ) Free(gindex);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
   cdoFinish();
 

@@ -138,8 +138,8 @@ void *Timstat2(void *argument)
   int nvars  = vlistNvars(vlistID1);
   int nrecs  = vlistNrecs(vlistID1);
   int nrecs3 = nrecs;
-  int *recVarID   = (int*) malloc(nrecs*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecs*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecs*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecs*sizeof(int));
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   //int taxisID2 = vlistInqTaxis(vlistID2);
@@ -152,11 +152,11 @@ void *Timstat2(void *argument)
  
   gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array1  = (double*) malloc(gridsize*sizeof(double));
-  double *array2  = (double*) malloc(gridsize*sizeof(double));
+  double *array1  = (double*) Malloc(gridsize*sizeof(double));
+  double *array2  = (double*) Malloc(gridsize*sizeof(double));
   				 
-  double ****work = (double ****) malloc(nvars*sizeof(double ***));
-  int ***nofvals  = (int ***) malloc(nvars*sizeof(int **));
+  double ****work = (double ****) Malloc(nvars*sizeof(double ***));
+  int ***nofvals  = (int ***) Malloc(nvars*sizeof(int **));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -164,18 +164,18 @@ void *Timstat2(void *argument)
       gridsize = gridInqSize(gridID);
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-      work[varID]    = (double ***) malloc(nlevs*sizeof(double **));
-      nofvals[varID] = (int **) malloc(nlevs*sizeof(int *));  
+      work[varID]    = (double ***) Malloc(nlevs*sizeof(double **));
+      nofvals[varID] = (int **) Malloc(nlevs*sizeof(int *));  
 
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  nofvals[varID][levelID] = (int*) malloc(gridsize*sizeof(int));
+	  nofvals[varID][levelID] = (int*) Malloc(gridsize*sizeof(int));
 	  memset(nofvals[varID][levelID], 0, gridsize*sizeof(int));
       
-	  work[varID][levelID] = (double **) malloc(nwork*sizeof(double *));
+	  work[varID][levelID] = (double **) Malloc(nwork*sizeof(double *));
 	  for ( i = 0; i < nwork; i++ )
 	    {
-	      work[varID][levelID][i] = (double*) malloc(gridsize*sizeof(double));
+	      work[varID][levelID][i] = (double*) Malloc(gridsize*sizeof(double));
 	      memset(work[varID][levelID][i], 0, gridsize*sizeof(double));
 	    }
 	}
@@ -283,27 +283,27 @@ void *Timstat2(void *argument)
       nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
-	  free(nofvals[varID][levelID]);
+	  Free(nofvals[varID][levelID]);
 	  for ( i = 0; i < nwork; i++ )
-	    free(work[varID][levelID][i]);
-	  free(work[varID][levelID]);
+	    Free(work[varID][levelID][i]);
+	  Free(work[varID][levelID]);
 	}
     
-      free(nofvals[varID]);
-      free(work[varID]);
+      Free(nofvals[varID]);
+      Free(work[varID]);
     }
     
-  free(nofvals);
-  free(work);
+  Free(nofvals);
+  Free(work);
 
   streamClose(streamID3);
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array1 )     free(array1);
-  if ( array2 )     free(array2);
-  if ( recVarID )   free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( array1 )     Free(array1);
+  if ( array2 )     Free(array2);
+  if ( recVarID )   Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
     
   cdoFinish();   
  

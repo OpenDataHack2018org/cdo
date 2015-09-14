@@ -261,12 +261,12 @@ void *Mrotuv(void *argument)
   nlon    = gridInqXsize(gridID1);
   nlat    = gridInqYsize(gridID1);
 
-  grid1x  = (double*) malloc(gridsize*sizeof(double));
-  grid1y  = (double*) malloc(gridsize*sizeof(double));
-  gridux  = (double*) malloc(gridsize*sizeof(double));
-  griduy  = (double*) malloc(gridsize*sizeof(double));
-  gridvx  = (double*) malloc(gridsize*sizeof(double));
-  gridvy  = (double*) malloc(gridsize*sizeof(double));
+  grid1x  = (double*) Malloc(gridsize*sizeof(double));
+  grid1y  = (double*) Malloc(gridsize*sizeof(double));
+  gridux  = (double*) Malloc(gridsize*sizeof(double));
+  griduy  = (double*) Malloc(gridsize*sizeof(double));
+  gridvx  = (double*) Malloc(gridsize*sizeof(double));
+  gridvy  = (double*) Malloc(gridsize*sizeof(double));
 
   gridsizex = (nlon+2)*nlat;
 
@@ -331,19 +331,19 @@ void *Mrotuv(void *argument)
   missval1 = vlistInqVarMissval(vlistID1, uid);
   missval2 = vlistInqVarMissval(vlistID1, vid);
 
-  ufield  = (double*) malloc(gridsize*sizeof(double));
-  vfield  = (double*) malloc(gridsize*sizeof(double));
+  ufield  = (double*) Malloc(gridsize*sizeof(double));
+  vfield  = (double*) Malloc(gridsize*sizeof(double));
 
-  urfield  = (double**) malloc(nlevs*sizeof(double*));
-  vrfield  = (double**) malloc(nlevs*sizeof(double*));
+  urfield  = (double**) Malloc(nlevs*sizeof(double*));
+  vrfield  = (double**) Malloc(nlevs*sizeof(double*));
   for ( lid = 0; lid < nlevs; lid++ )
     {
-      urfield[lid] = (double*) malloc(gridsize*sizeof(double));
-      vrfield[lid] = (double*) malloc(gridsize*sizeof(double));
+      urfield[lid] = (double*) Malloc(gridsize*sizeof(double));
+      vrfield[lid] = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  uhelp   = (double*) malloc(gridsizex*sizeof(double));
-  vhelp   = (double*) malloc(gridsizex*sizeof(double));
+  uhelp   = (double*) Malloc(gridsizex*sizeof(double));
+  vhelp   = (double*) Malloc(gridsizex*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -425,16 +425,16 @@ void *Mrotuv(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( ufield  ) free(ufield);
-  if ( vfield  ) free(vfield);
-  if ( urfield ) free(urfield);
-  if ( vrfield ) free(vrfield);
-  if ( uhelp   ) free(uhelp);
-  if ( vhelp   ) free(vhelp);
-  if ( gridux  ) free(gridux);
-  if ( griduy  ) free(griduy);
-  if ( gridvx  ) free(gridvx);
-  if ( gridvy  ) free(gridvy);
+  if ( ufield  ) Free(ufield);
+  if ( vfield  ) Free(vfield);
+  if ( urfield ) Free(urfield);
+  if ( vrfield ) Free(vrfield);
+  if ( uhelp   ) Free(uhelp);
+  if ( vhelp   ) Free(vhelp);
+  if ( gridux  ) Free(gridux);
+  if ( griduy  ) Free(griduy);
+  if ( gridvx  ) Free(gridvx);
+  if ( gridvy  ) Free(gridvy);
 
   cdoFinish();
 

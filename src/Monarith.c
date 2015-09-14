@@ -72,8 +72,8 @@ void *Monarith(void *argument)
   field_init(&field1);
   field_init(&field2);
 
-  field1.ptr = (double*) malloc(gridsize*sizeof(double));
-  field2.ptr = (double*) malloc(gridsize*sizeof(double));
+  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);
@@ -86,15 +86,15 @@ void *Monarith(void *argument)
 
   nvars  = vlistNvars(vlistID2);
 
-  vardata2  = (double **) malloc(nvars*sizeof(double *));
-  varnmiss2 = (int **) malloc(nvars*sizeof(int *));
+  vardata2  = (double **) Malloc(nvars*sizeof(double *));
+  varnmiss2 = (int **) Malloc(nvars*sizeof(int *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
       nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-      vardata2[varID]  = (double*) malloc(nlev*gridsize*sizeof(double));
-      varnmiss2[varID] = (int*) malloc(nlev*sizeof(int));
+      vardata2[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
+      varnmiss2[varID] = (int*) Malloc(nlev*sizeof(int));
     }
 
   tsID  = 0;
@@ -182,15 +182,15 @@ void *Monarith(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(vardata2[varID]);
-      free(varnmiss2[varID]);
+      Free(vardata2[varID]);
+      Free(varnmiss2[varID]);
     }
 
-  free(vardata2);
-  free(varnmiss2);
+  Free(vardata2);
+  Free(varnmiss2);
 
-  if ( field1.ptr ) free(field1.ptr);
-  if ( field2.ptr ) free(field2.ptr);
+  if ( field1.ptr ) Free(field1.ptr);
+  if ( field2.ptr ) Free(field2.ptr);
 
   cdoFinish();
 

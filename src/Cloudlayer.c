@@ -200,13 +200,13 @@ void *Cloudlayer(void *argument)
   nlevel = zaxisInqSize(zaxisID);
   int nhlev  = nlevel+1;
 
-  double *aclcac = (double*) malloc(gridsize*nlevel*sizeof(double));
+  double *aclcac = (double*) Malloc(gridsize*nlevel*sizeof(double));
   for ( varID = 0; varID < nvars2; ++varID )
-    cloud[varID] = (double*) malloc(gridsize*sizeof(double));
+    cloud[varID] = (double*) Malloc(gridsize*sizeof(double));
 
   if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
     {
-      plevs = (double*) malloc(nlevel*sizeof(double));
+      plevs = (double*) Malloc(nlevel*sizeof(double));
       zaxisInqLevels(zaxisID, plevs);
       if ( plevs[0] > plevs[nlevel-1] )
 	{
@@ -236,7 +236,7 @@ void *Cloudlayer(void *argument)
 	  pl_index(&kmax[0], &kmin[0], 75000.,101300., nlevel, plevs);
 	}
 
-      free(plevs);
+      Free(plevs);
     }
   else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
     {
@@ -247,13 +247,13 @@ void *Cloudlayer(void *argument)
 	{
 	  double *vct;
 
-	  vct = (double*) malloc(nvct*sizeof(double));
+	  vct = (double*) Malloc(nvct*sizeof(double));
 	  zaxisInqVct(zaxisID, vct);
 
 	  nlevs = nlevel + 1;
-	  plevs = (double*) malloc(nlevs*sizeof(double));
+	  plevs = (double*) Malloc(nlevs*sizeof(double));
 	  vct2plev(vct, plevs, nlevs);
-	  free(vct);
+	  Free(vct);
 
 	  if ( nvars2 == 1 )
 	    {
@@ -266,7 +266,7 @@ void *Cloudlayer(void *argument)
 	      hl_index(&kmax[0], &kmin[0], 75000.,101300., nhlev, plevs);
 	    }
 
-	  free(plevs);
+	  Free(plevs);
  	}
       else
 	cdoAbort("Unsupported vertical coordinate table format!");
@@ -369,9 +369,9 @@ void *Cloudlayer(void *argument)
  
   vlistDestroy(vlistID2);
 
-  free(aclcac);
+  Free(aclcac);
   for ( varID = 0; varID < nvars2; ++varID )
-    free(cloud[varID]);
+    Free(cloud[varID]);
 
   cdoFinish();
 

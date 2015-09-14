@@ -73,15 +73,15 @@ void *Runpctl(void *argument)
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
-  array = (double*) malloc(ndates*sizeof(double));
+  vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+  array = (double*) Malloc(ndates*sizeof(double));
   
   for ( its = 0; its < ndates; its++ )
     {
@@ -192,11 +192,11 @@ void *Runpctl(void *argument)
       field_free(vars1[its], vlistID1);
     }
 
-  free(vars1);
-  free(array);
+  Free(vars1);
+  Free(array);
   
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   dtlist_delete(dtlist);
 

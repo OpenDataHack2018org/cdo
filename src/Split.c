@@ -136,8 +136,8 @@ void *Split(void *argument)
 	    }
 	}
 
-      vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-      streamIDs = (int*) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+      streamIDs = (int*) Malloc(nsplit*sizeof(int));
       int codes[nsplit];
       memcpy(codes, itmp, nsplit*sizeof(int));
 
@@ -201,8 +201,8 @@ void *Split(void *argument)
 	    }
 	}
 
-      vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-      streamIDs = (int*) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+      streamIDs = (int*) Malloc(nsplit*sizeof(int));
       int params[nsplit];
       memcpy(params, itmp, nsplit*sizeof(int));
 
@@ -255,8 +255,8 @@ void *Split(void *argument)
 	    }
 	}
 
-      vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-      streamIDs = (int*) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+      streamIDs = (int*) Malloc(nsplit*sizeof(int));
       int tabnums[nsplit];
       memcpy(tabnums, itmp, nsplit*sizeof(int));
 
@@ -294,8 +294,8 @@ void *Split(void *argument)
       char varname[CDI_MAX_NAME];
       nsplit = nvars;
 
-      vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-      streamIDs = (int*) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+      streamIDs = (int*) Malloc(nsplit*sizeof(int));
 
       for ( index = 0; index < nsplit; index++ )
 	{
@@ -342,8 +342,8 @@ void *Split(void *argument)
 	    }
 	}
 
-      vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-      streamIDs = (int*) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+      streamIDs = (int*) Malloc(nsplit*sizeof(int));
       double levels[nsplit];
       memcpy(levels, ftmp, nsplit*sizeof(double));
 
@@ -382,8 +382,8 @@ void *Split(void *argument)
 
       nsplit = vlistNgrids(vlistID1);
 
-      vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-      streamIDs = (int*) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+      streamIDs = (int*) Malloc(nsplit*sizeof(int));
       int gridIDs[nsplit];
       for ( index = 0; index < nsplit; index++ )
 	gridIDs[index] = vlistGrid(vlistID1, index);
@@ -423,8 +423,8 @@ void *Split(void *argument)
 
       nsplit = vlistNzaxis(vlistID1);
 
-      vlistIDs  = (int*) malloc(nsplit*sizeof(int));
-      streamIDs = (int*) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
+      streamIDs = (int*) Malloc(nsplit*sizeof(int));
       int zaxisIDs[nsplit];
       for ( index = 0; index < nsplit; index++ )
 	zaxisIDs[index] = vlistZaxis(vlistID1, index);
@@ -480,7 +480,7 @@ void *Split(void *argument)
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double *) malloc(gridsize*sizeof(double));
+      array = (double *) Malloc(gridsize*sizeof(double));
     }
 
   int nrecs;
@@ -525,10 +525,10 @@ void *Split(void *argument)
     }
  
   if ( ! lcopy )
-    if ( array ) free(array);
+    if ( array ) Free(array);
 
-  if ( vlistIDs  ) free(vlistIDs);
-  if ( streamIDs ) free(streamIDs);
+  if ( vlistIDs  ) Free(vlistIDs);
+  if ( streamIDs ) Free(streamIDs);
 
   cdoFinish();
 

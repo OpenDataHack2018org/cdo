@@ -643,7 +643,7 @@ void *Setpartab(void *argument)
 	{
 	  fseek(fp, 0L, SEEK_END);
 	  size_t fsize = (size_t) ftell(fp);
-	  char *parbuf = (char *) malloc(fsize+1);
+	  char *parbuf = (char *) Malloc(fsize+1);
 	  fseek(fp, 0L, SEEK_SET);
 	  fread(parbuf, fsize, 1, fp);
 	  parbuf[fsize] = 0;
@@ -652,7 +652,7 @@ void *Setpartab(void *argument)
 	  if ( atoi(parbuf) == 0 ) tableformat = 1;
 
 	  fclose(fp);
-	  free(parbuf);
+	  Free(parbuf);
 	}
 
       if ( tableformat == 0 ) tableID = defineTable(partab);
@@ -673,7 +673,7 @@ void *Setpartab(void *argument)
   /* vlistPrint(vlistID2);*/
 
   int nvars = vlistNvars(vlistID2);
-  var_t *vars = (var_t *) malloc(nvars*sizeof(var_t));
+  var_t *vars = (var_t *) Malloc(nvars*sizeof(var_t));
   memset(vars, 0, nvars*sizeof(var_t));
 
   if ( convert_data )
@@ -740,7 +740,7 @@ void *Setpartab(void *argument)
 
   long gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array = (double *) malloc(gridsize*sizeof(double));
+  double *array = (double *) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
@@ -838,8 +838,8 @@ void *Setpartab(void *argument)
   UDUNITS_UNLOCK();
 #endif
 
-  if ( array ) free(array);
-  if ( vars  ) free(vars);
+  if ( array ) Free(array);
+  if ( vars  ) Free(vars);
 
   cdoFinish();
 

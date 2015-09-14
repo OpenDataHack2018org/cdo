@@ -89,8 +89,8 @@ void timpctl(int operatorID)
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords * sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords * sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords * sizeof(int));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -99,7 +99,7 @@ void timpctl(int operatorID)
   int gridsize = vlistGridsizeMax(vlistID1);
 
   field_init(&field);
-  field.ptr = (double*) malloc(gridsize * sizeof(double));
+  field.ptr = (double*) Malloc(gridsize * sizeof(double));
 
   vars1 = field_malloc(vlistID1, FIELD_PTR);
   hset = hsetCreate(nvars);
@@ -209,10 +209,10 @@ void timpctl(int operatorID)
 
   dtlist_delete(dtlist);
   
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   streamClose(streamID4);
   streamClose(streamID3);

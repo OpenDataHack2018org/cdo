@@ -18,12 +18,6 @@
 #ifndef _CDO_H
 #define _CDO_H
 
-#include <stdio.h>
-#include <stdbool.h>
-#include "dmemory.h"
-#include "util.h"
 #include "text.h"
-
-
 
 #endif  /* _CDO_H */

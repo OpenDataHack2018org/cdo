@@ -153,7 +153,7 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
 static
 void pfree(void *ptr)
 {
-  if ( ptr ) free(ptr);
+  if ( ptr ) Free(ptr);
 }
 
 static
@@ -285,7 +285,7 @@ void *kvlParseFile(const char *filename)
       return (kvl);
     }
 
-  buffer = (char*) malloc(filesize);
+  buffer = (char*) Malloc(filesize);
   nitems = fread(buffer, 1, filesize, fp);
 
   fclose(fp);
@@ -296,7 +296,7 @@ void *kvlParseFile(const char *filename)
       return (kvl);
     }
  
-  kvl = (kvl_t*) calloc(1, sizeof(kvl_t));
+  kvl = (kvl_t*) Calloc(1, sizeof(kvl_t));
   kvl->buffer = buffer;
   kvl->buffersize = filesize;
   kvl->filename = strdup(filename);
@@ -316,7 +316,7 @@ void kvlDelete(void *kvlist)
   pfree(kvl->filename);
   pfree(kvl->buffer);
 
-  free(kvl);
+  Free(kvl);
 }
 
 

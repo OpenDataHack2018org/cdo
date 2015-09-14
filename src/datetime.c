@@ -1,8 +1,5 @@
-#include <string.h>
-#include <math.h>
-
 #include <cdi.h>
-#include "cdo.h"
+#include "cdo_int.h"
 #include "datetime.h"
 
 static int timestat_date = -1;
@@ -56,7 +53,7 @@ void dtlist_init(dtlist_type *dtlist)
 
 dtlist_type *dtlist_new(void)
 {
-  dtlist_type *dtlist = (dtlist_type *) malloc(sizeof(dtlist_type));
+  dtlist_type *dtlist = (dtlist_type *) Malloc(sizeof(dtlist_type));
 
   dtlist_init(dtlist);
 
@@ -67,9 +64,9 @@ dtlist_type *dtlist_new(void)
 void dtlist_delete(dtlist_type *dtlist)
 {
   if ( dtlist->nalloc > 0 && dtlist->dtinfo )
-    free(dtlist->dtinfo);
+    Free(dtlist->dtinfo);
 
-  free(dtlist);
+  Free(dtlist);
 }
 
 
@@ -80,7 +77,7 @@ void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
   if ( (size_t)tsID >= dtlist->nalloc )
     {
       dtlist->nalloc += NALLOC;
-      dtlist->dtinfo = (dtinfo_type *) realloc(dtlist->dtinfo, dtlist->nalloc*sizeof(dtinfo_type));
+      dtlist->dtinfo = (dtinfo_type *) Realloc(dtlist->dtinfo, dtlist->nalloc*sizeof(dtinfo_type));
     }
 
   if ( (size_t)tsID >= dtlist->size ) dtlist->size = (size_t)tsID + 1;

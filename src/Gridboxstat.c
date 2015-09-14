@@ -93,19 +93,19 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
         gridHasBounds = TRUE;
 
-      xvals1 = (double*) malloc(nlon1*sizeof(double));
-      yvals1 = (double*) malloc(nlat1*sizeof(double));
-      xvals2 = (double*) malloc(nlon2*sizeof(double));
-      yvals2 = (double*) malloc(nlat2*sizeof(double));
+      xvals1 = (double*) Malloc(nlon1*sizeof(double));
+      yvals1 = (double*) Malloc(nlat1*sizeof(double));
+      xvals2 = (double*) Malloc(nlon2*sizeof(double));
+      yvals2 = (double*) Malloc(nlat2*sizeof(double));
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
       if ( gridHasBounds )
         {
-          grid1_corner_lon = (double*) malloc(2*nlon1*sizeof(double));
-          grid1_corner_lat = (double*) malloc(2*nlat1*sizeof(double));
-          grid2_corner_lon = (double*) malloc(2*nlon2*sizeof(double));
-          grid2_corner_lat = (double*) malloc(2*nlat2*sizeof(double));
+          grid1_corner_lon = (double*) Malloc(2*nlon1*sizeof(double));
+          grid1_corner_lat = (double*) Malloc(2*nlat1*sizeof(double));
+          grid2_corner_lon = (double*) Malloc(2*nlon2*sizeof(double));
+          grid2_corner_lat = (double*) Malloc(2*nlat2*sizeof(double));
           gridInqXbounds(gridID1, grid1_corner_lon);
           gridInqYbounds(gridID1, grid1_corner_lat);
         }
@@ -140,22 +140,22 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
 
-      free(xvals2);
-      free(yvals2);
+      Free(xvals2);
+      Free(yvals2);
 
-      free(xvals1);
-      free(yvals1);
+      Free(xvals1);
+      Free(yvals1);
       
       if ( gridHasBounds )
         {
           gridDefNvertex(gridID2, 2);
           gridDefXbounds(gridID2, grid2_corner_lon);
           gridDefYbounds(gridID2, grid2_corner_lat);
-          free(grid2_corner_lon);
-          free(grid2_corner_lat);
+          Free(grid2_corner_lon);
+          Free(grid2_corner_lat);
 
-          free(grid1_corner_lon);
-          free(grid1_corner_lat);
+          Free(grid1_corner_lon);
+          Free(grid1_corner_lat);
         }
     } /* if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT ) */
   else if ( gridtype == GRID_GENERIC )
@@ -167,10 +167,10 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
         gridHasBounds = TRUE;
       
-      xvals1 = (double*) malloc(nlon1*nlat1*sizeof(double));
-      yvals1 = (double*) malloc(nlon1*nlat1*sizeof(double));
-      xvals2 = (double*) malloc(nlon2*nlat2*sizeof(double));
-      yvals2 = (double*) malloc(nlon2*nlat2*sizeof(double));
+      xvals1 = (double*) Malloc(nlon1*nlat1*sizeof(double));
+      yvals1 = (double*) Malloc(nlon1*nlat1*sizeof(double));
+      xvals2 = (double*) Malloc(nlon2*nlat2*sizeof(double));
+      yvals2 = (double*) Malloc(nlon2*nlat2*sizeof(double));
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
@@ -185,10 +185,10 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       
       if ( gridHasBounds )
         {
-          grid1_corner_lon = (double*) malloc(4*nlon1*nlat1*sizeof(double));
-          grid1_corner_lat = (double*) malloc(4*nlon1*nlat1*sizeof(double));
-          grid2_corner_lon = (double*) malloc(4*nlon2*nlat2*sizeof(double));
-          grid2_corner_lat = (double*) malloc(4*nlon2*nlat2*sizeof(double));
+          grid1_corner_lon = (double*) Malloc(4*nlon1*nlat1*sizeof(double));
+          grid1_corner_lat = (double*) Malloc(4*nlon1*nlat1*sizeof(double));
+          grid2_corner_lon = (double*) Malloc(4*nlon2*nlat2*sizeof(double));
+          grid2_corner_lat = (double*) Malloc(4*nlon2*nlat2*sizeof(double));
           gridInqXbounds(gridID1, grid1_corner_lon);
           gridInqYbounds(gridID1, grid1_corner_lat);
 
@@ -422,11 +422,11 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
 
-      free(xvals2);
-      free(yvals2);
+      Free(xvals2);
+      Free(yvals2);
 
-      free(xvals1);
-      free(yvals1);
+      Free(xvals1);
+      Free(yvals1);
 
       if ( gridHasBounds )
         {
@@ -434,11 +434,11 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           gridDefXbounds(gridID2, grid2_corner_lon);
           gridDefYbounds(gridID2, grid2_corner_lat);
           
-          free(grid2_corner_lon);
-          free(grid2_corner_lat);
+          Free(grid2_corner_lon);
+          Free(grid2_corner_lat);
           
-          free(grid1_corner_lon);
-          free(grid1_corner_lat);
+          Free(grid1_corner_lon);
+          Free(grid1_corner_lat);
         }
     } /* else if ( gridtype == GRID_CURVILINEAR ) */
   else
@@ -472,14 +472,14 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   if ( field1->weight ) useWeight = TRUE;
 
   gridsize = xinc*yinc;
-  field = (field_t*) malloc(ompNumThreads*sizeof(field_t));
+  field = (field_t*) Malloc(ompNumThreads*sizeof(field_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
       field[i].size    = gridsize;
-      field[i].ptr     = (double*) malloc(gridsize*sizeof(double));
+      field[i].ptr     = (double*) Malloc(gridsize*sizeof(double));
       field[i].weight  = NULL;
       if ( useWeight )
-	field[i].weight  = (double*) malloc(gridsize*sizeof(double));
+	field[i].weight  = (double*) Malloc(gridsize*sizeof(double));
       field[i].missval = field1->missval;
       field[i].nmiss   = 0;
     }
@@ -547,11 +547,11 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      if ( field[i].ptr    ) free(field[i].ptr);
-      if ( field[i].weight ) free(field[i].weight);
+      if ( field[i].ptr    ) Free(field[i].ptr);
+      if ( field[i].weight ) Free(field[i].weight);
     }
 
-  if ( field ) free(field);
+  if ( field ) Free(field);
 }
 
 
@@ -619,13 +619,13 @@ void *Gridboxstat(void *argument)
   field_init(&field2);
 
   int gridsize1 = gridInqSize(gridID1);
-  field1.ptr    = (double*) malloc(gridsize1*sizeof(double));
+  field1.ptr    = (double*) Malloc(gridsize1*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )
-    field1.weight = (double*) malloc(gridsize1*sizeof(double));
+    field1.weight = (double*) Malloc(gridsize1*sizeof(double));
 
   int gridsize2 = gridInqSize(gridID2);
-  field2.ptr    = (double*) malloc(gridsize2*sizeof(double));
+  field2.ptr    = (double*) Malloc(gridsize2*sizeof(double));
   field2.weight = NULL;
 
   int tsID = 0;
@@ -670,11 +670,11 @@ void *Gridboxstat(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
   
-  if ( field1.ptr )    free(field1.ptr);
-  if ( field1.weight ) free(field1.weight);
+  if ( field1.ptr )    Free(field1.ptr);
+  if ( field1.weight ) Free(field1.weight);
   
-  if ( field2.ptr )    free(field2.ptr);
-  if ( field2.weight ) free(field2.weight);
+  if ( field2.ptr )    Free(field2.ptr);
+  if ( field2.weight ) Free(field2.weight);
   
   cdoFinish();
   

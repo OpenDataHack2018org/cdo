@@ -90,8 +90,8 @@ void *Seaspctl(void *argument)
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords * sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords * sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords * sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords * sizeof(int));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -99,9 +99,9 @@ void *Seaspctl(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field.ptr = (double*) malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  vars1 = (field_t **) malloc(nvars * sizeof(field_t *));
+  vars1 = (field_t **) Malloc(nvars * sizeof(field_t *));
   hset = hsetCreate(nvars);
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -111,7 +111,7 @@ void *Seaspctl(void *argument)
       nlevels   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval  = vlistInqVarMissval(vlistID1, varID);
 
-      vars1[varID] = (field_t*) malloc(nlevels * sizeof(field_t));
+      vars1[varID] = (field_t*) Malloc(nlevels * sizeof(field_t));
       hsetCreateVarLevels(hset, varID, nlevels, gridID);
 
       for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -119,7 +119,7 @@ void *Seaspctl(void *argument)
 	  vars1[varID][levelID].grid    = gridID;
 	  vars1[varID][levelID].nmiss   = 0;
 	  vars1[varID][levelID].missval = missval;
-	  vars1[varID][levelID].ptr     = (double*) malloc(gridsize * sizeof(double));
+	  vars1[varID][levelID].ptr     = (double*) Malloc(gridsize * sizeof(double));
 	}
     }
 
@@ -235,18 +235,18 @@ void *Seaspctl(void *argument)
       nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevels; levelID++ )
 	free(vars1[varID][levelID].ptr);
-      free(vars1[varID]);
+      Free(vars1[varID]);
     }
 
-  free(vars1);
+  Free(vars1);
   hsetDestroy(hset);
 
   dtlist_delete(dtlist);
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   streamClose(streamID4);
   streamClose(streamID3);

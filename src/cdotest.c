@@ -154,8 +154,8 @@ void writeNcFile(const char path[], const double array[], int length)
 static
 double **createVars(int nvars, int nts)
 {  
-  double *array = (double*) malloc(nvars*nts*sizeof(double));
-  double **vars = (double**) malloc(nvars*sizeof(double*));
+  double *array = (double*) Malloc(nvars*nts*sizeof(double));
+  double **vars = (double**) Malloc(nvars*sizeof(double*));
   
   int i;
   
@@ -171,8 +171,8 @@ void destroyVars(double **vars)
 {  
   if ( vars != NULL)
     {
-      free(vars[0]);
-      free(vars);
+      Free(vars[0]);
+      Free(vars);
     }
 }
 
@@ -204,7 +204,7 @@ static
 int submitCdoCommand(const char *argument)
 {  
   const char *cdoPath = getCdoPath();
-  char *cdoCommand = (char*) malloc(strlen(cdoPath) + strlen(argument) + 8);
+  char *cdoCommand = (char*) Malloc(strlen(cdoPath) + strlen(argument) + 8);
   
   int status;
   
@@ -214,7 +214,7 @@ int submitCdoCommand(const char *argument)
   strcat(cdoCommand, argument);
   
   status = system(cdoCommand);
-  free(cdoCommand);
+  Free(cdoCommand);
   
   return status;
 }

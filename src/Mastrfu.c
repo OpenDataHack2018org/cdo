@@ -38,12 +38,12 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2, int nmiss,
 
   int nlat = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
-  double *phi    = (double*) malloc(nlat*sizeof(double));
-  double *dummy  = (double*) malloc(nlat*sizeof(double));
-  double *cosphi = (double*) malloc(nlat*sizeof(double));
-  double *plevel = (double*) malloc(nlev*sizeof(double));
-  double **field1 = (double**) malloc(nlev*sizeof(double*));
-  double **field2 = (double**) malloc(nlev*sizeof(double*));
+  double *phi    = (double*) Malloc(nlat*sizeof(double));
+  double *dummy  = (double*) Malloc(nlat*sizeof(double));
+  double *cosphi = (double*) Malloc(nlat*sizeof(double));
+  double *plevel = (double*) Malloc(nlev*sizeof(double));
+  double **field1 = (double**) Malloc(nlev*sizeof(double*));
+  double **field2 = (double**) Malloc(nlev*sizeof(double*));
 
   zaxisInqLevels(zaxisID, plevel);
 
@@ -95,12 +95,12 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2, int nmiss,
 	    }
     }
 
-  free(field2);
-  free(field1);
-  free(plevel);
-  free(cosphi);
-  free(dummy);
-  free(phi);
+  Free(field2);
+  Free(field1);
+  Free(plevel);
+  Free(cosphi);
+  Free(dummy);
+  Free(phi);
 }
 
 
@@ -156,8 +156,8 @@ void *Mastrfu(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  double *array1 = (double*) malloc(gridsize*nlev*sizeof(double));
-  double *array2 = (double*) malloc(gridsize*nlev*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*nlev*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*nlev*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -191,8 +191,8 @@ void *Mastrfu(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
+  if ( array1 ) Free(array1);
+  if ( array2 ) Free(array2);
 
   cdoFinish();
 

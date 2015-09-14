@@ -204,8 +204,8 @@ void *Change(void *argument)
 	{
 	  zaxisID1 = vlistZaxis(vlistID2, index);
 	  nlevs = zaxisInqSize(zaxisID1);
-	  levels = (double*) malloc(nlevs*sizeof(double));
-	  newlevels = (double*) malloc(nlevs*sizeof(double));
+	  levels = (double*) Malloc(nlevs*sizeof(double));
+	  newlevels = (double*) Malloc(nlevs*sizeof(double));
 	  zaxisInqLevels(zaxisID1, levels);
 
 	  for ( k = 0; k < nlevs; k++ ) newlevels[k] = levels[k];
@@ -227,8 +227,8 @@ void *Change(void *argument)
 	      vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 	    }
 
-	  free(levels);
-	  free(newlevels);
+	  Free(levels);
+	  Free(newlevels);
 	}
     }
   else if ( operatorID == CHLEVELC || operatorID == CHLEVELV )
@@ -255,7 +255,7 @@ void *Change(void *argument)
 
       zaxisID1 = vlistInqVarZaxis(vlistID2, varID);
       nlevs = zaxisInqSize(zaxisID1);
-      levels = (double*) malloc(nlevs*sizeof(double));
+      levels = (double*) Malloc(nlevs*sizeof(double));
       zaxisInqLevels(zaxisID1, levels);
       nfound = 0;
       for ( k = 0; k < nlevs; k++ )
@@ -274,7 +274,7 @@ void *Change(void *argument)
       else
 	cdoAbort("Level %g not found!", chlevels[0]);
 
-      free(levels);
+      Free(levels);
     }
   else if ( operatorID == CHLTYPE )                
     {
@@ -308,7 +308,7 @@ void *Change(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID2);
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
   tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
@@ -331,7 +331,7 @@ void *Change(void *argument)
   streamClose(streamID1);
   streamClose(streamID2);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   cdoFinish();
 

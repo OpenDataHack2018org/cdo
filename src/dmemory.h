@@ -1,16 +1,13 @@
 #ifndef _DMEMORY_H
 #define _DMEMORY_H
 
-#include <stdlib.h>
+#include <stdio.h>
 
-/*
- * if DEBUG_MEMORY is defined setenv MEMORY_DEBUG to debug memory
- */
-
+// if DEBUG_MEMORY is defined setenv MEMORY_DEBUG to debug memory
 #define  DEBUG_MEMORY
 
-#ifndef  WITH_CALLER_NAME
-#define  WITH_CALLER_NAME
+#ifndef  WITH_FUNCTION_NAME
+#define  WITH_FUNCTION_NAME
 #endif
 
 extern size_t  memTotal(void);
@@ -19,27 +16,41 @@ extern void    memExitOnError(void);
 
 #if  defined  DEBUG_MEMORY
 
-extern void   *Realloc(const char *caller, const char *file, int line, void *ptr, size_t size);
-extern void   *Calloc (const char *caller, const char *file, int line, size_t nmemb, size_t size);
-extern void   *Malloc (const char *caller, const char *file, int line, size_t size);
-extern void    Free   (const char *caller, const char *file, int line, void *ptr);
+extern void   *memRealloc(void *ptr, size_t size, const char *file, const char *functionname, int line);
+extern void   *memCalloc (size_t nmemb, size_t size, const char *file, const char *functionname, int line);
+extern void   *memMalloc (size_t size, const char *file, const char *functionname, int line);
+extern void    memFree   (void *ptr, const char *file, const char *functionname, int line);
 
-#if  defined  calloc
-#  undef  calloc
-#endif
-
-#if  defined  WITH_CALLER_NAME
-#  define  realloc(p, s)  Realloc(__func__, __FILE__, __LINE__, (p), (s))
-#  define   calloc(n, s)   Calloc(__func__, __FILE__, __LINE__, (n), (s))
-#  define   malloc(s)      Malloc(__func__, __FILE__, __LINE__, (s))
-#  define     free(p)        Free(__func__, __FILE__, __LINE__, (p))
+#if  defined  WITH_FUNCTION_NAME
+#  define  Realloc(p, s)  memRealloc((p), (s), __FILE__, __func__, __LINE__)
+#  define   Calloc(n, s)   memCalloc((n), (s), __FILE__, __func__, __LINE__)
+#  define   Malloc(s)      memMalloc((s), __FILE__, __func__, __LINE__)
+#  define     Free(p)        memFree((p), __FILE__, __func__, __LINE__)
 #else
-#  define  realloc(p, s)  Realloc((void *) NULL, __FILE__, __LINE__, (p), (s))
-#  define   calloc(n, s)   Calloc((void *) NULL, __FILE__, __LINE__, (n), (s))
-#  define   malloc(s)      Malloc((void *) NULL, __FILE__, __LINE__, (s))
-#  define     free(p)        Free((void *) NULL, __FILE__, __LINE__, (p))
+#  define  Realloc(p, s)  memRealloc((p), (s), __FILE__, (void *) NULL, __LINE__)
+#  define   Calloc(n, s)   memCalloc((n), (s), __FILE__, (void *) NULL, __LINE__)
+#  define   Malloc(s)      memMalloc((s), __FILE__, (void *) NULL, __LINE__)
+#  define     Free(p)        memFree((p), __FILE__, (void *) NULL, __LINE__)
 #endif
 
 #endif /* DEBUG_MEMORY */
 
+void *cdiXmalloc(size_t, const char *, const char *, int);
+#define xmalloc(size) cdiXmalloc((size), __FILE__, __func__,  __LINE__ )
+
+void *cdiXcalloc(size_t, size_t, const char *, const char *, int);
+#define xcalloc(nmemb,size) cdiXcalloc((nmemb), (size), __FILE__, __func__, __LINE__)
+
+void *cdiXrealloc(void *, size_t, const char *, const char *, int);
+#define xrealloc(p,size) cdiXrealloc((p), (size), __FILE__, __func__, __LINE__)
+
 #endif /* _DMEMORY_H */
+/*
+ * Local Variables:
+ * c-file-style: "Java"
+ * c-basic-offset: 2
+ * indent-tabs-mode: nil
+ * show-trailing-whitespace: t
+ * require-trailing-newline: t
+ * End:
+ */

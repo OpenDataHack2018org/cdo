@@ -68,8 +68,8 @@ void *Subtrend(void *argument)
 
   field_init(&field1);
   field_init(&field4);
-  field1.ptr = (double*) malloc(gridsize*sizeof(double));
-  field4.ptr = (double*) malloc(gridsize*sizeof(double));
+  field1.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field4.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   vars2 = field_malloc(vlistID1, FIELD_PTR);
   vars3 = field_malloc(vlistID1, FIELD_PTR);
@@ -129,8 +129,8 @@ void *Subtrend(void *argument)
   field_free(vars2, vlistID1);
   field_free(vars3, vlistID1);
 
-  if ( field1.ptr ) free(field1.ptr);
-  if ( field4.ptr ) free(field4.ptr);
+  if ( field1.ptr ) Free(field1.ptr);
+  if ( field4.ptr ) Free(field4.ptr);
 
   streamClose(streamID4);
   streamClose(streamID3);

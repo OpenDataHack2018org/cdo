@@ -100,21 +100,21 @@ void *Intgridtraj(void *argument)
   nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) malloc(nrecords*sizeof(int));
-  recLevelID = (int*) malloc(nrecords*sizeof(int));
+  recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
-  vardata1 = (double**) malloc(nvars*sizeof(double*));
-  vardata2 = (double**) malloc(nvars*sizeof(double*));
+  vardata1 = (double**) Malloc(nvars*sizeof(double*));
+  vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
-      vardata2[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
+      vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
+      vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
   gridID2 = gridCreate(GRID_TRAJECTORY, 1);
@@ -246,12 +246,12 @@ void *Intgridtraj(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(vardata1[varID]);
-      free(vardata2[varID]);
+      Free(vardata1[varID]);
+      Free(vardata2[varID]);
     }
-  free(vardata1);
-  free(vardata2);
-  if ( array )  free(array);
+  Free(vardata1);
+  Free(vardata2);
+  if ( array )  Free(array);
 
   cdoFinish();
 

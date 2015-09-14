@@ -118,31 +118,31 @@ void *Ensval(void *argument)
   }
 
   // allocate array to hold results 
-  r = (double*) malloc( nostreams*sizeof(double));
+  r = (double*) Malloc( nostreams*sizeof(double));
   
 
   // one stream for each value of the decomposition
-  streamID2 = (int*) malloc( nostreams*sizeof(int));
-  vlistID2 = (int*) malloc( nostreams*sizeof(int));
-  taxisID2 = (int*) malloc( nostreams*sizeof(int));
-  zaxisID2 = (int*) malloc( nostreams*sizeof(int));
+  streamID2 = (int*) Malloc( nostreams*sizeof(int));
+  vlistID2 = (int*) Malloc( nostreams*sizeof(int));
+  taxisID2 = (int*) Malloc( nostreams*sizeof(int));
+  zaxisID2 = (int*) Malloc( nostreams*sizeof(int));
 
-  val = (double*) calloc( nfiles,sizeof(double));
+  val = (double*) Calloc( nfiles,sizeof(double));
   
   if ( operfunc == CRPS ) {
-    alpha= (double*) calloc( nens+1,sizeof(double));
-    beta = (double*) calloc( nens+1,sizeof(double));
-    alpha_weights= (double*) calloc( nens+1,sizeof(double));
-    beta_weights = (double*) calloc( nens+1,sizeof(double));
+    alpha= (double*) Calloc( nens+1,sizeof(double));
+    beta = (double*) Calloc( nens+1,sizeof(double));
+    alpha_weights= (double*) Calloc( nens+1,sizeof(double));
+    beta_weights = (double*) Calloc( nens+1,sizeof(double));
   }
   else if ( operfunc == BRS ) {
-    brs_g = (double*) calloc( nens+1,sizeof(double));
-    brs_o = (double*) calloc( nens+1,sizeof(double));
+    brs_g = (double*) Calloc( nens+1,sizeof(double));
+    brs_o = (double*) Calloc( nens+1,sizeof(double));
   }
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);
 
-  ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
+  ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -203,7 +203,7 @@ void *Ensval(void *argument)
       break;
     }
 
-    ofilename = (char*) calloc(namelen, sizeof(char));
+    ofilename = (char*) Calloc(namelen, sizeof(char));
 
     sprintf(ofilename, "%s.%s%s", ofilebase, type_suffix, file_suffix);
     // fprintf(stderr, "StreamID %i: %s\n", stream, ofilename);
@@ -217,7 +217,7 @@ void *Ensval(void *argument)
     streamID2[stream] = streamOpenWrite(fileargument, cdoFiletype());    
     file_argument_free(fileargument);
 
-    free(ofilename);
+    Free(ofilename);
 
     zaxisID2[stream] = zaxisDuplicate(zaxisID1);
     taxisID2[stream] = taxisDuplicate(taxisID1);
@@ -269,12 +269,12 @@ void *Ensval(void *argument)
 		  gridsize = gridInqSize(gridID);
 		  missval  = vlistInqVarMissval(vlistID1, varID);
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));//vlistGridsizeMax(vlistID1);
-		  if ( weights ) free(weights); 
-		  weights= (double*) malloc(gridsize*sizeof(double));
+		  if ( weights ) Free(weights); 
+		  weights= (double*) Malloc(gridsize*sizeof(double));
 		}
 
-	      if (ef[fileID].array ) free(ef[fileID].array);
-	      ef[fileID].array = (double*) malloc(gridsize*sizeof(double));
+	      if (ef[fileID].array ) Free(ef[fileID].array);
+	      ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
 
 	      streamID = ef[fileID].streamID;
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
@@ -509,7 +509,7 @@ void *Ensval(void *argument)
     streamClose(streamID2[stream]);
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    if ( ef[fileID].array ) free(ef[fileID].array);
+    if ( ef[fileID].array ) Free(ef[fileID].array);
 
   for ( stream = 0; stream < nostreams; stream++ ) {
     vlistDestroy(vlistID2[stream]);
@@ -524,22 +524,22 @@ void *Ensval(void *argument)
   gridDestroy(gridID);
   gridDestroy(gridID2);
 
-  if ( ef ) free(ef);
-  if ( weights ) free(weights);
-  if ( r ) free(r);
-  if ( alpha ) free(alpha);
-  if ( beta ) free(beta);
-  if ( alpha_weights ) free(alpha_weights);
-  if ( beta_weights ) free(beta_weights);
-  if ( brs_g ) free(brs_g);
-  if ( brs_o) free(brs_o);
-  if ( brs_g_weights ) free(brs_g_weights);
-  if ( brs_o_weights) free(brs_o_weights);
-  if ( val ) free(val);
-  if ( vlistID2 ) free(vlistID2);
-  if ( streamID2 ) free(streamID2);
-  if ( zaxisID2 ) free(zaxisID2);
-  if ( taxisID2 ) free(taxisID2);  
+  if ( ef ) Free(ef);
+  if ( weights ) Free(weights);
+  if ( r ) Free(r);
+  if ( alpha ) Free(alpha);
+  if ( beta ) Free(beta);
+  if ( alpha_weights ) Free(alpha_weights);
+  if ( beta_weights ) Free(beta_weights);
+  if ( brs_g ) Free(brs_g);
+  if ( brs_o) Free(brs_o);
+  if ( brs_g_weights ) Free(brs_g_weights);
+  if ( brs_o_weights) Free(brs_o_weights);
+  if ( val ) Free(val);
+  if ( vlistID2 ) Free(vlistID2);
+  if ( streamID2 ) Free(streamID2);
+  if ( zaxisID2 ) Free(zaxisID2);
+  if ( taxisID2 ) Free(taxisID2);  
   cdoFinish();
   
   return (0);

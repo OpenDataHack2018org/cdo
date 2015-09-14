@@ -109,7 +109,7 @@ void *Vertcum(void *argument)
                       lhybrid = TRUE;
                       nlevshl = nlevs+1;
 
-                      double *vct = (double*) malloc(nvct*sizeof(double));
+                      double *vct = (double*) Malloc(nvct*sizeof(double));
                       zaxisInqVct(zaxisID, vct);
 
                       zaxisIDhl = zaxisCreate(ZAXIS_HYBRID_HALF, nlevshl);
@@ -127,7 +127,7 @@ void *Vertcum(void *argument)
                 }
             }
         }
-      if ( vct ) free(vct);
+      if ( vct ) Free(vct);
     }
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -136,13 +136,13 @@ void *Vertcum(void *argument)
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
-      varnmiss[varID] = (int*) malloc(nlevs*sizeof(int));
-      vardata1[varID] = (double**) malloc(nlevs*sizeof(double*));
-      vardata2[varID] = (double**) malloc(nlevs2*sizeof(double*));
+      varnmiss[varID] = (int*) Malloc(nlevs*sizeof(int));
+      vardata1[varID] = (double**) Malloc(nlevs*sizeof(double*));
+      vardata2[varID] = (double**) Malloc(nlevs2*sizeof(double*));
       for ( levelID = 0; levelID < nlevs; ++levelID )
-        vardata1[varID][levelID] = (double*) malloc(gridsize*sizeof(double));
+        vardata1[varID][levelID] = (double*) Malloc(gridsize*sizeof(double));
       for ( levelID = 0; levelID < nlevs2; ++levelID )
-        vardata2[varID][levelID] = (double*) malloc(gridsize*sizeof(double));
+        vardata2[varID][levelID] = (double*) Malloc(gridsize*sizeof(double));
     }
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -235,11 +235,11 @@ void *Vertcum(void *argument)
     {
       nlevs  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       nlevs2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-      for ( levelID = 0; levelID < nlevs; ++levelID ) free(vardata1[varID][levelID]);
-      for ( levelID = 0; levelID < nlevs2; ++levelID ) free(vardata2[varID][levelID]);
-      free(vardata1[varID]);
-      free(vardata2[varID]);
-      free(varnmiss[varID]);
+      for ( levelID = 0; levelID < nlevs; ++levelID ) Free(vardata1[varID][levelID]);
+      for ( levelID = 0; levelID < nlevs2; ++levelID ) Free(vardata2[varID][levelID]);
+      Free(vardata1[varID]);
+      Free(vardata2[varID]);
+      Free(varnmiss[varID]);
     }
 
   streamClose(streamID2);

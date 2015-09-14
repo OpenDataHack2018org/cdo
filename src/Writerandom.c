@@ -62,11 +62,11 @@ void *Writerandom(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      recdata    = (double**) malloc(nrecs*sizeof(double*));
-      recvarID   = (int*) malloc(nrecs*sizeof(int));
-      reclevelID = (int*) malloc(nrecs*sizeof(int));
-      recnmiss   = (int*) malloc(nrecs*sizeof(int));
-      recindex   = (int*) malloc(nrecs*sizeof(int));
+      recdata    = (double**) Malloc(nrecs*sizeof(double*));
+      recvarID   = (int*) Malloc(nrecs*sizeof(int));
+      reclevelID = (int*) Malloc(nrecs*sizeof(int));
+      recnmiss   = (int*) Malloc(nrecs*sizeof(int));
+      recindex   = (int*) Malloc(nrecs*sizeof(int));
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -74,7 +74,7 @@ void *Writerandom(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  recvarID[recID] = varID;
 	  reclevelID[recID] = levelID;
-	  recdata[recID] = (double*) malloc(gridsize*sizeof(double));
+	  recdata[recID] = (double*) Malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
 	}
 
@@ -114,13 +114,13 @@ void *Writerandom(void *argument)
 	  streamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ ) free(recdata[recID]);
+      for ( recID = 0; recID < nrecs; recID++ ) Free(recdata[recID]);
 
-      free(recdata);
-      free(recvarID);
-      free(reclevelID);
-      free(recnmiss);
-      free(recindex);
+      Free(recdata);
+      Free(recvarID);
+      Free(reclevelID);
+      Free(recnmiss);
+      Free(recindex);
 
       tsID++;
     }

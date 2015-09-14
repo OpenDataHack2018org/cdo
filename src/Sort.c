@@ -173,21 +173,21 @@ void *Sort(void *argument)
 
   nvars   = vlistNvars(vlistID1);
 
-  varInfo = (varinfo_t*) malloc(nvars*sizeof(varinfo_t));
+  varInfo = (varinfo_t*) Malloc(nvars*sizeof(varinfo_t));
   for ( varID = 0; varID < nvars; ++varID )
     {
       nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       varInfo[varID].nlevs = nlevs;
-      varInfo[varID].levInfo = (levinfo_t*) malloc(nlevs*sizeof(levinfo_t));
+      varInfo[varID].levInfo = (levinfo_t*) Malloc(nlevs*sizeof(levinfo_t));
     }
 
-  vardata = (double**) malloc(nvars*sizeof(double*));
+  vardata = (double**) Malloc(nvars*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata[varID] = (double*) malloc(gridsize*nlevs*sizeof(double));
+      vardata[varID] = (double*) Malloc(gridsize*nlevs*sizeof(double));
     }
 
   tsID = 0;
@@ -282,11 +282,11 @@ void *Sort(void *argument)
   streamClose(streamID1);
   streamClose(streamID2);
 
-  for ( varID = 0; varID < nvars; varID++ ) free(vardata[varID]);
-  free(vardata);
+  for ( varID = 0; varID < nvars; varID++ ) Free(vardata[varID]);
+  Free(vardata);
 
-  for ( vindex = 0; vindex < nvars; vindex++ ) free(varInfo[vindex].levInfo);
-  free(varInfo);
+  for ( vindex = 0; vindex < nvars; vindex++ ) Free(varInfo[vindex].levInfo);
+  Free(varInfo);
 
   cdoFinish();
 

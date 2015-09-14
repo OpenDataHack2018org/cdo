@@ -355,7 +355,7 @@ void *EcaCwdi(void *argument)
   if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = parameter2double(operatorArgv()[1]);
   
-  longname = (char*) malloc(strlen(CWDI_LONGNAME) + 80);
+  longname = (char*) Malloc(strlen(CWDI_LONGNAME) + 80);
   sprintf(longname, CWDI_LONGNAME, argN, argT);
 
   request.var1.name     = CWDI_NAME;
@@ -378,7 +378,7 @@ void *EcaCwdi(void *argument)
    
   eca2(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);
@@ -396,7 +396,7 @@ void *EcaCwfi(void *argument)
 
   if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
 
-  longname = (char*) malloc(strlen(CWFI_LONGNAME) + 40);
+  longname = (char*) Malloc(strlen(CWFI_LONGNAME) + 40);
   sprintf(longname, CWFI_LONGNAME, argN);
 
   request.var1.name     = CWFI_NAME;
@@ -418,7 +418,7 @@ void *EcaCwfi(void *argument)
    
   eca2(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);
@@ -498,7 +498,7 @@ void *EcaGsl(void *argument)
   if ( operatorArgc() > 1 ) argT = parameter2double(operatorArgv()[1]);
   if ( operatorArgc() > 2 ) minLandFraction = parameter2double(operatorArgv()[2]);
 
-  longname = (char*) malloc(strlen(GSL_LONGNAME) + 160);
+  longname = (char*) Malloc(strlen(GSL_LONGNAME) + 160);
   sprintf(longname, GSL_LONGNAME, argN, argT, argN, argT);
   
   request.name      = GSL_NAME;
@@ -517,7 +517,7 @@ void *EcaGsl(void *argument)
    
   eca4(&request);
   
-  free(longname);
+  Free(longname);
 
   cdoFinish();
   
@@ -576,7 +576,7 @@ void *EcaHwdi(void *argument)
   if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = parameter2double(operatorArgv()[1]);
   
-  longname = (char*) malloc(strlen(HWDI_LONGNAME) + 80);
+  longname = (char*) Malloc(strlen(HWDI_LONGNAME) + 80);
   sprintf(longname, HWDI_LONGNAME, argN, argT);
   
   request.var1.name     = HWDI_NAME;
@@ -599,7 +599,7 @@ void *EcaHwdi(void *argument)
    
   eca2(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);
@@ -617,7 +617,7 @@ void *EcaHwfi(void *argument)
 
   if ( operatorArgc() > 0 ) argN = parameter2int(operatorArgv()[0]);
 
-  longname = (char*) malloc(strlen(HWFI_LONGNAME) + 40);
+  longname = (char*) Malloc(strlen(HWFI_LONGNAME) + 40);
   sprintf(longname, HWFI_LONGNAME, argN);
 
   request.var1.name     = HWFI_NAME;
@@ -639,7 +639,7 @@ void *EcaHwfi(void *argument)
    
   eca2(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);
@@ -683,7 +683,7 @@ void *EcaSu(void *argument)
   cdoOperatorAdd("eca_su", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argT = parameter2double(operatorArgv()[0]);
-  longname = (char*) malloc(strlen(SU_LONGNAME) + 40);
+  longname = (char*) Malloc(strlen(SU_LONGNAME) + 40);
   sprintf(longname, SU_LONGNAME, argT);
 
   request.var1.name     = SU_NAME;
@@ -701,7 +701,7 @@ void *EcaSu(void *argument)
  
   eca1(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);
@@ -818,7 +818,7 @@ void *EcaTr(void *argument)
   cdoOperatorAdd("eca_tr", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argT = parameter2double(operatorArgv()[0]);
-  longname = (char*) malloc(strlen(TR_LONGNAME) + 40);
+  longname = (char*) Malloc(strlen(TR_LONGNAME) + 40);
   sprintf(longname, TR_LONGNAME, argT);
  
   request.var1.name     = TR_NAME;
@@ -836,7 +836,7 @@ void *EcaTr(void *argument)
    
   eca1(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);
@@ -1327,7 +1327,7 @@ void *EcaRx5day(void *argument)
   cdoInitialize(argument);
   if ( operatorArgc() > 0 ) argX = parameter2double(operatorArgv()[0]);
   
-  longname = (char*) malloc(strlen(RX5DAY_LONGNAME2) + 40);
+  longname = (char*) Malloc(strlen(RX5DAY_LONGNAME2) + 40);
   sprintf(longname, RX5DAY_LONGNAME2, argX);
   
   cdoOperatorAdd("eca_rx5day", 0, 31, NULL);
@@ -1351,7 +1351,7 @@ void *EcaRx5day(void *argument)
    
   eca1(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);
@@ -1431,7 +1431,7 @@ void *Strwin(void *argument)
   if ( operatorArgc() > 0 )
     maxWind = parameter2double(operatorArgv()[0]);
 
-  longname = (char*) malloc(strlen(STRWIN_LONGNAME) + 40);
+  longname = (char*) Malloc(strlen(STRWIN_LONGNAME) + 40);
   sprintf(longname, STRWIN_LONGNAME, maxWind);
          
   request.var1.name     = STRWIN_NAME;
@@ -1454,7 +1454,7 @@ void *Strwin(void *argument)
    
   eca1(&request);
   
-  free(longname);
+  Free(longname);
   cdoFinish();
   
   return (0);

@@ -288,7 +288,7 @@ void *Seltime(void *argument)
 
   if ( nsel )
     {
-      selfound = (int*) malloc(nsel*sizeof(int));
+      selfound = (int*) Malloc(nsel*sizeof(int));
       for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
     }
 
@@ -308,7 +308,7 @@ void *Seltime(void *argument)
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
     }
 
   int ntsteps = vlistNtsteps(vlistID1);
@@ -347,15 +347,15 @@ void *Seltime(void *argument)
     {
       if ( lnts1 )
 	{
-	  vdate_list = (int*) malloc(nts1*sizeof(int));
-	  vtime_list = (int*) malloc(nts1*sizeof(int));
+	  vdate_list = (int*) Malloc(nts1*sizeof(int));
+	  vtime_list = (int*) Malloc(nts1*sizeof(int));
 	}
       else
 	{
 	  nts1 = 1;
 	}
 
-      vars  = (field_t ***) malloc(nts1*sizeof(field_t **));
+      vars  = (field_t ***) Malloc(nts1*sizeof(field_t **));
 
       for ( int tsID = 0; tsID < nts1; tsID++ )
 	{
@@ -371,7 +371,7 @@ void *Seltime(void *argument)
 		  
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
-		      vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+		      vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 		    }
 		}
 	    }
@@ -604,7 +604,7 @@ void *Seltime(void *argument)
       cdoWarning("%d timesteps missing after the last month!", nts2-its2);
 
   if ( ! lcopy )
-    if ( array ) free(array);
+    if ( array ) Free(array);
 
   for ( isel = 0; isel < nsel; isel++ )
     {
@@ -668,7 +668,7 @@ void *Seltime(void *argument)
 	}
     }
 
-  if ( selfound ) free(selfound);
+  if ( selfound ) Free(selfound);
 
   listDelete(ilist);
 
@@ -676,9 +676,9 @@ void *Seltime(void *argument)
     {
       for ( tsID = 0; tsID < nts1; tsID++ ) field_free(vars[tsID], vlistID2);
 
-      if ( vars  ) free(vars);
-      if ( vdate_list ) free(vdate_list);
-      if ( vtime_list ) free(vtime_list);
+      if ( vars  ) Free(vars);
+      if ( vdate_list ) Free(vdate_list);
+      if ( vtime_list ) Free(vtime_list);
     }
 
   vlistDestroy(vlistID2);

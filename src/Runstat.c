@@ -100,18 +100,18 @@ void *Runstat(void *argument)
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
+  vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
   if ( !runstat_nomiss )
-    samp1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
+    samp1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
   if ( lvarstd )
-    vars2 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
+    vars2 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
 
   for ( its = 0; its < ndates; its++ )
     {
@@ -123,7 +123,7 @@ void *Runstat(void *argument)
     }
 
   int gridsizemax = vlistGridsizeMax(vlistID1);
-  int *imask = (int*) malloc(gridsizemax*sizeof(int));
+  int *imask = (int*) Malloc(gridsizemax*sizeof(int));
 
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
@@ -343,13 +343,13 @@ void *Runstat(void *argument)
       if ( lvarstd ) field_free(vars2[its], vlistID1);
     }
 
-  free(vars1);
-  if ( !runstat_nomiss ) free(samp1);
-  if ( lvarstd ) free(vars2);
+  Free(vars1);
+  if ( !runstat_nomiss ) Free(samp1);
+  if ( lvarstd ) Free(vars2);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
-  if ( imask )      free(imask);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
+  if ( imask )      Free(imask);
 
   dtlist_delete(dtlist);
 

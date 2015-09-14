@@ -75,8 +75,8 @@ void *Yearmonstat(void *argument)
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   int calendar = taxisInqCalendar(taxisID1);
   dtlist_type *dtlist = dtlist_new();
@@ -86,7 +86,7 @@ void *Yearmonstat(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
 
   field_init(&field);
-  field.ptr = (double*) malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   vars1 = field_malloc(vlistID1, FIELD_PTR);
   samp1 = field_malloc(vlistID1, FIELD_NONE);
@@ -143,7 +143,7 @@ void *Yearmonstat(void *argument)
 		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
-			samp1[varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		      for ( i = 0; i < gridsize; i++ )
 			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
@@ -164,7 +164,7 @@ void *Yearmonstat(void *argument)
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
 			{
-			  samp1[varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+			  samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 			  for ( i = 0; i < gridsize; i++ )
 			    samp1[varID][levelID].ptr[i] = dsets;
 			}
@@ -230,10 +230,10 @@ void *Yearmonstat(void *argument)
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   dtlist_delete(dtlist);
 

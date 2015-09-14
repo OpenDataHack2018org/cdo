@@ -130,7 +130,7 @@ void *Vertintap(void *argument)
       double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
                           10000,  7000,  5000,  3000,  2000, 1000 };
       nplev = sizeof(stdlev)/sizeof(*stdlev);
-      plev  = (double *) malloc(nplev*sizeof(double));
+      plev  = (double *) Malloc(nplev*sizeof(double));
       for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
     }
   else
@@ -167,7 +167,7 @@ void *Vertintap(void *argument)
 
       if ( is_height_axis(zaxisID, nlevel) )
         {
-	  double *level = (double *) malloc(nlevel*sizeof(double));
+	  double *level = (double *) Malloc(nlevel*sizeof(double));
 	  zaxisInqLevels(zaxisID, level);
 	  int l;
 	  for ( l = 0; l < nlevel; l++ )
@@ -175,7 +175,7 @@ void *Vertintap(void *argument)
 	      if ( (l+1) != (int) (level[l]+0.5) ) break;
 	    }
 	  if ( l == nlevel ) mono_level = TRUE; 
-	  free(level);          
+	  Free(level);          
         }
       
       if ( is_height_axis(zaxisID, nlevel) && mono_level )
@@ -202,7 +202,7 @@ void *Vertintap(void *argument)
 
       if ( is_hybrid_axis(zaxisID, nlevel) )
 	{
-	  double *level = (double *) malloc(nlevel*sizeof(double));
+	  double *level = (double *) Malloc(nlevel*sizeof(double));
 	  zaxisInqLevels(zaxisID, level);
 	  int l;
 	  for ( l = 0; l < nlevel; l++ )
@@ -210,7 +210,7 @@ void *Vertintap(void *argument)
 	      if ( (l+1) != (int) (level[l]+0.5) ) break;
 	    }
 	  if ( l == nlevel ) mono_level = TRUE; 
-	  free(level);
+	  Free(level);
 	}
 
       if ( is_hybrid_axis(zaxisID, nlevel) && mono_level )
@@ -226,7 +226,7 @@ void *Vertintap(void *argument)
 		  nhlevf   = nhlev;
 		  nhlevh   = nhlevf + 1;
 	      
-		  vct = (double*) malloc(nvct*sizeof(double));
+		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
@@ -247,7 +247,7 @@ void *Vertintap(void *argument)
 		  nhlevf   = nhlev - 1;
 		  nhlevh   = nhlev;
 	      
-		  vct = (double*) malloc(nvct*sizeof(double));
+		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
@@ -273,7 +273,7 @@ void *Vertintap(void *argument)
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
   if ( Extrapolate == 0 )
-    pnmiss = (int *) malloc(nplev*sizeof(int));
+    pnmiss = (int *) Malloc(nplev*sizeof(int));
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -295,10 +295,10 @@ void *Vertintap(void *argument)
 
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
-      vert_index = (int *) malloc(gridsize*nplev*sizeof(int));
-      ps_prog    = (double *) malloc(gridsize*sizeof(double));
-      full_press = (double *) malloc(gridsize*nhlevf*sizeof(double));
-      dpress     = (double *) malloc(gridsize*nhlevf*sizeof(double));
+      vert_index = (int *) Malloc(gridsize*nplev*sizeof(int));
+      ps_prog    = (double *) Malloc(gridsize*sizeof(double));
+      full_press = (double *) Malloc(gridsize*nhlevf*sizeof(double));
+      dpress     = (double *) Malloc(gridsize*nhlevf*sizeof(double));
     }
   else
     cdoWarning("No 3D variable with generalized height level found!");
@@ -335,20 +335,20 @@ void *Vertintap(void *argument)
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
 
-      vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
+      vardata1[varID] = (double *) Malloc(gridsize*nlevel*sizeof(double));
 
       if ( zaxisID == zaxisIDh )
 	{
 	  varinterp[varID] = TRUE;
-	  vardata2[varID]  = (double *) malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = (int *) malloc(maxlev*sizeof(int));
+	  vardata2[varID]  = (double *) Malloc(gridsize*nplev*sizeof(double));
+	  varnmiss[varID]  = (int *) Malloc(maxlev*sizeof(int));
 	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
 	}
       else
 	{
 	  varinterp[varID] = FALSE;
 	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
+	  varnmiss[varID]  = (int *) Malloc(nlevel*sizeof(int));
 	}
     }
 
@@ -513,17 +513,17 @@ void *Vertintap(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(varnmiss[varID]);
-      free(vardata1[varID]);
-      if ( varinterp[varID] ) free(vardata2[varID]);
+      Free(varnmiss[varID]);
+      Free(vardata1[varID]);
+      if ( varinterp[varID] ) Free(vardata2[varID]);
     }
 
-  if ( pnmiss     ) free(pnmiss);
-  if ( ps_prog    ) free(ps_prog);
-  if ( vert_index ) free(vert_index);
-  if ( full_press ) free(full_press);
-  if ( dpress     ) free(dpress);
-  if ( vct        ) free(vct);
+  if ( pnmiss     ) Free(pnmiss);
+  if ( ps_prog    ) Free(ps_prog);
+  if ( vert_index ) Free(vert_index);
+  if ( full_press ) Free(full_press);
+  if ( dpress     ) Free(dpress);
+  if ( vct        ) Free(vct);
 
   listDelete(flist);
 

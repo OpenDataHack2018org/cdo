@@ -70,20 +70,20 @@ void *Vardup(void *argument)
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   int gridsize = vlistGridsizeMax(vlistID1);
-  double *array    = (double*) malloc(gridsize*sizeof(double));
-  double **vardata = (double **) malloc(nvars*sizeof(double *));
-  int **varnmiss   = (int **) malloc(nvars*sizeof(int *));
+  double *array    = (double*) Malloc(gridsize*sizeof(double));
+  double **vardata = (double **) Malloc(nvars*sizeof(double *));
+  int **varnmiss   = (int **) Malloc(nvars*sizeof(int *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata[varID]  = (double*) malloc(gridsize*nlevel*sizeof(double));
-      varnmiss[varID] = (int*) malloc(nlevel*sizeof(int));
+      vardata[varID]  = (double*) Malloc(gridsize*nlevel*sizeof(double));
+      varnmiss[varID] = (int*) Malloc(nlevel*sizeof(int));
     }
 
   for ( i = 1; i < nmul; i++ )
@@ -143,11 +143,11 @@ void *Vardup(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  for ( varID = 0; varID < nvars; varID++ ) free(vardata[varID]);
-  for ( varID = 0; varID < nvars; varID++ ) free(varnmiss[varID]);
-  free(vardata);
-  free(varnmiss);
-  free(array);
+  for ( varID = 0; varID < nvars; varID++ ) Free(vardata[varID]);
+  for ( varID = 0; varID < nvars; varID++ ) Free(varnmiss[varID]);
+  Free(vardata);
+  Free(varnmiss);
+  Free(array);
 
   cdoFinish();
 

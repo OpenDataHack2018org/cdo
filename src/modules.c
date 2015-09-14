@@ -19,11 +19,8 @@
 #  include "config.h"
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <cdi.h>
-#include "cdo.h"
+#include "cdo_int.h"
 #include "operator_help.h"
 #include "modules.h"
 #include "error.h"

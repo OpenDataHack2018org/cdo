@@ -139,7 +139,7 @@ int conv_cmor_table(const char *filename)
 		   strncmp("comment", ename, len)         == 0 )
 		printf("  %-15s = \"%.*s\"\n", ename, vlen, ovalue);
 
-	      free(ovalue);
+	      Free(ovalue);
 	    }
 	  if ( hasmissval ) printf("  %-15s = %g\n", "missing_value", missval);
 	  printf("/\n");

@@ -124,9 +124,9 @@ void *Setzaxis(void *argument)
 	{
 	  zaxisID1 = vlistZaxis(vlistID1, index);
           int nlev = zaxisInqSize(zaxisID1);
-          double *levels  = (double *) malloc(nlev*sizeof(double));
-          double *lbounds = (double *) malloc(nlev*sizeof(double));
-          double *ubounds = (double *) malloc(nlev*sizeof(double));
+          double *levels  = (double *) Malloc(nlev*sizeof(double));
+          double *lbounds = (double *) Malloc(nlev*sizeof(double));
+          double *ubounds = (double *) Malloc(nlev*sizeof(double));
 
           if ( nlev > 1 )
             {
@@ -142,9 +142,9 @@ void *Setzaxis(void *argument)
 	      vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
             }
 
-          free(levels);
-          free(lbounds);
-          free(ubounds);
+          Free(levels);
+          Free(lbounds);
+          Free(ubounds);
 	}
     }
 
@@ -152,7 +152,7 @@ void *Setzaxis(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  double *array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -175,7 +175,7 @@ void *Setzaxis(void *argument)
   streamClose(streamID1);
   streamClose(streamID2);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   cdoFinish();
 

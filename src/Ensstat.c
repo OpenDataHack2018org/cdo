@@ -104,15 +104,15 @@ void *Ensstat(void *argument)
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ens_file_t *ef = (ens_file_t *) malloc(nfiles*sizeof(ens_file_t));
+  ens_file_t *ef = (ens_file_t *) Malloc(nfiles*sizeof(ens_file_t));
 
-  field_t *field = (field_t *) malloc(ompNumThreads*sizeof(field_t));
+  field_t *field = (field_t *) Malloc(ompNumThreads*sizeof(field_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);
       field[i].size   = nfiles;
-      field[i].ptr    = (double*) malloc(nfiles*sizeof(double));
-      field[i].weight = (double*) malloc(nfiles*sizeof(double));
+      field[i].ptr    = (double*) Malloc(nfiles*sizeof(double));
+      field[i].weight = (double*) Malloc(nfiles*sizeof(double));
       for ( fileID = 0; fileID < nfiles; fileID++ ) field[i].weight[fileID] = 1;
     }
 
@@ -135,15 +135,15 @@ void *Ensstat(void *argument)
   int gridsize = vlistGridsizeMax(vlistID1);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = (double*) malloc(gridsize*sizeof(double));
+    ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
 
-  double *array2 = (double *) malloc(gridsize*sizeof(double));
+  double *array2 = (double *) Malloc(gridsize*sizeof(double));
 
   int nvars = vlistNvars(vlistID2);
   double *count2 = NULL;
   if ( count_data )
     {
-      count2 = (double *) malloc(gridsize*sizeof(double));
+      count2 = (double *) Malloc(gridsize*sizeof(double));
       for ( varID = 0; varID < nvars; ++varID )
 	{
 	  char name[CDI_MAX_NAME];
@@ -261,19 +261,19 @@ void *Ensstat(void *argument)
   streamClose(streamID2);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    if ( ef[fileID].array ) free(ef[fileID].array);
+    if ( ef[fileID].array ) Free(ef[fileID].array);
 
-  if ( ef ) free(ef);
-  if ( array2 ) free(array2);
-  if ( count2 ) free(count2);
+  if ( ef ) Free(ef);
+  if ( array2 ) Free(array2);
+  if ( count2 ) Free(count2);
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      if ( field[i].ptr    ) free(field[i].ptr);
-      if ( field[i].weight ) free(field[i].weight);
+      if ( field[i].ptr    ) Free(field[i].ptr);
+      if ( field[i].weight ) Free(field[i].weight);
     }
 
-  if ( field ) free(field);
+  if ( field ) Free(field);
 
   cdoFinish();
 

@@ -98,10 +98,10 @@ void *Cond2(void *argument)
   if ( filltype == FILL_REC && gridsize != gridInqSize(vlistGrid(vlistID1, 0)) )
     cdoAbort("Stream1 >%s< has wrong gridsize!", cdoStreamName(0)->args);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
-  array3 = (double*) malloc(gridsize*sizeof(double));
-  array4 = (double*) malloc(gridsize*sizeof(double));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
+  array2 = (double*) Malloc(gridsize*sizeof(double));
+  array3 = (double*) Malloc(gridsize*sizeof(double));
+  array4 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( cdoVerbose )
     cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d",
@@ -115,14 +115,14 @@ void *Cond2(void *argument)
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
 
 	  nvars  = vlistNvars(vlistID1);
-	  vardata1  = (double **) malloc(nvars*sizeof(double *));
-	  varnmiss1 = (int **) malloc(nvars*sizeof(int *));
+	  vardata1  = (double **) Malloc(nvars*sizeof(double *));
+	  varnmiss1 = (int **) Malloc(nvars*sizeof(int *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      vardata1[varID]  = (double*) malloc(nlev*gridsize*sizeof(double));
-	      varnmiss1[varID] = (int*) malloc(nlev*sizeof(int));
+	      vardata1[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
+	      varnmiss1[varID] = (int*) Malloc(nlev*sizeof(int));
 	    }
 	}
     }
@@ -215,18 +215,18 @@ void *Cond2(void *argument)
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  free(vardata1[varID]);
-	  free(varnmiss1[varID]);
+	  Free(vardata1[varID]);
+	  Free(varnmiss1[varID]);
 	}
 
-      free(vardata1);
-      free(varnmiss1);
+      Free(vardata1);
+      Free(varnmiss1);
     }
 
-  if ( array4 ) free(array4);
-  if ( array3 ) free(array3);
-  if ( array2 ) free(array2);
-  if ( array1 ) free(array1);
+  if ( array4 ) Free(array4);
+  if ( array3 ) Free(array3);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
   cdoFinish();
 

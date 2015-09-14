@@ -31,6 +31,7 @@
 #include "pstream_int.h"
 #include <cdi.h>
 #include "cdo.h"
+#include "cdo_int.h"
 #include "error.h"
 #include "dmemory.h"
 
@@ -91,28 +92,28 @@ void pipe_init(pipe_t *pipe)
   pipe->usedata = TRUE;
   pipe->pstreamptr_in = 0;
 
-  pipe->mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
+  pipe->mutex = (pthread_mutex_t*) Malloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(pipe->mutex, &m_attr);
 
-  pipe->tsDef = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->tsDef = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->tsDef, &c_attr);
-  pipe->tsInq = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->tsInq = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->tsInq, &c_attr);
 
-  pipe->recDef = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->recDef = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->recDef, &c_attr);
-  pipe->recInq = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->recInq = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->recInq, &c_attr);
   
-  pipe->vlistDef = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->vlistDef = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->vlistDef, &c_attr);
-  pipe->isclosed = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->isclosed = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->isclosed, &c_attr);
 
-  pipe->writeCond = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->writeCond = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->writeCond, &c_attr);
 
-  pipe->readCond = (pthread_cond_t*) malloc(sizeof(pthread_cond_t));
+  pipe->readCond = (pthread_cond_t*) Malloc(sizeof(pthread_cond_t));
   pthread_cond_init(pipe->readCond, &c_attr);
 
   pthread_mutexattr_destroy(&m_attr);
@@ -124,7 +125,7 @@ pipe_t *pipeNew()
 {
   pipe_t *pipe;
 
-  pipe = (pipe_t*) malloc(sizeof(pipe_t));
+  pipe = (pipe_t*) Malloc(sizeof(pipe_t));
 
   pipe_init(pipe);
 
@@ -136,16 +137,16 @@ void pipeDelete(pipe_t *pipe)
 {
   if ( pipe )
     {
-      if ( pipe->mutex )     free(pipe->mutex);
-      if ( pipe->tsDef )     free(pipe->tsDef);
-      if ( pipe->tsInq )     free(pipe->tsInq);
-      if ( pipe->recDef )    free(pipe->recDef);
-      if ( pipe->recInq )    free(pipe->recInq);
-      if ( pipe->vlistDef )  free(pipe->vlistDef);
-      if ( pipe->isclosed )  free(pipe->isclosed);
-      if ( pipe->writeCond ) free(pipe->writeCond);
-      if ( pipe->readCond )  free(pipe->readCond);
-      free(pipe);
+      if ( pipe->mutex )     Free(pipe->mutex);
+      if ( pipe->tsDef )     Free(pipe->tsDef);
+      if ( pipe->tsInq )     Free(pipe->tsInq);
+      if ( pipe->recDef )    Free(pipe->recDef);
+      if ( pipe->recInq )    Free(pipe->recInq);
+      if ( pipe->vlistDef )  Free(pipe->vlistDef);
+      if ( pipe->isclosed )  Free(pipe->isclosed);
+      if ( pipe->writeCond ) Free(pipe->writeCond);
+      if ( pipe->readCond )  Free(pipe->readCond);
+      Free(pipe);
     }
 }
 

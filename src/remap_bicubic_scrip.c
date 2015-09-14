@@ -105,7 +105,7 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   long tgt_grid_size = tgt_grid->size;
 
-  weightlinks4_t *weightlinks = (weightlinks4_t *) malloc(tgt_grid_size*sizeof(weightlinks4_t));
+  weightlinks4_t *weightlinks = (weightlinks4_t *) Malloc(tgt_grid_size*sizeof(weightlinks4_t));
 
   /* Loop over destination grid */
 
@@ -192,7 +192,7 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   weightlinks2remaplinks4(tgt_grid_size, weightlinks, rv);
 
-  if ( weightlinks ) free(weightlinks);
+  if ( weightlinks ) Free(weightlinks);
 
 } /* scrip_remap_weights_bicubic */
 
@@ -226,9 +226,9 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
   if ( src_grid->rank != 2 )
     cdoAbort("Can not do bicubic interpolation when source grid rank != 2"); 
 
-  double *grad1_lat    = (double*) malloc(src_grid->size*sizeof(double));
-  double *grad1_lon    = (double*) malloc(src_grid->size*sizeof(double));
-  double *grad1_latlon = (double*) malloc(src_grid->size*sizeof(double));
+  double *grad1_lat    = (double*) Malloc(src_grid->size*sizeof(double));
+  double *grad1_lon    = (double*) Malloc(src_grid->size*sizeof(double));
+  double *grad1_latlon = (double*) Malloc(src_grid->size*sizeof(double));
 
   remap_gradients(*src_grid, src_array, grad1_lat, grad1_lon, grad1_latlon);
 
@@ -317,8 +317,8 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
         }
     }
 
-  free(grad1_lat);
-  free(grad1_lon);
-  free(grad1_latlon);
+  Free(grad1_lat);
+  Free(grad1_lon);
+  Free(grad1_latlon);
 
 } /* scrip_remap_bicubic */

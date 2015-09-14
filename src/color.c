@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "dmemory.h"
 #include "color.h"
 
 
@@ -171,7 +172,7 @@ int cptRead(FILE *fp, CPT *cpt)
 	
   cptInit(cpt);
 
-  cpt->lut = (LUT*) calloc(1, n_alloc*sizeof(LUT));
+  cpt->lut = (LUT*) Calloc(1, n_alloc*sizeof(LUT));
 	
   /* Save the original setting since it may be modified by settings in the CPT file */
   color_model = RGB; 
@@ -320,7 +321,7 @@ int cptRead(FILE *fp, CPT *cpt)
       if (n == n_alloc) {
 	i = n_alloc;
 	n_alloc += small_chunk;
-	cpt->lut = (LUT*) realloc((void *)cpt->lut, (size_t)n_alloc*sizeof (LUT));
+	cpt->lut = (LUT*) Realloc((void *)cpt->lut, (size_t)n_alloc*sizeof (LUT));
 	memset ((void *)&cpt->lut[i], 0, (size_t)(small_chunk * sizeof (LUT)));  /* Initialize new structs to zero */
       }
     }
@@ -339,7 +340,7 @@ int cptRead(FILE *fp, CPT *cpt)
       return (READERR);
     }
 		
-  cpt->lut = (LUT*) realloc((void *)cpt->lut, (size_t)n*sizeof (LUT));
+  cpt->lut = (LUT*) Realloc((void *)cpt->lut, (size_t)n*sizeof (LUT));
   ncolors = n;
   for (i = annot = 0, gap = FALSE; i < ncolors - 1; i++) {
     if ( fabs(cpt->lut[i].z_high - cpt->lut[i+1].z_low) > 0 ) gap = TRUE;

@@ -24,7 +24,7 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 
   nvars = vlistNvars(vlistID);
 
-  field = (field_t **) malloc(nvars*sizeof(field_t *));
+  field = (field_t **) Malloc(nvars*sizeof(field_t *));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -35,7 +35,7 @@ field_t **field_allocate(int vlistID, int ptype, int init)
       nlevel   = zaxisInqSize(zaxisID);
       missval  = vlistInqVarMissval(vlistID, varID);
 
-      field[varID] = (field_t*) malloc(nlevel*sizeof(field_t));
+      field[varID] = (field_t*) Malloc(nlevel*sizeof(field_t));
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
 	  field_init(&field[varID][levelID]);
@@ -50,13 +50,13 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 
 	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
 	    {
-	      field[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
+	      field[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 	      if ( init ) memset(field[varID][levelID].ptr, 0, nwpv*gridsize*sizeof(double));
 	    }
 
 	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
 	    {
-	      field[varID][levelID].weight = (double*) malloc(nwpv*gridsize*sizeof(double));
+	      field[varID][levelID].weight = (double*) Malloc(nwpv*gridsize*sizeof(double));
 	      if ( init ) memset(field[varID][levelID].weight, 0, nwpv*gridsize*sizeof(double));
 	    }    
 	}
@@ -90,12 +90,12 @@ void field_free(field_t **field, int vlistID)
       nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
-	  if ( field[varID][levelID].ptr )    free(field[varID][levelID].ptr);
-       	  if ( field[varID][levelID].weight ) free(field[varID][levelID].weight);
+	  if ( field[varID][levelID].ptr )    Free(field[varID][levelID].ptr);
+       	  if ( field[varID][levelID].weight ) Free(field[varID][levelID].weight);
 	}
 
-      free(field[varID]);
+      Free(field[varID]);
     }
 
-  free(field);
+  Free(field);
 }

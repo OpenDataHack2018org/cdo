@@ -90,10 +90,10 @@ int y_is_gauss(double *gridyvals, int ysize)
   if ( ysize > 2 )
     {
       double *yvals, *yw;
-      yvals = (double*) malloc(ysize*sizeof(double));
-      yw    = (double*) malloc(ysize*sizeof(double));
+      yvals = (double*) Malloc(ysize*sizeof(double));
+      yw    = (double*) Malloc(ysize*sizeof(double));
       gaussaw(yvals, yw, (size_t)ysize);
-      free(yw);
+      Free(yw);
       for ( i = 0; i < (int) ysize; i++ )
 	yvals[i] = asin(yvals[i])/M_PI*180.0;
 
@@ -113,7 +113,7 @@ int y_is_gauss(double *gridyvals, int ysize)
 	  if ( i == (int) ysize ) lgauss = TRUE;
 	}
 
-      free(yvals);
+      Free(yvals);
     }
 
   return (lgauss);
@@ -130,8 +130,8 @@ int define_grid(dsets_t *pfi)
   nx = pfi->dnum[0];
   ny = pfi->dnum[1];
 
-  xvals = (double*) malloc(nx*sizeof(double));
-  yvals = (double*) malloc(ny*sizeof(double));
+  xvals = (double*) Malloc(nx*sizeof(double));
+  yvals = (double*) Malloc(ny*sizeof(double));
 
   get_dim_vals(pfi, xvals, nx, 0);
   get_dim_vals(pfi, yvals, ny, 1);
@@ -150,8 +150,8 @@ int define_grid(dsets_t *pfi)
   gridDefXvals(gridID, xvals);
   gridDefYvals(gridID, yvals);
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
   
   return (gridID);
 }
@@ -168,7 +168,7 @@ int define_level(dsets_t *pfi, int nlev)
     {
       double *zvals = NULL;
 
-      zvals = (double*) malloc(nz*sizeof(double));
+      zvals = (double*) Malloc(nz*sizeof(double));
 
       get_dim_vals(pfi, zvals, nz, 2);
 
@@ -182,7 +182,7 @@ int define_level(dsets_t *pfi, int nlev)
 	}
       zaxisDefLevels(zaxisID, zvals);
 
-      free(zvals);
+      Free(zvals);
     }
   else
     {
@@ -256,10 +256,10 @@ void *Importbinary(void *argument)
 
   vlistID = vlistCreate();
 
-  var_zaxisID = (int*) malloc(nvars*sizeof(int));
-  recVarID    = (int*) malloc(nrecs*sizeof(int));
-  recLevelID  = (int*) malloc(nrecs*sizeof(int));
-  var_dfrm    = (int*) malloc(nrecs*sizeof(int));
+  var_zaxisID = (int*) Malloc(nvars*sizeof(int));
+  recVarID    = (int*) Malloc(nrecs*sizeof(int));
+  recLevelID  = (int*) Malloc(nrecs*sizeof(int));
+  var_dfrm    = (int*) Malloc(nrecs*sizeof(int));
 
   recID = 0;
   for ( ivar = 0; ivar < nvars; ++ivar )
@@ -372,9 +372,9 @@ void *Importbinary(void *argument)
 
   //recsize = pfi.gsiz*4;
   recsize = pfi.gsiz*8;
-  rec = (char*) malloc(recsize);
+  rec = (char*) Malloc(recsize);
 
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
   /*
   if (pfi.tmplat)
@@ -583,13 +583,13 @@ void *Importbinary(void *argument)
   zaxisDestroy(zaxisID);
   taxisDestroy(taxisID);
 
-  free(array);
-  free(rec);
+  Free(array);
+  Free(rec);
 
-  if ( var_zaxisID ) free(var_zaxisID);
-  if ( recVarID    ) free(recVarID);
-  if ( recLevelID  ) free(recLevelID);
-  if ( var_dfrm    ) free(var_dfrm);
+  if ( var_zaxisID ) Free(var_zaxisID);
+  if ( recVarID    ) Free(recVarID);
+  if ( recLevelID  ) Free(recLevelID);
+  if ( var_dfrm    ) Free(var_dfrm);
 
   cdoFinish();
 

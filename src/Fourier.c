@@ -79,9 +79,9 @@ void *Fourier(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vdate = (int*) realloc(vdate, nalloc*sizeof(int));
-	  vtime = (int*) realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
+	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
+	  vars  = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);
@@ -94,7 +94,7 @@ void *Fourier(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double*) malloc(2*gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double*) Malloc(2*gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -106,15 +106,15 @@ void *Fourier(void *argument)
 
   for ( bit = nts; !(bit & 1); bit >>= 1 );
 
-  ompmem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
+  ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      ompmem[i].real = (double*) malloc(nts*sizeof(double));
-      ompmem[i].imag = (double*) malloc(nts*sizeof(double));
+      ompmem[i].real = (double*) Malloc(nts*sizeof(double));
+      ompmem[i].imag = (double*) Malloc(nts*sizeof(double));
       if ( bit != 1 )
 	{
-	  ompmem[i].work_r = (double*) malloc(nts*sizeof(double));
-	  ompmem[i].work_i = (double*) malloc(nts*sizeof(double));
+	  ompmem[i].work_r = (double*) Malloc(nts*sizeof(double));
+	  ompmem[i].work_i = (double*) Malloc(nts*sizeof(double));
 	}
     }
 
@@ -169,15 +169,15 @@ void *Fourier(void *argument)
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      free(ompmem[i].real);
-      free(ompmem[i].imag);
+      Free(ompmem[i].real);
+      Free(ompmem[i].imag);
       if ( bit != 1 )
 	{
-	  free(ompmem[i].work_r);
-	  free(ompmem[i].work_i);
+	  Free(ompmem[i].work_r);
+	  Free(ompmem[i].work_i);
 	}
     }
-  free(ompmem);
+  Free(ompmem);
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
@@ -195,7 +195,7 @@ void *Fourier(void *argument)
 		  nmiss = vars[tsID][varID][levelID].nmiss;
 		  streamDefRecord(streamID2, varID, levelID);
 		  streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
-		  free(vars[tsID][varID][levelID].ptr);
+		  Free(vars[tsID][varID][levelID].ptr);
 		  vars[tsID][varID][levelID].ptr = NULL;
 		}
 	    }
@@ -204,9 +204,9 @@ void *Fourier(void *argument)
       field_free(vars[tsID], vlistID1);
     }
 
-  if ( vars  ) free(vars);
-  if ( vdate ) free(vdate);
-  if ( vtime ) free(vtime);
+  if ( vars  ) Free(vars);
+  if ( vdate ) Free(vdate);
+  if ( vtime ) Free(vtime);
 
   streamClose(streamID2);
   streamClose(streamID1);

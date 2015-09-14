@@ -549,7 +549,7 @@ double fldpctl(field_t field, const int p)
     {
       if ( nmiss > 0 )
         {
-          array2 = (double*) malloc((len - nmiss)*sizeof(double));
+          array2 = (double*) Malloc((len - nmiss)*sizeof(double));
 
           for ( i = 0, j = 0; i < len; i++ ) 
             if ( !DBL_IS_EQUAL(array[i], missval) )
@@ -557,7 +557,7 @@ double fldpctl(field_t field, const int p)
 
           pctl = nth_element(array2, j, (int)ceil(j*(p/100.0))-1);
 
-          free(array2);
+          Free(array2);
         }
       else
         {

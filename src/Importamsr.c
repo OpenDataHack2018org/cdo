@@ -121,7 +121,7 @@ void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
   for ( varID = 0; varID < nvars; ++varID )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      amsr_data = (unsigned char *) realloc(amsr_data, gridsize);
+      amsr_data = (unsigned char *) Realloc(amsr_data, gridsize);
       size = fread(amsr_data, 1, gridsize, fp);
       if ( (int)size != gridsize ) cdoAbort("Read error!");
 
@@ -144,7 +144,7 @@ void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
 	}
     } 
 
-  free(amsr_data);
+  Free(amsr_data);
 }
 
 static
@@ -225,7 +225,7 @@ void *Importamsr(void *argument)
   if ( fsize == 12441600 )
     {
       nvars = 6;
-      for ( i = 0; i < nvars; ++i ) data[i] = (double*) malloc(gridsize*sizeof(double));
+      for ( i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
 
       init_amsr_day(vlistID, gridID, zaxisID, nvars);
 
@@ -245,12 +245,12 @@ void *Importamsr(void *argument)
 	  write_data(streamID, nvars, data, nmiss);
 	}
 
-      for ( i = 0; i < nvars; ++i ) free(data[i]);
+      for ( i = 0; i < nvars; ++i ) Free(data[i]);
     }
   else if ( fsize == 5184000 )
     {
       nvars = 5;
-      for ( i = 0; i < nvars; ++i ) data[i] = (double*) malloc(gridsize*sizeof(double));
+      for ( i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
 
       init_amsr_averaged(vlistID, gridID, zaxisID, nvars);
 
@@ -267,7 +267,7 @@ void *Importamsr(void *argument)
 
       write_data(streamID, nvars, data, nmiss);
 
-      for ( i = 0; i < nvars; ++i ) free(data[i]);
+      for ( i = 0; i < nvars; ++i ) Free(data[i]);
     }
   else
     cdoAbort("Unexpected file size for AMSR data!");

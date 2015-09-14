@@ -132,7 +132,7 @@ pml_t *pmlNew(const char *name)
 {
   pml_t *pml;
 
-  pml = (pml_t*) malloc(sizeof(pml_t));
+  pml = (pml_t*) Malloc(sizeof(pml_t));
 
   pml_init(pml, name);
 
@@ -146,10 +146,10 @@ void pmlDestroy(pml_t *pml)
 
   for ( int i = 0; i < pml->size; ++i )
     {
-      if ( pml->entry[i] ) free(pml->entry[i]);
+      if ( pml->entry[i] ) Free(pml->entry[i]);
     }
 
-  free(pml);
+  Free(pml);
 }
 
 
@@ -198,7 +198,7 @@ int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t si
       return (-1);
     }
 
-  pml_entry = (pml_entry_t*) malloc(sizeof(pml_entry_t));
+  pml_entry = (pml_entry_t*) Malloc(sizeof(pml_entry_t));
 
   pml_entry->name = strdup(name);
   pml_entry->len  = strlen(name);
@@ -329,7 +329,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
       bufsize += len+1;
     }
 
-  parbuf = (char*) malloc(bufsize*sizeof(char));
+  parbuf = (char*) Malloc(bufsize*sizeof(char));
   memset(parbuf, 0, bufsize*sizeof(char));
 
   istart = 0;
@@ -386,7 +386,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
 
  END_LABEL:
 
-  free(parbuf);
+  Free(parbuf);
 
   return (status);
 }
@@ -639,7 +639,7 @@ void *Select(void *argument)
 
 	  vlistClearFlag(vlistID1);
 	  nvars = vlistNvars(vlistID1);
-	  vars  = (int*) malloc(nvars*sizeof(int));
+	  vars  = (int*) Malloc(nvars*sizeof(int));
 
 	  if ( operatorID == DELETE )
 	    {
@@ -868,7 +868,7 @@ void *Select(void *argument)
 	    {
 	      gridsize = vlistGridsizeMax(vlistID1);
 	      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-	      array = (double*) malloc(gridsize*sizeof(double));
+	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
 
 	  startdate = par_startdate[0];
@@ -1047,8 +1047,8 @@ void *Select(void *argument)
 
   pmlDestroy(pml);
 
-  if ( array ) free(array);
-  if ( vars ) free(vars);
+  if ( array ) Free(array);
+  if ( vars ) Free(vars);
 
   if ( tsID2 == 0 ) cdoAbort("No timesteps selected!");
 

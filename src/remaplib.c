@@ -84,26 +84,26 @@ double intlin(double x, double y1, double x1, double y2, double x2);
 
 void remapGridFree(remapgrid_t *grid)
 {
-  if ( grid->vgpm ) free(grid->vgpm);
-  if ( grid->mask ) free(grid->mask);
+  if ( grid->vgpm ) Free(grid->vgpm);
+  if ( grid->mask ) Free(grid->mask);
 
-  if ( grid->reg2d_center_lat ) free(grid->reg2d_center_lat);
-  if ( grid->reg2d_center_lon ) free(grid->reg2d_center_lon);
-  if ( grid->reg2d_corner_lat ) free(grid->reg2d_corner_lat);
-  if ( grid->reg2d_corner_lon ) free(grid->reg2d_corner_lon);
+  if ( grid->reg2d_center_lat ) Free(grid->reg2d_center_lat);
+  if ( grid->reg2d_center_lon ) Free(grid->reg2d_center_lon);
+  if ( grid->reg2d_corner_lat ) Free(grid->reg2d_corner_lat);
+  if ( grid->reg2d_corner_lon ) Free(grid->reg2d_corner_lon);
 
-  if ( grid->cell_center_lat ) free(grid->cell_center_lat);
-  if ( grid->cell_center_lon ) free(grid->cell_center_lon);
-  if ( grid->cell_corner_lat ) free(grid->cell_corner_lat);
-  if ( grid->cell_corner_lon ) free(grid->cell_corner_lon);
+  if ( grid->cell_center_lat ) Free(grid->cell_center_lat);
+  if ( grid->cell_center_lon ) Free(grid->cell_center_lon);
+  if ( grid->cell_corner_lat ) Free(grid->cell_corner_lat);
+  if ( grid->cell_corner_lon ) Free(grid->cell_corner_lon);
 
-  if ( grid->cell_area ) free(grid->cell_area);
-  if ( grid->cell_frac ) free(grid->cell_frac);
+  if ( grid->cell_area ) Free(grid->cell_area);
+  if ( grid->cell_frac ) Free(grid->cell_frac);
 
-  if ( grid->cell_bound_box ) free(grid->cell_bound_box);
+  if ( grid->cell_bound_box ) Free(grid->cell_bound_box);
 
-  if ( grid->bin_addr ) free(grid->bin_addr);
-  if ( grid->bin_lats ) free(grid->bin_lats);
+  if ( grid->bin_addr ) Free(grid->bin_addr);
+  if ( grid->bin_lats ) Free(grid->bin_lats);
 
 } /* remapGridFree */
 
@@ -118,9 +118,9 @@ void remapVarsFree(remapvars_t *rv)
       rv->pinit    = FALSE;
       rv->sort_add = FALSE;
 
-      if ( rv->src_cell_add ) free(rv->src_cell_add);
-      if ( rv->tgt_cell_add ) free(rv->tgt_cell_add);
-      if ( rv->wts ) free(rv->wts);
+      if ( rv->src_cell_add ) Free(rv->src_cell_add);
+      if ( rv->tgt_cell_add ) Free(rv->tgt_cell_add);
+      if ( rv->wts ) Free(rv->wts);
 
       if ( rv->links.option == TRUE )
 	{
@@ -128,17 +128,17 @@ void remapVarsFree(remapvars_t *rv)
 
 	  if ( rv->links.num_blks )
 	    {
-	      free(rv->links.num_links);
+	      Free(rv->links.num_links);
 	      num_blks = rv->links.num_blks;
 	      for ( i = 0; i < num_blks; ++i )
 		{
-		  free(rv->links.src_add[i]);
-		  free(rv->links.dst_add[i]);
-		  free(rv->links.w_index[i]);
+		  Free(rv->links.src_add[i]);
+		  Free(rv->links.dst_add[i]);
+		  Free(rv->links.w_index[i]);
 		}
-	      free(rv->links.src_add);
-	      free(rv->links.dst_add);
-	      free(rv->links.w_index);
+	      Free(rv->links.src_add);
+	      Free(rv->links.dst_add);
+	      Free(rv->links.w_index);
 	    }
 	}
     }
@@ -189,23 +189,23 @@ void remapGridRealloc(int map_type, remapgrid_t *grid)
   long nalloc;
 
   if ( grid->nvgp )
-    grid->vgpm   = (int*) realloc(grid->vgpm, grid->nvgp*sizeof(int));
+    grid->vgpm   = (int*) Realloc(grid->vgpm, grid->nvgp*sizeof(int));
 
-  grid->mask     = (int*) realloc(grid->mask, grid->size*sizeof(int));
+  grid->mask     = (int*) Realloc(grid->mask, grid->size*sizeof(int));
 
   if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
-      grid->cell_center_lon = (double*) realloc(grid->cell_center_lon, grid->size*sizeof(double));
-      grid->cell_center_lat = (double*) realloc(grid->cell_center_lat, grid->size*sizeof(double));
+      grid->cell_center_lon = (double*) Realloc(grid->cell_center_lon, grid->size*sizeof(double));
+      grid->cell_center_lat = (double*) Realloc(grid->cell_center_lat, grid->size*sizeof(double));
     }
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
     {
-      grid->cell_area = (double*) realloc(grid->cell_area, grid->size*sizeof(double));
+      grid->cell_area = (double*) Realloc(grid->cell_area, grid->size*sizeof(double));
       memset(grid->cell_area, 0, grid->size*sizeof(double));
     }
 
-  grid->cell_frac = (double*) realloc(grid->cell_frac, grid->size*sizeof(double));
+  grid->cell_frac = (double*) Realloc(grid->cell_frac, grid->size*sizeof(double));
   memset(grid->cell_frac, 0, grid->size*sizeof(double));
 
   if ( grid->lneed_cell_corners )
@@ -218,10 +218,10 @@ void remapGridRealloc(int map_type, remapgrid_t *grid)
 	{
 	  nalloc = grid->num_cell_corners*grid->size;
 
-	  grid->cell_corner_lon = (double*) realloc(grid->cell_corner_lon, nalloc*sizeof(double));
+	  grid->cell_corner_lon = (double*) Realloc(grid->cell_corner_lon, nalloc*sizeof(double));
 	  memset(grid->cell_corner_lon, 0, nalloc*sizeof(double));
 
-	  grid->cell_corner_lat = (double*) realloc(grid->cell_corner_lat, nalloc*sizeof(double));  
+	  grid->cell_corner_lat = (double*) Realloc(grid->cell_corner_lat, nalloc*sizeof(double));  
 	  memset(grid->cell_corner_lat, 0, nalloc*sizeof(double));
 	}
     }
@@ -452,21 +452,18 @@ static
 int expand_lonlat_grid(int gridID)
 {
   char units[CDI_MAX_NAME];
-  int gridIDnew;
-  long nx, ny, nxp4, nyp4;
-  double *xvals, *yvals;
 
-  nx = gridInqXsize(gridID);
-  ny = gridInqYsize(gridID);
-  nxp4 = nx+4;
-  nyp4 = ny+4;
+  long nx = gridInqXsize(gridID);
+  long ny = gridInqYsize(gridID);
+  long nxp4 = nx+4;
+  long nyp4 = ny+4;
 
-  xvals = (double*) malloc(nxp4*sizeof(double));
-  yvals = (double*) malloc(nyp4*sizeof(double));
+  double *xvals = (double*) Malloc(nxp4*sizeof(double));
+  double *yvals = (double*) Malloc(nyp4*sizeof(double));
   gridInqXvals(gridID, xvals+2);
   gridInqYvals(gridID, yvals+2);
 
-  gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
+  int gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
   gridDefXsize(gridIDnew, nxp4);
   gridDefYsize(gridIDnew, nyp4);
 	      
@@ -488,8 +485,8 @@ int expand_lonlat_grid(int gridID)
   gridDefXvals(gridIDnew, xvals);
   gridDefYvals(gridIDnew, yvals);
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
   if ( gridIsRotated(gridID) )
     {
@@ -498,32 +495,28 @@ int expand_lonlat_grid(int gridID)
       gridDefAngle(gridIDnew, gridInqAngle(gridID));
     }
 
-  return(gridIDnew);
+  return gridIDnew;
 }
 
 static
 int expand_curvilinear_grid(int gridID)
 {
   char units[CDI_MAX_NAME];
-  int gridIDnew;
-  long gridsize, gridsize_new;
-  long nx, ny, nxp4, nyp4;
   long i, j;
-  double *xvals, *yvals;
 
-  gridsize = gridInqSize(gridID);
-  nx = gridInqXsize(gridID);
-  ny = gridInqYsize(gridID);
-  nxp4 = nx+4;
-  nyp4 = ny+4;
-  gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
+  long gridsize = gridInqSize(gridID);
+  long nx = gridInqXsize(gridID);
+  long ny = gridInqYsize(gridID);
+  long nxp4 = nx+4;
+  long nyp4 = ny+4;
+  int gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
 
-  xvals = (double*) malloc(gridsize_new*sizeof(double));
-  yvals = (double*) malloc(gridsize_new*sizeof(double));
+  double *xvals = (double*) Malloc(gridsize_new*sizeof(double));
+  double *yvals = (double*) Malloc(gridsize_new*sizeof(double));
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
-  gridIDnew = gridCreate(GRID_CURVILINEAR, nxp4*nyp4);
+  int gridIDnew = gridCreate(GRID_CURVILINEAR, nxp4*nyp4);
   gridDefXsize(gridIDnew, nxp4);
   gridDefYsize(gridIDnew, nyp4);
 
@@ -579,10 +572,10 @@ int expand_curvilinear_grid(int gridID)
   gridDefXvals(gridIDnew, xvals);
   gridDefYvals(gridIDnew, yvals);
   
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 
-  return(gridIDnew);
+  return gridIDnew;
 }
 
 /*****************************************************************************/
@@ -606,22 +599,20 @@ static
 void remap_define_reg2d(int gridID, remapgrid_t *grid)
 {
   char unitstr[CDI_MAX_NAME];
-  long nx, nxm, ny;
-  long nxp1, nyp1;
 
-  nx = grid->dims[0];
-  ny = grid->dims[1];
+  long nx = grid->dims[0];
+  long ny = grid->dims[1];
 
-  nxp1 = nx + 1;
-  nyp1 = ny + 1;
+  long nxp1 = nx + 1;
+  long nyp1 = ny + 1;
 
-  nxm = nx;
+  long nxm = nx;
   if ( grid->is_cyclic ) nxm++;
 
   if ( grid->size != nx*ny ) cdoAbort("Internal error, wrong dimensions!");
 
-  grid->reg2d_center_lon = (double*) realloc(grid->reg2d_center_lon, nxm*sizeof(double));
-  grid->reg2d_center_lat = (double*) realloc(grid->reg2d_center_lat,  ny*sizeof(double));
+  grid->reg2d_center_lon = (double*) Realloc(grid->reg2d_center_lon, nxm*sizeof(double));
+  grid->reg2d_center_lat = (double*) Realloc(grid->reg2d_center_lat,  ny*sizeof(double));
  
   grid->reg2d_center_lon[0] = 0;
   grid->reg2d_center_lat[0] = 0;
@@ -637,8 +628,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 
   if ( grid->is_cyclic ) grid->reg2d_center_lon[nx] = grid->reg2d_center_lon[0] + PI2;
 
-  grid->reg2d_corner_lon = (double*) malloc(nxp1*sizeof(double));
-  grid->reg2d_corner_lat = (double*) malloc(nyp1*sizeof(double));
+  grid->reg2d_corner_lon = (double*) Malloc(nxp1*sizeof(double));
+  grid->reg2d_corner_lat = (double*) Malloc(nyp1*sizeof(double));
 
   grid_gen_corners(nx, grid->reg2d_center_lon, grid->reg2d_corner_lon);
   grid_gen_corners(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
@@ -711,11 +702,11 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 
   if ( gridInqMask(gridID, NULL) )
     {
-      int *mask = (int*) malloc(gridsize*sizeof(int));
+      int *mask = (int*) Malloc(gridsize*sizeof(int));
       gridInqMask(gridID, mask);
       for ( i = 0; i < gridsize; ++i )
 	if ( mask[i] == 0 ) grid->mask[i] = FALSE;
-      free(mask);
+      Free(mask);
     }
 
   if ( remap_write_remap == FALSE && grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
@@ -786,7 +777,7 @@ static
 void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 {
   if ( remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->luse_cell_corners )
-    grid->cell_bound_box = (restr_t*) realloc(grid->cell_bound_box, 4*grid->size*sizeof(restr_t));
+    grid->cell_bound_box = (restr_t*) Realloc(grid->cell_bound_box, 4*grid->size*sizeof(restr_t));
 
   if ( grid->luse_cell_corners )
     {
@@ -1028,10 +1019,10 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   /*  Allocate address and weight arrays for mapping 1 */
   if ( map_type == MAP_TYPE_CONSERV )
     {
-      rv->src_cell_add = (int*) realloc(rv->src_cell_add, rv->max_links*sizeof(int));
-      rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
+      rv->src_cell_add = (int*) Realloc(rv->src_cell_add, rv->max_links*sizeof(int));
+      rv->tgt_cell_add = (int*) Realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
 
-      rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
+      rv->wts = (double*) Realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
     }
 
   rv->links.option    = FALSE;
@@ -1062,10 +1053,10 @@ void resize_remap_vars(remapvars_t *rv, int increment)
 
   if ( rv->max_links )
     {
-      rv->src_cell_add = (int*) realloc(rv->src_cell_add, rv->max_links*sizeof(int));
-      rv->tgt_cell_add = (int*) realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
+      rv->src_cell_add = (int*) Realloc(rv->src_cell_add, rv->max_links*sizeof(int));
+      rv->tgt_cell_add = (int*) Realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
 
-      rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
+      rv->wts = (double*) Realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
     }
 
 } /* resize_remap_vars */
@@ -1187,14 +1178,14 @@ long get_max_add(long num_links, long size, const int *restrict add)
   long max_add;
   int *isum;
 
-  isum = (int*) malloc(size*sizeof(int));
+  isum = (int*) Malloc(size*sizeof(int));
   memset(isum, 0, size*sizeof(int));
 
   for ( n = 0; n < num_links; ++n ) isum[add[n]]++;
 
   max_add = 0;
   for ( i = 0; i < size; ++i ) if ( isum[i] > max_add ) max_add = isum[i];
-  free(isum);
+  Free(isum);
 
   return (max_add);
 }
@@ -1266,16 +1257,16 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #if defined(_OPENMP)
-  src_cls2 = (double **) malloc(ompNumThreads*sizeof(double *));
-  src_wts2 = (double **) malloc(ompNumThreads*sizeof(double *));
+  src_cls2 = (double **) Malloc(ompNumThreads*sizeof(double *));
+  src_wts2 = (double **) Malloc(ompNumThreads*sizeof(double *));
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      src_cls2[i] = (double*) malloc(max_cls*sizeof(double));
-      src_wts2[i] = (double*) malloc(max_cls*sizeof(double));
+      src_cls2[i] = (double*) Malloc(max_cls*sizeof(double));
+      src_wts2[i] = (double*) Malloc(max_cls*sizeof(double));
     }
 #else
-  src_cls = (double*) malloc(max_cls*sizeof(double));
-  src_wts = (double*) malloc(max_cls*sizeof(double));
+  src_cls = (double*) Malloc(max_cls*sizeof(double));
+  src_wts = (double*) Malloc(max_cls*sizeof(double));
 #endif
 
   for ( n = 0; n < num_links; ++n )
@@ -1372,15 +1363,15 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 #if defined(_OPENMP)
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      free(src_cls2[i]);
-      free(src_wts2[i]);
+      Free(src_cls2[i]);
+      Free(src_wts2[i]);
     }
 
-  free(src_cls2);
-  free(src_wts2);
+  Free(src_cls2);
+  Free(src_wts2);
 #else
-  free(src_cls);
-  free(src_wts);
+  Free(src_cls);
+  Free(src_wts);
 #endif
 }
 
@@ -1510,7 +1501,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   cdoPrint("number of sparse matrix entries %d", rv.num_links);
   cdoPrint("total number of dest cells %d", tgt_grid.size);
 
-  tgt_count = (int*) malloc(tgt_grid.size*sizeof(int));
+  tgt_count = (int*) Malloc(tgt_grid.size*sizeof(int));
 
   for ( n = 0; n < tgt_grid.size; ++n ) tgt_count[n] = 0;
 
@@ -1555,7 +1546,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 	}
     }
 
-  free(tgt_count);
+  Free(tgt_count);
 
   if ( rv.sort_add )
     cdoPrint("Sparse matrix entries are explicitly sorted.");
@@ -1802,17 +1793,17 @@ void reorder_links(remapvars_t *rv)
 
       printf("num_links %ld  max_links %ld  num_blks %ld\n", rv->num_links, max_links, num_blks);
 
-      rv->links.num_links = (int*) malloc(num_blks*sizeof(int));
-      rv->links.dst_add   = (int **) malloc(num_blks*sizeof(int *));
-      rv->links.src_add   = (int **) malloc(num_blks*sizeof(int *));
-      rv->links.w_index   = (int **) malloc(num_blks*sizeof(int *));
+      rv->links.num_links = (int*) Malloc(num_blks*sizeof(int));
+      rv->links.dst_add   = (int **) Malloc(num_blks*sizeof(int *));
+      rv->links.src_add   = (int **) Malloc(num_blks*sizeof(int *));
+      rv->links.w_index   = (int **) Malloc(num_blks*sizeof(int *));
     }
 
   for ( j = 0; j < num_blks; j++ )
     {
-      rv->links.dst_add[j] = (int*) malloc(max_links*sizeof(int));
-      rv->links.src_add[j] = (int*) malloc(max_links*sizeof(int));
-      rv->links.w_index[j] = (int*) malloc(max_links*sizeof(int));
+      rv->links.dst_add[j] = (int*) Malloc(max_links*sizeof(int));
+      rv->links.src_add[j] = (int*) Malloc(max_links*sizeof(int));
+      rv->links.w_index[j] = (int*) Malloc(max_links*sizeof(int));
     }
 
   for ( j = 0; j < num_blks; j++ )

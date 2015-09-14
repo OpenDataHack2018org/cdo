@@ -101,9 +101,9 @@ int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *t
 {
   int status = 0;
   int i;
-  double *levels  = (double *) malloc(nlev*sizeof(double));
-  double *lbounds = (double *) malloc(nlev*sizeof(double));
-  double *ubounds = (double *) malloc(nlev*sizeof(double));
+  double *levels  = (double *) Malloc(nlev*sizeof(double));
+  double *lbounds = (double *) Malloc(nlev*sizeof(double));
+  double *ubounds = (double *) Malloc(nlev*sizeof(double));
 
   zaxisInqLevels(zaxisID, levels);
   if ( genbounds )
@@ -146,9 +146,9 @@ int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *t
 	printf("   %3d  %6g  %6g/%-6g  %6g  %6g\n", i+1, levels[i], lbounds[i], ubounds[i], thickness[i], weights[i]);
     }
 
-  free(levels);
-  free(lbounds);
-  free(ubounds);
+  Free(levels);
+  Free(lbounds);
+  Free(ubounds);
 
   return status;
 }
@@ -243,8 +243,8 @@ void *Vertstat(void *argument)
 	  // if ( nlev > 1 )
 	    {
 	      vert[index].numlevel = nlev;
-	      vert[index].thickness = (double *) malloc(nlev*sizeof(double));
-	      vert[index].weights = (double *) malloc(nlev*sizeof(double));
+	      vert[index].thickness = (double *) Malloc(nlev*sizeof(double));
+	      vert[index].weights = (double *) Malloc(nlev*sizeof(double));
 	      vert[index].status = getLayerThickness(genbounds, index, zaxisID, nlev, vert[index].thickness, vert[index].weights); 
 	    }
 	}
@@ -258,13 +258,13 @@ void *Vertstat(void *argument)
 
   field_t field;
   field_init(&field);
-  field.ptr = (double*) malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  field_t *vars1 = (field_t*) malloc(nvars*sizeof(field_t));
-  field_t *samp1 = (field_t*) malloc(nvars*sizeof(field_t));
+  field_t *vars1 = (field_t*) Malloc(nvars*sizeof(field_t));
+  field_t *samp1 = (field_t*) Malloc(nvars*sizeof(field_t));
   field_t *vars2 = NULL;
   if ( lvarstd )
-    vars2 = (field_t*) malloc(nvars*sizeof(field_t));
+    vars2 = (field_t*) Malloc(nvars*sizeof(field_t));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -280,7 +280,7 @@ void *Vertstat(void *argument)
       vars1[varID].nsamp   = 0;
       vars1[varID].nmiss   = 0;
       vars1[varID].missval = missval;
-      vars1[varID].ptr     = (double*) malloc(gridsize*sizeof(double));
+      vars1[varID].ptr     = (double*) Malloc(gridsize*sizeof(double));
       samp1[varID].grid    = gridID;
       samp1[varID].nmiss   = 0;
       samp1[varID].missval = missval;
@@ -291,7 +291,7 @@ void *Vertstat(void *argument)
 	  vars2[varID].grid    = gridID;
 	  vars2[varID].nmiss   = 0;
 	  vars2[varID].missval = missval;
-	  vars2[varID].ptr     = (double*) malloc(gridsize*sizeof(double));
+	  vars2[varID].ptr     = (double*) Malloc(gridsize*sizeof(double));
 	}
     }
 
@@ -358,7 +358,7 @@ void *Vertstat(void *argument)
 	      if ( nmiss > 0 || samp1[varID].ptr || needWeights )
 		{
 		  if ( samp1[varID].ptr == NULL )
-		    samp1[varID].ptr = (double *) malloc(gridsize*sizeof(double));
+		    samp1[varID].ptr = (double *) Malloc(gridsize*sizeof(double));
 
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[varID].ptr[i], vars1[varID].missval) )
@@ -380,7 +380,7 @@ void *Vertstat(void *argument)
 		{
 		  if ( samp1[varID].ptr == NULL )
 		    {
-		      samp1[varID].ptr = (double*) malloc(gridsize*sizeof(double));
+		      samp1[varID].ptr = (double*) Malloc(gridsize*sizeof(double));
 		      for ( i = 0; i < gridsize; i++ )
 			samp1[varID].ptr[i] = vars1[varID].nsamp;
 		    }
@@ -450,20 +450,20 @@ void *Vertstat(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(vars1[varID].ptr);
-      if ( samp1[varID].ptr ) free(samp1[varID].ptr);
-      if ( lvarstd ) free(vars2[varID].ptr);
+      Free(vars1[varID].ptr);
+      if ( samp1[varID].ptr ) Free(samp1[varID].ptr);
+      if ( lvarstd ) Free(vars2[varID].ptr);
     }
 
-  free(vars1);
-  free(samp1);
-  if ( lvarstd ) free(vars2);
+  Free(vars1);
+  Free(samp1);
+  if ( lvarstd ) Free(vars2);
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
   if ( needWeights )
     for ( int index = 0; index < nzaxis; ++index )
-      if ( vert[index].numlevel > 1 )  free(vert[index].weights);
+      if ( vert[index].numlevel > 1 )  Free(vert[index].weights);
 
   streamClose(streamID2);
   streamClose(streamID1);

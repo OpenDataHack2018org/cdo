@@ -61,7 +61,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
       if ( nlev1 > mlev1 )
 	{
 	  mlev1 = nlev1;
-	  lev1 = (double*) realloc(lev1, mlev1*sizeof(double));
+	  lev1 = (double*) Realloc(lev1, mlev1*sizeof(double));
 	}
       zaxisInqLevels(zaxisID1, lev1);
 
@@ -80,7 +80,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 	      if ( nlev2 > mlev2 )
 		{
 		  mlev2 = nlev2;
-		  lev2 = (double*) realloc(lev2, mlev2*sizeof(double));
+		  lev2 = (double*) Realloc(lev2, mlev2*sizeof(double));
 		}
 	      zaxisInqLevels(zaxisID2, lev2);
 
@@ -110,8 +110,8 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 	}
     }
 
-  if ( lev1 ) free(lev1);
-  if ( lev2 ) free(lev2);
+  if ( lev1 ) Free(lev1);
+  if ( lev2 ) Free(lev2);
 }
 /*
 static
@@ -170,10 +170,10 @@ void *Merge(void *argument)
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  int *streamIDs = (int*) malloc(nmerge*sizeof(int));
-  int *vlistIDs  = (int*) malloc(nmerge*sizeof(int));
-  int *numrecs   = (int*) malloc(nmerge*sizeof(int));
-  int *numsteps  = (int*) malloc(nmerge*sizeof(int));
+  int *streamIDs = (int*) Malloc(nmerge*sizeof(int));
+  int *vlistIDs  = (int*) Malloc(nmerge*sizeof(int));
+  int *numrecs   = (int*) Malloc(nmerge*sizeof(int));
+  int *numsteps  = (int*) Malloc(nmerge*sizeof(int));
 
   for ( index = 0; index < nmerge; index++ )
     {
@@ -236,7 +236,7 @@ void *Merge(void *argument)
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID2);
-      array = (double*) malloc(gridsize*sizeof(double));
+      array = (double*) Malloc(gridsize*sizeof(double));
     }
 
   int firstindex = 0;
@@ -336,13 +336,13 @@ void *Merge(void *argument)
 
   vlistDestroy(vlistID2);
 
-  if ( streamIDs ) free(streamIDs);
-  if ( vlistIDs  ) free(vlistIDs);
-  if ( numrecs   ) free(numrecs);
-  if ( numsteps  ) free(numsteps);
+  if ( streamIDs ) Free(streamIDs);
+  if ( vlistIDs  ) Free(vlistIDs);
+  if ( numrecs   ) Free(numrecs);
+  if ( numsteps  ) Free(numsteps);
  
   if ( ! lcopy )
-    if ( array ) free(array);
+    if ( array ) Free(array);
 
   cdoFinish();
 

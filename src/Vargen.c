@@ -92,8 +92,8 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
 void remap_nn_reg2d(int nx, int ny, double *restrict data, int gridID, double *array)
 {
   int gridsize = gridInqSize(gridID);
-  double *xvals = (double*) malloc(gridsize*sizeof(double));
-  double *yvals = (double*) malloc(gridsize*sizeof(double));
+  double *xvals = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
   if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
 
@@ -125,8 +125,8 @@ void remap_nn_reg2d(int nx, int ny, double *restrict data, int gridID, double *a
       array[i] = data[jj*nx+ii];
     }
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 }
 
 
@@ -307,12 +307,12 @@ void *Vargen(void *argument)
 
   int gridsize = gridInqSize(gridID);
   int datasize = gridsize;
-  double *array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
   double *data = array;
   if ( gridID != gridIDdata && gridIDdata != -1 )
     {
       datasize = gridInqSize(gridIDdata);
-      data = (double*) malloc(datasize*sizeof(double));
+      data = (double*) Malloc(datasize*sizeof(double));
     }
   
   if ( operatorID == FOR )
@@ -350,8 +350,8 @@ void *Vargen(void *argument)
                 }
               else if ( operatorID == SINCOS || operatorID == COSHILL )
                 {
-		  double *xvals = (double*) malloc(gridsize*sizeof(double));
-		  double *yvals = (double*) malloc(gridsize*sizeof(double));
+		  double *xvals = (double*) Malloc(gridsize*sizeof(double));
+		  double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
 		  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
 
@@ -379,8 +379,8 @@ void *Vargen(void *argument)
 			array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 		    }
 
-		  free(xvals);
-		  free(yvals);
+		  Free(xvals);
+		  Free(yvals);
 		}
               else if ( operatorID == CONST )
                 {
@@ -437,9 +437,9 @@ void *Vargen(void *argument)
 
   vlistDestroy(vlistID);
 
-  if ( gridID != gridIDdata && gridIDdata != -1 ) free(data);
-  if ( array ) free(array);
-  if ( levels ) free(levels); 
+  if ( gridID != gridIDdata && gridIDdata != -1 ) Free(data);
+  if ( array ) Free(array);
+  if ( levels ) Free(levels); 
 
   cdoFinish();
 

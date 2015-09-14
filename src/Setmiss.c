@@ -133,7 +133,7 @@ void *Setmiss(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  double *array = (double*) malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -222,7 +222,7 @@ void *Setmiss(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array ) free(array);
+  if ( array ) Free(array);
 
   cdoFinish();
 

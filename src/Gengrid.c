@@ -61,9 +61,9 @@ void *Gengrid(void *argument)
   xsize = gridInqXsize(gridID1);
   ysize = gridInqYsize(gridID1);
 
-  array1 = (double*) malloc(gridsize*sizeof(double));
-  array2 = (double*) malloc(gridsize*sizeof(double));
-  array3 = (double*) malloc(gridsize*sizeof(double));
+  array1 = (double*) Malloc(gridsize*sizeof(double));
+  array2 = (double*) Malloc(gridsize*sizeof(double));
+  array3 = (double*) Malloc(gridsize*sizeof(double));
 
   streamInqRecord(streamID1, &varID, &levelID);
   streamReadRecord(streamID1, array1, &nmiss1);
@@ -150,9 +150,9 @@ void *Gengrid(void *argument)
 
   streamClose(streamID3);
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
-  if ( array3 ) free(array3);
+  if ( array1 ) Free(array1);
+  if ( array2 ) Free(array2);
+  if ( array3 ) Free(array3);
 
   cdoFinish();
 

@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include "cdo_int.h"
 
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	/* pi */
@@ -758,7 +756,7 @@ void glo_coor(double *pxn, double *prlon, double *prlat,
    * icosahedral triangles into mni equal parts.                 
    */  
 
-  if ( (mcosv = (int*) malloc(knd*sizeof(int))) == NULL ) 
+  if ( (mcosv = (int*) Malloc(knd*sizeof(int))) == NULL ) 
     {
       perror("malloc mcosv");
       exit (-1);
@@ -977,7 +975,7 @@ void glo_coor(double *pxn, double *prlon, double *prlat,
         }
     }
   
-  free(mcosv);
+  Free(mcosv);
   
   return;
 } /* glo_coor */
@@ -1341,9 +1339,9 @@ void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
       exit (-1);
     }
 
-  xn    = (double*) malloc(gridsize*3*sizeof(double));
-  rlonx = (double*) malloc((ni+3)*(ni+3)*nd*sizeof(double));
-  rlatx = (double*) malloc((ni+3)*(ni+3)*nd*sizeof(double));
+  xn    = (double*) Malloc(gridsize*3*sizeof(double));
+  rlonx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double));
+  rlatx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double));
 
   im1s = 0;
   im1e = ni;
@@ -1361,7 +1359,7 @@ void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
     {
       struct polygon *poly;
       
-      poly  = (struct polygon*) malloc((ni+1)*(ni+1)*nd*sizeof(struct polygon));
+      poly  = (struct polygon*) Malloc((ni+1)*(ni+1)*nd*sizeof(struct polygon));
 
       neighbours(rlonx,rlatx,im1s-1,im1e+1,im2s-1,im2e+1,nd, poly,im1s,im1e,im2s,im2e,nd);
 
@@ -1381,12 +1379,12 @@ void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
 	    }
 	}
       
-      free(poly);
+      Free(poly);
     }
 
-  free(rlatx);
-  free(rlonx);
-  free(xn);
+  Free(rlatx);
+  Free(rlonx);
+  Free(xn);
 }
 
 /*
@@ -1415,42 +1413,42 @@ int main(int argc, char *argv[])
 
   factorni(ni, &ni2, &ni3);  
 
-  if (( poly  = (struct polygon*) malloc((ni+1)*(ni+1)*nd*sizeof(struct polygon))) == NULL) {
+  if (( poly  = (struct polygon*) Malloc((ni+1)*(ni+1)*nd*sizeof(struct polygon))) == NULL) {
     perror("malloc poly");
     exit (-1);
   } 
   
-  if (( xn  = (double*) malloc((ni+1)*(ni+1)*3*nd*sizeof(double))) == NULL) {
+  if (( xn  = (double*) Malloc((ni+1)*(ni+1)*3*nd*sizeof(double))) == NULL) {
     perror("malloc xn");
     exit (-1);
   } 
   
-  if ((rlon = (double*) malloc((ni+1)*(ni+1)*nd*sizeof(double))) == NULL) {
+  if ((rlon = (double*) Malloc((ni+1)*(ni+1)*nd*sizeof(double))) == NULL) {
     perror("malloc rlon");
     exit (-1);
   } 
   
-  if ((rlat = (double*) malloc((ni+1)*(ni+1)*nd*sizeof(double))) == NULL) {
+  if ((rlat = (double*) Malloc((ni+1)*(ni+1)*nd*sizeof(double))) == NULL) {
     perror("malloc rlat");
     exit (-1);
   } 
 
-  if ((rlonx = (double*) malloc((ni+3)*(ni+3)*nd*sizeof(double))) == NULL) {
+  if ((rlonx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double))) == NULL) {
     perror("malloc rlonx");
     exit (-1);
   } 
   
-  if ((rlatx = (double*) malloc((ni+3)*(ni+3)*nd*sizeof(double))) == NULL) {
+  if ((rlatx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double))) == NULL) {
     perror("malloc rlatx");
     exit (-1);
   } 
 
-  if ((mask = (int*) malloc((ni+1)*(ni+1)*nd*sizeof(int))) == NULL) {
+  if ((mask = (int*) Malloc((ni+1)*(ni+1)*nd*sizeof(int))) == NULL) {
     perror("malloc mask");
     exit (-1);
   } 
 
-  if (( area  = (double*) malloc((ni+1)*(ni+1)*nd*sizeof(double))) == NULL) {
+  if (( area  = (double*) Malloc((ni+1)*(ni+1)*nd*sizeof(double))) == NULL) {
     perror("malloc area");
     exit (-1);
   } 
@@ -1577,14 +1575,14 @@ int main(int argc, char *argv[])
     }
   }
 
-  free(poly);
-  free(xn);
-  free(rlon);
-  free(rlat);
-  free(rlonx);
-  free(rlatx);
-  free(mask);
-  free(area);
+  Free(poly);
+  Free(xn);
+  Free(rlon);
+  Free(rlat);
+  Free(rlonx);
+  Free(rlatx);
+  Free(mask);
+  Free(area);
 
   return(0);
 }

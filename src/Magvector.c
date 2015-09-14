@@ -113,7 +113,7 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		  fprintf(stderr,"STEP FREQ %d\n",STEP_FREQ );
 	      }
 	      
-	    free( split_str );  
+	    Free( split_str );  
 	  }
 	  
         if( nlon > 1 )
@@ -291,10 +291,10 @@ void *Magvector(void *argument)
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
 
-  uarray          = (double*) malloc(gridsize*sizeof(double));
-  varray          = (double*) malloc(gridsize*sizeof(double));
-  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
-  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
+  uarray          = (double*) Malloc(gridsize*sizeof(double));
+  varray          = (double*) Malloc(gridsize*sizeof(double));
+  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
@@ -410,10 +410,10 @@ void *Magvector(void *argument)
 
   streamClose(streamID);
 
-  if ( uarray  ) free(uarray);
-  if ( varray  ) free(varray);
-  if ( grid_center_lon ) free(grid_center_lon);
-  if ( grid_center_lat ) free(grid_center_lat);
+  if ( uarray  ) Free(uarray);
+  if ( varray  ) Free(varray);
+  if ( grid_center_lon ) Free(grid_center_lon);
+  if ( grid_center_lat ) Free(grid_center_lat);
 
   /*   quit_XMLtemplate_parser( ); */
 

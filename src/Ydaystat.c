@@ -98,14 +98,14 @@ void *Ydaystat(void *argument)
   int nvars    = vlistNvars(vlistID1);
   int nrecords = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
   field_t field;
   field_init(&field);
-  field.ptr = (double*) malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
   int otsID = 0;
@@ -157,7 +157,7 @@ void *Ydaystat(void *argument)
 	      if ( nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
 		{
 		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
-		    samp1[dayoy][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+		    samp1[dayoy][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[dayoy][varID][levelID].ptr[i],
@@ -177,7 +177,7 @@ void *Ydaystat(void *argument)
 		{
 		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
 		    {
-		      samp1[dayoy][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
+		      samp1[dayoy][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 		      for ( i = 0; i < gridsize; i++ )
 			samp1[dayoy][varID][levelID].ptr[i] = nsets[dayoy];
 		    }
@@ -297,10 +297,10 @@ void *Ydaystat(void *argument)
 	}
     }
 
-  if ( field.ptr ) free(field.ptr);
+  if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( recVarID   ) Free(recVarID);
+  if ( recLevelID ) Free(recLevelID);
 
   streamClose(streamID2);
   streamClose(streamID1);

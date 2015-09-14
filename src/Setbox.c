@@ -125,7 +125,7 @@ void *Setbox(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   nvars = vlistNvars(vlistID1);
-  vars  = (int*) malloc(nvars*sizeof(int));
+  vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( gridID == vlistInqVarGrid(vlistID1, varID) )
@@ -139,7 +139,7 @@ void *Setbox(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = gridInqSize(gridID);
-  array = (double*) malloc(gridsize*sizeof(double));
+  array = (double*) Malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -173,8 +173,8 @@ void *Setbox(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( vars  ) free(vars);
-  if ( array ) free(array);
+  if ( vars  ) Free(vars);
+  if ( array ) Free(array);
 
   cdoFinish();
 

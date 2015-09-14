@@ -24,9 +24,13 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <math.h>
 #include <float.h>
+#include <ctype.h>
+#include <stdarg.h>
 
 #include "compare.h"
 #include "timebase.h"
@@ -54,7 +58,7 @@ char *strdup(const char *s);
 ({					      	  \
    const char *__old = (s);			  \
    size_t __len = strlen(__old) + 1;		  \
-   char *__new = malloc(__len);	  \
+   char *__new = Malloc(__len);	  \
    (char *) memcpy(__new, __old, __len);	  \
 })
 */
@@ -137,8 +141,6 @@ void openUnlock(void);
 int  cdf_openread(const char *filename);
 
 void printFiletype(int streamID, int vlistID);
-
-void job_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath);
 
 void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval);
 

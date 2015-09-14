@@ -162,8 +162,8 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
   double *gxhelp, *gyhelp;
 
   gridsizex = (nlon+2)*nlat;
-  gxhelp  = (double*) malloc(gridsizex*sizeof(double));
-  gyhelp  = (double*) malloc(gridsizex*sizeof(double));
+  gxhelp  = (double*) Malloc(gridsizex*sizeof(double));
+  gyhelp  = (double*) Malloc(gridsizex*sizeof(double));
 
   /* load to a help field */
   for ( j = 0; j < nlat; j++ )
@@ -252,8 +252,8 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 	/* printf("%d %d %g %g %g %g \n", j, i, gx2, gy2, grid3x[IX2D(j,i,nlon)], grid3y[IX2D(j,i,nlon)]); */
       }
 
-  free(gxhelp);
-  free(gyhelp);
+  Free(gxhelp);
+  Free(gyhelp);
 }
 
 
@@ -322,12 +322,12 @@ void *Mrotuvb(void *argument)
   nlon    = gridInqXsize(gridID1);
   nlat    = gridInqYsize(gridID1);
 
-  grid1x  = (double*) malloc(gridsize*sizeof(double));
-  grid1y  = (double*) malloc(gridsize*sizeof(double));
-  grid2x  = (double*) malloc(gridsize*sizeof(double));
-  grid2y  = (double*) malloc(gridsize*sizeof(double));
-  grid3x  = (double*) malloc(gridsize*sizeof(double));
-  grid3y  = (double*) malloc(gridsize*sizeof(double));
+  grid1x  = (double*) Malloc(gridsize*sizeof(double));
+  grid1y  = (double*) Malloc(gridsize*sizeof(double));
+  grid2x  = (double*) Malloc(gridsize*sizeof(double));
+  grid2y  = (double*) Malloc(gridsize*sizeof(double));
+  grid3x  = (double*) Malloc(gridsize*sizeof(double));
+  grid3y  = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID1, grid1x);
   gridInqYvals(gridID1, grid1y);
@@ -363,10 +363,10 @@ void *Mrotuvb(void *argument)
       memcpy(grid3y, grid1y, gridsize*sizeof(double));
     }
 
-  if ( grid1x ) free(grid1x);
-  if ( grid1y ) free(grid1y);
-  if ( grid2x ) free(grid2x);
-  if ( grid2y ) free(grid2y);
+  if ( grid1x ) Free(grid1x);
+  if ( grid1y ) Free(grid1y);
+  if ( grid2x ) Free(grid2x);
+  if ( grid2y ) Free(grid2y);
 
   gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
   gridDefPrec(gridID3, gridInqPrec(gridID1));
@@ -406,16 +406,16 @@ void *Mrotuvb(void *argument)
   missval1 = vlistInqVarMissval(vlistID1, 0);
   missval2 = vlistInqVarMissval(vlistID2, 0);
 
-  ufield  = (double*) malloc(gridsize*sizeof(double));
-  vfield  = (double*) malloc(gridsize*sizeof(double));
-  urfield = (double*) malloc(gridsize*sizeof(double));
-  vrfield = (double*) malloc(gridsize*sizeof(double));
+  ufield  = (double*) Malloc(gridsize*sizeof(double));
+  vfield  = (double*) Malloc(gridsize*sizeof(double));
+  urfield = (double*) Malloc(gridsize*sizeof(double));
+  vrfield = (double*) Malloc(gridsize*sizeof(double));
 
   if ( gpint )
     {
       int gridsizex = (nlon+2)*nlat;
-      uhelp   = (double*) malloc(gridsizex*sizeof(double));
-      vhelp   = (double*) malloc(gridsizex*sizeof(double));
+      uhelp   = (double*) Malloc(gridsizex*sizeof(double));
+      vhelp   = (double*) Malloc(gridsizex*sizeof(double));
     }
 
   tsID = 0;
@@ -521,17 +521,17 @@ void *Mrotuvb(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( ufield  ) free(ufield);
-  if ( vfield  ) free(vfield);
-  if ( urfield ) free(urfield);
-  if ( vrfield ) free(vrfield);
+  if ( ufield  ) Free(ufield);
+  if ( vfield  ) Free(vfield);
+  if ( urfield ) Free(urfield);
+  if ( vrfield ) Free(vrfield);
   if ( gpint )
     {
-      if ( uhelp   ) free(uhelp);
-      if ( vhelp   ) free(vhelp);
+      if ( uhelp   ) Free(uhelp);
+      if ( vhelp   ) Free(vhelp);
     }
-  if ( grid3x  ) free(grid3x);
-  if ( grid3y  ) free(grid3y);
+  if ( grid3x  ) Free(grid3x);
+  if ( grid3y  ) Free(grid3y);
 
   cdoFinish();
 

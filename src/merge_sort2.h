@@ -3,12 +3,9 @@
 
 /* MERGE SORT DEFINES */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
+#include "cdo_int.h"
+
 #include <time.h>
-#include "cdo.h"
 
 #if defined(_OPENMP)
 #include <omp.h>

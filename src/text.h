@@ -1,6 +1,8 @@
 #ifndef _TEXT_H
 #define _TEXT_H
 
+#include <stdio.h>
+
 #define RESET		0
 #define BRIGHT 		1
 #define DIM		2

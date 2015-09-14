@@ -2134,9 +2134,9 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   long jump = (nlon + 2);
   long lot  = nlev * nlat;
 
-  double *restrict wfc = (double*) malloc(lot*jump*sizeof(double));
+  double *restrict wfc = (double*) Malloc(lot*jump*sizeof(double));
 #if ! defined(_OPENMP)
-  double *restrict wgp = (double*) malloc(lot*jump*sizeof(double));
+  double *restrict wgp = (double*) Malloc(lot*jump*sizeof(double));
 #endif
 
   for ( lev = 0; lev < nlev; ++lev )
@@ -2160,7 +2160,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   nvex  = lot - (nblox-1)*NFFT;
   nvex0 = nvex;
 
-  istartv = (long*) malloc(nblox*sizeof(long));
+  istartv = (long*) Malloc(nblox*sizeof(long));
 
   istart = 0;
   for ( nb = 0; nb < nblox; nb++ )
@@ -2176,7 +2176,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
   for ( nb = 0; nb < nblox; nb++ )
     {
 #if defined(_OPENMP)
-      double *restrict wgp = (double*) malloc(lot*jump*sizeof(double));
+      double *restrict wgp = (double*) Malloc(lot*jump*sizeof(double));
 #endif
       istart = istartv[nb];
       if ( nb == 0 ) nvex = nvex0;
@@ -2251,7 +2251,7 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
 	}
 
 #if defined(_OPENMP)
-      free(wgp);
+      Free(wgp);
 #endif
     }
 
@@ -2264,11 +2264,11 @@ void fc2gp(double *restrict trig, long *restrict ifax, double *restrict fc, doub
     for ( lon = 0; lon < nlon; ++lon )
       gp[lon + j*nlon] = wpt[lon + j*jump];
 
-  free(istartv);
+  Free(istartv);
 #if ! defined(_OPENMP)
-  free(wgp);
+  Free(wgp);
 #endif
-  free(wfc);
+  Free(wfc);
 }
 
 
@@ -2299,8 +2299,8 @@ void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict
   jump = (nlon + 2);
   lot  = nlev * nlat;
 
-  double *restrict wfc = (double*) malloc(lot * jump * sizeof(double));
-  double *restrict wgp = (double*) malloc(lot * jump * sizeof(double));
+  double *restrict wfc = (double*) Malloc(lot * jump * sizeof(double));
+  double *restrict wgp = (double*) Malloc(lot * jump * sizeof(double));
 
   rix = 0;
   wix = 0;
@@ -2402,6 +2402,6 @@ void gp2fc(double *trig, long *ifax, const double *restrict gp, double *restrict
 	}
     }
 
-  free(wgp);
-  free(wfc);
+  Free(wgp);
+  Free(wfc);
 }
