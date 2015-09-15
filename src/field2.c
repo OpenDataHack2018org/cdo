@@ -43,11 +43,10 @@ void farfun(field_t *field1, field_t field2, const int function)
 static
 void arradd(const size_t n, double * restrict a, const double * restrict b)
 {
-  size_t i;
- 
   // SSE2 version is 15% faster than the original loop (tested with gcc47)
 #if 0
   //#ifdef __SSE2__ /*__SSE2__*/ // bug in this code!!!
+  size_t i;
   const size_t residual =  n % 8;
   const size_t ofs = n - residual;
 
@@ -65,7 +64,10 @@ void arradd(const size_t n, double * restrict a, const double * restrict b)
 
 #else
 
-  for ( i = 0; i < n; i++ ) a[i] += b[i];
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(a,b)
+#endif
+  for ( size_t i = 0; i < n; i++ ) a[i] += b[i];
 
 #endif
 }
@@ -73,6 +75,9 @@ void arradd(const size_t n, double * restrict a, const double * restrict b)
 static
 void arraddw(const size_t n, double * restrict a, const double * restrict b, double w)
 {
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(a,b,w)
+#endif
   for ( size_t i = 0; i < n; i++ ) a[i] += w*b[i];
 }
 
