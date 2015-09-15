@@ -182,8 +182,21 @@ void *Merge(void *argument)
       vlistIDs[index]  = streamInqVlist(streamID1);
     }
 
+  int taxisindex = 0;
   int vlistID1 = vlistIDs[0];
   int taxisID1 = vlistInqTaxis(vlistID1);
+  if ( vlistNtsteps(vlistID1) == 0 )
+    for ( index = 1; index < nmerge; index++ )
+      {
+        vlistID1 = vlistIDs[index];
+        if ( vlistNtsteps(vlistID1) != 0 )
+          {
+            taxisindex = index;
+            taxisID1 = vlistInqTaxis(vlistID1);
+            break;
+          }
+      }
+
   int taxisID2 = taxisDuplicate(taxisID1);
 
   int vlistID2 = vlistCreate();
@@ -239,7 +252,6 @@ void *Merge(void *argument)
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  int firstindex = 0;
   int tsID = 0;
   while ( tsID >= 0 )
     {
@@ -272,11 +284,11 @@ void *Merge(void *argument)
       for ( index = 0; index < nmerge; index++ )
 	printf("tsID %d   %d sID %d vID %d nrecs %d\n", tsID, index, streamIDs[index], vlistIDs[index], numrecs[index]);
       */
-      if ( numrecs[firstindex] == 0 )
+      if ( numrecs[taxisindex] == 0 )
 	{
 	  for ( index = 1; index < nmerge; index++ )
 	    if ( vlistIDs[index] != -1 && numrecs[index] != 0 )
-	      cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!", firstindex+1, tsID, tsID==1?"":"s", index+1);
+	      cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!", taxisindex+1, tsID, tsID==1?"":"s", index+1);
 	  break;
 	}
       else
@@ -284,11 +296,14 @@ void *Merge(void *argument)
 	  for ( index = 1; index < nmerge; index++ )
 	    if ( vlistIDs[index] != -1 && numrecs[index] == 0 )
 	      {
-		cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!", index+1, tsID, tsID==1?"":"s", firstindex+1);
+		cdoWarning("Input stream %d has %d timestep%s. Stream %d has more timesteps, skipped!", index+1, tsID, tsID==1?"":"s", taxisindex+1);
 		break;
 	      }
 	  if ( index < nmerge ) break;
 	}
+
+      taxisCopyTimestep(taxisID2, taxisID1);
+      streamDefTimestep(streamID2, tsID);
 
       for ( index = 0; index < nmerge; index++ )
 	{
@@ -297,12 +312,6 @@ void *Merge(void *argument)
 	  nrecs = numrecs[index];
 
 	  if ( vlistID1 == -1 ) continue;
-
-	  if ( index == firstindex )
-	    {
-	      taxisCopyTimestep(taxisID2, taxisID1);
-	      streamDefTimestep(streamID2, tsID);
-	    }
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {

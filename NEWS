@@ -26,6 +26,7 @@ Version 1.7.0 (28 October 2015):
      * env. CDO_TIMESTAT_DATE does not work [Bug #5758]
      * splityear*: support for constant fields is missing [Bug #5759]
      * yseaspctl: check of verification date failed [Bug #5810]
+     * Converting rotated lat-lon netcdf to/from grib: flip sign of the angle of rotation [Bug #5870]
 
 Version 1.6.9 (28 April 2015):
 
