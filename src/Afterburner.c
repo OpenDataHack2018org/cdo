@@ -2403,7 +2403,7 @@ void *Afterburner(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }
 #else
 int main(int argc, char *argv[])

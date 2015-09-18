@@ -74,7 +74,6 @@ static
 void print_filter(hid_t dset_id, char *varname)
 {
   hid_t plist;
-  H5Z_filter_t filter;
   unsigned int flags;
   int idx;
   unsigned int cd_values;
@@ -89,8 +88,7 @@ void print_filter(hid_t dset_id, char *varname)
 
   for ( idx = 0; idx < nfilter; idx++ )
     {
-      filter = H5Pget_filter(plist, idx, &flags, &cd_nelmts, &cd_values,
-			     pnamelen, pname);
+      H5Pget_filter(plist, idx, &flags, &cd_nelmts, &cd_values, pnamelen, pname);
       cdoPrint("Dataset %s: filter %d =  %s", varname, idx+1, pname);
     }
 
@@ -225,26 +223,28 @@ static
 int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax,
 		      double dx, double dy, double p1, double p2, double p3, double p4)
 {
-  int gridID;
-  int i;
-  double *xvals, *yvals;
+  UNUSED(p1);
+  UNUSED(p2);
+  UNUSED(p3);
+  UNUSED(p4);
+  UNUSED(xmax);
+  UNUSED(ymin);
+  double *xvals = (double*) Malloc(nx*sizeof(double));
+  double *yvals = (double*) Malloc(ny*sizeof(double));
 
-  xvals = (double*) Malloc(nx*sizeof(double));
-  yvals = (double*) Malloc(ny*sizeof(double));
-
-  for ( i = 0; i < nx; ++i )
+  for ( int i = 0; i < nx; ++i )
     {
       xvals[i] = xmin + i*dx + dx/2;
       /* printf("x[%d]=%g\n", i, xvals[i]); */
     }
 
-  for ( i = 0; i < ny; ++i )
+  for ( int i = 0; i < ny; ++i )
     {
-      yvals[i] = ymax - i*dx - dx/2;
+      yvals[i] = ymax - i*dy - dy/2;
       /* printf("y[%d]=%g\n", i, yvals[i]); */
     }
 
-  gridID = gridCreate(GRID_SINUSOIDAL, nx*ny);
+  int gridID = gridCreate(GRID_SINUSOIDAL, nx*ny);
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
   gridDefXvals(gridID, xvals);
@@ -260,26 +260,24 @@ static
 int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax,
 		double dx, double dy, double a, double lon0, double lat0)
 {
-  int gridID;
-  int i;
-  double *xvals, *yvals;
+  UNUSED(xmax);
+  UNUSED(ymin);
+  double *xvals = (double*) Malloc(nx*sizeof(double));
+  double *yvals = (double*) Malloc(ny*sizeof(double));
 
-  xvals = (double*) Malloc(nx*sizeof(double));
-  yvals = (double*) Malloc(ny*sizeof(double));
-
-  for ( i = 0; i < nx; ++i )
+  for ( int i = 0; i < nx; ++i )
     {
       xvals[i] = xmin + i*dx + dx/2;
       /* printf("x[%d]=%g\n", i, xvals[i]); */
     }
 
-  for ( i = 0; i < ny; ++i )
+  for ( int i = 0; i < ny; ++i )
     {
-      yvals[i] = ymax - i*dx - dx/2;
+      yvals[i] = ymax - i*dy - dy/2;
       /* printf("y[%d]=%g\n", i, yvals[i]); */
     }
 
-  gridID = gridCreate(GRID_LAEA, nx*ny);
+  int gridID = gridCreate(GRID_LAEA, nx*ny);
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
   gridDefXvals(gridID, xvals);
@@ -356,7 +354,6 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   hid_t proj_tid, region_tid;
   hid_t str_tid, fltarr_tid;
   hid_t ptype_id;
-  herr_t     status;
   hsize_t dims;
   int xsize, ysize;
   typedef struct proj_t {
@@ -426,7 +423,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   if ( proj_id < 0 )
     memset(&proj, 0, sizeof(proj_t));
   else
-    status = H5Dread(proj_id, proj_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &proj);
+    H5Dread(proj_id, proj_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &proj);
 
   H5Dclose(proj_id);
   H5Tclose(proj_tid);
@@ -454,7 +451,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   if ( region_id < 0 )
     memset(&region, 0, sizeof(region_t));
   else
-    status = H5Dread(region_id, region_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &region);
+    H5Dread(region_id, region_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &region);
 
   H5Dclose(region_id);
   H5Tclose(region_tid);
@@ -620,7 +617,7 @@ int read_region(hid_t loc_id, int nx, int ny)
   hid_t region_id;
   hid_t region_tid;
   hid_t str64_tid, str128_tid, fltarr_tid;
-  herr_t     status;
+  herr_t status;
   hsize_t dims;
   typedef struct region_t {
     double area_extent[4];
@@ -687,6 +684,7 @@ int read_region(hid_t loc_id, int nx, int ny)
   }
   */
   status = H5Dread(region_id, region_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &region);
+  UNUSED(status);
 
   if ( cdoVerbose )
     {
@@ -1622,6 +1620,7 @@ void *Importcmsaf(void *argument)
 
   /* Close file */
   status = H5Fclose(file_id);
+  UNUSED(status);
 
   processDefVarNum(vlistNvars(vlistID), streamID);
 
@@ -1642,5 +1641,5 @@ void *Importcmsaf(void *argument)
   cdoAbort("HDF5 support not compiled in!");
 #endif
 
-  return (0);
+  return 0;
 }

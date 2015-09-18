@@ -248,6 +248,6 @@ int main(void)
   usvs_to_uv(30.0, 20.0, 30.0, 0.0, polphi, pollam, &x1, &x2);
   printf("usvs_to_uv %g %g %g %g\n", polphi, pollam, x1, x2);
 
-  return (0);
+  return 0;
 }
 */

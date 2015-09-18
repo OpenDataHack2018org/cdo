@@ -58,7 +58,7 @@ int template_parser(  char *Filename, const char *varname )
 
         xmlCleanupParser();
 
-        return (0);
+        return 0;
 }
 
 

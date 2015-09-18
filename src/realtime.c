@@ -42,7 +42,7 @@ int util_cputime(double *user_time, double *system_time)
 #endif
 #endif
 
-  return (0);
+  return 0;
 }
 
 double util_walltime(void)

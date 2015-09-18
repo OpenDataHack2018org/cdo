@@ -382,7 +382,7 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 
   pthread_cond_signal(pipe->recInq);
 
-  return (0);
+  return 0;
 }
 
 

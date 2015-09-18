@@ -177,5 +177,5 @@ void *Seascount(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

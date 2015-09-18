@@ -312,5 +312,5 @@ void *Harmonic(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

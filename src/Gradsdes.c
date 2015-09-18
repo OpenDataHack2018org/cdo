@@ -1001,7 +1001,7 @@ void *Gradsdes(void *argument)
     {
       dumpmap();
       cdoFinish();
-      return (0);
+      return 0;
     }
 
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
@@ -1414,5 +1414,5 @@ void *Gradsdes(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

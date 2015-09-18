@@ -137,7 +137,7 @@ gaint i,y;
 
   i = y / 4;
   i = (i*4) - y;
-  if (i!=0) return (0);
+  if (i!=0) return 0;
 
   i = y / 100;
   i = (i*100) - y;
@@ -145,7 +145,7 @@ gaint i,y;
 
   i = y / 400;
   i = (i*400) - y;
-  if (i!=0) return (0);
+  if (i!=0) return 0;
 
   return (1);
 }
@@ -539,7 +539,7 @@ gaint cmpwrd (char *ch1, char *ch2) {
 
   if ( (*ch1==' '||*ch1=='\t'||*ch1=='\0'||*ch1=='\n'||*ch1=='\r') &&
        (*ch2==' '||*ch2=='\t'||*ch2=='\0'||*ch2=='\n'||*ch2=='\r') ) return (1);
-  return (0);
+  return 0;
 }
 
 
@@ -826,7 +826,7 @@ gadouble *vals,v1,v2;
   pfi->ab2gr[dim] = liconv;
   pfi->gr2ab[dim] = liconv;
   pfi->linear[dim] = 1;
-  return (0);
+  return 0;
 
 err1:
   gaprnt (0,"Open Error:  Missing or invalid dimension");
@@ -876,7 +876,7 @@ gaint i;
   pfi->ab2gr[dim] = lev2gr;
   pfi->gr2ab[dim] = gr2lev;
   pfi->linear[dim] = 0;
-  return (0);
+  return 0;
 
 err1:
   gaprnt (0,"Open Error:  Invalid value in LEVELS data\n");

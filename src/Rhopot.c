@@ -121,7 +121,7 @@ int main (int argc, char *argv[])
       printf("%d %5g %3g %8g %8g %8g %10.3f\n", i, p, s[i], t[i], x[i], r[i], r[i]-x[i]);
   }
 
-  return (0);
+  return 0;
 }
 */
 
@@ -330,5 +330,5 @@ void *Rhopot(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

@@ -86,7 +86,7 @@ int valid_argument (char *caller, char *arg)
   if (!arg || !*arg)
     {
       fprintf (stderr, "%s: Argument required.\n", caller);
-      return (0);
+      return 0;
     }
   return (1);
 }
@@ -124,7 +124,7 @@ int com_help(char *arg)
       if (printed) printf ("\n");
     }
 
-  return (0);
+  return 0;
 }
 
 
@@ -134,7 +134,7 @@ int com_list(char *arg)
   if (!arg)
     arg = "";
 
-  return (0);
+  return 0;
 }
 
 /* The user wishes to quit using this program. Just set DONE non-zero. */
@@ -144,7 +144,7 @@ int com_quit(char *arg)
 
   Done = 1;
 
-  return (0);
+  return 0;
 }
 
 
@@ -191,7 +191,7 @@ int com_stat(char *arg)
 	}
     }
 
-  return (0);
+  return 0;
 }
 
 
@@ -199,7 +199,7 @@ int com_set(char *arg)
 {
   printf("com_set: %s\n", arg);
 
-  return (0);
+  return 0;
 }
 
 
@@ -219,7 +219,7 @@ int com_vars(char *arg)
 	      varID+1, paramstr, all_vars[varID].name, all_vars[varID].longname, all_vars[varID].units);
     }
 
-  return (0);
+  return 0;
 }
 
 /* Look up NAME as the name of a command, and return a pointer to that
@@ -390,5 +390,5 @@ void *Command(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

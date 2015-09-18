@@ -542,5 +542,5 @@ void *Ensval(void *argument)
   if ( taxisID2 ) Free(taxisID2);  
   cdoFinish();
   
-  return (0);
+  return 0;
 }

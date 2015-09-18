@@ -38,7 +38,7 @@ void *Test(void *argument)
   */
   cdoFinish();
 
-  return (0);
+  return 0;
 }
 
 
@@ -61,7 +61,7 @@ void *Test2(void *argument)
   */
   cdoFinish();
 
-  return (0);
+  return 0;
 }
 
 
@@ -156,5 +156,5 @@ void *Testdata(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

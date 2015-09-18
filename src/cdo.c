@@ -176,7 +176,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
   fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
   fprintf(stderr, "    -s, --silent   Silent mode\n");
-  fprintf(stderr, "    -t <partab>    Set default parameter table name or file\n");
+  fprintf(stderr, "    -t <partab>    Set GRIB1 default parameter table name or file\n");
   fprintf(stderr, "                   Predefined tables: ");
   for ( int id = 0; id < tableInqNumber(); id++ )
     if ( (name = tableInqNamePtr(id)) )
@@ -1232,7 +1232,7 @@ int parse_options_long(int argc, char *argv[])
         }
     }
 
-  return (0);
+  return 0;
 }
 
 static
@@ -1381,7 +1381,7 @@ int parse_options(int argc, char *argv[])
         }
     }
 
-  return (0);
+  return 0;
 }
 
 static

@@ -478,6 +478,7 @@ src/Wct.c -text
 src/Wind.c -text
 src/Writegrid.c -text
 src/Writerandom.c -text
+src/XTimstat.c -text
 src/YAR.c -text
 src/Ydayarith.c -text
 src/Ydaypctl.c -text

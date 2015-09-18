@@ -120,7 +120,7 @@ int vlistConstVars(int vlistID)
   int nvars = vlistNvars(vlistID);
 
   for ( int varID = 0; varID < nvars; ++varID )
-    if ( vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT ) return (0);
+    if ( vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT ) return 0;
 
   return (1);
 }
@@ -355,5 +355,5 @@ void *Merge(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

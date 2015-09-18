@@ -34,7 +34,7 @@ int readline(FILE *fp, char *line, int len)
     }
   line[ipos] = 0;
 
-  if ( feof(fp) && ipos == 0 ) return (0);
+  if ( feof(fp) && ipos == 0 ) return 0;
 
   return (1);
 }

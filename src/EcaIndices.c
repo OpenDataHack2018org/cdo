@@ -303,7 +303,7 @@ void *EcaCfd(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -338,7 +338,7 @@ void *EcaCsu(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -381,7 +381,7 @@ void *EcaCwdi(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -421,7 +421,7 @@ void *EcaCwfi(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -442,7 +442,7 @@ void *EcaEtr(void *argument)
   eca3(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -469,7 +469,7 @@ void *EcaFd(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -521,7 +521,7 @@ void *EcaGsl(void *argument)
 
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -559,7 +559,7 @@ void *EcaHd(void *argument)
 
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -602,7 +602,7 @@ void *EcaHwdi(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -642,7 +642,7 @@ void *EcaHwfi(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -669,7 +669,7 @@ void *EcaId(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -704,7 +704,7 @@ void *EcaSu(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -729,7 +729,7 @@ void *EcaTg10p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -754,7 +754,7 @@ void *EcaTg90p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -779,7 +779,7 @@ void *EcaTn10p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -804,7 +804,7 @@ void *EcaTn90p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -839,7 +839,7 @@ void *EcaTr(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -864,7 +864,7 @@ void *EcaTx10p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -889,7 +889,7 @@ void *EcaTx90p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -931,7 +931,7 @@ void *EcaCdd(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -970,7 +970,7 @@ void *EcaCwd(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1038,7 +1038,7 @@ void *EcaPd(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1064,7 +1064,7 @@ void *EcaR75p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1090,7 +1090,7 @@ void *EcaR75ptot(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1116,7 +1116,7 @@ void *EcaR90p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1142,7 +1142,7 @@ void *EcaR90ptot(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1168,7 +1168,7 @@ void *EcaR95p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1194,7 +1194,7 @@ void *EcaR95ptot(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1220,7 +1220,7 @@ void *EcaR99p(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1246,7 +1246,7 @@ void *EcaR99ptot(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1280,7 +1280,7 @@ void *EcaRr1(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1314,7 +1314,7 @@ void *EcaRx1day(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1354,7 +1354,7 @@ void *EcaRx5day(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1388,7 +1388,7 @@ void *EcaSdii(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1415,7 +1415,7 @@ void *Fdns(void *argument)
   eca2(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1457,7 +1457,7 @@ void *Strwin(void *argument)
   Free(longname);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1490,7 +1490,7 @@ void *Strbre(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1523,7 +1523,7 @@ void *Strgal(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }
 
 
@@ -1556,5 +1556,5 @@ void *Hurr(void *argument)
   eca1(&request);
   cdoFinish();
   
-  return (0);
+  return 0;
 }

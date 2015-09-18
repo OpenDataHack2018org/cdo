@@ -190,5 +190,5 @@ void *Change_e5slm(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

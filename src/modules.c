@@ -184,6 +184,7 @@ void *Timcount(void *argument);
 void *Timpctl(void *argument);
 void *Timselpctl(void *argument);
 void *Timselstat(void *argument);
+void *XTimstat(void *argument);
 void *Timstat(void *argument);
 void *Timstat2(void *argument);
 void *Timstat3(void *argument);
@@ -441,6 +442,8 @@ void *Maggraph(void *argument);
 #define    HourpctlOperators    {"hourpctl"}
 #define  TimselpctlOperators    {"timselpctl"}
 #define  TimselstatOperators    {"timselmin", "timselmax", "timselsum", "timselmean", "timselavg", "timselvar", "timselvar1", "timselstd", "timselstd1"}
+#define  XTimstatOperators      {"xtimmin",  "xtimmax",  "xtimsum",  "xtimmean",  "xtimavg",  "xtimvar",  "xtimvar1",  "xtimstd",  "xtimstd1", \
+                                 "xmonmin",  "xmonmax",  "xmonsum",  "xmonmean",  "xmonavg",  "xmonvar",  "xmonvar1",  "xmonstd",  "xmonstd1"}
 #define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timvar",  "timvar1",  "timstd",  "timstd1"}
 #define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearvar", "yearvar1", "yearstd", "yearstd1"}
 #define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monvar1",  "monstd",  "monstd1"}
@@ -706,6 +709,7 @@ static modules_t Modules[] =
   { Timselpctl,     TimselpctlHelp,    TimselpctlOperators,    CDI_REAL,  3,  1 },
   { Timsort,        TimsortHelp,       TimsortOperators,       CDI_REAL,  1,  1 },
   { Timselstat,     TimselstatHelp,    TimselstatOperators,    CDI_REAL,  1,  1 },
+  { XTimstat,       NULL,              XTimstatOperators,      CDI_BOTH,  1,  1 },
   { Timstat,        TimstatHelp,       TimstatOperators,       CDI_BOTH,  1,  1 },
   { Timstat,        YearstatHelp,      YearstatOperators,      CDI_BOTH,  1,  1 },
   { Timstat,        MonstatHelp,       MonstatOperators,       CDI_BOTH,  1,  1 },

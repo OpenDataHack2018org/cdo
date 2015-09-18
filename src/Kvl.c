@@ -55,7 +55,7 @@ int read_cmor_table(const char *filename)
 
   kvlDelete(kvlist);
 
-  return (0);
+  return 0;
 }
 
 static
@@ -148,7 +148,7 @@ int conv_cmor_table(const char *filename)
 
   kvlDelete(kvlist);
 
-  return (0);
+  return 0;
 }
 
 
@@ -196,5 +196,5 @@ void *Kvl(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

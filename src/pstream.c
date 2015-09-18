@@ -1112,7 +1112,7 @@ int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
     }
 
-  return (0);
+  return 0;
 }
 
 

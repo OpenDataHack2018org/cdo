@@ -287,7 +287,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units)
 static
 void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 {
-  FILE *fp;
+  FILE *fp = NULL;
   namelist_t *nml;
   int nml_code, nml_out_code, nml_table, nml_param, nml_out_param, nml_chunktype, nml_datatype, nml_type, nml_name, nml_out_name, nml_stdname;
   int nml_longname, nml_units, nml_comment, nml_ltype, nml_delete, nml_convert, nml_missval, nml_factor;
@@ -843,5 +843,5 @@ void *Setpartab(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

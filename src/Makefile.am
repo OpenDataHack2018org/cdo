@@ -327,6 +327,7 @@ cdo_SOURCES += Adisit.c        \
                Wind.c          \
                Writegrid.c     \
                Writerandom.c   \
+               XTimstat.c      \
                YAR.c           \
                Yearmonstat.c   \
                Ydayarith.c     \

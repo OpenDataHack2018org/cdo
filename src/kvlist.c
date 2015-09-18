@@ -423,6 +423,6 @@ int main(int argc, char *argv[])
 
   kvlDelete(kvlist);
 
-  return (0);
+  return 0;
 }
 */

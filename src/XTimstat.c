@@ -72,7 +72,7 @@
 #include "pstream.h"
 
 
-void *Timstat(void *argument)
+void *XTimstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
   int gridsize;
@@ -94,51 +94,24 @@ void *Timstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timmin",    func_min,  DATE_LEN, NULL);
-  cdoOperatorAdd("timmax",    func_max,  DATE_LEN, NULL);
-  cdoOperatorAdd("timsum",    func_sum,  DATE_LEN, NULL);
-  cdoOperatorAdd("timmean",   func_mean, DATE_LEN, NULL);
-  cdoOperatorAdd("timavg",    func_avg,  DATE_LEN, NULL);
-  cdoOperatorAdd("timvar",    func_var,  DATE_LEN, NULL);
-  cdoOperatorAdd("timvar1",   func_var1, DATE_LEN, NULL);
-  cdoOperatorAdd("timstd",    func_std,  DATE_LEN, NULL);
-  cdoOperatorAdd("timstd1",   func_std1, DATE_LEN, NULL);
-  cdoOperatorAdd("yearmin",   func_min,  10, NULL);
-  cdoOperatorAdd("yearmax",   func_max,  10, NULL);
-  cdoOperatorAdd("yearsum",   func_sum,  10, NULL);
-  cdoOperatorAdd("yearmean",  func_mean, 10, NULL);
-  cdoOperatorAdd("yearavg",   func_avg,  10, NULL);
-  cdoOperatorAdd("yearvar",   func_var,  10, NULL);
-  cdoOperatorAdd("yearvar1",  func_var1, 10, NULL);
-  cdoOperatorAdd("yearstd",   func_std,  10, NULL);
-  cdoOperatorAdd("yearstd1",  func_std1, 10, NULL);
-  cdoOperatorAdd("monmin",    func_min,   8, NULL);
-  cdoOperatorAdd("monmax",    func_max,   8, NULL);
-  cdoOperatorAdd("monsum",    func_sum,   8, NULL);
-  cdoOperatorAdd("monmean",   func_mean,  8, NULL);
-  cdoOperatorAdd("monavg",    func_avg,   8, NULL);
-  cdoOperatorAdd("monvar",    func_var,   8, NULL);
-  cdoOperatorAdd("monvar1",   func_var1,  8, NULL);
-  cdoOperatorAdd("monstd",    func_std,   8, NULL);
-  cdoOperatorAdd("monstd1",   func_std1,  8, NULL);
-  cdoOperatorAdd("daymin",    func_min,   6, NULL);
-  cdoOperatorAdd("daymax",    func_max,   6, NULL);
-  cdoOperatorAdd("daysum",    func_sum,   6, NULL);
-  cdoOperatorAdd("daymean",   func_mean,  6, NULL);
-  cdoOperatorAdd("dayavg",    func_avg,   6, NULL);
-  cdoOperatorAdd("dayvar",    func_var,   6, NULL);
-  cdoOperatorAdd("dayvar1",   func_var1,  6, NULL);
-  cdoOperatorAdd("daystd",    func_std,   6, NULL);
-  cdoOperatorAdd("daystd1",   func_std1,  6, NULL);
-  cdoOperatorAdd("hourmin",   func_min,   4, NULL);
-  cdoOperatorAdd("hourmax",   func_max,   4, NULL);
-  cdoOperatorAdd("hoursum",   func_sum,   4, NULL);
-  cdoOperatorAdd("hourmean",  func_mean,  4, NULL);
-  cdoOperatorAdd("houravg",   func_avg,   4, NULL);
-  cdoOperatorAdd("hourvar",   func_var,   4, NULL);
-  cdoOperatorAdd("hourvar1",  func_var1,  4, NULL);
-  cdoOperatorAdd("hourstd",   func_std,   4, NULL);
-  cdoOperatorAdd("hourstd1",  func_std1,  4, NULL);
+  cdoOperatorAdd("xtimmin",    func_min,  DATE_LEN, NULL);
+  cdoOperatorAdd("xtimmax",    func_max,  DATE_LEN, NULL);
+  cdoOperatorAdd("xtimsum",    func_sum,  DATE_LEN, NULL);
+  cdoOperatorAdd("xtimmean",   func_mean, DATE_LEN, NULL);
+  cdoOperatorAdd("xtimavg",    func_avg,  DATE_LEN, NULL);
+  cdoOperatorAdd("xtimvar",    func_var,  DATE_LEN, NULL);
+  cdoOperatorAdd("xtimvar1",   func_var1, DATE_LEN, NULL);
+  cdoOperatorAdd("xtimstd",    func_std,  DATE_LEN, NULL);
+  cdoOperatorAdd("xtimstd1",   func_std1, DATE_LEN, NULL);
+  cdoOperatorAdd("xmonmin",    func_min,   8, NULL);
+  cdoOperatorAdd("xmonmax",    func_max,   8, NULL);
+  cdoOperatorAdd("xmonsum",    func_sum,   8, NULL);
+  cdoOperatorAdd("xmonmean",   func_mean,  8, NULL);
+  cdoOperatorAdd("xmonavg",    func_avg,   8, NULL);
+  cdoOperatorAdd("xmonvar",    func_var,   8, NULL);
+  cdoOperatorAdd("xmonvar1",   func_var1,  8, NULL);
+  cdoOperatorAdd("xmonstd",    func_std,   8, NULL);
+  cdoOperatorAdd("xmonstd1",   func_std1,  8, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);

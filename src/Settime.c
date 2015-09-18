@@ -62,7 +62,7 @@ int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
       else if ( *incperiod == 12 ) { *incperiod = 1; *incunit = 43200; *tunit = TUNIT_12HOURS; }
     }
 
-  return (0);
+  return 0;
 }
 
 static
@@ -483,5 +483,5 @@ void *Settime(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

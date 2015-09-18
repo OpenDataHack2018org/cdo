@@ -486,5 +486,5 @@ void *Specinfo(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }

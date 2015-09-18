@@ -1253,7 +1253,7 @@ int input_darray(FILE *gfp, int n_values, double *array)
   int i;
   int read_items;
 
-  if ( n_values <= 0 ) return (0);
+  if ( n_values <= 0 ) return 0;
 
   read_items = 0;
   for ( i = 0; i < n_values; i++ )

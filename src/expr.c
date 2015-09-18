@@ -868,7 +868,7 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
   /* node is leaf */
   if ( p->type == typeCon || p->type == typeVar || p->u.opr.nops == 0 )
     {
-      return (0);
+      return 0;
     }
 
   /* node has children */
@@ -877,7 +877,7 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
       exNode(p->u.opr.op[k], parse_arg);
     }
 
-  return (0);
+  return 0;
 }
 
 
@@ -891,7 +891,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 
   if ( ! p ) return (rnode);
 
-  /*  if ( ! parse_arg->init ) { exNode(p, parse_arg); return (0); } */
+  /*  if ( ! parse_arg->init ) { exNode(p, parse_arg); return 0; } */
 
   switch ( p->type )
     {

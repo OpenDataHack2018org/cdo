@@ -91,7 +91,7 @@ void *Template1(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }
 
 
@@ -152,5 +152,5 @@ void *Template2(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return 0;
 }
