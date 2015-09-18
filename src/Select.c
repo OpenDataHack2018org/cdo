@@ -195,7 +195,7 @@ int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t si
   if ( pml->size >= MAX_PML_ENTRY )
     {
       fprintf(stderr, "Too many entries in parameter list %s! (Max = %d)\n", pml->name, MAX_PML_ENTRY);
-      return (-1);
+      return -1;
     }
 
   pml_entry = (pml_entry_t*) Malloc(sizeof(pml_entry_t));

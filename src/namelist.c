@@ -173,7 +173,7 @@ int namelistAdd(namelist_t *nml, const char *name, int type, int dis, void *ptr,
   if ( nml->size >= MAX_NML_ENTRY )
     {
       fprintf(stderr, "Too many namelist entries in %s! (Max = %d)\n", nml->name, MAX_NML_ENTRY);
-      return (-1);
+      return -1;
     }
 
   nml_entry = (nml_entry_t*) Malloc(sizeof(nml_entry_t));

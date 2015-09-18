@@ -805,7 +805,7 @@ gaint deflin (char *ch, dsets_t *pfi, gaint dim, gaint flag) {
 gadouble *vals,v1,v2;
 
   vals = (gadouble *)galloc(sizeof(gadouble)*6,"vals1");
-  if (vals==NULL) return (-1);
+  if (vals==NULL) return -1;
 
   if ((ch = nxtwrd(ch))==NULL) goto err1;
   if (getdbl(ch,&v1)==NULL) goto err1;
@@ -854,7 +854,7 @@ gaint i;
   }
 
   vals = (gadouble *)galloc((pfi->dnum[dim]+5)*sizeof(gadouble),"vals2");
-  if (vals==NULL) return (-1);
+  if (vals==NULL) return -1;
 
   vvs = vals;
   *vvs = (gadouble)pfi->dnum[dim];
@@ -1252,7 +1252,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   if ( descr == NULL )
     {
       fprintf(stderr, "fopen failed on %s", filename);
-      return (-1);
+      return -1;
     }
 
   /* Copy descriptor file name into gafile structure */
@@ -2054,7 +2054,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   } 
   else {
     fprintf(stderr, "Grid data type unsupported!");
-    return (-1);
+    return -1;
   }
 
 /* set the global calendar and check if we are trying to change with a new file...

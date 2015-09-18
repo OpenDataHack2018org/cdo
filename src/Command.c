@@ -254,7 +254,7 @@ int execute_line(char *line)
   if ( !command )
     {
       fprintf (stderr, "%s: No such command!\n", word);
-      return (-1);
+      return -1;
     }
   /* Get argument to command, if any. */
   while ( isspace(line[i]) ) i++;

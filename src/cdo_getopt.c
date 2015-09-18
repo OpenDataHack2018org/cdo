@@ -112,7 +112,7 @@ int cdo_getopt_internal(int nargc, char * const *nargv, const char *ostr)
       if ( CDO_optind >= nargc || *(place = nargv[CDO_optind]) != '-' )
 	{
 	  place = EMSG;
-	  return (-1);
+	  return -1;
 	}
       
       if ( place[1] && *++place == '-' )
@@ -122,14 +122,14 @@ int cdo_getopt_internal(int nargc, char * const *nargv, const char *ostr)
 	  return (-2);
 	}
 
-      if ( place[1] ) return (-1);
+      if ( place[1] ) return -1;
     } 
 
   /* option letter okay? */
   if ( (CDO_optopt = (int)*place++) == (int)':' || !(oli = (char *)strchr(ostr, CDO_optopt)) )
     {
       /* if the user didn't specify '-' as an option, assume it means -1. */
-      if ( CDO_optopt == (int)'-' ) return (-1);
+      if ( CDO_optopt == (int)'-' ) return -1;
 
       if ( !*place ) ++CDO_optind;
 
