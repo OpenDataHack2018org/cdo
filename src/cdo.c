@@ -73,6 +73,7 @@ static int numThreads = 0;
 static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
+static int CDO_cmor = 0;
 
 void gridsearch_set_method(const char *methodstr);
 
@@ -608,22 +609,18 @@ void defineVarnames(const char *arg)
 {
   size_t len = strlen(arg);
   size_t istart = 0;
-  char *pbuf;
-
   while ( istart < len && (arg[istart] == ' ' || arg[istart] == ',') ) istart++;
 
   len -= istart;
 
   if ( len )
-    {
-      char *commapos;
-      
+    {      
       cdoVarnames = (char **) Malloc(MAX_NUM_VARNAMES*sizeof(char *));
 
-      pbuf = strdup(arg+istart);
+      char *pbuf = strdup(arg+istart);
       cdoVarnames[cdoNumVarnames++] = pbuf;    
 
-      commapos = pbuf;
+      char *commapos = pbuf;
       while ( (commapos = strchr(commapos, ',')) != NULL )
         {
           *commapos++ = '\0';
@@ -1011,7 +1008,6 @@ long str_to_int(char *intstring)
   return (intval);
 }
 
-
 static
 int parse_options_long(int argc, char *argv[])
 {
@@ -1031,6 +1027,7 @@ int parse_options_long(int argc, char *argv[])
       { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
+      { "cmor",                    no_argument,           &CDO_cmor,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
       { "no_warnings",             no_argument,           &_Verbose,  0  },
@@ -1236,155 +1233,6 @@ int parse_options_long(int argc, char *argv[])
 }
 
 static
-int parse_options(int argc, char *argv[])
-{
-  int c;
-
-  while ( (c = cdo_getopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ")) != -1 )
-    {
-      switch (c)
-        {
-        case 'a':
-          cdoDefaultTimeType = TAXIS_ABSOLUTE;
-          break;
-        case 'b':
-          setDefaultDataType(CDO_optarg);
-          break;
-        case 'B':
-          cdoBenchmark = TRUE;
-          break;
-        case 'C':
-          CDO_Color = TRUE;
-          break;
-        case 'c':
-          cdoCheckDatarange = TRUE;
-          break;
-        case 'd':
-          Debug = 1;
-          break;
-        case 'D':
-          Debug = 1;
-          DebugLevel = atoi(CDO_optarg);
-          break;
-        case 'e':
-          {
-#if defined(HAVE_GETHOSTNAME)
-          char host[1024];
-          gethostname(host, sizeof(host));
-          cdoExpName = CDO_optarg;
-          /* printf("host: %s %s\n", host, cdoExpName); */
-          if ( strcmp(host, cdoExpName) == 0 )
-            cdoExpMode = CDO_EXP_REMOTE;
-          else
-            cdoExpMode = CDO_EXP_LOCAL;
-#else
-          fprintf(stderr, "Function gethostname not available!\n");
-          exit(EXIT_FAILURE);
-#endif
-          break;
-          }
-        case 'f':
-          setDefaultFileType(CDO_optarg, 1);
-          break;
-        case 'g':
-          defineGrid(CDO_optarg);
-          break;
-        case 'h':        
-          Help = 1;
-          break;
-        case 'H':        
-          CDO_Append_History = FALSE;
-          break;
-        case 'i':
-          defineInstitution(CDO_optarg);
-          break;
-        case 'k':
-          defineChunktype(CDO_optarg);
-          break;
-        case 'L':        
-          cdoLockIO = TRUE;
-          break;
-        case 'l':
-          defineZaxis(CDO_optarg);
-          break;
-        case 'm':
-          cdiDefMissval(atof(CDO_optarg));
-          break;
-        case 'M':
-          cdiDefGlobal("HAVE_MISSVAL", TRUE);
-          break;
-        case 'n':
-          defineVarnames(CDO_optarg);
-          break;
-        case 'O':
-          cdoOverwriteMode = TRUE;
-          break;
-        case 'P':
-          if ( *CDO_optarg < '1' || *CDO_optarg > '9' )
-            {
-              fprintf(stderr, "Unexpected character in number of OpenMP threads (-P <nthreads>): %s!\n", CDO_optarg);
-              exit(EXIT_FAILURE);
-            }
-          numThreads = atoi(CDO_optarg);
-          break;
-        case 'p':
-          fprintf(stderr, "CDO option -p is obsolete and will be removed in the next release, please switch to -b <bits>!\n");
-          setDefaultDataTypeByte(CDO_optarg);
-          break;
-        case 'Q':
-          cdiDefGlobal("SORTNAME", TRUE);
-          break;
-        case 'R':
-          cdoRegulargrid = TRUE;
-          cdiDefGlobal("REGULARGRID", TRUE);
-          break;
-        case 'r':
-          cdoDefaultTimeType = TAXIS_RELATIVE;
-          break;
-        case 'S':
-          cdoDiag = TRUE;
-          break;
-        case 's':
-          cdoSilentMode = TRUE;
-          break;
-        case 'T':
-          cdoTimer = TRUE;
-          break;
-        case 't':
-          cdoDefaultTableID = defineTable(CDO_optarg);
-          break;
-        case 'u':
-          cdoInteractive = TRUE;
-          break;
-        case 'V':
-          Version = 1;
-          break;
-        case 'v':
-          cdoVerbose = TRUE;
-          break;
-        case 'W': /* Warning messages */
-          _Verbose = 1;
-          break;
-        case 'X': /* multi threaded I/O */
-          cdoParIO = TRUE;
-          break;
-        case 'Z':
-          cdoCompress = TRUE;
-          break;
-        case 'z':
-          defineCompress(CDO_optarg);
-          break;
-        case ':':
-          fprintf(stderr, "\nmissing parameter for one of the options\n\n");
-          Help = 1;
-          break;
-        }
-    }
-
-  return 0;
-}
-
-static
 void cdo_rusage(void)
 {
 #if defined(HAVE_SYS_RESOURCE_H) && defined(RUSAGE_SELF)
@@ -1438,10 +1286,7 @@ int main(int argc, char *argv[])
 
   get_env_vars();
 
-  if ( 1 )
-    status = parse_options_long(argc, argv);
-  else
-    status = parse_options(argc, argv);
+  status = parse_options_long(argc, argv);
 
   if ( status != 0 ) return (-1);
 
