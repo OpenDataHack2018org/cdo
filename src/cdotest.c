@@ -35,7 +35,7 @@ int equals(double expected, double actual, double eps)
 {
   return (int) fabs(expected - actual) < eps; 
 }
-
+/*
 static 
 double humidityIndex(double t, double p, double r, double missval)
 {
@@ -47,7 +47,7 @@ double humidityIndex(double t, double p, double r, double missval)
     
   return t + (5.0 / 9.0) * ((0.01 * r * p * 6.112 * pow(10.0, (7.5 * t) / (237.7 + t))) - 10.0);
 }
-
+*/
 /* reads a NetCDF file containing data for a single grid point */ 
 static
 void readNcFile(const char path[], double **vars, int nvars, int nts)
@@ -178,7 +178,7 @@ void destroyVars(double **vars)
 
 /* gets the path of the CDO binary executable */
 static 
-char *getCdoPath()
+const char *getCdoPath()
 {
   char *cdoPath = getenv("CDO_PATH");
   
@@ -396,7 +396,7 @@ void testEcaGsl()
  
   destroyVars(vars);
 }
-
+/*
 static
 void testHi()
 {
@@ -424,7 +424,7 @@ void testHi()
 
   destroyVars(vars);
 }
-
+*/
 static
 void testTimcount()
 {
@@ -463,14 +463,14 @@ void testTimcount()
   
   destroyVars(vars);
 }
-
+/*
 static
 void testSeascount()
 {
   const double array[] = {MISSVAL, MISSVAL, TO_KELVIN(1.0), MISSVAL, 
     TO_KELVIN(1.0), TO_KELVIN(1.0)};
   
-  /* number of output variables and time steps */
+  // number of output variables and time steps
   int nvars = 1;
   int nts   = 1;
   
@@ -502,7 +502,7 @@ void testSeascount()
   
   destroyVars(vars);
 }
-
+*/
 static
 void testWct()
 {

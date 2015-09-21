@@ -32,7 +32,7 @@ void *Varrms(void *argument)
 {
   int streamID1, streamID2, streamID3;
   int vlistID1, vlistID2, vlistID3;
-  int gridID1, gridID2, gridID3, lastgrid = -1;
+  int gridID1, gridID3, lastgrid = -1;
   int wstatus = FALSE;
   int code = 0, oldcode = 0;
   int index, ngrids;
@@ -84,7 +84,6 @@ void *Varrms(void *argument)
   ngrids = vlistNgrids(vlistID1);
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
-  gridID2 = vlistGrid(vlistID1, index);
   
   if ( needWeights &&
        gridInqType(gridID1) != GRID_LONLAT &&

@@ -45,8 +45,8 @@ void *Vertwind(void *argument)
   int gridsize, i;
   int offset;
   int nmiss, nmiss_out;
-  int temp_code, sq_code, ps_code, omega_code, lsp_code;
-  int tempID = -1, sqID = -1, psID = -1, omegaID = -1, lnpsID = -1;
+  int temp_code, sq_code, ps_code, omega_code;
+  int tempID = -1, sqID = -1, psID = -1, omegaID = -1;
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
   double tv, rho;
@@ -61,13 +61,12 @@ void *Vertwind(void *argument)
 
   int vlistID1 = streamInqVlist(streamID1);
 
-  int ngp = vlist_check_gridsize(vlistID1);
+  vlist_check_gridsize(vlistID1);
 
   temp_code  = 130;
   sq_code    = 133;
   ps_code    = 134;
   omega_code = 135;
-  lsp_code   = 152;
 
   nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; ++varID )
@@ -89,14 +88,12 @@ void *Vertwind(void *argument)
 	  else if ( strcmp(varname, "sq")    == 0 ) code = 133;
 	  else if ( strcmp(varname, "aps")   == 0 ) code = 134;
 	  else if ( strcmp(varname, "omega") == 0 ) code = 135;
-	  else if ( strcmp(varname, "lsp")   == 0 ) code = 152;
 	}
 
       if      ( code == temp_code  ) tempID  = varID;
       else if ( code == sq_code    ) sqID    = varID;
       else if ( code == ps_code    ) psID    = varID;
       else if ( code == omega_code ) omegaID = varID;
-      else if ( code == lsp_code   ) lnpsID  = varID;
     }
 
   if ( tempID == -1 || sqID == -1 || omegaID == -1 )

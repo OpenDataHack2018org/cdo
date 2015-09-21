@@ -54,12 +54,6 @@ void add_vars_mv(int gridsize, double missval, const double *restrict var1, cons
     }
 }
 
-static
-void add_vars(int gridsize, const double *restrict var1, const double *restrict var2, double *restrict var3)
-{
-  for ( int i = 0; i < gridsize; ++i )
-    var3[i] = var2[i] + var1[i];
-}
 
 void *Vertcum(void *argument)
 {

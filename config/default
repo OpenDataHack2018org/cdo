@@ -86,16 +86,16 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
+	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native" CXX=icpc
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=clang CFLAGS="-g -Wall -Ofast -march=native"
+	            CC=clang CFLAGS="-g -Wall -Wwrite-strings -Ofast -march=native"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -Wa,-q"
+	            CC=gcc CFLAGS="-g -pipe -Wall -Wwrite-strings -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -Wa,-q"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
