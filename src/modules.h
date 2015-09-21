@@ -20,7 +20,7 @@
 
 void *(*operatorModule(char *operatorName))(void *);
 
-char **operatorHelp(char *operatorName);
+const char **operatorHelp(char *operatorName);
 
 int operatorStreamInCnt(char *operatorName);
 int operatorStreamOutCnt(char *operatorName);

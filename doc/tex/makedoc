@@ -304,7 +304,7 @@ while (<MOFILE>) {
     }
 
     print HELPFILE "\n";
-    print HELPFILE "static char *${mname}Help[] = {\n";
+    print HELPFILE "static const char *${mname}Help[] = {\n";
 
     @hkeys = split(" ", $moperators);
 #    print "$#hkeys @hkeys \n";

@@ -1,6 +1,6 @@
 /* Automatically created with makedoc, don't edit! */
 
-static char *InfoHelp[] = {
+static const char *InfoHelp[] = {
     "NAME",
     "    info, infon, map - Information and simple statistics",
     "",
@@ -32,7 +32,7 @@ static char *InfoHelp[] = {
     NULL
 };
 
-static char *SinfoHelp[] = {
+static const char *SinfoHelp[] = {
     "NAME",
     "    sinfo, sinfon - Short information",
     "",
@@ -64,7 +64,7 @@ static char *SinfoHelp[] = {
     NULL
 };
 
-static char *DiffHelp[] = {
+static const char *DiffHelp[] = {
     "NAME",
     "    diff, diffn - Compare two datasets field by field",
     "",
@@ -93,7 +93,7 @@ static char *DiffHelp[] = {
     NULL
 };
 
-static char *NinfoHelp[] = {
+static const char *NinfoHelp[] = {
     "NAME",
     "    npar, nlevel, nyear, nmon, ndate, ntime - ",
     "    Print the number of parameters, levels or times",
@@ -121,7 +121,7 @@ static char *NinfoHelp[] = {
     NULL
 };
 
-static char *ShowinfoHelp[] = {
+static const char *ShowinfoHelp[] = {
     "NAME",
     "    showformat, showcode, showname, showstdname, showlevel, showltype, showyear, ",
     "    showmon, showdate, showtime, showtimestamp - Show variables, levels or times",
@@ -158,7 +158,7 @@ static char *ShowinfoHelp[] = {
     NULL
 };
 
-static char *FiledesHelp[] = {
+static const char *FiledesHelp[] = {
     "NAME",
     "    pardes, griddes, zaxisdes, vct - Dataset description",
     "",
@@ -183,7 +183,7 @@ static char *FiledesHelp[] = {
     NULL
 };
 
-static char *CopyHelp[] = {
+static const char *CopyHelp[] = {
     "NAME",
     "    copy, cat - Copy datasets",
     "",
@@ -204,7 +204,7 @@ static char *CopyHelp[] = {
     NULL
 };
 
-static char *ReplaceHelp[] = {
+static const char *ReplaceHelp[] = {
     "NAME",
     "    replace - Replace variables",
     "",
@@ -217,7 +217,7 @@ static char *ReplaceHelp[] = {
     NULL
 };
 
-static char *DuplicateHelp[] = {
+static const char *DuplicateHelp[] = {
     "NAME",
     "    duplicate - Duplicates a dataset",
     "",
@@ -233,7 +233,7 @@ static char *DuplicateHelp[] = {
     NULL
 };
 
-static char *MergegridHelp[] = {
+static const char *MergegridHelp[] = {
     "NAME",
     "    mergegrid - Merge grid",
     "",
@@ -249,7 +249,7 @@ static char *MergegridHelp[] = {
     NULL
 };
 
-static char *MergeHelp[] = {
+static const char *MergeHelp[] = {
     "NAME",
     "    merge, mergetime - Merge datasets",
     "",
@@ -280,7 +280,7 @@ static char *MergeHelp[] = {
     NULL
 };
 
-static char *SplitHelp[] = {
+static const char *SplitHelp[] = {
     "NAME",
     "    splitcode, splitparam, splitname, splitlevel, splitgrid, splitzaxis, ",
     "    splittabnum - Split a dataset",
@@ -329,7 +329,7 @@ static char *SplitHelp[] = {
     NULL
 };
 
-static char *SplittimeHelp[] = {
+static const char *SplittimeHelp[] = {
     "NAME",
     "    splithour, splitday, splitseas, splityear, splityearmon, splitmon - ",
     "    Split timesteps of a dataset",
@@ -374,7 +374,7 @@ static char *SplittimeHelp[] = {
     NULL
 };
 
-static char *SplitselHelp[] = {
+static const char *SplitselHelp[] = {
     "NAME",
     "    splitsel - Split selected timesteps",
     "",
@@ -400,7 +400,7 @@ static char *SplitselHelp[] = {
     NULL
 };
 
-static char *DistgridHelp[] = {
+static const char *DistgridHelp[] = {
     "NAME",
     "    distgrid - Distribute horizontal grid",
     "",
@@ -425,7 +425,7 @@ static char *DistgridHelp[] = {
     NULL
 };
 
-static char *CollgridHelp[] = {
+static const char *CollgridHelp[] = {
     "NAME",
     "    collgrid - Collect horizontal grid",
     "",
@@ -448,7 +448,7 @@ static char *CollgridHelp[] = {
     NULL
 };
 
-static char *SelectHelp[] = {
+static const char *SelectHelp[] = {
     "NAME",
     "    select, delete - Select fields",
     "",
@@ -488,7 +488,7 @@ static char *SelectHelp[] = {
     NULL
 };
 
-static char *SelvarHelp[] = {
+static const char *SelvarHelp[] = {
     "NAME",
     "    selparam, delparam, selcode, delcode, selname, delname, selstdname, sellevel, ",
     "    sellevidx, selgrid, selzaxis, selzaxisname, selltype, seltabnum - Select fields",
@@ -557,7 +557,7 @@ static char *SelvarHelp[] = {
     NULL
 };
 
-static char *SeltimeHelp[] = {
+static const char *SeltimeHelp[] = {
     "NAME",
     "    seltimestep, seltime, selhour, selday, selmon, selyear, selseas, seldate, ",
     "    selsmon - Select timesteps",
@@ -612,7 +612,7 @@ static char *SeltimeHelp[] = {
     NULL
 };
 
-static char *SelboxHelp[] = {
+static const char *SelboxHelp[] = {
     "NAME",
     "    sellonlatbox, selindexbox - Select a box of a field",
     "",
@@ -644,7 +644,7 @@ static char *SelboxHelp[] = {
     NULL
 };
 
-static char *CondHelp[] = {
+static const char *CondHelp[] = {
     "NAME",
     "    ifthen, ifnotthen - Conditional select one field",
     "",
@@ -671,7 +671,7 @@ static char *CondHelp[] = {
     NULL
 };
 
-static char *Cond2Help[] = {
+static const char *Cond2Help[] = {
     "NAME",
     "    ifthenelse - Conditional select  two fields",
     "",
@@ -693,7 +693,7 @@ static char *Cond2Help[] = {
     NULL
 };
 
-static char *CondcHelp[] = {
+static const char *CondcHelp[] = {
     "NAME",
     "    ifthenc, ifnotthenc - Conditional select a constant",
     "",
@@ -720,7 +720,7 @@ static char *CondcHelp[] = {
     NULL
 };
 
-static char *CompHelp[] = {
+static const char *CompHelp[] = {
     "NAME",
     "    eq, ne, le, lt, ge, gt - Comparison of two fields",
     "",
@@ -763,7 +763,7 @@ static char *CompHelp[] = {
     NULL
 };
 
-static char *CompcHelp[] = {
+static const char *CompcHelp[] = {
     "NAME",
     "    eqc, nec, lec, ltc, gec, gtc - Comparison of a field with a constant",
     "",
@@ -806,7 +806,7 @@ static char *CompcHelp[] = {
     NULL
 };
 
-static char *SetpartabHelp[] = {
+static const char *SetpartabHelp[] = {
     "NAME",
     "    setpartabp, setpartabn - Set parameter table",
     "",
@@ -856,7 +856,7 @@ static char *SetpartabHelp[] = {
     NULL
 };
 
-static char *SetHelp[] = {
+static const char *SetHelp[] = {
     "NAME",
     "    setpartab, setcode, setparam, setname, setunit, setlevel, setltype - ",
     "    Set field info",
@@ -900,7 +900,7 @@ static char *SetHelp[] = {
     NULL
 };
 
-static char *SettimeHelp[] = {
+static const char *SettimeHelp[] = {
     "NAME",
     "    setdate, settime, setday, setmon, setyear, settunits, settaxis, setreftime, ",
     "    setcalendar, shifttime - Set time",
@@ -956,7 +956,7 @@ static char *SettimeHelp[] = {
     NULL
 };
 
-static char *ChangeHelp[] = {
+static const char *ChangeHelp[] = {
     "NAME",
     "    chcode, chparam, chname, chunit, chlevel, chlevelc, chlevelv - ",
     "    Change field header",
@@ -1003,7 +1003,7 @@ static char *ChangeHelp[] = {
     NULL
 };
 
-static char *SetgridHelp[] = {
+static const char *SetgridHelp[] = {
     "NAME",
     "    setgrid, setgridtype, setgridarea - Set grid information",
     "",
@@ -1041,7 +1041,7 @@ static char *SetgridHelp[] = {
     NULL
 };
 
-static char *SetzaxisHelp[] = {
+static const char *SetzaxisHelp[] = {
     "NAME",
     "    setzaxis, genlevelbounds - Set z-axis information",
     "",
@@ -1065,7 +1065,7 @@ static char *SetzaxisHelp[] = {
     NULL
 };
 
-static char *SetgattHelp[] = {
+static const char *SetgattHelp[] = {
     "NAME",
     "    setgatt, setgatts - Set global attribute",
     "",
@@ -1093,7 +1093,7 @@ static char *SetgattHelp[] = {
     NULL
 };
 
-static char *InvertHelp[] = {
+static const char *InvertHelp[] = {
     "NAME",
     "    invertlat - Invert latitudes",
     "",
@@ -1105,7 +1105,7 @@ static char *InvertHelp[] = {
     NULL
 };
 
-static char *InvertlevHelp[] = {
+static const char *InvertlevHelp[] = {
     "NAME",
     "    invertlev - Invert levels",
     "",
@@ -1117,7 +1117,7 @@ static char *InvertlevHelp[] = {
     NULL
 };
 
-static char *MaskregionHelp[] = {
+static const char *MaskregionHelp[] = {
     "NAME",
     "    maskregion - Mask regions",
     "",
@@ -1140,7 +1140,7 @@ static char *MaskregionHelp[] = {
     NULL
 };
 
-static char *MaskboxHelp[] = {
+static const char *MaskboxHelp[] = {
     "NAME",
     "    masklonlatbox, maskindexbox - Mask a box",
     "",
@@ -1173,7 +1173,7 @@ static char *MaskboxHelp[] = {
     NULL
 };
 
-static char *SetboxHelp[] = {
+static const char *SetboxHelp[] = {
     "NAME",
     "    setclonlatbox, setcindexbox - Set a box to constant",
     "",
@@ -1208,7 +1208,7 @@ static char *SetboxHelp[] = {
     NULL
 };
 
-static char *EnlargeHelp[] = {
+static const char *EnlargeHelp[] = {
     "NAME",
     "    enlarge - Enlarge fields",
     "",
@@ -1228,7 +1228,7 @@ static char *EnlargeHelp[] = {
     NULL
 };
 
-static char *SetmissHelp[] = {
+static const char *SetmissHelp[] = {
     "NAME",
     "    setmissval, setctomiss, setmisstoc, setrtomiss, setvrange, setmisstonn - ",
     "    Set missing value",
@@ -1281,7 +1281,7 @@ static char *SetmissHelp[] = {
     NULL
 };
 
-static char *ExprHelp[] = {
+static const char *ExprHelp[] = {
     "NAME",
     "    expr, exprf, aexpr, aexprf - Evaluate expressions",
     "",
@@ -1349,7 +1349,7 @@ static char *ExprHelp[] = {
     NULL
 };
 
-static char *MathHelp[] = {
+static const char *MathHelp[] = {
     "NAME",
     "    abs, int, nint, pow, sqr, sqrt, exp, ln, log10, sin, cos, tan, asin, acos, ",
     "    reci - Mathematical functions",
@@ -1395,7 +1395,7 @@ static char *MathHelp[] = {
     NULL
 };
 
-static char *ArithcHelp[] = {
+static const char *ArithcHelp[] = {
     "NAME",
     "    addc, subc, mulc, divc - Arithmetic with a constant",
     "",
@@ -1421,7 +1421,7 @@ static char *ArithcHelp[] = {
     NULL
 };
 
-static char *ArithHelp[] = {
+static const char *ArithHelp[] = {
     "NAME",
     "    add, sub, mul, div, min, max, atan2 - Arithmetic on two datasets",
     "",
@@ -1455,7 +1455,7 @@ static char *ArithHelp[] = {
     NULL
 };
 
-static char *MonarithHelp[] = {
+static const char *MonarithHelp[] = {
     "NAME",
     "    monadd, monsub, monmul, mondiv - Monthly arithmetic",
     "",
@@ -1482,7 +1482,7 @@ static char *MonarithHelp[] = {
     NULL
 };
 
-static char *YhourarithHelp[] = {
+static const char *YhourarithHelp[] = {
     "NAME",
     "    yhouradd, yhoursub, yhourmul, yhourdiv - Multi-year hourly arithmetic",
     "",
@@ -1509,7 +1509,7 @@ static char *YhourarithHelp[] = {
     NULL
 };
 
-static char *YdayarithHelp[] = {
+static const char *YdayarithHelp[] = {
     "NAME",
     "    ydayadd, ydaysub, ydaymul, ydaydiv - Multi-year daily arithmetic",
     "",
@@ -1536,7 +1536,7 @@ static char *YdayarithHelp[] = {
     NULL
 };
 
-static char *YmonarithHelp[] = {
+static const char *YmonarithHelp[] = {
     "NAME",
     "    ymonadd, ymonsub, ymonmul, ymondiv - Multi-year monthly arithmetic",
     "",
@@ -1562,7 +1562,7 @@ static char *YmonarithHelp[] = {
     NULL
 };
 
-static char *YseasarithHelp[] = {
+static const char *YseasarithHelp[] = {
     "NAME",
     "    yseasadd, yseassub, yseasmul, yseasdiv - Multi-year seasonal arithmetic",
     "",
@@ -1588,7 +1588,7 @@ static char *YseasarithHelp[] = {
     NULL
 };
 
-static char *ArithdaysHelp[] = {
+static const char *ArithdaysHelp[] = {
     "NAME",
     "    muldpm, divdpm, muldpy, divdpy - Arithmetic with days",
     "",
@@ -1612,7 +1612,7 @@ static char *ArithdaysHelp[] = {
     NULL
 };
 
-static char *ConsecstatHelp[] = {
+static const char *ConsecstatHelp[] = {
     "NAME",
     "    consecsum, consects - Consecute timestep periods",
     "",
@@ -1639,7 +1639,7 @@ static char *ConsecstatHelp[] = {
     NULL
 };
 
-static char *EnsstatHelp[] = {
+static const char *EnsstatHelp[] = {
     "NAME",
     "    ensmin, ensmax, enssum, ensmean, ensavg, ensstd, ensstd1, ensvar, ensvar1, ",
     "    enspctl - Statistical values over an ensemble",
@@ -1691,7 +1691,7 @@ static char *EnsstatHelp[] = {
     NULL
 };
 
-static char *Ensstat2Help[] = {
+static const char *Ensstat2Help[] = {
     "NAME",
     "    ensrkhistspace, ensrkhisttime, ensroc - Statistical values over an ensemble",
     "",
@@ -1731,7 +1731,7 @@ static char *Ensstat2Help[] = {
     NULL
 };
 
-static char *EnsvalHelp[] = {
+static const char *EnsvalHelp[] = {
     "NAME",
     "    enscrps, ensbrs - Ensemble validation tools",
     "",
@@ -1794,7 +1794,7 @@ static char *EnsvalHelp[] = {
     NULL
 };
 
-static char *FldstatHelp[] = {
+static const char *FldstatHelp[] = {
     "NAME",
     "    fldmin, fldmax, fldsum, fldmean, fldavg, fldstd, fldstd1, fldvar, fldvar1, ",
     "    fldpctl - Statistical values over a field",
@@ -1861,7 +1861,7 @@ static char *FldstatHelp[] = {
     NULL
 };
 
-static char *ZonstatHelp[] = {
+static const char *ZonstatHelp[] = {
     "NAME",
     "    zonmin, zonmax, zonsum, zonmean, zonavg, zonstd, zonstd1, zonvar, zonvar1, ",
     "    zonpctl - Zonal statistical values",
@@ -1903,7 +1903,7 @@ static char *ZonstatHelp[] = {
     NULL
 };
 
-static char *MerstatHelp[] = {
+static const char *MerstatHelp[] = {
     "NAME",
     "    mermin, mermax, mersum, mermean, meravg, merstd, merstd1, mervar, mervar1, ",
     "    merpctl - Meridional statistical values",
@@ -1945,7 +1945,7 @@ static char *MerstatHelp[] = {
     NULL
 };
 
-static char *GridboxstatHelp[] = {
+static const char *GridboxstatHelp[] = {
     "NAME",
     "    gridboxmin, gridboxmax, gridboxsum, gridboxmean, gridboxavg, gridboxstd, ",
     "    gridboxstd1, gridboxvar, gridboxvar1 - Statistical values over grid boxes",
@@ -1985,7 +1985,7 @@ static char *GridboxstatHelp[] = {
     NULL
 };
 
-static char *VertstatHelp[] = {
+static const char *VertstatHelp[] = {
     "NAME",
     "    vertmin, vertmax, vertsum, vertmean, vertavg, vertstd, vertstd1, vertvar, ",
     "    vertvar1 - Vertical statistical values",
@@ -2020,7 +2020,7 @@ static char *VertstatHelp[] = {
     NULL
 };
 
-static char *TimselstatHelp[] = {
+static const char *TimselstatHelp[] = {
     "NAME",
     "    timselmin, timselmax, timselsum, timselmean, timselavg, timselstd, ",
     "    timselstd1, timselvar, timselvar1 - Time range statistical values",
@@ -2088,7 +2088,7 @@ static char *TimselstatHelp[] = {
     NULL
 };
 
-static char *TimselpctlHelp[] = {
+static const char *TimselpctlHelp[] = {
     "NAME",
     "    timselpctl - Time range percentile values",
     "",
@@ -2119,7 +2119,7 @@ static char *TimselpctlHelp[] = {
     NULL
 };
 
-static char *RunstatHelp[] = {
+static const char *RunstatHelp[] = {
     "NAME",
     "    runmin, runmax, runsum, runmean, runavg, runstd, runstd1, runvar, runvar1 - ",
     "    Running statistical values",
@@ -2170,7 +2170,7 @@ static char *RunstatHelp[] = {
     NULL
 };
 
-static char *RunpctlHelp[] = {
+static const char *RunpctlHelp[] = {
     "NAME",
     "    runpctl - Running percentile values",
     "",
@@ -2189,7 +2189,7 @@ static char *RunpctlHelp[] = {
     NULL
 };
 
-static char *TimstatHelp[] = {
+static const char *TimstatHelp[] = {
     "NAME",
     "    timmin, timmax, timsum, timmean, timavg, timstd, timstd1, timvar, timvar1 - ",
     "    Statistical values over all timesteps",
@@ -2233,7 +2233,7 @@ static char *TimstatHelp[] = {
     NULL
 };
 
-static char *TimpctlHelp[] = {
+static const char *TimpctlHelp[] = {
     "NAME",
     "    timpctl - Percentile values over all timesteps",
     "",
@@ -2259,7 +2259,7 @@ static char *TimpctlHelp[] = {
     NULL
 };
 
-static char *HourstatHelp[] = {
+static const char *HourstatHelp[] = {
     "NAME",
     "    hourmin, hourmax, hoursum, hourmean, houravg, hourstd, hourstd1, hourvar, ",
     "    hourvar1 - Hourly statistical values",
@@ -2313,7 +2313,7 @@ static char *HourstatHelp[] = {
     NULL
 };
 
-static char *HourpctlHelp[] = {
+static const char *HourpctlHelp[] = {
     "NAME",
     "    hourpctl - Hourly percentile values",
     "",
@@ -2342,7 +2342,7 @@ static char *HourpctlHelp[] = {
     NULL
 };
 
-static char *DaystatHelp[] = {
+static const char *DaystatHelp[] = {
     "NAME",
     "    daymin, daymax, daysum, daymean, dayavg, daystd, daystd1, dayvar, dayvar1 - ",
     "    Daily statistical values",
@@ -2396,7 +2396,7 @@ static char *DaystatHelp[] = {
     NULL
 };
 
-static char *DaypctlHelp[] = {
+static const char *DaypctlHelp[] = {
     "NAME",
     "    daypctl - Daily percentile values",
     "",
@@ -2425,7 +2425,7 @@ static char *DaypctlHelp[] = {
     NULL
 };
 
-static char *MonstatHelp[] = {
+static const char *MonstatHelp[] = {
     "NAME",
     "    monmin, monmax, monsum, monmean, monavg, monstd, monstd1, monvar, monvar1 - ",
     "    Monthly statistical values",
@@ -2479,7 +2479,7 @@ static char *MonstatHelp[] = {
     NULL
 };
 
-static char *MonpctlHelp[] = {
+static const char *MonpctlHelp[] = {
     "NAME",
     "    monpctl - Monthly percentile values",
     "",
@@ -2508,7 +2508,7 @@ static char *MonpctlHelp[] = {
     NULL
 };
 
-static char *YearmonstatHelp[] = {
+static const char *YearmonstatHelp[] = {
     "NAME",
     "    yearmonmean - Yearly mean from monthly data",
     "",
@@ -2530,7 +2530,7 @@ static char *YearmonstatHelp[] = {
     NULL
 };
 
-static char *YearstatHelp[] = {
+static const char *YearstatHelp[] = {
     "NAME",
     "    yearmin, yearmax, yearsum, yearmean, yearavg, yearstd, yearstd1, yearvar, ",
     "    yearvar1 - Yearly statistical values",
@@ -2587,7 +2587,7 @@ static char *YearstatHelp[] = {
     NULL
 };
 
-static char *YearpctlHelp[] = {
+static const char *YearpctlHelp[] = {
     "NAME",
     "    yearpctl - Yearly percentile values",
     "",
@@ -2616,7 +2616,7 @@ static char *YearpctlHelp[] = {
     NULL
 };
 
-static char *SeasstatHelp[] = {
+static const char *SeasstatHelp[] = {
     "NAME",
     "    seasmin, seasmax, seassum, seasmean, seasavg, seasstd, seasstd1, seasvar, ",
     "    seasvar1 - Seasonal statistical values",
@@ -2672,7 +2672,7 @@ static char *SeasstatHelp[] = {
     NULL
 };
 
-static char *SeaspctlHelp[] = {
+static const char *SeaspctlHelp[] = {
     "NAME",
     "    seaspctl - Seasonal percentile values",
     "",
@@ -2701,7 +2701,7 @@ static char *SeaspctlHelp[] = {
     NULL
 };
 
-static char *YhourstatHelp[] = {
+static const char *YhourstatHelp[] = {
     "NAME",
     "    yhourmin, yhourmax, yhoursum, yhourmean, yhouravg, yhourstd, yhourstd1, ",
     "    yhourvar, yhourvar1 - Multi-year hourly statistical values",
@@ -2763,7 +2763,7 @@ static char *YhourstatHelp[] = {
     NULL
 };
 
-static char *YdaystatHelp[] = {
+static const char *YdaystatHelp[] = {
     "NAME",
     "    ydaymin, ydaymax, ydaysum, ydaymean, ydayavg, ydaystd, ydaystd1, ydayvar, ",
     "    ydayvar1 - Multi-year daily statistical values",
@@ -2825,7 +2825,7 @@ static char *YdaystatHelp[] = {
     NULL
 };
 
-static char *YdaypctlHelp[] = {
+static const char *YdaypctlHelp[] = {
     "NAME",
     "    ydaypctl - Multi-year daily percentile values",
     "",
@@ -2854,7 +2854,7 @@ static char *YdaypctlHelp[] = {
     NULL
 };
 
-static char *YmonstatHelp[] = {
+static const char *YmonstatHelp[] = {
     "NAME",
     "    ymonmin, ymonmax, ymonsum, ymonmean, ymonavg, ymonstd, ymonstd1, ymonvar, ",
     "    ymonvar1 - Multi-year monthly statistical values",
@@ -2916,7 +2916,7 @@ static char *YmonstatHelp[] = {
     NULL
 };
 
-static char *YmonpctlHelp[] = {
+static const char *YmonpctlHelp[] = {
     "NAME",
     "    ymonpctl - Multi-year monthly percentile values",
     "",
@@ -2947,7 +2947,7 @@ static char *YmonpctlHelp[] = {
     NULL
 };
 
-static char *YseasstatHelp[] = {
+static const char *YseasstatHelp[] = {
     "NAME",
     "    yseasmin, yseasmax, yseassum, yseasmean, yseasavg, yseasstd, yseasstd1, ",
     "    yseasvar, yseasvar1 - Multi-year seasonal statistical values",
@@ -3010,7 +3010,7 @@ static char *YseasstatHelp[] = {
     NULL
 };
 
-static char *YseaspctlHelp[] = {
+static const char *YseaspctlHelp[] = {
     "NAME",
     "    yseaspctl - Multi-year seasonal percentile values",
     "",
@@ -3042,7 +3042,7 @@ static char *YseaspctlHelp[] = {
     NULL
 };
 
-static char *YdrunstatHelp[] = {
+static const char *YdrunstatHelp[] = {
     "NAME",
     "    ydrunmin, ydrunmax, ydrunsum, ydrunmean, ydrunavg, ydrunstd, ydrunstd1, ",
     "    ydrunvar, ydrunvar1 - Multi-year daily running statistical values",
@@ -3114,7 +3114,7 @@ static char *YdrunstatHelp[] = {
     NULL
 };
 
-static char *YdrunpctlHelp[] = {
+static const char *YdrunpctlHelp[] = {
     "NAME",
     "    ydrunpctl - Multi-year daily running percentile values",
     "",
@@ -3154,7 +3154,7 @@ static char *YdrunpctlHelp[] = {
     NULL
 };
 
-static char *FldcorHelp[] = {
+static const char *FldcorHelp[] = {
     "NAME",
     "    fldcor - Correlation in grid space",
     "",
@@ -3176,7 +3176,7 @@ static char *FldcorHelp[] = {
     NULL
 };
 
-static char *TimcorHelp[] = {
+static const char *TimcorHelp[] = {
     "NAME",
     "    timcor - Correlation over time",
     "",
@@ -3197,7 +3197,7 @@ static char *TimcorHelp[] = {
     NULL
 };
 
-static char *FldcovarHelp[] = {
+static const char *FldcovarHelp[] = {
     "NAME",
     "    fldcovar - Covariance in grid space",
     "",
@@ -3218,7 +3218,7 @@ static char *FldcovarHelp[] = {
     NULL
 };
 
-static char *TimcovarHelp[] = {
+static const char *TimcovarHelp[] = {
     "NAME",
     "    timcovar - Covariance over time",
     "",
@@ -3238,7 +3238,7 @@ static char *TimcovarHelp[] = {
     NULL
 };
 
-static char *RegresHelp[] = {
+static const char *RegresHelp[] = {
     "NAME",
     "    regres - Regression",
     "",
@@ -3253,7 +3253,7 @@ static char *RegresHelp[] = {
     NULL
 };
 
-static char *DetrendHelp[] = {
+static const char *DetrendHelp[] = {
     "NAME",
     "    detrend - Detrend time series",
     "",
@@ -3270,7 +3270,7 @@ static char *DetrendHelp[] = {
     NULL
 };
 
-static char *TrendHelp[] = {
+static const char *TrendHelp[] = {
     "NAME",
     "    trend - Trend of time series",
     "",
@@ -3287,7 +3287,7 @@ static char *TrendHelp[] = {
     NULL
 };
 
-static char *SubtrendHelp[] = {
+static const char *SubtrendHelp[] = {
     "NAME",
     "    subtrend - Subtract a trend",
     "",
@@ -3303,7 +3303,7 @@ static char *SubtrendHelp[] = {
     NULL
 };
 
-static char *EOFsHelp[] = {
+static const char *EOFsHelp[] = {
     "NAME",
     "    eof, eoftime, eofspatial, eof3d - Empirical Orthogonal Functions",
     "",
@@ -3361,7 +3361,7 @@ static char *EOFsHelp[] = {
     NULL
 };
 
-static char *EofcoeffHelp[] = {
+static const char *EofcoeffHelp[] = {
     "NAME",
     "    eofcoeff - Principal coefficients of EOFs",
     "",
@@ -3388,7 +3388,7 @@ static char *EofcoeffHelp[] = {
     NULL
 };
 
-static char *RemapgridHelp[] = {
+static const char *RemapgridHelp[] = {
     "NAME",
     "    remapbil, remapbic, remapdis, remapnn, remapcon, remapcon2, remaplaf - ",
     "    SCRIP grid interpolation",
@@ -3449,7 +3449,7 @@ static char *RemapgridHelp[] = {
     NULL
 };
 
-static char *GenweightsHelp[] = {
+static const char *GenweightsHelp[] = {
     "NAME",
     "    genbil, genbic, gendis, gennn, gencon, gencon2, genlaf - ",
     "    Generate SCRIP grid interpolation weights",
@@ -3518,7 +3518,7 @@ static char *GenweightsHelp[] = {
     NULL
 };
 
-static char *RemapHelp[] = {
+static const char *RemapHelp[] = {
     "NAME",
     "    remap - SCRIP grid remapping",
     "",
@@ -3559,7 +3559,7 @@ static char *RemapHelp[] = {
     NULL
 };
 
-static char *RemapetaHelp[] = {
+static const char *RemapetaHelp[] = {
     "NAME",
     "    remapeta - Remap vertical hybrid level",
     "",
@@ -3618,7 +3618,7 @@ static char *RemapetaHelp[] = {
     NULL
 };
 
-static char *VertintmlHelp[] = {
+static const char *VertintmlHelp[] = {
     "NAME",
     "    ml2pl, ml2hl - Vertical interpolation",
     "",
@@ -3656,7 +3656,7 @@ static char *VertintmlHelp[] = {
     NULL
 };
 
-static char *VertintapHelp[] = {
+static const char *VertintapHelp[] = {
     "NAME",
     "    ap2pl - Vertical interpolation",
     "",
@@ -3677,7 +3677,7 @@ static char *VertintapHelp[] = {
     NULL
 };
 
-static char *IntlevelHelp[] = {
+static const char *IntlevelHelp[] = {
     "NAME",
     "    intlevel - Linear level interpolation",
     "",
@@ -3692,7 +3692,7 @@ static char *IntlevelHelp[] = {
     NULL
 };
 
-static char *Intlevel3dHelp[] = {
+static const char *Intlevel3dHelp[] = {
     "NAME",
     "    intlevel3d, intlevelx3d - ",
     "    Linear level interpolation from/to 3d vertical coordinates",
@@ -3714,7 +3714,7 @@ static char *Intlevel3dHelp[] = {
     NULL
 };
 
-static char *InttimeHelp[] = {
+static const char *InttimeHelp[] = {
     "NAME",
     "    inttime, intntime - Time interpolation",
     "",
@@ -3741,7 +3741,7 @@ static char *InttimeHelp[] = {
     NULL
 };
 
-static char *IntyearHelp[] = {
+static const char *IntyearHelp[] = {
     "NAME",
     "    intyear - Year interpolation",
     "",
@@ -3765,7 +3765,7 @@ static char *IntyearHelp[] = {
     NULL
 };
 
-static char *SpectralHelp[] = {
+static const char *SpectralHelp[] = {
     "NAME",
     "    sp2gp, sp2gpl, gp2sp, gp2spl, sp2sp - Spectral transformation",
     "",
@@ -3810,7 +3810,7 @@ static char *SpectralHelp[] = {
     NULL
 };
 
-static char *WindHelp[] = {
+static const char *WindHelp[] = {
     "NAME",
     "    dv2uv, dv2uvl, uv2dv, uv2dvl, dv2ps - Wind transformation",
     "",
@@ -3863,7 +3863,7 @@ static char *WindHelp[] = {
     NULL
 };
 
-static char *ImportbinaryHelp[] = {
+static const char *ImportbinaryHelp[] = {
     "NAME",
     "    import_binary - Import binary data sets",
     "",
@@ -3891,7 +3891,7 @@ static char *ImportbinaryHelp[] = {
     NULL
 };
 
-static char *ImportcmsafHelp[] = {
+static const char *ImportcmsafHelp[] = {
     "NAME",
     "    import_cmsaf - Import CM-SAF HDF5 files",
     "",
@@ -3940,7 +3940,7 @@ static char *ImportcmsafHelp[] = {
     NULL
 };
 
-static char *ImportamsrHelp[] = {
+static const char *ImportamsrHelp[] = {
     "NAME",
     "    import_amsr - Import AMSR binary files",
     "",
@@ -3960,7 +3960,7 @@ static char *ImportamsrHelp[] = {
     NULL
 };
 
-static char *InputHelp[] = {
+static const char *InputHelp[] = {
     "NAME",
     "    input, inputsrv, inputext - Formatted input",
     "",
@@ -3995,7 +3995,7 @@ static char *InputHelp[] = {
     NULL
 };
 
-static char *OutputHelp[] = {
+static const char *OutputHelp[] = {
     "NAME",
     "    output, outputf, outputint, outputsrv, outputext - Formatted output",
     "",
@@ -4035,7 +4035,7 @@ static char *OutputHelp[] = {
     NULL
 };
 
-static char *OutputtabHelp[] = {
+static const char *OutputtabHelp[] = {
     "NAME",
     "    outputtab - Table output",
     "",
@@ -4075,7 +4075,7 @@ static char *OutputtabHelp[] = {
     NULL
 };
 
-static char *GradsdesHelp[] = {
+static const char *GradsdesHelp[] = {
     "NAME",
     "    gradsdes - GrADS data descriptor file",
     "",
@@ -4098,7 +4098,7 @@ static char *GradsdesHelp[] = {
     NULL
 };
 
-static char *AfterburnerHelp[] = {
+static const char *AfterburnerHelp[] = {
     "NAME",
     "    after - ECHAM standard post processor",
     "",
@@ -4191,7 +4191,7 @@ static char *AfterburnerHelp[] = {
     NULL
 };
 
-static char *FilterHelp[] = {
+static const char *FilterHelp[] = {
     "NAME",
     "    bandpass, lowpass, highpass - Time series filtering",
     "",
@@ -4237,7 +4237,7 @@ static char *FilterHelp[] = {
     NULL
 };
 
-static char *GridcellHelp[] = {
+static const char *GridcellHelp[] = {
     "NAME",
     "    gridarea, gridweights - Grid cell quantities",
     "",
@@ -4264,7 +4264,7 @@ static char *GridcellHelp[] = {
     NULL
 };
 
-static char *Smooth9Help[] = {
+static const char *Smooth9Help[] = {
     "NAME",
     "    smooth9 - 9 point smoothing",
     "",
@@ -4285,7 +4285,7 @@ static char *Smooth9Help[] = {
     NULL
 };
 
-static char *ReplacevaluesHelp[] = {
+static const char *ReplacevaluesHelp[] = {
     "NAME",
     "    setvals, setrtoc, setrtoc2 - Replace variable values",
     "",
@@ -4318,7 +4318,7 @@ static char *ReplacevaluesHelp[] = {
     NULL
 };
 
-static char *TimsortHelp[] = {
+static const char *TimsortHelp[] = {
     "NAME",
     "    timsort - Timsort",
     "",
@@ -4333,7 +4333,7 @@ static char *TimsortHelp[] = {
     NULL
 };
 
-static char *VargenHelp[] = {
+static const char *VargenHelp[] = {
     "NAME",
     "    const, random, for, stdatm - Generate a field",
     "",
@@ -4386,7 +4386,7 @@ static char *VargenHelp[] = {
     NULL
 };
 
-static char *RotuvbHelp[] = {
+static const char *RotuvbHelp[] = {
     "NAME",
     "    rotuvb - Rotation",
     "",
@@ -4403,7 +4403,7 @@ static char *RotuvbHelp[] = {
     NULL
 };
 
-static char *MastrfuHelp[] = {
+static const char *MastrfuHelp[] = {
     "NAME",
     "    mastrfu - Mass stream function",
     "",
@@ -4417,7 +4417,7 @@ static char *MastrfuHelp[] = {
     NULL
 };
 
-static char *DeriveparHelp[] = {
+static const char *DeriveparHelp[] = {
     "NAME",
     "    sealevelpressure - Sea level pressure",
     "",
@@ -4430,7 +4430,7 @@ static char *DeriveparHelp[] = {
     NULL
 };
 
-static char *AdisitHelp[] = {
+static const char *AdisitHelp[] = {
     "NAME",
     "    adisit, adipot - Potential temperature to in-situ temperature and vice versa",
     "",
@@ -4461,7 +4461,7 @@ static char *AdisitHelp[] = {
     NULL
 };
 
-static char *RhopotHelp[] = {
+static const char *RhopotHelp[] = {
     "NAME",
     "    rhopot - Calculates potential density",
     "",
@@ -4479,7 +4479,7 @@ static char *RhopotHelp[] = {
     NULL
 };
 
-static char *HistogramHelp[] = {
+static const char *HistogramHelp[] = {
     "NAME",
     "    histcount, histsum, histmean, histfreq - Histogram",
     "",
@@ -4511,7 +4511,7 @@ static char *HistogramHelp[] = {
     NULL
 };
 
-static char *SethaloHelp[] = {
+static const char *SethaloHelp[] = {
     "NAME",
     "    sethalo - Set the left and right bounds of a field",
     "",
@@ -4531,7 +4531,7 @@ static char *SethaloHelp[] = {
     NULL
 };
 
-static char *WctHelp[] = {
+static const char *WctHelp[] = {
     "NAME",
     "    wct - Windchill temperature",
     "",
@@ -4549,7 +4549,7 @@ static char *WctHelp[] = {
     NULL
 };
 
-static char *FdnsHelp[] = {
+static const char *FdnsHelp[] = {
     "NAME",
     "    fdns - Frost days where no snow index per time period",
     "",
@@ -4567,7 +4567,7 @@ static char *FdnsHelp[] = {
     NULL
 };
 
-static char *StrwinHelp[] = {
+static const char *StrwinHelp[] = {
     "NAME",
     "    strwin - Strong wind days index per time period",
     "",
@@ -4590,7 +4590,7 @@ static char *StrwinHelp[] = {
     NULL
 };
 
-static char *StrbreHelp[] = {
+static const char *StrbreHelp[] = {
     "NAME",
     "    strbre - Strong breeze days index per time period",
     "",
@@ -4609,7 +4609,7 @@ static char *StrbreHelp[] = {
     NULL
 };
 
-static char *StrgalHelp[] = {
+static const char *StrgalHelp[] = {
     "NAME",
     "    strgal - Strong gale days index per time period",
     "",
@@ -4628,7 +4628,7 @@ static char *StrgalHelp[] = {
     NULL
 };
 
-static char *HurrHelp[] = {
+static const char *HurrHelp[] = {
     "NAME",
     "    hurr - Hurricane days index per time period",
     "",
@@ -4647,7 +4647,7 @@ static char *HurrHelp[] = {
     NULL
 };
 
-static char *FillmissHelp[] = {
+static const char *FillmissHelp[] = {
     "NAME",
     "    fillmiss, fillmiss2 - Fill missing values",
     "",
@@ -4668,7 +4668,7 @@ static char *FillmissHelp[] = {
     NULL
 };
 
-static char *EcaCddHelp[] = {
+static const char *EcaCddHelp[] = {
     "NAME",
     "    eca_cdd - Consecutive dry days index per time period",
     "",
@@ -4689,7 +4689,7 @@ static char *EcaCddHelp[] = {
     NULL
 };
 
-static char *EcaCfdHelp[] = {
+static const char *EcaCfdHelp[] = {
     "NAME",
     "    eca_cfd - Consecutive frost days index per time period",
     "",
@@ -4707,7 +4707,7 @@ static char *EcaCfdHelp[] = {
     NULL
 };
 
-static char *EcaCsuHelp[] = {
+static const char *EcaCsuHelp[] = {
     "NAME",
     "    eca_csu - Consecutive summer days index per time period",
     "",
@@ -4729,7 +4729,7 @@ static char *EcaCsuHelp[] = {
     NULL
 };
 
-static char *EcaCwdHelp[] = {
+static const char *EcaCwdHelp[] = {
     "NAME",
     "    eca_cwd - Consecutive wet days index per time period",
     "",
@@ -4750,7 +4750,7 @@ static char *EcaCwdHelp[] = {
     NULL
 };
 
-static char *EcaCwdiHelp[] = {
+static const char *EcaCwdiHelp[] = {
     "NAME",
     "    eca_cwdi - Cold wave duration index wrt mean of reference period",
     "",
@@ -4776,7 +4776,7 @@ static char *EcaCwdiHelp[] = {
     NULL
 };
 
-static char *EcaCwfiHelp[] = {
+static const char *EcaCwfiHelp[] = {
     "NAME",
     "    eca_cwfi - Cold-spell days index wrt 10th percentile of reference period",
     "",
@@ -4802,7 +4802,7 @@ static char *EcaCwfiHelp[] = {
     NULL
 };
 
-static char *EcaEtrHelp[] = {
+static const char *EcaEtrHelp[] = {
     "NAME",
     "    eca_etr - Intra-period extreme temperature range",
     "",
@@ -4821,7 +4821,7 @@ static char *EcaEtrHelp[] = {
     NULL
 };
 
-static char *EcaFdHelp[] = {
+static const char *EcaFdHelp[] = {
     "NAME",
     "    eca_fd - Frost days index per time period",
     "",
@@ -4839,7 +4839,7 @@ static char *EcaFdHelp[] = {
     NULL
 };
 
-static char *EcaGslHelp[] = {
+static const char *EcaGslHelp[] = {
     "NAME",
     "    eca_gsl - Thermal Growing season length index",
     "",
@@ -4874,7 +4874,7 @@ static char *EcaGslHelp[] = {
     NULL
 };
 
-static char *EcaHdHelp[] = {
+static const char *EcaHdHelp[] = {
     "NAME",
     "    eca_hd - Heating degree days per time period",
     "",
@@ -4897,7 +4897,7 @@ static char *EcaHdHelp[] = {
     NULL
 };
 
-static char *EcaHwdiHelp[] = {
+static const char *EcaHwdiHelp[] = {
     "NAME",
     "    eca_hwdi - Heat wave duration index wrt mean of reference period",
     "",
@@ -4923,7 +4923,7 @@ static char *EcaHwdiHelp[] = {
     NULL
 };
 
-static char *EcaHwfiHelp[] = {
+static const char *EcaHwfiHelp[] = {
     "NAME",
     "    eca_hwfi - Warm spell days index wrt 90th percentile of reference period",
     "",
@@ -4952,7 +4952,7 @@ static char *EcaHwfiHelp[] = {
     NULL
 };
 
-static char *EcaIdHelp[] = {
+static const char *EcaIdHelp[] = {
     "NAME",
     "    eca_id - Ice days index per time period",
     "",
@@ -4970,7 +4970,7 @@ static char *EcaIdHelp[] = {
     NULL
 };
 
-static char *EcaR75pHelp[] = {
+static const char *EcaR75pHelp[] = {
     "NAME",
     "    eca_r75p - Moderate wet days wrt 75th percentile of reference period",
     "",
@@ -4989,7 +4989,7 @@ static char *EcaR75pHelp[] = {
     NULL
 };
 
-static char *EcaR75ptotHelp[] = {
+static const char *EcaR75ptotHelp[] = {
     "NAME",
     "    eca_r75ptot - Precipitation percent due to R75p days",
     "",
@@ -5009,7 +5009,7 @@ static char *EcaR75ptotHelp[] = {
     NULL
 };
 
-static char *EcaR90pHelp[] = {
+static const char *EcaR90pHelp[] = {
     "NAME",
     "    eca_r90p - Wet days wrt 90th percentile of reference period",
     "",
@@ -5028,7 +5028,7 @@ static char *EcaR90pHelp[] = {
     NULL
 };
 
-static char *EcaR90ptotHelp[] = {
+static const char *EcaR90ptotHelp[] = {
     "NAME",
     "    eca_r90ptot - Precipitation percent due to R90p days",
     "",
@@ -5048,7 +5048,7 @@ static char *EcaR90ptotHelp[] = {
     NULL
 };
 
-static char *EcaR95pHelp[] = {
+static const char *EcaR95pHelp[] = {
     "NAME",
     "    eca_r95p - Very wet days wrt 95th percentile of reference period",
     "",
@@ -5067,7 +5067,7 @@ static char *EcaR95pHelp[] = {
     NULL
 };
 
-static char *EcaR95ptotHelp[] = {
+static const char *EcaR95ptotHelp[] = {
     "NAME",
     "    eca_r95ptot - Precipitation percent due to R95p days",
     "",
@@ -5087,7 +5087,7 @@ static char *EcaR95ptotHelp[] = {
     NULL
 };
 
-static char *EcaR99pHelp[] = {
+static const char *EcaR99pHelp[] = {
     "NAME",
     "    eca_r99p - Extremely wet days wrt 99th percentile of reference period",
     "",
@@ -5106,7 +5106,7 @@ static char *EcaR99pHelp[] = {
     NULL
 };
 
-static char *EcaR99ptotHelp[] = {
+static const char *EcaR99ptotHelp[] = {
     "NAME",
     "    eca_r99ptot - Precipitation percent due to R99p days",
     "",
@@ -5126,7 +5126,7 @@ static char *EcaR99ptotHelp[] = {
     NULL
 };
 
-static char *EcaPdHelp[] = {
+static const char *EcaPdHelp[] = {
     "NAME",
     "    eca_pd, eca_r10mm, eca_r20mm - Precipitation days index per time period",
     "",
@@ -5160,7 +5160,7 @@ static char *EcaPdHelp[] = {
     NULL
 };
 
-static char *EcaRr1Help[] = {
+static const char *EcaRr1Help[] = {
     "NAME",
     "    eca_rr1 - Wet days index per time period",
     "",
@@ -5179,7 +5179,7 @@ static char *EcaRr1Help[] = {
     NULL
 };
 
-static char *EcaRx1dayHelp[] = {
+static const char *EcaRx1dayHelp[] = {
     "NAME",
     "    eca_rx1day - Highest one day precipitation amount per time period",
     "",
@@ -5201,7 +5201,7 @@ static char *EcaRx1dayHelp[] = {
     NULL
 };
 
-static char *EcaRx5dayHelp[] = {
+static const char *EcaRx5dayHelp[] = {
     "NAME",
     "    eca_rx5day - Highest five-day precipitation amount per time period",
     "",
@@ -5222,7 +5222,7 @@ static char *EcaRx5dayHelp[] = {
     NULL
 };
 
-static char *EcaSdiiHelp[] = {
+static const char *EcaSdiiHelp[] = {
     "NAME",
     "    eca_sdii - Simple daily intensity index per time period",
     "",
@@ -5241,7 +5241,7 @@ static char *EcaSdiiHelp[] = {
     NULL
 };
 
-static char *EcaSuHelp[] = {
+static const char *EcaSuHelp[] = {
     "NAME",
     "    eca_su - Summer days index per time period",
     "",
@@ -5261,7 +5261,7 @@ static char *EcaSuHelp[] = {
     NULL
 };
 
-static char *EcaTg10pHelp[] = {
+static const char *EcaTg10pHelp[] = {
     "NAME",
     "    eca_tg10p - Cold days percent wrt 10th percentile of reference period",
     "",
@@ -5283,7 +5283,7 @@ static char *EcaTg10pHelp[] = {
     NULL
 };
 
-static char *EcaTg90pHelp[] = {
+static const char *EcaTg90pHelp[] = {
     "NAME",
     "    eca_tg90p - Warm days percent wrt 90th percentile of reference period",
     "",
@@ -5305,7 +5305,7 @@ static char *EcaTg90pHelp[] = {
     NULL
 };
 
-static char *EcaTn10pHelp[] = {
+static const char *EcaTn10pHelp[] = {
     "NAME",
     "    eca_tn10p - Cold nights percent wrt 10th percentile of reference period",
     "",
@@ -5327,7 +5327,7 @@ static char *EcaTn10pHelp[] = {
     NULL
 };
 
-static char *EcaTn90pHelp[] = {
+static const char *EcaTn90pHelp[] = {
     "NAME",
     "    eca_tn90p - Warm nights percent wrt 90th percentile of reference period",
     "",
@@ -5346,7 +5346,7 @@ static char *EcaTn90pHelp[] = {
     NULL
 };
 
-static char *EcaTrHelp[] = {
+static const char *EcaTrHelp[] = {
     "NAME",
     "    eca_tr - Tropical nights index per time period",
     "",
@@ -5366,7 +5366,7 @@ static char *EcaTrHelp[] = {
     NULL
 };
 
-static char *EcaTx10pHelp[] = {
+static const char *EcaTx10pHelp[] = {
     "NAME",
     "    eca_tx10p - Very cold days percent wrt 10th percentile of reference period",
     "",
@@ -5388,7 +5388,7 @@ static char *EcaTx10pHelp[] = {
     NULL
 };
 
-static char *EcaTx90pHelp[] = {
+static const char *EcaTx90pHelp[] = {
     "NAME",
     "    eca_tx90p - Very warm days percent wrt 90th percentile of reference period",
     "",

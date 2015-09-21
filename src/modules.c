@@ -29,12 +29,12 @@
 #define  MAX_MOD_OPERATORS  128         /* maximum number of operators for a module */
 
 typedef struct {
-  void  *(*func)(void *);               /* Module                   */
-  char **help;                          /* Help                     */
-  char  *operators[MAX_MOD_OPERATORS];  /* Operator names           */
-  short  number;                        /* Allowed number type      */
-  short  streamInCnt;                   /* Number of input streams  */
-  short  streamOutCnt;                  /* Number of output streams */
+  void  *(*func)(void *);                     /* Module                   */
+  const char **help;                          /* Help                     */
+  const char  *operators[MAX_MOD_OPERATORS];  /* Operator names           */
+  short  number;                              /* Allowed number type      */
+  short  streamInCnt;                         /* Number of input streams  */
+  short  streamOutCnt;                        /* Number of output streams */
 }
 modules_t;
 
@@ -801,7 +801,7 @@ static modules_t Modules[] =
 							       
 static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
 
-static char *opalias[][2] =
+static const char *opalias[][2] =
 {
   {"anomaly",             "ymonsub"    },
   {"deltap_fl",           "deltap"     },
@@ -880,12 +880,11 @@ int similar(const char *a, const char *b, int alen, int blen)
 }
 
 
-char *operatorAlias(char *operatorName)
+const char *operatorAlias(char *operatorName)
 {
-  char *operatorNameNew;
   int i;
 
-  operatorNameNew = operatorName;
+  const char *operatorNameNew = operatorName;
 
   for ( i = 0; i < nopalias; i++ )
     {
@@ -899,11 +898,11 @@ char *operatorAlias(char *operatorName)
       operatorNameNew = opalias[i][1];
     }
 
-  return (operatorNameNew);
+  return operatorNameNew;
 }
 
 static
-int operatorInqModID(char *operatorName)
+int operatorInqModID(const char *operatorName)
 {
   int i, j, modID = -1;
 
@@ -979,42 +978,37 @@ int operatorInqModID(char *operatorName)
     if ( ! Modules[modID].func )
       Error("Module for operator >%s< not installed!", operatorName);
 
-  return (modID);
+  return modID;
 }
 
 void *(*operatorModule(char *operatorName))(void *)
 {
-  int modID;
-  modID = operatorInqModID(operatorName);
-  return (Modules[modID].func);
+  int modID = operatorInqModID(operatorName);
+  return Modules[modID].func;
 }
 
-char **operatorHelp(char *operatorName)
+const char **operatorHelp(char *operatorName)
 {
-  int modID;
-  modID = operatorInqModID(operatorName);
-  return (Modules[modID].help);
+  int modID = operatorInqModID(operatorName);
+  return Modules[modID].help;
 }
 
 int operatorStreamInCnt(char *operatorName)
 {
-  int modID;
-  modID = operatorInqModID(operatorAlias(operatorName));
-  return (Modules[modID].streamInCnt);
+  int modID = operatorInqModID(operatorAlias(operatorName));
+  return Modules[modID].streamInCnt;
 }
 
 int operatorStreamOutCnt(char *operatorName)
 {
-  int modID;
-  modID = operatorInqModID(operatorAlias(operatorName));
-  return (Modules[modID].streamOutCnt);
+  int modID = operatorInqModID(operatorAlias(operatorName));
+  return Modules[modID].streamOutCnt;
 }
 
 int operatorStreamNumber(char *operatorName)
 {
-  int modID;
-  modID = operatorInqModID(operatorAlias(operatorName));
-  return (Modules[modID].number);
+  int modID = operatorInqModID(operatorAlias(operatorName));
+  return Modules[modID].number;
 }
 
 int cmpname(const void *s1, const void *s2)
@@ -1022,13 +1016,13 @@ int cmpname(const void *s1, const void *s2)
   char **c1 = (char **) s1;
   char **c2 = (char **) s2;
 
-  return (strcmp((const char *)*c1, (const char *)*c2));
+  return strcmp((const char *)*c1, (const char *)*c2);
 }
 
 void operatorPrintAll(void)
 {
   int i, j, nbyte, nop = 0;
-  char *opernames[4096];
+  const char *opernames[4096];
   FILE *pout = stderr;
 
   for ( i = 0; i < NumModules; i++ )

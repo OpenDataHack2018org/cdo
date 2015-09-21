@@ -189,7 +189,7 @@ char *getOperator(const char *argument)
   return (operatorArg);
 }
 
-char *operatorAlias(char *operatorName);
+const char *operatorAlias(char *operatorName);
 
 char *getOperatorName(const char *operatorArg)
 {
