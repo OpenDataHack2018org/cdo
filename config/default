@@ -42,7 +42,7 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
+	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native" CXX=icpc
         elif  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -54,7 +54,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=clang CFLAGS="-g -Wall -O3"
+	            CC=clang CFLAGS="-g -Wall -Wwrite-strings -O3"
         elif  test "$COMP" = g++ ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -63,7 +63,7 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector"
+	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -Wwrite-strings -pedantic -O3 -march=native -fstack-protector"
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
         fi

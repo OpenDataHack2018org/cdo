@@ -263,16 +263,18 @@ while (<MOFILE>) {
       print TRLIST "Here is a short overview of all operators in this section:\\\\\n";
       print TRLIST "\n";
 
-      print TROVER "\\newpage\n";
-      print TROVER "\\section{$chap}\n";
-      print TROVER "\\input{ref_intro_${shortname}}\n";
-      print TROVER "\\input{ref_list_${shortname}}\n";
-      print TROVER "\\input{ref_man_${shortname}}\n\n";
-#      if ( $chap eq "ECA indices" ) {
+      if ( $shortname ne "climat" ) {
+        print TROVER "\\newpage\n";
+        print TROVER "\\section{$chap}\n";
+        print TROVER "\\input{ref_intro_${shortname}}\n";
+        print TROVER "\\input{ref_list_${shortname}}\n";
+        print TROVER "\\input{ref_man_${shortname}}\n\n";
+      }
+      if ( $shortname eq "climat" ) {
 #	print "find eca!";
-#	$refskip = 1;
-#      }
-#      else {
+	$refskip = 1;
+      }
+      else {
 	print TRCARD "\\subsubsection*{$chap}\n";
 	$refskip = 0;
       if ( $chap eq "Statistical values" ) {
@@ -294,7 +296,7 @@ while (<MOFILE>) {
 	print TRCARD "\\end{tabular*}\n";
 	print TRCARD "\\vspace{2mm}\n\n";
       }
-#      }
+      }
 #      print TCFILE "\\begin{tabular*}{13cm}{ll}\n";
 #      print TCFILE "\\hspace*{30mm} &  \\\\ \n";
 
