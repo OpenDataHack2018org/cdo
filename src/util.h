@@ -91,6 +91,7 @@ extern int cdoExpMode;
 extern int CDO_Color;
 extern int CDO_Use_FFTW;
 extern int CDO_Version_Info;
+extern int CDO_CMOR_Mode;
 extern int cdoDiag;
 
 extern int cdoNumVarnames;

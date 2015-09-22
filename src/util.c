@@ -81,6 +81,8 @@ int cdoCheckDatarange    = FALSE;
 int CDO_Color            = FALSE;
 int CDO_Use_FFTW         = TRUE;
 int CDO_Version_Info     = TRUE;
+int CDO_CMOR_Mode        = FALSE;
+
 int cdoDiag              = FALSE;
 
 int CDO_Reduce_Dim       = FALSE;

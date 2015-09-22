@@ -73,7 +73,6 @@ static int numThreads = 0;
 static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
-static int CDO_cmor_mode = 0;
 
 void gridsearch_set_method(const char *methodstr);
 
@@ -968,12 +967,12 @@ void cdo_set_options(void)
 {
   if ( Debug )
     {
-      fprintf(stderr, "CDO_cmor_mode       = %d\n", CDO_cmor_mode);
+      fprintf(stderr, "CDO_CMOR_Mode       = %d\n", CDO_CMOR_Mode);
       fprintf(stderr, "CDO_netcdf_hdr_pad  = %d\n", CDO_netcdf_hdr_pad);
       fprintf(stderr, "\n");
     }
   
-  if ( CDO_cmor_mode > 0 )      cdiDefGlobal("CMOR_MODE", CDO_cmor_mode);
+  if ( CDO_CMOR_Mode )          cdiDefGlobal("CMOR_MODE", CDO_CMOR_Mode);
   if ( CDO_netcdf_hdr_pad > 0 ) cdiDefGlobal("NETCDF_HDR_PAD", CDO_netcdf_hdr_pad);  
 }
 
@@ -1029,7 +1028,7 @@ int parse_options_long(int argc, char *argv[])
       { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
-      { "cmor",                    no_argument,      &CDO_cmor_mode,  1  },
+      { "cmor",                    no_argument,      &CDO_CMOR_Mode,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
       { "no_warnings",             no_argument,           &_Verbose,  0  },
