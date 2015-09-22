@@ -528,7 +528,7 @@ void after_setEndOfInterval(struct Control *globs, int nrecs)
       else if ( globs->OutputInterval == UNLIM_INTERVAL )
 	globs->EndOfInterval = FALSE;
       else
-	Error( "output interval %d not implemented!", globs->OutputInterval);
+	Error("output interval %d not implemented!", globs->OutputInterval);
     }
 }
 
@@ -1516,13 +1516,13 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 			    }
 			  else
 			    {
-			      Error( "VCT not defined in inputfile!");
+			      Error("VCT not defined in inputfile!");
 			    }
 			}
 		    }
 
 		  if ( numlevel != (globs->nvct/2 - 1) )
-		    Error( "Number of hybrid levels %d does not match vct levels %d",
+		    Error("Number of hybrid levels %d does not match vct levels %d",
 			  numlevel, globs->nvct/2-1);
 
 		  if ( globs->Debug )
