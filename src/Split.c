@@ -33,19 +33,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-void create_uuid(unsigned char uuid[CDI_UUID_SIZE]);
-void uuid2str(const unsigned char *uuid, char *uuidstr);
-
-
-#define UUIDSTR_SIZE (CDI_UUID_SIZE*2 + 4)
-
-static
-void get_uuid(char uuidstr[UUIDSTR_SIZE])
-{
-  unsigned char uuid[CDI_UUID_SIZE];
-  create_uuid(uuid);
-  uuid2str(uuid, uuidstr);
-}
 
 static
 void gen_filename(char *filename, int swap_obase, const char *obase, const char *suffix)
@@ -464,13 +451,7 @@ void *Split(void *argument)
 
   for ( index = 0; index < nsplit; index++ )
     {
-      if ( uuid_attribute )
-        {
-          char uuidstr[UUIDSTR_SIZE];
-          get_uuid(uuidstr);
-          vlistDefAttTxt(vlistIDs[index], CDI_GLOBAL, uuid_attribute, 
-                         UUIDSTR_SIZE, uuidstr);
-        }
+      if ( uuid_attribute ) cdo_def_tracking_id(vlistIDs[index], uuid_attribute);
 
       streamDefVlist(streamIDs[index], vlistIDs[index]);
     }

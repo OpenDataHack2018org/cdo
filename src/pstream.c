@@ -1069,6 +1069,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 
       if ( CDO_CMOR_Mode )
         {
+          cdo_def_tracking_id(vlistID, "tracking_id");
           cdo_def_creation_date(vlistID);
         }
 

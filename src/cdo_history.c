@@ -121,3 +121,26 @@ void cdo_def_creation_date(int vlistID)
   if ( strlen(datetimestr) == 0 ) init_strtime();
   vlistDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int)strlen(datetimestr)+1, datetimestr);
 }
+
+
+void create_uuid(unsigned char uuid[CDI_UUID_SIZE]);
+void uuid2str(const unsigned char *uuid, char *uuidstr);
+
+
+#define UUIDSTR_SIZE (CDI_UUID_SIZE*2 + 4)
+
+static
+void get_uuid(char uuidstr[UUIDSTR_SIZE])
+{
+  unsigned char uuid[CDI_UUID_SIZE];
+  create_uuid(uuid);
+  uuid2str(uuid, uuidstr);
+}
+
+
+void cdo_def_tracking_id(int vlistID, const char *uuid_attribute)
+{
+  char uuidstr[UUIDSTR_SIZE];
+  get_uuid(uuidstr);
+  vlistDefAttTxt(vlistID, CDI_GLOBAL, uuid_attribute, UUIDSTR_SIZE, uuidstr);
+}
