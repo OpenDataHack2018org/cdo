@@ -217,7 +217,7 @@ void cdo_init_is_tty(void)
 }
 
 static
-void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
+void cdoPrintHelp(const char *phelp[]/*, char *xoperator*/)
 {
   if ( phelp == NULL )
     fprintf(stderr, "No help available for this operator!\n");
@@ -779,8 +779,7 @@ void get_env_vars(void)
     {
       if ( CDO_Color == FALSE )
         {
-          char *username;
-          username = getenv("LOGNAME");
+          const char *username = getenv("LOGNAME");
           if ( username == NULL )
             {
               username = getenv("USER");
@@ -794,8 +793,6 @@ void get_env_vars(void)
 static
 void print_system_info()
 {
-  const char *envstr;
-
   fprintf(stderr, "\n");
   fprintf(stderr, "CDO_Color           = %d\n", CDO_Color);
   fprintf(stderr, "CDO_Reset_History   = %d\n", CDO_Reset_History);
@@ -806,6 +803,7 @@ void print_system_info()
   fprintf(stderr, "cdoDefaultTableID   = %d\n", cdoDefaultTableID);
   fprintf(stderr, "\n");
 
+  const char *envstr;
   envstr = getenv("HOSTTYPE");
   if ( envstr ) fprintf(stderr, "HOSTTYPE            = %s\n", envstr);
   envstr = getenv("VENDOR");
@@ -960,7 +958,6 @@ void check_stacksize()
 #endif
 #endif
 }
-
 
 static
 void cdo_set_options(void)

@@ -1067,6 +1067,11 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 	    vlistDefVarChunkType(vlistID, varID, cdoChunkType);
 	}
 
+      if ( CDO_CMOR_Mode )
+        {
+          cdo_def_creation_date(vlistID);
+        }
+
       if ( CDO_Version_Info )
         vlistDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment());
 

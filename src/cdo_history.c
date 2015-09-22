@@ -26,6 +26,7 @@ static char *ghistory = NULL;
 static size_t ghistorysize = 0;
 
 static char strtime[32];
+static char datetimestr[32];
 
 static
 void init_strtime()
@@ -39,16 +40,16 @@ void init_strtime()
     {
       ltime = localtime(&tp);
       (void) strftime(strtime, sizeof(strtime), "%a %b %d %H:%M:%S %Y: ", ltime);
+      (void) strftime(datetimestr, sizeof(datetimestr), "%Y-%m-%dT%H:%M:%SZ", ltime);
     }
 }
 
 static
 char *get_strtimeptr()
 {
-  if ( strlen(strtime) == 0 )
-    init_strtime();
+  if ( strlen(strtime) == 0 ) init_strtime();
 
-  return (strtime);
+  return strtime;
 }
 
 
@@ -112,4 +113,11 @@ void cdoDefHistory(int fileID, char *histstring)
       streamDefHistory(fileID, strlen(history), history);
       Free(history);
     }
+}
+
+
+void cdo_def_creation_date(int vlistID)
+{
+  if ( strlen(datetimestr) == 0 ) init_strtime();
+  vlistDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int)strlen(datetimestr)+1, datetimestr);
 }

@@ -180,6 +180,7 @@ int     cdoFiletype(void);
 
 void    cdoInqHistory(int fileID);
 void    cdoDefHistory(int fileID, char *histstring);
+void cdo_def_creation_date(int vlistID);
 
 int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);
