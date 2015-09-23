@@ -108,7 +108,6 @@ void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridI
   gridInqYunits(gridID, units);
   grid_to_degree(units, nyvals, yvals, "grid center lat");
 
-  int ij;
   int ii, jj;
   double xval, yval;
   for ( int j = 0; j < nyvals; j++ )
@@ -116,7 +115,6 @@ void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridI
       yval = yvals[j];
       for ( int i = 0; i < nxvals; i++ )
         {
-          ij = j*nxvals + i;
           xval = xvals[i];
           if ( xval >=  180 ) xval -= 360;
           if ( xval <  -180 ) xval += 360;
@@ -124,7 +122,7 @@ void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridI
           jj = (yval +  90)*2;
           if ( ii > nx ) ii = nx;
           if ( jj > ny ) jj = ny;
-          array[ij] = data[jj*nx+ii];
+          array[j*nxvals+i] = data[jj*nx+ii];
         }
     }
 
