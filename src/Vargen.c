@@ -40,20 +40,20 @@
 
 
 #if defined(ENABLE_DATA)
-  static double etopo_scale  = 3;
-  static double etopo_offset = 11000;
+  static const double etopo_scale  = 3;
+  static const double etopo_offset = 11000;
   static const unsigned short etopo[] = {
 #include "etopo.h"
   };
 
-  static double temp_scale  =  500;
-  static double temp_offset = -220;
+  static const double temp_scale  =  500;
+  static const double temp_offset = -220;
   static const unsigned short temp[] = {
 #include "temp.h"
   };
 
-  static double mask_scale  =  1;
-  static double mask_offset =  0;
+  static const double mask_scale  =  1;
+  static const double mask_offset =  0;
   static const unsigned short mask[] = {
 #include "mask.h"
   };
@@ -67,8 +67,8 @@
 #define CC_R             (287.05)  /* specific gas constant for air */
 static double TMP4PRESSURE = (C_EARTH_GRAV*SCALEHEIGHT)/(CC_R*T_ZERO);
 
-static double
-std_atm_temperatur(double height)
+static
+double std_atm_temperatur(double height)
 {
   /*
     Compute the temperatur for the given height (in meters) according to the
@@ -77,8 +77,8 @@ std_atm_temperatur(double height)
    return (T_ZERO + T_DELTA * exp((-1)*(height/SCALEHEIGHT)));
 }
 
-static double
-std_atm_pressure(double height)
+static
+double std_atm_pressure(double height)
 {
   /*
     Compute the pressure for the given height (in meters) according to the
@@ -87,18 +87,16 @@ std_atm_pressure(double height)
   return (P_ZERO * exp((-1)*TMP4PRESSURE*log((exp(height/SCALEHEIGHT)*T_ZERO + T_DELTA)/(T_ZERO + T_DELTA))));
 }
 
-int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym);
-
-void remap_nn_reg2d(int nx, int ny, double *restrict data, int gridID, double *array)
+static
+void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
 {
-  int gridsize = gridInqSize(gridID);
-  double *xvals = (double*) Malloc(gridsize*sizeof(double));
-  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+  if ( !(gridInqType(gridID) == GRID_LONLAT && !gridIsRotated(gridID)) )
+    cdoAbort("Internal error, wrong grid type!");
 
-  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
-
-  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
-    gridID = gridToCurvilinear(gridID, 0);
+  int nxvals = gridInqXsize(gridID);
+  int nyvals = gridInqYsize(gridID);
+  double *xvals = (double*) Malloc(nxvals*sizeof(double));
+  double *yvals = (double*) Malloc(nyvals*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -106,8 +104,55 @@ void remap_nn_reg2d(int nx, int ny, double *restrict data, int gridID, double *a
   /* Convert lat/lon units if required */
   char units[CDI_MAX_NAME];
   gridInqXunits(gridID, units);
-  grid_to_degree(units, gridsize, xvals, "grid center lon");
+  grid_to_degree(units, nxvals, xvals, "grid center lon");
   gridInqYunits(gridID, units);
+  grid_to_degree(units, nyvals, yvals, "grid center lat");
+
+  int ij;
+  int ii, jj;
+  double xval, yval;
+  for ( int j = 0; j < nyvals; j++ )
+    {
+      yval = yvals[j];
+      for ( int i = 0; i < nxvals; i++ )
+        {
+          ij = j*nxvals + i;
+          xval = xvals[i];
+          if ( xval >=  180 ) xval -= 360;
+          if ( xval <  -180 ) xval += 360;
+          ii = (xval + 180)*2;
+          jj = (yval +  90)*2;
+          if ( ii > nx ) ii = nx;
+          if ( jj > ny ) jj = ny;
+          array[ij] = data[jj*nx+ii];
+        }
+    }
+
+  Free(xvals);
+  Free(yvals);
+}
+
+static
+void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
+{
+  int gridID2 = gridID;
+  int gridsize = gridInqSize(gridID2);
+  double *xvals = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+
+  if ( gridInqType(gridID2) == GRID_GME ) gridID2 = gridToUnstructured(gridID2, 0);
+
+  if ( gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR )
+    gridID2 = gridToCurvilinear(gridID2, 0);
+
+  gridInqXvals(gridID2, xvals);
+  gridInqYvals(gridID2, yvals);
+
+  /* Convert lat/lon units if required */
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID2, units);
+  grid_to_degree(units, gridsize, xvals, "grid center lon");
+  gridInqYunits(gridID2, units);
   grid_to_degree(units, gridsize, yvals, "grid center lat");
 
   int ii, jj;
@@ -127,6 +172,17 @@ void remap_nn_reg2d(int nx, int ny, double *restrict data, int gridID, double *a
 
   Free(xvals);
   Free(yvals);
+
+  if ( gridID != gridID2 ) gridDestroy(gridID2);
+}
+
+static
+void remap_nn_reg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
+{
+  if ( gridInqType(gridID) == GRID_LONLAT && !gridIsRotated(gridID) )
+    remap_nn_reg2d_reg2d(nx, ny, data, gridID, array);
+  else
+    remap_nn_reg2d_nonreg2d(nx, ny, data, gridID, array);
 }
 
 
