@@ -1,0 +1,68 @@
+@BeginModule
+@NewPage
+@Name      = Remapycon
+@Title     = Conservative remapping
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = remapycon genycon
+
+@BeginDescription
+This module contains operators for conservative remapping of fields between grids in spherical coordinates.
+The operators in this module uses code from the YAC software package to compute the conservative remapping weights.
+For a detailed description of the remapping method see @cite{YAC}.
+The search algorithm for the conservative remapping requires that no grid cell occurs more than once. 
+@EndDescription
+@EndModule
+
+
+@BeginOperator_remapycon
+@Name      = remapycon
+@Title     = First order conservative remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a first order conservative remapping on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_genycon
+@Title     = Generate 1st order conservative remap weights
+@Parameter = grid
+
+@BeginDescription
+Generates first order conservative remapping weights and writes the result to a file.
+Use the operator @mod{remap} to apply this remapping weights to a data file with the same source grid.
+@EndDescription
+@EndOperator
+
+
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter
+
+
+@BeginEnvironment
+@Item = CDO_REMAP_NORM
+This variable is used to choose the normalization of the conservative interpolation. 
+By default @env{CDO_REMAP_NORM} is set to 'fracarea'. 'fracarea' uses the sum of the
+non-masked source cell intersected areas to normalize each target cell field value.
+This results in a reasonable flux value but the flux is not locally conserved.
+The option 'destarea' uses the total target cell area to normalize each target cell
+field value. Local flux conservation is ensured, but unreasonable flux values may result.
+@Item = REMAP_AREA_MIN
+This variable is used to set the minimum destination area fraction. The default
+of this variable is 0.0.
+@EndEnvironment
+
+
+@BeginExample
+Say @file{ifile} contains fields on a quadrilateral curvilinear grid.
+To remap all fields conservative to a Gaussian N32 grid, type:
+@BeginVerbatim
+   cdo remapycon,n32 ifile ofile
+@EndVerbatim
+@EndExample

@@ -92,6 +92,7 @@ Trend         Regression
 Subtrend      Regression
 EOFs          EOFs
 Eofcoeff      EOFs
+Remapycon     Interpolation
 Remapgrid     Interpolation
 Genweights    Interpolation
 Remap         Interpolation
