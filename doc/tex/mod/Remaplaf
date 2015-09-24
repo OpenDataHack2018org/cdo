@@ -30,11 +30,11 @@ Performs a largest area fraction remapping on all input fields.
 
 @BeginOperator_genlaf
 @Name      = genlaf
-@Title     = Generate largest area fraction remap remap weights
+@Title     = Generate largest area fraction remap weights
 @Parameter = grid
 
 @BeginDescription
-Generates largest area fraction remap remapping weights for the first input field and
+Generates largest area fraction remapping weights for the first input field and
 writes the result to a file. The format of this file is netCDF following the SCRIP convention.
 Use the operator @mod{remap} to apply this remapping weights to a data file with the same source grid.
 @EndDescription
