@@ -1,14 +1,14 @@
 @BeginModule
 @NewPage
-@Name      = Remapcon
-@Title     = First order conservative remapping
+@Name      = Remapcon2
+@Title     = Second order conservative remapping
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = remapcon gencon
+@Operators = remapcon2 gencon2
 
 @BeginDescription
-This module contains operators for a first order conservative remapping of fields between grids in spherical coordinates.
+This module contains operators for a second order conservative remapping of fields between grids in spherical coordinates.
 The interpolation is based on an adapted SCRIP library version. 
 For a detailed description of the interpolation method see @cite{SCRIP}.
 The interpolation method is completely general and can be used for any grid on a sphere.
@@ -17,23 +17,23 @@ The search algorithm for the conservative remapping requires that no grid cell o
 @EndModule
 
 
-@BeginOperator_remapcon
-@Name      = remapcon
-@Title     = First order conservative remapping
+@BeginOperator_remapcon2
+@Name      = remapcon2
+@Title     = Second order conservative remapping
 @Parameter = grid
 
 @BeginDescription
-Performs a first order conservative remapping on all input fields.
+Performs a second order conservative remapping on all input fields.
 @EndDescription
 @EndOperator
 
 
-@BeginOperator_gencon
-@Title     = Generate 1st order conservative remap weights
-@Parameter = grid
+@BeginOperator_gencon2
+@Title     = Generate 2nd order conservative remap weights
+@Parameter = grid2
 
 @BeginDescription
-Generates first order conservative remapping weights for the first input field and
+Generates second order conservative remapping weights for the first input field and
 writes the result to a file. The format of this file is netCDF following the SCRIP convention.
 Use the operator @mod{remap} to apply this remapping weights to a data file with the same source grid.
 @EndDescription
@@ -62,14 +62,13 @@ of this variable is 0.0.
 
 @BeginNote
 The SCRIP conservative remapping method doesn't work correctly for some grid combinations.
-Please use @mod{remapycon} or @mod{genycon} in case of problems. 
 @EndNote
 
 
 @BeginExample
 Say @file{ifile} contains fields on a quadrilateral curvilinear grid.
-To remap all fields conservative to a Gaussian N32 grid, type:
+To remap all fields conservative (2nd order) to a Gaussian N32 grid, type:
 @BeginVerbatim
-   cdo remapcon,n32 ifile ofile
+   cdo remapcon2,n32 ifile ofile
 @EndVerbatim
 @EndExample

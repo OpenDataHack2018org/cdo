@@ -94,6 +94,7 @@ EOFs          EOFs
 Eofcoeff      EOFs
 Remapycon     Interpolation
 Remapcon      Interpolation
+Remapcon2     Interpolation
 Remapgrid     Interpolation
 Genweights    Interpolation
 Remap         Interpolation

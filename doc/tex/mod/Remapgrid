@@ -5,7 +5,7 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = remapbil remapbic remapdis remapnn remapcon remapcon2 remaplaf
+@Operators = remapbil remapbic remapdis remapnn remaplaf
 
 @BeginDescription
 This module contains operators to remap all input fields to a new horizontal grid.
@@ -60,28 +60,6 @@ values on all input fields.
 
 @BeginDescription
 Performs a nearest neighbor remapping on all input fields.
-@EndDescription
-@EndOperator
-
-
-@BeginOperator_remapcon
-@Name      = remapcon
-@Title     = First order conservative remapping
-@Parameter = grid
-
-@BeginDescription
-Performs a first order conservative remapping on all input fields.
-@EndDescription
-@EndOperator
-
-
-@BeginOperator_remapcon2
-@Name      = remapcon2
-@Title     = Second order conservative remapping
-@Parameter = grid
-
-@BeginDescription
-Performs a second order conservative remapping on all input fields.
 @EndDescription
 @EndOperator
 

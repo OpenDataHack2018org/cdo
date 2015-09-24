@@ -5,7 +5,7 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = genbil genbic gendis gennn gencon gencon2 genlaf
+@Operators = genbil genbic gendis gennn genlaf
 
 @BeginDescription
 Interpolation between different horizontal grids can be a very time-consuming 
@@ -65,28 +65,6 @@ nearest neighbor values and writes the result to a file.
 
 @BeginDescription
 Generates nearest neighbor remapping weights and writes the result to a file.
-@EndDescription
-@EndOperator
-
-
-@BeginOperator_gencon
-@Title     = Generate 1st order conservative remap weights
-@Parameter = grid
-
-@BeginDescription
-Generates first order conservative remapping weights and
-writes the result to a file.
-@EndDescription
-@EndOperator
-
-
-@BeginOperator_gencon2
-@Title     = Generate 2nd order conservative remap weights
-@Parameter = grid
-
-@BeginDescription
-Generates second order conservative remapping weights and
-writes the result to a file.
 @EndDescription
 @EndOperator
 
