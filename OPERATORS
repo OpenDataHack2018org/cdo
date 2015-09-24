@@ -448,6 +448,8 @@ Operator catalog:
    Remapbil      genbil          Generate bilinear interpolation weights
    Remapbic      remapbic        Bicubic interpolation
    Remapbic      genbic          Generate bicubic interpolation weights
+   Remapnn       remapnn         Nearest neighbor remapping
+   Remapnn       gennn           Generate nearest neighbor remap weights
    Remapdis      remapdis        Distance-weighted average remapping
    Remapdis      gendis          Generate distance-weighted average remap weights
    Remapycon     remapycon       First order conservative remapping
@@ -456,10 +458,8 @@ Operator catalog:
    Remapcon      gencon          Generate 1st order conservative remap weights
    Remapcon2     remapcon2       Second order conservative remapping
    Remapcon2     gencon2         Generate 2nd order conservative remap weights
-   Remapgrid     remapnn         Nearest neighbor remapping
-   Remapgrid     remaplaf        Largest area fraction remapping
-   Genweights    gennn           Generate nearest neighbor remap weights
-   Genweights    genlaf          Generate largest area fraction remap weights
+   Remaplaf      remaplaf        Largest area fraction remapping
+   Remaplaf      genlaf          Generate largest area fraction remap remap weights
    Remap         remap           SCRIP grid remapping
    Remapeta      remapeta        Remap vertical hybrid level
    Vertint       ml2pl           Model to pressure level interpolation

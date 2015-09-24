@@ -99,8 +99,7 @@ Remapdis      Interpolation
 Remapycon     Interpolation
 Remapcon      Interpolation
 Remapcon2     Interpolation
-Remapgrid     Interpolation
-Genweights    Interpolation
+Remaplaf      Interpolation
 Remap         Interpolation
 Remapeta      Interpolation
 Vertint       Interpolation

@@ -1,0 +1,54 @@
+@BeginModule
+@NewPage
+@Name      = Remaplaf
+@Title     = Largest area fraction remapping
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = remaplaf genlaf
+
+@BeginDescription
+This module contains operators for a largest area fraction remapping of fields between grids in spherical coordinates.
+The operators in this module uses code from the YAC software package to compute the largest area fraction.
+For a detailed description of the interpolation method see @cite{YAC}.
+The interpolation method is completely general and can be used for any grid on a sphere.
+The search algorithm for this remapping method requires that no grid cell occurs more than once. 
+@EndDescription
+@EndModule
+
+
+@BeginOperator_remaplaf
+@Name      = remaplaf
+@Title     = Largest area fraction remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a largest area fraction remapping on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_genlaf
+@Name      = genlaf
+@Title     = Generate largest area fraction remap remap weights
+@Parameter = grid
+
+@BeginDescription
+Generates largest area fraction remap remapping weights for the first input field and
+writes the result to a file. The format of this file is netCDF following the SCRIP convention.
+Use the operator @mod{remap} to apply this remapping weights to a data file with the same source grid.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter
+
+
+@BeginEnvironment
+@Item = REMAP_AREA_MIN
+This variable is used to set the minimum destination area fraction. The default
+of this variable is 0.0.
+@EndEnvironment

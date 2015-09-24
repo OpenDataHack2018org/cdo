@@ -375,12 +375,13 @@ void *Maggraph(void *argument);
 #define  RemapOperators         {"remap"}
 #define  RemapbilOperators      {"remapbil", "genbil"}
 #define  RemapbicOperators      {"remapbic", "genbic"}
+#define  RemapnnOperators       {"remapnn", "gennn"}
 #define  RemapdisOperators      {"remapdis", "gendis"}
 #define  RemapyconOperators     {"remapycon", "genycon"}
 #define  RemapconOperators      {"remapcon", "gencon"}
 #define  Remapcon2Operators     {"remapcon2", "gencon2"}
-#define    RemapgridOperators   {"remapnn", "remaplaf", "remapsum"}
-#define    GenweightsOperators  {"gennn", "genlaf"}
+#define  RemaplafOperators      {"remaplaf", "genlaf"}
+#define    RemapgridOperators   {"remapsum"}
 #define  RemapetaOperators      {"remapeta", "remapeta_s", "remapeta_z"}
 #define  ReplaceOperators       {"replace"}
 #define  ReplacevaluesOperators {"setvals", "setrtoc", "setrtoc2"}
@@ -652,12 +653,13 @@ static modules_t Modules[] =
   { Remap,          RemapHelp,         RemapOperators,         CDI_REAL,  1,  1 },
   { Remap,          RemapbilHelp,      RemapbilOperators,      CDI_REAL,  1,  1 },
   { Remap,          RemapbicHelp,      RemapbicOperators,      CDI_REAL,  1,  1 },
+  { Remap,          RemapnnHelp,       RemapnnOperators,       CDI_REAL,  1,  1 },
   { Remap,          RemapdisHelp,      RemapdisOperators,      CDI_REAL,  1,  1 },
   { Remap,          RemapyconHelp,     RemapyconOperators,     CDI_REAL,  1,  1 },
   { Remap,          RemapconHelp,      RemapconOperators,      CDI_REAL,  1,  1 },
   { Remap,          Remapcon2Help,     Remapcon2Operators,     CDI_REAL,  1,  1 },
-  { Remap,          RemapgridHelp,     RemapgridOperators,     CDI_REAL,  1,  1 },
-  { Remap,          GenweightsHelp,    GenweightsOperators,    CDI_REAL,  1,  1 },
+  { Remap,          RemaplafHelp,      RemaplafOperators,      CDI_REAL,  1,  1 },
+  { Remap,          NULL,              RemapgridOperators,     CDI_REAL,  1,  1 },
   { Remapeta,       RemapetaHelp,      RemapetaOperators,      CDI_REAL,  1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,       CDI_REAL,  2,  1 },
   { Replacevalues,  ReplacevaluesHelp, ReplacevaluesOperators, CDI_REAL,  1,  1 },
