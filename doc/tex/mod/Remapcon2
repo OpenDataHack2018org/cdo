@@ -29,6 +29,7 @@ Performs a second order conservative remapping on all input fields.
 
 
 @BeginOperator_gencon2
+@Name      = gencon2
 @Title     = Generate 2nd order conservative remap weights
 @Parameter = grid2
 

@@ -373,6 +373,7 @@ void *Maggraph(void *argument);
 #define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
+#define  RemapbilOperators      {"remapbil", "genbil"}
 #define  RemapyconOperators     {"remapycon", "genycon"}
 #define  RemapconOperators      {"remapcon", "gencon"}
 #define  Remapcon2Operators     {"remapcon2", "gencon2"}
@@ -647,6 +648,7 @@ static modules_t Modules[] =
   { Pressure,       NULL,              PressureOperators,      CDI_REAL,  1,  1 },
   { Regres,         RegresHelp,        RegresOperators,        CDI_REAL,  1,  1 },
   { Remap,          RemapHelp,         RemapOperators,         CDI_REAL,  1,  1 },
+  { Remap,          RemapbilHelp,      RemapbilOperators,      CDI_REAL,  1,  1 },
   { Remap,          RemapyconHelp,     RemapyconOperators,     CDI_REAL,  1,  1 },
   { Remap,          RemapconHelp,      RemapconOperators,      CDI_REAL,  1,  1 },
   { Remap,          Remapcon2Help,     Remapcon2Operators,     CDI_REAL,  1,  1 },

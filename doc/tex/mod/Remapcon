@@ -29,6 +29,7 @@ Performs a first order conservative remapping on all input fields.
 
 
 @BeginOperator_gencon
+@Name      = gencon
 @Title     = Generate 1st order conservative remap weights
 @Parameter = grid
 
