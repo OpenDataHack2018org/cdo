@@ -1,0 +1,53 @@
+@BeginModule
+@NewPage
+@Name      = Remapnn
+@Title     = Nearest neighbor remapping
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = remapnn gennn
+
+@BeginDescription
+This module contains operators for a nearest neighbor remapping of fields between grids
+in spherical coordinates.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_remapnn
+@Name      = remapnn
+@Title     = Nearest neighbor remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a nearest neighbor remapping on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gennn
+@Name      = gennn
+@Title     = Generate nearest neighbor remap weights
+@Parameter = grid
+
+@BeginDescription
+Generates nearest neighbor remapping weights for the first input field and writes the result to a file.
+The format of this file is netCDF following the SCRIP convention.
+Use the operator @mod{remap} to apply this remapping weights to a data file with the same source grid.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter
+
+
+@BeginEnvironment
+@Item = REMAP_EXTRAPOLATE
+This variable is used to switch the extrapolation feature 'on' or 'off'.
+By default the extrapolation is enabled for this remapping method.
+@Item = CDO_REMAP_RADIUS
+Remap search radius in degree, default 180 degree.
+@EndEnvironment

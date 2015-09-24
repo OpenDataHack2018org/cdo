@@ -12,7 +12,6 @@ This module contains operators for a distance-weighted average remapping of the 
 nearest neighbor values of fields between grids in spherical coordinates.
 The interpolation is based on an adapted SCRIP library version. 
 For a detailed description of the interpolation method see @cite{SCRIP}.
-This interpolation method only works on quadrilateral curvilinear source grids.
 @EndDescription
 @EndModule
 
