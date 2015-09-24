@@ -5,7 +5,7 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = remapbic remapdis remapnn remaplaf
+@Operators = remapdis remapnn remaplaf
 
 @BeginDescription
 This module contains operators to remap all input fields to a new horizontal grid.
@@ -15,18 +15,6 @@ methods see @cite{SCRIP}.
 The search algorithm for the conservative remapping requires that no grid cell occurs more than once. 
 @EndDescription
 @EndModule
-
-
-@BeginOperator_remapbic
-@Name      = remapbic
-@Title     = Bicubic interpolation
-@Parameter = grid
-
-@BeginDescription
-Performs a bicubic interpolation on all input fields.
-This interpolation method only works on quadrilateral curvilinear grids.
-@EndDescription
-@EndOperator
 
 
 @BeginOperator_remapdis

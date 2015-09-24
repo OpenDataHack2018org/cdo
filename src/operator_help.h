@@ -3419,6 +3419,37 @@ static const char *RemapbilHelp[] = {
     NULL
 };
 
+static const char *RemapbicHelp[] = {
+    "NAME",
+    "    remapbic, genbic - Bicubic interpolation",
+    "",
+    "SYNOPSIS",
+    "    <operator>,grid  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This module contains operators for a bicubic remapping of fields between grids in spherical coordinates.",
+    "    The interpolation is based on an adapted SCRIP library version. ",
+    "    For a detailed description of the interpolation method see SCRIP.",
+    "    This interpolation method only works on quadrilateral curvilinear source grids.",
+    "",
+    "OPERATORS",
+    "    remapbic  Bicubic interpolation",
+    "              Performs a bicubic interpolation on all input fields.",
+    "    genbic    Generate bicubic interpolation weights",
+    "              Generates bicubic interpolation weights for the first input field and writes the",
+    "              result to a file. The format of this file is netCDF following the SCRIP convention.",
+    "              Use the operator remap to apply this remapping weights to a data file with the same source grid.",
+    "",
+    "PARAMETER",
+    "    grid  STRING  Target grid description file or name",
+    "",
+    "ENVIRONMENT",
+    "    REMAP_EXTRAPOLATE",
+    "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
+    "        By default the extrapolation is enabled for for circular grids.",
+    NULL
+};
+
 static const char *RemapyconHelp[] = {
     "NAME",
     "    remapycon, genycon - First order conservative remapping",
@@ -3546,7 +3577,7 @@ static const char *Remapcon2Help[] = {
 
 static const char *RemapgridHelp[] = {
     "NAME",
-    "    remapbic, remapdis, remapnn, remaplaf - SCRIP grid interpolation",
+    "    remapdis, remapnn, remaplaf - SCRIP grid interpolation",
     "",
     "SYNOPSIS",
     "    <operator>,grid  ifile ofile",
@@ -3559,9 +3590,6 @@ static const char *RemapgridHelp[] = {
     "    The search algorithm for the conservative remapping requires that no grid cell occurs more than once. ",
     "",
     "OPERATORS",
-    "    remapbic  Bicubic interpolation",
-    "              Performs a bicubic interpolation on all input fields.",
-    "              This interpolation method only works on quadrilateral curvilinear grids.",
     "    remapdis  Distance-weighted average remapping",
     "              Performs a distance-weighted average remapping of the four nearest neighbor ",
     "              values on all input fields.",
@@ -3599,7 +3627,7 @@ static const char *RemapgridHelp[] = {
 
 static const char *GenweightsHelp[] = {
     "NAME",
-    "    genbic, gendis, gennn, genlaf - Generate SCRIP grid interpolation weights",
+    "    gendis, gennn, genlaf - Generate SCRIP grid interpolation weights",
     "",
     "SYNOPSIS",
     "    <operator>,grid  ifile ofile",
@@ -3617,9 +3645,6 @@ static const char *GenweightsHelp[] = {
     "    Each operator is using a different interpolation method.",
     "",
     "OPERATORS",
-    "    genbic  Generate bicubic interpolation weights",
-    "            Generates bicubic interpolation weights and writes the result to a file.",
-    "            This interpolation method only works on quadrilateral curvilinear grids.",
     "    gendis  Generate distance-weighted average remap weights",
     "            Generates distance-weighted average remapping weights of the four",
     "            nearest neighbor values and writes the result to a file.",

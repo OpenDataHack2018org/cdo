@@ -5,7 +5,7 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = genbic gendis gennn genlaf
+@Operators = gendis gennn genlaf
 
 @BeginDescription
 Interpolation between different horizontal grids can be a very time-consuming 
@@ -20,18 +20,6 @@ generate SCRIP interpolation weights of the first input field.
 Each operator is using a different interpolation method.
 @EndDescription
 @EndModule
-
-
-@BeginOperator_genbic
-@Name      = genbic
-@Title     = Generate bicubic interpolation weights
-@Parameter = grid
-
-@BeginDescription
-Generates bicubic interpolation weights and writes the result to a file.
-This interpolation method only works on quadrilateral curvilinear grids.
-@EndDescription
-@EndOperator
 
 
 @BeginOperator_gendis

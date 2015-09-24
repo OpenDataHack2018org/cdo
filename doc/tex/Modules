@@ -93,6 +93,7 @@ Subtrend      Regression
 EOFs          EOFs
 Eofcoeff      EOFs
 Remapbil      Interpolation
+Remapbic      Interpolation
 Remapycon     Interpolation
 Remapcon      Interpolation
 Remapcon2     Interpolation

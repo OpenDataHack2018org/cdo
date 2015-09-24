@@ -374,11 +374,12 @@ void *Maggraph(void *argument);
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
 #define  RemapbilOperators      {"remapbil", "genbil"}
+#define  RemapbicOperators      {"remapbic", "genbic"}
 #define  RemapyconOperators     {"remapycon", "genycon"}
 #define  RemapconOperators      {"remapcon", "gencon"}
 #define  Remapcon2Operators     {"remapcon2", "gencon2"}
-#define    RemapgridOperators   {"remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapsum"}
-#define    GenweightsOperators  {"genbil", "genbic", "gendis", "gennn", "genlaf"}
+#define    RemapgridOperators   {"remapdis", "remapnn", "remaplaf", "remapsum"}
+#define    GenweightsOperators  {"gendis", "gennn", "genlaf"}
 #define  RemapetaOperators      {"remapeta", "remapeta_s", "remapeta_z"}
 #define  ReplaceOperators       {"replace"}
 #define  ReplacevaluesOperators {"setvals", "setrtoc", "setrtoc2"}
@@ -649,6 +650,7 @@ static modules_t Modules[] =
   { Regres,         RegresHelp,        RegresOperators,        CDI_REAL,  1,  1 },
   { Remap,          RemapHelp,         RemapOperators,         CDI_REAL,  1,  1 },
   { Remap,          RemapbilHelp,      RemapbilOperators,      CDI_REAL,  1,  1 },
+  { Remap,          RemapbicHelp,      RemapbicOperators,      CDI_REAL,  1,  1 },
   { Remap,          RemapyconHelp,     RemapyconOperators,     CDI_REAL,  1,  1 },
   { Remap,          RemapconHelp,      RemapconOperators,      CDI_REAL,  1,  1 },
   { Remap,          Remapcon2Help,     Remapcon2Operators,     CDI_REAL,  1,  1 },
