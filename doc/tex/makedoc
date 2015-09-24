@@ -892,6 +892,7 @@ while (<MOFILE>) {
 	  $hline = $line;
 	  $hline =~ s/\"/\\\"/g;
 	  $hline =~ s/\\cite//og;
+	  $hline =~ s/\@env\{([^}]*)\}/\1/og;
 #	  if ( $lines == 0 ) {
 #	    print HELPFILE "$hline\",\n";
 #	  }

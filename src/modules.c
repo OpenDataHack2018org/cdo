@@ -373,8 +373,10 @@ void *Maggraph(void *argument);
 #define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
-#define    RemapgridOperators   {"remapycon", "remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
-#define    GenweightsOperators  {"genycon", "gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
+#define  RemapyconOperators     {"remapycon", "genycon"}
+#define  RemapconOperators      {"remapcon", "gencon"}
+#define    RemapgridOperators   {"remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
+#define    GenweightsOperators  {"genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
 #define  RemapetaOperators      {"remapeta", "remapeta_s", "remapeta_z"}
 #define  ReplaceOperators       {"replace"}
 #define  ReplacevaluesOperators {"setvals", "setrtoc", "setrtoc2"}
@@ -644,6 +646,8 @@ static modules_t Modules[] =
   { Pressure,       NULL,              PressureOperators,      CDI_REAL,  1,  1 },
   { Regres,         RegresHelp,        RegresOperators,        CDI_REAL,  1,  1 },
   { Remap,          RemapHelp,         RemapOperators,         CDI_REAL,  1,  1 },
+  { Remap,          RemapyconHelp,     RemapyconOperators,     CDI_REAL,  1,  1 },
+  { Remap,          RemapconHelp,      RemapconOperators,      CDI_REAL,  1,  1 },
   { Remap,          RemapgridHelp,     RemapgridOperators,     CDI_REAL,  1,  1 },
   { Remap,          GenweightsHelp,    GenweightsOperators,    CDI_REAL,  1,  1 },
   { Remapeta,       RemapetaHelp,      RemapetaOperators,      CDI_REAL,  1,  1 },

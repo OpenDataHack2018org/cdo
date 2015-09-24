@@ -195,6 +195,8 @@ doc/tex/mod/Outputgmt -text
 doc/tex/mod/Outputtab -text
 doc/tex/mod/Regres -text
 doc/tex/mod/Remap -text
+doc/tex/mod/Remapcon -text
+doc/tex/mod/Remapcon2 -text
 doc/tex/mod/Remapeta -text
 doc/tex/mod/Remapgrid -text
 doc/tex/mod/Remapycon -text

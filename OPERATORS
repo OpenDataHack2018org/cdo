@@ -444,6 +444,10 @@ Operator catalog:
 -------------------------------------------------------------
    Interpolation
 -------------------------------------------------------------
+   Remapycon     remapycon       First order conservative remapping
+   Remapycon     genycon         Generate 1st order conservative remap weights
+   Remapcon      remapcon        First order conservative remapping
+   Remapcon      gencon          Generate 1st order conservative remap weights
    Remapgrid     remapbil        Bilinear interpolation
    Remapgrid     remapbic        Bicubic interpolation
    Remapgrid     remapdis        Distance-weighted average remapping

@@ -1,24 +1,24 @@
 @BeginModule
 @NewPage
-@Name      = Remapycon
+@Name      = Remapcon
 @Title     = First order conservative remapping
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = remapycon genycon
+@Operators = remapcon gencon
 
 @BeginDescription
 This module contains operators for a first order conservative remapping of fields between grids in spherical coordinates.
-The operators in this module uses code from the YAC software package to compute the conservative remapping weights.
-For a detailed description of the interpolation method see @cite{YAC}.
+The interpolation is based on an adapted SCRIP library version. 
+For a detailed description of the interpolation method see @cite{SCRIP}.
 The interpolation method is completely general and can be used for any grid on a sphere.
 The search algorithm for the conservative remapping requires that no grid cell occurs more than once. 
 @EndDescription
 @EndModule
 
 
-@BeginOperator_remapycon
-@Name      = remapycon
+@BeginOperator_remapcon
+@Name      = remapcon
 @Title     = First order conservative remapping
 @Parameter = grid
 
@@ -28,7 +28,7 @@ Performs a first order conservative remapping on all input fields.
 @EndOperator
 
 
-@BeginOperator_genycon
+@BeginOperator_gencon
 @Title     = Generate 1st order conservative remap weights
 @Parameter = grid
 
@@ -60,10 +60,16 @@ of this variable is 0.0.
 @EndEnvironment
 
 
+@BeginNote
+The SCRIP conservative remapping method doesn't work correctly for some grid combinations.
+Please use @mod{remapycon} or @mod{genycon} in case of problems. 
+@EndNote
+
+
 @BeginExample
 Say @file{ifile} contains fields on a quadrilateral curvilinear grid.
 To remap all fields conservative to a Gaussian N32 grid, type:
 @BeginVerbatim
-   cdo remapycon,n32 ifile ofile
+   cdo remapcon,n32 ifile ofile
 @EndVerbatim
 @EndExample
