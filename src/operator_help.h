@@ -3450,6 +3450,42 @@ static const char *RemapbicHelp[] = {
     NULL
 };
 
+static const char *RemapdisHelp[] = {
+    "NAME",
+    "    remapdis, gendis - Distance-weighted average remapping",
+    "",
+    "SYNOPSIS",
+    "    <operator>,grid  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This module contains operators for a distance-weighted average remapping of the four",
+    "    nearest neighbor values of fields between grids in spherical coordinates.",
+    "    The interpolation is based on an adapted SCRIP library version. ",
+    "    For a detailed description of the interpolation method see SCRIP.",
+    "    This interpolation method only works on quadrilateral curvilinear source grids.",
+    "",
+    "OPERATORS",
+    "    remapdis  Distance-weighted average remapping",
+    "              Performs a distance-weighted average remapping of the four nearest neighbor ",
+    "              values on all input fields.",
+    "    gendis    Generate distance-weighted average remap weights",
+    "              Generates distance-weighted average remapping weights of the four nearest neighbor",
+    "              values for the first input field and writes the result to a file.",
+    "              The format of this file is netCDF following the SCRIP convention.",
+    "              Use the operator remap to apply this remapping weights to a data file with the same source grid.",
+    "",
+    "PARAMETER",
+    "    grid  STRING  Target grid description file or name",
+    "",
+    "ENVIRONMENT",
+    "    REMAP_EXTRAPOLATE",
+    "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
+    "        By default the extrapolation is enabled for this remapping method.",
+    "    CDO_REMAP_RADIUS ",
+    "        Remap search radius in degree, default 180 degree.",
+    NULL
+};
+
 static const char *RemapyconHelp[] = {
     "NAME",
     "    remapycon, genycon - First order conservative remapping",
@@ -3577,7 +3613,7 @@ static const char *Remapcon2Help[] = {
 
 static const char *RemapgridHelp[] = {
     "NAME",
-    "    remapdis, remapnn, remaplaf - SCRIP grid interpolation",
+    "    remapnn, remaplaf - SCRIP grid interpolation",
     "",
     "SYNOPSIS",
     "    <operator>,grid  ifile ofile",
@@ -3590,9 +3626,6 @@ static const char *RemapgridHelp[] = {
     "    The search algorithm for the conservative remapping requires that no grid cell occurs more than once. ",
     "",
     "OPERATORS",
-    "    remapdis  Distance-weighted average remapping",
-    "              Performs a distance-weighted average remapping of the four nearest neighbor ",
-    "              values on all input fields.",
     "    remapnn   Nearest neighbor remapping",
     "              Performs a nearest neighbor remapping on all input fields.",
     "    remaplaf  Largest area fraction remapping",
@@ -3627,7 +3660,7 @@ static const char *RemapgridHelp[] = {
 
 static const char *GenweightsHelp[] = {
     "NAME",
-    "    gendis, gennn, genlaf - Generate SCRIP grid interpolation weights",
+    "    gennn, genlaf - Generate SCRIP grid interpolation weights",
     "",
     "SYNOPSIS",
     "    <operator>,grid  ifile ofile",
@@ -3645,9 +3678,6 @@ static const char *GenweightsHelp[] = {
     "    Each operator is using a different interpolation method.",
     "",
     "OPERATORS",
-    "    gendis  Generate distance-weighted average remap weights",
-    "            Generates distance-weighted average remapping weights of the four",
-    "            nearest neighbor values and writes the result to a file.",
     "    gennn   Generate nearest neighbor remap weights",
     "            Generates nearest neighbor remapping weights and writes the result to a file.",
     "    genlaf  Generate largest area fraction remap weights",

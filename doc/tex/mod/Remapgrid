@@ -5,7 +5,7 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = remapdis remapnn remaplaf
+@Operators = remapnn remaplaf
 
 @BeginDescription
 This module contains operators to remap all input fields to a new horizontal grid.
@@ -15,18 +15,6 @@ methods see @cite{SCRIP}.
 The search algorithm for the conservative remapping requires that no grid cell occurs more than once. 
 @EndDescription
 @EndModule
-
-
-@BeginOperator_remapdis
-@Name      = remapdis
-@Title     = Distance-weighted average remapping
-@Parameter = grid
-
-@BeginDescription
-Performs a distance-weighted average remapping of the four nearest neighbor 
-values on all input fields.
-@EndDescription
-@EndOperator
 
 
 @BeginOperator_remapnn

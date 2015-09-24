@@ -448,16 +448,16 @@ Operator catalog:
    Remapbil      genbil          Generate bilinear interpolation weights
    Remapbic      remapbic        Bicubic interpolation
    Remapbic      genbic          Generate bicubic interpolation weights
+   Remapdis      remapdis        Distance-weighted average remapping
+   Remapdis      gendis          Generate distance-weighted average remap weights
    Remapycon     remapycon       First order conservative remapping
    Remapycon     genycon         Generate 1st order conservative remap weights
    Remapcon      remapcon        First order conservative remapping
    Remapcon      gencon          Generate 1st order conservative remap weights
    Remapcon2     remapcon2       Second order conservative remapping
    Remapcon2     gencon2         Generate 2nd order conservative remap weights
-   Remapgrid     remapdis        Distance-weighted average remapping
    Remapgrid     remapnn         Nearest neighbor remapping
    Remapgrid     remaplaf        Largest area fraction remapping
-   Genweights    gendis          Generate distance-weighted average remap weights
    Genweights    gennn           Generate nearest neighbor remap weights
    Genweights    genlaf          Generate largest area fraction remap weights
    Remap         remap           SCRIP grid remapping

@@ -94,6 +94,7 @@ EOFs          EOFs
 Eofcoeff      EOFs
 Remapbil      Interpolation
 Remapbic      Interpolation
+Remapdis      Interpolation
 Remapycon     Interpolation
 Remapcon      Interpolation
 Remapcon2     Interpolation

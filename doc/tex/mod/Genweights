@@ -5,7 +5,7 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = gendis gennn genlaf
+@Operators = gennn genlaf
 
 @BeginDescription
 Interpolation between different horizontal grids can be a very time-consuming 
@@ -20,18 +20,6 @@ generate SCRIP interpolation weights of the first input field.
 Each operator is using a different interpolation method.
 @EndDescription
 @EndModule
-
-
-@BeginOperator_gendis
-@Name      = gendis
-@Title     = Generate distance-weighted average remap weights
-@Parameter = grid
-
-@BeginDescription
-Generates distance-weighted average remapping weights of the four
-nearest neighbor values and writes the result to a file.
-@EndDescription
-@EndOperator
 
 
 @BeginOperator_gennn
