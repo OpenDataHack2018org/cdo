@@ -9,6 +9,8 @@ Version 1.7.0 (28 October 2015):
      * distgrid: added support for curvilinear grids
      * collgrid: added support for curvilinear grids
    New operators:
+     * remapycon: First order conservative remapping (new implementation of remapcon)
+     * genycon: Generate 1st order conservative remap weights (new implementation of gencon)
      * setmisstonn: Set missing value to nearest neightbor
      * ap2pl: Interpolate 3D variables on hybrid sigma height coordinates to pressure levels
      * vertstd1: Vertical standard deviation [Divisor is (n-1)]

@@ -3675,7 +3675,7 @@ static const char *RemaplafHelp[] = {
 
 static const char *RemapHelp[] = {
     "NAME",
-    "    remap - SCRIP grid remapping",
+    "    remap - Grid remapping",
     "",
     "SYNOPSIS",
     "    remap,grid,weights  ifile ofile",
@@ -3684,8 +3684,8 @@ static const char *RemapHelp[] = {
     "    This operator remaps all input fields to a new horizontal grid. The remap type and ",
     "    the interpolation weights of one input grid are read from a netCDF file. More weights ",
     "    are computed if the input fields are on different grids. The netCDF file with the ",
-    "    weights should follow the SCRIP convention. Normally these weights come from ",
-    "    a previous call to module GENWEIGHTS or were created by the original SCRIP package.",
+    "    weights should follow the SCRIP convention. Normally these weights come from",
+    "    a previous call to one of the genXXX operators (e.g. genbil) or were created by the original SCRIP package.",
     "",
     "PARAMETER",
     "    grid     STRING  Target grid description file or name",
@@ -3707,10 +3707,6 @@ static const char *RemapHelp[] = {
     "        of this variable is 0.0.",
     "    CDO_REMAP_RADIUS ",
     "        Remap search radius in degree, default 180 degree.",
-    "",
-    "NOTE",
-    "    For this module the author has converted the original Fortran 90 SCRIP software to",
-    "    ANSI C99. If there are any problems send a bug report to CDO and not to SCRIP!",
     NULL
 };
 

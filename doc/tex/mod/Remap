@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = Remap
-@Title     = SCRIP grid remapping
+@Title     = Grid remapping
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
@@ -10,15 +10,15 @@
 
 
 @BeginOperator_remap
-@Title     = SCRIP grid remapping
+@Title     = Grid remapping
 @Parameter = grid weights
 
 @BeginDescription
 This operator remaps all input fields to a new horizontal grid. The remap type and 
 the interpolation weights of one input grid are read from a netCDF file. More weights 
 are computed if the input fields are on different grids. The netCDF file with the 
-weights should follow the @ref{SCRIP} convention. Normally these weights come from 
-a previous call to module @mod{GENWEIGHTS} or were created by the original SCRIP package.
+weights should follow the @ref{SCRIP} convention. Normally these weights come from
+a previous call to one of the genXXX operators (e.g. @mod{genbil}) or were created by the original SCRIP package.
 @EndDescription
 @EndOperator
 
@@ -48,12 +48,6 @@ of this variable is 0.0.
 @Item = CDO_REMAP_RADIUS
 Remap search radius in degree, default 180 degree.
 @EndEnvironment
-
-
-@BeginNote
-For this module the author has converted the original Fortran 90 SCRIP software to
-ANSI C99. If there are any problems send a bug report to CDO and not to SCRIP!
-@EndNote
 
 
 @BeginExample
