@@ -179,25 +179,25 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
-	Change.c Change_e5slm.c Cloudlayer.c Collgrid.c Command.c \
-	Comp.c Compc.c Complextorect.c Cond.c Cond2.c Condc.c \
-	Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c Diff.c \
-	Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
-	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
-	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
-	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c \
-	Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c \
-	Hi.c Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
-	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
-	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
-	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
-	Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c \
-	Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c \
-	Pack.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
-	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
-	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
-	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
-	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
+	Change.c Change_e5slm.c Cloudlayer.c CMOR.c Collgrid.c \
+	Command.c Comp.c Compc.c Complextorect.c Cond.c Cond2.c \
+	Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c \
+	Diff.c Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c \
+	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c \
+	Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c \
+	Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c \
+	Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c \
+	Harmonic.c Hi.c Histogram.c Importamsr.c Importbinary.c \
+	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
+	Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c Inttime.c \
+	Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c Log.c \
+	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
+	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
+	Output.c Outputgmt.c Pack.c Pinfo.c Pressure.c Regres.c \
+	Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
+	Runpctl.c Runstat.c Seascount.c Seaspctl.c Seasstat.c Selbox.c \
+	Select.c Seloperator.c Selrec.c Seltime.c Selvar.c Set.c \
+	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
 	Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth9.c \
 	Sort.c Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c \
 	Split.c Splitrec.c Splitsel.c Splittime.c Splityear.c SSOpar.c \
@@ -229,8 +229,9 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Arithlat.$(OBJEXT) cdo-CDItest.$(OBJEXT) \
 	cdo-CDIread.$(OBJEXT) cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) \
 	cdo-Change.$(OBJEXT) cdo-Change_e5slm.$(OBJEXT) \
-	cdo-Cloudlayer.$(OBJEXT) cdo-Collgrid.$(OBJEXT) \
-	cdo-Command.$(OBJEXT) cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
+	cdo-Cloudlayer.$(OBJEXT) cdo-CMOR.$(OBJEXT) \
+	cdo-Collgrid.$(OBJEXT) cdo-Command.$(OBJEXT) \
+	cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
@@ -594,25 +595,25 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 #
 cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
-	Change.c Change_e5slm.c Cloudlayer.c Collgrid.c Command.c \
-	Comp.c Compc.c Complextorect.c Cond.c Cond2.c Condc.c \
-	Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c Diff.c \
-	Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
-	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
-	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
-	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gengrid.c \
-	Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c Harmonic.c \
-	Hi.c Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
-	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
-	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
-	Invertlev.c Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c \
-	Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c \
-	Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c \
-	Pack.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
-	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
-	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
-	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
-	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
+	Change.c Change_e5slm.c Cloudlayer.c CMOR.c Collgrid.c \
+	Command.c Comp.c Compc.c Complextorect.c Cond.c Cond2.c \
+	Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c \
+	Diff.c Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c \
+	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c \
+	Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c \
+	Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c \
+	Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c \
+	Harmonic.c Hi.c Histogram.c Importamsr.c Importbinary.c \
+	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
+	Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c Inttime.c \
+	Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c Log.c \
+	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
+	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
+	Output.c Outputgmt.c Pack.c Pinfo.c Pressure.c Regres.c \
+	Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
+	Runpctl.c Runstat.c Seascount.c Seaspctl.c Seasstat.c Selbox.c \
+	Select.c Seloperator.c Selrec.c Seltime.c Selvar.c Set.c \
+	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
 	Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth9.c \
 	Sort.c Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c \
 	Split.c Splitrec.c Splitsel.c Splittime.c Splityear.c SSOpar.c \
@@ -827,6 +828,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDIread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDItest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDIwrite.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CMOR.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Cat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CdoMagicsMapper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Change.Po@am__quote@
@@ -1949,6 +1951,20 @@ cdo-Cloudlayer.obj: Cloudlayer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Cloudlayer.c' object='cdo-Cloudlayer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Cloudlayer.obj `if test -f 'Cloudlayer.c'; then $(CYGPATH_W) 'Cloudlayer.c'; else $(CYGPATH_W) '$(srcdir)/Cloudlayer.c'; fi`
+
+cdo-CMOR.o: CMOR.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CMOR.o -MD -MP -MF $(DEPDIR)/cdo-CMOR.Tpo -c -o cdo-CMOR.o `test -f 'CMOR.c' || echo '$(srcdir)/'`CMOR.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-CMOR.Tpo $(DEPDIR)/cdo-CMOR.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='CMOR.c' object='cdo-CMOR.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CMOR.o `test -f 'CMOR.c' || echo '$(srcdir)/'`CMOR.c
+
+cdo-CMOR.obj: CMOR.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CMOR.obj -MD -MP -MF $(DEPDIR)/cdo-CMOR.Tpo -c -o cdo-CMOR.obj `if test -f 'CMOR.c'; then $(CYGPATH_W) 'CMOR.c'; else $(CYGPATH_W) '$(srcdir)/CMOR.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-CMOR.Tpo $(DEPDIR)/cdo-CMOR.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='CMOR.c' object='cdo-CMOR.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CMOR.obj `if test -f 'CMOR.c'; then $(CYGPATH_W) 'CMOR.c'; else $(CYGPATH_W) '$(srcdir)/CMOR.c'; fi`
 
 cdo-Collgrid.o: Collgrid.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Collgrid.o -MD -MP -MF $(DEPDIR)/cdo-Collgrid.Tpo -c -o cdo-Collgrid.o `test -f 'Collgrid.c' || echo '$(srcdir)/'`Collgrid.c

@@ -52,6 +52,7 @@ void *CDIwrite(void *argument);
 void *Change(void *argument);
 void *Change_e5slm(void *argument);
 void *Cloudlayer(void *argument);
+void *CMOR(void *argument);
 void *Collgrid(void *argument);
 void *Command(void *argument);
 void *Comp(void *argument);
@@ -286,6 +287,7 @@ void *Maggraph(void *argument);
 #define  ChangeOperators        {"chcode", "chtabnum", "chparam", "chname", "chunit", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}
+#define  CMOROperators          {"cmor"}
 #define  CollgridOperators      {"collgrid"}
 #define  CommandOperators       {"command", "com", "cmd"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
@@ -569,6 +571,7 @@ static modules_t Modules[] =
   { Change,         ChangeHelp,        ChangeOperators,        CDI_REAL,  1,  1 },
   { Change_e5slm,   NULL,              Change_e5slmOperators,  CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    CDI_REAL,  1,  1 },
+  { CMOR,           NULL,              CMOROperators,          CDI_REAL,  1,  0 },
   { Collgrid,       CollgridHelp,      CollgridOperators,      CDI_REAL, -1,  1 },
   { Command,        NULL,              CommandOperators,       CDI_REAL,  1,  0 },
   { Comp,           CompHelp,          CompOperators,          CDI_REAL,  2,  1 },
