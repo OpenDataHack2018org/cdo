@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-09-25  Uwe Schulzweida
+
+        * added operator sortparam to sort all variables by there parameter number
+
 2015-09-15  Uwe Schulzweida
 
         * merge: search for first time variing stream

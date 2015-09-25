@@ -40,6 +40,7 @@ typedef struct
   int        varID;
   int        nlevs;
   int        code;
+  char       param[CDI_MAX_NAME];
   char       name[CDI_MAX_NAME];
   levinfo_t *levInfo;
 }
@@ -48,16 +49,25 @@ varinfo_t;
 static
 int cmpvarcode(const void *s1, const void *s2)
 {
-  int cmp = 0;
   const varinfo_t *x = (const varinfo_t *) s1;
   const varinfo_t *y = (const varinfo_t *) s2;
+  int cmp = 0;
   /*
   printf("%d %d  %d %d\n", x->code, y->code, x, y);
   */
   if      ( x->code < y->code ) cmp = -1;
   else if ( x->code > y->code ) cmp =  1;
 
-  return (cmp);
+  return cmp;
+}
+
+static
+int cmpvarparam(const void *s1, const void *s2)
+{
+  const varinfo_t *x = (const varinfo_t *) s1;
+  const varinfo_t *y = (const varinfo_t *) s2;
+
+  return strcmp(x->param, y->param);
 }
 
 static
@@ -66,47 +76,46 @@ int cmpvarname(const void *s1, const void *s2)
   const varinfo_t *x = (const varinfo_t *) s1;
   const varinfo_t *y = (const varinfo_t *) s2;
 
-  return (strcmp(x->name, y->name));
+  return strcmp(x->name, y->name);
 }
 
 static
 int cmpvarlevel(const void *s1, const void *s2)
 {
-  int cmp = 0;
   const levinfo_t *x = (const levinfo_t *) s1;
   const levinfo_t *y = (const levinfo_t *) s2;
+  int cmp = 0;
 
   if      ( x->level < y->level ) cmp = -1;
   else if ( x->level > y->level ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
 int cmpvarlevelrev(const void *s1, const void *s2)
 {
-  int cmp = 0;
   const levinfo_t *x = (const levinfo_t *) s1;
   const levinfo_t *y = (const levinfo_t *) s2;
+  int cmp = 0;
 
   if      ( x->level > y->level ) cmp = -1;
   else if ( x->level < y->level ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
 void setNmiss(int varID, int levelID, int nvars, varinfo_t *varInfo, int nmiss)
 {
   int vindex, lindex;
-  int nlevs;
 
   for ( vindex = 0; vindex < nvars; vindex++ )
     if ( varInfo[vindex].varID == varID ) break;
 
   if ( vindex == nvars ) cdoAbort("Internal problem; varID not found!");
 
-  nlevs = varInfo[vindex].nlevs; 
+  int nlevs = varInfo[vindex].nlevs; 
   for ( lindex = 0; lindex < nlevs; lindex++ )
     if ( varInfo[vindex].levInfo[lindex].levelID == levelID ) break;
 
@@ -116,31 +125,44 @@ void setNmiss(int varID, int levelID, int nvars, varinfo_t *varInfo, int nmiss)
 }
 
 
+void paramToStringLong(int param, char *paramstr, int maxlen)
+{
+  int dis, cat, num;
+  int len;
+
+  cdiDecodeParam(param, &num, &cat, &dis);
+
+  size_t umaxlen = maxlen >= 0 ? (unsigned)maxlen : 0U;
+  if ( dis == 255 && (cat == 255 || cat == 0 ) )
+    len = snprintf(paramstr, umaxlen, "%03d", num);
+  else  if ( dis == 255 )
+    len = snprintf(paramstr, umaxlen, "%03d.%03d", num, cat);
+  else
+    len = snprintf(paramstr, umaxlen, "%03d.%03d.%03d", num, cat, dis);
+
+  if ( len >= maxlen || len < 0)
+    fprintf(stderr, "Internal problem (%s): size of input string is too small!\n", __func__);
+}
+
+
 void *Sort(void *argument)
 {
-  int SORTCODE, SORTNAME, SORTLEVEL;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs;
-  int tsID, recID, varID, levelID, zaxisID;
+  int recID, varID, levelID, zaxisID;
   int vindex, lindex;
-  int nvars, nlevs, offset;
-  int vlistID1, vlistID2;
+  int nrecs, nlevs, offset;
   int gridsize;
   int nmiss;
   double *single;
-  double **vardata = NULL;
-  varinfo_t *varInfo;
-  int taxisID1, taxisID2;
   int (*cmpvarlev)(const void *, const void *) = cmpvarlevel;
 
   cdoInitialize(argument);
 
-  SORTCODE  = cdoOperatorAdd("sortcode",  0, 0, NULL);
-  SORTNAME  = cdoOperatorAdd("sortname",  0, 0, NULL);
-  SORTLEVEL = cdoOperatorAdd("sortlevel", 0, 0, NULL);
+  int SORTCODE  = cdoOperatorAdd("sortcode",  0, 0, NULL);
+  int SORTPARAM = cdoOperatorAdd("sortparam", 0, 0, NULL);
+  int SORTNAME  = cdoOperatorAdd("sortname",  0, 0, NULL);
+  int SORTLEVEL = cdoOperatorAdd("sortlevel", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
@@ -150,13 +172,13 @@ void *Sort(void *argument)
       if ( iarg < 0 ) cmpvarlev = cmpvarlevelrev;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
   /*
   if ( operatorID == SORTCODE )
@@ -167,13 +189,13 @@ void *Sort(void *argument)
       ;
   */
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars   = vlistNvars(vlistID1);
+  int nvars   = vlistNvars(vlistID1);
 
-  varInfo = (varinfo_t*) Malloc(nvars*sizeof(varinfo_t));
+  varinfo_t *varInfo = (varinfo_t*) Malloc(nvars*sizeof(varinfo_t));
   for ( varID = 0; varID < nvars; ++varID )
     {
       nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
@@ -181,7 +203,7 @@ void *Sort(void *argument)
       varInfo[varID].levInfo = (levinfo_t*) Malloc(nlevs*sizeof(levinfo_t));
     }
 
-  vardata = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata = (double**) Malloc(nvars*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -190,7 +212,7 @@ void *Sort(void *argument)
       vardata[varID] = (double*) Malloc(gridsize*nlevs*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -205,6 +227,8 @@ void *Sort(void *argument)
 	    {
 	      varInfo[varID].varID = varID;
 	      varInfo[varID].code  = vlistInqVarCode(vlistID1, varID);
+	      int iparam  = vlistInqVarParam(vlistID1, varID);
+	      paramToStringLong(iparam, varInfo[varID].param, sizeof(varInfo[varID].param));
 	      vlistInqVarName(vlistID1, varID, varInfo[varID].name);
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      varInfo[varID].levInfo[levelID].levelID = levelID;
@@ -234,6 +258,8 @@ void *Sort(void *argument)
 
 	  if      ( operatorID == SORTCODE )
 	    qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarcode);
+	  else if ( operatorID == SORTPARAM )
+	    qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarparam);
 	  else if ( operatorID == SORTNAME )
 	    qsort(varInfo, nvars, sizeof(varinfo_t), cmpvarname);
 	  else if ( operatorID == SORTLEVEL )
