@@ -459,7 +459,7 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   int nmiss;
   double *array1, *array2;
   double missval;
-  long ig, i, j, ii, jj, index;
+  long i, j, ii, jj, index;
   long gridsize;
   field_t *field;
   int isize;
@@ -497,9 +497,9 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   nlat2 = gridInqYsize(gridID2);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(ig, ilat, ilon, j, jj, i, ii, index, isize)
+#pragma omp parallel for default(shared) private(ilat, ilon, j, jj, i, ii, index, isize)
 #endif
-  for ( ig = 0; ig < nlat2*nlon2; ++ig )
+  for ( long ig = 0; ig < nlat2*nlon2; ++ig )
     {
       int ompthID = cdo_omp_get_thread_num();
 

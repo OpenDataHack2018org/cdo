@@ -83,7 +83,6 @@ static
 int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks)
 {
   int lsouthnorth = TRUE;
-  int fileID;
   int gridID2 = -1;
   int idx;
   int nx, ny, ix, iy, i, j, ij, offset;
@@ -102,7 +101,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   double **xvals = (double**) Malloc(nfiles*sizeof(double*));
   double **yvals = (double**) Malloc(nfiles*sizeof(double*));
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       gridID   = vlistGrid(ef[fileID].vlistID, igrid);
       gridtype = gridInqType(gridID);
@@ -155,7 +154,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
     }
 
   if ( cdoVerbose )
-    for ( fileID = 0; fileID < nfiles; fileID++ )
+    for ( int fileID = 0; fileID < nfiles; fileID++ )
       printf("1 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
   if ( lregular )
@@ -163,7 +162,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
       qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
 
       if ( cdoVerbose )
-        for ( fileID = 0; fileID < nfiles; fileID++ )
+        for ( int fileID = 0; fileID < nfiles; fileID++ )
           printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
       if ( lsouthnorth )
@@ -172,11 +171,11 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
         qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy_gt);  	      
 
       if ( cdoVerbose )
-        for ( fileID = 0; fileID < nfiles; fileID++ )
+        for ( int fileID = 0; fileID < nfiles; fileID++ )
           printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
       nx = 1;
-      for ( fileID = 1; fileID < nfiles; fileID++ )
+      for ( int fileID = 1; fileID < nfiles; fileID++ )
         {
           if ( DBL_IS_EQUAL(xyinfo[0].y, xyinfo[fileID].y) ) nx++;
           else break;
@@ -229,7 +228,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
   if ( gridindex != NULL )
     {
-      for ( fileID = 0; fileID < nfiles; fileID++ )
+      for ( int fileID = 0; fileID < nfiles; fileID++ )
 	{
 	  idx = xyinfo[fileID].id;
 	  iy = fileID/nx;
@@ -286,7 +285,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   gridInqYunits(gridID, string);
   gridDefYunits(gridID2, string);
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       if ( xvals[fileID] ) Free(xvals[fileID]);
       if ( yvals[fileID] ) Free(yvals[fileID]);
@@ -306,7 +305,6 @@ void *Collgrid(void *argument)
   int nrecs, nrecs0;
   int levelID;
   int nmiss;
-  int fileID;
   double missval;
 
   cdoInitialize(argument);
@@ -321,7 +319,7 @@ void *Collgrid(void *argument)
 
   ens_file_t *ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       ef[fileID].streamID = streamOpenRead(cdoStreamName(fileID));
       ef[fileID].vlistID  = streamInqVlist(ef[fileID].streamID);
@@ -331,7 +329,7 @@ void *Collgrid(void *argument)
   vlistClearFlag(vlistID1);
 
   /* check that the contents is always the same */
-  for ( fileID = 1; fileID < nfiles; fileID++ )
+  for ( int fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   int nvars = vlistNvars(vlistID1);
@@ -404,13 +402,13 @@ void *Collgrid(void *argument)
 
   int gridsize;
   int gridsizemax = 0;
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       if ( gridsize > gridsizemax ) gridsizemax = gridsize;
     }
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) Malloc(gridsizemax*sizeof(double));
 
 
@@ -433,7 +431,7 @@ void *Collgrid(void *argument)
 
   int *gridIDs = (int*) Malloc(ngrids2*sizeof(int));
   int **gridindex = (int **) Malloc(nfiles*sizeof(int *));
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int*) Malloc(gridsizemax*sizeof(int));
 
   int ginit = FALSE;
@@ -495,7 +493,7 @@ void *Collgrid(void *argument)
   do
     {
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
-      for ( fileID = 1; fileID < nfiles; fileID++ )
+      for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  nrecs = streamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
@@ -511,7 +509,7 @@ void *Collgrid(void *argument)
 	  streamInqRecord(ef[0].streamID, &varID, &levelID);
 	  if ( cdoVerbose && tsID == 0 ) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
 
-	  for ( fileID = 0; fileID < nfiles; fileID++ )
+	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
 	      int varIDx, levelIDx;
 	      if ( fileID > 0 ) streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
@@ -527,9 +525,9 @@ void *Collgrid(void *argument)
 	      for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(fileID, nmiss)
+#pragma omp parallel for default(shared) private(nmiss)
 #endif
-	      for ( fileID = 0; fileID < nfiles; fileID++ )
+	      for ( int fileID = 0; fileID < nfiles; fileID++ )
 		{
 		  streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
 
@@ -560,12 +558,12 @@ void *Collgrid(void *argument)
     }
   while ( nrecs0 > 0 );
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     streamClose(ef[fileID].streamID);
 
   streamClose(streamID2);
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     if ( ef[fileID].array ) Free(ef[fileID].array);
 
   if ( ef ) Free(ef);

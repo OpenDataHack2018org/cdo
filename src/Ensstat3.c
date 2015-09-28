@@ -77,7 +77,6 @@ void *Ensstat3(void *argument)
   double val;
   int ival;
   field_t *field;
-  int fileID;
   const char *ofilename;
 
   typedef struct
@@ -131,11 +130,11 @@ void *Ensstat3(void *argument)
       field[i].size   = nfiles;
       field[i].ptr    = (double*) Malloc(nfiles*sizeof(double));
       field[i].weight = (double*) Malloc(nfiles*sizeof(double));
-      for ( fileID = 0; fileID < nfiles; fileID++ )
+      for ( int fileID = 0; fileID < nfiles; fileID++ )
 	field[i].weight[fileID] = 1;
     }
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = streamOpenRead(cdoStreamName(fileID));
 
@@ -146,7 +145,7 @@ void *Ensstat3(void *argument)
     }
 
   /* check for identical contents of all ensemble members */
-  for ( fileID = 1; fileID < nfiles; fileID++ )
+  for ( int fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   vlistID1 = ef[0].vlistID;
@@ -207,7 +206,7 @@ void *Ensstat3(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
 
   if ( operfunc == func_rank && datafunc == SPACE ) 
@@ -246,7 +245,7 @@ void *Ensstat3(void *argument)
   do
     {
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
-      for ( fileID = 1; fileID < nfiles; fileID++ )
+      for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
 	  streamID = ef[fileID].streamID;
 	  nrecs = streamInqTimestep(streamID, tsID);
@@ -271,10 +270,11 @@ void *Ensstat3(void *argument)
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(fileID, streamID, nmiss) \
-                                     lastprivate(varID, levelID)
+#pragma omp parallel for default(none) shared(ef, nfiles)      \
+                                      private(streamID, nmiss) \
+                                  lastprivate(varID, levelID)
 #endif
-	  for ( fileID = 0; fileID < nfiles; fileID++ )
+	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
 	      streamID = ef[fileID].streamID;
 	      streamInqRecord(streamID, &varID, &levelID);
@@ -291,7 +291,7 @@ void *Ensstat3(void *argument)
 	      array2[binID][0] = 0;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, binID, fileID)
+#pragma omp parallel for default(shared) private(binID)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
@@ -300,7 +300,7 @@ void *Ensstat3(void *argument)
 	      field[ompthID].missval = missval;
 	      field[ompthID].nmiss = 0;
 	      have_miss = 0;
-	      for ( fileID = 0; fileID < nfiles; fileID++ )
+	      for ( int fileID = 0; fileID < nfiles; fileID++ )
 		{
 		  field[ompthID].ptr[fileID] = ef[fileID].array[i];
 		  if ( DBL_IS_EQUAL(field[ompthID].ptr[fileID], missval) ) 
@@ -478,7 +478,7 @@ void *Ensstat3(void *argument)
 	    roc_curve_integrate((const double **)roc,nbins));
   }
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = ef[fileID].streamID;
       streamClose(streamID);
@@ -487,7 +487,7 @@ void *Ensstat3(void *argument)
   if ( operfunc != func_roc ) 
     streamClose(streamID2);
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     if ( ef[fileID].array ) Free(ef[fileID].array);
 
   if ( ef ) Free(ef);

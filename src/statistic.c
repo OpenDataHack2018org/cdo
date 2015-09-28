@@ -1307,11 +1307,10 @@ void annihilate_1side(double **M, long i, long j, long n)
 
   if ( tmp < fnorm_precision ) {
 #if defined(_OPENMP)
-#pragma omp critical 
+#pragma omp atomic
 #endif
-    {
-      n_finished++;
-    }
+    n_finished++;
+
     Free(mi);
     Free(mj);
     return;
@@ -1397,7 +1396,7 @@ int jacobi_1side(double **M, double *A, long n)
     if ( n%2 == 1 ) {
       for ( m = 0; m < n; m++ ) {
 #if defined(_OPENMP)
-#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
+#pragma omp parallel for private(idx,i_ann,j_ann) shared(M,annihilations,n,n_finished)
 #endif
         for ( i = 0; i < n/2; i++) {
           idx = m*(n/2)+i;
@@ -1411,7 +1410,7 @@ int jacobi_1side(double **M, double *A, long n)
     else { // n%2 == 0                                                                               
       for( m = 0; m < n; m++) {
 #if defined(_OPENMP)
-#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
+#pragma omp parallel for private(idx,i_ann,j_ann) shared(M,annihilations,n,n_finished)
 #endif
         for( i = 0; i < n/2-(m%2); i++) {
 	  idx = m/2 * ( n/2 + n/2-1);

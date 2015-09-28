@@ -459,7 +459,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 {
   double epsm1i;
   long jblt;
-  long k, iv, ij;
+  long k, iv;
   long jlev = 0;
   double *zt2 = NULL, *zq2 = NULL;
   double /* *etah1,*/ *ph1, *lnph1, *fi1;
@@ -697,11 +697,11 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	 ltq, nvars, imiss, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, fis1, fis2, ps2, \
 	 ah2, bh2, nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt) \
   firstprivate(lpsmod) \
-  private(ij, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, \
+  private(ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, \
           theta_pbl, rh2, wgt, idx, vars_pbl, zt2, zq2) \
   schedule(dynamic,1)
 #endif
-  for ( ij = 0; ij < ngp; ++ij )
+  for ( int ij = 0; ij < ngp; ++ij )
     {
 #if defined(_OPENMP)
       int ompthID = omp_get_thread_num();

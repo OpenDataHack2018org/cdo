@@ -499,7 +499,6 @@ static
 void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* Include centroids in weights and normalize using destination area if requested */
-  long n;
   long num_wts = rv->num_wts;
   long num_links = rv->num_links;
   long tgt_cell_add;       /* current linear address for target grid cell   */
@@ -513,9 +512,9 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_wts, num_links, rv, tgt_grid)	\
-  private(n, tgt_cell_add, norm_factor)
+  private(tgt_cell_add, norm_factor)
 #endif
-      for ( n = 0; n < num_links; ++n )
+      for ( long n = 0; n < num_links; ++n )
 	{
 	  tgt_cell_add = rv->tgt_cell_add[n];
 
@@ -535,9 +534,9 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_wts, num_links, rv, tgt_grid)	\
-  private(n, tgt_cell_add, norm_factor)
+  private(tgt_cell_add, norm_factor)
 #endif
-      for ( n = 0; n < num_links; ++n )
+      for ( long n = 0; n < num_links; ++n )
 	{
 	  tgt_cell_add = rv->tgt_cell_add[n];
 
@@ -565,7 +564,6 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   long   src_num_cell_corners;
   long   tgt_num_cell_corners;
   long   src_cell_add;       /* current linear address for source grid cell   */
-  long   tgt_cell_add;       /* current linear address for target grid cell   */
   long   k;                  /* generic counters                        */
   long   nbins;
   long   num_wts;
@@ -713,9 +711,9 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
          srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size,	\
 	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2) \
   private(srch_add, tgt_grid_cell, tgt_area, k, num_srch_cells, max_srch_cells,  \
-	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_cell_add, tgt_cell_add, ioffset)
+	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_cell_add, ioffset)
 #endif
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       double partial_weight;
       long n, num_weights, num_weights_old;
@@ -1140,7 +1138,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       for ( n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n];
-	  tgt_cell_add = rv->tgt_cell_add[n];
+	  long tgt_cell_add = rv->tgt_cell_add[n];
 
 	  if ( rv->wts[n*num_wts] < -0.01 )
 	    cdoPrint("Map weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",

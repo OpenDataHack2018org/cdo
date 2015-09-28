@@ -357,8 +357,7 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   double search_radius = remap_search_radius*DEG2RAD;
   double range = SQR(2*search_radius);
 
-  unsigned index;
-#pragma omp parallel for private(index) shared(findex, mindex, array1, array2, xvals, yvals, range)
+#pragma omp parallel for default(none) shared(findex, mindex, vindex, array1, array2, xvals, yvals, range, gs, nmiss)
   for ( unsigned i = 0; i < nmiss; ++i )
     {
 #if defined(_OPENMP)
@@ -368,8 +367,7 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/nmiss);
 
       double prange = range;
-
-      index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
+      unsigned index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
       if ( index == GS_NOT_FOUND ) index = mindex[i];
       else                         index = vindex[index];
 

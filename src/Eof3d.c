@@ -337,7 +337,7 @@ void *EOF3d(void * argument)
 	  double *eigenvec = eigenvectors[varID][eofID];
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(i,j,sum) shared(datafields, eigenvec)
+#pragma omp parallel for default(none) private(j,sum) shared(varID,nts,eofID,npack,pack,cov,datafields,eigenvec)
 #endif 
 	  for ( i = 0; i < npack; i++ )
 	    {
@@ -351,8 +351,7 @@ void *EOF3d(void * argument)
 	  sum = 0;
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(i) default(none) reduction(+:sum) \
-  shared(eigenvec,weight,pack,npack,gridsize)
+#pragma omp parallel for default(none)  shared(eigenvec,weight,pack,npack,gridsize) reduction(+:sum)
 #endif 
 	  for ( i = 0; i < npack; i++ )
 	    sum +=  weight[pack[i]%gridsize] *
@@ -362,8 +361,7 @@ void *EOF3d(void * argument)
 	    {
 	      sum = sqrt(sum);
 #if defined(_OPENMP)
-#pragma omp parallel for private(i) default(none) \
-  shared(sum,npack,eigenvec,pack)
+#pragma omp parallel for default(none) shared(sum,npack,eigenvec,pack)
 #endif
 	      for( i = 0; i < npack; i++ )
 		eigenvec[pack[i]] /= sum;
@@ -371,8 +369,7 @@ void *EOF3d(void * argument)
 	  else
 	    {
 #if defined(_OPENMP)
-#pragma omp parallel for private(i) default(none) \
-  shared(eigenvec,pack,missval,npack)
+#pragma omp parallel for default(none) shared(eigenvec,pack,missval,npack)
 #endif
 	      for( i = 0; i < npack; i++ )
 		eigenvec[pack[i]] = missval;

@@ -232,15 +232,15 @@ static
 void boundbox_from_corners(long size, long nc, const double *restrict corner_lon,
 			   const double *restrict corner_lat, restr_t *restrict bound_box)
 {
-  long i4, inc, i, j;
+  long i4, inc, j;
   restr_t clon, clat;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(bound_box, corner_lat, corner_lon, nc, size)	\
-  private(i4, inc, i, j, clon, clat)
+  private(i4, inc, j, clon, clat)
 #endif
-  for ( i = 0; i < size; ++i )
+  for ( long i = 0; i < size; ++i )
     {
       i4 = i<<2; // *4
       inc = i*nc;
@@ -266,16 +266,16 @@ static
 void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny, const double *restrict center_lon,
 			  const double *restrict center_lat, restr_t *restrict bound_box)
 {
-  long n4, i, j, k, n, ip1, jp1;
+  long n4, i, j, k, ip1, jp1;
   long n_add, e_add, ne_add;
   restr_t tmp_lats[4], tmp_lons[4];  /* temps for computing bounding boxes */
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box)	\
-  private(n4, i, j, k, n, ip1, jp1, n_add, e_add, ne_add, tmp_lats, tmp_lons)
+  private(n4, i, j, k, ip1, jp1, n_add, e_add, ne_add, tmp_lats, tmp_lons)
 #endif
-  for ( n = 0; n < size; n++ )
+  for ( long n = 0; n < size; n++ )
     {
       n4 = n<<2;
 
@@ -374,14 +374,12 @@ void check_lon_range2(long nc, long nlons, double *corners, double *centers)
 static
 void check_lon_range(long nlons, double *lons)
 {
-  long n;
-
   assert(lons != NULL);
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlons, lons)
 #endif
-  for ( n = 0; n < nlons; ++n )
+  for ( long n = 0; n < nlons; ++n )
     {
       // remove missing values
       if ( lons[n] < -PI2 ) lons[n] = 0;
@@ -395,14 +393,12 @@ void check_lon_range(long nlons, double *lons)
 static
 void check_lat_range(long nlats, double *lats)
 {
-  long n;
-
   assert(lats != NULL);
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlats, lats)
 #endif
-  for ( n = 0; n < nlats; ++n )
+  for ( long n = 0; n < nlats; ++n )
     {
       if ( lats[n] >  PIH ) lats[n] =  PIH;
       if ( lats[n] < -PIH ) lats[n] = -PIH;
@@ -412,14 +408,14 @@ void check_lat_range(long nlats, double *lats)
 static
 void check_lon_boundbox_range(long nlons, restr_t *bound_box)
 {
-  long n, n4;
+  long n4;
 
   assert(bound_box != NULL);
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlons, bound_box) private(n4)
 #endif
-  for ( n = 0; n < nlons; ++n )
+  for ( long n = 0; n < nlons; ++n )
     {
       n4 = n<<2;
       if ( RESTR_ABS(bound_box[n4+3] - bound_box[n4+2]) > RESTR_SCALE(PI) )
@@ -433,14 +429,14 @@ void check_lon_boundbox_range(long nlons, restr_t *bound_box)
 static
 void check_lat_boundbox_range(long nlats, restr_t *restrict bound_box, double *restrict lats)
 {
-  long n, n4;
+  long n4;
 
   assert(bound_box != NULL);
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n4)
 #endif
-  for ( n = 0; n < nlats; ++n )
+  for ( long n = 0; n < nlats; ++n )
     {
       n4 = n<<2;
       if ( RESTR_SCALE(lats[n]) < bound_box[n4  ] ) bound_box[n4  ] = RESTR_SCALE(-PIH);
@@ -1275,7 +1271,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)					\
-  private(i, n, k, src_cls, src_wts, ncls, imax, wts) \
+  private(n, k, src_cls, src_wts, ncls, imax, wts) \
   schedule(dynamic,1)
 #endif
   for ( i = 0; i < dst_size; ++i )
@@ -1558,7 +1554,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 void remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat,
 		     double *restrict grad_lon, double *restrict grad_latlon)
 {
-  long n, nx, ny, grid_size;
+  long nx, ny, grid_size;
   long i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw;
   double delew, delns;
   double grad_lat_zero, grad_lon_zero;
@@ -1573,9 +1569,9 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(grid_size, grad_lat, grad_lon, grad_latlon, grid, nx, ny, array) \
-  private(n, i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw, delew, delns, grad_lat_zero, grad_lon_zero)
+  private(i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw, delew, delns, grad_lat_zero, grad_lon_zero)
 #endif
-  for ( n = 0; n < grid_size; ++n )
+  for ( long n = 0; n < grid_size; ++n )
     {
       grad_lat[n] = ZERO;
       grad_lon[n] = ZERO;

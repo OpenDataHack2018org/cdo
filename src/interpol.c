@@ -227,7 +227,7 @@ void intlinarr2(double missval, int lon_is_circular,
 		long nxm, long nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
 		long gridsize2, double *field, const double *restrict x, const double *restrict y)
 {
-  long i, ii, jj;
+  long ii, jj;
   long gridsize1;
   long nlon1 = nxm;
   double findex = 0;
@@ -248,9 +248,9 @@ void intlinarr2(double missval, int lon_is_circular,
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask) \
-  private(i, jj, ii)
+  private(jj,ii)
 #endif
-  for ( i = 0; i < gridsize2; ++i )
+  for ( int i = 0; i < gridsize2; ++i )
     {
       int src_add[4];                /*  address for the four source points    */
       long n;
@@ -367,7 +367,7 @@ void intconarr2(double missval, int lon_is_circular,
 {
   long ndeps;
   int *deps;
-  long i, ii = -1, jj = -1;
+  long ii = -1, jj = -1;
   long gridsize1;
   long nlon1 = nxm;
   long nx, ny;
@@ -440,10 +440,10 @@ void intconarr2(double missval, int lon_is_circular,
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask, nc2) \
-  private(i, jj, ii)
+  private(jj, ii)
 #endif
   */
-  for ( i = 0; i < gridsize2; ++i )
+  for ( int i = 0; i < gridsize2; ++i )
     {
       int src_add[4];                /*  address for the four source points    */
       long n;

@@ -659,7 +659,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
 
 #if defined(_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) \
-        private(i, n, m, wgttmp, who_am_i)   \
+        private(n, m, wgttmp, who_am_i)    \
         shared(weights) num_threads(2)
 #endif
   for ( i=0; i < nsplit; i++ )

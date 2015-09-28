@@ -162,10 +162,9 @@ void store_weightlinks4(long num_weights, int *srch_add, double weights[4][4], l
 
 void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, remapvars_t *rv)
 {
-  long tgt_cell_add;
   long nlinks = 0;
 
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       if ( weightlinks[tgt_cell_add].nlinks )
 	{
@@ -183,11 +182,9 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
       rv->wts          = (double*) Malloc(nlinks*sizeof(double));
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) \
-  shared(rv, weightlinks)		 \
-  private(tgt_cell_add)
+#pragma omp parallel for default(none) shared(rv, weightlinks,tgt_grid_size) 
 #endif
-      for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+      for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
 	{
 	  long num_links = weightlinks[tgt_cell_add].nlinks;
 	  if ( num_links )
@@ -208,10 +205,9 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
 
 void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, remapvars_t *rv)
 {
-  long tgt_cell_add;
   long nlinks = 0;
 
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       if ( weightlinks[tgt_cell_add].nlinks )
 	{
@@ -229,11 +225,9 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
       rv->wts          = (double*) Malloc(4*nlinks*sizeof(double));
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) \
-  shared(rv, weightlinks)		 \
-  private(tgt_cell_add)
+#pragma omp parallel for default(none) shared(rv,weightlinks,tgt_grid_size)
 #endif
-      for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+      for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
 	{
 	  long num_links = weightlinks[tgt_cell_add].nlinks;
 	  if ( num_links )

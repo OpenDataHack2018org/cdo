@@ -1137,7 +1137,6 @@ static
 void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centroid_lat, double *src_centroid_lon)
 {
   /* Include centroids in weights and normalize using destination area if requested */
-  long n;
   long num_links = rv->num_links;
   long src_cell_add;       /* current linear address for source grid cell   */
   long tgt_cell_add;       /* current linear address for target grid cell   */
@@ -1152,9 +1151,9 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
-  private(n, src_cell_add, tgt_cell_add, norm_factor)
+  private(src_cell_add, tgt_cell_add, norm_factor)
 #endif
-      for ( n = 0; n < num_links; ++n )
+      for ( long n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n]; tgt_cell_add = rv->tgt_cell_add[n];
 
@@ -1174,9 +1173,9 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)		\
-  private(n, src_cell_add, tgt_cell_add, norm_factor)
+  private(src_cell_add, tgt_cell_add, norm_factor)
 #endif
-      for ( n = 0; n < num_links; ++n )
+      for ( long n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n]; tgt_cell_add = rv->tgt_cell_add[n];
 
@@ -1196,9 +1195,9 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv, double *src_centr
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, weights, tgt_grid, src_centroid_lat, src_centroid_lon)	\
-  private(n, src_cell_add, norm_factor)
+  private(src_cell_add, norm_factor)
 #endif
-      for ( n = 0; n < num_links; ++n )
+      for ( long n = 0; n < num_links; ++n )
 	{
 	  src_cell_add = rv->src_cell_add[n];;
 
@@ -1378,7 +1377,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   if ( cdoTimer ) timer_start(timer_remap_con_l1);
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) \
+#pragma omp parallel for default(none) \
   shared(nbins, num_wts, src_centroid_lon, src_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\
@@ -1601,7 +1600,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   findex = 0;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) \
+#pragma omp parallel for default(none) \
   shared(nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 srch_corner_lat2, srch_corner_lon2, max_srch_cells2, 		\

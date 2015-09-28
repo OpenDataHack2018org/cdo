@@ -358,7 +358,6 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*  Local variables */
-  unsigned tgt_cell_add;  /* destination address */
   int remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -393,9 +392,9 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(gs, weightlinks, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
-  private(tgt_cell_add, nbr_mask, nbr_add, nbr_dist)
+  private(nbr_mask, nbr_add, nbr_dist)
 #endif
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( unsigned tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
@@ -452,7 +451,6 @@ void distwgt_remap(double* restrict tgt_point, const double* restrict src_array,
 void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
 {
   /*  Local variables */
-  unsigned tgt_cell_add;              /* destination address                         */
   int remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -494,9 +492,9 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
 #pragma omp parallel for default(none) \
   shared(gs, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   shared(src_array, tgt_array, missval) \
-  private(tgt_cell_add, nbr_mask, nbr_add, nbr_dist)
+  private(nbr_mask, nbr_add, nbr_dist)
 #endif
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( unsigned tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"

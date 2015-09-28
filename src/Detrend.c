@@ -70,14 +70,10 @@ void *Detrend(void *argument)
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;
-  int tsID;
   int i;
-  int nts;
   int nalloc = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
+  int nlevel;
   double missval;
   field_t ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
@@ -86,26 +82,25 @@ void *Detrend(void *argument)
     double *array1;
     double *array2;
   } memory_t;
-  memory_t *ompmem = NULL;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
@@ -131,9 +126,9 @@ void *Detrend(void *argument)
       tsID++;
     }
 
-  nts = tsID;
+  int nts = tsID;
 
-  ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
+  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
       ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
@@ -149,18 +144,18 @@ void *Detrend(void *argument)
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, tsID)
+#pragma omp parallel for default(none) shared(ompmem, vars, varID, levelID, gridsize, nts, missval)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
               int ompthID = cdo_omp_get_thread_num();
 
-	      for ( tsID = 0; tsID < nts; tsID++ )
+	      for ( int tsID = 0; tsID < nts; tsID++ )
 		ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
 	      detrend(nts, missval, ompmem[ompthID].array1, ompmem[ompthID].array2);
 
-	      for ( tsID = 0; tsID < nts; tsID++ )
+	      for ( int tsID = 0; tsID < nts; tsID++ )
 		vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array2[tsID];
 	    }
 	}
@@ -173,7 +168,7 @@ void *Detrend(void *argument)
     }
   Free(ompmem);
 
-  for ( tsID = 0; tsID < nts; tsID++ )
+  for ( int tsID = 0; tsID < nts; tsID++ )
     {
       dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
       streamDefTimestep(streamID2, tsID);

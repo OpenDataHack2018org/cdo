@@ -383,20 +383,20 @@ void gridGenRotBounds(int gridID, int nx, int ny,
 static
 void gridGenXbounds2D(long nx, long ny, const double* restrict xbounds, double* restrict xbounds2D)
 {
-  long i, j, index;
+  long index;
   double minlon, maxlon;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
-  shared(nx, ny, xbounds, xbounds2D)	      \
-  private(i, j, minlon, maxlon, index)
+                          shared(nx, ny, xbounds, xbounds2D) \
+                         private(minlon, maxlon, index)
 #endif
-  for ( i = 0; i < nx; ++i )
+  for ( long i = 0; i < nx; ++i )
     {
       minlon = xbounds[2*i  ];
       maxlon = xbounds[2*i+1];
 
-      for ( j = 0; j < ny; ++j )
+      for ( long j = 0; j < ny; ++j )
 	{
 	  index = j*4*nx + 4*i;
 	  xbounds2D[index  ] = minlon;
@@ -410,15 +410,15 @@ void gridGenXbounds2D(long nx, long ny, const double* restrict xbounds, double* 
 static
 void gridGenYbounds2D(long nx, long ny, const double* restrict ybounds, double* restrict ybounds2D)
 {
-  long i, j, index;
+  long index;
   double minlat, maxlat;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
-  shared(nx, ny, ybounds, ybounds2D)	      \
-  private(i, j, minlat, maxlat, index)
+                          shared(nx, ny, ybounds, ybounds2D) \
+                         private(minlat, maxlat, index)
 #endif
-  for ( j = 0; j < ny; ++j )
+  for ( long j = 0; j < ny; ++j )
     {
       if ( ybounds[0] > ybounds[1] )
 	{
@@ -431,7 +431,7 @@ void gridGenYbounds2D(long nx, long ny, const double* restrict ybounds, double* 
 	  minlat = ybounds[2*j  ];
 	}
 
-      for ( i = 0; i < nx; ++i )
+      for ( long i = 0; i < nx; ++i )
 	{
 	  index = j*4*nx + 4*i;
 	  ybounds2D[index  ] = minlat;

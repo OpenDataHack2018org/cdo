@@ -83,7 +83,6 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 {
   /*   Local variables */
   int  search_result;
-  long tgt_cell_add;        /*  destination addresss                   */
   int src_add[4];      /*  address for the four source points     */
   double src_lats[4];  /*  latitudes  of four bilinear corners    */
   double src_lons[4];  /*  longitudes of four bilinear corners    */
@@ -114,9 +113,9 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
-  private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)
+  private(src_add, src_lats, src_lons, wgts, plat, plon, search_result)
 #endif
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
@@ -207,7 +206,6 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 {
   /*   Local variables */
   int  search_result;
-  long tgt_cell_add;        /*  destination addresss                 */
   int src_add[4];      /*  address for the four source points   */
   double src_lats[4];  /*  latitudes  of four bilinear corners  */
   double src_lons[4];  /*  longitudes of four bilinear corners  */
@@ -239,9 +237,9 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon, findex) \
-  private(tgt_cell_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)
+  private(src_add, src_lats, src_lons, wgts, plat, plon, search_result)
 #endif
-  for ( tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+  for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"

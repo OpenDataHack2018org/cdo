@@ -54,7 +54,7 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
 		       double **covar, double **data, double missval, double sum_w)
 {
 #if defined(_OPENMP)
-#pragma omp parallel for shared(tsID, data, out)
+#pragma omp parallel for default(none) shared(npack, nts, tsID, pack, data, covar, out)
 #endif
   for ( int i = 0; i < npack; ++i )
     {
@@ -81,7 +81,7 @@ void scale_eigvec_time(double *restrict out, int tsID, int nts, int npack, const
 #endif
   for ( int i = 0; i < npack; ++i )
     {
-      // do not need to account for weights as eigenvectors are non-weighted                                   
+      // do not need to account for weights as eigenvectors are non-weighted                               
       sum += weight[pack[i]] * out[pack[i]] * out[pack[i]];
     }
 

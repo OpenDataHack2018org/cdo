@@ -123,18 +123,18 @@ void *Timsort(void *argument)
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, tsID)
+#pragma omp parallel for default(none) shared(gridsize,nts,sarray,vars,varID,levelID)
 #endif
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( int i = 0; i < gridsize; i++ )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 
-	      for ( tsID = 0; tsID < nts; tsID++ )
+	      for ( int tsID = 0; tsID < nts; tsID++ )
 		sarray[ompthID][tsID] = vars[tsID][varID][levelID].ptr[i];
 
 	      qsort(sarray[ompthID], nts, sizeof(double), cmpdarray);  	      
 
-	      for ( tsID = 0; tsID < nts; tsID++ )
+	      for ( int tsID = 0; tsID < nts; tsID++ )
 		vars[tsID][varID][levelID].ptr[i] = sarray[ompthID][tsID];
 	    }
 	}

@@ -33,7 +33,6 @@ void *Fourier(void *argument)
   int nrecs;
   int gridID, varID, levelID, recID;
   int tsID;
-  int i;
   int nts;
   int nalloc = 0;
   int streamID1, streamID2;
@@ -107,7 +106,7 @@ void *Fourier(void *argument)
   for ( bit = nts; !(bit & 1); bit >>= 1 );
 
   ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-  for ( i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < ompNumThreads; i++ )
     {
       ompmem[i].real = (double*) Malloc(nts*sizeof(double));
       ompmem[i].imag = (double*) Malloc(nts*sizeof(double));
@@ -127,9 +126,9 @@ void *Fourier(void *argument)
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, tsID)
+#pragma omp parallel for default(shared) private(tsID)
 #endif
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( int i = 0; i < gridsize; i++ )
 	    {
 	      int lmiss = 0;
               int ompthID = cdo_omp_get_thread_num();
@@ -167,7 +166,7 @@ void *Fourier(void *argument)
 	}
     }
 
-  for ( i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < ompNumThreads; i++ )
     {
       Free(ompmem[i].real);
       Free(ompmem[i].imag);

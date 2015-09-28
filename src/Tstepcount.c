@@ -67,7 +67,6 @@ void *Tstepcount(void *argument)
   int vdate = 0, vtime = 0;
   double missval;
   double refval = 0;
-  double count;
   field_t ***vars = NULL;
   typedef struct
   {
@@ -144,17 +143,16 @@ void *Tstepcount(void *argument)
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, tsID) \
-  schedule(dynamic,1)
+#pragma omp parallel for default(none) shared(gridsize,mem,vars,varID,levelID,nts,missval,refval) schedule(dynamic,1)
 #endif
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( int i = 0; i < gridsize; i++ )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 
-	      for ( tsID = 0; tsID < nts; tsID++ )
+	      for ( int tsID = 0; tsID < nts; tsID++ )
 		mem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-	      count = tstepcount(nts, missval, mem[ompthID].array1, refval);
+	      double count = tstepcount(nts, missval, mem[ompthID].array1, refval);
 	      vars[0][varID][levelID].ptr[i] = count;
 	    }
 	}

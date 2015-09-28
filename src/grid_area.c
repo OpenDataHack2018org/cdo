@@ -415,11 +415,10 @@ int gridGenArea(int gridID, double* area)
   progressInit();
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)        \
-  shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat, grid_center_lon, grid_center_lat) \
-  private(i)
+#pragma omp parallel for default(none)  \
+  shared(findex,gridsize,area,nv,grid_corner_lon,grid_corner_lat,grid_center_lon,grid_center_lat)
 #endif
-  for ( i = 0; i < gridsize; ++i )
+  for ( int i = 0; i < gridsize; ++i )
     {
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;

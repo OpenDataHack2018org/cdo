@@ -65,12 +65,10 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
 #if defined(HAVE_LIBFFTW3) 
 static
 void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
-{  
-  int i;
-
+{
   fftw_execute(*p_T2S);
 
-  for ( i = 0; i < nts; i++ )
+  for ( int i = 0; i < nts; i++ )
     if ( ! fmasc[i] )
       {
         fft_out[i][0] = 0;
@@ -86,7 +84,6 @@ void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_
 static
 void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 {  
-  int i;
   int lpower2 = FALSE;
   double *work_r = NULL;
   double *work_i = NULL;
@@ -104,7 +101,7 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
   else
     ft_r(array1, array2, nts, 1, work_r, work_i);
 
-  for ( i = 0; i < nts; i++ )
+  for ( int i = 0; i < nts; i++ )
     if ( ! fmasc[i] )
       array1[i] = array2[i] = 0;
 
@@ -123,13 +120,12 @@ void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 void *Filter(void *argument)
 {
   enum {BANDPASS, HIGHPASS, LOWPASS};
-  char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
+  const char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;
   int tsID;
-  int i;
   int nts;
   int nalloc = 0;
   int nmiss;
@@ -263,7 +259,7 @@ void *Filter(void *argument)
     {
 #if defined(HAVE_LIBFFTW3) 
       ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-      for ( i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  ompmem[i].in_fft  = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
 	  ompmem[i].out_fft = (fftw_complex*) Malloc(nts*sizeof(fftw_complex));
@@ -275,7 +271,7 @@ void *Filter(void *argument)
   else
     {
       ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-      for ( i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  ompmem[i].array1 = (double*) Malloc(nts*sizeof(double));
 	  ompmem[i].array2 = (double*) Malloc(nts*sizeof(double));
@@ -328,9 +324,9 @@ void *Filter(void *argument)
             {
 #if defined(HAVE_LIBFFTW3) 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, tsID)
+#pragma omp parallel for default(shared) private(tsID)
 #endif
-              for ( i = 0; i < gridsize; i++ )
+              for ( int i = 0; i < gridsize; i++ )
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 
@@ -352,9 +348,9 @@ void *Filter(void *argument)
           else
             {
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(i, tsID)
+#pragma omp parallel for default(shared) private(tsID)
 #endif
-              for ( i = 0; i < gridsize; i++ )  
+              for ( int i = 0; i < gridsize; i++ )  
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 
@@ -375,7 +371,7 @@ void *Filter(void *argument)
   if ( use_fftw )
     {
 #if defined(HAVE_LIBFFTW3) 
-      for ( i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  Free(ompmem[i].in_fft);
 	  Free(ompmem[i].out_fft);
@@ -385,7 +381,7 @@ void *Filter(void *argument)
     }
   else
     {
-      for ( i = 0; i < ompNumThreads; i++ )
+      for ( int i = 0; i < ompNumThreads; i++ )
 	{
 	  Free(ompmem[i].array1);
 	  Free(ompmem[i].array2);

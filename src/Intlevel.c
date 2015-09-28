@@ -35,13 +35,13 @@ static
 void vert_interp_lev(int gridsize, double missval, double *vardata1, double *vardata2,
 		     int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
-  int i, ilev;
+  int i;
   int idx1, idx2;
   double wgt1, wgt2;
   double w1, w2;
   double *var1L1, *var1L2, *var2;
 
-  for ( ilev = 0; ilev < nlev2; ++ilev )
+  for ( int ilev = 0; ilev < nlev2; ++ilev )
     {
       idx1 = lev_idx1[ilev];
       idx2 = lev_idx2[ilev];
@@ -55,7 +55,7 @@ void vert_interp_lev(int gridsize, double missval, double *vardata1, double *var
       var1L2 = vardata1+gridsize*idx2;
 
 #if defined(_OPENMP)
-#pragma omp parallel for shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval) private(i, w1, w2)
+#pragma omp parallel for default(none) shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval) private(w1, w2)
 #endif
       for ( i = 0; i < gridsize; ++i )
 	{
