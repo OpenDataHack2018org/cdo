@@ -1,21 +1,33 @@
 // aligned access gives 3-5% speedup
-// icc -std=c99 -O2 -xCORE-AVX2 -qopt-report=5 -openmp memalign.c fun.c
-// gcc -std=c99 -O3 -march=native -ftree-vectorize -fdump-tree-vect-blocks -fopt-info-optimized -fopenmp memalign.c fun.c
+// icc -g -std=c99 -O2 -xCORE-AVX2 -qopt-report=5 -openmp memalign.c fun.c
+// gcc -g -std=c99 -O3 -march=native -ftree-vectorize -fdump-tree-vect-blocks -fopt-info-optimized -fopenmp memalign.c fun.c
 
+/*
+ICC16/hama2:
+        fun1    fun2
+SSE3    12.7    16.8  unaligned
+SSE3    12.4    13.7    aligned
+AVX2    10.4    10.4  unaligned
+AVX2    10.4    10.4    aligned
+ */
+/*
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
 #endif
-/*
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200112L
 #endif
 */
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 
-void fun1(int nelem, double *restrict array1, double *restrict array2);
-void fun2(int nelem, double *restrict array1, double *restrict array2, double *restrict array3);
+//#define NITER 200000000
+#define NITER 2000000
+
+void fun1(const unsigned nelem, double *restrict array1, double *restrict array2);
+void fun2(const unsigned nelem, double *restrict array1, double *restrict array2, double *restrict array3);
 
 void print_opt(void)
 {
@@ -57,28 +69,34 @@ int get_alignment(double *ptr)
 
 int main(void)
 {
-  int nelem = 97;
+  double start_time;
+  //  int nelem = 97;
+  int nelem = 4*4096;
   double *array1, *array2;
 
   print_opt();
 
   malloc(nelem*sizeof(double));
-  //array1 = (double *) malloc(nelem*sizeof(double));
-  posix_memalign((void **)&array1, 64, nelem*sizeof(double));
+  array1 = (double *) malloc(nelem*sizeof(double));
+  //posix_memalign((void **)&array1, 64, nelem*sizeof(double));
   malloc(nelem*sizeof(double));
-  //array2 = (double *) malloc(nelem*sizeof(double));
-  posix_memalign((void **)&array2, 64, nelem*sizeof(double));
+  array2 = (double *) malloc(nelem*sizeof(double));
+  //posix_memalign((void **)&array2, 64, nelem*sizeof(double));
 
   printf("mem alignment: %d %d\n", get_alignment(array1), get_alignment(array2));
 
   for ( int i = 0; i < nelem; ++i ) array1[i] = 0;
   for ( int i = 0; i < nelem; ++i ) array2[i] = 1;
-  /*
-  for ( int i = 0; i < 200000000; ++i )
+
+  start_time = omp_get_wtime();
+  for ( int i = 0; i < NITER; ++i )
     fun1(nelem, array1, array2);
-  */
-  for ( int i = 0; i < 200000000; ++i )
+  printf("\n fun1 in %lf seconds\n ",omp_get_wtime() - start_time);
+
+  start_time = omp_get_wtime();
+  for ( int i = 0; i < NITER; ++i )
     fun2(nelem, array1, array2, array2);
+  printf("\n fun2 in %lf seconds\n ",omp_get_wtime() - start_time);
 
   free(array1);
   free(array2);

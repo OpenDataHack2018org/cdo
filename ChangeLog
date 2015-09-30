@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-09-30  Uwe Schulzweida
+
+	* usvs_to_uv: if ( rla < 0.0 ) rla += 360.0  (bug fix) [report: Laura Niederdrenk]
+
 2015-09-25  Uwe Schulzweida
 
         * added operator sortparam to sort all variables by there parameter number

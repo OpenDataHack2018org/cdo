@@ -187,6 +187,7 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   /* umrechnung von grad in bogenmass */
   zpolphi = polphi*DEG2RAD;
   zpollam = pollam*DEG2RAD;
+  if ( rla < 0.0 ) rla += 360.0;
   zrla    = rla   *DEG2RAD;
   pollamd = pollam;
   if ( pollamd < 0.0 ) pollamd += 360.0;

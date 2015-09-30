@@ -703,12 +703,12 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   /* Loop over destination grid */
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) \
+#pragma omp parallel for default(none) \
   shared(ompNumThreads, lyac, nbins, num_wts, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          rv, cdoVerbose, max_srch_cells2, tgt_num_cell_corners, target_cell_type, \
          weightlinks, \
-         srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size,	\
+         srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, nx, \
 	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2) \
   private(srch_add, tgt_grid_cell, tgt_area, k, num_srch_cells, max_srch_cells,  \
 	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_cell_add, ioffset)
