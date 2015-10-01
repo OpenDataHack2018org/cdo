@@ -21,7 +21,6 @@ static void nce(int istat)
   /*
     This routine provides a simple interface to netCDF error message routine.
   */
-
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
 }
 #endif
@@ -34,8 +33,10 @@ int cdf_openread(const char *filename)
   int nc_file_id;      /* netCDF grid file id           */
 
   openLock();
-  nce(nc_open(filename, NC_NOWRITE, &nc_file_id));
+  int istat = nc_open(filename, NC_NOWRITE, &nc_file_id);
   openUnlock();
+  if ( istat != NC_NOERR )      
+    cdoAbort("Open failed on %s! %s", filename, nc_strerror(istat));
   fileID = nc_file_id;
 #else
   cdoWarning("netCDF support not compiled in!");
@@ -217,6 +218,9 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   len = strlen(gridfile);
   if ( gridfile[len-2] == 'n' && gridfile[len-1] == 'c' ) len -= 3;
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "title", len, gridfile));
+
+  if ( CDO_Version_Info )
+    nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment()));
 
   /* define grid size dimension */
 

@@ -79,17 +79,14 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
   int nc_dims2_id[2];       /* netCDF ids for 2d array dims             */
 
-  char *map_name = "SCRIP remapping with CDO";
+  const char *map_name = "SCRIP remapping with CDO";
   char normalize_opt[64] = "unknown";
   char map_method[64] = "unknown";
   char tmp_string[64] = "unknown";
-  char history[1024] = "date and time";
   char src_grid_name[64] = "source grid";
   char tgt_grid_name[64] = "dest grid";
-  char *src_grid_units = "radians";
-  char *tgt_grid_units = "radians";
-  time_t date_and_time_in_sec;
-  struct tm *date_and_time;
+  const char *src_grid_units = "radians";
+  const char *tgt_grid_units = "radians";
   long i;
   int lgridarea = FALSE;
   int writemode = NC_CLOBBER;
@@ -190,18 +187,6 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   if ( map_type == MAP_TYPE_CONSERV && submap_type == SUBMAP_TYPE_NONE )
     nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "remap_order", NC_INT, 1L, &remap_order));
 
-  /* History */
-  date_and_time_in_sec = time(NULL);
-
-  if ( date_and_time_in_sec != -1 )
-    {
-      date_and_time = localtime(&date_and_time_in_sec);
-      (void) strftime(history, 1024, "%d %b %Y : ", date_and_time);
-      strcat(history, commandLine());
-    }
-
-  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "history", strlen(history), history));
-
   /* File convention */
   strcpy(tmp_string, "SCRIP");
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "conventions", strlen(tmp_string), tmp_string));
@@ -212,6 +197,20 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
   gridName(gridInqType(tgt_grid.gridID), tgt_grid_name);
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "dest_grid", strlen(tgt_grid_name), tgt_grid_name));
+
+  /* History */
+  time_t date_and_time_in_sec = time(NULL);
+  if ( date_and_time_in_sec != -1 )
+    {
+      char history[1024] = "date and time";
+      struct tm *date_and_time = localtime(&date_and_time_in_sec);
+      (void) strftime(history, 1024, "%d %b %Y : ", date_and_time);
+      strcat(history, commandLine());
+      nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "history", strlen(history), history));
+    }
+
+  if ( CDO_Version_Info )
+    nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment()));
 
   /* Prepare netCDF dimension info */
 

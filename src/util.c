@@ -115,6 +115,26 @@ char *cdoExpName         = NULL;
 int timer_read, timer_write;
 
 
+
+const char *cdoComment(void)
+{
+  static char comment[256];
+  static int init = 0;
+
+  if ( ! init )
+    {
+      init = 1;
+
+      int size = strlen(CDO_Version);
+
+      strncat(comment, CDO_Version, size);
+      comment[size] = 0;
+    }
+
+  return comment;
+}
+
+
 #if defined(HAVE_FNMATCH_H)
 int wildcardmatch(const char *pattern, const char *string)
 {

@@ -947,25 +947,6 @@ int pstreamInqVlist(int pstreamID)
 }
 
 static
-const char *cdoComment(void)
-{
-  static char comment[256];
-  static int init = 0;
-
-  if ( ! init )
-    {
-      init = 1;
-
-      int size = strlen(CDO_Version);
-
-      strncat(comment, CDO_Version, size);
-      comment[size] = 0;
-    }
-
-  return comment;
-}
-
-static
 void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 {
   int filetype = pstreamptr->filetype;
