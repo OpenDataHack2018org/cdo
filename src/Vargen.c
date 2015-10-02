@@ -120,8 +120,8 @@ void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridI
           if ( xval <  -180 ) xval += 360;
           ii = (xval + 180)*2;
           jj = (yval +  90)*2;
-          if ( ii > nx ) ii = nx;
-          if ( jj > ny ) jj = ny;
+          if ( ii >= nx ) ii = nx-1;
+          if ( jj >= ny ) jj = ny-1;
           array[j*nxvals+i] = data[jj*nx+ii];
         }
     }
@@ -155,6 +155,7 @@ void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gr
 
   int ii, jj;
   double xval, yval;
+  printf("gridsize %d %d %d\n", gridsize, nx, ny);
   for ( int i = 0; i < gridsize; i++ )
     {
       xval = xvals[i];
@@ -163,8 +164,8 @@ void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gr
       if ( xval <  -180 ) xval += 360;
       ii = (xval + 180)*2;
       jj = (yval +  90)*2;
-      if ( ii > nx ) ii = nx;
-      if ( jj > ny ) jj = ny;
+      if ( ii >= nx ) ii = nx-1;
+      if ( jj >= ny ) jj = ny-1;
       array[i] = data[jj*nx+ii];
     }
 
