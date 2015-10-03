@@ -155,7 +155,6 @@ void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gr
 
   int ii, jj;
   double xval, yval;
-  printf("gridsize %d %d %d\n", gridsize, nx, ny);
   for ( int i = 0; i < gridsize; i++ )
     {
       xval = xvals[i];
