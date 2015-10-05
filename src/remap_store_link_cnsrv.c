@@ -103,7 +103,7 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
   long ilayer, i, iblk, iadd2;
   long nlayer, blksize;
   int lstore_link;
-  grid_layer_t *grid_layer, **grid_layer2;
+  grid_layer_t *grid_layer = NULL, **grid_layer2;
 
   /*  If all weights are ZERO, do not bother storing the link */
 

@@ -1080,9 +1080,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	      if ( overlap_buffer2[i][n].coordinates_xyz ) Free(overlap_buffer2[i][n].coordinates_xyz);
 	      if ( overlap_buffer2[i][n].edge_type ) Free(overlap_buffer2[i][n].edge_type);
 	    }
-	}
-      for ( n = 0; n < max_srch_cells2[i]; n++ )
-	{
+
 	  Free(src_grid_cells2[i][n].coordinates_x);
 	  Free(src_grid_cells2[i][n].coordinates_y);
 	  Free(src_grid_cells2[i][n].coordinates_xyz);

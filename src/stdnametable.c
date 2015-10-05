@@ -8,9 +8,9 @@ typedef struct
 {
   int   varid;
   int   echamcode;
-  char *name;
-  char *stdname;     /* Standard name */
-  char *units;       /* Units         */
+  const char *name;
+  const char *stdname;     /* Standard name */
+  const char *units;       /* Units         */
 }
 stdnametable_t;
 
