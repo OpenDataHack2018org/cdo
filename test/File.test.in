@@ -35,7 +35,7 @@ for OPERATOR in write copy; do
       FILEFORMAT=GRIB
       ENABLED_TEST=no
     fi
-    if [  "@ENABLE_GRIBAPI@" = no -a "${FORMAT}" = grb2 ] ; then
+    if [ "@ENABLE_GRIBAPI@" = no -a "${FORMAT}" = grb2 ] ; then
       FILEFORMAT=GRIB_API
       ENABLED_TEST=no
     fi

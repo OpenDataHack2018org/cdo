@@ -1,10 +1,10 @@
 #! @SHELL@
 #
 AFTERTESTFILE=ECHAM5_T42L19.grb
-if [ -f "$CDOTESTDATA/$AFTERTESTFILE" ]; then
-echo 1..4 # Number of tests to be executed.
+if [ -f "$CDOTESTDATA/$AFTERTESTFILE" -a "@ENABLE_CGRIBEX@" = yes ]; then
+  echo 1..4 # Number of tests to be executed.
 else
-echo 1..1 # Number of tests to be executed.
+  echo 1..1 # Number of tests to be executed.
 fi
 #
 test -n "$CDO"      || CDO=cdo
@@ -40,7 +40,7 @@ let NTEST+=1
 rm -f $OFILE
 rm -f $CDOOUT $CDOERR
 ######################################################
-if [ -f "$CDOTESTDATA/$AFTERTESTFILE" ]; then
+if [ -f "$CDOTESTDATA/$AFTERTESTFILE" -a "@ENABLE_CGRIBEX@" = yes ]; then
 ######################################################
 SELECT=bot
 IFILE=$CDOTESTDATA/$AFTERTESTFILE
