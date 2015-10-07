@@ -22,6 +22,7 @@
 
 #include <cdi.h>
 #include "cdo.h"
+#include "util.h"
 #include "error.h"
 
 

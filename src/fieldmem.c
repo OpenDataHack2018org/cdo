@@ -5,6 +5,7 @@
 #include <cdo.h>
 #include "dmemory.h"
 #include "field.h"
+#include "util.h"
 
 
 void field_init(field_t *field)

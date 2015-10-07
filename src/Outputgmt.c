@@ -476,7 +476,7 @@ void verify_grid_old(int gridtype, int gridsize, int ncorner,
   int isnegative;
   double area;
   double lon, lat;
-  double lon_bounds[9], lat_bounds[9];
+  double lon_bounds[ncorner], lat_bounds[ncorner];
 
   /* check that all centers are inside the bounds */
 
