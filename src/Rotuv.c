@@ -89,34 +89,37 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
 void *Rotuv(void *argument)
 {
-  int streamID1, streamID2;
-  int nrecs;
-  int tsID, recID, varID, levelID;
+  int recID, varID, levelID;
   int varID1, varID2, nlevel1, nlevel2;
   int gridsize;
-  int nvars, code, gridID;
-  int vlistID1, vlistID2;
+  int code, gridID;
   int offset;
   int nlevel;
   int lvar = FALSE;
-  int i, nch;
+  int i;
   int lfound[MAXARG];
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
-  int taxisID1, taxisID2;
-  int *recVarID, *recLevelID;
-  int **varnmiss;
-  double **vardata, *single, *usvar = NULL, *vsvar = NULL;
+  double *single, *usvar = NULL, *vsvar = NULL;
 
   cdoInitialize(argument);
 
   operatorInputArg("pairs of u and v in the rotated system");
 
-  nch = operatorArgc();
+  int nch = operatorArgc();
   if ( nch%2 ) cdoAbort("Odd number of input arguments!");
 
-  if ( isdigit(*operatorArgv()[0]) )
+  int lcode = TRUE;
+  int len = (int)strlen(operatorArgv()[0]);
+  for ( i = 0; i < len; ++i )
+    if ( !isdigit(operatorArgv()[0][i]) )
+      {
+        lcode = FALSE;
+        break;
+      }
+
+  if ( lcode )
     {
       lvar = FALSE;
       for ( i = 0; i < nch; i++ )
@@ -129,19 +132,19 @@ void *Rotuv(void *argument)
 	chvars[i] = operatorArgv()[i];
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  nvars = vlistNvars(vlistID1);
-  nrecs = vlistNrecs(vlistID1);
+  int nvars = vlistNvars(vlistID1);
+  int nrecs = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) Malloc(nrecs*sizeof(int));
-  recLevelID = (int*) Malloc(nrecs*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecs*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecs*sizeof(int));
 
-  varnmiss   = (int **) Malloc(nvars*sizeof(int *));
-  vardata    = (double **) Malloc(nvars*sizeof(double *));
+  int **varnmiss    = (int **) Malloc(nvars*sizeof(int *));
+  double **vardata  = (double **) Malloc(nvars*sizeof(double *));
 
   for ( i = 0; i < nch; i++ ) lfound[i] = FALSE;
 
@@ -180,15 +183,15 @@ void *Rotuv(void *argument)
       vardata[varID]  = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
