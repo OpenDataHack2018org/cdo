@@ -151,6 +151,7 @@ case "${HOSTNAME}" in
 # mistral
     mlogin*)
         CDOLIBS="--with-grib_api=/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48 \
+                    --with-szip=/sw/rhel6-x64/sys/szip-2.1-gcc48 \
                     --with-netcdf=/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-gcc48 \
                     --with-hdf5=/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48"
 
