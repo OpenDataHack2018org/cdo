@@ -182,7 +182,7 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
       rv->wts          = (double*) Malloc(nlinks*sizeof(double));
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(rv, weightlinks,tgt_grid_size) 
+#pragma omp parallel for schedule(dynamic) default(none) shared(rv,weightlinks,tgt_grid_size) 
 #endif
       for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
 	{

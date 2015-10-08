@@ -41,12 +41,10 @@ int referenceToGrid(int gridID1);
 static
 void scale_vec(double scalefactor, long nvals, double *restrict values)
 {
-  long n;
-
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nvals, scalefactor, values)
 #endif
-  for ( n = 0; n < nvals; ++n )
+  for ( long n = 0; n < nvals; ++n )
     {
       values[n] *= scalefactor;
     }
