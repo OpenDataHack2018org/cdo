@@ -20,10 +20,13 @@
 
 double var_to_std(double rvar, double missval);
 
-#define  FIELD_NONE 0
-#define  FIELD_ALL  1
-#define  FIELD_PTR  2
-#define  FILED_WGT  3
+enum field_flag {
+  FIELD_NONE  =  1,
+  FIELD_PTR   =  2,
+  FIELD_WGT   =  4,
+  FIELD_PTR2  =  8,
+  FIELD_ALL   =  FIELD_PTR | FIELD_WGT
+};
 
 
 #define  FADD(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))

@@ -90,7 +90,6 @@ void faradd(field_t *field1, field_t field2)
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  /*  double *weight1 = field1->weight; */
   const int    grid2    = field2.grid;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
@@ -127,7 +126,6 @@ void farsum(field_t *field1, field_t field2)
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  /*  double *weight1 = field1->weight; */
   const int    grid2    = field2.grid;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
@@ -170,7 +168,6 @@ void farsumw(field_t *field1, field_t field2, double w)
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  /*  double *weight1 = field1->weight; */
   const int    grid2    = field2.grid;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
@@ -267,7 +264,6 @@ void farsumq(field_t *field1, field_t field2)
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  /*  double *weight1 = field1->weight; */
   const int    grid2    = field2.grid;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
@@ -311,7 +307,6 @@ void farsumqw(field_t *field1, field_t field2, double w)
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  /*  double *weight1 = field1->weight; */
   const int    grid2    = field2.grid;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
@@ -968,7 +963,6 @@ void farcount(field_t *field1, field_t field2)
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  /*  double *weight1 = field1->weight; */
   const int    grid2    = field2.grid;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;

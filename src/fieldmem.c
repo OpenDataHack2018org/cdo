@@ -16,28 +16,22 @@ void field_init(field_t *field)
 
 field_t **field_allocate(int vlistID, int ptype, int init)
 {
-  int nvars, nlevel;
-  int varID, zaxisID, levelID;
-  int gridID, gridsize;
-  int nwpv; // number of words per value; real:1  complex:2
-  double missval;
-  field_t **field;
+  int nvars = vlistNvars(vlistID);
 
-  nvars = vlistNvars(vlistID);
+  field_t **field = (field_t **) Malloc(nvars*sizeof(field_t *));
 
-  field = (field_t **) Malloc(nvars*sizeof(field_t *));
-
-  for ( varID = 0; varID < nvars; ++varID )
+  for ( int varID = 0; varID < nvars; ++varID )
     {
-      nwpv     = vlistInqNWPV(vlistID, varID);
-      gridID   = vlistInqVarGrid(vlistID, varID);
-      gridsize = gridInqSize(gridID);
-      zaxisID  = vlistInqVarZaxis(vlistID, varID);
-      nlevel   = zaxisInqSize(zaxisID);
-      missval  = vlistInqVarMissval(vlistID, varID);
+      int nwpv     = vlistInqNWPV(vlistID, varID); // number of words per value; real:1  complex:2
+      int gridID   = vlistInqVarGrid(vlistID, varID);
+      int gridsize = gridInqSize(gridID);
+      int zaxisID  = vlistInqVarZaxis(vlistID, varID);
+      int nlevel   = zaxisInqSize(zaxisID);
+      double missval  = vlistInqVarMissval(vlistID, varID);
 
       field[varID] = (field_t*) Malloc(nlevel*sizeof(field_t));
-      for ( levelID = 0; levelID < nlevel; ++levelID )
+
+      for ( int levelID = 0; levelID < nlevel; ++levelID )
 	{
 	  field_init(&field[varID][levelID]);
 
@@ -49,13 +43,13 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 	  field[varID][levelID].ptr     = NULL;
 	  field[varID][levelID].weight  = NULL;
 
-	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
+	  if ( ptype & FIELD_PTR )
 	    {
 	      field[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 	      if ( init ) memset(field[varID][levelID].ptr, 0, nwpv*gridsize*sizeof(double));
 	    }
 
-	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
+	  if ( ptype & FIELD_WGT )
 	    {
 	      field[varID][levelID].weight = (double*) Malloc(nwpv*gridsize*sizeof(double));
 	      if ( init ) memset(field[varID][levelID].weight, 0, nwpv*gridsize*sizeof(double));
@@ -63,33 +57,29 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 	}
     }
 
-  return (field);
+  return field;
 }
 
 
 field_t **field_malloc(int vlistID, int ptype)
 {
-  return (field_allocate(vlistID, ptype, 0));
+  return field_allocate(vlistID, ptype, 0);
 }
 
 
 field_t **field_calloc(int vlistID, int ptype)
 {
-  return (field_allocate(vlistID, ptype, 1));
+  return field_allocate(vlistID, ptype, 1);
 }
 
 
 void field_free(field_t **field, int vlistID)
 {
-  int nvars, nlevel;
-  int varID, levelID;
-
-  nvars = vlistNvars(vlistID);
-
-  for ( varID = 0; varID < nvars; ++varID )
+  int nvars = vlistNvars(vlistID);
+  for ( int varID = 0; varID < nvars; ++varID )
     {
-      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
-      for ( levelID = 0; levelID < nlevel; ++levelID )
+      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+      for ( int levelID = 0; levelID < nlevel; ++levelID )
 	{
 	  if ( field[varID][levelID].ptr )    Free(field[varID][levelID].ptr);
        	  if ( field[varID][levelID].weight ) Free(field[varID][levelID].weight);
