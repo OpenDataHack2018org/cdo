@@ -85,7 +85,7 @@ void *XTimstat(void *argument)
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
   int nmiss;
-  int nlevel;
+  int nlevels;
   int lvfrac = FALSE;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
@@ -152,8 +152,7 @@ void *XTimstat(void *argument)
   if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int nvars    = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   if ( cmplen == 0 && CDO_Reduce_Dim )
     for ( varID = 0; varID < nvars; ++varID )
@@ -191,9 +190,6 @@ void *XTimstat(void *argument)
       streamDefVlist(streamID3, vlistID3);
     }
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
-
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
@@ -201,10 +197,7 @@ void *XTimstat(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
-  field_t field;
-  field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
-
+  field_t **input_vars = field_malloc(vlistID1, FIELD_PTR);
   field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_t **vars2 = NULL;
@@ -229,62 +222,62 @@ void *XTimstat(void *argument)
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
+              streamReadRecord(streamID1, input_vars[varID][levelID].ptr, &nmiss);
+              input_vars[varID][levelID].nmiss = nmiss;
+            }
 
-	      if ( tsID == 0 )
-		{
-		  recVarID[recID]   = varID;
-		  recLevelID[recID] = levelID;
-		}
+          for ( varID = 0; varID < nvars; varID++ )
+            {
+              nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+              for ( levelID = 0; levelID < nlevels; levelID++ )
+                {
+                  nwpv     = vars1[varID][levelID].nwpv;
+                  gridsize = gridInqSize(vars1[varID][levelID].grid);
 
-	      nwpv     = vars1[varID][levelID].nwpv;
-	      gridsize = gridInqSize(vars1[varID][levelID].grid);
+                  if ( nsets == 0 )
+                    {
+                      memcpy(vars1[varID][levelID].ptr, input_vars[varID][levelID].ptr, nwpv*gridsize*sizeof(double));
+                      nmiss = input_vars[varID][levelID].nmiss;
+                      vars1[varID][levelID].nmiss = nmiss;
+                      if ( nmiss > 0 || samp1[varID][levelID].ptr )
+                        {
+                          if ( samp1[varID][levelID].ptr == NULL )
+                            samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 
-	      if ( nsets == 0 )
-		{
-		  streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-		  vars1[varID][levelID].nmiss = nmiss;
-
-		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
-		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
-			samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-
-		      for ( i = 0; i < nwpv*gridsize; i++ )
-			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
-			  samp1[varID][levelID].ptr[i] = 0;
-			else
-			  samp1[varID][levelID].ptr[i] = 1;
-		    }
-		}
-	      else
-		{
-		  streamReadRecord(streamID1, field.ptr, &field.nmiss);
-		  field.grid    = vars1[varID][levelID].grid;
-		  field.missval = vars1[varID][levelID].missval;
-
-		  if ( field.nmiss > 0 || samp1[varID][levelID].ptr )
-		    {
-		      if ( samp1[varID][levelID].ptr == NULL )
-			{
-			  samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-			  for ( i = 0; i < nwpv*gridsize; i++ )
-			    samp1[varID][levelID].ptr[i] = nsets;
-			}
-
-		      for ( i = 0; i < nwpv*gridsize; i++ )
-			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
-			  samp1[varID][levelID].ptr[i]++;
-		    }
-
-		  if ( lvarstd )
-		    {
-		      farsumq(&vars2[varID][levelID], field);
-		      farsum(&vars1[varID][levelID], field);
-		    }
-		  else
-		    {
-		      farfun(&vars1[varID][levelID], field, operfunc);
-		    }
+                          for ( i = 0; i < nwpv*gridsize; i++ )
+                            if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
+                              samp1[varID][levelID].ptr[i] = 0;
+                            else
+                              samp1[varID][levelID].ptr[i] = 1;
+                        }
+                    }
+                  else
+                    {
+                      nmiss = input_vars[varID][levelID].nmiss;
+                      if ( nmiss > 0 || samp1[varID][levelID].ptr )
+                        {
+                          if ( samp1[varID][levelID].ptr == NULL )
+                            {
+                              samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+                              for ( i = 0; i < nwpv*gridsize; i++ )
+                                samp1[varID][levelID].ptr[i] = nsets;
+                            }
+                          
+                          for ( i = 0; i < nwpv*gridsize; i++ )
+                            if ( !DBL_IS_EQUAL(input_vars[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
+                              samp1[varID][levelID].ptr[i]++;
+                        }
+                  
+                      if ( lvarstd )
+                        {
+                          farsumq(&vars2[varID][levelID], input_vars[varID][levelID]);
+                          farsum(&vars1[varID][levelID], input_vars[varID][levelID]);
+                        }
+                      else
+                        {
+                          farfun(&vars1[varID][levelID], input_vars[varID][levelID], operfunc);
+                        }
+                    }
 		}
 	    }
 
@@ -292,8 +285,8 @@ void *XTimstat(void *argument)
 	    for ( varID = 0; varID < nvars; varID++ )
 	      {
 		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-		nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		for ( levelID = 0; levelID < nlevel; levelID++ )
+		nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		for ( levelID = 0; levelID < nlevels; levelID++ )
 		  farmoq(&vars2[varID][levelID], vars1[varID][levelID]);
 	      }
 
@@ -309,8 +302,8 @@ void *XTimstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
+	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    for ( levelID = 0; levelID < nlevels; levelID++ )
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
 		  farcdiv(&vars1[varID][levelID], (double)nsets);
@@ -325,8 +318,8 @@ void *XTimstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
+	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    for ( levelID = 0; levelID < nlevels; levelID++ )
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
 		  {
@@ -359,8 +352,8 @@ void *XTimstat(void *argument)
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 	    nwpv     = vars1[varID][levelID].nwpv;
 	    gridsize = gridInqSize(vars1[varID][levelID].grid);
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
+	    nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    for ( levelID = 0; levelID < nlevels; levelID++ )
 	      {
 		missval = vars1[varID][levelID].missval;
 		if ( samp1[varID][levelID].ptr )
@@ -395,23 +388,24 @@ void *XTimstat(void *argument)
 	  streamDefTimestep(streamID3, otsID);
 	}
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( varID = 0; varID < nvars; ++varID )
 	{
-	  varID   = recVarID[recID];
-	  levelID = recLevelID[recID];
-
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
-	  if ( cdoDiag )
-	    {
-	      if ( samp1[varID][levelID].ptr )
-		{
-		  streamDefRecord(streamID3, varID, levelID);
-		  streamWriteRecord(streamID3, samp1[varID][levelID].ptr, 0);
-		}
-	    }
+          nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          for ( levelID = 0; levelID < nlevels; ++ levelID )
+            {
+              streamDefRecord(streamID2, varID, levelID);
+              streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+              if ( cdoDiag )
+                {
+                  if ( samp1[varID][levelID].ptr )
+                    {
+                      streamDefRecord(streamID3, varID, levelID);
+                      streamWriteRecord(streamID3, samp1[varID][levelID].ptr, 0);
+                    }
+                }
+            }
 	}
 
       if ( nrecs == 0 ) break;
@@ -419,6 +413,7 @@ void *XTimstat(void *argument)
     }
 
 
+  field_free(input_vars, vlistID1);
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
   if ( lvarstd ) field_free(vars2, vlistID1);
@@ -428,11 +423,6 @@ void *XTimstat(void *argument)
   if ( cdoDiag ) streamClose(streamID3);
   streamClose(streamID2);
   streamClose(streamID1);
-
-  if ( field.ptr ) Free(field.ptr);
-
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
 
   cdoFinish();
 
