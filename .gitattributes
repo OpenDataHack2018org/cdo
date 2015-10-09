@@ -158,7 +158,6 @@ doc/tex/mod/Filter -text
 doc/tex/mod/Fldcor -text
 doc/tex/mod/Fldcovar -text
 doc/tex/mod/Fldstat -text
-doc/tex/mod/Genweights -text
 doc/tex/mod/Gradsdes -text
 doc/tex/mod/Gridboxstat -text
 doc/tex/mod/Gridcell -text

@@ -3415,7 +3415,7 @@ static const char *RemapbilHelp[] = {
     "ENVIRONMENT",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
-    "        By default the extrapolation is enabled for for circular grids.",
+    "        By default the extrapolation is enabled for circular grids.",
     NULL
 };
 
@@ -3446,7 +3446,7 @@ static const char *RemapbicHelp[] = {
     "ENVIRONMENT",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
-    "        By default the extrapolation is enabled for for circular grids.",
+    "        By default the extrapolation is enabled for circular grids.",
     NULL
 };
 
@@ -3681,11 +3681,16 @@ static const char *RemapHelp[] = {
     "    remap,grid,weights  ifile ofile",
     "",
     "DESCRIPTION",
+    "    Interpolation between different horizontal grids can be a very time-consuming ",
+    "    process. Especially if the data are on an unstructured and/or a large grid. ",
+    "    In this case the interpolation process can be split into two parts.",
+    "    Firstly the generation of the interpolation weights, which is the most time-consuming part.",
+    "    These interpolation weights can be reused for every remapping process with the operator remap.",
     "    This operator remaps all input fields to a new horizontal grid. The remap type and ",
     "    the interpolation weights of one input grid are read from a netCDF file. More weights ",
     "    are computed if the input fields are on different grids. The netCDF file with the ",
-    "    weights should follow the SCRIP convention. Normally these weights come from",
-    "    a previous call to one of the genXXX operators (e.g. genbil) or were created by the original SCRIP package.",
+    "    weights should follow the SCRIP convention. Normally these weights come from a previous",
+    "    call to one of the genXXX operators (e.g. genbil) or were created by the original SCRIP package.",
     "",
     "PARAMETER",
     "    grid     STRING  Target grid description file or name",
