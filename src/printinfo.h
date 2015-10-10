@@ -633,10 +633,13 @@ void printTimesteps(int streamID, int taxisID, int verbose)
       fprintf(stdout, "\n");
 
       ntimeout = 0;
-      int toff = tsID%4;
-      if ( toff > 0 ) toff = 4 - toff;
-      for ( int i = 0; i < toff; ++i ) next_vdatetime = next_vdatetime->next;
-
+      int toff = 0;
+      if ( tsID > 2*NUM_TIMESTEP )
+        {
+          toff = tsID%4;
+          if ( toff > 0 ) toff = 4 - toff;
+          for ( int i = 0; i < toff; ++i ) next_vdatetime = next_vdatetime->next;
+        }
       for ( int i = toff; i < nvdatetime; ++i )
 	{
 	  vdate = next_vdatetime->vdate;
