@@ -382,12 +382,12 @@ void *Timstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nwpv     = vars1[varID][levelID].nwpv;
-	    gridsize = gridInqSize(vars1[varID][levelID].grid);
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
-		missval = vars1[varID][levelID].missval;
+                nwpv     = vars1[varID][levelID].nwpv;
+                gridsize = gridInqSize(vars1[varID][levelID].grid);
+		missval  = vars1[varID][levelID].missval;
 		if ( samp1[varID][levelID].ptr )
 		  {
 		    int irun = 0;

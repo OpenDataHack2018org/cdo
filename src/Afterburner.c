@@ -655,7 +655,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 	    {
 	      statusp = after_readTimestep(&rarg);
 	    }
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
 	  else
 	    {
 	      rval = pthread_create(&thrID, &attr, after_readTimestep, &rarg);
@@ -668,7 +668,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 	      if ( globs->Type >  0 ) after_legini_setup(globs, vars);
 	    }
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
 	  if ( ParallelRead )
 	    {
 	      pthread_join(thrID, &statusp);
@@ -678,7 +678,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 #endif
 	  tsFirst = FALSE;
 	}
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
       else
 	{
 	  pthread_join(thrID, &statusp);

@@ -72,6 +72,33 @@
 #include "pstream.h"
 
 
+typedef struct {
+  int streamID, nrecs;
+  field_t **vars;
+}
+readarg_t;
+static int num_recs = 0;
+
+static
+void *cdoReadTimestep(void *rarg)
+{
+  int varID, levelID, nmiss;
+  readarg_t *readarg = (readarg_t *) rarg;
+  field_t **input_vars = readarg->vars;
+  int streamID = readarg->streamID;
+  int nrecs = readarg->nrecs;
+
+  for ( int recID = 0; recID < nrecs; ++recID )
+    {
+      streamInqRecord(streamID, &varID, &levelID);
+      streamReadRecord(streamID, input_vars[varID][levelID].ptr, &nmiss);
+      input_vars[varID][levelID].nmiss = nmiss;
+    }
+
+  return ((void *) &num_recs);
+}
+
+
 void *XTimstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
@@ -79,7 +106,7 @@ void *XTimstat(void *argument)
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
-  int varID, levelID, recID;
+  int varID, levelID;
   long nsets;
   int i;
   int streamID3 = -1;
@@ -203,6 +230,14 @@ void *XTimstat(void *argument)
   field_t **vars2 = NULL;
   if ( lvarstd ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
+  readarg_t readarg;
+  readarg.streamID = streamID1;
+  readarg.vars = input_vars;
+
+  int lparallelread = FALSE;
+  int ltsfirst = TRUE;
+  void *statusp = NULL;
+
   int tsID  = 0;
   int otsID = 0;
   while ( TRUE )
@@ -219,12 +254,26 @@ void *XTimstat(void *argument)
 
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
-	  for ( recID = 0; recID < nrecs; recID++ )
-	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
-              streamReadRecord(streamID1, input_vars[varID][levelID].ptr, &nmiss);
-              input_vars[varID][levelID].nmiss = nmiss;
+          readarg.nrecs = nrecs;
+          if ( ltsfirst = 0 || lparallelread  == FALSE )
+            {
+#if defined(HAVE_LIBPTHREAD)
+              if ( lparallelread )
+                {
+                }
+              else
+#endif
+                {
+                  statusp = cdoReadTimestep(&readarg);
+                }
+              
+              ltsfirst = FALSE;
             }
+#if defined(HAVE_LIBPTHREAD)
+          else
+            {
+            }
+#endif
 
           for ( varID = 0; varID < nvars; varID++ )
             {
@@ -350,12 +399,12 @@ void *XTimstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nwpv     = vars1[varID][levelID].nwpv;
-	    gridsize = gridInqSize(vars1[varID][levelID].grid);
-	    nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevels; levelID++ )
 	      {
-		missval = vars1[varID][levelID].missval;
+                nwpv     = vars1[varID][levelID].nwpv;
+                gridsize = gridInqSize(vars1[varID][levelID].grid);
+		missval  = vars1[varID][levelID].missval;
 		if ( samp1[varID][levelID].ptr )
 		  {
 		    int irun = 0;
