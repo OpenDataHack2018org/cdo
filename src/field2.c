@@ -65,7 +65,7 @@ void arradd(const size_t n, double * restrict a, const double * restrict b)
 #else
 
 #if defined(_OPENMP)
-  //#pragma omp parallel for default(none) shared(a,b)
+#pragma omp parallel for default(none) shared(a,b)
 #endif
   for ( size_t i = 0; i < n; i++ ) a[i] += b[i];
 
