@@ -1,3 +1,5 @@
+// This file is used in CDI and CDO !!!
+
 #define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
 #define TIME_FORMAT "%2.2d:%2.2d:%2.2d"
 
@@ -314,8 +316,8 @@ void printGridInfo(int vlistID)
 	      int i;
 	      double *xvals, *yvals;
 	      double xfirst, xlast, yfirst, ylast;
-	      xvals = (double*) Malloc((size_t)gridsize*sizeof(double));
-	      yvals = (double*) Malloc((size_t)gridsize*sizeof(double));
+	      xvals = (double*) malloc((size_t)gridsize*sizeof(double));
+	      yvals = (double*) malloc((size_t)gridsize*sizeof(double));
 
 	      gridInqXvals(gridID, xvals);
 	      gridInqYvals(gridID, yvals);
@@ -337,8 +339,8 @@ void printGridInfo(int vlistID)
 	      fprintf(stdout, "\n");
 	      fprintf(stdout, "%33s : %g to %g %s\n", yname, yfirst, ylast, yunits);
 
-	      Free(xvals);
-	      Free(yvals);
+	      free(xvals);
+	      free(yvals);
 	    }
 	}
       else if ( gridtype == GRID_LCC )
@@ -421,7 +423,7 @@ void printZaxisInfo(int vlistID)
       fprintf(stdout, " levels=%d", levelsize);
       fprintf(stdout, "\n");
 
-      levels = (double*) Malloc((size_t)levelsize*sizeof(double));
+      levels = (double*) malloc((size_t)levelsize*sizeof(double));
       zaxisInqLevels(zaxisID, levels);
 
       if ( !(zaxistype == ZAXIS_SURFACE && levelsize == 1 && !(fabs(levels[0]) > 0)) )
@@ -448,7 +450,7 @@ void printZaxisInfo(int vlistID)
           fprintf(stdout, "\n");
         }
 
-      Free(levels);
+      free(levels);
 
       if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
         {

@@ -29,7 +29,7 @@
 
 #include "printinfo.h"
 
-const char * tunit2str(int tunits)
+const char *tunit2str(int tunits)
 {
   if      ( tunits == TUNIT_YEAR )       return ("years");
   else if ( tunits == TUNIT_MONTH )      return ("months");
@@ -46,7 +46,7 @@ const char * tunit2str(int tunits)
 }
 
 
-const char* calendar2str(int calendar)
+const char *calendar2str(int calendar)
 {
   if      ( calendar == CALENDAR_STANDARD )  return ("standard");
   else if ( calendar == CALENDAR_PROLEPTIC ) return ("proleptic_gregorian");
