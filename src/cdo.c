@@ -418,7 +418,7 @@ void setDefaultDataType(char *datatypestr)
         }
     }
 }
-
+/*
 static
 void setDefaultDataTypeByte(char *datatypestr)
 {
@@ -462,7 +462,7 @@ void setDefaultDataTypeByte(char *datatypestr)
         }
     }
 }
-
+*/
 static
 void setDefaultFileType(char *filetypestr, int labort)
 {
