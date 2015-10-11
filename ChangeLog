@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-10-11  Uwe Schulzweida
+
+	* removed obsolate  option -p
+
 2015-10-08  Uwe Schulzweida
 
 	* rotuvb: fix parameter parse error for var names starting with a digit

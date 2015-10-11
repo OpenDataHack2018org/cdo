@@ -1178,8 +1178,8 @@ int parse_options_long(int argc, char *argv[])
           numThreads = atoi(CDO_optarg);
           break;
         case 'p':
-          fprintf(stderr, "CDO option -p is obsolete and will be removed in the next release, please switch to -b <bits>!\n");
-          setDefaultDataTypeByte(CDO_optarg);
+          fprintf(stderr, "CDO option -p is not available anymore, please use -b <bits>!\n");
+          //setDefaultDataTypeByte(CDO_optarg);
           break;
         case 'Q':
           cdiDefGlobal("SORTNAME", TRUE);
