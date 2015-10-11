@@ -448,7 +448,7 @@ void setDefaultDataTypeByte(char *datatypestr)
       if ( *datatypestr == 'l' || *datatypestr == 'L' )
         {
           if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
-          datatypestr++;
+          datatypestr++;setDefaultDataTypeByte
         }
       else if ( *datatypestr == 'b' || *datatypestr == 'B' )
         {
