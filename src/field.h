@@ -60,9 +60,11 @@ typedef struct {
   size_t   size;
   int      nsamp;
   int      nmiss;
+  int      nmiss2;
   double   missval;
   double  *weight;
   double  *ptr;
+  double  *ptr2;
 }
 field_t;
 

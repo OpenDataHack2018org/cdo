@@ -659,7 +659,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 	  else
 	    {
 	      rval = pthread_create(&thrID, &attr, after_readTimestep, &rarg);
-	      if ( rval != 0 ) Error( "pthread_create failed!");
+	      if ( rval != 0 ) Error("pthread_create failed!");
 	    }
 #endif
 
@@ -673,7 +673,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 	    {
 	      pthread_join(thrID, &statusp);
 	      if ( *(int *)statusp < 0 )
-		Error( "after_readTimestep error! (status = %d)", *(int *)statusp);
+		Error("after_readTimestep error! (status = %d)", *(int *)statusp);
 	    }
 #endif
 	  tsFirst = FALSE;
@@ -683,7 +683,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 	{
 	  pthread_join(thrID, &statusp);
 	  if ( *(int *)statusp < 0 )
-	    Error( "after_readTimestep error! (status = %d)", *(int *)statusp);
+	    Error("after_readTimestep error! (status = %d)", *(int *)statusp);
 	}
 #endif
       nrecs = *(int *)statusp;
@@ -697,7 +697,7 @@ void after_control(struct Control *globs, struct Variable *vars)
       if ( nrecs && ParallelRead )
 	{
 	  rval = pthread_create(&thrID, &attr, after_readTimestep, &rarg);
-	  if ( rval != 0 ) Error( "pthread_create failed!");
+	  if ( rval != 0 ) Error("pthread_create failed!");
 	}
 #endif
 

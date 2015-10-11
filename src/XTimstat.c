@@ -69,10 +69,16 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
+//#include "pstream.h"
+#include "pstream_write.h"
+
+#if defined(HAVE_LIBPTHREAD)
+#include <pthread.h>
+#endif
 
 
 typedef struct {
+  int tsIDnext;
   int streamID, nrecs;
   field_t **vars;
 }
@@ -86,16 +92,35 @@ void *cdoReadTimestep(void *rarg)
   readarg_t *readarg = (readarg_t *) rarg;
   field_t **input_vars = readarg->vars;
   int streamID = readarg->streamID;
+  int tsIDnext = readarg->tsIDnext;
   int nrecs = readarg->nrecs;
 
   for ( int recID = 0; recID < nrecs; ++recID )
     {
       streamInqRecord(streamID, &varID, &levelID);
-      streamReadRecord(streamID, input_vars[varID][levelID].ptr, &nmiss);
-      input_vars[varID][levelID].nmiss = nmiss;
+      streamReadRecord(streamID, input_vars[varID][levelID].ptr2, &nmiss);
+      input_vars[varID][levelID].nmiss2 = nmiss;
     }
 
+  num_recs = streamInqTimestep(streamID, tsIDnext);
+
   return ((void *) &num_recs);
+}
+
+static
+void cdoUpdateVars(int nvars, int vlistID, field_t **vars)
+{
+  for ( int varID = 0; varID < nvars; varID++ )
+    {
+      int nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+      for ( int levelID = 0; levelID < nlevels; levelID++ )
+        {
+          double *tmp = vars[varID][levelID].ptr;
+          vars[varID][levelID].ptr   = vars[varID][levelID].ptr2;
+          vars[varID][levelID].ptr2  = tmp;
+          vars[varID][levelID].nmiss = vars[varID][levelID].nmiss2;
+        }
+    }
 }
 
 
@@ -167,7 +192,8 @@ void *XTimstat(void *argument)
 
   int cmplen = DATE_LEN - comparelen;
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  // int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0)->args);
 
   int vlistID1 = streamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
@@ -224,7 +250,7 @@ void *XTimstat(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
-  field_t **input_vars = field_malloc(vlistID1, FIELD_PTR);
+  field_t **input_vars = field_malloc(vlistID1, FIELD_PTR | FIELD_PTR2);
   field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_t **vars2 = NULL;
@@ -234,16 +260,37 @@ void *XTimstat(void *argument)
   readarg.streamID = streamID1;
   readarg.vars = input_vars;
 
-  int lparallelread = FALSE;
+  int lparallelread = TRUE;
   int ltsfirst = TRUE;
   void *statusp = NULL;
+  
+#if defined(HAVE_LIBPTHREAD)
+  pthread_t thrID;
+  pthread_attr_t attr;
+  int rval;
+
+  if ( lparallelread )
+    {
+      size_t stacksize;
+      pthread_attr_init(&attr);
+      pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+      pthread_attr_getstacksize(&attr, &stacksize);
+      if ( stacksize < 2097152 )
+	{
+	  stacksize = 2097152;
+	  pthread_attr_setstacksize(&attr, stacksize);
+	}
+    }
+#endif
 
   int tsID  = 0;
   int otsID = 0;
+  nrecs = streamInqTimestep(streamID1, tsID);
+  tsID++;
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+      while ( nrecs > 0 )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 	  vdate = dtlist_get_vdate(dtlist, nsets);
@@ -254,12 +301,16 @@ void *XTimstat(void *argument)
 
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
+          readarg.tsIDnext = tsID;
           readarg.nrecs = nrecs;
-          if ( ltsfirst = 0 || lparallelread  == FALSE )
+
+          if ( ltsfirst || lparallelread  == FALSE )
             {
 #if defined(HAVE_LIBPTHREAD)
               if ( lparallelread )
                 {
+                  rval = pthread_create(&thrID, &attr, cdoReadTimestep, &readarg);
+                  if ( rval != 0 ) cdoAbort("pthread_create failed!");
                 }
               else
 #endif
@@ -267,11 +318,34 @@ void *XTimstat(void *argument)
                   statusp = cdoReadTimestep(&readarg);
                 }
               
+#if defined(HAVE_LIBPTHREAD)
+              if ( lparallelread )
+                {
+                  pthread_join(thrID, &statusp);
+                  if ( *(int *)statusp < 0 )
+                    cdoAbort("cdoReadTimestep error! (status = %d)", *(int *)statusp);
+                }
+#endif
               ltsfirst = FALSE;
             }
 #if defined(HAVE_LIBPTHREAD)
           else
             {
+              pthread_join(thrID, &statusp);
+              if ( *(int *)statusp < 0 )
+                cdoAbort("cdoReadTimestep error! (status = %d)", *(int *)statusp);
+            }
+#endif
+          nrecs = *(int *)statusp;
+
+          cdoUpdateVars(nvars, vlistID1, input_vars);
+
+#if  defined  (HAVE_LIBPTHREAD)
+          if ( nrecs && lparallelread )
+            {
+              readarg.tsIDnext = tsID+1;
+              rval = pthread_create(&thrID, &attr, cdoReadTimestep, &readarg);
+              if ( rval != 0 ) cdoAbort("pthread_create failed!");
             }
 #endif
 
@@ -469,8 +543,8 @@ void *XTimstat(void *argument)
 
   dtlist_delete(dtlist);
 
-  if ( cdoDiag ) streamClose(streamID3);
-  streamClose(streamID2);
+  if ( cdoDiag ) pstreamClose(streamID3);
+  pstreamClose(streamID2);
   streamClose(streamID1);
 
   cdoFinish();
