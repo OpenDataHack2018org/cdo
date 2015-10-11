@@ -7,6 +7,8 @@ libcdo_la_SOURCES =            \
                cdo_vlist.c     \
                cdo_getopt.c    \
                cdo_getopt.h    \
+               cdo_task.c      \
+               cdo_task.h      \
                cdo_history.c   \
                after_sptrans.c \
                after_fctrans.c \
