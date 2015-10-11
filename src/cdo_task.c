@@ -42,7 +42,7 @@ void *cdo_task(void *task)
   // cond_wait mutex must be locked before we can wait
   pthread_mutex_lock(&(task_info->work_mtx));
 
-  printf("<worker> start\n");
+  //printf("<worker> start\n");
 
   // ensure boss is waiting
   pthread_mutex_lock(&(task_info->boss_mtx));
@@ -71,9 +71,9 @@ void *cdo_task(void *task)
         }
       
       // do blocking task
-      printf("<worker> JOB start\n");
-      task_info->routine(task_info->arg);
-      printf("<worker> JOB end\n");
+      //printf("<worker> JOB start\n");
+      task_info->result = task_info->routine(task_info->arg);
+      //printf("<worker> JOB end\n");
 
       // ensure boss is waiting
       pthread_mutex_lock(&(task_info->boss_mtx));
@@ -140,11 +140,21 @@ void *cdo_task_new()
 
 #if defined(HAVE_LIBPTHREAD)
   task_info = (cdo_task_t *) malloc(sizeof(cdo_task_t));
-
   task_info->routine = NULL;
   task_info->arg = NULL;
   task_info->result = NULL;
   task_info->state = SETUP;
+
+  pthread_attr_t attr;
+  size_t stacksize;
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+  pthread_attr_getstacksize(&attr, &stacksize);
+  if ( stacksize < 2097152 )
+    {
+      stacksize = 2097152;
+      pthread_attr_setstacksize(&attr, stacksize);
+    }
 
   pthread_cond_init(&(task_info->work_cond), NULL);
   pthread_mutex_init(&(task_info->work_mtx), NULL);
@@ -153,7 +163,7 @@ void *cdo_task_new()
 
   pthread_mutex_lock(&(task_info->boss_mtx));
 
-  pthread_create(&(task_info->thread), NULL, cdo_task, (void *)task_info);
+  pthread_create(&(task_info->thread), &attr, cdo_task, (void *)task_info);
 
   cdo_task_wait(task_info);
 #endif
@@ -170,7 +180,7 @@ void cdo_task_delete(void *task)
   // ensure the worker is waiting
   pthread_mutex_lock(&(task_info->work_mtx));
 
-  printf("cdo_task_delete: send DIE to <worker>\n");
+  //printf("cdo_task_delete: send DIE to <worker>\n");
   task_info->state = DIE;
 
   // wake-up signal

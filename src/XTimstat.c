@@ -69,12 +69,9 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "cdo_task.h"
 //#include "pstream.h"
 #include "pstream_write.h"
-
-#if defined(HAVE_LIBPTHREAD)
-#include <pthread.h>
-#endif
 
 
 typedef struct {
@@ -83,6 +80,7 @@ typedef struct {
   field_t **vars;
 }
 readarg_t;
+
 static int num_recs = 0;
 
 static
@@ -262,26 +260,18 @@ void *XTimstat(void *argument)
 
   int lparallelread = TRUE;
   int ltsfirst = TRUE;
-  void *statusp = NULL;
-  
-#if defined(HAVE_LIBPTHREAD)
-  pthread_t thrID;
-  pthread_attr_t attr;
-  int rval;
+  void *read_task = NULL;
+  void *readresult = NULL;
 
   if ( lparallelread )
     {
-      size_t stacksize;
-      pthread_attr_init(&attr);
-      pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-      pthread_attr_getstacksize(&attr, &stacksize);
-      if ( stacksize < 2097152 )
-	{
-	  stacksize = 2097152;
-	  pthread_attr_setstacksize(&attr, stacksize);
-	}
+      read_task = cdo_task_new();
+      if ( read_task == NULL )
+        {
+          lparallelread = FALSE;
+          cdoWarning("CDO tasks not available!");
+        }
     }
-#endif
 
   int tsID  = 0;
   int otsID = 0;
@@ -306,48 +296,35 @@ void *XTimstat(void *argument)
 
           if ( ltsfirst || lparallelread  == FALSE )
             {
-#if defined(HAVE_LIBPTHREAD)
               if ( lparallelread )
                 {
-                  rval = pthread_create(&thrID, &attr, cdoReadTimestep, &readarg);
-                  if ( rval != 0 ) cdoAbort("pthread_create failed!");
+                  cdo_task_start(read_task, cdoReadTimestep, &readarg);
                 }
               else
-#endif
                 {
-                  statusp = cdoReadTimestep(&readarg);
+                  readresult = cdoReadTimestep(&readarg);
                 }
               
-#if defined(HAVE_LIBPTHREAD)
               if ( lparallelread )
                 {
-                  pthread_join(thrID, &statusp);
-                  if ( *(int *)statusp < 0 )
-                    cdoAbort("cdoReadTimestep error! (status = %d)", *(int *)statusp);
+                  readresult = cdo_task_wait(read_task);
                 }
-#endif
               ltsfirst = FALSE;
             }
-#if defined(HAVE_LIBPTHREAD)
           else
             {
-              pthread_join(thrID, &statusp);
-              if ( *(int *)statusp < 0 )
-                cdoAbort("cdoReadTimestep error! (status = %d)", *(int *)statusp);
+              readresult = cdo_task_wait(read_task);
             }
-#endif
-          nrecs = *(int *)statusp;
+          
+          nrecs = *(int *)readresult;
 
           cdoUpdateVars(nvars, vlistID1, input_vars);
 
-#if  defined  (HAVE_LIBPTHREAD)
           if ( nrecs && lparallelread )
             {
               readarg.tsIDnext = tsID+1;
-              rval = pthread_create(&thrID, &attr, cdoReadTimestep, &readarg);
-              if ( rval != 0 ) cdoAbort("pthread_create failed!");
+              cdo_task_start(read_task, cdoReadTimestep, &readarg);
             }
-#endif
 
           for ( varID = 0; varID < nvars; varID++ )
             {
