@@ -3,7 +3,7 @@
 @Title     = Generate a field
 @Section   = Miscellaneous
 @Arguments = ofile
-@Operators = const random for stdatm
+@Operators = const random topo for stdatm
 
 @BeginDescription
 Generates a dataset with one or more fields
@@ -27,6 +27,16 @@ Creates a constant field. All field elements of the grid have the same value.
 
 @BeginDescription
 Creates a field with rectangularly distrubuted random numbers in the interval [0,1].
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_topo
+@Title     = Create a field with topography
+@Parameter = [grid]
+
+@BeginDescription
+Creates a field with topography data, per default on a global half degree grid.
 @EndDescription
 @EndOperator
 

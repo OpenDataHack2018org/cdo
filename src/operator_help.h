@@ -1267,7 +1267,7 @@ static const char *SetmissHelp[] = {
     "                          / miss   if i(t,x) LT rmin OR  i(t,x) GT rmax",
     "                 o(t,x) = ",
     "                          \\ i(t,x) if i(t,x) GE rmin AND i(t,x) LE rmax",
-    "    setmisstonn  Set missing value to nearest neightbor",
+    "    setmisstonn  Set missing value to nearest neighbor",
     "                 Set all missing values to the nearest non missing value.",
     "                          / i(t,y) if i(t,x) EQ miss AND i(t,y) NE miss",
     "                 o(t,x) = ",
@@ -4491,11 +4491,12 @@ static const char *TimsortHelp[] = {
 
 static const char *VargenHelp[] = {
     "NAME",
-    "    const, random, for, stdatm - Generate a field",
+    "    const, random, topo, for, stdatm - Generate a field",
     "",
     "SYNOPSIS",
     "    const,const,grid  ofile",
     "    random,grid[,seed]  ofile",
+    "    topo[,grid]  ofile",
     "    for,start,end[,inc]  ofile",
     "    stdatm,levels  ofile",
     "",
@@ -4507,6 +4508,8 @@ static const char *VargenHelp[] = {
     "            Creates a constant field. All field elements of the grid have the same value.",
     "    random  Create a field with random numbers",
     "            Creates a field with rectangularly distrubuted random numbers in the interval [0,1].",
+    "    topo    Create a field with topography",
+    "            Creates a field with topography data, per default on a global half degree grid.",
     "    for     Create a time series",
     "            Creates a time series with field size 1 and field elements beginning with a start value in time step 1",
     "            which is increased from one time step to the next.",
@@ -4800,27 +4803,6 @@ static const char *HurrHelp[] = {
     "    meridional wind speeds and have to be given in units of m/s.",
     "    The date information of a timestep in ofile is the date of",
     "    the last contributing timestep in ifile.",
-    NULL
-};
-
-static const char *FillmissHelp[] = {
-    "NAME",
-    "    fillmiss, fillmiss2 - Fill missing values",
-    "",
-    "SYNOPSIS",
-    "    fillmiss  ifile ofile",
-    "    fillmiss2[,maxiter]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "",
-    "OPERATORS",
-    "    fillmiss   Fill missing values",
-    "               Fill missing values by bilinear interpolation of the neightbors.",
-    "    fillmiss2  Fill missing values",
-    "               Fill missing values by using the neares value from up/down/left/right neightbors. ",
-    "",
-    "PARAMETER",
-    "    maxiter  INTEGER  Number of iterations to perform this nearest neightbors replacement",
     NULL
 };
 

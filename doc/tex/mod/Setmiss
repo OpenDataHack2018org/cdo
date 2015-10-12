@@ -130,7 +130,7 @@ o(t,x) = \left\{
 
 
 @BeginOperator_setmisstonn
-@Title     = Set missing value to nearest neightbor
+@Title     = Set missing value to nearest neighbor
 
 @BeginDescription
 Set all missing values to the nearest non missing value.
