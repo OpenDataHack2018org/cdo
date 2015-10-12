@@ -42,8 +42,8 @@ doc/cdo.pdf -text
 doc/cdoBrochureWeb.pdf -text svneol=unset#unset
 doc/cdo_eca.pdf -text svneol=unset#application/pdf
 doc/cdo_limits -text
+doc/cdo_nudgingdata.pdf -text
 doc/cdo_refcard.pdf -text
-doc/cdo_spectralnudgingdata.pdf -text
 doc/cdo_vs_nco -text
 doc/eca_operator.pdf -text
 doc/parameter_table -text
