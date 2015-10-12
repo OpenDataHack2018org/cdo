@@ -40,6 +40,7 @@ doc/Doxyfile -text
 doc/cdo-poster.pdf -text
 doc/cdo.pdf -text
 doc/cdoBrochureWeb.pdf -text svneol=unset#unset
+doc/cdo_ana_vis_wegner.pdf -text svneol=unset#application/pdf
 doc/cdo_cmsaf_kaspar.pdf -text svneol=unset#application/pdf
 doc/cdo_eca.pdf -text svneol=unset#application/pdf
 doc/cdo_limits -text
