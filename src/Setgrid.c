@@ -53,6 +53,7 @@ void *Setgrid(void *argument)
   int ligme = 0;
   int number = 0, position = 0;
   int grid2_nvgp;
+  int lbounds = TRUE;
   int *grid2_vgpm = NULL;
   char *gridname = NULL;
   char *griduri = NULL;
@@ -85,14 +86,16 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       gridname = operatorArgv()[0];
 
-      if      ( strcmp(gridname, "curvilinear") == 0 )   gridtype = GRID_CURVILINEAR;
-      else if ( strcmp(gridname, "cell") == 0 )          gridtype = GRID_UNSTRUCTURED;
-      else if ( strcmp(gridname, "unstructured") == 0 )  gridtype = GRID_UNSTRUCTURED;
-      else if ( strcmp(gridname, "generic") == 0 )       gridtype = GRID_GENERIC;
-      else if ( strcmp(gridname, "dereference") == 0 )   ldereference = 1;
-      else if ( strcmp(gridname, "lonlat") == 0 )        gridtype = GRID_LONLAT;
-      else if ( strcmp(gridname, "gaussian") == 0 )      gridtype = GRID_GAUSSIAN;
-      else if ( strcmp(gridname, "regular") == 0 )      {gridtype = GRID_GAUSSIAN; lregular = 1;}
+      if      ( strcmp(gridname, "curvilinear0") == 0 )  {gridtype = GRID_CURVILINEAR; lbounds = 0;}
+      else if ( strcmp(gridname, "curvilinear") == 0 )   {gridtype = GRID_CURVILINEAR; lbounds = 1;}
+      else if ( strcmp(gridname, "cell") == 0 )           gridtype = GRID_UNSTRUCTURED;
+      else if ( strcmp(gridname, "unstructured0") == 0 ) {gridtype = GRID_UNSTRUCTURED; lbounds = 0;}
+      else if ( strcmp(gridname, "unstructured") == 0 )  {gridtype = GRID_UNSTRUCTURED; lbounds = 1;}
+      else if ( strcmp(gridname, "generic") == 0 )        gridtype = GRID_GENERIC;
+      else if ( strcmp(gridname, "dereference") == 0 )    ldereference = 1;
+      else if ( strcmp(gridname, "lonlat") == 0 )         gridtype = GRID_LONLAT;
+      else if ( strcmp(gridname, "gaussian") == 0 )       gridtype = GRID_GAUSSIAN;
+      else if ( strcmp(gridname, "regular") == 0 )       {gridtype = GRID_GAUSSIAN; lregular = 1;}
       else cdoAbort("Unsupported grid name: %s", gridname);
     }
   else if ( operatorID == SETGRIDAREA )
@@ -266,7 +269,7 @@ void *Setgrid(void *argument)
 	    {
 	      if      ( gridtype == GRID_CURVILINEAR  )
 		{
-		  gridID2 = gridToCurvilinear(gridID1, 1);
+		  gridID2 = gridToCurvilinear(gridID1, lbounds);
 		}
 	      else if ( gridtype == GRID_UNSTRUCTURED )
 		{
