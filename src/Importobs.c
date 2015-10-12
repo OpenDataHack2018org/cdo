@@ -31,8 +31,8 @@ static
 void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 {
   int  code[]  = {11, 17, 33, 34, 1, 2/*, 3*/};
-  char *name[]  = {"temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/};
-  char *units[] = {"Celsius", "", "m/s", "m/s", "m", "hPa" /*, ""*/};
+  const char *name[]  = {"temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/};
+  const char *units[] = {"Celsius", "", "m/s", "m/s", "m", "hPa" /*, ""*/};
   int varID;
 
   for ( int i = 0; i < nvars; ++i )
