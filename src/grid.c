@@ -506,8 +506,8 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
   long i;
 
   int nbpar = 0;
-  params[nbpar++] = (char*) "proj=sinu";
-  params[nbpar++] = (char*) "ellps=WGS84";
+  params[nbpar++] = gen_param("proj=sinu");
+  params[nbpar++] = gen_param("ellps=WGS84");
 
   if ( cdoVerbose )
     for ( i = 0; i < nbpar; ++i )
@@ -516,6 +516,8 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
   projPJ proj = pj_init(nbpar, params);
   if ( !proj )
     cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+  for ( i = 0; i < nbpar; ++i ) Free(params[i]);
 
   /* proj->over = 1; */		/* allow longitude > 180 */
 
