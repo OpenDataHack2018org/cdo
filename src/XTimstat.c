@@ -153,6 +153,15 @@ void *XTimstat(void *argument)
   cdoOperatorAdd("xtimvar1",   func_var1, DATE_LEN, NULL);
   cdoOperatorAdd("xtimstd",    func_std,  DATE_LEN, NULL);
   cdoOperatorAdd("xtimstd1",   func_std1, DATE_LEN, NULL);
+  cdoOperatorAdd("xyearmin",   func_min,  10, NULL);
+  cdoOperatorAdd("xyearmax",   func_max,  10, NULL);
+  cdoOperatorAdd("xyearsum",   func_sum,  10, NULL);
+  cdoOperatorAdd("xyearmean",  func_mean, 10, NULL);
+  cdoOperatorAdd("xyearavg",   func_avg,  10, NULL);
+  cdoOperatorAdd("xyearvar",   func_var,  10, NULL);
+  cdoOperatorAdd("xyearvar1",  func_var1, 10, NULL);
+  cdoOperatorAdd("xyearstd",   func_std,  10, NULL);
+  cdoOperatorAdd("xyearstd1",  func_std1, 10, NULL);
   cdoOperatorAdd("xmonmin",    func_min,   8, NULL);
   cdoOperatorAdd("xmonmax",    func_max,   8, NULL);
   cdoOperatorAdd("xmonsum",    func_sum,   8, NULL);
