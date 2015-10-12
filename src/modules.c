@@ -602,7 +602,7 @@ static modules_t Modules[] =
   { Expr,           ExprHelp,          ExprOperators,          CDI_REAL,  1,  1 },
   { FC,             NULL,              FCOperators,            CDI_REAL,  1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,       CDI_BOTH,  1,  0 },
-  { Fillmiss,       FillmissHelp,      FillmissOperators,      CDI_REAL,  1,  1 },
+  { Fillmiss,       NULL,              FillmissOperators,      CDI_REAL,  1,  1 },
   { Filter,         FilterHelp,        FilterOperators,        CDI_REAL,  1,  1 },
   { Fldrms,         NULL,              FldrmsOperators,        CDI_REAL,  2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,       CDI_REAL,  1,  1 },
