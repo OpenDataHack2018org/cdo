@@ -666,7 +666,6 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
   int lgrid_gen_bounds = FALSE;
   int gridID_gme = -1;
 
-  printf("gridID %d %d %d\n", gridID, remap_write_remap == TRUE, grid->remap_grid_type != REMAP_GRID_TYPE_REG2D);
   if ( gridInqType(grid->gridID) != GRID_UNSTRUCTURED && gridInqType(grid->gridID) != GRID_CURVILINEAR )
     {
       if ( gridInqType(grid->gridID) == GRID_GME )
