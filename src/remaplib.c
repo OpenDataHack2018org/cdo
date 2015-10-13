@@ -607,8 +607,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 
   if ( grid->size != nx*ny ) cdoAbort("Internal error, wrong dimensions!");
 
-  grid->reg2d_center_lon = (double*) Realloc(grid->reg2d_center_lon, nxm*sizeof(double));
-  grid->reg2d_center_lat = (double*) Realloc(grid->reg2d_center_lat,  ny*sizeof(double));
+  grid->reg2d_center_lon = (double*) Malloc(nxm*sizeof(double));
+  grid->reg2d_center_lat = (double*) Malloc( ny*sizeof(double));
  
   grid->reg2d_center_lon[0] = 0;
   grid->reg2d_center_lat[0] = 0;
