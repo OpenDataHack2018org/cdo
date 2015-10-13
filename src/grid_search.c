@@ -102,7 +102,7 @@ struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const d
 {
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));  
   // see  example_cartesian.c
-  if ( cdoVerbose) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
+  if ( cdoVerbose ) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
   float min[3], max[3];
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
@@ -315,6 +315,7 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
   unsigned index = GS_NOT_FOUND;
   if ( near == NULL ) return index;
   
+#if defined(ENABLE_NEARPT3)
   float range0 = gs_set_range(prange);
 
   float point[3];
@@ -325,7 +326,6 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
   q[1] = NPT3SCALE(point[1]);
   q[2] = NPT3SCALE(point[2]);
 
-#if defined(ENABLE_NEARPT3)
   int closestpt = nearpt3_query(near->nearpt3, q);
 
   if ( closestpt >= 0 )
@@ -340,6 +340,10 @@ unsigned gs_nearest_nearpt3(struct gsNear *near, double lon, double lat, double 
            *prange = range;
         }
     }
+#else
+  UNUSED(lon);
+  UNUSED(lat);
+  UNUSED(prange);
 #endif
 
   return index;
