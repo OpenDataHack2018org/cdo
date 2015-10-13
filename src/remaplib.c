@@ -680,9 +680,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
       else if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
 	  lgrid_destroy = TRUE;
-          printf("to curvilinear %d\n", gridID);
 	  gridID = gridToCurvilinear(grid->gridID, 1);
-          printf("   curvilinear %d\n", gridID);
 	  lgrid_gen_bounds = TRUE;
 	}
     }
