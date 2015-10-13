@@ -234,5 +234,6 @@ int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict s
 int find_ij_weights(double plon, double plat, double* restrict src_lats, double* restrict src_lons, double *ig, double *jg);
 int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym);
 
+void remapgrid_get_lonlat(remapgrid_t *grid, unsigned cell_add, double *plon, double *plat);
 
 #endif  /* _REMAP_H */

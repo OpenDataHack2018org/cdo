@@ -371,6 +371,25 @@ void check_lon_range2(long nc, long nlons, double *corners, double *centers)
     }
 }
 
+
+void remapgrid_get_lonlat(remapgrid_t *grid, unsigned cell_add, double *plon, double *plat)
+{
+  if ( grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+    {
+      unsigned nx = grid->dims[0];
+      unsigned iy = cell_add/nx;
+      unsigned ix = cell_add - iy*nx;
+      *plat = grid->reg2d_center_lat[iy];
+      *plon = grid->reg2d_center_lon[ix];
+      if ( *plon < 0 ) *plon += PI2;
+    }
+  else
+    {
+      *plat = grid->cell_center_lat[cell_add];
+      *plon = grid->cell_center_lon[cell_add];
+    }
+}
+
 static
 void check_lon_range(long nlons, double *lons)
 {
@@ -647,6 +666,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
   int lgrid_gen_bounds = FALSE;
   int gridID_gme = -1;
 
+  printf("gridID %d %d %d\n", gridID, remap_write_remap == TRUE, grid->remap_grid_type != REMAP_GRID_TYPE_REG2D);
   if ( gridInqType(grid->gridID) != GRID_UNSTRUCTURED && gridInqType(grid->gridID) != GRID_CURVILINEAR )
     {
       if ( gridInqType(grid->gridID) == GRID_GME )
@@ -660,7 +680,9 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
       else if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
 	  lgrid_destroy = TRUE;
+          printf("to curvilinear %d\n", gridID);
 	  gridID = gridToCurvilinear(grid->gridID, 1);
+          printf("   curvilinear %d\n", gridID);
 	  lgrid_gen_bounds = TRUE;
 	}
     }
@@ -830,6 +852,7 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 
 void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid)
 {
+  int lbounds = TRUE;
   int reg2d_src_gridID = gridID1;
   int reg2d_tgt_gridID = gridID2;
 
@@ -844,16 +867,15 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
       // src_grid->remap_grid_type = 0;
     }
 
-  if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && map_type == MAP_TYPE_CONSERV_YAC )
+  if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
-      if ( IS_REG2D_GRID(gridID2) ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if ( IS_REG2D_GRID(gridID2) && map_type == MAP_TYPE_CONSERV_YAC ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // else src_grid->remap_grid_type = -1;
     }
 
-  if ( remap_gen_weights == FALSE && map_type == MAP_TYPE_BILINEAR )
+  if ( remap_gen_weights == FALSE && IS_REG2D_GRID(gridID2) && tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
-      if ( IS_REG2D_GRID(gridID2) ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
-      // else src_grid->remap_grid_type = -1;
+      if ( map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_DISTWGT ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
 
   if ( lextrapolate > 0 )
@@ -917,7 +939,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 	gridInqType(src_grid->gridID) == GRID_LAEA || 
 	gridInqType(src_grid->gridID) == GRID_SINUSOIDAL) )
     {
-      src_grid->gridID = gridID1 = gridToCurvilinear(src_grid->gridID, 1);
+      src_grid->gridID = gridID1 = gridToCurvilinear(src_grid->gridID, lbounds);
     }
 
   if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&

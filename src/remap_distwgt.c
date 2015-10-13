@@ -448,7 +448,7 @@ void distwgt_remap(double* restrict tgt_point, const double* restrict src_array,
 void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
 {
   /*  Local variables */
-  int remap_grid_type = src_grid->remap_grid_type;
+  int src_remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
 
@@ -470,7 +470,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   start = clock();
 
   struct gridsearch *gs = NULL;
-  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+  if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
     gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else if ( num_neighbors == 1 )
     gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
@@ -487,7 +487,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(gs, num_neighbors, remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
+  shared(gs, num_neighbors, src_remap_grid_type, src_grid, tgt_grid, tgt_grid_size, findex) \
   shared(src_array, tgt_array, missval) \
   private(nbr_mask, nbr_add, nbr_dist)
 #endif
@@ -502,12 +502,12 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
       tgt_array[tgt_cell_add] = missval;
 
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
-	
-      double plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      double plon = tgt_grid->cell_center_lon[tgt_cell_add];
+
+      double plon = 0, plat = 0;
+      remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
       /* Find nearest grid points on source grid and distances to each point */
-      if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+      if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add, nbr_dist, 
 			      plat, plon, src_grid->dims);
       else
