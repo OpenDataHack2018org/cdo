@@ -1074,10 +1074,10 @@ int parse_options_long(int argc, char *argv[])
             }
           else if ( luse_fftw )
             {
-              int use_fftw = str_to_int(CDO_optarg);
-              if ( use_fftw != 0 && use_fftw != 1 )
-                cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", use_fftw);
-              CDO_Use_FFTW = use_fftw;
+              int intarg = parameter2int(CDO_optarg);
+              if ( intarg != 0 && intarg != 1 )
+                cdoAbort("Unsupported value for option --use_fftw=%d [range: 0-1]", intarg);
+              CDO_Use_FFTW = intarg;
             }
           else if ( lgridsearchnn )
             {
@@ -1094,7 +1094,10 @@ int parse_options_long(int argc, char *argv[])
             }
           else if ( lremap_genweights )
             {
-              remap_genweights = str_to_int(CDO_optarg);
+              int intarg = parameter2int(CDO_optarg);
+              if ( intarg != 0 && intarg != 1 )
+                cdoAbort("Unsupported value for option --remap_genweights=%d [range: 0-1]", intarg);
+              remap_genweights = intarg;
             }
           break;
         case 'a':
