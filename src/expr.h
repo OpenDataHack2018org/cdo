@@ -1,7 +1,13 @@
 #include <stdio.h>
 
+#ifndef register
+#define register
+#endif
+
+#ifdef __cplusplus
 #ifndef fileno
 int fileno(FILE *stream);
+#endif
 #endif
 
 #ifndef strdupx
