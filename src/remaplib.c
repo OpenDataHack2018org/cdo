@@ -773,7 +773,7 @@ static
 void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 {
   if ( remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->luse_cell_corners )
-    grid->cell_bound_box = (restr_t*) Realloc(grid->cell_bound_box, 4*grid->size*sizeof(restr_t));
+    grid->cell_bound_box = (restr_t*) Malloc(4*grid->size*sizeof(restr_t));
 
   if ( grid->luse_cell_corners )
     {
@@ -1015,10 +1015,10 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   /*  Allocate address and weight arrays for mapping 1 */
   if ( map_type == MAP_TYPE_CONSERV )
     {
-      rv->src_cell_add = (int*) Realloc(rv->src_cell_add, rv->max_links*sizeof(int));
-      rv->tgt_cell_add = (int*) Realloc(rv->tgt_cell_add, rv->max_links*sizeof(int));
+      rv->src_cell_add = (int*) Malloc(rv->max_links*sizeof(int));
+      rv->tgt_cell_add = (int*) Malloc(rv->max_links*sizeof(int));
 
-      rv->wts = (double*) Realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
+      rv->wts = (double*) Malloc(rv->num_wts*rv->max_links*sizeof(double));
     }
 
   rv->links.option    = FALSE;
