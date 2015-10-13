@@ -960,6 +960,10 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
     {
       remap_define_reg2d(reg2d_src_gridID, src_grid);
     }
+  else if ( tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+    {
+      remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
+    }
   else if ( map_type != MAP_TYPE_DISTWGT )
     {
       cell_bounding_boxes(src_grid, REMAP_GRID_BASIS_SRC);
