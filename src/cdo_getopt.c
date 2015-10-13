@@ -100,7 +100,7 @@ char *__progname(char *nargv0)
 static
 int cdo_getopt_internal(int nargc, char * const *nargv, const char *ostr)
 {
-  static char *place = EMSG;		/* option letter processing */
+  static const char *place = EMSG;		/* option letter processing */
   char *oli;				/* option letter list index */
 
   assert(nargv != NULL);

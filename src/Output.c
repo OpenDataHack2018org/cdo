@@ -333,7 +333,7 @@ void *Output(void *argument)
 		{
 		  if ( tsID == 0 && recID == 0 )
 		    {
-		      char *fname = "frontplane.xyz";
+		      const char *fname = "frontplane.xyz";
 		      FILE *fp;
 		      double fmin = 0;
 		      double dx, x0, y0, z0, x, y, z;

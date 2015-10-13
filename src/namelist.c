@@ -18,10 +18,13 @@
 #include "cdo_int.h"
 #include "namelist.h"
 
-#if ! defined(strdup)
+
+#ifndef strdupx
+#ifndef strdup
 char *strdup(const char *s);
 #endif
-int readline(FILE *fp, char *line, int len);
+#define strdupx  strdup
+#endif
 
 
 #define  func_1         -1 /* nptype */

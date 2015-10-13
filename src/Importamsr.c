@@ -45,8 +45,8 @@ void init_amsr_day(int vlistID, int gridID, int zaxisID, int nvars)
     5:cloud	cloud liquid water in millimeters
     6:rain   	rain rate in millimeters/hour
   */
-  char *name[]  = {"hours", "sst", "wind", "vapor", "cloud", "rain"};
-  char *units[] = {"h", "deg Celcius", "m/s", "mm", "mm", "mm/h"};
+  const char *name[]  = {"hours", "sst", "wind", "vapor", "cloud", "rain"};
+  const char *units[] = {"h", "deg Celcius", "m/s", "mm", "mm", "mm/h"};
   double xscale[]  = {0.1, 0.15, 0.2, 0.3, 0.01, 0.1};
   double xminval[] = {0., -3., 0., 0., 0., 0.};
   int i, varID;
@@ -91,8 +91,8 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
     4:cloud     cloud liquid water in millimeters
     5:rain	rain rate in millimeters/hour
   */
-  char *name[]  = {"sst", "wind", "vapor", "cloud", "rain"};
-  char *units[] = {"deg Celcius", "m/s", "mm", "mm", "mm/h"};
+  const char *name[]  = {"sst", "wind", "vapor", "cloud", "rain"};
+  const char *units[] = {"deg Celcius", "m/s", "mm", "mm", "mm/h"};
   double xscale[]  = {0.15, 0.2, 0.3, 0.01, 0.1};
   double xminval[] = {-3., 0., 0., 0., 0.};
   int i, varID;

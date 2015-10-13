@@ -26,10 +26,10 @@
 #include "error.h"
 
 
-int defineTable(char *tablearg)
+int defineTable(const char *tablearg)
 {
   int tableID = CDI_UNDEFID;
-  char *tablename = tablearg;
+  const char *tablename = tablearg;
 
   if ( fileExists(tablename) ) tableID = tableRead(tablename);
 

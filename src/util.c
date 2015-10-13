@@ -51,7 +51,7 @@
 /* refactor: moved here from *.c */
 
 int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.c
-char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.c
+const char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.c
 int CDO_optind = 1;      // refactor: moved here from cdo_getopt.c
 
 
@@ -110,7 +110,7 @@ char **cdoVarnames       = NULL;
 char CDO_File_Suffix[32];
 
 int cdoExpMode           = -1;
-char *cdoExpName         = NULL;
+const char *cdoExpName         = NULL;
 
 int timer_read, timer_write;
 
@@ -211,7 +211,7 @@ char *getOperator(const char *argument)
   return (operatorArg);
 }
 
-const char *operatorAlias(char *operatorName);
+char *operatorAlias(char *operatorName);
 
 char *getOperatorName(const char *operatorArg)
 {
@@ -237,7 +237,8 @@ char *getOperatorName(const char *operatorArg)
     }
 
   /*  return (operatorName); */
-  return (operatorAlias(operatorName));
+  char * alias = operatorAlias(operatorName);
+  return alias;
 }
 
 

@@ -42,11 +42,11 @@ static double starttime = 0.0;
 void afterInqHistory(int fileID);
 void afterDefHistory(int fileID, char *histstring);
 
-int   scan_par_obsolate(char *namelist, char *name, int def);
+int   scan_par_obsolate(char *namelist, const char *name, int def);
 void  scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCodes);
-int   scan_par(int verbose, char *namelist, char *name, int def);
+int   scan_par(int verbose, char *namelist, const char *name, int def);
 int   scan_time(int verbose, char *namelist, int *hours, int max_hours);
-void  scan_darray(char *namelist, char *name, double *values, int maxValues, int *numValues);
+void  scan_darray(char *namelist, const char *name, double *values, int maxValues, int *numValues);
 
 long  get_nfft(void);
 

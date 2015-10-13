@@ -162,7 +162,7 @@ void gr2t (gadouble *, gadouble, struct dt *);
 char *gafndt (char *, struct dt *, struct dt *, gadouble *, 
               struct gachsub *, struct gaens *, gaint, gaint, gaint *);
 
-gaint cmpwrd (char *ch1, char *ch2);
+gaint cmpwrd (const char *ch1, const char *ch2);
 char *intprs (char *ch, int *val);
 void gabswp (void *r, gaint cnt);
 void gabswp2 (void *r, gaint cnt);

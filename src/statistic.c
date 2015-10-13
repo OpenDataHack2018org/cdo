@@ -4,6 +4,9 @@
 /* HEADER FOR PARALLEL EIGEN SOLUTION */
 /*  -->SEE END OF ROUTINE             */
 /* ********************************** */
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

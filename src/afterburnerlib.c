@@ -100,7 +100,7 @@ void FreeSamp(struct Variable *vars)
 
 /* alloc_dp - Allocate space for double array */
 static
-double *alloc_dp(int words, char *array_name)
+double *alloc_dp(int words, const char *array_name)
 {
   double *result = NULL;
 

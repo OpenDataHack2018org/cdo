@@ -50,19 +50,19 @@ double *gl_data = NULL;
 
 int Done = 0;
 
-int com_help(char *);
-int com_list(char *);
-int com_quit(char *);
-int com_stat(char *);
-int com_set(char *);
-int com_vars(char *);
+int com_help(const char *);
+int com_list(const char *);
+int com_quit(const char *);
+int com_stat(const char *);
+int com_set(const char *);
+int com_vars(const char *);
 //int com_stat(char *);
 
 
 typedef struct {
-  char  *name; /* User printable name of the function. */
-  int  (*func)(char *); /* Function to call to do the job. */
-  char  *doc; /* Documentation for this function. */
+  const char  *name; /* User printable name of the function. */
+  int  (*func)(const char *); /* Function to call to do the job. */
+  const char  *doc; /* Documentation for this function. */
 }
 command_t;
 
@@ -92,7 +92,7 @@ int valid_argument (char *caller, char *arg)
 }
 
 /* Print out help for ARG, or for all of the commands if ARG is not present. */
-int com_help(char *arg)
+int com_help(const char *arg)
 {
   int i;
   int printed = 0;
@@ -129,7 +129,7 @@ int com_help(char *arg)
 
 
 /* List the file(s) named in arg. */
-int com_list(char *arg)
+int com_list(const char *arg)
 {
   if (!arg)
     arg = "";
@@ -138,7 +138,7 @@ int com_list(char *arg)
 }
 
 /* The user wishes to quit using this program. Just set DONE non-zero. */
-int com_quit(char *arg)
+int com_quit(const char *arg)
 {
   UNUSED(arg);
 
@@ -148,7 +148,7 @@ int com_quit(char *arg)
 }
 
 
-int com_stat(char *arg)
+int com_stat(const char *arg)
 {
   int nrecs;
   int tsID;
@@ -195,7 +195,7 @@ int com_stat(char *arg)
 }
 
 
-int com_set(char *arg)
+int com_set(const char *arg)
 {
   printf("com_set: %s\n", arg);
 
@@ -203,7 +203,7 @@ int com_set(char *arg)
 }
 
 
-int com_vars(char *arg)
+int com_vars(const char *arg)
 {
   int varID;
   char paramstr[32];

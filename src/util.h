@@ -48,11 +48,11 @@ extern int CDO_Reset_History;
 extern int timer_read, timer_write; // refactor: both pstream.c and CDIread.c CDIwrite.c defined in cdo.c
 
 extern int   CDO_optind;
-extern char *CDO_optarg;
+extern const char *CDO_optarg;
 extern int CDO_opterr;
 extern int remap_genweights;
 
-extern char *cdoExpName;
+extern const char *cdoExpName;
 extern int ompNumThreads;
 
 extern int stdin_is_tty;
@@ -206,7 +206,7 @@ int cdo_omp_get_thread_num(void);
 void strtolower(char *str);
 
 /* refactor: moved here from cdo.c */
-void exp_run(int argc, char *argv[], char *cdoExpName); // job.c
+void exp_run(int argc, char *argv[], const char *cdoExpName); // job.c
 void printFeatures(void); // features.c
 void printLibraries(void);  // features.c  
 

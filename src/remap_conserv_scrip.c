@@ -1419,8 +1419,14 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
       if ( num_srch_cells > max_srch_cells )
 	{
+#ifdef _OPENMP
+        srch_corner_lat = (double*) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = (double*) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
+
+#else
 	  srch_corner_lat = (double*) Realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
 	  srch_corner_lon = (double*) Realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
+#endif
 
 	  max_srch_cells  = num_srch_cells;
 
@@ -1642,9 +1648,14 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
       if ( num_srch_cells > max_srch_cells )
 	{
-	  srch_corner_lat = (double*) Realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
+#ifdef _OPENMP
+	  srch_corner_lat = (double*) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = (double*) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
+#else
+      srch_corner_lat = (double*) Realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
 	  srch_corner_lon = (double*) Realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
 
+#endif
 	  max_srch_cells  = num_srch_cells;
 
 	  max_srch_cells2[ompthID]  = max_srch_cells;

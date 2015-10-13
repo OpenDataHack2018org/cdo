@@ -1,6 +1,10 @@
 #ifndef _HETAETA_H
 #define _HETAETA_H
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 void hetaeta(int ltq, int ngp, const int *imiss,
 	     int nlev1, const double *restrict ah1, const double *restrict bh1,
              const double *restrict fis1, const double *restrict ps1, 

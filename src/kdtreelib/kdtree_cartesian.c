@@ -2,6 +2,9 @@
  * \brief Routines specific to the n-dimensional cartesian kd-tree
  *
  */
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
 
 #include "kdtree.h"
 #include "pqueue.h"

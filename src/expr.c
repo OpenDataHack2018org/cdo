@@ -37,7 +37,7 @@ static double f_sqr(double x)  { return (x*x);      }
 
 typedef struct {
   int type;
-  char *name;                      /* function name            */
+  const char *name;                      /* function name            */
   double (*func)(double);          /* pointer to function      */
 }
 func_t;

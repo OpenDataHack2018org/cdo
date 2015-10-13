@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #ifndef _DMEMORY_H
 #  include "dmemory.h"
 #endif

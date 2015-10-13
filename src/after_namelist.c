@@ -6,7 +6,7 @@
 
 
 static
-char *amatch(char *msr, char *sub)
+char *amatch(char *msr, const char *sub)
 {
   int i,nm,ns;
 
@@ -20,7 +20,7 @@ char *amatch(char *msr, char *sub)
 }
 
 
-int scan_par_obsolate(char *namelist, char *name, int def)
+int scan_par_obsolate(char *namelist, const char *name, int def)
 {
   char *cp;
   int value;
@@ -38,7 +38,7 @@ int scan_par_obsolate(char *namelist, char *name, int def)
 }
 
 
-int scan_par(int verbose, char *namelist, char *name, int def)
+int scan_par(int verbose, char *namelist, const char *name, int def)
 {
   char *cp;
   int value;
@@ -115,7 +115,7 @@ void scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCode
 }
 
 
-void scan_darray(char *namelist, char *name, double *values, int maxValues, int *numValues)
+void scan_darray(char *namelist, const char *name, double *values, int maxValues, int *numValues)
 {
   char *cp,*icp;
   double val;

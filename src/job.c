@@ -579,7 +579,7 @@ int ftprmd(const char *url, const char *path)
 #define  DEFAULT_CDO_REMOTE_PATH  "/client/bin/cdo"
 const char *cdojobfiles  = "ftp_files";
 
-void exp_run(int argc, char *argv[], char *cdoExpName)
+void exp_run(int argc, char *argv[], const char *cdoExpName)
 {
   char commandline[65536];
   int i;

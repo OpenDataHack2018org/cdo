@@ -1965,7 +1965,7 @@ void freeNode(nodeType *p)
   free (p);
 }
 
-void yyerror(void *parse_arg, void *scanner, char *errstr)
+void yyerror(void *parse_arg, void *scanner, const char *errstr)
 {
   fprintf(stdout, "%s!\n", errstr);
 }

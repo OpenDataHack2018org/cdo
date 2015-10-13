@@ -1,6 +1,9 @@
 #ifndef _AFTERBURNER_H
 #define _AFTERBURNER_H
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
 /* =============================================== */
 /* These include files should be standard on all   */
 /* UNIX systems.                                   */

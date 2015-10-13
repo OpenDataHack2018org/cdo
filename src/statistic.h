@@ -2,6 +2,10 @@
 
 #define _STATISTIC_H
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 void eigen_solution_of_symmetric_matrix (double **a, double *eig_val, int n, const char *prompt);
 int solution_of_linear_equation (double **a, double *b, int n);
 int inverse_of_matrix (double **a, double **b, int n);

@@ -32,7 +32,7 @@
 #define LIM_NTSM 1024
 
 enum {TU_SECONDS=0, TU_MINUTES, TU_HOURS, TU_DAYS, TU_MONTHS, TU_YEARS};
-char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
+const char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
 int   iunits[] = {1, 60, 3600, 86400, 1, 12};
 
 

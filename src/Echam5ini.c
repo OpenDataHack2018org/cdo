@@ -296,7 +296,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
   char atttext[1024];
   size_t attlen;
   //int attint;
-  char *username;
+  const char *username;
   char timestr[30];
   time_t date_and_time_in_sec;
   struct tm *date_and_time;

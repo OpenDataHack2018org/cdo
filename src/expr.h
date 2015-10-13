@@ -98,7 +98,7 @@ typedef union{
 YY_DECL;
 
 int  yyparse(parse_parm_t *parse_arg, void*);
-void yyerror(void *parse_arg, void *scanner, char *errstr);
+void yyerror(void *parse_arg, void *scanner, const char *errstr);
 
 int  yylex_init(void **);
 int  yylex_destroy(void *);

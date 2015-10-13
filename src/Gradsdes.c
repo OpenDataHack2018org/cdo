@@ -961,7 +961,8 @@ void *Gradsdes(void *argument)
   int flt64 = 0;
   int cal365day = 0;
   int sequential = FALSE;
-  char Time[30], Incr[10] = {"1mn"}, *IncrKey[] = {"mn","hr","dy","mo","yr"};
+  char Time[30], Incr[10] = {"1mn"};
+  const char *IncrKey[] = {"mn","hr","dy","mo","yr"};
   int isd, imn, ihh, iyy, imm, idd;
   int isds = 0, imns = 0, ihhs = 0, iyys = 0, imms = 0, idds = 0;
   int imn0 = 0, ihh0 = 0, iyy0 = 0, imm0 = 0, idd0 = 0;

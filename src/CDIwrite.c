@@ -93,7 +93,7 @@ void *CDIwrite(void *argument)
 {
   int memtype = MEMTYPE_DOUBLE;
   int nvars = 10, nlevs = 0, ntimesteps = 30;
-  char *defaultgrid = "global_.2";
+  const char *defaultgrid = "global_.2";
   int streamID;
   int tsID, varID, levelID;
   int gridsize, i;

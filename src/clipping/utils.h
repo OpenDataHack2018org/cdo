@@ -69,7 +69,7 @@ void yac_free_pointer_unique_lookup();
  * prints a short error message and info from where it was called
  * followed by an exit. 
  */
-void yac_internal_abort_message ( char * text, char * file, int line );
+void yac_internal_abort_message ( const char * text, const char * file, int line );
 
 /** \example test_quicksort.c
  * This contains an example of how to use quicksort_index.

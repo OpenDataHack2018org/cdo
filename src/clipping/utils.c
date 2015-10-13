@@ -62,7 +62,7 @@ void yac_free_pointer_unique_lookup() {
   pointer_lookup_table_size = 0;
 }
 
-void yac_internal_abort_message ( char * text, char * file, int line )
+void yac_internal_abort_message ( const char * text, const char * file, int line )
 {
   fprintf(stderr, "%s \n", text); 
   fprintf(stderr, "Aborting in file %s, line %i ...\n", file, line );

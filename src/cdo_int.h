@@ -126,8 +126,8 @@ int     days_per_year(int calendar, int year);
 int     calendar_dpy(int calendar);
 
 void    defineGrid(const char *gridarg);
-void    defineInstitution(char *instarg);
-int     defineTable(char *tablearg);
+void    defineInstitution(const char *instarg);
+int     defineTable(const char *tablearg);
 
 void    cdolog(const char *prompt, double cputime);
 void    cdologs(int noper);

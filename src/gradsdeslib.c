@@ -350,7 +350,7 @@ gaint swap,mo1,mo2;
   else return (min2-min1);
 }
 
-static char *mons[12] = {"jan","feb","mar","apr","may","jun",
+static const char *mons[12] = {"jan","feb","mar","apr","may","jun",
                          "jul","aug","sep","oct","nov","dec"};
 
 /* Parse an absolute date/time value.  Format is:
@@ -527,7 +527,7 @@ char id[3];
    blank-delimited words in the two strings match.  CR and NULL also
    serve as delimiters.                                               */
 
-gaint cmpwrd (char *ch1, char *ch2) {
+gaint cmpwrd (const char *ch1, const char *ch2) {
 
   while (*ch1==' '||*ch1=='\t') ch1++;  /* Advance past leading blanks.     */
   while (*ch2==' '||*ch2=='\t') ch2++;

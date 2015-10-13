@@ -294,7 +294,7 @@ void cdoSetDebug(int level)
 #define IsBigendian()  ( u_byteorder.c[sizeof(long) - 1] )
 
 static
-void setDefaultDataType(char *datatypestr)
+void setDefaultDataType(const char *datatypestr)
 {
   static union {unsigned long l; unsigned char c[sizeof(long)];} u_byteorder = {1};
   int nbits = -1;
@@ -464,11 +464,11 @@ void setDefaultDataTypeByte(char *datatypestr)
 }
 */
 static
-void setDefaultFileType(char *filetypestr, int labort)
+void setDefaultFileType(const char *filetypestr, int labort)
 {
   if ( filetypestr )
     {
-      char *ftstr = filetypestr;
+      const char *ftstr = filetypestr;
       size_t len;
 
       if      ( cmpstrlen(filetypestr, "grb2", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_GRB2;}
@@ -975,7 +975,7 @@ void cdo_set_options(void)
 
 
 static
-long str_to_int(char *intstring)
+long str_to_int(const char *intstring)
 {
   long intval = -1;
   long fact = 1;

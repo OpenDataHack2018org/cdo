@@ -196,8 +196,12 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
 		  rv->tgt_cell_add[offset+ilink] = tgt_cell_add;
 		  rv->wts[offset+ilink] = weightlinks[tgt_cell_add].addweights[ilink].weight;
 		}
-	      Free(weightlinks[tgt_cell_add].addweights);
-	    }
+#ifdef _OPENMP
+	      free(weightlinks[tgt_cell_add].addweights);
+#else
+          Free(weightlinks[tgt_cell_add].addweights);
+#endif
+        }
 	}
     }
 }
@@ -241,8 +245,12 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
 		  for ( long k = 0; k < 4; ++k )
 		    rv->wts[(offset+ilink)*4+k] = addweights[ilink].weight[k];
 		}
+#ifdef _OPENMP
+          free(addweights);
+#else
 	      Free(addweights);
-	    }
+#endif
+        }
 	}
     }
 }

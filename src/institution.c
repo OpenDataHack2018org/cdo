@@ -95,9 +95,9 @@ int readInstitution(const char *instfile)
 }
 
 
-void defineInstitution(char *instarg)
+void defineInstitution(const char *instarg)
 {
-  char *instname = instarg;
+  const char *instname = instarg;
   int instID = readInstitution(instname);
 
   if ( instID == UNDEFID )
