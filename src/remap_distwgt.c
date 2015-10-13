@@ -290,8 +290,8 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 
   int ndist = num_neighbors;
   ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
-  double *dist = (double *) Malloc(ndist*sizeof(double));
-  int    *adds = (int *) Malloc(ndist*sizeof(int));
+  double dist[ndist];
+  int    adds[ndist];
 
   const double range0 = SQR(2*search_radius);
   double range = range0;
@@ -340,9 +340,6 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 
   for ( j = 0; j < ndist; ++j )
     nbr_store_distance(adds[j], dist[j], num_neighbors, nbr_add, nbr_dist);
-
-  Free(adds);
-  Free(dist);
 
   nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
