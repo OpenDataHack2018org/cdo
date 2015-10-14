@@ -46,11 +46,11 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=icpc CFLAGS="-g -std=c++11 -Wall -O2 -Drestrict= -qopt-report=5 -march=native"
+	            CC=icpc CFLAGS="-g -std=c++11 -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang++ ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=clang++ CFLAGS="-g -Wall -O3 -Drestrict="
+	            CC=clang++ CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -58,7 +58,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = g++ ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=g++ CFLAGS="-g -std=c++14 -Drestrict= -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
+	            CC=g++ CFLAGS="-g -std=c++14 -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
@@ -87,15 +87,27 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native" CXX=icpc
+        elif  test "$COMP" = icpc ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=icpc CFLAGS="-g -std=c++11 -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = clang++ ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=clang++ CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
 	            CC=clang CFLAGS="-g -Wall -Wwrite-strings -Ofast -march=native"
+        elif  test "$COMP" = g++ ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=g++ CFLAGS="-g -std=c++14 -Wall -W -Wfloat-equal -pedantic -O3"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=gcc CFLAGS="-g -pipe -Wall -Wwrite-strings -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -Wa,-q"
+	            CC=gcc CFLAGS="-g -std=c11 -pipe -Wall -Wwrite-strings -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -Wa,-q"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi

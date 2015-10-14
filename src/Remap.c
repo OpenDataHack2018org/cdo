@@ -88,7 +88,7 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *num_neighb
     case REMAPDIS:
     case GENDIS:
       *map_type = MAP_TYPE_DISTWGT;
-      *num_neighbors = 4;
+      if ( *num_neighbors == 0 ) *num_neighbors = 4;
       break;
     case REMAPNN:
     case GENNN:
@@ -758,7 +758,7 @@ void *Remap(void *argument)
   int norm_opt = NORM_OPT_NONE;
   int map_type = -1;
   int submap_type = SUBMAP_TYPE_NONE;
-  int num_neighbors = 4;
+  int num_neighbors = 0;
   int need_gradiants = FALSE;
   int grid1sizemax;
   char varname[CDI_MAX_NAME];
@@ -822,8 +822,18 @@ void *Remap(void *argument)
   else
     {
       operatorInputArg("grid description file or name");
-      operatorCheckArgc(1);
-      gridID2 = cdoDefineGrid(operatorArgv()[0]);
+      if ( operfunc == REMAPDIS && operatorArgc() == 2 )
+        {
+          gridID2 = cdoDefineGrid(operatorArgv()[0]);
+          int inum = parameter2int(operatorArgv()[1]);
+          if ( inum < 1 || inum > 9 ) cdoAbort("Number of nearest neighbors out of range (1-9)!", inum);
+          num_neighbors = inum;
+        }
+      else
+        {
+          operatorCheckArgc(1);
+          gridID2 = cdoDefineGrid(operatorArgv()[0]);
+        }
     }
 
   if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
