@@ -872,7 +872,8 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 
   if ( remap_gen_weights == FALSE && IS_REG2D_GRID(gridID2) && tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
-      if ( map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_DISTWGT ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if ( map_type == MAP_TYPE_DISTWGT ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if ( map_type == MAP_TYPE_BILINEAR && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
 
   if ( lextrapolate > 0 )

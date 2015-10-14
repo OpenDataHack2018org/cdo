@@ -169,7 +169,6 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
   double wgts[4];                /*  bilinear weights for four corners      */
-  double plat, plon;             /*  lat/lon coords of destination point    */
   extern int timer_remap_bil;
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -195,7 +194,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(weightlinks, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
-  private(src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
+  private(src_add, src_lats, src_lons, wgts, search_result)    \
   schedule(static)
 #endif
   for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
@@ -210,8 +209,8 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 
-      plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      plon = tgt_grid->cell_center_lon[tgt_cell_add];
+      double plon = 0, plat = 0;
+      remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
       /* Find nearest square of grid points on source grid  */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -292,7 +291,6 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
   double wgts[4];                /*  bilinear weights for four corners      */
-  double plat, plon;             /*  lat/lon coords of destination point    */
   extern int timer_remap_bil;
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -316,7 +314,7 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(cdoSilentMode, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
-  private(src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
+  private(src_add, src_lats, src_lons, wgts, search_result)    \
   schedule(static)
 #endif
   for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
@@ -331,20 +329,8 @@ void scrip_remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const do
 
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 
-      if ( tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
-        {
-          long nx = tgt_grid->dims[0];
-	  long iy = tgt_cell_add/nx;
-	  long ix = tgt_cell_add - iy*nx;
-
-          plat = tgt_grid->reg2d_center_lat[iy];
-          plon = tgt_grid->reg2d_center_lon[ix];
-        }
-      else
-        {
-          plat = tgt_grid->cell_center_lat[tgt_cell_add];
-          plon = tgt_grid->cell_center_lon[tgt_cell_add];
-        }
+      double plon = 0, plat = 0;
+      remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
       /* Find nearest square of grid points on source grid  */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
