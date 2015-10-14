@@ -19,11 +19,11 @@ For a detailed description of the interpolation method see @cite{SCRIP}.
 @BeginOperator_remapdis
 @Name      = remapdis
 @Title     = Distance-weighted average remapping
-@Parameter = grid
+@Parameter = grid [neighbors]
 
 @BeginDescription
-Performs a distance-weighted average remapping of the four nearest neighbor 
-values on all input fields.
+Performs a distance-weighted average remapping of the nearest neighbors value on all input fields.
+The default number of nearest neighbors is 4.
 @EndDescription
 @EndOperator
 
@@ -44,7 +44,9 @@ Use the operator @mod{remap} to apply this remapping weights to a data file with
 
 @BeginParameter
 @Item = grid
-STRING  Target grid description file or name
+STRING   Target grid description file or name
+@Item = neighbors
+INTEGER  Number of nearest neighbors
 @EndParameter
 
 
