@@ -163,9 +163,9 @@ int gridToMeridional(int gridID1)
 }
 
 
-void grid_gen_corners(long n, const double* restrict vals, double* restrict corners)
+void grid_gen_corners(int n, const double* restrict vals, double* restrict corners)
 {
-  long i;
+  int i;
 
   if ( n == 1 )
     {
@@ -183,11 +183,9 @@ void grid_gen_corners(long n, const double* restrict vals, double* restrict corn
 }
 
 
-void grid_gen_bounds(long n, const double* restrict vals, double* restrict bounds)
+void grid_gen_bounds(int n, const double *restrict vals, double *restrict bounds)
 {
-  long i;
-
-  for ( i = 0; i < n-1; ++i )
+  for ( int i = 0; i < n-1; ++i )
     {
       bounds[2*i+1]   = 0.5*(vals[i] + vals[i+1]);
       bounds[2*(i+1)] = 0.5*(vals[i] + vals[i+1]);
@@ -378,10 +376,10 @@ void gridGenRotBounds(int gridID, int nx, int ny,
     }
 }
 
-static
-void gridGenXbounds2D(long nx, long ny, const double* restrict xbounds, double* restrict xbounds2D)
+
+void grid_gen_xbounds2D(int nx, int ny, const double *restrict xbounds, double *restrict xbounds2D)
 {
-  long index;
+  int index;
   double minlon, maxlon;
 
 #if defined(_OPENMP)
@@ -389,12 +387,12 @@ void gridGenXbounds2D(long nx, long ny, const double* restrict xbounds, double* 
                           shared(nx, ny, xbounds, xbounds2D) \
                          private(minlon, maxlon, index)
 #endif
-  for ( long i = 0; i < nx; ++i )
+  for ( int i = 0; i < nx; ++i )
     {
       minlon = xbounds[2*i  ];
       maxlon = xbounds[2*i+1];
 
-      for ( long j = 0; j < ny; ++j )
+      for ( int j = 0; j < ny; ++j )
 	{
 	  index = j*4*nx + 4*i;
 	  xbounds2D[index  ] = minlon;
@@ -405,10 +403,10 @@ void gridGenXbounds2D(long nx, long ny, const double* restrict xbounds, double* 
     }
 }
 
-static
-void gridGenYbounds2D(long nx, long ny, const double* restrict ybounds, double* restrict ybounds2D)
+
+void grid_gen_ybounds2D(int nx, int ny, const double *restrict ybounds, double *restrict ybounds2D)
 {
-  long index;
+  int index;
   double minlat, maxlat;
 
 #if defined(_OPENMP)
@@ -416,7 +414,7 @@ void gridGenYbounds2D(long nx, long ny, const double* restrict ybounds, double* 
                           shared(nx, ny, ybounds, ybounds2D) \
                          private(minlat, maxlat, index)
 #endif
-  for ( long j = 0; j < ny; ++j )
+  for ( int j = 0; j < ny; ++j )
     {
       if ( ybounds[0] > ybounds[1] )
 	{
@@ -429,7 +427,7 @@ void gridGenYbounds2D(long nx, long ny, const double* restrict ybounds, double* 
 	  minlat = ybounds[2*j  ];
 	}
 
-      for ( long i = 0; i < nx; ++i )
+      for ( int i = 0; i < nx; ++i )
 	{
 	  index = j*4*nx + 4*i;
 	  ybounds2D[index  ] = minlat;
@@ -945,14 +943,11 @@ int check_range(long n, double *vals, double valid_min, double valid_max)
 
 int gridToCurvilinear(int gridID1, int lbounds)
 {
-  int gridID2;
-  int gridtype;
-  size_t gridsize;
   long index;
 
-  gridtype = gridInqType(gridID1);
-  gridsize = (size_t) gridInqSize(gridID1);
-  gridID2  = gridCreate(GRID_CURVILINEAR, (int) gridsize);
+  int gridtype = gridInqType(gridID1);
+  size_t gridsize = (size_t) gridInqSize(gridID1);
+  int gridID2  = gridCreate(GRID_CURVILINEAR, (int) gridsize);
   gridDefPrec(gridID2, DATATYPE_FLT32);
 	  
   switch (gridtype)
@@ -965,7 +960,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
     case GRID_SINUSOIDAL:
       {
 	long i, j;
-	int nx, ny;
 	double *xvals = NULL, *yvals = NULL;
 	double *xvals2D, *yvals2D;
 	double *xbounds = NULL, *ybounds = NULL;
@@ -973,8 +967,8 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	char xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
 	double xscale = 1, yscale = 1;
 
-	nx = gridInqXsize(gridID1);
-	ny = gridInqYsize(gridID1);
+	int nx = gridInqXsize(gridID1);
+	int ny = gridInqYsize(gridID1);
 
 	gridInqXunits(gridID1, xunits);
 	gridInqYunits(gridID1, yunits);
@@ -1208,8 +1202,8 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		      }
 		    else
 		      {
-			gridGenXbounds2D(nx, ny, xbounds, xbounds2D);
-			gridGenYbounds2D(nx, ny, ybounds, ybounds2D);
+			grid_gen_xbounds2D(nx, ny, xbounds, xbounds2D);
+			grid_gen_ybounds2D(nx, ny, ybounds, ybounds2D);
 		      }
 		  }
 		
@@ -1357,8 +1351,8 @@ int gridToUnstructured(int gridID1, int lbounds)
 		  }
 		else
 		  {
-		    gridGenXbounds2D(nx, ny, xbounds, xbounds2D);
-		    gridGenYbounds2D(nx, ny, ybounds, ybounds2D);
+		    grid_gen_xbounds2D(nx, ny, xbounds, xbounds2D);
+		    grid_gen_ybounds2D(nx, ny, ybounds, ybounds2D);
 		  }
 
 		gridDefXbounds(gridID2, xbounds2D);

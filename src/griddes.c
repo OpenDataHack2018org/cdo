@@ -1478,9 +1478,8 @@ int compNlon(int nlat)
 static
 void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
-  int nlon, nlat, i;
   int gridtype = GRID_LONLAT;
-  char *endptr;
+  int lbounds = TRUE;
 
   if ( *pline != 0 )
     {
@@ -1491,25 +1490,112 @@ void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1
 
       if ( ! isdigit((int) *pline) && !ispunct((int) *pline) ) return;
 
-      endptr = (char *) pline;
+      char *endptr = (char *) pline;
       inc = strtod(pline, &endptr);
-      if ( *endptr != 0 ) return;
+      if ( *endptr != 0 )
+        {
+          pline = endptr;
+          if ( *pline == '_' ) pline++;
+          else return;
+          
+          if ( *pline == 0 ) return;
+          if ( *pline == 'c' )
+            {
+              gridtype = GRID_CURVILINEAR;
+              pline++;
+              if ( *pline == '0' )
+                {
+                  lbounds = FALSE;
+                  pline++;
+                }
+            }
+          else if ( *pline == 'u' )
+            {
+              gridtype = GRID_UNSTRUCTURED;
+              pline++;
+              if ( *pline == '0' )
+                {
+                  lbounds = FALSE;
+                  pline++;
+                }
+            }
+          if ( *pline != 0 ) return;          
+        }
 
       if ( inc < 1e-9 ) inc = 1;
     }
 
   grid->type = gridtype;
 
-  nlon = (int) ((lon2 - lon1)/inc + 0.5);
-  nlat = (int) ((lat2 - lat1)/inc + 0.5);
-  grid->xsize = nlon;
-  grid->ysize = nlat;
+  int nlon = (int) ((lon2 - lon1)/inc + 0.5);
+  int nlat = (int) ((lat2 - lat1)/inc + 0.5);
 
-  grid->xvals = (double*) Malloc(grid->xsize*sizeof(double));
-  grid->yvals = (double*) Malloc(grid->ysize*sizeof(double));
+  double *xvals = (double*) Malloc(nlon*sizeof(double));
+  double *yvals = (double*) Malloc(nlat*sizeof(double));
 
-  for ( i = 0; i < nlon; ++i ) grid->xvals[i] = lon1 + inc/2 + i*inc;
-  for ( i = 0; i < nlat; ++i ) grid->yvals[i] = lat1 + inc/2 + i*inc;
+  for ( int i = 0; i < nlon; ++i ) xvals[i] = lon1 + inc/2 + i*inc;
+  for ( int i = 0; i < nlat; ++i ) yvals[i] = lat1 + inc/2 + i*inc;
+
+  if ( gridtype == GRID_LONLAT )
+    {
+      grid->xsize = nlon;
+      grid->ysize = nlat;
+      grid->xvals = xvals;
+      grid->yvals = yvals;
+      xvals = NULL;
+      yvals = NULL;
+    }
+  else
+    {
+      double gridsize = nlon*nlat;
+      double *xvals2D = (double*) Malloc(gridsize*sizeof(double));
+      double *yvals2D = (double*) Malloc(gridsize*sizeof(double));
+      for ( int j = 0; j < nlat; j++ )
+        for ( int i = 0; i < nlon; i++ )
+          {
+            xvals2D[j*nlon+i] = xvals[i];
+            yvals2D[j*nlon+i] = yvals[j];
+          }
+
+      if ( gridtype == GRID_CURVILINEAR )
+        {
+          grid->xsize = nlon;
+          grid->ysize = nlat;
+        }
+      else
+        {
+          grid->xsize = gridsize;
+          grid->ysize = gridsize;
+          if ( lbounds ) grid->nvertex = 4;
+        }
+      
+      grid->xvals = xvals2D;
+      grid->yvals = yvals2D;
+      
+      if ( lbounds && nlon > 1 && nlat > 1 )
+        {
+          double *xbounds = (double*) Malloc(2*nlon*sizeof(double));
+          grid_gen_bounds(nlon, xvals, xbounds);
+          
+          double *ybounds = (double*) Malloc(2*nlat*sizeof(double));
+          grid_gen_bounds(nlat, yvals, ybounds);
+          grid_check_lat_borders(2*nlat, ybounds);
+
+          double *xbounds2D = (double*) Malloc(4*gridsize*sizeof(double));
+          double *ybounds2D = (double*) Malloc(4*gridsize*sizeof(double));
+
+          grid_gen_xbounds2D(nlon, nlat, xbounds, xbounds2D);
+          grid_gen_ybounds2D(nlon, nlat, ybounds, ybounds2D);
+
+          Free(xbounds);
+          Free(ybounds);
+          grid->xbounds = xbounds2D;
+          grid->ybounds = ybounds2D;
+        }
+   }
+
+  if ( xvals ) Free(xvals);
+  if ( yvals ) Free(yvals);
 }
 
 

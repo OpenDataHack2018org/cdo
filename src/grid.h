@@ -22,7 +22,13 @@
 void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description);
 void grid_to_degree(const char *units, long nvals, double *restrict values, const char *description);
 
-void grid_gen_corners(long n, const double* restrict vals, double* restrict corners);
+void grid_gen_corners(int n, const double* restrict vals, double* restrict corners);
+void grid_gen_bounds(int n, const double *restrict vals, double *restrict bounds);
+void grid_check_lat_borders(int n, double *ybounds);
+
+void grid_gen_xbounds2D(int nx, int ny, const double *restrict xbounds, double *restrict xbounds2D);
+void grid_gen_ybounds2D(int nx, int ny, const double *restrict ybounds, double *restrict ybounds2D);
+
 void grid_cell_center_to_bounds_X2D(const char* xunitstr, long xsize, long ysize,
 				    const double* restrict grid_center_lon, double* restrict grid_corner_lon, double dlon);
 void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize,
