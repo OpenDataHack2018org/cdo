@@ -403,8 +403,8 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
 
       if ( ! tgt_grid->mask[tgt_cell_add] ) continue;
 	
-      double plat = tgt_grid->cell_center_lat[tgt_cell_add];
-      double plon = tgt_grid->cell_center_lon[tgt_cell_add];
+      double plon = 0, plat = 0;
+      remapgrid_get_lonlat(tgt_grid, tgt_cell_add, &plon, &plat);
 
       /* Find nearest grid points on source grid and distances to each point */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )

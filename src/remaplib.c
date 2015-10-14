@@ -1450,7 +1450,6 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   long n, ns, i;
   long idiff, imax, imin, icount;
   int *tgt_count;
-  double minval, maxval, sum;
 	  
   if ( remap_order == 2 )
     cdoPrint("Second order mapping from grid1 to grid2:");
@@ -1459,9 +1458,9 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   cdoPrint("----------------------------------------");
 
   ns = 0;
-  sum = 0;
-  minval =  DBL_MAX;
-  maxval = -DBL_MAX;
+  double sum = 0;
+  double minval =  DBL_MAX;
+  double maxval = -DBL_MAX;
   for ( n = 0; n < src_grid.size; ++n )
     {
       if ( !DBL_IS_EQUAL(array1[n], missval) )
