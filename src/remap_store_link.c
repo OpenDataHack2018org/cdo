@@ -180,28 +180,32 @@ void weightlinks2remaplinks(long tgt_grid_size, weightlinks_t *weightlinks, rema
       rv->src_cell_add = (int*) Malloc(nlinks*sizeof(int));
       rv->tgt_cell_add = (int*) Malloc(nlinks*sizeof(int));
       rv->wts          = (double*) Malloc(nlinks*sizeof(double));
-
+      int *restrict src_cell_adds = rv->src_cell_add;
+      int *restrict tgt_cell_adds = rv->tgt_cell_add;
+      double *restrict wts = rv->wts;
+      
 #if defined(_OPENMP)
-#pragma omp parallel for schedule(dynamic) default(none) shared(rv,weightlinks,tgt_grid_size) 
+#pragma omp parallel for schedule(dynamic) default(none) shared(src_cell_adds,tgt_cell_adds,wts,weightlinks,tgt_grid_size) 
 #endif
       for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
 	{
 	  long num_links = weightlinks[tgt_cell_add].nlinks;
 	  if ( num_links )
 	    {
-	      long offset    = weightlinks[tgt_cell_add].offset;
-	      for ( long ilink = 0; ilink < num_links; ++ilink )
+	      long offset = weightlinks[tgt_cell_add].offset;
+              addweight_t *addweights = weightlinks[tgt_cell_add].addweights;
+ 	      for ( long ilink = 0; ilink < num_links; ++ilink )
 		{
-		  rv->src_cell_add[offset+ilink] = weightlinks[tgt_cell_add].addweights[ilink].add;
-		  rv->tgt_cell_add[offset+ilink] = tgt_cell_add;
-		  rv->wts[offset+ilink] = weightlinks[tgt_cell_add].addweights[ilink].weight;
+		  src_cell_adds[offset+ilink] = addweights[ilink].add;
+		  tgt_cell_adds[offset+ilink] = tgt_cell_add;
+		  wts[offset+ilink] = addweights[ilink].weight;
 		}
 #ifdef _OPENMP
-	      free(weightlinks[tgt_cell_add].addweights);
+	      free(addweights);
 #else
-          Free(weightlinks[tgt_cell_add].addweights);
+              Free(addweights);
 #endif
-        }
+            }
 	}
     }
 }
@@ -227,30 +231,33 @@ void weightlinks2remaplinks4(long tgt_grid_size, weightlinks4_t *weightlinks, re
       rv->src_cell_add = (int*) Malloc(nlinks*sizeof(int));
       rv->tgt_cell_add = (int*) Malloc(nlinks*sizeof(int));
       rv->wts          = (double*) Malloc(4*nlinks*sizeof(double));
+      int *restrict src_cell_adds = rv->src_cell_add;
+      int *restrict tgt_cell_adds = rv->tgt_cell_add;
+      double *restrict wts = rv->wts;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(rv,weightlinks,tgt_grid_size)
+#pragma omp parallel for default(none) shared(src_cell_adds,tgt_cell_adds,wts,weightlinks,tgt_grid_size)
 #endif
       for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
 	{
 	  long num_links = weightlinks[tgt_cell_add].nlinks;
 	  if ( num_links )
 	    {
-	      long offset    = weightlinks[tgt_cell_add].offset;
+	      long offset = weightlinks[tgt_cell_add].offset;
 	      addweight4_t *addweights = weightlinks[tgt_cell_add].addweights;
 	      for ( long ilink = 0; ilink < num_links; ++ilink )
 		{
-		  rv->src_cell_add[offset+ilink] = addweights[ilink].add;
-		  rv->tgt_cell_add[offset+ilink] = tgt_cell_add;
+		  src_cell_adds[offset+ilink] = addweights[ilink].add;
+		  tgt_cell_adds[offset+ilink] = tgt_cell_add;
 		  for ( long k = 0; k < 4; ++k )
-		    rv->wts[(offset+ilink)*4+k] = addweights[ilink].weight[k];
+		    wts[(offset+ilink)*4+k] = addweights[ilink].weight[k];
 		}
 #ifdef _OPENMP
-          free(addweights);
+              free(addweights);
 #else
 	      Free(addweights);
 #endif
-        }
+            }
 	}
     }
 }
