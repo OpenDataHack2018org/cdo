@@ -186,6 +186,9 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
   long tgt_grid_size = tgt_grid->size;
 
   weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
+  weightlinks[0].addweights = (addweight_t *) Malloc(4*tgt_grid_size*sizeof(addweight_t));
+  for ( unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+    weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4*tgt_cell_add;
 
   double findex = 0;
 
@@ -242,7 +245,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 	      /* Successfully found iw,jw - compute weights */
 	      set_bilinear_weights(iw, jw, wgts);
 
-	      store_weightlinks(1, 4, src_add, wgts, tgt_cell_add, weightlinks);
+	      store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
 	    }
           else
 	    {
@@ -264,12 +267,12 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
 	      tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
-	      store_weightlinks(1, 4, src_add, wgts, tgt_cell_add, weightlinks);
+	      store_weightlinks(0, 4, src_add, wgts, tgt_cell_add, weightlinks);
 	    }
         }
     }
 
-  weightlinks2remaplinks(1, tgt_grid_size, weightlinks, rv);
+  weightlinks2remaplinks(0, tgt_grid_size, weightlinks, rv);
 
   if ( weightlinks ) Free(weightlinks);
 
