@@ -1,3 +1,7 @@
+#if defined(_OPENMP)
+#include <omp.h> // omp_get_wtime
+#endif
+
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
@@ -378,9 +382,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
 #if defined(_OPENMP)
-  double omp_get_wtime(void);
   double start = 0;
-
   if ( cdoVerbose ) start = omp_get_wtime();
 #endif
 
@@ -485,9 +487,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
 #if defined(_OPENMP)
-  double omp_get_wtime(void);
   double start = 0;
-
   if ( cdoVerbose ) start = omp_get_wtime();
 #endif
 
