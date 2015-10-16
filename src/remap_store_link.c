@@ -149,7 +149,8 @@ void store_weightlinks4(unsigned num_weights, int *srch_add, double weights[4][4
 
   if ( num_weights )
     {
-      addweight4_t *addweights = (addweight4_t *) Malloc(num_weights*sizeof(addweight4_t));
+      addweight4_t *addweights = weightlinks[cell_add].addweights;
+
       for ( unsigned n = 0; n < num_weights; ++n )
 	{
 	  addweights[n].add       = srch_add[n];
@@ -159,7 +160,6 @@ void store_weightlinks4(unsigned num_weights, int *srch_add, double weights[4][4
 
       sort_addweights4(num_weights, addweights);
 
-      weightlinks[cell_add].addweights = addweights;
       weightlinks[cell_add].nlinks     = num_weights;
     }
 }
@@ -265,12 +265,9 @@ void weightlinks2remaplinks4(unsigned tgt_grid_size, weightlinks4_t *weightlinks
 		  for ( unsigned k = 0; k < 4; ++k )
 		    wts[(offset+ilink)*4+k] = addweights[ilink].weight[k];
 		}
-#ifdef _OPENMP
-              free(addweights);
-#else
-	      Free(addweights);
-#endif
             }
 	}
+
+      Free(weightlinks[0].addweights);
     }
 }

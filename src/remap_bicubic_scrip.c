@@ -105,6 +105,9 @@ void scrip_remap_bicubic_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   long tgt_grid_size = tgt_grid->size;
 
   weightlinks4_t *weightlinks = (weightlinks4_t *) Malloc(tgt_grid_size*sizeof(weightlinks4_t));
+  weightlinks[0].addweights = (addweight4_t *) Malloc(4*tgt_grid_size*sizeof(addweight4_t));
+  for ( unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+    weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + 4*tgt_cell_add;
 
   /* Loop over destination grid */
 

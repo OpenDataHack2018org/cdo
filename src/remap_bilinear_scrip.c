@@ -12,7 +12,7 @@
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 
-int find_ij_weights(double plon, double plat, double* restrict src_lats, double* restrict src_lons, double *ig, double *jg)
+int find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
 {
   int lfound = 0;
   long iter;                     /*  iteration counters   */
@@ -79,7 +79,7 @@ int find_ij_weights(double plon, double plat, double* restrict src_lats, double*
 
   if ( iter < remap_max_iter ) lfound = 1;
 
-  return (lfound);
+  return lfound;
 }
 
 static
@@ -104,7 +104,7 @@ int num_src_points(const int* restrict mask, const int src_add[4], double src_la
 	src_lats[n] = 0.;
     }
 
-  return (icount);
+  return icount;
 }
 
 static
@@ -146,7 +146,7 @@ void bilinear_warning(double plon, double plat, double iw, double jw, int* src_a
 }
 
 static
-void bilinear_remap(double* restrict tgt_point, const double* restrict src_array, const double wgts[4], const int src_add[4])
+void bilinear_remap(double* restrict tgt_point, const double *restrict src_array, const double wgts[4], const int src_add[4])
 {
   // *tgt_point = 0.;
   // for ( int n = 0; n < 4; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
