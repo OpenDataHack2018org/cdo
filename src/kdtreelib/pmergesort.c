@@ -106,6 +106,7 @@ mergesort_t(void *args)
             perror("pthread_create");
             return NULL;
         }
+
         pthread_join(thr[0], NULL);
         pthread_join(thr[1], NULL);
 

@@ -369,10 +369,20 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
   unsigned ny = src_grid->dims[1];
 
   weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
+  weightlinks[0].addweights = (addweight_t *) Malloc(num_neighbors*tgt_grid_size*sizeof(addweight_t));
+  for ( unsigned tgt_cell_add = 1; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
+    weightlinks[tgt_cell_add].addweights = weightlinks[0].addweights + num_neighbors*tgt_cell_add;
 
   int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
   int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+
+#if defined(_OPENMP)
+  double omp_get_wtime(void);
+  double start = 0;
+
+  if ( cdoVerbose ) start = omp_get_wtime();
+#endif
 
   struct gridsearch *gs = NULL;
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -381,6 +391,11 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
     gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
+
+#if defined(_OPENMP)
+  if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
+  if ( cdoVerbose ) start = omp_get_wtime();
+#endif
 
   /* Loop over destination grid  */
 
@@ -424,16 +439,20 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
       for ( unsigned n = 0; n < nadds; ++n )
         if ( nbr_mask[n] ) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
-      store_weightlinks(nadds, nbr_add, nbr_dist, tgt_cell_add, weightlinks);
+      store_weightlinks(0, nadds, nbr_add, nbr_dist, tgt_cell_add, weightlinks);
     }
 
   progressStatus(0, 1, 1);
 
   if ( gs ) gridsearch_delete(gs);
 
-  weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
+  weightlinks2remaplinks(0, tgt_grid_size, weightlinks, rv);
 
   if ( weightlinks ) Free(weightlinks);
+
+#if defined(_OPENMP)
+  if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime()-start);
+#endif
 
 }  /* scrip_remap_weights_distwgt */
 
@@ -465,9 +484,12 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
-  clock_t start;
+#if defined(_OPENMP)
+  double omp_get_wtime(void);
+  double start = 0;
 
-  start = clock();
+  if ( cdoVerbose ) start = omp_get_wtime();
+#endif
 
   struct gridsearch *gs = NULL;
   if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -477,9 +499,10 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   else
     gs = gridsearch_create(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
 
-  if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(clock()-start))/CLOCKS_PER_SEC);
-
-  start = clock();
+#if defined(_OPENMP)
+  if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", omp_get_wtime()-start);
+  if ( cdoVerbose ) start = omp_get_wtime();
+#endif
 
   /* Loop over destination grid  */
 
@@ -533,6 +556,8 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
 
   if ( gs ) gridsearch_delete(gs);
 
-  if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(clock()-start))/CLOCKS_PER_SEC);
+#if defined(_OPENMP)
+  if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", omp_get_wtime()-start);
+#endif
 
 }  /* scrip_remap_distwgt */

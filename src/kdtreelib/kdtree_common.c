@@ -184,6 +184,7 @@ kd_doBuildTree(void *threadarg)
     else                      qcomp = _compPoints2;
 
     pmergesort(points, nPoints, sizeof(struct kd_point), qcomp, max_threads);
+
     pivot = nPoints / 2;
     if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)
         return NULL;

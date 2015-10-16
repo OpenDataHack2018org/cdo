@@ -1065,7 +1065,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  tgt_grid->cell_frac[tgt_cell_add] += partial_weight;
 	}
 
-      store_weightlinks(num_weights, srch_add, partial_weights, tgt_cell_add, weightlinks);
+      store_weightlinks(1, num_weights, srch_add, partial_weights, tgt_cell_add, weightlinks);
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area; 
       // printf("area %d %g %g\n", tgt_cell_add, tgt_grid->cell_area[tgt_cell_add], tgt_area);
@@ -1110,7 +1110,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       Free(srch_add2[i]);
     }
 
-  weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
+  weightlinks2remaplinks(1, tgt_grid_size, weightlinks, rv);
 
   if ( weightlinks ) Free(weightlinks);
 

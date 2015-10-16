@@ -242,7 +242,7 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 	      /* Successfully found iw,jw - compute weights */
 	      set_bilinear_weights(iw, jw, wgts);
 
-	      store_weightlinks(4, src_add, wgts, tgt_cell_add, weightlinks);
+	      store_weightlinks(1, 4, src_add, wgts, tgt_cell_add, weightlinks);
 	    }
           else
 	    {
@@ -264,12 +264,12 @@ void scrip_remap_bilinear_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
 	      tgt_grid->cell_frac[tgt_cell_add] = 1.;
 
-	      store_weightlinks(4, src_add, wgts, tgt_cell_add, weightlinks);
+	      store_weightlinks(1, 4, src_add, wgts, tgt_cell_add, weightlinks);
 	    }
         }
     }
 
-  weightlinks2remaplinks(tgt_grid_size, weightlinks, rv);
+  weightlinks2remaplinks(1, tgt_grid_size, weightlinks, rv);
 
   if ( weightlinks ) Free(weightlinks);
 
