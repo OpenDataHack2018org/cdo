@@ -494,7 +494,6 @@ int get_lonlat_circle_index(remapgrid_t *remap_grid)
 }
 
 
-
 static
 void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 {
@@ -832,18 +831,12 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       if ( num_srch_cells > max_srch_cells )
 	{
-#ifdef _OPENMP
-      partial_areas   = (double*) realloc(partial_areas,   num_srch_cells*sizeof(double));
+          partial_areas   = (double*) realloc(partial_areas,   num_srch_cells*sizeof(double));
 	  partial_weights = (double*) realloc(partial_weights, num_srch_cells*sizeof(double));
-      overlap_buffer = (struct grid_cell*) realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
+          overlap_buffer = (struct grid_cell*) realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
 	  src_grid_cells = (struct grid_cell*) realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
-#else
-      partial_areas   = (double*) Realloc(partial_areas,   num_srch_cells*sizeof(double));
-	  partial_weights = (double*) Realloc(partial_weights, num_srch_cells*sizeof(double));
-      overlap_buffer = (struct grid_cell*) Realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
-	  src_grid_cells = (struct grid_cell*) Realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
-#endif
-	  	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
+
+          for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {
 	      overlap_buffer[n].array_size      = 0;
 	      overlap_buffer[n].num_corners     = 0;
@@ -858,16 +851,10 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	      src_grid_cells[n].array_size      = srch_corners;
 	      src_grid_cells[n].num_corners     = srch_corners;
 	      src_grid_cells[n].edge_type       = src_edge_type;
-#ifdef _OPENMP
 	      src_grid_cells[n].coordinates_x   = (double*) malloc(srch_corners*sizeof(double));
 	      src_grid_cells[n].coordinates_y   = (double*) malloc(srch_corners*sizeof(double));
 	      src_grid_cells[n].coordinates_xyz = (double*) malloc(3*srch_corners*sizeof(double));
-#else
-          src_grid_cells[n].coordinates_x   = (double*) Malloc(srch_corners*sizeof(double));
-	      src_grid_cells[n].coordinates_y   = (double*) Malloc(srch_corners*sizeof(double));
-	      src_grid_cells[n].coordinates_xyz = (double*) Malloc(3*srch_corners*sizeof(double));
-#endif
-        }
+            }
 
 	  max_srch_cells = num_srch_cells;
 
