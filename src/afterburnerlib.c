@@ -314,7 +314,7 @@ void after_GP2FC(double *gp, double *fc, long nlat, long nlon, long nlev, long n
 
   if ( ifax[9] != nlon )
     {
-      if ( trig ) free (trig);
+      if ( trig ) Free(trig);
       trig = (double *) Malloc(nlon * sizeof(double));
       fft_set (trig, ifax, nlon);
     }
@@ -330,7 +330,7 @@ void after_FC2GP(double *fc, double *gp, long nlat, long nlon, long nlev, long n
 
   if ( ifax[9] != nlon )
     {
-      if ( trig ) free (trig);
+      if ( trig ) Free(trig);
       trig = (double *) Malloc(nlon * sizeof(double));
       fft_set (trig, ifax, nlon);
     }

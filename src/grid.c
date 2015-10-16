@@ -1309,8 +1309,8 @@ int gridToUnstructured(int gridID1, int lbounds)
 	gridDefXvals(gridID2, xvals2D);
 	gridDefYvals(gridID2, yvals2D);
 
-	free(xvals2D);
-	free(yvals2D);
+        Free(xvals2D);
+        Free(yvals2D);
 
 	if ( lbounds )
 	  {
@@ -1358,15 +1358,15 @@ int gridToUnstructured(int gridID1, int lbounds)
 		gridDefXbounds(gridID2, xbounds2D);
 		gridDefYbounds(gridID2, ybounds2D);
 
-		free(xbounds);
-		free(ybounds);
-		free(xbounds2D);
-		free(ybounds2D);
+                Free(xbounds);
+                Free(ybounds);
+                Free(xbounds2D);
+                Free(ybounds2D);
 	      }
 	    }
 
-	free(xvals);
-	free(yvals);
+        Free(xvals);
+        Free(yvals);
 
 	gridCopyMask(gridID1, gridID2, gridsize);
 
@@ -1439,11 +1439,11 @@ int gridToUnstructured(int gridID1, int lbounds)
 	gridDefXunits(gridID2, "degrees_east");
 	gridDefYunits(gridID2, "degrees_north");
 
-	free (imask);
-	free (xvals);
-	free (yvals);
-	if ( xbounds ) free (xbounds);
-	if ( ybounds ) free (ybounds);
+        Free(imask);
+        Free(xvals);
+        Free(yvals);
+	if ( xbounds ) Free(xbounds);
+	if ( ybounds ) Free(ybounds);
 	
 	gridCopyMask(gridID1, gridID2, gridsize);
 

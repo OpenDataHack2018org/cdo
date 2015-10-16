@@ -201,8 +201,8 @@ void *Yhourarith(void *argument)
 	    Free(varnmiss2[houroy][varID]);
 	  }
 
-	free(vardata2[houroy]);
-	free(varnmiss2[houroy]);
+        Free(vardata2[houroy]);
+        Free(varnmiss2[houroy]);
       }
 
   if ( field1.ptr ) Free(field1.ptr);

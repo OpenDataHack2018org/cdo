@@ -516,7 +516,7 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
 	}
 	
       if( split_str ) 	  
-	free( split_str );
+        Free( split_str );
     }
       
     if( halt_flag == TRUE )

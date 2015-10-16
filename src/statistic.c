@@ -77,7 +77,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
   
   eigen_solution_of_triangular_matrix (eig_val, e, n, a, prompt);
   
-  free (e);
+  Free(e);
 
   for (i = 0; i < n; i++)
     for (j = i + 1; j < n; j++)
@@ -345,7 +345,7 @@ int solution_of_linear_equation (double **a, double *b, int n)
   if (not_singular)
     lu_backsubstitution (a, n, index, b);
   
-  free (index);
+  Free(index);
   
   return not_singular;
 }
@@ -377,8 +377,8 @@ int inverse_of_matrix (double **a, double **b, int n)
         }
     }
   
-  free (index);
-  free (col);
+  Free(index);
+  Free(col);
 
   return not_singular;
 }
@@ -448,7 +448,7 @@ int lu_decomposition (double **a, int n, int *index, int *sign)
         }
     }
 
-  free (v);
+  Free(v);
 
   return 1;
 }

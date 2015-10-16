@@ -293,7 +293,7 @@ void *Harmonic(void *argument)
   for ( j = 0; j < n_out; ++j )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	free(out[j][varID]);
+        Free(out[j][varID]);
 
       Free(out[j]);
     }
@@ -303,7 +303,7 @@ void *Harmonic(void *argument)
   for ( j = 0; j < n_out*2; ++j )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	free(work[j][varID]);
+        Free(work[j][varID]);
 
       Free(work[j]);
     }

@@ -452,8 +452,8 @@ void *Maskbox(void *argument)
 	    }
 	  fclose(fp); 
 	}
-      if ( xcoords ) free ( xcoords );
-      if ( ycoords ) free ( ycoords );
+      if ( xcoords ) Free( xcoords );
+      if ( ycoords ) Free( ycoords );
     }
 
   int tsID = 0;

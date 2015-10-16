@@ -174,8 +174,8 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 				float_param_list[i] = atof( split_str[i] );			
 			  }
 			mag_set1r( param_name, float_param_list, split_str_count );		
-			free( float_param_list );
-			free( split_str );
+			Free( float_param_list );
+			Free( split_str );
 		  }
 
 	  }
@@ -200,8 +200,8 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 				int_param_list[i] = atoi( split_str[i] );			
 			}
 			mag_set1i( param_name, int_param_list, split_str_count );		
-			free( int_param_list );
-			free( split_str );
+			Free( int_param_list );
+			Free( split_str );
 		  }
 	  }
 
@@ -229,7 +229,7 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 		  fprintf( stderr, "Input strarr is %s split str count is %d Sep char is %s\n",param_value, split_str_count, sep_char );
 		
 		mag_set1c( param_name, (const char**)split_str, split_str_count );		
-		free( split_str );
+		Free( split_str );
 	  }
 	else 
 	  {

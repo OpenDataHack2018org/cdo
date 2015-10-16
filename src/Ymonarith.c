@@ -202,8 +202,8 @@ void *Ymonarith(void *argument)
 	    Free(varnmiss2[mon][varID]);
 	  }
 
-	free(vardata2[mon]);
-	free(varnmiss2[mon]);
+        Free(vardata2[mon]);
+        Free(varnmiss2[mon]);
       }
 
   if ( field1.ptr ) Free(field1.ptr);

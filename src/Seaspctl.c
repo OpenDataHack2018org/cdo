@@ -234,7 +234,7 @@ void *Seaspctl(void *argument)
     {
       nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevels; levelID++ )
-	free(vars1[varID][levelID].ptr);
+        Free(vars1[varID][levelID].ptr);
       Free(vars1[varID]);
     }
 

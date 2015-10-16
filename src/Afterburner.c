@@ -147,7 +147,7 @@ void FreeMean(struct Variable *vars)
   for ( int code = 0; code < MaxCodes; code++ )
     if ( vars[code].mean )
       {
-	free(vars[code].mean);
+        Free(vars[code].mean);
 	vars[code].mean = NULL;
       }
 }

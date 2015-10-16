@@ -158,7 +158,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
            if( !strcmp( split_str[0],"step_freq" ) )
 	     fprintf( stderr,"STEP_FREQ %d\n",STEP_FREQ );
 
-           Free( split_str );
+           Free(split_str);
         }
     }
 
@@ -449,7 +449,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   mag_text();
 
   if( LEV_LIST ) 
-    Free( LEV_LIST );
+    Free(LEV_LIST);
 
 
 }
@@ -936,7 +936,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 		                 {
 		                    LEV_LIST[k] = atof( split_str1[k] );
 		                 }
-	                       Free( split_str1 );
+	                       Free(split_str1);
 	                    }
 			  }
 		      }
@@ -960,8 +960,8 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
 	}
 	
-      if( split_str ) 	  
-	free( split_str );
+      if ( split_str ) 	  
+        Free(split_str);
     } /*** Loop over params ****/
       
     if( halt_flag == TRUE )
@@ -991,7 +991,7 @@ int checkcolour( char *colour_in )
 	if( strchr( colour_in,';') == NULL || strstr( colour_in,"RGB(") == NULL )
 	  {
 	    cdoWarning( "Found 'RGB=true',Specify Colour in 'RGB(r;g;b)' ( where r,g,b in [0.0,1.0] ) format!" );
-	    Free( split_str );
+	    Free(split_str);
 	    return 1;
 	  }
 	  
@@ -1020,7 +1020,7 @@ int checkcolour( char *colour_in )
 	if(  split_str_count != 3 ) 
 	  {
 	    cdoWarning( " Colour specified in Improper format!" );
-	    Free( split_str );
+	    Free(split_str);
 	    return 1;
 	  }
     
@@ -1032,18 +1032,18 @@ int checkcolour( char *colour_in )
 	    rgb_values[0] + rgb_values[1] + rgb_values[2] < 0.0f 	   )
 	  {
 	    cdoWarning( " RGB Colour specified with Improper values!" );
-	    Free( split_str );
+	    Free(split_str);
 	    return 1;
 	  }
 	  
-	free( split_str );  
+        Free(split_str);  
       }
     else
       {
 	if( strchr( colour_in,';') != NULL || strstr( colour_in,"RGB(") != NULL )
 	  {
 	    cdoWarning( "Found Colour with 'RGB(r;g;b)' format, set parameter RGB='true' !" );
-	    Free( split_str );
+	    Free(split_str);
 	    return 1;
 	  }
 	  

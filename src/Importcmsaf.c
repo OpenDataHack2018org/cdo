@@ -1027,21 +1027,21 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    {
 	      H5Aread(attr, atype_mem, attstring);
 	      if ( ((datasets_t *) opdata)->obj[nset].description )
-		free(((datasets_t *) opdata)->obj[nset].description);
+                Free(((datasets_t *) opdata)->obj[nset].description);
 	      ((datasets_t *) opdata)->obj[nset].description = strdup(attstring);
 	    }
 	  else if ( strcmp(attname, "title") == 0 )
 	    {
 	      H5Aread(attr, atype_mem, attstring);
 	      if ( ((datasets_t *) opdata)->obj[nset].title )
-		free(((datasets_t *) opdata)->obj[nset].title);
+                Free(((datasets_t *) opdata)->obj[nset].title);
 	      ((datasets_t *) opdata)->obj[nset].title = strdup(attstring);
 	    }
 	  else if ( strcmp(attname, "time") == 0 )
 	    {
 	      H5Aread(attr, atype_mem, attstring);
 	      if ( ((datasets_t *) opdata)->obj[nset].time )
-		free(((datasets_t *) opdata)->obj[nset].time);
+                Free(((datasets_t *) opdata)->obj[nset].time);
 	      ((datasets_t *) opdata)->obj[nset].time = strdup(attstring);
 	    }
 	  else if ( strcmp(attname, "unit") == 0 )

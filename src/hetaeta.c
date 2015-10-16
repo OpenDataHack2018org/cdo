@@ -839,7 +839,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   if ( nvars > 0 )
     {
       for ( iv = 0; iv < nvars; ++iv )
-	free(vars_pbl[iv]);
+        Free(vars_pbl[iv]);
 
       Free(vars_pbl);
     }

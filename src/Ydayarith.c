@@ -176,8 +176,8 @@ void *Ydayarith(void *argument)
 	    Free(varnmiss2[day][varID]);
 	  }
 
-	free(vardata2[day]);
-	free(varnmiss2[day]);
+        Free(vardata2[day]);
+        Free(varnmiss2[day]);
       }
 
   if ( field1.ptr ) Free(field1.ptr);

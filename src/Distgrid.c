@@ -334,7 +334,7 @@ void *Distgrid(void *argument)
       Free(grids[i].gridsize);
 
       for ( index = 0; index < nsplit; index++ )
-	free(grids[i].gridindex[index]);
+        Free(grids[i].gridindex[index]);
       Free(grids[i].gridindex);
     }
   Free(grids);
