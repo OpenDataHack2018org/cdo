@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-10-17  Uwe Schulzweida
+
+	* diff: set checkrel=TRUE
+
 2015-10-11  Uwe Schulzweida
 
 	* removed obsolate  option -p

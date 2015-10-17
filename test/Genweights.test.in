@@ -9,6 +9,7 @@ test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
 ABSLIMMAX=0.001
+ABSLIMDIS=0.2
 ABSLIMYCON=0.25
 CDOOUT=cout
 CDOERR=cerr
@@ -28,6 +29,7 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
     if [ "$USER" = "m214003" ]; then RMODS="dis nn $RMODS"; fi
     for RMOD in $RMODS; do
       ABSLIM=$ABSLIMMAX
+      if [ $RMOD = dis ];  then ABSLIM=$ABSLIMDIS; fi
       if [ $RMOD = ycon ]; then ABSLIM=$ABSLIMYCON; fi
       RSTAT=0
       OFILE=${GRID}_${RMOD}
