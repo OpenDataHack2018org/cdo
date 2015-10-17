@@ -33,7 +33,7 @@ void nbr_store_distance(int nadd, double distance, int num_neighbors, int *restr
       int n, nchk;
       for ( nchk = 0; nchk < num_neighbors; ++nchk )
 	{
-	  if ( distance < nbr_dist[nchk] )
+	  if ( distance < nbr_dist[nchk] || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]) )
 	    {
 	      for ( n = num_neighbors-1; n > nchk; --n )
 		{

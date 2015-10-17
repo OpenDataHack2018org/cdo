@@ -228,10 +228,9 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
   gs->n = n;
-
   if ( n == 0 ) return gs;
 
-   gs->kdt = gs_create_kdtree(n, lons, lats);
+  gs->kdt  = gs_create_kdtree(n, lons, lats);
 
   return gs;
 }
@@ -423,14 +422,28 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
   float point[3];
   float range0 = gs_set_range(prange);
   float range = range0;
+  struct pqueue *result = NULL;
 
   LLtoXYZ_f(lon, lat, point);
 
-  struct pqueue *result = kd_qnearest(gs->kdt, point, &range, nnn, 3);
-  // printf("range %g %g %g %p\n", lon, lat, range, node);
+  if ( gs )
+    {
+      result = kd_qnearest(gs->kdt, point, &range, nnn, 3);
+      // printf("range %g %g %g %p\n", lon, lat, range, node);
 
-  if ( !(range < range0) ) result = NULL;
-  if ( prange ) *prange = range;
-
+      if ( !(range < range0) )
+        {
+          if ( result )
+            {
+              struct resItem *p;
+              while ( pqremove_min(result, &p) ) Free(p); // Free the result node taken from the heap
+              Free(result->d); // free the heap
+              Free(result);    // and free the heap information structure
+            }
+          result = NULL;
+        }
+      if ( prange ) *prange = range;
+    }
+  
   return result;
 }
