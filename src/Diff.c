@@ -46,7 +46,7 @@ void *Diff(void *argument)
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
   double absdiff;
-  double abslim = 0., abslim2 = 1.e-3, rellim = 0.5;
+  double abslim = 0., abslim2 = 1.e-3, rellim = 1.0;
   double absm, relm;
   double missval1, missval2;
 
@@ -59,8 +59,10 @@ void *Diff(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorArgc() == 1 ) abslim = parameter2double(operatorArgv()[0]);
+  if ( operatorArgc() >= 1 ) abslim = parameter2double(operatorArgv()[0]);
   if ( abslim < -1.e33 || abslim > 1.e+33 ) cdoAbort("Abs. limit out of range\n");
+  if ( operatorArgc() == 2 ) rellim = parameter2double(operatorArgv()[1]);
+  if ( rellim < -1.e33 || rellim > 1.e+33 ) cdoAbort("Rel. limit out of range\n");
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int streamID2 = streamOpenRead(cdoStreamName(1));
@@ -107,7 +109,7 @@ void *Diff(void *argument)
 	  missval2 = vlistInqVarMissval(vlistID2, varID2);
 
 	  //checkrel = gridInqType(gridID) != GRID_SPECTRAL;
-          checkrel = FALSE;
+          checkrel = TRUE;
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
@@ -152,7 +154,7 @@ void *Diff(void *argument)
 
 	  if ( ! cdoSilentMode || cdoVerbose )
 	    {
-	      if ( absm > abslim || (checkrel && relm > rellim) || cdoVerbose )
+	      if ( absm > abslim || (checkrel && relm >= rellim) || cdoVerbose )
 		{
 		  if ( lhead )
 		    {
@@ -213,8 +215,8 @@ void *Diff(void *argument)
 	    }
 
 	  ngrec++;
-	  if ( absm > abslim  || (checkrel && relm > rellim) ) ndrec++;
-	  if ( absm > abslim2 || (checkrel && relm > rellim) ) nd2rec++;
+	  if ( absm > abslim  || (checkrel && relm >= rellim) ) ndrec++;
+	  if ( absm > abslim2 || (checkrel && relm >= rellim) ) nd2rec++;
 	}
       tsID++;
     }
