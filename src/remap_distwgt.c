@@ -284,13 +284,12 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
     double plat,         ! latitude  of the search point
     double plon,         ! longitude of the search point
   */
-  /*  Local variables */
-  int n;
+
   double search_radius = get_search_radius();
 
   /* Initialize distance and address arrays */
-  for ( n = 0; n < num_neighbors; ++n ) nbr_add[n]  = -1;
-  for ( n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
+  for ( int n = 0; n < num_neighbors; ++n ) nbr_add[n]  = -1;
+  for ( int n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
 
   int ndist = num_neighbors;
   ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
