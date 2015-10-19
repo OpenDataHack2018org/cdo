@@ -22,7 +22,7 @@
 
 #define SWAP(a, b) {t = (a); (a) = (b); (b) = t;}
 
-double nth_element(double array[], int length, int n)
+double nth_element(double *array, int length, int n)
 {
   int i, j, k = 0, l = length-1, m;
   double a,t;

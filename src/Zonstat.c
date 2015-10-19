@@ -70,8 +70,8 @@ void *Zonstat(void *argument)
       operatorInputArg("percentile number");
       pn = parameter2int(operatorArgv()[0]);
       
-      if ( pn < 1 || pn > 99 )
-        cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+      if ( pn < 1 || pn > 100 )
+        cdoAbort("Illegal argument: percentile number %d is not in the range 1..100!", pn);
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));

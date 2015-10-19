@@ -34,6 +34,6 @@
  * @author Ralf Quast
  * @version 1.0
  */
-double nth_element(double array[], int length, int n);
+double nth_element(double *array, int length, int n);
 
 #endif /*NTH_ELEMENT_H_*/
