@@ -85,10 +85,11 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Copy_netcdf.test.in $(srcdir)/Cat.test.in \
 	$(srcdir)/Gridarea.test.in $(srcdir)/Genweights.test.in \
 	$(srcdir)/Remap.test.in $(srcdir)/Select.test.in \
-	$(srcdir)/Spectral.test.in $(srcdir)/Timstat.test.in \
-	$(srcdir)/Vertint.test.in $(srcdir)/Afterburner.test.in \
-	$(srcdir)/Detrend.test.in $(srcdir)/Arith.test.in \
-	$(srcdir)/Gradsdes.test.in $(srcdir)/wildcard.test.in README
+	$(srcdir)/Spectral.test.in $(srcdir)/Ymonstat.test.in \
+	$(srcdir)/Timstat.test.in $(srcdir)/Vertint.test.in \
+	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
+	$(srcdir)/Arith.test.in $(srcdir)/Gradsdes.test.in \
+	$(srcdir)/wildcard.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -101,9 +102,9 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Cat.test Gridarea.test Genweights.test \
-	Remap.test Select.test Spectral.test Timstat.test Vertint.test \
-	Afterburner.test Detrend.test Arith.test Gradsdes.test \
-	wildcard.test
+	Remap.test Select.test Spectral.test Ymonstat.test \
+	Timstat.test Vertint.test Afterburner.test Detrend.test \
+	Arith.test Gradsdes.test wildcard.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -513,8 +514,8 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 
 # tests which should pass
 TESTS = File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test \
-        Genweights.test Remap.test Select.test Spectral.test Timstat.test Vertint.test Afterburner.test Arith.test \
-        Gradsdes.test wildcard.test
+        Genweights.test Remap.test Select.test Spectral.test Ymonstat.test Timstat.test Vertint.test \
+        Afterburner.test Arith.test Gradsdes.test wildcard.test
 
 
 #        $(top_srcdir)/test/test_Remap.sh \
@@ -582,6 +583,8 @@ Remap.test: $(top_builddir)/config.status $(srcdir)/Remap.test.in
 Select.test: $(top_builddir)/config.status $(srcdir)/Select.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Spectral.test: $(top_builddir)/config.status $(srcdir)/Spectral.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Ymonstat.test: $(top_builddir)/config.status $(srcdir)/Ymonstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Timstat.test: $(top_builddir)/config.status $(srcdir)/Timstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

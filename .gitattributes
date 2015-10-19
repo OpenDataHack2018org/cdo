@@ -701,6 +701,7 @@ test/Select.test.in -text
 test/Spectral.test.in -text
 test/Timstat.test.in -text
 test/Vertint.test.in -text
+test/Ymonstat.test.in -text
 test/bm_Remap.sh -text
 test/data/Makefile.am -text
 test/data/Makefile.in -text
@@ -762,6 +763,15 @@ test/data/timsum_ref -text
 test/data/timvar1_ref -text
 test/data/timvar_ref -text
 test/data/ts_mm_5years -text
+test/data/ymonavg_ref -text
+test/data/ymonmax_ref -text
+test/data/ymonmean_ref -text
+test/data/ymonmin_ref -text
+test/data/ymonstd1_ref -text
+test/data/ymonstd_ref -text
+test/data/ymonsum_ref -text
+test/data/ymonvar1_ref -text
+test/data/ymonvar_ref -text
 test/grid_search/bisection_search.c -text
 test/grid_search/bnd_circle.c -text
 test/grid_search/bucket_search.c -text

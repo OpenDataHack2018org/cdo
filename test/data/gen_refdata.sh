@@ -6,6 +6,16 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Ymonstat
+#
+STATS="min max sum avg mean std std1 var var1"
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT ymon$STAT $IFILE ymon${STAT}_ref
+done
+exit
+########################################################################
+#
 # Test File
 #
 $CDO $FORMAT cdiwrite,1,global_10,3,3,3 file_F32_srv_ref
