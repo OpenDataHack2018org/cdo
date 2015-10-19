@@ -90,8 +90,8 @@ libcdo_la_SOURCES =            \
                operator_help.h \
                par_io.c        \
                par_io.h        \
-               percentiles.c   \
-               percentiles.h   \
+               percentiles_hist.c   \
+               percentiles_hist.h   \
                pipe.c          \
                pipe.h          \
                pragma_omp_atomic_update.h \

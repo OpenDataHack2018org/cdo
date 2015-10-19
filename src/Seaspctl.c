@@ -26,7 +26,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "percentiles.h"
+#include "percentiles_hist.h"
 #include "util.h"
 
 

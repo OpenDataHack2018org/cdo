@@ -15,8 +15,8 @@
   GNU General Public License for more details.
 */
 
-#ifndef PERCENTILES_H_
-#define PERCENTILES_H_
+#ifndef PERCENTILES_HIST_H_
+#define PERCENTILES_HIST_H_
 
 #include "field.h"
 
@@ -47,4 +47,4 @@ void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const fi
 void hsetAddVarLevelValues(HISTOGRAM_SET *histField, int varID, int levelID, const field_t *field);
 void hsetGetVarLevelPercentiles(field_t *field, const HISTOGRAM_SET *hset, int varID, int levelID, double pn); 
 
-#endif /*PERCENTILES_H_*/
+#endif /* PERCENTILES_HIST_H_ */

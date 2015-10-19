@@ -628,8 +628,8 @@ src/nth_element.h -text
 src/operator_help.h -text
 src/par_io.c -text
 src/par_io.h -text
-src/percentiles.c -text
-src/percentiles.h -text
+src/percentiles_hist.c -text
+src/percentiles_hist.h -text
 src/pipe.c -text
 src/pipe.h -text
 src/pragma_omp_atomic_update.h -text

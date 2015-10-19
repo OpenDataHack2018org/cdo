@@ -23,7 +23,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "nth_element.h"
-#include "percentiles.h"
+#include "percentiles_hist.h"
 
 #define NBINS_DEFAULT   101
 #define NBINS_MINIMUM    11

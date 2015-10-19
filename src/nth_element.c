@@ -45,12 +45,9 @@ double nth_element(double *array, int length, int n)
           m = (k+l) >> 1; 
           SWAP(array[m],array[k+1]);
           
-          if ( array[k] > array[l] ) 
-            SWAP(array[k], array[l])
-          if ( array[k+1] > array[l] ) 
-            SWAP(array[k+1], array[l])
-          if ( array[k] > array[k+1] ) 
-            SWAP(array[k], array[k+1])
+          if ( array[k]   > array[l] )   SWAP(array[k],   array[l])
+          if ( array[k+1] > array[l] )   SWAP(array[k+1], array[l])
+          if ( array[k]   > array[k+1] ) SWAP(array[k],   array[k+1])
 
           i = k+1; 
           j = l;
