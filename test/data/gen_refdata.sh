@@ -6,9 +6,30 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Fldpctl
+#
+IFILE=t21_geosp_tsurf.grb
+PCTLS="1 20 25 33 50 66 75 80 99 100"
+for PCTL in $PCTLS; do
+  $CDO $FORMAT fldpctl,$PCTL $IFILE fldpctl${PCTL}_ref
+done
+rm -f $IFILE
+exit
+########################################################################
+#
+# Fldstat
+#
+STATS="min max sum avg mean std std1 var var1"
+IFILE=t21_geosp_tsurf.grb
+for STAT in $STATS; do
+  $CDO $FORMAT fld$STAT $IFILE fld${STAT}_ref
+done
+exit
+########################################################################
+#
 # Enspctl
 #
-IFILE=ts_mm_5years
+IFILE=ts_mm_5year
 export CDO_FILE_SUFFIX=NULL
 $CDO splityear $IFILE ts_year
 IFILE="ts_year????"
