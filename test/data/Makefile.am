@@ -6,6 +6,7 @@ GRIB_REF     = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile0
 NETCDF_REF   = netcdf_testfile01_sinfon_ref netcdf_testfile01_infon_ref netcdf_testfile02_sinfon_ref netcdf_testfile02_infon_ref
 YMONSTAT_REF = ymonmin_ref ymonmax_ref ymonsum_ref ymonavg_ref ymonmean_ref ymonstd_ref ymonstd1_ref ymonvar_ref ymonvar1_ref
 TIMSTAT_REF  = timmin_ref timmax_ref timsum_ref timavg_ref timmean_ref timstd_ref timstd1_ref timvar_ref timvar1_ref
+ENSSTAT_REF  = enspctl1_ref enspctl20_ref enspctl25_ref enspctl33_ref enspctl50_ref enspctl66_ref enspctl75_ref enspctl80_ref enspctl99_ref enspctl100_ref
 SPECTRAL_REF = sp2gp_ref sp2gpl_ref gp2sp_ref gp2spl_ref
 VERTINT_REF  = ml2pl_ref
 REMAP_REF    = n16_bic_ref n16_bil_ref n16_con_ref n16_ycon_ref n16_laf_ref n16_nn_ref n16_dis_ref \
@@ -14,4 +15,4 @@ SELECT_REF   = select1_ref select2_ref select3_ref select4_ref select5_ref
 DETREND_REF  = detrend_ref
 GRADSDES_REF = pl_data.ctl pl_data.gmp
 
-EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(YMONSTAT_REF) $(TIMSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(GRADSDES_REF)
+EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(YMONSTAT_REF) $(TIMSTAT_REF) $(ENSSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(GRADSDES_REF)

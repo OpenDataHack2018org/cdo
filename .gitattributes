@@ -687,6 +687,7 @@ test/Arith.test.in -text
 test/Cat.test.in -text
 test/Copy_netcdf.test.in -text
 test/Detrend.test.in -text
+test/Ensstat.test.in -text
 test/File.test.in -text
 test/Genweights.test.in -text
 test/Gradsdes.test.in -text
@@ -708,6 +709,16 @@ test/data/Makefile.in -text
 test/data/bathy4.grb -text
 test/data/detrend_data -text
 test/data/detrend_ref -text
+test/data/enspctl100_ref -text
+test/data/enspctl1_ref -text
+test/data/enspctl20_ref -text
+test/data/enspctl25_ref -text
+test/data/enspctl33_ref -text
+test/data/enspctl50_ref -text
+test/data/enspctl66_ref -text
+test/data/enspctl75_ref -text
+test/data/enspctl80_ref -text
+test/data/enspctl99_ref -text
 test/data/file_F32_srv_ref -text
 test/data/gen_refdata.sh -text
 test/data/gp2sp_ref -text

@@ -21232,7 +21232,9 @@ ac_config_files="$ac_config_files test/File.test test/Read_grib.test test/Read_n
 
 ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test"
 
-ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Ymonstat.test test/Timstat.test test/Vertint.test"
+ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test"
+
+ac_config_files="$ac_config_files test/Ymonstat.test test/Ensstat.test test/Enspctl.test"
 
 ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arith.test test/Gradsdes.test"
 
@@ -22397,9 +22399,11 @@ do
     "test/Remap.test") CONFIG_FILES="$CONFIG_FILES test/Remap.test" ;;
     "test/Select.test") CONFIG_FILES="$CONFIG_FILES test/Select.test" ;;
     "test/Spectral.test") CONFIG_FILES="$CONFIG_FILES test/Spectral.test" ;;
-    "test/Ymonstat.test") CONFIG_FILES="$CONFIG_FILES test/Ymonstat.test" ;;
     "test/Timstat.test") CONFIG_FILES="$CONFIG_FILES test/Timstat.test" ;;
     "test/Vertint.test") CONFIG_FILES="$CONFIG_FILES test/Vertint.test" ;;
+    "test/Ymonstat.test") CONFIG_FILES="$CONFIG_FILES test/Ymonstat.test" ;;
+    "test/Ensstat.test") CONFIG_FILES="$CONFIG_FILES test/Ensstat.test" ;;
+    "test/Enspctl.test") CONFIG_FILES="$CONFIG_FILES test/Enspctl.test" ;;
     "test/Afterburner.test") CONFIG_FILES="$CONFIG_FILES test/Afterburner.test" ;;
     "test/Detrend.test") CONFIG_FILES="$CONFIG_FILES test/Detrend.test" ;;
     "test/Arith.test") CONFIG_FILES="$CONFIG_FILES test/Arith.test" ;;
@@ -23907,9 +23911,11 @@ _LT_EOF
     "test/Remap.test":F) chmod a+x "$ac_file" ;;
     "test/Select.test":F) chmod a+x "$ac_file" ;;
     "test/Spectral.test":F) chmod a+x "$ac_file" ;;
-    "test/Ymonstat.test":F) chmod a+x "$ac_file" ;;
     "test/Timstat.test":F) chmod a+x "$ac_file" ;;
     "test/Vertint.test":F) chmod a+x "$ac_file" ;;
+    "test/Ymonstat.test":F) chmod a+x "$ac_file" ;;
+    "test/Ensstat.test":F) chmod a+x "$ac_file" ;;
+    "test/Enspctl.test":F) chmod a+x "$ac_file" ;;
     "test/Afterburner.test":F) chmod a+x "$ac_file" ;;
     "test/Detrend.test":F) chmod a+x "$ac_file" ;;
     "test/Arith.test":F) chmod a+x "$ac_file" ;;

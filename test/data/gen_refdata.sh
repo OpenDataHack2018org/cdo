@@ -6,6 +6,20 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Enspctl
+#
+IFILE=ts_mm_5years
+export CDO_FILE_SUFFIX=NULL
+$CDO splityear $IFILE ts_year
+IFILE="ts_year????"
+PCTLS="1 20 25 33 50 66 75 80 99 100"
+for PCTL in $PCTLS; do
+  $CDO $FORMAT enspctl,$PCTL $IFILE enspctl${PCTL}_ref
+done
+rm -f $IFILE
+exit
+########################################################################
+#
 # Ymonstat
 #
 STATS="min max sum avg mean std std1 var var1"
