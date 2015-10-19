@@ -687,6 +687,7 @@ test/Arith.test.in -text
 test/Cat.test.in -text
 test/Copy_netcdf.test.in -text
 test/Detrend.test.in -text
+test/Enspctl.test.in -text
 test/Ensstat.test.in -text
 test/File.test.in -text
 test/Genweights.test.in -text
