@@ -540,18 +540,16 @@ double fldpctl(field_t field, const int p)
   const int    nmiss   = field.nmiss;
   const double missval = field.missval;
   double *array  = field.ptr;
-  double *array2;
-
-  size_t i, j;
   double pctl = missval;
 
   if ( len - nmiss > 0 )
     {
       if ( nmiss > 0 )
         {
-          array2 = (double*) Malloc((len - nmiss)*sizeof(double));
+          double *array2 = (double*) Malloc((len - nmiss)*sizeof(double));
 
-          for ( i = 0, j = 0; i < len; i++ ) 
+          size_t j = 0;
+          for ( size_t i = 0; i < len; i++ ) 
             if ( !DBL_IS_EQUAL(array[i], missval) )
               array2[j++] = array[i];
 
