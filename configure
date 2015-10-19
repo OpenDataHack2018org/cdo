@@ -21234,7 +21234,7 @@ ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweigh
 
 ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test"
 
-ac_config_files="$ac_config_files test/Ymonstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test"
+ac_config_files="$ac_config_files test/Ymonstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test"
 
 ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arith.test test/Gradsdes.test"
 
@@ -22402,6 +22402,7 @@ do
     "test/Timstat.test") CONFIG_FILES="$CONFIG_FILES test/Timstat.test" ;;
     "test/Vertint.test") CONFIG_FILES="$CONFIG_FILES test/Vertint.test" ;;
     "test/Ymonstat.test") CONFIG_FILES="$CONFIG_FILES test/Ymonstat.test" ;;
+    "test/Fldstat.test") CONFIG_FILES="$CONFIG_FILES test/Fldstat.test" ;;
     "test/Fldpctl.test") CONFIG_FILES="$CONFIG_FILES test/Fldpctl.test" ;;
     "test/Ensstat.test") CONFIG_FILES="$CONFIG_FILES test/Ensstat.test" ;;
     "test/Enspctl.test") CONFIG_FILES="$CONFIG_FILES test/Enspctl.test" ;;
@@ -23915,6 +23916,7 @@ _LT_EOF
     "test/Timstat.test":F) chmod a+x "$ac_file" ;;
     "test/Vertint.test":F) chmod a+x "$ac_file" ;;
     "test/Ymonstat.test":F) chmod a+x "$ac_file" ;;
+    "test/Fldstat.test":F) chmod a+x "$ac_file" ;;
     "test/Fldpctl.test":F) chmod a+x "$ac_file" ;;
     "test/Ensstat.test":F) chmod a+x "$ac_file" ;;
     "test/Enspctl.test":F) chmod a+x "$ac_file" ;;

@@ -690,6 +690,8 @@ test/Detrend.test.in -text
 test/Enspctl.test.in -text
 test/Ensstat.test.in -text
 test/File.test.in -text
+test/Fldpctl.test.in -text
+test/Fldstat.test.in -text
 test/Genweights.test.in -text
 test/Gradsdes.test.in -text
 test/Gridarea.test.in -text
