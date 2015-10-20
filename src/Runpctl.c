@@ -25,7 +25,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "nth_element.h"
+#include "percentiles.h"
 
 
 void *Runpctl(void *argument)
@@ -135,7 +135,7 @@ void *Runpctl(void *argument)
                   
                   if ( j > 0 )
                     {
-                      vars1[0][varID][levelID].ptr[i] = nth_element(array, j, (int)ceil(j*(pn/100.0))-1);
+                      vars1[0][varID][levelID].ptr[i] = percentile(array, j, pn);
                     }
                   else
                     {
