@@ -18,7 +18,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include <cdi.h>
-#include "nth_element.h"
+#include "percentiles.h"
 
 
 void zonfun(field_t field1, field_t *field2, int function)
@@ -461,20 +461,19 @@ void zonstd1(field_t field1, field_t *field2)
 /* RQ */
 void zonpctl(field_t field1, field_t *field2, int p)
 {
-  long   i, j, l, nx, ny;
+  long   i, j, l;
   int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
   double *array  = field1.ptr;
-  double *array2;
 
-  nx = gridInqXsize(grid);
-  ny = gridInqYsize(grid);
+  long nx = gridInqXsize(grid);
+  long ny = gridInqYsize(grid);
   
   if ( nmiss > 0 )
     {
-      array2 = (double*) Malloc(nx*sizeof(double));
+      double *array2 = (double*) Malloc(nx*sizeof(double));
       
       for ( j = 0; j < ny; j++ )
         {
@@ -484,7 +483,7 @@ void zonpctl(field_t field1, field_t *field2, int p)
 	    
           if ( l > 0 )
             {
-              field2->ptr[j] = nth_element(array2, l, (int)ceil(l*(p/100.0))-1);
+              field2->ptr[j] = percentile(array2, l, p);
             }
           else
             {
@@ -501,7 +500,7 @@ void zonpctl(field_t field1, field_t *field2, int p)
         {
           if ( nx > 0 )
             {
-              field2->ptr[j] = nth_element(&array[j*nx], nx, (int)ceil(nx*(p/100.0))-1);
+              field2->ptr[j] = percentile(&array[j*nx], nx, p);
             }
           else
             {
