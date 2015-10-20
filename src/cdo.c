@@ -169,6 +169,8 @@ void cdo_usage(void)
 #if defined(_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
+  fprintf(stderr, "    --percentile <method>\n");
+  fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
   fprintf(stderr, "    -Q             Alphanumeric sorting of netCDF parameter names\n");
   fprintf(stderr, "    --reduce_dim   Reduce netCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
