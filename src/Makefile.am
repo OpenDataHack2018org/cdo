@@ -92,6 +92,8 @@ libcdo_la_SOURCES =            \
                par_io.h        \
                percentiles_hist.c   \
                percentiles_hist.h   \
+               percentiles.c   \
+               percentiles.h   \
                pipe.c          \
                pipe.h          \
                pragma_omp_atomic_update.h \
