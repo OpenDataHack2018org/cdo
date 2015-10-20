@@ -18,10 +18,8 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include <cdi.h>
-/* RQ */
-#include "nth_element.h"
+#include "percentiles.h"
 #include "merge_sort2.h"
-/* QR */
 
 double crps_det_integrate(double *a, const double d, const size_t n);
 
@@ -553,13 +551,13 @@ double fldpctl(field_t field, const int p)
             if ( !DBL_IS_EQUAL(array[i], missval) )
               array2[j++] = array[i];
 
-          pctl = nth_element(array2, j, (int)ceil(j*(p/100.0))-1);
+          pctl = percentile(array2, j, p);
 
           Free(array2);
         }
       else
         {
-          pctl = nth_element(array, len, (int)ceil(len*(p/100.0))-1);
+          pctl = percentile(array, len, p);
         }
     }
 
