@@ -6,10 +6,10 @@
 
 double percentile(double *array, unsigned len, double pn)
 {
-  int element = (int)ceil(len*(pn/100.0))-1;
-  if ( element <    0 ) element = 0;
-  if ( element >= len ) element = len-1;
-  double percentil = nth_element(array, len, element);
+  int rank = (int)ceil(len*(pn/100.0));
+  if ( rank <   1 ) rank = 1;
+  if ( rank > len ) rank = len;
+  double percentil = nth_element(array, len, rank-1);
   return percentil;
 }
 
