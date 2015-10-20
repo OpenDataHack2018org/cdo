@@ -319,7 +319,10 @@ const char *processInqPrompt(void)
 {
   int processID = processSelf();
 
-  return (Process[processID].prompt);
+  const char *prompt = "cdo";
+  if (Process[processID].prompt[0] ) prompt = Process[processID].prompt;
+
+  return prompt;
 }
 
 #if defined(HAVE_GLOB_H)
