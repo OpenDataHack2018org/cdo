@@ -22,7 +22,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "nth_element.h"
+#include "percentiles.h"
 #include "percentiles_hist.h"
 
 #define NBINS_DEFAULT   101
@@ -127,7 +127,6 @@ static int histAddValue(HISTOGRAM *hist, double value)
 
 static double histGetPercentile(const HISTOGRAM *hist, double p)
 {
-  double s, t;
   int i = 0, count = 0;
   
   assert( hist != NULL );
@@ -136,10 +135,11 @@ static double histGetPercentile(const HISTOGRAM *hist, double p)
   assert( p >= 0 );
   assert( p <= 100 );
   
-  s = hist->nsamp * (p / 100.0);
   
   if ( hist->nsamp > DBL_CAPACITY(hist->nbins) )
     { 
+      double s = hist->nsamp * (p / 100.0);
+
       do count += INT_PTR(hist->ptr)[i++]; while ( count < s );
   
       assert( i > 0 );
@@ -147,12 +147,12 @@ static double histGetPercentile(const HISTOGRAM *hist, double p)
       assert( INT_PTR(hist->ptr)[i - 1] > 0 );
       assert( hist->step > 0.0 );
   
-      t = (count - s) / INT_PTR(hist->ptr)[i - 1];
+      double t = (count - s) / INT_PTR(hist->ptr)[i - 1];
       return hist->min + (i - t) * hist->step;
     }
   else
     {
-      return (double)nth_element(DBL_PTR(hist->ptr), hist->nsamp, (int)ceil(s) - 1);
+      return percentile(DBL_PTR(hist->ptr), hist->nsamp, p);
     } 
 }
 
