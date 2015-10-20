@@ -277,6 +277,7 @@ doc/tex/mod/Zonstat -text
 doc/tex/mod/chdoc -text
 doc/tex/mod/syntax -text
 doc/tex/partab.tex -text
+doc/tex/percentile.tex -text
 doc/tex/poster/sab-cdo_2011/MPG_SF.pdf -text svneol=unset#unset
 doc/tex/poster/sab-cdo_2011/MPIM_SF.pdf -text
 doc/tex/poster/sab-cdo_2011/beamerthemeMPIMET.sty -text
