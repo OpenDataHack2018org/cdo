@@ -46,7 +46,6 @@ void *Zonstat(void *argument)
   int index;
   int recID, nrecs;
   int varID, levelID;
-  int pn = 0;
 
   cdoInitialize(argument);
 
@@ -65,13 +64,12 @@ void *Zonstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
+  double pn = 0;
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
-      pn = parameter2int(operatorArgv()[0]);
-      
-      if ( pn < 1 || pn > 100 )
-        cdoAbort("Illegal argument: percentile number %d is not in the range 1..100!", pn);
+      pn = parameter2double(operatorArgv()[0]);
+      percentile_check_number(pn);
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));

@@ -57,9 +57,7 @@ void *Seaspctl(void *argument)
 
   operatorInputArg("percentile number");
   double pn = parameter2double(operatorArgv()[0]);
-      
-  if ( !(pn > 0 && pn < 100) )
-    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
+  percentile_check_number(pn);
 
   season_start = get_season_start();
 

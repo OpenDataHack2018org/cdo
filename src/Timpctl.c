@@ -54,9 +54,7 @@ void timpctl(int operatorID)
   
   operatorInputArg("percentile number");
   double pn = parameter2double(operatorArgv()[0]);
-      
-  if ( !(pn >= 0 && pn <= 100) )
-    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
+  percentile_check_number(pn);
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 

@@ -51,11 +51,9 @@ void *Runpctl(void *argument)
 
   operatorInputArg("percentile number, number of timesteps");
   operatorCheckArgc(2);
-  int pn     = parameter2int(operatorArgv()[0]);
+  double pn  = parameter2double(operatorArgv()[0]);
+  percentile_check_number(pn);
   int ndates = parameter2int(operatorArgv()[1]);
-
-  if ( pn < 1 || pn > 100 )
-    cdoAbort("Illegal argument: percentile number %d is not in the range 1..100!", pn);
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

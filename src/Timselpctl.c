@@ -55,13 +55,11 @@ void *Timselpctl(void *argument)
   if ( nargc < 2 ) cdoAbort("Too few arguments! Need %d found %d.", 2, nargc);
 
   double pn  = parameter2double(operatorArgv()[0]);
+  percentile_check_number(pn);
   int ndates = parameter2int(operatorArgv()[1]);
   int noffset = 0, nskip = 0;
   if ( nargc > 2 ) noffset = parameter2int(operatorArgv()[2]);
   if ( nargc > 3 ) nskip   = parameter2int(operatorArgv()[3]);
-
-  if ( !(pn > 0 && pn < 100) )
-    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 

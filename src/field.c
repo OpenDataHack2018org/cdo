@@ -532,7 +532,7 @@ void varrms(field_t field, field_t field2, field_t *field3)
 }
 
 /* RQ */
-double fldpctl(field_t field, const int p)
+double fldpctl(field_t field, const double pn)
 {
   const size_t len     = field.size;
   const int    nmiss   = field.nmiss;
@@ -551,13 +551,13 @@ double fldpctl(field_t field, const int p)
             if ( !DBL_IS_EQUAL(array[i], missval) )
               array2[j++] = array[i];
 
-          pctl = percentile(array2, j, p);
+          pctl = percentile(array2, j, pn);
 
           Free(array2);
         }
       else
         {
-          pctl = percentile(array, len, p);
+          pctl = percentile(array, len, pn);
         }
     }
 

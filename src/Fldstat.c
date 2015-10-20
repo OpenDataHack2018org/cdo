@@ -96,7 +96,6 @@ void *Fldstat(void *argument)
   int nmiss;
   double sglval;
   field_t field;
-  int pn = 0;
 
   cdoInitialize(argument);
 
@@ -115,13 +114,12 @@ void *Fldstat(void *argument)
   int operfunc    = cdoOperatorF1(operatorID);
   int needWeights = cdoOperatorF2(operatorID);
 
+  double pn = 0;
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
-      pn = parameter2int(operatorArgv()[0]);
-      
-      if ( pn < 1 || pn > 100 )
-        cdoAbort("Illegal argument: percentile number %d is not in the range 1..100!", pn);
+      pn = parameter2double(operatorArgv()[0]);
+      percentile_check_number(pn);
     }
 
   int useweights = TRUE;

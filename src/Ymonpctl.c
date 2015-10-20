@@ -59,17 +59,14 @@ void *Ymonpctl(void *argument)
   int vdates2[NMONTH];
   field_t **vars1[NMONTH];
   field_t field;
-  double pn;
   HISTOGRAM_SET *hsets[NMONTH];
 
   cdoInitialize(argument);
   cdoOperatorAdd("ymonpctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number");
-  pn = parameter2double(operatorArgv()[0]);
-      
-  if ( !(pn > 0 && pn < 100) )
-    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
+  double pn = parameter2double(operatorArgv()[0]);
+  percentile_check_number(pn);
 
   for ( month = 0; month < NMONTH; month++ )
     {

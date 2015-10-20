@@ -67,10 +67,8 @@ void *Ydrunpctl(void *argument)
   operatorInputArg("percentile number, number of timesteps");
   operatorCheckArgc(2);
   double pn  = parameter2double(operatorArgv()[0]);
+  percentile_check_number(pn);
   int ndates = parameter2int(operatorArgv()[1]);
-
-  if ( !(pn > 0 && pn < 100) )
-    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
   
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     {

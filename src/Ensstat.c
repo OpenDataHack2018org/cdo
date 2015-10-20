@@ -55,7 +55,6 @@ void *Ensstat(void *argument)
     double missval;
     double *array;
   } ens_file_t;
-  int pn = 0;
 
   cdoInitialize(argument);
 
@@ -75,13 +74,13 @@ void *Ensstat(void *argument)
 
   int argc = operatorArgc();
   int nargc = argc;
+
+  double pn = 0;
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
       pn = parameter2int(operatorArgv()[0]);
-      
-      if ( pn < 1 || pn > 100 )
-        cdoAbort("Illegal argument: percentile number %d is not in the range 1..100!", pn);
+      percentile_check_number(pn);
       argc--;
     }
 

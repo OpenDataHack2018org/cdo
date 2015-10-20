@@ -18,6 +18,8 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+#include <stdio.h>
+#include "percentiles.h"
 
 /* dummy use of unused parameters to silence compiler warnings */
 #define  UNUSED(x) (void)x

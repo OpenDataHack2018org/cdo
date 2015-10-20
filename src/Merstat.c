@@ -46,7 +46,6 @@ void *Merstat(void *argument)
   int recID, nrecs;
   int varID, levelID;
   int needWeights = FALSE;
-  int pn = 0;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);
@@ -65,16 +64,13 @@ void *Merstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  /* RQ */
+  double pn = 0;
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
-      pn = parameter2int(operatorArgv()[0]);
-      
-      if ( pn < 1 || pn > 100 )
-        cdoAbort("Illegal argument: percentile number %d is not in the range 1..100!", pn);
+      pn = parameter2double(operatorArgv()[0]);
+      percentile_check_number(pn);
     }
-  /* QR */
 
   if ( operfunc == func_mean || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std ||

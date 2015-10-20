@@ -88,7 +88,7 @@ double fldstd(field_t field);
 double fldstd1(field_t field);
 double fldvar(field_t field);
 double fldvar1(field_t field);
-double fldpctl(field_t field, const int k);
+double fldpctl(field_t field, const double pn);
 void   fldunm(field_t *field);
 int    fldhvs(field_t *field, const size_t nlevels);
 
