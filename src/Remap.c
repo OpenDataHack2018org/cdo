@@ -826,7 +826,7 @@ void *Remap(void *argument)
         {
           gridID2 = cdoDefineGrid(operatorArgv()[0]);
           int inum = parameter2int(operatorArgv()[1]);
-          if ( inum < 1 || inum > 9 ) cdoAbort("Number of nearest neighbors out of range (1-9)!", inum);
+          //  if ( inum < 1 || inum > 9 ) cdoAbort("Number of nearest neighbors out of range (1-9)!", inum);
           num_neighbors = inum;
         }
       else
