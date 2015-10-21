@@ -6,6 +6,8 @@ Version 1.7.0 (28 October 2015):
    New features:
      * added support for netCDF Scalar Coordinate Variables
      * added support for hybrid sigma pressure coordinates following the CF convention
+     * added option --percentile to select different percentile methods
+       Available methods: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest
      * distgrid: added support for curvilinear grids
      * collgrid: added support for curvilinear grids
    New operators:
