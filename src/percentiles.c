@@ -58,9 +58,10 @@ double percentile_numpy(double *array, int len, double pn)
       else
         {
           int irank = 0;
-          if      ( interpolation_method == LOWER   ) irank = (int) rank;
-          else if ( interpolation_method == HIGHER  ) irank = (int) rank + 1;
-          else if ( interpolation_method == NEAREST ) irank = (int) lround(rank);
+          if      ( interpolation_method == LOWER   ) irank = (int) floor(rank);
+          else if ( interpolation_method == HIGHER  ) irank = (int) ceil(rank);
+          else if ( interpolation_method == NEAREST ) irank = (int) round(rank);
+          // numpy is using around(), with rounds to the nearest even value
 
           if ( irank <   1 ) irank = 1;
           if ( irank > len ) irank = len;
@@ -105,5 +106,36 @@ void percentile_set_method(const char *methodstr)
 void percentile_check_number(double pn)
 {
   if ( pn < 0 || pn > 100 )
-    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
+    cdoAbort("Percentile number %g out of range! Percentiles must be in the range [0,100].", pn);
 }
+
+/*
+  CDO check
+#/bin/sh
+CDO=cdo
+#
+cdo -f nc input,r5x1 testfile <<EOF
+ 15 20 35 40 50
+EOF
+cdo -f nc input,r6x1 testfile <<EOF
+ 15 20 35 40 50 55
+EOF
+#
+PERS="30 40 50 75 100"
+METS="nrank nist numpy numpy_lower numpy_higher numpy_nearest"
+#
+for MET in $METS; do
+    for PER in $PERS; do
+        echo "$MET: $PER"
+        $CDO -s --percentile $MET output -fldpctl,$PER testfile 
+    done
+done
+*/
+/*
+  numpy check
+#python with numpy 1.9.0
+import numpy as np
+np.version.version
+a=np.array([15, 20, 35, 40, 50, 55])
+for p in [30, 40, 50, 75, 100] : print np.percentile(a, p, interpolation='linear')
+*/
