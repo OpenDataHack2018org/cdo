@@ -1,3 +1,77 @@
 \section{Percentile}
 
+There is no standard definition of percentile.
+All definitions yield to similar results when the number of values is very large.
+The following percentile methods are available in {\CDO}:
+
+\vspace{2mm}
+\hspace{2cm}
+\begin{tabular}[c]{|>{\columncolor{pcolor1}}l|l|}
+\hline
+\rowcolor{pcolor1}
+\cellcolor{pcolor2}
+Percentile            & \\
+\rowcolor{pcolor1}
+\cellcolor{pcolor2}
+method               & \multirow{-2}{*}{Description} \\
+\hline
+ nrank                  & Nearest Rank method, the default method used in {\CDO} \\
+\hline
+ nist                     & The primary method recommended by NIST \\
+\hline
+ numpy                & numpy.percentile with the option interpolation set to 'linear' \\
+\hline
+ numpy\_lower    & numpy.percentile with the option interpolation set to 'lower' \\
+\hline
+ numpy\_higher   & numpy.percentile with the option interpolation set to 'higher' \\
+\hline
+ numpy\_nearest & numpy.percentile with the option interpolation set to 'nearest' \\
+\hline
+\end{tabular}
+
+\vspace{3mm}
+
+The percentile method can be selected with the {\CDO} option {\tt -\,-percentile}.
+The Nearest Rank method is the default percentile method in {\CDO}.
+
+The different percentile methods can lead to different results,
+especially for small number of data values.
+Consider the ordered list \{15, 20, 35, 40, 50, 55\}, which contains six
+data values.
+Here is the result for  the 30th, 40th, 50th, 75th and 100th percentiles of
+this list using the different percentile methods:
+
+\vspace{2mm}
+\hspace{2cm}
+\begin{tabular}[c]{|>{\columncolor{pcolor1}}c|c|c|c|c|c|c|}
+\hline
+\rowcolor{pcolor1}
+\cellcolor{pcolor2}
+Percentile &      &  & & numpy & numpy & numpy \\
+\rowcolor{pcolor1}
+\cellcolor{pcolor2}
+ P              &  \multirow{-2}{*}{nrank}  &  \multirow{-2}{*}{nist}  &   \multirow{-2}{*}{numpy}  & lower   & higher & nearest \\
+\hline
+30th              &   20   &   21.5    &    27.5      &  20      &   35  &  35  \\
+\hline
+40th              &   35   &   32       &    35        &  35      &   40   & 35 \\
+\hline
+50th              &   35    &  37.5     &   37.5      &  35      &  40    & 40  \\
+\hline
+75th              &   50    &  51.25     &   47.5    &  40      &  50    & 50 \\
+\hline 
+100th            &   55    &  55          &   55        &  55      &  55     &  55 \\
+\hline
+\end{tabular}
+
+\vspace{3mm}
+
 \subsection{Percentile over timesteps}
+
+The amount of data for time series can be very large.
+All data values need to held in memory to calculate the percentile.
+The percentile over timesteps uses a histogram algorithm, to limit the
+amount of required memory. The default number of histogram bins is 101.
+That means the histogram algorithm is used, when the dataset has more than 101 time steps.
+The default can be overridden by setting the environment variable {\tt CDO\_PCTL\_NBINS} to a different value.
+The histogram algorithm is implemented only for the Nearest Rank method.
