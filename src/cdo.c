@@ -1094,12 +1094,12 @@ int parse_options_long(int argc, char *argv[])
             }
           else if ( lgridsearchradius )
             {
-              extern double remap_search_radius;
+              extern double gridsearch_radius;
               double fval = atof(CDO_optarg);
               if ( fval < 0 || fval > 180 )
                 cdoAbort("gridsearchradius=%g out of bounds (0-180)", fval);
               else
-                remap_search_radius = fval;
+                gridsearch_radius = fval;
             }
           else if ( lremap_genweights )
             {

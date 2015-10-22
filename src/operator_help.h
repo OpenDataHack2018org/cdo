@@ -3473,11 +3473,11 @@ static const char *RemapnnHelp[] = {
     "    grid  STRING  Target grid description file or name",
     "",
     "ENVIRONMENT",
-    "    REMAP_EXTRAPOLATE",
+    "    REMAP_EXTRAPOLATE    ",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for this remapping method.",
-    "    CDO_REMAP_RADIUS ",
-    "        Remap search radius in degree, default 180 degree.",
+    "    CDO_GRIDSEARCH_RADIUS",
+    "        Grid search radius in degree, default 180 degree.",
     NULL
 };
 
@@ -3510,11 +3510,11 @@ static const char *RemapdisHelp[] = {
     "    neighbors  INTEGER  Number of nearest neighbors",
     "",
     "ENVIRONMENT",
-    "    REMAP_EXTRAPOLATE",
+    "    REMAP_EXTRAPOLATE    ",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for this remapping method.",
-    "    CDO_REMAP_RADIUS ",
-    "        Remap search radius in degree, default 180 degree.",
+    "    CDO_GRIDSEARCH_RADIUS",
+    "        Grid search radius in degree, default 180 degree.",
     NULL
 };
 
@@ -3699,21 +3699,21 @@ static const char *RemapHelp[] = {
     "    weights  STRING  Interpolation weights (SCRIP netCDF file)",
     "",
     "ENVIRONMENT",
-    "    CDO_REMAP_NORM   ",
+    "    CDO_REMAP_NORM       ",
     "        This variable is used to choose the normalization of the conservative interpolation. ",
     "        By default CDO_REMAP_NORM is set to 'fracarea'. 'fracarea' uses the sum of the",
     "        non-masked source cell intersected areas to normalize each target cell field value.",
     "        This results in a reasonable flux value but the flux is not locally conserved.",
     "        The option 'destarea' uses the total target cell area to normalize each target cell",
     "        field value. Local flux conservation is ensured, but unreasonable flux values may result.",
-    "    REMAP_EXTRAPOLATE",
+    "    REMAP_EXTRAPOLATE    ",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for remapdis, remapnn and for circular grids.",
-    "    REMAP_AREA_MIN   ",
+    "    REMAP_AREA_MIN       ",
     "        This variable is used to set the minimum destination area fraction. The default",
     "        of this variable is 0.0.",
-    "    CDO_REMAP_RADIUS ",
-    "        Remap search radius in degree, default 180 degree.",
+    "    CDO_GRIDSEARCH_RADIUS",
+    "        Grid search radius in degree, default 180 degree.",
     NULL
 };
 

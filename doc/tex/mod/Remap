@@ -50,8 +50,8 @@ By default the extrapolation is enabled for remapdis, remapnn and for circular g
 @Item = REMAP_AREA_MIN
 This variable is used to set the minimum destination area fraction. The default
 of this variable is 0.0.
-@Item = CDO_REMAP_RADIUS
-Remap search radius in degree, default 180 degree.
+@Item = CDO_GRIDSEARCH_RADIUS
+Grid search radius in degree, default 180 degree.
 @EndEnvironment
 
 

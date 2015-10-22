@@ -352,9 +352,9 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
-  extern double remap_search_radius;
+  extern double gridsearch_radius;
   double findex = 0;
-  double search_radius = remap_search_radius*DEG2RAD;
+  double search_radius = gridsearch_radius*DEG2RAD;
   double range = SQR(2*search_radius);
 
 #pragma omp parallel for default(none) shared(findex, mindex, vindex, array1, array2, xvals, yvals, range, gs, nmiss)

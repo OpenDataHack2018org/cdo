@@ -252,7 +252,7 @@ void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_
 
 
 double remap_threshhold = 2;
-double remap_search_radius = 180;
+double gridsearch_radius = 180;
 int remap_test = 0;
 int remap_order = 1;
 int remap_non_global = FALSE;
@@ -373,14 +373,31 @@ void get_remap_env(void)
 	}
       else
 	{
-	  remap_search_radius = fval;
+	  gridsearch_radius = fval;
 	  if ( cdoVerbose )
-	    cdoPrint("Set CDO_REMAP_RADIUS to %g", remap_search_radius);
+	    cdoPrint("Set CDO_REMAP_RADIUS to %g", gridsearch_radius);
+	}
+    }
+
+  envstr = getenv("CDO_GRIDSEARCH_RADIUS");
+  if ( envstr )
+    {
+      double fval;
+      fval = atof(envstr);
+      if ( fval < 0 || fval > 180 )
+	{
+	  cdoAbort("CDO_GRIDSEARCH_RADIUS=%g out of bounds (0-180)", fval);
+	}
+      else
+	{
+	  gridsearch_radius = fval;
+	  if ( cdoVerbose )
+	    cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", gridsearch_radius);
 	}
     }
   
   if ( cdoVerbose )
-    cdoPrint("remap_radius = %g", remap_search_radius);
+    cdoPrint("remap_radius = %g", gridsearch_radius);
 
   envstr = getenv("REMAP_AREA_MIN");
   if ( envstr )

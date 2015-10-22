@@ -113,9 +113,9 @@ unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const in
 static
 double get_search_radius(void)
 {
-  extern double remap_search_radius;
+  extern double gridsearch_radius;
 
-  double search_radius = remap_search_radius;
+  double search_radius = gridsearch_radius;
 
   if ( search_radius <    0. ) search_radius = 0.;
   if ( search_radius >  180. ) search_radius = 180.;
@@ -302,7 +302,7 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 
   int ndist = num_neighbors;
   ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
-  if ( ndist > gs->n ) ndist = gs->n;
+  if ( ndist > (int)gs->n ) ndist = gs->n;
   double dist[ndist];
   int    adds[ndist];
 
