@@ -129,6 +129,7 @@ double get_search_radius(void)
    This routine finds the closest num_neighbor points to a search 
    point and computes a distance to each of the neighbors.
 */
+#define MAX_SEARCH_CELLS 25
 static
 void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t *src_grid, int *restrict nbr_add, double *restrict nbr_dist, 
 			   double plat, double plon, const int *restrict src_grid_dims)
@@ -149,7 +150,9 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
   int n, nadd;
   long ii, jj;
   int i, j, ix;
-  int src_add[25];
+  int src_add[MAX_SEARCH_CELLS];
+  int *src_add_tmp = NULL;
+  int *psrc_add = src_add;
   int num_add = 0;
   double distance;   //  Angular distance
   double cos_search_radius = cos(get_search_radius());
@@ -179,8 +182,24 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
     {
       if ( src_grid->is_cyclic && ii == (nxm-1) ) ii = 0;
 
-      for ( j = (jj-2); j <= (jj+2); ++j )
-	for ( i = (ii-2); i <= (ii+2); ++i )
+      long k;
+      for ( k = 3; k < 10000; k+=2 )
+        if ( num_neighbors <= ((k-2)*(k-2)) ) break;
+
+      if ( (k*k) > MAX_SEARCH_CELLS ) psrc_add = src_add_tmp = (int *) malloc(k*k*sizeof(int));
+
+      k /= 2;
+
+      int j0 = jj-k;
+      int jn = jj+k;
+      int i0 = ii-k;
+      int in = ii+k;
+      if ( j0 < 0 ) j0 = 0;
+      if ( jn >= ny ) jn = ny-1;
+      if ( (in-i0) > nx ) { i0 = 0; in = nx-1; }
+      
+      for ( j = j0; j <= jn; ++j )
+	for ( i = i0; i <= in; ++i )
 	  {
 	    ix = i;
 	    
@@ -191,20 +210,8 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
 	      }
 
 	    if ( ix >= 0 && ix < nx && j >= 0 && j < ny )
-	      src_add[num_add++] = j*nx+ix;
+	      psrc_add[num_add++] = j*nx+ix;
 	  }
-      /*
-      num_add = 0;
-
-      for ( j = (jj-1); j <= jj; ++j )
-	for ( i = (ii-1); i <= ii; ++i )
-	  {
-	    ix = i;
-	    if ( src_grid->is_cyclic && ix == (nxm-1) ) ix = 0;
-
-	    src_add[num_add++] = j*nx+ix;
-	  }
-      */
     }
 
   /* Initialize distance and address arrays */
@@ -220,7 +227,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
 
       for ( int na = 0; na < num_add; ++na )
 	{
-	  nadd = src_add[na];
+	  nadd = psrc_add[na];
 
 	  iy = nadd/nx;
 	  ix = nadd - iy*nx;
@@ -243,6 +250,8 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
 	}
 
       nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
+
+      if ( src_add_tmp ) free(src_add_tmp);
     }
   else if ( src_grid->lextrapolate )
     {
@@ -293,6 +302,7 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 
   int ndist = num_neighbors;
   ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
+  if ( ndist > gs->n ) ndist = gs->n;
   double dist[ndist];
   int    adds[ndist];
 
