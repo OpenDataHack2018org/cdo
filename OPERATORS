@@ -164,6 +164,7 @@ Operator catalog:
    Setmiss       setrtomiss      Set range to missing value
    Setmiss       setvrange       Set valid range
    Setmiss       setmisstonn     Set missing value to nearest neighbor
+   Setmiss       setmisstodis    Set missing value to distance-weighted average
 -------------------------------------------------------------
    Arithmetic
 -------------------------------------------------------------

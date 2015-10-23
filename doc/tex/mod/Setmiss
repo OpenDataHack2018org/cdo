@@ -4,7 +4,7 @@
 @Title     = Set missing value
 @Section   = Modification
 @Arguments = ifile ofile
-@Operators = setmissval setctomiss setmisstoc setrtomiss setvrange setmisstonn
+@Operators = setmissval setctomiss setmisstoc setrtomiss setvrange setmisstonn setmisstodis
 
 @BeginDescription
 This module sets part of a field to missing value or missing values
@@ -153,22 +153,35 @@ o(t,x) = \left\{
 @EndOperator
 
 
+@BeginOperator_setmisstodis
+@Title     = Set missing value to distance-weighted average
+@Parameter = [neighbors]
+
+@BeginDescription
+Set all missing values to the distance-weighted average of the nearest non missing values.
+The default number of nearest neighbors is 4.
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginParameter rmax
+@Item = neighbors
+INTEGER  Number of nearest neighbors
 @Item = newmiss
-FLOAT  New missing value
+FLOAT    New missing value
 @Item = c
-FLOAT  Constant
+FLOAT    Constant
 @Item = rmin
-FLOAT  Lower bound
+FLOAT    Lower bound
 @Item = rmax
-FLOAT  Upper bound
+FLOAT    Upper bound
 @EndParameter
 
 
 @BeginExample
-Assume an input dataset has one field with temperatures
-in the range from 246 to 304 Kelvin. To set all values
-below 273.15 Kelvin to missing value use:
+Assume an input dataset has one field with temperatures in the range from 246 to 304 Kelvin.
+To set all values below 273.15 Kelvin to missing value use:
 @BeginVerbatim
    cdo setrtomiss,0,273.15 ifile ofile
 @EndVerbatim
