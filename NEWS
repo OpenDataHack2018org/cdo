@@ -14,6 +14,7 @@ Version 1.7.0 (28 October 2015):
      * remapycon: First order conservative remapping (new implementation of remapcon)
      * genycon: Generate 1st order conservative remap weights (new implementation of gencon)
      * setmisstonn: Set missing value to nearest neightbor
+     * setmisstodis: Set missing value to the distance-weighted average of the nearest neighbors
      * ap2pl: Interpolate 3D variables on hybrid sigma height coordinates to pressure levels
      * vertstd1: Vertical standard deviation [Divisor is (n-1)]
      * vertvar1: Vertical variance [Divisor is (n-1)]

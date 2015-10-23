@@ -65,32 +65,45 @@ void nbr_check_distance(unsigned num_neighbors, const int *restrict nbr_add, dou
     }
 }
 
-static
+
 double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist)
 {
   /* Compute weights based on inverse distance if mask is false, eliminate those points */
 
   double dist_tot = 0.; /* sum of neighbor distances (for normalizing) */
 
-  for ( unsigned n = 0; n < num_neighbors; ++n )
+  if ( src_grid_mask )
     {
-      // printf("tgt_cell_add %ld %ld %d %g\n", tgt_cell_add, n, nbr_add[n], nbr_dist[n]);
-      nbr_mask[n] = FALSE;
-
-      /* Uwe Schulzweida: check if nbr_add is valid */
-      if ( nbr_add[n] >= 0 )
-        if ( src_grid_mask[nbr_add[n]] )
-          {
-            nbr_dist[n] = ONE/nbr_dist[n];
-            dist_tot = dist_tot + nbr_dist[n];
-            nbr_mask[n] = TRUE;
-          }
+      for ( unsigned n = 0; n < num_neighbors; ++n )
+        {
+          nbr_mask[n] = FALSE;
+          if ( nbr_add[n] >= 0 )
+            if ( src_grid_mask[nbr_add[n]] )
+              {
+                nbr_dist[n] = ONE/nbr_dist[n];
+                dist_tot = dist_tot + nbr_dist[n];
+                nbr_mask[n] = TRUE;
+              }
+        }
+    }
+  else
+    {
+      for ( unsigned n = 0; n < num_neighbors; ++n )
+        {
+          nbr_mask[n] = FALSE;
+          if ( nbr_add[n] >= 0 )
+            {
+              nbr_dist[n] = ONE/nbr_dist[n];
+              dist_tot = dist_tot + nbr_dist[n];
+              nbr_mask[n] = TRUE;
+            }
+        }
     }
 
   return dist_tot;
 }
 
-static
+
 unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist)
 {
   /* Normalize weights and store the link */
@@ -132,7 +145,7 @@ double get_search_radius(void)
 #define MAX_SEARCH_CELLS 25
 static
 void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t *src_grid, int *restrict nbr_add, double *restrict nbr_dist, 
-			   double plat, double plon, const int *restrict src_grid_dims)
+			   double plon, double plat, const int *restrict src_grid_dims)
 {
   /*
     Output variables:
@@ -279,8 +292,8 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
     }
 }  /*  grid_search_nbr_reg2d  */
 
-static
-void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plat, double plon)
+
+void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat)
 {
   /*
     Output variables:
@@ -435,16 +448,14 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
       /* Find nearest grid points on source grid and distances to each point */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add, nbr_dist, 
-			      plat, plon, src_grid->dims);
+			      plon, plat, src_grid->dims);
       else
-        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plat, plon);
+        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plon, plat);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
-
       double dist_tot = nbr_compute_weights(num_neighbors, src_grid->mask, nbr_mask, nbr_add, nbr_dist);
 
       /* Normalize weights and store the link */
-
       unsigned nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
 
       for ( unsigned n = 0; n < nadds; ++n )
@@ -541,16 +552,14 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
       /* Find nearest grid points on source grid and distances to each point */
       if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	grid_search_nbr_reg2d(gs, num_neighbors, src_grid, nbr_add, nbr_dist, 
-			      plat, plon, src_grid->dims);
+			      plon, plat, src_grid->dims);
       else
-        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plat, plon);
+        grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, plon, plat);
       
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
-
       double dist_tot = nbr_compute_weights(num_neighbors, src_grid->mask, nbr_mask, nbr_add, nbr_dist);
 
       /* Normalize weights and store the link */
-
       unsigned nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
 
       for ( unsigned n = 0; n < nadds; ++n )

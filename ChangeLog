@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.0
 	* Version 1.7.0 released
 
+2015-10-23  Uwe Schulzweida
+
+	* New operator: setmisstodis - Set missing value to the distance-weighted average of the nearest neighbors
+
 2015-10-17  Uwe Schulzweida
 
 	* diff: set checkrel=TRUE

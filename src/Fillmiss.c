@@ -271,14 +271,17 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
 }
 
 
-void setmisstonn(field_t *field1, field_t *field2, int maxfill)
+void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist);
+unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
+
+static
+void setmisstodis(field_t *field1, field_t *field2, int num_neighbors)
 {
   int gridID = field1->grid;
   double missval = field1->missval;
   double *array1 = field1->ptr;
   double *array2 = field2->ptr;
-
-  UNUSED(maxfill);
 
   unsigned gridsize = gridInqSize(gridID);
 
@@ -319,6 +322,7 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
   unsigned nv = 0, nm = 0;
   for ( unsigned i = 0; i < gridsize; ++i ) 
     {
+      array2[i] = array1[i];
       if ( DBL_IS_EQUAL(array1[i], missval) )
         {
           mindex[nm] = i;
@@ -326,7 +330,6 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
         }
       else
         {
-          array2[i] = array1[i];
           lons[nv] = xvals[i];
           lats[nv] = yvals[i];
           vindex[nv] = i;
@@ -335,14 +338,23 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
     }
 
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
+  
+  int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
+  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
+  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
   clock_t start, finish;
-
   start = clock();
 
   struct gridsearch *gs = NULL;
 
-  if ( nmiss ) gs = gridsearch_create_nn(nvals, lons, lats);
+  if ( nmiss )
+    {
+      if ( num_neighbors == 1 )
+        gs = gridsearch_create_nn(nvals, lons, lats);
+      else
+        gs = gridsearch_create(nvals, lons, lats);
+    }
   
   finish = clock();
 
@@ -352,12 +364,10 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
   start = clock();
 
-  extern double gridsearch_radius;
   double findex = 0;
-  double search_radius = gridsearch_radius*DEG2RAD;
-  double range = SQR(2*search_radius);
 
-#pragma omp parallel for default(none) shared(findex, mindex, vindex, array1, array2, xvals, yvals, range, gs, nmiss)
+#pragma omp parallel for default(none) shared(findex, mindex, vindex, array1, array2, xvals, yvals, gs, nmiss, num_neighbors) \
+                                      private(nbr_mask, nbr_add, nbr_dist)
   for ( unsigned i = 0; i < nmiss; ++i )
     {
 #if defined(_OPENMP)
@@ -366,14 +376,19 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/nmiss);
 
-      double prange = range;
-      unsigned index = gridsearch_nearest(gs, xvals[mindex[i]], yvals[mindex[i]], &prange);
-      if ( index == GS_NOT_FOUND ) index = mindex[i];
-      else                         index = vindex[index];
+      grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[mindex[i]], yvals[mindex[i]]);
 
-      // printf("%u %u %d\n", i, index, (int)(prange*100000));
+      /* Compute weights based on inverse distance if mask is false, eliminate those points */
+      double dist_tot = nbr_compute_weights(num_neighbors, NULL, nbr_mask, nbr_add, nbr_dist);
 
-      array2[mindex[i]] = array1[index];
+      /* Normalize weights and store the link */
+      unsigned nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      if ( nadds )
+        {
+          double result = 0;
+          for ( unsigned n = 0; n < nadds; ++n ) result += array1[vindex[nbr_add[n]]]*nbr_dist[n];
+          array2[mindex[i]] = result;
+        }
     }
 
   if ( mindex ) Free(mindex);
@@ -394,20 +409,19 @@ void setmisstonn(field_t *field1, field_t *field2, int maxfill)
 
 void *Fillmiss(void *argument)
 {
-  int gridID;
-  int nrecs;
-  int recID, varID, levelID;
-  int nmiss, i, nfill = 1;
+  int nrecs, recID, varID, levelID;
   void (*fill_method) (field_t *fin , field_t *fout , int) = NULL;
 
   cdoInitialize(argument);
 
-  int FILLMISS        = cdoOperatorAdd("fillmiss"   ,  0, 0, "nfill");
-  int FILLMISSONESTEP = cdoOperatorAdd("fillmiss2"  ,  0, 0, "nfill");
-  int SETMISSTONN     = cdoOperatorAdd("setmisstonn" , 0, 0, "nfill");
+  int FILLMISS        = cdoOperatorAdd("fillmiss"   ,   0, 0, "nfill");
+  int FILLMISSONESTEP = cdoOperatorAdd("fillmiss2"  ,   0, 0, "nfill");
+  int SETMISSTONN     = cdoOperatorAdd("setmisstonn" ,  0, 0, "");
+  int SETMISSTODIS    = cdoOperatorAdd("setmisstodis" , 0, 0, "number of neighbors");
 
   int operatorID      = cdoOperatorID();
 
+  int nfill = 1;
   if ( operatorID == FILLMISS )
      {
        fill_method = &fillmiss;
@@ -418,7 +432,12 @@ void *Fillmiss(void *argument)
      }
   else if ( operatorID == SETMISSTONN )
      {
-       fill_method = &setmisstonn;
+       fill_method = &setmisstodis;
+     }
+  else if ( operatorID == SETMISSTODIS )
+     {
+       nfill = 4;
+       fill_method = &setmisstodis;
      }
 
   /* Argument handling */
@@ -428,8 +447,8 @@ void *Fillmiss(void *argument)
 
     if ( oargc == 1 )
       {
-        nfill = atoi(oargv[0]);
-        if ( operatorID != FILLMISSONESTEP ) 
+        nfill = parameter2int(oargv[0]);
+        if ( operatorID == FILLMISS ) 
           {
             if ( nfill < 1 || nfill > 4 ) cdoAbort("nfill out of range!");
           }
@@ -479,11 +498,10 @@ void *Fillmiss(void *argument)
             }
           else
             {
-              gridID = vlistInqVarGrid(vlistID1, varID);
+              int gridID = vlistInqVarGrid(vlistID1, varID);
 
-              if ( operatorID != SETMISSTONN && 
-                   (gridInqType(gridID) == GRID_GME ||
-                    gridInqType(gridID) == GRID_UNSTRUCTURED) )
+              if ( (operatorID == FILLMISS || operatorID == FILLMISSONESTEP) && 
+                   (gridInqType(gridID) == GRID_GME || gridInqType(gridID) == GRID_UNSTRUCTURED) )
                 cdoAbort("%s data unsupported!", gridNamePtr(gridInqType(gridID)) );
                 
               field1.grid    = gridID;
@@ -495,9 +513,9 @@ void *Fillmiss(void *argument)
 
               fill_method(&field1, &field2, nfill);
 
-              gridsize = gridInqSize(field2.grid);
-              nmiss = 0;
-              for ( i = 0; i < gridsize; ++i )
+              int gridsize = gridInqSize(field2.grid);
+              int nmiss = 0;
+              for ( int i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
               
               streamWriteRecord(streamID2, field2.ptr, nmiss);
