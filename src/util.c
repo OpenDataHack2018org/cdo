@@ -85,6 +85,8 @@ int CDO_CMOR_Mode        = FALSE;
 
 int cdoDiag              = FALSE;
 
+int CDO_Memtype          = MEMTYPE_DOUBLE;
+
 int CDO_Reduce_Dim       = FALSE;
 int CDO_Append_History   = TRUE;
 int CDO_Reset_History    = FALSE;

@@ -45,6 +45,7 @@
 extern char *Progname;
 extern char *cdoGridSearchDir;
 extern int CDO_Reduce_Dim;
+extern int CDO_Memtype;
 extern int CDO_Append_History;
 extern int CDO_Reset_History;
 extern int timer_read, timer_write; // refactor: both pstream.c and CDIread.c CDIwrite.c defined in cdo.c

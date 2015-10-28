@@ -1031,6 +1031,7 @@ int parse_options_long(int argc, char *argv[])
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "cmor",                    no_argument,      &CDO_CMOR_Mode,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
+      { "float",                   no_argument,        &CDO_Memtype,  MEMTYPE_FLOAT  },
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
       { "no_warnings",             no_argument,           &_Verbose,  0  },
       { "format",            required_argument,                NULL, 'f' },

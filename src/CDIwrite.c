@@ -91,7 +91,7 @@ void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_
 
 void *CDIwrite(void *argument)
 {
-  int memtype = MEMTYPE_DOUBLE;
+  int memtype = CDO_Memtype;
   int nvars = 10, nlevs = 0, ntimesteps = 30;
   const char *defaultgrid = "global_.2";
   int streamID;
@@ -115,13 +115,6 @@ void *CDIwrite(void *argument)
   sinfo[0] = 0;
 
   cdoInitialize(argument);
-
-  char *envstr = getenv("MEMTYPE");
-  if ( envstr )
-    {
-      if      ( strcmp(envstr, "float")  == 0 ) memtype = MEMTYPE_FLOAT;
-      else if ( strcmp(envstr, "double") == 0 ) memtype = MEMTYPE_DOUBLE;
-    }
 
   if ( cdoVerbose ) cdoPrint("parameter: <nruns, <grid, <nlevs, <ntimesteps, <nvars>>>>>");
 

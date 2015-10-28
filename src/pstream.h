@@ -36,6 +36,7 @@
 #define  streamInqRecord          pstreamInqRecord
 
 #define  streamReadRecord         pstreamReadRecord
+#define  streamReadRecordF        pstreamReadRecordF
 
 #define  streamCopyRecord         pstreamCopyRecord
 
@@ -58,6 +59,7 @@ int     pstreamInqTimestep(int pstreamID, int tsID);
 int     pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
 void    pstreamReadRecord(int pstreamID, double *data, int *nmiss);
+void    pstreamReadRecordF(int pstreamID, float *data, int *nmiss);
 void    pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
 void    pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);

@@ -1157,6 +1157,34 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 }
 
 
+void pstreamReadRecordF(int pstreamID, float *data, int *nmiss)
+{
+  if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
+
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
+#if defined(HAVE_LIBPTHREAD)
+  if ( pstreamptr->ispipe )
+    {
+      cdoAbort("pipeReadRecord not implemented for memtype float!");
+      // pipeReadRecord(pstreamptr, data, nmiss);
+    }
+  else
+#endif
+    {
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
+#if defined(HAVE_LIBPTHREAD)
+      if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
+#endif
+      streamReadRecordF(pstreamptr->fileID, data, nmiss);
+#if defined(HAVE_LIBPTHREAD)
+      if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
+#endif
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
+    }
+}
+
+
 void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int nmiss)
 {
   long i;

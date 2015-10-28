@@ -80,10 +80,10 @@ void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_
 
 void *CDIread(void *argument)
 {
-  int memtype = MEMTYPE_DOUBLE;
+  int memtype = CDO_Memtype;
   int streamID;
   int tsID, varID, levelID;
-  int gridsize, i, nmiss;
+  int gridsize, nmiss;
   int recID, nrecs;
   int vlistID;
   int filetype = -1, datatype = -1;
@@ -98,13 +98,6 @@ void *CDIread(void *argument)
   sinfo[0] = 0;
 
   cdoInitialize(argument);
-
-  char *envstr = getenv("MEMTYPE");
-  if ( envstr )
-    {
-      if      ( strcmp(envstr, "float")  == 0 ) memtype = MEMTYPE_FLOAT;
-      else if ( strcmp(envstr, "double") == 0 ) memtype = MEMTYPE_DOUBLE;
-    }
 
   if ( cdoVerbose ) cdoPrint("parameter: <nruns>");
 
@@ -152,9 +145,8 @@ void *CDIread(void *argument)
 
 	      if ( memtype == MEMTYPE_FLOAT )
 		{
-		  cdoAbort("streamReadRecordF not implemented!");
-		  // streamReadRecordF(streamID, farray, &nmiss);
-		  for ( i = 0; i < gridsize; ++i ) darray[i] = farray[i];
+                  streamReadRecordF(streamID, farray, &nmiss);
+                  //  for ( int i = 0; i < gridsize; ++i ) darray[i] = farray[i];
 		  data_size += gridsize*4;
 		}
 	      else
