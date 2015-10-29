@@ -305,23 +305,20 @@ void *XTimstat(void *argument)
           readarg.tsIDnext = tsID;
           readarg.nrecs = nrecs;
 
-          if ( ltsfirst || lparallelread  == FALSE )
+          if ( ltsfirst || lparallelread == FALSE )
             {
+              ltsfirst = FALSE;
+
               if ( lparallelread )
                 {
                   cdo_task_start(read_task, cdoReadTimestep, &readarg);
+                  readresult = cdo_task_wait(read_task);
                 }
               else
                 {
                   readresult = cdoReadTimestep(&readarg);
                 }
-              
-              if ( lparallelread )
-                {
-                  readresult = cdo_task_wait(read_task);
-                }
-              ltsfirst = FALSE;
-            }
+           }
           else
             {
               readresult = cdo_task_wait(read_task);
@@ -347,7 +344,7 @@ void *XTimstat(void *argument)
 
                   if ( nsets == 0 )
                     {
-                      farset(&vars1[varID][levelID], input_vars[varID][levelID]);
+                      farcpy(&vars1[varID][levelID], input_vars[varID][levelID]);
                       nmiss = input_vars[varID][levelID].nmiss;
                       vars1[varID][levelID].nmiss = nmiss;
                       if ( nmiss > 0 || samp1[varID][levelID].ptr )

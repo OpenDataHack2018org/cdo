@@ -41,7 +41,7 @@ void farfun(field_t *field1, field_t field2, const int function)
 }
 
 
-void farset(field_t *field1, field_t field2)
+void farcpy(field_t *field1, field_t field2)
 {
   size_t   i, len;
   int          nwpv     = field1->nwpv;
