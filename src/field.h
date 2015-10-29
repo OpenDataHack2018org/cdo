@@ -149,6 +149,7 @@ void farround(field_t *field);
 
 void farfun(field_t *field1, field_t field2, const int function);
 
+void farset(field_t *field1, field_t field2);
 void faradd(field_t *field1, field_t field2);
 void farsum(field_t *field1, field_t field2);
 void farsumw(field_t *field1, field_t field2, double w);

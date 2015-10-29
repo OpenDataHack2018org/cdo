@@ -850,7 +850,7 @@ void *Select(void *argument)
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 	    }
 
-	  /* add support for negative timestep values */
+	  // support for negative timestep values
 	  if ( npar_timestep > 0 && ntsteps > 0 && nfiles == 1 )
 	    {
 	      for ( i = 0; i < npar_timestep; i++ )
@@ -985,7 +985,6 @@ void *Select(void *argument)
 	      if ( streamID2 == CDI_UNDEFID )
 		{
 		  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-
 		  streamDefVlist(streamID2, vlistID2);
 		}
 

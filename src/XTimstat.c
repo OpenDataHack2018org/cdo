@@ -96,7 +96,10 @@ void *cdoReadTimestep(void *rarg)
   for ( int recID = 0; recID < nrecs; ++recID )
     {
       streamInqRecord(streamID, &varID, &levelID);
-      streamReadRecord(streamID, input_vars[varID][levelID].ptr2, &nmiss);
+      if ( CDO_Memtype == MEMTYPE_FLOAT )
+        streamReadRecordF(streamID, input_vars[varID][levelID].ptr2, &nmiss);
+      else
+        streamReadRecord(streamID, input_vars[varID][levelID].ptr2, &nmiss);
       input_vars[varID][levelID].nmiss2 = nmiss;
     }
 
@@ -225,7 +228,6 @@ void *XTimstat(void *argument)
   if ( cdoDiag )
     {
       char filename[8192];
-
       strcpy(filename, cdoOperatorName(operatorID));
       strcat(filename, "_");
       strcat(filename, cdoStreamName(1)->args);
@@ -345,7 +347,7 @@ void *XTimstat(void *argument)
 
                   if ( nsets == 0 )
                     {
-                      memcpy(vars1[varID][levelID].ptr, input_vars[varID][levelID].ptr, nwpv*gridsize*sizeof(double));
+                      farset(&vars1[varID][levelID], input_vars[varID][levelID]);
                       nmiss = input_vars[varID][levelID].nmiss;
                       vars1[varID][levelID].nmiss = nmiss;
                       if ( nmiss > 0 || samp1[varID][levelID].ptr )

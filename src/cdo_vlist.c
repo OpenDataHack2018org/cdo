@@ -234,8 +234,6 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 
 int vlistCompareX(int vlistID1, int vlistID2, int flag)
 {
-  int varID;
-
   int nvars = vlistNvars(vlistID1);
   int nvars2 = vlistNvars(vlistID2);
   int nlevels2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, 0));
@@ -243,7 +241,7 @@ int vlistCompareX(int vlistID1, int vlistID2, int flag)
   if ( nvars2 != 1 )
     cdoAbort("Internal problem, vlistCompareX() called with unexpected vlistID2 argument!");
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( int varID = 0; varID < nvars; varID++ )
     {
       if ( flag & CMP_GRIDSIZE )
 	{
