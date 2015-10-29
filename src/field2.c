@@ -53,6 +53,7 @@ void farcpy(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+  float *array2f = field2.ptrf;
 
   if ( nwpv != 2 ) nwpv = 1;
 
@@ -61,8 +62,10 @@ void farcpy(field_t *field1, field_t field2)
   if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  for ( i = 0; i < len; i++ ) 
-    array1[i] = array2[i];
+  if ( field2.memtype == MEMTYPE_FLOAT )
+    for ( i = 0; i < len; i++ ) array1[i] = array2f[i];
+  else
+    for ( i = 0; i < len; i++ ) array1[i] = array2[i];
 }
 
 static
@@ -155,6 +158,7 @@ void farsum(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+  float *array2f = field2.ptrf;
 
   if ( nwpv != 2 ) nwpv = 1;
 
@@ -180,7 +184,10 @@ void farsum(field_t *field1, field_t field2)
     }
   else
     {
-      arradd(len, array1, array2);
+      if ( field2.memtype == MEMTYPE_FLOAT )
+        for ( size_t i = 0; i < len; i++ ) array1[i] += array2f[i];
+      else
+        arradd(len, array1, array2);
     }
 }
 

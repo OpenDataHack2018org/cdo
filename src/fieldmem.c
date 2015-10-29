@@ -3,6 +3,7 @@
 
 #include <cdi.h>
 #include <cdo.h>
+#include <cdo_int.h>
 #include "dmemory.h"
 #include "field.h"
 #include "util.h"
@@ -40,6 +41,7 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 	  field[varID][levelID].nsamp   = 0;
 	  field[varID][levelID].nmiss   = 0;
 	  field[varID][levelID].nmiss2  = 0;
+	  if ( ptype & FIELD_FLT ) field[varID][levelID].memtype = MEMTYPE_FLOAT;
 	  field[varID][levelID].missval = missval;
 	  field[varID][levelID].ptr     = NULL;
 	  field[varID][levelID].ptr2    = NULL;
@@ -47,15 +49,31 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 
 	  if ( ptype & FIELD_PTR )
 	    {
-	      field[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-	      if ( init ) memset(field[varID][levelID].ptr, 0, nwpv*gridsize*sizeof(double));
-	    }
+              if ( ptype & FIELD_FLT )
+                {
+                  field[varID][levelID].ptrf = (float*) Malloc(nwpv*gridsize*sizeof(float));
+                  if ( init ) memset(field[varID][levelID].ptrf, 0, nwpv*gridsize*sizeof(float));
+                }
+              else
+                {
+                  field[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+                  if ( init ) memset(field[varID][levelID].ptr, 0, nwpv*gridsize*sizeof(double));
+                }
+            }
 
 	  if ( ptype & FIELD_PTR2 )
 	    {
-	      field[varID][levelID].ptr2 = (double*) Malloc(nwpv*gridsize*sizeof(double));
-	      if ( init ) memset(field[varID][levelID].ptr2, 0, nwpv*gridsize*sizeof(double));
-	    }
+              if ( ptype & FIELD_FLT )
+                {
+                  field[varID][levelID].ptr2 = Malloc(nwpv*gridsize*sizeof(float));
+                  if ( init ) memset(field[varID][levelID].ptr2, 0, nwpv*gridsize*sizeof(float));
+                }
+              else
+                {
+                  field[varID][levelID].ptr2 = Malloc(nwpv*gridsize*sizeof(double));
+                  if ( init ) memset(field[varID][levelID].ptr2, 0, nwpv*gridsize*sizeof(double));
+                }
+            }
 
 	  if ( ptype & FIELD_WGT )
 	    {
@@ -90,6 +108,7 @@ void field_free(field_t **field, int vlistID)
       for ( int levelID = 0; levelID < nlevel; ++levelID )
 	{
 	  if ( field[varID][levelID].ptr )    Free(field[varID][levelID].ptr);
+	  if ( field[varID][levelID].ptrf )   Free(field[varID][levelID].ptrf);
 	  if ( field[varID][levelID].ptr2 )   Free(field[varID][levelID].ptr2);
        	  if ( field[varID][levelID].weight ) Free(field[varID][levelID].weight);
 	}

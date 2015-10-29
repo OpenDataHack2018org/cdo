@@ -1057,7 +1057,7 @@ int parse_options_long(int argc, char *argv[])
       lgridsearchradius = 0;
       lremap_genweights = 0;
 
-      c = cdo_getopt_long(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhLMOQRrsSTuVvWXZ", opt_long, NULL);
+      c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
 
       switch (c)
@@ -1191,8 +1191,7 @@ int parse_options_long(int argc, char *argv[])
           numThreads = atoi(CDO_optarg);
           break;
         case 'p':
-          fprintf(stderr, "CDO option -p is not available anymore, please use -b <bits>!\n");
-          //setDefaultDataTypeByte(CDO_optarg);
+          CDO_Parallel_Read = TRUE;
           break;
         case 'Q':
           cdiDefGlobal("SORTNAME", TRUE);

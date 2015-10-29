@@ -96,10 +96,12 @@ void *cdoReadTimestep(void *rarg)
   for ( int recID = 0; recID < nrecs; ++recID )
     {
       streamInqRecord(streamID, &varID, &levelID);
+      
       if ( CDO_Memtype == MEMTYPE_FLOAT )
         streamReadRecordF(streamID, input_vars[varID][levelID].ptr2, &nmiss);
       else
         streamReadRecord(streamID, input_vars[varID][levelID].ptr2, &nmiss);
+      
       input_vars[varID][levelID].nmiss2 = nmiss;
     }
 
@@ -111,13 +113,22 @@ void *cdoReadTimestep(void *rarg)
 static
 void cdoUpdateVars(int nvars, int vlistID, field_t **vars)
 {
+  void *tmp = NULL;
   for ( int varID = 0; varID < nvars; varID++ )
     {
       int nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
       for ( int levelID = 0; levelID < nlevels; levelID++ )
         {
-          double *tmp = vars[varID][levelID].ptr;
-          vars[varID][levelID].ptr   = vars[varID][levelID].ptr2;
+          if ( CDO_Memtype == MEMTYPE_FLOAT )
+            {
+              tmp = vars[varID][levelID].ptrf;
+              vars[varID][levelID].ptrf   = vars[varID][levelID].ptr2;
+            }
+          else
+            {
+              tmp = vars[varID][levelID].ptr;
+              vars[varID][levelID].ptr   = vars[varID][levelID].ptr2;
+            }
           vars[varID][levelID].ptr2  = tmp;
           vars[varID][levelID].nmiss = vars[varID][levelID].nmiss2;
         }
@@ -259,7 +270,9 @@ void *XTimstat(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
-  field_t **input_vars = field_malloc(vlistID1, FIELD_PTR | FIELD_PTR2);
+  int FIELD_MEMTYPE = 0;
+  if ( CDO_Memtype == MEMTYPE_FLOAT ) FIELD_MEMTYPE = FIELD_FLT;
+  field_t **input_vars = field_malloc(vlistID1, FIELD_PTR | FIELD_PTR2 | FIELD_MEMTYPE);
   field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_t **vars2 = NULL;
@@ -269,7 +282,7 @@ void *XTimstat(void *argument)
   readarg.streamID = streamID1;
   readarg.vars = input_vars;
 
-  int lparallelread = TRUE;
+  int lparallelread = CDO_Parallel_Read;
   int ltsfirst = TRUE;
   void *read_task = NULL;
   void *readresult = NULL;
@@ -308,17 +321,8 @@ void *XTimstat(void *argument)
           if ( ltsfirst || lparallelread == FALSE )
             {
               ltsfirst = FALSE;
-
-              if ( lparallelread )
-                {
-                  cdo_task_start(read_task, cdoReadTimestep, &readarg);
-                  readresult = cdo_task_wait(read_task);
-                }
-              else
-                {
-                  readresult = cdoReadTimestep(&readarg);
-                }
-           }
+              readresult = cdoReadTimestep(&readarg);
+            }
           else
             {
               readresult = cdo_task_wait(read_task);

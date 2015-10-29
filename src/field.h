@@ -25,7 +25,8 @@ enum field_flag {
   FIELD_PTR   =  2,
   FIELD_WGT   =  4,
   FIELD_PTR2  =  8,
-  FIELD_ALL   =  FIELD_PTR | FIELD_WGT
+  FIELD_FLT   = 16,
+  FIELD_ALL   = FIELD_PTR | FIELD_WGT
 };
 
 
@@ -61,10 +62,12 @@ typedef struct {
   int      nsamp;
   int      nmiss;
   int      nmiss2;
+  int      memtype;
   double   missval;
   double  *weight;
   double  *ptr;
-  double  *ptr2;
+  float   *ptrf;
+  void    *ptr2;
 }
 field_t;
 
