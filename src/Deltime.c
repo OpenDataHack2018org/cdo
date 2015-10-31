@@ -164,5 +164,5 @@ void *Deltime(void *argument)
 
   cdoFinish();
 
-  return (NULL);
+  return 0;
 }

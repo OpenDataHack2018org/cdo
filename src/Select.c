@@ -130,13 +130,11 @@ void pml_init(pml_t *pml, const char *name)
 
 pml_t *pmlNew(const char *name)
 {
-  pml_t *pml;
-
-  pml = (pml_t*) Malloc(sizeof(pml_t));
+  pml_t *pml = (pml_t*) Malloc(sizeof(pml_t));
 
   pml_init(pml, name);
 
-  return (pml);
+  return pml;
 }
 
 
@@ -189,16 +187,13 @@ void pmlPrint(pml_t *pml)
 
 int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t size)
 {
-  pml_entry_t *pml_entry;
-  int entry = 0;
-
   if ( pml->size >= MAX_PML_ENTRY )
     {
       fprintf(stderr, "Too many entries in parameter list %s! (Max = %d)\n", pml->name, MAX_PML_ENTRY);
       return -1;
     }
 
-  pml_entry = (pml_entry_t*) Malloc(sizeof(pml_entry_t));
+  pml_entry_t *pml_entry = (pml_entry_t*) Malloc(sizeof(pml_entry_t));
 
   pml_entry->name = strdup(name);
   pml_entry->len  = strlen(name);
@@ -208,10 +203,10 @@ int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t si
   pml_entry->dis  = dis;
   pml_entry->occ  = 0;
 
-  entry = pml->size;
+  int entry = pml->size;
   pml->entry[pml->size++] = pml_entry;
 
-  return (entry);
+  return entry;
 }
 
 
@@ -235,7 +230,7 @@ int pmlNum(pml_t *pml, const char *name)
   if ( i == pml->size )
     fprintf(stderr, "Parameter list entry %s not found in %s\n", name, pml->name);
 
-  return (nocc);
+  return nocc;
 }
 
 void split_intstring(const char *intstr, int *first, int *last, int *inc);
@@ -278,17 +273,16 @@ int pml_add_entry(pml_entry_t *entry, char *arg)
       fprintf(stderr, "unsupported type!\n");
     }
 
-  return (status);
+  return status;
 }
 
 
 void pmlProcess(pml_entry_t *entry, int argc, char **argv)
 {
-  int i;
   char *parg;
   char *epos;
 
-  for ( i = 0; i < argc; ++i )
+  for ( int i = 0; i < argc; ++i )
     {
       parg = argv[i];
       if ( i == 0 )
@@ -313,10 +307,9 @@ int pmlRead(pml_t *pml, int argc, char **argv)
   int params[MAX_PML_ENTRY];
   int num_par[MAX_PML_ENTRY];
   int nparams = 0;
-  int i, istart;
+  int i;
   char *epos;
   size_t len;
-  char *parbuf;
   int bufsize = 0;
   int status = 0;
   /*
@@ -329,10 +322,10 @@ int pmlRead(pml_t *pml, int argc, char **argv)
       bufsize += len+1;
     }
 
-  parbuf = (char*) Malloc(bufsize*sizeof(char));
+  char *parbuf = (char*) Malloc(bufsize*sizeof(char));
   memset(parbuf, 0, bufsize*sizeof(char));
 
-  istart = 0;
+  int istart = 0;
   while ( istart < argc )
     {
       epos = strchr(argv[istart], '=');
@@ -388,7 +381,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
 
   Free(parbuf);
 
-  return (status);
+  return status;
 }
 
 
@@ -398,7 +391,7 @@ int par_check_int(int npar, int *parlist, int *flaglist, int par)
   for ( int i = 0; i < npar; i++ )
     if ( par == parlist[i] ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
-  return (found);
+  return found;
 }
 
 
@@ -408,7 +401,7 @@ int par_check_flt(int npar, double *parlist, int *flaglist, double par)
   for ( int i = 0; i < npar; i++ )
     if ( fabs(par - parlist[i]) < 1.e-4 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
-  return (found);
+  return found;
 }
 
 
@@ -418,7 +411,7 @@ int par_check_word(int npar, char **parlist, int *flaglist, char *par)
   for ( int i = 0; i < npar; i++ )
     if ( wildcardmatch(parlist[i], par) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
-  return (found);
+  return found;
 }
 
 
@@ -436,7 +429,7 @@ int par_check_date(int npar, char **parlist, int *flaglist, char *par)
       if ( wildcardmatch(wcdate, par) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
     }
 
-  return (found);
+  return found;
 }
 
 
@@ -1053,5 +1046,5 @@ void *Select(void *argument)
 
   cdoFinish();
 
-  return (NULL);
+  return 0;
 }

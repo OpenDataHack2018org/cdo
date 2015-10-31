@@ -603,8 +603,7 @@ void *Seltime(void *argument)
     if ( its2 < nts2 )
       cdoWarning("%d timesteps missing after the last month!", nts2-its2);
 
-  if ( ! lcopy )
-    if ( array ) Free(array);
+  if ( array ) Free(array);
 
   for ( isel = 0; isel < nsel; isel++ )
     {
@@ -687,5 +686,5 @@ void *Seltime(void *argument)
 
   cdoFinish();
 
-  return (NULL);
+  return 0;
 }

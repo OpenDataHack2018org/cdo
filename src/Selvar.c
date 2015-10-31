@@ -415,5 +415,5 @@ void *Selvar(void *argument)
 
   cdoFinish();
 
-  return (NULL);
+  return 0;
 }

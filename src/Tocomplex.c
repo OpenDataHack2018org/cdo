@@ -123,5 +123,5 @@ void *Tocomplex(void *argument)
 
   cdoFinish();
 
-  return (NULL);
+  return 0;
 }

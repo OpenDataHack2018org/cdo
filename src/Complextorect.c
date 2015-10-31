@@ -123,5 +123,5 @@ void *Complextorect(void *argument)
 
   cdoFinish();
 
-  return (NULL);
+  return 0;
 }
