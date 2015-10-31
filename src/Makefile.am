@@ -306,6 +306,7 @@ cdo_SOURCES += Adisit.c        \
                Templates.c     \
                Test.c          \
                Tests.c         \
+               Timedt.c        \
                Timcount.c      \
                Timpctl.c       \
                Timselpctl.c    \

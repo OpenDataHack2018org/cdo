@@ -180,6 +180,7 @@ void *Test(void *argument);
 void *Test2(void *argument);
 void *Testdata(void *argument);
 void *Tests(void *argument);
+void *Timedt(void *argument);
 void *Timsort(void *argument);
 void *Timcount(void *argument);
 void *Timpctl(void *argument);
@@ -438,6 +439,7 @@ void *Maggraph(void *argument);
 #define  Test2Operators         {"test2"}
 #define  TestdataOperators      {"testdata"}
 #define  TestsOperators         {"normal", "studentt", "chisquare", "beta", "fisher"}
+#define  TimedtOperators        {"timedt"}
 #define  TimsortOperators       {"timsort"}
 #define  TimcountOperators      {"timcount"}
 #define    YearcountOperators   {"yearcount"}
@@ -725,6 +727,7 @@ static modules_t Modules[] =
   { Timpctl,        DaypctlHelp,       DaypctlOperators,       CDI_REAL,  3,  1 },
   { Timpctl,        HourpctlHelp,      HourpctlOperators,      CDI_REAL,  3,  1 },
   { Timselpctl,     TimselpctlHelp,    TimselpctlOperators,    CDI_REAL,  3,  1 },
+  { Timedt,         NULL,              TimedtOperators,        CDI_REAL,  1,  1 },
   { Timsort,        TimsortHelp,       TimsortOperators,       CDI_REAL,  1,  1 },
   { Timselstat,     TimselstatHelp,    TimselstatOperators,    CDI_REAL,  1,  1 },
   { XTimstat,       NULL,              XTimstatOperators,      CDI_BOTH,  1,  1 },

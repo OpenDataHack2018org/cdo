@@ -38,6 +38,7 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 
 	  field[varID][levelID].nwpv    = nwpv;
 	  field[varID][levelID].grid    = gridID;
+	  field[varID][levelID].size    = gridsize;
 	  field[varID][levelID].nsamp   = 0;
 	  field[varID][levelID].nmiss   = 0;
 	  field[varID][levelID].nmiss2  = 0;

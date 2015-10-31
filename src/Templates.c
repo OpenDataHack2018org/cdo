@@ -23,39 +23,36 @@
 
 void *Template1(void *argument)
 {
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
+  int recID, varID, levelID;
   int lcopy = FALSE;
   int gridsize, nmiss;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
+  double *array = NULL;
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -86,8 +83,7 @@ void *Template1(void *argument)
 
   vlistDestroy(vlistID2);
 
-  if ( ! lcopy )
-    if ( array ) Free(array);
+  if ( array ) Free(array);
 
   cdoFinish();
 
@@ -97,34 +93,29 @@ void *Template1(void *argument)
 
 void *Template2(void *argument)
 {
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int gridsize;
+  int recID, varID, levelID;
   int nmiss;
-  int taxisID1, taxisID2;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

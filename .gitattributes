@@ -465,6 +465,7 @@ src/Templates.c -text
 src/Test.c -text
 src/Tests.c -text
 src/Timcount.c -text
+src/Timedt.c -text
 src/Timpctl.c -text
 src/Timselpctl.c -text
 src/Timselstat.c -text
