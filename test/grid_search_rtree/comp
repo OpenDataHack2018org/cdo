@@ -1,0 +1,2 @@
+gcc -g -std=c99 -O2 test_glob.c card.c index.c node.c rect.c split_l.c
+icc -g -std=c99 -O2 test_glob.c card.c index.c node.c rect.c split_l.c -march=native
