@@ -1,0 +1,40 @@
+#!/bin/ksh
+#
+#set -x
+PAPER=a4
+#
+cdo -f nc -div -temp -ltc,.5 -mask file1
+cdo setmisstonn file1 file2
+#
+cdo outputbounds file1 > tmp1
+cdo outputbounds file2 > tmp2
+#
+rm -f .gmtdefaults4 plot.ps
+gmtset PAGE_ORIENTATION portrait  COLOR_NAN 200/200/200 PAPER_MEDIA $PAPER BASEMAP_TYPE plain ANNOT_FONT_SIZE_PRIMARY 10p GRID_PEN_PRIMARY 1p
+#
+CPT=colors.cpt
+makecpt -T270/308/2 -Cjet > $CPT
+#
+PROJ="-R-20/60/-45/45  -Jx.1d"
+#
+XOFF=1
+YOFF=1.6
+#
+psxy $PROJ -M tmp1 -L -C$CPT -M -K  -Xa$XOFF -Ya$YOFF >> plot.ps
+pscoast $PROJ -Dc -W -K -O  -Xa$XOFF -Ya$YOFF >> plot.ps
+psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15 -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
+#
+#
+XOFF=12
+YOFF=1.6
+#
+psxy $PROJ -M tmp2 -L -C$CPT -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
+pscoast $PROJ -Dc -W -K -O  -Xa$XOFF -Ya$YOFF >> plot.ps
+psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15 -O -Xa$XOFF -Ya$YOFF >> plot.ps
+#
+rm -f tmp1 tmp2
+ps2pdf plot.ps
+pdfcrop plot.pdf setmisstonn0.pdf
+rm -f plot.ps plot.pdf
+rm -f file1 file2
+rm -f $CPT
