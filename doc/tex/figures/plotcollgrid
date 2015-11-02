@@ -1,0 +1,92 @@
+#!/bin/ksh
+#
+#set -x
+MASK=1
+PAPER=a4
+#
+cdo outputbounds -remapycon,global_1 -topo > tmp1
+cdo outputbounds -topo,global_5 > tmp2
+#
+rm -f .gmtdefaults4 plot.ps
+gmtset PAGE_ORIENTATION portrait  PAPER_MEDIA $PAPER BASEMAP_TYPE plain ANNOT_FONT_SIZE_PRIMARY 10p GRID_PEN_PRIMARY 1p
+#
+CPT=colors.cpt
+cat > $CPT <<EOF
+-8000   0       5       25      -7000   0       5       25
+-7000   0       10      50      -6000   0       10      50
+-6000   0       80      125     -5000   0       80      125
+-5000   0       150     200     -4000   0       150     200
+-4000   86      197     184     -3000   86      197     184
+-3000   172     245     168     -2000   172     245     168
+-2000   211     250     211     -1000   211     250     211
+-1000   250     255     255     0       250     255     255
+0       70      120     50      200     70      120     50 
+200     120     100     50      400     120     100     50 
+400     146     126     60      600     146     126     60 
+600     198     178     80      800     198     178     80 
+800     250     230     100     1000    250     230     100
+1000    250     234     126     1500    250     234     126
+1500    252     238     152     2000    252     238     152
+2000    252     243     177     4000    252     243     177
+4000    253     249     216     8000    253     249     216
+F       255     255     255                             
+B       0       0       0
+N       215     215     215
+EOF
+#
+PROJ="-R-20/60/-45/45  -Jx.1"
+#
+XOFF=12
+YOFF=1.6
+#
+psxy $PROJ -M tmp1 -L -C$CPT -K  -Xa$XOFF -Ya$YOFF >> plot.ps
+if [ $MASK -eq 1 ] ; then
+psxy $PROJ -M tmp2   -K -O     -Xa$XOFF -Ya$YOFF >> plot.ps
+fi
+psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15 -K -O  -Xa$XOFF -Ya$YOFF >> plot.ps
+#
+DX=40
+DY=30
+#
+for IY in 1 2 3; do
+#
+Y1=$((-45+(IY-1)*DY))
+Y2=$((-45+(IY)*DY))
+#
+for IX in 1 2; do
+#
+X1=$((-20+(IX-1)*DX))
+X2=$((-20+(IX)*DX))
+PROJ="-R$X1/$X2/$Y1/$Y2  -Jx.1"
+XOFF=$((1+(IX-1)*4.6))
+YOFF=$((1+(IY-1)*3.6))
+echo $X1 $X2 $Y1 $Y2 $XOFF $YOFF
+#
+OVERLAY1="-K -O"
+OVERLAY2="-K -O"
+#if [ $IX -eq 1 -a $IY -eq 1 ] ; then OVERLAY1="-K" ; fi
+if [ $IX -eq 2 -a $IY -eq 3 ] ; then OVERLAY2="-O" ; fi
+AW=w
+AE=e
+AS=s
+AN=n
+if [ $IX -eq 1 ] ; then AW=W ; fi
+if [ $IX -eq 2 ] ; then AE=E ; fi
+if [ $IY -eq 1 ] ; then AS=S ; fi
+if [ $IY -eq 3 ] ; then AN=N ; fi
+ANNO=${AW}${AE}${AS}${AN}
+#
+psxy $PROJ -M tmp1 -L -C$CPT $OVERLAY1 -Xa$XOFF -Ya$YOFF>> plot.ps
+if [ $MASK -eq 1 ] ; then
+psxy $PROJ -M tmp2   -K -O   -Xa$XOFF -Ya$YOFF  >> plot.ps
+fi
+psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15$ANNO $OVERLAY2 -Xa$XOFF -Ya$YOFF>> plot.ps
+#
+done
+done
+#
+rm -f tmp1 tmp2
+ps2pdf plot.ps
+pdfcrop plot.pdf collgrid0.pdf
+rm -f plot.ps plot.pdf
+rm -f $CPT
