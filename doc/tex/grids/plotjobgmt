@@ -24,3 +24,6 @@ psxy    -P -JN1/11 -Rg -M tmp1 -W2p,black          -O -K >> plot.ps
 psxy    -P -JN1/11 -Rg -M tmp2 -W2p,red            -O    >> plot.ps
 #
 rm -f tmp1 tmp2
+#
+ps2pdf plot.ps ${FILE}0.pdf
+rm -f plot.ps
