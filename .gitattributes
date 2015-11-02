@@ -71,7 +71,7 @@ doc/tex/figures/distgrid.pdf -text
 doc/tex/figures/plotcollgrid -text
 doc/tex/figures/plotdistgrid -text
 doc/tex/figures/plotsetmisstonn -text
-doc/tex/figures/setmisstonn0.pdf -text svneol=unset#application/pdf
+doc/tex/figures/setmisstonn.pdf -text svneol=unset#application/pdf
 doc/tex/grid.tex -text
 doc/tex/grids/cell.gmt -text
 doc/tex/grids/cell.grid -text
