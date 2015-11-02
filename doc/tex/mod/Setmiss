@@ -180,6 +180,8 @@ FLOAT    Upper bound
 
 
 @BeginExample
+@bold{setrtomiss}
+
 Assume an input dataset has one field with temperatures in the range from 246 to 304 Kelvin.
 To set all values below 273.15 Kelvin to missing value use:
 @BeginVerbatim
@@ -195,4 +197,22 @@ Result of '{\tt cdo info ofile}':
    -1 :       Date  Time    Code Level  Size  Miss :  Minimum     Mean  Maximum
     1 : 1987-12-31 12:00:00 139      0  2048   871 :   273.16   287.08   303.71
 @EndListing
+
+@bold{setmisstonn}
+
+Set all missing values to the nearest non missing value:
+@BeginVerbatim
+   cdo setmisstonn ifile ofile
+@EndVerbatim
+@IfDoc
+Below is a schematic illustration of this example:
+
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{setmisstonn.pdf}
+
+\vspace{1mm}
+
+On the left side is input data with missing values in gray and on the right side the result with the filled missing values.
+@EndifDoc
 @EndExample
