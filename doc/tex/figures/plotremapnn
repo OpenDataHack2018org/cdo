@@ -1,0 +1,109 @@
+#!/bin/ksh
+#
+#set -x
+MASK=1
+PAPER=a4
+#
+CPT=colors.cpt
+#makecpt -T-6000/2000/500 -Cjet > $CPT
+cat > $CPT <<EOF
+# COLOR_MODEL = RGB
+-9000     0       5      25    -7000      0      10      50
+-7000     0      10      50    -6000     12      44     132        
+-6000    12      44     132    -5000      0      80     125
+-5000     0      80     125    -4000      0     150     200
+-4000     0     150     200    -3000     65     182     196
+-3000    65     182     196    -2000     86     197     184
+-2000    86     197     184    -1000    172     245     168
+-1000   172     245     168     -500    211     250     211
+ -500   211     250     211     -200    237     255     217
+ -200   237     255     217        0    250     255     255
+    0     0      90      50      200    129     195      31
+  200   129     195      31      400    255     255     204
+  400   255     255     204      700    244     189      69
+  700   244     189      69     1000    102      51      12
+ 1000   102      51      12     1500    146     126      60
+ 1500   146     126      60     2200    128     128     128
+ 2200   128     128     128     3000    224     236     244
+ 3000   224     236     244     8000    255     255     255
+F       255     255     255                             
+B       0       0       0
+N       210     210     210
+EOF
+#
+cat > region <<EOF
+-8 -20
+20 -20
+20  20
+-8  20
+-8  13
+-2  13
+-2  11
+ 0  11
+ 0   3
+-2   3
+-2  -1
+-8  -1
+EOF
+#
+SRCGRID=africa_2
+TGTGRID=r2b4_region.nc
+FILE1=source.nc
+FILE2=target.nc
+#
+cdo -f nc maskregion,region -remapycon,$SRCGRID -topo $FILE1
+cdo info $FILE1
+#
+REMAPS="nn dis bil bic ycon con laf"
+#REMAPS=nn
+#
+for REMAP in $REMAPS; do
+#
+cdo remap${REMAP},$TGTGRID $FILE1 $FILE2
+#
+cdo outputbounds $FILE1 > tmp1
+cdo outputbounds $FILE2 > tmp2
+#
+rm -f .gmtdefaults4 plot.ps
+gmtset PAGE_ORIENTATION portrait  COLOR_NAN 200/200/200 PAPER_MEDIA $PAPER BASEMAP_TYPE plain ANNOT_FONT_SIZE_PRIMARY 10p GRID_PEN_PRIMARY 1p
+#
+
+PROJ="-R-6/18/-14/16  -Jx.1d"
+#
+XOFF=1
+YOFF=1.6
+#
+psxy $PROJ -M tmp1 -L -C$CPT -M -K  -Xa$XOFF -Ya$YOFF >> plot.ps
+if [ $MASK -eq 1 ] ; then
+psxy $PROJ -M tmp1   -K -O     -Xa$XOFF -Ya$YOFF >> plot.ps
+fi
+psbasemap $PROJ -B0g0 -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
+#
+XOFF=4
+YOFF=1.6
+#
+psxy $PROJ -M tmp1 -L -C$CPT -M -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
+if [ $MASK -eq 1 ] ; then
+psxy $PROJ -M tmp2   -K -O     -Xa$XOFF -Ya$YOFF >> plot.ps
+fi
+psbasemap $PROJ -B0g0 -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
+#
+XOFF=7
+YOFF=1.6
+#
+psxy $PROJ -M tmp2 -L -C$CPT -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
+if [ $MASK -eq 1 ] ; then
+psxy $PROJ -M tmp2 -K  -O     -Xa$XOFF -Ya$YOFF >> plot.ps
+fi
+psbasemap $PROJ -B0g0 -O -Xa$XOFF -Ya$YOFF >> plot.ps
+#
+rm -f tmp1 tmp2
+ps2pdf plot.ps
+pdfcrop plot.pdf remap${REMAP}.pdf
+rm -f plot.ps plot.pdf
+rm -f $FILE2
+#
+done
+#
+rm -f $FILE1
+rm -f $CPT region

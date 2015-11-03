@@ -22,15 +22,15 @@ YOFF=1.6
 #
 psxy $PROJ -M tmp1 -L -C$CPT -M -K  -Xa$XOFF -Ya$YOFF >> plot.ps
 pscoast $PROJ -Dc -W -K -O  -Xa$XOFF -Ya$YOFF >> plot.ps
-psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15 -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
+psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15WeSN -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
 #
 #
-XOFF=12
+XOFF=10
 YOFF=1.6
 #
 psxy $PROJ -M tmp2 -L -C$CPT -K -O -Xa$XOFF -Ya$YOFF >> plot.ps
 pscoast $PROJ -Dc -W -K -O  -Xa$XOFF -Ya$YOFF >> plot.ps
-psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15 -O -Xa$XOFF -Ya$YOFF >> plot.ps
+psbasemap $PROJ -Ba40-20f20g40-20/a30-15f15g30-15wESN -O -Xa$XOFF -Ya$YOFF >> plot.ps
 #
 rm -f tmp1 tmp2
 ps2pdf plot.ps

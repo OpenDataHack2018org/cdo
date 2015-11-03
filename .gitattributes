@@ -70,7 +70,16 @@ doc/tex/figures/collgrid.pdf -text
 doc/tex/figures/distgrid.pdf -text
 doc/tex/figures/plotcollgrid -text
 doc/tex/figures/plotdistgrid -text
+doc/tex/figures/plotremapnn -text
 doc/tex/figures/plotsetmisstonn -text
+doc/tex/figures/r2b4_region.nc -text
+doc/tex/figures/remapbic.pdf -text svneol=unset#application/pdf
+doc/tex/figures/remapbil.pdf -text svneol=unset#application/pdf
+doc/tex/figures/remapcon.pdf -text svneol=unset#application/pdf
+doc/tex/figures/remapdis.pdf -text svneol=unset#application/pdf
+doc/tex/figures/remaplaf.pdf -text svneol=unset#application/pdf
+doc/tex/figures/remapnn.pdf -text svneol=unset#application/pdf
+doc/tex/figures/remapycon.pdf -text svneol=unset#application/pdf
 doc/tex/figures/setmisstonn.pdf -text svneol=unset#application/pdf
 doc/tex/grid.tex -text
 doc/tex/grids/cell.gmt -text
