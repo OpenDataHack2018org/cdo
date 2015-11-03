@@ -213,6 +213,6 @@ Below is a schematic illustration of this example:
 
 \vspace{1mm}
 
-On the left side is input data with missing values in gray and on the right side the result with the filled missing values.
+On the left side is input data with missing values in grey and on the right side the result with the filled missing values.
 @EndifDoc
 @EndExample

@@ -10,6 +10,19 @@
 @BeginDescription
 This module contains operators for a nearest neighbor remapping of fields between grids
 in spherical coordinates.
+@IfDoc
+Below is a schematic illustration of the nearest neighbor remapping:
+
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{remapnn.pdf}
+
+\vspace{1mm}
+
+The figure on the left side show the input data on a regular lon/lat source grid and on the right side
+the remapped result on an unstructured triangular target grid. The figure in the middle shows the input data with
+the target grid. Missing values are grey colored.
+@EndifDoc
 @EndDescription
 @EndModule
 
