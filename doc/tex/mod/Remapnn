@@ -19,9 +19,9 @@ Below is a schematic illustration of the nearest neighbor remapping:
 
 \vspace{1mm}
 
-The figure on the left side show the input data on a regular lon/lat source grid and on the right side
+The figure on the left side shows the input data on a regular lon/lat source grid and on the right side
 the remapped result on an unstructured triangular target grid. The figure in the middle shows the input data with
-the target grid. Missing values are grey colored.
+the target grid. Grid cells with missing value are grey colored.
 @EndifDoc
 @EndDescription
 @EndModule
