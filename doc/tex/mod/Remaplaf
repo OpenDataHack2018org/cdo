@@ -13,6 +13,19 @@ The operators in this module uses code from the YAC software package to compute 
 For a detailed description of the interpolation method see @cite{YAC}.
 The interpolation method is completely general and can be used for any grid on a sphere.
 The search algorithm for this remapping method requires that no grid cell occurs more than once. 
+@IfDoc
+Below is a schematic illustration of the largest area fraction conservative remapping:
+
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{remaplaf.pdf}
+
+\vspace{1mm}
+
+The figure on the left side shows the input data on a regular lon/lat source grid and on the right side
+the remapped result on an unstructured triangular target grid. The figure in the middle shows the input data with
+the target grid. Grid cells with missing value are grey colored.
+@EndifDoc
 @EndDescription
 @EndModule
 

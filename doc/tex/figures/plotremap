@@ -54,7 +54,7 @@ FILE2=target.nc
 cdo -f nc maskregion,region -remapycon,$SRCGRID -topo $FILE1
 cdo info $FILE1
 #
-REMAPS="nn dis bil bic ycon con laf"
+REMAPS="nn dis bil bic ycon con con2 laf"
 #REMAPS=nn
 #
 for REMAP in $REMAPS; do
@@ -99,7 +99,7 @@ psbasemap $PROJ -B0g0 -O -Xa$XOFF -Ya$YOFF >> plot.ps
 #
 rm -f tmp1 tmp2
 ps2pdf plot.ps
-pdfcrop plot.pdf remap${REMAP}.pdf
+pdfcrop plot.pdf remap${REMAP}0.pdf
 rm -f plot.ps plot.pdf
 rm -f $FILE2
 #

@@ -12,6 +12,19 @@ This module contains operators for a distance-weighted average remapping of the 
 nearest neighbor values of fields between grids in spherical coordinates.
 The interpolation is based on an adapted SCRIP library version. 
 For a detailed description of the interpolation method see @cite{SCRIP}.
+@IfDoc
+Below is a schematic illustration of the distance-weighted average remapping:
+
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{remapdis.pdf}
+
+\vspace{1mm}
+
+The figure on the left side shows the input data on a regular lon/lat source grid and on the right side
+the remapped result on an unstructured triangular target grid. The figure in the middle shows the input data with
+the target grid. Grid cells with missing value are grey colored.
+@EndifDoc
 @EndDescription
 @EndModule
 
