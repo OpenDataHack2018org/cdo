@@ -1,6 +1,6 @@
 Contributors
 
-The primary contributors to CDO development have been: 
+The primary contributors to the CDO development have been: 
 
 Uwe Schulweida
 
@@ -10,44 +10,47 @@ Luis Kornblueh
 
 Ralf Müller
 
-operator: showunit, stdatm, intlevel3d, consecsum, consects
-eca_gsl: adjust implementation to fit definition by ECA
+Webpage <------------------
+Implemented operators: showunit, stdatm, intlevel3d, consecsum, consects
+Modified operators: eca_gsl
 
 Cedrick Ansorge
 
 He worked on the CDO software package as a student assistant at MPI-M from 2007-2011.
-His main contributions are the implementation of {time series filters} and {empirical orthogonal functions (EOFs)} in two and three dimensions. 
-As part of the implementation of EOFs he implemented a parallel variable precision method for eigen-value computation based on a one-sided 
-Jacobi annihilation scheme. 
-Also he built in a parallel version of merge-sort and ensemble skill scores such as the {Brier-Score} \texttt{ensbrs} and
-{cumulative ranked probability score} \texttt{enscrps}.
-Some minor contributions relate to grid-handling and interpolation. For instance, the operators \texttt{maskregion} and \texttt{smooth9} 
-were partly implemented by Cedrick Ansorge.
+Implemented operators: eof, eof3d, enscrps, ensbrs, maskregion,
+bandpass, lowpass, highpass, smooth9
 
-Ralf Quast brockmann-consult 2006
-timcount, hourcount, daycount, moncount, yearcount, seascount
-Module Ydrunstat, all percentile operators, 
+Ralf Quast
+
+He worked on CDO on behalf of the Service Gruppe Anpassung (SGA) in 2006.
+Implemented operators: all ECA Indices of Daily Temperature and
+Precipitation Extremes, all percentile operators, module Ydrun<STAT>,
 wct, hi
-ECA Indices of Daily Temperature and Precipitation Extremes
+% timcount, hourcount, daycount, moncount, yearcount, seascount
+
+Karl-Hermann Wieners
+
+Implemented operators: aexpr, aexprf, selzaxisname
 
 Frank Kaspar
-import_cmsaf
+
+Contributed to operator: import_cmsaf
 
 Etienne Tourigny
 
-Operator: setclonlatbox, setcindexbox, setvals, splitsel, histfreq, setrtoc, setrtoc2
+Implemented operators: setclonlatbox, setcindexbox, setvals, splitsel, histfreq, setrtoc, setrtoc2
 
 Helmut Haak
 
-operator: adisit - Potential temperature to in-situ temperature
+Contributed to operator: adisit
 
 Martin Claus
 
-vertwind: added missing value support
+Modified operator: vertwind (added missing value support)
 
 Álvaro M. Valdebenito
 
-Settime: added "seconds" support to "settunits", "settaxis" and "shifttime"
+Modified operators:  settunits, settaxis and shifttime (added support for "seconds")
 
 Modali Kameswarrao
 
@@ -62,4 +65,4 @@ Reinhard Budich
 
 Acknowledgments
 
-CDO uses many tools from the GNU project, including automake, and libtool. 
+CDO uses tools from the GNU project, including automake, and libtool. 
