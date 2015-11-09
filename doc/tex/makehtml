@@ -2,6 +2,12 @@
 if [ ! -d ../html ];then mkdir ../html ;fi
 htlatex cdo.tex "html" "" -d../html/
 cd ../html
-tidy cdo.html > index.html
+#check for html cleanup tool
+which tidy
+if [[ 0 = $? ]]; then
+  tidy -c -i -wrap 200 cdo.html > index.html
+else
+  cp cdo.html index.html
+fi
 cp ../*pdf .
 zip cdo-doc.zip *.*
