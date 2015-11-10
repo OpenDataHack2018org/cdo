@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.7.1 (24 February 2016):
+
+   Fixed bugs:
+     * cdo -t table_file does not read variable name from table file [Bug #6312]
+
 Version 1.7.0 (28 October 2015):
 
    New features:
