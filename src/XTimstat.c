@@ -75,8 +75,14 @@
 
 
 typedef struct {
+  short varID;
+  short levelID;
+} recinfo_t;
+
+typedef struct {
   int tsIDnext;
   int streamID, nrecs;
+  recinfo_t *recinfo;
   field_t **vars;
 }
 readarg_t;
@@ -89,6 +95,7 @@ void *cdoReadTimestep(void *rarg)
   int varID, levelID, nmiss;
   readarg_t *readarg = (readarg_t *) rarg;
   field_t **input_vars = readarg->vars;
+  recinfo_t *recinfo = readarg->recinfo;
   int streamID = readarg->streamID;
   int tsIDnext = readarg->tsIDnext;
   int nrecs = readarg->nrecs;
@@ -96,7 +103,13 @@ void *cdoReadTimestep(void *rarg)
   for ( int recID = 0; recID < nrecs; ++recID )
     {
       streamInqRecord(streamID, &varID, &levelID);
-      
+
+      if ( tsIDnext == 1 && recinfo )
+        {
+          recinfo[recID].varID   = varID;
+          recinfo[recID].levelID = levelID;
+        }
+
       if ( CDO_Memtype == MEMTYPE_FLOAT )
         streamReadRecordF(streamID, input_vars[varID][levelID].ptr2, &nmiss);
       else
@@ -142,7 +155,6 @@ void *XTimstat(void *argument)
   int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
-  int nrecs;
   int varID, levelID;
   long nsets;
   int i;
@@ -299,7 +311,10 @@ void *XTimstat(void *argument)
 
   int tsID  = 0;
   int otsID = 0;
-  nrecs = streamInqTimestep(streamID1, tsID);
+  int nrecs = streamInqTimestep(streamID1, tsID);
+  int maxrecs = nrecs;
+  recinfo_t *recinfo = (recinfo_t *) malloc(maxrecs*sizeof(recinfo_t)); 
+  
   tsID++;
   while ( TRUE )
     {
@@ -316,7 +331,8 @@ void *XTimstat(void *argument)
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
           readarg.tsIDnext = tsID;
-          readarg.nrecs = nrecs;
+          readarg.nrecs    = nrecs;
+          readarg.recinfo  = recinfo;
 
           if ( ltsfirst || lparallelread == FALSE )
             {
@@ -531,6 +547,7 @@ void *XTimstat(void *argument)
   if ( lvarstd ) field_free(vars2, vlistID1);
 
   dtlist_delete(dtlist);
+  Free(recinfo);
 
   if ( cdoDiag ) pstreamClose(streamID3);
   pstreamClose(streamID2);
