@@ -92,9 +92,9 @@ void arradd(const size_t n, double * restrict a, const double * restrict b)
 
 #else
 
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(a,b)
-#endif
+  //#if defined(_OPENMP)
+  //#pragma omp parallel for default(none) shared(a,b)
+  //#endif
   for ( size_t i = 0; i < n; i++ ) a[i] += b[i];
 
 #endif
@@ -122,6 +122,7 @@ void faradd(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+  float *array2f = field2.ptrf;
 
   if ( nwpv != 2 ) nwpv = 1;
 
@@ -141,7 +142,10 @@ void faradd(field_t *field1, field_t field2)
     }
   else
     {
-      arradd(len, array1, array2);
+      if ( field2.memtype == MEMTYPE_FLOAT )
+        for ( size_t i = 0; i < len; i++ ) array1[i] += array2f[i];
+      else
+        arradd(len, array1, array2);
     }
 }
 
