@@ -100,6 +100,8 @@ void *cdoReadTimestep(void *rarg)
   int tsIDnext = readarg->tsIDnext;
   int nrecs = readarg->nrecs;
 
+  timer_start(timer_read);
+
   for ( int recID = 0; recID < nrecs; ++recID )
     {
       streamInqRecord(streamID, &varID, &levelID);
@@ -118,6 +120,8 @@ void *cdoReadTimestep(void *rarg)
       input_vars[varID][levelID].nmiss2 = nmiss;
     }
 
+  timer_stop(timer_read);
+
   num_recs = streamInqTimestep(streamID, tsIDnext);
 
   return ((void *) &num_recs);
@@ -127,6 +131,7 @@ static
 void cdoUpdateVars(int nvars, int vlistID, field_t **vars)
 {
   void *tmp = NULL;
+
   for ( int varID = 0; varID < nvars; varID++ )
     {
       int nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
@@ -354,60 +359,72 @@ void *XTimstat(void *argument)
               cdo_task_start(read_task, cdoReadTimestep, &readarg);
             }
 
-          for ( varID = 0; varID < nvars; varID++ )
+          if ( nsets == 0 )
             {
-              nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-              for ( levelID = 0; levelID < nlevels; levelID++ )
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(maxrecs, recinfo, input_vars, vars1, samp1)
+#endif
+              for ( int recID = 0; recID < maxrecs; recID++ )
                 {
-                  nwpv     = vars1[varID][levelID].nwpv;
-                  gridsize = gridInqSize(vars1[varID][levelID].grid);
+                  int varID    = recinfo[recID].varID;
+                  int levelID  = recinfo[recID].levelID;
+                  int nwpv     = vars1[varID][levelID].nwpv;
+                  int gridsize = gridInqSize(vars1[varID][levelID].grid);
+                  int nmiss    = input_vars[varID][levelID].nmiss;
 
-                  if ( nsets == 0 )
+                  farcpy(&vars1[varID][levelID], input_vars[varID][levelID]);
+                  vars1[varID][levelID].nmiss = nmiss;
+                  if ( nmiss > 0 || samp1[varID][levelID].ptr )
                     {
-                      farcpy(&vars1[varID][levelID], input_vars[varID][levelID]);
-                      nmiss = input_vars[varID][levelID].nmiss;
-                      vars1[varID][levelID].nmiss = nmiss;
-                      if ( nmiss > 0 || samp1[varID][levelID].ptr )
+                      if ( samp1[varID][levelID].ptr == NULL )
+                        samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+                      
+                      for ( int i = 0; i < nwpv*gridsize; i++ )
+                        if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
+                          samp1[varID][levelID].ptr[i] = 0;
+                        else
+                          samp1[varID][levelID].ptr[i] = 1;
+                    }
+                }
+            }
+          else
+            {
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(lvarstd, nsets, maxrecs, recinfo, input_vars, vars1, samp1, vars2, operfunc)
+#endif
+              for ( int recID = 0; recID < maxrecs; recID++ )
+                {
+                  int varID    = recinfo[recID].varID;
+                  int levelID  = recinfo[recID].levelID;
+                  int nwpv     = vars1[varID][levelID].nwpv;
+                  int gridsize = gridInqSize(vars1[varID][levelID].grid);
+                  int nmiss    = input_vars[varID][levelID].nmiss;
+                  
+                  if ( nmiss > 0 || samp1[varID][levelID].ptr )
+                    {
+                      if ( samp1[varID][levelID].ptr == NULL )
                         {
-                          if ( samp1[varID][levelID].ptr == NULL )
-                            samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-
-                          for ( i = 0; i < nwpv*gridsize; i++ )
-                            if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
-                              samp1[varID][levelID].ptr[i] = 0;
-                            else
-                              samp1[varID][levelID].ptr[i] = 1;
+                          samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+                          for ( int i = 0; i < nwpv*gridsize; i++ )
+                            samp1[varID][levelID].ptr[i] = nsets;
                         }
+                          
+                      for ( int i = 0; i < nwpv*gridsize; i++ )
+                        if ( !DBL_IS_EQUAL(input_vars[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
+                          samp1[varID][levelID].ptr[i]++;
+                    }
+                  
+                  if ( lvarstd )
+                    {
+                      farsumq(&vars2[varID][levelID], input_vars[varID][levelID]);
+                      farsum(&vars1[varID][levelID], input_vars[varID][levelID]);
                     }
                   else
                     {
-                      nmiss = input_vars[varID][levelID].nmiss;
-                      if ( nmiss > 0 || samp1[varID][levelID].ptr )
-                        {
-                          if ( samp1[varID][levelID].ptr == NULL )
-                            {
-                              samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-                              for ( i = 0; i < nwpv*gridsize; i++ )
-                                samp1[varID][levelID].ptr[i] = nsets;
-                            }
-                          
-                          for ( i = 0; i < nwpv*gridsize; i++ )
-                            if ( !DBL_IS_EQUAL(input_vars[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
-                              samp1[varID][levelID].ptr[i]++;
-                        }
-                  
-                      if ( lvarstd )
-                        {
-                          farsumq(&vars2[varID][levelID], input_vars[varID][levelID]);
-                          farsum(&vars1[varID][levelID], input_vars[varID][levelID]);
-                        }
-                      else
-                        {
-                          farfun(&vars1[varID][levelID], input_vars[varID][levelID], operfunc);
-                        }
+                      farfun(&vars1[varID][levelID], input_vars[varID][levelID], operfunc);
                     }
-		}
-	    }
+                }
+            }
 
 	  if ( nsets == 0 && lvarstd )
 	    for ( varID = 0; varID < nvars; varID++ )
@@ -427,21 +444,21 @@ void *XTimstat(void *argument)
       if ( nrecs == 0 && nsets == 0 ) break;
 
       if ( lmean )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevels; levelID++ )
-	      {
-		if ( samp1[varID][levelID].ptr == NULL )
-		  farcdiv(&vars1[varID][levelID], (double)nsets);
-		else
-                  {
-                    //   farround(&samp1[varID][levelID]); not necessary
-                    fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
-                  }
-              }
-	  }
+        {
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(nsets, maxrecs, recinfo, vars1, samp1)
+#endif
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID    = recinfo[recID].varID;
+              int levelID  = recinfo[recID].levelID;
+
+              if ( samp1[varID][levelID].ptr == NULL )
+                farcdiv(&vars1[varID][levelID], (double)nsets);
+              else
+                fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
+            }
+        }
       else if ( lvarstd )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
