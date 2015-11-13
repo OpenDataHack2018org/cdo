@@ -352,10 +352,11 @@ argument_t *glob_pattern(const char *restrict string)
   char **p;
 
   wordexp_t glob_results;
+  glob_results.we_wordc = 0;
   argument_t *argument = NULL;
 
   // glob the input argument or do even more shell magic
-  wordexp(string, &glob_results, flags);
+  int status = wordexp(string, &glob_results, flags);
 
   // How much space do we need?
   for ( p = glob_results.we_wordv, cnt = glob_results.we_wordc; cnt; p++, cnt-- )
@@ -374,7 +375,7 @@ argument_t *glob_pattern(const char *restrict string)
       if ( cnt < glob_results.we_wordc-1 ) strcat(argument->args, " ");
     }
 
-  wordfree(&glob_results);
+  if ( status == 0 ) wordfree(&glob_results);
 
   return argument;
 }
