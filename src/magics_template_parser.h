@@ -10,6 +10,8 @@
 #include<libxml/parser.h>
 #include<libxml/tree.h>
 
+#include "cdo_int.h"
+
 int magics_template_parser( xmlNode * a_node );
 
 int SetMagicsParameterValue( char *param_name, char *param_type, char *param_value );

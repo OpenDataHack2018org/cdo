@@ -20,16 +20,26 @@ xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 
 #define DBG 0
 
+/***** ADDED for handling plots with  defined lat lon min max *****/
+/*** LAT_MIN,LAT_MAX, LON_MIN,LON_MAX ****/
+/**** lat_min,lat_max,lon_min,lon_max ****/
+
+/****  
+subpage_lower_left_latitude 
+subpage_lower_left_longitude
+subpage_upper_right_latitude
+subpage_upper_right_longitude
+****/
 
 int CONTOUR, SHADED, GRFILL;
 
-char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split"};
+char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split","lat_min","lat_max","lon_min","lon_max"};
 int contour_param_count = sizeof(contour_params)/sizeof(char*);
 
-char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split"};
+char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max"};
 int shaded_param_count = sizeof(shaded_params)/sizeof(char*);
 
-char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split"};
+char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max"};
 int grfill_param_count = sizeof(grfill_params)/sizeof(char*);
 
 char  *STD_COLOUR_TABLE[] = {"red", "green", "blue", "yellow", "cyan", "magenta", "black", "avocado",
@@ -83,6 +93,8 @@ extern void StrReplaceChar( );
  /* Magics default values */
 int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0, FILE_SPLIT = FALSE;
 double YMIN = 1.0e+200, YMAX = -1.0e+200, INTERVAL = 8.0, RESOLUTION = 10.0f, *LEV_LIST = NULL ;
+double LAT_MIN = 1.0e+200, LAT_MAX = -1.e+200;
+double LON_MIN = 1.0e+200, LON_MAX = -1.e+200;
 char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEVICE = NULL, *COLOUR_TRIAD = NULL;
 
 
@@ -158,6 +170,18 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
            if( !strcmp( split_str[0],"step_freq" ) )
 	     fprintf( stderr,"STEP_FREQ %d\n",STEP_FREQ );
 
+           if( !strcmp( split_str[0],"lat_min" ) )
+	     fprintf(stderr," Lat Min Val %g\n",LAT_MIN );
+	
+           if( !strcmp( split_str[0],"lat_max" ) )
+	     fprintf(stderr,"Lat Max Val %g\n",LAT_MAX );
+
+           if( !strcmp( split_str[0],"lon_min" ) )
+	     fprintf(stderr," Lon Min Val %g\n",LON_MIN );
+	
+           if( !strcmp( split_str[0],"lon_max" ) )
+	     fprintf(stderr,"Lon Max Val %g\n",LON_MAX );
+
            Free(split_str);
         }
     }
@@ -225,6 +249,26 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       mag_setc ( "contour_shade", "on" );
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );
+
+      if( LAT_MIN < 1.0e+200  )
+        {
+	   mag_setr( "subpage_lower_left_latitude", LAT_MIN );
+        }
+
+      if( LON_MIN < 1.0e+200  )
+        {
+	   mag_setr( "subpage_lower_left_longitude", LON_MIN );
+        }
+
+      if( LAT_MAX > -1.0e+200 )
+        {
+	   mag_setr( "subpage_upper_right_latitude", LAT_MAX );
+        }
+
+      if( LON_MAX > -1.0e+200 )
+        {
+	   mag_setr( "subpage_upper_right_longitude", LON_MAX );
+        }
       
       if( YMIN < 1.0e+200  )
         {
@@ -304,6 +348,26 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       mag_setc ("contour_highlight",        "off");
       
     
+      if( LAT_MIN < 1.0e+200  )
+        {
+	   mag_setr( "subpage_lower_left_latitude", LAT_MIN );
+        }
+
+      if( LON_MIN < 1.0e+200  )
+        {
+	   mag_setr( "subpage_lower_left_longitude", LON_MIN );
+        }
+
+      if( LAT_MAX > -1.0e+200 )
+        {
+	   mag_setr( "subpage_upper_right_latitude", LAT_MAX );
+        }
+
+      if( LON_MAX > -1.0e+200 )
+        {
+	   mag_setr( "subpage_upper_right_longitude", LON_MAX );
+        }
+      
       if( YMIN < 1.0e+200  )
 	mag_setr( "contour_min_level", YMIN );
 
@@ -352,6 +416,26 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );
+      
+      if( LAT_MIN < 1.0e+200  )
+        {
+	   mag_setr( "subpage_lower_left_latitude", LAT_MIN );
+        }
+
+      if( LON_MIN < 1.0e+200  )
+        {
+	   mag_setr( "subpage_lower_left_longitude", LON_MIN );
+        }
+
+      if( LAT_MAX > -1.0e+200 )
+        {
+	   mag_setr( "subpage_upper_right_latitude", LAT_MAX );
+        }
+
+      if( LON_MAX > -1.0e+200 )
+        {
+	   mag_setr( "subpage_upper_right_longitude", LON_MAX );
+        }
       
       if( YMIN < 1.0e+200  )
         {
@@ -859,9 +943,11 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 			}
 		    }
 		      
-		  if( !strcmp( split_str[0],"min" )      ||  !strcmp( split_str[0],"max" )     ||
-		      !strcmp( split_str[0],"count" )     ||  !strcmp( split_str[0],"interval" ) ||
-		      !strcmp( split_str[0],"thickness" ) ||  !strcmp( split_str[0],"resolution" ) || 
+		  if( !strcmp( split_str[0],"min" )       ||  !strcmp( split_str[0],"max" )            ||
+		      !strcmp( split_str[0],"lat_min" )   ||  !strcmp( split_str[0],"lat_max" )        ||
+		      !strcmp( split_str[0],"lon_min" )   ||  !strcmp( split_str[0],"lon_max" )        ||
+		      !strcmp( split_str[0],"count" )     ||  !strcmp( split_str[0],"interval" )       ||
+		      !strcmp( split_str[0],"thickness" ) ||  !strcmp( split_str[0],"resolution" )     ||
 		      !strcmp( split_str[0],"step_freq" )
                     )
 		    {
@@ -896,6 +982,22 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 		           if( !strcmp( split_str[0],"step_freq" ) )
 			     {
 	  	                STEP_FREQ = atoi( split_str[1] );
+			     }
+                           if( !strcmp( split_str[0],"lat_min" ) )
+	                     {
+	                        LAT_MIN = atof( split_str[1] );
+			     }
+                           if( !strcmp( split_str[0],"lat_max" ) )
+	                     {
+	  		        LAT_MAX = atof( split_str[1] );
+			     }
+                           if( !strcmp( split_str[0],"lon_min" ) )
+	                     {
+	                        LON_MIN = atof( split_str[1] );
+			     }
+                           if( !strcmp( split_str[0],"lon_max" ) )
+	                     {
+	  		        LON_MAX = atof( split_str[1] );
 			     }
 	                }
 		    }
