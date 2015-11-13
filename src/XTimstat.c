@@ -446,7 +446,7 @@ void *XTimstat(void *argument)
       if ( lmean )
         {
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(nsets, maxrecs, recinfo, vars1, samp1) if(maxrecs>1) if(maxrecs>1)
+#pragma omp parallel for default(none) shared(nsets, maxrecs, recinfo, vars1, samp1) if(maxrecs>1)
 #endif
           for ( int recID = 0; recID < maxrecs; recID++ )
             {
