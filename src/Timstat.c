@@ -285,6 +285,7 @@ void *Timstat(void *argument)
 	      else
 		{
 		  streamReadRecord(streamID1, field.ptr, &field.nmiss);
+		  field.size    = gridsize;
 		  field.grid    = vars1[varID][levelID].grid;
 		  field.missval = vars1[varID][levelID].missval;
 		  if ( field.nmiss > 0 || samp1[varID][levelID].ptr )

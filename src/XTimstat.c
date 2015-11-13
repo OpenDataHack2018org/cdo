@@ -369,7 +369,7 @@ void *XTimstat(void *argument)
                   int varID    = recinfo[recID].varID;
                   int levelID  = recinfo[recID].levelID;
                   int nwpv     = vars1[varID][levelID].nwpv;
-                  int gridsize = gridInqSize(vars1[varID][levelID].grid);
+                  int gridsize = vars1[varID][levelID].size;
                   int nmiss    = input_vars[varID][levelID].nmiss;
 
                   farcpy(&vars1[varID][levelID], input_vars[varID][levelID]);
@@ -397,7 +397,7 @@ void *XTimstat(void *argument)
                   int varID    = recinfo[recID].varID;
                   int levelID  = recinfo[recID].levelID;
                   int nwpv     = vars1[varID][levelID].nwpv;
-                  int gridsize = gridInqSize(vars1[varID][levelID].grid);
+                  int gridsize = vars1[varID][levelID].size;
                   int nmiss    = input_vars[varID][levelID].nmiss;
                   
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
@@ -499,7 +499,7 @@ void *XTimstat(void *argument)
 	    for ( levelID = 0; levelID < nlevels; levelID++ )
 	      {
                 nwpv     = vars1[varID][levelID].nwpv;
-                gridsize = gridInqSize(vars1[varID][levelID].grid);
+                gridsize = vars1[varID][levelID].size;
 		missval  = vars1[varID][levelID].missval;
 		if ( samp1[varID][levelID].ptr )
 		  {

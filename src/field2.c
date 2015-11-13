@@ -43,33 +43,35 @@ void farfun(field_t *field1, field_t field2, const int function)
 
 void farcpy(field_t *field1, field_t field2)
 {
-  size_t   i, len;
-  int          nwpv     = field1->nwpv;
-  const int    grid1    = field1->grid;
+  size_t gridsize1      = (size_t) field1->size;
+  size_t nwpv           = (size_t) field1->nwpv;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
-  double *array1  = field1->ptr;
-  const int    grid2    = field2.grid;
+  double *array1        = field1->ptr;
+  size_t gridsize2      = (size_t) field2.size;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
-  double *array2  = field2.ptr;
-  float *array2f = field2.ptrf;
+  const double *restrict array2 = field2.ptr;
+  const float *restrict array2f = field2.ptrf;
+
+  if ( gridsize1 == 0 ) gridsize1 = gridInqSize(field1->grid);
+  if ( gridsize2 == 0 ) gridsize2 = gridInqSize(field2.grid);
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  len = (size_t) (nwpv*gridInqSize(grid1));
+  const size_t len = nwpv*gridsize1;
 
-  if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
+  if ( len != nwpv*gridsize2 )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( field2.memtype == MEMTYPE_FLOAT )
-    for ( i = 0; i < len; i++ ) array1[i] = array2f[i];
+    for ( size_t i = 0; i < len; i++ ) array1[i] = array2f[i];
   else
-    for ( i = 0; i < len; i++ ) array1[i] = array2[i];
+    for ( size_t i = 0; i < len; i++ ) array1[i] = array2[i];
 }
 
 static
-void arradd(const size_t n, double * restrict a, const double * restrict b)
+void arradd(const size_t n, double *restrict a, const double *restrict b)
 {
   // SSE2 version is 15% faster than the original loop (tested with gcc47)
 #if 0
@@ -101,7 +103,7 @@ void arradd(const size_t n, double * restrict a, const double * restrict b)
 }
 
 static
-void arraddw(const size_t n, double * restrict a, const double * restrict b, double w)
+void arraddw(const size_t n, double *restrict a, const double *restrict b, double w)
 {
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(a,b,w)
@@ -152,28 +154,30 @@ void faradd(field_t *field1, field_t field2)
 
 void farsum(field_t *field1, field_t field2)
 {
-  size_t   i, len;
-  int          nwpv     = field1->nwpv;
-  const int    grid1    = field1->grid;
+  size_t gridsize1      = (size_t) field1->size;
+  size_t nwpv           = (size_t) field1->nwpv;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
-  double *array1  = field1->ptr;
-  const int    grid2    = field2.grid;
+  double *array1        = field1->ptr;
+  size_t gridsize2      = (size_t) field2.size;
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
-  double *array2  = field2.ptr;
-  float *array2f = field2.ptrf;
+  const double *restrict array2 = field2.ptr;
+  const float *restrict array2f = field2.ptrf;
+
+  if ( gridsize1 == 0 ) gridsize1 = gridInqSize(field1->grid);
+  if ( gridsize2 == 0 ) gridsize2 = gridInqSize(field2.grid);
 
   if ( nwpv != 2 ) nwpv = 1;
 
-  len = (size_t) (nwpv*gridInqSize(grid1));
+  const size_t len = nwpv*gridsize1;
 
-  if ( len != (size_t) (nwpv*gridInqSize(grid2)) )
+  if ( len != nwpv*gridsize2 )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
-      for ( i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array2[i], missval2) )
 	  {
 	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
@@ -183,7 +187,7 @@ void farsum(field_t *field1, field_t field2)
 	  }
 
       field1->nmiss = 0;
-      for ( i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
 	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
     }
   else
