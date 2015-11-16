@@ -51,10 +51,10 @@ int correlation_t(long gridsize, double missval1, double missval2, int *nofvals,
 	  temp6 = MUL(temp4, temp5);
 
 	  cor = DIV(temp1, SQRT(temp6));
-	  /*
-	    if      ( cor < -1)  cor = -1;
-	    else if ( cor >  1)  cor =  1;
-	  */
+
+          if      ( cor < -1 )  cor = -1;
+          else if ( cor >  1 )  cor =  1;
+
 	  if ( DBL_IS_EQUAL(cor, missval1) ) nmiss++;
 	}
       else
