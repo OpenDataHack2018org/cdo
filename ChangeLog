@@ -5,6 +5,10 @@
 
 2015-11-16  Uwe Schulzweida
 
+	* seldate: stop reading if data date is greater than end date
+
+2015-11-16  Uwe Schulzweida
+
 	* timcor: set data range -1 to 1
 
 2015-10-28  Uwe Schulzweida

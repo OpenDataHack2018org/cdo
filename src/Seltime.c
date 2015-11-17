@@ -421,6 +421,10 @@ void *Seltime(void *argument)
 	      selfound[0]      = TRUE;
 	      selfound[nsel-1] = TRUE;
 	    }
+          else if ( selfval > fltarr[nsel-1] )
+            {
+              break;
+            }
 	}
       else
 	{
