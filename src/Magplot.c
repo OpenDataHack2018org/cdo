@@ -33,13 +33,13 @@ subpage_upper_right_longitude
 
 int CONTOUR, SHADED, GRFILL;
 
-char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split","lat_min","lat_max","lon_min","lon_max"};
+char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int contour_param_count = sizeof(contour_params)/sizeof(char*);
 
-char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max"};
+char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int shaded_param_count = sizeof(shaded_params)/sizeof(char*);
 
-char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max"};
+char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int grfill_param_count = sizeof(grfill_params)/sizeof(char*);
 
 char  *STD_COLOUR_TABLE[] = {"red", "green", "blue", "yellow", "cyan", "magenta", "black", "avocado",
@@ -75,6 +75,16 @@ int STYLE_COUNT = sizeof( STYLE_TABLE )/ sizeof( char *);
 char *DEVICE_TABLE[] = { "PS","EPS","PDF","PNG","GIF","GIF_ANIMATION","JPEG","SVG","KML"};
 int DEVICE_COUNT = sizeof( DEVICE_TABLE )/ sizeof( char *);
 
+
+/*char *PROJECTION_TABLE[] = { "cylindrical", "polar_stereographic", "polar_north", "geos", "meteosat", "meteosat_57E", "goes_east", "lambert", "EPSG3857", "goode", "collignon", "mollweide", "robinson", "bonne", "google", "efas", "EPSG4326", "lambert_north_atlantic", "mercator", "cartesian", "taylor", "tephigram" };
+*/
+/** The following projections are having some issues to be clarified with Magics++ **/
+
+char *PROJECTION_TABLE[] = { "cylindrical", "polar_stereographic", "polar_north", "geos", "meteosat", "meteosat_57E", "lambert", "EPSG3857", "goode", "collignon", "mollweide", "robinson", "bonne", "google", "efas", "EPSG4326", "lambert_north_atlantic", "mercator" };
+int PROJECTION_COUNT = sizeof( PROJECTION_TABLE )/ sizeof( char *);
+
+
+
 int ANIM_FLAG = 0, STEP_FREQ = 0; /* '0' for static images like jpeg,ps, etc.. , '1' for animation formats */
 
 
@@ -82,6 +92,7 @@ int checkcolour( char *colour_in );
 int ReadColourTable ( char *filepath );
 int checkstyle( char *style_in );
 int checkdevice( char *device_in );
+int checkprojection( char *projection_in );
 void VerifyPlotParameters( int num_param, char **param_names, int opID );
 
 extern int IsNumeric();
@@ -95,7 +106,7 @@ int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0, FILE_SPLIT = FAL
 double YMIN = 1.0e+200, YMAX = -1.0e+200, INTERVAL = 8.0, RESOLUTION = 10.0f, *LEV_LIST = NULL ;
 double LAT_MIN = 1.0e+200, LAT_MAX = -1.e+200;
 double LON_MIN = 1.0e+200, LON_MAX = -1.e+200;
-char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEVICE = NULL, *COLOUR_TRIAD = NULL;
+char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEVICE = NULL, *COLOUR_TRIAD = NULL, *PROJECTION = NULL;
 
 
 static
@@ -182,6 +193,9 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
            if( !strcmp( split_str[0],"lon_max" ) )
 	     fprintf(stderr,"Lon Max Val %g\n",LON_MAX );
 
+           if( !strcmp( split_str[0],"projection" ) )
+	     fprintf( stderr,"PROJECTION %s\n",PROJECTION );
+
            Free(split_str);
         }
     }
@@ -235,6 +249,12 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       mag_setc ("output_format", DEVICE );
     }
 
+  if( PROJECTION )
+    {
+      mag_setc ( "subpage_map_projection", PROJECTION );
+    }
+
+
   mag_seti ("map_label_latitude_frequency",2);
   mag_seti ("map_label_longitude_frequency",2);
   /*mag_setr ("map_label_height",0.5);*/
@@ -249,6 +269,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       mag_setc ( "contour_shade", "on" );
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );
+
 
       if( LAT_MIN < 1.0e+200  )
         {
@@ -832,7 +853,8 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 		  if( !strcmp( split_str[0],"colour" )     || !strcmp( split_str[0],"style" )       ||
 		      !strcmp( split_str[0],"colour_min" ) || !strcmp( split_str[0],"colour_max" )  ||
 		      !strcmp( split_str[0],"RGB" )        || !strcmp( split_str[0],"colour_triad" )||
-		      !strcmp( split_str[0],"device")      || !strcmp( split_str[0],"file_split" )
+		      !strcmp( split_str[0],"device")      || !strcmp( split_str[0],"file_split" )  ||
+		      !strcmp( split_str[0],"projection") 
 		    )
 		    {
 		      if( IsNumeric( split_str[1] ) )
@@ -939,6 +961,11 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 				   else
 				     COLOUR_TRIAD = "anti_clockwise";
 				}
+			    }
+			  else if( !strcmp( split_str[0],"projection" ) )
+			    {
+			      if( checkprojection( split_str[1] ) )
+				syntax = FALSE;
 			    }
 			}
 		    }
@@ -1295,6 +1322,37 @@ int checkdevice( char *device_in )
       
     if( !found )
 	 cdoWarning( " Device specified with Improper value!\n" );
+    
+    return 1; 
+}
+
+int checkprojection( char *projection_in )
+
+{
+    int i, found = FALSE;
+
+    /*StrToUpperCase( projection_in );*/
+
+    for( i = 0 ; i < PROJECTION_COUNT; i++ )
+      {
+	if( DBG )
+	  fprintf( stderr, "Input %s ref %s\n",projection_in, PROJECTION_TABLE[i] );
+	
+	if( !strcmp( PROJECTION_TABLE[i], projection_in ) )
+	  {
+	    found = TRUE;
+	    PROJECTION = projection_in;
+	    return 0;
+	  }
+      }
+      
+    if( !found )
+      {	
+	 cdoWarning( " Projection specified with Improper value!\n" );
+	 cdoWarning( " Specify one of the following:\n" );
+	 cdoWarning( " cylindrical polar_stereographic polar_north geos meteosat meteosat_57E geos_east lambert EPSG3857 goode collignon mollweide robinson bonne google efas EPSG4326 lambert_north_atlantic mercator cartesian taylor tephigram\n" );
+
+      }	
     
     return 1; 
 }
