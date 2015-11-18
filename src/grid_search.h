@@ -43,7 +43,7 @@ struct gridsearch {
 };
 
 
-struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
+struct gridsearch *gridsearch_create_reg2d(unsigned lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats);
 void gridsearch_delete(struct gridsearch *gs);

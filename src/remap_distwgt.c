@@ -377,6 +377,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
   unsigned tgt_grid_size = tgt_grid->size;
   unsigned nx = src_grid->dims[0];
   unsigned ny = src_grid->dims[1];
+  unsigned lcyclic = src_grid->is_cyclic;
 
   weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
   weightlinks[0].addweights = (addweight_t *) Malloc(num_neighbors*tgt_grid_size*sizeof(addweight_t));
@@ -394,7 +395,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
 
   struct gridsearch *gs = NULL;
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+    gs = gridsearch_create_reg2d(lcyclic, nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else if ( num_neighbors == 1 )
     gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else
@@ -484,6 +485,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   unsigned tgt_grid_size = tgt_grid->size;
   unsigned nx = src_grid->dims[0];
   unsigned ny = src_grid->dims[1];
+  unsigned lcyclic = src_grid->is_cyclic;
 
   int nbr_mask[num_neighbors];    // mask at nearest neighbors
   int nbr_add[num_neighbors];     // source address at nearest neighbors
@@ -496,7 +498,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
 
   struct gridsearch *gs = NULL;
   if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    gs = gridsearch_create_reg2d(nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
+    gs = gridsearch_create_reg2d(lcyclic, nx, ny, src_grid->reg2d_center_lon, src_grid->reg2d_center_lat);
   else if ( num_neighbors == 1 )
     gs = gridsearch_create_nn(src_grid_size, src_grid->cell_center_lon, src_grid->cell_center_lat);
   else

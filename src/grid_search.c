@@ -54,17 +54,20 @@ void gridsearch_set_method(const char *methodstr)
 }
 
 
-struct gridsearch *gridsearch_create_reg2d(unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_reg2d(unsigned lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 
   gs->nx = nx;
   gs->ny = ny;
 
-  double *reg2d_center_lon = (double *) Malloc((nx+1)*sizeof(double));
+  unsigned nxm = nx;
+  if ( lcyclic ) nxm++;
+
+  double *reg2d_center_lon = (double *) Malloc(nxm*sizeof(double));
   double *reg2d_center_lat = (double *) Malloc(ny*sizeof(double));
 
-  memcpy(reg2d_center_lon, lons, (nx+1)*sizeof(double));
+  memcpy(reg2d_center_lon, lons, nxm*sizeof(double));
   memcpy(reg2d_center_lat, lats, ny*sizeof(double));
 
   double *coslon = (double *) Malloc(nx*sizeof(double));
