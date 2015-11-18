@@ -553,7 +553,7 @@ int getMemAlignment(void)
 
   for ( k = 0; k < 4; ++k ) if ( ma_result[k] ) ma = ma_check[k];
 
-  return (ma);
+  return ma;
 }
 
 
@@ -1005,7 +1005,7 @@ long str_to_int(const char *intstring)
       if ( fact ) intval = fact*atol(intstring);
     }
 
-  return (intval);
+  return intval;
 }
 
 static
@@ -1018,6 +1018,7 @@ int parse_options_long(int argc, char *argv[])
   int lgridsearchradius;
   int lremap_genweights;
   int lpercentile;
+  int lprintoperators = 0;
 
   struct cdo_option opt_long[] =
     {
@@ -1033,6 +1034,7 @@ int parse_options_long(int argc, char *argv[])
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "float",                   no_argument,        &CDO_Memtype,  MEMTYPE_FLOAT  },
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
+      { "operators",               no_argument,    &lprintoperators,  1  },
       { "no_warnings",             no_argument,           &_Verbose,  0  },
       { "format",            required_argument,                NULL, 'f' },
       { "help",                    no_argument,                NULL, 'h' },
@@ -1239,6 +1241,12 @@ int parse_options_long(int argc, char *argv[])
         }
     }
 
+  if ( lprintoperators )
+    {
+      operatorPrintAll();
+      return 1;
+    }
+  
   return 0;
 }
 
@@ -1351,7 +1359,7 @@ int main(int argc, char *argv[])
   if ( numThreads > 0 )
     {
       fprintf(stderr, "Option -P failed, OpenMP support not compiled in!\n");
-      return(-1);
+      return -1;
     }
 #endif
 
@@ -1375,7 +1383,7 @@ int main(int argc, char *argv[])
       lstop = TRUE;
     }
 
-  if ( lstop ) return (status);
+  if ( lstop ) return status;
 
   if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
 
@@ -1397,9 +1405,9 @@ int main(int argc, char *argv[])
           cdoSetDebug(DebugLevel);
          }
 
-      timer_total      = timer_new("total");
-      timer_read       = timer_new("read");
-      timer_write      = timer_new("write");
+      timer_total  = timer_new("total");
+      timer_read   = timer_new("read");
+      timer_write  = timer_new("write");
 
       timer_start(timer_total);
 
@@ -1426,5 +1434,5 @@ int main(int argc, char *argv[])
 
   if ( CDO_Rusage ) cdo_rusage();
 
-  return (status);
+  return status;
 }
