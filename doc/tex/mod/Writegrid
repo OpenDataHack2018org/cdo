@@ -13,6 +13,6 @@
 @Title     = Write grid
 
 @BeginDescription
-Write the grid information to a file (SCRIP netCDF).
+Write the grid information to a file (SCRIP NetCDF).
 @EndDescription
 @EndOperator

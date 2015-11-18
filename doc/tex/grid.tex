@@ -21,7 +21,7 @@ If the cell area is not available then it will be computed from the geographical
 This is only possible if the geographical coordinates of the grid cell corners are available or derivable.
 Otherwise {\CDO} gives a warning message and uses constant area weights for all grid cells.
 
-The cell area is read automatically from a netCDF input file if a variable has the
+The cell area is read automatically from a NetCDF input file if a variable has the
 corresponding ``cell\_measures'' attribute, e.g.:
 
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\small]
@@ -92,13 +92,13 @@ If there are more then one grid in the datafile the grid description of the firs
 SCRIP (Spherical Coordinate Remapping and Interpolation Package) uses
 a common grid description for curvilinear and unstructured grids.
 For more information about the convention see \cite{SCRIP}.
-This grid description is stored in netCDF. Therefor it is only
-available if {\CDO} was compiled with netCDF support!
+This grid description is stored in NetCDF. Therefor it is only
+available if {\CDO} was compiled with NetCDF support!
 
 \vspace{2mm}
 
 %\begin{minipage}[t]{\textwidth}
-SCRIP grid description example of a curvilinear MPIOM \cite{MPIOM} GROB3 grid (only the netCDF header):
+SCRIP grid description example of a curvilinear MPIOM \cite{MPIOM} GROB3 grid (only the NetCDF header):
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
     netcdf grob3s {
     dimensions:

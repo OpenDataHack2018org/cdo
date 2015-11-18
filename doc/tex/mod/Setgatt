@@ -44,12 +44,12 @@ STRING  File name which contains global text attributes
 
 
 @BeginNote
-Besides netCDF none of the supported data formats supports global attributes.
+Besides NetCDF none of the supported data formats supports global attributes.
 @EndNote
 
 
 @BeginExample
-To set the global text attribute "myatt" to "myattcontents" in a netCDF file use:
+To set the global text attribute "myatt" to "myattcontents" in a NetCDF file use:
 @BeginVerbatim
    cdo setgatt,myatt,myattcontents ifile ofile
 @EndVerbatim

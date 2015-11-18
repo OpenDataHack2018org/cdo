@@ -41,7 +41,7 @@ Only 32-bit IEEE floats are supported for standard binary files!
 
 
 @BeginExample
-To convert a binary data file to netCDF use:
+To convert a binary data file to NetCDF use:
 @BeginVerbatim
    cdo -f nc import_binary ifile.ctl ofile.nc
 @EndVerbatim

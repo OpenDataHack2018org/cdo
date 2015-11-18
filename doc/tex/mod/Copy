@@ -34,7 +34,7 @@ of @file{ofile}. If @file{ofile} does not exist it will be created.
 
 
 @BeginExample
-To change the format of a dataset to netCDF use:
+To change the format of a dataset to NetCDF use:
 @BeginVerbatim
    cdo -f nc copy ifile ofile.nc
 @EndVerbatim

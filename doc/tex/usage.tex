@@ -43,10 +43,10 @@ The following options are available for all operators:
               {\bf File format}          & \sl $<$format$>$ \\
                GRIB version 1            & {\tt grb}  \\
                GRIB version 2            & {\tt grb2} \\
-               netCDF                    & {\tt nc}   \\
-               netCDF version 2 (64-bit) & {\tt nc2}  \\
-               netCDF-4 (HDF5)           & {\tt nc4}  \\
-               netCDF-4 classic          & {\tt nc4c} \\
+               NetCDF                    & {\tt nc}   \\
+               NetCDF version 2 (64-bit) & {\tt nc2}  \\
+               NetCDF-4 (HDF5)           & {\tt nc4}  \\
+               NetCDF-4 classic          & {\tt nc4c} \\
                SERVICE                   & {\tt srv}  \\
                EXTRA                     & {\tt ext}  \\
                IEG                       & {\tt ieg}  \\
@@ -55,18 +55,18 @@ The following options are available for all operators:
               \vspace*{1mm}
             } \\
          \> GRIB2 is only available if {\CDO} was compiled with GRIB\_API support and all \\
-         \> netCDF file types are only available if {\CDO} was compiled with netCDF support! \\
+         \> NetCDF file types are only available if {\CDO} was compiled with NetCDF support! \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -g $<$grid$>$}
          \> Define the default grid description by name or from file (see chapter 1.3 on page \pageref{GRID_DESCRIPTION}). \\
          \> Available grid names are: {\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>}, {\tt gme<NI>} \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -h, -\,-help}
          \> Help information for the operators. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -\,-no\_history}
-         \> Do not append to netCDF {\it history} global attribute. \\
+         \> Do not append to NetCDF {\it history} global attribute. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -\,-netcdf\_hdr\_pad, -\,-hdr\_pad, -\,-header\_pad $<$nbr$>$}
          \> \\
 \makebox[1.5in][l]{\hspace*{1cm}}
-         \> Pad netCDF output header with {\it nbr} bytes. \\
+         \> Pad NetCDF output header with {\it nbr} bytes. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -k $<$chunktype$>$}
          \> NetCDF4 chunk type: auto, grid or lines. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -L}
@@ -85,9 +85,9 @@ The following options are available for all operators:
 \makebox[1.5in][l]{\hspace*{1cm}}
          \> Percentile method: {\tt nrank nist numpy numpy\_lower numpy\_higher numpy\_nearest} \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -Q}
-         \> Alphanumeric sorting of netCDF parameter names. \\
+         \> Alphanumeric sorting of NetCDF parameter names. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -\,-reduce\_dim}
-         \> Reduce netCDF dimensions (module: TIMSTAT, FLDSTAT). \\
+         \> Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT). \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -R, -\,-regular}
          \> Convert GRIB1 data from reduced to regular grid (only with cgribex lib). \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -r}
@@ -111,7 +111,7 @@ The following options are available for all operators:
 \makebox[1.5in][l]{\hspace*{1cm}\sl \ \ jpeg}
          \> JPEG compression of GRIB2 records. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl \ \ zip[\_1-9]}
-         \> Deflate compression of netCDF4 variables. \\
+         \> Deflate compression of NetCDF4 variables. \\
 \end{tabbing}
 %\footnotemark
 %\footnotetext{Needs szip support compiled in}

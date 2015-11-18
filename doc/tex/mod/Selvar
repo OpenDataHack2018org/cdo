@@ -180,7 +180,7 @@ Selects all fields with parameter table numbers in a user given list.
 
 @BeginDescription
 Selects all fields with record numbers in a user given list.
-This operator can not be used with netCDF data!
+This operator can not be used with NetCDF data!
 @EndDescription
 @EndOperator
 

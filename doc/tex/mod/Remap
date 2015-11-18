@@ -20,8 +20,8 @@ In this case the interpolation process can be split into two parts.
 Firstly the generation of the interpolation weights, which is the most time-consuming part.
 These interpolation weights can be reused for every remapping process with the operator @mod{remap}.
 This operator remaps all input fields to a new horizontal grid. The remap type and 
-the interpolation weights of one input grid are read from a netCDF file. More weights 
-are computed if the input fields are on different grids. The netCDF file with the 
+the interpolation weights of one input grid are read from a NetCDF file. More weights 
+are computed if the input fields are on different grids. The NetCDF file with the 
 weights should follow the @ref{SCRIP} convention. Normally these weights come from a previous
 call to one of the genXXX operators (e.g. @mod{genbil}) or were created by the original SCRIP package.
 @EndDescription
@@ -32,7 +32,7 @@ call to one of the genXXX operators (e.g. @mod{genbil}) or were created by the o
 @Item = grid
 STRING  Target grid description file or name
 @Item = weights
-STRING  Interpolation weights (SCRIP netCDF file)
+STRING  Interpolation weights (SCRIP NetCDF file)
 @EndParameter
 
 

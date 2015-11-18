@@ -8,21 +8,21 @@ and subsampling tools, and spatial interpolation.
 %There are a lot of operators for doing standard processing like simple statistic,
 %arithmetic, selection and interpolation on datasets from climate and forecast models.
 %The operators are primarily designed to aid manipulation and analysis of gridded scientific data
-{\CDO} was developed to have the same set of processing functions for GRIB \cite{GRIB} and netCDF \cite{netCDF}
+{\CDO} was developed to have the same set of processing functions for GRIB \cite{GRIB} and NetCDF \cite{NetCDF}
 datasets in one package.
 
 The Climate Data Interface \cite{CDI} is used for the fast and file format
-independent access to GRIB and netCDF datasets.
+independent access to GRIB and NetCDF datasets.
 The local \href{http://www.mpimet.mpg.de/}{MPI-MET} data formats SERVICE, EXTRA and 
 IEG are also supported.
 
-There are some limitations for GRIB and netCDF datasets.
-A GRIB dataset has to be consistent, similar to netCDF.
+There are some limitations for GRIB and NetCDF datasets.
+A GRIB dataset has to be consistent, similar to NetCDF.
 That means all time steps need to have the same variables, and
 within a time step each variable may occur only once.
 NetCDF datasets are only supported for the classic data model and arrays up to 4 dimensions.
 These dimensions should only be used by the horizontal and vertical grid and the time.
-The netCDF attributes should follow the
+The NetCDF attributes should follow the
 \href{http://ftp.unidata.ucar.edu/software/netcdf/docs/conventions.html}
      {GDT, COARDS or CF Conventions}.
 

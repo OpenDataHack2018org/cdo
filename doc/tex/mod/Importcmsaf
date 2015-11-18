@@ -94,7 +94,7 @@ functionality.
 
 
 @BeginExample
-@C To convert a CM-SAF HDF5 file to netCDF use:
+@C To convert a CM-SAF HDF5 file to NetCDF use:
 @C @BeginVerbatim
 @C    cdo -f nc import_cmsaf ifile.h5 ofile.nc
 @C @EndVerbatim
@@ -102,7 +102,7 @@ A typical sequence of commands with this operator could look like this:
 @BeginVerbatim
 cdo -f nc remapbil,r360x180 -import_cmsaf cmsaf_product.hdf output.nc
 @EndVerbatim
-(bilinear remapping to a predefined global grid with 1 deg resolution and conversion to netcdf). \\
+(bilinear remapping to a predefined global grid with 1 deg resolution and conversion to NetCDF). \\
 
 If you work with CM-SAF data on original satellite project, an additional file
 with information on geolocation is required, to perform such spatial operations:

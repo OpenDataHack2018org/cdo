@@ -63,8 +63,8 @@ The default value is 0 Pa.
 
 @BeginNote
 The code numbers or the variable names of the required parameter have to follow the @cite{ECHAM} convention.
-@C The netCDF CF convention for vertical hybrid coordinates is not supported, yet!
-Presently, the vertical coordinate definition of a netCDF file has also to follow the ECHAM convention.
+@C The NetCDF CF convention for vertical hybrid coordinates is not supported, yet!
+Presently, the vertical coordinate definition of a NetCDF file has also to follow the ECHAM convention.
 This means:
 @BeginItemize
 @Item = the dimension of the full level coordinate and the corresponding variable is called mlev,

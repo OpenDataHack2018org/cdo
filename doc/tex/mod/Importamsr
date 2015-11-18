@@ -28,7 +28,7 @@ More information to the data is available on the AMSR homepage http://www.remss.
 
 
 @BeginExample
-To convert monthly binary AMSR files to netCDF use:
+To convert monthly binary AMSR files to NetCDF use:
 @BeginVerbatim
    cdo -f nc amsre_yyyymmv5 amsre_yyyymmv5.nc
 @EndVerbatim

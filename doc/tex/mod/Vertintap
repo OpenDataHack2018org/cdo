@@ -9,7 +9,7 @@
 @BeginDescription
 Interpolate 3D variables on hybrid sigma height coordinates to pressure levels.
 The input file must contain the 3D air pressure. The air pressure is identified
-by the netCDF CF standard name air_pressure.
+by the NetCDF CF standard name air_pressure.
 This operator requires all variables on the same horizontal grid.
 @EndDescription
 @EndModule
@@ -28,7 +28,7 @@ FLOAT  Pressure levels in pascal
 
 
 @BeginNote
-This is a specific implementation for netCDF files from the ICON model, it may not work with data from other sources.
+This is a specific implementation for NetCDF files from the ICON model, it may not work with data from other sources.
 @EndNote
 
 

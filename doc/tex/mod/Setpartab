@@ -38,7 +38,7 @@ The following parameter table entries are supported:
 @EndTable
 
 The search key for the variable depends on the operator. Use @oper{setpartabn} to search variables by the name.
-This is typically used for netCDF datasets. The operator @oper{setpartabp} searches variables by the parameter ID.
+This is typically used for NetCDF datasets. The operator @oper{setpartabp} searches variables by the parameter ID.
 @EndDescription
 @EndModule
 

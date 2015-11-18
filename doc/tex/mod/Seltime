@@ -106,7 +106,7 @@ Selects a month and optional an arbitrary number of timesteps before and after t
 
 @BeginParameter
 @Item = timesteps
-INTEGER  Comma separated list of timesteps. Negative values selects timesteps from the end (netCDF only).
+INTEGER  Comma separated list of timesteps. Negative values selects timesteps from the end (NetCDF only).
 @Item = times
 STRING   Comma separated list of times (format hh:mm:ss).
 @Item = hours

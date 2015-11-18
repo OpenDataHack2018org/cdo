@@ -48,7 +48,7 @@ Performs a largest area fraction remapping on all input fields.
 
 @BeginDescription
 Generates largest area fraction remapping weights for the first input field and
-writes the result to a file. The format of this file is netCDF following the SCRIP convention.
+writes the result to a file. The format of this file is NetCDF following the SCRIP convention.
 Use the operator @mod{remap} to apply this remapping weights to a data file with the same source grid.
 @EndDescription
 @EndOperator

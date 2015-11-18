@@ -49,7 +49,7 @@ The default number of nearest neighbors is 4.
 @BeginDescription
 Generates distance-weighted average remapping weights of the four nearest neighbor
 values for the first input field and writes the result to a file.
-The format of this file is netCDF following the SCRIP convention.
+The format of this file is NetCDF following the SCRIP convention.
 Use the operator @mod{remap} to apply this remapping weights to a data file with the same source grid.
 @EndDescription
 @EndOperator
