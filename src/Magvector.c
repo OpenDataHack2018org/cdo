@@ -21,7 +21,7 @@ extern xmlNode  *magics_node;
 #define DBG 0
 
 int VECTOR, STREAM;
-char  *vector_params[] = {"thin_fac","unit_vec","device","step_freq"};
+const char  *vector_params[] = {"thin_fac","unit_vec","device","step_freq"};
 int vector_param_count = sizeof(vector_params)/sizeof(char*);
 
 void VerifyVectorParameters( int num_param, char **param_names, int opID );
@@ -48,12 +48,13 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
         double dlon = 0, dlat = 0;
 	int split_str_count;
 	char plotfilename[4096];
-	char *sep_char= "=";
+	const char *sep_char= "=";
 	char **split_str=NULL;
 	char *temp_str = NULL;
 	char *titlename;
 	
-
+        (void)varname;
+        
 	if( uarray == NULL && varray == NULL )
 	  {
 	    fprintf( stderr," No Velocity Components in input file, cannot creaate Vector PLOT!\n" );
@@ -80,7 +81,8 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 	    split_str_count = 0;
 	    sep_char = "=";
 	    split_str_count = StringSplitWithSeperator( params[i], sep_char, &split_str );
-	    
+	    (void)split_str_count;
+            
 	    if( !strcmp( split_str[0],"thin_fac" ) )
 	      {
 		THIN_FAC = atof( split_str[1] );
@@ -176,11 +178,11 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		mag_seti( "wind_arrow_thickness",1 );
 		mag_coast();
 		
-		if( THIN_FAC != 2.0f )
+		if( IS_NOT_EQUAL(THIN_FAC, 2.0f) )
 		  mag_setr("wind_thinning_factor",THIN_FAC);
 		
 		/*wind_arrow_unit_velocity */
-		if( UNIT_VEC != 25.0f )
+		if( IS_NOT_EQUAL(UNIT_VEC, 25.0f) )
 		  mag_setr("wind_arrow_unit_velocity",UNIT_VEC);
                 
 		mag_wind();
@@ -221,64 +223,45 @@ void quit_MAGICS( )
 void *Magvector(void *argument)
 
 {
-  int operatorID;
-  int varID, recID;
-  int gridsize;
-  int gridID;
   int nrecs;
   int levelID;
-  int tsID;
-  int streamID;
-  int vlistID;
   int nmiss;
-  int nlon, nlat;
-  int nlev;
-  int zaxisID, taxisID;
-  int vdate, vtime;
-  int found;
-  int nparam = 0;
-  int i;
-  char **pnames = NULL;
   char varname[CDI_MAX_NAME];
-  double missval;
-  double *uarray = NULL;
-  double *varray = NULL;
-  double *grid_center_lat = NULL, *grid_center_lon = NULL;
   char units[CDI_MAX_NAME];
   char vdatestr[32],vtimestr[32],datetimestr[64];
 
 
   cdoInitialize(argument);
 
-  nparam = operatorArgc();
-  pnames = operatorArgv();
+  int nparam = operatorArgc();
+  char **pnames = operatorArgv();
   
-  VECTOR  = cdoOperatorAdd("vector", 0, 0, NULL);
-  STREAM  = cdoOperatorAdd("stream", 0, 0, NULL);
+  int VECTOR  = cdoOperatorAdd("vector", 0, 0, NULL);
+  int STREAM  = cdoOperatorAdd("stream", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
   
   if( nparam )
     {
       if( DBG )
 	{
-	  for( i = 0; i < nparam; i++ )
+	  for( int i = 0; i < nparam; i++ )
 	    fprintf( stderr,"Param %d is %s!\n",i+1, pnames[i] );
 	}
       
       VerifyVectorParameters( nparam, pnames, operatorID );
     }
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
 
-  vlistID = streamInqVlist(streamID);
-  taxisID = vlistInqTaxis(vlistID);
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
 
-  found = 0;
-  varID = 0;
-  gridID  = vlistInqVarGrid(vlistID, varID);
-  zaxisID = vlistInqVarZaxis(vlistID, varID);
-  missval = vlistInqVarMissval(vlistID, varID);
+  int found = 0;
+  int varID = 0;
+  int gridID  = vlistInqVarGrid(vlistID, varID);
+  // int zaxisID = vlistInqVarZaxis(vlistID, varID);
+  // double missval = vlistInqVarMissval(vlistID, varID);
 
   if ( gridInqType(gridID) == GRID_GME          ) cdoAbort("GME grid unspported!");
   if ( gridInqType(gridID) == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
@@ -286,15 +269,15 @@ void *Magvector(void *argument)
   if ( gridInqType(gridID) != GRID_CURVILINEAR )
     gridID = gridToCurvilinear(gridID, 1);
 
-  gridsize = gridInqSize(gridID);
-  nlon     = gridInqXsize(gridID);
-  nlat     = gridInqYsize(gridID);
-  nlev     = zaxisInqSize(zaxisID);
+  int gridsize = gridInqSize(gridID);
+  int nlon     = gridInqXsize(gridID);
+  int nlat     = gridInqYsize(gridID);
+  // int nlev     = zaxisInqSize(zaxisID);
 
-  uarray          = (double*) Malloc(gridsize*sizeof(double));
-  varray          = (double*) Malloc(gridsize*sizeof(double));
-  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
-  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+  double *uarray          = (double*) Malloc(gridsize*sizeof(double));
+  double *varray          = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
@@ -305,7 +288,7 @@ void *Magvector(void *argument)
   gridInqYunits(gridID, units);
   grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
 					
-  tsID = 0;
+  int tsID = 0;
 
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   /*
@@ -335,14 +318,14 @@ void *Magvector(void *argument)
             }
         }
 
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
+      int vdate = taxisInqVdate(taxisID);
+      int vtime = taxisInqVtime(taxisID);
 	      
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
       sprintf(datetimestr, "%s %s", vdatestr,vtimestr);
 
-      for( recID = 0; recID < nrecs; recID++ )
+      for( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID, &varID, &levelID);
 
@@ -433,10 +416,10 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
   
   int i, j;
   int found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
-  int param_count;
-  char **params;
+  int param_count = 0;
+  const char **params = NULL;
   char **split_str = NULL;
-  char *sep_char = "=";
+  const char *sep_char = "=";
 
   /* char  *vector_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB"}; */
 

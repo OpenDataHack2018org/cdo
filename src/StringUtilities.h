@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include "cdo_int.h"
 
-int StringSplitWithSeperator( char *source_string, char *seperator, char*** ptr_split_string );
+int StringSplitWithSeperator(const char *source_string, const char *seperator, char*** ptr_split_string );
 
 int IsNumeric (const char *s);
 

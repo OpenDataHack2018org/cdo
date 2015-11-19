@@ -20,7 +20,7 @@ int magics_template_parser( xmlNode *a_node )
 {
     int param_set_flag;
     xmlNode *cur_node = NULL;
-    xmlChar    *param_name,*param_type,*param_value,*value;
+    const char *param_name,*param_type,*param_value;
 
     if( a_node == NULL )
         return 0;
@@ -29,21 +29,20 @@ int magics_template_parser( xmlNode *a_node )
     fprintf( stdout,"Parsing the magics Node \n");
 #endif
 
-    if( !strcmp( a_node->name, "magics" ) )
+    if( !strcmp( (const char*)a_node->name, "magics" ) )
     {
- 	value = xmlGetProp( a_node, "version" );
+      const char *value = (const char*) xmlGetProp( a_node, (const xmlChar *)"version" );
 
-        if( value )
+      if( value )
         {
-	    	if( DBG )
-			printf( "Version %s \n", value ); 
+          if( DBG )
+            printf( "Version %s \n", value ); 
 
-		if( atof( value ) > 3.0f ) 
-		{
-			return 1;
-		}
+          if( atof( value ) > 3.0f ) 
+            {
+              return 1;
+            }
         }
-
     }
 
 
@@ -73,14 +72,14 @@ int magics_template_parser( xmlNode *a_node )
 	    else
 	    {
 		
-		param_name = xmlGetProp( cur_node,"parameter");
-		param_type = xmlGetProp(cur_node,"type");
-		param_value = xmlGetProp(cur_node,"value");
+              param_name = (const char *)xmlGetProp(cur_node, (const xmlChar *)"parameter");
+              param_type = (const char *)xmlGetProp(cur_node, (const xmlChar *)"type");
+              param_value = (const char *)xmlGetProp(cur_node, (const xmlChar *)"value");
 #if 0
     		printf( "\t\tAttr name: %s Type: %s Value: %s \n", param_name,param_type,param_value);
 #endif
 		
-    		param_set_flag = SetMagicsParameterValue( param_name, param_type, param_value );
+    		param_set_flag = SetMagicsParameterValue(param_name, param_type, param_value );
 		
 		if( param_set_flag )
 			printf(" Error in Setting the Parameter %s\n",param_name );
@@ -90,16 +89,15 @@ int magics_template_parser( xmlNode *a_node )
     return 0;
 }
 
-int SetMagicsParameterValue( char *param_name, char *param_type, char *param_value )
+int SetMagicsParameterValue( const char *param_name, const char *param_type, const char *param_value )
 
 {
 	int i, ret_flag = 0;
 	int split_str_count = 0;
 	char **split_str = NULL;
-	char *sep_char = ",";
-	char *search_char = ";";
+	const char *sep_char = ",";
+	const char *search_char = ";";
 	double *float_param_list = NULL;
-	int *int_param_list = NULL;
 
 	if( param_name == NULL )
 	  {
@@ -194,14 +192,14 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
 		if( split_str_count )
 		  {
-		    int_param_list = (double*) Malloc(sizeof( int ) * split_str_count );
-			for( i = 0; i < split_str_count; i++ )
-			{
-				int_param_list[i] = atoi( split_str[i] );			
-			}
-			mag_set1i( param_name, int_param_list, split_str_count );		
-			Free( int_param_list );
-			Free( split_str );
+		    int *int_param_list = (int*) Malloc(sizeof( int ) * split_str_count );
+                    for( i = 0; i < split_str_count; i++ )
+                      {
+                        int_param_list[i] = atoi( split_str[i] );			
+                      }
+                    mag_set1i( param_name, int_param_list, split_str_count );		
+                    Free( int_param_list );
+                    Free( split_str );
 		  }
 	  }
 

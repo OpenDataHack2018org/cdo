@@ -14,4 +14,4 @@
 
 int magics_template_parser( xmlNode * a_node );
 
-int SetMagicsParameterValue( char *param_name, char *param_type, char *param_value );
+int SetMagicsParameterValue( const char *param_name, const char *param_type, const char *param_value );

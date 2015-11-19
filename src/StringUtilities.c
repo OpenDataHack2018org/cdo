@@ -2,7 +2,7 @@
 
 #define DBG 0
 
-int StringSplitWithSeperator(  char *source_string, char *seperator, char*** ptr_split_string )
+int StringSplitWithSeperator(const char *source_string, const char *seperator, char*** ptr_split_string )
 
 {
 	char *duplicate_src = NULL, **temp_list = NULL , *temp_str = NULL, *saveptr;

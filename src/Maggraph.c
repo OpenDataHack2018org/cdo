@@ -32,7 +32,7 @@ extern xmlNode  *magics_node;
 #define DBG 0
 
 
-char *line_colours[] = {     "red", "green", "blue", "yellow", "cyan", "magenta",
+const char *line_colours[] = {"red", "green", "blue", "yellow", "cyan", "magenta",
 			     "avocado","beige", "brick", "brown", "burgundy",
 			     "charcoal", "chestnut", "coral", "cream", 
 			     "evergreen", "gold", 
@@ -52,13 +52,13 @@ char *line_colours[] = {     "red", "green", "blue", "yellow", "cyan", "magenta"
 			     "bluishpurple", "purple",
 			};
 
-char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","device"};
+const char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","device"};
 
 int graph_param_count = sizeof(graph_params)/sizeof(char*);
 int num_colours = sizeof( line_colours )/sizeof( char* );
 
 void VerifyGraphParameters( int num_param, char **param_names );
-int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char );
+int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, const char *sep_char );
 
 extern int checkdevice();
 extern int IsNumeric();
@@ -77,10 +77,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   char *lines[1];
   char *temp_str;
   char **split_str = NULL;
-  char *sep_char = "=";
+  const char *sep_char = "=";
   char **date_time_str[nfiles];
   char min_date_time_str[1024], max_date_time_str[1024];
-  int  min_index, max_index;
+  int  min_index = 0, max_index = 0;
   char vdatestr[32], vtimestr[32], legend_text_data[256];
   char vdatestr1[32], vtimestr1[32];
   char vdatestr2[32], vtimestr2[32];
@@ -458,6 +458,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
     split_str_count = 0;
     sep_char = "-";
     split_str_count = StringSplitWithSeperator( max_date_time_str, sep_char, &split_str );
+    (void)split_str_count;
     num_years  = atoi( split_str[0] );
     num_months = atoi( split_str[1] );
     num_days   = atoi( split_str[2] );
@@ -706,7 +707,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
 }
 
-int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char )
+int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, const char *sep_char )
 {
   
   int    split_str_count1, split_str_count2;
@@ -788,9 +789,7 @@ void quit_MAGICS( )
 
 void *Maggraph(void *argument)
 {
-  const char *ofilename;
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];
-  char **pnames = NULL;
   int varID, levelID;
   int gridID;
   int nrecs;
@@ -799,24 +798,21 @@ void *Maggraph(void *argument)
   int vlistID, vlistID0 = -1;
   int nmiss;
   int taxisID;
-  int **vdate = NULL, **vtime = NULL;
-  int fileID, nfiles;
-  long *nts, nts_alloc;
-  int nparam = 0;
-  double **datatab = NULL;
+  int fileID;
+  long nts_alloc;
   double val;
   int i;
   
   cdoInitialize(argument);
 
-  nparam = operatorArgc();
-  pnames = operatorArgv();
+  int nparam = operatorArgc();
+  char **pnames = operatorArgv();
   
   if( nparam )
     VerifyGraphParameters(nparam,pnames);
   
-  nfiles = cdoStreamCnt() - 1;
-  ofilename = cdoStreamName(nfiles)->args;
+  int nfiles = cdoStreamCnt() - 1;
+  const char *ofilename = cdoStreamName(nfiles)->args;
   
   if( DBG )
     {
@@ -824,10 +820,10 @@ void *Maggraph(void *argument)
        fprintf( stderr," files %s\n",ofilename );
     }
 	
-  datatab = (double **) Malloc(nfiles*sizeof(double *));
-  vdate   = (int **) Malloc(nfiles*sizeof(int *));
-  vtime   = (int **) Malloc(nfiles*sizeof(int *));
-  nts     = (long*) Malloc(nfiles*sizeof(long));
+  double **datatab = (double **) Malloc(nfiles*sizeof(double *));
+  int **vdate   = (int **) Malloc(nfiles*sizeof(int *));
+  int **vtime   = (int **) Malloc(nfiles*sizeof(int *));
+  long *nts     = (long*) Malloc(nfiles*sizeof(long));
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -960,7 +956,7 @@ void VerifyGraphParameters( int num_param, char **param_names )
   int i, j;
   int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
   char **split_str = NULL;
-  char *sep_char = "=";
+  const char *sep_char = "=";
   char *temp_str;
   
   for ( i = 0; i < num_param; ++i )

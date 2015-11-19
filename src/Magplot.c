@@ -33,16 +33,16 @@ subpage_upper_right_longitude
 
 int CONTOUR, SHADED, GRFILL;
 
-char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
+const char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int contour_param_count = sizeof(contour_params)/sizeof(char*);
 
-char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
+const char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int shaded_param_count = sizeof(shaded_params)/sizeof(char*);
 
-char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
+const char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int grfill_param_count = sizeof(grfill_params)/sizeof(char*);
 
-char  *STD_COLOUR_TABLE[] = {"red", "green", "blue", "yellow", "cyan", "magenta", "black", "avocado",
+const char  *STD_COLOUR_TABLE[] = {"red", "green", "blue", "yellow", "cyan", "magenta", "black", "avocado",
 			     "beige", "brick", "brown", "burgundy",
 			     "charcoal", "chestnut", "coral", "cream", 
 			     "evergreen", "gold", "grey", 
@@ -69,10 +69,10 @@ int  STD_COLOUR_COUNT = sizeof( STD_COLOUR_TABLE )/sizeof( char* );
 int  USR_COLOUR_COUNT =0;
 
 
-char *STYLE_TABLE[] = { "SOLID","DASH","DOT","CHAIN_DASH","CHAIN_DOT"};
+const char *STYLE_TABLE[] = { "SOLID","DASH","DOT","CHAIN_DASH","CHAIN_DOT"};
 int STYLE_COUNT = sizeof( STYLE_TABLE )/ sizeof( char *);
 
-char *DEVICE_TABLE[] = { "PS","EPS","PDF","PNG","GIF","GIF_ANIMATION","JPEG","SVG","KML"};
+const char *DEVICE_TABLE[] = { "PS","EPS","PDF","PNG","GIF","GIF_ANIMATION","JPEG","SVG","KML"};
 int DEVICE_COUNT = sizeof( DEVICE_TABLE )/ sizeof( char *);
 
 
@@ -80,7 +80,7 @@ int DEVICE_COUNT = sizeof( DEVICE_TABLE )/ sizeof( char *);
 */
 /** The following projections are having some issues to be clarified with Magics++ **/
 
-char *PROJECTION_TABLE[] = { "cylindrical", "polar_stereographic", "polar_north", "geos", "meteosat", "meteosat_57E", "lambert", "EPSG3857", "goode", "collignon", "mollweide", "robinson", "bonne", "google", "efas", "EPSG4326", "lambert_north_atlantic", "mercator" };
+const char *PROJECTION_TABLE[] = { "cylindrical", "polar_stereographic", "polar_north", "geos", "meteosat", "meteosat_57E", "lambert", "EPSG3857", "goode", "collignon", "mollweide", "robinson", "bonne", "google", "efas", "EPSG4326", "lambert_north_atlantic", "mercator" };
 int PROJECTION_COUNT = sizeof( PROJECTION_TABLE )/ sizeof( char *);
 
 
@@ -106,7 +106,7 @@ int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0, FILE_SPLIT = FAL
 double YMIN = 1.0e+200, YMAX = -1.0e+200, INTERVAL = 8.0, RESOLUTION = 10.0f, *LEV_LIST = NULL ;
 double LAT_MIN = 1.0e+200, LAT_MAX = -1.e+200;
 double LON_MIN = 1.0e+200, LON_MAX = -1.e+200;
-char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEVICE = NULL, *COLOUR_TRIAD = NULL, *PROJECTION = NULL;
+const char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEVICE = NULL, *COLOUR_TRIAD = NULL, *PROJECTION = NULL;
 
 
 static
@@ -117,11 +117,9 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   double dlon = 0, dlat = 0;
   char plotfilename[4096];
   char *titlename;
-  int j, split_str_count, split_str_count1;
-  char *sep_char = "=";
-  char **split_str = NULL, **split_str1 = NULL;
-  char *temp_str = NULL;
-  char  orig_char = ';', rep_char = ',';
+  int j, split_str_count;
+  const char *sep_char = "=";
+  char **split_str = NULL;
   char tempname[256];
   
   
@@ -165,7 +163,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 	
            if( !strcmp( split_str[0],"list" ) ) 
 	     {
-	        for( j = 0; j < split_str_count1; j++ )
+	        for( j = 0; j < split_str_count; j++ )
 	           fprintf( stderr,"LIST %f\n",LEV_LIST[j] ); 
 	     }
 	
@@ -221,19 +219,19 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   /* Set the input data arrays to magics++ */
    
   mag_set2r("input_field", array, nlon, nlat);
-
   /*
-  	mag_setc("input_field_organization", "REGULAR");
-  	mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
-  	mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
+  mag_setc("input_field_organization", "NONREGULAR");
+  mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
+  mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
   */
+  mag_setc("input_field_organization", "REGULAR");
 
   mag_setr("input_field_initial_latitude", grid_center_lat[0]);
   mag_setr("input_field_latitude_step", dlat);
 
   mag_setr("input_field_initial_longitude", grid_center_lon[0]);
   mag_setr("input_field_longitude_step", dlon);
- 
+
   /* magics_template_parser( magics_node ); */
   /* results_template_parser(results_node, varname ); */
 
@@ -309,7 +307,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       if( COLOUR_MAX )
 	mag_setc( "contour_shade_max_level_colour", COLOUR_MAX );
 
-      if( INTERVAL != 8.0f )
+      if( IS_NOT_EQUAL(INTERVAL, 8.0f) )
 	{
 	  mag_setc( "contour_level_selection_type", "INTERVAL" );
 	  mag_setr( "contour_interval", INTERVAL );
@@ -355,7 +353,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 
       if( DBG )
         {
-           mag_enqc ( "output_name", &tempname );
+          mag_enqc ( "output_name", (char*)&tempname );
            fprintf( stderr, " SHADED Done %s!\n",tempname );
            fprintf( stderr, " SHADED Done!\n" );
         }
@@ -400,7 +398,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 	mag_setc( "contour_line_colour", COLOUR );
       
       
-      if( INTERVAL != 8.0f )
+      if( IS_NOT_EQUAL(INTERVAL, 8.0f) )
 	{
 	  mag_setc( "contour_level_selection_type", "INTERVAL" );
 	  mag_setr( "contour_interval", INTERVAL );
@@ -484,7 +482,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       if( COLOUR_MAX )
 	mag_setc( "contour_shade_max_level_colour", COLOUR_MAX );
       
-      if( INTERVAL != 8.0f )
+      if( IS_NOT_EQUAL(INTERVAL, 8.0f) )
 	{
 	  mag_setc( "contour_level_selection_type", "INTERVAL" );
 	  mag_setr( "contour_interval", INTERVAL );
@@ -508,7 +506,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 	  mag_set1c( "contour_shade_colour_list",( const char ** ) USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
 	}
 	
-      if( RESOLUTION != 10.0f)
+      if( IS_NOT_EQUAL(RESOLUTION, 10.0f) )
 	mag_setr( "contour_shade_cell_resolution", RESOLUTION );
       
       if( COLOUR_TRIAD )                                
@@ -585,63 +583,44 @@ void quit_MAGICS( )
 
 void *Magplot(void *argument)
 {
-  int operatorID;
-  int varID, recID;
-  int gridsize;
-  int gridID;
   int nrecs;
   int levelID;
-  int tsID;
-  int streamID;
-  int vlistID;
   int nmiss;
-  int nlon, nlat;
-  int nlev;
-  int zaxisID, taxisID;
-  int vdate, vtime;
-  int nparam = 0;
-  int i;
-  char **pnames = NULL;
   char varname[CDI_MAX_NAME];
-  double missval;
-  double *array = NULL;
-  double *grid_center_lat = NULL, *grid_center_lon = NULL;
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32], datetimestr[64];
 
-
   cdoInitialize(argument);
   
+  int nparam = operatorArgc();
+  char **pnames = operatorArgv();
   
-  nparam = operatorArgc();
-  pnames = operatorArgv();
-  
-  CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
-  SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
-  GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
+  int CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
+  int SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
+  int GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
   
   if( nparam )
     {
       if( DBG )
 	{
-	  for( i = 0; i < nparam; i++ )
+	  for( int i = 0; i < nparam; i++ )
 	    fprintf( stderr,"Param %d is %s!\n",i+1, pnames[i] );
 	}
       
       VerifyPlotParameters( nparam, pnames, operatorID );
     }
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
 
-  vlistID = streamInqVlist(streamID);
-  taxisID = vlistInqTaxis(vlistID);
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
 
-  varID = 0;
-  gridID  = vlistInqVarGrid(vlistID, varID);
-  zaxisID = vlistInqVarZaxis(vlistID, varID);
-  missval = vlistInqVarMissval(vlistID, varID);
+  int varID = 0;
+  int gridID  = vlistInqVarGrid(vlistID, varID);
+  // int zaxisID = vlistInqVarZaxis(vlistID, varID);
+  // double missval = vlistInqVarMissval(vlistID, varID);
 
   if ( gridInqType(gridID) == GRID_GME          ) cdoAbort("GME grid unspported!");
   if ( gridInqType(gridID) == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
@@ -649,14 +628,14 @@ void *Magplot(void *argument)
   if ( gridInqType(gridID) != GRID_CURVILINEAR )
     gridID = gridToCurvilinear(gridID, 1);
 
-  gridsize = gridInqSize(gridID);
-  nlon     = gridInqXsize(gridID);
-  nlat     = gridInqYsize(gridID);
-  nlev     = zaxisInqSize(zaxisID);
+  int gridsize = gridInqSize(gridID);
+  int nlon     = gridInqXsize(gridID);
+  int nlat     = gridInqYsize(gridID);
+  //int nlev     = zaxisInqSize(zaxisID);
 
-  array           = (double*) Malloc(gridsize*sizeof(double));
-  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
-  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+  double *array           = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
@@ -667,7 +646,7 @@ void *Magplot(void *argument)
   gridInqYunits(gridID, units);
   grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
 					
-  tsID = 0;
+  int tsID = 0;
 
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   /*
@@ -716,8 +695,8 @@ void *Magplot(void *argument)
 	    }
         }
       
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
+      int vdate = taxisInqVdate(taxisID);
+      int vtime = taxisInqVtime(taxisID);
 	      
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
@@ -725,7 +704,7 @@ void *Magplot(void *argument)
       if( DBG )
         fprintf( stderr,"Date %s Time %s\n",vdatestr, vtimestr );
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
@@ -801,12 +780,12 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 {
   int i, j, k;
   int found = FALSE, syntax = TRUE, halt_flag = FALSE, /* file_found = TRUE, */ split_str_count;
-  int param_count;
-  char **params;
+  int param_count = 0;
+  const char **params = NULL;
   char **split_str = NULL, **split_str1 = NULL;
-  char *sep_char = "=";
-  char *temp_str;
-  char  orig_char = ';', rep_char = ',';
+  const char *sep_char = "=";
+  const char *temp_str;
+  const char  orig_char = ';', rep_char = ',';
   FILE *fp;
 
 /*  
@@ -1102,12 +1081,10 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 
 
 int checkcolour( char *colour_in )
-
 {
-
-    int i, n, found = FALSE;
+    int i, n;
     int split_str_count;
-    char *sep_char =",";
+    const char *sep_char =",";
     char **split_str = NULL;
     float  rgb_values[3];
     char temp[256];
@@ -1181,7 +1158,6 @@ int checkcolour( char *colour_in )
 	  {
 	    if( !strcmp( STD_COLOUR_TABLE[i], colour_in ) )
 	      {
-		found = TRUE;
 		return 0;
 	      }
 	  }

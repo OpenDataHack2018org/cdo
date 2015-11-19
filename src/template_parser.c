@@ -34,7 +34,7 @@ int template_parser(  char *Filename, const char *varname )
 
                   root_element = xmlDocGetRootElement( doc );
 		  
-		  if( !strcmp( root_element->name, "magics" ) )
+		  if( !strcmp( (const char*)root_element->name, "magics" ) )
 		  {
                   	if ( magics_template_parser( root_element ) == 1 )
 		  	{
@@ -42,7 +42,7 @@ int template_parser(  char *Filename, const char *varname )
 	        		return (2);
 			}
 		  }
-		  else if( !strcmp( root_element->name, "results" ) )
+		  else if( !strcmp( (const char*)root_element->name, "results" ) )
 		  {
                   	results_template_parser( root_element, varname );
 			 /* Needs some error handling */
@@ -99,7 +99,7 @@ int updatemagics_and_results_nodes(  )
 #if 0
             fprintf( stdout, "Node Name: %s \n", cur_node->name );
 #endif
-            if( !strcmp( cur_node->name, "magics" ) ) 
+            if( !strcmp( (const char*)cur_node->name, "magics" ) ) 
             {
 		magics_node = cur_node;
 #if 0
@@ -107,7 +107,7 @@ int updatemagics_and_results_nodes(  )
 #endif
 	    }  
 
-            if( !strcmp( cur_node->name, "results" ) ) 
+            if( !strcmp( (const char*)cur_node->name, "results" ) ) 
             {
 		results_node = cur_node;
 #if 0

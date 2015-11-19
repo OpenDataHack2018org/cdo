@@ -19,34 +19,35 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 {
     xmlNode *cur_node = NULL;
     xmlAttrPtr attr = NULL;
-    xmlChar    *param_name,*param_value,*value;
-    char       *param_type;
+    xmlChar *param_value;
 
 	
-    if( a_node == NULL )
-	return 1;
+    if ( a_node == NULL )
+      return 1;
 
-    if( !strcmp( a_node->name, "results" ) )
+    if ( !strcmp( (const char*)a_node->name, "results" ) )
     {
- 	value = xmlGetProp( a_node, "version" );
+      const char *value = (const char*) xmlGetProp( a_node, (const xmlChar *)"version" );
 
-	if( value )
+      if ( value )
 	{
-    		if( DBG_MSG )
-			printf( "Version %s \n", value ); 
+          if ( DBG_MSG )
+            printf( "Version %s \n", value ); 
 
-		if( atof( value ) > 3.0f ) 
-		{
-			return 1;
-		}
+          if ( atof( value ) > 3.0f ) 
+            {
+              return 1;
+            }
 	}
     }
 
 
     for ( cur_node = a_node->children; cur_node; cur_node = cur_node->next )
     {
-	param_name = NULL;
-	param_type = NULL;
+#if 0
+	xmlChar *param_name = NULL;
+	char *param_type = NULL;
+#endif
 	param_value = NULL;
 
         if ( cur_node->type == XML_ELEMENT_NODE )
@@ -73,7 +74,7 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 	      printf( "Finding varname = %s  result_name = %s\n", varname, xmlGetProp( cur_node,"name") );
 #endif
 
-	      if ( strcmp( varname, xmlGetProp( cur_node,"name" ) ) == 0 )
+	      if ( strcmp( varname, (const char*)xmlGetProp( cur_node,(xmlChar *)"name" ) ) == 0 )
 	      {
 #if 0
 	          printf( "Found varname = %s  result_name = %s\n", varname, xmlGetProp( cur_node,"name") );

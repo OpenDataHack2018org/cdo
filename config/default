@@ -81,6 +81,8 @@ case "${HOSTNAME}" in
                  --with-grib_api=$HOME/local/gribapi-1.13.0 \
                  --with-netcdf=$HOME/local \
                  --with-hdf5=$HOME/local \
+                 --with-libxml2=/usr \
+                 --with-magics=$HOME/local/magics-2.25.3 \
                  --with-proj=/opt/local"
 
         if  test "$COMP" = icc ; then
