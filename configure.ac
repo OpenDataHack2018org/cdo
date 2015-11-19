@@ -215,7 +215,18 @@ AC_MSG_RESULT([no])
 
 AM_CONDITIONAL(BUILD_AVX2_TESTS, test x$ac_have_as_avx2 = xyes)
 
+AC_ARG_ENABLE([cxx],
+              [AS_HELP_STRING([--enable-cxx],[Use CXX as default compiler [default=no]])],
+              [AS_IF([test "x$enable_cxx" != 'xno'],
+                     [CC=$CXX
+                      CXXFLAGS=$CFLAGS
+                      enable_cxx=yes],
+              [enable_cxx=no])],
+              [enable_cxx=no])
+AC_MSG_RESULT([$enable_cxx])
+AC_SUBST([ENABLE_CXX],[$enable_cxx])
 #  ----------------------------------------------------------------------
+AC_SUBST([CXXFLAGS])
 AC_SUBST([CPPFLAGS])
 AC_SUBST([FCFLAGS])
 AC_SUBST([CLDFLAGS])
