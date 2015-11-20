@@ -128,6 +128,7 @@ void *Nmltest(void *argument);
 void *Output(void *argument);
 void *Outputgmt(void *argument);
 void *Pack(void *argument);
+void *Pardup(void *argument);
 void *Pinfo(void *argument);
 void *Pressure(void *argument);
 void *Regres(void *argument);
@@ -196,7 +197,6 @@ void *Transpose(void *argument);
 void *Trend(void *argument);
 void *Trms(void *argument);
 void *Tstepcount(void *argument);
-void *Vardup(void *argument);
 void *Vargen(void *argument);
 void *Varrms(void *argument);
 void *Vertintml(void *argument);
@@ -372,6 +372,7 @@ void *Maggraph(void *argument);
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri", "outputvrml"}
 #define  PackOperators          {"pack"}
+#define  PardupOperators        {"pardup", "parmul"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
 #define  RegresOperators        {"regres"}
@@ -470,7 +471,6 @@ void *Maggraph(void *argument);
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
 #define  TstepcountOperators    {"tstepcount"}
-#define  VardupOperators        {"pardup", "parmul"}
 #define  VargenOperators        {"random", "const", "sincos", "coshill", "for", "topo", "temp", "mask", "stdatm"}
 #define  VarrmsOperators        {"varrms"}
 #define  VertintmlOperators     {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
@@ -653,6 +653,7 @@ static modules_t Modules[] =
   { Output,         OutputtabHelp,     OutputtabOperators,     CDI_REAL, -1,  0 },
   { Outputgmt,      NULL,              OutputgmtOperators,     CDI_REAL,  1,  0 },
   { Pack,           NULL,              PackOperators,          CDI_REAL,  1,  1 },
+  { Pardup,         NULL,              PardupOperators,        CDI_REAL,  1,  1 },
   { Pinfo,          NULL,              PinfoOperators,         CDI_REAL,  1,  1 },
   { Pressure,       NULL,              PressureOperators,      CDI_REAL,  1,  1 },
   { Regres,         RegresHelp,        RegresOperators,        CDI_REAL,  1,  1 },
@@ -745,7 +746,6 @@ static modules_t Modules[] =
   { Trend,          TrendHelp,         TrendOperators,         CDI_REAL,  1,  2 },
   { Trms,           NULL,              TrmsOperators,          CDI_REAL,  2,  1 },
   { Tstepcount,     NULL,              TstepcountOperators,    CDI_REAL,  1,  1 },
-  { Vardup,         NULL,              VardupOperators,        CDI_REAL,  1,  1 },
   { Vargen,         VargenHelp,        VargenOperators,        CDI_REAL,  0,  1 },
   { Varrms,         NULL,              VarrmsOperators,        CDI_REAL,  2,  1 },
   { Vertintml,      VertintmlHelp,     VertintmlOperators,     CDI_REAL,  1,  1 },
@@ -849,8 +849,6 @@ static const char *opalias[][2] =
   {"outputkey",           "outputtab"  },
   {"vardes",              "pardes"     },
   {"delvar",              "delname"    },
-  {"vardup",              "pardup"     },
-  {"varmul",              "parmul"     },
   {"read_e5ml",           "import_e5ml"},
   {"remapcon1",           "remaplaf"   },
   {"remapdis1",           "remapnn"    },

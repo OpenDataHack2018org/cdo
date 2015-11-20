@@ -18,8 +18,8 @@
 /*
    This module contains the following operators:
 
-      Vardup     pardup          Duplicate parameters
-      Vardup     parmul          Multiply parameters
+      Pardup     pardup          Duplicate parameters
+      Pardup     parmul          Multiply parameters
 */
 
 #include <cdi.h>
@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Vardup(void *argument)
+void *Pardup(void *argument)
 {
   int nrecs;
   int recID, varID, varID2, levelID;

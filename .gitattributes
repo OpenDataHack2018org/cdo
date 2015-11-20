@@ -425,6 +425,7 @@ src/Nmltest.c -text
 src/Output.c -text
 src/Outputgmt.c -text
 src/Pack.c -text
+src/Pardup.c -text
 src/Pinfo.c -text
 src/Pressure.c -text
 src/Regres.c -text
@@ -491,7 +492,6 @@ src/Transpose.c -text
 src/Trend.c -text
 src/Trms.c -text
 src/Tstepcount.c -text
-src/Vardup.c -text
 src/Vargen.c -text
 src/Varrms.c -text
 src/Vertcum.c -text

@@ -257,6 +257,7 @@ cdo_SOURCES += Adisit.c        \
                Output.c        \
                Outputgmt.c     \
                Pack.c          \
+               Pardup.c        \
                Pinfo.c         \
                Pressure.c      \
                Regres.c        \
@@ -321,7 +322,6 @@ cdo_SOURCES += Adisit.c        \
                Trend.c         \
                Trms.c          \
                Tstepcount.c    \
-               Vardup.c        \
                Vargen.c        \
                Varrms.c        \
                Vertintml.c     \

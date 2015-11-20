@@ -194,18 +194,18 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c Log.c \
 	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
 	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
-	Output.c Outputgmt.c Pack.c Pinfo.c Pressure.c Regres.c \
-	Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
-	Runpctl.c Runstat.c Seascount.c Seaspctl.c Seasstat.c Selbox.c \
-	Select.c Seloperator.c Selrec.c Seltime.c Selvar.c Set.c \
-	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
-	Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth9.c \
-	Sort.c Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c \
-	Split.c Splitrec.c Splitsel.c Splittime.c Splityear.c SSOpar.c \
-	Subtrend.c Tee.c Templates.c Test.c Tests.c Timedt.c \
-	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
-	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
-	Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c Vargen.c \
+	Output.c Outputgmt.c Pack.c Pardup.c Pinfo.c Pressure.c \
+	Regres.c Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c \
+	Rotuv.c Runpctl.c Runstat.c Seascount.c Seaspctl.c Seasstat.c \
+	Selbox.c Select.c Seloperator.c Selrec.c Seltime.c Selvar.c \
+	Set.c Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c \
+	Setpartab.c Setrcaname.c Settime.c Setzaxis.c Showinfo.c \
+	Sinfo.c Smooth9.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
+	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
+	Splityear.c SSOpar.c Subtrend.c Tee.c Templates.c Test.c \
+	Tests.c Timedt.c Timcount.c Timpctl.c Timselpctl.c \
+	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
+	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c \
 	Varrms.c Vertintml.c Vertintap.c Vertstat.c Vertcum.c \
 	Vertwind.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
 	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
@@ -266,7 +266,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
 	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
 	cdo-Nmltest.$(OBJEXT) cdo-Output.$(OBJEXT) \
-	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
+	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) \
+	cdo-Pardup.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
 	cdo-Remap.$(OBJEXT) cdo-Remapeta.$(OBJEXT) \
 	cdo-Replace.$(OBJEXT) cdo-Replacevalues.$(OBJEXT) \
@@ -296,20 +297,20 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Timstat3.$(OBJEXT) cdo-Tinfo.$(OBJEXT) \
 	cdo-Tocomplex.$(OBJEXT) cdo-Transpose.$(OBJEXT) \
 	cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
-	cdo-Tstepcount.$(OBJEXT) cdo-Vardup.$(OBJEXT) \
-	cdo-Vargen.$(OBJEXT) cdo-Varrms.$(OBJEXT) \
-	cdo-Vertintml.$(OBJEXT) cdo-Vertintap.$(OBJEXT) \
-	cdo-Vertstat.$(OBJEXT) cdo-Vertcum.$(OBJEXT) \
-	cdo-Vertwind.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) \
-	cdo-Writegrid.$(OBJEXT) cdo-Writerandom.$(OBJEXT) \
-	cdo-XTimstat.$(OBJEXT) cdo-YAR.$(OBJEXT) \
-	cdo-Yearmonstat.$(OBJEXT) cdo-Ydayarith.$(OBJEXT) \
-	cdo-Ydaypctl.$(OBJEXT) cdo-Ydaystat.$(OBJEXT) \
-	cdo-Ydrunpctl.$(OBJEXT) cdo-Ydrunstat.$(OBJEXT) \
-	cdo-Yhourarith.$(OBJEXT) cdo-Yhourstat.$(OBJEXT) \
-	cdo-Ymonarith.$(OBJEXT) cdo-Ymonpctl.$(OBJEXT) \
-	cdo-Ymonstat.$(OBJEXT) cdo-Yseaspctl.$(OBJEXT) \
-	cdo-Yseasstat.$(OBJEXT) cdo-Zonstat.$(OBJEXT) $(am__objects_1)
+	cdo-Tstepcount.$(OBJEXT) cdo-Vargen.$(OBJEXT) \
+	cdo-Varrms.$(OBJEXT) cdo-Vertintml.$(OBJEXT) \
+	cdo-Vertintap.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
+	cdo-Vertcum.$(OBJEXT) cdo-Vertwind.$(OBJEXT) cdo-Wct.$(OBJEXT) \
+	cdo-Wind.$(OBJEXT) cdo-Writegrid.$(OBJEXT) \
+	cdo-Writerandom.$(OBJEXT) cdo-XTimstat.$(OBJEXT) \
+	cdo-YAR.$(OBJEXT) cdo-Yearmonstat.$(OBJEXT) \
+	cdo-Ydayarith.$(OBJEXT) cdo-Ydaypctl.$(OBJEXT) \
+	cdo-Ydaystat.$(OBJEXT) cdo-Ydrunpctl.$(OBJEXT) \
+	cdo-Ydrunstat.$(OBJEXT) cdo-Yhourarith.$(OBJEXT) \
+	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
+	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
+	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
+	cdo-Zonstat.$(OBJEXT) $(am__objects_1)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
 cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -613,18 +614,18 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c Log.c \
 	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
 	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
-	Output.c Outputgmt.c Pack.c Pinfo.c Pressure.c Regres.c \
-	Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
-	Runpctl.c Runstat.c Seascount.c Seaspctl.c Seasstat.c Selbox.c \
-	Select.c Seloperator.c Selrec.c Seltime.c Selvar.c Set.c \
-	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
-	Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth9.c \
-	Sort.c Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c \
-	Split.c Splitrec.c Splitsel.c Splittime.c Splityear.c SSOpar.c \
-	Subtrend.c Tee.c Templates.c Test.c Tests.c Timedt.c \
-	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
-	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
-	Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c Vargen.c \
+	Output.c Outputgmt.c Pack.c Pardup.c Pinfo.c Pressure.c \
+	Regres.c Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c \
+	Rotuv.c Runpctl.c Runstat.c Seascount.c Seaspctl.c Seasstat.c \
+	Selbox.c Select.c Seloperator.c Selrec.c Seltime.c Selvar.c \
+	Set.c Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c \
+	Setpartab.c Setrcaname.c Settime.c Setzaxis.c Showinfo.c \
+	Sinfo.c Smooth9.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
+	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
+	Splityear.c SSOpar.c Subtrend.c Tee.c Templates.c Test.c \
+	Tests.c Timedt.c Timcount.c Timpctl.c Timselpctl.c \
+	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
+	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c \
 	Varrms.c Vertintml.c Vertintap.c Vertstat.c Vertcum.c \
 	Vertwind.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
 	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
@@ -918,6 +919,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Outputgmt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pack.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pardup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pressure.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Regres.Po@am__quote@
@@ -983,7 +985,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Trend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Trms.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Tstepcount.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vardup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vargen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Varrms.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertcum.Po@am__quote@
@@ -3065,6 +3066,20 @@ cdo-Pack.obj: Pack.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Pack.obj `if test -f 'Pack.c'; then $(CYGPATH_W) 'Pack.c'; else $(CYGPATH_W) '$(srcdir)/Pack.c'; fi`
 
+cdo-Pardup.o: Pardup.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Pardup.o -MD -MP -MF $(DEPDIR)/cdo-Pardup.Tpo -c -o cdo-Pardup.o `test -f 'Pardup.c' || echo '$(srcdir)/'`Pardup.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Pardup.Tpo $(DEPDIR)/cdo-Pardup.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Pardup.c' object='cdo-Pardup.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Pardup.o `test -f 'Pardup.c' || echo '$(srcdir)/'`Pardup.c
+
+cdo-Pardup.obj: Pardup.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Pardup.obj -MD -MP -MF $(DEPDIR)/cdo-Pardup.Tpo -c -o cdo-Pardup.obj `if test -f 'Pardup.c'; then $(CYGPATH_W) 'Pardup.c'; else $(CYGPATH_W) '$(srcdir)/Pardup.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Pardup.Tpo $(DEPDIR)/cdo-Pardup.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Pardup.c' object='cdo-Pardup.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Pardup.obj `if test -f 'Pardup.c'; then $(CYGPATH_W) 'Pardup.c'; else $(CYGPATH_W) '$(srcdir)/Pardup.c'; fi`
+
 cdo-Pinfo.o: Pinfo.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Pinfo.o -MD -MP -MF $(DEPDIR)/cdo-Pinfo.Tpo -c -o cdo-Pinfo.o `test -f 'Pinfo.c' || echo '$(srcdir)/'`Pinfo.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Pinfo.Tpo $(DEPDIR)/cdo-Pinfo.Po
@@ -3960,20 +3975,6 @@ cdo-Tstepcount.obj: Tstepcount.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Tstepcount.c' object='cdo-Tstepcount.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Tstepcount.obj `if test -f 'Tstepcount.c'; then $(CYGPATH_W) 'Tstepcount.c'; else $(CYGPATH_W) '$(srcdir)/Tstepcount.c'; fi`
-
-cdo-Vardup.o: Vardup.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vardup.o -MD -MP -MF $(DEPDIR)/cdo-Vardup.Tpo -c -o cdo-Vardup.o `test -f 'Vardup.c' || echo '$(srcdir)/'`Vardup.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vardup.Tpo $(DEPDIR)/cdo-Vardup.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vardup.c' object='cdo-Vardup.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vardup.o `test -f 'Vardup.c' || echo '$(srcdir)/'`Vardup.c
-
-cdo-Vardup.obj: Vardup.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vardup.obj -MD -MP -MF $(DEPDIR)/cdo-Vardup.Tpo -c -o cdo-Vardup.obj `if test -f 'Vardup.c'; then $(CYGPATH_W) 'Vardup.c'; else $(CYGPATH_W) '$(srcdir)/Vardup.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Vardup.Tpo $(DEPDIR)/cdo-Vardup.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vardup.c' object='cdo-Vardup.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vardup.obj `if test -f 'Vardup.c'; then $(CYGPATH_W) 'Vardup.c'; else $(CYGPATH_W) '$(srcdir)/Vardup.c'; fi`
 
 cdo-Vargen.o: Vargen.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Vargen.o -MD -MP -MF $(DEPDIR)/cdo-Vargen.Tpo -c -o cdo-Vargen.o `test -f 'Vargen.c' || echo '$(srcdir)/'`Vargen.c
