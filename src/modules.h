@@ -27,5 +27,6 @@ int operatorStreamOutCnt(char *operatorName);
 int operatorStreamNumber(char *operatorName);
 
 void operatorPrintAll(void);
+void operatorPrintList(void);
 
 #endif  /* _MODULES_H */

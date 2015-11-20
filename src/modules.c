@@ -864,7 +864,6 @@ static const char *opalias[][2] =
   {"sortvar",             "sortname"   },
   {"splitvar",            "splitname"  },
   {"sort",                "timsort"    },
-  {"write_e5ml",          "export_e5ml"},
   {"eca_r1mm",            "eca_rr1"    },
   {"fpressure",           "pressure_fl"},
   {"hpressure",           "pressure_hl"},
@@ -1054,9 +1053,8 @@ void operatorPrintAll(void)
 	  opernames[nop++] = Modules[i].operators[j++];
 	}
     }
-  /*
-   * Add operator aliases
-   */
+
+  // Add operator aliases
   for ( i = 0; i < nopalias; i++ )
     {
       opernames[nop++] = opalias[i][0];
@@ -1075,4 +1073,112 @@ void operatorPrintAll(void)
       nbyte += fprintf(pout, " %s", opernames[i]);
     }
   fprintf(pout, "\n");
+}
+
+
+void operatorPrintList(void)
+{
+  int i, j, nbyte, nop = 0;
+  const char *opernames[4096];
+  FILE *pout = stderr;
+
+  for ( i = 0; i < NumModules; i++ )
+    {
+      j = 0;
+      while ( Modules[i].operators[j] )
+	{
+	  opernames[nop++] = Modules[i].operators[j++];
+	}
+    }
+
+  // Add operator aliases
+  for ( i = 0; i < nopalias; i++ )
+    {
+      opernames[nop++] = opalias[i][0];
+    }
+
+  qsort(opernames, nop, sizeof(char *), cmpname);
+
+  for ( i = 0; i < nop; i++ )
+    {
+      int iname = -1;
+      int ialias = -1;
+      size_t operlen = strlen(opernames[i]);
+      const char *pdes = NULL;
+      const char **phelp = NULL;
+      const char **help = NULL;
+
+      for ( j = 0; j < nopalias; j++ )
+        {
+          if ( strcmp(opernames[i], opalias[j][0]) == 0 )
+            {
+              ialias = j;
+              break;
+            }
+        }
+
+      if ( ialias == -1 ) help = operatorHelp((char *)opernames[i]);
+
+      phelp = help;
+      if ( phelp )
+        {
+          int loper = FALSE;
+          int index = 0;
+          while ( *phelp )
+            {
+              if ( loper )
+                {
+                  if ( *phelp[0] == '\0' ) break;
+                  const char *ph = *phelp;
+                  while ( *ph != '\0' )
+                    {
+                      if ( *ph != ' ' ) break;
+                      ph++;
+                    }
+                  if ( *ph != '\0' && strncmp(ph, opernames[i], operlen) == 0 && ph[operlen] == ' ' )
+                    {
+                      ph += operlen;
+                      while ( *ph != '\0' )
+                        {
+                          if ( *ph != ' ' ) break;
+                          ph++;
+                        }
+                      if ( *ph != '\0' ) pdes = ph;
+                    }
+                }
+              
+              if ( strcmp(*phelp, "NAME") == 0 ) iname = index+1;
+              if ( strcmp(*phelp, "OPERATORS") == 0 ) loper = TRUE;
+              index++;
+              phelp++;
+            }
+        }
+
+      phelp = help;
+      if ( phelp && pdes == NULL && iname >= 0 )
+        {
+          const char *ph = phelp[iname];
+          while ( *ph != '\0' )
+            {
+              if ( *ph != ' ' ) break;
+              ph++;
+            }
+          if ( *ph != '\0' && strncmp(ph, opernames[i], operlen) == 0 && ph[operlen] == ' ' )
+            {
+              ph += operlen;
+              while ( *ph != '\0' )
+                {
+                  if ( *ph != ' ' && *ph != '-' ) break;
+                  ph++;
+                }
+              if ( *ph != '\0' ) pdes = ph;
+            }      
+        }
+
+      nbyte = fprintf(pout, "%s ", opernames[i]);
+      for ( int i = nbyte; i <= 16; ++i ) fprintf(pout, " ");
+      if ( pdes ) fprintf(pout, "%s", pdes);
+      else if ( ialias >= 0 )  fprintf(pout, "--> %s", opalias[ialias][1]);
+      fprintf(pout, "\n");
+    }
 }

@@ -166,6 +166,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
   fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
+  fprintf(stderr, "    --operators    List of all operators\n");
 #if defined(_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
@@ -195,9 +196,12 @@ void cdo_usage(void)
   fprintf(stderr, "\n");
 
   fprintf(stderr, "  Operators:\n");
+  fprintf(stderr, "    Use option --operators for a list of all operators.\n");
+  /*
   set_text_color(stderr, RESET, GREEN);
   operatorPrintAll();
   reset_text_color(stderr);
+  */
 
   fprintf(stderr, "\n");
   fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2015 Uwe Schulzweida\n", VERSION);
@@ -265,7 +269,6 @@ void cdoPrintHelp(const char *phelp[]/*, char *xoperator*/)
         }
     }
 }
-
 
 static
 void cdoSetDebug(int level)
@@ -1243,7 +1246,10 @@ int parse_options_long(int argc, char *argv[])
 
   if ( lprintoperators )
     {
-      operatorPrintAll();
+      set_text_color(stderr, RESET, GREEN);
+      operatorPrintList();
+      //operatorPrintAll();
+      reset_text_color(stderr);
       return 1;
     }
   
@@ -1403,7 +1409,7 @@ int main(int argc, char *argv[])
         {
           if ( DebugLevel == 0 ) DebugLevel = 1;
           cdoSetDebug(DebugLevel);
-         }
+        }
 
       timer_total  = timer_new("total");
       timer_read   = timer_new("read");
