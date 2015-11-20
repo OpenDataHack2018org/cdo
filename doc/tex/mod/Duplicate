@@ -14,13 +14,13 @@
 
 @BeginDescription
 This operator duplicates the contents of @file{ifile} and writes the result to @file{ofile}.
-The optional parameter sets the number of duplicates, the default is 1.
+The optional parameter sets the number of duplicates, the default is 2.
 @EndDescription
 @EndOperator
 
 
 @BeginParameter
 @Item = ndup
-INTEGER  Number of duplicates, default is 1.
+INTEGER  Number of duplicates, default is 2.
 @EndParameter
 

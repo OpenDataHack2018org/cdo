@@ -226,10 +226,10 @@ static const char *DuplicateHelp[] = {
     "",
     "DESCRIPTION",
     "    This operator duplicates the contents of ifile and writes the result to ofile.",
-    "    The optional parameter sets the number of duplicates, the default is 1.",
+    "    The optional parameter sets the number of duplicates, the default is 2.",
     "",
     "PARAMETER",
-    "    ndup  INTEGER  Number of duplicates, default is 1.",
+    "    ndup  INTEGER  Number of duplicates, default is 2.",
     NULL
 };
 

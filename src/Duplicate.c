@@ -38,7 +38,7 @@ void *Duplicate(void *argument)
   int nvars, nlevel;
   int ntsteps;
   int *vdate = NULL, *vtime = NULL;
-  int idup, ndup = 1;
+  int idup, ndup = 2;
   field_t ***vars = NULL;
 
   cdoInitialize(argument);
