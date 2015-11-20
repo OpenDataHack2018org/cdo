@@ -276,7 +276,7 @@ void *Maggraph(void *argument);
 
 
 #define  AdisitOperators        {"adisit", "adipot"}
-#define  AfterburnerOperators   {"afterburner", "after"}
+#define  AfterburnerOperators   {"after"}
 #define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc", "mod"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy", "muldoy"}
@@ -335,7 +335,7 @@ void *Maggraph(void *argument);
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  ImportamsrOperators    {"import_amsr"}
-#define  ImportbinaryOperators  {"import_binary", "import_grads"}
+#define  ImportbinaryOperators  {"import_binary"}
 #define  ImportcmsafOperators   {"import_cmsaf"}
 #define  ImportobsOperators     {"import_obs"}
 #define  InfoOperators          {"info", "infop", "infon", "infoc", "map"}
@@ -824,45 +824,45 @@ static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
 
 static const char *opalias[][2] =
 {
-  {"anomaly",             "ymonsub"    },
-  {"deltap_fl",           "deltap"     },
-  {"diffv",               "diffn"      },
-  {"covar0",              "timcovar"   },
-  {"covar0r",             "fldcovar"   },
-  {"gather",              "collgrid"   },
-  {"geopotheight",        "gheight"    },
-  {"ggstat",              "info"       },
-  {"ggstats",             "sinfo"      },
-  {"globavg",             "fldavg"     },
-  {"infos",               "sinfo"      },
-  {"infov",               "infon"      },
-  {"intgrid",             "intgridbil" },
-  {"log",                 "ln"         },
-  {"lmean",               "ymonmean"   },
-  {"lmmean",              "ymonmean"   },
-  {"lmavg",               "ymonavg"    },
-  {"lmstd",               "ymonstd"    },
-  {"lsmean",              "yseasmean"  },
-  {"chvar",               "chname"     },
-  {"ncode",               "npar"       },
-  {"nvar",                "npar"       },
-  {"outputkey",           "outputtab"  },
-  {"vardes",              "pardes"     },
-  {"delvar",              "delname"    },
-  {"read_e5ml",           "import_e5ml"},
-  {"remapcon1",           "remaplaf"   },
-  {"remapdis1",           "remapnn"    },
-  {"scatter",             "distgrid"   },
-  {"showvar",             "showname"   },
-  {"selgridname",         "selgrid"    },
-  {"selvar",              "selname"    },
-  {"setvar",              "setname"    },
-  {"setpartabv",          "setpartabn" },
-  {"sinfov",              "sinfon"     },
-  {"sortvar",             "sortname"   },
-  {"splitvar",            "splitname"  },
-  {"sort",                "timsort"    },
-  {"eca_r1mm",            "eca_rr1"    },
+  {"afterburner",         "after"},
+  {"anomaly",             "ymonsub"},
+  {"deltap_fl",           "deltap"},
+  {"diffv",               "diffn"},
+  {"covar0",              "timcovar"},
+  {"covar0r",             "fldcovar"},
+  {"gather",              "collgrid"},
+  {"geopotheight",        "gheight"},
+  {"ggstat",              "info"},
+  {"ggstats",             "sinfo"},
+  {"globavg",             "fldavg"},
+  {"import_grads",        "import_binary"},
+  {"infos",               "sinfo"},
+  {"infov",               "infon"},
+  {"intgrid",             "intgridbil"},
+  {"log",                 "ln"},
+  {"lmean",               "ymonmean"},
+  {"lmmean",              "ymonmean"},
+  {"lmavg",               "ymonavg"},
+  {"lmstd",               "ymonstd"},
+  {"lsmean",              "yseasmean"},
+  {"chvar",               "chname"},
+  {"ncode",               "npar"},
+  {"nvar",                "npar"},
+  {"outputkey",           "outputtab"},
+  {"vardes",              "pardes"},
+  {"delvar",              "delname"},
+  {"remapcon1",           "remaplaf"},
+  {"remapdis1",           "remapnn"},
+  {"scatter",             "distgrid"},
+  {"showvar",             "showname"},
+  {"selgridname",         "selgrid"},
+  {"setvar",              "setname"},
+  {"setpartabv",          "setpartabn"},
+  {"sinfov",              "sinfon"},
+  {"sortvar",             "sortname"},
+  {"splitvar",            "splitname"},
+  {"sort",                "timsort"},
+  {"eca_r1mm",            "eca_rr1"},
   {"fpressure",           "pressure_fl"},
   {"hpressure",           "pressure_hl"},
   {"ensrkhistspace",      "ensrkhist_space"},

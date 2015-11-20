@@ -1357,7 +1357,7 @@ static const char *ExprHelp[] = {
 static const char *MathHelp[] = {
     "NAME",
     "    abs, int, nint, pow, sqr, sqrt, exp, ln, log10, sin, cos, tan, asin, acos, ",
-    "    reci - Mathematical functions",
+    "    atan, reci - Mathematical functions",
     "",
     "SYNOPSIS",
     "    <operator>  ifile ofile",
@@ -1395,6 +1395,8 @@ static const char *MathHelp[] = {
     "           o(t,x) = asin(i(t,x))",
     "    acos   Arc cosine",
     "           o(t,x) = acos(i(t,x))",
+    "    atan   Arc tangent",
+    "           o(t,x) = atan(i(t,x))",
     "    reci   Reciprocal value",
     "           o(t,x) = 1 / i(t,x)",
     NULL
