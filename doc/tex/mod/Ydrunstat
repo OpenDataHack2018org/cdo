@@ -163,7 +163,7 @@ o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 
 @BeginOperator_ydrunvar1
-@Title     = Multi-year daily running variance
+@Title     = Multi-year daily running variance (n-1)
 @Parameter = nts
 
 @BeginDescription
@@ -213,7 +213,7 @@ o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 
 @BeginOperator_ydrunstd1
-@Title     = Multi-year daily running standard deviation
+@Title     = Multi-year daily running standard deviation (n-1)
 @Parameter = nts
 
 @BeginDescription

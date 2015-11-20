@@ -149,7 +149,7 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_timselvar1
-@Title     = Time range variance
+@Title     = Time range variance (n-1)
 @Parameter = nsets [noffset] [nskip]
 
 @BeginDescription
@@ -193,7 +193,7 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_timselstd1
-@Title     = Time range standard deviation
+@Title     = Time range standard deviation (n-1)
 @Parameter = nsets [noffset] [nskip]
 
 @BeginDescription

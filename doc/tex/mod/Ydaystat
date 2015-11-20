@@ -150,7 +150,7 @@ o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 
 
 @BeginOperator_ydayvar1
-@Title     = Multi-year daily variance
+@Title     = Multi-year daily variance (n-1)
 
 @BeginDescription
 Divisor is (n-1). 
@@ -198,7 +198,7 @@ o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 
 
 @BeginOperator_ydaystd1
-@Title     = Multi-year daily standard deviation
+@Title     = Multi-year daily standard deviation (n-1)
 
 @BeginDescription
 Divisor is (n-1). 

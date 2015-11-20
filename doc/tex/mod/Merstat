@@ -71,7 +71,7 @@ For every longitude the variance over all latitudes is computed. Divisor is n.
 
 
 @BeginOperator_mervar1
-@Title     = Meridional variance
+@Title     = Meridional variance (n-1)
 
 @BeginDescription
 For every longitude the variance over all latitudes is computed. Divisor is (n-1).
@@ -89,7 +89,7 @@ For every longitude the standard deviation over all latitudes is computed. Divis
 
 
 @BeginOperator_merstd1
-@Title     = Meridional standard deviation
+@Title     = Meridional standard deviation (n-1)
 
 @BeginDescription
 For every longitude the standard deviation over all latitudes is computed. Divisor is (n-1).

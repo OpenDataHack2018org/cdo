@@ -121,7 +121,7 @@ o(t+(nts-1)/2,x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 
 
 @BeginOperator_runvar1
-@Title     = Running variance
+@Title     = Running variance (n-1)
 @Parameter = nts
 
 @BeginDescription
@@ -159,7 +159,7 @@ o(t+(nts-1)/2,x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 
 
 @BeginOperator_runstd1
-@Title     = Running standard deviation
+@Title     = Running standard deviation (n-1)
 @Parameter = nts
 
 @BeginDescription

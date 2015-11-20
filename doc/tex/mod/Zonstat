@@ -71,7 +71,7 @@ For every latitude the variance over all longitudes is computed. Divisor is n.
 
 
 @BeginOperator_zonvar1
-@Title     = Zonal variance
+@Title     = Zonal variance (n-1)
 
 @BeginDescription
 For every latitude the variance over all longitudes is computed. Divisor is (n-1).
@@ -89,7 +89,7 @@ For every latitude the standard deviation over all longitudes is computed. Divis
 
 
 @BeginOperator_zonstd1
-@Title     = Zonal standard deviation
+@Title     = Zonal standard deviation (n-1)
 
 @BeginDescription
 For every latitude the standard deviation over all longitudes is computed. Divisor is (n-1). 

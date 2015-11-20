@@ -151,7 +151,7 @@ o(\mbox{12},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 
 
 @BeginOperator_ymonvar1
-@Title     = Multi-year monthly variance
+@Title     = Multi-year monthly variance (n-1)
 
 @BeginDescription
 Divisor is (n-1). 
@@ -199,7 +199,7 @@ o(\mbox{12},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 
 
 @BeginOperator_ymonstd1
-@Title     = Multi-year monthly standard deviation
+@Title     = Multi-year monthly standard deviation (n-1)
 
 @BeginDescription
 Divisor is (n-1). 

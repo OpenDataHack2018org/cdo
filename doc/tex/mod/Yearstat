@@ -131,7 +131,7 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_yearvar1
-@Title     = Yearly variance
+@Title     = Yearly variance (n-1)
 
 @BeginDescription
 @IfMan
@@ -169,7 +169,7 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_yearstd1
-@Title     = Yearly standard deviation
+@Title     = Yearly standard deviation (n-1)
 
 @BeginDescription
 @IfMan

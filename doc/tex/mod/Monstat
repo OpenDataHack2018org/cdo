@@ -131,7 +131,7 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_monvar1
-@Title     = Monthly variance
+@Title     = Monthly variance (n-1)
 
 @BeginDescription
 @IfMan
@@ -169,7 +169,7 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_monstd1
-@Title     = Monthly standard deviation
+@Title     = Monthly standard deviation (n-1)
 
 @BeginDescription
 @IfMan

@@ -133,7 +133,7 @@ weighted by area weights obtained by the input field.
 
 
 @BeginOperator_fldvar1
-@Title     = Field variance
+@Title     = Field variance (n-1)
 
 @BeginDescription
 @IfMan
@@ -173,7 +173,7 @@ weighted by area weights obtained by the input field.
 
 
 @BeginOperator_fldstd1
-@Title     = Field standard deviation
+@Title     = Field standard deviation (n-1)
 
 @BeginDescription
 @IfMan

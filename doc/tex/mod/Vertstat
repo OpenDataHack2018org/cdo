@@ -70,7 +70,7 @@ For every gridpoint the variance over all levels is computed. Divisor is n.
 
 
 @BeginOperator_vertvar1
-@Title     = Vertical variance
+@Title     = Vertical variance (n-1)
 
 @BeginDescription
 For every gridpoint the variance over all levels is computed. Divisor is (n-1).
@@ -88,7 +88,7 @@ For every gridpoint the standard deviation over all levels is computed. Divisor 
 
 
 @BeginOperator_vertstd1
-@Title     = Vertical standard deviation
+@Title     = Vertical standard deviation (n-1)
 
 @BeginDescription
 For every gridpoint the standard deviation over all levels is computed. Divisor is (n-1).

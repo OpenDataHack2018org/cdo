@@ -116,7 +116,7 @@ o(t,x) = \mbox{\bf std}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 
 
 @BeginOperator_ensstd1
-@Title     = Ensemble standard deviation
+@Title     = Ensemble standard deviation (n-1)
 
 @BeginDescription
 Divisor is (n-1).
@@ -152,7 +152,7 @@ o(t,x) = \mbox{\bf var}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 
 
 @BeginOperator_ensvar1
-@Title     = Ensemble variance
+@Title     = Ensemble variance (n-1)
 
 @BeginDescription
 Divisor is (n-1).

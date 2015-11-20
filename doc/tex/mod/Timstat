@@ -115,7 +115,7 @@ o(1,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_timvar1
-@Title     = Time variance
+@Title     = Time variance (n-1)
 
 @BeginDescription
 Divisor is (n-1). 
@@ -151,7 +151,7 @@ o(1,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_timstd1
-@Title     = Time standard deviation
+@Title     = Time standard deviation (n-1)
 
 @BeginDescription
 Divisor is (n-1). 

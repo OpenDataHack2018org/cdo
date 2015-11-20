@@ -310,8 +310,8 @@ void *Maggraph(void *argument);
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl"}
-#define  Ensstat3Operators      {"ensrkhist_space","ensrkhist_time","ensroc"}
-#define  EnsvalOperators        {"enscrps","ensbrs"}
+#define  Ensstat3Operators      {"ensrkhistspace", "ensrkhisttime", "ensroc"}
+#define  EnsvalOperators        {"enscrps", "ensbrs"}
 #define  EofcoeffOperators      {"eofcoeff"}
 #define  Eofcoeff3dOperators    {"eofcoeff3d"}
 #define  EOFsOperators          {"eof", "eofspatial", "eoftime"}
@@ -865,8 +865,8 @@ static const char *opalias[][2] =
   {"eca_r1mm",            "eca_rr1"},
   {"fpressure",           "pressure_fl"},
   {"hpressure",           "pressure_hl"},
-  {"ensrkhistspace",      "ensrkhist_space"},
-  {"ensrkhisttime",       "ensrkhist_time"}
+  {"ensrkhist_space",     "ensrkhistspace"},
+  {"ensrkhist_time",      "ensrkhisttime"}
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));
@@ -1078,7 +1078,7 @@ void operatorPrintList(void)
 {
   int i, j, nbyte, nop = 0;
   const char *opernames[4096];
-  FILE *pout = stderr;
+  FILE *pout = stdout;
 
   for ( i = 0; i < NumModules; i++ )
     {

@@ -131,7 +131,7 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_dayvar1
-@Title     = Daily variance
+@Title     = Daily variance (n-1)
 
 @BeginDescription
 @IfMan
@@ -169,7 +169,7 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_daystd1
-@Title     = Daily standard deviation
+@Title     = Daily standard deviation (n-1)
 
 @BeginDescription
 @IfMan

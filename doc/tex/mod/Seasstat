@@ -139,7 +139,7 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_seasvar1
-@Title     = Seasonal variance
+@Title     = Seasonal variance (n-1)
 
 @BeginDescription
 @IfMan
@@ -179,7 +179,7 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_seasstd1
-@Title     = Seasonal standard deviation
+@Title     = Seasonal standard deviation (n-1)
 
 @BeginDescription
 @IfMan

@@ -161,7 +161,7 @@ o(\mbox{4},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginOperator_yseasvar1
-@Title     = Multi-year seasonal variance
+@Title     = Multi-year seasonal variance (n-1)
 
 @BeginDescription
 @IfMan
@@ -209,7 +209,7 @@ o(\mbox{4},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginOperator_yseasstd1
-@Title     = Multi-year seasonal standard deviation
+@Title     = Multi-year seasonal standard deviation (n-1)
 
 @BeginDescription
 @IfMan

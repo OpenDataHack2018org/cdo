@@ -234,9 +234,9 @@ Operator catalog:
    Ensstat       ensmean         Ensemble mean
    Ensstat       ensavg          Ensemble average
    Ensstat       ensstd          Ensemble standard deviation
-   Ensstat       ensstd1         Ensemble standard deviation
+   Ensstat       ensstd1         Ensemble standard deviation (n-1)
    Ensstat       ensvar          Ensemble variance
-   Ensstat       ensvar1         Ensemble variance
+   Ensstat       ensvar1         Ensemble variance (n-1)
    Ensstat       enspctl         Ensemble percentiles
    Ensstat2      ensrkhistspace  Ranked Histogram averaged over time
    Ensstat2      ensrkhisttime   Ranked Histogram averaged over space
@@ -249,9 +249,9 @@ Operator catalog:
    Fldstat       fldmean         Field mean
    Fldstat       fldavg          Field average
    Fldstat       fldstd          Field standard deviation
-   Fldstat       fldstd1         Field standard deviation
+   Fldstat       fldstd1         Field standard deviation (n-1)
    Fldstat       fldvar          Field variance
-   Fldstat       fldvar1         Field variance
+   Fldstat       fldvar1         Field variance (n-1)
    Fldstat       fldpctl         Field percentiles
    Zonstat       zonmin          Zonal minimum
    Zonstat       zonmax          Zonal maximum
@@ -259,9 +259,9 @@ Operator catalog:
    Zonstat       zonmean         Zonal mean
    Zonstat       zonavg          Zonal average
    Zonstat       zonstd          Zonal standard deviation
-   Zonstat       zonstd1         Zonal standard deviation
+   Zonstat       zonstd1         Zonal standard deviation (n-1)
    Zonstat       zonvar          Zonal variance
-   Zonstat       zonvar1         Zonal variance
+   Zonstat       zonvar1         Zonal variance (n-1)
    Zonstat       zonpctl         Zonal percentiles
    Merstat       mermin          Meridional minimum
    Merstat       mermax          Meridional maximum
@@ -269,9 +269,9 @@ Operator catalog:
    Merstat       mermean         Meridional mean
    Merstat       meravg          Meridional average
    Merstat       merstd          Meridional standard deviation
-   Merstat       merstd1         Meridional standard deviation
+   Merstat       merstd1         Meridional standard deviation (n-1)
    Merstat       mervar          Meridional variance
-   Merstat       mervar1         Meridional variance
+   Merstat       mervar1         Meridional variance (n-1)
    Merstat       merpctl         Meridional percentiles
    Gridboxstat   gridboxmin      Gridbox minimum
    Gridboxstat   gridboxmax      Gridbox maximum
@@ -279,27 +279,27 @@ Operator catalog:
    Gridboxstat   gridboxmean     Gridbox mean
    Gridboxstat   gridboxavg      Gridbox average
    Gridboxstat   gridboxstd      Gridbox standard deviation
-   Gridboxstat   gridboxstd1     Gridbox standard deviation
+   Gridboxstat   gridboxstd1     Gridbox standard deviation (n-1)
    Gridboxstat   gridboxvar      Gridbox variance
-   Gridboxstat   gridboxvar1     Gridbox variance
+   Gridboxstat   gridboxvar1     Gridbox variance (n-1)
    Vertstat      vertmin         Vertical minimum
    Vertstat      vertmax         Vertical maximum
    Vertstat      vertsum         Vertical sum
    Vertstat      vertmean        Vertical mean
    Vertstat      vertavg         Vertical average
    Vertstat      vertstd         Vertical standard deviation
-   Vertstat      vertstd1        Vertical standard deviation
+   Vertstat      vertstd1        Vertical standard deviation (n-1)
    Vertstat      vertvar         Vertical variance
-   Vertstat      vertvar1        Vertical variance
+   Vertstat      vertvar1        Vertical variance (n-1)
    Timselstat    timselmin       Time range minimum
    Timselstat    timselmax       Time range maximum
    Timselstat    timselsum       Time range sum
    Timselstat    timselmean      Time range mean
    Timselstat    timselavg       Time range average
    Timselstat    timselstd       Time range standard deviation
-   Timselstat    timselstd1      Time range standard deviation
+   Timselstat    timselstd1      Time range standard deviation (n-1)
    Timselstat    timselvar       Time range variance
-   Timselstat    timselvar1      Time range variance
+   Timselstat    timselvar1      Time range variance (n-1)
    Timselpctl    timselpctl      Time range percentiles
    Runstat       runmin          Running minimum
    Runstat       runmax          Running maximum
@@ -307,9 +307,9 @@ Operator catalog:
    Runstat       runmean         Running mean
    Runstat       runavg          Running average
    Runstat       runstd          Running standard deviation
-   Runstat       runstd1         Running standard deviation
+   Runstat       runstd1         Running standard deviation (n-1)
    Runstat       runvar          Running variance
-   Runstat       runvar1         Running variance
+   Runstat       runvar1         Running variance (n-1)
    Runpctl       runpctl         Running percentiles
    Timstat       timmin          Time minimum
    Timstat       timmax          Time maximum
@@ -317,9 +317,9 @@ Operator catalog:
    Timstat       timmean         Time mean
    Timstat       timavg          Time average
    Timstat       timstd          Time standard deviation
-   Timstat       timstd1         Time standard deviation
+   Timstat       timstd1         Time standard deviation (n-1)
    Timstat       timvar          Time variance
-   Timstat       timvar1         Time variance
+   Timstat       timvar1         Time variance (n-1)
    Timpctl       timpctl         Time percentiles
    Hourstat      hourmin         Hourly minimum
    Hourstat      hourmax         Hourly maximum
@@ -327,9 +327,9 @@ Operator catalog:
    Hourstat      hourmean        Hourly mean
    Hourstat      houravg         Hourly average
    Hourstat      hourstd         Hourly standard deviation
-   Hourstat      hourstd1        Hourly standard deviation
+   Hourstat      hourstd1        Hourly standard deviation (n-1)
    Hourstat      hourvar         Hourly variance
-   Hourstat      hourvar1        Hourly variance
+   Hourstat      hourvar1        Hourly variance (n-1)
    Hourpctl      hourpctl        Hourly percentiles
    Daystat       daymin          Daily minimum
    Daystat       daymax          Daily maximum
@@ -337,9 +337,9 @@ Operator catalog:
    Daystat       daymean         Daily mean
    Daystat       dayavg          Daily average
    Daystat       daystd          Daily standard deviation
-   Daystat       daystd1         Daily standard deviation
+   Daystat       daystd1         Daily standard deviation (n-1)
    Daystat       dayvar          Daily variance
-   Daystat       dayvar1         Daily variance
+   Daystat       dayvar1         Daily variance (n-1)
    Daypctl       daypctl         Daily percentiles
    Monstat       monmin          Monthly minimum
    Monstat       monmax          Monthly maximum
@@ -347,9 +347,9 @@ Operator catalog:
    Monstat       monmean         Monthly mean
    Monstat       monavg          Monthly average
    Monstat       monstd          Monthly standard deviation
-   Monstat       monstd1         Monthly standard deviation
+   Monstat       monstd1         Monthly standard deviation (n-1)
    Monstat       monvar          Monthly variance
-   Monstat       monvar1         Monthly variance
+   Monstat       monvar1         Monthly variance (n-1)
    Monpctl       monpctl         Monthly percentiles
    Yearmonstat   yearmonmean     Yearly mean from monthly data
    Yearstat      yearmin         Yearly minimum
@@ -358,9 +358,9 @@ Operator catalog:
    Yearstat      yearmean        Yearly mean
    Yearstat      yearavg         Yearly average
    Yearstat      yearstd         Yearly standard deviation
-   Yearstat      yearstd1        Yearly standard deviation
+   Yearstat      yearstd1        Yearly standard deviation (n-1)
    Yearstat      yearvar         Yearly variance
-   Yearstat      yearvar1        Yearly variance
+   Yearstat      yearvar1        Yearly variance (n-1)
    Yearpctl      yearpctl        Yearly percentiles
    Seasstat      seasmin         Seasonal minimum
    Seasstat      seasmax         Seasonal maximum
@@ -368,9 +368,9 @@ Operator catalog:
    Seasstat      seasmean        Seasonal mean
    Seasstat      seasavg         Seasonal average
    Seasstat      seasstd         Seasonal standard deviation
-   Seasstat      seasstd1        Seasonal standard deviation
+   Seasstat      seasstd1        Seasonal standard deviation (n-1)
    Seasstat      seasvar         Seasonal variance
-   Seasstat      seasvar1        Seasonal variance
+   Seasstat      seasvar1        Seasonal variance (n-1)
    Seaspctl      seaspctl        Seasonal percentiles
    Yhourstat     yhourmin        Multi-year hourly minimum
    Yhourstat     yhourmax        Multi-year hourly maximum
@@ -378,18 +378,18 @@ Operator catalog:
    Yhourstat     yhourmean       Multi-year hourly mean
    Yhourstat     yhouravg        Multi-year hourly average
    Yhourstat     yhourstd        Multi-year hourly standard deviation
-   Yhourstat     yhourstd1       Multi-year hourly standard deviation
+   Yhourstat     yhourstd1       Multi-year hourly standard deviation (n-1)
    Yhourstat     yhourvar        Multi-year hourly variance
-   Yhourstat     yhourvar1       Multi-year hourly variance
+   Yhourstat     yhourvar1       Multi-year hourly variance (n-1)
    Ydaystat      ydaymin         Multi-year daily minimum
    Ydaystat      ydaymax         Multi-year daily maximum
    Ydaystat      ydaysum         Multi-year daily sum
    Ydaystat      ydaymean        Multi-year daily mean
    Ydaystat      ydayavg         Multi-year daily average
    Ydaystat      ydaystd         Multi-year daily standard deviation
-   Ydaystat      ydaystd1        Multi-year daily standard deviation
+   Ydaystat      ydaystd1        Multi-year daily standard deviation (n-1)
    Ydaystat      ydayvar         Multi-year daily variance
-   Ydaystat      ydayvar1        Multi-year daily variance
+   Ydaystat      ydayvar1        Multi-year daily variance (n-1)
    Ydaypctl      ydaypctl        Multi-year daily percentiles
    Ymonstat      ymonmin         Multi-year monthly minimum
    Ymonstat      ymonmax         Multi-year monthly maximum
@@ -397,9 +397,9 @@ Operator catalog:
    Ymonstat      ymonmean        Multi-year monthly mean
    Ymonstat      ymonavg         Multi-year monthly average
    Ymonstat      ymonstd         Multi-year monthly standard deviation
-   Ymonstat      ymonstd1        Multi-year monthly standard deviation
+   Ymonstat      ymonstd1        Multi-year monthly standard deviation (n-1)
    Ymonstat      ymonvar         Multi-year monthly variance
-   Ymonstat      ymonvar1        Multi-year monthly variance
+   Ymonstat      ymonvar1        Multi-year monthly variance (n-1)
    Ymonpctl      ymonpctl        Multi-year monthly percentiles
    Yseasstat     yseasmin        Multi-year seasonal minimum
    Yseasstat     yseasmax        Multi-year seasonal maximum
@@ -407,9 +407,9 @@ Operator catalog:
    Yseasstat     yseasmean       Multi-year seasonal mean
    Yseasstat     yseasavg        Multi-year seasonal average
    Yseasstat     yseasstd        Multi-year seasonal standard deviation
-   Yseasstat     yseasstd1       Multi-year seasonal standard deviation
+   Yseasstat     yseasstd1       Multi-year seasonal standard deviation (n-1)
    Yseasstat     yseasvar        Multi-year seasonal variance
-   Yseasstat     yseasvar1       Multi-year seasonal variance
+   Yseasstat     yseasvar1       Multi-year seasonal variance (n-1)
    Yseaspctl     yseaspctl       Multi-year seasonal percentiles
    Ydrunstat     ydrunmin        Multi-year daily running minimum
    Ydrunstat     ydrunmax        Multi-year daily running maximum
@@ -417,9 +417,9 @@ Operator catalog:
    Ydrunstat     ydrunmean       Multi-year daily running mean
    Ydrunstat     ydrunavg        Multi-year daily running average
    Ydrunstat     ydrunstd        Multi-year daily running standard deviation
-   Ydrunstat     ydrunstd1       Multi-year daily running standard deviation
+   Ydrunstat     ydrunstd1       Multi-year daily running standard deviation (n-1)
    Ydrunstat     ydrunvar        Multi-year daily running variance
-   Ydrunstat     ydrunvar1       Multi-year daily running variance
+   Ydrunstat     ydrunvar1       Multi-year daily running variance (n-1)
    Ydrunpctl     ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------
    Correlation and co.

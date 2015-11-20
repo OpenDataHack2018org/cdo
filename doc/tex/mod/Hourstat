@@ -131,7 +131,7 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_hourvar1
-@Title     = Hourly variance
+@Title     = Hourly variance (n-1)
 
 @BeginDescription
 @IfMan
@@ -169,7 +169,7 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginOperator_hourstd1
-@Title     = Hourly standard deviation
+@Title     = Hourly standard deviation (n-1)
 
 @BeginDescription
 @IfMan
