@@ -35,15 +35,6 @@ extern void    memFree   (void *ptr, const char *file, const char *functionname,
 
 #endif /* DEBUG_MEMORY */
 
-void *cdiXmalloc(size_t, const char *, const char *, int);
-#define xmalloc(size) cdiXmalloc((size), __FILE__, __func__,  __LINE__ )
-
-void *cdiXcalloc(size_t, size_t, const char *, const char *, int);
-#define xcalloc(nmemb,size) cdiXcalloc((nmemb), (size), __FILE__, __func__, __LINE__)
-
-void *cdiXrealloc(void *, size_t, const char *, const char *, int);
-#define xrealloc(p,size) cdiXrealloc((p), (size), __FILE__, __func__, __LINE__)
-
 #endif /* _DMEMORY_H */
 /*
  * Local Variables:

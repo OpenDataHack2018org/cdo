@@ -113,9 +113,9 @@ void *cdoReadTimestep(void *rarg)
         }
 
       if ( CDO_Memtype == MEMTYPE_FLOAT )
-        streamReadRecordF(streamID, input_vars[varID][levelID].ptr2, &nmiss);
+        streamReadRecordF(streamID, (float*)input_vars[varID][levelID].ptr2, &nmiss);
       else
-        streamReadRecord(streamID, input_vars[varID][levelID].ptr2, &nmiss);
+        streamReadRecord(streamID, (double*)input_vars[varID][levelID].ptr2, &nmiss);
       
       input_vars[varID][levelID].nmiss2 = nmiss;
     }
@@ -140,12 +140,12 @@ void cdoUpdateVars(int nvars, int vlistID, field_t **vars)
           if ( CDO_Memtype == MEMTYPE_FLOAT )
             {
               tmp = vars[varID][levelID].ptrf;
-              vars[varID][levelID].ptrf   = vars[varID][levelID].ptr2;
+              vars[varID][levelID].ptrf = (float*) vars[varID][levelID].ptr2;
             }
           else
             {
               tmp = vars[varID][levelID].ptr;
-              vars[varID][levelID].ptr   = vars[varID][levelID].ptr2;
+              vars[varID][levelID].ptr = (double*) vars[varID][levelID].ptr2;
             }
           vars[varID][levelID].ptr2  = tmp;
           vars[varID][levelID].nmiss = vars[varID][levelID].nmiss2;
@@ -377,7 +377,7 @@ void *XTimstat(void *argument)
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
                     {
                       if ( samp1[varID][levelID].ptr == NULL )
-                        samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+                        samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
                       
                       for ( int i = 0; i < nwpv*gridsize; i++ )
                         if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
@@ -404,7 +404,7 @@ void *XTimstat(void *argument)
                     {
                       if ( samp1[varID][levelID].ptr == NULL )
                         {
-                          samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
+                          samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
                           for ( int i = 0; i < nwpv*gridsize; i++ )
                             samp1[varID][levelID].ptr[i] = nsets;
                         }
