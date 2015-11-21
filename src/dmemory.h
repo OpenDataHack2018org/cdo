@@ -10,6 +10,10 @@
 #define  WITH_FUNCTION_NAME
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern size_t  memTotal(void);
 extern void    memDebug(int debug);
 extern void    memExitOnError(void);
@@ -20,6 +24,10 @@ extern void   *memRealloc(void *ptr, size_t size, const char *file, const char *
 extern void   *memCalloc (size_t nmemb, size_t size, const char *file, const char *functionname, int line);
 extern void   *memMalloc (size_t size, const char *file, const char *functionname, int line);
 extern void    memFree   (void *ptr, const char *file, const char *functionname, int line);
+
+#if defined (__cplusplus)
+}
+#endif
 
 #if  defined  WITH_FUNCTION_NAME
 #  define  Realloc(p, s)  memRealloc((p), (s), __FILE__, __func__, __LINE__)
