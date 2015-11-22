@@ -19,6 +19,7 @@ libcdo_la_SOURCES =            \
                afterburnerlib.c\
                afterburner.h   \
                vct_l191.h      \
+               calendar.h      \
                constants.h     \
                constants.c     \
                color.c         \

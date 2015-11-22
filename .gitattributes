@@ -527,6 +527,7 @@ src/after_vertint.c -text
 src/after_vertint.h -text
 src/afterburner.h -text
 src/afterburnerlib.c -text
+src/calendar.h -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_getopt.c -text
