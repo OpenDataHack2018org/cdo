@@ -34,6 +34,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "cdi_uuid.h"
 #include "grid.h"
 #include "griddes.h"
 #include "error.h"
@@ -667,7 +668,6 @@ double readflt(const char *filename, const char *name, const char *pline)
   return (val);
 }
 
-void str2uuid(const char *uuidstr, unsigned char *uuid);
 
 int gridFromFile(FILE *gfp, const char *dname)
 {
@@ -809,7 +809,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	{
 	  char uuidOfHGridStr[256];
 	  strcpy(uuidOfHGridStr, skipSeparator(pline + len));
-	  str2uuid(uuidOfHGridStr, grid.uuid);
+	  cdiStr2UUID(uuidOfHGridStr, grid.uuid);
 	}
       else if ( cmpstrlen(pline, "xsize", len)  == 0 )
 	{

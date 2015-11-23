@@ -121,10 +121,6 @@ void time2str(int time, char *timestr, int maxlen);
 const char * tunit2str(int tunits);
 const char * calendar2str(int calendar);
 
-int     days_per_month(int calendar, int year, int month);
-int     days_per_year(int calendar, int year);
-int     calendar_dpy(int calendar);
-
 void    defineGrid(const char *gridarg);
 void    defineInstitution(const char *instarg);
 int     defineTable(const char *tablearg);
@@ -151,5 +147,25 @@ char *expand_filename(const char *string);
 double parameter2double(const char *string);
 int    parameter2int(const char *string);
 int    parameter2intlist(const char *string);
+
+int referenceToGrid(int gridID1);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void cdiDefTableID(int tableID);
+
+void gridGenXvals(int xsize, double xfirst, double xlast, double xinc, double *xvals);
+void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast, double yinc, double *yvals);
+
+void gaussaw(double *restrict pa, double *restrict pw, size_t nlat);
+
+int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon,
+		   double msval, int *kret, int omisng, int operio, int oveggy);
+
+#if defined (__cplusplus)
+}
+#endif
 
 #endif  /* _CDO_INT_H */

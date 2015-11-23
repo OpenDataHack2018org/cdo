@@ -21,6 +21,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "cdi_uuid.h"
 
 static char *ghistory = NULL;
 static size_t ghistorysize = 0;
@@ -123,18 +124,14 @@ void cdo_def_creation_date(int vlistID)
 }
 
 
-void create_uuid(unsigned char uuid[CDI_UUID_SIZE]);
-void uuid2str(const unsigned char *uuid, char *uuidstr);
-
-
 #define UUIDSTR_SIZE (CDI_UUID_SIZE*2 + 4)
 
 static
 void get_uuid(char uuidstr[UUIDSTR_SIZE])
 {
   unsigned char uuid[CDI_UUID_SIZE];
-  create_uuid(uuid);
-  uuid2str(uuid, uuidstr);
+  cdiCreateUUID(uuid);
+  cdiUUID2Str(uuid, uuidstr);
 }
 
 

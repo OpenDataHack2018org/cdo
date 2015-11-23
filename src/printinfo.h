@@ -3,18 +3,6 @@
 #define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
 #define TIME_FORMAT "%2.2d:%2.2d:%2.2d"
 
-void uuid2str(const unsigned char uuid[CDI_UUID_SIZE], char *uuidstr);
-
-static inline
-int cdiUUIDIsNull(const unsigned char uuid[CDI_UUID_SIZE])
-{
-  int isNull = 1;
-  for (size_t i = 0; i < CDI_UUID_SIZE; ++i)
-    isNull &= (uuid[i] == 0);
-  return isNull;
-}
-
-
 void datetime2str(int date, int time, char *datetimestr, int maxlen)
 {
   int year, month, day;
@@ -385,7 +373,7 @@ void printGridInfo(int vlistID)
       if ( !cdiUUIDIsNull(uuidOfHGrid) )
         {
           char uuidOfHGridStr[37];
-          uuid2str(uuidOfHGrid, uuidOfHGridStr);
+          cdiUUID2Str(uuidOfHGrid, uuidOfHGridStr);
           if ( uuidOfHGridStr[0] != 0  && strlen(uuidOfHGridStr) == 36 )
             {
 	      fprintf(stdout, "%33s : %s\n", "uuid", uuidOfHGridStr);
@@ -502,7 +490,7 @@ void printZaxisInfo(int vlistID)
           if ( !cdiUUIDIsNull(uuidOfVGrid) )
             {
               char uuidOfVGridStr[37];
-              uuid2str(uuidOfVGrid, uuidOfVGridStr);
+              cdiUUID2Str(uuidOfVGrid, uuidOfVGridStr);
               if ( uuidOfVGridStr[0] != 0  && strlen(uuidOfVGridStr) == 36 )
                 {
                   fprintf(stdout, "%33s : ", "uuid");

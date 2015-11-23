@@ -50,7 +50,7 @@ void  scan_darray(char *namelist, const char *name, double *values, int maxValue
 
 long  get_nfft(void);
 
-char   *zaxisNamePtr(int leveltype);
+char zaxistypename[CDI_MAX_NAME];
 char   *vlistInqVarNamePtr(int vlistID, int varID);
 char   *vlistInqVarLongnamePtr(int vlistID, int varID);
 char   *vlistInqVarUnitsPtr(int vlistID, int varID);
@@ -954,9 +954,10 @@ void after_defineLevel(struct Control *globs, struct Variable *vars)
 	    }
 	}
       else
-	Error( "%s level data unsupported for TYPE %d",
-	      zaxisNamePtr(zaxisInqType(iVertID)), globs->Type);	    
-
+        {
+          zaxisName(zaxisInqType(iVertID), zaxistypename);
+          Error("%s level data unsupported for TYPE %d", zaxistypename, globs->Type);	    
+        }
       break;
     }
   case 30:
@@ -1652,9 +1653,10 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	{
 	  gridID = vars[code].igridID;
 	  zaxisID = vars[code].izaxisID;
+          zaxisName(zaxisInqType(zaxisID), zaxistypename);
 	  fprintf(stderr," Detected Code %3d  grid %-8s size %5d  level %2d %-8s\n",
 		  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
-		  zaxisInqSize(zaxisID), zaxisNamePtr(zaxisInqType(zaxisID)));
+		  zaxisInqSize(zaxisID), zaxistypename);
 	}
 
 
@@ -1756,9 +1758,10 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	{
 	  gridID  = vars[code].ogridID;
 	  zaxisID = vars[code].ozaxisID;
+          zaxisName(zaxisInqType(zaxisID), zaxistypename);
 	  fprintf(stderr," Selected Code %3d  grid %-8s size %5d  level %2d %-8s\n",
 		  code, gridNamePtr(gridInqType(gridID)), gridInqSize(gridID),
-		  zaxisInqSize(zaxisID), zaxisNamePtr(zaxisInqType(zaxisID)));
+		  zaxisInqSize(zaxisID), zaxistypename);
 	}
 }
 

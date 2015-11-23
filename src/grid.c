@@ -35,8 +35,6 @@
 #include "error.h"
 #include "grid.h"
 
-int referenceToGrid(int gridID1);
-
 
 static
 void scale_vec(double scalefactor, long nvals, double *restrict values)
@@ -693,10 +691,6 @@ void grib_get_reduced_row(long pl,double lon_first,double lon_last,long* npoints
 
   return;
 }
-
-
-int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon,
-		   double msval, int *kret, int omisng, int operio, int oveggy);
 
 static
 int qu2reg_subarea(int gridsize, int np, double xfirst, double xlast, 

@@ -27,6 +27,7 @@
 #include "pstream.h"
 #include "util.h"
 
+#include "cdi_uuid.h"
 #include "printinfo.h"
 
 const char *tunit2str(int tunits)

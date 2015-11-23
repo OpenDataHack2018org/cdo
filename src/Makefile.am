@@ -10,6 +10,7 @@ libcdo_la_SOURCES =            \
                cdo_task.c      \
                cdo_task.h      \
                cdo_history.c   \
+               cdi_uuid.h      \
                after_sptrans.c \
                after_fctrans.c \
                after_dvtrans.c \

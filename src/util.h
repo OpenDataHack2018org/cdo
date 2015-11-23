@@ -200,7 +200,6 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
 
 void writeNCgrid(const char *gridfile, int gridID, int *imask);
 void defineZaxis(const char *zaxisarg);
-void cdiDefTableID(int tableID);
 
 int gridFromName(const char *gridname);
 int zaxisFromName(const char *zaxisname);

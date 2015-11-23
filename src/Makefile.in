@@ -561,7 +561,7 @@ top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	cdo_getopt.c cdo_getopt.h cdo_task.c cdo_task.h cdo_history.c \
-	after_sptrans.c after_fctrans.c after_dvtrans.c \
+	cdi_uuid.h after_sptrans.c after_fctrans.c after_dvtrans.c \
 	after_vertint.c after_vertint.h after_namelist.c \
 	afterburnerlib.c afterburner.h vct_l191.h calendar.h \
 	constants.h constants.c color.c color.h commandline.c const.h \

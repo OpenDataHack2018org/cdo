@@ -18,7 +18,13 @@
 #define  HAVE_OPENMP4  1
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void gaussaw(double *pa, double *pw, size_t nlat);
+#if defined (__cplusplus)
+}
+#endif
 
 static
 void jspleg1(double *pleg, double plat, int ktrunc, double *work)
