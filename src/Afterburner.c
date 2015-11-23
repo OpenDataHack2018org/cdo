@@ -51,9 +51,6 @@ void  scan_darray(char *namelist, const char *name, double *values, int maxValue
 long  get_nfft(void);
 
 char zaxistypename[CDI_MAX_NAME];
-char   *vlistInqVarNamePtr(int vlistID, int varID);
-char   *vlistInqVarLongnamePtr(int vlistID, int varID);
-char   *vlistInqVarUnitsPtr(int vlistID, int varID);
 
 typedef struct {
   int lana, nrecs;
@@ -1092,7 +1089,7 @@ void after_setCodes(struct Control *globs, struct Variable *vars, int maxCodes, 
 {
   int code;
   int table, modelID, tableID;
-  char *name, *longname;
+  const char *name, *longname;
   int varID;
 
   if ( globs->Verbose ) lprintf(stdout);
@@ -1634,7 +1631,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
   int ovarID, ogridID, ozaxisID;
   int ovarID2;
   int ivarID, instID, modelID, tableID;
-  char *name, *longname, *units;
+  const char *name, *longname, *units;
   char histstring[99];
   int datatype;
 
