@@ -15,6 +15,7 @@
 #include "template_parser.h"
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
+#include "StringUtilities.h"
 
 extern xmlNode  *magics_node;
 
@@ -30,11 +31,7 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID );
 double THIN_FAC = 2.0, UNIT_VEC = 25.0;
 extern int ANIM_FLAG,STEP_FREQ;
 
-extern int checkdevice();
-extern int IsNumeric();
-extern void StrToUpperCase();
-extern int StringSplitWithSeperator();
-
+extern int checkdevice(char *device_in);
 
 extern char *DEVICE;
 extern char *DEVICE_TABLE;

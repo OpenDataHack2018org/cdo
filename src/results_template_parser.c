@@ -7,7 +7,7 @@
 
 /* extern int GetMagicsParameterInfo( const char *user_name, char **magics_name, char **magics_type ); */
 
-extern int GetMagicsParameterInfo(  char *user_name, xmlChar *param_value );
+extern int GetMagicsParameterInfo(  const char *user_name, char *param_value );
 
 extern xmlNode *results_node;
 
@@ -88,7 +88,7 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 			  param_value = xmlNodeGetContent( attr->children );
 
 			  /* if( !GetMagicsParameterInfo( attr->name, &magics_param_name, &param_type ) ) */
-			  if( !GetMagicsParameterInfo( (char *) attr->name, param_value ) )
+			  if( !GetMagicsParameterInfo( (const char *) attr->name, (char *) param_value ) )
 			  {
 
 #if 0

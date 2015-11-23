@@ -14,6 +14,7 @@
 #include "template_parser.h"
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
+#include "StringUtilities.h"
 
 xmlDoc *param_doc = NULL;
 xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
@@ -94,12 +95,6 @@ int checkstyle( char *style_in );
 int checkdevice( char *device_in );
 int checkprojection( char *projection_in );
 void VerifyPlotParameters( int num_param, char **param_names, int opID );
-
-extern int IsNumeric();
-extern void StrToUpperCase();
-extern void StrToLowerCase();
-extern int StringSplitWithSeperator();
-extern void StrReplaceChar( );
 
  /* Magics default values */
 int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0, FILE_SPLIT = FALSE;
@@ -784,7 +779,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
   const char **params = NULL;
   char **split_str = NULL, **split_str1 = NULL;
   const char *sep_char = "=";
-  const char *temp_str;
+  char *temp_str;
   const char  orig_char = ';', rep_char = ',';
   FILE *fp;
 

@@ -159,11 +159,11 @@ int GetMagicsParameterInfo( const char *user_name, char *param_value )
 
   if( once )
     {
-      qsort ( mapper, PARAM_COUNT, sizeof( CdoMagicsMapper ), Compare );
+      qsort (mapper, PARAM_COUNT, sizeof( CdoMagicsMapper ), Compare);
       once = 0;
     }
 
-  result = bsearch ( &target, mapper, PARAM_COUNT, sizeof ( CdoMagicsMapper ), Compare );
+  result = (CdoMagicsMapper*) bsearch(&target, mapper, PARAM_COUNT, sizeof ( CdoMagicsMapper ), Compare);
   if ( result )
     {
       result->Set_magics_param( result->cdo_name, param_value );
@@ -178,5 +178,6 @@ int GetMagicsParameterInfo( const char *user_name, char *param_value )
       /* Call the Reset functions of all the features to Reset the magics params to default in the calling function */
       ret_flag = 1;
     }
+
   return ret_flag;
 }

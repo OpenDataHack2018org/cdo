@@ -22,7 +22,7 @@
 #include "template_parser.h"
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
-#include <ctype.h>
+#include "StringUtilities.h"
 
 
 extern xmlNode  *magics_node;
@@ -60,10 +60,7 @@ int num_colours = sizeof( line_colours )/sizeof( char* );
 void VerifyGraphParameters( int num_param, char **param_names );
 int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, const char *sep_char );
 
-extern int checkdevice();
-extern int IsNumeric();
-extern void StrToUpperCase();
-extern int StringSplitWithSeperator();
+extern int checkdevice(char *device_in);
 
 extern char *DEVICE;
 extern char *DEVICE_TABLE;
@@ -91,11 +88,11 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   int count ;
   int num_years = 0, num_months = 0, num_days = 0;
   int ret;
-  long tsID, fileID, i, ntime_steps;
-  double *date_time;
+  long tsID, fileID, i, ntime_steps = 0;
+  double *date_time = NULL;
   double min_val = 1.0e+200, max_val = -1.0e+200;
-  double *mean_val, *std_dev_val;
-  double *spread_min, *spread_max;
+  double *mean_val = NULL, *std_dev_val = NULL;
+  double *spread_min = NULL, *spread_max = NULL;
   double y_min_val = 1.0e+200, y_max_val = -1.0e+200;
   
   if( DBG )
