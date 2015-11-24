@@ -40,25 +40,25 @@ case "${HOSTNAME}" in
                  --with-szlib=$HOME/local"
 
         if  test "$COMP" = icc ; then
-	  ${CONFPATH}configure  \
+	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native" CXX=icpc
+	            CC=icc CXX=icpc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=icpc CFLAGS="-g -std=c++11 -Wall -O2 -qopt-report=5 -march=native"
+	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang++ ; then
-	  ${CONFPATH}configure  \
+	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=clang++ CFLAGS="-g -Wall -O3"
+	            CC=clang CXX=clang++ CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
 	            CC=clang CFLAGS="-g -Wall -Wwrite-strings -O3"
         elif  test "$COMP" = g++ ; then
-	  ${CONFPATH}configure  \
+	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=g++ CFLAGS="-g -std=c++14 -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
+	            CC=gcc CXX=g++ CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
