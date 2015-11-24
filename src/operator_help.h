@@ -4882,6 +4882,32 @@ static const char *MagvectorHelp[] = {
     NULL
 };
 
+static const char *MaggraphHelp[] = {
+    "NAME",
+    "    graph - Line graph plot",
+    "",
+    "SYNOPSIS",
+    "    graph,params  ifiles ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator generates line graph plots.",
+    "    The data for the plot is read from ifiles.",
+    "    The result is written to ofile. The default format is XXX, this can be changed with the device parameter.",
+    "    ",
+    "    Here is a list of all common plot parameters:",
+    "    ",
+    "     Keyname    & Type    & Description      ",
+    "     device      & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)",
+    "     projection  & STRING  & Projection (cylindrical, polar_stereographic, robinson, mercator)",
+    "     style       & STRING  & Contour line style (solid, dash, dot, chain_dash, chain_dot)",
+    "     min         & FLOAT   & Minimum value",
+    "     max         & FLOAT   & Maximum value",
+    "",
+    "PARAMETER",
+    "    params  STRING   Comma separated list of plot parameters",
+    NULL
+};
+
 static const char *EcaCddHelp[] = {
     "NAME",
     "    eca_cdd - Consecutive dry days index per time period",

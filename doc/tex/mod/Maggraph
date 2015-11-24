@@ -1,0 +1,33 @@
+@BeginModule
+@NewPage
+@Name      = Maggraph
+@Title     = Line graph plot
+@Section   = Magics
+@Arguments = ifiles ofile
+@Operators = graph
+
+@BeginDescription
+This operator generates line graph plots.
+The data for the plot is read from @file{ifiles}.
+The result is written to @file{ofile}. The default format is XXX, this can be changed with the device parameter.
+
+Here is a list of all common plot parameters:
+
+@BeginTable
+ @bold{Keyname}    & @bold{Type}    & @bold{Description}      
+ device      & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)
+@EndTable
+@EndDescription
+@EndModule
+
+
+@BeginOperator_graph
+@Title     = Line graph plot
+@Parameter = params
+@EndOperator
+
+
+@BeginParameter
+@Item = params
+STRING   Comma separated list of plot parameters
+@EndParameter

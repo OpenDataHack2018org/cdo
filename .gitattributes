@@ -196,6 +196,7 @@ doc/tex/mod/Inttime -text
 doc/tex/mod/Intyear -text
 doc/tex/mod/Invert -text
 doc/tex/mod/Invertlev -text
+doc/tex/mod/Maggraph -text
 doc/tex/mod/Magplot -text
 doc/tex/mod/Magvector -text
 doc/tex/mod/Maskbox -text
