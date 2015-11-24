@@ -1,7 +1,6 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "par_io.h"
 #include "pstream.h"
 
 #if defined(HAVE_LIBCMOR)

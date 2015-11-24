@@ -1,0 +1,28 @@
+\chapter{Introduction}
+
+The Climate Data Operators ({\CDO}) software is a collection of operators
+for standard processing of climate and forecast model data.
+
+This document describes additional {\CDO} operators to ....
+
+Magics++ is the latest generation of the ECMWF's Meteorological plotting software MAGICS.
+Magics++ supports the plotting of contours, wind fields, observations, satellite images, symbols, text,
+axis and graphs (including box plots). Data fields to be plotted may be presented in various formats, for
+instance GRIB 1 and 2 code data, gaussian grid, regularly spaced grid and fitted data,BUFR and
+NetCDF format or retrieved from an ODB database. The produced meteorological plots can be saved in
+various formats, such as PostScript, EPS, PDF, GIF, PNG and SVG.[1]
+
+In order to rapidly generate high quality pictures from the data obtained from the existing CDO
+operators, the CDO has been interfaced with Magics++ library. As a first step,some new CDO plotting
+operators are created to cater to the most essential/ frequently used plotting features viz., graph,
+contour, vector. These operators rely on the Magics++ and generate output files in the various formats
+supported by Magics++.
+
+Magics++ provides a vast number of parameters to control the attributes of various plotting
+features. Keeping in view, the usability of CDO users, currently only a few of these parameters are
+supported and accessible to the CDO users as command line arguments for the respective operators.
+The users are requested to refer to the Magics++ manual[1] for detailed description of the various
+parameters available for the various features. An option is provided to CDO users to input some of
+these parameters in an XML file which can be passed as an argument for the CDO plotting operators.
+The description of the new plotting operators and the various arguments that can be passed for these
+operators is provided in the subsequent sections.

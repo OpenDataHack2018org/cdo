@@ -1,0 +1,62 @@
+@BeginModule
+@NewPage
+@Name      = Magplot
+@Title     = Lat/Lon plot
+@Section   = Magics
+@Arguments = ifile ofile
+@Operators = contour shaded grfill
+
+@BeginDescription
+This operator generates 2D Lon/Lat plots.
+The data for the plot is read from @file{ifile}.
+The result is written to @file{ofile}. The default format is XXX, this can be changed with the device parameter.
+The type of the plot depends on the choosen operator.
+
+Here is a list of all common plot parameters:
+
+@BeginTable
+ @bold{Keyname}    & @bold{Type}    & @bold{Description}      
+ device      & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)
+ projection  & STRING  & Projection (cylindrical, polar_stereographic, robinson, mercator)
+ style       & STRING  & Contour line style (solid, dash, dot, chain_dash, chain_dot)
+ min         & FLOAT   & Minimum value
+ max         & FLOAT   & Maximum value
+@EndTable
+@EndDescription
+@EndModule
+
+
+@BeginOperator_contour
+@Title     = Contour plot
+@Parameter = params
+
+@BeginDescription
+Contour plot
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_shaded
+@Title     = Shaded contour plot
+@Parameter = params
+
+@BeginDescription
+Shaded contour plot
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_grfill
+@Title     = Shaded grid boxes
+@Parameter = params
+
+@BeginDescription
+Shaded grid boxes
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = params
+STRING   Comma separated list of plot parameters
+@EndParameter

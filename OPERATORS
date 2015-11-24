@@ -539,6 +539,12 @@ Operator catalog:
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
 -------------------------------------------------------------
+   Magics
+-------------------------------------------------------------
+   Magplot       contour         Contour plot
+   Magplot       shaded          Shaded contour plot
+   Magplot       grfill          Shaded grid boxes
+-------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------
    EcaCdd        eca_cdd         Consecutive dry days index per time period

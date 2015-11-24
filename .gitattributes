@@ -58,6 +58,7 @@ doc/tex/cdo_adv.tex -text
 doc/tex/cdo_con.tex -text
 doc/tex/cdo_eca.tex -text
 doc/tex/cdo_int.tex -text
+doc/tex/cdo_magics.tex -text
 doc/tex/cdo_openmp.tex -text
 doc/tex/cdo_ref.tex -text
 doc/tex/cdo_ref_over.tex -text
@@ -95,10 +96,13 @@ doc/tex/grids/plotjobgmt -text
 doc/tex/install.tex -text
 doc/tex/logo/cdo_logo.eps -text
 doc/tex/logo/cdo_logo.pdf -text
+doc/tex/magics_int.tex -text
+doc/tex/magics_ref.tex -text
 doc/tex/makedoc -text
 doc/tex/makehtml -text
 doc/tex/makepdf -text
 doc/tex/makepdfeca -text
+doc/tex/makepdfmagics -text
 doc/tex/makerefcard -text
 doc/tex/missval.tex -text
 doc/tex/mod/Adisit -text
@@ -192,6 +196,7 @@ doc/tex/mod/Inttime -text
 doc/tex/mod/Intyear -text
 doc/tex/mod/Invert -text
 doc/tex/mod/Invertlev -text
+doc/tex/mod/Magplot -text
 doc/tex/mod/Maskbox -text
 doc/tex/mod/Maskregion -text
 doc/tex/mod/Mastrfu -text

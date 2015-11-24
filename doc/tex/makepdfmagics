@@ -1,0 +1,14 @@
+pdflatex cdo_magics.tex
+pdflatex cdo_magics.tex
+cat > cdo_magics.ist << 'EOF'
+delim_0        "{\\idxdotfill} "
+headings_flag  1
+heading_prefix "{\\centerline {\\Large \\bf "
+%heading_prefix "{\\centerline {\\bfseries "
+heading_suffix "}}"
+EOF
+makeindex -s cdo_magics.ist cdo_magics.idx
+pdflatex cdo_magics
+#thumbpdf cdo
+pdflatex cdo_magics
+

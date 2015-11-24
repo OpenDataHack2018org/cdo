@@ -556,7 +556,8 @@ void *Maggraph(void *argument);
 
 static modules_t Modules[] =
 {
-  /* stream out -1 means usage of obase */
+  // stream in  -1 means: unlimited number of input streams
+  // stream out -1 means: usage of obase
   /*
     function        help function      operator names          number     num streams
                                                                type       in  out
