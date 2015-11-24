@@ -263,14 +263,14 @@ while (<MOFILE>) {
       print TRLIST "Here is a short overview of all operators in this section:\\\\\n";
       print TRLIST "\n";
 
-      if ( $shortname ne "climat" ) {
+      if ( $shortname ne "climat" && $shortname ne "magics" ) {
         print TROVER "\\newpage\n";
         print TROVER "\\section{$chap}\n";
         print TROVER "\\input{ref_intro_${shortname}}\n";
         print TROVER "\\input{ref_list_${shortname}}\n";
         print TROVER "\\input{ref_man_${shortname}}\n\n";
       }
-      if ( $shortname eq "climat" ) {
+      if ( $shortname eq "climat" || $shortname eq "magics" ) {
 #	print "find eca!";
 	$refskip = 1;
       }
