@@ -144,6 +144,7 @@ void *Selvar(void *argument)
 
   int vlistID1 = streamInqVlist(streamID1);
   int nvars = vlistNvars(vlistID1);
+  int *vars = (int*) Malloc(nvars*sizeof(int));
 
   if ( operatorID == SELGRID && !args_are_numeric && nsel == 1 && strncmp(argnames[0], "var=", 4) == 0 )
     {
@@ -170,6 +171,8 @@ void *Selvar(void *argument)
   vlistClearFlag(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
+      vars[varID] = FALSE;
+
       vlistInqVarName(vlistID1, varID, varname);
       vlistInqVarStdname(vlistID1, varID, stdname);
       param    = vlistInqVarParam(vlistID1, varID);
@@ -210,7 +213,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == SELSTDNAME )
 		{
-		  found = strcmp(argnames[isel], stdname) == 0;
+		  found = wildcardmatch(argnames[isel], stdname) == 0;
 		}
 	      else if ( operatorID == SELLEVEL )
 		{
@@ -265,22 +268,30 @@ void *Selvar(void *argument)
 	        {
 		  vlistDefFlag(vlistID1, varID, levID, !INVERTS_SELECTION(operatorID));
 		  selfound[isel] = TRUE;
+                  vars[varID] = TRUE;
 	        }
-
 	    }
 	}
     }
 
   int npar = 0;
+  for ( varID = 0; varID < nvars; varID++ ) if ( vars[varID] ) npar++;
+
   for ( varID = 0; varID < nvars; varID++ )
     {
-      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      nlevs   = zaxisInqSize(zaxisID);
-
-      for ( levID = 0; levID < nlevs; levID++ )
-	if ( vlistInqFlag(vlistID1, varID, levID) == TRUE ) break;
-	      
-      if ( levID < nlevs ) npar++;
+      if ( vars[varID] )
+        {
+          int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+          if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+            {
+              int psvarid = vlist_get_psvarid(vlistID1, zaxisID);
+              if ( psvarid != -1 && !vars[psvarid] )
+                {
+                  vars[psvarid] = TRUE;
+                  vlistDefFlag(vlistID1, psvarid, 0, !INVERTS_SELECTION(operatorID));
+                }
+            }
+        }
     }
 
   for ( isel = 0; isel < nsel; isel++ )
@@ -407,6 +418,8 @@ void *Selvar(void *argument)
 
   if ( ! lcopy )
     if ( array ) Free(array);
+
+  if ( vars ) Free(vars);
 
   if ( selfound ) Free(selfound);
 

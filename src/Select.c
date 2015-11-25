@@ -480,7 +480,7 @@ int vlist_get_psvarid(int vlistID, int zaxisID)
       if ( cdoVerbose && psvarid == -1 )
         cdoWarning("Surface pressure variable not found - %s", psname);
     }
-  
+
   return psvarid;
 }
 
@@ -666,7 +666,6 @@ void *Select(void *argument)
 	      nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
 
-
 	      vars[varID] = FALSE;
 	      
 	      if ( npar_ltype )
@@ -711,7 +710,7 @@ void *Select(void *argument)
 	    {
 	      if ( vars[varID] )
 		{
-		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
+		  int zaxisID = vlistInqVarZaxis(vlistID1, varID);
                   if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
                     {
                       int psvarid = vlist_get_psvarid(vlistID1, zaxisID);
