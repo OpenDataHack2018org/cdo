@@ -74,14 +74,11 @@
 
 void *Timstat(void *argument)
 {
+  enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
   int timestat_date = TIMESTAT_MEAN;
-  int gridsize;
-  int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
   int varID, levelID, recID;
-  long nsets;
-  int i;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
   int nmiss;
@@ -94,51 +91,51 @@ void *Timstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timmin",    func_min,  DATE_LEN, NULL);
-  cdoOperatorAdd("timmax",    func_max,  DATE_LEN, NULL);
-  cdoOperatorAdd("timsum",    func_sum,  DATE_LEN, NULL);
-  cdoOperatorAdd("timmean",   func_mean, DATE_LEN, NULL);
-  cdoOperatorAdd("timavg",    func_avg,  DATE_LEN, NULL);
-  cdoOperatorAdd("timvar",    func_var,  DATE_LEN, NULL);
-  cdoOperatorAdd("timvar1",   func_var1, DATE_LEN, NULL);
-  cdoOperatorAdd("timstd",    func_std,  DATE_LEN, NULL);
-  cdoOperatorAdd("timstd1",   func_std1, DATE_LEN, NULL);
-  cdoOperatorAdd("yearmin",   func_min,  10, NULL);
-  cdoOperatorAdd("yearmax",   func_max,  10, NULL);
-  cdoOperatorAdd("yearsum",   func_sum,  10, NULL);
-  cdoOperatorAdd("yearmean",  func_mean, 10, NULL);
-  cdoOperatorAdd("yearavg",   func_avg,  10, NULL);
-  cdoOperatorAdd("yearvar",   func_var,  10, NULL);
-  cdoOperatorAdd("yearvar1",  func_var1, 10, NULL);
-  cdoOperatorAdd("yearstd",   func_std,  10, NULL);
-  cdoOperatorAdd("yearstd1",  func_std1, 10, NULL);
-  cdoOperatorAdd("monmin",    func_min,   8, NULL);
-  cdoOperatorAdd("monmax",    func_max,   8, NULL);
-  cdoOperatorAdd("monsum",    func_sum,   8, NULL);
-  cdoOperatorAdd("monmean",   func_mean,  8, NULL);
-  cdoOperatorAdd("monavg",    func_avg,   8, NULL);
-  cdoOperatorAdd("monvar",    func_var,   8, NULL);
-  cdoOperatorAdd("monvar1",   func_var1,  8, NULL);
-  cdoOperatorAdd("monstd",    func_std,   8, NULL);
-  cdoOperatorAdd("monstd1",   func_std1,  8, NULL);
-  cdoOperatorAdd("daymin",    func_min,   6, NULL);
-  cdoOperatorAdd("daymax",    func_max,   6, NULL);
-  cdoOperatorAdd("daysum",    func_sum,   6, NULL);
-  cdoOperatorAdd("daymean",   func_mean,  6, NULL);
-  cdoOperatorAdd("dayavg",    func_avg,   6, NULL);
-  cdoOperatorAdd("dayvar",    func_var,   6, NULL);
-  cdoOperatorAdd("dayvar1",   func_var1,  6, NULL);
-  cdoOperatorAdd("daystd",    func_std,   6, NULL);
-  cdoOperatorAdd("daystd1",   func_std1,  6, NULL);
-  cdoOperatorAdd("hourmin",   func_min,   4, NULL);
-  cdoOperatorAdd("hourmax",   func_max,   4, NULL);
-  cdoOperatorAdd("hoursum",   func_sum,   4, NULL);
-  cdoOperatorAdd("hourmean",  func_mean,  4, NULL);
-  cdoOperatorAdd("houravg",   func_avg,   4, NULL);
-  cdoOperatorAdd("hourvar",   func_var,   4, NULL);
-  cdoOperatorAdd("hourvar1",  func_var1,  4, NULL);
-  cdoOperatorAdd("hourstd",   func_std,   4, NULL);
-  cdoOperatorAdd("hourstd1",  func_std1,  4, NULL);
+  cdoOperatorAdd("timmin",    func_min,   DATE_LEN, NULL);
+  cdoOperatorAdd("timmax",    func_max,   DATE_LEN, NULL);
+  cdoOperatorAdd("timsum",    func_sum,   DATE_LEN, NULL);
+  cdoOperatorAdd("timmean",   func_mean,  DATE_LEN, NULL);
+  cdoOperatorAdd("timavg",    func_avg,   DATE_LEN, NULL);
+  cdoOperatorAdd("timvar",    func_var,   DATE_LEN, NULL);
+  cdoOperatorAdd("timvar1",   func_var1,  DATE_LEN, NULL);
+  cdoOperatorAdd("timstd",    func_std,   DATE_LEN, NULL);
+  cdoOperatorAdd("timstd1",   func_std1,  DATE_LEN, NULL);
+  cdoOperatorAdd("yearmin",   func_min,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearmax",   func_max,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearsum",   func_sum,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearmean",  func_mean,  YEAR_LEN, NULL);
+  cdoOperatorAdd("yearavg",   func_avg,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearvar",   func_var,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearvar1",  func_var1,  YEAR_LEN, NULL);
+  cdoOperatorAdd("yearstd",   func_std,   YEAR_LEN, NULL);
+  cdoOperatorAdd("yearstd1",  func_std1,  YEAR_LEN, NULL);
+  cdoOperatorAdd("monmin",    func_min,   MON_LEN, NULL);
+  cdoOperatorAdd("monmax",    func_max,   MON_LEN, NULL);
+  cdoOperatorAdd("monsum",    func_sum,   MON_LEN, NULL);
+  cdoOperatorAdd("monmean",   func_mean,  MON_LEN, NULL);
+  cdoOperatorAdd("monavg",    func_avg,   MON_LEN, NULL);
+  cdoOperatorAdd("monvar",    func_var,   MON_LEN, NULL);
+  cdoOperatorAdd("monvar1",   func_var1,  MON_LEN, NULL);
+  cdoOperatorAdd("monstd",    func_std,   MON_LEN, NULL);
+  cdoOperatorAdd("monstd1",   func_std1,  MON_LEN, NULL);
+  cdoOperatorAdd("daymin",    func_min,   DAY_LEN, NULL);
+  cdoOperatorAdd("daymax",    func_max,   DAY_LEN, NULL);
+  cdoOperatorAdd("daysum",    func_sum,   DAY_LEN, NULL);
+  cdoOperatorAdd("daymean",   func_mean,  DAY_LEN, NULL);
+  cdoOperatorAdd("dayavg",    func_avg,   DAY_LEN, NULL);
+  cdoOperatorAdd("dayvar",    func_var,   DAY_LEN, NULL);
+  cdoOperatorAdd("dayvar1",   func_var1,  DAY_LEN, NULL);
+  cdoOperatorAdd("daystd",    func_std,   DAY_LEN, NULL);
+  cdoOperatorAdd("daystd1",   func_std1,  DAY_LEN, NULL);
+  cdoOperatorAdd("hourmin",   func_min,   HOUR_LEN, NULL);
+  cdoOperatorAdd("hourmax",   func_max,   HOUR_LEN, NULL);
+  cdoOperatorAdd("hoursum",   func_sum,   HOUR_LEN, NULL);
+  cdoOperatorAdd("hourmean",  func_mean,  HOUR_LEN, NULL);
+  cdoOperatorAdd("houravg",   func_avg,   HOUR_LEN, NULL);
+  cdoOperatorAdd("hourvar",   func_var,   HOUR_LEN, NULL);
+  cdoOperatorAdd("hourvar1",  func_var1,  HOUR_LEN, NULL);
+  cdoOperatorAdd("hourstd",   func_std,   HOUR_LEN, NULL);
+  cdoOperatorAdd("hourstd1",  func_std1,  HOUR_LEN, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc   = cdoOperatorF1(operatorID);
@@ -186,6 +183,12 @@ void *Timstat(void *argument)
     for ( varID = 0; varID < nvars; ++varID )
       vlistDefVarTsteptype(vlistID2, varID, TSTEP_CONSTANT);
 
+  const char *freq = NULL;
+  if      ( comparelen == DAY_LEN )  freq = "day";
+  else if ( comparelen == MON_LEN )  freq = "mon";
+  else if ( comparelen == YEAR_LEN ) freq = "year";
+  if ( freq ) vlistDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
+
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
@@ -225,7 +228,7 @@ void *Timstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field_t field;
@@ -241,12 +244,12 @@ void *Timstat(void *argument)
   int otsID = 0;
   while ( TRUE )
     {
-      nsets = 0;
+      long nsets = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-	  vdate = dtlist_get_vdate(dtlist, nsets);
-	  vtime = dtlist_get_vtime(dtlist, nsets);
+	  int vdate = dtlist_get_vdate(dtlist, nsets);
+	  int vtime = dtlist_get_vtime(dtlist, nsets);
 
 	  if ( nsets == 0 ) SET_DATE(indate2, vdate, vtime);
 	  SET_DATE(indate1, vdate, vtime);
@@ -275,7 +278,7 @@ void *Timstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 
-		      for ( i = 0; i < nwpv*gridsize; i++ )
+		      for ( int i = 0; i < nwpv*gridsize; i++ )
 			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
 			else
@@ -293,11 +296,11 @@ void *Timstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			{
 			  samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
-			  for ( i = 0; i < nwpv*gridsize; i++ )
+			  for ( int i = 0; i < nwpv*gridsize; i++ )
 			    samp1[varID][levelID].ptr[i] = nsets;
 			}
 
-		      for ( i = 0; i < nwpv*gridsize; i++ )
+		      for ( int i = 0; i < nwpv*gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i]++;
 		    }
@@ -392,7 +395,7 @@ void *Timstat(void *argument)
 		if ( samp1[varID][levelID].ptr )
 		  {
 		    int irun = 0;
-		    for ( i = 0; i < nwpv*gridsize; ++i )
+		    for ( int i = 0; i < nwpv*gridsize; ++i )
 		      {
 			if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
 			  {
@@ -404,7 +407,7 @@ void *Timstat(void *argument)
 		    if ( irun )
 		      {
 			nmiss = 0;
-			for ( i = 0; i < nwpv*gridsize; ++i )
+			for ( int i = 0; i < nwpv*gridsize; ++i )
 			  if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], missval) ) nmiss++;
 			vars1[varID][levelID].nmiss = nmiss;
 		      }
