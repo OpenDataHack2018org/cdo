@@ -90,6 +90,9 @@ void printFeatures(void)
 #if defined(HAVE_LIBFFTW3)
   fprintf(stderr, " FFTW3");
 #endif
+#if defined(HAVE_LIBCMOR)
+  fprintf(stderr, " CMOR");
+#endif
 #if defined(__AVX2__)
   fprintf(stderr, " AVX2");
 #elif defined(__AVX__)
