@@ -1,0 +1,36 @@
+@BeginModule
+@NewPage
+@Name      = CMOR
+@Title     = CMOR
+@Section   = Miscellaneous
+@Arguments = ifile
+@Operators = cmor
+
+@BeginDescription
+Options is a comma separated list of key-value pairs with optional parameters.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_cmor
+@Title     = CMOR
+@Parameter = tab [options]
+@EndOperator
+
+
+@BeginParameter
+@Item = tab
+STRING   Name of the CMOR table as specified from PCMDI
+@Item = var
+STRING   Comma separated list of variables
+@Item = expinfo
+STRING   Experiment specific parameter file
+@Item = modinfo
+STRING   Model specific parameter file
+@Item = userinfo
+STRING   User/institute specific parameter file
+@EndParameter
+
+
+@BeginExample
+@EndExample
