@@ -197,10 +197,41 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
       
       if ( flag & CMP_NLEVEL )
 	{
-	  if ( zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) !=
-	       zaxisInqSize(vlistInqVarZaxis(vlistID2, varID)) )
-	    cdoAbort("Number of levels of the input parameters do not match!");
-	}
+          int zaxisID1 = vlistInqVarZaxis(vlistID1, varID);
+          int zaxisID2 = vlistInqVarZaxis(vlistID2, varID);
+          if ( zaxisID1 != zaxisID2 )
+            {
+              int nlev1 = zaxisInqSize(zaxisID1);
+              int nlev2 = zaxisInqSize(zaxisID2);
+              if ( nlev1 != nlev2 )
+                cdoAbort("Number of levels of the input parameters do not match!");
+
+              double *lev1 = (double*) Malloc(nlev1*sizeof(double));
+              double *lev2 = (double*) Malloc(nlev1*sizeof(double));
+              zaxisInqLevels(zaxisID1, lev1);
+              zaxisInqLevels(zaxisID2, lev2);
+              
+              int ldiffer = FALSE;
+              for ( int i = 0; i < nlev1; ++i )
+                if ( IS_NOT_EQUAL(lev1[i], lev2[i]) )
+                  { ldiffer = TRUE; break; }
+              if ( ldiffer )
+                {
+                  ldiffer = FALSE;
+                  for ( int i = 0; i < nlev1; ++i )
+                    if ( IS_NOT_EQUAL(lev1[i], lev2[nlev1-1-i]) )
+                      { ldiffer = TRUE; break; }
+
+                  if ( ldiffer )
+                    cdoWarning("Input parameters have different levels!");
+                  else
+                    cdoWarning("Z-axis orientation differ!");
+                }
+              
+              Free(lev1);
+              Free(lev2);
+            }
+        }
     }
 
   if ( flag & CMP_GRID )
