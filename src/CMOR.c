@@ -11,11 +11,18 @@ void *CMOR(void *argument)
 {
   cdoInitialize(argument);
 
+  int nparams = operatorArgc();
+  char **params = operatorArgv();
+
+  if ( cdoVerbose )
+    for ( int i = 0; i < nparams; ++i )
+      printf("param %d: %s\n", i, params[i]);
+ 
 #if defined(HAVE_LIBCMOR)
   /*
   if ( cdoVerbose )
     cdoPrint("Using CMOR version %d.%d.%d.", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
-  */
+  */  
   int streamID = streamOpenRead(cdoStreamName(0));
 
   int vlistID = streamInqVlist(streamID);
