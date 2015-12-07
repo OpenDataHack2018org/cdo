@@ -42,15 +42,15 @@ int correlation_t(long gridsize, double missval1, double missval2, int *nofvals,
 
       if ( nvals > 0 )
 	{
-	  temp0 = MUL(work0[i], work1[i]);
-	  temp1 = SUB(work4[i], DIV(temp0, nvals));
-	  temp2 = MUL(work0[i], work0[i]);
-	  temp3 = MUL(work1[i], work1[i]);
-	  temp4 = SUB(work2[i], DIV(temp2, nvals));
-	  temp5 = SUB(work3[i], DIV(temp3, nvals));
-	  temp6 = MUL(temp4, temp5);
+	  temp0 = MULMN(work0[i], work1[i]);
+	  temp1 = SUBMN(work4[i], DIVMN(temp0, nvals));
+	  temp2 = MULMN(work0[i], work0[i]);
+	  temp3 = MULMN(work1[i], work1[i]);
+	  temp4 = SUBMN(work2[i], DIVMN(temp2, nvals));
+	  temp5 = SUBMN(work3[i], DIVMN(temp3, nvals));
+	  temp6 = MULMN(temp4, temp5);
 
-	  cor = DIV(temp1, SQRT(temp6));
+	  cor = DIVMN(temp1, SQRTMN(temp6));
 
           if      ( cor < -1 )  cor = -1;
           else if ( cor >  1 )  cor =  1;
@@ -87,8 +87,8 @@ int covariance_t(long gridsize, double missval1, double missval2, int *nofvals,
 
       if ( nvals > 0 )
 	{
-	  temp = DIV(MUL(work0[i], work1[i]), dnvals*dnvals);
-	  covar = SUB(DIV(work2[i], dnvals), temp);
+	  temp = DIVMN( MULMN(work0[i], work1[i]), dnvals*dnvals);
+	  covar = SUBMN( DIVMN(work2[i], dnvals), temp);
 
 	  if ( DBL_IS_EQUAL(covar, missval1) ) nmiss++;
 	}

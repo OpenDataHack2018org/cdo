@@ -75,7 +75,7 @@ void *Timselstat(void *argument)
   int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  double divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

@@ -46,7 +46,7 @@ void *Seasstat(void *argument)
   int vdate1 = 0, vtime1 = 0;
   int nrecs;
   int varID, levelID, recID;
-  long nsets;
+  int nsets;
   int i;
   int year, month, day, seas, seas0 = 0;
   int nmiss;
@@ -76,7 +76,7 @@ void *Seasstat(void *argument)
   int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  double divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

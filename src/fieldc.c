@@ -47,7 +47,7 @@ void farcmul(field_t *field, double rconst)
   if ( nmiss > 0 )
     {
       for ( i = 0; i < len; i++ ) 
-	array[i] = MUL(array[i], rconst);
+	array[i] = MULMN(array[i], rconst);
     }
   else
     {
@@ -76,7 +76,7 @@ void farcdiv(field_t *field, double rconst)
   if ( nmiss > 0 || IS_EQUAL(rconst, 0) )
     {
       for ( i = 0; i < len; i++ )
-	array[i] = DIV(array[i], rconst);
+	array[i] = DIVMN(array[i], rconst);
 
       if ( IS_EQUAL(rconst, 0) ) field->nmiss = len;
     }
@@ -102,7 +102,7 @@ void farcadd(field_t *field, double rconst)
   if ( nmiss > 0 )
     {
       for ( i = 0; i < len; i++ ) 
-	array[i] = ADD(array[i], rconst);
+	array[i] = ADDMN(array[i], rconst);
     }
   else
     {
@@ -129,7 +129,7 @@ void farinv(field_t *field)
   len    = gridInqSize(grid);
 
   for ( i = 0; i < len; i++ ) 
-    array[i] = DIV(1.0, array[i]);
+    array[i] = DIVMN(1.0, array[i]);
 
   field->nmiss = 0;
   for ( i = 0; i < len; i++ )

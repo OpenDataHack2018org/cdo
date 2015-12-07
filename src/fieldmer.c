@@ -205,7 +205,7 @@ void mermean(field_t field1, field_t *field2)
 	    }
 	}
 
-      ravg = DIV(rsum, rsumw);
+      ravg = DIVMN(rsum, rsumw);
 
       if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 
@@ -240,7 +240,7 @@ void meravg(field_t field1, field_t *field2)
 	  for ( j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(w[j*nx+i], missval1) )
 	      {
-		rsum  = ADD(rsum, MUL(w[j*nx+i], array[j*nx+i]));
+		rsum  = ADDMN(rsum, MULMN(w[j*nx+i], array[j*nx+i]));
 		rsumw += w[j*nx+i];
 	      }
 	}
@@ -253,7 +253,7 @@ void meravg(field_t field1, field_t *field2)
 	    }
 	}
 
-      ravg = DIV(rsum, rsumw);
+      ravg = DIVMN(rsum, rsumw);
 
       if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 

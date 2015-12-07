@@ -30,29 +30,50 @@ enum field_flag {
 };
 
 
-#define  FADD(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
-#define  FSUB(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
-#define  FMUL(x,y)  (DBL_IS_EQUAL((x),0.)||IS_EQUAL((y),0.) ? 0 : DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
-#define  FDIV(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) || DBL_IS_EQUAL((y),0.) ? missval1 : (x)/(y))
-#define  FPOW(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : pow((x),(y)))
-#define  FSQRT(x)   (DBL_IS_EQUAL((x),missval1) || (x)<0 ? missval1 : sqrt(x))
+#define  MADDMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
+#define  MSUBMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
+#define  MMULMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
+#define  MDIVMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) || DBL_IS_EQUAL((y),0.) ? missval1 : (x)/(y))
+#define  MPOWMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : pow((x),(y)))
+#define  MSQRTMN(x)   (DBL_IS_EQUAL((x),missval1) || (x)<0 ? missval1 : sqrt(x))
 
 
-double _FADD_(const double x, const double y, const double missval1, const double missval2);
-double _FSUB_(const double x, const double y, const double missval1, const double missval2);
-double _FMUL_(const double x, const double y, const double missval1, const double missval2);
-double _FDIV_(const double x, const double y, const double missval1, const double missval2);
-double _FPOW_(const double x, const double y, const double missval1, const double missval2);
-double _FSQRT_(const double x, const double missval1);
+#define  ADD(x,y)  ((x)+(y))
+#define  SUB(x,y)  ((x)-(y))
+#define  MUL(x,y)  ((x)*(y))
+#define  DIV(x,y)  (IS_EQUAL((y),0.) ? missval1 : (x)/(y))
+#define  POW(x,y)  pow((x),(y))
+#define  SQRT(x)   sqrt(x)
 
 
-#define ADD(x,y)  _FADD_(x, y, missval1, missval2)
-#define SUB(x,y)  _FSUB_(x, y, missval1, missval2)
-#define MUL(x,y)  _FMUL_(x, y, missval1, missval2)
-#define DIV(x,y)  _FDIV_(x, y, missval1, missval2)
-#define POW(x,y)  _FPOW_(x, y, missval1, missval2)
-#define SQRT(x)   _FSQRT_(x, missval1)
+#define  ADDM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
+#define  SUBM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
+#define  MULM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
+#define  DIVM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) || IS_EQUAL((y),0.) ? missval1 : (x)/(y))
+#define  POWM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : pow((x),(y)))
+#define  SQRTM(x)   (IS_EQUAL((x),missval1) || (x)<0 ? missval1 : sqrt(x))
 
+
+#define  ADDMN(x,y)  FADDMN(x, y, missval1, missval2)
+#define  SUBMN(x,y)  FSUBMN(x, y, missval1, missval2)
+#define  MULMN(x,y)  FMULMN(x, y, missval1, missval2)
+#define  DIVMN(x,y)  FDIVMN(x, y, missval1, missval2)
+#define  POWMN(x,y)  FPOWMN(x, y, missval1, missval2)
+#define  SQRTMN(x)   FSQRTMN(x, missval1)
+
+
+static inline
+double FADDMN(double x, double y, double missval1, double missval2) { return MADDMN(x,y);}
+static inline
+double FSUBMN(double x, double y, double missval1, double missval2) { return MSUBMN(x, y);}
+static inline
+double FMULMN(double x, double y, double missval1, double missval2) { return MMULMN(x, y);}
+static inline
+double FDIVMN(double x, double y, double missval1, double missval2) { return MDIVMN(x, y);}
+static inline
+double FPOWMN(double x, double y, double missval1, double missval2) { return MPOWMN(x, y);}
+static inline
+double FSQRTMN(double x, double missval1) { return MSQRTMN(x);}
 
 typedef struct {
   int      nwpv; // number of words per value; real:1  complex:2
@@ -81,7 +102,7 @@ void      field_free(field_t **field, const int vlistID);
 
 /* field.c */
 
-double fldfun(field_t field, const int function);
+double fldfun(field_t field, int function);
 double fldmin(field_t field);
 double fldmax(field_t field);
 double fldsum(field_t field);
@@ -150,7 +171,7 @@ void farround(field_t *field);
 
 /* field2.c */
 
-void farfun(field_t *field1, field_t field2, const int function);
+void farfun(field_t *field1, field_t field2, int function);
 
 void farcpy(field_t *field1, field_t field2);
 void faradd(field_t *field1, field_t field2);
@@ -164,16 +185,14 @@ void farmul(field_t *field1, field_t field2);
 void fardiv(field_t *field1, field_t field2);
 void farmin(field_t *field1, field_t field2);
 void farmax(field_t *field1, field_t field2);
-void farvar(field_t *field1, field_t field2, field_t field3, const double divisor);
-void farstd(field_t *field1, field_t field2, field_t field3, const double divisor);
-void farcvar(field_t *field1, field_t field2, const double rconst1, const double divisor);
-void farcstd(field_t *field1, field_t field2, const double rconst1, const double divisor);
+void farvar(field_t *field1, field_t field2, field_t field3, int divisor);
+void farstd(field_t *field1, field_t field2, field_t field3, int divisor);
+void farcvar(field_t *field1, field_t field2, int nsets, int divisor);
+void farcstd(field_t *field1, field_t field2, int nsets, int divisor);
 void farmoq(field_t *field1, field_t field2);
 void farmoqw(field_t *field1, field_t field2, double w);
 void faratan2(field_t *field1, field_t field2);
 
-/* RQ */
 void farcount(field_t *field1, field_t field2);
-/* QR */
 
 #endif  /* _FIELD_H */

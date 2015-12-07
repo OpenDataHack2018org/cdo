@@ -47,7 +47,7 @@ void *Ydaystat(void *argument)
   int year, month, day, dayoy;
   int nrecs;
   int levelID;
-  long nsets[NDAY];
+  int nsets[NDAY];
   int nmiss;
   int nlevel;
   int vdates[NDAY], vtimes[NDAY];
@@ -71,7 +71,7 @@ void *Ydaystat(void *argument)
   int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  double divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     {

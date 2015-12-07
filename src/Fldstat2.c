@@ -56,8 +56,8 @@ double correlation_s(const double * restrict in0, const double * restrict in1,
     }
 
   out = IS_NOT_EQUAL(wsum0, 0) ?
-        DIV((sum01 * wsum0 - sum0 * sum1),
-	     SQRT((sum00 * wsum0 - sum0 * sum0) *
+        DIVMN((sum01 * wsum0 - sum0 * sum1),
+	     SQRTMN((sum00 * wsum0 - sum0 * sum0) *
 	          (sum11 * wsum0 - sum1 * sum1))) : missval1;
 
   return (out);

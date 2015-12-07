@@ -262,7 +262,7 @@ void zonmean(field_t field1, field_t *field2)
 	    }
 	}
 
-      ravg = DIV(rsum, rsumw);
+      ravg = DIVMN(rsum, rsumw);
 
       if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 
@@ -295,7 +295,7 @@ void zonavg(field_t field1, field_t *field2)
 	{
 	  for ( i = 0; i < nx; i++ )
 	    {
-	      rsum   = ADD(rsum, array[j*nx+i]);
+	      rsum   = ADDMN(rsum, array[j*nx+i]);
 	      rsumw += 1;
 	    }
 	}
@@ -308,7 +308,7 @@ void zonavg(field_t field1, field_t *field2)
 	    }
 	}
 
-      ravg = DIV(rsum, rsumw);
+      ravg = DIVMN(rsum, rsumw);
 
       if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 

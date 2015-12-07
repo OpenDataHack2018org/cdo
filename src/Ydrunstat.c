@@ -428,9 +428,7 @@ void ydstatFinalize(YDAY_STATS *stats, int operfunc)
 {
   int varID, levelID, nvars, nlevels;
   int dayoy;
-  double divisor;
-
-  divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   nvars = vlistNvars(stats->vlist);
   

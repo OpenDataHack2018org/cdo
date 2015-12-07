@@ -23,59 +23,28 @@
 
 double crps_det_integrate(double *a, const double d, const size_t n);
 
-double _FADD_(const double x, const double y, const double missval1, const double missval2)
-{
-  return FADD(x,y);
-}
-
-double _FSUB_(const double x, const double y, const double missval1, const double missval2)
-{
-  return FSUB(x, y);
-}
-
-double _FMUL_(const double x, const double y, const double missval1, const double missval2)
-{
-  return FMUL(x, y);
-}
-
-double _FDIV_(const double x, const double y, const double missval1, const double missval2)
-{
-  return FDIV(x, y);
-}
-
-double _FPOW_(const double x, const double y, const double missval1, const double missval2)
-{
-  return FPOW(x, y);
-}
-
-double _FSQRT_(const double x, const double missval1)
-{
-  return FSQRT(x);
-}
-
-
-double fldfun(field_t field, const int function)
+double fldfun(field_t field, int function)
 {
   double rval = 0;
 
-  // Why is this not a switch-case statement?
-  if      ( function == func_min  )  rval = fldmin(field);
-  else if ( function == func_max  )  rval = fldmax(field);
-  else if ( function == func_sum  )  rval = fldsum(field);
-  else if ( function == func_mean )  rval = fldmean(field);
-  else if ( function == func_avg  )  rval = fldavg(field);
-  else if ( function == func_std  )  rval = fldstd(field);
-  else if ( function == func_std1 )  rval = fldstd1(field);
-  else if ( function == func_var  )  rval = fldvar(field);
-  else if ( function == func_var1 )  rval = fldvar1(field);
+  switch (function)
+    {
+    case func_min:    rval = fldmin(field);  break;
+    case func_max:    rval = fldmax(field);  break;
+    case func_sum:    rval = fldsum(field);  break;
+    case func_mean:   rval = fldmean(field); break;
+    case func_avg:    rval = fldavg(field);  break;
+    case func_std:    rval = fldstd(field);  break;
+    case func_std1:   rval = fldstd1(field); break;
+    case func_var:    rval = fldvar(field);  break;
+    case func_var1:   rval = fldvar1(field); break;
+    case func_crps:   rval = fldcrps(field); break;
+    case func_brs:    rval = fldbrs(field);  break;
+    case func_rank:   rval = fldrank(field); break;
+    case func_roc:    rval = fldroc(field);  break;
+    default: cdoAbort("%s: function %d not implemented!", __func__, function);
+    }
   
-  else if ( function == func_crps )  rval = fldcrps(field);
-  else if ( function == func_brs )   rval = fldbrs(field);
-
-  else if ( function == func_rank )  rval = fldrank(field);
-  else if ( function == func_roc )   rval = fldroc(field);
-  else cdoAbort("%s: function %d not implemented!", __func__, function);
-
   return rval;
 }
 
@@ -288,7 +257,7 @@ double fldmean(field_t field)
 	}
     }
 
-  ravg = DIV(rsum, rsumw);
+  ravg = DIVMN(rsum, rsumw);
 
   return (ravg);
 }
@@ -310,8 +279,8 @@ double fldavg(field_t field)
       for ( i = 0; i < len; i++ ) 
 	if ( !DBL_IS_EQUAL(w[i], missval1) )
 	  {
-	    rsum  = ADD(rsum, MUL(w[i], array[i]));
-	    rsumw = ADD(rsumw, w[i]);
+	    rsum  = ADDMN(rsum, MULMN(w[i], array[i]));
+	    rsumw = ADDMN(rsumw, w[i]);
 	  }
     }
   else
@@ -323,7 +292,7 @@ double fldavg(field_t field)
 	}
     }
 
-  ravg = DIV(rsum, rsumw);
+  ravg = DIVMN(rsum, rsumw);
 
   return (ravg);
 }
@@ -453,9 +422,9 @@ void fldrms(field_t field, field_t field2, field_t *field3)
       for ( i = 0; i < len; i++ ) 
 	if ( !DBL_IS_EQUAL(w[i], missval1) )
 	  {
-	    rsum  = ADD(rsum, MUL(w[i], MUL(SUB(array2[i], array1[i]),
-                                            SUB(array2[i], array1[i]))));
-	    rsumw = ADD(rsumw, w[i]);
+	    rsum  = ADDMN(rsum, MULMN(w[i], MULMN( SUBMN(array2[i], array1[i]),
+                                            SUBMN(array2[i], array1[i]))));
+	    rsumw = ADDMN(rsumw, w[i]);
 	  }
     }
     /*
@@ -469,7 +438,7 @@ void fldrms(field_t field, field_t field2, field_t *field3)
     }
     */
 
-  ravg = SQRT(DIV(rsum, rsumw));
+  ravg = SQRTMN( DIVMN(rsum, rsumw));
 
   if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 
@@ -507,9 +476,9 @@ void varrms(field_t field, field_t field2, field_t *field3)
 	for ( i = 0; i < len; i++ )
 	  /*	  if ( !DBL_IS_EQUAL(w[i], missval1) ) */
 	    {
-	      rsum  = ADD(rsum, MUL(w[i], MUL(SUB(array2[k*len+i], array1[k*len+i]),
-                                              SUB(array2[k*len+i], array1[k*len+i]))));
-	      rsumw = ADD(rsumw, w[i]);
+	      rsum  = ADDMN(rsum, MULMN(w[i], MULMN( SUBMN(array2[k*len+i], array1[k*len+i]),
+                                              SUBMN(array2[k*len+i], array1[k*len+i]))));
+	      rsumw = ADDMN(rsumw, w[i]);
 	    }
     }
     /*
@@ -523,7 +492,7 @@ void varrms(field_t field, field_t field2, field_t *field3)
     }
     */
 
-  ravg = SQRT(DIV(rsum, rsumw));
+  ravg = SQRTMN( DIVMN(rsum, rsumw));
 
   if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 
@@ -613,15 +582,15 @@ double crps_det_integrate(double *a, const double d, const size_t n)
 #if defined(_OPENMP)
 #pragma omp parallel for if ( n>10000 ) shared(a) private(i) \
   reduction(+:area) schedule(static,10000) 
-#endif                                                     /* **************************** */
-  for ( i=1; i<n; i++ ) {                                  /* INTEGRATE CURVE AREA         */
-    if ( a[i] < d )                                        /* left of heavyside            */
+#endif                                                         /* **************************** */
+  for ( i=1; i<n; i++ ) {                                      /* INTEGRATE CURVE AREA         */
+    if ( a[i] < d )                                            /* left of heavyside            */
       area += (a[i]-a[i-1])*(double)i*i/n/n;                   /*                              */
-    else if ( a[i-1] > d )                                 /* right of heavyside           */
-      area += (a[i]-a[i-1])*(1.-(double)i/n)*(1.-(double)i/n);              /*                              */
-    else if ( a[i-1] < d && a[i] > d ) {                   /* hitting jump pf heavyside    */
+    else if ( a[i-1] > d )                                     /* right of heavyside           */
+      area += (a[i]-a[i-1])*(1.-(double)i/n)*(1.-(double)i/n); /*                              */
+    else if ( a[i-1] < d && a[i] > d ) {                       /* hitting jump pf heavyside    */
       area += (d-a[i-1]) * (double)i*i/n/n;                    /* (occurs exactly once!)       */
-      area += (a[i]-d) * (1.-(double)i/n)*(1.-(double)i/n);                 /* **************************** */
+      area += (a[i]-d) * (1.-(double)i/n)*(1.-(double)i/n);    /* **************************** */
     }
   }
 

@@ -113,7 +113,7 @@ void *Subtrend(void *argument)
 	  missval1 = missval;
 	  missval2 = missval;
 	  for ( i = 0; i < gridsize; i++ )
-	    field4.ptr[i] = SUB(field1.ptr[i], ADD(vars2[varID][levelID].ptr[i], MUL(vars3[varID][levelID].ptr[i], tsID)));
+	    field4.ptr[i] = SUBMN(field1.ptr[i], ADDMN(vars2[varID][levelID].ptr[i], MULMN(vars3[varID][levelID].ptr[i], tsID)));
     
 	  nmiss = 0;
 	  for ( i = 0; i < gridsize; i++ )

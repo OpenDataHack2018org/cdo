@@ -67,7 +67,7 @@ void *Ymonstat(void *argument)
   int levelID;
   int tsID;
   int otsID;
-  long nsets[NMONTH];
+  int nsets[NMONTH];
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
@@ -77,7 +77,6 @@ void *Ymonstat(void *argument)
   int mon[NMONTH];
   int nmon = 0;
   int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
-  double divisor;
   field_t **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
   field_t field;
 
@@ -99,7 +98,7 @@ void *Ymonstat(void *argument)
   lmean   = operfunc == func_mean || operfunc == func_avg;
   lstd    = operfunc == func_std || operfunc == func_std1;
   lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   for ( month = 0; month < NMONTH; month++ )
     {

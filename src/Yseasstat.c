@@ -68,7 +68,7 @@ void *Yseasstat(void *argument)
   int year, month, day, seas;
   int nrecs;
   int levelID;
-  long nsets[NSEAS];
+  int nsets[NSEAS];
   int nmiss;
   int nlevel;
   date_time_t datetime[NSEAS];
@@ -102,7 +102,7 @@ void *Yseasstat(void *argument)
   int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  double divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

@@ -145,14 +145,14 @@ void *Trend(void *argument)
 
       for ( i = 0; i < gridsize; i++ )
 	{
-	  temp1 = SUB(work[2][varID][levelID].ptr[i],
-		      DIV(MUL(work[0][varID][levelID].ptr[i], work[3][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
-	  temp2 = SUB(work[1][varID][levelID].ptr[i],
-		      DIV(MUL(work[0][varID][levelID].ptr[i], work[0][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
+	  temp1 = SUBMN(work[2][varID][levelID].ptr[i],
+		      DIVMN( MULMN(work[0][varID][levelID].ptr[i], work[3][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
+	  temp2 = SUBMN(work[1][varID][levelID].ptr[i],
+		      DIVMN( MULMN(work[0][varID][levelID].ptr[i], work[0][varID][levelID].ptr[i]), work[4][varID][levelID].ptr[i]));
 
-	  field2.ptr[i] = DIV(temp1, temp2);
-	  field1.ptr[i] = SUB(DIV(work[3][varID][levelID].ptr[i], work[4][varID][levelID].ptr[i]),
-			      MUL(DIV(work[0][varID][levelID].ptr[i], work[4][varID][levelID].ptr[i]), field2.ptr[i]));
+	  field2.ptr[i] = DIVMN(temp1, temp2);
+	  field1.ptr[i] = SUBMN( DIVMN(work[3][varID][levelID].ptr[i], work[4][varID][levelID].ptr[i]),
+			      MULMN( DIVMN(work[0][varID][levelID].ptr[i], work[4][varID][levelID].ptr[i]), field2.ptr[i]));
 	}
 
       nmiss = 0;

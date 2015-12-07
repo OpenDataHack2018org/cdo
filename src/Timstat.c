@@ -72,17 +72,22 @@
 #include "pstream.h"
 
 
+typedef struct {
+  short varID;
+  short levelID;
+} recinfo_t;
+
+
 void *Timstat(void *argument)
 {
   enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
   int timestat_date = TIMESTAT_MEAN;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
-  int varID, levelID, recID;
+  int varID, levelID;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
   int nmiss;
-  int nlevel;
   int lvfrac = FALSE;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
@@ -144,7 +149,7 @@ void *Timstat(void *argument)
   int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  double divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   if ( operfunc == func_mean )
     {
@@ -176,8 +181,8 @@ void *Timstat(void *argument)
   if ( taxisInqType(taxisID2) == TAXIS_FORECAST ) taxisDefType(taxisID2, TAXIS_RELATIVE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int nvars    = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
+  int nvars   = vlistNvars(vlistID1);
+  int maxrecs = vlistNrecs(vlistID1);
 
   if ( cmplen == 0 && CDO_Reduce_Dim )
     for ( varID = 0; varID < nvars; ++varID )
@@ -221,8 +226,7 @@ void *Timstat(void *argument)
       streamDefVlist(streamID3, vlistID3);
     }
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  recinfo_t *recinfo = (recinfo_t *) malloc(maxrecs*sizeof(recinfo_t));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -231,9 +235,16 @@ void *Timstat(void *argument)
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
+  int FIELD_MEMTYPE = 0;
+  if ( CDO_Memtype == MEMTYPE_FLOAT ) FIELD_MEMTYPE = MEMTYPE_FLOAT;
+
   field_t field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.memtype = FIELD_MEMTYPE;
+  if ( FIELD_MEMTYPE == MEMTYPE_FLOAT )
+    field.ptrf = (float*) Malloc(gridsize*sizeof(float));
+  else
+    field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
@@ -244,7 +255,7 @@ void *Timstat(void *argument)
   int otsID = 0;
   while ( TRUE )
     {
-      long nsets = 0;
+      int nsets = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
@@ -256,30 +267,32 @@ void *Timstat(void *argument)
 
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
 	      if ( tsID == 0 )
 		{
-		  recVarID[recID]   = varID;
-		  recLevelID[recID] = levelID;
+                  recinfo[recID].varID   = varID;
+                  recinfo[recID].levelID = levelID;
 		}
 
-	      nwpv     = vars1[varID][levelID].nwpv;
-	      gridsize = gridInqSize(vars1[varID][levelID].grid);
+              field_t *pvar1 = &vars1[varID][levelID];
+              
+	      nwpv     = pvar1->nwpv;
+	      gridsize = gridInqSize(pvar1->grid);
 
 	      if ( nsets == 0 )
 		{
-		  streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-		  vars1[varID][levelID].nmiss = nmiss;
+		  streamReadRecord(streamID1, pvar1->ptr, &nmiss);
+		  pvar1->nmiss = nmiss;
 		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
 			samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 
 		      for ( int i = 0; i < nwpv*gridsize; i++ )
-			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
+			if ( DBL_IS_EQUAL(pvar1->ptr[i], pvar1->missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
 			else
 			  samp1[varID][levelID].ptr[i] = 1;
@@ -287,10 +300,13 @@ void *Timstat(void *argument)
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, field.ptr, &field.nmiss);
+                  if ( CDO_Memtype == MEMTYPE_FLOAT )
+                    streamReadRecordF(streamID1, field.ptrf, &field.nmiss);
+                  else
+                    streamReadRecord(streamID1, field.ptr, &field.nmiss);
 		  field.size    = gridsize;
-		  field.grid    = vars1[varID][levelID].grid;
-		  field.missval = vars1[varID][levelID].missval;
+		  field.grid    = pvar1->grid;
+		  field.missval = pvar1->missval;
 		  if ( field.nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
@@ -301,29 +317,34 @@ void *Timstat(void *argument)
 			}
 
 		      for ( int i = 0; i < nwpv*gridsize; i++ )
-			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
+			if ( !DBL_IS_EQUAL(field.ptr[i], pvar1->missval) )
 			  samp1[varID][levelID].ptr[i]++;
 		    }
 
 		  if ( lvarstd )
 		    {
-		      farsumq(&vars2[varID][levelID], field);
-		      farsum(&vars1[varID][levelID], field);
+                      field_t *pvar2 = &vars2[varID][levelID];
+		      farsumq(pvar2, field);
+		      farsum(pvar1, field);
 		    }
 		  else
 		    {
-		      farfun(&vars1[varID][levelID], field, operfunc);
+		      farfun(pvar1, field, operfunc);
 		    }
 		}
 	    }
 
 	  if ( nsets == 0 && lvarstd )
-	    for ( varID = 0; varID < nvars; varID++ )
-	      {
+            for ( int recID = 0; recID < maxrecs; recID++ )
+              {
+                int varID   = recinfo[recID].varID;
+                int levelID = recinfo[recID].levelID;
+                field_t *pvar1 = &vars1[varID][levelID];
+                field_t *pvar2 = &vars2[varID][levelID];
+
 		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-		nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		for ( levelID = 0; levelID < nlevel; levelID++ )
-		  farmoq(&vars2[varID][levelID], vars1[varID][levelID]);
+
+                farmoq(pvar2, *pvar1);
 	      }
 
 	  vdate0 = vdate;
@@ -335,42 +356,38 @@ void *Timstat(void *argument)
       if ( nrecs == 0 && nsets == 0 ) break;
 
       if ( lmean )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_t *pvar1 = &vars1[varID][levelID];
+
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      {
-		if ( samp1[varID][levelID].ptr == NULL )
-		  farcdiv(&vars1[varID][levelID], (double)nsets);
-		else
-                  {
-                    //   farround(&samp1[varID][levelID]); not necessary
-                    fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
-                  }
-              }
+
+            if ( samp1[varID][levelID].ptr == NULL )
+              farcdiv(pvar1, (double)nsets);
+            else
+              fardiv(pvar1, samp1[varID][levelID]);
 	  }
       else if ( lvarstd )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      {
-		if ( samp1[varID][levelID].ptr == NULL )
-		  {
-		    if ( lstd )
-		      farcstd(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
-		    else
-		      farcvar(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
-		  }
-		else
-		  {
-		    if ( lstd )
-		      farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
-		    else
-		      farvar(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
-		  }
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_t *pvar1 = &vars1[varID][levelID];
+            field_t *pvar2 = &vars2[varID][levelID];
+
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+            if ( samp1[varID][levelID].ptr == NULL )
+              {
+                if ( lstd ) farcstd(pvar1, *pvar2, nsets, divisor);
+                else        farcvar(pvar1, *pvar2, nsets, divisor);
+              }
+            else
+              {
+                if ( lstd ) farstd(pvar1, *pvar2, samp1[varID][levelID], divisor);
+                else        farvar(pvar1, *pvar2, samp1[varID][levelID], divisor);
 	      }
 	  }
 
@@ -383,35 +400,36 @@ void *Timstat(void *argument)
 	}
 
       if ( lvfrac && operfunc == func_mean )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      {
-                nwpv     = vars1[varID][levelID].nwpv;
-                gridsize = gridInqSize(vars1[varID][levelID].grid);
-		missval  = vars1[varID][levelID].missval;
-		if ( samp1[varID][levelID].ptr )
-		  {
-		    int irun = 0;
-		    for ( int i = 0; i < nwpv*gridsize; ++i )
-		      {
-			if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
-			  {
-			    vars1[varID][levelID].ptr[i] = missval;
-			    irun++;
-			  }
-		      }
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_t *pvar1 = &vars1[varID][levelID];
 
-		    if ( irun )
-		      {
-			nmiss = 0;
-			for ( int i = 0; i < nwpv*gridsize; ++i )
-			  if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], missval) ) nmiss++;
-			vars1[varID][levelID].nmiss = nmiss;
-		      }
-		  }
+	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+            nwpv     = pvar1->nwpv;
+            gridsize = gridInqSize(pvar1->grid);
+            missval  = pvar1->missval;
+            if ( samp1[varID][levelID].ptr )
+              {
+                int irun = 0;
+                for ( int i = 0; i < nwpv*gridsize; ++i )
+                  {
+                    if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
+                      {
+                        pvar1->ptr[i] = missval;
+                        irun++;
+                      }
+                  }
+
+                if ( irun )
+                  {
+                    nmiss = 0;
+                    for ( int i = 0; i < nwpv*gridsize; ++i )
+                      if ( DBL_IS_EQUAL(pvar1->ptr[i], missval) ) nmiss++;
+                    pvar1->nmiss = nmiss;
+                  }
 	      }
 	  }
 
@@ -424,15 +442,17 @@ void *Timstat(void *argument)
 	  streamDefTimestep(streamID3, otsID);
 	}
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < maxrecs; recID++ )
 	{
-	  varID   = recVarID[recID];
-	  levelID = recLevelID[recID];
+          int varID   = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
+          field_t *pvar1 = &vars1[varID][levelID];
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	  streamWriteRecord(streamID2, pvar1->ptr,  pvar1->nmiss);
+          
 	  if ( cdoDiag )
 	    {
 	      if ( samp1[varID][levelID].ptr )
@@ -459,9 +479,7 @@ void *Timstat(void *argument)
   streamClose(streamID1);
 
   if ( field.ptr ) Free(field.ptr);
-
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  Free(recinfo);
 
   cdoFinish();
 

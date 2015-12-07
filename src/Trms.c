@@ -50,12 +50,12 @@ void trms(field_t field1, field_t field2, double *dp, field_t *field3)
     for ( i = 0; i < len; i++ ) 
       {
 	wp = w[i]*dp[k*len+i];
-	rsum  = ADD(rsum, MUL(wp, MUL(SUB(array2[k*len+i], array1[k*len+i]),
-				      SUB(array2[k*len+i], array1[k*len+i]))));
-	rsumw = ADD(rsumw, wp);
+	rsum  = ADDMN(rsum, MULMN(wp, MULMN( SUBMN(array2[k*len+i], array1[k*len+i]),
+				      SUBMN(array2[k*len+i], array1[k*len+i]))));
+	rsumw = ADDMN(rsumw, wp);
       }
 
-  ravg = SQRT(DIV(rsum, rsumw));
+  ravg = SQRTMN( DIVMN(rsum, rsumw));
 
   if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 

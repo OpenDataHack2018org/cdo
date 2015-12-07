@@ -56,12 +56,12 @@ void detrend(long nts, double missval1, double *array1, double *array2)
 	n++;
       }
 
-  work1 = DIV(SUB(sumjx, DIV(MUL(sumx, sumj), n) ),
-	      SUB(sumjj, DIV(MUL(sumj, sumj), n)) );
-  work2 = SUB(DIV(sumx, n), MUL(work1, DIV(sumj, n)));
+  work1 = DIVMN( SUBMN(sumjx, DIVMN( MULMN(sumx, sumj), n) ),
+	      SUBMN(sumjj, DIVMN( MULMN(sumj, sumj), n)) );
+  work2 = SUBMN( DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
 
   for ( j = 0; j < nts; j++ )
-    array2[j] = SUB(array1[j], ADD(work2, MUL(j, work1)));
+    array2[j] = SUBMN(array1[j], ADDMN(work2, MULMN(j, work1)));
 }
 
 

@@ -117,22 +117,22 @@ void oper_expr_con_var(int oper, int nmiss, long n, double missval1, double miss
   switch ( oper )
     {
     case '+':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = ADD(cval, idat[i]);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = ADDMN(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] = cval + idat[i];
       break;
     case '-':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = SUB(cval, idat[i]);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = SUBMN(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] = cval - idat[i];
       break;
     case '*':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MUL(cval, idat[i]);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MULMN(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] = cval * idat[i];
       break;
     case '/':
-      for ( i=0; i<n; ++i ) odat[i] = DIV(cval, idat[i]);
+      for ( i=0; i<n; ++i ) odat[i] = DIVMN(cval, idat[i]);
       break;
     case '^':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POW(cval, idat[i]);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POWMN(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] = pow(cval, idat[i]);
       break;
     case '<':
@@ -185,23 +185,23 @@ void oper_expr_var_con(int oper, int nmiss, long n, double missval1, double miss
   switch ( oper )
     {
     case '+':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = ADD(idat[i], cval);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = ADDMN(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] = idat[i] + cval;
       break;
     case '-':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = SUB(idat[i], cval);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = SUBMN(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] = idat[i] - cval;
       break;
     case '*':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MUL(idat[i], cval);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MULMN(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] = idat[i] * cval;
       break;
     case '/':
-      if ( nmiss || IS_EQUAL(cval, 0) ) for ( i=0; i<n; ++i ) odat[i] = DIV(idat[i], cval);
+      if ( nmiss || IS_EQUAL(cval, 0) ) for ( i=0; i<n; ++i ) odat[i] = DIVMN(idat[i], cval);
       else                              for ( i=0; i<n; ++i ) odat[i] = idat[i] / cval;
       break;
     case '^':
-      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POW(idat[i], cval);
+      if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POWMN(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] = pow(idat[i], cval);
       break;
     case '<':
@@ -255,19 +255,19 @@ void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double mi
   switch ( oper )
     {
     case '+':
-      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = ADD(idat1[i], idat2[i]);
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = ADDMN(idat1[i], idat2[i]);
       else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] + idat2[i];
       break;
     case '-':
-      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = SUB(idat1[i], idat2[i]);
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = SUBMN(idat1[i], idat2[i]);
       else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] - idat2[i];
       break;
     case '*':
-      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MUL(idat1[i], idat2[i]);
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MULMN(idat1[i], idat2[i]);
       else         for ( i=0; i<ngp; ++i ) odat[i] = idat1[i] * idat2[i];
       break;
     case '/':
-      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = DIV(idat1[i], idat2[i]);
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = DIVMN(idat1[i], idat2[i]);
       else
         {
           for ( i = 0; i < ngp; ++i )
@@ -278,7 +278,7 @@ void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double mi
         }
       break;
     case '^':
-      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = POW(idat1[i], idat2[i]);
+      if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = POWMN(idat1[i], idat2[i]);
       else         for ( i=0; i<ngp; ++i ) odat[i] = pow(idat1[i], idat2[i]);
       break;
     case '<':

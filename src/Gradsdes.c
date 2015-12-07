@@ -680,27 +680,24 @@ void ctl_options(FILE *gdp, int yrev, int zrev, int sequential, int bigendian, i
 static
 void ctl_undef(FILE *gdp, int vlistID)
 {
-  double missval;
-
-  missval = vlistInqVarMissval(vlistID, 0);
+  double missval = vlistInqVarMissval(vlistID, 0);
   fprintf(gdp, "UNDEF  %g\n", missval);
 }
 
 static
 void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
 {
-  int varID, nvars;
   int ltype, code;
   int zaxisID, nlev;
   int i, j;
   int len;
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
 
-  nvars   = vlistNvars(vlistID);
+  int nvars = vlistNvars(vlistID);
 
   fprintf(gdp, "VARS  %d\n", nvarsout);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( int varID = 0; varID < nvars; varID++ )
     {
       if ( vars[varID] == TRUE )
         {

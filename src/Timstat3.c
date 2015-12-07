@@ -235,11 +235,11 @@ void *Timstat3(void *argument)
 	      fnvals0 = iwork[0][varID][levelID][i];
 	      fnvals1 = iwork[1][varID][levelID][i];
 
-	      temp0 = DIV(MUL(fwork[0][varID][levelID].ptr[i], fwork[0][varID][levelID].ptr[i]), fnvals0);
-	      temp1 = DIV(MUL(fwork[2][varID][levelID].ptr[i], fwork[2][varID][levelID].ptr[i]), fnvals1);
-	      temp2 = SUB(fwork[1][varID][levelID].ptr[i], temp0);
-	      temp3 = SUB(fwork[3][varID][levelID].ptr[i], temp1);
-	      statistic = DIV(temp2, ADD(temp2, MUL(rconst, temp3)));
+	      temp0 = DIVMN( MULMN(fwork[0][varID][levelID].ptr[i], fwork[0][varID][levelID].ptr[i]), fnvals0);
+	      temp1 = DIVMN( MULMN(fwork[2][varID][levelID].ptr[i], fwork[2][varID][levelID].ptr[i]), fnvals1);
+	      temp2 = SUBMN(fwork[1][varID][levelID].ptr[i], temp0);
+	      temp3 = SUBMN(fwork[3][varID][levelID].ptr[i], temp1);
+	      statistic = DIVMN(temp2, ADDMN(temp2, MULMN(rconst, temp3)));
 	      
 	      if ( fnvals0 <= 1 || fnvals1 <= 1 )
 		fractil_1 = fractil_2 = missval1;
@@ -271,35 +271,35 @@ void *Timstat3(void *argument)
 	      for ( j = 0; j < n_in; j++ )
 		{
 		  fnvals = iwork[j][varID][levelID][i];
-		  tmp   = DIV(MUL(fwork[2*j][varID][levelID].ptr[i], fwork[2*j][varID][levelID].ptr[i]), fnvals);
-		  temp0 = ADD(temp0, DIV(SUB(fwork[2*j+1][varID][levelID].ptr[i], tmp), var_factor[j]));
-		  deg_of_freedom = ADD(deg_of_freedom, fnvals);
+		  tmp   = DIVMN( MULMN(fwork[2*j][varID][levelID].ptr[i], fwork[2*j][varID][levelID].ptr[i]), fnvals);
+		  temp0 = ADDMN(temp0, DIVMN( SUBMN(fwork[2*j+1][varID][levelID].ptr[i], tmp), var_factor[j]));
+		  deg_of_freedom = ADDMN(deg_of_freedom, fnvals);
 		}
 
 	      if ( !DBL_IS_EQUAL(temp0, missval1) && temp0 < 0 ) /* This is possible because */
 		temp0 = 0;	                                 /* of rounding errors       */
 
-	      stddev_estimator = SQRT(DIV(temp0, deg_of_freedom));
+	      stddev_estimator = SQRTMN( DIVMN(temp0, deg_of_freedom));
 	      mean_estimator = -rconst;
 	      for ( j = 0; j < n_in; j++ )
 		{
 		  fnvals = iwork[j][varID][levelID][i];
-		  mean_estimator = ADD(mean_estimator,
-				       MUL(mean_factor[j],
-					   DIV(fwork[2*j][varID][levelID].ptr[i], fnvals)));
+		  mean_estimator = ADDMN(mean_estimator,
+				       MULMN(mean_factor[j],
+					   DIVMN(fwork[2*j][varID][levelID].ptr[i], fnvals)));
 		}
 
 	      temp1 = 0;
 	      for ( j = 0; j < n_in; j++ )
 		{
 		  fnvals = iwork[j][varID][levelID][i];
-		  temp1 = ADD(temp1, DIV(MUL(MUL(mean_factor[j], mean_factor[j]),
+		  temp1 = ADDMN(temp1, DIVMN( MULMN( MULMN(mean_factor[j], mean_factor[j]),
 					     var_factor[j]), fnvals));
 		}
 
-	      norm = SQRT(temp1);
+	      norm = SQRTMN(temp1);
 	      
-	      temp2 = DIV(DIV(mean_estimator, norm), stddev_estimator);
+	      temp2 = DIVMN( DIVMN(mean_estimator, norm), stddev_estimator);
 	      fractil = deg_of_freedom < 1 ? missval1 :
 		student_t_inv (deg_of_freedom, 1 - risk/2, __func__);
 

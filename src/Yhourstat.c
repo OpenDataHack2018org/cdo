@@ -77,7 +77,7 @@ void *Yhourstat(void *argument)
   int levelID;
   int tsID;
   int otsID;
-  long nsets[MAX_HOUR];
+  int nsets[MAX_HOUR];
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
@@ -85,7 +85,6 @@ void *Yhourstat(void *argument)
   int *recVarID, *recLevelID;
   int vdates[MAX_HOUR], vtimes[MAX_HOUR];
   int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
-  double divisor;
   field_t **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
   field_t field;
 
@@ -107,7 +106,7 @@ void *Yhourstat(void *argument)
   lmean   = operfunc == func_mean || operfunc == func_avg;
   lstd    = operfunc == func_std || operfunc == func_std1;
   lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  divisor = operfunc == func_std1 || operfunc == func_var1;
+  int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   for ( houroy = 0; houroy < MAX_HOUR; ++houroy )
     {

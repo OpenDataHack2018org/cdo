@@ -28,7 +28,7 @@
 
 
 static const char WCT_NAME[]     = "wind_chill_temperature";
-static const char WCT_LONGNAME[] = "Windchill temperature describes the fact that low temperatures are felt to be even lower in case of wind. It is based on the rate of heat loss from exposed skin caused by wind and cold. It is calculated according to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * (SQRT(ff*3.6) - 0.0124 * ff * 3.6)) with T  = air temperature in degree Celsius, ff = 10 m wind speed in m/s. Windchill temperature is only defined for temperatures at or below 33 degree Celsius and wind speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
+static const char WCT_LONGNAME[] = "Windchill temperature describes the fact that low temperatures are felt to be even lower in case of wind. It is based on the rate of heat loss from exposed skin caused by wind and cold. It is calculated according to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * ( SQRTMN(ff*3.6) - 0.0124 * ff * 3.6)) with T  = air temperature in degree Celsius, ff = 10 m wind speed in m/s. Windchill temperature is only defined for temperatures at or below 33 degree Celsius and wind speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
 static const char WCT_UNITS[]    = "Celsius";
 
 static const int FIRST_VAR = 0;

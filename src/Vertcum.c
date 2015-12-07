@@ -39,7 +39,7 @@ void add_vars_mv(int gridsize, double missval, const double *restrict var1, cons
   double missval2 = missval;
   /*
   for ( int i = 0; i < gridsize; ++i )
-    var3[i] = ADD(var2[i], var1[i]);
+    var3[i] = ADDMN(var2[i], var1[i]);
   */
   for ( int i = 0; i < gridsize; ++i )
     {
