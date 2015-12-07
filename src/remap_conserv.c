@@ -8,6 +8,12 @@
 #include "clipping/area.h"
 #include "clipping/geometry.h"
 
+#define STIMER
+
+#ifdef STIMER
+#include <time.h>
+#endif
+
 typedef struct {
   enum yac_edge_type *src_edge_type;
   long srch_corners;
@@ -750,11 +756,14 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   long sum_srch_cells = 0;
   long sum_srch_cells2 = 0;
 
+#ifdef STIMER
+  double stimer = 0;
+#endif
   /* Loop over destination grid */
 
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(dynamic) default(none)                   \
-  shared(ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
+  shared(stimer, ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, \
 	 src_edge_type, tgt_edge_type, rv, cdoVerbose, tgt_num_cell_corners, target_cell_type, \
          weightlinks,  srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
 	 search, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2)
@@ -779,7 +788,10 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
       struct grid_cell *tgt_grid_cell = tgt_grid_cell2[ompthID];
 
       /* Get search cells */
-
+#ifdef STIMER
+      clock_t start = clock();
+#endif
+          
       if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	{
 	  double tgt_cell_bound_box[4];
@@ -815,6 +827,10 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	  num_srch_cells = get_srch_cells(tgt_cell_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
 					  tgt_cell_bound_box_r, src_grid->cell_bound_box, src_grid_size, srch_add);
 	}
+#ifdef STIMER
+      clock_t finish = clock();
+      stimer += ((double)(finish-start))/CLOCKS_PER_SEC;
+#endif
 
       if ( 0 && cdoVerbose ) sum_srch_cells += num_srch_cells;
 
@@ -993,7 +1009,11 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       tgt_grid->cell_area[tgt_cell_add] = tgt_area; 
       // printf("area %d %g %g\n", tgt_cell_add, tgt_grid->cell_area[tgt_cell_add], tgt_area);
-    }
+  }
+
+#ifdef STIMER
+printf("stime = %gs\n", stimer);
+#endif
 
   if ( 0 && cdoVerbose )
     {
