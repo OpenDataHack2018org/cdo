@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..1 # Number of tests to be executed.
+echo 1..4 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -7,10 +7,12 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout
 CDOERR=cerr
 #
+FILES="datar.nc datac.nc datau.nc testfile01c.nc"
+#
 NTEST=1
 #
 for OPERATOR in copy; do
-  for FILE in testfile01c.nc; do
+  for FILE in $FILES; do
     RSTAT=0
     IFILE=$DATAPATH/${FILE}
     OFILE=${OPERATOR}_${FILE}
