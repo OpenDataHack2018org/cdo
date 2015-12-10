@@ -499,6 +499,7 @@ void *Select(void *argument)
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   char stdname[CDI_MAX_NAME];
+  char zaxisname[CDI_MAX_NAME];
   int vlistID0 = -1, vlistID2 = -1;
   int i;
   int result = FALSE;
@@ -522,11 +523,13 @@ void *Select(void *argument)
   PML_DEF_INT(hour,               24, "Hour");
   PML_DEF_INT(minute,             60, "Minute");
   PML_DEF_INT(code,             1024, "Code number");
-  PML_DEF_INT(ltype,            1024, "Level type");
   PML_DEF_INT(levidx,           1024, "Level index");
+  PML_DEF_INT(ltype,             256, "Level type");
+  PML_DEF_INT(zaxis,             256, "Zaxis number");
   PML_DEF_FLT(level,            1024, "Level");
   PML_DEF_WORD(name,            1024, "Variable name");
   PML_DEF_WORD(param,           1024, "Parameter");
+  PML_DEF_WORD(zname,            256, "Zaxis name");
   PML_DEF_WORD(startdate,          1, "Start date");
   PML_DEF_WORD(enddate,            1, "End date");
   PML_DEF_WORD(date,            1024, "Date");
@@ -539,11 +542,13 @@ void *Select(void *argument)
   PML_INIT_INT(hour);
   PML_INIT_INT(minute);
   PML_INIT_INT(code);
-  PML_INIT_INT(ltype);
   PML_INIT_INT(levidx);
+  PML_INIT_INT(ltype);
+  PML_INIT_INT(zaxis);
   PML_INIT_FLT(level);
   PML_INIT_WORD(name);
   PML_INIT_WORD(param);
+  PML_INIT_WORD(zname);
   PML_INIT_WORD(startdate);
   PML_INIT_WORD(enddate);
   PML_INIT_WORD(date);
@@ -577,11 +582,13 @@ void *Select(void *argument)
   PML_ADD_INT(pml, hour);
   PML_ADD_INT(pml, minute);
   PML_ADD_INT(pml, code);
-  PML_ADD_INT(pml, ltype);
   PML_ADD_INT(pml, levidx);
+  PML_ADD_INT(pml, ltype);
+  PML_ADD_INT(pml, zaxis);
   PML_ADD_FLT(pml, level);
   PML_ADD_WORD(pml, name);
   PML_ADD_WORD(pml, param);
+  PML_ADD_WORD(pml, zname);
   PML_ADD_WORD(pml, startdate);
   PML_ADD_WORD(pml, enddate);
   PML_ADD_WORD(pml, date);
@@ -598,11 +605,13 @@ void *Select(void *argument)
   PML_NUM(pml, hour);
   PML_NUM(pml, minute);
   PML_NUM(pml, code);
-  PML_NUM(pml, ltype);
   PML_NUM(pml, levidx);
+  PML_NUM(pml, ltype);
+  PML_NUM(pml, zaxis);
   PML_NUM(pml, level);
   PML_NUM(pml, name);
   PML_NUM(pml, param);
+  PML_NUM(pml, zname);
   PML_NUM(pml, startdate);
   PML_NUM(pml, enddate);
   PML_NUM(pml, date);
@@ -665,9 +674,38 @@ void *Select(void *argument)
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
-
+              int zaxistype = zaxisInqType(zaxisID);
+              zaxis   = vlistZaxisIndex(vlistID1, zaxisID)+1;
+              zaxisName(zaxistype, zaxisname);
+              zname = zaxisname;
+              printf("zname %s\n", zname);
+              
 	      vars[varID] = FALSE;
+              int found_code  = npar_code  && PAR_CHECK_INT(code);
+              int found_name  = npar_name  && PAR_CHECK_WORD(name);
+              int found_param = npar_param && PAR_CHECK_WORD(param);
+              int found_ltype = npar_ltype && PAR_CHECK_INT(ltype);
+              int found_zaxis = npar_zaxis && PAR_CHECK_INT(zaxis);
+              int found_zname = npar_zname && PAR_CHECK_WORD(zname);
+              int lvert = (npar_ltype || npar_zaxis || npar_zname) ? (found_ltype || found_zaxis || found_zname) : TRUE;
+              printf("found_code, found_name, found_param, found_ltype, found_zaxis, lvert %d %d %d %d %d %d\n", found_code, found_name, found_param, found_ltype, found_zaxis, lvert);
 	      
+              if ( !vars[varID] && lvert && (found_code || found_name || found_param) ) vars[varID] = TRUE;
+              if ( !vars[varID] && !npar_code && !npar_name && !npar_param )
+                {
+                  if ( found_ltype || found_zaxis || found_zname) vars[varID] = TRUE;
+                  else
+                    {
+                      for ( levID = 0; levID < nlevs; levID++ )
+                        {
+                          levidx = levID + 1;
+                          level = zaxisInqLevel(zaxisID, levID);
+                          if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
+                          if ( !vars[varID] && npar_level  && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
+                        }
+                    }
+                }
+              /*
 	      if ( npar_ltype )
 		{
 		  if ( !vars[varID] && npar_code  && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
@@ -704,6 +742,7 @@ void *Select(void *argument)
 			}
 		    }
 		}
+              */
 	    }
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -757,11 +796,13 @@ void *Select(void *argument)
 	    }
 
 	  PAR_CHECK_INT_FLAG(code);
-	  PAR_CHECK_INT_FLAG(ltype);
 	  PAR_CHECK_INT_FLAG(levidx);
+	  PAR_CHECK_INT_FLAG(ltype);
+	  PAR_CHECK_INT_FLAG(zaxis);
 	  PAR_CHECK_FLT_FLAG(level);
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
+	  PAR_CHECK_WORD_FLAG(zname);
 
 	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = TRUE;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;
