@@ -5,6 +5,7 @@
 
 2015-12-10  Uwe Schulzweida
 
+	* Select: added parameter grid and gridname
 	* Select: added parameter zaxis and zaxisname
 
 2015-11-26  Uwe Schulzweida

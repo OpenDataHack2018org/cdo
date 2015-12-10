@@ -346,7 +346,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
 
       if ( i == pml->size )
 	{
-	  fprintf(stderr, "Parameter >%s< has not a valid keyword!\n", argv[istart]);
+	  fprintf(stderr, "Parameter >%s< has an invalid keyword!\n", argv[istart]);
 	  status = 2;
 	  goto END_LABEL;
 	}
@@ -490,7 +490,7 @@ void *Select(void *argument)
   int streamID2 = CDI_UNDEFID;
   int tsID1, tsID2, nrecs;
   int nvars, nvars2, nlevs;
-  int zaxisID, levID;
+  int gridID, zaxisID, levID;
   int varID2, levelID2;
   int recID, varID, levelID;
   int iparam;
@@ -499,7 +499,8 @@ void *Select(void *argument)
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   char stdname[CDI_MAX_NAME];
-  char zaxisname[CDI_MAX_NAME];
+  char gname[CDI_MAX_NAME];
+  char zname[CDI_MAX_NAME];
   int vlistID0 = -1, vlistID2 = -1;
   int i;
   int result = FALSE;
@@ -526,10 +527,12 @@ void *Select(void *argument)
   PML_DEF_INT(levidx,           1024, "Level index");
   PML_DEF_INT(ltype,             256, "Level type");
   PML_DEF_INT(zaxis,             256, "Zaxis number");
+  PML_DEF_INT(grid,              256, "Grid number");
   PML_DEF_FLT(level,            1024, "Level");
   PML_DEF_WORD(name,            1024, "Variable name");
   PML_DEF_WORD(param,           1024, "Parameter");
-  PML_DEF_WORD(zname,            256, "Zaxis name");
+  PML_DEF_WORD(zaxisname,        256, "Zaxis name");
+  PML_DEF_WORD(gridname,         256, "Grid name");
   PML_DEF_WORD(startdate,          1, "Start date");
   PML_DEF_WORD(enddate,            1, "End date");
   PML_DEF_WORD(date,            1024, "Date");
@@ -545,18 +548,20 @@ void *Select(void *argument)
   PML_INIT_INT(levidx);
   PML_INIT_INT(ltype);
   PML_INIT_INT(zaxis);
+  PML_INIT_INT(grid);
   PML_INIT_FLT(level);
   PML_INIT_WORD(name);
   PML_INIT_WORD(param);
-  PML_INIT_WORD(zname);
+  PML_INIT_WORD(zaxisname);
+  PML_INIT_WORD(gridname);
   PML_INIT_WORD(startdate);
   PML_INIT_WORD(enddate);
   PML_INIT_WORD(date);
 
   cdoInitialize(argument);
 
-  int SELECT  = cdoOperatorAdd("select", 0, 0, "parameter list");
-  int DELETE  = cdoOperatorAdd("delete", 0, 0, "parameter list");
+  int SELECT = cdoOperatorAdd("select", 0, 0, "parameter list");
+  int DELETE = cdoOperatorAdd("delete", 0, 0, "parameter list");
 
   int lcopy = FALSE;
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
@@ -585,10 +590,12 @@ void *Select(void *argument)
   PML_ADD_INT(pml, levidx);
   PML_ADD_INT(pml, ltype);
   PML_ADD_INT(pml, zaxis);
+  PML_ADD_INT(pml, grid);
   PML_ADD_FLT(pml, level);
   PML_ADD_WORD(pml, name);
   PML_ADD_WORD(pml, param);
-  PML_ADD_WORD(pml, zname);
+  PML_ADD_WORD(pml, zaxisname);
+  PML_ADD_WORD(pml, gridname);
   PML_ADD_WORD(pml, startdate);
   PML_ADD_WORD(pml, enddate);
   PML_ADD_WORD(pml, date);
@@ -608,10 +615,12 @@ void *Select(void *argument)
   PML_NUM(pml, levidx);
   PML_NUM(pml, ltype);
   PML_NUM(pml, zaxis);
+  PML_NUM(pml, grid);
   PML_NUM(pml, level);
   PML_NUM(pml, name);
   PML_NUM(pml, param);
-  PML_NUM(pml, zname);
+  PML_NUM(pml, zaxisname);
+  PML_NUM(pml, gridname);
   PML_NUM(pml, startdate);
   PML_NUM(pml, enddate);
   PML_NUM(pml, date);
@@ -671,30 +680,41 @@ void *Select(void *argument)
 	      name  = varname;
 	      param = paramstr;
 
+	      gridID  = vlistInqVarGrid(vlistID1, varID);
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
-              int zaxistype = zaxisInqType(zaxisID);
+
               zaxis   = vlistZaxisIndex(vlistID1, zaxisID)+1;
-              zaxisName(zaxistype, zaxisname);
-              zname = zaxisname;
-              printf("zname %s\n", zname);
+              int zaxistype = zaxisInqType(zaxisID);
+              zaxisName(zaxistype, zname);
+              zaxisname = zname;
+
+              grid   = vlistGridIndex(vlistID1, gridID)+1;
+              int gridtype = gridInqType(gridID);
+              gridName(gridtype, gname);
+              gridname = gname;
               
 	      vars[varID] = FALSE;
-              int found_code  = npar_code  && PAR_CHECK_INT(code);
-              int found_name  = npar_name  && PAR_CHECK_WORD(name);
-              int found_param = npar_param && PAR_CHECK_WORD(param);
-              int found_ltype = npar_ltype && PAR_CHECK_INT(ltype);
-              int found_zaxis = npar_zaxis && PAR_CHECK_INT(zaxis);
-              int found_zname = npar_zname && PAR_CHECK_WORD(zname);
-              int lvert = (npar_ltype || npar_zaxis || npar_zname) ? (found_ltype || found_zaxis || found_zname) : TRUE;
-              printf("found_code, found_name, found_param, found_ltype, found_zaxis, lvert %d %d %d %d %d %d\n", found_code, found_name, found_param, found_ltype, found_zaxis, lvert);
+              int found_code  = npar_code      && PAR_CHECK_INT(code);
+              int found_name  = npar_name      && PAR_CHECK_WORD(name);
+              int found_param = npar_param     && PAR_CHECK_WORD(param);
+              int found_grid  = npar_grid      && PAR_CHECK_INT(grid);
+              int found_gname = npar_gridname  && PAR_CHECK_WORD(gridname);
+              int found_ltype = npar_ltype     && PAR_CHECK_INT(ltype);
+              int found_zaxis = npar_zaxis     && PAR_CHECK_INT(zaxis);
+              int found_zname = npar_zaxisname && PAR_CHECK_WORD(zaxisname);
+              int lvar  = found_code || found_name || found_param;
+              int lgrid = (npar_grid || npar_gridname) ? (found_grid || found_gname) : TRUE;
+              int lvert = (npar_ltype || npar_zaxis || npar_zaxisname) ? (found_ltype || found_zaxis || found_zname) : TRUE;
 	      
-              if ( !vars[varID] && lvert && (found_code || found_name || found_param) ) vars[varID] = TRUE;
-              if ( !vars[varID] && !npar_code && !npar_name && !npar_param )
+              if ( !vars[varID] && lgrid && lvar) vars[varID] = TRUE;
+              if ( !vars[varID] && lvert && lvar) vars[varID] = TRUE;
+              if ( !vars[varID] && !lvar )
                 {
-                  if ( found_ltype || found_zaxis || found_zname) vars[varID] = TRUE;
-                  else
+                  if      ( found_grid || found_gname ) vars[varID] = TRUE;
+                  else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = TRUE;
+                  else if ( npar_levidx || npar_level )
                     {
                       for ( levID = 0; levID < nlevs; levID++ )
                         {
@@ -705,44 +725,6 @@ void *Select(void *argument)
                         }
                     }
                 }
-              /*
-	      if ( npar_ltype )
-		{
-		  if ( !vars[varID] && npar_code  && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
-		  if ( !vars[varID] && npar_name  && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
-		  if ( !vars[varID] && npar_param && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
-		  if ( !vars[varID] && !npar_code && !npar_name && !npar_param )
-		    {
-		      if ( PAR_CHECK_INT(ltype) ) vars[varID] = TRUE;
-		      else
-			{
-			  for ( levID = 0; levID < nlevs; levID++ )
-			    {
-			      levidx = levID + 1;
-			      level = zaxisInqLevel(zaxisID, levID);
-			      if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
-			      if ( !vars[varID] && npar_level  && PAR_CHECK_INT(ltype) && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
-			    }
-			}
-		    }
-		}
-	      else
-		{
-		  if ( !vars[varID] && npar_code  && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
-		  if ( !vars[varID] && npar_name  && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
-		  if ( !vars[varID] && npar_param && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
-		  if ( !vars[varID] && !npar_code && !npar_name && !npar_param )
-		    {
-		      for ( levID = 0; levID < nlevs; levID++ )
-			{
-			  levidx = levID + 1;
-			  level = zaxisInqLevel(zaxisID, levID);
-			  if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
-			  if ( !vars[varID] && npar_level  && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
-			}
-		    }
-		}
-              */
 	    }
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -799,10 +781,12 @@ void *Select(void *argument)
 	  PAR_CHECK_INT_FLAG(levidx);
 	  PAR_CHECK_INT_FLAG(ltype);
 	  PAR_CHECK_INT_FLAG(zaxis);
+	  PAR_CHECK_INT_FLAG(grid);
 	  PAR_CHECK_FLT_FLAG(level);
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
-	  PAR_CHECK_WORD_FLAG(zname);
+	  PAR_CHECK_WORD_FLAG(zaxisname);
+	  PAR_CHECK_WORD_FLAG(gridname);
 
 	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = TRUE;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;

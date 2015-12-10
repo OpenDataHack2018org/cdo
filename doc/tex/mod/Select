@@ -44,12 +44,16 @@ STRING  Comma separated list of variable names.
 STRING  Comma separated list of parameter identifiers.
 @Item = code
 INTEGER Comma separated list of code numbers.
-@Item = ltype
-INTEGER Comma separated list of GRIB level types.
-@Item = levidx
-INTEGER Comma separated list of index of levels.
 @Item = level
 FLOAT   Comma separated list of vertical levels.
+@Item = levidx
+INTEGER Comma separated list of index of levels.
+@Item = zaxisname
+STRING  Comma separated list of zaxis names.
+@Item = zaxis
+INTEGER Comma separated list of zaxis numbers.
+@Item = ltype
+INTEGER Comma separated list of GRIB level types.
 @Item = date
 STRING  Comma separated list of dates (format YYYY-MM-DDThh:mm:ss).
 @Item = startdate
