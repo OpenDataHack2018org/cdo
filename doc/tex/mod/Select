@@ -54,6 +54,10 @@ STRING  Comma separated list of zaxis names.
 INTEGER Comma separated list of zaxis numbers.
 @Item = ltype
 INTEGER Comma separated list of GRIB level types.
+@Item = gridname
+STRING  Comma separated list of grid names.
+@Item = grid
+INTEGER Comma separated list of grid numbers.
 @Item = date
 STRING  Comma separated list of dates (format YYYY-MM-DDThh:mm:ss).
 @Item = startdate
