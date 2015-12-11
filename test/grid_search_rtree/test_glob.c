@@ -54,10 +54,10 @@ void main()
       //---------------
       // setup
       //---------------
-      const int nxa = 720;
-      const int nya = 361;
-      const int nxb = 360;
-      const int nyb = 181;
+      const int nxa = 720*4;
+      const int nya = 360*4+1;
+      const int nxb = 360*4;
+      const int nyb = 180*4+1;
       /*
       const int nxa = 72;
       const int nya = 37;
@@ -69,9 +69,9 @@ void main()
 
       for ( unsigned i = 0; i < nxa; ++i ) coords_x_a[i] = -180 + i*360./nxa;
       for ( unsigned i = 0; i < nya; ++i ) coords_y_a[i] =  -90 + i*360./nxa;
- 
-      printf("xa: %g %g ... %g %g\n", coords_x_a[0], coords_x_a[1], coords_x_a[nxa-2], coords_x_a[nxa-1]);
-      printf("ya: %g %g ... %g %g\n", coords_y_a[0], coords_y_a[1], coords_y_a[nya-2], coords_y_a[nya-1]);
+
+      printf("nxa: %d xa: %g %g ... %g %g\n", nxa, coords_x_a[0], coords_x_a[1], coords_x_a[nxa-2], coords_x_a[nxa-1]);
+      printf("nya: %d ya: %g %g ... %g %g\n", nya, coords_y_a[0], coords_y_a[1], coords_y_a[nya-2], coords_y_a[nya-1]);
 
       for ( unsigned i = 0; i < nxa; ++i ) coords_x_a[i] *= rad;
       for ( unsigned i = 0; i < nya; ++i ) coords_y_a[i] *= rad;   
@@ -82,8 +82,8 @@ void main()
       for ( unsigned i = 0; i < nxb; ++i ) coords_x_b[i] = -180 + i*360./nxb;
       for ( unsigned i = 0; i < nyb; ++i ) coords_y_b[i] =  -90 + i*360./nxb;
 
-      printf("xb: %g %g ... %g %g\n", coords_x_b[0], coords_x_b[1], coords_x_b[nxb-2], coords_x_b[nxb-1]);
-      printf("yb: %g %g ... %g %g\n", coords_y_b[0], coords_y_b[1], coords_y_b[nyb-2], coords_y_b[nyb-1]);
+      printf("nxb: %d xb: %g %g ... %g %g\n", nxb, coords_x_b[0], coords_x_b[1], coords_x_b[nxb-2], coords_x_b[nxb-1]);
+      printf("nyb: %d yb: %g %g ... %g %g\n", nyb, coords_y_b[0], coords_y_b[1], coords_y_b[nyb-2], coords_y_b[nyb-1]);
 
       for ( unsigned i = 0; i < nxb; ++i ) coords_x_b[i] *= rad;
       for ( unsigned i = 0; i < nyb; ++i ) coords_y_b[i] *= rad;
