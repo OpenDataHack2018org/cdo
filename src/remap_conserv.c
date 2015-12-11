@@ -8,7 +8,7 @@
 #include "clipping/area.h"
 #include "clipping/geometry.h"
 
-#define STIMER
+//#define STIMER
 
 #ifdef STIMER
 #include <time.h>
@@ -580,7 +580,7 @@ int get_lonlat_circle_index(remapgrid_t *remap_grid)
 
   //printf("lonlat_circle_index %d\n", lonlat_circle_index);
 
-  return (lonlat_circle_index);
+  return lonlat_circle_index;
 }
 
 
@@ -642,13 +642,54 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
     }
 }
 
+static
+void set_yac_coordinates(int remap_grid_type, int cell_add, int num_cell_corners, remapgrid_t *remap_grid, struct grid_cell *yac_grid_cell)
+{
+  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+    {
+      int nx = remap_grid->dims[0];
+      int iy = cell_add/nx;
+      int ix = cell_add - iy*nx;
+      const double *restrict reg2d_corner_lon = remap_grid->reg2d_corner_lon;
+      const double *restrict reg2d_corner_lat = remap_grid->reg2d_corner_lat;
+      double *restrict coordinates_x = yac_grid_cell->coordinates_x;
+      double *restrict coordinates_y = yac_grid_cell->coordinates_y;
+
+      coordinates_x[0] = reg2d_corner_lon[ix  ];
+      coordinates_y[0] = reg2d_corner_lat[iy  ];
+      coordinates_x[1] = reg2d_corner_lon[ix+1];
+      coordinates_y[1] = reg2d_corner_lat[iy  ];
+      coordinates_x[2] = reg2d_corner_lon[ix+1];
+      coordinates_y[2] = reg2d_corner_lat[iy+1];
+      coordinates_x[3] = reg2d_corner_lon[ix  ];
+      coordinates_y[3] = reg2d_corner_lat[iy+1];
+    }
+  else
+    {
+      const double *restrict cell_corner_lon = remap_grid->cell_corner_lon;
+      const double *restrict cell_corner_lat = remap_grid->cell_corner_lat;
+      double *restrict coordinates_x = yac_grid_cell->coordinates_x;
+      double *restrict coordinates_y = yac_grid_cell->coordinates_y;
+      for ( int ic = 0; ic < num_cell_corners; ++ic )
+        {
+          coordinates_x[ic] = cell_corner_lon[cell_add*num_cell_corners+ic];
+          coordinates_y[ic] = cell_corner_lat[cell_add*num_cell_corners+ic];
+        }
+    }
+      
+  const double *restrict coordinates_x = yac_grid_cell->coordinates_x;
+  const double *restrict coordinates_y = yac_grid_cell->coordinates_y;
+  double *restrict coordinates_xyz = yac_grid_cell->coordinates_xyz;
+  for ( int ic = 0; ic < num_cell_corners; ++ic )
+    LLtoXYZ(coordinates_x[ic], coordinates_y[ic], coordinates_xyz+ic*3);
+}
+
 
 void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
-  int    lcheck = TRUE;
-  long   srch_corners;       /* num of corners of srch cells           */
-  int    i;
+  int lcheck = TRUE;
+  long srch_corners;       /* num of corners of srch cells           */
 
   /* Variables necessary if segment manages to hit pole */
   int src_remap_grid_type = src_grid->remap_grid_type;
@@ -705,7 +746,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
 
   struct grid_cell *tgt_grid_cell2[ompNumThreads];  
-  for ( i = 0; i < ompNumThreads; ++i )
+  for ( int i = 0; i < ompNumThreads; ++i )
     {
       tgt_grid_cell2[i] = (struct grid_cell*) Malloc(sizeof(struct grid_cell));
       tgt_grid_cell2[i]->array_size      = tgt_num_cell_corners;
@@ -729,7 +770,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
     }
 
   int *srch_add2[ompNumThreads];
-  for ( i = 0; i < ompNumThreads; ++i )
+  for ( int i = 0; i < ompNumThreads; ++i )
     srch_add2[i] = (int*) Malloc(src_grid_size*sizeof(int));
 
   srch_corners = src_num_cell_corners;
@@ -763,7 +804,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(dynamic) default(none)                   \
-  shared(stimer, ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, \
+  shared(ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, \
 	 src_edge_type, tgt_edge_type, rv, cdoVerbose, tgt_num_cell_corners, target_cell_type, \
          weightlinks,  srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
 	 search, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2)
@@ -771,9 +812,9 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   for ( long tgt_cell_add = 0; tgt_cell_add < tgt_grid_size; ++tgt_cell_add )
     {
       double partial_weight;
-      long   src_cell_add;       /* current linear address for source grid cell   */
-      long   num_srch_cells;
-      long k, n, num_weights, num_weights_old;
+      long src_cell_add;       /* current linear address for source grid cell   */
+      long num_srch_cells;
+      long n, num_weights, num_weights_old;
       int ompthID = cdo_omp_get_thread_num();
 
 #if defined(_OPENMP)
@@ -839,33 +880,8 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       if ( num_srch_cells == 0 ) continue;
 
-      if ( tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	{
-	  long nx = tgt_grid->dims[0];
-	  long iy = tgt_cell_add/nx;
-	  long ix = tgt_cell_add - iy*nx;
+      set_yac_coordinates(tgt_remap_grid_type, tgt_cell_add, tgt_num_cell_corners, tgt_grid, tgt_grid_cell);
 
-	  tgt_grid_cell->coordinates_x[0] = tgt_grid->reg2d_corner_lon[ix  ];
-	  tgt_grid_cell->coordinates_y[0] = tgt_grid->reg2d_corner_lat[iy  ];
-	  tgt_grid_cell->coordinates_x[1] = tgt_grid->reg2d_corner_lon[ix+1];
-	  tgt_grid_cell->coordinates_y[1] = tgt_grid->reg2d_corner_lat[iy  ];
-	  tgt_grid_cell->coordinates_x[2] = tgt_grid->reg2d_corner_lon[ix+1];
-	  tgt_grid_cell->coordinates_y[2] = tgt_grid->reg2d_corner_lat[iy+1];
-	  tgt_grid_cell->coordinates_x[3] = tgt_grid->reg2d_corner_lon[ix  ];
-	  tgt_grid_cell->coordinates_y[3] = tgt_grid->reg2d_corner_lat[iy+1];
-	}
-      else
-	{
-	  for ( int ic = 0; ic < tgt_num_cell_corners; ++ic )
-	    {
-	      tgt_grid_cell->coordinates_x[ic] = tgt_grid->cell_corner_lon[tgt_cell_add*tgt_num_cell_corners+ic];
-	      tgt_grid_cell->coordinates_y[ic] = tgt_grid->cell_corner_lat[tgt_cell_add*tgt_num_cell_corners+ic];
-	    }
-	}
-      
-      for ( int ic = 0; ic < tgt_num_cell_corners; ++ic )
-	LLtoXYZ(tgt_grid_cell->coordinates_x[ic], tgt_grid_cell->coordinates_y[ic], tgt_grid_cell->coordinates_xyz+ic*3);
-      
       /* Create search arrays */
 
       search_realloc(num_srch_cells, &search[ompthID]);
@@ -876,36 +892,9 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       for ( n = 0; n < num_srch_cells; ++n )
 	{
-	  long srch_corners_new = srch_corners;
-
+	  int srch_corners_new = srch_corners;
 	  src_cell_add = srch_add[n];
-
-	  if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	    {
-              long nx = src_grid->dims[0];
-	      long iy = src_cell_add/nx;
-	      long ix = src_cell_add - iy*nx;
-	      src_grid_cells[n].coordinates_x[0] = src_grid->reg2d_corner_lon[ix  ];
-	      src_grid_cells[n].coordinates_y[0] = src_grid->reg2d_corner_lat[iy  ];
-	      src_grid_cells[n].coordinates_x[1] = src_grid->reg2d_corner_lon[ix+1];
-	      src_grid_cells[n].coordinates_y[1] = src_grid->reg2d_corner_lat[iy  ];
-	      src_grid_cells[n].coordinates_x[2] = src_grid->reg2d_corner_lon[ix+1];
-	      src_grid_cells[n].coordinates_y[2] = src_grid->reg2d_corner_lat[iy+1];
-	      src_grid_cells[n].coordinates_x[3] = src_grid->reg2d_corner_lon[ix  ];
-	      src_grid_cells[n].coordinates_y[3] = src_grid->reg2d_corner_lat[iy+1];
-	    }
-	  else
-	    {
-	      long ioffset = src_cell_add*srch_corners;
-	      for ( k = 0; k < srch_corners_new; ++k )
-		{
-		  src_grid_cells[n].coordinates_x[k] = src_grid->cell_corner_lon[ioffset+k];
-		  src_grid_cells[n].coordinates_y[k] = src_grid->cell_corner_lat[ioffset+k];
-		}
-	    }
-
-	  for ( int ic = 0; ic < srch_corners_new; ++ic )
-	    LLtoXYZ(src_grid_cells[n].coordinates_x[ic], src_grid_cells[n].coordinates_y[ic], src_grid_cells[n].coordinates_xyz+ic*3);
+          set_yac_coordinates(src_remap_grid_type, src_cell_add, srch_corners_new, src_grid, &src_grid_cells[n]);
 	}
 
       if ( tgt_num_cell_corners < 4 || target_cell_type == LON_LAT_CELL )
