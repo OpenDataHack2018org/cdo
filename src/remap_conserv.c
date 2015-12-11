@@ -684,6 +684,25 @@ void set_yac_coordinates(int remap_grid_type, int cell_add, int num_cell_corners
     LLtoXYZ(coordinates_x[ic], coordinates_y[ic], coordinates_xyz+ic*3);
 }
 
+static
+void reg2d_bound_box(remapgrid_t *remap_grid, double *grid_bound_box)
+{
+  int nx = remap_grid->dims[0];
+  int ny = remap_grid->dims[1];
+  const double *restrict reg2d_corner_lon = remap_grid->reg2d_corner_lon;
+  const double *restrict reg2d_corner_lat = remap_grid->reg2d_corner_lat;
+
+  grid_bound_box[0] = reg2d_corner_lat[0];
+  grid_bound_box[1] = reg2d_corner_lat[ny];
+  if ( grid_bound_box[0] > grid_bound_box[1] )
+    {
+      grid_bound_box[0] = reg2d_corner_lat[ny];
+      grid_bound_box[1] = reg2d_corner_lat[0];
+    }
+  grid_bound_box[2] = reg2d_corner_lon[0];
+  grid_bound_box[3] = reg2d_corner_lon[nx];
+}
+
 
 void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
@@ -694,7 +713,6 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   /* Variables necessary if segment manages to hit pole */
   int src_remap_grid_type = src_grid->remap_grid_type;
   int tgt_remap_grid_type = tgt_grid->remap_grid_type;
-  double src_grid_bound_box[4];
   extern int timer_remap_con;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -775,20 +793,9 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   srch_corners = src_num_cell_corners;
 
+  double src_grid_bound_box[4];
   if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
-    {
-      long nx = src_grid->dims[0];
-      long ny = src_grid->dims[1];
-      src_grid_bound_box[0] = src_grid->reg2d_corner_lat[0];
-      src_grid_bound_box[1] = src_grid->reg2d_corner_lat[ny];
-      if ( src_grid_bound_box[0] > src_grid_bound_box[1] )
-	{
-	  src_grid_bound_box[0] = src_grid->reg2d_corner_lat[ny];
-	  src_grid_bound_box[1] = src_grid->reg2d_corner_lat[0];
-	}
-      src_grid_bound_box[2] = src_grid->reg2d_corner_lon[0];
-      src_grid_bound_box[3] = src_grid->reg2d_corner_lon[nx];
-    }
+    reg2d_bound_box(src_grid, src_grid_bound_box);
 
   weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
   
@@ -915,7 +922,6 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	{
 	  if ( partial_areas[n] > 0 )
 	    {
-	      //printf(">>>>   %d %d %g %g\n", (int)tgt_cell_add, srch_add[n], tgt_area, partial_areas[n]);
 	      partial_areas[num_weights] = partial_areas[n];
 	      srch_add[num_weights] = srch_add[n];
 	      num_weights++;
@@ -934,14 +940,10 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	partial_weights[n] *= tgt_area;
 
       num_weights_old = num_weights;
-      for ( num_weights = 0, n = 0; n < num_weights_old; ++n )
+      num_weights = 0;
+      for ( n = 0; n < num_weights_old; ++n )
 	{
 	  src_cell_add = srch_add[n];
-
-	  if ( 0 && cdoVerbose )
-	    printf("tgt_cell_add %ld, src_cell_add %ld,  partial_weights[n] %g, tgt_area  %g\n",
-                   tgt_cell_add, src_cell_add, partial_weights[n], tgt_area);
-
 	  if ( partial_weights[n] <= 0. ) src_cell_add = -1;
 	  if ( src_cell_add != -1 )
 	    {
