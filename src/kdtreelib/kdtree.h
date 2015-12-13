@@ -28,11 +28,10 @@
 #define  KD_TYPE  KD_FLOAT
 
 #if KD_TYPE == KD_INT
-typedef long kdata_t;
-//#  define KDATA_SCALE(x) ((int) (0.5+100000000*(x)))
-//#  define KDATA_INVSCALE(x) ((x)/100000000.)
-#  define KDATA_SCALE(x) ((int) (0.5+100000000*(x)))
-#  define KDATA_INVSCALE(x) ((x)/100000000.)
+typedef int kdata_t;
+#  define KDATA_SFAC     100000000.
+#  define KDATA_SCALE(x) ((int) (0.5+KDATA_SFAC*(x)))
+#  define KDATA_INVSCALE(x) ((x)/KDATA_SFAC)
 #  define KDATA_ABS(x)   abs(x)
 #else
 typedef float kdata_t;
