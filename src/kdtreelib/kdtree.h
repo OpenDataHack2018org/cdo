@@ -22,23 +22,24 @@
 #include <stdio.h>
 #include <string.h>
 
-#define  KDATA_T  float
+#define  KD_FLOAT 1
+#define  KD_INT   2
 
-typedef KDATA_T kdata_t;
+#define  KD_TYPE  KD_FLOAT
 
-//#if KDATA_T == int
+#if KD_TYPE == KD_INT
+typedef long kdata_t;
 //#  define KDATA_SCALE(x) ((int) (0.5+100000000*(x)))
 //#  define KDATA_INVSCALE(x) ((x)/100000000.)
-/*
-#  define KDATA_SCALE(x) ((int) (0.5+10000000*(x)))
-#  define KDATA_INVSCALE(x) ((x)/10000000.)
+#  define KDATA_SCALE(x) ((int) (0.5+100000000*(x)))
+#  define KDATA_INVSCALE(x) ((x)/100000000.)
 #  define KDATA_ABS(x)   abs(x)
 #else
-*/
+typedef float kdata_t;
 #  define KDATA_SCALE(x) (x)
 #  define KDATA_INVSCALE(x) (x)
 #  define KDATA_ABS(x)   fabs(x)
-//#endif
+#endif
 
 
 #define KD_MAX_DIM 3
