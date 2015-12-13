@@ -22,10 +22,29 @@
 #include <stdio.h>
 #include <string.h>
 
+#define  KDATA_T  float
+
+typedef KDATA_T kdata_t;
+
+//#if KDATA_T == int
+//#  define KDATA_SCALE(x) ((int) (0.5+100000000*(x)))
+//#  define KDATA_INVSCALE(x) ((x)/100000000.)
+/*
+#  define KDATA_SCALE(x) ((int) (0.5+10000000*(x)))
+#  define KDATA_INVSCALE(x) ((x)/10000000.)
+#  define KDATA_ABS(x)   abs(x)
+#else
+*/
+#  define KDATA_SCALE(x) (x)
+#  define KDATA_INVSCALE(x) (x)
+#  define KDATA_ABS(x)   fabs(x)
+//#endif
+
+
 #define KD_MAX_DIM 3
 
 typedef struct kd_point {
-    float point[KD_MAX_DIM];
+    kdata_t point[KD_MAX_DIM];
     unsigned index;
 } kd_point;
 
@@ -34,9 +53,9 @@ typedef struct kd_point {
  * \brief kd-tree node structure definition 
  */
 typedef struct kdNode {
-    float location[KD_MAX_DIM]; /*!<vector to the node's location */
-    float min[KD_MAX_DIM];      /*!<vector to the min coordinates of the hyperrectangle */
-    float max[KD_MAX_DIM];      /*!<vector to the max coordinates of the hyperrectangle */
+    kdata_t location[KD_MAX_DIM]; /*!<vector to the node's location */
+    kdata_t min[KD_MAX_DIM];      /*!<vector to the min coordinates of the hyperrectangle */
+    kdata_t max[KD_MAX_DIM];      /*!<vector to the max coordinates of the hyperrectangle */
     int split;                  /*!<axis along which the tree bifurcates */
     unsigned index;             /*!<optional index value */
     struct kdNode *left;        /*!<the left child of the tree node */
@@ -49,7 +68,7 @@ typedef struct kdNode {
  */
 typedef struct resItem {
     struct kdNode *node;        /*!<pointer to a kdNode */
-    float dist_sq;              /*!<distance squared as the priority */
+    kdata_t dist_sq;            /*!<distance squared as the priority */
 } resItem;
 
 /*!
@@ -71,8 +90,8 @@ typedef struct kd_thread_data {
     int max_threads;
     struct kd_point *points;
     unsigned long nPoints;
-    float min[KD_MAX_DIM];
-    float max[KD_MAX_DIM];
+    kdata_t min[KD_MAX_DIM];
+    kdata_t max[KD_MAX_DIM];
     int depth;
     int dim;
 } kd_thread_data;
@@ -94,14 +113,14 @@ struct resItem **pqpeek_max(struct pqueue *q, struct resItem **d);
 void *kd_malloc(size_t size, const char *msg);
 int kd_isleaf(struct kdNode *n);
 /* Cartesian */
-float kd_sqr(float a);
-float kd_min(float x, float y);
+kdata_t kd_sqr(kdata_t a);
+kdata_t kd_min(kdata_t x, kdata_t y);
 /* Spherical */
-float kd_sph_orth_dist(float *p1, float *p2, int split);
-float kd_sph_dist_sq(float *x, float *y);
-float kd_sph_dist(float *x, float *y);
-float kd_sph_bearing(float *p1, float *p2);
-float kd_sph_xtd(float *p1, float *p2, float *p3);
+kdata_t kd_sph_orth_dist(kdata_t *p1, kdata_t *p2, int split);
+kdata_t kd_sph_dist_sq(kdata_t *x, kdata_t *y);
+kdata_t kd_sph_dist(kdata_t *x, kdata_t *y);
+kdata_t kd_sph_bearing(kdata_t *p1, kdata_t *p2);
+kdata_t kd_sph_xtd(kdata_t *p1, kdata_t *p2, kdata_t *p3);
 
 /* helper functions for debugging */
 void kd_printNode(struct kdNode *node);
@@ -110,60 +129,60 @@ void kd_printTree(struct kdNode *node);
 /* Functions for building and destroying trees */
 void kd_freeNode(kdNode * node);
 struct kdNode *kd_allocNode(struct kd_point *points, unsigned long pivot,
-                            float *min, float *max, int dim, int axis);
+                            kdata_t *min, kdata_t *max, int dim, int axis);
 void kd_destroyTree(struct kdNode *node);
 struct kd_thread_data *kd_buildArg(struct kd_point *points,
                                    unsigned long nPoints,
-                                   float *min, float *max,
+                                   kdata_t *min, kdata_t *max,
                                    int depth, int max_threads,
                                    int dim);
 struct kdNode *kd_buildTree(struct kd_point *points, unsigned long nPoints,
-                            float *min, float *max, int dim, int max_threads);
+                            kdata_t *min, kdata_t *max, int dim, int max_threads);
 void *kd_doBuildTree(void *threadarg);
 struct kdNode *kd_sph_buildTree(struct kd_point *points,
                                 unsigned long nPoints,
-                                float *min, float *max,
+                                kdata_t *min, kdata_t *max,
                                 int max_threads);
 void *kd_sph_doBuildTree(void *threadarg);
 
 /* Functions for range searches 
  * Cartesian
  */
-int kd_isPointInRect(struct kdNode *node, float *min, float *max, int dim);
-int kd_isRectInRect(struct kdNode *node, float *min, float *max, int dim);
-int kd_rectOverlapsRect(struct kdNode *node, float *min, float *max, int dim);
-struct pqueue *kd_ortRangeSearch(struct kdNode *node, float *min, float *max,
+int kd_isPointInRect(struct kdNode *node, kdata_t *min, kdata_t *max, int dim);
+int kd_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max, int dim);
+int kd_rectOverlapsRect(struct kdNode *node, kdata_t *min, kdata_t *max, int dim);
+struct pqueue *kd_ortRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max,
                                  int dim);
-int kd_doOrtRangeSearch(struct kdNode *node, float *min, float *max, int dim,
+int kd_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max, int dim,
                         struct pqueue *res);
-struct kdNode *kd_nearest(struct kdNode *node, float *p, float *max_dist_sq,
+struct kdNode *kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                           int dim);
-struct pqueue *kd_qnearest(struct kdNode *node, float *p,
-                           float *max_dist_sq, unsigned int q, int dim);
-int kd_doQnearest(struct kdNode *node, float *p,
-                  float *max_dist_sq, unsigned int q, int dim,
+struct pqueue *kd_qnearest(struct kdNode *node, kdata_t *p,
+                           kdata_t *max_dist_sq, unsigned int q, int dim);
+int kd_doQnearest(struct kdNode *node, kdata_t *p,
+                  kdata_t *max_dist_sq, unsigned int q, int dim,
                   struct pqueue *res);
-struct pqueue *kd_range(struct kdNode *node, float *p, float *max_dist_sq,
+struct pqueue *kd_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                         int dim, int ordered);
-int kd_doRange(struct kdNode *node, float *p, float *max_dist_sq,
+int kd_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                int dim, struct pqueue *res, int ordered);
 /* spherical */
-int kd_sph_isPointInRect(struct kdNode *node, float *min, float *max);
-int kd_sph_isRectInRect(struct kdNode *node, float *min, float *max);
-int kd_sph_rectOverlapsRect(struct kdNode *node, float *min, float *max);
-struct pqueue *kd_sph_ortRangeSearch(struct kdNode *node, float *min,
-                                     float *max);
-int kd_sph_doOrtRangeSearch(struct kdNode *node, float *min, float *max,
+int kd_sph_isPointInRect(struct kdNode *node, kdata_t *min, kdata_t *max);
+int kd_sph_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max);
+int kd_sph_rectOverlapsRect(struct kdNode *node, kdata_t *min, kdata_t *max);
+struct pqueue *kd_sph_ortRangeSearch(struct kdNode *node, kdata_t *min,
+                                     kdata_t *max);
+int kd_sph_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max,
                             struct pqueue *res);
-struct kdNode *kd_sph_nearest(struct kdNode *node, float *p,
-                              float *max_dist_sq);
-struct pqueue *kd_sph_qnearest(struct kdNode *node, float *p,
-                               float *max_dist_sq, unsigned int q);
-int kd_sph_doQnearest(struct kdNode *node, float *p,
-                      float *max_dist_sq, unsigned int q, struct pqueue *res);
-struct pqueue *kd_sph_range(struct kdNode *node, float *p, float *max_dist_sq,
+struct kdNode *kd_sph_nearest(struct kdNode *node, kdata_t *p,
+                              kdata_t *max_dist_sq);
+struct pqueue *kd_sph_qnearest(struct kdNode *node, kdata_t *p,
+                               kdata_t *max_dist_sq, unsigned int q);
+int kd_sph_doQnearest(struct kdNode *node, kdata_t *p,
+                      kdata_t *max_dist_sq, unsigned int q, struct pqueue *res);
+struct pqueue *kd_sph_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                             int ordered);
-int kd_sph_doRange(struct kdNode *node, float *p, float *max_dist_sq,
+int kd_sph_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                    struct pqueue *res, int ordered);
 
 /* Functions for results heaps */

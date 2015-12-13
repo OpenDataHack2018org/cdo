@@ -11,11 +11,11 @@
    general utility functions 
 
    ********************************************************************* */
-inline float
-kd_sph_dist_sq(float *x, float *y)
+inline kdata_t
+kd_sph_dist_sq(kdata_t *x, kdata_t *y)
 {
-    float ds;
-    /*float arg;*/
+    kdata_t ds;
+    /*kdata_t arg;*/
 
     if (!x || !y)
         return -1;
@@ -29,10 +29,10 @@ kd_sph_dist_sq(float *x, float *y)
     return kd_sqr(ds);
 }
 
-inline float
-kd_sph_dist(float *x, float *y)
+inline kdata_t
+kd_sph_dist(kdata_t *x, kdata_t *y)
 {
-    float ds;
+    kdata_t ds;
 
     if (!x || !y)
         return -1;
@@ -42,10 +42,10 @@ kd_sph_dist(float *x, float *y)
     return ds;
 }
 
-float
-kd_sph_bearing(float *p1, float *p2)
+kdata_t
+kd_sph_bearing(kdata_t *p1, kdata_t *p2)
 {
-    float x, y;
+    kdata_t x, y;
     
     x = cos(p1[1]) * sin(p2[1]) - sin(p1[1]) * cos(p2[1]) * cos(p2[0] - p1[0]);
     y = sin(p2[0] - p1[0]) * cos(p2[1]);
@@ -62,10 +62,10 @@ kd_sph_bearing(float *p1, float *p2)
  *
  * \return distance of p3 from the great circle connecting p1 and p2. 
  */
-float 
-kd_sph_xtd(float *p1, float *p2, float *p3)
+kdata_t 
+kd_sph_xtd(kdata_t *p1, kdata_t *p2, kdata_t *p3)
 {
-    float d13, theta13, theta12;
+    kdata_t d13, theta13, theta12;
     
     d13 = kd_sph_dist(p1, p3);
     theta13 = kd_sph_bearing(p1, p3);
@@ -74,12 +74,12 @@ kd_sph_xtd(float *p1, float *p2, float *p3)
 }
 
 
-float
-kd_sph_orth_dist(float *p1, float *p2, int split)
+kdata_t
+kd_sph_orth_dist(kdata_t *p1, kdata_t *p2, int split)
 {
 
-    float ra2, dec2;
-    float dx;
+    kdata_t ra2, dec2;
+    kdata_t dx;
 
     if (split == 1) {
         ra2 = p1[0];
@@ -129,7 +129,7 @@ kd_sph_orth_dist(float *p1, float *p2, int split)
  */
 struct kdNode *
 kd_sph_buildTree(struct kd_point *points, unsigned long nPoints,
-                 float *min, float *max, int max_threads)
+                 kdata_t *min, kdata_t *max, int max_threads)
 {
     struct kd_thread_data *my_data;
     struct kdNode *tree;
@@ -154,7 +154,7 @@ kd_sph_buildTree(struct kd_point *points, unsigned long nPoints,
 /* Returns 1 if node is a point in the hyperrectangle defined by
    minimum and maximum vectors min and max. */
 int
-kd_sph_isPointInRect(struct kdNode *node, float *min, float *max)
+kd_sph_isPointInRect(struct kdNode *node, kdata_t *min, kdata_t *max)
 {
     if (node == NULL)
         return 0;
@@ -178,7 +178,7 @@ kd_sph_isPointInRect(struct kdNode *node, float *min, float *max)
    the HR described by the minimum and maximum vectors min and
    max. Returns 0 otherwise. */
 int
-kd_sph_isRectInRect(struct kdNode *node, float *min, float *max)
+kd_sph_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max)
 {
     if (node == NULL)
         return 0;
@@ -242,7 +242,7 @@ kd_sph_isRectInRect(struct kdNode *node, float *min, float *max)
    by the minimum and maximum vectors min and max. Returns 0
    otherwise. */
 int
-kd_sph_rectOverlapsRect(struct kdNode *node, float *min, float *max)
+kd_sph_rectOverlapsRect(struct kdNode *node, kdata_t *min, kdata_t *max)
 {
     if (node == NULL)
         return 0;
@@ -274,7 +274,7 @@ kd_sph_rectOverlapsRect(struct kdNode *node, float *min, float *max)
  * Rectangle must not cross the meridian!
 */
 struct pqueue *
-kd_sph_ortRangeSearch(struct kdNode *node, float *min, float *max)
+kd_sph_ortRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max)
 {
     struct pqueue *res;
     uint32_t i;
@@ -296,7 +296,7 @@ kd_sph_ortRangeSearch(struct kdNode *node, float *min, float *max)
 /* This is the orthogonal range search. Returns 1 if okay, 0 in case
    of problems. */
 int
-kd_sph_doOrtRangeSearch(struct kdNode *node, float *min, float *max,
+kd_sph_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max,
                         struct pqueue *res)
 {
 
@@ -342,11 +342,11 @@ kd_sph_doOrtRangeSearch(struct kdNode *node, float *min, float *max,
  * neigbor.
  */
 struct kdNode *
-kd_sph_nearest(struct kdNode *node, float *p, float *max_dist_sq)
+kd_sph_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq)
 {
     struct kdNode *nearer, *further, *nearest, *tmp, *tmp_nearest;
-    float dist_sq, tmp_dist_sq, dx;
-    float p1[2], p2[2];
+    kdata_t dist_sq, tmp_dist_sq, dx;
+    kdata_t p1[2], p2[2];
 
     if (!node)
         return NULL;
@@ -431,8 +431,8 @@ kd_sph_nearest(struct kdNode *node, float *p, float *max_dist_sq)
  * in case of problems.
  */
 struct pqueue *
-kd_sph_qnearest(struct kdNode *node, float *p,
-                float *max_dist_sq, unsigned int q)
+kd_sph_qnearest(struct kdNode *node, kdata_t *p,
+                kdata_t *max_dist_sq, unsigned int q)
 {
     struct pqueue *res;
     uint32_t i;
@@ -460,13 +460,13 @@ kd_sph_qnearest(struct kdNode *node, float *p,
  * return 1 if okay, zero in case of problems
  */
 int
-kd_sph_doQnearest(struct kdNode *node, float *p, float *max_dist_sq,
+kd_sph_doQnearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                   unsigned int q, struct pqueue *res)
 {
     struct kdNode *nearer, *further;
     struct resItem *point, *item;
-    float dist_sq, dx;
-    float p1[2], p2[2];
+    kdata_t dist_sq, dx;
+    kdata_t p1[2], p2[2];
 
     if (!node)
         return 1;
@@ -585,7 +585,7 @@ kd_sph_doQnearest(struct kdNode *node, float *p, float *max_dist_sq,
  * NULL in case of problems.
  */
 struct pqueue *
-kd_sph_range(struct kdNode *node, float *p, float *max_dist_sq, int ordered)
+kd_sph_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int ordered)
 {
     struct pqueue *res;
     uint32_t i;
@@ -606,14 +606,14 @@ kd_sph_range(struct kdNode *node, float *p, float *max_dist_sq, int ordered)
 
 /* This is the range search. Returns 1 if okay, 0 in case of problems */
 int
-kd_sph_doRange(struct kdNode *node, float *p, float *max_dist_sq,
+kd_sph_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
                struct pqueue *res, int ordered)
 {
 
     struct kdNode *nearer, *further;
     struct resItem *point;
-    float dist_sq, dx;
-    float p1[2], p2[2];
+    kdata_t dist_sq, dx;
+    kdata_t p1[2], p2[2];
 
     if (!node)
         return 1;

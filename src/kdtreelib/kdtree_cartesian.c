@@ -15,24 +15,23 @@
 
    ********************************************************************* */
 
-
 static
-float square(const float x)
+kdata_t square(const kdata_t x)
 {
   return x*x;
 }
 
 static
-float kd_dist_sq(const float *restrict a, const float *restrict b, int dim)
+kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b, int dim)
 {
   return (square((a[0]-b[0]))+square((a[1]-b[1]))+square((a[2]-b[2])));
 }
 
-inline float
-kd_dist_sq_ori(float *x, float *y, int dim)
+inline kdata_t
+kd_dist_sq_ori(kdata_t *x, kdata_t *y, int dim)
 {
     int i;
-    float dsq = 0;
+    kdata_t dsq = 0;
 
     if (!x || !y)
         return -1;
@@ -42,8 +41,8 @@ kd_dist_sq_ori(float *x, float *y, int dim)
     return dsq;
 }
 
-inline float
-kd_min(float x, float y)
+inline kdata_t
+kd_min(kdata_t x, kdata_t y)
 {
     return x < y ? x : y;
 }
@@ -86,7 +85,7 @@ kd_min(float x, float y)
  */
 struct kdNode *
 kd_buildTree(struct kd_point *points, unsigned long nPoints,
-             float *min, float *max, int dim, int max_threads)
+             kdata_t *min, kdata_t *max, int dim, int max_threads)
 {
     struct kd_thread_data *my_data;
     struct kdNode *tree;
@@ -108,7 +107,7 @@ kd_buildTree(struct kd_point *points, unsigned long nPoints,
 /* Returns 1 if node is a point in the hyperrectangle defined by
    minimum and maximum vectors min and max. */
 int
-kd_isPointInRect(struct kdNode *node, float *min, float *max, int dim)
+kd_isPointInRect(struct kdNode *node, kdata_t *min, kdata_t *max, int dim)
 {
     int i;
 
@@ -126,7 +125,7 @@ kd_isPointInRect(struct kdNode *node, float *min, float *max, int dim)
    the HR described by the minimum and maximum vectors min and
    max. Returns 0 otherwise. */
 int
-kd_isRectInRect(struct kdNode *node, float *min, float *max, int dim)
+kd_isRectInRect(struct kdNode *node, kdata_t *min, kdata_t *max, int dim)
 {
     int i;
 
@@ -144,7 +143,7 @@ kd_isRectInRect(struct kdNode *node, float *min, float *max, int dim)
    the minimum and maximum vectors min and max. Returns 0
    otherwise. */
 int
-kd_rectOverlapsRect(struct kdNode *node, float *min, float *max, int dim)
+kd_rectOverlapsRect(struct kdNode *node, kdata_t *min, kdata_t *max, int dim)
 {
     int i;
 
@@ -175,7 +174,7 @@ kd_rectOverlapsRect(struct kdNode *node, float *min, float *max, int dim)
  * \return  Pointer to a priority queue, NULL in case of problems.
 */
 struct pqueue *
-kd_ortRangeSearch(struct kdNode *node, float *min, float *max, int dim)
+kd_ortRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max, int dim)
 {
     struct pqueue *res;
     uint32_t i;
@@ -196,7 +195,7 @@ kd_ortRangeSearch(struct kdNode *node, float *min, float *max, int dim)
 /* This is the orthogonal range search. Returns 1 if okay, 0 in case
    of problems. */
 int
-kd_doOrtRangeSearch(struct kdNode *node, float *min, float *max,
+kd_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max,
                     int dim, struct pqueue *res)
 {
 
@@ -243,10 +242,10 @@ kd_doOrtRangeSearch(struct kdNode *node, float *min, float *max,
  * neigbor.
  */
 struct kdNode *
-kd_nearest(struct kdNode *node, float *p, float *max_dist_sq, int dim)
+kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int dim)
 {
     struct kdNode *nearer, *further, *nearest = NULL, *tmp, *tmp_nearest;
-    float dist_sq, tmp_dist_sq, dx;
+    kdata_t dist_sq, tmp_dist_sq, dx;
 
     if (!node)
         return NULL;
@@ -271,8 +270,8 @@ kd_nearest(struct kdNode *node, float *p, float *max_dist_sq, int dim)
     if (!further)
         return nearest;
 
-    dx = kd_min(fabs(p[node->split] - further->min[node->split]),
-                fabs(p[node->split] - further->max[node->split]));
+    dx = kd_min(KDATA_ABS(p[node->split] - further->min[node->split]),
+                KDATA_ABS(p[node->split] - further->max[node->split]));
     if (*max_dist_sq > kd_sqr(dx)) {
         /*
          * some part of the further hyper-rectangle is in the search
@@ -318,8 +317,8 @@ kd_nearest(struct kdNode *node, float *p, float *max_dist_sq, int dim)
  * in case of problems.
  */
 struct pqueue *
-kd_qnearest(struct kdNode *node, float *p,
-            float *max_dist_sq, unsigned int q, int dim)
+kd_qnearest(struct kdNode *node, kdata_t *p,
+            kdata_t *max_dist_sq, unsigned int q, int dim)
 {
     struct pqueue *res;
     uint32_t i;
@@ -348,11 +347,11 @@ kd_qnearest(struct kdNode *node, float *p,
  */
 // Uwe Schulzweida: extract kd_check_dist() from kd_doQnearest()
 static int
-kd_check_dist(struct kdNode *node, float *p,
-              float *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
+kd_check_dist(struct kdNode *node, kdata_t *p,
+              kdata_t *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
 {
     struct resItem *point, *item;
-    float dist_sq;
+    kdata_t dist_sq;
 
     dist_sq = kd_dist_sq(node->location, p, dim);
     if (dist_sq < *max_dist_sq && kd_isleaf(node)) {
@@ -395,11 +394,11 @@ kd_check_dist(struct kdNode *node, float *p,
 }
 
 int
-kd_doQnearest(struct kdNode *node, float *p,
-              float *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
+kd_doQnearest(struct kdNode *node, kdata_t *p,
+              kdata_t *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
 {
     struct kdNode *nearer, *further;
-    float dx;
+    kdata_t dx;
 
     if (!node) return 1;
 
@@ -416,8 +415,8 @@ kd_doQnearest(struct kdNode *node, float *p,
 
     if (!further) return 1;
 
-    dx = kd_min(fabs(p[node->split] - further->min[node->split]),
-                fabs(p[node->split] - further->max[node->split]));
+    dx = kd_min(KDATA_ABS(p[node->split] - further->min[node->split]),
+                KDATA_ABS(p[node->split] - further->max[node->split]));
     if (*max_dist_sq > kd_sqr(dx)) {
         /*
          * some part of the further hyper-rectangle is in the search
@@ -448,7 +447,7 @@ kd_doQnearest(struct kdNode *node, float *p,
  * NULL in case of problems.
  */
 struct pqueue *
-kd_range(struct kdNode *node, float *p, float *max_dist_sq,
+kd_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
          int dim, int ordered)
 {
     struct pqueue *res;
@@ -470,13 +469,13 @@ kd_range(struct kdNode *node, float *p, float *max_dist_sq,
 
 /* This is the range search. Returns 1 if okay, 0 in case of problems */
 int
-kd_doRange(struct kdNode *node, float *p, float *max_dist_sq,
+kd_doRange(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
            int dim, struct pqueue *res, int ordered)
 {
 
     struct kdNode *nearer, *further;
     struct resItem *point;
-    float dist_sq, dx;
+    kdata_t dist_sq, dx;
 
     if (!node)
         return 1;
@@ -504,8 +503,8 @@ kd_doRange(struct kdNode *node, float *p, float *max_dist_sq,
     if (!further)
         return 1;
 
-    dx = kd_min(fabs(p[node->split] - further->min[node->split]),
-                fabs(p[node->split] - further->max[node->split]));
+    dx = kd_min(KDATA_ABS(p[node->split] - further->min[node->split]),
+                KDATA_ABS(p[node->split] - further->max[node->split]));
     if (*max_dist_sq > kd_sqr(dx)) {
         /*
          * some part of the further hyper-rectangle is in the search

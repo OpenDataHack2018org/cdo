@@ -27,10 +27,10 @@ kd_malloc(size_t size, const char *msg)
     return ptr;
 }
 
-float
-kd_sqr(float x)
+kdata_t
+kd_sqr(kdata_t x)
 {
-    return x == 0.0 ? 0.0 : x * x;
+    return x == 0 ? 0 : x * x;
 }
 
 int
@@ -143,11 +143,11 @@ kd_doBuildTree(void *threadarg)
 {
     int sortaxis;
     unsigned long pivot;
-    float tmpMinLeft[KD_MAX_DIM], tmpMaxLeft[KD_MAX_DIM], tmpMinRight[KD_MAX_DIM], tmpMaxRight[KD_MAX_DIM];
+    kdata_t tmpMinLeft[KD_MAX_DIM], tmpMaxLeft[KD_MAX_DIM], tmpMinRight[KD_MAX_DIM], tmpMaxRight[KD_MAX_DIM];
     struct kdNode *node;
     struct kd_point *points;
     unsigned long nPoints;
-    float *min, *max;
+    kdata_t *min, *max;
     int depth, dim, max_threads;
     pthread_t threads[2];
     pthread_attr_t attr;
@@ -189,8 +189,8 @@ kd_doBuildTree(void *threadarg)
     if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)
         return NULL;
 
-    memcpy(tmpMinLeft, min, dim * sizeof(float));
-    memcpy(tmpMaxLeft, max, dim * sizeof(float));
+    memcpy(tmpMinLeft, min, dim * sizeof(kdata_t));
+    memcpy(tmpMaxLeft, max, dim * sizeof(kdata_t));
     tmpMaxLeft[sortaxis] = node->location[sortaxis];
     argleft =
         kd_buildArg(points, pivot, tmpMinLeft, tmpMaxLeft,
@@ -210,8 +210,8 @@ kd_doBuildTree(void *threadarg)
         }
     }
 
-    memcpy(tmpMinRight, min, dim * sizeof(float));
-    memcpy(tmpMaxRight, max, dim * sizeof(float));
+    memcpy(tmpMinRight, min, dim * sizeof(kdata_t));
+    memcpy(tmpMaxRight, max, dim * sizeof(kdata_t));
     tmpMinRight[sortaxis] = node->location[sortaxis];
     argright = kd_buildArg(&points[pivot], nPoints - pivot,
                            tmpMinRight, tmpMaxRight, depth + 1,
@@ -255,7 +255,7 @@ kd_freeNode(kdNode *node)
 struct kd_thread_data *
 kd_buildArg(struct kd_point *points,
             unsigned long nPoints,
-            float *min, float *max,
+            kdata_t *min, kdata_t *max,
             int depth, int max_threads, int dim)
 {
     struct kd_thread_data *d;
@@ -264,8 +264,8 @@ kd_buildArg(struct kd_point *points,
         return NULL;
     d->points = points;
     d->nPoints = nPoints;
-    memcpy(d->min, min, dim*sizeof(float));
-    memcpy(d->max, max, dim*sizeof(float));
+    memcpy(d->min, min, dim*sizeof(kdata_t));
+    memcpy(d->max, max, dim*sizeof(kdata_t));
     d->depth = depth;
     d->max_threads = max_threads;
     d->dim = dim;
@@ -275,16 +275,16 @@ kd_buildArg(struct kd_point *points,
 
 struct kdNode *
 kd_allocNode(struct kd_point *points, unsigned long pivot,
-             float *min, float *max, int axis, int dim)
+             kdata_t *min, kdata_t *max, int axis, int dim)
 {
     struct kdNode *node;
 
     if ((node = (kdNode *)kd_malloc(sizeof(kdNode), "kd_allocNode (node): ")) == NULL)
         return NULL;
     node->split = axis;
-    memcpy(node->location, points[pivot].point, dim * sizeof(float));
-    memcpy(node->min, min, dim * sizeof(float));
-    memcpy(node->max, max, dim * sizeof(float));
+    memcpy(node->location, points[pivot].point, dim * sizeof(kdata_t));
+    memcpy(node->min, min, dim * sizeof(kdata_t));
+    memcpy(node->max, max, dim * sizeof(kdata_t));
     node->left = node->right = NULL;
     node->index = 0;
     return node;
