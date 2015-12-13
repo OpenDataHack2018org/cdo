@@ -30,13 +30,10 @@ kdata_t kd_dist_sq(const kdata_t *restrict a, const kdata_t *restrict b, int dim
 inline kdata_t
 kd_dist_sq_ori(kdata_t *x, kdata_t *y, int dim)
 {
-    int i;
+    if (!x || !y) return -1;
+
     kdata_t dsq = 0;
-
-    if (!x || !y)
-        return -1;
-
-    for(i = 0; i < dim; i++)
+    for(int i = 0; i < dim; i++)
         dsq += kd_sqr(x[i] - y[i]);
     return dsq;
 }

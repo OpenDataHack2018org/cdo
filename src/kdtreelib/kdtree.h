@@ -29,7 +29,7 @@
 
 #if KD_TYPE == KD_INT
 typedef int kdata_t;
-#  define KDATA_SFAC     100000000.
+#  define KDATA_SFAC     20000.
 #  define KDATA_SCALE(x) ((int) (0.5+KDATA_SFAC*(x)))
 #  define KDATA_INVSCALE(x) ((x)/KDATA_SFAC)
 #  define KDATA_ABS(x)   abs(x)
@@ -53,13 +53,13 @@ typedef struct kd_point {
  * \brief kd-tree node structure definition 
  */
 typedef struct kdNode {
+    struct kdNode *left;          /*!<the left child of the tree node */
+    struct kdNode *right;         /*!<the right child of the tree node */
     kdata_t location[KD_MAX_DIM]; /*!<vector to the node's location */
     kdata_t min[KD_MAX_DIM];      /*!<vector to the min coordinates of the hyperrectangle */
     kdata_t max[KD_MAX_DIM];      /*!<vector to the max coordinates of the hyperrectangle */
-    int split;                  /*!<axis along which the tree bifurcates */
-    unsigned index;             /*!<optional index value */
-    struct kdNode *left;        /*!<the left child of the tree node */
-    struct kdNode *right;       /*!<the right child of the tree node */
+    int split;                    /*!<axis along which the tree bifurcates */
+    unsigned index;               /*!<optional index value */
 } kdNode;
 
 /*!
@@ -76,10 +76,10 @@ typedef struct resItem {
  * \brief priority queue (min-max heap)
  */
 typedef struct pqueue {
+    struct resItem **d;         /*!<pointer to an array of result items */
     uint32_t size;              /*!<current length of the queue */
     uint32_t avail;             /*!<currently allocated queue elements */
     uint32_t step;              /*!<step size in which new elements are allocated */
-    struct resItem **d;         /*!<pointer to an array of result items */
 } pqueue;
 
 /*!
@@ -87,11 +87,11 @@ typedef struct pqueue {
  * \brief arguments passed to the threaded kd-Tree construction
  */
 typedef struct kd_thread_data {
-    int max_threads;
     struct kd_point *points;
-    unsigned long nPoints;
     kdata_t min[KD_MAX_DIM];
     kdata_t max[KD_MAX_DIM];
+    unsigned long nPoints;
+    int max_threads;
     int depth;
     int dim;
 } kd_thread_data;

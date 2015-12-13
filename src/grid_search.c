@@ -31,6 +31,14 @@ static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
    xyz[2] = sin(lat);
 }
 
+static inline void LLtoXYZ_kd(double lon, double lat, kdata_t *restrict xyz)
+{
+   double cos_lat = cos(lat);
+   xyz[0] = KDATA_SCALE(cos_lat * cos(lon));
+   xyz[1] = KDATA_SCALE(cos_lat * sin(lon));
+   xyz[2] = KDATA_SCALE(sin(lat));
+}
+
 static
 float square(const float x)
 {
@@ -106,17 +114,17 @@ struct kdNode *gs_create_kdtree(unsigned n, const double *restrict lons, const d
   struct kd_point *pointlist = (struct kd_point *) Malloc(n * sizeof(struct kd_point));  
   // see  example_cartesian.c
   if ( cdoVerbose ) printf("kdtree lib init 3D: n=%d  nthreads=%d\n", n, ompNumThreads);
-  float min[3], max[3];
+  kdata_t min[3], max[3];
   min[0] = min[1] = min[2] =  1e9;
   max[0] = max[1] = max[2] = -1e9;
-  float *restrict point;
+  kdata_t *restrict point;
 #if defined(HAVE_OPENMP4)
 #pragma omp simd
 #endif
   for ( unsigned i = 0; i < n; i++ ) 
     {
       point = pointlist[i].point;
-      LLtoXYZ_f(lons[i], lats[i], point);
+      LLtoXYZ_kd(lons[i], lats[i], point);
       for ( unsigned j = 0; j < 3; ++j )
         {
           min[j] = point[j] < min[j] ? point[j] : min[j];
@@ -298,15 +306,16 @@ kdNode *gs_nearest_kdtree(kdNode *kdt, double lon, double lat, double *prange)
   if ( kdt == NULL ) return NULL;
   
   float range0 = gs_set_range(prange);
-  float range = range0;
+  kdata_t range = KDATA_SCALE(range0);
 
-  float point[3];
-  LLtoXYZ_f(lon, lat, point);
+  kdata_t point[3];
+  LLtoXYZ_kd(lon, lat, point);
 
   kdNode *node = kd_nearest(kdt, point, &range, 3);
 
-  if ( !(range < range0) ) node = NULL;
-  if ( prange ) *prange = range;
+  float frange = KDATA_INVSCALE(range);
+  if ( !(frange < range0) ) node = NULL;
+  if ( prange ) *prange = frange;
 
   return node;
 }
@@ -422,19 +431,20 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
 {
   if ( gs->kdt == NULL ) return NULL;
   
-  float point[3];
+  kdata_t point[3];
   float range0 = gs_set_range(prange);
-  float range = range0;
+  kdata_t range = KDATA_SCALE(range0);
   struct pqueue *result = NULL;
 
-  LLtoXYZ_f(lon, lat, point);
+  LLtoXYZ_kd(lon, lat, point);
 
   if ( gs )
     {
       result = kd_qnearest(gs->kdt, point, &range, nnn, 3);
       // printf("range %g %g %g %p\n", lon, lat, range, node);
 
-      if ( !(range < range0) )
+      float frange = KDATA_INVSCALE(range);
+      if ( !(frange < range0) )
         {
           if ( result )
             {
@@ -445,7 +455,7 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
             }
           result = NULL;
         }
-      if ( prange ) *prange = range;
+      if ( prange ) *prange = frange;
     }
   
   return result;
