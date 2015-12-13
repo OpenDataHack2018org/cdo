@@ -730,7 +730,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   int max_num_cell_corners = src_num_cell_corners;
   if ( tgt_num_cell_corners > max_num_cell_corners ) max_num_cell_corners = tgt_num_cell_corners;
 
-  enum yac_edge_type great_circle_type[32];
+  enum yac_edge_type great_circle_type[max_num_cell_corners];
   for ( int i = 0; i < max_num_cell_corners; ++i ) great_circle_type[i] = GREAT_CIRCLE;
 
   enum yac_edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
@@ -759,7 +759,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   if ( !(tgt_num_cell_corners < 4 || target_cell_type == LON_LAT_CELL) )
     {
       if ( tgt_grid->cell_center_lon == NULL || tgt_grid->cell_center_lat == NULL )
-	cdoAbort("Internal problem (remap_weights_conserv): missing target point coordinates!");
+	cdoAbort("Internal problem (%s): missing target point coordinates!", __func__);
     }
 
 
@@ -812,7 +812,7 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(dynamic) default(none)                   \
   shared(ompNumThreads, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box, \
-	 src_edge_type, tgt_edge_type, rv, cdoVerbose, tgt_num_cell_corners, target_cell_type, \
+	 rv, cdoVerbose, tgt_num_cell_corners, target_cell_type, \
          weightlinks,  srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
 	 search, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2)
 #endif
