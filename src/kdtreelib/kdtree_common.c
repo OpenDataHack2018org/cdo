@@ -93,15 +93,10 @@ _compPoints0(const void *p1, const void *p2)
     struct kd_point *a = (struct kd_point *) p1;
     struct kd_point *b = (struct kd_point *) p2;
 
-    if      (a->point[0] > b->point[0]) return  1;
-    else if (a->point[0] < b->point[0]) return -1;
-    else
-      {
-        if      ( a->index > b->index ) return  1;
-        else if ( a->index < b->index ) return -1;
+    int ret = (a->point[0] > b->point[0]) ? 1 : (a->point[0] < b->point[0]) ? -1 : 0;
+    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
 
-        return 0;
-      }
+    return ret;
 }
 
 static int
@@ -110,15 +105,10 @@ _compPoints1(const void *p1, const void *p2)
     struct kd_point *a = (struct kd_point *) p1;
     struct kd_point *b = (struct kd_point *) p2;
 
-    if      (a->point[1] > b->point[1]) return  1;
-    else if (a->point[1] < b->point[1]) return -1;
-    else
-      {
-        if      ( a->index > b->index ) return  1;
-        else if ( a->index < b->index ) return -1;
+    int ret = (a->point[1] > b->point[1]) ? 1 : (a->point[1] < b->point[1]) ? -1 : 0;
+    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
 
-        return 0;
-      }
+    return ret;
 }
 
 static int
@@ -127,15 +117,10 @@ _compPoints2(const void *p1, const void *p2)
     struct kd_point *a = (struct kd_point *) p1;
     struct kd_point *b = (struct kd_point *) p2;
 
-    if      (a->point[2] > b->point[2]) return  1;
-    else if (a->point[2] < b->point[2]) return -1;
-    else
-      {
-        if      ( a->index > b->index ) return  1;
-        else if ( a->index < b->index ) return -1;
+    int ret = (a->point[2] > b->point[2]) ? 1 : (a->point[2] < b->point[2]) ? -1 : 0;
+    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
 
-        return 0;
-      }
+    return ret;
 }
 
 void *
