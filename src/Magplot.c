@@ -253,10 +253,10 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   /*mag_setr ("map_label_height",0.5);*/
   mag_setr ("map_label_height",0.4);
 
-
   /* define the contouring parameters */
   if ( operatorID == SHADED )
     {
+      printf("shaded\n");
 
       mag_setc ( "contour", "off" );
       mag_setc ( "contour_shade", "on" );
@@ -355,7 +355,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
     }
   else if ( operatorID == CONTOUR )
     {
-
+      printf("contour\n");
       mag_setc ("contour",                  "on");
       mag_setc ("contour_shade",            "off");
       mag_setc ("contour_label",            "on");
@@ -590,12 +590,12 @@ void *Magplot(void *argument)
   int nparam = operatorArgc();
   char **pnames = operatorArgv();
   
-  int CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
-  int SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
-  int GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
+  CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
+  SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
+  GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
 
   int operatorID = cdoOperatorID();
-  
+
   if( nparam )
     {
       if( DBG )
