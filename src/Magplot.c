@@ -230,11 +230,9 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   /* magics_template_parser( magics_node ); */
   /* results_template_parser(results_node, varname ); */
 
-
   /* set up the coastline attributes */
   /* mag_setc ("map_coastline_colour", "khaki"); */
   /* mag_setc ("map_grid_colour",      "grey");  */ 
-
 
   /* Parameters common to all operators */
   if( DEVICE )                                
@@ -247,7 +245,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       mag_setc ( "subpage_map_projection", PROJECTION );
     }
 
-
   mag_seti ("map_label_latitude_frequency",2);
   mag_seti ("map_label_longitude_frequency",2);
   /*mag_setr ("map_label_height",0.5);*/
@@ -256,13 +253,10 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   /* define the contouring parameters */
   if ( operatorID == SHADED )
     {
-      printf("shaded\n");
-
       mag_setc ( "contour", "off" );
       mag_setc ( "contour_shade", "on" );
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );
-
 
       if( LAT_MIN < 1.0e+200  )
         {
@@ -355,13 +349,11 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
     }
   else if ( operatorID == CONTOUR )
     {
-      printf("contour\n");
       mag_setc ("contour",                  "on");
       mag_setc ("contour_shade",            "off");
       mag_setc ("contour_label",            "on");
       mag_setc ("contour_highlight",        "off");
       
-    
       if( LAT_MIN < 1.0e+200  )
         {
 	   mag_setr( "subpage_lower_left_latitude", LAT_MIN );
@@ -422,7 +414,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
     }
   else if ( operatorID == GRFILL )
     {
-
       mag_setc ( "contour", "off" );
       mag_setc ( "contour_shade", "on" );
 
@@ -546,10 +537,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   mag_setc("text_justification", "left");
   mag_text();
 
-  if( LEV_LIST ) 
-    Free(LEV_LIST);
-
-
+  if ( LEV_LIST ) Free(LEV_LIST);
 }
 
 
@@ -569,11 +557,9 @@ void init_MAGICS( )
 static
 void quit_MAGICS( )
 {
-
   mag_close ();
   if( DBG )
     fprintf( stderr,"Exiting From MAGICS\n" );
-
 }
 
 void *Magplot(void *argument)
