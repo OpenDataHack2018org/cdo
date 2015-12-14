@@ -214,19 +214,20 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   /* Set the input data arrays to magics++ */
    
   mag_set2r("input_field", array, nlon, nlat);
-  /*
+  /*  
   mag_setc("input_field_organization", "NONREGULAR");
   mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
   mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
   */
   mag_setc("input_field_organization", "REGULAR");
+  // mag_setc("input_field_organization", "GAUSSIAN");
 
   mag_setr("input_field_initial_latitude", grid_center_lat[0]);
   mag_setr("input_field_latitude_step", dlat);
 
   mag_setr("input_field_initial_longitude", grid_center_lon[0]);
   mag_setr("input_field_longitude_step", dlon);
-
+  
   /* magics_template_parser( magics_node ); */
   /* results_template_parser(results_node, varname ); */
 
@@ -417,7 +418,8 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       mag_setc ( "contour", "off" );
       mag_setc ( "contour_shade", "on" );
 
-      mag_setc ( "contour_shade_technique", "cell_shading" );
+      // mag_setc ( "contour_shade_technique", "cell_shading" );
+      mag_setc ( "contour_shade_technique", "grid_shading" );
 
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );

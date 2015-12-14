@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
 
+2015-12-14  Uwe Schulzweida
+
+	* grfill: changed contour_shade_technique from cell_shading to grid_shading
+
 2015-12-10  Uwe Schulzweida
 
 	* Select: added parameter grid and gridname
