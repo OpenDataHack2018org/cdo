@@ -24,7 +24,7 @@
       Exprf      aexprf          Append evaluated expressions from script file
 */
 /*
-Operatoren: +, -, *, \, ^
+Operatoren: +, -, *, \, ^, ==, !=, >, <, >=, <=, <=>, &&, ||, ?:
 Functions: sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
 Functions: min, max, avg, std, var
 Constansts: M_PI, M_E
@@ -43,21 +43,18 @@ Constansts: M_PI, M_E
 
 void *Expr(void *argument)
 {
-  int operatorID;
   char *exprs = NULL;
   const char *exprf = NULL;
-  int streamID1, streamID2 = CDI_UNDEFID;
   int offset;
-  int nrecs, nvars, nvars1, nvars2;
+  int nrecs, nvars;
   int gridID, zaxisID;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int gridsize, nlevel;
+  int recID, varID, levelID;
+  int vlistID2;
+  int gridsize;
+  int nlevel;
   int nmiss;
-  int taxisID1, taxisID2;
   //int lwarn = TRUE;
   double missval;
-  double *array = NULL;
   double *single1, *single2;
   parse_parm_t parse_arg;
   void *scanner;
@@ -69,23 +66,21 @@ void *Expr(void *argument)
   yyset_extra(&parse_arg, scanner);
 
 
-# define REPLACES_VARIABLES(id) cdoOperatorF1(id)
-# define READS_COMMAND_LINE(id) cdoOperatorF2(id)
+#define REPLACES_VARIABLES(id) cdoOperatorF1(id)
+#define READS_COMMAND_LINE(id) cdoOperatorF2(id)
 
   cdoOperatorAdd("expr",   1, 1, "expressions");
   cdoOperatorAdd("exprf",  1, 0, "expr script filename");
   cdoOperatorAdd("aexpr",  0, 1, "expressions");
   cdoOperatorAdd("aexprf", 0, 0, "expr script filename");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
   if ( READS_COMMAND_LINE(operatorID) )
     {
-      size_t slen;
-
-      slen = strlen(operatorArgv()[0]);
+      size_t slen = strlen(operatorArgv()[0]);
       exprs = (char*) Malloc(slen+2);
       strcpy(exprs, operatorArgv()[0]);
       if ( exprs[slen-1] != ';' )
@@ -96,25 +91,22 @@ void *Expr(void *argument)
     }
   else
     {
-      int ichar, ipos = 0;
-      FILE *fp;
-      size_t fsize;
-      struct stat filestat;
-
       exprf = operatorArgv()[0];
 
       /* Open script file for reading */
-      if( (fp = fopen(exprf, "r")) == NULL ) cdoAbort("Open failed on %s", exprf);
+      FILE *fp = fopen(exprf, "r");
+      if( fp == NULL ) cdoAbort("Open failed on %s", exprf);
 
+      struct stat filestat;
       if ( stat(exprf, &filestat) != 0 ) cdoAbort("Stat failed on %s", exprf);
 
-      fsize = (size_t) filestat.st_size;
+      size_t fsize = (size_t) filestat.st_size;
       exprs = (char*) Malloc(fsize+1);
 
+      int ichar, ipos = 0;
       while ( (ichar = fgetc(fp)) != EOF ) exprs[ipos++] = ichar;
 
       exprs[ipos] = 0;
-
       if ( ipos == 0 ) cdoAbort("%s is empty!", exprf);
 
       fclose(fp);
@@ -123,11 +115,11 @@ void *Expr(void *argument)
   if ( cdoVerbose ) cdoPrint(exprs);
 
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  nvars1 = vlistNvars(vlistID1);
+  int nvars1 = vlistNvars(vlistID1);
 
   if ( REPLACES_VARIABLES(operatorID) )
     {
@@ -159,7 +151,7 @@ void *Expr(void *argument)
 
   parse_arg.init = 0;
 
-  nvars2 = vlistNvars(vlistID2);
+  int nvars2 = vlistNvars(vlistID2);
   if ( nvars2 == 0 ) cdoAbort("No output variable found!");
 
   if ( cdoVerbose ) vlistPrint(vlistID2);
@@ -169,11 +161,11 @@ void *Expr(void *argument)
       if ( parse_arg.var_needed[varID] )
 	printf("Needed var: %d %s\n", varID, parse_arg.var[varID]);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
@@ -210,9 +202,9 @@ void *Expr(void *argument)
     }
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
