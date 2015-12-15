@@ -4271,7 +4271,7 @@ static const char *AfterburnerHelp[] = {
     "    after - ECHAM standard post processor",
     "",
     "SYNOPSIS",
-    "    after  ifiles ofile",
+    "    after[,vct]  ifiles ofile",
     "",
     "DESCRIPTION",
     "    The \"afterburner\" is the standard post processor for ECHAM data which provides the following operations:",
@@ -4356,6 +4356,9 @@ static const char *AfterburnerHelp[] = {
     "        0/10/11  & 152  LnPs               &  0",
     "        0/10/11  & 155  divergence         &  0",
     "         >11     & all codes               &  0/1",
+    "",
+    "PARAMETER",
+    "    vct  STRING  File with VCT in ASCII format",
     NULL
 };
 

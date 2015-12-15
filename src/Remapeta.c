@@ -35,11 +35,9 @@
 static 
 void setmissval(long nvals, int *imiss, double missval, double *array)
 {
-  long i;
-
   if ( imiss )
     {
-      for ( i = 0; i < nvals; ++i )
+      for ( long i = 0; i < nvals; ++i )
 	if ( imiss[i] ) array[i] = missval;
     }
 }
@@ -115,8 +113,7 @@ double *vctFromFile(const char *filename, int *nvct)
 
   while ( readline(fp, line, 1024) )
     {
-      if ( line[0] == '#' ) continue;
-      if ( line[0] == '\0' ) continue;
+      if ( line[0] == '#' || line[0] == '\0' ) continue;
 
       pline = line;
       num = (int) strtod(pline, &pline);

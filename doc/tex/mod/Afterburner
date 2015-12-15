@@ -10,6 +10,7 @@
 
 @BeginOperator_after
 @Title     = ECHAM standard post processor
+@Parameter = [vct]
 
 @BeginDescription
 The "afterburner" is the standard post processor for @cite{ECHAM} data which provides the following operations:
@@ -26,6 +27,7 @@ This operator reads selection parameters as namelist from stdin.
 Use the UNIX redirection "<namelistfile" to read the namelist from file.
 @EndDescription
 @EndOperator
+
 
 @BeginNamelist
 Namelist parameter and there defaults:
@@ -107,6 +109,13 @@ Possible combinations of TYPE, CODE and MEAN:
      >11     & all codes               &  0/1
 @EndTable
 @EndNamelist
+
+
+@BeginParameter
+@Item = vct
+STRING  File with VCT in ASCII format
+@EndParameter
+
 
 @BeginExample
 To interpolate ECHAM hybrid model level data to pressure levels of 925, 850, 500 and 200 hPa, use:

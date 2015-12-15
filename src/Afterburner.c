@@ -1170,6 +1170,7 @@ void after_checkNamelist(struct Control *globs)
     }
 }
 
+#if defined(AFTERBURNER)
 static
 void after_usage(void)
 {
@@ -1198,6 +1199,7 @@ void after_usage(void)
 
   exit(1);
 }
+#endif
 
 static
 void after_parini(struct Control *globs, struct Variable *vars)
@@ -1208,7 +1210,7 @@ void after_parini(struct Control *globs, struct Variable *vars)
     {
 #if defined(CDO)
       fprintf(stderr, "Default namelist: \n");
-      fprintf(stderr, "  TYPE = 0, CODE = -1, LEVEL = -1, MULTI = 0, DAYIN = 30, MEAN = 0, TIMESEL = -1, UNITSEL = 0\n");
+      fprintf(stderr, "  TYPE=0, CODE=-1, LEVEL=-1, INTERVAL=0, MEAN=0, EXTRAPOLATE=0\n");
 #endif
       fprintf(stdout, "Enter namelist parameter:\n");
     }
@@ -1219,7 +1221,9 @@ void after_parini(struct Control *globs, struct Variable *vars)
       if ( length == 0L )
 	{
 	  fprintf(stderr,"\n stdin not connected\n");
+#if defined(AFTERBURNER)
 	  after_usage();
+#endif
 	}
       fseek(stdin, 0L, SEEK_SET);
     }
@@ -1464,14 +1468,19 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 	      if ( leveltype == ZAXIS_HYBRID && globs->nvct == 0 )
 		{
 		  nhzaxis++;
-		  if ( numlevel != (zaxisInqVctSize(zaxisID)/2 - 1) )
+                  int nvct = zaxisInqVctSize(zaxisID);
+		  if ( numlevel != (nvct/2 - 1) )
 		    {
-		      if ( ! (numlevel == 191 && zaxisInqVctSize(zaxisID) == 0) )
+                      if ( nvct == 0 )
+                        {
+                          if ( numlevel != 191 )
+                            Warning("VCT missing for hybrid level data with %d levels!", numlevel);
+                        }
+                      else
 			{
-			  Warning( "Skip %d hybrid level data with %d levels!",
-				  (zaxisInqVctSize(zaxisID)/2 - 1), numlevel);
-			  continue;
+			  Warning("Skip %d hybrid level data with %d levels!", (nvct/2 - 1), numlevel);
 			}
+                      continue;
 		    }
 		}
 
@@ -1520,8 +1529,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
 		    }
 
 		  if ( numlevel != (globs->nvct/2 - 1) )
-		    Error("Number of hybrid levels %d does not match vct levels %d",
-			  numlevel, globs->nvct/2-1);
+		    Error("Number of hybrid levels %d does not match VCT levels %d", numlevel, globs->nvct/2-1);
 
 		  if ( globs->Debug )
 		    for ( i = 0; i < globs->nvct/2; i++ )
@@ -1762,35 +1770,40 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	}
 }
 
-#if defined(AFTERBURNER)
 static
 void after_readVct(struct Control *globs, const char *vctfile)
 {
   char line[1024];
-  int i, n;
+  int i, n, nlines = 0;
   double va, vb;
 
   FILE *fp = fopen(vctfile, "r");
   if ( fp == NULL ) SysError( "Open failed on %s", vctfile);
 
-  while ( fgets(line, 1023, fp) ) globs->nvct++;
-
-  globs->nvct *= 2;
-  globs->vct = (double *) Malloc(globs->nvct*sizeof(double));
-
-  rewind(fp);
-  for ( i = 0; i < globs->nvct/2; i++ )
+  while ( fgets(line, 1023, fp) )
     {
-      fgets(line, 1023, fp);
+      if ( line[0] == '#' || line[0] == '\0' ) continue;
+      nlines++;
+    }
+  
+  globs->nvct = nlines*2;
+  globs->vct = (double *) Malloc(globs->nvct*sizeof(double));
+ 
+  rewind(fp);
+
+  i = 0;
+  while ( fgets(line, 1023, fp) )
+    {
+      if ( line[0] == '#' || line[0] == '\0' ) continue;
       sscanf(line, "%d %lg %lg", &n, &va, &vb);
       globs->vct[i]               = va;
       globs->vct[i+globs->nvct/2] = vb;
+      i++;
     }
-  fprintf(stdout, "  Reading VCT for %d hybrid levels from file %s\n", globs->nvct/2-1, vctfile);
+  fprintf(stdout, "  Read VCT with %d hybrid levels from file %s\n", globs->nvct/2-1, vctfile);
 
   fclose(fp);
 }
-#endif
 
 #if defined(AFTERBURNER)
 static
@@ -2335,7 +2348,7 @@ int afterburner(int argc, char *argv[])
       fprintf(stderr, "  Maximum ffts to run in parallel:  %ld\n", get_nfft());
     }
 
-  /* read option VCT */
+  /* read optional VCT */
   if ( Vctfile ) after_readVct(globs, Vctfile);
 
   /* --------------------- */
@@ -2367,6 +2380,12 @@ void *Afterburner(void *argument)
   after_control_init(globs);
 
   globs->Verbose = cdoVerbose;
+
+  if ( operatorArgc() == 1 )
+    {
+      const char *vctfile = operatorArgv()[0];
+      after_readVct(globs, vctfile);
+    }
 
   struct Variable vars[MaxCodes+5];
   for ( int code = 0; code < MaxCodes+5; code++ ) after_variable_init(&vars[code]);
