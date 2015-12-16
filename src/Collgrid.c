@@ -151,9 +151,15 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
               if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
             }
         }
+      else
+        {
+          xyinfo[fileID].x  = 0;
+          xyinfo[fileID].y  = 0;
+          xyinfo[fileID].id = fileID;
+        }
     }
 
-  if ( cdoVerbose )
+  if ( cdoVerbose && lregular )
     for ( int fileID = 0; fileID < nfiles; fileID++ )
       printf("1 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
@@ -476,8 +482,7 @@ void *Collgrid(void *argument)
 	{
 	  if ( gridIDs[i] != -1 ) 
 	    {
-	      if ( gridID == vlistGrid(vlistID2, i) )
-		vars[varID] = TRUE;
+	      if ( gridID == vlistGrid(vlistID2, i) ) vars[varID] = TRUE;
 	      break;
 	    }
 	}
