@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..3 # Number of tests to be executed.
+echo 1..6 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -7,24 +7,25 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout
 CDOERR=cerr
 #
-FILES="datar.nc datac.nc"
-FILES="datar.nc"
+GRIDTYPES="regular generic"
 DISTS="4,3 12,1 1,6"
 #
 NTEST=1
 #
-for FILE in $FILES; do
+for GRIDTYPE in $GRIDTYPES; do
   for DIST in $DISTS; do
     RSTAT=0
+    GT=$(echo $GRIDTYPE | cut -c1)
+    FILE=data${GT}.nc
     IFILE=$DATAPATH/${FILE}
     OFILE=${OPERATOR}_${FILE}
 
-    CDOTEST="collgrid $DIST $FILE"
+    CDOTEST="$GRIDTYPE $DIST"
 
     if [ "@ENABLE_NETCDF@" = yes ] ; then
       nx=$(echo $DIST | sed 's/,.*//')
       NX=""
-      if [ $FILE = datac.nc ] ; then NX=",$nx" ; fi
+      if [ $FILE != datar.nc ] ; then NX=",$nx" ; fi
       CDOCOMMAND="$CDO collgrid$NX xxx* $OFILE"
       echo "Running test: $NTEST"
       echo "$CDOCOMMAND"
