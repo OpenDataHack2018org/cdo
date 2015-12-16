@@ -736,6 +736,7 @@ test/data/Makefile.am -text
 test/data/Makefile.in -text
 test/data/bathy4.grb -text
 test/data/datac.nc -text
+test/data/datag.nc -text
 test/data/datar.nc -text
 test/data/datau.nc -text
 test/data/detrend_data -text
