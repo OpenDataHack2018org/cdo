@@ -886,7 +886,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
   int gridID1 = -1, zaxisID1 = -1, tsteptype1 = -1;
   double missval = 0;
   char varname[256];
-  int varID, nvars;
+  int varID;
   nodeType *rnode = NULL;
 
   if ( ! p ) return (rnode);
@@ -913,14 +913,26 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  if ( parse_arg->debug )
 	    printf("\tpush var \t%s\n", p->u.var.nm);
 
-	  nvars = vlistNvars(parse_arg->vlistID1);
+          int vlistID = parse_arg->vlistID1;
+	  int nvars = vlistNvars(vlistID);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      vlistInqVarName(parse_arg->vlistID1, varID, varname);
+	      vlistInqVarName(vlistID, varID, varname);
 	      if ( strcmp(varname, p->u.var.nm) == 0 ) break;
 	    }
-
+          /*
 	  if ( varID == nvars )
+            {
+              vlistID = parse_arg->vlistID2;
+              nvars = vlistNvars(vlistID);
+              for ( varID = 0; varID < nvars; varID++ )
+                {
+                  vlistInqVarName(vlistID, varID, varname);
+                  if ( strcmp(varname, p->u.var.nm) == 0 ) break;
+                }  
+            }
+          */
+          if ( varID == nvars )
 	    {
 	      cdoAbort("Variable >%s< not found!", p->u.var.nm);
 	    }
@@ -931,16 +943,15 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 
 	      if ( parse_arg->var_needed[varID] == 0 )
 		{
-
 		  parse_arg->var[varID] = strdupx(p->u.var.nm);
 		  parse_arg->varID[varID] = varID;
 		  parse_arg->var_needed[varID] = 1;
 		}
 
-	      gridID1    = vlistInqVarGrid(parse_arg->vlistID1, varID);
-	      zaxisID1   = vlistInqVarZaxis(parse_arg->vlistID1, varID);
-	      tsteptype1 = vlistInqVarTsteptype(parse_arg->vlistID1, varID);
-	      missval    = vlistInqVarMissval(parse_arg->vlistID1, varID);
+	      gridID1    = vlistInqVarGrid(vlistID, varID);
+	      zaxisID1   = vlistInqVarZaxis(vlistID, varID);
+	      tsteptype1 = vlistInqVarTsteptype(vlistID, varID);
+	      missval    = vlistInqVarMissval(vlistID, varID);
 	      nlev1 = zaxisInqSize(zaxisID1);
 
 	      parse_arg->missval2 = missval;
@@ -1025,9 +1036,9 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  else
 	    {
 	      if ( parse_arg->debug )
-		printf("\tpop var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
+		printf("\tpop  var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
 
-	      nvars = vlistNvars(parse_arg->vlistID2);
+	      int nvars = vlistNvars(parse_arg->vlistID2);
 	      for ( varID = nvars-1; varID >= 0; varID-- )
 		{
 		  vlistInqVarName(parse_arg->vlistID2, varID, varname);
