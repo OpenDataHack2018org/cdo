@@ -17,14 +17,14 @@
 This operator collects the data of the input files to one output file. 
 All input files need to have the same variables and the same number of timesteps on a different
 horizonal grid region. A source region must be a structured longitude/latitude grid box.
-The parameter @var{nx} needs to be specified only for curvilinear grids.
+The parameter @var{nx} needs to be specified only non regular lon/lat grids.
 @EndDescription
 @EndOperator
 
 
 @BeginParameter names
 @Item = nx
-INTEGER  Number of regions in x direction, only needed for curvilinear grids
+INTEGER  Number of regions in x direction [default: number of input files]
 @Item = names
 STRING   Comma separated list of variable names [default: all variables]
 @EndParameter

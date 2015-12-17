@@ -280,6 +280,15 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   if ( xvals2 ) Free(xvals2);
   if ( yvals2 ) Free(yvals2);
 
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
+    {
+      if ( xvals[fileID] ) Free(xvals[fileID]);
+      if ( yvals[fileID] ) Free(yvals[fileID]);
+    }
+  Free(xvals);
+  Free(yvals);
+  Free(xyinfo);
+
   char string[1024];
   string[0] = 0;
   gridID = vlistGrid(ef[0].vlistID, igrid);
@@ -295,15 +304,6 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   gridDefXunits(gridID2, string);
   gridInqYunits(gridID, string);
   gridDefYunits(gridID2, string);
-
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
-    {
-      if ( xvals[fileID] ) Free(xvals[fileID]);
-      if ( yvals[fileID] ) Free(yvals[fileID]);
-    }
-  Free(xvals);
-  Free(yvals);
-  Free(xyinfo);
 
   return gridID2;
 }
