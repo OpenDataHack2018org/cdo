@@ -85,10 +85,13 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   int lsouthnorth = TRUE;
   int gridID2 = -1;
   int idx;
-  int nx, ny, ix, iy, i, j, ij, offset;
+  int ny, ix, iy, i, j, ij, offset;
   int lregular = FALSE;
   int lcurvilinear = FALSE;
   double *xvals2 = NULL, *yvals2 = NULL;
+
+  int nx = -1;
+  if ( nxblocks != -1 ) nx = nxblocks;
 
   int gridID   = vlistGrid(ef[0].vlistID, igrid);
   int gridtype = gridInqType(gridID);
@@ -180,17 +183,19 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
         for ( int fileID = 0; fileID < nfiles; fileID++ )
           printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
 
-      nx = 1;
-      for ( int fileID = 1; fileID < nfiles; fileID++ )
+      if ( nx <= 0 )
         {
-          if ( DBL_IS_EQUAL(xyinfo[0].y, xyinfo[fileID].y) ) nx++;
-          else break;
+          nx = 1;
+          for ( int fileID = 1; fileID < nfiles; fileID++ )
+            {
+              if ( DBL_IS_EQUAL(xyinfo[0].y, xyinfo[fileID].y) ) nx++;
+              else break;
+            }
         }
     }
   else
     {
-      nx = nxblocks;
-      if ( nx <= 0 ) cdoAbort("Parameter nx missing!");
+      if ( nx <= 0 ) nx = nfiles;
     }
 
   ny = nfiles/nx;
@@ -306,7 +311,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
 void *Collgrid(void *argument)
 {
-  int nxblocks = 1;
+  int nxblocks = -1;
   int varID, recID;
   int nrecs, nrecs0;
   int levelID;
