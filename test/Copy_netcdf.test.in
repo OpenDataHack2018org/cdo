@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..4 # Number of tests to be executed.
+echo 1..5 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -7,7 +7,7 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout
 CDOERR=cerr
 #
-FILES="datar.nc datac.nc datau.nc testfile01c.nc"
+FILES="datar.nc datag.nc datac.nc datau.nc testfile01c.nc"
 #
 NTEST=1
 #
