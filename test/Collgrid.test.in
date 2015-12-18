@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..6 # Number of tests to be executed.
+echo 1..9 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -7,7 +7,7 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout
 CDOERR=cerr
 #
-GRIDTYPES="regular generic"
+GRIDTYPES="regular generic curvilinear"
 DISTS="4,3 12,1 1,6"
 #
 NTEST=1
