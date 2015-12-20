@@ -25,9 +25,9 @@
       Vertstat   vertmean        Vertical mean
       Vertstat   vertavg         Vertical average
       Vertstat   vertvar         Vertical variance
-      Vertstat   vertvar1        Vertical variance [Divisor is (n-1)]
+      Vertstat   vertvar1        Vertical variance [Normalize by (n-1)]
       Vertstat   vertstd         Vertical standard deviation
-      Vertstat   vertstd1        Vertical standard deviation [Divisor is (n-1)]
+      Vertstat   vertstd1        Vertical standard deviation [Normalize by (n-1)]
 */
 
 

@@ -24,9 +24,9 @@
       Seasstat   seasmean        Seasonal mean
       Seasstat   seasavg         Seasonal average
       Seasstat   seasvar         Seasonal variance
-      Seasstat   seasvar1        Seasonal variance [Divisor is (n-1)]
+      Seasstat   seasvar1        Seasonal variance [Normalize by (n-1)]
       Seasstat   seasstd         Seasonal standard deviation
-      Seasstat   seasstd1        Seasonal standard deviation [Divisor is (n-1)]
+      Seasstat   seasstd1        Seasonal standard deviation [Normalize by (n-1)]
 */
 
 

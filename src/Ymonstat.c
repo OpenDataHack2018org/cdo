@@ -24,9 +24,9 @@
       Ymonstat   ymonmean        Multi-year monthly mean
       Ymonstat   ymonavg         Multi-year monthly average
       Ymonstat   ymonvar         Multi-year monthly variance
-      Ymonstat   ymonvar1        Multi-year monthly variance [Divisor is (n-1)]
+      Ymonstat   ymonvar1        Multi-year monthly variance [Normalize by (n-1)]
       Ymonstat   ymonstd         Multi-year monthly standard deviation
-      Ymonstat   ymonstd1        Multi-year monthly standard deviation [Divisor is (n-1)]
+      Ymonstat   ymonstd1        Multi-year monthly standard deviation [Normalize by (n-1)]
 */
 
 

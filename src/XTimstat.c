@@ -24,45 +24,45 @@
       Timstat    timmean         Time mean
       Timstat    timavg          Time average
       Timstat    timvar          Time variance
-      Timstat    timvar1         Time variance [Divisor is (n-1)]
+      Timstat    timvar1         Time variance [Normalize by (n-1)]
       Timstat    timstd          Time standard deviation
-      Timstat    timstd1         Time standard deviation [Divisor is (n-1)]
+      Timstat    timstd1         Time standard deviation [Normalize by (n-1)]
       Hourstat   hourmin         Hourly minimum
       Hourstat   hourmax         Hourly maximum
       Hourstat   hoursum         Hourly sum
       Hourstat   hourmean        Hourly mean
       Hourstat   houravg         Hourly average
       Hourstat   hourvar         Hourly variance
-      Hourstat   hourvar1        Hourly variance [Divisor is (n-1)]
+      Hourstat   hourvar1        Hourly variance [Normalize by (n-1)]
       Hourstat   hourstd         Hourly standard deviation
-      Hourstat   hourstd1        Hourly standard deviation [Divisor is (n-1)]
+      Hourstat   hourstd1        Hourly standard deviation [Normalize by (n-1)]
       Daystat    daymin          Daily minimum
       Daystat    daymax          Daily maximum
       Daystat    daysum          Daily sum
       Daystat    daymean         Daily mean
       Daystat    dayavg          Daily average
       Daystat    dayvar          Daily variance
-      Daystat    dayvar1         Daily variance [Divisor is (n-1)]
+      Daystat    dayvar1         Daily variance [Normalize by (n-1)]
       Daystat    daystd          Daily standard deviation
-      Daystat    daystd1         Daily standard deviation [Divisor is (n-1)]
+      Daystat    daystd1         Daily standard deviation [Normalize by (n-1)]
       Monstat    monmin          Monthly minimum
       Monstat    monmax          Monthly maximum
       Monstat    monsum          Monthly sum
       Monstat    monmean         Monthly mean
       Monstat    monavg          Monthly average
       Monstat    monvar          Monthly variance
-      Monstat    monvar1         Monthly variance [Divisor is (n-1)]
+      Monstat    monvar1         Monthly variance [Normalize by (n-1)]
       Monstat    monstd          Monthly standard deviation
-      Monstat    monstd1         Monthly standard deviation [Divisor is (n-1)]
+      Monstat    monstd1         Monthly standard deviation [Normalize by (n-1)]
       Yearstat   yearmin         Yearly minimum
       Yearstat   yearmax         Yearly maximum
       Yearstat   yearsum         Yearly sum
       Yearstat   yearmean        Yearly mean
       Yearstat   yearavg         Yearly average
       Yearstat   yearvar         Yearly variance
-      Yearstat   yearvar1        Yearly variance [Divisor is (n-1)]
+      Yearstat   yearvar1        Yearly variance [Normalize by (n-1)]
       Yearstat   yearstd         Yearly standard deviation
-      Yearstat   yearstd1        Yearly standard deviation [Divisor is (n-1)]
+      Yearstat   yearstd1        Yearly standard deviation [Normalize by (n-1)]
 */
 
 

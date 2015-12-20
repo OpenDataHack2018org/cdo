@@ -24,9 +24,9 @@
       Gridboxstat    gridboxmean         Gridbox mean
       Gridboxstat    gridboxavg          Gridbox average
       Gridboxstat    gridboxstd          Gridbox standard deviation
-      Gridboxstat    gridboxstd1         Gridbox standard deviation [Divisor is (n-1)]
+      Gridboxstat    gridboxstd1         Gridbox standard deviation [Normalize by (n-1)]
       Gridboxstat    gridboxvar          Gridbox variance
-      Gridboxstat    gridboxvar1         Gridbox variance [Divisor is (n-1)]
+      Gridboxstat    gridboxvar1         Gridbox variance [Normalize by (n-1)]
 */
 
 

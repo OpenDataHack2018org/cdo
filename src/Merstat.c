@@ -24,9 +24,9 @@
       Merstat    mermean         Meridional mean
       Merstat    meravg          Meridional average
       Merstat    merstd          Meridional standard deviation
-      Merstat    merstd          Meridional standard deviation [Divisor is (n-1)]
+      Merstat    merstd          Meridional standard deviation [Normalize by (n-1)]
       Merstat    mervar          Meridional variance
-      Merstat    mervar          Meridional variance [Divisor is (n-1)]
+      Merstat    mervar          Meridional variance [Normalize by (n-1)]
       Merstat    merpctl         Meridional percentiles
 */
 

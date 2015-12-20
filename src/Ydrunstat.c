@@ -24,9 +24,9 @@
       Ydrunstat    ydrunmean         Multi-year daily running mean
       Ydrunstat    ydrunavg          Multi-year daily running average
       Ydrunstat    ydrunvar          Multi-year daily running variance
-      Ydrunstat    ydrunvar1         Multi-year daily running variance [Divisor is (n-1)]
+      Ydrunstat    ydrunvar1         Multi-year daily running variance [Normalize by (n-1)]
       Ydrunstat    ydrunstd          Multi-year daily running standard deviation
-      Ydrunstat    ydrunstd1         Multi-year daily running standard deviation [Divisor is (n-1)]
+      Ydrunstat    ydrunstd1         Multi-year daily running standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>

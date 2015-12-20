@@ -24,9 +24,9 @@
       Yhourstat   yhourmean        Multi-year hourly mean
       Yhourstat   yhouravg         Multi-year hourly average
       Yhourstat   yhourvar         Multi-year hourly variance
-      Yhourstat   yhourvar1        Multi-year hourly variance [Divisor is (n-1)]
+      Yhourstat   yhourvar1        Multi-year hourly variance [Normalize by (n-1)]
       Yhourstat   yhourstd         Multi-year hourly standard deviation
-      Yhourstat   yhourstd1        Multi-year hourly standard deviation [Divisor is (n-1)]
+      Yhourstat   yhourstd1        Multi-year hourly standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>

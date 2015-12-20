@@ -24,9 +24,9 @@
       Fldstat    fldmean         Field mean
       Fldstat    fldavg          Field average
       Fldstat    fldstd          Field standard deviation
-      Fldstat    fldstd1         Field standard deviation [Divisor is (n-1)]
+      Fldstat    fldstd1         Field standard deviation [Normalize by (n-1)]
       Fldstat    fldvar          Field variance
-      Fldstat    fldvar1         Field variance [Divisor is (n-1)]
+      Fldstat    fldvar1         Field variance [Normalize by (n-1)]
       Fldstat    fldpctl         Field percentiles
 */
 

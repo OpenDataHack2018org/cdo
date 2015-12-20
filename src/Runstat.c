@@ -24,9 +24,9 @@
       Runstat    runmean         Running mean
       Runstat    runavg          Running average
       Runstat    runvar          Running variance
-      Runstat    runvar1         Running variance [Divisor is (n-1)]
+      Runstat    runvar1         Running variance [Normalize by (n-1)]
       Runstat    runstd          Running standard deviation
-      Runstat    runstd1         Running standard deviation [Divisor is (n-1)]
+      Runstat    runstd1         Running standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>

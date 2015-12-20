@@ -24,9 +24,9 @@
       Timselstat    timselmean         Time range mean
       Timselstat    timselavg          Time range average
       Timselstat    timselvar          Time range variance
-      Timselstat    timselvar1         Time range variance [Divisor is (n-1)]
+      Timselstat    timselvar1         Time range variance [Normalize by (n-1)]
       Timselstat    timselstd          Time range standard deviation
-      Timselstat    timselstd1         Time range standard deviation [Divisor is (n-1)]
+      Timselstat    timselstd1         Time range standard deviation [Normalize by (n-1)]
 */
 
 

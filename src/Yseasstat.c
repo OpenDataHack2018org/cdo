@@ -24,9 +24,9 @@
       Yseasstat  yseasmean       Multi-year seasonally mean
       Yseasstat  yseasavg        Multi-year seasonally average
       Yseasstat  yseasvar        Multi-year seasonally variance
-      Yseasstat  yseasvar1       Multi-year seasonally variance [Divisor is (n-1)]
+      Yseasstat  yseasvar1       Multi-year seasonally variance [Normalize by (n-1)]
       Yseasstat  yseasstd        Multi-year seasonally standard deviation
-      Yseasstat  yseasstd1       Multi-year seasonally standard deviation [Divisor is (n-1)]
+      Yseasstat  yseasstd1       Multi-year seasonally standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>

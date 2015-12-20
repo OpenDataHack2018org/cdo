@@ -24,9 +24,9 @@
       Ydaystat   ydaymean        Multi-year daily mean
       Ydaystat   ydayavg         Multi-year daily average
       Ydaystat   ydayvar         Multi-year daily variance
-      Ydaystat   ydayvar1        Multi-year daily variance [Divisor is (n-1)]
+      Ydaystat   ydayvar1        Multi-year daily variance [Normalize by (n-1)]
       Ydaystat   ydaystd         Multi-year daily standard deviation
-      Ydaystat   ydaystd1        Multi-year daily standard deviation [Divisor is (n-1)]
+      Ydaystat   ydaystd1        Multi-year daily standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>

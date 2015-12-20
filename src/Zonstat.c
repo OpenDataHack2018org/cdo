@@ -25,9 +25,9 @@
       Zonstat    zonmean         Zonal mean
       Zonstat    zonavg          Zonal average
       Zonstat    zonstd          Zonal standard deviation
-      Zonstat    zonstd1         Zonal standard deviation [Divisor is (n-1)]
+      Zonstat    zonstd1         Zonal standard deviation [Normalize by (n-1)]
       Zonstat    zonvar          Zonal variance
-      Zonstat    zonvar1         Zonal variance [Divisor is (n-1)]
+      Zonstat    zonvar1         Zonal variance [Normalize by (n-1)]
       Zonstat    zonpctl         Zonal percentiles
 */
 
