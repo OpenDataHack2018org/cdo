@@ -65,7 +65,7 @@ For every longitude the area weighted average over all latitudes is computed.
 @Title     = Meridional variance
 
 @BeginDescription
-For every longitude the variance over all latitudes is computed. Divisor is n.
+For every longitude the variance over all latitudes is computed. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -74,7 +74,7 @@ For every longitude the variance over all latitudes is computed. Divisor is n.
 @Title     = Meridional variance (n-1)
 
 @BeginDescription
-For every longitude the variance over all latitudes is computed. Divisor is (n-1).
+For every longitude the variance over all latitudes is computed. Normalize by (n-1).
 @EndDescription
 @EndOperator
 
@@ -83,7 +83,7 @@ For every longitude the variance over all latitudes is computed. Divisor is (n-1
 @Title     = Meridional standard deviation
 
 @BeginDescription
-For every longitude the standard deviation over all latitudes is computed. Divisor is n.
+For every longitude the standard deviation over all latitudes is computed. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -92,7 +92,7 @@ For every longitude the standard deviation over all latitudes is computed. Divis
 @Title     = Meridional standard deviation (n-1)
 
 @BeginDescription
-For every longitude the standard deviation over all latitudes is computed. Divisor is (n-1).
+For every longitude the standard deviation over all latitudes is computed. Normalize by (n-1).
 @EndDescription
 @EndOperator
 

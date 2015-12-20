@@ -117,12 +117,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-Divisor is n. For every gridpoint x_1, ..., x_n of the same field it is:
+Normalize by n. For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = var{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-Divisor is n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+Normalize by n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf var}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -137,12 +137,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-Divisor is (n-1). For every gridpoint x_1, ..., x_n of the same field it is:
+Normalize by (n-1). For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = var1{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-Divisor is (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+Normalize by (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf var1}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -157,12 +157,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-Divisor is n. For every gridpoint x_1, ..., x_n of the same field it is:
+Normalize by n. For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = std{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-Divisor is n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+Normalize by n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf std}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -177,12 +177,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-Divisor is (n-1). For every gridpoint x_1, ..., x_n of the same field it is:
+Normalize by (n-1). For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = std1{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-Divisor is (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+Normalize by (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf std1}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath

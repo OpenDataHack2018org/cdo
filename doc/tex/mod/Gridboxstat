@@ -71,7 +71,7 @@ Average of the selected grid boxes.
 @Parameter = nx ny
 
 @BeginDescription
-Variance of the selected grid boxes. Divisor is n.
+Variance of the selected grid boxes. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -81,7 +81,7 @@ Variance of the selected grid boxes. Divisor is n.
 @Parameter = nx ny
 
 @BeginDescription
-Variance of the selected grid boxes. Divisor is (n-1).
+Variance of the selected grid boxes. Normalize by (n-1).
 @EndDescription
 @EndOperator
 
@@ -91,7 +91,7 @@ Variance of the selected grid boxes. Divisor is (n-1).
 @Parameter = nx ny
 
 @BeginDescription
-Standard deviation of the selected grid boxes. Divisor is n.
+Standard deviation of the selected grid boxes. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -101,7 +101,7 @@ Standard deviation of the selected grid boxes. Divisor is n.
 @Parameter = nx ny
 
 @BeginDescription
-Standard deviation of the selected grid boxes. Divisor is (n-1).
+Standard deviation of the selected grid boxes. Normalize by (n-1).
 @EndDescription
 @EndOperator
 

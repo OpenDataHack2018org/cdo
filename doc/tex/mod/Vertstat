@@ -64,7 +64,7 @@ For every gridpoint the layer weighted average over all levels is computed.
 @Title     = Vertical variance
 
 @BeginDescription
-For every gridpoint the variance over all levels is computed. Divisor is n.
+For every gridpoint the variance over all levels is computed. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -73,7 +73,7 @@ For every gridpoint the variance over all levels is computed. Divisor is n.
 @Title     = Vertical variance (n-1)
 
 @BeginDescription
-For every gridpoint the variance over all levels is computed. Divisor is (n-1).
+For every gridpoint the variance over all levels is computed. Normalize by (n-1).
 @EndDescription
 @EndOperator
 
@@ -82,7 +82,7 @@ For every gridpoint the variance over all levels is computed. Divisor is (n-1).
 @Title     = Vertical standard deviation
 
 @BeginDescription
-For every gridpoint the standard deviation over all levels is computed. Divisor is n.
+For every gridpoint the standard deviation over all levels is computed. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -91,7 +91,7 @@ For every gridpoint the standard deviation over all levels is computed. Divisor 
 @Title     = Vertical standard deviation (n-1)
 
 @BeginDescription
-For every gridpoint the standard deviation over all levels is computed. Divisor is (n-1).
+For every gridpoint the standard deviation over all levels is computed. Normalize by (n-1).
 @EndDescription
 @EndOperator
 

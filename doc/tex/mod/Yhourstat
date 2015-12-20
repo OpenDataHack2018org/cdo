@@ -129,7 +129,7 @@ o(\mbox{8784},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 @Title     = Multi-year hourly variance
 
 @BeginDescription
-Divisor is n. 
+Normalize by n. 
 
 @IfMan
 o(0001,x) = var{i(t,x), day(i(t)) = 0001}
@@ -153,7 +153,7 @@ o(\mbox{8784},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 @Title     = Multi-year hourly variance (n-1)
 
 @BeginDescription
-Divisor is (n-1). 
+Normalize by (n-1). 
 
 @IfMan
 o(0001,x) = var1{i(t,x), day(i(t)) = 0001}
@@ -177,7 +177,7 @@ o(\mbox{8784},x) = \mbox{\bf var1}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 @Title     = Multi-year hourly standard deviation
 
 @BeginDescription
-Divisor is n. 
+Normalize by n. 
 
 @IfMan
 o(0001,x) = std{i(t,x), day(i(t)) = 0001}
@@ -201,7 +201,7 @@ o(\mbox{8784},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 @Title     = Multi-year hourly standard deviation (n-1)
 
 @BeginDescription
-Divisor is (n-1). 
+Normalize by (n-1). 
 
 @IfMan
 o(0001,x) = std1{i(t,x), day(i(t)) = 0001}

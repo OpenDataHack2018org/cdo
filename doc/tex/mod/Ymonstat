@@ -130,7 +130,7 @@ o(\mbox{12},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 @Title     = Multi-year monthly variance
 
 @BeginDescription
-Divisor is n. 
+Normalize by n. 
 
 @IfMan
 o(01,x) = var{i(t,x), month(i(t)) = 01}
@@ -154,7 +154,7 @@ o(\mbox{12},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 @Title     = Multi-year monthly variance (n-1)
 
 @BeginDescription
-Divisor is (n-1). 
+Normalize by (n-1). 
 
 @IfMan
 o(01,x) = var1{i(t,x), month(i(t)) = 01}
@@ -178,7 +178,7 @@ o(\mbox{12},x) = \mbox{\bf var1}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 @Title     = Multi-year monthly standard deviation
 
 @BeginDescription
-Divisor is n. 
+Normalize by n. 
 
 @IfMan
 o(01,x) = std{i(t,x), month(i(t)) = 01}
@@ -202,7 +202,7 @@ o(\mbox{12},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 @Title     = Multi-year monthly standard deviation (n-1)
 
 @BeginDescription
-Divisor is (n-1). 
+Normalize by (n-1). 
 
 @IfMan
 o(01,x) = std1{i(t,x), month(i(t)) = 01}

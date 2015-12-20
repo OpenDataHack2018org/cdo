@@ -100,7 +100,7 @@ o(1,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 @Title     = Time variance
 
 @BeginDescription
-Divisor is n. 
+Normalize by n. 
 
 @IfMan
 o(1,x) = var{i(t',x), t_1<t'<=t_n}
@@ -118,7 +118,7 @@ o(1,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 @Title     = Time variance (n-1)
 
 @BeginDescription
-Divisor is (n-1). 
+Normalize by (n-1). 
 
 @IfMan
 o(1,x) = var1{i(t',x), t_1<t'<=t_n}
@@ -136,7 +136,7 @@ o(1,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \leq t_n\}
 @Title     = Time standard deviation
 
 @BeginDescription
-Divisor is n. 
+Normalize by n. 
 
 @IfMan
 o(1,x) = std{i(t',x), t_1<t'<=t_n}
@@ -154,7 +154,7 @@ o(1,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 @Title     = Time standard deviation (n-1)
 
 @BeginDescription
-Divisor is (n-1). 
+Normalize by (n-1). 
 
 @IfMan
 o(1,x) = std1{i(t',x), t_1<t'<=t_n}

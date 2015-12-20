@@ -65,7 +65,7 @@ For every latitude the average over all longitudes is computed.
 @Title     = Zonal variance
 
 @BeginDescription
-For every latitude the variance over all longitudes is computed. Divisor is n.
+For every latitude the variance over all longitudes is computed. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -74,7 +74,7 @@ For every latitude the variance over all longitudes is computed. Divisor is n.
 @Title     = Zonal variance (n-1)
 
 @BeginDescription
-For every latitude the variance over all longitudes is computed. Divisor is (n-1).
+For every latitude the variance over all longitudes is computed. Normalize by (n-1).
 @EndDescription
 @EndOperator
 
@@ -83,7 +83,7 @@ For every latitude the variance over all longitudes is computed. Divisor is (n-1
 @Title     = Zonal standard deviation
 
 @BeginDescription
-For every latitude the standard deviation over all longitudes is computed. Divisor is n.
+For every latitude the standard deviation over all longitudes is computed. Normalize by n.
 @EndDescription
 @EndOperator
 
@@ -92,7 +92,7 @@ For every latitude the standard deviation over all longitudes is computed. Divis
 @Title     = Zonal standard deviation (n-1)
 
 @BeginDescription
-For every latitude the standard deviation over all longitudes is computed. Divisor is (n-1). 
+For every latitude the standard deviation over all longitudes is computed. Normalize by (n-1). 
 @EndDescription
 @EndOperator
 

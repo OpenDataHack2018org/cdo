@@ -123,12 +123,12 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-Divisor is n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
+Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = var{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-Divisor is n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
+Normalize by n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
@@ -143,12 +143,12 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-Divisor is (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
+Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = var1{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-Divisor is (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
+Normalize by (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \le t_n\}
@@ -163,12 +163,12 @@ o(t,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-Divisor is n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
+Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = std{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-Divisor is n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
+Normalize by n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}
@@ -183,12 +183,12 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-Divisor is (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
+Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = std1{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-Divisor is (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
+Normalize by (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \le t_n\}
