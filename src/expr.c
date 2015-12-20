@@ -884,6 +884,7 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
 nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 {
   int gridID1 = -1, zaxisID1 = -1, tsteptype1 = -1;
+  int vlistID = -1;
   double missval = 0;
   char varname[256];
   int varID;
@@ -913,14 +914,13 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  if ( parse_arg->debug )
 	    printf("\tpush var \t%s\n", p->u.var.nm);
 
-          int vlistID = parse_arg->vlistID1;
+          vlistID = parse_arg->vlistID1;
 	  int nvars = vlistNvars(vlistID);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      vlistInqVarName(vlistID, varID, varname);
 	      if ( strcmp(varname, p->u.var.nm) == 0 ) break;
 	    }
-          /*
 	  if ( varID == nvars )
             {
               vlistID = parse_arg->vlistID2;
@@ -931,7 +931,6 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
                   if ( strcmp(varname, p->u.var.nm) == 0 ) break;
                 }  
             }
-          */
           if ( varID == nvars )
 	    {
 	      cdoAbort("Variable >%s< not found!", p->u.var.nm);
@@ -978,7 +977,10 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
           p->nmiss   = 0;
 	  if ( ! parse_arg->init )
 	    {
-	      p->data  = parse_arg->vardata1[varID];
+              if ( vlistID == parse_arg->vlistID1 )
+                p->data  = parse_arg->vardata1[varID];
+              else
+                p->data  = parse_arg->vardata2[varID];
 	      p->nmiss = parse_arg->nmiss[varID];
 	    }
 	  p->tmpvar  = 0;
