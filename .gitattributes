@@ -44,6 +44,7 @@ doc/cdo_ana_vis_wegner.pdf -text svneol=unset#application/pdf
 doc/cdo_cmsaf_kaspar.pdf -text svneol=unset#application/pdf
 doc/cdo_eca.pdf -text svneol=unset#application/pdf
 doc/cdo_limits -text
+doc/cdo_magics.pdf -text svneol=unset#application/pdf
 doc/cdo_nudgingdata.pdf -text
 doc/cdo_refcard.pdf -text
 doc/cdo_vs_nco -text
