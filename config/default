@@ -36,6 +36,8 @@ case "${HOSTNAME}" in
                  --with-hdf5=$HOME/local/hdf5-1.8.15-threadsafe \
                  --with-udunits2=/opt/local \
                  --with-curl=/opt/local \
+                 --with-libxml2=/usr \
+                 --with-magics=$HOME/local/Magics-2.25.3 \
                  --with-proj=/opt/local \
                  --with-szlib=$HOME/local"
 

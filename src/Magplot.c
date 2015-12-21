@@ -221,13 +221,13 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   */
   mag_setc("input_field_organization", "REGULAR");
   // mag_setc("input_field_organization", "GAUSSIAN");
-
+  
   mag_setr("input_field_initial_latitude", grid_center_lat[0]);
   mag_setr("input_field_latitude_step", dlat);
 
   mag_setr("input_field_initial_longitude", grid_center_lon[0]);
   mag_setr("input_field_longitude_step", dlon);
-  
+
   /* magics_template_parser( magics_node ); */
   /* results_template_parser(results_node, varname ); */
 

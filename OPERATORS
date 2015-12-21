@@ -543,7 +543,7 @@ Operator catalog:
 -------------------------------------------------------------
    Magplot       contour         Contour plot
    Magplot       shaded          Shaded contour plot
-   Magplot       grfill          Shaded grid boxes
+   Magplot       grfill          Shaded gridfill plot
    Magvector     vector          Vector arrows plot
    Magvector     stream          Streamlines plot
    Maggraph      graph           Line graph plot
