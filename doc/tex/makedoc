@@ -1220,7 +1220,9 @@ sub print_description {
 	  $line =~ s/\\and/\\&\\&/og;
 	  $line =~ s/\\or/\$||\$/og;
 	  $line =~ s/%/\\%/og;
-	  if ( $table == 1 ) { $line =~ s/$/ \\\\ \\hline/g; }
+	  if ( $table == 1 ) {
+            $line =~ s/$/ \\\\ \\hline/g;
+          }
 	}
 	print TRFILE "$line\n";
       }

@@ -16,7 +16,7 @@ The type of the plot depends on the choosen operator.
 Here is a list of all common plot parameters:
 
 @BeginTable
- @bold{Keyname}    & @bold{Type}    & @bold{Description}      
+ @bold{Keyname}     & @bold{Type}    & @bold{Description}      
  device      & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)
  projection  & STRING  & Projection (cylindrical, polar_stereographic, robinson, mercator)
  style       & STRING  & Contour line style (solid, dash, dot, chain_dash, chain_dot)
@@ -46,11 +46,11 @@ The following additional parameters are valid for contour operator,
 in addition to the common plot parameters:
 
 @BeginTable
- @bold{Keyname}    & @bold{Type}    & @bold{Description}      
- colour            & STRING  & Colour for drawing the contours
- thickness         & FLOAT   & Thickness of the contour line
- style             & STRING  & Line Style can be "SOLID", "DASH", "DOT", "CHAIN_DASH",
-                   &         & "CHAIN_DOT"
+ @bold{Keyname}      & @bold{Type}    & @bold{Description}      
+ colour       & STRING  & Colour for drawing the contours
+ thickness    & FLOAT   & Thickness of the contour line
+ style        & STRING  & Line Style can be "SOLID", "DASH", "DOT", "CHAIN_DASH",
+              &         & "CHAIN_DOT"
 @EndTable
 @EndDescription
 @EndOperator
@@ -66,14 +66,14 @@ The following additional parameters are valid for shaded contour operator,
 in addition to the common plot parameters.
 
 @BeginTable
- @bold{Keyname}    & @bold{Type}    & @bold{Description}      
- colour_min        & STRING  & Colour for the Minimum colour band
- colour_max        & STRING  & Colour for the Minimum colour band
- colour_triad      & STRING  & Direction of colour sequencing for shading "CW" or "ACW",
-                   &         & to denote "clockwise" and "anticlockwise" respectively.
-                   &         & To be used in conjunction with "colour_min", "colour_max"
-                   &         & options. Default is "ACW"
- colour_table      & STRING  & File with user specified colours with the format as
+ @bold{Keyname}      & @bold{Type}    & @bold{Description}      
+ colour_min   & STRING  & Colour for the Minimum colour band
+ colour_max   & STRING  & Colour for the Minimum colour band
+ colour_triad & STRING  & Direction of colour sequencing for shading "CW" or "ACW",
+              &         & to denote "clockwise" and "anticlockwise" respectively.
+              &         & To be used in conjunction with "colour_min", "colour_max"
+              &         & options. Default is "ACW"
+ colour_table & STRING  & File with user specified colours with the format as
 @EndTable
 
 Example file for 6 colours in RGB format:
@@ -86,6 +86,7 @@ Example file for 6 colours in RGB format:
 	RGB(0.5;0.5;0.0)
 	RGB(1.0;0.0;0.0)
 @EndListing
+
 @EndDescription
 @EndOperator
 
@@ -100,8 +101,8 @@ to the value of the field at that cell. The following additional parameters are 
 operator, in addition to the common plot parameters and shaded contour parameters:
 
 @BeginTable
- @bold{Keyname}    & @bold{Type}    & @bold{Description}      
- resolution        & FLOAT   &  Number of cells per cm for CELL shading.
+ @bold{Keyname}      & @bold{Type}    & @bold{Description}      
+ resolution   & FLOAT   &  Number of cells per cm for CELL shading.
 @EndTable
 @EndDescription
 @EndOperator

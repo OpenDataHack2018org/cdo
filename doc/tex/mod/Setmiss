@@ -144,7 +144,7 @@ o(t,x) =
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
- i(t,y) & \mbox{if} \;\; i(t,x) \geq \mbox{miss} \wedge i(t,y) \neq \mbox{miss}  \\
+ i(t,y) & \mbox{if} \;\; i(t,x) = \mbox{miss} \wedge i(t,y) \neq \mbox{miss}  \\
  i(t,x) & \mbox{if} \;\; i(t,x) \neq \mbox{miss}  \\
 \end{array}   \right.
 @EndMath

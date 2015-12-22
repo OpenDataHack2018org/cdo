@@ -551,7 +551,7 @@ void *Maggraph(void *argument);
 
 #if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
 #define  MagplotOperators       {"contour", "shaded", "grfill"}
-#define  MagvectorOperators     {"vector", "stream"}
+#define  MagvectorOperators     {"vector"}
 #define  MaggraphOperators      {"graph"}
 #endif
 
@@ -816,9 +816,9 @@ static modules_t Modules[] =
   /*  { Hi,             NULL,              HiOperators,        1,   CDI_REAL,  3,  1 }, */
   { Wct,            WctHelp,           WctOperators,           1,   CDI_REAL,  2,  1 },
 #if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
-  { Magplot,        NULL,              MagplotOperators,       1,   CDI_REAL,  1,  1 },
-  { Magvector,      NULL,              MagvectorOperators,     1,   CDI_REAL,  1,  1 },
-  { Maggraph,       NULL,              MaggraphOperators,      1,   CDI_REAL, -1,  1 },
+  { Magplot,        MagplotHelp,       MagplotOperators,       1,   CDI_REAL,  1,  1 },
+  { Magvector,      MagvectorHelp,     MagvectorOperators,     1,   CDI_REAL,  1,  1 },
+  { Maggraph,       MaggraphHelp,      MaggraphOperators,      1,   CDI_REAL, -1,  1 },
 #endif
 };							       
 							       

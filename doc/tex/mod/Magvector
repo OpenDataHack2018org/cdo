@@ -15,7 +15,7 @@ this can be changed with the device parameter.
 Here is a list of all vector plot parameters:
 
 @BeginTable
- @bold{Keyname}    & @bold{Type}    & @bold{Description}      
+ @bold{Keyname}     & @bold{Type}    & @bold{Description}      
  device      & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)
  projection  & STRING  & Projection (cylindrical, polar_stereographic, robinson, mercator)
  thin_fac    & FLOAT   & Controls the actual number of wind arrows or flags plotted.
