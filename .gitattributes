@@ -54,6 +54,7 @@ doc/tex/Modules -text
 doc/tex/appendix.tex -text
 doc/tex/bib.tex -text
 doc/tex/bibeca.tex -text
+doc/tex/bibmagics.tex -text
 doc/tex/cdo.tex -text
 doc/tex/cdo_adv.tex -text
 doc/tex/cdo_con.tex -text
