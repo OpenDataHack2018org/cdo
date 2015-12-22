@@ -5,23 +5,86 @@ for standard processing of climate and forecast model data.
 
 This document describes additional {\CDO} operators to be used for generating plots.
 
-Magics++ is the latest generation of the ECMWF's Meteorological plotting software MAGICS.
-Magics++ supports the plotting of contours, wind fields, observations, satellite images, symbols, text,
+Magics is the latest generation of the ECMWF's Meteorological plotting software MAGICS.
+Magics supports the plotting of contours, wind fields, observations, satellite images, symbols, text,
 axis and graphs (including box plots). Data fields to be plotted may be presented in various formats, for
 instance GRIB 1 and 2 code data, gaussian grid, regularly spaced grid and fitted data, BUFR and
 NetCDF format or retrieved from an ODB database. The produced meteorological plots can be saved in
 various formats, such as PostScript, EPS, PDF, GIF, PNG and SVG. \cite{Magics}
 
-In order to rapidly generate high quality pictures from the data obtained from the existing CDO
-operators, the CDO has been interfaced with Magics++ library. As a first step, some CDO plotting
+In order to rapidly generate high quality pictures from the data obtained from the existing {\CDO}
+operators, the {\CDO} has been interfaced with the Magics library. As a first step, some {\CDO} plotting
 operators are created to cater to the most essential/ frequently used plotting features viz., graph,
-contour, vector. These operators rely on the Magics++ and generate output files in the various formats
-supported by Magics++. These operators can be used as terminal operators and chained with the existing 
+contour, vector. These operators rely on the Magics and generate output files in the various formats
+supported by Magics. These operators can be used as terminal operators and chained with the existing 
 operators.
 
-Magics++ provides a vast number of parameters to control the attributes of various plotting
-features. Keeping in view, the usability of CDO users, currently only a few of these parameters are
-supported and accessible to the CDO users as command line arguments for the respective operators.
-The users are requested to refer to the Magics++ manual \cite{Magics} for detailed description of the various
+Magics provides a vast number of parameters to control the attributes of various plotting
+features. Keeping in view, the usability of {\CDO} users, currently only a few of these parameters are
+supported and accessible to the {\CDO} users as command line arguments for the respective operators.
+The users are requested to refer to the Magics manual \cite{Magics} for detailed description of the various
 parameters available for the various features. The description of the plotting operators and the
 various arguments that can be passed for these operators is provided in the subsequent sections.
+
+\chapter{Building CDO with Magics}
+
+This section describes how to build and install {\CDO} with Magics
+support on a UNIX system.
+
+\section{Magics}
+ 
+Magics needs to be installed before building {\CDO}.
+The Fortran and netCDF support can be disabled when building Magics from source.
+
+\section{Compilation}
+
+First go to the {\CDO}  \href{https://code.zmaw.de/projects/cdo}{\tt download} page
+({\tt https://code.zmaw.de/projects/cdo}) to get the latest distribution,
+if you do not have it yet.
+Compilation is done by performing the following steps:
+
+\begin{enumerate}
+\item Unpack the archive, if you haven't done that yet:
+   
+\begin{verbatim}
+    gunzip cdo-$VERSION.tar.gz    # uncompress the archive
+    tar xf cdo-$VERSION.tar       # unpack it
+    cd cdo-$VERSION
+\end{verbatim}
+
+\item Configure {\CDO} with Magics support:
+ 
+\begin{verbatim}
+./configure --with-magics=<Magics root directory>
+\end{verbatim}
+
+For an overview of other configuration options use
+
+\begin{verbatim}
+    ./configure --help
+\end{verbatim}
+
+\item Compile the program by running make:
+
+\begin{verbatim}
+    make
+\end{verbatim}
+
+\end{enumerate}
+
+The program should compile without problems and the binary ({\tt cdo}) 
+should be available in the {\tt src} directory of the distribution.
+
+
+\section{Installation}
+
+After the compilation of the source code do a {\tt make install},
+possibly as root if the destination permissions require that.
+
+\begin{verbatim}
+    make install
+\end{verbatim} 
+
+The binary is installed into the directory {\tt $<$prefix$>$/bin}.
+{\tt $<$prefix$>$} defaults to {\tt /usr/local} but can be changed with 
+the {\tt --prefix} option of the configure script. 
