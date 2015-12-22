@@ -2,8 +2,7 @@
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
-#include<limits.h>  /* TEMPORARY FIX, UNTIL NEXT MAGICS LIBRARY RELEASE */ 
-
+#include <limits.h>
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -11,26 +10,14 @@
 #include "pstream.h"
 
 #if defined(HAVE_LIBMAGICS)
+
 #include "magics_api.h"
-#endif
 
-
-#if defined(HAVE_LIBXML2)
-
-#include<libxml/parser.h>
-#include<libxml/tree.h>
-#include "template_parser.h"
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 #include "StringUtilities.h"
 
-
-extern xmlNode  *magics_node;
-
-#endif
-
 #define DBG 0
-
 
 const char *line_colours[] = {"red", "green", "blue", "yellow", "cyan", "magenta",
 			     "avocado","beige", "brick", "brown", "burgundy",
@@ -57,7 +44,6 @@ const char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","device"};
 int graph_param_count = sizeof(graph_params)/sizeof(char*);
 int num_colours = sizeof( line_colours )/sizeof( char* );
 
-void VerifyGraphParameters( int num_param, char **param_names );
 int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, const char *sep_char );
 
 extern int checkdevice(char *device_in);
@@ -70,7 +56,6 @@ extern int DEVICE_COUNT;
 static
 void maggraph(const char *plotfile, const char *varname,const char *varunits, long nfiles, long *nts, int **vdate, int **vtime, double **datatab, int nparam, char **params)
 {
-  
   char *lines[1];
   char *temp_str;
   char **split_str = NULL;
@@ -485,10 +470,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	1. Loop over the Files
 	2. Loop over the number of time steps 
 	3. Set the attributes for the magics data and plot
-  */  
-   
-#if defined(HAVE_LIBMAGICS)
-
+  */
 
   /* magics_template_parser( magics_node ); */
 
@@ -699,14 +681,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   if( DBG )
     fprintf(stderr, "%s\n",lines[0]);
-
-#endif
-
 }
 
 int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, const char *sep_char )
 {
-  
   int    split_str_count1, split_str_count2;
   int	 i,flag[3]; /*  '3' since, three fields are expected in the input strings */
   char   **split_str1 = NULL;
@@ -752,12 +730,8 @@ int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, const char *se
     return 0;
 }
 
-
-#if defined(HAVE_LIBMAGICS)
-
 static
 void init_MAGICS( )
-
 {
   setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
   mag_open();
@@ -768,24 +742,142 @@ void init_MAGICS( )
 
 }
 
-
 static
 void quit_MAGICS( )
-
 {
-
   mag_close ();
   if( DBG )
     fprintf( stdout,"Exiting From MAGICS\n" );
 
 }
 
+static
+void VerifyGraphParameters( int num_param, char **param_names )
+{
+  int i, j;
+  int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
+  char **split_str = NULL;
+  const char *sep_char = "=";
+  char *temp_str;
+  
+  for ( i = 0; i < num_param; ++i )
+    {
+      split_str_count = 0;
+      found = FALSE;
+      syntax = TRUE;
+      split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
+      if( split_str_count > 1 ) 
+	{
+	  for ( j = 0; j < graph_param_count; ++j )
+	    {
+	      if( !strcmp( split_str[0], graph_params[j] ) )
+		{
+		  found = TRUE;
+		  if( !strcmp( split_str[0],"obsv" ) ||  !strcmp( split_str[0],"stat" ) )
+		    {  
+		      if( IsNumeric( split_str[1] ) )
+			syntax = FALSE;
+		      else 
+			{			
+			  temp_str = strdup( split_str[1] );    
+			  StrToUpperCase( temp_str );
+			  if( strcmp( temp_str,"TRUE" ) && strcmp( temp_str,"FALSE" ) )
+			    syntax = FALSE;			      
+			}
+		    }	 
+		      
+		  if( !strcmp( split_str[0],"ymin" ) ||  !strcmp( split_str[0],"ymax" ) || !strcmp( split_str[0],"sigma" )  )
+		    {
+		      if( !IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		    }
+		    
+		    
+      		  if( !strcmp( split_str[0],"device" ) )
+		    {
+		      if( IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		      else 
+			{
+			  if( !strcmp( split_str[0],"device" ) )
+			    {
+			      if( DBG )
+				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+			      if( checkdevice( split_str[1] ) )
+				syntax = FALSE;
+
+                              /* Graph not supported in google earth format */
+                              if( !strcmp( split_str[1],"GIF_ANIMATION" ) || !strcmp( split_str[1],"gif_animation" ))
+                                {
+                                   syntax = FALSE;
+	                           fprintf( stderr,"Animation not supported for Graph!\n");
+                                   if( DBG )
+                                     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+                                }
+                              if( !strcmp( split_str[1],"KML" ) || !strcmp( split_str[1],"kml" ) )
+                                {
+                                   syntax = FALSE;
+	                           fprintf( stderr," 'kml' format not supported for  Graph!\n");
+                                   if( DBG )
+                                     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+                                }
+			    }
+			}
+		    }
+
+/*		    
+		  if( !strcmp( split_str[0],"xml" ) )
+		    {
+		      if( ( fp = fopen( split_str[1],"r") ) == NULL )
+			{
+			  fprintf( stderr,"Input XML File not found in specified path '%s'\n", split_str[1] );
+			  halt_flag = TRUE;
+			}
+		      else
+			{
+			  // HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR 
+			  fclose(fp);
+			  init_XMLtemplate_parser( split_str[1] );
+			  updatemagics_and_results_nodes( );
+			}
+		    }
+*/
+		}
+	    }
+	}
+      else
+	{
+	  syntax = FALSE;
+	}
+	
+      if( found == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Unknown parameter  '%s'!\n", param_names[i] );
+	} 
+      if( found == TRUE && syntax == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter specification  '%s'!\n", param_names[i] );
+	}
+      Free( split_str );
+    }
+      
+    if( halt_flag == TRUE )
+    {
+      exit(0);
+    }
+    
+}
 #endif
 
 #define NINC_ALLOC 1024
 
 void *Maggraph(void *argument)
 {
+  cdoInitialize(argument);
+
+#if defined(HAVE_LIBMAGICS)
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];
   int varID, levelID;
   int gridID;
@@ -800,8 +892,6 @@ void *Maggraph(void *argument)
   double val;
   int i;
   
-  cdoInitialize(argument);
-
   int nparam = operatorArgc();
   char **pnames = operatorArgv();
   
@@ -897,18 +987,13 @@ void *Maggraph(void *argument)
       streamClose(streamID);
     }
   
-#if defined(HAVE_LIBXML2)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   /*
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
   */
-#endif
 
-
-#if defined(HAVE_LIBMAGICS)
   init_MAGICS( );
-#endif
 
   cdoPrint(" Creating PLOT for %s", varname);
   if( DBG )
@@ -920,13 +1005,9 @@ void *Maggraph(void *argument)
     }
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 
-#if defined(HAVE_LIBXML2)
   /* quit_XMLtemplate_parser( ); */
-#endif
 
-#if defined(HAVE_LIBMAGICS)
   quit_MAGICS( );
-#endif
 
   if ( vlistID0 != -1 ) vlistDestroy(vlistID0);
 
@@ -941,129 +1022,13 @@ void *Maggraph(void *argument)
   if ( vdate ) Free(vdate);
   if ( vtime ) Free(vtime);
 
+#else
+  
+  cdoAbort("MAGICS support not compiled in!");
+
+#endif
+
   cdoFinish();
 
   return 0;
-}
-
-
-void VerifyGraphParameters( int num_param, char **param_names )
-
-{
-  int i, j;
-  int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
-  char **split_str = NULL;
-  const char *sep_char = "=";
-  char *temp_str;
-  
-  for ( i = 0; i < num_param; ++i )
-    {
-      split_str_count = 0;
-      found = FALSE;
-      syntax = TRUE;
-      split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
-      if( split_str_count > 1 ) 
-	{
-	  for ( j = 0; j < graph_param_count; ++j )
-	    {
-	      if( !strcmp( split_str[0], graph_params[j] ) )
-		{
-		  found = TRUE;
-		  if( !strcmp( split_str[0],"obsv" ) ||  !strcmp( split_str[0],"stat" ) )
-		    {  
-		      if( IsNumeric( split_str[1] ) )
-			syntax = FALSE;
-		      else 
-			{			
-			  temp_str = strdup( split_str[1] );    
-			  StrToUpperCase( temp_str );
-			  if( strcmp( temp_str,"TRUE" ) && strcmp( temp_str,"FALSE" ) )
-			    syntax = FALSE;			      
-			}
-		    }	 
-		      
-		  if( !strcmp( split_str[0],"ymin" ) ||  !strcmp( split_str[0],"ymax" ) || !strcmp( split_str[0],"sigma" )  )
-		    {
-		      if( !IsNumeric( split_str[1] ) )
-			syntax = FALSE;       
-		    }
-		    
-		    
-      		  if( !strcmp( split_str[0],"device" ) )
-		    {
-		      if( IsNumeric( split_str[1] ) )
-			syntax = FALSE;       
-		      else 
-			{
-			  if( !strcmp( split_str[0],"device" ) )
-			    {
-			      if( DBG )
-				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
-			      if( checkdevice( split_str[1] ) )
-				syntax = FALSE;
-
-                              /* Graph not supported in google earth format */
-                              if( !strcmp( split_str[1],"GIF_ANIMATION" ) || !strcmp( split_str[1],"gif_animation" ))
-                                {
-                                   syntax = FALSE;
-	                           fprintf( stderr,"Animation not supported for Graph!\n");
-                                   if( DBG )
-                                     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
-                                }
-                              if( !strcmp( split_str[1],"KML" ) || !strcmp( split_str[1],"kml" ) )
-                                {
-                                   syntax = FALSE;
-	                           fprintf( stderr," 'kml' format not supported for  Graph!\n");
-                                   if( DBG )
-                                     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
-                                }
-			    }
-			}
-		    }
-
-/*		    
-		  if( !strcmp( split_str[0],"xml" ) )
-		    {
-		      if( ( fp = fopen( split_str[1],"r") ) == NULL )
-			{
-			  fprintf( stderr,"Input XML File not found in specified path '%s'\n", split_str[1] );
-			  halt_flag = TRUE;
-			}
-		      else
-			{
-#if defined(HAVE_LIBXML2)
-			  // HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR 
-			  fclose(fp);
-			  init_XMLtemplate_parser( split_str[1] );
-			  updatemagics_and_results_nodes( );
-#endif			
-			}
-		    }
-*/
-		}
-	    }
-	}
-      else
-	{
-	  syntax = FALSE;
-	}
-	
-      if( found == FALSE )
-	{
-	  halt_flag = TRUE;
-	  fprintf( stderr,"Unknown parameter  '%s'!\n", param_names[i] );
-	} 
-      if( found == TRUE && syntax == FALSE )
-	{
-	  halt_flag = TRUE;
-	  fprintf( stderr,"Invalid parameter specification  '%s'!\n", param_names[i] );
-	}
-      Free( split_str );
-    }
-      
-    if( halt_flag == TRUE )
-    {
-      exit(0);
-    }
-    
 }

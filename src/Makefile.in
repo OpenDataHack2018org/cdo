@@ -80,30 +80,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cdo$(EXEEXT)
-#if ENABLE_NEARPT3
-#cdo_SOURCES +=           \
-#               nearpt3x.h      \
-#               nearpt3c.h      \
-#               nearpt3c.cc     \
-#               cellsearchorder.h
-#endif
-@ENABLE_MAGICS_TRUE@am__append_1 = Magplot.c       \
-@ENABLE_MAGICS_TRUE@               Magvector.c     \
-@ENABLE_MAGICS_TRUE@               Maggraph.c      \
-@ENABLE_MAGICS_TRUE@               template_parser.h   \
-@ENABLE_MAGICS_TRUE@               template_parser.c   \
-@ENABLE_MAGICS_TRUE@               results_template_parser.h   \
-@ENABLE_MAGICS_TRUE@               results_template_parser.c   \
-@ENABLE_MAGICS_TRUE@               magics_template_parser.h   \
-@ENABLE_MAGICS_TRUE@               magics_template_parser.c   \
-@ENABLE_MAGICS_TRUE@               StringUtilities.h   \
-@ENABLE_MAGICS_TRUE@               StringUtilities.c   \
-@ENABLE_MAGICS_TRUE@               CdoMagicsMapper.h   \
-@ENABLE_MAGICS_TRUE@               CdoMagicsMapper.c
-
-@ENABLE_ALL_STATIC_TRUE@am__append_2 = -all-static
+@ENABLE_ALL_STATIC_TRUE@am__append_1 = -all-static
 noinst_PROGRAMS = cdotest$(EXEEXT)
-@ENABLE_ALL_STATIC_TRUE@am__append_3 = -all-static
+@ENABLE_ALL_STATIC_TRUE@am__append_2 = -all-static
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/config.h.in $(top_srcdir)/config/mkinstalldirs \
@@ -178,52 +157,6 @@ am__v_lt_0 = --silent
 am__v_lt_1 = 
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am__cdo_SOURCES_DIST = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
-	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
-	Change.c Change_e5slm.c Cloudlayer.c CMOR.c Collgrid.c \
-	Command.c Comp.c Compc.c Complextorect.c Cond.c Cond2.c \
-	Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c \
-	Diff.c Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c \
-	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c \
-	Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c \
-	Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c \
-	Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c \
-	Harmonic.c Hi.c Histogram.c Importamsr.c Importbinary.c \
-	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
-	Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c Inttime.c \
-	Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c Log.c \
-	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
-	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
-	Output.c Outputgmt.c Pack.c Pardup.c Pinfo.c Pressure.c \
-	Regres.c Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c \
-	Rotuv.c Runpctl.c Runstat.c Seascount.c Seaspctl.c Seasstat.c \
-	Selbox.c Select.c Seloperator.c Selrec.c Seltime.c Selvar.c \
-	Set.c Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c \
-	Setpartab.c Setrcaname.c Settime.c Setzaxis.c Showinfo.c \
-	Sinfo.c Smooth9.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
-	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
-	Splityear.c SSOpar.c Subtrend.c Tee.c Templates.c Test.c \
-	Tests.c Timedt.c Timcount.c Timpctl.c Timselpctl.c \
-	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
-	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c \
-	Varrms.c Vertintml.c Vertintap.c Vertstat.c Vertcum.c \
-	Vertwind.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
-	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
-	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
-	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
-	nearpt3c.h Magplot.c Magvector.c Maggraph.c template_parser.h \
-	template_parser.c results_template_parser.h \
-	results_template_parser.c magics_template_parser.h \
-	magics_template_parser.c StringUtilities.h StringUtilities.c \
-	CdoMagicsMapper.h CdoMagicsMapper.c
-@ENABLE_MAGICS_TRUE@am__objects_1 = cdo-Magplot.$(OBJEXT) \
-@ENABLE_MAGICS_TRUE@	cdo-Magvector.$(OBJEXT) \
-@ENABLE_MAGICS_TRUE@	cdo-Maggraph.$(OBJEXT) \
-@ENABLE_MAGICS_TRUE@	cdo-template_parser.$(OBJEXT) \
-@ENABLE_MAGICS_TRUE@	cdo-results_template_parser.$(OBJEXT) \
-@ENABLE_MAGICS_TRUE@	cdo-magics_template_parser.$(OBJEXT) \
-@ENABLE_MAGICS_TRUE@	cdo-StringUtilities.$(OBJEXT) \
-@ENABLE_MAGICS_TRUE@	cdo-CdoMagicsMapper.$(OBJEXT)
 am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Afterburner.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Arithc.$(OBJEXT) cdo-Arithdays.$(OBJEXT) \
@@ -310,7 +243,12 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
 	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
 	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
-	cdo-Zonstat.$(OBJEXT) $(am__objects_1)
+	cdo-Zonstat.$(OBJEXT) cdo-Magplot.$(OBJEXT) \
+	cdo-Magvector.$(OBJEXT) cdo-Maggraph.$(OBJEXT) \
+	cdo-template_parser.$(OBJEXT) \
+	cdo-results_template_parser.$(OBJEXT) \
+	cdo-magics_template_parser.$(OBJEXT) \
+	cdo-StringUtilities.$(OBJEXT) cdo-CdoMagicsMapper.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
 cdo_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -357,8 +295,7 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libcdo_la_SOURCES) $(cdo_SOURCES) $(cdotest_SOURCES)
-DIST_SOURCES = $(libcdo_la_SOURCES) $(am__cdo_SOURCES_DIST) \
-	$(cdotest_SOURCES)
+DIST_SOURCES = $(libcdo_la_SOURCES) $(cdo_SOURCES) $(cdotest_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -598,6 +535,15 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	clipping/grid_cell.c clipping/grid_cell.h \
 	clipping/intersection.c clipping/utils.c clipping/utils.h
 #
+#if ENABLE_NEARPT3
+#cdo_SOURCES +=           \
+#               nearpt3x.h      \
+#               nearpt3c.h      \
+#               nearpt3c.cc     \
+#               cellsearchorder.h
+#endif
+
+#if ENABLE_MAGICS
 cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
 	Change.c Change_e5slm.c Cloudlayer.c CMOR.c Collgrid.c \
@@ -631,17 +577,22 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
 	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
 	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
-	nearpt3c.h $(am__append_1)
+	nearpt3c.h Magplot.c Magvector.c Maggraph.c template_parser.h \
+	template_parser.c results_template_parser.h \
+	results_template_parser.c magics_template_parser.h \
+	magics_template_parser.c StringUtilities.h StringUtilities.c \
+	CdoMagicsMapper.h CdoMagicsMapper.c
+#endif
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
-cdo_LDFLAGS = $(am__append_2)
+cdo_LDFLAGS = $(am__append_1)
 libcdo_la_CPPFLAGS = $(cdo_CPPFLAGS)
 cdotest_SOURCES = cdo_int.h	\
 	           cdotest.c
 
 cdotest_LDADD = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
-cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_3)
+cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_2)
 
 #cdo-userlog.o: userlog.c config.h
 #	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c

@@ -2,22 +2,31 @@
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
+#include "cdo_int.h"
 #include "magics_template_parser.h"
 #include "StringUtilities.h"
 
+#if defined(HAVE_LIBXML2)
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#endif
+
+#if defined(HAVE_LIBMAGICS)
 #include "magics_api.h"
+#endif
+
 
 #define DBG 0 
 
-
-extern xmlNode *magics_node;
+extern void *magics_node;
 
 
 /* Recursive function that sets the Magics parameters from the XML structure */
 
-int magics_template_parser( xmlNode *a_node ) 
-
+int magics_template_parser( void *node ) 
 {
+#if defined(HAVE_LIBXML2)
+    xmlNode *a_node = (xmlNode*) node;
     int param_set_flag;
     xmlNode *cur_node = NULL;
     const char *param_name,*param_type,*param_value;
@@ -86,13 +95,21 @@ int magics_template_parser( xmlNode *a_node )
 	    }
         }
     }
-    return 0;
+#else
+  
+  cdoAbort("XML2 support not compiled in!");
+  
+#endif
+
+  return 0;
 }
 
-int SetMagicsParameterValue( const char *param_name, const char *param_type, const char *param_value )
 
+int SetMagicsParameterValue( const char *param_name, const char *param_type, const char *param_value )
 {
-	int i, ret_flag = 0;
+	int ret_flag = 0;
+#if defined(HAVE_LIBMAGICS)
+	int i;
 	int split_str_count = 0;
 	char **split_str = NULL;
 	const char *sep_char = ",";
@@ -234,6 +251,7 @@ int SetMagicsParameterValue( const char *param_name, const char *param_type, con
 		ret_flag = 3;
 		fprintf(stderr, "Unknown Parameter Type\n" );
 	  }
-
+#endif
+        
 	return ret_flag;
 }

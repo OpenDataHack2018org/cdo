@@ -269,11 +269,9 @@ void *Hurr(void *argument);
 //void *Hi(void *argument);
 void *Wct(void *argument);
 
-#if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
 void *Magplot(void *argument);
 void *Magvector(void *argument);
 void *Maggraph(void *argument);
-#endif
 
 
 #define  AdisitOperators        {"adisit", "adipot"}
@@ -549,11 +547,9 @@ void *Maggraph(void *argument);
 #define  HiOperators            {"hi"}
 #define  WctOperators           {"wct"}
 
-#if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
 #define  MagplotOperators       {"contour", "shaded", "grfill"}
 #define  MagvectorOperators     {"vector"}
 #define  MaggraphOperators      {"graph"}
-#endif
 
 static modules_t Modules[] =
 {
@@ -815,11 +811,9 @@ static modules_t Modules[] =
   { Hurr,           HurrHelp,          HurrOperators,          1,   CDI_REAL,  1,  1 },
   /*  { Hi,             NULL,              HiOperators,        1,   CDI_REAL,  3,  1 }, */
   { Wct,            WctHelp,           WctOperators,           1,   CDI_REAL,  2,  1 },
-#if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
   { Magplot,        MagplotHelp,       MagplotOperators,       1,   CDI_REAL,  1,  1 },
   { Magvector,      MagvectorHelp,     MagvectorOperators,     1,   CDI_REAL,  1,  1 },
   { Maggraph,       MaggraphHelp,      MaggraphOperators,      1,   CDI_REAL, -1,  1 },
-#endif
 };							       
 							       
 static int NumModules = sizeof(Modules) / sizeof(Modules[0]);

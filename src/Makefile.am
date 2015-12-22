@@ -362,7 +362,7 @@ cdo_SOURCES += nearpt3c.h
 #               cellsearchorder.h
 #endif
 
-if ENABLE_MAGICS
+#if ENABLE_MAGICS
 cdo_SOURCES += Magplot.c       \
                Magvector.c     \
                Maggraph.c      \
@@ -376,7 +376,7 @@ cdo_SOURCES += Magplot.c       \
                StringUtilities.c   \
                CdoMagicsMapper.h   \
                CdoMagicsMapper.c
-endif
+#endif
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD    = libcdo.la $(top_builddir)/libcdi/src/libcdi.la

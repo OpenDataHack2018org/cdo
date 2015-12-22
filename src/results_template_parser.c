@@ -1,22 +1,31 @@
+#if defined(HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
+#include "cdo_int.h"
 #include "template_parser.h"
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 
-#define DBG_MSG 0 
+#if defined(HAVE_LIBXML2)
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#endif
 
+
+#define DBG_MSG 0 
 
 /* extern int GetMagicsParameterInfo( const char *user_name, char **magics_name, char **magics_type ); */
 
 extern int GetMagicsParameterInfo(  const char *user_name, char *param_value );
 
-extern xmlNode *results_node;
-
 
 /* Recursive function that sets the results parameters from the XML structure */
 
-int results_template_parser( xmlNode * a_node, const char *varname ) 
-
+int results_template_parser( void * node, const char *varname ) 
 {
+#if defined(HAVE_LIBXML2)
+    xmlNode *a_node = (xmlNode*) node;
     xmlNode *cur_node = NULL;
     xmlAttrPtr attr = NULL;
     xmlChar *param_value;
@@ -118,5 +127,11 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 	    }
         }
     }
-    return 0;
+#else
+  
+  cdoAbort("XML2 support not compiled in!");
+  
+#endif
+
+  return 0;
 }

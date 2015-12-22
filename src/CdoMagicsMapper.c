@@ -1,7 +1,10 @@
-
 #if defined(HAVE_CONFIG_H)
-#  include "config.h" /* HAVE_LIBMAGICS */
+#  include "config.h"
 #endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "CdoMagicsMapper.h"
 #include "magics_template_parser.h"
@@ -114,9 +117,7 @@ int Set_magics_param_CTABLE( const char *user_name, const char *param_value )
     return 1;
   printf("Setting the CTABLE magics params \n"); 
 #if 0
-#if defined(HAVE_LIBMAGICS)
   SetMagicsParameterValue( "contour_level_list", "floatarray", param_value );
-#endif
 #endif
   return 0;
 }

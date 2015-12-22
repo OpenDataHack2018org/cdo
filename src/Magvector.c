@@ -8,24 +8,20 @@
 #include "grid.h"
 #include "pstream.h"
 
+
+#if defined(HAVE_LIBMAGICS)
+
 #include "magics_api.h"
 
-#include<libxml/parser.h>
-#include<libxml/tree.h>
-#include "template_parser.h"
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 #include "StringUtilities.h"
-
-extern xmlNode  *magics_node;
 
 #define DBG 0
 
 int VECTOR, STREAM;
 const char  *vector_params[] = {"thin_fac","unit_vec","device","step_freq"};
 int vector_param_count = sizeof(vector_params)/sizeof(char*);
-
-void VerifyVectorParameters( int num_param, char **param_names, int opID );
 
 /* Default Magics Values */
 double THIN_FAC = 2.0, UNIT_VEC = 25.0;
@@ -127,10 +123,6 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		dlat /= (nlat-1);
 	  }
 
-
-/* #if defined(HAVE_LIBMAGICS) */
-
-
         /* magics_template_parser( magics_node ); */
 
         /* results_template_parser(results_node, varname ); */
@@ -192,7 +184,6 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 	  }
 }
 
-
 static
 void init_MAGICS( )
 
@@ -217,18 +208,118 @@ void quit_MAGICS( )
 
 }
 
-void *Magvector(void *argument)
+static
+void VerifyVectorParameters( int num_param, char **param_names, int opID )
 
 {
+  
+  int i, j;
+  int found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
+  int param_count = 0;
+  const char **params = NULL;
+  char **split_str = NULL;
+  const char *sep_char = "=";
+
+  /* char  *vector_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB"}; */
+
+  for ( i = 0; i < num_param; ++i )
+    {
+      split_str_count = 0;
+      found = FALSE;
+      syntax = TRUE;
+      split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
+      
+      if( DBG )
+	fprintf( stderr, "Verifying params!\n");
+      
+      if( split_str_count > 1 ) 
+	{
+	  
+	  if( opID == VECTOR )
+	    {
+	      param_count = vector_param_count;
+	      params = vector_params;
+	    }
+	  
+	  for ( j = 0; j < param_count; ++j )
+	    {
+	      if( !strcmp( split_str[0], params[j] ) )
+		{
+		  found = TRUE;
+		      
+		  if( !strcmp( split_str[0],"thin_fac" ) || !strcmp( split_str[0],"unit_vec" ) ||
+		      !strcmp( split_str[0],"step_freq" )
+                    )
+		    {
+		      if( !IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		    }
+		    
+   		  if( !strcmp( split_str[0],"device" ) )
+		    {
+		      if( IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		      else 
+			{
+			  if( !strcmp( split_str[0],"device" ) )
+			    {
+			      if( DBG )
+				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+			      if( checkdevice( split_str[1] ) )
+				syntax = FALSE;
+
+                              /* Vector not supported in google earth format */
+			      if( !strcmp( split_str[1],"KML" ) || !strcmp( split_str[1],"kml" ) )
+                                {
+				   syntax = FALSE;
+			           if( DBG )
+				     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+                                }
+			    }
+			}
+		    }
+		}
+	    }
+	}
+      else
+	{
+	  syntax = FALSE;
+	}
+	
+      if( found == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter  '%s'\n", param_names[i] );
+	} 
+      if( found == TRUE && syntax == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
+	}
+	
+      if( split_str ) 	  
+        Free( split_str );
+    }
+      
+    if( halt_flag == TRUE )
+    {
+      exit(0);
+    }
+}
+#endif
+
+
+void *Magvector(void *argument)
+{
+  cdoInitialize(argument);
+
+#if defined(HAVE_LIBMAGICS)
   int nrecs;
   int levelID;
   int nmiss;
   char varname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
   char vdatestr[32],vtimestr[32],datetimestr[64];
-
-
-  cdoInitialize(argument);
 
   int nparam = operatorArgc();
   char **pnames = operatorArgv();
@@ -238,7 +329,7 @@ void *Magvector(void *argument)
 
   int operatorID = cdoOperatorID();
   
-  if( nparam )
+  if ( nparam )
     {
       if( DBG )
 	{
@@ -399,109 +490,13 @@ void *Magvector(void *argument)
 
   quit_MAGICS( );
 
+#else
+  
+  cdoAbort("MAGICS support not compiled in!");
+
+#endif
+
   cdoFinish();
 
   return 0;
-
-}
-
-
-
-void VerifyVectorParameters( int num_param, char **param_names, int opID )
-
-{
-  
-  int i, j;
-  int found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
-  int param_count = 0;
-  const char **params = NULL;
-  char **split_str = NULL;
-  const char *sep_char = "=";
-
-  /* char  *vector_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB"}; */
-
-  for ( i = 0; i < num_param; ++i )
-    {
-      split_str_count = 0;
-      found = FALSE;
-      syntax = TRUE;
-      split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
-      
-      if( DBG )
-	fprintf( stderr, "Verifying params!\n");
-      
-      if( split_str_count > 1 ) 
-	{
-	  
-	  if( opID == VECTOR )
-	    {
-	      param_count = vector_param_count;
-	      params = vector_params;
-	    }
-	  
-	  for ( j = 0; j < param_count; ++j )
-	    {
-	      if( !strcmp( split_str[0], params[j] ) )
-		{
-		  found = TRUE;
-		      
-		  if( !strcmp( split_str[0],"thin_fac" ) || !strcmp( split_str[0],"unit_vec" ) ||
-		      !strcmp( split_str[0],"step_freq" )
-                    )
-		    {
-		      if( !IsNumeric( split_str[1] ) )
-			syntax = FALSE;       
-		    }
-		    
-   		  if( !strcmp( split_str[0],"device" ) )
-		    {
-		      if( IsNumeric( split_str[1] ) )
-			syntax = FALSE;       
-		      else 
-			{
-			  if( !strcmp( split_str[0],"device" ) )
-			    {
-			      if( DBG )
-				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
-			      if( checkdevice( split_str[1] ) )
-				syntax = FALSE;
-
-                              /* Vector not supported in google earth format */
-			      if( !strcmp( split_str[1],"KML" ) || !strcmp( split_str[1],"kml" ) )
-                                {
-				   syntax = FALSE;
-			           if( DBG )
-				     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
-                                }
-			    }
-			}
-		    }
-		}
-	    }
-	}
-      else
-	{
-	  syntax = FALSE;
-	}
-	
-      if( found == FALSE )
-	{
-	  halt_flag = TRUE;
-	  fprintf( stderr,"Invalid parameter  '%s'\n", param_names[i] );
-	} 
-      if( found == TRUE && syntax == FALSE )
-	{
-	  halt_flag = TRUE;
-	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
-	}
-	
-      if( split_str ) 	  
-        Free( split_str );
-    }
-      
-    if( halt_flag == TRUE )
-    {
-      exit(0);
-    }
-    
 }

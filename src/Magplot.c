@@ -7,17 +7,15 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
+
+
+#if defined(HAVE_LIBMAGICS)
+
 #include "magics_api.h"
 
-#include<libxml/parser.h>
-#include<libxml/tree.h>
-#include "template_parser.h"
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 #include "StringUtilities.h"
-
-xmlDoc *param_doc = NULL;
-xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 
 #define DBG 0
 
@@ -94,7 +92,6 @@ int ReadColourTable ( char *filepath );
 int checkstyle( char *style_in );
 int checkdevice( char *device_in );
 int checkprojection( char *projection_in );
-void VerifyPlotParameters( int num_param, char **param_names, int opID );
 
  /* Magics default values */
 int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0, FILE_SPLIT = FALSE;
@@ -564,202 +561,8 @@ void quit_MAGICS( )
     fprintf( stderr,"Exiting From MAGICS\n" );
 }
 
-void *Magplot(void *argument)
-{
-  int nrecs;
-  int levelID;
-  int nmiss;
-  char varname[CDI_MAX_NAME];
-  char units[CDI_MAX_NAME];
-  char vdatestr[32], vtimestr[32], datetimestr[64];
-
-  cdoInitialize(argument);
-  
-  int nparam = operatorArgc();
-  char **pnames = operatorArgv();
-  
-  CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
-  SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
-  GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
-
-  int operatorID = cdoOperatorID();
-
-  if( nparam )
-    {
-      if( DBG )
-	{
-	  for( int i = 0; i < nparam; i++ )
-	    fprintf( stderr,"Param %d is %s!\n",i+1, pnames[i] );
-	}
-      
-      VerifyPlotParameters( nparam, pnames, operatorID );
-    }
-
-  int streamID = streamOpenRead(cdoStreamName(0));
-
-  int vlistID = streamInqVlist(streamID);
-  int taxisID = vlistInqTaxis(vlistID);
-
-  int varID = 0;
-  int gridID  = vlistInqVarGrid(vlistID, varID);
-  // int zaxisID = vlistInqVarZaxis(vlistID, varID);
-  // double missval = vlistInqVarMissval(vlistID, varID);
-
-  if ( gridInqType(gridID) == GRID_GME          ) cdoAbort("GME grid unspported!");
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
-
-  if ( gridInqType(gridID) != GRID_CURVILINEAR )
-    gridID = gridToCurvilinear(gridID, 1);
-
-  int gridsize = gridInqSize(gridID);
-  int nlon     = gridInqXsize(gridID);
-  int nlat     = gridInqYsize(gridID);
-  //int nlev     = zaxisInqSize(zaxisID);
-
-  double *array           = (double*) Malloc(gridsize*sizeof(double));
-  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
-  double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
-
-  gridInqYvals(gridID, grid_center_lat);
-  gridInqXvals(gridID, grid_center_lon);
-
-  /* Convert lat/lon units if required */
-  gridInqXunits(gridID, units);
-  grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
-  gridInqYunits(gridID, units);
-  grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
-					
-  int tsID = 0;
-
-  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
-  /*
-     init_XMLtemplate_parser( Filename );
-     updatemagics_and_results_nodes( );
-  */
-
-
-  init_MAGICS( );
-
-  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-    {
-      if( ANIM_FLAG )
-        {
-      	  if( nrecs > 1 )
-	    {
-	      cdoWarning("File has more than one variable! Animation creation not possible!!! \n");
-	      break;
-            }
-      	  if( tsID % STEP_FREQ )
-	    {
-                tsID++;
-		continue;
-            }
-	}
-      else 	
-        {
-          if( STEP_FREQ )
-	    {
-          	if( tsID % STEP_FREQ )
-	    	  {
-                     tsID++;
-	             cdoWarning("NOT PLOTTING STEP %d!!!\n",tsID);
-	             continue;
-	    	  }
-            }
-         else 
-            {
-		if( tsID )
-		  {
-	   		cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
-           		cdoWarning("To plot steps at a particular interval, set 'step_freq' to the frequency of the steps to be plotted!!!");
-           		cdoWarning("To plot steps at random interval, set 'step_freq' to '1' and select the steps using the selection operators!!!");
-       	   		break;
-		  }
-	    }
-        }
-      
-      int vdate = taxisInqVdate(taxisID);
-      int vtime = taxisInqVtime(taxisID);
-	      
-      date2str(vdate, vdatestr, sizeof(vdatestr));
-      time2str(vtime, vtimestr, sizeof(vtimestr));
-      sprintf( datetimestr, "%s %s", vdatestr, vtimestr );
-      if( DBG )
-        fprintf( stderr,"Date %s Time %s\n",vdatestr, vtimestr );
-
-      for ( int recID = 0; recID < nrecs; recID++ )
-	{
-	  streamInqRecord(streamID, &varID, &levelID);
-	  streamReadRecord(streamID, array, &nmiss);
-	  vlistInqVarName(vlistID, varID, varname);
-	  vlistInqVarUnits(vlistID, varID, units);
-
-	  if ( operatorID == SHADED || operatorID == CONTOUR || operatorID == GRFILL )
-          {
-                if( DBG )
-                  {
-                     if( operatorID == SHADED )
-                       fprintf( stderr," Creating SHADED PLOT for %s\n",varname );
-                     else if( operatorID == CONTOUR )
-                       fprintf( stderr," Creating CONTOUR PLOT for %s\n",varname );
-                     else if( operatorID == GRFILL )
-                       fprintf( stderr," Creating GRFILL PLOT for %s\n",varname );
-                  }
-
-                if( DBG )
-                  fprintf( stderr,"Plot %d\n",varID );
-	  	magplot(cdoStreamName(1)->args, operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
-          }
-	  else
-	  	fprintf(stderr,"operator not implemented\n");
-	}
-
-      if( DBG )
-        fprintf( stderr,"TimeStep %d\n",tsID );
-
-       
-      tsID++;
-      /*
-      if( !STEP_FREQ  && tsID )
-        {
-	   cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
-           cdoWarning("To plot steps at a particular interval, set 'step_freq' to the frequency of the steps to be plotted!!!");
-           cdoWarning("To plot steps at random interval, set 'step_freq' to '1' and select the steps using the selection operators!!!");
-       	   break;
-	}
-      else
-        {
-      	   tsID++;
-           if( DBG )
-             fprintf( stderr,"TimeStep %d\n",tsID );
-	}
-      */
-    }
-
-  if( ANIM_FLAG )
-    {
-      if( FILE_SPLIT == TRUE  ) 
-        cdoWarning("File split parameter ignored!!!");
-    }
-  quit_MAGICS( );
-
-  streamClose(streamID);
-
-  if ( array  ) Free(array);
-  if ( grid_center_lon ) Free(grid_center_lon);
-  if ( grid_center_lat ) Free(grid_center_lat);
-
-/*   quit_XMLtemplate_parser( ); */
-
-  cdoFinish();
-
-  return 0;
-
-}
-
-
+static
 void VerifyPlotParameters( int num_param, char **param_names, int opID )
-
 {
   int i, j, k;
   int found = FALSE, syntax = TRUE, halt_flag = FALSE, /* file_found = TRUE, */ split_str_count;
@@ -1155,7 +958,6 @@ int checkcolour( char *colour_in )
 
 
 int ReadColourTable ( char *filepath )
-
 {
     
     FILE *fp;
@@ -1227,8 +1029,8 @@ int ReadColourTable ( char *filepath )
     return 0;
 }
 
-int checkstyle( char *style_in )
 
+int checkstyle( char *style_in )
 {
     int i, found = FALSE;
     StrToUpperCase( style_in );
@@ -1253,7 +1055,6 @@ int checkstyle( char *style_in )
 
 
 int checkdevice( char *device_in )
-
 {
     int i, found = FALSE;
     StrToUpperCase( device_in );
@@ -1285,8 +1086,8 @@ int checkdevice( char *device_in )
     return 1; 
 }
 
-int checkprojection( char *projection_in )
 
+int checkprojection( char *projection_in )
 {
     int i, found = FALSE;
 
@@ -1314,4 +1115,205 @@ int checkprojection( char *projection_in )
       }	
     
     return 1; 
+}
+#endif
+
+
+void *Magplot(void *argument)
+{
+  cdoInitialize(argument);
+
+#if defined(HAVE_LIBMAGICS)
+  int nrecs;
+  int levelID;
+  int nmiss;
+  char varname[CDI_MAX_NAME];
+  char units[CDI_MAX_NAME];
+  char vdatestr[32], vtimestr[32], datetimestr[64];
+  
+  int nparam = operatorArgc();
+  char **pnames = operatorArgv();
+  
+  CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
+  SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
+  GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
+
+  int operatorID = cdoOperatorID();
+
+  if( nparam )
+    {
+      if( DBG )
+	{
+	  for( int i = 0; i < nparam; i++ )
+	    fprintf( stderr,"Param %d is %s!\n",i+1, pnames[i] );
+	}
+      
+      VerifyPlotParameters( nparam, pnames, operatorID );
+    }
+
+  int streamID = streamOpenRead(cdoStreamName(0));
+
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
+
+  int varID = 0;
+  int gridID  = vlistInqVarGrid(vlistID, varID);
+  // int zaxisID = vlistInqVarZaxis(vlistID, varID);
+  // double missval = vlistInqVarMissval(vlistID, varID);
+
+  if ( gridInqType(gridID) == GRID_GME          ) cdoAbort("GME grid unspported!");
+  if ( gridInqType(gridID) == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
+
+  if ( gridInqType(gridID) != GRID_CURVILINEAR )
+    gridID = gridToCurvilinear(gridID, 1);
+
+  int gridsize = gridInqSize(gridID);
+  int nlon     = gridInqXsize(gridID);
+  int nlat     = gridInqYsize(gridID);
+  //int nlev     = zaxisInqSize(zaxisID);
+
+  double *array           = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+
+  gridInqYvals(gridID, grid_center_lat);
+  gridInqXvals(gridID, grid_center_lon);
+
+  /* Convert lat/lon units if required */
+  gridInqXunits(gridID, units);
+  grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
+					
+  int tsID = 0;
+
+  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
+  /*
+     init_XMLtemplate_parser( Filename );
+     updatemagics_and_results_nodes( );
+  */
+
+
+  init_MAGICS( );
+
+  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+    {
+      if( ANIM_FLAG )
+        {
+      	  if( nrecs > 1 )
+	    {
+	      cdoWarning("File has more than one variable! Animation creation not possible!!! \n");
+	      break;
+            }
+      	  if( tsID % STEP_FREQ )
+	    {
+                tsID++;
+		continue;
+            }
+	}
+      else 	
+        {
+          if( STEP_FREQ )
+	    {
+          	if( tsID % STEP_FREQ )
+	    	  {
+                     tsID++;
+	             cdoWarning("NOT PLOTTING STEP %d!!!\n",tsID);
+	             continue;
+	    	  }
+            }
+         else 
+            {
+		if( tsID )
+		  {
+	   		cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
+           		cdoWarning("To plot steps at a particular interval, set 'step_freq' to the frequency of the steps to be plotted!!!");
+           		cdoWarning("To plot steps at random interval, set 'step_freq' to '1' and select the steps using the selection operators!!!");
+       	   		break;
+		  }
+	    }
+        }
+      
+      int vdate = taxisInqVdate(taxisID);
+      int vtime = taxisInqVtime(taxisID);
+	      
+      date2str(vdate, vdatestr, sizeof(vdatestr));
+      time2str(vtime, vtimestr, sizeof(vtimestr));
+      sprintf( datetimestr, "%s %s", vdatestr, vtimestr );
+      if( DBG )
+        fprintf( stderr,"Date %s Time %s\n",vdatestr, vtimestr );
+
+      for ( int recID = 0; recID < nrecs; recID++ )
+	{
+	  streamInqRecord(streamID, &varID, &levelID);
+	  streamReadRecord(streamID, array, &nmiss);
+	  vlistInqVarName(vlistID, varID, varname);
+	  vlistInqVarUnits(vlistID, varID, units);
+
+	  if ( operatorID == SHADED || operatorID == CONTOUR || operatorID == GRFILL )
+          {
+                if( DBG )
+                  {
+                     if( operatorID == SHADED )
+                       fprintf( stderr," Creating SHADED PLOT for %s\n",varname );
+                     else if( operatorID == CONTOUR )
+                       fprintf( stderr," Creating CONTOUR PLOT for %s\n",varname );
+                     else if( operatorID == GRFILL )
+                       fprintf( stderr," Creating GRFILL PLOT for %s\n",varname );
+                  }
+
+                if( DBG )
+                  fprintf( stderr,"Plot %d\n",varID );
+	  	magplot(cdoStreamName(1)->args, operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
+          }
+	  else
+	  	fprintf(stderr,"operator not implemented\n");
+	}
+
+      if( DBG )
+        fprintf( stderr,"TimeStep %d\n",tsID );
+
+       
+      tsID++;
+      /*
+      if( !STEP_FREQ  && tsID )
+        {
+	   cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
+           cdoWarning("To plot steps at a particular interval, set 'step_freq' to the frequency of the steps to be plotted!!!");
+           cdoWarning("To plot steps at random interval, set 'step_freq' to '1' and select the steps using the selection operators!!!");
+       	   break;
+	}
+      else
+        {
+      	   tsID++;
+           if( DBG )
+             fprintf( stderr,"TimeStep %d\n",tsID );
+	}
+      */
+    }
+
+  if( ANIM_FLAG )
+    {
+      if( FILE_SPLIT == TRUE  ) 
+        cdoWarning("File split parameter ignored!!!");
+    }
+  quit_MAGICS( );
+
+  streamClose(streamID);
+
+  if ( array  ) Free(array);
+  if ( grid_center_lon ) Free(grid_center_lon);
+  if ( grid_center_lat ) Free(grid_center_lat);
+
+/*   quit_XMLtemplate_parser( ); */
+#else
+  
+  cdoAbort("MAGICS support not compiled in!");
+
+#endif
+
+  cdoFinish();
+
+  return 0;
+
 }
