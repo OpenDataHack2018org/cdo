@@ -797,7 +797,7 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
 
   gridtype = gridInqType(gridID1);
 
-  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced gaussian grid!");
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced Gaussian grid!");
 
   lmiss = nmiss > 0;
   lperio = 1;
@@ -843,7 +843,7 @@ int gridToRegular(int gridID1)
 
   gridtype = gridInqType(gridID1);
 
-  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced gaussian grid!");
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced Gaussian grid!");
 
   ny = gridInqYsize(gridID1);
   np = gridInqNP(gridID1);

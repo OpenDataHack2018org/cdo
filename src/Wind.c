@@ -164,7 +164,7 @@ void *Wind(void *argument)
 	  gridID1 = vlistInqVarGrid(vlistID1, varID1);
 
 	  if ( gridInqType(gridID1) != GRID_GAUSSIAN )
-	    cdoAbort("U-wind is not on gaussian grid!");
+	    cdoAbort("U-wind is not on Gaussian grid!");
 
 	  if ( gridID1 != vlistInqVarGrid(vlistID1, varID2) )
 	    cdoAbort("U and V wind must have the same grid represention!");
