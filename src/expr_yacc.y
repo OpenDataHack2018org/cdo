@@ -36,10 +36,10 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %token <varnm>  VARIABLE
 %token <fname>  FUNCTION
 
+%left AND OR
 %left LEG GE LE EQ NE '>' '<'
 %left '+' '-'
 %left '*' '/'
-%left AND OR
 %right '?' ':'
 %right '^'
 %nonassoc UMINUS

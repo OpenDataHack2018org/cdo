@@ -48,13 +48,13 @@ extern int yydebug;
     CONSTANT = 258,
     VARIABLE = 259,
     FUNCTION = 260,
-    LEG = 261,
-    GE = 262,
-    LE = 263,
-    EQ = 264,
-    NE = 265,
-    AND = 266,
-    OR = 267,
+    AND = 261,
+    OR = 262,
+    LEG = 263,
+    GE = 264,
+    LE = 265,
+    EQ = 266,
+    NE = 267,
     UMINUS = 268
   };
 #endif
@@ -62,13 +62,13 @@ extern int yydebug;
 #define CONSTANT 258
 #define VARIABLE 259
 #define FUNCTION 260
-#define LEG 261
-#define GE 262
-#define LE 263
-#define EQ 264
-#define NE 265
-#define AND 266
-#define OR 267
+#define AND 261
+#define OR 262
+#define LEG 263
+#define GE 264
+#define LE 265
+#define EQ 266
+#define NE 267
 #define UMINUS 268
 
 /* Value type.  */
