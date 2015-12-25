@@ -1895,11 +1895,11 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( lcheck )
     {
+      remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
+      remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
+
       for ( n = 0; n < src_grid_size; ++n )
 	{
-	  if ( src_grid->cell_area[n] < -.01 )
-	    cdoPrint("Source grid area error: %d %g", n, src_grid->cell_area[n]);
-
 	  if ( src_centroid_lat[n] < -PIH-.01 || src_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Source grid centroid lat error: %d %g", n, src_centroid_lat[n]);
 
@@ -1909,8 +1909,6 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
       for ( n = 0; n < tgt_grid_size; ++n )
 	{
-	  if ( tgt_grid->cell_area[n] < -.01 )
-	    cdoPrint("Target grid area error: %d %g", n, tgt_grid->cell_area[n]);
 	  if ( tgt_centroid_lat[n] < -PIH-.01 || tgt_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Target grid centroid lat error: %d %g", n, tgt_centroid_lat[n]);
 
@@ -1918,19 +1916,7 @@ void scrip_remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	  tgt_centroid_lon[n] = 0;
 	}
 
-      for ( n = 0; n < num_links; ++n )
-	{
-	  src_cell_add = rv->src_cell_add[n];
-	  tgt_cell_add = rv->tgt_cell_add[n];
-
-	  if ( rv->wts[3*n] < -0.01 )
-	    cdoPrint("Map weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
-		     src_cell_add, tgt_cell_add, n, rv->wts[3*n]);
-
-	  if ( rv->norm_opt != NORM_OPT_NONE && rv->wts[3*n] > 1.01 )
-	    cdoPrint("Map weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
-		     src_cell_add, tgt_cell_add, n, rv->wts[3*n]);
-	}
+      remapCheckWeights(num_links, 3, rv->norm_opt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
 
       for ( n = 0; n < num_links; ++n )
 	{

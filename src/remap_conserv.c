@@ -585,13 +585,13 @@ int get_lonlat_circle_index(remapgrid_t *remap_grid)
 
 
 static
-void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
+void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 {
-  /* Include centroids in weights and normalize using destination area if requested */
-  long num_wts = rv->num_wts;
+  // Include centroids in weights and normalize using destination area if requested
   long num_links = rv->num_links;
-  long tgt_cell_add;       /* current linear address for target grid cell   */
-  double norm_factor = 0;  /* factor for normalizing wts */
+  int num_wts = rv->num_wts;
+  int tgt_cell_add;       // current linear address for target grid cell
+  double norm_factor = 0; // factor for normalizing wts
 
   if ( rv->norm_opt == NORM_OPT_DESTAREA )
     {
@@ -600,7 +600,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 #endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(num_wts, num_links, rv, tgt_grid)	\
+  shared(num_wts, num_links, rv, tgt_grid) \
   private(tgt_cell_add, norm_factor)
 #endif
       for ( long n = 0; n < num_links; ++n )
@@ -622,7 +622,7 @@ void normalize_weights(remapgrid_t *tgt_grid, remapvars_t *rv)
 #endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(num_wts, num_links, rv, tgt_grid)	\
+  shared(num_wts, num_links, rv, tgt_grid) \
   private(tgt_cell_add, norm_factor)
 #endif
       for ( long n = 0; n < num_links; ++n )
@@ -706,9 +706,8 @@ void reg2d_bound_box(remapgrid_t *remap_grid, double *grid_bound_box)
 
 void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
-  /* local variables */
   int lcheck = TRUE;
-  long srch_corners;       /* num of corners of srch cells           */
+  int srch_corners;  // num of corners of srch cells
 
   /* Variables necessary if segment manages to hit pole */
   int src_remap_grid_type = src_grid->remap_grid_type;
@@ -721,11 +720,11 @@ void remap_conserv_weights(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   if ( cdoTimer ) timer_start(timer_remap_con);
 
-  long src_grid_size = src_grid->size;
-  long tgt_grid_size = tgt_grid->size;
+  int src_grid_size = src_grid->size;
+  int tgt_grid_size = tgt_grid->size;
 
-  long src_num_cell_corners = src_grid->num_cell_corners;
-  long tgt_num_cell_corners = tgt_grid->num_cell_corners;
+  int src_num_cell_corners = src_grid->num_cell_corners;
+  int tgt_num_cell_corners = tgt_grid->num_cell_corners;
 
   int max_num_cell_corners = src_num_cell_corners;
   if ( tgt_num_cell_corners > max_num_cell_corners ) max_num_cell_corners = tgt_num_cell_corners;
@@ -1030,58 +1029,31 @@ printf("stime = %gs\n", stimer);
 
   if ( weightlinks ) Free(weightlinks);
 
-  /* Normalize using destination area if requested */
-  normalize_weights(tgt_grid, rv);
+  // Normalize weights using destination area if requested
+  remapNormalizeWeights(tgt_grid, rv);
 
-  long num_links = rv->num_links;
-
-  if ( cdoVerbose )
-    cdoPrint("Total number of links = %ld", rv->num_links);
+  if ( cdoVerbose ) cdoPrint("Total number of links = %ld", rv->num_links);
   
-  long n;
-  for ( n = 0; n < src_grid_size; ++n )
+  for ( int n = 0; n < src_grid_size; ++n )
     if ( IS_NOT_EQUAL(src_grid->cell_area[n], 0) ) src_grid->cell_frac[n] /= src_grid->cell_area[n];
 
-  for ( n = 0; n < tgt_grid_size; ++n )
+  for ( int n = 0; n < tgt_grid_size; ++n )
     if ( IS_NOT_EQUAL(tgt_grid->cell_area[n], 0) ) tgt_grid->cell_frac[n] /= tgt_grid->cell_area[n];
 
-  /* Perform some error checking on final weights  */
-
+  // Perform some error checking on final weights
   if ( lcheck )
     {
-      for ( n = 0; n < src_grid_size; ++n )
-	{
-	  if ( src_grid->cell_area[n] < -.01 )
-	    cdoPrint("Source grid area error: %d %g", n, src_grid->cell_area[n]);
-	}
+      remapCheckArea(src_grid_size, src_grid->cell_area, "Source");
+      remapCheckArea(tgt_grid_size, tgt_grid->cell_area, "Target");
 
-      for ( n = 0; n < tgt_grid_size; ++n )
-	{
-	  if ( tgt_grid->cell_area[n] < -.01 )
-	    cdoPrint("Target grid area error: %d %g", n, tgt_grid->cell_area[n]);
-	}
-
-      for ( n = 0; n < num_links; ++n )
-	{
-	  long src_cell_add = rv->src_cell_add[n];
-	  long tgt_cell_add = rv->tgt_cell_add[n];
-          long num_wts = rv->num_wts;
-
-	  if ( rv->wts[n*num_wts] < -0.01 )
-	    cdoPrint("Map weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
-		     src_cell_add, tgt_cell_add, n, rv->wts[n*num_wts]);
-
-	  if ( rv->norm_opt != NORM_OPT_NONE && rv->wts[n*num_wts] > 1.01 )
-	    cdoPrint("Map weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
-		     src_cell_add, tgt_cell_add, n, rv->wts[n*num_wts]);
-	}
-    } // lcheck
+      remapCheckWeights(rv->num_links, rv->num_wts, rv->norm_opt, rv->src_cell_add, rv->tgt_cell_add, rv->wts);
+    }
 
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
-} /* remap_weights_conserv */
+} // remap_weights_conserv
 
 
 void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
 {
-} /* remap_conserv */
+} // remap_conserv

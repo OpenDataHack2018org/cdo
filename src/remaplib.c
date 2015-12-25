@@ -1852,3 +1852,28 @@ void reorder_links(remapvars_t *rv)
       printf("loop %ld  nlinks %ld\n", j+1, nlinks);
     }
 }
+
+
+void remapCheckArea(int grid_size, double *restrict cell_area, const char *name)
+{
+  for ( int n = 0; n < grid_size; ++n )
+    {
+      if ( cell_area[n] < -.01 )
+        cdoPrint("%s grid area error: %d %g", name, n, cell_area[n]);
+    }
+}
+
+
+void remapCheckWeights(long num_links, int num_wts, int norm_opt, int *src_cell_add, int *tgt_cell_add, double *wts)
+{
+  for ( long n = 0; n < num_links; ++n )
+    {
+      if ( wts[n*num_wts] < -0.01 )
+        cdoPrint("Map weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+                 src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
+
+      if ( norm_opt != NORM_OPT_NONE && wts[n*num_wts] > 1.01 )
+        cdoPrint("Map weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+                 src_cell_add[n], tgt_cell_add[n], n, wts[n*num_wts]);
+    }
+}

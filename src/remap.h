@@ -236,4 +236,7 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
 
 void remapgrid_get_lonlat(remapgrid_t *grid, unsigned cell_add, double *plon, double *plat);
 
+void remapCheckArea(int grid_size, double *restrict cell_area, const char *name);
+void remapCheckWeights(long num_links, int num_wts, int norm_opt, int *src_cell_add, int *tgt_cell_add, double *wts);
+
 #endif  /* _REMAP_H */
