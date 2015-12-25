@@ -40,7 +40,6 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %left '+' '-'
 %left '*' '/'
 %left AND OR
-%right '='
 %right '?' ':'
 %right '^'
 %nonassoc UMINUS
@@ -101,11 +100,9 @@ expr:
 nodeType *expr_con(double value)
 {
   nodeType *p = NULL;
-  size_t nodeSize;
-
   /* allocate node */
-  nodeSize = SIZEOF_NODETYPE + sizeof(conNodeType);
-  if ((p = (nodeType*) malloc(nodeSize)) == NULL)
+  size_t nodeSize = SIZEOF_NODETYPE + sizeof(conNodeType);
+  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
@@ -118,11 +115,9 @@ nodeType *expr_con(double value)
 nodeType *expr_var(char *nm)
 {
   nodeType *p = NULL;
-  size_t nodeSize;
-
   /* allocate node */
-  nodeSize = SIZEOF_NODETYPE + sizeof(varNodeType);
-  if ((p = (nodeType*) malloc(nodeSize)) == NULL)
+  size_t nodeSize = SIZEOF_NODETYPE + sizeof(varNodeType);
+  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
@@ -135,11 +130,9 @@ nodeType *expr_var(char *nm)
 nodeType *expr_fun(char *fname, nodeType *op)
 {
   nodeType *p = NULL;
-  size_t nodeSize;
-
   /* allocate node */
-  nodeSize = SIZEOF_NODETYPE + sizeof(funNodeType);
-  if ((p = (nodeType*) malloc(nodeSize)) == NULL)
+  size_t nodeSize = SIZEOF_NODETYPE + sizeof(funNodeType);
+  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
@@ -152,22 +145,19 @@ nodeType *expr_fun(char *fname, nodeType *op)
 
 nodeType *expr_opr(int oper, int nops, ...)
 {
-  va_list ap;
   nodeType *p = NULL;
-  size_t nodeSize;
-  int i;
-
   /* allocate node */
-  nodeSize = SIZEOF_NODETYPE + sizeof(oprNodeType) + (nops - 1)*sizeof(nodeType*);
-  if ((p = (nodeType*) malloc(nodeSize)) == NULL)
+  size_t nodeSize = SIZEOF_NODETYPE + sizeof(oprNodeType) + (nops - 1)*sizeof(nodeType*);
+  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeOpr;
   p->u.opr.oper = oper;
   p->u.opr.nops = nops;
+  va_list ap;
   va_start(ap, nops);
-  for (i = 0; i < nops; i++)
+  for ( int i = 0; i < nops; i++ )
     p->u.opr.op[i] = va_arg(ap, nodeType*);
   va_end(ap);
 
@@ -176,13 +166,11 @@ nodeType *expr_opr(int oper, int nops, ...)
 
 void freeNode(nodeType *p)
 {
-  int i;
+  if ( !p ) return;
 
-  if ( ! p ) return;
-
-  if (p->type == typeOpr)
+  if ( p->type == typeOpr )
     {
-      for (i = 0; i < p->u.opr.nops; i++)
+      for ( int i = 0; i < p->u.opr.nops; i++ )
 	freeNode(p->u.opr.op[i]);
     }
   

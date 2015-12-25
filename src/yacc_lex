@@ -1,3 +1,3 @@
 # bison version 3.0.4;  flex version 2.5.37
-bison -y -o expr_yacc.c -d expr_yacc.y
+bison -W -y -r all -o expr_yacc.c -d expr_yacc.y
 flex -v -oexpr_lex.c expr_lex.l
