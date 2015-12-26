@@ -457,10 +457,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    53,    53,    57,    58,    62,    63,    64,    65,    66,
-      70,    71,    75,    76,    77,    78,    79,    80,    81,    82,
-      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
-      93,    94
+       0,    52,    52,    56,    57,    61,    62,    63,    64,    65,
+      69,    70,    74,    75,    76,    77,    78,    79,    80,    81,
+      82,    83,    84,    85,    86,    87,    88,    89,    90,    91,
+      92,    93
 };
 #endif
 
@@ -1299,175 +1299,175 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 53 "expr_yacc.y" /* yacc.c:1646  */
+#line 52 "expr_yacc.y" /* yacc.c:1646  */
     { return(0); }
 #line 1305 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 57 "expr_yacc.y" /* yacc.c:1646  */
+#line 56 "expr_yacc.y" /* yacc.c:1646  */
     { expr_run((yyvsp[0].nPtr), (parse_parm_t *) parse_arg); freeNode((yyvsp[0].nPtr)); }
 #line 1311 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 62 "expr_yacc.y" /* yacc.c:1646  */
+#line 61 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(';', 2, NULL, NULL); }
 #line 1317 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 63 "expr_yacc.y" /* yacc.c:1646  */
+#line 62 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = (yyvsp[-1].nPtr); }
 #line 1323 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 64 "expr_yacc.y" /* yacc.c:1646  */
+#line 63 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('=', 2, expr_var((yyvsp[-3].varnm)), (yyvsp[-1].nPtr)); }
 #line 1329 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 65 "expr_yacc.y" /* yacc.c:1646  */
+#line 64 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('=', 2, expr_var((yyvsp[-1].varnm)), expr_var((yyvsp[-1].varnm))); }
 #line 1335 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 66 "expr_yacc.y" /* yacc.c:1646  */
+#line 65 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = (yyvsp[-1].nPtr); }
 #line 1341 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 70 "expr_yacc.y" /* yacc.c:1646  */
+#line 69 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = (yyvsp[0].nPtr); }
 #line 1347 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 71 "expr_yacc.y" /* yacc.c:1646  */
+#line 70 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(';', 2, (yyvsp[-1].nPtr), (yyvsp[0].nPtr)); }
 #line 1353 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 75 "expr_yacc.y" /* yacc.c:1646  */
+#line 74 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_con((yyvsp[0].cvalue)); }
 #line 1359 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 76 "expr_yacc.y" /* yacc.c:1646  */
+#line 75 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_var((yyvsp[0].varnm)); }
 #line 1365 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 77 "expr_yacc.y" /* yacc.c:1646  */
+#line 76 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(UMINUS, 1, (yyvsp[0].nPtr)); }
 #line 1371 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 78 "expr_yacc.y" /* yacc.c:1646  */
+#line 77 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('+', 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1377 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 79 "expr_yacc.y" /* yacc.c:1646  */
+#line 78 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('-', 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1383 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 80 "expr_yacc.y" /* yacc.c:1646  */
+#line 79 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('*', 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1389 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 81 "expr_yacc.y" /* yacc.c:1646  */
+#line 80 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('/', 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1395 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 82 "expr_yacc.y" /* yacc.c:1646  */
+#line 81 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('<', 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1401 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 83 "expr_yacc.y" /* yacc.c:1646  */
+#line 82 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('>', 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1407 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 84 "expr_yacc.y" /* yacc.c:1646  */
+#line 83 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('^', 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1413 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 85 "expr_yacc.y" /* yacc.c:1646  */
+#line 84 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(GE,  2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1419 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 86 "expr_yacc.y" /* yacc.c:1646  */
+#line 85 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(LE,  2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1425 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 87 "expr_yacc.y" /* yacc.c:1646  */
+#line 86 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(NE,  2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1431 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 88 "expr_yacc.y" /* yacc.c:1646  */
+#line 87 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(EQ,  2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1437 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 89 "expr_yacc.y" /* yacc.c:1646  */
+#line 88 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(LEG, 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1443 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 90 "expr_yacc.y" /* yacc.c:1646  */
+#line 89 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(AND, 2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1449 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 91 "expr_yacc.y" /* yacc.c:1646  */
+#line 90 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr(OR,  2, (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1455 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 92 "expr_yacc.y" /* yacc.c:1646  */
+#line 91 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_opr('?', 3, (yyvsp[-4].nPtr), (yyvsp[-2].nPtr), (yyvsp[0].nPtr)); }
 #line 1461 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 93 "expr_yacc.y" /* yacc.c:1646  */
+#line 92 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = (yyvsp[-1].nPtr); }
 #line 1467 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 94 "expr_yacc.y" /* yacc.c:1646  */
+#line 93 "expr_yacc.y" /* yacc.c:1646  */
     { (yyval.nPtr) = expr_fun((yyvsp[-3].fname), (yyvsp[-1].nPtr)); }
 #line 1473 "expr_yacc.c" /* yacc.c:1646  */
     break;
@@ -1701,7 +1701,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 97 "expr_yacc.y" /* yacc.c:1906  */
+#line 96 "expr_yacc.y" /* yacc.c:1906  */
 
 
 #define SIZEOF_NODETYPE ((char *)&p->u.con - (char *)p)

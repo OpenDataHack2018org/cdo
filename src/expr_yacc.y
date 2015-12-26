@@ -41,7 +41,6 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %left '+' '-'
 %left '*' '/'
 %precedence UMINUS
- /* %nonassoc UMINUS */
 %right '?' ':'
 %right '^'
 
