@@ -40,9 +40,10 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %left LEG GE LE EQ NE '>' '<'
 %left '+' '-'
 %left '*' '/'
+%precedence UMINUS
+ /* %nonassoc UMINUS */
 %right '?' ':'
 %right '^'
-%nonassoc UMINUS
 
 %type <nPtr> stmt expr stmt_list
 
