@@ -37,14 +37,22 @@ static double f_sqr(double x)  { return (x*x);      }
 
 typedef struct {
   int type;
-  const char *name;                      /* function name            */
-  double (*func)(double);          /* pointer to function      */
+  const char *name;          // function name
+  double (*func)(double);    // pointer to function
 }
 func_t;
 
+double expr_sum(int n, double *restrict array)
+{
+  printf("expr_sum: %d\n", n);
+  double sum = 0;
+  for ( int i = 0; i < n ; ++i ) sum += array[i];
+  return sum;
+}
+
 static func_t fun_sym_tbl[] =
 {
-  /* scalar functions */
+  // scalar functions
   {0, "abs",   fabs},
   {0, "floor", floor},
   {0, "ceil",  ceil},
@@ -70,7 +78,10 @@ static func_t fun_sym_tbl[] =
   {0, "atanh", atanh},
   {0, "gamma", tgamma},
 
-  /* array functions
+  // cdo functions
+  {1, "sum",  expr_sum},
+  // {1, "fldmean",  cdo_fldmean},
+  /*
   {1, "min",   min},
   {1, "max",   max},
   {1, "sum",   sum},
@@ -105,7 +116,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 
   p->u.con.value = cval1;
 
-  return (p);
+  return p;
 }
 
 static
@@ -335,7 +346,6 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   int ngp  = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
   long n   = ngp*nlev;
-  long i;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -354,14 +364,14 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   oper_expr_con_var(oper, nmiss, n, missval1, missval2, odat, cval, idat);
 
   nmiss = 0;
-  for ( i = 0; i < n; i++ )
+  for ( long i = 0; i < n; i++ )
     if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
 
   p->nmiss = nmiss;
 
   if ( p2->tmpvar ) Free(p2->data);
 
-  return (p);
+  return p;
 }
 
 static
@@ -376,7 +386,6 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   int ngp  = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
   long n   = ngp*nlev;
-  long i;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -395,14 +404,14 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   oper_expr_var_con(oper, nmiss, n, missval1, missval2, odat, idat, cval);
 
   nmiss = 0;
-  for ( i = 0; i < n; i++ )
+  for ( long i = 0; i < n; i++ )
     if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
 
   p->nmiss = nmiss;
 
   if ( p1->tmpvar ) Free(p1->data);
 
-  return (p);
+  return p;
 }
 
 static
@@ -490,14 +499,12 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   if ( p1->tmpvar ) Free(p1->data);
   if ( p2->tmpvar ) Free(p2->data);
 
-  return (p);
+  return p;
 }
 
 static
 void ex_copy(nodeType *p2, nodeType *p1)
 {
-  long i;
-
   if ( cdoVerbose ) printf("\tcopy %s\n", p1->u.var.nm);
 
   long ngp1 = gridInqSize(p1->gridID);
@@ -509,7 +516,7 @@ void ex_copy(nodeType *p2, nodeType *p1)
   long ngp = ngp2;
   long nlev = zaxisInqSize(p2->zaxisID);
 
-  for ( i = 0; i < ngp*nlev; i++ ) p2->data[i] = p1->data[i];
+  for ( long i = 0; i < ngp*nlev; i++ ) p2->data[i] = p1->data[i];
 
   p2->missval = p1->missval;
   p2->nmiss   = p1->nmiss;
@@ -547,20 +554,19 @@ nodeType *expr(int oper, nodeType *p1, nodeType *p2)
   else
     cdoAbort("Internal problem!");
 
-  return (p);
+  return p;
 }
 
 static
 nodeType *ex_fun_con(char *fun, nodeType *p1)
 {
-  int i;
   int funcID = -1;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type = typeCon;
 
-  for ( i = 0; i < NumFunc; i++)
+  for ( int i = 0; i < NumFunc; i++)
     if ( fun_sym_tbl[i].type == 0 )
       if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
 	{ 
@@ -573,13 +579,12 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
 
   p->u.con.value = fun_sym_tbl[funcID].func(p1->u.con.value);
 
-  return (p);
+  return p;
 }
 
 static
 nodeType *ex_fun_var(char *fun, nodeType *p1)
 {
-  long i;
   int funcID = -1;
   int gridID  = p1->gridID;
   int zaxisID = p1->zaxisID;
@@ -600,7 +605,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 
   p->data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-  for ( i = 0; i < NumFunc; i++)
+  for ( int i = 0; i < NumFunc; i++ )
     if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
       { 
 	funcID = i;
@@ -612,34 +617,44 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 
   if ( nmiss > 0 )
     {
-      for ( i = 0; i < ngp*nlev; i++ )
+      for ( long i = 0; i < ngp*nlev; i++ )
 	{
 	  errno = -1;
 	  p->data[i] = DBL_IS_EQUAL(p1->data[i], missval) ? missval : fun_sym_tbl[funcID].func(p1->data[i]);
 	  if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
-	  else if ( isnan(p->data[i]) )  p->data[i] = missval;
+	  else if ( isnan(p->data[i]) ) p->data[i] = missval;
 	}
     }
   else
     {
-      for ( i = 0; i < ngp*nlev; i++ )
-	{
-	  errno = -1;
-	  p->data[i] = fun_sym_tbl[funcID].func(p1->data[i]);
-	  if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
-	  else if ( isnan(p->data[i]) )  p->data[i] = missval;
-	}
+      if ( fun_sym_tbl[funcID].type == 0 )
+        {
+          for ( long i = 0; i < ngp*nlev; i++ )
+            {
+              errno = -1;
+              p->data[i] = fun_sym_tbl[funcID].func(p1->data[i]);
+              if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
+              else if ( isnan(p->data[i]) ) p->data[i] = missval;
+            }
+        }
+      else
+        {
+          /*
+          for ( int k = 0; k < nlev; k++ )
+            p->data[k] = fun_sym_tbl[funcID].func(ngp, p1->data+k*ngp);
+          */
+        }
     }
 
   nmiss = 0;
-  for ( i = 0; i < ngp*nlev; i++ )
+  for ( long i = 0; i < ngp*nlev; i++ )
     if ( DBL_IS_EQUAL(p->data[i], missval) ) nmiss++;
 
   p->nmiss = nmiss;
 
   if ( p1->tmpvar ) Free(p1->data);
 
-  return (p);
+  return p;
 }
 
 static
@@ -660,7 +675,7 @@ nodeType *ex_fun(char *fun, nodeType *p1)
   else
     cdoAbort("Internal problem!");
 
-  return (p);
+  return p;
 }
 
 static
@@ -698,7 +713,7 @@ nodeType *ex_uminus_var(nodeType *p1)
 
   p->nmiss = nmiss;
   
-  return (p);
+  return p;
 }
 
 static
@@ -710,7 +725,7 @@ nodeType *ex_uminus_con(nodeType *p1)
 
   p->u.con.value = -(p1->u.con.value);
 
-  return (p);
+  return p;
 }
 
 static
@@ -731,7 +746,7 @@ nodeType *ex_uminus(nodeType *p1)
   else
     cdoAbort("Internal problem!");
 
-  return (p);
+  return p;
 }
 
 static
@@ -857,13 +872,13 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 	}
     }
 
-  return (p);
+  return p;
 }
 
 
 int exNode(nodeType *p, parse_parm_t *parse_arg)
 {
-  if ( ! p ) return(0);
+  if ( ! p ) return 0;
 
   /* node is leaf */
   if ( p->type == typeCon || p->type == typeVar || p->u.opr.nops == 0 )
@@ -890,7 +905,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
   int varID;
   nodeType *rnode = NULL;
 
-  if ( ! p ) return (rnode);
+  if ( ! p ) return rnode;
 
   /*  if ( ! parse_arg->init ) { exNode(p, parse_arg); return 0; } */
 
@@ -993,8 +1008,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	{
 	  expr_run(p->u.fun.op, parse_arg);
 
-	  if ( parse_arg->debug )
-	    printf("\tcall \t%s\n", p->u.fun.name);
+	  if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name);
 	}
       else
 	{
@@ -1076,8 +1090,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	    {
 	      expr_run(p->u.opr.op[0], parse_arg);
 
-	      if ( parse_arg->debug )
-		printf("\tneg\n");
+	      if ( parse_arg->debug ) printf("\tneg\n");
 	    }
 	  else
 	    {
@@ -1092,8 +1105,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	      expr_run(p->u.opr.op[1], parse_arg);
 	      expr_run(p->u.opr.op[2], parse_arg);
 
-	      if ( parse_arg->debug )
-		printf("\t?:\n");
+	      if ( parse_arg->debug ) printf("\t?:\n");
 	    }
 	  else
 	    {
@@ -1136,5 +1148,5 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
       break;
     }
 
-  return (rnode);
+  return rnode;
 }

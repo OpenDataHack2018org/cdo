@@ -49,7 +49,7 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %%
 
 program:
-        function                  { return(0); }
+        function                  { return 0; }
         ;
 
 function:
