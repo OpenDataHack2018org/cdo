@@ -916,7 +916,7 @@ case 5:
 YY_RULE_SETUP
 #line 60 "expr_lex.l"
 {
-                yylval->fname = (char *) strdupx(yytext);
+                yylval->fname = strdup(yytext);
                 return FUNCTION;
              } /* end functions */
 	YY_BREAK
@@ -924,7 +924,7 @@ case 6:
 YY_RULE_SETUP
 #line 66 "expr_lex.l"
 {
-                yylval->varnm = (char *) strdupx(yytext);
+                yylval->varnm = strdup(yytext);
                 return VARIABLE;
              }
 	YY_BREAK

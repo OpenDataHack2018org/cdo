@@ -210,8 +210,8 @@ void *Expr(void *argument)
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
-	       
-      for ( varID = 0; varID < nvars; varID++ ) parse_arg.nmiss[varID] = 0;
+
+      for ( varID = 0; varID < nvars1; varID++ ) parse_arg.nmiss[varID] = 0;
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{

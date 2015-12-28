@@ -1300,7 +1300,7 @@ yyreduce:
     {
         case 2:
 #line 52 "expr_yacc.y" /* yacc.c:1646  */
-    { return(0); }
+    { return 0; }
 #line 1305 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
@@ -1731,7 +1731,7 @@ nodeType *expr_var(char *nm)
 
   /* copy information */
   p->type = typeVar;
-  p->u.var.nm = strdupx(nm);
+  p->u.var.nm = strdup(nm);
 
   return p;
 }
@@ -1746,7 +1746,7 @@ nodeType *expr_fun(char *fname, nodeType *op)
 
   /* copy information */
   p->type = typeFun;
-  p->u.fun.name = strdupx(fname);
+  p->u.fun.name = strdup(fname);
   p->u.fun.op   = op;
 
   return p;

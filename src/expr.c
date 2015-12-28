@@ -37,49 +37,48 @@ static double f_sqr(double x)  { return (x*x);      }
 
 typedef struct {
   int type;
-  const char *name;          // function name
-  double (*func)(double);    // pointer to function
+  const char *name;  // function name
+  void (*func)();    // pointer to function
 }
 func_t;
 
 double expr_sum(int n, double *restrict array)
 {
-  printf("expr_sum: %d\n", n);
   double sum = 0;
-  for ( int i = 0; i < n ; ++i ) sum += array[i];
+  for ( int i = 0; i < n; ++i ) sum += array[i];
   return sum;
 }
 
 static func_t fun_sym_tbl[] =
 {
   // scalar functions
-  {0, "abs",   fabs},
-  {0, "floor", floor},
-  {0, "ceil",  ceil},
-  {0, "int",   f_int},
-  {0, "nint",  f_nint},
-  {0, "sqr",   f_sqr},
-  {0, "sqrt",  sqrt},
-  {0, "exp",   exp},
-  {0, "erf",   erf},
-  {0, "log",   log},
-  {0, "log10", log10},
-  {0, "sin",   sin},
-  {0, "cos",   cos},
-  {0, "tan",   tan},
-  {0, "sinh",  sinh},
-  {0, "cosh",  cosh},
-  {0, "tanh",  tanh},
-  {0, "asin",  asin},
-  {0, "acos",  acos},
-  {0, "atan",  atan},
-  {0, "asinh", asinh},
-  {0, "acosh", acosh},
-  {0, "atanh", atanh},
-  {0, "gamma", tgamma},
+  {0, "abs",   (void (*)()) fabs},
+  {0, "floor", (void (*)()) floor},
+  {0, "ceil",  (void (*)()) ceil},
+  {0, "int",   (void (*)()) f_int},
+  {0, "nint",  (void (*)()) f_nint},
+  {0, "sqr",   (void (*)()) f_sqr},
+  {0, "sqrt",  (void (*)()) sqrt},
+  {0, "exp",   (void (*)()) exp},
+  {0, "erf",   (void (*)()) erf},
+  {0, "log",   (void (*)()) log},
+  {0, "log10", (void (*)()) log10},
+  {0, "sin",   (void (*)()) sin},
+  {0, "cos",   (void (*)()) cos},
+  {0, "tan",   (void (*)()) tan},
+  {0, "sinh",  (void (*)()) sinh},
+  {0, "cosh",  (void (*)()) cosh},
+  {0, "tanh",  (void (*)()) tanh},
+  {0, "asin",  (void (*)()) asin},
+  {0, "acos",  (void (*)()) acos},
+  {0, "atan",  (void (*)()) atan},
+  {0, "asinh", (void (*)()) asinh},
+  {0, "acosh", (void (*)()) acosh},
+  {0, "atanh", (void (*)()) atanh},
+  {0, "gamma", (void (*)()) tgamma},
 
   // cdo functions
-  {1, "sum",  expr_sum},
+  {1, "sum",  (void (*)()) expr_sum},
   // {1, "fldmean",  cdo_fldmean},
   /*
   {1, "min",   min},
@@ -351,7 +350,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 
   p->type     = typeVar;
   p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
+  p->u.var.nm = strdup("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
   p->missval  = missval1;
@@ -391,7 +390,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 
   p->type     = typeVar;
   p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
+  p->u.var.nm = strdup("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
   p->missval  = missval1;
@@ -430,7 +429,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   long ngp1 = gridInqSize(p1->gridID);
   long ngp2 = gridInqSize(p2->gridID);
 
-  if ( ngp1 != ngp2 && ngp2 != 1 ) cdoAbort("Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
+  if ( ngp1 != ngp2 && ngp2 != 1 ) cdoAbort("expr_var_var: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", ngp1, ngp2);
 
   long ngp = ngp1;
 
@@ -441,7 +440,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 
   p->type     = typeVar;
   p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
+  p->u.var.nm = strdup("tmp");
 
   if ( nlev1 > nlev2 )
     {
@@ -507,13 +506,12 @@ void ex_copy(nodeType *p2, nodeType *p1)
 {
   if ( cdoVerbose ) printf("\tcopy %s\n", p1->u.var.nm);
 
-  long ngp1 = gridInqSize(p1->gridID);
+  long ngp  = gridInqSize(p1->gridID);
   long ngp2 = gridInqSize(p2->gridID);
 
-  if ( ngp1 != ngp2 )
-    cdoAbort("Number of grid points differ. ngp1 = %d, ngp2 = %d", ngp1, ngp2);
+  if ( ngp != ngp2 )
+    cdoAbort("ex_copy: Number of grid points differ (ngp1 = %d, ngp2 = %d)", ngp, ngp2);
 
-  long ngp = ngp2;
   long nlev = zaxisInqSize(p2->zaxisID);
 
   for ( long i = 0; i < ngp*nlev; i++ ) p2->data[i] = p1->data[i];
@@ -577,7 +575,8 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
   if ( funcID == -1 )
     cdoAbort("Function >%s< not available!", fun);
 
-  p->u.con.value = fun_sym_tbl[funcID].func(p1->u.con.value);
+  double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
+  p->u.con.value = exprfunc(p1->u.con.value);
 
   return p;
 }
@@ -586,6 +585,18 @@ static
 nodeType *ex_fun_var(char *fun, nodeType *p1)
 {
   int funcID = -1;
+  for ( int i = 0; i < NumFunc; i++ )
+    if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
+      { 
+	funcID = i;
+	break;
+      }
+
+  if ( funcID == -1 )
+    cdoAbort("Function >%s< not available!", fun);
+
+  int functype = fun_sym_tbl[funcID].type;
+
   int gridID  = p1->gridID;
   int zaxisID = p1->zaxisID;
   int nmiss   = p1->nmiss;
@@ -598,29 +609,30 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 
   p->type     = typeVar;
   p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
-  p->gridID   = gridID;
+  p->u.var.nm = strdup("tmp");
   p->zaxisID  = zaxisID;
   p->missval  = missval;
 
+  if ( functype == 0 )
+    {
+      p->gridID   = gridID;
+    }
+  else
+    {
+      ngp = 1;
+      int sgridID = gridCreate(GRID_GENERIC, ngp);
+      p->gridID   = sgridID;
+    }
+
   p->data = (double*) Malloc(ngp*nlev*sizeof(double));
-
-  for ( int i = 0; i < NumFunc; i++ )
-    if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
-      { 
-	funcID = i;
-	break;
-      }
-
-  if ( funcID == -1 )
-    cdoAbort("Function >%s< not available!", fun);
-
+  
   if ( nmiss > 0 )
     {
+      double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
       for ( long i = 0; i < ngp*nlev; i++ )
 	{
 	  errno = -1;
-	  p->data[i] = DBL_IS_EQUAL(p1->data[i], missval) ? missval : fun_sym_tbl[funcID].func(p1->data[i]);
+	  p->data[i] = DBL_IS_EQUAL(p1->data[i], missval) ? missval : exprfunc(p1->data[i]);
 	  if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
 	  else if ( isnan(p->data[i]) ) p->data[i] = missval;
 	}
@@ -629,20 +641,20 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
     {
       if ( fun_sym_tbl[funcID].type == 0 )
         {
+          double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
           for ( long i = 0; i < ngp*nlev; i++ )
             {
               errno = -1;
-              p->data[i] = fun_sym_tbl[funcID].func(p1->data[i]);
+              p->data[i] = exprfunc(p1->data[i]);
               if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
               else if ( isnan(p->data[i]) ) p->data[i] = missval;
             }
         }
       else
         {
-          /*
+          double (*exprfunc)(int,double*) = (double (*)(int,double*)) fun_sym_tbl[funcID].func;
           for ( int k = 0; k < nlev; k++ )
-            p->data[k] = fun_sym_tbl[funcID].func(ngp, p1->data+k*ngp);
-          */
+            p->data[k] = exprfunc(ngp, p1->data+k*ngp);
         }
     }
 
@@ -693,7 +705,7 @@ nodeType *ex_uminus_var(nodeType *p1)
 
   p->type     = typeVar;
   p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
+  p->u.var.nm = strdup("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
   p->missval  = missval;
@@ -782,7 +794,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
       missval2 = p2->missval;
       pdata2 = p2->data;
       if ( ngp2 > 1 && ngp2 != ngp1 )
-	cdoAbort("expr?expr:expr: Number of grid points differ. ngp1 = %ld, ngp2 = %ld", ngp1, ngp2);
+	cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", ngp1, ngp2);
       if ( nlev2 > 1 && nlev2 != nlev )
 	{
 	  if ( nlev == 1 )
@@ -791,7 +803,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 	      px = p2;
 	    }
 	  else
-	    cdoAbort("expr?expr:expr: Number of levels differ. nlev = %ld, nlev2 = %ld", nlev, nlev2);
+	    cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, nlev2 = %ld)", nlev, nlev2);
 	}
     }
 
@@ -811,7 +823,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
       missval3 = p3->missval;
       pdata3 = p3->data;
       if ( ngp3 > 1 && ngp3 != ngp1 )
-	cdoAbort("expr?expr:expr: Number of grid points differ. ngp1 = %ld, ngp3 = %ld", ngp1, ngp3);
+	cdoAbort("expr?expr:expr: Number of grid points differ (ngp1 = %ld, ngp3 = %ld)", ngp1, ngp3);
       if ( nlev3 > 1 && nlev3 != nlev )
 	{
 	  if ( nlev == 1 )
@@ -820,7 +832,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 	      px = p3;
 	    }
 	  else
-	    cdoAbort("expr?expr:expr: Number of levels differ. nlev = %ld, nlev3 = %ld", nlev, nlev3);
+	    cdoAbort("expr?expr:expr: Number of levels differ (nlev = %ld, nlev3 = %ld)", nlev, nlev3);
 	}
     }
 
@@ -828,7 +840,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 
   p->type     = typeVar;
   p->tmpvar   = 1;
-  p->u.var.nm = strdupx("tmp");
+  p->u.var.nm = strdup("tmp");
 
   p->gridID  = px->gridID;
   p->zaxisID = px->zaxisID;
@@ -874,19 +886,19 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 
   return p;
 }
-
-
+/*
+static
 int exNode(nodeType *p, parse_parm_t *parse_arg)
 {
   if ( ! p ) return 0;
 
-  /* node is leaf */
+  // node is leaf
   if ( p->type == typeCon || p->type == typeVar || p->u.opr.nops == 0 )
     {
       return 0;
     }
 
-  /* node has children */
+  // node has children
   for ( int k = 0; k < p->u.opr.nops; k++ )
     {
       exNode(p->u.opr.op[k], parse_arg);
@@ -894,7 +906,7 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
 
   return 0;
 }
-
+*/
 
 nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 {
@@ -957,7 +969,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 
 	      if ( parse_arg->var_needed[varID] == 0 )
 		{
-		  parse_arg->var[varID] = strdupx(p->u.var.nm);
+		  parse_arg->var[varID] = strdup(p->u.var.nm);
 		  parse_arg->varID[varID] = varID;
 		  parse_arg->var_needed[varID] = 1;
 		}
@@ -990,6 +1002,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  p->zaxisID = zaxisID1;
 	  p->missval = missval;
           p->nmiss   = 0;
+	  p->tmpvar  = 0;
 	  if ( ! parse_arg->init )
 	    {
               if ( vlistID == parse_arg->vlistID1 )
@@ -998,7 +1011,6 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
                 p->data  = parse_arg->vardata2[varID];
 	      p->nmiss = parse_arg->nmiss[varID];
 	    }
-	  p->tmpvar  = 0;
 	  rnode = p;
 	}
 
@@ -1009,6 +1021,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  expr_run(p->u.fun.op, parse_arg);
 
 	  if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name);
+          
 	}
       else
 	{
@@ -1023,8 +1036,10 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  parse_arg->zaxisID2   = -1;
           parse_arg->tsteptype2 = -1;
 
-	  rnode = expr_run(p->u.opr.op[1], parse_arg);
-
+          rnode = expr_run(p->u.opr.op[1], parse_arg);
+          // if ( rnode )
+          //   printf("rnode name %s\n", rnode->u.var.nm);
+          // printf("parse_arg->vlistID2 %d parse_arg->gridID2 %d\n", parse_arg->vlistID2, parse_arg->gridID2);
 	  if ( parse_arg->init )
 	    {
 	      if ( parse_arg->debug )
@@ -1073,9 +1088,11 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 		  missval  = vlistInqVarMissval(parse_arg->vlistID2, varID);
 	      
 		  p->gridID  = parse_arg->gridID2;
+                  // printf(">>>>> %s %d\n", p->u.opr.op[0]->u.var.nm, gridInqSize(p->gridID));
 		  p->zaxisID = parse_arg->zaxisID2;
 		  p->missval = missval;
 		  p->data    = parse_arg->vardata2[varID];
+		  p->nmiss   = parse_arg->nmiss[varID];
 		  p->tmpvar  = 0;
 
 		  ex_copy(p, rnode);

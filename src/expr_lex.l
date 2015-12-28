@@ -58,13 +58,13 @@ M_E          {
 
 
 {LPH}{LPHDGT}*/[ ]*\( {
-                yylval->fname = (char *) strdupx(yytext);
+                yylval->fname = strdup(yytext);
                 return FUNCTION;
              } /* end functions */
 
 
 {LPH}{LPHDGT}* {
-                yylval->varnm = (char *) strdupx(yytext);
+                yylval->varnm = strdup(yytext);
                 return VARIABLE;
              }
 
