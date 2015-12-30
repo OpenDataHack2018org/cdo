@@ -1020,8 +1020,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	{
 	  expr_run(p->u.fun.op, parse_arg);
 
-	  if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name);
-          
+	  if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name); 
 	}
       else
 	{

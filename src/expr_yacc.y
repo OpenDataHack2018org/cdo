@@ -37,7 +37,7 @@ int expr_run(nodeType *p, parse_parm_t *parse_arg);
 %token <fname>  FUNCTION
 
 %left AND OR
-%left LEG GE LE EQ NE '>' '<'
+%left LEG GE LE EQ NE GT LT
 %left '+' '-'
 %left '*' '/'
 %precedence UMINUS
@@ -78,8 +78,8 @@ expr:
         | expr '-' expr           { $$ = expr_opr('-', 2, $1, $3); }
         | expr '*' expr           { $$ = expr_opr('*', 2, $1, $3); }
         | expr '/' expr           { $$ = expr_opr('/', 2, $1, $3); }
-        | expr '<' expr           { $$ = expr_opr('<', 2, $1, $3); }
-        | expr '>' expr           { $$ = expr_opr('>', 2, $1, $3); }
+        | expr LT  expr           { $$ = expr_opr(LT,  2, $1, $3); }
+        | expr GT  expr           { $$ = expr_opr(GT,  2, $1, $3); }
         | expr '^' expr           { $$ = expr_opr('^', 2, $1, $3); }
         | expr GE  expr           { $$ = expr_opr(GE,  2, $1, $3); }
         | expr LE  expr           { $$ = expr_opr(LE,  2, $1, $3); }

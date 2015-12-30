@@ -55,7 +55,9 @@ extern int yydebug;
     LE = 265,
     EQ = 266,
     NE = 267,
-    UMINUS = 268
+    GT = 268,
+    LT = 269,
+    UMINUS = 270
   };
 #endif
 /* Tokens.  */
@@ -69,7 +71,9 @@ extern int yydebug;
 #define LE 265
 #define EQ 266
 #define NE 267
-#define UMINUS 268
+#define GT 268
+#define LT 269
+#define UMINUS 270
 
 /* Value type.  */
 

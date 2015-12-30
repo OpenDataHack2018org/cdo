@@ -69,19 +69,21 @@ M_E          {
              }
 
 
-[-()<>=+*/;{}^.?:] {
+[-()=+*/;{}^.?:] {
                 return *yytext;
              }
 
 "<=>"           return LEG;
 ">="            return GE;
 "<="            return LE;
+">"             return GT;
+"<"             return LT;
 "=="            return EQ;
 "!="            return NE;
 "&&"            return AND;
 "||"            return OR;
 
-[ \t\n]+        ;       /* ignore whitespace */
+[ \t\n\r]+      ;       /* ignore whitespace */
 
 .               yyerror(NULL, NULL, "Unknown character");
 %%
