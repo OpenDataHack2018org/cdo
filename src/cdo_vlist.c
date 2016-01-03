@@ -44,9 +44,8 @@ void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
       else
 	{
 	  for ( int i = 0; i < ysize; ++i )
-	    if ( fabs(yvals1[i] - yvals2[i]) > 1.e-5 )
+	    if ( fabs(yvals1[i] - yvals2[i]) > 3.e-5 )
 	      {
-		// printf("lat %g %g %g\n", yvals1[i], yvals2[i], yvals1[i] - yvals2[i]);
 		cdoWarning("Grid latitudes differ!");
 		break;
 	      }
@@ -69,7 +68,7 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
       gridInqXvals(gridID2, xvals2);
 		  
       for ( int i = 0; i < xsize; ++i )
-	if ( fabs(xvals1[i] - xvals2[i]) > 1.e-5 )
+	if ( fabs(xvals1[i] - xvals2[i]) > 3.e-5 )
 	  {
 	    cdoWarning("Grid longitudes differ!");
 	    break;
