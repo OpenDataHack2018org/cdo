@@ -505,6 +505,7 @@ void *Select(void *argument)
   int ntsteps;
   bool ltimsel = false;
   bool *vars = NULL;
+  double **vardata2 = NULL;
   double *array = NULL;
   double fstartdate = -99999999999.;
   double fenddate   = -99999999999.;
@@ -792,7 +793,7 @@ void *Select(void *argument)
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
 	      for ( int levID = 0; levID < nlevs; levID++ )
-		if ( vlistInqFlag(vlistID1, varID, levID) == TRUE )
+		if ( vlistInqFlag(vlistID1, varID, levID) == result )
                   {
                     npar++;
                     break;
@@ -902,6 +903,12 @@ void *Select(void *argument)
 	  goto END_LABEL;
 	}
 
+      if ( lcopy_const )
+        {
+          vardata2 = (double**) malloc(nvars2*sizeof(double));
+          for ( int varID = 0; varID < nvars2; ++varID ) vardata2[varID] = NULL;
+        }
+
       bool lstop = false;
       int tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
@@ -992,6 +999,8 @@ void *Select(void *argument)
                 }
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
+
+              if ( copytimestep && indf == 0 && tsID1 == 0 ) lcopy_const = false;
 	    }
 
 	  if ( copytimestep == true )
@@ -1004,11 +1013,30 @@ void *Select(void *argument)
 
 	      taxisCopyTimestep(taxisID2, taxisID1);
 	      streamDefTimestep(streamID2, tsID2);
-	      tsID2++;
-            }              
-     
-	  if ( copytimestep == true )
-	    {
+
+              if ( lcopy_const && tsID2 == 0 )
+                {
+                  for ( varID2 = 0; varID2 < nvars2; ++varID2 )
+                    {
+                      if ( vardata2[varID2] )
+                        {
+                          double missval = vlistInqVarMissval(vlistID2, varID2);
+                          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+                          int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
+                          for ( int levelID2 = 0; levelID2 < nlevel; ++levelID2 )
+                            {
+                              double *pdata = vardata2[varID2]+gridsize*levelID;
+                              int nmiss = 0;
+                              for ( int i = 0; i < gridsize; ++i )
+                                if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
+
+                              streamDefRecord(streamID2, varID2, levelID2);
+                              streamWriteRecord(streamID2, pdata, nmiss);
+                            }
+                        }
+                    }
+                }
+              
 	      for ( int recID = 0; recID < nrecs; recID++ )
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
@@ -1030,7 +1058,32 @@ void *Select(void *argument)
 			}
 		    }
 		}
+
+	      tsID2++;              
 	    }
+          else if ( lcopy_const && indf == 0 && tsID1 == 0 )
+            {
+	      for ( int recID = 0; recID < nrecs; recID++ )
+		{
+		  streamInqRecord(streamID1, &varID, &levelID);
+		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
+		    {
+		      varID2 = vlistFindVar(vlistID2, varID);
+                      if ( vlistInqVarTsteptype(vlistID2, varID2) == TSTEP_CONSTANT )
+                        {
+                          levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+                          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+                          if ( levelID == 0 )
+                            {
+                              int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
+                              vardata2[varID2] = (double*) malloc(gridsize*nlevel*sizeof(double));
+                            }
+                          int nmiss;
+                          streamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID, &nmiss);
+                        }
+		    }
+		}
+            }
 
 	  tsID1++;
 	}
@@ -1065,6 +1118,13 @@ void *Select(void *argument)
 
   if ( array ) Free(array);
   if ( vars ) Free(vars);
+  if ( vardata2 )
+    {
+      for ( int varID = 0; varID < nvars2; ++ varID )
+        if ( vardata2[varID] ) free(vardata2[varID]);
+
+      free(vardata2);
+    }
 
   if ( tsID2 == 0 ) cdoAbort("No timesteps selected!");
 
