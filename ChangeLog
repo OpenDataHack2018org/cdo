@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
 
+2016-01-04  Uwe Schulzweida
+
+	* delete: don't abort if variables are available (bug fix) [report: Renate Brokopf]
+
 2015-12-28  Uwe Schulzweida
 
 	* Exprf: init nmiss (bug fix)

@@ -655,11 +655,11 @@ void *Select(void *argument)
 	  if ( operatorID == DELETE )
 	    {
 	      result = FALSE;
-	      for ( varID = 0; varID < nvars; varID++ )
+	      for ( int varID = 0; varID < nvars; varID++ )
 		{
 		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
 		  nlevs   = zaxisInqSize(zaxisID);
-		  for ( levID = 0; levID < nlevs; levID++ )
+		  for ( int levID = 0; levID < nlevs; levID++ )
 		    vlistDefFlag(vlistID1, varID, levID, TRUE);
 		}
 	    }
@@ -668,7 +668,7 @@ void *Select(void *argument)
 	      result = TRUE;
 	    }
 
-	  for ( varID = 0; varID < nvars; varID++ )
+	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
 	      iparam  = vlistInqVarParam(vlistID1, varID);
 	      code    = vlistInqVarCode(vlistID1, varID);
@@ -727,7 +727,7 @@ void *Select(void *argument)
                 }
 	    }
 
-	  for ( varID = 0; varID < nvars; varID++ )
+	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vars[varID] )
 		{
@@ -740,7 +740,7 @@ void *Select(void *argument)
                 }
             }
 
-	  for ( varID = 0; varID < nvars; varID++ )
+	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vars[varID] )
 		{
@@ -792,15 +792,16 @@ void *Select(void *argument)
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;
 
 	  npar = 0;
-	  for ( varID = 0; varID < nvars; varID++ )
+	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
-
-	      for ( levID = 0; levID < nlevs; levID++ )
-		if ( vlistInqFlag(vlistID1, varID, levID) == result ) break;
-	      
-	      if ( levID < nlevs ) npar++;
+	      for ( int levID = 0; levID < nlevs; levID++ )
+		if ( vlistInqFlag(vlistID1, varID, levID) == TRUE )
+                  {
+                    npar++;
+                    break;
+                  }
 	    }
 
 	  if ( npar == 0 )

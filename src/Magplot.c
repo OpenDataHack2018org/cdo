@@ -102,7 +102,7 @@ const char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL
 
 
 static
-void magplot( const char *plotfile, int operatorID, const char *varname, const char *units, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params, char *datetime )
+void magplot( const char *plotfile, int operatorID, const char *varname, const char *units, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params, char *datetime, bool lregular)
 
 {
   long i;
@@ -211,20 +211,26 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
   /* Set the input data arrays to magics++ */
    
   mag_set2r("input_field", array, nlon, nlat);
-  /*  
-  mag_setc("input_field_organization", "NONREGULAR");
-  mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
-  mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
-  */
-  mag_setc("input_field_organization", "REGULAR");
-  // mag_setc("input_field_organization", "GAUSSIAN");
+
+  if ( lregular )
+    {
+      mag_setc("input_field_organization", "REGULAR");
+      // mag_setc("input_field_organization", "GAUSSIAN");
+
+      mag_setr("input_field_initial_latitude", grid_center_lat[0]);
+      mag_setr("input_field_latitude_step", dlat);
+        
+      mag_setr("input_field_initial_longitude", grid_center_lon[0]);
+      mag_setr("input_field_longitude_step", dlon);
+     }
+  else
+    {
+      mag_setc("input_field_organization", "NONREGULAR");
+
+      mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
+      mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
+    }
   
-  mag_setr("input_field_initial_latitude", grid_center_lat[0]);
-  mag_setr("input_field_latitude_step", dlat);
-
-  mag_setr("input_field_initial_longitude", grid_center_lon[0]);
-  mag_setr("input_field_longitude_step", dlon);
-
   /* magics_template_parser( magics_node ); */
   /* results_template_parser(results_node, varname ); */
 
@@ -1161,11 +1167,14 @@ void *Magplot(void *argument)
   // int zaxisID = vlistInqVarZaxis(vlistID, varID);
   // double missval = vlistInqVarMissval(vlistID, varID);
 
-  if ( gridInqType(gridID) == GRID_GME          ) cdoAbort("GME grid unspported!");
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
+  int gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_GME          ) cdoAbort("GME grid unspported!");
+  if ( gridtype == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
 
-  if ( gridInqType(gridID) != GRID_CURVILINEAR )
-    gridID = gridToCurvilinear(gridID, 1);
+  bool lregular = false;
+  if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) lregular = true;
+  
+  if ( gridtype != GRID_CURVILINEAR ) gridID = gridToCurvilinear(gridID, 1);
 
   int gridsize = gridInqSize(gridID);
   int nlon     = gridInqXsize(gridID);
@@ -1173,11 +1182,11 @@ void *Magplot(void *argument)
   //int nlev     = zaxisInqSize(zaxisID);
 
   double *array           = (double*) Malloc(gridsize*sizeof(double));
-  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
   double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
 
-  gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
+  gridInqYvals(gridID, grid_center_lat);
 
   /* Convert lat/lon units if required */
   gridInqXunits(gridID, units);
@@ -1264,7 +1273,7 @@ void *Magplot(void *argument)
 
                 if( DBG )
                   fprintf( stderr,"Plot %d\n",varID );
-	  	magplot(cdoStreamName(1)->args, operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
+	  	magplot(cdoStreamName(1)->args, operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr, lregular);
           }
 	  else
 	  	fprintf(stderr,"operator not implemented\n");
