@@ -488,13 +488,11 @@ int vlist_get_psvarid(int vlistID, int zaxisID)
 void *Select(void *argument)
 {
   int streamID2 = CDI_UNDEFID;
-  int tsID1, tsID2, nrecs;
+  int nrecs;
   int nvars, nvars2, nlevs;
-  int gridID, zaxisID, levID;
+  int zaxisID;
   int varID2, levelID2;
-  int recID, varID, levelID;
-  int iparam;
-  int vdate, vtime;
+  int varID, levelID;
   int last_year = -999999999;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
@@ -502,14 +500,9 @@ void *Select(void *argument)
   char gname[CDI_MAX_NAME];
   char zname[CDI_MAX_NAME];
   int vlistID0 = -1, vlistID2 = -1;
-  int i;
   int result = FALSE;
-  int gridsize;
-  int nmiss;
   int taxisID2 = CDI_UNDEFID;
   int ntsteps;
-  int second;
-  int npar;
   bool ltimsel = false;
   bool *vars = NULL;
   double *array = NULL;
@@ -574,7 +567,7 @@ void *Select(void *argument)
   char **argnames = operatorArgv();
 
   if ( cdoVerbose )
-    for ( i = 0; i < nsel; i++ )
+    for ( int i = 0; i < nsel; i++ )
       printf("name %d = %s\n", i+1, argnames[i]);
 
   pml_t *pml = pmlNew("SELECT");
@@ -633,7 +626,7 @@ void *Select(void *argument)
 
   if ( !cdoVerbose && nfiles > 1 ) progressInit();
 
-  tsID2 = 0;
+  int tsID2 = 0;
   for ( int indf = 0; indf < nfiles; indf++ )
     {
       if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, (indf+1.)/nfiles);
@@ -643,6 +636,8 @@ void *Select(void *argument)
 
       int vlistID1 = streamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
+
+      bool lcopy_const = false;
 
       if ( indf == 0 )
 	{
@@ -670,8 +665,8 @@ void *Select(void *argument)
 
 	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
-	      iparam  = vlistInqVarParam(vlistID1, varID);
-	      code    = vlistInqVarCode(vlistID1, varID);
+	      int iparam = vlistInqVarParam(vlistID1, varID);
+	      code = vlistInqVarCode(vlistID1, varID);
 	      vlistInqVarName(vlistID1, varID, varname);
 	      vlistInqVarStdname(vlistID1, varID, stdname);
 
@@ -680,7 +675,7 @@ void *Select(void *argument)
 	      name  = varname;
 	      param = paramstr;
 
-	      gridID  = vlistInqVarGrid(vlistID1, varID);
+	      int gridID  = vlistInqVarGrid(vlistID1, varID);
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
@@ -716,7 +711,7 @@ void *Select(void *argument)
                   else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = true;
                   else if ( npar_levidx || npar_level )
                     {
-                      for ( levID = 0; levID < nlevs; levID++ )
+                      for ( int levID = 0; levID < nlevs; levID++ )
                         {
                           levidx = levID + 1;
                           level = zaxisInqLevel(zaxisID, levID);
@@ -747,7 +742,7 @@ void *Select(void *argument)
 		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
 		  nlevs   = zaxisInqSize(zaxisID);
 
-		  for ( levID = 0; levID < nlevs; levID++ )
+		  for ( int levID = 0; levID < nlevs; levID++ )
 		    {
 		      levidx = levID + 1;
 		      level = zaxisInqLevel(zaxisID, levID);
@@ -791,7 +786,7 @@ void *Select(void *argument)
 	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = true;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = true;
 
-	  npar = 0;
+	  int npar = 0;
 	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
@@ -808,13 +803,14 @@ void *Select(void *argument)
 	    {
 	      if ( ltimsel == true )
 		{
-		  for ( varID = 0; varID < nvars; varID++ )
+                  lcopy_const = true;
+
+		  for ( int varID = 0; varID < nvars; varID++ )
 		    {
 		      vars[varID] = true;
 		      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 		      nlevs   = zaxisInqSize(zaxisID);
-
-		      for ( levID = 0; levID < nlevs; levID++ )
+		      for ( int levID = 0; levID < nlevs; levID++ )
 			vlistDefFlag(vlistID1, varID, levID, TRUE);
 		    }
 		}
@@ -827,11 +823,11 @@ void *Select(void *argument)
 	  //if ( cdoVerbose ) vlistPrint(vlistID1);
 
 	  vlistID0 = vlistDuplicate(vlistID1);
-	  for ( varID = 0; varID < nvars; varID++ )
+	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
-	      for ( levID = 0; levID < nlevs; levID++ )
+	      for ( int levID = 0; levID < nlevs; levID++ )
 		vlistDefFlag(vlistID0, varID, levID, vlistInqFlag(vlistID1, varID, levID));
 	    }
 
@@ -864,14 +860,14 @@ void *Select(void *argument)
 
 	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {	      
-	      for ( varID = 0; varID < nvars2; ++varID )
+	      for ( int varID = 0; varID < nvars2; ++varID )
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 	    }
 
 	  // support for negative timestep values
 	  if ( npar_timestep > 0 && ntsteps > 0 && nfiles == 1 )
 	    {
-	      for ( i = 0; i < npar_timestep; i++ )
+	      for ( int i = 0; i < npar_timestep; i++ )
 		{
 		  if ( par_timestep[i] < 0 )
 		    {
@@ -884,7 +880,7 @@ void *Select(void *argument)
 
 	  if ( ! lcopy )
 	    {
-	      gridsize = vlistGridsizeMax(vlistID1);
+	      int gridsize = vlistGridsizeMax(vlistID1);
 	      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
@@ -907,7 +903,7 @@ void *Select(void *argument)
 	}
 
       bool lstop = false;
-      tsID1 = 0;
+      int tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
 	  bool copytimestep = true;
@@ -923,9 +919,9 @@ void *Select(void *argument)
 		  break;
 		}
 
-	      vdate = taxisInqVdate(taxisID1);
-	      vtime = taxisInqVtime(taxisID1);
-
+	      int vdate = taxisInqVdate(taxisID1);
+	      int vtime = taxisInqVtime(taxisID1);
+              int second;
 	      cdiDecodeDate(vdate, &year, &month, &day);
 	      cdiDecodeTime(vtime, &hour, &minute, &second);
 
@@ -1007,10 +1003,13 @@ void *Select(void *argument)
 		}
 
 	      taxisCopyTimestep(taxisID2, taxisID1);
-
 	      streamDefTimestep(streamID2, tsID2);
+	      tsID2++;
+            }              
      
-	      for ( recID = 0; recID < nrecs; recID++ )
+	  if ( copytimestep == true )
+	    {
+	      for ( int recID = 0; recID < nrecs; recID++ )
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
@@ -1025,12 +1024,12 @@ void *Select(void *argument)
 			}
 		      else
 			{
+                          int nmiss;
 			  streamReadRecord(streamID1, array, &nmiss);
 			  streamWriteRecord(streamID2, array, nmiss);
 			}
 		    }
 		}
-	      tsID2++;
 	    }
 
 	  tsID1++;
