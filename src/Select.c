@@ -54,13 +54,13 @@ static PARAMETER Parameter[] =
 static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 */
 
-#define PML_DEF(name, size, txt)      int flag_##name[size]; int npar_##name = 0; int max_##name = size; const char str_##name[] = txt
+#define PML_DEF(name, size, txt)      bool flag_##name[size]; int npar_##name = 0; int max_##name = size; const char str_##name[] = txt
 #define PML_DEF_INT(name, size, txt)  int par_##name[size]; int name = 0; PML_DEF(name, size, txt)
 #define PML_DEF_FLT(name, size, txt)  double par_##name[size]; double name = 0; PML_DEF(name, size, txt)
 #define PML_DEF_WORD(name, size, txt) char *par_##name[size]; char *name = 0; PML_DEF(name, size, txt)
-#define PML_INIT_INT(name)            memset(flag_##name, 0, max_##name * sizeof(int))
-#define PML_INIT_FLT(name)            memset(flag_##name, 0, max_##name * sizeof(int))
-#define PML_INIT_WORD(name)           memset(flag_##name, 0, max_##name * sizeof(int))
+#define PML_INIT_INT(name)            memset(flag_##name, 0, max_##name * sizeof(bool))
+#define PML_INIT_FLT(name)            memset(flag_##name, 0, max_##name * sizeof(bool))
+#define PML_INIT_WORD(name)           memset(flag_##name, 0, max_##name * sizeof(bool))
 #define PML_ADD_INT(nml, name)        pmlAdd(nml, #name, PML_INT,  0, par_##name, sizeof(par_##name)/sizeof(int))
 #define PML_ADD_FLT(nml, name)        pmlAdd(nml, #name, PML_FLT,  0, par_##name, sizeof(par_##name)/sizeof(double))
 #define PML_ADD_WORD(nml, name)       pmlAdd(nml, #name, PML_WORD, 0, par_##name, sizeof(par_##name)/sizeof(char *))
@@ -385,39 +385,39 @@ int pmlRead(pml_t *pml, int argc, char **argv)
 }
 
 
-int par_check_int(int npar, int *parlist, int *flaglist, int par)
+bool par_check_int(int npar, int *parlist, bool *flaglist, int par)
 {
-  int found = 0;
+  bool found = false;
   for ( int i = 0; i < npar; i++ )
-    if ( par == parlist[i] ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+    if ( par == parlist[i] ) { found = true; flaglist[i] = true;/* break;*/}
 
   return found;
 }
 
 
-int par_check_flt(int npar, double *parlist, int *flaglist, double par)
+bool par_check_flt(int npar, double *parlist, bool *flaglist, double par)
 {
-  int found = 0;
+  bool found = false;
   for ( int i = 0; i < npar; i++ )
-    if ( fabs(par - parlist[i]) < 1.e-4 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+    if ( fabs(par - parlist[i]) < 1.e-4 ) { found = true; flaglist[i] = true;/* break;*/}
 
   return found;
 }
 
 
-int par_check_word(int npar, char **parlist, int *flaglist, char *par)
+bool par_check_word(int npar, char **parlist, bool *flaglist, char *par)
 {
-  int found = 0;
+  bool found = false;
   for ( int i = 0; i < npar; i++ )
-    if ( wildcardmatch(parlist[i], par) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+    if ( wildcardmatch(parlist[i], par) == 0 ) { found = true; flaglist[i] = true;/* break;*/}
 
   return found;
 }
 
 
-int par_check_date(int npar, char **parlist, int *flaglist, char *par)
+bool par_check_date(int npar, char **parlist, bool *flaglist, char *par)
 {
-  int found = 0;
+  bool found = false;
   char wcdate[512];
 
   if ( *par == ' ' ) ++par;
@@ -426,33 +426,33 @@ int par_check_date(int npar, char **parlist, int *flaglist, char *par)
     {
       strcpy(wcdate, parlist[i]);
       strcat(wcdate, "*");
-      if ( wildcardmatch(wcdate, par) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
+      if ( wildcardmatch(wcdate, par) == 0 ) { found = true; flaglist[i] = true;/* break;*/}
     }
 
   return found;
 }
 
 
-void par_check_int_flag(int npar, int *parlist, int *flaglist, const char *txt)
+void par_check_int_flag(int npar, int *parlist, bool *flaglist, const char *txt)
 {
   for ( int i = 0; i < npar; ++i )
-    if ( flaglist[i] == FALSE )
+    if ( flaglist[i] == false )
       cdoWarning("%s >%d< not found!", txt, parlist[i]);
 }
 
 
-void par_check_flt_flag(int npar, double *parlist, int *flaglist, const char *txt)
+void par_check_flt_flag(int npar, double *parlist, bool *flaglist, const char *txt)
 {
   for ( int i = 0; i < npar; ++i )
-    if ( flaglist[i] == FALSE )
+    if ( flaglist[i] == false )
       cdoWarning("%s >%g< not found!", txt, parlist[i]);
 }
 
 
-void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *txt)
+void par_check_word_flag(int npar, char **parlist, bool *flaglist, const char *txt)
 {
   for ( int i = 0; i < npar; ++i )
-    if ( flaglist[i] == FALSE )
+    if ( flaglist[i] == false )
       cdoWarning("%s >%s< not found!", txt, parlist[i]);
 }
 
@@ -508,10 +508,10 @@ void *Select(void *argument)
   int nmiss;
   int taxisID2 = CDI_UNDEFID;
   int ntsteps;
-  int ltimsel = FALSE;
   int second;
   int npar;
-  int *vars = NULL;
+  bool ltimsel = false;
+  bool *vars = NULL;
   double *array = NULL;
   double fstartdate = -99999999999.;
   double fenddate   = -99999999999.;
@@ -563,8 +563,8 @@ void *Select(void *argument)
   int SELECT = cdoOperatorAdd("select", 0, 0, "parameter list");
   int DELETE = cdoOperatorAdd("delete", 0, 0, "parameter list");
 
-  int lcopy = FALSE;
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = false;
+  if ( UNCHANGED_RECORD ) lcopy = true;
 
   int operatorID = cdoOperatorID();
 
@@ -650,7 +650,7 @@ void *Select(void *argument)
 
 	  vlistClearFlag(vlistID1);
 	  nvars = vlistNvars(vlistID1);
-	  vars  = (int*) Malloc(nvars*sizeof(int));
+	  vars  = (bool*) Malloc(nvars*sizeof(bool));
 
 	  if ( operatorID == DELETE )
 	    {
@@ -695,33 +695,33 @@ void *Select(void *argument)
               gridName(gridtype, gname);
               gridname = gname;
               
-	      vars[varID] = FALSE;
-              int found_code  = npar_code      && PAR_CHECK_INT(code);
-              int found_name  = npar_name      && PAR_CHECK_WORD(name);
-              int found_param = npar_param     && PAR_CHECK_WORD(param);
-              int found_grid  = npar_grid      && PAR_CHECK_INT(grid);
-              int found_gname = npar_gridname  && PAR_CHECK_WORD(gridname);
-              int found_ltype = npar_ltype     && PAR_CHECK_INT(ltype);
-              int found_zaxis = npar_zaxis     && PAR_CHECK_INT(zaxis);
-              int found_zname = npar_zaxisname && PAR_CHECK_WORD(zaxisname);
-              int lvar  = found_code || found_name || found_param;
-              int lgrid = (npar_grid || npar_gridname) ? (found_grid || found_gname) : TRUE;
-              int lvert = (npar_ltype || npar_zaxis || npar_zaxisname) ? (found_ltype || found_zaxis || found_zname) : TRUE;
+	      vars[varID] = false;
+              bool found_code  = npar_code      && PAR_CHECK_INT(code);
+              bool found_name  = npar_name      && PAR_CHECK_WORD(name);
+              bool found_param = npar_param     && PAR_CHECK_WORD(param);
+              bool found_grid  = npar_grid      && PAR_CHECK_INT(grid);
+              bool found_gname = npar_gridname  && PAR_CHECK_WORD(gridname);
+              bool found_ltype = npar_ltype     && PAR_CHECK_INT(ltype);
+              bool found_zaxis = npar_zaxis     && PAR_CHECK_INT(zaxis);
+              bool found_zname = npar_zaxisname && PAR_CHECK_WORD(zaxisname);
+              bool lvar  = found_code || found_name || found_param;
+              bool lgrid = (npar_grid || npar_gridname) ? (found_grid || found_gname) : true;
+              bool lvert = (npar_ltype || npar_zaxis || npar_zaxisname) ? (found_ltype || found_zaxis || found_zname) : true;
 	      
-              if ( !vars[varID] && lgrid && lvar) vars[varID] = TRUE;
-              if ( !vars[varID] && lvert && lvar) vars[varID] = TRUE;
+              if ( !vars[varID] && lgrid && lvar) vars[varID] = true;
+              if ( !vars[varID] && lvert && lvar) vars[varID] = true;
               if ( !vars[varID] && !lvar )
                 {
-                  if      ( found_grid || found_gname ) vars[varID] = TRUE;
-                  else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = TRUE;
+                  if      ( found_grid || found_gname ) vars[varID] = true;
+                  else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = true;
                   else if ( npar_levidx || npar_level )
                     {
                       for ( levID = 0; levID < nlevs; levID++ )
                         {
                           levidx = levID + 1;
                           level = zaxisInqLevel(zaxisID, levID);
-                          if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
-                          if ( !vars[varID] && npar_level  && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
+                          if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(levidx) )  vars[varID] = true;
+                          if ( !vars[varID] && npar_level  && PAR_CHECK_FLT(level)  )  vars[varID] = true;
                         }
                     }
                 }
@@ -735,7 +735,7 @@ void *Select(void *argument)
                   if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
                     {
                       int psvarid = vlist_get_psvarid(vlistID1, zaxisID);
-                      if ( psvarid != -1 && !vars[psvarid] ) vars[psvarid] = TRUE;
+                      if ( psvarid != -1 && !vars[psvarid] ) vars[psvarid] = true;
                     }
                 }
             }
@@ -788,8 +788,8 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(zaxisname);
 	  PAR_CHECK_WORD_FLAG(gridname);
 
-	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = TRUE;
-	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;
+	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = true;
+	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = true;
 
 	  npar = 0;
 	  for ( int varID = 0; varID < nvars; varID++ )
@@ -806,11 +806,11 @@ void *Select(void *argument)
 
 	  if ( npar == 0 )
 	    {
-	      if ( ltimsel == TRUE )
+	      if ( ltimsel == true )
 		{
 		  for ( varID = 0; varID < nvars; varID++ )
 		    {
-		      vars[varID] = TRUE;
+		      vars[varID] = true;
 		      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 		      nlevs   = zaxisInqSize(zaxisID);
 
@@ -906,20 +906,20 @@ void *Select(void *argument)
 	  goto END_LABEL;
 	}
 
-      int lstop = FALSE;
+      bool lstop = false;
       tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
-	  int copytimestep = TRUE;
+	  bool copytimestep = true;
 
-	  if ( ltimsel == TRUE )
+	  if ( ltimsel == true )
 	    {
-	      copytimestep = FALSE;
+	      copytimestep = false;
 	      timestep = tsID1 + 1;
 
 	      if ( operatorID == SELECT && npar_timestep > 0 && timestep > par_timestep[npar_timestep-1] )
 		{
-		  lstop = TRUE;
+		  lstop = true;
 		  break;
 		}
 
@@ -937,20 +937,20 @@ void *Select(void *argument)
 
 	      timestep_of_year++;
 
-	      if ( npar_timestep && PAR_CHECK_INT(timestep) ) copytimestep = TRUE;
-	      if ( npar_timestep_of_year && PAR_CHECK_INT(timestep_of_year) ) copytimestep = TRUE;
+	      if ( npar_timestep && PAR_CHECK_INT(timestep) ) copytimestep = true;
+	      if ( npar_timestep_of_year && PAR_CHECK_INT(timestep_of_year) ) copytimestep = true;
 
 	      if ( !copytimestep && npar_date == 0 && npar_timestep == 0 && npar_timestep_of_year == 0 )
 		{
-		  int lyear = 0, lmonth = 0, lday = 0, lhour = 0, lminute = 0;
+		  bool lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 
-		  if ( npar_year   == 0 || (npar_year   && PAR_CHECK_INT(year))   ) lyear   = TRUE;
-		  if ( npar_month  == 0 || (npar_month  && PAR_CHECK_INT(month))  ) lmonth  = TRUE;
-		  if ( npar_day    == 0 || (npar_day    && PAR_CHECK_INT(day))    ) lday    = TRUE;
-		  if ( npar_hour   == 0 || (npar_hour   && PAR_CHECK_INT(hour))   ) lhour   = TRUE;
-		  if ( npar_minute == 0 || (npar_minute && PAR_CHECK_INT(minute)) ) lminute = TRUE;
+		  if ( npar_year   == 0 || (npar_year   && PAR_CHECK_INT(year))   ) lyear   = true;
+		  if ( npar_month  == 0 || (npar_month  && PAR_CHECK_INT(month))  ) lmonth  = true;
+		  if ( npar_day    == 0 || (npar_day    && PAR_CHECK_INT(day))    ) lday    = true;
+		  if ( npar_hour   == 0 || (npar_hour   && PAR_CHECK_INT(hour))   ) lhour   = true;
+		  if ( npar_minute == 0 || (npar_minute && PAR_CHECK_INT(minute)) ) lminute = true;
 
-		  if ( lyear && lmonth && lday && lhour && lminute ) copytimestep = TRUE;
+		  if ( lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
 		}
 
 	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
@@ -959,17 +959,17 @@ void *Select(void *argument)
 		{
 		  if ( fdate > fenddate )
 		    {
-		      flag_enddate[0] = TRUE;
-		      copytimestep = FALSE;
+		      flag_enddate[0] = true;
+		      copytimestep = false;
 		      if ( operatorID == SELECT )
 			{
-			  lstop = TRUE;
+			  lstop = true;
 			  break;
 			}
 		    }
 		  else
 		    {
-		      copytimestep = TRUE;
+		      copytimestep = true;
 		    }
 		}
 
@@ -977,12 +977,12 @@ void *Select(void *argument)
 		{
 		  if ( fdate < fstartdate )
 		    {
-		      copytimestep = FALSE;
+		      copytimestep = false;
 		    }
 		  else
 		    {
-		      flag_startdate[0] = TRUE;
-		      copytimestep = TRUE;
+		      flag_startdate[0] = true;
+		      copytimestep = true;
 		    }
 		}
 
@@ -992,13 +992,13 @@ void *Select(void *argument)
                   char vdatetimestr[64];
                   datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
                   date = vdatetimestr;
-                  if ( PAR_CHECK_DATE(date) ) copytimestep = TRUE;
+                  if ( PAR_CHECK_DATE(date) ) copytimestep = true;
                 }
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
 	    }
 
-	  if ( copytimestep == TRUE )
+	  if ( copytimestep == true )
 	    {
 	      if ( streamID2 == CDI_UNDEFID )
 		{
