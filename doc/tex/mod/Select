@@ -50,13 +50,13 @@ FLOAT   Comma separated list of vertical levels.
 INTEGER Comma separated list of index of levels.
 @Item = zaxisname
 STRING  Comma separated list of zaxis names.
-@Item = zaxis
+@Item = zaxisnum
 INTEGER Comma separated list of zaxis numbers.
 @Item = ltype
 INTEGER Comma separated list of GRIB level types.
 @Item = gridname
 STRING  Comma separated list of grid names.
-@Item = grid
+@Item = gridnum
 INTEGER Comma separated list of grid numbers.
 @Item = date
 STRING  Comma separated list of dates (format YYYY-MM-DDThh:mm:ss).

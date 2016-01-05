@@ -618,9 +618,6 @@ void *Select(void *argument)
   PML_NUM(pml, startdate);
   PML_NUM(pml, enddate);
   PML_NUM(pml, date);
-  /*
-  pmlDelete(pml);
-  */
 
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
