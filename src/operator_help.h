@@ -479,6 +479,7 @@ static const char *SelectHelp[] = {
     "    ltype             INTEGER Comma separated list of GRIB level types.",
     "    gridname          STRING  Comma separated list of grid names.",
     "    gridnum           INTEGER Comma separated list of grid numbers.",
+    "    steptype          STRING  Comma separated list of timestep types.",
     "    date              STRING  Comma separated list of dates (format YYYY-MM-DDThh:mm:ss).",
     "    startdate         STRING  Start date (format YYYY-MM-DDThh:mm:ss).",
     "    enddate           STRING  End date (format YYYY-MM-DDThh:mm:ss).",

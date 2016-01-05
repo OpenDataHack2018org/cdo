@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
 
+2016-01-05  Uwe Schulzweida
+
+	* Select: added search key steptype
+
 2016-01-04  Uwe Schulzweida
 
 	* select/delete: added full support for time constant fields (bug fix) [report: Ralf Müller]
@@ -22,8 +26,8 @@
 
 2015-12-10  Uwe Schulzweida
 
-	* Select: added parameter grid and gridname
-	* Select: added parameter zaxis and zaxisname
+	* Select: added search key gridnum and gridname
+	* Select: added search key zaxisnum and zaxisname
 
 2015-11-26  Uwe Schulzweida
 

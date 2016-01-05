@@ -57,7 +57,7 @@ static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 #define PML_DEF(name, size, txt)      bool flag_##name[size]; int npar_##name = 0; int max_##name = size; const char str_##name[] = txt
 #define PML_DEF_INT(name, size, txt)  int par_##name[size]; int name = 0; PML_DEF(name, size, txt)
 #define PML_DEF_FLT(name, size, txt)  double par_##name[size]; double name = 0; PML_DEF(name, size, txt)
-#define PML_DEF_WORD(name, size, txt) char *par_##name[size]; char *name = 0; PML_DEF(name, size, txt)
+#define PML_DEF_WORD(name, size, txt) char *par_##name[size]; const char *name = 0; PML_DEF(name, size, txt)
 #define PML_INIT_INT(name)            memset(flag_##name, 0, max_##name * sizeof(bool))
 #define PML_INIT_FLT(name)            memset(flag_##name, 0, max_##name * sizeof(bool))
 #define PML_INIT_WORD(name)           memset(flag_##name, 0, max_##name * sizeof(bool))
@@ -405,7 +405,7 @@ bool par_check_flt(int npar, double *parlist, bool *flaglist, double par)
 }
 
 
-bool par_check_word(int npar, char **parlist, bool *flaglist, char *par)
+bool par_check_word(int npar, char **parlist, bool *flaglist, const char *par)
 {
   bool found = false;
   for ( int i = 0; i < npar; i++ )
@@ -415,7 +415,7 @@ bool par_check_word(int npar, char **parlist, bool *flaglist, char *par)
 }
 
 
-bool par_check_date(int npar, char **parlist, bool *flaglist, char *par)
+bool par_check_date(int npar, char **parlist, bool *flaglist, const char *par)
 {
   bool found = false;
   char wcdate[512];
@@ -527,6 +527,7 @@ void *Select(void *argument)
   PML_DEF_WORD(param,           1024, "Parameter");
   PML_DEF_WORD(zaxisname,        256, "Zaxis name");
   PML_DEF_WORD(gridname,         256, "Grid name");
+  PML_DEF_WORD(steptype,          32, "Time step type");
   PML_DEF_WORD(startdate,          1, "Start date");
   PML_DEF_WORD(enddate,            1, "End date");
   PML_DEF_WORD(date,            1024, "Date");
@@ -548,6 +549,7 @@ void *Select(void *argument)
   PML_INIT_WORD(param);
   PML_INIT_WORD(zaxisname);
   PML_INIT_WORD(gridname);
+  PML_INIT_WORD(steptype);
   PML_INIT_WORD(startdate);
   PML_INIT_WORD(enddate);
   PML_INIT_WORD(date);
@@ -590,6 +592,7 @@ void *Select(void *argument)
   PML_ADD_WORD(pml, param);
   PML_ADD_WORD(pml, zaxisname);
   PML_ADD_WORD(pml, gridname);
+  PML_ADD_WORD(pml, steptype);
   PML_ADD_WORD(pml, startdate);
   PML_ADD_WORD(pml, enddate);
   PML_ADD_WORD(pml, date);
@@ -615,6 +618,7 @@ void *Select(void *argument)
   PML_NUM(pml, param);
   PML_NUM(pml, zaxisname);
   PML_NUM(pml, gridname);
+  PML_NUM(pml, steptype);
   PML_NUM(pml, startdate);
   PML_NUM(pml, enddate);
   PML_NUM(pml, date);
@@ -687,6 +691,19 @@ void *Select(void *argument)
               int gridtype = gridInqType(gridID);
               gridName(gridtype, gname);
               gridname = gname;
+
+              int tsteptype = vlistInqVarTsteptype(vlistID1, varID);
+              if      ( tsteptype == TSTEP_CONSTANT ) steptype = "constant";
+              else if ( tsteptype == TSTEP_INSTANT  ) steptype = "instant";
+              else if ( tsteptype == TSTEP_INSTANT2 ) steptype = "instant";
+              else if ( tsteptype == TSTEP_INSTANT3 ) steptype = "instant";
+              else if ( tsteptype == TSTEP_MIN      ) steptype = "min";
+              else if ( tsteptype == TSTEP_MAX      ) steptype = "max";
+              else if ( tsteptype == TSTEP_AVG      ) steptype = "avg";
+              else if ( tsteptype == TSTEP_ACCUM    ) steptype = "accum";
+              else if ( tsteptype == TSTEP_RANGE    ) steptype = "range";
+              else if ( tsteptype == TSTEP_DIFF     ) steptype = "diff";
+              else                                    steptype = "unknown";
               
 	      vars[varID] = false;
               bool found_code  = npar_code      && PAR_CHECK_INT(code);
@@ -694,18 +711,22 @@ void *Select(void *argument)
               bool found_param = npar_param     && PAR_CHECK_WORD(param);
               bool found_grid  = npar_gridnum   && PAR_CHECK_INT(gridnum);
               bool found_gname = npar_gridname  && PAR_CHECK_WORD(gridname);
+              bool found_stype = npar_steptype  && PAR_CHECK_WORD(steptype);
               bool found_ltype = npar_ltype     && PAR_CHECK_INT(ltype);
               bool found_zaxis = npar_zaxisnum  && PAR_CHECK_INT(zaxisnum);
               bool found_zname = npar_zaxisname && PAR_CHECK_WORD(zaxisname);
               bool lvar  = found_code || found_name || found_param;
+              bool lstep = npar_steptype ? found_stype : true;
               bool lgrid = (npar_gridnum || npar_gridname) ? (found_grid || found_gname) : true;
               bool lvert = (npar_ltype || npar_zaxisnum || npar_zaxisname) ? (found_ltype || found_zaxis || found_zname) : true;
 	      
               if ( !vars[varID] && lgrid && lvar) vars[varID] = true;
               if ( !vars[varID] && lvert && lvar) vars[varID] = true;
+              if ( !vars[varID] && lstep && lvar) vars[varID] = true;
               if ( !vars[varID] && !lvar )
                 {
                   if      ( found_grid || found_gname ) vars[varID] = true;
+                  else if ( found_stype ) vars[varID] = true;
                   else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = true;
                   else if ( npar_levidx || npar_level )
                     {
@@ -780,6 +801,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(param);
 	  PAR_CHECK_WORD_FLAG(zaxisname);
 	  PAR_CHECK_WORD_FLAG(gridname);
+	  PAR_CHECK_WORD_FLAG(steptype);
 
 	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = true;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = true;

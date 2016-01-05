@@ -54,7 +54,7 @@ To print short information of a dataset use:
 @EndVerbatim
 This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
 @BeginListing
-    -1 : Institut Source  Ttype    Levels Num   Points Num Dtype : Name 
+    -1 : Institut Source  Steptype Levels Num   Points Num Dtype : Name 
      1 : MPIMET   ECHAM5  constant      1   1     2048   1  F32  : GEOSP 
      2 : MPIMET   ECHAM5  instant       4   2     2048   1  F32  : T     
      3 : MPIMET   ECHAM5  instant       1   1     2048   1  F32  : TSURF 

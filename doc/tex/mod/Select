@@ -58,6 +58,8 @@ INTEGER Comma separated list of GRIB level types.
 STRING  Comma separated list of grid names.
 @Item = gridnum
 INTEGER Comma separated list of grid numbers.
+@Item = steptype
+STRING  Comma separated list of timestep types.
 @Item = date
 STRING  Comma separated list of dates (format YYYY-MM-DDThh:mm:ss).
 @Item = startdate

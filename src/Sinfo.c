@@ -128,11 +128,11 @@ void *Sinfo(void *argument)
 
       set_text_color(stdout, BRIGHT, BLACK);
       if ( lensemble )
-	fprintf(stdout, "%6d : Institut Source   Ttype    Einfo Levels Num    Points Num Dtype : ",  -(indf+1));
+	fprintf(stdout, "%6d : Institut Source   Steptype Einfo Levels Num    Points Num Dtype : ",  -(indf+1));
       else if ( nsubtypes > 0 )
-	fprintf(stdout, "%6d : Institut Source   Ttype    Subtypes Levels Num    Points Num Dtype : ",  -(indf+1));
+	fprintf(stdout, "%6d : Institut Source   Steptype Subtypes Levels Num    Points Num Dtype : ",  -(indf+1));
       else
-	fprintf(stdout, "%6d : Institut Source   Ttype    Levels Num    Points Num Dtype : ",  -(indf+1));
+	fprintf(stdout, "%6d : Institut Source   Steptype Levels Num    Points Num Dtype : ",  -(indf+1));
 
       if      ( operfunc == func_name ) fprintf(stdout, "Parameter name");
       else if ( operfunc == func_code ) fprintf(stdout, "Table Code");
