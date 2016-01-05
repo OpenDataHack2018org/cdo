@@ -205,6 +205,7 @@ void *Vertintap(void *argument);
 void *Vertstat(void *argument);
 void *Vertcum(void *argument);
 void *Vertwind(void *argument);
+void *Verifygrid(void *argument);
 void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
@@ -368,7 +369,7 @@ void *Maggraph(void *argument);
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr", "outputxyz"}
 #define  OutputtabOperators     {"outputtab"}
-#define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
+#define  OutputgmtOperators     {"outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri", "outputvrml"}
 #define  PackOperators          {"pack"}
 #define  PardupOperators        {"pardup", "parmul"}
@@ -477,6 +478,7 @@ void *Maggraph(void *argument);
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertint", "vertmean", "vertavg", "vertstd", "vertstd1", "vertvar", "vertvar1"}
 #define  VertcumOperators       {"vertcum", "vertcumhl"}
 #define  VertwindOperators      {"vertwind"}
+#define  VerifygridOperators    {"verifygrid"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
@@ -751,6 +753,7 @@ static modules_t Modules[] =
   { Vertstat,       VertstatHelp,      VertstatOperators,      1,   CDI_REAL,  1,  1 },
   { Vertcum,        NULL,              VertcumOperators,       1,   CDI_REAL,  1,  1 },
   { Vertwind,       NULL,              VertwindOperators,      1,   CDI_REAL,  1,  1 },
+  { Verifygrid,     NULL,              VerifygridOperators,    1,   CDI_REAL,  1,  0 },
   { Wind,           WindHelp,          WindOperators,          1,   CDI_REAL,  1,  1 },
   { Writegrid,      NULL,              WritegridOperators,     1,   CDI_REAL,  1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,   1,   CDI_REAL,  1,  1 },
@@ -862,7 +865,8 @@ static const char *opalias[][2] =
   {"fpressure",           "pressure_fl"},
   {"hpressure",           "pressure_hl"},
   {"ensrkhist_space",     "ensrkhistspace"},
-  {"ensrkhist_time",      "ensrkhisttime"}
+  {"ensrkhist_time",      "ensrkhisttime"},
+  {"gridverify",          "verifygrid"},
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));

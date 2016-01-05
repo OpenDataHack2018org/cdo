@@ -233,19 +233,19 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Tstepcount.$(OBJEXT) cdo-Vargen.$(OBJEXT) \
 	cdo-Varrms.$(OBJEXT) cdo-Vertintml.$(OBJEXT) \
 	cdo-Vertintap.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
-	cdo-Vertcum.$(OBJEXT) cdo-Vertwind.$(OBJEXT) cdo-Wct.$(OBJEXT) \
-	cdo-Wind.$(OBJEXT) cdo-Writegrid.$(OBJEXT) \
-	cdo-Writerandom.$(OBJEXT) cdo-XTimstat.$(OBJEXT) \
-	cdo-YAR.$(OBJEXT) cdo-Yearmonstat.$(OBJEXT) \
-	cdo-Ydayarith.$(OBJEXT) cdo-Ydaypctl.$(OBJEXT) \
-	cdo-Ydaystat.$(OBJEXT) cdo-Ydrunpctl.$(OBJEXT) \
-	cdo-Ydrunstat.$(OBJEXT) cdo-Yhourarith.$(OBJEXT) \
-	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
-	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
-	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
-	cdo-Zonstat.$(OBJEXT) cdo-Magplot.$(OBJEXT) \
-	cdo-Magvector.$(OBJEXT) cdo-Maggraph.$(OBJEXT) \
-	cdo-template_parser.$(OBJEXT) \
+	cdo-Vertcum.$(OBJEXT) cdo-Vertwind.$(OBJEXT) \
+	cdo-Verifygrid.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) \
+	cdo-Writegrid.$(OBJEXT) cdo-Writerandom.$(OBJEXT) \
+	cdo-XTimstat.$(OBJEXT) cdo-YAR.$(OBJEXT) \
+	cdo-Yearmonstat.$(OBJEXT) cdo-Ydayarith.$(OBJEXT) \
+	cdo-Ydaypctl.$(OBJEXT) cdo-Ydaystat.$(OBJEXT) \
+	cdo-Ydrunpctl.$(OBJEXT) cdo-Ydrunstat.$(OBJEXT) \
+	cdo-Yhourarith.$(OBJEXT) cdo-Yhourstat.$(OBJEXT) \
+	cdo-Ymonarith.$(OBJEXT) cdo-Ymonpctl.$(OBJEXT) \
+	cdo-Ymonstat.$(OBJEXT) cdo-Yseaspctl.$(OBJEXT) \
+	cdo-Yseasstat.$(OBJEXT) cdo-Zonstat.$(OBJEXT) \
+	cdo-Magplot.$(OBJEXT) cdo-Magvector.$(OBJEXT) \
+	cdo-Maggraph.$(OBJEXT) cdo-template_parser.$(OBJEXT) \
 	cdo-results_template_parser.$(OBJEXT) \
 	cdo-magics_template_parser.$(OBJEXT) \
 	cdo-StringUtilities.$(OBJEXT) cdo-CdoMagicsMapper.$(OBJEXT)
@@ -573,12 +573,12 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
 	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c \
 	Varrms.c Vertintml.c Vertintap.c Vertstat.c Vertcum.c \
-	Vertwind.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
-	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
-	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
-	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
-	nearpt3c.h Magplot.c Magvector.c Maggraph.c template_parser.h \
-	template_parser.c results_template_parser.h \
+	Vertwind.c Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c \
+	XTimstat.c YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c \
+	Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c \
+	Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c \
+	Zonstat.c cdo.h nearpt3c.h Magplot.c Magvector.c Maggraph.c \
+	template_parser.h template_parser.c results_template_parser.h \
 	results_template_parser.c magics_template_parser.h \
 	magics_template_parser.c StringUtilities.h StringUtilities.c \
 	CdoMagicsMapper.h CdoMagicsMapper.c
@@ -938,6 +938,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Tstepcount.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vargen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Varrms.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Verifygrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertcum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertintap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertintml.Po@am__quote@
@@ -4024,6 +4025,20 @@ cdo-Vertwind.obj: Vertwind.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Vertwind.c' object='cdo-Vertwind.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertwind.obj `if test -f 'Vertwind.c'; then $(CYGPATH_W) 'Vertwind.c'; else $(CYGPATH_W) '$(srcdir)/Vertwind.c'; fi`
+
+cdo-Verifygrid.o: Verifygrid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Verifygrid.o -MD -MP -MF $(DEPDIR)/cdo-Verifygrid.Tpo -c -o cdo-Verifygrid.o `test -f 'Verifygrid.c' || echo '$(srcdir)/'`Verifygrid.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Verifygrid.Tpo $(DEPDIR)/cdo-Verifygrid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Verifygrid.c' object='cdo-Verifygrid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Verifygrid.o `test -f 'Verifygrid.c' || echo '$(srcdir)/'`Verifygrid.c
+
+cdo-Verifygrid.obj: Verifygrid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Verifygrid.obj -MD -MP -MF $(DEPDIR)/cdo-Verifygrid.Tpo -c -o cdo-Verifygrid.obj `if test -f 'Verifygrid.c'; then $(CYGPATH_W) 'Verifygrid.c'; else $(CYGPATH_W) '$(srcdir)/Verifygrid.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Verifygrid.Tpo $(DEPDIR)/cdo-Verifygrid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Verifygrid.c' object='cdo-Verifygrid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Verifygrid.obj `if test -f 'Verifygrid.c'; then $(CYGPATH_W) 'Verifygrid.c'; else $(CYGPATH_W) '$(srcdir)/Verifygrid.c'; fi`
 
 cdo-Wct.o: Wct.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Wct.o -MD -MP -MF $(DEPDIR)/cdo-Wct.Tpo -c -o cdo-Wct.o `test -f 'Wct.c' || echo '$(srcdir)/'`Wct.c

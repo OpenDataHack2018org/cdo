@@ -331,6 +331,7 @@ cdo_SOURCES += Adisit.c        \
                Vertstat.c      \
                Vertcum.c       \
                Vertwind.c      \
+               Verifygrid.c    \
                Wct.c           \
                Wind.c          \
                Writegrid.c     \
