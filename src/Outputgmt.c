@@ -579,62 +579,45 @@ void make_cyclic(double *array1, double *array2, int nlon, int nlat)
 
 void *Outputgmt(void *argument)
 {
-  int GRIDVERIFY, OUTPUTCENTER, OUTPUTCENTER2, OUTPUTCENTERCPT, OUTPUTBOUNDS;
-  int OUTPUTBOUNDSCPT, OUTPUTVECTOR, OUTPUTTRI, OUTPUTVRML;
-  int operatorID;
   int process_data = TRUE;
   int i, j;
   int varID0, varID, recID;
-  int nvals;
-  int gridsize = 0;
   int gridsize2 = 0;
-  int gridID, code;
   int nrecs;
   int levelID;
-  int tsID;
-  int streamID = 0;
-  int vlistID;
   int nmiss;
-  int nlon, nlat, nalloc;
-  int nlev, lzon = FALSE, lmer = FALSE, lhov = FALSE;
+  int nalloc;
+  int lzon = FALSE, lmer = FALSE, lhov = FALSE;
   int ncorner = 0, ic;
   int status;
   int lgrid_gen_bounds = FALSE, luse_grid_corner = FALSE;
-  int zaxisID, taxisID;
   int ninc = 1;
   int vdate, vtime;
   char varname[CDI_MAX_NAME];
   double level;
-  double missval;
-  double *array = NULL;
   double *array2 = NULL;
-  double *parray;
   double *uf = NULL, *vf = NULL, *alpha = NULL, *auv = NULL;
-  double *grid_center_lat = NULL, *grid_center_lon = NULL;
   double *grid_center_lat2 = NULL, *grid_center_lon2 = NULL;
   double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
-  double *plat, *plon;
-  double *zaxis_center_lev, *zaxis_lower_lev, *zaxis_upper_lev;
   int *grid_mask = NULL;
   FILE *cpt_fp;
   CPT cpt;
-  int grid_is_circular;
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);
 
-  GRIDVERIFY      = cdoOperatorAdd("gridverify",      0, 0, NULL);
-  OUTPUTCENTER    = cdoOperatorAdd("outputcenter",    0, 0, NULL);
-  OUTPUTCENTER2   = cdoOperatorAdd("outputcenter2",   0, 0, NULL);
-  OUTPUTCENTERCPT = cdoOperatorAdd("outputcentercpt", 0, 0, NULL);
-  OUTPUTBOUNDS    = cdoOperatorAdd("outputbounds",    0, 0, NULL);
-  OUTPUTBOUNDSCPT = cdoOperatorAdd("outputboundscpt", 0, 0, NULL);
-  OUTPUTVECTOR    = cdoOperatorAdd("outputvector",    0, 0, NULL);
-  OUTPUTTRI       = cdoOperatorAdd("outputtri",       0, 0, NULL);
-  OUTPUTVRML      = cdoOperatorAdd("outputvrml",      0, 0, NULL);
+  int GRIDVERIFY      = cdoOperatorAdd("gridverify",      0, 0, NULL);
+  int OUTPUTCENTER    = cdoOperatorAdd("outputcenter",    0, 0, NULL);
+  int OUTPUTCENTER2   = cdoOperatorAdd("outputcenter2",   0, 0, NULL);
+  int OUTPUTCENTERCPT = cdoOperatorAdd("outputcentercpt", 0, 0, NULL);
+  int OUTPUTBOUNDS    = cdoOperatorAdd("outputbounds",    0, 0, NULL);
+  int OUTPUTBOUNDSCPT = cdoOperatorAdd("outputboundscpt", 0, 0, NULL);
+  int OUTPUTVECTOR    = cdoOperatorAdd("outputvector",    0, 0, NULL);
+  int OUTPUTTRI       = cdoOperatorAdd("outputtri",       0, 0, NULL);
+  int OUTPUTVRML      = cdoOperatorAdd("outputvrml",      0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == OUTPUTVECTOR )
     {
@@ -655,9 +638,7 @@ void *Outputgmt(void *argument)
 
   if ( operatorID == OUTPUTCENTERCPT || operatorID == OUTPUTBOUNDSCPT || operatorID == OUTPUTVRML )
     {
-      char *cpt_file;
-
-      cpt_file = operatorArgv()[0];
+      char *cpt_file = operatorArgv()[0];
 
       if ( (cpt_fp = fopen (cpt_file, "r")) == NULL )
 	cdoAbort("Open failed on color palette table %s", cpt_file);
@@ -669,17 +650,17 @@ void *Outputgmt(void *argument)
       if ( cdoVerbose ) cptWrite(stderr, cpt);
     }
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
 
-  vlistID = streamInqVlist(streamID);
-  taxisID = vlistInqTaxis(vlistID);
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
 
   varID = 0;
   vlistInqVarName(vlistID, varID, varname);
-  code    = vlistInqVarCode(vlistID, varID);
-  gridID  = vlistInqVarGrid(vlistID, varID);
-  zaxisID = vlistInqVarZaxis(vlistID, varID);
-  missval = vlistInqVarMissval(vlistID, varID);
+  int code    = vlistInqVarCode(vlistID, varID);
+  int gridID  = vlistInqVarGrid(vlistID, varID);
+  int zaxisID = vlistInqVarZaxis(vlistID, varID);
+  double missval = vlistInqVarMissval(vlistID, varID);
 
   if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
 
@@ -689,10 +670,10 @@ void *Outputgmt(void *argument)
       lgrid_gen_bounds = TRUE;
     }
 
-  gridsize = gridInqSize(gridID);
-  nlon     = gridInqXsize(gridID);
-  nlat     = gridInqYsize(gridID);
-  nlev     = zaxisInqSize(zaxisID);
+  int gridsize = gridInqSize(gridID);
+  int nlon     = gridInqXsize(gridID);
+  int nlat     = gridInqYsize(gridID);
+  int nlev     = zaxisInqSize(zaxisID);
 
   if ( gridInqMaskGME(gridID, NULL) )
     {
@@ -732,10 +713,10 @@ void *Outputgmt(void *argument)
   else
     ncorner = 4;
 
-  grid_is_circular = gridIsCircular(gridID);
+  int grid_is_circular = gridIsCircular(gridID);
 
-  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
-  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
@@ -746,9 +727,9 @@ void *Outputgmt(void *argument)
   gridInqYunits(gridID, units);
   grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
 
-  nvals = gridsize;
-  plon = grid_center_lon;
-  plat = grid_center_lat;
+  int nvals = gridsize;
+  double *plon = grid_center_lon;
+  double *plat = grid_center_lat;
 
   if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
     {
@@ -773,9 +754,9 @@ void *Outputgmt(void *argument)
       plat = grid_center_lat2;
     }
 
-  zaxis_center_lev = (double*) Malloc(nlev*sizeof(double));
-  zaxis_lower_lev  = (double*) Malloc(nlev*sizeof(double));
-  zaxis_upper_lev  = (double*) Malloc(nlev*sizeof(double));
+  double *zaxis_center_lev = (double*) Malloc(nlev*sizeof(double));
+  double *zaxis_lower_lev  = (double*) Malloc(nlev*sizeof(double));
+  double *zaxis_upper_lev  = (double*) Malloc(nlev*sizeof(double));
 
   zaxisInqLevels(zaxisID, zaxis_center_lev);
 
@@ -833,8 +814,8 @@ void *Outputgmt(void *argument)
 	}
     }
 
-  array = (double*) Malloc(gridsize*sizeof(double));
-  parray = array;
+  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *parray = array;
 						
   if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
     {
@@ -855,7 +836,7 @@ void *Outputgmt(void *argument)
 		grid_center_lon, grid_center_lat,
 		grid_corner_lon, grid_corner_lat);
 
-  tsID = 0;
+  int tsID = 0;
   if ( process_data )
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
