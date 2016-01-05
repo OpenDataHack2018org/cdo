@@ -520,7 +520,7 @@ void *Select(void *argument)
   PML_DEF_INT(code,             1024, "Code number");
   PML_DEF_INT(levidx,           1024, "Level index");
   PML_DEF_INT(ltype,             256, "Level type");
-  PML_DEF_INT(zaxis,             256, "Zaxis number");
+  PML_DEF_INT(zaxisnum,          256, "Zaxis number");
   PML_DEF_INT(grid,              256, "Grid number");
   PML_DEF_FLT(level,            1024, "Level");
   PML_DEF_WORD(name,            1024, "Variable name");
@@ -541,7 +541,7 @@ void *Select(void *argument)
   PML_INIT_INT(code);
   PML_INIT_INT(levidx);
   PML_INIT_INT(ltype);
-  PML_INIT_INT(zaxis);
+  PML_INIT_INT(zaxisnum);
   PML_INIT_INT(grid);
   PML_INIT_FLT(level);
   PML_INIT_WORD(name);
@@ -583,7 +583,7 @@ void *Select(void *argument)
   PML_ADD_INT(pml, code);
   PML_ADD_INT(pml, levidx);
   PML_ADD_INT(pml, ltype);
-  PML_ADD_INT(pml, zaxis);
+  PML_ADD_INT(pml, zaxisnum);
   PML_ADD_INT(pml, grid);
   PML_ADD_FLT(pml, level);
   PML_ADD_WORD(pml, name);
@@ -608,7 +608,7 @@ void *Select(void *argument)
   PML_NUM(pml, code);
   PML_NUM(pml, levidx);
   PML_NUM(pml, ltype);
-  PML_NUM(pml, zaxis);
+  PML_NUM(pml, zaxisnum);
   PML_NUM(pml, grid);
   PML_NUM(pml, level);
   PML_NUM(pml, name);
@@ -678,7 +678,7 @@ void *Select(void *argument)
 	      nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
 
-              zaxis   = vlistZaxisIndex(vlistID1, zaxisID)+1;
+              zaxisnum = vlistZaxisIndex(vlistID1, zaxisID)+1;
               int zaxistype = zaxisInqType(zaxisID);
               zaxisName(zaxistype, zname);
               zaxisname = zname;
@@ -695,11 +695,11 @@ void *Select(void *argument)
               bool found_grid  = npar_grid      && PAR_CHECK_INT(grid);
               bool found_gname = npar_gridname  && PAR_CHECK_WORD(gridname);
               bool found_ltype = npar_ltype     && PAR_CHECK_INT(ltype);
-              bool found_zaxis = npar_zaxis     && PAR_CHECK_INT(zaxis);
+              bool found_zaxis = npar_zaxisnum  && PAR_CHECK_INT(zaxisnum);
               bool found_zname = npar_zaxisname && PAR_CHECK_WORD(zaxisname);
               bool lvar  = found_code || found_name || found_param;
               bool lgrid = (npar_grid || npar_gridname) ? (found_grid || found_gname) : true;
-              bool lvert = (npar_ltype || npar_zaxis || npar_zaxisname) ? (found_ltype || found_zaxis || found_zname) : true;
+              bool lvert = (npar_ltype || npar_zaxisnum || npar_zaxisname) ? (found_ltype || found_zaxis || found_zname) : true;
 	      
               if ( !vars[varID] && lgrid && lvar) vars[varID] = true;
               if ( !vars[varID] && lvert && lvar) vars[varID] = true;
@@ -773,7 +773,7 @@ void *Select(void *argument)
 	  PAR_CHECK_INT_FLAG(code);
 	  PAR_CHECK_INT_FLAG(levidx);
 	  PAR_CHECK_INT_FLAG(ltype);
-	  PAR_CHECK_INT_FLAG(zaxis);
+	  PAR_CHECK_INT_FLAG(zaxisnum);
 	  PAR_CHECK_INT_FLAG(grid);
 	  PAR_CHECK_FLT_FLAG(level);
 	  PAR_CHECK_WORD_FLAG(name);
