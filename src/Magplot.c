@@ -35,10 +35,10 @@ int CONTOUR, SHADED, GRFILL;
 const char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int contour_param_count = sizeof(contour_params)/sizeof(char*);
 
-const char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
+const char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colour_table","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int shaded_param_count = sizeof(shaded_params)/sizeof(char*);
 
-const char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
+const char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colour_table","resolution","RGB","colour_triad","device","step_freq","file_split","lat_min","lat_max","lon_min","lon_max","projection"};
 int grfill_param_count = sizeof(grfill_params)/sizeof(char*);
 
 const char  *STD_COLOUR_TABLE[] = {"red", "green", "blue", "yellow", "cyan", "magenta", "black", "avocado",
@@ -582,8 +582,8 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 
 /*  
   char  *contour_params[] = {"ymin","ymax","count","interval","list","colour","thickness","style"};
-  char  *shaded_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colortable","step_freq"};
-  char  *grfill_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colortable","resolution"};
+  char  *shaded_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colour_table","step_freq"};
+  char  *grfill_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colour_table","resolution"};
 */
 
 
@@ -800,7 +800,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 	                }
 		    }
 		    
-		  if( !strcmp( split_str[0],"colourtable" ) )
+		  if( !strcmp( split_str[0],"colour_table" ) )
 		    {
 		      if( ( fp = fopen( split_str[1],"r") ) == NULL )
 			{
