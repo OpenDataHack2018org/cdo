@@ -1,5 +1,5 @@
    File format : netCDF
-    -1 : Institut Source   Ttype    Levels Num    Points Num Dtype : Parameter name
+    -1 : Institut Source   Steptype Levels Num    Points Num Dtype : Parameter name
      1 : unknown  unknown  instant       1   1         1   1  F32  : for           
    Grid coordinates :
      1 : lonlat                   : points=1 (1x1)

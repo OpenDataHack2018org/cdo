@@ -1,5 +1,5 @@
    File format : GRIB
-    -1 : Institut Source   Ttype    Levels Num    Points Num Dtype : Parameter ID
+    -1 : Institut Source   Steptype Levels Num    Points Num Dtype : Parameter ID
      1 : unknown  unknown  instant       1   1         1   1  P0   : 1             
    Grid coordinates :
      1 : lonlat                   : points=1 (1x1)
