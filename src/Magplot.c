@@ -946,93 +946,92 @@ int checkcolour( char *colour_in )
 	  }
 	  
 	StrToLowerCase( colour_in );
-	for( i = 0 ; i < STD_COLOUR_COUNT; i++ )
+	for ( i = 0 ; i < STD_COLOUR_COUNT; i++ )
 	  {
-	    if( !strcmp( STD_COLOUR_TABLE[i], colour_in ) )
-	      {
-		return 0;
-	      }
+	    if ( !strcmp( STD_COLOUR_TABLE[i], colour_in ) ) return 0;
 	  }
-	  cdoWarning( "Specified Colour not in Standard colour list, resetting to blue(default colour)!" );
-	  return 1;
+        cdoWarning( "Specified Colour not in Standard colour list, resetting to blue(default colour)!" );
+        return 1;
       }
       
     if( DBG )  
-      cdoWarning( "Colour %s verified!",ref );  
+      cdoWarning( "Colour %s verified!",ref );
+
     return 0;
 }
 
 
-int ReadColourTable ( char *filepath )
+int ReadColourTable( char *filepath )
 {
+  int  i, num_colors = 0;
+  char  orig_char = ';', rep_char = ',';
     
-    FILE *fp;
-    int  i, num_colors;
-    char **temp_table = NULL;
-    char  orig_char = ';', rep_char = ',';
+  FILE *fp = fopen( filepath,"r" );
     
-    fp = fopen( filepath,"r" );
+  if ( !fp )
+    {
+      fprintf( stdout, "File Not available!" );
+      return 1;
+    }
     
-    if( !fp )
-      {
-	fprintf( stdout, "File Not available!" );
-	return 1;
-      }
+  fscanf( fp, "%d", &num_colors );
     
-    fscanf( fp, "%d", &num_colors );
+  if( DBG )
+    fprintf( stderr, "Num Colours %d\n", num_colors );
     
-    if( DBG )
-      fprintf( stderr, "Num Colours %d\n", num_colors );
+  if ( !num_colors )
+    {
+      cdoWarning("No colours found in File, proceeding with Standard Colour table!\n");
+      fclose(fp);
+      return 1;
+    }
     
-    if( !num_colors )
-      {
-	cdoWarning("No colours found in File, proceeding with Standard Colour table!\n");
-	fclose(fp);
-	return 1;
-      }
+  USR_COLOUR_COUNT = 0;
+  USR_COLOUR_TABLE = ( char **) Malloc( num_colors * sizeof( char* ));
+  char **temp_table = ( char **) Malloc( num_colors * sizeof( char* ));
     
-    USR_COLOUR_COUNT = 0;
-    USR_COLOUR_TABLE = ( char **) Malloc( num_colors * sizeof( char* ));
-    temp_table  = ( char **) Malloc( num_colors * sizeof( char* ));
+  for ( i = 0; i < num_colors; i++ )
+    {
+      temp_table[i] = (char *) Malloc(256 * sizeof( char ));
+      fscanf( fp, "%s", temp_table[i] );
+      if( DBG )
+        fprintf( stdout, "%s\n", temp_table[i] );
+    }
     
-    for( i =0; i < num_colors; i++ )
-      {
-         temp_table[i] = ( char *) Malloc(  256 * sizeof( char ));
-	 fscanf( fp, "%s", temp_table[i] );
-	 if( DBG )
-	   fprintf( stdout, "%s\n", temp_table[i] );
-      } 
-    
-    for( i = 0; i < num_colors; i++ )
-      {
-	  if( DBG )
-	    fprintf( stdout, "%s \n", temp_table[i] );
-	  
-	  if( !checkcolour( temp_table[i] ) )
-	    {
-	      if( isRGB )
-		StrReplaceChar( temp_table[i], orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+  fclose(fp);
 
-	      if( DBG )
-		fprintf( stdout, "Before appending %s\n", temp_table[i] );
+  for ( i = 0; i < num_colors; i++ )
+    {
+      if( DBG )
+        fprintf( stdout, "%s \n", temp_table[i] );
+	  
+      if ( !checkcolour( temp_table[i] ) )
+        {
+          if( isRGB )
+            StrReplaceChar( temp_table[i], orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+
+          if( DBG )
+            fprintf( stdout, "Before appending %s\n", temp_table[i] );
+          
+          USR_COLOUR_TABLE[ USR_COLOUR_COUNT ] = strdup( temp_table[i] );
 	      
-	      USR_COLOUR_TABLE[ USR_COLOUR_COUNT ] = strdup( temp_table[i] );
+          /* strcpy( USR_COLOUR_TABLE[ USR_COLOUR_COUNT ], temp_table[i] ); */
+          USR_COLOUR_COUNT++;
 	      
-	      /* strcpy( USR_COLOUR_TABLE[ USR_COLOUR_COUNT ], temp_table[i] ); */
-	      USR_COLOUR_COUNT++;
-	      
-	      if( DBG )
-		fprintf( stdout, "After appending %s\n", temp_table[i] );
-	    }
-      }
+          if( DBG )
+            fprintf( stdout, "After appending %s\n", temp_table[i] );
+        }
+    }
     
-    if( USR_COLOUR_COUNT < num_colors )
-      {
-	  cdoWarning( " Discarding improper format colours and continuing!\n" );
-      }
-      
-    fclose(fp);   
-    return 0;
+  if( USR_COLOUR_COUNT < num_colors )
+    {
+      cdoWarning( " Discarding improper format colours and continuing!\n" );
+    }
+
+  for ( i = 0; i < num_colors; i++ ) free(temp_table[i]);
+  free(temp_table);
+    
+  return 0;
 }
 
 
