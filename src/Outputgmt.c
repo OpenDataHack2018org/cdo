@@ -424,7 +424,7 @@ void *Outputgmt(void *argument)
 
 	  if ( cdoVerbose )
 	    for ( i = 0; i < nlev; ++i )
-	      printf("level: %d %g %g %g\n",
+	      fprintf(stderr, "level: %d %g %g %g\n",
 		     i+1, zaxis_lower_lev[i], zaxis_center_lev[i], zaxis_upper_lev[i]);
 	}
     }
@@ -504,6 +504,17 @@ void *Outputgmt(void *argument)
 
 	  if ( operatorID == OUTPUTCENTER || operatorID == OUTPUTCENTER2 || operatorID == OUTPUTCENTERCPT )
 	    {
+              if ( cdoVerbose )
+                {
+                  double minval, maxval, meanval;
+                  array_stat(gridsize, array, missval, &minval, &maxval, &meanval);
+                  double range = maxval - minval;
+                  fprintf(stderr, "minval, maxval, meanval, range %g %g %g %g\n", minval, maxval, meanval, range);
+                  fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range/20);
+                  fprintf(stderr, "pscontour -K -Jx0.02id -Rd -I -Cgmt.cpt data.gmt > gmtplot.ps\n");
+                  fprintf(stderr, "pscoast -O -J -R -Dc -W -B30g30 >> gmtplot.ps\n");
+                }
+
 	      for ( i = 0; i < nvals; i++ )
 		{
 		  if ( grid_mask )
@@ -597,10 +608,20 @@ void *Outputgmt(void *argument)
             }
 	  else if ( operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT )
 	    {
+              if ( cdoVerbose )
+                {
+                  double minval, maxval, meanval;
+                  array_stat(gridsize, array, missval, &minval, &maxval, &meanval);
+                  double range = maxval - minval;
+                  fprintf(stderr, "minval, maxval, meanval, range %g %g %g %g\n", minval, maxval, meanval, range);
+                  fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range/20);
+                  fprintf(stderr, "psxy -K -Jx0.02id -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps\n");
+                  fprintf(stderr, "pscoast -O -J -R -Dc -W -B30g30 >> gmtplot.ps\n");
+                }
+
 	      for ( i = 0; i < gridsize; i++ )
 		{
-		  if ( grid_mask )
-		    if ( grid_mask[i] == 0 ) continue;
+		  if ( grid_mask && grid_mask[i] == 0 ) continue;
 
 		  if ( !DBL_IS_EQUAL(array[i], missval) )
 		    fprintf(stdout, "> -Z%g", array[i]);
