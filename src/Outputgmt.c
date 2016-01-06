@@ -204,7 +204,7 @@ void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double mis
 void *Outputgmt(void *argument)
 {
   int i, j;
-  int varID0, varID, recID;
+  int varID0, recID;
   int gridsize2 = 0;
   int nrecs;
   int levelID;
@@ -214,7 +214,6 @@ void *Outputgmt(void *argument)
   int status;
   int lgrid_gen_bounds = FALSE, luse_grid_corner = FALSE;
   int ninc = 1;
-  int vdate, vtime;
   char varname[CDI_MAX_NAME];
   double level;
   double *array2 = NULL;
@@ -271,7 +270,7 @@ void *Outputgmt(void *argument)
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
-  varID = 0;
+  int varID = 0;
   vlistInqVarName(vlistID, varID, varname);
   int code    = vlistInqVarCode(vlistID, varID);
   int gridID  = vlistInqVarGrid(vlistID, varID);
@@ -450,8 +449,8 @@ void *Outputgmt(void *argument)
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
+      int vdate = taxisInqVdate(taxisID);
+      int vtime = taxisInqVtime(taxisID);
 	      
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
@@ -510,31 +509,6 @@ void *Outputgmt(void *argument)
 		  if ( grid_mask )
 		    if ( grid_mask[i] == 0 ) continue;
 
-                  /*
-		  if ( operatorID == OUTPUTCENTERCPT )
-		    {
-		      int r = 0, g = 0, b = 0, n;
-
-		      if ( !DBL_IS_EQUAL(array[i], missval) )
-			{
-			  for ( n = 0; n < cpt->ncolors; n++ )
-			    if ( array[i] > cpt->lut[n].z_low && array[i] <= cpt->lut[n].z_high ) break;
-
-			  if ( n == cpt->ncolors )
-			    {
-			      r = cpt->bfn[0].rgb[0];  g = cpt->bfn[0].rgb[1];  b = cpt->bfn[0].rgb[2];
-			    }
-			  else
-			    {
-			      r = cpt->lut[n].rgb_high[0];  g = cpt->lut[n].rgb_high[1];  b = cpt->lut[n].rgb_high[2];
-			    }
-			}
-		      else
-			{
-			  r = cpt->bfn[2].rgb[0];  g = cpt->bfn[2].rgb[1];  b = cpt->bfn[2].rgb[2]; 
-			}
-		    }
-                  */
 		  if ( operatorID == OUTPUTCENTER )
 		    {
 		      if ( lzon )
