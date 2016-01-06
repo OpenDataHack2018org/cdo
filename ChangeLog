@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
 
+2016-01-06  Uwe Schulzweida
+
+	* genbil: generate weight file also for num_links=0 
+
 2016-01-05  Uwe Schulzweida
 
 	* Select: added search key steptype
