@@ -193,7 +193,6 @@ void *CDIwrite(void *argument)
 	  vars[varID][levelID] = (double*) Malloc(gridsize*sizeof(double));
 	  for ( i = 0; i < gridsize; ++i )
 	    vars[varID][levelID][i] = varID + array[i]*(levelID+1);
-	  //    vars[varID][levelID][i] = varID + rand()/(RAND_MAX+1.0);
 	}
     }
 

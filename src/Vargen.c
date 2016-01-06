@@ -400,7 +400,7 @@ void *Vargen(void *argument)
               if ( operatorID == RANDOM )
                 {
                   for ( i = 0; i < gridsize; i++ )
-                    array[i] = rand()/(RAND_MAX+1.0);
+                    array[i] = ((double)rand())/((double)RAND_MAX);
                 }
               else if ( operatorID == SINCOS || operatorID == COSHILL )
                 {

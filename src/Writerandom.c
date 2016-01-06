@@ -82,7 +82,7 @@ void *Writerandom(void *argument)
 
       for ( rindex = nrecs-1; rindex >= 0; rindex-- )
 	{
-	  index = (int) (rindex*1.0*rand()/(RAND_MAX+1.0));
+	  index = (int) (rindex*((double)rand())/((double)RAND_MAX));
 	  /*	printf("rindex %d %d\n", rindex, index); */
 	  ipos = -1;
 	  for ( recID = 0; recID < nrecs; recID++ )
