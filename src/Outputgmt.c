@@ -77,6 +77,129 @@ void make_cyclic(double *array1, double *array2, int nlon, int nlat)
     }
 }
 
+static
+void array_stat(int ngp, double *restrict array, double missval, double *minval, double *maxval, double *meanval)
+{
+  double rmin = DBL_MAX;
+  double rmax = -DBL_MAX;
+  double rmean = 0;
+  
+  int nvals = 0;
+  for ( int i = 0; i < ngp; i++ )
+    {
+      if ( !DBL_IS_EQUAL(array[i], missval) )
+        {
+          if ( array[i] < rmin ) rmin = array[i];
+          if ( array[i] > rmax ) rmax = array[i];
+          rmean += array[i];
+          nvals++;
+        }
+    }
+
+  if ( IS_EQUAL(rmin,  DBL_MAX) ) rmin = missval;
+  if ( IS_EQUAL(rmax, -DBL_MAX) ) rmax = missval;
+
+  if ( nvals ) rmean /= nvals;
+  else         rmean = missval;
+
+  *minval = rmin;
+  *maxval = rmax;
+  *meanval = rmean;
+}
+
+static
+void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double missval, CPT *cpt)
+{
+  double minval, maxval, meanval;
+  array_stat(ngp, array, missval, &minval, &maxval, &meanval);
+
+  double dx = 10./nlon;
+
+  printf("Viewpoint {\n");
+  printf("  description \"viewpoint1\"\n");
+  printf("  orientation 0 0 1 0\n");
+  printf("  position 0.0 0.0 10.0\n");
+  printf("}\n");
+  printf("\n");
+  printf("Background {\n");
+  printf("  skyColor [\n");
+  printf("    0.0 0.1 0.8,\n");
+  printf("    0.0 0.5 1.0,\n");
+  printf("    1.0 1.0 1.0\n");
+  printf("  ]\n");
+  printf("  skyAngle [0.785, 1.571]\n");
+  printf("\n");
+  printf("  groundColor [\n");
+  printf("    0.0 0.0 0.0,\n");
+  printf("    0.3 0.3 0.3,\n");
+  printf("    0.5 0.5 0.5\n");
+  printf("  ]\n");
+  printf("  groundAngle [0.785, 1.571]\n");
+  printf("}\n");
+  printf("\n");
+  printf("Transform {\n");
+  printf("  children [\n");
+  printf("    Shape {\n");
+  printf("      appearance Appearance {\n");
+  printf("        material Material {}\n");
+  printf("      }\n");
+  printf("      geometry ElevationGrid {\n");
+  printf("        colorPerVertex TRUE\n");
+  printf("        solid FALSE\n");
+  printf("        xDimension %d\n", nlon);
+  printf("        zDimension %d\n", nlat);
+  printf("        xSpacing %g\n", dx);
+  printf("        zSpacing %g\n", dx);
+  printf("        color Color {\n");
+  printf("          color [\n");
+  for ( int j = nlat-1; j >= 0 ; --j )
+    for ( int i = 0; i < nlon; ++i )
+      {
+        int r = 0, g = 0, b = 0;
+        double val = array[j*nlon+i];
+        
+        if ( !DBL_IS_EQUAL(val, missval) )
+          {
+            int n;
+            for ( n = 0; n < cpt->ncolors; n++ )
+              if ( val > cpt->lut[n].z_low && val <= cpt->lut[n].z_high ) break;
+            
+            if ( n == cpt->ncolors )
+              {
+                r = cpt->bfn[0].rgb[0];  g = cpt->bfn[0].rgb[1];  b = cpt->bfn[0].rgb[2];
+              }
+            else
+              {
+                //  r = cpt->lut[n].rgb_high[0];  g = cpt->lut[n].rgb_high[1];  b = cpt->lut[n].rgb_high[2];
+                r = intlin(val, cpt->lut[n].rgb_low[0], cpt->lut[n].z_low, cpt->lut[n].rgb_high[0], cpt->lut[n].z_high);
+                g = intlin(val, cpt->lut[n].rgb_low[1], cpt->lut[n].z_low, cpt->lut[n].rgb_high[1], cpt->lut[n].z_high);
+                b = intlin(val, cpt->lut[n].rgb_low[2], cpt->lut[n].z_low, cpt->lut[n].rgb_high[2], cpt->lut[n].z_high);
+              }
+          }
+        else
+          {
+            r = cpt->bfn[2].rgb[0];  g = cpt->bfn[2].rgb[1];  b = cpt->bfn[2].rgb[2]; 
+          }
+        printf(" %.3g %.3g %.3g,\n", r/255., g/255., b/255.);
+      }
+  printf("          ]\n");
+  printf("        }\n");
+  printf("        height [\n");
+
+  for ( int j = nlat-1; j >= 0 ; --j )
+    for ( int i = 0; i < nlon; ++i )
+      printf("%g,\n", array[j*nlon+i]);
+
+  printf("        ]\n");
+  printf("      }\n");
+  printf("    }\n");
+  printf("  ]\n");
+  printf("  translation -5 0 %g\n", -5.*nlat/nlon);
+  printf("  rotation 0.0 0.0 0.0 0.0\n");
+  printf("  scale 1.0 %g 1.0\n", 0.5/(maxval-minval));
+  printf("}\n");
+}
+
 
 void *Outputgmt(void *argument)
 {
@@ -130,7 +253,8 @@ void *Outputgmt(void *argument)
 
   if ( operatorID == OUTPUTCENTERCPT || operatorID == OUTPUTBOUNDSCPT || operatorID == OUTPUTVRML )
     {
-      char *cpt_file = operatorArgv()[0];
+       operatorCheckArgc(1);
+       char *cpt_file = operatorArgv()[0];
 
       if ( (cpt_fp = fopen (cpt_file, "r")) == NULL )
 	cdoAbort("Open failed on color palette table %s", cpt_file);
@@ -393,21 +517,21 @@ void *Outputgmt(void *argument)
 
 		      if ( !DBL_IS_EQUAL(array[i], missval) )
 			{
-			  for ( n = 0; n < cpt.ncolors; n++ )
-			    if ( array[i] > cpt.lut[n].z_low && array[i] <= cpt.lut[n].z_high ) break;
+			  for ( n = 0; n < cpt->ncolors; n++ )
+			    if ( array[i] > cpt->lut[n].z_low && array[i] <= cpt->lut[n].z_high ) break;
 
-			  if ( n == cpt.ncolors )
+			  if ( n == cpt->ncolors )
 			    {
-			      r = cpt.bfn[0].rgb[0];  g = cpt.bfn[0].rgb[1];  b = cpt.bfn[0].rgb[2];
+			      r = cpt->bfn[0].rgb[0];  g = cpt->bfn[0].rgb[1];  b = cpt->bfn[0].rgb[2];
 			    }
 			  else
 			    {
-			      r = cpt.lut[n].rgb_high[0];  g = cpt.lut[n].rgb_high[1];  b = cpt.lut[n].rgb_high[2];
+			      r = cpt->lut[n].rgb_high[0];  g = cpt->lut[n].rgb_high[1];  b = cpt->lut[n].rgb_high[2];
 			    }
 			}
 		      else
 			{
-			  r = cpt.bfn[2].rgb[0];  g = cpt.bfn[2].rgb[1];  b = cpt.bfn[2].rgb[2]; 
+			  r = cpt->bfn[2].rgb[0];  g = cpt->bfn[2].rgb[1];  b = cpt->bfn[2].rgb[2]; 
 			}
 		    }
                   */
@@ -495,104 +619,7 @@ void *Outputgmt(void *argument)
 	    }
 	  else if ( operatorID == OUTPUTVRML )
 	    {
-	      double minval = 1e33;
-	      double maxval = -1e33;
-	      double meanval = 0;
-	      for ( i = 0; i < gridsize; i++ )
-		{
-		  if ( array[i] < minval ) minval = array[i];
-		  if ( array[i] > maxval ) maxval = array[i];
-		  meanval += array[i];
-		}
-	      meanval /= gridsize;
-
-	      double dx = 10./nlon;
-
-	      printf("Viewpoint {\n");
-	      printf("  description \"viewpoint1\"\n");
-	      printf("  orientation 0 0 1 0\n");
-	      printf("  position 0.0 0.0 10.0\n");
-	      printf("}\n");
-	      printf("\n");
-	      printf("Background {\n");
-	      printf("  skyColor [\n");
-	      printf("    0.0 0.1 0.8,\n");
-	      printf("    0.0 0.5 1.0,\n");
-	      printf("    1.0 1.0 1.0\n");
-	      printf("  ]\n");
-	      printf("  skyAngle [0.785, 1.571]\n");
-	      printf("\n");
-	      printf("  groundColor [\n");
-	      printf("    0.0 0.0 0.0,\n");
-	      printf("    0.3 0.3 0.3,\n");
-	      printf("    0.5 0.5 0.5\n");
-	      printf("  ]\n");
-	      printf("  groundAngle [0.785, 1.571]\n");
-	      printf("}\n");
-	      printf("\n");
-	      printf("Transform {\n");
-	      printf("  children [\n");
-	      printf("    Shape {\n");
-	      printf("      appearance Appearance {\n");
-	      printf("        material Material {}\n");
-	      printf("      }\n");
-	      printf("      geometry ElevationGrid {\n");
-    	      printf("        colorPerVertex TRUE\n");
-    	      printf("        solid FALSE\n");
-    	      printf("        xDimension %d\n", nlon);
-    	      printf("        zDimension %d\n", nlat);
-    	      printf("        xSpacing %g\n", dx);
-    	      printf("        zSpacing %g\n", dx);
-	      printf("        color Color {\n");
-	      printf("          color [\n");
-	      for ( j = nlat-1; j >= 0 ; --j )
-		for ( i = 0; i < nlon; ++i )
-		{
-		  int r = 0, g = 0, b = 0, n;
-		  double val = array[j*nlon+i];
-
-		  if ( !DBL_IS_EQUAL(val, missval) )
-		    {
-		      for ( n = 0; n < cpt.ncolors; n++ )
-			if ( val > cpt.lut[n].z_low && val <= cpt.lut[n].z_high ) break;
-		      
-		      if ( n == cpt.ncolors )
-			{
-			  r = cpt.bfn[0].rgb[0];  g = cpt.bfn[0].rgb[1];  b = cpt.bfn[0].rgb[2];
-			}
-		      else
-			{
-			  //  r = cpt.lut[n].rgb_high[0];  g = cpt.lut[n].rgb_high[1];  b = cpt.lut[n].rgb_high[2];
-			  r = intlin(val, cpt.lut[n].rgb_low[0], cpt.lut[n].z_low, cpt.lut[n].rgb_high[0], cpt.lut[n].z_high);
-			  g = intlin(val, cpt.lut[n].rgb_low[1], cpt.lut[n].z_low, cpt.lut[n].rgb_high[1], cpt.lut[n].z_high);
-			  b = intlin(val, cpt.lut[n].rgb_low[2], cpt.lut[n].z_low, cpt.lut[n].rgb_high[2], cpt.lut[n].z_high);
-			}
-		    }
-		  else
-		    {
-		      r = cpt.bfn[2].rgb[0];  g = cpt.bfn[2].rgb[1];  b = cpt.bfn[2].rgb[2]; 
-		    }
-		  printf(" %.3g %.3g %.3g,\n", r/255., g/255., b/255.);
-		}
-	      printf("          ]\n");
-	      printf("        }\n");
-    	      printf("        height [\n");
-	      //	      for ( j = 0; j < nlat; ++j )
-	      for ( j = nlat-1; j >= 0 ; --j )
-		{
-		  for ( i = 0; i < nlon; ++i )
-		    {
-		      printf("%g,\n", array[j*nlon+i]);
-		    }
-		}
-    	      printf("        ]\n");
-	      printf("      }\n");
-	      printf("    }\n");
-	      printf("  ]\n");
-	      printf("  translation -5 0 %g\n", -5.*nlat/nlon);
-	      printf("  rotation 0.0 0.0 0.0 0.0\n");
-	      printf("  scale 1.0 %g 1.0\n", 0.5/(maxval-minval));
-	      printf("}\n");
+              output_vrml(nlon, nlat, gridsize, array, missval, &cpt);
             }
 	  else if ( operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT )
 	    {
@@ -639,8 +666,8 @@ void *Outputgmt(void *argument)
 		      double xlev[4], xlat[4];
 		      double levmin = zaxis_lower_lev[levelID];
 		      double levmax = zaxis_upper_lev[levelID];
-		      double latmin = grid_corner_lat[i*4+0];
-		      double latmax = grid_corner_lat[i*4+0];
+		      double latmin = grid_corner_lat[i*4];
+		      double latmax = grid_corner_lat[i*4];
 		      for ( ic = 1; ic < 4; ic++ )
 			{
 			  if ( grid_corner_lat[i*4+ic] < latmin ) latmin = grid_corner_lat[i*4+ic];
@@ -663,8 +690,8 @@ void *Outputgmt(void *argument)
 		      double xlev[4], xlon[4];
 		      double levmin = zaxis_lower_lev[levelID];
 		      double levmax = zaxis_upper_lev[levelID];
-		      double lonmin = grid_corner_lon[i*4+0];
-		      double lonmax = grid_corner_lon[i*4+0];
+		      double lonmin = grid_corner_lon[i*4];
+		      double lonmax = grid_corner_lon[i*4];
 		      for ( ic = 1; ic < 4; ic++ )
 			{
 			  if ( grid_corner_lon[i*4+ic] < lonmin ) lonmin = grid_corner_lon[i*4+ic];
