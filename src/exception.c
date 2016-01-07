@@ -10,6 +10,7 @@
 #include "process.h"
 #include "error.h"
 
+void pstreamCloseAll(void);
 
 void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 {	
@@ -32,50 +33,38 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
       switch (filetype)
 	{
 	case FILETYPE_GRB:
-	  {
-	    break;
-	  }
+          break;
 	case FILETYPE_GRB2:
-	  {
-	    fprintf(stderr, "To create a CDO application with GRIB2 support use: ./configure --with-netcdf=<GRIB_API root directory> ...\n");
-	    break;
-	  }
+          fprintf(stderr, "To create a CDO application with GRIB2 support use: ./configure --with-netcdf=<GRIB_API root directory> ...\n");
+          break;
 	case FILETYPE_SRV:
-	  {
-	    break;
-	  }
+          break;
 	case FILETYPE_EXT:
-	  {
-	    break;
-	  }
+          break;
 	case FILETYPE_IEG:
-	  {
-	    break;
-	  }
+          break;
 	case FILETYPE_NC:
 	case FILETYPE_NC2:
 	case FILETYPE_NC4:
 	case FILETYPE_NC4C:
-	  {
-	    const char *ncv = (filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C) ? "4" : ((filetype == FILETYPE_NC2) ? "2" : "");
+          {
+            const char *ncv = (filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C) ? "4" : ((filetype == FILETYPE_NC2) ? "2" : "");
 #if defined HAVE_LIBNETCDF
-	    fprintf(stderr, "CDO was build with a netCDF version which doesn't support netCDF%s data!\n", ncv);
+            fprintf(stderr, "CDO was build with a netCDF version which doesn't support netCDF%s data!\n", ncv);
 #else
-	    fprintf(stderr, "To create a CDO application with netCDF%s support use: ./configure --with-netcdf=<netCDF%s root directory> ...\n", ncv, ncv);
+            fprintf(stderr, "To create a CDO application with netCDF%s support use: ./configure --with-netcdf=<netCDF%s root directory> ...\n", ncv, ncv);
 #endif
-	    break;
-	  }
+            break;
+          }
 	default:
-	  {
-	    break;
-	  }
+          break;
 	}
     }
   
+  if ( _ExitOnError ) pstreamCloseAll();
   if ( _ExitOnError ) exit(EXIT_FAILURE);
 }
 
-void pstreamCloseAll(void);
 void cdoAbort(const char *fmt, ...)
 {
   va_list args;

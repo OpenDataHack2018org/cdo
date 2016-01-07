@@ -524,8 +524,12 @@ int pstreamOpenRead(const argument_t *argument)
 	pthread_mutex_lock(&streamOpenReadMutex);
 #endif
       int fileID = streamOpenRead(filename);
-      if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", filename);
-
+      if ( fileID < 0 )
+        {
+          pstreamptr->isopen = FALSE;
+          cdiOpenError(fileID, "Open failed on >%s<", filename);
+        }
+      
       if ( cdoDefaultFileType == CDI_UNDEFID )
 	cdoDefaultFileType = streamInqFiletype(fileID);
       /*
