@@ -598,8 +598,7 @@ void check_data(int vlistID2, int varID2, int varID, var_t *vars, long gridsize,
 void *Setpartab(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
-  int varID2, levelID2;
+  int varID, levelID;
   int nmiss;
   int delvars = FALSE;
   int tableID = -1;
@@ -681,31 +680,54 @@ void *Setpartab(void *argument)
 
   if ( tableformat == 0 )
     {
-      for ( varID = 0; varID < nvars; varID++ )
-	vlistDefVarTable(vlistID2, varID, tableID);
+      /*
+        for ( int varID = 0; varID < nvars; varID++ )
+	  vlistDefVarTable(vlistID2, varID, tableID);
+      */
+      char name[CDI_MAX_NAME], longname[CDI_MAX_NAME], units[CDI_MAX_NAME];
+      for ( int varID = 0; varID < nvars; varID++ )
+        {
+          int param = vlistInqVarParam(vlistID2, varID);
+          int pdis, pcat, pnum;
+          cdiDecodeParam(param, &pnum, &pcat, &pdis);
+          if ( pdis == 255 )
+            {
+              int code = pnum;
+              if ( tableInqParName(tableID, code, name) == 0 )
+                {
+                  vlistDefVarName(vlistID2, varID, name);
+                  longname[0] = 0;
+                  tableInqParLongname(tableID, code, longname);
+                  units[0] = 0;
+                  tableInqParUnits(tableID, code, units);
+                  vlistDefVarLongname(vlistID2, varID, longname);
+                  vlistDefVarUnits(vlistID2, varID, units);
+                }
+            }
+          vlistDefVarTable(vlistID2, varID, tableID);
+        }
     }
   else
     {
       read_partab(ptmode, nvars, vlistID2, vars);
 
-      for ( varID = 0; varID < nvars; ++varID )
-	if ( vars[varID].remove ) break;
-
-      if ( varID < nvars ) delvars = TRUE;
+      for ( int varID = 0; varID < nvars; ++varID )
+	if ( vars[varID].remove )
+          {
+            delvars = TRUE;
+            break;
+          }
 
       if ( delvars )
 	{
-	  int levID, nlevs, zaxisID;
-	  int vlistIDx;
-
 	  vlistClearFlag(vlistID1);
 	  vlistClearFlag(vlistID2);
 
-	  for ( varID = 0; varID < nvars; varID++ )
+	  for ( int varID = 0; varID < nvars; varID++ )
 	    {
-	      zaxisID  = vlistInqVarZaxis(vlistID2, varID);
-	      nlevs    = zaxisInqSize(zaxisID);
-	      for ( levID = 0; levID < nlevs; levID++ )
+	      int zaxisID = vlistInqVarZaxis(vlistID2, varID);
+	      int nlevs   = zaxisInqSize(zaxisID);
+	      for ( int levID = 0; levID < nlevs; levID++ )
 		{
 		  vlistDefFlag(vlistID1, varID, levID, TRUE);
 		  vlistDefFlag(vlistID2, varID, levID, TRUE);
@@ -717,7 +739,7 @@ void *Setpartab(void *argument)
 		}
 	    }
 
-	  vlistIDx = vlistCreate();
+	  int vlistIDx = vlistCreate();
 	  vlistCopyFlag(vlistIDx, vlistID2);
 
 	  vlistDestroy(vlistID2);
@@ -725,7 +747,7 @@ void *Setpartab(void *argument)
 	  vlistID2 = vlistIDx;
 	}
 
-      for ( varID = 0; varID < nvars; ++varID )
+      for ( int varID = 0; varID < nvars; ++varID )
 	convertVarUnits(vars, varID, vars[varID].name);
     }
 
@@ -749,12 +771,12 @@ void *Setpartab(void *argument)
 
       streamDefTimestep(streamID2, tsID1);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  varID2 = varID;
-	  levelID2 = levelID;
+	  int varID2 = varID;
+	  int levelID2 = levelID;
 
 	  if ( delvars )
 	    {
@@ -826,7 +848,7 @@ void *Setpartab(void *argument)
 #if defined(HAVE_UDUNITS2)
   UDUNITS_LOCK();
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( int varID = 0; varID < nvars; varID++ )
     if ( vars[varID].ut_converter ) cv_free((cv_converter*)vars[varID].ut_converter);
 
   if ( ut_read )

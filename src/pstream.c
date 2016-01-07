@@ -141,7 +141,7 @@ pstream_t *pstream_to_pointer(int idx)
   else
     Error("pstream index %d undefined!", idx);
 
-  return (pstreamptr);
+  return pstreamptr;
 }
 
 /* Create an index from a pointer */
@@ -173,7 +173,7 @@ int pstream_from_pointer(pstream_t *ptr)
   else
     Error("Internal problem (pointer %p undefined)", ptr);
 
-  return (idx);
+  return idx;
 }
 
 static
@@ -210,7 +210,7 @@ pstream_t *pstream_new_entry(void)
 
   if ( pstreamptr ) pstream_init_entry(pstreamptr);
 
-  return (pstreamptr);
+  return pstreamptr;
 }
 
 static
@@ -274,7 +274,7 @@ int pstreamFindID(const char *name)
 
   if ( pstreamID == _pstream_max ) pstreamID = -1;
 
-  return (pstreamID);
+  return pstreamID;
 }
 
 
@@ -282,7 +282,7 @@ int pstreamIsPipe(int pstreamID)
 {
   pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
 
-  return (pstreamptr->ispipe);
+  return pstreamptr->ispipe;
 }
 
 
@@ -551,7 +551,7 @@ int pstreamOpenRead(const argument_t *argument)
 
   if ( pstreamID < 0 ) cdiOpenError(pstreamID, "Open failed on >%s<", argument->args);
   
-  return (pstreamID);
+  return pstreamID;
 }
 
 static
@@ -722,7 +722,7 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
       pstreamptr->filetype = filetype;
    }
 
-  return (pstreamID);
+  return pstreamID;
 }
 
 
@@ -775,7 +775,7 @@ int pstreamOpenAppend(const argument_t *argument)
       pstreamptr->fileID = fileID;
     }
 
-  return (pstreamID);
+  return pstreamID;
 }
 
 
@@ -1415,7 +1415,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
       pstreamptr->tsID = tsID;
     }
 
-  return (nrecs);
+  return nrecs;
 }
 
 
@@ -1677,7 +1677,7 @@ int pstreamInqFiletype(int pstreamID)
 #endif
     filetype = streamInqFiletype(pstreamptr->fileID);
 
-  return (filetype);
+  return filetype;
 }
 
 
@@ -1694,7 +1694,7 @@ int pstreamInqByteorder(int pstreamID)
 #endif
     byteorder = streamInqByteorder(pstreamptr->fileID);
 
-  return (byteorder);
+  return byteorder;
 }
 
 void pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
