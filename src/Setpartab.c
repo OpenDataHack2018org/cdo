@@ -698,9 +698,9 @@ void *Setpartab(void *argument)
                   vlistDefVarName(vlistID2, varID, name);
                   longname[0] = 0;
                   tableInqParLongname(tableID, code, longname);
+                  vlistDefVarLongname(vlistID2, varID, longname);
                   units[0] = 0;
                   tableInqParUnits(tableID, code, units);
-                  vlistDefVarLongname(vlistID2, varID, longname);
                   vlistDefVarUnits(vlistID2, varID, units);
                 }
             }
