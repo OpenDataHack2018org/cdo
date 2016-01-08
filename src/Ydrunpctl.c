@@ -41,14 +41,11 @@ int getmonthday(int date)
 
 void *Ydrunpctl(void *argument)
 {
-  int gridsize;
   int varID;
   int recID;
   int gridID;
   int nrecs;
   int levelID;
-  int tsID;
-  int otsID;
   int inp, its;
   int nmiss;
   int nlevels;
@@ -59,7 +56,6 @@ void *Ydrunpctl(void *argument)
   int vdates2[NDAY] /*, vtimes2[NDAY]*/;
   int nsets[NDAY];
   int year, month, day, dayoy;
-  field_t field;
   HISTOGRAM_SET *hsets[NDAY];
     
   cdoInitialize(argument);
@@ -112,7 +108,9 @@ void *Ydrunpctl(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
+
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
@@ -125,7 +123,7 @@ void *Ydrunpctl(void *argument)
       vars1[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != streamInqTimestep(streamID3, tsID) )
@@ -134,7 +132,7 @@ void *Ydrunpctl(void *argument)
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
       
-      if ( vdate != taxisInqVdate(taxisID3) || vtime != taxisInqVtime(taxisID3) )
+      if ( vdate != taxisInqVdate(taxisID3) )
         cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
@@ -287,13 +285,13 @@ void *Ydrunpctl(void *argument)
 	vdates1[dayoy] = cdiEncodeDate(outyear, month, day);
       }
   */
-  otsID = 0;
+  int otsID = 0;
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( nsets[dayoy] )
       {
         if ( getmonthday(vdates1[dayoy]) != getmonthday(vdates2[dayoy]) )
           cdoAbort("Verification dates for day %d of %s, %s and %s are different!",
-                   dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
+                   dayoy, cdoStreamName(0)->args, cdoStreamName(1)->args);
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
