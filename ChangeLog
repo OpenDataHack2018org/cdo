@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
 
+2016-01-08  Uwe Schulzweida
+
+	* ydaypctl: check of verification date failed (bug fix)
+
 2016-01-07  Uwe Schulzweida
 
 	* setpartab: added support to combine setpartab operators (bug fix) [report: Karl-Hermann Wieners]
