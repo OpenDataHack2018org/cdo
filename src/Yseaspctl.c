@@ -40,6 +40,7 @@ void set_date(int vdate_new, int vtime_new, date_time_t *datetime);
 
 int getmonthday(int date);
 
+
 void *Yseaspctl(void *argument)
 {
   int varID;
@@ -49,9 +50,9 @@ void *Yseaspctl(void *argument)
   int year, month, day, seas;
   int nrecs;
   int levelID;
-  long nsets[NSEAS];
   int nmiss;
   int nlevels;
+  long nsets[NSEAS];
   date_time_t datetime1[NSEAS], datetime2[NSEAS];
   field_t **vars1[NSEAS];
   HISTOGRAM_SET *hsets[NSEAS];
@@ -120,7 +121,7 @@ void *Yseaspctl(void *argument)
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
       
-      if ( vdate != taxisInqVdate(taxisID3) || vtime != taxisInqVtime(taxisID3) )
+      if ( vdate != taxisInqVdate(taxisID3) )
         cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
@@ -212,8 +213,8 @@ void *Yseaspctl(void *argument)
     if ( nsets[seas] )
       {
         if ( getmonthday(datetime1[seas].vdate) != getmonthday(datetime2[seas].vdate) )
-          cdoAbort("Verification dates for season %d of %s, %s and %s are different!",
-                   seas, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
+          cdoAbort("Verification dates for the season %d of %s and %s are different!",
+                   seas, cdoStreamName(0)->args, cdoStreamName(1)->args);
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

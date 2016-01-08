@@ -37,6 +37,7 @@ int getmonth(int date)
   return month;
 }
 
+
 void *Ymonpctl(void *argument)
 {
   int varID;
@@ -45,13 +46,12 @@ void *Ymonpctl(void *argument)
   int vdate, vtime;
   int year, month, day;
   int levelID;
-  long nsets[NMONTH];
   int nmiss;
   int nrecs, nlevels;
   int vdates1[NMONTH], vtimes1[NMONTH];
   int vdates2[NMONTH];
+  long nsets[NMONTH];
   field_t **vars1[NMONTH];
-  field_t field;
   HISTOGRAM_SET *hsets[NMONTH];
 
   cdoInitialize(argument);
@@ -100,6 +100,8 @@ void *Ymonpctl(void *argument)
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
   int gridsize = vlistGridsizeMax(vlistID1);
+
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
