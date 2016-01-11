@@ -129,62 +129,29 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
            sep_char = "=";
            split_str_count = StringSplitWithSeperator( params[i], sep_char, &split_str );
 	
-           if( !strcmp( split_str[0],"min" ) )
-	     fprintf(stderr," Min Val %g\n",YMIN );
+           if ( !strcmp( split_str[0],"min" ) )        fprintf(stderr,"Min Val %g\n",YMIN );
+           if ( !strcmp( split_str[0],"max" ) )        fprintf(stderr,"Max Val %g\n",YMAX );
+           // if ( !strcmp( split_str[0],"resolution" ) ) fprintf( stderr,"RESOLUTION %g\n",RESOLUTION );
+           if ( !strcmp( split_str[0],"colour" ) )     fprintf(stderr,"COLOUR %s\n",COLOUR );
+           if ( !strcmp( split_str[0],"colour_min" ) ) fprintf(stderr,"COLOUR %s\n",COLOUR_MIN );
+           if ( !strcmp( split_str[0],"colour_max" ) ) fprintf(stderr,"COLOUR %s\n",COLOUR_MAX );
+           if ( !strcmp( split_str[0],"interval" ) )   fprintf(stderr,"INTERVAL %f\n",INTERVAL );
+           if( !strcmp( split_str[0],"count" ) )       fprintf(stderr,"COUNT %d\n",COUNT );
 	
-           if( !strcmp( split_str[0],"max" ) )
-	     fprintf(stderr,"Max Val %g\n",YMAX );
-	
-           if( !strcmp( split_str[0],"resolution" ) )
-	     fprintf( stderr,"RESOLUTION %g\n",RESOLUTION );
-	
-           if( !strcmp( split_str[0],"colour" ) ) 
-	     fprintf(stderr,"COLOUR %s\n",COLOUR );
-	
-           if( !strcmp( split_str[0],"colour_min" ) ) 
-	     fprintf(stderr,"COLOUR %s\n",COLOUR_MIN );
-	
-           if( !strcmp( split_str[0],"colour_max" ) ) 
-	     fprintf(stderr,"COLOUR %s\n",COLOUR_MAX );
-	
-           if( !strcmp( split_str[0],"interval" ) )
-	     fprintf( stderr,"INTERVAL %f\n",INTERVAL );
-	
-           if( !strcmp( split_str[0],"count" ) )
-	     fprintf( stderr,"COUNT %d\n",COUNT );
-	
-           if( !strcmp( split_str[0],"list" ) ) 
+           if ( !strcmp( split_str[0],"list" ) ) 
 	     {
-	        for( j = 0; j < split_str_count; j++ )
-	           fprintf( stderr,"LIST %f\n",LEV_LIST[j] ); 
+               for( j = 0; j < split_str_count; j++ )  fprintf(stderr,"LIST %f\n",LEV_LIST[j] ); 
 	     }
 	
-           if( !strcmp( split_str[0],"thickness" ) )
-	     fprintf( stderr,"THICKNESS %d\n",THICKNESS );
-	
-           if( !strcmp( split_str[0],"style" ) )
-	     fprintf( stderr,"STYLE %s\n",STYLE );
-	
-           if( !strcmp( split_str[0],"device" ) )
-	     fprintf( stderr,"DEVICE %s\n",DEVICE );
-
-           if( !strcmp( split_str[0],"step_freq" ) )
-	     fprintf( stderr,"STEP_FREQ %d\n",STEP_FREQ );
-
-           if( !strcmp( split_str[0],"lat_min" ) )
-	     fprintf(stderr," Lat Min Val %g\n",LAT_MIN );
-	
-           if( !strcmp( split_str[0],"lat_max" ) )
-	     fprintf(stderr,"Lat Max Val %g\n",LAT_MAX );
-
-           if( !strcmp( split_str[0],"lon_min" ) )
-	     fprintf(stderr," Lon Min Val %g\n",LON_MIN );
-	
-           if( !strcmp( split_str[0],"lon_max" ) )
-	     fprintf(stderr,"Lon Max Val %g\n",LON_MAX );
-
-           if( !strcmp( split_str[0],"projection" ) )
-	     fprintf( stderr,"PROJECTION %s\n",PROJECTION );
+           if ( !strcmp( split_str[0],"thickness" ) )  fprintf(stderr,"THICKNESS %d\n",THICKNESS );
+           if ( !strcmp( split_str[0],"style" ) )      fprintf(stderr,"STYLE %s\n",STYLE );
+           if ( !strcmp( split_str[0],"device" ) )     fprintf(stderr,"DEVICE %s\n",DEVICE );
+           if ( !strcmp( split_str[0],"step_freq" ) )  fprintf(stderr,"STEP_FREQ %d\n",STEP_FREQ );
+           if ( !strcmp( split_str[0],"lat_min" ) )    fprintf(stderr,"Lat Min Val %g\n",LAT_MIN );
+           if ( !strcmp( split_str[0],"lat_max" ) )    fprintf(stderr,"Lat Max Val %g\n",LAT_MAX );
+           if ( !strcmp( split_str[0],"lon_min" ) )    fprintf(stderr,"Lon Min Val %g\n",LON_MIN );
+           if ( !strcmp( split_str[0],"lon_max" ) )    fprintf(stderr,"Lon Max Val %g\n",LON_MAX );
+           if ( !strcmp( split_str[0],"projection" ) ) fprintf(stderr,"PROJECTION %s\n",PROJECTION );
 
            Free(split_str);
         }
@@ -496,10 +463,10 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 	  mag_setc( "contour_shade_colour_method", "LIST" );
 	  mag_set1c( "contour_shade_colour_list",( const char ** ) USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
 	}
-	
+      /*
       if( IS_NOT_EQUAL(RESOLUTION, 10.0f) )
 	mag_setr( "contour_shade_cell_resolution", RESOLUTION );
-      
+      */
       if( COLOUR_TRIAD )                                
 	  mag_setc( "contour_shade_colour_direction", COLOUR_TRIAD );
 

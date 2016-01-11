@@ -615,8 +615,11 @@ void *Outputgmt(void *argument)
                   double range = maxval - minval;
                   fprintf(stderr, "minval, maxval, meanval, range %g %g %g %g\n", minval, maxval, meanval, range);
                   fprintf(stderr, "makecpt -T%g/%g/%g -Crainbow > gmt.cpt\n", minval, maxval, range/20);
-                  fprintf(stderr, "psxy -K -Jx0.02id -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps\n");
+                  fprintf(stderr, "psxy -K -JQ0/10i -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps\n");
+                  // fprintf(stderr, "psxy -K -Jx0.028id -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps\n");
+                  // fprintf(stderr, "psxy -K -JN0/10i -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps\n");
                   fprintf(stderr, "pscoast -O -J -R -Dc -W -B30g30 >> gmtplot.ps\n");
+                  fprintf(stderr, "ps2pdf gmtplot.ps\n");
                 }
 
 	      for ( i = 0; i < gridsize; i++ )

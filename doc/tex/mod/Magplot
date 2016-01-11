@@ -97,13 +97,14 @@ Example file for 6 colours in RGB format:
 
 @BeginDescription
 The operator @bold{grfill} is similar to satellite imaging and shades each cell (pixel) according
-to the value of the field at that cell. The following additional parameters are valid for shaded gridfill
-operator, in addition to the common plot parameters and shaded contour parameters:
-
-@BeginTable
- @bold{Keyname}      & @bold{Type}    & @bold{Description}      
- resolution   & FLOAT   &  Number of cells per cm for CELL shading.
-@EndTable
+to the value of the field at that cell.
+@C The following additional parameters are valid for shaded gridfill
+@C operator, in addition to the common plot parameters and shaded contour parameters:
+@C 
+@C @BeginTable
+@C  @bold{Keyname}      & @bold{Type}    & @bold{Description}      
+@C  resolution   & FLOAT   &  Number of cells per cm for CELL shading.
+@C @EndTable
 @EndDescription
 @EndOperator
 
