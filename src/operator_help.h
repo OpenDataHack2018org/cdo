@@ -4867,7 +4867,7 @@ static const char *MagplotHelp[] = {
     "                           &         & \"CHAIN_DOT\"",
     "    shaded   Shaded contour plot",
     "             The operator shaded generates the filled contours of the given input field values.",
-    "             The following additional parameters are valid for shaded contour operator,",
+    "             The following additional parameters are valid for shaded contour and gridfill operator,",
     "             in addition to the common plot parameters.",
     "             ",
     "              Keyname      & Type    & Description      ",

@@ -62,7 +62,7 @@ in addition to the common plot parameters:
 
 @BeginDescription
 The operator @bold{shaded} generates the filled contours of the given input field values.
-The following additional parameters are valid for shaded contour operator,
+The following additional parameters are valid for shaded contour and gridfill operator,
 in addition to the common plot parameters.
 
 @BeginTable
@@ -128,3 +128,32 @@ The valid standard name strings for "colour" are:
 @Item = params
 STRING   Comma separated list of plot parameters
 @EndParameter
+
+
+@BeginExample
+1) Shaded contour plot of a global temperature field with a resolution of 4 degree.
+The contour interval is 3 with a rainbow color table.
+@BeginVerbatim
+  cdo shaded,interval=3,colour_min=violet,colour_max=red,colour_triad=cw temp plot
+@EndVerbatim
+@IfDoc
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{magshaded.pdf}
+
+\vspace{1mm}
+@EndifDoc
+
+2) Shaded gridfill plot of a global temperature field with a resolution of 4 degree.
+The contour interval is 3 with a rainbow color table.
+@BeginVerbatim
+  cdo grfill,interval=3,colour_min=violet,colour_max=red,colour_triad=cw temp plot
+@EndVerbatim
+@IfDoc
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{maggrfill.pdf}
+
+\vspace{1mm}
+@EndifDoc
+@EndExample

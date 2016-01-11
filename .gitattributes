@@ -71,6 +71,8 @@ doc/tex/eca_int.tex -text
 doc/tex/eca_ref.tex -text
 doc/tex/figures/collgrid.pdf -text
 doc/tex/figures/distgrid.pdf -text
+doc/tex/figures/maggrfill.pdf -text svneol=unset#application/pdf
+doc/tex/figures/magshaded.pdf -text svneol=unset#application/pdf
 doc/tex/figures/plotcollgrid -text
 doc/tex/figures/plotdistgrid -text
 doc/tex/figures/plotremap -text

@@ -261,11 +261,11 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 	   mag_setr( "contour_max_level", YMAX );
         }
       
-      if( COLOUR_MIN )
-	mag_setc( "contour_shade_min_level_colour", COLOUR_MIN );
-      
       if( COLOUR_MAX )
 	mag_setc( "contour_shade_max_level_colour", COLOUR_MAX );
+
+      if( COLOUR_MIN )
+	mag_setc( "contour_shade_min_level_colour", COLOUR_MIN );
 
       if( IS_NOT_EQUAL(INTERVAL, 8.0f) )
 	{
@@ -290,7 +290,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
 	  mag_setc( "contour_shade_colour_method", "LIST" );
 	  mag_set1c( "contour_shade_colour_list",( const char **)USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
 	}
-	
+          
       if( COLOUR_TRIAD )                                
 	{
 	  mag_setc( "contour_shade_colour_direction", COLOUR_TRIAD );
@@ -314,8 +314,8 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       if( DBG )
         {
           mag_enqc ( "output_name", (char*)&tempname );
-           fprintf( stderr, " SHADED Done %s!\n",tempname );
-           fprintf( stderr, " SHADED Done!\n" );
+          fprintf( stderr, " SHADED Done %s!\n",tempname );
+          fprintf( stderr, " SHADED Done!\n" );
         }
     }
   else if ( operatorID == CONTOUR )
@@ -380,6 +380,10 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       if( STYLE )
       	  mag_setc( "contour_line_style", STYLE );
       
+      /* Adjust Set The page slightly to fit the legend */
+      mag_setr ( "subpage_x_length", 24. );
+      mag_setr ( "subpage_y_length", 30. );
+
       if( DBG )
         fprintf( stderr, " CONTOUR Done!\n" );
     }
