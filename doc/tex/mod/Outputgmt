@@ -26,3 +26,38 @@
 @EndDescription
 
 @EndOperator
+
+
+@BeginExample
+1) GMT shaded contour plot of a global temperature field with a resolution of 4 degree.
+The contour interval is 3 with a rainbow color table.
+@BeginVerbatim
+  cdo outputcenter -temp,global_4 > data.gmt
+  makecpt -T213/318/3  -Crainbow > gmt.cpt
+  pscontour -K -JQ0/10i -Rd -I -Cgmt.cpt data.gmt > gmtplot.ps
+  pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps
+@EndVerbatim
+@IfDoc
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{gmtshaded.pdf}
+
+\vspace{1mm}
+@EndifDoc
+
+2) GMT shaded gridfill plot of a global temperature field with a resolution of 4 degree.
+The contour interval is 3 with a rainbow color table.
+@BeginVerbatim
+  cdo outputbounds -temp,global_4 > data.gmt
+  makecpt -T213/318/3  -Crainbow > gmt.cpt
+  psxy -K -JQ0/10i -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps
+  pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps
+@EndVerbatim
+@IfDoc
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{gmtgrfill.pdf}
+
+\vspace{1mm}
+@EndifDoc
+@EndExample

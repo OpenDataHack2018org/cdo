@@ -651,7 +651,7 @@ static modules_t Modules[] =
   { Nmltest,        NULL,              NmltestOperators,       0,   CDI_REAL,  0,  0 },
   { Output,         OutputHelp,        OutputOperators,        1,   CDI_REAL, -1,  0 },
   { Output,         OutputtabHelp,     OutputtabOperators,     1,   CDI_REAL, -1,  0 },
-  { Outputgmt,      NULL,              OutputgmtOperators,     1,   CDI_REAL,  1,  0 },
+  { Outputgmt,      OutputgmtHelp,     OutputgmtOperators,     1,   CDI_REAL,  1,  0 },
   { Pack,           NULL,              PackOperators,          1,   CDI_REAL,  1,  1 },
   { Pardup,         NULL,              PardupOperators,        1,   CDI_REAL,  1,  1 },
   { Pinfo,          NULL,              PinfoOperators,         1,   CDI_REAL,  1,  1 },

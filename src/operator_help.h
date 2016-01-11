@@ -4244,6 +4244,21 @@ static const char *OutputtabHelp[] = {
     NULL
 };
 
+static const char *OutputgmtHelp[] = {
+    "NAME",
+    "    outputcenter, outputbounds - Formatted GMT output",
+    "",
+    "SYNOPSIS",
+    "    <operator>  ifiles",
+    "",
+    "DESCRIPTION",
+    "",
+    "OPERATORS",
+    "    outputcenter  Output grid center",
+    "    outputbounds  Output grid bounds",
+    NULL
+};
+
 static const char *GradsdesHelp[] = {
     "NAME",
     "    gradsdes - GrADS data descriptor file",
