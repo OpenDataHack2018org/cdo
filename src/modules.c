@@ -369,7 +369,7 @@ void *Maggraph(void *argument);
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr", "outputxyz"}
 #define  OutputtabOperators     {"outputtab"}
-#define  OutputgmtOperators     {"outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
+#define  OutputgmtOperators     {"gmtxyz", "gmtcells", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri", "outputvrml"}
 #define  PackOperators          {"pack"}
 #define  PardupOperators        {"pardup", "parmul"}

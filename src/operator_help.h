@@ -4246,16 +4246,23 @@ static const char *OutputtabHelp[] = {
 
 static const char *OutputgmtHelp[] = {
     "NAME",
-    "    outputcenter, outputbounds - Formatted GMT output",
+    "    gmtxyz, gmtcells - GMT output",
     "",
     "SYNOPSIS",
-    "    <operator>  ifiles",
+    "    <operator>  ifile",
     "",
     "DESCRIPTION",
+    "    This module prints the first field of the input dataset to standard output.",
+    "    The output can be used to generate 2D Lon/Lat plots with GMT.",
+    "    The format of the output depends on the chosen operator.",
     "",
     "OPERATORS",
-    "    outputcenter  Output grid center",
-    "    outputbounds  Output grid bounds",
+    "    gmtxyz    GMT xyz format",
+    "              The operator exports the first field to the GMT xyz ASCII format.",
+    "              The output can be used to create contour plots with the GMT module pscontour.",
+    "    gmtcells  GMT multiple segment format",
+    "              The operator exports the first field to the GMT multiple segment ASCII format.",
+    "              The output can be used to create shaded gridfill plots with the GMT module psxy.",
     NULL
 };
 
@@ -4873,7 +4880,7 @@ static const char *MagplotHelp[] = {
     "    contour  Contour plot",
     "             The operator contour generates the discrete contour lines of the input field values.",
     "             The following additional parameters are valid for contour operator,",
-    "             in addition to the common plot parameters:",
+    "             modulein addition to the common plot parameters:",
     "             ",
     "              Keyname      & Type    & Description      ",
     "              colour       & STRING  & Colour for drawing the contours",

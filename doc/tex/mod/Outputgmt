@@ -1,30 +1,38 @@
 @BeginModule
 @NewPage
 @Name      = Outputgmt
-@Title     = Formatted GMT output
+@Title     = GMT output
 @Section   = Import/Export
-@Arguments = ifiles
-@Operators = outputcenter outputbounds
+@Arguments = ifile
+@Operators = gmtxyz gmtcells
+
+@BeginDescription
+This module prints the first field of the input dataset to standard output.
+The output can be used to generate 2D Lon/Lat plots with @cite{GMT}.
+The format of the output depends on the chosen operator.
+@EndDescription
 @EndModule
 
 
-@BeginOperator_outputcenter
+@BeginOperator_gmtxyz
 
-@Title     = Output grid center
+@Title     = GMT xyz format
 
 @BeginDescription
+The operator exports the first field to the GMT xyz ASCII format.
+The output can be used to create contour plots with the GMT module pscontour.
 @EndDescription
-
 @EndOperator
 
 
-@BeginOperator_outputbounds
+@BeginOperator_gmtcells
 
-@Title     = Output grid bounds
+@Title     = GMT multiple segment format
 
 @BeginDescription
+The operator exports the first field to the GMT multiple segment ASCII format.
+The output can be used to create shaded gridfill plots with the GMT module psxy.
 @EndDescription
-
 @EndOperator
 
 
@@ -32,7 +40,7 @@
 1) GMT shaded contour plot of a global temperature field with a resolution of 4 degree.
 The contour interval is 3 with a rainbow color table.
 @BeginVerbatim
-  cdo outputcenter -temp,global_4 > data.gmt
+  cdo gmtxyz temp > data.gmt
   makecpt -T213/318/3  -Crainbow > gmt.cpt
   pscontour -K -JQ0/10i -Rd -I -Cgmt.cpt data.gmt > gmtplot.ps
   pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps
@@ -48,7 +56,7 @@ The contour interval is 3 with a rainbow color table.
 2) GMT shaded gridfill plot of a global temperature field with a resolution of 4 degree.
 The contour interval is 3 with a rainbow color table.
 @BeginVerbatim
-  cdo outputbounds -temp,global_4 > data.gmt
+  cdo gmtcells temp > data.gmt
   makecpt -T213/318/3  -Crainbow > gmt.cpt
   psxy -K -JQ0/10i -Rd -L -Cgmt.cpt -m data.gmt > gmtplot.ps
   pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps

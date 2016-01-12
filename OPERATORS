@@ -501,8 +501,8 @@ Operator catalog:
    Output        outputsrv       SERVICE ASCII output
    Output        outputext       EXTRA ASCII output
    Outputtab     outputtab       Table output
-   Outputgmt     outputcenter    Output grid center
-   Outputgmt     outputbounds    Output grid bounds
+   Outputgmt     gmtxyz          GMT xyz format
+   Outputgmt     gmtcells        GMT multiple segment format
 -------------------------------------------------------------
    Miscellaneous
 -------------------------------------------------------------
