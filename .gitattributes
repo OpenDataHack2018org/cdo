@@ -75,6 +75,7 @@ doc/tex/figures/gmtgrfill.pdf -text svneol=unset#application/pdf
 doc/tex/figures/gmtshaded.pdf -text svneol=unset#application/pdf
 doc/tex/figures/maggrfill.pdf -text svneol=unset#application/pdf
 doc/tex/figures/magshaded.pdf -text svneol=unset#application/pdf
+doc/tex/figures/magvector.pdf -text svneol=unset#application/pdf
 doc/tex/figures/plotcollgrid -text
 doc/tex/figures/plotdistgrid -text
 doc/tex/figures/plotremap -text
@@ -833,6 +834,7 @@ test/data/timsum_ref -text
 test/data/timvar1_ref -text
 test/data/timvar_ref -text
 test/data/ts_mm_5years -text
+test/data/uvdata.grb -text
 test/data/ymonavg_ref -text
 test/data/ymonmax_ref -text
 test/data/ymonmean_ref -text

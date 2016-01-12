@@ -3,14 +3,15 @@
 @Name      = Magvector
 @Title     = Lat/Lon vector plot
 @Section   = Magics
-@Arguments = ifile ofile
+@Arguments = ifile obase
 @Operators = vector
 
 @BeginDescription
 This operator generates 2D Lon/Lat vector plots.
 The data for the plot is read from @file{ifile}. The input is expected to contain two velocity
-components. The result is written to @file{ofile}. The default output file format is postscript,
-this can be changed with the device parameter.
+components. Only data on rectilinear Lon/Lat grids are supported.
+The output file will be named <obase>.<device> where device is the device name. 
+The default output file format is postscript, this can be changed with the device parameter.
 
 Here is a list of all vector plot parameters:
 
@@ -18,8 +19,8 @@ Here is a list of all vector plot parameters:
  @bold{Keyname}     & @bold{Type}    & @bold{Description}      
  device      & STRING  & Output device (ps, eps, pdf, png, gif, gif_animation, jpeg, svg, kml)
  projection  & STRING  & Projection (cylindrical, polar_stereographic, robinson, mercator)
- thin_fac    & FLOAT   & Controls the actual number of wind arrows or flags plotted.
- unit_vec    & FLOAT   & Wind speed in m/s represented by a unit vector (1.0 cm)
+ thin_fac    & FLOAT   & Controls the actual number of wind arrows or flags plotted (default 2).
+ unit_vec    & FLOAT   & Wind speed in m/s represented by a unit vector (1.0cm)
  step_freq   & INTEGER & Frequency of time steps to be considered for making the animation
              &         & (device=gif_animation). Default value is "1" (all time steps).
              &         & Will be ignored if input file has multiple variables.
@@ -38,3 +39,19 @@ Here is a list of all vector plot parameters:
 @Item = params
 STRING   Comma separated list of plot parameters
 @EndParameter
+
+
+@BeginExample
+Vector plot of global wind vectors with a resolution of 5 degree.
+The unit vector is set to 70 and all wind arrows are plotted.
+@BeginVerbatim
+  cdo vector,thin_fac=1,unit_vec=70 uvdata plot
+@EndVerbatim
+@IfDoc
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{magvector.pdf}
+
+\vspace{1mm}
+@EndifDoc
+@EndExample
