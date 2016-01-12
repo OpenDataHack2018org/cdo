@@ -4,10 +4,14 @@ CDO NEWS
 Version 1.7.1 (24 February 2016):
 
    New operators:
+     * contour: Contour plot
+     * shaded: Shaded contour plot
+     * grfill: Shaded gridfill plot
      * gmtxyz: Output GMT xyz format to create contour plots with the GMT module pscontour.
      * gmtcells: Output GMT multiple segment format to create shaded gridfill plots with psxy.
    Fixed bugs:
      * cdo -t table_file does not read variable name from table file [Bug #6312]
+     * ydaypctl: check of verification date failed (bug fix)
 
 Version 1.7.0 (28 October 2015):
 
