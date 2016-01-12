@@ -229,11 +229,9 @@ void *Outputgmt(void *argument)
   cdoInitialize(argument);
 
   int OUTPUTCENTER    = cdoOperatorAdd("gmtxyz",          0, 0, NULL);
-  int OUTPUTCENTER    = cdoOperatorAdd("outputcenter",    0, 0, NULL);
   int OUTPUTCENTER2   = cdoOperatorAdd("outputcenter2",   0, 0, NULL);
   int OUTPUTCENTERCPT = cdoOperatorAdd("outputcentercpt", 0, 0, NULL);
   int OUTPUTBOUNDS    = cdoOperatorAdd("gmtcells",        0, 0, NULL);
-  int OUTPUTBOUNDS    = cdoOperatorAdd("outputbounds",    0, 0, NULL);
   int OUTPUTBOUNDSCPT = cdoOperatorAdd("outputboundscpt", 0, 0, NULL);
   int OUTPUTVECTOR    = cdoOperatorAdd("outputvector",    0, 0, NULL);
   int OUTPUTTRI       = cdoOperatorAdd("outputtri",       0, 0, NULL);

@@ -369,7 +369,7 @@ void *Maggraph(void *argument);
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr", "outputxyz"}
 #define  OutputtabOperators     {"outputtab"}
-#define  OutputgmtOperators     {"gmtxyz", "gmtcells", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
+#define  OutputgmtOperators     {"gmtxyz", "gmtcells", "outputcenter2", "outputcentercpt", \
                                  "outputboundscpt", "outputvector", "outputtri", "outputvrml"}
 #define  PackOperators          {"pack"}
 #define  PardupOperators        {"pardup", "parmul"}
@@ -867,6 +867,8 @@ static const char *opalias[][2] =
   {"ensrkhist_space",     "ensrkhistspace"},
   {"ensrkhist_time",      "ensrkhisttime"},
   {"gridverify",          "verifygrid"},
+  {"outputcenter",        "gmtxyz"},
+  {"outputbounds",        "gmtcells"},
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));
