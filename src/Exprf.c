@@ -84,7 +84,7 @@ char *exprs_from_file(const char *exprf)
   return exprs;
 }
 
-#define MAX_PARAM 4096
+#define MAX_PARAMS 4096
 
 void *Expr(void *argument)
 {
@@ -136,20 +136,25 @@ void *Expr(void *argument)
 
   int vlisttmp = vlistCreate();
 
-  int nparam         = MAX_PARAM;
-  paramType *param1  = (paramType*) Malloc(nvars1*sizeof(paramType));
-  parse_arg.init     = true;
-  parse_arg.debug    = false;
+  paramType *params    = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
+  memset(params, 0, MAX_PARAMS*sizeof(paramType));
+  parse_arg.maxparams  = MAX_PARAMS;
+  parse_arg.nparams    = nvars1;
+  parse_arg.nvars1     = nvars1;
+  parse_arg.init       = true;
+  parse_arg.debug      = false;
   if ( cdoVerbose ) parse_arg.debug = true;
-  parse_arg.nvars1   = nvars1;
-  parse_arg.param1   = param1;
-  parse_arg.vlistID1 = vlistID1;
-  parse_arg.vlistID2 = vlistID2;
-  parse_arg.vlisttmp = vlisttmp;
-  parse_arg.gridID2  = -1;
-  parse_arg.zaxisID2 = -1;
+  parse_arg.params     = params;
+  parse_arg.vlistID1   = vlistID1;
+  parse_arg.vlistID2   = vlistID2;
+  parse_arg.vlisttmp   = vlisttmp;
+  parse_arg.gridID2    = -1;
+  parse_arg.zaxisID2   = -1;
   parse_arg.tsteptype2 = -1;
-   
+
+  char name[CDI_MAX_NAME];
+  char longname[CDI_MAX_NAME];
+  char units[CDI_MAX_NAME];
   for ( int varID = 0; varID < nvars1; varID++ )
     {
       int gridID     = vlistInqVarGrid(vlistID1, varID);
@@ -157,14 +162,21 @@ void *Expr(void *argument)
       int ngp        = gridInqSize(gridID);
       int nlev       = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID1, varID);
+
+      vlistInqVarName(vlistID1, varID, name);
+      vlistInqVarLongname(vlistID1, varID, longname);
+      vlistInqVarUnits(vlistID1, varID, units);
       
-      param1[varID].gridID  = gridID;
-      param1[varID].zaxisID = zaxisID;
-      param1[varID].ngp     = ngp;
-      param1[varID].nlev    = nlev;
-      param1[varID].missval = missval;
-      param1[varID].nmiss   = 0;
-      param1[varID].data    = NULL;
+      params[varID].gridID   = gridID;
+      params[varID].zaxisID  = zaxisID;
+      params[varID].ngp      = ngp;
+      params[varID].nlev     = nlev;
+      params[varID].missval  = missval;
+      params[varID].nmiss    = 0;
+      params[varID].data     = NULL;
+      params[varID].name     = strdup(name);
+      params[varID].longname = strdup(longname);
+      params[varID].units    = strdup(units);
     }
 
   /* Set all input variables to 'needed' if replacing is switched off */
@@ -184,7 +196,7 @@ void *Expr(void *argument)
   if ( cdoVerbose )
     for ( int varID = 0; varID < nvars1; varID++ )
       if ( parse_arg.needed[varID] )
-	printf("Needed var: %d %s\n", varID, parse_arg.varname[varID]);
+	printf("Needed var: %d %s\n", varID, params[varID].name);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -200,15 +212,15 @@ void *Expr(void *argument)
     {
       if ( parse_arg.needed[varID] )
         {
-          int ngp  = param1[varID].ngp;
-          int nlev = param1[varID].nlev;
-          param1[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
+          int ngp  = params[varID].ngp;
+          int nlev = params[varID].nlev;
+          params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
         }
     }
 
   for ( int varID = 0; varID < nvars; varID++ )
     {
-      parse_arg.vardata2[varID] = param1[varID].data;
+      parse_arg.vardata2[varID] = params[varID].data;
     }
 
   for ( int varID = nvars; varID < nvars2; varID++ )
@@ -229,7 +241,7 @@ void *Expr(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( int varID = 0; varID < nvars1; varID++ ) param1[varID].nmiss = 0;
+      for ( int varID = 0; varID < nvars1; varID++ ) params[varID].nmiss = 0;
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
@@ -237,11 +249,11 @@ void *Expr(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  if ( parse_arg.needed[varID] )
 	    {
-	      int offset = param1[varID].ngp*levelID;
+	      int offset = params[varID].ngp*levelID;
               int nmiss;
-	      double *vardata = param1[varID].data + offset;
+	      double *vardata = params[varID].data + offset;
 	      streamReadRecord(streamID1, vardata, &nmiss);
-	      param1[varID].nmiss += nmiss;
+	      params[varID].nmiss += nmiss;
 	    }
 	}
 
@@ -292,12 +304,16 @@ void *Expr(void *argument)
 
   if ( exprs ) Free(exprs);
 
-  if ( param1 )
+  if ( params )
     {
-      for ( int varID = 0; varID < nvars1; varID++ )
-        if ( param1[varID].data ) Free(param1[varID].data);
-      
-      Free(param1);
+      for ( int varID = 0; varID < MAX_PARAMS; varID++ )
+        {
+          if ( params[varID].data )     Free(params[varID].data);
+          if ( params[varID].name )     Free(params[varID].name);
+          if ( params[varID].longname ) Free(params[varID].longname);
+          if ( params[varID].units )    Free(params[varID].units);
+        }
+      Free(params);
     }
 
   cdoFinish();

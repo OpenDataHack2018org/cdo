@@ -985,7 +985,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
 	      if ( parse_arg->needed[varID] == false && vlistID == parse_arg->vlistID1 )
 		{
-		  parse_arg->varname[varID] = strdup(p->u.var.nm);
 		  parse_arg->needed[varID] = true;
 		}
 
@@ -1022,8 +1021,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	    {
               if ( vlistID == parse_arg->vlistID1 )
                 {
-                  p->param.data  = parse_arg->param1[varID].data;
-                  p->param.nmiss = parse_arg->param1[varID].nmiss;
+                  p->param.data  = parse_arg->params[varID].data;
+                  p->param.nmiss = parse_arg->params[varID].nmiss;
                 }
               else
                 {

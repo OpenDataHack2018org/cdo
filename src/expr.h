@@ -43,6 +43,9 @@ typedef struct {
   int ngp;
   int nlev;
   int nmiss;
+  char *name;
+  char *longname;
+  char *units;
   double missval;
   double *data;
 } paramType;
@@ -68,17 +71,18 @@ typedef struct nodeTypeTag {
 typedef struct {
   bool   init;
   bool   debug;
+  int    maxparams;
+  int    nparams;
   int    vlistID1, vlistID2, vlisttmp;
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
   bool   needed[MAX_VARS];
-  char  *varname[MAX_VARS];
   int    gridID2;
   int    zaxisID2;
   int    tsteptype2;
   double missval2;
-  double **vardata1, **vardata2;
-  paramType *param1;
+  double **vardata2;
+  paramType *params;
 } parse_param_t;
 
 
