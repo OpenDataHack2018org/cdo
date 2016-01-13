@@ -137,13 +137,13 @@ void *Expr(void *argument)
 
   int vlisttmp = vlistCreate();
 
-  parse_arg.init = 1;
+  parse_arg.init     = true;
+  parse_arg.debug    = false;
+  if ( cdoVerbose ) parse_arg.debug = true;
   parse_arg.vlistID1 = vlistID1;
   parse_arg.vlistID2 = vlistID2;
   parse_arg.vlisttmp = vlisttmp;
   parse_arg.nvars1   = 0;
-  parse_arg.debug    = 0;
-  if ( cdoVerbose ) parse_arg.debug    = 1;
   parse_arg.gridID2  = -1;
   parse_arg.zaxisID2 = -1;
   parse_arg.tsteptype2  = -1;
@@ -155,7 +155,7 @@ void *Expr(void *argument)
   yy_scan_string(exprs, scanner);
   yyparse(&parse_arg, scanner);
 
-  parse_arg.init = 0;
+  parse_arg.init = false;
 
   int nvars2 = vlistNvars(vlistID2);
   if ( nvars2 == 0 ) cdoAbort("No output variable found!");

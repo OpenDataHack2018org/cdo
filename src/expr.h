@@ -48,12 +48,7 @@ typedef struct {
 typedef struct nodeTypeTag {
   bool ltmpvar;
   paramType param;
-  /*
-  int gridID, zaxisID;
-  int nmiss;
-  double missval;
-  double *data;
-  */
+
   nodeEnum type;              // type of node
 
   // union must be last entry in nodeType
@@ -69,14 +64,14 @@ typedef struct nodeTypeTag {
 #define MAX_VARS 1024
 
 typedef struct {
+  bool   init;
+  bool   debug;
   int    vlistID1, vlistID2, vlisttmp;
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
   int    varID[MAX_VARS];
   bool   needed[MAX_VARS];
   char  *varname[MAX_VARS];
-  int    init;
-  int    debug;
   int    gridID2;
   int    zaxisID2;
   int    tsteptype2;
