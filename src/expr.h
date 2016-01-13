@@ -12,27 +12,27 @@ int fileno(FILE *stream);
 
 typedef enum { typeCon, typeVar, typeFun, typeOpr } nodeEnum;
 
-/* constants */
+// constants
 typedef struct {
-  double value;               /* value of constant */
+  double value;               // value of constant
 } conNodeType;
 
-/* variables */
+// variables
 typedef struct {
-  char *nm;                   /* variable name */
+  char *nm;                   // variable name
 } varNodeType;
 
-/* functions */
+// functions
 typedef struct {
-  char *name;                 /* function name */
-  struct nodeTypeTag *op;     /* operand       */
+  char *name;                 // function name
+  struct nodeTypeTag *op;     // operand
 } funNodeType;
 
-/* operators */
+// operators
 typedef struct {
-  int oper;                   /* operator              */
-  int nops;                   /* number of operands    */
-  struct nodeTypeTag *op[1];  /* operands (expandable) */
+  int oper;                   // operator             
+  int nops;                   // number of operands   
+  struct nodeTypeTag *op[1];  // operands (expandable)
 } oprNodeType;
 
 typedef struct nodeTypeTag {
@@ -41,22 +41,22 @@ typedef struct nodeTypeTag {
   int nmiss;
   double missval;
   double *data;
-  nodeEnum type;              /* type of node */
+  nodeEnum type;              // type of node
 
-  /* union must be last entry in nodeType */
-  /* because operNodeType may dynamically increase */
+  // union must be last entry in nodeType
+  // because operNodeType may dynamically increase
   union {
-    conNodeType con;          /* constants   */
-    varNodeType var;          /* variables   */
-    funNodeType fun;          /* functions   */
-    oprNodeType opr;          /* operators   */
+    conNodeType con;          // constants
+    varNodeType var;          // variables
+    funNodeType fun;          // functions
+    oprNodeType opr;          // operators
   } u;
 } nodeType;
 
 #define MAX_VARS 1024
 
-typedef struct{ /* prs_sct */
-  int    vlistID1, vlistID2;
+typedef struct {
+  int    vlistID1, vlistID2, vlisttmp;
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
   int    varID[MAX_VARS];
@@ -73,10 +73,10 @@ typedef struct{ /* prs_sct */
 
 
 typedef union{
-  double cvalue;              /* constant value */
-  char *varnm;                /* variable name  */
-  char *fname;                /* function name  */
-  nodeType *nPtr;             /* node pointer   */
+  double cvalue;              // constant value
+  char *varnm;                // variable name 
+  char *fname;                // function name 
+  nodeType *nPtr;             // node pointer  
 } stype_t;
 
 

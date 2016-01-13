@@ -943,22 +943,32 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 
           vlistID = parse_arg->vlistID1;
 	  int nvars = vlistNvars(vlistID);
-	  for ( varID = 0; varID < nvars; varID++ )
+	  for ( varID = nvars-1; varID >= 0; --varID )
 	    {
 	      vlistInqVarName(vlistID, varID, varname);
 	      if ( strcmp(varname, p->u.var.nm) == 0 ) break;
 	    }
-	  if ( varID == nvars )
+	  if ( varID < 0 )
             {
               vlistID = parse_arg->vlistID2;
               nvars = vlistNvars(vlistID);
-              for ( varID = 0; varID < nvars; varID++ )
+              for ( varID = nvars-1; varID >= 0; --varID )
                 {
                   vlistInqVarName(vlistID, varID, varname);
                   if ( strcmp(varname, p->u.var.nm) == 0 ) break;
                 }  
+              if ( varID < 0 )
+                {
+                  vlistID = parse_arg->vlisttmp;
+                  nvars = vlistNvars(vlistID);
+                  for ( varID = nvars-1; varID >= 0; --varID )
+                    {
+                      vlistInqVarName(vlistID, varID, varname);
+                      if ( strcmp(varname, p->u.var.nm) == 0 ) break;
+                    }  
+                }
             }
-          if ( varID == nvars )
+          if ( varID == -1 )
 	    {
 	      cdoAbort("Variable >%s< not found!", p->u.var.nm);
 	    }
@@ -1050,31 +1060,57 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	      if ( parse_arg->gridID2 == -1 || parse_arg->zaxisID2 == -1 || parse_arg->tsteptype2 == -1 )
 		cdoAbort("Operand not variable!");
 
-	      varID = vlistDefVar(parse_arg->vlistID2, parse_arg->gridID2, parse_arg->zaxisID2, parse_arg->tsteptype2);
-	      const char *varname = p->u.opr.op[0]->u.var.nm;
-	      vlistDefVarName(parse_arg->vlistID2, varID, varname);
-	      vlistDefVarMissval(parse_arg->vlistID2, varID, parse_arg->missval2);
-	      if ( memcmp(varname, "var", 3) == 0 )
-		{
-		  if ( strlen(varname) > 3 && isdigit(varname[3]) )
-		    {
-		      int code = atoi(varname+3);
-		      vlistDefVarCode(parse_arg->vlistID2, varID, code);
-		    }
-		}
+	      const char *varname2 = p->u.opr.op[0]->u.var.nm;
+              int vlistID2 = parse_arg->vlistID2;
+              if ( *varname2 == '_' ) vlistID2 = parse_arg->vlisttmp;
+              int nvars = vlistNvars(vlistID2);
+              for ( varID = nvars-1; varID >= 0; --varID )
+                {
+                  vlistInqVarName(vlistID2, varID, varname);
+                  if ( strcmp(varname, varname2) == 0 ) break;
+                }
+              if ( varID >= 0 )
+                {
+                  cdoWarning("Variable %s already defined!", varname2);
+                }
+              else
+                {
+                  varID = vlistDefVar(vlistID2, parse_arg->gridID2, parse_arg->zaxisID2, parse_arg->tsteptype2);
+                  vlistDefVarName(vlistID2, varID, varname2);
+                  vlistDefVarMissval(vlistID2, varID, parse_arg->missval2);
+                  if ( memcmp(varname2, "var", 3) == 0 )
+                    {
+                      if ( strlen(varname2) > 3 && isdigit(varname2[3]) )
+                        {
+                          int code = atoi(varname2+3);
+                          vlistDefVarCode(vlistID2, varID, code);
+                        }
+                    }
+                }
 	    }
 	  else
 	    {
 	      if ( parse_arg->debug )
 		printf("\tpop  var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
 
-	      int nvars = vlistNvars(parse_arg->vlistID2);
-	      for ( varID = nvars-1; varID >= 0; varID-- )
+              int vlistID2 = parse_arg->vlistID2;
+	      int nvars = vlistNvars(vlistID2);
+	      for ( varID = nvars-1; varID >= 0; --varID )
 		{
-		  vlistInqVarName(parse_arg->vlistID2, varID, varname);
+		  vlistInqVarName(vlistID2, varID, varname);
 		  if ( strcmp(varname, p->u.opr.op[0]->u.var.nm) == 0 ) break;
 		}
-
+	      if ( varID < 0 )
+                {
+                  int vlistID2 = parse_arg->vlisttmp;
+                  int nvars = vlistNvars(vlistID2);
+                  for ( varID = nvars-1; varID >= 0; --varID )
+                    {
+                      vlistInqVarName(vlistID2, varID, varname);
+                      if ( strcmp(varname, p->u.opr.op[0]->u.var.nm) == 0 ) break;
+                    }
+                }
+              
 	      if ( varID < 0 )
 		{
 		  cdoAbort("Variable >%s< not found!", p->u.opr.op[0]->u.var.nm);
