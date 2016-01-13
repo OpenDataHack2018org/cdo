@@ -165,7 +165,7 @@ void *Expr(void *argument)
   if ( cdoVerbose )
     for ( int varID = 0; varID < nvars1; varID++ )
       if ( parse_arg.var_needed[varID] )
-	printf("Needed var: %d %s\n", varID, parse_arg.var[varID]);
+	printf("Needed var: %d %s\n", varID, parse_arg.varname[varID]);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);

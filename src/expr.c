@@ -349,7 +349,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
-  p->tmpvar   = 1;
+  p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
@@ -368,7 +368,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 
   p->nmiss = nmiss;
 
-  if ( p2->tmpvar ) Free(p2->data);
+  if ( p2->ltmpvar ) Free(p2->data);
 
   return p;
 }
@@ -389,7 +389,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
-  p->tmpvar   = 1;
+  p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
@@ -408,7 +408,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 
   p->nmiss = nmiss;
 
-  if ( p1->tmpvar ) Free(p1->data);
+  if ( p1->ltmpvar ) Free(p1->data);
 
   return p;
 }
@@ -439,7 +439,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
-  p->tmpvar   = 1;
+  p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
 
   if ( nlev1 > nlev2 )
@@ -495,8 +495,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 
   p->nmiss = nmiss;
 
-  if ( p1->tmpvar ) Free(p1->data);
-  if ( p2->tmpvar ) Free(p2->data);
+  if ( p1->ltmpvar ) Free(p1->data);
+  if ( p2->ltmpvar ) Free(p2->data);
 
   return p;
 }
@@ -608,7 +608,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
-  p->tmpvar   = 1;
+  p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
   p->zaxisID  = zaxisID;
   p->missval  = missval;
@@ -664,7 +664,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 
   p->nmiss = nmiss;
 
-  if ( p1->tmpvar ) Free(p1->data);
+  if ( p1->ltmpvar ) Free(p1->data);
 
   return p;
 }
@@ -704,7 +704,7 @@ nodeType *ex_uminus_var(nodeType *p1)
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
-  p->tmpvar   = 1;
+  p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
@@ -839,7 +839,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
-  p->tmpvar   = 1;
+  p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
 
   p->gridID  = px->gridID;
@@ -979,7 +979,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 
 	      if ( parse_arg->var_needed[varID] == 0 )
 		{
-		  parse_arg->var[varID] = strdup(p->u.var.nm);
+		  parse_arg->varname[varID] = strdup(p->u.var.nm);
 		  parse_arg->varID[varID] = varID;
 		  parse_arg->var_needed[varID] = 1;
 		}
@@ -1012,7 +1012,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  p->zaxisID = zaxisID1;
 	  p->missval = missval;
           p->nmiss   = 0;
-	  p->tmpvar  = 0;
+	  p->ltmpvar = false;
 	  if ( ! parse_arg->init )
 	    {
               if ( vlistID == parse_arg->vlistID1 )
@@ -1128,11 +1128,11 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 		  p->missval = missval;
 		  p->data    = parse_arg->vardata2[varID];
 		  p->nmiss   = parse_arg->nmiss[varID];
-		  p->tmpvar  = 0;
+		  p->ltmpvar = false;
 
 		  ex_copy(p, rnode);
 
-		  if ( rnode->tmpvar ) Free(rnode->data);
+		  if ( rnode->ltmpvar ) Free(rnode->data);
 		}
 	    }
 

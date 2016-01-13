@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 #ifndef register
@@ -36,7 +37,7 @@ typedef struct {
 } oprNodeType;
 
 typedef struct nodeTypeTag {
-  int tmpvar;
+  bool ltmpvar;
   int gridID, zaxisID;
   int nmiss;
   double missval;
@@ -61,7 +62,7 @@ typedef struct {
   int    nmiss[MAX_VARS];
   int    varID[MAX_VARS];
   int    var_needed[MAX_VARS];
-  char   *var[MAX_VARS];
+  char  *varname[MAX_VARS];
   int    init;
   int    debug;
   int    gridID2;
