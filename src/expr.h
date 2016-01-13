@@ -61,7 +61,7 @@ typedef struct {
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
   int    varID[MAX_VARS];
-  int    var_needed[MAX_VARS];
+  bool   needed[MAX_VARS];
   char  *varname[MAX_VARS];
   int    init;
   int    debug;

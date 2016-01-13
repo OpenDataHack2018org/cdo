@@ -150,7 +150,7 @@ void *Expr(void *argument)
    
   /* Set all input variables to 'needed' if replacing is switched off */
   for ( int varID = 0; varID < nvars1; varID++ )
-    parse_arg.var_needed[varID] = ! REPLACES_VARIABLES(operatorID);
+    parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
 
   yy_scan_string(exprs, scanner);
   yyparse(&parse_arg, scanner);
@@ -164,7 +164,7 @@ void *Expr(void *argument)
 
   if ( cdoVerbose )
     for ( int varID = 0; varID < nvars1; varID++ )
-      if ( parse_arg.var_needed[varID] )
+      if ( parse_arg.needed[varID] )
 	printf("Needed var: %d %s\n", varID, parse_arg.varname[varID]);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -186,7 +186,7 @@ void *Expr(void *argument)
 
       int gridsize = gridInqSize(gridID);
       int nlevel   = zaxisInqSize(zaxisID);
-      if ( parse_arg.var_needed[varID] )
+      if ( parse_arg.needed[varID] )
 	parse_arg.vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
       else
 	parse_arg.vardata1[varID] = NULL;
@@ -224,7 +224,7 @@ void *Expr(void *argument)
 	{
           int varID, levelID;
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  if ( parse_arg.var_needed[varID] )
+	  if ( parse_arg.needed[varID] )
 	    {
 	      int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      int offset   = gridsize*levelID;

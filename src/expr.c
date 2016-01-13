@@ -977,11 +977,11 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	      int nlev1, nlev2 = 0;
 	      if ( varID >= MAX_VARS ) cdoAbort("Too many parameter (limit=%d)!", MAX_VARS);
 
-	      if ( parse_arg->var_needed[varID] == 0 )
+	      if ( parse_arg->needed[varID] == false )
 		{
 		  parse_arg->varname[varID] = strdup(p->u.var.nm);
 		  parse_arg->varID[varID] = varID;
-		  parse_arg->var_needed[varID] = 1;
+		  parse_arg->needed[varID] = true;
 		}
 
 	      gridID1    = vlistInqVarGrid(vlistID, varID);
