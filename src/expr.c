@@ -506,15 +506,17 @@ void ex_copy(nodeType *p2, nodeType *p1)
 {
   if ( cdoVerbose ) printf("\tcopy %s\n", p1->u.var.nm);
 
-  long ngp  = gridInqSize(p1->param.gridID);
-  long ngp2 = gridInqSize(p2->param.gridID);
-
+  size_t ngp  = gridInqSize(p1->param.gridID);
+  size_t ngp2 = gridInqSize(p2->param.gridID);
   if ( ngp != ngp2 )
-    cdoAbort("ex_copy: Number of grid points differ (ngp1 = %d, ngp2 = %d)", ngp, ngp2);
+    cdoAbort("ex_copy: Number of grid points differ (ngp1 = %zu, ngp2 = %zu)", ngp, ngp2);
 
-  long nlev = zaxisInqSize(p2->param.zaxisID);
+  size_t nlev  = zaxisInqSize(p1->param.zaxisID);
+  size_t nlev2 = zaxisInqSize(p2->param.zaxisID);
+  if ( nlev != nlev2 )
+    cdoAbort("ex_copy: Number of levels differ (nlev1 = %zu, nlev2 = %zu)", nlev, nlev2);
 
-  memcpy(p2->param.data, p1->param.data, ngp*nlev*sizeof(double));
+  for ( size_t i = 0; i < ngp*nlev; ++i ) p2->param.data[i] = p1->param.data[i];
 
   p2->param.missval = p1->param.missval;
   p2->param.nmiss   = p1->param.nmiss;
@@ -981,10 +983,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	      int nlev1, nlev2 = 0;
 	      if ( varID >= MAX_VARS ) cdoAbort("Too many parameter (limit=%d)!", MAX_VARS);
 
-	      if ( parse_arg->needed[varID] == false )
+	      if ( parse_arg->needed[varID] == false && vlistID == parse_arg->vlistID1 )
 		{
 		  parse_arg->varname[varID] = strdup(p->u.var.nm);
-		  parse_arg->varID[varID] = varID;
 		  parse_arg->needed[varID] = true;
 		}
 
@@ -1020,11 +1021,16 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	  if ( ! parse_arg->init )
 	    {
               if ( vlistID == parse_arg->vlistID1 )
-                p->param.data  = parse_arg->vardata1[varID];
+                {
+                  p->param.data  = parse_arg->param1[varID].data;
+                  p->param.nmiss = parse_arg->param1[varID].nmiss;
+                }
               else
-                p->param.data  = parse_arg->vardata2[varID];
-	      p->param.nmiss = parse_arg->nmiss[varID];
-	    }
+                {
+                  p->param.data  = parse_arg->vardata2[varID];
+                  p->param.nmiss = 0;
+                }
+              }
 	  rnode = p;
 	}
 

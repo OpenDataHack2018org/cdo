@@ -84,6 +84,7 @@ char *exprs_from_file(const char *exprf)
   return exprs;
 }
 
+#define MAX_PARAM 4096
 
 void *Expr(void *argument)
 {
@@ -95,7 +96,6 @@ void *Expr(void *argument)
 
   yylex_init(&scanner);
   yyset_extra(&parse_arg, scanner);
-
 
 #define REPLACES_VARIABLES(id) cdoOperatorF1(id)
 #define READS_COMMAND_LINE(id) cdoOperatorF2(id)
@@ -117,7 +117,6 @@ void *Expr(void *argument)
 
   if ( cdoVerbose ) cdoPrint(exprs);
 
-
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int vlistID1 = streamInqVlist(streamID1);
   int nvars1 = vlistNvars(vlistID1);
@@ -137,17 +136,37 @@ void *Expr(void *argument)
 
   int vlisttmp = vlistCreate();
 
+  int nparam         = MAX_PARAM;
+  paramType *param1  = (paramType*) Malloc(nvars1*sizeof(paramType));
   parse_arg.init     = true;
   parse_arg.debug    = false;
   if ( cdoVerbose ) parse_arg.debug = true;
+  parse_arg.nvars1   = nvars1;
+  parse_arg.param1   = param1;
   parse_arg.vlistID1 = vlistID1;
   parse_arg.vlistID2 = vlistID2;
   parse_arg.vlisttmp = vlisttmp;
-  parse_arg.nvars1   = 0;
   parse_arg.gridID2  = -1;
   parse_arg.zaxisID2 = -1;
-  parse_arg.tsteptype2  = -1;
+  parse_arg.tsteptype2 = -1;
    
+  for ( int varID = 0; varID < nvars1; varID++ )
+    {
+      int gridID     = vlistInqVarGrid(vlistID1, varID);
+      int zaxisID    = vlistInqVarZaxis(vlistID1, varID);
+      int ngp        = gridInqSize(gridID);
+      int nlev       = zaxisInqSize(zaxisID);
+      double missval = vlistInqVarMissval(vlistID1, varID);
+      
+      param1[varID].gridID  = gridID;
+      param1[varID].zaxisID = zaxisID;
+      param1[varID].ngp     = ngp;
+      param1[varID].nlev    = nlev;
+      param1[varID].missval = missval;
+      param1[varID].nmiss   = 0;
+      param1[varID].data    = NULL;
+    }
+
   /* Set all input variables to 'needed' if replacing is switched off */
   for ( int varID = 0; varID < nvars1; varID++ )
     parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
@@ -175,26 +194,21 @@ void *Expr(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  parse_arg.vardata1 = (double**) Malloc(nvars1*sizeof(double*));
   parse_arg.vardata2 = (double**) Malloc(nvars2*sizeof(double*));
 
   for ( int varID = 0; varID < nvars1; varID++ )
     {
-      int gridID  = vlistInqVarGrid(vlistID1, varID);
-      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      /* parse_arg.missval[varID] = vlistInqVarMissval(vlistID1, varID); */
-
-      int gridsize = gridInqSize(gridID);
-      int nlevel   = zaxisInqSize(zaxisID);
       if ( parse_arg.needed[varID] )
-	parse_arg.vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
-      else
-	parse_arg.vardata1[varID] = NULL;
+        {
+          int ngp  = param1[varID].ngp;
+          int nlev = param1[varID].nlev;
+          param1[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
+        }
     }
 
   for ( int varID = 0; varID < nvars; varID++ )
     {
-      parse_arg.vardata2[varID] = parse_arg.vardata1[varID];
+      parse_arg.vardata2[varID] = param1[varID].data;
     }
 
   for ( int varID = nvars; varID < nvars2; varID++ )
@@ -207,9 +221,6 @@ void *Expr(void *argument)
       parse_arg.vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
-  int gridsize = vlistGridsizeMax(vlistID1);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
-
   int nrecs;
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -218,7 +229,7 @@ void *Expr(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( int varID = 0; varID < nvars1; varID++ ) parse_arg.nmiss[varID] = 0;
+      for ( int varID = 0; varID < nvars1; varID++ ) param1[varID].nmiss = 0;
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
@@ -226,12 +237,11 @@ void *Expr(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  if ( parse_arg.needed[varID] )
 	    {
-	      int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	      int offset   = gridsize*levelID;
+	      int offset = param1[varID].ngp*levelID;
               int nmiss;
-	      double *vardata = parse_arg.vardata1[varID] + offset;
+	      double *vardata = param1[varID].data + offset;
 	      streamReadRecord(streamID1, vardata, &nmiss);
-	      parse_arg.nmiss[varID] += nmiss;
+	      param1[varID].nmiss += nmiss;
 	    }
 	}
 
@@ -280,8 +290,15 @@ void *Expr(void *argument)
 
   yylex_destroy(scanner);
 
-  if ( array ) Free(array);
   if ( exprs ) Free(exprs);
+
+  if ( param1 )
+    {
+      for ( int varID = 0; varID < nvars1; varID++ )
+        if ( param1[varID].data ) Free(param1[varID].data);
+      
+      Free(param1);
+    }
 
   cdoFinish();
 
