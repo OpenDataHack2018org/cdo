@@ -71,12 +71,12 @@ typedef struct nodeTypeTag {
 typedef struct {
   bool   init;
   bool   debug;
+  bool  *needed;
   int    maxparams;
   int    nparams;
   int    vlistID1, vlistID2, vlisttmp;
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
-  bool   needed[MAX_VARS];
   int    gridID2;
   int    zaxisID2;
   int    tsteptype2;

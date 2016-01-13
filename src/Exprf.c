@@ -151,6 +151,7 @@ void *Expr(void *argument)
   parse_arg.gridID2    = -1;
   parse_arg.zaxisID2   = -1;
   parse_arg.tsteptype2 = -1;
+  parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
 
   char name[CDI_MAX_NAME];
   char longname[CDI_MAX_NAME];

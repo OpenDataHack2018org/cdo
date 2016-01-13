@@ -983,7 +983,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	      int nlev1, nlev2 = 0;
 	      if ( varID >= MAX_VARS ) cdoAbort("Too many parameter (limit=%d)!", MAX_VARS);
 
-	      if ( parse_arg->needed[varID] == false && vlistID == parse_arg->vlistID1 )
+	      if ( parse_arg->needed[varID] == false && varID < parse_arg->nvars1 )
 		{
 		  parse_arg->needed[varID] = true;
 		}
