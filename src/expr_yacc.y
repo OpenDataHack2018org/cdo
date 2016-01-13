@@ -10,7 +10,7 @@
 
 /* Bison manual p. 60 describes how to call yyparse() with arguments */
 /* #define YYPARSE_PARAM parse_arg */
-/* #define YYLEX_PARAM   ((parse_parm_t *) parse_arg, void *yyscanner) */
+/* #define YYLEX_PARAM   ((parse_param_t *) parse_arg, void *yyscanner) */
 
   /* #define YYPURE 1 *//* ??? */
 
@@ -21,14 +21,14 @@ nodeType *expr_con(double value);
 nodeType *expr_fun(char *fname, nodeType *p);
 
 void freeNode(nodeType *p);
-int expr_run(nodeType *p, parse_parm_t *parse_arg);
+int expr_run(nodeType *p, parse_param_t *parse_arg);
 
 %}
 
 %pure-parser
-%parse-param {parse_parm_t *parse_arg}
+%parse-param {parse_param_t *parse_arg}
 %parse-param {void *scanner}
-%lex-param {parse_parm_t *parse_arg}
+%lex-param {parse_param_t *parse_arg}
 %lex-param {yyscan_t *scanner}
 
 
@@ -53,7 +53,7 @@ program:
         ;
 
 function:
-          function stmt           { expr_run($2, (parse_parm_t *) parse_arg); freeNode($2); }
+          function stmt           { expr_run($2, (parse_param_t *) parse_arg); freeNode($2); }
         | /* NULL */
         ;
 
@@ -189,7 +189,7 @@ int main(void)
   void *scanner;
   int yy_scan_string(const char *str, void *scanner);
 
-  parse_parm_t parse_arg;
+  parse_param_t parse_arg;
 
   printf("%s\n", fexpr);
 

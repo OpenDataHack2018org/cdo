@@ -89,7 +89,7 @@ void *Expr(void *argument)
 {
   cdoInitialize(argument);
 
-  parse_parm_t parse_arg;
+  parse_param_t parse_arg;
   void *scanner;
   int yy_scan_string(const char *str, void *scanner);
 

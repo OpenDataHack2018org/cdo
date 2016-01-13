@@ -74,7 +74,7 @@
 
 /* Bison manual p. 60 describes how to call yyparse() with arguments */
 /* #define YYPARSE_PARAM parse_arg */
-/* #define YYLEX_PARAM   ((parse_parm_t *) parse_arg, void *yyscanner) */
+/* #define YYLEX_PARAM   ((parse_param_t *) parse_arg, void *yyscanner) */
 
   /* #define YYPURE 1 *//* ??? */
 
@@ -85,7 +85,7 @@ nodeType *expr_con(double value);
 nodeType *expr_fun(char *fname, nodeType *p);
 
 void freeNode(nodeType *p);
-int expr_run(nodeType *p, parse_parm_t *parse_arg);
+int expr_run(nodeType *p, parse_param_t *parse_arg);
 
 
 #line 92 "expr_yacc.c" /* yacc.c:339  */
@@ -157,7 +157,7 @@ extern int yydebug;
 
 
 
-int yyparse (parse_parm_t *parse_arg, void *scanner);
+int yyparse (parse_param_t *parse_arg, void *scanner);
 
 #endif /* !YY_YY_EXPR_YACC_H_INCLUDED  */
 
@@ -695,7 +695,7 @@ do {                                                                      \
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, parse_parm_t *parse_arg, void *scanner)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, parse_param_t *parse_arg, void *scanner)
 {
   FILE *yyo = yyoutput;
   YYUSE (yyo);
@@ -716,7 +716,7 @@ yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvalue
 `--------------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, parse_parm_t *parse_arg, void *scanner)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, parse_param_t *parse_arg, void *scanner)
 {
   YYFPRINTF (yyoutput, "%s %s (",
              yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
@@ -754,7 +754,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, parse_parm_t *parse_arg, void *scanner)
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, parse_param_t *parse_arg, void *scanner)
 {
   unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -1034,7 +1034,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, parse_parm_t *parse_arg, void *scanner)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, parse_param_t *parse_arg, void *scanner)
 {
   YYUSE (yyvaluep);
   YYUSE (parse_arg);
@@ -1056,7 +1056,7 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, parse_parm_t *pars
 `----------*/
 
 int
-yyparse (parse_parm_t *parse_arg, void *scanner)
+yyparse (parse_param_t *parse_arg, void *scanner)
 {
 /* The lookahead symbol.  */
 int yychar;
@@ -1311,7 +1311,7 @@ yyreduce:
 
   case 3:
 #line 56 "expr_yacc.y" /* yacc.c:1646  */
-    { expr_run((yyvsp[0].nPtr), (parse_parm_t *) parse_arg); freeNode((yyvsp[0].nPtr)); }
+    { expr_run((yyvsp[0].nPtr), (parse_param_t *) parse_arg); freeNode((yyvsp[0].nPtr)); }
 #line 1316 "expr_yacc.c" /* yacc.c:1646  */
     break;
 
@@ -1803,7 +1803,7 @@ int main(void)
   void *scanner;
   int yy_scan_string(const char *str, void *scanner);
 
-  parse_parm_t parse_arg;
+  parse_param_t parse_arg;
 
   printf("%s\n", fexpr);
 

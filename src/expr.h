@@ -36,12 +36,24 @@ typedef struct {
   struct nodeTypeTag *op[1];  // operands (expandable)
 } oprNodeType;
 
+// parameter
+typedef struct {
+  int gridID;
+  int zaxisID;
+  int nmiss;
+  double missval;
+  double *data;
+} paramType;
+
 typedef struct nodeTypeTag {
   bool ltmpvar;
+  paramType param;
+  /*
   int gridID, zaxisID;
   int nmiss;
   double missval;
   double *data;
+  */
   nodeEnum type;              // type of node
 
   // union must be last entry in nodeType
@@ -70,7 +82,7 @@ typedef struct {
   int    tsteptype2;
   double missval2;
   double **vardata1, **vardata2;
-} parse_parm_t;
+} parse_param_t;
 
 
 typedef union{
@@ -82,12 +94,12 @@ typedef union{
 
 
 #define YYSTYPE        stype_t
-#define YY_EXTRA_TYPE  parse_parm_t *
+#define YY_EXTRA_TYPE  parse_param_t *
 
-#define YY_DECL int yylex(YYSTYPE *yylval_param, parse_parm_t *parse_arg, void *yyscanner)
+#define YY_DECL int yylex(YYSTYPE *yylval_param, parse_param_t *parse_arg, void *yyscanner)
 YY_DECL;
 
-int  yyparse(parse_parm_t *parse_arg, void*);
+int  yyparse(parse_param_t *parse_arg, void*);
 void yyerror(void *parse_arg, void *scanner, const char *errstr);
 
 int  yylex_init(void **);

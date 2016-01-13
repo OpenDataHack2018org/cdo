@@ -79,6 +79,6 @@ extern int yydebug;
 
 
 
-int yyparse (parse_parm_t *parse_arg, void *scanner);
+int yyparse (parse_param_t *parse_arg, void *scanner);
 
 #endif /* !YY_YY_EXPR_YACC_H_INCLUDED  */
