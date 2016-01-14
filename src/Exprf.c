@@ -134,8 +134,6 @@ void *Expr(void *argument)
       nvars = nvars1;
     }
 
-  int vlisttmp = vlistCreate();
-
   paramType *params    = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
   memset(params, 0, MAX_PARAMS*sizeof(paramType));
   parse_arg.maxparams  = MAX_PARAMS;
@@ -146,7 +144,6 @@ void *Expr(void *argument)
   if ( cdoVerbose ) parse_arg.debug = true;
   parse_arg.params     = params;
   parse_arg.vlistID2   = vlistID2;
-  parse_arg.vlisttmp   = vlisttmp;
   parse_arg.gridID2    = -1;
   parse_arg.zaxisID2   = -1;
   parse_arg.tsteptype2 = -1;
@@ -226,6 +223,20 @@ void *Expr(void *argument)
   for ( int varID = 0; varID < nvars; varID++ )
     {
       parse_arg.vardata2[varID] = params[varID].data;
+    }
+
+  // printf(">>>> nvars1, nvars, nvars2 %d %d %d\n", nvars1, nvars, nvars2);
+
+  for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
+    {
+      int gridID  = params[varID].gridID;
+      int zaxisID = params[varID].zaxisID;
+      int ngp  = gridInqSize(gridID);
+      int nlev = zaxisInqSize(zaxisID);
+      // int ngp  = params[varID].ngp;
+      // int nlev = params[varID].nlev;
+      // printf("name %s ngp %d nlev %d\n", params[varID].name, ngp, nlev);
+      params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
 
   for ( int varID = nvars; varID < nvars2; varID++ )

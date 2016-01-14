@@ -75,7 +75,7 @@ typedef struct {
   bool  *needed;
   int    maxparams;
   int    nparams;
-  int    vlistID2, vlisttmp;
+  int    vlistID2;
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
   int    gridID2;
