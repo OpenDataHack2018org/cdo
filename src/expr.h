@@ -40,6 +40,7 @@ typedef struct {
 typedef struct {
   int gridID;
   int zaxisID;
+  int steptype;
   int ngp;
   int nlev;
   int nmiss;
@@ -74,7 +75,7 @@ typedef struct {
   bool  *needed;
   int    maxparams;
   int    nparams;
-  int    vlistID1, vlistID2, vlisttmp;
+  int    vlistID2, vlisttmp;
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
   int    gridID2;

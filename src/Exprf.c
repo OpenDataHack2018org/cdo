@@ -145,7 +145,6 @@ void *Expr(void *argument)
   parse_arg.debug      = false;
   if ( cdoVerbose ) parse_arg.debug = true;
   parse_arg.params     = params;
-  parse_arg.vlistID1   = vlistID1;
   parse_arg.vlistID2   = vlistID2;
   parse_arg.vlisttmp   = vlisttmp;
   parse_arg.gridID2    = -1;
@@ -160,6 +159,7 @@ void *Expr(void *argument)
     {
       int gridID     = vlistInqVarGrid(vlistID1, varID);
       int zaxisID    = vlistInqVarZaxis(vlistID1, varID);
+      int steptype   = vlistInqVarTsteptype(vlistID1, varID);
       int ngp        = gridInqSize(gridID);
       int nlev       = zaxisInqSize(zaxisID);
       double missval = vlistInqVarMissval(vlistID1, varID);
@@ -170,6 +170,7 @@ void *Expr(void *argument)
       
       params[varID].gridID   = gridID;
       params[varID].zaxisID  = zaxisID;
+      params[varID].steptype = steptype;
       params[varID].ngp      = ngp;
       params[varID].nlev     = nlev;
       params[varID].missval  = missval;
@@ -193,6 +194,9 @@ void *Expr(void *argument)
   if ( nvars2 == 0 ) cdoAbort("No output variable found!");
 
   if ( cdoVerbose ) vlistPrint(vlistID2);
+
+  for ( int varID = 0; varID < parse_arg.nparams; varID++ )
+    printf("var: %d %s ngp=%d nlev=%d\n", varID, params[varID].name, params[varID].ngp, params[varID].nlev);
 
   if ( cdoVerbose )
     for ( int varID = 0; varID < nvars1; varID++ )
@@ -316,6 +320,8 @@ void *Expr(void *argument)
         }
       Free(params);
     }
+
+  if ( parse_arg.needed ) Free(parse_arg.needed);
 
   cdoFinish();
 

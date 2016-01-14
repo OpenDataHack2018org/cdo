@@ -947,12 +947,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	  if ( parse_arg->debug )
 	    printf("\tpush var \t%s\n", p->u.var.nm);
 
-          vlistID = parse_arg->vlistID1;
-	  int nvars = vlistNvars(vlistID);
+          vlistID = -1;
+          int nvars = parse_arg->nvars1;
 	  for ( varID = nvars-1; varID >= 0; --varID )
 	    {
-	      vlistInqVarName(vlistID, varID, varname);
-	      if ( strcmp(varname, p->u.var.nm) == 0 ) break;
+	      if ( strcmp(parse_arg->params[varID].name, p->u.var.nm) == 0 ) break;
 	    }
 	  if ( varID < 0 )
             {
@@ -988,12 +987,23 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 		  parse_arg->needed[varID] = true;
 		}
 
-	      gridID1    = vlistInqVarGrid(vlistID, varID);
-	      zaxisID1   = vlistInqVarZaxis(vlistID, varID);
-	      tsteptype1 = vlistInqVarTsteptype(vlistID, varID);
-	      missval    = vlistInqVarMissval(vlistID, varID);
-	      nlev1 = zaxisInqSize(zaxisID1);
-
+              if ( vlistID != -1 )
+                {
+                  gridID1    = vlistInqVarGrid(vlistID, varID);
+                  zaxisID1   = vlistInqVarZaxis(vlistID, varID);
+                  tsteptype1 = vlistInqVarTsteptype(vlistID, varID);
+                  missval    = vlistInqVarMissval(vlistID, varID);
+                  nlev1 = zaxisInqSize(zaxisID1);
+                }
+              else
+                {
+                  gridID1    = parse_arg->params[varID].gridID;
+                  zaxisID1   = parse_arg->params[varID].zaxisID;
+                  tsteptype1 = parse_arg->params[varID].steptype;
+                  missval    = parse_arg->params[varID].missval;
+                  nlev1      = parse_arg->params[varID].nlev;
+                }
+              
 	      parse_arg->missval2 = missval;
 
 	      if ( parse_arg->gridID2 == -1 )
@@ -1019,7 +1029,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	  p->ltmpvar = false;
 	  if ( ! parse_arg->init )
 	    {
-              if ( vlistID == parse_arg->vlistID1 )
+              if ( vlistID == -1 )
                 {
                   p->param.data  = parse_arg->params[varID].data;
                   p->param.nmiss = parse_arg->params[varID].nmiss;
