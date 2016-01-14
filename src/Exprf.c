@@ -121,19 +121,6 @@ void *Expr(void *argument)
   int vlistID1 = streamInqVlist(streamID1);
   int nvars1 = vlistNvars(vlistID1);
 
-  int vlistID2 = -1;
-  int nvars = 0;
-  if ( REPLACES_VARIABLES(operatorID) )
-    {
-      vlistID2 = vlistCreate();
-      nvars = 0;
-    }
-  else
-    {
-      vlistID2 = vlistDuplicate(vlistID1);
-      nvars = nvars1;
-    }
-
   paramType *params    = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
   memset(params, 0, MAX_PARAMS*sizeof(paramType));
   parse_arg.maxparams  = MAX_PARAMS;
@@ -143,7 +130,6 @@ void *Expr(void *argument)
   parse_arg.debug      = false;
   if ( cdoVerbose ) parse_arg.debug = true;
   parse_arg.params     = params;
-  parse_arg.vlistID2   = vlistID2;
   parse_arg.gridID2    = -1;
   parse_arg.zaxisID2   = -1;
   parse_arg.tsteptype2 = -1;
@@ -187,18 +173,50 @@ void *Expr(void *argument)
 
   parse_arg.init = false;
 
-  int nvars2 = vlistNvars(vlistID2);
-  if ( nvars2 == 0 ) cdoAbort("No output variable found!");
-
-  if ( cdoVerbose ) vlistPrint(vlistID2);
-
-  for ( int varID = 0; varID < parse_arg.nparams; varID++ )
-    printf("var: %d %s ngp=%d nlev=%d\n", varID, params[varID].name, params[varID].ngp, params[varID].nlev);
-
   if ( cdoVerbose )
     for ( int varID = 0; varID < nvars1; varID++ )
       if ( parse_arg.needed[varID] )
 	printf("Needed var: %d %s\n", varID, params[varID].name);
+
+  for ( int varID = 0; varID < parse_arg.nparams; varID++ )
+    printf("var: %d %s ngp=%d nlev=%d\n", varID, params[varID].name, params[varID].ngp, params[varID].nlev);
+
+  int vlistID2 = -1;
+  int nvars = 0;
+  if ( REPLACES_VARIABLES(operatorID) )
+    {
+      vlistID2 = vlistCreate();
+      nvars = 0;
+    }
+  else
+    {
+      vlistID2 = vlistDuplicate(vlistID1);
+      nvars = nvars1;
+    }
+
+  int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
+
+  for ( int pidx = nvars1; pidx < parse_arg.nparams; pidx++ )
+    {
+      if ( *params[pidx].name == '_' ) continue;
+      int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
+      vlistDefVarName(vlistID2, varID, params[pidx].name);
+      vlistDefVarMissval(vlistID2, varID, params[pidx].missval);
+      if ( memcmp(params[pidx].name, "var", 3) == 0 )
+        {
+          if ( strlen(params[pidx].name) > 3 && isdigit(params[pidx].name[3]) )
+            {
+              int code = atoi(params[pidx].name+3);
+              vlistDefVarCode(vlistID2, varID, code);
+            }
+        }
+      varIDmap[varID] = pidx;
+    }
+
+  int nvars2 = vlistNvars(vlistID2);
+  if ( nvars2 == 0 ) cdoAbort("No output variable found!");
+
+  if ( cdoVerbose ) vlistPrint(vlistID2);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
@@ -207,8 +225,6 @@ void *Expr(void *argument)
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
-
-  parse_arg.vardata2 = (double**) Malloc(nvars2*sizeof(double*));
 
   for ( int varID = 0; varID < nvars1; varID++ )
     {
@@ -219,12 +235,12 @@ void *Expr(void *argument)
           params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
         }
     }
-
+  /*
   for ( int varID = 0; varID < nvars; varID++ )
     {
       parse_arg.vardata2[varID] = params[varID].data;
     }
-
+  */
   // printf(">>>> nvars1, nvars, nvars2 %d %d %d\n", nvars1, nvars, nvars2);
 
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
@@ -238,7 +254,7 @@ void *Expr(void *argument)
       // printf("name %s ngp %d nlev %d\n", params[varID].name, ngp, nlev);
       params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
-
+  /*
   for ( int varID = nvars; varID < nvars2; varID++ )
     {
       int gridID  = vlistInqVarGrid(vlistID2, varID);
@@ -248,7 +264,7 @@ void *Expr(void *argument)
       int nlevel   = zaxisInqSize(zaxisID);
       parse_arg.vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
-
+  */
   int nrecs;
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -275,12 +291,13 @@ void *Expr(void *argument)
 
       for ( int varID = nvars; varID < nvars2; varID++ )
 	{
+          int pidx = varIDmap[varID];
 	  int gridID   = vlistInqVarGrid(vlistID2, varID);
 	  int zaxisID  = vlistInqVarZaxis(vlistID2, varID);
 	  int gridsize = gridInqSize(gridID);
 	  int nlevel   = zaxisInqSize(zaxisID);
 
-	  memset(parse_arg.vardata2[varID], 0, gridsize*nlevel*sizeof(double));
+	  memset(params[pidx].data, 0, gridsize*nlevel*sizeof(double));
 	}
 
       yy_scan_string(exprs, scanner);
@@ -288,6 +305,7 @@ void *Expr(void *argument)
 
       for ( int varID = 0; varID < nvars2; varID++ )
 	{
+          int pidx = varIDmap[varID];
 	  int gridID  = vlistInqVarGrid(vlistID2, varID);
 	  int zaxisID = vlistInqVarZaxis(vlistID2, varID);
 	  double missval = vlistInqVarMissval(vlistID2, varID);
@@ -297,7 +315,7 @@ void *Expr(void *argument)
 	  for ( int levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      int offset = gridsize*levelID;
-	      double *vardata = parse_arg.vardata2[varID] + offset;
+	      double *vardata = params[pidx].data + offset;
 
 	      int nmiss = 0;
 	      for ( int i = 0; i < gridsize; i++ )
@@ -333,6 +351,7 @@ void *Expr(void *argument)
     }
 
   if ( parse_arg.needed ) Free(parse_arg.needed);
+  if ( varIDmap ) Free(varIDmap);
 
   cdoFinish();
 

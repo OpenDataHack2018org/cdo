@@ -75,14 +75,12 @@ typedef struct {
   bool  *needed;
   int    maxparams;
   int    nparams;
-  int    vlistID2;
   int    nvars1, nvars2;
   int    nmiss[MAX_VARS];
   int    gridID2;
   int    zaxisID2;
   int    tsteptype2;
   double missval2;
-  double **vardata2;
   paramType *params;
 } parse_param_t;
 
