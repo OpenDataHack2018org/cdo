@@ -151,6 +151,7 @@ void *Expr(void *argument)
       vlistInqVarLongname(vlistID1, varID, longname);
       vlistInqVarUnits(vlistID1, varID, units);
       
+      params[varID].select   = false;
       params[varID].gridID   = gridID;
       params[varID].zaxisID  = zaxisID;
       params[varID].steptype = steptype;
@@ -178,26 +179,26 @@ void *Expr(void *argument)
       if ( parse_arg.needed[varID] )
 	printf("Needed var: %d %s\n", varID, params[varID].name);
 
-  for ( int varID = 0; varID < parse_arg.nparams; varID++ )
-    printf("var: %d %s ngp=%d nlev=%d\n", varID, params[varID].name, params[varID].ngp, params[varID].nlev);
+  if ( cdoVerbose )
+    for ( int varID = 0; varID < parse_arg.nparams; varID++ )
+      printf("var: %d %s ngp=%d nlev=%d\n", varID, params[varID].name, params[varID].ngp, params[varID].nlev);
 
   int vlistID2 = -1;
-  int nvars = 0;
   if ( REPLACES_VARIABLES(operatorID) )
     {
       vlistID2 = vlistCreate();
-      nvars = 0;
     }
   else
     {
       vlistID2 = vlistDuplicate(vlistID1);
-      nvars = nvars1;
+      for ( int pidx = 0; pidx < nvars1; pidx++ ) params[pidx].select = false;
     }
 
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
 
-  for ( int pidx = nvars1; pidx < parse_arg.nparams; pidx++ )
+  for ( int pidx = 0; pidx < parse_arg.nparams; pidx++ )
     {
+      if ( pidx < nvars1 && params[pidx].select == false ) continue;
       if ( *params[pidx].name == '_' ) continue;
       int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
       vlistDefVarName(vlistID2, varID, params[pidx].name);
@@ -289,9 +290,10 @@ void *Expr(void *argument)
 	    }
 	}
 
-      for ( int varID = nvars; varID < nvars2; varID++ )
+      for ( int varID = 0; varID < nvars2; varID++ )
 	{
           int pidx = varIDmap[varID];
+          if ( pidx < nvars1 ) continue;
 	  int gridID   = vlistInqVarGrid(vlistID2, varID);
 	  int zaxisID  = vlistInqVarZaxis(vlistID2, varID);
 	  int gridsize = gridInqSize(gridID);

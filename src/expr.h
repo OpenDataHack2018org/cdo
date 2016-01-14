@@ -38,6 +38,7 @@ typedef struct {
 
 // parameter
 typedef struct {
+  bool select;
   int gridID;
   int zaxisID;
   int steptype;
@@ -67,7 +68,6 @@ typedef struct nodeTypeTag {
   } u;
 } nodeType;
 
-#define MAX_VARS 1024
 
 typedef struct {
   bool   init;
@@ -75,8 +75,7 @@ typedef struct {
   bool  *needed;
   int    maxparams;
   int    nparams;
-  int    nvars1, nvars2;
-  int    nmiss[MAX_VARS];
+  int    nvars1;
   int    gridID2;
   int    zaxisID2;
   int    tsteptype2;

@@ -917,9 +917,7 @@ int exNode(nodeType *p, parse_param_t *parse_arg)
 nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 {
   int gridID1 = -1, zaxisID1 = -1, tsteptype1 = -1;
-  int vlistID = -1;
   double missval = 0;
-  char varname[256];
   int varID;
   nodeType *rnode = NULL;
 
@@ -959,7 +957,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	  else
 	    {
 	      int nlev1, nlev2 = 0;
-	      if ( varID >= MAX_VARS ) cdoAbort("Too many parameter (limit=%d)!", MAX_VARS);
 
 	      if ( varID < parse_arg->nvars1 && parse_arg->needed[varID] == false )
 		{
@@ -1047,7 +1044,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 }
               if ( varID >= 0 )
                 {
-                  cdoWarning("Variable %s already defined!", varname2);
+                  if ( varID < parse_arg->nvars1 ) parse_arg->params[varID].select = true;
+                  else cdoWarning("Variable %s already defined!", varname2);
                 }
               else
                 {
