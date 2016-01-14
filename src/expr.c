@@ -1022,9 +1022,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           parse_arg->tsteptype2 = -1;
 
           rnode = expr_run(p->u.opr.op[1], parse_arg);
-          // if ( rnode )
-          //   printf("rnode name %s\n", rnode->u.var.nm);
-          // printf("parse_arg->vlistID2 %d parse_arg->gridID2 %d\n", parse_arg->vlistID2, parse_arg->gridID2);
+
 	  if ( parse_arg->init )
 	    {
 	      if ( parse_arg->debug )
