@@ -397,7 +397,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 
   int ngp  = gridInqSize(gridID);
   int nlev = zaxisInqSize(zaxisID);
-  long n   = ngp*nlev;
+  long n   = (long)ngp*nlev;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -518,7 +518,7 @@ void ex_copy(nodeType *p2, nodeType *p1)
   int ngp = p1->param.ngp;
   assert(ngp > 0);
 
-  if ( (ngp) != p2->param.ngp )
+  if ( ngp != p2->param.ngp )
     cdoAbort("%s: Number of grid points differ (%s[%d] = %s[%d])",
              __func__, p2->param.name, p2->param.ngp, p1->param.name, ngp);
 
@@ -526,8 +526,8 @@ void ex_copy(nodeType *p2, nodeType *p1)
   assert(nlev > 0);
 
   if ( nlev != p2->param.nlev )
-    cdoAbort("%s: Number of levels differ (nlev1 = %d, nlev2 = %d)",
-             __func__, nlev, p2->param.nlev);
+    cdoAbort("%s: Number of levels differ (%s[%d] = %s[%d])",
+             __func__, p2->param.name, p2->param.nlev, p1->param.name, nlev);
 
   for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) p2->param.data[i] = p1->param.data[i];
 
