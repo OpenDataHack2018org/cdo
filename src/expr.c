@@ -389,14 +389,12 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 {
-  int gridID   = p1->param.gridID;
-  int zaxisID  = p1->param.zaxisID;
-  int nmiss    = p1->param.nmiss;
+  int ngp   = p1->param.ngp;
+  int nlev  = p1->param.nlev;
+  int nmiss = p1->param.nmiss;
   double missval1 = p1->param.missval;
   double missval2 = p1->param.missval;
 
-  int ngp  = gridInqSize(gridID);
-  int nlev = zaxisInqSize(zaxisID);
   long n   = (long)ngp*nlev;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
