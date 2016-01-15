@@ -52,6 +52,7 @@ typedef struct {
   double *data;
 } paramType;
 
+
 typedef struct nodeTypeTag {
   bool ltmpvar;
   paramType param;

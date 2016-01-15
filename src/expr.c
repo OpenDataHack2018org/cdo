@@ -4,6 +4,7 @@
 #include <math.h>
 #include <errno.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include <cdi.h>
 #include "cdo.h"
@@ -103,6 +104,7 @@ void param_meta_copy(paramType *out, paramType *in)
   out->nlev     = in->nlev;
   out->missval  = in->missval;
   out->nmiss    = 0;
+  out->name     = NULL;
 }
 
 static
@@ -364,6 +366,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
   param_meta_copy(&p->param, &p2->param);
+  p->param.name = p->u.var.nm;
 
   p->param.data = (double*) Malloc(n*sizeof(double));
   double *restrict odat = p->param.data;
@@ -402,6 +405,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
   param_meta_copy(&p->param, &p1->param);
+  p->param.name = p->u.var.nm;
 
   p->param.data = (double*) Malloc(n*sizeof(double));
   double *restrict odat = p->param.data;
@@ -437,7 +441,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   long ngp1 = gridInqSize(p1->param.gridID);
   long ngp2 = gridInqSize(p2->param.gridID);
 
-  if ( ngp1 != ngp2 && ngp2 != 1 ) cdoAbort("expr_var_var: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", ngp1, ngp2);
+  if ( ngp1 != ngp2 && ngp2 != 1 )
+    cdoAbort("%s: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", __func__, ngp1, ngp2);
 
   long ngp = ngp1;
 
@@ -467,6 +472,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       nlev = nlev1;
       param_meta_copy(&p->param, &p1->param);
     }
+
+  p->param.name = p1->param.name;
 
   p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
@@ -508,17 +515,21 @@ void ex_copy(nodeType *p2, nodeType *p1)
 {
   if ( cdoVerbose ) printf("\tcopy %s\n", p1->u.var.nm);
 
-  size_t ngp  = gridInqSize(p1->param.gridID);
-  size_t ngp2 = gridInqSize(p2->param.gridID);
-  if ( ngp != ngp2 )
-    cdoAbort("ex_copy: Number of grid points differ (ngp1 = %zu, ngp2 = %zu)", ngp, ngp2);
+  int ngp = p1->param.ngp;
+  assert(ngp > 0);
 
-  size_t nlev  = zaxisInqSize(p1->param.zaxisID);
-  size_t nlev2 = zaxisInqSize(p2->param.zaxisID);
-  if ( nlev != nlev2 )
-    cdoAbort("ex_copy: Number of levels differ (nlev1 = %zu, nlev2 = %zu)", nlev, nlev2);
+  if ( (ngp) != p2->param.ngp )
+    cdoAbort("%s: Number of grid points differ (%s[%d] = %s[%d])",
+             __func__, p2->param.name, p2->param.ngp, p1->param.name, ngp);
 
-  for ( size_t i = 0; i < ngp*nlev; ++i ) p2->param.data[i] = p1->param.data[i];
+  int nlev = p1->param.nlev;
+  assert(nlev > 0);
+
+  if ( nlev != p2->param.nlev )
+    cdoAbort("%s: Number of levels differ (nlev1 = %d, nlev2 = %d)",
+             __func__, nlev, p2->param.nlev);
+
+  for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) p2->param.data[i] = p1->param.data[i];
 
   p2->param.missval = p1->param.missval;
   p2->param.nmiss   = p1->param.nmiss;
@@ -713,6 +724,7 @@ nodeType *ex_uminus_var(nodeType *p1)
   p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
   param_meta_copy(&p->param, &p1->param);
+  p->param.name = p->u.var.nm;
 
   p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
   double *restrict pdata = p->param.data;
@@ -849,6 +861,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
   p->u.var.nm = strdup("tmp");
 
   param_meta_copy(&p->param, &px->param);
+  p->param.name = p->u.var.nm;
 
   p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
@@ -972,7 +985,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	      if ( parse_arg->gridID2 == -1 )
 		parse_arg->gridID2 = gridID1;
 
-              printf(">> typeVar: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
+              // printf(">> typeVar: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
 	      if ( parse_arg->zaxisID2 != -1 ) nlev2 = zaxisInqSize(parse_arg->zaxisID2);
 
 	      if ( parse_arg->zaxisID2 == -1 || (nlev1 > 1 && nlev2 == 1) )
@@ -984,12 +997,13 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	}
 	/* else */
 	{ 
-	  if ( parse_arg->debug )
-	    printf("var: %s %d %d %d\n", p->u.var.nm, varID, gridID1, zaxisID1);
-	  p->param.gridID  = gridID1;
-	  p->param.zaxisID = zaxisID1;
-	  p->param.missval = missval;
-          p->param.nmiss   = 0;
+          param_meta_copy(&p->param, &parse_arg->params[varID]);
+          p->param.name = parse_arg->params[varID].name;
+
+ 	  if ( parse_arg->debug )
+	    printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
+                   p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
+         
 	  p->ltmpvar = false;
 	  if ( ! parse_arg->init )
 	    {
@@ -1020,9 +1034,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	  parse_arg->zaxisID2   = -1;
           parse_arg->tsteptype2 = -1;
 
-          printf(">> = init1: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
+          // printf(">> = init1: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
           rnode = expr_run(p->u.opr.op[1], parse_arg);
-          printf(">> = init2: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
+          // printf(">> = init2: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
 
 	  if ( parse_arg->init )
 	    {
@@ -1052,11 +1066,13 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                   if ( varID >= parse_arg->maxparams )
                     cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
-                  parse_arg->params[varID].name = strdup(varname2);
-                  parse_arg->params[varID].missval = parse_arg->missval2;
-                  parse_arg->params[varID].gridID = parse_arg->gridID2;
-                  parse_arg->params[varID].zaxisID = parse_arg->zaxisID2;
+                  parse_arg->params[varID].name     = strdup(varname2);
+                  parse_arg->params[varID].missval  = parse_arg->missval2;
+                  parse_arg->params[varID].gridID   = parse_arg->gridID2;
+                  parse_arg->params[varID].zaxisID  = parse_arg->zaxisID2;
                   parse_arg->params[varID].steptype = parse_arg->tsteptype2;
+                  parse_arg->params[varID].ngp      = gridInqSize(parse_arg->gridID2);
+                  parse_arg->params[varID].nlev     = zaxisInqSize(parse_arg->zaxisID2);
                   parse_arg->nparams++;
                 }
 	    }
@@ -1079,13 +1095,16 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 		{
                   parse_arg->gridID2  = parse_arg->params[varID].gridID;
                   parse_arg->zaxisID2 = parse_arg->params[varID].zaxisID;
-          printf(">> = run: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
+                  // printf(">> = run: zaxisID2 %d %s\n", parse_arg->zaxisID2, parse_arg->params[varID].name);
                   parse_arg->tsteptype2 = parse_arg->params[varID].steptype;
 
                   param_meta_copy(&p->param, &parse_arg->params[varID]);
+                  p->param.name = parse_arg->params[varID].name;
                   p->param.data = parse_arg->params[varID].data;
 		  p->ltmpvar    = false;
 
+                  //printf(">>copy %s\n", p->param.name);
+                  //printf(">>copy %s\n", rnode->param.name);
 		  ex_copy(p, rnode);
 
 		  if ( rnode->ltmpvar )
