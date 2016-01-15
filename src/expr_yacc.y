@@ -174,7 +174,7 @@ void freeNode(nodeType *p)
 	freeNode(p->u.opr.op[i]);
     }
   
-  free (p);
+  free(p);
 }
 
 void yyerror(void *parse_arg, void *scanner, const char *errstr)

@@ -697,13 +697,10 @@ nodeType *ex_fun(char *fun, nodeType *p1)
 static
 nodeType *ex_uminus_var(nodeType *p1)
 {
-  int gridID  = p1->param.gridID;
-  int zaxisID = p1->param.zaxisID;
-  int nmiss   = p1->param.nmiss;
+  long ngp  = p1->param.ngp;
+  long nlev = p1->param.nlev;
+  int nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
-
-  long ngp  = gridInqSize(gridID);
-  long nlev = zaxisInqSize(zaxisID);
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
