@@ -350,15 +350,13 @@ void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double mi
 static
 nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 {
-  int gridID   = p2->param.gridID;
-  int zaxisID  = p2->param.zaxisID;
-  int nmiss    = p2->param.nmiss;
+  int ngp   = p2->param.ngp;
+  int nlev  = p2->param.nlev;
+  int nmiss = p2->param.nmiss;
   double missval1 = p2->param.missval;
   double missval2 = p2->param.missval;
 
-  int ngp  = gridInqSize(gridID);
-  int nlev = zaxisInqSize(zaxisID);
-  long n   = ngp*nlev;
+  long n   = (long)ngp*nlev;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -426,26 +424,21 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 {
-  long i;
-  long nlev, k;
-  long loff, loff1, loff2;
-  int nmiss;
-
   int nmiss1 = p1->param.nmiss;
   int nmiss2 = p2->param.nmiss;
   double missval1 = p1->param.missval;
   double missval2 = p2->param.missval;
 
-  long ngp1 = gridInqSize(p1->param.gridID);
-  long ngp2 = gridInqSize(p2->param.gridID);
+  long ngp1 = p1->param.ngp;
+  long ngp2 = p2->param.ngp;
 
   if ( ngp1 != ngp2 && ngp2 != 1 )
     cdoAbort("%s: Number of grid points differ (ngp1 = %ld, ngp2 = %ld)", __func__, ngp1, ngp2);
 
   long ngp = ngp1;
 
-  long nlev1 = zaxisInqSize(p1->param.zaxisID);
-  long nlev2 = zaxisInqSize(p2->param.zaxisID);
+  long nlev1 = p1->param.nlev;
+  long nlev2 = p2->param.nlev;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -453,6 +446,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
 
+  long nlev;
   if ( nlev1 > nlev2 )
     {
       if ( nlev2 != 1 ) cdoAbort("nlev2 = %d must be 1!", nlev2);
@@ -471,13 +465,14 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       param_meta_copy(&p->param, &p1->param);
     }
 
-  p->param.name = p1->param.name;
+  p->param.name = p->u.var.nm;
 
   p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-  for ( k = 0; k < nlev; k++ )
+  for ( long k = 0; k < nlev; k++ )
     {
-      loff = k*ngp;
+      long loff1, loff2;
+      long loff = k*ngp;
 
       if ( nlev1 == 1 ) loff1 = 0;
       else              loff1 = k*ngp1;
@@ -496,8 +491,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
         oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
     }
 
-  nmiss = 0;
-  for ( i = 0; i < ngp*nlev; i++ )
+  int nmiss = 0;
+  for ( long i = 0; i < ngp*nlev; i++ )
     if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
 
   p->param.nmiss = nmiss;
