@@ -605,31 +605,25 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 
   int functype = fun_sym_tbl[funcID].type;
 
-  int gridID  = p1->param.gridID;
-  int zaxisID = p1->param.zaxisID;
-  int nmiss   = p1->param.nmiss;
+  long ngp  = p1->param.ngp;
+  long nlev = p1->param.nlev;
+  int nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
-
-  long ngp  = gridInqSize(gridID);
-  long nlev = zaxisInqSize(zaxisID);
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type     = typeVar;
   p->ltmpvar  = true;
   p->u.var.nm = strdup("tmp");
-  p->param.zaxisID  = zaxisID;
-  p->param.missval  = missval;
 
-  if ( functype == 0 )
-    {
-      p->param.gridID = gridID;
-    }
-  else
+  param_meta_copy(&p->param, &p1->param);
+
+  if ( functype == 1 )
     {
       ngp = 1;
       int sgridID = gridCreate(GRID_GENERIC, ngp);
       p->param.gridID = sgridID;
+      p->param.ngp    = ngp;
     }
 
   p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
