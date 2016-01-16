@@ -159,11 +159,11 @@ void oper_expr_con_var(int oper, int nmiss, long n, double missval1, double miss
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POWMN(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] = pow(cval, idat[i]);
       break;
-    case '<':
+    case LT:
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLT(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPLT(cval, idat[i]);
       break;
-    case '>':
+    case GT:
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGT(cval, idat[i]);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPGT(cval, idat[i]);
       break;
@@ -228,11 +228,11 @@ void oper_expr_var_con(int oper, int nmiss, long n, double missval1, double miss
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = POWMN(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] = pow(idat[i], cval);
       break;
-    case '<':
+    case LT:
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPLT(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPLT(idat[i], cval);
       break;
-    case '>':
+    case GT:
       if ( nmiss ) for ( i=0; i<n; ++i ) odat[i] = MVCOMPGT(idat[i], cval);
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPGT(idat[i], cval);
       break;
@@ -265,7 +265,7 @@ void oper_expr_var_con(int oper, int nmiss, long n, double missval1, double miss
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPOR(idat[i], cval);
       break;
     default:
-      cdoAbort("%s: operator >%c< unsupported!", __func__, oper);
+      cdoAbort("%s: operator '%c' unsupported!", __func__, oper);
       break;
     }
 }
@@ -305,11 +305,11 @@ void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double mi
       if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = POWMN(idat1[i], idat2[i]);
       else         for ( i=0; i<ngp; ++i ) odat[i] = pow(idat1[i], idat2[i]);
       break;
-    case '<':
+    case LT:
       if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPLT(idat1[i], idat2[i]);
       else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPLT(idat1[i], idat2[i]);
       break;
-    case '>':
+    case GT:
       if ( nmiss ) for ( i=0; i<ngp; ++i ) odat[i] = MVCOMPGT(idat1[i], idat2[i]);
       else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPGT(idat1[i], idat2[i]);
       break;
@@ -407,8 +407,6 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   double *restrict odat = p->param.data;
   const double *restrict idat = p1->param.data;
   double cval = p2->u.con.value;
-
-  //printf("expr_var_con: alloc %ld oper %d %d %d\n", n, oper, '<', '-');
 
   oper_expr_var_con(oper, nmiss, n, missval1, missval2, odat, idat, cval);
 
@@ -994,11 +992,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	{ 
           param_meta_copy(&p->param, &parse_arg->params[varID]);
           p->param.name = parse_arg->params[varID].name;
-
+          /*
  	  if ( parse_arg->debug )
 	    printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
                    p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
-         
+          */
 	  p->ltmpvar = false;
 	  if ( ! parse_arg->init )
 	    {
@@ -1152,8 +1150,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 		  case '-':  printf("\tsub\n"); break;
 		  case '*':  printf("\tmul\n"); break;
 		  case '/':  printf("\tdiv\n"); break;
-		  case '<':  printf("\tcompLT\n"); break;
-		  case '>':  printf("\tcompGT\n"); break;
+		  case LT:   printf("\tcompLT\n"); break;
+		  case GT:   printf("\tcompGT\n"); break;
 		  case LE:   printf("\tcompLE\n"); break;
 		  case GE:   printf("\tcompGE\n"); break;
 		  case NE:   printf("\tcompNE\n"); break;
