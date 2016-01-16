@@ -265,7 +265,7 @@ void oper_expr_var_con(int oper, int nmiss, long n, double missval1, double miss
       else         for ( i=0; i<n; ++i ) odat[i] =   COMPOR(idat[i], cval);
       break;
     default:
-      cdoAbort("%s: operator %c unsupported!", __func__, oper);
+      cdoAbort("%s: operator >%c< unsupported!", __func__, oper);
       break;
     }
 }
@@ -393,7 +393,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   double missval1 = p1->param.missval;
   double missval2 = p1->param.missval;
 
-  long n   = (long)ngp*nlev;
+  long n = (long)ngp*nlev;
 
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -407,6 +407,8 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   double *restrict odat = p->param.data;
   const double *restrict idat = p1->param.data;
   double cval = p2->u.con.value;
+
+  //printf("expr_var_con: alloc %ld oper %d %d %d\n", n, oper, '<', '-');
 
   oper_expr_var_con(oper, nmiss, n, missval1, missval2, odat, idat, cval);
 
@@ -766,13 +768,24 @@ nodeType *ex_uminus(nodeType *p1)
 static
 nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 {
-  if ( cdoVerbose ) printf("\t %s ? %s : %s\n", p1->u.var.nm, p2->u.var.nm, p3->u.var.nm);
-
   if ( p1->type == typeCon ) cdoAbort("expr?expr:expr: First expression is a constant but must be a variable!");
 
+  if ( cdoVerbose )
+    {
+      printf("\t%s ? ", p1->u.var.nm);
+      if ( p2->type == typeCon )
+        printf("%g : ", p2->u.con.value);
+      else
+        printf("%s : ", p2->u.var.nm);
+      if ( p3->type == typeCon )
+        printf("%g\n", p3->u.con.value);
+      else
+        printf("%s\n", p3->u.var.nm);
+    }
+
   int nmiss1 = p1->param.nmiss;
-  long ngp1 = gridInqSize(p1->param.gridID);
-  long nlev1 = zaxisInqSize(p1->param.zaxisID);
+  long ngp1 = p1->param.ngp;
+  long nlev1 = p1->param.nlev;
   double missval1 = p1->param.missval;
   double *pdata1 = p1->param.data;
 
@@ -791,8 +804,8 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
     }
   else
     {
-      ngp2 = gridInqSize(p2->param.gridID);
-      nlev2 = zaxisInqSize(p2->param.zaxisID);
+      ngp2 = p2->param.ngp;
+      nlev2 = p2->param.nlev;
       missval2 = p2->param.missval;
       pdata2 = p2->param.data;
       if ( ngp2 > 1 && ngp2 != ngp1 )
@@ -820,8 +833,8 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
     }
   else
     {
-      ngp3 = gridInqSize(p3->param.gridID);
-      nlev3 = zaxisInqSize(p3->param.zaxisID);
+      ngp3 = p3->param.ngp;
+      nlev3 = p3->param.nlev;
       missval3 = p3->param.missval;
       pdata3 = p3->param.data;
       if ( ngp3 > 1 && ngp3 != ngp1 )
@@ -849,11 +862,11 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
 
   p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-  long loff, loff1, loff2, loff3;
 
   for ( long k = 0; k < nlev; ++k )
     {
-      loff = k*ngp;
+      long loff1, loff2, loff3;
+      long loff = k*ngp;
 
       if ( nlev1 == 1 ) loff1 = 0;
       else              loff1 = k*ngp;
