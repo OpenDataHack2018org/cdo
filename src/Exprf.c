@@ -134,9 +134,9 @@ void *Expr(void *argument)
   parse_arg.debug      = false;
   if ( cdoVerbose ) parse_arg.debug = true;
   parse_arg.params     = params;
-  parse_arg.gridID2    = -1;
-  parse_arg.zaxisID2   = -1;
-  parse_arg.tsteptype2 = -1;
+  parse_arg.param2.gridID   = -1;
+  parse_arg.param2.zaxisID  = -1;
+  parse_arg.param2.steptype = -1;
   parse_arg.surfaceID  = surfaceID;
   parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
 
@@ -211,6 +211,8 @@ void *Expr(void *argument)
       int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
       vlistDefVarName(vlistID2, varID, params[pidx].name);
       vlistDefVarMissval(vlistID2, varID, params[pidx].missval);
+      if ( params[pidx].units ) vlistDefVarUnits(vlistID2, varID, params[pidx].units);
+      if ( params[pidx].longname ) vlistDefVarLongname(vlistID2, varID, params[pidx].longname);
       if ( memcmp(params[pidx].name, "var", 3) == 0 )
         {
           if ( strlen(params[pidx].name) > 3 && isdigit(params[pidx].name[3]) )
@@ -224,16 +226,6 @@ void *Expr(void *argument)
 
   int nvars2 = vlistNvars(vlistID2);
   if ( nvars2 == 0 ) cdoAbort("No output variable found!");
-
-  if ( cdoVerbose ) vlistPrint(vlistID2);
-
-  int taxisID1 = vlistInqTaxis(vlistID1);
-  int taxisID2 = taxisDuplicate(taxisID1);
-  vlistDefTaxis(vlistID2, taxisID2);
-
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
 
   for ( int varID = 0; varID < nvars1; varID++ )
     {
@@ -252,6 +244,7 @@ void *Expr(void *argument)
       params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
 
+  // cleanup needed!!!
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
     {
       int coord = params[varID].coord;
@@ -261,30 +254,28 @@ void *Expr(void *argument)
           if ( coord == 'x' || coord == 'y' )
             {
               if ( gridInqType(gridID) == GRID_GENERIC )
-                cdoAbort("Not a geographical coordinate!", params[varID].name);
+                cdoAbort("%s: not a geographical coordinate!", params[varID].name);
               if ( gridInqType(gridID) == GRID_GME )
                 gridID = gridToUnstructured(gridID, 0);
               if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
                 gridID = gridToCurvilinear(gridID, 0);
 
-              size_t ngp = params[varID].ngp;
-              char units[CDI_MAX_NAME];
-              if ( coord == 'x' )
-                {
-                  gridInqXvals(gridID, params[varID].data);
-                  gridInqXunits(gridID, units);
-                  grid_to_radian(units, ngp, params[varID].data, "grid center lon");
-                }
-              else
-                {
-                  gridInqYvals(gridID, params[varID].data);
-                  gridInqYunits(gridID, units);
-                  grid_to_radian(units, ngp, params[varID].data, "grid center lat");
-                }        
+              if      ( coord == 'x' ) gridInqXvals(gridID, params[varID].data);
+              else if ( coord == 'y' ) gridInqYvals(gridID, params[varID].data);
             }
           if ( gridID != params[varID].gridID ) gridDestroy(gridID);
         }
     }
+ 
+  if ( cdoVerbose ) vlistPrint(vlistID2);
+    
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
+
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+
+  streamDefVlist(streamID2, vlistID2);
 
   int nrecs;
   int tsID = 0;

@@ -78,11 +78,8 @@ typedef struct {
   int    maxparams;
   int    nparams;
   int    nvars1;
-  int    gridID2;
-  int    zaxisID2;
-  int    tsteptype2;
   int    surfaceID;
-  double missval2;
+  paramType param2;
   paramType *params;
 } parse_param_t;
 

@@ -924,6 +924,7 @@ int exNode(nodeType *p, parse_param_t *parse_arg)
 nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 {
   paramType *params = parse_arg->params;
+  paramType *param2 = &parse_arg->param2;
   int gridID1 = -1, zaxisID1 = -1, tsteptype1 = -1;
   int varID;
   nodeType *rnode = NULL;
@@ -982,6 +983,10 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         if ( nvarID >= parse_arg->maxparams )
                           cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
+                        char units[CDI_MAX_NAME];
+                        if      ( coord == 'x' ) gridInqXunits(params[varID].gridID, units);
+                        else if ( coord == 'y' ) gridInqYunits(params[varID].gridID, units);
+                                      
                         params[nvarID].coord    = coord;
                         params[nvarID].name     = strdup(vnm);
                         params[nvarID].missval  = params[varID].missval;
@@ -990,7 +995,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         params[nvarID].steptype = TIME_CONSTANT;
                         params[nvarID].ngp      = params[varID].ngp;
                         params[nvarID].nlev     = 1;
+                        if ( units[0] ) params[nvarID].units = strdup(units);
                         parse_arg->nparams++;
+                        varID = nvarID;
                       }
                   }
             }
@@ -1011,20 +1018,20 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
               zaxisID1   = params[varID].zaxisID;
               tsteptype1 = params[varID].steptype;
               nlev1      = params[varID].nlev;
-              
-	      parse_arg->missval2 = params[varID].missval;
 
-	      if ( parse_arg->gridID2 == -1 )
-		parse_arg->gridID2 = gridID1;
+              param2->units   = params[varID].units;
+              param2->missval = params[varID].missval;
+
+	      if ( param2->gridID == -1 ) param2->gridID = gridID1;
 
               // printf(">> typeVar: zaxisID2 %d %s\n", parse_arg->zaxisID2, params[varID].name);
-	      if ( parse_arg->zaxisID2 != -1 ) nlev2 = zaxisInqSize(parse_arg->zaxisID2);
+	      if ( param2->zaxisID != -1 ) nlev2 = zaxisInqSize(param2->zaxisID);
 
-	      if ( parse_arg->zaxisID2 == -1 || (nlev1 > 1 && nlev2 == 1) )
-		parse_arg->zaxisID2 = zaxisID1;
+	      if ( param2->zaxisID == -1 || (nlev1 > 1 && nlev2 == 1) )
+		param2->zaxisID = zaxisID1;
 
-	      if ( parse_arg->tsteptype2 == -1 || parse_arg->tsteptype2 == TSTEP_CONSTANT )
-		parse_arg->tsteptype2 = tsteptype1;
+	      if ( param2->steptype == -1 /*|| param2->steptype == TSTEP_CONSTANT*/ )
+		param2->steptype = tsteptype1;
 	    }
 	}
 	/* else */
@@ -1062,9 +1069,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       switch( p->u.opr.oper )
 	{
         case '=':
-	  parse_arg->gridID2    = -1;
-	  parse_arg->zaxisID2   = -1;
-          parse_arg->tsteptype2 = -1;
+	  param2->gridID   = -1;
+	  param2->zaxisID  = -1;
+          param2->steptype = -1;
 
           // printf(">> = init1: zaxisID2 %d %s\n", parse_arg->zaxisID2, params[varID].name);
           rnode = expr_run(p->u.opr.op[1], parse_arg);
@@ -1078,7 +1085,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	      if ( p->u.opr.op[1]->type != typeVar )
 		cdoAbort("Operand not variable!");
 	      */
-	      if ( parse_arg->gridID2 == -1 || parse_arg->zaxisID2 == -1 || parse_arg->tsteptype2 == -1 )
+	      if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
 		cdoAbort("Operand not variable!");
 
 	      const char *varname2 = p->u.opr.op[0]->u.var.nm;
@@ -1098,14 +1105,14 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                   if ( varID >= parse_arg->maxparams )
                     cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
+                  param_meta_copy(&params[varID], &parse_arg->param2);
                   params[varID].coord    = 0;
                   params[varID].name     = strdup(varname2);
-                  params[varID].missval  = parse_arg->missval2;
-                  params[varID].gridID   = parse_arg->gridID2;
-                  params[varID].zaxisID  = parse_arg->zaxisID2;
-                  params[varID].steptype = parse_arg->tsteptype2;
-                  params[varID].ngp      = gridInqSize(parse_arg->gridID2);
-                  params[varID].nlev     = zaxisInqSize(parse_arg->zaxisID2);
+                  if ( param2->units ) params[varID].units = strdup(param2->units);
+                  params[varID].gridID   = param2->gridID;
+                  params[varID].zaxisID  = param2->zaxisID;
+                  params[varID].ngp      = gridInqSize(param2->gridID);
+                  params[varID].nlev     = zaxisInqSize(param2->zaxisID);
                   parse_arg->nparams++;
                 }
 	    }
@@ -1125,10 +1132,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 		}
 	      else
 		{
-                  parse_arg->gridID2  = params[varID].gridID;
-                  parse_arg->zaxisID2 = params[varID].zaxisID;
-                  // printf(">> = run: zaxisID2 %d %s\n", parse_arg->zaxisID2, params[varID].name);
-                  parse_arg->tsteptype2 = params[varID].steptype;
+                  param2->gridID   = params[varID].gridID;
+                  param2->zaxisID  = params[varID].zaxisID;
+                  param2->steptype = params[varID].steptype;
 
                   param_meta_copy(&p->param, &params[varID]);
                   p->param.name = params[varID].name;
