@@ -925,7 +925,6 @@ int exNode(nodeType *p, parse_param_t *parse_arg)
 nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 {
   int gridID1 = -1, zaxisID1 = -1, tsteptype1 = -1;
-  double missval = 0;
   int varID;
   nodeType *rnode = NULL;
 
@@ -974,10 +973,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
               gridID1    = parse_arg->params[varID].gridID;
               zaxisID1   = parse_arg->params[varID].zaxisID;
               tsteptype1 = parse_arg->params[varID].steptype;
-              missval    = parse_arg->params[varID].missval;
               nlev1      = parse_arg->params[varID].nlev;
               
-	      parse_arg->missval2 = missval;
+	      parse_arg->missval2 = parse_arg->params[varID].missval;
 
 	      if ( parse_arg->gridID2 == -1 )
 		parse_arg->gridID2 = gridID1;
