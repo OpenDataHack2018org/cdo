@@ -39,7 +39,7 @@
 
 #define IS_SURFACE_LEVEL(zaxisID)  (zaxisInqType(zaxisID) == ZAXIS_SURFACE && zaxisInqSize(zaxisID) == 1)
 
-static
+
 int getSurfaceID(int vlistID)
 {
   int surfID = -1;

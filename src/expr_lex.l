@@ -62,6 +62,11 @@ M_E          {
                 return FUNCTION;
              } /* end functions */
 
+{LPH}{LPHDGT}*\.{LPH}* {
+                /* Recognize coordinates, e.g., var_nm.x (lon of var_nm) */
+                yylval->varnm = strdup(yytext);
+                return VARIABLE;
+             }
 
 {LPH}{LPHDGT}* {
                 yylval->varnm = strdup(yytext);

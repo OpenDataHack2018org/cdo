@@ -38,16 +38,17 @@ typedef struct {
 
 // parameter
 typedef struct {
-  bool select;
-  int gridID;
-  int zaxisID;
-  int steptype;
-  int ngp;
-  int nlev;
-  int nmiss;
-  char *name;
-  char *longname;
-  char *units;
+  bool   select;
+  int    coord;
+  int    gridID;
+  int    zaxisID;
+  int    steptype;
+  int    ngp;
+  int    nlev;
+  int    nmiss;
+  char  *name;
+  char  *longname;
+  char  *units;
   double missval;
   double *data;
 } paramType;
@@ -80,6 +81,7 @@ typedef struct {
   int    gridID2;
   int    zaxisID2;
   int    tsteptype2;
+  int    surfaceID;
   double missval2;
   paramType *params;
 } parse_param_t;

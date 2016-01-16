@@ -38,8 +38,10 @@ Constansts: M_PI, M_E
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 #include "expr.h"
 
+int getSurfaceID(int vlistID);
 
 static
 char *exprs_from_arg(const char *arg)
@@ -121,6 +123,8 @@ void *Expr(void *argument)
   int vlistID1 = streamInqVlist(streamID1);
   int nvars1 = vlistNvars(vlistID1);
 
+  int surfaceID = getSurfaceID(vlistID1);
+
   paramType *params    = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
   memset(params, 0, MAX_PARAMS*sizeof(paramType));
   parse_arg.maxparams  = MAX_PARAMS;
@@ -133,6 +137,7 @@ void *Expr(void *argument)
   parse_arg.gridID2    = -1;
   parse_arg.zaxisID2   = -1;
   parse_arg.tsteptype2 = -1;
+  parse_arg.surfaceID  = surfaceID;
   parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
 
   char name[CDI_MAX_NAME];
@@ -152,6 +157,7 @@ void *Expr(void *argument)
       vlistInqVarUnits(vlistID1, varID, units);
       
       params[varID].select   = false;
+      params[varID].coord    = 0;
       params[varID].gridID   = gridID;
       params[varID].zaxisID  = zaxisID;
       params[varID].steptype = steptype;
@@ -181,7 +187,8 @@ void *Expr(void *argument)
 
   if ( cdoVerbose )
     for ( int varID = 0; varID < parse_arg.nparams; varID++ )
-      printf("var: %d %s ngp=%d nlev=%d\n", varID, params[varID].name, params[varID].ngp, params[varID].nlev);
+      printf("var: %d %s ngp=%d nlev=%d coord=%c\n",
+             varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord);
 
   int vlistID2 = -1;
   if ( REPLACES_VARIABLES(operatorID) )
@@ -199,7 +206,8 @@ void *Expr(void *argument)
   for ( int pidx = 0; pidx < parse_arg.nparams; pidx++ )
     {
       if ( pidx < nvars1 && params[pidx].select == false ) continue;
-      if ( *params[pidx].name == '_' ) continue;
+      if ( pidx >= nvars1 && *params[pidx].name == '_' ) continue;
+      if ( pidx >= nvars1 && params[pidx].coord ) continue;
       int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
       vlistDefVarName(vlistID2, varID, params[pidx].name);
       vlistDefVarMissval(vlistID2, varID, params[pidx].missval);
@@ -231,41 +239,53 @@ void *Expr(void *argument)
     {
       if ( parse_arg.needed[varID] )
         {
-          int ngp  = params[varID].ngp;
-          int nlev = params[varID].nlev;
+          size_t ngp  = params[varID].ngp;
+          size_t nlev = params[varID].nlev;
           params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
         }
     }
-  /*
-  for ( int varID = 0; varID < nvars; varID++ )
-    {
-      parse_arg.vardata2[varID] = params[varID].data;
-    }
-  */
-  // printf(">>>> nvars1, nvars, nvars2 %d %d %d\n", nvars1, nvars, nvars2);
 
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
     {
-      int gridID  = params[varID].gridID;
-      int zaxisID = params[varID].zaxisID;
-      int ngp  = gridInqSize(gridID);
-      int nlev = zaxisInqSize(zaxisID);
-      // int ngp  = params[varID].ngp;
-      // int nlev = params[varID].nlev;
-      // printf("name %s ngp %d nlev %d\n", params[varID].name, ngp, nlev);
+      size_t ngp  = params[varID].ngp;
+      size_t nlev = params[varID].nlev;
       params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
-  /*
-  for ( int varID = nvars; varID < nvars2; varID++ )
-    {
-      int gridID  = vlistInqVarGrid(vlistID2, varID);
-      int zaxisID = vlistInqVarZaxis(vlistID2, varID);
 
-      int gridsize = gridInqSize(gridID);
-      int nlevel   = zaxisInqSize(zaxisID);
-      parse_arg.vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
+    {
+      int coord = params[varID].coord;
+      if ( coord )
+        {
+          int gridID = params[varID].gridID;
+          if ( coord == 'x' || coord == 'y' )
+            {
+              if ( gridInqType(gridID) == GRID_GENERIC )
+                cdoAbort("Not a geographical coordinate!", params[varID].name);
+              if ( gridInqType(gridID) == GRID_GME )
+                gridID = gridToUnstructured(gridID, 0);
+              if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+                gridID = gridToCurvilinear(gridID, 0);
+
+              size_t ngp = params[varID].ngp;
+              char units[CDI_MAX_NAME];
+              if ( coord == 'x' )
+                {
+                  gridInqXvals(gridID, params[varID].data);
+                  gridInqXunits(gridID, units);
+                  grid_to_radian(units, ngp, params[varID].data, "grid center lon");
+                }
+              else
+                {
+                  gridInqYvals(gridID, params[varID].data);
+                  gridInqYunits(gridID, units);
+                  grid_to_radian(units, ngp, params[varID].data, "grid center lat");
+                }        
+            }
+          if ( gridID != params[varID].gridID ) gridDestroy(gridID);
+        }
     }
-  */
+
   int nrecs;
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
