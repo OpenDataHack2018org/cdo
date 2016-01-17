@@ -544,7 +544,6 @@ void verify_grid_old(int gridsize, int ncorner,
 
 void *Verifygrid(void *argument)
 {
-  int ncorner = 0;
   bool lgrid_gen_bounds = false, luse_grid_corner = true;
   double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
   char units[CDI_MAX_NAME];
@@ -566,17 +565,17 @@ void *Verifygrid(void *argument)
     }
 
   int gridsize = gridInqSize(gridID);
-
+  /*
   if ( gridInqMaskGME(gridID, NULL) )
     {
       int *grid_mask = (int*) Malloc(gridsize*sizeof(int));
       gridInqMaskGME(gridID, grid_mask);
+      free(grid_mask);
     }
-
+  */
+  int ncorner = 4;
   if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
     ncorner = gridInqNvertex(gridID);
-  else
-    ncorner = 4;
 
   double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
   double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
