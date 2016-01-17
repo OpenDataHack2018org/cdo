@@ -123,6 +123,7 @@ void *Expr(void *argument)
   int vlistID1 = streamInqVlist(streamID1);
   int nvars1 = vlistNvars(vlistID1);
 
+  int pointID   = gridCreate(GRID_GENERIC, 1);
   int surfaceID = getSurfaceID(vlistID1);
 
   paramType *params    = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
@@ -137,6 +138,7 @@ void *Expr(void *argument)
   parse_arg.param2.gridID   = -1;
   parse_arg.param2.zaxisID  = -1;
   parse_arg.param2.steptype = -1;
+  parse_arg.pointID    = pointID;
   parse_arg.surfaceID  = surfaceID;
   parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
 
@@ -250,9 +252,9 @@ void *Expr(void *argument)
       int coord = params[varID].coord;
       if ( coord )
         {
-          int gridID = params[varID].gridID;
           if ( coord == 'x' || coord == 'y' )
             {
+              int gridID = params[varID].gridID;
               if ( gridInqType(gridID) == GRID_GENERIC )
                 cdoAbort("%s: not a geographical coordinate!", params[varID].name);
               if ( gridInqType(gridID) == GRID_GME )
@@ -262,8 +264,14 @@ void *Expr(void *argument)
 
               if      ( coord == 'x' ) gridInqXvals(gridID, params[varID].data);
               else if ( coord == 'y' ) gridInqYvals(gridID, params[varID].data);
+              if ( gridID != params[varID].gridID ) gridDestroy(gridID);
             }
-          if ( gridID != params[varID].gridID ) gridDestroy(gridID);
+          else if ( coord == 'z' )
+            {
+              int zaxisID = params[varID].zaxisID;
+              printf("zaxisID %d\n", zaxisID);
+              zaxisInqLevels(zaxisID, params[varID].data);
+            }
         }
     }
  

@@ -78,6 +78,7 @@ typedef struct {
   int    maxparams;
   int    nparams;
   int    nvars1;
+  int    pointID;
   int    surfaceID;
   paramType param2;
   paramType *params;
