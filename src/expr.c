@@ -515,10 +515,10 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 }
 
 static
-void ex_copy(nodeType *p2, nodeType *p1)
+void ex_copy_var(nodeType *p2, nodeType *p1)
 {
   if ( cdoVerbose ) printf("\tcopy %s\n", p1->u.var.nm);
-
+  
   int ngp = p1->param.ngp;
   assert(ngp > 0);
 
@@ -533,10 +533,39 @@ void ex_copy(nodeType *p2, nodeType *p1)
     cdoAbort("%s: Number of levels differ (%s[%d] = %s[%d])",
              __func__, p2->param.name, p2->param.nlev, p1->param.name, nlev);
 
-  for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) p2->param.data[i] = p1->param.data[i];
+  double *restrict odat = p2->param.data;
+  const double *restrict idat = p1->param.data;
+  for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = idat[i];
 
   p2->param.missval = p1->param.missval;
   p2->param.nmiss   = p1->param.nmiss;
+}
+
+static
+void ex_copy_con(nodeType *p2, nodeType *p1)
+{
+  if ( cdoVerbose ) printf("\tcopy %g\n", p1->u.con.value);
+  
+  int ngp = p2->param.ngp;
+  assert(ngp > 0);
+
+  int nlev = p2->param.nlev;
+  assert(nlev > 0);
+
+  double cval = p1->u.con.value;
+  double *restrict odat = p2->param.data;
+  assert(odat != NULL);
+
+  for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = cval;
+}
+
+static
+void ex_copy(nodeType *p2, nodeType *p1)
+{
+  if ( p1->type == typeCon )
+    ex_copy_con(p2, p1);
+  else
+    ex_copy_var(p2, p1);
 }
 
 static
@@ -1130,21 +1159,25 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	    {
 	      if ( parse_arg->debug )
 		printf("\tpop  var \t%s\n", p->u.opr.op[0]->u.var.nm);
-	      /*
-	      if ( p->u.opr.op[1]->type != typeVar )
-		cdoAbort("Operand not variable!");
-	      */
-	      if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
-		cdoAbort("Operand not variable!");
 
+              //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
+              if ( p->u.opr.op[1]->type != typeCon )
+                {
+                  if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
+                    cdoAbort("Operand not variable!");
+                }
 	      const char *varname2 = p->u.opr.op[0]->u.var.nm;
               varID = param_search_name(parse_arg->nparams, params, varname2);
               if ( varID >= 0 )
                 {
-                  if ( varID < parse_arg->nvars1 ) params[varID].select = true;
+                  if ( varID < parse_arg->nvars1 )
+                    {
+                      params[varID].select = true;
+                      parse_arg->needed[varID] = true;
+                    }
                   else cdoWarning("Variable %s already defined!", varname2);
                 }
-              else
+              else if ( p->u.opr.op[1]->type != typeCon )
                 {
                   varID = parse_arg->nparams;
                   if ( varID >= parse_arg->maxparams )
@@ -1164,32 +1197,31 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	  else
 	    {
 	      if ( parse_arg->debug )
-		printf("\tpop  var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
-
+                {
+                  if ( rnode->type == typeCon )
+                    printf("\tpop  var\t%s\t%g\n", p->u.opr.op[0]->u.var.nm, rnode->u.con.value);
+                  else
+                    printf("\tpop  var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
+                }
+              
               varID = param_search_name(parse_arg->nparams, params, p->u.opr.op[0]->u.var.nm);
-	      if ( varID < 0 )
-		{
-		  cdoAbort("Variable >%s< not found!", p->u.opr.op[0]->u.var.nm);
-		}
-	      else
-		{
-                  param2->gridID   = params[varID].gridID;
-                  param2->zaxisID  = params[varID].zaxisID;
-                  param2->steptype = params[varID].steptype;
+	      if ( varID < 0 ) cdoAbort("Variable >%s< not found!", p->u.opr.op[0]->u.var.nm);
 
-                  param_meta_copy(&p->param, &params[varID]);
-                  p->param.name = params[varID].name;
-                  p->param.data = params[varID].data;
-		  p->ltmpvar    = false;
+              param2->gridID   = params[varID].gridID;
+              param2->zaxisID  = params[varID].zaxisID;
+              param2->steptype = params[varID].steptype;
 
-                  //printf(">>copy %s\n", p->param.name);
-                  //printf(">>copy %s\n", rnode->param.name);
-		  ex_copy(p, rnode);
+              param_meta_copy(&p->param, &params[varID]);
+              p->param.name = params[varID].name;
+              p->param.data = params[varID].data;
+              p->ltmpvar    = false;
 
-		  if ( rnode->ltmpvar )
-                    {
-                      Free(rnode->param.data);
-                    }
+              //printf(">>copy %s %p\n", p->param.name, p->param.data );
+              ex_copy(p, rnode);
+              
+              if ( rnode->type != typeCon && rnode->ltmpvar )
+                {
+                  Free(rnode->param.data);
                 }
 	    }
 
