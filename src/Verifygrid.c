@@ -542,6 +542,14 @@ void verify_grid_old(int gridsize, int ncorner,
 }
 
 
+static
+void verify_grid_test(int gridsize, int ncorner,
+                      double *grid_center_lon, double *grid_center_lat,
+                      double *grid_corner_lon, double *grid_corner_lat)
+{
+  cdoAbort("implementation missing");
+}
+
 void *Verifygrid(void *argument)
 {
   bool lgrid_gen_bounds = false, luse_grid_corner = true;
@@ -549,6 +557,11 @@ void *Verifygrid(void *argument)
   char units[CDI_MAX_NAME];
 
   cdoInitialize(argument);
+
+  int VERIFYGRID     = cdoOperatorAdd("verifygrid",  0,   0, NULL);
+  int VERIFYGRIDTEST = cdoOperatorAdd("verifygridtest",  0,   0, NULL);
+
+  int operatorID = cdoOperatorID();
 
   int streamID = streamOpenRead(cdoStreamName(0));
 
@@ -622,8 +635,11 @@ void *Verifygrid(void *argument)
     }
 
   streamClose(streamID);
-    
-  verify_grid(gridsize, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
+
+  if ( operatorID == VERIFYGRID )
+    verify_grid(gridsize, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
+  else
+    verify_grid_test(gridsize, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
 
   if ( grid_center_lon ) Free(grid_center_lon);
   if ( grid_center_lat ) Free(grid_center_lat);
