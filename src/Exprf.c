@@ -88,6 +88,64 @@ char *exprs_from_file(const char *exprf)
 
 #define MAX_PARAMS 4096
 
+static
+paramType *params_new(int vlistID1)
+{
+  paramType *params = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
+  memset(params, 0, MAX_PARAMS*sizeof(paramType));
+
+  int nvars1 = vlistNvars(vlistID1);
+
+  char name[CDI_MAX_NAME];
+  char longname[CDI_MAX_NAME];
+  char units[CDI_MAX_NAME];
+  for ( int varID = 0; varID < nvars1; varID++ )
+    {
+      int gridID     = vlistInqVarGrid(vlistID1, varID);
+      int zaxisID    = vlistInqVarZaxis(vlistID1, varID);
+      int steptype   = vlistInqVarTsteptype(vlistID1, varID);
+      int ngp        = gridInqSize(gridID);
+      int nlev       = zaxisInqSize(zaxisID);
+      double missval = vlistInqVarMissval(vlistID1, varID);
+
+      vlistInqVarName(vlistID1, varID, name);
+      vlistInqVarLongname(vlistID1, varID, longname);
+      vlistInqVarUnits(vlistID1, varID, units);
+      
+      params[varID].select   = false;
+      params[varID].coord    = 0;
+      params[varID].gridID   = gridID;
+      params[varID].zaxisID  = zaxisID;
+      params[varID].steptype = steptype;
+      params[varID].ngp      = ngp;
+      params[varID].nlev     = nlev;
+      params[varID].missval  = missval;
+      params[varID].nmiss    = 0;
+      params[varID].data     = NULL;
+      params[varID].name     = strdup(name);
+      params[varID].longname = strdup(longname);
+      params[varID].units    = strdup(units);
+    }
+
+  return params;
+}
+
+static
+void params_delete(paramType *params)
+{
+  if ( params )
+    {
+      for ( int varID = 0; varID < MAX_PARAMS; varID++ )
+        {
+          if ( params[varID].data )     Free(params[varID].data);
+          if ( params[varID].name )     Free(params[varID].name);
+          if ( params[varID].longname ) Free(params[varID].longname);
+          if ( params[varID].units )    Free(params[varID].units);
+        }
+      Free(params);
+    }
+}
+
 void *Expr(void *argument)
 {
   cdoInitialize(argument);
@@ -126,8 +184,8 @@ void *Expr(void *argument)
   int pointID   = gridCreate(GRID_GENERIC, 1);
   int surfaceID = getSurfaceID(vlistID1);
 
-  paramType *params    = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
-  memset(params, 0, MAX_PARAMS*sizeof(paramType));
+  paramType *params = params_new(vlistID1);
+
   parse_arg.maxparams  = MAX_PARAMS;
   parse_arg.nparams    = nvars1;
   parse_arg.nvars1     = nvars1;
@@ -141,37 +199,6 @@ void *Expr(void *argument)
   parse_arg.pointID    = pointID;
   parse_arg.surfaceID  = surfaceID;
   parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
-
-  char name[CDI_MAX_NAME];
-  char longname[CDI_MAX_NAME];
-  char units[CDI_MAX_NAME];
-  for ( int varID = 0; varID < nvars1; varID++ )
-    {
-      int gridID     = vlistInqVarGrid(vlistID1, varID);
-      int zaxisID    = vlistInqVarZaxis(vlistID1, varID);
-      int steptype   = vlistInqVarTsteptype(vlistID1, varID);
-      int ngp        = gridInqSize(gridID);
-      int nlev       = zaxisInqSize(zaxisID);
-      double missval = vlistInqVarMissval(vlistID1, varID);
-
-      vlistInqVarName(vlistID1, varID, name);
-      vlistInqVarLongname(vlistID1, varID, longname);
-      vlistInqVarUnits(vlistID1, varID, units);
-      
-      params[varID].select   = false;
-      params[varID].coord    = 0;
-      params[varID].gridID   = gridID;
-      params[varID].zaxisID  = zaxisID;
-      params[varID].steptype = steptype;
-      params[varID].ngp      = ngp;
-      params[varID].nlev     = nlev;
-      params[varID].missval  = missval;
-      params[varID].nmiss    = 0;
-      params[varID].data     = NULL;
-      params[varID].name     = strdup(name);
-      params[varID].longname = strdup(longname);
-      params[varID].units    = strdup(units);
-    }
 
   /* Set all input variables to 'needed' if replacing is switched off */
   for ( int varID = 0; varID < nvars1; varID++ )
@@ -233,17 +260,17 @@ void *Expr(void *argument)
     {
       if ( parse_arg.needed[varID] )
         {
-          size_t ngp  = params[varID].ngp;
-          size_t nlev = params[varID].nlev;
-          params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
+          int ngp  = params[varID].ngp;
+          int nlev = params[varID].nlev;
+          params[varID].data = (double*) Malloc((size_t)ngp*nlev*sizeof(double));
         }
     }
 
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
     {
-      size_t ngp  = params[varID].ngp;
-      size_t nlev = params[varID].nlev;
-      params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
+      int ngp  = params[varID].ngp;
+      int nlev = params[varID].nlev;
+      params[varID].data = (double*) Malloc((size_t)ngp*nlev*sizeof(double));
     }
 
   // cleanup needed!!!
@@ -269,7 +296,6 @@ void *Expr(void *argument)
           else if ( coord == 'z' )
             {
               int zaxisID = params[varID].zaxisID;
-              printf("zaxisID %d\n", zaxisID);
               zaxisInqLevels(zaxisID, params[varID].data);
             }
         }
@@ -301,9 +327,9 @@ void *Expr(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  if ( parse_arg.needed[varID] )
 	    {
-	      int offset = params[varID].ngp*levelID;
-              int nmiss;
+	      size_t offset = (size_t)params[varID].ngp*levelID;
 	      double *vardata = params[varID].data + offset;
+              int nmiss;
 	      streamReadRecord(streamID1, vardata, &nmiss);
 	      params[varID].nmiss += nmiss;
 	    }
@@ -313,12 +339,10 @@ void *Expr(void *argument)
 	{
           int pidx = varIDmap[varID];
           if ( pidx < nvars1 ) continue;
-	  int gridID   = vlistInqVarGrid(vlistID2, varID);
-	  int zaxisID  = vlistInqVarZaxis(vlistID2, varID);
-	  int gridsize = gridInqSize(gridID);
-	  int nlevel   = zaxisInqSize(zaxisID);
+          int ngp  = params[pidx].ngp;
+          int nlev = params[pidx].nlev;
 
-	  memset(params[pidx].data, 0, gridsize*nlevel*sizeof(double));
+	  memset(params[pidx].data, 0, (size_t)ngp*nlev*sizeof(double));
 	}
 
       yy_scan_string(exprs, scanner);
@@ -327,19 +351,17 @@ void *Expr(void *argument)
       for ( int varID = 0; varID < nvars2; varID++ )
 	{
           int pidx = varIDmap[varID];
-	  int gridID  = vlistInqVarGrid(vlistID2, varID);
-	  int zaxisID = vlistInqVarZaxis(vlistID2, varID);
 	  double missval = vlistInqVarMissval(vlistID2, varID);
 
-	  int gridsize = gridInqSize(gridID);
-	  int nlevel   = zaxisInqSize(zaxisID);
-	  for ( int levelID = 0; levelID < nlevel; levelID++ )
+          int ngp  = params[pidx].ngp;
+          int nlev = params[pidx].nlev;
+	  for ( int levelID = 0; levelID < nlev; levelID++ )
 	    {
-	      int offset = gridsize*levelID;
+              size_t offset = (size_t)ngp*levelID;
 	      double *vardata = params[pidx].data + offset;
 
 	      int nmiss = 0;
-	      for ( int i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < ngp; i++ )
 		if ( DBL_IS_EQUAL(vardata[i], missval) ) nmiss++;
 
 	      streamDefRecord(streamID2, varID, levelID);
@@ -359,17 +381,7 @@ void *Expr(void *argument)
 
   if ( exprs ) Free(exprs);
 
-  if ( params )
-    {
-      for ( int varID = 0; varID < MAX_PARAMS; varID++ )
-        {
-          if ( params[varID].data )     Free(params[varID].data);
-          if ( params[varID].name )     Free(params[varID].name);
-          if ( params[varID].longname ) Free(params[varID].longname);
-          if ( params[varID].units )    Free(params[varID].units);
-        }
-      Free(params);
-    }
+  params_delete(params);
 
   if ( parse_arg.needed ) Free(parse_arg.needed);
   if ( varIDmap ) Free(varIDmap);
