@@ -1175,7 +1175,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                       params[varID].select = true;
                       parse_arg->needed[varID] = true;
                     }
-                  else cdoWarning("Variable %s already defined!", varname2);
+                  else if ( params[varID].coord )
+                    cdoAbort("Coordinate variable %s is read only!", varname2);
+                  /*
+                  else
+                    cdoWarning("Variable %s already defined!", varname2);
+                  */
                 }
               else if ( p->u.opr.op[1]->type != typeCon )
                 {
@@ -1203,9 +1208,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                   else
                     printf("\tpop  var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
                 }
-              
-              varID = param_search_name(parse_arg->nparams, params, p->u.opr.op[0]->u.var.nm);
-	      if ( varID < 0 ) cdoAbort("Variable >%s< not found!", p->u.opr.op[0]->u.var.nm);
+
+              const char *varname2 = p->u.opr.op[0]->u.var.nm;
+              varID = param_search_name(parse_arg->nparams, params, varname2);
+	      if ( varID < 0 ) cdoAbort("Variable >%s< not found!", varname2);
+              else if ( params[varID].coord ) cdoAbort("Coordinate variable %s is read only!", varname2);
 
               param2->gridID   = params[varID].gridID;
               param2->zaxisID  = params[varID].zaxisID;
