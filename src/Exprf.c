@@ -220,6 +220,8 @@ void *Expr(void *argument)
       printf("var: %d %s ngp=%d nlev=%d coord=%c\n",
              varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord);
 
+  int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
+
   int vlistID2 = -1;
   if ( REPLACES_VARIABLES(operatorID) )
     {
@@ -228,10 +230,12 @@ void *Expr(void *argument)
   else
     {
       vlistID2 = vlistDuplicate(vlistID1);
-      for ( int pidx = 0; pidx < nvars1; pidx++ ) params[pidx].select = false;
+      for ( int pidx = 0; pidx < nvars1; pidx++ )
+        {
+          varIDmap[pidx] = pidx;
+          params[pidx].select = false;
+        }
     }
-
-  int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
 
   for ( int pidx = 0; pidx < parse_arg.nparams; pidx++ )
     {
