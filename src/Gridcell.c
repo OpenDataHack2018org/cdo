@@ -38,6 +38,44 @@ double orthodrome(double px1, double py1, double px2, double py2)
 }
 
 
+void grid_cell_area(int gridID, double *array)
+{
+  int gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_LONLAT      ||
+       gridtype == GRID_GAUSSIAN    ||
+       gridtype == GRID_LCC         ||
+       gridtype == GRID_GME         ||
+       gridtype == GRID_CURVILINEAR ||
+       gridtype == GRID_UNSTRUCTURED )
+    {
+      if ( gridHasArea(gridID) )
+        {
+          if ( cdoVerbose ) cdoPrint("Using existing grid cell area!");
+          gridInqArea(gridID, array);
+        }
+      else
+        {
+          int status = gridGenArea(gridID, array);
+          if ( status == 1 )
+            cdoAbort("%s: Grid corner missing!", __func__);
+          else if ( status == 2 )
+            cdoAbort("%s: Can't compute grid cell area for this grid!", __func__);
+
+          int ngp = gridInqSize(gridID);
+          for ( int i = 0; i < ngp; ++i )
+            array[i] *= PlanetRadius*PlanetRadius;
+        }
+    }
+  else
+    {
+      if ( gridtype == GRID_GAUSSIAN_REDUCED )
+        cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
+                 gridNamePtr(gridtype));
+      else
+        cdoAbort("%s: Unsupported grid type: %s", __func__, gridNamePtr(gridtype));
+    }
+}
+
 void *Gridcell(void *argument)
 {
   int GRIDAREA, GRIDWGTS, GRIDMASK, GRIDDX, GRIDDY;
@@ -135,39 +173,7 @@ void *Gridcell(void *argument)
 
   if ( operatorID == GRIDAREA )
     {
-      gridtype = gridInqType(gridID);
-      if ( gridtype == GRID_LONLAT      ||
-	   gridtype == GRID_GAUSSIAN    ||
-	   gridtype == GRID_LCC         ||
-	   gridtype == GRID_GME         ||
-	   gridtype == GRID_CURVILINEAR ||
-	   gridtype == GRID_UNSTRUCTURED )
-	{
-	  if ( gridHasArea(gridID) )
-	    {
-	      if ( cdoVerbose ) cdoPrint("Using existing grid cell area!");
-	      gridInqArea(gridID, array);
-	    }
-	  else
-	    {
-	      status = gridGenArea(gridID, array);
-	      if ( status == 1 )
-		cdoAbort("Grid corner missing!");
-	      else if ( status == 2 )
-		cdoAbort("Can't compute grid cell areas for this grid!");
-
-	      for ( i = 0; i < gridsize; ++i )
-		array[i] *= PlanetRadius*PlanetRadius;
-	    }
-	}
-      else
-	{
-	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
-	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
-		     gridNamePtr(gridtype));
-	  else
-	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
-	}
+      grid_cell_area(gridID, array);
     }
   else if ( operatorID == GRIDWGTS )
     {

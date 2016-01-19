@@ -1031,7 +1031,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                           if ( nvarID >= parse_arg->maxparams )
                             cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
                           
-                          char units[CDI_MAX_NAME];
+                          char units[CDI_MAX_NAME]; units[0] = 0;
                           if      ( coord == 'x' ) gridInqXunits(params[varID].gridID, units);
                           else if ( coord == 'y' ) gridInqYunits(params[varID].gridID, units);
                                       
@@ -1064,7 +1064,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                           if ( nvarID >= parse_arg->maxparams )
                             cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
                           
-                          char units[CDI_MAX_NAME];
+                          char units[CDI_MAX_NAME]; units[0] = 0;
                           zaxisInqUnits(params[varID].zaxisID, units);
                                       
                           params[nvarID].coord    = coord;

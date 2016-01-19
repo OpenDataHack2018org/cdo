@@ -41,6 +41,7 @@ Constansts: M_PI, M_E
 #include "grid.h"
 #include "expr.h"
 
+void grid_cell_area(int gridID, double *array);
 int getSurfaceID(int vlistID);
 
 static
@@ -293,11 +294,18 @@ void *Expr(void *argument)
               else if ( coord == 'y' ) gridInqYvals(gridID, params[varID].data);
               if ( gridID != params[varID].gridID ) gridDestroy(gridID);
             }
+          else if ( coord == 'a' )
+            {
+              int gridID = params[varID].gridID;
+              grid_cell_area(gridID, params[varID].data);
+            }
           else if ( coord == 'z' )
             {
               int zaxisID = params[varID].zaxisID;
               zaxisInqLevels(zaxisID, params[varID].data);
             }
+          else
+            cdoAbort("Computation of coordinate %c not implemented!", coord);
         }
     }
  
