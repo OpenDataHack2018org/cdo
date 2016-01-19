@@ -24,6 +24,10 @@ Here is a list of all common plot parameters:
  style       & STRING  & Contour line style (solid, dash, dot, chain_dash, chain_dot)
  min         & FLOAT   & Minimum value
  max         & FLOAT   & Maximum value
+ lon_max     & FLOAT   & Maximum longitude of the image
+ lon_min     & FLOAT   & Minimum longitude of the image
+ lat_max     & FLOAT   & Maximum latitude of the image
+ lat_min     & FLOAT   & Minimum latitude of the image
  count       & INTEGER & Number of Contour levels / Colour bands  
  interval    & FLOAT   & Interval in data units between two bands lines
  list        & INTEGER & List of levels to be plotted
