@@ -21257,9 +21257,9 @@ ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timst
 
 ac_config_files="$ac_config_files test/Ymonstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test"
 
-ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arith.test test/Gradsdes.test"
+ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arith.test test/Expr.test"
 
-ac_config_files="$ac_config_files test/Collgrid.test test/wildcard.test"
+ac_config_files="$ac_config_files test/Gradsdes.test test/Collgrid.test test/wildcard.test"
 
 ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings"
 
@@ -22430,6 +22430,7 @@ do
     "test/Afterburner.test") CONFIG_FILES="$CONFIG_FILES test/Afterburner.test" ;;
     "test/Detrend.test") CONFIG_FILES="$CONFIG_FILES test/Detrend.test" ;;
     "test/Arith.test") CONFIG_FILES="$CONFIG_FILES test/Arith.test" ;;
+    "test/Expr.test") CONFIG_FILES="$CONFIG_FILES test/Expr.test" ;;
     "test/Gradsdes.test") CONFIG_FILES="$CONFIG_FILES test/Gradsdes.test" ;;
     "test/Collgrid.test") CONFIG_FILES="$CONFIG_FILES test/Collgrid.test" ;;
     "test/wildcard.test") CONFIG_FILES="$CONFIG_FILES test/wildcard.test" ;;
@@ -23945,6 +23946,7 @@ _LT_EOF
     "test/Afterburner.test":F) chmod a+x "$ac_file" ;;
     "test/Detrend.test":F) chmod a+x "$ac_file" ;;
     "test/Arith.test":F) chmod a+x "$ac_file" ;;
+    "test/Expr.test":F) chmod a+x "$ac_file" ;;
     "test/Gradsdes.test":F) chmod a+x "$ac_file" ;;
     "test/Collgrid.test":F) chmod a+x "$ac_file" ;;
     "test/wildcard.test":F) chmod a+x "$ac_file" ;;

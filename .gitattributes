@@ -723,6 +723,7 @@ test/Copy_netcdf.test.in -text
 test/Detrend.test.in -text
 test/Enspctl.test.in -text
 test/Ensstat.test.in -text
+test/Expr.test.in -text
 test/File.test.in -text
 test/Fldpctl.test.in -text
 test/Fldstat.test.in -text
@@ -743,6 +744,8 @@ test/Ymonstat.test.in -text
 test/bm_Remap.sh -text
 test/data/Makefile.am -text
 test/data/Makefile.in -text
+test/data/aexpr1_ref -text
+test/data/aexpr2_ref -text
 test/data/bathy4.grb -text
 test/data/datac.nc -text
 test/data/datag.nc -text
@@ -760,6 +763,8 @@ test/data/enspctl66_ref -text
 test/data/enspctl75_ref -text
 test/data/enspctl80_ref -text
 test/data/enspctl99_ref -text
+test/data/expr1_ref -text
+test/data/expr2_ref -text
 test/data/file_F32_srv_ref -text
 test/data/fldavg_ref -text
 test/data/fldmax_ref -text

@@ -1,0 +1,62 @@
+#! @SHELL@
+echo 1..2 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+test -n "$DATAPATH" || DATAPATH=./data
+#
+CDOOUT=cout
+CDOERR=cerr
+FORMAT="-f srv -b 32"
+STATS="add sub mul div"
+#
+IFILE=$DATAPATH/pl_data
+NTEST=1
+#
+INSETS="_clev=1/var130.z;var1=var130*_clev;"
+INSETS="$INSETS  var1=(var129>0)?(var130-273.15):var152;"
+FINSTR=finstr
+#
+for INSTR in $INSETS; do
+
+  RSTAT=0
+
+  CDOTEST="instruction set $NTEST"
+  echo "Running test: $NTEST - $CDOTEST"
+
+  for EXPR in expr aexpr; do
+    RFILE=$DATAPATH/${EXPR}${NTEST}_ref
+    OFILE=${EXPR}${NTEST}_res
+
+    for FILE in "" "f"; do
+
+      if [ "$FILE" = "f" ] ; then
+        echo $INSTR > $FINSTR
+        CDOCOMMAND="$CDO $FORMAT $EXPR${FILE},$FINSTR $IFILE $OFILE"
+      else
+        CDOCOMMAND="$CDO $FORMAT $EXPR,$INSTR $IFILE $OFILE"
+      fi
+      
+      echo "$CDOCOMMAND"
+
+      $CDOCOMMAND
+      test $? -eq 0 || let RSTAT+=1
+
+      $CDO diff $RFILE $OFILE > $CDOOUT 2> $CDOERR
+      test $? -eq 0 || let RSTAT+=1
+      test -s $CDOOUT && let RSTAT+=1
+      cat $CDOOUT $CDOERR
+
+      rm -f $OFILE $FINSTR
+    done
+  done
+
+  test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+  test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+
+  let NTEST+=1
+
+done
+#
+rm -f $CDOOUT $CDOERR
+#
+exit 0
