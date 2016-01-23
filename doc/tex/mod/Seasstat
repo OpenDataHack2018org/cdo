@@ -12,7 +12,7 @@ This module computes statistical values over timesteps of the same season.
 Depending on the chosen operator the minimum, maximum, sum, average, variance
 or standard deviation of timesteps of the same season is written to @file{ofile}.
 The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
-Be careful about the first and the last output timestep , they may be incorrect values 
+Be careful about the first and the last output timestep, they may be incorrect values 
 if the seasons have incomplete timesteps.
 @EndDescription
 @EndModule

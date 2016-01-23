@@ -132,6 +132,30 @@ paramType *params_new(int vlistID1)
 }
 
 static
+int params_add_ts(parse_param_t *parse_arg)
+{
+  int varID = -1;
+  paramType *params = parse_arg->params;
+  if ( params )
+    {
+      varID = parse_arg->nparams;
+      if ( varID >= parse_arg->maxparams )
+        cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+
+      params[varID].name     = strdup("_TS");
+      params[varID].gridID   = parse_arg->pointID;
+      params[varID].zaxisID  = parse_arg->surfaceID;
+      params[varID].steptype = TIME_VARIABLE;
+      params[varID].ngp      = 1;
+      params[varID].nlev     = 1;
+      
+      parse_arg->nparams++;
+    }
+
+  return varID;
+}
+
+static
 void params_delete(paramType *params)
 {
   if ( params )
@@ -205,6 +229,8 @@ void *Expr(void *argument)
   for ( int varID = 0; varID < nvars1; varID++ )
     parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
 
+  int vartsID = params_add_ts(&parse_arg);
+                  
   yy_scan_string(exprs, scanner);
   yyparse(&parse_arg, scanner);
 
@@ -327,6 +353,7 @@ void *Expr(void *argument)
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
+      params[vartsID].data[0] = tsID+1;
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
