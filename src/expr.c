@@ -46,6 +46,7 @@ func_t;
 double expr_sum(int n, double *restrict array)
 {
   double sum = 0;
+  printf("n = %d\n", n);
   for ( int i = 0; i < n; ++i ) sum += array[i];
   return sum;
 }
@@ -93,6 +94,22 @@ static func_t fun_sym_tbl[] =
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
+
+static
+int get_funcID(const char *fun)
+{
+  int funcID = -1;
+  for ( int i = 0; i < NumFunc; i++ )
+    if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
+      { 
+	funcID = i;
+	break;
+      }
+
+  if ( funcID == -1 ) cdoAbort("Function >%s< not available!", fun);
+
+  return funcID;
+}
 
 static
 void param_meta_copy(paramType *out, paramType *in)
@@ -606,24 +623,11 @@ nodeType *expr(int oper, nodeType *p1, nodeType *p2)
 }
 
 static
-nodeType *ex_fun_con(char *fun, nodeType *p1)
+nodeType *ex_fun_con(int funcID, nodeType *p1)
 {
-  int funcID = -1;
-
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
   p->type = typeCon;
-
-  for ( int i = 0; i < NumFunc; i++)
-    if ( fun_sym_tbl[i].type == 0 )
-      if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
-	{ 
-	  funcID = i;
-	  break;
-	}
-
-  if ( funcID == -1 )
-    cdoAbort("Function >%s< not available!", fun);
 
   double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
   p->u.con.value = exprfunc(p1->u.con.value);
@@ -632,19 +636,8 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
 }
 
 static
-nodeType *ex_fun_var(char *fun, nodeType *p1)
+nodeType *ex_fun_var(int funcID, nodeType *p1)
 {
-  int funcID = -1;
-  for ( int i = 0; i < NumFunc; i++ )
-    if ( strcmp(fun, fun_sym_tbl[i].name) == 0 )
-      { 
-	funcID = i;
-	break;
-      }
-
-  if ( funcID == -1 )
-    cdoAbort("Function >%s< not available!", fun);
-
   int functype = fun_sym_tbl[funcID].type;
 
   long ngp  = p1->param.ngp;
@@ -716,19 +709,19 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 }
 
 static
-nodeType *ex_fun(char *fun, nodeType *p1)
+nodeType *ex_fun(int funcID, nodeType *p1)
 {
   nodeType *p = NULL;
 
   if ( p1->type == typeVar )
     {
-      p = ex_fun_var(fun, p1);
-      if ( cdoVerbose ) printf("\t%s (%s)\n", fun, p1->u.var.nm);
+      p = ex_fun_var(funcID, p1);
+      if ( cdoVerbose ) printf("\t%s (%s)\n", fun_sym_tbl[funcID].name, p1->u.var.nm);
     }
   else if ( p1->type == typeCon )
     {
-      p = ex_fun_con(fun, p1);
-      if ( cdoVerbose ) printf("\t%s (%g)\n", fun, p1->u.con.value);
+      p = ex_fun_con(funcID, p1);
+      if ( cdoVerbose ) printf("\t%s (%g)\n", fun_sym_tbl[funcID].name, p1->u.con.value);
     }
   else
     cdoAbort("Internal problem!");
@@ -1097,8 +1090,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
               if ( param2->gridID != -1 ) ngp2 = param2->ngp;
 	      if ( param2->gridID == -1 || (params[varID].ngp > 1 && ngp2 == 1) )
                 {
-                  param2->gridID = params[varID].gridID;
-                  param2->ngp    = params[varID].ngp;
+                  param2->gridID  = params[varID].gridID;
+                  param2->ngp     = params[varID].ngp;
                   param2->units   = params[varID].units;
                   param2->missval = params[varID].missval;
                 }
@@ -1137,16 +1130,27 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
       break;
     case typeFun:
-      if ( parse_arg->init )
-	{
-	  expr_run(p->u.fun.op, parse_arg);
+      {
+        int funcID = get_funcID(p->u.fun.name);
+      
+        if ( parse_arg->init )
+          {
+            expr_run(p->u.fun.op, parse_arg);
 
-	  if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name); 
-	}
-      else
-	{
-	  rnode = ex_fun(p->u.fun.name, expr_run(p->u.fun.op, parse_arg));
-	}
+            int functype = fun_sym_tbl[funcID].type;
+            if ( functype == 1 )
+              {
+                // param2->gridID = parse_arg->pointID;
+                // param2->ngp = 1;
+              }
+            
+            if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name); 
+          }
+        else
+          {
+            rnode = ex_fun(funcID, expr_run(p->u.fun.op, parse_arg));
+          }
+      }
       break;
     case typeOpr:
       switch( p->u.opr.oper )
@@ -1197,8 +1201,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                     cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
                   param_meta_copy(&params[varID], param2);
-                  params[varID].coord    = 0;
-                  params[varID].name     = strdup(varname2);
+                  params[varID].coord = 0;
+                  params[varID].name  = strdup(varname2);
                   if ( param2->units ) params[varID].units = strdup(param2->units);
                   parse_arg->nparams++;
                 }
