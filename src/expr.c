@@ -13,6 +13,8 @@
 #include "expr.h"
 #include "expr_yacc.h"
 
+int pointID = -1;
+
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
 #define    COMPLE(x,y)  ((x) <= (y) ? 1 : 0)
@@ -46,9 +48,15 @@ func_t;
 double expr_sum(int n, double *restrict array)
 {
   double sum = 0;
-  printf("n = %d\n", n);
   for ( int i = 0; i < n; ++i ) sum += array[i];
   return sum;
+}
+
+double expr_min(int n, double *restrict array)
+{
+  double minval = 1.e300;
+  for ( int i = 0; i < n; ++i ) if ( array[i] < minval ) minval = array[i];
+  return minval;
 }
 
 static func_t fun_sym_tbl[] =
@@ -79,11 +87,11 @@ static func_t fun_sym_tbl[] =
   {0, "atanh", (void (*)()) atanh},
   {0, "gamma", (void (*)()) tgamma},
 
-  // cdo functions
+  // cdo functions (Reduce grid to point)
   {1, "sum",  (void (*)()) expr_sum},
   // {1, "fldmean",  cdo_fldmean},
+  {1, "min",  (void (*)()) expr_min},
   /*
-  {1, "min",   min},
   {1, "max",   max},
   {1, "sum",   sum},
   {1, "avg",   avg},
@@ -655,32 +663,29 @@ nodeType *ex_fun_var(int funcID, nodeType *p1)
 
   if ( functype == 1 )
     {
-      ngp = 1;
-      int sgridID = gridCreate(GRID_GENERIC, ngp);
-      p->param.gridID = sgridID;
-      p->param.ngp    = ngp;
+      p->param.gridID = pointID;
+      p->param.ngp    = 1;
     }
 
-  p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+  p->param.data = (double*) Malloc(p->param.ngp*nlev*sizeof(double));
   double *restrict pdata = p->param.data;
   double *restrict p1data = p1->param.data;
   
-  if ( nmiss > 0 )
+  if ( functype == 0 )
     {
       double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
-      for ( long i = 0; i < ngp*nlev; i++ )
-	{
-	  errno = -1;
-	  pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
-	  if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
-	  else if ( isnan(pdata[i]) ) pdata[i] = missval;
-	}
-    }
-  else
-    {
-      if ( fun_sym_tbl[funcID].type == 0 )
+      if ( nmiss > 0 )
         {
-          double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
+          for ( long i = 0; i < ngp*nlev; i++ )
+            {
+              errno = -1;
+              pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
+              if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
+              else if ( isnan(pdata[i]) ) pdata[i] = missval;
+            }
+        }
+      else
+        {
           for ( long i = 0; i < ngp*nlev; i++ )
             {
               errno = -1;
@@ -689,16 +694,17 @@ nodeType *ex_fun_var(int funcID, nodeType *p1)
               else if ( isnan(pdata[i]) ) pdata[i] = missval;
             }
         }
-      else
-        {
-          double (*exprfunc)(int,double*) = (double (*)(int,double*)) fun_sym_tbl[funcID].func;
-          for ( int k = 0; k < nlev; k++ )
-            pdata[k] = exprfunc(ngp, p1data+k*ngp);
-        }
+
+    }
+  else
+    {
+      double (*exprfunc)(int,double*) = (double (*)(int,double*)) fun_sym_tbl[funcID].func;
+      for ( int k = 0; k < nlev; k++ )
+        pdata[k] = exprfunc(ngp, p1data+k*ngp);
     }
 
   nmiss = 0;
-  for ( long i = 0; i < ngp*nlev; i++ )
+  for ( long i = 0; i < p->param.ngp*nlev; i++ )
     if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
   p->param.nmiss = nmiss;
@@ -1140,8 +1146,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             int functype = fun_sym_tbl[funcID].type;
             if ( functype == 1 )
               {
-                // param2->gridID = parse_arg->pointID;
-                // param2->ngp = 1;
+                pointID = parse_arg->pointID;
+                param2->gridID = parse_arg->pointID;
+                param2->ngp = 1;
               }
             
             if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name); 
