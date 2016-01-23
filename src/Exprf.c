@@ -142,7 +142,7 @@ int params_add_ts(parse_param_t *parse_arg)
       if ( varID >= parse_arg->maxparams )
         cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
-      params[varID].name     = strdup("_TS");
+      params[varID].name     = strdup("_ts");
       params[varID].gridID   = parse_arg->pointID;
       params[varID].zaxisID  = parse_arg->surfaceID;
       params[varID].steptype = TIME_VARIABLE;
