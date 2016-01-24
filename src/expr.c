@@ -990,8 +990,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
     {
     case typeCon:
       {
-        if ( parse_arg->debug )
-          printf("\tpush const \t%g\n", p->u.con.value);
+        if ( parse_arg->debug ) printf("\tpush const \t%g\n", p->u.con.value);
 
         rnode = p;
 
@@ -999,8 +998,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       }
     case typeVar:
       {
-        if ( parse_arg->debug )
-          printf("\tpush var \t%s\n", p->u.var.nm);
+        if ( parse_arg->debug ) printf("\tpush var \t%s\n", p->u.var.nm);
 
         const char *vnm = p->u.var.nm;
         varID = param_search_name(parse_arg->nparams, params, vnm);
@@ -1161,8 +1159,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           {
             rnode = ex_fun(funcID, expr_run(p->u.fun.op, parse_arg));
           }
+
+        break;
       }
-      break;
     case typeOpr:
       switch( p->u.opr.oper )
 	{
