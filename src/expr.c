@@ -721,13 +721,13 @@ nodeType *ex_fun(int funcID, nodeType *p1)
 
   if ( p1->type == typeVar )
     {
-      p = ex_fun_var(funcID, p1);
       if ( cdoVerbose ) printf("\t%s (%s)\n", fun_sym_tbl[funcID].name, p1->u.var.nm);
+      p = ex_fun_var(funcID, p1);
     }
   else if ( p1->type == typeCon )
     {
-      p = ex_fun_con(funcID, p1);
       if ( cdoVerbose ) printf("\t%s (%g)\n", fun_sym_tbl[funcID].name, p1->u.con.value);
+      p = ex_fun_con(funcID, p1);
     }
   else
     cdoAbort("Internal problem!");
@@ -790,13 +790,13 @@ nodeType *ex_uminus(nodeType *p1)
 
   if ( p1->type == typeVar )
     {
-      p = ex_uminus_var(p1);
       if ( cdoVerbose ) printf("\t- (%s)\n", p1->u.var.nm);
+      p = ex_uminus_var(p1);
     }
   else if ( p1->type == typeCon )
     {
-      p = ex_uminus_con(p1);
       if ( cdoVerbose ) printf("\t- (%g)\n", p1->u.con.value);
+      p = ex_uminus_con(p1);
     }
   else
     cdoAbort("Internal problem!");
@@ -994,143 +994,142 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           printf("\tpush const \t%g\n", p->u.con.value);
 
         rnode = p;
+
+        break;
       }
-      break;
     case typeVar:
-      /*    if ( parse_arg->init ) */
-	{
-	  if ( parse_arg->debug )
-	    printf("\tpush var \t%s\n", p->u.var.nm);
+      {
+        if ( parse_arg->debug )
+          printf("\tpush var \t%s\n", p->u.var.nm);
 
-          const char *vnm = p->u.var.nm;
-          varID = param_search_name(parse_arg->nparams, params, vnm);
-          if ( varID == -1 && parse_arg->init )
-            {
-              size_t len = strlen(vnm);
-              int coord = vnm[len-1];
-              if ( len > 2 && vnm[len-2] == '.' )
-                {
-                  if ( coord == 'x' || coord == 'y' || coord == 'a' )
-                    {
-                      char *varname = strdup(vnm);
-                      varname[len-2] = 0;
-                      varID = param_search_name(parse_arg->nparams, params, varname);
-                      free(varname);
-                      if ( varID == -1 )
-                        {
-                          cdoAbort("Coordinate %c: variable >%s< not found!", coord, varname);
-                        }
-                      else
-                        {
-                          int nvarID = parse_arg->nparams;
-                          if ( nvarID >= parse_arg->maxparams )
-                            cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+        const char *vnm = p->u.var.nm;
+        varID = param_search_name(parse_arg->nparams, params, vnm);
+        if ( varID == -1 && parse_arg->init )
+          {
+            size_t len = strlen(vnm);
+            int coord = vnm[len-1];
+            if ( len > 2 && vnm[len-2] == '.' )
+              {
+                if ( coord == 'x' || coord == 'y' || coord == 'a' )
+                  {
+                    char *varname = strdup(vnm);
+                    varname[len-2] = 0;
+                    varID = param_search_name(parse_arg->nparams, params, varname);
+                    free(varname);
+                    if ( varID == -1 )
+                      {
+                        cdoAbort("Coordinate %c: variable >%s< not found!", coord, varname);
+                      }
+                    else
+                      {
+                        int nvarID = parse_arg->nparams;
+                        if ( nvarID >= parse_arg->maxparams )
+                          cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
                           
-                          char units[CDI_MAX_NAME]; units[0] = 0;
-                          if      ( coord == 'x' ) gridInqXunits(params[varID].gridID, units);
-                          else if ( coord == 'y' ) gridInqYunits(params[varID].gridID, units);
+                        char units[CDI_MAX_NAME]; units[0] = 0;
+                        if      ( coord == 'x' ) gridInqXunits(params[varID].gridID, units);
+                        else if ( coord == 'y' ) gridInqYunits(params[varID].gridID, units);
                                       
-                          params[nvarID].coord    = coord;
-                          params[nvarID].name     = strdup(vnm);
-                          params[nvarID].missval  = params[varID].missval;
-                          params[nvarID].gridID   = params[varID].gridID;
-                          params[nvarID].zaxisID  = parse_arg->surfaceID;
-                          params[nvarID].steptype = TIME_CONSTANT;
-                          params[nvarID].ngp      = params[varID].ngp;
-                          params[nvarID].nlev     = 1;
-                          if ( units[0] ) params[nvarID].units = strdup(units);
-                          parse_arg->nparams++;
-                          varID = nvarID;
-                        }
-                    }
-                  else if ( coord == 'z' )
-                    {
-                      char *varname = strdup(vnm);
-                      varname[len-2] = 0;
-                      varID = param_search_name(parse_arg->nparams, params, varname);
-                      free(varname);
-                      if ( varID == -1 )
-                        {
-                          cdoAbort("Coordinate %c: variable >%s< not found!", coord, varname);
-                        }
-                      else
-                        {
-                          int nvarID = parse_arg->nparams;
-                          if ( nvarID >= parse_arg->maxparams )
-                            cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+                        params[nvarID].coord    = coord;
+                        params[nvarID].name     = strdup(vnm);
+                        params[nvarID].missval  = params[varID].missval;
+                        params[nvarID].gridID   = params[varID].gridID;
+                        params[nvarID].zaxisID  = parse_arg->surfaceID;
+                        params[nvarID].steptype = TIME_CONSTANT;
+                        params[nvarID].ngp      = params[varID].ngp;
+                        params[nvarID].nlev     = 1;
+                        if ( units[0] ) params[nvarID].units = strdup(units);
+                        parse_arg->nparams++;
+                        varID = nvarID;
+                      }
+                  }
+                else if ( coord == 'z' )
+                  {
+                    char *varname = strdup(vnm);
+                    varname[len-2] = 0;
+                    varID = param_search_name(parse_arg->nparams, params, varname);
+                    free(varname);
+                    if ( varID == -1 )
+                      {
+                        cdoAbort("Coordinate %c: variable >%s< not found!", coord, varname);
+                      }
+                    else
+                      {
+                        int nvarID = parse_arg->nparams;
+                        if ( nvarID >= parse_arg->maxparams )
+                          cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
                           
-                          char units[CDI_MAX_NAME]; units[0] = 0;
-                          zaxisInqUnits(params[varID].zaxisID, units);
+                        char units[CDI_MAX_NAME]; units[0] = 0;
+                        zaxisInqUnits(params[varID].zaxisID, units);
                                       
-                          params[nvarID].coord    = coord;
-                          params[nvarID].name     = strdup(vnm);
-                          params[nvarID].missval  = params[varID].missval;
-                          params[nvarID].gridID   = parse_arg->pointID;
-                          params[nvarID].zaxisID  = params[varID].zaxisID;
-                          params[nvarID].steptype = TIME_CONSTANT;
-                          params[nvarID].ngp      = 1;
-                          params[nvarID].nlev     = params[varID].nlev;
-                          if ( units[0] ) params[nvarID].units = strdup(units);
-                          parse_arg->nparams++;
-                          varID = nvarID;
-                        }
-                    }
-                }
-            }
-          if ( varID == -1 )
-	    {
-              cdoAbort("Variable >%s< not found!", p->u.var.nm);
-	    }
-	  else if ( parse_arg->init )
-	    {
-	      if ( varID < parse_arg->nvars1 && parse_arg->needed[varID] == false )
-		{
-		  parse_arg->needed[varID] = true;
-		}
+                        params[nvarID].coord    = coord;
+                        params[nvarID].name     = strdup(vnm);
+                        params[nvarID].missval  = params[varID].missval;
+                        params[nvarID].gridID   = parse_arg->pointID;
+                        params[nvarID].zaxisID  = params[varID].zaxisID;
+                        params[nvarID].steptype = TIME_CONSTANT;
+                        params[nvarID].ngp      = 1;
+                        params[nvarID].nlev     = params[varID].nlev;
+                        if ( units[0] ) params[nvarID].units = strdup(units);
+                        parse_arg->nparams++;
+                        varID = nvarID;
+                      }
+                  }
+              }
+          }
+        if ( varID == -1 )
+          {
+            cdoAbort("Variable >%s< not found!", p->u.var.nm);
+          }
+        else if ( parse_arg->init )
+          {
+            if ( varID < parse_arg->nvars1 && parse_arg->needed[varID] == false )
+              {
+                parse_arg->needed[varID] = true;
+              }
 
-              int ngp2 = 0;
-              if ( param2->gridID != -1 ) ngp2 = param2->ngp;
-	      if ( param2->gridID == -1 || (params[varID].ngp > 1 && ngp2 == 1) )
-                {
-                  param2->gridID  = params[varID].gridID;
-                  param2->ngp     = params[varID].ngp;
-                  param2->units   = params[varID].units;
-                  param2->missval = params[varID].missval;
-                }
-              int nlev2 = 0;
-	      if ( param2->zaxisID != -1 ) nlev2 = param2->nlev;
-	      if ( param2->zaxisID == -1 || (params[varID].nlev > 1 && nlev2 == 1) )
-                {
-                  param2->zaxisID = params[varID].zaxisID;
-                  param2->nlev    = params[varID].nlev;
-                  param2->units   = params[varID].units;
-                  param2->missval = params[varID].missval;
-                }
+            int ngp2 = 0;
+            if ( param2->gridID != -1 ) ngp2 = param2->ngp;
+            if ( param2->gridID == -1 || (params[varID].ngp > 1 && ngp2 == 1) )
+              {
+                param2->gridID  = params[varID].gridID;
+                param2->ngp     = params[varID].ngp;
+                param2->units   = params[varID].units;
+                param2->missval = params[varID].missval;
+              }
+            int nlev2 = 0;
+            if ( param2->zaxisID != -1 ) nlev2 = param2->nlev;
+            if ( param2->zaxisID == -1 || (params[varID].nlev > 1 && nlev2 == 1) )
+              {
+                param2->zaxisID = params[varID].zaxisID;
+                param2->nlev    = params[varID].nlev;
+                param2->units   = params[varID].units;
+                param2->missval = params[varID].missval;
+              }
+            
+            if ( param2->steptype == -1 ||
+                 (param2->steptype == TSTEP_CONSTANT && params[varID].steptype != TSTEP_CONSTANT) )
+              param2->steptype = params[varID].steptype;
+          }
 
-	      if ( param2->steptype == -1 ||
-                   (param2->steptype == TSTEP_CONSTANT && params[varID].steptype != TSTEP_CONSTANT) )
-		param2->steptype = params[varID].steptype;
-	    }
-	}
-	/* else */
-	{ 
-          param_meta_copy(&p->param, &params[varID]);
-          p->param.name = params[varID].name;
-          /*
+
+        param_meta_copy(&p->param, &params[varID]);
+        p->param.name = params[varID].name;
+        /*
  	  if ( parse_arg->debug )
-	    printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
-                   p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
-          */
-	  p->ltmpvar = false;
-	  if ( ! parse_arg->init )
-	    {
-              p->param.data  = params[varID].data;
-              p->param.nmiss = params[varID].nmiss;
-            }
-	  rnode = p;
-	}
+          printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
+          p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
+        */
+        p->ltmpvar = false;
+        if ( ! parse_arg->init )
+          {
+            p->param.data  = params[varID].data;
+            p->param.nmiss = params[varID].nmiss;
+          }
+        rnode = p;
 
-      break;
+        break;
+      }
     case typeFun:
       {
         int funcID = get_funcID(p->u.fun.name);
@@ -1146,8 +1145,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 // printf("ngp %d\n", p->param.ngp);
                 // p->u.fun.op->param.gridID = parse_arg->pointID;
                 // p->u.fun.op->param.ngp = 1;
-                // param2->gridID = parse_arg->pointID;
-                // param2->ngp = 1;
+                //if ( param2->gridID == -1 )
+                  {
+                    // param2->gridID = parse_arg->pointID;
+                    // param2->ngp = 1;
+                  }
                 // p->param.gridID = parse_arg->pointID;
                 // p->param.ngp = 1;
                 // rnode = p;
