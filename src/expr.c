@@ -988,17 +988,13 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
   switch ( p->type )
     {
-    case typeCon:       
-      if ( parse_arg->init )
-	{
-	  if ( parse_arg->debug )
-	    printf("\tpush const \t%g\n", p->u.con.value);
-	}
-      else
-	{
-	  rnode = p;
-	}
+    case typeCon:
+      {
+        if ( parse_arg->debug )
+          printf("\tpush const \t%g\n", p->u.con.value);
 
+        rnode = p;
+      }
       break;
     case typeVar:
       /*    if ( parse_arg->init ) */
@@ -1147,8 +1143,14 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             if ( functype == 1 )
               {
                 pointID = parse_arg->pointID;
-                param2->gridID = parse_arg->pointID;
-                param2->ngp = 1;
+                // printf("ngp %d\n", p->param.ngp);
+                // p->u.fun.op->param.gridID = parse_arg->pointID;
+                // p->u.fun.op->param.ngp = 1;
+                // param2->gridID = parse_arg->pointID;
+                // param2->ngp = 1;
+                // p->param.gridID = parse_arg->pointID;
+                // p->param.ngp = 1;
+                // rnode = p;
               }
             
             if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name); 
