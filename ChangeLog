@@ -597,7 +597,7 @@
 
 2014-06-19  Uwe Schulzweida
 
-	* Filter: disable zero-padding
+	* Filter (operator: highpass,lowpass,bandpass): disable zero-padding
 	* Detrend: added test
 	* added option --use_fftw: used in module filter
 
