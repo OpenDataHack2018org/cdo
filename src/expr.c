@@ -998,9 +998,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       }
     case typeVar:
       {
-        if ( parse_arg->debug ) printf("\tpush\tvar\t%s\n", p->u.var.nm);
-
         const char *vnm = p->u.var.nm;
+        // if ( parse_arg->debug ) printf("\tpush\tvar\t%s\n", vnm);
         varID = param_search_name(parse_arg->nparams, params, vnm);
         if ( varID == -1 && parse_arg->init )
           {
@@ -1125,6 +1124,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             p->param.nmiss = params[varID].nmiss;
           }
         rnode = p;
+
+        if ( parse_arg->debug ) printf("\tpush\tvar\t%s[nlev=%d][ngp=%d]\n", vnm, p->param.nlev, p->param.ngp);
 
         break;
       }

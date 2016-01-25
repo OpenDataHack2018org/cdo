@@ -38,27 +38,27 @@ typedef struct {
 
 // parameter
 typedef struct {
-  bool   select;
-  int    coord;
-  int    gridID;
-  int    zaxisID;
-  int    steptype;
-  int    ngp;
-  int    nlev;
-  int    nmiss;
-  char  *name;
-  char  *longname;
-  char  *units;
-  double missval;
+  bool    select;
+  int     coord;
+  int     gridID;
+  int     zaxisID;
+  int     steptype;
+  int     ngp;
+  int     nlev;
+  int     nmiss;
+  char   *name;
+  char   *longname;
+  char   *units;
+  double  missval;
   double *data;
 } paramType;
 
 
 typedef struct nodeTypeTag {
-  bool ltmpvar;
+  bool      ltmpvar;
   paramType param;
 
-  nodeEnum type;              // type of node
+  nodeEnum  type;             // type of node
 
   // union must be last entry in nodeType
   // because operNodeType may dynamically increase
@@ -72,23 +72,23 @@ typedef struct nodeTypeTag {
 
 
 typedef struct {
-  bool   init;
-  bool   debug;
-  bool  *needed;
-  int    maxparams;
-  int    nparams;
-  int    nvars1;
-  int    pointID;
-  int    surfaceID;
-  paramType param2;
+  bool       init;
+  bool       debug;
+  bool      *needed;
+  int        maxparams;
+  int        nparams;
+  int        nvars1;
+  int        pointID;
+  int        surfaceID;
+  paramType  param2;
   paramType *params;
 } parse_param_t;
 
 
 typedef union{
-  double cvalue;              // constant value
-  char *varnm;                // variable name 
-  char *fname;                // function name 
+  double    cvalue;           // constant value
+  char     *varnm;            // variable name 
+  char     *fname;            // function name 
   nodeType *nPtr;             // node pointer  
 } stype_t;
 
