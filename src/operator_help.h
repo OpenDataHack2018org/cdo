@@ -4886,7 +4886,7 @@ static const char *MagplotHelp[] = {
     "    contour  Contour plot",
     "             The operator contour generates the discrete contour lines of the input field values.",
     "             The following additional parameters are valid for contour operator,",
-    "             modulein addition to the common plot parameters:",
+    "             module in addition to the common plot parameters:",
     "             ",
     "              Keyname      & Type    & Description      ",
     "              colour       & STRING  & Colour for drawing the contours",
