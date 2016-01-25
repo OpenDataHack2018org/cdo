@@ -542,9 +542,10 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 }
 
 static
-void ex_copy_var(nodeType *p2, nodeType *p1)
+void ex_copy_var(nodeType *p2, nodeType *p1, int linit)
 {
-  if ( cdoVerbose ) printf("\tcopy\t%s\n", p1->u.var.nm);
+  if ( cdoVerbose ) printf("\texpr\tcopy\t%s[L%d][N%d] = %s[L%d][N%d]\n",
+                           p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
   
   int ngp = p1->param.ngp;
   assert(ngp > 0);
@@ -560,18 +561,25 @@ void ex_copy_var(nodeType *p2, nodeType *p1)
     cdoAbort("%s: Number of levels differ (%s[%d] = %s[%d])",
              __func__, p2->param.name, p2->param.nlev, p1->param.name, nlev);
 
-  double *restrict odat = p2->param.data;
-  const double *restrict idat = p1->param.data;
-  for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = idat[i];
+  if ( ! linit )
+    {
+      double *restrict odat = p2->param.data;
+      const double *restrict idat = p1->param.data;
+      for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = idat[i];
+  
+      p2->param.missval = p1->param.missval;
+      p2->param.nmiss   = p1->param.nmiss;
 
-  p2->param.missval = p1->param.missval;
-  p2->param.nmiss   = p1->param.nmiss;
+      if ( p1->ltmpvar ) Free(p1->param.data);
+    }
 }
 
 static
-void ex_copy_con(nodeType *p2, nodeType *p1)
+void ex_copy_con(nodeType *p2, nodeType *p1, int linit)
 {
-  if ( cdoVerbose ) printf("\tcopy\t%g\n", p1->u.con.value);
+  double cval = p1->u.con.value;
+
+  if ( cdoVerbose ) printf("\texpr\tcopy\t%s[L%d][N%d] = %g\n", p2->param.name, p2->param.nlev, p2->param.ngp, cval);
   
   int ngp = p2->param.ngp;
   assert(ngp > 0);
@@ -579,20 +587,22 @@ void ex_copy_con(nodeType *p2, nodeType *p1)
   int nlev = p2->param.nlev;
   assert(nlev > 0);
 
-  double cval = p1->u.con.value;
-  double *restrict odat = p2->param.data;
-  assert(odat != NULL);
+  if ( ! linit )
+    {
+      double *restrict odat = p2->param.data;
+      assert(odat != NULL);
 
-  for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = cval;
+      for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = cval;
+    }
 }
 
 static
-void ex_copy(nodeType *p2, nodeType *p1)
+void ex_copy(nodeType *p2, nodeType *p1, int linit)
 {
   if ( p1->type == typeCon )
-    ex_copy_con(p2, p1);
+    ex_copy_con(p2, p1, linit);
   else
-    ex_copy_var(p2, p1);
+    ex_copy_var(p2, p1, linit);
 }
 
 static
@@ -977,6 +987,7 @@ int param_search_name(int nparam, paramType *params, const char *name)
 
 nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 {
+  int linit = parse_arg->init;
   paramType *params = parse_arg->params;
   paramType *param2 = &parse_arg->param2;
   int varID;
@@ -984,7 +995,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
   if ( ! p ) return rnode;
 
-  /*  if ( ! parse_arg->init ) { exNode(p, parse_arg); return 0; } */
+  /*  if ( ! linit ) { exNode(p, parse_arg); return 0; } */
 
   switch ( p->type )
     {
@@ -1001,7 +1012,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
         const char *vnm = p->u.var.nm;
         // if ( parse_arg->debug ) printf("\tpush\tvar\t%s\n", vnm);
         varID = param_search_name(parse_arg->nparams, params, vnm);
-        if ( varID == -1 && parse_arg->init )
+        if ( varID == -1 && linit )
           {
             size_t len = strlen(vnm);
             int coord = vnm[len-1];
@@ -1078,7 +1089,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           {
             cdoAbort("Variable >%s< not found!", p->u.var.nm);
           }
-        else if ( parse_arg->init )
+        else if ( linit )
           {
             if ( varID < parse_arg->nvars1 && parse_arg->needed[varID] == false )
               {
@@ -1118,14 +1129,14 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
         */
         p->ltmpvar = false;
-        if ( ! parse_arg->init )
+        if ( ! linit )
           {
             p->param.data  = params[varID].data;
             p->param.nmiss = params[varID].nmiss;
           }
         rnode = p;
 
-        if ( parse_arg->debug ) printf("\tpush\tvar\t%s[nlev=%d][ngp=%d]\n", vnm, p->param.nlev, p->param.ngp);
+        if ( parse_arg->debug ) printf("\tpush\tvar\t%s[L%d][N%d]\n", vnm, p->param.nlev, p->param.ngp);
 
         break;
       }
@@ -1133,7 +1144,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       {
         int funcID = get_funcID(p->u.fun.name);
       
-        if ( parse_arg->init )
+        if ( linit )
           {
             expr_run(p->u.fun.op, parse_arg);
 
@@ -1167,7 +1178,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       switch( p->u.opr.oper )
 	{
         case '=':
-	  if ( parse_arg->init )
+	  if ( linit )
             {
               param2->gridID   = -1;
               param2->zaxisID  = -1;
@@ -1178,18 +1189,24 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
           rnode = expr_run(p->u.opr.op[1], parse_arg);
 
-	  if ( parse_arg->init )
-	    {
-	      if ( parse_arg->debug )
-		printf("\tpop\tvar\t%s\n", p->u.opr.op[0]->u.var.nm);
+          const char *varname2 = p->u.opr.op[0]->u.var.nm;
 
+          if ( parse_arg->debug )
+            {
+              if ( rnode && rnode->type == typeVar)
+                printf("\tpop\tvar\t%s[L%d][N%d]\n", varname2, rnode->param.nlev, rnode->param.ngp);
+              else
+                printf("\tpop\tvar\t%s\n", varname2);
+            }
+
+          if ( linit )
+	    {
               //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
               if ( p->u.opr.op[1]->type != typeCon )
                 {
                   if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
                     cdoAbort("Operand not variable!");
                 }
-	      const char *varname2 = p->u.opr.op[0]->u.var.nm;
               varID = param_search_name(parse_arg->nparams, params, varname2);
               if ( varID >= 0 )
                 {
@@ -1220,15 +1237,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	    }
 	  else
 	    {
-	      if ( parse_arg->debug )
-                {
-                  if ( rnode->type == typeCon )
-                    printf("\tpop\tvar\t%s\t%g\n", p->u.opr.op[0]->u.var.nm, rnode->u.con.value);
-                  else
-                    printf("\tpop\tvar\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
-                }
-
-              const char *varname2 = p->u.opr.op[0]->u.var.nm;
               varID = param_search_name(parse_arg->nparams, params, varname2);
 	      if ( varID < 0 ) cdoAbort("Variable >%s< not found!", varname2);
               else if ( params[varID].coord ) cdoAbort("Coordinate variable %s is read only!", varname2);
@@ -1237,18 +1245,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
               p->param.data = params[varID].data;
               p->ltmpvar    = false;
 
-              //printf(">>copy %s %p\n", p->param.name, p->param.data );
-              ex_copy(p, rnode);
-              
-              if ( rnode->type != typeCon && rnode->ltmpvar )
-                {
-                  Free(rnode->param.data);
-                }
+              ex_copy(p, rnode, linit);
 	    }
 
 	  break;
         case UMINUS:    
-	  if ( parse_arg->init )
+	  if ( linit )
 	    {
 	      expr_run(p->u.opr.op[0], parse_arg);
 
@@ -1261,7 +1263,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
 	  break;
         case '?':    
-	  if ( parse_arg->init )
+	  if ( linit )
 	    {
 	      expr_run(p->u.opr.op[0], parse_arg);
 	      expr_run(p->u.opr.op[1], parse_arg);
@@ -1278,7 +1280,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
 	  break;
         default:
-	  if ( parse_arg->init )
+	  if ( linit )
 	    {
 	      expr_run(p->u.opr.op[0], parse_arg);
 	      expr_run(p->u.opr.op[1], parse_arg);
