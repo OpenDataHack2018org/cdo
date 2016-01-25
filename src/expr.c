@@ -544,7 +544,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 static
 void ex_copy_var(nodeType *p2, nodeType *p1)
 {
-  if ( cdoVerbose ) printf("\tcopy %s\n", p1->u.var.nm);
+  if ( cdoVerbose ) printf("\tcopy\t%s\n", p1->u.var.nm);
   
   int ngp = p1->param.ngp;
   assert(ngp > 0);
@@ -571,7 +571,7 @@ void ex_copy_var(nodeType *p2, nodeType *p1)
 static
 void ex_copy_con(nodeType *p2, nodeType *p1)
 {
-  if ( cdoVerbose ) printf("\tcopy %g\n", p1->u.con.value);
+  if ( cdoVerbose ) printf("\tcopy\t%g\n", p1->u.con.value);
   
   int ngp = p2->param.ngp;
   assert(ngp > 0);
@@ -604,25 +604,25 @@ nodeType *expr(int oper, nodeType *p1, nodeType *p2)
     {
       p = expr_var_var(oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s %c %s\n", p1->u.var.nm, oper, p2->u.var.nm);
+	printf("\t%s\t%c\t%s\n", p1->u.var.nm, oper, p2->u.var.nm);
     }
   else if ( p1->type == typeCon && p2->type == typeCon )
     {
       p = expr_con_con(oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%g %c %g\n", p1->u.con.value, oper, p2->u.con.value);
+	printf("\t%g\t%c\t%g\n", p1->u.con.value, oper, p2->u.con.value);
     }
   else if ( p1->type == typeVar && p2->type == typeCon )
     {
       p = expr_var_con(oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s %c %g\n", p1->u.var.nm, oper, p2->u.con.value);
+	printf("\t%s\t%c\t%g\n", p1->u.var.nm, oper, p2->u.con.value);
     }
   else if ( p1->type == typeCon && p2->type == typeVar )
     {
       p = expr_con_var(oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%g %c %s\n", p1->u.con.value, oper, p2->u.var.nm);
+	printf("\t%g\t%c\t%s\n", p1->u.con.value, oper, p2->u.var.nm);
     }
   else
     cdoAbort("Internal problem!");
@@ -990,7 +990,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
     {
     case typeCon:
       {
-        if ( parse_arg->debug ) printf("\tpush const \t%g\n", p->u.con.value);
+        if ( parse_arg->debug ) printf("\tpush\tconst\t%g\n", p->u.con.value);
 
         rnode = p;
 
@@ -998,7 +998,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       }
     case typeVar:
       {
-        if ( parse_arg->debug ) printf("\tpush var \t%s\n", p->u.var.nm);
+        if ( parse_arg->debug ) printf("\tpush\tvar\t%s\n", p->u.var.nm);
 
         const char *vnm = p->u.var.nm;
         varID = param_search_name(parse_arg->nparams, params, vnm);
@@ -1153,7 +1153,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 // rnode = p;
               }
             
-            if ( parse_arg->debug ) printf("\tcall \t%s\n", p->u.fun.name); 
+            if ( parse_arg->debug ) printf("\tcall\t%s\n", p->u.fun.name); 
           }
         else
           {
@@ -1180,7 +1180,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	  if ( parse_arg->init )
 	    {
 	      if ( parse_arg->debug )
-		printf("\tpop  var \t%s\n", p->u.opr.op[0]->u.var.nm);
+		printf("\tpop\tvar\t%s\n", p->u.opr.op[0]->u.var.nm);
 
               //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
               if ( p->u.opr.op[1]->type != typeCon )
@@ -1222,9 +1222,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	      if ( parse_arg->debug )
                 {
                   if ( rnode->type == typeCon )
-                    printf("\tpop  var\t%s\t%g\n", p->u.opr.op[0]->u.var.nm, rnode->u.con.value);
+                    printf("\tpop\tvar\t%s\t%g\n", p->u.opr.op[0]->u.var.nm, rnode->u.con.value);
                   else
-                    printf("\tpop  var\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
+                    printf("\tpop\tvar\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
                 }
 
               const char *varname2 = p->u.opr.op[0]->u.var.nm;
