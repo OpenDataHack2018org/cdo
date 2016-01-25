@@ -618,7 +618,7 @@ void ex_copy(int init, nodeType *p2, nodeType *p1)
 static
 nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
 {
-  const char *coper = "unknown";
+  const char *coper = "???";
 
   if ( cdoVerbose )
     {
@@ -847,35 +847,34 @@ nodeType *ex_uminus(nodeType *p1)
 }
 
 static
-nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
+nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 {
   if ( p1->type == typeCon ) cdoAbort("expr?expr:expr: First expression is a constant but must be a variable!");
 
   if ( cdoVerbose )
     {
-      printf("\t%s ? ", p1->u.var.nm);
+      printf("\t%s\tarith\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
       if ( p2->type == typeCon )
         printf("%g : ", p2->u.con.value);
       else
-        printf("%s : ", p2->u.var.nm);
+        printf("%s[L%d][N%d] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
       if ( p3->type == typeCon )
         printf("%g\n", p3->u.con.value);
       else
-        printf("%s\n", p3->u.var.nm);
+        printf("%s[L%d][N%d]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
     }
 
   int nmiss1 = p1->param.nmiss;
   long ngp1 = p1->param.ngp;
   long nlev1 = p1->param.nlev;
   double missval1 = p1->param.missval;
-  double *pdata1 = p1->param.data;
 
   long ngp = ngp1;
   long nlev = nlev1;
   nodeType *px = p1;
 
   double missval2 = missval1;
-  double *pdata2;
+  double *pdata2 = NULL;
   long ngp2 = 1;
   long nlev2 = 1;
   
@@ -904,7 +903,7 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
     }
 
   double missval3 = missval1;
-  double *pdata3;
+  double *pdata3 = NULL;
   long ngp3 = 1;
   long nlev3 = 1;
   
@@ -941,42 +940,50 @@ nodeType *ex_ifelse(nodeType *p1, nodeType *p2, nodeType *p3)
   param_meta_copy(&p->param, &px->param);
   p->param.name = p->u.var.nm;
 
-  p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
-
-
-  for ( long k = 0; k < nlev; ++k )
+  if ( ! init )
     {
-      long loff1, loff2, loff3;
-      long loff = k*ngp;
+      double *pdata1 = p1->param.data;
+      
+      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-      if ( nlev1 == 1 ) loff1 = 0;
-      else              loff1 = k*ngp;
+      for ( long k = 0; k < nlev; ++k )
+        {
+          long loff1, loff2, loff3;
+          long loff = k*ngp;
 
-      if ( nlev2 == 1 ) loff2 = 0;
-      else              loff2 = k*ngp;
+          if ( nlev1 == 1 ) loff1 = 0;
+          else              loff1 = k*ngp;
 
-      if ( nlev3 == 1 ) loff3 = 0;
-      else              loff3 = k*ngp;
+          if ( nlev2 == 1 ) loff2 = 0;
+          else              loff2 = k*ngp;
 
-      const double *restrict idat1 = pdata1+loff1;
-      const double *restrict idat2 = pdata2+loff2;
-      const double *restrict idat3 = pdata3+loff3;
-      double *restrict odat = p->param.data+loff;
+          if ( nlev3 == 1 ) loff3 = 0;
+          else              loff3 = k*ngp;
 
-      double ival2 = idat2[0];
-      double ival3 = idat3[0];
-      for ( long i = 0; i < ngp; ++i ) 
-	{
-	  if ( ngp2 > 1 ) ival2 = idat2[i];
-	  if ( ngp3 > 1 ) ival3 = idat3[i];
+          const double *restrict idat1 = pdata1+loff1;
+          const double *restrict idat2 = pdata2+loff2;
+          const double *restrict idat3 = pdata3+loff3;
+          double *restrict odat = p->param.data+loff;
 
-	  if ( nmiss1 && DBL_IS_EQUAL(idat1[i], missval1) )
-	    odat[i] = missval1;
-	  else if ( IS_NOT_EQUAL(idat1[i], 0) )
-	    odat[i] = DBL_IS_EQUAL(ival2, missval2) ? missval1 : ival2;
-	  else
-	    odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;
-	}
+          double ival2 = idat2[0];
+          double ival3 = idat3[0];
+          for ( long i = 0; i < ngp; ++i ) 
+            {
+              if ( ngp2 > 1 ) ival2 = idat2[i];
+              if ( ngp3 > 1 ) ival3 = idat3[i];
+
+              if ( nmiss1 && DBL_IS_EQUAL(idat1[i], missval1) )
+                odat[i] = missval1;
+              else if ( IS_NOT_EQUAL(idat1[i], 0) )
+                odat[i] = DBL_IS_EQUAL(ival2, missval2) ? missval1 : ival2;
+              else
+                odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;
+            }
+          }
+
+      if ( p1->ltmpvar ) Free(pdata1);
+      if ( p2->ltmpvar ) Free(pdata2);
+      if ( p3->ltmpvar ) Free(pdata3);
     }
 
   return p;
@@ -1294,23 +1301,15 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	    }
 
 	  break;
-        case '?':    
-	  if ( init )
-	    {
-	      expr_run(p->u.opr.op[0], parse_arg);
-	      expr_run(p->u.opr.op[1], parse_arg);
-	      expr_run(p->u.opr.op[2], parse_arg);
+        case '?':
+          {
+            rnode = ex_ifelse(init,
+                              expr_run(p->u.opr.op[0], parse_arg),
+                              expr_run(p->u.opr.op[1], parse_arg),
+                              expr_run(p->u.opr.op[2], parse_arg));
 
-	      if ( parse_arg->debug ) printf("\t?:\n");
-	    }
-	  else
-	    {
-	      rnode = ex_ifelse(expr_run(p->u.opr.op[0], parse_arg),
-			        expr_run(p->u.opr.op[1], parse_arg),
-			        expr_run(p->u.opr.op[2], parse_arg));
-	    }
-
-	  break;
+            break;
+          }
         default:
           {
             rnode = expr(init, p->u.opr.oper,
