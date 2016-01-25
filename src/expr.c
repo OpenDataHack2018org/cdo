@@ -137,7 +137,7 @@ void param_meta_copy(paramType *out, paramType *in)
 }
 
 static
-nodeType *expr_con_con(int init, int oper, nodeType *p1, nodeType *p2)
+nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -648,12 +648,6 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
       if ( cdoVerbose )
 	printf("\t%s\tarith\t%s[L%d][N%d] = %s %s %s\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
     }
-  else if ( p1->type == typeCon && p2->type == typeCon )
-    {
-      p = expr_con_con(init, oper, p1, p2);
-      if ( cdoVerbose )
-	printf("\t%s\tarith\t%g = %g %s %g\n", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
-    }
   else if ( p1->type == typeVar && p2->type == typeCon )
     {
       p = expr_var_con(init, oper, p1, p2);
@@ -665,6 +659,12 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
       p = expr_con_var(init, oper, p1, p2);
       if ( cdoVerbose )
 	printf("\t%s\tarith\t%s[L%d][N%d] = %g %s %s\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
+    }
+  else if ( p1->type == typeCon && p2->type == typeCon )
+    {
+      p = expr_con_con(oper, p1, p2);
+      if ( cdoVerbose )
+	printf("\t%s\tarith\t%g = %g %s %g\n", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
     }
   else
     cdoAbort("Internal problem!");
@@ -1167,20 +1167,21 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
         param_meta_copy(&p->param, &params[varID]);
         p->param.name = params[varID].name;
-        /*
- 	  if ( parse_arg->debug )
-          printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
-          p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
-        */
         p->ltmpvar = false;
+        /*
+        if ( parse_arg->debug )
+          printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
+                 p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
+        */
         if ( ! init )
           {
             p->param.data  = params[varID].data;
             p->param.nmiss = params[varID].nmiss;
           }
-        rnode = p;
-
+        
         if ( parse_arg->debug ) printf("\tpush\tvar\t%s[L%d][N%d]\n", vnm, p->param.nlev, p->param.ngp);
+
+        rnode = p;
 
         break;
       }
@@ -1241,7 +1242,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 if ( rnode && rnode->type == typeVar)
                   printf("\tpop\tvar\t%s[L%d][N%d]\n", varname2, rnode->param.nlev, rnode->param.ngp);
                 else
-                  printf("\tpop\tvar\t%s\n", varname2);
+                  printf("\tpop\tconst\t%s\n", varname2);
               }
 
             if ( init )
