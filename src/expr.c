@@ -778,7 +778,7 @@ nodeType *ex_fun(int funcID, nodeType *p1)
 }
 
 static
-nodeType *ex_uminus_var(nodeType *p1)
+nodeType *ex_uminus_var(int init, nodeType *p1)
 {
   long ngp  = p1->param.ngp;
   long nlev = p1->param.nlev;
@@ -793,22 +793,27 @@ nodeType *ex_uminus_var(nodeType *p1)
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
 
-  p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
-  double *restrict pdata = p->param.data;
-  const double *restrict p1data = p1->param.data;
-
-  if ( nmiss > 0 )
+  if ( ! init )
     {
-      for ( long i = 0; i < ngp*nlev; i++ )
-	pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
-    }
-  else
-    {
-      for ( long i = 0; i < ngp*nlev; i++ )
-	pdata[i] = -(p1data[i]);
-    }
+      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+      double *restrict pdata = p->param.data;
+      const double *restrict p1data = p1->param.data;
 
-  p->param.nmiss = nmiss;
+      if ( nmiss > 0 )
+        {
+          for ( long i = 0; i < ngp*nlev; i++ )
+            pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
+        }
+      else
+        {
+          for ( long i = 0; i < ngp*nlev; i++ )
+            pdata[i] = -(p1data[i]);
+        }
+
+      p->param.nmiss = nmiss;
+
+      if ( p1->ltmpvar ) Free(p1->param.data);
+    }
   
   return p;
 }
@@ -826,18 +831,18 @@ nodeType *ex_uminus_con(nodeType *p1)
 }
 
 static
-nodeType *ex_uminus(nodeType *p1)
+nodeType *ex_uminus(int init, nodeType *p1)
 {
   nodeType *p = NULL;
 
   if ( p1->type == typeVar )
     {
-      if ( cdoVerbose ) printf("\t- (%s)\n", p1->u.var.nm);
-      p = ex_uminus_var(p1);
+      if ( cdoVerbose ) printf("\t%s\tneg\t- (%s)\n", ExIn[init], p1->u.var.nm);
+      p = ex_uminus_var(init, p1);
     }
   else if ( p1->type == typeCon )
     {
-      if ( cdoVerbose ) printf("\t- (%g)\n", p1->u.con.value);
+      if ( cdoVerbose ) printf("\t%s\tneg\t- (%g)\n", ExIn[init], p1->u.con.value);
       p = ex_uminus_con(p1);
     }
   else
@@ -853,7 +858,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   if ( cdoVerbose )
     {
-      printf("\t%s\tarith\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
+      printf("\t%s\tifelse\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
       if ( p2->type == typeCon )
         printf("%g : ", p2->u.con.value);
       else
@@ -1288,7 +1293,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	    }
 
 	  break;
-        case UMINUS:    
+        case UMINUS:
+          /*
 	  if ( init )
 	    {
 	      expr_run(p->u.opr.op[0], parse_arg);
@@ -1296,8 +1302,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	      if ( parse_arg->debug ) printf("\tneg\n");
 	    }
 	  else
+          */
 	    {
-	      rnode = ex_uminus(expr_run(p->u.opr.op[0], parse_arg));
+	      rnode = ex_uminus(init, expr_run(p->u.opr.op[0], parse_arg));
 	    }
 
 	  break;
