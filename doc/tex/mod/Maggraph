@@ -41,3 +41,18 @@ Here is a list of all graph plot parameters:
 @Item = params
 STRING   Comma separated list of plot parameters
 @EndParameter
+
+
+@BeginExample
+Graph plot of an atlantic MOC time series from 1965 to 1976:
+@BeginVerbatim
+  cdo graph amoc plot
+@EndVerbatim
+@IfDoc
+\vspace{1mm}
+
+\includegraphics[width=\textwidth]{maggraph.pdf}
+
+\vspace{1mm}
+@EndifDoc
+@EndExample

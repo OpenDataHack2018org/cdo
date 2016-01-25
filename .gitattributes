@@ -73,6 +73,7 @@ doc/tex/figures/collgrid.pdf -text
 doc/tex/figures/distgrid.pdf -text
 doc/tex/figures/gmtgrfill.pdf -text svneol=unset#application/pdf
 doc/tex/figures/gmtshaded.pdf -text svneol=unset#application/pdf
+doc/tex/figures/maggraph.pdf -text svneol=unset#application/pdf
 doc/tex/figures/maggrfill.pdf -text svneol=unset#application/pdf
 doc/tex/figures/magshaded.pdf -text svneol=unset#application/pdf
 doc/tex/figures/magvector.pdf -text svneol=unset#application/pdf
