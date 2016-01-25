@@ -13,6 +13,7 @@
 #include "expr.h"
 #include "expr_yacc.h"
 
+static const char *ExIn[] = {"expr", "init"};
 int pointID = -1;
 
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
@@ -136,7 +137,7 @@ void param_meta_copy(paramType *out, paramType *in)
 }
 
 static
-nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
+nodeType *expr_con_con(int init, int oper, nodeType *p1, nodeType *p2)
 {
   nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
 
@@ -376,7 +377,7 @@ void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double mi
 }
 
 static
-nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
+nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
 {
   int ngp   = p2->param.ngp;
   int nlev  = p2->param.nlev;
@@ -394,26 +395,29 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   param_meta_copy(&p->param, &p2->param);
   p->param.name = p->u.var.nm;
 
-  p->param.data = (double*) Malloc(n*sizeof(double));
-  double *restrict odat = p->param.data;
-  const double *restrict idat = p2->param.data;
-  double cval = p1->u.con.value;
+  if ( ! init )
+    {
+      p->param.data = (double*) Malloc(n*sizeof(double));
+      double *restrict odat = p->param.data;
+      const double *restrict idat = p2->param.data;
+      double cval = p1->u.con.value;
 
-  oper_expr_con_var(oper, nmiss, n, missval1, missval2, odat, cval, idat);
+      oper_expr_con_var(oper, nmiss, n, missval1, missval2, odat, cval, idat);
 
-  nmiss = 0;
-  for ( long i = 0; i < n; i++ )
-    if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
+      nmiss = 0;
+      for ( long i = 0; i < n; i++ )
+        if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
 
-  p->param.nmiss = nmiss;
+      p->param.nmiss = nmiss;
 
-  if ( p2->ltmpvar ) Free(p2->param.data);
-
+      if ( p2->ltmpvar ) Free(p2->param.data);
+    }
+  
   return p;
 }
 
 static
-nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
+nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
 {
   int ngp   = p1->param.ngp;
   int nlev  = p1->param.nlev;
@@ -431,26 +435,29 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
 
-  p->param.data = (double*) Malloc(n*sizeof(double));
-  double *restrict odat = p->param.data;
-  const double *restrict idat = p1->param.data;
-  double cval = p2->u.con.value;
+  if ( ! init )
+    {
+      p->param.data = (double*) Malloc(n*sizeof(double));
+      double *restrict odat = p->param.data;
+      const double *restrict idat = p1->param.data;
+      double cval = p2->u.con.value;
 
-  oper_expr_var_con(oper, nmiss, n, missval1, missval2, odat, idat, cval);
+      oper_expr_var_con(oper, nmiss, n, missval1, missval2, odat, idat, cval);
 
-  nmiss = 0;
-  for ( long i = 0; i < n; i++ )
-    if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
+      nmiss = 0;
+      for ( long i = 0; i < n; i++ )
+        if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
 
-  p->param.nmiss = nmiss;
+      p->param.nmiss = nmiss;
 
-  if ( p1->ltmpvar ) Free(p1->param.data);
-
+      if ( p1->ltmpvar ) Free(p1->param.data);
+    }
+  
   return p;
 }
 
 static
-nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
+nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 {
   nodeType *px = p1;
   int nmiss1 = p1->param.nmiss;
@@ -503,46 +510,49 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 
   p->param.name = p->u.var.nm;
 
-  p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
-
-  for ( long k = 0; k < nlev; k++ )
+  if ( ! init )
     {
-      long loff1 = 0, loff2 = 0;
-      long loff = k*ngp;
+      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-      if ( nlev1 > 1 ) loff1 = k*ngp1;
-      if ( nlev2 > 1 ) loff2 = k*ngp2;
-
-      const double *restrict idat1 = p1->param.data+loff1;
-      const double *restrict idat2 = p2->param.data+loff2;
-      double *restrict odat = p->param.data+loff;
-      int nmiss = nmiss1 > 0 || nmiss2 > 0;
-
-      if ( ngp1 != ngp2 )
+      for ( long k = 0; k < nlev; k++ )
         {
-          if ( ngp2 == 1 )
-            oper_expr_var_con(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2[0]);
+          long loff1 = 0, loff2 = 0;
+          long loff = k*ngp;
+
+          if ( nlev1 > 1 ) loff1 = k*ngp1;
+          if ( nlev2 > 1 ) loff2 = k*ngp2;
+
+          const double *restrict idat1 = p1->param.data+loff1;
+          const double *restrict idat2 = p2->param.data+loff2;
+          double *restrict odat = p->param.data+loff;
+          int nmiss = nmiss1 > 0 || nmiss2 > 0;
+
+          if ( ngp1 != ngp2 )
+            {
+              if ( ngp2 == 1 )
+                oper_expr_var_con(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2[0]);
+              else
+                oper_expr_con_var(oper, nmiss, ngp, missval1, missval2, odat, idat1[0], idat2);
+            }
           else
-            oper_expr_con_var(oper, nmiss, ngp, missval1, missval2, odat, idat1[0], idat2);
+            oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
         }
-      else
-        oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
+
+      int nmiss = 0;
+      for ( long i = 0; i < ngp*nlev; i++ )
+        if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
+
+      p->param.nmiss = nmiss;
+
+      if ( p1->ltmpvar ) Free(p1->param.data);
+      if ( p2->ltmpvar ) Free(p2->param.data);
     }
-
-  int nmiss = 0;
-  for ( long i = 0; i < ngp*nlev; i++ )
-    if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
-
-  p->param.nmiss = nmiss;
-
-  if ( p1->ltmpvar ) Free(p1->param.data);
-  if ( p2->ltmpvar ) Free(p2->param.data);
-
+  
   return p;
 }
 
 static
-void ex_copy_var(nodeType *p2, nodeType *p1, int linit)
+void ex_copy_var(int init, nodeType *p2, nodeType *p1)
 {
   if ( cdoVerbose ) printf("\texpr\tcopy\t%s[L%d][N%d] = %s[L%d][N%d]\n",
                            p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
@@ -561,7 +571,7 @@ void ex_copy_var(nodeType *p2, nodeType *p1, int linit)
     cdoAbort("%s: Number of levels differ (%s[%d] = %s[%d])",
              __func__, p2->param.name, p2->param.nlev, p1->param.name, nlev);
 
-  if ( ! linit )
+  if ( ! init )
     {
       double *restrict odat = p2->param.data;
       const double *restrict idat = p1->param.data;
@@ -575,7 +585,7 @@ void ex_copy_var(nodeType *p2, nodeType *p1, int linit)
 }
 
 static
-void ex_copy_con(nodeType *p2, nodeType *p1, int linit)
+void ex_copy_con(int init, nodeType *p2, nodeType *p1)
 {
   double cval = p1->u.con.value;
 
@@ -587,7 +597,7 @@ void ex_copy_con(nodeType *p2, nodeType *p1, int linit)
   int nlev = p2->param.nlev;
   assert(nlev > 0);
 
-  if ( ! linit )
+  if ( ! init )
     {
       double *restrict odat = p2->param.data;
       assert(odat != NULL);
@@ -597,42 +607,64 @@ void ex_copy_con(nodeType *p2, nodeType *p1, int linit)
 }
 
 static
-void ex_copy(nodeType *p2, nodeType *p1, int linit)
+void ex_copy(int init, nodeType *p2, nodeType *p1)
 {
   if ( p1->type == typeCon )
-    ex_copy_con(p2, p1, linit);
+    ex_copy_con(init, p2, p1);
   else
-    ex_copy_var(p2, p1, linit);
+    ex_copy_var(init, p2, p1);
 }
 
 static
-nodeType *expr(int oper, nodeType *p1, nodeType *p2)
+nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p = NULL;
+  const char *coper = "unknown";
+
+  if ( cdoVerbose )
+    {
+      switch ( oper )
+        {
+        case '+':  coper = "+"; break;
+        case '-':  coper = "+"; break;
+        case '*':  coper = "+"; break;
+        case '/':  coper = "/"; break;
+        case LT:   coper = ">"; break;
+        case GT:   coper = "<"; break;
+        case LE:   coper = "<="; break;
+        case GE:   coper = ">="; break;
+        case NE:   coper = "!="; break;
+        case EQ:   coper = "=="; break;
+        case LEG:  coper = "<=>"; break;
+        case AND:  coper = "&&"; break;
+        case OR:   coper = "||"; break;
+        }
+    }
+
+ nodeType *p = NULL;
 
   if ( p1->type == typeVar && p2->type == typeVar )
     {
-      p = expr_var_var(oper, p1, p2);
+      p = expr_var_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s\t%c\t%s\n", p1->u.var.nm, oper, p2->u.var.nm);
+	printf("\t%s\tarith\t%s[L%d][N%d] = %s %s %s\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
     }
   else if ( p1->type == typeCon && p2->type == typeCon )
     {
-      p = expr_con_con(oper, p1, p2);
+      p = expr_con_con(init, oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%g\t%c\t%g\n", p1->u.con.value, oper, p2->u.con.value);
+	printf("\t%s\tarith\t%g = %g %s %g\n", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
     }
   else if ( p1->type == typeVar && p2->type == typeCon )
     {
-      p = expr_var_con(oper, p1, p2);
+      p = expr_var_con(init, oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s\t%c\t%g\n", p1->u.var.nm, oper, p2->u.con.value);
+	printf("\t%s\tarith\t%s[L%d][N%d] = %s %s %g\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
     }
   else if ( p1->type == typeCon && p2->type == typeVar )
     {
-      p = expr_con_var(oper, p1, p2);
+      p = expr_con_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%g\t%c\t%s\n", p1->u.con.value, oper, p2->u.var.nm);
+	printf("\t%s\tarith\t%s[L%d][N%d] = %g %s %s\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
     }
   else
     cdoAbort("Internal problem!");
@@ -987,7 +1019,7 @@ int param_search_name(int nparam, paramType *params, const char *name)
 
 nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 {
-  int linit = parse_arg->init;
+  int init = parse_arg->init;
   paramType *params = parse_arg->params;
   paramType *param2 = &parse_arg->param2;
   int varID;
@@ -995,7 +1027,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
   if ( ! p ) return rnode;
 
-  /*  if ( ! linit ) { exNode(p, parse_arg); return 0; } */
+  /*  if ( ! init ) { exNode(p, parse_arg); return 0; } */
 
   switch ( p->type )
     {
@@ -1012,7 +1044,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
         const char *vnm = p->u.var.nm;
         // if ( parse_arg->debug ) printf("\tpush\tvar\t%s\n", vnm);
         varID = param_search_name(parse_arg->nparams, params, vnm);
-        if ( varID == -1 && linit )
+        if ( varID == -1 && init )
           {
             size_t len = strlen(vnm);
             int coord = vnm[len-1];
@@ -1089,7 +1121,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           {
             cdoAbort("Variable >%s< not found!", p->u.var.nm);
           }
-        else if ( linit )
+        else if ( init )
           {
             if ( varID < parse_arg->nvars1 && parse_arg->needed[varID] == false )
               {
@@ -1129,7 +1161,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           p->u.var.nm, p->param.name, p->param.gridID, p->param.zaxisID, p->param.ngp, p->param.nlev, varID);
         */
         p->ltmpvar = false;
-        if ( ! linit )
+        if ( ! init )
           {
             p->param.data  = params[varID].data;
             p->param.nmiss = params[varID].nmiss;
@@ -1144,7 +1176,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       {
         int funcID = get_funcID(p->u.fun.name);
       
-        if ( linit )
+        if ( init )
           {
             expr_run(p->u.fun.op, parse_arg);
 
@@ -1178,7 +1210,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       switch( p->u.opr.oper )
 	{
         case '=':
-	  if ( linit )
+	  if ( init )
             {
               param2->gridID   = -1;
               param2->zaxisID  = -1;
@@ -1199,7 +1231,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 printf("\tpop\tvar\t%s\n", varname2);
             }
 
-          if ( linit )
+          if ( init )
 	    {
               //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
               if ( p->u.opr.op[1]->type != typeCon )
@@ -1245,12 +1277,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
               p->param.data = params[varID].data;
               p->ltmpvar    = false;
 
-              ex_copy(p, rnode, linit);
+              ex_copy(init, p, rnode);
 	    }
 
 	  break;
         case UMINUS:    
-	  if ( linit )
+	  if ( init )
 	    {
 	      expr_run(p->u.opr.op[0], parse_arg);
 
@@ -1263,7 +1295,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
 	  break;
         case '?':    
-	  if ( linit )
+	  if ( init )
 	    {
 	      expr_run(p->u.opr.op[0], parse_arg);
 	      expr_run(p->u.opr.op[1], parse_arg);
@@ -1280,34 +1312,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
 	  break;
         default:
-	  if ( linit )
-	    {
-	      expr_run(p->u.opr.op[0], parse_arg);
-	      expr_run(p->u.opr.op[1], parse_arg);
-	      if ( parse_arg->debug )
-		switch( p->u.opr.oper )
-		  {
-		  case '+':  printf("\tadd\n"); break;
-		  case '-':  printf("\tsub\n"); break;
-		  case '*':  printf("\tmul\n"); break;
-		  case '/':  printf("\tdiv\n"); break;
-		  case LT:   printf("\tcompLT\n"); break;
-		  case GT:   printf("\tcompGT\n"); break;
-		  case LE:   printf("\tcompLE\n"); break;
-		  case GE:   printf("\tcompGE\n"); break;
-		  case NE:   printf("\tcompNE\n"); break;
-		  case EQ:   printf("\tcompEQ\n"); break;
-		  case LEG:  printf("\tcompLEG\n"); break;
-		  case AND:  printf("\tcompAND\n"); break;
-		  case OR:   printf("\tcompOR\n"); break;
-		  }
-	    }
-	  else
-	    {
-	      rnode = expr(p->u.opr.oper, expr_run(p->u.opr.op[0], parse_arg),
-			                  expr_run(p->u.opr.op[1], parse_arg));
-	    }
-          break;
+          {
+            rnode = expr(init, p->u.opr.oper,
+                         expr_run(p->u.opr.op[0], parse_arg),
+                         expr_run(p->u.opr.op[1], parse_arg));
+            break;
+          }
         }
       break;
     }
