@@ -1222,92 +1222,85 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
       switch( p->u.opr.oper )
 	{
         case '=':
-	  if ( init )
-            {
-              param2->gridID   = -1;
-              param2->zaxisID  = -1;
-              param2->steptype = -1;
-              param2->ngp  = 0;
-              param2->nlev = 0;
-            }
+          {
+            if ( init )
+              {
+                param2->gridID   = -1;
+                param2->zaxisID  = -1;
+                param2->steptype = -1;
+                param2->ngp  = 0;
+                param2->nlev = 0;
+              }
 
-          rnode = expr_run(p->u.opr.op[1], parse_arg);
+            rnode = expr_run(p->u.opr.op[1], parse_arg);
 
-          const char *varname2 = p->u.opr.op[0]->u.var.nm;
+            const char *varname2 = p->u.opr.op[0]->u.var.nm;
 
-          if ( parse_arg->debug )
-            {
-              if ( rnode && rnode->type == typeVar)
-                printf("\tpop\tvar\t%s[L%d][N%d]\n", varname2, rnode->param.nlev, rnode->param.ngp);
-              else
-                printf("\tpop\tvar\t%s\n", varname2);
-            }
+            if ( parse_arg->debug )
+              {
+                if ( rnode && rnode->type == typeVar)
+                  printf("\tpop\tvar\t%s[L%d][N%d]\n", varname2, rnode->param.nlev, rnode->param.ngp);
+                else
+                  printf("\tpop\tvar\t%s\n", varname2);
+              }
 
-          if ( init )
-	    {
-              //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
-              if ( p->u.opr.op[1]->type != typeCon )
-                {
-                  if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
-                    cdoAbort("Operand not variable!");
-                }
-              varID = param_search_name(parse_arg->nparams, params, varname2);
-              if ( varID >= 0 )
-                {
-                  if ( varID < parse_arg->nvars1 )
-                    {
-                      params[varID].select = true;
-                      parse_arg->needed[varID] = true;
-                    }
-                  else if ( params[varID].coord )
-                    cdoAbort("Coordinate variable %s is read only!", varname2);
-                  /*
-                  else
-                    cdoWarning("Variable %s already defined!", varname2);
-                  */
-                }
-              else if ( p->u.opr.op[1]->type != typeCon )
-                {
-                  varID = parse_arg->nparams;
-                  if ( varID >= parse_arg->maxparams )
-                    cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+            if ( init )
+              {
+                //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
+                if ( p->u.opr.op[1]->type != typeCon )
+                  {
+                    if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
+                      cdoAbort("Operand not variable!");
+                  }
+                varID = param_search_name(parse_arg->nparams, params, varname2);
+                if ( varID >= 0 )
+                  {
+                    if ( varID < parse_arg->nvars1 )
+                      {
+                        params[varID].select = true;
+                        parse_arg->needed[varID] = true;
+                      }
+                    else if ( params[varID].coord )
+                      cdoAbort("Coordinate variable %s is read only!", varname2);
+                    /*
+                      else
+                      cdoWarning("Variable %s already defined!", varname2);
+                    */
+                  }
+                else if ( p->u.opr.op[1]->type != typeCon )
+                  {
+                    varID = parse_arg->nparams;
+                    if ( varID >= parse_arg->maxparams )
+                      cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
+                    
+                    param_meta_copy(&params[varID], param2);
+                    params[varID].coord = 0;
+                    params[varID].name  = strdup(varname2);
+                    if ( param2->units ) params[varID].units = strdup(param2->units);
+                    parse_arg->nparams++;
+                  }
+              }
+            else
+              {
+                varID = param_search_name(parse_arg->nparams, params, varname2);
+                if ( varID < 0 ) cdoAbort("Variable >%s< not found!", varname2);
+                else if ( params[varID].coord ) cdoAbort("Coordinate variable %s is read only!", varname2);
+                param_meta_copy(&p->param, &params[varID]);
+                p->param.name = params[varID].name;
+                p->param.data = params[varID].data;
+                p->ltmpvar    = false;
 
-                  param_meta_copy(&params[varID], param2);
-                  params[varID].coord = 0;
-                  params[varID].name  = strdup(varname2);
-                  if ( param2->units ) params[varID].units = strdup(param2->units);
-                  parse_arg->nparams++;
-                }
-	    }
-	  else
-	    {
-              varID = param_search_name(parse_arg->nparams, params, varname2);
-	      if ( varID < 0 ) cdoAbort("Variable >%s< not found!", varname2);
-              else if ( params[varID].coord ) cdoAbort("Coordinate variable %s is read only!", varname2);
-              param_meta_copy(&p->param, &params[varID]);
-              p->param.name = params[varID].name;
-              p->param.data = params[varID].data;
-              p->ltmpvar    = false;
+                ex_copy(init, p, rnode);
+              }
 
-              ex_copy(init, p, rnode);
-	    }
-
-	  break;
+            break;
+          }
         case UMINUS:
-          /*
-	  if ( init )
-	    {
-	      expr_run(p->u.opr.op[0], parse_arg);
+          {
+            rnode = ex_uminus(init, expr_run(p->u.opr.op[0], parse_arg));
 
-	      if ( parse_arg->debug ) printf("\tneg\n");
-	    }
-	  else
-          */
-	    {
-	      rnode = ex_uminus(init, expr_run(p->u.opr.op[0], parse_arg));
-	    }
-
-	  break;
+            break;
+          }
         case '?':
           {
             rnode = ex_ifelse(init,
