@@ -625,8 +625,8 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
       switch ( oper )
         {
         case '+':  coper = "+"; break;
-        case '-':  coper = "+"; break;
-        case '*':  coper = "+"; break;
+        case '-':  coper = "-"; break;
+        case '*':  coper = "*"; break;
         case '/':  coper = "/"; break;
         case LT:   coper = ">"; break;
         case GT:   coper = "<"; break;
@@ -686,7 +686,7 @@ nodeType *ex_fun_con(int funcID, nodeType *p1)
 }
 
 static
-nodeType *ex_fun_var(int funcID, nodeType *p1)
+nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
 {
   int functype = fun_sym_tbl[funcID].type;
 
@@ -709,66 +709,69 @@ nodeType *ex_fun_var(int funcID, nodeType *p1)
       p->param.ngp    = 1;
     }
 
-  p->param.data = (double*) Malloc(p->param.ngp*nlev*sizeof(double));
-  double *restrict pdata = p->param.data;
-  double *restrict p1data = p1->param.data;
-  
-  if ( functype == 0 )
+  if ( ! init )
     {
-      double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
-      if ( nmiss > 0 )
+      p->param.data = (double*) Malloc(p->param.ngp*nlev*sizeof(double));
+      double *restrict pdata = p->param.data;
+      double *restrict p1data = p1->param.data;
+  
+      if ( functype == 0 )
         {
-          for ( long i = 0; i < ngp*nlev; i++ )
+          double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
+          if ( nmiss > 0 )
             {
-              errno = -1;
-              pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
-              if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
-              else if ( isnan(pdata[i]) ) pdata[i] = missval;
+              for ( long i = 0; i < ngp*nlev; i++ )
+                {
+                  errno = -1;
+                  pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
+                  if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
+                  else if ( isnan(pdata[i]) ) pdata[i] = missval;
+                }
             }
+          else
+            {
+              for ( long i = 0; i < ngp*nlev; i++ )
+                {
+                  errno = -1;
+                  pdata[i] = exprfunc(p1data[i]);
+                  if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
+                  else if ( isnan(pdata[i]) ) pdata[i] = missval;
+                }
+            }
+          
         }
       else
         {
-          for ( long i = 0; i < ngp*nlev; i++ )
-            {
-              errno = -1;
-              pdata[i] = exprfunc(p1data[i]);
-              if ( errno == EDOM || errno == ERANGE ) pdata[i] = missval;
-              else if ( isnan(pdata[i]) ) pdata[i] = missval;
-            }
+          double (*exprfunc)(int,double*) = (double (*)(int,double*)) fun_sym_tbl[funcID].func;
+          for ( int k = 0; k < nlev; k++ )
+            pdata[k] = exprfunc(ngp, p1data+k*ngp);
         }
 
+      nmiss = 0;
+      for ( long i = 0; i < p->param.ngp*nlev; i++ )
+        if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
+
+      p->param.nmiss = nmiss;
+
+      if ( p1->ltmpvar ) Free(p1data);
     }
-  else
-    {
-      double (*exprfunc)(int,double*) = (double (*)(int,double*)) fun_sym_tbl[funcID].func;
-      for ( int k = 0; k < nlev; k++ )
-        pdata[k] = exprfunc(ngp, p1data+k*ngp);
-    }
-
-  nmiss = 0;
-  for ( long i = 0; i < p->param.ngp*nlev; i++ )
-    if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
-
-  p->param.nmiss = nmiss;
-
-  if ( p1->ltmpvar ) Free(p1data);
-
+  
   return p;
 }
 
 static
-nodeType *ex_fun(int funcID, nodeType *p1)
+nodeType *ex_fun(int init, int funcID, nodeType *p1)
 {
   nodeType *p = NULL;
 
   if ( p1->type == typeVar )
     {
-      if ( cdoVerbose ) printf("\t%s (%s)\n", fun_sym_tbl[funcID].name, p1->u.var.nm);
-      p = ex_fun_var(funcID, p1);
+      if ( cdoVerbose ) printf("\t%s\tfunc\t%s (%s)\n", ExIn[init], fun_sym_tbl[funcID].name, p1->u.var.nm);
+      p = ex_fun_var(init, funcID, p1);
     }
   else if ( p1->type == typeCon )
     {
-      if ( cdoVerbose ) printf("\t%s (%g)\n", fun_sym_tbl[funcID].name, p1->u.con.value);
+      if ( cdoVerbose ) printf("\t%s\tfunc\t%s (%g)\n", ExIn[init], fun_sym_tbl[funcID].name, p1->u.con.value);
       p = ex_fun_con(funcID, p1);
     }
   else
@@ -1031,6 +1034,7 @@ int param_search_name(int nparam, paramType *params, const char *name)
 
 nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 {
+  pointID = parse_arg->pointID;
   int init = parse_arg->init;
   paramType *params = parse_arg->params;
   paramType *param2 = &parse_arg->param2;
@@ -1188,34 +1192,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
     case typeFun:
       {
         int funcID = get_funcID(p->u.fun.name);
-      
-        if ( init )
-          {
-            expr_run(p->u.fun.op, parse_arg);
 
-            int functype = fun_sym_tbl[funcID].type;
-            if ( functype == 1 )
-              {
-                pointID = parse_arg->pointID;
-                // printf("ngp %d\n", p->param.ngp);
-                // p->u.fun.op->param.gridID = parse_arg->pointID;
-                // p->u.fun.op->param.ngp = 1;
-                //if ( param2->gridID == -1 )
-                  {
-                    // param2->gridID = parse_arg->pointID;
-                    // param2->ngp = 1;
-                  }
-                // p->param.gridID = parse_arg->pointID;
-                // p->param.ngp = 1;
-                // rnode = p;
-              }
-            
-            if ( parse_arg->debug ) printf("\tcall\t%s\n", p->u.fun.name); 
-          }
-        else
-          {
-            rnode = ex_fun(funcID, expr_run(p->u.fun.op, parse_arg));
-          }
+        rnode = ex_fun(init, funcID, expr_run(p->u.fun.op, parse_arg));
 
         break;
       }
