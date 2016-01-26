@@ -1252,7 +1252,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                     if ( varID >= parse_arg->maxparams )
                       cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
-                    printf(">>>>>>> %s %d %d\n", rnode->param.name, rnode->param.nlev, rnode->param.ngp);
                     param_meta_copy(&params[varID], &rnode->param);
                     params[varID].coord = 0;
                     params[varID].name  = strdup(varname2);
