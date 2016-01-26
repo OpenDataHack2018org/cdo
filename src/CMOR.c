@@ -7,7 +7,6 @@
 
 #if defined(HAVE_LIBCMOR)
 #include "cmor.h"
-#endif
 
 static char *trim(char *s)
 {
@@ -68,6 +67,7 @@ static char *get_val(char *key)
   else
     return NULL;
 }
+#endif
 
 void *CMOR(void *argument)
 {
@@ -76,31 +76,50 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   int nparams = operatorArgc();
   char **params = operatorArgv();
-  int i;
+  char *param;
+  int i, j, k, size;
   char *table, *vars;
   char *var_list[CMOR_MAX_VARIABLES];
   int use_n_vars = 0;
 
-  if ( cdoVerbose )
-    for ( i = 0; i < nparams; ++i )
-      printf("param %d: %s\n", i, params[i]);
-
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
-  table = params[0];
 
   hcreate(100);
   parse_kvfile("cmor.rc");
+  table = params[0];
 
-  for ( i = 1; i < nparams; ++i )
-    hinsert(params[i]);
+  /* Assume key = value pairs from here on.
+   * That is, if params[i] contains no '=' then treat it as if
+   * it belongs to the value of params[i-1], separated by a ','.*/
+  i = 1;
+  while ( i < nparams )
+    {
+      j = 1;
+      size = strlen(params[i]) + 1;
+      while ( i + j < nparams && strchr(params[i + j], '=') == NULL )
+        {
+          size += strlen(params[i + j]) + 1;
+          j++;
+        }
+      param = (char *) Malloc(size);
+      strcpy(param, params[i]);
+      for (k = 1; k < j; k++)
+        {
+          strcat(param, ",");
+          strcat(param, params[i + k]);
+        }
+      hinsert(param);
+      free(param);
+      i += j;
+    }
 
   vars = get_val("var");
   if ( vars )
     {
-      var_list[0] = strtok(strdup(vars), " ");
+      var_list[0] = strtok(strdup(vars), ",");
       do
         use_n_vars++;
-      while ( (var_list[use_n_vars] = strtok(NULL, " ")) );
+      while ( (var_list[use_n_vars] = strtok(NULL, ",")) );
     }
 
   int streamID = streamOpenRead(cdoStreamName(0));
