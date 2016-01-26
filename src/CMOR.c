@@ -23,19 +23,19 @@ static char *trim(char *s)
   return s;
 }
 
-static int hinsert(char *kvstr)
+static ENTRY *hinsert(char *kvstr)
 {
   char *key, *value;
-  ENTRY e;
+  ENTRY e, *ep;
 
   key = trim(strtok(kvstr, "="));
   value = trim(strtok(NULL, "="));
   if ( key == NULL || value == NULL )
-    return 1;
+    return NULL;
   e.key = strdup(key);
   e.data = (void *)strdup(value);
-  hsearch(e, ENTER);
-  return 0;
+  ep = hsearch(e, ENTER);
+  return ep;
 }
 
 static int parse_kvfile(const char *filename)
@@ -43,7 +43,6 @@ static int parse_kvfile(const char *filename)
   FILE *fp;
   char line[1024], *comment;
 
-  hcreate(100);
   fp = fopen(filename, "r");
   if ( fp == NULL )
     return 1;
@@ -58,6 +57,18 @@ static int parse_kvfile(const char *filename)
   return 0;
 }
 
+static char *get_val(char *key)
+{
+  ENTRY e, *ep;
+
+  e.key = key;
+  ep = hsearch(e, FIND);
+  if ( ep )
+    return (char *)ep->data;
+  else
+    return NULL;
+}
+
 void *CMOR(void *argument)
 {
   cdoInitialize(argument);
@@ -65,41 +76,33 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   int nparams = operatorArgc();
   char **params = operatorArgv();
-  char tab[CMOR_MAX_STRING];
-  char *option, *value;
-  char *var, *chunk, *expinfo, *modinfo, *userinfo;
+  int i;
+  char *table, *vars;
+  char *var_list[CMOR_MAX_VARIABLES];
+  int use_n_vars = 0;
+
   if ( cdoVerbose )
-    for ( int i = 0; i < nparams; ++i )
+    for ( i = 0; i < nparams; ++i )
       printf("param %d: %s\n", i, params[i]);
 
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
-  strncpy(tab, params[0], CMOR_MAX_STRING);
-  for ( int i = 1; i < nparams; ++i )
-    {
-      option = strtok(params[i], "=");
-      value = strtok(NULL, "=");
-      if ( value == NULL )
-        cdoAbort("Missing value!");
-      if ( strncasecmp(option, "var", 3) == 0 )
-        var = value;
-      else if ( strncasecmp(option, "chunk", 5) == 0 )
-        chunk = value;
-      else if ( strncasecmp(option, "expinfo", 7) == 0 )
-        expinfo = value;
-      else if ( strncasecmp(option, "modinfo", 7) == 0 )
-        modinfo = value;
-      else if ( strncasecmp(option, "userinfo", 8) == 0 )
-        userinfo = value;
-      else
-        cdoAbort("Unknown option!");
-    }
+  table = params[0];
 
+  hcreate(100);
   parse_kvfile("cmor.rc");
 
-  /*
-  if ( cdoVerbose )
-    cdoPrint("Using CMOR version %d.%d.%d.", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
-  */
+  for ( i = 1; i < nparams; ++i )
+    hinsert(params[i]);
+
+  vars = get_val("var");
+  if ( vars )
+    {
+      var_list[0] = strtok(strdup(vars), " ");
+      do
+        use_n_vars++;
+      while ( (var_list[use_n_vars] = strtok(NULL, " ")) );
+    }
+
   int streamID = streamOpenRead(cdoStreamName(0));
 
   int vlistID = streamInqVlist(streamID);
@@ -122,13 +125,13 @@ void *CMOR(void *argument)
     }
 
   streamClose(streamID);
+  hdestroy();
 
   if ( array ) Free(array);
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
 
-  hdestroy();
   cdoFinish();
 
   return 0;
