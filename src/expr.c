@@ -14,6 +14,7 @@
 #include "expr_yacc.h"
 
 static const char *ExIn[] = {"expr", "init"};
+static const char *tmpvnm = "_tmp_";
 int pointID = -1;
 
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
@@ -391,7 +392,7 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
 
   p->type     = typeVar;
   p->ltmpvar  = true;
-  p->u.var.nm = strdup("tmp");
+  p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p2->param);
   p->param.name = p->u.var.nm;
 
@@ -431,7 +432,7 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
 
   p->type     = typeVar;
   p->ltmpvar  = true;
-  p->u.var.nm = strdup("tmp");
+  p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
 
@@ -504,7 +505,7 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 
   p->type     = typeVar;
   p->ltmpvar  = true;
-  p->u.var.nm = strdup("tmp");
+  p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &px->param);
 
@@ -699,7 +700,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
 
   p->type     = typeVar;
   p->ltmpvar  = true;
-  p->u.var.nm = strdup("tmp");
+  p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &p1->param);
 
@@ -792,7 +793,7 @@ nodeType *ex_uminus_var(int init, nodeType *p1)
 
   p->type     = typeVar;
   p->ltmpvar  = true;
-  p->u.var.nm = strdup("tmp");
+  p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
 
@@ -943,7 +944,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   p->type     = typeVar;
   p->ltmpvar  = true;
-  p->u.var.nm = strdup("tmp");
+  p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &px->param);
   p->param.name = p->u.var.nm;
