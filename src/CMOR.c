@@ -2,10 +2,61 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include <search.h>
+#include <ctype.h>
 
 #if defined(HAVE_LIBCMOR)
 #include "cmor.h"
 #endif
+
+static char *trim(char *s)
+{
+  int n;
+  if (s == NULL)
+    return s;
+  while ( *s != '\0' && (isspace(*s) || *s == '"') )
+    s++;
+  n = strlen(s);
+  while ( n > 0 && (isspace(s[n - 1]) || s[n - 1] == '"') )
+    n--;
+  s[n] = '\0';
+  return s;
+}
+
+static int hinsert(char *kvstr)
+{
+  char *key, *value;
+  ENTRY e;
+
+  key = trim(strtok(kvstr, "="));
+  value = trim(strtok(NULL, "="));
+  if ( key == NULL || value == NULL )
+    return 1;
+  e.key = strdup(key);
+  e.data = (void *)strdup(value);
+  hsearch(e, ENTER);
+  return 0;
+}
+
+static int parse_kvfile(const char *filename)
+{
+  FILE *fp;
+  char line[1024], *comment;
+
+  hcreate(100);
+  fp = fopen(filename, "r");
+  if ( fp == NULL )
+    return 1;
+  while ( fgets(line, sizeof(line), fp) != NULL )
+    {
+      comment = strchr(line, '#');
+      if ( comment )
+        *comment = '\0';
+      hinsert(line);
+    }
+  fclose(fp);
+  return 0;
+}
 
 void *CMOR(void *argument)
 {
@@ -43,6 +94,8 @@ void *CMOR(void *argument)
         cdoAbort("Unknown option!");
     }
 
+  parse_kvfile("cmor.rc");
+
   /*
   if ( cdoVerbose )
     cdoPrint("Using CMOR version %d.%d.%d.", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
@@ -75,6 +128,7 @@ void *CMOR(void *argument)
   cdoWarning("CMOR support not compiled in!");
 #endif
 
+  hdestroy();
   cdoFinish();
 
   return 0;
