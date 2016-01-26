@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "dmemory.h"
+
 #include "expr.h"
 #include "expr_yacc.h" /* expr_yacc.h (y.tab.h) is produced from expr_yacc.y by parser generator */
 
@@ -102,7 +104,7 @@ nodeType *expr_con(double value)
   nodeType *p = NULL;
   /* allocate node */
   size_t nodeSize = SIZEOF_NODETYPE + sizeof(conNodeType);
-  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
+  if ( (p = (nodeType*) Calloc(1, nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
@@ -117,7 +119,7 @@ nodeType *expr_var(char *nm)
   nodeType *p = NULL;
   /* allocate node */
   size_t nodeSize = SIZEOF_NODETYPE + sizeof(varNodeType);
-  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
+  if ( (p = (nodeType*) Calloc(1, nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
@@ -132,7 +134,7 @@ nodeType *expr_fun(char *fname, nodeType *op)
   nodeType *p = NULL;
   /* allocate node */
   size_t nodeSize = SIZEOF_NODETYPE + sizeof(funNodeType);
-  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
+  if ( (p = (nodeType*) Calloc(1, nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
@@ -148,7 +150,7 @@ nodeType *expr_opr(int oper, int nops, ...)
   nodeType *p = NULL;
   /* allocate node */
   size_t nodeSize = SIZEOF_NODETYPE + sizeof(oprNodeType) + (nops - 1)*sizeof(nodeType*);
-  if ( (p = (nodeType*) malloc(nodeSize)) == NULL )
+  if ( (p = (nodeType*) Calloc(1, nodeSize)) == NULL )
     yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
@@ -174,7 +176,7 @@ void freeNode(nodeType *p)
 	freeNode(p->u.opr.op[i]);
     }
   
-  free(p);
+  Free(p);
 }
 
 void yyerror(void *parse_arg, void *scanner, const char *errstr)

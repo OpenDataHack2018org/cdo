@@ -55,7 +55,7 @@ typedef struct {
 
 
 typedef struct nodeTypeTag {
-  bool      ltmpvar;
+  bool      ltmpobj;
   paramType param;
 
   nodeEnum  type;             // type of node

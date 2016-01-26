@@ -13,6 +13,8 @@
 #include "expr.h"
 #include "expr_yacc.h"
 
+void freeNode(nodeType *p);
+
 static const char *ExIn[] = {"expr", "init"};
 static const char *tmpvnm = "_tmp_";
 int pointID = -1;
@@ -106,6 +108,26 @@ static func_t fun_sym_tbl[] =
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
 
 static
+void node_data_delete(nodeType *p)
+{
+  if ( p )
+    {
+      if ( p->param.data ) { Free(p->param.data); p->param.data = NULL;}
+      //   Free(p);
+    }
+}
+
+static
+void node_delete(nodeType *p)
+{
+  if ( p )
+    {
+      if ( p->type == typeVar ) node_data_delete(p);
+      Free(p);
+    }
+}
+
+static
 int get_funcID(const char *fun)
 {
   int funcID = -1;
@@ -135,14 +157,16 @@ void param_meta_copy(paramType *out, paramType *in)
   out->name     = NULL;
   out->longname = NULL;
   out->units    = NULL;
+  out->data     = NULL;
 }
 
 static
 nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
-  p->type = typeCon;
+  p->type    = typeCon;
+  p->ltmpobj = true;
 
   double cval1 = p1->u.con.value;
   double cval2 = p2->u.con.value;
@@ -388,10 +412,10 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
 
   long n   = (long)ngp*nlev;
 
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
   p->type     = typeVar;
-  p->ltmpvar  = true;
+  p->ltmpobj  = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p2->param);
   p->param.name = p->u.var.nm;
@@ -410,8 +434,6 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
         if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
-
-      if ( p2->ltmpvar ) Free(p2->param.data);
     }
   
   return p;
@@ -428,10 +450,10 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
 
   long n = (long)ngp*nlev;
 
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
   p->type     = typeVar;
-  p->ltmpvar  = true;
+  p->ltmpobj  = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
@@ -450,8 +472,6 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
         if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
-
-      if ( p1->ltmpvar ) Free(p1->param.data);
     }
   
   return p;
@@ -501,10 +521,10 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
         }
     }
 
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
   p->type     = typeVar;
-  p->ltmpvar  = true;
+  p->ltmpobj  = true;
   p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &px->param);
@@ -544,9 +564,6 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
         if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
-
-      if ( p1->ltmpvar ) Free(p1->param.data);
-      if ( p2->ltmpvar ) Free(p2->param.data);
     }
   
   return p;
@@ -580,9 +597,9 @@ void ex_copy_var(int init, nodeType *p2, nodeType *p1)
   
       p2->param.missval = p1->param.missval;
       p2->param.nmiss   = p1->param.nmiss;
-
-      if ( p1->ltmpvar ) Free(p1->param.data);
     }
+
+  if ( p1->ltmpobj ) node_delete(p1);
 }
 
 static
@@ -670,15 +687,19 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
   else
     cdoAbort("Internal problem!");
 
+  if ( p1->ltmpobj ) node_delete(p1);
+  if ( p2->ltmpobj ) node_delete(p2);
+
   return p;
 }
 
 static
 nodeType *ex_fun_con(int funcID, nodeType *p1)
 {
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
-  p->type = typeCon;
+  p->type    = typeCon;
+  p->ltmpobj = true;
 
   double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
   p->u.con.value = exprfunc(p1->u.con.value);
@@ -696,10 +717,10 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
   int nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
   p->type     = typeVar;
-  p->ltmpvar  = true;
+  p->ltmpobj  = true;
   p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &p1->param);
@@ -753,9 +774,9 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
         if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
       p->param.nmiss = nmiss;
-
-      if ( p1->ltmpvar ) Free(p1data);
     }
+
+  if ( p1->ltmpobj ) node_delete(p1);
   
   return p;
 }
@@ -789,10 +810,10 @@ nodeType *ex_uminus_var(int init, nodeType *p1)
   int nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
   p->type     = typeVar;
-  p->ltmpvar  = true;
+  p->ltmpobj  = true;
   p->u.var.nm = strdup(tmpvnm);
   param_meta_copy(&p->param, &p1->param);
   p->param.name = p->u.var.nm;
@@ -815,9 +836,9 @@ nodeType *ex_uminus_var(int init, nodeType *p1)
         }
 
       p->param.nmiss = nmiss;
-
-      if ( p1->ltmpvar ) Free(p1->param.data);
     }
+
+  if ( p1->ltmpobj ) node_delete(p1);
   
   return p;
 }
@@ -825,9 +846,10 @@ nodeType *ex_uminus_var(int init, nodeType *p1)
 static
 nodeType *ex_uminus_con(nodeType *p1)
 {
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
-  p->type = typeCon;
+  p->type    = typeCon;
+  p->ltmpobj = true;
 
   p->u.con.value = -(p1->u.con.value);
 
@@ -862,7 +884,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   if ( cdoVerbose )
     {
-      fprintf(stderr, " expr:\t%s\tifelse\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
+      fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
       if ( p2->type == typeCon )
         printf("%g : ", p2->u.con.value);
       else
@@ -940,10 +962,10 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 	}
     }
 
-  nodeType *p = (nodeType*) Malloc(sizeof(nodeType));
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
   p->type     = typeVar;
-  p->ltmpvar  = true;
+  p->ltmpobj  = true;
   p->u.var.nm = strdup(tmpvnm);
 
   param_meta_copy(&p->param, &px->param);
@@ -989,11 +1011,11 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
                 odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;
             }
           }
-
-      if ( p1->ltmpvar ) Free(pdata1);
-      if ( p2->ltmpvar ) Free(pdata2);
-      if ( p3->ltmpvar ) Free(pdata3);
     }
+
+  if ( p1->ltmpobj ) node_delete(p1);
+  if ( p2->ltmpobj ) node_delete(p2);
+  if ( p3->ltmpobj ) node_delete(p3);
 
   return p;
 }
@@ -1172,7 +1194,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
         param_meta_copy(&p->param, &params[varID]);
         p->param.name = params[varID].name;
-        p->ltmpvar = false;
+        p->ltmpobj = false;
         /*
         if ( parse_arg->debug )
           printf("var: u.var.nm=%s name=%s gridID=%d zaxisID=%d ngp=%d nlev=%d  varID=%d\n",
@@ -1183,7 +1205,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             p->param.data  = params[varID].data;
             p->param.nmiss = params[varID].nmiss;
           }
-        
+
         if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%d][N%d]", vnm, p->param.nlev, p->param.ngp);
 
         rnode = p;
@@ -1195,7 +1217,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
         int funcID = get_funcID(p->u.fun.name);
 
         rnode = ex_fun(init, funcID, expr_run(p->u.fun.op, parse_arg));
-
+        
         break;
       }
     case typeOpr:
@@ -1271,10 +1293,13 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 param_meta_copy(&p->param, &params[varID]);
                 p->param.name = params[varID].name;
                 p->param.data = params[varID].data;
-                p->ltmpvar    = false;
+                p->ltmpobj    = false;
 
                 ex_copy(init, p, rnode);
               }
+
+            //  if ( rnode->ltmpobj ) node_delete(rnode);
+            // rnode = p;
 
             break;
           }
@@ -1290,7 +1315,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                               expr_run(p->u.opr.op[0], parse_arg),
                               expr_run(p->u.opr.op[1], parse_arg),
                               expr_run(p->u.opr.op[2], parse_arg));
-
+            
             break;
           }
         default:
@@ -1298,6 +1323,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             rnode = expr(init, p->u.opr.oper,
                          expr_run(p->u.opr.op[0], parse_arg),
                          expr_run(p->u.opr.op[1], parse_arg));
+
             break;
           }
         }

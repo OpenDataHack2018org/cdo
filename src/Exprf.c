@@ -239,12 +239,12 @@ void *Expr(void *argument)
   if ( cdoVerbose )
     for ( int varID = 0; varID < nvars1; varID++ )
       if ( parse_arg.needed[varID] )
-	printf("Needed var: %d %s\n", varID, params[varID].name);
+	cdoPrint("Needed var: %d %s", varID, params[varID].name);
 
   if ( cdoVerbose )
     for ( int varID = 0; varID < parse_arg.nparams; varID++ )
-      printf("var: %d %s ngp=%d nlev=%d coord=%c\n",
-             varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord);
+      cdoPrint("var: %d %s ngp=%d nlev=%d coord=%c",
+               varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord);
 
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
 
