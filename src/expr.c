@@ -554,8 +554,8 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 static
 void ex_copy_var(int init, nodeType *p2, nodeType *p1)
 {
-  if ( cdoVerbose ) printf("\texpr\tcopy\t%s[L%d][N%d] = %s[L%d][N%d]\n",
-                           p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
+  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%d][N%d] = %s[L%d][N%d]",
+                             p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
   
   int ngp = p1->param.ngp;
   assert(ngp > 0);
@@ -589,7 +589,7 @@ void ex_copy_con(int init, nodeType *p2, nodeType *p1)
 {
   double cval = p1->u.con.value;
 
-  if ( cdoVerbose ) printf("\texpr\tcopy\t%s[L%d][N%d] = %g\n", p2->param.name, p2->param.nlev, p2->param.ngp, cval);
+  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%d][N%d] = %g", p2->param.name, p2->param.nlev, p2->param.ngp, cval);
   
   int ngp = p2->param.ngp;
   assert(ngp > 0);
@@ -646,25 +646,25 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
     {
       p = expr_var_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s\tarith\t%s[L%d][N%d] = %s %s %s\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
+	cdoPrint("\t%s\tarith\t%s[L%d][N%d] = %s %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
     }
   else if ( p1->type == typeVar && p2->type == typeCon )
     {
       p = expr_var_con(init, oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s\tarith\t%s[L%d][N%d] = %s %s %g\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
+	cdoPrint("\t%s\tarith\t%s[L%d][N%d] = %s %s %g", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
     }
   else if ( p1->type == typeCon && p2->type == typeVar )
     {
       p = expr_con_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s\tarith\t%s[L%d][N%d] = %g %s %s\n", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
+	cdoPrint("\t%s\tarith\t%s[L%d][N%d] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
     }
   else if ( p1->type == typeCon && p2->type == typeCon )
     {
       p = expr_con_con(oper, p1, p2);
       if ( cdoVerbose )
-	printf("\t%s\tarith\t%g = %g %s %g\n", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
+	cdoPrint("\t%s\tarith\t%g = %g %s %g", ExIn[init], p->u.con.value, p1->u.con.value, coper, p2->u.con.value);
     }
   else
     cdoAbort("Internal problem!");
@@ -766,12 +766,12 @@ nodeType *ex_fun(int init, int funcID, nodeType *p1)
 
   if ( p1->type == typeVar )
     {
-      if ( cdoVerbose ) printf("\t%s\tfunc\t%s (%s)\n", ExIn[init], fun_sym_tbl[funcID].name, p1->u.var.nm);
+      if ( cdoVerbose ) cdoPrint("\t%s\tfunc\t%s (%s)", ExIn[init], fun_sym_tbl[funcID].name, p1->u.var.nm);
       p = ex_fun_var(init, funcID, p1);
     }
   else if ( p1->type == typeCon )
     {
-      if ( cdoVerbose ) printf("\t%s\tfunc\t%s (%g)\n", ExIn[init], fun_sym_tbl[funcID].name, p1->u.con.value);
+      if ( cdoVerbose ) cdoPrint("\t%s\tfunc\t%s (%g)", ExIn[init], fun_sym_tbl[funcID].name, p1->u.con.value);
       p = ex_fun_con(funcID, p1);
     }
   else
@@ -840,12 +840,12 @@ nodeType *ex_uminus(int init, nodeType *p1)
 
   if ( p1->type == typeVar )
     {
-      if ( cdoVerbose ) printf("\t%s\tneg\t- (%s)\n", ExIn[init], p1->u.var.nm);
+      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%s)", ExIn[init], p1->u.var.nm);
       p = ex_uminus_var(init, p1);
     }
   else if ( p1->type == typeCon )
     {
-      if ( cdoVerbose ) printf("\t%s\tneg\t- (%g)\n", ExIn[init], p1->u.con.value);
+      if ( cdoVerbose ) cdoPrint("\t%s\tneg\t- (%g)", ExIn[init], p1->u.con.value);
       p = ex_uminus_con(p1);
     }
   else
@@ -861,7 +861,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   if ( cdoVerbose )
     {
-      printf("\t%s\tifelse\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
+      fprintf(stderr, " expr:\t%s\tifelse\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
       if ( p2->type == typeCon )
         printf("%g : ", p2->u.con.value);
       else
@@ -1037,7 +1037,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
   pointID = parse_arg->pointID;
   int init = parse_arg->init;
   paramType *params = parse_arg->params;
-  paramType *param2 = &parse_arg->param2;
+  //paramType *param2 = &parse_arg->param2;
   int varID;
   nodeType *rnode = NULL;
 
@@ -1049,7 +1049,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
     {
     case typeCon:
       {
-        if ( parse_arg->debug ) printf("\tpush\tconst\t%g\n", p->u.con.value);
+        if ( parse_arg->debug ) cdoPrint("\tpush\tconst\t%g", p->u.con.value);
 
         rnode = p;
 
@@ -1058,7 +1058,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
     case typeVar:
       {
         const char *vnm = p->u.var.nm;
-        // if ( parse_arg->debug ) printf("\tpush\tvar\t%s\n", vnm);
         varID = param_search_name(parse_arg->nparams, params, vnm);
         if ( varID == -1 && init )
           {
@@ -1143,7 +1142,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
               {
                 parse_arg->needed[varID] = true;
               }
-
+            /*
             int ngp2 = 0;
             if ( param2->gridID != -1 ) ngp2 = param2->ngp;
             if ( param2->gridID == -1 || (params[varID].ngp > 1 && ngp2 == 1) )
@@ -1166,6 +1165,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             if ( param2->steptype == -1 ||
                  (param2->steptype == TSTEP_CONSTANT && params[varID].steptype != TSTEP_CONSTANT) )
               param2->steptype = params[varID].steptype;
+            */
           }
 
 
@@ -1183,7 +1183,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             p->param.nmiss = params[varID].nmiss;
           }
         
-        if ( parse_arg->debug ) printf("\tpush\tvar\t%s[L%d][N%d]\n", vnm, p->param.nlev, p->param.ngp);
+        if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%d][N%d]", vnm, p->param.nlev, p->param.ngp);
 
         rnode = p;
 
@@ -1202,6 +1202,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	{
         case '=':
           {
+            /*
             if ( init )
               {
                 param2->gridID   = -1;
@@ -1210,7 +1211,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 param2->ngp  = 0;
                 param2->nlev = 0;
               }
-
+            */
             rnode = expr_run(p->u.opr.op[1], parse_arg);
 
             const char *varname2 = p->u.opr.op[0]->u.var.nm;
@@ -1218,19 +1219,21 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             if ( parse_arg->debug )
               {
                 if ( rnode && rnode->type == typeVar)
-                  printf("\tpop\tvar\t%s[L%d][N%d]\n", varname2, rnode->param.nlev, rnode->param.ngp);
+                  cdoPrint("\tpop\tvar\t%s[L%d][N%d]", varname2, rnode->param.nlev, rnode->param.ngp);
                 else
-                  printf("\tpop\tconst\t%s\n", varname2);
+                  cdoPrint("\tpop\tconst\t%s", varname2);
               }
 
             if ( init )
               {
                 //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
+                /*
                 if ( p->u.opr.op[1]->type != typeCon )
                   {
                     if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
                       cdoAbort("Operand not variable!");
                   }
+                */
                 varID = param_search_name(parse_arg->nparams, params, varname2);
                 if ( varID >= 0 )
                   {
@@ -1255,7 +1258,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                     param_meta_copy(&params[varID], &rnode->param);
                     params[varID].coord = 0;
                     params[varID].name  = strdup(varname2);
-                    if ( param2->units ) params[varID].units = strdup(param2->units);
+                    if ( rnode->param.units ) params[varID].units = strdup(rnode->param.units);
                     parse_arg->nparams++;
                   }
               }
