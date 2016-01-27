@@ -594,6 +594,8 @@ src/etopo.h -text
 src/exception.c -text
 src/expr.c -text
 src/expr.h -text
+src/expr_fun.c -text
+src/expr_fun.h -text
 src/expr_lex.c -text
 src/expr_lex.l -text
 src/expr_yacc.c -text

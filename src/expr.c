@@ -11,6 +11,7 @@
 #include "cdo_int.h"
 #include "field.h"
 #include "expr.h"
+#include "expr_fun.h"
 #include "expr_yacc.h"
 
 void freeNode(nodeType *p);
@@ -56,13 +57,6 @@ double expr_sum(int n, double *restrict array)
   return sum;
 }
 
-double expr_min(int n, double *restrict array)
-{
-  double minval = 1.e300;
-  for ( int i = 0; i < n; ++i ) if ( array[i] < minval ) minval = array[i];
-  return minval;
-}
-
 static func_t fun_sym_tbl[] =
 {
   // scalar functions
@@ -94,7 +88,8 @@ static func_t fun_sym_tbl[] =
   // cdo functions (Reduce grid to point)
   {1, "sum",  (void (*)()) expr_sum},
   // {1, "fldmean",  cdo_fldmean},
-  {1, "min",  (void (*)()) expr_min},
+  {1, "fldmin",  (void (*)()) fun_fldmin},
+  {1, "fldmax",  (void (*)()) fun_fldmax},
   /*
   {1, "max",   max},
   {1, "sum",   sum},
@@ -712,9 +707,9 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
 {
   int functype = fun_sym_tbl[funcID].type;
 
-  long ngp  = p1->param.ngp;
-  long nlev = p1->param.nlev;
-  int nmiss = p1->param.nmiss;
+  size_t ngp  = p1->param.ngp;
+  size_t nlev = p1->param.nlev;
+  size_t nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
   nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
@@ -742,7 +737,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
           double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
           if ( nmiss > 0 )
             {
-              for ( long i = 0; i < ngp*nlev; i++ )
+              for ( size_t i = 0; i < ngp*nlev; i++ )
                 {
                   errno = -1;
                   pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : exprfunc(p1data[i]);
@@ -752,7 +747,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
             }
           else
             {
-              for ( long i = 0; i < ngp*nlev; i++ )
+              for ( size_t i = 0; i < ngp*nlev; i++ )
                 {
                   errno = -1;
                   pdata[i] = exprfunc(p1data[i]);
@@ -764,13 +759,13 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
         }
       else
         {
-          double (*exprfunc)(int,double*) = (double (*)(int,double*)) fun_sym_tbl[funcID].func;
-          for ( int k = 0; k < nlev; k++ )
-            pdata[k] = exprfunc(ngp, p1data+k*ngp);
+          double (*exprfunc)(size_t,double,size_t,double*) = (double (*)(size_t,double,size_t,double*)) fun_sym_tbl[funcID].func;
+          for ( size_t k = 0; k < nlev; k++ )
+            pdata[k] = exprfunc(nmiss, missval, ngp, p1data+k*ngp);
         }
 
       nmiss = 0;
-      for ( long i = 0; i < p->param.ngp*nlev; i++ )
+      for ( size_t i = 0; i < p->param.ngp*nlev; i++ )
         if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
       p->param.nmiss = nmiss;

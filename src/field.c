@@ -60,7 +60,7 @@ double fldrank(field_t field)
   const size_t len       = field.size-1;
   size_t j;
   
-  if ( nmiss )  return(missval);
+  if ( nmiss ) return missval;
 
   sort_iter_single(len,array, 1);
 
@@ -138,17 +138,15 @@ double fldbrs(field_t field)
 
 double fldmin(field_t field)
 {
-  size_t   i;
   const size_t len     = field.size;
-  const int    nmiss   = field.nmiss;
+  const size_t nmiss   = field.nmiss;
   const double missval = field.missval;
-  const double *restrict array  = field.ptr;
-  double rmin = 0;
+  const double *restrict array = field.ptr;
+  double rmin = DBL_MAX;
 
   if ( nmiss > 0 )
     {
-      rmin = DBL_MAX;
-      for ( i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  if ( array[i] < rmin ) rmin = array[i];
 
@@ -157,29 +155,26 @@ double fldmin(field_t field)
     }
   else
     {
-      rmin = array[0];
       //#pragma simd reduction(min:rmin) 
-      for ( i = 1; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	if ( array[i] < rmin )  rmin = array[i];
     }
 
-  return (rmin);
+  return rmin;
 }
 
 
 double fldmax(field_t field)
 {
-  size_t   i;
   const size_t len     = field.size;
-  const int    nmiss   = field.nmiss;
+  const size_t nmiss   = field.nmiss;
   const double missval = field.missval;
-  double *array  = field.ptr;
-  double rmax = 0;
+  const double *restrict array = field.ptr;
+  double rmax = -DBL_MAX;
 
   if ( nmiss > 0 )
     {
-      rmax = -DBL_MAX;
-      for ( i = 0; i < len; i++ )
+      for ( size_t i = 0; i < len; i++ )
         if ( !DBL_IS_EQUAL(array[i], missval) )
           if ( array[i] > rmax ) rmax = array[i];
       
@@ -188,12 +183,11 @@ double fldmax(field_t field)
     }
   else
     {
-      rmax = array[0];
-      for ( i = 1; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
         if ( array[i] > rmax )  rmax = array[i];
     }
 
-  return (rmax);
+  return rmax;
 }
 
 
@@ -224,7 +218,7 @@ double fldsum(field_t field)
 	rsum += array[i];
     }
 
-  return (rsum);
+  return rsum;
 }
 
 
@@ -259,7 +253,7 @@ double fldmean(field_t field)
 
   ravg = DIVMN(rsum, rsumw);
 
-  return (ravg);
+  return ravg;
 }
 
 
@@ -294,7 +288,7 @@ double fldavg(field_t field)
 
   ravg = DIVMN(rsum, rsumw);
 
-  return (ravg);
+  return ravg;
 }
 
 static
@@ -344,7 +338,7 @@ double fldvar(field_t field)
   double rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
-  return (rvar);
+  return rvar;
 }
 
 
@@ -363,7 +357,7 @@ double fldvar1(field_t field)
   double rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
-  return (rvar);
+  return rvar;
 }
 
 
@@ -595,6 +589,6 @@ double crps_det_integrate(double *a, const double d, const size_t n)
   }
 
 
-  return(area);
+  return area;
 }
 

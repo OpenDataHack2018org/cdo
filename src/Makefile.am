@@ -42,6 +42,8 @@ libcdo_la_SOURCES =            \
                exception.c     \
                expr.c          \
                expr.h          \
+               expr_fun.c      \
+               expr_fun.h      \
                expr_lex.c      \
                expr_yacc.c     \
                expr_yacc.h     \

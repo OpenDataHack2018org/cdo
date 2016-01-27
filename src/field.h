@@ -18,6 +18,9 @@
 #ifndef _FIELD_H
 #define _FIELD_H
 
+#include <math.h>
+#include "compare.h"
+
 double var_to_std(double rvar, double missval);
 
 enum field_flag {
