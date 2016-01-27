@@ -18,10 +18,10 @@
 #ifndef _EXPR_FUN_H
 #define _EXPR_FUN_H
 
-double fun_fldmin(size_t nmiss, double missval, size_t ngp, double *array, double *w);
-double fun_fldmax(size_t nmiss, double missval, size_t ngp, double *array, double *w);
-double fun_fldsum(size_t nmiss, double missval, size_t ngp, double *array, double *w);
-double fun_fldmean(size_t nmiss, double missval, size_t ngp, double *array, double *w);
-double fun_fldavg(size_t nmiss, double missval, size_t ngp, double *array, double *w);
+double fun_fldmin(int gridID, size_t nmiss, double missval, size_t ngp, double *array);
+double fun_fldmax(int gridID, size_t nmiss, double missval, size_t ngp, double *array);
+double fun_fldsum(int gridID, size_t nmiss, double missval, size_t ngp, double *array);
+double fun_fldmean(int gridID, size_t nmiss, double missval, size_t ngp, double *array);
+double fun_fldavg(int gridID, size_t nmiss, double missval, size_t ngp, double *array);
 
 #endif

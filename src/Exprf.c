@@ -243,7 +243,7 @@ void *Expr(void *argument)
 
   if ( cdoVerbose )
     for ( int varID = 0; varID < parse_arg.nparams; varID++ )
-      cdoPrint("var: %d %s ngp=%d nlev=%d coord=%c",
+      cdoPrint("var: %d %s ngp=%zu nlev=%zu coord=%c",
                varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord);
 
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
@@ -291,17 +291,17 @@ void *Expr(void *argument)
     {
       if ( parse_arg.needed[varID] )
         {
-          int ngp  = params[varID].ngp;
-          int nlev = params[varID].nlev;
-          params[varID].data = (double*) Malloc((size_t)ngp*nlev*sizeof(double));
+          size_t ngp  = params[varID].ngp;
+          size_t nlev = params[varID].nlev;
+          params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
         }
     }
 
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
     {
-      int ngp  = params[varID].ngp;
-      int nlev = params[varID].nlev;
-      params[varID].data = (double*) Malloc((size_t)ngp*nlev*sizeof(double));
+      size_t ngp  = params[varID].ngp;
+      size_t nlev = params[varID].nlev;
+      params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
 
   // cleanup needed!!!
@@ -366,7 +366,7 @@ void *Expr(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  if ( parse_arg.needed[varID] )
 	    {
-	      size_t offset = (size_t)params[varID].ngp*levelID;
+	      size_t offset = params[varID].ngp*levelID;
 	      double *vardata = params[varID].data + offset;
               int nmiss;
 	      streamReadRecord(streamID1, vardata, &nmiss);
@@ -378,10 +378,10 @@ void *Expr(void *argument)
 	{
           int pidx = varIDmap[varID];
           if ( pidx < nvars1 ) continue;
-          int ngp  = params[pidx].ngp;
-          int nlev = params[pidx].nlev;
+          size_t ngp  = params[pidx].ngp;
+          size_t nlev = params[pidx].nlev;
 
-	  memset(params[pidx].data, 0, (size_t)ngp*nlev*sizeof(double));
+	  memset(params[pidx].data, 0, ngp*nlev*sizeof(double));
 	}
 
       yy_scan_string(exprs, scanner);
@@ -392,15 +392,15 @@ void *Expr(void *argument)
           int pidx = varIDmap[varID];
 	  double missval = vlistInqVarMissval(vlistID2, varID);
 
-          int ngp  = params[pidx].ngp;
-          int nlev = params[pidx].nlev;
+          size_t ngp = params[pidx].ngp;
+          int nlev = (int) params[pidx].nlev;
 	  for ( int levelID = 0; levelID < nlev; levelID++ )
 	    {
-              size_t offset = (size_t)ngp*levelID;
+              size_t offset = ngp*levelID;
 	      double *vardata = params[pidx].data + offset;
 
 	      int nmiss = 0;
-	      for ( int i = 0; i < ngp; i++ )
+	      for ( size_t i = 0; i < ngp; i++ )
 		if ( DBL_IS_EQUAL(vardata[i], missval) ) nmiss++;
 
 	      streamDefRecord(streamID2, varID, levelID);

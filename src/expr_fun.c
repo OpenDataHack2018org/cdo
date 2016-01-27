@@ -31,35 +31,36 @@ void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, do
 }
 
 
-double fun_fldmin(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+double fun_fldmin(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  fld_field_init(&field, nmiss, missval, ngp, array, NULL);
   
   return fldmin(field);
 }
 
 
-double fun_fldmax(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+double fun_fldmax(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  fld_field_init(&field, nmiss, missval, ngp, array, NULL);
   
   return fldmax(field);
 }
 
 
-double fun_fldsum(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+double fun_fldsum(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  fld_field_init(&field, nmiss, missval, ngp, array, NULL);
   
   return fldsum(field);
 }
 
 
-double fun_fldmean(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+double fun_fldmean(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
 {
+  double *w = NULL;
   field_t field;
   fld_field_init(&field, nmiss, missval, ngp, array, w);
   
@@ -67,8 +68,9 @@ double fun_fldmean(size_t nmiss, double missval, size_t ngp, double *array, doub
 }
 
 
-double fun_fldavg(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+double fun_fldavg(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
 {
+  double *w = NULL;
   field_t field;
   fld_field_init(&field, nmiss, missval, ngp, array, w);
   

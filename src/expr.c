@@ -49,13 +49,6 @@ typedef struct {
 }
 func_t;
 
-double expr_sum(int n, double *restrict array)
-{
-  double sum = 0;
-  for ( int i = 0; i < n; ++i ) sum += array[i];
-  return sum;
-}
-
 static func_t fun_sym_tbl[] =
 {
   // scalar functions
@@ -758,10 +751,10 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
         }
       else
         {
-          double (*exprfunc)(size_t,double,size_t,double*,double*) =
-            (double (*)(size_t,double,size_t,double*,double*)) fun_sym_tbl[funcID].func;
+          double (*exprfunc)(int,size_t,double,size_t,double*) =
+            (double (*)(int,size_t,double,size_t,double*)) fun_sym_tbl[funcID].func;
           for ( size_t k = 0; k < nlev; k++ )
-            pdata[k] = exprfunc(nmiss, missval, ngp, p1data+k*ngp,NULL);
+            pdata[k] = exprfunc(p1->param.gridID, nmiss, missval, ngp, p1data+k*ngp);
         }
 
       nmiss = 0;
