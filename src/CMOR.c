@@ -8,6 +8,15 @@
 #if defined(HAVE_LIBCMOR)
 #include "cmor.h"
 
+typedef struct _cmor_var
+{
+  char name[CDI_MAX_NAME];
+  int cdi_varID;
+  int cmor_varID;
+  int axis_id[CMOR_MAX_AXES];
+  char datatype;
+} cmor_var;
+
 static char *trim(char *s)
 {
   int n;
@@ -33,7 +42,17 @@ static ENTRY *hinsert(char *kvstr)
     return NULL;
   e.key = strdup(key);
   e.data = (void *)strdup(value);
-  ep = hsearch(e, ENTER);
+  ep = hsearch(e, FIND);
+  if ( ep )
+    {
+      Free (ep->data);
+      ep->data = e.data;
+      Free (e.key);
+    }
+  else
+    {
+      ep = hsearch(e, ENTER);
+    }
   return ep;
 }
 
@@ -66,6 +85,22 @@ static char *get_val(char *key, char *def)
     return (char *)ep->data;
   else
     return def;
+}
+
+static char *translate(char *word)
+{
+  ENTRY e, *ep;
+  char *key;
+
+  key = (char *) Malloc (strlen(word) + 11);
+  sprintf(key, "translate_%s", word);
+  e.key = key;
+  ep = hsearch(e, FIND);
+  Free(key);
+  if ( ep )
+    return (char *)ep->data;
+  else
+    return word;
 }
 
 static void parse_cmdline_kv(int nparams, char **params)
@@ -108,8 +143,6 @@ void *CMOR(void *argument)
   int nparams = operatorArgc();
   char **params = operatorArgv();
   char *table;
-  char *var_list[CMOR_MAX_VARIABLES];
-  int nvars;
   char *chunk;
   char *logfile;
   int netcdf_file_action, exit_control;
@@ -205,18 +238,6 @@ void *CMOR(void *argument)
     cdoAbort("Cannot load table!");
   cmor_set_table(table_id);
 
-  char *vars = get_val("var", NULL);
-  if ( vars )
-    {
-      char *var = strtok(strdup(vars), ",");
-      nvars = 0;
-      while ( nvars < CMOR_MAX_VARIABLES && var != NULL )
-        {
-          var_list[nvars++] = var;
-          var = strtok(NULL, ",");
-        }
-    }
-
   int streamID = streamOpenRead(cdoStreamName(0));
 
   int vlistID = streamInqVlist(streamID);
@@ -224,9 +245,113 @@ void *CMOR(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID);
   double *array = (double*) Malloc(gridsize*sizeof(double));
-
+  int nvars = vlistNvars(vlistID);
+  cmor_var *cmor_var_list = (cmor_var *) Malloc(nvars * sizeof(cmor_var));;
+  cmor_var *cmor_var;
+  int copy_nvars = 0;
   int recID, varID, levelID, nrecs, nmiss;
+  int gridID, gridType;
   int tsID = 0;
+  char *select_vars = get_val("var", NULL);
+  char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
+  int axis_id[2], length;
+  double *coord_vals, *cell_bounds;
+  int ndims;
+  double missing_value;
+  double tolerance = 1e-4;
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      vlistInqVarName(vlistID, varID, name);
+      if ( select_vars == NULL || strstr(select_vars, name) != NULL)
+        {
+          cmor_var = &cmor_var_list[copy_nvars++];
+          strcpy(cmor_var->name, name);
+          cmor_var->cdi_varID = varID;
+          gridID = vlistInqVarGrid(vlistID, varID);
+          gridType = gridInqType(gridID);
+
+          ndims = 0;
+          /* X-Axis */
+          gridInqXname(gridID, name);
+          gridInqXunits(gridID, units);
+          length = gridInqXsize(gridID);
+          coord_vals = Malloc(length * sizeof(double));
+          gridInqXvals(gridID, coord_vals);
+          cell_bounds = Malloc(2 * length * sizeof(double));
+          gridInqXbounds(gridID, cell_bounds);
+          error_flag = cmor_axis(&cmor_var->axis_id[0],
+                                 translate(name),
+                                 units,
+                                 length,
+                                 (void *)coord_vals,
+                                 'd',
+                                 (void *)cell_bounds,
+                                 2,
+                                 NULL);
+          if ( error_flag )
+            cdoAbort("cmor_axis failed.");
+          ndims++;
+          /* Y-Axis */
+          gridInqYname(gridID, name);
+          gridInqYunits(gridID, units);
+          length = gridInqYsize(gridID);
+          coord_vals = Malloc(length * sizeof(double));
+          gridInqYvals(gridID, coord_vals);
+          cell_bounds = Malloc(2 * length * sizeof(double));
+          gridInqYbounds(gridID, cell_bounds);
+          error_flag = cmor_axis(&cmor_var->axis_id[1],
+                                 translate(name),
+                                 units,
+                                 length,
+                                 (void *)coord_vals,
+                                 'd',
+                                 (void *)cell_bounds,
+                                 2,
+                                 NULL);
+          if ( error_flag )
+            cdoAbort("cmor_axis failed.");
+          ndims++;
+          /* Time-Axis */
+          /* Z-Axis */
+          /* Variable */
+          vlistInqVarUnits(vlistID, varID, units);
+          missing_value = vlistInqVarMissval(vlistID, varID);
+          switch ( vlistInqVarDatatype(vlistID, varID) )
+            {
+            case DATATYPE_INT32:
+              cmor_var->datatype = 'i';
+              break;
+            case DATATYPE_FLT32:
+              cmor_var->datatype = 'f';
+              break;
+            case DATATYPE_FLT64:
+              cmor_var->datatype = 'd';
+              break;
+            default:
+              cdoAbort("Datatype not supported by CMOR!");
+            }
+
+          /* fixme: missing axes */
+          cmor_variable(&cmor_var->cmor_varID,
+                        cmor_var->name,
+                        units,
+                        ndims,
+                        cmor_var->axis_id,
+                        'd',
+                        &missing_value,
+                        &tolerance,
+                        NULL,
+                        NULL,
+                        NULL,
+                        NULL);
+        }
+      else
+        {
+          printf("Not found var %s\n", name);
+        }
+    }
+
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
       for ( recID = 0; recID < nrecs; recID++ )
