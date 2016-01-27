@@ -56,7 +56,7 @@ static int parse_kvfile(const char *filename)
   return 0;
 }
 
-static char *get_val(char *key)
+static char *get_val(char *key, char *def)
 {
   ENTRY e, *ep;
 
@@ -65,7 +65,7 @@ static char *get_val(char *key)
   if ( ep )
     return (char *)ep->data;
   else
-    return NULL;
+    return def;
 }
 
 static void parse_cmdline_kv(int nparams, char **params)
@@ -107,23 +107,114 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   int nparams = operatorArgc();
   char **params = operatorArgv();
-  char *table, *vars;
+  char *table;
   char *var_list[CMOR_MAX_VARIABLES];
-  int use_n_vars = 0;
+  int nvars;
+  char *chunk;
+  char *logfile;
+  int netcdf_file_action, exit_control;
+  int set_verbosity;
+  int create_subdirectories;
+  int error_flag;
+  int *month_lengths;
+  int table_id;
 
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
   hcreate(100);
   parse_kvfile("cmor.rc");
   table = params[0];
-  parse_cmdline_kv(nparams - 1, &params[1]);
+  nparams--;
+  params++;
+  parse_cmdline_kv(nparams, params);
 
-  vars = get_val("var");
+  chunk = get_val("chunk", "replace");
+  if ( strcasecmp(chunk, "replace") == 0 )
+    netcdf_file_action = CMOR_REPLACE;
+  else if ( strcasecmp(chunk, "append") == 0 )
+    netcdf_file_action = CMOR_APPEND;
+
+  set_verbosity = CMOR_NORMAL;
+  if ( strcasecmp(get_val("set_verbosity", ""), "CMOR_QUIET") == 0 )
+    set_verbosity = CMOR_QUIET;
+
+  exit_control = CMOR_NORMAL;
+  if ( strcasecmp(get_val("exit_control", ""), "CMOR_EXIT_ON_MAJOR") == 0 )
+    exit_control = CMOR_EXIT_ON_MAJOR;
+  if ( strcasecmp(get_val("exit_control", ""), "CMOR_EXIT_ON_WARNING") == 0 )
+    exit_control = CMOR_EXIT_ON_WARNING;
+
+  logfile = get_val("logfile", NULL);
+
+  create_subdirectories = atoi(get_val("create_subdirectories", "0"));
+  error_flag = cmor_setup(get_val("inpath", "/usr/share/cmor/"),
+                          &netcdf_file_action,
+                          &set_verbosity,
+                          &exit_control,
+                          logfile,
+                          &create_subdirectories);
+  if ( error_flag )
+    cdoAbort("CMOR setup failed!");
+
+  if ( get_val("month_lengths", NULL) )
+    {
+      char *month_lengths_str = strdup(get_val("month_lengths", ""));
+      char *month_str = strtok(month_lengths_str, ",");
+      int month = 0;
+      month_lengths = Malloc (12 * sizeof(int));
+      while ( month < 12 && month_str != NULL )
+        {
+          month_lengths[month++] = atoi(month_str);
+          month_str = strtok(NULL, ",");
+        }
+      if ( month != 12 )
+        cdoAbort("Invalid format for month_lengths");
+    }
+  else
+    {
+      month_lengths = NULL;
+    }
+
+  double branch_time = atof(get_val("branch_time", "0.0"));
+
+  error_flag = cmor_dataset(get_val("outpath", "./"),
+                            get_val("expinfo", ""),
+                            get_val("institution", ""),
+                            get_val("modinfo", ""),
+                            get_val("calendar", "gregorian"),
+                            atoi(get_val("realization", "1")),
+                            get_val("contact", ""),
+                            get_val("history", ""),
+                            get_val("comment", ""),
+                            get_val("references", ""),
+                            atoi(get_val("leap_year", "0")),
+                            atoi(get_val("leap_month", "0")),
+                            month_lengths,
+                            get_val("model_id", ""),
+                            get_val("forcing", ""),
+                            atoi(get_val("initialization_method", "1")),
+                            atoi(get_val("physics_version", "1")),
+                            get_val("institute_id", ""),
+                            get_val("parent_experiment_id", ""),
+                            &branch_time,
+                            get_val("parent_experiment_rip", ""));
+
+  if ( error_flag )
+    cdoAbort("Cannot create dataset!");
+  error_flag = cmor_load_table(table, &table_id);
+  if ( error_flag )
+    cdoAbort("Cannot load table!");
+  cmor_set_table(table_id);
+
+  char *vars = get_val("var", NULL);
   if ( vars )
     {
-      var_list[0] = strtok(strdup(vars), ",");
-      do
-        use_n_vars++;
-      while ( (var_list[use_n_vars] = strtok(NULL, ",")) );
+      char *var = strtok(strdup(vars), ",");
+      nvars = 0;
+      while ( nvars < CMOR_MAX_VARIABLES && var != NULL )
+        {
+          var_list[nvars++] = var;
+          var = strtok(NULL, ",");
+        }
     }
 
   int streamID = streamOpenRead(cdoStreamName(0));
