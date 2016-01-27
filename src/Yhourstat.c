@@ -177,7 +177,7 @@ void *Yhourstat(void *argument)
 	  if ( nsets[houroy] == 0 )
 	    {
 	      streamReadRecord(streamID1, vars1[houroy][varID][levelID].ptr, &nmiss);
-	      vars1[houroy][varID][levelID].nmiss = nmiss;
+	      vars1[houroy][varID][levelID].nmiss = (size_t) nmiss;
 
 	      if ( nmiss > 0 || samp1[houroy][varID][levelID].ptr )
 		{
@@ -194,7 +194,8 @@ void *Yhourstat(void *argument)
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	      streamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss   = (size_t) nmiss;
 	      field.grid    = vars1[houroy][varID][levelID].grid;
 	      field.missval = vars1[houroy][varID][levelID].missval;
 
@@ -290,7 +291,7 @@ void *Yhourstat(void *argument)
 
 	    streamDefRecord(streamID2, varID, levelID);
 	    streamWriteRecord(streamID2, vars1[houroy][varID][levelID].ptr,
-			      vars1[houroy][varID][levelID].nmiss);
+			      (int)vars1[houroy][varID][levelID].nmiss);
 	  }
 
 	otsID++;

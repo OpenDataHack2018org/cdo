@@ -14,7 +14,6 @@
 #include "expr_fun.h"
 #include "expr_yacc.h"
 
-void freeNode(nodeType *p);
 
 static const char *ExIn[] = {"expr", "init"};
 static const char *tmpvnm = "_tmp_";
@@ -86,10 +85,11 @@ static func_t fun_sym_tbl[] =
   {0, "gamma", (void (*)()) tgamma},
 
   // cdo functions (Reduce grid to point)
-  {1, "sum",  (void (*)()) expr_sum},
-  // {1, "fldmean",  cdo_fldmean},
   {1, "fldmin",  (void (*)()) fun_fldmin},
   {1, "fldmax",  (void (*)()) fun_fldmax},
+  {1, "fldsum",  (void (*)()) fun_fldsum},
+  {1, "fldmean", (void (*)()) fun_fldmean},
+  {1, "fldavg",  (void (*)()) fun_fldavg},
   /*
   {1, "max",   max},
   {1, "sum",   sum},
@@ -182,10 +182,10 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 }
 
 static
-void oper_expr_con_var(int oper, int nmiss, long n, double missval1, double missval2,
+void oper_expr_con_var(int oper, bool nmiss, size_t n, double missval1, double missval2,
                        double *restrict odat, double cval, const double *restrict idat)
 {
-  long i;
+  size_t i;
 
   switch ( oper )
     {
@@ -250,10 +250,10 @@ void oper_expr_con_var(int oper, int nmiss, long n, double missval1, double miss
 }
 
 static
-void oper_expr_var_con(int oper, int nmiss, long n, double missval1, double missval2,
+void oper_expr_var_con(int oper, bool nmiss, size_t n, double missval1, double missval2,
                        double *restrict odat, const double *restrict idat, double cval)
 {
-  long i;
+  size_t i;
 
   switch ( oper )
     {
@@ -320,10 +320,10 @@ void oper_expr_var_con(int oper, int nmiss, long n, double missval1, double miss
 }
 
 static
-void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double missval2,
+void oper_expr_var_var(int oper, bool nmiss, size_t ngp, double missval1, double missval2,
                        double *restrict odat, const double *restrict idat1, const double *restrict idat2)
 {
-  long i;
+  size_t i;
 
   switch ( oper )
     {
@@ -391,7 +391,7 @@ void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double mi
       else         for ( i=0; i<ngp; ++i ) odat[i] =   COMPOR(idat1[i], idat2[i]);
       break;
     default:
-      cdoAbort("%s: operator %d (%c) unsupported!", __func__, (int)oper, oper);
+      cdoAbort("%s: operator %d (%c) unsupported!", __func__, oper, oper);
       break;
     }
 }
@@ -399,13 +399,13 @@ void oper_expr_var_var(int oper, int nmiss, long ngp, double missval1, double mi
 static
 nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
 {
-  int ngp   = p2->param.ngp;
-  int nlev  = p2->param.nlev;
-  int nmiss = p2->param.nmiss;
+  size_t ngp   = p2->param.ngp;
+  size_t nlev  = p2->param.nlev;
+  size_t nmiss = p2->param.nmiss;
   double missval1 = p2->param.missval;
   double missval2 = p2->param.missval;
 
-  long n   = (long)ngp*nlev;
+  size_t n = ngp*nlev;
 
   nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
@@ -422,10 +422,10 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
       const double *restrict idat = p2->param.data;
       double cval = p1->u.con.value;
 
-      oper_expr_con_var(oper, nmiss, n, missval1, missval2, odat, cval, idat);
+      oper_expr_con_var(oper, nmiss>0, n, missval1, missval2, odat, cval, idat);
 
       nmiss = 0;
-      for ( long i = 0; i < n; i++ )
+      for ( size_t i = 0; i < n; i++ )
         if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
@@ -437,13 +437,13 @@ nodeType *expr_con_var(int init, int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
 {
-  int ngp   = p1->param.ngp;
-  int nlev  = p1->param.nlev;
-  int nmiss = p1->param.nmiss;
+  size_t ngp   = p1->param.ngp;
+  size_t nlev  = p1->param.nlev;
+  size_t nmiss = p1->param.nmiss;
   double missval1 = p1->param.missval;
   double missval2 = p1->param.missval;
 
-  long n = (long)ngp*nlev;
+  size_t n = ngp*nlev;
 
   nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
@@ -460,10 +460,10 @@ nodeType *expr_var_con(int init, int oper, nodeType *p1, nodeType *p2)
       const double *restrict idat = p1->param.data;
       double cval = p2->u.con.value;
 
-      oper_expr_var_con(oper, nmiss, n, missval1, missval2, odat, idat, cval);
+      oper_expr_var_con(oper, nmiss>0, n, missval1, missval2, odat, idat, cval);
 
       nmiss = 0;
-      for ( long i = 0; i < n; i++ )
+      for ( size_t i = 0; i < n; i++ )
         if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
@@ -476,15 +476,15 @@ static
 nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 {
   nodeType *px = p1;
-  int nmiss1 = p1->param.nmiss;
-  int nmiss2 = p2->param.nmiss;
+  size_t nmiss1 = p1->param.nmiss;
+  size_t nmiss2 = p2->param.nmiss;
   double missval1 = p1->param.missval;
   double missval2 = p2->param.missval;
 
-  long ngp1 = p1->param.ngp;
-  long ngp2 = p2->param.ngp;
+  size_t ngp1 = p1->param.ngp;
+  size_t ngp2 = p2->param.ngp;
 
-  long ngp = ngp1;
+  size_t ngp = ngp1;
 
   if ( ngp1 != ngp2 )
     {
@@ -499,10 +499,10 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
         }
     }
 
-  long nlev1 = p1->param.nlev;
-  long nlev2 = p2->param.nlev;
+  size_t nlev1 = p1->param.nlev;
+  size_t nlev2 = p2->param.nlev;
 
-  long nlev = nlev1;
+  size_t nlev = nlev1;
   if ( nlev1 != nlev2 )
     {
       if ( nlev1 == 1 || nlev2 == 1 )
@@ -530,10 +530,10 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
     {
       p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-      for ( long k = 0; k < nlev; k++ )
+      for ( size_t k = 0; k < nlev; k++ )
         {
-          long loff1 = 0, loff2 = 0;
-          long loff = k*ngp;
+          size_t loff1 = 0, loff2 = 0;
+          size_t loff = k*ngp;
 
           if ( nlev1 > 1 ) loff1 = k*ngp1;
           if ( nlev2 > 1 ) loff2 = k*ngp2;
@@ -554,8 +554,8 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
             oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
         }
 
-      int nmiss = 0;
-      for ( long i = 0; i < ngp*nlev; i++ )
+      size_t nmiss = 0;
+      for ( size_t i = 0; i < ngp*nlev; i++ )
         if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
@@ -567,17 +567,17 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 static
 void ex_copy_var(int init, nodeType *p2, nodeType *p1)
 {
-  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%d][N%d] = %s[L%d][N%d]",
+  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%zu][N%zu] = %s[L%zu][N%zu]",
                              p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
   
-  int ngp = p1->param.ngp;
+  size_t ngp = p1->param.ngp;
   assert(ngp > 0);
 
   if ( ngp != p2->param.ngp )
     cdoAbort("%s: Number of grid points differ (%s[%d] = %s[%d])",
              __func__, p2->param.name, p2->param.ngp, p1->param.name, ngp);
 
-  int nlev = p1->param.nlev;
+  size_t nlev = p1->param.nlev;
   assert(nlev > 0);
 
   if ( nlev != p2->param.nlev )
@@ -602,12 +602,12 @@ void ex_copy_con(int init, nodeType *p2, nodeType *p1)
 {
   double cval = p1->u.con.value;
 
-  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%d][N%d] = %g", p2->param.name, p2->param.nlev, p2->param.ngp, cval);
+  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%zu][N%zu] = %g", p2->param.name, p2->param.nlev, p2->param.ngp, cval);
   
-  int ngp = p2->param.ngp;
+  size_t ngp = p2->param.ngp;
   assert(ngp > 0);
 
-  int nlev = p2->param.nlev;
+  size_t nlev = p2->param.nlev;
   assert(nlev > 0);
 
   if ( ! init )
@@ -659,19 +659,19 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
     {
       p = expr_var_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%d][N%d] = %s %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
+	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
     }
   else if ( p1->type == typeVar && p2->type == typeCon )
     {
       p = expr_var_con(init, oper, p1, p2);
       if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%d][N%d] = %s %s %g", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
+	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %g", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
     }
   else if ( p1->type == typeCon && p2->type == typeVar )
     {
       p = expr_con_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%d][N%d] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
+	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
     }
   else if ( p1->type == typeCon && p2->type == typeCon )
     {
@@ -755,13 +755,13 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
                   else if ( isnan(pdata[i]) ) pdata[i] = missval;
                 }
             }
-          
         }
       else
         {
-          double (*exprfunc)(size_t,double,size_t,double*) = (double (*)(size_t,double,size_t,double*)) fun_sym_tbl[funcID].func;
+          double (*exprfunc)(size_t,double,size_t,double*,double*) =
+            (double (*)(size_t,double,size_t,double*,double*)) fun_sym_tbl[funcID].func;
           for ( size_t k = 0; k < nlev; k++ )
-            pdata[k] = exprfunc(nmiss, missval, ngp, p1data+k*ngp);
+            pdata[k] = exprfunc(nmiss, missval, ngp, p1data+k*ngp,NULL);
         }
 
       nmiss = 0;
@@ -800,9 +800,9 @@ nodeType *ex_fun(int init, int funcID, nodeType *p1)
 static
 nodeType *ex_uminus_var(int init, nodeType *p1)
 {
-  long ngp  = p1->param.ngp;
-  long nlev = p1->param.nlev;
-  int nmiss = p1->param.nmiss;
+  size_t ngp   = p1->param.ngp;
+  size_t nlev  = p1->param.nlev;
+  size_t nmiss = p1->param.nmiss;
   double missval = p1->param.missval;
 
   nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
@@ -821,12 +821,12 @@ nodeType *ex_uminus_var(int init, nodeType *p1)
 
       if ( nmiss > 0 )
         {
-          for ( long i = 0; i < ngp*nlev; i++ )
+          for ( size_t i = 0; i < ngp*nlev; i++ )
             pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
         }
       else
         {
-          for ( long i = 0; i < ngp*nlev; i++ )
+          for ( size_t i = 0; i < ngp*nlev; i++ )
             pdata[i] = -(p1data[i]);
         }
 
@@ -879,30 +879,30 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   if ( cdoVerbose )
     {
-      fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%d][N%d] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
+      fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%zu][N%zu] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
       if ( p2->type == typeCon )
         printf("%g : ", p2->u.con.value);
       else
-        printf("%s[L%d][N%d] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
+        printf("%s[L%zu][N%zu] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
       if ( p3->type == typeCon )
         printf("%g\n", p3->u.con.value);
       else
-        printf("%s[L%d][N%d]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
+        printf("%s[L%zu][N%zu]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
     }
 
-  int nmiss1 = p1->param.nmiss;
-  long ngp1 = p1->param.ngp;
-  long nlev1 = p1->param.nlev;
+  size_t nmiss1 = p1->param.nmiss;
+  size_t ngp1   = p1->param.ngp;
+  size_t nlev1  = p1->param.nlev;
   double missval1 = p1->param.missval;
 
-  long ngp = ngp1;
-  long nlev = nlev1;
+  size_t ngp = ngp1;
+  size_t nlev = nlev1;
   nodeType *px = p1;
 
   double missval2 = missval1;
   double *pdata2 = NULL;
-  long ngp2 = 1;
-  long nlev2 = 1;
+  size_t ngp2 = 1;
+  size_t nlev2 = 1;
   
   if ( p2->type == typeCon )
     {
@@ -930,8 +930,8 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   double missval3 = missval1;
   double *pdata3 = NULL;
-  long ngp3 = 1;
-  long nlev3 = 1;
+  size_t ngp3 = 1;
+  size_t nlev3 = 1;
   
   if ( p3->type == typeCon )
     {
@@ -972,10 +972,10 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
       
       p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
 
-      for ( long k = 0; k < nlev; ++k )
+      for ( size_t k = 0; k < nlev; ++k )
         {
-          long loff1, loff2, loff3;
-          long loff = k*ngp;
+          size_t loff1, loff2, loff3;
+          size_t loff = k*ngp;
 
           if ( nlev1 == 1 ) loff1 = 0;
           else              loff1 = k*ngp;
@@ -993,7 +993,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
           double ival2 = idat2[0];
           double ival3 = idat3[0];
-          for ( long i = 0; i < ngp; ++i ) 
+          for ( size_t i = 0; i < ngp; ++i ) 
             {
               if ( ngp2 > 1 ) ival2 = idat2[i];
               if ( ngp3 > 1 ) ival3 = idat3[i];
@@ -1201,7 +1201,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             p->param.nmiss = params[varID].nmiss;
           }
 
-        if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%d][N%d]", vnm, p->param.nlev, p->param.ngp);
+        if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%zu][N%zu]", vnm, p->param.nlev, p->param.ngp);
 
         rnode = p;
 
@@ -1237,7 +1237,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             if ( parse_arg->debug )
               {
                 if ( rnode && rnode->type == typeVar)
-                  cdoPrint("\tpop\tvar\t%s[L%d][N%d]", varname2, rnode->param.nlev, rnode->param.ngp);
+                  cdoPrint("\tpop\tvar\t%s[L%zu][N%zu]", varname2, rnode->param.nlev, rnode->param.ngp);
                 else
                   cdoPrint("\tpop\tconst\t%s", varname2);
               }

@@ -285,7 +285,7 @@ void *Timstat(void *argument)
 	      if ( nsets == 0 )
 		{
 		  streamReadRecord(streamID1, pvar1->ptr, &nmiss);
-		  pvar1->nmiss = nmiss;
+		  pvar1->nmiss = (size_t)nmiss;
 		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
@@ -301,9 +301,10 @@ void *Timstat(void *argument)
 	      else
 		{
                   if ( CDO_Memtype == MEMTYPE_FLOAT )
-                    streamReadRecordF(streamID1, field.ptrf, &field.nmiss);
+                    streamReadRecordF(streamID1, field.ptrf, &nmiss);
                   else
-                    streamReadRecord(streamID1, field.ptr, &field.nmiss);
+                    streamReadRecord(streamID1, field.ptr, &nmiss);
+                  field.nmiss   = (size_t)nmiss;
 		  field.size    = gridsize;
 		  field.grid    = pvar1->grid;
 		  field.missval = pvar1->missval;
@@ -428,7 +429,7 @@ void *Timstat(void *argument)
                     nmiss = 0;
                     for ( int i = 0; i < nwpv*gridsize; ++i )
                       if ( DBL_IS_EQUAL(pvar1->ptr[i], missval) ) nmiss++;
-                    pvar1->nmiss = nmiss;
+                    pvar1->nmiss = (size_t)nmiss;
                   }
 	      }
 	  }
@@ -451,7 +452,7 @@ void *Timstat(void *argument)
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, pvar1->ptr,  pvar1->nmiss);
+	  streamWriteRecord(streamID2, pvar1->ptr, (int)pvar1->nmiss);
           
 	  if ( cdoDiag )
 	    {

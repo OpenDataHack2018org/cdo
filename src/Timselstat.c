@@ -159,7 +159,7 @@ void *Timselstat(void *argument)
 	      if ( nsets == 0 )
 		{
 		  streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-		  vars1[varID][levelID].nmiss = nmiss;
+		  vars1[varID][levelID].nmiss = (size_t)nmiss;
 
 		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
@@ -176,7 +176,8 @@ void *Timselstat(void *argument)
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, field.ptr, &field.nmiss);
+		  streamReadRecord(streamID1, field.ptr, &nmiss);
+                  field.nmiss   = (size_t)nmiss;
 		  field.grid    = vars1[varID][levelID].grid;
 		  field.missval = vars1[varID][levelID].missval;
 
@@ -268,7 +269,7 @@ void *Timselstat(void *argument)
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr, (int)vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;

@@ -80,13 +80,13 @@ double FSQRTMN(double x, double missval1) { return MSQRTMN(x);}
 
 typedef struct {
   int      nwpv; // number of words per value; real:1  complex:2
+  int      memtype;
   int      grid;
   int      zaxis;
   size_t   size;
-  int      nsamp;
-  int      nmiss;
-  int      nmiss2;
-  int      memtype;
+  size_t   nsamp;
+  size_t   nmiss;
+  size_t   nmiss2;
   double   missval;
   double  *weight;
   double  *ptr;

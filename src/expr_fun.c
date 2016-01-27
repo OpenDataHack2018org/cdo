@@ -19,7 +19,7 @@
 #include "field.h"
 
 static
-void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, double *restrict array)
+void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, double *array, double *w)
 {
   field_init(field);
 
@@ -27,23 +27,50 @@ void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, do
   field->nmiss   = nmiss;
   field->missval = missval;
   field->ptr     = array;
-  field->weight  = NULL;
+  field->weight  = w;
 }
 
 
-double fun_fldmin(size_t nmiss, double missval, size_t ngp, double *restrict array)
+double fun_fldmin(size_t nmiss, double missval, size_t ngp, double *array, double *w)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array);
+  fld_field_init(&field, nmiss, missval, ngp, array, w);
   
   return fldmin(field);
 }
 
 
-double fun_fldmax(size_t nmiss, double missval, size_t ngp, double *restrict array)
+double fun_fldmax(size_t nmiss, double missval, size_t ngp, double *array, double *w)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array);
+  fld_field_init(&field, nmiss, missval, ngp, array, w);
   
   return fldmax(field);
+}
+
+
+double fun_fldsum(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+{
+  field_t field;
+  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  
+  return fldsum(field);
+}
+
+
+double fun_fldmean(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+{
+  field_t field;
+  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  
+  return fldmean(field);
+}
+
+
+double fun_fldavg(size_t nmiss, double missval, size_t ngp, double *array, double *w)
+{
+  field_t field;
+  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  
+  return fldavg(field);
 }

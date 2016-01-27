@@ -43,9 +43,9 @@ typedef struct {
   int     gridID;
   int     zaxisID;
   int     steptype;
-  int     ngp;
-  int     nlev;
-  int     nmiss;
+  size_t  ngp;
+  size_t  nlev;
+  size_t  nmiss;
   char   *name;
   char   *longname;
   char   *units;

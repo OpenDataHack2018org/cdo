@@ -173,7 +173,7 @@ void *Ymonstat(void *argument)
 	  if ( nsets[month] == 0 )
 	    {
 	      streamReadRecord(streamID1, vars1[month][varID][levelID].ptr, &nmiss);
-	      vars1[month][varID][levelID].nmiss = nmiss;
+	      vars1[month][varID][levelID].nmiss = (size_t) nmiss;
 
 	      if ( nmiss > 0 || samp1[month][varID][levelID].ptr )
 		{
@@ -190,7 +190,8 @@ void *Ymonstat(void *argument)
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	      streamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss   = (size_t) nmiss;
 	      field.grid    = vars1[month][varID][levelID].grid;
 	      field.missval = vars1[month][varID][levelID].missval;
 
@@ -314,7 +315,7 @@ void *Ymonstat(void *argument)
 
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, vars1[month][varID][levelID].ptr,
-			    vars1[month][varID][levelID].nmiss);
+			    (int)vars1[month][varID][levelID].nmiss);
 	}
 
       otsID++;

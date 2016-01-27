@@ -210,9 +210,10 @@ void *Fldstat(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	  streamReadRecord(streamID1, field.ptr, &nmiss);
 
-	  field.grid = vlistInqVarGrid(vlistID1, varID);
+          field.nmiss   = (size_t)nmiss;
+          field.grid = vlistInqVarGrid(vlistID1, varID);
 	  field.size = gridInqSize(field.grid);
 
 	  if ( needWeights && field.grid != lastgrid )

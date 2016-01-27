@@ -144,6 +144,8 @@ double fldmin(field_t field)
   const double *restrict array = field.ptr;
   double rmin = DBL_MAX;
 
+  assert(array!=NULL);
+
   if ( nmiss > 0 )
     {
       for ( size_t i = 0; i < len; i++ ) 
@@ -172,6 +174,8 @@ double fldmax(field_t field)
   const double *restrict array = field.ptr;
   double rmax = -DBL_MAX;
 
+  assert(array!=NULL);
+
   if ( nmiss > 0 )
     {
       for ( size_t i = 0; i < len; i++ )
@@ -193,17 +197,19 @@ double fldmax(field_t field)
 
 double fldsum(field_t field)
 {
-  size_t   i;
-  size_t   nvals   = 0;
   const size_t len     = field.size;
-  const int    nmiss   = field.nmiss;
+  const size_t nmiss   = field.nmiss;
   const double missval = field.missval;
-  double *array  = field.ptr;
+  const double *restrict array = field.ptr;
   double rsum = 0;
+
+  assert(array!=NULL);
 
   if ( nmiss > 0 )
     {
-      for ( i = 0; i < len; i++ ) 
+      size_t nvals = 0;
+
+      for ( size_t i = 0; i < len; i++ ) 
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  {
 	    rsum += array[i];
@@ -214,7 +220,7 @@ double fldsum(field_t field)
     }
   else
     {
-      for ( i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	rsum += array[i];
     }
 
@@ -224,18 +230,20 @@ double fldsum(field_t field)
 
 double fldmean(field_t field)
 {
-  size_t   i;
   const size_t len      = field.size;
-  const int    nmiss    = field.nmiss;
+  const size_t nmiss    = field.nmiss;
   const double missval1 = field.missval;
   const double missval2 = field.missval;
-  double *array   = field.ptr;
-  double *w       = field.weight;
-  double rsum = 0, rsumw = 0, ravg = 0;
+  const double *restrict array = field.ptr;
+  const double *restrict w     = field.weight;
+  double rsum = 0, rsumw = 0;
+
+  assert(array!=NULL);
+  assert(w!=NULL);
 
   if ( nmiss > 0 )
     {
-      for ( i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	if ( !DBL_IS_EQUAL(array[i], missval1) && !DBL_IS_EQUAL(w[i], missval1) )
 	  {
 	    rsum  += w[i] * array[i];
@@ -244,14 +252,14 @@ double fldmean(field_t field)
     }
   else
     {
-      for ( i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	{
 	  rsum  += w[i] * array[i];
 	  rsumw += w[i];
 	}
     }
 
-  ravg = DIVMN(rsum, rsumw);
+  double ravg = DIVMN(rsum, rsumw);
 
   return ravg;
 }
@@ -259,18 +267,20 @@ double fldmean(field_t field)
 
 double fldavg(field_t field)
 {
-  size_t   i;
   const size_t len      = field.size;
-  const int    nmiss    = field.nmiss;
+  const size_t nmiss    = field.nmiss;
   const double missval1 = field.missval;
   const double missval2 = field.missval;
-  double *array   = field.ptr;
-  double *w       = field.weight;
-  double rsum = 0, rsumw = 0, ravg = 0;
+  const double *restrict array = field.ptr;
+  const double *restrict w     = field.weight;
+  double rsum = 0, rsumw = 0;
+
+  assert(array!=NULL);
+  assert(w!=NULL);
 
   if ( nmiss > 0 )
     {
-      for ( i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	if ( !DBL_IS_EQUAL(w[i], missval1) )
 	  {
 	    rsum  = ADDMN(rsum, MULMN(w[i], array[i]));
@@ -279,14 +289,14 @@ double fldavg(field_t field)
     }
   else
     {
-      for ( i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; i++ ) 
 	{
 	  rsum  += w[i] * array[i];
 	  rsumw += w[i];
 	}
     }
 
-  ravg = DIVMN(rsum, rsumw);
+  double ravg = DIVMN(rsum, rsumw);
 
   return ravg;
 }

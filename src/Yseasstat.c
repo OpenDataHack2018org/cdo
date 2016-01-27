@@ -165,7 +165,7 @@ void *Yseasstat(void *argument)
 	  if ( nsets[seas] == 0 )
 	    {
 	      streamReadRecord(streamID1, vars1[seas][varID][levelID].ptr, &nmiss);
-	      vars1[seas][varID][levelID].nmiss = nmiss;
+	      vars1[seas][varID][levelID].nmiss = (size_t)nmiss;
 
 	      if ( nmiss > 0 || samp1[seas][varID][levelID].ptr )
 		{
@@ -182,7 +182,8 @@ void *Yseasstat(void *argument)
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	      streamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss   = (size_t)nmiss;
 	      field.grid    = vars1[seas][varID][levelID].grid;
 	      field.missval = vars1[seas][varID][levelID].missval;
 
@@ -278,7 +279,7 @@ void *Yseasstat(void *argument)
 
 	    streamDefRecord(streamID2, varID, levelID);
 	    streamWriteRecord(streamID2, vars1[seas][varID][levelID].ptr,
-			      vars1[seas][varID][levelID].nmiss);
+			      (int)vars1[seas][varID][levelID].nmiss);
 	  }
 
 	otsID++;

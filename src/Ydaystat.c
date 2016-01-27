@@ -152,7 +152,7 @@ void *Ydaystat(void *argument)
 	  if ( nsets[dayoy] == 0 )
 	    {
 	      streamReadRecord(streamID1, vars1[dayoy][varID][levelID].ptr, &nmiss);
-	      vars1[dayoy][varID][levelID].nmiss = nmiss;
+	      vars1[dayoy][varID][levelID].nmiss = (size_t)nmiss;
 
 	      if ( nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
 		{
@@ -169,7 +169,8 @@ void *Ydaystat(void *argument)
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	      streamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss   = (size_t)nmiss;
 	      field.grid    = vars1[dayoy][varID][levelID].grid;
 	      field.missval = vars1[dayoy][varID][levelID].missval;
 
@@ -281,7 +282,7 @@ void *Ydaystat(void *argument)
 
 	    streamDefRecord(streamID2, varID, levelID);
 	    streamWriteRecord(streamID2, vars1[dayoy][varID][levelID].ptr,
-			      vars1[dayoy][varID][levelID].nmiss);
+			      (int)vars1[dayoy][varID][levelID].nmiss);
 	  }
 
 	otsID++;

@@ -72,6 +72,7 @@ int *fill_vars(int vlistID)
 
 void *Arithc(void *argument)
 {
+  int nmiss;
   int nrecs, recID;
   int varID, levelID;
 
@@ -122,7 +123,8 @@ void *Arithc(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	  streamReadRecord(streamID1, field.ptr, &nmiss);
+          field.nmiss = (size_t) nmiss;
 
 	  if ( vars[varID] )
 	    {
@@ -138,8 +140,9 @@ void *Arithc(void *argument)
 		if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
 	    }
 
+          nmiss = (int) field.nmiss;
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, field.ptr, field.nmiss);
+	  streamWriteRecord(streamID2, field.ptr, nmiss);
 	}
       tsID++;
     }

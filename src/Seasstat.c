@@ -180,7 +180,8 @@ void *Seasstat(void *argument)
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, field.ptr, &field.nmiss);
+		  streamReadRecord(streamID1, field.ptr, &nmiss);
+                  field.nmiss   = (size_t)nmiss;
 		  field.grid    = vars1[varID][levelID].grid;
 		  field.missval = vars1[varID][levelID].missval;
 
@@ -295,7 +296,7 @@ void *Seasstat(void *argument)
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr, (int)vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;

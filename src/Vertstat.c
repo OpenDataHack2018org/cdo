@@ -337,7 +337,7 @@ void *Vertstat(void *argument)
 	  if ( levelID == 0 )
 	    {
 	      streamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
-	      vars1[varID].nmiss = nmiss;
+	      vars1[varID].nmiss = (size_t)nmiss;
 
 	      if ( operatorID == VERTINT && IS_NOT_EQUAL(layer_thickness, 1.0) ) farcmul(&vars1[varID], layer_thickness);
 	      if ( lmean && IS_NOT_EQUAL(layer_weight, 1.0) ) farcmul(&vars1[varID], layer_weight);
@@ -369,7 +369,8 @@ void *Vertstat(void *argument)
 	    }
 	  else
 	    {
-	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	      streamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss   = (size_t)nmiss;
 	      field.grid    = vars1[varID].grid;
 	      field.missval = vars1[varID].missval;
 
@@ -440,7 +441,7 @@ void *Vertstat(void *argument)
 		}
 
 	      streamDefRecord(streamID2, varID, 0);
-	      streamWriteRecord(streamID2, vars1[varID].ptr, vars1[varID].nmiss);
+	      streamWriteRecord(streamID2, vars1[varID].ptr, (int)vars1[varID].nmiss);
 	      vars1[varID].nsamp = 0;
 	    }
 	}

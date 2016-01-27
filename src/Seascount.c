@@ -38,6 +38,7 @@ void *Seascount(void *argument)
   int varID, levelID, recID;
   int tsID;
   int otsID;
+  int nmiss;
   long nsets;
   int i;
   int year, month, day, seas, seas0 = 0;
@@ -131,7 +132,8 @@ void *Seascount(void *argument)
 		  vars1[varID][levelID].nmiss = gridsize;
                 }
 
-              streamReadRecord(streamID1, field.ptr, &field.nmiss);
+              streamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss   = (size_t)nmiss;
               field.grid    = vars1[varID][levelID].grid;
               field.missval = vars1[varID][levelID].missval;
 
@@ -158,7 +160,7 @@ void *Seascount(void *argument)
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr, (int)vars1[varID][levelID].nmiss);
         }
 
       if ( nrecs == 0 ) break;

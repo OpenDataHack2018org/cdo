@@ -49,6 +49,7 @@ void *Timcount(void *argument)
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nvars;
+  int nmiss;
   int nwpv; // number of words per value; real:1  complex:2
   int *recVarID, *recLevelID;
   field_t **vars1 = NULL;
@@ -132,7 +133,8 @@ void *Timcount(void *argument)
 		  vars1[varID][levelID].nmiss = gridsize;
 		}
 
-              streamReadRecord(streamID1, field.ptr, &field.nmiss);
+              streamReadRecord(streamID1, field.ptr, &nmiss);
+              field.nmiss   = (size_t)nmiss;
               field.grid    = vars1[varID][levelID].grid;
 	      field.missval = vars1[varID][levelID].missval;
 
@@ -159,7 +161,7 @@ void *Timcount(void *argument)
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  (int)vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
