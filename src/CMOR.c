@@ -67,31 +67,16 @@ static char *get_val(char *key)
   else
     return NULL;
 }
-#endif
 
-void *CMOR(void *argument)
+static void parse_cmdline_kv(int nparams, char **params)
 {
-  cdoInitialize(argument);
-
-#if defined(HAVE_LIBCMOR)
-  int nparams = operatorArgc();
-  char **params = operatorArgv();
-  char *param;
   int i, j, k, size;
-  char *table, *vars;
-  char *var_list[CMOR_MAX_VARIABLES];
-  int use_n_vars = 0;
+  char *p;
 
-  if ( nparams < 1 ) cdoAbort("Too few arguments!");
-
-  hcreate(100);
-  parse_kvfile("cmor.rc");
-  table = params[0];
-
-  /* Assume key = value pairs from here on.
-   * That is, if params[i] contains no '=' then treat it as if
-   * it belongs to the value of params[i-1], separated by a ','.*/
-  i = 1;
+  /* Assume key = value pairs. That is, if params[i] contains no '='
+   * then treat it as if it belongs to the value of params[i-1],
+   * separated by a ','.*/
+  i = 0;
   while ( i < nparams )
     {
       j = 1;
@@ -101,17 +86,36 @@ void *CMOR(void *argument)
           size += strlen(params[i + j]) + 1;
           j++;
         }
-      param = (char *) Malloc(size);
-      strcpy(param, params[i]);
+      p = (char *) Malloc(size);
+      strcpy(p, params[i]);
       for (k = 1; k < j; k++)
         {
-          strcat(param, ",");
-          strcat(param, params[i + k]);
+          strcat(p, ",");
+          strcat(p, params[i + k]);
         }
-      hinsert(param);
-      free(param);
+      hinsert(p);
+      free(p);
       i += j;
     }
+}
+#endif
+
+void *CMOR(void *argument)
+{
+  cdoInitialize(argument);
+
+#if defined(HAVE_LIBCMOR)
+  int nparams = operatorArgc();
+  char **params = operatorArgv();
+  char *table, *vars;
+  char *var_list[CMOR_MAX_VARIABLES];
+  int use_n_vars = 0;
+
+  if ( nparams < 1 ) cdoAbort("Too few arguments!");
+  hcreate(100);
+  parse_kvfile("cmor.rc");
+  table = params[0];
+  parse_cmdline_kv(nparams - 1, &params[1]);
 
   vars = get_val("var");
   if ( vars )
