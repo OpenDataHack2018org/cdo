@@ -44,15 +44,9 @@ static ENTRY *hinsert(char *kvstr)
   e.data = (void *)strdup(value);
   ep = hsearch(e, FIND);
   if ( ep )
-    {
-      Free (ep->data);
-      ep->data = e.data;
-      Free (e.key);
-    }
+    ep->data = e.data;
   else
-    {
-      ep = hsearch(e, ENTER);
-    }
+    ep = hsearch(e, ENTER);
   return ep;
 }
 
@@ -275,7 +269,7 @@ void *CMOR(void *argument)
   int tsID = 0;
   char *select_vars = get_val("var", NULL);
   char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
-  int axis_id[2], length;
+  int length;
   double *coord_vals, *cell_bounds;
   int ndims;
   double missing_value;
@@ -293,6 +287,39 @@ void *CMOR(void *argument)
           gridType = gridInqType(gridID);
 
           ndims = 0;
+
+          /* Time-Axis */
+          int rdate = taxisInqRdate(taxisID);
+          int rtime = taxisInqRtime(taxisID);
+          int timeunit = taxisInqTunit(taxisID);
+          int year, month, day, hour, minute, second;
+          cdiDecodeDate(rdate, &year, &month, &day);
+          cdiDecodeTime(rtime, &hour, &minute, &second);
+
+          if ( timeunit == TUNIT_QUARTER ||
+               timeunit == TUNIT_30MINUTES )
+            timeunit = TUNIT_MINUTE;
+          if ( timeunit == TUNIT_3HOURS ||
+               timeunit == TUNIT_6HOURS ||
+               timeunit == TUNIT_12HOURS )
+            timeunit = TUNIT_HOUR;
+
+          sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d",
+                  tunitNamePtr(timeunit), year, month, day, hour,
+                  minute, second);
+
+          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
+                                 "time",
+                                 units,
+                                 0,
+                                 NULL,
+                                 0,
+                                 NULL,
+                                 0,
+                                 NULL);
+          if ( error_flag )
+            cdoAbort("cmor_axis failed.");
+
           /* X-Axis */
           gridInqXname(gridID, name);
           gridInqXunits(gridID, units);
@@ -301,7 +328,7 @@ void *CMOR(void *argument)
           gridInqXvals(gridID, coord_vals);
           cell_bounds = Malloc(2 * length * sizeof(double));
           gridInqXbounds(gridID, cell_bounds);
-          error_flag = cmor_axis(&cmor_var->axis_id[0],
+          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
                                  substitute(name),
                                  units,
                                  length,
@@ -312,7 +339,7 @@ void *CMOR(void *argument)
                                  NULL);
           if ( error_flag )
             cdoAbort("cmor_axis failed.");
-          ndims++;
+
           /* Y-Axis */
           gridInqYname(gridID, name);
           gridInqYunits(gridID, units);
@@ -321,7 +348,7 @@ void *CMOR(void *argument)
           gridInqYvals(gridID, coord_vals);
           cell_bounds = Malloc(2 * length * sizeof(double));
           gridInqYbounds(gridID, cell_bounds);
-          error_flag = cmor_axis(&cmor_var->axis_id[1],
+          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
                                  substitute(name),
                                  units,
                                  length,
@@ -332,9 +359,25 @@ void *CMOR(void *argument)
                                  NULL);
           if ( error_flag )
             cdoAbort("cmor_axis failed.");
-          ndims++;
-          /* Time-Axis */
+
           /* Z-Axis */
+          int zaxisID = vlistInqVarZaxis(vlistID, varID);
+          zaxisInqName(zaxisID, name);
+          zaxisInqUnits(zaxisID, units);
+          length = zaxisInqSize(zaxisID);
+          coord_vals = Malloc(length * sizeof(double));
+          zaxisInqLevels(zaxisID, coord_vals);
+          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
+                                 substitute(name),
+                                 units,
+                                 length,
+                                 (void *)coord_vals,
+                                 'd',
+                                 NULL,
+                                 0,
+                                 NULL);
+          if ( error_flag )
+            cdoAbort("cmor_axis failed.");
           /* Variable */
           vlistInqVarUnits(vlistID, varID, units);
           missing_value = vlistInqVarMissval(vlistID, varID);
@@ -353,7 +396,17 @@ void *CMOR(void *argument)
               cdoAbort("Datatype not supported by CMOR!");
             }
 
-          /* fixme: missing axes */
+          char *positive;
+          switch ( zaxisInqPositive(zaxisID) )
+            {
+            case 1:
+              positive = "up";
+              break;
+            case 2:
+              positive = "down";
+              break;
+            }
+
           cmor_variable(&cmor_var->cmor_varID,
                         substitute(cmor_var->name),
                         units,
@@ -362,7 +415,7 @@ void *CMOR(void *argument)
                         cmor_var->datatype,
                         &missing_value,
                         &tolerance,
-                        NULL,
+                        NULL, // positive,
                         NULL,
                         NULL,
                         NULL);
