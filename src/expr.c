@@ -581,7 +581,7 @@ void ex_copy_var(int init, nodeType *p2, nodeType *p1)
     {
       double *restrict odat = p2->param.data;
       const double *restrict idat = p1->param.data;
-      for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = idat[i];
+      for ( size_t i = 0; i < ngp*nlev; ++i ) odat[i] = idat[i];
   
       p2->param.missval = p1->param.missval;
       p2->param.nmiss   = p1->param.nmiss;
@@ -608,7 +608,7 @@ void ex_copy_con(int init, nodeType *p2, nodeType *p1)
       double *restrict odat = p2->param.data;
       assert(odat != NULL);
 
-      for ( size_t i = 0; i < (size_t)ngp*nlev; ++i ) odat[i] = cval;
+      for ( size_t i = 0; i < ngp*nlev; ++i ) odat[i] = cval;
     }
 }
 
@@ -634,6 +634,7 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
         case '-':  coper = "-"; break;
         case '*':  coper = "*"; break;
         case '/':  coper = "/"; break;
+        case '^':  coper = "^"; break;
         case LT:   coper = ">"; break;
         case GT:   coper = "<"; break;
         case LE:   coper = "<="; break;
@@ -961,6 +962,7 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   if ( ! init )
     {
+      size_t nmiss = 0;
       double *pdata1 = p1->param.data;
       
       p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
@@ -998,7 +1000,12 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
               else
                 odat[i] = DBL_IS_EQUAL(ival3, missval3) ? missval1 : ival3;
             }
-          }
+
+          for ( size_t i = 0; i < ngp; i++ )
+            if ( DBL_IS_EQUAL(odat[i], missval1) ) nmiss++;
+        }
+
+      p->param.nmiss = nmiss;
     }
 
   if ( p1->ltmpobj ) node_delete(p1);
@@ -1269,6 +1276,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                     param_meta_copy(&params[varID], &rnode->param);
                     params[varID].coord = 0;
                     params[varID].name  = strdup(varname2);
+                    params[varID].nmiss = rnode->param.nmiss;
                     if ( rnode->param.units ) params[varID].units = strdup(rnode->param.units);
                     parse_arg->nparams++;
                   }
@@ -1279,9 +1287,10 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 if ( varID < 0 ) cdoAbort("Variable >%s< not found!", varname2);
                 else if ( params[varID].coord ) cdoAbort("Coordinate variable %s is read only!", varname2);
                 param_meta_copy(&p->param, &params[varID]);
-                p->param.name = params[varID].name;
-                p->param.data = params[varID].data;
-                p->ltmpobj    = false;
+                p->param.name  = params[varID].name;
+                p->param.nmiss = params[varID].nmiss;
+                p->param.data  = params[varID].data;
+                p->ltmpobj     = false;
 
                 ex_copy(init, p, rnode);
               }
