@@ -19,7 +19,7 @@
 static void nce(int istat)
 {
   /*
-    This routine provides a simple interface to netCDF error message routine.
+    This routine provides a simple interface to NetCDF error message routine.
   */
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
 }
@@ -30,7 +30,7 @@ int cdf_openread(const char *filename)
 {
   int fileID = -1;
 #if defined(HAVE_LIBNETCDF)
-  int nc_file_id;      /* netCDF grid file id           */
+  int nc_file_id;      /* NetCDF grid file id           */
 
   openLock();
   int istat = nc_open(filename, NC_NOWRITE, &nc_file_id);
@@ -39,7 +39,7 @@ int cdf_openread(const char *filename)
     cdoAbort("Open failed on %s! %s", filename, nc_strerror(istat));
   fileID = nc_file_id;
 #else
-  cdoWarning("netCDF support not compiled in!");
+  cdoWarning("NetCDF support not compiled in!");
 #endif
 
   return (fileID);
@@ -50,16 +50,16 @@ int gridFromNCfile(const char *gridfile)
 {
   int gridID = -1;
 #if defined(HAVE_LIBNETCDF)
-  int nc_file_id;      /* netCDF grid file id           */
-  int nc_gridsize_id;  /* netCDF grid size dim id       */
-  int nc_gridcorn_id;  /* netCDF grid corner dim id     */
-  int nc_gridrank_id;  /* netCDF grid rank dim id       */
-  int nc_griddims_id;  /* netCDF grid dimension size id */
-  int nc_gridclat_id;  /* netCDF grid corner lat var id */
-  int nc_gridclon_id;  /* netCDF grid corner lon var id */
-  int nc_gridlat_id;   /* netCDF grid center lat var id */
-  int nc_gridlon_id;   /* netCDF grid center lon var id */
-  int nc_gridmask_id;  /* netCDF grid mask id           */
+  int nc_file_id;      /* NetCDF grid file id           */
+  int nc_gridsize_id;  /* NetCDF grid size dim id       */
+  int nc_gridcorn_id;  /* NetCDF grid corner dim id     */
+  int nc_gridrank_id;  /* NetCDF grid rank dim id       */
+  int nc_griddims_id;  /* NetCDF grid dimension size id */
+  int nc_gridclat_id;  /* NetCDF grid corner lat var id */
+  int nc_gridclon_id;  /* NetCDF grid corner lon var id */
+  int nc_gridlat_id;   /* NetCDF grid center lat var id */
+  int nc_gridlon_id;   /* NetCDF grid center lon var id */
+  int nc_gridmask_id;  /* NetCDF grid mask id           */
 
   nc_type xtype;
   size_t attlen;
@@ -151,7 +151,7 @@ int gridFromNCfile(const char *gridfile)
   nce(nc_close(nc_file_id));
 
 #else
-  cdoWarning("netCDF support not compiled in!");
+  cdoWarning("NetCDF support not compiled in!");
 #endif
 
   return (gridID);
@@ -161,15 +161,15 @@ int gridFromNCfile(const char *gridfile)
 void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 {
 #if defined(HAVE_LIBNETCDF)
-  int nc_file_id;      /* netCDF grid file id           */
-  int nc_gridsize_id;  /* netCDF grid size dim id       */
-  int nc_gridcorn_id;  /* netCDF grid corner dim id     */
-  int nc_gridrank_id;  /* netCDF grid rank dim id       */
-  int nc_griddims_id;  /* netCDF grid dimension size id */
-  int nc_gridclat_id;  /* netCDF grid corner lat var id */
-  int nc_gridclon_id;  /* netCDF grid corner lon var id */
-  int nc_gridlat_id;   /* netCDF grid center lat var id */
-  int nc_gridlon_id;   /* netCDF grid center lon var id */
+  int nc_file_id;      /* NetCDF grid file id           */
+  int nc_gridsize_id;  /* NetCDF grid size dim id       */
+  int nc_gridcorn_id;  /* NetCDF grid corner dim id     */
+  int nc_gridrank_id;  /* NetCDF grid rank dim id       */
+  int nc_griddims_id;  /* NetCDF grid dimension size id */
+  int nc_gridclat_id;  /* NetCDF grid corner lat var id */
+  int nc_gridclon_id;  /* NetCDF grid corner lon var id */
+  int nc_gridlat_id;   /* NetCDF grid center lat var id */
+  int nc_gridlon_id;   /* NetCDF grid center lon var id */
   int nc_gridxsize_id, nc_gridysize_id, nc_grdimask_id;
 
   nc_type xtype;
@@ -211,7 +211,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   else
     cdoWarning("Unknown units supplied for grid!");
 
-  /* create netCDF dataset for this grid */
+  /* create NetCDF dataset for this grid */
   
   nce(nc_create(gridfile, NC_CLOBBER, &nc_file_id));
 
@@ -331,6 +331,6 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   nce(nc_close(nc_file_id));
 
 #else
-  Error("netCDF support not compiled in!");
+  Error("NetCDF support not compiled in!");
 #endif
 }

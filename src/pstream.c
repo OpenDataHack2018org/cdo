@@ -702,13 +702,13 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
 
 	  if ( cdoCompType == COMPRESS_SZIP &&
 	       (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-	    cdoWarning("SZIP compression not available for non GRIB/netCDF4 data!");
+	    cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
 
 	  if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
 	    cdoWarning("JPEG compression not available for non GRIB2 data!");
 
 	  if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-	    cdoWarning("Deflate compression not available for non netCDF4 data!");
+	    cdoWarning("Deflate compression not available for non NetCDF4 data!");
 	}
       /*
       if ( cdoDefaultInstID != CDI_UNDEFID )

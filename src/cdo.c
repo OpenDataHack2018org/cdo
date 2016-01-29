@@ -148,9 +148,9 @@ void cdo_usage(void)
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h, --help     Help information for the operators\n");
-  fprintf(stderr, "    --history      Do not append to netCDF \"history\" global attribute\n");
+  fprintf(stderr, "    --history      Do not append to NetCDF \"history\" global attribute\n");
   fprintf(stderr, "    --netcdf_hdr_pad, --hdr_pad, --header_pad <nbr>\n");
-  fprintf(stderr, "                   Pad netCDF output header with nbr bytes\n");
+  fprintf(stderr, "                   Pad NetCDF output header with nbr bytes\n");
   /*
   fprintf(stderr, "    -i <inst>      Institution name/file\n");
   fprintf(stderr, "                   Predefined instituts: ");
@@ -172,8 +172,8 @@ void cdo_usage(void)
 #endif
   fprintf(stderr, "    --percentile <method>\n");
   fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
-  fprintf(stderr, "    -Q             Alphanumeric sorting of netCDF parameter names\n");
-  fprintf(stderr, "    --reduce_dim   Reduce netCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
+  fprintf(stderr, "    -Q             Alphanumeric sorting of NetCDF parameter names\n");
+  fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
@@ -191,7 +191,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -W             Print extra warning messages\n");
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
-  fprintf(stderr, "        zip[_1-9]  Deflate compression of netCDF4 variables\n");
+  fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
   reset_text_color(stderr);
   fprintf(stderr, "\n");
 

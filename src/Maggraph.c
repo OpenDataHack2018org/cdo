@@ -867,7 +867,6 @@ void VerifyGraphParameters( int num_param, char **param_names )
     {
       exit(0);
     }
-    
 }
 #endif
 
@@ -882,21 +881,14 @@ void *Maggraph(void *argument)
   int varID, levelID;
   int gridID;
   int nrecs;
-  int tsID;
-  int streamID;
-  int vlistID, vlistID0 = -1;
+  int vlistID0 = -1;
   int nmiss;
-  int taxisID;
-  int fileID;
   long nts_alloc;
-  double val;
-  int i;
   
   int nparam = operatorArgc();
   char **pnames = operatorArgv();
   
-  if( nparam )
-    VerifyGraphParameters(nparam,pnames);
+  if ( nparam ) VerifyGraphParameters(nparam,pnames);
   
   int nfiles = cdoStreamCnt() - 1;
   const char *ofilename = cdoStreamName(nfiles)->args;
@@ -912,7 +904,7 @@ void *Maggraph(void *argument)
   int **vtime   = (int **) Malloc(nfiles*sizeof(int *));
   long *nts     = (long*) Malloc(nfiles*sizeof(long));
   
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       datatab[fileID] = NULL;
       vdate[fileID]   = NULL;
@@ -920,16 +912,15 @@ void *Maggraph(void *argument)
       nts[fileID]     = 0;
     }
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      
-     
       if( DBG )
         fprintf( stderr," file %d is %s\n", fileID, cdoStreamName(fileID)->args );
-      streamID = streamOpenRead(cdoStreamName(fileID));
+      
+      int streamID = streamOpenRead(cdoStreamName(fileID));
 
-      vlistID = streamInqVlist(streamID);
-      taxisID = vlistInqTaxis(vlistID);
+      int vlistID = streamInqVlist(streamID);
+      int taxisID = vlistInqTaxis(vlistID);
 
       vlistInqVarUnits(vlistID, 0, units);
       if( DBG )
@@ -938,10 +929,13 @@ void *Maggraph(void *argument)
 	{
 	  vlistInqVarName(vlistID, 0, varname);
 	  
-	  
 	  gridID = vlistInqVarGrid(vlistID, 0);
+          int zaxisID = vlistInqVarZaxis(vlistID, 0);
+          int nvars = vlistNvars(vlistID);
 
+          if ( nvars > 1 ) cdoAbort("Input stream has more than on variable!");
 	  if ( gridInqSize(gridID) != 1 ) cdoAbort("Variable has more than one grid point!");
+	  if ( zaxisInqSize(zaxisID) != 1 ) cdoAbort("Variable has more than one level!");
 
 	  vlistID0 = vlistDuplicate(vlistID);
 	}
@@ -950,11 +944,11 @@ void *Maggraph(void *argument)
 	  vlistCompare(vlistID0, vlistID, CMP_ALL);
 	}
 
-      tsID = 0;
+      int tsID = 0;
       nts_alloc = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	{
-	  if ( nrecs != 1 ) cdoAbort("Input streams have more than one record!\n");
+	  if ( nrecs != 1 ) cdoAbort("Input stream has more than one point in time!");
 	  
 	  if ( tsID == 0 )
 	    {
@@ -973,7 +967,8 @@ void *Maggraph(void *argument)
 	      vdate[ fileID ]   = (int*) Realloc(vdate[fileID], nts_alloc*sizeof(int));
 	      vtime[ fileID ]   = (int*) Realloc(vtime[fileID], nts_alloc*sizeof(int));
 	    }
-	  
+
+          double val;
 	  streamInqRecord( streamID, &varID, &levelID );
 	  streamReadRecord( streamID, &val, &nmiss );	
 	  datatab[ fileID ][ tsID ] = val;
@@ -1000,7 +995,7 @@ void *Maggraph(void *argument)
     {
       fprintf(stderr, "Num params %d\n", nparam);
   
-      for( i = 0; i< nparam; i++ )
+      for( int i = 0; i< nparam; i++ )
 	fprintf(stderr, "Param %s\n", pnames[i]);
     }
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
@@ -1011,13 +1006,12 @@ void *Maggraph(void *argument)
 
   if ( vlistID0 != -1 ) vlistDestroy(vlistID0);
 
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       if ( datatab[fileID] ) Free(datatab[fileID]);
     }
 
   Free(datatab);
-
 
   if ( vdate ) Free(vdate);
   if ( vtime ) Free(vtime);

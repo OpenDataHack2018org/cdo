@@ -30,10 +30,10 @@ const char *filetypestr(int filetype)
     {
     case FILETYPE_GRB:  return ("GRIB");            break;
     case FILETYPE_GRB2: return ("GRIB2");           break;
-    case FILETYPE_NC:   return ("netCDF");          break;
-    case FILETYPE_NC2:  return ("netCDF2");         break;
-    case FILETYPE_NC4:  return ("netCDF4");         break;
-    case FILETYPE_NC4C: return ("netCDF4 classic"); break;
+    case FILETYPE_NC:   return ("NetCDF");          break;
+    case FILETYPE_NC2:  return ("NetCDF2");         break;
+    case FILETYPE_NC4:  return ("NetCDF4");         break;
+    case FILETYPE_NC4C: return ("NetCDF4 classic"); break;
     case FILETYPE_SRV:  return ("SERVICE");         break;
     case FILETYPE_EXT:  return ("EXTRA");           break;
     case FILETYPE_IEG:  return ("IEG");             break;

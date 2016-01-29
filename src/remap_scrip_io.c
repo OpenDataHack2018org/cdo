@@ -23,7 +23,7 @@ void remapgrid_alloc(int map_type, remapgrid_t *grid);
 static
 void nce(int istat)
 {
-  // This routine provides a simple interface to netCDF error message routine.
+  // This routine provides a simple interface to NetCDF error message routine.
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
 }
 #endif
@@ -32,7 +32,7 @@ void nce(int istat)
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, int num_neighbors,
 		       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv)
 {
-  // Writes remap data to a netCDF file using SCRIP conventions
+  // Writes remap data to a NetCDF file using SCRIP conventions
   /*
     Input variables:
 
@@ -42,7 +42,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 
   // Local variables
 
-  int nc_file_id;           /* id for netCDF file                       */
+  int nc_file_id;           /* id for NetCDF file                       */
   int nc_srcgrdsize_id;     /* id for source grid size                  */
   int nc_dstgrdsize_id;     /* id for destination grid size             */
   int nc_srcgrdcorn_id = 0; /* id for number of source grid corners     */
@@ -71,7 +71,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   int nc_dstadd_id;         /* id for map destination address           */
   int nc_rmpmatrix_id;      /* id for remapping matrix                  */
 
-  int nc_dims2_id[2];       /* netCDF ids for 2d array dims             */
+  int nc_dims2_id[2];       /* NetCDF ids for 2d array dims             */
 
   const char *map_name = "SCRIP remapping with CDO";
   char normalize_opt[64] = "unknown";
@@ -165,7 +165,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
       }
   }
 
-  // Create netCDF file for mapping and define some global attributes
+  // Create NetCDF file for mapping and define some global attributes
   nce(nc_create(interp_file, writemode, &nc_file_id));
 
   // Map name
@@ -206,7 +206,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   if ( CDO_Version_Info )
     nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment()));
 
-  // Prepare netCDF dimension info
+  // Prepare NetCDF dimension info
 
   // Define grid size dimensions
   nce(nc_def_dim(nc_file_id, "src_grid_size", src_grid.size, &nc_srcgrdsize_id));
@@ -230,7 +230,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   nce(nc_def_var(nc_file_id, "src_grid_dims", NC_INT, 1, &nc_srcgrdrank_id, &nc_srcgrddims_id));
   nce(nc_def_var(nc_file_id, "dst_grid_dims", NC_INT, 1, &nc_dstgrdrank_id, &nc_dstgrddims_id));
 
-  // Define all arrays for netCDF descriptors
+  // Define all arrays for NetCDF descriptors
 
   // Define grid center latitude array
   nce(nc_def_var(nc_file_id, "src_grid_center_lat", NC_DOUBLE, 1, &nc_srcgrdsize_id, &nc_srcgrdcntrlat_id));
@@ -374,7 +374,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   nce(nc_close(nc_file_id));
 
 #else
-  cdoAbort("netCDF support not compiled in!");
+  cdoAbort("NetCDF support not compiled in!");
 #endif
 
 }  // write_remap_scrip
@@ -384,7 +384,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type, int *num_neighbors,
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
-  // The routine reads a netCDF file to extract remapping info in SCRIP format
+  // The routine reads a NetCDF file to extract remapping info in SCRIP format
   /*
     Input variables
 
@@ -396,7 +396,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   int lgridarea = FALSE;
   int status;
-  int nc_file_id;           /* id for netCDF file                       */
+  int nc_file_id;           /* id for NetCDF file                       */
   int nc_srcgrdsize_id;     /* id for source grid size                  */
   int nc_dstgrdsize_id;     /* id for destination grid size             */
   int nc_srcgrdcorn_id;     /* id for number of source grid corners     */
@@ -766,7 +766,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_close(nc_file_id));
 
 #else
-  cdoAbort("netCDF support not compiled in!");
+  cdoAbort("NetCDF support not compiled in!");
 #endif
 
   rv->links.option    = FALSE;

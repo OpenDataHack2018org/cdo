@@ -229,16 +229,16 @@ void filedes(int streamID)
       printf("  GRIB2 data\n");
       break;
     case FILETYPE_NC:
-      printf("  netCDF data\n");
+      printf("  NetCDF data\n");
       break;
     case FILETYPE_NC2:
-      printf("  netCDF2 data\n");
+      printf("  NetCDF2 data\n");
       break;
     case FILETYPE_NC4:
-      printf("  netCDF4 data\n");
+      printf("  NetCDF4 data\n");
       break;
     case FILETYPE_NC4C:
-      printf("  netCDF4 classic data\n");
+      printf("  NetCDF4 classic data\n");
       break;
     case FILETYPE_SRV:
       printf("  SERVICE data\n");

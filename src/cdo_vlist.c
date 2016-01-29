@@ -257,7 +257,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	if ( strcmp(names1[varID], names2[varID]) != 0 ) break;
 
       if ( varID == nvars )
-	cdoPrint("Use the CDO option -Q to sort the parameter names, if you have netCDF input files!");
+	cdoPrint("Use the CDO option -Q to sort the parameter names, if you have NetCDF input files!");
     }
 }
 

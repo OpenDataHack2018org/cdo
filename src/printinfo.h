@@ -51,16 +51,16 @@ void printFiletype(int streamID, int vlistID)
       printf("GRIB2");
       break;
     case FILETYPE_NC:
-      printf("netCDF");
+      printf("NetCDF");
       break;
     case FILETYPE_NC2:
-      printf("netCDF2");
+      printf("NetCDF2");
       break;
     case FILETYPE_NC4:
-      printf("netCDF4");
+      printf("NetCDF4");
       break;
     case FILETYPE_NC4C:
-      printf("netCDF4 classic");
+      printf("NetCDF4 classic");
       break;
     case FILETYPE_SRV:
       printf("SERVICE");

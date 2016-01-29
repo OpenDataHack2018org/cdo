@@ -104,7 +104,7 @@ static
 void nce(int istat)
 {
   /*
-    This routine provides a simple interface to netCDF error message routine.
+    This routine provides a simple interface to NetCDF error message routine.
   */
 
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
@@ -268,7 +268,7 @@ int import_e5ml(const char *filename, VAR **vars)
   nvars = nvars_ml + 1;
 
 #else
-  cdoAbort("netCDF support not compiled in!");
+  cdoAbort("NetCDF support not compiled in!");
 #endif
 
   return (nvars);
@@ -605,7 +605,7 @@ void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtim
   nce(nc_close(nc_file_id));
 
 #else
-  cdoAbort("netCDF support not compiled in!");
+  cdoAbort("NetCDF support not compiled in!");
 #endif
 }
 
@@ -1075,7 +1075,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   nvars = varid;
 
 #else
-  cdoAbort("netCDF support not compiled in!");
+  cdoAbort("NetCDF support not compiled in!");
 #endif
 
   return (nvars);
@@ -1420,7 +1420,7 @@ void export_e5res(const char *filename, VAR *vars, int nvars)
   nce(nc_close(nc_file_id));
 
 #else
-  cdoAbort("netCDF support not compiled in!");
+  cdoAbort("NetCDF support not compiled in!");
 #endif
 }
 

@@ -1878,7 +1878,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( cmpstrlen(buffer, "CDF", len) == 0 )
 	{
-	  if ( cdoDebug ) cdoPrint("Grid from netCDF file");
+	  if ( cdoDebug ) cdoPrint("Grid from NetCDF file");
 	  gridID = gridFromNCfile(filename);
 	}
 
@@ -1895,7 +1895,7 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cmpstrlen(buffer+1, "HDF", len) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("Grid from netCDF4 file");
+	      if ( cdoDebug ) cdoPrint("Grid from NetCDF4 file");
 	      gridID = gridFromNCfile(filename);
 	    }
 	}

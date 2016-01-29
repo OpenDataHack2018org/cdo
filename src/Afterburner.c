@@ -1185,8 +1185,8 @@ void after_usage(void)
   /*  fprintf(stderr, "     option -h : help (this output)\n"); */
   /*  fprintf(stderr, "     option -p : parallel read on\n"); */
   fprintf(stderr, "  <InputFiles> : ECHAM or ECMWF Ana or ReAna files\n");
-  fprintf(stderr, "  <OutputFile> : GRIB, netCDF or SERVICE format file\n");
-  fprintf(stderr, "<VarianceFile> : GRIB, netCDF or SERVICE format file\n");
+  fprintf(stderr, "  <OutputFile> : GRIB, NetCDF or SERVICE format file\n");
+  fprintf(stderr, "<VarianceFile> : GRIB, NetCDF or SERVICE format file\n");
   fprintf(stderr, "  namelist is read from <stdin>\n");
   fprintf(stderr, "  output is written to <stdout>\n\n");
 
@@ -1274,7 +1274,7 @@ void after_parini(struct Control *globs, struct Variable *vars)
   int gribFormat = scan_par_obsolate(namelist, "grib",   0);
   int cdfFormat  = scan_par_obsolate(namelist, "netcdf", 0);
 
-  if ( gribFormat && cdfFormat ) Error( "GRIB or netCDF?");
+  if ( gribFormat && cdfFormat ) Error( "GRIB or NetCDF?");
 
   switch ( fileFormat )
     {
@@ -2089,7 +2089,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
 	Error("Can't write fourier coefficients to GRIB!");
       else if ( ofiletype == FILETYPE_NC || ofiletype == FILETYPE_NC2 ||
 		ofiletype == FILETYPE_NC4 )
-	Error("Can't write fourier coefficients to netCDF!");
+	Error("Can't write fourier coefficients to NetCDF!");
     }
 
   filename = strrchr(ifile,'/');

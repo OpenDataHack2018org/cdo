@@ -831,7 +831,7 @@ void *Remap(void *argument)
 
   if ( lremapxxx )
     {
-      operatorInputArg("grid description file or name, remap weights file (SCRIP netCDF)");
+      operatorInputArg("grid description file or name, remap weights file (SCRIP NetCDF)");
       operatorCheckArgc(2);
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
       remap_file = operatorArgv()[1];

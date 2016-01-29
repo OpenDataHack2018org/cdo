@@ -1040,7 +1040,7 @@ void *Gradsdes(void *argument)
        filetype != FILETYPE_GRB )
     {
       if ( filetype == FILETYPE_NC )
-        //        cdoAbort("Unsupported file format: netCDF");
+        //        cdoAbort("Unsupported file format: NetCDF");
         ;
       else if ( filetype == FILETYPE_GRB2 )
         //cdoAbort("Unsupported file format: GRIB2");
@@ -1190,7 +1190,7 @@ void *Gradsdes(void *argument)
     }
   else if ( filetype == FILETYPE_NC )
     {
-      fprintf(gdp, "DTYPE  netCDF\n");
+      fprintf(gdp, "DTYPE  NetCDF\n");
     }
 
   /* XYHEADER */

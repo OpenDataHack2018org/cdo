@@ -50,9 +50,9 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
           {
             const char *ncv = (filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C) ? "4" : ((filetype == FILETYPE_NC2) ? "2" : "");
 #if defined HAVE_LIBNETCDF
-            fprintf(stderr, "CDO was build with a netCDF version which doesn't support netCDF%s data!\n", ncv);
+            fprintf(stderr, "CDO was build with a NetCDF version which doesn't support NetCDF%s data!\n", ncv);
 #else
-            fprintf(stderr, "To create a CDO application with netCDF%s support use: ./configure --with-netcdf=<netCDF%s root directory> ...\n", ncv, ncv);
+            fprintf(stderr, "To create a CDO application with NetCDF%s support use: ./configure --with-netcdf=<NetCDF%s root directory> ...\n", ncv, ncv);
 #endif
             break;
           }
