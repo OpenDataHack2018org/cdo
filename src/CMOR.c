@@ -10,10 +10,8 @@
 
 typedef struct _cmor_var
 {
-  char name[CDI_MAX_NAME];
   int cdi_varID;
   int cmor_varID;
-  int axis_id[CMOR_MAX_AXES];
   char datatype;
 } cmor_var;
 
@@ -142,10 +140,6 @@ void *CMOR(void *argument)
   int netcdf_file_action, exit_control;
   int set_verbosity;
   int create_subdirectories;
-  int error_flag;
-  int *month_lengths;
-  int table_id;
-  char *calendar;
 
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
   hcreate(100);
@@ -174,15 +168,16 @@ void *CMOR(void *argument)
   logfile = get_val("logfile", NULL);
 
   create_subdirectories = atoi(get_val("create_subdirectories", "0"));
-  error_flag = cmor_setup(get_val("inpath", "/usr/share/cmor/"),
-                          &netcdf_file_action,
-                          &set_verbosity,
-                          &exit_control,
-                          logfile,
-                          &create_subdirectories);
-  if ( error_flag )
-    cdoAbort("CMOR setup failed!");
+  cmor_setup(get_val("inpath", "/usr/share/cmor/"),
+             &netcdf_file_action,
+             &set_verbosity,
+             &exit_control,
+             logfile,
+             &create_subdirectories);
 
+  int *month_lengths;
+  int table_id;
+  char *calendar;
   int streamID = streamOpenRead(cdoStreamName(0));
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -229,51 +224,46 @@ void *CMOR(void *argument)
 
   double branch_time = atof(get_val("branch_time", "0.0"));
 
-  error_flag = cmor_dataset(get_val("outpath", "./"),
-                            get_val("expinfo", ""),
-                            get_val("institution", ""),
-                            get_val("modinfo", ""),
-                            calendar,
-                            atoi(get_val("realization", "1")),
-                            get_val("contact", ""),
-                            get_val("history", ""),
-                            get_val("comment", ""),
-                            get_val("references", ""),
-                            atoi(get_val("leap_year", "0")),
-                            atoi(get_val("leap_month", "0")),
-                            month_lengths,
-                            get_val("model_id", ""),
-                            get_val("forcing", ""),
-                            atoi(get_val("initialization_method", "1")),
-                            atoi(get_val("physics_version", "1")),
-                            get_val("institute_id", ""),
-                            get_val("parent_experiment_id", ""),
-                            &branch_time,
-                            get_val("parent_experiment_rip", ""));
+  cmor_dataset(get_val("outpath", "./"),
+               get_val("expinfo", ""),
+               get_val("institution", ""),
+               get_val("modinfo", ""),
+               calendar,
+               atoi(get_val("realization", "1")),
+               get_val("contact", ""),
+               get_val("history", ""),
+               get_val("comment", ""),
+               get_val("references", ""),
+               atoi(get_val("leap_year", "0")),
+               atoi(get_val("leap_month", "0")),
+               month_lengths,
+               get_val("model_id", ""),
+               get_val("forcing", ""),
+               atoi(get_val("initialization_method", "1")),
+               atoi(get_val("physics_version", "1")),
+               get_val("institute_id", ""),
+               get_val("parent_experiment_id", ""),
+               &branch_time,
+               get_val("parent_experiment_rip", ""));
 
-  if ( error_flag )
-    cdoAbort("Cannot create dataset!");
-  error_flag = cmor_load_table(table, &table_id);
-  if ( error_flag )
-    cdoAbort("Cannot load table!");
+  cmor_load_table(table, &table_id);
   cmor_set_table(table_id);
 
-  int gridsize = vlistGridsizeMax(vlistID);
-  double *array = (double*) Malloc(gridsize*sizeof(double));
   int nvars = vlistNvars(vlistID);
   cmor_var *cmor_var_list = (cmor_var *) Malloc(nvars * sizeof(cmor_var));;
   cmor_var *cmor_var;
   int copy_nvars = 0;
   int recID, varID, levelID, nrecs, nmiss;
-  int gridID, gridType;
-  int tsID = 0;
-  char *select_vars = get_val("var", NULL);
+  int gridID;
   char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
   int length;
   double *coord_vals, *cell_bounds;
   int ndims;
   double missing_value;
   double tolerance = 1e-4;
+  int maxlevels = 0;
+  int axis_ids[CMOR_MAX_AXES];
+  char *select_vars = get_val("var", NULL);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -281,11 +271,8 @@ void *CMOR(void *argument)
       if ( select_vars == NULL || strstr(select_vars, name) != NULL)
         {
           cmor_var = &cmor_var_list[copy_nvars++];
-          strcpy(cmor_var->name, name);
           cmor_var->cdi_varID = varID;
           gridID = vlistInqVarGrid(vlistID, varID);
-          gridType = gridInqType(gridID);
-
           ndims = 0;
 
           /* Time-Axis */
@@ -308,37 +295,34 @@ void *CMOR(void *argument)
                   tunitNamePtr(timeunit), year, month, day, hour,
                   minute, second);
 
-          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
-                                 "time",
-                                 units,
-                                 0,
-                                 NULL,
-                                 0,
-                                 NULL,
-                                 0,
-                                 NULL);
-          if ( error_flag )
-            cdoAbort("cmor_axis failed.");
+          cmor_axis(&axis_ids[ndims++],
+                    "time",
+                    units,
+                    0,
+                    NULL,
+                    0,
+                    NULL,
+                    0,
+                    NULL);
 
-          /* X-Axis */
-          gridInqXname(gridID, name);
-          gridInqXunits(gridID, units);
-          length = gridInqXsize(gridID);
+          /* Z-Axis */
+          int zaxisID = vlistInqVarZaxis(vlistID, varID);
+          zaxisInqName(zaxisID, name);
+          zaxisInqUnits(zaxisID, units);
+          length = zaxisInqSize(zaxisID);
+          if ( length > maxlevels )
+            maxlevels = length;
           coord_vals = Malloc(length * sizeof(double));
-          gridInqXvals(gridID, coord_vals);
-          cell_bounds = Malloc(2 * length * sizeof(double));
-          gridInqXbounds(gridID, cell_bounds);
-          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
-                                 substitute(name),
-                                 units,
-                                 length,
-                                 (void *)coord_vals,
-                                 'd',
-                                 (void *)cell_bounds,
-                                 2,
-                                 NULL);
-          if ( error_flag )
-            cdoAbort("cmor_axis failed.");
+          zaxisInqLevels(zaxisID, coord_vals);
+          cmor_axis(&axis_ids[ndims++],
+                    substitute(name),
+                    units,
+                    length,
+                    (void *)coord_vals,
+                    'd',
+                    NULL,
+                    0,
+                    NULL);
 
           /* Y-Axis */
           gridInqYname(gridID, name);
@@ -348,70 +332,47 @@ void *CMOR(void *argument)
           gridInqYvals(gridID, coord_vals);
           cell_bounds = Malloc(2 * length * sizeof(double));
           gridInqYbounds(gridID, cell_bounds);
-          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
-                                 substitute(name),
-                                 units,
-                                 length,
-                                 (void *)coord_vals,
-                                 'd',
-                                 (void *)cell_bounds,
-                                 2,
-                                 NULL);
-          if ( error_flag )
-            cdoAbort("cmor_axis failed.");
+          cmor_axis(&axis_ids[ndims++],
+                    substitute(name),
+                    units,
+                    length,
+                    (void *)coord_vals,
+                    'd',
+                    (void *)cell_bounds,
+                    2,
+                    NULL);
 
-          /* Z-Axis */
-          int zaxisID = vlistInqVarZaxis(vlistID, varID);
-          zaxisInqName(zaxisID, name);
-          zaxisInqUnits(zaxisID, units);
-          length = zaxisInqSize(zaxisID);
+          /* X-Axis */
+          gridInqXname(gridID, name);
+          gridInqXunits(gridID, units);
+          length = gridInqXsize(gridID);
           coord_vals = Malloc(length * sizeof(double));
-          zaxisInqLevels(zaxisID, coord_vals);
-          error_flag = cmor_axis(&cmor_var->axis_id[ndims++],
-                                 substitute(name),
-                                 units,
-                                 length,
-                                 (void *)coord_vals,
-                                 'd',
-                                 NULL,
-                                 0,
-                                 NULL);
-          if ( error_flag )
-            cdoAbort("cmor_axis failed.");
+          gridInqXvals(gridID, coord_vals);
+          cell_bounds = Malloc(2 * length * sizeof(double));
+          gridInqXbounds(gridID, cell_bounds);
+          cmor_axis(&axis_ids[ndims++],
+                    substitute(name),
+                    units,
+                    length,
+                    (void *)coord_vals,
+                    'd',
+                    (void *)cell_bounds,
+                    2,
+                    NULL);
+
           /* Variable */
           vlistInqVarUnits(vlistID, varID, units);
           missing_value = vlistInqVarMissval(vlistID, varID);
-          switch ( vlistInqVarDatatype(vlistID, varID) )
-            {
-            case DATATYPE_INT32:
-              cmor_var->datatype = 'i';
-              break;
-            case DATATYPE_FLT32:
-              cmor_var->datatype = 'f';
-              break;
-            case DATATYPE_FLT64:
-              cmor_var->datatype = 'd';
-              break;
-            default:
-              cdoAbort("Datatype not supported by CMOR!");
-            }
-
-          char *positive;
-          switch ( zaxisInqPositive(zaxisID) )
-            {
-            case 1:
-              positive = "up";
-              break;
-            case 2:
-              positive = "down";
-              break;
-            }
-
+          if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
+            cmor_var->datatype = 'f';
+          else
+            cmor_var->datatype = 'd';
+          vlistInqVarName(vlistID, varID, name);
           cmor_variable(&cmor_var->cmor_varID,
-                        substitute(cmor_var->name),
+                        substitute(name),
                         units,
                         ndims,
-                        cmor_var->axis_id,
+                        axis_ids,
                         cmor_var->datatype,
                         &missing_value,
                         &tolerance,
@@ -426,21 +387,45 @@ void *CMOR(void *argument)
         }
     }
 
+  int gridsize = vlistGridsizeMax(vlistID);
+  double *array = (double*) Malloc(gridsize * maxlevels * sizeof(double));
+  double time_vals;
+  double time_bnds[2];
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int i = 0; i < copy_nvars; i++ )
         {
-          streamInqRecord(streamID, &varID, &levelID);
-          streamReadRecord(streamID, array, &nmiss);
+          cmor_var = &cmor_var_list[i];
+          time_vals = 0.5 + tsID;
+          time_bnds[0] = tsID;
+          time_bnds[1] = tsID + 1.0;
+          for ( recID = 0; recID < nrecs; recID++ )
+            {
+              streamInqRecord(streamID, &varID, &levelID);
+              if ( cmor_var->datatype == 'f' )
+                streamReadRecordF(streamID,
+                                  (float *)array + gridsize * levelID, &nmiss);
+              else
+                streamReadRecord(streamID, array + gridsize * levelID, &nmiss);
+            }
+          //streamReadVarF(streamID, cmor_var->cdi_varID, array, &nmiss);
+          cmor_write(cmor_var->cmor_varID,
+                     (void *)array,
+                     cmor_var->datatype,
+                     NULL, // file_suffix
+                     1,    // ntimes_passed
+                     &time_vals, // time_vals
+                     time_bnds, // time_bnds
+                     NULL);// store_with
         }
-
       tsID++;
     }
-
+  Free (array);
   streamClose(streamID);
+  cmor_close();
   hdestroy();
 
-  if ( array ) Free(array);
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
