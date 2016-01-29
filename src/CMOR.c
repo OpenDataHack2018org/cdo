@@ -151,6 +151,7 @@ void *CMOR(void *argument)
   int error_flag;
   int *month_lengths;
   int table_id;
+  char *calendar;
 
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
   hcreate(100);
@@ -188,6 +189,31 @@ void *CMOR(void *argument)
   if ( error_flag )
     cdoAbort("CMOR setup failed!");
 
+  int streamID = streamOpenRead(cdoStreamName(0));
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
+
+  switch(taxisInqCalendar(taxisID))
+    {
+    case CALENDAR_STANDARD:
+      calendar = "gregorian";
+      break;
+    case CALENDAR_PROLEPTIC:
+      calendar = "proleptic_gregorian";
+      break;
+    case CALENDAR_360DAYS:
+      calendar = "360_day";
+      break;
+    case CALENDAR_365DAYS:
+      calendar = "noleap";
+      break;
+    case CALENDAR_366DAYS:
+      calendar = "all_leap";
+      break;
+    default:
+      cdoAbort("Unsupported calendar type.");
+    }
+
   if ( get_val("month_lengths", NULL) )
     {
       char *month_lengths_str = strdup(get_val("month_lengths", ""));
@@ -213,7 +239,7 @@ void *CMOR(void *argument)
                             get_val("expinfo", ""),
                             get_val("institution", ""),
                             get_val("modinfo", ""),
-                            get_val("calendar", "gregorian"),
+                            calendar,
                             atoi(get_val("realization", "1")),
                             get_val("contact", ""),
                             get_val("history", ""),
@@ -237,11 +263,6 @@ void *CMOR(void *argument)
   if ( error_flag )
     cdoAbort("Cannot load table!");
   cmor_set_table(table_id);
-
-  int streamID = streamOpenRead(cdoStreamName(0));
-
-  int vlistID = streamInqVlist(streamID);
-  int taxisID = vlistInqTaxis(vlistID);
 
   int gridsize = vlistGridsizeMax(vlistID);
   double *array = (double*) Malloc(gridsize*sizeof(double));
