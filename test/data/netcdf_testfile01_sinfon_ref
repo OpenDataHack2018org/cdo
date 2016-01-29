@@ -1,4 +1,4 @@
-   File format : netCDF
+   File format : NetCDF
     -1 : Institut Source   Steptype Levels Num    Points Num Dtype : Parameter name
      1 : unknown  unknown  instant       1   1      2592   1  I16  : tem           
    Grid coordinates :
