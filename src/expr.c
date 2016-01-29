@@ -518,6 +518,7 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
   param_meta_copy(&p->param, &px->param);
 
   p->param.name = p->u.var.nm;
+  //printf("%s %s nmiss %ld %ld\n", p->u.var.nm, px->param.name, nmiss1, nmiss2);
 
   if ( ! init )
     {
@@ -544,14 +545,17 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
                 oper_expr_con_var(oper, nmiss, ngp, missval1, missval2, odat, idat1[0], idat2);
             }
           else
-            oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
-        }
+            {
+              oper_expr_var_var(oper, nmiss, ngp, missval1, missval2, odat, idat1, idat2);
+            }
+          }
 
       size_t nmiss = 0;
       for ( size_t i = 0; i < ngp*nlev; i++ )
         if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
+      // printf("%s %s nmiss %ld\n", p->u.var.nm, px->param.name, nmiss);
     }
   
   return p;
@@ -1288,11 +1292,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 else if ( params[varID].coord ) cdoAbort("Coordinate variable %s is read only!", varname2);
                 param_meta_copy(&p->param, &params[varID]);
                 p->param.name  = params[varID].name;
-                p->param.nmiss = params[varID].nmiss;
                 p->param.data  = params[varID].data;
                 p->ltmpobj     = false;
 
                 ex_copy(init, p, rnode);
+                // p->param.nmiss = rnode->param.nmiss;
+                // printf("= %s %ld %ld\n", p->param.name, p->param.nmiss, rnode->param.nmiss); 
               }
 
             //  if ( rnode->ltmpobj ) node_delete(rnode);
