@@ -87,13 +87,13 @@ static char *get_val(char *key, char *def)
     return def;
 }
 
-static char *translate(char *word)
+static char *substitute(char *word)
 {
   ENTRY e, *ep;
   char *key;
 
-  key = (char *) Malloc (strlen(word) + 11);
-  sprintf(key, "translate_%s", word);
+  key = (char *) Malloc (strlen(word) + 12);
+  sprintf(key, "substitute_%s", word);
   e.key = key;
   ep = hsearch(e, FIND);
   Free(key);
@@ -281,7 +281,7 @@ void *CMOR(void *argument)
           cell_bounds = Malloc(2 * length * sizeof(double));
           gridInqXbounds(gridID, cell_bounds);
           error_flag = cmor_axis(&cmor_var->axis_id[0],
-                                 translate(name),
+                                 substitute(name),
                                  units,
                                  length,
                                  (void *)coord_vals,
@@ -301,7 +301,7 @@ void *CMOR(void *argument)
           cell_bounds = Malloc(2 * length * sizeof(double));
           gridInqYbounds(gridID, cell_bounds);
           error_flag = cmor_axis(&cmor_var->axis_id[1],
-                                 translate(name),
+                                 substitute(name),
                                  units,
                                  length,
                                  (void *)coord_vals,
@@ -334,11 +334,11 @@ void *CMOR(void *argument)
 
           /* fixme: missing axes */
           cmor_variable(&cmor_var->cmor_varID,
-                        cmor_var->name,
+                        substitute(cmor_var->name),
                         units,
                         ndims,
                         cmor_var->axis_id,
-                        'd',
+                        cmor_var->datatype,
                         &missing_value,
                         &tolerance,
                         NULL,
