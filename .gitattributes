@@ -37,18 +37,8 @@ contrib/conda/build.sh -text
 contrib/conda/meta.yaml -text
 contrib/makecompl.rb -text
 doc/Doxyfile -text
-doc/cdo-poster.pdf -text
-doc/cdo.pdf -text
-doc/cdoBrochureWeb.pdf -text svneol=unset#unset
-doc/cdo_ana_vis_wegner.pdf -text svneol=unset#application/pdf
-doc/cdo_cmsaf_kaspar.pdf -text svneol=unset#application/pdf
-doc/cdo_eca.pdf -text svneol=unset#application/pdf
 doc/cdo_limits -text
-doc/cdo_magics.pdf -text svneol=unset#application/pdf
-doc/cdo_nudgingdata.pdf -text
-doc/cdo_refcard.pdf -text
 doc/cdo_vs_nco -text
-doc/eca_operator.pdf -text
 doc/parameter_table -text
 doc/tex/Modules -text
 doc/tex/appendix.tex -text
