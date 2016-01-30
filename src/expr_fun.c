@@ -37,11 +37,14 @@ double *fld_weights(int gridID, size_t ngp)
   double *weights = (double*) Malloc(ngp*sizeof(double));
   for ( size_t i = 0; i < ngp; ++i ) weights[i] = 1;
 
-  int wstatus = gridWeights(gridID, weights);
-  if ( wstatus != 0 && lwarn )
+  if ( ngp > 1 )
     {
-      lwarn = false;
-      cdoWarning("Grid cell bounds not available, using constant grid cell area weights!");
+      int wstatus = gridWeights(gridID, weights);
+      if ( wstatus != 0 && lwarn )
+        {
+          lwarn = false;
+          cdoWarning("Grid cell bounds not available, using constant grid cell area weights!");
+        }
     }
 
   return weights;

@@ -101,14 +101,10 @@ static func_t fun_sym_tbl[] =
   {1, 0, "fldsum",  (void (*)()) fldsum},
   {1, 1, "fldmean", (void (*)()) fldmean},
   {1, 1, "fldavg",  (void (*)()) fldavg},
-  /*
-  {1, "max",   max},
-  {1, "sum",   sum},
-  {1, "avg",   avg},
-  {1, "mean",  mean},
-  {1, "std",   std},
-  {1, "var",   var},
-  */
+  {1, 1, "fldstd",  (void (*)()) fldstd},
+  {1, 1, "fldstd1", (void (*)()) fldstd1},
+  {1, 1, "fldvar",  (void (*)()) fldvar},
+  {1, 1, "fldvar1", (void (*)()) fldvar1},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
