@@ -101,7 +101,6 @@ void node_data_delete(nodeType *p)
   if ( p )
     {
       if ( p->param.data ) { Free(p->param.data); p->param.data = NULL;}
-      //   Free(p);
     }
 }
 
