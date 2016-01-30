@@ -562,8 +562,8 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 static
 void ex_copy_var(int init, nodeType *p2, nodeType *p1)
 {
-  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%zu][N%zu] = %s[L%zu][N%zu]",
-                             p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
+  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %s[L%zu][N%zu]",
+                             ExIn[init], p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
   
   size_t ngp = p1->param.ngp;
   assert(ngp > 0);
@@ -588,8 +588,6 @@ void ex_copy_var(int init, nodeType *p2, nodeType *p1)
       p2->param.missval = p1->param.missval;
       p2->param.nmiss   = p1->param.nmiss;
     }
-
-  if ( p1->ltmpobj ) node_delete(p1);
 }
 
 static
@@ -597,7 +595,7 @@ void ex_copy_con(int init, nodeType *p2, nodeType *p1)
 {
   double cval = p1->u.con.value;
 
-  if ( cdoVerbose ) cdoPrint("\texpr\tcopy\t%s[L%zu][N%zu] = %g", p2->param.name, p2->param.nlev, p2->param.ngp, cval);
+  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %g", ExIn[init], p2->param.name, p2->param.nlev, p2->param.ngp, cval);
   
   size_t ngp = p2->param.ngp;
   assert(ngp > 0);
@@ -1292,13 +1290,12 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 p->param.name  = params[varID].name;
                 p->param.data  = params[varID].data;
                 p->ltmpobj     = false;
-
+                
                 ex_copy(init, p, rnode);
                 params[varID].nmiss = p->param.nmiss;
               }
-
-            //  if ( rnode->ltmpobj ) node_delete(rnode);
-            // rnode = p;
+            
+            if ( rnode->ltmpobj ) node_delete(rnode);
 
             break;
           }
