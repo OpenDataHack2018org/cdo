@@ -136,7 +136,7 @@ void compareGrids(int gridID1, int gridID2)
 	  compare_grid_unstructured(gridID1, gridID2);
 	}
     }
-  else
+  else if ( gridInqSize(gridID1) > 1 )
     {
       cdoWarning("Grids have different types! First grid: %s; second grid: %s",
 		 gridNamePtr(gridInqType(gridID1)), gridNamePtr(gridInqType(gridID2)));

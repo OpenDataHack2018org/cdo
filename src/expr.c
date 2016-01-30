@@ -1,3 +1,20 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,6 +61,7 @@ static double f_sqr(double x)  { return (x*x);      }
 
 typedef struct {
   int type;
+  int flag;
   const char *name;  // function name
   void (*func)();    // pointer to function
 }
@@ -52,37 +70,37 @@ func_t;
 static func_t fun_sym_tbl[] =
 {
   // scalar functions
-  {0, "abs",   (void (*)()) fabs},
-  {0, "floor", (void (*)()) floor},
-  {0, "ceil",  (void (*)()) ceil},
-  {0, "int",   (void (*)()) f_int},
-  {0, "nint",  (void (*)()) f_nint},
-  {0, "sqr",   (void (*)()) f_sqr},
-  {0, "sqrt",  (void (*)()) sqrt},
-  {0, "exp",   (void (*)()) exp},
-  {0, "erf",   (void (*)()) erf},
-  {0, "log",   (void (*)()) log},
-  {0, "log10", (void (*)()) log10},
-  {0, "sin",   (void (*)()) sin},
-  {0, "cos",   (void (*)()) cos},
-  {0, "tan",   (void (*)()) tan},
-  {0, "sinh",  (void (*)()) sinh},
-  {0, "cosh",  (void (*)()) cosh},
-  {0, "tanh",  (void (*)()) tanh},
-  {0, "asin",  (void (*)()) asin},
-  {0, "acos",  (void (*)()) acos},
-  {0, "atan",  (void (*)()) atan},
-  {0, "asinh", (void (*)()) asinh},
-  {0, "acosh", (void (*)()) acosh},
-  {0, "atanh", (void (*)()) atanh},
-  {0, "gamma", (void (*)()) tgamma},
+  {0, 0, "abs",   (void (*)()) fabs},
+  {0, 0, "floor", (void (*)()) floor},
+  {0, 0, "ceil",  (void (*)()) ceil},
+  {0, 0, "int",   (void (*)()) f_int},
+  {0, 0, "nint",  (void (*)()) f_nint},
+  {0, 0, "sqr",   (void (*)()) f_sqr},
+  {0, 0, "sqrt",  (void (*)()) sqrt},
+  {0, 0, "exp",   (void (*)()) exp},
+  {0, 0, "erf",   (void (*)()) erf},
+  {0, 0, "log",   (void (*)()) log},
+  {0, 0, "log10", (void (*)()) log10},
+  {0, 0, "sin",   (void (*)()) sin},
+  {0, 0, "cos",   (void (*)()) cos},
+  {0, 0, "tan",   (void (*)()) tan},
+  {0, 0, "sinh",  (void (*)()) sinh},
+  {0, 0, "cosh",  (void (*)()) cosh},
+  {0, 0, "tanh",  (void (*)()) tanh},
+  {0, 0, "asin",  (void (*)()) asin},
+  {0, 0, "acos",  (void (*)()) acos},
+  {0, 0, "atan",  (void (*)()) atan},
+  {0, 0, "asinh", (void (*)()) asinh},
+  {0, 0, "acosh", (void (*)()) acosh},
+  {0, 0, "atanh", (void (*)()) atanh},
+  {0, 0, "gamma", (void (*)()) tgamma},
 
   // cdo functions (Reduce grid to point)
-  {1, "fldmin",  (void (*)()) fun_fldmin},
-  {1, "fldmax",  (void (*)()) fun_fldmax},
-  {1, "fldsum",  (void (*)()) fun_fldsum},
-  {1, "fldmean", (void (*)()) fun_fldmean},
-  {1, "fldavg",  (void (*)()) fun_fldavg},
+  {1, 0, "fldmin",  (void (*)()) fldmin},
+  {1, 0, "fldmax",  (void (*)()) fldmax},
+  {1, 0, "fldsum",  (void (*)()) fldsum},
+  {1, 1, "fldmean", (void (*)()) fldmean},
+  {1, 1, "fldavg",  (void (*)()) fldavg},
   /*
   {1, "max",   max},
   {1, "sum",   sum},
@@ -700,6 +718,7 @@ static
 nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
 {
   int functype = fun_sym_tbl[funcID].type;
+  int funcflag = fun_sym_tbl[funcID].flag;
 
   size_t ngp  = p1->param.ngp;
   size_t nlev = p1->param.nlev;
@@ -750,12 +769,19 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
                 }
             }
         }
-      else
+      else if ( functype == 1 )
         {
-          double (*exprfunc)(int,size_t,double,size_t,double*) =
-            (double (*)(int,size_t,double,size_t,double*)) fun_sym_tbl[funcID].func;
+          field_t field;
+          double *weights = NULL;
+          if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
+
+          double (*exprfunc)(field_t) = (double (*)(field_t)) fun_sym_tbl[funcID].func;
           for ( size_t k = 0; k < nlev; k++ )
-            pdata[k] = exprfunc(p1->param.gridID, nmiss, missval, ngp, p1data+k*ngp);
+            {
+              fld_field_init(&field, nmiss, missval, ngp, p1data+k*ngp, weights);
+              pdata[k] = exprfunc(field);
+            }
+          if ( weights ) Free(weights);
         }
 
       nmiss = 0;

@@ -15,10 +15,10 @@
   GNU General Public License for more details.
 */
 
-#include <stdio.h>
-#include "field.h"
+#include "cdo_int.h"
+#include "grid.h"
 
-static
+
 void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, double *array, double *w)
 {
   field_init(field);
@@ -31,48 +31,64 @@ void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, do
 }
 
 
-double fun_fldmin(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
+double *fld_weights(int gridID, size_t ngp)
+{
+  static bool lwarn = true;
+  double *weights = (double*) Malloc(ngp*sizeof(double));
+  for ( size_t i = 0; i < ngp; ++i ) weights[i] = 1;
+
+  int wstatus = gridWeights(gridID, weights);
+  if ( wstatus != 0 && lwarn )
+    {
+      lwarn = false;
+      cdoWarning("Grid cell bounds not available, using constant grid cell area weights!");
+    }
+
+  return weights;
+}
+
+/*
+double fun_fldmin(size_t nmiss, double missval, size_t ngp, double *array, double *weights)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, NULL);
+  fld_field_init(&field, nmiss, missval, ngp, array, weights);
   
   return fldmin(field);
 }
 
 
-double fun_fldmax(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
+double fun_fldmax(size_t nmiss, double missval, size_t ngp, double *array, double *weights)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, NULL);
+  fld_field_init(&field, nmiss, missval, ngp, array, weights);
   
   return fldmax(field);
 }
 
 
-double fun_fldsum(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
+double fun_fldsum(size_t nmiss, double missval, size_t ngp, double *array, double *weights)
 {
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, NULL);
+  fld_field_init(&field, nmiss, missval, ngp, array, weights);
   
   return fldsum(field);
 }
 
 
-double fun_fldmean(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
+double fun_fldmean(size_t nmiss, double missval, size_t ngp, double *array, double *weights)
 {
-  double *w = NULL;
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  fld_field_init(&field, nmiss, missval, ngp, array, weights);
   
   return fldmean(field);
 }
 
 
-double fun_fldavg(int gridID, size_t nmiss, double missval, size_t ngp, double *array)
+double fun_fldavg(size_t nmiss, double missval, size_t ngp, double *array, double *weights)
 {
-  double *w = NULL;
   field_t field;
-  fld_field_init(&field, nmiss, missval, ngp, array, w);
+  fld_field_init(&field, nmiss, missval, ngp, array, weights);
   
   return fldavg(field);
 }
+*/
