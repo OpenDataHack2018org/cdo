@@ -555,7 +555,6 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
         if ( DBL_IS_EQUAL(p->param.data[i], missval1) ) nmiss++;
 
       p->param.nmiss = nmiss;
-      // printf("%s %s nmiss %ld\n", p->u.var.nm, px->param.name, nmiss);
     }
   
   return p;
@@ -1296,8 +1295,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 p->ltmpobj     = false;
 
                 ex_copy(init, p, rnode);
-                // p->param.nmiss = rnode->param.nmiss;
-                // printf("= %s %ld %ld\n", p->param.name, p->param.nmiss, rnode->param.nmiss); 
+                params[varID].nmiss = p->param.nmiss;
               }
 
             //  if ( rnode->ltmpobj ) node_delete(rnode);

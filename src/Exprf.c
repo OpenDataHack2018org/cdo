@@ -377,11 +377,11 @@ void *Expr(void *argument)
       for ( int varID = 0; varID < nvars2; varID++ )
 	{
           int pidx = varIDmap[varID];
-          //   printf(">>>> %s %ld\n", params[pidx].name, params[pidx].nmiss);
           if ( pidx < nvars1 ) continue;
           size_t ngp  = params[pidx].ngp;
           size_t nlev = params[pidx].nlev;
 
+          params[pidx].nmiss = 0;
 	  memset(params[pidx].data, 0, ngp*nlev*sizeof(double));
 	}
 
