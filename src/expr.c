@@ -35,6 +35,7 @@
 static const char *ExIn[] = {"expr", "init"};
 static const char *tmpvnm = "_tmp_";
 int pointID = -1;
+int surfaceID = -1;
 
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
@@ -95,7 +96,7 @@ static func_t fun_sym_tbl[] =
   {0, 0, "atanh", (void (*)()) atanh},
   {0, 0, "gamma", (void (*)()) tgamma},
 
-  // cdo functions (Reduce grid to point)
+  // cdo field functions (Reduce grid to point)
   {1, 0, "fldmin",  (void (*)()) fldmin},
   {1, 0, "fldmax",  (void (*)()) fldmax},
   {1, 0, "fldsum",  (void (*)()) fldsum},
@@ -105,6 +106,17 @@ static func_t fun_sym_tbl[] =
   {1, 1, "fldstd1", (void (*)()) fldstd1},
   {1, 1, "fldvar",  (void (*)()) fldvar},
   {1, 1, "fldvar1", (void (*)()) fldvar1},
+
+  // cdo field functions (Reduce grid to point)
+  {2, 0, "vertmin",  (void (*)()) fldmin},
+  {2, 0, "vertmax",  (void (*)()) fldmax},
+  {2, 0, "vertsum",  (void (*)()) fldsum},
+  {2, 1, "vertmean", (void (*)()) fldmean},
+  {2, 1, "vertavg",  (void (*)()) fldavg},
+  {2, 1, "vertstd",  (void (*)()) fldstd},
+  {2, 1, "vertstd1", (void (*)()) fldstd1},
+  {2, 1, "vertvar",  (void (*)()) fldvar},
+  {2, 1, "vertvar1", (void (*)()) fldvar1},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -699,6 +711,9 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *ex_fun_con(int funcID, nodeType *p1)
 {
+  int functype = fun_sym_tbl[funcID].type;
+  if ( functype != 0 ) cdoAbort("Function %s not available for constant values!", fun_sym_tbl[funcID].name);
+
   nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
   p->type    = typeCon;
@@ -734,11 +749,16 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
       p->param.gridID = pointID;
       p->param.ngp    = 1;
     }
+  else if ( functype == 2 )
+    {
+      p->param.zaxisID = surfaceID;
+      p->param.nlev    = 1;
+    }
 
   if ( ! init )
     {
-      p->param.data = (double*) Malloc(p->param.ngp*nlev*sizeof(double));
-      double *restrict pdata = p->param.data;
+      p->param.data = (double*) Malloc(p->param.ngp*p->param.nlev*sizeof(double));
+      double *restrict pdata  = p->param.data;
       double *restrict p1data = p1->param.data;
   
       if ( functype == 0 )
@@ -779,9 +799,25 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
             }
           if ( weights ) Free(weights);
         }
+      else if ( functype == 2 )
+        {
+          field_t field;
+          double *weights = NULL;
+          if ( funcflag == 1 ) weights = vert_weights(p1->param.zaxisID, nlev);
+          double *array = (double*) Malloc(nlev*sizeof(double));
+          double (*exprfunc)(field_t) = (double (*)(field_t)) fun_sym_tbl[funcID].func;
+          for ( size_t i = 0; i < ngp; i++ )
+            {
+              for ( size_t k = 0; k < nlev; k++ ) array[k] = p1data[k*ngp+i];
+              fld_field_init(&field, nmiss, missval, nlev, array, weights);
+              pdata[i] = exprfunc(field);
+            }
+          if ( array ) Free(array);
+          if ( weights ) Free(weights);
+        }
 
       nmiss = 0;
-      for ( size_t i = 0; i < p->param.ngp*nlev; i++ )
+      for ( size_t i = 0; i < p->param.ngp*p->param.nlev; i++ )
         if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
 
       p->param.nmiss = nmiss;
@@ -1075,6 +1111,7 @@ int param_search_name(int nparam, paramType *params, const char *name)
 nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 {
   pointID = parse_arg->pointID;
+  surfaceID = parse_arg->surfaceID;
   int init = parse_arg->init;
   paramType *params = parse_arg->params;
   //paramType *param2 = &parse_arg->param2;

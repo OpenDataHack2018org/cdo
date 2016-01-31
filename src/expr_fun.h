@@ -18,13 +18,8 @@
 #ifndef _EXPR_FUN_H
 #define _EXPR_FUN_H
 
-double *fld_weights(int gridID, size_t ngp);
 void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, double *array, double *w);
-/*
-double fun_fldmin(size_t nmiss, double missval, size_t ngp, double *array, double *weights);
-double fun_fldmax(size_t nmiss, double missval, size_t ngp, double *array, double *weights);
-double fun_fldsum(size_t nmiss, double missval, size_t ngp, double *array, double *weights);
-double fun_fldmean(size_t nmiss, double missval, size_t ngp, double *array, double *weights);
-double fun_fldavg(size_t nmiss, double missval, size_t ngp, double *array, double *weights);
-*/
+double *fld_weights(int gridID, size_t ngp);
+double *vert_weights(int zaxisID, size_t nlev);
+
 #endif

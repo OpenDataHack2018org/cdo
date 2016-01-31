@@ -96,7 +96,7 @@ void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds)
     }
 }
 
-static
+
 int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
 {
   int status = 0;

@@ -305,6 +305,9 @@ static
 void prevarsum(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
 	       double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
 { 
+  assert(array!=NULL);
+  assert(w!=NULL);
+
   *rsum = *rsumw = 0;
   *rsumq = *rsumwq = 0;
 
