@@ -97,7 +97,6 @@ typedef struct {
   int        nvars1;
   int        pointID;
   int        surfaceID;
-  paramType  param2;
   paramType *params;
 } parse_param_t;
 

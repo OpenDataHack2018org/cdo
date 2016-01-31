@@ -542,6 +542,17 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 
   param_meta_copy(&p->param, &px->param);
 
+  int steptype1 = p1->param.steptype;
+  int steptype2 = p2->param.steptype;
+
+  if ( p->param.steptype == TSTEP_CONSTANT )
+    {
+      if ( steptype1 != TSTEP_CONSTANT )
+        p->param.steptype = steptype1;
+      else if ( steptype2 != TSTEP_CONSTANT )
+        p->param.steptype = steptype2;
+    }
+
   p->param.name = p->u.var.nm;
   //printf("%s %s nmiss %ld %ld\n", p->u.var.nm, px->param.name, nmiss1, nmiss2);
 
@@ -1114,7 +1125,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
   surfaceID = parse_arg->surfaceID;
   int init = parse_arg->init;
   paramType *params = parse_arg->params;
-  //paramType *param2 = &parse_arg->param2;
   int varID;
   nodeType *rnode = NULL;
 
@@ -1219,30 +1229,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
               {
                 parse_arg->needed[varID] = true;
               }
-            /*
-            int ngp2 = 0;
-            if ( param2->gridID != -1 ) ngp2 = param2->ngp;
-            if ( param2->gridID == -1 || (params[varID].ngp > 1 && ngp2 == 1) )
-              {
-                param2->gridID  = params[varID].gridID;
-                param2->ngp     = params[varID].ngp;
-                param2->units   = params[varID].units;
-                param2->missval = params[varID].missval;
-              }
-            int nlev2 = 0;
-            if ( param2->zaxisID != -1 ) nlev2 = param2->nlev;
-            if ( param2->zaxisID == -1 || (params[varID].nlev > 1 && nlev2 == 1) )
-              {
-                param2->zaxisID = params[varID].zaxisID;
-                param2->nlev    = params[varID].nlev;
-                param2->units   = params[varID].units;
-                param2->missval = params[varID].missval;
-              }
-            
-            if ( param2->steptype == -1 ||
-                 (param2->steptype == TSTEP_CONSTANT && params[varID].steptype != TSTEP_CONSTANT) )
-              param2->steptype = params[varID].steptype;
-            */
           }
 
 
@@ -1279,16 +1265,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 	{
         case '=':
           {
-            /*
-            if ( init )
-              {
-                param2->gridID   = -1;
-                param2->zaxisID  = -1;
-                param2->steptype = -1;
-                param2->ngp  = 0;
-                param2->nlev = 0;
-              }
-            */
             rnode = expr_run(p->u.opr.op[1], parse_arg);
 
             const char *varname2 = p->u.opr.op[0]->u.var.nm;
@@ -1303,14 +1279,6 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
             if ( init )
               {
-                //printf("type %d %d  %d  %d %d %d %d\n", typeVar, p->u.opr.op[1]->type, p->u.opr.op[0]->type, typeCon, typeVar, typeFun, typeOpr);
-                /*
-                if ( p->u.opr.op[1]->type != typeCon )
-                  {
-                    if ( param2->gridID == -1 || param2->zaxisID == -1 || param2->steptype == -1 )
-                      cdoAbort("Operand not variable!");
-                  }
-                */
                 varID = param_search_name(parse_arg->nparams, params, varname2);
                 if ( varID >= 0 )
                   {

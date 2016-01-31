@@ -218,9 +218,6 @@ void *Expr(void *argument)
   parse_arg.debug      = false;
   if ( cdoVerbose ) parse_arg.debug = true;
   parse_arg.params     = params;
-  parse_arg.param2.gridID   = -1;
-  parse_arg.param2.zaxisID  = -1;
-  parse_arg.param2.steptype = -1;
   parse_arg.pointID    = pointID;
   parse_arg.surfaceID  = surfaceID;
   parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
