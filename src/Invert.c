@@ -135,21 +135,13 @@ void invertLonDes(int vlistID)
 static
 void invertLatDes(int vlistID)
 {
-  int index, ngrids;
-  int gridID1, gridID2;
-  int nlat, nlon, size;
-  int ilat, ilon;
-  int gridtype, nv, iv;
-  double *yv1, *yv2;
-  double *yb1, *yb2;
-
-  ngrids = vlistNgrids(vlistID);
-  for ( index = 0; index < ngrids; index++ )
+  int ngrids = vlistNgrids(vlistID);
+  for ( int index = 0; index < ngrids; index++ )
     {
-      gridID1 = vlistGrid(vlistID, index);
-      gridID2 = gridDuplicate(gridID1);
+      int gridID1 = vlistGrid(vlistID, index);
+      int gridID2 = gridDuplicate(gridID1);
 
-      gridtype = gridInqType(gridID1);
+      int gridtype = gridInqType(gridID1);
 
       if ( gridtype != GRID_GENERIC && gridtype != GRID_GAUSSIAN &&
 	   gridtype != GRID_LONLAT  && gridtype != GRID_CURVILINEAR )
@@ -157,32 +149,30 @@ void invertLatDes(int vlistID)
 
       if ( gridInqYvals(gridID1, NULL) )
 	{
-	  nlon  = gridInqXsize(gridID1);
-	  nlat  = gridInqYsize(gridID1);
+	  int nlon  = gridInqXsize(gridID1);
+	  int nlat  = gridInqYsize(gridID1);
 
-	  if ( gridtype == GRID_CURVILINEAR )
-	    size = nlon*nlat;
-	  else
-            size = nlat;
+          int size = nlat;
+	  if ( gridtype == GRID_CURVILINEAR ) size = nlon*nlat;
 
-	  yv1 = (double*) Malloc(size*sizeof(double));
-	  yv2 = (double*) Malloc(size*sizeof(double));
+	  double *yv1 = (double*) Malloc(size*sizeof(double));
+	  double *yv2 = (double*) Malloc(size*sizeof(double));
 
 
 	  if ( gridtype == GRID_CURVILINEAR )
 	    {
 	      gridInqXvals(gridID1, yv1);
 
-	      for ( ilat = 0; ilat < nlat; ilat++ )
-		for ( ilon = 0; ilon < nlon; ilon++ )
+	      for ( int ilat = 0; ilat < nlat; ilat++ )
+		for ( int ilon = 0; ilon < nlon; ilon++ )
 		  yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
 
 	      gridDefXvals(gridID2, yv2);
 
 	      gridInqYvals(gridID1, yv1);
 
-	      for ( ilat = 0; ilat < nlat; ilat++ )
-		for ( ilon = 0; ilon < nlon; ilon++ )
+	      for ( int ilat = 0; ilat < nlat; ilat++ )
+		for ( int ilon = 0; ilon < nlon; ilon++ )
 		  yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
 
 	      gridDefYvals(gridID2, yv2);
@@ -191,7 +181,7 @@ void invertLatDes(int vlistID)
 	    {
 	      gridInqYvals(gridID1, yv1);
 
-	      for ( ilat = 0; ilat < nlat; ilat++ )
+	      for ( int ilat = 0; ilat < nlat; ilat++ )
 		yv2[nlat-ilat-1] = yv1[ilat];
 
 	      gridDefYvals(gridID2, yv2);
@@ -203,31 +193,29 @@ void invertLatDes(int vlistID)
 
       if ( gridInqYbounds(gridID1, NULL) )
 	{
-	  nlon  = gridInqXsize(gridID1);
-	  nlat  = gridInqYsize(gridID1);
+	  int nlon  = gridInqXsize(gridID1);
+	  int nlat  = gridInqYsize(gridID1);
 
-	  nv = gridInqNvertex(gridID1);
+	  int nv = gridInqNvertex(gridID1);
 
-	  if ( gridtype == GRID_CURVILINEAR )
-	    size = nv*nlon*nlat;
-	  else
-            size = nv*nlat;
+          int size = nlat;
+	  if ( gridtype == GRID_CURVILINEAR ) size = nlon*nlat;
 
-	  yb1 = (double*) Malloc(size*sizeof(double));
-	  yb2 = (double*) Malloc(size*sizeof(double));
+	  double *yb1 = (double*) Malloc(size*sizeof(double));
+	  double *yb2 = (double*) Malloc(size*sizeof(double));
 
 	  gridInqYbounds(gridID1, yb1);
 
 	  if ( gridtype == GRID_CURVILINEAR )
 	    {
-	      for ( ilat = 0; ilat < nlat; ilat++ )
-		for ( ilon = 0; ilon < nlon; ilon++ )
-		  for ( iv = 0; iv < nv; iv++ )
+	      for ( int ilat = 0; ilat < nlat; ilat++ )
+		for ( int ilon = 0; ilon < nlon; ilon++ )
+		  for ( int iv = 0; iv < nv; iv++ )
 		    yb2[(nlat-ilat-1)*nlon*nv + ilon*nv + iv] = yb1[ilat*nlon*nv + ilon*nv + iv];
 	    }
 	  else
 	    {
-		for ( ilat = 0; ilat < nlat; ilat++ )
+		for ( int ilat = 0; ilat < nlat; ilat++ )
 		  {
 		    yb2[nlat*2-ilat*2-1] = yb1[ilat*2];
 		    yb2[nlat*2-ilat*2-2] = yb1[ilat*2+1];
