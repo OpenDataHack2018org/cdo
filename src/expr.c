@@ -37,6 +37,8 @@ static const char *tmpvnm = "_tmp_";
 int pointID = -1;
 int surfaceID = -1;
 
+enum {FT_STD, FT_CONST, FT_FLD, FT_VERT};
+
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
 #define    COMPLE(x,y)  ((x) <= (y) ? 1 : 0)
@@ -56,9 +58,12 @@ int surfaceID = -1;
 #define MVCOMPAND(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPAND(x,y))
 #define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
-static double f_int(double x)  { return ((int)(x)); }
-static double f_nint(double x) { return (round(x)); }
-static double f_sqr(double x)  { return (x*x);      }
+static double f_int(double x)    { return (int)(x); }
+static double f_nint(double x)   { return round(x); }
+static double f_sqr(double x)    { return x*x;      }
+static double pt_ngp(paramType *p)  { return p->ngp;   }
+static double pt_nlev(paramType *p) { return p->nlev;  }
+static double pt_size(paramType *p) { return p->ngp*p->nlev;  }
 
 typedef struct {
   int type;
@@ -71,52 +76,57 @@ func_t;
 static func_t fun_sym_tbl[] =
 {
   // scalar functions
-  {0, 0, "abs",   (void (*)()) fabs},
-  {0, 0, "floor", (void (*)()) floor},
-  {0, 0, "ceil",  (void (*)()) ceil},
-  {0, 0, "int",   (void (*)()) f_int},
-  {0, 0, "nint",  (void (*)()) f_nint},
-  {0, 0, "sqr",   (void (*)()) f_sqr},
-  {0, 0, "sqrt",  (void (*)()) sqrt},
-  {0, 0, "exp",   (void (*)()) exp},
-  {0, 0, "erf",   (void (*)()) erf},
-  {0, 0, "log",   (void (*)()) log},
-  {0, 0, "log10", (void (*)()) log10},
-  {0, 0, "sin",   (void (*)()) sin},
-  {0, 0, "cos",   (void (*)()) cos},
-  {0, 0, "tan",   (void (*)()) tan},
-  {0, 0, "sinh",  (void (*)()) sinh},
-  {0, 0, "cosh",  (void (*)()) cosh},
-  {0, 0, "tanh",  (void (*)()) tanh},
-  {0, 0, "asin",  (void (*)()) asin},
-  {0, 0, "acos",  (void (*)()) acos},
-  {0, 0, "atan",  (void (*)()) atan},
-  {0, 0, "asinh", (void (*)()) asinh},
-  {0, 0, "acosh", (void (*)()) acosh},
-  {0, 0, "atanh", (void (*)()) atanh},
-  {0, 0, "gamma", (void (*)()) tgamma},
+  {FT_STD, 0, "abs",   (void (*)()) fabs},
+  {FT_STD, 0, "floor", (void (*)()) floor},
+  {FT_STD, 0, "ceil",  (void (*)()) ceil},
+  {FT_STD, 0, "int",   (void (*)()) f_int},
+  {FT_STD, 0, "nint",  (void (*)()) f_nint},
+  {FT_STD, 0, "sqr",   (void (*)()) f_sqr},
+  {FT_STD, 0, "sqrt",  (void (*)()) sqrt},
+  {FT_STD, 0, "exp",   (void (*)()) exp},
+  {FT_STD, 0, "erf",   (void (*)()) erf},
+  {FT_STD, 0, "log",   (void (*)()) log},
+  {FT_STD, 0, "log10", (void (*)()) log10},
+  {FT_STD, 0, "sin",   (void (*)()) sin},
+  {FT_STD, 0, "cos",   (void (*)()) cos},
+  {FT_STD, 0, "tan",   (void (*)()) tan},
+  {FT_STD, 0, "sinh",  (void (*)()) sinh},
+  {FT_STD, 0, "cosh",  (void (*)()) cosh},
+  {FT_STD, 0, "tanh",  (void (*)()) tanh},
+  {FT_STD, 0, "asin",  (void (*)()) asin},
+  {FT_STD, 0, "acos",  (void (*)()) acos},
+  {FT_STD, 0, "atan",  (void (*)()) atan},
+  {FT_STD, 0, "asinh", (void (*)()) asinh},
+  {FT_STD, 0, "acosh", (void (*)()) acosh},
+  {FT_STD, 0, "atanh", (void (*)()) atanh},
+  {FT_STD, 0, "gamma", (void (*)()) tgamma},
+
+  // constant functions
+  {FT_CONST, 0, "ngp",   (void (*)()) pt_ngp},      // number of horizontal grid points
+  {FT_CONST, 0, "nlev",  (void (*)()) pt_nlev},     // number of vertical levels
+  {FT_CONST, 0, "size",  (void (*)()) pt_size},     // ngp*nlev
 
   // cdo field functions (Reduce grid to point)
-  {1, 0, "fldmin",  (void (*)()) fldmin},
-  {1, 0, "fldmax",  (void (*)()) fldmax},
-  {1, 0, "fldsum",  (void (*)()) fldsum},
-  {1, 1, "fldmean", (void (*)()) fldmean},
-  {1, 1, "fldavg",  (void (*)()) fldavg},
-  {1, 1, "fldstd",  (void (*)()) fldstd},
-  {1, 1, "fldstd1", (void (*)()) fldstd1},
-  {1, 1, "fldvar",  (void (*)()) fldvar},
-  {1, 1, "fldvar1", (void (*)()) fldvar1},
+  {FT_FLD, 0, "fldmin",  (void (*)()) fldmin},
+  {FT_FLD, 0, "fldmax",  (void (*)()) fldmax},
+  {FT_FLD, 0, "fldsum",  (void (*)()) fldsum},
+  {FT_FLD, 1, "fldmean", (void (*)()) fldmean},
+  {FT_FLD, 1, "fldavg",  (void (*)()) fldavg},
+  {FT_FLD, 1, "fldstd",  (void (*)()) fldstd},
+  {FT_FLD, 1, "fldstd1", (void (*)()) fldstd1},
+  {FT_FLD, 1, "fldvar",  (void (*)()) fldvar},
+  {FT_FLD, 1, "fldvar1", (void (*)()) fldvar1},
 
   // cdo field functions (Reduce grid to point)
-  {2, 0, "vertmin",  (void (*)()) fldmin},
-  {2, 0, "vertmax",  (void (*)()) fldmax},
-  {2, 0, "vertsum",  (void (*)()) fldsum},
-  {2, 1, "vertmean", (void (*)()) fldmean},
-  {2, 1, "vertavg",  (void (*)()) fldavg},
-  {2, 1, "vertstd",  (void (*)()) fldstd},
-  {2, 1, "vertstd1", (void (*)()) fldstd1},
-  {2, 1, "vertvar",  (void (*)()) fldvar},
-  {2, 1, "vertvar1", (void (*)()) fldvar1},
+  {FT_VERT, 0, "vertmin",  (void (*)()) fldmin},
+  {FT_VERT, 0, "vertmax",  (void (*)()) fldmax},
+  {FT_VERT, 0, "vertsum",  (void (*)()) fldsum},
+  {FT_VERT, 1, "vertmean", (void (*)()) fldmean},
+  {FT_VERT, 1, "vertavg",  (void (*)()) fldavg},
+  {FT_VERT, 1, "vertstd",  (void (*)()) fldstd},
+  {FT_VERT, 1, "vertstd1", (void (*)()) fldstd1},
+  {FT_VERT, 1, "vertvar",  (void (*)()) fldvar},
+  {FT_VERT, 1, "vertvar1", (void (*)()) fldvar1},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -723,7 +733,7 @@ static
 nodeType *ex_fun_con(int funcID, nodeType *p1)
 {
   int functype = fun_sym_tbl[funcID].type;
-  if ( functype != 0 ) cdoAbort("Function %s not available for constant values!", fun_sym_tbl[funcID].name);
+  if ( functype != FT_STD ) cdoAbort("Function %s not available for constant values!", fun_sym_tbl[funcID].name);
 
   nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
 
@@ -755,12 +765,18 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
 
   param_meta_copy(&p->param, &p1->param);
 
-  if ( functype == 1 )
+  if ( functype == FT_CONST )
+    {
+      p->type = typeCon;
+      double (*exprfunc)(paramType*) = (double (*)(paramType*)) fun_sym_tbl[funcID].func;
+      p->u.con.value = exprfunc(&p1->param);
+    }
+  else if ( functype == FT_FLD )
     {
       p->param.gridID = pointID;
       p->param.ngp    = 1;
     }
-  else if ( functype == 2 )
+  else if ( functype == FT_VERT )
     {
       p->param.zaxisID = surfaceID;
       p->param.nlev    = 1;
@@ -772,7 +788,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
       double *restrict pdata  = p->param.data;
       double *restrict p1data = p1->param.data;
   
-      if ( functype == 0 )
+      if ( functype == FT_STD )
         {
           double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
           if ( nmiss > 0 )
@@ -796,7 +812,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
                 }
             }
         }
-      else if ( functype == 1 )
+      else if ( functype == FT_FLD )
         {
           field_t field;
           double *weights = NULL;
@@ -810,7 +826,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
             }
           if ( weights ) Free(weights);
         }
-      else if ( functype == 2 )
+      else if ( functype == FT_VERT )
         {
           field_t field;
           double *weights = NULL;
