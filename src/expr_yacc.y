@@ -28,6 +28,7 @@ int expr_run(nodeType *p, parse_param_t *parse_arg);
 %}
 
 %pure-parser
+%define parse.error verbose
 %parse-param {parse_param_t *parse_arg}
 %parse-param {void *scanner}
 %lex-param {parse_param_t *parse_arg}
