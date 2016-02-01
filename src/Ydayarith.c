@@ -34,18 +34,11 @@
 
 void *Ydayarith(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2, streamID3;
-  int gridsize;
-  int nrecs, nvars, nlev, recID;
-  int tsID;
+  int nrecs, nlev, recID;
   int varID, levelID;
   int offset;
-  int vlistID1, vlistID2, vlistID3;
-  int taxisID1, taxisID2, taxisID3;
+  int nmiss;
   int vdate, year, mon, day;
-  field_t field1, field2;
   int **varnmiss2[MAX_DAY];
   double **vardata2[MAX_DAY];
 
@@ -56,39 +49,40 @@ void *Ydayarith(void *argument)
   cdoOperatorAdd("ydaymul", func_mul, 0, NULL);
   cdoOperatorAdd("ydaydiv", func_div, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));
   field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  nvars  = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
 
   for ( day = 0; day < MAX_DAY ; day++ ) vardata2[day] = NULL;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       vdate = taxisInqVdate(taxisID2);
@@ -117,8 +111,8 @@ void *Ydayarith(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
 
-	  streamReadRecord(streamID2, vardata2[day][varID]+offset, &field2.nmiss);
-	  varnmiss2[day][varID][levelID] = field2.nmiss;
+	  streamReadRecord(streamID2, vardata2[day][varID]+offset, &nmiss);
+	  varnmiss2[day][varID][levelID] = nmiss;
 	}
 
       tsID++;
@@ -141,7 +135,8 @@ void *Ydayarith(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
+	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = (size_t) nmiss;
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
@@ -157,8 +152,9 @@ void *Ydayarith(void *argument)
 
 	  farfun(&field1, field2, operfunc);
 
+          nmiss = (int) field1.nmiss;
 	  streamDefRecord(streamID3, varID, levelID);
-	  streamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+	  streamWriteRecord(streamID3, field1.ptr, nmiss);
 	}
       tsID++;
     }
