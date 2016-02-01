@@ -36,6 +36,7 @@ void eca1(const ECA_REQUEST_1 *request)
 {
   const int operatorID = cdoOperatorID();
   
+  int nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
@@ -224,7 +225,8 @@ void eca1(const ECA_REQUEST_1 *request)
                   if ( IS_SET(request->var2.h3) ) var23[levelID].nmiss = gridsize; 
                 }
 
-              streamReadRecord(istreamID, field1.ptr, &field1.nmiss);
+              streamReadRecord(istreamID, field1.ptr, &nmiss);
+              field1.nmiss   = (size_t)nmiss;
               field1.grid    = var12[levelID].grid;
               field1.missval = var12[levelID].missval;
               
@@ -402,6 +404,7 @@ void eca2(const ECA_REQUEST_2 *request)
 {
   const int operatorID = cdoOperatorID();
   
+  int nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
@@ -611,11 +614,13 @@ void eca2(const ECA_REQUEST_2 *request)
                     var22[levelID].nmiss = gridsize;
                 }
 
-              streamReadRecord(istreamID1, field1.ptr, &field1.nmiss);
+              streamReadRecord(istreamID1, field1.ptr, &nmiss);
+              field1.nmiss   = (size_t)nmiss;
               field1.grid    = gridID;
               field1.missval = missval1;
               
-              streamReadRecord(istreamID2, field2.ptr, &field2.nmiss);
+              streamReadRecord(istreamID2, field2.ptr, &nmiss);
+              field2.nmiss   = (size_t)nmiss;
               field2.grid    = gridID;
               field2.missval = missval2;
 
@@ -789,6 +794,7 @@ void eca3(const ECA_REQUEST_3 *request)
 {
   const int operatorID = cdoOperatorID();
 
+  int nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
@@ -930,11 +936,13 @@ void eca3(const ECA_REQUEST_3 *request)
                   var2[levelID].nmiss = gridsize;
                 }
 
-              streamReadRecord(istreamID1, field1.ptr, &field1.nmiss);
+              streamReadRecord(istreamID1, field1.ptr, &nmiss);
+              field1.nmiss   = (size_t)nmiss;
               field1.grid    = var1[levelID].grid;
               field1.missval = var1[levelID].missval;
 
-              streamReadRecord(istreamID2, field2.ptr, &field2.nmiss);
+              streamReadRecord(istreamID2, field2.ptr, &nmiss);
+              field2.nmiss   = (size_t)nmiss;
               field2.grid    = var1[levelID].grid;
               field2.missval = var1[levelID].missval;
 
@@ -994,6 +1002,7 @@ void eca4(const ECA_REQUEST_4 *request)
 {
   const int operatorID = cdoOperatorID();
 
+  int nmiss;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize, gridtype;
@@ -1171,7 +1180,8 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( streamInqTimestep(istreamID2, itsID) )
     {
       streamInqRecord(istreamID2, &varID, &levelID);
-      streamReadRecord(istreamID2, mask.ptr, &mask.nmiss);
+      streamReadRecord(istreamID2, mask.ptr, &nmiss);
+      mask.nmiss   = (size_t)nmiss;
       mask.grid    = gridID;
       mask.missval = vlistInqVarMissval(ivlistID2, 0);
 
@@ -1238,9 +1248,10 @@ void eca4(const ECA_REQUEST_4 *request)
                   endDateWithHist[1][levelID].nmiss   = gridsize;
                 }
 
-              streamReadRecord(istreamID1, fieldGt.ptr, &fieldGt.nmiss);
+              streamReadRecord(istreamID1, fieldGt.ptr, &nmiss);
+              fieldGt.nmiss   = (size_t)nmiss;
               memcpy(fieldLt.ptr, fieldGt.ptr, gridsize*sizeof(double));
-              fieldLt.nmiss = fieldGt.nmiss;
+              fieldLt.nmiss   = fieldGt.nmiss;
               fieldGt.grid    = startCount[levelID].grid;
               fieldGt.missval = startCount[levelID].missval;
               fieldLt.grid    = startCount[levelID].grid;

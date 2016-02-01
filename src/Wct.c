@@ -86,6 +86,7 @@ void *Wct(void *argument)
   int gridsize;
   int nrecs, nrecs2, recID;
   int tsID;
+  int nmiss;
   int gridID, zaxisID;
   int varID1, varID2, varID3;
   int levelID1, levelID2;
@@ -151,10 +152,12 @@ void *Wct(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID1, &levelID1);
-	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
-
+	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = (size_t) nmiss;
+          
 	  streamInqRecord(streamID2, &varID2, &levelID2);
-	  streamReadRecord(streamID2, field2.ptr, &field2.nmiss);
+	  streamReadRecord(streamID2, field2.ptr, &nmiss);
+          field2.nmiss = (size_t) nmiss;
 	  
 	  if ( varID1 != varID2 || levelID1 != levelID2 )
 	    cdoAbort("Input streams have different structure!");
@@ -171,7 +174,7 @@ void *Wct(void *argument)
 	  farexpr(&field1, field2, windchillTemperature);
 	  
 	  streamDefRecord(streamID3, varID3, levelID1);
-	  streamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+	  streamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;

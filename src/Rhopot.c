@@ -296,9 +296,17 @@ void *Rhopot(void *argument)
 
 	  offset = gridsize*levelID;
 
-	  if ( varID == toID ) streamReadRecord(streamID1, to.ptr+offset, &(to.nmiss));
-	  if ( varID == saoID ) streamReadRecord(streamID1, sao.ptr+offset, &(sao.nmiss));
-	}
+	  if ( varID == toID )
+            {
+              streamReadRecord(streamID1, to.ptr+offset, &nmiss);
+              to.nmiss = (size_t) nmiss;
+            }
+	  if ( varID == saoID )
+            {
+              streamReadRecord(streamID1, sao.ptr+offset, &nmiss);
+              sao.nmiss = (size_t) nmiss;
+            }
+        }
 
       calc_rhopot(gridsize, nlevel, pressure, to, sao, rho); 
 

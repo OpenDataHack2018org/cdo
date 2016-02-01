@@ -44,7 +44,7 @@ void *Timstat3(void *argument)
   int nlevs;
   int i, iw, is;
   int varID, recID, levelID, gridID;
-  int nmiss3;
+  int nmiss;
   double rconst, risk;
   double fnvals0, fnvals1;
   double missval, missval1, missval2;
@@ -190,8 +190,9 @@ void *Timstat3(void *argument)
 		  recLevelID[recID] = levelID;	     	     
 		}	 
 
-	      streamReadRecord(streamID[is], in[is].ptr, &in[is].nmiss);
-	      
+	      streamReadRecord(streamID[is], in[is].ptr, &nmiss);
+	      in[is].nmiss = (size_t) nmiss;
+              
 	      for ( i = 0; i < gridsize; ++i )
 		{
 		  /*
@@ -308,12 +309,12 @@ void *Timstat3(void *argument)
 	    }
 	}
 
-      nmiss3 = 0;
+      nmiss = 0;
       for ( i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(out[0].ptr[i], missval1) ) nmiss3++;
+	if ( DBL_IS_EQUAL(out[0].ptr[i], missval1) ) nmiss++;
 
       streamDefRecord(streamID3, varID, levelID);
-      streamWriteRecord(streamID3, out[0].ptr, nmiss3);
+      streamWriteRecord(streamID3, out[0].ptr, nmiss);
     }
 
   for ( varID = 0; varID < nvars; varID++ )

@@ -37,6 +37,7 @@ void *Arith(void *argument)
 {
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
+  int nmiss;
   int gridsize;
   int nrecs, nrecs2, nvars = 0, nlev, recID;
   int nlevels2 = 1;
@@ -250,8 +251,9 @@ void *Arith(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamIDx1, &varID, &levelID);
-	  streamReadRecord(streamIDx1, fieldx1->ptr, &fieldx1->nmiss);
-
+	  streamReadRecord(streamIDx1, fieldx1->ptr, &nmiss);
+          fieldx1->nmiss = (size_t) nmiss;
+          
 	  if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
 	    {
 	      int lstatus = nlevels2 > 1 ? varID == 0 : recID == 0;
@@ -259,7 +261,8 @@ void *Arith(void *argument)
 	      if ( lstatus || (filltype != FILL_VAR && filltype != FILL_VARTS) )
 		{
 		  streamInqRecord(streamIDx2, &varID2, &levelID2);
-		  streamReadRecord(streamIDx2, fieldx2->ptr, &fieldx2->nmiss);
+		  streamReadRecord(streamIDx2, fieldx2->ptr, &nmiss);
+                  fieldx2->nmiss = (size_t) nmiss;
 		}
 
 	      if ( filltype == FILL_TS )
@@ -308,7 +311,7 @@ void *Arith(void *argument)
 	  farfun(&field1, field2, operfunc);
 
 	  streamDefRecord(streamID3, varID, levelID);
-	  streamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+	  streamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;

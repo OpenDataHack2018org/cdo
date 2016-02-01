@@ -557,6 +557,7 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
 
 void *Gridboxstat(void *argument)
 {
+  int nmiss;
   int lastgrid = -1;
   int wstatus = FALSE;
   int index;
@@ -638,7 +639,8 @@ void *Gridboxstat(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
-          streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
+          streamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = (size_t) nmiss;
 
           field1.grid = vlistInqVarGrid(vlistID1, varID);
           field1.size = gridInqSize(field1.grid);
@@ -662,7 +664,7 @@ void *Gridboxstat(void *argument)
           gridboxstat(&field1, &field2, xinc, yinc, operfunc);
           
           streamDefRecord(streamID2, varID,  levelID);
-          streamWriteRecord(streamID2, field2.ptr, field2.nmiss);
+          streamWriteRecord(streamID2, field2.ptr, (int)field2.nmiss);
         }
       tsID++;
     }

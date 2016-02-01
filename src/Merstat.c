@@ -43,6 +43,7 @@ void *Merstat(void *argument)
   int gridID1, gridID2 = -1, lastgrid = -1;
   int wstatus = FALSE;
   int index;
+  int nmiss;
   int recID, nrecs;
   int varID, levelID;
   int needWeights = FALSE;
@@ -140,8 +141,8 @@ void *Merstat(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
-
+	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = (size_t) nmiss;
 	  field1.grid = vlistInqVarGrid(vlistID1, varID);
 	  if ( needWeights && field1.grid != lastgrid )
 	    {
@@ -162,7 +163,7 @@ void *Merstat(void *argument)
 	    merfun(field1, &field2, operfunc);
 
 	  streamDefRecord(streamID2, varID,  levelID);
-	  streamWriteRecord(streamID2, field2.ptr, field2.nmiss);
+	  streamWriteRecord(streamID2, field2.ptr, (int)field2.nmiss);
 	}
       tsID++;
     }

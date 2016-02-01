@@ -91,6 +91,7 @@ void *Hi(void *argument)
 {
   int streamID1, streamID2, streamID3, streamID4;
   int gridsize;
+  int nmiss;
   int nrecs, nrecs2, nrecs3, recID;
   int tsID;
   int gridID, zaxisID;
@@ -165,13 +166,16 @@ void *Hi(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID1, &levelID1);
-	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
-
+	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = (size_t) nmiss;
+          
 	  streamInqRecord(streamID2, &varID2, &levelID2);
-	  streamReadRecord(streamID2, field2.ptr, &field2.nmiss);
+	  streamReadRecord(streamID2, field2.ptr, &nmiss);
+          field2.nmiss = (size_t) nmiss;
 	  
 	  streamInqRecord(streamID3, &varID3, &levelID3);
-	  streamReadRecord(streamID3, field3.ptr, &field3.nmiss);
+	  streamReadRecord(streamID3, field3.ptr, &nmiss);
+          field3.nmiss = (size_t) nmiss;
 	  
 	  if ( varID1 != varID2 || varID1 != varID3 || levelID1 != levelID2 || levelID1 != levelID3 )
 	    cdoAbort("Input streams have different structure!");
@@ -190,7 +194,7 @@ void *Hi(void *argument)
 	  farexpr(&field1, field2, field3, humidityIndex);
 	  
 	  streamDefRecord(streamID4, varID4, levelID1);
-	  streamWriteRecord(streamID4, field1.ptr, field1.nmiss);
+	  streamWriteRecord(streamID4, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;

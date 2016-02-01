@@ -151,8 +151,11 @@ void *Splitsel(void *argument)
 	  {
 	    streamInqRecord(streamID1, &varID, &levelID);
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
-	      streamReadRecord(streamID1, vars[varID][levelID].ptr, &vars[varID][levelID].nmiss);
-	  }
+              {
+                streamReadRecord(streamID1, vars[varID][levelID].ptr, &nmiss);
+                vars[varID][levelID].nmiss = (size_t) nmiss;
+              }
+          }
     }
 
   index = 0;

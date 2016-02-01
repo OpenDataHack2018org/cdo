@@ -328,9 +328,17 @@ void *Adisit(void *argument)
 
 	  offset = gridsize*levelID;
 
-	  if ( varID == thoID ) streamReadRecord(streamID1, tho.ptr+offset, &(tho.nmiss));
-	  if ( varID == saoID ) streamReadRecord(streamID1, sao.ptr+offset, &(sao.nmiss));
-	}
+	  if ( varID == thoID )
+            {
+              streamReadRecord(streamID1, tho.ptr+offset, &nmiss);
+              tho.nmiss = (size_t) nmiss;
+            }
+	  if ( varID == saoID )
+            {
+              streamReadRecord(streamID1, sao.ptr+offset, &nmiss);
+              sao.nmiss = (size_t) nmiss;
+            }
+        }
 
       if (operatorID == ADISIT )
         {

@@ -37,6 +37,7 @@ void *Fldrms(void *argument)
   int recID, nrecs;
   int tsID, varID, levelID;
   int lim;
+  int nmiss;
   int ndiffgrids;
   int needWeights = FALSE;
   double slon, slat;
@@ -122,9 +123,11 @@ void *Fldrms(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
+	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss = (size_t) nmiss;
 	  streamInqRecord(streamID2, &varID, &levelID);
-	  streamReadRecord(streamID2, field2.ptr, &field2.nmiss);
+	  streamReadRecord(streamID2, field2.ptr, &nmiss);
+          field2.nmiss = (size_t) nmiss;
 
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
@@ -152,7 +155,7 @@ void *Fldrms(void *argument)
 	  fldrms(field1, field2, &field3);
 
 	  streamDefRecord(streamID3, varID,  levelID);
-	  streamWriteRecord(streamID3, &sglval, field3.nmiss);
+	  streamWriteRecord(streamID3, &sglval, (int)field3.nmiss);
 	}
       tsID++;
     }

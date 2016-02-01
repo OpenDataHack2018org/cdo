@@ -40,6 +40,7 @@ void *Monarith(void *argument)
   int tsID, tsID2;
   int varID, levelID;
   int offset;
+  int nmiss;
   int vlistID1, vlistID2, vlistID3;
   int taxisID1, taxisID2, taxisID3;
   int vdate;
@@ -140,8 +141,8 @@ void *Monarith(void *argument)
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      offset   = gridsize*levelID;
 
-	      streamReadRecord(streamID2, vardata2[varID]+offset, &field2.nmiss);
-	      varnmiss2[varID][levelID] = field2.nmiss;
+	      streamReadRecord(streamID2, vardata2[varID]+offset, &nmiss);
+	      varnmiss2[varID][levelID] = nmiss;
 	    }
 
 	  tsID2++;
@@ -154,23 +155,22 @@ void *Monarith(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
+	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+          field1.nmiss   = (size_t) nmiss;
+	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
+	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
 	  memcpy(field2.ptr, vardata2[varID]+offset, gridsize*sizeof(double));
-	  field2.nmiss = varnmiss2[varID][levelID];
-
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
-
+	  field2.nmiss   = varnmiss2[varID][levelID];
 	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
 	  field2.missval = vlistInqVarMissval(vlistID2, varID);
 
 	  farfun(&field1, field2, operfunc);
 
 	  streamDefRecord(streamID3, varID, levelID);
-	  streamWriteRecord(streamID3, field1.ptr, field1.nmiss);
+	  streamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;

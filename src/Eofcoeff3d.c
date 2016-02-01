@@ -127,8 +127,8 @@ void *Eofcoeff3d(void * argument)
          if ( levelID >= nlevs )
            cdoAbort("Internal error - too high levelID");
          
-         streamReadRecord(streamID1, eof[varID][levelID][eofID].ptr, 
-                          &eof[varID][levelID][eofID].nmiss);
+         streamReadRecord(streamID1, eof[varID][levelID][eofID].ptr, &nmiss);
+         eof[varID][levelID][eofID].nmiss = (size_t) nmiss;
        }
      eofID++;
    }
@@ -212,8 +212,8 @@ void *Eofcoeff3d(void * argument)
         {
           streamInqRecord(streamID2, &varID, &levelID);
           missval2 = vlistInqVarMissval(vlistID2, varID);
-          streamReadRecord(streamID2, in.ptr, &in.nmiss);  
-
+          streamReadRecord(streamID2, in.ptr, &nmiss);  
+          in.nmiss = (size_t) nmiss;
           
           for (eofID = 0; eofID < neof; eofID++ )
             {
@@ -248,7 +248,7 @@ void *Eofcoeff3d(void * argument)
       for ( eofID = 0; eofID < neof; eofID++ ) {
 	for ( varID = 0; varID < nvars; varID++ ) {
 	  streamDefRecord(streamIDs[eofID], varID, 0);
-	  streamWriteRecord(streamIDs[eofID],out[varID][eofID].ptr,out[varID][eofID].nmiss);
+	  streamWriteRecord(streamIDs[eofID], out[varID][eofID].ptr, (int)out[varID][eofID].nmiss);
 	}
       }
 
