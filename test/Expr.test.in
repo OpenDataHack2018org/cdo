@@ -12,7 +12,7 @@ STATS="add sub mul div"
 IFILE=$DATAPATH/pl_data
 NTEST=1
 #
-INSETS="_clev=1/var130.z;var1=var130*_clev;"
+INSETS="_clev=var130.z;pottemp=var130*((100000/_clev)^0.287);"
 INSETS="$INSETS  var1=(var129>0)?(var130-273.15):var152;"
 FINSTR=finstr
 #
