@@ -299,7 +299,6 @@ void *CMOR(void *argument)
   int ndims;
   double missing_value;
   double tolerance = 1e-4;
-  int maxlevels = 0;
   int axis_ids[CMOR_MAX_AXES];
   char *select_vars = get_val("var", NULL);
 
@@ -345,17 +344,15 @@ void *CMOR(void *argument)
 
           /* Z-Axis */
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
+          int levels = zaxisInqSize(zaxisID);
+          coord_vals = Malloc(levels * sizeof(double));
+          zaxisInqLevels(zaxisID, coord_vals);
           zaxisInqName(zaxisID, name);
           zaxisInqUnits(zaxisID, units);
-          length = zaxisInqSize(zaxisID);
-          if ( length > maxlevels )
-            maxlevels = length;
-          coord_vals = Malloc(length * sizeof(double));
-          zaxisInqLevels(zaxisID, coord_vals);
           cmor_axis(&axis_ids[ndims++],
                     substitute(name),
                     units,
-                    length,
+                    levels,
                     (void *)coord_vals,
                     'd',
                     NULL,
@@ -404,12 +401,12 @@ void *CMOR(void *argument)
           if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
             {
               cc_var->datatype = 'f';
-              cc_var->data = Malloc(gridsize * maxlevels * sizeof(float));
+              cc_var->data = Malloc(gridsize * levels * sizeof(float));
             }
           else
             {
               cc_var->datatype = 'd';
-              cc_var->data = Malloc(gridsize * maxlevels * sizeof(double));
+              cc_var->data = Malloc(gridsize * levels * sizeof(double));
             }
           vlistInqVarName(vlistID, varID, name);
           cmor_variable(&cc_var->cmor_varID,
