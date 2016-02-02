@@ -89,32 +89,6 @@ static char *get_val(char *key, char *def)
     return def;
 }
 
-static void append_attr(int vlistID, int varID,
-                        char *key, char *value, size_t n)
-{
-  memset(value, 0, n);
-  int status = vlistInqAttTxt(vlistID, varID, key, n - 1, value);
-  char *hval = get_val(key, NULL);
-
-  if ( hval != NULL )
-    {
-      if ( status == CDI_NOERR )
-        {
-          n -= strlen(value) + 2;
-          value += strlen(value);
-          if ( n > 0 )
-            {
-              *value++ = ' ';
-              strncpy(value, hval, n);
-            }
-          }
-      else
-        {
-          strncpy(value, hval, n - 1);
-        }
-    }
-}
-
 static char *substitute(char *word)
 {
   ENTRY e, *ep;
@@ -259,8 +233,7 @@ void *CMOR(void *argument)
     }
 
   double branch_time = atof(get_val("branch_time", "0.0"));
-  char history[CMOR_MAX_STRING];
-  append_attr(vlistID, CDI_GLOBAL, "history", history, CMOR_MAX_STRING);
+
   cmor_dataset(get_val("outpath", "./"),
                get_val("expinfo", ""),
                get_val("institution", ""),
@@ -268,7 +241,7 @@ void *CMOR(void *argument)
                calendar,
                atoi(get_val("realization", "1")),
                get_val("contact", ""),
-               history,
+               get_val("history", ""),
                get_val("comment", ""),
                get_val("references", ""),
                atoi(get_val("leap_year", "0")),
