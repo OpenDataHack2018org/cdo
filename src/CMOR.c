@@ -8,12 +8,22 @@
 #if defined(HAVE_LIBCMOR)
 #include "cmor.h"
 
-typedef struct _cmor_var
+typedef struct _cc_var_t
 {
   int cdi_varID;
   int cmor_varID;
   char datatype;
-} cmor_var;
+  void *data;
+} cc_var_t;
+
+static cc_var_t *find_cc_var(const int cdi_varID,
+                             cc_var_t *var_list, int length)
+{
+  for ( int i = 0; i < length; i++ )
+    if ( cdi_varID == var_list[i].cdi_varID )
+      return &var_list[i];
+  return NULL;
+}
 
 static char *trim(char *s)
 {
@@ -277,9 +287,10 @@ void *CMOR(void *argument)
   cmor_set_table(table_id);
 
   int nvars = vlistNvars(vlistID);
-  cmor_var *cmor_var_list = (cmor_var *) Malloc(nvars * sizeof(cmor_var));;
-  cmor_var *cmor_var;
-  int copy_nvars = 0;
+  size_t gridsize = vlistGridsizeMax(vlistID);
+  cc_var_t *cc_var_list = (cc_var_t *) Malloc(nvars * sizeof(cc_var_t));;
+  cc_var_t *cc_var;
+  int cc_var_n = 0;
   int recID, varID, levelID, nrecs, nmiss;
   int gridID;
   char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
@@ -297,8 +308,8 @@ void *CMOR(void *argument)
       vlistInqVarName(vlistID, varID, name);
       if ( select_vars == NULL || strstr(select_vars, name) != NULL)
         {
-          cmor_var = &cmor_var_list[copy_nvars++];
-          cmor_var->cdi_varID = varID;
+          cc_var = &cc_var_list[cc_var_n++];
+          cc_var->cdi_varID = varID;
           gridID = vlistInqVarGrid(vlistID, varID);
           ndims = 0;
 
@@ -391,16 +402,22 @@ void *CMOR(void *argument)
           vlistInqVarUnits(vlistID, varID, units);
           missing_value = vlistInqVarMissval(vlistID, varID);
           if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
-            cmor_var->datatype = 'f';
+            {
+              cc_var->datatype = 'f';
+              cc_var->data = Malloc(gridsize * maxlevels * sizeof(float));
+            }
           else
-            cmor_var->datatype = 'd';
+            {
+              cc_var->datatype = 'd';
+              cc_var->data = Malloc(gridsize * maxlevels * sizeof(double));
+            }
           vlistInqVarName(vlistID, varID, name);
-          cmor_variable(&cmor_var->cmor_varID,
+          cmor_variable(&cc_var->cmor_varID,
                         substitute(name),
                         units,
                         ndims,
                         axis_ids,
-                        cmor_var->datatype,
+                        cc_var->datatype,
                         &missing_value,
                         &tolerance,
                         NULL, // positive,
@@ -414,45 +431,43 @@ void *CMOR(void *argument)
         }
     }
 
-  int gridsize = vlistGridsizeMax(vlistID);
-  double *array = (double*) Malloc(gridsize * maxlevels * sizeof(double));
   double time_vals;
   double time_bnds[2];
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
-      for ( int i = 0; i < copy_nvars; i++ )
+      for ( recID = 0; recID < nrecs; recID++ )
         {
-          cmor_var = &cmor_var_list[i];
-          time_vals = 0.5 + tsID;
-          time_bnds[0] = tsID;
-          time_bnds[1] = tsID + 1.0;
-          for ( recID = 0; recID < nrecs; recID++ )
-            {
-              streamInqRecord(streamID, &varID, &levelID);
-              if ( cmor_var->datatype == 'f' )
-                streamReadRecordF(streamID,
-                                  (float *)array + gridsize * levelID, &nmiss);
-              else
-                streamReadRecord(streamID, array + gridsize * levelID, &nmiss);
-            }
-          //streamReadVarF(streamID, cmor_var->cdi_varID, array, &nmiss);
-          cmor_write(cmor_var->cmor_varID,
-                     (void *)array,
-                     cmor_var->datatype,
-                     NULL, // file_suffix
-                     1,    // ntimes_passed
-                     &time_vals, // time_vals
-                     time_bnds, // time_bnds
-                     NULL);// store_with
+          streamInqRecord(streamID, &varID, &levelID);
+          cc_var = find_cc_var(varID, cc_var_list, cc_var_n);
+          if ( cc_var->datatype == 'f' )
+            streamReadRecordF(streamID,
+                              (float *)cc_var->data + gridsize * levelID,
+                              &nmiss);
+          else
+            streamReadRecord(streamID,
+                             (double *)cc_var->data + gridsize * levelID,
+                             &nmiss);
         }
+      time_vals = 0.5 + tsID;
+      time_bnds[0] = tsID;
+      time_bnds[1] = tsID + 1.0;
+      cmor_write(cc_var->cmor_varID,
+                 cc_var->data,
+                 cc_var->datatype,
+                 NULL,
+                 1,
+                 &time_vals,
+                 time_bnds,
+                 NULL);
       tsID++;
     }
-  Free (array);
   streamClose(streamID);
   cmor_close();
   hdestroy();
-
+  for ( int i = 0; i < cc_var_n; i++ )
+    Free (cc_var_list[i].data);
+  Free (cc_var_list);
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
