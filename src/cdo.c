@@ -27,6 +27,8 @@
 #include <execinfo.h>
 #endif
 
+#include <signal.h>
+#include <fenv.h>
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
@@ -77,6 +79,7 @@ static int numThreads = 0;
 static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
+static const char *username;
 
 void gridsearch_set_method(const char *methodstr);
 
@@ -100,6 +103,7 @@ void gridsearch_set_method(const char *methodstr);
           } \
       }
 
+#define ISME  (strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
 
 static
 void cdo_stackframe(void)
@@ -116,6 +120,35 @@ void cdo_stackframe(void)
     free(messages);
   }
 #endif
+}
+
+static
+int cdo_feenableexcept(unsigned excepts)
+{
+  static fenv_t fenv;
+  unsigned new_excepts = excepts & FE_ALL_EXCEPT,
+           old_excepts = 0;  // previous masks
+
+  if ( fegetenv(&fenv) ) return -1;
+#if defined(__i386__) || defined(__x86_64__)
+  old_excepts = fenv.__control & FE_ALL_EXCEPT;
+
+  // unmask
+  fenv.__control &= ~new_excepts;
+  fenv.__mxcsr   &= ~(new_excepts << 7);
+#endif
+
+  return ( fesetenv(&fenv) ? -1 : (int)old_excepts );
+}
+
+static
+void cdo_sig_handler(int signo)
+{
+  if ( signo == SIGFPE )
+    {
+      cdo_stackframe();
+      cdoAbort("floating-point exception!");
+    }
 }
 
 static
@@ -164,6 +197,11 @@ void cdo_usage(void)
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
+  if ( ISME )
+    {
+      fprintf(stderr, "    --enableexcept <except>\n");
+      fprintf(stderr, "                   Set individual floating-point traps (DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
+    }
   fprintf(stderr, "    -f, --format <format>\n");
   fprintf(stderr, "                   Format of the output file. (grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
@@ -663,6 +701,13 @@ void get_env_vars(void)
 {
   char *envstr;
 
+  username = getenv("LOGNAME");
+  if ( username == NULL )
+    {
+      username = getenv("USER");
+      if ( username == NULL ) username = "unknown";
+    }
+
   envstr = getenv("CDO_GRID_SEARCH_DIR");
   if ( envstr )
     {
@@ -795,19 +840,7 @@ void get_env_vars(void)
             fprintf(stderr, "CDO_COLOR = %s\n", envstr);
         }
     }
-  else
-    {
-      if ( CDO_Color == FALSE )
-        {
-          const char *username = getenv("LOGNAME");
-          if ( username == NULL )
-            {
-              username = getenv("USER");
-              if ( username == NULL ) username = "unknown";
-            }
-          if ( strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0 ) CDO_Color = TRUE;
-        }
-    }
+  else if ( CDO_Color == FALSE && ISME ) CDO_Color = TRUE;
 }
 
 static
@@ -1037,6 +1070,7 @@ int parse_options_long(int argc, char *argv[])
   int lremap_genweights;
   int lpercentile;
   int lprintoperators = 0;
+  int lenableexcept;
 
   struct cdo_option opt_long[] =
     {
@@ -1048,6 +1082,7 @@ int parse_options_long(int argc, char *argv[])
       { "gridsearchnn",      required_argument,      &lgridsearchnn,  1  },
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
+      { "enableexcept",      required_argument,      &lenableexcept,  1  },
       { "cmor",                    no_argument,      &CDO_CMOR_Mode,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "float",                   no_argument,        &CDO_Memtype,  MEMTYPE_FLOAT  },
@@ -1076,6 +1111,7 @@ int parse_options_long(int argc, char *argv[])
       lgridsearchnn = 0;
       lgridsearchradius = 0;
       lremap_genweights = 0;
+      lenableexcept = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1101,6 +1137,19 @@ int parse_options_long(int argc, char *argv[])
           else if ( lpercentile )
             {
               percentile_set_method(CDO_optarg);
+            }
+          else if ( lenableexcept )
+            {
+              int except = -1;
+              if      ( strcmp(CDO_optarg, "DIVBYZERO")  == 0 ) except = FE_DIVBYZERO;
+              else if ( strcmp(CDO_optarg, "INEXACT")    == 0 ) except = FE_INEXACT;
+              else if ( strcmp(CDO_optarg, "INVALID")    == 0 ) except = FE_INVALID;
+              else if ( strcmp(CDO_optarg, "OVERFLOW")   == 0 ) except = FE_OVERFLOW;
+              else if ( strcmp(CDO_optarg, "UNDERFLOW")  == 0 ) except = FE_UNDERFLOW;
+              else if ( strcmp(CDO_optarg, "ALL_EXCEPT") == 0 ) except = FE_ALL_EXCEPT;
+              if ( except < 0 ) cdoAbort("option --%s: unsupported argument: %s", "enableexcept", CDO_optarg);
+              cdo_feenableexcept((unsigned)except);
+              if ( signal(SIGFPE, cdo_sig_handler) == SIG_ERR ) cdoWarning("can't catch SIGFPE!");
             }
           else if ( luse_fftw )
             {
