@@ -530,6 +530,7 @@ void *Select(void *argument)
   PML_DEF_WORD(steptype,          32, "Time step type");
   PML_DEF_WORD(startdate,          1, "Start date");
   PML_DEF_WORD(enddate,            1, "End date");
+  PML_DEF_WORD(seas,              12, "Season");
   PML_DEF_WORD(date,            1024, "Date");
 
   PML_INIT_INT(timestep_of_year);
@@ -552,6 +553,7 @@ void *Select(void *argument)
   PML_INIT_WORD(steptype);
   PML_INIT_WORD(startdate);
   PML_INIT_WORD(enddate);
+  PML_INIT_WORD(seas);
   PML_INIT_WORD(date);
 
   cdoInitialize(argument);
@@ -595,6 +597,7 @@ void *Select(void *argument)
   PML_ADD_WORD(pml, steptype);
   PML_ADD_WORD(pml, startdate);
   PML_ADD_WORD(pml, enddate);
+  PML_ADD_WORD(pml, seas);
   PML_ADD_WORD(pml, date);
 
   pmlRead(pml, nsel, argnames);
@@ -621,6 +624,7 @@ void *Select(void *argument)
   PML_NUM(pml, steptype);
   PML_NUM(pml, startdate);
   PML_NUM(pml, enddate);
+  PML_NUM(pml, seas);
   PML_NUM(pml, date);
 
   int streamCnt = cdoStreamCnt();
@@ -803,7 +807,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(gridname);
 	  PAR_CHECK_WORD_FLAG(steptype);
 
-	  if ( npar_date || npar_startdate || npar_enddate ) ltimsel = true;
+	  if ( npar_date || npar_startdate || npar_enddate || npar_seas ) ltimsel = true;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = true;
 
 	  int npar = 0;
@@ -1126,6 +1130,7 @@ void *Select(void *argument)
   PAR_CHECK_WORD_FLAG(startdate);
   UNUSED(str_enddate);
   //  PAR_CHECK_WORD_FLAG(enddate);
+  PAR_CHECK_WORD_FLAG(seas);
   PAR_CHECK_WORD_FLAG(date);
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);

@@ -43,74 +43,55 @@
 static
 int seaslist(LIST *ilist)
 {
-  int i;
-  char Seas[3];
-  int seas[4] = {FALSE, FALSE, FALSE, FALSE};
-  int imon[17]; /* 1-16 ! */
-  int ival;
-  size_t len;
+  const char *smons = "JFMAMJJASONDJFMAMJJASOND";
+  int imons[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  assert(strlen(smons)==(sizeof(imons)/sizeof(int)));
 
-  int season_start = get_season_start();
+  int imon[17]; /* 1-16 ! */
+  for ( int i = 0; i < 17; ++i ) imon[i] = 0;
+
   int nsel = operatorArgc();
   if ( isdigit(*operatorArgv()[0]))
-    for ( i = 0; i < nsel; i++ )
-      {
-	ival = parameter2int(operatorArgv()[i]);
-	if      ( ival == 1 || ival == 13 ) seas[0] = TRUE;
-	else if ( ival == 2 || ival == 14 ) seas[1] = TRUE;
-	else if ( ival == 3 || ival == 15 ) seas[2] = TRUE;
-	else if ( ival == 4 || ival == 16 ) seas[3] = TRUE;
-	else cdoAbort("Season %d not available!", ival);
-      }
-  else
-    for ( i = 0; i < nsel; i++ )
-      {
-	len = strlen(operatorArgv()[i]);
-	if ( len > 3 ) len = 3;
-	while ( len-- > 0 ) Seas[len] = toupper(operatorArgv()[i][len]);
-	if ( season_start == START_DEC )
-	  {
-	    if      ( memcmp(Seas, "DJF", 3) == 0 ) seas[0] = TRUE;
-	    else if ( memcmp(Seas, "MAM", 3) == 0 ) seas[1] = TRUE;
-	    else if ( memcmp(Seas, "JJA", 3) == 0 ) seas[2] = TRUE;
-	    else if ( memcmp(Seas, "SON", 3) == 0 ) seas[3] = TRUE;
-	    else cdoAbort("Season %s not available!", operatorArgv()[i]);
-	  }
-	else
-	  {
-	    if      ( memcmp(Seas, "JFM", 3) == 0 ) seas[0] = TRUE;
-	    else if ( memcmp(Seas, "AMJ", 3) == 0 ) seas[1] = TRUE;
-	    else if ( memcmp(Seas, "JAS", 3) == 0 ) seas[2] = TRUE;
-	    else if ( memcmp(Seas, "OND", 3) == 0 ) seas[3] = TRUE;
-	    else cdoAbort("Season %s not available!", operatorArgv()[i]);
-	  }
-      }
-  
-  for ( i = 0; i < 17; ++i ) imon[i] = 0;
-  
-  if ( season_start == START_DEC )
     {
-      if ( seas[0] ) { imon[12]++; imon[ 1]++; imon[ 2]++; imon[13]++; }
-      if ( seas[1] ) { imon[ 3]++; imon[ 4]++; imon[ 5]++; imon[14]++; }
-      if ( seas[2] ) { imon[ 6]++; imon[ 7]++; imon[ 8]++; imon[15]++; }
-      if ( seas[3] ) { imon[ 9]++; imon[10]++; imon[11]++; imon[16]++; }
+      for ( int i = 0; i < nsel; i++ )
+        {
+          int ival = parameter2int(operatorArgv()[i]);
+          if      ( ival == 1 ) { imon[12]++; imon[ 1]++; imon[ 2]++; }
+          else if ( ival == 2 ) { imon[ 3]++; imon[ 4]++; imon[ 5]++; }
+          else if ( ival == 3 ) { imon[ 6]++; imon[ 7]++; imon[ 8]++; }
+          else if ( ival == 4 ) { imon[ 9]++; imon[10]++; imon[11]++; }
+          else cdoAbort("Season %d not available!", ival);
+        }
     }
   else
     {
-      if ( seas[0] ) { imon[ 1]++; imon[ 2]++; imon[ 3]++; imon[13]++; }
-      if ( seas[1] ) { imon[ 4]++; imon[ 5]++; imon[ 6]++; imon[14]++; }
-      if ( seas[2] ) { imon[ 7]++; imon[ 8]++; imon[ 9]++; imon[15]++; }
-      if ( seas[3] ) { imon[10]++; imon[11]++; imon[12]++; imon[16]++; }
-    }
-  
-  nsel = 0;
-  for ( i = 1; i < 17; ++i )
-    {
-      if ( imon[i] )
-	listSetInt(ilist, nsel++, i);
+      for ( int i = 0; i < nsel; i++ )
+        {
+          const char *sname = operatorArgv()[i];
+          size_t len = strlen(sname);
+          if ( len == 3 && strcmp(sname, "ANN") == 0 )
+            {
+              for ( size_t k = 0; k < 12; ++k ) imon[k+1] = 1;
+            }
+          else
+            {
+              if ( len > 12 ) cdoAbort("Too many months %d (limit=12)!", (int)len);
+              char *sstr = strcasestr(smons, sname);
+              if ( sstr == NULL ) cdoAbort("Season %s not available!", sname);
+              size_t ks = (size_t)(sstr-smons);
+              size_t ke = ks + len;
+              for ( size_t k = ks; k < ke; ++k ) imon[imons[k]]++;
+            }
+        }
     }
 
-  return (nsel);
+  nsel = 0;
+  for ( int i = 1; i < 17; ++i )
+    {
+      if ( imon[i] ) listSetInt(ilist, nsel++, i);
+    }
+
+  return nsel;
 }
 
 
