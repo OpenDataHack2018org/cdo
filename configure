@@ -17524,6 +17524,18 @@ fi
 
 done
 
+for ac_header in execinfo.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "execinfo.h" "ac_cv_header_execinfo_h" "$ac_includes_default"
+if test "x$ac_cv_header_execinfo_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_EXECINFO_H 1
+_ACEOF
+
+fi
+
+done
+
 #  ----------------------------------------------------------------------
 # Checks for the availability of functions
 for ac_func in mallinfo
@@ -17532,6 +17544,17 @@ do :
 if test "x$ac_cv_func_mallinfo" = xyes; then :
   cat >>confdefs.h <<_ACEOF
 #define HAVE_MALLINFO 1
+_ACEOF
+
+fi
+done
+
+for ac_func in backtrace
+do :
+  ac_fn_c_check_func "$LINENO" "backtrace" "ac_cv_func_backtrace"
+if test "x$ac_cv_func_backtrace" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_BACKTRACE 1
 _ACEOF
 
 fi

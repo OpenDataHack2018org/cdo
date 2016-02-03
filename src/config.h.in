@@ -12,6 +12,9 @@
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA
 
+/* Define to 1 if you have the `backtrace' function. */
+#undef HAVE_BACKTRACE
+
 /* Define to 1 if you have the <cmor.h> header file. */
 #undef HAVE_CMOR_H
 
@@ -24,6 +27,9 @@
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <execinfo.h> header file. */
+#undef HAVE_EXECINFO_H
 
 /* Define to 1 if you have the <fftw3.h> header file. */
 #undef HAVE_FFTW3_H

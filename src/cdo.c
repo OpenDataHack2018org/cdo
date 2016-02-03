@@ -23,6 +23,10 @@
 //#define _XOPEN_SOURCE 600 /* gethostname */
 #endif
 
+#if defined (HAVE_EXECINFO_H)
+#include <execinfo.h>
+#endif
+
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
@@ -96,6 +100,23 @@ void gridsearch_set_method(const char *methodstr);
           } \
       }
 
+
+static
+void cdo_stackframe(void)
+{
+#if defined HAVE_EXECINFO_H && defined HAVE_BACKTRACE
+  void *callstack[32];
+  int frames = backtrace(callstack, 32);
+  char **messages = backtrace_symbols(callstack, frames);
+
+  fprintf(stderr, "[bt] Execution path:\n");
+  if ( messages ) {
+    for ( int i = 0; i < frames; ++i )
+      fprintf(stderr, "[bt] %s\n", messages[i]);
+    free(messages);
+  }
+#endif
+}
 
 static
 void cdo_version(void)
@@ -520,41 +541,35 @@ void setDefaultFileType(const char *filetypestr, int labort)
     }
 }
 
-#if defined(malloc)
-#undef malloc
-#undef free
-#endif
-
 #define NTESTS 11
 #include <inttypes.h>
 static
 int getMemAlignment(void)
 {
   int ma = -1;
-  int i, k;
   double *ptr[NTESTS];
   int64_t iptr;
   size_t tsize[NTESTS] = {1, 3, 5, 9, 17, 33, 69, 121, 251, 510, 1025};
   size_t ma_check[4] = {8, 16, 32, 64};
   int ma_result[4] = {1, 1, 1, 1};
 
-  for ( i = 0; i < NTESTS; ++i )
+  for ( int i = 0; i < NTESTS; ++i )
     {
-      ptr[i] = (double*) Malloc(tsize[i]);
+      ptr[i] = (double*) malloc(tsize[i]);
       iptr = (int64_t) ptr[i];
-      for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
+      for ( int k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
     }
-  for ( i = 0; i < NTESTS; ++i ) Free(ptr[i]);
+  for ( int i = 0; i < NTESTS; ++i ) free(ptr[i]);
 
-  for ( i = NTESTS-1; i >= 0; i-- )
+  for ( int i = NTESTS-1; i >= 0; i-- )
     {
-      ptr[i] = (double*) Malloc(tsize[i]+5);
+      ptr[i] = (double*) malloc(tsize[i]+5);
       iptr = (int64_t) ptr[i];
-      for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
+      for ( int k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
     }
-  for ( i = 0; i < NTESTS; ++i ) Free(ptr[i]);
+  for ( int i = 0; i < NTESTS; ++i ) free(ptr[i]);
 
-  for ( k = 0; k < 4; ++k ) if ( ma_result[k] ) ma = ma_check[k];
+  for ( int k = 0; k < 4; ++k ) if ( ma_result[k] ) ma = ma_check[k];
 
   return ma;
 }
