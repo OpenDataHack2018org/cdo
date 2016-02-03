@@ -422,15 +422,19 @@ void *CMOR(void *argument)
       time_vals = 0.5 + tsID;
       time_bnds[0] = tsID;
       time_bnds[1] = tsID + 1.0;
-      cmor_write(cc_var->cmor_varID,
-                 cc_var->data,
-                 cc_var->datatype,
-                 NULL,
-                 1,
-                 &time_vals,
-                 time_bnds,
-                 NULL);
-      tsID++;
+      for ( int i = 0; i < cc_var_n; i++ )
+        {
+          cc_var = &cc_var_list[i];
+          cmor_write(cc_var->cmor_varID,
+                     cc_var->data,
+                     cc_var->datatype,
+                     NULL,
+                     1,
+                     &time_vals,
+                     time_bnds,
+                     NULL);
+          tsID++;
+        }
     }
   streamClose(streamID);
   cmor_close();
