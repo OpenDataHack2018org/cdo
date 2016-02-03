@@ -187,27 +187,57 @@ void *CMOR(void *argument)
 
   int *month_lengths;
   int table_id;
-  char *calendar;
   int streamID = streamOpenRead(cdoStreamName(0));
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
+  int calendar = taxisInqCalendar(taxisID);
+  char *calendarstr;
+  int rdate = taxisInqRdate(taxisID);
+  int rtime = taxisInqRtime(taxisID);
+  juldate_t r_juldate  = juldate_encode(calendar, rdate, rtime);
+  int timeunit = taxisInqTunit(taxisID);
+  int tunitsec;
+  int year, month, day, hour, minute, second;
+  char taxis_units[CMOR_MAX_STRING];
 
-  switch(taxisInqCalendar(taxisID))
+  cdiDecodeDate(rdate, &year, &month, &day);
+  cdiDecodeTime(rtime, &hour, &minute, &second);
+  if ( timeunit == TUNIT_QUARTER ||
+       timeunit == TUNIT_30MINUTES )
+    timeunit = TUNIT_MINUTE;
+  if ( timeunit == TUNIT_3HOURS ||
+       timeunit == TUNIT_6HOURS ||
+       timeunit == TUNIT_12HOURS )
+    timeunit = TUNIT_HOUR;
+
+  switch ( timeunit )
+    {
+    case TUNIT_MINUTE: tunitsec = 60; break;
+    case TUNIT_HOUR: tunitsec = 3600; break;
+    case TUNIT_DAY: tunitsec = 86400; break;
+    default: tunitsec = 3600;
+    }
+
+  sprintf(taxis_units, "%s since %d-%d-%d %02d:%02d:%02d",
+          tunitNamePtr(timeunit), year, month, day, hour,
+          minute, second);
+
+  switch ( calendar )
     {
     case CALENDAR_STANDARD:
-      calendar = "gregorian";
+      calendarstr = "gregorian";
       break;
     case CALENDAR_PROLEPTIC:
-      calendar = "proleptic_gregorian";
+      calendarstr = "proleptic_gregorian";
       break;
     case CALENDAR_360DAYS:
-      calendar = "360_day";
+      calendarstr = "360_day";
       break;
     case CALENDAR_365DAYS:
-      calendar = "noleap";
+      calendarstr = "noleap";
       break;
     case CALENDAR_366DAYS:
-      calendar = "all_leap";
+      calendarstr = "all_leap";
       break;
     default:
       cdoAbort("Unsupported calendar type.");
@@ -238,7 +268,7 @@ void *CMOR(void *argument)
                get_val("expinfo", ""),
                get_val("institution", ""),
                get_val("modinfo", ""),
-               calendar,
+               calendarstr,
                atoi(get_val("realization", "1")),
                get_val("contact", ""),
                get_val("history", ""),
@@ -286,28 +316,9 @@ void *CMOR(void *argument)
           ndims = 0;
 
           /* Time-Axis */
-          int rdate = taxisInqRdate(taxisID);
-          int rtime = taxisInqRtime(taxisID);
-          int timeunit = taxisInqTunit(taxisID);
-          int year, month, day, hour, minute, second;
-          cdiDecodeDate(rdate, &year, &month, &day);
-          cdiDecodeTime(rtime, &hour, &minute, &second);
-
-          if ( timeunit == TUNIT_QUARTER ||
-               timeunit == TUNIT_30MINUTES )
-            timeunit = TUNIT_MINUTE;
-          if ( timeunit == TUNIT_3HOURS ||
-               timeunit == TUNIT_6HOURS ||
-               timeunit == TUNIT_12HOURS )
-            timeunit = TUNIT_HOUR;
-
-          sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d",
-                  tunitNamePtr(timeunit), year, month, day, hour,
-                  minute, second);
-
           cmor_axis(&axis_ids[ndims++],
-                    "time",
-                    units,
+                    substitute("time"),
+                    taxis_units,
                     0,
                     NULL,
                     0,
@@ -401,11 +412,42 @@ void *CMOR(void *argument)
         }
     }
 
-  double time_vals;
+  double time_val;
   double time_bnds[2];
+  double *time_bndsp;
+  int has_bnds = taxisHasBounds(taxisID);
   int tsID = 0;
+  int vdate, vtime;
+  int vdate0b, vdate1b;
+  int vtime0b, vtime1b;
+  juldate_t juldate;
+
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
+      vdate = taxisInqVdate(taxisID);
+      vtime = taxisInqVtime(taxisID);
+      juldate = juldate_encode(calendar, vdate, vtime);
+      time_val = juldate_to_seconds(juldate_sub(juldate, r_juldate))
+        / tunitsec;
+
+      if ( has_bnds )
+        {
+          taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
+          juldate = juldate_encode(calendar, vdate0b, vtime0b);
+          time_bnds[0] = juldate_to_seconds(juldate_sub(juldate, r_juldate))
+            / tunitsec;
+
+          taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
+          juldate = juldate_encode(calendar, vdate1b, vtime1b);
+          time_bnds[1] = juldate_to_seconds(juldate_sub(juldate, r_juldate))
+            / tunitsec;
+          time_bndsp = time_bnds;
+        }
+      else
+        {
+          time_bndsp = NULL;
+        }
+
       for ( recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID, &varID, &levelID);
@@ -419,9 +461,7 @@ void *CMOR(void *argument)
                              (double *)cc_var->data + gridsize * levelID,
                              &nmiss);
         }
-      time_vals = 0.5 + tsID;
-      time_bnds[0] = tsID;
-      time_bnds[1] = tsID + 1.0;
+
       for ( int i = 0; i < cc_var_n; i++ )
         {
           cc_var = &cc_var_list[i];
@@ -430,8 +470,8 @@ void *CMOR(void *argument)
                      cc_var->datatype,
                      NULL,
                      1,
-                     &time_vals,
-                     time_bnds,
+                     &time_val,
+                     time_bndsp,
                      NULL);
           tsID++;
         }
