@@ -47,8 +47,8 @@ int seaslist(LIST *ilist)
   int imons[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
   assert(strlen(smons)==(sizeof(imons)/sizeof(int)));
 
-  int imon[17]; /* 1-16 ! */
-  for ( int i = 0; i < 17; ++i ) imon[i] = 0;
+  int imon[13]; /* 1-12 ! */
+  for ( int i = 0; i < 13; ++i ) imon[i] = 0;
 
   int nsel = operatorArgc();
   if ( isdigit(*operatorArgv()[0]))
@@ -86,10 +86,7 @@ int seaslist(LIST *ilist)
     }
 
   nsel = 0;
-  for ( int i = 1; i < 17; ++i )
-    {
-      if ( imon[i] ) listSetInt(ilist, nsel++, i);
-    }
+  for ( int i = 1; i < 13; ++i ) if ( imon[i] ) listSetInt(ilist, nsel++, i);
 
   return nsel;
 }

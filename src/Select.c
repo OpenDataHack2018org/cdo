@@ -74,6 +74,7 @@ static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 #define PAR_CHECK_FLT(name)           par_check_flt(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_WORD(name)          par_check_word(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_DATE(name)          par_check_date(npar_##name, par_##name, flag_##name, name)
+#define PAR_CHECK_SEAS(name, month)   par_check_seas(npar_##name, par_##name, flag_##name, month)
 
 #define MAX_PLIST_ENTRY  256
 #define MAX_PML_ENTRY    256
@@ -427,6 +428,20 @@ bool par_check_date(int npar, char **parlist, bool *flaglist, const char *par)
       strcpy(wcdate, parlist[i]);
       strcat(wcdate, "*");
       if ( wildcardmatch(wcdate, par) == 0 ) { found = true; flaglist[i] = true;/* break;*/}
+    }
+
+  return found;
+}
+
+
+bool par_check_seas(int npar, char **parlist, bool *flaglist, int month)
+{
+  printf("month %d\n", month);
+  bool found = false;
+
+  for ( int i = 0; i < npar; i++ )
+    {
+      // if ( wildcardmatch(parlist[i], par) == 0 ) { found = true; flaglist[i] = true;/* break;*/}
     }
 
   return found;
@@ -968,15 +983,16 @@ void *Select(void *argument)
 
 	      if ( !copytimestep && npar_date == 0 && npar_timestep == 0 && npar_timestep_of_year == 0 )
 		{
-		  bool lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
+		  bool lseas = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 
+		  if ( npar_seas   == 0 || (npar_seas   && PAR_CHECK_SEAS(seas, month)) ) lseas   = true;
 		  if ( npar_year   == 0 || (npar_year   && PAR_CHECK_INT(year))   ) lyear   = true;
 		  if ( npar_month  == 0 || (npar_month  && PAR_CHECK_INT(month))  ) lmonth  = true;
 		  if ( npar_day    == 0 || (npar_day    && PAR_CHECK_INT(day))    ) lday    = true;
 		  if ( npar_hour   == 0 || (npar_hour   && PAR_CHECK_INT(hour))   ) lhour   = true;
 		  if ( npar_minute == 0 || (npar_minute && PAR_CHECK_INT(minute)) ) lminute = true;
 
-		  if ( lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
+		  if ( lseas && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
 		}
 
 	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
