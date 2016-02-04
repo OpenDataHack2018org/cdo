@@ -126,7 +126,8 @@ static
 int cdo_feenableexcept(int excepts)
 {
 #if defined HAVE_FEENABLEEXCEPT
-  int old_excepts = feenableexcept(int);
+  int feenableexcept(int);
+  int old_excepts = feenableexcept(excepts);
   return old_excepts;
 #else
   static fenv_t fenv;
