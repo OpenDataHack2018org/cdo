@@ -16,12 +16,11 @@ typedef struct _cc_var_t
   void *data;
 } cc_var_t;
 
-static cc_var_t *find_cc_var(const int cdi_varID,
-                             cc_var_t *var_list, int length)
+static cc_var_t *find_var(const int cdi_varID, cc_var_t vars[], int nvars)
 {
-  for ( int i = 0; i < length; i++ )
-    if ( cdi_varID == var_list[i].cdi_varID )
-      return &var_list[i];
+  for ( int i = 0; i < nvars; i++ )
+    if ( cdi_varID == vars[i].cdi_varID )
+      return &vars[i];
   return NULL;
 }
 
@@ -137,27 +136,18 @@ static void parse_cmdline_kv(int nparams, char **params)
 }
 #endif
 
-void *CMOR(void *argument)
+static void setup(int streamID, char *table)
 {
-  cdoInitialize(argument);
-
-#if defined(HAVE_LIBCMOR)
-  int nparams = operatorArgc();
-  char **params = operatorArgv();
-  char *table;
   char *chunk;
   char *logfile;
   int netcdf_file_action, exit_control;
   int set_verbosity;
   int create_subdirectories;
-
-  if ( nparams < 1 ) cdoAbort("Too few arguments!");
-  hcreate(100);
-  parse_kvfile("cmor.rc");
-  table = params[0];
-  nparams--;
-  params++;
-  parse_cmdline_kv(nparams, params);
+  int *month_lengths;
+  int table_id;
+  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
+  char *calendar;
+  double branch_time = atof(get_val("branch_time", "0.0"));
 
   chunk = get_val("chunk", "replace");
   if ( strcasecmp(chunk, "replace") == 0 )
@@ -185,59 +175,22 @@ void *CMOR(void *argument)
              logfile,
              &create_subdirectories);
 
-  int *month_lengths;
-  int table_id;
-  int streamID = streamOpenRead(cdoStreamName(0));
-  int vlistID = streamInqVlist(streamID);
-  int taxisID = vlistInqTaxis(vlistID);
-  int calendar = taxisInqCalendar(taxisID);
-  char *calendarstr;
-  int rdate = taxisInqRdate(taxisID);
-  int rtime = taxisInqRtime(taxisID);
-  juldate_t r_juldate  = juldate_encode(calendar, rdate, rtime);
-  int timeunit = taxisInqTunit(taxisID);
-  int tunitsec;
-  int year, month, day, hour, minute, second;
-  char taxis_units[CMOR_MAX_STRING];
-
-  cdiDecodeDate(rdate, &year, &month, &day);
-  cdiDecodeTime(rtime, &hour, &minute, &second);
-  if ( timeunit == TUNIT_QUARTER ||
-       timeunit == TUNIT_30MINUTES )
-    timeunit = TUNIT_MINUTE;
-  if ( timeunit == TUNIT_3HOURS ||
-       timeunit == TUNIT_6HOURS ||
-       timeunit == TUNIT_12HOURS )
-    timeunit = TUNIT_HOUR;
-
-  switch ( timeunit )
-    {
-    case TUNIT_MINUTE: tunitsec = 60; break;
-    case TUNIT_HOUR: tunitsec = 3600; break;
-    case TUNIT_DAY: tunitsec = 86400; break;
-    default: tunitsec = 3600;
-    }
-
-  sprintf(taxis_units, "%s since %d-%d-%d %02d:%02d:%02d",
-          tunitNamePtr(timeunit), year, month, day, hour,
-          minute, second);
-
-  switch ( calendar )
+  switch ( taxisInqCalendar(taxisID) )
     {
     case CALENDAR_STANDARD:
-      calendarstr = "gregorian";
+      calendar = "gregorian";
       break;
     case CALENDAR_PROLEPTIC:
-      calendarstr = "proleptic_gregorian";
+      calendar = "proleptic_gregorian";
       break;
     case CALENDAR_360DAYS:
-      calendarstr = "360_day";
+      calendar = "360_day";
       break;
     case CALENDAR_365DAYS:
-      calendarstr = "noleap";
+      calendar = "noleap";
       break;
     case CALENDAR_366DAYS:
-      calendarstr = "all_leap";
+      calendar = "all_leap";
       break;
     default:
       cdoAbort("Unsupported calendar type.");
@@ -262,13 +215,11 @@ void *CMOR(void *argument)
       month_lengths = NULL;
     }
 
-  double branch_time = atof(get_val("branch_time", "0.0"));
-
   cmor_dataset(get_val("outpath", "./"),
                get_val("expinfo", ""),
                get_val("institution", ""),
                get_val("modinfo", ""),
-               calendarstr,
+               calendar,
                atoi(get_val("realization", "1")),
                get_val("contact", ""),
                get_val("history", ""),
@@ -288,30 +239,48 @@ void *CMOR(void *argument)
 
   cmor_load_table(table, &table_id);
   cmor_set_table(table_id);
+}
 
-  int nvars = vlistNvars(vlistID);
+static void define_variables(int streamID, cc_var_t vars[], int *nvars)
+{
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
   size_t gridsize = vlistGridsizeMax(vlistID);
-  cc_var_t *cc_var_list = (cc_var_t *) Malloc(nvars * sizeof(cc_var_t));;
-  cc_var_t *cc_var;
-  int cc_var_n = 0;
-  int recID, varID, levelID, nrecs, nmiss;
-  int gridID;
+  cc_var_t *var;
+  int varID, gridID;
   char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
   int length;
   double *coord_vals, *cell_bounds;
-  int ndims;
+  int ndims, levels;
   double missing_value;
   double tolerance = 1e-4;
   int axis_ids[CMOR_MAX_AXES];
   char *select_vars = get_val("var", NULL);
+  int year, month, day, hour, minute, second;
+  int timeunit = taxisInqTunit(taxisID);
+  char taxis_units[CMOR_MAX_STRING];
 
-  for ( varID = 0; varID < nvars; varID++ )
+  cdiDecodeDate(taxisInqRdate(taxisID), &year, &month, &day);
+  cdiDecodeTime(taxisInqRtime(taxisID), &hour, &minute, &second);
+  if ( timeunit == TUNIT_QUARTER || timeunit == TUNIT_30MINUTES )
+    timeunit = TUNIT_MINUTE;
+  if ( timeunit == TUNIT_3HOURS ||
+       timeunit == TUNIT_6HOURS ||
+       timeunit == TUNIT_12HOURS )
+    timeunit = TUNIT_HOUR;
+
+  sprintf(taxis_units, "%s since %d-%d-%d %02d:%02d:%02d",
+          tunitNamePtr(timeunit), year, month, day, hour,
+          minute, second);
+
+  *nvars = 0;
+  for ( varID = 0; varID < vlistNvars(vlistID); varID++ )
     {
       vlistInqVarName(vlistID, varID, name);
       if ( select_vars == NULL || strstr(select_vars, name) != NULL)
         {
-          cc_var = &cc_var_list[cc_var_n++];
-          cc_var->cdi_varID = varID;
+          var = &vars[(*nvars)++];
+          var->cdi_varID = varID;
           gridID = vlistInqVarGrid(vlistID, varID);
           ndims = 0;
 
@@ -328,7 +297,7 @@ void *CMOR(void *argument)
 
           /* Z-Axis */
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
-          int levels = zaxisInqSize(zaxisID);
+          levels = zaxisInqSize(zaxisID);
           coord_vals = Malloc(levels * sizeof(double));
           zaxisInqLevels(zaxisID, coord_vals);
           zaxisInqName(zaxisID, name);
@@ -384,21 +353,21 @@ void *CMOR(void *argument)
           missing_value = vlistInqVarMissval(vlistID, varID);
           if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
             {
-              cc_var->datatype = 'f';
-              cc_var->data = Malloc(gridsize * levels * sizeof(float));
+              var->datatype = 'f';
+              var->data = Malloc(gridsize * levels * sizeof(float));
             }
           else
             {
-              cc_var->datatype = 'd';
-              cc_var->data = Malloc(gridsize * levels * sizeof(double));
+              var->datatype = 'd';
+              var->data = Malloc(gridsize * levels * sizeof(double));
             }
           vlistInqVarName(vlistID, varID, name);
-          cmor_variable(&cc_var->cmor_varID,
+          cmor_variable(&var->cmor_varID,
                         substitute(name),
                         units,
                         ndims,
                         axis_ids,
-                        cc_var->datatype,
+                        var->datatype,
                         &missing_value,
                         &tolerance,
                         NULL, // positive,
@@ -406,38 +375,58 @@ void *CMOR(void *argument)
                         NULL,
                         NULL);
         }
-      else
-        {
-          printf("Not found var %s\n", name);
-        }
     }
+}
 
+static void write_variables(int streamID, cc_var_t vars[], int nvars)
+{
+  cc_var_t *var;
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
+  size_t gridsize = vlistGridsizeMax(vlistID);
   double time_val;
   double time_bnds[2];
   double *time_bndsp;
   int has_bnds = taxisHasBounds(taxisID);
-  int tsID = 0;
-  int vdate, vtime;
+  int tsID;
   int vdate0b, vdate1b;
   int vtime0b, vtime1b;
-  juldate_t juldate;
+  juldate_t juldate, r_juldate;
+  int calendar = taxisInqCalendar(taxisID);
+  int tunitsec;
+  int nrecs, recID;
+  int varID, levelID;
+  int nmiss;
 
+  switch ( taxisInqTunit(taxisID) )
+    {
+    case TUNIT_MINUTE: tunitsec = 60; break;
+    case TUNIT_HOUR: tunitsec = 3600; break;
+    case TUNIT_DAY: tunitsec = 86400; break;
+    default: tunitsec = 3600;
+    }
+
+  r_juldate = juldate_encode(calendar,
+                             taxisInqRdate(taxisID),
+                             taxisInqRtime(taxisID));
+  tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
-      juldate = juldate_encode(calendar, vdate, vtime);
+      juldate = juldate_encode(calendar,
+                               taxisInqVdate(taxisID),
+                               taxisInqVtime(taxisID));
       time_val = juldate_to_seconds(juldate_sub(juldate, r_juldate))
         / tunitsec;
 
       if ( has_bnds )
         {
           taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
+          taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
+
           juldate = juldate_encode(calendar, vdate0b, vtime0b);
           time_bnds[0] = juldate_to_seconds(juldate_sub(juldate, r_juldate))
             / tunitsec;
 
-          taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
           juldate = juldate_encode(calendar, vdate1b, vtime1b);
           time_bnds[1] = juldate_to_seconds(juldate_sub(juldate, r_juldate))
             / tunitsec;
@@ -451,23 +440,23 @@ void *CMOR(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID, &varID, &levelID);
-          cc_var = find_cc_var(varID, cc_var_list, cc_var_n);
-          if ( cc_var->datatype == 'f' )
+          var = find_var(varID, vars, nvars);
+          if ( var->datatype == 'f' )
             streamReadRecordF(streamID,
-                              (float *)cc_var->data + gridsize * levelID,
+                              (float *)var->data + gridsize * levelID,
                               &nmiss);
           else
             streamReadRecord(streamID,
-                             (double *)cc_var->data + gridsize * levelID,
+                             (double *)var->data + gridsize * levelID,
                              &nmiss);
         }
 
-      for ( int i = 0; i < cc_var_n; i++ )
+      for ( int i = 0; i < nvars; i++ )
         {
-          cc_var = &cc_var_list[i];
-          cmor_write(cc_var->cmor_varID,
-                     cc_var->data,
-                     cc_var->datatype,
+          var = &vars[i];
+          cmor_write(var->cmor_varID,
+                     var->data,
+                     var->datatype,
                      NULL,
                      1,
                      &time_val,
@@ -476,18 +465,46 @@ void *CMOR(void *argument)
           tsID++;
         }
     }
+}
+
+void *CMOR(void *argument)
+{
+  cdoInitialize(argument);
+
+#if defined(HAVE_LIBCMOR)
+  int nparams = operatorArgc();
+  char **params = operatorArgv();
+  int nvars, nvars_max;
+  int streamID;
+  cc_var_t *vars;
+
+  if ( nparams < 1 )
+    cdoAbort("Too few arguments!");
+
+  hcreate(100);
+  parse_kvfile("cmor.rc");
+  parse_cmdline_kv(nparams - 1, &params[1]);
+
+  streamID = streamOpenRead(cdoStreamName(0));
+  nvars_max = vlistNvars(streamInqVlist(streamID));
+  vars = (cc_var_t *) Malloc(nvars_max * sizeof(cc_var_t));;
+
+  setup(streamID, params[0]);
+  define_variables(streamID, vars, &nvars);
+  write_variables(streamID, vars, nvars);
+
   streamClose(streamID);
   cmor_close();
+
   hdestroy();
-  for ( int i = 0; i < cc_var_n; i++ )
-    Free (cc_var_list[i].data);
-  Free (cc_var_list);
+  for ( int i = 0; i < nvars; i++ )
+    Free (vars[i].data);
+  Free (vars);
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
 
   cdoFinish();
-
   return 0;
 }
 /*
