@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = seltimestep seltime selhour selday selmon selyear selseas seldate selsmon
+@Operators = seltimestep seltime selhour selday selmonth selyear selseason seldate selsmon
 
 @BeginDescription
 This module selects user specified timesteps from @file{ifile} and writes them to @file{ofile}.
@@ -54,7 +54,7 @@ Selects all timesteps with a day in a user given list.
 @EndOperator
 
 
-@BeginOperator_selmon
+@BeginOperator_selmonth
 @Title     = Select months
 @Parameter = months
 
@@ -74,7 +74,7 @@ Selects all timesteps with a year in a user given list.
 @EndOperator
 
 
-@BeginOperator_selseas
+@BeginOperator_selseason
 @Title     = Select seasons
 @Parameter = seasons
 
@@ -118,7 +118,7 @@ INTEGER  Comma separated list of months.
 @Item = years
 INTEGER  Comma separated list of years.
 @Item = seasons
-STRING   Comma separated list of seasons (DJF, MAM, JJA, SON).
+STRING   Comma separated list of seasons (substring of DJFMAMJJASOND).
 @Item = date1
 STRING   Start date (format YYYY-MM-DDThh:mm:ss).
 @Item = date2
@@ -133,7 +133,7 @@ INTEGER  Number of timesteps after the selected month [default: nts1].
 #@BeginExample
 #@BeginVerbatim
 #   cdo seltimestep,6/8
-#   cdo selmon,6/8
-#   cdo selseas,JJA
+#   cdo selmonth,6/8
+#   cdo selseason,JJA
 #@EndVerbatim
 #@EndExample

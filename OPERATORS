@@ -84,9 +84,9 @@ Operator catalog:
    Seltime       seltime         Select times
    Seltime       selhour         Select hours
    Seltime       selday          Select days
-   Seltime       selmon          Select months
+   Seltime       selmonth        Select months
    Seltime       selyear         Select years
-   Seltime       selseas         Select seasons
+   Seltime       selseason       Select seasons
    Seltime       seldate         Select dates
    Seltime       selsmon         Select single month
    Selbox        sellonlatbox    Select a longitude/latitude box
