@@ -40,13 +40,31 @@
 #include "list.h"
 
 
+void season_to_months(const char *season, int *imonths)
+{
+  const char *smons = "JFMAMJJASONDJFMAMJJASOND";
+  const int imons[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  assert(strlen(smons)==(sizeof(imons)/sizeof(int)));
+
+  size_t len = strlen(season);
+  if ( len == 3 && strcmp(season, "ANN") == 0 )
+    {
+      for ( size_t k = 0; k < 12; ++k ) imonths[k+1] = 1;
+    }
+  else
+    {
+      if ( len > 12 ) cdoAbort("Too many months %d (limit=12)!", (int)len);
+      char *sstr = strcasestr(smons, season);
+      if ( sstr == NULL ) cdoAbort("Season %s not available!", season);
+      size_t ks = (size_t)(sstr-smons);
+      size_t ke = ks + len;
+      for ( size_t k = ks; k < ke; ++k ) imonths[imons[k]]++;
+    }
+}
+
 static
 int seaslist(LIST *ilist)
 {
-  const char *smons = "JFMAMJJASONDJFMAMJJASOND";
-  int imons[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-  assert(strlen(smons)==(sizeof(imons)/sizeof(int)));
-
   int imon[13]; /* 1-12 ! */
   for ( int i = 0; i < 13; ++i ) imon[i] = 0;
 
@@ -66,23 +84,7 @@ int seaslist(LIST *ilist)
   else
     {
       for ( int i = 0; i < nsel; i++ )
-        {
-          const char *sname = operatorArgv()[i];
-          size_t len = strlen(sname);
-          if ( len == 3 && strcmp(sname, "ANN") == 0 )
-            {
-              for ( size_t k = 0; k < 12; ++k ) imon[k+1] = 1;
-            }
-          else
-            {
-              if ( len > 12 ) cdoAbort("Too many months %d (limit=12)!", (int)len);
-              char *sstr = strcasestr(smons, sname);
-              if ( sstr == NULL ) cdoAbort("Season %s not available!", sname);
-              size_t ks = (size_t)(sstr-smons);
-              size_t ke = ks + len;
-              for ( size_t k = ks; k < ke; ++k ) imon[imons[k]]++;
-            }
-        }
+        season_to_months(operatorArgv()[i], imon);
     }
 
   nsel = 0;

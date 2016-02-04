@@ -74,7 +74,7 @@ static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 #define PAR_CHECK_FLT(name)           par_check_flt(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_WORD(name)          par_check_word(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_DATE(name)          par_check_date(npar_##name, par_##name, flag_##name, name)
-#define PAR_CHECK_SEAS(name, month)   par_check_seas(npar_##name, par_##name, flag_##name, month)
+#define PAR_CHECK_SEASON(name, month) par_check_season(npar_##name, par_##name, flag_##name, month)
 
 #define MAX_PLIST_ENTRY  256
 #define MAX_PML_ENTRY    256
@@ -433,15 +433,19 @@ bool par_check_date(int npar, char **parlist, bool *flaglist, const char *par)
   return found;
 }
 
+void season_to_months(const char *season, int *imonths);
 
-bool par_check_seas(int npar, char **parlist, bool *flaglist, int month)
+bool par_check_season(int npar, char **parlist, bool *flaglist, int month)
 {
-  printf("month %d\n", month);
+  assert(month>=1&&month<=12);
   bool found = false;
+  int imon[13]; /* 1-12 ! */
 
   for ( int i = 0; i < npar; i++ )
     {
-      // if ( wildcardmatch(parlist[i], par) == 0 ) { found = true; flaglist[i] = true;/* break;*/}
+      for ( int i = 0; i < 13; ++i ) imon[i] = 0;
+      season_to_months(parlist[i], imon);
+      if ( imon[month] ) { found = true; flaglist[i] = true;/* break;*/}
     }
 
   return found;
@@ -545,7 +549,7 @@ void *Select(void *argument)
   PML_DEF_WORD(steptype,          32, "Time step type");
   PML_DEF_WORD(startdate,          1, "Start date");
   PML_DEF_WORD(enddate,            1, "End date");
-  PML_DEF_WORD(seas,              12, "Season");
+  PML_DEF_WORD(season,            12, "Season");
   PML_DEF_WORD(date,            1024, "Date");
 
   PML_INIT_INT(timestep_of_year);
@@ -568,7 +572,7 @@ void *Select(void *argument)
   PML_INIT_WORD(steptype);
   PML_INIT_WORD(startdate);
   PML_INIT_WORD(enddate);
-  PML_INIT_WORD(seas);
+  PML_INIT_WORD(season);
   PML_INIT_WORD(date);
 
   cdoInitialize(argument);
@@ -612,7 +616,7 @@ void *Select(void *argument)
   PML_ADD_WORD(pml, steptype);
   PML_ADD_WORD(pml, startdate);
   PML_ADD_WORD(pml, enddate);
-  PML_ADD_WORD(pml, seas);
+  PML_ADD_WORD(pml, season);
   PML_ADD_WORD(pml, date);
 
   pmlRead(pml, nsel, argnames);
@@ -639,7 +643,7 @@ void *Select(void *argument)
   PML_NUM(pml, steptype);
   PML_NUM(pml, startdate);
   PML_NUM(pml, enddate);
-  PML_NUM(pml, seas);
+  PML_NUM(pml, season);
   PML_NUM(pml, date);
 
   int streamCnt = cdoStreamCnt();
@@ -822,7 +826,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(gridname);
 	  PAR_CHECK_WORD_FLAG(steptype);
 
-	  if ( npar_date || npar_startdate || npar_enddate || npar_seas ) ltimsel = true;
+	  if ( npar_date || npar_startdate || npar_enddate || npar_season ) ltimsel = true;
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = true;
 
 	  int npar = 0;
@@ -969,6 +973,7 @@ void *Select(void *argument)
               int second;
 	      cdiDecodeDate(vdate, &year, &month, &day);
 	      cdiDecodeTime(vtime, &hour, &minute, &second);
+              UNUSED(season);
 
 	      if ( year != last_year )
 		{
@@ -983,16 +988,16 @@ void *Select(void *argument)
 
 	      if ( !copytimestep && npar_date == 0 && npar_timestep == 0 && npar_timestep_of_year == 0 )
 		{
-		  bool lseas = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
+		  bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 
-		  if ( npar_seas   == 0 || (npar_seas   && PAR_CHECK_SEAS(seas, month)) ) lseas   = true;
+		  if ( npar_season == 0 || (npar_season && PAR_CHECK_SEASON(season, month)) ) lseason   = true;
 		  if ( npar_year   == 0 || (npar_year   && PAR_CHECK_INT(year))   ) lyear   = true;
 		  if ( npar_month  == 0 || (npar_month  && PAR_CHECK_INT(month))  ) lmonth  = true;
 		  if ( npar_day    == 0 || (npar_day    && PAR_CHECK_INT(day))    ) lday    = true;
 		  if ( npar_hour   == 0 || (npar_hour   && PAR_CHECK_INT(hour))   ) lhour   = true;
 		  if ( npar_minute == 0 || (npar_minute && PAR_CHECK_INT(minute)) ) lminute = true;
 
-		  if ( lseas && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
+		  if ( lseason && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
 		}
 
 	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
@@ -1146,7 +1151,7 @@ void *Select(void *argument)
   PAR_CHECK_WORD_FLAG(startdate);
   UNUSED(str_enddate);
   //  PAR_CHECK_WORD_FLAG(enddate);
-  PAR_CHECK_WORD_FLAG(seas);
+  PAR_CHECK_WORD_FLAG(season);
   PAR_CHECK_WORD_FLAG(date);
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);

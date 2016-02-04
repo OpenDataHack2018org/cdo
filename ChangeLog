@@ -5,6 +5,8 @@
 
 2016-02-03  Uwe Schulzweida
 
+	* select: added search key season to select seasons
+	* selseas: renamed to selseason
 	* selseas: added support for season ANN
 
 2016-01-13  Uwe Schulzweida
