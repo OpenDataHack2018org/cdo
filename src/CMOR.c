@@ -298,19 +298,22 @@ static void define_variables(int streamID, cc_var_t vars[], int *nvars)
           /* Z-Axis */
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
           levels = zaxisInqSize(zaxisID);
-          coord_vals = Malloc(levels * sizeof(double));
-          zaxisInqLevels(zaxisID, coord_vals);
-          zaxisInqName(zaxisID, name);
-          zaxisInqUnits(zaxisID, units);
-          cmor_axis(&axis_ids[ndims++],
-                    substitute(name),
-                    units,
-                    levels,
-                    (void *)coord_vals,
-                    'd',
-                    NULL,
-                    0,
-                    NULL);
+          if ( zaxisInqType(zaxisID) != ZAXIS_SURFACE )
+            {
+              coord_vals = Malloc(levels * sizeof(double));
+              zaxisInqLevels(zaxisID, coord_vals);
+              zaxisInqName(zaxisID, name);
+              zaxisInqUnits(zaxisID, units);
+              cmor_axis(&axis_ids[ndims++],
+                        substitute(name),
+                        units,
+                        levels,
+                        (void *)coord_vals,
+                        'd',
+                        NULL,
+                        0,
+                        NULL);
+            }
 
           /* Y-Axis */
           gridInqYname(gridID, name);
@@ -371,7 +374,7 @@ static void define_variables(int streamID, cc_var_t vars[], int *nvars)
                         var->datatype,
                         (void *) missing_value,
                         &tolerance,
-                        NULL, // positive,
+                        NULL,
                         NULL,
                         NULL,
                         NULL);
