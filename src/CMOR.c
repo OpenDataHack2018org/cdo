@@ -134,7 +134,6 @@ static void parse_cmdline_kv(int nparams, char **params)
       i += j;
     }
 }
-#endif
 
 static void setup(int streamID, char *table)
 {
@@ -466,6 +465,7 @@ static void write_variables(int streamID, cc_var_t vars[], int nvars)
                    NULL);
     }
 }
+#endif
 
 void *CMOR(void *argument)
 {
