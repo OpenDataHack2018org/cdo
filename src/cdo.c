@@ -123,22 +123,30 @@ void cdo_stackframe(void)
 }
 
 static
-int cdo_feenableexcept(unsigned excepts)
+int cdo_feenableexcept(int excepts)
 {
+#if defined HAVE_FEENABLEEXCEPT
+  int old_excepts = feenableexcept(int);
+  return old_excepts;
+#else
   static fenv_t fenv;
-  unsigned new_excepts = excepts & FE_ALL_EXCEPT,
-           old_excepts = 0;  // previous masks
+  unsigned new_excepts = ((unsigned)excepts) & FE_ALL_EXCEPT;
+  int old_excepts = -1;  // previous masks
 
   if ( fegetenv(&fenv) ) return -1;
 #if defined(__i386__) || defined(__x86_64__)
-  old_excepts = fenv.__control & FE_ALL_EXCEPT;
+  if ( ISME )
+    {
+      old_excepts = (int) (fenv.__control & FE_ALL_EXCEPT);
 
-  // unmask
-  fenv.__control &= ~new_excepts;
-  fenv.__mxcsr   &= ~(new_excepts << 7);
+      // unmask
+      fenv.__control &= ~new_excepts;
+      fenv.__mxcsr   &= ~(new_excepts << 7);
+    }
 #endif
 
   return ( fesetenv(&fenv) ? -1 : (int)old_excepts );
+#endif
 }
 
 static

@@ -17560,6 +17560,17 @@ _ACEOF
 fi
 done
 
+for ac_func in feenableexcept
+do :
+  ac_fn_c_check_func "$LINENO" "feenableexcept" "ac_cv_func_feenableexcept"
+if test "x$ac_cv_func_feenableexcept" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_FEENABLEEXCEPT 1
+_ACEOF
+
+fi
+done
+
 #  ----------------------------------------------------------------------
 # Checks for the availability of ANSI-C99 functions
 for ac_func in getrlimit

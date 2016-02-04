@@ -72,6 +72,7 @@ AC_CHECK_HEADERS(execinfo.h)
 # Checks for the availability of functions
 AC_CHECK_FUNCS(mallinfo)
 AC_CHECK_FUNCS(backtrace)
+AC_CHECK_FUNCS(feenableexcept)
 #  ----------------------------------------------------------------------
 # Checks for the availability of ANSI-C99 functions
 AC_CHECK_FUNCS(getrlimit)
