@@ -252,7 +252,7 @@ static void define_variables(int streamID, cc_var_t vars[], int *nvars)
   int length;
   double *coord_vals, *cell_bounds;
   int ndims, levels;
-  double missing_value;
+  char missing_value[sizeof(double)];
   double tolerance = 1e-4;
   int axis_ids[CMOR_MAX_AXES];
   char *select_vars = get_val("var", NULL);
@@ -350,25 +350,26 @@ static void define_variables(int streamID, cc_var_t vars[], int *nvars)
 
           /* Variable */
           vlistInqVarUnits(vlistID, varID, units);
-          missing_value = vlistInqVarMissval(vlistID, varID);
+          vlistInqVarName(vlistID, varID, name);
           if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
             {
               var->datatype = 'f';
+              *(float *) missing_value = vlistInqVarMissval(vlistID, varID);
               var->data = Malloc(gridsize * levels * sizeof(float));
             }
           else
             {
               var->datatype = 'd';
+              *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
               var->data = Malloc(gridsize * levels * sizeof(double));
             }
-          vlistInqVarName(vlistID, varID, name);
           cmor_variable(&var->cmor_varID,
                         substitute(name),
                         units,
                         ndims,
                         axis_ids,
                         var->datatype,
-                        &missing_value,
+                        (void *) missing_value,
                         &tolerance,
                         NULL, // positive,
                         NULL,
@@ -394,7 +395,7 @@ static void write_variables(int streamID, cc_var_t vars[], int nvars)
   juldate_t juldate, r_juldate;
   int calendar = taxisInqCalendar(taxisID);
   int tunitsec;
-  int nrecs, recID;
+  int nrecs;
   int varID, levelID;
   int nmiss;
 
@@ -410,7 +411,7 @@ static void write_variables(int streamID, cc_var_t vars[], int nvars)
                              taxisInqRdate(taxisID),
                              taxisInqRtime(taxisID));
   tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+  while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
       juldate = juldate_encode(calendar,
                                taxisInqVdate(taxisID),
@@ -437,7 +438,7 @@ static void write_variables(int streamID, cc_var_t vars[], int nvars)
           time_bndsp = NULL;
         }
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      while ( nrecs-- )
         {
           streamInqRecord(streamID, &varID, &levelID);
           var = find_var(varID, vars, nvars);
@@ -452,18 +453,14 @@ static void write_variables(int streamID, cc_var_t vars[], int nvars)
         }
 
       for ( int i = 0; i < nvars; i++ )
-        {
-          var = &vars[i];
-          cmor_write(var->cmor_varID,
-                     var->data,
-                     var->datatype,
-                     NULL,
-                     1,
-                     &time_val,
-                     time_bndsp,
-                     NULL);
-          tsID++;
-        }
+        cmor_write(vars[i].cmor_varID,
+                   vars[i].data,
+                   vars[i].datatype,
+                   NULL,
+                   1,
+                   &time_val,
+                   time_bndsp,
+                   NULL);
     }
 }
 
