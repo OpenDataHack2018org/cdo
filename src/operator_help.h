@@ -487,6 +487,7 @@ static const char *SelectHelp[] = {
     "    hour              INTEGER Comma separated list of hours.",
     "    day               INTEGER Comma separated list of days.",
     "    month             INTEGER Comma separated list of months.",
+    "    season            STRING  Comma separated list of seasons (substring of DJFMAMJJASOND).",
     "    year              INTEGER Comma separated list of years.",
     "    timestep          INTEGER Comma separated list of timesteps. Negative values selects timesteps from the end (NetCDF only).",
     "    timestep_of_year  INTEGER Comma separated list of timesteps of year.",
