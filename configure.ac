@@ -72,7 +72,6 @@ AC_CHECK_HEADERS(execinfo.h)
 # Checks for the availability of functions
 AC_CHECK_FUNCS(mallinfo)
 AC_CHECK_FUNCS(backtrace)
-AC_CHECK_FUNCS(feenableexcept)
 #  ----------------------------------------------------------------------
 # Checks for the availability of ANSI-C99 functions
 AC_CHECK_FUNCS(getrlimit)
@@ -118,6 +117,9 @@ AC_CHECK_LIB([m],[floor])
 AC_CHECK_DECLS([isnan],,,[AC_INCLUDES_DEFAULT
 @%:@include <math.h>])
 AC_CHECK_FUNCS(sqrtl)
+AC_CHECK_FUNCS(feenableexcept)
+#
+AC_CHECK_MEMBERS([fenv_t.__control, fenv_t.__mxcsr],,,[[#include <fenv.h>]])
 #  ----------------------------------------------------------------------
 #  Enable NEARPT3 support
 # AC_MSG_CHECKING([for nearpt3 support])

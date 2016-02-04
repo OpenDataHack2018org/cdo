@@ -17560,17 +17560,6 @@ _ACEOF
 fi
 done
 
-for ac_func in feenableexcept
-do :
-  ac_fn_c_check_func "$LINENO" "feenableexcept" "ac_cv_func_feenableexcept"
-if test "x$ac_cv_func_feenableexcept" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_FEENABLEEXCEPT 1
-_ACEOF
-
-fi
-done
-
 #  ----------------------------------------------------------------------
 # Checks for the availability of ANSI-C99 functions
 for ac_func in getrlimit
@@ -17724,6 +17713,39 @@ _ACEOF
 
 fi
 done
+
+for ac_func in feenableexcept
+do :
+  ac_fn_c_check_func "$LINENO" "feenableexcept" "ac_cv_func_feenableexcept"
+if test "x$ac_cv_func_feenableexcept" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_FEENABLEEXCEPT 1
+_ACEOF
+
+fi
+done
+
+#
+ac_fn_c_check_member "$LINENO" "fenv_t" "__control" "ac_cv_member_fenv_t___control" "#include <fenv.h>
+"
+if test "x$ac_cv_member_fenv_t___control" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_FENV_T___CONTROL 1
+_ACEOF
+
+
+fi
+ac_fn_c_check_member "$LINENO" "fenv_t" "__mxcsr" "ac_cv_member_fenv_t___mxcsr" "#include <fenv.h>
+"
+if test "x$ac_cv_member_fenv_t___mxcsr" = xyes; then :
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_FENV_T___MXCSR 1
+_ACEOF
+
+
+fi
 
 #  ----------------------------------------------------------------------
 #  Enable NEARPT3 support

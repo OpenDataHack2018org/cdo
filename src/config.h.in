@@ -34,6 +34,12 @@
 /* Define to 1 if you have the `feenableexcept' function. */
 #undef HAVE_FEENABLEEXCEPT
 
+/* Define to 1 if `__control' is a member of `fenv_t'. */
+#undef HAVE_FENV_T___CONTROL
+
+/* Define to 1 if `__mxcsr' is a member of `fenv_t'. */
+#undef HAVE_FENV_T___MXCSR
+
 /* Define to 1 if you have the <fftw3.h> header file. */
 #undef HAVE_FFTW3_H
 

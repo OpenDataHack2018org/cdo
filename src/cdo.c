@@ -134,15 +134,12 @@ int cdo_feenableexcept(int excepts)
   int old_excepts = -1;  // previous masks
 
   if ( fegetenv(&fenv) ) return -1;
-#if defined(__i386__) || defined(__x86_64__)
-  if ( ISME )
-    {
-      old_excepts = (int) (fenv.__control & FE_ALL_EXCEPT);
+#if defined(HAVE_FENV_T___CONTROL) && defined(HAVE_FENV_T___MXCSR)
+  old_excepts = (int) (fenv.__control & FE_ALL_EXCEPT);
 
-      // unmask
-      fenv.__control &= ~new_excepts;
-      fenv.__mxcsr   &= ~(new_excepts << 7);
-    }
+  // unmask
+  fenv.__control &= ~new_excepts;
+  fenv.__mxcsr   &= ~(new_excepts << 7);
 #endif
 
   return ( fesetenv(&fenv) ? -1 : (int)old_excepts );
