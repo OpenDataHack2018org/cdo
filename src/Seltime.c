@@ -22,9 +22,9 @@
       Seltime    seltime         Select times
       Seltime    selhour         Select hours
       Seltime    selday          Select days
-      Seltime    selmon          Select months
+      Seltime    selmonth        Select months
       Seltime    selyear         Select years
-      Seltime    selseas         Select seasons
+      Seltime    selseason       Select seasons
       Seltime    seldate         Select dates
       Seltime    selsmon         Select single month
 */
@@ -203,9 +203,9 @@ void *Seltime(void *argument)
   int SELTIME     = cdoOperatorAdd("seltime",     func_time,     0, "times (format hh:mm:ss)");
   int SELHOUR     = cdoOperatorAdd("selhour",     func_time,     0, "hours");
   int SELDAY      = cdoOperatorAdd("selday",      func_date,     0, "days");
-  int SELMON      = cdoOperatorAdd("selmon",      func_date,     0, "months");
+  int SELMONTH    = cdoOperatorAdd("selmonth",    func_date,     0, "months");
   int SELYEAR     = cdoOperatorAdd("selyear",     func_date,     0, "years");
-  int SELSEAS     = cdoOperatorAdd("selseas",     func_date,     0, "seasons");
+  int SELSEASON   = cdoOperatorAdd("selseason",   func_date,     0, "seasons");
   int SELSMON     = cdoOperatorAdd("selsmon",     func_date,     0, "month[,nts1[,nts2]]");
 
   int operatorID = cdoOperatorID();
@@ -217,7 +217,7 @@ void *Seltime(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == SELSEAS )
+  if ( operatorID == SELSEASON )
     {
       nsel = seaslist(ilist);
     }
@@ -635,7 +635,7 @@ void *Seltime(void *argument)
 	    {
 	      cdoWarning("Day %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELMON )
+	  else if ( operatorID == SELMONTH )
 	    {
 	      cdoWarning("Month %d not found!", intarr[isel]);
 	    }
@@ -643,7 +643,7 @@ void *Seltime(void *argument)
 	    {
 	      cdoWarning("Year %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELSEAS )
+	  else if ( operatorID == SELSEASON )
 	    {
 	      if ( isel < 3 )
 		cdoWarning("Month %d not found!", intarr[isel]);

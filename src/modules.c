@@ -402,7 +402,7 @@ void *Maggraph(void *argument);
                                  "selzaxis", "selzaxisname", "seltabnum", "delparam", "delcode", "delname", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelrecOperators        {"selrec"}
-#define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
+#define  SeltimeOperators       {"seltimestep", "selyear", "selseason", "selmonth", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
 #define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
@@ -869,6 +869,8 @@ static const char *opalias[][2] =
   {"gridverify",          "verifygrid"},
   {"outputcenter",        "gmtxyz"},
   {"outputbounds",        "gmtcells"},
+  {"selseas",             "selseason"},
+  {"selmon",              "selmonth"},
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));
