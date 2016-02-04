@@ -171,6 +171,7 @@ case "${HOSTNAME}" in
                  --with-hdf5=/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48 \
                  --with-szlib=/sw/rhel6-x64/sys/szip-2.1-gcc48 \
                  --with-udunits2=/sw/rhel6-x64/util/udunits-2.2.17-gcc48 \
+                 --with-cmor=/sw/rhel6-x64/cmor-2.9.2-gcc48 \
                  --with-proj=/sw/rhel6-x64/graphics/proj4-4.9.1-gcc48"
 
         if  test "$COMP" = icc ; then
