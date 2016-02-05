@@ -8,15 +8,15 @@
 #if defined(HAVE_LIBCMOR)
 #include "cmor.h"
 
-typedef struct _cc_var_t
+struct cc_var
 {
   int cdi_varID;
   int cmor_varID;
   char datatype;
   void *data;
-} cc_var_t;
+};
 
-static cc_var_t *find_var(const int cdi_varID, cc_var_t vars[], int nvars)
+static struct cc_var *find_var(int cdi_varID, struct cc_var vars[], int nvars)
 {
   for ( int i = 0; i < nvars; i++ )
     if ( cdi_varID == vars[i].cdi_varID )
@@ -40,7 +40,7 @@ static char *trim(char *s)
 
 static ENTRY *hinsert(char *key, char *value)
 {
-  /* Insert new keys. Do not overwrite existing keys. */
+  /* Insert new keys. Do not overwrite values of existing keys. */
   ENTRY e, *ep;
 
   e.key = key;
@@ -67,7 +67,7 @@ static ENTRY *parse_kv(char *kvstr)
 static int parse_kv_file(const char *filename)
 {
   FILE *fp;
-  char line[1024], *comment;
+  char line[CMOR_MAX_STRING], *comment;
 
   fp = fopen(filename, "r");
   if ( fp == NULL )
@@ -149,7 +149,6 @@ static void dump_global_attributes(int vlistID)
   char buffer[8];
   char *value;
   int type, len;
-  double att_double;
 
   vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
   for ( i = 0; i < natts; i++ )
@@ -287,12 +286,12 @@ static void setup(int streamID, char *table)
   cmor_set_table(table_id);
 }
 
-static void define_variables(int streamID, cc_var_t vars[], int *nvars)
+static void define_variables(int streamID, struct cc_var vars[], int *nvars)
 {
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
   size_t gridsize = vlistGridsizeMax(vlistID);
-  cc_var_t *var;
+  struct cc_var *var;
   int varID, gridID;
   char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
   int length;
@@ -428,9 +427,9 @@ static void define_variables(int streamID, cc_var_t vars[], int *nvars)
     }
 }
 
-static void write_variables(int streamID, cc_var_t vars[], int nvars)
+static void write_variables(int streamID, struct cc_var vars[], int nvars)
 {
-  cc_var_t *var;
+  struct cc_var *var;
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
   size_t gridsize = vlistGridsizeMax(vlistID);
@@ -524,7 +523,7 @@ void *CMOR(void *argument)
   int nvars, nvars_max;
   int streamID;
   int vlistID;
-  cc_var_t *vars;
+  struct cc_var *vars;
 
   if ( nparams < 1 )
     cdoAbort("Too few arguments!");
@@ -537,7 +536,7 @@ void *CMOR(void *argument)
   vlistID = streamInqVlist(streamID);
   dump_global_attributes(vlistID);
   nvars_max = vlistNvars(vlistID);
-  vars = (cc_var_t *) Malloc(nvars_max * sizeof(cc_var_t));;
+  vars = (struct cc_var *) Malloc(nvars_max * sizeof(struct cc_var));
 
   setup(streamID, params[0]);
   define_variables(streamID, vars, &nvars);
