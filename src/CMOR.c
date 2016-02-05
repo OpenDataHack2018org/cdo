@@ -38,26 +38,33 @@ static char *trim(char *s)
   return s;
 }
 
-static ENTRY *hinsert(char *kvstr)
+static ENTRY *hinsert(char *key, char *value)
 {
-  char *key, *value;
+  /* Insert new keys. Do not overwrite existing keys. */
   ENTRY e, *ep;
 
-  key = trim(strtok(kvstr, "="));
-  value = trim(strtok(NULL, "="));
-  if ( key == NULL || value == NULL )
-    return NULL;
-  e.key = strdup(key);
-  e.data = (void *)strdup(value);
+  e.key = key;
+  e.data = (void *)value;
   ep = hsearch(e, FIND);
-  if ( ep )
-    ep->data = e.data;
-  else
-    ep = hsearch(e, ENTER);
+  if ( ep == NULL )
+    {
+      e.key = strdup(key);
+      e.data = (void *)strdup(value);
+      ep = hsearch(e, ENTER);
+    }
   return ep;
 }
 
-static int parse_kvfile(const char *filename)
+static ENTRY *parse_kv(char *kvstr)
+{
+  char *key = trim(strtok(kvstr, "="));
+  char *value = trim(strtok(NULL, "="));
+  if ( key == NULL || value == NULL )
+    return NULL;
+  return hinsert(key, value);
+}
+
+static int parse_kv_file(const char *filename)
 {
   FILE *fp;
   char line[1024], *comment;
@@ -70,10 +77,41 @@ static int parse_kvfile(const char *filename)
       comment = strchr(line, '#');
       if ( comment )
         *comment = '\0';
-      hinsert(line);
+      parse_kv(line);
     }
   fclose(fp);
   return 0;
+}
+
+static void parse_kv_cmdline(int nparams, char **params)
+{
+  int i, j, k, size;
+  char *p;
+
+  /* Assume key = value pairs. That is, if params[i] contains no '='
+   * then treat it as if it belongs to the value of params[i-1],
+   * separated by a ','.*/
+  i = 0;
+  while ( i < nparams )
+    {
+      j = 1;
+      size = strlen(params[i]) + 1;
+      while ( i + j < nparams && strchr(params[i + j], '=') == NULL )
+        {
+          size += strlen(params[i + j]) + 1;
+          j++;
+        }
+      p = (char *) Malloc(size);
+      strcpy(p, params[i]);
+      for (k = 1; k < j; k++)
+        {
+          strcat(p, ",");
+          strcat(p, params[i + k]);
+        }
+      parse_kv(p);
+      free(p);
+      i += j;
+    }
 }
 
 static char *get_val(char *key, char *def)
@@ -104,34 +142,43 @@ static char *substitute(char *word)
     return word;
 }
 
-static void parse_cmdline_kv(int nparams, char **params)
+static void dump_global_attributes(int vlistID)
 {
-  int i, j, k, size;
-  char *p;
+  int i, natts;
+  char name[CDI_MAX_NAME];
+  char buffer[8];
+  char *value;
+  int type, len;
+  double att_double;
 
-  /* Assume key = value pairs. That is, if params[i] contains no '='
-   * then treat it as if it belongs to the value of params[i-1],
-   * separated by a ','.*/
-  i = 0;
-  while ( i < nparams )
+  vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+  for ( i = 0; i < natts; i++ )
     {
-      j = 1;
-      size = strlen(params[i]) + 1;
-      while ( i + j < nparams && strchr(params[i + j], '=') == NULL )
+      value = NULL;
+      vlistInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
+      switch ( type )
         {
-          size += strlen(params[i + j]) + 1;
-          j++;
+        case DATATYPE_TXT:
+          value = Malloc(len + 1);
+          vlistInqAttTxt(vlistID, CDI_GLOBAL, name, len, value);
+          value[len] = '\0';
+          break;
+        case DATATYPE_INT32:
+          value = Malloc(CDI_MAX_NAME);
+          vlistInqAttInt(vlistID, CDI_GLOBAL, name, len, (int *)buffer);
+          snprintf(value, CDI_MAX_NAME, "%i", *(int *)buffer);
+          break;
+        case DATATYPE_FLT64:
+          value = Malloc(CDI_MAX_NAME);
+          vlistInqAttFlt(vlistID, CDI_GLOBAL, name, len, (double *)buffer);
+          snprintf(value, CDI_MAX_NAME, "%e", *(double *)buffer);
+          break;
+        default:
+          printf("Unsupported type %i name %s\n", type, name);
         }
-      p = (char *) Malloc(size);
-      strcpy(p, params[i]);
-      for (k = 1; k < j; k++)
-        {
-          strcat(p, ",");
-          strcat(p, params[i + k]);
-        }
-      hinsert(p);
-      free(p);
-      i += j;
+      hinsert(name, value);
+      if ( value )
+        Free(value);
     }
 }
 
@@ -215,9 +262,9 @@ static void setup(int streamID, char *table)
     }
 
   cmor_dataset(get_val("outpath", "./"),
-               get_val("expinfo", ""),
+               get_val("experiment_id", ""),
                get_val("institution", ""),
-               get_val("modinfo", ""),
+               get_val("source", ""),
                calendar,
                atoi(get_val("realization", "1")),
                get_val("contact", ""),
@@ -476,17 +523,20 @@ void *CMOR(void *argument)
   char **params = operatorArgv();
   int nvars, nvars_max;
   int streamID;
+  int vlistID;
   cc_var_t *vars;
 
   if ( nparams < 1 )
     cdoAbort("Too few arguments!");
 
   hcreate(100);
-  parse_kvfile("cmor.rc");
-  parse_cmdline_kv(nparams - 1, &params[1]);
+  parse_kv_cmdline(nparams - 1, &params[1]);
+  parse_kv_file("cmor.rc");
 
   streamID = streamOpenRead(cdoStreamName(0));
-  nvars_max = vlistNvars(streamInqVlist(streamID));
+  vlistID = streamInqVlist(streamID);
+  dump_global_attributes(vlistID);
+  nvars_max = vlistNvars(vlistID);
   vars = (cc_var_t *) Malloc(nvars_max * sizeof(cc_var_t));;
 
   setup(streamID, params[0]);
