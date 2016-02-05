@@ -75,7 +75,7 @@ INTEGER Comma separated list of days.
 @Item = month
 INTEGER Comma separated list of months.
 @Item = season
-STRING  Comma separated list of seasons (substring of DJFMAMJJASOND).
+STRING  Comma separated list of seasons (substring of DJFMAMJJASOND or ANN).
 @Item = year
 INTEGER Comma separated list of years.
 @Item = timestep

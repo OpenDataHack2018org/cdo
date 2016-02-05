@@ -118,7 +118,7 @@ INTEGER  Comma separated list of months.
 @Item = years
 INTEGER  Comma separated list of years.
 @Item = seasons
-STRING   Comma separated list of seasons (substring of DJFMAMJJASOND).
+STRING   Comma separated list of seasons (substring of DJFMAMJJASOND or ANN).
 @Item = date1
 STRING   Start date (format YYYY-MM-DDThh:mm:ss).
 @Item = date2
