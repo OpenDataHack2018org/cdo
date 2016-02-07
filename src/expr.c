@@ -1167,7 +1167,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           {
             if ( strcmp(cname, "remove") == 0 )
               {
-                if ( varID < parse_arg->nvars1 ) params[varID].remove = true;
+                params[varID].remove = true;
               }
           }
         

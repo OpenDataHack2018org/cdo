@@ -251,28 +251,26 @@ void *Expr(void *argument)
   if ( ! REPLACES_VARIABLES(operatorID) )
     {
       vlistClearFlag(vlistID1);
+      int pidx = 0;
       for ( int varID = 0; varID < nvars1; varID++ )
         {
+          params[varID].select = false;
           if ( params[varID].remove == false )
             {
+              varIDmap[pidx++] = varID;
               int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
               for ( int levID = 0; levID < nlevs; levID++ )
                 vlistDefFlag(vlistID1, varID, levID, TRUE);
             }
         }
       vlistCopyFlag(vlistID2, vlistID1);
-      
-      for ( int pidx = 0; pidx < nvars1; pidx++ )
-        {
-          varIDmap[pidx] = pidx;
-          params[pidx].select = false;
-        }
     }
 
   for ( int pidx = 0; pidx < parse_arg.nparams; pidx++ )
     {
       if ( pidx <  nvars1 && params[pidx].select == false ) continue;
       if ( pidx >= nvars1 && params[pidx].name[0] == '_' ) continue;
+      if ( pidx >= nvars1 && params[pidx].remove == true ) continue;
       if ( pidx >= nvars1 && params[pidx].coord ) continue;
 
       int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
