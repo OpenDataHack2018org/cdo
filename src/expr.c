@@ -37,7 +37,7 @@ static const char *tmpvnm = "_tmp_";
 int pointID = -1;
 int surfaceID = -1;
 
-enum {FT_STD, FT_CONST, FT_FLD, FT_VERT};
+enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_GRID};
 
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
@@ -117,7 +117,7 @@ static func_t fun_sym_tbl[] =
   {FT_FLD, 1, "fldvar",  (void (*)()) fldvar},
   {FT_FLD, 1, "fldvar1", (void (*)()) fldvar1},
 
-  // cdo field functions (Reduce grid to point)
+  // cdo field functions (Reduce level to point)
   {FT_VERT, 0, "vertmin",  (void (*)()) fldmin},
   {FT_VERT, 0, "vertmax",  (void (*)()) fldmax},
   {FT_VERT, 0, "vertsum",  (void (*)()) fldsum},
@@ -127,6 +127,8 @@ static func_t fun_sym_tbl[] =
   {FT_VERT, 1, "vertstd1", (void (*)()) fldstd1},
   {FT_VERT, 1, "vertvar",  (void (*)()) fldvar},
   {FT_VERT, 1, "vertvar1", (void (*)()) fldvar1},
+  
+  //  {FT_GRID, 1, "x", (void (*)()) xcoord},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -671,6 +673,8 @@ void ex_copy(int init, nodeType *p2, nodeType *p1)
 static
 nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
 {
+  if ( p1 == NULL || p2 == NULL ) return  NULL;
+  
   const char *coper = "???";
 
   if ( cdoVerbose )
@@ -1150,6 +1154,25 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
   switch ( p->type )
     {
+    case typeCom:
+      {
+        const char *cname = p->u.com.cname;
+        const char *vname = p->u.com.vname;
+        if ( parse_arg->debug ) cdoPrint("\tstatement\t\t%s(%s)", cname, vname);
+
+        varID = param_search_name(parse_arg->nparams, params, vname);
+        if ( varID == -1 ) cdoAbort("Variable %s not found, needed for statement %s(%s)!", vname, cname, vname);
+
+        if ( init )
+          {
+            if ( strcmp(cname, "remove") == 0 )
+              {
+                if ( varID < parse_arg->nvars1 ) params[varID].remove = true;
+              }
+          }
+        
+        break;
+      }
     case typeCon:
       {
         if ( parse_arg->debug ) cdoPrint("\tpush\tconst\t%g", p->u.con.value);

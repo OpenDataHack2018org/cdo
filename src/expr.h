@@ -28,7 +28,13 @@ int fileno(FILE *stream);
 #endif
 
 
-typedef enum { typeCon, typeVar, typeFun, typeOpr } nodeEnum;
+typedef enum { typeCon, typeVar, typeFun, typeOpr, typeCom } nodeEnum;
+
+// commands
+typedef struct {
+  char *cname;                // command name
+  char *vname;                // variable name
+} comNodeType;
 
 // constants
 typedef struct {
@@ -56,6 +62,7 @@ typedef struct {
 // parameter
 typedef struct {
   bool    select;
+  bool    remove;
   int     coord;
   int     gridID;
   int     zaxisID;
@@ -80,6 +87,7 @@ typedef struct nodeTypeTag {
   // union must be last entry in nodeType
   // because operNodeType may dynamically increase
   union {
+    comNodeType com;          // commands
     conNodeType con;          // constants
     varNodeType var;          // variables
     funNodeType fun;          // functions

@@ -48,32 +48,34 @@ extern int yydebug;
     CONSTANT = 258,
     VARIABLE = 259,
     FUNCTION = 260,
-    AND = 261,
-    OR = 262,
-    LEG = 263,
-    GE = 264,
-    LE = 265,
-    EQ = 266,
-    NE = 267,
-    GT = 268,
-    LT = 269,
-    UMINUS = 270
+    REMOVE = 261,
+    AND = 262,
+    OR = 263,
+    LEG = 264,
+    GE = 265,
+    LE = 266,
+    EQ = 267,
+    NE = 268,
+    GT = 269,
+    LT = 270,
+    UMINUS = 271
   };
 #endif
 /* Tokens.  */
 #define CONSTANT 258
 #define VARIABLE 259
 #define FUNCTION 260
-#define AND 261
-#define OR 262
-#define LEG 263
-#define GE 264
-#define LE 265
-#define EQ 266
-#define NE 267
-#define GT 268
-#define LT 269
-#define UMINUS 270
+#define REMOVE 261
+#define AND 262
+#define OR 263
+#define LEG 264
+#define GE 265
+#define LE 266
+#define EQ 267
+#define NE 268
+#define GT 269
+#define LT 270
+#define UMINUS 271
 
 /* Value type.  */
 

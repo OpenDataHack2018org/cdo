@@ -56,6 +56,7 @@ M_E          {
                 return CONSTANT;
              } /* end constant */
 
+"remove("    { return REMOVE; }
 
 {LPH}{LPHDGT}*/[ ]*\( {
                 yylval->fname = strdup(yytext);

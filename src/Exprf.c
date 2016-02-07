@@ -89,6 +89,7 @@ char *exprs_from_file(const char *exprf)
 
 #define MAX_PARAMS 4096
 
+
 static
 paramType *params_new(int vlistID1)
 {
@@ -114,6 +115,7 @@ paramType *params_new(int vlistID1)
       vlistInqVarUnits(vlistID1, varID, units);
       
       params[varID].select   = false;
+      params[varID].remove   = false;
       params[varID].coord    = 0;
       params[varID].gridID   = gridID;
       params[varID].zaxisID  = zaxisID;
@@ -245,14 +247,21 @@ void *Expr(void *argument)
 
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
 
-  int vlistID2 = -1;
-  if ( REPLACES_VARIABLES(operatorID) )
+  int vlistID2 = vlistCreate();
+  if ( ! REPLACES_VARIABLES(operatorID) )
     {
-      vlistID2 = vlistCreate();
-    }
-  else
-    {
-      vlistID2 = vlistDuplicate(vlistID1);
+      vlistClearFlag(vlistID1);
+      for ( int varID = 0; varID < nvars1; varID++ )
+        {
+          if ( params[varID].remove == false )
+            {
+              int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+              for ( int levID = 0; levID < nlevs; levID++ )
+                vlistDefFlag(vlistID1, varID, levID, TRUE);
+            }
+        }
+      vlistCopyFlag(vlistID2, vlistID1);
+      
       for ( int pidx = 0; pidx < nvars1; pidx++ )
         {
           varIDmap[pidx] = pidx;
@@ -262,9 +271,10 @@ void *Expr(void *argument)
 
   for ( int pidx = 0; pidx < parse_arg.nparams; pidx++ )
     {
-      if ( pidx < nvars1 && params[pidx].select == false ) continue;
-      if ( pidx >= nvars1 && *params[pidx].name == '_' ) continue;
+      if ( pidx <  nvars1 && params[pidx].select == false ) continue;
+      if ( pidx >= nvars1 && params[pidx].name[0] == '_' ) continue;
       if ( pidx >= nvars1 && params[pidx].coord ) continue;
+
       int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
       vlistDefVarName(vlistID2, varID, params[pidx].name);
       vlistDefVarMissval(vlistID2, varID, params[pidx].missval);

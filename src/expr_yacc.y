@@ -21,6 +21,7 @@ nodeType *expr_opr(int oper, int nops, ...);
 nodeType *expr_var(char *nm);
 nodeType *expr_con(double value);
 nodeType *expr_fun(char *fname, nodeType *p);
+nodeType *expr_com(const char *cname, char *vname);
 
 void freeNode(nodeType *p);
 int expr_run(nodeType *p, parse_param_t *parse_arg);
@@ -38,6 +39,7 @@ int expr_run(nodeType *p, parse_param_t *parse_arg);
 %token <cvalue> CONSTANT
 %token <varnm>  VARIABLE
 %token <fname>  FUNCTION
+%token REMOVE
 
 %left AND OR
 %left LEG GE LE EQ NE GT LT
@@ -65,6 +67,7 @@ stmt:
         | expr ';'                { $$ = $1; }
         | VARIABLE '=' expr ';'   { $$ = expr_opr('=', 2, expr_var($1), $3); }
         | VARIABLE ';'            { $$ = expr_opr('=', 2, expr_var($1), expr_var($1)); } /* conflicts: 1 shift/reduce */
+        | REMOVE VARIABLE ')' ';' { $$ = expr_com("remove", $2); }
         | '{' stmt_list '}'       { $$ = $2; }
         ;
 
@@ -142,6 +145,22 @@ nodeType *expr_fun(char *fname, nodeType *op)
   p->type = typeFun;
   p->u.fun.name = strdup(fname);
   p->u.fun.op   = op;
+
+  return p;
+}
+
+nodeType *expr_com(const char *cname, char *vname)
+{
+  nodeType *p = NULL;
+  /* allocate node */
+  size_t nodeSize = SIZEOF_NODETYPE + sizeof(comNodeType);
+  if ( (p = (nodeType*) Calloc(1, nodeSize)) == NULL )
+    yyerror(NULL, NULL, "Out of memory");
+
+  /* copy information */
+  p->type = typeCom;
+  p->u.com.cname = strdup(cname);
+  p->u.com.vname = strdup(vname);
 
   return p;
 }
