@@ -37,7 +37,7 @@ static const char *tmpvnm = "_tmp_";
 int pointID = -1;
 int surfaceID = -1;
 
-enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_GRID};
+enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD};
 
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
@@ -128,7 +128,10 @@ static func_t fun_sym_tbl[] =
   {FT_VERT, 1, "vertvar",  (void (*)()) fldvar},
   {FT_VERT, 1, "vertvar1", (void (*)()) fldvar1},
   
-  //  {FT_GRID, 1, "x", (void (*)()) xcoord},
+  {FT_COORD, 0, "clon",     NULL},
+  {FT_COORD, 0, "clat",     NULL},
+  {FT_COORD, 0, "clev",     NULL},
+  {FT_COORD, 0, "gridarea", NULL},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -747,12 +750,15 @@ nodeType *ex_fun_con(int funcID, nodeType *p1)
   double (*exprfunc)(double) = (double (*)(double)) fun_sym_tbl[funcID].func;
   p->u.con.value = exprfunc(p1->u.con.value);
 
+  if ( p1->ltmpobj ) node_delete(p1);
+
   return p;
 }
 
 static
 nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
 {
+  //const char *funcname = fun_sym_tbl[funcID].name;
   int functype = fun_sym_tbl[funcID].type;
   int funcflag = fun_sym_tbl[funcID].flag;
 
@@ -845,6 +851,10 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
             }
           if ( array ) Free(array);
           if ( weights ) Free(weights);
+        }
+      else if ( functype == FT_COORD )
+        {
+          for ( size_t i = 0; i < ngp*nlev; i++ ) pdata[i] = p1data[i];
         }
 
       nmiss = 0;
@@ -1294,8 +1304,36 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
     case typeFun:
       {
         int funcID = get_funcID(p->u.fun.name);
+        int functype = fun_sym_tbl[funcID].type;
 
-        rnode = ex_fun(init, funcID, expr_run(p->u.fun.op, parse_arg));
+        nodeType *fnode = expr_run(p->u.fun.op, parse_arg);
+
+        if ( functype == FT_COORD )
+          {
+            const char *funcname = fun_sym_tbl[funcID].name;            
+            if ( fnode->type != typeVar ) cdoAbort("Parameter of function %s needs to be a variable!", funcname);
+            
+            size_t len = 3 + strlen(fnode->u.var.nm);
+            char *cname = (char*) Calloc(len, 1);
+            strcpy(cname, fnode->u.var.nm);
+            
+            if      ( strcmp(funcname, "clon") == 0 ) strcat(cname, ".x");
+            else if ( strcmp(funcname, "clat") == 0 ) strcat(cname, ".y");
+            else if ( strcmp(funcname, "clev") == 0 ) strcat(cname, ".z");
+            else if ( strcmp(funcname, "gridarea") == 0 ) strcat(cname, ".a");
+            else cdoAbort("Implementation missing for function %s!", funcname);
+            
+            Free(fnode->u.var.nm);
+            fnode->u.var.nm = cname;
+            
+            nodeType *tmpnode = fnode;
+            fnode = expr_run(tmpnode, parse_arg);
+            if ( tmpnode->ltmpobj ) node_delete(tmpnode);
+          }
+
+        rnode = ex_fun(init, funcID, fnode);
+        // if ( fnode->ltmpobj ) node_delete(fnode);
+        // Free(fnode);
         
         break;
       }
