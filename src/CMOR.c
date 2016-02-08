@@ -27,8 +27,7 @@ static struct cc_var *find_var(int cdi_varID, struct cc_var vars[], int nvars)
 static char *trim(char *s)
 {
   int n;
-  if (s == NULL)
-    return s;
+  if (s == NULL) return s;
   while ( *s != '\0' && (isspace(*s) || *s == '"') )
     s++;
   n = strlen(s);
@@ -38,19 +37,43 @@ static char *trim(char *s)
   return s;
 }
 
-static ENTRY *hinsert(char *key, char *value)
+static ENTRY *hinsert(const char *key, const char *value)
 {
   /* Insert new keys. Do not overwrite values of existing keys. */
   ENTRY e, *ep;
 
-  e.key = key;
-  e.data = (void *)value;
+  e.key = strdup(key);
+  e.data = (void *)strdup(value);
   ep = hsearch(e, FIND);
   if ( ep == NULL )
     {
-      e.key = strdup(key);
-      e.data = (void *)strdup(value);
       ep = hsearch(e, ENTER);
+    }
+  else
+    {
+      free(e.key);
+      free(e.data);
+    }
+  return ep;
+}
+
+static ENTRY *hreplace(const char *key, const char *value)
+{
+  /* Overwrites values of existing keys. */
+  ENTRY e, *ep;
+
+  e.key = strdup(key);
+  e.data = (void *)strdup(value);
+  ep = hsearch(e, FIND);
+  if ( ep == NULL )
+    {
+      ep = hsearch(e, ENTER);
+    }
+  else
+    {
+      free(e.key);
+      free(ep->data);
+      ep->data = e.data;
     }
   return ep;
 }
@@ -75,8 +98,7 @@ static int parse_kv_file(const char *filename)
   while ( fgets(line, sizeof(line), fp) != NULL )
     {
       comment = strchr(line, '#');
-      if ( comment )
-        *comment = '\0';
+      if ( comment ) *comment = '\0';
       parse_kv(line);
     }
   fclose(fp);
@@ -131,7 +153,7 @@ static char *substitute(char *word)
   ENTRY e, *ep;
   char *key;
 
-  key = (char *) Malloc (strlen(word) + 12);
+  key = (char *) Malloc(strlen(word) + 12);
   sprintf(key, "substitute_%s", word);
   e.key = key;
   ep = hsearch(e, FIND);
@@ -142,13 +164,14 @@ static char *substitute(char *word)
     return word;
 }
 
-static void dump_global_attributes(int vlistID)
+static void dump_global_attributes(int streamID)
 {
   int i, natts;
   char name[CDI_MAX_NAME];
   char buffer[8];
   char *value;
   int type, len;
+  int vlistID = streamInqVlist(streamID);
 
   vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
   for ( i = 0; i < natts; i++ )
@@ -176,9 +199,42 @@ static void dump_global_attributes(int vlistID)
           printf("Unsupported type %i name %s\n", type, name);
         }
       hinsert(name, value);
-      if ( value )
-        Free(value);
+      if ( value ) Free(value);
     }
+}
+
+static void dump_special_attributes(int streamID)
+{
+  int fileID;
+  size_t historysize;
+  char *history, *new_history;
+  const char *value;
+  int vlistID = streamInqVlist(streamID);
+
+  /* Any new history will be appended to the existing history. */
+  fileID = pstreamFileID(streamID);
+  historysize = (size_t) streamInqHistorySize(fileID);
+  if ( historysize )
+    {
+      new_history = get_val("history", NULL);
+      if ( new_history ) historysize += strlen(new_history) + 1;
+      history = Malloc(historysize + 1);
+      memset(history, 0, historysize + 1);
+      streamInqHistoryString(fileID, history);
+      if ( new_history )
+        {
+          strcat(history, " ");
+          strcat(history, new_history);
+        }
+      hreplace("history", history);
+      Free(history);
+    }
+
+  value = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, 0));
+  if ( value ) hinsert("institution", value);
+
+  value = modelInqNamePtr(vlistInqVarModel(vlistID, 0));
+  if ( value ) hinsert("source", value);
 }
 
 static void setup(int streamID, char *table)
@@ -246,7 +302,7 @@ static void setup(int streamID, char *table)
       char *month_lengths_str = strdup(get_val("month_lengths", ""));
       char *month_str = strtok(month_lengths_str, ",");
       int month = 0;
-      month_lengths = Malloc (12 * sizeof(int));
+      month_lengths = Malloc(12 * sizeof(int));
       while ( month < 12 && month_str != NULL )
         {
           month_lengths[month++] = atoi(month_str);
@@ -522,20 +578,18 @@ void *CMOR(void *argument)
   char **params = operatorArgv();
   int nvars, nvars_max;
   int streamID;
-  int vlistID;
   struct cc_var *vars;
 
-  if ( nparams < 1 )
-    cdoAbort("Too few arguments!");
+  if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
   hcreate(100);
   parse_kv_cmdline(nparams - 1, &params[1]);
   parse_kv_file("cmor.rc");
 
   streamID = streamOpenRead(cdoStreamName(0));
-  vlistID = streamInqVlist(streamID);
-  dump_global_attributes(vlistID);
-  nvars_max = vlistNvars(vlistID);
+  dump_global_attributes(streamID);
+  dump_special_attributes(streamID);
+  nvars_max = vlistNvars(streamInqVlist(streamID));
   vars = (struct cc_var *) Malloc(nvars_max * sizeof(struct cc_var));
 
   setup(streamID, params[0]);
@@ -547,8 +601,8 @@ void *CMOR(void *argument)
 
   hdestroy();
   for ( int i = 0; i < nvars; i++ )
-    Free (vars[i].data);
-  Free (vars);
+    Free(vars[i].data);
+  Free(vars);
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
