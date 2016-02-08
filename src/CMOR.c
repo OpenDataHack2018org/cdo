@@ -455,18 +455,10 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
           /* Variable */
           vlistInqVarUnits(vlistID, varID, units);
           vlistInqVarName(vlistID, varID, name);
-          if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
-            {
-              var->datatype = 'f';
-              *(float *) missing_value = vlistInqVarMissval(vlistID, varID);
-              var->data = Malloc(gridsize * levels * sizeof(float));
-            }
-          else
-            {
-              var->datatype = 'd';
-              *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
-              var->data = Malloc(gridsize * levels * sizeof(double));
-            }
+          var->datatype = 'd';
+          *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
+          var->data = Malloc(gridsize * levels * sizeof(double));
+
           cmor_variable(&var->cmor_varID,
                         substitute(name),
                         units,
@@ -546,14 +538,9 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
         {
           streamInqRecord(streamID, &varID, &levelID);
           var = find_var(varID, vars, nvars);
-          if ( var->datatype == 'f' )
-            streamReadRecordF(streamID,
-                              (float *)var->data + gridsize * levelID,
-                              &nmiss);
-          else
-            streamReadRecord(streamID,
-                             (double *)var->data + gridsize * levelID,
-                             &nmiss);
+          streamReadRecord(streamID,
+                           (double *)var->data + gridsize * levelID,
+                           &nmiss);
         }
 
       for ( int i = 0; i < nvars; i++ )
