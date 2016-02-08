@@ -81,20 +81,46 @@ void printAtts(FILE *fp, int vlistID, int varID)
 }
 
 static
-void partab(FILE *fp, int vlistID, int option)
+void printHistory(FILE *fp, int streamID)
 {
+  int fileID = pstreamFileID(streamID);
+  size_t historysize = (size_t) streamInqHistorySize(fileID);
+  if ( historysize > 0 )
+    {
+      char *history = (char*) Malloc(historysize+1);
+      history[historysize] = 0;
+      streamInqHistoryString(fileID, history);
+      fprintf(fp, "  history=%s\n", history);
+    }
+}
+
+static
+void printSource(FILE *fp, int vlistID, int varID)
+{
+  /* institute info */
+  const char *instptr = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, varID));
+  if ( instptr ) fprintf(fp, "  institution=%s\n", instptr);
+
+  /* source info */
+  const char *modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
+  if ( modelptr ) fprintf(fp, "  source=%s\n", modelptr);
+}
+
+static
+void partab(FILE *fp, int streamID, int option)
+{
+  int vlistID = streamInqVlist(streamID);
   int varID, datatype = -1;
   int param;
   char pstr[32];
   char paramstr[32];
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
   int natts;
-  int nvars;
   int chunktype;
   int linebreak = 1;
   double missval;
       
-  nvars  = vlistNvars(vlistID);
+  int nvars = vlistNvars(vlistID);
   if ( option == 4 ) linebreak = 0;
 
   if ( option == 2 )
@@ -104,6 +130,8 @@ void partab(FILE *fp, int vlistID, int option)
 	{
 	  fprintf(fp, "&parameter\n");
 	  fprintf(fp, "  name=_GLOBAL_\n");
+          printHistory(fp, streamID);
+          printSource(fp, vlistID, 0);
 	  printAtts(fp, vlistID, CDI_GLOBAL);
 	  fprintf(fp, "/\n");
 	}
@@ -410,11 +438,10 @@ void *Filedes(void *argument)
   else if ( operatorID == PARTAB || operatorID == SPARTAB || operatorID == PARTAB2 )
     {
       int option = 1;
-
       if ( operatorID == SPARTAB ) option = 4;
       if ( operatorID == PARTAB2 ) option = 2;
       
-      partab(stdout, vlistID, option);
+      partab(stdout, streamID, option);
     }
   else if ( operatorID == FILEDES )
     {

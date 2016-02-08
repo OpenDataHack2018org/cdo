@@ -64,6 +64,8 @@ void    pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
 void    pstreamInqGRIBinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
 
+int     pstreamFileID(int pstreamID);
+
 void    cdoVlistCopyFlag(int vlistID2, int vlistID1);
 
 #endif  /* _PSTREAM_H */
