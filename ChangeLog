@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
 
+2016-02-08  Uwe Schulzweida
+
+	* expr: added support for function clon(), clat() and clev()
+
 2016-02-04  Uwe Schulzweida
 
 	* selmon: renamed to selmonth
