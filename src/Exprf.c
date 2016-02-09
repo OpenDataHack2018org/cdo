@@ -91,28 +91,28 @@ char *exprs_from_file(const char *exprf)
 
 
 static
-paramType *params_new(int vlistID1)
+paramType *params_new(int vlistID)
 {
   paramType *params = (paramType*) Malloc(MAX_PARAMS*sizeof(paramType));
   memset(params, 0, MAX_PARAMS*sizeof(paramType));
 
-  int nvars1 = vlistNvars(vlistID1);
+  int nvars1 = vlistNvars(vlistID);
 
   char name[CDI_MAX_NAME];
   char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
   for ( int varID = 0; varID < nvars1; varID++ )
     {
-      int gridID     = vlistInqVarGrid(vlistID1, varID);
-      int zaxisID    = vlistInqVarZaxis(vlistID1, varID);
-      int steptype   = vlistInqVarTsteptype(vlistID1, varID);
+      int gridID     = vlistInqVarGrid(vlistID, varID);
+      int zaxisID    = vlistInqVarZaxis(vlistID, varID);
+      int steptype   = vlistInqVarTsteptype(vlistID, varID);
       int ngp        = gridInqSize(gridID);
       int nlev       = zaxisInqSize(zaxisID);
-      double missval = vlistInqVarMissval(vlistID1, varID);
+      double missval = vlistInqVarMissval(vlistID, varID);
 
-      vlistInqVarName(vlistID1, varID, name);
-      vlistInqVarLongname(vlistID1, varID, longname);
-      vlistInqVarUnits(vlistID1, varID, units);
+      vlistInqVarName(vlistID, varID, name);
+      vlistInqVarLongname(vlistID, varID, longname);
+      vlistInqVarUnits(vlistID, varID, units);
       
       params[varID].select   = false;
       params[varID].remove   = false;
@@ -131,6 +131,38 @@ paramType *params_new(int vlistID1)
     }
 
   return params;
+}
+
+static
+void params_add_coord(parse_param_t *parse_arg, int coord, int gridID, int size, const char *units)
+{
+  int ncoords = parse_arg->ncoords;
+  if ( ncoords >= parse_arg->maxcoords )
+    cdoAbort("Too many coordinates (limit=%d)", parse_arg->maxcoords);
+  
+  parse_arg->coords[ncoords].needed = false;
+  parse_arg->coords[ncoords].coord  = coord;
+  parse_arg->coords[ncoords].cdiID  = gridID;
+  parse_arg->coords[ncoords].size   = size;
+  parse_arg->coords[ncoords].units  = strdup(units);
+  
+  parse_arg->ncoords++;
+}
+
+static
+void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
+{
+  char units[CDI_MAX_NAME];
+  int ngrids = vlistNgrids(vlistID);
+  for ( int index = 0; index < ngrids; ++index )
+    {
+      int gridID = vlistGrid(vlistID, index);
+      int size   = gridInqSize(gridID);
+      gridInqXunits(gridID, units);
+      params_add_coord(parse_arg, 'x', gridID, size, units);
+      gridInqYunits(gridID, units);
+      params_add_coord(parse_arg, 'y', gridID, size, units);
+    }
 }
 
 static
@@ -207,6 +239,9 @@ void *Expr(void *argument)
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int vlistID1 = streamInqVlist(streamID1);
   int nvars1 = vlistNvars(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
+  int nzaxis = vlistNzaxis(vlistID1);
+  int maxcoords = ngrids*2+nzaxis;
 
   int pointID   = gridCreate(GRID_GENERIC, 1);
   int surfaceID = getSurfaceID(vlistID1);
@@ -223,12 +258,16 @@ void *Expr(void *argument)
   parse_arg.pointID    = pointID;
   parse_arg.surfaceID  = surfaceID;
   parse_arg.needed     = (bool*) Malloc(nvars1*sizeof(bool));
-
+  parse_arg.coords     = (coordType*) Malloc(maxcoords*sizeof(coordType));
+  parse_arg.maxcoords  = maxcoords;
+  parse_arg.ncoords    = 0;
+  
   /* Set all input variables to 'needed' if replacing is switched off */
   for ( int varID = 0; varID < nvars1; varID++ )
     parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
 
   int vartsID = params_add_ts(&parse_arg);
+  params_add_coordinates(vlistID1, &parse_arg);
                   
   yy_scan_string(exprs, scanner);
   yyparse(&parse_arg, scanner);
@@ -444,6 +483,13 @@ void *Expr(void *argument)
   params_delete(params);
 
   if ( parse_arg.needed ) Free(parse_arg.needed);
+  if ( parse_arg.coords )
+    {
+      for ( int i = 0; i < parse_arg.ncoords; i++ )
+        if ( parse_arg.coords[i].units ) Free(parse_arg.coords[i].units);
+ 
+      Free(parse_arg.coords);
+    }
   if ( varIDmap ) Free(varIDmap);
 
   cdoFinish();

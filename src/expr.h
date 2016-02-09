@@ -97,14 +97,26 @@ typedef struct nodeTypeTag {
 
 
 typedef struct {
+  bool       needed;
+  int        coord;
+  int        cdiID;
+  int        size;
+  char      *units;
+} coordType;
+
+
+typedef struct {
   bool       init;
   bool       debug;
   bool      *needed;
   int        maxparams;
   int        nparams;
   int        nvars1;
+  int        ncoords;
+  int        maxcoords;
   int        pointID;
   int        surfaceID;
+  coordType *coords;
   paramType *params;
 } parse_param_t;
 
