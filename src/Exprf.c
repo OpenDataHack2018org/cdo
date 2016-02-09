@@ -309,7 +309,7 @@ void *Expr(void *argument)
       params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
 
-  // cleanup needed!!!
+  char units[CDI_MAX_NAME];
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
     {
       int coord = params[varID].coord;
@@ -325,19 +325,34 @@ void *Expr(void *argument)
               if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
                 gridID = gridToCurvilinear(gridID, 0);
 
-              if      ( coord == 'x' ) gridInqXvals(gridID, params[varID].data);
-              else if ( coord == 'y' ) gridInqYvals(gridID, params[varID].data);
+              if      ( coord == 'x' )
+                {
+                  gridInqXvals(gridID, params[varID].data);
+                  gridInqXunits(gridID, units);
+                  if ( !params[varID].units ) params[varID].units = strdup(units);
+                }
+              else if ( coord == 'y' )
+                {
+                  gridInqYvals(gridID, params[varID].data);
+                  gridInqYunits(gridID, units);
+                  if ( !params[varID].units ) params[varID].units = strdup(units);
+                }
+              
               if ( gridID != params[varID].gridID ) gridDestroy(gridID);
             }
           else if ( coord == 'a' )
             {
               int gridID = params[varID].gridID;
               grid_cell_area(gridID, params[varID].data);
+              if ( !params[varID].longname ) params[varID].longname = strdup("grid cell area");
+              if ( !params[varID].units ) params[varID].units = strdup("m^2");
             }
           else if ( coord == 'z' )
             {
               int zaxisID = params[varID].zaxisID;
               zaxisInqLevels(zaxisID, params[varID].data);
+              zaxisInqUnits(zaxisID, units);
+              if ( !params[varID].units ) params[varID].units = strdup(units);
             }
           else
             cdoAbort("Computation of coordinate %c not implemented!", coord);
