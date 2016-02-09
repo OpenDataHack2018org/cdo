@@ -1001,15 +1001,26 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	  }
 	else
 	  {
+            /*
 	    if ( ! (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)) )
-	      Error("Grid has no values");
+	      Error("Grid has no coordinates");
+            */
+            if ( nx == 0 ) nx = 1;
+            if ( ny == 0 ) ny = 1;
 
-	    xvals = (double*) Malloc(nx*sizeof(double));
-	    yvals = (double*) Malloc(ny*sizeof(double));
-
-	    gridInqXvals(gridID1, xvals);
-	    gridInqYvals(gridID1, yvals);
-
+            xvals = (double*) Malloc(nx*sizeof(double));
+            yvals = (double*) Malloc(ny*sizeof(double));
+            
+            if ( gridInqXvals(gridID1, NULL) )
+              gridInqXvals(gridID1, xvals);
+            else
+              for ( int i = 0; i < nx; ++i ) xvals[i] = 0;
+            
+            if ( gridInqYvals(gridID1, NULL) )
+              gridInqYvals(gridID1, yvals);
+            else
+              for ( int i = 0; i < ny; ++i ) yvals[i] = 0;
+            
 	    if ( gridIsRotated(gridID1) )
 	      {		
 		double xpole = gridInqXpole(gridID1);
