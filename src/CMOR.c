@@ -455,10 +455,18 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
           /* Variable */
           vlistInqVarUnits(vlistID, varID, units);
           vlistInqVarName(vlistID, varID, name);
-          var->datatype = 'd';
-          *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
-          var->data = Malloc(gridsize * levels * sizeof(double));
-
+          if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
+            {
+              var->datatype = 'f';
+              *(float *) missing_value = vlistInqVarMissval(vlistID, varID);
+              var->data = Malloc(gridsize * levels * sizeof(float));
+            }
+          else
+            {
+              var->datatype = 'd';
+              *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
+              var->data = Malloc(gridsize * levels * sizeof(double));
+            }
           cmor_variable(&var->cmor_varID,
                         substitute(name),
                         units,
@@ -494,6 +502,9 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
   int nrecs;
   int varID, levelID;
   int nmiss;
+  double *buffer;
+
+  buffer = (double *) Malloc(gridsize * sizeof(double));
 
   switch ( taxisInqTunit(taxisID) )
     {
@@ -538,9 +549,18 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
         {
           streamInqRecord(streamID, &varID, &levelID);
           var = find_var(varID, vars, nvars);
-          streamReadRecord(streamID,
-                           (double *)var->data + gridsize * levelID,
-                           &nmiss);
+          if ( var->datatype == 'f' )
+            {
+              streamReadRecord(streamID, buffer, &nmiss);
+              for ( int i = 0; i < gridsize; i++ )
+                ((float *)var->data)[gridsize * levelID + i] = (float)buffer[i];
+            }
+          else
+            {
+              streamReadRecord(streamID,
+                               (double *)var->data + gridsize * levelID,
+                               &nmiss);
+            }
         }
 
       for ( int i = 0; i < nvars; i++ )
@@ -553,6 +573,7 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
                    time_bndsp,
                    NULL);
     }
+  Free(buffer);
 }
 #endif
 
