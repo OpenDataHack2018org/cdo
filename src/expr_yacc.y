@@ -24,7 +24,6 @@ nodeType *expr_fun(char *fname, nodeType *p);
 nodeType *expr_com(const char *cname, char *vname);
 
 void freeNode(nodeType *p);
-int expr_run(nodeType *p, parse_param_t *parse_arg);
 
 %}
 

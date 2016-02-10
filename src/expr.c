@@ -128,10 +128,11 @@ static func_t fun_sym_tbl[] =
   {FT_VERT, 1, "vertvar",  (void (*)()) fldvar},
   {FT_VERT, 1, "vertvar1", (void (*)()) fldvar1},
   
-  {FT_COORD, 0, "clon",     NULL},
-  {FT_COORD, 0, "clat",     NULL},
-  {FT_COORD, 0, "clev",     NULL},
-  {FT_COORD, 0, "gridarea", NULL},
+  {FT_COORD, 0, "clon",       NULL},
+  {FT_COORD, 0, "clat",       NULL},
+  {FT_COORD, 0, "clev",       NULL},
+  {FT_COORD, 0, "gridarea",   NULL},
+  {FT_COORD, 0, "gridweight", NULL},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -891,6 +892,43 @@ nodeType *ex_fun(int init, int funcID, nodeType *p1)
 }
 
 static
+nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg)
+{  
+  const char *funcname = fun_sym_tbl[funcID].name;            
+  if ( p1->type != typeVar ) cdoAbort("Parameter of function %s needs to be a variable!", funcname);
+            
+  size_t len = 3 + strlen(p1->u.var.nm);
+  char *cname = (char*) Calloc(len, 1);
+  strcpy(cname, p1->u.var.nm);
+            
+  if      ( strcmp(funcname, "clon") == 0 ) strcat(cname, ".x");
+  else if ( strcmp(funcname, "clat") == 0 ) strcat(cname, ".y");
+  else if ( strcmp(funcname, "clev") == 0 ) strcat(cname, ".z");
+  else if ( strcmp(funcname, "gridarea")   == 0 ) strcat(cname, ".a");
+  else if ( strcmp(funcname, "gridweight") == 0 ) strcat(cname, ".w");
+  else cdoAbort("Implementation missing for function %s!", funcname);
+  
+  Free(p1->u.var.nm);
+  p1->u.var.nm = cname;
+            
+  nodeType *p = expr_run(p1, parse_arg);
+  if ( p1->ltmpobj ) node_delete(p1);
+
+  if ( ! init )
+    {
+      size_t ngp  = p1->param.ngp;
+      size_t nlev = p1->param.nlev;
+      p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
+      double *restrict pdata  = p->param.data;
+      double *restrict p1data = p1->param.data;
+
+      for ( size_t i = 0; i < ngp*nlev; i++ ) pdata[i] = p1data[i];
+    }
+
+  return p;
+}
+
+static
 nodeType *ex_uminus_var(int init, nodeType *p1)
 {
   size_t ngp   = p1->param.ngp;
@@ -1201,7 +1239,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             int coord = vnm[len-1];
             if ( len > 2 && vnm[len-2] == '.' )
               {
-                if ( coord == 'x' || coord == 'y' || coord == 'a' )
+                if ( coord == 'x' || coord == 'y' || coord == 'a' || coord == 'w' )
                   {
                     char *varname = strdup(vnm);
                     varname[len-2] = 0;
@@ -1216,11 +1254,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         int nvarID = parse_arg->nparams;
                         if ( nvarID >= parse_arg->maxparams )
                           cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
-                          
-                        char units[CDI_MAX_NAME]; units[0] = 0;
-                        if      ( coord == 'x' ) gridInqXunits(params[varID].gridID, units);
-                        else if ( coord == 'y' ) gridInqYunits(params[varID].gridID, units);
-                                      
+
+                        int coordID = params_get_coordID(parse_arg, coord, params[varID].gridID);
+                        const char *units = parse_arg->coords[coordID].units;
+                        const char *longname = parse_arg->coords[coordID].longname;
+
                         params[nvarID].coord    = coord;
                         params[nvarID].name     = strdup(vnm);
                         params[nvarID].missval  = params[varID].missval;
@@ -1229,7 +1267,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         params[nvarID].steptype = TIME_CONSTANT;
                         params[nvarID].ngp      = params[varID].ngp;
                         params[nvarID].nlev     = 1;
-                        if ( units[0] ) params[nvarID].units = strdup(units);
+                        if ( units ) params[nvarID].units = strdup(units);
+                        if ( longname ) params[nvarID].longname = strdup(longname);
                         parse_arg->nparams++;
                         varID = nvarID;
                       }
@@ -1250,9 +1289,10 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         if ( nvarID >= parse_arg->maxparams )
                           cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
                           
-                        char units[CDI_MAX_NAME]; units[0] = 0;
-                        zaxisInqUnits(params[varID].zaxisID, units);
-                                      
+                        int coordID = params_get_coordID(parse_arg, coord, params[varID].zaxisID);
+                        const char *units = parse_arg->coords[coordID].units;
+                        const char *longname = parse_arg->coords[coordID].longname;
+                                     
                         params[nvarID].coord    = coord;
                         params[nvarID].name     = strdup(vnm);
                         params[nvarID].missval  = params[varID].missval;
@@ -1261,7 +1301,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         params[nvarID].steptype = TIME_CONSTANT;
                         params[nvarID].ngp      = 1;
                         params[nvarID].nlev     = params[varID].nlev;
-                        if ( units[0] ) params[nvarID].units = strdup(units);
+                        if ( units ) params[nvarID].units = strdup(units);
+                        if ( longname ) params[nvarID].longname = strdup(longname);
                         parse_arg->nparams++;
                         varID = nvarID;
                       }
@@ -1282,7 +1323,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
 
         param_meta_copy(&p->param, &params[varID]);
-        p->param.name = params[varID].name;
+        p->param.name  = params[varID].name;
+        p->param.units = params[varID].units;
         p->ltmpobj = false;
         /*
         if ( parse_arg->debug )
@@ -1310,30 +1352,14 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
         if ( functype == FT_COORD )
           {
-            const char *funcname = fun_sym_tbl[funcID].name;            
-            if ( fnode->type != typeVar ) cdoAbort("Parameter of function %s needs to be a variable!", funcname);
-            
-            size_t len = 3 + strlen(fnode->u.var.nm);
-            char *cname = (char*) Calloc(len, 1);
-            strcpy(cname, fnode->u.var.nm);
-            
-            if      ( strcmp(funcname, "clon") == 0 ) strcat(cname, ".x");
-            else if ( strcmp(funcname, "clat") == 0 ) strcat(cname, ".y");
-            else if ( strcmp(funcname, "clev") == 0 ) strcat(cname, ".z");
-            else if ( strcmp(funcname, "gridarea") == 0 ) strcat(cname, ".a");
-            else cdoAbort("Implementation missing for function %s!", funcname);
-            
-            Free(fnode->u.var.nm);
-            fnode->u.var.nm = cname;
-            
-            nodeType *tmpnode = fnode;
-            fnode = expr_run(tmpnode, parse_arg);
-            if ( tmpnode->ltmpobj ) node_delete(tmpnode);
+            rnode = coord_fun(init, funcID, fnode, parse_arg);
           }
-
-        rnode = ex_fun(init, funcID, fnode);
-        // if ( fnode->ltmpobj ) node_delete(fnode);
-        // Free(fnode);
+        else
+          {
+            rnode = ex_fun(init, funcID, fnode);
+            // if ( fnode->ltmpobj ) node_delete(fnode);
+            // Free(fnode);
+          }
         
         break;
       }

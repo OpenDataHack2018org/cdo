@@ -102,6 +102,8 @@ typedef struct {
   int        cdiID;
   int        size;
   char      *units;
+  char      *longname;
+  double    *data;
 } coordType;
 
 
@@ -141,3 +143,7 @@ void yyerror(void *parse_arg, void *scanner, const char *errstr);
 int  yylex_init(void **);
 int  yylex_destroy(void *);
 void yyset_extra(YY_EXTRA_TYPE, void *);
+
+nodeType *expr_run(nodeType *p, parse_param_t *parse_arg);
+int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID);
+

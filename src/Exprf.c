@@ -134,19 +134,39 @@ paramType *params_new(int vlistID)
 }
 
 static
-void params_add_coord(parse_param_t *parse_arg, int coord, int gridID, int size, const char *units)
+void params_add_coord(parse_param_t *parse_arg, int coord, int cdiID, int size, const char *units, const char *longname)
 {
   int ncoords = parse_arg->ncoords;
   if ( ncoords >= parse_arg->maxcoords )
     cdoAbort("Too many coordinates (limit=%d)", parse_arg->maxcoords);
   
-  parse_arg->coords[ncoords].needed = false;
-  parse_arg->coords[ncoords].coord  = coord;
-  parse_arg->coords[ncoords].cdiID  = gridID;
-  parse_arg->coords[ncoords].size   = size;
-  parse_arg->coords[ncoords].units  = strdup(units);
-  
+  parse_arg->coords[ncoords].needed   = false;
+  parse_arg->coords[ncoords].coord    = coord;
+  parse_arg->coords[ncoords].cdiID    = cdiID;
+  parse_arg->coords[ncoords].size     = size;
+  parse_arg->coords[ncoords].units    = NULL;
+  parse_arg->coords[ncoords].longname = NULL;
+  parse_arg->coords[ncoords].data     = NULL;
+  if ( units ) parse_arg->coords[ncoords].units = strdup(units);
+  if ( longname ) parse_arg->coords[ncoords].longname = strdup(longname);
+ 
   parse_arg->ncoords++;
+}
+
+
+int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID)
+{
+  int ncoords = parse_arg->ncoords;
+  for ( int coordID = 0; coordID < ncoords; ++coordID )
+    {
+      if ( parse_arg->coords[coordID].coord == coord &&
+           parse_arg->coords[coordID].cdiID == cdiID )
+        return coordID;
+    }
+
+  cdoAbort("%s: coordinate %c not found!", __func__, coord);
+  
+  return -1;
 }
 
 static
@@ -159,9 +179,20 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
       int gridID = vlistGrid(vlistID, index);
       int size   = gridInqSize(gridID);
       gridInqXunits(gridID, units);
-      params_add_coord(parse_arg, 'x', gridID, size, units);
+      params_add_coord(parse_arg, 'x', gridID, size, units, NULL);
       gridInqYunits(gridID, units);
-      params_add_coord(parse_arg, 'y', gridID, size, units);
+      params_add_coord(parse_arg, 'y', gridID, size, units, NULL);
+      
+      params_add_coord(parse_arg, 'a', gridID, size, "m^2", "grid cell area");
+      params_add_coord(parse_arg, 'w', gridID, size, NULL, "grid cell area weights");
+    }
+  int nzaxis = vlistNzaxis(vlistID);
+  for ( int index = 0; index < nzaxis; ++index )
+    {
+      int zaxisID = vlistZaxis(vlistID, index);
+      int size    = zaxisInqSize(zaxisID);
+      zaxisInqUnits(zaxisID, units);
+      params_add_coord(parse_arg, 'z', zaxisID, size, units, NULL);
     }
 }
 
@@ -241,7 +272,7 @@ void *Expr(void *argument)
   int nvars1 = vlistNvars(vlistID1);
   int ngrids = vlistNgrids(vlistID1);
   int nzaxis = vlistNzaxis(vlistID1);
-  int maxcoords = ngrids*2+nzaxis;
+  int maxcoords = ngrids*4+nzaxis;
 
   int pointID   = gridCreate(GRID_GENERIC, 1);
   int surfaceID = getSurfaceID(vlistID1);
@@ -348,7 +379,6 @@ void *Expr(void *argument)
       params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
 
-  char units[CDI_MAX_NAME];
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
     {
       int coord = params[varID].coord;
@@ -364,18 +394,8 @@ void *Expr(void *argument)
               if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
                 gridID = gridToCurvilinear(gridID, 0);
 
-              if      ( coord == 'x' )
-                {
-                  gridInqXvals(gridID, params[varID].data);
-                  gridInqXunits(gridID, units);
-                  if ( !params[varID].units ) params[varID].units = strdup(units);
-                }
-              else if ( coord == 'y' )
-                {
-                  gridInqYvals(gridID, params[varID].data);
-                  gridInqYunits(gridID, units);
-                  if ( !params[varID].units ) params[varID].units = strdup(units);
-                }
+              if      ( coord == 'x' ) gridInqXvals(gridID, params[varID].data);
+              else if ( coord == 'y' ) gridInqYvals(gridID, params[varID].data);
               
               if ( gridID != params[varID].gridID ) gridDestroy(gridID);
             }
@@ -383,15 +403,11 @@ void *Expr(void *argument)
             {
               int gridID = params[varID].gridID;
               grid_cell_area(gridID, params[varID].data);
-              if ( !params[varID].longname ) params[varID].longname = strdup("grid cell area");
-              if ( !params[varID].units ) params[varID].units = strdup("m^2");
             }
           else if ( coord == 'z' )
             {
               int zaxisID = params[varID].zaxisID;
               zaxisInqLevels(zaxisID, params[varID].data);
-              zaxisInqUnits(zaxisID, units);
-              if ( !params[varID].units ) params[varID].units = strdup(units);
             }
           else
             cdoAbort("Computation of coordinate %c not implemented!", coord);
@@ -486,8 +502,11 @@ void *Expr(void *argument)
   if ( parse_arg.coords )
     {
       for ( int i = 0; i < parse_arg.ncoords; i++ )
-        if ( parse_arg.coords[i].units ) Free(parse_arg.coords[i].units);
- 
+        {
+          if ( parse_arg.coords[i].data  ) Free(parse_arg.coords[i].data);
+          if ( parse_arg.coords[i].units ) Free(parse_arg.coords[i].units);
+          if ( parse_arg.coords[i].longname ) Free(parse_arg.coords[i].longname);
+        }
       Free(parse_arg.coords);
     }
   if ( varIDmap ) Free(varIDmap);
