@@ -92,7 +92,7 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
 	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
 	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
-	$(srcdir)/wildcard.test.in README
+	$(srcdir)/threads.test.in $(srcdir)/wildcard.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -108,7 +108,8 @@ CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Remap.test Select.test Spectral.test Timstat.test Vertint.test \
 	Ymonstat.test Fldstat.test Fldpctl.test Ensstat.test \
 	Enspctl.test Afterburner.test Detrend.test Arith.test \
-	Expr.test Gradsdes.test Collgrid.test wildcard.test
+	Expr.test Gradsdes.test Collgrid.test threads.test \
+	wildcard.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -379,6 +380,7 @@ ENABLE_NC4 = @ENABLE_NC4@
 ENABLE_NC4HDF5 = @ENABLE_NC4HDF5@
 ENABLE_NETCDF = @ENABLE_NETCDF@
 ENABLE_SERVICE = @ENABLE_SERVICE@
+ENABLE_THREADS = @ENABLE_THREADS@
 EXEEXT = @EXEEXT@
 FCFLAGS = @FCFLAGS@
 FGREP = @FGREP@
@@ -518,10 +520,10 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 
 
 # tests which should pass
-TESTS = File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test \
+TESTS = threads.test wildcard.test File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test \
         Genweights.test Remap.test Select.test Spectral.test Ymonstat.test Timstat.test Ensstat.test \
         Enspctl.test Fldstat.test Fldpctl.test Vertint.test Afterburner.test Arith.test Expr.test \
-        Gradsdes.test Collgrid.test wildcard.test
+        Gradsdes.test Collgrid.test
 
 
 #        $(top_srcdir)/test/test_Remap.sh \
@@ -615,6 +617,8 @@ Expr.test: $(top_builddir)/config.status $(srcdir)/Expr.test.in
 Gradsdes.test: $(top_builddir)/config.status $(srcdir)/Gradsdes.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Collgrid.test: $(top_builddir)/config.status $(srcdir)/Collgrid.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+threads.test: $(top_builddir)/config.status $(srcdir)/threads.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 wildcard.test: $(top_builddir)/config.status $(srcdir)/wildcard.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

@@ -2,6 +2,7 @@ AC_DEFUN([ACX_OPTIONS],
 [
 #  ----------------------------------------------------------------------
 #  Checks for multithreaded compiling + linking
+ENABLE_THREADS=no
 AC_ARG_WITH([threads],
             [AC_HELP_STRING([--with-threads=<yes/no/directory>],
                             [Compile + link for multithreading [default=yes]])],
@@ -12,7 +13,8 @@ THREADS_LIBS=''
 AS_CASE([$with_threads],
         [no],[AC_MSG_CHECKING([multithreading])
               AC_MSG_RESULT([suppressed])],
-        [yes],[AX_PTHREAD([AC_DEFINE([HAVE_LIBPTHREAD],[1],[Define 1 for multithread support])],[AC_MSG_ERROR([multithreaded settings NOT found])])
+        [yes],[AX_PTHREAD([AC_DEFINE([HAVE_LIBPTHREAD],[1],[Define 1 for multithread support])
+                           ENABLE_THREADS=yes],[AC_MSG_ERROR([multithreaded settings NOT found])])
                LIBS="$PTHREAD_LIBS $LIBS"
                CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
                CC="$PTHREAD_CC"
@@ -22,8 +24,10 @@ AS_CASE([$with_threads],
              CPPFLAGS="-I$THREADS_ROOT/include $CPPFLAGS "
              AC_CHECK_HEADERS(pthread.h)
              AC_CHECK_LIB([pthread],[pthread_create])
+             ENABLE_THREADS=yes
              THREADS_LIBS=" -L$THREADS_ROOT/lib -lpthread"
              THREADS_INCLUDE=" -I$THREADS_ROOT/include"])
+AC_SUBST([ENABLE_THREADS])
 AC_SUBST([THREADS_INCLUDE])
 AC_SUBST([THREADS_LIBS])
 #  ----------------------------------------------------------------------

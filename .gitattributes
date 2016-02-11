@@ -822,6 +822,7 @@ test/data/sp2gp_ref -text
 test/data/sp2gpl_ref -text
 test/data/t21_geosp_tsurf.grb -text
 test/data/testfile01c.nc -text
+test/data/thread1_ref -text
 test/data/timavg_ref -text
 test/data/timmax_ref -text
 test/data/timmean_ref -text
@@ -916,4 +917,5 @@ test/test_diff.py -text
 test/test_info.py -text
 test/test_intgridbil.py -text
 test/test_operators -text
+test/threads.test.in -text
 test/wildcard.test.in -text

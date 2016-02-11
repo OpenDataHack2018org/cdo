@@ -252,7 +252,7 @@ AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Rema
 AC_CONFIG_FILES([test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Ymonstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/wildcard.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/wildcard.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings])
 AC_OUTPUT
 

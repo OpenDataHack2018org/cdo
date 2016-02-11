@@ -672,6 +672,7 @@ ZLIB_LIBS
 ZLIB_INCLUDE
 THREADS_LIBS
 THREADS_INCLUDE
+ENABLE_THREADS
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
@@ -17787,6 +17788,7 @@ CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
 
 #  ----------------------------------------------------------------------
 #  Checks for multithreaded compiling + linking
+ENABLE_THREADS=no
 
 # Check whether --with-threads was given.
 if test "${with_threads+set}" = set; then :
@@ -18234,6 +18236,7 @@ if test x"$ax_pthread_ok" = xyes; then
 
 $as_echo "#define HAVE_LIBPTHREAD 1" >>confdefs.h
 
+                           ENABLE_THREADS=yes
         :
 else
         ax_pthread_ok=no
@@ -18311,11 +18314,13 @@ _ACEOF
 
 fi
 
+             ENABLE_THREADS=yes
              THREADS_LIBS=" -L$THREADS_ROOT/lib -lpthread"
              THREADS_INCLUDE=" -I$THREADS_ROOT/include" ;; #(
   *) :
      ;;
 esac
+
 
 
 #  ----------------------------------------------------------------------
@@ -21315,7 +21320,7 @@ ac_config_files="$ac_config_files test/Ymonstat.test test/Fldstat.test test/Fldp
 
 ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arith.test test/Expr.test"
 
-ac_config_files="$ac_config_files test/Gradsdes.test test/Collgrid.test test/wildcard.test"
+ac_config_files="$ac_config_files test/Gradsdes.test test/Collgrid.test test/threads.test test/wildcard.test"
 
 ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings"
 
@@ -22489,6 +22494,7 @@ do
     "test/Expr.test") CONFIG_FILES="$CONFIG_FILES test/Expr.test" ;;
     "test/Gradsdes.test") CONFIG_FILES="$CONFIG_FILES test/Gradsdes.test" ;;
     "test/Collgrid.test") CONFIG_FILES="$CONFIG_FILES test/Collgrid.test" ;;
+    "test/threads.test") CONFIG_FILES="$CONFIG_FILES test/threads.test" ;;
     "test/wildcard.test") CONFIG_FILES="$CONFIG_FILES test/wildcard.test" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
@@ -24005,6 +24011,7 @@ _LT_EOF
     "test/Expr.test":F) chmod a+x "$ac_file" ;;
     "test/Gradsdes.test":F) chmod a+x "$ac_file" ;;
     "test/Collgrid.test":F) chmod a+x "$ac_file" ;;
+    "test/threads.test":F) chmod a+x "$ac_file" ;;
     "test/wildcard.test":F) chmod a+x "$ac_file" ;;
 
   esac

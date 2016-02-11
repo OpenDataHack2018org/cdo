@@ -7,7 +7,6 @@ test -n "$DATAPATH" || DATAPATH=./data
 CDOOUT=cout
 CDOERR=cerr
 FORMAT="-f srv -b 32"
-STATS="add sub mul div"
 #
 IFILE=$DATAPATH/pl_data
 NTEST=1
