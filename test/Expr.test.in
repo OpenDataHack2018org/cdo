@@ -11,12 +11,10 @@ FORMAT="-f srv -b 32"
 IFILE=$DATAPATH/pl_data
 NTEST=1
 #
-INSETS="_clev=var130.z;pottemp=var130*((100000/_clev)^0.287);"
-INSETS="$INSETS  var1=(var129>0)?(var130-273.15):var152;"
 FINSTR=finstr
 #
-for INSTR in $INSETS; do
-
+function testfunc()
+{
   RSTAT=0
 
   CDOTEST="instruction set $NTEST"
@@ -53,8 +51,13 @@ for INSTR in $INSETS; do
   test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 
   let NTEST+=1
-
-done
+}
+#
+INSTR="_clev=var130.z;pottemp=var130*((100000/_clev)^0.287);"
+testfunc
+#
+INSTR="var1=(var129>0)?(var130-273.15):var152;"
+testfunc
 #
 rm -f $CDOOUT $CDOERR
 #
