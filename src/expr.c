@@ -1439,8 +1439,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 params[varID].nmiss = p->param.nmiss;
               }
             
-            if ( rnode->ltmpobj ) { node_delete(rnode); rnode = NULL; }
-            else Free(rnode);
+            if ( rnode && rnode->ltmpobj ) { node_delete(rnode); rnode = NULL; }
+            // else Free(rnode);
 
             break;
           }
