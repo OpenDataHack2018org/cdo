@@ -223,7 +223,7 @@ void *Fldstat(void *argument)
 	      if ( useweights && field.size > 1 )
 		{
 		  int wstatus = gridWeights(field.grid, field.weight);
-		  if ( wstatus != 0 && tsID == 0 && levelID == 0 )
+		  if ( wstatus && tsID == 0 && levelID == 0 )
 		    {
 		      char varname[CDI_MAX_NAME];
 		      vlistInqVarName(vlistID1, varID, varname);

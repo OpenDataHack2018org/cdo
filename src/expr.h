@@ -63,6 +63,7 @@ typedef struct {
 typedef struct {
   bool    select;
   bool    remove;
+  bool    lmiss;
   int     coord;
   int     gridID;
   int     zaxisID;

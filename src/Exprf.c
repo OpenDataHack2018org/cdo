@@ -116,6 +116,7 @@ paramType *params_new(int vlistID)
       
       params[varID].select   = false;
       params[varID].remove   = false;
+      params[varID].lmiss    = true;
       params[varID].coord    = 0;
       params[varID].gridID   = gridID;
       params[varID].zaxisID  = zaxisID;
@@ -172,6 +173,7 @@ int params_get_coordID(parse_param_t *parse_arg, int coord, int cdiID)
 static
 void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
 {
+  char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
   int ngrids = vlistNgrids(vlistID);
   for ( int index = 0; index < ngrids; ++index )
@@ -179,9 +181,9 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
       int gridID = vlistGrid(vlistID, index);
       int size   = gridInqSize(gridID);
       gridInqXunits(gridID, units);
-      params_add_coord(parse_arg, 'x', gridID, size, units, NULL);
+      params_add_coord(parse_arg, 'x', gridID, size, units, "longitude");
       gridInqYunits(gridID, units);
-      params_add_coord(parse_arg, 'y', gridID, size, units, NULL);
+      params_add_coord(parse_arg, 'y', gridID, size, units, "latitude");
       
       params_add_coord(parse_arg, 'a', gridID, size, "m^2", "grid cell area");
       params_add_coord(parse_arg, 'w', gridID, size, NULL, "grid cell area weights");
@@ -192,7 +194,8 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
       int zaxisID = vlistZaxis(vlistID, index);
       int size    = zaxisInqSize(zaxisID);
       zaxisInqUnits(zaxisID, units);
-      params_add_coord(parse_arg, 'z', zaxisID, size, units, NULL);
+      zaxisInqLongname(zaxisID, longname);
+      params_add_coord(parse_arg, 'z', zaxisID, size, units, longname);
     }
 }
 
@@ -345,7 +348,7 @@ void *Expr(void *argument)
 
       int varID = vlistDefVar(vlistID2, params[pidx].gridID, params[pidx].zaxisID, params[pidx].steptype);
       vlistDefVarName(vlistID2, varID, params[pidx].name);
-      vlistDefVarMissval(vlistID2, varID, params[pidx].missval);
+      if ( params[pidx].lmiss ) vlistDefVarMissval(vlistID2, varID, params[pidx].missval);
       if ( params[pidx].units ) vlistDefVarUnits(vlistID2, varID, params[pidx].units);
       if ( params[pidx].longname ) vlistDefVarLongname(vlistID2, varID, params[pidx].longname);
       if ( memcmp(params[pidx].name, "var", 3) == 0 )
@@ -384,11 +387,13 @@ void *Expr(void *argument)
       int coord = params[varID].coord;
       if ( coord )
         {
+          char *varname = strdup(params[varID].name);
+          varname[strlen(varname)-2] = 0;
           if ( coord == 'x' || coord == 'y' )
             {
               int gridID = params[varID].gridID;
               if ( gridInqType(gridID) == GRID_GENERIC )
-                cdoAbort("%s: not a geographical coordinate!", params[varID].name);
+                cdoAbort("variable %s has no geographical coordinates!", varname);
               if ( gridInqType(gridID) == GRID_GME )
                 gridID = gridToUnstructured(gridID, 0);
               if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
@@ -404,6 +409,18 @@ void *Expr(void *argument)
               int gridID = params[varID].gridID;
               grid_cell_area(gridID, params[varID].data);
             }
+          else if ( coord == 'w' )
+            {
+              int gridID = params[varID].gridID;
+              int ngp = params[varID].ngp;
+              params[varID].data[0] = 1;
+              if ( ngp > 1 )
+                {
+		  int wstatus = gridWeights(gridID, params[varID].data);
+		  if ( wstatus )
+                    cdoWarning("Grid cell bounds not available, using constant grid cell area weights for variable %s!", varname);
+                }
+            }
           else if ( coord == 'z' )
             {
               int zaxisID = params[varID].zaxisID;
@@ -411,6 +428,8 @@ void *Expr(void *argument)
             }
           else
             cdoAbort("Computation of coordinate %c not implemented!", coord);
+
+          free(varname);
         }
     }
  
@@ -466,6 +485,9 @@ void *Expr(void *argument)
       for ( int varID = 0; varID < nvars2; varID++ )
 	{
           int pidx = varIDmap[varID];
+
+          if ( tsID > 0 && params[pidx].steptype == TIME_CONSTANT ) continue;
+
 	  double missval = vlistInqVarMissval(vlistID2, varID);
 
           size_t ngp = params[pidx].ngp;

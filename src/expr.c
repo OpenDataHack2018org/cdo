@@ -183,6 +183,7 @@ void param_meta_copy(paramType *out, paramType *in)
   out->missval  = in->missval;
   out->nmiss    = 0;
   out->coord    = 0;
+  out->lmiss    = true;
   out->name     = NULL;
   out->longname = NULL;
   out->units    = NULL;
@@ -752,6 +753,7 @@ nodeType *ex_fun_con(int funcID, nodeType *p1)
   p->u.con.value = exprfunc(p1->u.con.value);
 
   if ( p1->ltmpobj ) node_delete(p1);
+  else Free(p1);
 
   return p;
 }
@@ -853,10 +855,8 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
           if ( array ) Free(array);
           if ( weights ) Free(weights);
         }
-      else if ( functype == FT_COORD )
-        {
-          for ( size_t i = 0; i < ngp*nlev; i++ ) pdata[i] = p1data[i];
-        }
+      else
+        cdoAbort("Intermal error, wrong function type (%d)!", functype);
 
       nmiss = 0;
       for ( size_t i = 0; i < p->param.ngp*p->param.nlev; i++ )
@@ -866,6 +866,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
     }
 
   if ( p1->ltmpobj ) node_delete(p1);
+  else Free(p1);
   
   return p;
 }
@@ -895,7 +896,8 @@ static
 nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg)
 {  
   const char *funcname = fun_sym_tbl[funcID].name;            
-  if ( p1->type != typeVar ) cdoAbort("Parameter of function %s needs to be a variable!", funcname);
+  if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
+  if ( p1->ltmpobj ) cdoAbort("Temorary objects not allowed in function %s()!", funcname);
             
   size_t len = 3 + strlen(p1->u.var.nm);
   char *cname = (char*) Calloc(len, 1);
@@ -910,12 +912,13 @@ nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg
   
   Free(p1->u.var.nm);
   p1->u.var.nm = cname;
-            
+
   nodeType *p = expr_run(p1, parse_arg);
-  if ( p1->ltmpobj ) node_delete(p1);
+  p->param.lmiss = false;
 
   if ( ! init )
     {
+      /*
       size_t ngp  = p1->param.ngp;
       size_t nlev = p1->param.nlev;
       p->param.data = (double*) Malloc(ngp*nlev*sizeof(double));
@@ -923,8 +926,12 @@ nodeType *coord_fun(int init, int funcID, nodeType *p1, parse_param_t *parse_arg
       double *restrict p1data = p1->param.data;
 
       for ( size_t i = 0; i < ngp*nlev; i++ ) pdata[i] = p1data[i];
+      */
     }
-
+  /*
+  Free(cname);
+  Free(p1);
+  */
   return p;
 }
 
@@ -1260,6 +1267,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         const char *longname = parse_arg->coords[coordID].longname;
 
                         params[nvarID].coord    = coord;
+                        params[nvarID].lmiss    = false;
                         params[nvarID].name     = strdup(vnm);
                         params[nvarID].missval  = params[varID].missval;
                         params[nvarID].gridID   = params[varID].gridID;
@@ -1294,6 +1302,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                         const char *longname = parse_arg->coords[coordID].longname;
                                      
                         params[nvarID].coord    = coord;
+                        params[nvarID].lmiss    = false;
                         params[nvarID].name     = strdup(vnm);
                         params[nvarID].missval  = params[varID].missval;
                         params[nvarID].gridID   = parse_arg->pointID;
@@ -1323,8 +1332,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
 
         param_meta_copy(&p->param, &params[varID]);
-        p->param.name  = params[varID].name;
-        p->param.units = params[varID].units;
+        p->param.coord    = params[varID].coord;
+        p->param.lmiss    = params[varID].lmiss;
+        p->param.name     = params[varID].name;
+        p->param.longname = params[varID].longname;
+        p->param.units    = params[varID].units;
         p->ltmpobj = false;
         /*
         if ( parse_arg->debug )
@@ -1405,9 +1417,11 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
 
                     param_meta_copy(&params[varID], &rnode->param);
                     params[varID].coord = 0;
+                    params[varID].lmiss = rnode->param.lmiss;
                     params[varID].name  = strdup(varname2);
                     params[varID].nmiss = rnode->param.nmiss;
                     if ( rnode->param.units ) params[varID].units = strdup(rnode->param.units);
+                    if ( rnode->param.longname ) params[varID].longname = strdup(rnode->param.longname);
                     parse_arg->nparams++;
                   }
               }
@@ -1425,7 +1439,8 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 params[varID].nmiss = p->param.nmiss;
               }
             
-            if ( rnode->ltmpobj ) node_delete(rnode);
+            if ( rnode->ltmpobj ) { node_delete(rnode); rnode = NULL; }
+            else Free(rnode);
 
             break;
           }
