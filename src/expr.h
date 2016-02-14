@@ -61,21 +61,22 @@ typedef struct {
 
 // parameter
 typedef struct {
-  bool    select;
-  bool    remove;
-  bool    lmiss;
-  int     coord;
-  int     gridID;
-  int     zaxisID;
-  int     steptype;
-  size_t  ngp;
-  size_t  nlev;
-  size_t  nmiss;
-  char   *name;
-  char   *longname;
-  char   *units;
-  double  missval;
-  double *data;
+  bool       select;
+  bool       remove;
+  bool       lmiss;
+  int        coord;
+  int        gridID;
+  int        zaxisID;
+  int        steptype;
+  size_t     ngp;
+  size_t     nlev;
+  size_t     nmiss;
+  char      *name;
+  char      *longname;
+  char      *units;
+  double     missval;
+  double    *data;
+  double    *weight;
 } paramType;
 
 

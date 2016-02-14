@@ -829,7 +829,9 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
         {
           field_t field;
           double *weights = NULL;
-          if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
+          //if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
+          if ( funcflag == 1 ) weights = p1->param.weight;
+          assert(weights!=NULL);
 
           double (*exprfunc)(field_t) = (double (*)(field_t)) fun_sym_tbl[funcID].func;
           for ( size_t k = 0; k < nlev; k++ )
@@ -837,7 +839,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
               fld_field_init(&field, nmiss, missval, ngp, p1data+k*ngp, weights);
               pdata[k] = exprfunc(field);
             }
-          if ( weights ) Free(weights);
+          //if ( weights ) Free(weights);
         }
       else if ( functype == FT_VERT )
         {
@@ -1370,15 +1372,15 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           }
         else
           {
-            if ( init )
+            int functype = fun_sym_tbl[funcID].type;
+            int funcflag = fun_sym_tbl[funcID].flag;
+            if ( functype == FT_FLD && funcflag == 1 )
               {
-                int functype = fun_sym_tbl[funcID].type;
-                int funcflag = fun_sym_tbl[funcID].flag;
-                if ( functype == FT_FLD && funcflag == 1 )
-                  {
-                    int coordID = params_get_coordID(parse_arg, 'w', fnode->param.gridID);
-                    parse_arg->coords[coordID].needed = true;
-                  }
+                int coordID = params_get_coordID(parse_arg, 'w', fnode->param.gridID);
+                if ( init )
+                  parse_arg->coords[coordID].needed = true;
+                else
+                  fnode->param.weight = parse_arg->coords[coordID].data;
               }
             rnode = ex_fun(init, funcID, fnode);
             // if ( fnode->ltmpobj ) node_delete(fnode);
