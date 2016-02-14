@@ -47,7 +47,7 @@ function testfunc()
   rm -f $OFILE
 }
 #
-INSTR="-fldmean -timmean -select,code=,129,130,152"
+INSTR="-fldmean -timmean -select,code=129,130,152"
 testfunc 
 #
 rm -f $CDOOUT $CDOERR

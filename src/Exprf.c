@@ -382,6 +382,59 @@ void *Expr(void *argument)
       params[varID].data = (double*) Malloc(ngp*nlev*sizeof(double));
     }
 
+  for ( int i = 0; i < parse_arg.ncoords; i++ )
+    {
+      if ( parse_arg.coords[i].needed )
+        {
+          int coord = parse_arg.coords[i].coord;
+          if ( coord == 'x' || coord == 'y' || coord == 'a' || coord == 'w' )
+            {
+              int gridID = parse_arg.coords[i].cdiID;
+              size_t ngp = parse_arg.coords[i].size;
+              double *data = (double*) malloc(ngp*sizeof(double));
+              parse_arg.coords[i].data = data;
+              if ( coord == 'x' || coord == 'y' )
+                {
+                  if ( gridInqType(gridID) == GRID_GENERIC )
+                    cdoAbort("Grid has no geographical coordinates!");
+                  if ( gridInqType(gridID) == GRID_GME )
+                    gridID = gridToUnstructured(gridID, 0);
+                  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+                    gridID = gridToCurvilinear(gridID, 0);
+                  
+                  if      ( coord == 'x' ) gridInqXvals(gridID, data);
+                  else if ( coord == 'y' ) gridInqYvals(gridID, data);
+              
+                  if ( gridID != parse_arg.coords[i].cdiID ) gridDestroy(gridID);
+                }
+              else if ( coord == 'a' )
+                {
+                  grid_cell_area(gridID, data);
+                }
+              else if ( coord == 'w' )
+                {
+                  data[0] = 1;
+                  if ( ngp > 1 )
+                    {
+                      int wstatus = gridWeights(gridID, data);
+                      if ( wstatus )
+                        cdoWarning("Grid cell bounds not available, using constant grid cell area weights!");
+                    }
+                }
+            }
+          else if ( coord == 'z' )
+            {
+              int zaxisID = parse_arg.coords[i].cdiID;
+              size_t nlev = parse_arg.coords[i].size;
+              double *data = (double*) malloc(nlev*sizeof(double));
+              parse_arg.coords[i].data = data;
+              zaxisInqLevels(zaxisID, data);
+            }
+          else
+            cdoAbort("Computation of coordinate %c not implemented!", coord);
+        }
+    }
+  
   for ( int varID = parse_arg.nvars1; varID < parse_arg.nparams; varID++ )
     {
       int coord = params[varID].coord;
@@ -389,42 +442,27 @@ void *Expr(void *argument)
         {
           char *varname = strdup(params[varID].name);
           varname[strlen(varname)-2] = 0;
-          if ( coord == 'x' || coord == 'y' )
+          if ( coord == 'x' || coord == 'y' || coord == 'a' || coord == 'w' )
             {
-              int gridID = params[varID].gridID;
-              if ( gridInqType(gridID) == GRID_GENERIC )
-                cdoAbort("variable %s has no geographical coordinates!", varname);
-              if ( gridInqType(gridID) == GRID_GME )
-                gridID = gridToUnstructured(gridID, 0);
-              if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
-                gridID = gridToCurvilinear(gridID, 0);
+              int coordID = params_get_coordID(&parse_arg, coord, params[varID].gridID);
+              int gridID = parse_arg.coords[coordID].cdiID;
+              size_t ngp = parse_arg.coords[coordID].size;
+              double *data = parse_arg.coords[coordID].data;
+              assert(gridID==params[varID].gridID);
+              assert(data!=NULL);
 
-              if      ( coord == 'x' ) gridInqXvals(gridID, params[varID].data);
-              else if ( coord == 'y' ) gridInqYvals(gridID, params[varID].data);
-              
-              if ( gridID != params[varID].gridID ) gridDestroy(gridID);
-            }
-          else if ( coord == 'a' )
-            {
-              int gridID = params[varID].gridID;
-              grid_cell_area(gridID, params[varID].data);
-            }
-          else if ( coord == 'w' )
-            {
-              int gridID = params[varID].gridID;
-              int ngp = params[varID].ngp;
-              params[varID].data[0] = 1;
-              if ( ngp > 1 )
-                {
-		  int wstatus = gridWeights(gridID, params[varID].data);
-		  if ( wstatus )
-                    cdoWarning("Grid cell bounds not available, using constant grid cell area weights for variable %s!", varname);
-                }
+              memcpy(params[varID].data, data, ngp*sizeof(double));
             }
           else if ( coord == 'z' )
             {
-              int zaxisID = params[varID].zaxisID;
-              zaxisInqLevels(zaxisID, params[varID].data);
+              int coordID = params_get_coordID(&parse_arg, coord, params[varID].zaxisID);
+              int zaxisID = parse_arg.coords[coordID].cdiID;
+              size_t nlev = parse_arg.coords[coordID].size;
+              double *data = parse_arg.coords[coordID].data;
+              assert(zaxisID==params[varID].zaxisID);
+              assert(data!=NULL);
+
+              memcpy(params[varID].data, data, nlev*sizeof(double));
             }
           else
             cdoAbort("Computation of coordinate %c not implemented!", coord);

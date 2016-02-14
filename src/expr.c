@@ -1263,6 +1263,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                           cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
 
                         int coordID = params_get_coordID(parse_arg, coord, params[varID].gridID);
+                        parse_arg->coords[coordID].needed = true;
                         const char *units = parse_arg->coords[coordID].units;
                         const char *longname = parse_arg->coords[coordID].longname;
 
@@ -1298,6 +1299,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                           cdoAbort("Too many parameter (limit=%d)", parse_arg->maxparams);
                           
                         int coordID = params_get_coordID(parse_arg, coord, params[varID].zaxisID);
+                        parse_arg->coords[coordID].needed = true;
                         const char *units = parse_arg->coords[coordID].units;
                         const char *longname = parse_arg->coords[coordID].longname;
                                      
@@ -1368,6 +1370,16 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
           }
         else
           {
+            if ( init )
+              {
+                int functype = fun_sym_tbl[funcID].type;
+                int funcflag = fun_sym_tbl[funcID].flag;
+                if ( functype == FT_FLD && funcflag == 1 )
+                  {
+                    int coordID = params_get_coordID(parse_arg, 'w', fnode->param.gridID);
+                    parse_arg->coords[coordID].needed = true;
+                  }
+              }
             rnode = ex_fun(init, funcID, fnode);
             // if ( fnode->ltmpobj ) node_delete(fnode);
             // Free(fnode);
