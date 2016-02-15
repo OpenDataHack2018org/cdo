@@ -18,6 +18,9 @@ Constansts: M_PI, M_E
 @BeginDescription
 This module arithmetically processes every timestep of the input dataset.
 Each individual assignment statement have to end with a semi-colon.
+Unlike regular variables, temporary variables are never written to the output stream.
+To define a temporary variable simply prefix the variable name with an underscore (e.g. _varname)
+when the variable is declared.
 
 The following operators are supported:
 
@@ -29,19 +32,20 @@ The following operators are supported:
      *      & multiplication      & x * y     & Product of x and y 
      /      & division            & x / y     & Quotient of x and y
      \exp      & exponentiation      & x \exp y     & Exponentiates x with y 
-     ==     & equal to            & x == y    & 1, if x equal to y; else 0
-     !=     & not equal to        & x != y    & 1, if x not equal to y; else 0
-     >      & greater than        & x > y     & 1, if x greater than y; else 0
-     <      & less than           & x < y     & 1, if x less than y; else 0
-     >=     & greater equal       & x >= y    & 1, if x greater equal y; else 0
-     <=     & less equal          & x <= y    & 1, if x less equal y; else 0
+     ==     & equal to            & x == y    &  1, if x equal to y; else 0
+     !=     & not equal to        & x != y    &  1, if x not equal to y; else 0
+     >      & greater than        & x > y     &  1, if x greater than y; else 0
+     <      & less than           & x < y     &  1, if x less than y; else 0
+     >=     & greater equal       & x >= y    &  1, if x greater equal y; else 0
+     <=     & less equal          & x <= y    &  1, if x less equal y; else 0
      <=>    & less equal greater  & x <=> y   & -1, if x less y; 1, if x greater y; else 0 
-     \and     & logical AND         & x \and y    & 1, if x and y not equal 0; else 0
-     \or     & logical OR          & x \or y    & 1, if x or y not equal 0; else 0
+     \and     & logical AND         & x \and y    &  1, if x and y not equal 0; else 0
+     \or     & logical OR          & x \or y    &  1, if x or y not equal 0; else 0
      ?:     & ternary conditional & x ? y : z & y, if x not equal 0, else z 
 @EndTable
 
 The following intrinsic functions are available:
+
 @BeginList log10(x)
 @Item = abs(x)
 Absolute value of x
@@ -76,6 +80,36 @@ Arc-cosine of x, where x is specified in radians
 @Item = atan(x)
 Arc-tangent of x, where x is specified in radians
 @EndList
+
+The following coordinate functions are available:
+
+@BeginList clon(x)
+@Item = clon(x)
+Longitude coordinate of x (available only if x has geographical coordinates) 
+@Item = clat(x)
+Latitude coordinate of x (available only if x has geographical coordinates) 
+@Item = clev(x)
+Level coordinate of x (0, if x is a 2D surface variable)
+@EndList
+
+The following utility functions are available:
+
+@BeginList remove(x)
+@Item = remove(x)
+Remove variable x from output stream
+@Item = ngp(x)
+Number of horizontal grid points
+@Item = nlev(x)
+Number of vertical levels
+@Item = size(x)
+Total number of elements (ngp(x)*nlev(x))
+@EndList
+
+The following CDO functions are available:
+
+@mod{fldmin}, @mod{fldmax}, @mod{fldsum}, @mod{fldmean}, @mod{fldavg}, @mod{fldstd}, @mod{fldstd1}, @mod{fldvar}, @mod{fldvar1}, 
+@mod{vertmin}, @mod{vertmax}, @mod{vertsum}, @mod{vertmean}, @mod{vertavg}, @mod{vertstd}, @mod{vertstd1}, @mod{vertvar}, @mod{vertvar1}
+
 @EndDescription
 @EndModule
 
