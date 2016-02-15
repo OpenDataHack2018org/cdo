@@ -21,6 +21,7 @@ nodeType *expr_opr(int oper, int nops, ...);
 nodeType *expr_var(char *nm);
 nodeType *expr_con(double value);
 nodeType *expr_fun(char *fname, nodeType *p);
+nodeType *expr_fun1c(char *fname, nodeType *op, double value);
 nodeType *expr_com(const char *cname, char *vname);
 
 void freeNode(nodeType *p);
@@ -95,6 +96,7 @@ expr:
         | expr OR  expr           { $$ = expr_opr(OR,  2, $1, $3); }
         | expr '?' expr ':' expr  { $$ = expr_opr('?', 3, $1, $3, $5); }
         | '(' expr ')'            { $$ = $2; }
+        | FUNCTION '(' expr ',' CONSTANT ')'   { $$ = expr_fun1c($1, $3, $5); }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }
         ;
 
@@ -144,6 +146,23 @@ nodeType *expr_fun(char *fname, nodeType *op)
   p->type = typeFun;
   p->u.fun.name = strdup(fname);
   p->u.fun.op   = op;
+
+  return p;
+}
+
+nodeType *expr_fun1c(char *fname, nodeType *op, double value)
+{
+  nodeType *p = NULL;
+  /* allocate node */
+  size_t nodeSize = SIZEOF_NODETYPE + sizeof(fun1cNodeType);
+  if ( (p = (nodeType*) Calloc(1, nodeSize)) == NULL )
+    yyerror(NULL, NULL, "Out of memory");
+
+  /* copy information */
+  p->type = typeFun1c;
+  p->u.fun1c.name  = strdup(fname);
+  p->u.fun1c.op    = op;
+  p->u.fun1c.value = value;
 
   return p;
 }

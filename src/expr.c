@@ -37,7 +37,7 @@ static const char *tmpvnm = "_tmp_";
 int pointID = -1;
 int surfaceID = -1;
 
-enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD};
+enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 
 #define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
 #define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
@@ -135,6 +135,9 @@ static func_t fun_sym_tbl[] =
   {FT_COORD, 0, "clev",       NULL},
   {FT_COORD, 0, "gridarea",   NULL},
   {FT_COORD, 0, "gridweight", NULL},
+
+  {FT_1C, 0, "sellevel",  NULL},
+  {FT_1C, 0, "sellevidx", NULL},
 };
 
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
@@ -763,7 +766,7 @@ nodeType *ex_fun_con(int funcID, nodeType *p1)
 static
 nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
 {
-  //const char *funcname = fun_sym_tbl[funcID].name;
+  const char *funcname = fun_sym_tbl[funcID].name;
   int functype = fun_sym_tbl[funcID].type;
   int funcflag = fun_sym_tbl[funcID].flag;
 
@@ -863,7 +866,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
         {
         }
       else
-        cdoAbort("Intermal error, wrong function type (%d)!", functype);
+        cdoAbort("Intermal error, wrong function type (%d) for %s()!", functype, funcname);
 
       nmiss = 0;
       for ( size_t i = 0; i < p->param.ngp*p->param.nlev; i++ )
@@ -895,6 +898,83 @@ nodeType *ex_fun(int init, int funcID, nodeType *p1)
     }
   else
     cdoAbort("Internal problem!");
+
+  return p;
+}
+
+static
+nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t *parse_arg)
+{  
+  const char *funcname = fun_sym_tbl[funcID].name;            
+  if ( p1->type != typeVar ) cdoAbort("Parameter of function %s() needs to be a variable!", funcname);
+  if ( p1->ltmpobj ) cdoAbort("Temorary objects not allowed in function %s()!", funcname);
+
+  size_t ngp   = p1->param.ngp;
+  size_t nlev  = p1->param.nlev;
+  size_t nmiss = p1->param.nmiss;
+  double missval = p1->param.missval;
+
+  nodeType *p = (nodeType*) Calloc(1, sizeof(nodeType));
+
+  p->type     = typeVar;
+  p->ltmpobj  = true;
+  p->u.var.nm = strdup(tmpvnm);
+  param_meta_copy(&p->param, &p1->param);
+  p->param.name = p->u.var.nm;
+
+  p->param.nlev = 1;
+
+  size_t levidx = 0;
+  if ( init )
+    {
+      int zaxisID = p1->param.zaxisID;
+      int coordID = params_get_coordID(parse_arg, 'z', zaxisID);
+      parse_arg->coords[coordID].needed = true;
+
+      double *data = (double*) malloc(nlev*sizeof(double));
+      zaxisInqLevels(zaxisID, data);
+
+      for ( levidx = 0; levidx < nlev; ++levidx )
+        if ( IS_EQUAL(data[levidx], value) )
+          break;
+      if ( levidx == nlev ) cdoAbort("%s(): level %g not found!", funcname, value);
+
+      int zaxisID2 = zaxisCreate(zaxisInqType(zaxisID), 1);
+      zaxisDefLevels(zaxisID2, &data[levidx]);
+      p->param.zaxisID = zaxisID2;
+    }
+  else
+    {
+      int zaxisID = p1->param.zaxisID;
+      int coordID = params_get_coordID(parse_arg, 'z', zaxisID);
+      const double *data = parse_arg->coords[coordID].data;
+
+      for ( levidx = 0; levidx < nlev; ++levidx )
+        if ( IS_EQUAL(data[levidx], value) )
+          break;
+      if ( levidx == nlev ) cdoAbort("%s(): level %g not found!", funcname, value);
+    }
+  
+  if ( ! init )
+    {
+      p->param.data = (double*) Malloc(ngp*sizeof(double));
+      double *restrict pdata = p->param.data;
+      const double *restrict p1data = p1->param.data+ngp*levidx;
+
+      for ( size_t i = 0; i < ngp; i++ )
+        pdata[i] = p1data[i];
+
+      if ( nmiss > 0 )
+        {
+          nmiss = 0;
+          for ( size_t i = 0; i < ngp; i++ )
+            if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
+        }
+
+      p->param.nmiss = nmiss;
+    }
+
+  if ( p1->ltmpobj ) node_delete(p1);
 
   return p;
 }
@@ -1361,6 +1441,21 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
         if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%zu][N%zu]", vnm, p->param.nlev, p->param.ngp);
 
         rnode = p;
+
+        break;
+      }
+    case typeFun1c:
+      {
+        int funcID = get_funcID(p->u.fun1c.name);
+        int functype = fun_sym_tbl[funcID].type;
+        
+        nodeType *fnode = expr_run(p->u.fun1c.op, parse_arg);
+        
+        if ( functype == FT_1C )
+          {
+            double value = p->u.fun1c.value;
+            rnode = fun1c(init, funcID, fnode, value, parse_arg);
+          }
 
         break;
       }

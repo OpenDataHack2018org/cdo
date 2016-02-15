@@ -30,7 +30,7 @@ int fileno(FILE *stream);
 extern int CDO_parser_errorno;
 
 
-typedef enum { typeCon, typeVar, typeFun, typeOpr, typeCom } nodeEnum;
+typedef enum { typeCon, typeVar, typeFun, typeFun1c, typeOpr, typeCom } nodeEnum;
 
 // commands
 typedef struct {
@@ -47,6 +47,13 @@ typedef struct {
 typedef struct {
   char *nm;                   // variable name
 } varNodeType;
+
+// 1c functions
+typedef struct {
+  char *name;                 // function name
+  double value;               // value of constant
+  struct nodeTypeTag *op;     // operand
+} fun1cNodeType;
 
 // functions
 typedef struct {
@@ -95,6 +102,7 @@ typedef struct nodeTypeTag {
     conNodeType con;          // constants
     varNodeType var;          // variables
     funNodeType fun;          // functions
+    fun1cNodeType fun1c;      // functions
     oprNodeType opr;          // operators
   } u;
 } nodeType;
