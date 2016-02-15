@@ -94,7 +94,7 @@ Level coordinate of x (0, if x is a 2D surface variable)
 
 The following utility functions are available:
 
-@BeginList remove(x)
+@BeginList missval(x)
 @Item = remove(x)
 Remove variable x from output stream
 @Item = ngp(x)
@@ -103,6 +103,8 @@ Number of horizontal grid points
 Number of vertical levels
 @Item = size(x)
 Total number of elements (ngp(x)*nlev(x))
+@Item = missval(x)
+Returns the missing value of variable x
 @EndList
 
 The following CDO functions are available:

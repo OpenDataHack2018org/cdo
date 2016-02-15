@@ -1817,9 +1817,12 @@ void freeNode(nodeType *p)
   Free(p);
 }
 
+int CDO_parser_errorno = 0;
+
 void yyerror(void *parse_arg, void *scanner, const char *errstr)
 {
-  fprintf(stdout, "%s!\n", errstr);
+  fprintf(stderr, "%s!\n", errstr);
+  CDO_parser_errorno = -1;
 }
 /*
 int main(void)

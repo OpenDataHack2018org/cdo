@@ -303,8 +303,10 @@ void *Expr(void *argument)
   int vartsID = params_add_ts(&parse_arg);
   params_add_coordinates(vlistID1, &parse_arg);
                   
+  CDO_parser_errorno = 0;
   yy_scan_string(exprs, scanner);
   yyparse(&parse_arg, scanner);
+  if ( CDO_parser_errorno != 0 ) cdoAbort("Syntax error!");
 
   parse_arg.init = false;
 

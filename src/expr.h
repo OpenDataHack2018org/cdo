@@ -27,6 +27,8 @@ int fileno(FILE *stream);
 #endif
 #endif
 
+extern int CDO_parser_errorno;
+
 
 typedef enum { typeCon, typeVar, typeFun, typeOpr, typeCom } nodeEnum;
 

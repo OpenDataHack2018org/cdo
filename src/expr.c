@@ -58,12 +58,13 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD};
 #define MVCOMPAND(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPAND(x,y))
 #define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
-static double f_int(double x)    { return (int)(x); }
-static double f_nint(double x)   { return round(x); }
-static double f_sqr(double x)    { return x*x;      }
-static double pt_ngp(paramType *p)  { return p->ngp;   }
-static double pt_nlev(paramType *p) { return p->nlev;  }
-static double pt_size(paramType *p) { return p->ngp*p->nlev;  }
+static double f_int(double x)          { return (int)(x); }
+static double f_nint(double x)         { return round(x); }
+static double f_sqr(double x)          { return x*x;      }
+static double pt_ngp(paramType *p)     { return p->ngp;   }
+static double pt_nlev(paramType *p)    { return p->nlev;  }
+static double pt_size(paramType *p)    { return p->ngp*p->nlev; }
+static double pt_missval(paramType *p) { return p->missval; }
 
 typedef struct {
   int type;
@@ -102,9 +103,10 @@ static func_t fun_sym_tbl[] =
   {FT_STD, 0, "gamma", (void (*)()) tgamma},
 
   // constant functions
-  {FT_CONST, 0, "ngp",   (void (*)()) pt_ngp},      // number of horizontal grid points
-  {FT_CONST, 0, "nlev",  (void (*)()) pt_nlev},     // number of vertical levels
-  {FT_CONST, 0, "size",  (void (*)()) pt_size},     // ngp*nlev
+  {FT_CONST, 0, "ngp",     (void (*)()) pt_ngp},      // number of horizontal grid points
+  {FT_CONST, 0, "nlev",    (void (*)()) pt_nlev},     // number of vertical levels
+  {FT_CONST, 0, "size",    (void (*)()) pt_size},     // ngp*nlev
+  {FT_CONST, 0, "missval", (void (*)()) pt_missval},  // Returns the missing value of a variable
 
   // cdo field functions (Reduce grid to point)
   {FT_FLD, 0, "fldmin",  (void (*)()) fldmin},
@@ -856,6 +858,9 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
             }
           if ( array ) Free(array);
           if ( weights ) Free(weights);
+        }
+      else if ( functype == FT_CONST )
+        {
         }
       else
         cdoAbort("Intermal error, wrong function type (%d)!", functype);
