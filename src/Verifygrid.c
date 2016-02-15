@@ -55,7 +55,7 @@ static void normalize_vector(double (*a)[3]){
   divide_by_scalar(a, euclidean_norm(*a));
 }
 
-static int is_point_left_of_edge(double point_on_line_1[], double point_on_line_2[], double point[]){
+static double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2]){
 
   /* 
      Computes whether a point is left of the line through point_on_line_1 and point_on_line_2. This is part of the solution to the point in polygon problem.
@@ -63,8 +63,24 @@ static int is_point_left_of_edge(double point_on_line_1[], double point_on_line_
      This algorithm is by Dan Sunday (geomalgorithms.com) and is completely free for use and modification.
   */
 
-  return ((point_on_line_2[0] - point_on_line_1[0]) * (point[1] - point_on_line_1[1]) - (point[0] - point_on_line_1[0]) * (point_on_line_2[1] - point_on_line_1[1]));
+  printf("Testing whether point (%f, %f) is left of the the edge from point (%f, %f) and point (%f, %f)... ", point[0], point[1], point_on_line_1[0], point_on_line_1[1], point_on_line_2[0], point_on_line_2[1]);
 
+  double answer = ((point_on_line_2[0] - point_on_line_1[0]) * (point[1] - point_on_line_1[1]) 
+		- (point[0] - point_on_line_1[0]) * (point_on_line_2[1] - point_on_line_1[1]));
+
+  if (answer == 0){
+    printf("the point lies on the edge.\n");
+  }
+
+  if (answer > 0){
+    printf("the point lies left of the edge.\n");
+  }
+
+  if (answer < 0){
+    printf("the point lies to the right of the edge.\n");
+  }
+
+  return answer;
 }
 
 static int winding_numbers_algorithm(double (*cell_corners)[][2], int number_corners, double point[]){
@@ -75,7 +91,7 @@ static int winding_numbers_algorithm(double (*cell_corners)[][2], int number_cor
      Based on an algorithm by Dan Sunday (geomalgorithms.com). His algorithm is completely free for use and modification.
    */
   
-  int winding_number;
+  int winding_number = 0;
   
   for (int i = 0;  i < number_corners; i++){
     if ((*cell_corners)[i][1] <= point[1]){
@@ -91,6 +107,55 @@ static int winding_numbers_algorithm(double (*cell_corners)[][2], int number_cor
 
   return winding_number;
 
+}
+
+static int winding_numbers_test_algorithm(double cell_corners[][2], int number_corners, double point[]){
+  
+  /* 
+     Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
+     Returns 0 if the point is outside, returns 1 if the point is inside the cell.
+     Based on an algorithm by Dan Sunday (geomalgorithms.com). His algorithm is completely free for use and modification.
+  */
+
+  printf("Testing whether the presumed center point lies within the bounds of the cell.\n \n");
+  
+  int winding_number = 0;
+  
+  for (int i = 0;  i < number_corners; i++){
+    printf("Edge number %u from vertex (%f, %f) to vertex (%f, %f):\n", i+1, cell_corners[i][0], cell_corners[i][1], cell_corners[i + 1][0], cell_corners[i + 1][1]);
+    if ((cell_corners)[i][1] <= point[1]){
+      if (cell_corners[i + 1][1] > point[1]){
+	printf("There is an upward crossing of the ray y = %f.\n", point[1]);
+	if (is_point_left_of_edge(cell_corners[i], cell_corners[i + 1], point) > 0){
+	  winding_number++;
+	  printf("The upward edge crossing happened on the right side of the presumed center point. The new winding number is increased to  %u.\n", winding_number);
+	}
+	else {
+	  printf("The downward edge crossing happened on the left side of the presumed center point. The winding number remains unchanged.\n");
+	}
+      } 
+      else {
+	printf("There is NO crossing of the ray y = %f.\n", point[1]);
+      }
+    }
+    else { 
+      if (cell_corners[i + 1][1] <= point[1]){
+	printf("There is a downward crossing of the ray y = %f.\n", point[1]);
+	if (is_point_left_of_edge(cell_corners[i], cell_corners[i + 1], point) < 0){
+	  winding_number--;
+	  printf("The downward edge crossing happened on the right side of the presumed center point. The new winding number is decreased to %u.\n", winding_number);
+	}
+	else {
+	  printf("The downward edge crosssing happened on the left side of the presumed center point. The winding number remains unchanged.\n");
+	}
+      }
+      else {
+	printf("There is NO crossing of the ray y = %f.\n", point[1]);
+      }
+    }
+    printf("\n");
+  }
+  return winding_number;
 }
 
 
@@ -738,13 +803,23 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
      
       /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
         
-      int winding_number = winding_numbers_algorithm(&cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
+      int winding_number = winding_numbers_test_algorithm(cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
 
-      printf("If the winding number is not 0 the presumed center point is within the bounds of the cell. The winding number is: %u\n\n", winding_number);
+      printf("If the winding number is not 0 the presumed center point is within the bounds of the cell. The winding number is: %d\n\n", winding_number);
 
 }
 
- 
+  double cell_corners[5][2] = {{1.5, 0}, {0, 1.5}, {-1.5, 0}, {0, -1.5}, {1.5, 0}};
+
+  double center_point[2] = {0.5, 0.5};
+
+  int winding_test_number = winding_numbers_test_algorithm(cell_corners, 4, center_point);
+
+  printf("If the winding test number is not 0 the presumed center point is within the bounds of the cell. The winding number is: %d\n\n", winding_test_number);
+
+  
+
+
   cdoAbort("implementation missing");
 }
 
