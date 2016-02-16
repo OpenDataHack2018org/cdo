@@ -83,33 +83,8 @@ static double is_point_left_of_edge(double point_on_line_1[2], double point_on_l
   return answer;
 }
 
-static int winding_numbers_algorithm(double (*cell_corners)[][2], int number_corners, double point[]){
-  
-  /* 
-     Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
-     Returns 0 if the point is outside, returns 1 if the point is inside the cell.
-     Based on an algorithm by Dan Sunday (geomalgorithms.com). His algorithm is completely free for use and modification.
-   */
-  
-  int winding_number = 0;
-  
-  for (int i = 0;  i < number_corners; i++){
-    if ((*cell_corners)[i][1] <= point[1]){
-      if ((*cell_corners)[i + 1][1] > point[1])
-	if (is_point_left_of_edge((*cell_corners)[i], (*cell_corners)[i + 1], point) > 0)
-	  ++winding_number;
-    }
-    else { if ((*cell_corners)[i + 1][1] <= point[1])
-	if (is_point_left_of_edge((*cell_corners)[i], (*cell_corners)[i + 1], point) < 0)
-	  --winding_number;
-    }
-  }
 
-  return winding_number;
-
-}
-
-static int winding_numbers_test_algorithm(double cell_corners[][2], int number_corners, double point[]){
+static int winding_numbers_algorithm(double cell_corners[][2], int number_corners, double point[]){
   
   /* 
      Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
@@ -117,7 +92,7 @@ static int winding_numbers_test_algorithm(double cell_corners[][2], int number_c
      Based on an algorithm by Dan Sunday (geomalgorithms.com). His algorithm is completely free for use and modification.
   */
 
-  printf("Testing whether the presumed center point lies within the bounds of the cell.\n \n");
+  printf("Checking if the presumed center point lies within the bounds of the cell ... \n\n");
   
   int winding_number = 0;
   
@@ -146,7 +121,7 @@ static int winding_numbers_test_algorithm(double cell_corners[][2], int number_c
 	  printf("The downward edge crossing happened on the right side of the presumed center point. The new winding number is decreased to %u.\n", winding_number);
 	}
 	else {
-	  printf("The downward edge crosssing happened on the left side of the presumed center point. The winding number remains unchanged.\n");
+	  printf("The downward edge crossing happened on the left side of the presumed center point. The winding number remains unchanged.\n");
 	}
       }
       else {
@@ -157,6 +132,63 @@ static int winding_numbers_test_algorithm(double cell_corners[][2], int number_c
   }
   return winding_number;
 }
+
+static double perp_dot_product(double vector_one[2], double vector_two[2]){
+
+  /* 
+     The perp-dot product is used for testing if a simple polygon is convex. From Hill, F. S. Jr. "The Pleasures of 'Perp Dot' Products." Chapter II.5 in Graphics Gems IV, Academic Press, 1994
+     It uses a vector that is perpendicular to vector_one (rotated 90 degrees counterclockwise) to calculate the dot product with vector_two.
+     It is positive if vector_one is less than 90 degrees away from vector_two indicating a left turn between vector_one and vector_two, and is negative otherwise.
+     If all edges of a simple polygon wind the same way, it is convex.
+  */
+  
+  return (vector_one[0] * vector_two[1]) - (vector_one[1] - vector_two[0]);
+
+}
+
+static double sign(double x){
+
+  /* Is positive if x is positive, negative if x is negative and zero if x is zero.*/
+
+  return (x > 0) -  (x < 0);
+}
+
+
+static int is_simple_polygon_convex(double cell_corners[][2], int number_corners){
+
+  /* Uses the perp-dot product to tell if a simple polygon, a cell, is convex. */
+
+  double direction = 0;
+
+  for (int i = 0; i < number_corners - 1; i++){
+
+    /* Tests in which direction edge B winds that is connected to edge A when walking along the polygon edges. Does so for all edges of the polygon. */
+
+    double edge_a[2] = {cell_corners[i + 1][0] - cell_corners[i][0], cell_corners[i + 1][1] - cell_corners[i][1]};
+    double edge_b[2] = {cell_corners[i + 2][0] - cell_corners[i + 1][0], cell_corners[i + 2][1] - cell_corners[i + 1][1]};
+    
+    double turns_to = sign(perp_dot_product(edge_a, edge_b));
+    
+    /* In the first iteration the direction of winding of the entire polygon is set. Better not be 0.*/
+
+    if (i == 1){
+      direction = turns_to;
+    }
+
+    if (sign(direction) != sign(turns_to)){
+      if (direction != 0){
+	return 0;
+      }
+    }
+    else{
+      direction = turns_to;
+    }      
+  }
+  
+  return 1;
+
+}
+
 
 
 
@@ -697,7 +729,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   for (cell_no = 0; cell_no < gridsize; ++cell_no)
     {
 
-       printf("Cell number %d:\n\n", cell_no+1);
+       printf("CELL NUMBER %d:\n\n", cell_no+1);
 
        /* Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of cartesian coordinates in Euclidean space. LLtoXYZ is located in clipping/geometry.h */
 
@@ -774,7 +806,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
       printf("The y-axis coordinates after normalization are: (%f, %f, %f)\n", new_y_axis[0], new_y_axis[1], new_y_axis[2]);
       printf("The x-axis coordinates after normalization are: (%f, %f, %f)\n\n", new_x_axis[0], new_x_axis[1], new_x_axis[2]);
       
-      printf("Checking orthogonality of coordinate axes after normalization...\n");
+      printf("Checking orthogonality of coordinate axes after normalization...\n\n");
       printf("Scalar product of x- and z-axes: %f\n", dotproduct(new_x_axis, new_z_axis));
       printf("Scalar product of y- and z-axes: %f\n", dotproduct(new_y_axis, new_z_axis));
       printf("Scalar product of x- and y-axes: %f\n\n", dotproduct(new_x_axis, new_y_axis));
@@ -801,24 +833,48 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
       printf("The center xyz coordinates in respect to the original reference frame are: %f, %f, %f\n", center_point_in_Euclidean_space[0], center_point_in_Euclidean_space[1], center_point_in_Euclidean_space[2]);
       printf("The center xy coordinates in respect to the reference frame contructed from the surface normal of the cell as its z-axis are: %f, %f\n\n", center_point_on_cell_plane[0], center_point_on_cell_plane[1]);
      
+      
       /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
         
-      int winding_number = winding_numbers_test_algorithm(cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
+      int winding_number = winding_numbers_algorithm(cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
 
-      printf("If the winding number is not 0 the presumed center point is within the bounds of the cell. The winding number is: %d\n\n", winding_number);
+      if (winding_number == 0){
+	printf("The presumed center point lies OUTSIDE the bounds of the cell.\n\n");
+      } else {
+	printf("The presumed center point lies INSIDE the bounds of the cell.\n\n");
+      }
+
+      /* Convexity of the cell is tested. */
+
+      printf("Checking if the cell is convex ... ");
+
+      if (is_simple_polygon_convex(cell_corners_on_cell_plane, ncorner) == 1){
+	printf("cell is convex!\n\n");
+      } else {
+	printf("cell is not convex!\n\n");
+      }
 
 }
+  
+  /*
 
   double cell_corners[5][2] = {{1.5, 0}, {0, 1.5}, {-1.5, 0}, {0, -1.5}, {1.5, 0}};
 
   double center_point[2] = {0.5, 0.5};
 
-  int winding_test_number = winding_numbers_test_algorithm(cell_corners, 4, center_point);
+  int winding_test_number = winding_numbers_algorithm(cell_corners, 4, center_point);
 
   printf("If the winding test number is not 0 the presumed center point is within the bounds of the cell. The winding number is: %d\n\n", winding_test_number);
 
-  
+  double u = 34;
 
+  printf("%f has the sign: %f\n", u, sign(u));
+
+  double cell_corners_2[5][2] = {{1.5, 0}, {0, 1.5}, {-1.5, 0}, {0, -1.5}, {1.5, 0}};
+
+  printf("The polygon is convex? %u\n", is_simple_polygon_convex(cell_corners_2, 4));
+  
+  */
 
   cdoAbort("implementation missing");
 }
