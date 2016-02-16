@@ -849,6 +849,7 @@ static const char *opalias[][2] =
   {"nvar",                "npar"},
   {"outputkey",           "outputtab"},
   {"vardes",              "pardes"},
+  {"selvar",              "selname"},
   {"delvar",              "delname"},
   {"remapcon1",           "remaplaf"},
   {"remapdis1",           "remapnn"},
