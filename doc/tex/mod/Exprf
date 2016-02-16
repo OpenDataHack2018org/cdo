@@ -44,7 +44,9 @@ The following operators are supported:
      ?:     & ternary conditional & x ? y : z & y, if x not equal 0, else z 
 @EndTable
 
-The following intrinsic functions are available:
+The following functions are supported:
+
+Math intrinsics:
 
 @BeginList log10(x)
 @Item = abs(x)
@@ -81,7 +83,7 @@ Arc-cosine of x, where x is specified in radians
 Arc-tangent of x, where x is specified in radians
 @EndList
 
-The following coordinate functions are available:
+Coordinates:
 
 @BeginList clon(x)
 @Item = clon(x)
@@ -92,11 +94,9 @@ Latitude coordinate of x (available only if x has geographical coordinates)
 Level coordinate of x (0, if x is a 2D surface variable)
 @EndList
 
-The following utility functions are available:
+Constants:
 
 @BeginList missval(x)
-@Item = remove(x)
-Remove variable x from output stream
 @Item = ngp(x)
 Number of horizontal grid points
 @Item = nlev(x)
@@ -107,10 +107,24 @@ Total number of elements (ngp(x)*nlev(x))
 Returns the missing value of variable x
 @EndList
 
-The following CDO functions are available:
+Statistical values over a field:
 
-@mod{fldmin}, @mod{fldmax}, @mod{fldsum}, @mod{fldmean}, @mod{fldavg}, @mod{fldstd}, @mod{fldstd1}, @mod{fldvar}, @mod{fldvar1}, 
-@mod{vertmin}, @mod{vertmax}, @mod{vertsum}, @mod{vertmean}, @mod{vertavg}, @mod{vertstd}, @mod{vertstd1}, @mod{vertvar}, @mod{vertvar1}
+@mod{fldmin}(x), @mod{fldmax}(x), @mod{fldsum}(x), @mod{fldmean}(x), @mod{fldavg}(x), @mod{fldstd}(x), @mod{fldstd1}(x), @mod{fldvar}(x), @mod{fldvar1}(x)
+
+Vertical statistical values:
+
+@mod{vertmin}(x), @mod{vertmax}(x), @mod{vertsum}(x), @mod{vertmean}(x), @mod{vertavg}(x), @mod{vertstd}(x), @mod{vertstd1}(x), @mod{vertvar}(x), @mod{vertvar1}(x)
+
+Miscellaneous:
+
+@BeginList sellevidx(x,k)
+@Item = sellevel(x,k)
+Select level k of variable x
+@Item = sellevidx(x,k)
+Select level index k of variable x
+@Item = remove(x)
+Remove variable x from output stream
+@EndList
 
 @EndDescription
 @EndModule
