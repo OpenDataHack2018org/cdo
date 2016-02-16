@@ -903,6 +903,19 @@ nodeType *ex_fun(int init, int funcID, nodeType *p1)
 }
 
 static
+size_t get_levidx(size_t nlev, const double *data, double value, const char *funcname)
+{
+  size_t levidx;
+  
+  for ( levidx = 0; levidx < nlev; ++levidx )
+    if ( IS_EQUAL(data[levidx], value) )
+      break;
+  if ( levidx == nlev ) cdoAbort("%s(): level %g not found!", funcname, value);
+
+  return levidx;
+}
+
+static
 nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t *parse_arg)
 {  
   const char *funcname = fun_sym_tbl[funcID].name;            
@@ -924,45 +937,54 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
 
   p->param.nlev = 1;
 
+  int zaxisID = p1->param.zaxisID;
+  int coordID = params_get_coordID(parse_arg, 'z', zaxisID);
   size_t levidx = 0;
+  
+  double *data = NULL;
   if ( init )
     {
-      int zaxisID = p1->param.zaxisID;
-      int coordID = params_get_coordID(parse_arg, 'z', zaxisID);
       parse_arg->coords[coordID].needed = true;
 
-      double *data = (double*) malloc(nlev*sizeof(double));
+      data = (double*) malloc(nlev*sizeof(double));
       zaxisInqLevels(zaxisID, data);
-
-      for ( levidx = 0; levidx < nlev; ++levidx )
-        if ( IS_EQUAL(data[levidx], value) )
-          break;
-      if ( levidx == nlev ) cdoAbort("%s(): level %g not found!", funcname, value);
-
-      int zaxisID2 = zaxisCreate(zaxisInqType(zaxisID), 1);
-      zaxisDefLevels(zaxisID2, &data[levidx]);
-      p->param.zaxisID = zaxisID2;
     }
   else
     {
-      int zaxisID = p1->param.zaxisID;
-      int coordID = params_get_coordID(parse_arg, 'z', zaxisID);
-      const double *data = parse_arg->coords[coordID].data;
-
-      for ( levidx = 0; levidx < nlev; ++levidx )
-        if ( IS_EQUAL(data[levidx], value) )
-          break;
-      if ( levidx == nlev ) cdoAbort("%s(): level %g not found!", funcname, value);
+      data = parse_arg->coords[coordID].data;
     }
-  
+
+  if ( strcmp(funcname, "sellevidx") == 0 )
+    {
+      long ilevidx = lround(value);
+      if ( ilevidx < 1 || ilevidx > (long)nlev )
+        cdoAbort("%s(): level index %ld out of range (range: 1-%zu)!", funcname, ilevidx, nlev);
+      levidx = (size_t) ilevidx - 1;
+    }
+  else if ( strcmp(funcname, "sellevel") == 0 )
+    {
+      levidx = get_levidx(nlev, data, value, funcname);
+    }
+  else
+    cdoAbort("Function %s() not implemented!", funcname);
+
+  if ( init )
+    {
+      double level = data[levidx];
+      int zaxisID2 = zaxisCreate(zaxisInqType(zaxisID), 1);
+      zaxisDefLevels(zaxisID2, &level);
+      p->param.zaxisID = zaxisID2;
+    }
+
+  if ( init ) Free(data);
+
   if ( ! init )
     {
       p->param.data = (double*) Malloc(ngp*sizeof(double));
       double *restrict pdata = p->param.data;
       const double *restrict p1data = p1->param.data+ngp*levidx;
 
-      for ( size_t i = 0; i < ngp; i++ )
-        pdata[i] = p1data[i];
+      for ( size_t i = 0; i < ngp; i++ ) pdata[i] = p1data[i];
 
       if ( nmiss > 0 )
         {

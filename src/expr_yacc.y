@@ -96,6 +96,7 @@ expr:
         | expr OR  expr           { $$ = expr_opr(OR,  2, $1, $3); }
         | expr '?' expr ':' expr  { $$ = expr_opr('?', 3, $1, $3, $5); }
         | '(' expr ')'            { $$ = $2; }
+        | FUNCTION '(' expr ',' '-' CONSTANT ')'   { $$ = expr_fun1c($1, $3, - $6); }
         | FUNCTION '(' expr ',' CONSTANT ')'   { $$ = expr_fun1c($1, $3, $5); }
         | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }
         ;
