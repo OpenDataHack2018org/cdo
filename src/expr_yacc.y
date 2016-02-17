@@ -40,6 +40,7 @@ void freeNode(nodeType *p);
 %token <varnm>  VARIABLE
 %token <fname>  FUNCTION
 %token REMOVE
+%token PRINT
 
 %left AND OR
 %left LEG GE LE EQ NE GT LT
@@ -68,6 +69,7 @@ stmt:
         | VARIABLE '=' expr ';'   { $$ = expr_opr('=', 2, expr_var($1), $3); }
         | VARIABLE ';'            { $$ = expr_opr('=', 2, expr_var($1), expr_var($1)); } /* conflicts: 1 shift/reduce */
         | REMOVE VARIABLE ')' ';' { $$ = expr_com("remove", $2); }
+        | PRINT VARIABLE ')' ';' { $$ = expr_com("print", $2); }
         | '{' stmt_list '}'       { $$ = $2; }
         ;
 

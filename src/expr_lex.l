@@ -58,6 +58,8 @@ M_E          {
 
 "remove("    { return REMOVE; }
 
+"print("    { return PRINT; }
+
 {LPH}{LPHDGT}*/[ ]*\( {
                 yylval->fname = strdup(yytext);
                 return FUNCTION;

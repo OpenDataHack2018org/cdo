@@ -1334,6 +1334,18 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                 params[varID].remove = true;
               }
           }
+        else
+          {
+            if ( strcmp(cname, "print") == 0 )
+              {
+                size_t ngp = params[varID].ngp;
+                size_t nlev = params[varID].nlev;
+                const double *data = params[varID].data;
+                for ( size_t k = 0; k < nlev; ++k )
+                  for ( size_t i = 0; i < ngp; ++i )
+                    fprintf(stdout, "   %s[lev=%zu:gp=%zu] = %g\n", vname, k+1, i+1, data[k*ngp+i]);
+              }
+          }
         
         break;
       }
