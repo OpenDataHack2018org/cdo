@@ -128,6 +128,7 @@ typedef struct {
   int        nvars1;
   int        ncoords;
   int        maxcoords;
+  int        tsID;
   int        pointID;
   int        surfaceID;
   coordType *coords;

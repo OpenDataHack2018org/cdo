@@ -301,6 +301,7 @@ void *Expr(void *argument)
     parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
 
   int vartsID = params_add_ts(&parse_arg);
+  parse_arg.tsID       = vartsID;
   params_add_coordinates(vlistID1, &parse_arg);
                   
   CDO_parser_errorno = 0;
