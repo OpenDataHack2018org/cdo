@@ -81,6 +81,10 @@ Arc-sine of x, where x is specified in radians
 Arc-cosine of x, where x is specified in radians
 @Item = atan(x)
 Arc-tangent of x, where x is specified in radians
+@Item = rad(x)
+Convert x from degrees to radians
+@Item = deg(x)
+Convert x from radians to degrees
 @EndList
 
 Coordinates:

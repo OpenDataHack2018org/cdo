@@ -61,6 +61,8 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 static double f_int(double x)          { return (int)(x); }
 static double f_nint(double x)         { return round(x); }
 static double f_sqr(double x)          { return x*x;      }
+static double f_rad(double x)          { return x*M_PI/180.; }
+static double f_deg(double x)          { return x*180./M_PI; }
 static double pt_ngp(paramType *p)     { return p->ngp;   }
 static double pt_nlev(paramType *p)    { return p->nlev;  }
 static double pt_size(paramType *p)    { return p->ngp*p->nlev; }
@@ -101,6 +103,8 @@ static func_t fun_sym_tbl[] =
   {FT_STD, 0, "acosh", (void (*)()) acosh},
   {FT_STD, 0, "atanh", (void (*)()) atanh},
   {FT_STD, 0, "gamma", (void (*)()) tgamma},
+  {FT_STD, 0, "rad",   (void (*)()) f_rad},
+  {FT_STD, 0, "deg",   (void (*)()) f_deg},
 
   // constant functions
   {FT_CONST, 0, "ngp",     (void (*)()) pt_ngp},      // number of horizontal grid points

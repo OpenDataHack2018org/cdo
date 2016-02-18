@@ -1349,6 +1349,8 @@ static const char *ExprHelp[] = {
     "    asin(x) "    "    Arc-sine of x, where x is specified in radians",
     "    acos(x) "    "    Arc-cosine of x, where x is specified in radians",
     "    atan(x) "    "    Arc-tangent of x, where x is specified in radians",
+    "    rad(x)  "    "    Convert x from degrees to radians",
+    "    deg(x)  "    "    Convert x from radians to degrees",
     "    ",
     "    Coordinates:",
     "    ",
