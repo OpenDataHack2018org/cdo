@@ -35,23 +35,19 @@
 #include "pstream.h"
 
 
-#define  NDAY       373
+#define  MAX_DOY       373
 
 
 void *Ydaystat(void *argument)
 {
-  int i;
-  int varID;
-  int recID;
-  int vdate, vtime;
-  int year, month, day, dayoy;
+  int varID, levelID;
+  int year, month, day;
   int nrecs;
-  int levelID;
-  int nsets[NDAY];
+  int nsets[MAX_DOY];
   int nmiss;
   int nlevel;
-  int vdates[NDAY], vtimes[NDAY];
-  field_t **vars1[NDAY], **vars2[NDAY], **samp1[NDAY];
+  int vdates[MAX_DOY], vtimes[MAX_DOY];
+  field_t **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
   cdoInitialize(argument);
 
@@ -73,7 +69,7 @@ void *Ydaystat(void *argument)
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor = operfunc == func_std1 || operfunc == func_var1;
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     {
       vars1[dayoy] = NULL;
       vars2[dayoy] = NULL;
@@ -111,20 +107,18 @@ void *Ydaystat(void *argument)
   int otsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
 
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      if ( month >= 1 && month <= 12 )
-	dayoy = (month-1)*31 + day;
-      else
-	dayoy = 0;
+      int dayoy = 0;
+      if ( month >= 1 && month <= 12 ) dayoy = (month-1)*31 + day;
 
-      if ( dayoy < 0 || dayoy >= NDAY )
-	cdoAbort("day of year %d out of range (date=%d)!", dayoy, vdate);
+      if ( dayoy < 0 || dayoy >= MAX_DOY )
+	cdoAbort("Day of year %d out of range (date=%d)!", dayoy, vdate);
 
       vdates[dayoy] = vdate;
       vtimes[dayoy] = vtime;
@@ -137,7 +131,7 @@ void *Ydaystat(void *argument)
 	    vars2[dayoy] = field_malloc(vlistID1, FIELD_PTR);
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -159,7 +153,7 @@ void *Ydaystat(void *argument)
 		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
 		    samp1[dayoy][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( int i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[dayoy][varID][levelID].ptr[i],
 				      vars1[dayoy][varID][levelID].missval) )
 		      samp1[dayoy][varID][levelID].ptr[i] = 0;
@@ -179,11 +173,11 @@ void *Ydaystat(void *argument)
 		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
 		    {
 		      samp1[dayoy][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			samp1[dayoy][varID][levelID].ptr[i] = nsets[dayoy];
 		    }
 		  
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( int i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[dayoy][varID][levelID].missval) )
 		      samp1[dayoy][varID][levelID].ptr[i]++;
 		}
@@ -215,13 +209,13 @@ void *Ydaystat(void *argument)
 
   // set the year to the minimum of years found on output timestep
   int outyear = 1e9;
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     if ( nsets[dayoy] )
       {
         cdiDecodeDate(vdates[dayoy], &year, &month, &day);
         if ( year < outyear ) outyear = year;
       }
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     if ( nsets[dayoy] )
       {
         cdiDecodeDate(vdates[dayoy], &year, &month, &day);
@@ -229,7 +223,7 @@ void *Ydaystat(void *argument)
         //  printf("vdates[%d] = %d  nsets = %d\n", dayoy, vdates[dayoy], nsets[dayoy]);
       }
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     if ( nsets[dayoy] )
       {
 	if ( lmean )
@@ -273,7 +267,7 @@ void *Ydaystat(void *argument)
 	taxisDefVtime(taxisID2, vtimes[dayoy]);
 	streamDefTimestep(streamID2, otsID);
 
-	for ( recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID   = recVarID[recID];
 	    levelID = recLevelID[recID];
@@ -288,7 +282,7 @@ void *Ydaystat(void *argument)
 	otsID++;
       }
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     {
       if ( vars1[dayoy] != NULL )
 	{
