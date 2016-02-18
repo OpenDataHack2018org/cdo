@@ -32,27 +32,101 @@
 #include "clipping/clipping.c"
 #include "math.h"
 
-static double euclidean_norm (double a[]) {
+
+static double Euclidean_norm (double a[]) {
 
   /* Computes the Euclidean norm of a vector given in Cartesian coordinates. */
 
   return sqrt(pow(a[0],2) + pow(a[1],2) + pow(a[2],2));
 }
 
-static void divide_by_scalar (double (*a)[3], double scalar) {
+static void divide_by_scalar (double (*p_a)[3], double scalar) {
 
   /* Component-wise scalar division of a three dimensional vector given in Cartesian coordinates. */
 
-  (*a)[0] = (*a)[0]/scalar;
-  (*a)[1] = (*a)[1]/scalar;
-  (*a)[2] = (*a)[2]/scalar;
+  (*p_a)[0] = (*p_a)[0]/scalar;
+  (*p_a)[1] = (*p_a)[1]/scalar;
+  (*p_a)[2] = (*p_a)[2]/scalar;
 }
 
-static void normalize_vector(double (*a)[3]){
+static void normalize_vector(double (*p_a)[3]){
 
-  /* Normalizes a vector by dividing it though its magnitude. */
+  /* Normalizes a vector a by dividing it though its magnitude. */
 
-  divide_by_scalar(a, euclidean_norm(*a));
+  divide_by_scalar(p_a, Euclidean_norm(*p_a));
+}
+
+
+static void compute_the_new_z_axis(double (*cell_corners_in_Euclidean_space)[][3], double (*p_new_z_axis)[3]){
+
+  /* Takes the first three corners/vertices of the cell and computes two edges originating at the first corner/vertex. These two edges are on the same plane as all the other vertices. */
+
+  double edge_one[3] = {(*cell_corners_in_Euclidean_space)[1][0] -(*cell_corners_in_Euclidean_space)[0][0],
+			(*cell_corners_in_Euclidean_space)[1][1] -(*cell_corners_in_Euclidean_space)[0][1],
+			(*cell_corners_in_Euclidean_space)[1][2] -(*cell_corners_in_Euclidean_space)[0][2]};
+  
+  double edge_two[3] = {(*cell_corners_in_Euclidean_space)[2][0] - (*cell_corners_in_Euclidean_space)[0][0],
+			(*cell_corners_in_Euclidean_space)[2][1] - (*cell_corners_in_Euclidean_space)[0][1],
+			(*cell_corners_in_Euclidean_space)[2][2] - (*cell_corners_in_Euclidean_space)[0][2]};
+
+  /* The cross product of the two edges is the surface normal and the new z-axis. crossproduct_d is defined in clipping/geometry.h */
+  
+  crossproduct_d((edge_one), (edge_two), (*p_new_z_axis));
+
+  normalize_vector(p_new_z_axis);
+}
+ 
+static void compute_the_new_y_axis(double (*p_new_z_axis)[3], double (*p_new_y_axis)[3]){
+
+  /* Then the new y-axis is the result of the cross product of the new z-axis and the old x-axis. crossproduct_d is defined in clipping/geometry.h */
+  
+  double old_x_axis[3] = {1, 0, 0};
+  
+  crossproduct_d((*p_new_z_axis), old_x_axis, (*p_new_y_axis));
+  
+  normalize_vector(p_new_y_axis);
+}
+
+static void compute_the_new_x_axis(double (*p_new_z_axis)[3], double (*p_new_y_axis)[3], double (*p_new_x_axis)[3]){
+
+  /* The new x-axis is the result of the cross product of the new z-axis and the new y-axis. crossproduct_d is defined in clipping/geometry.h */
+  
+  crossproduct_d((*p_new_y_axis), (*p_new_z_axis), (*p_new_x_axis));
+  
+  normalize_vector(p_new_x_axis);
+}
+
+static void project_Euclidean_corner_coordinates_onto_the_cell_plane(double (*p_new_x_axis)[3], double (*p_new_y_axis)[3], double (*p_cell_corners_in_Euclidean_space)[][3], double (*p_cell_corners_on_cell_plane)[][2], int ncorners){
+
+  /* All corner points are projected onto the new x- and y-axes. dotproduct is defined in clipping/clipping.c */
+
+  for (int corner_no = 0; corner_no < ncorners; corner_no++){
+    (*p_cell_corners_on_cell_plane)[corner_no][0] = dotproduct((*p_new_x_axis), (*p_cell_corners_in_Euclidean_space)[corner_no]);
+    (*p_cell_corners_on_cell_plane)[corner_no][1] = dotproduct((*p_new_y_axis), (*p_cell_corners_in_Euclidean_space)[corner_no]);  
+    }
+      
+  /* The last vertex is set to be the same as the first one in order to close the cell.*/
+
+  (*p_cell_corners_on_cell_plane)[ncorners][0] = (*p_cell_corners_on_cell_plane)[0][0];
+  (*p_cell_corners_on_cell_plane)[ncorners][1] = (*p_cell_corners_on_cell_plane)[0][1];
+
+  printf("The coordinates of the cell vertices on the cell plane are: ");
+
+  for (int corner_no =0; corner_no <= ncorners; corner_no++){
+    printf("(%f, %f) ", (*p_cell_corners_on_cell_plane)[corner_no][0], (*p_cell_corners_on_cell_plane)[corner_no][1]);
+  }
+
+  printf("\n\n");
+}
+
+static void project_Euclidean_center_coordinates_onto_the_cell_plane(double (*p_new_x_axis)[3], double (*p_new_y_axis)[3], double (*p_center_point_in_Euclidean_space)[3], double (*p_center_point_on_cell_plane)[2]){
+  
+  /* The center point is projected onto the new x- and -y-axes. dotproduct is defined in clipping/clipping.c  */
+
+  (*p_center_point_on_cell_plane)[0] = dotproduct((*p_new_x_axis), (*p_center_point_in_Euclidean_space));
+  (*p_center_point_on_cell_plane)[1] = dotproduct((*p_new_y_axis), (*p_center_point_in_Euclidean_space));
+
+  printf("The coordinates of the presumed center point of the cell on the cell plane are: (%f, %f)\n\n", (*p_center_point_on_cell_plane)[0], (*p_center_point_on_cell_plane)[1]);
 }
 
 static double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2]){
@@ -84,7 +158,7 @@ static double is_point_left_of_edge(double point_on_line_1[2], double point_on_l
 }
 
 
-static int winding_numbers_algorithm(double cell_corners[][2], int number_corners, double point[]){
+static int winding_numbers_algorithm(double (*cell_corners)[][2], int number_corners, double point[]){
   
   /* 
      Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
@@ -97,11 +171,11 @@ static int winding_numbers_algorithm(double cell_corners[][2], int number_corner
   int winding_number = 0;
   
   for (int i = 0;  i < number_corners; i++){
-    printf("Edge number %u from vertex (%f, %f) to vertex (%f, %f):\n", i+1, cell_corners[i][0], cell_corners[i][1], cell_corners[i + 1][0], cell_corners[i + 1][1]);
-    if ((cell_corners)[i][1] <= point[1]){
-      if (cell_corners[i + 1][1] > point[1]){
+    printf("Edge number %u from vertex (%f, %f) to vertex (%f, %f):\n\n", i+1, (*cell_corners)[i][0], (*cell_corners)[i][1], (*cell_corners)[i + 1][0], (*cell_corners)[i + 1][1]);
+    if ((*cell_corners)[i][1] <= point[1]){
+      if ((*cell_corners)[i + 1][1] > point[1]){
 	printf("There is an upward crossing of the ray y = %f.\n", point[1]);
-	if (is_point_left_of_edge(cell_corners[i], cell_corners[i + 1], point) > 0){
+	if (is_point_left_of_edge((*cell_corners)[i], (*cell_corners)[i + 1], point) > 0){
 	  winding_number++;
 	  printf("The upward edge crossing happened on the right side of the presumed center point. The new winding number is increased to  %u.\n", winding_number);
 	}
@@ -114,9 +188,9 @@ static int winding_numbers_algorithm(double cell_corners[][2], int number_corner
       }
     }
     else { 
-      if (cell_corners[i + 1][1] <= point[1]){
+      if ((*cell_corners)[i + 1][1] <= point[1]){
 	printf("There is a downward crossing of the ray y = %f.\n", point[1]);
-	if (is_point_left_of_edge(cell_corners[i], cell_corners[i + 1], point) < 0){
+	if (is_point_left_of_edge((*cell_corners)[i], (*cell_corners)[i + 1], point) < 0){
 	  winding_number--;
 	  printf("The downward edge crossing happened on the right side of the presumed center point. The new winding number is decreased to %u.\n", winding_number);
 	}
@@ -148,13 +222,13 @@ static double perp_dot_product(double vector_one[2], double vector_two[2]){
 
 static double sign(double x){
 
-  /* Is positive if x is positive, negative if x is negative and zero if x is zero.*/
+  /* Is +1 if x is positive, -1 if x is negative and 0 if x is zero.*/
 
   return (x > 0) -  (x < 0);
 }
 
 
-static int is_simple_polygon_convex(double cell_corners[][2], int number_corners){
+static int is_simple_polygon_convex(double (*cell_corners)[][2], int number_corners){
 
   /* Uses the perp-dot product to tell if a simple polygon, a cell, is convex. */
 
@@ -164,8 +238,8 @@ static int is_simple_polygon_convex(double cell_corners[][2], int number_corners
 
     /* Tests in which direction edge B winds that is connected to edge A when walking along the polygon edges. Does so for all edges of the polygon. */
 
-    double edge_a[2] = {cell_corners[i + 1][0] - cell_corners[i][0], cell_corners[i + 1][1] - cell_corners[i][1]};
-    double edge_b[2] = {cell_corners[i + 2][0] - cell_corners[i + 1][0], cell_corners[i + 2][1] - cell_corners[i + 1][1]};
+    double edge_a[2] = {(*cell_corners)[i + 1][0] - (*cell_corners)[i][0], (*cell_corners)[i + 1][1] - (*cell_corners)[i][1]};
+    double edge_b[2] = {(*cell_corners)[i + 2][0] - (*cell_corners)[i + 1][0], (*cell_corners)[i + 2][1] - (*cell_corners)[i + 1][1]};
     
     double turns_to = sign(perp_dot_product(edge_a, edge_b));
     
@@ -184,11 +258,35 @@ static int is_simple_polygon_convex(double cell_corners[][2], int number_corners
       direction = turns_to;
     }      
   }
-  
   return 1;
-
 }
 
+static double calculate_twice_the_polygon_area(double (*cell_corners)[][2], int number_corners){
+
+  /* This algorithm works with non-convex and even self-intersecting polygons. It results in twice the area of the polygon. */
+  
+  double twice_the_polygon_area = 0;
+
+  for (int i = 0; i < number_corners - 1; i++){
+    
+    twice_the_polygon_area += ((*cell_corners)[i + 1][0] - (*cell_corners)[i][0]) * ((*cell_corners)[i + 1][1] - (*cell_corners)[i][1]);
+  }
+  return twice_the_polygon_area;
+}
+
+static int are_polygon_vertices_arranged_in_clockwise_order(double twice_the_cell_area){
+
+  /* A positive area indicates a clockwise arrangement of vertices, a negative area a counterclockwise arrangement. There should be an area to begin with. */
+  
+  double area_sign = sign(twice_the_cell_area);
+
+  if (area_sign > 0){
+    return 1;
+  }
+  if (area_sign < 0){
+    return 0;
+  }
+}
 
 
 
@@ -711,9 +809,9 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   /* 
      This function performs three tests on each cell of a given grid:
 
-     1) it tests whether the center point is within the bounds of the cell
-     2) it tests whether the corners all cell bounds have the same orientation, i.e. the corners of the cell are in clockwise or counterclockwise order
-     3) it tests whether the cell is convex
+     1) it tests whether all cell bounds have the same orientation, i.e. the corners of the cell are in clockwise or counterclockwise order
+     2) it tests whether the cell is convex
+     3) it tests whether the center point is within the bounds of the cell
 
      It performs these tests after longitude and latitude on the unit circle have been converted first to Cartesian coordinates in Euclidean space and subsequently to two dimensional coordinates on the plane each cell occupies.  
   */
@@ -726,18 +824,23 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   int cell_no;
   int corner_no;
 
+  int no_of_cells_with_vertices_arranged_in_clockwise_order = 0;
+  int no_of_cells_with_vertices_arranged_in_counterclockwise_order = 0;
+  int no_of_convex_cells = 0;
+  int no_of_degenerate_cells = 0;
+  int no_of_cells_with_center_points_within_their_bounds = 0;
+
   for (cell_no = 0; cell_no < gridsize; ++cell_no)
     {
 
-       printf("CELL NUMBER %d:\n\n", cell_no+1);
+       printf("Cell Number %d:\n\n", cell_no+1);
 
-       /* Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of cartesian coordinates in Euclidean space. LLtoXYZ is located in clipping/geometry.h */
-
-       /* This is first done for the presumed center point of the cell. LLtoXYZ is defined in clipping/geometry.h */
+       /* 
+	  Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of Cartesian coordinates in Euclidean space.
+	  This is first done for the presumed center point of the cell and then for all the corners of the cell. LLtoXYZ is defined in clipping/geometry.h 
+       */
 
       LLtoXYZ(grid_center_lon[cell_no], grid_center_lat[cell_no], center_point_in_Euclidean_space);
-
-      /* Then the transformation is done for all the corners of the cell. */
 
       for (corner_no = 0; corner_no < ncorner; ++corner_no)
 	{
@@ -749,134 +852,131 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 	In order to solve the two-dimensional point-in-polygon problem for each cell, the three-dimensional coordinates of the polygon and its center point are projected onto the two-dimensional plane they form.
         
 	This is done in the following steps:
-      
-	1) Compute the normal of the plane using three corners. The normal is the new z-axis. AT LEAST THREE CORNERS ARE A GIVEN.
+
+	1) Compute two vectors that lie on the cell plane. The first three corners of the cell are used to do this. THIS MEANS THAT AT LEAST THREE CORNERS MUST BE GIVEN.
+	   Then compute the normal of the cell plane the two vectors are on. The normal is the new z-axis.
 	2) Compute the new y-axis by computing the cross product of the new z-axis and the old x-axis.
 	3) Compute the new x-axis by computing the cross product of the new z-axis and the new y-axis.
-	4) Divide all three axis vectors by their length cutting them to unit length.
-	5) Project every corner point onto the new x- and y-axes by using the dot product.
+	4) Project every corner point onto the new x- and y-axes by using the dot product.
 
-	The result is a xy tuple for each corner and the presumend center point  which is a projection onto the plane the xyz corner points form.
+	The result is a xy tuple for each corner and the presumend center point which is a projection onto the plane the xyz corner points form.
       */
-
+      
       double new_x_axis[3];
       double new_y_axis[3];
       double new_z_axis[3];
-      double old_x_axis[3] = {1, 0, 0};
-      double old_y_axis[3] = {0, 1, 0};
-      double old_z_axis[3] = {0, 0, 1};
-
-      /* The surface normal is the result of the cross product of two edges of a cell polygon. The edges must not be parallel, i.e their cross product must not be zero. */
-
-      /* The two edges A and B are calculated from the first three corners of the cell. The first edge A is corner no. 2 - corner no. 1. */
-
-      double A[3] = {cell_corners_in_Euclidean_space[1][0] - cell_corners_in_Euclidean_space[0][0], cell_corners_in_Euclidean_space[1][1] - cell_corners_in_Euclidean_space[0][1], cell_corners_in_Euclidean_space[1][2] - cell_corners_in_Euclidean_space[0][2]};
       
-      /* The second edge B is corner no. 3 - corner no. 1. */
-
-      double B[3] = {cell_corners_in_Euclidean_space[2][0] - cell_corners_in_Euclidean_space[0][0], cell_corners_in_Euclidean_space[2][1] - cell_corners_in_Euclidean_space[0][1], cell_corners_in_Euclidean_space[2][2] - cell_corners_in_Euclidean_space[0][2]};
-
-      /* The cross product of the two edges A and B is the surface normal and the new z-axis. crossproduct_d is defined in clipping/geometry.h */
-
-      crossproduct_d(A, B, new_z_axis);
-
-      printf("The cross product of vector A (%f, %f, %f) and vector B (%f, %f, %f) is the normal vector (%f, %f, %f), the new z-axis.\n", A[0], A[1], A[2], B[0], B[1], B[2], new_z_axis[0], new_z_axis[1], new_z_axis[2] );
-
-      /* Then the new y-axis is the result of the cross product of the new z-axis and the old x-axis, and the new x-axis is the result of the cross product of the new z-axis and the new y-axis. */
-
-      crossproduct_d(old_x_axis, new_z_axis, new_y_axis);
-
-      printf("The cross product of the old x-axis (%f, %f, %f) and the new z-axis (%f, %f, %f) is the new y-axis (%f, %f, %f).\n", old_x_axis[0], old_x_axis[1], old_x_axis[2], new_z_axis[0], new_z_axis[1], new_z_axis[2], new_y_axis[0], new_y_axis[1], new_y_axis[2]);
-
-      crossproduct_d(new_z_axis, new_y_axis, new_x_axis);
-
-      printf("The cross product of the new z-axis (%f, %f, %f) and the new y-axis (%f, %f, %f) is the new x-axis (%f, %f, %f).\n\n", new_z_axis[0], new_z_axis[1], new_z_axis[2], new_y_axis[0], new_y_axis[1], new_y_axis[2], new_x_axis[0], new_x_axis[1], new_x_axis[2]);
-      	
-      /* The axis vectors need to be normalized in order to function as basis for a coordinate system. */
+      compute_the_new_z_axis(&cell_corners_in_Euclidean_space, &new_z_axis);
       
-      printf("The z-axis coordinates before normalization are: (%f, %f, %f)\n", new_z_axis[0], new_z_axis[1], new_z_axis[2]);
-      printf("The y-axis coordinates before normalization are: (%f, %f, %f)\n", new_y_axis[0], new_y_axis[1], new_y_axis[2]);
-      printf("The x-axis coordinates before normalization are: (%f, %f, %f)\n\n", new_x_axis[0], new_x_axis[1], new_x_axis[2]);
-        
-      normalize_vector(&new_x_axis);
-      normalize_vector(&new_y_axis);
-      normalize_vector(&new_z_axis);
-
-      printf("The z-axis coordinates after normalization are: (%f, %f, %f)\n", new_z_axis[0], new_z_axis[1], new_z_axis[2]);
-      printf("The y-axis coordinates after normalization are: (%f, %f, %f)\n", new_y_axis[0], new_y_axis[1], new_y_axis[2]);
-      printf("The x-axis coordinates after normalization are: (%f, %f, %f)\n\n", new_x_axis[0], new_x_axis[1], new_x_axis[2]);
+      compute_the_new_y_axis(&new_z_axis, &new_y_axis);
       
-      printf("Checking orthogonality of coordinate axes after normalization...\n\n");
-      printf("Scalar product of x- and z-axes: %f\n", dotproduct(new_x_axis, new_z_axis));
-      printf("Scalar product of y- and z-axes: %f\n", dotproduct(new_y_axis, new_z_axis));
-      printf("Scalar product of x- and y-axes: %f\n\n", dotproduct(new_x_axis, new_y_axis));
-
-
-      /* All corner points are projected onto the new x- and y-axes. dotproduct is defined in clipping/clipping.c */
-
-      for (corner_no = 0; corner_no < ncorner; ++corner_no)
-	{
-	  cell_corners_on_cell_plane[corner_no][0] = dotproduct(new_x_axis, cell_corners_in_Euclidean_space[corner_no]);
-	  cell_corners_on_cell_plane[corner_no][1] = dotproduct(new_y_axis, cell_corners_in_Euclidean_space[corner_no]);  
-	}
+      compute_the_new_x_axis(&new_z_axis, &new_y_axis, &new_x_axis);
       
-      cell_corners_on_cell_plane[ncorner][0] = cell_corners_on_cell_plane[0][0];
-      cell_corners_on_cell_plane[ncorner][1] = cell_corners_on_cell_plane[0][1];
-       
-
-
-      /* As well as the center point. */
-
-      center_point_on_cell_plane[0] = dotproduct(new_x_axis, center_point_in_Euclidean_space);
-      center_point_on_cell_plane[1] = dotproduct(new_y_axis, center_point_in_Euclidean_space);
+      project_Euclidean_corner_coordinates_onto_the_cell_plane(&new_x_axis, &new_y_axis, &cell_corners_in_Euclidean_space, &cell_corners_on_cell_plane, ncorner);
       
-      printf("The center xyz coordinates in respect to the original reference frame are: %f, %f, %f\n", center_point_in_Euclidean_space[0], center_point_in_Euclidean_space[1], center_point_in_Euclidean_space[2]);
-      printf("The center xy coordinates in respect to the reference frame contructed from the surface normal of the cell as its z-axis are: %f, %f\n\n", center_point_on_cell_plane[0], center_point_on_cell_plane[1]);
-     
-      
-      /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
-        
-      int winding_number = winding_numbers_algorithm(cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
+      project_Euclidean_center_coordinates_onto_the_cell_plane(&new_x_axis, &new_y_axis, &center_point_in_Euclidean_space, &center_point_on_cell_plane);
 
-      if (winding_number == 0){
-	printf("The presumed center point lies OUTSIDE the bounds of the cell.\n\n");
-      } else {
-	printf("The presumed center point lies INSIDE the bounds of the cell.\n\n");
+      /* Checking whether the cell has a size greater zero. */
+
+      double twice_the_cell_area = calculate_twice_the_polygon_area(&cell_corners_on_cell_plane, ncorner);
+
+      if (twice_the_cell_area == 0){
+	printf("This cell is degenerate. Its area equals zero.\n\n");
+	no_of_degenerate_cells += 1;
+	
+	continue;	 
       }
 
+      /* Checking whether the cell corners/polygon vertices are arranged in a clockwise or counterclockwise order. This is done by looking at the sign of the cell area. */
+
+      if (are_polygon_vertices_arranged_in_clockwise_order(twice_the_cell_area) == 1){
+	printf("The cell's corners are arranged in clockwise order.\n\n");
+	no_of_cells_with_vertices_arranged_in_clockwise_order += 1;
+      } else {
+	printf("The cell's corners are arranged in counterclockwise order.\n\n");
+	no_of_cells_with_vertices_arranged_in_counterclockwise_order += 1;
+      }
+  
       /* Convexity of the cell is tested. */
 
       printf("Checking if the cell is convex ... ");
 
-      if (is_simple_polygon_convex(cell_corners_on_cell_plane, ncorner) == 1){
+      if (is_simple_polygon_convex(&cell_corners_on_cell_plane, ncorner) == 1){
 	printf("cell is convex!\n\n");
+	no_of_convex_cells += 1;
       } else {
 	printf("cell is not convex!\n\n");
+	no_of_degenerate_cells += 1;
       }
+    
+      /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
+        
+      int winding_number = winding_numbers_algorithm(&cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
 
-}
+      if (winding_number == 0){
+	printf("The presumed center point lies OUTSIDE the bounds of the cell.\n\n\n\n");
+      } else {
+	printf("The presumed center point lies INSIDE the bounds of the cell.\n\n\n\n");
+	no_of_cells_with_center_points_within_their_bounds += 1;
+      }
+    }
   
+  printf("There are %u cells in all.\n\n", gridsize );
+  printf("Number of cells with clockwise ordering of vertices: %u\n", no_of_cells_with_vertices_arranged_in_clockwise_order);
+  printf("Number of cells with counterclockwise ordering of vertices: %u\n", no_of_cells_with_vertices_arranged_in_counterclockwise_order);
+  printf("Number of convex cells: %u\n", no_of_convex_cells);
+  printf("Number of nonsimple or degenerate cells; %u\n", no_of_degenerate_cells);
+  printf("Number of cells with presumed center points within their bounds: %u\n", no_of_cells_with_center_points_within_their_bounds);
+  
+  /******************* TESTING ********************/
+
+
+  double cell_corners_in_3D[][3] = {{1.5, 0, 1.5}, {0, 1.5, 0}, {-1.5, 0, -1.5}, {0, -1.5, 0}, {1.5, 0, -1.5}};
+  double cell_corners_in_2D[5][2];
+  double center_point_in_3D[3] = {0.5, 0, 0.5};
+  double center_point_in_2D[2];
+  double z_axis[3];
+  double y_axis[3];
+  double x_axis[3];
+
+  printf("\n\n\n\n\nTesting the projection on the cell plane:\n\n");
+
+  printf("The vertex coordinates in Euclidean space are: (%f, %f, %f), (%f, %f, %f), (%f, %f, %f), (%f, %f, %f)\n\n", cell_corners_in_3D[0][0], cell_corners_in_3D[0][1], cell_corners_in_3D[0][2], cell_corners_in_3D[1][0], cell_corners_in_3D[1][1], cell_corners_in_3D[1][2], cell_corners_in_3D[2][0], cell_corners_in_3D[2][1], cell_corners_in_3D[2][2], cell_corners_in_3D[3][0], cell_corners_in_3D[3][1], cell_corners_in_3D[3][2]);
+ 
+  printf("The center point coordinates in Euclidean space are: (%f, %f, %f)\n\n", center_point_in_3D[0], center_point_in_3D[1], center_point_in_3D[2]);
+
+  compute_the_new_z_axis(&cell_corners_in_3D, &z_axis);
+
+  printf("The new z-axis is: (%f, %f, %f)\n\n", z_axis[0], z_axis[1], z_axis[2] );
+
+  compute_the_new_y_axis(&z_axis, &y_axis);
+
+  printf("The new y-axis is: (%f, %f, %f)\n\n", y_axis[0], y_axis[1], y_axis[2] );
+
+  compute_the_new_x_axis(&z_axis, &y_axis, &x_axis);
+
+  printf("The new x-axis is: (%f, %f, %f)\n\n", x_axis[0], x_axis[1], x_axis[2] );
+
+  project_Euclidean_corner_coordinates_onto_the_cell_plane(&x_axis, &y_axis, &cell_corners_in_3D, &cell_corners_in_2D, 4);
+      
+  printf("The new vertex coordinates are:(%f, %f), (%f, %f), (%f, %f), (%f, %f)\n\n", cell_corners_in_2D[0][0], cell_corners_in_2D[0][1], cell_corners_in_2D[1][0], cell_corners_in_2D[1][1], cell_corners_in_2D[2][0], cell_corners_in_2D[2][1], cell_corners_in_2D[3][0], cell_corners_in_2D[3][1]);
+
+  project_Euclidean_center_coordinates_onto_the_cell_plane(&x_axis, &y_axis, &center_point_in_3D, &center_point_in_2D);
+
+  printf("The new center point coordinates are: (%f, %f)\n\n", center_point_in_2D[0], center_point_in_2D[1]);
+
+  double double_the_area = calculate_twice_the_polygon_area(&cell_corners_in_2D, 4);
+ 
+  printf("Are the vertices arranged in clockwise order? %u\n\n", are_polygon_vertices_arranged_in_clockwise_order(double_the_area));
+
+  printf("Is the cell convex? %u\n\n", is_simple_polygon_convex(&cell_corners_in_2D, 4));
+
+  int winding_number = winding_numbers_algorithm(&cell_corners_in_2D, 4, center_point_in_2D);
+
+  printf("If the winding number is 0 the presumed center point is outside the bounds of the cell. The winding number is: %d\n\n", winding_number);
+
   /*
-
-  double cell_corners[5][2] = {{1.5, 0}, {0, 1.5}, {-1.5, 0}, {0, -1.5}, {1.5, 0}};
-
-  double center_point[2] = {0.5, 0.5};
-
-  int winding_test_number = winding_numbers_algorithm(cell_corners, 4, center_point);
-
-  printf("If the winding test number is not 0 the presumed center point is within the bounds of the cell. The winding number is: %d\n\n", winding_test_number);
-
-  double u = 34;
-
-  printf("%f has the sign: %f\n", u, sign(u));
-
-  double cell_corners_2[5][2] = {{1.5, 0}, {0, 1.5}, {-1.5, 0}, {0, -1.5}, {1.5, 0}};
-
-  printf("The polygon is convex? %u\n", is_simple_polygon_convex(cell_corners_2, 4));
-  
-  */
-
-  cdoAbort("implementation missing");
+    cdoAbort("implementation missing");*/
 }
 
 void *Verifygrid(void *argument)
