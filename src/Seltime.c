@@ -54,7 +54,8 @@ void season_to_months(const char *season, int *imonths)
   else
     {
       if ( len > 12 ) cdoAbort("Too many months %d (limit=12)!", (int)len);
-      char *sstr = strcasestr(smons, season);
+      //      char *sstr = strcasestr(smons, season); // nonstandard extension
+      char *sstr = strstr(smons, season);
       if ( sstr == NULL ) cdoAbort("Season %s not available!", season);
       size_t ks = (size_t)(sstr-smons);
       size_t ke = ks + len;
