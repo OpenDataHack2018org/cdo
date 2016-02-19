@@ -443,7 +443,7 @@ bool par_check_season(int npar, char **parlist, bool *flaglist, int month)
 
   for ( int i = 0; i < npar; i++ )
     {
-      for ( int i = 0; i < 13; ++i ) imon[i] = 0;
+      for ( int m = 0; m < 13; ++m ) imon[m] = 0;
       season_to_months(parlist[i], imon);
       if ( imon[month] ) { found = true; flaglist[i] = true;/* break;*/}
     }
@@ -675,7 +675,7 @@ void *Select(void *argument)
 	  if ( operatorID == DELETE )
 	    {
 	      result = FALSE;
-	      for ( int varID = 0; varID < nvars; varID++ )
+	      for ( varID = 0; varID < nvars; varID++ )
 		{
 		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
 		  nlevs   = zaxisInqSize(zaxisID);
@@ -688,7 +688,7 @@ void *Select(void *argument)
 	      result = TRUE;
 	    }
 
-	  for ( int varID = 0; varID < nvars; varID++ )
+	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      int iparam = vlistInqVarParam(vlistID1, varID);
 	      code = vlistInqVarCode(vlistID1, varID);
@@ -764,7 +764,7 @@ void *Select(void *argument)
                 }
 	    }
 
-	  for ( int varID = 0; varID < nvars; varID++ )
+	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vars[varID] )
 		{
@@ -777,7 +777,7 @@ void *Select(void *argument)
                 }
             }
 
-	  for ( int varID = 0; varID < nvars; varID++ )
+	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vars[varID] )
 		{
@@ -830,7 +830,7 @@ void *Select(void *argument)
 	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = true;
 
 	  int npar = 0;
-	  for ( int varID = 0; varID < nvars; varID++ )
+	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
@@ -848,7 +848,7 @@ void *Select(void *argument)
 		{
                   lcopy_const = true;
 
-		  for ( int varID = 0; varID < nvars; varID++ )
+		  for ( varID = 0; varID < nvars; varID++ )
 		    {
 		      vars[varID] = true;
 		      zaxisID = vlistInqVarZaxis(vlistID1, varID);
@@ -866,7 +866,7 @@ void *Select(void *argument)
 	  //if ( cdoVerbose ) vlistPrint(vlistID1);
 
 	  vlistID0 = vlistDuplicate(vlistID1);
-	  for ( int varID = 0; varID < nvars; varID++ )
+	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
@@ -903,7 +903,7 @@ void *Select(void *argument)
 
 	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {	      
-	      for ( int varID = 0; varID < nvars2; ++varID )
+	      for ( varID = 0; varID < nvars2; ++varID )
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 	    }
 
@@ -948,7 +948,7 @@ void *Select(void *argument)
       if ( lcopy_const )
         {
           vardata2 = (double**) malloc(nvars2*sizeof(double));
-          for ( int varID = 0; varID < nvars2; ++varID ) vardata2[varID] = NULL;
+          for ( varID = 0; varID < nvars2; ++varID ) vardata2[varID] = NULL;
         }
 
       bool lstop = false;
@@ -1165,7 +1165,7 @@ void *Select(void *argument)
   if ( vars ) Free(vars);
   if ( vardata2 )
     {
-      for ( int varID = 0; varID < nvars2; ++ varID )
+      for ( varID = 0; varID < nvars2; ++ varID )
         if ( vardata2[varID] ) free(vardata2[varID]);
 
       free(vardata2);
