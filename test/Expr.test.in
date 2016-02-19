@@ -53,7 +53,7 @@ function testfunc()
   let NTEST+=1
 }
 #
-INSTR="_clev=var130.z;pottemp=var130*((100000/_clev)^0.287);"
+INSTR="_clev=clev(var130);pottemp=var130*((100000/_clev)^0.287);"
 testfunc
 #
 INSTR="var1=(var129>0)?(var130-273.15):var152;"
