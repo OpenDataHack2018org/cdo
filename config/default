@@ -41,14 +41,14 @@ case "${HOSTNAME}" in
                  --with-proj=/opt/local \
                  --with-szlib=$HOME/local"
 
-        if  test "$COMP" = icc ; then
+        if  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
-        elif  test "$COMP" = icpc ; then
+	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
@@ -87,14 +87,14 @@ case "${HOSTNAME}" in
                  --with-libxml2=/opt/local \
                  --with-proj=/opt/local"
 
-        if  test "$COMP" = icc ; then
-	  ${CONFPATH}configure --prefix=$HOME/local \
-                    $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native" CXX=icpc
-        elif  test "$COMP" = icpc ; then
+        if  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
 	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = icc ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
