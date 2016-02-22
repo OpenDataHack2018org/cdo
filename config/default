@@ -148,7 +148,12 @@ case "${HOSTNAME}" in
                  --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
                  --with-proj=/sw/squeeze-x64/proj-4.7.0"
 
-        if  test "$COMP" = icc ; then
+        if  test "$COMP" = icpc ; then
+          ${CONFPATH}configure --enable-cxx --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = icc ; then
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --with-fftw3 \
                     $CDOLIBS \
@@ -157,6 +162,10 @@ case "${HOSTNAME}" in
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -fast"
+        elif  test "$COMP" = g++ ; then
+	  ${CONFPATH}configure --enable-cxx \
+                    $CDOLIBS \
+	            CC=gcc CXX=g++ CFLAGS="-g -Wall-pedantic -O3"
 	else
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     --with-fftw3 \
