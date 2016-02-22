@@ -59,7 +59,7 @@ static void normalize_vector(double (*p_a)[3]){
 
 static void compute_the_new_z_axis(double (*cell_corners_in_Euclidean_space)[][3], double (*p_new_z_axis)[3]){
 
-  /* Takes the first three corners/vertices of the cell and computes two edges originating at the first corner/vertex. These two edges are on the same plane as all the other vertices. */
+  /* Takes the first three corners/vertices of the cell and computes two edges originating at the first corner/vertex. These two edges are on the same plane as all the other vertices. THERE NEED TO BE AT LEAST THREE CORNERS. */
 
   double edge_one[3] = {(*cell_corners_in_Euclidean_space)[1][0] -(*cell_corners_in_Euclidean_space)[0][0],
 			(*cell_corners_in_Euclidean_space)[1][1] -(*cell_corners_in_Euclidean_space)[0][1],
@@ -109,7 +109,8 @@ static void project_Euclidean_corner_coordinates_onto_the_cell_plane(double (*p_
 
   (*p_cell_corners_on_cell_plane)[ncorners][0] = (*p_cell_corners_on_cell_plane)[0][0];
   (*p_cell_corners_on_cell_plane)[ncorners][1] = (*p_cell_corners_on_cell_plane)[0][1];
-
+  
+  /*
   printf("The coordinates of the cell vertices on the cell plane are: ");
 
   for (int corner_no =0; corner_no <= ncorners; corner_no++){
@@ -117,6 +118,7 @@ static void project_Euclidean_corner_coordinates_onto_the_cell_plane(double (*p_
   }
 
   printf("\n\n");
+  */
 }
 
 static void project_Euclidean_center_coordinates_onto_the_cell_plane(double (*p_new_x_axis)[3], double (*p_new_y_axis)[3], double (*p_center_point_in_Euclidean_space)[3], double (*p_center_point_on_cell_plane)[2]){
@@ -125,8 +127,10 @@ static void project_Euclidean_center_coordinates_onto_the_cell_plane(double (*p_
 
   (*p_center_point_on_cell_plane)[0] = dotproduct((*p_new_x_axis), (*p_center_point_in_Euclidean_space));
   (*p_center_point_on_cell_plane)[1] = dotproduct((*p_new_y_axis), (*p_center_point_in_Euclidean_space));
-
+  
+  /*
   printf("The coordinates of the presumed center point of the cell on the cell plane are: (%f, %f)\n\n", (*p_center_point_on_cell_plane)[0], (*p_center_point_on_cell_plane)[1]);
+  */
 }
 
 static double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2]){
@@ -136,9 +140,10 @@ static double is_point_left_of_edge(double point_on_line_1[2], double point_on_l
      Returns 0 if the point is on the line, > 0 if the point is left of the line, and < 0 if the point is right of the line.
      This algorithm is by Dan Sunday (geomalgorithms.com) and is completely free for use and modification.
   */
-
+  
+  /*
   printf("Testing whether point (%f, %f) is left of the the edge from point (%f, %f) and point (%f, %f)... ", point[0], point[1], point_on_line_1[0], point_on_line_1[1], point_on_line_2[0], point_on_line_2[1]);
-
+  */
   double answer = ((point_on_line_2[0] - point_on_line_1[0]) * (point[1] - point_on_line_1[1]) 
 		- (point[0] - point_on_line_1[0]) * (point_on_line_2[1] - point_on_line_1[1]));
 
@@ -158,7 +163,36 @@ static double is_point_left_of_edge(double point_on_line_1[2], double point_on_l
 }
 
 
-static int winding_numbers_algorithm(double (*cell_corners)[][2], int number_corners, double point[]){
+static int winding_numbers_algorithm_without_printfs(double (*cell_corners)[][2], int number_corners, double point[]){
+  
+  /* 
+     Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
+     Returns 0 if the point is outside, returns 1 if the point is inside the cell.
+     Based on an algorithm by Dan Sunday (geomalgorithms.com). His algorithm is completely free for use and modification.
+  */
+  
+  int winding_number = 0;
+  
+  for (int i = 0;  i < number_corners; i++){
+    if ((*cell_corners)[i][1] <= point[1]){
+      if ((*cell_corners)[i + 1][1] > point[1]){
+	if (is_point_left_of_edge((*cell_corners)[i], (*cell_corners)[i + 1], point) > 0){
+	  winding_number++;
+	}
+      }       
+    }
+    else { 
+      if ((*cell_corners)[i + 1][1] <= point[1]){
+	if (is_point_left_of_edge((*cell_corners)[i], (*cell_corners)[i + 1], point) < 0){
+	  winding_number--;
+	}
+      }
+    }
+  }
+  return winding_number;
+}
+
+static int winding_numbers_algorithm_with_printfs(double (*cell_corners)[][2], int number_corners, double point[]){
   
   /* 
      Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
@@ -835,6 +869,9 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 
        printf("Cell Number %d:\n\n", cell_no+1);
 
+       printf("Euclidean coordinates are:\n\n");
+       
+
        /* 
 	  Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of Cartesian coordinates in Euclidean space.
 	  This is first done for the presumed center point of the cell and then for all the corners of the cell. LLtoXYZ is defined in clipping/geometry.h 
@@ -845,7 +882,14 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
       for (corner_no = 0; corner_no < ncorner; ++corner_no)
 	{
 	  LLtoXYZ(grid_corner_lon[cell_no*ncorner+corner_no], grid_corner_lat[cell_no*ncorner+corner_no], cell_corners_in_Euclidean_space[corner_no]);
+	  
+	  printf("(%f, %f) ", cell_corners_in_Euclidean_space[corner_no][0], cell_corners_in_Euclidean_space[corner_no][1]);
 	}
+
+      printf("\n\n");
+      
+
+     
 
       /*
 	Each cell corresponds to a two-dimensional polygon now in unknown orientation in three-dimensional space. Each cell and its center point are coplanar. THIS IS A GIVEN.
@@ -911,7 +955,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
     
       /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
         
-      int winding_number = winding_numbers_algorithm(&cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
+      int winding_number = winding_numbers_algorithm_without_printfs(&cell_corners_on_cell_plane, ncorner, center_point_on_cell_plane);
 
       if (winding_number == 0){
 	printf("The presumed center point lies OUTSIDE the bounds of the cell.\n\n\n\n");
@@ -925,7 +969,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   printf("Number of cells with clockwise ordering of vertices: %u\n", no_of_cells_with_vertices_arranged_in_clockwise_order);
   printf("Number of cells with counterclockwise ordering of vertices: %u\n", no_of_cells_with_vertices_arranged_in_counterclockwise_order);
   printf("Number of convex cells: %u\n", no_of_convex_cells);
-  printf("Number of nonsimple or degenerate cells; %u\n", no_of_degenerate_cells);
+  printf("Number of nonsimple or degenerate cells: %u\n", no_of_degenerate_cells);
   printf("Number of cells with presumed center points within their bounds: %u\n", no_of_cells_with_center_points_within_their_bounds);
   
   /******************* TESTING ********************/
@@ -971,12 +1015,12 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 
   printf("Is the cell convex? %u\n\n", is_simple_polygon_convex(&cell_corners_in_2D, 4));
 
-  int winding_number = winding_numbers_algorithm(&cell_corners_in_2D, 4, center_point_in_2D);
+  int winding_number = winding_numbers_algorithm_without_printfs(&cell_corners_in_2D, 4, center_point_in_2D);
 
   printf("If the winding number is 0 the presumed center point is outside the bounds of the cell. The winding number is: %d\n\n", winding_number);
 
-  /*
-    cdoAbort("implementation missing");*/
+
+
 }
 
 void *Verifygrid(void *argument)
