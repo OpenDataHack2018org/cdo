@@ -625,7 +625,7 @@ nodeType *expr_var_var(int init, int oper, nodeType *p1, nodeType *p2)
 static
 void ex_copy_var(int init, nodeType *p2, nodeType *p1)
 {
-  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %s[L%zu][N%zu]",
+  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%lu][N%lu] = %s[L%lu][N%lu]",
                              ExIn[init], p2->param.name, p2->param.nlev, p2->param.ngp, p1->param.name, p2->param.nlev, p2->param.ngp);
   
   size_t ngp = p1->param.ngp;
@@ -658,7 +658,7 @@ void ex_copy_con(int init, nodeType *p2, nodeType *p1)
 {
   double cval = p1->u.con.value;
 
-  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%zu][N%zu] = %g", ExIn[init], p2->param.name, p2->param.nlev, p2->param.ngp, cval);
+  if ( cdoVerbose ) cdoPrint("\t%s\tcopy\t%s[L%lu][N%lu] = %g", ExIn[init], p2->param.name, p2->param.nlev, p2->param.ngp, cval);
   
   size_t ngp = p2->param.ngp;
   assert(ngp > 0);
@@ -718,19 +718,19 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
     {
       p = expr_var_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
+	cdoPrint("\t%s\tarith\t%s[L%lu][N%lu] = %s %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.var.nm);
     }
   else if ( p1->type == typeVar && p2->type == typeCon )
     {
       p = expr_var_con(init, oper, p1, p2);
       if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %s %s %g", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
+	cdoPrint("\t%s\tarith\t%s[L%lu][N%lu] = %s %s %g", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.var.nm, coper, p2->u.con.value);
     }
   else if ( p1->type == typeCon && p2->type == typeVar )
     {
       p = expr_con_var(init, oper, p1, p2);
       if ( cdoVerbose )
-	cdoPrint("\t%s\tarith\t%s[L%zu][N%zu] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
+	cdoPrint("\t%s\tarith\t%s[L%lu][N%lu] = %g %s %s", ExIn[init], p->u.var.nm, p->param.nlev, p->param.ngp, p1->u.con.value, coper, p2->u.var.nm);
     }
   else if ( p1->type == typeCon && p2->type == typeCon )
     {
@@ -965,7 +965,7 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
     {
       long ilevidx = lround(value);
       if ( ilevidx < 1 || ilevidx > (long)nlev )
-        cdoAbort("%s(): level index %ld out of range (range: 1-%zu)!", funcname, ilevidx, nlev);
+        cdoAbort("%s(): level index %ld out of range (range: 1-%lu)!", funcname, ilevidx, nlev);
       levidx = (size_t) ilevidx - 1;
     }
   else if ( strcmp(funcname, "sellevel") == 0 )
@@ -1133,15 +1133,15 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
   if ( cdoVerbose )
     {
-      fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%zu][N%zu] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
+      fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%lu][N%lu] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
       if ( p2->type == typeCon )
         printf("%g : ", p2->u.con.value);
       else
-        printf("%s[L%zu][N%zu] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
+        printf("%s[L%lu][N%lu] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
       if ( p3->type == typeCon )
         printf("%g\n", p3->u.con.value);
       else
-        printf("%s[L%zu][N%zu]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
+        printf("%s[L%lu][N%lu]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
     }
 
   size_t nmiss1 = p1->param.nmiss;
@@ -1358,9 +1358,9 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
                       if ( i < maxout || (ngp > maxout && i >= (ngp-maxout)) )
                         {
                           if ( steptype == TIME_CONSTANT )
-                            fprintf(stdout, "   %s[lev=%zu:gp=%zu] = %g\n", vname, k+1, i+1, data[k*ngp+i]);
+                            fprintf(stdout, "   %s[lev=%lu:gp=%lu] = %g\n", vname, k+1, i+1, data[k*ngp+i]);
                           else
-                            fprintf(stdout, "   %s[ts=%ld:lev=%zu:gp=%zu] = %g\n", vname, tsID, k+1, i+1, data[k*ngp+i]);
+                            fprintf(stdout, "   %s[ts=%ld:lev=%lu:gp=%lu] = %g\n", vname, tsID, k+1, i+1, data[k*ngp+i]);
                         }
                       else if ( i == maxout )
                         {
@@ -1495,7 +1495,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             p->param.nmiss = params[varID].nmiss;
           }
 
-        if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%zu][N%zu]", vnm, p->param.nlev, p->param.ngp);
+        if ( parse_arg->debug ) cdoPrint("\tpush\tvar\t%s[L%lu][N%lu]", vnm, p->param.nlev, p->param.ngp);
 
         rnode = p;
 
@@ -1558,7 +1558,7 @@ nodeType *expr_run(nodeType *p, parse_param_t *parse_arg)
             if ( parse_arg->debug )
               {
                 if ( rnode && rnode->type == typeVar)
-                  cdoPrint("\tpop\tvar\t%s[L%zu][N%zu]", varname2, rnode->param.nlev, rnode->param.ngp);
+                  cdoPrint("\tpop\tvar\t%s[L%lu][N%lu]", varname2, rnode->param.nlev, rnode->param.ngp);
                 else
                   cdoPrint("\tpop\tconst\t%s", varname2);
               }

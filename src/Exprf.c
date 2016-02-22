@@ -318,7 +318,7 @@ void *Expr(void *argument)
 
   if ( cdoVerbose )
     for ( int varID = 0; varID < parse_arg.nparams; varID++ )
-      cdoPrint("var: %d %s ngp=%zu nlev=%zu coord=%c",
+      cdoPrint("var: %d %s ngp=%lu nlev=%lu coord=%c",
                varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord);
 
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
