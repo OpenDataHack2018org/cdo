@@ -1,4 +1,10 @@
 #!/bin/sh
+./makedoc
+[ ! -f cdo.pdf ] && ./makepdf
+[ ! -f cdo_refcard.pdf ] && ./makerefcard
+[ ! -f cdo_eca.pdf ] && ./makepdfeca
+[ ! -f cdo_magics.pdf ] && ./makepdfmagics
+
 if [ ! -d ../html ];then mkdir ../html ;fi
 htlatex cdo.tex "html" "" -d../html/
 cd ../html
@@ -9,5 +15,5 @@ if [[ 0 = $? ]]; then
 else
   cp cdo.html index.html
 fi
-cp ../*pdf .
+cp ../tex/*pdf .
 zip cdo-doc.zip *.*

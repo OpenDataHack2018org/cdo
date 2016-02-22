@@ -85,10 +85,12 @@ doc/tex/grid.tex -text
 doc/tex/grids/cell.gmt -text
 doc/tex/grids/cell.grid -text
 doc/tex/grids/cell.pdf -text
+doc/tex/grids/cell.png -text svneol=unset#image/png
 doc/tex/grids/cell1.gmt -text
 doc/tex/grids/curv.gmt -text
 doc/tex/grids/curv.grid -text
 doc/tex/grids/curv.pdf -text
+doc/tex/grids/curv.png -text svneol=unset#image/png
 doc/tex/grids/curv1.gmt -text
 doc/tex/grids/plotjobgmt -text
 doc/tex/install.tex -text
