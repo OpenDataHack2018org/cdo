@@ -114,7 +114,7 @@ void *Settime(void *argument)
   int nmiss;
   int gridsize;
   int tunit = TUNIT_DAY;
-  int ijulinc = 0, incperiod = 0, incunit = 0;
+  int ijulinc = 0, incperiod = 1, incunit = 86400;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int day0;
   int taxis_has_bounds, copy_timestep = FALSE;
@@ -175,10 +175,13 @@ void *Settime(void *argument)
       if ( operatorArgc() == 3 )
 	{
 	  const char *timeunits = operatorArgv()[2];
-	  incperiod = (int)strtol(timeunits, NULL, 10);
-	  if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
-	  while ( isdigit((int) *timeunits) ) timeunits++;
-
+          int ich = timeunits[0];
+          if ( ich == '-' || ich == '+' || isdigit(ich) )
+            {
+              incperiod = (int)strtol(timeunits, NULL, 10);
+              if ( ich == '-' || ich == '+' ) timeunits++;
+              while ( isdigit((int) *timeunits) ) timeunits++;
+            }
 	  get_tunits(timeunits, &incperiod, &incunit, &tunit);
 	}
       /* increment in seconds */

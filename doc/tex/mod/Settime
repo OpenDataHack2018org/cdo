@@ -128,7 +128,7 @@ STRING   Date (format: YYYY-MM-DD)
 @Item = time
 STRING   Time (format: hh:mm:ss)
 @Item = inc
-STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]
+STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 1hour]
 @Item = calendar
 STRING   Calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
 @Item = sval

@@ -1,7 +1,11 @@
-2016-02-24  Uwe Schulzweida
+2016-02-25  Uwe Schulzweida
 
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
+
+2016-02-22  Uwe Schulzweida
+
+	* settaxis: set default increment to 1hour
 
 2016-02-08  Uwe Schulzweida
 

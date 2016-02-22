@@ -956,7 +956,7 @@ static const char *SettimeHelp[] = {
     "    units     STRING   Base units of the time axis (seconds, minutes, hours, days, months, years)",
     "    date      STRING   Date (format: YYYY-MM-DD)",
     "    time      STRING   Time (format: hh:mm:ss)",
-    "    inc       STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]",
+    "    inc       STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 1hour]",
     "    calendar  STRING   Calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)",
     "    sval      STRING   Shift value (e.g. -3hour)",
     NULL
