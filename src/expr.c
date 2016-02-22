@@ -839,9 +839,12 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
           field_t field;
           double *weights = NULL;
           //if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
-          if ( funcflag == 1 ) weights = p1->param.weight;
-          assert(weights!=NULL);
-
+          if ( funcflag == 1 )
+            {
+              weights = p1->param.weight;
+              assert(weights!=NULL);
+            }
+          
           double (*exprfunc)(field_t) = (double (*)(field_t)) fun_sym_tbl[funcID].func;
           for ( size_t k = 0; k < nlev; k++ )
             {
