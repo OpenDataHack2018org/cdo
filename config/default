@@ -88,11 +88,11 @@ case "${HOSTNAME}" in
                  --with-proj=/opt/local"
 
         if  test "$COMP" = icpc ; then
-	  ${CONFPATH}configure --enable-cxx \
+	  ${CONFPATH}configure --enable-cxx --prefix=$HOME/local \
                     $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
-        elif  test "$COMP" = icc ; then
-	  ${CONFPATH}configure  \
+	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
+        elif  test "$COMP" = icpc ; then
+	  ${CONFPATH}configure \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang++ ; then
