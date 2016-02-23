@@ -303,7 +303,7 @@ double fldavg(field_t field)
 
 static
 void prevarsum(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
-	       double missval, double *rsum, double *rsumw, double *rsumq, double *sumwq)
+	       double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 { 
   assert(array!=NULL);
   assert(w!=NULL);
