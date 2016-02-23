@@ -56,7 +56,7 @@ double yac_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_
   double area = huiliers_area(cell);
   area /= (EarthRadius*EarthRadius);
 
-  return (area);
+  return area;
 }
 */
 static
@@ -166,7 +166,7 @@ double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corn
       if ( area < 0.0 ) area = 0.0;
     }
 
-  return (area);
+  return area;
 }
 
 /** area of a spherical triangle based on L'Huilier's Theorem
@@ -206,7 +206,7 @@ double mod_tri_area(const double *restrict u, const double *restrict v, const do
 
   double area = fabs(4.0 * atan(sqrt(fabs(t))));
 
-  return (area);
+  return area;
 }
 
  /*
@@ -245,7 +245,7 @@ double mod_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_
       if ( i < (num_corners-1) ) { pnt2[0] = pnt3[0]; pnt2[1] = pnt3[1]; pnt2[2] = pnt3[2]; }
     }
 
-  return (sum);
+  return sum;
 }
 
 static
@@ -279,26 +279,24 @@ double mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell
       sum += mod_tri_area(pnt1, pnt2, pnt3);
     }
 
-  return (sum);
+  return sum;
 }
 
 
 int gridGenArea(int gridID, double* area)
 {
   int status = 0;
-  int gridtype;
   int lgrid_gen_bounds = FALSE;
   int lgriddestroy = FALSE;
-  long i;
-  long nv, gridsize;
+  long nv;
   int* grid_mask = NULL;
   double* grid_center_lon = NULL;
   double* grid_center_lat = NULL;
   double* grid_corner_lon = NULL;
   double* grid_corner_lat = NULL;
 
-  gridsize = gridInqSize(gridID);
-  gridtype = gridInqType(gridID);
+  long gridsize = gridInqSize(gridID);
+  int gridtype = gridInqType(gridID);
 
   if ( gridtype != GRID_LONLAT      &&
        gridtype != GRID_GAUSSIAN    &&
@@ -338,7 +336,7 @@ int gridGenArea(int gridID, double* area)
 	    {
 	      lgriddestroy = TRUE;
 	      gridID = referenceToGrid(gridID);
-	      if ( gridID == -1 ) return (1);
+	      if ( gridID == -1 ) return 1;
 	    }
 	}
     }
@@ -354,14 +352,14 @@ int gridGenArea(int gridID, double* area)
     {
       cdoWarning("Computation of grid cell area weights failed, grid cell center coordinates missing!");
       status = 1;
-      return (status);
+      return status;
     }
 
   if ( nv == 0 )
     {
       cdoWarning("Computation of grid cell area weights failed, grid cell corner coordinates missing!");
       status = 1;
-      return (status);
+      return status;
     }
 
   char xunitstr[CDI_MAX_NAME];
@@ -398,7 +396,7 @@ int gridGenArea(int gridID, double* area)
       else
 	{
 	  status = 1;
-	  return (status);
+	  return status;
 	}
     }
   
@@ -418,7 +416,7 @@ int gridGenArea(int gridID, double* area)
 #pragma omp parallel for default(none)  \
   shared(findex,gridsize,area,nv,grid_corner_lon,grid_corner_lat,grid_center_lon,grid_center_lat)
 #endif
-  for ( int i = 0; i < gridsize; ++i )
+  for ( long i = 0; i < gridsize; ++i )
     {
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
@@ -439,7 +437,7 @@ int gridGenArea(int gridID, double* area)
   if ( cdoVerbose )
     {
       double total_area = 0;
-      for ( i = 0; i < gridsize; ++i ) total_area += area[i];
+      for ( long i = 0; i < gridsize; ++i ) total_area += area[i];
       cdoPrint("Total area = %g steradians", total_area);
     }
 
@@ -449,5 +447,5 @@ int gridGenArea(int gridID, double* area)
   Free(grid_corner_lat);
   if ( grid_mask ) Free(grid_mask);
 
-  return (status);
+  return status;
 }
