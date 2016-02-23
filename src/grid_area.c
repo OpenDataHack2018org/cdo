@@ -289,11 +289,6 @@ int gridGenArea(int gridID, double* area)
   int lgrid_gen_bounds = FALSE;
   int lgriddestroy = FALSE;
   long nv;
-  int* grid_mask = NULL;
-  double* grid_center_lon = NULL;
-  double* grid_center_lat = NULL;
-  double* grid_corner_lon = NULL;
-  double* grid_corner_lat = NULL;
 
   long gridsize = gridInqSize(gridID);
   int gridtype = gridInqType(gridID);
@@ -317,8 +312,11 @@ int gridGenArea(int gridID, double* area)
 	{
 	  lgriddestroy = TRUE;
 	  gridID = gridToUnstructured(gridID, 1);
+          /*
 	  grid_mask = (int*) Malloc(gridsize*sizeof(int));
 	  gridInqMaskGME(gridID, grid_mask);
+          if ( grid_mask ) Free(grid_mask);
+          */
 	}
       else
 	{
@@ -367,14 +365,14 @@ int gridGenArea(int gridID, double* area)
   gridInqXunits(gridID, xunitstr);
   gridInqYunits(gridID, yunitstr);
 
-  grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
-  grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+  double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID, grid_center_lon);
   gridInqYvals(gridID, grid_center_lat);
 
-  grid_corner_lon = (double*) Malloc(nv*gridsize*sizeof(double));
-  grid_corner_lat = (double*) Malloc(nv*gridsize*sizeof(double));
+  double *grid_corner_lon = (double*) Malloc(nv*gridsize*sizeof(double));
+  double *grid_corner_lat = (double*) Malloc(nv*gridsize*sizeof(double));
 
   if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
     {
@@ -434,19 +432,26 @@ int gridGenArea(int gridID, double* area)
 	area[i] = mod_huiliers_area2(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv, grid_center_lon[i], grid_center_lat[i]);
     }
 
-  if ( cdoVerbose || gridsize < 20 )
+  if ( cdoVerbose )
     {
       double total_area = 0;
       for ( long i = 0; i < gridsize; ++i ) total_area += area[i];
-      if ( cdoVerbose ) cdoPrint("Total area = %g steradians", total_area);
-      if ( gridsize < 20 && IS_EQUAL(total_area, 0.) ) status = 2;
+      cdoPrint("Total area = %g steradians", total_area);
+    }
+
+  if ( gridsize < 20 )
+    {
+      double total_area = 0;
+      for ( long i = 0; i < gridsize; ++i ) total_area += area[i];
+      int nzero = 0;
+      for ( long i = 0; i < gridsize; ++i ) if ( IS_EQUAL(area[i], 0.) ) nzero++;
+      if ( IS_EQUAL(total_area, 0.) ) status = 2;
     }
 
   Free(grid_center_lon);
   Free(grid_center_lat);
   Free(grid_corner_lon);
   Free(grid_corner_lat);
-  if ( grid_mask ) Free(grid_mask);
 
   return status;
 }
