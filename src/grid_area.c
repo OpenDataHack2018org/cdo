@@ -434,11 +434,12 @@ int gridGenArea(int gridID, double* area)
 	area[i] = mod_huiliers_area2(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv, grid_center_lon[i], grid_center_lat[i]);
     }
 
-  if ( cdoVerbose )
+  if ( cdoVerbose || gridsize < 20 )
     {
       double total_area = 0;
       for ( long i = 0; i < gridsize; ++i ) total_area += area[i];
-      cdoPrint("Total area = %g steradians", total_area);
+      if ( cdoVerbose ) cdoPrint("Total area = %g steradians", total_area);
+      if ( gridsize < 20 && IS_EQUAL(total_area, 0.) ) status = 2;
     }
 
   Free(grid_center_lon);
