@@ -303,35 +303,40 @@ double fldavg(field_t field)
 
 static
 void prevarsum(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
-	       double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
+	       double missval, double *rsum, double *rsumw, double *rsumq, double *sumwq)
 { 
   assert(array!=NULL);
   assert(w!=NULL);
 
-  *rsum = *rsumw = 0;
-  *rsumq = *rsumwq = 0;
+  double xsum = 0, xsumw = 0;
+  double xsumq = 0, xsumwq = 0;
 
   if ( nmiss )
     {
       for ( size_t i = 0; i < len; i++ ) 
         if ( !DBL_IS_EQUAL(array[i], missval) && !DBL_IS_EQUAL(w[i], missval) )
           {
-            *rsum   += w[i] * array[i];
-            *rsumq  += w[i] * array[i] * array[i];
-            *rsumw  += w[i];
-            *rsumwq += w[i] * w[i];
+            xsum   += w[i] * array[i];
+            xsumq  += w[i] * array[i] * array[i];
+            xsumw  += w[i];
+            xsumwq += w[i] * w[i];
           }
     }
   else
     {
       for ( size_t i = 0; i < len; i++ ) 
         {
-          *rsum   += w[i] * array[i];
-          *rsumq  += w[i] * array[i] * array[i];
-          *rsumw  += w[i];
-          *rsumwq += w[i] * w[i];
+          xsum   += w[i] * array[i];
+          xsumq  += w[i] * array[i] * array[i];
+          xsumw  += w[i];
+          xsumwq += w[i] * w[i];
         }
     }
+
+  *rsum   = xsum;
+  *rsumq  = xsumq;
+  *rsumw  = xsumw;
+  *rsumwq = xsumwq;
 }
 
 
