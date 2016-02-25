@@ -30,24 +30,21 @@
 
 void *Cat(void *argument)
 {
-  int streamID1, streamID2 = CDI_UNDEFID;
-  int nrecs;
-  int tsID1, tsID2 = 0, recID, varID, levelID;
-  int vlistID1, vlistID2 = CDI_UNDEFID;
-  int taxisID1, taxisID2 = CDI_UNDEFID;
-  int lcopy = FALSE;
-  int gridsize;
+  int nrecs, nrecs0 = 0;
+  int tsID2 = 0, varID, levelID;
+  int streamID2 = CDI_UNDEFID;
+  int vlistID2 = CDI_UNDEFID;
+  int taxisID2 = CDI_UNDEFID;
   int nmiss;
-  int ntsteps, nvars;
-  int timer_cat;
   double tw0 = 0, tw = 0;
   double *array = NULL;
 
   cdoInitialize(argument);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = false;
+  if ( UNCHANGED_RECORD ) lcopy = true;
 
-  timer_cat = timer_new("cat");
+  int timer_cat = timer_new("cat");
   if ( cdoTimer ) timer_start(timer_cat);
 
   int streamCnt = cdoStreamCnt();
@@ -58,10 +55,10 @@ void *Cat(void *argument)
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
       if ( cdoTimer ) tw0 = timer_val(timer_cat);
 
-      streamID1 = streamOpenRead(cdoStreamName(indf));
+      int streamID1 = streamOpenRead(cdoStreamName(indf));
 
-      vlistID1 = streamInqVlist(streamID1);
-      taxisID1 = vlistInqTaxis(vlistID1);
+      int vlistID1 = streamInqVlist(streamID1);
+      int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
 	{
@@ -91,8 +88,8 @@ void *Cat(void *argument)
 	      taxisID2 = taxisDuplicate(taxisID1);
 	      vlistDefTaxis(vlistID2, taxisID2);
 	  
-	      ntsteps = vlistNtsteps(vlistID1);
-	      nvars   = vlistNvars(vlistID1);
+	      int ntsteps = vlistNtsteps(vlistID1);
+	      int nvars   = vlistNvars(vlistID1);
 	      
 	      if ( ntsteps == 1 )
 		{
@@ -113,7 +110,7 @@ void *Cat(void *argument)
 
 	  if ( ! lcopy )
 	    {
-	      gridsize = vlistGridsizeMax(vlistID1);
+	      size_t gridsize = (size_t) vlistGridsizeMax(vlistID1);
 	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
 	}
@@ -124,9 +121,11 @@ void *Cat(void *argument)
 
       int ntsteps = vlistNtsteps(vlistID1);
 
-      tsID1 = 0;
+      int tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
+          if ( indf == 0 && tsID1 == 0 ) nrecs0 = nrecs;
+          
 	  {
 	    double fstatus = indf+1.;
 	    if ( ntsteps > 1 ) fstatus = indf+(tsID1+1.)/ntsteps;
@@ -137,9 +136,14 @@ void *Cat(void *argument)
 
 	  streamDefTimestep(streamID2, tsID2);
 	       
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
+
+              if ( indf > 0 && tsID1 == 0 && nrecs == nrecs0 )
+                if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                  continue;
+
 	      streamDefRecord(streamID2,  varID,  levelID);
 
 	      if ( lcopy )
@@ -156,6 +160,7 @@ void *Cat(void *argument)
 	  tsID1++;
 	  tsID2++;
 	}
+      
       streamClose(streamID1);
 
       if ( cdoTimer ) tw = timer_val(timer_cat) - tw0;
