@@ -127,6 +127,11 @@ void *Copy(void *argument)
 	      if ( lcopy && (operatorID == SELALL || operatorID == SZIP) )
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
+
+                  if ( tsID2 > 0 && tsID1 == 0 )
+                    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                      continue;
+                  
 		  streamDefRecord(streamID2,  varID,  levelID);
 		  streamCopyRecord(streamID2, streamID1);
 		}
@@ -142,6 +147,11 @@ void *Copy(void *argument)
 		  else
 		    {
 		      streamInqRecord(streamID1, &varID, &levelID);
+
+                      if ( tsID2 > 0 && tsID1 == 0 )
+                        if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                          continue;
+
 		      streamReadRecord(streamID1, array, &nmiss);
 		    }
 		  /*

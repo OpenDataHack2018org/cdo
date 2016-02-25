@@ -6,6 +6,7 @@
 2016-02-25  Uwe Schulzweida
 
 	* cat: skip time constant fields for nfile>1 (bug fix) [report: Ralf Müller]
+	* copy: skip time constant fields for nfile>1 (bug fix)
 	* mergetime: skip time constant fields for nfile>1 (bug fix)
 
 2016-02-22  Uwe Schulzweida
