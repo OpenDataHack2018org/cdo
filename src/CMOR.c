@@ -87,14 +87,18 @@ static ENTRY *parse_kv(char *kvstr)
   return hinsert(key, value);
 }
 
-static int parse_kv_file(const char *filename)
+static int parse_kv_file(const char *filename, int verbose)
 {
   FILE *fp;
   char line[CMOR_MAX_STRING], *comment;
 
   fp = fopen(filename, "r");
   if ( fp == NULL )
-    return 1;
+    {
+      if ( verbose )
+        cdoWarning("cannot open '%s'", filename);
+      return 1;
+    }
   while ( fgets(line, sizeof(line), fp) != NULL )
     {
       comment = strchr(line, '#');
@@ -575,6 +579,33 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
     }
   Free(buffer);
 }
+
+void read_config_files(void)
+{
+  char *info_files;
+  char *filename;
+  char *home;
+  const char *dotconfig = ".cdocmorinfo";
+
+  /* Files from info key in command line. */
+  info_files = get_val("info", "");
+  filename = strtok(info_files, ",");
+  while ( filename != NULL )
+    {
+      parse_kv_file(filename, 1);
+      filename = strtok(NULL, ",");
+    }
+
+  /* Config file in user's $HOME directory. */
+  home = getenv("HOME");
+  filename = Malloc(strlen(home) + strlen(dotconfig) + 2);
+  sprintf(filename, "%s/%s", home, dotconfig);
+  parse_kv_file(filename, 0);
+  Free(filename);
+
+  /* System wide configuration. */
+  parse_kv_file("/etc/cdocmor.info", 0);
+}
 #endif
 
 void *CMOR(void *argument)
@@ -591,12 +622,18 @@ void *CMOR(void *argument)
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
   hcreate(100);
+
+  /* Command line config has highest priority. */
   parse_kv_cmdline(nparams - 1, &params[1]);
-  parse_kv_file("cmor.rc");
+
+  /* Config files are read with descending priority. */
+  read_config_files();
 
   streamID = streamOpenRead(cdoStreamName(0));
+  /* Existing attributes have lowest priority. */
   dump_global_attributes(streamID);
   dump_special_attributes(streamID);
+
   nvars_max = vlistNvars(streamInqVlist(streamID));
   vars = (struct cc_var *) Malloc(nvars_max * sizeof(struct cc_var));
 
