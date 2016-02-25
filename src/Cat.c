@@ -30,7 +30,7 @@
 
 void *Cat(void *argument)
 {
-  int nrecs, nrecs0 = 0;
+  int nrecs;
   int tsID2 = 0, varID, levelID;
   int streamID2 = CDI_UNDEFID;
   int vlistID2 = CDI_UNDEFID;
@@ -123,9 +123,7 @@ void *Cat(void *argument)
 
       int tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
-	{
-          if ( indf == 0 && tsID1 == 0 ) nrecs0 = nrecs;
-          
+	{          
 	  {
 	    double fstatus = indf+1.;
 	    if ( ntsteps > 1 ) fstatus = indf+(tsID1+1.)/ntsteps;
@@ -140,7 +138,7 @@ void *Cat(void *argument)
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
-              if ( indf > 0 && tsID1 == 0 && nrecs == nrecs0 )
+              if ( tsID2 > 0 && tsID1 == 0 )
                 if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                   continue;
 

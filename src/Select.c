@@ -1086,6 +1086,10 @@ void *Select(void *argument)
 		  streamInqRecord(streamID1, &varID, &levelID);
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
+                      if ( tsID2 > 0 && tsID1 == 0 )
+                        if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                          continue;
+
 		      varID2   = vlistFindVar(vlistID2, varID);
 		      levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 		      
