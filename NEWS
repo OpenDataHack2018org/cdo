@@ -19,6 +19,7 @@ Version 1.7.1 (25 February 2016):
      * cdo -t table_file does not read variable name from table file [Bug #6312]
      * One day shift backwards when converting to relative time axis with -r [Bug #6496]
      * ydaypctl: check of verification date failed (bug fix)
+     * cat, copy, mergetime, select: remove time constant input fields for nfile>1
 
 Version 1.7.0 (28 October 2015):
 
