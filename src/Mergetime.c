@@ -37,13 +37,11 @@ void *Mergetime(void *argument)
   int fileID;
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int lcopy = FALSE;
-  int gridsize;
   int nmiss;
   int vdate, vtime;
   int last_vdate = -1, last_vtime = -1;
   int next_fileID;
   int skip_same_time = FALSE;
-  int process_timestep;
   double *array = NULL;
   typedef struct
   {
@@ -127,13 +125,13 @@ void *Mergetime(void *argument)
 
   if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(sf[0].vlistID);
+      size_t gridsize = vlistGridsizeMax(sf[0].vlistID);
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
   while ( TRUE )
     {
-      process_timestep = TRUE;
+      bool process_timestep = true;
 
       next_fileID = -1;
       vdate = 0;
@@ -165,7 +163,7 @@ void *Mergetime(void *argument)
 	    time2str(vtime, vtimestr, sizeof(vtimestr));
 	    cdoPrint("Timestep %4d in stream %d (%s %s) already exists, skipped!",
 		     sf[fileID].tsID+1, sf[fileID].streamID, vdatestr, vtimestr);
-	    process_timestep = FALSE;
+	    process_timestep = false;
 	  }
 
       if ( process_timestep )
@@ -191,7 +189,12 @@ void *Mergetime(void *argument)
 	  for ( recID = 0; recID < sf[fileID].nrecs; recID++ )
 	    {
 	      streamInqRecord(sf[fileID].streamID, &varID, &levelID);
-	      streamDefRecord(streamID2,  varID,  levelID);
+
+              if ( tsID2 > 0 && sf[fileID].tsID == 0 )
+                if ( vlistInqVarTsteptype(sf[fileID].vlistID, varID) == TSTEP_CONSTANT )
+                  continue;
+
+              streamDefRecord(streamID2, varID, levelID);
 	  
 	      if ( lcopy )
 		{
