@@ -30,30 +30,27 @@
 
 void *Copy(void *argument)
 {
-  int SELALL, SZIP;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
+  bool lconstvars = true;
+  int streamID2 = CDI_UNDEFID;
+  int vlistID2 = CDI_UNDEFID;
+  int taxisID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID1, tsID2, recID, varID, levelID;
-  int lcopy = FALSE;
-  int gridsize;
-  int vlistID1, vlistID2 = CDI_UNDEFID;
+  int recID, varID, levelID;
   int nmiss;
-  int streamCnt, nfiles, indf;
-  int taxisID1, taxisID2 = CDI_UNDEFID;
   int ntsteps, nvars;
   double *array = NULL;
   par_io_t parIO;
 
   cdoInitialize(argument);
 
-            cdoOperatorAdd("copy",   0, 0, NULL);
-  SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
-  SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
+                cdoOperatorAdd("copy",   0, 0, NULL);
+  int SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
+  int SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = false;
+  if ( UNCHANGED_RECORD ) lcopy = true;
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == SZIP )
     {
@@ -61,18 +58,18 @@ void *Copy(void *argument)
       cdoCompLevel = 0;
     }
 
-  streamCnt = cdoStreamCnt();
-  nfiles = streamCnt - 1;
+  int streamCnt = cdoStreamCnt();
+  int nfiles = streamCnt - 1;
 
-  tsID2 = 0;
-  for ( indf = 0; indf < nfiles; indf++ )
+  int tsID2 = 0;
+  for ( int indf = 0; indf < nfiles; indf++ )
     {
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
 
-      streamID1 = streamOpenRead(cdoStreamName(indf));
+      int streamID1 = streamOpenRead(cdoStreamName(indf));
 
-      vlistID1 = streamInqVlist(streamID1);
-      taxisID1 = vlistInqTaxis(vlistID1);
+      int vlistID1 = streamInqVlist(streamID1);
+      int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
 	{
@@ -95,13 +92,14 @@ void *Copy(void *argument)
 
 	  if ( ntsteps == 0 && nfiles > 1 )
 	    {	      
+              lconstvars = false;
 	      for ( varID = 0; varID < nvars; ++varID )
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 	    }
 
 	  streamDefVlist(streamID2, vlistID2);
 
-	  gridsize = vlistGridsizeMax(vlistID1);
+	  int gridsize = vlistGridsizeMax(vlistID1);
 	  array = (double*) Malloc(gridsize*sizeof(double));
 	  if ( cdoParIO )
 	    {
@@ -115,7 +113,7 @@ void *Copy(void *argument)
 	  vlistCompare(vlistID1, vlistID2, CMP_ALL);
 	}
 
-      tsID1 = 0;
+      int tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
@@ -128,7 +126,7 @@ void *Copy(void *argument)
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
 
-                  if ( tsID2 > 0 && tsID1 == 0 )
+                  if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
                     if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                       continue;
                   
@@ -148,7 +146,7 @@ void *Copy(void *argument)
 		    {
 		      streamInqRecord(streamID1, &varID, &levelID);
 
-                      if ( tsID2 > 0 && tsID1 == 0 )
+                      if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
                         if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                           continue;
 

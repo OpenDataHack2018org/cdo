@@ -30,6 +30,7 @@
 
 void *Cat(void *argument)
 {
+  bool lconstvars = true;
   int nrecs;
   int tsID2 = 0, varID, levelID;
   int streamID2 = CDI_UNDEFID;
@@ -100,7 +101,8 @@ void *Cat(void *argument)
 		}
 
 	      if ( ntsteps == 0 && nfiles > 1 )
-		{		  
+		{
+                  lconstvars = false;
 		  for ( varID = 0; varID < nvars; ++varID )
 		    vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 		}
@@ -138,7 +140,7 @@ void *Cat(void *argument)
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
-              if ( tsID2 > 0 && tsID1 == 0 )
+              if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
                 if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                   continue;
 

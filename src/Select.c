@@ -506,6 +506,7 @@ int vlist_get_psvarid(int vlistID, int zaxisID)
 
 void *Select(void *argument)
 {
+  bool lconstvars = true;
   int streamID2 = CDI_UNDEFID;
   int nrecs;
   int nvars, nvars2, nlevs;
@@ -902,7 +903,8 @@ void *Select(void *argument)
 	  if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
 
 	  if ( ntsteps2 == 0 && nfiles > 1 )
-	    {	      
+	    {
+              lconstvars = false;
 	      for ( varID = 0; varID < nvars2; ++varID )
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 	    }
@@ -1086,7 +1088,7 @@ void *Select(void *argument)
 		  streamInqRecord(streamID1, &varID, &levelID);
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
-                      if ( tsID2 > 0 && tsID1 == 0 )
+                      if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
                         if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                           continue;
 
