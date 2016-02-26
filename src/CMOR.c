@@ -592,7 +592,7 @@ void read_config_files(void)
   filename = strtok(info_files, ",");
   while ( filename != NULL )
     {
-      parse_kv_file(filename, 1);
+      parse_kv_file(trim(filename), 1);
       filename = strtok(NULL, ",");
     }
 
