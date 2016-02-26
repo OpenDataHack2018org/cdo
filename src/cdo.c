@@ -280,11 +280,11 @@ void cdo_init_is_tty(void)
 {
   struct stat statbuf;
   fstat(0, &statbuf);
-  if ( S_ISCHR(statbuf.st_mode) ) stdin_is_tty = 1;  
+  if ( S_ISCHR(statbuf.st_mode) ) stdin_is_tty = 1;
   fstat(1, &statbuf);
-  if ( S_ISCHR(statbuf.st_mode) ) stdout_is_tty = 1;  
+  if ( S_ISCHR(statbuf.st_mode) ) stdout_is_tty = 1;
   fstat(2, &statbuf);
-  if ( S_ISCHR(statbuf.st_mode) ) stderr_is_tty = 1;  
+  if ( S_ISCHR(statbuf.st_mode) ) stderr_is_tty = 1;
 }
 
 static
@@ -1387,6 +1387,13 @@ int main(int argc, char *argv[])
   cdo_set_options();
 
   if ( Debug || Version ) cdo_version();
+
+  if ( Debug )
+    {
+      fprintf(stderr, "stdin_is_tty:   %d\n", stdin_is_tty);
+      fprintf(stderr, "stdout_is_tty:  %d\n", stdout_is_tty);
+      fprintf(stderr, "stderr_is_tty:  %d\n", stderr_is_tty);
+    }
 
   if ( Debug ) print_system_info();
 
