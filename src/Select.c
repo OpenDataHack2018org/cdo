@@ -652,6 +652,7 @@ void *Select(void *argument)
 
   if ( !cdoVerbose && nfiles > 1 ) progressInit();
 
+  timestep = 0;
   int tsID2 = 0;
   for ( int indf = 0; indf < nfiles; indf++ )
     {
@@ -957,12 +958,12 @@ void *Select(void *argument)
       int tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
+          timestep++;
 	  bool copytimestep = true;
 
 	  if ( ltimsel == true )
 	    {
 	      copytimestep = false;
-	      timestep = tsID1 + 1;
 
 	      if ( operatorID == SELECT && npar_timestep > 0 && timestep > par_timestep[npar_timestep-1] )
 		{

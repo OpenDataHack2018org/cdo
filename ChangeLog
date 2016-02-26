@@ -3,12 +3,13 @@
 	* using CDI library version 1.7.1
 	* Version 1.7.1 released
 
-2016-02-25  Uwe Schulzweida
+2016-02-26  Uwe Schulzweida
 
 	* cat: skip time constant fields for nfile>1 (bug fix) [report: Ralf Müller]
 	* copy: skip time constant fields for nfile>1 (bug fix)
 	* mergetime: skip time constant fields for nfile>1 (bug fix)
 	* select: skip time constant fields for nfile>1 (bug fix)
+	* select: search key timestep doesn't work with nfiles>1 (bug fix)
 
 2016-02-22  Uwe Schulzweida
 
