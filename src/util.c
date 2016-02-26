@@ -519,27 +519,30 @@ int fileExists(const char *restrict filename)
 
 int userFileOverwrite(const char *restrict filename)
 {
-  int status = 0, len;
-  char line[1024], *pline;
+  int status = 0;
 
-  fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
-  readline(stdin, line, 1024);
-  pline = line;
-  while ( isspace((int) *pline) ) pline++;
-  len = strlen(pline);
-  if ( len == 3 )
+  if ( stdin_is_tty )
     {
-      if ( pline[0] == 'y' && pline[1] == 'e' && pline[2] == 's' )
-        status = 1;
-      else if ( pline[0] == 'Y' && pline[1] == 'E' && pline[2] == 'S' )
-        status = 1;
-    }
-  else if ( len == 1 )
-    {
-      if ( pline[0] == 'y' ) status = 1;
+      fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
+      char line[1024];
+      readline(stdin, line, 1024);
+      char *pline = line;
+      while ( isspace((int) *pline) ) pline++;
+      int len = (int) strlen(pline);
+      if ( len == 3 )
+        {
+          if ( pline[0] == 'y' && pline[1] == 'e' && pline[2] == 's' )
+            status = 1;
+          else if ( pline[0] == 'Y' && pline[1] == 'E' && pline[2] == 'S' )
+            status = 1;
+        }
+      else if ( len == 1 )
+        {
+          if ( pline[0] == 'y' || pline[0] == 'Y' ) status = 1;
+        }
     }
 
-  return (status);
+  return status;
 }
 
 
