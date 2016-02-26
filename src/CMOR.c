@@ -241,6 +241,41 @@ static void dump_special_attributes(int streamID)
   if ( value ) hinsert("source", value);
 }
 
+static void read_config_files(void)
+{
+  char *info_files;
+  char *filename;
+  char *home;
+  const char *dotconfig = ".cdocmorinfo";
+
+  /* Files from info key in command line. */
+  info_files = get_val("info", "");
+  filename = strtok(info_files, ",");
+  while ( filename != NULL )
+    {
+      parse_kv_file(trim(filename), 1);
+      filename = strtok(NULL, ",");
+    }
+
+  /* Config file in user's $HOME directory. */
+  home = getenv("HOME");
+  filename = Malloc(strlen(home) + strlen(dotconfig) + 2);
+  sprintf(filename, "%s/%s", home, dotconfig);
+  parse_kv_file(filename, 0);
+  Free(filename);
+
+  /* System wide configuration. */
+  parse_kv_file("/etc/cdocmor.info", 0);
+}
+
+static int in_list(char **list, const char *needle)
+{
+  while ( *list )
+    if ( strcmp(*list++, needle) == 0 )
+      return 1;
+  return 0;
+}
+
 static void setup(int streamID, char *table)
 {
   char *chunk;
@@ -364,6 +399,8 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
   int year, month, day, hour, minute, second;
   int timeunit = taxisInqTunit(taxisID);
   char taxis_units[CMOR_MAX_STRING];
+  char **name_list, *var_name;
+  int i;
 
   cdiDecodeDate(taxisInqRdate(taxisID), &year, &month, &day);
   cdiDecodeTime(taxisInqRtime(taxisID), &hour, &minute, &second);
@@ -378,11 +415,28 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
           tunitNamePtr(timeunit), year, month, day, hour,
           minute, second);
 
+  if ( select_vars )
+    {
+      name_list = Malloc((strlen(select_vars) + 1) * sizeof(char *));
+      var_name = strtok(select_vars, ",");
+      i = 0;
+      while ( var_name != NULL )
+        {
+          name_list[i++] = trim(var_name);
+          var_name = strtok(NULL, ",");
+        }
+      name_list[i] = NULL;
+    }
+  else
+    {
+      name_list = NULL;
+    }
+
   *nvars = 0;
   for ( varID = 0; varID < vlistNvars(vlistID); varID++ )
     {
       vlistInqVarName(vlistID, varID, name);
-      if ( select_vars == NULL || strstr(select_vars, name) != NULL)
+      if ( name_list == NULL || in_list(name_list, name) )
         {
           var = &vars[(*nvars)++];
           var->cdi_varID = varID;
@@ -485,6 +539,7 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
                         NULL);
         }
     }
+  if ( name_list ) Free(name_list);
 }
 
 static void write_variables(int streamID, struct cc_var vars[], int nvars)
@@ -507,6 +562,7 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
   int varID, levelID;
   int nmiss;
   double *buffer;
+  int i;
 
   buffer = (double *) Malloc(gridsize * sizeof(double));
 
@@ -553,21 +609,25 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
         {
           streamInqRecord(streamID, &varID, &levelID);
           var = find_var(varID, vars, nvars);
-          if ( var->datatype == 'f' )
+          if ( var )
             {
-              streamReadRecord(streamID, buffer, &nmiss);
-              for ( int i = 0; i < gridsize; i++ )
-                ((float *)var->data)[gridsize * levelID + i] = (float)buffer[i];
-            }
-          else
-            {
-              streamReadRecord(streamID,
-                               (double *)var->data + gridsize * levelID,
-                               &nmiss);
+              if ( var->datatype == 'f' )
+                {
+                  streamReadRecord(streamID, buffer, &nmiss);
+                  for ( i = 0; i < gridsize; i++ )
+                    ((float *)var->data)[gridsize * levelID + i] =
+                      (float)buffer[i];
+                }
+              else
+                {
+                  streamReadRecord(streamID,
+                                   (double *)var->data + gridsize * levelID,
+                                   &nmiss);
+                }
             }
         }
 
-      for ( int i = 0; i < nvars; i++ )
+      for ( i = 0; i < nvars; i++ )
         cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
@@ -578,33 +638,6 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
                    NULL);
     }
   Free(buffer);
-}
-
-void read_config_files(void)
-{
-  char *info_files;
-  char *filename;
-  char *home;
-  const char *dotconfig = ".cdocmorinfo";
-
-  /* Files from info key in command line. */
-  info_files = get_val("info", "");
-  filename = strtok(info_files, ",");
-  while ( filename != NULL )
-    {
-      parse_kv_file(trim(filename), 1);
-      filename = strtok(NULL, ",");
-    }
-
-  /* Config file in user's $HOME directory. */
-  home = getenv("HOME");
-  filename = Malloc(strlen(home) + strlen(dotconfig) + 2);
-  sprintf(filename, "%s/%s", home, dotconfig);
-  parse_kv_file(filename, 0);
-  Free(filename);
-
-  /* System wide configuration. */
-  parse_kv_file("/etc/cdocmor.info", 0);
 }
 #endif
 
