@@ -4,7 +4,7 @@ CDO NEWS
 Version 1.7.1 (25 February 2016):
 
    New features:
-     * select: added search key steptype, gridnum, gridname, zaxisnum,I zaxisname
+     * select: added search key steptype, gridnum, gridname, zaxisnum, zaxisname
      * expr, exprf, aexpr, aexprf: added support for function clon(x), clat(x), clev(x),
        remove(x), ngp(x), nlev(x), size(x), missval(x), sellevel(x,k), sellevidx(x,k),
        fldmin(x), fldmax(x), fldsum(x), fldmean(x), fldavg(x), fldstd(x), fldstd1(x), fldvar(x), fldvar1(x),
