@@ -89,11 +89,13 @@ Convert x from radians to degrees
 
 Coordinates:
 
-@BeginList clon(x)
+@BeginList gridarea(x)
 @Item = clon(x)
 Longitude coordinate of x (available only if x has geographical coordinates) 
 @Item = clat(x)
 Latitude coordinate of x (available only if x has geographical coordinates) 
+@Item = gridarea(x)
+Grid cell area of x (available only if x has geographical coordinates) 
 @Item = clev(x)
 Level coordinate of x (0, if x is a 2D surface variable)
 @EndList
