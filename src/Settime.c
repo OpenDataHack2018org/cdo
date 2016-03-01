@@ -54,7 +54,7 @@ int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
   else if ( memcmp(unit, "days", len)    == 0 ) { *incunit = 86400; *tunit = TUNIT_DAY;     }
   else if ( memcmp(unit, "months", len)  == 0 ) { *incunit =     1; *tunit = TUNIT_MONTH;   }
   else if ( memcmp(unit, "years", len)   == 0 ) { *incunit =    12; *tunit = TUNIT_YEAR;    }
-  else cdoAbort("time unit >%s< unsupported", unit);
+  else cdoAbort("Time unit >%s< unsupported!", unit);
 
   if ( *tunit == TUNIT_HOUR )
     {
@@ -102,6 +102,41 @@ void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
     }
 }
 
+static
+void gen_bounds(int calendar, int tunit, int vdate, int vtime, int *vdateb, int *vtimeb)
+{
+  juldate_t juldate;
+  int year, month, day;
+  //int hour, minute, second;
+  UNUSED(vtime);
+  
+  vdateb[0] = vdate;
+  vdateb[1] = vdate;
+  vtimeb[0] = 0;
+  vtimeb[1] = 0;
+          
+  cdiDecodeDate(vdate, &year, &month, &day);
+  if ( tunit == TUNIT_MONTH )
+    {
+      vdateb[0] = cdiEncodeDate(year, month, 1);
+      month++;
+      if ( month > 12 ) { month = 1; year++; }
+      vdateb[1] = cdiEncodeDate(year, month, 1);
+    }
+  else if ( tunit == TUNIT_YEAR )
+    {
+      vdateb[0] = cdiEncodeDate(year,   1, 1);
+      vdateb[1] = cdiEncodeDate(year+1, 1, 1);
+    }
+  else if ( tunit == TUNIT_DAY )
+    {
+      vdateb[0] = vdate;
+      juldate = juldate_encode(calendar, vdateb[0], vtimeb[0]);
+      juldate = juldate_add_seconds(86400, juldate);
+      juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
+    }
+}
+
 
 void *Settime(void *argument)
 {
@@ -133,7 +168,7 @@ void *Settime(void *argument)
   int SETTIME     = cdoOperatorAdd("settime",      0,  1, "time (format: hh:mm:ss)");
   int SETTUNITS   = cdoOperatorAdd("settunits",    0,  1, "time units (seconds, minutes, hours, days, months, years)");
   int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date,time<,frequency> (format YYYY-MM-DD,hh:mm:ss)");
-  int SETTBOUNDS  = cdoOperatorAdd("settbounds",   0,  1, "frequency (hour, day, month, year)");
+  int SETTBOUNDS  = cdoOperatorAdd("settbounds",   0,  1, "frequency (day, month, year)");
   int SETREFTIME  = cdoOperatorAdd("setreftime",   0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
   int SETCALENDAR = cdoOperatorAdd("setcalendar",  0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");
   int SHIFTTIME   = cdoOperatorAdd("shifttime",    0,  1, "shift value");
@@ -217,7 +252,7 @@ void *Settime(void *argument)
 	  newval = parameter2int(timestr);
 	}
     }
-  else if ( operatorID == SHIFTTIME || operatorID == SETTBOUNDS )
+  else if ( operatorID == SHIFTTIME )
     {
       operatorCheckArgc(1);
       const char *timeunits = operatorArgv()[0];
@@ -230,13 +265,17 @@ void *Settime(void *argument)
       /* increment in seconds */
       ijulinc = incperiod * incunit;
     }
-  else if ( operatorID == SETTUNITS )
+  else if ( operatorID == SETTUNITS || operatorID == SETTBOUNDS )
     {
       operatorCheckArgc(1);
       int idum;
       const char *timeunits = operatorArgv()[0];
       incperiod = 0;
       get_tunits(timeunits, &incperiod, &idum, &tunit);
+
+      if ( operatorID == SETTBOUNDS &&
+           !(tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR) )
+        cdoAbort("Unsupported frequency %s! Use day, month or year.", timeunits);
     }
   else if ( operatorID == SETCALENDAR )
     {
@@ -415,30 +454,7 @@ void *Settime(void *argument)
 	}
       else if ( operatorID == SETTBOUNDS )
 	{
-          vdateb[0] = vdate;
-          vdateb[1] = vdate;
-          vtimeb[0] = vtime;
-          vtimeb[1] = vtime;
-          
-          cdiDecodeDate(vdate, &year, &month, &day);
-          if ( tunit == TUNIT_MONTH )
-            {
-              vtimeb[0] = 0;
-              vtimeb[1] = 0;
-              vdateb[0] = cdiEncodeDate(year, month, 1);
-              month++;
-              if ( month > 12 ) { month = 1; year++; }
-              vdateb[1] = cdiEncodeDate(year, month, 1);
-            }
-          else if ( tunit == TUNIT_DAY )
-            {
-              vtimeb[0] = 0;
-              vtimeb[1] = 0;
-              vdateb[0] = vdate;
-              juldate = juldate_encode(calendar, vdateb[0], vtimeb[0]);
-              juldate = juldate_add_seconds(86400, juldate);
-              juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
-            }
+          gen_bounds(calendar, tunit, vdate, vtime, vdateb, vtimeb);
           
           if ( CDO_CMOR_Mode )
             {
