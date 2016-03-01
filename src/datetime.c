@@ -227,21 +227,19 @@ int dtlist_get_vtime(dtlist_type *dtlist, int tsID)
 void datetime_avg(int calendar, int ndates, datetime_t *datetime)
 {
   int vdate, vtime;
-  juldate_t juldate1, juldate2, juldatem;
-  double seconds;
 
   if ( ndates%2 == 0 )
     {
       vdate = datetime[ndates/2-1].date;
       vtime = datetime[ndates/2-1].time;
-      juldate1 = juldate_encode(calendar, vdate, vtime);
+      juldate_t juldate1 = juldate_encode(calendar, vdate, vtime);
 
       vdate = datetime[ndates/2].date;
       vtime = datetime[ndates/2].time;
-      juldate2 = juldate_encode(calendar, vdate, vtime);
+      juldate_t juldate2 = juldate_encode(calendar, vdate, vtime);
 
-      seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
-      juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
+      double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
+      juldate_t juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
       juldate_decode(calendar, juldatem, &vdate, &vtime);
     }
   else

@@ -415,7 +415,7 @@ void *Maggraph(void *argument);
 #define  SetpartabOperators     {"setpartabc", "setpartabp", "setpartabn"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
-                                 "settaxis", "setreftime", "setcalendar", "shifttime"}
+                                 "settaxis", "settbounds", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis", "genlevelbounds"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
                                  "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}

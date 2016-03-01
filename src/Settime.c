@@ -117,7 +117,7 @@ void *Settime(void *argument)
   int ijulinc = 0, incperiod = 1, incunit = 86400;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int day0;
-  int taxis_has_bounds, copy_timestep = FALSE;
+  int copy_timestep = FALSE;
   int newcalendar = CALENDAR_STANDARD;
   // int nargs;
   const char *datestr, *timestr;
@@ -132,7 +132,8 @@ void *Settime(void *argument)
   int SETDATE     = cdoOperatorAdd("setdate",      0,  1, "date (format: YYYY-MM-DD)");
   int SETTIME     = cdoOperatorAdd("settime",      0,  1, "time (format: hh:mm:ss)");
   int SETTUNITS   = cdoOperatorAdd("settunits",    0,  1, "time units (seconds, minutes, hours, days, months, years)");
-  int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
+  int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date,time<,frequency> (format YYYY-MM-DD,hh:mm:ss)");
+  int SETTBOUNDS  = cdoOperatorAdd("settbounds",   0,  1, "frequency (hour, day, month, year)");
   int SETREFTIME  = cdoOperatorAdd("setreftime",   0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
   int SETCALENDAR = cdoOperatorAdd("setcalendar",  0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");
   int SHIFTTIME   = cdoOperatorAdd("shifttime",    0,  1, "shift value");
@@ -216,7 +217,7 @@ void *Settime(void *argument)
 	  newval = parameter2int(timestr);
 	}
     }
-  else if ( operatorID == SHIFTTIME )
+  else if ( operatorID == SHIFTTIME || operatorID == SETTBOUNDS )
     {
       operatorCheckArgc(1);
       const char *timeunits = operatorArgv()[0];
@@ -268,7 +269,7 @@ void *Settime(void *argument)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
-  taxis_has_bounds = taxisHasBounds(taxisID1);
+  int taxis_has_bounds = taxisHasBounds(taxisID1);
   int ntsteps  = vlistNtsteps(vlistID1);
   int nvars    = vlistNvars(vlistID1);
 
@@ -412,6 +413,42 @@ void *Settime(void *argument)
 	      juldate = juldate_add_seconds(ijulinc, juldate);
 	    }
 	}
+      else if ( operatorID == SETTBOUNDS )
+	{
+          vdateb[0] = vdate;
+          vdateb[1] = vdate;
+          vtimeb[0] = vtime;
+          vtimeb[1] = vtime;
+          
+          cdiDecodeDate(vdate, &year, &month, &day);
+          if ( tunit == TUNIT_MONTH )
+            {
+              vtimeb[0] = 0;
+              vtimeb[1] = 0;
+              vdateb[0] = cdiEncodeDate(year, month, 1);
+              month++;
+              if ( month > 12 ) { month = 1; year++; }
+              vdateb[1] = cdiEncodeDate(year, month, 1);
+            }
+          else if ( tunit == TUNIT_DAY )
+            {
+              vtimeb[0] = 0;
+              vtimeb[1] = 0;
+              vdateb[0] = vdate;
+              juldate = juldate_encode(calendar, vdateb[0], vtimeb[0]);
+              juldate = juldate_add_seconds(86400, juldate);
+              juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
+            }
+          
+          if ( CDO_CMOR_Mode )
+            {
+              juldate_t juldate1 = juldate_encode(calendar, vdateb[0], vtimeb[0]);
+              juldate_t juldate2 = juldate_encode(calendar, vdateb[1], vtimeb[1]);
+              double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
+              juldate_t juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
+              juldate_decode(calendar, juldatem, &vdate, &vtime);
+            }
+	}
       else if ( operatorID == SHIFTTIME )
 	{
 	  shifttime(calendar, tunit, ijulinc, &vdate, &vtime);
@@ -459,7 +496,7 @@ void *Settime(void *argument)
 
 	  taxisDefVdate(taxisID2, vdate);
 	  taxisDefVtime(taxisID2, vtime);
-	  if ( taxis_has_bounds )
+	  if ( taxis_has_bounds || operatorID == SETTBOUNDS )
 	    {
 	      taxisDefVdateBounds(taxisID2, vdateb[0], vdateb[1]);
 	      taxisDefVtimeBounds(taxisID2, vtimeb[0], vtimeb[1]);
