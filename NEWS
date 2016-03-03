@@ -13,6 +13,8 @@ Version 1.7.1 (25 February 2016):
      * contour: Contour plot
      * shaded: Shaded contour plot
      * grfill: Shaded gridfill plot
+     * vector: Lat/Lon vector plot
+     * graph: Line graph plot
      * gmtxyz: Output GMT xyz format to create contour plots with the GMT module pscontour.
      * gmtcells: Output GMT multiple segment format to create shaded gridfill plots with psxy.
    Fixed bugs:
