@@ -704,6 +704,7 @@ src/text.h -text
 src/timebase.h -text
 src/timer.c -text
 src/userlog.c -text
+src/uthash.h -text
 src/util.c -text
 src/util.h -text
 src/vct_l191.h -text

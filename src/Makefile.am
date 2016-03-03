@@ -139,6 +139,7 @@ libcdo_la_SOURCES =            \
                timebase.h      \
                timer.c         \
                userlog.c       \
+               uthash.h        \
                util.c          \
                util.h          \
                zaxis.c
