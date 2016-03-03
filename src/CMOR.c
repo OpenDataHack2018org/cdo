@@ -210,25 +210,43 @@ static void dump_global_attributes(int streamID)
 static void dump_special_attributes(int streamID)
 {
   int fileID;
-  size_t historysize;
+  size_t historysize, old_historysize;
   char *history, *new_history;
   const char *value;
   int vlistID = streamInqVlist(streamID);
 
   /* Any new history will be appended to the existing history. */
   fileID = pstreamFileID(streamID);
-  historysize = (size_t) streamInqHistorySize(fileID);
+  old_historysize = (size_t) streamInqHistorySize(fileID);
+  new_history = get_val("history", "");
+
+  if ( old_historysize )
+    {
+      historysize = old_historysize;
+      if ( new_history )
+        historysize += strlen(new_history) + 1;
+    }
+  else
+    {
+      historysize = strlen(new_history);
+    }
+
   if ( historysize )
     {
-      new_history = get_val("history", NULL);
-      if ( new_history ) historysize += strlen(new_history) + 1;
       history = Malloc(historysize + 1);
       memset(history, 0, historysize + 1);
-      streamInqHistoryString(fileID, history);
-      if ( new_history )
+      if ( old_historysize )
         {
-          strcat(history, " ");
-          strcat(history, new_history);
+          streamInqHistoryString(fileID, history);
+          if ( new_history )
+            {
+              strcat(history, " ");
+              strcat(history, new_history);
+            }
+        }
+      else
+        {
+          strcpy(history, new_history);
         }
       hreplace("history", history);
       Free(history);
