@@ -2,10 +2,10 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include <search.h>
-#include <ctype.h>
 
 #if defined(HAVE_LIBCMOR)
+#include <ctype.h>
+#include "uthash.h"
 #include "cmor.h"
 
 struct cc_var
@@ -14,6 +14,13 @@ struct cc_var
   int cmor_varID;
   char datatype;
   void *data;
+};
+
+struct kv
+{
+  char *key;
+  char *value;
+  UT_hash_handle hh;
 };
 
 static struct cc_var *find_var(int cdi_varID, struct cc_var vars[], int nvars)
@@ -37,57 +44,48 @@ static char *trim(char *s)
   return s;
 }
 
-static ENTRY *hinsert(const char *key, const char *value)
+static void hinsert(struct kv **ht, const char *key, const char *value)
 {
   /* Insert new keys. Do not overwrite values of existing keys. */
-  ENTRY e, *ep;
+  struct kv *e, *s;
 
-  e.key = strdup(key);
-  e.data = (void *)strdup(value);
-  ep = hsearch(e, FIND);
-  if ( ep == NULL )
+  HASH_FIND_STR(*ht, key, s);
+  if ( s == NULL)
     {
-      ep = hsearch(e, ENTER);
+      e = Malloc(sizeof(struct kv));
+      e->key = Malloc(strlen(key) + 1);
+      e->value = Malloc(strlen(value) + 1);
+      strcpy(e->key, key);
+      strcpy(e->value, value);
+      HASH_ADD_KEYPTR(hh, *ht, e->key, strlen(e->key), e);
     }
-  else
-    {
-      free(e.key);
-      free(e.data);
-    }
-  return ep;
 }
 
-static ENTRY *hreplace(const char *key, const char *value)
+static void hreplace(struct kv **ht, const char *key, const char *value)
 {
   /* Overwrites values of existing keys. */
-  ENTRY e, *ep;
+  struct kv *s;
 
-  e.key = strdup(key);
-  e.data = (void *)strdup(value);
-  ep = hsearch(e, FIND);
-  if ( ep == NULL )
+  HASH_FIND_STR(*ht, key, s);
+  if ( s )
     {
-      ep = hsearch(e, ENTER);
+      HASH_DEL(*ht, s);
+      Free(s->key);
+      Free(s->value);
+      Free(s);
     }
-  else
-    {
-      free(e.key);
-      free(ep->data);
-      ep->data = e.data;
-    }
-  return ep;
+  hinsert(ht, key, value);
 }
 
-static ENTRY *parse_kv(char *kvstr)
+static void parse_kv(struct kv **ht, char *kvstr)
 {
   char *key = trim(strtok(kvstr, "="));
   char *value = trim(strtok(NULL, "="));
-  if ( key == NULL || value == NULL )
-    return NULL;
-  return hinsert(key, value);
+  if ( key && value )
+    hinsert(ht, key, value);
 }
 
-static int parse_kv_file(const char *filename, int verbose)
+static int parse_kv_file(struct kv **ht, const char *filename, int verbose)
 {
   FILE *fp;
   char line[CMOR_MAX_STRING], *comment;
@@ -103,13 +101,13 @@ static int parse_kv_file(const char *filename, int verbose)
     {
       comment = strchr(line, '#');
       if ( comment ) *comment = '\0';
-      parse_kv(line);
+      parse_kv(ht, line);
     }
   fclose(fp);
   return 0;
 }
 
-static void parse_kv_cmdline(int nparams, char **params)
+static void parse_kv_cmdline(struct kv **ht, int nparams, char **params)
 {
   int i, j, k, size;
   char *p;
@@ -134,41 +132,33 @@ static void parse_kv_cmdline(int nparams, char **params)
           strcat(p, ",");
           strcat(p, params[i + k]);
         }
-      parse_kv(p);
-      free(p);
+      parse_kv(ht, p);
+      Free(p);
       i += j;
     }
 }
 
-static char *get_val(char *key, char *def)
+static char *get_val(struct kv **ht, char *key, char *def)
 {
-  ENTRY e, *ep;
+  struct kv *e;
 
-  e.key = key;
-  ep = hsearch(e, FIND);
-  if ( ep )
-    return (char *)ep->data;
-  else
-    return def;
+  HASH_FIND_STR(*ht, key, e);
+  return e ? e->value : def;
 }
 
-static char *substitute(char *word)
+static char *substitute(struct kv **ht, char *word)
 {
-  ENTRY e, *ep;
+  struct kv *e;
   char *key;
 
   key = (char *) Malloc(strlen(word) + 12);
   sprintf(key, "substitute_%s", word);
-  e.key = key;
-  ep = hsearch(e, FIND);
+  HASH_FIND_STR(*ht, key, e);
   Free(key);
-  if ( ep )
-    return (char *)ep->data;
-  else
-    return word;
+  return e ? e->value : word;
 }
 
-static void dump_global_attributes(int streamID)
+static void dump_global_attributes(struct kv **ht, int streamID)
 {
   int i, natts;
   char name[CDI_MAX_NAME];
@@ -200,14 +190,14 @@ static void dump_global_attributes(int streamID)
           snprintf(value, CDI_MAX_NAME, "%e", *(double *)buffer);
           break;
         default:
-          printf("Unsupported type %i name %s\n", type, name);
+          cdoWarning("Unsupported type %i name %s\n", type, name);
         }
-      hinsert(name, value);
+      hinsert(ht, name, value);
       if ( value ) Free(value);
     }
 }
 
-static void dump_special_attributes(int streamID)
+static void dump_special_attributes(struct kv **ht, int streamID)
 {
   int fileID;
   size_t historysize, old_historysize;
@@ -218,7 +208,7 @@ static void dump_special_attributes(int streamID)
   /* Any new history will be appended to the existing history. */
   fileID = pstreamFileID(streamID);
   old_historysize = (size_t) streamInqHistorySize(fileID);
-  new_history = get_val("history", "");
+  new_history = get_val(ht, "history", "");
 
   if ( old_historysize )
     {
@@ -248,42 +238,45 @@ static void dump_special_attributes(int streamID)
         {
           strcpy(history, new_history);
         }
-      hreplace("history", history);
+      hreplace(ht, "history", history);
       Free(history);
     }
 
   value = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, 0));
-  if ( value ) hinsert("institution", value);
+  if ( value ) hinsert(ht, "institution", value);
 
   value = modelInqNamePtr(vlistInqVarModel(vlistID, 0));
-  if ( value ) hinsert("source", value);
+  if ( value ) hinsert(ht, "source", value);
 }
 
-static void read_config_files(void)
+static void read_config_files(struct kv **ht)
 {
-  char *info_files;
+  char *info, *infoc;
   char *filename;
   char *home;
   const char *dotconfig = ".cdocmorinfo";
 
   /* Files from info key in command line. */
-  info_files = get_val("info", "");
-  filename = strtok(info_files, ",");
+  info = get_val(ht, "info", "");
+  infoc = Malloc(strlen(info) + 1);
+  strcpy(infoc, info);
+  filename = strtok(infoc, ",");
   while ( filename != NULL )
     {
-      parse_kv_file(trim(filename), 1);
+      parse_kv_file(ht, trim(filename), 1);
       filename = strtok(NULL, ",");
     }
+  Free(infoc);
 
   /* Config file in user's $HOME directory. */
   home = getenv("HOME");
   filename = Malloc(strlen(home) + strlen(dotconfig) + 2);
   sprintf(filename, "%s/%s", home, dotconfig);
-  parse_kv_file(filename, 0);
+  parse_kv_file(ht, filename, 0);
   Free(filename);
 
   /* System wide configuration. */
-  parse_kv_file("/etc/cdocmor.info", 0);
+  parse_kv_file(ht, "/etc/cdocmor.info", 0);
 }
 
 static int in_list(char **list, const char *needle)
@@ -294,7 +287,7 @@ static int in_list(char **list, const char *needle)
   return 0;
 }
 
-static void setup(int streamID, char *table)
+static void setup(struct kv **ht, int streamID, char *table)
 {
   char *chunk;
   char *logfile;
@@ -305,28 +298,29 @@ static void setup(int streamID, char *table)
   int table_id;
   int taxisID = vlistInqTaxis(streamInqVlist(streamID));
   char *calendar;
-  double branch_time = atof(get_val("branch_time", "0.0"));
+  double branch_time = atof(get_val(ht, "branch_time", "0.0"));
 
-  chunk = get_val("chunk", "replace");
+  chunk = get_val(ht, "chunk", "replace");
   if ( strcasecmp(chunk, "replace") == 0 )
     netcdf_file_action = CMOR_REPLACE;
   else if ( strcasecmp(chunk, "append") == 0 )
     netcdf_file_action = CMOR_APPEND;
 
   set_verbosity = CMOR_NORMAL;
-  if ( strcasecmp(get_val("set_verbosity", ""), "CMOR_QUIET") == 0 )
+  if ( strcasecmp(get_val(ht, "set_verbosity", ""), "CMOR_QUIET") == 0 )
     set_verbosity = CMOR_QUIET;
 
   exit_control = CMOR_NORMAL;
-  if ( strcasecmp(get_val("exit_control", ""), "CMOR_EXIT_ON_MAJOR") == 0 )
+  if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_MAJOR") == 0 )
     exit_control = CMOR_EXIT_ON_MAJOR;
-  if ( strcasecmp(get_val("exit_control", ""), "CMOR_EXIT_ON_WARNING") == 0 )
+  if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_WARNING")
+       == 0 )
     exit_control = CMOR_EXIT_ON_WARNING;
 
-  logfile = get_val("logfile", NULL);
+  logfile = get_val(ht, "logfile", NULL);
 
-  create_subdirectories = atoi(get_val("create_subdirectories", "0"));
-  cmor_setup(get_val("inpath", "/usr/share/cmor/"),
+  create_subdirectories = atoi(get_val(ht, "create_subdirectories", "0"));
+  cmor_setup(get_val(ht, "inpath", "/usr/share/cmor/"),
              &netcdf_file_action,
              &set_verbosity,
              &exit_control,
@@ -354,10 +348,11 @@ static void setup(int streamID, char *table)
       cdoAbort("Unsupported calendar type.");
     }
 
-  if ( get_val("month_lengths", NULL) )
+  char *ml = get_val(ht, "month_lengths", NULL);
+  if ( ml )
     {
-      char *month_lengths_str = strdup(get_val("month_lengths", ""));
-      char *month_str = strtok(month_lengths_str, ",");
+      char *mlc = Malloc(strlen(ml) + 1);
+      char *month_str = strtok(mlc, ",");
       int month = 0;
       month_lengths = Malloc(12 * sizeof(int));
       while ( month < 12 && month_str != NULL )
@@ -365,6 +360,7 @@ static void setup(int streamID, char *table)
           month_lengths[month++] = atoi(month_str);
           month_str = strtok(NULL, ",");
         }
+      Free(mlc);
       if ( month != 12 )
         cdoAbort("Invalid format for month_lengths");
     }
@@ -373,33 +369,34 @@ static void setup(int streamID, char *table)
       month_lengths = NULL;
     }
 
-  cmor_dataset(get_val("outpath", "./"),
-               get_val("experiment_id", ""),
-               get_val("institution", ""),
-               get_val("source", ""),
+  cmor_dataset(get_val(ht, "outpath", "./"),
+               get_val(ht, "experiment_id", ""),
+               get_val(ht, "institution", ""),
+               get_val(ht, "source", ""),
                calendar,
-               atoi(get_val("realization", "1")),
-               get_val("contact", ""),
-               get_val("history", ""),
-               get_val("comment", ""),
-               get_val("references", ""),
-               atoi(get_val("leap_year", "0")),
-               atoi(get_val("leap_month", "0")),
+               atoi(get_val(ht, "realization", "1")),
+               get_val(ht, "contact", ""),
+               get_val(ht, "history", ""),
+               get_val(ht, "comment", ""),
+               get_val(ht, "references", ""),
+               atoi(get_val(ht, "leap_year", "0")),
+               atoi(get_val(ht, "leap_month", "0")),
                month_lengths,
-               get_val("model_id", ""),
-               get_val("forcing", ""),
-               atoi(get_val("initialization_method", "1")),
-               atoi(get_val("physics_version", "1")),
-               get_val("institute_id", ""),
-               get_val("parent_experiment_id", ""),
+               get_val(ht, "model_id", ""),
+               get_val(ht, "forcing", ""),
+               atoi(get_val(ht, "initialization_method", "1")),
+               atoi(get_val(ht, "physics_version", "1")),
+               get_val(ht, "institute_id", ""),
+               get_val(ht, "parent_experiment_id", ""),
                &branch_time,
-               get_val("parent_experiment_rip", ""));
+               get_val(ht, "parent_experiment_rip", ""));
 
   cmor_load_table(table, &table_id);
   cmor_set_table(table_id);
 }
 
-static void define_variables(int streamID, struct cc_var vars[], int *nvars)
+static void define_variables(struct kv **ht, int streamID,
+                             struct cc_var vars[], int *nvars)
 {
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -413,7 +410,7 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
   char missing_value[sizeof(double)];
   double tolerance = 1e-4;
   int axis_ids[CMOR_MAX_AXES];
-  char *select_vars = get_val("var", NULL);
+  char *select_vars = get_val(ht, "var", NULL);
   int year, month, day, hour, minute, second;
   int timeunit = taxisInqTunit(taxisID);
   char taxis_units[CMOR_MAX_STRING];
@@ -463,7 +460,7 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
 
           /* Time-Axis */
           cmor_axis(&axis_ids[ndims++],
-                    substitute("time"),
+                    substitute(ht, "time"),
                     taxis_units,
                     0,
                     NULL,
@@ -482,7 +479,7 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
               zaxisInqName(zaxisID, name);
               zaxisInqUnits(zaxisID, units);
               cmor_axis(&axis_ids[ndims++],
-                        substitute(name),
+                        substitute(ht, name),
                         units,
                         levels,
                         (void *)coord_vals,
@@ -501,7 +498,7 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
           cell_bounds = Malloc(2 * length * sizeof(double));
           gridInqYbounds(gridID, cell_bounds);
           cmor_axis(&axis_ids[ndims++],
-                    substitute(name),
+                    substitute(ht, name),
                     units,
                     length,
                     (void *)coord_vals,
@@ -519,7 +516,7 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
           cell_bounds = Malloc(2 * length * sizeof(double));
           gridInqXbounds(gridID, cell_bounds);
           cmor_axis(&axis_ids[ndims++],
-                    substitute(name),
+                    substitute(ht, name),
                     units,
                     length,
                     (void *)coord_vals,
@@ -544,7 +541,7 @@ static void define_variables(int streamID, struct cc_var vars[], int *nvars)
               var->data = Malloc(gridsize * levels * sizeof(double));
             }
           cmor_variable(&var->cmor_varID,
-                        substitute(name),
+                        substitute(ht, name),
                         units,
                         ndims,
                         axis_ids,
@@ -669,36 +666,42 @@ void *CMOR(void *argument)
   int nvars, nvars_max;
   int streamID;
   struct cc_var *vars;
+  struct kv *ht = NULL;
+  struct kv *s, *tmp;
 
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
-  hcreate(100);
-
   /* Command line config has highest priority. */
-  parse_kv_cmdline(nparams - 1, &params[1]);
+  parse_kv_cmdline(&ht, nparams - 1, &params[1]);
 
   /* Config files are read with descending priority. */
-  read_config_files();
+  read_config_files(&ht);
 
   streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
-  dump_global_attributes(streamID);
-  dump_special_attributes(streamID);
+  dump_global_attributes(&ht, streamID);
+  dump_special_attributes(&ht, streamID);
 
   nvars_max = vlistNvars(streamInqVlist(streamID));
   vars = (struct cc_var *) Malloc(nvars_max * sizeof(struct cc_var));
 
-  setup(streamID, params[0]);
-  define_variables(streamID, vars, &nvars);
+  setup(&ht, streamID, params[0]);
+  define_variables(&ht, streamID, vars, &nvars);
   write_variables(streamID, vars, nvars);
 
   streamClose(streamID);
   cmor_close();
 
-  hdestroy();
   for ( int i = 0; i < nvars; i++ )
     Free(vars[i].data);
   Free(vars);
+
+  HASH_ITER(hh, ht, s, tmp)
+    {
+      Free(s->key);
+      Free(s->value);
+      Free(s);
+    }
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
