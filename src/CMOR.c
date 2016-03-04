@@ -406,6 +406,7 @@ static void define_variables(struct kv **ht, int streamID,
   char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
   int length;
   double *coord_vals, *cell_bounds;
+  int nbounds;
   int ndims, levels;
   char missing_value[sizeof(double)];
   double tolerance = 1e-4;
@@ -496,7 +497,12 @@ static void define_variables(struct kv **ht, int streamID,
           coord_vals = Malloc(length * sizeof(double));
           gridInqYvals(gridID, coord_vals);
           cell_bounds = Malloc(2 * length * sizeof(double));
-          gridInqYbounds(gridID, cell_bounds);
+          nbounds = gridInqYbounds(gridID, cell_bounds);
+          if ( nbounds != 2 * length )
+            {
+              Free(cell_bounds);
+              cell_bounds = NULL;
+            }
           cmor_axis(&axis_ids[ndims++],
                     substitute(ht, name),
                     units,
@@ -514,7 +520,12 @@ static void define_variables(struct kv **ht, int streamID,
           coord_vals = Malloc(length * sizeof(double));
           gridInqXvals(gridID, coord_vals);
           cell_bounds = Malloc(2 * length * sizeof(double));
-          gridInqXbounds(gridID, cell_bounds);
+          nbounds = gridInqXbounds(gridID, cell_bounds);
+          if ( nbounds != 2 * length )
+            {
+              Free(cell_bounds);
+              cell_bounds = NULL;
+            }
           cmor_axis(&axis_ids[ndims++],
                     substitute(ht, name),
                     units,
