@@ -521,7 +521,7 @@ int userFileOverwrite(const char *restrict filename)
 {
   int status = 0;
 
-  if ( stdin_is_tty && stderr_is_tty )
+  if ( !cdoSilentMode && stdin_is_tty && stderr_is_tty )
     {
       fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
       char line[1024];

@@ -323,10 +323,8 @@ void *Collgrid(void *argument)
   int nfiles = cdoStreamCnt() - 1;
   const char *ofilename = cdoStreamName(nfiles)->args;
 
-  if ( !cdoSilentMode && !cdoOverwriteMode )
-    if ( fileExists(ofilename) )
-      if ( !userFileOverwrite(ofilename) )
-	cdoAbort("Outputfile %s already exists!", ofilename);
+  if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
+    cdoAbort("Outputfile %s already exists!", ofilename);
 
   ens_file_t *ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
 
