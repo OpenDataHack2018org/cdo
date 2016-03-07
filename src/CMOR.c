@@ -33,11 +33,10 @@ static struct cc_var *find_var(int cdi_varID, struct cc_var vars[], int nvars)
 
 static char *trim(char *s)
 {
-  int n;
   if (s == NULL) return s;
   while ( *s != '\0' && (isspace(*s) || *s == '"') )
     s++;
-  n = strlen(s);
+  int n = strlen(s);
   while ( n > 0 && (isspace(s[n - 1]) || s[n - 1] == '"') )
     n--;
   s[n] = '\0';
@@ -48,7 +47,6 @@ static void hinsert(struct kv **ht, const char *key, const char *value)
 {
   /* Insert new keys. Do not overwrite values of existing keys. */
   struct kv *e, *s;
-
   HASH_FIND_STR(*ht, key, s);
   if ( s == NULL)
     {
@@ -65,7 +63,6 @@ static void hreplace(struct kv **ht, const char *key, const char *value)
 {
   /* Overwrites values of existing keys. */
   struct kv *s;
-
   HASH_FIND_STR(*ht, key, s);
   if ( s )
     {
@@ -87,19 +84,18 @@ static void parse_kv(struct kv **ht, char *kvstr)
 
 static int parse_kv_file(struct kv **ht, const char *filename, int verbose)
 {
-  FILE *fp;
-  char line[CMOR_MAX_STRING], *comment;
-
-  fp = fopen(filename, "r");
+  FILE *fp = fopen(filename, "r");
   if ( fp == NULL )
     {
       if ( verbose )
         cdoWarning("cannot open '%s'", filename);
       return 1;
     }
+
+  char line[CMOR_MAX_STRING];
   while ( fgets(line, sizeof(line), fp) != NULL )
     {
-      comment = strchr(line, '#');
+      char *comment = strchr(line, '#');
       if ( comment ) *comment = '\0';
       parse_kv(ht, line);
     }
@@ -109,25 +105,22 @@ static int parse_kv_file(struct kv **ht, const char *filename, int verbose)
 
 static void parse_kv_cmdline(struct kv **ht, int nparams, char **params)
 {
-  int i, j, k, size;
-  char *p;
-
   /* Assume key = value pairs. That is, if params[i] contains no '='
    * then treat it as if it belongs to the value of params[i-1],
    * separated by a ','.*/
-  i = 0;
+  int i = 0;
   while ( i < nparams )
     {
-      j = 1;
-      size = strlen(params[i]) + 1;
+      int j = 1;
+      int size = strlen(params[i]) + 1;
       while ( i + j < nparams && strchr(params[i + j], '=') == NULL )
         {
           size += strlen(params[i + j]) + 1;
           j++;
         }
-      p = (char *) Malloc(size);
+      char *p = (char *) Malloc(size);
       strcpy(p, params[i]);
-      for (k = 1; k < j; k++)
+      for (int k = 1; k < j; k++)
         {
           strcat(p, ",");
           strcat(p, params[i + k]);
@@ -141,7 +134,6 @@ static void parse_kv_cmdline(struct kv **ht, int nparams, char **params)
 static char *get_val(struct kv **ht, char *key, char *def)
 {
   struct kv *e;
-
   HASH_FIND_STR(*ht, key, e);
   return e ? e->value : def;
 }
@@ -149,9 +141,7 @@ static char *get_val(struct kv **ht, char *key, char *def)
 static char *substitute(struct kv **ht, char *word)
 {
   struct kv *e;
-  char *key;
-
-  key = (char *) Malloc(strlen(word) + 12);
+  char *key = (char *) Malloc(strlen(word) + 12);
   sprintf(key, "substitute_%s", word);
   HASH_FIND_STR(*ht, key, e);
   Free(key);
@@ -160,17 +150,15 @@ static char *substitute(struct kv **ht, char *word)
 
 static void dump_global_attributes(struct kv **ht, int streamID)
 {
-  int i, natts;
-  char name[CDI_MAX_NAME];
-  char buffer[8];
-  char *value;
-  int type, len;
+  int natts;
   int vlistID = streamInqVlist(streamID);
-
   vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
-  for ( i = 0; i < natts; i++ )
+  for ( int i = 0; i < natts; i++ )
     {
-      value = NULL;
+      char name[CDI_MAX_NAME];
+      char *value = NULL;
+      char buffer[8];
+      int type, len;
       vlistInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
       switch ( type )
         {
@@ -199,16 +187,12 @@ static void dump_global_attributes(struct kv **ht, int streamID)
 
 static void dump_special_attributes(struct kv **ht, int streamID)
 {
-  int fileID;
-  size_t historysize, old_historysize;
-  char *history, *new_history;
-  const char *value;
   int vlistID = streamInqVlist(streamID);
-
   /* Any new history will be appended to the existing history. */
-  fileID = pstreamFileID(streamID);
-  old_historysize = (size_t) streamInqHistorySize(fileID);
-  new_history = get_val(ht, "history", "");
+  int fileID = pstreamFileID(streamID);
+  size_t old_historysize = (size_t) streamInqHistorySize(fileID);
+  char *new_history = get_val(ht, "history", "");
+  size_t historysize;
 
   if ( old_historysize )
     {
@@ -223,7 +207,7 @@ static void dump_special_attributes(struct kv **ht, int streamID)
 
   if ( historysize )
     {
-      history = Malloc(historysize + 1);
+      char *history = Malloc(historysize + 1);
       memset(history, 0, historysize + 1);
       if ( old_historysize )
         {
@@ -242,7 +226,7 @@ static void dump_special_attributes(struct kv **ht, int streamID)
       Free(history);
     }
 
-  value = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, 0));
+  const char *value = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, 0));
   if ( value ) hinsert(ht, "institution", value);
 
   value = modelInqNamePtr(vlistInqVarModel(vlistID, 0));
@@ -251,16 +235,11 @@ static void dump_special_attributes(struct kv **ht, int streamID)
 
 static void read_config_files(struct kv **ht)
 {
-  char *info, *infoc;
-  char *filename;
-  char *home;
-  const char *dotconfig = ".cdocmorinfo";
-
   /* Files from info key in command line. */
-  info = get_val(ht, "info", "");
-  infoc = Malloc(strlen(info) + 1);
+  char *info = get_val(ht, "info", "");
+  char *infoc = Malloc(strlen(info) + 1);
   strcpy(infoc, info);
-  filename = strtok(infoc, ",");
+  char *filename = strtok(infoc, ",");
   while ( filename != NULL )
     {
       parse_kv_file(ht, trim(filename), 1);
@@ -269,7 +248,8 @@ static void read_config_files(struct kv **ht)
   Free(infoc);
 
   /* Config file in user's $HOME directory. */
-  home = getenv("HOME");
+  char *home = getenv("HOME");
+  const char *dotconfig = ".cdocmorinfo";
   filename = Malloc(strlen(home) + strlen(dotconfig) + 2);
   sprintf(filename, "%s/%s", home, dotconfig);
   parse_kv_file(ht, filename, 0);
@@ -289,37 +269,26 @@ static int in_list(char **list, const char *needle)
 
 static void setup(struct kv **ht, int streamID, char *table)
 {
-  char *chunk;
-  char *logfile;
-  int netcdf_file_action, exit_control;
-  int set_verbosity;
-  int create_subdirectories;
-  int *month_lengths;
-  int table_id;
-  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
-  char *calendar;
-  double branch_time = atof(get_val(ht, "branch_time", "0.0"));
-
-  chunk = get_val(ht, "chunk", "replace");
+  int netcdf_file_action;
+  char *chunk = get_val(ht, "chunk", "replace");
   if ( strcasecmp(chunk, "replace") == 0 )
     netcdf_file_action = CMOR_REPLACE;
   else if ( strcasecmp(chunk, "append") == 0 )
     netcdf_file_action = CMOR_APPEND;
 
-  set_verbosity = CMOR_NORMAL;
+  int set_verbosity = CMOR_NORMAL;
   if ( strcasecmp(get_val(ht, "set_verbosity", ""), "CMOR_QUIET") == 0 )
     set_verbosity = CMOR_QUIET;
 
-  exit_control = CMOR_NORMAL;
+  int exit_control = CMOR_NORMAL;
   if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_MAJOR") == 0 )
     exit_control = CMOR_EXIT_ON_MAJOR;
   if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_WARNING")
        == 0 )
     exit_control = CMOR_EXIT_ON_WARNING;
 
-  logfile = get_val(ht, "logfile", NULL);
-
-  create_subdirectories = atoi(get_val(ht, "create_subdirectories", "0"));
+  char *logfile = get_val(ht, "logfile", NULL);
+  int create_subdirectories = atoi(get_val(ht, "create_subdirectories", "0"));
   cmor_setup(get_val(ht, "inpath", "/usr/share/cmor/"),
              &netcdf_file_action,
              &set_verbosity,
@@ -327,6 +296,8 @@ static void setup(struct kv **ht, int streamID, char *table)
              logfile,
              &create_subdirectories);
 
+  char *calendar;
+  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
   switch ( taxisInqCalendar(taxisID) )
     {
     case CALENDAR_STANDARD:
@@ -348,6 +319,7 @@ static void setup(struct kv **ht, int streamID, char *table)
       cdoAbort("Unsupported calendar type.");
     }
 
+  int *month_lengths;
   char *ml = get_val(ht, "month_lengths", NULL);
   if ( ml )
     {
@@ -369,6 +341,7 @@ static void setup(struct kv **ht, int streamID, char *table)
       month_lengths = NULL;
     }
 
+  double branch_time = atof(get_val(ht, "branch_time", "0.0"));
   cmor_dataset(get_val(ht, "outpath", "./"),
                get_val(ht, "experiment_id", ""),
                get_val(ht, "institution", ""),
@@ -391,6 +364,7 @@ static void setup(struct kv **ht, int streamID, char *table)
                &branch_time,
                get_val(ht, "parent_experiment_rip", ""));
 
+  int table_id;
   cmor_load_table(table, &table_id);
   cmor_set_table(table_id);
 }
@@ -400,24 +374,9 @@ static void define_variables(struct kv **ht, int streamID,
 {
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
-  size_t gridsize = vlistGridsizeMax(vlistID);
-  struct cc_var *var;
-  int varID, gridID;
-  char name[CDI_MAX_NAME], units[CDI_MAX_NAME];
-  int length;
-  double *coord_vals, *cell_bounds;
-  int nbounds;
-  int ndims, levels;
-  char missing_value[sizeof(double)];
-  double tolerance = 1e-4;
-  int axis_ids[CMOR_MAX_AXES];
-  char *select_vars = get_val(ht, "var", NULL);
-  int year, month, day, hour, minute, second;
-  int timeunit = taxisInqTunit(taxisID);
   char taxis_units[CMOR_MAX_STRING];
-  char **name_list, *var_name;
-  int i;
-
+  int timeunit = taxisInqTunit(taxisID);
+  int year, month, day, hour, minute, second;
   cdiDecodeDate(taxisInqRdate(taxisID), &year, &month, &day);
   cdiDecodeTime(taxisInqRtime(taxisID), &hour, &minute, &second);
   if ( timeunit == TUNIT_QUARTER || timeunit == TUNIT_30MINUTES )
@@ -431,11 +390,13 @@ static void define_variables(struct kv **ht, int streamID,
           tunitNamePtr(timeunit), year, month, day, hour,
           minute, second);
 
+  char **name_list;
+  char *select_vars = get_val(ht, "var", NULL);
   if ( select_vars )
     {
       name_list = Malloc((strlen(select_vars) + 1) * sizeof(char *));
-      var_name = strtok(select_vars, ",");
-      i = 0;
+      char *var_name = strtok(select_vars, ",");
+      int i = 0;
       while ( var_name != NULL )
         {
           name_list[i++] = trim(var_name);
@@ -449,16 +410,14 @@ static void define_variables(struct kv **ht, int streamID,
     }
 
   *nvars = 0;
-  for ( varID = 0; varID < vlistNvars(vlistID); varID++ )
+  for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
     {
+      char name[CDI_MAX_NAME];
+      int axis_ids[CMOR_MAX_AXES];
       vlistInqVarName(vlistID, varID, name);
       if ( name_list == NULL || in_list(name_list, name) )
         {
-          var = &vars[(*nvars)++];
-          var->cdi_varID = varID;
-          gridID = vlistInqVarGrid(vlistID, varID);
-          ndims = 0;
-
+          int ndims = 0;
           /* Time-Axis */
           cmor_axis(&axis_ids[ndims++],
                     substitute(ht, "time"),
@@ -472,7 +431,9 @@ static void define_variables(struct kv **ht, int streamID,
 
           /* Z-Axis */
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
-          levels = zaxisInqSize(zaxisID);
+          int levels = zaxisInqSize(zaxisID);
+          char units[CDI_MAX_NAME];
+          double *coord_vals;
           if ( zaxisInqType(zaxisID) != ZAXIS_SURFACE )
             {
               coord_vals = Malloc(levels * sizeof(double));
@@ -491,13 +452,14 @@ static void define_variables(struct kv **ht, int streamID,
             }
 
           /* Y-Axis */
+          int gridID = vlistInqVarGrid(vlistID, varID);
           gridInqYname(gridID, name);
           gridInqYunits(gridID, units);
-          length = gridInqYsize(gridID);
+          int length = gridInqYsize(gridID);
           coord_vals = Malloc(length * sizeof(double));
           gridInqYvals(gridID, coord_vals);
-          cell_bounds = Malloc(2 * length * sizeof(double));
-          nbounds = gridInqYbounds(gridID, cell_bounds);
+          double *cell_bounds = Malloc(2 * length * sizeof(double));
+          int nbounds = gridInqYbounds(gridID, cell_bounds);
           if ( nbounds != 2 * length )
             {
               Free(cell_bounds);
@@ -539,6 +501,11 @@ static void define_variables(struct kv **ht, int streamID,
           /* Variable */
           vlistInqVarUnits(vlistID, varID, units);
           vlistInqVarName(vlistID, varID, name);
+          char missing_value[sizeof(double)];
+          double tolerance = 1e-4;
+          size_t gridsize = vlistGridsizeMax(vlistID);
+          struct cc_var *var = &vars[(*nvars)++];
+          var->cdi_varID = varID;
           if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
             {
               var->datatype = 'f';
@@ -570,28 +537,9 @@ static void define_variables(struct kv **ht, int streamID,
 
 static void write_variables(int streamID, struct cc_var vars[], int nvars)
 {
-  struct cc_var *var;
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
-  size_t gridsize = vlistGridsizeMax(vlistID);
-  double time_val;
-  double time_bnds[2];
-  double *time_bndsp;
-  int has_bnds = taxisHasBounds(taxisID);
-  int tsID;
-  int vdate0b, vdate1b;
-  int vtime0b, vtime1b;
-  juldate_t juldate, r_juldate;
-  int calendar = taxisInqCalendar(taxisID);
   int tunitsec;
-  int nrecs;
-  int varID, levelID;
-  int nmiss;
-  double *buffer;
-  int i;
-
-  buffer = (double *) Malloc(gridsize * sizeof(double));
-
   switch ( taxisInqTunit(taxisID) )
     {
     case TUNIT_MINUTE: tunitsec = 60; break;
@@ -600,20 +548,28 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
     default: tunitsec = 3600;
     }
 
-  r_juldate = juldate_encode(calendar,
-                             taxisInqRdate(taxisID),
-                             taxisInqRtime(taxisID));
-  tsID = 0;
+  int calendar = taxisInqCalendar(taxisID);
+  juldate_t r_juldate = juldate_encode(calendar,
+                                       taxisInqRdate(taxisID),
+                                       taxisInqRtime(taxisID));
+  size_t gridsize = vlistGridsizeMax(vlistID);
+  double *buffer = (double *) Malloc(gridsize * sizeof(double));
+  int tsID = 0;
+  int nrecs;
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
-      juldate = juldate_encode(calendar,
-                               taxisInqVdate(taxisID),
-                               taxisInqVtime(taxisID));
+      double time_bnds[2];
+      double *time_bndsp;
+      double time_val;
+      juldate_t juldate = juldate_encode(calendar,
+                                         taxisInqVdate(taxisID),
+                                         taxisInqVtime(taxisID));
       time_val = juldate_to_seconds(juldate_sub(juldate, r_juldate))
         / tunitsec;
 
-      if ( has_bnds )
+      if ( taxisHasBounds(taxisID) )
         {
+          int vdate0b, vdate1b, vtime0b, vtime1b;
           taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
           taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
 
@@ -633,14 +589,16 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
 
       while ( nrecs-- )
         {
+          int varID, levelID;
           streamInqRecord(streamID, &varID, &levelID);
-          var = find_var(varID, vars, nvars);
+          struct cc_var *var = find_var(varID, vars, nvars);
           if ( var )
             {
+              int nmiss;
               if ( var->datatype == 'f' )
                 {
                   streamReadRecord(streamID, buffer, &nmiss);
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( size_t i = 0; i < gridsize; i++ )
                     ((float *)var->data)[gridsize * levelID + i] =
                       (float)buffer[i];
                 }
@@ -653,7 +611,7 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
             }
         }
 
-      for ( i = 0; i < nvars; i++ )
+      for ( int i = 0; i < nvars; i++ )
         cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
@@ -674,12 +632,7 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   int nparams = operatorArgc();
   char **params = operatorArgv();
-  int nvars, nvars_max;
-  int streamID;
-  struct cc_var *vars;
   struct kv *ht = NULL;
-  struct kv *s, *tmp;
-
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
   /* Command line config has highest priority. */
@@ -688,14 +641,15 @@ void *CMOR(void *argument)
   /* Config files are read with descending priority. */
   read_config_files(&ht);
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
   dump_global_attributes(&ht, streamID);
   dump_special_attributes(&ht, streamID);
 
-  nvars_max = vlistNvars(streamInqVlist(streamID));
-  vars = (struct cc_var *) Malloc(nvars_max * sizeof(struct cc_var));
-
+  int nvars;
+  int nvars_max = vlistNvars(streamInqVlist(streamID));
+  struct cc_var *vars = (struct cc_var *) Malloc(nvars_max
+                                                 * sizeof(struct cc_var));
   setup(&ht, streamID, params[0]);
   define_variables(&ht, streamID, vars, &nvars);
   write_variables(streamID, vars, nvars);
@@ -707,6 +661,7 @@ void *CMOR(void *argument)
     Free(vars[i].data);
   Free(vars);
 
+  struct kv *s, *tmp;
   HASH_ITER(hh, ht, s, tmp)
     {
       Free(s->key);
