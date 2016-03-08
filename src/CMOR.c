@@ -188,11 +188,16 @@ static void dump_global_attributes(struct kv **ht, int streamID)
 static void dump_special_attributes(struct kv **ht, int streamID)
 {
   int vlistID = streamInqVlist(streamID);
-  /* Any new history will be appended to the existing history. */
   int fileID = pstreamFileID(streamID);
-  size_t old_historysize = (size_t) streamInqHistorySize(fileID);
+  size_t old_historysize;
   char *new_history = get_val(ht, "history", "");
   size_t historysize;
+  int natts;
+  vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+  if ( natts > 0 )
+    old_historysize = (size_t) streamInqHistorySize(fileID);
+  else
+    old_historysize = 0;
 
   if ( old_historysize )
     {
@@ -228,7 +233,6 @@ static void dump_special_attributes(struct kv **ht, int streamID)
 
   const char *value = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, 0));
   if ( value ) hinsert(ht, "institution", value);
-
   value = modelInqNamePtr(vlistInqVarModel(vlistID, 0));
   if ( value ) hinsert(ht, "source", value);
 }
