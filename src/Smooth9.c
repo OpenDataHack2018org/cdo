@@ -27,46 +27,201 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+static inline
+void smooth_sum(short m, double sfac, double val, double *avg, double *divavg)
+{
+  if ( m ) { *avg += sfac*val; *divavg += sfac; }
+}
+
+static
+void smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss2)
+{
+  double avg,divavg;
+  size_t i, ij , j;
+  size_t gridsize = gridInqSize(gridID);
+  size_t nlon = gridInqXsize(gridID);	 
+  size_t nlat = gridInqYsize(gridID);
+  int grid_is_cyclic = gridIsCircular(gridID);
+
+  short *mask = (short*) Malloc(gridsize*sizeof(short));
+
+  for ( size_t i = 0; i < gridsize; i++) 
+    {		
+      if ( DBL_IS_EQUAL(missval, array1[i]) ) mask[i] = 0;
+      else mask[i] = 1;
+    }
+ 
+  *nmiss2 = 0;
+  for ( i = 0; i < nlat; i++ )
+    {
+      for ( j = 0; j < nlon; j++ )
+        {		      
+          avg = 0; divavg = 0; 	  		     			
+
+          if ( (i == 0) || (j == 0) || (i == (nlat-1)) || (j == (nlon-1)) )
+            {
+              ij = j+nlon*i;
+              if ( mask[ij] )
+                {
+                  avg += array1[ij];  divavg+= 1;					     		       
+                  /* upper left corner */
+                  if ( (i != 0) && (j != 0) ) 
+                    { 
+                      ij = ((i-1)*nlon)+j-1;
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+                  else if ( i != 0 && grid_is_cyclic ) 
+                    { 
+                      ij = (i-1)*nlon+j-1+nlon;
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+			      
+                  /* upper cell */
+                  if ( i != 0 ) 
+                    {
+                      ij = ((i-1)*nlon)+j;
+                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+                    }
+                  
+                  /* upper right corner */
+                  if ( (i != 0) && (j != (nlon-1)) ) 
+                    {
+                      ij = ((i-1)*nlon)+j+1;
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+                  else if ( i!=0 && grid_is_cyclic )
+                    { 
+                      ij = (i-1)*nlon+j+1-nlon;
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+                  
+                  /* left cell */
+                  if  ( j != 0 ) 
+                    {
+                      ij = ((i)*nlon)+j-1;
+                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+                    }
+                  else if ( grid_is_cyclic )
+                    {
+                      ij = i*nlon-1+nlon;
+                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+                    }
+                  
+                  /* right cell */
+                  if ( j!=(nlon-1) ) 
+                    { 
+                      ij = (i*nlon)+j+1;
+                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+                    }
+                  else if ( grid_is_cyclic )
+                    {
+                      ij = i*nlon+j+1-nlon;
+                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+                    }
+                  
+                  /* lower left corner */
+                  if ( mask[ij] &&  ( (i!=(nlat-1))&& (j!=0) ) )
+                    {	       
+                      ij = ((i+1)*nlon+j-1);
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+                  else if ( (i != (nlat-1)) && grid_is_cyclic ) 
+                    {
+                      ij= (i+1)*nlon-1+nlon; 
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+                  
+                  /* lower cell */
+                  if  ( i != (nlat-1) ) 
+                    {
+                      ij = ((i+1)*nlon)+j;
+                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+                    }
+                  
+                  /* lower right corner */
+                  if ( (i != (nlat-1)) && (j != (nlon-1)) )
+                    {
+                      ij = ((i+1)*nlon)+j+1;
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+                  else if ( (i != (nlat-1)) && grid_is_cyclic )
+                    {
+                      ij= ((i+1)*nlon)+j+1-nlon;
+                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+                    }
+                }
+            }
+          else if ( mask[j+nlon*i] )
+            {			 
+              avg += array1[j+nlon*i]; divavg+= 1;
+			    
+              ij = ((i-1)*nlon)+j-1;
+              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+
+              ij = ((i-1)*nlon)+j;
+              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+
+              ij = ((i-1)*nlon)+j+1;
+              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+              
+              ij = ((i)*nlon)+j-1;
+              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+
+              ij = (i*nlon)+j+1;
+              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+              
+              ij = ((i+1)*nlon+j-1);	        
+              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+
+              ij = ((i+1)*nlon)+j;
+              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
+
+              ij = ((i+1)*nlon)+j+1;
+              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+            }
+
+          if ( fabs(divavg) > 0 )
+            {
+              array2[i*nlon+j] = avg/divavg;			
+            }
+          else 
+            {
+              array2[i*nlon+j] = missval;					
+              (*nmiss2)++;
+            }
+        }			    	     
+    }
+
+  Free(mask);
+}
+
+
 void *Smooth9(void *argument)
 {
-  int operatorID;
-  int streamID1, streamID2;
-  int gridsize;
   int gridID;
-  int nrecs, recID;
-  int tsID;
+  int nrecs;
   int varID, levelID;
-  int vlistID1, vlistID2;
-  int nmiss, nmiss2;
-  int i, j , i2;
-  double avg,divavg;
-  double missval1, missval2;
-  double *array1, *array2;
-  int taxisID1, taxisID2;
-  int nlon, nlat;
+  int nmiss;
   int gridtype;
-  int nvars;
-  int grid_is_cyclic;
-  int *varIDs = NULL, *mask =  NULL; 
 
   cdoInitialize(argument);
 
   cdoOperatorAdd("smooth9",   0,   0, NULL);
  
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
   UNUSED(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  nvars = vlistNvars(vlistID1);
-  varIDs  = (int*) Malloc(nvars*sizeof(int)); 
+  int nvars = vlistNvars(vlistID1);
+  int *varIDs = (int*) Malloc(nvars*sizeof(int)); 
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -85,209 +240,34 @@ void *Smooth9(void *argument)
 	}
     }
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize *sizeof(double));
-  mask   = (int*) Malloc(gridsize *sizeof(int));
+  size_t gridsize = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize *sizeof(double));
  
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
 	
 	  if ( varIDs[varID] )
 	    {	    
-	      missval1 = vlistInqVarMissval(vlistID1, varID);
-	      missval2 = missval1;
-
+	      double missval = vlistInqVarMissval(vlistID1, varID);
 	      gridID = vlistInqVarGrid(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
-	      nlon = gridInqXsize(gridID);	 
-	      nlat = gridInqYsize(gridID);
-	      grid_is_cyclic = gridIsCircular(gridID);
-	   
-	      for ( i = 0; i < gridsize; i++) 
-		{		
-		  if ( DBL_IS_EQUAL(missval1, array1[i]) ) mask[i] = 0;
-		  else mask[i] = 1;
-		}
- 
-	      nmiss2=0;
-	      for ( i = 0; i < nlat; i++ )
-		{
-		  for ( i2 = 0; i2 < nlon; i2++ )
-		    {		      
-		      avg = 0; divavg = 0; 	  		     			
 
-		      if ( ( i == 0 ) || ( i2 == 0 )  ||
-                           ( i == ( nlat - 1 ) ) || ( i2 == ( nlon -1 ) ) )
-			{
-			  j = i2+nlon*i;
-			  if ( mask[j] )
-			    {
-			      avg += array1[j];  divavg+= 1;					     		       
-			      /* upper left corner */
-			      if ( (  i!=0 ) && ( i2!=0 ) ) 
-				{ 
-				  j = ((i-1)*nlon)+i2-1;
-				  if ( mask[j] ) 
-				    { avg +=   0.3*array1[j]; divavg+=0.3;}
-				}
-			      else if ( i != 0 && grid_is_cyclic ) 
-				{ 
-				  j = (i-1)*nlon+i2-1+nlon;
-				  if ( mask[j] ) 
-				    { avg+=0.3*array1[j]; divavg+=0.3;}
-				}
-			      
-			      /* upper cell */
-			      if ( i!=0 ) 
-				{
-				  j = ((i-1)*nlon)+i2;
-				  if ( mask[j] )
-				    { avg +=  0.5*array1[j];  divavg+= 0.5; }
-				}
-			      
-			      /* upper right corner */
-			      if ( ( i!=0) && ( i2!=(nlon-1) ) ) 
-				{
-				  j = ((i-1)*nlon)+i2+1;
-				  if ( mask[j] )
-				    { avg +=   0.3*array1[j]; divavg+= 0.3; }
-				}
-			      else if ( i!= 0 && grid_is_cyclic )
-				{ 
-				  j = (i-1)*nlon+i2+1-nlon;
-				  if ( mask[j] ) 
-				    {avg+=0.3*array1[j]; divavg+=0.3;}
-				}
-			      
-			      /* left cell */
-			      if  ( i2!=0 ) 
-				{
-				  j = ((i)*nlon)+i2-1;
-				  if ( mask[j] )
-				    {  avg +=   0.5*array1[j];  divavg+= 0.5;}
-				}
-			      else if ( grid_is_cyclic )
-				{
-				  j = i*nlon-1+nlon;
-				  if ( mask[j] ) 
-				    { avg+=0.5*array1[j]; divavg+=0.5;}
-				}
-			      
-			      /* right cell */
-			      if ( i2!=(nlon-1) ) 
-				{ 
-				  j = (i*nlon)+i2+1;
-				  if ( mask[j] )
-				    {  avg +=   0.5*array1[j]; divavg+= 0.5; } 
-				}
-			      else if ( grid_is_cyclic )
-				{
-				  j = i*nlon+i2+1-nlon;
-				  if (mask[j])
-				    { avg+=0.5*array1[j]; divavg+=0.5;}
-				}
-			      
-			      /* lower left corner */
-			      if ( mask[j] &&  ( (i!=(nlat-1))&& (i2!=0) ) )
-				{	       
-				  j = ((i+1)*nlon+i2-1);
-				  if ( mask[j] )
-				    { avg +=   0.3*array1[j];  divavg+= 0.3; }
-				}
-			      else if ( i!= nlat-1 && grid_is_cyclic ) 
-				{
-				  j= (i+1)*nlon-1+nlon; 
-				  if ( mask[j] ) 
-				    { avg+= 0.3*array1[j]; divavg+=0.3; }
-				}
-			      
-			      /* lower cell */
-			      if  ( i!=(nlat-1) ) 
-				{
-				  j = ((i+1)*nlon)+i2;
-				  if ( mask[j] ) 
-				    { avg += 0.5*array1[j];  divavg+= 0.5;  }
-				}
-			      
-			      /* lower right corner */
-			      if ( i!=(nlat-1) && (i2!=(nlon-1) ) )
-				{
-				  j = ((i+1)*nlon)+i2+1;
-				  if ( mask[j] )
-				    {  avg += 0.3*array1[j]; divavg+= 0.3; }	
-				}
-			      else if ( i != (nlat-1) && grid_is_cyclic )
-				{
-				  j= ((i+1)*nlon)+i2+1-nlon;
-				  if ( mask[j] )
-				    {avg+=0.3*array1[j]; divavg+=0.3;}
-				}
-			    }
-			}
-		      else if ( mask[i2+nlon*i] )
-			{			 
-			  avg += array1[i2+nlon*i]; divavg+= 1;
-			    
-			  j = ((i-1)*nlon)+i2-1;
-			  if ( mask[j] )
-			    { avg += 0.3*array1[j]; divavg+= 0.3; }
+              smooth9(gridID, missval, array1, array2, &nmiss);
 
-			  j = ((i-1)*nlon)+i2;
-			  if ( mask[j] )
-			    { avg += 0.5*array1[j]; divavg+= 0.5; }
-
-			  j = ((i-1)*nlon)+i2+1;
-			  if ( mask[j] )
-			    { avg += 0.3*array1[j]; divavg+= 0.3; }
-
-			  j = ((i)*nlon)+i2-1;
-			  if ( mask[j] )
-			    { avg += 0.5*array1[j]; divavg+= 0.5; }
-
-			  j = (i*nlon)+i2+1;
-			  if ( mask[j] )
-			    { avg += 0.5*array1[j]; divavg+= 0.5; } 
-
-			  j = ((i+1)*nlon+i2-1);	        
-			  if ( mask[j] )
-			    { avg += 0.3*array1[j]; divavg+= 0.3; }
-
-			  j = ((i+1)*nlon)+i2;
-			  if ( mask[j] )
-			    { avg += 0.5*array1[j]; divavg+= 0.5; }
-
-			  j = ((i+1)*nlon)+i2+1;
-			  if ( mask[j] )
-			    { avg += 0.3*array1[j]; divavg+= 0.3; }
-			}
-
-		      if ( fabs(divavg) > 0 )
-			{
-			  array2[i*nlon+i2] = avg/divavg;			
-			}
-		      else 
-			{
-			  array2[i*nlon+i2] = missval2;					
-			  nmiss2++;
-			}
-		    }			    	     
-		}    
 	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, array2, nmiss2);		
+	      streamWriteRecord(streamID2, array2, nmiss);		
 	    }     	   
 	  else 
 	    {
@@ -295,6 +275,7 @@ void *Smooth9(void *argument)
 	      streamWriteRecord(streamID2, array1, nmiss);
 	    }
 	}
+
       tsID++;
     }
 
