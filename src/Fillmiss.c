@@ -279,6 +279,7 @@ static
 void setmisstodis(field_t *field1, field_t *field2, int num_neighbors)
 {
   int gridID = field1->grid;
+  int gridID0 = gridID;
   double missval = field1->missval;
   double *array1 = field1->ptr;
   double *array2 = field2->ptr;
@@ -399,6 +400,8 @@ void setmisstodis(field_t *field1, field_t *field2, int num_neighbors)
   if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
   if ( gs ) gridsearch_delete(gs);
+
+  if ( gridID0 != gridID ) gridDestroy(gridID);
 
   if ( lons ) Free(lons);
   if ( lats ) Free(lats);

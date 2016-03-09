@@ -20,12 +20,111 @@
 
       Smoothstat       smooth9             running 9-point-average
 */
-
+#include <time.h> // clock()
 
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
+
+#include "grid_search.h"
+
+void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist);
+unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
+
+static
+void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss)
+{
+  *nmiss = 0;
+  int num_neighbors = 9;
+  int gridID0 = gridID;
+  unsigned gridsize = gridInqSize(gridID);
+
+  double *xvals = (double*) Malloc(gridsize*sizeof(double));
+  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+
+  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
+
+  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+    gridID = gridToCurvilinear(gridID, 0);
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
+
+  /* Convert lat/lon units if required */
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID, units);
+  grid_to_radian(units, gridsize, xvals, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_radian(units, gridsize, yvals, "grid center lat");
+
+  int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
+  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
+  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+
+  clock_t start, finish;
+  start = clock();
+
+  struct gridsearch *gs = NULL;
+
+  if ( num_neighbors == 1 )
+    gs = gridsearch_create_nn(gridsize, xvals, yvals);
+  else
+    gs = gridsearch_create(gridsize, xvals, yvals);
+  
+  finish = clock();
+
+  if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+
+  progressInit();
+
+  start = clock();
+
+  double findex = 0;
+
+#pragma omp parallel for default(none) shared(findex, array1, array2, xvals, yvals, gs, gridsize, num_neighbors) \
+                                      private(nbr_mask, nbr_add, nbr_dist)
+  for ( unsigned i = 0; i < gridsize; ++i )
+    {
+#if defined(_OPENMP)
+#include "pragma_omp_atomic_update.h"
+#endif
+      findex++;
+      if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
+
+      grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[i], yvals[i]);
+
+      /* Compute weights based on inverse distance if mask is false, eliminate those points */
+      double dist_tot = nbr_compute_weights(num_neighbors, NULL, nbr_mask, nbr_add, nbr_dist);
+
+      /* Normalize weights and store the link */
+      unsigned nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      if ( nadds )
+        {
+          /*
+          printf("n %u %d nadds %u dis %g\n", i, nbr_add[0], nadds, nbr_dist[0]);
+          for ( unsigned n = 0; n < nadds; ++n )
+            printf("   n %u add %d dis %g\n", n, nbr_add[n], nbr_dist[n]);
+          */
+          double result = 0;
+          for ( unsigned n = 0; n < nadds; ++n ) result += array1[nbr_add[n]]*nbr_dist[n];
+          array2[i] = result;
+        }
+    }
+
+  finish = clock();
+
+  if ( cdoVerbose ) printf("gridsearch nearest: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
+
+  if ( gs ) gridsearch_delete(gs);
+
+  if ( gridID0 != gridID ) gridDestroy(gridID);
+
+  Free(xvals);
+  Free(yvals);
+}
 
 static inline
 void smooth_sum(short m, double sfac, double val, double *avg, double *divavg)
@@ -34,7 +133,7 @@ void smooth_sum(short m, double sfac, double val, double *avg, double *divavg)
 }
 
 static
-void smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss2)
+void smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss)
 {
   double avg,divavg;
   size_t i, ij , j;
@@ -51,7 +150,7 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
       else mask[i] = 1;
     }
  
-  *nmiss2 = 0;
+  *nmiss = 0;
   for ( i = 0; i < nlat; i++ )
     {
       for ( j = 0; j < nlon; j++ )
@@ -187,7 +286,7 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
           else 
             {
               array2[i*nlon+j] = missval;					
-              (*nmiss2)++;
+              (*nmiss)++;
             }
         }			    	     
     }
@@ -206,7 +305,8 @@ void *Smooth(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("smooth9",   0,   0, NULL);
+  int SMOOTH  = cdoOperatorAdd("smooth",    0,   0, NULL);
+  int SMOOTH9 = cdoOperatorAdd("smooth9",   0,   0, NULL);
  
   int operatorID = cdoOperatorID();
   UNUSED(operatorID);
@@ -264,7 +364,10 @@ void *Smooth(void *argument)
 	      double missval = vlistInqVarMissval(vlistID1, varID);
 	      gridID = vlistInqVarGrid(vlistID1, varID);
 
-              smooth9(gridID, missval, array1, array2, &nmiss);
+              if ( operatorID == SMOOTH )
+                smooth(gridID, missval, array1, array2, &nmiss);
+              else if ( operatorID == SMOOTH9 )
+                smooth9(gridID, missval, array1, array2, &nmiss);
 
 	      streamDefRecord(streamID2, varID, levelID);
 	      streamWriteRecord(streamID2, array2, nmiss);		
