@@ -513,7 +513,7 @@ Operator catalog:
    Filter        highpass        Highpass filtering
    Gridcell      gridarea        Grid cell area
    Gridcell      gridweights     Grid cell weights
-   Smooth9       smooth9         9 point smoothing
+   Smooth        smooth9         9 point smoothing
    Replacevalues setvals         Set list of old values to new values
    Replacevalues setrtoc         Set range to constant
    Replacevalues setrtoc2        Set range to constant others to constant2

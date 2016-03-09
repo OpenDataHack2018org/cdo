@@ -295,7 +295,7 @@ cdo_SOURCES += Adisit.c        \
                Setzaxis.c      \
                Showinfo.c      \
                Sinfo.c         \
-               Smooth9.c       \
+               Smooth.c        \
                Sort.c          \
                Sorttimestamp.c \
                Specinfo.c      \

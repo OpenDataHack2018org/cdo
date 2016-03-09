@@ -4496,7 +4496,7 @@ static const char *GridcellHelp[] = {
     NULL
 };
 
-static const char *Smooth9Help[] = {
+static const char *SmoothHelp[] = {
     "NAME",
     "    smooth9 - 9 point smoothing",
     "",

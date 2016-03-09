@@ -1,6 +1,6 @@
 @BeginModule
 @NewPage
-@Name      = Smooth9
+@Name      = Smooth
 @Title     = 9 point smoothing
 @Section   = Miscellaneous
 @Arguments = ifile ofile

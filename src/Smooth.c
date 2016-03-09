@@ -196,7 +196,7 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
 }
 
 
-void *Smooth9(void *argument)
+void *Smooth(void *argument)
 {
   int gridID;
   int nrecs;

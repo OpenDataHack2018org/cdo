@@ -215,7 +215,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Setmiss.$(OBJEXT) cdo-Setpartab.$(OBJEXT) \
 	cdo-Setrcaname.$(OBJEXT) cdo-Settime.$(OBJEXT) \
 	cdo-Setzaxis.$(OBJEXT) cdo-Showinfo.$(OBJEXT) \
-	cdo-Sinfo.$(OBJEXT) cdo-Smooth9.$(OBJEXT) cdo-Sort.$(OBJEXT) \
+	cdo-Sinfo.$(OBJEXT) cdo-Smooth.$(OBJEXT) cdo-Sort.$(OBJEXT) \
 	cdo-Sorttimestamp.$(OBJEXT) cdo-Specinfo.$(OBJEXT) \
 	cdo-Spectral.$(OBJEXT) cdo-Spectrum.$(OBJEXT) \
 	cdo-Split.$(OBJEXT) cdo-Splitrec.$(OBJEXT) \
@@ -568,7 +568,7 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Selbox.c Select.c Seloperator.c Selrec.c Seltime.c Selvar.c \
 	Set.c Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c \
 	Setpartab.c Setrcaname.c Settime.c Setzaxis.c Showinfo.c \
-	Sinfo.c Smooth9.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
+	Sinfo.c Smooth.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
 	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
 	Splityear.c SSOpar.c Subtrend.c Tee.c Templates.c Test.c \
 	Tests.c Timedt.c Timcount.c Timpctl.c Timselpctl.c \
@@ -906,7 +906,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setzaxis.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Showinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Sinfo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Smooth9.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Smooth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Sort.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Sorttimestamp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Specinfo.Po@am__quote@
@@ -3490,19 +3490,19 @@ cdo-Sinfo.obj: Sinfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Sinfo.obj `if test -f 'Sinfo.c'; then $(CYGPATH_W) 'Sinfo.c'; else $(CYGPATH_W) '$(srcdir)/Sinfo.c'; fi`
 
-cdo-Smooth9.o: Smooth9.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Smooth9.o -MD -MP -MF $(DEPDIR)/cdo-Smooth9.Tpo -c -o cdo-Smooth9.o `test -f 'Smooth9.c' || echo '$(srcdir)/'`Smooth9.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Smooth9.Tpo $(DEPDIR)/cdo-Smooth9.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Smooth9.c' object='cdo-Smooth9.o' libtool=no @AMDEPBACKSLASH@
+cdo-Smooth.o: Smooth.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Smooth.o -MD -MP -MF $(DEPDIR)/cdo-Smooth.Tpo -c -o cdo-Smooth.o `test -f 'Smooth.c' || echo '$(srcdir)/'`Smooth.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Smooth.Tpo $(DEPDIR)/cdo-Smooth.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Smooth.c' object='cdo-Smooth.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Smooth9.o `test -f 'Smooth9.c' || echo '$(srcdir)/'`Smooth9.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Smooth.o `test -f 'Smooth.c' || echo '$(srcdir)/'`Smooth.c
 
-cdo-Smooth9.obj: Smooth9.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Smooth9.obj -MD -MP -MF $(DEPDIR)/cdo-Smooth9.Tpo -c -o cdo-Smooth9.obj `if test -f 'Smooth9.c'; then $(CYGPATH_W) 'Smooth9.c'; else $(CYGPATH_W) '$(srcdir)/Smooth9.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Smooth9.Tpo $(DEPDIR)/cdo-Smooth9.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Smooth9.c' object='cdo-Smooth9.obj' libtool=no @AMDEPBACKSLASH@
+cdo-Smooth.obj: Smooth.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Smooth.obj -MD -MP -MF $(DEPDIR)/cdo-Smooth.Tpo -c -o cdo-Smooth.obj `if test -f 'Smooth.c'; then $(CYGPATH_W) 'Smooth.c'; else $(CYGPATH_W) '$(srcdir)/Smooth.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Smooth.Tpo $(DEPDIR)/cdo-Smooth.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Smooth.c' object='cdo-Smooth.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Smooth9.obj `if test -f 'Smooth9.c'; then $(CYGPATH_W) 'Smooth9.c'; else $(CYGPATH_W) '$(srcdir)/Smooth9.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Smooth.obj `if test -f 'Smooth.c'; then $(CYGPATH_W) 'Smooth.c'; else $(CYGPATH_W) '$(srcdir)/Smooth.c'; fi`
 
 cdo-Sort.o: Sort.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Sort.o -MD -MP -MF $(DEPDIR)/cdo-Sort.Tpo -c -o cdo-Sort.o `test -f 'Sort.c' || echo '$(srcdir)/'`Sort.c

@@ -162,7 +162,7 @@ void *Settime(void *argument);
 void *Setzaxis(void *argument);
 void *Showinfo(void *argument);
 void *Sinfo(void *argument);
-void *Smooth9(void *argument);
+void *Smooth(void *argument);
 void *Sort(void *argument);
 void *Sorttimestamp(void *argument);
 void *Specinfo(void *argument);
@@ -420,7 +420,7 @@ void *Maggraph(void *argument);
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
                                  "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
-#define  Smooth9Operators       {"smooth9"}
+#define  SmoothOperators        {"smooth", "smooth9"}
 #define  SortOperators          {"sortcode", "sortparam", "sortname", "sortlevel"}
 #define  SorttimestampOperators {"sorttimestamp", "sorttaxis"}
 #define  SpecinfoOperators      {"specinfo"}
@@ -697,7 +697,7 @@ static modules_t Modules[] =
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,      1,   CDI_BOTH,  1,  1 },
   { Showinfo,       ShowinfoHelp,      ShowinfoOperators,      1,   CDI_BOTH,  1,  0 },
   { Sinfo,          SinfoHelp,         SinfoOperators,         1,   CDI_BOTH, -1,  0 },
-  { Smooth9,        Smooth9Help,       Smooth9Operators,       1,   CDI_REAL,  1,  1 },
+  { Smooth,         SmoothHelp,        SmoothOperators,        1,   CDI_REAL,  1,  1 },
   { Sort,           NULL,              SortOperators,          1,   CDI_REAL,  1,  1 },
   { Sorttimestamp,  NULL,              SorttimestampOperators, 1,   CDI_REAL, -1,  1 },
   { Specinfo,       NULL,              SpecinfoOperators,      1,   CDI_REAL,  0,  0 },
