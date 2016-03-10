@@ -90,6 +90,12 @@ Set this variable to NULL to disable the adding of a file suffix.
 @EndEnvironment
 
 
+@BeginNote
+The operators in this module need to open all output files simultaneously.
+The maximum number of open files depends on the operating system!
+@EndNote
+
+
 @BeginExample
 Assume the input GRIB1 dataset has timesteps from
 January to December. To split each month with all

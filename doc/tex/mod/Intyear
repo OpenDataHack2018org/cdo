@@ -37,6 +37,12 @@ Set this variable to NULL to disable the adding of a file suffix.
 @EndEnvironment
 
 
+@BeginNote
+This operator needs to open all output files simultaneously.
+The maximum number of open files depends on the operating system!
+@EndNote
+
+
 @BeginExample
 Assume there are two monthly mean datasets over a year. The first dataset 
 has 12 timesteps for the year 1985 and the second one for the year 1990.

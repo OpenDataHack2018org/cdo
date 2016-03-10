@@ -118,6 +118,12 @@ Set this variable to NULL to disable the adding of a file suffix.
 @EndEnvironment
 
 
+@BeginNote
+The operators in this module need to open all output files simultaneously.
+The maximum number of open files depends on the operating system!
+@EndNote
+
+
 @BeginExample
 Assume an input GRIB1 dataset with three variables, e.g. code number 129, 130 and 139.
 To split this dataset into three pieces, one for each code number use:

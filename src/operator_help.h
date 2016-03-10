@@ -277,6 +277,10 @@ static const char *MergeHelp[] = {
     "ENVIRONMENT",
     "    SKIP_SAME_TIME",
     "        If set to 1, skips all consecutive timesteps with a double entry of the same timestamp.",
+    "",
+    "NOTE",
+    "    The operators in this module need to open all input files simultaneously.",
+    "    The maximum number of open files depends on the operating system!",
     NULL
 };
 
@@ -326,6 +330,10 @@ static const char *SplitHelp[] = {
     "        Set the default file suffix. This suffix will be added to the output file ",
     "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
+    "",
+    "NOTE",
+    "    The operators in this module need to open all output files simultaneously.",
+    "    The maximum number of open files depends on the operating system!",
     NULL
 };
 
@@ -371,6 +379,10 @@ static const char *SplittimeHelp[] = {
     "        Set the default file suffix. This suffix will be added to the output file ",
     "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
+    "",
+    "NOTE",
+    "    The operators in this module need to open all output files simultaneously.",
+    "    The maximum number of open files depends on the operating system!",
     NULL
 };
 
@@ -1738,6 +1750,10 @@ static const char *EnsstatHelp[] = {
     "",
     "PARAMETER",
     "    p  FLOAT  Percentile number in {0, ..., 100}",
+    "",
+    "NOTE",
+    "    This operator needs to open all input files simultaneously.",
+    "    The maximum number of open files depends on the operating system!",
     NULL
 };
 
@@ -3969,6 +3985,10 @@ static const char *IntyearHelp[] = {
     "        Set the default file suffix. This suffix will be added to the output file ",
     "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
+    "",
+    "NOTE",
+    "    This operator needs to open all output files simultaneously.",
+    "    The maximum number of open files depends on the operating system!",
     NULL
 };
 
