@@ -228,7 +228,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -k <chunktype> NetCDF4 chunk type: auto, grid or lines\n");
   fprintf(stderr, "    -L             Lock IO (sequential access)\n");
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
-  fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
+  fprintf(stderr, "    -m <missval>   Set the missing value of non NetCDF files (default: %g)\n", cdiInqMissval());
   fprintf(stderr, "    --no_warnings  Inhibit warning messages\n");
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
   fprintf(stderr, "    --operators    List of all operators\n");
