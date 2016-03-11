@@ -132,6 +132,12 @@ void smooth_sum(short m, double sfac, double val, double *avg, double *divavg)
   if ( m ) { *avg += sfac*val; *divavg += sfac; }
 }
 
+static inline
+void smooth9_sum(size_t ij, short *mask, double sfac, const double *restrict array, double *avg, double *divavg)
+{
+  if ( mask[ij] ) { *avg += sfac*array[ij]; *divavg += sfac; }
+}
+
 static
 void smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss)
 {
@@ -165,118 +171,61 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
                   avg += array1[ij];  divavg+= 1;					     		       
                   /* upper left corner */
                   if ( (i != 0) && (j != 0) ) 
-                    { 
-                      ij = ((i-1)*nlon)+j-1;
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i-1)*nlon)+j-1, mask, 0.3, array1, &avg, &divavg);
                   else if ( i != 0 && grid_is_cyclic ) 
-                    { 
-                      ij = (i-1)*nlon+j-1+nlon;
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum((i-1)*nlon+j-1+nlon, mask, 0.3, array1, &avg, &divavg);
 			      
                   /* upper cell */
                   if ( i != 0 ) 
-                    {
-                      ij = ((i-1)*nlon)+j;
-                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i-1)*nlon)+j, mask, 0.5, array1, &avg, &divavg);
                   
                   /* upper right corner */
                   if ( (i != 0) && (j != (nlon-1)) ) 
-                    {
-                      ij = ((i-1)*nlon)+j+1;
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
-                  else if ( i!=0 && grid_is_cyclic )
-                    { 
-                      ij = (i-1)*nlon+j+1-nlon;
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i-1)*nlon)+j+1, mask, 0.3, array1, &avg, &divavg);
+                  else if ( (i !=0 ) && grid_is_cyclic )
+                    smooth9_sum((i-1)*nlon+j+1-nlon, mask, 0.3, array1, &avg, &divavg);
                   
                   /* left cell */
                   if  ( j != 0 ) 
-                    {
-                      ij = ((i)*nlon)+j-1;
-                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i)*nlon)+j-1, mask, 0.5, array1, &avg, &divavg);
                   else if ( grid_is_cyclic )
-                    {
-                      ij = i*nlon-1+nlon;
-                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(i*nlon-1+nlon, mask, 0.5, array1, &avg, &divavg);
                   
                   /* right cell */
                   if ( j!=(nlon-1) ) 
-                    { 
-                      ij = (i*nlon)+j+1;
-                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum((i*nlon)+j+1, mask, 0.5, array1, &avg, &divavg);
                   else if ( grid_is_cyclic )
-                    {
-                      ij = i*nlon+j+1-nlon;
-                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(i*nlon+j+1-nlon, mask, 0.5, array1, &avg, &divavg);
                   
                   /* lower left corner */
                   if ( mask[ij] &&  ( (i!=(nlat-1))&& (j!=0) ) )
-                    {	       
-                      ij = ((i+1)*nlon+j-1);
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i+1)*nlon+j-1), mask, 0.3, array1, &avg, &divavg);
                   else if ( (i != (nlat-1)) && grid_is_cyclic ) 
-                    {
-                      ij= (i+1)*nlon-1+nlon; 
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum((i+1)*nlon-1+nlon, mask, 0.3, array1, &avg, &divavg);
                   
                   /* lower cell */
                   if  ( i != (nlat-1) ) 
-                    {
-                      ij = ((i+1)*nlon)+j;
-                      smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i+1)*nlon)+j, mask, 0.5, array1, &avg, &divavg);
                   
                   /* lower right corner */
                   if ( (i != (nlat-1)) && (j != (nlon-1)) )
-                    {
-                      ij = ((i+1)*nlon)+j+1;
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i+1)*nlon)+j+1, mask, 0.3, array1, &avg, &divavg);
                   else if ( (i != (nlat-1)) && grid_is_cyclic )
-                    {
-                      ij= ((i+1)*nlon)+j+1-nlon;
-                      smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-                    }
+                    smooth9_sum(((i+1)*nlon)+j+1-nlon, mask, 0.3, array1, &avg, &divavg);
                 }
             }
           else if ( mask[j+nlon*i] )
             {			 
               avg += array1[j+nlon*i]; divavg+= 1;
 			    
-              ij = ((i-1)*nlon)+j-1;
-              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-
-              ij = ((i-1)*nlon)+j;
-              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-
-              ij = ((i-1)*nlon)+j+1;
-              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-              
-              ij = ((i)*nlon)+j-1;
-              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-
-              ij = (i*nlon)+j+1;
-              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-              
-              ij = ((i+1)*nlon+j-1);	        
-              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
-
-              ij = ((i+1)*nlon)+j;
-              smooth_sum(mask[ij], 0.5, array1[ij], &avg, &divavg);
-
-              ij = ((i+1)*nlon)+j+1;
-              smooth_sum(mask[ij], 0.3, array1[ij], &avg, &divavg);
+              smooth9_sum(((i-1)*nlon)+j-1, mask, 0.3, array1, &avg, &divavg);
+              smooth9_sum(((i-1)*nlon)+j,   mask, 0.5, array1, &avg, &divavg);
+              smooth9_sum(((i-1)*nlon)+j+1, mask, 0.3, array1, &avg, &divavg);
+              smooth9_sum(((i)*nlon)+j-1,   mask, 0.5, array1, &avg, &divavg);
+              smooth9_sum((i*nlon)+j+1,     mask, 0.5, array1, &avg, &divavg);
+              smooth9_sum(((i+1)*nlon+j-1), mask, 0.3, array1, &avg, &divavg);
+              smooth9_sum(((i+1)*nlon)+j,   mask, 0.5, array1, &avg, &divavg);
+              smooth9_sum(((i+1)*nlon)+j+1, mask, 0.3, array1, &avg, &divavg);
             }
 
           if ( fabs(divavg) > 0 )
