@@ -72,8 +72,7 @@ void collectLocations(double *maskField, int gridSize, double falseVal, int *mas
   {
     if (!DBL_IS_EQUAL(maskField[i],falseVal))
     {
-      maskIndexList[k] = i;
-      printf("sdfsdf:%d ",i);
+      printf("found at:%d -",i);
       k += 1;
     }
   }
@@ -123,15 +122,34 @@ void *MapReduce(void *argument)
   cdoPrint("maskSize = %d",maskSize);
 
   /* collect the original coordinates */
-  int maskIndexList[maskSize];
-  for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;
-    cdoPrint("maskIndexList[%d] = %d",3,maskIndexList[3]);
-  /*
-  collectLocations(inputMaskField, inputGridSize, 0.0, &maskIndexList);
+   int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
+   for (int m = 0; m < maskSize; m++)
+   {
+     maskIndexList[m] = -1;
+   }
+   cdoPrint("maskIndexList[%d] = %d",0,maskIndexList[0]);
+   cdoPrint("maskIndexList[%d] = %d",3,maskIndexList[3]);
 
-  for (int l = 0; l < 1; l++)
-    cdoPrint("maskIndexList[%d] = %d",l,maskIndexList[l]);
-  */
+   cdoPrint("size:%d",sizeof(maskIndexList)/sizeof(int));
+   /* create an index list of relevant points {{{ */
+   int k = 0;
+   for (int i = 0; i < inputGridSize; i++)
+   {
+     if (!DBL_IS_EQUAL(inputMaskField[i],0.0))
+     {
+       printf("found at:%d -",i);
+       maskIndexList[k] = i;
+       k += 1;
+     }
+   }
+   printf(" k =%d ",k);
+
+   for (int l = 0; l < maskSize; l++)
+   {
+     cdoPrint("maskIndexList[%d] = %d",l,maskIndexList[l]);
+   }
+   /* }}} */
+ 
 
 
   /* create unstructured output grid */
