@@ -31,14 +31,72 @@
 #include "grid_search.h"
 
 void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
-double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist);
-unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
+
+double intlin(double x, double y1, double x1, double y2, double x2);
+
+double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist, double search_radius, double weight0, double weightInf)
+{
+  // Compute weights based on inverse distance if mask is false, eliminate those points
+
+  double dist_tot = 0.; // sum of neighbor distances (for normalizing)
+
+  if ( src_grid_mask )
+    {
+      for ( unsigned n = 0; n < num_neighbors; ++n )
+        {
+          nbr_mask[n] = FALSE;
+          if ( nbr_add[n] >= 0 )
+            if ( src_grid_mask[nbr_add[n]] )
+              {
+                nbr_dist[n] = 1./nbr_dist[n];
+                dist_tot += nbr_dist[n];
+                nbr_mask[n] = TRUE;
+              }
+        }
+    }
+  else
+    {
+      for ( unsigned n = 0; n < num_neighbors; ++n )
+        {
+          nbr_mask[n] = FALSE;
+          if ( nbr_add[n] >= 0 )
+            {
+              nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightInf, search_radius);
+              dist_tot += nbr_dist[n];
+              nbr_mask[n] = TRUE;
+            }
+        }
+    }
+
+  return dist_tot;
+}
+
+
+unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist)
+{
+  // Normalize weights and store the link
+
+  unsigned nadds = 0;
+
+  for ( unsigned n = 0; n < num_neighbors; ++n )
+    {
+      if ( nbr_mask[n] )
+        {
+          nbr_dist[nadds] = nbr_dist[n]/dist_tot;
+          nbr_add[nadds]  = nbr_add[n];
+          nadds++;
+        }
+    }
+
+  return nadds;
+}
+
 
 static
-void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss)
+void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss,
+            int num_neighbors, double search_radius, double weight0, double weightInf)
 {
   *nmiss = 0;
-  int num_neighbors = 9;
   int gridID0 = gridID;
   unsigned gridsize = gridInqSize(gridID);
 
@@ -73,6 +131,8 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
     gs = gridsearch_create_nn(gridsize, xvals, yvals);
   else
     gs = gridsearch_create(gridsize, xvals, yvals);
+
+  gs->search_radius = search_radius;
   
   finish = clock();
 
@@ -84,30 +144,35 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   double findex = 0;
 
+  /*
 #pragma omp parallel for default(none) shared(findex, array1, array2, xvals, yvals, gs, gridsize, num_neighbors) \
                                       private(nbr_mask, nbr_add, nbr_dist)
+  */
   for ( unsigned i = 0; i < gridsize; ++i )
     {
+      /*
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
+      */
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
 
       grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[i], yvals[i]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
-      double dist_tot = nbr_compute_weights(num_neighbors, NULL, nbr_mask, nbr_add, nbr_dist);
+      double dist_tot = smooth_nbr_compute_weights(num_neighbors, NULL, nbr_mask, nbr_add, nbr_dist,
+                                                   search_radius, weight0, weightInf);
 
       /* Normalize weights and store the link */
-      unsigned nadds = nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      unsigned nadds = smooth_nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
       if ( nadds )
         {
-          /*
+          
           printf("n %u %d nadds %u dis %g\n", i, nbr_add[0], nadds, nbr_dist[0]);
           for ( unsigned n = 0; n < nadds; ++n )
             printf("   n %u add %d dis %g\n", n, nbr_add[n], nbr_dist[n]);
-          */
+          
           double result = 0;
           for ( unsigned n = 0; n < nadds; ++n ) result += array1[nbr_add[n]]*nbr_dist[n];
           array2[i] = result;
@@ -124,12 +189,6 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   Free(xvals);
   Free(yvals);
-}
-
-static inline
-void smooth_sum(short m, double sfac, double val, double *avg, double *divavg)
-{
-  if ( m ) { *avg += sfac*val; *divavg += sfac; }
 }
 
 static inline
@@ -251,6 +310,10 @@ void *Smooth(void *argument)
   int varID, levelID;
   int nmiss;
   int gridtype;
+  int max_points = 5;
+  double search_radius = 60, weight0 = 0.25, weightInf = 0.;
+
+  search_radius *= DEG2RAD;
 
   cdoInitialize(argument);
 
@@ -291,7 +354,7 @@ void *Smooth(void *argument)
 
   size_t gridsize = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsize*sizeof(double));
-  double *array2 = (double*) Malloc(gridsize *sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
  
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -314,7 +377,7 @@ void *Smooth(void *argument)
 	      gridID = vlistInqVarGrid(vlistID1, varID);
 
               if ( operatorID == SMOOTH )
-                smooth(gridID, missval, array1, array2, &nmiss);
+                smooth(gridID, missval, array1, array2, &nmiss, max_points, search_radius, weight0, weightInf);
               else if ( operatorID == SMOOTH9 )
                 smooth9(gridID, missval, array1, array2, &nmiss);
 

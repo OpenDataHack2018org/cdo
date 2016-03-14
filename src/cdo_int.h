@@ -79,11 +79,11 @@ enum T_EIGEN_MODE  {JACOBI, DANIELSON_LANCZOS};
 
 
 #ifndef  M_LN10
-#define  M_LN10      2.30258509299404568402  /* log_e 10 */
+#define  M_LN10      2.30258509299404568401799145468436421  /* log_e 10 */
 #endif
 
 #ifndef  M_PI
-#define  M_PI        3.14159265358979323846  /* pi */
+#define  M_PI        3.14159265358979323846264338327950288  /* pi */
 #endif
 
 

@@ -10,18 +10,30 @@
 #include "cdo_int.h"
 #include "dmemory.h"
 #include "util.h"
+#include "grid.h"
 #include "grid_search.h"
 
-
-#ifndef  M_PI
-#define  M_PI        3.14159265358979323846264338327950288  /* pi */
-#endif
 
 #define  PI       M_PI
 #define  PI2      (2.0*PI)
 
 
 static int gridsearch_method_nn = GS_KDTREE;
+
+static
+double cdo_default_search_radius(void)
+{
+  extern double gridsearch_radius;
+
+  double search_radius = gridsearch_radius;
+
+  if ( search_radius <    0. ) search_radius = 0.;
+  if ( search_radius >  180. ) search_radius = 180.;
+
+  search_radius = search_radius*DEG2RAD;
+
+  return search_radius;
+}
 
 static inline void LLtoXYZ_f(double lon, double lat, float *restrict xyz)
 {
@@ -104,6 +116,8 @@ struct gridsearch *gridsearch_create_reg2d(unsigned lcyclic, unsigned nx, unsign
   gs->sinlon = sinlon;
   gs->coslat = coslat;
   gs->sinlat = sinlat;
+
+  gs->search_radius = cdo_default_search_radius();
 
   return gs;
 }
@@ -243,6 +257,8 @@ struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, co
 
   gs->kdt  = gs_create_kdtree(n, lons, lats);
 
+  gs->search_radius = cdo_default_search_radius();
+
   return gs;
 }
 
@@ -258,6 +274,8 @@ struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons,
   if      ( gs->method_nn == GS_KDTREE  ) gs->kdt  = gs_create_kdtree(n, lons, lats);
   else if ( gs->method_nn == GS_NEARPT3 ) gs->near = gs_create_nearpt3(n, lons, lats);
   else if ( gs->method_nn == GS_FULL    ) gs->full = gs_create_full(n, lons, lats);
+
+  gs->search_radius = cdo_default_search_radius();
 
   return gs;
 }
