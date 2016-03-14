@@ -377,7 +377,7 @@ void *EOFs(void * argument)
 	      npack = 0;
 	      for ( i = 0; i < gridsize; ++i )
 		{
-		  if ( !DBL_IS_EQUAL(weight[i], 0.0) && !DBL_IS_EQUAL(weight[i], missval) &&
+		  if ( !DBL_IS_EQUAL(weight[i], 0) && !DBL_IS_EQUAL(weight[i], missval) &&
 		       !DBL_IS_EQUAL(in[i], missval) )
 		    pack[npack++] = i;
 		}
@@ -392,7 +392,7 @@ void *EOFs(void * argument)
 	  ipack = 0;
 	  for ( i = 0; i < gridsize; ++i )
 	    {
-	      if ( !DBL_IS_EQUAL(weight[i], 0.0) && !DBL_IS_EQUAL(weight[i], missval) &&
+	      if ( !DBL_IS_EQUAL(weight[i], 0) && !DBL_IS_EQUAL(weight[i], missval) &&
 		   !DBL_IS_EQUAL(in[i], missval) && pack[ipack++] != i )
 		{
 		  cdoAbort("Missing values unsupported!");
