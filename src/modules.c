@@ -114,6 +114,7 @@ void *Invertlev(void *argument);
 void *Isosurface(void *argument);
 void *Kvl(void *argument);
 void *Log(void *argument);
+void *MapReduce(void *argument);
 void *Maskbox(void *argument);
 void *Mastrfu(void *argument);
 void *Math(void *argument);
@@ -352,6 +353,7 @@ void *Maggraph(void *argument);
 #define  IsosurfaceOperators    {"isosurface"}
 #define  KvlOperators           {"read_cmor_table", "conv_cmor_table"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
+#define  MapReduceOperators     {"reduce", "unreduce"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
@@ -636,6 +638,7 @@ static modules_t Modules[] =
   { Isosurface,     NULL,              IsosurfaceOperators,    1,   CDI_REAL,  1,  1 },
   { Kvl,            NULL,              KvlOperators,           1,   CDI_REAL,  0,  0 },
   { Log,            NULL,              LogOperators,           0,   CDI_REAL,  1,  0 },
+  { MapReduce,      MapReduceHelp,     MapReduceOperators,     1,   CDI_REAL,  1,  1 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,       1,   CDI_REAL,  1,  1 },
   { Maskbox,        MaskregionHelp,    MaskregionOperators,    1,   CDI_REAL,  1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,       1,   CDI_REAL,  1,  1 },

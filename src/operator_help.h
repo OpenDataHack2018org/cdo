@@ -738,6 +738,28 @@ static const char *CondcHelp[] = {
     NULL
 };
 
+static const char *MapReduceHelp[] = {
+    "NAME",
+    "    reduce, unreduce - Reduce grid to user-definde mask - unpack to target grid",
+    "",
+    "SYNOPSIS",
+    "    reduce,mask  ifile ofile",
+    "    unreduce,grid  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This module contains operators for data reduction based on a user defined mask.",
+    "",
+    "OPERATORS",
+    "    reduce    Reduce input file variables for locations, where mask is not zero",
+    "              Performs a transformation to an unstructured grid",
+    "    unreduce  Unpack input fields to given grid description",
+    "              Blowup the input fields towards given grid without changing the values",
+    "",
+    "PARAMETER",
+    "    mask  STRING  Target mask",
+    NULL
+};
+
 static const char *CompHelp[] = {
     "NAME",
     "    eq, ne, le, lt, ge, gt - Comparison of two fields",

@@ -247,6 +247,7 @@ cdo_SOURCES += Adisit.c        \
                Isosurface.c    \
                Kvl.c           \
                Log.c           \
+	       MapReduce.c     \
                Maskbox.c       \
                Mastrfu.c       \
                Math.c          \

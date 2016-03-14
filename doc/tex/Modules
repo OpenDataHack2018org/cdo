@@ -21,6 +21,7 @@ Selbox        Selection
 Cond          Conditional selection
 Cond2         Conditional selection
 Condc         Conditional selection
+MapReduce     Conditional selection
 Comp	      Comparison
 Compc	      Comparison
 Setpartab     Modification

@@ -417,6 +417,7 @@ src/Magplot.c -text
 src/Magvector.c -text
 src/Makefile.am -text
 src/Makefile.in -text
+src/MapRecuce.c -text
 src/Maskbox.c -text
 src/Mastrfu.c -text
 src/Math.c -text
