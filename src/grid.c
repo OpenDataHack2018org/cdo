@@ -1233,6 +1233,68 @@ int gridToCurvilinear(int gridID1, int lbounds)
 }
 
 
+int gridToUnstructuredSelecton(int gridID1, int lbounds, int selectionSize, int *selectionIndexList)
+{
+
+  /* transform input grid into a unstructured Version {{{ */
+  int unstructuredGridID = gridToUnstructured(gridID1,1);
+  int unstructuredGridSize = gridInqSize(unstructuredGridID);
+
+  int unstructuredSelectionGridID = gridCreate(GRID_UNSTRUCTURED,selectionSize);
+  /* }}} */
+
+  /* copy meta data of coordinates {{{*/
+  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
+  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
+
+  gridInqXname(unstructuredGridID, xname);
+  gridInqXlongname(unstructuredGridID, xlongname);
+  gridInqXunits(unstructuredGridID, xunits);
+  gridInqYname(unstructuredGridID, yname);
+  gridInqYlongname(unstructuredGridID, ylongname);
+  gridInqYunits(unstructuredGridID, yunits);
+
+  gridDefXname(unstructuredSelectionGridID, xname);
+  gridDefXlongname(unstructuredSelectionGridID, xlongname);
+  gridDefXunits(unstructuredSelectionGridID, xunits);
+  gridDefYname(unstructuredSelectionGridID, yname);
+  gridDefYlongname(unstructuredSelectionGridID, ylongname);
+  gridDefYunits(unstructuredSelectionGridID, yunits);
+  /* }}} */
+
+  /* TODO: select bounds */
+
+  /* select relevant coordinate {{{ */
+  double *xvalsUnstructured = (double*) Malloc(unstructuredGridSize*sizeof(double));
+  double *yvalsUnstructured = (double*) Malloc(unstructuredGridSize*sizeof(double));
+  gridInqXvals(unstructuredGridID, xvalsUnstructured);
+  gridInqYvals(unstructuredGridID, yvalsUnstructured);
+
+  gridDefXsize(unstructuredSelectionGridID, selectionSize);
+  gridDefYsize(unstructuredSelectionGridID, selectionSize);
+  double *xvals = (double*) Malloc(selectionSize*sizeof(double));
+  double *yvals = (double*) Malloc(selectionSize*sizeof(double));
+
+  for (int i = 0; i < selectionSize; i++)
+  {
+    xvals[i] = xvalsUnstructured[selectionIndexList[i]];
+    yvals[i] = yvalsUnstructured[selectionIndexList[i]];
+    /*
+    cdoPrint("xval[%d](%d) = %g",i,selectionIndexList[i],xvals[i]);
+    cdoPrint("yval[%d](%d) = %g",i,selectionIndexList[i],yvals[i]);
+    */
+  }
+  gridDefXvals(unstructuredSelectionGridID,xvals);
+  gridDefYvals(unstructuredSelectionGridID,yvals);
+  /* }}} */
+
+  Free(xvalsUnstructured);
+  Free(yvalsUnstructured);
+  Free(xvals);
+  Free(yvals);
+
+  return (unstructuredSelectionGridID);
+}
 int gridToUnstructured(int gridID1, int lbounds)
 {
   int gridtype = gridInqType(gridID1);

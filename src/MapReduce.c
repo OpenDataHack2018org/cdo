@@ -117,65 +117,33 @@ void *MapReduce(void *argument)
   streamReadRecord(streamID1, inputMaskField, &nmiss);
   minmaxval(inputGridSize, inputMaskField, NULL,&missval1, &missval2);
   cdoPrint("min: %g | max: %g ",missval1, missval2);
-  /* count points */
+  /* count points {{{*/
   int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
-  cdoPrint("maskSize = %d",maskSize);
+  if (cdoDebug) cdoPrint("maskSize = %d",maskSize); /* }}} */
 
   /* collect the original coordinates */
    int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
-   for (int m = 0; m < maskSize; m++)
-   {
-     maskIndexList[m] = -1;
-   }
-   cdoPrint("maskIndexList[%d] = %d",0,maskIndexList[0]);
-   cdoPrint("maskIndexList[%d] = %d",3,maskIndexList[3]);
+   for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;
 
-   cdoPrint("size:%d",sizeof(maskIndexList)/sizeof(int));
    /* create an index list of relevant points {{{ */
    int k = 0;
    for (int i = 0; i < inputGridSize; i++)
    {
      if (!DBL_IS_EQUAL(inputMaskField[i],0.0))
      {
-       printf("found at:%d -",i);
+       if (cdoDebug) printf("found at:%d -",i);
        maskIndexList[k] = i;
        k += 1;
      }
    }
-   printf(" k =%d ",k);
 
-   for (int l = 0; l < maskSize; l++)
-   {
-     cdoPrint("maskIndexList[%d] = %d",l,maskIndexList[l]);
-   }
+   if (cdoDebug) for (int l = 0; l < maskSize; l++) cdoPrint("maskIndexList[%d] = %d",l,maskIndexList[l]);
    /* }}} */
  
-
-
   /* create unstructured output grid */
-  int outputGridID = gridCreate(GRID_UNSTRUCTURED,maskSize);
-  gridDefXsize(outputGridID,maskSize);
-  gridDefYsize(outputGridID,maskSize);
-  double *xvals = (double*) Malloc(maskSize*sizeof(double));
-  double *yvals = (double*) Malloc(maskSize*sizeof(double));
+  int outputGridID = gridToUnstructuredSelecton(inputGridID,1, maskSize, maskIndexList);
 
-  /* start with lonlat grid intput */
   int inputGridType = gridInqType(inputGridID);
-  if (GRID_LONLAT != inputGridType)
-  {
-    cdoPrint("Currenlty only LONLAT intput grds area supported!");
-    cdoFinish();
-  }
-
-  for (int i = 0; i < maskSize; i++) xvals[i] = 0.0;
-
-  gridDefXvals(outputGridID, xvals);
-  gridDefYvals(outputGridID, yvals);
-
-  Free(xvals);
-  Free(yvals);
-  Free(inputMaskField);
-  Free(maskIndexList);
 
   /* copy time axis */
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -189,10 +157,30 @@ void *MapReduce(void *argument)
     tsID++;
   }
 
+  vlistChangeGridIndex(vlistID2, 0, outputGridID);
+  int tsteptype = TSTEP_CONSTANT;
+  int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+
+  varID = vlistDefVar(vlistID2, outputGridID, zaxisID, tsteptype);
+  vlistDefVarName(vlistID2    , varID , "mask");
+  vlistDefVarStdname(vlistID2 , varID , "grid_mask");
+  vlistDefVarLongname(vlistID2, varID , "mask");
+  vlistDefVarUnits(vlistID2   , varID , "");
+
+  double *values = (double *)Malloc(maskSize*sizeof(double));
+  for (int i = 0; i < maskSize;  i++) values[i] = 1.0;
+
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamDefVlist(streamID2, vlistID2);
+
+  streamDefRecord(streamID2, 0, 0);
+  streamWriteRecord(streamID2, values, 0);
 
   streamClose(streamID2);
   streamClose(streamID1);
+
+  Free(inputMaskField);
+  Free(maskIndexList);
 
   cdoFinish();
 
