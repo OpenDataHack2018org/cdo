@@ -65,7 +65,7 @@ Square of x
 Square Root of x
 @Item = exp(x)
 Exponential of x
-@Item = log(x)
+@Item = ln(x)
 Natural logarithm of x
 @Item = log10(x)
 Base 10 logarithm of x

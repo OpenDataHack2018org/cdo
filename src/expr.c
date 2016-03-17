@@ -89,6 +89,7 @@ static func_t fun_sym_tbl[] =
   {FT_STD, 0, "exp",   (void (*)()) exp},
   {FT_STD, 0, "erf",   (void (*)()) erf},
   {FT_STD, 0, "log",   (void (*)()) log},
+  {FT_STD, 0, "ln",    (void (*)()) log},
   {FT_STD, 0, "log10", (void (*)()) log10},
   {FT_STD, 0, "sin",   (void (*)()) sin},
   {FT_STD, 0, "cos",   (void (*)()) cos},

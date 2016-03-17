@@ -5,6 +5,7 @@
 
 2016-03-17  Uwe Schulzweida
 
+	* expr: renamed function log() to ln()
 	* eca_cdd, eca_cwd: Added support to choose the amount of days
 
 2016-03-05  Uwe Schulzweida

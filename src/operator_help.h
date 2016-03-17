@@ -1353,7 +1353,7 @@ static const char *ExprHelp[] = {
     "    sqr(x)  "    "    Square of x",
     "    sqrt(x) "    "    Square Root of x",
     "    exp(x)  "    "    Exponential of x",
-    "    log(x)  "    "    Natural logarithm of x",
+    "    ln(x)   "    "    Natural logarithm of x",
     "    log10(x)"    "    Base 10 logarithm of x",
     "    sin(x)  "    "    Sine of x, where x is specified in radians",
     "    cos(x)  "    "    Cosine of x, where x is specified in radians",
