@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-03-17  Uwe Schulzweida
+
+	* eca_cdd, eca_cwd: Added support to choose the amount of days
+
 2016-03-05  Uwe Schulzweida
 
 	* merge, mergetime: option -s doesn't work correctly (bug fix)

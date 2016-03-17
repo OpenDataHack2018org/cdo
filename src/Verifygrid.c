@@ -1612,7 +1612,6 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
       for (corner_no = 0; corner_no < ncorner; corner_no++)
 	{
 	  LLtoXYZ(grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no], cell_corner_coordinates);
-	  
 	  /* The components of the result vector are appended to the list of cell corner coordinates. */
 	  
 	  for (vector_component = 0; vector_component < 3; vector_component++){	    
