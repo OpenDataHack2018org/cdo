@@ -122,7 +122,7 @@ void *MapReduce(void *argument)
   cdoPrint("min: %g | max: %g ",missval1, missval2);
   /* count points {{{*/
   int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
-  if (cdoDebug) cdoPrint("maskSize = %d",maskSize); /* }}} */
+  cdoPrint("maskSize = %d",maskSize); /* }}} */
 
   /* collect the original coordinates */
    int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
@@ -140,12 +140,13 @@ void *MapReduce(void *argument)
      }
    }
 
-   if (cdoDebug) for (int l = 0; l < maskSize; l++) cdoPrint("maskIndexList[%d] = %d",l,maskIndexList[l]);
+  /*for (int l = 0; l < maskSize; l++) cdoPrint("maskIndexList[%d] = %d",l,maskIndexList[l]);
+   */
    streamClose(maskStreamID);
    /* }}} */
  
   /* create unstructured output grid */
-  int outputGridID = gridToUnstructuredSelecton(inputGridID,1, maskSize, maskIndexList);
+  int outputGridID = gridToUnstructuredSelecton(inputGridID,TRUE, maskSize, maskIndexList);
 
   int inputGridType = gridInqType(inputGridID);
 
@@ -156,12 +157,10 @@ void *MapReduce(void *argument)
 
 
   /* copy the mask to target grid */
-      streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  streamDefVlist(streamID2, vlistID2);
-  vlistChangeGridIndex(vlistID2, 0, outputGridID);
-  int tsteptype = TSTEP_CONSTANT;
-  int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+  int ngrids = vlistNgrids(vlistID1);
+  for ( int index = 0; index < ngrids; index++ ) vlistChangeGridIndex(vlistID2, index, outputGridID);
 
+  /*
   varID = vlistDefVar(vlistID2, outputGridID, zaxisID, tsteptype);
   vlistDefVarName(vlistID2    , varID , "mask");
   vlistDefVarStdname(vlistID2 , varID , "grid_mask");
@@ -174,7 +173,10 @@ void *MapReduce(void *argument)
 
   streamDefRecord(streamID2, 0, 0);
   streamWriteRecord(streamID2, values, 0);
+  */
 
+  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  streamDefVlist(streamID2, vlistID2);
   /* loop over all data fields */
   double *arrayOut = (double *)Malloc(maskSize*sizeof(double));
   tsID = 0;
