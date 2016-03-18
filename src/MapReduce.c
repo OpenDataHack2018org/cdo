@@ -102,11 +102,6 @@ void *MapReduce(void *argument)
 
   cdoInitialize(argument);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  int vlistID1  = streamInqVlist(streamID1);
-  int nvars     = vlistNvars(vlistID1);
-  int vlistID2  = vlistDuplicate(vlistID1);
 
   /* check input grid type and size */
   int inputGridID = cdoDefineGrid(operatorArgv()[0]);
@@ -151,8 +146,12 @@ void *MapReduce(void *argument)
   int inputGridType = gridInqType(inputGridID);
 
   /* copy time axis */
-  int taxisID1 = vlistInqTaxis(vlistID1);
-  int taxisID2 = taxisDuplicate(taxisID1);
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int vlistID1  = streamInqVlist(streamID1);
+  int taxisID1  = vlistInqTaxis(vlistID1);
+
+  int vlistID2  = vlistDuplicate(vlistID1);
+  int taxisID2  = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
 
@@ -160,7 +159,7 @@ void *MapReduce(void *argument)
   int ngrids = vlistNgrids(vlistID1);
   for ( int index = 0; index < ngrids; index++ ) vlistChangeGridIndex(vlistID2, index, outputGridID);
 
-  /*
+  /* {{{
   varID = vlistDefVar(vlistID2, outputGridID, zaxisID, tsteptype);
   vlistDefVarName(vlistID2    , varID , "mask");
   vlistDefVarStdname(vlistID2 , varID , "grid_mask");
@@ -173,20 +172,25 @@ void *MapReduce(void *argument)
 
   streamDefRecord(streamID2, 0, 0);
   streamWriteRecord(streamID2, values, 0);
-  */
+   }}} */
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   streamDefVlist(streamID2, vlistID2);
   /* loop over all data fields */
   double *arrayOut = (double *)Malloc(maskSize*sizeof(double));
-  tsID = 0;
+  tsID = 0; 
+  int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
   {
     taxisCopyTimestep(taxisID2, taxisID1);
+    streamDefTimestep(streamID2, tsID2);
+
     for ( recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(streamID1, &varID, &levelID);
+      cdoPrint("aaaaaa");
       streamReadRecord(streamID1, arrayIn, &nmiss);
+      cdoPrint("bbbbbb");
 
       gridID = vlistInqVarGrid(vlistID1, varID);
 
@@ -196,6 +200,8 @@ void *MapReduce(void *argument)
         for (int i = 0; i < maskSize;  i++)
           arrayOut[i] = arrayIn[maskIndexList[i]];
 
+  minmaxval(maskSize, arrayOut, NULL,&missval1, &missval2);
+  cdoPrint("min: %g | max: %g ",missval1, missval2);
         streamDefRecord(streamID2, varID, levelID);
         streamWriteRecord(streamID2, arrayOut, 0);
         
