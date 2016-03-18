@@ -1,0 +1,55 @@
+@BeginModule
+@NewPage
+@Name      = MapReduce
+@Title     = Reduce grid to user-definde mask - unpack to target grid
+@Section   = Conditional selection
+@Class     = Conditional
+@Arguments = ifile ofile
+@Operators = reduce unreduce
+
+@BeginDescription
+This module contains operators for data reduction based on a user defined mask.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_reduce
+@Name      = reduce
+@Title     = Reduce input file variables for locations, where mask is non-zero.
+             Horizontal grids of @file{mask} and @file{ifile} must be identical
+@Parameter = mask
+
+@BeginDescription
+Performs a transformation to an unstructured grid including coordinate bounds
+@EndDescription
+@EndOperator
+@BeginParameter
+@Item = mask
+STRING  Target mask
+@EndParameter
+
+@BeginExample
+Say @file{ifile} contains fields on a quadrilateral curvilinear grid and
+@file{maskfile} holds a single field with zero-to-one mask onthe same
+horizontal grid. To limit all data fields from @file{ifile} to the location
+where the mask has a value of 1, call
+@BeginVerbatim
+   cdo reduce,mask ifile ofile
+@EndVerbatim
+@EndExample
+
+
+@BeginOperator_unreduce
+@Name      = unpack
+@Title     = Unpack input fields to given grid description
+@Parameter = grid
+
+@BeginDescription
+Blowup the input fields towards given grid without changing the values
+@EndDescription
+@EndOperator
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter
