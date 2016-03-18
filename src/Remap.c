@@ -673,12 +673,11 @@ static
 void remap_normalize(int norm_opt, int gridsize, double *array, double missval, remapgrid_t *tgt_grid)
 {
   /* used only to check the result of remapcon */
-  int i;
   double grid_err;
 
   if ( norm_opt == NORM_OPT_NONE )
     {
-      for ( i = 0; i < gridsize; i++ )
+      for ( int i = 0; i < gridsize; i++ )
 	{
 	  if ( !DBL_IS_EQUAL(array[i], missval) )
 	    {
@@ -693,7 +692,7 @@ void remap_normalize(int norm_opt, int gridsize, double *array, double missval, 
     }
   else if ( norm_opt == NORM_OPT_DESTAREA )
     {
-      for ( i = 0; i < gridsize; i++ )
+      for ( int i = 0; i < gridsize; i++ )
 	{
 	  if ( !DBL_IS_EQUAL(array[i], missval) )
 	    {

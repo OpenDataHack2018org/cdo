@@ -608,9 +608,9 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 	  tgt_cell_add = rv->tgt_cell_add[n];
 
           if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_cell_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_area[tgt_cell_add];
+	    norm_factor = 1./tgt_grid->cell_area[tgt_cell_add];
           else
-            norm_factor = ZERO;
+            norm_factor = 0.;
 
 	  rv->wts[n*num_wts] *= norm_factor;
 	}
@@ -630,9 +630,9 @@ void remapNormalizeWeights(remapgrid_t *tgt_grid, remapvars_t *rv)
 	  tgt_cell_add = rv->tgt_cell_add[n];
 
           if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_cell_add], 0) )
-	    norm_factor = ONE/tgt_grid->cell_frac[tgt_cell_add];
+	    norm_factor = 1./tgt_grid->cell_frac[tgt_cell_add];
           else
-            norm_factor = ZERO;
+            norm_factor = 0.;
 
 	  rv->wts[n*num_wts] *= norm_factor;
 	}
