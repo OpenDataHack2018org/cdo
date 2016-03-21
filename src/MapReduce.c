@@ -1,24 +1,24 @@
 /*
-   This file is part of CDO. CDO is a collection of Operators to
-   manipulate and analyse Climate model Data.
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
 
-   Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
-   See COPYING file for copying and redistribution conditions.
+  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; version 2 of the License.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   */
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
 
 /*
-   This module contains the following operators:
+  This module contains the following operators:
 
-   Pack      reduce
+  Pack      reduce
 */
 
 #if defined(_OPENMP)
@@ -59,9 +59,9 @@ int countMask(double *maskField, int gridSize, double falseVal)
   counter = 0;
 
   for (int i = 0; i < gridSize; i++)
-  {
-    if (!DBL_IS_EQUAL(maskField[i],falseVal)) counter += 1;
-  }
+    {
+      if (!DBL_IS_EQUAL(maskField[i],falseVal)) counter += 1;
+    }
   return counter;
 }
 
@@ -100,13 +100,13 @@ void *MapReduce(void *argument)
 
   int k = 0;
   for (int i = 0; i < inputGridSize; i++)
-  {
-    if (!DBL_IS_EQUAL(inputMaskField[i],0.0))
     {
-      maskIndexList[k] = i;
-      k += 1;
+      if (!DBL_IS_EQUAL(inputMaskField[i],0.0))
+        {
+          maskIndexList[k] = i;
+          k += 1;
+        }
     }
-  }
   /* }}} */
 
   /* create unstructured output grid including bounds*/
@@ -123,21 +123,21 @@ void *MapReduce(void *argument)
   /* use vlist flags for marking the corresponding variables */
   vlistClearFlag(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
-  {
-    vars[varID] = FALSE;
-
-    int gridID = vlistInqVarGrid(vlistID1, varID);
-    if (inputGridType == gridInqType(gridID) && inputGridSize == gridInqSize(gridID))
     {
-      vars[varID] = TRUE;
-      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      int nlevs    = zaxisInqSize(zaxisID);
-      for ( int levID = 0; levID < nlevs; levID++ )
-      {
-        vlistDefFlag(vlistID1, varID, levID, TRUE);
-      }
+      vars[varID] = FALSE;
+
+      int gridID = vlistInqVarGrid(vlistID1, varID);
+      if (inputGridType == gridInqType(gridID) && inputGridSize == gridInqSize(gridID))
+        {
+          vars[varID] = TRUE;
+          int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+          int nlevs    = zaxisInqSize(zaxisID);
+          for ( int levID = 0; levID < nlevs; levID++ )
+            {
+              vlistDefFlag(vlistID1, varID, levID, TRUE);
+            }
+        }
     }
-  }
   int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
   /* }}} */
@@ -159,31 +159,31 @@ void *MapReduce(void *argument)
 
   tsID = 0; 
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
-  {
-    taxisCopyTimestep(taxisID2, taxisID1);
-    streamDefTimestep(streamID2, tsID);
-
-    for ( recID = 0; recID < nrecs; recID++ )
     {
-      streamInqRecord(streamID1, &varID, &levelID);
-      if (TRUE == vars[varID])
-      {
-        int varID2   = vlistFindVar(vlistID2, varID);
-        int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+      taxisCopyTimestep(taxisID2, taxisID1);
+      streamDefTimestep(streamID2, tsID);
 
-        streamReadRecord(streamID1, arrayIn, &nmiss);
+      for ( recID = 0; recID < nrecs; recID++ )
+        {
+          streamInqRecord(streamID1, &varID, &levelID);
+          if (TRUE == vars[varID])
+            {
+              int varID2   = vlistFindVar(vlistID2, varID);
+              int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-        for (int i = 0; i < maskSize;  i++)
-          arrayOut[i] = arrayIn[maskIndexList[i]];
+              streamReadRecord(streamID1, arrayIn, &nmiss);
+
+              for (int i = 0; i < maskSize;  i++)
+                arrayOut[i] = arrayIn[maskIndexList[i]];
 
 
-        streamDefRecord(streamID2, varID2, levelID2);
-        streamWriteRecord(streamID2, arrayOut, 0);
+              streamDefRecord(streamID2, varID2, levelID2);
+              streamWriteRecord(streamID2, arrayOut, 0);
 
-      }
+            }
+        }
+      tsID++;
     }
-    tsID++;
-  }
   /* }}} */
 
 
