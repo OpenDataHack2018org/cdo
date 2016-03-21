@@ -1233,7 +1233,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 }
 
 
-int gridToUnstructuredSelecton(int gridID1, int lbounds, int selectionSize, int *selectionIndexList)
+int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList)
 {
 
   /* transform input grid into a unstructured Version if necessary {{{ */

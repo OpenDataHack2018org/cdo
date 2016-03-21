@@ -41,7 +41,7 @@ int referenceToGrid(int gridID);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
 int gridToUnstructured(int gridID, int lbounds);
-int gridToUnstructuredSelecton(int gridID1, int lbounds, int selectionSize, int *selectionIndexList);
+int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList);
 int gridToCurvilinear(int gridID, int lbounds);
 int gridCurvilinearToRegular(int gridID);
 int gridToRegular(int gridID);
