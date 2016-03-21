@@ -36,6 +36,8 @@ struct gridsearch {
 
   struct gsFull *full;
 
+  double search_radius;
+
   // reg2d search
   double *reg2d_center_lon, *reg2d_center_lat;
   double *coslat, *sinlat;   // cosine, sine of grid lats (for distance)

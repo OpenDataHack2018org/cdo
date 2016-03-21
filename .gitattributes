@@ -662,6 +662,8 @@ src/percentiles_hist.c -text
 src/percentiles_hist.h -text
 src/pipe.c -text
 src/pipe.h -text
+src/pmlist.c -text
+src/pmlist.h -text
 src/pragma_omp_atomic_update.h -text
 src/printinfo.h -text
 src/process.c -text

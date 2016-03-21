@@ -167,7 +167,7 @@ void *Settime(void *argument)
   int SETDATE     = cdoOperatorAdd("setdate",      0,  1, "date (format: YYYY-MM-DD)");
   int SETTIME     = cdoOperatorAdd("settime",      0,  1, "time (format: hh:mm:ss)");
   int SETTUNITS   = cdoOperatorAdd("settunits",    0,  1, "time units (seconds, minutes, hours, days, months, years)");
-  int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date,time<,frequency> (format YYYY-MM-DD,hh:mm:ss)");
+  int SETTAXIS    = cdoOperatorAdd("settaxis",     0, -2, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
   int SETTBOUNDS  = cdoOperatorAdd("settbounds",   0,  1, "frequency (day, month, year)");
   int SETREFTIME  = cdoOperatorAdd("setreftime",   0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
   int SETCALENDAR = cdoOperatorAdd("setcalendar",  0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");

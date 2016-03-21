@@ -5,7 +5,7 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setdate settime setday setmon setyear settunits settaxis setreftime setcalendar shifttime
+@Operators = setdate settime setday setmon setyear settunits settaxis settbounds setreftime setcalendar shifttime
 
 @BeginDescription
 This module sets the time axis or part of the time axis. Which part of the
@@ -84,6 +84,16 @@ Sets the time axis.
 @EndOperator
 
 
+@BeginOperator_settbounds
+@Title     = Set time bounds
+@Parameter = frequency
+
+@BeginDescription
+Sets the time bounds.
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_setreftime
 @Title     = Set reference time
 @Parameter = date time [units]
@@ -129,6 +139,8 @@ STRING   Date (format: YYYY-MM-DD)
 STRING   Time (format: hh:mm:ss)
 @Item = inc
 STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 1hour]
+@Item = frequency
+STRING   Frequency of the time series (day, month, year)
 @Item = calendar
 STRING   Calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
 @Item = sval

@@ -27,454 +27,9 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-//#include "list.h"
+#include "pmlist.h"
 
 double datestr_to_double(const char *datestr, int opt);
-
-#define  PML_INT         1
-#define  PML_FLT         2
-#define  PML_WORD        3
-#define  PML_DATE        4
-#define  PML_TIME        4
-
-/*
-typedef struct {
-  char *name;
-  int maxpar;
-  int numpar;
-  char *par;
-}
-PARAMETER;
-
-static PARAMETER Parameter[] =
-{
-  {"code", 1024, 0, NULL},
-};
-
-static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
-*/
-
-#define PML_DEF(name, size, txt)      bool flag_##name[size]; int npar_##name = 0; int max_##name = size; const char str_##name[] = txt
-#define PML_DEF_INT(name, size, txt)  int par_##name[size]; int name = 0; PML_DEF(name, size, txt)
-#define PML_DEF_FLT(name, size, txt)  double par_##name[size]; double name = 0; PML_DEF(name, size, txt)
-#define PML_DEF_WORD(name, size, txt) char *par_##name[size]; const char *name = 0; PML_DEF(name, size, txt)
-#define PML_INIT_INT(name)            memset(flag_##name, 0, max_##name * sizeof(bool))
-#define PML_INIT_FLT(name)            memset(flag_##name, 0, max_##name * sizeof(bool))
-#define PML_INIT_WORD(name)           memset(flag_##name, 0, max_##name * sizeof(bool))
-#define PML_ADD_INT(nml, name)        pmlAdd(nml, #name, PML_INT,  0, par_##name, sizeof(par_##name)/sizeof(int))
-#define PML_ADD_FLT(nml, name)        pmlAdd(nml, #name, PML_FLT,  0, par_##name, sizeof(par_##name)/sizeof(double))
-#define PML_ADD_WORD(nml, name)       pmlAdd(nml, #name, PML_WORD, 0, par_##name, sizeof(par_##name)/sizeof(char *))
-#define PML_NUM(nml, name)            npar_##name = pmlNum(nml, #name)
-#define PML_PAR(name)                 npar_##name, par_##name, name
-
-#define PAR_CHECK_INT_FLAG(name)      par_check_int_flag(npar_##name, par_##name, flag_##name, str_##name)
-#define PAR_CHECK_FLT_FLAG(name)      par_check_flt_flag(npar_##name, par_##name, flag_##name, str_##name)
-#define PAR_CHECK_WORD_FLAG(name)     par_check_word_flag(npar_##name, par_##name, flag_##name, str_##name)
-#define PAR_CHECK_INT(name)           par_check_int(npar_##name, par_##name, flag_##name, name)
-#define PAR_CHECK_FLT(name)           par_check_flt(npar_##name, par_##name, flag_##name, name)
-#define PAR_CHECK_WORD(name)          par_check_word(npar_##name, par_##name, flag_##name, name)
-#define PAR_CHECK_DATE(name)          par_check_date(npar_##name, par_##name, flag_##name, name)
-#define PAR_CHECK_SEASON(name, month) par_check_season(npar_##name, par_##name, flag_##name, month)
-
-#define MAX_PLIST_ENTRY  256
-#define MAX_PML_ENTRY    256
-
-typedef struct
-{
-  char *text;
-  size_t len;
-  void *ptr;
-  int type;
-  int occ;
-  int dis;
-  size_t size;
-} plist_entry_t;
-
-
-typedef struct
-{
-  int size;
-  plist_entry_t *entry[MAX_PLIST_ENTRY];
-} plist_t;
-
-
-typedef struct
-{
-  char *name;
-  size_t len;
-  void *ptr;
-  int type;
-  int occ;
-  int dis;
-  size_t size;
-} pml_entry_t;
-
-
-typedef struct
-{
-  int size;
-  int dis;
-  char *name;
-  /* PML_LINE line; */
-  pml_entry_t *entry[MAX_PML_ENTRY];
-} pml_t;
-
-
-static
-void pml_init(pml_t *pml, const char *name)
-{
-  pml->size = 0;
-  pml->dis  = 1;
-  pml->name = strdup(name);
-}
-
-
-pml_t *pmlNew(const char *name)
-{
-  pml_t *pml = (pml_t*) Malloc(sizeof(pml_t));
-
-  pml_init(pml, name);
-
-  return pml;
-}
-
-
-void pmlDestroy(pml_t *pml)
-{
-  if ( pml == NULL ) return;
-
-  for ( int i = 0; i < pml->size; ++i )
-    {
-      if ( pml->entry[i] ) Free(pml->entry[i]);
-    }
-
-  Free(pml);
-}
-
-
-void pmlPrint(pml_t *pml)
-{
-  pml_entry_t *entry;
-  int i, j, nout;
-
-  if ( pml == NULL ) return;
-
-  fprintf(stdout, "Parameter list: %s\n", pml->name);
-  fprintf(stdout, " Num  Name             Type  Size   Dis   Occ  Entries\n");
-
-  for ( i = 0; i < pml->size; ++i )
-    {
-      entry = pml->entry[i];
-      fprintf(stdout, "%4d  %-16s %4d  %4d  %4d  %4d ",
-	      i+1, pml->entry[i]->name, pml->entry[i]->type, (int)pml->entry[i]->size,
-	      pml->entry[i]->dis, pml->entry[i]->occ);
-      nout = pml->entry[i]->occ;
-      if ( nout > 8 ) nout = 8;
-
-      if      ( entry->type == PML_WORD )
-	for ( j = 0; j < nout; j++ )
-	  fprintf(stdout, " %s", ((char **)entry->ptr)[j]);
-      else if ( entry->type == PML_INT )
-	for ( j = 0; j < nout; j++ )
-	  fprintf(stdout, " %d", ((int *)entry->ptr)[j]);
-      else if ( entry->type == PML_FLT )
-	for ( j = 0; j < nout; j++ )
-	  fprintf(stdout, " %g", ((double *)entry->ptr)[j]);
-      
-      fprintf(stdout, "\n");
-    }
-}
-
-
-int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t size)
-{
-  if ( pml->size >= MAX_PML_ENTRY )
-    {
-      fprintf(stderr, "Too many entries in parameter list %s! (Max = %d)\n", pml->name, MAX_PML_ENTRY);
-      return -1;
-    }
-
-  pml_entry_t *pml_entry = (pml_entry_t*) Malloc(sizeof(pml_entry_t));
-
-  pml_entry->name = strdup(name);
-  pml_entry->len  = strlen(name);
-  pml_entry->type = type;
-  pml_entry->ptr  = ptr;
-  pml_entry->size = size;
-  pml_entry->dis  = dis;
-  pml_entry->occ  = 0;
-
-  int entry = pml->size;
-  pml->entry[pml->size++] = pml_entry;
-
-  return entry;
-}
-
-
-int pmlNum(pml_t *pml, const char *name)
-{
-  pml_entry_t *entry;
-  int i, nocc = 0;
-
-  if ( pml == NULL ) return (nocc);
-
-  for ( i = 0; i < pml->size; i++ )
-    {
-      entry = pml->entry[i];
-      if ( strcmp(name, entry->name) == 0 )
-	{
-	  nocc = entry->occ;
-	  break;
-	}
-    }
-
-  if ( i == pml->size )
-    fprintf(stderr, "Parameter list entry %s not found in %s\n", name, pml->name);
-
-  return nocc;
-}
-
-void split_intstring(const char *intstr, int *first, int *last, int *inc);
-
-int pml_add_entry(pml_entry_t *entry, char *arg)
-{
-  int status = 0;
-
-  if ( entry->type == PML_INT )
-    {
-      int ival, first, last, inc;
-
-      split_intstring(arg, &first, &last, &inc);
-
-      if ( inc >= 0 )
-	{
-	  for ( ival = first; ival <= last; ival += inc )
-	    if ( entry->occ < (int) entry->size )
-	      ((int *) entry->ptr)[entry->occ++] = ival;
-	}
-      else
-	{
-	  for ( ival = first; ival >= last; ival += inc )
-	    if ( entry->occ < (int) entry->size )
-	      ((int *) entry->ptr)[entry->occ++] = ival;
-	}
-    }
-  else if ( entry->type == PML_FLT )
-    {
-      if ( entry->occ < (int) entry->size )
-	((double *) entry->ptr)[entry->occ++] = atof(arg);
-    }
-  else if ( entry->type == PML_WORD )
-    {
-      if ( entry->occ < (int) entry->size )
-	((char **) entry->ptr)[entry->occ++] = strdupx(arg);
-    }
-  else
-    {
-      fprintf(stderr, "unsupported type!\n");
-    }
-
-  return status;
-}
-
-
-void pmlProcess(pml_entry_t *entry, int argc, char **argv)
-{
-  char *parg;
-  char *epos;
-
-  for ( int i = 0; i < argc; ++i )
-    {
-      parg = argv[i];
-      if ( i == 0 )
-	{
-	  epos = strchr(parg, '=');
-	  if ( epos == NULL )
-	    {
-	      fprintf(stderr, "internal problem, keyword not found!\n");
-	    }
-	  parg += epos-parg+1;
-	}
-
-      pml_add_entry(entry, parg);
-    }
-}
-
-
-int pmlRead(pml_t *pml, int argc, char **argv)
-{
-  pml_entry_t *entry = NULL;
-  pml_entry_t *pentry[MAX_PML_ENTRY];
-  int params[MAX_PML_ENTRY];
-  int num_par[MAX_PML_ENTRY];
-  int nparams = 0;
-  int i;
-  char *epos;
-  size_t len;
-  int bufsize = 0;
-  int status = 0;
-  /*
-  if ( cdoVerbose )
-    for ( i = 0; i < argc; ++i ) printf("pmlRead: %d %s\n", i, argv[i]);
-  */
-  for ( i = 0; i < argc; ++i )
-    {
-      len = strlen(argv[i]);
-      bufsize += len+1;
-    }
-
-  char *parbuf = (char*) Malloc(bufsize*sizeof(char));
-  memset(parbuf, 0, bufsize*sizeof(char));
-
-  int istart = 0;
-  while ( istart < argc )
-    {
-      epos = strchr(argv[istart], '=');
-      if ( epos == NULL )
-	{
-	  fprintf(stderr, "Parameter >%s< has no keyword!\n", argv[istart]);
-	  status = 1;
-	  goto END_LABEL;
-	}
-
-      len = epos - argv[istart];
-      for ( i = 0; i < pml->size; ++i )
-	{
-	  entry = pml->entry[i];
-	  if ( entry->len == len )
-	    if ( memcmp(entry->name, argv[istart], len) == 0 ) break;
-	}
-
-      if ( i == pml->size )
-	{
-	  fprintf(stderr, "Parameter >%s< has an invalid keyword!\n", argv[istart]);
-	  status = 2;
-	  goto END_LABEL;
-	}
-
-      num_par[nparams] = 0;
-      pentry[nparams]  = entry;
-      params[nparams]  = istart;
-      num_par[nparams] = 1;
-      
-      istart++;
-      for ( i = istart; i < argc; ++i )
-	{
-	  if ( *argv[i] == 0 ) { i++; break;}
-	  epos = strchr(argv[i], '=');
-	  if ( epos != NULL ) break;
-
-	  num_par[nparams]++;
-	}
-
-      istart = i;
-
-      nparams++;
-    }
-
-  for ( i = 0; i < nparams; ++i )
-    {
-      pmlProcess(pentry[i], num_par[i], &argv[params[i]]);
-    }
-
-
- END_LABEL:
-
-  Free(parbuf);
-
-  return status;
-}
-
-
-bool par_check_int(int npar, int *parlist, bool *flaglist, int par)
-{
-  bool found = false;
-  for ( int i = 0; i < npar; i++ )
-    if ( par == parlist[i] ) { found = true; flaglist[i] = true;/* break;*/}
-
-  return found;
-}
-
-
-bool par_check_flt(int npar, double *parlist, bool *flaglist, double par)
-{
-  bool found = false;
-  for ( int i = 0; i < npar; i++ )
-    if ( fabs(par - parlist[i]) < 1.e-4 ) { found = true; flaglist[i] = true;/* break;*/}
-
-  return found;
-}
-
-
-bool par_check_word(int npar, char **parlist, bool *flaglist, const char *par)
-{
-  bool found = false;
-  for ( int i = 0; i < npar; i++ )
-    if ( wildcardmatch(parlist[i], par) == 0 ) { found = true; flaglist[i] = true;/* break;*/}
-
-  return found;
-}
-
-
-bool par_check_date(int npar, char **parlist, bool *flaglist, const char *par)
-{
-  bool found = false;
-  char wcdate[512];
-
-  if ( *par == ' ' ) ++par;
-
-  for ( int i = 0; i < npar; i++ )
-    {
-      strcpy(wcdate, parlist[i]);
-      strcat(wcdate, "*");
-      if ( wildcardmatch(wcdate, par) == 0 ) { found = true; flaglist[i] = true;/* break;*/}
-    }
-
-  return found;
-}
-
-void season_to_months(const char *season, int *imonths);
-
-bool par_check_season(int npar, char **parlist, bool *flaglist, int month)
-{
-  assert(month>=1&&month<=12);
-  bool found = false;
-  int imon[13]; /* 1-12 ! */
-
-  for ( int i = 0; i < npar; i++ )
-    {
-      for ( int m = 0; m < 13; ++m ) imon[m] = 0;
-      season_to_months(parlist[i], imon);
-      if ( imon[month] ) { found = true; flaglist[i] = true;/* break;*/}
-    }
-
-  return found;
-}
-
-
-void par_check_int_flag(int npar, int *parlist, bool *flaglist, const char *txt)
-{
-  for ( int i = 0; i < npar; ++i )
-    if ( flaglist[i] == false )
-      cdoWarning("%s >%d< not found!", txt, parlist[i]);
-}
-
-
-void par_check_flt_flag(int npar, double *parlist, bool *flaglist, const char *txt)
-{
-  for ( int i = 0; i < npar; ++i )
-    if ( flaglist[i] == false )
-      cdoWarning("%s >%g< not found!", txt, parlist[i]);
-}
-
-
-void par_check_word_flag(int npar, char **parlist, bool *flaglist, const char *txt)
-{
-  for ( int i = 0; i < npar; ++i )
-    if ( flaglist[i] == false )
-      cdoWarning("%s >%s< not found!", txt, parlist[i]);
-}
-
 
 int vlist_get_psvarid(int vlistID, int zaxisID)
 {
@@ -530,52 +85,6 @@ void *Select(void *argument)
   double fstartdate = -99999999999.;
   double fenddate   = -99999999999.;
 
-  PML_DEF_INT(timestep_of_year, 4096, "Timestep of year");
-  PML_DEF_INT(timestep,         4096, "Timestep");
-  PML_DEF_INT(year,             1024, "Year");
-  PML_DEF_INT(month,              32, "Month");
-  PML_DEF_INT(day,                32, "Day");
-  PML_DEF_INT(hour,               24, "Hour");
-  PML_DEF_INT(minute,             60, "Minute");
-  PML_DEF_INT(code,             1024, "Code number");
-  PML_DEF_INT(levidx,           1024, "Level index");
-  PML_DEF_INT(ltype,             256, "Level type");
-  PML_DEF_INT(zaxisnum,          256, "Zaxis number");
-  PML_DEF_INT(gridnum,           256, "Grid number");
-  PML_DEF_FLT(level,            1024, "Level");
-  PML_DEF_WORD(name,            1024, "Variable name");
-  PML_DEF_WORD(param,           1024, "Parameter");
-  PML_DEF_WORD(zaxisname,        256, "Zaxis name");
-  PML_DEF_WORD(gridname,         256, "Grid name");
-  PML_DEF_WORD(steptype,          32, "Time step type");
-  PML_DEF_WORD(startdate,          1, "Start date");
-  PML_DEF_WORD(enddate,            1, "End date");
-  PML_DEF_WORD(season,            12, "Season");
-  PML_DEF_WORD(date,            1024, "Date");
-
-  PML_INIT_INT(timestep_of_year);
-  PML_INIT_INT(timestep);
-  PML_INIT_INT(year);
-  PML_INIT_INT(month);
-  PML_INIT_INT(day);
-  PML_INIT_INT(hour);
-  PML_INIT_INT(minute);
-  PML_INIT_INT(code);
-  PML_INIT_INT(levidx);
-  PML_INIT_INT(ltype);
-  PML_INIT_INT(zaxisnum);
-  PML_INIT_INT(gridnum);
-  PML_INIT_FLT(level);
-  PML_INIT_WORD(name);
-  PML_INIT_WORD(param);
-  PML_INIT_WORD(zaxisname);
-  PML_INIT_WORD(gridname);
-  PML_INIT_WORD(steptype);
-  PML_INIT_WORD(startdate);
-  PML_INIT_WORD(enddate);
-  PML_INIT_WORD(season);
-  PML_INIT_WORD(date);
-
   cdoInitialize(argument);
 
   int SELECT = cdoOperatorAdd("select", 0, 0, "parameter list");
@@ -595,57 +104,34 @@ void *Select(void *argument)
     for ( int i = 0; i < nsel; i++ )
       printf("name %d = %s\n", i+1, argnames[i]);
 
-  pml_t *pml = pmlNew("SELECT");
+  pml_t *pml = pml_create("SELECT");
 
-  PML_ADD_INT(pml, timestep_of_year);
-  PML_ADD_INT(pml, timestep);
-  PML_ADD_INT(pml, year);
-  PML_ADD_INT(pml, month);
-  PML_ADD_INT(pml, day);
-  PML_ADD_INT(pml, hour);
-  PML_ADD_INT(pml, minute);
-  PML_ADD_INT(pml, code);
-  PML_ADD_INT(pml, levidx);
-  PML_ADD_INT(pml, ltype);
-  PML_ADD_INT(pml, zaxisnum);
-  PML_ADD_INT(pml, gridnum);
-  PML_ADD_FLT(pml, level);
-  PML_ADD_WORD(pml, name);
-  PML_ADD_WORD(pml, param);
-  PML_ADD_WORD(pml, zaxisname);
-  PML_ADD_WORD(pml, gridname);
-  PML_ADD_WORD(pml, steptype);
-  PML_ADD_WORD(pml, startdate);
-  PML_ADD_WORD(pml, enddate);
-  PML_ADD_WORD(pml, season);
-  PML_ADD_WORD(pml, date);
+  PML_ADD_INT(pml, timestep_of_year, 4096, "Timestep of year");
+  PML_ADD_INT(pml, timestep,         4096, "Timestep");
+  PML_ADD_INT(pml, year,             1024, "Year");
+  PML_ADD_INT(pml, month,              32, "Month");
+  PML_ADD_INT(pml, day,                32, "Day");
+  PML_ADD_INT(pml, hour,               24, "Hour");
+  PML_ADD_INT(pml, minute,             60, "Minute");
+  PML_ADD_INT(pml, code,             1024, "Code number");
+  PML_ADD_INT(pml, levidx,           1024, "Level index");
+  PML_ADD_INT(pml, ltype,             256, "Level type");
+  PML_ADD_INT(pml, zaxisnum,          256, "Zaxis number");
+  PML_ADD_INT(pml, gridnum,           256, "Grid number");
+  PML_ADD_FLT(pml, level,            1024, "Level");
+  PML_ADD_WORD(pml, name,            1024, "Variable name");
+  PML_ADD_WORD(pml, param,           1024, "Parameter");
+  PML_ADD_WORD(pml, zaxisname,        256, "Zaxis name");
+  PML_ADD_WORD(pml, gridname,         256, "Grid name");
+  PML_ADD_WORD(pml, steptype,          32, "Time step type");
+  PML_ADD_WORD(pml, startdate,          1, "Start date");
+  PML_ADD_WORD(pml, enddate,            1, "End date");
+  PML_ADD_WORD(pml, season,            12, "Season");
+  PML_ADD_WORD(pml, date,            1024, "Date");
 
-  pmlRead(pml, nsel, argnames);
+  pml_read(pml, nsel, argnames);
 
-  if ( cdoVerbose ) pmlPrint(pml);
-
-  PML_NUM(pml, timestep_of_year);
-  PML_NUM(pml, timestep);
-  PML_NUM(pml, year);
-  PML_NUM(pml, month);
-  PML_NUM(pml, day);
-  PML_NUM(pml, hour);
-  PML_NUM(pml, minute);
-  PML_NUM(pml, code);
-  PML_NUM(pml, levidx);
-  PML_NUM(pml, ltype);
-  PML_NUM(pml, zaxisnum);
-  PML_NUM(pml, gridnum);
-  PML_NUM(pml, level);
-  PML_NUM(pml, name);
-  PML_NUM(pml, param);
-  PML_NUM(pml, zaxisname);
-  PML_NUM(pml, gridname);
-  PML_NUM(pml, steptype);
-  PML_NUM(pml, startdate);
-  PML_NUM(pml, enddate);
-  PML_NUM(pml, season);
-  PML_NUM(pml, date);
+  if ( cdoVerbose ) pml_print(pml);
 
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
@@ -731,20 +217,20 @@ void *Select(void *argument)
               else                                    steptype = "unknown";
               
 	      vars[varID] = false;
-              bool found_code  = npar_code      && PAR_CHECK_INT(code);
-              bool found_name  = npar_name      && PAR_CHECK_WORD(name);
-              bool found_param = npar_param     && PAR_CHECK_WORD(param);
-              bool found_grid  = npar_gridnum   && PAR_CHECK_INT(gridnum);
-              bool found_gname = npar_gridname  && PAR_CHECK_WORD(gridname);
-              bool found_stype = npar_steptype  && PAR_CHECK_WORD(steptype);
-              bool found_ltype = npar_ltype     && PAR_CHECK_INT(ltype);
-              bool found_zaxis = npar_zaxisnum  && PAR_CHECK_INT(zaxisnum);
-              bool found_zname = npar_zaxisname && PAR_CHECK_WORD(zaxisname);
+              bool found_code  = PML_NOCC(pml, code)      && PML_CHECK_INT(pml, code);
+              bool found_name  = PML_NOCC(pml, name)      && PML_CHECK_WORD(pml, name);
+              bool found_param = PML_NOCC(pml, param)     && PML_CHECK_WORD(pml, param);
+              bool found_grid  = PML_NOCC(pml, gridnum)   && PML_CHECK_INT(pml, gridnum);
+              bool found_gname = PML_NOCC(pml, gridname)  && PML_CHECK_WORD(pml, gridname);
+              bool found_stype = PML_NOCC(pml, steptype)  && PML_CHECK_WORD(pml, steptype);
+              bool found_ltype = PML_NOCC(pml, ltype)     && PML_CHECK_INT(pml, ltype);
+              bool found_zaxis = PML_NOCC(pml, zaxisnum)  && PML_CHECK_INT(pml, zaxisnum);
+              bool found_zname = PML_NOCC(pml, zaxisname) && PML_CHECK_WORD(pml, zaxisname);
               bool lvar  = found_code || found_name || found_param;
-              bool lstep = npar_steptype ? found_stype : true;
-              bool lgrid = (npar_gridnum || npar_gridname) ? (found_grid || found_gname) : true;
-              bool lvert = (npar_ltype || npar_zaxisnum || npar_zaxisname) ? (found_ltype || found_zaxis || found_zname) : true;
-	      
+              bool lstep = PML_NOCC(pml, steptype) ? found_stype : true;
+              bool lgrid = (PML_NOCC(pml, gridnum) || PML_NOCC(pml, gridname)) ? (found_grid || found_gname) : true;
+              bool lvert = (PML_NOCC(pml, ltype) || PML_NOCC(pml, zaxisnum) || PML_NOCC(pml, zaxisname)) ? (found_ltype || found_zaxis || found_zname) : true;
+	     
               if ( !vars[varID] && lgrid && lvar) vars[varID] = true;
               if ( !vars[varID] && lvert && lvar) vars[varID] = true;
               if ( !vars[varID] && lstep && lvar) vars[varID] = true;
@@ -753,14 +239,14 @@ void *Select(void *argument)
                   if      ( found_grid || found_gname ) vars[varID] = true;
                   else if ( found_stype ) vars[varID] = true;
                   else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = true;
-                  else if ( npar_levidx || npar_level )
+                  else if ( PML_NOCC(pml, levidx) || PML_NOCC(pml, level) )
                     {
                       for ( int levID = 0; levID < nlevs; levID++ )
                         {
                           levidx = levID + 1;
                           level = zaxisInqLevel(zaxisID, levID);
-                          if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(levidx) )  vars[varID] = true;
-                          if ( !vars[varID] && npar_level  && PAR_CHECK_FLT(level)  )  vars[varID] = true;
+                          if ( !vars[varID] && PML_NOCC(pml, levidx) && PML_CHECK_INT(pml, levidx) )  vars[varID] = true;
+                          if ( !vars[varID] && PML_NOCC(pml, level)  && PML_CHECK_FLT(pml, level)  )  vars[varID] = true;
                         }
                     }
                 }
@@ -797,14 +283,14 @@ void *Select(void *argument)
 			}
 		      else
 			{
-			  if ( npar_levidx )
+			  if ( PML_NOCC(pml, levidx) )
 			    {
-			      if ( PAR_CHECK_INT(levidx) )
+			      if ( PML_CHECK_INT(pml, levidx) )
 				vlistDefFlag(vlistID1, varID, levID, result);
 			    }
-			  else if ( npar_level )
+			  else if ( PML_NOCC(pml, level) )
 			    {
-			      if ( PAR_CHECK_FLT(level) )
+			      if ( PML_CHECK_FLT(pml, level) )
 				vlistDefFlag(vlistID1, varID, levID, result);
 			    }
 			  else
@@ -816,20 +302,20 @@ void *Select(void *argument)
 		}
 	    }
 
-	  PAR_CHECK_INT_FLAG(code);
-	  PAR_CHECK_INT_FLAG(levidx);
-	  PAR_CHECK_INT_FLAG(ltype);
-	  PAR_CHECK_INT_FLAG(zaxisnum);
-	  PAR_CHECK_INT_FLAG(gridnum);
-	  PAR_CHECK_FLT_FLAG(level);
-	  PAR_CHECK_WORD_FLAG(name);
-	  PAR_CHECK_WORD_FLAG(param);
-	  PAR_CHECK_WORD_FLAG(zaxisname);
-	  PAR_CHECK_WORD_FLAG(gridname);
-	  PAR_CHECK_WORD_FLAG(steptype);
+	  PML_CHECK_INT_FLAG(pml, code);
+	  PML_CHECK_INT_FLAG(pml, levidx);
+	  PML_CHECK_INT_FLAG(pml, ltype);
+	  PML_CHECK_INT_FLAG(pml, zaxisnum);
+	  PML_CHECK_INT_FLAG(pml, gridnum);
+	  PML_CHECK_FLT_FLAG(pml, level);
+	  PML_CHECK_WORD_FLAG(pml, name);
+	  PML_CHECK_WORD_FLAG(pml, param);
+	  PML_CHECK_WORD_FLAG(pml, zaxisname);
+	  PML_CHECK_WORD_FLAG(pml, gridname);
+	  PML_CHECK_WORD_FLAG(pml, steptype);
 
-	  if ( npar_date || npar_startdate || npar_enddate || npar_season ) ltimsel = true;
-	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = true;
+	  if ( PML_NOCC(pml, date) || PML_NOCC(pml, startdate) || PML_NOCC(pml, enddate) || PML_NOCC(pml, season) ) ltimsel = true;
+	  if ( PML_NOCC(pml, timestep_of_year) || PML_NOCC(pml, timestep) || PML_NOCC(pml, year) || PML_NOCC(pml, month) || PML_NOCC(pml, day) || PML_NOCC(pml, hour) || PML_NOCC(pml, minute) ) ltimsel = true;
 
 	  int npar = 0;
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -899,7 +385,7 @@ void *Select(void *argument)
 	    }
 
 	  int ntsteps2 = ntsteps;
-	  if ( operatorID == SELECT && npar_timestep == 1 ) ntsteps2 = 1;
+	  if ( operatorID == SELECT && PML_NOCC(pml, timestep) == 1 ) ntsteps2 = 1;
 	  
 	  if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
 
@@ -911,9 +397,9 @@ void *Select(void *argument)
 	    }
 
 	  // support for negative timestep values
-	  if ( npar_timestep > 0 && ntsteps > 0 && nfiles == 1 )
+	  if ( PML_NOCC(pml, timestep) > 0 && ntsteps > 0 && nfiles == 1 )
 	    {
-	      for ( int i = 0; i < npar_timestep; i++ )
+	      for ( int i = 0; i < PML_NOCC(pml, timestep); i++ )
 		{
 		  if ( par_timestep[i] < 0 )
 		    {
@@ -933,8 +419,8 @@ void *Select(void *argument)
 
 	  startdate = par_startdate[0];
 	  enddate   = par_enddate[0];
-	  if ( npar_startdate ) fstartdate = datestr_to_double(startdate, 0);
-	  if ( npar_enddate   ) fenddate   = datestr_to_double(enddate, 1);
+	  if ( PML_NOCC(pml, startdate) ) fstartdate = datestr_to_double(startdate, 0);
+	  if ( PML_NOCC(pml, enddate)   ) fenddate   = datestr_to_double(enddate, 1);
 	}
       else
 	{
@@ -965,7 +451,7 @@ void *Select(void *argument)
 	    {
 	      copytimestep = false;
 
-	      if ( operatorID == SELECT && npar_timestep > 0 && timestep > par_timestep[npar_timestep-1] )
+	      if ( operatorID == SELECT && PML_NOCC(pml, timestep) > 0 && timestep > par_timestep[PML_NOCC(pml, timestep)-1] )
 		{
 		  lstop = true;
 		  break;
@@ -986,26 +472,26 @@ void *Select(void *argument)
 
 	      timestep_of_year++;
 
-	      if ( npar_timestep && PAR_CHECK_INT(timestep) ) copytimestep = true;
-	      if ( npar_timestep_of_year && PAR_CHECK_INT(timestep_of_year) ) copytimestep = true;
+	      if ( PML_NOCC(pml, timestep) && PML_CHECK_INT(pml, timestep) ) copytimestep = true;
+	      if ( PML_NOCC(pml, timestep_of_year) && PML_CHECK_INT(pml, timestep_of_year) ) copytimestep = true;
 
-	      if ( !copytimestep && npar_date == 0 && npar_timestep == 0 && npar_timestep_of_year == 0 )
+	      if ( !copytimestep && PML_NOCC(pml, date) == 0 && PML_NOCC(pml, timestep) == 0 && PML_NOCC(pml, timestep_of_year) == 0 )
 		{
 		  bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 
-		  if ( npar_season == 0 || (npar_season && PAR_CHECK_SEASON(season, month)) ) lseason   = true;
-		  if ( npar_year   == 0 || (npar_year   && PAR_CHECK_INT(year))   ) lyear   = true;
-		  if ( npar_month  == 0 || (npar_month  && PAR_CHECK_INT(month))  ) lmonth  = true;
-		  if ( npar_day    == 0 || (npar_day    && PAR_CHECK_INT(day))    ) lday    = true;
-		  if ( npar_hour   == 0 || (npar_hour   && PAR_CHECK_INT(hour))   ) lhour   = true;
-		  if ( npar_minute == 0 || (npar_minute && PAR_CHECK_INT(minute)) ) lminute = true;
+		  if ( PML_NOCC(pml, season) == 0 || (PML_NOCC(pml, season) && PML_CHECK_SEASON(pml, season, month)) ) lseason   = true;
+		  if ( PML_NOCC(pml, year)   == 0 || (PML_NOCC(pml, year)   && PML_CHECK_INT(pml, year))   ) lyear   = true;
+		  if ( PML_NOCC(pml, month)  == 0 || (PML_NOCC(pml, month)  && PML_CHECK_INT(pml, month))  ) lmonth  = true;
+		  if ( PML_NOCC(pml, day)    == 0 || (PML_NOCC(pml, day)    && PML_CHECK_INT(pml, day))    ) lday    = true;
+		  if ( PML_NOCC(pml, hour)   == 0 || (PML_NOCC(pml, hour)   && PML_CHECK_INT(pml, hour))   ) lhour   = true;
+		  if ( PML_NOCC(pml, minute) == 0 || (PML_NOCC(pml, minute) && PML_CHECK_INT(pml, minute)) ) lminute = true;
 
 		  if ( lseason && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
 		}
 
 	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
 
-	      if ( npar_enddate )
+	      if ( PML_NOCC(pml, enddate) )
 		{
 		  if ( fdate > fenddate )
 		    {
@@ -1023,7 +509,7 @@ void *Select(void *argument)
 		    }
 		}
 
-	      if ( npar_startdate )
+	      if ( PML_NOCC(pml, startdate) )
 		{
 		  if ( fdate < fstartdate )
 		    {
@@ -1037,12 +523,12 @@ void *Select(void *argument)
 		}
 
               
-              if ( npar_date )
+              if ( PML_NOCC(pml, date) )
                 {
                   char vdatetimestr[64];
                   datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
                   date = vdatetimestr;
-                  if ( PAR_CHECK_DATE(date) ) copytimestep = true;
+                  if ( PML_CHECK_DATE(pml, date) ) copytimestep = true;
                 }
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
@@ -1148,25 +634,24 @@ void *Select(void *argument)
 
   if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, 1);    
 
-  PAR_CHECK_INT_FLAG(timestep_of_year);
-  PAR_CHECK_INT_FLAG(timestep);
-  PAR_CHECK_INT_FLAG(year);
-  PAR_CHECK_INT_FLAG(month);
-  PAR_CHECK_INT_FLAG(day);
-  PAR_CHECK_INT_FLAG(hour);
-  PAR_CHECK_INT_FLAG(minute);
-  PAR_CHECK_WORD_FLAG(startdate);
-  UNUSED(str_enddate);
-  //  PAR_CHECK_WORD_FLAG(enddate);
-  PAR_CHECK_WORD_FLAG(season);
-  PAR_CHECK_WORD_FLAG(date);
+  PML_CHECK_INT_FLAG(pml, timestep_of_year);
+  PML_CHECK_INT_FLAG(pml, timestep);
+  PML_CHECK_INT_FLAG(pml, year);
+  PML_CHECK_INT_FLAG(pml, month);
+  PML_CHECK_INT_FLAG(pml, day);
+  PML_CHECK_INT_FLAG(pml, hour);
+  PML_CHECK_INT_FLAG(pml, minute);
+  PML_CHECK_WORD_FLAG(pml, startdate);
+  //  PML_CHECK_WORD_FLAG(pml, enddate);
+  PML_CHECK_WORD_FLAG(pml, season);
+  PML_CHECK_WORD_FLAG(pml, date);
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);
 
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);
 
-  pmlDestroy(pml);
+  pml_destroy(pml);
 
   if ( array ) Free(array);
   if ( vars ) Free(vars);

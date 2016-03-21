@@ -73,7 +73,7 @@ void *Output(void *argument)
   int nKeys;
   int Keylen[]           = {      0,        8,      11,      4,      8,     6,     6,     6,     6,      4,      4,          6,     10,      8,      5,       2,     2 };
   enum                     {knohead,   kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kbin,  kxind,  kyind,  ktimestep,  kdate,  ktime,  kyear,  kmonth,  kday };
-  const char *Keynames[] = {"nohead", "value", "param", "code", "name", "lon", "lat", "lev", "bin", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
+  const char *Keynames[] = {"nohead",  "value", "param", "code", "name", "lon", "lat", "lev", "bin", "xind", "yind", "timestep", "date", "time", "year", "month", "day"};
 
 
   cdoInitialize(argument);
@@ -309,23 +309,26 @@ void *Output(void *argument)
 		      for ( k = 0; k < nkeys; ++k )
 			{
 			  len = Keylen[keys[k]];
-			  if      ( keys[k] == kvalue    ) fprintf(stdout, "%*g ", len, array[i]);
-			  else if ( keys[k] == kparam    ) fprintf(stdout, "%*s ", len, paramstr);
-			  else if ( keys[k] == kcode     ) fprintf(stdout, "%*d ", len, code);
-			  else if ( keys[k] == kname     ) fprintf(stdout, "%*s ", len, name);
-			  else if ( keys[k] == klon      ) fprintf(stdout, "%*g ", len, lon);
-			  else if ( keys[k] == klat      ) fprintf(stdout, "%*g ", len, lat);
-			  else if ( keys[k] == klev      ) fprintf(stdout, "%*g ", len, level);
-			  else if ( keys[k] == kbin      ) fprintf(stdout, "%*g ", len, level);
-			  else if ( keys[k] == kxind     ) fprintf(stdout, "%*d ", len, xind+1);
-			  else if ( keys[k] == kyind     ) fprintf(stdout, "%*d ", len, yind+1);
-			  else if ( keys[k] == ktimestep ) fprintf(stdout, "%*d ", len, tsID+1);
-			  else if ( keys[k] == kdate     ) fprintf(stdout, "%*s ", len, vdatestr);
-			  else if ( keys[k] == ktime     ) fprintf(stdout, "%*s ", len, vtimestr);
-			  else if ( keys[k] == kyear     ) fprintf(stdout, "%*d ", len, year);
-			  else if ( keys[k] == kmonth    ) fprintf(stdout, "%*d ", len, month);
-			  else if ( keys[k] == kday      ) fprintf(stdout, "%*d ", len, day);
-			}
+                          switch ( keys[k] )
+                            {
+                            case kvalue:     fprintf(stdout, "%*g ", len, array[i]); break;
+                            case kparam:     fprintf(stdout, "%*s ", len, paramstr); break;
+                            case kcode:      fprintf(stdout, "%*d ", len, code); break;
+                            case kname:      fprintf(stdout, "%*s ", len, name); break;
+                            case klon:       fprintf(stdout, "%*g ", len, lon); break;
+                            case klat:       fprintf(stdout, "%*g ", len, lat); break;
+                            case klev:       fprintf(stdout, "%*g ", len, level); break;
+                            case kbin:       fprintf(stdout, "%*g ", len, level); break;
+                            case kxind:      fprintf(stdout, "%*d ", len, xind+1); break;
+                            case kyind:      fprintf(stdout, "%*d ", len, yind+1); break;
+                            case ktimestep:  fprintf(stdout, "%*d ", len, tsID+1); break;
+                            case kdate:      fprintf(stdout, "%*s ", len, vdatestr); break;
+                            case ktime:      fprintf(stdout, "%*s ", len, vtimestr); break;
+                            case kyear:      fprintf(stdout, "%*d ", len, year); break;
+                            case kmonth:     fprintf(stdout, "%*d ", len, month); break;
+                            case kday:       fprintf(stdout, "%*d ", len, day); break;
+                            }
+                        }
 		      fprintf(stdout, "\n");
 		    }
 		}

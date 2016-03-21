@@ -74,15 +74,15 @@
 static const char CFD_NAME[]         = "consecutive_frost_days_index_per_time_period";
 static const char CFD_LONGNAME[]     = "Consecutive frost days index is the greatest number of consecutive frost days in a given time period. Frost days is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
 static const char CFD_UNITS[]        = "No.";
-static const char CFD_NAME2[]        = "number_of_cfd_periods_with_more_than_5days_per_time_period";
-static const char CFD_LONGNAME2[]    = "Number of cfd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CFD_NAME2[]        = "number_of_cfd_periods_with_more_than_%ddays_per_time_period";
+static const char CFD_LONGNAME2[]    = "Number of cfd periods in given time period with more than %d days. The time period should be defined by the bounds of the time coordinate.";
 static const char CFD_UNITS2[]       = "No.";
 
 static const char CSU_NAME[]         = "consecutive_summer_days_index_per_time_period";
 static const char CSU_LONGNAME[]     = "Consecutive summer days index is the greatest number of consecutive summer days in a given time period. Summer days is the number of days where maximum of temperature is above 25 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
 static const char CSU_UNITS[]        = "No.";
-static const char CSU_NAME2[]        = "number_of_csu_periods_with_more_than_5days_per_time_period";
-static const char CSU_LONGNAME2[]    = "Number of csu periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CSU_NAME2[]        = "number_of_csu_periods_with_more_than_%ddays_per_time_period";
+static const char CSU_LONGNAME2[]    = "Number of csu periods in given time period with more than %d days. The time period should be defined by the bounds of the time coordinate.";
 static const char CSU_UNITS2[]       = "No.";
 
 static const char CWDI_NAME[]        = "cold_wave_duration_index_wrt_mean_of_reference_period";
@@ -171,15 +171,15 @@ static const char TX90P_UNITS[]      = "Percent";
 static const char CDD_NAME[]         = "consecutive_dry_days_index_per_time_period";
 static const char CDD_LONGNAME[]     = "Consecutive dry days is the greatest number of consecutive days per time period with daily precipitation amount  below %g mm. The time period should be defined by the bounds of the time coordinate.";
 static const char CDD_UNITS[]        = "No.";
-static const char CDD_NAME2[]        = "number_of_cdd_periods_with_more_than_5days_per_time_period";
-static const char CDD_LONGNAME2[]    = "Number of cdd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CDD_NAME2[]        = "number_of_cdd_periods_with_more_than_%ddays_per_time_period";
+static const char CDD_LONGNAME2[]    = "Number of cdd periods in given time period with more than %d days. The time period should be defined by the bounds of the time coordinate.";
 static const char CDD_UNITS2[]       = "No.";
 
 static const char CWD_NAME[]         = "consecutive_wet_days_index_per_time_period";
 static const char CWD_LONGNAME[]     = "Consecutive wet days is the greatest number of consecutive days per time period with daily precipitation above %g mm. The time period should be defined by the bounds of the time coordinate.";
 static const char CWD_UNITS[]        = "No.";
-static const char CWD_NAME2[]        = "number_of_cwd_periods_with_more_than_5days_per_time_period";
-static const char CWD_LONGNAME2[]    = "Number of cwd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CWD_NAME2[]        = "number_of_cwd_periods_with_more_than_%ddays_per_time_period";
+static const char CWD_LONGNAME2[]    = "Number of cwd periods in given time period with more than %d days. The time period should be defined by the bounds of the time coordinate.";
 static const char CWD_UNITS2[]       = "No.";
 
 static const char PD_NAME[]          = "precipitation_days_index_per_time_period";
@@ -278,10 +278,22 @@ static const char HURR_LONGNAME2[]   = "Greatest number of consecutive hurricane
 void *EcaCfd(void *argument)
 {
   ECA_REQUEST_1 request;
+  int ndays = 5;
+  char cfd_longname2[1024];
+  char cfd_name2[1024];
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_cfd", 0, 31, NULL);
   
+  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+  else if ( operatorArgc() > 0 ) 
+    {
+      ndays = parameter2int(operatorArgv()[0]);
+    }
+
+  sprintf(cfd_longname2, CFD_LONGNAME2, ndays);
+  sprintf(cfd_name2,     CFD_NAME2, ndays);
+
   request.var1.name     = CFD_NAME;
   request.var1.longname = CFD_LONGNAME;
   request.var1.units    = NULL;
@@ -292,11 +304,11 @@ void *EcaCfd(void *argument)
   request.var1.mulc     = 0.0;
   request.var1.addc     = 0.0;
   request.var1.epilog   = NONE;
-  request.var2.name     = CFD_NAME2;
-  request.var2.longname = CFD_LONGNAME2;
+  request.var2.name     = cfd_name2;
+  request.var2.longname = cfd_longname2;
   request.var2.units    = CFD_UNITS2;
   request.var2.h1       = farseleqc;
-  request.var2.h1arg    = 6;
+  request.var2.h1arg    = ndays+1;
   request.var2.h2       = NULL;
   request.var2.h3       = farnum;
    
@@ -309,13 +321,24 @@ void *EcaCfd(void *argument)
 
 void *EcaCsu(void *argument)
 {
-  double argT = 25.0;
   ECA_REQUEST_1 request;
+  double argT = 25.0;
+  int ndays = 5;
+  char csu_longname2[1024];
+  char csu_name2[1024];
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_csu", 0, 31, NULL);
 
-  if ( operatorArgc() > 0 ) argT = parameter2double(operatorArgv()[0]);
+  if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
+  else if ( operatorArgc() > 0 ) 
+    {
+      argT = parameter2double(operatorArgv()[0]);
+      if ( operatorArgc() == 2 ) ndays = parameter2int(operatorArgv()[1]);
+    }
+  
+  sprintf(csu_longname2, CSU_LONGNAME2, ndays);
+  sprintf(csu_name2,     CSU_NAME2, ndays);
 
   request.var1.name     = CSU_NAME;
   request.var1.longname = CSU_LONGNAME;
@@ -327,15 +350,16 @@ void *EcaCsu(void *argument)
   request.var1.mulc     = 0.0;
   request.var1.addc     = 0.0;
   request.var1.epilog   = NONE;
-  request.var2.name     = CSU_NAME2;
-  request.var2.longname = CSU_LONGNAME2;
+  request.var2.name     = csu_name2;
+  request.var2.longname = csu_longname2;
   request.var2.units    = CSU_UNITS2;
   request.var2.h1       = farseleqc;
-  request.var2.h1arg    = 6;
+  request.var2.h1arg    = ndays+1;
   request.var2.h2       = NULL;
   request.var2.h3       = farnum;
   
   eca1(&request);
+  
   cdoFinish();
   
   return 0;
@@ -810,19 +834,19 @@ void *EcaTn90p(void *argument)
 
 void *EcaTr(void *argument)
 {
-  char *longname;
-  double argT = 20.0;
   ECA_REQUEST_1 request;
+  double argT = 20.0;
+  char tr_longname[1024];
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_tr", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argT = parameter2double(operatorArgv()[0]);
-  longname = (char*) Malloc(strlen(TR_LONGNAME) + 40);
-  sprintf(longname, TR_LONGNAME, argT);
+
+  sprintf(tr_longname, TR_LONGNAME, argT);
  
   request.var1.name     = TR_NAME;
-  request.var1.longname = longname;
+  request.var1.longname = tr_longname;
   request.var1.units    = TR_UNITS;
   request.var1.f1       = farselgtc;
   request.var1.f1arg    = TO_KELVIN(argT);
@@ -836,7 +860,6 @@ void *EcaTr(void *argument)
    
   eca1(&request);
   
-  Free(longname);
   cdoFinish();
   
   return 0;
@@ -899,19 +922,28 @@ void *EcaTx90p(void *argument)
 void *EcaCdd(void *argument)
 {
   ECA_REQUEST_1 request;
-  char lnamebuffer[1024];
   double threshold = 1;
+  int ndays = 5;
+  char cdd_longname[1024];
+  char cdd_longname2[1024];
+  char cdd_name2[1024];
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_cdd", 0, 31, NULL);
 
-  if ( operatorArgc() == 1 ) threshold = parameter2double(operatorArgv()[0]);
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
-
-  sprintf(lnamebuffer, CDD_LONGNAME, threshold);
+  if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
+  else if ( operatorArgc() > 0 ) 
+    {
+      threshold = parameter2double(operatorArgv()[0]);
+      if ( operatorArgc() == 2 ) ndays = parameter2int(operatorArgv()[1]);
+    }
+  
+  sprintf(cdd_longname,  CDD_LONGNAME, threshold);
+  sprintf(cdd_longname2, CDD_LONGNAME2, ndays);
+  sprintf(cdd_name2,     CDD_NAME2, ndays);
 
   request.var1.name     = CDD_NAME;
-  request.var1.longname = lnamebuffer;
+  request.var1.longname = cdd_longname;
   request.var1.units    = CDD_UNITS;
   request.var1.f1       = farselltc;
   request.var1.f1arg    = threshold;
@@ -920,15 +952,16 @@ void *EcaCdd(void *argument)
   request.var1.mulc     = 0.0;
   request.var1.addc     = 0.0;
   request.var1.epilog   = NONE;
-  request.var2.name     = CDD_NAME2;
-  request.var2.longname = CDD_LONGNAME2;
+  request.var2.name     = cdd_name2;
+  request.var2.longname = cdd_longname2;
   request.var2.units    = CDD_UNITS2;
   request.var2.h1       = farseleqc;
-  request.var2.h1arg    = 6;
+  request.var2.h1arg    = ndays+1;
   request.var2.h2       = NULL;
   request.var2.h3       = farnum;
    
   eca1(&request);
+  
   cdoFinish();
   
   return 0;
@@ -938,19 +971,28 @@ void *EcaCdd(void *argument)
 void *EcaCwd(void *argument)
 {
   ECA_REQUEST_1 request;
-  char lnamebuffer[1024];
   double threshold = 1;
+  int ndays = 5;
+  char cwd_longname[1024];
+  char cwd_longname2[1024];
+  char cwd_name2[1024];
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_cwd", 0, 31, NULL);
 
-  if ( operatorArgc() == 1 ) threshold = parameter2double(operatorArgv()[0]);
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
-
-  sprintf(lnamebuffer, CWD_LONGNAME, threshold);
+  if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
+  else if ( operatorArgc() > 0 ) 
+    {
+      threshold = parameter2double(operatorArgv()[0]);
+      if ( operatorArgc() == 2 ) ndays = parameter2int(operatorArgv()[1]);
+    }
+  
+  sprintf(cwd_longname,  CWD_LONGNAME, threshold);
+  sprintf(cwd_longname2, CWD_LONGNAME2, ndays);
+  sprintf(cwd_name2,     CWD_NAME2, ndays);
 
   request.var1.name     = CWD_NAME;
-  request.var1.longname = lnamebuffer;
+  request.var1.longname = cwd_longname;
   request.var1.units    = CWD_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = threshold;
@@ -959,15 +1001,16 @@ void *EcaCwd(void *argument)
   request.var1.mulc     = 0.0;
   request.var1.addc     = 0.0;
   request.var1.epilog   = NONE;
-  request.var2.name     = CWD_NAME2;
-  request.var2.longname = CWD_LONGNAME2;
+  request.var2.name     = cwd_name2;
+  request.var2.longname = cwd_longname2;
   request.var2.units    = CWD_UNITS2;
   request.var2.h1       = farseleqc;
-  request.var2.h1arg    = 6;
+  request.var2.h1arg    = ndays+1;
   request.var2.h2       = NULL;
   request.var2.h3       = farnum;
    
   eca1(&request);
+  
   cdoFinish();
   
   return 0;

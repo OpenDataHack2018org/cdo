@@ -74,8 +74,8 @@ double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_
           if ( nbr_add[n] >= 0 )
             if ( src_grid_mask[nbr_add[n]] )
               {
-                nbr_dist[n] = ONE/nbr_dist[n];
-                dist_tot = dist_tot + nbr_dist[n];
+                nbr_dist[n] = 1./nbr_dist[n];
+                dist_tot += nbr_dist[n];
                 nbr_mask[n] = TRUE;
               }
         }
@@ -87,8 +87,8 @@ double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_
           nbr_mask[n] = FALSE;
           if ( nbr_add[n] >= 0 )
             {
-              nbr_dist[n] = ONE/nbr_dist[n];
-              dist_tot = dist_tot + nbr_dist[n];
+              nbr_dist[n] = 1./nbr_dist[n];
+              dist_tot += nbr_dist[n];
               nbr_mask[n] = TRUE;
             }
         }
@@ -117,20 +117,6 @@ unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const in
   return nadds;
 }
 
-static
-double get_search_radius(void)
-{
-  extern double gridsearch_radius;
-
-  double search_radius = gridsearch_radius;
-
-  if ( search_radius <    0. ) search_radius = 0.;
-  if ( search_radius >  180. ) search_radius = 180.;
-
-  search_radius = search_radius*DEG2RAD;
-
-  return search_radius;
-}
 
 //  This routine finds the closest num_neighbor points to a search point and computes a distance to each of the neighbors.
 
@@ -159,7 +145,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
   int *psrc_add = src_add;
   int num_add = 0;
   double distance;   //  Angular distance
-  double cos_search_radius = cos(get_search_radius());
+  double cos_search_radius = cos(gs->search_radius);
   double coslat_dst = cos(plat);  // cos(lat)  of the search point
   double coslon_dst = cos(plon);  // cos(lon)  of the search point
   double sinlat_dst = sin(plat);  // sin(lat)  of the search point
@@ -297,7 +283,7 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
     double plon,         ! longitude of the search point
   */
 
-  double search_radius = get_search_radius();
+  double search_radius = gs->search_radius;
 
   // Initialize distance and address arrays
   for ( int n = 0; n < num_neighbors; ++n ) nbr_add[n]  = -1;

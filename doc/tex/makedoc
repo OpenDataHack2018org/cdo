@@ -29,7 +29,7 @@ open(CLASS,    ">$class");
 # Preprocess EcaIndices file for grabbing the variable names, which are creates
 # by theses operators
 my $ecaIndicesFile = "../../src/EcaIndices.c";
-my $search_pattern = '(\w*)_NAME\d*\[\] .* = "(\w+)"';
+my $search_pattern = '(\w*)_NAME\d*\[\] .* = "(\w+%*\w+)"';
 my %ecaVars;
 
 open(ECANAMES,$ecaIndicesFile);
@@ -37,6 +37,7 @@ while (<ECANAMES>) {
   if (my ($found) = m/($search_pattern)/o) {
     my $eca        = "eca_".lc($2);
     my $var        = $3;
+    $var           =~ s/%d/<N>/og;
     $ecaVars{$eca} = [] unless exists $ecaVars{$eca};
     push @{$ecaVars{$eca}}, $var;
   }

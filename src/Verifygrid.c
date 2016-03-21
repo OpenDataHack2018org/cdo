@@ -31,6 +31,255 @@
 #include "clipping/geometry.h"
 #include "clipping/clipping.c"
 #include "math.h"
+#include "stdio.h"
+
+
+#define ConvexCompare(delta) \
+  ( (delta[0] > 0) ? -1 :    \
+    (delta[0] < 0) ?  1 :    \
+    (delta[1] > 0) ? -1 :    \
+    (delta[1] < 0) ?  1 :    \
+    0 )		  
+
+#define ConvexGetPointDelta(delta, previous_point, current_point) \
+  /* Given a previous point, reads a new 'current' point and returns the delta. */\
+ 						\
+  current_point[0] = cell_corners[corner_to_read * 2 + 0];	\
+  current_point[1] = cell_corners[corner_to_read * 2 + 1];		\
+  corner_to_read++;							\
+  delta[0] = current_point[0] - previous_point[0];			\
+  delta[1] = current_point[1] - previous_point[1];			\
+
+#define ConvexCross(p, q) p[0] * q[1] - p[1] * q[0];
+
+#define ConvexCheckTriple						\
+  if ( (this_direction = ConvexCompare(current_delta)) == -current_direction ) { \
+    ++direction_changes;						\
+    if ( direction_changes > 2 ) return 1;		   	\
+  }									\
+  current_direction = this_direction;					\
+  cross_product = ConvexCross(previous_delta, current_delta);		\
+  if ( cross_product > 0 ) { if ( angle_sign == -1 ) return 1;	\
+    angle_sign = 1;							\
+  }									\
+  else if (cross_product < 0) { if (angle_sign == 1) return 1;	\
+    angle_sign = -1;							\
+  }									\
+  p_second_corner = p_third_corner;		\
+  previous_delta[0] = current_delta[0];		\
+  previous_delta[1] = current_delta[1];		\
+  
+/* 
+   The following polygon classifications are possible:
+
+   NotConvex = 1 
+   NotConvexDegenerate = 2
+   ConvexDegenerate = 3
+   ConvexCCW = 4
+   ConvexCW = 5
+ */
+
+static int classify_polygon(int number_corners, double cell_corners[]){
+ 
+  int current_direction, this_direction, direction_changes = 0, angle_sign = 0, corner_to_read;
+  double *p_second_corner, *p_third_corner, *p_save_second_corner, *first_corner, previous_delta[2], current_delta[2], cross_product;
+
+  /* Get different point, return if less than 3 different points. */
+    
+  if ( number_corners < 3 ){ 
+    return 3;
+  }
+  
+  corner_to_read = 1;
+
+  printf("Outside loop?\n\n");
+
+  while(1){
+
+    fprintf(stderr,"Inside loop?\n\n");
+
+    ConvexGetPointDelta(previous_delta, first_corner, p_second_corner);
+    
+    fprintf(stderr,"After macro?\n\n");
+
+    if ( previous_delta[0] || previous_delta[1] ){
+      break;
+    }
+    
+    /* Check if there are any corners left. */
+    
+    if ( corner_to_read >= number_corners ){
+      return 3;
+    }
+  }
+
+  p_save_second_corner = p_second_corner;
+  
+  current_direction = ConvexCompare(previous_delta);	/* Find initial direction */
+  
+  while ( corner_to_read < number_corners ) {
+    /* Get different point, break if no more points */
+    ConvexGetPointDelta(current_delta, p_second_corner, p_third_corner);
+    if ( current_delta[0] == 0.0  &&	 current_delta[1] == 0.0 ) continue;
+    
+    ConvexCheckTriple;		/* Check current three points */
+  }
+ 
+  /* Must check for direction changes from last vertex back to first */
+  p_third_corner[0] = cell_corners[0];
+  p_third_corner[1] = cell_corners[1];
+  
+  /* Prepare for 'ConvexCheckTriple' */
+  current_delta[0] = p_third_corner[0] - p_second_corner[0];
+  current_delta[1] = p_third_corner[1] - p_second_corner[1];
+  if ( ConvexCompare(current_delta) ) {
+	ConvexCheckTriple;
+  }
+  
+  /* and check for direction changes back to second vertex */
+  current_delta[0] = p_save_second_corner[0] - p_second_corner[0];
+  current_delta[1] = p_save_second_corner[1] - p_second_corner[1];
+  ConvexCheckTriple;		     
+  
+  /* Decide on polygon type given accumulated status */
+  if ( direction_changes > 2 )
+    return angle_sign ? 1 : 2;
+  
+  if ( angle_sign > 0 ) return 4;
+  if ( angle_sign < 0 ) return 5;
+  return 3;
+  
+}
+
+inline void x_ConvexGetPointDelta(double (*p_delta)[2], double (*p_previous_point)[2], double (*p_current_point)[2] , double cell_corners[], int *p_corner_to_read){
+  (*p_current_point)[0] = cell_corners[*p_corner_to_read * 2 + 0];		
+  (*p_current_point)[1] = cell_corners[*p_corner_to_read * 2 + 1];
+  *p_corner_to_read = *p_corner_to_read + 1;
+  (*p_delta)[0] = (*p_current_point)[0] - (*p_previous_point)[0];			
+  (*p_delta)[1] = (*p_current_point)[1] - (*p_previous_point)[1];			 
+}
+
+inline int x_ConvexCompare(double (*p_delta)[2]){
+  if((*p_delta)[0] > 0){
+    return -1;
+  } else { 
+    if((*p_delta)[0] < 0){
+      return 1;
+    } else {
+      if((*p_delta)[1] > 0){ 
+	return -1;
+      } else {
+	if((*p_delta)[1] < 0){
+	  return 1;
+	} else {
+	  return 0;
+	}	
+      }
+    }
+  }
+}
+
+inline int x_ConvexCheckTriple(int * p_current_direction, int * p_this_direction, int * p_direction_changes, double current_delta[2], double (*p_previous_delta)[2], int * p_angle_sign, double (*p_second_corner)[2], double (*p_third_corner)[2]){
+  if ( (*p_this_direction = ConvexCompare(current_delta)) == -(*p_current_direction)) { 
+    (*p_direction_changes) = (*p_direction_changes) + 1;						
+    if (*p_direction_changes > 2 ) return 1;				
+  }									
+  *p_current_direction = *p_this_direction;					
+  int cross_product = ConvexCross((*p_previous_delta), current_delta);		
+  if ( cross_product > 0 ){ 
+    if ( *p_angle_sign == -1 ) return 1;	
+    *p_angle_sign = 1;							
+  }									
+  else if (cross_product < 0){ 
+    if (*p_angle_sign == 1) return 1;	
+    *p_angle_sign = -1;							
+  }									
+  p_second_corner = p_third_corner;		
+  (*p_previous_delta)[0] = current_delta[0];		
+  (*p_previous_delta)[1] = current_delta[1];	
+}
+
+
+static int x_classify_polygon(int number_corners, double cell_corners[]){
+ 
+  int current_direction, this_direction, direction_changes = 0, angle_sign = 0, corner_to_read;
+
+  double second_corner[2], third_corner[2], first_corner[2], save_second_corner[2];
+  double (*p_second_corner)[2], (*p_third_corner)[2], (*p_first_corner)[2], (*p_save_second_corner)[2];
+
+  p_second_corner = &second_corner;
+  p_third_corner = &third_corner;
+  p_first_corner = &first_corner;
+  p_save_second_corner = &save_second_corner;
+ 
+  double previous_delta[2], current_delta[2], cross_product;
+
+  /* Get different point, return if less than 3 different points. */
+    
+  if (number_corners < 3){ 
+    return 3;
+  }
+  
+  corner_to_read = 1;
+  
+  (*p_first_corner)[0] = cell_corners[0];
+  (*p_first_corner)[1] = cell_corners[1];
+
+
+  while(1){
+    
+    x_ConvexGetPointDelta(&previous_delta, p_first_corner, p_second_corner, cell_corners, &corner_to_read);
+    
+    if (previous_delta[0] || previous_delta[1]){
+      break;
+    }
+
+    /* Check if there are any corners left. */
+    
+    if (corner_to_read >= number_corners){
+      return 3;
+    }
+  }
+
+  p_save_second_corner = p_second_corner;
+  
+  current_direction = ConvexCompare(&previous_delta);	/* Find initial direction */
+
+  while (corner_to_read < number_corners) {
+    /* Get different point, break if no more points */
+    x_ConvexGetPointDelta(&current_delta, p_second_corner, p_third_corner, cell_corners, &corner_to_read);
+
+    if ( current_delta[0] == 0.0  && current_delta[1] == 0.0 ) continue;
+    
+    x_ConvexCheckTriple(&current_direction, &this_direction, &direction_changes, current_delta, &previous_delta, &angle_sign, p_second_corner, p_third_corner);
+  }
+
+  /* Must check for direction changes from last vertex back to first */
+  (*p_third_corner)[0] = cell_corners[0];
+  (*p_third_corner)[1] = cell_corners[1];
+  
+  /* Prepare for 'ConvexCheckTriple' */
+  current_delta[0] = (*p_third_corner)[0] - (*p_second_corner)[0];
+  current_delta[1] = (*p_third_corner)[1] - (*p_second_corner)[1];
+  if (x_ConvexCompare(&current_delta)){
+    x_ConvexCheckTriple(&current_direction, &this_direction, &direction_changes, current_delta, &previous_delta, &angle_sign, p_second_corner, p_third_corner);
+  }
+  
+  /* and check for direction changes back to second vertex */
+  current_delta[0] = (*p_save_second_corner)[0] - (*p_second_corner)[0];
+  current_delta[1] = (*p_save_second_corner)[1] - (*p_second_corner)[1];
+  x_ConvexCheckTriple(&current_direction, &this_direction, &direction_changes, current_delta, &previous_delta, &angle_sign, p_second_corner, p_third_corner);
+  
+  /* Decide on polygon type given accumulated status */
+  if (direction_changes > 2)
+    return angle_sign ? 1 : 2;
+  
+  if (angle_sign > 0) return 4;
+  if (angle_sign < 0) return 5;
+  return 3;
+  
+}
+
 
 struct axis {
   double axis_vector[3];
@@ -1320,12 +1569,13 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   
   double center_point_in_Euclidean_space[3];
   double cell_corners_in_Euclidean_space_open_cell[ncorner * 3];
-  double cell_corners_in_Euclidean_space[(ncorner + 1) * 3];
-  double corners_of_the_final_cell[ncorner * 3];
+ 
+ 
   double cell_corner_coordinates[3];
   double center_point_on_cell_plane[2];
   double cell_corners_on_cell_plane[(ncorner + 1)  * 2];
   double no_cells_with_a_specific_no_of_corners[ncorner + 1];
+  double surface_normal_of_the_cell[3];
   
 
   int cell_no;
@@ -1334,44 +1584,34 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   int axes_pointing_inward = 0;
   int no_of_cells_with_duplicates = 0;
   int vector_component;
+  int no_cells_with_classification_no[5];
 
   int no_of_cells_with_vertices_arranged_in_clockwise_order = 0;
   int no_of_cells_with_vertices_arranged_in_counterclockwise_order = 0;
   int no_of_convex_cells = 0;
   int no_of_degenerate_cells = 0;
   int no_of_cells_with_center_points_within_their_bounds = 0;
+  int coordinate_to_ignore;
+  double abs_x, abs_y, abs_z;
 
 
   /* 
      Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of Cartesian coordinates in Euclidean space. 
      This is first done for the presumed center point of the cell and then for all the corners of the cell. LLtoXYZ is defined in clipping/geometry.h 
   */
-
-  
-  /* The values for the corners of the final cell are retrieved for comparison within the loop. */
-
-
-  for (corner_no = 0; corner_no < ncorner; corner_no++){
-    LLtoXYZ(grid_corner_lon[(gridsize - 1) * ncorner + corner_no], grid_corner_lat[(gridsize - 1) * ncorner + corner_no], cell_corner_coordinates);
-    
-    corners_of_the_final_cell[corner_no * 3 + 0] = cell_corner_coordinates[0];
-    corners_of_the_final_cell[corner_no * 3 + 1] = cell_corner_coordinates[1];
-    corners_of_the_final_cell[corner_no * 3 + 2] = cell_corner_coordinates[2];
-  }
   
 
   for (cell_no = 0; cell_no < gridsize; cell_no++)
     {
       printf("\n\n");
       printf("Cell Number %d:\n\n", cell_no + 1);
-      printf("Euclidean coordinates are:\n\n");
+      printf("Euclidean coordinates of the still open cell are:\n\n");
       
       LLtoXYZ(grid_center_lon[cell_no], grid_center_lat[cell_no], center_point_in_Euclidean_space);
       
       for (corner_no = 0; corner_no < ncorner; corner_no++)
 	{
 	  LLtoXYZ(grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no], cell_corner_coordinates);
-	 
 	  /* The components of the result vector are appended to the list of cell corner coordinates. */
 	  
 	  for (vector_component = 0; vector_component < 3; vector_component++){	    
@@ -1389,11 +1629,12 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
       
       int actual_number_of_corners = ncorner;
       
-      
-      for (corner_no = ncorner - 1; corner_no >= 0; corner_no--){
-	if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 0] == corners_of_the_final_cell[corner_no * 3 + 0]){
-	  if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 1] == corners_of_the_final_cell[corner_no * 3 + 1]){
-	    if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 2] == corners_of_the_final_cell[corner_no * 3 + 2]){
+      /* We are ensuring the last cell is not compared to itself.*/
+
+      for (corner_no = ncorner - 1; corner_no > 0; corner_no--){
+	if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 0] == cell_corners_in_Euclidean_space_open_cell[(corner_no - 1) * 3 + 0]){
+	  if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 1] == cell_corners_in_Euclidean_space_open_cell[(corner_no - 1) * 3 + 1]){
+	    if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 2] == cell_corners_in_Euclidean_space_open_cell[(corner_no - 1) * 3 + 2]){
 	      actual_number_of_corners = actual_number_of_corners - 1;
 	    }
 	  }
@@ -1402,8 +1643,17 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 	}	
       }            
       
-      no_cells_with_a_specific_no_of_corners[actual_number_of_corners] = no_cells_with_a_specific_no_of_corners[actual_number_of_corners] + 1;
       
+      printf("The actual number of corners is: %u\n\n", actual_number_of_corners);
+
+      no_cells_with_a_specific_no_of_corners[actual_number_of_corners] += 1;
+      
+      /* If there are less than three corners in the cell, it is unusable and considered degenerate. No area can be computed. */
+      
+      if (actual_number_of_corners < 3){
+	printf("Less than three corners found. Skipping!\n\n");
+	continue;
+      }
       
       /* Checks if there are any duplicate vertices in the list of corners. */
       
@@ -1411,9 +1661,13 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 
       if (no_of_duplicates_in_this_list_of_vertices(cell_corners_in_Euclidean_space_open_cell, actual_number_of_corners * 3) > 0){
 	no_of_cells_with_duplicates += 1;
+	printf("Duplicate corner found. Skipping!\n\n");
+	continue;
       }
 
       /* We are creating a closed polygon/cell by setting the additional last corner to be the same as the first one. */
+
+      double cell_corners_in_Euclidean_space[(actual_number_of_corners + 1) * 3];
 
       for (corner_no = 0; corner_no < actual_number_of_corners; corner_no++){
 	cell_corners_in_Euclidean_space[corner_no * 3 + 0] = cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 0];
@@ -1421,98 +1675,136 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 	cell_corners_in_Euclidean_space[corner_no * 3 + 2] = cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 2];
       }
 
-      cell_corners_in_Euclidean_space[(ncorner * 3) + 0] = cell_corners_in_Euclidean_space[0];
-      cell_corners_in_Euclidean_space[(ncorner * 3) + 1] = cell_corners_in_Euclidean_space[1];
-      cell_corners_in_Euclidean_space[(ncorner * 3) + 2] = cell_corners_in_Euclidean_space[2];
+      cell_corners_in_Euclidean_space[actual_number_of_corners * 3 + 0] = cell_corners_in_Euclidean_space[0];
+      cell_corners_in_Euclidean_space[actual_number_of_corners * 3 + 1] = cell_corners_in_Euclidean_space[1];
+      cell_corners_in_Euclidean_space[actual_number_of_corners * 3 + 2] = cell_corners_in_Euclidean_space[2];
 
-      /* The area of this cell is calculated. */
-            
-      double cell_area = inefficiently_calculate_the_area_of_a_polygon_in_Euclidean_space(ncorner, cell_corners_in_Euclidean_space);
-
-      printf("The cell area is: %f\n\n", cell_area);
+      /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
       
-      /* Checking whether the cell has a size greater zero. */
-
-      if (cell_area == 0){
-	printf("This cell is degenerate. Its area equals zero. The cell corners are colinear.\n\n");
-	no_of_degenerate_cells += 1;	
-	continue;	 
-      }
+      double vertex_one[3] = {cell_corners_in_Euclidean_space[0],
+			      cell_corners_in_Euclidean_space[1],
+			      cell_corners_in_Euclidean_space[2]};
       
-      /* Checking whether the cell corners/polygon vertices are arranged in a clockwise or counterclockwise order. This is done by looking at the sign of the cell area. */
-
-      if (are_polygon_vertices_arranged_in_clockwise_order(cell_area) == 1){
-	printf("The cell's corners are arranged in clockwise order.\n\n");
-	no_of_cells_with_vertices_arranged_in_clockwise_order += 1;
+      double vertex_two[3] = {cell_corners_in_Euclidean_space[3 + 0],
+			      cell_corners_in_Euclidean_space[3 + 1],
+			      cell_corners_in_Euclidean_space[3 + 2]};
+      
+      double vertex_three[3] = {cell_corners_in_Euclidean_space[6 + 0],
+				cell_corners_in_Euclidean_space[6 + 1],
+				cell_corners_in_Euclidean_space[6 + 2]};
+      
+      
+      find_unit_normal(vertex_one, vertex_two, vertex_three, surface_normal_of_the_cell);
+      
+      /* The surface normal is used to choose the coordinate to ignore. */
+      
+      if (surface_normal_of_the_cell[0] > 0){
+	abs_x = surface_normal_of_the_cell[0];
       } else {
-	printf("The cell's corners are arranged in counterclockwise order.\n\n");
-	no_of_cells_with_vertices_arranged_in_counterclockwise_order += 1;
+	abs_x = surface_normal_of_the_cell[0] * (-1);
       }
       
-      continue;
+      if (surface_normal_of_the_cell[1] > 0){
+	abs_y = surface_normal_of_the_cell[1];
+      } else {
+	abs_y = surface_normal_of_the_cell[1] * (-1);
+      }
+      
+      if (surface_normal_of_the_cell[2] > 0){
+	abs_z = surface_normal_of_the_cell[2];
+      } else {
+	abs_z = surface_normal_of_the_cell[2] * (-1);
+      }
+      
+      coordinate_to_ignore = 3;
+      
+      if (abs_x > abs_y){
+	if (abs_x > abs_z){
+      coordinate_to_ignore = 1;
+	}
+      } else {
+	if (abs_y > abs_z){
+	  coordinate_to_ignore = 2;
+	}
+      }
 
-      /*
-	Each cell corresponds to a two-dimensional polygon now in unknown orientation in three-dimensional space. Each cell and its center point are coplanar. THIS IS A GIVEN !!!
-	In order to solve the two-dimensional point-in-polygon problem for each cell, the three-dimensional coordinates of the polygon and its center point are projected onto the two-dimensional plane they form.
-        
-	This is done in the following steps:
+      /* The remaining two-dimensional coordinates are written into an array. */
 
-	1) Compute two vectors that lie on the cell plane. The first three corners of the cell are used to do this. THIS MEANS THAT AT LEAST THREE CORNERS MUST BE GIVEN.
-	   Then compute the normal of the cell plane the two vectors are on. The normal is the new z-axis.
-	2) Compute the new y-axis by computing the cross product of the new z-axis and the old x-axis.
-	3) Compute the new x-axis by computing the cross product of the new z-axis and the new y-axis.
-	4) Project every corner point onto the new x- and y-axes by using the dot product.
+      printf("Coordinate to ignore is: %u\n\n",coordinate_to_ignore);
 
-	The result is a xy tuple for each corner and the presumend center point which is a projection onto the plane the xyz corner points form.
+      double cell_corners_plane_projection[(actual_number_of_corners +1) * 2];
+
+      switch(coordinate_to_ignore){
+      case 1:
+	for(int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++){
+	  cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_in_Euclidean_space[corner_no * 3 + 1];
+	  cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_in_Euclidean_space[corner_no * 3 + 2];
+	}		
+	break;
+      case 2:
+	for(int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++){
+	  cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_in_Euclidean_space[corner_no * 3 + 0];
+	  cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_in_Euclidean_space[corner_no * 3 + 2];
+	}
+	break;
+      case 3:
+	for(int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++){
+	  cell_corners_plane_projection[corner_no * 2 + 0] = cell_corners_in_Euclidean_space[corner_no * 3 + 0];
+	  cell_corners_plane_projection[corner_no * 2 + 1] = cell_corners_in_Euclidean_space[corner_no * 3 + 1];
+	}
+	break;
+      }
+
+      printf("Cell coordinates of the closed cell in 2D are:\n\n");
+
+      for(int corner_no = 0; corner_no <= actual_number_of_corners; corner_no++){
+	printf("(%f, %f)\n", cell_corners_plane_projection[corner_no * 2 + 0], cell_corners_plane_projection[corner_no * 2 + 1]);
+      }
+      
+    
+      /* 
+	 Determining the class of a polygon cell.
+	 The following polygon classifications are possible:
+	 
+	 NotConvex = 1 
+	 NotConvexDegenerate = 2
+	 ConvexDegenerate = 3
+	 ConvexCCW = 4
+	 ConvexCW = 5	 
+      
       */
 
-      
-      struct axis new_z_axis = compute_the_new_z_axis(cell_corners_in_Euclidean_space);
+      int cell_class = 0;
+     
 
-      /* Regardless of whether the vertices are arranged in clockwise or counterclockwise order, the z-axis is to point inward. */
+      cell_class = x_classify_polygon(actual_number_of_corners, cell_corners_plane_projection);
       
-      double vector_pointing_from_origin_to_first_cell_vertex[3] = {cell_corners_in_Euclidean_space[0], cell_corners_in_Euclidean_space[1], cell_corners_in_Euclidean_space[2]};
-      
-      int axis_points_inward = 0;
-      
-      if (sign(dotproduct(new_z_axis.axis_vector, vector_pointing_from_origin_to_first_cell_vertex)) < 0){
-	axis_points_inward = 1;
-	axes_pointing_inward += 1;
-      }
-      
-      if (axis_points_inward == 0){
-	new_z_axis.axis_vector[0] = new_z_axis.axis_vector[0] * (-1);
-	new_z_axis.axis_vector[1] = new_z_axis.axis_vector[1] * (-1);
-	new_z_axis.axis_vector[2] = new_z_axis.axis_vector[2] * (-1);
-      }
+      no_cells_with_classification_no[cell_class] += 1;
 
-      struct axis new_y_axis = compute_the_new_y_axis(new_z_axis);      
-      struct axis new_x_axis = compute_the_new_x_axis(new_z_axis, new_y_axis);
+      printf("\nPolygon class: %u\n", cell_class);
+     
       
-      int ortho_zy = dotproduct(new_z_axis.axis_vector, new_y_axis.axis_vector);
-      int ortho_yx = dotproduct(new_y_axis.axis_vector, new_x_axis.axis_vector);
-      int ortho_zx = dotproduct(new_z_axis.axis_vector, new_x_axis.axis_vector);
+      if (cell_class == 1) printf("Not Convex.\n\n");
+      if (cell_class == 2) printf("Not Convex Degenerate.\n\n");
+      if (cell_class == 3) printf("Convex Degenerate.\n\n");
+      if (cell_class == 4) printf("Convex Counterclockwise.\n\n");
+      if (cell_class == 5) printf("Convex Clockwise.\n\n");
+      
+     
+      
+      printf("Cell classification resulted in: %d\n\n", cell_class);
+      
+      
+   
 
-      if ((ortho_zy + ortho_yx + ortho_zx) == 0){
-	orthogonal_axes = orthogonal_axes + 1;
-      } 
-      
-      transform_Euclidean_corner_coordinates_onto_the_cell_plane(new_x_axis, new_y_axis, new_z_axis, &cell_corners_in_Euclidean_space, &cell_corners_on_cell_plane, ncorner);
-      transform_Euclidean_center_coordinates_onto_the_cell_plane(new_x_axis, new_y_axis, new_z_axis, &center_point_in_Euclidean_space, &center_point_on_cell_plane);
 
-      
+
+
+      continue;
+
+
+
   
-      /* Convexity of the cell is tested. */
-
-      printf("Checking if the cell is convex ... ");
-
-      if (is_simple_polygon_convex(cell_corners_on_cell_plane, ncorner) == 1){
-	printf("cell is convex!\n\n");
-	no_of_convex_cells += 1;
-      } else {
-	printf("cell is not convex!\n\n");
-	no_of_degenerate_cells += 1;
-      }
     
       /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
         
@@ -1531,15 +1823,18 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 
   printf("\n\n");
 
-  printf("The corners of the final cell are:\n\n");
-  for (corner_no = 0; corner_no < ncorner; corner_no++){
-    printf("(%f, %f, %f)\n", corners_of_the_final_cell[corner_no * 3 + 0], corners_of_the_final_cell[corner_no * 3 + 1], corners_of_the_final_cell[corner_no * 3 + 2]);
-  }
-
   printf("\nNumber of cells with a certain number of corners:\n\n");
 
   for(int i = 0; i < ncorner + 1; i++){
     printf("%d corners in %f cells.\n", i, no_cells_with_a_specific_no_of_corners[i]);
+  }
+
+  printf("\n\n");
+
+  printf("\nNumber of cells with a certain cell classification:\n\n");
+
+  for(int i = 0; i < 5 + 1; i++){
+    printf("Classification number %u in %u cells.\n", i, no_cells_with_classification_no[i]);
   }
   
 
@@ -1548,12 +1843,16 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   printf("There are %u cells in all.\n\n", gridsize );
   
   printf("Number of cells with duplicate vertices: %u\n", no_of_cells_with_duplicates);
+
+  /*
   printf("Number of cells with clockwise ordering of vertices: %u\n", no_of_cells_with_vertices_arranged_in_clockwise_order);
   printf("Number of cells with counterclockwise ordering of vertices: %u\n", no_of_cells_with_vertices_arranged_in_counterclockwise_order);
   printf("Number of convex cells: %u\n", no_of_convex_cells);
   printf("Number of nonsimple or degenerate cells: %u\n", no_of_degenerate_cells);
   printf("Number of cells with presumed center points within their bounds: %u\n\n", no_of_cells_with_center_points_within_their_bounds);
+  */
 
+  
 }
 
 void *Verifygrid(void *argument)

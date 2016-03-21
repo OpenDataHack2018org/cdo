@@ -134,6 +134,7 @@ Operator catalog:
    Settime       setyear         Set year
    Settime       settunits       Set time units
    Settime       settaxis        Set time axis
+   Settime       settbounds      Set time bounds
    Settime       setreftime      Set reference time
    Settime       setcalendar     Set calendar
    Settime       shifttime       Shift timesteps

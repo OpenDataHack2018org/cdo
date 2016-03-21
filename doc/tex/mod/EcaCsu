@@ -11,7 +11,7 @@
 Let @file{ifile} be a time series of the daily maximum temperature TX, then the largest number of consecutive
 days where TX > @math{T} is counted. The number T is an optional parameter with default @math{T} = 25@celsius.
 Note that TN have to be given in units of Kelvin, whereas @math{T} have to be given in degrees Celsius.
-A further output variable is the number of summer periods of more than 5 days.
+A further output variable is the number of summer periods of more than @math{N} days.
 The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
@@ -19,13 +19,15 @@ The date information of a timestep in @file{ofile} is the date of the last contr
 
 @BeginOperator_eca_csu
 @Title     = Consecutive summer days index per time period
-@Parameter = [T]
+@Parameter = [T] [N]
 @EndOperator
 
 
 @BeginParameter
 @Item = T
-FLOAT   Temperature threshold (unit: @celsius; default: T = 25@celsius)
+FLOAT    Temperature threshold (unit: @celsius; default: T = 25@celsius)
+@Item = N
+INTEGER  Minimum number of days exceeded (default: N = 5)
 @EndParameter
 
 
