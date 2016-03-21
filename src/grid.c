@@ -1291,7 +1291,6 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   double *xbounds = (double*) Malloc(nvertex*selectionSize*sizeof(double));
   double *ybounds = (double*) Malloc(nvertex*selectionSize*sizeof(double));
 
-  cdoPrint("nvertex = %d",nvertex);
   for (int i = 0; i < selectionSize; i++)
   {
     xvals[i] = xvalsUnstructured[selectionIndexList[i]];

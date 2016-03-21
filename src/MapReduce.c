@@ -40,11 +40,10 @@ void read_first_record(char *filename, int gridSize, double *field)
 {
   int nmiss,varID,levelID;
   int streamID = streamOpenRead(filename);
-  int nrecs = streamInqTimestep(streamID,0);
+  streamInqTimestep(streamID,0);
   streamInqRecord(streamID,&varID,&levelID);
   streamReadRecord(streamID, field, &nmiss);
   streamClose(streamID);
-  nrecs = nrecs;
 }
 
 #include "pstream.h"
@@ -84,7 +83,7 @@ void *MapReduce(void *argument)
   int inputGridID   = cdoDefineGrid(operatorArgv()[0]);
   int inputGridSize = gridInqSize(inputGridID);
   int inputGridType = gridInqType(inputGridID);
-  if ( cdoVerbose ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
+  if ( cdoDebug ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
 
   /* creata an index list of the relevant locations  {{{ */
   tsID = 0;
@@ -93,7 +92,7 @@ void *MapReduce(void *argument)
 
   /* non-zero values mark the relevant points */
   int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
-  cdoPrint("MapReduce: maskSize = %d",maskSize);
+  if ( cdoDebug ) cdoPrint("MapReduce: maskSize = %d",maskSize);
 
   int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
   for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;
