@@ -50,8 +50,7 @@ void read_first_record(char *filename, int gridSize, double *field)
 #include "pstream.h"
 
 /*
- * count the number of locations, for which the mask is TRUE, i.e. has a
- * non-zero value
+ * count the number of locations, for which the mask is TRUE
  * */
 int countMask(double *maskField, int gridSize, double falseVal)
 {
@@ -80,50 +79,48 @@ void *MapReduce(void *argument)
 
   cdoInitialize(argument);
 
-
-  /* check input grid type and size */
-  int inputGridID = cdoDefineGrid(operatorArgv()[0]);
+  /* check input grid type and size - this will be used for selecting relevant
+   * variables from the input file*/
+  int inputGridID   = cdoDefineGrid(operatorArgv()[0]);
   int inputGridSize = gridInqSize(inputGridID);
-  if ( cdoVerbose ) cdoPrint("input gridSize:%d", inputGridSize);
+  int inputGridType = gridInqType(inputGridID);
+  if ( cdoVerbose ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
 
-  /* search the number of relevant locations */
-  tsID = 0; nrecs = 0;
+  /* creata an index list of the relevant locations  {{{ */
+  tsID = 0;
   double *inputMaskField = (double*) Malloc(inputGridSize*sizeof(double));
   read_first_record(operatorArgv()[0],inputGridSize, inputMaskField);
-  /* count points {{{*/
-  int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
-  cdoPrint("maskSize = %d",maskSize); /* }}} */
 
-  /* collect the original coordinates */
+  /* non-zero values mark the relevant points */
+  int maskSize = countMask(inputMaskField, inputGridSize, 0.0);
+  cdoPrint("MapReduce: maskSize = %d",maskSize);
+
   int *maskIndexList = (int *) Malloc(maskSize*sizeof(int));
   for (int m = 0; m < maskSize; m++) maskIndexList[m] = -1;
 
-  /* create an index list of relevant points {{{ */
   int k = 0;
   for (int i = 0; i < inputGridSize; i++)
   {
     if (!DBL_IS_EQUAL(inputMaskField[i],0.0))
     {
-      if (cdoDebug) printf("found at:%d -",i);
       maskIndexList[k] = i;
       k += 1;
     }
   }
+  /* }}} */
 
+  /* create unstructured output grid including bounds*/
+  int outputGridID = gridToUnstructuredSelecton(inputGridID, maskSize, maskIndexList);
 
-  /* create unstructured output grid */
-  int outputGridID = gridToUnstructuredSelecton(inputGridID,TRUE, maskSize, maskIndexList);
-
-  int inputGridType = gridInqType(inputGridID);
-
-  /* copy time axis */
+  /* create output vlist: Only variabes which have the same gridtype and
+   * gridsize as the input mask should be proessed. Everything else is ignoreds
+   * {{{ */
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int vlistID1  = streamInqVlist(streamID1);
-  int nvars = vlistNvars(vlistID1);
-  int *vars = (int*) Malloc(nvars*sizeof(int));
+  int nvars     = vlistNvars(vlistID1);
+  int *vars     = (int*) Malloc(nvars*sizeof(int));
 
-  int taxisID1  = vlistInqTaxis(vlistID1);
-
+  /* use vlist flags for marking the corresponding variables */
   vlistClearFlag(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
   {
@@ -143,20 +140,23 @@ void *MapReduce(void *argument)
   }
   int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
+  /* }}} */
 
+  int taxisID1  = vlistInqTaxis(vlistID1);
   int taxisID2  = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-
-  /* copy the mask to target grid */
+  /* use the new selection grid for all output variables */
   int ngrids = vlistNgrids(vlistID2);
   for ( int index = 0; index < ngrids; index++ ) vlistChangeGridIndex(vlistID2, index, outputGridID);
 
+  /* loop over input fields and mask the data values {{{ */
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   streamDefVlist(streamID2, vlistID2);
-  /* loop over all data fields */
-  double *arrayIn = (double *)Malloc(inputGridSize*sizeof(double));
+
+  double *arrayIn  = (double *)Malloc(inputGridSize*sizeof(double));
   double *arrayOut = (double *)Malloc(maskSize*sizeof(double));
+
   tsID = 0; 
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
   {
@@ -171,9 +171,7 @@ void *MapReduce(void *argument)
         int varID2   = vlistFindVar(vlistID2, varID);
         int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-        cdoPrint("aaaaaa");
         streamReadRecord(streamID1, arrayIn, &nmiss);
-        cdoPrint("bbbbbb");
 
         for (int i = 0; i < maskSize;  i++)
           arrayOut[i] = arrayIn[maskIndexList[i]];
@@ -184,9 +182,9 @@ void *MapReduce(void *argument)
 
       }
     }
-
     tsID++;
   }
+  /* }}} */
 
 
   streamClose(streamID2);
