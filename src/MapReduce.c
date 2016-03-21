@@ -32,40 +32,27 @@
 #include "cdo_int.h"
 #include "grid.h"
 
+/* read only the first data variable from input filename into a given double
+ * pointer */
+/* DON'T MOVE IT! is necessary to have the pstream.h file included AFTER this
+ * function definition */
 void read_first_record(char *filename, int gridSize, double *field)
 {
   int nmiss,varID,levelID;
-  double *missval1, *missval2;
   int streamID = streamOpenRead(filename);
   int nrecs = streamInqTimestep(streamID,0);
   streamInqRecord(streamID,&varID,&levelID);
   streamReadRecord(streamID, field, &nmiss);
-  /*  minmaxval(gridSize, field, NULL,&missval1, &missval2);
-      cdoPrint("min: %g | max: %g ",missval1, missval2);
-      */
-  /*for (int l = 0; l < maskSize; l++) cdoPrint("maskIndexList[%d] = %d",l,maskIndexList[l]);
-  */
   streamClose(streamID);
-  /* }}} */
-  }
+  nrecs = nrecs;
+}
 
 #include "pstream.h"
 
-int matrix2vector(int i, int j, int Ni, int Nj)
-{
-  return i*Nj + j;
-}
-int *vector2matrix(int k, int Ni, int Nj)
-{
-  int *retval;
-  retval = (int *) malloc(2*sizeof(int));
-
-  retval[0] = k/Nj; retval[1] = k%Nj;
-  return retval;
-}
-
-/* count the number of locations, for which the mask is TRUE, i.e. has a
- * non-zero value */
+/*
+ * count the number of locations, for which the mask is TRUE, i.e. has a
+ * non-zero value
+ * */
 int countMask(double *maskField, int gridSize, double falseVal)
 {
   int counter;
@@ -79,41 +66,17 @@ int countMask(double *maskField, int gridSize, double falseVal)
   return counter;
 }
 
-/*
- * collect the indices of relevant location out of the given mask
- */
-void collectLocations(double *maskField, int gridSize, double falseVal, int *maskIndexList)
-{
-  int k = 0;
-  for (int i = 0; i < gridSize; i++)
-  {
-    if (!DBL_IS_EQUAL(maskField[i],falseVal))
-    {
-      printf("found at:%d -",i);
-      k += 1;
-    }
-  }
-  printf(" k =%d ",k);
-}
-
-/*
+/* 
  * the operators argument has to be a single horizontal field,
  * non-zero values are used to mark the relevant locations
  */
 void *MapReduce(void *argument)
 {
-  int gridsize;
   int nrecs;
   int tsID;
   int varID, levelID, recID;
-  int i;
-  int nts;
-  int nalloc = 0;
   int nmiss;
-  int nlevel;
-  int datatype = DATATYPE_INT16;
-  dtlist_type *dtlist = dtlist_new();
-  double missval1, missval2;
+  /*double missval1, missval2; */
 
   cdoInitialize(argument);
 
