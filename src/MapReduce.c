@@ -190,6 +190,9 @@ void *MapReduce(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
+  Free(vars);
+  Free(arrayOut);
+  Free(arrayIn);
   Free(inputMaskField);
   Free(maskIndexList);
 
@@ -197,3 +200,12 @@ void *MapReduce(void *argument)
 
   return 0;
 }
+/*
+ * Local Variables:
+ * c-file-style: "Java"
+ * c-basic-offset: 2
+ * indent-tabs-mode: nil
+ * show-trailing-whitespace: t
+ * require-trailing-newline: t
+ * End:
+ */
