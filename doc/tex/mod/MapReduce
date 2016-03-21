@@ -1,31 +1,29 @@
 @BeginModule
 @NewPage
 @Name      = MapReduce
-@Title     = Reduce grid to user-definde mask - unpack to target grid
+@Title     = Reduce fields to user-defined mask
 @Section   = Conditional selection
 @Class     = Conditional
 @Arguments = ifile ofile
-@Operators = reduce unreduce
+@Operators = reduce
 
 @BeginDescription
-This module contains operators for data reduction based on a user defined mask.
+This module holds an operator for data reduction based on a user defined mask.
+The output grid is unstructured and includes coordinate bounds.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_reduce
 @Name      = reduce
-@Title     = Reduce input file variables for locations, where mask is non-zero.
+@Title     = Reduce input file variables to locations, where mask is non-zero.
              Horizontal grids of @file{mask} and @file{ifile} must be identical
 @Parameter = mask
 
-@BeginDescription
-Performs a transformation to an unstructured grid including coordinate bounds
-@EndDescription
 @EndOperator
 @BeginParameter
 @Item = mask
-STRING  Target mask
+STRING  file which holds the mask field
 @EndParameter
 
 @BeginExample

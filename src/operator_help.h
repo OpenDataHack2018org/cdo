@@ -740,23 +740,17 @@ static const char *CondcHelp[] = {
 
 static const char *MapReduceHelp[] = {
     "NAME",
-    "    reduce, unreduce - Reduce grid to user-definde mask - unpack to target grid",
+    "    reduce - Reduce fields to user-defined mask",
     "",
     "SYNOPSIS",
     "    reduce,mask  ifile ofile",
-    "    unreduce,grid  ifile ofile",
     "",
     "DESCRIPTION",
-    "    This module contains operators for data reduction based on a user defined mask.",
-    "",
-    "OPERATORS",
-    "    reduce    Reduce input file variables for locations, where mask is non-zero.",
-    "              Performs a transformation to an unstructured grid including coordinate bounds",
-    "    unreduce  Unpack input fields to given grid description",
-    "              Blowup the input fields towards given grid without changing the values",
+    "    This module holds an operator for data reduction based on a user defined mask.",
+    "    The output grid is unstructured and includes coordinate bounds.",
     "",
     "PARAMETER",
-    "    mask  STRING  Target mask",
+    "    mask  STRING  file which holds the mask field",
     NULL
 };
 
