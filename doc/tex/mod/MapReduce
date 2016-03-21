@@ -27,13 +27,16 @@ STRING  file which holds the mask field
 @EndParameter
 
 @BeginExample
-Say @file{ifile} contains fields on a quadrilateral curvilinear grid and
-@file{maskfile} holds a single field with zero-to-one mask onthe same
-horizontal grid. To limit all data fields from @file{ifile} to the location
-where the mask has a value of 1, call
+To limit data fields to land values, a mask has to be created first with
 @BeginVerbatim
-   cdo reduce,mask ifile ofile
+   cdo -gtc,0 -topo,ni96 lsm_gme96.grb
 @EndVerbatim
+Here a GME grid is used. Say @file{temp_gme96.grb} contains a global temperture field.
+The following command limits the global grid to landpoints.
+@BeginVerbatim
+   cdo -f nc reduce,lsm_gme96.grb temp_gme96.grb tempOnLand_gme96.nc
+@EndVerbatim
+Note that output file type is NetCDF, because unstructured grids cannot be stored in GRIB format.
 @EndExample
 
 
