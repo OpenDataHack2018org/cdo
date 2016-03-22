@@ -9,7 +9,8 @@
 
 @BeginDescription
 This module holds an operator for data reduction based on a user defined mask.
-The output grid is unstructured and includes coordinate bounds.
+The output grid is unstructured and includes coordinate bounds. Bounds can be
+avoided by using the additional 'nobounds' keyword.
 @EndDescription
 @EndModule
 
@@ -18,12 +19,14 @@ The output grid is unstructured and includes coordinate bounds.
 @Name      = reduce
 @Title     = Reduce input file variables to locations, where mask is non-zero.
              Horizontal grids of @file{mask} and @file{ifile} must be identical
-@Parameter = mask
+@Parameter = mask [nobounds]
 
 @EndOperator
 @BeginParameter
 @Item = mask
-STRING  file which holds the mask field
+STRING file which holds the mask field
+@Item = nobounds
+STRING if given, coordinated bounds are not written to output
 @EndParameter
 
 @BeginExample
