@@ -1233,7 +1233,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 }
 
 
-int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList)
+int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList, int nobounds)
 {
 
   /* transform input grid into a unstructured Version if necessary {{{ */
@@ -1272,24 +1272,17 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
 
   /* TODO: select bounds */
 
-  /* select relevant coordinate {{{ */
+  /* copy relevant coordinate {{{ */
   double *xvalsUnstructured = (double*) Malloc(unstructuredGridSize*sizeof(double));
   double *yvalsUnstructured = (double*) Malloc(unstructuredGridSize*sizeof(double));
   gridInqXvals(unstructuredGridID, xvalsUnstructured);
   gridInqYvals(unstructuredGridID, yvalsUnstructured);
-  int nvertex = gridInqNvertex(unstructuredGridID);
-  double *xboundsUnstructured = (double*) Malloc(nvertex*unstructuredGridSize*sizeof(double));
-  double *yboundsUnstructured = (double*) Malloc(nvertex*unstructuredGridSize*sizeof(double));
-  gridInqXbounds(unstructuredGridID, xboundsUnstructured);
-  gridInqYbounds(unstructuredGridID, yboundsUnstructured);
 
 
   gridDefXsize(unstructuredSelectionGridID, selectionSize);
   gridDefYsize(unstructuredSelectionGridID, selectionSize);
   double *xvals   = (double*) Malloc(selectionSize*sizeof(double));
   double *yvals   = (double*) Malloc(selectionSize*sizeof(double));
-  double *xbounds = (double*) Malloc(nvertex*selectionSize*sizeof(double));
-  double *ybounds = (double*) Malloc(nvertex*selectionSize*sizeof(double));
 
   for (int i = 0; i < selectionSize; i++)
   {
@@ -1299,27 +1292,44 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
     cdoPrint("xval[%d](%d) = %g",i,selectionIndexList[i],xvals[i]);
     cdoPrint("yval[%d](%d) = %g",i,selectionIndexList[i],yvals[i]);
     */
-
-    for (int k = 0; k < nvertex; k++)
-    {
-      xbounds[i*nvertex+k] = xboundsUnstructured[selectionIndexList[i]*nvertex+k];
-      ybounds[i*nvertex+k] = yboundsUnstructured[selectionIndexList[i]*nvertex+k];
-    }
   }
   gridDefXvals(unstructuredSelectionGridID,xvals);
   gridDefYvals(unstructuredSelectionGridID,yvals);
-  gridDefNvertex(unstructuredSelectionGridID,nvertex);
-  gridDefXbounds(unstructuredSelectionGridID,xbounds);
-  gridDefYbounds(unstructuredSelectionGridID,ybounds);
+  /* }}} */
+
+  /* copy bounds if requested {{{ */
+  if ( ! nobounds )
+  {
+    int nvertex                 = gridInqNvertex(unstructuredGridID);
+    double *xbounds             = (double*) Malloc(nvertex*selectionSize*sizeof(double));
+    double *ybounds             = (double*) Malloc(nvertex*selectionSize*sizeof(double));
+    double *xboundsUnstructured = (double*) Malloc(nvertex*unstructuredGridSize*sizeof(double));
+    double *yboundsUnstructured = (double*) Malloc(nvertex*unstructuredGridSize*sizeof(double));
+    gridInqXbounds(unstructuredGridID, xboundsUnstructured);
+    gridInqYbounds(unstructuredGridID, yboundsUnstructured);
+    for (int i = 0; i < selectionSize; i++)
+    {
+      for (int k = 0; k < nvertex; k++)
+      {
+        xbounds[i*nvertex+k] = xboundsUnstructured[selectionIndexList[i]*nvertex+k];
+        ybounds[i*nvertex+k] = yboundsUnstructured[selectionIndexList[i]*nvertex+k];
+      }
+    }
+    gridDefNvertex(unstructuredSelectionGridID,nvertex);
+    gridDefXbounds(unstructuredSelectionGridID,xbounds);
+    gridDefYbounds(unstructuredSelectionGridID,ybounds);
+
+    Free(xboundsUnstructured);
+    Free(yboundsUnstructured);
+    Free(xbounds);
+    Free(ybounds);
+  }
   /* }}} */
 
   Free(xvalsUnstructured);
   Free(yvalsUnstructured);
   Free(xvals);
   Free(yvals);
-  Free(xboundsUnstructured);
-  Free(yboundsUnstructured);
-  Free(xbounds);
 
   return (unstructuredSelectionGridID);
 }
