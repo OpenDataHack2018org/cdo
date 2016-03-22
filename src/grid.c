@@ -1317,6 +1317,9 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   Free(yvalsUnstructured);
   Free(xvals);
   Free(yvals);
+  Free(xboundsUnstructured);
+  Free(yboundsUnstructured);
+  Free(xbounds);
 
   return (unstructuredSelectionGridID);
 }
