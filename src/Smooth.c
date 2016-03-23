@@ -313,12 +313,12 @@ void *Smooth(void *argument)
 
   cdoInitialize(argument);
 
-  int SMOOTH  = cdoOperatorAdd("smooth",    0,   0, NULL);
-  int SMOOTH9 = cdoOperatorAdd("smooth9",   0,   0, NULL);
+  int SMOOTHP = cdoOperatorAdd("smoothpoint",  0,   0, NULL);
+  int SMOOTH9 = cdoOperatorAdd("smooth9",      0,   0, NULL);
  
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == SMOOTH )
+  if ( operatorID == SMOOTHP )
     {      
       int pargc = operatorArgc();
 
@@ -414,7 +414,7 @@ void *Smooth(void *argument)
 
               for ( int i = 0; i < xnsmooth; ++i )
                 {
-                  if ( operatorID == SMOOTH )
+                  if ( operatorID == SMOOTHP )
                     smooth(gridID, missval, array1, array2, &nmiss, xmax_points, xsearch_radius, xweight0, xweightInf);
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
