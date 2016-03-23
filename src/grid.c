@@ -1233,7 +1233,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 }
 
 
-int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList, int nobounds)
+int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList, int nocoords, int nobounds)
 {
 
   /* transform input grid into a unstructured Version if necessary {{{ */
@@ -1244,11 +1244,13 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   }
   else
   {
-    unstructuredGridID = gridToUnstructured(gridID1,TRUE);
+    unstructuredGridID = gridToUnstructured(gridID1,!nobounds);
   }
   int unstructuredGridSize = gridInqSize(unstructuredGridID);
 
   int unstructuredSelectionGridID = gridCreate(GRID_UNSTRUCTURED,selectionSize);
+
+  if ( nocoords ) return (unstructuredSelectionGridID);
   /* }}} */
 
   /* copy meta data of coordinates {{{*/
@@ -1333,6 +1335,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
 
   return (unstructuredSelectionGridID);
 }
+
 int gridToUnstructured(int gridID1, int lbounds)
 {
   int gridtype = gridInqType(gridID1);

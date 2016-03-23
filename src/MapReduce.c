@@ -75,6 +75,7 @@ void *MapReduce(void *argument)
   int varID, levelID, recID;
   int nmiss;
   int nobounds = FALSE;
+  int nocoords = FALSE;
   /*double missval1, missval2; */
 
   cdoInitialize(argument);
@@ -112,11 +113,12 @@ void *MapReduce(void *argument)
   /* check if coordinated bounds shound not be created */
   if ( 2 <= operatorArgc() )
   {
-    char *boundOrNoBounds = operatorArgv()[1];
-    if ( 0 == strncmp("nobounds",boundOrNoBounds,8) ) nobounds = TRUE;
+    char *coordinatesLimitation = operatorArgv()[1];
+    if ( 0 == strncmp("nobounds",coordinatesLimitation,8) ) nobounds = TRUE;
+    if ( 0 == strncmp("nocoords",coordinatesLimitation,8) ) nocoords = TRUE;
   }
   /* create unstructured output grid including bounds*/
-  int outputGridID = gridToUnstructuredSelecton(inputGridID, maskSize, maskIndexList, nobounds);
+  int outputGridID = gridToUnstructuredSelecton(inputGridID, maskSize, maskIndexList, nocoords, nobounds);
 
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds

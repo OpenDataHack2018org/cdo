@@ -19,7 +19,7 @@ avoided by using the additional 'nobounds' keyword.
 @Name      = reduce
 @Title     = Reduce input file variables to locations, where mask is non-zero.
              Horizontal grids of @file{mask} and @file{ifile} must be identical
-@Parameter = mask [nobounds]
+@Parameter = mask [nobounds|nocoords]
 
 @EndOperator
 @BeginParameter
@@ -27,6 +27,8 @@ avoided by using the additional 'nobounds' keyword.
 STRING file which holds the mask field
 @Item = nobounds
 STRING if given, coordinated bounds are not written to output
+@Item = nocoords
+STRING if given, coordinates and bounds are not written to output
 @EndParameter
 
 @BeginExample

@@ -743,7 +743,7 @@ static const char *MapReduceHelp[] = {
     "    reduce - Reduce fields to user-defined mask",
     "",
     "SYNOPSIS",
-    "    reduce,mask[,nobounds]  ifile ofile",
+    "    reduce,mask[,nobounds|nocoords]  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module holds an operator for data reduction based on a user defined mask.",
@@ -753,6 +753,7 @@ static const char *MapReduceHelp[] = {
     "PARAMETER",
     "    mask      STRING file which holds the mask field",
     "    nobounds  STRING if given, coordinated bounds are not written to output",
+    "    nocoords  STRING if given, coordinates and bounds are not written to output",
     NULL
 };
 
