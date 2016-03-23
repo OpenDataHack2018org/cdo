@@ -27,6 +27,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
+#include "pmlist.h"
 
 #include "grid_search.h"
 
@@ -306,11 +307,9 @@ void *Smooth(void *argument)
   int varID, levelID;
   int nmiss;
   int gridtype;
-  int nsmooth = 4;
-  int max_points = 5;
-  double search_radius = 120, weight0 = 0.25, weightInf = 0.25;
-
-  search_radius *= DEG2RAD;
+  int xnsmooth = 1;
+  int xmax_points = 5;
+  double xsearch_radius = 90, xweight0 = 0.25, xweightInf = 0.25;
 
   cdoInitialize(argument);
 
@@ -318,7 +317,47 @@ void *Smooth(void *argument)
   int SMOOTH9 = cdoOperatorAdd("smooth9",   0,   0, NULL);
  
   int operatorID = cdoOperatorID();
-  UNUSED(operatorID);
+
+  if ( operatorID == SMOOTH )
+    {      
+      int pargc = operatorArgc();
+
+      if ( pargc )
+        {
+          char **pargv = operatorArgv();
+          pml_t *pml = pml_create("SMOOTH");
+
+          PML_ADD_INT(pml, nsmooth,           1, "Number of smooth iterations");
+          PML_ADD_INT(pml, max_points,        1, "Maximum number of points");
+          PML_ADD_FLT(pml, search_radius,     1, "Search radius");
+          PML_ADD_FLT(pml, weight0,           1, "weight0");
+          PML_ADD_FLT(pml, weightInf,         1, "weightInf");
+      
+          pml_read(pml, pargc, pargv);
+          if ( cdoVerbose ) pml_print(pml);
+      
+          if ( PML_NOCC(pml, nsmooth) )       xnsmooth = par_nsmooth[0];
+          if ( PML_NOCC(pml, max_points) )    xmax_points = par_max_points[0];
+          if ( PML_NOCC(pml, search_radius) ) xsearch_radius = par_search_radius[0];
+          if ( PML_NOCC(pml, weight0) )       xweight0 = par_weight0[0];
+          if ( PML_NOCC(pml, weightInf) )     xweightInf = par_weightInf[0];
+
+          UNUSED(nsmooth);
+          UNUSED(max_points);
+          UNUSED(search_radius);
+          UNUSED(weight0);
+          UNUSED(weightInf);
+
+          pml_destroy(pml);
+        }
+      
+      if ( cdoVerbose )
+        cdoPrint("nsmooth = %d, max_points = %d, search_radius = %g, weight0 = %g, weightInf = %g",
+                 xnsmooth, xmax_points, xsearch_radius, xweight0, xweightInf);
+      
+    }
+
+  xsearch_radius *= DEG2RAD;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -373,10 +412,10 @@ void *Smooth(void *argument)
 	      double missval = vlistInqVarMissval(vlistID1, varID);
 	      gridID = vlistInqVarGrid(vlistID1, varID);
 
-              for ( int i = 0; i < nsmooth; ++i )
+              for ( int i = 0; i < xnsmooth; ++i )
                 {
                   if ( operatorID == SMOOTH )
-                    smooth(gridID, missval, array1, array2, &nmiss, max_points, search_radius, weight0, weightInf);
+                    smooth(gridID, missval, array1, array2, &nmiss, xmax_points, xsearch_radius, xweight0, xweightInf);
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
                   
