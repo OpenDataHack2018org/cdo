@@ -309,7 +309,7 @@ void *Smooth(void *argument)
   int gridtype;
   int xnsmooth = 1;
   int xmax_points = 5;
-  double xsearch_radius = 90, xweight0 = 0.25, xweightR = 0.25;
+  double xsearch_radius = 180, xweight0 = 0.25, xweightR = 0.25;
 
   cdoInitialize(argument);
 
