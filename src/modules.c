@@ -422,7 +422,7 @@ void *Maggraph(void *argument);
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
                                  "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
-#define  SmoothOperators        {"smooth", "smooth9"}
+#define  SmoothOperators        {"smoothpoint", "smooth9"}
 #define  SortOperators          {"sortcode", "sortparam", "sortname", "sortlevel"}
 #define  SorttimestampOperators {"sorttimestamp", "sorttaxis"}
 #define  SpecinfoOperators      {"specinfo"}
