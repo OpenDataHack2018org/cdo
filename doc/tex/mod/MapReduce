@@ -5,7 +5,7 @@
 @Section   = Conditional selection
 @Class     = Conditional
 @Arguments = ifile ofile
-@Operators = reduce
+@Operators = reducegrid
 
 @BeginDescription
 This module holds an operator for data reduction based on a user defined mask.
@@ -15,20 +15,18 @@ avoided by using the additional 'nobounds' keyword.
 @EndModule
 
 
-@BeginOperator_reduce
-@Name      = reduce
+@BeginOperator_reducegrid
+@Name      = reducegrid
 @Title     = Reduce input file variables to locations, where mask is non-zero.
              Horizontal grids of @file{mask} and @file{ifile} must be identical
-@Parameter = mask [nobounds|nocoords]
+@Parameter = mask[,limitCoordsOutput]
 
 @EndOperator
 @BeginParameter
 @Item = mask
 STRING file which holds the mask field
-@Item = nobounds
-STRING if given, coordinated bounds are not written to output
-@Item = nocoords
-STRING if given, coordinates and bounds are not written to output
+@Item = limitCoordsOutput
+STRING optional parameter to limit the amount of coordinates: 'nobounds' disables coordinate bounds in the output, 'nocoords' avoids all coordinate information
 @EndParameter
 
 @BeginExample
@@ -45,9 +43,9 @@ Note that output file type is NetCDF, because unstructured grids cannot be store
 @EndExample
 
 
-@BeginOperator_unreduce
-@Name      = unpack
-@Title     = Unpack input fields to given grid description
+@BeginOperator_expandgrid
+@Name      = expandgrid
+@Title     = Unpack input fields to given grid description - reverse operators of reducegrid
 @Parameter = grid
 
 @BeginDescription

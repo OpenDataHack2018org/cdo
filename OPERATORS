@@ -99,7 +99,7 @@ Operator catalog:
    Cond2         ifthenelse      If then else
    Condc         ifthenc         If then constant
    Condc         ifnotthenc      If not then constant
-   MapReduce     reduce          Reduce input file variables to locations, where mask is non-zero.
+   MapReduce     reducegrid      Reduce input file variables to locations, where mask is non-zero.
 -------------------------------------------------------------
    Comparison
 -------------------------------------------------------------

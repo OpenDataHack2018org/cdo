@@ -740,10 +740,10 @@ static const char *CondcHelp[] = {
 
 static const char *MapReduceHelp[] = {
     "NAME",
-    "    reduce - Reduce fields to user-defined mask",
+    "    reducegrid - Reduce fields to user-defined mask",
     "",
     "SYNOPSIS",
-    "    reduce,mask[,nobounds|nocoords]  ifile ofile",
+    "    reducegrid,mask[,limitCoordsOutput]  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module holds an operator for data reduction based on a user defined mask.",
@@ -751,9 +751,8 @@ static const char *MapReduceHelp[] = {
     "    avoided by using the additional 'nobounds' keyword.",
     "",
     "PARAMETER",
-    "    mask      STRING file which holds the mask field",
-    "    nobounds  STRING if given, coordinated bounds are not written to output",
-    "    nocoords  STRING if given, coordinates and bounds are not written to output",
+    "    mask               STRING file which holds the mask field",
+    "    limitCoordsOutput  STRING optional parameter to limit the amount of coordinates: 'nobounds' disables coordinate bounds in the output, 'nocoords' avoids all coordinate information",
     NULL
 };
 
