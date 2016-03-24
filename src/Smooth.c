@@ -35,7 +35,7 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist, double search_radius, double weight0, double weightInf)
+double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist, double search_radius, double weight0, double weightR)
 {
   // Compute weights based on inverse distance if mask is false, eliminate those points
 
@@ -46,7 +46,7 @@ double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict sr
       nbr_mask[n] = FALSE;
       if ( nbr_add[n] >= 0 && src_grid_mask[nbr_add[n]] )
         {
-          nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightInf, search_radius);
+          nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
           dist_tot += nbr_dist[n];
           nbr_mask[n] = TRUE;
         }
@@ -78,7 +78,7 @@ unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, c
 
 static
 void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss,
-            int num_neighbors, double search_radius, double weight0, double weightInf)
+            int num_neighbors, double search_radius, double weight0, double weightR)
 {
   *nmiss = 0;
   int gridID0 = gridID;
@@ -153,7 +153,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
       double dist_tot = smooth_nbr_compute_weights(num_neighbors, mask, nbr_mask, nbr_add, nbr_dist,
-                                                   search_radius, weight0, weightInf);
+                                                   search_radius, weight0, weightR);
 
       /* Normalize weights and store the link */
       unsigned nadds = smooth_nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
@@ -309,7 +309,7 @@ void *Smooth(void *argument)
   int gridtype;
   int xnsmooth = 1;
   int xmax_points = 5;
-  double xsearch_radius = 90, xweight0 = 0.25, xweightInf = 0.25;
+  double xsearch_radius = 90, xweight0 = 0.25, xweightR = 0.25;
 
   cdoInitialize(argument);
 
@@ -327,33 +327,33 @@ void *Smooth(void *argument)
           char **pargv = operatorArgv();
           pml_t *pml = pml_create("SMOOTH");
 
-          PML_ADD_INT(pml, nsmooth,           1, "Number of smooth iterations");
-          PML_ADD_INT(pml, max_points,        1, "Maximum number of points");
-          PML_ADD_FLT(pml, search_radius,     1, "Search radius");
-          PML_ADD_FLT(pml, weight0,           1, "weight0");
-          PML_ADD_FLT(pml, weightInf,         1, "weightInf");
+          PML_ADD_INT(pml, nsmooth,        1, "Number of smooth iterations");
+          PML_ADD_INT(pml, npoints,        1, "Maximum number of points");
+          PML_ADD_FLT(pml, radius,         1, "Search radius");
+          PML_ADD_FLT(pml, weight0,        1, "weight at distrance 0");
+          PML_ADD_FLT(pml, weightR,        1, "weight at the search radius");
       
           pml_read(pml, pargc, pargv);
           if ( cdoVerbose ) pml_print(pml);
       
           if ( PML_NOCC(pml, nsmooth) )       xnsmooth = par_nsmooth[0];
-          if ( PML_NOCC(pml, max_points) )    xmax_points = par_max_points[0];
-          if ( PML_NOCC(pml, search_radius) ) xsearch_radius = par_search_radius[0];
+          if ( PML_NOCC(pml, npoints) )       xmax_points = par_npoints[0];
+          if ( PML_NOCC(pml, radius) )        xsearch_radius = par_radius[0];
           if ( PML_NOCC(pml, weight0) )       xweight0 = par_weight0[0];
-          if ( PML_NOCC(pml, weightInf) )     xweightInf = par_weightInf[0];
+          if ( PML_NOCC(pml, weightR) )       xweightR = par_weightR[0];
 
           UNUSED(nsmooth);
-          UNUSED(max_points);
-          UNUSED(search_radius);
+          UNUSED(npoints);
+          UNUSED(radius);
           UNUSED(weight0);
-          UNUSED(weightInf);
+          UNUSED(weightR);
 
           pml_destroy(pml);
         }
       
       if ( cdoVerbose )
-        cdoPrint("nsmooth = %d, max_points = %d, search_radius = %g, weight0 = %g, weightInf = %g",
-                 xnsmooth, xmax_points, xsearch_radius, xweight0, xweightInf);
+        cdoPrint("nsmooth = %d, npoints = %d, radius = %g, weight0 = %g, weightR = %g",
+                 xnsmooth, xmax_points, xsearch_radius, xweight0, xweightR);
       
     }
 
@@ -370,7 +370,7 @@ void *Smooth(void *argument)
 
   int nvars = vlistNvars(vlistID1);
   int *varIDs = (int*) Malloc(nvars*sizeof(int)); 
-
+  
   for ( varID = 0; varID < nvars; ++varID )
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
@@ -381,10 +381,16 @@ void *Smooth(void *argument)
 	{
 	  varIDs[varID] = 1;
 	}
+      else if ( gridtype == GRID_UNSTRUCTURED && operatorID == SMOOTHP )
+        {
+	  varIDs[varID] = 1;
+        }
       else
 	{
+          char varname[CDI_MAX_NAME];
+          vlistInqVarName(vlistID1, varID, varname);
 	  varIDs[varID] = 0;
-	  cdoWarning("Unsupported grid for varID %d", varID);
+	  cdoWarning("Unsupported grid for variable %s", varname);
 	}
     }
 
@@ -415,7 +421,7 @@ void *Smooth(void *argument)
               for ( int i = 0; i < xnsmooth; ++i )
                 {
                   if ( operatorID == SMOOTHP )
-                    smooth(gridID, missval, array1, array2, &nmiss, xmax_points, xsearch_radius, xweight0, xweightInf);
+                    smooth(gridID, missval, array1, array2, &nmiss, xmax_points, xsearch_radius, xweight0, xweightR);
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
                   
