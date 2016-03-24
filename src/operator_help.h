@@ -752,7 +752,7 @@ static const char *MapReduceHelp[] = {
     "",
     "PARAMETER",
     "    mask               STRING file which holds the mask field",
-    "    limitCoordsOutput  STRING optional parameter to limit the amount of coordinates: 'nobounds' disables coordinate bounds in the output, 'nocoords' avoids all coordinate information",
+    "    limitCoordsOutput  STRING optional parameter to limit coordinates output: 'nobounds' disables coordinate bounds, 'nocoords' avoids all coordinate information",
     NULL
 };
 

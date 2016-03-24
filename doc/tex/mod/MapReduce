@@ -26,7 +26,7 @@ avoided by using the additional 'nobounds' keyword.
 @Item = mask
 STRING file which holds the mask field
 @Item = limitCoordsOutput
-STRING optional parameter to limit the amount of coordinates: 'nobounds' disables coordinate bounds in the output, 'nocoords' avoids all coordinate information
+STRING optional parameter to limit coordinates output: 'nobounds' disables coordinate bounds, 'nocoords' avoids all coordinate information
 @EndParameter
 
 @BeginExample
