@@ -327,20 +327,20 @@ void *Smooth(void *argument)
           char **pargv = operatorArgv();
           pml_t *pml = pml_create("SMOOTH");
 
-          PML_ADD_INT(pml, nsmooth,        1, "Number of smooth iterations");
+          PML_ADD_INT(pml, nsmooth,        1, "Number of times to smooth");
           PML_ADD_INT(pml, npoints,        1, "Maximum number of points");
           PML_ADD_FLT(pml, radius,         1, "Search radius");
-          PML_ADD_FLT(pml, weight0,        1, "weight at distrance 0");
-          PML_ADD_FLT(pml, weightR,        1, "weight at the search radius");
+          PML_ADD_FLT(pml, weight0,        1, "Weight at distance 0");
+          PML_ADD_FLT(pml, weightR,        1, "Weight at the search radius");
       
           pml_read(pml, pargc, pargv);
           if ( cdoVerbose ) pml_print(pml);
       
-          if ( PML_NOCC(pml, nsmooth) )       xnsmooth = par_nsmooth[0];
-          if ( PML_NOCC(pml, npoints) )       xmax_points = par_npoints[0];
-          if ( PML_NOCC(pml, radius) )        xsearch_radius = par_radius[0];
-          if ( PML_NOCC(pml, weight0) )       xweight0 = par_weight0[0];
-          if ( PML_NOCC(pml, weightR) )       xweightR = par_weightR[0];
+          if ( PML_NOCC(pml, nsmooth) )   xnsmooth = par_nsmooth[0];
+          if ( PML_NOCC(pml, npoints) )   xmax_points = par_npoints[0];
+          if ( PML_NOCC(pml, radius) )    xsearch_radius = par_radius[0];
+          if ( PML_NOCC(pml, weight0) )   xweight0 = par_weight0[0];
+          if ( PML_NOCC(pml, weightR) )   xweightR = par_weightR[0];
 
           UNUSED(nsmooth);
           UNUSED(npoints);
