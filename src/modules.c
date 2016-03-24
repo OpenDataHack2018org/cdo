@@ -353,7 +353,7 @@ void *Maggraph(void *argument);
 #define  IsosurfaceOperators    {"isosurface"}
 #define  KvlOperators           {"read_cmor_table", "conv_cmor_table"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
-#define  MapReduceOperators     {"reduce", "unreduce"}
+#define  MapReduceOperators     {"reducegrid"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
