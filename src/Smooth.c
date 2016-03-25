@@ -31,6 +31,13 @@
 
 #include "grid_search.h"
 
+typedef struct {
+  int npoints;
+  double radius;
+  double weight0;
+  double weightR;
+} smoothpoint_t;
+
 void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
 
 double intlin(double x, double y1, double x1, double y2, double x2);
@@ -77,19 +84,16 @@ unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, c
 
 
 static
-void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss,
-            int num_neighbors, double search_radius, double weight0, double weightR)
+void smoothpoint(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss, smoothpoint_t spoint)
 {
   *nmiss = 0;
+  int num_neighbors = spoint.npoints;
   int gridID0 = gridID;
   unsigned gridsize = gridInqSize(gridID);
 
-  int *mask = (int*) Malloc(gridsize*sizeof(double));
+  int *mask = (int*) Malloc(gridsize*sizeof(int));
   for ( unsigned i = 0; i < gridsize; ++i )
-    if ( DBL_IS_EQUAL(array1[i], missval) )
-      mask[i] = 0;
-    else
-      mask[i] = 1;
+    mask[i] = DBL_IS_EQUAL(array1[i], missval) ? 0 : 1;
   
   double *xvals = (double*) Malloc(gridsize*sizeof(double));
   double *yvals = (double*) Malloc(gridsize*sizeof(double));
@@ -123,7 +127,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
   else
     gs = gridsearch_create(gridsize, xvals, yvals);
 
-  gs->search_radius = search_radius;
+  gs->search_radius = spoint.radius;
   
   finish = clock();
 
@@ -153,7 +157,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
       double dist_tot = smooth_nbr_compute_weights(num_neighbors, mask, nbr_mask, nbr_add, nbr_dist,
-                                                   search_radius, weight0, weightR);
+                                                   spoint.radius, spoint.weight0, spoint.weightR);
 
       /* Normalize weights and store the link */
       unsigned nadds = smooth_nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
@@ -308,8 +312,11 @@ void *Smooth(void *argument)
   int nmiss;
   int gridtype;
   int xnsmooth = 1;
-  int xmax_points = 5;
-  double xsearch_radius = 180, xweight0 = 0.25, xweightR = 0.25;
+  smoothpoint_t spoint;
+  spoint.npoints = 5;
+  spoint.radius  = 180;
+  spoint.weight0 = 0.25;
+  spoint.weightR = 0.25;
 
   cdoInitialize(argument);
 
@@ -327,20 +334,25 @@ void *Smooth(void *argument)
           char **pargv = operatorArgv();
           pml_t *pml = pml_create("SMOOTH");
 
-          PML_ADD_INT(pml, nsmooth,        1, "Number of times to smooth");
-          PML_ADD_INT(pml, npoints,        1, "Maximum number of points");
-          PML_ADD_FLT(pml, radius,         1, "Search radius");
-          PML_ADD_FLT(pml, weight0,        1, "Weight at distance 0");
-          PML_ADD_FLT(pml, weightR,        1, "Weight at the search radius");
+          PML_ADD_INT(pml, nsmooth,   1, "Number of times to smooth");
+          PML_ADD_INT(pml, npoints,   1, "Maximum number of points");
+          PML_ADD_FLT(pml, radius,    1, "Search radius");
+          PML_ADD_FLT(pml, weight0,   1, "Weight at distance 0");
+          PML_ADD_FLT(pml, weightR,   1, "Weight at the search radius");
+          PML_ADD_WORD(pml, form,     1, "Form of the curve (linear, exponential, gauss");
       
           pml_read(pml, pargc, pargv);
           if ( cdoVerbose ) pml_print(pml);
       
-          if ( PML_NOCC(pml, nsmooth) )   xnsmooth = par_nsmooth[0];
-          if ( PML_NOCC(pml, npoints) )   xmax_points = par_npoints[0];
-          if ( PML_NOCC(pml, radius) )    xsearch_radius = par_radius[0];
-          if ( PML_NOCC(pml, weight0) )   xweight0 = par_weight0[0];
-          if ( PML_NOCC(pml, weightR) )   xweightR = par_weightR[0];
+          if ( PML_NOCC(pml, nsmooth) )   xnsmooth       = par_nsmooth[0];
+          if ( PML_NOCC(pml, npoints) )   spoint.npoints = par_npoints[0];
+          if ( PML_NOCC(pml, radius) )    spoint.radius  = par_radius[0];
+          if ( PML_NOCC(pml, weight0) )   spoint.weight0 = par_weight0[0];
+          if ( PML_NOCC(pml, weightR) )   spoint.weightR = par_weightR[0];
+          if ( PML_NOCC(pml, form) )
+            {
+              if ( cdoVerbose ) printf("Form: %s\n", par_form[0]);
+            }
 
           UNUSED(nsmooth);
           UNUSED(npoints);
@@ -353,11 +365,11 @@ void *Smooth(void *argument)
       
       if ( cdoVerbose )
         cdoPrint("nsmooth = %d, npoints = %d, radius = %g, weight0 = %g, weightR = %g",
-                 xnsmooth, xmax_points, xsearch_radius, xweight0, xweightR);
+                 xnsmooth, spoint.npoints, spoint.radius, spoint.weight0, spoint.weightR);
       
     }
 
-  xsearch_radius *= DEG2RAD;
+  spoint.radius *= DEG2RAD;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -421,7 +433,7 @@ void *Smooth(void *argument)
               for ( int i = 0; i < xnsmooth; ++i )
                 {
                   if ( operatorID == SMOOTHP )
-                    smooth(gridID, missval, array1, array2, &nmiss, xmax_points, xsearch_radius, xweight0, xweightR);
+                    smoothpoint(gridID, missval, array1, array2, &nmiss, spoint);
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
                   
