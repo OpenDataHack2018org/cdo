@@ -151,7 +151,7 @@ static int classify_polygon(int number_corners, double cell_corners[]){
   
 }
 
-inline void x_ConvexGetPointDelta(double (*p_delta)[2], double (*p_previous_point)[2], double (*p_current_point)[2] , double cell_corners[], int *p_corner_to_read){
+static inline void x_ConvexGetPointDelta(double (*p_delta)[2], double (*p_previous_point)[2], double (*p_current_point)[2] , double cell_corners[], int *p_corner_to_read){
   (*p_current_point)[0] = cell_corners[*p_corner_to_read * 2 + 0];		
   (*p_current_point)[1] = cell_corners[*p_corner_to_read * 2 + 1];
   *p_corner_to_read = *p_corner_to_read + 1;
@@ -159,7 +159,7 @@ inline void x_ConvexGetPointDelta(double (*p_delta)[2], double (*p_previous_poin
   (*p_delta)[1] = (*p_current_point)[1] - (*p_previous_point)[1];			 
 }
 
-inline int x_ConvexCompare(double (*p_delta)[2]){
+static inline int x_ConvexCompare(double (*p_delta)[2]){
   if((*p_delta)[0] > 0){
     return -1;
   } else { 
@@ -179,7 +179,7 @@ inline int x_ConvexCompare(double (*p_delta)[2]){
   }
 }
 
-inline int x_ConvexCheckTriple(int * p_current_direction, int * p_this_direction, int * p_direction_changes, double current_delta[2], double (*p_previous_delta)[2], int * p_angle_sign, double (*p_second_corner)[2], double (*p_third_corner)[2]){
+static inline int x_ConvexCheckTriple(int * p_current_direction, int * p_this_direction, int * p_direction_changes, double current_delta[2], double (*p_previous_delta)[2], int * p_angle_sign, double (*p_second_corner)[2], double (*p_third_corner)[2]){
   if ( (*p_this_direction = ConvexCompare(current_delta)) == -(*p_current_direction)) { 
     (*p_direction_changes) = (*p_direction_changes) + 1;						
     if (*p_direction_changes > 2 ) return 1;				
