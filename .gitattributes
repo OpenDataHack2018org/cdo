@@ -200,6 +200,7 @@ doc/tex/mod/Invertlev -text
 doc/tex/mod/Maggraph -text
 doc/tex/mod/Magplot -text
 doc/tex/mod/Magvector -text
+doc/tex/mod/MapReduce -text
 doc/tex/mod/Maskbox -text
 doc/tex/mod/Maskregion -text
 doc/tex/mod/Mastrfu -text
@@ -417,6 +418,7 @@ src/Magplot.c -text
 src/Magvector.c -text
 src/Makefile.am -text
 src/Makefile.in -text
+src/MapReduce.c -text
 src/Maskbox.c -text
 src/Mastrfu.c -text
 src/Math.c -text

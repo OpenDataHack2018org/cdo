@@ -1,0 +1,60 @@
+@BeginModule
+@NewPage
+@Name      = MapReduce
+@Title     = Reduce fields to user-defined mask
+@Section   = Conditional selection
+@Class     = Conditional
+@Arguments = ifile ofile
+@Operators = reducegrid
+
+@BeginDescription
+This module holds an operator for data reduction based on a user defined mask.
+The output grid is unstructured and includes coordinate bounds. Bounds can be
+avoided by using the additional 'nobounds' keyword. With 'nocoords' given,
+coordinates a completely suppressed.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_reducegrid
+@Name      = reducegrid
+@Title     = Reduce input file variables to locations, where mask is non-zero.
+             Horizontal grids of @file{mask} and @file{ifile} must be identical
+@Parameter = mask[,limitCoordsOutput]
+
+@EndOperator
+@BeginParameter
+@Item = mask
+STRING file which holds the mask field
+@Item = limitCoordsOutput
+STRING optional parameter to limit coordinates output: 'nobounds' disables coordinate bounds, 'nocoords' avoids all coordinate information
+@EndParameter
+
+@BeginExample
+To limit data fields to land values, a mask has to be created first with
+@BeginVerbatim
+   cdo -gtc,0 -topo,ni96 lsm_gme96.grb
+@EndVerbatim
+Here a GME grid is used. Say @file{temp_gme96.grb} contains a global temperture field.
+The following command limits the global grid to landpoints.
+@BeginVerbatim
+   cdo -f nc reduce,lsm_gme96.grb temp_gme96.grb tempOnLand_gme96.nc
+@EndVerbatim
+Note that output file type is NetCDF, because unstructured grids cannot be stored in GRIB format.
+@EndExample
+
+
+@BeginOperator_expandgrid
+@Name      = expandgrid
+@Title     = Unpack input fields to given grid description - reverse operators of reducegrid
+@Parameter = grid
+
+@BeginDescription
+Blowup the input fields towards given grid without changing the values
+@EndDescription
+@EndOperator
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter

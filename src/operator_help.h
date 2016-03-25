@@ -738,6 +738,25 @@ static const char *CondcHelp[] = {
     NULL
 };
 
+static const char *MapReduceHelp[] = {
+    "NAME",
+    "    reducegrid - Reduce fields to user-defined mask",
+    "",
+    "SYNOPSIS",
+    "    reducegrid,mask[,limitCoordsOutput]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This module holds an operator for data reduction based on a user defined mask.",
+    "    The output grid is unstructured and includes coordinate bounds. Bounds can be",
+    "    avoided by using the additional 'nobounds' keyword. With 'nocoords' given,",
+    "    coordinates a completely suppressed.",
+    "",
+    "PARAMETER",
+    "    mask               STRING file which holds the mask field",
+    "    limitCoordsOutput  STRING optional parameter to limit coordinates output: 'nobounds' disables coordinate bounds, 'nocoords' avoids all coordinate information",
+    NULL
+};
+
 static const char *CompHelp[] = {
     "NAME",
     "    eq, ne, le, lt, ge, gt - Comparison of two fields",
