@@ -42,9 +42,22 @@
 #include "util.h"
 #include "datetime.h"
 
-#define  OPENMP4  201307
-#if defined(_OPENMP) && defined(OPENMP4) && _OPENMP >= OPENMP4
-#define  HAVE_OPENMP4  1
+#if defined(_OPENMP)
+#define  OPENMP3   200805 
+#define  OPENMP4   201307
+#define  OPENMP45  201511
+
+#if _OPENMP >= OPENMP3
+#define  HAVE_OPENMP3   1
+#endif
+
+#if _OPENMP >= OPENMP4
+#define  HAVE_OPENMP4   1
+#endif
+
+#if _OPENMP >= OPENMP45
+#define  HAVE_OPENMP45  1
+#endif
 #endif
 
 

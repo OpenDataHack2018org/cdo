@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-03-25  Uwe Schulzweida
+
+	* OpenMP installation error [Bug #6523]
+
 2016-03-18  Uwe Schulzweida
 
 	* New operator: settbounds - Set time bounds

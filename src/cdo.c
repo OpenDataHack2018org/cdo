@@ -1410,11 +1410,13 @@ int main(int argc, char *argv[])
       fprintf(stderr, "OMP num procs       = %d\n", omp_get_num_procs());
       fprintf(stderr, "OMP max threads     = %d\n", omp_get_max_threads());
       fprintf(stderr, "OMP num threads     = %d\n", omp_get_num_threads());
+#if defined(HAVE_OPENMP3)
       fprintf(stderr, "OMP thread limit    = %d\n", omp_get_thread_limit());
       omp_sched_t kind;
       int modifer;
       omp_get_schedule(&kind, &modifer);
       fprintf(stderr, "OMP schedule        = %d (1:static; 2:dynamic; 3:guided; 4:auto)\n", (int) kind);
+#endif
 #if defined(HAVE_OPENMP4)
       fprintf(stderr, "OMP proc bind       = %d (0:false; 1:true; 2:master; 3:close; 4:spread)\n", (int) omp_get_proc_bind());
 #if !defined(__ICC)
