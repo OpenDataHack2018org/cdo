@@ -1516,7 +1516,7 @@ void pstreamCloseAll(void)
       pstream_t *pstreamptr = _pstreamList[i].ptr;
       if ( pstreamptr && pstreamptr->isopen )
 	{
-	  if ( !pstreamptr->ispipe )
+	  if ( !pstreamptr->ispipe && pstreamptr->fileID != CDI_UNDEFID )
 	    {
 	      if ( PSTREAM_Debug )
 		Message("Close file %s id %d", pstreamptr->name, pstreamptr->fileID);
