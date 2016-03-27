@@ -140,7 +140,7 @@ int yac_point_in_cell2 (struct point point,  double point_coords[3],
  */
 static inline double get_angle (double a_lon, double b_lon) {
    double diff = a_lon - b_lon;
-   return diff - round(diff / (2.0 * M_PI)) * (2.0 * M_PI);
+   return diff - lround(diff / (2.0 * M_PI)) * (2.0 * M_PI);
 }
 
 /** \example test_find_overlap.c
