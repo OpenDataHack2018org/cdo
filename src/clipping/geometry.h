@@ -44,6 +44,10 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "grid.h"
 #include "utils.h"
 
@@ -140,7 +144,11 @@ int yac_point_in_cell2 (struct point point,  double point_coords[3],
  */
 static inline double get_angle (double a_lon, double b_lon) {
    double diff = a_lon - b_lon;
+#if defined(CDO)
    return diff - lround(diff / (2.0 * M_PI)) * (2.0 * M_PI);
+#else
+   return diff - round(diff / (2.0 * M_PI)) * (2.0 * M_PI);
+#endif
 }
 
 /** \example test_find_overlap.c
