@@ -42,26 +42,46 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
   int nx = gridInqXsize(gridID1);
   int ny = gridInqYsize(gridID1);
 
+  bool lxcoord = true;
+  bool lycoord = true;
+  if ( gridInqXvals(gridID1, NULL) == 0 ) lxcoord = false;
+  if ( gridInqYvals(gridID1, NULL) == 0 ) lycoord = false;
+
   double *xvals = NULL, *yvals = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
-  if ( lregular )
+
+  if ( lxcoord )
     {
-      xvals = (double*) Malloc(nx*sizeof(double));
-      yvals = (double*) Malloc(ny*sizeof(double));
+      if ( lregular )
+        {
+          xvals = (double*) Malloc(nx*sizeof(double));
+        }
+      else
+        {
+          xvals = (double*) Malloc(nx*ny*sizeof(double));
+          xvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));
+        }
+      
+      gridInqXvals(gridID1, xvals);
     }
-  else
+
+  if ( lycoord )
     {
-      xvals = (double*) Malloc(nx*ny*sizeof(double));
-      yvals = (double*) Malloc(nx*ny*sizeof(double));
-      xvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));
-      yvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));      
+      if ( lregular )
+        {
+          yvals = (double*) Malloc(ny*sizeof(double));
+        }
+      else
+        {
+          yvals = (double*) Malloc(nx*ny*sizeof(double));
+          yvals2 = (double*) Malloc(nxvals*nyvals*sizeof(double));
+        }
+
+      gridInqYvals(gridID1, yvals);
     }
-  
+ 
   int *xlsize = (int*) Malloc(nxblocks*sizeof(int));
   int *ylsize = (int*) Malloc(nyblocks*sizeof(int));
-
-  gridInqXvals(gridID1, xvals);
-  gridInqYvals(gridID1, yvals);
 
   for ( ix = 0; ix < nxblocks; ++ix ) xlsize[ix] = nxvals;
   if ( nx%nxblocks != 0 ) xlsize[nxblocks-1] = nx - (nxblocks-1)*nxvals;
@@ -89,8 +109,8 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	       	// printf(">> %d %d %d\n", j, i, offset + j*nx + i);
                 if ( !lregular )
                   {
-                    xvals2[gridsize2] = xvals[offset + j*nx + i];
-                    yvals2[gridsize2] = yvals[offset + j*nx + i];
+                    if ( lxcoord ) xvals2[gridsize2] = xvals[offset + j*nx + i];
+                    if ( lycoord ) yvals2[gridsize2] = yvals[offset + j*nx + i];
                   }
 		gridindex[index][gridsize2++] = offset + j*nx + i;
 	      }
@@ -103,13 +123,13 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 
         if ( lregular )
           {
-            gridDefXvals(gridID2, xvals+ix*nxvals);
-            gridDefYvals(gridID2, yvals+iy*nyvals);
+            if ( lxcoord ) gridDefXvals(gridID2, xvals+ix*nxvals);
+            if ( lycoord ) gridDefYvals(gridID2, yvals+iy*nyvals);
           }
         else
           {
-            gridDefXvals(gridID2, xvals2);
-            gridDefYvals(gridID2, yvals2);
+            if ( lxcoord ) gridDefXvals(gridID2, xvals2);
+            if ( lycoord ) gridDefYvals(gridID2, yvals2);
           }
         
 	gridIDs[index] = gridID2;

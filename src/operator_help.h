@@ -448,7 +448,7 @@ static const char *CollgridHelp[] = {
     "    This operator collects the data of the input files to one output file. ",
     "    All input files need to have the same variables and the same number of timesteps on a different",
     "    horizonal grid region. A source region must be a structured longitude/latitude grid box.",
-    "    The parameter nx needs to be specified only non regular lon/lat grids.",
+    "    The parameter nx needs to be specified only for non regular lon/lat grids.",
     "",
     "PARAMETER",
     "    nx     INTEGER  Number of regions in x direction [default: number of input files]",
