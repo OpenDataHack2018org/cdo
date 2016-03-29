@@ -17,7 +17,7 @@
 This operator collects the data of the input files to one output file. 
 All input files need to have the same variables and the same number of timesteps on a different
 horizonal grid region. A source region must be a structured longitude/latitude grid box.
-The parameter @var{nx} needs to be specified only non regular lon/lat grids.
+The parameter @var{nx} needs to be specified only for non regular lon/lat grids.
 @EndDescription
 @EndOperator
 
