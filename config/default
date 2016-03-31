@@ -197,7 +197,7 @@ case "${HOSTNAME}" in
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
                     $CDOLIBS \
-                    CC=gcc CFLAGS='-g -Wall -O3 -march=native'
+                    CC=gcc CFLAGS='-g -Wall -O3 -march=native -mavx2'
 	fi
 	;;
 # x86_64-unknown-linux-gnu
