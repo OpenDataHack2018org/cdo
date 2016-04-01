@@ -366,7 +366,7 @@ void *Maggraph(void *argument);
 #define  MonarithOperators      {"monadd", "monsub", "monmul", "mondiv"}
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
-#define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel"}
+#define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel", "ngridpoints", "ngrids"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr", "outputxyz"}
