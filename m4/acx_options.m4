@@ -67,7 +67,7 @@ HDF5_ROOT=''
 HDF5_INCLUDE=''
 HDF5_LIBS=''
 AC_ARG_WITH([hdf5],
-            [AS_HELP_STRING([--with-hdf5=<yes|no|directory> (default=no)],[location of hdf5 library, NETCDF4 requires hdf5 high level interface])],
+            [AS_HELP_STRING([--with-hdf5=<yes|no|directory> (default=no)],[location of HDF5 library])],
             [AS_CASE(["$with_hdf5"],
                      [no],[AC_MSG_CHECKING([for hdf5 library])
                            AC_MSG_RESULT([suppressed])],
@@ -75,11 +75,11 @@ AC_ARG_WITH([hdf5],
                             AC_SEARCH_LIBS([H5Fopen],
                                            [hdf5],
                                            [AC_DEFINE([HAVE_LIBHDF5],[1],[Define to 1 for HDF5 support])],
-                                           [AC_MSG_ERROR([Cannot link to hdf5 library! It is required for Netcdf4])])
+                                           [AC_MSG_ERROR([Cannot link to hdf5 library!])])
                             AC_SEARCH_LIBS([H5DSis_scale],
                                            [hdf5_hl],
                                            [have_hdf5_hl=yes],
-                                           [AC_MSG_NOTICE([Cannot find hdf5 high level interface! It is required for netCDF4.])
+                                           [AC_MSG_NOTICE([Cannot find hdf5 high level interface!])
                                             have_hdf5_hl=no])
                             AS_IF([test "x$have_libhdf5_hl" = xyes],
                                   [HDF5_LIBS=" -lhdf5_hl -lhdf5"],
@@ -93,14 +93,11 @@ AC_ARG_WITH([hdf5],
                                  AC_SEARCH_LIBS([H5Fopen],
                                                 [hdf5],
                                                 [AC_DEFINE([HAVE_LIBHDF5],[1],[Define to 1 for HDF5 support])],
-                                                [AC_MSG_ERROR([Cannot link to hdf5! It is required for netCDF4.])])
+                                                [AC_MSG_ERROR([Cannot link to hdf5!])])
                                  AC_SEARCH_LIBS([H5DSis_scale],
                                                 [hdf5_hl],
                                                 [have_hdf5_hl=yes],
-                                                [AC_MSG_NOTICE([Cannot link to hdf5 high level interface! It is required for netCDF4.\
-                                                                HDF5 must be built with zlib; the location of zlib must be specified for HDF5 with the \
-                                                                --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
-                                                                specified with the --with-szlib option..])
+                                                [AC_MSG_NOTICE([Cannot link to hdf5 high level interface!])
                                                 have_hdf5_hl=no])
                                  AS_IF([test "x$have_libhdf5_hl" = 'xyes'],
                                        [HDF5_LIBS=" -L$HDF5_ROOT/lib -lhdf5_hl -lhdf5"],

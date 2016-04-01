@@ -1515,8 +1515,7 @@ Optional Packages:
                           location of szlib library, optional for GRIB1
                           compression
   --with-hdf5=<yes|no|directory> (default=no)
-                          location of hdf5 library, NETCDF4 requires hdf5 high
-                          level interface
+                          location of HDF5 library
   --with-netcdf=<yes|no|directory> (default=no)
                           location of netCDF library (lib and include subdirs)
   --with-cmor=<directory> Specify location of CMOR library.
@@ -18583,7 +18582,7 @@ if test "$ac_res" != no; then :
 $as_echo "#define HAVE_LIBHDF5 1" >>confdefs.h
 
 else
-  as_fn_error $? "Cannot link to hdf5 library! It is required for Netcdf4" "$LINENO" 5
+  as_fn_error $? "Cannot link to hdf5 library!" "$LINENO" 5
 fi
 
                             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing H5DSis_scale" >&5
@@ -18641,8 +18640,8 @@ if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
   have_hdf5_hl=yes
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Cannot find hdf5 high level interface! It is required for netCDF4." >&5
-$as_echo "$as_me: Cannot find hdf5 high level interface! It is required for netCDF4." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: Cannot find hdf5 high level interface!" >&5
+$as_echo "$as_me: Cannot find hdf5 high level interface!" >&6;}
                                             have_hdf5_hl=no
 fi
 
@@ -18726,7 +18725,7 @@ if test "$ac_res" != no; then :
 $as_echo "#define HAVE_LIBHDF5 1" >>confdefs.h
 
 else
-  as_fn_error $? "Cannot link to hdf5! It is required for netCDF4." "$LINENO" 5
+  as_fn_error $? "Cannot link to hdf5!" "$LINENO" 5
 fi
 
                                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing H5DSis_scale" >&5
@@ -18784,14 +18783,8 @@ if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
   have_hdf5_hl=yes
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Cannot link to hdf5 high level interface! It is required for netCDF4.\
-                                                                HDF5 must be built with zlib; the location of zlib must be specified for HDF5 with the \
-                                                                --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
-                                                                specified with the --with-szlib option.." >&5
-$as_echo "$as_me: Cannot link to hdf5 high level interface! It is required for netCDF4.\
-                                                                HDF5 must be built with zlib; the location of zlib must be specified for HDF5 with the \
-                                                                --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
-                                                                specified with the --with-szlib option.." >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: Cannot link to hdf5 high level interface!" >&5
+$as_echo "$as_me: Cannot link to hdf5 high level interface!" >&6;}
                                                 have_hdf5_hl=no
 fi
 
