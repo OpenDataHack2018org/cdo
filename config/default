@@ -261,7 +261,6 @@ case "${HOSTNAME}" in
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
 	            --with-netcdf=/sw/etch-ia32/netcdf-4.1.1-gcc \
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.4-threadsafe \
-                    --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
                     --with-szlib=/sw/etch-ia32/szip-2.1 \
                     --withroj=/sw/etch-ia32/proj-4.6.0 \
 	            --enable-all-static CC=icc CFLAGS="-g -fast -openmp" AR=xiar LD=xild
@@ -304,7 +303,6 @@ case "${HOSTNAME}" in
                     --with-grib_api=/sw/centos58-x64/grib_api-1.12.3 \
                     --with-netcdf=/sw/centos58-x64/netcdf-4.2.1.1 \
                     --with-szlib=/sw/centos58-x64/szip-2.1 \
-                    --with-zlib=/usr \
 	            CC=gcc CFLAGS="-g -Wall -O3"
 	;;
 # powerpc-ibm-aix5.3.0.0

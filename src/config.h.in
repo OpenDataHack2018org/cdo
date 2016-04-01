@@ -133,9 +133,6 @@
 /* Define to 1 if you have the <libxml/tree.h> header file. */
 #undef HAVE_LIBXML_TREE_H
 
-/* Define 1 for ZLIB support */
-#undef HAVE_LIBZ
-
 /* Define to 1 if you have the <magics_api.h> header file. */
 #undef HAVE_MAGICS_API_H
 
@@ -222,9 +219,6 @@
 
 /* Define to 1 if you have the <wordexp.h> header file. */
 #undef HAVE_WORDEXP_H
-
-/* Define to 1 if you have the <zlib.h> header file. */
-#undef HAVE_ZLIB_H
 
 /* Host name */
 #undef HOST_NAME

@@ -31,36 +31,11 @@ AC_SUBST([ENABLE_THREADS])
 AC_SUBST([THREADS_INCLUDE])
 AC_SUBST([THREADS_LIBS])
 #  ----------------------------------------------------------------------
-#  Link application to ZLIB library, needed for netcdf
-ZLIB_INCLUDE=''
-ZLIB_LIBS=''
-AC_ARG_WITH([zlib],
-            [AS_HELP_STRING([--with-zlib=<yes|no|directory> (default=yes)],[location of ZLIB compression library (lib and include subdirs), nec. for HDF5/NETCDF4])],
-            [AS_CASE(["$with_zlib"],
-                     [no],[AC_MSG_CHECKING([for ZLIB library])
-                           AC_MSG_RESULT([suppressed])],
-                     [yes],[AC_CHECK_HEADERS(zlib.h)
-                            AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
-                            ZLIB_LIBS=" -lz"],
-                     [*],[ZLIB_ROOT=$with_zlib
-                          LDFLAGS="-L$ZLIB_ROOT/lib $LDFLAGS"
-                          CPPFLAGS="-I$ZLIB_ROOT/include $CPPFLAGS"
-                          AC_CHECK_HEADERS(zlib.h)
-                          AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
-                          ZLIB_INCLUDE=" -I$ZLIB_ROOT/include"
-                          ZLIB_LIBS=" -L$ZLIB_ROOT/lib -lz"])],
-                     [AC_CHECK_HEADERS(zlib.h)
-                      AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
-              ZLIB_LIBS=" -lz"])
-AC_SUBST([ZLIB_INCLUDE])
-AC_SUBST([ZLIB_LIBS])
-#  ----------------------------------------------------------------------
-#  Compile application with SZLIB library, needed for GRIB1 or for
-#  linking against hdf5/netcdf4
+#  Compile application with SZLIB library, needed for GRIB1 linking
 SZLIB_INCLUDE=''
 SZLIB_LIBS=''
 AC_ARG_WITH([szlib],
-            [AS_HELP_STRING([--with-szlib=<yes|no|directory> (default=no)],[location of szlib library, optional for GRIB1 and NETCDF4 compression])],
+            [AS_HELP_STRING([--with-szlib=<yes|no|directory> (default=no)],[location of szlib library, optional for GRIB1 compression])],
             [AS_CASE(["$with_szlib"],
                      [no],[AC_MSG_CHECKING([for szlib library])
                            AC_MSG_RESULT([suppressed])],
