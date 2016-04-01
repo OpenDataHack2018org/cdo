@@ -22,10 +22,6 @@
   "threads"    : {
     "lib"      : "@THREADS_LIBS@",
     "include"  : "@THREADS_INCLUDE@"
-  },
-  "zlib"       : {
-    "lib"      : "@ZLIB_LIBS@",
-  },
   "szlib"      : {
     "lib"      : "@SZLIB_LIBS@",
     "include"  : "@SZLIB_INCLUDE@"
