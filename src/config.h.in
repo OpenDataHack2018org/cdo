@@ -103,10 +103,10 @@
 /* Define to 1 if you have the `malloc' library (-lmalloc). */
 #undef HAVE_LIBMALLOC
 
-/* Define to 1 for NETCDF OpenDAP */
+/* Define to 1 for NetCDF OpenDAP */
 #undef HAVE_LIBNC_DAP
 
-/* Define to 1 for NETCDF support */
+/* Define to 1 for NetCDF support */
 #undef HAVE_LIBNETCDF
 
 /* Define to 1 for PROJ support */
@@ -148,16 +148,16 @@
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
-/* Define to 1 for NETCDF4/HDF5 support */
+/* Define to 1 for NetCDF4/HDF5 support */
 #undef HAVE_NC4HDF5
 
-/* Define to 1 for NETCDF4/HDF5 threadsafe support */
+/* Define to 1 for NetCDF4/HDF5 threadsafe support */
 #undef HAVE_NC4HDF5_THREADSAFE
 
-/* Define to 1 for NETCDF2 support */
+/* Define to 1 for NetCDF2 support */
 #undef HAVE_NETCDF2
 
-/* Define to 1 for NETCDF4 support */
+/* Define to 1 for NetCDF4 support */
 #undef HAVE_NETCDF4
 
 /* Define to 1 if you have the <netcdf.h> header file. */
