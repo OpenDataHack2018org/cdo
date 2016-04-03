@@ -41,8 +41,12 @@ void printFeatures(void)
 #endif
 #if defined(_OPENMP)
   fprintf(stderr, " OpenMP");
-#if defined(HAVE_OPENMP4)
+#if defined(HAVE_OPENMP45)
+  fprintf(stderr, "45");
+#elif defined(HAVE_OPENMP4)
   fprintf(stderr, "4");
+#elif defined(HAVE_OPENMP3)
+  fprintf(stderr, "3");
 #endif
 #endif
 #if  defined(HAVE_LIBHDF5)
