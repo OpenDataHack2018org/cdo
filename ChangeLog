@@ -3,6 +3,9 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-04-04  Ralf Mueller
+        * New operators: ngrids, ngridpoints - Show number of grids/gridpoints per variable
+
 2016-04-02  Uwe Schulzweida
 
 	* Fix typo in eca_sdii code [Bug #6655]
@@ -11,7 +14,7 @@
 
  	* clipping/geometry.h::get_angle: replace round() by lround()
 
-2016-03-25  Uwe Schulzweida
+2016-03-25  Uwe Schulzweida/Ralf Mueller
 
 	* OpenMP installation error [Bug #6523]
 	* New operator: reducegrid - Select gridpoints wrt. given mask
