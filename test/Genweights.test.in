@@ -11,8 +11,8 @@ test -n "$DATAPATH" || DATAPATH=./data
 ABSLIMMAX=0.001
 ABSLIMDIS=0.2
 ABSLIMYCON=0.25
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 FORMAT="-f srv -b 32"
 GRIDS="n16 n32"
 #
@@ -32,8 +32,8 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
       if [ $RMOD = dis ];  then ABSLIM=$ABSLIMDIS; fi
       if [ $RMOD = ycon ]; then ABSLIM=$ABSLIMYCON; fi
       RSTAT=0
-      OFILE=${GRID}_${RMOD}
-      RFILE=$DATAPATH/${OFILE}_ref
+      OFILE=${GRID}_${RMOD}_$$
+      RFILE=$DATAPATH/${GRID}_${RMOD}_ref
 
       CDOTEST="gen${RMOD} $GRID $GRIDTYPE"
       CDOCOMMAND="$CDO $FORMAT gen${RMOD},$GRID $SETGRID $IFILE remapweights"

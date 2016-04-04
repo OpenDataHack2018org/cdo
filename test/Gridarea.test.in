@@ -4,8 +4,8 @@ echo 1..7 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 REFVAL="12.5663706"
 GRIDS="global_5 global_2 global_1 global_.5 n32 n80 n160"
 RSTAT=0;

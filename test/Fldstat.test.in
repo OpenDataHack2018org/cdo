@@ -4,8 +4,8 @@ echo 1..9 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 FORMAT="-f srv -b 32"
 #
 STATS="min max sum avg mean std std1 var var1"

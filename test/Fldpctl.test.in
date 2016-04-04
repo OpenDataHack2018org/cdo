@@ -4,8 +4,8 @@ echo 1..1 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 FORMAT="-f srv -b 32"
 #
 PCTLS="1 20 25 33 50 66 75 80 99 100"

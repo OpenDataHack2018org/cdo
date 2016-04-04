@@ -11,8 +11,8 @@ test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
 ABSLIMMAX=0.0001
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 FORMAT=""
 NTEST=1
 ######################################################

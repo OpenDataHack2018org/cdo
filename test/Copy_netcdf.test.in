@@ -4,8 +4,8 @@ echo 1..5 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 #
 FILES="datar.nc datag.nc datac.nc datau.nc testfile01c.nc"
 #

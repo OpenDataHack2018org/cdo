@@ -4,8 +4,8 @@ echo 1..9 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 #
 GRIDTYPES="regular generic curvilinear"
 DISTS="4,3 12,1 1,6"

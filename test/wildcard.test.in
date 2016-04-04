@@ -23,8 +23,8 @@ else
   IFILES="$IFILE1"
 fi
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 #
 NTEST=1
 #

@@ -4,8 +4,8 @@ echo 1..2 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 #
 IFILE=$DATAPATH/detrend_data
 NTEST=1

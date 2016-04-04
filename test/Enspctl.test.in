@@ -4,14 +4,14 @@ echo 1..1 # Number of tests to be executed.
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
-CDOOUT=cout
-CDOERR=cerr
+CDOOUT=cout$$
+CDOERR=cerr$$
 PCTLS="1 20 25 33 50 66 75 80 99 100"
 #
 IFILE=$DATAPATH/ts_mm_5years
 export CDO_FILE_SUFFIX=NULL
-$CDO splityear $IFILE ts_year
-IFILE="ts_year????"
+$CDO splityear $IFILE ${$}ts_year
+IFILES="${$}ts_year????"
 #
 NTEST=1
 RSTAT=0
@@ -22,7 +22,7 @@ for PCTL in $PCTLS; do
   OFILE=enspctl${STAT}_res
 
   CDOTEST="enspctl"
-  CDOCOMMAND="$CDO enspctl,${PCTL} $IFILE $OFILE"
+  CDOCOMMAND="$CDO enspctl,${PCTL} $IFILES $OFILE"
 
   echo "$CDOCOMMAND"
 
@@ -42,6 +42,6 @@ test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
 test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 #
 rm -f $CDOOUT $CDOERR
-rm -f $IFILE
+rm -f $IFILES
 #
 exit 0
