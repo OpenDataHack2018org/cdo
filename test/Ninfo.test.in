@@ -1,0 +1,41 @@
+#! @SHELL@
+echo 1..5 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+#
+NTEST=1
+#
+for OPERATOR in reducegrid; do
+  for grid  in r18x9 ni4 ni96 global_10 t63grid; do
+    RSTAT=0
+
+    CDOTEST="$OPERATOR on grid ${grid}"
+
+    CDOCOMMAND="$CDO -s -ngridpoints -topo,${grid}"
+    echo "$CDOCOMMAND"
+
+    $CDOCOMMAND
+    test $? -eq 0 || let RSTAT+=1
+    case $grid in
+      r18x9)
+        if test 162   -eq $($CDOCOMMAND) ; then  echo "ok $NTEST - $CDOTEST"; else echo "not ok $NTEST - $CDOTEST"; fi
+        ;;
+      ni4)
+        if test 250   -eq $($CDOCOMMAND) ; then  echo "ok $NTEST - $CDOTEST"; else echo "not ok $NTEST - $CDOTEST"; fi
+        ;;
+      ni96)
+        if test 94090 -eq $($CDOCOMMAND) ; then  echo "ok $NTEST - $CDOTEST"; else echo "not ok $NTEST - $CDOTEST"; fi
+        ;;
+      global_10)
+        if test 648   -eq $($CDOCOMMAND) ; then  echo "ok $NTEST - $CDOTEST"; else echo "not ok $NTEST - $CDOTEST"; fi
+        ;;
+      t63grid)
+        if test 18432 -eq $($CDOCOMMAND) ; then  echo "ok $NTEST - $CDOTEST"; else echo "not ok $NTEST - $CDOTEST"; fi
+        ;;
+    esac
+
+    let NTEST+=1
+  done
+done
+#
+exit 0
