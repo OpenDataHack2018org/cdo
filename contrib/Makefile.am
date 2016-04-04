@@ -6,6 +6,8 @@ completions:
 	  ruby -KN $(srcdir)/makecompl.rb -o cdoCompletion; \
 	fi
 
+cdoCompletion.bash cdoCompletion.zsh cdoCompletion.tcsh: completions
+
 test:
 	if (hash ruby &> /dev/null) ; then \
 	    (cd ruby;ruby test/test_cdo.rb) \
