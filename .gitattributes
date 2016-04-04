@@ -732,6 +732,8 @@ test/Gradsdes.test.in -text
 test/Gridarea.test.in -text
 test/Makefile.am -text
 test/Makefile.in -text
+test/MapReduce.test.in -text
+test/Ninfo.test.in -text
 test/README -text
 test/Read_grib.test.in -text
 test/Read_netcdf.test.in -text
@@ -794,6 +796,8 @@ test/data/grib_testfile01_sinfo_ref -text
 test/data/grib_testfile02.grb -text
 test/data/grib_testfile02_info_ref -text
 test/data/grib_testfile02_sinfo_ref -text
+test/data/griddes.ni4 -text
+test/data/griddes.r18x9 -text
 test/data/hl_l19.grb -text
 test/data/ml2pl_ref -text
 test/data/n16_bic_ref -text

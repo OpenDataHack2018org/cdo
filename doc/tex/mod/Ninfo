@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = npar nlevel nyear nmon ndate ntime
+@Operators = npar nlevel nyear nmon ndate ntime ngridpoints ngrids
 
 @BeginDescription
 This module prints the number of variables, levels or times of the 
@@ -65,6 +65,24 @@ Prints the number of different dates.
 
 @BeginDescription
 Prints the number of timesteps.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ngridpoints
+@Title     = Number of gridpoints
+
+@BeginDescription
+Prints the number of gridpoints for each variable.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ngrids
+@Title     = Number of horizontal grids
+
+@BeginDescription
+Prints the number of horizontal grids.
 @EndDescription
 @EndOperator
 

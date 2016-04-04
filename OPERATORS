@@ -20,6 +20,8 @@ Operator catalog:
    Ninfo         nmon            Number of months
    Ninfo         ndate           Number of dates
    Ninfo         ntime           Number of timesteps
+   Ninfo         ngridpoints     Number of gridpoints
+   Ninfo         ngrids          Number of horizontal grids
    Showinfo      showformat      Show file format
    Showinfo      showcode        Show code numbers
    Showinfo      showname        Show variable names

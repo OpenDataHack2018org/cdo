@@ -24,6 +24,8 @@
       Ninfo      nmon            Number of months
       Ninfo      ndate           Number of dates
       Ninfo      ntime           Number of timesteps
+      Ninfo      ngridpoints     Number of gridpoints
+      Ninfo      ngrids          Number of grids
 */
 
 
@@ -35,13 +37,14 @@
 
 void *Ninfo(void *argument)
 {
-  enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL};
+  enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL, NGRIDPOINTS, NGRIDS};
   int operatorID;
   int operfunc;
-  int varID, zaxisID;
+  int varID, zaxisID, gridID;
   int vdate;
-  int nrecs, nvars, ntsteps;
+  int nrecs, nvars, ntsteps, ngrids;
   int levelsize;
+  int gridsize;
   int tsID, ndate, date0 = 0;
   int day, mon0 = 0, mon, nmon, year0 = 0, year, nyear;
   int taxisID;
@@ -50,12 +53,14 @@ void *Ninfo(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("nyear",  NYEAR,  0, NULL);
-  cdoOperatorAdd("nmon",   NMON,   0, NULL);
-  cdoOperatorAdd("ndate",  NDATE,  0, NULL);
-  cdoOperatorAdd("ntime",  NTIME,  0, NULL);
-  cdoOperatorAdd("npar",   NPAR,   0, NULL);
-  cdoOperatorAdd("nlevel", NLEVEL, 0, NULL);
+  cdoOperatorAdd("nyear"       , NYEAR       , 0 , NULL);
+  cdoOperatorAdd("nmon"        , NMON        , 0 , NULL);
+  cdoOperatorAdd("ndate"       , NDATE       , 0 , NULL);
+  cdoOperatorAdd("ntime"       , NTIME       , 0 , NULL);
+  cdoOperatorAdd("npar"        , NPAR        , 0 , NULL);
+  cdoOperatorAdd("nlevel"      , NLEVEL      , 0 , NULL);
+  cdoOperatorAdd("ngridpoints" , NGRIDPOINTS , 0 , NULL);
+  cdoOperatorAdd("ngrids"      , NGRIDS      , 0 , NULL);
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);
@@ -67,6 +72,7 @@ void *Ninfo(void *argument)
   nvars   = vlistNvars(vlistID);
   taxisID = vlistInqTaxis(vlistID);
   ntsteps = vlistNtsteps(vlistID);
+  ngrids  = vlistNgrids(vlistID);
 
   switch ( operfunc )
     {
@@ -144,6 +150,17 @@ void *Ninfo(void *argument)
 	  levelsize = zaxisInqSize(zaxisID);
 	  fprintf(stdout, "%d\n", levelsize);
 	}
+      break;
+    case NGRIDPOINTS:
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  gridID = vlistInqVarGrid(vlistID, varID);
+	  gridsize = gridInqSize(gridID);
+	  fprintf(stdout, "%d\n", gridsize);
+	}
+      break;
+    case NGRIDS:
+      fprintf(stdout, "%d\n", ngrids);
       break;
     default:
       cdoAbort("operator not implemented!");
