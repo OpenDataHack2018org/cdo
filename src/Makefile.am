@@ -410,3 +410,8 @@ endif
 #	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
 #
 CLEANFILES  = `ls *~ 2> /dev/null`
+#
+clean-local: clean-local-dirs
+.PHONY: clean-local-dirs
+clean-local-dirs:
+	-rm -rf *.dSYM
