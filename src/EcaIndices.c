@@ -241,7 +241,7 @@ static const char RX5DAY_NAME2[]     = "number_of_5day_heavy_precipitation_perio
 static const char RX5DAY_LONGNAME2[] = "Number of 5day periods in given time period with precipitation amount exceeding %1.0f mm / 5 days. The time period should be defined by the bounds of the time coordinate.";
 static const char RX5DAY_UNITS2[]    = "No.";
 
-static const char SDII_NAME[]        = "simple_daily_intensitiy_index_per_time_period";
+static const char SDII_NAME[]        = "simple_daily_intensity_index_per_time_period";
 static const char SDII_LONGNAME[]    = "Simple daily intensity index is the mean of precipitation amount on wet days. A wet day is a day with precipitation sum of at least %g mm. The time period should be defined by the bounds of the time coordinate.";
 static const char SDII_UNITS[]       = "mm";
 

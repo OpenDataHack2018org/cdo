@@ -34,20 +34,12 @@
  * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
 
 #include "utils.h"
 #include "geometry.h"
-
-#if defined(CDO) && !defined(HAVE_SQRTL)
-#define sqrtl(x) (sqrt((double)x))
-#endif
 
 // angle tolerance
 const double yac_angle_tol = 1e-9;
@@ -226,9 +218,9 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs((double)(cross_cd[0] * a[0] +
+         double angle = fabs(cross_cd[0] * a[0] +
                              cross_cd[1] * a[1] +
-                             cross_cd[2] * a[2])) / length_cross_cd ;
+                             cross_cd[2] * a[2]) / length_cross_cd ;
 
          // if ab is on the plane of cd
          if (fabs(angle) < tol) {
@@ -258,9 +250,9 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs((double)(cross_ab[0] * c[0] +
+         double angle = fabs(cross_ab[0] * c[0] +
                              cross_ab[1] * c[1] +
-                             cross_ab[2] * c[2])) / length_cross_ab;
+                             cross_ab[2] * c[2]) / length_cross_ab;
 
          // if cd is on the plane of ab
          if (fabs(angle) < tol) {
@@ -447,9 +439,9 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs((double)(cross_cd[0] * a[0] +
+         double angle = fabs(cross_cd[0] * a[0] +
                              cross_cd[1] * a[1] +
-                             cross_cd[2] * a[2])) / length_cross_cd ;
+                             cross_cd[2] * a[2]) / length_cross_cd ;
 
          // if ab is not on the plane of cd
          if (fabs(angle) >= tol)
@@ -467,9 +459,9 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
 
          // dot product is most accurate for angles around half PI
          // (for angles very close to half PI: alpha = fabs(acos(alpha))
-         double angle = fabs((double)(cross_ab[0] * c[0] +
+         double angle = fabs(cross_ab[0] * c[0] +
                              cross_ab[1] * c[1] +
-                             cross_ab[2] * c[2])) / length_cross_ab;
+                             cross_ab[2] * c[2]) / length_cross_ab;
 
          // if cd is not on the plane of ab
          if (fabs(angle) >= tol)

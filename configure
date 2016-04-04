@@ -1535,7 +1535,7 @@ Optional Packages:
   --with-hdf5=<yes|no|directory> (default=no)
                           location of HDF5 library
   --with-netcdf=<yes|no|directory> (default=no)
-                          location of netCDF library (lib and include subdirs)
+                          location of NetCDF library (lib and include subdirs)
   --with-cmor=<directory> Specify location of CMOR library.
   --with-grib_api=<yes|no|directory> (default=no)
                           location of GRIB_API library (lib and include
@@ -18845,8 +18845,8 @@ ENABLE_NC4HDF5=no
 if test "${with_netcdf+set}" = set; then :
   withval=$with_netcdf; case "$with_netcdf" in #(
   no) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for netCDF library" >&5
-$as_echo_n "checking for netCDF library... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for NetCDF library" >&5
+$as_echo_n "checking for NetCDF library... " >&6; }
                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; } ;; #(
   yes) :
@@ -18920,11 +18920,10 @@ $as_echo "#define HAVE_LIBNETCDF 1" >>confdefs.h
 
                                             ENABLE_NETCDF=yes
 else
-  as_fn_error $? "Could not link to netCDF library" "$LINENO" 5
+  as_fn_error $? "Could not link to NetCDF library" "$LINENO" 5
 fi
 
                             NETCDF_LIBS=" -lnetcdf"
-
                             # Extract the first word of "nc-config", so it can be a program name with args.
 set dummy nc-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
@@ -19080,12 +19079,11 @@ $as_echo "#define HAVE_LIBNETCDF 1" >>confdefs.h
 
                                                  ENABLE_NETCDF=yes
 else
-  as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
+  as_fn_error $? "Could not link to NetCDF library" "$LINENO" 5
 fi
 
                                  NETCDF_LIBS=" -L$NETCDF_ROOT/lib -lnetcdf"
                                  NETCDF_INCLUDE=" -I$NETCDF_ROOT/include"
-
                                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking nc-config script" >&5
 $as_echo_n "checking nc-config script... " >&6; }
                                  # Extract the first word of "nc-config", so it can be a program name with args.
@@ -19182,15 +19180,15 @@ else
 $as_echo "Could not find nc-config! go on with default configuration" >&6; }
 fi
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: $with_netcdf is not a directory! NETCDF suppressed" >&5
-$as_echo "$as_me: $with_netcdf is not a directory! NETCDF suppressed" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: $with_netcdf is not a directory! NetCDF suppressed" >&5
+$as_echo "$as_me: $with_netcdf is not a directory! NetCDF suppressed" >&6;}
 fi ;; #(
   *) :
      ;;
 esac
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for NETCDF library" >&5
-$as_echo_n "checking for NETCDF library... " >&6; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for NetCDF library" >&5
+$as_echo_n "checking for NetCDF library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi

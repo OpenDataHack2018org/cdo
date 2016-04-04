@@ -5657,7 +5657,7 @@ static const char *EcaSdiiHelp[] = {
     "    wet days (RR > R) is written to ofile. R is an optional parameter with default R = 1 mm.",
     "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
-    "    - simple_daily_intensitiy_index_per_time_period",
+    "    - simple_daily_intensity_index_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
