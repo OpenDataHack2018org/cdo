@@ -1,0 +1,42 @@
+#! @SHELL@
+echo 1..2 # Number of tests to be executed.
+#
+test -n "$CDO"      || CDO=cdo
+test -n "$DATAPATH" || DATAPATH=./data
+#
+NTEST=1
+#
+for OPERATOR in reducegrid; do
+  for grid  in r18x9 ni4; do
+    RSTAT=0
+
+    REF="$DATAPATH/griddes.${grid}"
+
+    CDOTEST="$OPERATOR on grid ${grid}"
+
+    $CDO -temp,$grid data_${grid}.grb
+    $CDO -gtc,273.15 -temp,${grid} mask_${grid}.grb
+
+    if [ "@ENABLE_NETCDF@" = yes ] ; then
+      echo "Running test: $NTEST"
+      CDOCOMMAND="$CDO -f nc reducegrid,mask_${grid}.grb data_${grid}.grb reduced_${grid}.nc"
+      echo "$CDOCOMMAND"
+
+      $CDOCOMMAND
+      test $? -eq 0 || let RSTAT+=1
+
+      $CDO griddes reduced_${grid}.nc > griddes.${grid}
+      cmp griddes.${grid} $REF
+      test $? -eq 0 || let RSTAT+=1
+
+      test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+      test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+    else
+      test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP netCDF not enabled"
+    fi
+
+    let NTEST+=1
+  done
+done
+#
+exit 0
