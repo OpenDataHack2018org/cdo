@@ -14,6 +14,7 @@
 2016-03-25  Uwe Schulzweida
 
 	* OpenMP installation error [Bug #6523]
+	* New operator: reducegrid - Select gridpoints wrt. given mask
 
 2016-03-18  Uwe Schulzweida
 
