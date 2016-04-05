@@ -17,7 +17,7 @@ REMAP_REF    = n16_bic_ref n16_bil_ref n16_con_ref n16_ycon_ref n16_laf_ref n16_
 SELECT_REF   = select1_ref select2_ref select3_ref select4_ref select5_ref
 DETREND_REF  = detrend_ref
 EXPR_REF     = expr1_ref aexpr1_ref expr2_ref aexpr2_ref
-THREAD_REF   = thread1_ref
+THREAD_REF   = thread1_ref tsformat1_ref
 GRADSDES_REF = pl_data.ctl pl_data.gmp
 
 EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(YMONSTAT_REF) $(TIMSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF)

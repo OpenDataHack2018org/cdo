@@ -846,6 +846,7 @@ test/data/timsum_ref -text
 test/data/timvar1_ref -text
 test/data/timvar_ref -text
 test/data/ts_mm_5years -text
+test/data/tsformat1_ref -text
 test/data/uvdata.grb -text
 test/data/ymonavg_ref -text
 test/data/ymonmax_ref -text

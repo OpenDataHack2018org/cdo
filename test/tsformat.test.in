@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..1 # Number of tests to be executed.
+echo 1..8 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -8,7 +8,7 @@ CDOOUT=cout$$
 CDOERR=cerr$$
 OFORMAT="-f srv -b 32"
 FORMATS="srv ext ieg grb grb2 nc nc2 nc4"
-FORMATS="nc4"
+#FORMATS="nc4"
 #
 IFILE=$DATAPATH/pl_data
 NTEST=1
@@ -41,10 +41,10 @@ function testfunc()
 {
   RSTAT=0
 
-  CDOTEST="chaining set $NTEST"
+  CDOTEST="chaining set $INSET with $FILEFORMAT"
   echo "Running test: $NTEST - $CDOTEST"
 
-  RFILE=$DATAPATH/thread${NTEST}_ref
+  RFILE=$DATAPATH/tsformat${INSET}_ref
   OFILE=thread${NTEST}_res
 
   CDOCOMMAND="$CDO $INSTR ${IFILE}(${FORMAT}) $OFILE"
@@ -53,7 +53,7 @@ function testfunc()
 
   if [ "${ENABLE_TEST}" = yes ] ; then
     if [ "@ENABLE_THREADS@" = yes ] ; then
-      $CDO -f $FORMAT copy ${IFILE} ifile$$
+      $CDO -f $FORMAT setgrid,r12x6 ${IFILE} ifile$$
       CDOCOMMAND="$CDO $INSTR ifile$$ $OFILE"
       
       $CDOCOMMAND
@@ -81,8 +81,9 @@ function testfunc()
 #
 for FORMAT in $FORMATS; do
   fileformat
-#  INSTR="-fldmean -timmean -select,code=129,130,152"
-  INSTR="-fldmean -timmean -select,code=130"
+#  INSTR="-fldmin -timmean -select,code=129,130,152"
+  INSTR="-fldmin -timmean -select,code=130"
+  INSET=1
   testfunc
 done
 #
