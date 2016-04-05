@@ -6,7 +6,7 @@ test -n "$DATAPATH" || DATAPATH=./data
 #
 CDOOUT=cout$$
 CDOERR=cerr$$
-FORMAT="-f srv -b 32"
+OFORMAT="-f srv -b 32"
 #
 IFILE=$DATAPATH/pl_data
 NTEST=1
@@ -21,7 +21,7 @@ function testfunc()
   RFILE=$DATAPATH/thread${NTEST}_ref
   OFILE=thread${NTEST}_res
 
-  CDOCOMMAND="$CDO $FORMAT $INSTR $IFILE $OFILE"
+  CDOCOMMAND="$CDO $OFORMAT $INSTR $IFILE $OFILE"
       
   echo "$CDOCOMMAND"
 
