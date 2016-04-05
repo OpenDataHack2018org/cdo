@@ -796,9 +796,10 @@ test/data/grib_testfile01_sinfo_ref -text
 test/data/grib_testfile02.grb -text
 test/data/grib_testfile02_info_ref -text
 test/data/grib_testfile02_sinfo_ref -text
-test/data/griddes.ni4 -text
+test/data/griddes.icon_cell -text
 test/data/griddes.r18x9 -text
 test/data/hl_l19.grb -text
+test/data/icon_cell_grid -text
 test/data/ml2pl_ref -text
 test/data/n16_bic_ref -text
 test/data/n16_bil_ref -text
@@ -824,6 +825,7 @@ test/data/pl_data -text
 test/data/pl_data.ctl -text
 test/data/pl_data.gmp -text
 test/data/pl_data.grb -text
+test/data/r18x9_grid -text
 test/data/select1_ref -text
 test/data/select2_ref -text
 test/data/select3_ref -text

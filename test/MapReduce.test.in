@@ -7,19 +7,21 @@ test -n "$DATAPATH" || DATAPATH=./data
 NTEST=1
 #
 for OPERATOR in reducegrid; do
-  for grid  in r18x9 ni4; do
+  for grid  in r18x9 icon_cell; do
     RSTAT=0
 
+    REFGRID="${DATAPATH}/${grid}_grid"
     REF="$DATAPATH/griddes.${grid}"
 
     CDOTEST="$OPERATOR on grid ${grid}"
 
-    $CDO -temp,$grid data_${grid}.grb
-    $CDO -gtc,273.15 -temp,${grid} mask_${grid}.grb
-
     if [ "@ENABLE_NETCDF@" = yes ] ; then
+
+      $CDO -f nc -temp,$REFGRID data_${grid}.nc
+      $CDO -f nc -gtc,273.15 -temp,$REFGRID mask_${grid}.nc
+
       echo "Running test: $NTEST"
-      CDOCOMMAND="$CDO -f nc reducegrid,mask_${grid}.grb data_${grid}.grb reduced_${grid}.nc"
+      CDOCOMMAND="$CDO -f nc reducegrid,mask_${grid}.nc data_${grid}.nc reduced_${grid}.nc"
       echo "$CDOCOMMAND"
 
       $CDOCOMMAND
@@ -38,8 +40,8 @@ for OPERATOR in reducegrid; do
       test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP netCDF not enabled"
     fi
 
-    rm data_${grid}.grb
-    rm mask_${grid}.grb
+    rm data_${grid}.nc
+    rm mask_${grid}.nc
 
     let NTEST+=1
   done
