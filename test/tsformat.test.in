@@ -55,9 +55,11 @@ function testfunc()
     if [ "@ENABLE_THREADS@" = yes ] ; then
       $CDO -f $FORMAT setgrid,r12x6 ${IFILE} ifile$$
       CDOCOMMAND="$CDO $INSTR ifile$$ $OFILE"
-      
-      $CDOCOMMAND
-      test $? -eq 0 || let RSTAT+=1
+
+      for i in {1..5} ; do
+        $CDOCOMMAND
+        test $? -eq 0 || let RSTAT+=1
+      done
 
       $CDO diff -selcode,130 $RFILE $OFILE > $CDOOUT 2> $CDOERR
       test $? -eq 0 || let RSTAT+=1
