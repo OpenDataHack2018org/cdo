@@ -18,15 +18,19 @@ for GRID in $GRIDS; do
   CDOTEST="gridarea $GRID"
   CDOCOMMAND="$CDO outputf,%10.7f -fldsum -gridarea -random,$GRID"
 
-  echo "Running test: $NTEST"
-  echo "$CDOCOMMAND"
+  if [ "@ENABLE_THREADS@" = yes ] ; then
+    echo "Running test: $NTEST"
+    echo "$CDOCOMMAND"
 
-  GLOBAREA=`$CDOCOMMAND`
-  echo "gridarea $GRID: >$GLOBAREA< >$REFVAL<"
-  if [ "$GLOBAREA" != "$REFVAL" ]; then RSTAT=`expr $RSTAT + 1`; fi
+    GLOBAREA=`$CDOCOMMAND`
+    echo "gridarea $GRID: >$GLOBAREA< >$REFVAL<"
+    if [ "$GLOBAREA" != "$REFVAL" ]; then RSTAT=`expr $RSTAT + 1`; fi
 
-  test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
-  test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+    test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+    test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+  else
+    test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP POSIX threads not enabled"
+  fi
 
   let NTEST+=1
 done
