@@ -11,8 +11,8 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
                   $(top_srcdir)/config/tap-driver.sh
 
 # tests which should pass
-TESTS = threads.test wildcard.test File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test Detrend.test \
-        Genweights.test Remap.test Select.test Spectral.test Ymonstat.test Timstat.test Ensstat.test \
+TESTS = threads.test tsformat.test wildcard.test File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
+        Detrend.test Genweights.test Remap.test Select.test Spectral.test Ymonstat.test Timstat.test Ensstat.test \
         Enspctl.test Fldstat.test Fldpctl.test Vertint.test Afterburner.test Arith.test Expr.test \
         Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
 

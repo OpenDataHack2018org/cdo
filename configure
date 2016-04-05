@@ -21064,7 +21064,7 @@ ac_config_files="$ac_config_files test/Ymonstat.test test/Fldstat.test test/Fldp
 
 ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arith.test test/Expr.test"
 
-ac_config_files="$ac_config_files test/Gradsdes.test test/Collgrid.test test/threads.test test/wildcard.test"
+ac_config_files="$ac_config_files test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test"
 
 ac_config_files="$ac_config_files test/MapReduce.test test/Ninfo.test"
 
@@ -22241,6 +22241,7 @@ do
     "test/Gradsdes.test") CONFIG_FILES="$CONFIG_FILES test/Gradsdes.test" ;;
     "test/Collgrid.test") CONFIG_FILES="$CONFIG_FILES test/Collgrid.test" ;;
     "test/threads.test") CONFIG_FILES="$CONFIG_FILES test/threads.test" ;;
+    "test/tsformat.test") CONFIG_FILES="$CONFIG_FILES test/tsformat.test" ;;
     "test/wildcard.test") CONFIG_FILES="$CONFIG_FILES test/wildcard.test" ;;
     "test/MapReduce.test") CONFIG_FILES="$CONFIG_FILES test/MapReduce.test" ;;
     "test/Ninfo.test") CONFIG_FILES="$CONFIG_FILES test/Ninfo.test" ;;
@@ -23760,6 +23761,7 @@ _LT_EOF
     "test/Gradsdes.test":F) chmod a+x "$ac_file" ;;
     "test/Collgrid.test":F) chmod a+x "$ac_file" ;;
     "test/threads.test":F) chmod a+x "$ac_file" ;;
+    "test/tsformat.test":F) chmod a+x "$ac_file" ;;
     "test/wildcard.test":F) chmod a+x "$ac_file" ;;
     "test/MapReduce.test":F) chmod a+x "$ac_file" ;;
     "test/Ninfo.test":F) chmod a+x "$ac_file" ;;
