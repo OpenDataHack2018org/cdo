@@ -17,42 +17,42 @@ for OPERATOR in write copy; do
     CDOTEST="$OPERATOR $FORMAT"
     echo "Running test: $NTEST"
 
-    ENABLED_TEST=yes
+    ENABLE_TEST=yes
 
     if [ "@ENABLE_SERVICE@" = no -a "${FORMAT}" = srv ] ; then
       FILEFORMAT=SERVICE
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
     if [ "@ENABLE_EXTRA@" = no -a "${FORMAT}" = ext ] ; then
       FILEFORMAT=EXTRA
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
     if [ "@ENABLE_IEG@" = no -a "${FORMAT}" = ieg ] ; then
       FILEFORMAT=IEG
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
     if [ "@ENABLE_GRIB@" = no -a "${FORMAT}" = grb ] ; then
       FILEFORMAT=GRIB
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
     if [ "@ENABLE_GRIBAPI@" = no -a "${FORMAT}" = grb2 ] ; then
       FILEFORMAT=GRIB_API
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
     if [ "@ENABLE_NETCDF@" = no -a "${FORMAT}" = nc ] ; then
       FILEFORMAT=netCDF
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
     if [ "@ENABLE_NETCDF@" = no -a "${FORMAT}" = nc2 ] ; then
       FILEFORMAT=netCDF2
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
     if [ "@ENABLE_NC4@" = no -a "${FORMAT}" = nc4 ] ; then
       FILEFORMAT=netCDF4
-      ENABLED_TEST=no
+      ENABLE_TEST=no
     fi
 
-    if [ "${ENABLED_TEST}" = yes ] ; then
+    if [ "${ENABLE_TEST}" = yes ] ; then
       for DATATYPE in F32 F64; do
         FILE=file_${DATATYPE}_${FORMAT}
         RFILE=$DATAPATH/file_F32_srv_ref
