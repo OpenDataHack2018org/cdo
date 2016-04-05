@@ -45,7 +45,7 @@ function testfunc()
   echo "Running test: $NTEST - $CDOTEST"
 
   RFILE=$DATAPATH/tsformat${INSET}_ref
-  OFILE=thread${NTEST}_res
+  OFILE=thread${NTEST}_res$$
 
   CDOCOMMAND="$CDO $INSTR ${IFILE}(${FORMAT}) $OFILE"
       

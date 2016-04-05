@@ -19,7 +19,7 @@ function testfunc()
   echo "Running test: $NTEST - $CDOTEST"
 
   RFILE=$DATAPATH/thread${NTEST}_ref
-  OFILE=thread${NTEST}_res
+  OFILE=thread${NTEST}_res$$
 
   CDOCOMMAND="$CDO $OFORMAT $INSTR $IFILE $OFILE"
       
