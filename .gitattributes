@@ -929,4 +929,5 @@ test/test_info.py -text
 test/test_intgridbil.py -text
 test/test_operators -text
 test/threads.test.in -text
+test/tsformat.test.in -text
 test/wildcard.test.in -text
