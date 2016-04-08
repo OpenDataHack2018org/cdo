@@ -82,31 +82,35 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
 static
 void compare_grid_unstructured(int gridID1, int gridID2)
 {
-  int gridsize = gridInqSize(gridID1);
-
-  double *xvals1 = (double*) Malloc(gridsize*sizeof(double));
-  double *xvals2 = (double*) Malloc(gridsize*sizeof(double));
-  double *yvals1 = (double*) Malloc(gridsize*sizeof(double));
-  double *yvals2 = (double*) Malloc(gridsize*sizeof(double));
-
-  gridInqXvals(gridID1, xvals1);
-  gridInqXvals(gridID2, xvals2);
-  gridInqYvals(gridID1, yvals1);
-  gridInqYvals(gridID2, yvals2);
-
-  int inc = gridsize > 10000 ? gridsize/1000 : 1;
-  for ( int i = 0; i < gridsize; i += inc )
-    if ( fabs(xvals1[i] - xvals2[i]) > 2.e-5 || fabs(yvals1[i] - yvals2[i]) > 2.e-5 )
-      {
-        // printf("%g %g %g %g %g %g\n", xvals1[i], xvals2[i], yvals1[i], yvals2[i], xvals1[i] - xvals2[i], yvals1[i] - yvals2[i]);
-	cdoWarning("Geographic location of some grid points differ!");
-	break;
-      }
+  if ( gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL) &&
+       gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL) )
+    {
+      int gridsize = gridInqSize(gridID1);
       
-  Free(xvals1);
-  Free(xvals2);
-  Free(yvals1); 
-  Free(yvals2); 
+      double *xvals1 = (double*) Malloc(gridsize*sizeof(double));
+      double *xvals2 = (double*) Malloc(gridsize*sizeof(double));
+      double *yvals1 = (double*) Malloc(gridsize*sizeof(double));
+      double *yvals2 = (double*) Malloc(gridsize*sizeof(double));
+
+      gridInqXvals(gridID1, xvals1);
+      gridInqXvals(gridID2, xvals2);
+      gridInqYvals(gridID1, yvals1);
+      gridInqYvals(gridID2, yvals2);
+
+      int inc = gridsize > 10000 ? gridsize/1000 : 1;
+      for ( int i = 0; i < gridsize; i += inc )
+        if ( fabs(xvals1[i] - xvals2[i]) > 2.e-5 || fabs(yvals1[i] - yvals2[i]) > 2.e-5 )
+          {
+            // printf("%d %g %g %g %g %g %g\n", i, xvals1[i], xvals2[i], yvals1[i], yvals2[i], xvals1[i] - xvals2[i], yvals1[i] - yvals2[i]);
+            cdoWarning("Geographic location of some grid points differ!");
+            break;
+          }
+      
+      Free(xvals1);
+      Free(xvals2);
+      Free(yvals1); 
+      Free(yvals2); 
+    }
 }
 
 static
