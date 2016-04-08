@@ -7,7 +7,7 @@
 @Operators = cmor
 
 @BeginDescription
-Options is a comma separated list of key-value pairs with optional parameters.
+Options is a comma separated list of "key=value" pairs with optional parameters.
 @EndDescription
 @EndModule
 

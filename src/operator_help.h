@@ -476,7 +476,7 @@ static const char *SelectHelp[] = {
     "    ifiles is an arbitrary number of input files. All input files need to have ",
     "    the same structure with the same variables on different timesteps.",
     "    The fields selected depends on the chosen parameters. Parameter is a comma",
-    "    separated list of key-value pairs. Wildcards can be used for string parameter.",
+    "    separated list of \"key=value\" pairs. Wildcards can be used for string parameter.",
     "",
     "OPERATORS",
     "    select  Select fields",
