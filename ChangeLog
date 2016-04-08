@@ -3,7 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
-2016-04-05  Ralf Mueller
+2016-04-08  Uwe Schulzweida
+
+	* afterburner: seg. fault with data on half level (bug fix) [report: Monika Esch]
+
 2016-04-04  Ralf Mueller
 
         * New operators: ngrids, ngridpoints - Show number of grids/gridpoints per variable
