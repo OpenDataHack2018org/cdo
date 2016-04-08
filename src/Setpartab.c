@@ -73,7 +73,7 @@ static pthread_mutex_t udunitsMutex;
 #endif
 
 
-ut_system *ut_read = NULL;
+static ut_system *ut_read = NULL;
 
 static
 void udunitsInitialize(void)
