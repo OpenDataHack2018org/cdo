@@ -1486,6 +1486,8 @@ void after_precntl(struct Control *globs, struct Variable *vars)
                       continue;
 		    }
 		}
+              else if ( leveltype == ZAXIS_HYBRID && globs->nvct == zaxisInqVctSize(zaxisID) )
+                continue;
 
 	      if ( iVertID != - 1 )
 		Warning( "More than %d different vertical grid structure found!", vertfound);
