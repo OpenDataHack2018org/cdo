@@ -63,7 +63,6 @@ void *Vertintml(void *argument)
   double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
-  double *hyb_press = NULL;
   int Extrapolate = 0;
   int mono_level;
   int instNum, tableNum;
@@ -646,6 +645,7 @@ void *Vertintml(void *argument)
 		      nlevel = nhlevf;
 		    }
 		  */
+                  double *hyb_press = NULL;
 		  if ( nlevel == nhlevh )
 		    {
 		      hyb_press = half_press;

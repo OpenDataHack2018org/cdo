@@ -3,7 +3,9 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-04-05  Ralf Mueller
 2016-04-04  Ralf Mueller
+
         * New operators: ngrids, ngridpoints - Show number of grids/gridpoints per variable
 
 2016-04-02  Uwe Schulzweida

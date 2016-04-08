@@ -2061,8 +2061,13 @@ void after_processML(struct Control *globs, struct Variable *vars)
 		  }
 		else
 		  {
-		    interp_X(vars[code].hybrid, vars[code].grid, vars[FULL_PRESS].hybrid,
-			     globs->vert_index, pressureLevel, globs->NumLevelRequest, globs->DimGP, globs->NumLevel, vars[code].missval);
+                    int numlevel = vars[code].hlev;
+                    if ( code == OMEGA ) numlevel = globs->NumLevel;
+                    double *hyb_press = vars[FULL_PRESS].hybrid;
+                    if ( numlevel == (globs->NumLevel+1) ) hyb_press = vars[HALF_PRESS].hybrid;
+
+		    interp_X(vars[code].hybrid, vars[code].grid, hyb_press,
+			     globs->vert_index, pressureLevel, globs->NumLevelRequest, globs->DimGP, numlevel, vars[code].missval);
 		  }
 
 		if ( ! globs->Extrapolate ) vars[code].nmiss = nmiss;
@@ -2614,7 +2619,7 @@ void after_EchamAddRecord(struct Control *globs, struct Variable *vars, int code
       vars[code].hlev = nlevel;
       vars[code].plev = nlevel;
       vars[code].sfit = FALSE;
-      if ( nlevel > 1 && leveltype == ZAXIS_HYBRID && nlevel == globs->NumLevel )
+      if ( nlevel > 1 && leveltype == ZAXIS_HYBRID && (nlevel == globs->NumLevel || nlevel == globs->NumLevel+1) )
 	{
 	  vars[code].plev = globs->NumLevelRequest;
 	  vars[code].sfit = TRUE;

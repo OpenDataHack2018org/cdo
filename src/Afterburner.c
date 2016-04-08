@@ -982,11 +982,14 @@ void after_defineLevel(struct Control *globs, struct Variable *vars)
 	  if ( vars[code].selected )
 	    {
 	      if ( vars[code].izaxisID != -1 )
-		if ( zaxisInqType(vars[code].izaxisID) == zaxisInqType(iVertID) &&
-		     zaxisInqSize(vars[code].izaxisID) == globs->NumLevel &&
-		     zaxisInqSize(vars[code].izaxisID) >  1 )
-		  vars[code].ozaxisID = oVertID;
-	    }
+                {
+                  int nlev = zaxisInqSize(vars[code].izaxisID);
+                  if ( zaxisInqType(vars[code].izaxisID) == zaxisInqType(iVertID) &&
+                       (nlev == globs->NumLevel || nlev == globs->NumLevel+1) &&
+                       nlev >  1 )
+                    vars[code].ozaxisID = oVertID;
+                }
+            }
 	}
 
       break;
