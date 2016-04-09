@@ -77,7 +77,6 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@MAINTAINER_MODE_TRUE@am__append_1 = `ls cdoCompletion.*`
 subdir = contrib
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/config/mkinstalldirs COPYING
@@ -287,7 +286,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = makecompl.rb cdoCompletion.bash cdoCompletion.tcsh cdoCompletion.zsh
-CLEANFILES = $(am__append_1)
+CLEANFILES = `ls cdoCompletion.*`
 all: all-am
 
 .SUFFIXES:
@@ -366,7 +365,6 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-@MAINTAINER_MODE_FALSE@all-local:
 all-am: Makefile all-local
 installdirs:
 install: install-am
@@ -497,7 +495,9 @@ test:
 	    (cd python; python test/test_cdo.py) \
 	fi
 
-@MAINTAINER_MODE_TRUE@all-local: completions
+#if MAINTAINER_MODE
+all-local: completions
+#endif
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

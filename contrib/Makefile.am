@@ -1,5 +1,5 @@
 EXTRA_DIST = makecompl.rb cdoCompletion.bash cdoCompletion.tcsh cdoCompletion.zsh
-CLEANFILES = 
+CLEANFILES =
 
 completions:
 	if (hash ruby &> /dev/null) ; then \
@@ -16,8 +16,8 @@ test:
 	    (cd python; python test/test_cdo.py) \
 	fi
 
-if MAINTAINER_MODE
+#if MAINTAINER_MODE
 all-local: completions
 
-CLEANFILES  += `ls cdoCompletion.*`
-endif
+CLEANFILES += `ls cdoCompletion.*`
+#endif
