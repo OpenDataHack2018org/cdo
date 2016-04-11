@@ -519,13 +519,13 @@ static double calculate_the_polygon_area(double cell_corners[], int number_corne
 
 static int are_polygon_vertices_arranged_in_clockwise_order(double cell_area){
 
-  /* A positive area indicates a clockwise arrangement of vertices, a negative area a counterclockwise arrangement. There should be an area to begin with. */
+  /* A negative area indicates a clockwise arrangement of vertices, a positive area a counterclockwise arrangement. There should be an area to begin with. */
   
   if (cell_area > 0){
-    return 1;
+    return 0;
   }
   if (cell_area < 0){
-    return 0;
+    return 1;
   }
 }
 
@@ -1057,7 +1057,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   
   double center_point_in_Euclidean_space[3];
   double cell_corners_in_Euclidean_space_open_cell[ncorner * 3];
-  double no_cells_with_a_specific_no_of_corners[ncorner + 1];
+  double no_cells_with_a_specific_no_of_corners[ncorner];
   double no_cells_with_classification_no[6];
   double corner_coordinates[3];
   double second_corner_coordinates[3];
@@ -1096,7 +1096,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   */
   
 
-  for (cell_no = 0; cell_no < gridsize; cell_no++)
+  for (cell_no = 0; cell_no < 4; cell_no++)
     {
       printf("\n\n");
       printf("Cell Number %d:\n\n", cell_no + 1);
@@ -1149,7 +1149,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
       
       printf("The actual number of corners is: %u\n\n", actual_number_of_corners);
 
-      no_cells_with_a_specific_no_of_corners[actual_number_of_corners] += 1;
+      no_cells_with_a_specific_no_of_corners[actual_number_of_corners - 1] += 1;
       
       /* If there are less than three corners in the cell, it is unusable and considered degenerate. No area can be computed. */
       
@@ -1276,15 +1276,33 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 	break;
       }
 
+      printf("Cell coordinates of the closed cell in 2D are:\n\n");
+
+      for(corner_no = 0; corner_no <= actual_number_of_corners; corner_no++){
+	printf("(%f, %f)\n", cell_corners_plane_projection[corner_no * 2 + 0], cell_corners_plane_projection[corner_no * 2 + 1]);
+      }
+      
+      printf("\n");
+
+      printf("Center point coordinates in 2D are:\n\n");
+      printf("(%f, %f)", center_point_plane_projection[0], center_point_plane_projection[1]);
+      printf("\n\n");
+
       /* Checking for convexity of the cell. */
 
       if(is_simple_polygon_convex(cell_corners_plane_projection, actual_number_of_corners +1)){
 	no_convex_cells += 1;
       }
 
+      
+
       /* Checking the arrangement of cell vertices. */
 
-      int is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners));
+      double polygon_area = calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners);
+
+      fprintf(stderr,"The polygon area is: %f\n\n", polygon_area);
+
+      int is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
       
       if((is_clockwise == 1) && (invert_result == 1)){
 	clockwise_match += 1;
@@ -1316,6 +1334,10 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 	no_counterclockwise_cells +=1;
       }
       
+     
+
+      continue;
+
       /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
         
       winding_number = winding_numbers_algorithm_with_printfs(cell_corners_plane_projection, actual_number_of_corners + 1, center_point_plane_projection);
@@ -1326,7 +1348,6 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 	printf("The presumed center point lies INSIDE the bounds of the cell.\n\n\n\n");
 	no_of_cells_with_center_points_within_their_bounds += 1;
       }
-
 
       printf("Cell coordinates of the closed cell in 2D are:\n\n");
 
@@ -1343,8 +1364,6 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
     
 
       
-
-      continue;
 
       /* 
 	 Determining the class of a polygon cell.
@@ -1369,19 +1388,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
       if (cell_class == 3) printf("Cell classification resulted in polygon class: Convex Degenerate.\n\n");
       if (cell_class == 4) printf("Cell classification resulted in polygon class: Convex Counterclockwise.\n\n");
       if (cell_class == 5) printf("Cell classification resulted in polygon class: Convex Clockwise.\n\n");
-      
-      continue;
-   
-      /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
-        
-      winding_number = winding_numbers_algorithm_without_printfs(cell_corners_plane_projection, ncorner, center_point_plane_projection);
-
-      if (winding_number == 0){
-	printf("The presumed center point lies OUTSIDE the bounds of the cell.\n\n\n\n");
-      } else {
-	printf("The presumed center point lies INSIDE the bounds of the cell.\n\n\n\n");
-	no_of_cells_with_center_points_within_their_bounds += 1;
-      }
+    
 
     }
 
@@ -1412,8 +1419,8 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 
   printf("\n\n");
   printf("Number of cells with a certain number of corners:\n\n");
-  for(int i = 0; i < ncorner + 1; i++){
-    printf("%d corners in %f cells.\n", i, no_cells_with_a_specific_no_of_corners[i]);
+  for(int i = 0; i < ncorner; i++){
+    printf("%d corners in %f cells.\n", i+1, no_cells_with_a_specific_no_of_corners[i]);
   }
 
   printf("\n");
