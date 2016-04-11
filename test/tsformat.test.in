@@ -57,9 +57,8 @@ function testfunc()
       CDOCOMMAND="$CDO $INSTR ifile$$ $OFILE"
 
       for i in {1..5} ; do
-        $CDOCOMMAND > $CDOOUT 2> $CDOERR
+        $CDOCOMMAND
         test $? -eq 0 || let RSTAT+=1
-        cat $CDOOUT $CDOERR
       done
 
       $CDO diff -selcode,130 $RFILE $OFILE > $CDOOUT 2> $CDOERR
