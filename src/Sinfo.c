@@ -129,7 +129,7 @@ void *Sinfo(void *argument)
       set_text_color(stdout, BRIGHT, BLACK);
       if ( lensemble )
 	fprintf(stdout, "%6d : Institut Source   Steptype Einfo Levels Num    Points Num Dtype : ",  -(indf+1));
-      else if ( nsubtypes > 0 )
+      else if ( nsubtypes > 1 )
 	fprintf(stdout, "%6d : Institut Source   Steptype Subtypes Levels Num    Points Num Dtype : ",  -(indf+1));
       else
 	fprintf(stdout, "%6d : Institut Source   Steptype Levels Num    Points Num Dtype : ",  -(indf+1));
@@ -196,7 +196,7 @@ void *Sinfo(void *argument)
 		fprintf(stdout, "--/-- ");
 	    }
 
-          if ( nsubtypes > 0 )
+          if ( nsubtypes > 1 )
             {
               int subtypeID = vlistInqVarSubtype(vlistID, varID);
               int subtypesize = subtypeInqSize(subtypeID);
@@ -269,7 +269,7 @@ void *Sinfo(void *argument)
 
       printZaxisInfo(vlistID);
 
-      if ( nsubtypes > 0 )
+      if ( nsubtypes > 1 )
         {
           fprintf(stdout, "   Subtypes");
           fprintf(stdout, " :\n");

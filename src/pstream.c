@@ -930,7 +930,7 @@ int pstreamInqVlist(int pstreamID)
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
 
       int nsubtypes = vlistNsubtypes(vlistID);
-      if ( nsubtypes > 0 )
+      if ( nsubtypes > 1 )
         cdoWarning("Subtypes are unsupported, the processing results are possibly wrong!");
 
       if ( cdoDefaultTimeType != CDI_UNDEFID )
