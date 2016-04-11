@@ -43,7 +43,7 @@
     "include"  : "@PROJ_INCLUDE@"
   },
   "magics"       : {
-    "lib"      : "@MAGICS_LDFLAGS@",
+    "lib"      : "@MAGICS_LIBS@",
     "include"  : "@MAGICS_INCLUDE@"
   },
   "USER_NAME"          : "@USER_NAME@",
