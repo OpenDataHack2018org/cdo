@@ -146,7 +146,7 @@ case "${HOSTNAME}" in
                  --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
                  --with-szlib=/sw/squeeze-x64/szip-2.1 \
                  --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
-                 --with-proj=/sw/squeeze-x64/proj-4.7.0"
+                 --with-proj=/sw/squeeze-x64/proj-4.7.0 LIBS=-lz"
 
         if  test "$COMP" = icpc ; then
           ${CONFPATH}configure --enable-cxx --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
