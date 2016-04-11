@@ -809,3 +809,14 @@ int cdoFiletype(void)
   return (cdoDefaultFileType);
 }
 
+
+void cdoSetNAN(double missval, size_t gridsize, double *array)
+{
+  if ( DBL_IS_NAN(missval) )
+    {
+      double newmissval = -9e33;
+      for ( size_t i = 0; i < gridsize; ++i )
+        if ( DBL_IS_EQUAL(array[i], missval) )
+          array[i] = newmissval;
+    }
+}

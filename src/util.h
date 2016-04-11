@@ -183,6 +183,8 @@ const char *cdoOperatorEnter(int operID);
 
 int     cdoFiletype(void);
 
+void cdoSetNAN(double missval, size_t gridsize, double *array);
+
 void    cdoInqHistory(int fileID);
 void    cdoDefHistory(int fileID, char *histstring);
 void cdo_def_tracking_id(int vlistID, const char *uuid_attribute);

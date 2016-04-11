@@ -1135,7 +1135,6 @@ void *Magplot(void *argument)
   int varID = 0;
   int gridID  = vlistInqVarGrid(vlistID, varID);
   // int zaxisID = vlistInqVarZaxis(vlistID, varID);
-  // double missval = vlistInqVarMissval(vlistID, varID);
 
   int gridtype = gridInqType(gridID);
   if ( gridtype == GRID_GME          ) cdoAbort("GME grid unspported!");
@@ -1227,17 +1226,7 @@ void *Magplot(void *argument)
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
 
-	  if ( nmiss )
-	    {
-	      double missval = vlistInqVarMissval(vlistID, varID);
-	      if ( DBL_IS_NAN(missval) )
-		{
-		  double newmissval = -9e33;
-		  for ( int i = 0; i < gridsize; ++i )
-		    if ( DBL_IS_EQUAL(array[i], missval) )
-		      array[i] = newmissval;
-		}
-	    }
+          if ( nmiss ) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, array);
 	  
 	  vlistInqVarName(vlistID, varID, varname);
 	  vlistInqVarUnits(vlistID, varID, units);

@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-04-11  Uwe Schulzweida
+
+	* Magplot: set NAN missvals to -9e33 [Bug: #6677]
+
 2016-04-08  Uwe Schulzweida
 
 	* afterburner: seg. fault with data on half level (bug fix) [report: Monika Esch]

@@ -349,7 +349,6 @@ void *Magvector(void *argument)
   int varID = 0;
   int gridID  = vlistInqVarGrid(vlistID, varID);
   // int zaxisID = vlistInqVarZaxis(vlistID, varID);
-  // double missval = vlistInqVarMissval(vlistID, varID);
 
   if ( gridInqType(gridID) == GRID_GME          ) cdoAbort("GME grid unspported!");
   if ( gridInqType(gridID) == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
@@ -423,17 +422,17 @@ void *Magvector(void *argument)
 	    {
 	       if( !strcmp( varname, "var131" ) || !strcmp( varname, "u" ) ) /* U Velocity as per GRIB is 'var131, as per NC 'u' */
 	  	 {
-                      if( DBG )
-          		fprintf( stderr,"Found U VEL in Varname %s\n",varname );
-		      streamReadRecord(streamID, uarray, &nmiss);
-		      found ++;
+                   if( DBG ) fprintf( stderr,"Found U VEL in Varname %s\n",varname );
+                   streamReadRecord(streamID, uarray, &nmiss);
+                   if ( nmiss ) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, uarray);
+                   found++;
 	  	 }
 	       if( !strcmp( varname, "var132" ) || !strcmp( varname, "v" ) ) /* V Velocity as per GRIB  is 'var132, as per NC 'v'*/
 	  	 {
-                      if( DBG )
-          		fprintf( stderr,"Found V VEL in Varname %s\n",varname );
-		      streamReadRecord(streamID, varray, &nmiss);
-		      found ++;
+                   if( DBG ) fprintf( stderr,"Found V VEL in Varname %s\n",varname );
+                   streamReadRecord(streamID, varray, &nmiss);
+                   if ( nmiss ) cdoSetNAN(vlistInqVarMissval(vlistID, varID), gridsize, varray);
+                   found++;
 	  	 }	
 	       if( found == 2 )
 	    	 break;

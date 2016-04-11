@@ -970,7 +970,7 @@ void *Maggraph(void *argument)
 
           double val;
 	  streamInqRecord( streamID, &varID, &levelID );
-	  streamReadRecord( streamID, &val, &nmiss );	
+	  streamReadRecord( streamID, &val, &nmiss );
 	  datatab[ fileID ][ tsID ] = val;
 	  vdate[ fileID ][ tsID ] = taxisInqVdate(taxisID);
 	  vtime[ fileID ][ tsID ] = taxisInqVtime(taxisID);
