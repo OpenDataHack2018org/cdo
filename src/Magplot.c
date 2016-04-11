@@ -1226,6 +1226,19 @@ void *Magplot(void *argument)
 	{
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
+
+	  if ( nmiss )
+	    {
+	      double missval = vlistInqVarMissval(vlistID, varID);
+	      if ( DBL_IS_NAN(missval) )
+		{
+		  double newmissval = -9e33;
+		  for ( int i = 0; i < gridsize; ++i )
+		    if ( DBL_IS_EQUAL(array[i], missval) )
+		      array[i] = newmissval;
+		}
+	    }
+	  
 	  vlistInqVarName(vlistID, varID, varname);
 	  vlistInqVarUnits(vlistID, varID, units);
 
