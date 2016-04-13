@@ -462,6 +462,7 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
       // printf("range %g %g %g %p\n", lon, lat, range, node);
 
       float frange = KDATA_INVSCALE(range);
+      /*
       if ( !(frange < range0) )
         {
           if ( result )
@@ -473,6 +474,7 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
             }
           result = NULL;
         }
+      */
       if ( prange ) *prange = frange;
     }
   
