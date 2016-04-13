@@ -283,9 +283,17 @@ int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_
   int ndist = num_neighbors;
   ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
   if ( ndist > (int)gs->n ) ndist = gs->n;
-  double *dist = (double*) malloc(ndist*sizeof(double));
-  int    *adds = (int*) malloc(ndist*sizeof(int));
 
+  double zdist[32];
+  int zadds[32];
+  double *dist = zdist;
+  int *adds = zadds;
+  if ( num_neighbors > 16 )
+    {
+      dist = (double*) Malloc(ndist*sizeof(double));
+      adds = (int*) Malloc(ndist*sizeof(int));
+    }
+  
   const double range0 = SQR(search_radius);
   double range = range0;
 
@@ -336,8 +344,11 @@ int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_
 
   nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
-  Free(dist);
-  Free(adds);
+  if ( num_neighbors > 16 )
+    {
+      Free(dist);
+      Free(adds);
+    }
 
   if ( ndist > num_neighbors ) ndist = num_neighbors;
 
