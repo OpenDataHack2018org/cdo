@@ -45,18 +45,9 @@ void nbr_store_distance(int nadd, double distance, int num_neighbors, int *restr
 static
 void nbr_check_distance(unsigned num_neighbors, const int *restrict nbr_add, double *restrict nbr_dist)
 {
-  double distance;
-
   // If distance is zero, set to small number
   for ( unsigned nchk = 0; nchk < num_neighbors; ++nchk )
-    {
-      if ( nbr_add[nchk] >= 0 )
-	{
-	  distance = nbr_dist[nchk];
-	  if ( IS_EQUAL(distance, 0.) ) distance = TINY;
-	  nbr_dist[nchk] = distance;
-	}
-    }
+    if ( nbr_add[nchk] >= 0 && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
 }
 
 
@@ -269,7 +260,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
 } // grid_search_nbr_reg2d
 
 
-void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat)
+int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat)
 {
   /*
     Output variables:
@@ -292,10 +283,10 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
   int ndist = num_neighbors;
   ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
   if ( ndist > (int)gs->n ) ndist = gs->n;
-  double dist[ndist];
-  int    adds[ndist];
+  double *dist = (double*) malloc(ndist*sizeof(double));
+  int    *adds = (int*) malloc(ndist*sizeof(int));
 
-  const double range0 = SQR(2*search_radius);
+  const double range0 = SQR(search_radius);
   double range = range0;
 
   int j = 0;
@@ -325,7 +316,7 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
               nadd  = p->node->index;
               range = p->dist_sq;
               Free(p); // Free the result node taken from the heap
-              
+
               if ( range < range0 )
                 {
                   dist[j] = sqrt(range);
@@ -337,7 +328,7 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
           Free(gs_result);    // and free the heap information structure
         }
     }
-  
+
   ndist = j;
 
   for ( j = 0; j < ndist; ++j )
@@ -345,6 +336,12 @@ void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr
 
   nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
+  Free(dist);
+  Free(adds);
+
+  if ( ndist > num_neighbors ) ndist = num_neighbors;
+
+  return ndist;
 } // grid_search_nbr
 
 //  This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
