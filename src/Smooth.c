@@ -27,6 +27,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "grid.h"
+#include "constants.h" // planet radius
 #include "pmlist.h"
 
 #include "grid_search.h"
@@ -38,7 +39,7 @@ typedef struct {
   double weightR;
 } smoothpoint_t;
 
-void grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
+int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
@@ -113,9 +114,9 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
 
-  int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
-  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
-  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+  int *nbr_mask = (int*) Malloc(num_neighbors*sizeof(int));          /* mask at nearest neighbors                */
+  int *nbr_add = (int*) Malloc(num_neighbors*sizeof(int));           /* source address at nearest neighbors      */
+  double *nbr_dist = (double*) Malloc(num_neighbors*sizeof(double)); /* angular distance four nearest neighbors  */
 
   clock_t start, finish;
   start = clock();
@@ -153,14 +154,14 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
       findex++;
       if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
 
-      grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[i], yvals[i]);
+      unsigned nadds = grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[i], yvals[i]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
-      double dist_tot = smooth_nbr_compute_weights(num_neighbors, mask, nbr_mask, nbr_add, nbr_dist,
+      double dist_tot = smooth_nbr_compute_weights(nadds, mask, nbr_mask, nbr_add, nbr_dist,
                                                    spoint.radius, spoint.weight0, spoint.weightR);
 
       /* Normalize weights and store the link */
-      unsigned nadds = smooth_nbr_normalize_weights(num_neighbors, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      nadds = smooth_nbr_normalize_weights(nadds, dist_tot, nbr_mask, nbr_add, nbr_dist);
       if ( nadds )
         {
           /*
@@ -187,6 +188,9 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
 
   if ( gridID0 != gridID ) gridDestroy(gridID);
 
+  Free(nbr_mask);
+  Free(nbr_add);
+  Free(nbr_dist);
   Free(mask);
   Free(xvals);
   Free(yvals);
@@ -304,6 +308,33 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
 }
 
 
+double convert_radius(const char *string)
+{
+  char *endptr = NULL;
+  double radius = strtod(string, &endptr);
+
+  if ( *endptr != 0 )
+    {
+      printf(">%s< umfang %g\n", endptr, 2*PlanetRadius*M_PI);
+      if ( strcmp(endptr, "km") == 0 )
+        radius = 360*((radius*1000)/(2*PlanetRadius*M_PI));
+      else if ( strncmp(endptr, "m", 1) == 0 )
+        radius = 360*((radius)/(2*PlanetRadius*M_PI));
+      else if ( strncmp(endptr, "deg", 3) == 0 )
+        ;
+      else if ( strncmp(endptr, "rad", 3) == 0 )
+        radius *= RAD2DEG;
+      else
+        cdoAbort("Float parameter >%s< contains invalid character at position %d!",
+                 string, (int)(endptr-string+1));
+    }
+
+  if ( radius > 180. ) radius = 180.;
+
+  return radius;
+}
+
+
 void *Smooth(void *argument)
 {
   int gridID;
@@ -336,9 +367,9 @@ void *Smooth(void *argument)
 
           PML_ADD_INT(pml, nsmooth,   1, "Number of times to smooth");
           PML_ADD_INT(pml, npoints,   1, "Maximum number of points");
-          PML_ADD_FLT(pml, radius,    1, "Search radius");
           PML_ADD_FLT(pml, weight0,   1, "Weight at distance 0");
           PML_ADD_FLT(pml, weightR,   1, "Weight at the search radius");
+          PML_ADD_WORD(pml, radius,   1, "Search radius");
           PML_ADD_WORD(pml, form,     1, "Form of the curve (linear, exponential, gauss");
       
           pml_read(pml, pargc, pargv);
@@ -346,9 +377,9 @@ void *Smooth(void *argument)
       
           if ( PML_NOCC(pml, nsmooth) )   xnsmooth       = par_nsmooth[0];
           if ( PML_NOCC(pml, npoints) )   spoint.npoints = par_npoints[0];
-          if ( PML_NOCC(pml, radius) )    spoint.radius  = par_radius[0];
           if ( PML_NOCC(pml, weight0) )   spoint.weight0 = par_weight0[0];
           if ( PML_NOCC(pml, weightR) )   spoint.weightR = par_weightR[0];
+          if ( PML_NOCC(pml, radius) )    spoint.radius  = convert_radius(par_radius[0]);
           if ( PML_NOCC(pml, form) )
             {
               if ( cdoVerbose ) printf("Form: %s\n", par_form[0]);
@@ -364,7 +395,7 @@ void *Smooth(void *argument)
         }
       
       if ( cdoVerbose )
-        cdoPrint("nsmooth = %d, npoints = %d, radius = %g, weight0 = %g, weightR = %g",
+        cdoPrint("nsmooth = %d, npoints = %d, radius = %gdegree, weight0 = %g, weightR = %g",
                  xnsmooth, spoint.npoints, spoint.radius, spoint.weight0, spoint.weightR);
       
     }

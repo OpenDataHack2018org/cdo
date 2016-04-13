@@ -3,6 +3,11 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-04-13  Uwe Schulzweida
+
+	* gridsearch_qnearest: removed range check (bug fix)
+	* grid_search_nbr: set range0 to SQR(search_radius) (bug fix)
+
 2016-04-11  Uwe Schulzweida
 
 	* Magplot: set NAN missvals to -9e33 [Bug: #6677]
