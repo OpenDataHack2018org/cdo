@@ -780,7 +780,11 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   double * p_surface_normal_of_the_cell;
   p_surface_normal_of_the_cell = &surface_normal_of_the_cell[0];
 
-  int * no_cells_with_a_specific_no_of_corners = malloc(ncorner * sizeof(int));
+  int no_cells_with_a_specific_no_of_corners[ncorner];
+
+  for (int i; i < ncorner; i++){
+    no_cells_with_a_specific_no_of_corners[i] = 0;
+  }
 
   /* 
      Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of Cartesian coordinates in Euclidean space. 
@@ -979,8 +983,6 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
   for(int i = 2; i < ncorner; i++){
     fprintf(stdout,"%u cells with %d vertices.\n", no_cells_with_a_specific_no_of_corners[i], i + 1);
   }
-
-  free(no_cells_with_a_specific_no_of_corners);
 
   printf("\n"); 
 }
