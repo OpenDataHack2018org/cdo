@@ -782,7 +782,7 @@ static void verify_grid_test(int gridsize, int ncorner, double *grid_center_lon,
 
   int no_cells_with_a_specific_no_of_corners[ncorner];
 
-  for (int i; i < ncorner; i++){
+  for (int i = 0; i < ncorner; i++){
     no_cells_with_a_specific_no_of_corners[i] = 0;
   }
 
