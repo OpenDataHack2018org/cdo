@@ -11,3 +11,7 @@ rm -f ref_man_*.tex ref_list_*.tex catalog.tex cdo_ref_over.tex
 rm -f operator_help.h OPERATORS
 rm -f cdo_refcard.tex
 rm -f x.log cdo_class
+rm -f alphabetic_list.tex
+rm -f cdo_eca.idx cdo_eca.ilg cdo_eca.ind cdo_eca.ist cdo_eca.out cdo_eca.toc
+rm -f cdo_magics.idx cdo_magics.ilg cdo_magics.ind cdo_magics.ist cdo_magics.out cdo_magics.toc
+rm -f cdo_oper.html
