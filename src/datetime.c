@@ -7,9 +7,7 @@ static int timestat_date = -1;
 static
 void get_timestat_date(int *tstat_date)
 {
-  char *envstr;
-
-  envstr = getenv("CDO_TIMESTAT_DATE");
+  char *envstr = getenv("CDO_TIMESTAT_DATE");
   if ( envstr == NULL ) envstr = getenv("RUNSTAT_DATE");
   if ( envstr )
     {
@@ -38,7 +36,7 @@ void dtlist_init(dtlist_type *dtlist)
 {
   dtlist->nalloc     = 0;
   dtlist->size       = 0;
-  dtlist->calendar   = CALENDAR_STANDARD;
+  dtlist->calendar   = -1;
   dtlist->has_bounds = -1;
   dtlist->stat       = TIMESTAT_LAST;
   dtlist->dtinfo     = NULL;
@@ -63,8 +61,7 @@ dtlist_type *dtlist_new(void)
 
 void dtlist_delete(dtlist_type *dtlist)
 {
-  if ( dtlist->nalloc > 0 && dtlist->dtinfo )
-    Free(dtlist->dtinfo);
+  if ( dtlist->nalloc > 0 && dtlist->dtinfo ) Free(dtlist->dtinfo);
 
   Free(dtlist);
 }
@@ -85,16 +82,53 @@ void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
   dtlist->dtinfo[tsID].v.date = taxisInqVdate(taxisID);
   dtlist->dtinfo[tsID].v.time = taxisInqVtime(taxisID);
 
-  if ( tsID == 0 && dtlist->has_bounds == -1 )
+  dtlist->dtinfo[tsID].c.date = dtlist->dtinfo[tsID].v.date;
+  dtlist->dtinfo[tsID].c.time = dtlist->dtinfo[tsID].v.time;
+
+  if ( tsID == 0 )
     {
-      dtlist->has_bounds = 0;
-      if ( taxisHasBounds(taxisID) ) dtlist->has_bounds = 1;
+      if ( dtlist->has_bounds == -1 )
+        {
+          dtlist->has_bounds = 0;
+          if ( taxisHasBounds(taxisID) ) dtlist->has_bounds = 1;
+        }
+
+      if ( dtlist->calendar == -1 )
+        {
+          dtlist->calendar = taxisInqCalendar(taxisID);
+        }
     }
 
   if ( dtlist->has_bounds )
     {
       taxisInqVdateBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].date), &(dtlist->dtinfo[tsID].b[1].date));
       taxisInqVtimeBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].time), &(dtlist->dtinfo[tsID].b[1].time));
+
+      if ( dtlist->dtinfo[tsID].v.date == dtlist->dtinfo[tsID].b[1].date &&
+           dtlist->dtinfo[tsID].v.time == dtlist->dtinfo[tsID].b[1].time )
+        {
+          int calendar = dtlist->calendar;
+          
+          int vdate = dtlist->dtinfo[tsID].b[0].date;
+          int vtime = dtlist->dtinfo[tsID].b[0].time;
+          juldate_t juldate1 = juldate_encode(calendar, vdate, vtime);
+          
+          vdate = dtlist->dtinfo[tsID].b[1].date;
+          vtime = dtlist->dtinfo[tsID].b[1].time;
+          juldate_t juldate2 = juldate_encode(calendar, vdate, vtime);
+
+          // int hour, minute, second;
+          // cdiDecodeTime(vtime, &hour, &minute, &second);
+          
+          if ( vtime == 0 && juldate_to_seconds(juldate1) < juldate_to_seconds(juldate2) )
+            {
+              juldate_t juldate = juldate_add_seconds(-1, juldate2);
+              juldate_decode(calendar, juldate, &vdate, &vtime);
+
+              dtlist->dtinfo[tsID].c.date = vdate;
+              dtlist->dtinfo[tsID].c.time = vtime;
+            }
+        }
     }
   else
     {
@@ -211,7 +245,7 @@ int dtlist_get_vdate(dtlist_type *dtlist, int tsID)
   if ( tsID < 0 || (size_t)tsID >= dtlist->size )
     cdoAbort("Internal error; tsID out of bounds!");
 
-  return dtlist->dtinfo[tsID].v.date;
+  return dtlist->dtinfo[tsID].c.date;
 }
 
 
@@ -220,7 +254,7 @@ int dtlist_get_vtime(dtlist_type *dtlist, int tsID)
   if ( tsID < 0 || (size_t)tsID >= dtlist->size )
     cdoAbort("Internal error; tsID out of bounds!");
 
-  return dtlist->dtinfo[tsID].v.time;
+  return dtlist->dtinfo[tsID].c.time;
 }
 
 

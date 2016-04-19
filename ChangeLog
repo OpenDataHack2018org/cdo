@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-04-19  Uwe Schulzweida
+
+	* Adjust date/time by -1 second if the verification time is equal to upper time bounds
+
 2016-04-13  Uwe Schulzweida
 
 	* gridsearch_qnearest: removed range check (bug fix)
