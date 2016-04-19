@@ -247,7 +247,6 @@ void *Info(void *argument)
   int gridsize = 0;
   int gridID, zaxisID;
   int code, param;
-  int vdate, vtime;
   int nrecs;
   int levelID;
   int nmiss;
@@ -275,6 +274,8 @@ void *Info(void *argument)
 
   int operatorID = cdoOperatorID();
 
+  dtlist_type *dtlist = dtlist_new();
+
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
       int streamID = streamOpenRead(cdoStreamName(indf));
@@ -293,8 +294,9 @@ void *Info(void *argument)
       int tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	{
-	  vdate = taxisInqVdate(taxisID);
-	  vtime = taxisInqVtime(taxisID);
+	  dtlist_taxisInqTimestep(dtlist, taxisID, 0);
+	  int vdate = dtlist_get_vdate(dtlist, 0);
+	  int vtime = dtlist_get_vtime(dtlist, 0);
 
 	  date2str(vdate, vdatestr, sizeof(vdatestr));
 	  time2str(vtime, vtimestr, sizeof(vtimestr));
@@ -485,6 +487,8 @@ void *Info(void *argument)
 
       if ( array ) Free(array);
     }
+
+  dtlist_delete(dtlist);
 
   cdoFinish();
 
