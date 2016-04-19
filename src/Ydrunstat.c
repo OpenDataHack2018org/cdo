@@ -112,7 +112,7 @@ void *Ydrunstat(void *argument)
   int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
   int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  datetime_t *datetime = (datetime_t*) Malloc((ndates+1)*sizeof(datetime_t));
+  cdo_datetime_t *datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
   
   YDAY_STATS *stats = ydstatCreate(vlistID1);
   field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));

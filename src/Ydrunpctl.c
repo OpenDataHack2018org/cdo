@@ -50,7 +50,7 @@ void *Ydrunpctl(void *argument)
   int nmiss;
   int nlevels;
   field_t ***vars1 = NULL, **vars2[NDAY];
-  datetime_t *datetime;
+  cdo_datetime_t *datetime;
   int vdate, vtime;
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY] /*, vtimes2[NDAY]*/;
@@ -114,7 +114,7 @@ void *Ydrunpctl(void *argument)
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  datetime = (datetime_t*) Malloc((ndates+1)*sizeof(datetime_t));
+  datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
   
   vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
   
