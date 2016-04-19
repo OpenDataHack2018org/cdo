@@ -585,10 +585,13 @@ void printTimesteps(int streamID, int taxisID, int verbose)
   int nfact = 1;
   int tsID = 0;
 
+  dtlist_type *dtlist = dtlist_new();
+
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
+      dtlist_taxisInqTimestep(dtlist, taxisID, 0);
+      int vdate = dtlist_get_vdate(dtlist, 0);
+      int vtime = dtlist_get_vtime(dtlist, 0);
 
       if ( verbose || tsID < NUM_TIMESTEP )
 	{
@@ -615,6 +618,8 @@ void printTimesteps(int streamID, int taxisID, int verbose)
 
       tsID++;
     }
+
+  dtlist_delete(dtlist);
 
   if ( nvdatetime )
     {
