@@ -26,39 +26,33 @@
 
 void *Duplicate(void *argument)
 {
-  int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
-  int tsID;
-  int nts;
+  int gridID, varID, levelID;
   int nalloc = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
-  int ntsteps;
+  int nlevel;
   int *vdate = NULL, *vtime = NULL;
-  int idup, ndup = 2;
+  int ndup = 2;
   field_t ***vars = NULL;
 
   cdoInitialize(argument);
 
-  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+  if      ( operatorArgc()  > 1 ) cdoAbort("Too many arguments!");
   else if ( operatorArgc() == 1 ) ndup = parameter2int(operatorArgv()[0]);
 
   if ( cdoVerbose ) cdoPrint("ndup = %d\n", ndup);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ntsteps  = vlistNtsteps(vlistID1);
-  nvars    = vlistNvars(vlistID1);
+  int ntsteps  = vlistNtsteps(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
 
   if ( ntsteps == 1 )
     {
@@ -74,13 +68,13 @@ void *Duplicate(void *argument)
 	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
     }
  
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
   nvars = vlistNvars(vlistID1);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
@@ -96,11 +90,11 @@ void *Duplicate(void *argument)
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+	  int gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
@@ -109,9 +103,9 @@ void *Duplicate(void *argument)
       tsID++;
     }
 
-  nts = tsID;
+  int nts = tsID;
 
-  for ( idup = 0; idup < ndup; idup++ )
+  for ( int idup = 0; idup < ndup; idup++ )
     {
       for ( tsID = 0; tsID < nts; tsID++ )
 	{
