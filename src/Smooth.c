@@ -348,11 +348,9 @@ int convert_form(const char *formstr)
 
 void *Smooth(void *argument)
 {
-  int gridID;
   int nrecs;
   int varID, levelID;
   int nmiss;
-  int gridtype;
   int xnsmooth = 1;
   smoothpoint_t spoint;
   spoint.npoints = 5;
@@ -425,8 +423,8 @@ void *Smooth(void *argument)
   
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridID = vlistInqVarGrid(vlistID1, varID);
-      gridtype = gridInqType(gridID);
+      int gridID = vlistInqVarGrid(vlistID1, varID);
+      int gridtype = gridInqType(gridID);
       if ( gridtype == GRID_GAUSSIAN ||
            gridtype == GRID_LONLAT   ||
            gridtype == GRID_CURVILINEAR )
@@ -468,7 +466,7 @@ void *Smooth(void *argument)
 	  if ( varIDs[varID] )
 	    {	    
 	      double missval = vlistInqVarMissval(vlistID1, varID);
-	      gridID = vlistInqVarGrid(vlistID1, varID);
+	      int gridID = vlistInqVarGrid(vlistID1, varID);
 
               for ( int i = 0; i < xnsmooth; ++i )
                 {
