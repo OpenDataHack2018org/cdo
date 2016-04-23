@@ -82,7 +82,7 @@ void *Duplicate(void *argument)
 	  nalloc += NALLOC_INC;
 	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
 	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
+	  vars  = (field_t***) Realloc(vars, nalloc*sizeof(field_t**));
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);

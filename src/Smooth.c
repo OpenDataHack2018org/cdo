@@ -119,6 +119,7 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
   double *nbr_dist = (double*) Malloc(num_neighbors*sizeof(double)); /* angular distance four nearest neighbors  */
 
   clock_t start, finish;
+
   start = clock();
 
   struct gridsearch *gs = NULL;
@@ -129,7 +130,7 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
     gs = gridsearch_create(gridsize, xvals, yvals);
 
   gs->search_radius = spoint.radius;
-  
+
   finish = clock();
 
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
@@ -357,7 +358,7 @@ void *Smooth(void *argument)
   int operatorID = cdoOperatorID();
 
   if ( operatorID == SMOOTHP )
-    {      
+    {
       int pargc = operatorArgc();
 
       if ( pargc )
@@ -397,7 +398,6 @@ void *Smooth(void *argument)
       if ( cdoVerbose )
         cdoPrint("nsmooth = %d, npoints = %d, radius = %gdegree, weight0 = %g, weightR = %g",
                  xnsmooth, spoint.npoints, spoint.radius, spoint.weight0, spoint.weightR);
-      
     }
 
   spoint.radius *= DEG2RAD;
@@ -467,7 +467,7 @@ void *Smooth(void *argument)
                     smoothpoint(gridID, missval, array1, array2, &nmiss, spoint);
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
-                  
+
                   memcpy(array1, array2, gridsize*sizeof(double));
                 }
           
