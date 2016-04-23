@@ -32,8 +32,12 @@
 
 #include "grid_search.h"
 
+enum {FORM_LINEAR};
+static const char *Form[] = {"linear"};
+
 typedef struct {
   int npoints;
+  int form;
   double radius;
   double weight0;
   double weightR;
@@ -46,7 +50,6 @@ double intlin(double x, double y1, double x1, double y2, double x2);
 double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist, double search_radius, double weight0, double weightR)
 {
   // Compute weights based on inverse distance if mask is false, eliminate those points
-
   double dist_tot = 0.; // sum of neighbor distances (for normalizing)
 
   for ( unsigned n = 0; n < num_neighbors; ++n )
@@ -67,7 +70,6 @@ double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict sr
 unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist)
 {
   // Normalize weights and store the link
-
   unsigned nadds = 0;
 
   for ( unsigned n = 0; n < num_neighbors; ++n )
@@ -82,7 +84,6 @@ unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, c
 
   return nadds;
 }
-
 
 static
 void smoothpoint(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss, smoothpoint_t spoint)
@@ -206,8 +207,6 @@ void smooth9_sum(size_t ij, short *mask, double sfac, const double *restrict arr
 static
 void smooth9(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss)
 {
-  double avg,divavg;
-  size_t i, ij , j;
   size_t gridsize = gridInqSize(gridID);
   size_t nlon = gridInqXsize(gridID);	 
   size_t nlat = gridInqYsize(gridID);
@@ -215,22 +214,23 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
 
   short *mask = (short*) Malloc(gridsize*sizeof(short));
 
-  for ( size_t i = 0; i < gridsize; i++) 
+  for ( size_t i = 0; i < gridsize; ++i ) 
     {		
       if ( DBL_IS_EQUAL(missval, array1[i]) ) mask[i] = 0;
       else mask[i] = 1;
     }
  
   *nmiss = 0;
-  for ( i = 0; i < nlat; i++ )
+  for ( size_t i = 0; i < nlat; i++ )
     {
-      for ( j = 0; j < nlon; j++ )
+      for ( size_t j = 0; j < nlon; j++ )
         {		      
-          avg = 0; divavg = 0; 	  		     			
+          double avg = 0;
+          double divavg = 0; 	  		     			
 
           if ( (i == 0) || (j == 0) || (i == (nlat-1)) || (j == (nlon-1)) )
             {
-              ij = j+nlon*i;
+              size_t ij = j+nlon*i;
               if ( mask[ij] )
                 {
                   avg += array1[ij];  divavg+= 1;					     		       
@@ -308,7 +308,7 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
   Free(mask);
 }
 
-
+static
 double convert_radius(const char *string)
 {
   char *endptr = NULL;
@@ -316,7 +316,6 @@ double convert_radius(const char *string)
 
   if ( *endptr != 0 )
     {
-      printf(">%s< umfang %g\n", endptr, 2*PlanetRadius*M_PI);
       if ( strcmp(endptr, "km") == 0 )
         radius = 360*((radius*1000)/(2*PlanetRadius*M_PI));
       else if ( strncmp(endptr, "m", 1) == 0 )
@@ -335,6 +334,17 @@ double convert_radius(const char *string)
   return radius;
 }
 
+static
+int convert_form(const char *formstr)
+{
+  int form = FORM_LINEAR;
+
+  if ( strcmp(formstr, "linear") == 0 ) form = FORM_LINEAR;
+  else cdoAbort("form=%s unsupported!", formstr);
+
+  return form;
+}
+
 
 void *Smooth(void *argument)
 {
@@ -347,6 +357,7 @@ void *Smooth(void *argument)
   smoothpoint_t spoint;
   spoint.npoints = 5;
   spoint.radius  = 180;
+  spoint.form    = 0;
   spoint.weight0 = 0.25;
   spoint.weightR = 0.25;
 
@@ -381,14 +392,12 @@ void *Smooth(void *argument)
           if ( PML_NOCC(pml, weight0) )   spoint.weight0 = par_weight0[0];
           if ( PML_NOCC(pml, weightR) )   spoint.weightR = par_weightR[0];
           if ( PML_NOCC(pml, radius) )    spoint.radius  = convert_radius(par_radius[0]);
-          if ( PML_NOCC(pml, form) )
-            {
-              if ( cdoVerbose ) printf("Form: %s\n", par_form[0]);
-            }
+          if ( PML_NOCC(pml, form) )      spoint.form    = convert_form(par_form[0]);
 
           UNUSED(nsmooth);
           UNUSED(npoints);
           UNUSED(radius);
+          UNUSED(form);
           UNUSED(weight0);
           UNUSED(weightR);
 
@@ -396,8 +405,8 @@ void *Smooth(void *argument)
         }
       
       if ( cdoVerbose )
-        cdoPrint("nsmooth = %d, npoints = %d, radius = %gdegree, weight0 = %g, weightR = %g",
-                 xnsmooth, spoint.npoints, spoint.radius, spoint.weight0, spoint.weightR);
+        cdoPrint("nsmooth = %d, npoints = %d, radius = %gdegree, form = %s, weight0 = %g, weightR = %g",
+                 xnsmooth, spoint.npoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
     }
 
   spoint.radius *= DEG2RAD;
