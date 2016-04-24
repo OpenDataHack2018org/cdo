@@ -340,11 +340,12 @@ int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_
     }
 
   ndist = j;
+  int max_neighbors = ( ndist < num_neighbors ) ? ndist : num_neighbors;
 
   for ( j = 0; j < ndist; ++j )
-    nbr_store_distance(adds[j], dist[j], num_neighbors, nbr_add, nbr_dist);
+    nbr_store_distance(adds[j], dist[j], max_neighbors, nbr_add, nbr_dist);
 
-  nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
+  nbr_check_distance(max_neighbors, nbr_add, nbr_dist);
 
   if ( num_neighbors > 16 )
     {
