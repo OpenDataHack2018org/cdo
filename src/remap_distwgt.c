@@ -281,7 +281,9 @@ int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_
   for ( int n = 0; n < num_neighbors; ++n ) nbr_dist[n] = BIGNUM;
 
   int ndist = num_neighbors;
-  ndist = ndist*2; // check some more points if distance is the same use the smaller index (nadd)
+  // check some more points if distance is the same use the smaller index (nadd)
+  if ( ndist > 8 ) ndist += 8;
+  else             ndist *= 2; 
   if ( ndist > (int)gs->n ) ndist = gs->n;
 
   double zdist[32];
