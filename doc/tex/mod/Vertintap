@@ -4,27 +4,53 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = ap2pl
+@Operators = ap2pl ap2hl
 
 @BeginDescription
-Interpolate 3D variables on hybrid sigma height coordinates to pressure levels.
+Interpolate 3D variables on hybrid sigma height coordinates to pressure or height levels.
 The input file must contain the 3D air pressure. The air pressure is identified
 by the NetCDF CF standard name air_pressure.
-This operator requires all variables on the same horizontal grid.
+Use the alias  @bold{ap2plx}/@bold{ap2hlx} or the environment variable @env{EXTRAPOLATE}
+to extrapolate missing values. This operator requires all variables on the same horizontal grid.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_ap2pl
-@Title     = Model to pressure level interpolation
+@Title     = Air pressure to pressure level interpolation
 @Parameter = plevels
+
+@BeginDescription
+Interpolates 3D variables on hybrid sigma height coordinates to pressure level.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ap2hl
+@Title     = Air pressure to height level interpolation
+@Parameter = hlevels
+
+@BeginDescription
+Interpolates 3D variables on hybrid sigma height coordinates to height level.
+The procedure is the same as for the operator @oper{ap2pl} except for
+the pressure levels being calculated from the heights by:
+@math{plevel = 101325*exp(hlevel/-7000)}
+@EndDescription
 @EndOperator
 
 
 @BeginParameter
 @Item = plevels
 FLOAT  Pressure levels in pascal
+@Item = hlevels
+FLOAT  Height levels in meter (max level: 65535 m)
 @EndParameter
+
+
+@BeginEnvironment
+@Item = EXTRAPOLATE
+If set to 1 extrapolate missing values.
+@EndEnvironment
 
 
 @BeginNote

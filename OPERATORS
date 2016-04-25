@@ -470,7 +470,8 @@ Operator catalog:
    Remapeta      remapeta        Remap vertical hybrid level
    Vertint       ml2pl           Model to pressure level interpolation
    Vertint       ml2hl           Model to height level interpolation
-   Vertintap     ap2pl           Model to pressure level interpolation
+   Vertintap     ap2pl           Air pressure to pressure level interpolation
+   Vertintap     ap2hl           Air pressure to height level interpolation
    Intlevel      intlevel        Linear level interpolation
    Intlevel3d    intlevel3d      Linear level interpolation onto a 3d vertical coordinate
    Intlevel3d    intlevelx3d     like intlevel3d but with extrapolation
