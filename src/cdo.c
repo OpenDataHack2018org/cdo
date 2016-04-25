@@ -103,7 +103,7 @@ void gridsearch_set_method(const char *methodstr);
           } \
       }
 
-#define ISME  (strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
+#define ITSME  (strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0)
 
 static
 void cdo_stackframe(void)
@@ -203,11 +203,12 @@ void cdo_usage(void)
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
-  if ( ISME )
+  if ( ITSME )
     {
       fprintf(stderr, "    --enableexcept <except>\n");
       fprintf(stderr, "                   Set individual floating-point traps (DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
     }
+  fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
   fprintf(stderr, "    -f, --format <format>\n");
   fprintf(stderr, "                   Format of the output file. (grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
@@ -846,7 +847,7 @@ void get_env_vars(void)
             fprintf(stderr, "CDO_COLOR = %s\n", envstr);
         }
     }
-  else if ( CDO_Color == FALSE && ISME ) CDO_Color = TRUE;
+  else if ( CDO_Color == FALSE && ITSME ) CDO_Color = TRUE;
 }
 
 static

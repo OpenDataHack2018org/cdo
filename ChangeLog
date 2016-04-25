@@ -6,6 +6,7 @@
 2016-04-25  Uwe Schulzweida
 
 	* New operator: ap2hl - Air pressure to height level interpolation
+	* Added option --cmor to write CMOR conform NetCDF output
 
 2016-04-19  Uwe Schulzweida
 

@@ -33,6 +33,8 @@ The following options are available for all operators:
             } \\
          \> For {\tt srv}, {\tt ext} and {\tt ieg} format the letter {\tt L} or {\tt B} can be added to set the byteorder \\
          \> to {\tt L}ittle or {\tt B}ig endian. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-cmor}
+         \> CMOR conform NetCDF output. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -f $<$format$>$}
          \> Set the output file format. The valid file formats are: \\
          \> \parbox[r]{3in}{
@@ -236,4 +238,29 @@ The result is the same as:
 \begin{verbatim}
    cdo selday,5,6,7,8,9 ifile ofile
 \end{verbatim}
+\end{itemize}
+
+\subsection{CMOR compliant NetCDF output}
+
+The {\CDO} NetCDF output is almost conform to the \href{http://cfconventions.org}{CF convention}.
+The "Climate Model Output Rewriter" (\href{http://cfconventions.org}{CMOR}) library can be used to produce 
+CF-compliant NetCDF files that fulfill the requirements of many of the climate community's standard model experiments.
+
+\subsubsection{cmor operator}
+The  {\CDO} operator cmor can be used to write NetCDF output with the CMOR library.
+To enable this feature  {\CDO} needs to be compiled with CMOR support:
+\begin{verbatim}
+./configure  --with-netcdf=<NetCDF root directory> --with-cmor=<CMOR root directory> ...
+make
+\end{verbatim}
+
+\subsubsection{cmor option}
+The {\CDO} option -\,-cmor can be used to make the regular NetCDF output more CMOR conform.
+This feature is independent from the CMOR library and can be used with all {\CDO} operators, except the operator cmor.
+This option:
+\begin{itemize}
+\item Converts single value vertical coordinate to scalar coordinate variable
+\item Stores hybrid sigma pressure level conform to the CF convention
+\item Generates new {\tt tracking\_id} attribute
+\item Generates new {\tt creation\_date} attribute
 \end{itemize}
