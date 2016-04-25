@@ -43,7 +43,6 @@ typedef struct {
   double weightR;
 } smoothpoint_t;
 
-int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
@@ -89,9 +88,10 @@ static
 void smoothpoint(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss, smoothpoint_t spoint)
 {
   *nmiss = 0;
-  int num_neighbors = spoint.npoints;
   int gridID0 = gridID;
   unsigned gridsize = gridInqSize(gridID);
+  unsigned num_neighbors = spoint.npoints;
+  if ( num_neighbors > gridsize ) num_neighbors = gridsize;
 
   int *mask = (int*) Malloc(gridsize*sizeof(int));
   for ( unsigned i = 0; i < gridsize; ++i )
@@ -114,10 +114,10 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
   grid_to_radian(units, gridsize, xvals, "grid center lon");
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
-
+  
   int *nbr_mask = (int*) Malloc(num_neighbors*sizeof(int));          /* mask at nearest neighbors                */
-  int *nbr_add = (int*) Malloc(num_neighbors*sizeof(int));           /* source address at nearest neighbors      */
-  double *nbr_dist = (double*) Malloc(num_neighbors*sizeof(double)); /* angular distance four nearest neighbors  */
+
+  struct gsknn *knn = gridsearch_knn_new(num_neighbors);
 
   clock_t start, finish;
 
@@ -136,14 +136,14 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
 
   if ( cdoVerbose ) printf("gridsearch created: %.2f seconds\n", ((double)(finish-start))/CLOCKS_PER_SEC);
 
-  progressInit();
+  if ( cdoVerbose ) progressInit();
 
   start = clock();
 
   double findex = 0;
 
   /*
-#pragma omp parallel for default(none) shared(findex, array1, array2, xvals, yvals, gs, gridsize, num_neighbors) \
+#pragma omp parallel for default(none) shared(findex, array1, array2, xvals, yvals, gs, gridsize) \
                                       private(nbr_mask, nbr_add, nbr_dist)
   */
   for ( unsigned i = 0; i < gridsize; ++i )
@@ -154,9 +154,12 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
 #endif
       */
       findex++;
-      if ( cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
+      if ( cdoVerbose && cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
 
-      unsigned nadds = grid_search_nbr(gs, num_neighbors, nbr_add, nbr_dist, xvals[i], yvals[i]);
+      int *nbr_add = knn->add;
+      double *nbr_dist = knn->dist;
+      
+      unsigned nadds = gridsearch_knn(gs, knn, xvals[i], yvals[i]);
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
       double dist_tot = smooth_nbr_compute_weights(nadds, mask, nbr_mask, nbr_add, nbr_dist,
@@ -188,11 +191,11 @@ void smoothpoint(int gridID, double missval, const double *restrict array1, doub
 
   if ( gs ) gridsearch_delete(gs);
 
+  gridsearch_knn_delete(knn);
+
   if ( gridID0 != gridID ) gridDestroy(gridID);
 
   Free(nbr_mask);
-  Free(nbr_add);
-  Free(nbr_dist);
   Free(mask);
   Free(xvals);
   Free(yvals);
