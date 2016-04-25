@@ -297,9 +297,13 @@ void getnite(FILE *nmlfp, namelist_t *nml)
 	    }
         }
 
+    LABEL_READLINE:
+
       if ( ! readline(nmlfp, nml->line.lineac, MAX_LINE_LEN) ) break;
 
       linelen = strlen(nml->line.lineac);
+
+      if ( linelen == 0 || nml->line.lineac[0] == '#' || nml->line.lineac[0] == '!' ) goto LABEL_READLINE; 
 
       for ( i = 0; i < linelen+1; i++ )
 	{

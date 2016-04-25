@@ -7,6 +7,7 @@
 
 	* New operator: ap2hl - Air pressure to height level interpolation
 	* Added option --cmor to write CMOR conform NetCDF output
+	* setpartabn - added support for character # and ! deactivate line in table file
 
 2016-04-19  Uwe Schulzweida
 
