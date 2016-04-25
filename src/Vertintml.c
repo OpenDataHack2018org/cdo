@@ -107,15 +107,25 @@ void *Vertintml(void *argument)
   double *plev = NULL;
   if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
     {
-      /*
-      double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
-                          15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
-      */
-      double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
-                          10000,  7000,  5000,  3000,  2000, 1000 };
-      nplev = sizeof(stdlev)/sizeof(*stdlev);
-      plev  = (double *) Malloc(nplev*sizeof(double));
-      for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+      if ( operfunc == func_hl )
+        {
+          double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
+          nplev = sizeof(stdlev)/sizeof(*stdlev);
+          plev  = (double *) Malloc(nplev*sizeof(double));
+          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+        }
+      else
+        {
+          /*
+            double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
+            15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
+          */
+          double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
+                             10000,  7000,  5000,  3000,  2000, 1000 };
+          nplev = sizeof(stdlev)/sizeof(*stdlev);
+          plev  = (double *) Malloc(nplev*sizeof(double));
+          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+        }
     }
   else
     {

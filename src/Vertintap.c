@@ -94,6 +94,8 @@ void *Vertintap(void *argument)
 
   int AP2PL     = cdoOperatorAdd("ap2pl",     func_pl, type_lin, "pressure levels in pascal");
   int AP2PLX    = cdoOperatorAdd("ap2plx",    func_pl, type_lin, "pressure levels in pascal");
+  int AP2HL     = cdoOperatorAdd("ap2hl",     func_hl, type_lin, "height levels in meter");
+  int AP2HLX    = cdoOperatorAdd("ap2hlx",    func_hl, type_lin, "height levels in meter");
   int AP2PL_LP  = cdoOperatorAdd("ap2pl_lp",  func_pl, type_log, "pressure levels in pascal");
   int AP2PLX_LP = cdoOperatorAdd("ap2plx_lp", func_pl, type_log, "pressure levels in pascal");
 
@@ -101,7 +103,7 @@ void *Vertintap(void *argument)
   int operfunc   = cdoOperatorF1(operatorID);
   int opertype   = cdoOperatorF2(operatorID);
 
-  if ( operatorID == AP2PL || operatorID == AP2PL_LP )
+  if ( operatorID == AP2PL || operatorID == AP2HL || operatorID == AP2PL_LP )
     {
       char *envstr = getenv("EXTRAPOLATE");
 
@@ -112,7 +114,7 @@ void *Vertintap(void *argument)
             cdoPrint("Extrapolation of missing values enabled!");
 	}
     }
-  else if ( operatorID == AP2PLX || operatorID == AP2PLX_LP )
+  else if ( operatorID == AP2PLX ||  operatorID == AP2HLX || operatorID == AP2PLX_LP )
     {
       Extrapolate = 1;
     }
@@ -123,15 +125,25 @@ void *Vertintap(void *argument)
   double *plev = NULL;
   if ( operatorArgc() == 1 && strcmp(operatorArgv()[0], "default") == 0 )
     {
-      /*
-      double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
-                          15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
-      */
-      double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
-                          10000,  7000,  5000,  3000,  2000, 1000 };
-      nplev = sizeof(stdlev)/sizeof(*stdlev);
-      plev  = (double *) Malloc(nplev*sizeof(double));
-      for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+      if ( operfunc == func_hl )
+        {
+          double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
+          nplev = sizeof(stdlev)/sizeof(*stdlev);
+          plev  = (double *) Malloc(nplev*sizeof(double));
+          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+        }
+      else
+        {
+          /*
+            double stdlev[] = {100000, 92500, 85000, 77500, 70000, 60000, 50000, 40000, 30000, 25000, 20000,
+            15000, 10000, 7000, 5000, 3000, 2000, 1000, 700, 500, 300, 200, 100, 50, 20, 10};
+          */
+          double stdlev[] = {100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
+                             10000,  7000,  5000,  3000,  2000, 1000 };
+          nplev = sizeof(stdlev)/sizeof(*stdlev);
+          plev  = (double *) Malloc(nplev*sizeof(double));
+          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+        }
     }
   else
     {

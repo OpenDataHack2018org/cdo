@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-04-25  Uwe Schulzweida
+
+	* New operator: ap2hl - Air pressure to height level interpolation
+
 2016-04-19  Uwe Schulzweida
 
 	* Adjust date/time by -1 second if the verification time is equal to upper time bound
