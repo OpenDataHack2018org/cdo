@@ -537,14 +537,16 @@ void gridsearch_knn_init(struct gsknn *knn)
     }
 }
 
+
 struct gsknn *gridsearch_knn_new(unsigned size)
 {
   struct gsknn *knn = (struct gsknn *) Malloc(sizeof(struct gsknn));
   
   knn->ndist   = size;
   knn->size    = size;
-  knn->add     = (int*) Malloc(size*sizeof(int));       /* source address at nearest neighbors        */
-  knn->dist    = (double*) Malloc(size*sizeof(double)); /* angular distance of the nearest neighbors  */
+  knn->mask    = (int*) Malloc(size*sizeof(int));       // mask at nearest neighbors
+  knn->add     = (int*) Malloc(size*sizeof(int));       // source address at nearest neighbors
+  knn->dist    = (double*) Malloc(size*sizeof(double)); // angular distance of the nearest neighbors
   knn->tmpadd  = NULL;
   knn->tmpdist = NULL;
 
@@ -563,6 +565,7 @@ void gridsearch_knn_delete(struct gsknn *knn)
       if ( knn->add     ) Free(knn->add);
       if ( knn->tmpdist ) Free(knn->tmpdist);
       if ( knn->tmpadd  ) Free(knn->tmpadd);
+      if ( knn->mask    ) Free(knn->mask);
       Free(knn);
     }
 }

@@ -46,8 +46,12 @@ typedef struct {
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist, double search_radius, double weight0, double weightR)
+double smooth_knn_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, struct gsknn *knn, double search_radius, double weight0, double weightR)
 {
+  int *restrict nbr_mask = knn->mask;
+  const int *restrict nbr_add = knn->add;
+  double *restrict nbr_dist = knn->dist;
+
   // Compute weights based on inverse distance if mask is false, eliminate those points
   double dist_tot = 0.; // sum of neighbor distances (for normalizing)
 
@@ -66,8 +70,12 @@ double smooth_nbr_compute_weights(unsigned num_neighbors, const int *restrict sr
 }
 
 
-unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist)
+unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, struct gsknn *knn)
 {
+  const int *restrict nbr_mask = knn->mask;
+  int *restrict nbr_add = knn->add;
+  double *restrict nbr_dist = knn->dist;
+
   // Normalize weights and store the link
   unsigned nadds = 0;
 
@@ -115,9 +123,9 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
   gridInqYunits(gridID, units);
   grid_to_radian(units, gridsize, yvals, "grid center lat");
   
-  int *nbr_mask = (int*) Malloc(num_neighbors*sizeof(int));          /* mask at nearest neighbors                */
-
-  struct gsknn *knn = gridsearch_knn_new(num_neighbors);
+  struct gsknn **knn = (struct gsknn**) Malloc(ompNumThreads*sizeof(struct gsknn*));
+  for ( int i = 0; i < ompNumThreads; i++ )
+    knn[i] = gridsearch_knn_new(num_neighbors);
 
   clock_t start, finish;
 
@@ -142,33 +150,30 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   double findex = 0;
 
-  /*
-#pragma omp parallel for default(none) shared(findex, array1, array2, xvals, yvals, gs, gridsize) \
-                                      private(nbr_mask, nbr_add, nbr_dist)
-  */
+#if defined(_OPENMP)
+#pragma omp parallel for schedule(dynamic) default(none) shared(cdoVerbose, knn, spoint, findex, mask, array1, array2, xvals, yvals, gs, gridsize, nmiss, missval)
+#endif
   for ( unsigned i = 0; i < gridsize; ++i )
     {
-      /*
+      int ompthID = cdo_omp_get_thread_num();
+      
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
 #endif
-      */
       findex++;
       if ( cdoVerbose && cdo_omp_get_thread_num() == 0 ) progressStatus(0, 1, findex/gridsize);
+     
+      unsigned nadds = gridsearch_knn(gs, knn[ompthID], xvals[i], yvals[i]);
 
-      int *nbr_add = knn->add;
-      double *nbr_dist = knn->dist;
-      
-      unsigned nadds = gridsearch_knn(gs, knn, xvals[i], yvals[i]);
+      // Compute weights based on inverse distance if mask is false, eliminate those points
+      double dist_tot = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
 
-      /* Compute weights based on inverse distance if mask is false, eliminate those points */
-      double dist_tot = smooth_nbr_compute_weights(nadds, mask, nbr_mask, nbr_add, nbr_dist,
-                                                   spoint.radius, spoint.weight0, spoint.weightR);
-
-      /* Normalize weights and store the link */
-      nadds = smooth_nbr_normalize_weights(nadds, dist_tot, nbr_mask, nbr_add, nbr_dist);
+      // Normalize weights and store the link
+      nadds = smooth_nbr_normalize_weights(nadds, dist_tot, knn[ompthID]);
       if ( nadds )
         {
+          const int *restrict nbr_add = knn[ompthID]->add;
+          const double *restrict nbr_dist = knn[ompthID]->dist;
           /*
           printf("n %u %d nadds %u dis %g\n", i, nbr_add[0], nadds, nbr_dist[0]);
           for ( unsigned n = 0; n < nadds; ++n )
@@ -180,6 +185,9 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
         }
       else
         {
+#if defined(_OPENMP)
+#include "pragma_omp_atomic_update.h"
+#endif
           (*nmiss)++;
           array2[i] = missval;
         }
@@ -191,11 +199,11 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 
   if ( gs ) gridsearch_delete(gs);
 
-  gridsearch_knn_delete(knn);
+  for ( int i = 0; i < ompNumThreads; i++ )
+    gridsearch_knn_delete(knn[i]);
 
   if ( gridID0 != gridID ) gridDestroy(gridID);
 
-  Free(nbr_mask);
   Free(mask);
   Free(xvals);
   Free(yvals);

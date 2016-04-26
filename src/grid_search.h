@@ -45,6 +45,7 @@ struct gridsearch {
 struct gsknn {
   unsigned ndist;
   unsigned size;
+  int     *mask;
   int     *add;
   int     *tmpadd;
   double  *dist;
