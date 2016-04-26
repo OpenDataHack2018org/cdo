@@ -70,7 +70,7 @@ double smooth_knn_compute_weights(unsigned num_neighbors, const int *restrict sr
 }
 
 
-unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, struct gsknn *knn)
+unsigned smooth_knn_normalize_weights(unsigned num_neighbors, double dist_tot, struct gsknn *knn)
 {
   const int *restrict nbr_mask = knn->mask;
   int *restrict nbr_add = knn->add;
@@ -169,7 +169,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
       double dist_tot = smooth_knn_compute_weights(nadds, mask, knn[ompthID], spoint.radius, spoint.weight0, spoint.weightR);
 
       // Normalize weights and store the link
-      nadds = smooth_nbr_normalize_weights(nadds, dist_tot, knn[ompthID]);
+      nadds = smooth_knn_normalize_weights(nadds, dist_tot, knn[ompthID]);
       if ( nadds )
         {
           const int *restrict nbr_add = knn[ompthID]->add;
