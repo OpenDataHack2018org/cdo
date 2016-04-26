@@ -129,9 +129,9 @@ void *Select(void *argument)
   PML_ADD_WORD(pml, season,            12, "Season");
   PML_ADD_WORD(pml, date,            1024, "Date");
 
-  pml_read(pml, nsel, argnames);
-
+  int status = pml_read(pml, nsel, argnames);
   if ( cdoVerbose ) pml_print(pml);
+  if ( status != 0 ) cdoAbort("Parameter read error!");
 
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;

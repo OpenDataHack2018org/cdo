@@ -393,9 +393,10 @@ void *Smooth(void *argument)
           PML_ADD_WORD(pml, radius,   1, "Search radius");
           PML_ADD_WORD(pml, form,     1, "Form of the curve (linear, exponential, gauss)");
       
-          pml_read(pml, pargc, pargv);
+          int status = pml_read(pml, pargc, pargv);
           if ( cdoVerbose ) pml_print(pml);
-      
+          if ( status != 0 ) cdoAbort("Parameter read error!");
+          
           if ( PML_NOCC(pml, nsmooth) )   xnsmooth         = par_nsmooth[0];
           if ( PML_NOCC(pml, maxpoints) ) spoint.maxpoints = par_maxpoints[0];
           if ( PML_NOCC(pml, weight0) )   spoint.weight0   = par_weight0[0];
