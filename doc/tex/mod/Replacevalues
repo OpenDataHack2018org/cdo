@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Replacevalues
 @Title     = Replace variable values
 @Section   = Miscellaneous

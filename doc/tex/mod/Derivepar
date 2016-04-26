@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Derivepar
 @Title     = Sea level pressure
 @Section   = Miscellaneous
