@@ -85,7 +85,7 @@ unsigned smooth_nbr_normalize_weights(unsigned num_neighbors, double dist_tot, c
 }
 
 static
-void smoothpoint(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss, smoothpoint_t spoint)
+void smooth(int gridID, double missval, const double *restrict array1, double *restrict array2, int *nmiss, smoothpoint_t spoint)
 {
   *nmiss = 0;
   int gridID0 = gridID;
@@ -364,12 +364,12 @@ void *Smooth(void *argument)
 
   cdoInitialize(argument);
 
-  int SMOOTHP = cdoOperatorAdd("smoothpoint",  0,   0, NULL);
-  int SMOOTH9 = cdoOperatorAdd("smooth9",      0,   0, NULL);
+  int SMOOTH  = cdoOperatorAdd("smooth",   0,   0, NULL);
+  int SMOOTH9 = cdoOperatorAdd("smooth9",  0,   0, NULL);
  
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == SMOOTHP )
+  if ( operatorID == SMOOTH )
     {
       int pargc = operatorArgc();
 
@@ -434,7 +434,7 @@ void *Smooth(void *argument)
 	{
 	  varIDs[varID] = 1;
 	}
-      else if ( gridtype == GRID_UNSTRUCTURED && operatorID == SMOOTHP )
+      else if ( gridtype == GRID_UNSTRUCTURED && operatorID == SMOOTH )
         {
 	  varIDs[varID] = 1;
         }
@@ -473,8 +473,8 @@ void *Smooth(void *argument)
 
               for ( int i = 0; i < xnsmooth; ++i )
                 {
-                  if ( operatorID == SMOOTHP )
-                    smoothpoint(gridID, missval, array1, array2, &nmiss, spoint);
+                  if ( operatorID == SMOOTH )
+                    smooth(gridID, missval, array1, array2, &nmiss, spoint);
                   else if ( operatorID == SMOOTH9 )
                     smooth9(gridID, missval, array1, array2, &nmiss);
 
