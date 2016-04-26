@@ -36,7 +36,7 @@ enum {FORM_LINEAR};
 static const char *Form[] = {"linear"};
 
 typedef struct {
-  int npoints;
+  int maxpoints;
   int form;
   double radius;
   double weight0;
@@ -90,7 +90,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
   *nmiss = 0;
   int gridID0 = gridID;
   unsigned gridsize = gridInqSize(gridID);
-  unsigned num_neighbors = spoint.npoints;
+  unsigned num_neighbors = spoint.maxpoints;
   if ( num_neighbors > gridsize ) num_neighbors = gridsize;
 
   int *mask = (int*) Malloc(gridsize*sizeof(int));
@@ -356,11 +356,11 @@ void *Smooth(void *argument)
   int nmiss;
   int xnsmooth = 1;
   smoothpoint_t spoint;
-  spoint.npoints = 5;
-  spoint.radius  = 180;
-  spoint.form    = 0;
-  spoint.weight0 = 0.25;
-  spoint.weightR = 0.25;
+  spoint.maxpoints = INT_MAX;
+  spoint.radius    = 1;
+  spoint.form      = FORM_LINEAR;
+  spoint.weight0   = 0.25;
+  spoint.weightR   = 0.25;
 
   cdoInitialize(argument);
 
@@ -379,24 +379,24 @@ void *Smooth(void *argument)
           pml_t *pml = pml_create("SMOOTH");
 
           PML_ADD_INT(pml, nsmooth,   1, "Number of times to smooth");
-          PML_ADD_INT(pml, npoints,   1, "Maximum number of points");
+          PML_ADD_INT(pml, maxpoints, 1, "Maximum number of points");
           PML_ADD_FLT(pml, weight0,   1, "Weight at distance 0");
           PML_ADD_FLT(pml, weightR,   1, "Weight at the search radius");
           PML_ADD_WORD(pml, radius,   1, "Search radius");
-          PML_ADD_WORD(pml, form,     1, "Form of the curve (linear, exponential, gauss");
+          PML_ADD_WORD(pml, form,     1, "Form of the curve (linear, exponential, gauss)");
       
           pml_read(pml, pargc, pargv);
           if ( cdoVerbose ) pml_print(pml);
       
-          if ( PML_NOCC(pml, nsmooth) )   xnsmooth       = par_nsmooth[0];
-          if ( PML_NOCC(pml, npoints) )   spoint.npoints = par_npoints[0];
-          if ( PML_NOCC(pml, weight0) )   spoint.weight0 = par_weight0[0];
-          if ( PML_NOCC(pml, weightR) )   spoint.weightR = par_weightR[0];
-          if ( PML_NOCC(pml, radius) )    spoint.radius  = convert_radius(par_radius[0]);
-          if ( PML_NOCC(pml, form) )      spoint.form    = convert_form(par_form[0]);
+          if ( PML_NOCC(pml, nsmooth) )   xnsmooth         = par_nsmooth[0];
+          if ( PML_NOCC(pml, maxpoints) ) spoint.maxpoints = par_maxpoints[0];
+          if ( PML_NOCC(pml, weight0) )   spoint.weight0   = par_weight0[0];
+          if ( PML_NOCC(pml, weightR) )   spoint.weightR   = par_weightR[0];
+          if ( PML_NOCC(pml, radius) )    spoint.radius    = convert_radius(par_radius[0]);
+          if ( PML_NOCC(pml, form) )      spoint.form      = convert_form(par_form[0]);
 
           UNUSED(nsmooth);
-          UNUSED(npoints);
+          UNUSED(maxpoints);
           UNUSED(radius);
           UNUSED(form);
           UNUSED(weight0);
@@ -406,8 +406,8 @@ void *Smooth(void *argument)
         }
       
       if ( cdoVerbose )
-        cdoPrint("nsmooth = %d, npoints = %d, radius = %gdegree, form = %s, weight0 = %g, weightR = %g",
-                 xnsmooth, spoint.npoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
+        cdoPrint("nsmooth = %d, maxpoints = %d, radius = %gdegree, form = %s, weight0 = %g, weightR = %g",
+                 xnsmooth, spoint.maxpoints, spoint.radius, Form[spoint.form], spoint.weight0, spoint.weightR);
     }
 
   spoint.radius *= DEG2RAD;
