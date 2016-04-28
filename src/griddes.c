@@ -161,7 +161,7 @@ int getoptname(char *optname, const char *optstring, int nopt)
   else
     nerr = 1;
 
-  return (nerr);
+  return nerr;
 }
 
 
@@ -514,7 +514,7 @@ int gridDefine(griddes_t grid)
   if ( grid.ylongname[0] ) gridDefYlongname(gridID, grid.ylongname);
   if ( grid.yunits[0]    ) gridDefYunits(gridID, grid.yunits);
 
-  return (gridID);
+  return gridID;
 }
 
 static
@@ -524,7 +524,7 @@ char *skipSeparator(char *pline)
   if ( *pline == '=' || *pline == ':' ) pline++;
   while ( isspace((int) *pline) ) pline++;
 
-  return (pline);
+  return pline;
 }
 
 
@@ -616,7 +616,7 @@ double *readfield(griddes_t *grid, int record, char *format, char *filename)
   else
     Error("format %s unsupported!", format);
 
-  return (vals);
+  return vals;
 }
 */
 /*
@@ -652,7 +652,7 @@ double *readfield4(griddes_t *grid, int record, char *format, char *filename)
   else
     Error("format %s unsupported!", format);
 
-  return (vals);
+  return vals;
 }
 */
 
@@ -665,7 +665,7 @@ double readflt(const char *filename, const char *name, const char *pline)
   if ( pline == endptr )
     cdoAbort("Couldn't read value for %s (grid description file: %s)!", name, filename);
  
-  return (val);
+  return val;
 }
 
 
@@ -677,11 +677,13 @@ int gridFromFile(FILE *gfp, const char *dname)
   int lerror;
   size_t i, len;
   griddes_t grid;
+  int lineno = 0;
 
   gridInit(&grid);
 
   while ( readline(gfp, line, MAX_LINE_LEN) )
     {
+      lineno++;
       if ( line[0] == '#' ) continue;
       if ( line[0] == '\0' ) continue;
       len = strlen(line);
@@ -987,8 +989,9 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  grid.yvals = (double*) Malloc(grid.size*sizeof(double));
 	  for ( i = 0; i < (int) grid.size; i++ )
 	    {
+              lineno++;
 	      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-		cdoAbort("Incomplete command: >gridlatlon< (grid description file: %s)", dname);
+		cdoAbort("Incomplete command: >gridlatlon< (line: %d file: %s)", lineno, dname);
 
 	      sscanf(line, "%lg %lg", &flat, &flon);
 	      grid.yvals[i] = flat;
@@ -1015,8 +1018,9 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  lval = strtol(pline, &endptr, 10);
 		  if ( pline == endptr )
 		    {
+                      lineno++;
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >mask< (grid description file: %s)", dname);
+			cdoAbort("Incomplete command: >mask< (line: %d file: %s)", lineno, dname);
 
 		      pline = line;
 		      lval = strtol(pline, &endptr, 10);
@@ -1057,8 +1061,10 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
+                      lineno++;
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >xvals< (grid description file: %s)", dname);
+			cdoAbort("Incomplete command: >xvals< (line: %d file: %s)", lineno, dname);
+                      printf("%d %s\n", lineno, line);
 
 		      pline = line;
 		      fval = strtod(pline, &endptr);
@@ -1068,7 +1074,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		}
 	    }
 	  else
-	    cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
+	    cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
 	}
       else if ( cmpstrlen(pline, "yvals", len)  == 0 )
 	{
@@ -1092,8 +1098,9 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
+                      lineno++;
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >yvals< (grid description file: %s)", dname);
+			cdoAbort("Incomplete command: >yvals< (line %d file: %s)", lineno, dname);
 
 		      pline = line;
 		      fval = strtod(pline, &endptr);
@@ -1133,8 +1140,9 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
+                      lineno++;
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >xbounds< (grid description file: %s)", dname);
+			cdoAbort("Incomplete command: >xbounds< (line %d file: %s)", lineno, dname);
 
 		      pline = line;
 		      fval = strtod(pline, &endptr);
@@ -1145,8 +1153,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    }
 	  else
 	    {
-	      if ( size         == 0 ) cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
-	      if ( grid.nvertex == 0 ) cdoAbort("nvertex undefined (grid description file: %s)!", dname);
+	      if ( size         == 0 ) cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
+	      if ( grid.nvertex == 0 ) cdoAbort("nvertex undefined (file: %s)!", dname);
 	    }
 	}
       else if ( cmpstrlen(pline, "ybounds", len)  == 0 )
@@ -1177,9 +1185,10 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
+                      lineno++;
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >ybounds< (grid description file: %s)", dname);
-
+			cdoAbort("Incomplete command: >ybounds< (line %d file: %s)", lineno, dname);
+                      
 		      pline = line;
 		      fval = strtod(pline, &endptr);
 		    }
@@ -1196,7 +1205,7 @@ int gridFromFile(FILE *gfp, const char *dname)
       else
 	{
 	  if ( grid.type != UNDEFID )
-	    cdoAbort("Invalid grid command : >%s< (grid description file: %s)", pline, dname);
+	    cdoAbort("Invalid grid command : >%s< (line %d file: %s)", pline, lineno, dname);
 	}
     }
   /*
@@ -1207,7 +1216,7 @@ int gridFromFile(FILE *gfp, const char *dname)
   */
   if ( grid.type != UNDEFID ) gridID = gridDefine(grid);
 
-  return (gridID);
+  return gridID;
 }
 
 
@@ -1235,28 +1244,23 @@ void skip_nondigit_lines(FILE *gfp)
 
 int input_ival(FILE *gfp, int *ival)
 {
-  int read_items;
-
   skip_nondigit_lines(gfp);
 
-  if ( feof(gfp) ) return(0);
+  if ( feof(gfp) ) return 0;
 
   *ival = 0;
-  read_items = fscanf(gfp, "%d", ival);
+  int read_items = fscanf(gfp, "%d", ival);
 
-  return (read_items);
+  return read_items;
 }
 
 
 int input_darray(FILE *gfp, int n_values, double *array)
 {
-  int i;
-  int read_items;
-
   if ( n_values <= 0 ) return 0;
 
-  read_items = 0;
-  for ( i = 0; i < n_values; i++ )
+  int read_items = 0;
+  for ( int i = 0; i < n_values; i++ )
     {
       skip_nondigit_lines(gfp);
 
@@ -1267,7 +1271,7 @@ int input_darray(FILE *gfp, int n_values, double *array)
       if ( feof(gfp) ) break;
     }
 
-  return (read_items);
+  return read_items;
 }
 
 
@@ -1281,8 +1285,8 @@ int gridFromPingo(FILE *gfp, const char *dname)
 
   gridInit(&grid);
 
-  if ( ! input_ival(gfp, &nlon) ) return (gridID);
-  if ( ! input_ival(gfp, &nlat) ) return (gridID);
+  if ( ! input_ival(gfp, &nlon) ) return gridID;
+  if ( ! input_ival(gfp, &nlat) ) return gridID;
 
   if ( nlon > 0 && nlon < 9999 && nlat > 0 && nlat < 9999 )
     {
@@ -1292,10 +1296,10 @@ int gridFromPingo(FILE *gfp, const char *dname)
       grid.xvals = (double*) Malloc(grid.xsize*sizeof(double));
       grid.yvals = (double*) Malloc(grid.ysize*sizeof(double));
 
-      if ( ! input_ival(gfp, &nlon) ) return (gridID);
+      if ( ! input_ival(gfp, &nlon) ) return gridID;
       if ( nlon == 2 )
 	{
-	  if ( input_darray(gfp, 2, grid.xvals) != 2 ) return (gridID);
+	  if ( input_darray(gfp, 2, grid.xvals) != 2 ) return gridID;
 	  grid.xvals[1] -= 360 * floor((grid.xvals[1] - grid.xvals[0]) / 360);
 
 	  if ( grid.xsize > 1 )
@@ -1307,7 +1311,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	}
       else if ( nlon == (int)grid.xsize )
 	{
-	  if ( input_darray(gfp, nlon, grid.xvals) != nlon ) return (gridID);
+	  if ( input_darray(gfp, nlon, grid.xvals) != nlon ) return gridID;
 	  for ( i = 0; i < nlon - 1; i++ )
 	    if ( grid.xvals[i+1] <= grid.xvals[i] ) break;
 
@@ -1317,26 +1321,26 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	      if ( i < nlon - 1 && grid.xvals[i+1] + 360 <= grid.xvals[i] )
 		{
 		  Message("Longitudes are not in ascending order!");
-		  return (gridID);
+		  return gridID;
 		}
 	    }
 	}
       else
-	return (gridID);
+	return gridID;
 
-      if ( ! input_ival(gfp, &nlat) ) return (gridID);
+      if ( ! input_ival(gfp, &nlat) ) return gridID;
       if ( nlat == 2 )
 	{
-	  if ( input_darray(gfp, 2, grid.yvals) != 2 ) return (gridID);
+	  if ( input_darray(gfp, 2, grid.yvals) != 2 ) return gridID;
 	  for ( i = 0; i < (int)grid.ysize; i++ )
 	    grid.yvals[i] = grid.yvals[0] + i*(grid.yvals[1] - grid.yvals[0]);
 	}
       else if ( nlat == (int)grid.ysize )
 	{
-	  if ( input_darray(gfp, nlat, grid.yvals) != nlat ) return (gridID);
+	  if ( input_darray(gfp, nlat, grid.yvals) != nlat ) return gridID;
 	}
       else
-	return (gridID);
+	return gridID;
 
       if ( grid.yvals[0]      >  90.001  || 
 	   grid.yvals[nlat-1] >  90.001  || 
@@ -1344,7 +1348,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	   grid.yvals[nlat-1] < -90.001 )
 	{
 	  Message("Latitudes must be between 90 and -90!");
-	  return (gridID);
+	  return gridID;
 	}
 
       for ( i = 0; i < nlat - 1; i++ )
@@ -1352,7 +1356,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	    ((grid.yvals[i+1] > grid.yvals[i]) != (grid.yvals[i+2] > grid.yvals[i+1]))) )
 	  {
 	    Message("Latitudes must be in descending or ascending order!");
-	    return (gridID);
+	    return gridID;
 	  }
 		    
       if ( nlat > 2 ) /* check if gaussian */
@@ -1381,7 +1385,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
   
   if ( grid.type != UNDEFID ) gridID = gridDefine(grid);
 
-  return (gridID);
+  return gridID;
 }
 
 
@@ -1390,7 +1394,7 @@ int nfc2nlat(int nfc, int ntr)
   int nlat = nfc / (ntr+1);
   nlat /= 2;
 
-  return (nlat);
+  return nlat;
 }
 
 
@@ -1398,7 +1402,7 @@ int nlat2ntr(int nlat)
 {
   int ntr = (nlat*2 - 1) / 3;
 
-  return (ntr);
+  return ntr;
 }
 
 
@@ -1406,7 +1410,7 @@ int nlat2ntr_linear(int nlat)
 {
   int ntr = (nlat*2 - 1) / 2;
 
-  return (ntr);
+  return ntr;
 }
 
 
@@ -1423,7 +1427,7 @@ int ntr2nlat(int ntr)
       */
     }
 
-  return (nlat);
+  return nlat;
 }
 
 
@@ -1440,7 +1444,7 @@ int ntr2nlat_linear(int ntr)
       */
     }
 
-  return (nlat);
+  return nlat;
 }
 
 
@@ -1472,7 +1476,7 @@ int compNlon(int nlat)
 	}
     }
 
-  return (nlon);
+  return nlon;
 }
 
 static
@@ -1621,7 +1625,7 @@ int gridFromName(const char *gridname)
 	  else if ( cmpstrlen(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
 	  else if ( cmpstrlen(pline, "",     len) == 0 ) grid.type = GRID_SPECTRAL;
       
-	  if ( pline[len] != 0 ) return (gridID);
+	  if ( pline[len] != 0 ) return gridID;
 
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
@@ -1649,7 +1653,7 @@ int gridFromName(const char *gridname)
 	  else if ( cmpstrlen(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
 	  else if ( cmpstrlen(pline, "",     len) == 0 ) grid.type = GRID_SPECTRAL;
      
-	  if ( pline[len] != 0 ) return (gridID);
+	  if ( pline[len] != 0 ) return gridID;
 
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
@@ -1696,13 +1700,13 @@ int gridFromName(const char *gridname)
 	  grid.xvals[0] = atof(pline);
 	  while ( isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-' ) pline++;
 	  if ( *pline == '_' ) pline++;
-	  if ( ! (pline[0] == 'l' &&  pline[1] == 'a' && pline[2] == 't') ) return(gridID);
+	  if ( ! (pline[0] == 'l' &&  pline[1] == 'a' && pline[2] == 't') ) return gridID;
 	  pline += 3;
 	  if ( *pline == '=' ) pline++;
 	  if ( isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-' )
 	    grid.yvals[0] = atof(pline);
 	  else
-	    return (gridID);
+	    return gridID;
 	}
     }
   else if ( gridname[0] == 'g' && gridname[1] == 'm' && gridname[2] == 'e' ) /* gme<NI> */
@@ -1832,7 +1836,7 @@ int gridFromName(const char *gridname)
 
   if ( grid.type != -1 ) gridID = gridDefine(grid);
 
-  return (gridID);
+  return gridID;
 }
 
 
@@ -1941,7 +1945,7 @@ int cdoDefineGrid(const char *gridfile)
 
   if ( lalloc ) Free(filename);
 
-  return (gridID);
+  return gridID;
 }
 
 
