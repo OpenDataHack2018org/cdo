@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-04-28  Uwe Schulzweida
+
+	* readline: added support for DOS text files (\r\n)
+
 2016-04-26  Uwe Schulzweida
 
 	* New operator: smooth - Smooth grid points
