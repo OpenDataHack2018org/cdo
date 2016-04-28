@@ -8,13 +8,14 @@
 
 @BeginDescription
 Smooth all grid points of a horizontal grid.
+Options is a comma separated list of "key=value" pairs with optional parameters.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_smooth
 @Title     = Smooth grid points
-@Parameter = [params]
+@Parameter = [options]
 
 @BeginDescription
 Performs a N point smoothing on all input fields. The number of points used depend
