@@ -481,18 +481,18 @@ uninstall-am:
 
 
 completions:
-	if (hash ruby &> /dev/null) ; then \
+	if hash ruby >/dev/null 2>&1 ; then \
 	  ruby -KN $(srcdir)/makecompl.rb -o cdoCompletion; \
 	fi
 
 cdoCompletion.bash cdoCompletion.zsh cdoCompletion.tcsh: completions
 
 test:
-	if (hash ruby &> /dev/null) ; then \
-	    (cd ruby;ruby test/test_cdo.rb) \
+	if hash ruby >/dev/null 2>&1 ; then \
+	    cd ruby;ruby test/test_cdo.rb \
 	fi
-	if (hash python &> /dev/null) ; then \
-	    (cd python; python test/test_cdo.py) \
+	if hash python >/dev/null 2>&1 ; then \
+	    cd python; python test/test_cdo.py \
 	fi
 
 #if MAINTAINER_MODE

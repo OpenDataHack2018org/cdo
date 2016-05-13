@@ -13,7 +13,7 @@ FORMATS="srv ext ieg grb grb2 nc nc2 nc4"
 IFILE=$DATAPATH/pl_data
 NTEST=1
 #
-function fileformat()
+fileformat()
 {
   FILEFORMAT=undefined
   ENABLE_TEST=yes
@@ -37,7 +37,7 @@ function fileformat()
   if [ "@ENABLE_NC4@" = no     -a "${FORMAT}" = nc4  ] ; then  ENABLE_TEST=no; fi
 }
 #
-function testfunc()
+testfunc()
 {
   RSTAT=0
 
