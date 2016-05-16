@@ -163,6 +163,26 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
     {
       int calendar = dtlist->calendar;
 
+//#define TEST_DTLIST 1
+#ifdef TEST_DTLIST
+      vdate = dtlist->dtinfo[0].v.date;
+      vtime = dtlist->dtinfo[0].v.time;
+      juldate_t juldate0 = juldate_encode(calendar, vdate, vtime);
+
+      juldate_t juldate;
+      double seconds = 0;
+      for ( int i = 1; i < nsteps; ++i )
+        {
+          vdate = dtlist->dtinfo[i].v.date;
+          vtime = dtlist->dtinfo[i].v.time;
+          juldate = juldate_encode(calendar, vdate, vtime);
+
+          seconds += juldate_to_seconds(juldate_sub(juldate, juldate0));
+        }
+      
+      juldate = juldate_add_seconds((int)lround(seconds/nsteps), juldate0);
+      juldate_decode(calendar, juldate, &vdate, &vtime);
+#else
       vdate = dtlist->dtinfo[nsteps/2-1].v.date;
       vtime = dtlist->dtinfo[nsteps/2-1].v.time;
       juldate_t juldate1 = juldate_encode(calendar, vdate, vtime);
@@ -174,6 +194,7 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
       double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
       juldate_t juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
       juldate_decode(calendar, juldatem, &vdate, &vtime);
+#endif
     }
   else
     {
