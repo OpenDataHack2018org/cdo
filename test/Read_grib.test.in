@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..4 # Number of tests to be executed.
+echo 1..6 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -10,7 +10,7 @@ CDOERR=cerr$$
 NTEST=1
 #
 for OPERATOR in sinfo info; do
-  for FILE in testfile01 testfile02; do
+  for FILE in testfile01 testfile02 testfile03; do
     RSTAT=0
     IFILE=$DATAPATH/grib_${FILE}.grb
     OFILE=grib_${FILE}_${OPERATOR}
