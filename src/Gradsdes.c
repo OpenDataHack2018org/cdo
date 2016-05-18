@@ -1408,8 +1408,6 @@ void *Gradsdes(void *argument)
   if ( intnum ) Free(intnum);
   if ( fltnum ) Free(fltnum);
 
- END_LABEL:
-
   cdoFinish();
 
   return 0;

@@ -208,8 +208,8 @@ void *Ensval(void *argument)
     sprintf(ofilename, "%s.%s%s", ofilebase, type_suffix, file_suffix);
     // fprintf(stderr, "StreamID %i: %s\n", stream, ofilename);
 
-  if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
-    cdoAbort("Outputfile %s already exists!", ofilename);
+    if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
+      cdoAbort("Outputfile %s already exists!", ofilename);
 
     argument_t *fileargument = file_argument_new(ofilename);
     streamID2[stream] = streamOpenWrite(fileargument, cdoFiletype());    

@@ -628,6 +628,7 @@ void tricntr(double *pxn,
              int kig1s, int kig1e, int kig2s, int kig2e, int knd, 
              int kjd, int kni)
 {
+  (void) knd;
   int id1, id2, id3, ioffset;
   double r1, r2, r3;
 
@@ -681,6 +682,7 @@ void gcpt(double *pxn,
           int kjd, double pgamma, 
           int ki1, int kj1, int ki2, int kj2, int ki, int kj)
 {
+  (void) knd;
   int id1, id2, id3, ioffset;
   double r1, r2, r3;
     
