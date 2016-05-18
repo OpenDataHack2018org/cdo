@@ -626,11 +626,122 @@ void query_user_exit(const char *argument)
     } /* end switch */
 }
 
+static
+int pstreamOpenWritePipe(const argument_t *argument, int filetype)
+{
+  int pstreamID = -1;
+  
+#if defined(HAVE_LIBPTHREAD)
+  if ( PSTREAM_Debug ) Message("pipe %s", argument->args);
+  pstreamID = pstreamFindID(argument->args);
+  if ( pstreamID == -1 ) Error("%s is not open!", argument->args);
+
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
+  pstreamptr->wthreadID = pthread_self();
+  pstreamptr->filetype = filetype;
+  processAddStream(pstreamID);
+#endif
+
+  return pstreamID;
+}
+
+static
+int pstreamOpenWriteFile(const argument_t *argument, int filetype)
+{
+  char *filename = (char*) Malloc(strlen(argument->args)+1);
+
+  pstream_t *pstreamptr = pstream_new_entry();
+  if ( ! pstreamptr ) Error("No memory");
+
+  int pstreamID = pstreamptr->self;
+  
+  if ( PSTREAM_Debug ) Message("file %s", argument->args);
+
+  if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
+
+  if ( cdoInteractive )
+    {
+      struct stat stbuf;
+
+      int rstatus = stat(argument->args, &stbuf);
+      /* If permanent file already exists, query user whether to overwrite or exit */
+      if ( rstatus != -1 ) query_user_exit(argument->args);
+    }
+
+  if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
+
+#if defined(HAVE_LIBPTHREAD)
+  if ( cdoLockIO )
+    pthread_mutex_lock(&streamMutex);
+  else
+    pthread_mutex_lock(&streamOpenWriteMutex);
+#endif
+
+  int fileID = streamOpenWrite(argument->args, filetype);
+  
+#if defined(HAVE_LIBPTHREAD)
+  if ( cdoLockIO )
+    pthread_mutex_unlock(&streamMutex);
+  else
+    pthread_mutex_unlock(&streamOpenWriteMutex);
+#endif
+  
+  if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
+  if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", argument->args);
+
+  cdoDefHistory(fileID, commandLine());
+
+  if ( cdoDefaultByteorder != CDI_UNDEFID )
+    streamDefByteorder(fileID, cdoDefaultByteorder);
+
+  if ( cdoCompress )
+    {
+      if      ( filetype == FILETYPE_GRB )
+        {
+          cdoCompType  = COMPRESS_SZIP;
+          cdoCompLevel = 0;
+        }
+      else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+        {
+          cdoCompType  = COMPRESS_ZIP;
+          cdoCompLevel = 1;
+        }
+    }
+
+  if ( cdoCompType != COMPRESS_NONE )
+    {
+      streamDefCompType(fileID, cdoCompType);
+      streamDefCompLevel(fileID, cdoCompLevel);
+
+      if ( cdoCompType == COMPRESS_SZIP &&
+           (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+        cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
+
+      if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
+        cdoWarning("JPEG compression not available for non GRIB2 data!");
+
+      if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+        cdoWarning("Deflate compression not available for non NetCDF4 data!");
+    }
+  /*
+    if ( cdoDefaultInstID != CDI_UNDEFID )
+    streamDefInstID(fileID, cdoDefaultInstID);
+  */
+  strcpy(filename, argument->args);
+
+  pstreamptr->mode     = 'w';
+  pstreamptr->name     = filename;
+  pstreamptr->fileID   = fileID;
+  pstreamptr->filetype = filetype;
+
+  return pstreamID;
+}
+
 
 int pstreamOpenWrite(const argument_t *argument, int filetype)
 {
   int pstreamID = -1;
-  pstream_t *pstreamptr;
 
   PSTREAM_INIT();
 
@@ -638,103 +749,12 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
 
   if ( ispipe )
     {
-#if defined(HAVE_LIBPTHREAD)
-      if ( PSTREAM_Debug ) Message("pipe %s", argument->args);
-      pstreamID = pstreamFindID(argument->args);
-      if ( pstreamID == -1 ) Error("%s is not open!", argument->args);
-
-      pstreamptr = pstream_to_pointer(pstreamID);
-
-      pstreamptr->wthreadID = pthread_self();
-      pstreamptr->filetype = filetype;
-      processAddStream(pstreamID);
-#endif
+      pstreamID = pstreamOpenWritePipe(argument, filetype);
     }
   else
     {
-      char *filename = (char*) Malloc(strlen(argument->args)+1);
-
-      pstreamptr = pstream_new_entry();
-      if ( ! pstreamptr ) Error("No memory");
-
-      pstreamID = pstreamptr->self;
-  
-      if ( PSTREAM_Debug ) Message("file %s", argument->args);
-
-      if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
-
-      if ( cdoInteractive )
-	{
-	  int rstatus;
-	  struct stat stbuf;
-
-	  rstatus = stat(argument->args, &stbuf);
-	  /* If permanent file already exists, query user whether to overwrite or exit */
-	  if ( rstatus != -1 ) query_user_exit(argument->args);
-	}
-
-      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
-#if defined(HAVE_LIBPTHREAD)
-      if ( cdoLockIO )
-	pthread_mutex_lock(&streamMutex);
-      else
-	pthread_mutex_lock(&streamOpenWriteMutex);
-#endif
-      int fileID = streamOpenWrite(argument->args, filetype);
-#if defined(HAVE_LIBPTHREAD)
-      if ( cdoLockIO )
-	pthread_mutex_unlock(&streamMutex);
-      else
-	pthread_mutex_unlock(&streamOpenWriteMutex);
-#endif
-      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
-      if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", argument->args);
-
-      cdoDefHistory(fileID, commandLine());
-
-      if ( cdoDefaultByteorder != CDI_UNDEFID )
-	streamDefByteorder(fileID, cdoDefaultByteorder);
-
-      if ( cdoCompress )
-	{
-	  if      ( filetype == FILETYPE_GRB )
-	    {
-	      cdoCompType  = COMPRESS_SZIP;
-	      cdoCompLevel = 0;
-	    }
-	  else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
-	    {
-	      cdoCompType  = COMPRESS_ZIP;
-	      cdoCompLevel = 1;
-	    }
-	}
-
-      if ( cdoCompType != COMPRESS_NONE )
-	{
-	  streamDefCompType(fileID, cdoCompType);
-	  streamDefCompLevel(fileID, cdoCompLevel);
-
-	  if ( cdoCompType == COMPRESS_SZIP &&
-	       (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-	    cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
-
-	  if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
-	    cdoWarning("JPEG compression not available for non GRIB2 data!");
-
-	  if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-	    cdoWarning("Deflate compression not available for non NetCDF4 data!");
-	}
-      /*
-      if ( cdoDefaultInstID != CDI_UNDEFID )
-	streamDefInstID(fileID, cdoDefaultInstID);
-      */
-      strcpy(filename, argument->args);
-
-      pstreamptr->mode     = 'w';
-      pstreamptr->name     = filename;
-      pstreamptr->fileID   = fileID;
-      pstreamptr->filetype = filetype;
-   }
+      pstreamID = pstreamOpenWriteFile(argument, filetype);
+    }
 
   return pstreamID;
 }
