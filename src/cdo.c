@@ -252,6 +252,8 @@ void cdo_usage(void)
       fprintf(stderr, " %s", name);
   fprintf(stderr, "\n");
 
+  fprintf(stderr, "    --timestat_date <srcdate>\n");
+  fprintf(stderr, "                   Target timestamp (time statistics): first, middle, midhigh or last source timestep.\n");
   fprintf(stderr, "    -V, --version  Print the version number\n");
   fprintf(stderr, "    -v, --verbose  Print extra details for some operators\n");
   fprintf(stderr, "    -W             Print extra warning messages\n");
@@ -706,8 +708,6 @@ void defineVarnames(const char *arg)
 static
 void get_env_vars(void)
 {
-  char *envstr;
-
   username = getenv("LOGNAME");
   if ( username == NULL )
     {
@@ -715,7 +715,7 @@ void get_env_vars(void)
       if ( username == NULL ) username = "unknown";
     }
 
-  envstr = getenv("CDO_GRID_SEARCH_DIR");
+  char *envstr = getenv("CDO_GRID_SEARCH_DIR");
   if ( envstr )
     {
       size_t len = strlen(envstr);
@@ -987,15 +987,13 @@ void check_stacksize()
 #if defined(HAVE_GETRLIMIT)
 #if defined(RLIMIT_STACK)
   {
-#define  MIN_STACK_SIZE  67108864L  /* 64MB */
-    int status;
     struct rlimit rlim;
-    RLIM_T min_stack_size = MIN_STACK_SIZE;
-
-    status = getrlimit(RLIMIT_STACK, &rlim);
+    int status = getrlimit(RLIMIT_STACK, &rlim);
 
     if ( status == 0 )
       {
+#define  MIN_STACK_SIZE  67108864L  /* 64MB */
+        RLIM_T min_stack_size = MIN_STACK_SIZE;
         if ( min_stack_size > rlim.rlim_max ) min_stack_size = rlim.rlim_max;
         if ( rlim.rlim_cur < min_stack_size )
           {
@@ -1038,14 +1036,12 @@ static
 long str_to_int(const char *intstring)
 {
   long intval = -1;
-  long fact = 1;
 
   if ( intstring )
     {
-      int loop, len;
-
-      len = (int) strlen(intstring);
-      for ( loop = 0; loop < len; loop++ )
+      long fact = 1;
+      int len = (int) strlen(intstring);
+      for ( int loop = 0; loop < len; loop++ )
         {
           if ( ! isdigit((int) intstring[loop]) )
             {
@@ -1078,6 +1074,7 @@ int parse_options_long(int argc, char *argv[])
   int lpercentile;
   int lprintoperators = 0;
   int lenableexcept;
+  int ltimestat_date;
 
   struct cdo_option opt_long[] =
     {
@@ -1090,6 +1087,7 @@ int parse_options_long(int argc, char *argv[])
       { "gridsearchradius",  required_argument,  &lgridsearchradius,  1  },
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "enableexcept",      required_argument,      &lenableexcept,  1  },
+      { "timestat_date",     required_argument,     &ltimestat_date,  1  },
       { "cmor",                    no_argument,      &CDO_CMOR_Mode,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "float",                   no_argument,        &CDO_Memtype,  MEMTYPE_FLOAT  },
@@ -1119,6 +1117,7 @@ int parse_options_long(int argc, char *argv[])
       lgridsearchradius = 0;
       lremap_genweights = 0;
       lenableexcept = 0;
+      ltimestat_date = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1157,6 +1156,17 @@ int parse_options_long(int argc, char *argv[])
               if ( except < 0 ) cdoAbort("option --%s: unsupported argument: %s", "enableexcept", CDO_optarg);
               cdo_feenableexcept((unsigned)except);
               if ( signal(SIGFPE, cdo_sig_handler) == SIG_ERR ) cdoWarning("can't catch SIGFPE!");
+            }
+          else if ( ltimestat_date )
+            {
+              int timestatdate = -1;
+              if      ( strcmp(CDO_optarg, "first")   == 0 ) timestatdate = TIMESTAT_FIRST;
+              else if ( strcmp(CDO_optarg, "last")    == 0 ) timestatdate = TIMESTAT_LAST;
+              else if ( strcmp(CDO_optarg, "middle")  == 0 ) timestatdate = TIMESTAT_MEAN;
+              else if ( strcmp(CDO_optarg, "midhigh") == 0 ) timestatdate = TIMESTAT_MIDHIGH;
+              if ( timestatdate < 0 ) cdoAbort("option --%s: unsupported argument: %s", "timestat_date", CDO_optarg);
+              extern int CDO_Timestat_Date;
+              CDO_Timestat_Date = timestatdate;
             }
           else if ( luse_fftw )
             {

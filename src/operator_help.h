@@ -4090,7 +4090,7 @@ static const char *WindHelp[] = {
     "DESCRIPTION",
     "    This module converts relative divergence and vorticity to U and V wind and vice versa.",
     "    Divergence and vorticity are spherical harmonic coefficients in spectral space and",
-    "    U and V are on a regular Gaussian grid. The Gaussian latitudes needs to be ordered from",
+    "    U and V are on a regular Gaussian grid. The Gaussian latitudes need to be ordered from",
     "    north to south.",
     "",
     "OPERATORS",

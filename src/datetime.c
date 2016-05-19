@@ -2,7 +2,7 @@
 #include "cdo_int.h"
 #include "datetime.h"
 
-static int timestat_date = -1;
+int CDO_Timestat_Date = -1;
 
 static
 void get_timestat_date(int *tstat_date)
@@ -42,10 +42,10 @@ void dtlist_init(dtlist_type *dtlist)
   dtlist->stat       = TIMESTAT_LAST;
   dtlist->dtinfo     = NULL;
 
-  if ( timestat_date == -1 )
+  if ( CDO_Timestat_Date == -1 )
     {
-      timestat_date = 0;
-      get_timestat_date(&timestat_date);
+      CDO_Timestat_Date = 0;
+      get_timestat_date(&CDO_Timestat_Date);
     }
 }
 
@@ -224,7 +224,7 @@ void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
     cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
 
   int stat = dtlist->stat;
-  if ( timestat_date > 0 ) stat = timestat_date;
+  if ( CDO_Timestat_Date > 0 ) stat = CDO_Timestat_Date;
 
   if      ( stat == TIMESTAT_MEAN    ) dtlist_mean(dtlist, nsteps);
   else if ( stat == TIMESTAT_MIDHIGH ) dtlist_midhigh(dtlist, nsteps);
