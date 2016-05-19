@@ -18,9 +18,10 @@ void get_timestat_date(int *tstat_date)
       envstrl[7] = 0;
       strtolower(envstrl);
 
-      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = TIMESTAT_FIRST;
-      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = TIMESTAT_LAST;
-      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = TIMESTAT_MEAN;
+      if      ( memcmp(envstrl, "first", 5)   == 0 )  env_date = TIMESTAT_FIRST;
+      else if ( memcmp(envstrl, "last", 4)    == 0 )  env_date = TIMESTAT_LAST;
+      else if ( memcmp(envstrl, "middle", 6)  == 0 )  env_date = TIMESTAT_MEAN;
+      else if ( memcmp(envstrl, "midhigh", 7) == 0 )  env_date = TIMESTAT_MIDHIGH;
 
       if ( env_date >= 0 )
 	{
@@ -163,8 +164,8 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
     {
       int calendar = dtlist->calendar;
 
-//#define TEST_DTLIST 1
-#ifdef TEST_DTLIST
+//#define TEST_DTLIST_MEAN 1
+#ifdef TEST_DTLIST_MEAN
       vdate = dtlist->dtinfo[0].v.date;
       vtime = dtlist->dtinfo[0].v.time;
       juldate_t juldate0 = juldate_encode(calendar, vdate, vtime);
@@ -207,6 +208,16 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
 }
 
 
+void dtlist_midhigh(dtlist_type *dtlist, int nsteps)
+{
+  int vdate = dtlist->dtinfo[nsteps/2].v.date;
+  int vtime = dtlist->dtinfo[nsteps/2].v.time;
+
+  dtlist->timestat.v.date = vdate;
+  dtlist->timestat.v.time = vtime;
+}
+
+
 void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
 {
   if ( (size_t)nsteps > dtlist->size )
@@ -215,9 +226,11 @@ void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
   int stat = dtlist->stat;
   if ( timestat_date > 0 ) stat = timestat_date;
 
-  if      ( stat == TIMESTAT_MEAN  ) dtlist_mean(dtlist, nsteps);
-  else if ( stat == TIMESTAT_FIRST ) dtlist->timestat.v = dtlist->dtinfo[0].v;
-  else if ( stat == TIMESTAT_LAST  ) dtlist->timestat.v = dtlist->dtinfo[nsteps-1].v;
+  if      ( stat == TIMESTAT_MEAN    ) dtlist_mean(dtlist, nsteps);
+  else if ( stat == TIMESTAT_MIDHIGH ) dtlist_midhigh(dtlist, nsteps);
+  else if ( stat == TIMESTAT_FIRST   ) dtlist->timestat.v = dtlist->dtinfo[0].v;
+  else if ( stat == TIMESTAT_LAST    ) dtlist->timestat.v = dtlist->dtinfo[nsteps-1].v;
+  else cdoAbort("Internal error; implementation missing for timestat=%d", stat);
 
   if ( dtlist->has_bounds )
     {
