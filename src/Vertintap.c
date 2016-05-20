@@ -50,7 +50,7 @@ int is_height_axis(int zaxisID, int nlevel)
     }
   return isheight;
 }
-
+/*
 static
 int is_hybrid_axis(int zaxisID, int nlevel)
 {
@@ -59,7 +59,7 @@ int is_hybrid_axis(int zaxisID, int nlevel)
        nlevel > 1 ) ishybrid = TRUE;
   return ishybrid;
 }
-
+*/
 
 void *Vertintap(void *argument)
 {
@@ -68,11 +68,10 @@ void *Vertintap(void *argument)
   int recID, nrecs;
   int i, k, offset;
   int varID, levelID;
-  int zaxisIDp, zaxisIDh = -1, nzaxis;
+  int zaxisIDp, zaxisIDh = -1;
   int gridID, zaxisID;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
-  int nvct;
   int apressID = -1, dpressID = -1;
   int psID = -1, tempID = -1;
   int param;
@@ -168,9 +167,8 @@ void *Vertintap(void *argument)
     zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
 
   zaxisDefLevels(zaxisIDp, plev);
-  nzaxis  = vlistNzaxis(vlistID1);
+  int nzaxis = vlistNzaxis(vlistID1);
 
-  int lheight = FALSE;
   for ( i = 0; i < nzaxis; i++ )
     {
       mono_level = TRUE;
@@ -192,88 +190,17 @@ void *Vertintap(void *argument)
       
       if ( is_height_axis(zaxisID, nlevel) && mono_level )
         {
-          lheight  = TRUE;
           zaxisIDh = zaxisID;
           nhlev    = nlevel;
           nhlevf   = nhlev;
           nhlevh   = nhlevf + 1;
+          printf("nhlev, nhlevf, nhlevh %d %d %d\n", nhlev, nhlevf, nhlevh);
 
           vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
           break;
         }
     }
 
-  if ( ! lheight ) { // old version, not needed anymore!!
-  int lhavevct = FALSE;
-  for ( i = 0; i < nzaxis; i++ )
-    {
-      /* mono_level = FALSE; */
-      mono_level = TRUE;
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-
-      if ( is_hybrid_axis(zaxisID, nlevel) )
-	{
-	  double *level = (double *) Malloc(nlevel*sizeof(double));
-	  zaxisInqLevels(zaxisID, level);
-	  int l;
-	  for ( l = 0; l < nlevel; l++ )
-	    {
-	      if ( (l+1) != (int) (level[l]+0.5) ) break;
-	    }
-	  if ( l == nlevel ) mono_level = TRUE; 
-	  Free(level);
-	}
-
-      if ( is_hybrid_axis(zaxisID, nlevel) && mono_level )
-	{
-	  nvct = zaxisInqVctSize(zaxisID);
-	  if ( nlevel == (nvct/2 - 1) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev;
-		  nhlevh   = nhlevf + 1;
-	      
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	      else
-		{
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	  else if ( nlevel == (nvct/2) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev - 1;
-		  nhlevh   = nhlev;
-	      
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	      else
-		{
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	}
-    }
-  }
-  
   int nvars = vlistNvars(vlistID1);
 
   int vars[nvars];
@@ -375,7 +302,8 @@ void *Vertintap(void *argument)
 
   if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
   if ( zaxisIDh != -1 && psID == -1 && dpressID )
-    cdoWarning("Surface pressure not found - set to upper level of %s!", var_stdname(air_pressure));
+    cdoWarning("Surface pressure not found - set to vertical sum of %s!", var_stdname(pressure_thickness));
+  //  cdoWarning("Surface pressure not found - set to upper level of %s!", var_stdname(air_pressure));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -433,6 +361,7 @@ void *Vertintap(void *argument)
 	    }
           else if ( dpressID != -1 )
 	    {
+              printf("nhlevf %d\n", nhlevf);
 	      memcpy(dpress, vardata1[dpressID], gridsize*nhlevf*sizeof(double)); 
 	      for ( i = 0; i < gridsize; i++ )  ps_prog[i] = 0;
 	      for ( k = 0; k < nhlevf; ++k )
