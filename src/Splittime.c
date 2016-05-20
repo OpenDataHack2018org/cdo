@@ -65,7 +65,6 @@ void *Splittime(void *argument)
   int index = 0;
   int i;
   int vdate, vtime;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
   int gridID;
@@ -78,7 +77,7 @@ void *Splittime(void *argument)
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = UNCHANGED_RECORD;
 
   int SPLITHOUR = cdoOperatorAdd("splithour", func_time, 10000, NULL);
   int SPLITDAY  = cdoOperatorAdd("splitday",  func_date,     1, NULL);

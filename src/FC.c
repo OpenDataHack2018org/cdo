@@ -34,47 +34,40 @@
 
 void *FC(void *argument)
 {
-  int FC2SP, SP2FC, FC2GP, GP2FC;
-  int operatorID;
-  int streamID1, streamID2;
   int nrecs, nvars;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int index, ngrids;
-  int vlistID1, vlistID2;
+  int recID, varID, levelID;
+  int index;
   int gridIDsp = -1, gridIDgp = -1, gridIDfc = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
   int nmiss;
   int *vars;
-  int lcopy = FALSE;
-  int taxisID1, taxisID2;
   int nlon = 0, nlat = 0, ntr = 0;
   int nsp = 0, nfc = 0;
-  double *array1 = NULL, *array2 = NULL;
+  double *array2 = NULL;
   SPTRANS *sptrans = NULL;
 
   cdoInitialize(argument);
 
-  FC2SP  = cdoOperatorAdd("fc2sp",  0, 0, NULL);
-  SP2FC  = cdoOperatorAdd("sp2fc", 0, 0, NULL);
-  FC2GP  = cdoOperatorAdd("fc2gp",  0, 0, NULL);
-  GP2FC  = cdoOperatorAdd("gp2fc", 0, 0, NULL);
+  bool lcopy = UNCHANGED_RECORD;
 
-  operatorID = cdoOperatorID();
+  int FC2SP  = cdoOperatorAdd("fc2sp",  0, 0, NULL);
+  int SP2FC  = cdoOperatorAdd("sp2fc", 0, 0, NULL);
+  int FC2GP  = cdoOperatorAdd("fc2gp",  0, 0, NULL);
+  int GP2FC  = cdoOperatorAdd("gp2fc", 0, 0, NULL);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   /* find first spectral grid */
   for ( index = 0; index < ngrids; index++ )
     {
@@ -239,12 +232,12 @@ void *FC(void *argument)
 
   if ( gridID1 != -1 ) vlistChangeGrid(vlistID2, gridID1, gridID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( gridID2 != -1 )
     {
@@ -252,7 +245,7 @@ void *FC(void *argument)
       array2 = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

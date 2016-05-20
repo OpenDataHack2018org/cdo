@@ -36,12 +36,11 @@ void *Mergetime(void *argument)
   int vlistID1, vlistID2;
   int fileID;
   int taxisID1, taxisID2 = CDI_UNDEFID;
-  int lcopy = FALSE;
   int nmiss;
   int vdate, vtime;
   int last_vdate = -1, last_vtime = -1;
   int next_fileID;
-  int skip_same_time = FALSE;
+  bool skip_same_time = false;
   double *array = NULL;
   typedef struct
   {
@@ -65,14 +64,14 @@ void *Mergetime(void *argument)
 	ival = atoi(envstr);
 	if ( ival == 1 )
 	  {
-	    skip_same_time = TRUE;
+	    skip_same_time = true;
 	    if ( cdoVerbose )
 	      cdoPrint("Set SKIP_SAME_TIME to %d", ival);
 	  }
       }
   }
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = UNCHANGED_RECORD;
 
   int nfiles = cdoStreamCnt() - 1;
 

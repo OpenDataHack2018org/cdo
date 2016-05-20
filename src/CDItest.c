@@ -28,33 +28,22 @@
 
 void *CDItest(void *argument)
 {
-  int NCOPY;
-  int operatorID;
-  int streamID1, streamID2;
-  int n;
   int nrecs;
-  int tsID1, tsID2, recID, varID, levelID;
-  int lcopy = FALSE;
-  int gridsize;
-  int vlistID1, vlistID2 = -1;
+  int recID, varID, levelID;
   int nmiss;
-  int taxisID1, taxisID2 = CDI_UNDEFID;
   int max_copy = 3;
-  double *array = NULL;
   double s_utime, s_stime;
   double e_utime, e_stime;
-  double c_cputime = 0, c_usertime = 0, c_systime = 0;
 
   cdoInitialize(argument);
 
-  NCOPY = cdoOperatorAdd("ncopy",   0, 0, NULL);
+  bool lcopy = false;
+  //bool lcopy = UNCHANGED_RECORD;
 
+  int NCOPY = cdoOperatorAdd("ncopy",   0, 0, NULL);
   UNUSED(NCOPY);
 
-  //  if ( UNCHANGED_RECORD ) lcopy = TRUE;
-
-  operatorID = cdoOperatorID();
-
+  int operatorID = cdoOperatorID();
   UNUSED(operatorID);
 
   //  operatorInputArg("Number of copies");
@@ -62,27 +51,27 @@ void *CDItest(void *argument)
 
   processStartTime(&s_utime, &s_stime);
 
-  n = 0;
+  int n = 0;
   while ( TRUE )
     {
-      streamID1 = streamOpenRead(cdoStreamName(0));
+      int streamID1 = streamOpenRead(cdoStreamName(0));
 
-      vlistID1 = streamInqVlist(streamID1);
-      taxisID1 = vlistInqTaxis(vlistID1);
+      int vlistID1 = streamInqVlist(streamID1);
+      int taxisID1 = vlistInqTaxis(vlistID1);
 
-      streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+      int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-      vlistID2 = vlistDuplicate(vlistID1);
-      taxisID2 = taxisDuplicate(taxisID1);
+      int vlistID2 = vlistDuplicate(vlistID1);
+      int taxisID2 = taxisDuplicate(taxisID1);
       vlistDefTaxis(vlistID2, taxisID2);
 
       streamDefVlist(streamID2, vlistID2);
 
-      gridsize = vlistGridsizeMax(vlistID1);
-      array = (double*) Malloc(gridsize*sizeof(double));
+      int gridsize = vlistGridsizeMax(vlistID1);
+      double *array = (double*) Malloc(gridsize*sizeof(double));
 
-      tsID1 = 0;
-      tsID2 = 0;
+      int tsID1 = 0;
+      int tsID2 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
@@ -120,9 +109,9 @@ void *CDItest(void *argument)
 
       cdoProcessTime(&e_utime, &e_stime);
 
-      c_usertime = e_utime - s_utime;
-      c_systime  = e_stime - s_stime;
-      c_cputime  = c_usertime + c_systime;
+      double c_usertime = e_utime - s_utime;
+      double c_systime  = e_stime - s_stime;
+      double c_cputime  = c_usertime + c_systime;
 
       s_utime = e_utime;
       s_stime = e_stime;

@@ -23,38 +23,33 @@
 
 void *Seloperator(void *argument)
 {
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
-  int scode, sltype;
+  int recID, varID, levelID;
   double slevel = 0, level;
-  int nvars, nlevs, code, zaxisID, selfound = FALSE;
+  int nlevs, code, zaxisID, selfound = FALSE;
   int levID, ltype = 0;
   int varID2, levelID2;
   int sellevel, selcode, selltype;
-  int lcopy = FALSE;
   int gridsize, nmiss;
   double *array = NULL;
 
   cdoInitialize(argument);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = UNCHANGED_RECORD;
 
   operatorInputArg("code, ltype, level");
 
-  scode  = parameter2int(operatorArgv()[0]);
-  sltype = parameter2int(operatorArgv()[1]);
+  int scode  = parameter2int(operatorArgv()[0]);
+  int sltype = parameter2int(operatorArgv()[1]);
 
   if ( operatorArgc() == 3 )
     slevel = parameter2double(operatorArgv()[2]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
       code    = vlistInqVarCode(vlistID1, varID);
@@ -93,14 +88,14 @@ void *Seloperator(void *argument)
   if ( selfound == FALSE )
     cdoWarning("Code %d, ltype %d, level %g not found!", scode, sltype, slevel);
 
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
@@ -110,7 +105,7 @@ void *Seloperator(void *argument)
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

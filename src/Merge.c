@@ -133,14 +133,13 @@ void *Merge(void *argument)
   int nrecs = 0;
   int recID, levelID, levelID2;
   int index;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
   //int skip_same_var = FALSE;
 
   cdoInitialize(argument);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = UNCHANGED_RECORD;
 
   /*
   {

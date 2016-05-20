@@ -42,8 +42,7 @@ void *Cat(void *argument)
 
   cdoInitialize(argument);
 
-  bool lcopy = false;
-  if ( UNCHANGED_RECORD ) lcopy = true;
+  bool lcopy = UNCHANGED_RECORD;
 
   int timer_cat = timer_new("cat");
   if ( cdoTimer ) timer_start(timer_cat);

@@ -90,8 +90,7 @@ void *Select(void *argument)
   int SELECT = cdoOperatorAdd("select", 0, 0, "parameter list");
   int DELETE = cdoOperatorAdd("delete", 0, 0, "parameter list");
 
-  bool lcopy = false;
-  if ( UNCHANGED_RECORD ) lcopy = true;
+  bool lcopy = UNCHANGED_RECORD;
 
   int operatorID = cdoOperatorID();
 

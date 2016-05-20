@@ -199,6 +199,8 @@ void *Seltime(void *argument)
 
   cdoInitialize(argument);
 
+  bool lcopy = UNCHANGED_RECORD;
+
   int SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     0, "timesteps");
   int SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 0, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
   int SELTIME     = cdoOperatorAdd("seltime",     func_time,     0, "times (format hh:mm:ss)");
@@ -212,9 +214,6 @@ void *Seltime(void *argument)
   int operatorID = cdoOperatorID();
 
   int operfunc = cdoOperatorF1(operatorID);
-
-  int lcopy = FALSE;
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 

@@ -35,12 +35,9 @@ void *Splitsel(void *argument)
   int varID, levelID, recID;
   int tsID, tsID2;
   int nsets;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
   int gridID;
-  int nvars, nlevel;
-  int nconst;
+  int nlevel;
 /*   int ndates = 0, noffset = 0, nskip = 0, nargc; */
   double ndates, noffset, nskip;
   int i2 = 0;
@@ -52,7 +49,6 @@ void *Splitsel(void *argument)
   char filename[8192];
   const char *refname;
   int index = 0;
-  int lcopy = FALSE;
   double *array = NULL;
   field_t **vars = NULL;
 
@@ -60,9 +56,9 @@ void *Splitsel(void *argument)
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
-  cdoOperatorAdd("splitsel",  0,  0, NULL);
+  bool lcopy = UNCHANGED_RECORD;
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  cdoOperatorAdd("splitsel",  0,  0, NULL);
 
   /*  operatorInputArg("nsets <noffset <nskip>>"); */
 
@@ -82,14 +78,14 @@ void *Splitsel(void *argument)
 
   if ( cdoVerbose ) cdoPrint("nsets = %f, noffset = %f, nskip = %f", ndates, noffset, nskip);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
 /*   taxisID2 = taxisCreate(TAXIS_ABSOLUTE); */
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   strcpy(filename, cdoStreamName(1)->args);
@@ -106,8 +102,8 @@ void *Splitsel(void *argument)
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  nvars = vlistNvars(vlistID1);
-  nconst = 0;
+  int nvars = vlistNvars(vlistID1);
+  int nconst = 0;
   for ( varID = 0; varID < nvars; varID++ )
     if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) nconst++;
 
@@ -167,7 +163,7 @@ void *Splitsel(void *argument)
 	  
       if ( cdoVerbose ) cdoPrint("create file %s", filename);
       argument_t *fileargument = file_argument_new(filename);
-      streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+      int streamID2 = streamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
       streamDefVlist(streamID2, vlistID2);
