@@ -78,6 +78,7 @@ void *Select(void *argument)
   int result = FALSE;
   int taxisID2 = CDI_UNDEFID;
   int ntsteps;
+  bool lvarsel = false;
   bool ltimsel = false;
   bool *vars = NULL;
   double **vardata2 = NULL;
@@ -313,8 +314,13 @@ void *Select(void *argument)
 	  PML_CHECK_WORD_FLAG(pml, gridname);
 	  PML_CHECK_WORD_FLAG(pml, steptype);
 
-	  if ( PML_NOCC(pml, date) || PML_NOCC(pml, startdate) || PML_NOCC(pml, enddate) || PML_NOCC(pml, season) ) ltimsel = true;
-	  if ( PML_NOCC(pml, timestep_of_year) || PML_NOCC(pml, timestep) || PML_NOCC(pml, year) || PML_NOCC(pml, month) || PML_NOCC(pml, day) || PML_NOCC(pml, hour) || PML_NOCC(pml, minute) ) ltimsel = true;
+          if ( PML_NOCC(pml, code) || PML_NOCC(pml, levidx) || PML_NOCC(pml, ltype) || PML_NOCC(pml, zaxisnum) ||
+               PML_NOCC(pml, gridnum) || PML_NOCC(pml, level) || PML_NOCC(pml, name) || PML_NOCC(pml, param) ||
+               PML_NOCC(pml, zaxisname) || PML_NOCC(pml, gridname) || PML_NOCC(pml, steptype) ) lvarsel = true;
+
+	  if ( PML_NOCC(pml, date) || PML_NOCC(pml, startdate) || PML_NOCC(pml, enddate) || PML_NOCC(pml, season) ||
+               PML_NOCC(pml, timestep_of_year) || PML_NOCC(pml, timestep) || PML_NOCC(pml, year) || PML_NOCC(pml, month) ||
+               PML_NOCC(pml, day) || PML_NOCC(pml, hour) || PML_NOCC(pml, minute) ) ltimsel = true;
 
 	  int npar = 0;
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -331,7 +337,7 @@ void *Select(void *argument)
 
 	  if ( npar == 0 )
 	    {
-	      if ( ltimsel == true )
+	      if ( lvarsel == false && ltimsel == true )
 		{
                   lcopy_const = true;
 
