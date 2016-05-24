@@ -77,15 +77,16 @@ void *Intlevel3d(void *argument)
 
   operatorInputArg("icoordinate");
 
+  int streamID1 = streamOpenRead(cdoStreamName(0));                 /*  input data */
+  int streamID2 = streamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
+  int streamID3 = streamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
+
   /*  Read filename from Parameter */
   operatorInputArg("filename for vertical source coordinates variable");
   operatorCheckArgc(1);
   argument_t *fileargument = file_argument_new(operatorArgv()[0]);
   int streamID0 = streamOpenRead(fileargument);                     /*  3d vertical input coordinate */
   file_argument_free(fileargument);
-  int streamID1 = streamOpenRead(cdoStreamName(0));                 /*  input data */
-  int streamID2 = streamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
-  int streamID3 = streamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
 
   int vlistID0 = streamInqVlist(streamID0);
   int vlistID1 = streamInqVlist(streamID1); taxisID1 = vlistInqTaxis(vlistID1);
