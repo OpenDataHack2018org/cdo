@@ -5,6 +5,7 @@
 
 2016-05-25  Uwe Schulzweida
 
+	* CDO_CommandLine: changed from fixed size of 1024 to dynamic size
 	* uv2dv: ignore GRIB2 parameter id
 
 2016-05-20  Uwe Schulzweida

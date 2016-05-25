@@ -15,63 +15,62 @@
   GNU General Public License for more details.
 */
 
+#include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
+#include "dmemory.h"
 
 static int    gargc = 0;
 static char **gargv;
 
-static char CommandLine[1024];
+static char *CDO_CommandLine = NULL;
+
+
+void freeCommandLine(void)
+{
+  if ( CDO_CommandLine ) Free(CDO_CommandLine);
+}
+
 
 void initCommandLine(void)
 {
-  int iarg;
-  char *pargv;
-  size_t len, offset = 0;
-  /*
-  time_t tp;
-  struct tm *ltime;
+  size_t maxlen = 1;
+  for ( int iarg = 0; iarg < gargc; iarg++ ) maxlen += strlen(gargv[iarg]) + 1;
 
-  tp = time(NULL);
-
-  if ( tp != -1 )
+  CDO_CommandLine = (char*) Malloc(maxlen);
+  atexit(freeCommandLine);
+  
+  char *pargv = strrchr(gargv[0], '/');
+  if ( pargv == 0 ) pargv = gargv[0];
+  else              pargv++;
+  
+  size_t offset = 0;
+  for ( int iarg = 1; iarg < gargc; iarg++ )
     {
-      ltime = localtime(&tp);
-      offset = strftime(CommandLine, 1024, "%d %b %Y : ", ltime);
-    }
-    */
-  for ( iarg = 0; iarg < gargc; iarg++ )
-    {
-      if ( iarg == 0 )
-	{
-	  pargv = strrchr(gargv[iarg], '/');
-	  if ( pargv == 0 ) pargv = gargv[0];
-	  else              pargv++;
-	}
-      else
-	pargv = gargv[iarg];
-
-      len = strlen(pargv);
-      if ( offset+len+1 > 1024 ) break;
-      memcpy(CommandLine+offset, pargv, len);
+      pargv = gargv[iarg];
+      size_t len = strlen(pargv);
+      if ( offset+len+1 > maxlen ) break;
+      memcpy(CDO_CommandLine+offset, pargv, len);
       offset += len;
-      CommandLine[offset] = ' ';
+      CDO_CommandLine[offset] = ' ';
       offset++;
     }
 
-  CommandLine[offset-1] = '\0';
+  CDO_CommandLine[offset-1] = '\0';
 }
 
 char *commandLine(void)
 {
-  static int init = 0;
+  static bool init = false;
 
-  if ( init == 0 )
+  if ( !init )
     {
       initCommandLine();
-      init = 1;
+      init = true;
     }
 
-  return (CommandLine);
+  return CDO_CommandLine;
 }
 
 void setCommandLine(int argc, char **argv)
