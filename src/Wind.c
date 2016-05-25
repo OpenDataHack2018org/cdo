@@ -83,7 +83,7 @@ void *Wind(void *argument)
       if ( operatorID == UV2DV || operatorID == UV2DVL )
 	{
 	  /* search for u and v wind */
-	  if ( code <= 0 )
+	  if ( pdis != 255 || code <= 0 )
 	    {
 	      vlistInqVarName(vlistID1, varID, varname);
 	      strtolower(varname);

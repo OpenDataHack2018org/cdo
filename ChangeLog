@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-05-25  Uwe Schulzweida
+
+	* uv2dv: ignore GRIB2 parameter id
+
 2016-05-20  Uwe Schulzweida
 
 	* Select: check level only if no vars selected
