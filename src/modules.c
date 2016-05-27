@@ -480,7 +480,7 @@ void *Maggraph(void *argument);
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertint", "vertmean", "vertavg", "vertstd", "vertstd1", "vertvar", "vertvar1"}
 #define  VertcumOperators       {"vertcum", "vertcumhl"}
 #define  VertwindOperators      {"vertwind"}
-#define  VerifygridOperators    {"verifygrid", "verifygridtest"}
+#define  VerifygridOperators    {"verifygrid"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}

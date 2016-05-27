@@ -19,30 +19,17 @@
    This module contains the following operators:
 */
 
-#if defined(HAVE_CONFIG_H)
-#  include "config.h" /* VERSION */
-#endif
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
 #include "clipping/geometry.h"
-#include "clipping/clipping.c"
-#include "math.h"
-#include "stdio.h"
-#include "stdlib.h"
 #include "time.h"
-
-/*
-#include <inttypes.h>
-#include <stdint.h>
-*/
 
 /* Quicksort is called with a pointer to the array to be sorted and an integer indicating its length. */
 
-void quick_sort (double * array, int array_length) {
+void quick_sort(double * array, int array_length) {
   int i, j;
   double p, temp;
   
@@ -63,7 +50,6 @@ void quick_sort (double * array, int array_length) {
   quick_sort(array, i);
   quick_sort(array + i, array_length - i);
 }
-
 
 /* Quicksort is called with a pointer to the array of center points to be sorted and an integer indicating its length. It sorts the array by its longitude coordinates */
 
@@ -104,7 +90,7 @@ void quick_sort_by_lon(double * array, int array_length) {
 
 /* This uses quicksort to sort the latitude coordinates in a subarray of all coordinates. */
 
-void quick_sort_of_subarray_by_lat(double * array, int array_length, int subarray_start, int subarray_end){
+void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subarray_end){
 
   int subarray_length = (subarray_end - subarray_start) / 2 + 1;     
   double subarray[subarray_length];
@@ -125,45 +111,8 @@ void quick_sort_of_subarray_by_lat(double * array, int array_length, int subarra
   }            
 }
 
-
-/* Function merge is used by mergesort. */
-
-static void merge (double * array, int array_length, int middle){
-  
-  int i, j, k;
-  
-  double * temp_array = malloc(array_length * sizeof (double));
-  
-  for (i = 0, j = middle, k = 0; k < array_length; k++) {
-    temp_array[k] = j == array_length      ? array[i++]
-      : i == middle      ? array[j++]
-      : array[j] < array[i] ? array[j++]
-      :               array[i++];
-  }
-  
-  for (i = 0; i < array_length; i++){
-    array[i] = temp_array[i];
-  }
-
-  free(temp_array);
-}
-
-/* Mergesort is called with a pointer to the array to be sorted and an integer indicating its length. */
-
-static void merge_sort (double * array, int array_length){
-  if (array_length < 2){
-    return;
-  }
-  
-  int middle = array_length / 2;
-  
-  merge_sort(array, middle);
-  merge_sort(array + middle, array_length - middle);
-  merge(array, array_length, middle);
-}
-
-
-static double determinant(double matrix[3][3]){
+static
+double determinant(double matrix[3][3]){
   
   /* Calculates the determinant for a 3 x 3 matrix. */
   
@@ -175,7 +124,8 @@ static double determinant(double matrix[3][3]){
     - matrix[0][0] * matrix[1][2] * matrix[2][1];
 }
 
-static void find_unit_normal(double a[3], double b[3], double c[3], double * unit_normal){
+static
+void find_unit_normal(double a[3], double b[3], double c[3], double * unit_normal){
   
   /* Calculates the unit normal for a plane defined on three points a, b, c in Euclidean space. */
 
@@ -208,8 +158,9 @@ static void find_unit_normal(double a[3], double b[3], double c[3], double * uni
 
 }
 
-static int no_of_duplicates_in_this_list_of_vertices(double cell_corners[], int array_length){
-
+static
+int no_of_duplicates_in_this_list_of_vertices(double cell_corners[], int array_length)
+{
   /* Returns the number of coordinate duplicates found in a list of Cartesian coordinates, the cell corners or vertices. */
   
   /* Ensure that the lenght of the array is a multiple of 3. */
@@ -224,20 +175,19 @@ static int no_of_duplicates_in_this_list_of_vertices(double cell_corners[], int 
 
   for (int i = 0; i < array_length; i = i + 3){
     for (int j = i + 3; j < array_length; j = j + 3 ){
-      if (cell_corners[i + 0] == cell_corners[j]){
-	if (cell_corners[i + 1] == cell_corners[j + 1]){
-	  if (cell_corners[i + 2] == cell_corners[j + 2]){
+      if ( IS_EQUAL(cell_corners[i + 0], cell_corners[j])     &&
+           IS_EQUAL(cell_corners[i + 1], cell_corners[j + 1]) &&
+           IS_EQUAL(cell_corners[i + 2], cell_corners[j + 2]) ){
 	    no_duplicates += 1;
-	  }
-	}
       }
     }
   }
   return no_duplicates;
 }
 
-static double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2]){
-
+static
+double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2])
+{
   /* 
      Computes whether a point is left of the line through point_on_line_1 and point_on_line_2. This is part of the solution to the point in polygon problem.
      Returns 0 if the point is on the line, > 0 if the point is left of the line, and < 0 if the point is right of the line.
@@ -246,10 +196,12 @@ static double is_point_left_of_edge(double point_on_line_1[2], double point_on_l
   
   double answer = ((point_on_line_2[0] - point_on_line_1[0]) * (point[1] - point_on_line_1[1]) 
 		- (point[0] - point_on_line_1[0]) * (point_on_line_2[1] - point_on_line_1[1]));
+  
   return answer;
 }
 
-static int winding_numbers_algorithm(double cell_corners[], int number_corners, double point[]){
+static
+int winding_numbers_algorithm(double cell_corners[], int number_corners, double point[]){
   
   /* 
      Computes whether a point is inside the bounds of a cell. This is the solution to the point in polygon problem.
@@ -286,20 +238,22 @@ static int winding_numbers_algorithm(double cell_corners[], int number_corners, 
   return winding_number;
 }
 
-static double sign(double x){
-
+static
+double sign(double x)
+{
   /* Is +1 if x is positive, -1 if x is negative and 0 if x is zero.*/
 
   return (x > 0) -  (x < 0);
 }
 
-static int is_simple_polygon_convex(double cell_corners[], int number_corners){
+static
+bool is_simple_polygon_convex(double cell_corners[], int number_corners){
 
    /* Tests in which direction the polygon winds when walking along its edges. Does so for all edges of the polygon. */
 
   double direction = 0;
   
-  for (int i = 0; i < number_corners - 2; i++){
+  for ( int i = 0; i < number_corners - 2; i++ ){
     
     double turns_to = (cell_corners[i * 2 + 0] - cell_corners[(i + 1) * 2 + 0]) 
       * (cell_corners[(i + 1) * 2 + 1] - cell_corners[(i + 2) * 2 + 1]) - (cell_corners[i * 2 + 1] - cell_corners[(i + 1) * 2 + 1]) 
@@ -311,562 +265,48 @@ static int is_simple_polygon_convex(double cell_corners[], int number_corners){
       direction = turns_to;
     }
 
-    if (sign(direction) != sign(turns_to)){
-      if (direction != 0){
-	return 0;
+    if ( IS_NOT_EQUAL(sign(direction), sign(turns_to)) ){
+      if ( IS_NOT_EQUAL(direction, 0) ){
+	return false;
       }
     }
     else{
       direction = turns_to;
     }      
   }
-  return 1;
+
+  return true;
 }
 
-static double calculate_the_polygon_area(double cell_corners[], int number_corners){
 
+static
+double calculate_the_polygon_area(double cell_corners[], int number_corners)
+{
   /* This algorithm is based on the calculation from Wolfram Mathworld Polygon Area. It results in the area of planar non-self-intersecting polygon. */
   
   double twice_the_polygon_area = 0;
 
-  for (int i = 0; i < number_corners - 1; i++){
-    
-    twice_the_polygon_area += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1]) - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]);
-       
-  }
+  for (int i = 0; i < number_corners - 1; i++)
+    {
+      twice_the_polygon_area += (cell_corners[i * 2 + 0] * cell_corners[(i + 1) * 2 + 1]) - (cell_corners[(i + 1) * 2 + 0] * cell_corners[i * 2 + 1]); 
+    }
+  
   return twice_the_polygon_area / 2;
 }
 
-static int are_polygon_vertices_arranged_in_clockwise_order(double cell_area){
+static
+bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area)
+{
+  bool status = false;
 
   /* A negative area indicates a clockwise arrangement of vertices, a positive area a counterclockwise arrangement. There should be an area to begin with. */
-  
-  if (cell_area > 0){
-    return 0;
-  }
-  if (cell_area < 0){
-    return 1;
-  }
-}
+  if ( cell_area < 0 ) status = true;
 
-
-
-
-double intlin(double x, double y1, double x1, double y2, double x2);
-
-static
-int pnpoly(int npol, double *xp, double *yp, double x, double y)
-{
-  int i, j, c = 0;
-
-  for (i = 0, j = npol-1; i < npol; j = i++) {
-    if ((((yp[i]<=y) && (y<yp[j])) ||
-	 ((yp[j]<=y) && (y<yp[i]))) &&
-	(x < (xp[j] - xp[i]) * (y - yp[i]) / (yp[j] - yp[i]) + xp[i]))
-      
-      c = !c;
-  }
-  return c;
-}
-
-
-static
-double PolygonArea_old(int np, double *xp, double *yp)
-{
-  int i, j;
-  double area = 0;
-
-  for ( i = 0; i < np; i++ )
-    {
-      j = (i + 1) % np;
-      area += xp[i] * yp[j];
-      area -= yp[i] * xp[j];
-    }
-
-  area /= 2;
-  /* return(area < 0 ? -area : area); */
-  return (area);
-}
-
-
-static
-double PolygonArea(int np, double *xp, double *yp, double yc)
-{
-  int i, j;
-  double area = 0.;
-
-  /* Process area in Radians */
-   
-  for ( i = 0; i < np; i++ )
-    {
-      j = (i + 1) % np;
-      area += DEG2RAD*xp[i] * DEG2RAD*yp[j];
-      area -= DEG2RAD*yp[i] * DEG2RAD*xp[j];
-    }
-  area *= 0.5 * cos(DEG2RAD*yc);
-  return (area);
+  return status;
 }
 
 static
-int ccw(double p0x, double p0y, double p1x, double p1y, double p2x, double p2y)
-{
-  /*
-    This function says whether the point are orientated clockwise
-    +1 positive orientation
-    -1 negative orientation
-     0 points are on a line --> no orientation
-    
-    This is done by a comparision of the gradient of
-    dy1/dx1 = p1 - p0 vs.
-    dy2/dx2 = p2 - p0
-    To avoid singularities at dx1=0 OR dx2 = 0 we multiply with dx1*dx2
-  */
-  double dx1, dx2, dy1, dy2;
-
-  dx1 = p1x - p0x; dy1 = p1y - p0y;
-  dx2 = p2x - p0x; dy2 = p2y - p0y;
-  if ( dx1*dy2 > dy1*dx2 ) return +1;
-  if ( dx1*dy2 < dy1*dx2 ) return -1;
-  if ( (dx1*dx2 < 0 ) || (dy1*dy2 < 0)) return -1;
-  if ( (dx1*dx1 + dy1*dy1) < (dx2*dx2 + dy2*dy2)) return +1;
-
-  return 0;
-}
-
-static
-int intersect(double pix, double piy, double pjx, double pjy,
-              double pkx, double pky, double plx, double ply)
-{
-  /*This function returns if there is an intersection between the lines 
-    line1 between pi and pj and
-    line2 between pk and pl,
-    whereas pi = (pix, piy).
-      
-    This can done by means of ccw since the product of ccw(pi,pj,pk)*ccw(pi,pj,pl)
-    shows if pk and pl are on different or the same side(s) of the line1 (They must
-    have different signums to be on different sides).
-      
-    Consequently if and ONLY IF pk as well as pl are on different sides of line1
-    AND pi as well as pj are on different sides of line2 there HAS TO be an intersection.
-  */
-    
-  return ( ( ccw(pix, piy, pjx, pjy, pkx, pky) *
-	     ccw(pix, piy, pjx, pjy, plx, ply) <= 0 ) &&
-	   ( ccw(pkx, pky, plx, ply, pix, piy) *
-	     ccw(pkx, pky, plx, ply, pjx, pjy) <= 0 ) );
-}
-
-static
-int check_ncorner(int ncorner, const double *lon_bounds, const double *lat_bounds)
-{
-  int ncorner_new = ncorner;
-  int k;
-
-  for ( k=ncorner-1; k>0; --k )
-    if ( IS_NOT_EQUAL(lon_bounds[k], lon_bounds[k-1]) ||
-	 IS_NOT_EQUAL(lat_bounds[k], lat_bounds[k-1]) ) break;
-
-  if ( k < ncorner-1 ) ncorner_new = k+1;
-
-  return ncorner_new;
-}
-
-static
-void verify_grid(int gridsize, int ncorner,
-		double *grid_center_lon, double *grid_center_lat,
-		double *grid_corner_lon, double *grid_corner_lat)
-{
-  int i0, i, j, k, l;
-  int l0;
-  int nout;
-  int isinside, convex, alone, isnegative;
-  const int mnv = ncorner+1;
-  int cuts[mnv][mnv];  
-  int *alone_cell;          
-  int check_corners;
-  double lon, lat = 0;
-  double lon_bounds[mnv], lat_bounds[mnv];
-  double area, sumarea;
-
-  alone_cell = (int*) Malloc(gridsize*ncorner*sizeof(int));
-
-  check_corners = 0; /* don't execute corner checking (last loop) */
-  nout = 0;
-  sumarea = 0;
-  /*
-  for ( i = 0; i < gridsize; ++i )
-    {
-      lon = grid_center_lon[i];
-      lat = grid_center_lat[i];
-      for ( k = 0; k < ncorner; ++k )
-        {
-          lon_bounds[k] = grid_corner_lon[i*ncorner+k];
-          lat_bounds[k] = grid_corner_lat[i*ncorner+k];
-          if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
-          if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
-        }      
-      lon_bounds[ncorner] = lon_bounds[0];
-      lat_bounds[ncorner] = lat_bounds[0];
-      fprintf(stdout, " %6i %6i %9.4f %9.4f :",  nout, i+1, lon, lat);
-      for ( k = 0; k < ncorner; k++ )
-	fprintf(stdout, " %9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
-      fprintf(stdout, "\n");
-    }
-  */
-
-  /* Check if center is inside bounds of cell */
-  for ( i = 0; i < gridsize; ++i )
-    {
-      lon = grid_center_lon[i];
-      lat = grid_center_lat[i];
-
-      for ( k = 0; k < ncorner; ++k )
-        {
-          lon_bounds[k] = grid_corner_lon[i*ncorner+k];
-          lat_bounds[k] = grid_corner_lat[i*ncorner+k];
-          if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
-          if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
-        }      
-      lon_bounds[ncorner] = lon_bounds[0];
-      lat_bounds[ncorner] = lat_bounds[0];
-      
-      isinside = pnpoly(ncorner+1, lon_bounds, lat_bounds, lon, lat);
-
-      if ( !isinside ) nout++;
-      if ( !isinside && cdoVerbose )
-        {
-          if ( nout == 1 )
-            {
-              fprintf(stdout,"\n CENTER IS OUT OF BOUNDS");
-              fprintf(stdout,"\n                                               :");
-              for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "          Corner %2i : ", k+1);
-              fprintf(stdout,"\n Number  Index center_lon center_lat area*10^6 :");
-              for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "   lon_%2.2i    lat_%2.2i : ", k+1, k+1);
-              fprintf(stdout, "\n");
-            }
-          area = PolygonArea(ncorner+1, lon_bounds, lat_bounds,lat);
-          fprintf(stdout, " %6i %6i  %9.4f  %9.4f %9.5f :", 
-		  nout, i+1, lon, lat, area*pow(10,6));
-
-	  int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
-
-          for ( k = 0; k < ncorner_new; k++ )
-	    fprintf(stdout, "%9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
-           for ( k = ncorner_new; k < ncorner; k++ )
-	     fprintf(stdout, "     ----      ---- : ");
-          fprintf(stdout, "\n");
-        }
-    }
-
-  if ( nout )
-    cdoWarning("%d of %d points out of bounds!", nout, gridsize);
-  
-  /* check that all cell bounds have the same orientation */
-  
-  nout = 0;
-  for ( i = 0; i < gridsize; ++i )
-    {
-      lon = grid_center_lon[i];
-      lat = grid_center_lat[i];
-      
-      for ( k = 0; k < ncorner; ++k )
-	{
-          lon_bounds[k] = grid_corner_lon[i*ncorner+k];
-          lat_bounds[k] = grid_corner_lat[i*ncorner+k];
-          if ( (grid_center_lon[i] - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
-          if ( (lon_bounds[k] - grid_center_lon[i]) > 270 ) lon_bounds[k] -= 360;
-	}
-      lon_bounds[ncorner] = lon_bounds[0];
-      lat_bounds[ncorner] = lat_bounds[0];
-      
-      area = PolygonArea(ncorner+1, lon_bounds, lat_bounds, lat);
-      
-      isnegative = area < 0 ? 1 : 0;
-      sumarea += area < 0 ? -area : area;
-      
-      if ( isnegative ) nout++;
-      
-      if ( isnegative && cdoVerbose )
-        {
-          if ( nout == 1 )
-            {
-              fprintf(stdout,"\n                                     :");
-              for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "          Corner %2i : ", k+1);
-              fprintf(stdout,"\n Number  Index center_lon center_lat :");
-              for ( k = 0; k < ncorner; k++ )
-                fprintf(stdout, "   lon_%2.2i    lat_%2.2i : ", k+1, k+1);
-              fprintf(stdout, "\n");
-            }
-          fprintf(stdout, " %6i %6i  %9.4f  %9.4f :", nout, i+1, lon, lat);
-
-	  int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
-
-          for ( k = 0; k < ncorner_new; k++ )
-	    fprintf(stdout, "%9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
-           for ( k = ncorner_new; k < ncorner; k++ )
-	     fprintf(stdout, "     ----      ---- : ");
-
-          fprintf(stdout, "\n");
-        }
-    }
-
-  if ( nout )
-    cdoWarning("%d of %d grid cells have wrong orientation!", nout, gridsize);
-
-  if ( cdoVerbose ) 
-    fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
-
-  if ( fabs(100.*(sumarea - 4.*M_PI)/4.*M_PI) > 0.1)
-    cdoWarning("area-error: %9.5f%%", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
-  
-  /* check that all cells are convex */
-  
-  nout = 0;
-  for ( i0 = 0; i0 < gridsize; i0++ )
-    {
-      lon = grid_center_lon[i0];
-      lat = grid_center_lat[i0];
-
-      for ( k = 0; k < ncorner; k++ )
-	{
-	  lon_bounds[k] = grid_corner_lon[i0*ncorner+k];
-	  lat_bounds[k] = grid_corner_lat[i0*ncorner+k];
-	  /* Find cells that cover left and right border of the grid and adjust
-	     coordinates --> they become closed polygons on theta-phi plane! */
-	  if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360; 
-	  if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
-	}
-      
-      /* Reset found cuts for the current cell before starting the search */
-      for ( i = 0; i < ncorner; i++ )
-	for ( j = 0; j < ncorner; j++ )
-	  cuts[i][j] = 0;
-      
-      /* Loops cover all combinations between inner lines of the Polygon
-	 Check whether each inner line is cut by an other (inner) one at least once. 
-	 - Only if there is a cut every inner line the Polygon is convex
-	 - We assume: Points are in either cyclic or anticyclic order
-      */
-      for ( i = 0; i < ncorner-1; i++ )
-	{
-          /* j = i+2 excludes lines from one corner to an other (j=i+1) and
-	     from one point to itself (j=i)*/
-          for ( j = i+2 ; j < ncorner; j++ )
-	    {
-              /* Exclude the line between the last and first corner */
-              if ( i == 0 && j == ncorner-1 ) continue;
-
-	      /* k = i+1: if starting point is in common lines to different corners
-		 do not intersect */
-              for ( k = i+1; k < ncorner - 1; k++ )
-		{                  
-                  if ( i == k ) l0 = j+1;
-                  else          l0 = k+2;
-
-                  for ( l = l0; l < ncorner; l++ )
-		    {
-                      if ( cuts[k][l] && cuts[i][j] ) continue;
-		      /* Exlude the line between the last and first corner 
-			 Exlude the line itself (l!=i, k!=j)
-			 Check if line ij and kl intersect each other.
-			 If so increment respective counters for intersections. 
-			 It is not relevant by which line a line is intersected - 
-			 it is only relevant if they is itersected! */
-                      if ( ! ( k==0 && l == ncorner-1 ) && ( l != j ) && ( k != j )  )
-			{
-                          if ( intersect(lon_bounds[i], lat_bounds[i], lon_bounds[j], lat_bounds[j],
-                                         lon_bounds[k], lat_bounds[k], lon_bounds[l], lat_bounds[l]) )
-			    {
-			      cuts[i][j]++; cuts[k][l]++; cuts[j][i]++; cuts[l][k]++;
-			    }
-			}
-		    }
-		}                  
-	    }
-	}
-
-      convex = 1;
-      /* The following loop covers all inner lines of the Polygon 
-	 (The assumption applies that the points are in cyclic order) */
-      for ( i = 0; i < ncorner-1; i++ )
-	for ( j = i+2; j < ncorner; j++)
-	  {
-	    if ( i == 0 && j == ncorner-1 ) continue;	   
-	    if ( ! cuts[i][j] ) convex = 0;
-	  }
-      if ( !convex ) nout++;        
-      if ( cdoVerbose && ( !convex ) )
-	{
-          if ( nout == 1 )
-	    {
-              fprintf(stdout,"\n NO CONVEX POLYGON");
-              fprintf(stdout,"\n                                       :");
-              for ( k = 0; k < ncorner; k++ )
-		fprintf(stdout, "            Corner %2i : ", k);
-              fprintf(stdout,"\n Number  Index  center_lon  center_lat :");
-              for ( k = 0; k < ncorner; k++ )
-		fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
-              fprintf(stdout, "\n");
-	    }
-          
-          fprintf(stdout, " %6i %6i   %9.4f   %9.4f :", nout, i0+1, lon, lat);
-          for ( k = 0; k < ncorner; k++ )
-	    fprintf(stdout, "  %9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
-          fprintf(stdout, "\n");         
-	}     
-    }
-
-  if ( nout )
-    cdoWarning("%d of %d cells are not Convex!", nout, gridsize);
-
-  if ( check_corners )
-    {
-      /* 
-	 Check if there is a corner at the same point of 
-	 an other cell foreach corner of each cell 
-      */
-      nout = 0;
-      for ( i = 0; i < gridsize*ncorner; i++ )
-	alone_cell[i] = 1;
-      
-      for ( i = 0; i < gridsize*ncorner; i++ )
-	{
-	  if ( ! alone_cell[i] ) continue;
-	  alone = 1;
-	  lon = grid_corner_lon[i];
-	  lat = grid_corner_lat[i];			
-	  for ( j = 0; j < gridsize*ncorner; j++ )
-	    if ( j != i && 
-		 IS_EQUAL(grid_corner_lat[j], lat) && 
-		 IS_EQUAL(grid_corner_lon[j], lon) )
-	      { alone = 0; alone_cell[i] = alone_cell[j] = 1; break; }
-	  if ( alone )
-	    {
-	      if      ( lon >= 180. ) lon -= 360.;
-	      else if ( lon  < 180. ) lon += 360.;
-	      for ( j = i+1; j < gridsize*ncorner; j++ )
-		if (j != i  && 
-		    IS_EQUAL(grid_corner_lat[j], lat) && 
-		    IS_EQUAL(grid_corner_lon[j], lon) )
-		  { alone = 0; alone_cell[i] = alone_cell[j] = 0; break; }
-	    }
-	  if ( alone )
-	    { 
-	      nout++;
-	      if ( cdoVerbose )
-		{
-		  if ( nout == 1 )
-		    {
-		      fprintf(stdout,"\n VERTEX ALONE ON GRID\n");
-		      fprintf(stdout," number cell-Index  Vert-Index :        lon        lat\n");
-		    }							
-		  fprintf(stdout, " %6i     %6i      %6i : %10.4f %10.4f\n", 
-			  nout, i/ncorner, i, grid_corner_lon[i], grid_corner_lat[i]);
-		}					
-	    }
-	}
-
-      if ( nout )
-	cdoWarning("%d of %d corners are lonely on the grid!", nout, gridsize*ncorner);
-    }
-
-  Free(alone_cell);
-}
-
-
-void verify_grid_old(int gridsize, int ncorner,
-		double *grid_center_lon, double *grid_center_lat,
-		double *grid_corner_lon, double *grid_corner_lat)
-{
-  int i, k;
-  int nout;
-  int isinside;
-  int isnegative;
-  double area;
-  double lon, lat;
-  double lon_bounds[ncorner], lat_bounds[ncorner];
-
-  /* check that all centers are inside the bounds */
-
-  nout = 0;
-  for ( i = 0; i < gridsize; ++i )
-    {
-      lon = grid_center_lon[i];
-      lat = grid_center_lat[i];
-
-      for ( k = 0; k < ncorner; ++k )
-	{
-	  lon_bounds[k] = grid_corner_lon[i*ncorner+k];
-	  lat_bounds[k] = grid_corner_lat[i*ncorner+k];
-	}
-
-      for ( k = 0; k < ncorner; ++k )
-	{
-	  if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
-	  if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
-	}
-
-      lon_bounds[ncorner] = lon_bounds[0];
-      lat_bounds[ncorner] = lat_bounds[0];
-
-      isinside = pnpoly(ncorner+1, lon_bounds, lat_bounds, lon, lat);
-
-      if ( !isinside ) nout++;
-
-      if ( !isinside && cdoVerbose )
-	printf("center: %d %d %g %g %g %g %g %g %g %g %g %g\n", nout, i, lon, lat, lon_bounds[0], lat_bounds[0],
-	       lon_bounds[1], lat_bounds[1], lon_bounds[2], lat_bounds[2], lon_bounds[3], lat_bounds[3]);
-    }
-
-  if ( nout > 0 )
-    cdoWarning("%d of %d points out of bounds!", nout, gridsize);
-
-
-  /* check that all cell bounds have the same orientation */
-
-  nout = 0;
-  for ( i = 0; i < gridsize; ++i )
-    {
-      lon = grid_center_lon[i];
-      lat = grid_center_lat[i];
-
-      for ( k = 0; k < ncorner; ++k )
-	{
-	  lon_bounds[k] = grid_corner_lon[i*ncorner+k];
-	  lat_bounds[k] = grid_corner_lat[i*ncorner+k];
-	}
-
-      for ( k = 0; k < ncorner; ++k )
-	{
-	  if ( (grid_center_lon[i] - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
-	  if ( (lon_bounds[k] - grid_center_lon[i]) > 270 ) lon_bounds[k] -= 360;
-	}
-
-      lon_bounds[ncorner] = lon_bounds[0];
-      lat_bounds[ncorner] = lat_bounds[0];
-
-      area = PolygonArea_old(ncorner+1, lon_bounds, lat_bounds);
-
-      if ( area < 0 ) isnegative = 1;
-      else            isnegative = 0;
-
-      if ( isnegative ) nout++;
-
-
-      if ( isnegative && cdoVerbose )
-	printf("bounds: %d %d %g %g %g %g %g %g %g %g %g %g\n", nout, i, lon, lat, lon_bounds[0], lat_bounds[0],
-	       lon_bounds[1], lat_bounds[1], lon_bounds[2], lat_bounds[2], lon_bounds[3], lat_bounds[3]);
-    }
-
-  if ( nout > 0 )
-    cdoWarning("%d of %d grid cells have wrong orientation!", nout, gridsize);
-}
-
-
-static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon, double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat){
+void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon, double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat){
 
   /* 
      Firt, this function performs the following test:
@@ -891,7 +331,6 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
   double center_point_plane_projection[2];
 
   int cell_no = 0;
-  int cell_class = 0;
   int corner_no = 0;
   int actual_number_of_corners = 0;
   int no_of_cells_with_duplicates = 0;
@@ -901,8 +340,6 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
   int winding_number = 0;
   int no_of_cells_with_center_points_out_of_bounds = 0;
   int coordinate_to_ignore = 0;
-  int invert_result = 0;
-  int is_clockwise = 0;
   int subarray_start = 0;
   int subarray_end = 0;
   int no_unique_center_points = 1;
@@ -917,11 +354,14 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
 
   int no_cells_with_a_specific_no_of_corners[ncorner];
 
-  for (int i = 0; i < ncorner; i++){
+  for ( int i = 0; i < ncorner; i++ )
     no_cells_with_a_specific_no_of_corners[i] = 0;
-  }
 
-  fprintf(stdout,"Grid no %u (of %u) consists of %d cells, of which\n\n", gridno + 1, ngrids, gridsize);
+  if ( gridno == 0 )
+    cdoPrint("Grid consists of %d cells, of which", gridsize);
+  else
+    cdoPrint("Grid no %u (of %u) consists of %d cells, of which", gridno + 1, ngrids, gridsize);
+  cdoPrint("");
 
   /* For performing the first test, an array of all center point coordinates is built. */
 
@@ -944,13 +384,13 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
 
     if(cell_no == gridsize - 2){    
       subarray_end = gridsize * 2 - 2;      
-      quick_sort_of_subarray_by_lat(center_point_array, gridsize * 2, subarray_start, subarray_end);
+      quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
     }
             
     if(fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1)  * 2  + 0]) > 0.0001){     
       subarray_end = cell_no * 2;    
       if((subarray_end - subarray_start) > 1){	
-	quick_sort_of_subarray_by_lat(center_point_array, gridsize * 2, subarray_start, subarray_end);
+	quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
       }     
       subarray_start = subarray_end + 2;  
     }        
@@ -979,7 +419,7 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
   */
   
 
-  for (cell_no = 0; cell_no < gridsize; cell_no++)
+  for ( cell_no = 0; cell_no < gridsize; cell_no++ )
     {    
       /* Conversion of center point spherical coordinates to Cartesian coordinates. */
 
@@ -1005,14 +445,13 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
       
       actual_number_of_corners = ncorner;
 
+      double *cell_corners = cell_corners_in_Euclidean_space_open_cell;
       for (corner_no = ncorner - 1; corner_no > 0; corner_no--){
-	if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 0] == cell_corners_in_Euclidean_space_open_cell[(corner_no - 1) * 3 + 0]){
-	  if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 1] == cell_corners_in_Euclidean_space_open_cell[(corner_no - 1) * 3 + 1]){
-	    if (cell_corners_in_Euclidean_space_open_cell[corner_no * 3 + 2] == cell_corners_in_Euclidean_space_open_cell[(corner_no - 1) * 3 + 2]){
-	      actual_number_of_corners = actual_number_of_corners - 1;
-	    }
-	  }
-	} else {
+	if ( IS_EQUAL(cell_corners[corner_no * 3 + 0], cell_corners[(corner_no - 1) * 3 + 0]) &&
+             IS_EQUAL(cell_corners[corner_no * 3 + 1], cell_corners[(corner_no - 1) * 3 + 1]) &&
+             IS_EQUAL(cell_corners[corner_no * 3 + 2], cell_corners[(corner_no - 1) * 3 + 2]) ){
+          actual_number_of_corners = actual_number_of_corners - 1;
+        } else {
 	  break;
 	}	
       }                  
@@ -1030,13 +469,14 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
       
       /* Checks if there are any duplicate vertices in the list of corners. Note that the last (additional) corner has not been set yet. */
 
-      if (no_of_duplicates_in_this_list_of_vertices(cell_corners_in_Euclidean_space_open_cell, actual_number_of_corners * 3) > 0){
-	no_of_cells_with_duplicates += 1;
-	if (cdoVerbose){
-	  fprintf(stdout,"A duplicate vertex was found in cell no %u. This cell is considered degenerate and will be omitted from further computation!\n\n", cell_no + 1);
-	}
-	continue;
-      }
+      if ( no_of_duplicates_in_this_list_of_vertices(cell_corners_in_Euclidean_space_open_cell, actual_number_of_corners * 3) > 0 )
+        {
+          no_of_cells_with_duplicates += 1;
+          if ( cdoVerbose )
+            cdoPrint("A duplicate vertex was found in cell no %u.", cell_no + 1);
+
+          continue;
+        }
 
       /* We are creating a closed polygon/cell by setting the additional last corner to be the same as the first one. */
 
@@ -1093,11 +533,9 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
       /* The following projection on the plane that two coordinate axes lie on changes the arrangement of the polygon vertices if the coordinate to be ignored along the third axis is smaller than 0.
 	 In this case, the result of the computation of the orientation of vertices needs to be inverted. Clockwise becomes counterclockwise and vice versa. */
 
-      invert_result = 0;
-
-      if (cell_corners_in_Euclidean_space[coordinate_to_ignore - 1] < 0){
-	invert_result = 1;
-      }
+      bool invert_result = false;
+      if ( cell_corners_in_Euclidean_space[coordinate_to_ignore - 1] < 0 )
+	invert_result = true;
       
       switch(coordinate_to_ignore){
       case 1:
@@ -1128,70 +566,64 @@ static void verify_grid_test(int gridsize, int gridno, int ngrids, int ncorner, 
 
       /* Checking for convexity of the cell. */
 
-      if(is_simple_polygon_convex(cell_corners_plane_projection, actual_number_of_corners +1)){
+      if ( is_simple_polygon_convex(cell_corners_plane_projection, actual_number_of_corners +1) )
 	no_convex_cells += 1;
-      }
      
       /* Checking the arrangement or direction of cell vertices. */
 
       polygon_area = calculate_the_polygon_area(cell_corners_plane_projection, actual_number_of_corners + 1);
-      is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
+      bool is_clockwise = are_polygon_vertices_arranged_in_clockwise_order(polygon_area);
             
       /* If the direction of the vertices was flipped during the projection onto the two-dimensional plane, the previous result needs to be inverted now. */
 
-      if(invert_result == 1){
-	if(is_clockwise == 1){
-	  is_clockwise = 0;
-	} else {
-	  is_clockwise = 1;
-	}
-      }
+      if ( invert_result )
+        {
+          if ( is_clockwise )
+            is_clockwise = false;
+          else
+            is_clockwise = true;
+        }
 
       /* The overall counter of (counter)clockwise cells is increased by one. */
 
-      if(is_clockwise){
+      if ( is_clockwise )
 	no_clockwise_cells += 1;
-      } else {
+      else
 	no_counterclockwise_cells +=1;
-      }
       
       /* The winding numbers algorithm is used to test whether the presumed center point is within the bounds of the cell. */
         
       winding_number = winding_numbers_algorithm(cell_corners_plane_projection, actual_number_of_corners + 1, center_point_plane_projection);
 
-      if (winding_number == 0){
+      if ( winding_number == 0 )
 	no_of_cells_with_center_points_out_of_bounds += 1;
-      }
     }
 
   int no_nonunique_cells = gridsize - no_unique_center_points;
-
-  if (no_nonunique_cells != 0){
-    fprintf(stdout,"%u\tcells are not unique\n", no_nonunique_cells);
-  }
-  
   int no_nonconvex_cells =  (int) gridsize - no_convex_cells;
 
-  if (no_nonconvex_cells != 0){
-    fprintf(stdout,"%u\tcells are non-convex\n", no_nonconvex_cells);
-  }
+  for ( int i = 2; i < ncorner; i++ )
+    if ( no_cells_with_a_specific_no_of_corners[i] )
+      cdoPrintBlue("%9d cells have %d vertices", no_cells_with_a_specific_no_of_corners[i], i + 1);
 
-  for(int i = 2; i < ncorner; i++){
-    if(no_cells_with_a_specific_no_of_corners[i] != 0)
-      fprintf(stdout,"%u\tcells have %d vertices\n", no_cells_with_a_specific_no_of_corners[i], i + 1);
-  }
-  if (no_of_cells_with_duplicates != 0){
-    fprintf(stdout,"%u\tcells have duplicate vertices", no_of_cells_with_duplicates);
-  }
-  if (no_clockwise_cells != 0){
-    fprintf(stdout,"\n%d\tcells have their vertices arranged in a clockwise order", no_clockwise_cells);  
-  }
-  if (no_of_cells_with_center_points_out_of_bounds != 0){
-    fprintf(stdout,"\n%d\tcells have their center points located outside their boundaries", no_of_cells_with_center_points_out_of_bounds);
-  }
+  if ( no_nonunique_cells )
+    cdoPrintRed("%9d cells are not unique", no_nonunique_cells);
+  
+  if ( no_nonconvex_cells )
+    cdoPrintRed("%9d cells are non-convex", no_nonconvex_cells);
 
-  fprintf(stdout,"\n"); 
+  if ( no_of_cells_with_duplicates )
+    cdoPrintRed("%9d cells have duplicate vertices", no_of_cells_with_duplicates);
+
+  if ( no_clockwise_cells )
+    cdoPrintRed("%9d cells have their vertices arranged in a clockwise order", no_clockwise_cells);
+  
+  if ( no_of_cells_with_center_points_out_of_bounds )
+    cdoPrintRed("%9d cells have their center points located outside their boundaries", no_of_cells_with_center_points_out_of_bounds);
+
+  cdoPrint("");
 }
+
 
 void *Verifygrid(void *argument)
 {
@@ -1199,8 +631,7 @@ void *Verifygrid(void *argument)
 
   cdoInitialize(argument);
 
-  int VERIFYGRID     = cdoOperatorAdd("verifygrid",  0,   0, NULL);
-  int VERIFYGRIDTEST = cdoOperatorAdd("verifygridtest",  0,   0, NULL);
+  int VERIFYGRID = cdoOperatorAdd("verifygrid",  0,   0, NULL);
 
   int operatorID = cdoOperatorID();
 
@@ -1282,9 +713,7 @@ void *Verifygrid(void *argument)
         }
       
       if ( operatorID == VERIFYGRID )
-        verify_grid(gridsize, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
-      else
-        verify_grid_test(gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
+        verify_grid(gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
 
       if ( grid_center_lon ) Free(grid_center_lon);
       if ( grid_center_lat ) Free(grid_center_lat);

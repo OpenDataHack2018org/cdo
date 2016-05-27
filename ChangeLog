@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-05-27   Asela Rajapakse
+
+	* New operator verifygrid - Verify grids
+
 2016-05-25  Uwe Schulzweida
 
 	* CDO_CommandLine: changed from fixed size of 1024 to dynamic size
