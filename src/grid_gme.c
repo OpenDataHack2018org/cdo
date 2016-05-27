@@ -61,26 +61,33 @@ void factorni(int kni, int *kni2, int *kni3)
   /*  kni3    INT      exponent of "3", either 0 or 1                   */
   /**********************************************************************/
 
+  unsigned lim = 9999;
   int mx = kni;
   
   *kni2  = 0;
   *kni3  = 0;
 
-  while (mx > 1) { 
-      if (mx%2 == 0) {
-	*kni2 = *kni2 + 1;
-	mx    = mx/2;
-      } else if (mx%3 == 0) {
-	*kni3 = *kni3 + 1;
-	mx    = mx/3;
-      } else {
+  while ( mx > 1 && --lim )
+    {
+      if ( mx%2 == 0 )
+        {
+          *kni2 = *kni2 + 1;
+          mx    = mx/2;
+        }
+      else if ( mx%3 == 0 )
+        {
+          *kni3 = *kni3 + 1;
+          mx    = mx/3;
+        }
+      else
+        {
 	/* error return */
-      }
-  }
+        }
+    }
 
   /* kni3 must not be greater than */
   
-  if (*kni3 > 1) {
+  if ( *kni3 > 1 ) {
     /* error return */
   }
 }
