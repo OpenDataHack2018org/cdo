@@ -88,6 +88,69 @@ double std_atm_pressure(double height)
 }
 
 static
+bool grid_is_generic_meter(int gridID)
+{
+  bool status = false;
+
+  if ( gridInqType(gridID) == GRID_GENERIC )
+    {
+      char xunits[CDI_MAX_NAME];
+      gridInqXunits(gridID, xunits);
+      char yunits[CDI_MAX_NAME];
+      gridInqXunits(gridID, yunits);
+
+      if ( strcmp(xunits, "m") == 0 &&  strcmp(yunits, "m") == 0 )
+        status = true;
+    }
+
+  return status;
+}
+
+static
+void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2D)
+{
+  int xsize = gridInqXsize(gridID);
+  int ysize = gridInqYsize(gridID);
+
+  assert(gridsize==xsize*ysize);
+
+  double *xcoord = (double*) Malloc(xsize*sizeof(double));
+  double *ycoord = (double*) Malloc(ysize*sizeof(double));
+
+  gridInqXvals(gridID, xcoord);
+  gridInqYvals(gridID, ycoord);
+
+  double xmin = xcoord[0];
+  double xmax = xcoord[0];
+  for ( int i = 1; i < xsize; ++i )
+    {
+      if ( xcoord[i] < xmin ) xmin = xcoord[i];
+      if ( xcoord[i] > xmax ) xmax = xcoord[i];
+    }
+
+  double ymin = ycoord[0];
+  double ymax = ycoord[0];
+  for ( int i = 1; i < ysize; ++i )
+    {
+      if ( ycoord[i] < ymin ) ymin = ycoord[i];
+      if ( ycoord[i] > ymax ) ymax = ycoord[i];
+    }
+
+  double xrange = xmax - xmin;
+  double yrange = ymax - ymin;
+  
+  for ( int j = 0; j < ysize; ++j )
+    for ( int i = 0; i < xsize; ++i )
+      {
+        xvals2D[j*xsize+i] = xcoord[i]*M_PI/xrange; 
+        yvals2D[j*xsize+i] = ycoord[j]*M_PI/yrange; 
+      }
+  
+  Free(xcoord);
+  Free(ycoord);
+}
+
+static
 void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
 {
   if ( !(gridInqType(gridID) == GRID_LONLAT && !gridIsRotated(gridID)) )
@@ -407,21 +470,28 @@ void *Vargen(void *argument)
 		  double *xvals = (double*) Malloc(gridsize*sizeof(double));
 		  double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
-		  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
+                  if ( grid_is_generic_meter(gridID) )
+                    {
+                      conv_generic_grid(gridID, gridsize, xvals, yvals);
+                    }
+                  else
+                    {
+                      if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
 
-		  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
-		    gridID = gridToCurvilinear(gridID, 0);
+                      if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+                        gridID = gridToCurvilinear(gridID, 0);
 
-		  gridInqXvals(gridID, xvals);
-		  gridInqYvals(gridID, yvals);
+                      gridInqXvals(gridID, xvals);
+                      gridInqYvals(gridID, yvals);
 
-		  /* Convert lat/lon units if required */
-		  char units[CDI_MAX_NAME];
-		  gridInqXunits(gridID, units);
-		  grid_to_radian(units, gridsize, xvals, "grid center lon");
-		  gridInqYunits(gridID, units);
-		  grid_to_radian(units, gridsize, yvals, "grid center lat");
-
+                      /* Convert lat/lon units if required */
+                      char units[CDI_MAX_NAME];
+                      gridInqXunits(gridID, units);
+                      grid_to_radian(units, gridsize, xvals, "grid center lon");
+                      gridInqYunits(gridID, units);
+                      grid_to_radian(units, gridsize, yvals, "grid center lat");
+                    }
+                  
 		  if ( operatorID == SINCOS )
 		    {
 		      for ( i = 0; i < gridsize; i++ )
