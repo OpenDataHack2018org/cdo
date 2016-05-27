@@ -962,19 +962,19 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
 	if ( gridtype == GRID_LAEA )
 	  {
-	    int lvalid_xunits = FALSE;
-	    int lvalid_yunits = FALSE;
+	    bool lvalid_xunits = false;
+	    bool lvalid_yunits = false;
 	    int len;
 	    len = (int) strlen(xunits);
-	    if ( len == 1 && memcmp(xunits, "m",  1) == 0 ) lvalid_xunits = TRUE;
-	    if ( len == 2 && memcmp(xunits, "km", 2) == 0 ) lvalid_xunits = TRUE;
+	    if ( len == 1 && memcmp(xunits, "m",  1) == 0 ) lvalid_xunits = true;
+	    if ( len == 2 && memcmp(xunits, "km", 2) == 0 ) lvalid_xunits = true;
 	    len = (int) strlen(yunits);
-	    if ( len == 1 && memcmp(yunits, "m",  1) == 0 ) lvalid_yunits = TRUE;
-	    if ( len == 2 && memcmp(yunits, "km", 2) == 0 ) lvalid_yunits = TRUE;
+	    if ( len == 1 && memcmp(yunits, "m",  1) == 0 ) lvalid_yunits = true;
+	    if ( len == 2 && memcmp(yunits, "km", 2) == 0 ) lvalid_yunits = true;
 
-	    if ( lvalid_xunits == FALSE )
+	    if ( lvalid_xunits == false )
 	      cdoWarning("Possibly wrong result! Invalid x-coordinate units: \"%s\" (expected \"m\" or \"km\")", xunits);
-	    if ( lvalid_yunits == FALSE )
+	    if ( lvalid_yunits == false )
 	      cdoWarning("Possibly wrong result! Invalid y-coordinate units: \"%s\" (expected \"m\" or \"km\")", yunits);
 	  }
 
@@ -986,7 +986,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
 	double *xvals2D = (double*) Malloc(gridsize*sizeof(double));
 	double *yvals2D = (double*) Malloc(gridsize*sizeof(double));
-
 
 	if ( gridtype == GRID_LCC )
 	  {
