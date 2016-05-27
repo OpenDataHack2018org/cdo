@@ -27,6 +27,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "interpol.h"
+#include "grid.h"
 
 
 int genThinoutGrid(int gridID1, int xinc, int yinc)
@@ -393,7 +394,10 @@ void *Intgrid(void *argument)
 	}
       else
 	{
-	  if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
+          bool ldistgen = false;
+          if ( grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2) ) ldistgen = true;
+          
+	  if ( !ldistgen && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
 	    cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
 
 	  if ( gridIsRotated(gridID1) )

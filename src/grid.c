@@ -1816,3 +1816,23 @@ int gridWeights(int gridID, double *grid_wgts)
 
   return w_status;
 }
+
+
+bool grid_is_distance_generic(int gridID)
+{
+  bool status = false;
+
+  if ( gridInqType(gridID) == GRID_GENERIC )
+    {
+      char xunits[CDI_MAX_NAME];
+      gridInqXunits(gridID, xunits);
+      char yunits[CDI_MAX_NAME];
+      gridInqXunits(gridID, yunits);
+
+      if ( strcmp(xunits, "m") == 0 && strcmp(yunits, "m") == 0 &&
+           gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
+        status = true;
+    }
+
+  return status;
+}

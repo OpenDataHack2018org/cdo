@@ -88,25 +88,6 @@ double std_atm_pressure(double height)
 }
 
 static
-bool grid_is_generic_meter(int gridID)
-{
-  bool status = false;
-
-  if ( gridInqType(gridID) == GRID_GENERIC )
-    {
-      char xunits[CDI_MAX_NAME];
-      gridInqXunits(gridID, xunits);
-      char yunits[CDI_MAX_NAME];
-      gridInqXunits(gridID, yunits);
-
-      if ( strcmp(xunits, "m") == 0 &&  strcmp(yunits, "m") == 0 )
-        status = true;
-    }
-
-  return status;
-}
-
-static
 void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2D)
 {
   int xsize = gridInqXsize(gridID);
@@ -470,7 +451,7 @@ void *Vargen(void *argument)
 		  double *xvals = (double*) Malloc(gridsize*sizeof(double));
 		  double *yvals = (double*) Malloc(gridsize*sizeof(double));
 
-                  if ( grid_is_generic_meter(gridID) )
+                  if ( grid_is_distance_generic(gridID) )
                     {
                       conv_generic_grid(gridID, gridsize, xvals, yvals);
                     }
