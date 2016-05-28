@@ -11,6 +11,7 @@ Version 1.7.2 (25 June 2016):
      * reducegrid: Select gridpoints wrt. given mask
      * settbounds: Set time bounds
    Fixed bugs:
+     * Error reading Gaussian reduced GRIB files [Bug #6780 #6819]
      * Installation error with OpenMP [Bug #6523]
      * shaded, contour, grfill: set NAN missvals to -9e33 [Bug: #6677]
 
