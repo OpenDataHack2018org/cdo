@@ -70,6 +70,8 @@ void *Setgrid(void *argument)
   if ( operatorID != UNSETGRIDMASK )
     operatorInputArg(cdoOperatorEnter(operatorID));  
 
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+
   if ( operatorID == SETGRID )
     {
       operatorCheckArgc(1);
@@ -181,8 +183,6 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       griduri = operatorArgv()[0];
     }
-
-  int streamID1 = streamOpenRead(cdoStreamName(0));
 
   int vlistID1 = streamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);

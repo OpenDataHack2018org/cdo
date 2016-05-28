@@ -170,18 +170,11 @@ void *Enlargegrid(void *argument)
 {
   int varID;
   int nrecs = 0;
-  int tsID, recID, levelID;
-  int streamID1, streamID2;
-  int vlistID1 , vlistID2;
+  int recID, levelID;
   int nmiss1, nmiss2;
-  int gridsize1, gridsize2;
-  int gridID1, gridID2;
-  int taxisID1, taxisID2;
   int index;
-  int i, *gindex = NULL;
-  int ndiffgrids, ngrids;
+  int i;
   double missval1;
-  double *array1, *array2;
 
   cdoInitialize(argument);
 
@@ -189,46 +182,46 @@ void *Enlargegrid(void *argument)
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
 
-  gridID2 = cdoDefineGrid(operatorArgv()[0]);
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int gridID2 = cdoDefineGrid(operatorArgv()[0]);
 
-  vlistID1 = streamInqVlist(streamID1);
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
 
-  ndiffgrids = 0;
+  int ndiffgrids = 0;
   for ( index = 1; index < vlistNgrids(vlistID1); index++ )
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
 
   if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(0)->args);
 
-  gridID1 = vlistGrid(vlistID1, 0);
+  int gridID1 = vlistGrid(vlistID1, 0);
 
-  gridsize1 = gridInqSize(gridID1);
-  gridsize2 = gridInqSize(gridID2);
+  int gridsize1 = gridInqSize(gridID1);
+  int gridsize2 = gridInqSize(gridID2);
 
-  array1 = (double*) Malloc(gridsize1*sizeof(double));
-  array2 = (double*) Malloc(gridsize2*sizeof(double));
-  gindex = (int*) Malloc(gridsize1*sizeof(int));
+  double *array1 = (double*) Malloc(gridsize1*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
+  int  *gindex = (int*) Malloc(gridsize1*sizeof(int));
 
   gen_index(gridID2, gridID1, gindex);
 
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   for ( index = 0; index < ngrids; index++ )
     {
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

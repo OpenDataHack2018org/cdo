@@ -834,6 +834,8 @@ void *Remap(void *argument)
 	cdoPrint("Extrapolation disabled!");
     }
 
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+
   if ( lremapxxx )
     {
       operatorInputArg("grid description file or name, remap weights file (SCRIP NetCDF)");
@@ -860,7 +862,6 @@ void *Remap(void *argument)
 
   if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
   int filetype = streamInqFiletype(streamID1);
 
   int vlistID1 = streamInqVlist(streamID1);
