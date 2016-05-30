@@ -739,22 +739,14 @@ void yar_remap_con(field_t *field1, field_t *field2)
 
 void *YAR(void *argument)
 {
-  int YARBIL, YARCON;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, ngrids;
+  int nrecs;
   int index;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
-  int gridID1 = -1, gridID2 = -1;
+  int recID, varID, levelID;
+  int gridID1 = -1;
   int nmiss;
   int xinc = 0, yinc = 0;
   double missval;
   double slon, slat;
-  double *array1 = NULL, *array2 = NULL;
-  field_t field1, field2;
-  int taxisID1, taxisID2;
 
   if ( cdoTimer )
     {
@@ -767,27 +759,29 @@ void *YAR(void *argument)
 
   cdoInitialize(argument);
 
-  YARBIL = cdoOperatorAdd("yarbil",  0, 0, NULL);
-  YARCON = cdoOperatorAdd("yarcon",  0, 0, NULL);
+  int YARBIL = cdoOperatorAdd("yarbil",  0, 0, NULL);
+  int YARCON = cdoOperatorAdd("yarcon",  0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg("grid description file or name");
-  gridID2 = cdoDefineGrid(operatorArgv()[0]);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int gridID2 = cdoDefineGrid(operatorArgv()[0]);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   for ( index = 0; index < ngrids; index++ )
     {
       gridID1 = vlistGrid(vlistID1, index);
@@ -801,17 +795,17 @@ void *YAR(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1   = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1   = (double*) Malloc(gridsize*sizeof(double));
 
   gridsize = gridInqSize(gridID2);
-  array2   = (double*) Malloc(gridsize*sizeof(double));
+  double *array2   = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

@@ -29,58 +29,55 @@
 
 void *Enlarge(void *argument)
 {
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
-  int gridID1, gridID2;
-  int i, index, ngrids;
+  int i, index;
   int recID, nrecs;
-  int tsID, varID, levelID;
-  int taxisID1, taxisID2;
+  int varID, levelID;
   int nmiss;
-  int gridsize1, gridsize2;
-  int xsize1, ysize1, xsize2, ysize2;
+  int gridsize1;
+  int gridID1;
+  int xsize1, ysize1;
   int ix, iy;
   int linfo = TRUE;
   double missval;
-  double *array1, *array2;
 
   cdoInitialize(argument);
 
   operatorCheckArgc(1);
 
-  gridID2 = cdoDefineGrid(operatorArgv()[0]);
-  xsize2 = gridInqXsize(gridID2);
-  ysize2 = gridInqYsize(gridID2);
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+
+  int gridID2 = cdoDefineGrid(operatorArgv()[0]);
+  int xsize2 = gridInqXsize(gridID2);
+  int ysize2 = gridInqYsize(gridID2);
 
   if ( cdoVerbose ) fprintf(stderr, "gridID2 %d, xsize2 %d, ysize2 %d\n", gridID2, xsize2, ysize2);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  gridsize2 = gridInqSize(gridID2);
+  int gridsize2 = gridInqSize(gridID2);
   if ( gridsize2 < vlistGridsizeMax(vlistID1) )
     cdoAbort("Gridsize of input stream is greater than new gridsize!");
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   for ( index = 0; index < ngrids; index++ )
     {
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  array1 = (double*) Malloc(gridsize2*sizeof(double));
-  array2 = (double*) Malloc(gridsize2*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize2*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

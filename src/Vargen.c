@@ -227,6 +227,8 @@ void remap_nn_reg2d(int nx, int ny, const double *restrict data, int gridID, dou
     remap_nn_reg2d_nonreg2d(nx, ny, data, gridID, array);
 }
 
+#define NLON 720
+#define NLAT 360
 
 void *Vargen(void *argument)
 {
@@ -238,9 +240,9 @@ void *Vargen(void *argument)
   double rval, rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
   double *levels = NULL;
-  double lon[720], lat[360];
-  int nlon = 720;
-  int nlat = 360;
+  double lon[NLON], lat[NLAT];
+  int nlon = NLON;
+  int nlat = NLAT;
 
   cdoInitialize(argument);
 

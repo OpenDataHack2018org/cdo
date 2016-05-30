@@ -111,7 +111,7 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=gcc CFLAGS="-g -std=c11 -pipe -Wall -Wpointer-arith -Wwrite-strings -W -Wfloat-equal -pedantic -O3 -march=native -fstack-protector -funsigned-char -Wa,-q"
+	            CC=gcc CFLAGS="-g -std=c11 -pipe -Wall -Wpointer-arith -Wwrite-strings -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector -funsigned-char"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi

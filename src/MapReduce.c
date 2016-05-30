@@ -80,6 +80,8 @@ void *MapReduce(void *argument)
 
   cdoInitialize(argument);
 
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+
   /* check input grid type and size - this will be used for selecting relevant
    * variables from the input file*/
   int inputGridID   = cdoDefineGrid(operatorArgv()[0]);
@@ -123,7 +125,6 @@ void *MapReduce(void *argument)
   /* create output vlist: Only variabes which have the same gridtype and
    * gridsize as the input mask should be proessed. Everything else is ignoreds
    * {{{ */
-  int streamID1 = streamOpenRead(cdoStreamName(0));
   int vlistID1  = streamInqVlist(streamID1);
   int nvars     = vlistNvars(vlistID1);
   int *vars     = (int*) Malloc(nvars*sizeof(int));
