@@ -41,14 +41,19 @@ void initCommandLine(void)
   CDO_CommandLine = (char*) Malloc(maxlen);
   atexit(freeCommandLine);
   
-  char *pargv = strrchr(gargv[0], '/');
-  if ( pargv == 0 ) pargv = gargv[0];
-  else              pargv++;
-  
+  char *pargv;
   size_t offset = 0;
-  for ( int iarg = 1; iarg < gargc; iarg++ )
+  for ( int iarg = 0; iarg < gargc; iarg++ )
     {
-      pargv = gargv[iarg];
+      if ( iarg == 0 )
+        {
+          pargv = strrchr(gargv[0], '/');
+          if ( pargv == 0 ) pargv = gargv[0];
+          else              pargv++;
+        }
+      else
+        pargv = gargv[iarg];
+      
       size_t len = strlen(pargv);
       if ( offset+len+1 > maxlen ) break;
       memcpy(CDO_CommandLine+offset, pargv, len);
