@@ -453,7 +453,7 @@ void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *v
  *
  * 3d version of vert_gen_weights() (src/Intlevel.c)
  */
-void vert_gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
+void vert_gen_weights3d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   int i,i1, i2;
@@ -545,7 +545,7 @@ void vert_gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nl
  *
  * 3d1d version of vert_gen_weights() (src/Intlevel.c)
  */
-void vert_gen_weights3d1d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
+void vert_gen_weights3d1d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			  int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   int i,i1, i2;

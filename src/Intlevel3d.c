@@ -49,18 +49,11 @@ void *Intlevel3d(void *argument)
   int zaxisID1 = -1, zaxisID3;
   int gridID3 = -1, gridID, zaxisID;
   int nlevi, nlevo, nlevel = 0, maxlev;
-  int lup, ldown;
-  int **varnmiss = NULL;
-  int *varinterp = NULL;
   int *vars = NULL;
-  int expol = FALSE;
   double missval;
   double *lev1 = NULL, *lev2 = NULL;
   double *single1, *single2;
-  double **vardata1 = NULL, **vardata2 = NULL;
   int taxisID1, taxisID3;
-  int *lev_idx1, *lev_idx2;
-  double *lev_wgt1, *lev_wgt2;
   double *zlevels_in, *zlevels_out;
   int zlevels_in_miss, zlevels_out_miss;
   char varname[10]; 
@@ -72,8 +65,9 @@ void *Intlevel3d(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  if      ( operatorID == INTLEVEL3D )  expol = FALSE;
-  else if ( operatorID == INTLEVELX3D ) expol = TRUE;
+  bool expol = false;
+  if      ( operatorID == INTLEVEL3D )  expol = false;
+  else if ( operatorID == INTLEVELX3D ) expol = true;
 
   operatorInputArg("icoordinate");
 
@@ -232,27 +226,27 @@ void *Intlevel3d(void *argument)
   /*
    * Check monotony of vertical levels
    */
-  lup = FALSE;
-  ldown = FALSE;
+  bool lup = false;
+  bool ldown = false;
   lev1 = zlevels_in + gridSize;
   for ( i = 0; i < nlevi-1; i++ )
     {
       if ( i == 1 )
 	{
 	  if ( lev1[(i+1)*gridSize] > lev1[i*gridSize] )
-	    lup = TRUE;
+	    lup = true;
 	  else if ( lev1[(i+1)*gridSize] < lev1[i*gridSize] )
-	    ldown = TRUE;	
+	    ldown = true;	
 	}
       else
 	{
 	  if ( lup )
 	    {
-	      if ( !(lev1[(i+1)*gridSize] > lev1[i*gridSize]) ) lup = FALSE;
+	      if ( !(lev1[(i+1)*gridSize] > lev1[i*gridSize]) ) lup = false;
 	    }
 	  else if ( ldown )
 	    {
-	      if ( !(lev1[(i+1)*gridSize] < lev1[i*gridSize]) ) ldown = FALSE;
+	      if ( !(lev1[(i+1)*gridSize] < lev1[i*gridSize]) ) ldown = false;
 	    }
 	}
     }
@@ -280,10 +274,10 @@ void *Intlevel3d(void *argument)
   /*
    * Create weights for later interpolation - assumption: input vertical correct is constant in time
    */
-  lev_idx1 = (int*) Malloc(nlevo*gridSize*sizeof(int));
-  lev_idx2 = (int*) Malloc(nlevo*gridSize*sizeof(int));
-  lev_wgt1 = (double*) Malloc(nlevo*gridSize*sizeof(double));
-  lev_wgt2 = (double*) Malloc(nlevo*gridSize*sizeof(double));
+  int *lev_idx1 = (int*) Malloc(nlevo*gridSize*sizeof(int));
+  int *lev_idx2 = (int*) Malloc(nlevo*gridSize*sizeof(int));
+  double *lev_wgt1 = (double*) Malloc(nlevo*gridSize*sizeof(double));
+  double *lev_wgt2 = (double*) Malloc(nlevo*gridSize*sizeof(double));
 
   vert_gen_weights3d(expol, nlevi+2, gridSize, zlevels_in, nlevo, zlevels_out, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
@@ -324,14 +318,13 @@ void *Intlevel3d(void *argument)
   maxlev    = nlevi > nlevo ? nlevi : nlevo;
   nvars     = vlistNvars(vlistID1);
   vars      = (int*) Malloc(nvars*sizeof(int));
-  vardata1  = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
-  vardata2  = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
-  varnmiss  = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
-  varinterp = (int*) Malloc(nvars*sizeof(int));     /* marker for variables to be interpolated       */
+  double **vardata1 = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
+  double **vardata2 = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
+  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
+  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));   /* marker for variables to be interpolated       */
 
   /* by default no variable should be interpolated */
-  for ( i = 0; i < nvars; i++ )
-    varinterp[varID] = FALSE;
+  for ( i = 0; i < nvars; i++ ) varinterp[varID] = false;
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -364,14 +357,14 @@ void *Intlevel3d(void *argument)
                memcmp(lonIn,lonOut,nlonIn*sizeof(double)) ||
                memcmp(latIn,latOut,nlatIn*sizeof(double))*/ )
             {
-              varinterp[varID] = FALSE;
+              varinterp[varID] = false;
               vardata2[varID]  = vardata1[varID];
               varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
               if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
             }
           else
             {
-              varinterp[varID] = TRUE;
+              varinterp[varID] = true;
               vardata2[varID]  = (double*) Malloc(gridsize*nlevo*sizeof(double));
               varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
               memset(varnmiss[varID], 0, maxlev*sizeof(int));
@@ -379,7 +372,7 @@ void *Intlevel3d(void *argument)
         }
       else
         {
-          varinterp[varID] = FALSE;
+          varinterp[varID] = false;
           vardata2[varID]  = vardata1[varID];
           varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
           if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
@@ -388,7 +381,7 @@ void *Intlevel3d(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( varinterp[varID] == TRUE ) break;
+      if ( varinterp[varID] ) break;
     }
   if ( varID == nvars ) cdoAbort("No processable variable found!");
 
