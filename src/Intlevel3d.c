@@ -100,7 +100,7 @@ void *Intlevel3d(void *argument)
    */
   {
     nvars = vlistNvars(vlistID0);
-    if (nvars != 1) cdoAbort("Only one single variable is allowed!");
+    if ( nvars != 1 ) cdoAbort("Only one single variable is allowed!");
 
     gridID     = vlistInqVarGrid(vlistID0, 0);
     zaxisID    = vlistInqVarZaxis(vlistID0, 0);
@@ -169,7 +169,7 @@ void *Intlevel3d(void *argument)
 
   /* Missing values are not allowed for coordinate variables */
   if ( 0 != zlevels_in_miss  )
-    cdoAbort("Input vertical coordinate variables are not allowd to contain missing values.");
+    cdoAbort("Input vertical coordinate variables are not allowed to contain missing values.");
   else
     {
       if ( cdoVerbose ) cdoPrint("Input vertical coordinate has no missing values.");
@@ -188,7 +188,7 @@ void *Intlevel3d(void *argument)
    * (later use of gridsizeo ONLY)
    */
   if ( gridsizei != gridsizeo )
-    cdoAbort("Input and output vertical coordinate must have the same gridsize");
+    cdoAbort("Input and output vertical coordinate must have the same gridsize!");
 
   gridSize = gridsizeo;
 
@@ -207,19 +207,28 @@ void *Intlevel3d(void *argument)
    * number of levels as the input vertical levels from operators parameter
    * (streamID0). Variables with a different z-axis should be copied into output.
    */
-  nzaxis  = vlistNzaxis(vlistID1);
-  for ( i = 0; i < nzaxis; i++ )
-  {
-    zaxisID = vlistZaxis(vlistID1, i);
-    nlevel  = zaxisInqSize(zaxisID);
-    if ( nlevel == nlevi )
+  nzaxis = vlistNzaxis(vlistID1);
+  for ( i = 0; i < nzaxis; ++i )
     {
-      zaxisID1 = zaxisID;
-      break;
+      zaxisID = vlistZaxis(vlistID1, i);
+      nlevel  = zaxisInqSize(zaxisID);
+      if ( nlevel == nlevi )
+        {
+          zaxisID1 = zaxisID;
+          break;
+        }
     }
-  }
-  if ( i == nzaxis ) cdoAbort("No processable variable found!");
+  if ( i == nzaxis ) cdoAbort("No processable variable found (vertical coordinate differ)!");
 
+  int ngrids = vlistNgrids(vlistID1);
+  for ( i = 0; i < ngrids; ++i )
+    {
+      gridID = vlistGrid(vlistID1, i);
+      gridsize = gridInqSize(gridID);
+      if ( gridsize == gridSize ) break;
+    }
+  if ( i == nzaxis ) cdoAbort("No processable variable found (grid coordinate differ)!");
+  
   /*
    * Check monotony of vertical levels
    */
@@ -375,7 +384,13 @@ void *Intlevel3d(void *argument)
           varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
           if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
         }
-      }
+    }
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      if ( varinterp[varID] == TRUE ) break;
+    }
+  if ( varID == nvars ) cdoAbort("No processable variable found!");
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
