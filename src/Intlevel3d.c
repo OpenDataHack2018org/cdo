@@ -49,7 +49,6 @@ void *Intlevel3d(void *argument)
   int zaxisID1 = -1, zaxisID3;
   int gridID3 = -1, gridID, zaxisID;
   int nlevi, nlevo, nlevel = 0, maxlev;
-  int *vars = NULL;
   double missval;
   double *lev1 = NULL, *lev2 = NULL;
   double *single1, *single2;
@@ -317,11 +316,11 @@ void *Intlevel3d(void *argument)
 
   maxlev    = nlevi > nlevo ? nlevi : nlevo;
   nvars     = vlistNvars(vlistID1);
-  vars      = (int*) Malloc(nvars*sizeof(int));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
+  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));   /* marker for variables to be interpolated       */
+  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
   double **vardata1 = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
   double **vardata2 = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
-  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
-  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));   /* marker for variables to be interpolated       */
 
   /* by default no variable should be interpolated */
   for ( i = 0; i < nvars; i++ ) varinterp[varID] = false;
@@ -388,7 +387,7 @@ void *Intlevel3d(void *argument)
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
+      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
 
       taxisCopyTimestep(taxisID3, taxisID1);
 
@@ -406,7 +405,7 @@ void *Intlevel3d(void *argument)
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
           streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
-	  vars[varID] = TRUE;
+	  vars[varID] = true;
 	}
 
       /* Perform the interpolation on all valid data variables */
@@ -472,7 +471,7 @@ void *Intlevel3d(void *argument)
       tsID++;
     }
 
-  nvars     = vlistNvars(vlistID1);
+  nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
       Free(varnmiss[varID]);
