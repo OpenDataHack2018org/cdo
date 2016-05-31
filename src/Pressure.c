@@ -74,7 +74,8 @@ void *Pressure(void *argument)
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlevf, &nhlevh);
+  int nhlev;
+  double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
   if ( zaxisIDh != -1 && gridsize > 0 )
     {

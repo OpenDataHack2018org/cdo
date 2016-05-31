@@ -59,12 +59,10 @@ void *Vertintml(void *argument)
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double minval, maxval;
   double missval;
-  double *vct = NULL;
   double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   int Extrapolate = 0;
-  int mono_level;
   int instNum, tableNum;
   int useTable;
   gribcode_t gribcodes = {0};
@@ -150,142 +148,24 @@ void *Vertintml(void *argument)
     zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
 
   zaxisDefLevels(zaxisIDp, plev);
-  int nzaxis  = vlistNzaxis(vlistID1);
-  int lhavevct = FALSE;
-  for ( i = 0; i < nzaxis; i++ )
-    {
-      /* mono_level = FALSE; */
-      mono_level = TRUE;
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
 
-      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
-	   nlevel > 1 )
-	{
-	  double level[nlevel];
-	  zaxisInqLevels(zaxisID, level);
-	  int l;
-	  for ( l = 0; l < nlevel; l++ )
-	    {
-	      if ( (l+1) != (int) (level[l]+0.5) ) break;
-	    }
-	  if ( l == nlevel ) mono_level = TRUE; 
-	}
+  double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
-      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
-	   nlevel > 1 && mono_level )
-	{
-	  nvct = zaxisInqVctSize(zaxisID);
-	  if ( nlevel == (nvct/2 - 1) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev;
-		  nhlevh   = nhlev + 1;
-
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	      else
-		{
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	  else if ( nlevel == (nvct/2) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev - 1;
-		  nhlevh   = nhlev;
-	      
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	      else
-		{
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	  else if ( nlevel == (nvct - 4 - 1) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  int vctsize;
-		  int voff = 4;
-		  
-		  rvct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, rvct);
-
-		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
-		    {
-		      lhavevct = TRUE;
-		      zaxisIDh = zaxisID;
-		      nhlev    = nlevel;
-		      nhlevf   = nhlev;
-		      nhlevh   = nhlev + 1;
-
-		      vctsize = 2*nhlevh;
-		      vct = (double*) Malloc(vctsize*sizeof(double));
-
-		      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-
-		      /* calculate VCT for LM */
-
-		      for ( i = 0; i < vctsize/2; i++ )
-			{
-			  if ( rvct[voff+i] >= rvct[voff] && rvct[voff+i] <= rvct[3] )
-			    {
-			      vct[i] = rvct[0]*rvct[voff+i];
-			      vct[vctsize/2+i] = 0;
-			    }
-			  else
-			    {
-			      vct[i] = (rvct[0]*rvct[3]*(1-rvct[voff+i]))/(1-rvct[3]);
-			      vct[vctsize/2+i] = (rvct[voff+i]-rvct[3])/(1-rvct[3]);
-			    }
-			}
-		      
-		      if ( cdoVerbose )
-			{
-			  for ( i = 0; i < vctsize/2; i++ )
-			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
-			}
-		    }
-		}
-	      else
-		{
-		  if ( memcmp(rvct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	}
-    }
+  vlist_hybrid_to_pressure(vlistID1, vlistID2, zaxisIDh, zaxisIDp);
 
   int psvarID = -1;
-  int linvertvct = FALSE;
-  if ( lhavevct && nvct && nvct%2 == 0 )
+  bool linvertvct = false;
+  if ( vct && nvct && nvct%2 == 0 )
     {
       psvarID = vlist_get_psvarid(vlistID1, zaxisIDh);
 
       for ( i = nvct/2+1; i < nvct; i++ )
         if ( vct[i] > vct[i-1] ) break;
 
-      if ( i == nvct ) linvertvct = TRUE;
+      if ( i == nvct ) linvertvct = true;
     }
 
-  if ( cdoVerbose ) cdoPrint("linvertvct = %d", linvertvct);
+  if ( cdoVerbose ) cdoPrint("linvertvct = %d", (int) linvertvct);
 
   if ( linvertvct )
     {

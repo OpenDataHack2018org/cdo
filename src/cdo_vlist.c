@@ -373,7 +373,7 @@ int vlist_check_gridsize(int vlistID)
 }
 
 
-double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf, int *rnhlevh)
+double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlevf, int *rnhlevh)
 {
   int zaxisIDh = -1;
   int nhlev = 0, nhlevf = 0, nhlevh = 0;
@@ -486,6 +486,7 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf, in
 
   *rzaxisIDh = zaxisIDh;
   *rnvct   = nvct;
+  *rnhlev  = nhlev;
   *rnhlevf = nhlevf;
   *rnhlevh = nhlevh;
   
