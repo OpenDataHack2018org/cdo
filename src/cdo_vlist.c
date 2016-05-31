@@ -371,3 +371,157 @@ int vlist_check_gridsize(int vlistID)
 
   return ngp;
 }
+
+
+double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf, int *rnhlevh)
+{
+  int zaxisIDh = -1;
+  int nhlev = 0, nhlevf = 0, nhlevh = 0;
+  int nvct = 0;
+  double *vct = NULL;
+  
+  bool lhavevct = false;
+  int nzaxis = vlistNzaxis(vlistID);
+  for ( int i = 0; i < nzaxis; ++i )
+    {
+      // bool mono_level = false;
+      bool mono_level = true;
+      int zaxisID = vlistZaxis(vlistID, i);
+      int nlevel  = zaxisInqSize(zaxisID);
+
+      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
+	   nlevel > 1 )
+	{
+	  int l;
+	  double *level = (double*) Malloc(nlevel*sizeof(double));
+	  zaxisInqLevels(zaxisID, level);
+	  for ( l = 0; l < nlevel; l++ )
+	    {
+	      if ( (l+1) != (int) (level[l]+0.5) ) break;
+	    }
+	  if ( l == nlevel ) mono_level = true; 
+	  Free(level);
+	}
+
+      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
+	   nlevel > 1 && mono_level )
+	{
+	  nvct = zaxisInqVctSize(zaxisID);
+	  if ( nlevel == (nvct/2 - 1) )
+	    {
+	      if ( lhavevct == false )
+		{
+		  lhavevct = true;
+		  zaxisIDh = zaxisID;
+		  nhlev    = nlevel;
+		  nhlevf   = nhlev;
+		  nhlevh   = nhlevf + 1;
+	      
+		  vct = (double*) Malloc(nvct*sizeof(double));
+		  zaxisInqVct(zaxisID, vct);
+		}
+	    }
+	  else if ( nlevel == (nvct/2) )
+	    {
+	      if ( lhavevct == false )
+		{
+		  lhavevct = true;
+		  zaxisIDh = zaxisID;
+		  nhlev    = nlevel;
+		  nhlevf   = nhlev - 1;
+		  nhlevh   = nhlev;
+	      
+		  vct = (double*) Malloc(nvct*sizeof(double));
+		  zaxisInqVct(zaxisID, vct);
+		}
+	    }
+	  else if ( nlevel == (nvct - 4 - 1) )
+	    {
+	      if ( lhavevct == false )
+		{
+		  int vctsize;
+		  int voff = 4;
+
+		  double *rvct = (double*) Malloc(nvct*sizeof(double));
+		  zaxisInqVct(zaxisID,rvct);
+
+		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
+		    {
+		      lhavevct = true;
+		      zaxisIDh = zaxisID;
+		      nhlev    = nlevel;
+		      nhlevf   = nhlev;
+		      nhlevh   = nhlev + 1;
+
+		      vctsize = 2*nhlevh;
+		      vct = (double*) Malloc(vctsize*sizeof(double));
+
+		      /* calculate VCT for LM */
+
+		      for ( i = 0; i < vctsize/2; i++ )
+			{
+			  if ( rvct[voff+i] >= rvct[voff] && rvct[voff+i] <= rvct[3] )
+			    {
+			      vct[i] = rvct[0]*rvct[voff+i];
+			      vct[vctsize/2+i] = 0;
+			    }
+			  else
+			    {
+			      vct[i] = (rvct[0]*rvct[3]*(1-rvct[voff+i]))/(1-rvct[3]);
+			      vct[vctsize/2+i] = (rvct[voff+i]-rvct[3])/(1-rvct[3]);
+			    }
+			}
+		      
+		      if ( cdoVerbose )
+			{
+			  for ( i = 0; i < vctsize/2; i++ )
+			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
+			}
+		    }
+		  Free(rvct);
+		}
+	    }
+	}
+    }
+
+  *rzaxisIDh = zaxisIDh;
+  *rnvct   = nvct;
+  *rnhlevf = nhlevf;
+  *rnhlevh = nhlevh;
+  
+  return vct;
+}
+
+
+void vlist_hybrid_to_pressure(int vlistID1, int vlistID2, int zaxisIDh, int zaxisIDp)
+{
+  int nvct0 = 0;
+  double *vct = NULL;
+
+  int nzaxis  = vlistNzaxis(vlistID1);
+  for ( int i = 0; i < nzaxis; ++i )
+    {
+      int zaxisID = vlistZaxis(vlistID1, i);
+      int nlevel  = zaxisInqSize(zaxisID);
+
+      if ( zaxisID == zaxisIDh && nlevel > 1 )
+	{
+	  int nvct = zaxisInqVctSize(zaxisID);
+          if ( vct == NULL )
+            {
+              nvct0 = nvct;
+              vct = (double*) Malloc(nvct*sizeof(double));
+              zaxisInqVct(zaxisID, vct);
+
+              vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+            }
+          else
+            {
+              if ( nvct0 == nvct && memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
+                vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+	    }
+	}
+    }
+
+  if ( vct ) free(vct);
+}
