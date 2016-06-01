@@ -168,6 +168,53 @@ void vert_sumw(double *sum, double *var3d, long gridsize, long nlevel, double *d
 }
 
 
+double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf)
+{
+  int zaxisIDh = -1;
+  int nhlevf = 0;
+  int nvct = 0;
+  double *vct = NULL;
+
+  bool lhavevct = false;
+  int nzaxis = vlistNzaxis(vlistID);
+  for ( int i = 0; i < nzaxis; i++ )
+    {
+      int zaxisID = vlistZaxis(vlistID, i);
+      int nlevel  = zaxisInqSize(zaxisID);
+
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 )
+	{
+          nvct = zaxisInqVctSize(zaxisID);
+
+          if ( nlevel == (nvct/2 - 1) )
+            {
+	      if ( lhavevct == false )
+		{
+		  lhavevct = true;
+                  zaxisIDh = zaxisID;
+                  nhlevf  = nlevel;
+ 
+                  vct = (double*) Malloc(nvct*sizeof(double));
+                  zaxisInqVct(zaxisID, vct);
+                }
+            }
+          else 
+            {
+              if ( cdoVerbose )
+                cdoPrint("nlevel = (nvct1/2 - 1): nlevel = %d", nlevel);
+              if ( nlevel < (nvct/2 - 1) )
+                cdoPrint("z-axis %d has only %d of %d hybrid sigma pressure levels!", i+1, nlevel, (nvct/2 - 1));
+            }
+	}
+    }
+
+  *rzaxisIDh = zaxisIDh;
+  *rnvct   = nvct;
+  *rnhlevf = nhlevf;
+  
+  return vct;
+}
+
 #define  MAX_VARS3D  1024
 
 void *Remapeta(void *argument)
@@ -177,17 +224,12 @@ void *Remapeta(void *argument)
   int i, offset, iv;
   int varID, levelID;
   int nvars3D = 0;
-  int zaxisIDh = -1;
   int zaxisID;
   int nlevel;
-  int nvct1;
   int sgeopotID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1, presID = -1;
   int code;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
-  int nhlevf1 = 0;
-  double *vct1 = NULL;
-  double *a1 = NULL, *b1 = NULL;
   double *fis1 = NULL, *ps1 = NULL, *t1 = NULL, *q1 = NULL;
   double *fis2 = NULL, *ps2 = NULL, *t2 = NULL, *q2 = NULL;
   double *tscor = NULL, *pscor = NULL, *secor = NULL;
@@ -317,73 +359,29 @@ void *Remapeta(void *argument)
 
   int surfaceID = zaxisFromName("surface");
 
-  int nzaxis  = vlistNzaxis(vlistID1);
-  bool lhavevct = false;
+  int zaxisIDh = -1;
+  int nvct1 = 0;
+  int nhlevf1 = 0;
+  double *vct1 = vlist_hybrid_vct(vlistID1, &zaxisIDh, &nvct1, &nhlevf1);
 
-  if ( cdoVerbose )
-    cdoPrint("nzaxis: %d", nzaxis);
+  vlist_change_hybrid_zaxis(vlistID1, vlistID2, zaxisIDh, zaxisID2);
 
-  for ( i = 0; i < nzaxis; i++ )
+  int nzaxis = vlistNzaxis(vlistID1);
+  for ( int i = 0; i < nzaxis; i++ )
     {
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
-	{
-	  if ( nlevel > 1 )
-	    {
-	      nvct1 = zaxisInqVctSize(zaxisID);
-
-              if ( cdoVerbose )
-                cdoPrint("i: %d, vct1 size of zaxisID %d = %d", i, zaxisID, nvct1);
-
-	      if ( nlevel == (nvct1/2 - 1) )
-		{
-		  if ( lhavevct == false )
-		    {
-		      lhavevct = true;
-		      zaxisIDh = zaxisID;
-		      nhlevf1  = nlevel;
-	      
-                      if ( cdoVerbose )
-                        cdoPrint("lhavevct=true  zaxisIDh = %d, nhlevf1   = %d", zaxisIDh, nlevel);
- 
-		      vct1 = (double*) Malloc(nvct1*sizeof(double));
-		      zaxisInqVct(zaxisID, vct1);
-		      
-		      vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
-
-		      a1 = vct1;
-		      b1 = vct1 + nvct1/2;
-		      if ( cdoVerbose )
-			for ( i = 0; i < nvct1/2; ++i )
-			  cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1/2+i]);
-		    }
-		  else
-		    {
-		      if ( memcmp(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double)) == 0 )
-			vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
-		    }
-		}
-              else 
-                {
-		  if ( cdoVerbose )
-		    cdoPrint("nlevel = (nvct1/2 - 1): nlevel = %d", nlevel);
-		  if ( nlevel < (nvct1/2 - 1) )
-		    cdoPrint("z-axis %d has only %d of %d hybrid sigma pressure levels!", i+1, nlevel, (nvct1/2 - 1));
-                }
-	    }
-	  else
-	    {
-	      vlistChangeZaxisIndex(vlistID2, i, surfaceID);
-	    }
-	}
-      else
-        {
-	  if ( cdoVerbose )
-	    cdoPrint("i: %d, type of zaxisID %d not ZAXIS_HYBRID", i, zaxisID);
-        }
+      int zaxisID = vlistZaxis(vlistID1, i);
+      int nlevel  = zaxisInqSize(zaxisID);
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == 1 )
+        vlistChangeZaxisIndex(vlistID2, i, surfaceID);
     }
+  
+  double *a1 = vct1;
+  double *b1 = vct1 + nvct1/2;
+  if ( cdoVerbose )
+    for ( i = 0; i < nvct1/2; ++i )
+      cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1/2+i]);
 
+  
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
