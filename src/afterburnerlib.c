@@ -1535,66 +1535,6 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
 }
 
 static
-void CheckContent(struct Variable *vars, int timestep)
-{
-  for ( int code = 0; code < 272; code++ )
-    {
-      /*  if ( code == GEOPOTENTIAL ) continue; */
-      if ( code ==          SLP ) continue;
-      if ( code == GEOPOTHEIGHT ) continue;
-      if ( code ==       STREAM ) continue;
-      if ( code ==      VELOPOT ) continue;
-      if ( code ==       U_WIND ) continue;
-      if ( code ==       V_WIND ) continue;
-      if ( code ==        OMEGA ) continue;
-      if ( code ==    RHUMIDITY ) continue;
-      if ( code ==    LOW_CLOUD ) continue;
-      if ( code ==    MID_CLOUD ) continue;
-      if ( code ==    HIH_CLOUD ) continue;
-      if ( code ==           PS ) continue;
-      if ( code ==     HUMIDITY )
-	{
-	  if ( vars[code].needed && !vars[code].selected &&
-	       vars[code].spectral == NULL &&
-	       vars[code].hybrid   == NULL )
-	    {
-	      Warning( "No humidity in data file, set to zero !");
-	      vars[code].needed = FALSE;
-	    }
-	}
-      else
-	{
-	  if ( vars[code].needed && !vars[code].comp &&
-	       vars[code].spectral == NULL &&
-	       vars[code].hybrid   == NULL )
-	    {
-	      if ( labort_after )
-		Error( "Code  %3d not found at timestep %d!", code, timestep);
-	      else
-		Warning( "Code  %3d not found at timestep %d!", code, timestep);
-	    }
-	}
-    }
-  /*
-  if ( NumLevelRequest > 0 )
-    {
-      vars[HALF_PRESS].needed = 1;
-      vars[FULL_PRESS].needed = 1;
-    }
-
-  code = HALF_PRESS;
-  if ( vars[code].needed && !vars[code].comp &&
-       vars[code].spectral == NULL && vars[code].hybrid == NULL )
-    Error( "Hybrid model level not found!");
-
-  code = FULL_PRESS;
-  if ( vars[code].needed && !vars[code].comp &&
-       vars[code].spectral == NULL && vars[code].hybrid == NULL )
-    Error( "Hybrid model level not found!");
-  */
-}
-
-static
 void Derivate(double field[], double derilam[], int levels,
 	      int Waves, int Latitudes, double DerivationFactor[])
 {
@@ -1628,8 +1568,6 @@ void after_processML(struct Control *globs, struct Variable *vars)
 
   globs->MeanCount++;
   globs->TermCount++;
-
-  CheckContent(vars, globs->TermCount);
 
   if ( globs->MeanCount == 1 )
     {

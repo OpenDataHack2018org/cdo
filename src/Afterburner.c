@@ -483,6 +483,8 @@ void after_defineNextTimestep(struct Control *globs)
     {
       if ( otsID == 0 )
 	{
+          int nvars = vlistNvars(globs->ovlistID);
+          if ( nvars == 0 ) Error("No variable selected!");
 	  vlistDefTaxis(globs->ovlistID, globs->taxisID2);
 	  streamDefVlist(globs->ostreamID, globs->ovlistID);
 	}
@@ -554,6 +556,67 @@ void after_moveTimestep(struct Variable *vars)
 	vars[code].grid  = vars[code].grid0;
 	vars[code].grid0 = NULL;
       }
+}
+
+static
+void after_check_content(struct Variable *vars, int timestep)
+{
+  extern int labort_after;
+  for ( int code = 0; code < 272; code++ )
+    {
+      /*  if ( code == GEOPOTENTIAL ) continue; */
+      if ( code ==          SLP ) continue;
+      if ( code == GEOPOTHEIGHT ) continue;
+      if ( code ==       STREAM ) continue;
+      if ( code ==      VELOPOT ) continue;
+      if ( code ==       U_WIND ) continue;
+      if ( code ==       V_WIND ) continue;
+      if ( code ==        OMEGA ) continue;
+      if ( code ==    RHUMIDITY ) continue;
+      if ( code ==    LOW_CLOUD ) continue;
+      if ( code ==    MID_CLOUD ) continue;
+      if ( code ==    HIH_CLOUD ) continue;
+      if ( code ==           PS ) continue;
+      if ( code ==     HUMIDITY )
+	{
+	  if ( vars[code].needed && !vars[code].selected &&
+	       vars[code].spectral == NULL &&
+	       vars[code].hybrid   == NULL )
+	    {
+	      Warning( "No humidity in data file, set to zero !");
+	      vars[code].needed = FALSE;
+	    }
+	}
+      else
+	{
+	  if ( vars[code].needed && !vars[code].comp &&
+	       vars[code].spectral == NULL &&
+	       vars[code].hybrid   == NULL )
+	    {
+	      if ( labort_after )
+		Error( "Code  %3d not found at timestep %d!", code, timestep);
+	      else
+		Warning( "Code  %3d not found at timestep %d!", code, timestep);
+	    }
+	}
+    }
+  /*
+  if ( NumLevelRequest > 0 )
+    {
+      vars[HALF_PRESS].needed = 1;
+      vars[FULL_PRESS].needed = 1;
+    }
+
+  code = HALF_PRESS;
+  if ( vars[code].needed && !vars[code].comp &&
+       vars[code].spectral == NULL && vars[code].hybrid == NULL )
+    Error( "Hybrid model level not found!");
+
+  code = FULL_PRESS;
+  if ( vars[code].needed && !vars[code].comp &&
+       vars[code].spectral == NULL && vars[code].hybrid == NULL )
+    Error( "Hybrid model level not found!");
+  */
 }
 
 static
@@ -701,8 +764,12 @@ void after_control(struct Control *globs, struct Variable *vars)
 
       if ( lstdout && globs->EndOfInterval ) after_printProcessStatus(-1);
       
-      if ( globs->Mean == 0 || globs->EndOfInterval ) after_defineNextTimestep(globs);
-
+      if ( globs->Mean == 0 || globs->EndOfInterval )
+        {
+          if ( !globs->AnalysisData ) after_check_content(vars, globs->TermCount+1);
+          after_defineNextTimestep(globs);
+        }
+      
       if ( globs->AnalysisData )
 	after_processPL(globs, vars);
       else
@@ -1430,7 +1497,7 @@ void after_precntl(struct Control *globs, struct Variable *vars)
     }
 
   if ( globs->Truncation == 0 && globs->Latitudes == 0 )
-    Error("Unsupported file structure!");
+    Error("Unsupported file structure (no spectral or Gaussian data found)!");
 
   if ( globs->Truncation == 0 )
     {
