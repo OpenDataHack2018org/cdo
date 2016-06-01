@@ -301,7 +301,7 @@ void after_setDateTime(struct Date *datetime, int date, int time)
 static
 void after_printProcessStatus(int tsID)
 {
-  static int counthead = FALSE;
+  static bool counthead = false;
 
   if ( tsID == -1 )
     {
@@ -311,16 +311,16 @@ void after_printProcessStatus(int tsID)
 	  fflush(stdout);
 	}
 
-      counthead = FALSE;
+      counthead = false;
     }
   else
     {
-      if ( counthead == FALSE )
+      if ( counthead == false )
 	{
 	  if ( stdout_is_tty )
 	    fprintf(stdout, " Process timestep :       ");
 
-	  counthead = TRUE;
+	  counthead = true;
 	}
 
       if ( stdout_is_tty )
@@ -338,7 +338,7 @@ int after_setNextDate(struct Control *globs)
   int i;
   int vdate, vtime;
 
-  int righttime = FALSE;
+  bool righttime = false;
   while ( TRUE )
     {
       nrecs = streamInqTimestep(globs->istreamID, TsID);
@@ -367,7 +367,7 @@ int after_setNextDate(struct Control *globs)
       for ( i = 0; i < nrqh; i++ )
 	if ( hours[i] < 0 || hours[i] == globs->NextDate.hr )
 	  {
-	    righttime = TRUE;
+	    righttime = true;
 	    break;
 	  }
 
@@ -377,7 +377,7 @@ int after_setNextDate(struct Control *globs)
 	TsID += 1;	  
     }
 
-  return (nrecs);
+  return nrecs;
 }
 
 
@@ -390,15 +390,12 @@ void *after_readTimestep(void *arg)
   int recID, varID, gridID, zaxisID, levelID, timeID;
   int code, leveltype;
   int nmiss;
-  int analysisData, nrecs;
-  struct Variable *vars;
-  struct Control *globs;
   RARG *rarg = (RARG *) arg;
 
-  nrecs        = rarg->nrecs;
-  analysisData = rarg->lana;
-  vars         = rarg->vars;
-  globs        = rarg->globs;
+  int nrecs        = rarg->nrecs;
+  int analysisData = rarg->lana;
+  struct Variable *vars = rarg->vars;
+  struct Control *globs = rarg->globs;
 
   for ( code = 0; code < MaxCodes; code++ ) vars[code].nmiss0 = 0;
 
@@ -470,7 +467,7 @@ void *after_readTimestep(void *arg)
   */
   num_recs = after_setNextDate(globs);
 
-  return ((void *) &num_recs);
+  return (void *) &num_recs;
 }
 
 static
@@ -581,7 +578,7 @@ void after_control(struct Control *globs, struct Variable *vars)
       pthread_attr_init(&attr);
       pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
       int status = pthread_attr_getstacksize(&attr, &stacksize);
-      if ( stacksize < 2097152 )
+      if ( status && stacksize < 2097152 )
 	{
 	  stacksize = 2097152;
 	  pthread_attr_setstacksize(&attr, stacksize);
@@ -594,7 +591,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 
   TsID = 0;
 
-  int righttime = FALSE;
+  bool righttime = false;
   while ( (nrecs = streamInqTimestep(globs->istreamID, TsID)) > 0 )
     {
       vdate = taxisInqVdate(globs->taxisID);
@@ -605,7 +602,7 @@ void after_control(struct Control *globs, struct Variable *vars)
       for ( i = 0; i < nrqh; i++ )
 	if ( hours[i] < 0 || hours[i] == globs->NewDate.hr )
 	  {
-	    righttime = TRUE;
+	    righttime = true;
 	    break;
 	  }
 
@@ -738,7 +735,7 @@ void after_setLevel(struct Control *globs)
   int k, l, found;
   int removeLevel[MaxLevel];
   double level;
-  int checkLevel = TRUE;
+  bool checkLevel = true;
   int numplevelDefault;  /* default pressure level */
   long plevelDefault[] = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
                             10000,  7000,  5000,  3000,  2000, 1000 };
@@ -795,20 +792,20 @@ void after_setLevel(struct Control *globs)
 	      oVertID = iVertID;
 	    }
 	}
-      checkLevel = FALSE;
+      checkLevel = false;
     }
   else
     {
       if ( iVertID == -1 )
 	{
 	  if ( globs->Verbose )	fprintf(stdout," No level detected\n");
-	  checkLevel = FALSE;
+	  checkLevel = false;
 	}
       else if ( globs->NumLevelRequest == 1 && IS_EQUAL(globs->LevelRequest[0], 0) )
 	{
 	  if ( globs->Verbose ) fprintf(stdout," No level selected\n");
 	  globs->NumLevelRequest = 0;
-	  checkLevel = FALSE;
+	  checkLevel = false;
 	}
       else if ( globs->Verbose )
 	{
@@ -1427,8 +1424,8 @@ void after_precntl(struct Control *globs, struct Variable *vars)
       else if ( gridtype == GRID_GAUSSIAN && globs->Latitudes == 0 )
 	{
 	  gaussGridID = gridID;
-	  globs->Longitudes  = gridInqXsize(gridID);
-	  globs->Latitudes   = gridInqYsize(gridID);
+	  globs->Longitudes = gridInqXsize(gridID);
+	  globs->Latitudes  = gridInqYsize(gridID);
 	}
     }
 
@@ -1881,10 +1878,9 @@ static
 void after_printCodes(void)
 {
   int tableID = tableInq(-1, 128, "echam4");
-  int ncodes;
   int codes[] = {34,35,36,131,132,135,148,149,151,156,157,259,260,261,262,263,264,268,269,270,271,275};
 
-  ncodes = sizeof(codes)/sizeof(codes[0]);
+  int ncodes = sizeof(codes)/sizeof(codes[0]);
 
   lprintf(stdout);
 
@@ -1921,35 +1917,29 @@ void after_printCodes(void)
 static
 void after_procstat(char *procpath, int truncation)
 {
-  FILE *sf;
-  double MaxMBytes;
   time_t tp;
-  long  yy, mm, dd, hh, mi;
   char mtype[12];
-  char *proc;
-  char *name;
   char  stat_file[128];
-  double CPUTime;
 
-  CPUTime = ((double) clock() - starttime ) / CLOCKS_PER_SEC;
+  double CPUTime = ((double) clock() - starttime ) / CLOCKS_PER_SEC;
 
   (void) time(&tp);
-  yy    = gmtime(&tp)->tm_year + 1900;
-  mm    = gmtime(&tp)->tm_mon + 1;
-  dd    = gmtime(&tp)->tm_mday   ;
-  hh    = gmtime(&tp)->tm_hour   ;
-  mi    = gmtime(&tp)->tm_min    ;
-  name  = getpwuid(getuid())->pw_name;
+  long yy    = gmtime(&tp)->tm_year + 1900;
+  long mm    = gmtime(&tp)->tm_mon + 1;
+  long dd    = gmtime(&tp)->tm_mday   ;
+  long hh    = gmtime(&tp)->tm_hour   ;
+  long mi    = gmtime(&tp)->tm_min    ;
+  char *name = getpwuid(getuid())->pw_name;
 
-  proc = strrchr(procpath,'/');
+  char *proc = strrchr(procpath,'/');
   if (proc == 0) proc = procpath;
   else           proc++         ;
 
   strcpy(stat_file, "/pf/m/m214003/local/log/after.log");
 
-  MaxMBytes = (double) memTotal() / 1048576.;
+  double MaxMBytes = (double) memTotal() / 1048576.;
 
-  sf = fopen(stat_file, "a");
+  FILE *sf = fopen(stat_file, "a");
   if ( sf )
     {
       char unknown[] = "";
