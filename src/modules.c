@@ -174,7 +174,6 @@ void *Splitrec(void *argument);
 void *Splitsel(void *argument);
 void *Splittime(void *argument);
 void *Splityear(void *argument);
-void *SSOpar(void *argument);
 void *Subtrend(void *argument);
 void *Tee(void *argument);
 void *Template1(void *argument);
@@ -433,7 +432,6 @@ void *Maggraph(void *argument);
 #define  SplitselOperators      {"splitsel"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}
 #define  SplityearOperators     {"splityear", "splityearmon"}
-#define  SSOparOperators        {"ssopar"}
 #define  SubtrendOperators      {"subtrend"}
 #define  TeeOperators           {"tee"}
 #define  Template1Operators     {"template1"}
@@ -711,7 +709,6 @@ static modules_t Modules[] =
   { Splitsel,       SplitselHelp,      SplitselOperators,      1,   CDI_BOTH,  1, -1 },
   { Splittime,      SplittimeHelp,     SplittimeOperators,     1,   CDI_BOTH,  1, -1 },
   { Splityear,      SplittimeHelp,     SplityearOperators,     1,   CDI_BOTH,  1, -1 },
-  { SSOpar,         NULL,              SSOparOperators,        0,   CDI_REAL,  1,  1 },
   { Subtrend,       SubtrendHelp,      SubtrendOperators,      1,   CDI_REAL,  3,  1 },
   { Tee,            NULL,              TeeOperators,           1,   CDI_REAL,  2,  1 },
   { Template1,      NULL,              Template1Operators,     0,   CDI_REAL,  1,  1 },
