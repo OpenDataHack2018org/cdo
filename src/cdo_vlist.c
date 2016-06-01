@@ -494,7 +494,7 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 }
 
 
-void vlist_hybrid_to_pressure(int vlistID1, int vlistID2, int zaxisIDh, int zaxisIDp)
+void vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1, int zaxisID2)
 {
   int nvct0 = 0;
   double *vct = NULL;
@@ -505,7 +505,7 @@ void vlist_hybrid_to_pressure(int vlistID1, int vlistID2, int zaxisIDh, int zaxi
       int zaxisID = vlistZaxis(vlistID1, i);
       int nlevel  = zaxisInqSize(zaxisID);
 
-      if ( zaxisID == zaxisIDh && nlevel > 1 )
+      if ( zaxisID == zaxisID1 && nlevel > 1 )
 	{
 	  int nvct = zaxisInqVctSize(zaxisID);
           if ( vct == NULL )
@@ -514,12 +514,12 @@ void vlist_hybrid_to_pressure(int vlistID1, int vlistID2, int zaxisIDh, int zaxi
               vct = (double*) Malloc(nvct*sizeof(double));
               zaxisInqVct(zaxisID, vct);
 
-              vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+              vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
             }
           else
             {
               if ( nvct0 == nvct && memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-                vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+                vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 	    }
 	}
     }

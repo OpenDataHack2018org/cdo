@@ -151,7 +151,7 @@ void *Vertintml(void *argument)
 
   double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
-  vlist_hybrid_to_pressure(vlistID1, vlistID2, zaxisIDh, zaxisIDp);
+  vlist_change_hybrid_zaxis(vlistID1, vlistID2, zaxisIDh, zaxisIDp);
 
   int psvarID = -1;
   bool linvertvct = false;

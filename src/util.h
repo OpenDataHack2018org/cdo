@@ -200,7 +200,7 @@ int     vlistIsSzipped(int vlistID);
 int     vlist_check_gridsize(int vlistID);
 int     vlist_get_psvarid(int vlistID, int zaxisID);
 double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlevf, int *rnhlevh);
-void vlist_hybrid_to_pressure(int vlistID1, int vlistID2, int zaxisIDh, int zaxisIDp);
+void vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1, int zaxisID2);
 
 void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname);
 
