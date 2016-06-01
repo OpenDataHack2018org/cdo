@@ -583,7 +583,9 @@ void after_check_content(struct Variable *vars, int timestep)
 	       vars[code].spectral == NULL &&
 	       vars[code].hybrid   == NULL )
 	    {
-	      Warning( "No humidity in data file, set to zero !");
+              static bool lwarn = true;
+              if ( lwarn ) Warning( "No humidity in data file, set to zero !");
+              lwarn = false;
 	      vars[code].needed = FALSE;
 	    }
 	}
