@@ -32,6 +32,7 @@
 
 void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev);
 
+double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf);
 
 void *Derivepar(void *argument)
 {
@@ -40,10 +41,8 @@ void *Derivepar(void *argument)
   int recID, nrecs;
   int i, offset;
   int varID, levelID;
-  int zaxisIDh = -1;
   int zaxisID;
   int nlevel;
-  int nvct;
   int surfaceID = -1;
   int sgeopotID = -1, geopotID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
   // int clwcID = -1, ciwcID = -1;
@@ -52,8 +51,6 @@ void *Derivepar(void *argument)
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
-  int nhlevf = 0;
-  double *vct = NULL;
   // double *lwater = NULL, *iwater = NULL;
   int nmiss, nmissout = 0;
   double *full_press = NULL;
@@ -78,51 +75,14 @@ void *Derivepar(void *argument)
  
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  int nzaxis = vlistNzaxis(vlistID1);
-  bool lhavevct = false;
+  int zaxisIDh = -1;
+  int nvct = 0;
+  int nhlevf = 0;
+  double *vct = vlist_hybrid_vct(vlistID1, &zaxisIDh, &nvct, &nhlevf);
 
-  if ( cdoVerbose ) cdoPrint("nzaxis: %d", nzaxis);
-
-  for ( i = 0; i < nzaxis; i++ )
-    {
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
-	{
-	  if ( nlevel > 1 )
-	    {
-	      nvct = zaxisInqVctSize(zaxisID);
-
-              if ( cdoVerbose )
-                cdoPrint("i: %d, vct size of zaxisID %d = %d", i, zaxisID, nvct);
-
-	      if ( nlevel == (nvct/2 - 1) )
-		{
-		  if ( lhavevct == false )
-		    {
-		      lhavevct = true;
-		      zaxisIDh = zaxisID;
-		      nhlevf   = nlevel;
-	      
-                      if ( cdoVerbose )
-                        cdoPrint("lhavevct=true  zaxisIDh = %d, nhlevf   = %d", zaxisIDh, nlevel);
- 
-		      vct = (double*) Malloc(nvct*sizeof(double));
-		      zaxisInqVct(zaxisID, vct);
-
-		      if ( cdoVerbose )
-			for ( i = 0; i < nvct/2; ++i )
-			  cdoPrint("vct: %5d %25.17f %25.17f", i, vct[i], vct[nvct/2+i]);
-		    }
-		}
-              else 
-                {
-		  if ( cdoVerbose )
-		    cdoPrint("nlevel = (nvct/2 - 1): nlevel = %d", nlevel);
-                }
-	    }
-	}
-    }
+  if ( cdoVerbose )
+    for ( i = 0; i < nvct/2; ++i )
+      cdoPrint("vct: %5d %25.17f %25.17f", i, vct[i], vct[nvct/2+i]);
 
   if ( zaxisIDh == -1 )
     cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
