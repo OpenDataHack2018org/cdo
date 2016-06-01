@@ -996,6 +996,8 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
     cdoAbort("Internal problem, varlist already allocated!");
 
   int nvars = vlistNvars(vlistID);
+  assert(nvars>0);
+  
   varlist_t *varlist = (varlist_t*) Malloc(nvars*sizeof(varlist_t));
 
   for ( int varID = 0; varID < nvars; ++varID )
