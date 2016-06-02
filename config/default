@@ -116,6 +116,23 @@ case "${HOSTNAME}" in
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
 	;;
+    cdo4windows-cyg)
+        CDOLIBS="--with-netcdf=/usr \
+                 --with-udunits2=/usr \
+                 --with-curl=/usr \
+                 --with-proj=/usr"
+
+        if  test "$COMP" = clang ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=clang CFLAGS="-g -Wall -O2"
+        else
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    $CDOLIBS \
+	            CC=gcc CFLAGS="-g -Wall -O2"
+        fi
+	;;
     daint*)
         if  test "$COMP" = icc ; then
           CDOLIBS="--with-netcdf=/opt/cray/netcdf/4.3.3.1/INTEL/14.0"
