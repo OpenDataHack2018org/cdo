@@ -10,6 +10,8 @@ Version 1.7.2 (25 June 2016):
      * ngridpoints: Show number of gridpoints per variable
      * reducegrid: Select gridpoints wrt. given mask
      * settbounds: Set time bounds
+   Changed operators:
+     * input: added optional zaxis parameter
    Fixed bugs:
      * Error reading Gaussian reduced GRIB files [Bug #6780 #6819]
      * Installation error with OpenMP [Bug #6523]

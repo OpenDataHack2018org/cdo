@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-06-02  Uwe Schulzweida
+
+	* input: added optional zaxis parameter
+
 2016-05-27   Asela Rajapakse
 
 	* New operator verifygrid - Verify grids
