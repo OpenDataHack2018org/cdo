@@ -4235,7 +4235,7 @@ static const char *InputHelp[] = {
     "    input, inputsrv, inputext - Formatted input",
     "",
     "SYNOPSIS",
-    "    input,grid  ofile",
+    "    input,grid[,zaxis]  ofile",
     "    inputsrv  ofile",
     "    inputext  ofile",
     "",
@@ -4261,7 +4261,8 @@ static const char *InputHelp[] = {
     "              the outputext operator.",
     "",
     "PARAMETER",
-    "    grid  STRING  Grid description file or name",
+    "    grid   STRING  Grid description file or name",
+    "    zaxis  STRING  Z-axis description file",
     NULL
 };
 
