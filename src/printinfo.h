@@ -1,5 +1,11 @@
 // This file is used in CDI and CDO !!!
 
+#if defined (HAVE_CONFIG_H)
+#  include "../src/config.h"
+#endif
+
+#include <stdio.h>
+
 #define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
 #define TIME_FORMAT "%2.2d:%2.2d:%2.2d"
 
@@ -147,6 +153,10 @@ void printGridInfo(int vlistID)
       int xsize    = gridInqXsize(gridID);
       int ysize    = gridInqYsize(gridID);
       int xysize   = xsize*ysize;
+      int prec     = gridInqPrec(gridID);
+
+      int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+
       gridInqXname(gridID, xname);
       gridInqYname(gridID, yname);
       gridInqXunits(gridID, xunits);
@@ -186,12 +196,12 @@ void printGridInfo(int vlistID)
               double xfirst = gridInqXval(gridID, 0);
               double xlast  = gridInqXval(gridID, xsize-1);
               double xinc   = gridInqXinc(gridID);
-              fprintf(stdout, "%33s : %g", xname, xfirst);
+              fprintf(stdout, "%33s : %.*g", xname, dig, xfirst);
               if ( xsize > 1 )
                 {
-                  fprintf(stdout, " to %g", xlast);
+                  fprintf(stdout, " to %.*g", dig, xlast);
                   if ( IS_NOT_EQUAL(xinc, 0) )
-                    fprintf(stdout, " by %g", xinc);
+                    fprintf(stdout, " by %.*g", dig, xinc);
                 }
               fprintf(stdout, " %s", xunits);
               if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
@@ -200,12 +210,12 @@ void printGridInfo(int vlistID)
 
 	  if ( ysize > 0 && lycoord )
 	    {
-	      fprintf(stdout, "%33s : %g", yname, yfirst);
+	      fprintf(stdout, "%33s : %.*g", yname, dig, yfirst);
 	      if ( ysize > 1 )
                 {
-                  fprintf(stdout, " to %g", ylast);
+                  fprintf(stdout, " to %.*g", dig, ylast);
                   if ( IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN && gridtype != GRID_GAUSSIAN_REDUCED )
-                    fprintf(stdout, " by %g", yinc);
+                    fprintf(stdout, " by %.*g", dig, yinc);
                 }
               fprintf(stdout, " %s", yunits);
 	      fprintf(stdout, "\n");
@@ -216,8 +226,8 @@ void printGridInfo(int vlistID)
 	      double lonpole = gridInqXpole(gridID);
 	      double latpole = gridInqYpole(gridID);
 	      double angle   = gridInqAngle(gridID);
-	      fprintf(stdout, "%33s : lon=%g  lat=%g", "northpole", lonpole, latpole);
-	      if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%g", angle);
+	      fprintf(stdout, "%33s : lon=%.*g  lat=%.*g", "northpole", dig, lonpole, dig, latpole);
+	      if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%.*g", dig, angle);
 	      fprintf(stdout, "\n");
 	    }
 
@@ -311,10 +321,10 @@ void printGridInfo(int vlistID)
 		  if ( yvals[i] > ylast  ) ylast  = yvals[i];
 		}
 
-	      fprintf(stdout, "%33s : %g to %g %s", xname, xfirst, xlast, xunits);
+	      fprintf(stdout, "%33s : %.*g to %.*g %s", xname, dig, xfirst, dig, xlast, xunits);
 	      if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
-	      fprintf(stdout, "%33s : %g to %g %s\n", yname, yfirst, ylast, yunits);
+	      fprintf(stdout, "%33s : %.*g to %.*g %s\n", yname, dig, yfirst, dig, ylast, yunits);
 
 	      free(xvals);
 	      free(yvals);
@@ -384,6 +394,10 @@ void printZaxisInfo(int vlistID)
       int zaxistype = zaxisInqType(zaxisID);
       int ltype     = zaxisInqLtype(zaxisID);
       int levelsize = zaxisInqSize(zaxisID);
+      int prec      = zaxisInqPrec(zaxisID);
+
+      int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+
       zaxisName(zaxistype, zaxisname);
       zaxisInqName(zaxisID, zname);
       zaxisInqUnits(zaxisID, zunits);
@@ -414,12 +428,12 @@ void printZaxisInfo(int vlistID)
               if ( levelID < levelsize ) zinc = 0;
             }
 
-          fprintf(stdout, "%33s : %g", zname, zfirst);
+          fprintf(stdout, "%33s : %.*g", zname, dig, zfirst);
           if ( levelsize > 1 )
             {
-              fprintf(stdout, " to %g", zlast);
+              fprintf(stdout, " to %.*g", dig, zlast);
               if ( IS_NOT_EQUAL(zinc, 0) )
-                fprintf(stdout, " by %g", zinc);
+                fprintf(stdout, " by %.*g", dig, zinc);
             }
           fprintf(stdout, " %s", zunits);
           fprintf(stdout, "\n");
@@ -434,14 +448,14 @@ void printZaxisInfo(int vlistID)
 
           level1 = zaxisInqLbound(zaxisID, 0);
           level2 = zaxisInqUbound(zaxisID, 0);
-          fprintf(stdout, "%g-%g", level1, level2);
+          fprintf(stdout, "%.*g-%.*g", dig, level1, dig, level2);
           if ( levelsize > 1 )
             {
               level1 = zaxisInqLbound(zaxisID, levelsize-1);
               level2 = zaxisInqUbound(zaxisID, levelsize-1);
-              fprintf(stdout, " to %g-%g", level1, level2);
+              fprintf(stdout, " to %.*g-%.*g", dig, level1, dig, level2);
               if ( IS_NOT_EQUAL(zinc, 0) )
-                fprintf(stdout, " by %g", zinc);
+                fprintf(stdout, " by %.*g", dig, zinc);
             }
           fprintf(stdout, " %s", zunits);
           fprintf(stdout, "\n");
@@ -553,7 +567,6 @@ static
 void printTimesteps(int streamID, int taxisID, int verbose)
 {
   int nrecs;
-  int vdate, vtime;
   struct datetime {
     int vdate;
     int vtime;
@@ -572,13 +585,19 @@ void printTimesteps(int streamID, int taxisID, int verbose)
   int nfact = 1;
   int tsID = 0;
 
+#ifdef CDO
   dtlist_type *dtlist = dtlist_new();
-
+#endif
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
+#ifdef CDO
       dtlist_taxisInqTimestep(dtlist, taxisID, 0);
       int vdate = dtlist_get_vdate(dtlist, 0);
       int vtime = dtlist_get_vtime(dtlist, 0);
+#else
+      int vdate = taxisInqVdate(taxisID);
+      int vtime = taxisInqVtime(taxisID);
+#endif
 
       if ( verbose || tsID < NUM_TIMESTEP )
 	{
@@ -606,8 +625,9 @@ void printTimesteps(int streamID, int taxisID, int verbose)
       tsID++;
     }
 
+#ifdef CDO
   dtlist_delete(dtlist);
-
+#endif
   if ( nvdatetime )
     {
       fprintf(stdout, "\n");
@@ -622,8 +642,8 @@ void printTimesteps(int streamID, int taxisID, int verbose)
         }
       for ( int i = toff; i < nvdatetime; ++i )
 	{
-	  vdate = next_vdatetime->vdate;
-	  vtime = next_vdatetime->vtime;
+	  int vdate = next_vdatetime->vdate;
+	  int vtime = next_vdatetime->vtime;
 	  ntimeout = printDateTime(ntimeout, vdate, vtime);
 	  next_vdatetime = next_vdatetime->next;
 	}
