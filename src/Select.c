@@ -91,8 +91,7 @@ void *Select(void *argument)
   bool lconstvars = true;
   int streamID2 = CDI_UNDEFID;
   int nrecs;
-  int nvars, nvars2, nlevs;
-  int zaxisID;
+  int nvars, nvars2;
   int varID, levelID;
   int last_year = -999999999;
   char paramstr[32];
@@ -191,8 +190,8 @@ void *Select(void *argument)
 	      xresult = false;
 	      for ( varID = 0; varID < nvars; ++varID )
 		{
-		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
-		  nlevs   = zaxisInqSize(zaxisID);
+		  int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+		  int nlevs   = zaxisInqSize(zaxisID);
 		  for ( int levID = 0; levID < nlevs; ++levID )
 		    vlistDefFlag(vlistID1, varID, levID, TRUE);
 		}
@@ -224,8 +223,8 @@ void *Select(void *argument)
 	      param = paramstr;
 
 	      int gridID  = vlistInqVarGrid(vlistID1, varID);
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      int nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
 
               zaxisnum = vlistZaxisIndex(vlistID1, zaxisID)+1;
@@ -305,9 +304,8 @@ void *Select(void *argument)
 	    {
 	      if ( vars[varID] )
 		{
-		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
-		  nlevs   = zaxisInqSize(zaxisID);
-
+		  int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+		  int nlevs   = zaxisInqSize(zaxisID);
 		  for ( int levID = 0; levID < nlevs; ++levID )
 		    {
 		      levidx = levID + 1;
@@ -353,8 +351,8 @@ void *Select(void *argument)
 	  int npar = 0;
 	  for ( varID = 0; varID < nvars; ++varID )
 	    {
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      int nlevs   = zaxisInqSize(zaxisID);
 	      for ( int levID = 0; levID < nlevs; ++levID )
 		if ( vlistInqFlag(vlistID1, varID, levID) == xresult )
                   {
@@ -372,8 +370,8 @@ void *Select(void *argument)
 		  for ( varID = 0; varID < nvars; ++varID )
 		    {
 		      vars[varID] = true;
-		      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-		      nlevs   = zaxisInqSize(zaxisID);
+		      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+		      int nlevs   = zaxisInqSize(zaxisID);
 		      for ( int levID = 0; levID < nlevs; ++levID )
 			vlistDefFlag(vlistID1, varID, levID, TRUE);
 		    }
@@ -383,14 +381,28 @@ void *Select(void *argument)
 		  cdoAbort("No variable selected!");
 		}
 	    }
+          else
+            {
+              if ( lvarsel && ltimsel )
+                {
+                  for ( varID = 0; varID < nvars; ++varID )
+                    {
+                      if ( vars[varID] == true && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+                        {
+                          lcopy_const = true;
+                          break;
+                        }
+                    }
+                }
+            }
 
 	  //if ( cdoVerbose ) vlistPrint(vlistID1);
 
 	  vlistID0 = vlistDuplicate(vlistID1);
 	  for ( varID = 0; varID < nvars; ++varID )
 	    {
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      int nlevs   = zaxisInqSize(zaxisID);
 	      for ( int levID = 0; levID < nlevs; ++levID )
 		vlistDefFlag(vlistID0, varID, levID, vlistInqFlag(vlistID1, varID, levID));
 	    }
@@ -610,7 +622,7 @@ void *Select(void *argument)
 			}
 		    }
 		}
-              
+
               if ( lcopy_const && tsID2 == 0 )
                 write_const_vars(streamID2, vlistID2, nvars2, vardata2);
 
