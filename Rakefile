@@ -145,13 +145,6 @@ task :checkConnections do |t|
       config["hostname"]
     else
       Net::SSH.start(hostname,username) do |ssh|
-
-        sh = ssh.shell.open
-
-        pp sh.echo "#{config['dir']}"
-        pp sh.mkdir(" -p #{config['dir']}")
-        pp sh.cd("#{config['dir']}")
-        puts sh.pwd.colorize(color: :red)
         hn = ssh.exec!("hostname -f").strip
         us = ssh.exec!("echo $USER").strip
         [hn,us]
