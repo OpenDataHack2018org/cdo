@@ -263,6 +263,8 @@ void *Arith(void *argument)
 		  streamInqRecord(streamIDx2, &varID2, &levelID2);
 		  streamReadRecord(streamIDx2, fieldx2->ptr, &nmiss);
                   fieldx2->nmiss = (size_t) nmiss;
+                  if ( varID   != varID2 ) cdoAbort("Internal error, varIDs of input streams differ!");
+                  if ( levelID != levelID2 ) cdoAbort("Internal error, levelIDs of input streams differ!");
 		}
 
 	      if ( filltype == FILL_TS )
