@@ -66,7 +66,6 @@ void *Select(void *argument)
   int nrecs;
   int nvars, nvars2, nlevs;
   int zaxisID;
-  int varID2, levelID2;
   int varID, levelID;
   int last_year = -999999999;
   char paramstr[32];
@@ -557,7 +556,7 @@ void *Select(void *argument)
 
               if ( lcopy_const && tsID2 == 0 )
                 {
-                  for ( varID2 = 0; varID2 < nvars2; ++varID2 )
+                  for ( int varID2 = 0; varID2 < nvars2; ++varID2 )
                     {
                       if ( vardata2[varID2] )
                         {
@@ -587,8 +586,8 @@ void *Select(void *argument)
                         if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                           continue;
 
-		      varID2   = vlistFindVar(vlistID2, varID);
-		      levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+		      int varID2   = vlistFindVar(vlistID2, varID);
+		      int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 		      
 		      streamDefRecord(streamID2, varID2, levelID2);
 		      if ( lcopy )
@@ -613,10 +612,10 @@ void *Select(void *argument)
 		  streamInqRecord(streamID1, &varID, &levelID);
 		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
-		      varID2 = vlistFindVar(vlistID2, varID);
+		      int varID2 = vlistFindVar(vlistID2, varID);
                       if ( vlistInqVarTsteptype(vlistID2, varID2) == TSTEP_CONSTANT )
                         {
-                          levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+                          int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
                           int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
                           if ( levelID == 0 )
                             {
@@ -624,7 +623,7 @@ void *Select(void *argument)
                               vardata2[varID2] = (double*) Malloc(gridsize*nlevel*sizeof(double));
                             }
                           int nmiss;
-                          streamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID, &nmiss);
+                          streamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID2, &nmiss);
                         }
 		    }
 		}
