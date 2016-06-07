@@ -111,90 +111,8 @@ void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subar
   }            
 }
 
-<<<<<<< HEAD
-/* Quicksort is called with a pointer to the array to be sorted and an integer indicating its length. */
 
-void quick_sort (double * array, int array_length) {
-  int i, j;
-  double p, temp;
-  
-  if (array_length < 2)
-    return;
-  p = array[array_length / 2];
-  for (i = 0, j = array_length - 1;; i++, j--) {
-    while (array[i] < p)
-      i++;
-    while (p < array[j])
-      j--;
-    if (i >= j)
-      break;
-    temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
-  }
-  quick_sort(array, i);
-  quick_sort(array + i, array_length - i);
-}
 
-/* Quicksort is called with a pointer to the array of center points to be sorted and an integer indicating its length. It sorts the array by its longitude coordinates */
-
-void quick_sort_by_lon(double * array, int array_length) {
-  int i, j;
-  double p, temp_lon, temp_lat;
-  
-  if (array_length < 4)
-    return;
-  
-  if((array_length / 2) % 2 != 0){
-    p = array[(array_length / 2) + 1];
-  } else {
-    p = array[array_length / 2];
-  }
-      
-      
-  for (i = 0, j = array_length - 2;; i += 2, j -= 2) {
-    while (array[i] < p)
-      i += 2;
-
-    while (p < array[j])
-      j -= 2;
-    
-    if (i >= j)
-      break;
-    
-    temp_lon = array[i];
-    temp_lat = array[i + 1];
-    array[i] = array[j];
-    array[i + 1] = array[j + 1];
-    array[j] = temp_lon;
-    array[j + 1] = temp_lat;
-  }
-  quick_sort_by_lon(array, i);
-  quick_sort_by_lon(array + i, array_length - i);
-}
-
-/* This uses quicksort to sort the latitude coordinates in a subarray of all coordinates. */
-
-void quick_sort_of_subarray_by_lat(double * array, int array_length, int subarray_start, int subarray_end){
-
-  int subarray_length = (subarray_end - subarray_start) / 2 + 1;     
-  double subarray[subarray_length];
-  int subarray_index = 0;
-  
-  for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){	 
-    subarray[subarray_index] = array[index];
-    subarray_index += 1;	  
-  }
-  
-  quick_sort(subarray, subarray_length);
-  
-  subarray_index = 0;
-  
-  for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){
-    array[index] = subarray[subarray_index];
-    subarray_index += 1;	  
-  }            
-}
 
 static
 double determinant(double matrix[3][3]){
@@ -476,58 +394,6 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
       subarray_end = cell_no * 2;    
       if((subarray_end - subarray_start) > 1){	
 	quick_sort_of_subarray_by_lat(center_point_array, subarray_start, subarray_end);
-      }     
-      subarray_start = subarray_end + 2;  
-    }        
-  }
-
-  /* Now checking for the number of unique center point coordinates. */
-
-  for(cell_no = 0; cell_no < gridsize - 1; cell_no++){
-    if(fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1) * 2 + 0]) < 0.0001){
-      if(fabs(center_point_array[cell_no * 2 + 1] - center_point_array[(cell_no + 1) * 2 + 1]) < 0.0001){
-	continue;
-      } else {
-	no_unique_center_points += 1;
-      }
-    } else {
-      	no_unique_center_points += 1;
-    }
-  }
-  
-  free(center_point_array);
-
-
-  fprintf(stdout,"Grid no %u (of %u) consists of %d cells, of which\n\n", gridno + 1, ngrids, gridsize);
-
-  /* For performing the first test, an array of all center point coordinates is built. */
-
-  double * center_point_array = (double *)malloc(gridsize * 2 * sizeof(double));
-  
-  for(cell_no = 0; cell_no < gridsize; cell_no++){
-    center_point_array[cell_no * 2 + 0] = grid_center_lon[cell_no];
-    center_point_array[cell_no * 2 + 1] = grid_center_lat[cell_no];
-  }
-
-  
-
-  /* The cell center points are sorted by their first coordinate (lon) with quicksort. */
-
-  quick_sort_by_lon(center_point_array, gridsize * 2);
-  
-  /* Now the lat coordinates in subarrays that reflect equal lon coordinates are sorted with quicksort. */
-
-  for(cell_no = 0; cell_no < gridsize - 1; cell_no++){
-
-    if(cell_no == gridsize - 2){    
-      subarray_end = gridsize * 2 - 2;      
-      quick_sort_of_subarray_by_lat(center_point_array, gridsize * 2, subarray_start, subarray_end);
-    }
-            
-    if(fabs(center_point_array[cell_no * 2 + 0] - center_point_array[(cell_no + 1)  * 2  + 0]) > 0.0001){     
-      subarray_end = cell_no * 2;    
-      if((subarray_end - subarray_start) > 1){	
-	quick_sort_of_subarray_by_lat(center_point_array, gridsize * 2, subarray_start, subarray_end);
       }     
       subarray_start = subarray_end + 2;  
     }        
