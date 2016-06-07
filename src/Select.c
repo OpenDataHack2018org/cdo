@@ -566,7 +566,7 @@ void *Select(void *argument)
                           int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
                           for ( int levelID2 = 0; levelID2 < nlevel; ++levelID2 )
                             {
-                              double *pdata = vardata2[varID2]+gridsize*levelID;
+                              double *pdata = vardata2[varID2]+gridsize*levelID2;
                               int nmiss = 0;
                               for ( int i = 0; i < gridsize; ++i )
                                 if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
@@ -621,7 +621,7 @@ void *Select(void *argument)
                           if ( levelID == 0 )
                             {
                               int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
-                              vardata2[varID2] = (double*) malloc(gridsize*nlevel*sizeof(double));
+                              vardata2[varID2] = (double*) Malloc(gridsize*nlevel*sizeof(double));
                             }
                           int nmiss;
                           streamReadRecord(streamID1, vardata2[varID2]+gridsize*levelID, &nmiss);
