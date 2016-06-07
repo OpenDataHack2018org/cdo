@@ -656,7 +656,7 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 }
 
 static
-void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
+void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *txt)
 {
   char xunitstr[CDI_MAX_NAME];
   char yunitstr[CDI_MAX_NAME];
@@ -727,7 +727,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
   if ( remap_write_remap == FALSE && grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
 
   if ( !(gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL)) )
-    cdoAbort("Grid cell center coordinates missing!");
+    cdoAbort("%s grid cell center coordinates missing!", txt);
 
   gridInqXvals(gridID, grid->cell_center_lon);
   gridInqYvals(gridID, grid->cell_center_lat);
@@ -750,7 +750,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 	}
       else
 	{
-	  cdoAbort("Grid cell corner coordinates missing!");
+	  cdoAbort("%s grid cell corner coordinates missing!", txt);
 	}
     }
 
@@ -948,9 +948,9 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
     }
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
-    remap_define_grid(map_type, gridID1, src_grid);
+  remap_define_grid(map_type, gridID1, src_grid, "Source");
 
-  remap_define_grid(map_type, gridID2, tgt_grid);
+  remap_define_grid(map_type, gridID2, tgt_grid, "Target");
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {

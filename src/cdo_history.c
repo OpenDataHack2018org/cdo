@@ -56,12 +56,14 @@ char *get_strtimeptr()
 
 void cdoInqHistory(int fileID)
 {
-  if ( ghistory )
+  if ( ghistory ) return;
+  /*
     {
       Free(ghistory);
       ghistorysize = 0;
       ghistory = NULL;
     }
+  */
 
   ghistorysize = streamInqHistorySize(fileID);
   if ( ghistorysize > 0 )

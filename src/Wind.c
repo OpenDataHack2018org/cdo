@@ -34,20 +34,14 @@
 
 void *Wind(void *argument)
 {
-  int UV2DV, UV2DVL, DV2UV, DV2UVL, DV2PS;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, nvars;
-  int tsID, recID, varID, levelID;
-  int nlev = 0, gridsize;
+  int nrecs;
+  int recID, varID, levelID;
+  int nlev = 0;
   int index, ngrids;
-  int vlistID1, vlistID2;
   int gridIDsp = -1, gridIDgp = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
   int nmiss;
-  int lcopy = FALSE;
-  int taxisID1, taxisID2;
   int nlon, nlat, ntr = -1;
   int code, param;
   int pnum, pcat, pdis;
@@ -56,32 +50,31 @@ void *Wind(void *argument)
   SPTRANS *sptrans = NULL;
   DVTRANS *dvtrans = NULL;
   char varname[CDI_MAX_NAME];
-  double *array1 = NULL;
   double *ivar1 = NULL, *ivar2 = NULL, *ovar1 = NULL, *ovar2 = NULL;
 
   cdoInitialize(argument);
 
-  UV2DV  = cdoOperatorAdd("uv2dv",  0, 0, NULL);
-  UV2DVL = cdoOperatorAdd("uv2dvl", 0, 0, NULL);
-  DV2UV  = cdoOperatorAdd("dv2uv",  0, 0, NULL);
-  DV2UVL = cdoOperatorAdd("dv2uvl", 0, 0, NULL);
-  DV2PS  = cdoOperatorAdd("dv2ps",  0, 0, NULL);
+  bool lcopy = UNCHANGED_RECORD;
 
-  operatorID = cdoOperatorID();
+  int UV2DV  = cdoOperatorAdd("uv2dv",  0, 0, NULL);
+  int UV2DVL = cdoOperatorAdd("uv2dvl", 0, 0, NULL);
+  int DV2UV  = cdoOperatorAdd("dv2uv",  0, 0, NULL);
+  int DV2UVL = cdoOperatorAdd("dv2uvl", 0, 0, NULL);
+  int DV2PS  = cdoOperatorAdd("dv2ps",  0, 0, NULL);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   /* find variables */
-  nvars = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; varID++ )
     {
       param = vlistInqVarParam(vlistID2, varID);
@@ -90,7 +83,7 @@ void *Wind(void *argument)
       if ( operatorID == UV2DV || operatorID == UV2DVL )
 	{
 	  /* search for u and v wind */
-	  if ( code <= 0 )
+	  if ( pdis != 255 || code <= 0 )
 	    {
 	      vlistInqVarName(vlistID1, varID, varname);
 	      strtolower(varname);
@@ -299,12 +292,12 @@ void *Wind(void *argument)
 	}
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( varID1 != -1 && varID2 != -1 )
     {
@@ -319,7 +312,7 @@ void *Wind(void *argument)
       ovar2 = (double*) Malloc(nlev*gridsize*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

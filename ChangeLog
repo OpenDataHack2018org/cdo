@@ -3,6 +3,36 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-06-07  Uwe Schulzweida
+
+	* select: file structure may change with time constant variables (bug fix)
+	* select: wrong result with time constant 3D variables (bug fix)
+
+2016-06-02  Uwe Schulzweida
+
+	* input: added optional zaxis parameter
+
+2016-05-27   Asela Rajapakse
+
+	* New operator verifygrid - Verify grids
+
+2016-05-25  Uwe Schulzweida
+
+	* CDO_CommandLine: changed from fixed size of 1024 to dynamic size
+	* uv2dv: ignore GRIB2 parameter id
+
+2016-05-20  Uwe Schulzweida
+
+	* Select: check level only if no vars selected
+
+2016-04-28  Uwe Schulzweida
+
+	* readline: added support for DOS text files (\r\n)
+
+2016-04-26  Uwe Schulzweida
+
+	* New operator: smooth - Smooth grid points
+
 2016-04-25  Uwe Schulzweida
 
 	* New operator: ap2hl - Air pressure to height level interpolation
@@ -45,7 +75,7 @@
 
 2016-03-18  Uwe Schulzweida
 
-	* New operator: settbounds - Set time bounds
+	* New operator: settbounds - Set time bounds settbounds - Set time bounds
 
 2016-03-17  Uwe Schulzweida
 

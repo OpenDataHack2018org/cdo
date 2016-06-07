@@ -172,16 +172,11 @@ void *Seltime(void *argument)
 {
   int streamID2 = -1;
   int nrecs;
-  int recID, varID, levelID;
-  int nsel = 0, selival;
-  int vdate, vtime;
-  int copytimestep;
-  int copy_nts2 = FALSE;
-  int i, isel;
-  int gridsize;
+  int varID, levelID;
+  int nsel = 0;
+  int i;
   int nmiss;
   int ncts = 0, nts, it;
-  int *selfound = NULL;
   int hour = 0, minute = 0, second = 0;
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
@@ -189,15 +184,17 @@ void *Seltime(void *argument)
   double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
-  int gridID;
-  int nlevel;
-  int lconstout = FALSE;
-  int process_nts1 = FALSE, process_nts2 = FALSE;
+  bool copy_nts2 = false;
+  bool lconstout = false;
+  bool process_nts1 = false, process_nts2 = false;
+  bool *selfound = NULL;
   int *vdate_list = NULL, *vtime_list = NULL;
   double *single;
   field_t ***vars = NULL;
 
   cdoInitialize(argument);
+
+  bool lcopy = UNCHANGED_RECORD;
 
   int SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     0, "timesteps");
   int SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 0, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
@@ -212,9 +209,6 @@ void *Seltime(void *argument)
   int operatorID = cdoOperatorID();
 
   int operfunc = cdoOperatorF1(operatorID);
-
-  int lcopy = FALSE;
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -269,8 +263,8 @@ void *Seltime(void *argument)
 
   if ( nsel )
     {
-      selfound = (int*) Malloc(nsel*sizeof(int));
-      for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
+      selfound = (bool*) Malloc(nsel*sizeof(bool));
+      for ( i = 0; i < nsel; i++ ) selfound[i] = false;
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
@@ -287,7 +281,7 @@ void *Seltime(void *argument)
 
   if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
+      int gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double*) Malloc(gridsize*sizeof(double));
     }
@@ -322,7 +316,7 @@ void *Seltime(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) nconst++;
       
-  int lnts1 = operatorID == SELSMON && nts1 > 0;
+  bool lnts1 = (operatorID == SELSMON) && (nts1 > 0);
 
   if ( lnts1 || nconst )
     {
@@ -346,9 +340,9 @@ void *Seltime(void *argument)
 	    {
 	      if ( lnts1 || (vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT) )
 		{
-		  gridID  = vlistInqVarGrid(vlistID1, varID);
-		  nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		  gridsize = gridInqSize(gridID);
+		  int gridID  = vlistInqVarGrid(vlistID1, varID);
+		  int nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		  int gridsize = gridInqSize(gridID);
 		  
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
@@ -363,11 +357,11 @@ void *Seltime(void *argument)
   int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
 
-      copytimestep = FALSE;
-      selival = -1;
+      bool copytimestep = false;
+      int selival = -1;
 
       if ( operfunc == func_step )
 	{
@@ -398,9 +392,9 @@ void *Seltime(void *argument)
 	{
 	  if ( selfval >= fltarr[0] && selfval <= fltarr[nsel-1] )
 	    {
-	      copytimestep = TRUE;
-	      selfound[0]      = TRUE;
-	      selfound[nsel-1] = TRUE;
+	      copytimestep = true;
+	      selfound[0]      = true;
+	      selfound[nsel-1] = true;
 	    }
           else if ( selfval > fltarr[nsel-1] )
             {
@@ -412,29 +406,29 @@ void *Seltime(void *argument)
 	  for ( i = 0; i < nsel; i++ )
 	    if ( selival == intarr[i] )
 	      {
-		copytimestep = TRUE;
-		selfound[i] = TRUE;
+		copytimestep = true;
+		selfound[i] = true;
 		break;
 	      }
 	}
 
-      if ( operatorID == SELSMON && copytimestep == FALSE )
+      if ( operatorID == SELSMON && copytimestep == false )
 	{
-	  copy_nts2 = FALSE;
+	  copy_nts2 = false;
 
-	  if ( process_nts1 == TRUE )
+	  if ( process_nts1 )
 	    {
-	      process_nts2 = TRUE;
+	      process_nts2 = true;
 	      its2 = 0;
-	      process_nts1 = FALSE;
+	      process_nts1 = false;
 	    }
 
-	  if ( process_nts2 == TRUE )
+	  if ( process_nts2 )
 	    {
 	      if ( its2++ < nts2 )
-		copy_nts2 = TRUE;
+		copy_nts2 = true;
 	      else
-		process_nts2 = FALSE;
+		process_nts2 = false;
 	    }
 	}
 
@@ -465,7 +459,7 @@ void *Seltime(void *argument)
 		  for ( varID = 0; varID < nvars; varID++ )
 		    {
 		      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT && tsID2 > 1 ) continue;
-		      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
 			  streamDefRecord(streamID2, varID, levelID);
@@ -480,10 +474,10 @@ void *Seltime(void *argument)
 	    }
 
 	  ncts++;
-	  if ( process_nts2 == FALSE )
+	  if ( !process_nts2 )
 	    {
 	      its2 = 0;
-	      process_nts1 = TRUE;
+	      process_nts1 = true;
 	    }
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
@@ -492,13 +486,13 @@ void *Seltime(void *argument)
 
 	  if ( tsID > 0 && lconstout )
 	    {
-	      lconstout = FALSE;
+	      lconstout = false;
 	      nts = nts1 - 1;
 	      for ( varID = 0; varID < nvars; varID++ )
 		{
 		  if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
 		    {
-		      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		      for ( levelID = 0; levelID < nlevel; levelID++ )
 			{
 			  streamDefRecord(streamID2, varID, levelID);
@@ -510,7 +504,7 @@ void *Seltime(void *argument)
 		}
 	    }
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      streamDefRecord(streamID2, varID, levelID);
@@ -531,7 +525,7 @@ void *Seltime(void *argument)
 
 	  if ( lnts1 || tsID == 0 )
 	    {
-	      if ( tsID == 0 && nconst && (!lnts1) ) lconstout = TRUE;
+	      if ( tsID == 0 && nconst && (!lnts1) ) lconstout = true;
 
 	      nts = nts1-1;
 	      if ( lnts1 )
@@ -546,9 +540,9 @@ void *Seltime(void *argument)
 			for ( varID = 0; varID < nvars; varID++ )
 			  {
 			    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-			    gridID   = vlistInqVarGrid(vlistID1, varID);
-			    gridsize = gridInqSize(gridID);
-			    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+			    int gridID   = vlistInqVarGrid(vlistID1, varID);
+			    int gridsize = gridInqSize(gridID);
+			    int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 			    for ( levelID = 0; levelID < nlevel; levelID++ )
 			      {
 				memcpy(vars[it][varID][levelID].ptr,
@@ -565,7 +559,7 @@ void *Seltime(void *argument)
 		  its1++;
 		}
 
-	      for ( recID = 0; recID < nrecs; recID++ )
+	      for ( int recID = 0; recID < nrecs; recID++ )
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
 		  if ( lnts1 || (vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT) )
@@ -590,15 +584,15 @@ void *Seltime(void *argument)
 
   if ( array ) Free(array);
 
-  for ( isel = 0; isel < nsel; isel++ )
+  for ( int isel = 0; isel < nsel; isel++ )
     {
-      if ( selfound[isel] == FALSE )
+      if ( selfound[isel] == false )
 	{
 	 
 	  int isel2;
 	  int lcont = FALSE;
 	  for ( isel2 = isel+1; isel2 < nsel; isel2++ )
-	    if ( selfound[isel2] == TRUE ) break;
+	    if ( selfound[isel2] ) break;
 	  if ( isel2 == nsel && (nsel-isel) > 1 ) lcont = TRUE;
 
 	  if ( operatorID == SELTIMESTEP )

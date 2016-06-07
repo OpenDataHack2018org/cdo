@@ -363,10 +363,7 @@ static const char *mons[12] = {"jan","feb","mar","apr","may","jun",
 
 char *adtprs (char *ch, struct dt *def, struct dt *dtim) {
 gaint val,flag,i;
-char *pos;
 char monam[5];
-
-  pos = ch;
 
   dtim->mn = 0;
   dtim->hr = 0;
@@ -485,10 +482,7 @@ char monam[5];
 
 char *rdtprs (char *ch, struct dt *dtim) {
 gaint flag,val;
-char *pos;
 char id[3];
-
-  pos = ch;
 
   dtim->yr = 0;
   dtim->mo = 0;
@@ -639,9 +633,7 @@ char *ch;
    encountered.  The word is terminated with '\0'. ch2 is src, ch1 is dest */
 
 void getwrd (char *ch1, char *ch2, int len) {
-char *ch;
 
-  ch = ch1;
   while (len>0 && *ch2!='\n' && *ch2!='\0' && *ch2!='\r' && *ch2!=' ' ) {
     *ch1 = *ch2;
     len--;
@@ -952,10 +944,9 @@ char *gafndt (char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals,
               struct gachsub *pch1st, struct gaens *ens1st, gaint t, gaint e, gaint *flag) {
 struct gachsub *pchsub;
 struct gaens *ens;
-struct dt stim;
 gaint len,olen,iv,tdif,i,tused,eused;
 char *fnout, *in, *out, *work, *in2, *out2;
-
+  (void)vals;
   tused = eused = 0;
   olen = 0;
   while (*(fn+olen)) olen++;
@@ -1107,11 +1098,6 @@ char *fnout, *in, *out, *work, *in2, *out2;
     /* forecast times */
     else if (*in=='%' && *(in+1)=='f' && *(in+2)=='2') {
       tused=1;
-      stim.yr = (gaint)(*vals+0.1);
-      stim.mo = (gaint)(*(vals+1)+0.1);
-      stim.dy = (gaint)(*(vals+2)+0.1);
-      stim.hr = (gaint)(*(vals+3)+0.1);
-      stim.mn = (gaint)(*(vals+4)+0.1);
       tdif = timdif(dtimi,dtim);
       tdif = (tdif+30)/60;
       if (tdif<99) sprintf (out,"%02i",tdif);
@@ -1120,11 +1106,6 @@ char *fnout, *in, *out, *work, *in2, *out2;
       in+=3;
     } else if (*in=='%' && *(in+1)=='f' && *(in+2)=='3') {
       tused=1;
-      stim.yr = (gaint)(*vals+0.1);
-      stim.mo = (gaint)(*(vals+1)+0.1);
-      stim.dy = (gaint)(*(vals+2)+0.1);
-      stim.hr = (gaint)(*(vals+3)+0.1);
-      stim.mn = (gaint)(*(vals+4)+0.1);
       tdif = timdif(dtimi,dtim); 
       tdif = (tdif+30)/60;
       if (tdif<999) sprintf (out,"%03i",tdif);
@@ -1234,8 +1215,8 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   char rec[MAX_RECLEN], mrec[MAX_RECLEN];
   char *ch, *pos;
   int i, j, ii, jj;
-  off_t levs,acum,acumvz,recacm;
-  gaint acumstride=0;
+  off_t levs,acum,recacm;
+  // gaint acumstride=0;
   gaint hdrb, trlb;
   gaint size=0,rc,len,flag,tim1,tim2;
   gaint flgs[8],e,t;
@@ -1628,14 +1609,14 @@ int read_gradsdes(char *filename, dsets_t *pfi)
               tdef.mo = -1000;
               tdef.dy = -1000;
               if ( (pos = adtprs(ch,&tdef,&dt1))==NULL) goto err3b_tdef;
-              if (*pos!=' ' || dt1.yr == -1000 || dt1.mo == -1000.0 ||
+              if (*pos!=' ' || dt1.yr == -1000 || dt1.mo == -1000 ||
                   dt1.dy == -1000) goto err3c_tdef;
               if ( (ch = nxtwrd(ch))==NULL) goto err4a_tdef;
               if ( (pos = rdtprs(ch,&dt2))==NULL) goto err4b_tdef;
               v1 = (dt2.yr * 12) + dt2.mo;
               v2 = (dt2.dy * 1440) + (dt2.hr * 60) + dt2.mn;
               /* check if 0 dt */
-              if ( (v1 == 0) && (v2 == 0) ) goto err4c_tdef;  
+              if ( ((int)v1 == 0) && ((int)v2 == 0) ) goto err4c_tdef;  
               if ((vals = (gadouble *)galloc(sizeof(gadouble)*8,"tvals5")) == NULL) goto err8; 
               *(vals) = dt1.yr;
               *(vals+1) = dt1.mo;
@@ -1882,7 +1863,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
           goto err9;
         }
     }
-
+  (void) flgs;
   /* Done scanning!
      Check if scanned stuff makes sense, and then set things up correctly */
 
@@ -2025,14 +2006,13 @@ int read_gradsdes(char *filename, dsets_t *pfi)
     pvar->recoff = 0;
     recacm = 0;
     pvar++;
-    acumvz=acum;
 
     for (i=1; i<pfi->vnum; i++) {
       if (pvar->var_t) {   
         acum = acum + levs*(pfi->gsiz)*(pfi->dnum[3]); 
       } else {                              
         acum = acum + (levs*pfi->gsiz);
-        acumstride = acum ;
+        // acumstride = acum ;
       }
       recacm += levs;
       pvar->offset = acum;
@@ -2209,11 +2189,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   gaprnt (0," starting value\n");
   goto err9;
 
- err3:
-  gaprnt (0,"Open Error:  Missing or invalid dimension");
-  gaprnt (0," starting value\n");
-  goto err9;
-
  err4a_tdef:
   gaprnt (0,"Open Error:  Time increment missing in tdef\n");
   gaprnt (0," use 1 for single time data\n");
@@ -2236,30 +2211,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 
  err6:
   gaprnt (0,"Open Error:  Invalid variable record\n");
-  goto err9;
-
- err6a:
-  gaprnt (0,"Open Error:  Invalid x,y pair\n");
-  goto err9;
-
- err7a: 
-  gaprnt (0,"Open Error:  EOF occurred reading ensemble names\n");
-  goto err9;
-
- err7b:
-  gaprnt (0,"Open Error:  Blank record found in EDEF data\n");
-  goto err9;
-
- err7c:
-  gaprnt (0,"Open Error:  Invalid ensemble grib codes\n");
-  goto err9;
-
- err7d:
-  gaprnt (0,"Open Error:  Invalid ensemble name\n");
-  goto err9;
-
- err7e:
-  gaprnt (0,"Open Error:  Invalid ensemble record\n");
   goto err9;
 
  err8:

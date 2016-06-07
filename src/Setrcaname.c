@@ -24,38 +24,32 @@
 
 void *Setrcaname(void *argument)
 {
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
+  int recID, varID, levelID;
   char **rcsnames;
-  FILE *fp;
   char line[MAX_LINE_LEN];
   char sname[CDI_MAX_NAME], sdescription[CDI_MAX_NAME], sunits[CDI_MAX_NAME];
   int scode, sltype, slevel;
-  int nvars;
   int zaxisID, ltype, code, nlev;
   int level;
-  int lcopy = FALSE;
   int gridsize, nmiss;
   double *array = NULL;
 
   cdoInitialize(argument);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = UNCHANGED_RECORD;
 
   operatorInputArg("file name with RCA names");
   rcsnames = operatorArgv();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  nvars = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
 
-  fp = fopen(rcsnames[0], "r");
+  FILE *fp = fopen(rcsnames[0], "r");
   if ( fp != NULL )
     {
       while ( readline(fp, line, MAX_LINE_LEN) )
@@ -110,11 +104,11 @@ void *Setrcaname(void *argument)
       perror(rcsnames[0]);
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
@@ -124,7 +118,7 @@ void *Setrcaname(void *argument)
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

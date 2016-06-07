@@ -1,5 +1,11 @@
 // This file is used in CDI and CDO !!!
 
+#if defined (HAVE_CONFIG_H)
+#  include "../src/config.h"
+#endif
+
+#include <stdio.h>
+
 #define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
 #define TIME_FORMAT "%2.2d:%2.2d:%2.2d"
 
@@ -134,21 +140,23 @@ void printFiletype(int streamID, int vlistID)
 static
 void printGridInfo(int vlistID)
 {
-  int ngrids, index;
-  int gridID, gridtype, trunc, gridsize, xsize, ysize, xysize;
   char xname[CDI_MAX_NAME], yname[CDI_MAX_NAME], xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   unsigned char uuidOfHGrid[CDI_UUID_SIZE];
 
-  ngrids = vlistNgrids(vlistID);
-  for ( index = 0; index < ngrids; index++ )
+  int ngrids = vlistNgrids(vlistID);
+  for ( int index = 0; index < ngrids; index++ )
     {
-      gridID   = vlistGrid(vlistID, index);
-      gridtype = gridInqType(gridID);
-      trunc    = gridInqTrunc(gridID);
-      gridsize = gridInqSize(gridID);
-      xsize    = gridInqXsize(gridID);
-      ysize    = gridInqYsize(gridID);
-      xysize   = xsize*ysize;
+      int gridID   = vlistGrid(vlistID, index);
+      int gridtype = gridInqType(gridID);
+      int trunc    = gridInqTrunc(gridID);
+      int gridsize = gridInqSize(gridID);
+      int xsize    = gridInqXsize(gridID);
+      int ysize    = gridInqYsize(gridID);
+      int xysize   = xsize*ysize;
+      int prec     = gridInqPrec(gridID);
+
+      int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+
       gridInqXname(gridID, xname);
       gridInqYname(gridID, yname);
       gridInqXunits(gridID, xunits);
@@ -164,14 +172,9 @@ void printGridInfo(int vlistID)
 	   gridtype == GRID_GAUSSIAN ||
 	   gridtype == GRID_GAUSSIAN_REDUCED )
 	{
-          int lxcoord = 1, lycoord = 1;
-	  double xfirst = 0.0, xlast = 0.0;
-	  double yfirst = 0.0, ylast = 0.0;
-	  double xinc = 0.0, yinc = 0.0;
-
-	  yfirst = gridInqYval(gridID, 0);
-	  ylast  = gridInqYval(gridID, ysize-1);
-	  yinc   = gridInqYinc(gridID);
+	  double yfirst = gridInqYval(gridID, 0);
+	  double ylast  = gridInqYval(gridID, ysize-1);
+	  double yinc   = gridInqYinc(gridID);
 
           fprintf(stdout, " : points=%d", gridsize);
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
@@ -184,20 +187,21 @@ void printGridInfo(int vlistID)
 
 	  fprintf(stdout, "\n");
 
-          if ( gridInqXvals(gridID, NULL) == 0 ) lxcoord = 0;
-          if ( gridInqYvals(gridID, NULL) == 0 ) lycoord = 0;
+          bool lxcoord = true, lycoord = true;
+          if ( gridInqXvals(gridID, NULL) == 0 ) lxcoord = false;
+          if ( gridInqYvals(gridID, NULL) == 0 ) lycoord = false;
 
 	  if ( xsize > 0 && lxcoord )
 	    {
-              xfirst = gridInqXval(gridID, 0);
-              xlast  = gridInqXval(gridID, xsize-1);
-              xinc   = gridInqXinc(gridID);
-              fprintf(stdout, "%33s : %g", xname, xfirst);
+              double xfirst = gridInqXval(gridID, 0);
+              double xlast  = gridInqXval(gridID, xsize-1);
+              double xinc   = gridInqXinc(gridID);
+              fprintf(stdout, "%33s : %.*g", xname, dig, xfirst);
               if ( xsize > 1 )
                 {
-                  fprintf(stdout, " to %g", xlast);
+                  fprintf(stdout, " to %.*g", dig, xlast);
                   if ( IS_NOT_EQUAL(xinc, 0) )
-                    fprintf(stdout, " by %g", xinc);
+                    fprintf(stdout, " by %.*g", dig, xinc);
                 }
               fprintf(stdout, " %s", xunits);
               if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
@@ -206,12 +210,12 @@ void printGridInfo(int vlistID)
 
 	  if ( ysize > 0 && lycoord )
 	    {
-	      fprintf(stdout, "%33s : %g", yname, yfirst);
+	      fprintf(stdout, "%33s : %.*g", yname, dig, yfirst);
 	      if ( ysize > 1 )
                 {
-                  fprintf(stdout, " to %g", ylast);
+                  fprintf(stdout, " to %.*g", dig, ylast);
                   if ( IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN && gridtype != GRID_GAUSSIAN_REDUCED )
-                    fprintf(stdout, " by %g", yinc);
+                    fprintf(stdout, " by %.*g", dig, yinc);
                 }
               fprintf(stdout, " %s", yunits);
 	      fprintf(stdout, "\n");
@@ -219,12 +223,11 @@ void printGridInfo(int vlistID)
 
 	  if ( gridIsRotated(gridID) )
 	    {
-	      double lonpole, latpole, angle;
-	      lonpole = gridInqXpole(gridID);
-	      latpole = gridInqYpole(gridID);
-	      angle   = gridInqAngle(gridID);
-	      fprintf(stdout, "%33s : lon=%g  lat=%g", "northpole", lonpole, latpole);
-	      if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%g", angle);
+	      double lonpole = gridInqXpole(gridID);
+	      double latpole = gridInqYpole(gridID);
+	      double angle   = gridInqAngle(gridID);
+	      fprintf(stdout, "%33s : lon=%.*g  lat=%.*g", "northpole", dig, lonpole, dig, latpole);
+	      if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%.*g", dig, angle);
 	      fprintf(stdout, "\n");
 	    }
 
@@ -264,9 +267,8 @@ void printGridInfo(int vlistID)
 	}
       else if ( gridtype == GRID_GME )
 	{
-	  int ni, nd;
-	  ni = gridInqGMEni(gridID);
-	  nd = gridInqGMEnd(gridID);
+	  int ni = gridInqGMEni(gridID);
+	  int nd = gridInqGMEnd(gridID);
 	  fprintf(stdout, " : points=%d  nd=%d  ni=%d\n", gridsize, nd, ni);
 	}
       else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
@@ -301,20 +303,17 @@ void printGridInfo(int vlistID)
 
 	  if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
 	    {
-	      int i;
-	      double *xvals, *yvals;
-	      double xfirst, xlast, yfirst, ylast;
-	      xvals = (double*) malloc((size_t)gridsize*sizeof(double));
-	      yvals = (double*) malloc((size_t)gridsize*sizeof(double));
+	      double *xvals = (double*) malloc((size_t)gridsize*sizeof(double));
+	      double *yvals = (double*) malloc((size_t)gridsize*sizeof(double));
 
 	      gridInqXvals(gridID, xvals);
 	      gridInqYvals(gridID, yvals);
 
-	      xfirst = xvals[0];
-	      xlast  = xvals[0];
-	      yfirst = yvals[0];
-	      ylast  = yvals[0];
-	      for ( i = 1; i < gridsize; i++ )
+	      double xfirst = xvals[0];
+	      double xlast  = xvals[0];
+	      double yfirst = yvals[0];
+	      double ylast  = yvals[0];
+	      for ( int i = 1; i < gridsize; i++ )
 		{
 		  if ( xvals[i] < xfirst ) xfirst = xvals[i];
 		  if ( xvals[i] > xlast  ) xlast  = xvals[i];
@@ -322,10 +321,10 @@ void printGridInfo(int vlistID)
 		  if ( yvals[i] > ylast  ) ylast  = yvals[i];
 		}
 
-	      fprintf(stdout, "%33s : %g to %g %s", xname, xfirst, xlast, xunits);
+	      fprintf(stdout, "%33s : %.*g to %.*g %s", xname, dig, xfirst, dig, xlast, xunits);
 	      if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
-	      fprintf(stdout, "%33s : %g to %g %s\n", yname, yfirst, ylast, yunits);
+	      fprintf(stdout, "%33s : %.*g to %.*g %s\n", yname, dig, yfirst, dig, ylast, yunits);
 
 	      free(xvals);
 	      free(yvals);
@@ -385,19 +384,20 @@ void printGridInfo(int vlistID)
 static
 void printZaxisInfo(int vlistID)
 {
-  int zaxisID, zaxistype, levelsize, levelID;
-  int ltype;
-  double *levels = NULL;
   char zaxisname[CDI_MAX_NAME], zname[CDI_MAX_NAME], zunits[CDI_MAX_NAME];
 
   int nzaxis = vlistNzaxis(vlistID);
-  for ( int index = 0; index < nzaxis; index++)
+  for ( int index = 0; index < nzaxis; index++ )
     {
-      double zfirst = 0, zlast = 0, zinc = 0;
-      zaxisID   = vlistZaxis(vlistID, index);
-      zaxistype = zaxisInqType(zaxisID);
-      ltype     = zaxisInqLtype(zaxisID);
-      levelsize = zaxisInqSize(zaxisID);
+      double zinc = 0;
+      int zaxisID   = vlistZaxis(vlistID, index);
+      int zaxistype = zaxisInqType(zaxisID);
+      int ltype     = zaxisInqLtype(zaxisID);
+      int levelsize = zaxisInqSize(zaxisID);
+      int prec      = zaxisInqPrec(zaxisID);
+
+      int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+
       zaxisName(zaxistype, zaxisname);
       zaxisInqName(zaxisID, zname);
       zaxisInqUnits(zaxisID, zunits);
@@ -411,15 +411,16 @@ void printZaxisInfo(int vlistID)
       fprintf(stdout, " levels=%d", levelsize);
       fprintf(stdout, "\n");
 
-      levels = (double*) malloc((size_t)levelsize*sizeof(double));
+      double *levels = (double*) malloc((size_t)levelsize*sizeof(double));
       zaxisInqLevels(zaxisID, levels);
 
       if ( !(zaxistype == ZAXIS_SURFACE && levelsize == 1 && !(fabs(levels[0]) > 0)) )
         {
-          zfirst = levels[0];
-          zlast  = levels[levelsize-1];
+          double zfirst = levels[0];
+          double zlast  = levels[levelsize-1];
           if ( levelsize > 2 )
             {
+              int levelID;
               zinc = (levels[levelsize-1] - levels[0]) / (levelsize-1);
               for ( levelID = 2; levelID < levelsize; ++levelID )
                 if ( fabs(fabs(levels[levelID] - levels[levelID-1]) - zinc) > 0.001*zinc ) break;
@@ -427,12 +428,12 @@ void printZaxisInfo(int vlistID)
               if ( levelID < levelsize ) zinc = 0;
             }
 
-          fprintf(stdout, "%33s : %g", zname, zfirst);
+          fprintf(stdout, "%33s : %.*g", zname, dig, zfirst);
           if ( levelsize > 1 )
             {
-              fprintf(stdout, " to %g", zlast);
+              fprintf(stdout, " to %.*g", dig, zlast);
               if ( IS_NOT_EQUAL(zinc, 0) )
-                fprintf(stdout, " by %g", zinc);
+                fprintf(stdout, " by %.*g", dig, zinc);
             }
           fprintf(stdout, " %s", zunits);
           fprintf(stdout, "\n");
@@ -447,14 +448,14 @@ void printZaxisInfo(int vlistID)
 
           level1 = zaxisInqLbound(zaxisID, 0);
           level2 = zaxisInqUbound(zaxisID, 0);
-          fprintf(stdout, "%.9g-%.9g", level1, level2);
+          fprintf(stdout, "%.*g-%.*g", dig, level1, dig, level2);
           if ( levelsize > 1 )
             {
               level1 = zaxisInqLbound(zaxisID, levelsize-1);
               level2 = zaxisInqUbound(zaxisID, levelsize-1);
-              fprintf(stdout, " to %.9g-%.9g", level1, level2);
+              fprintf(stdout, " to %.*g-%.*g", dig, level1, dig, level2);
               if ( IS_NOT_EQUAL(zinc, 0) )
-                fprintf(stdout, " by %g", zinc);
+                fprintf(stdout, " by %.*g", dig, zinc);
             }
           fprintf(stdout, " %s", zunits);
           fprintf(stdout, "\n");
@@ -566,7 +567,6 @@ static
 void printTimesteps(int streamID, int taxisID, int verbose)
 {
   int nrecs;
-  int vdate, vtime;
   struct datetime {
     int vdate;
     int vtime;
@@ -585,13 +585,19 @@ void printTimesteps(int streamID, int taxisID, int verbose)
   int nfact = 1;
   int tsID = 0;
 
+#ifdef CDO
   dtlist_type *dtlist = dtlist_new();
-
+#endif
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
+#ifdef CDO
       dtlist_taxisInqTimestep(dtlist, taxisID, 0);
       int vdate = dtlist_get_vdate(dtlist, 0);
       int vtime = dtlist_get_vtime(dtlist, 0);
+#else
+      int vdate = taxisInqVdate(taxisID);
+      int vtime = taxisInqVtime(taxisID);
+#endif
 
       if ( verbose || tsID < NUM_TIMESTEP )
 	{
@@ -619,8 +625,9 @@ void printTimesteps(int streamID, int taxisID, int verbose)
       tsID++;
     }
 
+#ifdef CDO
   dtlist_delete(dtlist);
-
+#endif
   if ( nvdatetime )
     {
       fprintf(stdout, "\n");
@@ -635,8 +642,8 @@ void printTimesteps(int streamID, int taxisID, int verbose)
         }
       for ( int i = toff; i < nvdatetime; ++i )
 	{
-	  vdate = next_vdatetime->vdate;
-	  vtime = next_vdatetime->vtime;
+	  int vdate = next_vdatetime->vdate;
+	  int vtime = next_vdatetime->vtime;
 	  ntimeout = printDateTime(ntimeout, vdate, vtime);
 	  next_vdatetime = next_vdatetime->next;
 	}

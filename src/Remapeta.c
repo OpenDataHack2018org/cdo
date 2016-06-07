@@ -45,9 +45,7 @@ void setmissval(long nvals, int *imiss, double missval, double *array)
 static
 void corr_hum(long gridsize, double *q, double q_min)
 {
-  long i;
-
-  for ( i = 0; i < gridsize; ++i )
+  for ( long i = 0; i < gridsize; ++i )
     {
       if ( q[i] < q_min ) q[i] = q_min;
     }
@@ -92,7 +90,7 @@ long ncctop(double cptop, long nlev, long nlevp1, double *vct_a, double *vct_b)
       if ( zp[jk] >= cptop ) break;
     }
 
-  return (nctop);
+  return nctop;
 }
 
 
@@ -100,16 +98,12 @@ double *vctFromFile(const char *filename, int *nvct)
 {
   char line[1024], *pline;
   int num, i = 0;
-  int nlevh2, nvct2;
   int maxvct = 8192;
-  double *vct2;
-  FILE *fp;
 
-
-  fp = fopen(filename, "r");
+  FILE *fp = fopen(filename, "r");
   if ( fp == NULL ) { perror(filename); exit(EXIT_FAILURE); }
 
-  vct2 = (double*) Malloc(maxvct*sizeof(double));
+  double *vct2 = (double*) Malloc(maxvct*sizeof(double));
 
   while ( readline(fp, line, 1024) )
     {
@@ -132,8 +126,8 @@ double *vctFromFile(const char *filename, int *nvct)
 
   fclose(fp);
 
-  nvct2 = 2*i;
-  nlevh2 = i - 1;
+  int nvct2 = 2*i;
+  int nlevh2 = i - 1;
 
   for ( i = 0; i < nlevh2+1; ++i )
     vct2[i+nvct2/2] = vct2[i+maxvct/2];
@@ -142,7 +136,7 @@ double *vctFromFile(const char *filename, int *nvct)
 
   *nvct = nvct2;
 
-  return (vct2);
+  return vct2;
 }
 
 static
@@ -174,33 +168,68 @@ void vert_sumw(double *sum, double *var3d, long gridsize, long nlevel, double *d
 }
 
 
+double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf)
+{
+  int zaxisIDh = -1;
+  int nhlevf = 0;
+  int nvct = 0;
+  double *vct = NULL;
+
+  bool lhavevct = false;
+  int nzaxis = vlistNzaxis(vlistID);
+  for ( int i = 0; i < nzaxis; i++ )
+    {
+      int zaxisID = vlistZaxis(vlistID, i);
+      int nlevel  = zaxisInqSize(zaxisID);
+
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 )
+	{
+          nvct = zaxisInqVctSize(zaxisID);
+
+          if ( nlevel == (nvct/2 - 1) )
+            {
+	      if ( lhavevct == false )
+		{
+		  lhavevct = true;
+                  zaxisIDh = zaxisID;
+                  nhlevf  = nlevel;
+ 
+                  vct = (double*) Malloc(nvct*sizeof(double));
+                  zaxisInqVct(zaxisID, vct);
+                }
+            }
+          else 
+            {
+              if ( cdoVerbose )
+                cdoPrint("nlevel = (nvct1/2 - 1): nlevel = %d", nlevel);
+              if ( nlevel < (nvct/2 - 1) )
+                cdoPrint("z-axis %d has only %d of %d hybrid sigma pressure levels!", i+1, nlevel, (nvct/2 - 1));
+            }
+	}
+    }
+
+  *rzaxisIDh = zaxisIDh;
+  *rnvct   = nvct;
+  *rnhlevf = nhlevf;
+  
+  return vct;
+}
+
 #define  MAX_VARS3D  1024
 
 void *Remapeta(void *argument)
 {
-  int REMAPETA, REMAPETAS, REMAPETAZ;
-  int operatorID;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
   int nfis2gp = 0;
   int recID, nrecs;
   int i, offset, iv;
-  int tsID, varID, levelID;
-  int nvars, nvars3D = 0;
-  int zaxisID2, zaxisIDh = -1, nzaxis, surfaceID;
-  int gridID, zaxisID;
+  int varID, levelID;
+  int nvars3D = 0;
+  int zaxisID;
   int nlevel;
-  int nvct1, nvct2 = 0;
   int sgeopotID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1, presID = -1;
   int code;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
-  int taxisID1, taxisID2;
-  int lhavevct;
-  int nhlevf1 = 0, nhlevf2 = 0;
-  double *lev2;
-  double *vct1 = NULL, *vct2 = NULL;
-  double *a1 = NULL, *b1 = NULL, *a2 = NULL, *b2 = NULL;
   double *fis1 = NULL, *ps1 = NULL, *t1 = NULL, *q1 = NULL;
   double *fis2 = NULL, *ps2 = NULL, *t2 = NULL, *q2 = NULL;
   double *tscor = NULL, *pscor = NULL, *secor = NULL;
@@ -220,22 +249,21 @@ void *Remapeta(void *argument)
   double missval = 0;
   double cconst = 1.E-6;
   const char *fname;
-  char *envstr;
   double cptop  = 0; /* min. pressure level for cond. */
 
   if ( cdoTimer ) timer_hetaeta = timer_new("Remapeta_hetaeta");
 
   cdoInitialize(argument);
 
-  REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
-  REMAPETAS = cdoOperatorAdd("remapeta_s", 0, 0, "VCT file name");
-  REMAPETAZ = cdoOperatorAdd("remapeta_z", 0, 0, "VCT file name");
+  int REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
+  int REMAPETAS = cdoOperatorAdd("remapeta_s", 0, 0, "VCT file name");
+  int REMAPETAZ = cdoOperatorAdd("remapeta_z", 0, 0, "VCT file name");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  envstr = getenv("REMAPETA_PTOP");
+  char *envstr = getenv("REMAPETA_PTOP");
   if ( envstr )
     {
       double fval = atof(envstr);
@@ -247,17 +275,18 @@ void *Remapeta(void *argument)
 	}
     }  
 
-  vct2 = vctFromFile(operatorArgv()[0], &nvct2);
-  nhlevf2 = nvct2/2 - 1;
+  int nvct2 = 0;
+  double *vct2 = vctFromFile(operatorArgv()[0], &nvct2);
+  int nhlevf2 = nvct2/2 - 1;
 
-  a2 = vct2;
-  b2 = vct2 + nvct2/2;
+  double *a2 = vct2;
+  double *b2 = vct2 + nvct2/2;
 
   if ( cdoVerbose )
     for ( i = 0; i < nhlevf2+1; ++i )
       cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2/2+i]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
   if ( operatorArgc() == 2 )
     {
@@ -270,10 +299,10 @@ void *Remapeta(void *argument)
       streamID = streamOpenRead(fileargument);
       file_argument_free(fileargument);
 
-      vlistID1 = streamInqVlist(streamID);
+      int vlistID1 = streamInqVlist(streamID);
 
       streamInqRecord(streamID, &varID, &levelID);
-      gridID  = vlistInqVarGrid(vlistID1, varID);
+      int gridID  = vlistInqVarGrid(vlistID1, varID);
       nfis2gp = gridInqSize(gridID);
 
       fis2 = (double*) Malloc(nfis2gp*sizeof(double));
@@ -306,21 +335,21 @@ void *Remapeta(void *argument)
       streamClose(streamID); 
     }
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  gridID = vlistGrid(vlistID1, 0);
+  int gridID = vlistGrid(vlistID1, 0);
   if ( gridInqType(gridID) == GRID_SPECTRAL )
     cdoAbort("Spectral data unsupported!");
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nhlevf2);
-  lev2 = (double*) Malloc(nhlevf2*sizeof(double));
+  int zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nhlevf2);
+  double *lev2 = (double*) Malloc(nhlevf2*sizeof(double));
   for ( i = 0; i < nhlevf2; ++i ) lev2[i] = i+1;
   zaxisDefLevels(zaxisID2, lev2);
   Free(lev2);
@@ -328,76 +357,32 @@ void *Remapeta(void *argument)
   if ( nvct2 == 0 ) cdoAbort("Internal problem, vct2 undefined!");
   zaxisDefVct(zaxisID2, nvct2, vct2);
 
-  surfaceID = zaxisFromName("surface");
+  int surfaceID = zaxisFromName("surface");
 
-  nzaxis  = vlistNzaxis(vlistID1);
-  lhavevct = FALSE;
+  int zaxisIDh = -1;
+  int nvct1 = 0;
+  int nhlevf1 = 0;
+  double *vct1 = vlist_hybrid_vct(vlistID1, &zaxisIDh, &nvct1, &nhlevf1);
 
-  if ( cdoVerbose )
-    cdoPrint("nzaxis: %d", nzaxis);
+  vlist_change_hybrid_zaxis(vlistID1, vlistID2, zaxisIDh, zaxisID2);
 
-  for ( i = 0; i < nzaxis; i++ )
+  int nzaxis = vlistNzaxis(vlistID1);
+  for ( int i = 0; i < nzaxis; i++ )
     {
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
-	{
-	  if ( nlevel > 1 )
-	    {
-	      nvct1 = zaxisInqVctSize(zaxisID);
-
-              if ( cdoVerbose )
-                cdoPrint("i: %d, vct1 size of zaxisID %d = %d", i, zaxisID, nvct1);
-
-	      if ( nlevel == (nvct1/2 - 1) )
-		{
-		  if ( lhavevct == FALSE )
-		    {
-		      lhavevct = TRUE;
-		      zaxisIDh = zaxisID;
-		      nhlevf1  = nlevel;
-	      
-                      if ( cdoVerbose )
-                        cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf1   = %d", zaxisIDh, nlevel);
- 
-		      vct1 = (double*) Malloc(nvct1*sizeof(double));
-		      zaxisInqVct(zaxisID, vct1);
-		      
-		      vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
-
-		      a1 = vct1;
-		      b1 = vct1 + nvct1/2;
-		      if ( cdoVerbose )
-			for ( i = 0; i < nvct1/2; ++i )
-			  cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1/2+i]);
-		    }
-		  else
-		    {
-		      if ( memcmp(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double)) == 0 )
-			vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
-		    }
-		}
-              else 
-                {
-		  if ( cdoVerbose )
-		    cdoPrint("nlevel = (nvct1/2 - 1): nlevel = %d", nlevel);
-		  if ( nlevel < (nvct1/2 - 1) )
-		    cdoPrint("z-axis %d has only %d of %d hybrid sigma pressure levels!", i+1, nlevel, (nvct1/2 - 1));
-                }
-	    }
-	  else
-	    {
-	      vlistChangeZaxisIndex(vlistID2, i, surfaceID);
-	    }
-	}
-      else
-        {
-	  if ( cdoVerbose )
-	    cdoPrint("i: %d, type of zaxisID %d not ZAXIS_HYBRID", i, zaxisID);
-        }
+      int zaxisID = vlistZaxis(vlistID1, i);
+      int nlevel  = zaxisInqSize(zaxisID);
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == 1 )
+        vlistChangeZaxisIndex(vlistID2, i, surfaceID);
     }
+  
+  double *a1 = vct1;
+  double *b1 = vct1 + nvct1/2;
+  if ( cdoVerbose )
+    for ( i = 0; i < nvct1/2; ++i )
+      cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1/2+i]);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
@@ -405,7 +390,7 @@ void *Remapeta(void *argument)
   if ( zaxisIDh == -1 )
     cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -563,7 +548,7 @@ void *Remapeta(void *argument)
 
   if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d", nvars3D, ltq);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

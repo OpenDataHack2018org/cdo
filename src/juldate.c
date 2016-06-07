@@ -43,9 +43,7 @@ juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1)
 
 juldate_t juldate_add_seconds(int seconds, juldate_t juldate)
 {
-  juldate_t juldate_new;
-
-  juldate_new = juldate;
+  juldate_t juldate_new = juldate;
 
   julday_add_seconds(seconds, &juldate_new.julday, &juldate_new.secofday);
 
@@ -55,9 +53,7 @@ juldate_t juldate_add_seconds(int seconds, juldate_t juldate)
 
 double juldate_to_seconds(juldate_t juldate)
 {
-  double seconds;
-
-  seconds = juldate.julday*86400. + juldate.secofday;
+  double seconds = juldate.julday*86400. + juldate.secofday;
 
   return seconds;
 }

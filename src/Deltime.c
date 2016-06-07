@@ -25,19 +25,12 @@
 
 void *Deltime(void *argument)
 {
-  int DELDAY, DEL29FEB;
-  int operatorID;
-  int streamID1, streamID2;
-  int tsID, tsID2, nrecs;
+  int nrecs;
   int recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
   int vdate /*, vtime */;
   int copytimestep;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
-  int nfound;
   int year, month, day;
   int dday, dmon;
   double *array = NULL;
@@ -45,12 +38,14 @@ void *Deltime(void *argument)
 
   cdoInitialize(argument);
 
-  DELDAY   = cdoOperatorAdd("delday",   0, 0, NULL);
-  DEL29FEB = cdoOperatorAdd("del29feb", 0, 0, NULL);
+  bool lcopy = UNCHANGED_RECORD;
+
+  int DELDAY   = cdoOperatorAdd("delday",   0, 0, NULL);
+  int DEL29FEB = cdoOperatorAdd("del29feb", 0, 0, NULL);
 
   UNUSED(DELDAY);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == DEL29FEB )
     {
@@ -84,19 +79,17 @@ void *Deltime(void *argument)
 
   if ( cdoVerbose ) cdoPrint("delete day %d%s", dday, cmons[dmon]);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
-
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   taxisDefCalendar(taxisID2, CALENDAR_365DAYS);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
@@ -106,9 +99,9 @@ void *Deltime(void *argument)
       array = (double*) Malloc(gridsize*sizeof(double));
     }
       
-  nfound = 0;
-  tsID  = 0;
-  tsID2 = 0;
+  int nfound = 0;
+  int tsID  = 0;
+  int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);

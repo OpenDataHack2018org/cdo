@@ -497,12 +497,11 @@ void knn_store_distance(int nadd, double distance, int num_neighbors, int *restr
     }
   else
     {
-      int n, nchk;
-      for ( nchk = 0; nchk < num_neighbors; ++nchk )
+      for ( int nchk = 0; nchk < num_neighbors; ++nchk )
 	{
 	  if ( distance < nbr_dist[nchk] || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]) )
 	    {
-	      for ( n = num_neighbors-1; n > nchk; --n )
+	      for ( int n = num_neighbors-1; n > nchk; --n )
 		{
 		  nbr_add[n]  = nbr_add[n-1];
 		  nbr_dist[n] = nbr_dist[n-1];
@@ -516,10 +515,10 @@ void knn_store_distance(int nadd, double distance, int num_neighbors, int *restr
 }
 
 static
-void knn_check_distance(unsigned num_neighbors, const int *restrict nbr_add, double *restrict nbr_dist)
+void knn_check_distance(int num_neighbors, const int *restrict nbr_add, double *restrict nbr_dist)
 {
   // If distance is zero, set to small number
-  for ( unsigned nchk = 0; nchk < num_neighbors; ++nchk )
+  for ( int nchk = 0; nchk < num_neighbors; ++nchk )
     if ( nbr_add[nchk] >= 0 && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
 }
 
@@ -537,14 +536,16 @@ void gridsearch_knn_init(struct gsknn *knn)
     }
 }
 
+
 struct gsknn *gridsearch_knn_new(unsigned size)
 {
   struct gsknn *knn = (struct gsknn *) Malloc(sizeof(struct gsknn));
   
   knn->ndist   = size;
   knn->size    = size;
-  knn->add     = (int*) Malloc(size*sizeof(int));       /* source address at nearest neighbors        */
-  knn->dist    = (double*) Malloc(size*sizeof(double)); /* angular distance of the nearest neighbors  */
+  knn->mask    = (int*) Malloc(size*sizeof(int));       // mask at nearest neighbors
+  knn->add     = (int*) Malloc(size*sizeof(int));       // source address at nearest neighbors
+  knn->dist    = (double*) Malloc(size*sizeof(double)); // angular distance of the nearest neighbors
   knn->tmpadd  = NULL;
   knn->tmpdist = NULL;
 
@@ -563,6 +564,7 @@ void gridsearch_knn_delete(struct gsknn *knn)
       if ( knn->add     ) Free(knn->add);
       if ( knn->tmpdist ) Free(knn->tmpdist);
       if ( knn->tmpadd  ) Free(knn->tmpadd);
+      if ( knn->mask    ) Free(knn->mask);
       Free(knn);
     }
 }

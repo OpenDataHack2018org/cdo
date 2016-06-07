@@ -24,13 +24,12 @@
 void *Template1(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
-  int lcopy = FALSE;
+  int varID, levelID;
   int gridsize, nmiss;
 
   cdoInitialize(argument);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = UNCHANGED_RECORD;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -59,7 +58,7 @@ void *Template1(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
@@ -94,7 +93,7 @@ void *Template1(void *argument)
 void *Template2(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int nmiss;
 
   cdoInitialize(argument);
@@ -122,7 +121,7 @@ void *Template2(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

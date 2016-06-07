@@ -29,18 +29,12 @@
 
 void *Splitrec(void *argument)
 {
-  int nchars;
-  int streamID1, streamID2;
   int varID;
-  int nrecs;
-  int tsID, recID, levelID;
+  int recID, levelID;
   int varID2, levelID2;
-  int vlistID1, vlistID2;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
-  int index;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
   double *array = NULL;
@@ -49,16 +43,16 @@ void *Splitrec(void *argument)
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  bool lcopy = UNCHANGED_RECORD;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  nrecs  = vlistNrecs(vlistID1);
+  int nrecs  = vlistNrecs(vlistID1);
 
   strcpy(filename, cdoStreamName(1)->args);
-  nchars = strlen(filename);
+  int nchars = strlen(filename);
 
   refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
@@ -71,8 +65,8 @@ void *Splitrec(void *argument)
       array = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  index = 0;
-  tsID = 0;
+  int index = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       for ( recID = 0; recID < nrecs; recID++ )
@@ -82,7 +76,7 @@ void *Splitrec(void *argument)
 	  vlistClearFlag(vlistID1);
 	  vlistDefFlag(vlistID1, varID, levelID, TRUE);
 
-	  vlistID2 = vlistCreate();
+	  int vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 
 	  index++;
@@ -93,7 +87,7 @@ void *Splitrec(void *argument)
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	  argument_t *fileargument = file_argument_new(filename);
-	  streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+	  int streamID2 = streamOpenWrite(fileargument, cdoFiletype());
 	  file_argument_free(fileargument);
 
 	  streamDefVlist(streamID2, vlistID2);

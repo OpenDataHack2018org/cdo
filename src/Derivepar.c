@@ -32,54 +32,17 @@
 
 void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev);
 
-
-void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval)
-{
-  long i;
-  double xmin =  DBL_MAX;
-  double xmax = -DBL_MAX;
-
-  if ( imiss )
-    {
-      for ( i = 0; i < nvals; ++i )
-	{
-	  if ( ! imiss[i] )
-	    {
-	      if      ( array[i] > xmax ) xmax = array[i];
-	      else if ( array[i] < xmin ) xmin = array[i];
-	    }
-	}
-    }
-  else
-    {
-      xmin = array[0];
-      xmax = array[0];
-      for ( i = 1; i < nvals; ++i )
-	{
-	  if      ( array[i] > xmax ) xmax = array[i];
-	  else if ( array[i] < xmin ) xmin = array[i];
-	}
-    }
-
-  *minval = xmin;
-  *maxval = xmax;
-}
-
+double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf);
 
 void *Derivepar(void *argument)
 {
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
-  int streamID2;
-  int vlistID2;
   int recID, nrecs;
   int i, offset;
-  int tsID, varID, levelID;
-  int nvars;
-  int zaxisIDh = -1, nzaxis;
+  int varID, levelID;
   int zaxisID;
   int nlevel;
-  int nvct;
   int surfaceID = -1;
   int sgeopotID = -1, geopotID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
   // int clwcID = -1, ciwcID = -1;
@@ -88,26 +51,16 @@ void *Derivepar(void *argument)
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
-  int taxisID1, taxisID2;
-  int lhavevct;
-  int nhlevf = 0;
-  double *vct = NULL;
-  double *sgeopot = NULL, *ps = NULL, *temp = NULL, *hum = NULL;
   // double *lwater = NULL, *iwater = NULL;
-  double *gheight = NULL;
-  double *sealevelpressure = NULL;
   int nmiss, nmissout = 0;
-  double *array = NULL;
-  double *half_press = NULL;
   double *full_press = NULL;
   double minval, maxval;
   int instNum, tableNum;
-  int useTable;
   gribcode_t gribcodes = {0};
 
   cdoInitialize(argument);
 
-  int GHEIGHT          = cdoOperatorAdd("gheight",   0, 0, NULL);
+  int GHEIGHT          = cdoOperatorAdd("gheight",            0, 0, NULL);
   int SEALEVELPRESSURE = cdoOperatorAdd("sealevelpressure",   0, 0, NULL);
 
   int operatorID = cdoOperatorID();
@@ -122,66 +75,28 @@ void *Derivepar(void *argument)
  
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  nzaxis  = vlistNzaxis(vlistID1);
-  lhavevct = FALSE;
+  int zaxisIDh = -1;
+  int nvct = 0;
+  int nhlevf = 0;
+  double *vct = vlist_hybrid_vct(vlistID1, &zaxisIDh, &nvct, &nhlevf);
 
   if ( cdoVerbose )
-    cdoPrint("nzaxis: %d", nzaxis);
-
-  for ( i = 0; i < nzaxis; i++ )
-    {
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
-	{
-	  if ( nlevel > 1 )
-	    {
-	      nvct = zaxisInqVctSize(zaxisID);
-
-              if ( cdoVerbose )
-                cdoPrint("i: %d, vct size of zaxisID %d = %d", i, zaxisID, nvct);
-
-	      if ( nlevel == (nvct/2 - 1) )
-		{
-		  if ( lhavevct == FALSE )
-		    {
-		      lhavevct = TRUE;
-		      zaxisIDh = zaxisID;
-		      nhlevf   = nlevel;
-	      
-                      if ( cdoVerbose )
-                        cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf   = %d", zaxisIDh, nlevel);
- 
-		      vct = (double*) Malloc(nvct*sizeof(double));
-		      zaxisInqVct(zaxisID, vct);
-
-		      if ( cdoVerbose )
-			for ( i = 0; i < nvct/2; ++i )
-			  cdoPrint("vct: %5d %25.17f %25.17f", i, vct[i], vct[nvct/2+i]);
-		    }
-		}
-              else 
-                {
-		  if ( cdoVerbose )
-		    cdoPrint("nlevel = (nvct/2 - 1): nlevel = %d", nlevel);
-                }
-	    }
-	}
-    }
+    for ( i = 0; i < nvct/2; ++i )
+      cdoPrint("vct: %5d %25.17f %25.17f", i, vct[i], vct[nvct/2+i]);
 
   if ( zaxisIDh == -1 )
     cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  useTable = FALSE;
+  bool useTable = false;
   for ( varID = 0; varID < nvars; varID++ )
     {
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
       if ( tableNum > 0  && tableNum != 255 )
 	{
-	  useTable = TRUE;
+	  useTable = true;
 	  break;
 	}
     }
@@ -283,16 +198,18 @@ void *Derivepar(void *argument)
 
   if ( tempID == -1 ) cdoAbort("%s not found!", var_stdname(air_temperature));
 
-  array   = (double*) Malloc(gridsize*sizeof(double));
-  sgeopot = (double*) Malloc(gridsize*sizeof(double));
-  ps      = (double*) Malloc(gridsize*sizeof(double));
-  temp    = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  double *array   = (double*) Malloc(gridsize*sizeof(double));
+  double *sgeopot = (double*) Malloc(gridsize*sizeof(double));
+  double *ps      = (double*) Malloc(gridsize*sizeof(double));
+  double *temp    = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
   // lwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
   // iwater = (double*) Malloc(gridsize*nhlevf*sizeof(double));
 
-  half_press = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
+  double *half_press = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
 
+  double *hum = NULL;
+  double *gheight = NULL;
   if ( operatorID == GHEIGHT )
     {
       if ( humID == -1 )
@@ -303,6 +220,7 @@ void *Derivepar(void *argument)
       gheight = (double*) Malloc(gridsize*(nhlevf+1)*sizeof(double));
     }
   
+  double *sealevelpressure = NULL;
   if ( operatorID == SEALEVELPRESSURE )
     {
       full_press   = (double*) Malloc(gridsize*nhlevf*sizeof(double));
@@ -338,7 +256,7 @@ void *Derivepar(void *argument)
 	cdoPrint("using %s", var_stdname(surface_air_pressure));
     }
 
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
 
   int var_id = -1;
 
@@ -360,15 +278,15 @@ void *Derivepar(void *argument)
   vlistDefVarStdname(vlistID2, varID, var_stdname(var_id));
   vlistDefVarUnits(vlistID2, varID, var_units(var_id));
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

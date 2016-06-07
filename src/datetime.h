@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 
-#define  TIMESTAT_FIRST  1
-#define  TIMESTAT_LAST   2
-#define  TIMESTAT_MEAN   3
+#define  TIMESTAT_FIRST    1
+#define  TIMESTAT_LAST     2
+#define  TIMESTAT_MEAN     3
+#define  TIMESTAT_MIDHIGH  4
 
 
 typedef struct {

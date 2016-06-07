@@ -33,13 +33,8 @@
 
 void *Setgrid(void *argument)
 {
-  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK, UNSETGRIDMASK, SETGRIDNUMBER, SETGRIDURI;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
+  int recID, varID, levelID;
   int gridID1, gridID2 = -1;
   int ngrids, index;
   int gridtype = -1;
@@ -59,22 +54,23 @@ void *Setgrid(void *argument)
   char *griduri = NULL;
   double *gridmask = NULL;
   double *areaweight = NULL;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
-  SETGRID       = cdoOperatorAdd("setgrid",       0, 0, "grid description file or name");
-  SETGRIDTYPE   = cdoOperatorAdd("setgridtype",   0, 0, "grid type");
-  SETGRIDAREA   = cdoOperatorAdd("setgridarea",   0, 0, "filename with area weights");
-  SETGRIDMASK   = cdoOperatorAdd("setgridmask",   0, 0, "filename with grid mask");
-  UNSETGRIDMASK = cdoOperatorAdd("unsetgridmask", 0, 0, NULL);
-  SETGRIDNUMBER = cdoOperatorAdd("setgridnumber", 0, 0, "grid number and optionally grid position");
-  SETGRIDURI    = cdoOperatorAdd("setgriduri",    0, 0, "reference URI of the horizontal grid");
+  int SETGRID       = cdoOperatorAdd("setgrid",       0, 0, "grid description file or name");
+  int SETGRIDTYPE   = cdoOperatorAdd("setgridtype",   0, 0, "grid type");
+  int SETGRIDAREA   = cdoOperatorAdd("setgridarea",   0, 0, "filename with area weights");
+  int SETGRIDMASK   = cdoOperatorAdd("setgridmask",   0, 0, "filename with grid mask");
+  int UNSETGRIDMASK = cdoOperatorAdd("unsetgridmask", 0, 0, NULL);
+  int SETGRIDNUMBER = cdoOperatorAdd("setgridnumber", 0, 0, "grid number and optionally grid position");
+  int SETGRIDURI    = cdoOperatorAdd("setgriduri",    0, 0, "reference URI of the horizontal grid");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID != UNSETGRIDMASK )
     operatorInputArg(cdoOperatorEnter(operatorID));  
+
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
   if ( operatorID == SETGRID )
     {
@@ -188,13 +184,11 @@ void *Setgrid(void *argument)
       griduri = operatorArgv()[0];
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
-
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( operatorID == SETGRID )
@@ -306,8 +300,14 @@ void *Setgrid(void *argument)
 	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
 
-	  if ( gridID2 == -1 ) cdoAbort("Unsupported grid type!");
-
+	  if ( gridID2 == -1 )
+            {
+              if ( lregular )
+                cdoAbort("No Gaussian reduced grid found!");
+              else
+                cdoAbort("Unsupported grid type!");
+            }
+          
 	  vlistChangeGridIndex(vlistID2, index, gridID2);
 	}
     }
@@ -362,7 +362,7 @@ void *Setgrid(void *argument)
 	}
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
   //vlistPrint(vlistID2);
@@ -373,9 +373,9 @@ void *Setgrid(void *argument)
     gridsize = vlistGridsizeMax(vlistID1);
 
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

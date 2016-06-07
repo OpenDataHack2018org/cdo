@@ -5,6 +5,9 @@
 #include "config.h"
 #endif
 
+#include <math.h>
+#include <stdbool.h>
+
 #ifndef  M_PI
 #define  M_PI        3.14159265358979323846264338327950288  /* pi */
 #endif
@@ -18,6 +21,8 @@
 #define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
 #endif
 
+
+bool grid_is_distance_generic(int gridID);
 
 void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description);
 void grid_to_degree(const char *units, long nvals, double *restrict values, const char *description);

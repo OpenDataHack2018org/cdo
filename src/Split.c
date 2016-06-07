@@ -60,7 +60,6 @@ void *Split(void *argument)
   int nsplit = 0;
   int index;
   int i;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
   int swap_obase = FALSE;
@@ -69,6 +68,8 @@ void *Split(void *argument)
   cdoInitialize(argument);
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
+
+  bool lcopy = UNCHANGED_RECORD;
 
   int SPLITCODE   = cdoOperatorAdd("splitcode",   0, 0, NULL);
   int SPLITPARAM  = cdoOperatorAdd("splitparam",  0, 0, NULL);
@@ -88,8 +89,6 @@ void *Split(void *argument)
           uuid_attribute = operatorArgv()[i] + 5;
       else cdoAbort("Unknown parameter: >%s<", operatorArgv()[0]); 
     }
-
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

@@ -36,7 +36,7 @@ char *FieldName(int code, const char *text)
 
   sprintf(name, "[%3d].%s", code, text);
 
-  return (name);
+  return name;
 }
 
 /* Free array space */
@@ -45,15 +45,13 @@ void *FreeMemory(void *ptr)
 {
   Free(ptr);
 
-  return (NULL);
+  return NULL;
 }
 
 static
 void FreeSpectral(struct Variable *vars)
 {
-  int code;
-
-  for ( code = MaxCodes-1; code >= 0; --code )
+  for ( int code = MaxCodes-1; code >= 0; --code )
     if ( vars[code].spectral )
       vars[code].spectral = (double *)FreeMemory(vars[code].spectral);
 }
@@ -61,9 +59,7 @@ void FreeSpectral(struct Variable *vars)
 static
 void FreeFourier(struct Variable *vars)
 {
-  int code;
-
-  for ( code = 0; code < MaxCodes; code++ )
+  for ( int code = 0; code < MaxCodes; code++ )
     if ( vars[code].fourier )
       vars[code].fourier = (double *)FreeMemory(vars[code].fourier);
 }
@@ -71,9 +67,7 @@ void FreeFourier(struct Variable *vars)
 static
 void FreeHybrid(struct Variable *vars)
 {
-  int code;
-
-  for ( code = 0; code < MaxCodes; code++ )
+  for ( int code = 0; code < MaxCodes; code++ )
     if ( vars[code].hybrid )
       vars[code].hybrid = (double *)FreeMemory(vars[code].hybrid);
 }
@@ -81,9 +75,7 @@ void FreeHybrid(struct Variable *vars)
 static
 void FreeGrid(struct Variable *vars)
 {
-  int code;
-
-  for ( code = 0; code < MaxCodes; code++ )
+  for ( int code = 0; code < MaxCodes; code++ )
     if ( vars[code].grid )
       vars[code].grid = (double *)FreeMemory(vars[code].grid);
 }
@@ -91,9 +83,7 @@ void FreeGrid(struct Variable *vars)
 static
 void FreeSamp(struct Variable *vars)
 {
-  int code;
-
-  for ( code = 0; code < MaxCodes; code++ )
+  for ( int code = 0; code < MaxCodes; code++ )
     if ( vars[code].samp )
       vars[code].samp = (int *)FreeMemory(vars[code].samp);
 }
@@ -111,7 +101,7 @@ double *alloc_dp(int words, const char *array_name)
       if ( result == NULL ) SysError(array_name, "No Memory!");
     }
 
-  return(result);
+  return result;
 }
 
 /* after_copy_array - Copy array of type double */
@@ -131,33 +121,26 @@ void after_zero_array(double *field, int words)
 static
 void IniQuaSum(double *dest, const double *restrict src, int len)
 {
-  int i;
-
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     dest[i] = src[i] * src[i];
 }
 
 static 
 void AddQuaSum(double *dest, const double *restrict src, int len)
 {
-  int i;
-
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     dest[i] += src[i] * src[i];
 }
 
 static
 void VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 {
-  int i;
-  double rn1;
+  const double rn1 = 1.0 / (n-1);
 
-  rn1 = 1.0 / (n-1);
-
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     Variance[i] = (Variance[i] - Sum[i] * Sum[i] * n) * rn1;
 
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     if (Variance[i] > 0.0) Variance[i] = sqrt(Variance[i]);
     else                   Variance[i] = 0.0;
 }
@@ -165,11 +148,9 @@ void VarQuaSum(double *Variance, const double *restrict Sum, int len, int n)
 static
 void AddVector(double * restrict dest, const double *restrict src, long len, int *nmiss, double missval)
 {
-  long i;
-
   if ( *nmiss > 0 )
     {
-      for ( i = 0; i < len; i++ )
+      for ( long i = 0; i < len; i++ )
 	if ( IS_NOT_EQUAL(src[i], missval) )
 	  {
 	    if ( IS_NOT_EQUAL(dest[i], missval) )
@@ -179,7 +160,7 @@ void AddVector(double * restrict dest, const double *restrict src, long len, int
 	  }
 
       *nmiss = 0;
-      for ( i = 0; i < len; i++ )
+      for ( long i = 0; i < len; i++ )
 	if ( IS_EQUAL(dest[i], missval) ) *nmiss = *nmiss + 1;
 
       if ( *nmiss == 0 ) *nmiss = 1;
@@ -189,36 +170,30 @@ void AddVector(double * restrict dest, const double *restrict src, long len, int
 #if defined (_OPENMP)
 #pragma omp parallel for
 #endif
-      for ( i = 0; i < len; i++ ) dest[i] += src[i];
+      for ( long i = 0; i < len; i++ ) dest[i] += src[i];
     }
 }
 
 static
 void Add2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, int len)
 {
-  int i;
-
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     dest[i] = srcA[i] + srcB[i];
 }
 
 static
 void Sub2Vectors(double *dest, const double *restrict srcA, const double *restrict srcB, int len)
 {
-  int i;
-
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     dest[i] = srcA[i] - srcB[i];
 }
 
 static
 void MultVectorScalar(double *dest, const double *restrict src, double factor, int len, int nmiss, double missval)
 {
-  int i;
-
   if ( nmiss > 0 )
     {
-      for ( i = 0; i < len; i++ )
+      for ( int i = 0; i < len; i++ )
 	{
 	  if ( IS_EQUAL(src[i], missval) )
 	    dest[i] = missval;
@@ -228,18 +203,16 @@ void MultVectorScalar(double *dest, const double *restrict src, double factor, i
     }
   else
     {
-      for ( i = 0; i < len; i++ ) dest[i] = src[i] * factor;
+      for ( int i = 0; i < len; i++ ) dest[i] = src[i] * factor;
     }
 }
 
 static
 void DivVectorIvector(double *dest, const double *restrict src, const int *samp, int len, int *nmiss, double missval)
 {
-  int i;
-
   *nmiss = 0;
 
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     {
       if ( IS_EQUAL(src[i], missval) || samp[i] == 0 )
 	{
@@ -347,26 +320,24 @@ void sh2rh(int AnalysisData, double *sphum, double *rhum, double *t, int lev,
    int lp,i;
    int lpi,lfp;
    double  es, qsatr;
-   double *fullp;
-   double  RALPW, RBETW, RGAMW;
-   // double  RALPS, RBETS, RGAMS;
    double  RALP , RBET , RGAM ;
 
    /* ***************************************************** */
    /* Define constants for calculation in presence of water */
    /* ***************************************************** */
-   RGAMW = (C_RCW - C_RCPV) / C_RV;
-   RBETW = C_RLVTT / C_RV + RGAMW * C_RTT;
-   RALPW = log(C_RESTT) + RBETW / C_RTT + RGAMW * log(C_RTT);
+   const double RGAMW = (C_RCW - C_RCPV) / C_RV;
+   const double RBETW = C_RLVTT / C_RV + RGAMW * C_RTT;
+   const double RALPW = log(C_RESTT) + RBETW / C_RTT + RGAMW * log(C_RTT);
 
    /* ***************************************************** */
    /* Define constants for calculation in presence of  ice  */
    /* ***************************************************** */
    /*
-   RGAMS = (C_RCS - C_RCPV) / C_RV;
-   RBETS = C_RLSTT / C_RV + RGAMS * C_RTT;
-   RALPS = log(C_RESTT) + RBETS / C_RTT + RGAMS * log(C_RTT);
+   const double RGAMS = (C_RCS - C_RCPV) / C_RV;
+   const double RBETS = C_RLSTT / C_RV + RGAMS * C_RTT;
+   const double RALPS = log(C_RESTT) + RBETS / C_RTT + RGAMS * log(C_RTT);
    */
+   double *fullp;
    if (AnalysisData) fullp = level;
    else              fullp = fullpresshybrid;
 
@@ -401,23 +372,21 @@ void rh2sh(double *sphum, double *rhum, double *t, int lev, int dimgpout, double
    int lp,i;
    int lpi;
    double  es,qsat;
-   double  RALPW, RBETW, RGAMW;
-   // double  RALPS, RBETS, RGAMS;
    double  RALP , RBET , RGAM ;
 
 /* ***************************************************** */
 /* Define constants for calculation in presence of water */
 /* ***************************************************** */
-   RGAMW = (C_RCW - C_RCPV) / C_RV;
-   RBETW = C_RLVTT / C_RV + RGAMW * C_RTT;
-   RALPW = log(C_RESTT) + RBETW / C_RTT + RGAMW * log(C_RTT);
+   const double RGAMW = (C_RCW - C_RCPV) / C_RV;
+   const double RBETW = C_RLVTT / C_RV + RGAMW * C_RTT;
+   const double RALPW = log(C_RESTT) + RBETW / C_RTT + RGAMW * log(C_RTT);
 
 /* ***************************************************** */
 /* Define constants for calculation in presence of  ice  */
 /* ***************************************************** */
-   // RGAMS = (C_RCS - C_RCPV) / C_RV;
-   // RBETS = C_RLSTT / C_RV + RGAMS * C_RTT;
-   // RALPS = log(C_RESTT) + RBETS / C_RTT + RGAMS * log(C_RTT);
+   // const double RGAMS = (C_RCS - C_RCPV) / C_RV;
+   // const double RBETS = C_RLSTT / C_RV + RGAMS * C_RTT;
+   // const double RALPS = log(C_RESTT) + RBETS / C_RTT + RGAMS * log(C_RTT);
 
 /***************************************************/
 /* Diagnostics of saturation water vapour pressure */
@@ -444,7 +413,7 @@ void rh2sh(double *sphum, double *rhum, double *t, int lev, int dimgpout, double
 
 void after_FCrh2FCsh(struct Control *globs, struct Variable *vars)
 {
-   long fieldSize = globs->DimGP * globs->NumLevelRequest;
+   const long fieldSize = globs->DimGP * globs->NumLevelRequest;
 
    if ( vars[RHUMIDITY].grid == NULL )
      vars[RHUMIDITY].grid = alloc_dp(fieldSize, "vars[RHUMIDITY].grid");
@@ -472,13 +441,11 @@ void after_FCrh2FCsh(struct Control *globs, struct Variable *vars)
 
 void after_SPuv2SPdv(struct Control *globs, struct Variable *vars)
 {
-   int i;
-   long fieldSize;
    double *Div, *DivOut, *Vor, *VorOut;
 
    Div = DivOut = vars[DIVERGENCE].spectral;
    Vor = VorOut =  vars[VORTICITY].spectral;
-   fieldSize = globs->DimFC * globs->NumLevelRequest;
+   const long fieldSize = globs->DimFC * globs->NumLevelRequest;
 
    if ( vars[U_WIND].fourier == NULL )
      vars[U_WIND].fourier = alloc_dp(fieldSize, "vars[U_WIND].fourier");
@@ -495,22 +462,21 @@ void after_SPuv2SPdv(struct Control *globs, struct Variable *vars)
    vars[U_WIND].fourier = (double *)FreeMemory(vars[U_WIND].fourier);
    vars[V_WIND].fourier = (double *)FreeMemory(vars[V_WIND].fourier);
 
-   for (i = 0; i < globs->NumLevelRequest; ++i) {
-      sp2sp(Div, globs->Truncation, DivOut, globs->Truncation);
-      sp2sp(Vor, globs->Truncation, VorOut, globs->Truncation);
-      Div    += globs->DimSP;
-      Vor    += globs->DimSP;
-      DivOut += globs->DimSP;
-      VorOut += globs->DimSP;
-   }
+   for ( int i = 0; i < globs->NumLevelRequest; ++i )
+     {
+       sp2sp(Div, globs->Truncation, DivOut, globs->Truncation);
+       sp2sp(Vor, globs->Truncation, VorOut, globs->Truncation);
+       Div    += globs->DimSP;
+       Vor    += globs->DimSP;
+       DivOut += globs->DimSP;
+       VorOut += globs->DimSP;
+     }
 }
 
 
 void after_FCsh2FCrh(struct Control *globs, struct Variable *vars)
 {
-   long fieldSize;
-
-   fieldSize = globs->DimGP * globs->NumLevelRequest;
+   const long fieldSize = globs->DimGP * globs->NumLevelRequest;
 
    if ( vars[RHUMIDITY].grid == NULL )
      vars[RHUMIDITY].grid = alloc_dp(fieldSize, "vars[RHUMIDITY].grid");
@@ -958,36 +924,33 @@ static
 void theta(double *pthetaf, double *pthetah, double *ph, double *ps,
 	   double *tf, double *ts, int levels, int dimgp, int dim3gp)
 {
-   int h,l;
-   double  kappa;
    double *thetah = pthetah;
    double *thetaf = pthetaf;
 
-   kappa = PlanetRD / C_RCPD;
+   const double kappa = PlanetRD / C_RCPD;
 
-   for (h = 0; h < dimgp; h++) thetah[h] = 0.0;
+   for ( int h = 0; h < dimgp; h++ ) thetah[h] = 0.0;
    thetah += dimgp;
-   for (l = 0; l < levels - 1; l++) {
-      for (h = 0; h < dimgp; h++) {
+   for ( int l = 0; l < levels - 1; l++ )
+     {
+       for ( int h = 0; h < dimgp; h++ )
          thetah[h] = 0.5 * (tf[h] + tf[h+dimgp]) * pow((ps[h]/ph[h]),kappa);
-      }
-      ph += dimgp;
-      tf += dimgp;
-      thetah += dimgp;
-   }
+
+       ph += dimgp;
+       tf += dimgp;
+       thetah += dimgp;
+     }
+ 
    after_copy_array(thetah,ts,dimgp);
    thetah = pthetah;
-   for (h = 0; h < dim3gp; h++) {
-      thetaf[h] = 0.5 * (thetah[h] + thetah[h+dimgp]);
-   }
+   for ( int h = 0; h < dim3gp; h++ )
+     thetaf[h] = 0.5 * (thetah[h] + thetah[h+dimgp]);
 }
 
 static
 void windSpeed(double *uvspeed, double *u, double *v, int dim3gp)
 {
-  int i;
-
-  for (i = 0; i < dim3gp; i++)
+  for ( int i = 0; i < dim3gp; i++ )
     uvspeed[i] = sqrt(u[i] * u[i] + v[i] * v[i]);
 }
 
@@ -1572,66 +1535,6 @@ void after_EchamCompGP(struct Control *globs, struct Variable *vars)
 }
 
 static
-void CheckContent(struct Variable *vars, int timestep)
-{
-  for ( int code = 0; code < 272; code++ )
-    {
-      /*  if ( code == GEOPOTENTIAL ) continue; */
-      if ( code ==          SLP ) continue;
-      if ( code == GEOPOTHEIGHT ) continue;
-      if ( code ==       STREAM ) continue;
-      if ( code ==      VELOPOT ) continue;
-      if ( code ==       U_WIND ) continue;
-      if ( code ==       V_WIND ) continue;
-      if ( code ==        OMEGA ) continue;
-      if ( code ==    RHUMIDITY ) continue;
-      if ( code ==    LOW_CLOUD ) continue;
-      if ( code ==    MID_CLOUD ) continue;
-      if ( code ==    HIH_CLOUD ) continue;
-      if ( code ==           PS ) continue;
-      if ( code ==     HUMIDITY )
-	{
-	  if ( vars[code].needed && !vars[code].selected &&
-	       vars[code].spectral == NULL &&
-	       vars[code].hybrid   == NULL )
-	    {
-	      Warning( "No humidity in data file, set to zero !");
-	      vars[code].needed = FALSE;
-	    }
-	}
-      else
-	{
-	  if ( vars[code].needed && !vars[code].comp &&
-	       vars[code].spectral == NULL &&
-	       vars[code].hybrid   == NULL )
-	    {
-	      if ( labort_after )
-		Error( "Code  %3d not found at timestep %d!", code, timestep);
-	      else
-		Warning( "Code  %3d not found at timestep %d!", code, timestep);
-	    }
-	}
-    }
-  /*
-  if ( NumLevelRequest > 0 )
-    {
-      vars[HALF_PRESS].needed = 1;
-      vars[FULL_PRESS].needed = 1;
-    }
-
-  code = HALF_PRESS;
-  if ( vars[code].needed && !vars[code].comp &&
-       vars[code].spectral == NULL && vars[code].hybrid == NULL )
-    Error( "Hybrid model level not found!");
-
-  code = FULL_PRESS;
-  if ( vars[code].needed && !vars[code].comp &&
-       vars[code].spectral == NULL && vars[code].hybrid == NULL )
-    Error( "Hybrid model level not found!");
-  */
-}
-
-static
 void Derivate(double field[], double derilam[], int levels,
 	      int Waves, int Latitudes, double DerivationFactor[])
 {
@@ -1665,8 +1568,6 @@ void after_processML(struct Control *globs, struct Variable *vars)
 
   globs->MeanCount++;
   globs->TermCount++;
-
-  CheckContent(vars, globs->TermCount);
 
   if ( globs->MeanCount == 1 )
     {

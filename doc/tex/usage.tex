@@ -104,6 +104,10 @@ The following options are available for all operators:
 \makebox[1.5in][l]{\hspace*{1cm}\sl -t $<$partab$>$}
          \> Set the GRIB1 (cgribex) default parameter table name or file (see chapter 1.6 on page \pageref{PARAMETER_TABLE}).\\
          \> Predefined tables are:  {\tt echam4 echam5 echam6 mpiom1 ecmwf remo}\\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-timestat\_date $<$srcdate$>$}
+         \> \\
+\makebox[1.5in][l]{\hspace*{1cm}}
+         \> Target timestamp (time statistics): {\tt first, middle, midhigh} or {\tt last} source timestep. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -V, -\,-version}
          \> Print the version number. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -v, -\,-verbose}
@@ -164,6 +168,10 @@ instead of
    rm tmp1 tmp2
 \end{verbatim}
 
+{\bf Note:}
+Operator chaining is implemented over POSIX Threads (pthreads).
+Therefore this {\CDO} feature is not available on operating systems without POSIX Threads support!
+
 All operators with an arbitrary number of input streams ({\tt ifiles})
 can't be combined with other operators if these operators are used
 with more than one input stream. Here is an incomplete list of
@@ -185,11 +193,18 @@ this feature:
 The CDO internal wildcard expansion is using the {\it glob()} function. 
 Therefore internal wildcard expansion is not available on operating systems without the {\it glob()} function!
 
-{\bf Note:}
-Operator chaining is implemented over POSIX Threads (pthreads).
-Therefore this {\CDO} feature is not available on operating systems without POSIX Threads support!
-
-
+All operators with one input stream will process only one input
+stream! You need to take care when mixing those operators with
+operator with an arbitrary number of input streams. 
+The following examples illustrate this problem.
+\begin{enumerate}
+\item {\tt cdo info -timavg ifile?}
+\item {\tt cdo info -timavg ifile1 ifile2}
+\item {\tt cdo timavg ifile1 tmpfile} \\
+{\tt cdo info tmpfile ifile2}
+\end{enumerate}
+ All three examples produce identical results. 
+The time average will be computed only on the first input file. 
 \subsection{Parallelized operators}
 
 Some of the {\CDO} operators are shared memory parallelized with OpenMP.

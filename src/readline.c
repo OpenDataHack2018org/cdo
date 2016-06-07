@@ -23,7 +23,12 @@ int readline(FILE *fp, char *line, int len)
 
   while ( (ichar = fgetc(fp)) != EOF )
     {
-      if ( ichar == '\r' ) break;
+      if ( ichar == '\r' )
+        {
+          if ( (ichar = fgetc(fp)) != EOF )
+            if ( ichar != '\n' ) ungetc(ichar, fp);
+          break;
+        }
       if ( ichar == '\n' ) break;
       line[ipos++] = ichar;
       if ( ipos >= len )
@@ -36,5 +41,5 @@ int readline(FILE *fp, char *line, int len)
 
   if ( feof(fp) && ipos == 0 ) return 0;
 
-  return (1);
+  return 1;
 }

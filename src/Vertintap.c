@@ -33,9 +33,9 @@
 #include "stdnametable.h"
 
 static
-int is_height_axis(int zaxisID, int nlevel)
+bool is_height_axis(int zaxisID, int nlevel)
 {
-  int isheight = FALSE;
+  bool isheight = false;
   if ( nlevel > 1 )
     {
       if ( zaxisInqType(zaxisID) == ZAXIS_REFERENCE )
@@ -45,12 +45,12 @@ int is_height_axis(int zaxisID, int nlevel)
           zaxisInqUnits(zaxisID, units);
           zaxisInqStdname(zaxisID, stdname);
           if ( strcmp(stdname, "height") == 0 && *units == 0 )
-            isheight = TRUE;
+            isheight = true;
         }
     }
   return isheight;
 }
-
+/*
 static
 int is_hybrid_axis(int zaxisID, int nlevel)
 {
@@ -59,20 +59,19 @@ int is_hybrid_axis(int zaxisID, int nlevel)
        nlevel > 1 ) ishybrid = TRUE;
   return ishybrid;
 }
-
+*/
 
 void *Vertintap(void *argument)
 {
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
-  int recID, nrecs;
+  int nrecs;
   int i, k, offset;
   int varID, levelID;
-  int zaxisIDp, zaxisIDh = -1, nzaxis;
+  int zaxisIDp, zaxisIDh = -1;
   int gridID, zaxisID;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
-  int nvct;
   int apressID = -1, dpressID = -1;
   int psID = -1, tempID = -1;
   int param;
@@ -80,6 +79,7 @@ void *Vertintap(void *argument)
   int *pnmiss = NULL;
   char paramstr[32];
   char stdname[CDI_MAX_NAME];
+  char varname[CDI_MAX_NAME];
   double minval, maxval;
   double missval;
   double *vct = NULL;
@@ -87,7 +87,6 @@ void *Vertintap(void *argument)
   double *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
   double *hyb_press = NULL;
   int Extrapolate = 0;
-  int mono_level;
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
@@ -168,119 +167,71 @@ void *Vertintap(void *argument)
     zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
 
   zaxisDefLevels(zaxisIDp, plev);
-  nzaxis  = vlistNzaxis(vlistID1);
 
-  int lheight = FALSE;
-  for ( i = 0; i < nzaxis; i++ )
-    {
-      mono_level = TRUE;
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-
-      if ( is_height_axis(zaxisID, nlevel) )
-        {
-	  double *level = (double *) Malloc(nlevel*sizeof(double));
-	  zaxisInqLevels(zaxisID, level);
-	  int l;
-	  for ( l = 0; l < nlevel; l++ )
-	    {
-	      if ( (l+1) != (int) (level[l]+0.5) ) break;
-	    }
-	  if ( l == nlevel ) mono_level = TRUE; 
-	  Free(level);          
-        }
-      
-      if ( is_height_axis(zaxisID, nlevel) && mono_level )
-        {
-          lheight  = TRUE;
-          zaxisIDh = zaxisID;
-          nhlev    = nlevel;
-          nhlevf   = nhlev;
-          nhlevh   = nhlevf + 1;
-
-          vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-          break;
-        }
-    }
-
-  if ( ! lheight ) { // old version, not needed anymore!!
-  int lhavevct = FALSE;
-  for ( i = 0; i < nzaxis; i++ )
-    {
-      /* mono_level = FALSE; */
-      mono_level = TRUE;
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-
-      if ( is_hybrid_axis(zaxisID, nlevel) )
-	{
-	  double *level = (double *) Malloc(nlevel*sizeof(double));
-	  zaxisInqLevels(zaxisID, level);
-	  int l;
-	  for ( l = 0; l < nlevel; l++ )
-	    {
-	      if ( (l+1) != (int) (level[l]+0.5) ) break;
-	    }
-	  if ( l == nlevel ) mono_level = TRUE; 
-	  Free(level);
-	}
-
-      if ( is_hybrid_axis(zaxisID, nlevel) && mono_level )
-	{
-	  nvct = zaxisInqVctSize(zaxisID);
-	  if ( nlevel == (nvct/2 - 1) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev;
-		  nhlevh   = nhlevf + 1;
-	      
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	      else
-		{
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	  else if ( nlevel == (nvct/2) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev - 1;
-		  nhlevh   = nhlev;
-	      
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	      else
-		{
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-		}
-	    }
-	}
-    }
-  }
-  
   int nvars = vlistNvars(vlistID1);
 
-  int vars[nvars];
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      vlistInqVarStdname(vlistID1, varID, stdname);
+      strtolower(stdname);
+
+      if      ( strcmp(stdname, var_stdname(surface_air_pressure)) == 0 ) psID = varID; 
+      else if ( strcmp(stdname, var_stdname(air_pressure))         == 0 ) apressID = varID; 
+      else if ( strcmp(stdname, var_stdname(pressure_thickness))   == 0 ) dpressID = varID; 
+      else if ( strcmp(stdname, var_stdname(air_temperature))      == 0 ) tempID = varID; 
+    }
+
+  if ( cdoVerbose )
+    {
+      cdoPrint("Found:");
+      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
+      if ( apressID  != -1 ) cdoPrint("  %s", var_stdname(air_pressure));
+      if ( dpressID  != -1 ) cdoPrint("  %s", var_stdname(pressure_thickness));
+      if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
+    }
+
+  if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
+
+  int nzaxis = vlistNzaxis(vlistID1);
+  for ( i = 0; i < nzaxis; i++ )
+    {
+      zaxisID = vlistZaxis(vlistID1, i);
+      if ( zaxisID == vlistInqVarZaxis(vlistID1, apressID) )
+        {
+          bool mono_level = true;
+          nlevel  = zaxisInqSize(zaxisID);
+
+          if ( is_height_axis(zaxisID, nlevel) )
+            {
+              double *level = (double *) Malloc(nlevel*sizeof(double));
+              zaxisInqLevels(zaxisID, level);
+              int l;
+              for ( l = 0; l < nlevel; l++ )
+                {
+                  if ( (l+1) != (int) (level[l]+0.5) ) break;
+                }
+              if ( l == nlevel ) mono_level = true; 
+              Free(level);          
+            }
+      
+          if ( is_height_axis(zaxisID, nlevel) && mono_level )
+            {
+              zaxisIDh = zaxisID;
+              nhlev    = nlevel;
+              nhlevf   = nhlev;
+              nhlevh   = nhlevf + 1;
+
+              vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+              break;
+            }
+        }
+    }
+  
+  bool vars[nvars];
   double *vardata1[nvars];
   double *vardata2[nvars];
   int *varnmiss[nvars];
-  int varinterp[nvars];
+  bool varinterp[nvars];
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
@@ -336,50 +287,38 @@ void *Vertintap(void *argument)
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
       nlevel   = zaxisInqSize(zaxisID);
 
-      vlistInqVarStdname(vlistID1, varID, stdname);
-      strtolower(stdname);
-
-      if      ( strcmp(stdname, var_stdname(surface_air_pressure)) == 0 ) psID = varID; 
-      else if ( strcmp(stdname, var_stdname(air_pressure))         == 0 ) apressID = varID; 
-      else if ( strcmp(stdname, var_stdname(pressure_thickness))   == 0 ) dpressID = varID; 
-      else if ( strcmp(stdname, var_stdname(air_temperature))      == 0 ) tempID = varID; 
-
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
 
       vardata1[varID] = (double *) Malloc(gridsize*nlevel*sizeof(double));
-
+           
       if ( zaxisID == zaxisIDh )
 	{
-	  varinterp[varID] = TRUE;
+	  varinterp[varID] = true;
 	  vardata2[varID]  = (double *) Malloc(gridsize*nplev*sizeof(double));
 	  varnmiss[varID]  = (int *) Malloc(maxlev*sizeof(int));
 	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
 	}
       else
 	{
-	  varinterp[varID] = FALSE;
+          vlistInqVarName(vlistID1, varID, varname);
+
+          if ( is_height_axis(zaxisID, nlevel) && nlevel == nhlevh )
+            cdoWarning("Interpolation from half level not supported, parameter %s not interpolated!", varname);
+          
+	  varinterp[varID] = false;
 	  vardata2[varID]  = vardata1[varID];
 	  varnmiss[varID]  = (int *) Malloc(nlevel*sizeof(int));
 	}
     }
-
-  if ( cdoVerbose )
-    {
-      cdoPrint("Found:");
-      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if ( apressID  != -1 ) cdoPrint("  %s", var_stdname(air_pressure));
-      if ( dpressID  != -1 ) cdoPrint("  %s", var_stdname(pressure_thickness));
-      if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
-    }
-
-  if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
+  
   if ( zaxisIDh != -1 && psID == -1 && dpressID )
-    cdoWarning("Surface pressure not found - set to upper level of %s!", var_stdname(air_pressure));
+    cdoWarning("Surface pressure not found - set to vertical sum of %s!", var_stdname(pressure_thickness));
+  //  cdoWarning("Surface pressure not found - set to upper level of %s!", var_stdname(air_pressure));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      if ( varinterp[varID] == TRUE && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
+      if ( varinterp[varID] && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
 	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
     }
 
@@ -392,7 +331,7 @@ void *Vertintap(void *argument)
     {
       for ( varID = 0; varID < nvars; ++varID )
 	{
-          vars[varID] = FALSE;
+          vars[varID] = false;
 	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    varnmiss[varID][levelID] = 0;
@@ -402,7 +341,7 @@ void *Vertintap(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  /*
@@ -419,11 +358,11 @@ void *Vertintap(void *argument)
 
 	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 
-	  vars[varID] = TRUE;
+	  vars[varID] = true;
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
-	if ( varinterp[varID] == TRUE ) vars[varID] = TRUE;
+	if ( varinterp[varID]  ) vars[varID] = true;
 
       if ( zaxisIDh != -1 )
 	{

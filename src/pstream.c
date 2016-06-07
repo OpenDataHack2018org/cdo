@@ -285,6 +285,259 @@ int pstreamIsPipe(int pstreamID)
   return pstreamptr->ispipe;
 }
 
+static
+void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
+{
+#if defined(HAVE_LIBPTHREAD)
+  int pstreamID = pstreamptr->self;
+
+  char *pipename = (char*) Malloc(16);
+  // struct sched_param param;
+  
+  argument_t *newargument = (argument_t*) Malloc(sizeof(argument_t));
+  newargument->argc = argument->argc + 1;
+  newargument->argv = (char **) Malloc(newargument->argc*sizeof(char *));
+  memcpy(newargument->argv, argument->argv, argument->argc*sizeof(char *));
+
+  char *operatorArg  = argument->argv[0];
+  char *operatorName = getOperatorName(operatorArg);
+
+  size_t len = strlen(argument->args);
+  char *newarg = (char*) Malloc(len+16);
+  strcpy(newarg, argument->args);
+  sprintf(pipename, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
+  newarg[len] = ' ';
+  strcpy(&newarg[len+1], pipename);
+
+  newargument->argv[argument->argc] = pipename;
+  newargument->args = newarg;
+  /*
+    printf("pstreamOpenRead: new args >%s<\n", newargument->args);
+    for ( int i = 0; i < newargument->argc; ++i )
+    printf("pstreamOpenRead: new arg %d >%s<\n", i, newargument->argv[i]);
+  */
+  pstreamptr->ispipe    = TRUE;
+  pstreamptr->name      = pipename;
+  pstreamptr->rthreadID = pthread_self();
+  pstreamptr->pipe      = pipeNew();
+  pstreamptr->argument  = (void *) newargument;
+ 
+  if ( ! cdoSilentMode )
+    cdoPrint("Started child process \"%s\".", newarg+1);
+
+  pthread_attr_t attr;
+  int status = pthread_attr_init(&attr);
+  if ( status ) SysError("pthread_attr_init failed for '%s'", newarg+1);
+  status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+  if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'", newarg+1);
+  /*
+    param.sched_priority = 0;
+    status = pthread_attr_setschedparam(&attr, &param);
+    if ( status ) SysError("pthread_attr_setschedparam failed for '%s'", newarg+1);
+  */
+  /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
+  /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'", newarg+1); */
+
+  pthread_attr_getscope(&attr, &pthreadScope);
+
+  /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
+  /* if ( status ) SysError("pthread_attr_setscope failed for '%s'", newarg+1); */
+  /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
+  /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
+
+  size_t stacksize = 0;
+  status = pthread_attr_getstacksize(&attr, &stacksize);
+  if ( stacksize < 2097152 )
+    {
+      stacksize = 2097152;
+      pthread_attr_setstacksize(&attr, stacksize);
+    }
+
+  pthread_t thrID;
+  int rval = pthread_create(&thrID, &attr, operatorModule(operatorName), newargument);
+  if ( rval != 0 )
+    {
+      errno = rval;
+      SysError("pthread_create failed for '%s'", newarg+1);
+    }
+
+  /* Free(operatorName); */
+  processAddStream(pstreamID);
+  /*      pipeInqInfo(pstreamID); */
+  if ( PSTREAM_Debug ) Message("pipe %s", pipename);
+#else
+  cdoAbort("Cannot use pipes, pthread support not compiled in!");
+#endif
+}
+
+static
+void pstreamCreateFilelist(const argument_t *argument, pstream_t *pstreamptr)
+{
+  size_t i;
+  size_t len = strlen(argument->args);
+
+  for ( i = 0; i < len; i++ )
+    if ( argument->args[i] == ':' ) break;
+
+  if ( i < len )
+    {
+      int nfiles = 1, j;
+
+      const char *pch = &argument->args[i+1];
+      len -= (i+1);
+      if ( len && ( strncmp(argument->args, "filelist:", 9) == 0 || 
+                    strncmp(argument->args, "flist:", 6) == 0 ) )
+        {
+          for ( i = 0; i < len; i++ ) if ( pch[i] == ',' ) nfiles++;
+
+          if ( nfiles == 1 )
+            {
+              char line[4096];
+              FILE *fp, *fp2;
+              fp = fopen(pch, "r");
+              if ( fp == NULL ) cdoAbort("Open failed on %s", pch);
+              
+              if ( cdoVerbose )
+                cdoPrint("Reading file names from %s", pch);
+
+              /* find number of files */
+              nfiles = 0;
+              while ( readline(fp, line, 4096) )
+                {
+                  if ( line[0] == '#' || line[0] == '\0' || line[0] == ' ' ) continue;
+
+                  fp2 = fopen(line, "r" );
+                  if ( fp2 == NULL ) cdoAbort("Open failed on %s", line);
+                  fclose(fp2);
+                  nfiles++;
+                  if ( cdoVerbose )
+                    cdoPrint("File number %d is %s", nfiles, line);
+                }
+
+              if ( nfiles == 0 ) cdoAbort("No imput file found in %s", pch);
+
+              pstreamptr->mfiles = nfiles;
+              pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
+		  
+              rewind(fp);
+
+              nfiles = 0;
+              while ( readline(fp, line, 4096) )
+                {
+                  if ( line[0] == '#' || line[0] == '\0' ||
+                       line[0] == ' ' ) continue;
+
+                  pstreamptr->mfnames[nfiles] = strdupx(line);
+                  nfiles++;
+                }
+
+              fclose(fp);
+            }
+          else
+            {
+              char line[65536];
+
+              pstreamptr->mfiles = nfiles;
+              pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
+		  
+              strcpy(line, pch);
+              for ( i = 0; i < len; i++ ) if ( line[i] == ',' ) line[i] = 0;
+              
+              i = 0;
+              for ( j = 0; j < nfiles; j++ )
+                {
+                  pstreamptr->mfnames[j] = strdupx(&line[i]);
+                  i += strlen(&line[i]) + 1;
+                }
+            }
+        }
+      else if ( len && strncmp(argument->args, "ls:", 3) == 0 )
+        {
+          char line[4096];
+          char command[4096];
+          char *fnames[16384];
+          FILE *pfp;
+
+          strcpy(command, "ls ");
+          strcat(command, pch);
+
+          pfp = popen(command, "r");
+          if ( pfp == 0 )
+            SysError("popen %s failed", command);
+
+          nfiles = 0;
+          while ( readline(pfp, line, 4096) )
+            {
+              if ( nfiles >= 16384 ) cdoAbort("Too many input files (limit: 16384)");
+              fnames[nfiles++] = strdupx(line);
+            }
+
+          pclose(pfp);
+
+          pstreamptr->mfiles = nfiles;
+          pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
+
+          for ( j = 0; j < nfiles; j++ )
+            pstreamptr->mfnames[j] = fnames[j];
+        }
+    }
+}
+
+static
+void pstreamOpenReadFile(const argument_t *argument, pstream_t *pstreamptr)
+{  
+  pstreamCreateFilelist(argument, pstreamptr);
+
+  size_t len;
+  char *filename = NULL;
+
+  if ( pstreamptr->mfiles )
+    {
+      len = strlen(pstreamptr->mfnames[0]);
+      filename = (char*) Malloc(len+1);
+      strcpy(filename, pstreamptr->mfnames[0]);
+      pstreamptr->nfiles = 1;
+    }
+  else
+    {
+      len = strlen(argument->args);
+      filename = (char*) Malloc(len+1);
+      strcpy(filename, argument->args);
+    }
+
+  if ( PSTREAM_Debug ) Message("file %s", filename);
+
+#if defined(HAVE_LIBPTHREAD)
+  if ( cdoLockIO )
+    pthread_mutex_lock(&streamMutex);
+  else
+    pthread_mutex_lock(&streamOpenReadMutex);
+#endif
+  int fileID = streamOpenRead(filename);
+  if ( fileID < 0 )
+    {
+      pstreamptr->isopen = FALSE;
+      cdiOpenError(fileID, "Open failed on >%s<", filename);
+    }
+      
+  if ( cdoDefaultFileType == CDI_UNDEFID )
+    cdoDefaultFileType = streamInqFiletype(fileID);
+  /*
+    if ( cdoDefaultInstID == CDI_UNDEFID )
+    cdoDefaultInstID = streamInqInstID(fileID);
+  */
+  cdoInqHistory(fileID);
+#if defined(HAVE_LIBPTHREAD)
+  if ( cdoLockIO )
+    pthread_mutex_unlock(&streamMutex);
+  else
+    pthread_mutex_unlock(&streamOpenReadMutex);
+#endif
+
+  pstreamptr->mode   = 'r';
+  pstreamptr->name   = filename;
+  pstreamptr->fileID = fileID;
+}
 
 int pstreamOpenRead(const argument_t *argument)
 {
@@ -303,250 +556,11 @@ int pstreamOpenRead(const argument_t *argument)
   */
   if ( ispipe )
     {
-#if defined(HAVE_LIBPTHREAD)
-      char *operatorArg;
-      char *operatorName;
-      char *newarg;
-      char *pipename = (char*) Malloc(16);
-      int rval;
-      pthread_t thrID;
-      pthread_attr_t attr;
-      // struct sched_param param;
-      size_t len;
-      size_t stacksize;
-      int status;
-      argument_t *newargument = (argument_t*) Malloc(sizeof(argument_t));
-
-      newargument->argc = argument->argc + 1;
-      newargument->argv = (char **) Malloc(newargument->argc*sizeof(char *));
-      memcpy(newargument->argv, argument->argv, argument->argc*sizeof(char *));
-
-      operatorArg  = argument->argv[0];
-      operatorName = getOperatorName(operatorArg);
-
-      len = strlen(argument->args);
-      newarg = (char*) Malloc(len+16);
-      strcpy(newarg, argument->args);
-      sprintf(pipename, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
-      newarg[len] = ' ';
-      strcpy(&newarg[len+1], pipename);
-
-      newargument->argv[argument->argc] = pipename;
-      newargument->args = newarg;
-      /*
-      printf("pstreamOpenRead: new args >%s<\n", newargument->args);
-      for ( int i = 0; i < newargument->argc; ++i )
-	printf("pstreamOpenRead: new arg %d >%s<\n", i, newargument->argv[i]);
-      */
-      pstreamptr->ispipe    = TRUE;
-      pstreamptr->name      = pipename;
-      pstreamptr->rthreadID = pthread_self();
-      pstreamptr->pipe      = pipeNew();
-      pstreamptr->argument  = (void *) newargument;
- 
-      if ( ! cdoSilentMode )
-	cdoPrint("Started child process \"%s\".", newarg+1);
-
-      status = pthread_attr_init(&attr);
-      if ( status ) SysError("pthread_attr_init failed for '%s'", newarg+1);
-      status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-      if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'", newarg+1);
-      /*
-      param.sched_priority = 0;
-      status = pthread_attr_setschedparam(&attr, &param);
-      if ( status ) SysError("pthread_attr_setschedparam failed for '%s'", newarg+1);
-      */
-      /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
-      /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'", newarg+1); */
-
-      pthread_attr_getscope(&attr, &pthreadScope);
-
-      /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
-      /* if ( status ) SysError("pthread_attr_setscope failed for '%s'", newarg+1); */
-      /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
-      /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
-
-      status = pthread_attr_getstacksize(&attr, &stacksize);
-      if ( stacksize < 2097152 )
-	{
-	  stacksize = 2097152;
-	  pthread_attr_setstacksize(&attr, stacksize);
-	}
-
-      rval = pthread_create(&thrID, &attr, operatorModule(operatorName), newargument);
-      if ( rval != 0 )
-	{
-	  errno = rval;
-	  SysError("pthread_create failed for '%s'", newarg+1);
-	}
-
-      /* Free(operatorName); */
-      processAddStream(pstreamID);
-      /*      pipeInqInfo(pstreamID); */
-      if ( PSTREAM_Debug ) Message("pipe %s", pipename);
-#else
-      cdoAbort("Cannot use pipes, pthread support not compiled in!");
-#endif
+      pstreamOpenReadPipe(argument, pstreamptr);
     }
   else
     {
-      size_t len, i;
-      int nfiles = 1, j;
-      char *filename = NULL;
-      const char *pch;
-
-      len = strlen(argument->args);
-
-      for ( i = 0; i < len; i++ )
-	if ( argument->args[i] == ':' ) break;
-
-      if ( i < len )
-	{
-	  pch = &argument->args[i+1];
-	  len -= (i+1);
-	  if ( len && ( strncmp(argument->args, "filelist:", 9) == 0 || 
-			strncmp(argument->args, "flist:", 6) == 0 ) )
-	    {
-	      for ( i = 0; i < len; i++ ) if ( pch[i] == ',' ) nfiles++;
-
-	      if ( nfiles == 1 )
-		{
-		  char line[4096];
-		  FILE *fp, *fp2;
-		  fp = fopen(pch, "r");
-		  if ( fp == NULL ) cdoAbort("Open failed on %s", pch);
-
-		  if ( cdoVerbose )
-		    cdoPrint("Reading file names from %s", pch);
-
-		  /* find number of files */
-		  nfiles = 0;
-		  while ( readline(fp, line, 4096) )
-		    {
-		      if ( line[0] == '#' || line[0] == '\0' || line[0] == ' ' ) continue;
-
-		      fp2 = fopen(line, "r" );
-		      if ( fp2 == NULL ) cdoAbort("Open failed on %s", line);
-		      fclose(fp2);
-		      nfiles++;
-		      if ( cdoVerbose )
-			cdoPrint("File number %d is %s", nfiles, line);
-		    }
-
-		  if ( nfiles == 0 ) cdoAbort("No imput file found in %s", pch);
-
-		  pstreamptr->mfiles = nfiles;
-		  pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
-		  
-		  rewind(fp);
-
-		  nfiles = 0;
-		  while ( readline(fp, line, 4096) )
-		    {
-		      if ( line[0] == '#' || line[0] == '\0' ||
-			   line[0] == ' ' ) continue;
-
-		      pstreamptr->mfnames[nfiles] = strdupx(line);
-		      nfiles++;
-		    }
-
-		  fclose(fp);
-		}
-	      else
-		{
-		  char line[65536];
-
-		  pstreamptr->mfiles = nfiles;
-		  pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
-		  
-		  strcpy(line, pch);
-		  for ( i = 0; i < len; i++ ) if ( line[i] == ',' ) line[i] = 0;
-
-		  i = 0;
-		  for ( j = 0; j < nfiles; j++ )
-		    {
-		      pstreamptr->mfnames[j] = strdupx(&line[i]);
-		      i += strlen(&line[i]) + 1;
-		    }
-		}
-	    }
-	  else if ( len && strncmp(argument->args, "ls:", 3) == 0 )
-	    {
-	      char line[4096];
-	      char command[4096];
-	      char *fnames[16384];
-	      FILE *pfp;
-
-	      strcpy(command, "ls ");
-	      strcat(command, pch);
-
-	      pfp = popen(command, "r");
-	      if ( pfp == 0 )
-		SysError("popen %s failed", command);
-
-	      nfiles = 0;
-	      while ( readline(pfp, line, 4096) )
-		{
-		  if ( nfiles >= 16384 ) cdoAbort("Too many input files (limit: 16384)");
-		  fnames[nfiles++] = strdupx(line);
-		}
-
-	      pclose(pfp);
-
-	      pstreamptr->mfiles = nfiles;
-	      pstreamptr->mfnames = (char **) Malloc(nfiles*sizeof(char *));
-
-	      for ( j = 0; j < nfiles; j++ )
-		pstreamptr->mfnames[j] = fnames[j];
-	    }
-	}
-
-      if ( pstreamptr->mfiles )
-	{
-	  len = strlen(pstreamptr->mfnames[0]);
-	  filename = (char*) Malloc(len+1);
-	  strcpy(filename, pstreamptr->mfnames[0]);
-	  pstreamptr->nfiles = 1;
-	}
-      else
-	{
-	  len = strlen(argument->args);
-	  filename = (char*) Malloc(len+1);
-	  strcpy(filename, argument->args);
-	}
-
-      if ( PSTREAM_Debug ) Message("file %s", filename);
-
-#if defined(HAVE_LIBPTHREAD)
-      if ( cdoLockIO )
-	pthread_mutex_lock(&streamMutex);
-      else
-	pthread_mutex_lock(&streamOpenReadMutex);
-#endif
-      int fileID = streamOpenRead(filename);
-      if ( fileID < 0 )
-        {
-          pstreamptr->isopen = FALSE;
-          cdiOpenError(fileID, "Open failed on >%s<", filename);
-        }
-      
-      if ( cdoDefaultFileType == CDI_UNDEFID )
-	cdoDefaultFileType = streamInqFiletype(fileID);
-      /*
-      if ( cdoDefaultInstID == CDI_UNDEFID )
-	cdoDefaultInstID = streamInqInstID(fileID);
-      */
-      cdoInqHistory(fileID);
-#if defined(HAVE_LIBPTHREAD)
-      if ( cdoLockIO )
-	pthread_mutex_unlock(&streamMutex);
-      else
-	pthread_mutex_unlock(&streamOpenReadMutex);
-#endif
-
-      pstreamptr->mode   = 'r';
-      pstreamptr->name   = filename;
-      pstreamptr->fileID = fileID;
+      pstreamOpenReadFile(argument, pstreamptr);
     }
 
   if ( pstreamID < 0 ) cdiOpenError(pstreamID, "Open failed on >%s<", argument->args);
@@ -612,11 +626,122 @@ void query_user_exit(const char *argument)
     } /* end switch */
 }
 
+static
+int pstreamOpenWritePipe(const argument_t *argument, int filetype)
+{
+  int pstreamID = -1;
+  
+#if defined(HAVE_LIBPTHREAD)
+  if ( PSTREAM_Debug ) Message("pipe %s", argument->args);
+  pstreamID = pstreamFindID(argument->args);
+  if ( pstreamID == -1 ) Error("%s is not open!", argument->args);
+
+  pstream_t *pstreamptr = pstream_to_pointer(pstreamID);
+
+  pstreamptr->wthreadID = pthread_self();
+  pstreamptr->filetype = filetype;
+  processAddStream(pstreamID);
+#endif
+
+  return pstreamID;
+}
+
+static
+int pstreamOpenWriteFile(const argument_t *argument, int filetype)
+{
+  char *filename = (char*) Malloc(strlen(argument->args)+1);
+
+  pstream_t *pstreamptr = pstream_new_entry();
+  if ( ! pstreamptr ) Error("No memory");
+
+  int pstreamID = pstreamptr->self;
+  
+  if ( PSTREAM_Debug ) Message("file %s", argument->args);
+
+  if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
+
+  if ( cdoInteractive )
+    {
+      struct stat stbuf;
+
+      int rstatus = stat(argument->args, &stbuf);
+      /* If permanent file already exists, query user whether to overwrite or exit */
+      if ( rstatus != -1 ) query_user_exit(argument->args);
+    }
+
+  if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
+
+#if defined(HAVE_LIBPTHREAD)
+  if ( cdoLockIO )
+    pthread_mutex_lock(&streamMutex);
+  else
+    pthread_mutex_lock(&streamOpenWriteMutex);
+#endif
+
+  int fileID = streamOpenWrite(argument->args, filetype);
+  
+#if defined(HAVE_LIBPTHREAD)
+  if ( cdoLockIO )
+    pthread_mutex_unlock(&streamMutex);
+  else
+    pthread_mutex_unlock(&streamOpenWriteMutex);
+#endif
+  
+  if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
+  if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", argument->args);
+
+  cdoDefHistory(fileID, commandLine());
+
+  if ( cdoDefaultByteorder != CDI_UNDEFID )
+    streamDefByteorder(fileID, cdoDefaultByteorder);
+
+  if ( cdoCompress )
+    {
+      if      ( filetype == FILETYPE_GRB )
+        {
+          cdoCompType  = COMPRESS_SZIP;
+          cdoCompLevel = 0;
+        }
+      else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+        {
+          cdoCompType  = COMPRESS_ZIP;
+          cdoCompLevel = 1;
+        }
+    }
+
+  if ( cdoCompType != COMPRESS_NONE )
+    {
+      streamDefCompType(fileID, cdoCompType);
+      streamDefCompLevel(fileID, cdoCompLevel);
+
+      if ( cdoCompType == COMPRESS_SZIP &&
+           (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+        cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
+
+      if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
+        cdoWarning("JPEG compression not available for non GRIB2 data!");
+
+      if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+        cdoWarning("Deflate compression not available for non NetCDF4 data!");
+    }
+  /*
+    if ( cdoDefaultInstID != CDI_UNDEFID )
+    streamDefInstID(fileID, cdoDefaultInstID);
+  */
+  strcpy(filename, argument->args);
+
+  pstreamptr->mode     = 'w';
+  pstreamptr->name     = filename;
+  pstreamptr->fileID   = fileID;
+  pstreamptr->filetype = filetype;
+
+  return pstreamID;
+}
+
 
 int pstreamOpenWrite(const argument_t *argument, int filetype)
 {
   int pstreamID = -1;
-  pstream_t *pstreamptr;
 
   PSTREAM_INIT();
 
@@ -624,103 +749,12 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
 
   if ( ispipe )
     {
-#if defined(HAVE_LIBPTHREAD)
-      if ( PSTREAM_Debug ) Message("pipe %s", argument->args);
-      pstreamID = pstreamFindID(argument->args);
-      if ( pstreamID == -1 ) Error("%s is not open!", argument->args);
-
-      pstreamptr = pstream_to_pointer(pstreamID);
-
-      pstreamptr->wthreadID = pthread_self();
-      pstreamptr->filetype = filetype;
-      processAddStream(pstreamID);
-#endif
+      pstreamID = pstreamOpenWritePipe(argument, filetype);
     }
   else
     {
-      char *filename = (char*) Malloc(strlen(argument->args)+1);
-
-      pstreamptr = pstream_new_entry();
-      if ( ! pstreamptr ) Error("No memory");
-
-      pstreamID = pstreamptr->self;
-  
-      if ( PSTREAM_Debug ) Message("file %s", argument->args);
-
-      if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
-
-      if ( cdoInteractive )
-	{
-	  int rstatus;
-	  struct stat stbuf;
-
-	  rstatus = stat(argument->args, &stbuf);
-	  /* If permanent file already exists, query user whether to overwrite or exit */
-	  if ( rstatus != -1 ) query_user_exit(argument->args);
-	}
-
-      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
-#if defined(HAVE_LIBPTHREAD)
-      if ( cdoLockIO )
-	pthread_mutex_lock(&streamMutex);
-      else
-	pthread_mutex_lock(&streamOpenWriteMutex);
-#endif
-      int fileID = streamOpenWrite(argument->args, filetype);
-#if defined(HAVE_LIBPTHREAD)
-      if ( cdoLockIO )
-	pthread_mutex_unlock(&streamMutex);
-      else
-	pthread_mutex_unlock(&streamOpenWriteMutex);
-#endif
-      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
-      if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", argument->args);
-
-      cdoDefHistory(fileID, commandLine());
-
-      if ( cdoDefaultByteorder != CDI_UNDEFID )
-	streamDefByteorder(fileID, cdoDefaultByteorder);
-
-      if ( cdoCompress )
-	{
-	  if      ( filetype == FILETYPE_GRB )
-	    {
-	      cdoCompType  = COMPRESS_SZIP;
-	      cdoCompLevel = 0;
-	    }
-	  else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
-	    {
-	      cdoCompType  = COMPRESS_ZIP;
-	      cdoCompLevel = 1;
-	    }
-	}
-
-      if ( cdoCompType != COMPRESS_NONE )
-	{
-	  streamDefCompType(fileID, cdoCompType);
-	  streamDefCompLevel(fileID, cdoCompLevel);
-
-	  if ( cdoCompType == COMPRESS_SZIP &&
-	       (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-	    cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
-
-	  if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
-	    cdoWarning("JPEG compression not available for non GRIB2 data!");
-
-	  if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-	    cdoWarning("Deflate compression not available for non NetCDF4 data!");
-	}
-      /*
-      if ( cdoDefaultInstID != CDI_UNDEFID )
-	streamDefInstID(fileID, cdoDefaultInstID);
-      */
-      strcpy(filename, argument->args);
-
-      pstreamptr->mode     = 'w';
-      pstreamptr->name     = filename;
-      pstreamptr->fileID   = fileID;
-      pstreamptr->filetype = filetype;
-   }
+      pstreamID = pstreamOpenWriteFile(argument, filetype);
+    }
 
   return pstreamID;
 }
@@ -962,6 +996,8 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
     cdoAbort("Internal problem, varlist already allocated!");
 
   int nvars = vlistNvars(vlistID);
+  assert(nvars>0);
+  
   varlist_t *varlist = (varlist_t*) Malloc(nvars*sizeof(varlist_t));
 
   for ( int varID = 0; varID < nvars; ++varID )
