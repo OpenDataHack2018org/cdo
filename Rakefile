@@ -109,7 +109,8 @@ end
 # constuct builders out of user configuration {{{ ==============================
 Builder = Struct.new(:host,:hostname,:compiler,:targetDir,:configureCall,:configureOptions,:isLocal?)
 @userConfig["hosts"].each {|host,config|
-  @defaultCompilers.each {|cc|
+  compilers = config.has_key?('CC') ? config['CC'] : @defaultCompilers
+  compilers.each {|cc|
     builder = Builder.new(host,
                           config["hostname"],
                           cc,
