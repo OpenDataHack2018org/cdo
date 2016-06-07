@@ -58,6 +58,33 @@ int vlist_get_psvarid(int vlistID, int zaxisID)
   return psvarid;
 }
 
+static
+void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
+{
+  for ( int varID2c = 0; varID2c < nvars; ++varID2c )
+    {
+      if ( vardata2[varID2c] )
+        {
+          double missval = vlistInqVarMissval(vlistID2, varID2c);
+          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2c));
+          int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2c));
+          for ( int levelID2c = 0; levelID2c < nlevel; ++levelID2c )
+            {
+              double *pdata = vardata2[varID2c]+gridsize*levelID2c;
+              int nmiss = 0;
+              for ( int i = 0; i < gridsize; ++i )
+                if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
+
+              // if ( levelID2c == 0 ) printf("Write varID %d\n", varID2c);
+              streamDefRecord(streamID2, varID2c, levelID2c);
+              streamWriteRecord(streamID2, pdata, nmiss);
+            }
+          Free(vardata2[varID2c]);
+          vardata2[varID2c] = NULL;
+        }
+    }
+}  
+
 
 void *Select(void *argument)
 {
@@ -440,7 +467,7 @@ void *Select(void *argument)
 
       if ( lcopy_const )
         {
-          vardata2 = (double**) malloc(nvars2*sizeof(double));
+          vardata2 = (double**) Malloc(nvars2*sizeof(double));
           for ( varID = 0; varID < nvars2; ++varID ) vardata2[varID] = NULL;
         }
 
@@ -553,29 +580,6 @@ void *Select(void *argument)
 
 	      taxisCopyTimestep(taxisID2, taxisID1);
 	      streamDefTimestep(streamID2, tsID2);
-
-              if ( lcopy_const && tsID2 == 0 )
-                {
-                  for ( int varID2 = 0; varID2 < nvars2; ++varID2 )
-                    {
-                      if ( vardata2[varID2] )
-                        {
-                          double missval = vlistInqVarMissval(vlistID2, varID2);
-                          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
-                          int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
-                          for ( int levelID2 = 0; levelID2 < nlevel; ++levelID2 )
-                            {
-                              double *pdata = vardata2[varID2]+gridsize*levelID2;
-                              int nmiss = 0;
-                              for ( int i = 0; i < gridsize; ++i )
-                                if ( DBL_IS_EQUAL(pdata[i], missval) ) nmiss++;
-
-                              streamDefRecord(streamID2, varID2, levelID2);
-                              streamWriteRecord(streamID2, pdata, nmiss);
-                            }
-                        }
-                    }
-                }
               
 	      for ( int recID = 0; recID < nrecs; ++recID )
 		{
@@ -589,7 +593,11 @@ void *Select(void *argument)
 		      int varID2   = vlistFindVar(vlistID2, varID);
 		      int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 		      
-		      streamDefRecord(streamID2, varID2, levelID2);
+                      if ( lcopy_const && tsID2 == 0 )
+                        write_const_vars(streamID2, vlistID2, varID2, vardata2);
+
+                      streamDefRecord(streamID2, varID2, levelID2);
+                      // if ( levelID2 == 0 ) printf("Write varID %d\n", varID2);
 		      if ( lcopy )
 			{
 			  streamCopyRecord(streamID2, streamID1);
@@ -602,6 +610,9 @@ void *Select(void *argument)
 			}
 		    }
 		}
+              
+              if ( lcopy_const && tsID2 == 0 )
+                write_const_vars(streamID2, vlistID2, nvars2, vardata2);
 
 	      tsID2++;              
 	    }
@@ -665,9 +676,9 @@ void *Select(void *argument)
   if ( vardata2 )
     {
       for ( varID = 0; varID < nvars2; ++varID )
-        if ( vardata2[varID] ) free(vardata2[varID]);
+        if ( vardata2[varID] ) Free(vardata2[varID]);
 
-      free(vardata2);
+      Free(vardata2);
     }
 
   if ( tsID2 == 0 ) cdoAbort("No timesteps selected!");

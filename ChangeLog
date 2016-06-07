@@ -5,6 +5,7 @@
 
 2016-06-07  Uwe Schulzweida
 
+	* select: file structure may change with time constant variables (bug fix)
 	* select: wrong result with time constant 3D variables (bug fix)
 
 2016-06-02  Uwe Schulzweida
