@@ -76,7 +76,7 @@ void *Select(void *argument)
   char zname[CDI_MAX_NAME];
   int vlistID0 = -1, vlistID2 = -1;
   int taxisID2 = CDI_UNDEFID;
-  int ntsteps;
+  int ntsteps2 = 0;
   bool ltimsel = false;
   bool *vars = NULL;
   double **vardata2 = NULL;
@@ -379,7 +379,7 @@ void *Select(void *argument)
 	  taxisID2 = taxisDuplicate(taxisID1);
 	  vlistDefTaxis(vlistID2, taxisID2);
 
-	  ntsteps = vlistNtsteps(vlistID1);
+	  int ntsteps = vlistNtsteps(vlistID1);
 
 	  nvars2 = vlistNvars(vlistID2);
 
@@ -391,11 +391,9 @@ void *Select(void *argument)
 	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
 
-	  int ntsteps2 = ntsteps;
+	  ntsteps2 = ntsteps;
 	  if ( operatorID == SELECT && PML_NOCC(pml, timestep) == 1 ) ntsteps2 = 1;
 	  
-	  if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
-
 	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {
               lconstvars = false;
@@ -411,7 +409,7 @@ void *Select(void *argument)
 		  if ( par_timestep[i] < 0 )
 		    {
 		      if ( cdoVerbose )
-			cdoPrint("timestep %d changed to %d", par_timestep[i], par_timestep[i] + ntsteps + 1 );
+			cdoPrint("timestep %d changed to %d", par_timestep[i], par_timestep[i] + ntsteps + 1);
 		      par_timestep[i] += ntsteps + 1;
 		    }
 		}
@@ -547,6 +545,9 @@ void *Select(void *argument)
 	    {
 	      if ( streamID2 == CDI_UNDEFID )
 		{
+                  bool lasttimestep = (nfiles == 1) && (ntsteps2 > 1) && (ntsteps2 == (tsID1+1));
+                  if ( lasttimestep && tsID2 == 0 ) ntsteps2 = 1;
+                  if ( ntsteps2 == 0 || ntsteps2 == 1 ) vlistDefNtsteps(vlistID2, ntsteps2);
 		  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 		  streamDefVlist(streamID2, vlistID2);
 		}
