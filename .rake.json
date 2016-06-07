@@ -1,0 +1,28 @@
+{ "hosts": {
+    "thunder": {
+      "hostname": "thunder5.zmaw.de",
+      "dir": "/scratch/mpi/CC/mh0287/users/m300064/builds/remote"
+    },
+    "thingol": {
+      "hostname": "localhost",
+      "dir": "/home/ram/builds/icon",
+      "CC": ["gcc","g++","clang","clang++"]
+    },
+    "mpipc": {
+      "hostname": "mpipc150.mpi.zmaw.de",
+      "dir": "/scratch/local1/m300064/builds/remote"
+    },
+    "mistral": {
+      "hostname": "mistral.dkrz.de",
+      "dir": "/work/mh0287/users/ralf/builds/remote",
+      "CC": ["gcc","g++","icc","icpc"]
+    },
+    "cygwin": {
+      "hostname": "cdo4windows-cyg.mpimet.mpg.de",
+      "dir": "/home/mpimet/ralf/builds/remote",
+      "username": "mpimet",
+      "CC": ["gcc","g++"]
+    }
+  },
+  "remoteUser": "m300064"
+}
