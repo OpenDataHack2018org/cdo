@@ -1,5 +1,6 @@
 require 'json'
 require 'net/ssh'
+require 'open3'
 require 'tempfile'
 require 'pp'
 require 'colorize'
@@ -29,46 +30,60 @@ def getBranchName
 end
 #
 # get files for sync
-def syncFileList(file)
-  file.write(`git ls-files`)
-  dbg(File.open(file.path).readlines)
+def executeLocal(cmd)
+  Open3.popen3(cmd) {|stdin, stdout, stderr, external|
+    # read from stdout and stderr in parallel
+    { :out => stdout, :err => stderr }.each {|key, stream|
+      Thread.new do
+        until (line = stream.gets).nil? do
+          puts line.strip.colorize(color: :green) if @debug and :out == key
+          puts line.strip.colorize(color: :red)   if @debug and :err == key
+        end
+      end
+    }
+
+    # Don't exit until the external process is done
+    external.join
+  }
 end
 #
 # synchronization for a given host
 def doSync(builder)
-  # remove eerything on the remote site first
+  # make sure, that the remote target directory is present
+  executeOnHost("mkdir -p #{builder.targetDir}", builder)
+
+  # basic rsync options
+  # * remove everything on the remote site first
   rsyncOpts = "--delete-excluded --delete"
-  # keep old stuff on the remote site
+  # * keep old stuff on the remote site
   rsyncOpts = "-L"
 
   # collect the source files
   file = Tempfile.new("rsyncCdoTempfiles2Transfer")
-  syncFileList(file)
-  file.close
+  begin
+    file.write(`git ls-files`)
 
-  # call rsync for a given host
-  if builder.isLocal?
-    syncCmd = "rsync #{rsyncOpts} -avz --files-from=#{file.path} . #{builder.targetDir}"
-  else
-    syncCmd = "rsync #{rsyncOpts} -avz --files-from=#{file.path}  -e '#{builder.command}' . #{builder.targetDir}"
+    # call rsync for a given host
+    if builder.isLocal?
+      syncCmd = "rsync #{rsyncOpts} -avz --files-from=#{file.path} . #{builder.targetDir}"
+    else
+      syncCmd = "rsync #{rsyncOpts} -avz --files-from=#{file.path}  -e ssh . #{builder.username}@#{builder.hostname}:#{builder.targetDir}"
+    end
+    dbg(syncCmd)
+    executeLocal(syncCmd)
+  ensure
+    file.close
+    file.unlink
   end
-  dbg(syncCmd)
-  call(syncCmd)
 end
 #
 # execute remote command
-def executeOnHost(command, config)
+def executeOnHost(command, builder)
   dbg(command)
 
-  hostname = config['hostname']
-  username = 'localhost' == config["hostname"] \
-    ? @user \
-    : ( config.has_key?('username') \
-       ? config['username'] \
-       : @userConfig["remoteUser"] )
-
-  Net::SSH.start(hostname,username) {|ssh|
-    ssh.exec!(command).strip
+  Net::SSH.start(builder.hostname,builder.username) {|ssh|
+    out = ssh.exec!(command).strip
+    dbg(out)
   }
 end
 #
@@ -83,6 +98,7 @@ def builder2task(builder)
   desc "sync files for host: #{builder.host}, branch: #{getBranchName}"
   task syncTaskName.to_sym do |t|
     dbg("sync source  code for branch:" + getBranchName)
+    doSync(builder)
   end
 
   desc "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
@@ -107,14 +123,19 @@ def builder2task(builder)
 end
 # }}}
 # constuct builders out of user configuration {{{ ==============================
-Builder = Struct.new(:host,:hostname,:compiler,:targetDir,:configureCall,:configureOptions,:isLocal?)
+Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:configureOptions,:isLocal?)
 @userConfig["hosts"].each {|host,config|
   compilers = config.has_key?('CC') ? config['CC'] : @defaultCompilers
   compilers.each {|cc|
     builder = Builder.new(host,
                           config["hostname"],
+                          ('localhost' == config['hostname']) \
+                              ? @user \
+                              : ( config.has_key?('username') \
+                                 ? config['username'] \
+                                 : @userConfig["remoteUser"]),
                           cc,
-                          config["dir"],
+                          [config["dir"],cc,getBranchName].join(File::SEPARATOR),
                           @defautConfigureCall[cc],
                           "",
                           config["hostname"] == 'localhost')
