@@ -235,6 +235,7 @@ case "${HOSTNAME}" in
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
                     --enable-maintainer-mode \
+                    --enable-data \
 	            --with-netcdf \
 	              --with-hdf5 \
                      --with-szlib \
@@ -242,7 +243,7 @@ case "${HOSTNAME}" in
                   --with-udunits2 \
                   --with-proj \
                       --with-pic \
-                      CC=gcc CFLAGS="-g -Wall -O2 -DWITH_DATA" LIBS=-lopenjpeg
+                      CC=gcc CFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
 	;;
 # standard workstations at MPI-M x86_64-lenny
     mpipc* )
@@ -326,6 +327,27 @@ case "${HOSTNAME}" in
                     AR="ar -X 64"  LDFLAGS="-brtl" \
 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
+# win7 based cygwin virtual machine
+    cdo4windows-cyg)
+        if  test "$COMP" = gcc ; then
+          ${CONFPATH}configure \
+                      --with-netcdf \
+                      --with-hdf5 \
+                      --with-proj \
+                      --with-fftw3 \
+                      --with-udunits \
+                      CC=gcc CFLAGS='-g -Wall -O3'
+        elif  test "$COMP" = g++ ; then
+          ${CONFPATH}configure \
+                      --with-netcdf \
+                      --with-hdf5 \
+                      --with-proj \
+                      --with-fftw3 \
+                      --with-udunits \
+                      --enable-cxx \
+                      CC=gcc CXX=g++ CFLAGS='-g -Wall -O3' CXXFLAGS='-g -Wall -O3'
+        fi
+        ;;
     *)
 	echo "configuration for hostname $HOSTNAME not found!"
 	;;
