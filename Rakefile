@@ -72,7 +72,7 @@ def executeOnHost(command, builder)
 
         channel.on_extended_data do |ch, type, data|
           stderr_data += data
-          $stderr.write(data) if @debug
+          $stderr.write(data)# if @debug
         end
 
         channel.on_request("exit-status") do |ch, data|
@@ -125,7 +125,9 @@ def builder2task(builder)
   syncTaskName   = "#{baseTaskName}_sync"
   configTaskName = "#{baseTaskName}_conf"
   buildTaskName  = "#{baseTaskName}_make"
+  cleanTaskName  = "#{baseTaskName}_clean"
   checkTaskName  = "#{baseTaskName}_check"
+  checkVTaskName = "#{baseTaskName}_checkV"
 
   desc "sync files for host: #{builder.host}, branch: #{getBranchName}"
   task syncTaskName.to_sym do |t|
@@ -141,14 +143,22 @@ def builder2task(builder)
 
   desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task buildTaskName.to_sym do |t|
-    dbg("call 'make'")
     executeOnHost("cd #{builder.targetDir}; make -j4",builder)
+  end
+
+  desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
+  task cleanTaskName.to_sym do |t|
+    executeOnHost("cd #{builder.targetDir}; make clean",builder)
   end
 
   desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task checkTaskName.to_sym do |t|
-    dbg("call 'make check'")
     executeOnHost("cd #{builder.targetDir}; make check",builder)
+  end
+
+  desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
+  task checkVTaskName.to_sym do |t|
+    executeOnHost("cd #{builder.targetDir}; ./src/cdo -V",builder)
   end
 
   desc "builder for host:#{builder.hostname}, CC=#{builder.compiler}"
