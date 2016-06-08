@@ -12,7 +12,7 @@ require 'logger'
 RC                   = "#{ENV['HOME']}/.rake.json"
 @userConfig          = ( File.exist?(RC) ) ? JSON.load(File.open(RC)) : {}
 # get setup from the environment
-@debug               = ENV.has_key?('DEBUG')
+@debug               = true == Rake.verbose ? true : false
 @user                = ENV['USER']
 # basic compilers handled by the default configuration: ./config/default
 @defaultCompilers    = %w[icpc icc clang clang++ gcc g++]
@@ -47,6 +47,47 @@ def executeLocal(cmd)
   }
 end
 #
+# execute remote command
+def executeOnHost(command, builder)
+  dbg(command)
+
+  command = ["source /etc/profile",
+             "[[ -f .profile ]] && source .profile",
+             "cd #{builder.targetDir}",
+             command].join(';')
+  Net::SSH.start(builder.hostname,builder.username) do |ssh|
+    stdout_data = ""
+    stderr_data = ""
+    exit_code = nil
+    exit_signal = nil
+    ssh.open_channel do |channel|
+      channel.exec(command) do |ch, success|
+        unless success
+          raise "FAILED: couldn't execute command #{command}"
+        end
+        channel.on_data do |ch, data|
+          stdout_data += data
+          $stdout.write(data) if @debug
+        end
+
+        channel.on_extended_data do |ch, type, data|
+          stderr_data += data
+          $stderr.write(data) if @debug
+        end
+
+        channel.on_request("exit-status") do |ch, data|
+          exit_code = data.read_long
+        end
+
+        channel.on_request("exit-signal") do |ch, data|
+          exit_signal = data.read_long
+        end
+      end
+    end
+    ssh.loop
+  end
+end
+#
 # synchronization for a given host
 def doSync(builder)
   # make sure, that the remote target directory is present
@@ -62,6 +103,7 @@ def doSync(builder)
   file = Tempfile.new("rsyncCdoTempfiles2Transfer")
   begin
     file.write(`git ls-files`)
+    file.write(`git submodule foreach 'git ls-files | sed "s|^|$path/|"'`)
 
     # call rsync for a given host
     if builder.isLocal?
@@ -75,16 +117,6 @@ def doSync(builder)
     file.close
     file.unlink
   end
-end
-#
-# execute remote command
-def executeOnHost(command, builder)
-  dbg(command)
-
-  Net::SSH.start(builder.hostname,builder.username) {|ssh|
-    out = ssh.exec!(command).strip
-    dbg(out)
-  }
 end
 #
 # construct task from builder object
@@ -104,16 +136,19 @@ def builder2task(builder)
   desc "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task configTaskName.to_sym do |t|
     dbg("call #{builder.configureCall}")
+    executeOnHost("cd #{builder.targetDir}; #{builder.configureCall}",builder)
   end
 
   desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task buildTaskName.to_sym do |t|
     dbg("call 'make'")
+    executeOnHost("cd #{builder.targetDir}; make -j4",builder)
   end
 
   desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task checkTaskName.to_sym do |t|
     dbg("call 'make check'")
+    executeOnHost("cd #{builder.targetDir}; make check",builder)
   end
 
   desc "builder for host:#{builder.hostname}, CC=#{builder.compiler}"
@@ -142,14 +177,6 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
     builder2task(builder)
   }
 }
-# }}}
-# remote sync task {{{
-# }}}
-#
-# remote configure task {{{
-# }}}
-#
-# remote building task {{{
 # }}}
 #
 # check connections {{{
