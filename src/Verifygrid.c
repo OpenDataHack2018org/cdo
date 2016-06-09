@@ -1,5 +1,5 @@
 /*
-  This file is part of CDO. CDO is a collection of Operators to
+  This files is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
   Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
