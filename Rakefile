@@ -11,6 +11,10 @@ require 'logger'
 # load user setting if available
 RC                   = "#{ENV['HOME']}/.rake.json"
 @userConfig          = ( File.exist?(RC) ) ? JSON.load(File.open(RC)) : {}
+if @userConfig.empty? then
+  warn "No host information!!"
+  exit(1)
+end
 # get setup from the environment
 @debug               = true == Rake.verbose ? true : false
 @user                = ENV['USER']
@@ -24,13 +28,14 @@ RC                   = "#{ENV['HOME']}/.rake.json"
 # helper methods {{{ ===========================================================
 # general debugging output
 def dbg(msg); pp msg if @debug; end
+
+# return name of current branch
+def getBranchName; `git branch`.split("\n").grep(/^\*/)[0].split[-1]; end
+
+# wrapper for calling commands locally
 #
-# collect file list for sync
-def getBranchName
-  `git branch`.split("\n").grep(/^\*/)[0].split[-1]
-end
-#
-# get files for sync
+# stdout is shown in debug mode only
+# stderr is always shown
 def executeLocal(cmd)
   Open3.popen3(cmd) {|stdin, stdout, stderr, external|
     # read from stdout and stderr in parallel
@@ -42,61 +47,71 @@ def executeLocal(cmd)
         end
       end
     }
-
     # Don't exit until the external process is done
     external.join
   }
 end
-#
-# execute remote command
-def executeOnHost(command, builder)
-  dbg(command)
 
-  command = ["[[ -f /etc/process ]] && source /etc/profile",
-             "[[ -f .profile ]] && source .profile",
+# execute remote command and collect
+#
+# stdout is shown in debug mode only
+# stderr is always shown
+def executeRemote(command, builder)
+  Net::SSH.start(builder.hostname,builder.username) do |ssh|
+    stdout_data = ""
+    stderr_data = ""
+    exit_code = nil
+    exit_signal = nil
+    ssh.open_channel do |channel|
+      channel.exec(command) do |ch, success|
+        unless success
+          raise "FAILED: couldn't execute command #{command}"
+        end
+        channel.on_data do |ch, data|
+          stdout_data += data
+          $stdout.write(data) if @debug
+        end
+
+        channel.on_extended_data do |ch, type, data|
+          stderr_data += data
+          $stderr.write(data)# if @debug
+        end
+
+        channel.on_request("exit-status") do |ch, data|
+          exit_code = data.read_long
+        end
+
+        channel.on_request("exit-signal") do |ch, data|
+          exit_signal = data.read_long
+        end
+      end
+    end
+    ssh.loop
+  end
+end
+#
+# execution wrapper
+def execute(command, builder)
+  # work in the target directory, ONLY
+  command = ["test -f /etc/profile && source /etc/profile",
+             "test -f .profile && source .profile",
+             "test ! -d #{builder.targetDir} && mkdir -p #{builder.targetDir}",
              "cd #{builder.targetDir}",
              command].join(';')
+
+  dbg(command)
+
   if builder.isLocal? then
     executeLocal(command)
   else
-    Net::SSH.start(builder.hostname,builder.username) do |ssh|
-      stdout_data = ""
-      stderr_data = ""
-      exit_code = nil
-      exit_signal = nil
-      ssh.open_channel do |channel|
-        channel.exec(command) do |ch, success|
-          unless success
-            raise "FAILED: couldn't execute command #{command}"
-          end
-          channel.on_data do |ch, data|
-            stdout_data += data
-            $stdout.write(data) if @debug
-          end
-
-          channel.on_extended_data do |ch, type, data|
-            stderr_data += data
-            $stderr.write(data)# if @debug
-          end
-
-          channel.on_request("exit-status") do |ch, data|
-            exit_code = data.read_long
-          end
-
-          channel.on_request("exit-signal") do |ch, data|
-            exit_signal = data.read_long
-          end
-        end
-      end
-      ssh.loop
-    end
+    executeRemote(command,builder)
   end
 end
 #
 # synchronization for a given host
 def doSync(builder)
   # make sure, that the remote target directory is present
-  executeOnHost("mkdir -p #{builder.targetDir}", builder)
+  execute("mkdir -p #{builder.targetDir}", builder)
 
   # basic rsync options
   # * remove everything on the remote site first
@@ -125,55 +140,78 @@ def doSync(builder)
 end
 #
 # construct task from builder object
-def builder2task(builder)
-  baseTaskName   = "#{builder.host}#{builder.compiler.upcase}"
-  syncTaskName   = "#{baseTaskName}_sync"
-  configTaskName = "#{baseTaskName}_conf"
-  buildTaskName  = "#{baseTaskName}_make"
-  cleanTaskName  = "#{baseTaskName}_clean"
-  checkTaskName  = "#{baseTaskName}_check"
-  checkVTaskName = "#{baseTaskName}_checkV"
+def builder2task(builder,useHostAsName=false,syncSource=true)
+  baseTaskName    = useHostAsName ? builder.host : "#{builder.host}#{builder.compiler.upcase}"
+  syncTaskName    = "#{baseTaskName}_sync"
+  configTaskName  = "#{baseTaskName}_conf"
+  buildTaskName   = "#{baseTaskName}_make"
+  cleanTaskName   = "#{baseTaskName}_clean"
+  checkTaskName   = "#{baseTaskName}_check"
+  checkVTaskName  = "#{baseTaskName}_checkV"
+  modlistTaskName = "#{baseTaskName}_mods"
+  showLogTaskName = "#{baseTaskName}_showLog"
 
-  desc "sync files for host: #{builder.host}, branch: #{getBranchName}"
-  task syncTaskName.to_sym do |t|
-    dbg("sync source  code for branch:" + getBranchName)
-    doSync(builder)
+  # collect things that should go into the general builder {{{
+  taskChain = []
+
+  if syncSource then
+    #desc "sync files for host: #{builder.host}, branch: #{getBranchName}"
+    task syncTaskName.to_sym do |t|
+      dbg("sync source  code for branch:" + getBranchName)
+      doSync(builder)
+    end
+    taskChain << syncTaskName
   end
 
-  desc "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
+  #desc "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task configTaskName.to_sym do |t|
     dbg("call #{builder.configureCall}")
-    executeOnHost("cd #{builder.targetDir}; #{builder.configureCall}",builder)
+    execute("cd #{builder.targetDir}; #{builder.configureCall}",builder)
   end
+  taskChain << configTaskName
 
-  desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
+  #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task buildTaskName.to_sym do |t|
-    executeOnHost("cd #{builder.targetDir}; make -j4",builder)
+    execute("cd #{builder.targetDir}; make -j4",builder)
   end
+  taskChain << buildTaskName
 
-  desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
-  task cleanTaskName.to_sym do |t|
-    executeOnHost("cd #{builder.targetDir}; make clean",builder)
-  end
-
-  desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
+  #desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task checkTaskName.to_sym do |t|
-    executeOnHost("cd #{builder.targetDir}; make check",builder)
+    execute("cd #{builder.targetDir}; make check",builder)
+  end
+  taskChain << checkTaskName
+  # }}}
+
+  #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
+  task cleanTaskName.to_sym do |t|
+    execute("cd #{builder.targetDir}; make clean",builder)
   end
 
-  desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
+  #desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task checkVTaskName.to_sym do |t|
-    executeOnHost("cd #{builder.targetDir}; ./src/cdo -V",builder)
+    execute("cd #{builder.targetDir}; ./src/cdo -V",builder)
+  end
+
+  # show remote config.log file
+  task showLogTaskName.to_sym do |t|
+    execute("cat config.log",builder)
+  end
+
+  # get the auto loaded modules on the target machine
+  task modlistTaskName.to_sym do |t|
+    execute("module list", builder)
   end
 
   desc "builder for host:#{builder.hostname}, CC=#{builder.compiler}"
-  task baseTaskName.to_sym  => [syncTaskName, configTaskName, buildTaskName, checkTaskName].map(&:to_sym) do |t|
+  task baseTaskName.to_sym  => taskChain.map(&:to_sym) do |t|
     pp builder.to_h
   end
 end
 # }}}
 # constuct builders out of user configuration {{{ ==============================
-Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:configureOptions,:isLocal?)
+Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?)
+# 1) construct builders from host configuration
 @userConfig["hosts"].each {|host,config|
   compilers = config.has_key?('CC') ? config['CC'] : @defaultCompilers
   compilers.each {|cc|
@@ -187,10 +225,27 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                           cc,
                           [config["dir"],cc,getBranchName].join(File::SEPARATOR),
                           @defautConfigureCall[cc],
-                          "",
                           config["hostname"] == 'localhost')
     builder2task(builder)
   }
+}
+# 2) construct builders from manual configuration
+@userConfig["builders"].each {|builderName,config|
+  builder = Builder.new(builderName,
+                        config["hostname"],
+                        ('localhost' == config['hostname'] \
+                                  or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname']) \
+                            ? @user \
+                            : ( config.has_key?('username') \
+                               ? config['username'] \
+                               : @userConfig["remoteUser"]),
+                        config["CC"],
+                        [@userConfig['hosts'][config['hostname']]['dir'],builderName,getBranchName].join(File::SEPARATOR),
+                        config['configureCall'],
+                        ( 'localhost' == config['hostname'] \
+                           or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname'] ))
+    builder2task(builder,true, config['sync'])
+
 }
 # }}}
 #
@@ -224,7 +279,5 @@ task :checkInterals do
   dbg(@srcDir)
   dbg(getBranchName)
   dbg(syncFileList) if false
-# dbg(executeOnHost("pwd",@userConfig["hosts"]["thunder4"]))
-# dbg(executeOnHost("pwd",@userConfig["hosts"]["cygwin"]))
 end
 # }}}
