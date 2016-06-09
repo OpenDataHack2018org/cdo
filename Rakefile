@@ -1,16 +1,12 @@
-begin
-  require 'json'
-  require 'net/ssh'
-  require 'open3'
-  require 'tempfile'
-  require 'pp'
-  require 'colorize'
-  require 'parallel'
-  require 'logger'
-rescue LoadError
-  sh "gem install net-ssh colorize parallelQueue --user-install"
-end
-
+require 'json'
+require 'net/ssh'
+require 'open3'
+require 'tempfile'
+require 'pp'
+require 'colorize'
+require 'parallel'
+require 'logger'
+#
 # configuration {{{ ============================================================
 # load user setting if available
 RC                   = "#{ENV['HOME']}/.rake.json"
@@ -56,8 +52,8 @@ end
 def executeOnHost(command, builder)
   dbg(command)
 
-  command = ["[[ -f /etc/process ]] && source /etc/profile",
-             "[[ -f .profile ]] && source .profile",
+  command = ["test -f /etc/process && source /etc/profile",
+             "test -f .profile && source .profile",
              "cd #{builder.targetDir}",
              command].join(';')
   if builder.isLocal? then
