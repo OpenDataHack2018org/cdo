@@ -162,6 +162,16 @@ case "${HOSTNAME}" in
           ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -fast"
+        elif  test "$COMP" = clang ; then
+          ${CONFPATH}configure              --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=clang CXX=clang++ CFLAGS="-g -O2"
+        elif  test "$COMP" = clang++ ; then
+          ${CONFPATH}configure --enable-cxx --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=clang CXX=clang++ CFLAGS="-g -O2"
         elif  test "$COMP" = g++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
