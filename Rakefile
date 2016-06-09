@@ -1,11 +1,15 @@
-require 'json'
-require 'net/ssh'
-require 'open3'
-require 'tempfile'
-require 'pp'
-require 'colorize'
-require 'parallel'
-require 'logger'
+begin
+  require 'json'
+  require 'net/ssh'
+  require 'open3'
+  require 'tempfile'
+  require 'pp'
+  require 'colorize'
+  require 'parallel'
+  require 'logger'
+rescue LoadError
+  sh "gem install net-ssh colorize parallelQueue --user-install"
+end
 
 # configuration {{{ ============================================================
 # load user setting if available
@@ -18,6 +22,7 @@ RC                   = "#{ENV['HOME']}/.rake.json"
 @defaultCompilers    = %w[icpc icc clang clang++ gcc g++]
 # default configure call
 @defautConfigureCall = lambda {|cc| "./config/default CC=#{cc}"}
+@srcDir              = File.expand_path(File.dirname(__FILE__))
 # }}}
 
 # helper methods {{{ ===========================================================
@@ -36,8 +41,8 @@ def executeLocal(cmd)
     { :out => stdout, :err => stderr }.each {|key, stream|
       Thread.new do
         until (line = stream.gets).nil? do
-          puts line.strip.colorize(color: :green) if @debug and :out == key
-          puts line.strip.colorize(color: :red)   if @debug and :err == key
+          puts line.chomp                       if :out == key and @debug
+          puts line.chomp.colorize(color: :red) if :err == key
         end
       end
     }
@@ -51,40 +56,44 @@ end
 def executeOnHost(command, builder)
   dbg(command)
 
-  command = ["source /etc/profile",
+  command = ["[[ -f /etc/process ]] && source /etc/profile",
              "[[ -f .profile ]] && source .profile",
              "cd #{builder.targetDir}",
              command].join(';')
-  Net::SSH.start(builder.hostname,builder.username) do |ssh|
-    stdout_data = ""
-    stderr_data = ""
-    exit_code = nil
-    exit_signal = nil
-    ssh.open_channel do |channel|
-      channel.exec(command) do |ch, success|
-        unless success
-          raise "FAILED: couldn't execute command #{command}"
-        end
-        channel.on_data do |ch, data|
-          stdout_data += data
-          $stdout.write(data) if @debug
-        end
+  if builder.isLocal? then
+    executeLocal(command)
+  else
+    Net::SSH.start(builder.hostname,builder.username) do |ssh|
+      stdout_data = ""
+      stderr_data = ""
+      exit_code = nil
+      exit_signal = nil
+      ssh.open_channel do |channel|
+        channel.exec(command) do |ch, success|
+          unless success
+            raise "FAILED: couldn't execute command #{command}"
+          end
+          channel.on_data do |ch, data|
+            stdout_data += data
+            $stdout.write(data) if @debug
+          end
 
-        channel.on_extended_data do |ch, type, data|
-          stderr_data += data
-          $stderr.write(data)# if @debug
-        end
+          channel.on_extended_data do |ch, type, data|
+            stderr_data += data
+            $stderr.write(data)# if @debug
+          end
 
-        channel.on_request("exit-status") do |ch, data|
-          exit_code = data.read_long
-        end
+          channel.on_request("exit-status") do |ch, data|
+            exit_code = data.read_long
+          end
 
-        channel.on_request("exit-signal") do |ch, data|
-          exit_signal = data.read_long
+          channel.on_request("exit-signal") do |ch, data|
+            exit_signal = data.read_long
+          end
         end
       end
+      ssh.loop
     end
-    ssh.loop
   end
 end
 #
@@ -216,9 +225,10 @@ end
 # check internals {{{
 desc "check some internals"
 task :checkInterals do
+  dbg(@srcDir)
   dbg(getBranchName)
   dbg(syncFileList) if false
-  dbg(executeOnHost("pwd",@userConfig["hosts"]["thunder4"]))
-  dbg(executeOnHost("pwd",@userConfig["hosts"]["cygwin"]))
+# dbg(executeOnHost("pwd",@userConfig["hosts"]["thunder4"]))
+# dbg(executeOnHost("pwd",@userConfig["hosts"]["cygwin"]))
 end
 # }}}
