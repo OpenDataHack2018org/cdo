@@ -240,6 +240,20 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
 } if @userConfig.has_key?('builders')
 # }}}
 #
+
+task :par do |t|
+  # remove all tasks from the stack
+  Rake.application.top_level_tasks.clear
+
+  # create a task list from the command line
+  ARGV.shift
+  taskList = ARGV
+  dbg(taskList)
+
+  Parallel.map(taskList) {|t|
+   sh "xterm -hold -e 'rake #{t}' "
+  }
+end
 # check connections {{{
 desc "check available connections"
 task :checkConnections do |t|
