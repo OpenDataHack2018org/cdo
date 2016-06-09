@@ -6,7 +6,6 @@ require 'pp'
 require 'colorize'
 require 'parallel'
 require 'logger'
-
 # configuration {{{ ============================================================
 # load user setting if available
 RC                   = "#{ENV['HOME']}/.rake.json"
