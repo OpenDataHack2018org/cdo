@@ -1,15 +1,11 @@
-begin
-  require 'json'
-  require 'net/ssh'
-  require 'open3'
-  require 'tempfile'
-  require 'pp'
-  require 'colorize'
-  require 'parallel'
-  require 'logger'
-rescue LoadError
-  sh "gem install net-ssh colorize parallelQueue --user-install"
-end
+require 'json'
+require 'net/ssh'
+require 'open3'
+require 'tempfile'
+require 'pp'
+require 'colorize'
+require 'parallel'
+require 'logger'
 
 # configuration {{{ ============================================================
 # load user setting if available
