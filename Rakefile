@@ -17,8 +17,6 @@ end
 # get setup from the environment
 @debug               = true # == Rake.verbose ? true : false
 @user                = ENV['USER']
-# basic compilers handled by the default configuration: ./config/default
-@defaultCompilers    = %w[icpc icc clang clang++ gcc g++]
 # default configure call
 @defautConfigureCall = lambda {|cc| "./config/default CC=#{cc}"}
 # }}}
@@ -205,9 +203,9 @@ end
 # constuct builders out of user configuration {{{ ==============================
 Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?)
 # 1) construct builders from host configuration
+#    this is what config/default should be able to handle
 @userConfig["hosts"].each {|host,config|
-  compilers = config.has_key?('CC') ? config['CC'] : @defaultCompilers
-  compilers.each {|cc|
+  config['CC'].each {|cc|
     builder = Builder.new(host,
                           config["hostname"],
                           ('localhost' == config['hostname']) \
@@ -217,7 +215,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                                  : @userConfig["remoteUser"]),
                           cc,
                           [config["dir"],cc,getBranchName].join(File::SEPARATOR),
-                          @defautConfigureCall[cc],
+                          "./config/default CC=#{cc}",
                           config["hostname"] == 'localhost')
     builder2task(builder)
   }
@@ -232,7 +230,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                             : ( config.has_key?('username') \
                                ? config['username'] \
                                : @userConfig["remoteUser"]),
-                        config["CC"],
+                        '', # CC can be empty here, because it should be set by the given configureCall
                         [@userConfig['hosts'][config['hostname']]['dir'],builderName,getBranchName].join(File::SEPARATOR),
                         config['configureCall'],
                         ( 'localhost' == config['hostname'] \
