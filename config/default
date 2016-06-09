@@ -232,6 +232,8 @@ case "${HOSTNAME}" in
 	;;
 # x86_64-archlinux
     luthien*)
+      case "$COMP" in
+      gcc|clang)
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
                     --enable-maintainer-mode \
@@ -241,10 +243,31 @@ case "${HOSTNAME}" in
                      --with-szlib \
                   --with-grib_api \
                   --with-udunits2 \
-                  --with-proj \
-                      --with-pic \
-                      CC=gcc CFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
+                  --with-grib_api \
+                  --with-fftw3    \
+                  --with-proj     \
+                      --with-pic  \
+                      CC=$COMP CFLAGS="-g -Wall -O3" LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
+        ;;
+      g++|clang++)
+ 	${CONFPATH}configure --prefix=$HOME/local \
+                    --program-suffix=-dev \
+                    --enable-maintainer-mode \
+                    --enable-data \
+                    --enable-cxx  \
+	            --with-netcdf \
+	              --with-hdf5 \
+                     --with-szlib \
+                  --with-grib_api \
+                  --with-udunits2 \
+                  --with-grib_api \
+                  --with-fftw3    \
+                  --with-proj     \
+                      --with-pic  \
+                      CC=$COMP CFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
 	;;
+      esac
+    ;;
 # standard workstations at MPI-M x86_64-lenny
     mpipc* )
 	${CONFPATH}configure \
