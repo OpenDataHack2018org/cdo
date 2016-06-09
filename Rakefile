@@ -15,7 +15,7 @@ if @userConfig.empty? then
   exit(1)
 end
 # get setup from the environment
-@debug               = true == Rake.verbose ? true : false
+@debug               = true # == Rake.verbose ? true : false
 @user                = ENV['USER']
 # basic compilers handled by the default configuration: ./config/default
 @defaultCompilers    = %w[icpc icc clang clang++ gcc g++]
@@ -165,31 +165,31 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   #desc "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task configTaskName.to_sym do |t|
     dbg("call #{builder.configureCall}")
-    execute("cd #{builder.targetDir}; #{builder.configureCall}",builder)
+    execute("#{builder.configureCall}",builder)
   end
   taskChain << configTaskName
 
   #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task buildTaskName.to_sym do |t|
-    execute("cd #{builder.targetDir}; make -j4",builder)
+    execute("make -j4",builder)
   end
   taskChain << buildTaskName
 
   #desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task checkTaskName.to_sym do |t|
-    execute("cd #{builder.targetDir}; make check",builder)
+    execute("make check",builder)
   end
   taskChain << checkTaskName
   # }}}
 
   #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task cleanTaskName.to_sym do |t|
-    execute("cd #{builder.targetDir}; make clean",builder)
+    execute("make clean",builder)
   end
 
   #desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task checkVTaskName.to_sym do |t|
-    execute("cd #{builder.targetDir}; ./src/cdo -V",builder)
+    execute("./src/cdo -V",builder)
   end
 
   # show remote config.log file
@@ -246,7 +246,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
   pp builder
     builder2task(builder,true, config['sync'])
 
-}
+} if @userConfig.has_key?('builders')
 # }}}
 #
 # check connections {{{
