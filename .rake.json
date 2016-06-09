@@ -10,7 +10,8 @@
     },
     "mpipc": {
       "hostname": "mpipc150.mpi.zmaw.de",
-      "dir": "/scratch/local1/m300064/builds/remote"
+      "dir": "/scratch/local1/m300064/builds/remote",
+      "CC": ["gcc"]
     },
     "mistral": {
       "hostname": "mistral.dkrz.de",
@@ -47,6 +48,13 @@
       "configureCall": "/home/ram/src/cdo/configure --with-netcdf --enable-cxx CC=clang CXX=clang++ CFLAGS='-g -O0'",
       "makeCall": "make -j 12",
       "sync": false
+    },
+    "mpipcCLANG": {
+      "hostname": "mpipc",
+      "CC": "clang",
+      "configureCall": "./configure --with-netcdf=--with-netcdf=/sw/squeeze-x64/netcdf-4.2-static --disable-openmp CC=clang CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
     }
   }
 }

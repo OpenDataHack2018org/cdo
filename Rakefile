@@ -231,7 +231,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
 # 2) construct builders from manual configuration
 @userConfig["builders"].each {|builderName,config|
   builder = Builder.new(builderName,
-                        config["hostname"],
+                        @userConfig['hosts'][config["hostname"]]['hostname'],
                         ('localhost' == config['hostname'] \
                                   or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname']) \
                             ? @user \
@@ -243,6 +243,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                         config['configureCall'],
                         ( 'localhost' == config['hostname'] \
                            or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname'] ))
+  pp builder
     builder2task(builder,true, config['sync'])
 
 }
