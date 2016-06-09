@@ -250,6 +250,7 @@ task :par do |t|
   taskList = ARGV
   dbg(taskList)
 
+  # execute tasks in parallel
   Parallel.map(taskList) {|t|
    sh "xterm -hold -e 'rake #{t}' "
   }
