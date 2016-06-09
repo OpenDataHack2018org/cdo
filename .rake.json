@@ -3,9 +3,9 @@
       "hostname": "thunder5.zmaw.de",
       "dir": "/scratch/mpi/CC/mh0287/users/m300064/builds/remote"
     },
-    "thingol": {
+    "luthien": {
       "hostname": "localhost",
-      "dir": "/home/ram/builds/icon",
+      "dir": "/home/ram/builds/cdo/auto",
       "CC": ["gcc","g++","clang","clang++"]
     },
     "mpipc": {
@@ -22,7 +22,31 @@
       "dir": "/home/mpimet/ralf/builds/remote",
       "username": "mpimet",
       "CC": ["gcc","g++"]
+    },
+    "cscs": {
+      "hostname": "daint.cscs.ch",
+      "dir": "/users/ram/builds/cdo",
+      "username": "ram",
+      "CC": ["icc","pgcc","cray","gcc"]
     }
   },
-  "remoteUser": "m300064"
+
+  "remoteUser": "m300064",
+
+  "builders": {
+    "localCLANG_3.8_Debug": {
+      "hostname": "luthien",
+      "CC": "clang",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf CC=clang CFLAGS='-g -O0'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
+    "localCLANG++_3.8_Debug": {
+      "hostname": "luthien",
+      "CC": "clang",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --enable-cxx CC=clang CXX=clang++ CFLAGS='-g -O0'",
+      "makeCall": "make -j 12",
+      "sync": false
+    }
+  }
 }
