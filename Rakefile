@@ -36,12 +36,14 @@ def getBranchName; `git branch`.split("\n").grep(/^\*/)[0].split[-1]; end
 # stdout is shown in debug mode only
 # stderr is always shown
 def executeLocal(cmd)
+  system(cmd)
+  return
   Open3.popen3(cmd) {|stdin, stdout, stderr, external|
     # read from stdout and stderr in parallel
     { :out => stdout, :err => stderr }.each {|key, stream|
       Thread.new do
         until (line = stream.gets).nil? do
-          puts line.chomp                       if :out == key and @debug
+          puts line.chomp                       if :out == key
           puts line.chomp.colorize(color: :red) if :err == key
         end
       end
@@ -150,16 +152,12 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   modlistTaskName = "#{baseTaskName}_mods"
   showLogTaskName = "#{baseTaskName}_showLog"
 
-  # collect things that should go into the general builder {{{
-  taskChain = []
-
   if syncSource then
     #desc "sync files for host: #{builder.host}, branch: #{getBranchName}"
     task syncTaskName.to_sym do |t|
       dbg("sync source  code for branch:" + getBranchName)
       doSync(builder)
     end
-    taskChain << syncTaskName
   end
 
   #desc "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
@@ -167,20 +165,16 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
     dbg("call #{builder.configureCall}")
     execute("#{builder.configureCall}",builder)
   end
-  taskChain << configTaskName
 
   #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task buildTaskName.to_sym do |t|
     execute("make -j4",builder)
   end
-  taskChain << buildTaskName
 
   #desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task checkTaskName.to_sym do |t|
     execute("make check",builder)
   end
-  taskChain << checkTaskName
-  # }}}
 
   #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
   task cleanTaskName.to_sym do |t|
@@ -203,9 +197,7 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   end
 
   desc "builder for host:#{builder.hostname}, CC=#{builder.compiler}"
-  task baseTaskName.to_sym  => taskChain.map(&:to_sym) do |t|
-    pp builder.to_h
-  end
+  task baseTaskName.to_sym  => [syncTaskName,configTaskName,buildTaskName,checkTaskName].map(&:to_sym) do |t|
 end
 # }}}
 # constuct builders out of user configuration {{{ ==============================
@@ -243,8 +235,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                         config['configureCall'],
                         ( 'localhost' == config['hostname'] \
                            or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname'] ))
-  pp builder
-    builder2task(builder,true, config['sync'])
+  builder2task(builder,true, config['sync'])
 
 } if @userConfig.has_key?('builders')
 # }}}
