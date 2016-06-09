@@ -464,7 +464,7 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
       
       if (actual_number_of_corners < 3){
 	if (cdoVerbose){
-	  fprintf(stdout,"Less than three vertices found in cell no %u. This cell is considered degenerate and will be omitted from further computation!\n\n", cell_no + 1);
+	  fprintf(stdout,"Less than three vertices found in cell no %u. This cell is considered degenerate and will be omitted from further computation!\n", cell_no + 1);
 	}
 	continue;
       }
@@ -485,7 +485,7 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
 	    if (fabs(cell_corners_in_Euclidean_space_open_cell[i + 1] - cell_corners_in_Euclidean_space_open_cell[j + 1]) < 0.000001){
 	      if (fabs(cell_corners_in_Euclidean_space_open_cell[i + 2] - cell_corners_in_Euclidean_space_open_cell[j + 2]) < 0.000001){
 		if (cdoVerbose){
-		  fprintf(stdout,"The duplicate vertex %f, %f, %f was found in cell no %u.\n\n", cell_corners_in_Euclidean_space_open_cell[j],  cell_corners_in_Euclidean_space_open_cell[j + 1],  cell_corners_in_Euclidean_space_open_cell[j + 2], cell_no + 1);
+		  fprintf(stdout,"The duplicate vertex %f, %f, %f was found in cell no %u.\n", cell_corners_in_Euclidean_space_open_cell[j],  cell_corners_in_Euclidean_space_open_cell[j + 1],  cell_corners_in_Euclidean_space_open_cell[j + 2], cell_no + 1);
 		}
 		no_duplicates += 1;
 		marked_duplicate_indices[j / 3] = 1;
@@ -517,7 +517,7 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
       
       if (actual_number_of_corners < 3){
 	if (cdoVerbose){
-	  fprintf(stdout,"Less than three vertices found in cell no %u. This cell is considered degenerate and will be omitted from further computation!\n\n", cell_no + 1);
+	  fprintf(stdout,"Less than three vertices found in cell no %u. This cell is considered degenerate and will be omitted from further computation!\n", cell_no + 1);
 	}
 	continue;
       }
@@ -655,14 +655,14 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
     if ( no_cells_with_a_specific_no_of_corners[i] )
       cdoPrintBlue("%9d cells have %d vertices", no_cells_with_a_specific_no_of_corners[i], i + 1);
 
+  if ( no_of_cells_with_duplicates )
+    cdoPrintBlue("%9d cells have duplicate vertices", no_of_cells_with_duplicates);
+
   if ( no_nonunique_cells )
     cdoPrintRed("%9d cells are not unique", no_nonunique_cells);
   
   if ( no_nonconvex_cells )
     cdoPrintRed("%9d cells are non-convex", no_nonconvex_cells);
-
-  if ( no_of_cells_with_duplicates )
-    cdoPrintRed("%9d cells have duplicate vertices", no_of_cells_with_duplicates);
 
   if ( no_clockwise_cells )
     cdoPrintRed("%9d cells have their vertices arranged in a clockwise order", no_clockwise_cells);
