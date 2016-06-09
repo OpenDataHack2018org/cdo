@@ -954,7 +954,7 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
     {
       parse_arg->coords[coordID].needed = true;
 
-      data = (double*) malloc(nlev*sizeof(double));
+      data = (double*) Malloc(nlev*sizeof(double));
       zaxisInqLevels(zaxisID, data);
     }
   else

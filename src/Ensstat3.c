@@ -223,9 +223,9 @@ void *Ensstat3(void *argument)
 
   if ( operfunc == func_roc ) {
     ctg_tab = (int**) Malloc((nbins+1)*sizeof(int*));
-    hist =    (int*) malloc ( nbins*sizeof(int));
-    uThresh = (double*) Malloc( nbins*sizeof(double));
-    lThresh = (double*) Malloc( nbins*sizeof(double));
+    hist =    (int*) Malloc(nbins*sizeof(int));
+    uThresh = (double*) Malloc(nbins*sizeof(double));
+    lThresh = (double*) Malloc(nbins*sizeof(double));
     roc     = (double**) Malloc((nbins+1)*sizeof(double*));
     
     for  ( i=0; i<nbins; i++ ) {

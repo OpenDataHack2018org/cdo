@@ -323,7 +323,7 @@ void *XTimstat(void *argument)
   int otsID = 0;
   int nrecs = streamInqTimestep(streamID1, tsID);
   int maxrecs = nrecs;
-  recinfo_t *recinfo = (recinfo_t *) malloc(maxrecs*sizeof(recinfo_t));
+  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
   
   tsID++;
   while ( TRUE )
@@ -386,7 +386,7 @@ void *XTimstat(void *argument)
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
                     {
                       if ( samp1[varID][levelID].ptr == NULL )
-                        samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
+                        samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
                       
                       for ( int i = 0; i < nwpv*gridsize; i++ )
                         if ( DBL_IS_EQUAL(pvar1->ptr[i], pvar1->missval) )
@@ -417,7 +417,7 @@ void *XTimstat(void *argument)
                     {
                       if ( samp1[varID][levelID].ptr == NULL )
                         {
-                          samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
+                          samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
                           for ( int i = 0; i < nwpv*gridsize; i++ )
                             samp1[varID][levelID].ptr[i] = nsets;
                         }

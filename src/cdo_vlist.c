@@ -524,5 +524,5 @@ void vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1, int zax
 	}
     }
 
-  if ( vct ) free(vct);
+  if ( vct ) Free(vct);
 }

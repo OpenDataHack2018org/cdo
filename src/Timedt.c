@@ -108,8 +108,8 @@ void *Timedt(void *argument)
       tsID2++;
     }
 
-  free(array1);
-  free(array2);
+  Free(array1);
+  Free(array2);
   field_free(vars, vlistID1);
 
   streamClose(streamID2);

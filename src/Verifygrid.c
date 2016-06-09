@@ -368,7 +368,7 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
 
   /* For performing the first test, an array of all center point coordinates is built. */
 
-  double * center_point_array = (double *)malloc(gridsize * 2 * sizeof(double));
+  double * center_point_array = (double *)Malloc(gridsize * 2 * sizeof(double));
   
   for(cell_no = 0; cell_no < gridsize; cell_no++){
     center_point_array[cell_no * 2 + 0] = grid_center_lon[cell_no];
@@ -413,7 +413,7 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
     }
   }
   
-  free(center_point_array);
+  Free(center_point_array);
 
   /* 
      Latitude and longitude are spherical coordinates on a unit circle. Each such coordinate tuple is transformed into a triple of Cartesian coordinates in Euclidean space. 
@@ -710,7 +710,7 @@ void *Verifygrid(void *argument)
         {
         int *grid_mask = (int*) Malloc(gridsize*sizeof(int));
         gridInqMaskGME(gridID, grid_mask);
-        free(grid_mask);
+        Free(grid_mask);
         }
       */
       int ncorner = 4;

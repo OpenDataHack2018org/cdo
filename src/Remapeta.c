@@ -312,7 +312,7 @@ void *Remapeta(void *argument)
       if ( nmiss )
 	{
 	  missval = vlistInqVarMissval(vlistID1, varID);
-	  imiss = (int*) malloc (nfis2gp*sizeof(int));
+	  imiss = (int*) Malloc(nfis2gp*sizeof(int));
 	  for ( i = 0; i < nfis2gp; ++i )
 	    {
 	      if ( DBL_IS_EQUAL(fis2[i], missval) )

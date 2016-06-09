@@ -167,7 +167,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
       for ( k = 3; k < 10000; k+=2 )
         if ( num_neighbors <= ((k-2)*(k-2)) ) break;
 
-      if ( (k*k) > MAX_SEARCH_CELLS ) psrc_add = src_add_tmp = (int *) malloc(k*k*sizeof(int));
+      if ( (k*k) > MAX_SEARCH_CELLS ) psrc_add = src_add_tmp = (int *) Malloc(k*k*sizeof(int));
 
       k /= 2;
 
@@ -231,7 +231,7 @@ void grid_search_nbr_reg2d(struct gridsearch *gs, int num_neighbors, remapgrid_t
 
       nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
-      if ( src_add_tmp ) free(src_add_tmp);
+      if ( src_add_tmp ) Free(src_add_tmp);
     }
   else if ( src_grid->lextrapolate )
     {
