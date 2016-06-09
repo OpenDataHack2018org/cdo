@@ -21,7 +21,6 @@ end
 @defaultCompilers    = %w[icpc icc clang clang++ gcc g++]
 # default configure call
 @defautConfigureCall = lambda {|cc| "./config/default CC=#{cc}"}
-@srcDir              = File.expand_path(File.dirname(__FILE__))
 # }}}
 
 # helper methods {{{ ===========================================================
@@ -197,7 +196,10 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   end
 
   desc "builder for host:#{builder.hostname}, CC=#{builder.compiler}"
-  task baseTaskName.to_sym  => [syncTaskName,configTaskName,buildTaskName,checkTaskName].map(&:to_sym) do |t|
+  task baseTaskName.to_sym  => [syncSource ? syncTaskName : nil,
+                                configTaskName,
+                                buildTaskName,
+                                checkTaskName].compact.map(&:to_sym)
 end
 # }}}
 # constuct builders out of user configuration {{{ ==============================
