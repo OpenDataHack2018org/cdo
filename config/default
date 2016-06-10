@@ -300,10 +300,10 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure \
                --prefix=`pwd`/build \
                --enable-maintainer-mode \
-               --with-netcdf='/sw/lenny-x64/netcdf-latest-gccsys' \
-               --with-hdf5='/sw/lenny-x64/hdf5-latest' \
-               --with-szlib='/sw/lenny-x64/szip-latest' \
-               --with-proj='/sw/lenny-x64/proj-latest' \
+               --with-netcdf='/sw/squeeze-x64/netcdf-latest-gccsys' \
+               --with-hdf5='/sw/squeeze-x64/hdf5-latest' \
+               --with-szlib='/sw/squeeze-x64/szip-latest' \
+               --with-proj='/sw/squeeze-x64/proj-latest' \
                --enable-ruby --enable-swig --enable-python \
 	           CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2"
         ;;
