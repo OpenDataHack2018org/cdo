@@ -193,7 +193,7 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
     execute("module list", builder)
   end
 
-  desc "builder for host:#{builder.hostname}, CC=#{builder.compiler}"
+  desc builder.docstring
   task baseTaskName.to_sym  => [syncSource ? syncTaskName : nil,
                                 configTaskName,
                                 buildTaskName,
@@ -201,7 +201,7 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
 end
 # }}}
 # constuct builders out of user configuration {{{ ==============================
-Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?)
+Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?,:docstring)
 # 1) construct builders from host configuration
 #    this is what config/default should be able to handle
 @userConfig["hosts"].each {|host,config|
@@ -216,7 +216,9 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                           cc,
                           [config["dir"],cc,getBranchName].join(File::SEPARATOR),
                           "./config/default CC=#{cc}",
-                          config["hostname"] == 'localhost')
+                          config["hostname"] == 'localhost',
+                         "builder on #{config['hostname']}, CC=#{cc}")
+
     builder2task(builder)
   }
 }
@@ -234,7 +236,11 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                         [@userConfig['hosts'][config['hostname']]['dir'],builderName,getBranchName].join(File::SEPARATOR),
                         config['configureCall'],
                         ( 'localhost' == config['hostname'] \
-                           or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname'] ))
+                           or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname'] ),
+                       config.has_key?('docstring') \
+                         ? config['docstring'] \
+                         : "builder on #{config['hostname']}: #{config['configureCall']}")
+
   builder2task(builder,true, config['sync'])
 
 } if @userConfig.has_key?('builders')
