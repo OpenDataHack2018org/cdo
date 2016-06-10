@@ -480,3 +480,185 @@ struct pqueue *gridsearch_qnearest(struct gridsearch *gs, double lon, double lat
   
   return result;
 }
+
+#define  BIGNUM   1.e+20
+#define  TINY     1.e-14
+
+static
+void knn_store_distance(int nadd, double distance, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist)
+{
+  if ( num_neighbors == 1 )
+    {
+      if ( distance < nbr_dist[0] || (distance <= nbr_dist[0] && nadd < nbr_add[0]) )
+	{
+	  nbr_add[0]  = nadd;
+	  nbr_dist[0] = distance;
+	}
+    }
+  else
+    {
+      for ( int nchk = 0; nchk < num_neighbors; ++nchk )
+	{
+	  if ( distance < nbr_dist[nchk] || (distance <= nbr_dist[nchk] && nadd < nbr_add[nchk]) )
+	    {
+	      for ( int n = num_neighbors-1; n > nchk; --n )
+		{
+		  nbr_add[n]  = nbr_add[n-1];
+		  nbr_dist[n] = nbr_dist[n-1];
+		}
+	      nbr_add[nchk]  = nadd;
+	      nbr_dist[nchk] = distance;
+	      break;
+	    }
+	}
+    }
+}
+
+static
+void knn_check_distance(int num_neighbors, const int *restrict nbr_add, double *restrict nbr_dist)
+{
+  // If distance is zero, set to small number
+  for ( int nchk = 0; nchk < num_neighbors; ++nchk )
+    if ( nbr_add[nchk] >= 0 && nbr_dist[nchk] <= 0. ) nbr_dist[nchk] = TINY;
+}
+
+
+void gridsearch_knn_init(struct gsknn *knn)
+{
+  unsigned ndist = knn->ndist;
+  int *restrict add = knn->add;
+  double *restrict dist = knn->dist;
+
+  for ( unsigned i = 0; i < ndist; ++i )
+    {
+      add[i]  = -1;
+      dist[i] = BIGNUM;
+    }
+}
+
+
+struct gsknn *gridsearch_knn_new(unsigned size)
+{
+  struct gsknn *knn = (struct gsknn *) Malloc(sizeof(struct gsknn));
+  
+  knn->ndist   = size;
+  knn->size    = size;
+  knn->mask    = (int*) Malloc(size*sizeof(int));       // mask at nearest neighbors
+  knn->add     = (int*) Malloc(size*sizeof(int));       // source address at nearest neighbors
+  knn->dist    = (double*) Malloc(size*sizeof(double)); // angular distance of the nearest neighbors
+  knn->tmpadd  = NULL;
+  knn->tmpdist = NULL;
+
+  gridsearch_knn_init(knn);
+
+  return knn;
+}
+
+
+void gridsearch_knn_delete(struct gsknn *knn)
+{
+  if ( knn )
+    {
+      knn->size = 0;
+      if ( knn->dist    ) Free(knn->dist);
+      if ( knn->add     ) Free(knn->add);
+      if ( knn->tmpdist ) Free(knn->tmpdist);
+      if ( knn->tmpadd  ) Free(knn->tmpadd);
+      if ( knn->mask    ) Free(knn->mask);
+      Free(knn);
+    }
+}
+
+
+int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat)
+{
+  /*
+    Output variables:
+
+    int nbr_add[num_neighbors]     ! address of each of the closest points
+    double nbr_dist[num_neighbors] ! distance to each of the closest points
+
+    Input variables:
+
+    double plat,         ! latitude  of the search point
+    double plon,         ! longitude of the search point
+  */
+
+  double search_radius = gs->search_radius;
+
+  // Initialize distance and address arrays
+  gridsearch_knn_init(knn);
+
+  int num_neighbors = knn->size;
+  int *restrict nbr_add = knn->add;
+  double *restrict nbr_dist = knn->dist;
+
+  int ndist = num_neighbors;
+  // check some more points if distance is the same use the smaller index (nadd)
+  if ( ndist > 8 ) ndist += 8;
+  else             ndist *= 2; 
+  if ( ndist > (int)gs->n ) ndist = gs->n;
+
+  if ( knn->tmpadd  == NULL ) knn->tmpadd  = (int*) Malloc(ndist*sizeof(int));
+  if ( knn->tmpdist == NULL ) knn->tmpdist = (double*) Malloc(ndist*sizeof(double));
+
+  int *adds = knn->tmpadd;
+  double *dist = knn->tmpdist;
+  
+  const double range0 = SQR(search_radius);
+  double range = range0;
+
+  int j = 0;
+
+  if ( num_neighbors == 1 )
+    {
+      unsigned nadd = gridsearch_nearest(gs, plon, plat, &range);
+      if ( nadd != GS_NOT_FOUND )
+        {
+          //if ( range < range0 )
+            {
+              dist[j] = sqrt(range);
+              adds[j] = nadd;
+              j++;
+            }
+        }
+    }
+  else
+    {
+      struct pqueue *gs_result = gridsearch_qnearest(gs, plon, plat, &range, ndist);
+      if ( gs_result )
+        {
+          unsigned nadd;
+          struct resItem *p;
+          while ( pqremove_min(gs_result, &p) )
+            {
+              nadd  = p->node->index;
+              range = p->dist_sq;
+              Free(p); // Free the result node taken from the heap
+
+              if ( range < range0 )
+                {
+                  dist[j] = sqrt(range);
+                  adds[j] = nadd;
+                  j++;
+                }
+            }
+          Free(gs_result->d); // free the heap
+          Free(gs_result);    // and free the heap information structure
+        }
+    }
+
+  ndist = j;
+  int max_neighbors = ( ndist < num_neighbors ) ? ndist : num_neighbors;
+
+  for ( j = 0; j < ndist; ++j )
+    knn_store_distance(adds[j], dist[j], max_neighbors, nbr_add, nbr_dist);
+
+  knn_check_distance(max_neighbors, nbr_add, nbr_dist);
+
+  if ( ndist > num_neighbors ) ndist = num_neighbors;
+
+  knn->ndist = ndist;
+
+  return ndist;
+} // gridsearch_knn

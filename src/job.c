@@ -335,14 +335,19 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 
 int job_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath)
 {
-  int status = 0;
+  int status = -1;
 #if defined(HAVE_LIBDRMAA)
 
   status = drmaa_submit(expname, jobfilename, jobname, tmppath, ftppath);
 #else
+  UNUSED(expname);
+  UNUSED(jobfilename);
+  UNUSED(jobname);
+  UNUSED(tmppath);
+  UNUSED(ftppath);
   fprintf(stderr, "DRMAA support not compiled in!\n");
 #endif
-  return (status);
+  return status;
 }
 
 
@@ -370,11 +375,14 @@ size_t my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
 
 
 int my_progress_func(void *stdout_is_tty,
-			double t, /* dltotal */
-			double d, /* dlnow */
-			double ultotal,
-			double ulnow)
+                     double t, /* dltotal */
+                     double d, /* dlnow */
+                     double ultotal,
+                     double ulnow)
 {
+  UNUSED(ultotal);
+  UNUSED(ulnow);
+
   if ( *(char*)stdout_is_tty )
     {
       fprintf(stdout, "\b\b\b\b\b%4d%%", (int) (d*100/t));
@@ -498,10 +506,15 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
 
   if ( flag ) fprintf(stdout, "\n");
 #else
+  UNUSED(flag);
+  UNUSED(url);
+  UNUSED(path);
+  UNUSED(target);
+  UNUSED(source);
   fprintf(stderr, "CURL support not compiled in!\n");
 #endif
 
-  return (status);
+  return status;
 }
 
 
@@ -569,10 +582,12 @@ int ftprmd(const char *url, const char *path)
   curl_global_cleanup();
 
 #else
+  UNUSED(url);
+  UNUSED(path);
   fprintf(stderr, "CURL support not compiled in!\n");
 #endif
 
-  return (status);
+  return status;
 }
 
 

@@ -49,18 +49,10 @@ void *Intlevel3d(void *argument)
   int zaxisID1 = -1, zaxisID3;
   int gridID3 = -1, gridID, zaxisID;
   int nlevi, nlevo, nlevel = 0, maxlev;
-  int lup, ldown;
-  int **varnmiss = NULL;
-  int *varinterp = NULL;
-  int *vars = NULL;
-  int expol = FALSE;
   double missval;
   double *lev1 = NULL, *lev2 = NULL;
   double *single1, *single2;
-  double **vardata1 = NULL, **vardata2 = NULL;
   int taxisID1, taxisID3;
-  int *lev_idx1, *lev_idx2;
-  double *lev_wgt1, *lev_wgt2;
   double *zlevels_in, *zlevels_out;
   int zlevels_in_miss, zlevels_out_miss;
   char varname[10]; 
@@ -72,10 +64,15 @@ void *Intlevel3d(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  if      ( operatorID == INTLEVEL3D )  expol = FALSE;
-  else if ( operatorID == INTLEVELX3D ) expol = TRUE;
+  bool expol = false;
+  if      ( operatorID == INTLEVEL3D )  expol = false;
+  else if ( operatorID == INTLEVELX3D ) expol = true;
 
   operatorInputArg("icoordinate");
+
+  int streamID1 = streamOpenRead(cdoStreamName(0));                 /*  input data */
+  int streamID2 = streamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
+  int streamID3 = streamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
 
   /*  Read filename from Parameter */
   operatorInputArg("filename for vertical source coordinates variable");
@@ -83,9 +80,6 @@ void *Intlevel3d(void *argument)
   argument_t *fileargument = file_argument_new(operatorArgv()[0]);
   int streamID0 = streamOpenRead(fileargument);                     /*  3d vertical input coordinate */
   file_argument_free(fileargument);
-  int streamID1 = streamOpenRead(cdoStreamName(0));                 /*  input data */
-  int streamID2 = streamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
-  int streamID3 = streamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */
 
   int vlistID0 = streamInqVlist(streamID0);
   int vlistID1 = streamInqVlist(streamID1); taxisID1 = vlistInqTaxis(vlistID1);
@@ -99,7 +93,7 @@ void *Intlevel3d(void *argument)
    */
   {
     nvars = vlistNvars(vlistID0);
-    if (nvars != 1) cdoAbort("Only one single variable is allowed!");
+    if ( nvars != 1 ) cdoAbort("Only one single variable is allowed!");
 
     gridID     = vlistInqVarGrid(vlistID0, 0);
     zaxisID    = vlistInqVarZaxis(vlistID0, 0);
@@ -168,7 +162,7 @@ void *Intlevel3d(void *argument)
 
   /* Missing values are not allowed for coordinate variables */
   if ( 0 != zlevels_in_miss  )
-    cdoAbort("Input vertical coordinate variables are not allowd to contain missing values.");
+    cdoAbort("Input vertical coordinate variables are not allowed to contain missing values.");
   else
     {
       if ( cdoVerbose ) cdoPrint("Input vertical coordinate has no missing values.");
@@ -187,7 +181,7 @@ void *Intlevel3d(void *argument)
    * (later use of gridsizeo ONLY)
    */
   if ( gridsizei != gridsizeo )
-    cdoAbort("Input and output vertical coordinate must have the same gridsize");
+    cdoAbort("Input and output vertical coordinate must have the same gridsize!");
 
   gridSize = gridsizeo;
 
@@ -206,43 +200,52 @@ void *Intlevel3d(void *argument)
    * number of levels as the input vertical levels from operators parameter
    * (streamID0). Variables with a different z-axis should be copied into output.
    */
-  nzaxis  = vlistNzaxis(vlistID1);
-  for ( i = 0; i < nzaxis; i++ )
-  {
-    zaxisID = vlistZaxis(vlistID1, i);
-    nlevel  = zaxisInqSize(zaxisID);
-    if ( nlevel == nlevi )
+  nzaxis = vlistNzaxis(vlistID1);
+  for ( i = 0; i < nzaxis; ++i )
     {
-      zaxisID1 = zaxisID;
-      break;
+      zaxisID = vlistZaxis(vlistID1, i);
+      nlevel  = zaxisInqSize(zaxisID);
+      if ( nlevel == nlevi )
+        {
+          zaxisID1 = zaxisID;
+          break;
+        }
     }
-  }
-  if ( i == nzaxis ) cdoAbort("No processable variable found!");
+  if ( i == nzaxis ) cdoAbort("No processable variable found (vertical coordinate differ)!");
 
+  int ngrids = vlistNgrids(vlistID1);
+  for ( i = 0; i < ngrids; ++i )
+    {
+      gridID = vlistGrid(vlistID1, i);
+      gridsize = gridInqSize(gridID);
+      if ( gridsize == gridSize ) break;
+    }
+  if ( i == nzaxis ) cdoAbort("No processable variable found (grid coordinate differ)!");
+  
   /*
    * Check monotony of vertical levels
    */
-  lup = FALSE;
-  ldown = FALSE;
+  bool lup = false;
+  bool ldown = false;
   lev1 = zlevels_in + gridSize;
   for ( i = 0; i < nlevi-1; i++ )
     {
       if ( i == 1 )
 	{
 	  if ( lev1[(i+1)*gridSize] > lev1[i*gridSize] )
-	    lup = TRUE;
+	    lup = true;
 	  else if ( lev1[(i+1)*gridSize] < lev1[i*gridSize] )
-	    ldown = TRUE;	
+	    ldown = true;	
 	}
       else
 	{
 	  if ( lup )
 	    {
-	      if ( !(lev1[(i+1)*gridSize] > lev1[i*gridSize]) ) lup = FALSE;
+	      if ( !(lev1[(i+1)*gridSize] > lev1[i*gridSize]) ) lup = false;
 	    }
 	  else if ( ldown )
 	    {
-	      if ( !(lev1[(i+1)*gridSize] < lev1[i*gridSize]) ) ldown = FALSE;
+	      if ( !(lev1[(i+1)*gridSize] < lev1[i*gridSize]) ) ldown = false;
 	    }
 	}
     }
@@ -270,10 +273,10 @@ void *Intlevel3d(void *argument)
   /*
    * Create weights for later interpolation - assumption: input vertical correct is constant in time
    */
-  lev_idx1 = (int*) Malloc(nlevo*gridSize*sizeof(int));
-  lev_idx2 = (int*) Malloc(nlevo*gridSize*sizeof(int));
-  lev_wgt1 = (double*) Malloc(nlevo*gridSize*sizeof(double));
-  lev_wgt2 = (double*) Malloc(nlevo*gridSize*sizeof(double));
+  int *lev_idx1 = (int*) Malloc(nlevo*gridSize*sizeof(int));
+  int *lev_idx2 = (int*) Malloc(nlevo*gridSize*sizeof(int));
+  double *lev_wgt1 = (double*) Malloc(nlevo*gridSize*sizeof(double));
+  double *lev_wgt2 = (double*) Malloc(nlevo*gridSize*sizeof(double));
 
   vert_gen_weights3d(expol, nlevi+2, gridSize, zlevels_in, nlevo, zlevels_out, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
@@ -313,15 +316,14 @@ void *Intlevel3d(void *argument)
 
   maxlev    = nlevi > nlevo ? nlevi : nlevo;
   nvars     = vlistNvars(vlistID1);
-  vars      = (int*) Malloc(nvars*sizeof(int));
-  vardata1  = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
-  vardata2  = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
-  varnmiss  = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
-  varinterp = (int*) Malloc(nvars*sizeof(int));     /* marker for variables to be interpolated       */
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
+  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));   /* marker for variables to be interpolated       */
+  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));    /* can for missing values of arbitrary variables */
+  double **vardata1 = (double**) Malloc(nvars*sizeof(double*)); /* input                                         */
+  double **vardata2 = (double**) Malloc(nvars*sizeof(double*)); /* output                                        */
 
   /* by default no variable should be interpolated */
-  for ( i = 0; i < nvars; i++ )
-    varinterp[varID] = FALSE;
+  for ( i = 0; i < nvars; i++ ) varinterp[varID] = false;
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -354,14 +356,14 @@ void *Intlevel3d(void *argument)
                memcmp(lonIn,lonOut,nlonIn*sizeof(double)) ||
                memcmp(latIn,latOut,nlatIn*sizeof(double))*/ )
             {
-              varinterp[varID] = FALSE;
+              varinterp[varID] = false;
               vardata2[varID]  = vardata1[varID];
               varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
               if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
             }
           else
             {
-              varinterp[varID] = TRUE;
+              varinterp[varID] = true;
               vardata2[varID]  = (double*) Malloc(gridsize*nlevo*sizeof(double));
               varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
               memset(varnmiss[varID], 0, maxlev*sizeof(int));
@@ -369,17 +371,23 @@ void *Intlevel3d(void *argument)
         }
       else
         {
-          varinterp[varID] = FALSE;
+          varinterp[varID] = false;
           vardata2[varID]  = vardata1[varID];
           varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
           if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
         }
-      }
+    }
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      if ( varinterp[varID] ) break;
+    }
+  if ( varID == nvars ) cdoAbort("No processable variable found!");
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
+      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
 
       taxisCopyTimestep(taxisID3, taxisID1);
 
@@ -397,7 +405,7 @@ void *Intlevel3d(void *argument)
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
           streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
-	  vars[varID] = TRUE;
+	  vars[varID] = true;
 	}
 
       /* Perform the interpolation on all valid data variables */
@@ -463,7 +471,7 @@ void *Intlevel3d(void *argument)
       tsID++;
     }
 
-  nvars     = vlistNvars(vlistID1);
+  nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
       Free(varnmiss[varID]);

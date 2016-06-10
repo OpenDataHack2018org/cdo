@@ -394,7 +394,7 @@ void *Expr(void *argument)
             {
               int gridID = parse_arg.coords[i].cdiID;
               size_t ngp = parse_arg.coords[i].size;
-              double *data = (double*) malloc(ngp*sizeof(double));
+              double *data = (double*) Malloc(ngp*sizeof(double));
               parse_arg.coords[i].data = data;
               if ( coord == 'x' || coord == 'y' )
                 {
@@ -429,7 +429,7 @@ void *Expr(void *argument)
             {
               int zaxisID = parse_arg.coords[i].cdiID;
               size_t nlev = parse_arg.coords[i].size;
-              double *data = (double*) malloc(nlev*sizeof(double));
+              double *data = (double*) Malloc(nlev*sizeof(double));
               parse_arg.coords[i].data = data;
               zaxisInqLevels(zaxisID, data);
             }

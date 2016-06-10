@@ -64,7 +64,6 @@ void *Selvar(void *argument)
   char **argnames = NULL;
   int isel;
   int i;
-  int lcopy = FALSE;
   int gridsize;
   int nmiss;
   int gridnum = 0;
@@ -73,6 +72,8 @@ void *Selvar(void *argument)
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
+
+  bool lcopy = UNCHANGED_RECORD;
 
 # define INVERTS_SELECTION(id) (cdoOperatorF2(id) & 1)
 # define TAKES_STRINGS(id) (cdoOperatorF2(id) & 2)
@@ -93,8 +94,6 @@ void *Selvar(void *argument)
   int DELCODE      = cdoOperatorAdd("delcode",      0, 1,   "code numbers");
   int DELNAME      = cdoOperatorAdd("delname",      0, 2|1, "variable names");
   int SELLTYPE     = cdoOperatorAdd("selltype",     0, 4,   "GRIB level types"); 
-
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   int operatorID = cdoOperatorID();
 

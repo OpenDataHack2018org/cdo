@@ -2,14 +2,12 @@
 #include "cdo_int.h"
 #include "datetime.h"
 
-static int timestat_date = -1;
+int CDO_Timestat_Date = -1;
 
 static
 void get_timestat_date(int *tstat_date)
 {
-  char *envstr;
-
-  envstr = getenv("CDO_TIMESTAT_DATE");
+  char *envstr = getenv("CDO_TIMESTAT_DATE");
   if ( envstr == NULL ) envstr = getenv("RUNSTAT_DATE");
   if ( envstr )
     {
@@ -20,9 +18,10 @@ void get_timestat_date(int *tstat_date)
       envstrl[7] = 0;
       strtolower(envstrl);
 
-      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = TIMESTAT_FIRST;
-      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = TIMESTAT_LAST;
-      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = TIMESTAT_MEAN;
+      if      ( memcmp(envstrl, "first", 5)   == 0 )  env_date = TIMESTAT_FIRST;
+      else if ( memcmp(envstrl, "last", 4)    == 0 )  env_date = TIMESTAT_LAST;
+      else if ( memcmp(envstrl, "middle", 6)  == 0 )  env_date = TIMESTAT_MEAN;
+      else if ( memcmp(envstrl, "midhigh", 7) == 0 )  env_date = TIMESTAT_MIDHIGH;
 
       if ( env_date >= 0 )
 	{
@@ -38,15 +37,15 @@ void dtlist_init(dtlist_type *dtlist)
 {
   dtlist->nalloc     = 0;
   dtlist->size       = 0;
-  dtlist->calendar   = CALENDAR_STANDARD;
+  dtlist->calendar   = -1;
   dtlist->has_bounds = -1;
   dtlist->stat       = TIMESTAT_LAST;
   dtlist->dtinfo     = NULL;
 
-  if ( timestat_date == -1 )
+  if ( CDO_Timestat_Date == -1 )
     {
-      timestat_date = 0;
-      get_timestat_date(&timestat_date);
+      CDO_Timestat_Date = 0;
+      get_timestat_date(&CDO_Timestat_Date);
     }
 }
 
@@ -63,8 +62,7 @@ dtlist_type *dtlist_new(void)
 
 void dtlist_delete(dtlist_type *dtlist)
 {
-  if ( dtlist->nalloc > 0 && dtlist->dtinfo )
-    Free(dtlist->dtinfo);
+  if ( dtlist->nalloc > 0 && dtlist->dtinfo ) Free(dtlist->dtinfo);
 
   Free(dtlist);
 }
@@ -85,16 +83,53 @@ void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
   dtlist->dtinfo[tsID].v.date = taxisInqVdate(taxisID);
   dtlist->dtinfo[tsID].v.time = taxisInqVtime(taxisID);
 
-  if ( tsID == 0 && dtlist->has_bounds == -1 )
+  dtlist->dtinfo[tsID].c.date = dtlist->dtinfo[tsID].v.date;
+  dtlist->dtinfo[tsID].c.time = dtlist->dtinfo[tsID].v.time;
+
+  if ( tsID == 0 )
     {
-      dtlist->has_bounds = 0;
-      if ( taxisHasBounds(taxisID) ) dtlist->has_bounds = 1;
+      if ( dtlist->has_bounds == -1 )
+        {
+          dtlist->has_bounds = 0;
+          if ( taxisHasBounds(taxisID) ) dtlist->has_bounds = 1;
+        }
+
+      if ( dtlist->calendar == -1 )
+        {
+          dtlist->calendar = taxisInqCalendar(taxisID);
+        }
     }
 
   if ( dtlist->has_bounds )
     {
       taxisInqVdateBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].date), &(dtlist->dtinfo[tsID].b[1].date));
       taxisInqVtimeBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].time), &(dtlist->dtinfo[tsID].b[1].time));
+
+      if ( dtlist->dtinfo[tsID].v.date == dtlist->dtinfo[tsID].b[1].date &&
+           dtlist->dtinfo[tsID].v.time == dtlist->dtinfo[tsID].b[1].time )
+        {
+          int calendar = dtlist->calendar;
+          
+          int vdate = dtlist->dtinfo[tsID].b[0].date;
+          int vtime = dtlist->dtinfo[tsID].b[0].time;
+          juldate_t juldate1 = juldate_encode(calendar, vdate, vtime);
+          
+          vdate = dtlist->dtinfo[tsID].b[1].date;
+          vtime = dtlist->dtinfo[tsID].b[1].time;
+          juldate_t juldate2 = juldate_encode(calendar, vdate, vtime);
+
+          // int hour, minute, second;
+          // cdiDecodeTime(vtime, &hour, &minute, &second);
+          
+          if ( vtime == 0 && juldate_to_seconds(juldate1) < juldate_to_seconds(juldate2) )
+            {
+              juldate_t juldate = juldate_add_seconds(-1, juldate2);
+              juldate_decode(calendar, juldate, &vdate, &vtime);
+
+              dtlist->dtinfo[tsID].c.date = vdate;
+              dtlist->dtinfo[tsID].c.time = vtime;
+            }
+        }
     }
   else
     {
@@ -129,6 +164,26 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
     {
       int calendar = dtlist->calendar;
 
+//#define TEST_DTLIST_MEAN 1
+#ifdef TEST_DTLIST_MEAN
+      vdate = dtlist->dtinfo[0].v.date;
+      vtime = dtlist->dtinfo[0].v.time;
+      juldate_t juldate0 = juldate_encode(calendar, vdate, vtime);
+
+      juldate_t juldate;
+      double seconds = 0;
+      for ( int i = 1; i < nsteps; ++i )
+        {
+          vdate = dtlist->dtinfo[i].v.date;
+          vtime = dtlist->dtinfo[i].v.time;
+          juldate = juldate_encode(calendar, vdate, vtime);
+
+          seconds += juldate_to_seconds(juldate_sub(juldate, juldate0));
+        }
+      
+      juldate = juldate_add_seconds((int)lround(seconds/nsteps), juldate0);
+      juldate_decode(calendar, juldate, &vdate, &vtime);
+#else
       vdate = dtlist->dtinfo[nsteps/2-1].v.date;
       vtime = dtlist->dtinfo[nsteps/2-1].v.time;
       juldate_t juldate1 = juldate_encode(calendar, vdate, vtime);
@@ -140,6 +195,7 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
       double seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
       juldate_t juldatem = juldate_add_seconds((int)lround(seconds), juldate1);
       juldate_decode(calendar, juldatem, &vdate, &vtime);
+#endif
     }
   else
     {
@@ -152,17 +208,29 @@ void dtlist_mean(dtlist_type *dtlist, int nsteps)
 }
 
 
+void dtlist_midhigh(dtlist_type *dtlist, int nsteps)
+{
+  int vdate = dtlist->dtinfo[nsteps/2].v.date;
+  int vtime = dtlist->dtinfo[nsteps/2].v.time;
+
+  dtlist->timestat.v.date = vdate;
+  dtlist->timestat.v.time = vtime;
+}
+
+
 void dtlist_stat_taxisDefTimestep(dtlist_type *dtlist, int taxisID, int nsteps)
 {
   if ( (size_t)nsteps > dtlist->size )
     cdoAbort("Internal error; unexpected nsteps=%d (limit=%ld)!", nsteps, dtlist->size);
 
   int stat = dtlist->stat;
-  if ( timestat_date > 0 ) stat = timestat_date;
+  if ( CDO_Timestat_Date > 0 ) stat = CDO_Timestat_Date;
 
-  if      ( stat == TIMESTAT_MEAN  ) dtlist_mean(dtlist, nsteps);
-  else if ( stat == TIMESTAT_FIRST ) dtlist->timestat.v = dtlist->dtinfo[0].v;
-  else if ( stat == TIMESTAT_LAST  ) dtlist->timestat.v = dtlist->dtinfo[nsteps-1].v;
+  if      ( stat == TIMESTAT_MEAN    ) dtlist_mean(dtlist, nsteps);
+  else if ( stat == TIMESTAT_MIDHIGH ) dtlist_midhigh(dtlist, nsteps);
+  else if ( stat == TIMESTAT_FIRST   ) dtlist->timestat.v = dtlist->dtinfo[0].v;
+  else if ( stat == TIMESTAT_LAST    ) dtlist->timestat.v = dtlist->dtinfo[nsteps-1].v;
+  else cdoAbort("Internal error; implementation missing for timestat=%d", stat);
 
   if ( dtlist->has_bounds )
     {
@@ -211,7 +279,7 @@ int dtlist_get_vdate(dtlist_type *dtlist, int tsID)
   if ( tsID < 0 || (size_t)tsID >= dtlist->size )
     cdoAbort("Internal error; tsID out of bounds!");
 
-  return dtlist->dtinfo[tsID].v.date;
+  return dtlist->dtinfo[tsID].c.date;
 }
 
 
@@ -220,11 +288,11 @@ int dtlist_get_vtime(dtlist_type *dtlist, int tsID)
   if ( tsID < 0 || (size_t)tsID >= dtlist->size )
     cdoAbort("Internal error; tsID out of bounds!");
 
-  return dtlist->dtinfo[tsID].v.time;
+  return dtlist->dtinfo[tsID].c.time;
 }
 
 
-void datetime_avg(int calendar, int ndates, datetime_t *datetime)
+void datetime_avg(int calendar, int ndates, cdo_datetime_t *datetime)
 {
   int vdate, vtime;
 

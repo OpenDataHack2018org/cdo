@@ -147,10 +147,13 @@ void cdolog(const char *prompt, double cputime)
   close(logfileno);
 
   errno = 0;
-
-  return;
-
+#else
+  UNUSED(prompt);
+  UNUSED(cputime);
 #endif
+#else
+  UNUSED(prompt);
+  UNUSED(cputime);
 #endif
 }
 
@@ -442,9 +445,8 @@ void cdologs(int noper)
   close(logfileno);
 
   errno = 0;
-
-  return;
-
+#else
+  UNUSED(noper);
 #endif
 #endif
 }
@@ -523,15 +525,13 @@ void dumplogs(const char *logfilename)
   close(logfileno);
 
   errno = 0;
-
-  return;
 #endif
 }
 
 
 void daylogs(const char *logfilename)
 {
-  int  logfileno;
+  int logfileno;
   int status;
   int date0 = 0, ncdo0, noper0, nhours0;
   int nlogs;
@@ -549,6 +549,8 @@ void daylogs(const char *logfilename)
   const size_t logsize = LOGSSIZE;
   size_t bufsize;
   struct stat filestat;
+
+  UNUSED(ncdo0);
 
   errno = 0;
   logfileno = open(logfilename, O_RDONLY);
@@ -593,8 +595,6 @@ void daylogs(const char *logfilename)
   close(logfileno);
 
   errno = 0;
-
-  return;
 }
 
 
@@ -622,6 +622,8 @@ void monlogs(const char *logfilename)
   size_t bufsize;
   struct stat filestat;
 
+  UNUSED(ncdo0);
+  
   errno = 0;
   logfileno = open(logfilename, O_RDONLY);
   if ( errno )
@@ -683,8 +685,6 @@ void monlogs(const char *logfilename)
   close(logfileno);
 
   errno = 0;
-
-  return;
 }
 
 
@@ -829,9 +829,8 @@ void cdologo(int noper)
   close(logfileno);
 
   errno = 0;
-
-  return;
-
+#else
+  UNUSED(noper);
 #endif
 #endif
 }
@@ -857,7 +856,7 @@ int cmplognocc(const void *s1, const void *s2)
   if      ( x->nocc < y->nocc ) cmp =  1;
   else if ( x->nocc > y->nocc ) cmp = -1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -870,7 +869,7 @@ int cmplognvals(const void *s1, const void *s2)
   if      ( x->nvals < y->nvals ) cmp =  1;
   else if ( x->nvals > y->nvals ) cmp = -1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -883,7 +882,7 @@ int cmplogtime(const void *s1, const void *s2)
   if      ( x->time < y->time ) cmp =  1;
   else if ( x->time > y->time ) cmp = -1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -896,7 +895,7 @@ int cmplogperc(const void *s1, const void *s2)
   if      ( x->perc < y->perc ) cmp =  1;
   else if ( x->perc > y->perc ) cmp = -1;
 
-  return (cmp);
+  return cmp;
 }
 
 static
@@ -905,7 +904,7 @@ int cmplogname(const void *s1, const void *s2)
   const loginfo_t *x = (const loginfo_t *)s1;
   const loginfo_t *y = (const loginfo_t *)s2;
 
-  return (strcmp(x->name, y->name));
+  return strcmp(x->name, y->name);
 }
 
 
@@ -1011,7 +1010,5 @@ void dumplogo(const char *logfilename, int dumptype)
   close(logfileno);
 
   errno = 0;
-
-  return;
 #endif
 }

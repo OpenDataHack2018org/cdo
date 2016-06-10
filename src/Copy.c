@@ -43,12 +43,11 @@ void *Copy(void *argument)
 
   cdoInitialize(argument);
 
+  bool lcopy = UNCHANGED_RECORD;
+
                 cdoOperatorAdd("copy",   0, 0, NULL);
   int SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
   int SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
-
-  bool lcopy = false;
-  if ( UNCHANGED_RECORD ) lcopy = true;
 
   int operatorID = cdoOperatorID();
 

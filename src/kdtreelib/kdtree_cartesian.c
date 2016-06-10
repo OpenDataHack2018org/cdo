@@ -241,53 +241,53 @@ kd_doOrtRangeSearch(struct kdNode *node, kdata_t *min, kdata_t *max,
 struct kdNode *
 kd_nearest(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq, int dim)
 {
-    struct kdNode *nearer, *further, *nearest = NULL, *tmp, *tmp_nearest;
-    kdata_t dist_sq, tmp_dist_sq, dx;
+    if ( !node ) return NULL;
 
-    if (!node)
-        return NULL;
-
-    if (p[node->split] < node->location[node->split]) {
-        nearer = node->left;
+    struct kdNode *nearer, *further;
+    if ( p[node->split] < node->location[node->split] ) {
+        nearer  = node->left;
         further = node->right;
     } else {
-        nearer = node->right;
+        nearer  = node->right;
         further = node->left;
     }
-    tmp = kd_nearest(nearer, p, max_dist_sq, dim);
-    if (tmp)
+    
+    struct kdNode *tmp = kd_nearest(nearer, p, max_dist_sq, dim);
+    struct kdNode *nearest = NULL;
+    if ( tmp )
         nearest = tmp;
     else
         nearest = node;
 
-    dist_sq = kd_dist_sq(nearest->location, p, dim);
+    kdata_t dist_sq = kd_dist_sq(nearest->location, p, dim);
     if (*max_dist_sq > dist_sq)
 	*max_dist_sq = dist_sq;
 
     if (!further)
         return nearest;
 
-    dx = kd_min(KDATA_ABS(p[node->split] - further->min[node->split]),
-                KDATA_ABS(p[node->split] - further->max[node->split]));
-    if (*max_dist_sq > kd_sqr(dx)) {
+    kdata_t dx = kd_min(KDATA_ABS(p[node->split] - further->min[node->split]),
+                        KDATA_ABS(p[node->split] - further->max[node->split]));
+    if ( *max_dist_sq > kd_sqr(dx) ) {
         /*
          * some part of the further hyper-rectangle is in the search
          * radius, search the further node 
          */
+        struct kdNode *tmp_nearest;
         tmp = kd_nearest(further, p, max_dist_sq, dim);
-        if (tmp)
+        if ( tmp )
             tmp_nearest = tmp;
         else
             tmp_nearest = further;
 
-        tmp_dist_sq = kd_dist_sq(tmp_nearest->location, p, dim);
-        if (tmp_dist_sq < dist_sq) {
+        kdata_t tmp_dist_sq = kd_dist_sq(tmp_nearest->location, p, dim);
+        if ( tmp_dist_sq < dist_sq ) {
             nearest = tmp_nearest;
             dist_sq = tmp_dist_sq;
             *max_dist_sq = kd_min(dist_sq, *max_dist_sq);
         }
         // Uwe Schulzweida
-        else if (tmp_dist_sq <= dist_sq && tmp_nearest->index < nearest->index) {
+        else if ( tmp_dist_sq <= dist_sq && tmp_nearest->index < nearest->index ) {
             nearest = tmp_nearest;
             dist_sq = tmp_dist_sq;
             *max_dist_sq = kd_min(dist_sq, *max_dist_sq);
@@ -317,19 +317,16 @@ struct pqueue *
 kd_qnearest(struct kdNode *node, kdata_t *p,
             kdata_t *max_dist_sq, unsigned int q, int dim)
 {
-    struct pqueue *res;
-    uint32_t i;
-
-    if ((res = pqinit(NULL, q + 2)) == NULL)
-        return NULL;
-    if (!kd_doQnearest(node, p, max_dist_sq, q + 1, dim, res)) {
-        for(i = 0; i < res->size; i++) {
-            free(res->d[i]);
-        }
+    struct pqueue *res = pqinit(NULL, q + 2);
+    if ( res == NULL) return NULL;
+    
+    if ( !kd_doQnearest(node, p, max_dist_sq, q + 1, dim, res) ) {
+        for ( uint32_t i = 0; i < res->size; ++i ) free(res->d[i]);
         free(res->d);
         free(res);
         return NULL;
     }
+    
     return res;
 }
 
@@ -347,33 +344,20 @@ static int
 kd_check_dist(struct kdNode *node, kdata_t *p,
               kdata_t *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
 {
-    struct resItem *point, *item;
-    kdata_t dist_sq;
-
-    dist_sq = kd_dist_sq(node->location, p, dim);
-    if (dist_sq < *max_dist_sq && kd_isleaf(node)) {
-        if ((point = (struct resItem *) kd_malloc(sizeof(struct resItem), "kd_doQnearest: "))
-            == NULL)
-            return 0;
+    kdata_t dist_sq = kd_dist_sq(node->location, p, dim);
+    if ( dist_sq < *max_dist_sq && kd_isleaf(node) ) {
+        struct resItem *point = (struct resItem *) kd_malloc(sizeof(struct resItem), "kd_doQnearest: ");
+        if ( point == NULL) return 0;
         point->node = node;
         point->dist_sq = dist_sq;
         pqinsert(res, point);
     }
-    /*
-    else if (res->size > 1 && dist_sq <= *max_dist_sq && kd_isleaf(node)) {
-        pqpeek_max(res, &item);
-        if ( node->index < item->node->index )
-          {
-            item->node = node;
-            item->dist_sq = dist_sq;
-          }
-    }
-    */
 
-    if (res->size > q) {
+    if ( res->size > q ) {
+        struct resItem *item;
         pqremove_max(res, &item);
         free(item);
-        if (res->size > 1) {
+        if ( res->size > 1 ) {
             /*
              * Only inspect the queue if there are items left 
              */
@@ -394,27 +378,26 @@ int
 kd_doQnearest(struct kdNode *node, kdata_t *p,
               kdata_t *max_dist_sq, unsigned int q, int dim, struct pqueue *res)
 {
+    if ( !node ) return 1;
+
+    if ( !kd_check_dist(node, p, max_dist_sq, q, dim, res) ) return 0;
+
     struct kdNode *nearer, *further;
-    kdata_t dx;
-
-    if (!node) return 1;
-
-    if (!kd_check_dist(node, p, max_dist_sq, q, dim, res)) return 0;
-
-    if (p[node->split] < node->location[node->split]) {
-        nearer = node->left;
+    if ( p[node->split] < node->location[node->split] ) {
+        nearer  = node->left;
         further = node->right;
     } else {
-        nearer = node->right;
+        nearer  = node->right;
         further = node->left;
     }
-    if (!kd_doQnearest(nearer, p, max_dist_sq, q, dim, res)) return 0;
+    if ( !kd_doQnearest(nearer, p, max_dist_sq, q, dim, res) ) return 0;
 
-    if (!further) return 1;
+    if ( !further ) return 1;
 
-    dx = kd_min(KDATA_ABS(p[node->split] - further->min[node->split]),
-                KDATA_ABS(p[node->split] - further->max[node->split]));
-    if (*max_dist_sq > kd_sqr(dx)) {
+    kdata_t dx = kd_min(KDATA_ABS(p[node->split] - further->min[node->split]),
+                        KDATA_ABS(p[node->split] - further->max[node->split]));
+    
+    if ( *max_dist_sq > kd_sqr(dx) ) {
         /*
          * some part of the further hyper-rectangle is in the search
          * radius, search the further node 
@@ -447,13 +430,11 @@ struct pqueue *
 kd_range(struct kdNode *node, kdata_t *p, kdata_t *max_dist_sq,
          int dim, int ordered)
 {
-    struct pqueue *res;
-    uint32_t i;
-
-    if ((res = pqinit(NULL, 1)) == NULL)
-        return NULL;
-    if (!kd_doRange(node, p, max_dist_sq, dim, res, ordered)) {
-        for(i = 0; i < res->size; i++) {
+    struct pqueue *res = pqinit(NULL, 1);
+    if ( res == NULL ) return NULL;
+    
+    if ( !kd_doRange(node, p, max_dist_sq, dim, res, ordered) ) {
+        for( uint32_t i = 0; i < res->size; ++i ) {
             free(res->d[i]);
         }
         free(res->d);

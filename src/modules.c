@@ -174,7 +174,6 @@ void *Splitrec(void *argument);
 void *Splitsel(void *argument);
 void *Splittime(void *argument);
 void *Splityear(void *argument);
-void *SSOpar(void *argument);
 void *Subtrend(void *argument);
 void *Tee(void *argument);
 void *Template1(void *argument);
@@ -422,7 +421,7 @@ void *Maggraph(void *argument);
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
                                  "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
-#define  SmoothOperators        {"smoothpoint", "smooth9"}
+#define  SmoothOperators        {"smooth", "smooth9"}
 #define  SortOperators          {"sortcode", "sortparam", "sortname", "sortlevel"}
 #define  SorttimestampOperators {"sorttimestamp", "sorttaxis"}
 #define  SpecinfoOperators      {"specinfo"}
@@ -433,7 +432,6 @@ void *Maggraph(void *argument);
 #define  SplitselOperators      {"splitsel"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}
 #define  SplityearOperators     {"splityear", "splityearmon"}
-#define  SSOparOperators        {"ssopar"}
 #define  SubtrendOperators      {"subtrend"}
 #define  TeeOperators           {"tee"}
 #define  Template1Operators     {"template1"}
@@ -476,11 +474,11 @@ void *Maggraph(void *argument);
 #define  VargenOperators        {"random", "const", "sincos", "coshill", "for", "topo", "temp", "mask", "stdatm"}
 #define  VarrmsOperators        {"varrms"}
 #define  VertintmlOperators     {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
-#define  VertintapOperators     {"ap2pl", "ap2plx", "ap2pl_lp", "ap2plx_lp"}
+#define  VertintapOperators     {"ap2pl", "ap2plx", "ap2pl_lp", "ap2plx_lp", "ap2hl", "ap2hlx"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertint", "vertmean", "vertavg", "vertstd", "vertstd1", "vertvar", "vertvar1"}
 #define  VertcumOperators       {"vertcum", "vertcumhl"}
 #define  VertwindOperators      {"vertwind"}
-#define  VerifygridOperators    {"verifygrid", "verifygridtest"}
+#define  VerifygridOperators    {"verifygrid"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
@@ -711,7 +709,6 @@ static modules_t Modules[] =
   { Splitsel,       SplitselHelp,      SplitselOperators,      1,   CDI_BOTH,  1, -1 },
   { Splittime,      SplittimeHelp,     SplittimeOperators,     1,   CDI_BOTH,  1, -1 },
   { Splityear,      SplittimeHelp,     SplityearOperators,     1,   CDI_BOTH,  1, -1 },
-  { SSOpar,         NULL,              SSOparOperators,        0,   CDI_REAL,  1,  1 },
   { Subtrend,       SubtrendHelp,      SubtrendOperators,      1,   CDI_REAL,  3,  1 },
   { Tee,            NULL,              TeeOperators,           1,   CDI_REAL,  2,  1 },
   { Template1,      NULL,              Template1Operators,     0,   CDI_REAL,  1,  1 },

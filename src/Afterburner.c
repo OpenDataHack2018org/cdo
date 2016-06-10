@@ -301,7 +301,7 @@ void after_setDateTime(struct Date *datetime, int date, int time)
 static
 void after_printProcessStatus(int tsID)
 {
-  static int counthead = FALSE;
+  static bool counthead = false;
 
   if ( tsID == -1 )
     {
@@ -311,16 +311,16 @@ void after_printProcessStatus(int tsID)
 	  fflush(stdout);
 	}
 
-      counthead = FALSE;
+      counthead = false;
     }
   else
     {
-      if ( counthead == FALSE )
+      if ( counthead == false )
 	{
 	  if ( stdout_is_tty )
 	    fprintf(stdout, " Process timestep :       ");
 
-	  counthead = TRUE;
+	  counthead = true;
 	}
 
       if ( stdout_is_tty )
@@ -338,7 +338,7 @@ int after_setNextDate(struct Control *globs)
   int i;
   int vdate, vtime;
 
-  int righttime = FALSE;
+  bool righttime = false;
   while ( TRUE )
     {
       nrecs = streamInqTimestep(globs->istreamID, TsID);
@@ -367,7 +367,7 @@ int after_setNextDate(struct Control *globs)
       for ( i = 0; i < nrqh; i++ )
 	if ( hours[i] < 0 || hours[i] == globs->NextDate.hr )
 	  {
-	    righttime = TRUE;
+	    righttime = true;
 	    break;
 	  }
 
@@ -377,7 +377,7 @@ int after_setNextDate(struct Control *globs)
 	TsID += 1;	  
     }
 
-  return (nrecs);
+  return nrecs;
 }
 
 
@@ -390,15 +390,12 @@ void *after_readTimestep(void *arg)
   int recID, varID, gridID, zaxisID, levelID, timeID;
   int code, leveltype;
   int nmiss;
-  int analysisData, nrecs;
-  struct Variable *vars;
-  struct Control *globs;
   RARG *rarg = (RARG *) arg;
 
-  nrecs        = rarg->nrecs;
-  analysisData = rarg->lana;
-  vars         = rarg->vars;
-  globs        = rarg->globs;
+  int nrecs        = rarg->nrecs;
+  int analysisData = rarg->lana;
+  struct Variable *vars = rarg->vars;
+  struct Control *globs = rarg->globs;
 
   for ( code = 0; code < MaxCodes; code++ ) vars[code].nmiss0 = 0;
 
@@ -470,7 +467,7 @@ void *after_readTimestep(void *arg)
   */
   num_recs = after_setNextDate(globs);
 
-  return ((void *) &num_recs);
+  return (void *) &num_recs;
 }
 
 static
@@ -486,6 +483,8 @@ void after_defineNextTimestep(struct Control *globs)
     {
       if ( otsID == 0 )
 	{
+          int nvars = vlistNvars(globs->ovlistID);
+          if ( nvars == 0 ) Error("No variable selected!");
 	  vlistDefTaxis(globs->ovlistID, globs->taxisID2);
 	  streamDefVlist(globs->ostreamID, globs->ovlistID);
 	}
@@ -560,6 +559,69 @@ void after_moveTimestep(struct Variable *vars)
 }
 
 static
+void after_check_content(struct Variable *vars, int timestep)
+{
+  extern int labort_after;
+  for ( int code = 0; code < 272; code++ )
+    {
+      /*  if ( code == GEOPOTENTIAL ) continue; */
+      if ( code ==          SLP ) continue;
+      if ( code == GEOPOTHEIGHT ) continue;
+      if ( code ==       STREAM ) continue;
+      if ( code ==      VELOPOT ) continue;
+      if ( code ==       U_WIND ) continue;
+      if ( code ==       V_WIND ) continue;
+      if ( code ==        OMEGA ) continue;
+      if ( code ==    RHUMIDITY ) continue;
+      if ( code ==    LOW_CLOUD ) continue;
+      if ( code ==    MID_CLOUD ) continue;
+      if ( code ==    HIH_CLOUD ) continue;
+      if ( code ==           PS ) continue;
+      if ( code ==     HUMIDITY )
+	{
+	  if ( vars[code].needed && !vars[code].selected &&
+	       vars[code].spectral == NULL &&
+	       vars[code].hybrid   == NULL )
+	    {
+              static bool lwarn = true;
+              if ( lwarn ) Warning( "No humidity in data file, set to zero !");
+              lwarn = false;
+	      vars[code].needed = FALSE;
+	    }
+	}
+      else
+	{
+	  if ( vars[code].needed && !vars[code].comp &&
+	       vars[code].spectral == NULL &&
+	       vars[code].hybrid   == NULL )
+	    {
+	      if ( labort_after )
+		Error( "Code  %3d not found at timestep %d!", code, timestep);
+	      else
+		Warning( "Code  %3d not found at timestep %d!", code, timestep);
+	    }
+	}
+    }
+  /*
+  if ( NumLevelRequest > 0 )
+    {
+      vars[HALF_PRESS].needed = 1;
+      vars[FULL_PRESS].needed = 1;
+    }
+
+  code = HALF_PRESS;
+  if ( vars[code].needed && !vars[code].comp &&
+       vars[code].spectral == NULL && vars[code].hybrid == NULL )
+    Error( "Hybrid model level not found!");
+
+  code = FULL_PRESS;
+  if ( vars[code].needed && !vars[code].comp &&
+       vars[code].spectral == NULL && vars[code].hybrid == NULL )
+    Error( "Hybrid model level not found!");
+  */
+}
+
+static
 void after_control(struct Control *globs, struct Variable *vars)
 {
   int i;
@@ -581,7 +643,7 @@ void after_control(struct Control *globs, struct Variable *vars)
       pthread_attr_init(&attr);
       pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
       int status = pthread_attr_getstacksize(&attr, &stacksize);
-      if ( stacksize < 2097152 )
+      if ( status && stacksize < 2097152 )
 	{
 	  stacksize = 2097152;
 	  pthread_attr_setstacksize(&attr, stacksize);
@@ -594,7 +656,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 
   TsID = 0;
 
-  int righttime = FALSE;
+  bool righttime = false;
   while ( (nrecs = streamInqTimestep(globs->istreamID, TsID)) > 0 )
     {
       vdate = taxisInqVdate(globs->taxisID);
@@ -605,7 +667,7 @@ void after_control(struct Control *globs, struct Variable *vars)
       for ( i = 0; i < nrqh; i++ )
 	if ( hours[i] < 0 || hours[i] == globs->NewDate.hr )
 	  {
-	    righttime = TRUE;
+	    righttime = true;
 	    break;
 	  }
 
@@ -704,8 +766,12 @@ void after_control(struct Control *globs, struct Variable *vars)
 
       if ( lstdout && globs->EndOfInterval ) after_printProcessStatus(-1);
       
-      if ( globs->Mean == 0 || globs->EndOfInterval ) after_defineNextTimestep(globs);
-
+      if ( globs->Mean == 0 || globs->EndOfInterval )
+        {
+          if ( !globs->AnalysisData ) after_check_content(vars, globs->TermCount+1);
+          after_defineNextTimestep(globs);
+        }
+      
       if ( globs->AnalysisData )
 	after_processPL(globs, vars);
       else
@@ -738,7 +804,7 @@ void after_setLevel(struct Control *globs)
   int k, l, found;
   int removeLevel[MaxLevel];
   double level;
-  int checkLevel = TRUE;
+  bool checkLevel = true;
   int numplevelDefault;  /* default pressure level */
   long plevelDefault[] = { 100000, 92500, 85000, 70000, 60000, 50000, 40000, 30000, 25000, 20000, 15000,
                             10000,  7000,  5000,  3000,  2000, 1000 };
@@ -795,20 +861,20 @@ void after_setLevel(struct Control *globs)
 	      oVertID = iVertID;
 	    }
 	}
-      checkLevel = FALSE;
+      checkLevel = false;
     }
   else
     {
       if ( iVertID == -1 )
 	{
 	  if ( globs->Verbose )	fprintf(stdout," No level detected\n");
-	  checkLevel = FALSE;
+	  checkLevel = false;
 	}
       else if ( globs->NumLevelRequest == 1 && IS_EQUAL(globs->LevelRequest[0], 0) )
 	{
 	  if ( globs->Verbose ) fprintf(stdout," No level selected\n");
 	  globs->NumLevelRequest = 0;
-	  checkLevel = FALSE;
+	  checkLevel = false;
 	}
       else if ( globs->Verbose )
 	{
@@ -1427,13 +1493,13 @@ void after_precntl(struct Control *globs, struct Variable *vars)
       else if ( gridtype == GRID_GAUSSIAN && globs->Latitudes == 0 )
 	{
 	  gaussGridID = gridID;
-	  globs->Longitudes  = gridInqXsize(gridID);
-	  globs->Latitudes   = gridInqYsize(gridID);
+	  globs->Longitudes = gridInqXsize(gridID);
+	  globs->Latitudes  = gridInqYsize(gridID);
 	}
     }
 
   if ( globs->Truncation == 0 && globs->Latitudes == 0 )
-    Error("Unsupported file structure!");
+    Error("Unsupported file structure (no spectral or Gaussian data found)!");
 
   if ( globs->Truncation == 0 )
     {
@@ -1881,10 +1947,9 @@ static
 void after_printCodes(void)
 {
   int tableID = tableInq(-1, 128, "echam4");
-  int ncodes;
   int codes[] = {34,35,36,131,132,135,148,149,151,156,157,259,260,261,262,263,264,268,269,270,271,275};
 
-  ncodes = sizeof(codes)/sizeof(codes[0]);
+  int ncodes = sizeof(codes)/sizeof(codes[0]);
 
   lprintf(stdout);
 
@@ -1921,35 +1986,29 @@ void after_printCodes(void)
 static
 void after_procstat(char *procpath, int truncation)
 {
-  FILE *sf;
-  double MaxMBytes;
   time_t tp;
-  long  yy, mm, dd, hh, mi;
   char mtype[12];
-  char *proc;
-  char *name;
   char  stat_file[128];
-  double CPUTime;
 
-  CPUTime = ((double) clock() - starttime ) / CLOCKS_PER_SEC;
+  double CPUTime = ((double) clock() - starttime ) / CLOCKS_PER_SEC;
 
   (void) time(&tp);
-  yy    = gmtime(&tp)->tm_year + 1900;
-  mm    = gmtime(&tp)->tm_mon + 1;
-  dd    = gmtime(&tp)->tm_mday   ;
-  hh    = gmtime(&tp)->tm_hour   ;
-  mi    = gmtime(&tp)->tm_min    ;
-  name  = getpwuid(getuid())->pw_name;
+  long yy    = gmtime(&tp)->tm_year + 1900;
+  long mm    = gmtime(&tp)->tm_mon + 1;
+  long dd    = gmtime(&tp)->tm_mday   ;
+  long hh    = gmtime(&tp)->tm_hour   ;
+  long mi    = gmtime(&tp)->tm_min    ;
+  char *name = getpwuid(getuid())->pw_name;
 
-  proc = strrchr(procpath,'/');
+  char *proc = strrchr(procpath,'/');
   if (proc == 0) proc = procpath;
   else           proc++         ;
 
   strcpy(stat_file, "/pf/m/m214003/local/log/after.log");
 
-  MaxMBytes = (double) memTotal() / 1048576.;
+  double MaxMBytes = (double) memTotal() / 1048576.;
 
-  sf = fopen(stat_file, "a");
+  FILE *sf = fopen(stat_file, "a");
   if ( sf )
     {
       char unknown[] = "";

@@ -1,12 +1,31 @@
 @BeginModule
 @NewPage
 @Name      = Smooth
-@Title     = 9 point smoothing
+@Title     = Smooth grid points
 @Section   = Miscellaneous
 @Arguments = ifile ofile
-@Operators = smooth9
+@Operators = smooth smooth9
+
+@BeginDescription
+Smooth all grid points of a horizontal grid.
+Options is a comma separated list of "key=value" pairs with optional parameters.
+@EndDescription
 @EndModule
 
+
+@BeginOperator_smooth
+@Title     = Smooth grid points
+@Parameter = [options]
+
+@BeginDescription
+Performs a N point smoothing on all input fields. The number of points used depend
+on the search radius (radius) and the maximum number of points (maxpoints).
+Per default all points within the search radius of 1degree are used.
+The weights for the points depend on the form of the curve and the distance.
+The implemented form of the curve is linear with constant default weights of 0.25
+at distance 0 (weight0) and at the search radius (weightR).
+@EndDescription
+@EndOperator
 
 @BeginOperator_smooth9
 @Title     = 9 point smoothing
@@ -24,3 +43,19 @@ be missing. Thus the final result may be the result of an averaging with less
 than 9 points.
 @EndDescription
 @EndOperator
+
+
+@BeginParameter maxpoints
+@Item = nsmooth
+INTEGER  Number of times to smooth, default nsmooth=1
+@Item = radius
+STRING   Search radius, default radius=1deg (units: deg, rad, km, m)
+@Item = maxpoints
+INTEGER  Maximum number of points, default maxpoints=2147483647
+@Item = form
+STRING   Form of the curve, default form=linear
+@Item = weight0
+FLOAT    Weight at distance 0, default weight0=0.25
+@Item = weightR
+FLOAT    Weight at the search radius, default weightR=0.25
+@EndParameter

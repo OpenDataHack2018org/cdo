@@ -13,3 +13,10 @@ stamp-h1
 config.log
 config.status
 config.h
+build
+cdo.pdf
+cdo_eca.pdf
+cdo_magics.pdf
+cdo_refcard.pdf
+autom4te.cache
+Makefile

@@ -31,9 +31,7 @@ struct gridsearch {
   unsigned nx, ny;
 
   struct gsNear *near;
-
   struct kdNode *kdt;
-
   struct gsFull *full;
 
   double search_radius;
@@ -44,6 +42,19 @@ struct gridsearch {
   double *coslon, *sinlon;   // cosine, sine of grid lons (for distance)
 };
 
+struct gsknn {
+  unsigned ndist;
+  unsigned size;
+  int     *mask;
+  int     *add;
+  int     *tmpadd;
+  double  *dist;
+  double  *tmpdist;
+};
+
+struct gsknn *gridsearch_knn_new(unsigned size);
+void gridsearch_knn_delete(struct gsknn *knn);
+int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat);
 
 struct gridsearch *gridsearch_create_reg2d(unsigned lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);

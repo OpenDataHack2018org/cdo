@@ -27,6 +27,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "interpol.h"
+#include "grid.h"
 
 
 int genThinoutGrid(int gridID1, int xinc, int yinc)
@@ -308,33 +309,28 @@ void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
 
 void *Intgrid(void *argument)
 {
-  int INTGRIDBIL, INTGRIDCON, INTPOINT, INTERPOLATE, BOXAVG, THINOUT;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, ngrids;
+  int nrecs;
   int index;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
+  int recID, varID, levelID;
   int gridID1 = -1, gridID2 = -1;
   int nmiss;
   int xinc = 0, yinc = 0;
   double missval;
   double slon, slat;
-  double *array1 = NULL, *array2 = NULL;
   field_t field1, field2;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
-  INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
-  INTGRIDCON  = cdoOperatorAdd("intgridcon",  0, 0, NULL);
-  INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
-  INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
-  BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
-  THINOUT     = cdoOperatorAdd("thinout",     0, 0, NULL);
+  int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
+  int INTGRIDCON  = cdoOperatorAdd("intgridcon",  0, 0, NULL);
+  int INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
+  int INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
+  int BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
+  int THINOUT     = cdoOperatorAdd("thinout",     0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
+
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
   if ( operatorID == INTGRIDBIL || operatorID == INTGRIDCON || operatorID == INTERPOLATE )
     {
@@ -361,16 +357,14 @@ void *Intgrid(void *argument)
       yinc = parameter2int(operatorArgv()[1]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
-
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   for ( index = 0; index < ngrids; index++ )
     {
       gridID1 = vlistGrid(vlistID1, index);
@@ -393,7 +387,10 @@ void *Intgrid(void *argument)
 	}
       else
 	{
-	  if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
+          bool ldistgen = false;
+          if ( grid_is_distance_generic(gridID1) && grid_is_distance_generic(gridID2) ) ldistgen = true;
+          
+	  if ( !ldistgen && gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
 	    cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
 
 	  if ( gridIsRotated(gridID1) )
@@ -403,20 +400,20 @@ void *Intgrid(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1   = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1   = (double*) Malloc(gridsize*sizeof(double));
 
   gridsize = gridInqSize(gridID2);
-  array2   = (double*) Malloc(gridsize*sizeof(double));
+  double *array2   = (double*) Malloc(gridsize*sizeof(double));
 
   field_init(&field1);
   field_init(&field2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);

@@ -999,8 +999,8 @@ int ReadColourTable( char *filepath )
       cdoWarning( " Discarding improper format colours and continuing!\n" );
     }
 
-  for ( i = 0; i < num_colors; i++ ) free(temp_table[i]);
-  free(temp_table);
+  for ( i = 0; i < num_colors; i++ ) Free(temp_table[i]);
+  Free(temp_table);
     
   return 0;
 }

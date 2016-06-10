@@ -73,14 +73,14 @@
 
 static const char CFD_NAME[]         = "consecutive_frost_days_index_per_time_period";
 static const char CFD_LONGNAME[]     = "Consecutive frost days index is the greatest number of consecutive frost days in a given time period. Frost days is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
-static const char CFD_UNITS[]        = "No.";
+//static const char CFD_UNITS[]        = "No.";
 static const char CFD_NAME2[]        = "number_of_cfd_periods_with_more_than_%ddays_per_time_period";
 static const char CFD_LONGNAME2[]    = "Number of cfd periods in given time period with more than %d days. The time period should be defined by the bounds of the time coordinate.";
 static const char CFD_UNITS2[]       = "No.";
 
 static const char CSU_NAME[]         = "consecutive_summer_days_index_per_time_period";
 static const char CSU_LONGNAME[]     = "Consecutive summer days index is the greatest number of consecutive summer days in a given time period. Summer days is the number of days where maximum of temperature is above 25 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
-static const char CSU_UNITS[]        = "No.";
+//static const char CSU_UNITS[]        = "No.";
 static const char CSU_NAME2[]        = "number_of_csu_periods_with_more_than_%ddays_per_time_period";
 static const char CSU_LONGNAME2[]    = "Number of csu periods in given time period with more than %d days. The time period should be defined by the bounds of the time coordinate.";
 static const char CSU_UNITS2[]       = "No.";
@@ -101,11 +101,11 @@ static const char CWFI_UNITS2[]      = "No.";
 
 static const char ETR_NAME[]         = "intra_period_extreme_temperature_range";
 static const char ETR_LONGNAME[]     = "Difference between the absolute extreme temperatures in observation period. The time period should be defined by the bounds of the time coordinate.";
-static const char ETR_UNITS[]        = "K";
+//static const char ETR_UNITS[]        = "K";
 
 static const char FD_NAME[]          = "frost_days_index_per_time_period";
 static const char FD_LONGNAME[]      = "Frost days index is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
-static const char FD_UNITS[]         = "No.";
+//static const char FD_UNITS[]         = "No.";
 
 static const char GSL_NAME[]         = "thermal_growing_season_length";
 static const char GSL_LONGNAME[]     = "Counted are the number of days per calendar year between the first occurrence of at least %d consecutive days where the daily mean temperature is above %1.0f degree Celsius and the first occurrence of at least %d consecutive days after 1st of July where the daily mean temperature is below %1.0f degree Celsius. The time period should be defined by the bounds of the time coordinate.";
@@ -138,7 +138,7 @@ static const char ID_UNITS[]         = "No.";
 
 static const char SU_NAME[]          = "summer_days_index_per_time_period";
 static const char SU_LONGNAME[]      = "Summer days index is the number of days where maximum of temperature is above %1.0f degree Celsius. The time period should be defined by the bounds of the time coordinate.";
-static const char SU_UNITS[]         = "No.";
+//static const char SU_UNITS[]         = "No.";
 
 static const char TG10P_NAME[]       = "cold_days_percent_wrt_10th_percentile_of_reference_period";
 static const char TG10P_LONGNAME[]   = "This is the percent of time per time period where daily mean temperature is below a reference value. The reference value is calculated  as the 10th percentile of daily mean temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
@@ -224,7 +224,7 @@ static const char R99P_UNITS[]       = "Percent";
 
 static const char R99PTOT_NAME[]     = "precipitation_percent_due_to_R99p_days";
 static const char R99PTOT_LONGNAME[] = "percentage of  total  precipitation amount per time period  due to  extremely_wet_days_wrt_99th_percentile_of_reference_period. The time period should be defined by the bounds of the time coordinate.";
-static const char R99PTOT_UNITS[]    = "Percent";
+//static const char R99PTOT_UNITS[]    = "Percent";
 
 static const char RR1_NAME[]         = "wet_days_index_per_time_period";
 static const char RR1_LONGNAME[]     = "Wet days index is the number of days per time period with daily precipitation of at least %g mm.  The time period should be defined by the bounds of the time coordinate.";
@@ -261,10 +261,10 @@ static const char STRBRE_LONGNAME[]  = "Strong breeze days index is the number o
 static const char STRBRE_NAME2[]     = "consecutive_strong_breeze_days_index_per_time_period";
 static const char STRBRE_LONGNAME2[] = "Greatest number of consecutive strong breeze days per time period. The time period should be defined by the bounds of the time coordinate.";
 
-static const char STRGAL_NAME[]      = "strong_gale_days_index_per_time_period";
-static const char STRGAL_LONGNAME[]  = "Strong gale days index is the number of days per time period where maximum wind speed is above 20.5 m/s. The time period should be defined by the bounds of the time coordinate.";
-static const char STRGAL_NAME2[]     = "consecutive_strong_gale_days_index_per_time_period";
-static const char STRGAL_LONGNAME2[] = "Greatest number of consecutive strong gale days per time period. The time period should be defined by the bounds of the time coordinate.";
+//static const char STRGAL_NAME[]      = "strong_gale_days_index_per_time_period";
+//static const char STRGAL_LONGNAME[]  = "Strong gale days index is the number of days per time period where maximum wind speed is above 20.5 m/s. The time period should be defined by the bounds of the time coordinate.";
+//static const char STRGAL_NAME2[]     = "consecutive_strong_gale_days_index_per_time_period";
+//static const char STRGAL_LONGNAME2[] = "Greatest number of consecutive strong gale days per time period. The time period should be defined by the bounds of the time coordinate.";
 
 static const char HURR_NAME[]        = "hurricane_days_index_per_time_period";
 static const char HURR_LONGNAME[]    = "Hurricane days index is the number of days per time period where maximum wind speed is above 32.5 m/s. The time period should be defined by the bounds of the time coordinate.";

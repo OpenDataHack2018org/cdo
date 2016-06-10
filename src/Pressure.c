@@ -44,26 +44,21 @@ void *Pressure(void *argument)
   int recID, nrecs;
   int i, k, offset;
   int tsID, varID, levelID;
-  int nvars;
-  int zaxisIDp, zaxisIDh = -1, nzaxis;
+  int zaxisIDp, zaxisIDh = -1;
   int gridID, zaxisID;
-  int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel = 0;
-  int nvct;
+  int nhlevf = 0, nhlevh = 0, nlevel = 0;
+  int nvct = 0;
   int psID = -1, lnpsID = -1, pvarID = -1;
   int code, param;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   double minval, maxval;
-  double *vct = NULL;
   double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap = NULL;
   double *pout = NULL;
   double *pdata = NULL;
   int taxisID1, taxisID2;
-  int lhavevct;
   int nmiss;
-  int mono_level;
   int instNum, tableNum;
-  int useTable;
 
   cdoInitialize(argument);
 
@@ -79,114 +74,8 @@ void *Pressure(void *argument)
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  nzaxis  = vlistNzaxis(vlistID1);
-  lhavevct = FALSE;
-  for ( i = 0; i < nzaxis; i++ )
-    {
-      mono_level = FALSE;
-      mono_level = TRUE;
-      zaxisID = vlistZaxis(vlistID1, i);
-      nlevel  = zaxisInqSize(zaxisID);
-
-      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
-	   nlevel > 1 )
-	{
-	  double *level;
-	  int l;
-	  level = (double*) Malloc(nlevel*sizeof(double));
-	  zaxisInqLevels(zaxisID, level);
-	  for ( l = 0; l < nlevel; l++ )
-	    {
-	      if ( (l+1) != (int) (level[l]+0.5) ) break;
-	    }
-	  if ( l == nlevel ) mono_level = TRUE; 
-	  Free(level);
-	}
-
-      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
-	   nlevel > 1 && mono_level )
-	{
-	  nvct = zaxisInqVctSize(zaxisID);
-	  if ( nlevel == (nvct/2 - 1) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev;
-		  nhlevh   = nhlevf + 1;
-	      
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-		}
-	    }
-	  else if ( nlevel == (nvct/2) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevf   = nhlev - 1;
-		  nhlevh   = nhlev;
-	      
-		  vct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID, vct);
-		}
-	    }
-	  else if ( nlevel == (nvct - 4 - 1) )
-	    {
-	      if ( lhavevct == FALSE )
-		{
-		  int vctsize;
-		  int voff = 4;
-		  double *rvct = NULL;
-
-		  rvct = (double*) Malloc(nvct*sizeof(double));
-		  zaxisInqVct(zaxisID,rvct);
-
-		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
-		    {
-		      lhavevct = TRUE;
-		      zaxisIDh = zaxisID;
-		      nhlev    = nlevel;
-		      nhlevf   = nhlev;
-		      nhlevh   = nhlev + 1;
-
-		      vctsize = 2*nhlevh;
-		      vct = (double*) Malloc(vctsize*sizeof(double));
-
-		      /* calculate VCT for LM */
-
-		      for ( i = 0; i < vctsize/2; i++ )
-			{
-			  if ( rvct[voff+i] >= rvct[voff] && rvct[voff+i] <= rvct[3] )
-			    {
-			      vct[i] = rvct[0]*rvct[voff+i];
-			      vct[vctsize/2+i] = 0;
-			    }
-			  else
-			    {
-			      vct[i] = (rvct[0]*rvct[3]*(1-rvct[voff+i]))/(1-rvct[3]);
-			      vct[vctsize/2+i] = (rvct[voff+i]-rvct[3])/(1-rvct[3]);
-			    }
-			}
-		      
-		      if ( cdoVerbose )
-			{
-			  for ( i = 0; i < vctsize/2; i++ )
-			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
-			}
-		    }
-		  Free(rvct);
-		}
-	    }
-	}
-    }
-
-
-  nvars = vlistNvars(vlistID1);
+  int nhlev;
+  double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
@@ -203,25 +92,23 @@ void *Pressure(void *argument)
   else
     zaxisIDp = zaxisCreate(ZAXIS_HYBRID_HALF, nhlevh);
 
-  {
-    double *level;
-    int l;
-    level = (double*) Malloc(nhlevh*sizeof(double));
-    for ( l = 0; l < nhlevh; l++ ) level[l] = l+1;
-    zaxisDefLevels(zaxisIDp, level);
-    Free(level);
-  }
+  double *level = (double*) Malloc(nhlevh*sizeof(double));
+  for ( int l = 0; l < nhlevh; l++ ) level[l] = l+1;
+  zaxisDefLevels(zaxisIDp, level);
+  Free(level);
 
   zaxisDefVct(zaxisIDp, 2*nhlevh, vct);
 
-  useTable = FALSE;
+  int nvars = vlistNvars(vlistID1);
+
+  bool useTable = false;
   for ( varID = 0; varID < nvars; varID++ )
     {
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
       if ( tableNum > 0 && tableNum != 255 )
 	{
-	  useTable = TRUE;
+	  useTable = true;
 	  break;
 	}
     }

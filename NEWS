@@ -1,6 +1,22 @@
 CDO NEWS
 --------
 
+Version 1.7.2 (25 June 2016):
+
+   New operators:
+     * smooth: Smooth grid points
+     * ap2hl: Air pressure to height level interpolation
+     * ngrids: Show number of grids
+     * ngridpoints: Show number of gridpoints per variable
+     * reducegrid: Select gridpoints wrt. given mask
+     * settbounds: Set time bounds
+   Changed operators:
+     * input: added optional zaxis parameter
+   Fixed bugs:
+     * Error reading Gaussian reduced GRIB files [Bug #6780 #6819]
+     * Installation error with OpenMP [Bug #6523]
+     * shaded, contour, grfill: set NAN missvals to -9e33 [Bug: #6677]
+
 Version 1.7.1 (25 February 2016):
 
    New features:

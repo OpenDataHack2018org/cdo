@@ -35,10 +35,10 @@ void search_realloc(long num_srch_cells, search_t *search)
 
   if ( num_srch_cells > max_srch_cells )
     {
-      partial_areas   = (double*) realloc(partial_areas,   num_srch_cells*sizeof(double));
-      partial_weights = (double*) realloc(partial_weights, num_srch_cells*sizeof(double));
-      overlap_buffer = (struct grid_cell*) realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
-      src_grid_cells = (struct grid_cell*) realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
+      partial_areas   = (double*) Realloc(partial_areas,   num_srch_cells*sizeof(double));
+      partial_weights = (double*) Realloc(partial_weights, num_srch_cells*sizeof(double));
+      overlap_buffer = (struct grid_cell*) Realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
+      src_grid_cells = (struct grid_cell*) Realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
 
       for ( long n = max_srch_cells; n < num_srch_cells; ++n )
         {
@@ -55,9 +55,9 @@ void search_realloc(long num_srch_cells, search_t *search)
           src_grid_cells[n].array_size      = search->srch_corners;
           src_grid_cells[n].num_corners     = search->srch_corners;
           src_grid_cells[n].edge_type       = search->src_edge_type;
-          src_grid_cells[n].coordinates_x   = (double*) malloc(search->srch_corners*sizeof(double));
-          src_grid_cells[n].coordinates_y   = (double*) malloc(search->srch_corners*sizeof(double));
-          src_grid_cells[n].coordinates_xyz = (double*) malloc(3*search->srch_corners*sizeof(double));
+          src_grid_cells[n].coordinates_x   = (double*) Malloc(search->srch_corners*sizeof(double));
+          src_grid_cells[n].coordinates_y   = (double*) Malloc(search->srch_corners*sizeof(double));
+          src_grid_cells[n].coordinates_xyz = (double*) Malloc(3*search->srch_corners*sizeof(double));
         }
 
       max_srch_cells = num_srch_cells;

@@ -63,13 +63,13 @@ void rotate_uv2(double *u_i, double *v_j, int ix, int iy,
   double lat_factor;
   double absold, absnew;  /* velocity vector lengths */
   int  i, j, ip1, im1, jp1, jm1;
-  int  change_sign_u, change_sign_v;
+  bool change_sign_u, change_sign_v;
   double pi = 3.14159265359;
 
 
   /* specification whether change in sign is needed for the input arrays */
-  change_sign_u = FALSE;
-  change_sign_v = TRUE;
+  change_sign_u = false;
+  change_sign_v = true;
 
   /* initialization */
   for ( i = 0; i < ix*iy; i++ )
@@ -259,47 +259,31 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 
 void *Mrotuvb(void *argument)
 {
-  int streamID1, streamID2, streamID3;
   int nrecs, nrecs2;
-  int tsID, recID, levelID;
+  int levelID;
   int varID1, varID2;
-  int nvars;
-  int gridID1, gridID2, gridID3;
-  int gridsize;
-  int nlon, nlat;
-  int vlistID1, vlistID2, vlistID3;
-  int i, j;
-  int taxisID1, taxisID3;
   int nmiss1, nmiss2;
-  int code1, code2;
-  int gpint = TRUE;
-  double missval1, missval2;
-  double *ufield = NULL, *vfield = NULL;
-  double *urfield = NULL, *vrfield = NULL;
-  double *uhelp = NULL, *vhelp = NULL;
-  double *grid1x = NULL, *grid2x = NULL, *grid3x = NULL;
-  double *grid1y = NULL, *grid2y = NULL, *grid3y = NULL;
+  bool gpint = true;
 
   cdoInitialize(argument);
 
   if ( operatorArgc() == 1 )
-    if ( strcmp(operatorArgv()[0], "noint") == 0 )
-      gpint = FALSE;
+    if ( strcmp(operatorArgv()[0], "noint") == 0 ) gpint = false;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoStreamName(0)->args);
   nvars = vlistNvars(vlistID2);
   if ( nvars > 1 ) cdoAbort("More than one variable found in %s",  cdoStreamName(1)->args);
 
-  gridID1 = vlistGrid(vlistID1, 0);
-  gridID2 = vlistGrid(vlistID2, 0);
-  gridsize = gridInqSize(gridID1);
+  int gridID1 = vlistGrid(vlistID1, 0);
+  int gridID2 = vlistGrid(vlistID2, 0);
+  int gridsize = gridInqSize(gridID1);
   if ( gpint == TRUE  && gridID1 == gridID2 ) cdoAbort("Input grids are the same, use parameter >noint< to disable interpolation!");
   if ( gpint == FALSE && gridID1 != gridID2 ) cdoAbort("Input grids are not the same!");
   if ( gridsize != gridInqSize(gridID2) ) cdoAbort("Grids have different size!");
@@ -319,15 +303,15 @@ void *Mrotuvb(void *argument)
 
   if ( gridsize != gridInqSize(gridID2) ) cdoAbort("Internal problem: gridsize changed!");
 
-  nlon    = gridInqXsize(gridID1);
-  nlat    = gridInqYsize(gridID1);
+  int nlon    = gridInqXsize(gridID1);
+  int nlat    = gridInqYsize(gridID1);
 
-  grid1x  = (double*) Malloc(gridsize*sizeof(double));
-  grid1y  = (double*) Malloc(gridsize*sizeof(double));
-  grid2x  = (double*) Malloc(gridsize*sizeof(double));
-  grid2y  = (double*) Malloc(gridsize*sizeof(double));
-  grid3x  = (double*) Malloc(gridsize*sizeof(double));
-  grid3y  = (double*) Malloc(gridsize*sizeof(double));
+  double *grid1x  = (double*) Malloc(gridsize*sizeof(double));
+  double *grid1y  = (double*) Malloc(gridsize*sizeof(double));
+  double *grid2x  = (double*) Malloc(gridsize*sizeof(double));
+  double *grid2y  = (double*) Malloc(gridsize*sizeof(double));
+  double *grid3x  = (double*) Malloc(gridsize*sizeof(double));
+  double *grid3y  = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID1, grid1x);
   gridInqYvals(gridID1, grid1y);
@@ -368,49 +352,50 @@ void *Mrotuvb(void *argument)
   if ( grid2x ) Free(grid2x);
   if ( grid2y ) Free(grid2y);
 
-  gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
+  int gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
   gridDefPrec(gridID3, gridInqPrec(gridID1));
   gridDefXsize(gridID3, nlon);
   gridDefYsize(gridID3, nlat);
   gridDefXvals(gridID3, grid3x);
   gridDefYvals(gridID3, grid3y);
 
-  for ( i = 0; i < gridsize; i++ )
+  for ( int i = 0; i < gridsize; i++ )
     {
       grid3x[i] *= DEG2RAD;
       grid3y[i] *= DEG2RAD;
     }
 
-  vlistID3 = vlistCreate();
+  int vlistID3 = vlistCreate();
   vlistCopy(vlistID3, vlistID1);
   vlistCat(vlistID3, vlistID2);
 
-  code1 = vlistInqVarCode(vlistID1, 0);
-  code2 = vlistInqVarCode(vlistID2, 0);
+  int code1 = vlistInqVarCode(vlistID1, 0);
+  int code2 = vlistInqVarCode(vlistID2, 0);
 
   if ( code1 == code2 ) vlistDefVarCode(vlistID3, 1, code1+1);
   
   vlistChangeGrid(vlistID3, gridID1, gridID3);
   vlistChangeGrid(vlistID3, gridID2, gridID3);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
   if ( cdoVerbose ) vlistPrint(vlistID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  missval1 = vlistInqVarMissval(vlistID1, 0);
-  missval2 = vlistInqVarMissval(vlistID2, 0);
+  double missval1 = vlistInqVarMissval(vlistID1, 0);
+  double missval2 = vlistInqVarMissval(vlistID2, 0);
 
-  ufield  = (double*) Malloc(gridsize*sizeof(double));
-  vfield  = (double*) Malloc(gridsize*sizeof(double));
-  urfield = (double*) Malloc(gridsize*sizeof(double));
-  vrfield = (double*) Malloc(gridsize*sizeof(double));
+  double *ufield  = (double*) Malloc(gridsize*sizeof(double));
+  double *vfield  = (double*) Malloc(gridsize*sizeof(double));
+  double *urfield = (double*) Malloc(gridsize*sizeof(double));
+  double *vrfield = (double*) Malloc(gridsize*sizeof(double));
 
+  double *uhelp = NULL, *vhelp = NULL;
   if ( gpint )
     {
       int gridsizex = (nlon+2)*nlat;
@@ -418,7 +403,7 @@ void *Mrotuvb(void *argument)
       vhelp   = (double*) Malloc(gridsizex*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID3, taxisID1);
@@ -429,7 +414,7 @@ void *Mrotuvb(void *argument)
 
       if ( nrecs != nrecs2 ) cdoAbort("Input streams have different number of levels!");
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID1, &levelID);
 	  streamInqRecord(streamID2, &varID2, &levelID);
@@ -440,7 +425,7 @@ void *Mrotuvb(void *argument)
 	  /* remove missing values */
 	  if ( nmiss1 || nmiss2 )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		{
 		  if ( DBL_IS_EQUAL(ufield[i], missval1) ) ufield[i] = 0;
 		  if ( DBL_IS_EQUAL(vfield[i], missval2) ) vfield[i] = 0;
@@ -450,15 +435,15 @@ void *Mrotuvb(void *argument)
 	  if ( gpint )
 	    {
 	      /* load to a help field */
-	      for ( j = 0; j < nlat; j++ )
-		for ( i = 0; i < nlon; i++ )
+	      for ( int j = 0; j < nlat; j++ )
+		for ( int i = 0; i < nlon; i++ )
 		  {
 		    uhelp[IX2D(j,i+1,nlon+2)] = ufield[IX2D(j,i,nlon)];
 		    vhelp[IX2D(j,i+1,nlon+2)] = vfield[IX2D(j,i,nlon)];
 		  }
 
 	      /* make help field cyclic */
-	      for ( j = 0; j < nlat; j++ )
+	      for ( int j = 0; j < nlat; j++ )
 		{
 		  uhelp[IX2D(j,0,nlon+2)]      = uhelp[IX2D(j,nlon,nlon+2)];
 		  uhelp[IX2D(j,nlon+1,nlon+2)] = uhelp[IX2D(j,1,nlon+2)];
@@ -467,15 +452,15 @@ void *Mrotuvb(void *argument)
 		}
 
 	      /* interpolate on pressure points */
-	      for ( j = 1; j < nlat; j++ )
-		for ( i = 0; i < nlon; i++ )
+	      for ( int j = 1; j < nlat; j++ )
+		for ( int i = 0; i < nlon; i++ )
 		  {
 		    ufield[IX2D(j,i,nlon)] = (uhelp[IX2D(j,i,nlon+2)]+uhelp[IX2D(j,i+1,nlon+2)])*0.5;
 		    vfield[IX2D(j,i,nlon)] = (vhelp[IX2D(j-1,i+1,nlon+2)]+vhelp[IX2D(j,i+1,nlon+2)])*0.5;
 		  }
 	    }
 
-	  for ( i = 0; i < nlon; i++ )
+	  for ( int i = 0; i < nlon; i++ )
 	    {
 	      ufield[IX2D(0,i,nlon)] = 0;
 	      vfield[IX2D(0,i,nlon)] = 0;
@@ -489,8 +474,8 @@ void *Mrotuvb(void *argument)
 	  /*
           {
 	  double lat, lon, auv, alpha;
-	  for ( j = 1; j < nlat-1; j += 3 )
-	    for ( i = 0; i < nlon; i += 3 )
+	  for ( int j = 1; j < nlat-1; j += 3 )
+	    for ( int i = 0; i < nlon; i += 3 )
 	      {
 		lat = grid3y[IX2D(j,i,nlon)]*RAD2DEG;
 		lon = grid3x[IX2D(j,i,nlon)]*RAD2DEG; 

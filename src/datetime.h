@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 
-#define  TIMESTAT_FIRST  1
-#define  TIMESTAT_LAST   2
-#define  TIMESTAT_MEAN   3
+#define  TIMESTAT_FIRST    1
+#define  TIMESTAT_LAST     2
+#define  TIMESTAT_MEAN     3
+#define  TIMESTAT_MIDHIGH  4
 
 
 typedef struct {
@@ -17,18 +18,13 @@ typedef struct {
 typedef struct {
   int   date;
   int   time;
-} datetime_t;
-
-
-typedef struct {
-  int   date;
-  int   time;
-} datetime_type;
+} cdo_datetime_t;
 
 typedef struct
 {
-  datetime_type v;
-  datetime_type b[2];
+  cdo_datetime_t c;     // corrected verification time
+  cdo_datetime_t v;     // verification time
+  cdo_datetime_t b[2];  // time bounds
 } dtinfo_type;
 
 typedef struct
@@ -52,7 +48,7 @@ juldate_t juldate_add_seconds(int seconds, juldate_t juldate);
 double    juldate_to_seconds(juldate_t juldate);
 
 
-void    datetime_avg(int dpy, int ndates, datetime_t *datetime);
+void    datetime_avg(int dpy, int ndates, cdo_datetime_t *datetime);
 
 dtlist_type *dtlist_new(void);
 void dtlist_delete(dtlist_type *dtlist);

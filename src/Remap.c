@@ -158,7 +158,7 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
   else
     cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
 
-  return (operfunc);
+  return operfunc;
 } 
 
 static
@@ -514,23 +514,21 @@ void get_remap_env(void)
 static
 void set_halo_to_missval(int nx, int ny, double *array, double missval)
 {
-  int i, j;
-
-  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+0]      = missval;
-  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+1]      = missval;
-  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+2]   = missval;
-  for ( j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+3]   = missval;
-  for ( i = 0; i < nx+4; i++ ) array[     0*(nx+4)+i] = missval;
-  for ( i = 0; i < nx+4; i++ ) array[     1*(nx+4)+i] = missval;
-  for ( i = 0; i < nx+4; i++ ) array[(ny+2)*(nx+4)+i] = missval;
-  for ( i = 0; i < nx+4; i++ ) array[(ny+3)*(nx+4)+i] = missval;
+  for ( int j = 0; j < ny+4; j++ ) array[j*(nx+4)+0]      = missval;
+  for ( int j = 0; j < ny+4; j++ ) array[j*(nx+4)+1]      = missval;
+  for ( int j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+2]   = missval;
+  for ( int j = 0; j < ny+4; j++ ) array[j*(nx+4)+nx+3]   = missval;
+  for ( int i = 0; i < nx+4; i++ ) array[     0*(nx+4)+i] = missval;
+  for ( int i = 0; i < nx+4; i++ ) array[     1*(nx+4)+i] = missval;
+  for ( int i = 0; i < nx+4; i++ ) array[(ny+2)*(nx+4)+i] = missval;
+  for ( int i = 0; i < nx+4; i++ ) array[(ny+3)*(nx+4)+i] = missval;
 }
 
 static
-int is_global_grid(int gridID)
+bool is_global_grid(int gridID)
 {
-  int global_grid = TRUE;
-  int non_global = remap_non_global || !gridIsCircular(gridID);
+  bool global_grid = true;
+  bool non_global = remap_non_global || !gridIsCircular(gridID);
   int gridtype = gridInqType(gridID);
 
   if ( (gridtype == GRID_LONLAT && gridIsRotated(gridID)) ||
@@ -538,15 +536,15 @@ int is_global_grid(int gridID)
        (gridtype == GRID_LCC) ||
        (gridtype == GRID_LAEA) ||
        (gridtype == GRID_SINUSOIDAL) ||
-       (gridtype == GRID_CURVILINEAR && non_global) ) global_grid = FALSE;
+       (gridtype == GRID_CURVILINEAR && non_global) ) global_grid = false;
 
-  return (global_grid);
+  return global_grid;
 }
 
 static
 void scale_gridbox_area(long gridsize, const double *restrict array1, long gridsize2, double *restrict array2, const double *restrict grid2_area)
 {
-  static int lgridboxinfo = TRUE;
+  static bool lgridboxinfo = true;
   long i;
   double array1sum = 0;
   double array2sum = 0;
@@ -563,7 +561,7 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
   if ( lgridboxinfo )
     {
       cdoPrint("gridbox_area replaced and scaled to %g", array1sum);
-      lgridboxinfo = FALSE;
+      lgridboxinfo = false;
     }
 }
 
@@ -595,10 +593,20 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, int *remapgrids)
 	      else
 		cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular grid!", gridNamePtr(gridtype));
 	    }
-	  else if ( gridtype == GRID_GENERIC && gridInqSize(gridID) == 1 )
-	    remapgrids[index] = FALSE;
+	  else if ( gridtype == GRID_GENERIC && gridInqSize(gridID) <= 2 )
+            {
+              remapgrids[index] = FALSE;
+            }
 	  else
-	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
+            {
+              int nvars = vlistNvars(vlistID);
+              int varID;
+              for ( varID = 0; varID < nvars; ++varID )
+                if ( gridID == vlistInqVarGrid(vlistID, varID) ) break;
+              char varname[CDI_MAX_NAME];
+              vlistInqVarName(vlistID, varID, varname);
+              cdoAbort("Variable %s has an unsupported %s grid!", varname, gridNamePtr(gridtype));
+            }
 	}
     }
 
@@ -607,32 +615,30 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, int *remapgrids)
 
   if ( index == ngrids ) cdoAbort("No remappable grid found!");
 
-  return (index);
+  return index;
 }
 
 static
 int set_max_remaps(int vlistID)
 {
   int max_remaps = 0;
-  int nzaxis, nvars, index;
-  int zaxisID, zaxissize;
 
-  nzaxis = vlistNzaxis(vlistID);
-  for ( index = 0; index < nzaxis; index++ )
+  const int nzaxis = vlistNzaxis(vlistID);
+  for ( int index = 0; index < nzaxis; index++ )
     {
-      zaxisID = vlistZaxis(vlistID, index);
-      zaxissize = zaxisInqSize(zaxisID);
+      const int zaxisID = vlistZaxis(vlistID, index);
+      const int zaxissize = zaxisInqSize(zaxisID);
       if ( zaxissize > max_remaps ) max_remaps = zaxissize;
     }
   
-  nvars = vlistNvars(vlistID);
+  const int nvars = vlistNvars(vlistID);
   if ( nvars > max_remaps ) max_remaps = nvars;
 
   max_remaps++;
 
   if ( cdoVerbose ) cdoPrint("Set max_remaps to %d", max_remaps);
 
-  return (max_remaps);
+  return max_remaps;
 }
 
 static
@@ -666,7 +672,7 @@ int get_norm_opt(void)
       else                                      cdoPrint("Normalization option: none");
     }
 
-  return (norm_opt);
+  return norm_opt;
 }
 
 static
@@ -828,6 +834,8 @@ void *Remap(void *argument)
 	cdoPrint("Extrapolation disabled!");
     }
 
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+
   if ( lremapxxx )
     {
       operatorInputArg("grid description file or name, remap weights file (SCRIP NetCDF)");
@@ -854,7 +862,6 @@ void *Remap(void *argument)
 
   if ( gridInqType(gridID2) == GRID_GENERIC ) cdoAbort("Unsupported target grid type (generic)!");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
   int filetype = streamInqFiletype(streamID1);
 
   int vlistID1 = streamInqVlist(streamID1);

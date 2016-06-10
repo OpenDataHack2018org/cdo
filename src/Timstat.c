@@ -226,7 +226,7 @@ void *Timstat(void *argument)
       streamDefVlist(streamID3, vlistID3);
     }
 
-  recinfo_t *recinfo = (recinfo_t *) malloc(maxrecs*sizeof(recinfo_t));
+  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);

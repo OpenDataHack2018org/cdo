@@ -38,14 +38,9 @@
 
 void *Spectral(void *argument)
 {
-  int GP2SP, GP2SPL, SP2GP, SP2GPL, SP2SP, SPCUT;
-  int operatorID;
-  int streamID1, streamID2;
   int nrecs, nvars;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int index, ngrids;
-  int vlistID1, vlistID2;
+  int varID, levelID;
+  int index;
   int gridIDsp = -1, gridIDgp = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
@@ -53,36 +48,34 @@ void *Spectral(void *argument)
   int ncut = 0;
   int *wnums = NULL, *waves = NULL;
   int *vars;
-  int lcopy = FALSE;
-  double *array1 = NULL, *array2 = NULL;
-  int taxisID1, taxisID2;
+  double *array2 = NULL;
   int nlon, nlat, ntr;
   SPTRANS *sptrans = NULL;
   LIST *ilist = listNew(INT_LIST);
 
   cdoInitialize(argument);
 
-  GP2SP  = cdoOperatorAdd("gp2sp",  0, 0, NULL);
-  GP2SPL = cdoOperatorAdd("gp2spl", 0, 0, NULL);
-  SP2GP  = cdoOperatorAdd("sp2gp",  0, 0, NULL);
-  SP2GPL = cdoOperatorAdd("sp2gpl", 0, 0, NULL);
-  SP2SP  = cdoOperatorAdd("sp2sp",  0, 0, NULL);
-  SPCUT  = cdoOperatorAdd("spcut",  0, 0, NULL);
+  bool lcopy = UNCHANGED_RECORD;
 
-  operatorID = cdoOperatorID();
+  int GP2SP  = cdoOperatorAdd("gp2sp",  0, 0, NULL);
+  int GP2SPL = cdoOperatorAdd("gp2spl", 0, 0, NULL);
+  int SP2GP  = cdoOperatorAdd("sp2gp",  0, 0, NULL);
+  int SP2GPL = cdoOperatorAdd("sp2gpl", 0, 0, NULL);
+  int SP2SP  = cdoOperatorAdd("sp2sp",  0, 0, NULL);
+  int SPCUT  = cdoOperatorAdd("spcut",  0, 0, NULL);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
   /* find first spectral grid */
   for ( index = 0; index < ngrids; index++ )
     {
@@ -238,12 +231,12 @@ void *Spectral(void *argument)
 
   if ( gridID1 != -1 ) vlistChangeGrid(vlistID2, gridID1, gridID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( gridID2 != -1 )
     {
@@ -251,14 +244,14 @@ void *Spectral(void *argument)
       array2 = (double*) Malloc(gridsize*sizeof(double));
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -294,6 +287,7 @@ void *Spectral(void *argument)
 		}
 	    }    
 	}
+
       tsID++;
     }
 

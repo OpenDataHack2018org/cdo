@@ -72,68 +72,68 @@ typedef struct {
   int type;
   int flag;
   const char *name;  // function name
-  void (*func)();    // pointer to function
+  double (*func)();    // pointer to function
 }
 func_t;
 
 static func_t fun_sym_tbl[] =
 {
   // scalar functions
-  {FT_STD, 0, "abs",   (void (*)()) fabs},
-  {FT_STD, 0, "floor", (void (*)()) floor},
-  {FT_STD, 0, "ceil",  (void (*)()) ceil},
-  {FT_STD, 0, "int",   (void (*)()) f_int},
-  {FT_STD, 0, "nint",  (void (*)()) f_nint},
-  {FT_STD, 0, "sqr",   (void (*)()) f_sqr},
-  {FT_STD, 0, "sqrt",  (void (*)()) sqrt},
-  {FT_STD, 0, "exp",   (void (*)()) exp},
-  {FT_STD, 0, "erf",   (void (*)()) erf},
-  {FT_STD, 0, "log",   (void (*)()) log},
-  {FT_STD, 0, "ln",    (void (*)()) log},
-  {FT_STD, 0, "log10", (void (*)()) log10},
-  {FT_STD, 0, "sin",   (void (*)()) sin},
-  {FT_STD, 0, "cos",   (void (*)()) cos},
-  {FT_STD, 0, "tan",   (void (*)()) tan},
-  {FT_STD, 0, "sinh",  (void (*)()) sinh},
-  {FT_STD, 0, "cosh",  (void (*)()) cosh},
-  {FT_STD, 0, "tanh",  (void (*)()) tanh},
-  {FT_STD, 0, "asin",  (void (*)()) asin},
-  {FT_STD, 0, "acos",  (void (*)()) acos},
-  {FT_STD, 0, "atan",  (void (*)()) atan},
-  {FT_STD, 0, "asinh", (void (*)()) asinh},
-  {FT_STD, 0, "acosh", (void (*)()) acosh},
-  {FT_STD, 0, "atanh", (void (*)()) atanh},
-  {FT_STD, 0, "gamma", (void (*)()) tgamma},
-  {FT_STD, 0, "rad",   (void (*)()) f_rad},
-  {FT_STD, 0, "deg",   (void (*)()) f_deg},
+  {FT_STD, 0, "abs",   (double (*)()) (double (*)(double)) fabs},
+  {FT_STD, 0, "floor", (double (*)()) (double (*)(double)) floor},
+  {FT_STD, 0, "ceil",  (double (*)()) (double (*)(double)) ceil},
+  {FT_STD, 0, "sqrt",  (double (*)()) (double (*)(double)) sqrt},
+  {FT_STD, 0, "exp",   (double (*)()) (double (*)(double)) exp},
+  {FT_STD, 0, "erf",   (double (*)()) (double (*)(double)) erf},
+  {FT_STD, 0, "log",   (double (*)()) (double (*)(double)) log},
+  {FT_STD, 0, "ln",    (double (*)()) (double (*)(double)) log},
+  {FT_STD, 0, "log10", (double (*)()) (double (*)(double)) log10},
+  {FT_STD, 0, "sin",   (double (*)()) (double (*)(double)) sin},
+  {FT_STD, 0, "cos",   (double (*)()) (double (*)(double)) cos},
+  {FT_STD, 0, "tan",   (double (*)()) (double (*)(double)) tan},
+  {FT_STD, 0, "sinh",  (double (*)()) (double (*)(double)) sinh},
+  {FT_STD, 0, "cosh",  (double (*)()) (double (*)(double)) cosh},
+  {FT_STD, 0, "tanh",  (double (*)()) (double (*)(double)) tanh},
+  {FT_STD, 0, "asin",  (double (*)()) (double (*)(double)) asin},
+  {FT_STD, 0, "acos",  (double (*)()) (double (*)(double)) acos},
+  {FT_STD, 0, "atan",  (double (*)()) (double (*)(double)) atan},
+  {FT_STD, 0, "asinh", (double (*)()) (double (*)(double)) asinh},
+  {FT_STD, 0, "acosh", (double (*)()) (double (*)(double)) acosh},
+  {FT_STD, 0, "atanh", (double (*)()) (double (*)(double)) atanh},
+  {FT_STD, 0, "gamma", (double (*)()) (double (*)(double)) tgamma},
+  {FT_STD, 0, "int",   (double (*)()) f_int},
+  {FT_STD, 0, "nint",  (double (*)()) f_nint},
+  {FT_STD, 0, "sqr",   (double (*)()) f_sqr},
+  {FT_STD, 0, "rad",   (double (*)()) f_rad},
+  {FT_STD, 0, "deg",   (double (*)()) f_deg},
 
   // constant functions
-  {FT_CONST, 0, "ngp",     (void (*)()) pt_ngp},      // number of horizontal grid points
-  {FT_CONST, 0, "nlev",    (void (*)()) pt_nlev},     // number of vertical levels
-  {FT_CONST, 0, "size",    (void (*)()) pt_size},     // ngp*nlev
-  {FT_CONST, 0, "missval", (void (*)()) pt_missval},  // Returns the missing value of a variable
+  {FT_CONST, 0, "ngp",     (double (*)()) pt_ngp},      // number of horizontal grid points
+  {FT_CONST, 0, "nlev",    (double (*)()) pt_nlev},     // number of vertical levels
+  {FT_CONST, 0, "size",    (double (*)()) pt_size},     // ngp*nlev
+  {FT_CONST, 0, "missval", (double (*)()) pt_missval},  // Returns the missing value of a variable
 
   // cdo field functions (Reduce grid to point)
-  {FT_FLD, 0, "fldmin",  (void (*)()) fldmin},
-  {FT_FLD, 0, "fldmax",  (void (*)()) fldmax},
-  {FT_FLD, 0, "fldsum",  (void (*)()) fldsum},
-  {FT_FLD, 1, "fldmean", (void (*)()) fldmean},
-  {FT_FLD, 1, "fldavg",  (void (*)()) fldavg},
-  {FT_FLD, 1, "fldstd",  (void (*)()) fldstd},
-  {FT_FLD, 1, "fldstd1", (void (*)()) fldstd1},
-  {FT_FLD, 1, "fldvar",  (void (*)()) fldvar},
-  {FT_FLD, 1, "fldvar1", (void (*)()) fldvar1},
+  {FT_FLD, 0, "fldmin",  (double (*)()) fldmin},
+  {FT_FLD, 0, "fldmax",  (double (*)()) fldmax},
+  {FT_FLD, 0, "fldsum",  (double (*)()) fldsum},
+  {FT_FLD, 1, "fldmean", (double (*)()) fldmean},
+  {FT_FLD, 1, "fldavg",  (double (*)()) fldavg},
+  {FT_FLD, 1, "fldstd",  (double (*)()) fldstd},
+  {FT_FLD, 1, "fldstd1", (double (*)()) fldstd1},
+  {FT_FLD, 1, "fldvar",  (double (*)()) fldvar},
+  {FT_FLD, 1, "fldvar1", (double (*)()) fldvar1},
 
   // cdo field functions (Reduce level to point)
-  {FT_VERT, 0, "vertmin",  (void (*)()) fldmin},
-  {FT_VERT, 0, "vertmax",  (void (*)()) fldmax},
-  {FT_VERT, 0, "vertsum",  (void (*)()) fldsum},
-  {FT_VERT, 1, "vertmean", (void (*)()) fldmean},
-  {FT_VERT, 1, "vertavg",  (void (*)()) fldavg},
-  {FT_VERT, 1, "vertstd",  (void (*)()) fldstd},
-  {FT_VERT, 1, "vertstd1", (void (*)()) fldstd1},
-  {FT_VERT, 1, "vertvar",  (void (*)()) fldvar},
-  {FT_VERT, 1, "vertvar1", (void (*)()) fldvar1},
+  {FT_VERT, 0, "vertmin",  (double (*)()) fldmin},
+  {FT_VERT, 0, "vertmax",  (double (*)()) fldmax},
+  {FT_VERT, 0, "vertsum",  (double (*)()) fldsum},
+  {FT_VERT, 1, "vertmean", (double (*)()) fldmean},
+  {FT_VERT, 1, "vertavg",  (double (*)()) fldavg},
+  {FT_VERT, 1, "vertstd",  (double (*)()) fldstd},
+  {FT_VERT, 1, "vertstd1", (double (*)()) fldstd1},
+  {FT_VERT, 1, "vertvar",  (double (*)()) fldvar},
+  {FT_VERT, 1, "vertvar1", (double (*)()) fldvar1},
   
   {FT_COORD, 0, "clon",       NULL},
   {FT_COORD, 0, "clat",       NULL},
@@ -954,7 +954,7 @@ nodeType *fun1c(int init, int funcID, nodeType *p1, double value, parse_param_t 
     {
       parse_arg->coords[coordID].needed = true;
 
-      data = (double*) malloc(nlev*sizeof(double));
+      data = (double*) Malloc(nlev*sizeof(double));
       zaxisInqLevels(zaxisID, data);
     }
   else

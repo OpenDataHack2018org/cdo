@@ -22,6 +22,8 @@
      Splityear  splityearmon    Split in years and month
 */
 
+#include <limits.h>
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -42,7 +44,6 @@ void *Splityear(void *argument)
   int day;
   int year1, year2;
   int mon1, mon2;
-  int lcopy = FALSE;
   int gridsize;
   int ic = 0;
   int cyear[MAX_YEARS];
@@ -55,8 +56,8 @@ void *Splityear(void *argument)
   cdoInitialize(argument);
 
   if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
-
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  
+  bool lcopy = UNCHANGED_RECORD;
 
   int SPLITYEAR    = cdoOperatorAdd("splityear",     0, 10000, NULL);
   int SPLITYEARMON = cdoOperatorAdd("splityearmon",  0,   100, NULL);
@@ -118,7 +119,7 @@ void *Splityear(void *argument)
 	}
     }
 
-  int index1 = - 1<<31;
+  int index1 = -INT_MAX;
   int index2;
   year1 = -1;
   mon1  = -1;

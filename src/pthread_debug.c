@@ -5,7 +5,6 @@
 #include <stdio.h>
 
 
-
 #if defined(HAVE_LIBPTHREAD)
 #include <pthread.h>
 #include <errno.h>
@@ -79,6 +78,8 @@ void print_pthread_attr(const char *caller, pthread_attr_t *attr)
 
 void print_pthread_mutexattr(const char *caller,  pthread_mutexattr_t *m_attr)
 {
+  (void) caller;
+  (void) m_attr;
   /*
 #if defined(_POSIX_THREAD_PRIO_PROTECT) && defined(_POSIX_THREAD_PRIO_INHERIT)
   {
@@ -114,6 +115,9 @@ void print_pthread_condattr(const char *caller, pthread_condattr_t *c_attr)
   pthread_condattr_getpshared(c_attr, &pshared);
   POUT2(caller, pshared, PTHREAD_PROCESS_SHARED, PTHREAD_PROCESS_PRIVATE);
   }
+#else
+  (void) caller;
+  (void) c_attr;
 #endif
 }
 
@@ -147,13 +151,14 @@ int Pthread_create(const char *caller, pthread_t *th,
 
   //if ( PTHREAD_Debug ) Message("-%s (thID = %ld, status = %d)", caller, (long) *th, status);
 
-  return (status);
+  return status;
 }
 
 
 int Pthread_join(const char *caller, pthread_t th, void **thread_return)
 {
   int status;
+  (void) caller;
 
   //  if ( PTHREAD_Debug ) Message("+%s (thID = %ld)", caller, (void *) th);
 
@@ -161,7 +166,7 @@ int Pthread_join(const char *caller, pthread_t th, void **thread_return)
 
   // if ( PTHREAD_Debug ) Message("-%s (thID = %ld, status = %d)", caller, (void *) th, status);
 
-  return (status);
+  return status;
 }
 
 

@@ -61,28 +61,33 @@ void factorni(int kni, int *kni2, int *kni3)
   /*  kni3    INT      exponent of "3", either 0 or 1                   */
   /**********************************************************************/
 
-  int mx;
-
-  mx = kni;
+  unsigned lim = 9999;
+  int mx = kni;
   
   *kni2  = 0;
   *kni3  = 0;
 
-  while (mx > 1) { 
-      if (mx%2 == 0) {
-	*kni2 = *kni2 + 1;
-	mx    = mx/2;
-      } else if (mx%3 == 0) {
-	*kni3 = *kni3 + 1;
-	mx    = mx/3;
-      } else {
+  while ( mx > 1 && --lim )
+    {
+      if ( mx%2 == 0 )
+        {
+          *kni2 = *kni2 + 1;
+          mx    = mx/2;
+        }
+      else if ( mx%3 == 0 )
+        {
+          *kni3 = *kni3 + 1;
+          mx    = mx/3;
+        }
+      else
+        {
 	/* error return */
-      }
-  }
+        }
+    }
 
   /* kni3 must not be greater than */
   
-  if (*kni3 > 1) {
+  if ( *kni3 > 1 ) {
     /* error return */
   }
 }
@@ -110,7 +115,7 @@ int pow_ii(int x, int n)
       break;
   }
   
-  return (pow);
+  return pow;
 }
 
 /*****************************************************************************/
@@ -174,30 +179,25 @@ struct cart circum_center(struct cart *v0, struct cart *v1, struct cart *v2)
     ptmp2++;
   }
   
-  return (center);
+  return center;
 }
 
 /*****************************************************************************/
 
 struct cart gc2cc(struct geo *position)
 {
-  double cln;
-  double sln;
-  double clt;
-  double slt;
-  
   struct cart x;
 
-  sln = sin(position->lon);
-  cln = cos(position->lon);
-  slt = sin(position->lat);
-  clt = cos(position->lat);
+  double sln = sin(position->lon);
+  double cln = cos(position->lon);
+  double slt = sin(position->lat);
+  double clt = cos(position->lat);
 
   x.x[0] = cln*clt;
   x.x[1] = sln*clt;
   x.x[2] = slt;
 
-  return (x);
+  return x;
 }
 
 /*****************************************************************************/
@@ -241,7 +241,7 @@ struct geo cc2gc(struct cart *x)
     position.lat = atan(tlt);
   }
 
-  return (position);
+  return position;
 }
 
 /*****************************************************************************/
@@ -635,6 +635,7 @@ void tricntr(double *pxn,
              int kig1s, int kig1e, int kig2s, int kig2e, int knd, 
              int kjd, int kni)
 {
+  (void) knd;
   int id1, id2, id3, ioffset;
   double r1, r2, r3;
 
@@ -688,6 +689,7 @@ void gcpt(double *pxn,
           int kjd, double pgamma, 
           int ki1, int kj1, int ki2, int kj2, int ki, int kj)
 {
+  (void) knd;
   int id1, id2, id3, ioffset;
   double r1, r2, r3;
     
@@ -1224,7 +1226,6 @@ void initmask(int *mask, int ni, int nd)
 void gme_grid_restore(double *p, int ni, int nd)
 {
   int j, jd;
-    
   int tmp1, tmp2, tmp3, tmp4, tmp5;
 
   struct array pinfo;
@@ -1259,55 +1260,31 @@ void gme_grid_restore(double *p, int ni, int nd)
     switch (jd) {
     case 1:
       break;
+    case 2:
     case 3:
     case 4:
-    case 2:
-      for (j = 0; j <= ni; j++) {
-	p[j+tmp4+tmp5*jd+tmp3] = p[tmp4*(j+1)+tmp5*(jd-1)+tmp3];
-      }
+      for (j = 0; j <= ni; j++) p[j+tmp4+tmp5*jd+tmp3] = p[tmp4*(j+1)+tmp5*(jd-1)+tmp3];
       break;
     case 5:
-      for (j = 0; j <= ni; j++) {
-	p[j+tmp4+tmp5*jd+tmp3] = p[tmp4*(j+1)+tmp5*(jd-1)+tmp3];
-      }
-      for (j = 0; j <= ni; j++) {
-	p[tmp4*(j+1)+tmp5*5+tmp3] = p[j+tmp4+tmp5+tmp3];
-      }
+      for (j = 0; j <= ni; j++) p[j+tmp4+tmp5*jd+tmp3] = p[tmp4*(j+1)+tmp5*(jd-1)+tmp3];
+      for (j = 0; j <= ni; j++) p[tmp4*(j+1)+tmp5*5+tmp3] = p[j+tmp4+tmp5+tmp3];
       break;
     case 6:
-      for (j = 0; j <= ni; j++) {
-	p[j+tmp4*(ni+1)+tmp5*6+tmp3] = p[ni+tmp4*(ni+1-j)+tmp5*2+tmp3];
-      }
-      for (j = 0; j <= ni; j++) {
-	p[ni+tmp4*(j+1)+tmp5*6+tmp3] = p[ni-j+tmp4*(ni+1)+tmp5+tmp3];
-      }
+      for (j = 0; j <= ni; j++) p[j+tmp4*(ni+1)+tmp5*6+tmp3] = p[ni+tmp4*(ni+1-j)+tmp5*2+tmp3];
+      for (j = 0; j <= ni; j++) p[ni+tmp4*(j+1)+tmp5*6+tmp3] = p[ni-j+tmp4*(ni+1)+tmp5+tmp3];
       break;
+    case 7:
     case 8:
     case 9:
-    case 7:
-      for (j = 0; j <= ni; j++) {
-	p[j+tmp4*(ni+1)+tmp5*jd+tmp3] = p[ni+tmp4*(ni+1-j)+tmp5*(jd-4)+tmp3];
-      }
-      for (j = 0; j <= ni; j++) {
-	p[ni+tmp4*(j+1)+tmp5*jd+tmp3] = p[ni-j+tmp4*(ni+1)+tmp5*(jd-5)+tmp3];
-      }
-      for (j = 0; j <= ni; j++) {
-	p[j+tmp4+tmp5*jd+tmp3] = p[tmp4*(j+1)+tmp5*(jd-1)+tmp3];
-      }
+      for (j = 0; j <= ni; j++) p[j+tmp4*(ni+1)+tmp5*jd+tmp3] = p[ni+tmp4*(ni+1-j)+tmp5*(jd-4)+tmp3];
+      for (j = 0; j <= ni; j++) p[ni+tmp4*(j+1)+tmp5*jd+tmp3] = p[ni-j+tmp4*(ni+1)+tmp5*(jd-5)+tmp3];
+      for (j = 0; j <= ni; j++) p[j+tmp4+tmp5*jd+tmp3] = p[tmp4*(j+1)+tmp5*(jd-1)+tmp3];
       break;
     case 10:
-      for (j = 0; j <= ni; j++) {
-	p[j+tmp4+tmp5*10+tmp3] = p[tmp4*(j+1)+tmp5*9+tmp3];
-      }
-      for (j = 0; j <= ni; j++) {
-	p[tmp4*(j+1)+tmp5*10+tmp3] = p[j+tmp4+tmp5*6+tmp3];
-      }
-      for (j = 0; j <= ni; j++) {
-	p[j+tmp4*(ni+1)+tmp5*10+tmp3] = p[ni+tmp4*(ni+1-j)+tmp5+tmp3];
-      }
-      for (j = 0; j <= ni; j++) {
-	p[ni+tmp4*(j+1)+tmp5*10+tmp3] = p[ni-j+tmp4*(ni+1)+tmp5*5+tmp3];
-      }
+      for (j = 0; j <= ni; j++) p[j+tmp4+tmp5*10+tmp3] = p[tmp4*(j+1)+tmp5*9+tmp3];
+      for (j = 0; j <= ni; j++) p[tmp4*(j+1)+tmp5*10+tmp3] = p[j+tmp4+tmp5*6+tmp3];
+      for (j = 0; j <= ni; j++) p[j+tmp4*(ni+1)+tmp5*10+tmp3] = p[ni+tmp4*(ni+1-j)+tmp5+tmp3];
+      for (j = 0; j <= ni; j++) p[ni+tmp4*(j+1)+tmp5*10+tmp3] = p[ni-j+tmp4*(ni+1)+tmp5*5+tmp3];
       break;
     }
   }
@@ -1584,6 +1561,6 @@ int main(int argc, char *argv[])
   Free(mask);
   Free(area);
 
-  return(0);
+  return 0;
 }
 */

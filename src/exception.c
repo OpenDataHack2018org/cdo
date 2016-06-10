@@ -67,20 +67,18 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 
 void cdoAbort(const char *fmt, ...)
 {
-  va_list args;
-	
-  va_start(args, fmt);
-
   printf("\n");
   set_text_color(stderr, RESET, RED);
    fprintf(stderr, "%s (Abort): ", processInqPrompt());
   reset_text_color(stderr);
+  
   set_text_color(stderr, RESET, BLACK);
+  va_list args;	
+  va_start(args, fmt);
   vfprintf(stderr, fmt, args);
-  reset_text_color(stderr);
-   fprintf(stderr, "\n");
-
   va_end(args);
+  reset_text_color(stderr);
+  fprintf(stderr, "\n");
 
   if ( _ExitOnError ) pstreamCloseAll();
   if ( _ExitOnError ) exit(EXIT_FAILURE);
@@ -91,39 +89,73 @@ void cdoWarning(const char *fmt, ...)
 {
   if ( _Verbose )
     {
-      va_list args;
-
-      va_start(args, fmt);
-
       set_text_color(stderr, BRIGHT, YELLOW);
       fprintf(stderr, "%s (Warning): ", processInqPrompt());
       reset_text_color(stderr);
+
       set_text_color(stderr, RESET, BLACK);
+      va_list args;
+      va_start(args, fmt);
       vfprintf(stderr, fmt, args);
+      va_end(args);
       reset_text_color(stderr);
       fprintf(stderr, "\n");
-
-      va_end(args);
     }
 }
 
 
 void cdoPrint(const char *fmt, ...)
 {
-  va_list args;
-
   if ( ! cdoSilentMode )
     {
-      va_start(args, fmt);
-
       set_text_color(stderr, RESET, GREEN);
       fprintf(stderr, "%s: ", processInqPrompt());
       reset_text_color(stderr);
+
       set_text_color(stderr, RESET, BLACK);
+      va_list args;
+      va_start(args, fmt);
       vfprintf(stderr, fmt, args);
+      va_end(args);
       reset_text_color(stderr);
       fprintf(stderr, "\n");
+    }
+}
 
+
+void cdoPrintBlue(const char *fmt, ...)
+{
+  if ( ! cdoSilentMode )
+    {
+      set_text_color(stderr, RESET, GREEN);
+      fprintf(stderr, "%s: ", processInqPrompt());
+      reset_text_color(stderr);
+
+      set_text_color(stderr, RESET, BLUE);
+      va_list args;
+      va_start(args, fmt);
+      vfprintf(stderr, fmt, args);
       va_end(args);
+      reset_text_color(stderr);
+      fprintf(stderr, "\n");
+    }
+}
+
+
+void cdoPrintRed(const char *fmt, ...)
+{
+  if ( ! cdoSilentMode )
+    {
+      set_text_color(stderr, RESET, GREEN);
+      fprintf(stderr, "%s: ", processInqPrompt());
+      reset_text_color(stderr);
+
+      set_text_color(stderr, RESET, RED);
+      va_list args;
+      va_start(args, fmt);
+      vfprintf(stderr, fmt, args);
+      va_end(args);
+      reset_text_color(stderr);
+      fprintf(stderr, "\n");
     }
 }

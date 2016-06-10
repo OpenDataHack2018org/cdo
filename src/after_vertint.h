@@ -1,6 +1,8 @@
 #ifndef _VINTERP_H
 #define _VINTERP_H
 
+#include <stdbool.h>
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -28,9 +30,9 @@ void interp_X(const double * restrict gt, double *pt, const double * restrict hy
 
 void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *vardata2,
 		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
-void vert_gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
+void vert_gen_weights3d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
-void vert_gen_weights3d1d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
+void vert_gen_weights3d1d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			  int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2);
 
 #if defined(__cplusplus)

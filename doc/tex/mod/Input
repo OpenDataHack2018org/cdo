@@ -16,7 +16,7 @@ input depends on the chosen operator.
 
 @BeginOperator_input
 @Title     = ASCII input
-@Parameter = grid
+@Parameter = grid [zaxis]
 
 @BeginDescription
 Reads fields with ASCII numbers from standard input and stores them
@@ -53,6 +53,8 @@ the @mod{outputext} operator.
 @BeginParameter
 @Item = grid
 STRING  Grid description file or name
+@Item = zaxis
+STRING  Z-axis description file
 @EndParameter
 
 

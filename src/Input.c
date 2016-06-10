@@ -33,54 +33,32 @@
 static
 int input_iarray(int nval, int *array)
 {
-  int i, n;
   int ival = 0;
 
-  for ( i = 0; i < nval; i++ )
+  for ( int i = 0; i < nval; i++ )
     {
-      n = scanf("%d", &array[i]);
+      int n = scanf("%d", &array[i]);
       if ( n != 1 ) break;
 
       ival++;
     }
 
-  return (ival);
+  return ival;
 }
 
 int input_darray(FILE *gfp, int nval, double *array);
-/*
-static int input_darray(int nval, double *array)
-{
-  int i, n;
-  int ival = 0;
 
-  for ( i = 0; i < nval; i++ )
-    {
-      n = scanf("%lg", &array[i]);
-      if ( n != 1 ) break;
-
-      ival++;
-    }
-
-  return (ival);
-}
-*/
 
 void *Input(void *argument)
 {
   int varID = 0;
-  int nlevs = 1;
   int gridsize0 = 0, gridsize = 0;
-  int gridID = -1, zaxisID, vdate = 0, vtime = 0;
-  int levelID;
   int taxisID = 0;
   int streamID = -1;
   int vlistID = -1;
-  int nmiss = 0;
   int i;
   int code = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
   int output_filetype = FILETYPE_GRB;
-  int rval;
   int ihead[8];
   double missval = 0;
   double levels[1];
@@ -94,12 +72,20 @@ void *Input(void *argument)
 
   int operatorID = cdoOperatorID();
 
+  int gridID = -1;
+  int zaxisID = -1;
   if ( operatorID == INPUT )
     {
       operatorInputArg("grid description file or name");
-      operatorCheckArgc(1);
+      if ( operatorArgc() == 1 ) operatorCheckArgc(1);
+      else                       operatorCheckArgc(2);
+      
       gridID = cdoDefineGrid(operatorArgv()[0]);
+      if ( operatorArgc() == 2 ) zaxisID = cdoDefineZaxis(operatorArgv()[1]);
     }
+
+  int nlevs = 1;
+  if ( zaxisID != -1 ) nlevs = zaxisInqSize(zaxisID);
 
   levels[0] = 0;
   int nrecs = 0;
@@ -116,18 +102,19 @@ void *Input(void *argument)
 	  gridsize = gridInqSize(gridID);
 	  date     = 0;
 	  time     = 0;
+
 	  
 	  if ( nrecs == 0 )
-	    array = (double*) Malloc(gridsize*sizeof(double));
+	    array = (double*) Malloc(gridsize*nlevs*sizeof(double));
 	  
-	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
+	  cdoPrint("Enter all %d elements of timestep %d!", gridsize*nlevs, nrecs+1);
 	  
-	  rval = input_darray(stdin, gridsize, array);
+	  int rval = input_darray(stdin, gridsize*nlevs, array);
 
 	  if ( nrecs > 0 && rval == 0 ) break;
 
-	  if ( rval != gridsize )
-	    cdoAbort("Too few input elements (%d of %d)!", rval, gridsize);
+	  if ( rval != gridsize*nlevs )
+	    cdoAbort("Too few input elements (%d of %d)!", rval, gridsize*nlevs);
 
 	  if ( feof(stdin) ) break;
 	}
@@ -139,7 +126,7 @@ void *Input(void *argument)
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
 		   " of record %d (or EOF(=^D))!", nrecs+1);
 
-	  rval = input_iarray(4, ihead);
+	  int rval = input_iarray(4, ihead);
 	  if ( feof(stdin) && nrecs == 0 )
 	    cdoAbort("Too few header elements (%d of %d)!", rval, 4);
 	  if ( feof(stdin) ) break;
@@ -183,7 +170,7 @@ void *Input(void *argument)
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
 		   " of record %d (or EOF(=^D))!", nrecs+1);
 
-	  rval = input_iarray(8, ihead);
+	  int rval = input_iarray(8, ihead);
 	  if ( feof(stdin) && nrecs == 0 )
 	    cdoAbort("Too few header elements (%d of %d)!", rval, 8);
 	  if ( feof(stdin) ) break;
@@ -226,8 +213,11 @@ void *Input(void *argument)
 
       if ( nrecs == 0 )
 	{
-	  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
-	  zaxisDefLevels(zaxisID, levels);
+          if ( zaxisID == -1 )
+            {
+              zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+              zaxisDefLevels(zaxisID, levels);
+            }
 
 	  vlistID = vlistCreate();
 	  varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
@@ -243,21 +233,22 @@ void *Input(void *argument)
 	  streamDefVlist(streamID, vlistID);
 	}
 
-      vdate = date;
-      vtime = time;
+      int vdate = date;
+      int vtime = time;
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);
       streamDefTimestep(streamID, tsID);
 
-      for ( levelID = 0; levelID < nlevs; levelID++ )
+      for ( int levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  streamDefRecord(streamID, varID, levelID);
 
-	  nmiss = 0;
+          int offset = gridsize*levelID;
+	  int nmiss = 0;
 	  for ( i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+	    if ( DBL_IS_EQUAL(array[offset+i], missval) ) nmiss++;
 
-	  streamWriteRecord(streamID, array, nmiss);
+	  streamWriteRecord(streamID, array+offset, nmiss);
 	}
 
       nrecs++;

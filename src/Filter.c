@@ -51,11 +51,11 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
   double dimin = nts*fmin / fdata;
   double dimax = nts*fmax / fdata;
 
-  int imin = dimin<0 ? 0 : (int)floor(dimin);  
-  int imax = ceil(dimax)>nts/2 ? nts/2 : (int) ceil(dimax);
+  int imin = (dimin < 0) ? 0 : (int)floor(dimin);  
+  int imax = (ceil(dimax) > nts/2) ? nts/2 : (int) ceil(dimax);
 
-  if ( imin < 0 || imin >= nts ) cdoAbort("Parameter fmin=%g out of bounds (1-%d)!", nts);
-  if ( imax < 0 || imax >= nts ) cdoAbort("Parameter fmax=%g out of bounds (1-%d)!", nts);
+  if ( imin < 0 || imin >= nts ) cdoAbort("Parameter fmin=%g: timestep %d out of bounds (1-%d)!", fmin, imin+1, nts);
+  if ( imax < 0 || imax >= nts ) cdoAbort("Parameter fmax=%g: timestep %d out of bounds (1-%d)!", fmax, imax+1, nts);
 
   fmasc[imin] = 1;
   for ( int i = imin+1; i <= imax; i++ )  
@@ -125,12 +125,10 @@ void *Filter(void *argument)
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;
-  int tsID;
-  int nts;
   int nalloc = 0;
   int nmiss;
-  int nvars, nlevel;
-  int incperiod0, incunit0, incunit, calendar;
+  int nlevel;
+  int incperiod0, incunit0, incunit;
   int year0, month0, day0;
   double fdata = 0;
   field_t ***vars = NULL;
@@ -180,11 +178,11 @@ void *Filter(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  calendar = taxisInqCalendar(taxisID1);  
+  int calendar = taxisInqCalendar(taxisID1);  
  
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   
-  tsID = 0;    
+  int tsID = 0;    
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
@@ -252,7 +250,7 @@ void *Filter(void *argument)
       tsID++;
     }
   
-  nts = tsID;
+  int nts = tsID;
   if ( nts <= 1 ) cdoAbort("Number of time steps <= 1!");
 
   if ( use_fftw )
@@ -277,8 +275,6 @@ void *Filter(void *argument)
 	  ompmem[i].array2 = (double*) Malloc(nts*sizeof(double));
 	}
     }
-
-  int *fmasc = (int*) Calloc(nts, sizeof(int));
 
   switch(operfunc)
     {
@@ -310,6 +306,7 @@ void *Filter(void *argument)
 
   if ( cdoVerbose ) cdoPrint("fmin=%g  fmax=%g", fmin, fmax);
   
+  int *fmasc = (int*) Calloc(nts, sizeof(int));
   create_fmasc(nts, fdata, fmin, fmax, fmasc);
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -418,7 +415,7 @@ void *Filter(void *argument)
       field_free(vars[tsID], vlistID1);
     }
 
-  if ( vars   ) Free(vars);
+  if ( vars ) Free(vars);
 
   dtlist_delete(dtlist);
 

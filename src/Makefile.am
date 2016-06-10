@@ -309,7 +309,6 @@ cdo_SOURCES += Adisit.c        \
                Splitsel.c      \
                Splittime.c     \
                Splityear.c     \
-               SSOpar.c        \
                Subtrend.c      \
                Tee.c           \
                Templates.c     \

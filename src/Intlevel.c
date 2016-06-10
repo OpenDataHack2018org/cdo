@@ -94,11 +94,11 @@ static
 void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
 		      int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
-  int i1, i2;
+  int i1;
   int    idx1 = 0, idx2 = 0;
   double val1, val2 = 0;
 
-  for ( i2 = 0; i2 < nlev2; ++i2 )
+  for ( int i2 = 0; i2 < nlev2; ++i2 )
     {
       for ( i1 = 1; i1 < nlev1; ++i1 )
 	{
@@ -165,24 +165,13 @@ void *Intlevel(void *argument)
   int gridsize;
   int recID, nrecs;
   int i, offset;
-  int tsID, varID, levelID;
-  int nvars;
+  int varID, levelID;
   int nmiss;
-  int zaxisID1 = -1, zaxisID2;
+  int zaxisID1 = -1;
   int gridID, zaxisID;
-  int nlev1, nlev2, nlevel = 0, maxlev;
-  int lup, ldown;
-  int **varnmiss = NULL;
-  int *varinterp = NULL;
-  int *vars = NULL;
-  int expol = FALSE;
+  int nlevel = 0;
   double missval;
-  double *lev1 = NULL, *lev2 = NULL;
   double *single1, *single2;
-  double **vardata1 = NULL, **vardata2 = NULL;
-  int *lev_idx1, *lev_idx2;
-  double *lev_wgt1, *lev_wgt2;
-  LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
@@ -193,12 +182,14 @@ void *Intlevel(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  if ( operatorID == INTLEVELX ) expol = TRUE;
+  bool expol = false;
+  if ( operatorID == INTLEVELX ) expol = true;
 
   operatorInputArg("levels");
 
-  nlev2 = args2fltlist(operatorArgc(), operatorArgv(), flist);
-  lev2  = (double *) listArrayPtr(flist);
+  LIST *flist = listNew(FLT_LIST);
+  int nlev2 = args2fltlist(operatorArgc(), operatorArgv(), flist);
+  double *lev2  = (double *) listArrayPtr(flist);
 
   if ( cdoVerbose ) for ( i = 0; i < nlev2; ++i ) printf("lev2 %d: %g\n", i, lev2[i]);
 
@@ -226,30 +217,30 @@ void *Intlevel(void *argument)
 
   if ( i == nzaxis ) cdoAbort("No processable variable found!");
 
-  nlev1 = nlevel;
-  lev1  = (double*) Malloc((nlev1+2)*sizeof(double));
+  int nlev1 = nlevel;
+  double *lev1 = (double*) Malloc((nlev1+2)*sizeof(double));
   zaxisInqLevels(zaxisID1, lev1+1);
 
-  lup = FALSE;
-  ldown = FALSE;
+  bool lup = false;
+  bool ldown = false;
   for ( i = 1; i < nlev1; ++i )
     {
       if ( i == 1 )
 	{
 	  if ( lev1[i+1] > lev1[i] )
-	    lup = TRUE;
+	    lup = true;
 	  else if ( lev1[i+1] < lev1[i] )
-	    ldown = TRUE;	
+	    ldown = true;	
 	}
       else
 	{
 	  if ( lup )
 	    {
-	      if ( !(lev1[i+1] > lev1[i]) ) lup = FALSE;
+	      if ( !(lev1[i+1] > lev1[i]) ) lup = false;
 	    }
 	  else if ( ldown )
 	    {
-	      if ( !(lev1[i+1] < lev1[i]) ) ldown = FALSE;
+	      if ( !(lev1[i+1] < lev1[i]) ) ldown = false;
 	    }
 	}
     }
@@ -269,14 +260,14 @@ void *Intlevel(void *argument)
 
   if ( cdoVerbose ) for ( i = 0; i < nlev1+2; ++i ) printf("lev1 %d: %g\n", i, lev1[i]);
 
-  lev_idx1 = (int*) Malloc(nlev2*sizeof(int));
-  lev_idx2 = (int*) Malloc(nlev2*sizeof(int));
-  lev_wgt1 = (double*) Malloc(nlev2*sizeof(double));
-  lev_wgt2 = (double*) Malloc(nlev2*sizeof(double));
+  int *lev_idx1 = (int*) Malloc(nlev2*sizeof(int));
+  int *lev_idx2 = (int*) Malloc(nlev2*sizeof(int));
+  double *lev_wgt1 = (double*) Malloc(nlev2*sizeof(double));
+  double *lev_wgt2 = (double*) Malloc(nlev2*sizeof(double));
 
   vert_gen_weights(expol, nlev1+2, lev1, nlev2, lev2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
 
-  zaxisID2 = zaxisCreate(zaxisInqType(zaxisID1), nlev2);
+  int zaxisID2 = zaxisCreate(zaxisInqType(zaxisID1), nlev2);
   zaxisDefLevels(zaxisID2, lev2);
   {
     char str[256];
@@ -301,15 +292,15 @@ void *Intlevel(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  vars      = (int*) Malloc(nvars*sizeof(int));
-  vardata1  = (double**) Malloc(nvars*sizeof(double*));
-  vardata2  = (double**) Malloc(nvars*sizeof(double*));
-  varnmiss  = (int**) Malloc(nvars*sizeof(int*));
-  varinterp = (int*) Malloc(nvars*sizeof(int));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
+  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));
+  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
+  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
-  maxlev   = nlev1 > nlev2 ? nlev1 : nlev2;
+  int maxlev = nlev1 > nlev2 ? nlev1 : nlev2;
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -322,24 +313,24 @@ void *Intlevel(void *argument)
 
       if ( zaxisID == zaxisID1 )
 	{
-	  varinterp[varID] = TRUE;
+	  varinterp[varID] = true;
 	  vardata2[varID]  = (double*) Malloc(gridsize*nlev2*sizeof(double));
 	  varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
 	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
 	}
       else
 	{
-	  varinterp[varID] = FALSE;
+	  varinterp[varID] = false;
 	  vardata2[varID]  = vardata1[varID];
 	  varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
 	}
     }
 
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
+      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
@@ -353,7 +344,7 @@ void *Intlevel(void *argument)
 	  single1  = vardata1[varID] + offset;
 	  
 	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
-	  vars[varID] = TRUE;
+	  vars[varID] = true;
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -420,7 +411,7 @@ void *Intlevel(void *argument)
   Free(lev_wgt1);
   Free(lev_wgt2);
 
-  if (lev1) Free(lev1);
+  Free(lev1);
 
   listDelete(flist);
 
