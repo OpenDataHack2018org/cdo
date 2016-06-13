@@ -5,6 +5,7 @@
 
 2016-06-13  Uwe Schulzweida
 
+	* mul: wrong result for missval*0 (bug fix)
 	* expr: nmiss lost for time constant fields (bug fix)
 
 2016-06-07  Uwe Schulzweida

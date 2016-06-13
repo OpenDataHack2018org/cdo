@@ -35,7 +35,7 @@ enum field_flag {
 
 #define  MADDMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
 #define  MSUBMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
-#define  MMULMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
+#define  MMULMN(x,y)  (DBL_IS_EQUAL((x),0.)||DBL_IS_EQUAL((y),0.) ? 0 : DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
 #define  MDIVMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) || DBL_IS_EQUAL((y),0.) ? missval1 : (x)/(y))
 #define  MPOWMN(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : pow((x),(y)))
 #define  MSQRTMN(x)   (DBL_IS_EQUAL((x),missval1) || (x)<0 ? missval1 : sqrt(x))
@@ -51,7 +51,7 @@ enum field_flag {
 
 #define  ADDM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
 #define  SUBM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
-#define  MULM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
+#define  MULM(x,y)  (IS_EQUAL((x),0.)||IS_EQUAL((y),0.) ? 0 : IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
 #define  DIVM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) || IS_EQUAL((y),0.) ? missval1 : (x)/(y))
 #define  POWM(x,y)  (IS_EQUAL((x),missval1) || IS_EQUAL((y),missval2) ? missval1 : pow((x),(y)))
 #define  SQRTM(x)   (IS_EQUAL((x),missval1) || (x)<0 ? missval1 : sqrt(x))
