@@ -493,7 +493,9 @@ void *Expr(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( int varID = 0; varID < nvars1; varID++ ) params[varID].nmiss = 0;
+      for ( int varID = 0; varID < nvars1; varID++ )
+        if ( tsID == 0 || params[varID].steptype != TIME_CONSTANT )
+          params[varID].nmiss = 0;
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
