@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'optparse'
+require 'pp'
 
 $opts = {:bin => '../src/cdo',:outfile => 'cdoCompletion'}
 OptionParser.new do |o|
@@ -21,7 +22,7 @@ Supported shells are TCSH, BASH and ZSH. For tcsh completion is only performed
 for regular options and operators with prepended '-'. Bash and zsh also
 complete opertors without leading '-'.
 
-AUTHOR:  Ralf Mueller, ralf.mueller@zmaw.de
+AUTHOR:  Ralf Mueller, ralf.mueller@mpimet.mpg.de
 
 LICENSE: CDO's License
 END
@@ -31,7 +32,7 @@ end.parse!
 #=============================================================================== 
 def getOperators
   # try to run the CDO binary first
-  cmd       = $opts[:bin] + ' 2>&1'
+  cmd       = $opts[:bin] + ' --operators'
   help      = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}
   if 5 >= help.size
     puts "Operators could not get listed by running the CDO binary (#{$opts[:bin]})"
@@ -42,23 +43,23 @@ def getOperators
       }
     }.flatten
   else
-    help[(help.index("Operators:")+1)..help.index(help.find {|v| v =~ /CDO version/}) - 2].join(' ').split
+    help.map {|line| line.split[0]}
   end
 end
 def getOptions
-  cmd     = $opts[:bin] + ' 2>&1'
-  options = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}.find_all {|item| /^-/.match(item)}.map {|o| o[0,2]}
+  cmd     = $opts[:bin] + ' -h 2>&1'
+  options = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}.grep(/^--*\w+(,| )/).map {|line| line.split[0]}#{|item| /^-(-)\w+ /.match(item)}.map {|o| o[0,2]}
   if options.empty?
     puts "Commandline options could not get listed by running the CDO binary (#{$opts[:bin]})"
     puts "Go on processing operators only ..."
-    return []
+    exit 1
   end
   options
 end
 #=============================================================================== 
 operators = getOperators.sort
 options   = getOptions.sort
-# require 'pp'; pp operators; pp options
+#pp operators; pp options
 # Create the configuration files
 complCmds = { 
   :tcsh => ['set cdoCmpl = (\\','); complete cdo \'c/-/$cdoCmpl/\' \'n/*/f/\''],

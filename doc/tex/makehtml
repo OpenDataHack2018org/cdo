@@ -16,4 +16,7 @@ else
   cp cdo.html index.html
 fi
 cp ../tex/*pdf .
-zip cdo-doc.zip *.*
+mkdir grids
+mv cell.png grids
+mv curv.png grids
+zip cdo-doc.zip *

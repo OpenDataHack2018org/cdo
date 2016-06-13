@@ -1,0 +1,64 @@
+{ "hosts": {
+    "thunder": {
+      "hostname": "thunder5.zmaw.de",
+      "dir": "/scratch/mpi/CC/mh0287/users/m300064/builds/remote",
+      "CC": ["icpc", "icc", "clang", "clang++", "gcc", "g++"]
+    },
+    "luthien": {
+      "hostname": "localhost",
+      "dir": "/home/ram/builds/cdo/auto",
+      "CC": ["gcc","g++","clang","clang++"]
+    },
+    "mpipc": {
+      "hostname": "mpipc150.mpi.zmaw.de",
+      "dir": "/scratch/local1/m300064/builds/remote",
+      "CC": ["gcc"]
+    },
+    "mistral": {
+      "hostname": "mistral.dkrz.de",
+      "dir": "/work/mh0287/users/ralf/builds/remote",
+      "CC": ["gcc","g++","icc","icpc"]
+    },
+    "cygwin": {
+      "hostname": "cdo4windows-cyg.mpimet.mpg.de",
+      "dir": "/home/mpimet/ralf/builds/remote",
+      "username": "mpimet",
+      "CC": ["gcc","g++"]
+    },
+    "cscs": {
+      "hostname": "daint.cscs.ch",
+      "dir": "/users/ram/builds/cdo",
+      "username": "ram",
+      "CC": ["icc","pgcc","cray","gcc"]
+    }
+  },
+
+  "remoteUser": "m300064",
+
+  "builders": {
+    "localCLANG_3.8_Debug": {
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp CC=clang CXX=clang++ CFLAGS='-g -O0'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
+    "localCLANG++_3.8_Debug": {
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --with-netcdf --disable-openmp --enable-cxx CC=clang CXX=clang++ CFLAGS='-g -O0'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
+    "mpipcCLANG": {
+      "hostname": "mpipc",
+      "configureCall": "./configure --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static --disable-openmp CC=clang CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
+    "localGCCInSourceNoOpenmp": {
+      "hostname": "luthien",
+      "configureCall": "./configure --disable-openmp CC=gcc CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    }
+  }
+}

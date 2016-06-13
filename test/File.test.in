@@ -10,7 +10,7 @@ FORMATS="srv ext ieg grb grb2 nc nc2 nc4"
 #
 NTEST=1
 #
-function fileformat()
+fileformat()
 {
   FILEFORMAT=undefined
   ENABLE_TEST=yes
