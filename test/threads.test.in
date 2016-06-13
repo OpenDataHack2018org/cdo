@@ -11,7 +11,7 @@ OFORMAT="-f srv -b 32"
 IFILE=$DATAPATH/pl_data
 NTEST=1
 #
-testfunc()
+function testfunc()
 {
   RSTAT=0
 

@@ -13,7 +13,7 @@ NTEST=1
 #
 FINSTR=finstr
 #
-testfunc()
+function testfunc()
 {
   RSTAT=0
 
