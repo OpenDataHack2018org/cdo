@@ -6,6 +6,17 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Arith
+#
+IFILE=arith1.srv
+MASK=arithmask.srv
+OPS="add sub mul div"
+for OP in $OPS; do
+  $CDO $FORMAT $OP $IFILE $MASK arith${OP}_ref
+done
+exit
+########################################################################
+#
 # Fldpctl
 #
 IFILE=t21_geosp_tsurf.grb

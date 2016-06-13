@@ -1,6 +1,6 @@
 INPUTDATA = ts_mm_5years hl_l19.grb t21_geosp_tsurf.grb bathy4.grb pl_data pl_data.grb detrend_data \
             grib_testfile01.grb grib_testfile02.grb grib_testfile03.grb netcdf_testfile01.nc netcdf_testfile02.nc testfile01c.nc \
-            datar.nc datac.nc datau.nc datag.nc
+            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv
 
 FILE_REF     = file_F32_srv_ref
 GRIB_REF     = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile02_sinfo_ref grib_testfile02_info_ref grib_testfile03_sinfo_ref grib_testfile03_info_ref
@@ -19,6 +19,7 @@ DETREND_REF  = detrend_ref
 EXPR_REF     = expr1_ref aexpr1_ref expr2_ref aexpr2_ref
 THREAD_REF   = thread1_ref tsformat1_ref
 GRADSDES_REF = pl_data.ctl pl_data.gmp
+ARITH_REF    = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
 MAPREDUCE    = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
 
-EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(YMONSTAT_REF) $(TIMSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(MAPREDUCE)
+EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(YMONSTAT_REF) $(TIMSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)

@@ -90,11 +90,11 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Fldstat.test.in $(srcdir)/Fldpctl.test.in \
 	$(srcdir)/Ensstat.test.in $(srcdir)/Enspctl.test.in \
 	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
-	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
-	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
-	$(srcdir)/threads.test.in $(srcdir)/tsformat.test.in \
-	$(srcdir)/wildcard.test.in $(srcdir)/MapReduce.test.in \
-	$(srcdir)/Ninfo.test.in README
+	$(srcdir)/Arithc.test.in $(srcdir)/Arith.test.in \
+	$(srcdir)/Expr.test.in $(srcdir)/Gradsdes.test.in \
+	$(srcdir)/Collgrid.test.in $(srcdir)/threads.test.in \
+	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
+	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -109,8 +109,8 @@ CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Cat.test Gridarea.test Genweights.test \
 	Remap.test Select.test Spectral.test Timstat.test Vertint.test \
 	Ymonstat.test Fldstat.test Fldpctl.test Ensstat.test \
-	Enspctl.test Afterburner.test Detrend.test Arith.test \
-	Expr.test Gradsdes.test Collgrid.test threads.test \
+	Enspctl.test Afterburner.test Detrend.test Arithc.test \
+	Arith.test Expr.test Gradsdes.test Collgrid.test threads.test \
 	tsformat.test wildcard.test MapReduce.test Ninfo.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -522,7 +522,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 # tests which should pass
 TESTS = threads.test tsformat.test wildcard.test File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
         Detrend.test Genweights.test Remap.test Select.test Spectral.test Ymonstat.test Timstat.test Ensstat.test \
-        Enspctl.test Fldstat.test Fldpctl.test Vertint.test Afterburner.test Arith.test Expr.test \
+        Enspctl.test Fldstat.test Fldpctl.test Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
         Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
 
 
@@ -609,6 +609,8 @@ Enspctl.test: $(top_builddir)/config.status $(srcdir)/Enspctl.test.in
 Afterburner.test: $(top_builddir)/config.status $(srcdir)/Afterburner.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Detrend.test: $(top_builddir)/config.status $(srcdir)/Detrend.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Arithc.test: $(top_builddir)/config.status $(srcdir)/Arithc.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Arith.test: $(top_builddir)/config.status $(srcdir)/Arith.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
