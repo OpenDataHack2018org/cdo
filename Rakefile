@@ -220,7 +220,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                          "builder on #{config['hostname']}, CC=#{cc}")
 
     builder2task(builder)
-  }
+  } if config.has_key?('CC')
 }
 # 2) construct builders from manual configuration
 @userConfig["builders"].each {|builderName,config|

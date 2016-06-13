@@ -30,6 +30,10 @@
       "dir": "/users/ram/builds/cdo",
       "username": "ram",
       "CC": ["icc","pgcc","cray","gcc"]
+    },
+    "wanglung": {
+      "hostname": "wanglung.mpi.zmaw.de",
+      "dir": "/home/zmaw/m300064/builds/remote"
     }
   },
 
@@ -57,6 +61,37 @@
     "localGCCInSourceNoOpenmp": {
       "hostname": "luthien",
       "configureCall": "./configure --disable-openmp CC=gcc CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
+    "localGCC": {
+      "doc": "local builder with default GCC - VPATH build",
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --enable-openmp CC=gcc CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
+    "macOSGCC": {
+      "hostname": "wanglung",
+      "configureCall": "./configure CC=gcc CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
+    "macOSCLANG": {
+      "hostname": "wanglung",
+      "configureCall": "./configure CC=clang CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
+    "macOSCLANG++": {
+      "hostname": "wanglung",
+      "configureCall": "./configure --enable-cxx CC=clang CXX=clang++ CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
+    "macOSG++": {
+      "hostname": "wanglung",
+      "configureCall": "./configure --enable-cxx CC=gcc  CXX=g++ CFLAGS='-g -O2'",
       "makeCall": "make -j 12",
       "sync": true
     }
