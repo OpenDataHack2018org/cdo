@@ -267,7 +267,7 @@ task :par do |t|
   }
 end
 
-desc "show help on all tasks"
+desc "show help on all hidden tasks"
 task :help do
   @_help.each {|t,help| puts "rake <host|localTask>_#{t}".ljust(35,' ') + "# #{help}" }
 end
