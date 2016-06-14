@@ -153,9 +153,10 @@ void printGridInfo(int vlistID)
       int xsize    = gridInqXsize(gridID);
       int ysize    = gridInqYsize(gridID);
       int xysize   = xsize*ysize;
-      int prec     = gridInqPrec(gridID);
+      // int prec     = gridInqPrec(gridID);
 
-      int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+      // int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+      int dig = 7;
 
       gridInqXname(gridID, xname);
       gridInqYname(gridID, yname);
