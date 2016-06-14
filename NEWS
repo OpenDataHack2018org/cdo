@@ -15,7 +15,7 @@ Version 1.7.2 (25 June 2016):
    Fixed bugs:
      * Error reading Gaussian reduced GRIB files [Bug #6780 #6819]
      * Installation error with OpenMP [Bug #6523]
-     * mul: wrong result for missval*0 (bug was íntroduced in 1.7.1)
+     * mul: wrong result for missval*0 (bug was introduced in 1.7.1)
      * shaded, contour, grfill: set NAN missvals to -9e33 [Bug: #6677]
 
 Version 1.7.1 (25 February 2016):
