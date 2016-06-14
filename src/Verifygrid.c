@@ -309,7 +309,7 @@ bool are_polygon_vertices_arranged_in_clockwise_order(double cell_area)
 }
 
 static
-void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon, double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat){
+void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner, double *grid_center_lon, double *grid_center_lat, double *grid_corner_lon, double *grid_corner_lat){
 
   /* 
      First, this function performs the following test:
@@ -360,11 +360,11 @@ void verify_grid(int gridsize, int gridno, int ngrids, int ncorner, double *grid
   for ( int i = 0; i < ncorner; i++ )
     no_cells_with_a_specific_no_of_corners[i] = 0;
 
-  if ( gridno == 0 )
-    cdoPrint("Grid consists of %d cells, of which", gridsize);
+  if ( ngrids == 1 )
+    cdoPrintBlue("Grid consists of %d cells (type: %s), of which", gridsize, gridNamePtr(gridtype));
   else
-    cdoPrint("Grid no %u (of %u) consists of %d cells, of which", gridno + 1, ngrids, gridsize);
-  cdoPrint("");
+    cdoPrintBlue("Grid no %u (of %u) consists of %d cells (type: %s), of which", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
+  //cdoPrint("");
 
   /* For performing the first test, an array of all center point coordinates is built. */
 
@@ -691,17 +691,25 @@ void *Verifygrid(void *argument)
   int ngrids = vlistNgrids(vlistID);
   for ( int gridno = 0; gridno < ngrids; ++gridno )
     {
+      bool lgeo = true;
       bool lgrid_gen_bounds = false, luse_grid_corner = true;
-      double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
 
       int gridID = vlistGrid(vlistID, gridno);
+      int gridtype = gridInqType(gridID);
 
-      if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
+      if ( gridtype == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
 
-      if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+      if ( gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR )
         {
-          gridID = gridToCurvilinear(gridID, 1);
-          lgrid_gen_bounds = TRUE;
+          if ( gridtype == GRID_GENERIC || gridtype == GRID_SPECTRAL )
+            {
+              lgeo = false;
+            }
+          else
+            {
+              gridID = gridToCurvilinear(gridID, 1);
+              lgrid_gen_bounds = true;
+            }
         }
 
       int gridsize = gridInqSize(gridID);
@@ -713,61 +721,71 @@ void *Verifygrid(void *argument)
         Free(grid_mask);
         }
       */
-      int ncorner = 4;
-      if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
-        ncorner = gridInqNvertex(gridID);
-
-      double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
-      double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
-
-      gridInqYvals(gridID, grid_center_lat);
-      gridInqXvals(gridID, grid_center_lon);
-
-      /* Convert lat/lon units if required */
-      gridInqXunits(gridID, units);
-      grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
-      gridInqYunits(gridID, units);
-      grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
-
-      if ( luse_grid_corner )
+      if ( lgeo )
         {
-          if ( ncorner == 0 ) cdoAbort("grid corner missing!");
-          int nalloc = ncorner*gridsize;
-          grid_corner_lat = (double*) Realloc(grid_corner_lat, nalloc*sizeof(double));
-          grid_corner_lon = (double*) Realloc(grid_corner_lon, nalloc*sizeof(double));
+          double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
+          int ncorner = 4;
+          if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
+            ncorner = gridInqNvertex(gridID);
+
+          double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
+          double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
+
+          gridInqYvals(gridID, grid_center_lat);
+          gridInqXvals(gridID, grid_center_lon);
+
+          /* Convert lat/lon units if required */
+          gridInqXunits(gridID, units);
+          grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
+          gridInqYunits(gridID, units);
+          grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
+
+          if ( luse_grid_corner )
+            {
+              if ( ncorner == 0 ) cdoAbort("grid corner missing!");
+              int nalloc = ncorner*gridsize;
+              grid_corner_lat = (double*) Realloc(grid_corner_lat, nalloc*sizeof(double));
+              grid_corner_lon = (double*) Realloc(grid_corner_lon, nalloc*sizeof(double));
           
-          if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
-            {
-              gridInqYbounds(gridID, grid_corner_lat);
-              gridInqXbounds(gridID, grid_corner_lon);
-            }
-          else
-            {
-              if ( lgrid_gen_bounds )
+              if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
                 {
-                  char xunitstr[CDI_MAX_NAME];
-                  char yunitstr[CDI_MAX_NAME];
-                  gridInqXunits(gridID, xunitstr);
-                  gridInqYunits(gridID, yunitstr);
+                  gridInqYbounds(gridID, grid_corner_lat);
+                  gridInqXbounds(gridID, grid_corner_lon);
                 }
               else
-                cdoAbort("Grid corner missing!");
+                {
+                  if ( lgrid_gen_bounds )
+                    {
+                      char xunitstr[CDI_MAX_NAME];
+                      char yunitstr[CDI_MAX_NAME];
+                      gridInqXunits(gridID, xunitstr);
+                      gridInqYunits(gridID, yunitstr);
+                    }
+                  else
+                    cdoAbort("Grid corner missing!");
+                }
+          
+              /* Note: using units from latitude instead from bounds */
+              grid_to_degree(units, ncorner*gridsize, grid_corner_lon, "grid corner lon");
+              grid_to_degree(units, ncorner*gridsize, grid_corner_lat, "grid corner lat");
             }
-          
-          
-          /* Note: using units from latitude instead from bounds */
-          grid_to_degree(units, ncorner*gridsize, grid_corner_lon, "grid corner lon");
-          grid_to_degree(units, ncorner*gridsize, grid_corner_lat, "grid corner lat");
-          
-        }
       
-      if ( operatorID == VERIFYGRID )
-        verify_grid(gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
+          if ( operatorID == VERIFYGRID )
+            verify_grid(gridtype, gridsize, gridno, ngrids, ncorner, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
 
-      if ( grid_center_lon ) Free(grid_center_lon);
-      if ( grid_center_lat ) Free(grid_center_lat);
-      if ( grid_corner_lon ) Free(grid_corner_lon);
-      if ( grid_corner_lat ) Free(grid_corner_lat);
+          if ( grid_center_lon ) Free(grid_center_lon);
+          if ( grid_center_lat ) Free(grid_center_lat);
+          if ( grid_corner_lon ) Free(grid_corner_lon);
+          if ( grid_corner_lat ) Free(grid_corner_lat);
+        }
+      else
+        {
+          if ( ngrids == 1 )
+            cdoPrintBlue("Grid consists of %d points (type: %s)", gridsize, gridNamePtr(gridtype));
+          else
+            cdoPrintBlue("Grid no %u (of %u) consists of %d points (type: %s)", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
+          cdoPrint("");
+        }
     }
 
   streamClose(streamID);
