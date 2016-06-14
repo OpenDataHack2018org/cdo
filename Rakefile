@@ -139,17 +139,8 @@ end
 #
 # construct task from builder object
 def builder2task(builder,useHostAsName=false,syncSource=true)
-  baseTaskName    = useHostAsName ? builder.host : "#{builder.host}#{builder.compiler.upcase}"
-  toDo = lambda {|what| "#{baseTaskName}_#{what}".to_sym}
-  syncTaskName    = "#{baseTaskName}_sync"
-  configTaskName  = "#{baseTaskName}_conf"
-  buildTaskName   = "#{baseTaskName}_make"
-  cleanTaskName   = "#{baseTaskName}_clean"
-  checkTaskName   = "#{baseTaskName}_check"
-  checkVTaskName  = "#{baseTaskName}_checkV"
-  modlistTaskName = "#{baseTaskName}_mods"
-  showLogTaskName = "#{baseTaskName}_showLog"
-  commandTaskName = "#{baseTaskName}_cmd"
+  baseTaskName = useHostAsName ? builder.host : "#{builder.host}#{builder.compiler.upcase}"
+  toDo         = lambda {|what| "#{baseTaskName}_#{what}".to_sym}
 
   if syncSource then
     @_help[:sync] = "sync files for host: #{builder.host}, branch: #{getBranchName}" unless @_help.has_key?(:sync)
@@ -207,10 +198,10 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   end
 
   desc builder.docstring
-  task baseTaskName.to_sym  => [syncSource ? syncTaskName : nil,
-                                configTaskName,
-                                buildTaskName,
-                                checkTaskName].compact.map(&:to_sym)
+  task baseTaskName.to_sym  => [syncSource ? toDo[:sync] : nil,
+                                toDo[:conf],
+                                toDo[:make],
+                                toDo[:check]].compact.map(&:to_sym)
 end
 # }}}
 # constuct builders out of user configuration {{{ ==============================
@@ -279,6 +270,10 @@ end
 desc "show help on all tasks"
 task :help do
   @_help.each {|t,help| puts "rake <host|localTask>_#{t}".ljust(35,' ') + "# #{help}" }
+end
+
+task :default do |t|
+  sh "rake -sT"
 end
 
 # check connections {{{
