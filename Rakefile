@@ -15,10 +15,10 @@ if @userConfig.empty? then
   exit(1)
 end
 # get setup from the environment
-@debug               = true # == Rake.verbose ? true : false
+@debug               = Rake.application.options.silent ? false : true
 @user                = ENV['USER']
-# default configure call
-@defautConfigureCall = lambda {|cc| "./config/default CC=#{cc}"}
+# internal variables
+@_help = {}
 # }}}
 
 # helper methods {{{ ===========================================================
@@ -140,6 +140,7 @@ end
 # construct task from builder object
 def builder2task(builder,useHostAsName=false,syncSource=true)
   baseTaskName    = useHostAsName ? builder.host : "#{builder.host}#{builder.compiler.upcase}"
+  toDo = lambda {|what| "#{baseTaskName}_#{what}".to_sym}
   syncTaskName    = "#{baseTaskName}_sync"
   configTaskName  = "#{baseTaskName}_conf"
   buildTaskName   = "#{baseTaskName}_make"
@@ -148,48 +149,60 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   checkVTaskName  = "#{baseTaskName}_checkV"
   modlistTaskName = "#{baseTaskName}_mods"
   showLogTaskName = "#{baseTaskName}_showLog"
+  commandTaskName = "#{baseTaskName}_cmd"
 
   if syncSource then
-    #desc "sync files for host: #{builder.host}, branch: #{getBranchName}"
-    task syncTaskName.to_sym do |t|
+    @_help[:sync] = "sync files for host: #{builder.host}, branch: #{getBranchName}" unless @_help.has_key?(:sync)
+    task toDo[:sync] do |t|
       dbg("sync source  code for branch:" + getBranchName)
       doSync(builder)
     end
   end
 
-  #desc "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
-  task configTaskName.to_sym do |t|
+  @_help[:conf]= \
+    "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:conf)
+  task toDo[:conf] do |t|
     dbg("call #{builder.configureCall}")
     execute("#{builder.configureCall}",builder)
   end
 
-  #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
-  task buildTaskName.to_sym do |t|
+  @_help[:make] = \
+    "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:make)
+  task toDo[:make].to_sym do |t|
     execute("make -j4",builder)
   end
 
-  #desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
-  task checkTaskName.to_sym do |t|
+  @_help[:check] = \
+    "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:check)
+  task toDo[:check] do |t|
     execute("make check",builder)
   end
 
-  #desc "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
-  task cleanTaskName.to_sym do |t|
+  @_help[:clean] = \
+    "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:clean)
+  task toDo[:clean] do |t|
     execute("make clean",builder)
   end
 
-  #desc "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName]
-  task checkVTaskName.to_sym do |t|
+  @_help[:checkV] = \
+    "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:checkV)
+  task toDo[:checkV] do |t|
     execute("./src/cdo -V",builder)
   end
 
-  # show remote config.log file
-  task showLogTaskName.to_sym do |t|
+  @_help[:showLog] = "show remote config.log file" unless @_help.has_key?(:make)
+  task toDo[:showLog] do |t|
     execute("cat config.log",builder)
   end
 
-  # get the auto loaded modules on the target machine
-  task modlistTaskName.to_sym do |t|
+  @_help[:cmd] = "execute command within the target build dir, e.g. rake localGCC_cmd['pwd']" unless @_help.has_key?(:cmd)
+  task toDo[:cmd] ,:cmd do |t, args|
+    warn "No command given!!" && exit(1) if args.cmd.nil?
+    execute(args.cmd,builder)
+  end
+
+  @_help[:mods] = "get the auto loaded modules on the target machine"
+  task toDo[:mods] do |t|
     execute("module list", builder)
   end
 
@@ -247,6 +260,7 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
 # }}}
 #
 
+desc "execute listed tasks in parallel, each of them in a separate xterm"
 task :par do |t|
   # remove all tasks from the stack
   Rake.application.top_level_tasks.clear
@@ -261,8 +275,13 @@ task :par do |t|
    sh "xterm -hold -e 'rake #{t}' "
   }
 end
+
+desc "show help on all tasks"
+task :help do
+  @_help.each {|t,help| puts "rake <host|localTask>_#{t}".ljust(35,' ') + "# #{help}" }
+end
+
 # check connections {{{
-desc "check available connections"
 task :checkConnections do |t|
   pp Parallel.map(@userConfig["hosts"]) {|host, config|
     hostname = config['hostname']
@@ -286,7 +305,6 @@ end
 # }}}
 #
 # check internals {{{
-desc "check some internals"
 task :checkInterals do
   dbg(@srcDir)
   dbg(getBranchName)
