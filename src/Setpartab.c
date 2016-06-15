@@ -174,26 +174,26 @@ void *get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
 
 typedef struct
 {
-  int convert;
-  int remove;
+  bool convert;
+  bool remove;
   // missing value
-  int changemissval;
+  bool changemissval;
   double missval_old;
   //
-  int lfactor;
+  bool lfactor;
   double factor;
   //
-  int checkvalid;
+  bool checkvalid;
   double valid_min;
   double valid_max;
   //
-  int check_min_mean_abs;
+  bool check_min_mean_abs;
   double ok_min_mean_abs;
   //
-  int check_max_mean_abs;
+  bool check_max_mean_abs;
   double ok_max_mean_abs;
   // units
-  int changeunits;
+  bool changeunits;
   char units_old[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
   // varname
@@ -213,9 +213,9 @@ void defineVarAttText(int vlistID2, int varID, const char *attname, const char *
 static
 void convertVarUnits(var_t *vars, int varID, char *name)
 {
-  if ( vars[varID].convert == FALSE ) vars[varID].changeunits = FALSE;
+  if ( vars[varID].convert == false ) vars[varID].changeunits = false;
 
-  if ( vars[varID].changeunits == TRUE )
+  if ( vars[varID].changeunits )
     {
       char *units = vars[varID].units;
       char *units_old = vars[varID].units_old;
@@ -238,7 +238,7 @@ void convertVarUnits(var_t *vars, int varID, char *name)
 	    }
 	  else
 	    cdoWarning("%s - converting units from [%s] to [%s] failed!", name, units_old, units);
-	  vars[varID].changeunits = FALSE;
+	  vars[varID].changeunits = false;
 	}
       else
 	{
@@ -250,12 +250,12 @@ void convertVarUnits(var_t *vars, int varID, char *name)
 	    }
 	}
 #else
-      static int lwarn_udunits = TRUE;
+      static bool lwarn_udunits = true;
       if ( lwarn_udunits )
 	{
 	  cdoWarning("%s - converting units from [%s] to [%s] failed, UDUNITS2 support not compiled in!", name,units_old, units);
-	  vars[varID].changeunits = FALSE;
-	  lwarn_udunits = FALSE;
+	  vars[varID].changeunits = false;
+	  lwarn_udunits = false;
 	}
 #endif
     }
@@ -274,7 +274,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units)
     {
       if ( len1 > 0 && len2 > 0 )
 	{
-	  vars[varID].changeunits = TRUE;
+	  vars[varID].changeunits = true;
 	  strcpy(vars[varID].units_old, units_old);
 	  strcpy(vars[varID].units, units);
 	}
@@ -293,7 +293,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   int nml_longname, nml_units, nml_comment, nml_ltype, nml_delete, nml_convert, nml_missval, nml_factor;
   int nml_cell_methods, nml_cell_measures;
   int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
-  int locc, i;
+  int i;
   int code, out_code, table, ltype, remove, convert;
   int nml_index = 0;
   int codenum, tabnum, levtype, param;
@@ -359,10 +359,10 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 
 	  if ( cdoVerbose ) namelistPrint(nml);
 
-	  locc = FALSE;
+	  bool locc = false;
 	  for ( i = 0; i < nml->size; i++ )
 	    {
-	      if ( nml->entry[i]->occ ) { locc = TRUE; break; }
+	      if ( nml->entry[i]->occ ) { locc = true; break; }
 	    }
 
 	  if ( locc )
@@ -446,8 +446,8 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		  if ( nml->entry[nml_comment]->occ  )  defineVarAttText(vlistID2, varID, "comment", comment);
 		  if ( nml->entry[nml_cell_methods]->occ  ) defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
 		  if ( nml->entry[nml_cell_measures]->occ ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
-		  if ( nml->entry[nml_delete]->occ && remove == 1 ) vars[varID].remove = TRUE;
-		  if ( nml->entry[nml_convert]->occ )   vars[varID].convert = convert==0 ? FALSE : TRUE;
+		  if ( nml->entry[nml_delete]->occ && remove == 1 ) vars[varID].remove = true;
+		  if ( nml->entry[nml_convert]->occ )   vars[varID].convert = convert==0 ? false : true;
 		  if ( nml->entry[nml_param]->occ )     vlistDefVarParam(vlistID2, varID, stringToParam(paramstr));
 		  if ( nml->entry[nml_out_param]->occ ) vlistDefVarParam(vlistID2, varID, stringToParam(out_paramstr));
 		  if ( nml->entry[nml_datatype]->occ )
@@ -468,32 +468,32 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 			{
 			  if ( cdoVerbose ) 
 			    cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
-			  vars[varID].changemissval = TRUE;
+			  vars[varID].changemissval = true;
 			  vars[varID].missval_old = missval_old;
 			  vlistDefVarMissval(vlistID2, varID, missval);
 			}
 		    }
 		  if ( nml->entry[nml_factor]->occ )
 		    {
-		      vars[varID].lfactor = TRUE;
+		      vars[varID].lfactor = true;
 		      vars[varID].factor = factor;
 		      if ( cdoVerbose ) 
 			cdoPrint("%s - scale factor %g", name, factor);
 		    }
 		  if ( nml->entry[nml_valid_min]->occ && nml->entry[nml_valid_max]->occ )
 		    {
-		      vars[varID].checkvalid = TRUE;
+		      vars[varID].checkvalid = true;
 		      vars[varID].valid_min = valid_min;
 		      vars[varID].valid_max = valid_max;
 		    }
 		  if ( nml->entry[nml_ok_min_mean_abs]->occ )
 		    {
-		      vars[varID].check_min_mean_abs = TRUE;
+		      vars[varID].check_min_mean_abs = true;
 		      vars[varID].ok_min_mean_abs = ok_min_mean_abs;
 		    }
 		  if ( nml->entry[nml_ok_max_mean_abs]->occ )
 		    {
-		      vars[varID].check_max_mean_abs = TRUE;
+		      vars[varID].check_max_mean_abs = true;
 		      vars[varID].ok_max_mean_abs = ok_max_mean_abs;
 		    }
 		}
@@ -600,7 +600,7 @@ void *Setpartab(void *argument)
   int nrecs;
   int varID, levelID;
   int nmiss;
-  int delvars = FALSE;
+  bool delvars = false;
   int tableID = -1;
   int tableformat = 0;
   double missval;
@@ -618,10 +618,10 @@ void *Setpartab(void *argument)
 
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
-  int convert_data = FALSE;
+  bool convert_data = false;
   if ( operatorArgc() == 2 )
     {
-      if ( strcmp("convert", operatorArgv()[1]) == 0 ) convert_data = TRUE;
+      if ( strcmp("convert", operatorArgv()[1]) == 0 ) convert_data = true;
       else cdoAbort("Unknown parameter: >%s<", operatorArgv()[1]); 
     }
 
@@ -676,7 +676,7 @@ void *Setpartab(void *argument)
   memset(vars, 0, nvars*sizeof(var_t));
 
   if ( convert_data )
-    for ( varID = 0; varID < nvars; ++varID ) vars[varID].convert = TRUE;
+    for ( varID = 0; varID < nvars; ++varID ) vars[varID].convert = true;
 
   if ( tableformat == 0 )
     {
@@ -714,7 +714,7 @@ void *Setpartab(void *argument)
       for ( int varID = 0; varID < nvars; ++varID )
 	if ( vars[varID].remove )
           {
-            delvars = TRUE;
+            delvars = true;
             break;
           }
 
@@ -797,7 +797,7 @@ void *Setpartab(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  if ( vlistInqVarNumber(vlistID2, varID2) != CDI_REAL ) gridsize *= 2;
 
-	  if ( nmiss > 0 && vars[varID].changemissval == TRUE )
+	  if ( nmiss > 0 && vars[varID].changemissval )
 	    {
 	      for ( long i = 0; i < gridsize; ++i )
 		{
@@ -805,7 +805,7 @@ void *Setpartab(void *argument)
 		}
 	    }
 
-	  if ( vars[varID].lfactor == TRUE )
+	  if ( vars[varID].lfactor )
 	    {
 	      for ( long i = 0; i < gridsize; ++i )
 		{
@@ -814,7 +814,7 @@ void *Setpartab(void *argument)
 	    }
 
 #if defined(HAVE_UDUNITS2)
-	  if ( vars[varID].changeunits == TRUE )
+	  if ( vars[varID].changeunits )
 	    {
 	      int nerr = 0;
 	      for ( long i = 0; i < gridsize; ++i )
@@ -829,7 +829,7 @@ void *Setpartab(void *argument)
 		{
 		  cdoWarning("Udunits: Error converting units from [%s] to [%s], parameter: %s",
 			     vars[varID].units_old, vars[varID].units, vars[varID].name);
-		  vars[varID].changeunits = FALSE;
+		  vars[varID].changeunits = false;
 		}
 	    }
 #endif
