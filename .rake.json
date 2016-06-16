@@ -36,7 +36,7 @@
       "dir": "/home/zmaw/m300064/builds/remote"
     },
     "ubuntu-32bit": {
-      "hostname": "134.76.24.138",
+      "hostname": "cdo4windows-ubuntu.mpimet.mpg.de",
       "dir": "/home/mpimet/build/cdo",
       "username":"mpimet"
     }
