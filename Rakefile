@@ -55,6 +55,7 @@ end
 # stdout is shown in debug mode only
 # stderr is always shown
 def executeRemote(command, builder)
+  pp builder
   Net::SSH.start(builder.hostname,builder.username) do |ssh|
     stdout_data = ""
     stderr_data = ""
@@ -204,6 +205,24 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
                                 toDo[:check]].compact.map(&:to_sym)
 end
 # }}}
+def getUsername(builderConfig, hostConfig)
+  username = nil
+
+  username = @user if [builderConfig['hostname'],hostConfig['hostname']].include?('localhost')
+  return username unless username.nil?
+
+  username =  builderConfig['username'] if builderConfig.has_key?('username')
+  return username unless username.nil?
+
+  username = hostConfig['username'] if hostConfig.has_key?('username')
+  return username unless username.nil?
+
+  username = @userConfig["remoteUser"] if @userConfig.has_key?('remoteUser')
+  return username unless username.nil?
+
+  warn "Could not find username!!"
+  exit(1)
+end
 # constuct builders out of user configuration {{{ ==============================
 Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?,:docstring)
 # 1) construct builders from host configuration
@@ -227,25 +246,33 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
   } if config.has_key?('CC')
 }
 # 2) construct builders from manual configuration
-@userConfig["builders"].each {|builderName,config|
-  builder = Builder.new(builderName,
-                        @userConfig['hosts'][config["hostname"]]['hostname'],
-                        ('localhost' == config['hostname'] \
-                                  or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname']) \
-                            ? @user \
-                            : ( config.has_key?('username') \
-                               ? config['username'] \
-                               : @userConfig["remoteUser"]),
-                        '', # CC can be empty here, because it should be set by the given configureCall
-                        [@userConfig['hosts'][config['hostname']]['dir'],builderName,getBranchName].join(File::SEPARATOR),
-                        config['configureCall'],
-                        ( 'localhost' == config['hostname'] \
-                           or 'localhost' == @userConfig['hosts'][config['hostname']]['hostname'] ),
-                       config.has_key?('docstring') \
-                         ? config['docstring'] \
-                         : "builder on #{config['hostname']}: #{config['configureCall']}")
+@userConfig["builders"].each {|builderName,builderConfig|
+  hostConfig = @userConfig['hosts'][builderConfig['hostname']]
 
-  builder2task(builder,true, config['sync'])
+  warn "Hostconfig not found!!!!" and exit(1) if hostConfig.nil?
+
+  username, hostname = getUsername(builderConfig,hostConfig), hostConfig['hostname']
+
+  if username.nil? or hostname.nil? then
+    puts [username, hostname].join(' - ').colorize(color: :red)
+    warn "Missing connection info!"
+    exit(1)
+  else
+    puts [username, hostname].join(' - ').colorize(color: :green) if false
+  end
+
+  builder = Builder.new(builderName,
+                        hostname,
+                        username,
+                        '', # CC can be empty here, because it should be set by the given configureCall
+                        [hostConfig['dir'],builderName,getBranchName].join(File::SEPARATOR),
+                        builderConfig['configureCall'],
+                        [builderConfig['hostname'],hostConfig['hostname']].include?('localhost'),
+                        builderConfig.has_key?('docstring') \
+                          ? builderConfig['docstring'] \
+                          : "builder on #{builderConfig['hostname']}: #{builderConfig['configureCall']}")
+
+  builder2task(builder,true, builderConfig['sync'])
 
 } if @userConfig.has_key?('builders')
 # }}}
