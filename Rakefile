@@ -55,7 +55,6 @@ end
 # stdout is shown in debug mode only
 # stderr is always shown
 def executeRemote(command, builder)
-  pp builder
   Net::SSH.start(builder.hostname,builder.username) do |ssh|
     stdout_data = ""
     stderr_data = ""
