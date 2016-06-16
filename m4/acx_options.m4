@@ -200,6 +200,36 @@ AC_SUBST([NETCDF_ROOT])
 AC_SUBST([NETCDF_INCLUDE])
 AC_SUBST([NETCDF_LIBS])
 #  ----------------------------------------------------------------------
+#  Link application with UDUNITS2 library
+AC_ARG_WITH([udunits2],
+            [AS_HELP_STRING([--with-udunits2=<directory>],
+                            [Specify location of UDUNITS2 library.])],
+            [AS_CASE(["$with_udunits2"],
+                     [no],[AC_MSG_CHECKING([for udunits2 library])
+                           AC_MSG_RESULT([suppressed])],
+                     [yes],[AC_CHECK_HEADERS([udunits2.h])
+                            AC_SEARCH_LIBS([ut_parse],
+                                           [udunits2],
+                                           [AC_DEFINE([HAVE_LIBUDUNITS2],[1],[Define to 1 for UDUNITS2 support])],
+                                           [AC_MSG_ERROR([Could not link to udunits2 library!])])
+                            AC_SUBST([UDUNITS_LDFLAGS],[" -ludunits2"])
+                            AC_SUBST([UDUNITS_INCLUDE],[""])],
+                     [*],[UDUNITS_ROOT=$with_udunits2
+                          AS_IF([test -d "$UDUNITS_ROOT"],
+                                [LDFLAGS="$LDFLAGS -L$UDUNITS_ROOT/lib"
+                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include"
+                                 AC_CHECK_HEADERS([udunits2.h])
+                                 AC_CHECK_HEADERS([udunits2/udunits2.h])
+                                 AC_SEARCH_LIBS([ut_parse],
+                                                [udunits2],
+                                                [AC_DEFINE([HAVE_LIBUDUNITS2],[1],[Define to 1 for UDUNITS2 support])],
+                                                [AC_MSG_ERROR([Could not link to udunits2 library!])])
+                                 AC_SUBST([UDUNITS_LDFLAGS],[" -L$UDUNITS_ROOT/lib -ludunits2"])
+                                 AC_SUBST([UDUNITS_INCLUDE],[" -I$UDUNITS_ROOT/include"])],
+                                [AC_MSG_ERROR([$UDUNITS_ROOT is not a directory! UDUNITS2 suppressed])])])],
+            [AC_MSG_CHECKING([for the UDUNITS2 library])
+             AC_MSG_RESULT([suppressed])])
+#  ----------------------------------------------------------------------
 #  Link application with CMOR library
 CMOR_LIBS=''
 AC_ARG_WITH([cmor],
@@ -387,36 +417,6 @@ AC_ARG_WITH([curl],
                                  AC_SUBST([CURL_INCLUDE],[" -I$CURL_ROOT/include"])],
                                 [AC_MSG_ERROR([$CURL_ROOT is not a directory! CURL suppressed])])])],
             [AC_MSG_CHECKING([for the CURL library])
-             AC_MSG_RESULT([suppressed])])
-#  ----------------------------------------------------------------------
-#  Link application with UDUNITS2 library
-AC_ARG_WITH([udunits2],
-            [AS_HELP_STRING([--with-udunits2=<directory>],
-                            [Specify location of UDUNITS2 library.])],
-            [AS_CASE(["$with_udunits2"],
-                     [no],[AC_MSG_CHECKING([for udunits2 library])
-                           AC_MSG_RESULT([suppressed])],
-                     [yes],[AC_CHECK_HEADERS([udunits2.h])
-                            AC_SEARCH_LIBS([ut_parse],
-                                           [udunits2],
-                                           [AC_DEFINE([HAVE_LIBUDUNITS2],[1],[Define to 1 for UDUNITS2 support])],
-                                           [AC_MSG_ERROR([Could not link to udunits2 library!])])
-                            AC_SUBST([UDUNITS_LDFLAGS],[" -ludunits2"])
-                            AC_SUBST([UDUNITS_INCLUDE],[""])],
-                     [*],[UDUNITS_ROOT=$with_udunits2
-                          AS_IF([test -d "$UDUNITS_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$UDUNITS_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include"
-                                 AC_CHECK_HEADERS([udunits2.h])
-                                 AC_CHECK_HEADERS([udunits2/udunits2.h])
-                                 AC_SEARCH_LIBS([ut_parse],
-                                                [udunits2],
-                                                [AC_DEFINE([HAVE_LIBUDUNITS2],[1],[Define to 1 for UDUNITS2 support])],
-                                                [AC_MSG_ERROR([Could not link to udunits2 library!])])
-                                 AC_SUBST([UDUNITS_LDFLAGS],[" -L$UDUNITS_ROOT/lib -ludunits2"])
-                                 AC_SUBST([UDUNITS_INCLUDE],[" -I$UDUNITS_ROOT/include"])],
-                                [AC_MSG_ERROR([$UDUNITS_ROOT is not a directory! UDUNITS2 suppressed])])])],
-            [AC_MSG_CHECKING([for the UDUNITS2 library])
              AC_MSG_RESULT([suppressed])])
 #  ----------------------------------------------------------------------
 #  Compile application with MAGICS (xml required)
