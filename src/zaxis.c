@@ -93,7 +93,7 @@ static int getoptname(char *optname, const char *optstring, int nopt)
   else
     nerr = 1;
 
-  return (nerr);
+  return nerr;
 }
 
 
@@ -135,7 +135,7 @@ int zaxisDefine(zaxis_t zaxis)
 	Warning("vct undefined!");	    
     }
 
-  return (zaxisID);
+  return zaxisID;
 }
 
 
@@ -145,7 +145,7 @@ static char *skipSeparator(char *pline)
   if ( *pline == '=' || *pline == ':' ) pline++;
   while ( isspace((int) *pline) ) pline++;
 
-  return (pline);
+  return pline;
 }
 
 
@@ -153,7 +153,6 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 {
   char line[MAX_LINE_LEN], *pline;
   int zaxisID;
-  int lerror;
   size_t i, len;
   zaxis_t zaxis;
 
@@ -165,11 +164,11 @@ int zaxisFromFile(FILE *gfp, const char *dname)
       if ( line[0] == '\0' ) continue;
       len = strlen(line);
 
-      lerror = FALSE;
+      bool lerror = false;
       for ( i = 0; i < len; ++i )
 	if ( !(line[i] == 9 || (line[i] > 31 && line[i] < 127)) )
 	  {
-	    lerror = TRUE;
+	    lerror = true;
 	    line[i] = '#';
 	  }
       if ( lerror ) cdoAbort("Zaxis description file >%s< contains illegal characters (line: %s)!", dname, line);
@@ -370,7 +369,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 
   zaxisID = zaxisDefine(zaxis);
 
-  return (zaxisID);
+  return zaxisID;
 }
 
 
@@ -393,7 +392,7 @@ int zaxisFromName(const char *zaxisname)
 
   if ( zaxis.type != -1 ) zaxisID = zaxisDefine(zaxis);
 
-  return (zaxisID);
+  return zaxisID;
 }
 
 
@@ -417,7 +416,7 @@ int cdoDefineZaxis(const char *zaxisfile)
 
   if ( zaxisID == -1 ) cdoAbort("Invalid zaxis description file %s!", zaxisfile);
 
-  return (zaxisID);
+  return zaxisID;
 }
 
 
@@ -448,7 +447,7 @@ int ztype2ltype(int zaxistype)
   else if ( zaxistype == ZAXIS_ISENTROPIC        )  ltype = 113;
   else if ( zaxistype == ZAXIS_DEPTH_BELOW_SEA   )  ltype = 160;
 
-  return (ltype);
+  return ltype;
 }
 
 
@@ -463,5 +462,5 @@ int zaxis2ltype(int zaxisID)
 
   if ( ltype <= 0 ) ltype = ztype2ltype(zaxistype);
 
-  return (ltype);
+  return ltype;
 }

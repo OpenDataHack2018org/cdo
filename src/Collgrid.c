@@ -82,12 +82,12 @@ int cmpxy_gt(const void *s1, const void *s2)
 static
 int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks)
 {
-  int lsouthnorth = TRUE;
+  bool lsouthnorth = true;
+  bool lregular = false;
+  bool lcurvilinear = false;
   int gridID2 = -1;
   int idx;
   int ny, ix, iy, i, j, ij, offset;
-  int lregular = FALSE;
-  int lcurvilinear = FALSE;
   double *xvals2 = NULL, *yvals2 = NULL;
 
   int nx = -1;
@@ -109,9 +109,9 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
       gridID   = vlistGrid(ef[fileID].vlistID, igrid);
       gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
-        lregular = TRUE;
+        lregular = true;
       else if ( gridtype == GRID_CURVILINEAR )
-        lcurvilinear = TRUE;
+        lcurvilinear = true;
       else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 )
         ;
       else
@@ -151,7 +151,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
           if ( ysize[fileID] > 1 )
             {
-              if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
+              if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = false;
             }
         }
       else
@@ -342,10 +342,10 @@ void *Collgrid(void *argument)
     vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   int nvars = vlistNvars(vlistID1);
-  int *vars  = (int*) Malloc(nvars*sizeof(int));
-  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
-  int *vars1  = (int*) Malloc(nvars*sizeof(int));
-  for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = FALSE;
+  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
+  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
+  bool *vars1  = (bool*) Malloc(nvars*sizeof(bool));
+  for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = false;
 
   int nsel = operatorArgc();
 
@@ -363,7 +363,7 @@ void *Collgrid(void *argument)
 
   if ( nsel == 0 )
     {
-      for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = TRUE;
+      for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = true;
     }
   else
     {
@@ -373,8 +373,8 @@ void *Collgrid(void *argument)
 	for ( int i = 0; i < nsel; i++ )
 	  fprintf(stderr, "name %d = %s\n", i+1, argnames[i]);
 
-      int *selfound = (int*) Malloc(nsel*sizeof(int));
-      for ( int i = 0; i < nsel; i++ ) selfound[i] = FALSE;
+      bool *selfound = (bool*) Malloc(nsel*sizeof(bool));
+      for ( int i = 0; i < nsel; i++ ) selfound[i] = false;
 
       char varname[CDI_MAX_NAME];
       for ( varID = 0; varID < nvars; varID++ )
@@ -385,14 +385,14 @@ void *Collgrid(void *argument)
 	    {
 	      if ( strcmp(argnames[isel], varname) == 0 )
 		{
-		  selfound[isel] = TRUE;
-		  vars1[varID] = TRUE;
+		  selfound[isel] = true;
+		  vars1[varID] = true;
 		}
 	    }
 	}
 
       for ( int isel = 0; isel < nsel; isel++ )
-	if ( selfound[isel] == FALSE )
+	if ( selfound[isel] == false )
 	  cdoAbort("Variable name %s not found!", argnames[isel]);
 
       Free(selfound);
@@ -400,7 +400,7 @@ void *Collgrid(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( vars1[varID] == TRUE )
+      if ( vars1[varID] )
 	{
 	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	  int nlevs    = zaxisInqSize(zaxisID);
@@ -433,7 +433,7 @@ void *Collgrid(void *argument)
   //int vlistID2 = vlistDuplicate(vlistID1);
   int nvars2 = vlistNvars(vlistID2);
   // int *vars  = (int*) Malloc(nvars*sizeof(int));
-  //for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+  //for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
 
   int ngrids1 = vlistNgrids(vlistID1);
   int ngrids2 = vlistNgrids(vlistID2);
@@ -443,7 +443,7 @@ void *Collgrid(void *argument)
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int*) Malloc(gridsizemax*sizeof(int));
 
-  int ginit = FALSE;
+  bool ginit = false;
   for ( int i2 = 0; i2 < ngrids2; ++i2 )
     {
       int i1;
@@ -452,10 +452,10 @@ void *Collgrid(void *argument)
 
       //   printf("i1 %d i2 %d\n", i1, i2);
 
-      if ( ginit == FALSE )
+      if ( !ginit )
 	{
 	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1, nxblocks);
-	  if ( gridIDs[i2] != -1 ) ginit = TRUE;
+	  if ( gridIDs[i2] != -1 ) ginit = true;
 	}
       else
 	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1, nxblocks);
@@ -485,7 +485,7 @@ void *Collgrid(void *argument)
 	{
 	  if ( gridIDs[i] != -1 ) 
 	    {
-	      if ( gridID == vlistGrid(vlistID2, i) ) vars[varID] = TRUE;
+	      if ( gridID == vlistGrid(vlistID2, i) ) vars[varID] = true;
 	      break;
 	    }
 	}

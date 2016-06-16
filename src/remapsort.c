@@ -113,7 +113,7 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
 
       /* Loop until proper level is found for this link, or reach bottom */
 
-      for ( i = 0; i < num_links; ++i ) /* while ( TRUE ) */
+      for ( i = 0; i < num_links; ++i )
 	{
 	  /* Find the largest of the two daughters */
 
@@ -190,7 +190,7 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
 
       final_lvl = 0;
 
-      for ( i = 0; i < num_links; ++i ) /* while ( TRUE ) */
+      for ( i = 0; i < num_links; ++i )
 	{
 	  /* Find the largest of the two daughters */
 
@@ -352,7 +352,7 @@ void sort_add_orig(long num_links, long num_wts, int *restrict add1, int *restri
 
       /* Loop until proper level is found for this link, or reach bottom */
 
-      for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
+      for ( i = 0; i < num_links; i++ )
 	{
 	  /* Find the largest of the two daughters */
 
@@ -435,7 +435,7 @@ void sort_add_orig(long num_links, long num_wts, int *restrict add1, int *restri
 
       final_lvl = 0;
 
-      for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
+      for ( i = 0; i < num_links; i++ )
 	{
 	  /* Find the largest of the two daughters */
 

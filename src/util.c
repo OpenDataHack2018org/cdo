@@ -194,24 +194,23 @@ char *getProgname(char *string)
   if ( progname == NULL ) progname = string;
   else                    progname++;
 
-  return (progname);
+  return progname;
 }
 
 char *getOperator(const char *argument)
 {
   char *operatorArg = NULL;
-  size_t len;
 
   if ( argument )
     {
-      len = 1 + strlen(argument);
+      size_t len = 1 + strlen(argument);
 
       operatorArg = (char*) Malloc(len);
 
       memcpy(operatorArg, argument, len);
     }
 
-  return (operatorArg);
+  return operatorArg;
 }
 
 char *operatorAlias(char *operatorName);
@@ -239,7 +238,7 @@ char *getOperatorName(const char *operatorArg)
       operatorName[len] = '\0';
     }
 
-  /*  return (operatorName); */
+  /*  return operatorName; */
   char * alias = operatorAlias(operatorName);
   return alias;
 }
@@ -247,16 +246,14 @@ char *getOperatorName(const char *operatorArg)
 
 argument_t *file_argument_new(const char *filename)
 {
-  argument_t *argument;
-
-  argument = (argument_t*) Calloc(1, sizeof(argument_t));
+  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
 
   argument->argc = 1;
   argument->argv = (char **) Calloc(1, sizeof(char *));
   argument->argv[0] = (char *) filename;
   argument->args = (char *) filename;
 
-  return (argument);
+  return argument;
 }
 
 
@@ -276,9 +273,7 @@ void file_argument_free(argument_t *argument)
 
 argument_t *argument_new(size_t argc, size_t len)
 {
-  argument_t *argument;
-
-  argument = (argument_t*) Calloc(1, sizeof(argument_t));
+  argument_t *argument = (argument_t*) Calloc(1, sizeof(argument_t));
 
   if ( argc > 0 )
     {
@@ -289,7 +284,7 @@ argument_t *argument_new(size_t argc, size_t len)
   if ( len > 0 )
     argument->args = (char*) Calloc(len, sizeof(char));
 
-  return (argument);
+  return argument;
 }
 
 
@@ -356,7 +351,7 @@ char *getFileArg(char *argument)
         }
     }
 
-  return (fileArg);
+  return fileArg;
 }
 
 
@@ -396,7 +391,7 @@ double parameter2double(const char *string)
     cdoAbort("Float parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));
 
-  return (fval);
+  return fval;
 }
 
 
@@ -410,7 +405,7 @@ int parameter2int(const char *string)
     cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));
 
-  return (ival);
+  return ival;
 }
 
 
@@ -424,7 +419,7 @@ int parameter2intlist(const char *string)
     cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));
 
-  return (ival);
+  return ival;
 }
 
 
@@ -435,11 +430,11 @@ static int season_start = START_DEC;
 
 int get_season_start(void)
 {
-  static int lgetenv = TRUE;
+  static bool lgetenv = true;
 
   if ( lgetenv )
     {
-      lgetenv = FALSE;
+      lgetenv = false;
   
       char *envstr = getenv("CDO_SEASON_START");
       if ( envstr )
@@ -546,13 +541,13 @@ int userFileOverwrite(const char *restrict filename)
 }
 
 
-int ps_lhead = FALSE;
+bool ps_lhead = false;
 int ps_nch   = 0;
 int ps_cval  = -1;
 
 void progressInit(void)
 {
-  ps_lhead = FALSE;
+  ps_lhead = false;
   ps_nch   = 0;
   ps_cval  = -1;
 }
@@ -578,7 +573,7 @@ void progressStatus(double offset, double refval, double curval)
     {
       ps_nch = fprintf(stdout, "%s: %3d%%", processInqPrompt(), 0);
       fflush(stdout);
-      ps_lhead = TRUE;
+      ps_lhead = true;
     }
 
   if ( ival != ps_cval )
@@ -590,7 +585,7 @@ void progressStatus(double offset, double refval, double curval)
 
   if ( ps_cval == 100 && ps_lhead )
     {
-      ps_lhead = FALSE;
+      ps_lhead = false;
       while ( ps_nch-- ) fprintf(stdout, "\b \b");
       fflush(stdout);
     }
@@ -615,7 +610,7 @@ int datatype2str(int datatype, char *datatypestr)
   else if ( datatype == DATATYPE_UINT32 ) strcpy(datatypestr, "U32");
   else                                  { strcpy(datatypestr, "-1"); status = -1;}
 
-  return (status);
+  return status;
 }
 
 
@@ -646,7 +641,7 @@ int str2datatype(const char *datatypestr)
       else if ( strncmp(datatypestr, "double", len) == 0 ) datatype = DATATYPE_FLT64;
     }
 
-  return (datatype);
+  return datatype;
 }
 
 
@@ -677,15 +672,15 @@ const char *filetypeext(int filetype)
   switch ( filetype )
     {
     case FILETYPE_GRB:
-    case FILETYPE_GRB2: return (".grb");   break;
+    case FILETYPE_GRB2: return ".grb";   break;
     case FILETYPE_NC:
     case FILETYPE_NC2:
     case FILETYPE_NC4:
-    case FILETYPE_NC4C: return (".nc");    break;
-    case FILETYPE_SRV:  return (".srv");   break;
-    case FILETYPE_EXT:  return (".ext");   break;
-    case FILETYPE_IEG:  return (".ieg");   break;
-    default:            return ("");
+    case FILETYPE_NC4C: return ".nc";    break;
+    case FILETYPE_SRV:  return ".srv";   break;
+    case FILETYPE_EXT:  return ".ext";   break;
+    case FILETYPE_IEG:  return ".ieg";   break;
+    default:            return "";
     }
 }
 
@@ -736,8 +731,8 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
         }
       else
         {
-          int lready = FALSE;
-          int lcompsz = FALSE;
+          bool lready = false;
+          bool lcompsz = false;
           
           if ( filetype == cdoDefaultFileType && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
             {
@@ -753,20 +748,20 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
                       switch (firstchar)
                         {
                         case 'g':
-                          if ( cdoDefaultFileType == FILETYPE_GRB || cdoDefaultFileType == FILETYPE_GRB2 ) lready = TRUE;
+                          if ( cdoDefaultFileType == FILETYPE_GRB || cdoDefaultFileType == FILETYPE_GRB2 ) lready = true;
                           break;
                         case 'n':
                           if ( cdoDefaultFileType == FILETYPE_NC || cdoDefaultFileType == FILETYPE_NC2 ||
-                               cdoDefaultFileType == FILETYPE_NC4 || cdoDefaultFileType == FILETYPE_NC4C ) lready = TRUE;
+                               cdoDefaultFileType == FILETYPE_NC4 || cdoDefaultFileType == FILETYPE_NC4C ) lready = true;
                           break;
                         case 's':
-                          if ( cdoDefaultFileType == FILETYPE_SRV ) lready = TRUE;
+                          if ( cdoDefaultFileType == FILETYPE_SRV ) lready = true;
                           break;
                         case 'e':
-                          if ( cdoDefaultFileType == FILETYPE_EXT ) lready = TRUE;
+                          if ( cdoDefaultFileType == FILETYPE_EXT ) lready = true;
                           break;
                         case 'i':
-                          if ( cdoDefaultFileType == FILETYPE_IEG ) lready = TRUE;
+                          if ( cdoDefaultFileType == FILETYPE_IEG ) lready = true;
                           break;
                         }
                     }
@@ -787,10 +782,10 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
           if ( !lready )
             {
               strncat(filesuffix, streamFilesuffix(cdoDefaultFileType), maxlen-1);
-              if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = TRUE;
+              if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
             }
 
-          if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == COMPRESS_SZIP ) lcompsz = TRUE;
+          if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == COMPRESS_SZIP ) lcompsz = true;
           if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
         }
     }
@@ -806,7 +801,7 @@ int cdoFiletype(void)
         cdoPrint("Set default filetype to GRIB");
     }
 
-  return (cdoDefaultFileType);
+  return cdoDefaultFileType;
 }
 
 
