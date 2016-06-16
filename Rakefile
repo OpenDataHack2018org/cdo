@@ -197,6 +197,12 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
     execute("module list", builder)
   end
 
+  @_help[:log] = "log everything to <host|localTask>.log"
+  file baseTaskName+".log" do |t|
+    sh "rake #{baseTaskName} > #{t.name} 2>&1"
+    sh "finished".colorize(color: :green)
+  end
+
   desc builder.docstring
   task baseTaskName.to_sym  => [syncSource ? toDo[:sync] : nil,
                                 toDo[:conf],
@@ -295,7 +301,9 @@ end
 
 desc "show help on all hidden tasks"
 task :help do
-  @_help.each {|t,help| puts "rake <host|localTask>_#{t}".ljust(35,' ') + "# #{help}" }
+  @_help.each {|t,help|
+    sep = :log == t ? '.' : '_'
+    puts "rake <host|localTask>#{sep}#{t}".ljust(35,' ') + "# #{help}" }
 end
 
 task :default do |t|
