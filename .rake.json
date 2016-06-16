@@ -34,6 +34,11 @@
     "wanglung": {
       "hostname": "wanglung.mpi.zmaw.de",
       "dir": "/home/zmaw/m300064/builds/remote"
+    },
+    "ubuntu-32bit": {
+      "hostname": "134.76.24.138",
+      "dir": "/home/mpimet/build/cdo",
+      "username":"mpimet"
     }
   },
 
@@ -93,6 +98,13 @@
       "hostname": "wanglung",
       "configureCall": "./configure --enable-cxx CC=gcc  CXX=g++ CFLAGS='-g -O2'",
       "makeCall": "make -j 12",
+      "sync": true
+    },
+    "linux32bit": {
+      "hostname": "ubuntu-32bit",
+      "configureCall": "./configure --with-netcdf ",
+      "makeCall": "make -j 3",
+      "username":"mpimet",
       "sync": true
     }
   }
