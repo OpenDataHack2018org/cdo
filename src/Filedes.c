@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Filedes    pardes          Parameter description
+      Filedes    codetab         Parameter code table
       Filedes    griddes         Grid description
       Filedes    vct             Vertical coordinate table
 */
@@ -315,7 +315,6 @@ void filedes(int streamID)
 
 void *Filedes(void *argument)
 {
-  int GRIDDES, GRIDDES2, ZAXISDES, VCT, VCT2, PARDES, FILEDES, VLIST, SPARTAB, PARTAB, PARTAB2;
   int operatorID;
   int streamID = 0;
   int zaxisID;
@@ -325,17 +324,17 @@ void *Filedes(void *argument)
 
   cdoInitialize(argument);
 
-  GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);
-  GRIDDES2 = cdoOperatorAdd("griddes2",  0, 0, NULL);
-  ZAXISDES = cdoOperatorAdd("zaxisdes",  0, 0, NULL);
-  VCT      = cdoOperatorAdd("vct",       0, 0, NULL);
-  VCT2     = cdoOperatorAdd("vct2",      0, 0, NULL);
-  PARDES   = cdoOperatorAdd("pardes",    0, 0, NULL);
-  FILEDES  = cdoOperatorAdd("filedes",   0, 0, NULL);
-  VLIST    = cdoOperatorAdd("vlist",     0, 0, NULL);
-  SPARTAB  = cdoOperatorAdd("spartab",   0, 0, NULL);
-  PARTAB   = cdoOperatorAdd("partab",    0, 0, NULL);
-  PARTAB2  = cdoOperatorAdd("partab2",   0, 0, NULL);
+  int GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);
+  int GRIDDES2 = cdoOperatorAdd("griddes2",  0, 0, NULL);
+  int ZAXISDES = cdoOperatorAdd("zaxisdes",  0, 0, NULL);
+  int VCT      = cdoOperatorAdd("vct",       0, 0, NULL);
+  int VCT2     = cdoOperatorAdd("vct2",      0, 0, NULL);
+  int CODETAB  = cdoOperatorAdd("codetab",   0, 0, NULL);
+  int FILEDES  = cdoOperatorAdd("filedes",   0, 0, NULL);
+  int VLIST    = cdoOperatorAdd("vlist",     0, 0, NULL);
+  int SPARTAB  = cdoOperatorAdd("spartab",   0, 0, NULL);
+  int PARTAB   = cdoOperatorAdd("partab",    0, 0, NULL);
+  int PARTAB2  = cdoOperatorAdd("partab2",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -411,7 +410,7 @@ void *Filedes(void *argument)
     {
       vlistPrint(vlistID);
     }
-  else if ( operatorID == PARDES )
+  else if ( operatorID == CODETAB )
     {
       int varID, code;
       char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];

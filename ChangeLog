@@ -6,6 +6,7 @@
 2016-06-21  Uwe Schulzweida
 
 	* Renamed operator setpartab to setcodetab
+	* Renamed operator pardes to codetab
 
 2016-06-13  Uwe Schulzweida
 

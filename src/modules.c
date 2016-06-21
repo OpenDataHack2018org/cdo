@@ -318,7 +318,7 @@ void *Maggraph(void *argument);
 #define  EOF3dOperators         {"eof3d","eof3dspatial","eof3dtime"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
 #define  FCOperators            {"fc2sp", "sp2fc", "fc2gp", "gp2fc"}
-#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "pardes", \
+#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "codetab", \
                                  "vlist", "partab", "partab2", "spartab"}
 #define  FillmissOperators      {"fillmiss", "fillmiss2"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
@@ -848,7 +848,8 @@ static const char *opalias[][2] =
   {"ncode",               "npar"},
   {"nvar",                "npar"},
   {"outputkey",           "outputtab"},
-  {"vardes",              "pardes"},
+  {"vardes",              "codetab"},
+  {"pardes",              "codetab"},
   {"selvar",              "selname"},
   {"delvar",              "delname"},
   {"remapcon1",           "remaplaf"},
