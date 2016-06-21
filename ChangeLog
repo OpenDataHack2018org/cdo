@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-06-21  Uwe Schulzweida
+
+	* Renamed operator setpartab to setcodetab
+
 2016-06-13  Uwe Schulzweida
 
 	* mul: wrong result for missval*0 (bug fix)

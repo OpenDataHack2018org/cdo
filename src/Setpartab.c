@@ -607,10 +607,10 @@ void *Setpartab(void *argument)
 
   cdoInitialize(argument);
 
-  int SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table name");
-  int SETPARTABC = cdoOperatorAdd("setpartabc", 0, 0, "parameter table name");
-  int SETPARTABP = cdoOperatorAdd("setpartabp", 0, 0, "parameter table name");
-  int SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
+  int SETCODETAB = cdoOperatorAdd("setcodetab",  0, 0, "parameter code table name");
+  int SETPARTABC = cdoOperatorAdd("setpartabc",  0, 0, "parameter table name");
+  int SETPARTABP = cdoOperatorAdd("setpartabp",  0, 0, "parameter table name");
+  int SETPARTABN = cdoOperatorAdd("setpartabn",  0, 0, "parameter table name");
 
   int operatorID = cdoOperatorID();
 
@@ -628,7 +628,7 @@ void *Setpartab(void *argument)
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
 
   pt_mode_t ptmode = CODE_NUMBER;
-  if      ( operatorID == SETPARTAB  ) ptmode = CODE_NUMBER;
+  if      ( operatorID == SETCODETAB ) ptmode = CODE_NUMBER;
   else if ( operatorID == SETPARTABC ) ptmode = CODE_NUMBER;
   else if ( operatorID == SETPARTABP ) ptmode = PARAMETER_ID;
   else if ( operatorID == SETPARTABN ) ptmode = VARIABLE_NAME;

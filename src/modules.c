@@ -412,7 +412,7 @@ void *Maggraph(void *argument);
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
 #define  SetmisstonnOperators   {"setmisstonn", "setmisstodis"}
-#define  Setpartab0Operators    {"setpartab"}
+#define  SetcodetabOperators    {"setcodetab"}
 #define  SetpartabOperators     {"setpartabc", "setpartabp", "setpartabn"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
@@ -691,7 +691,7 @@ static modules_t Modules[] =
   { Sethalo,        SethaloHelp,       SethaloOperators,       1,   CDI_REAL,  1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,       1,   CDI_REAL,  1,  1 },
   { Fillmiss,       SetmissHelp,       SetmisstonnOperators,   1,   CDI_REAL,  1,  1 },
-  { Setpartab,      SetHelp,           Setpartab0Operators,    1,   CDI_REAL,  1,  1 },
+  { Setpartab,      SetHelp,           SetcodetabOperators,    1,   CDI_REAL,  1,  1 },
   { Setpartab,      SetpartabHelp,     SetpartabOperators,     1,   CDI_REAL,  1,  1 },
   { Setrcaname,     NULL,              SetrcanameOperators,    1,   CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       1,   CDI_BOTH,  1,  1 },
@@ -858,6 +858,7 @@ static const char *opalias[][2] =
   {"selgridname",         "selgrid"},
   {"setvar",              "setname"},
   {"setpartabv",          "setpartabn"},
+  {"setpartab",           "setcodetab"},
   {"sinfov",              "sinfon"},
   {"sortvar",             "sortname"},
   {"splitvar",            "splitname"},
