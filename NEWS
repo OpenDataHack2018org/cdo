@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.7.2 (25 June 2016):
+Version 1.7.2 (28 June 2016):
 
    New operators:
      * smooth: Smooth grid points
@@ -12,6 +12,8 @@ Version 1.7.2 (25 June 2016):
      * settbounds: Set time bounds
    Changed operators:
      * input: added optional zaxis parameter
+     * setpartab: renamed to setcodetab
+     * pardes: renamed to codetab
    Fixed bugs:
      * Error reading Gaussian reduced GRIB files [Bug #6780 #6819]
      * Installation error with OpenMP [Bug #6523]
