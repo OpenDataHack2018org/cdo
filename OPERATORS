@@ -33,7 +33,7 @@ Operator catalog:
    Showinfo      showdate        Show date information
    Showinfo      showtime        Show time information
    Showinfo      showtimestamp   Show timestamp
-   Filedes       pardes          Parameter description
+   Filedes       codetab         Parameter code table
    Filedes       griddes         Grid description
    Filedes       zaxisdes        Z-axis description
    Filedes       vct             Vertical coordinate table
@@ -122,7 +122,7 @@ Operator catalog:
 -------------------------------------------------------------
    Setpartab     setpartabp      Set parameter table
    Setpartab     setpartabn      Set parameter table
-   Set           setpartab       Set parameter table
+   Set           setcodetab      Set parameter code table
    Set           setcode         Set code number
    Set           setparam        Set parameter identifier
    Set           setname         Set variable name

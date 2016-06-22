@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = pardes griddes zaxisdes vct
+@Operators = codetab griddes zaxisdes vct
 
 @BeginDescription
 This module prints the description of the parameters, the grids,
@@ -14,11 +14,11 @@ the z-axis or the vertical coordinate table.
 @EndModule
 
 
-@BeginOperator_pardes
-@Title     = Parameter description
+@BeginOperator_codetab
+@Title     = Parameter code table
 
 @BeginDescription
-Prints a table with a description of all variables.
+Prints a code table with a description of all variables.
 For each variable the operator prints one line listing the
 code, name, description and units.
 @EndDescription
@@ -56,7 +56,7 @@ Prints the vertical coordinate table.
 @C Assume an input dataset having three parameters with the names geosp, t and tslm1.
 @C To print the description of these parameters use:
 @C @BeginVerbatim
-@C    cdo pardes ifile
+@C    cdo codetab ifile
 @C @EndVerbatim
 @C Result:
 @C @BeginVerbatim
