@@ -22,6 +22,10 @@
 #include <proj_api.h>
 #endif
 
+#if defined(HAVE_LIBCMOR)
+#include "cmor.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 
@@ -148,6 +152,13 @@ void printLibraries(void)
   fprintf(stderr, " proj");
 #if defined(PJ_VERSION)
   fprintf(stderr, "/%g", PJ_VERSION*0.01);
+#endif
+#endif
+  
+#if defined(HAVE_LIBCMOR)
+  fprintf(stderr, " CMOR");
+#if defined(CMOR_VERSION_MAJOR)
+  fprintf(stderr, "/%u.%u.%u", CMOR_VERSION_MAJOR, CMOR_VERSION_MINOR, CMOR_VERSION_PATCH);
 #endif
 #endif
 
