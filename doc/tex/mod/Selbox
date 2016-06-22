@@ -57,12 +57,12 @@ INTEGER  Index of last latitude
 
 
 @BeginExample
-To select the region with the longitudes from 120E to 90W and latitudes from 20N to 20S from all input fields use:
+To select the region with the longitudes from 30W to 60E and latitudes from 30N to 80S from all input fields use:
 @BeginVerbatim
-   cdo sellonlatbox,120,-90,20,-20 ifile ofile
+   cdo sellonlatbox,-30,60,30,80 ifile ofile
 @EndVerbatim
 If the input dataset has fields on a Gaussian N16 grid, the same box can be selected with @oper{selindexbox} by:
 @BeginVerbatim
-   cdo selindexbox,23,48,13,20 ifile ofile
+   cdo selindexbox,60,11,3,11 ifile ofile
 @EndVerbatim
 @EndExample
