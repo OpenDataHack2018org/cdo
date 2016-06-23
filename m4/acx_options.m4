@@ -233,8 +233,7 @@ AC_ARG_WITH([udunits2],
 #  Link application with CMOR library
 CMOR_LIBS=''
 AC_ARG_WITH([cmor],
-            [AS_HELP_STRING([--with-cmor=<directory>],
-                            [Specify location of CMOR library.])],
+            [AS_HELP_STRING([--with-cmor=<directory>],[Specify location of CMOR library.])],
             [AS_CASE(["$with_cmor"],
                      [no],[AC_MSG_CHECKING([for cmor library])
                            AC_MSG_RESULT([suppressed])],
@@ -245,7 +244,7 @@ AC_ARG_WITH([cmor],
                      [*],[CMOR_ROOT=$with_cmor
                           AS_IF([test -d "$CMOR_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$CMOR_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$CMOR_ROOT/include"
+                                 CPPFLAGS="$CPPFLAGS -I$CMOR_ROOT/include -I$CMOR_ROOT/include/cdTime"
                                  AC_SEARCH_LIBS([cmor_load_table],
                                                 [cmor],
                                                 [AC_DEFINE([HAVE_LIBCMOR],[1],[Define to 1 for CMOR support])],
