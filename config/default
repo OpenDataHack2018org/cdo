@@ -218,13 +218,8 @@ case "${HOSTNAME}" in
 #                 --with-magics=/sw/rhel6-x64/graphics/magicsxx-2.18.15-gfxonly-gcc48 \
 #                 --with-cmor=/sw/rhel6-x64/cmor-2.9.2-shared-gcc48 \
 
-        if  test "$COMP" = icpc ; then
-          ${CONFPATH}configure  --enable-cxx \
-                    --with-fftw3 \
-                    $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
-        elif  test "$COMP" = icc ; then
-          ${CONFPATH}configure \
+        if  test "$COMP" = icc ; then
+          ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
@@ -232,10 +227,6 @@ case "${HOSTNAME}" in
           ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \
 	            CC=pgcc CFLAGS="-g -fast"
-        elif  test "$COMP" = g++ ; then
-	  ${CONFPATH}configure --enable-cxx \
-                    $CDOLIBS \
-	            CC=gcc CXX=g++ CFLAGS="-g -Wall -O3 -march=native"
 	else
           ${CONFPATH}configure --prefix=$HOME/local \
                     --with-fftw3 \
@@ -311,6 +302,18 @@ case "${HOSTNAME}" in
 	;;
       esac
     ;;
+# standard workstations at MPI-M debian jessie
+    mpipc149)
+        ${CONFPATH}configure \
+               --prefix=`pwd`/build \
+               --enable-maintainer-mode \
+               --with-netcdf='/sw/jessie-x64/netcdf-4.3.3.1-gccsys' \
+               --with-hdf5='/sw/jessie-x64/hdf5-1.8.16-gccsys/' \
+               --with-szlib='/sw/jessie-x64/szip-2.1-gccsys' \
+               --with-udunits2='/sw/jessie-x64/udunits-2.2.20-gccsys' \
+               --enable-ruby --enable-swig --enable-python \
+	           CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2" LIBS='-lm  -lpthread '
+        ;;
 # standard workstations at MPI-M x86_64-lenny
     mpipc* )
 	${CONFPATH}configure \
