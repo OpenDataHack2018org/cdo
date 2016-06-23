@@ -19334,7 +19334,7 @@ fi
     UDUNITS_ROOT=$with_udunits2
                           if test -d "$UDUNITS_ROOT"; then :
   LDFLAGS="$LDFLAGS -L$UDUNITS_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include"
+                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include -I$UDUNITS_ROOT/include/udunits2"
                                  for ac_header in udunits2.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "udunits2.h" "ac_cv_header_udunits2_h" "$ac_includes_default"
@@ -19527,7 +19527,7 @@ fi
     CMOR_ROOT=$with_cmor
                           if test -d "$CMOR_ROOT"; then :
   LDFLAGS="$LDFLAGS -L$CMOR_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$CMOR_ROOT/include"
+                                 CPPFLAGS="$CPPFLAGS -I$CMOR_ROOT/include -I$CMOR_ROOT/include/cdTime"
                                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing cmor_load_table" >&5
 $as_echo_n "checking for library containing cmor_load_table... " >&6; }
 if ${ac_cv_search_cmor_load_table+:} false; then :
