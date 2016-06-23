@@ -185,6 +185,12 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   task toDo[:clean] do |t|
     execute("make clean",builder)
   end
+  @_help[:cleanSync] = \
+    "rm target source dir and perform a fresh sync" unless @_help.has_key?(:cleanSync)
+  task toDo[:cleanSync] do |t|
+    execute("cd ; rm -rf #{builder.targetDir}",builder)
+    doSync(builder) if syncSource
+  end
 
   @_help[:checkV] = \
     "run './src/cdo -V' " unless @_help.has_key?(:checkV)
@@ -192,7 +198,7 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
     execute("./src/cdo -V",builder)
   end
 
-  @_help[:showLog] = "show remote config.log file" unless @_help.has_key?(:make)
+  @_help[:showLog] = "show config.log file" unless @_help.has_key?(:make)
   task toDo[:showLog] do |t|
     execute("cat config.log",builder)
   end
