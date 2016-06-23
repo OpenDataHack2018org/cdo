@@ -117,20 +117,27 @@ case "${HOSTNAME}" in
         fi
 	;;
     cdo4windows-cyg)
-        CDOLIBS="--with-netcdf=/usr \
+        CDOLIBS="--with-netcdf=/usr/local \
+                 --with-hdf5=/usr/local \
                  --with-udunits2=/usr \
-                 --with-curl=/usr \
                  --with-proj=/usr"
 
-        if  test "$COMP" = clang ; then
-	  ${CONFPATH}configure  \
+        if  test "$COMP" = g++ ; then
+	  ${CONFPATH}configure --prefix=/usr/local \
+                    --program-suffix=-g++ \
+                    --enable-cxx \
+                    --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=clang CFLAGS="-g -Wall -O2"
+	            CC=g++ CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
+                    LDFLAGS='-L/usr/local/lib' \
+                    LIBS='-lpthread -lm -lcurl -lhdf5_hl -lhdf5 -lz  -lsz -laec -ldl'
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=gcc CFLAGS="-g -Wall -O2"
+	            CC=gcc CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
+                    LDFLAGS='-L/usr/local/lib' \
+                    LIBS='-lpthread -lm -lcurl -lhdf5_hl -lhdf5 -lz  -lsz -laec -ldl'
         fi
 	;;
     daint*)
