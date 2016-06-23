@@ -217,7 +217,7 @@ AC_ARG_WITH([udunits2],
                      [*],[UDUNITS_ROOT=$with_udunits2
                           AS_IF([test -d "$UDUNITS_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$UDUNITS_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include"
+                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include -I$UDUNITS_ROOT/include/udunits2"
                                  AC_CHECK_HEADERS([udunits2.h])
                                  AC_CHECK_HEADERS([udunits2/udunits2.h])
                                  AC_SEARCH_LIBS([ut_parse],
