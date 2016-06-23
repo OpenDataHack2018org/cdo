@@ -8,17 +8,17 @@ require 'parallel'
 require 'logger'
 # configuration {{{ ============================================================
 # load user setting if available
-RC                   = "#{ENV['HOME']}/.rake.json"
-@userConfig          = ( File.exist?(RC) ) ? JSON.load(File.open(RC)) : {}
+RC          = "#{ENV['HOME']}/.rake.json"
+@userConfig = ( File.exist?(RC) ) ? JSON.load(File.open(RC)) : {}
 if @userConfig.empty? then
   warn "No host information!!"
   exit(1)
 end
 # get setup from the environment
-@debug               = Rake.application.options.silent ? false : true
-@user                = ENV['USER']
+@debug      = Rake.application.options.silent ? false : true
+@user       = ENV['USER']
 # internal variables
-@_help = {}
+@_help      = {}
 # }}}
 
 # helper methods {{{ ===========================================================
@@ -55,16 +55,20 @@ end
 # stdout is shown in debug mode only
 # stderr is always shown
 def executeRemote(command, builder)
-  Net::SSH.start(builder.hostname,builder.username) do |ssh|
+  Net::SSH.start(builder.hostname,builder.username,
+                 :config => true, :compression => true) do |ssh|
+
     stdout_data = ""
     stderr_data = ""
-    exit_code = nil
+    exit_code   = nil
     exit_signal = nil
+
     ssh.open_channel do |channel|
       channel.exec(command) do |ch, success|
         unless success
           raise "FAILED: couldn't execute command #{command}"
         end
+
         channel.on_data do |ch, data|
           stdout_data += data
           $stdout.write(data) if @debug
@@ -90,19 +94,19 @@ end
 #
 # execution wrapper
 def execute(command, builder)
-  # work in the target directory, ONLY
-  command = ["test -f /etc/profile && source /etc/profile",
-             "test -f .profile && source .profile",
-             "test ! -d #{builder.targetDir} && mkdir -p #{builder.targetDir}",
+  # 1)work in the target directory, ONLY
+  # 2)load the user given config files for environment setup
+  commands = (builder.envConfigFiles.map {|rcfile| "test -f #{rcfile} && source #{rcfile}"} +
+            ["test ! -d #{builder.targetDir} && mkdir -p #{builder.targetDir}",
              "cd #{builder.targetDir}",
-             command].join(';')
+             command]).join(';')
 
-  dbg(command)
+  dbg(commands)
 
   if builder.isLocal? then
-    executeLocal(command)
+    executeLocal(commands)
   else
-    executeRemote(command,builder)
+    executeRemote(commands,builder)
   end
 end
 #
@@ -229,7 +233,7 @@ def getUsername(builderConfig, hostConfig)
   exit(1)
 end
 # constuct builders out of user configuration {{{ ==============================
-Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?,:docstring)
+Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?,:docstring,:envConfigFiles)
 # 1) construct builders from host configuration
 #    this is what config/default should be able to handle
 @userConfig["hosts"].each {|host,config|
@@ -245,7 +249,8 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                           [config["dir"],cc,getBranchName].join(File::SEPARATOR),
                           "./config/default CC=#{cc}",
                           config["hostname"] == 'localhost',
-                         "builder on #{config['hostname']}, CC=#{cc}")
+                         "builder on #{config['hostname']}, CC=#{cc}",
+                          config.has_key?("envConfigFiles") ? config["envConfigFiles"] : [])
 
     builder2task(builder)
   } if config.has_key?('CC')
@@ -275,7 +280,8 @@ Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCa
                         [builderConfig['hostname'],hostConfig['hostname']].include?('localhost'),
                         builderConfig.has_key?('docstring') \
                           ? builderConfig['docstring'] \
-                          : "builder on #{builderConfig['hostname']}: #{builderConfig['configureCall']}")
+                          : "builder on #{builderConfig['hostname']}: #{builderConfig['configureCall']}",
+                        builderConfig.has_key?("envConfigFiles") ? builderConfig["envConfigFiles"] : [])
 
   builder2task(builder,true, builderConfig['sync'])
 
@@ -330,13 +336,5 @@ task :checkConnections do |t|
       end
     end
   }
-end
-# }}}
-#
-# check internals {{{
-task :checkInterals do
-  dbg(@srcDir)
-  dbg(getBranchName)
-  dbg(syncFileList) if false
 end
 # }}}
