@@ -2,6 +2,7 @@
     "thunder": {
       "hostname": "thunder5.zmaw.de",
       "dir": "/scratch/mpi/CC/mh0287/users/m300064/builds/remote",
+      "envConfigFiles": ["/etc/profile",".profile"],
       "CC": ["icpc", "icc", "clang", "clang++", "gcc", "g++"]
     },
     "luthien": {
@@ -12,11 +13,13 @@
     "mpipc": {
       "hostname": "mpipc150.mpi.zmaw.de",
       "dir": "/scratch/local1/m300064/builds/remote",
+      "envConfigFiles": ["/etc/profile",".profile"],
       "CC": ["gcc"]
     },
     "mistral": {
       "hostname": "mistral.dkrz.de",
       "dir": "/work/mh0287/users/ralf/builds/remote",
+      "envConfigFiles": ["/etc/profile",".profile"],
       "CC": ["gcc","g++","icc","icpc"]
     },
     "cygwin": {
@@ -38,6 +41,7 @@
     "ubuntu-32bit": {
       "hostname": "cdo4windows-ubuntu.mpimet.mpg.de",
       "dir": "/home/mpimet/build/cdo",
+      "envConfigFiles": ["/etc/profile",".profile"],
       "username":"mpimet"
     }
   },
