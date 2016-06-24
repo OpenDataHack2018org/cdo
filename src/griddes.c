@@ -1859,25 +1859,21 @@ int gridFromName(const char *gridname)
 
 int cdoDefineGrid(const char *gridfile)
 {
-  FILE *gfp;
-  char buffer[4];
   int gridID = -1;
   size_t len;
-  struct stat filestat;
-  int fileno;
-  int isreg = FALSE;
-  int lalloc = FALSE;
-  char *filename;
+  bool isreg = false;
+  bool lalloc = false;
 
-  filename = expand_filename(gridfile);
+  char *filename = expand_filename(gridfile);
   if ( filename )
-    lalloc = TRUE;
+    lalloc = true;
   else
     filename =  (char *) gridfile;
 
-  fileno = open(filename, O_RDONLY);
+  int fileno = open(filename, O_RDONLY);
   if ( fileno >= 0 )
     {
+      struct stat filestat;
       if ( fstat(fileno, &filestat) == 0 )
 	isreg = S_ISREG(filestat.st_mode);
     }
@@ -1892,6 +1888,7 @@ int cdoDefineGrid(const char *gridfile)
     }
   else
     {
+      char buffer[4];
       if ( read(fileno, buffer, 4) != 4 )
 	SysError("Read grid from %s failed!", filename);
 
@@ -1923,15 +1920,13 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( gridID == -1 )
 	{
-	  int streamID;
 	  if ( cdoDebug ) cdoPrint("Grid from CDI file");
 	  openLock();
-	  streamID = streamOpenRead(filename);
+	  int streamID = streamOpenRead(filename);
 	  openUnlock();
 	  if ( streamID >= 0 )
 	    {
-	      int vlistID;
-	      vlistID = streamInqVlist(streamID);
+	      int vlistID = streamInqVlist(streamID);
 	      gridID  = vlistGrid(vlistID, 0);
 	      streamClose(streamID);
 	    }
@@ -1940,7 +1935,7 @@ int cdoDefineGrid(const char *gridfile)
       if ( gridID == -1 )
 	{
 	  if ( cdoDebug ) cdoPrint("grid from ASCII file");
-	  gfp = fopen(filename, "r");
+	  FILE *gfp = fopen(filename, "r");
 	  //size_t buffersize = 20*1024*1024;
 	  //char *buffer = (char*) Malloc(buffersize);
 	  //setvbuf(gfp, buffer, _IOFBF, buffersize);
@@ -1952,7 +1947,7 @@ int cdoDefineGrid(const char *gridfile)
       if ( gridID == -1 )
 	{
 	  if ( cdoDebug ) cdoPrint("grid from PINGO file");
-	  gfp = fopen(filename, "r");
+	  FILE *gfp = fopen(filename, "r");
 	  gridID = gridFromPingo(gfp, filename);
 	  fclose(gfp);
 	}

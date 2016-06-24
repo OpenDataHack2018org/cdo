@@ -96,22 +96,19 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == SETGRIDAREA )
     {
-      int streamID, vlistID, gridID;
-      char *areafile;
-
       operatorCheckArgc(1);
-      areafile = operatorArgv()[0];
+      char *areafile = operatorArgv()[0];
 
       argument_t *fileargument = file_argument_new(areafile);
-      streamID = streamOpenRead(fileargument);
+      int streamID = streamOpenRead(fileargument);
       file_argument_free(fileargument);
 
-      vlistID = streamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
       nrecs = streamInqTimestep(streamID, 0);
       streamInqRecord(streamID, &varID, &levelID);
 
-      gridID = vlistInqVarGrid(vlistID, varID);
+      int gridID = vlistInqVarGrid(vlistID, varID);
       areasize = gridInqSize(gridID);
       areaweight = (double*) Malloc(areasize*sizeof(double));
   
@@ -121,11 +118,9 @@ void *Setgrid(void *argument)
 
       if ( cdoVerbose )
 	{
-	  double arrmean, arrmin, arrmax;
-
-	  arrmean = areaweight[0];
-	  arrmin  = areaweight[0];
-	  arrmax  = areaweight[0];
+	  double arrmean = areaweight[0];
+	  double arrmin  = areaweight[0];
+	  double arrmax  = areaweight[0];
 	  for ( i = 1; i < areasize; i++ )
 	    {
 	      if ( areaweight[i] < arrmin ) arrmin = areaweight[i];
@@ -139,23 +134,19 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == SETGRIDMASK )
     {
-      int streamID, vlistID, gridID;
-      char *maskfile;
-      double missval;
-
       operatorCheckArgc(1);
-      maskfile = operatorArgv()[0];
+      char *maskfile = operatorArgv()[0];
       argument_t *fileargument = file_argument_new(maskfile);
-      streamID = streamOpenRead(fileargument);
+      int streamID = streamOpenRead(fileargument);
       file_argument_free(fileargument);
 
-      vlistID = streamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
       nrecs = streamInqTimestep(streamID, 0);
       streamInqRecord(streamID, &varID, &levelID);
 
-      missval  = vlistInqVarMissval(vlistID, varID);
-      gridID   = vlistInqVarGrid(vlistID, varID);
+      double missval  = vlistInqVarMissval(vlistID, varID);
+      int gridID   = vlistInqVarGrid(vlistID, varID);
       masksize = gridInqSize(gridID);
       gridmask = (double*) Malloc(masksize*sizeof(double));
   
