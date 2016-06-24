@@ -147,7 +147,7 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   toDo         = lambda {|what| "#{baseTaskName}_#{what}".to_sym}
 
   if syncSource then
-    @_help[:sync] = "sync files for host: #{builder.host}, branch: #{getBranchName}" unless @_help.has_key?(:sync)
+    @_help[:sync] = "sync source files " unless @_help.has_key?(:sync)
     task toDo[:sync] do |t|
       dbg("sync source  code for branch:" + getBranchName)
       doSync(builder)
@@ -155,37 +155,50 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
   end
 
   @_help[:conf]= \
-    "configure on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:conf)
+    "run configure on host: ./config/default with user settings activated" unless @_help.has_key?(:conf)
   task toDo[:conf] do |t|
     dbg("call #{builder.configureCall}")
     execute("#{builder.configureCall}",builder)
   end
 
   @_help[:make] = \
-    "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:make)
+    "run 'make'" unless @_help.has_key?(:make)
   task toDo[:make].to_sym do |t|
     execute("make -j4",builder)
   end
 
   @_help[:check] = \
-    "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:check)
+    "run 'make check'" unless @_help.has_key?(:check)
   task toDo[:check] do |t|
     execute("make check",builder)
   end
 
+  @_help[:checkSerial] = \
+    "check with serialized IO (-L option)" unless @_help.has_key?(:checkSerial)
+  task toDo[:checkSerial] do |t|
+    execute("make check CDO='#{builder.targetDir}/src/cdo -L'",builder)
+  end
+
+
   @_help[:clean] = \
-    "build on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:clean)
+    "run 'make clean'" unless @_help.has_key?(:clean)
   task toDo[:clean] do |t|
     execute("make clean",builder)
   end
+  @_help[:cleanSync] = \
+    "rm target source dir and perform a fresh sync" unless @_help.has_key?(:cleanSync)
+  task toDo[:cleanSync] do |t|
+    execute("cd ; rm -rf #{builder.targetDir}",builder)
+    doSync(builder) if syncSource
+  end
 
   @_help[:checkV] = \
-    "check on host: %s, compiler %s, branch: %s" % [builder.host, builder.compiler, getBranchName] unless @_help.has_key?(:checkV)
+    "run './src/cdo -V' " unless @_help.has_key?(:checkV)
   task toDo[:checkV] do |t|
     execute("./src/cdo -V",builder)
   end
 
-  @_help[:showLog] = "show remote config.log file" unless @_help.has_key?(:make)
+  @_help[:showLog] = "show config.log file" unless @_help.has_key?(:make)
   task toDo[:showLog] do |t|
     execute("cat config.log",builder)
   end
