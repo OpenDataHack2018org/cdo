@@ -1483,7 +1483,21 @@ static
 void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
   int gridtype = GRID_LONLAT;
-  int lbounds = TRUE;
+  bool lbounds = true;
+
+  if ( *pline != 0 && (*pline == '+' || *pline == '-') && (isdigit((int) *(pline+1)) || ispunct((int) *(pline+1))) )
+    {
+      char *endptr = (char *) pline;
+      double off = strtod(pline, &endptr);
+      pline = endptr;
+      
+      lon1 -= off;
+      lon2 += off;
+      lat1 -= off;
+      lat2 += off;
+      if ( lat1 < -90 ) lat1 = -90;
+      if ( lat2 >  90 ) lat2 =  90;
+    }
 
   if ( *pline != 0 )
     {
@@ -1509,7 +1523,7 @@ void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1
               pline++;
               if ( *pline == '0' )
                 {
-                  lbounds = FALSE;
+                  lbounds = false;
                   pline++;
                 }
             }
@@ -1519,7 +1533,7 @@ void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1
               pline++;
               if ( *pline == '0' )
                 {
-                  lbounds = FALSE;
+                  lbounds = false;
                   pline++;
                 }
             }
@@ -1530,6 +1544,9 @@ void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1
     }
 
   grid->type = gridtype;
+
+  if ( lon1 >= lon2 || lat1 >= lat2 )
+    cdoAbort("Invalid grid box: lon1=%g lon2=%g lat1=%g lat2=%g", lon1, lon2, lat1, lat2);
 
   int nlon = (int) ((lon2 - lon1)/inc + 0.5);
   int nlat = (int) ((lat2 - lat1)/inc + 0.5);
