@@ -579,8 +579,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
     {
       nce(nc_inq_dimlen(nc_file_id, nc_srcgrdcorn_id, &dimlen));
       src_grid->num_cell_corners = dimlen;
-      src_grid->luse_cell_corners = TRUE;
-      src_grid->lneed_cell_corners = TRUE;
+      src_grid->luse_cell_corners = true;
+      src_grid->lneed_cell_corners = true;
     }
 
   status = nc_inq_dimid(nc_file_id, "dst_grid_corners", &nc_dstgrdcorn_id);
@@ -588,8 +588,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
     {
       nce(nc_inq_dimlen(nc_file_id, nc_dstgrdcorn_id, &dimlen));
       tgt_grid->num_cell_corners = dimlen;
-      tgt_grid->luse_cell_corners = TRUE;
-      tgt_grid->lneed_cell_corners = TRUE;
+      tgt_grid->luse_cell_corners = true;
+      tgt_grid->lneed_cell_corners = true;
     }
 
   nce(nc_inq_dimid(nc_file_id, "src_grid_rank", &nc_srcgrdrank_id));

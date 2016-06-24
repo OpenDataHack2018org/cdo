@@ -155,8 +155,8 @@ void remapgrid_init(remapgrid_t *grid)
   grid->num_srch_bins    = remap_num_srch_bins; // only for source grid ?
 
   grid->num_cell_corners = 0;
-  grid->luse_cell_corners  = FALSE;
-  grid->lneed_cell_corners = FALSE;
+  grid->luse_cell_corners  = false;
+  grid->lneed_cell_corners = false;
 
   grid->nvgp             = 0;
   grid->vgpm             = NULL;
@@ -263,7 +263,7 @@ void boundbox_from_corners(long size, long nc, const double *restrict corner_lon
 }
 
 static
-void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny, const double *restrict center_lon,
+void boundbox_from_center(bool lonIsCyclic, long size, long nx, long ny, const double *restrict center_lon,
 			  const double *restrict center_lat, restr_t *restrict bound_box)
 {
   long n4, i, j, k, ip1, jp1;
@@ -289,10 +289,7 @@ void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny, const do
       else
 	{
 	  /* 2009-01-09 Uwe Schulzweida: bug fix */
-	  if ( lonIsCyclic )
-	    ip1 = 0;
-	  else
-	    ip1 = i;
+	  ip1 = lonIsCyclic ? 0 : i;
 	}
 
       if ( j < (ny-1) )
@@ -674,7 +671,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 	  grid->nvgp = gridInqSize(gridID_gme);
 	  gridID = gridDuplicate(gridID_gme);
 	  gridCompress(gridID);
-	  grid->luse_cell_corners = TRUE;
+	  grid->luse_cell_corners = true;
 	}
       else if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
@@ -694,7 +691,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
       if ( grid->dims[1] == 0 ) cdoAbort("%s grid without latitude coordinates!", gridNamePtr(gridInqType(grid->gridID)));
     }
 
-  grid->is_cyclic = gridIsCircular(gridID);
+  grid->is_cyclic = gridIsCircular(gridID) ? true : false;
 
   if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
     grid->rank = 1;
@@ -847,7 +844,7 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 }
 
 
-void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid)
+void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid)
 {
   int lbounds = TRUE;
   int reg2d_src_gridID = gridID1;
@@ -876,23 +873,23 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
       if ( map_type == MAP_TYPE_BILINEAR && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
 
-  if ( lextrapolate > 0 )
-    src_grid->lextrapolate = TRUE;
+  if ( lextrapolate )
+    src_grid->lextrapolate = true;
   else
-    src_grid->lextrapolate = FALSE;
+    src_grid->lextrapolate = false;
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
     {
       if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
-	  src_grid->luse_cell_corners  = TRUE;
-	  src_grid->lneed_cell_corners = TRUE;
+	  src_grid->luse_cell_corners  = true;
+	  src_grid->lneed_cell_corners = true;
 	}
 
       if ( tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
-	  tgt_grid->luse_cell_corners  = TRUE;
-	  tgt_grid->lneed_cell_corners = TRUE;
+	  tgt_grid->luse_cell_corners  = true;
+	  tgt_grid->lneed_cell_corners = true;
 	}
     }
 

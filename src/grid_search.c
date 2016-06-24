@@ -74,7 +74,7 @@ void gridsearch_set_method(const char *methodstr)
 }
 
 
-struct gridsearch *gridsearch_create_reg2d(unsigned lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats)
+struct gridsearch *gridsearch_create_reg2d(bool lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats)
 {
   struct gridsearch *gs = (struct gridsearch *) Calloc(1, sizeof(struct gridsearch));
 

@@ -257,9 +257,9 @@ int remap_test = 0;
 int remap_order = 1;
 int remap_non_global = FALSE;
 int remap_num_srch_bins = 180;
-int lremap_num_srch_bins = FALSE;
-int remap_extrapolate = FALSE;
-int lextrapolate = FALSE;
+static bool lremap_num_srch_bins = false;
+static bool remap_extrapolate = false;
+static bool lextrapolate = false;
 int max_remaps = -1;
 int sort_mode = HEAP_SORT;
 double remap_frac_min = 0;
@@ -420,7 +420,7 @@ void get_remap_env(void)
       if ( ival > 0 )
 	{
 	  remap_num_srch_bins = ival;
-	  lremap_num_srch_bins = TRUE;
+	  lremap_num_srch_bins = true;
 	  if ( cdoVerbose )
 	    cdoPrint("Set REMAP_NUM_SRCH_BINS to %d", remap_num_srch_bins);
 	}
@@ -463,22 +463,22 @@ void get_remap_env(void)
 	{
 	  if ( memcmp(envstr, "ON", 2) == 0 || memcmp(envstr, "on", 2) == 0 )
 	    {
-	      lextrapolate = TRUE;
-	      remap_extrapolate = TRUE;
+	      lextrapolate = true;
+	      remap_extrapolate = true;
 	    }
 	  else if ( memcmp(envstr, "OFF", 3) == 0 || memcmp(envstr, "off", 3) == 0 )
 	    {
-	      lextrapolate = TRUE;
-	      remap_extrapolate = FALSE;
+	      lextrapolate = true;
+	      remap_extrapolate = false;
 	    }
 	  else
 	    cdoWarning("Environment variable REMAP_EXTRAPOLATE has wrong value!");
 
 	  if ( cdoVerbose )
 	    {
-	      if ( remap_extrapolate == TRUE )
+	      if ( remap_extrapolate )
 		cdoPrint("Extrapolation enabled!");
-	      else if ( remap_extrapolate == FALSE )
+	      else
 		cdoPrint("Extrapolation disabled!");
 	    }
 	}
@@ -504,7 +504,7 @@ void get_remap_env(void)
 	    {
 	      if ( remap_genweights == TRUE )
 		cdoPrint("Generation of weights enabled!");
-	      else if ( remap_genweights == FALSE )
+	      else
 		cdoPrint("Generation of weights disabled!");
 	    }
 	}
@@ -822,15 +822,15 @@ void *Remap(void *argument)
 
   if ( operfunc == REMAPDIS || operfunc == GENDIS ||
        operfunc == REMAPNN  || operfunc == GENNN )
-    remap_extrapolate = TRUE;
+    remap_extrapolate = true;
 
   get_remap_env();
 
   if ( cdoVerbose )
     {
-      if ( remap_extrapolate == TRUE )
+      if ( remap_extrapolate )
 	cdoPrint("Extrapolation enabled!");
-      else if ( remap_extrapolate == FALSE )
+      else
 	cdoPrint("Extrapolation disabled!");
     }
 
@@ -908,13 +908,13 @@ void *Remap(void *argument)
       remaps[0].gridID   = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
 
-      if ( map_type == MAP_TYPE_DISTWGT && !lextrapolate ) remap_extrapolate = TRUE;
-      if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = TRUE;
+      if ( map_type == MAP_TYPE_DISTWGT && !lextrapolate ) remap_extrapolate = true;
+      if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = true;
 
       if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&  !is_global_grid(gridID1) )
 	{
 	  remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
-	  remaps[0].src_grid.non_global = TRUE;
+	  remaps[0].src_grid.non_global = true;
 	}
 
       if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].src_grid.nvgp;
@@ -1031,7 +1031,7 @@ void *Remap(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
 
-	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
+	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = true;
 	  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
 	    {
 	      int gridsize_new;
@@ -1113,17 +1113,17 @@ void *Remap(void *argument)
 
 	      if ( remaps[r].gridID != gridID1 )
 		{
-		  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
-		  remaps[r].src_grid.non_global = FALSE;
+		  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = true;
+		  remaps[r].src_grid.non_global = false;
 		  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
 		    {
-		      remaps[r].src_grid.non_global = TRUE;
+		      remaps[r].src_grid.non_global = true;
 		    }
 		  /*
 		    remaps[r].src_grid.luse_cell_area = FALSE;
 		    remaps[r].tgt_grid.luse_cell_area = FALSE;
 		  */
-		  if ( gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == FALSE )
+		  if ( gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == false )
 		    {
 		      if ( !remap_extrapolate && map_type == MAP_TYPE_DISTWGT )
 			{

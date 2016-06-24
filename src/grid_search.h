@@ -1,6 +1,7 @@
 #ifndef _GRID_SEARCH_H_
 #define _GRID_SEARCH_H_
 
+#include <stdbool.h>
 #include <limits.h>
 #include "kdtreelib/kdtree.h"
 #include "nearpt3c.h"
@@ -56,7 +57,7 @@ struct gsknn *gridsearch_knn_new(unsigned size);
 void gridsearch_knn_delete(struct gsknn *knn);
 int gridsearch_knn(struct gridsearch *gs, struct gsknn *knn, double plon, double plat);
 
-struct gridsearch *gridsearch_create_reg2d(unsigned lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
+struct gridsearch *gridsearch_create_reg2d(bool lcyclic, unsigned nx, unsigned ny, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create(unsigned n, const double *restrict lons, const double *restrict lats);
 struct gridsearch *gridsearch_create_nn(unsigned n, const double *restrict lons, const double *restrict lats);
 void gridsearch_delete(struct gridsearch *gs);

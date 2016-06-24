@@ -374,7 +374,7 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
   unsigned tgt_grid_size = tgt_grid->size;
   unsigned nx = src_grid->dims[0];
   unsigned ny = src_grid->dims[1];
-  unsigned lcyclic = src_grid->is_cyclic;
+  bool lcyclic = src_grid->is_cyclic;
 
   weightlinks_t *weightlinks = (weightlinks_t *) Malloc(tgt_grid_size*sizeof(weightlinks_t));
   weightlinks[0].addweights = (addweight_t *) Malloc(num_neighbors*tgt_grid_size*sizeof(addweight_t));
@@ -482,7 +482,7 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
   unsigned tgt_grid_size = tgt_grid->size;
   unsigned nx = src_grid->dims[0];
   unsigned ny = src_grid->dims[1];
-  unsigned lcyclic = src_grid->is_cyclic;
+  bool lcyclic = src_grid->is_cyclic;
 
   int nbr_mask[num_neighbors];    // mask at nearest neighbors
   int nbr_add[num_neighbors];     // source address at nearest neighbors

@@ -73,16 +73,18 @@ typedef RESTR_TYPE restr_t;
 
 
 typedef struct {
-  int      lwrite_remap;
   int      gridID;
-  int      store_link_fast;
   int      remap_grid_type;
-  int      lextrapolate;
-  int      non_global;
-  int      is_cyclic;
   int      rank;                  /* rank of the grid */
   long     size;                  /* total points on the grid */
   long     num_cell_corners;      /* number of corners for each grid cell */
+
+  bool     lneed_cell_corners;
+  bool     luse_cell_corners;     /* use corners for bounding boxes  */
+
+  bool     lextrapolate;
+  bool     non_global;
+  bool     is_cyclic;
 
   int      dims[2];               /* size of grid dimension */
 
@@ -103,9 +105,6 @@ typedef struct {
 
   double*  cell_area;             /* tot area of each grid cell     */
   double*  cell_frac;             /* fractional area of grid cells participating in remapping  */
-
-  int      lneed_cell_corners;
-  int      luse_cell_corners;     /* use corners for bounding boxes  */
 
   restr_t *cell_bound_box;        /* lon/lat bounding box for use    */
 
@@ -168,7 +167,7 @@ void remap_set_threshhold(double threshhold);
 void remap_set_int(int remapvar, int value);
 
 
-void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid);
+void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid);
 void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remapvars_t *rv);
 
 void remapVarsFree(remapvars_t *rv);
