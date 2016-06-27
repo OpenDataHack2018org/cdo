@@ -5,13 +5,22 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = codetab griddes zaxisdes vct
+@Operators = partab codetab griddes zaxisdes vct
 
 @BeginDescription
-This module prints the description of the parameters, the grids,
-the z-axis or the vertical coordinate table.
+This module provides operators to print meta information about a dataset.
+The printed meta-data depends on the chosen operator.
 @EndDescription
 @EndModule
+
+
+@BeginOperator_partab
+@Title     = Parameter table
+
+@BeginDescription
+Prints all available meta information of the variables.
+@EndDescription
+@EndOperator
 
 
 @BeginOperator_codetab

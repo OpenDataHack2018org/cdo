@@ -33,6 +33,7 @@ Operator catalog:
    Showinfo      showdate        Show date information
    Showinfo      showtime        Show time information
    Showinfo      showtimestamp   Show timestamp
+   Filedes       partab          Parameter table
    Filedes       codetab         Parameter code table
    Filedes       griddes         Grid description
    Filedes       zaxisdes        Z-axis description
