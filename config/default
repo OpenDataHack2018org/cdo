@@ -321,7 +321,7 @@ case "${HOSTNAME}" in
           ${CONFPATH}configure \
             $CDOLIBS \
             --enable-cxx \
-            CC=gcc CXX=g++ CFLAGS="-std=c99 -g -Wall -W -Wfloat-equal -pedantic -O2" LIBS='-lm  -lpthread '
+            CC=gcc CXX=g++ CFLAGS="-std=c++11 -g -Wall -W -Wfloat-equal -pedantic -O2" LIBS='-lm  -lpthread '
           ;;
         clang)
           ${CONFPATH}configure \
