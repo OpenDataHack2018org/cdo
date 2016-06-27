@@ -304,16 +304,40 @@ case "${HOSTNAME}" in
     ;;
 # standard workstations at MPI-M debian jessie
     mpipc149)
-        ${CONFPATH}configure \
-               --prefix=`pwd`/build \
-               --enable-maintainer-mode \
-               --with-netcdf='/sw/jessie-x64/netcdf-4.3.3.1-gccsys' \
-               --with-hdf5='/sw/jessie-x64/hdf5-1.8.16-gccsys/' \
-               --with-szlib='/sw/jessie-x64/szip-2.1-gccsys' \
-               --with-udunits2='/sw/jessie-x64/udunits-2.2.20-gccsys' \
-               --enable-ruby --enable-swig --enable-python \
-	           CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2" LIBS='-lm  -lpthread '
+      CDOLIBS="--prefix=`pwd`/build \
+              --enable-maintainer-mode \
+              --with-netcdf=/sw/jessie-x64/netcdf-4.3.3.1-gccsys \
+              --with-hdf5=/sw/jessie-x64/hdf5-1.8.16-gccsys/ \
+              --with-szlib=/sw/jessie-x64/szip-2.1-gccsys \
+              --with-udunits2=/sw/jessie-x64/udunits-2.2.20-gccsys \
+              --enable-ruby --enable-swig --enable-python "
+      case "$COMP" in
+        gcc)
+          ${CONFPATH}configure \
+            $CDOLIBS \
+            CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2" LIBS='-lm  -lpthread '
+          ;;
+        g++) # jessie used gcc 6.1.1
+          ${CONFPATH}configure \
+            $CDOLIBS \
+            --enable-cxx \
+            CC=gcc CXX=g++ CFLAGS="-std=c99 -g -Wall -W -Wfloat-equal -pedantic -O2" LIBS='-lm  -lpthread '
+          ;;
+        clang)
+          ${CONFPATH}configure \
+            $CDOLIBS \
+            --disable-openmp \
+            CC=/sw/jessie-x64/util/clang+llvm-3.8.0/bin/clang CXX=/sw/jessie-x64/util/clang+llvm-3.8.0/bin/clang++
         ;;
+        clang++) # recent clang-3.8
+          ${CONFPATH}configure \
+            $CDOLIBS \
+            --disable-openmp \
+            --enable-cxx \
+            CC=/sw/jessie-x64/util/clang+llvm-3.8.0/bin/clang CXX=/sw/jessie-x64/util/clang+llvm-3.8.0/bin/clang++
+        ;;
+      esac
+      ;;
 # standard workstations at MPI-M x86_64-lenny
     mpipc* )
 	${CONFPATH}configure \
