@@ -60,7 +60,7 @@ double percentile_numpy(double *array, int len, double pn)
           int irank = 0;
           if      ( interpolation_method == LOWER   ) irank = (int) floor(rank);
           else if ( interpolation_method == HIGHER  ) irank = (int) ceil(rank);
-          else if ( interpolation_method == NEAREST ) irank = (int) round(rank);
+          else if ( interpolation_method == NEAREST ) irank = (int) lround(rank);
           // numpy is using around(), with rounds to the nearest even value
 
           if ( irank <   1 ) irank = 1;

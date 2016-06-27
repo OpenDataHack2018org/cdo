@@ -3,6 +3,11 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-06-27  Uwe Schulzweida
+
+	* round doesn't work as expected, replaced by lround()
+	* nint, expr(nint()): replace round by lround() (bug fix)
+
 2016-06-21  Uwe Schulzweida
 
 	* Renamed operator setpartab to setcodetab

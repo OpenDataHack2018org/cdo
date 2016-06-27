@@ -147,7 +147,7 @@ void farround(field_t *field)
   int len = gridInqSize(grid);
 
   for ( int i = 0; i < len; i++ ) 
-    array[i] = round(array[i]);
+    array[i] = (double)lround(array[i]);
 
   field->nmiss = 0;
   for ( int i = 0; i < len; i++ )

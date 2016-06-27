@@ -59,7 +59,7 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 #define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
 static double f_int(double x)          { return (int)(x); }
-static double f_nint(double x)         { return round(x); }
+static double f_nint(double x)         { return (double)lround(x); }
 static double f_sqr(double x)          { return x*x;      }
 static double f_rad(double x)          { return x*M_PI/180.; }
 static double f_deg(double x)          { return x*180./M_PI; }
