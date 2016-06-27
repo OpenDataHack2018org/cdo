@@ -44,21 +44,10 @@
 void *Math(void *argument)
 {
   enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI};
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
-  int gridsize;
-  int nrecs, recID;
-  int tsID;
+  int nrecs;
   int varID, levelID;
-  int vlistID1, vlistID2;
   int nmiss, nmiss2;
   int i;
-  int number;
-  double missval1;
-  double *array1, *array2;
-  double rc = 0;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
@@ -79,49 +68,50 @@ void *Math(void *argument)
   cdoOperatorAdd("pow",   POW,   0, NULL);
   cdoOperatorAdd("reci",  RECI,  0, NULL);
  
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
+  double rc = 0;
   if ( operfunc == POW )
     {
       operatorInputArg("value");
       rc = parameter2double(operatorArgv()[0]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
 
-	  missval1 = vlistInqVarMissval(vlistID1, varID);
+	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-          number   = vlistInqVarNumber(vlistID1, varID);
+          int number   = vlistInqVarNumber(vlistID1, varID);
 
           if ( number == CDI_REAL )
             {
