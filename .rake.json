@@ -20,7 +20,7 @@
       "hostname": "mpipc149.mpi.zmaw.de",
       "dir": "/scratch/local1/m300064/builds/remote",
       "envConfigFiles": ["/etc/profile",".profile"],
-      "CC": ["gcc"]
+      "CC": ["gcc","g++","clang","clang++"]
     },
     "mistral": {
       "hostname": "mistral.dkrz.de",
@@ -82,7 +82,7 @@
     "localGCC": {
       "doc": "local builder with default GCC - VPATH build",
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --enable-openmp CC=gcc CFLAGS='-g -O2'",
+      "configureCall": "/home/ram/src/cdo/configure --enable-openmp --with-grib_api --with-netcdf --with-hdf5 --with-proj --with-udunits2 CC=gcc CFLAGS='-g -O2'",
       "makeCall": "make -j 12",
       "sync": false
     },
