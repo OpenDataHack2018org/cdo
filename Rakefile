@@ -220,6 +220,7 @@ def builder2task(builder,useHostAsName=false,syncSource=true)
     sh "finished".colorize(color: :green)
   end
 
+  # this is the mail task to be executed: sync, conf, make, check
   desc builder.docstring
   task baseTaskName.to_sym  => [syncSource ? toDo[:sync] : nil,
                                 toDo[:conf],
@@ -249,6 +250,7 @@ end
 Builder = Struct.new(:host,:hostname,:username,:compiler,:targetDir,:configureCall,:isLocal?,:docstring,:envConfigFiles)
 # 1) construct builders from host configuration
 #    this is what config/default should be able to handle
+#    CC must be given, otherwise it's just a host description
 @userConfig["hosts"].each {|host,config|
   config['CC'].each {|cc|
     builder = Builder.new(host,
@@ -313,16 +315,15 @@ task :par do |t|
   dbg(taskList)
 
   # execute tasks in parallel
-  Parallel.map(taskList) {|t|
-   sh "xterm -hold -e 'rake #{t}' "
-  }
+  Parallel.map(taskList) {|t| sh "xterm -hold -e 'rake #{t}' " }
 end
 
 desc "show help on all hidden tasks"
 task :help do
   @_help.each {|t,help|
     sep = :log == t ? '.' : '_'
-    puts "rake <host|localTask>#{sep}#{t}".ljust(35,' ') + "# #{help}" }
+    puts "rake <host|localTask>#{sep}#{t}".ljust(35,' ') + "# #{help}"
+  }
 end
 
 task :default do |t|
