@@ -112,7 +112,7 @@ void *Intlevel3d(void *argument)
     nlevi      = nlevel;   /* number of input levels for later use */
     gridsizei  = gridsize; /* horizontal gridsize of input z coordinate */
     nrecs      = streamInqTimestep(streamID0, 0);
-    if (cdoVerbose) cdoPrint("%d records input 3d vertical height\n",nrecs);
+    if (cdoVerbose) cdoPrint("%d records input 3d vertical height",nrecs);
 
     for ( recID = 0; recID < nrecs; recID++ )
       {
@@ -148,7 +148,7 @@ void *Intlevel3d(void *argument)
     nlevo       = nlevel;  /* number of output levels for later use */
     gridsizeo   = gridsize;/* horizontal gridsize of output z coordinate */
     nrecs       = streamInqTimestep(streamID2, 0);
-    if (cdoVerbose) cdoPrint("%d records target 3d vertical height and gridsize %d\n",nrecs,gridsize);
+    if (cdoVerbose) cdoPrint("%d records target 3d vertical height and gridsize %d",nrecs,gridsize);
 
     for ( recID = 0; recID < nrecs; recID++ )
       {
@@ -359,7 +359,7 @@ void *Intlevel3d(void *argument)
               varinterp[varID] = false;
               vardata2[varID]  = vardata1[varID];
               varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
-              if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
+              if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels",varname,nlevel);
             }
           else
             {
@@ -374,7 +374,7 @@ void *Intlevel3d(void *argument)
           varinterp[varID] = false;
           vardata2[varID]  = vardata1[varID];
           varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
-          if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
+          if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels",varname,nlevel);
         }
     }
 

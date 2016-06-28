@@ -162,7 +162,7 @@ void *Ensval(void *argument)
   /* check for identical contents of all ensemble members */
   nvars = vlistNvars(ef[0].vlistID);
   if ( cdoVerbose ) 
-    cdoPrint("nvars %i\n",nvars);
+    cdoPrint("nvars %i",nvars);
 
   for ( fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
@@ -236,7 +236,7 @@ void *Ensval(void *argument)
   }
 
   if ( cdoVerbose ) 
-    cdoPrint(" sum_weights %10.6f\n",sum_weights);
+    cdoPrint(" sum_weights %10.6f",sum_weights);
   
   tsID = 0;
   do

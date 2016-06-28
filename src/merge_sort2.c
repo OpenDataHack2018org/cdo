@@ -104,7 +104,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
 
 #if defined(_OPENMP)
       /*      if ( 0 )
-      	cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i) \n",
+      	cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i)",
 	who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
       */
 #endif

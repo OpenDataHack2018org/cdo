@@ -107,7 +107,7 @@ void *Isosurface(void *argument)
 
   isoval = parameter2double(operatorArgv()[0]);
 
-  if ( cdoVerbose ) cdoPrint("Isoval: %g\n", isoval);
+  if ( cdoVerbose ) cdoPrint("Isoval: %g", isoval);
 
 
   streamID1 = streamOpenRead(cdoStreamName(0));
