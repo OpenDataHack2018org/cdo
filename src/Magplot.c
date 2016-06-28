@@ -952,7 +952,7 @@ int ReadColourTable( char *filepath )
     
   if ( !num_colors )
     {
-      cdoWarning("No colours found in File, proceeding with Standard Colour table!\n");
+      cdoWarning("No colours found in File, proceeding with Standard Colour table!");
       fclose(fp);
       return 1;
     }
@@ -996,7 +996,7 @@ int ReadColourTable( char *filepath )
     
   if( USR_COLOUR_COUNT < num_colors )
     {
-      cdoWarning( " Discarding improper format colours and continuing!\n" );
+      cdoWarning( " Discarding improper format colours and continuing!" );
     }
 
   for ( i = 0; i < num_colors; i++ ) Free(temp_table[i]);
@@ -1024,7 +1024,7 @@ int checkstyle( char *style_in )
       }
       
     if( !found )
-	 cdoWarning( " Style specified with Improper value!\n" );
+	 cdoWarning( " Style specified with Improper value!" );
     
     return 1; 
 }
@@ -1057,7 +1057,7 @@ int checkdevice( char *device_in )
       }
       
     if( !found )
-	 cdoWarning( " Device specified with Improper value!\n" );
+	 cdoWarning( " Device specified with Improper value!" );
     
     return 1; 
 }
@@ -1084,9 +1084,9 @@ int checkprojection( char *projection_in )
       
     if( !found )
       {	
-	 cdoWarning( " Projection specified with Improper value!\n" );
-	 cdoWarning( " Specify one of the following:\n" );
-	 cdoWarning( " cylindrical polar_stereographic polar_north geos meteosat meteosat_57E geos_east lambert EPSG3857 goode collignon mollweide robinson bonne google efas EPSG4326 lambert_north_atlantic mercator cartesian taylor tephigram\n" );
+	 cdoWarning( " Projection specified with Improper value!" );
+	 cdoWarning( " Specify one of the following:" );
+	 cdoWarning( " cylindrical polar_stereographic polar_north geos meteosat meteosat_57E geos_east lambert EPSG3857 goode collignon mollweide robinson bonne google efas EPSG4326 lambert_north_atlantic mercator cartesian taylor tephigram" );
 
       }	
     
@@ -1180,7 +1180,7 @@ void *Magplot(void *argument)
         {
       	  if( nrecs > 1 )
 	    {
-	      cdoWarning("File has more than one variable! Animation creation not possible!!! \n");
+	      cdoWarning("File has more than one variable! Animation creation not possible!!!");
 	      break;
             }
       	  if( tsID % STEP_FREQ )
@@ -1196,7 +1196,7 @@ void *Magplot(void *argument)
           	if( tsID % STEP_FREQ )
 	    	  {
                      tsID++;
-	             cdoWarning("NOT PLOTTING STEP %d!!!\n",tsID);
+	             cdoWarning("NOT PLOTTING STEP %d!!!",tsID);
 	             continue;
 	    	  }
             }

@@ -40,7 +40,7 @@ void *Duplicate(void *argument)
   if      ( operatorArgc()  > 1 ) cdoAbort("Too many arguments!");
   else if ( operatorArgc() == 1 ) ndup = parameter2int(operatorArgv()[0]);
 
-  if ( cdoVerbose ) cdoPrint("ndup = %d\n", ndup);
+  if ( cdoVerbose ) cdoPrint("ndup = %d", ndup);
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

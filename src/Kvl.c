@@ -171,7 +171,7 @@ void *Kvl(void *argument)
       if ( operatorArgc() != 1 ) cdoAbort("Too few arguments!");
       filename = operatorArgv()[0];
 
-      if ( cdoVerbose ) cdoPrint("Parse file: %s\n", filename);
+      if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
       read_cmor_table(filename);
     }
@@ -180,7 +180,7 @@ void *Kvl(void *argument)
       if ( operatorArgc() != 1 ) cdoAbort("Too few arguments!");
       filename = operatorArgv()[0];
 
-      if ( cdoVerbose ) cdoPrint("Parse file: %s\n", filename);
+      if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
       conv_cmor_table(filename);
     }
@@ -189,7 +189,7 @@ void *Kvl(void *argument)
       if ( operatorArgc() != 1 ) cdoAbort("Too few arguments!");
       filename = operatorArgv()[0];
 
-      if ( cdoVerbose ) cdoPrint("Parse file: %s\n", filename);
+      if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
       // conv_partab(filename);
     }

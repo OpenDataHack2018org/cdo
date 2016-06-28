@@ -30,25 +30,16 @@
 
 void *Diff(void *argument)
 {
-  int lhead = TRUE;
-  int i;
-  int varID1, varID2, recID;
-  int ndiff;
-  int code, param;
-  int gridID, zaxisID;
-  int checkrel;
+  bool lhead = true;
   int nrecs, nrecs2;
+  int varID1, varID2;
   int levelID;
-  int dsgn, zero;
   int nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  double absdiff;
   double abslim = 0., abslim2 = 1.e-3, rellim = 1.0;
-  double absm, relm;
-  double missval1, missval2;
 
   cdoInitialize(argument);
 
@@ -60,9 +51,9 @@ void *Diff(void *argument)
   int operatorID = cdoOperatorID();
 
   if ( operatorArgc() >= 1 ) abslim = parameter2double(operatorArgv()[0]);
-  if ( abslim < -1.e33 || abslim > 1.e+33 ) cdoAbort("Abs. limit out of range\n");
+  if ( abslim < -1.e33 || abslim > 1.e+33 ) cdoAbort("Abs. limit out of range!");
   if ( operatorArgc() == 2 ) rellim = parameter2double(operatorArgv()[1]);
-  if ( rellim < -1.e33 || rellim > 1.e+33 ) cdoAbort("Rel. limit out of range\n");
+  if ( rellim < -1.e33 || rellim > 1.e+33 ) cdoAbort("Rel. limit out of range!");
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
   int streamID2 = streamOpenRead(cdoStreamName(1));
@@ -93,36 +84,37 @@ void *Diff(void *argument)
 
       if ( nrecs == 0 || nrecs2 == 0 ) break;
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID1, &levelID);
 	  streamInqRecord(streamID2, &varID2, &levelID);
 
 	  indg += 1;
 
-	  param    = vlistInqVarParam(vlistID1, varID1);
-	  code     = vlistInqVarCode(vlistID1, varID1);
-	  gridID   = vlistInqVarGrid(vlistID1, varID1);
-	  zaxisID  = vlistInqVarZaxis(vlistID1, varID1);
-	  gridsize = gridInqSize(gridID);
-	  missval1 = vlistInqVarMissval(vlistID1, varID1);
-	  missval2 = vlistInqVarMissval(vlistID2, varID2);
+	  int param    = vlistInqVarParam(vlistID1, varID1);
+	  int code     = vlistInqVarCode(vlistID1, varID1);
+	  int gridID   = vlistInqVarGrid(vlistID1, varID1);
+	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID1);
+	  int gridsize = gridInqSize(gridID);
+	  double missval1 = vlistInqVarMissval(vlistID1, varID1);
+	  double missval2 = vlistInqVarMissval(vlistID2, varID2);
 
 	  //checkrel = gridInqType(gridID) != GRID_SPECTRAL;
-          checkrel = TRUE;
+          bool checkrel = true;
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  streamReadRecord(streamID1, array1, &nmiss1);
 	  streamReadRecord(streamID2, array2, &nmiss2);
 
-	  ndiff = 0;
-          absm = 0.0;
-	  relm = 0.0;
-	  dsgn = FALSE;
-          zero = FALSE;
+	  int ndiff = 0;
+	  bool dsgn = false;
+          bool zero = false;
+          double absm = 0.0;
+	  double relm = 0.0;
+          double absdiff;
 
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( int i = 0; i < gridsize; i++ )
 	    {
 	      if ( (DBL_IS_NAN(array1[i]) && !DBL_IS_NAN(array2[i])) ||
 		  (!DBL_IS_NAN(array1[i]) &&  DBL_IS_NAN(array2[i])) )
@@ -138,9 +130,9 @@ void *Diff(void *argument)
 		  absm = MAX(absm, absdiff);
 
 		  if ( array1[i]*array2[i] < 0. )
-		    dsgn = TRUE;
+		    dsgn = true;
 		  else if ( IS_EQUAL(array1[i]*array2[i], 0.) )
-		    zero = TRUE;
+		    zero = true;
 		  else
 		    relm = MAX(relm, absdiff / MAX(fabs(array1[i]), fabs(array2[i])));
 		}
@@ -158,7 +150,7 @@ void *Diff(void *argument)
 		{
 		  if ( lhead )
 		    {
-		      lhead = FALSE;
+		      lhead = false;
 
 		      set_text_color(stdout, BRIGHT, BLACK);
 		      fprintf(stdout, "               Date     Time   Level Gridsize    Miss ");

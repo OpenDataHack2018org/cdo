@@ -125,7 +125,7 @@ void *Select(void *argument)
 
   if ( cdoVerbose )
     for ( int i = 0; i < nsel; ++i )
-      printf("name %d = %s\n", i+1, argnames[i]);
+      cdoPrint("name %d = %s", i+1, argnames[i]);
 
   pml_t *pml = pml_create("SELECT");
 
@@ -354,7 +354,7 @@ void *Select(void *argument)
 	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      int nlevs   = zaxisInqSize(zaxisID);
 	      for ( int levID = 0; levID < nlevs; ++levID )
-		if ( vlistInqFlag(vlistID1, varID, levID) == xresult )
+		if ( vlistInqFlag(vlistID1, varID, levID) == TRUE )
                   {
                     npar++;
                     break;

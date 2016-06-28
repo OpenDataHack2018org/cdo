@@ -68,7 +68,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   if ( nsplit != 2 )
     {
       cdoAbort("Error: splitting into more than two subsegments not allowed\n"
-	     "       in this implementation of merge sort\n");
+	     "       in this implementation of merge sort!");
     }
 
   idx = (long*) Malloc(num_links*sizeof(long));
@@ -88,7 +88,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
       omp_set_nested(1);            
       if ( omp_get_nested() == 0 )
 	cdoWarning("openMP implementation seems to not support nested parallelism.\n"
-	       "Maximum of CPUs used is 2 instead of %i.\n", omp_get_num_threads());
+	       "\tMaximum of CPUs used is 2 instead of %i.\n", omp_get_num_threads());
     }                                    
 #endif
 
@@ -104,7 +104,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
 
 #if defined(_OPENMP)
       /*      if ( 0 )
-      	cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i) \n",
+      	cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i)",
 	who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
       */
 #endif
@@ -221,7 +221,7 @@ void sort_add(long num_links, double *restrict add1)
 	}
 
       if ( i == num_links ) {
-	cdoAbort("Internal problem; link 1 not found!\n");
+	cdoAbort("Internal problem; link 1 not found!");
 	exit(1);
       }
     }
@@ -284,7 +284,7 @@ void sort_add(long num_links, double *restrict add1)
 	}
 
       if ( i == num_links ) {
-	cdoAbort("Internal problem; link 2 not found!\n");
+	cdoAbort("Internal problem; link 2 not found!");
       }
     }
 

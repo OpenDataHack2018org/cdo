@@ -63,9 +63,9 @@ double dayofyear(int calendar, int vdate, int vtime)
   doy += (second+minute*60+hour*3600)/86400.;
 
   if ( cdoVerbose )
-    cdoPrint("%d %d %d %g\n", vdate, vtime, dpy, doy);
+    cdoPrint("vdate, vtime, dpy, doy: %d %d %d %g", vdate, vtime, dpy, doy);
 
-  return (doy);
+  return doy;
 }
 
 

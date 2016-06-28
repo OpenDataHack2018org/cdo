@@ -1195,7 +1195,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		}
 	      else
 		cdoWarning(" Missing value is inside the range of valid values!\n"
-                           " Dataset %s,  Missval: %g,  Range: %g - %g",
+                           "\tDataset %s,  Missval: %g,  Range: %g - %g",
 			   varname, missval, minval, maxval);
 	    }
 	}

@@ -64,7 +64,7 @@ void *Harmonic(void *argument)
   if ( n_out > 9 ) cdoAbort("Maximum number of wave numbers is 9!");
 
   if ( n < 1 || n < 2 * n_out )
-    cdoAbort("The wave length must be positive and smaller than\n"
+    cdoAbort("The wave length must be positive and smaller than "
 	     "2 times the number of requested harmonics (=%d)!", n_out);
 
   streamID1 = streamOpenRead(cdoStreamName(0));

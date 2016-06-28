@@ -46,14 +46,9 @@
 
 void *Selvar(void *argument)
 {
-  int nlevs;
-  int code, tabnum, param, gridID, zaxisID, levID;
-  int grididx, zaxisidx;
-  double level;
   int varID2, levelID2;
-  int recID, varID, levelID;
+  int varID, levelID;
   int *intarr = NULL, nsel = 0;
-  int *selfound = NULL;
   double *fltarr = NULL;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
@@ -62,12 +57,8 @@ void *Selvar(void *argument)
   char zaxistypename[CDI_MAX_NAME];
   char zaxisname[CDI_MAX_NAME];
   char **argnames = NULL;
-  int isel;
-  int i;
-  int gridsize;
   int nmiss;
   int gridnum = 0;
-  double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
 
@@ -90,14 +81,16 @@ void *Selvar(void *argument)
   int SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 4|2, "list of zaxis types or numbers");
   int SELZAXISNAME = cdoOperatorAdd("selzaxisname", 0, 2,   "list of zaxis names");
   int SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 4,   "table numbers");
-  int DELPARAM     = cdoOperatorAdd("delparam",     0, 2|1, "parameter");
-  int DELCODE      = cdoOperatorAdd("delcode",      0, 1,   "code numbers");
-  int DELNAME      = cdoOperatorAdd("delname",      0, 2|1, "variable names");
+  int DELPARAM     = cdoOperatorAdd("delparam",     1, 2|1, "parameter");
+  int DELCODE      = cdoOperatorAdd("delcode",      1, 1,   "code numbers");
+  int DELNAME      = cdoOperatorAdd("delname",      1, 2|1, "variable names");
   int SELLTYPE     = cdoOperatorAdd("selltype",     0, 4,   "GRIB level types"); 
 
   int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
+
+  bool ldelete = (cdoOperatorF1(operatorID) == 1) ? true : false;
 
   int args_are_numeric = operatorArgc() > 0 && isdigit(*operatorArgv()[0]);
 
@@ -107,8 +100,8 @@ void *Selvar(void *argument)
       argnames = operatorArgv();
 
       if ( cdoVerbose )
-	for ( i = 0; i < nsel; i++ )
-	  fprintf(stderr, "name %d = %s\n", i+1, argnames[i]);
+	for ( int i = 0; i < nsel; i++ )
+	  cdoPrint("name %d = %s", i+1, argnames[i]);
     }
   else if ( TAKES_FLOATS(operatorID) )
     {
@@ -116,8 +109,8 @@ void *Selvar(void *argument)
       fltarr = (double *) listArrayPtr(flist);
 
       if ( cdoVerbose )
-	for ( i = 0; i < nsel; i++ )
-	  printf("flt %d = %g\n", i+1, fltarr[i]);
+	for ( int i = 0; i < nsel; i++ )
+	  cdoPrint("flt %d = %g", i+1, fltarr[i]);
     }
   else
     {
@@ -125,14 +118,15 @@ void *Selvar(void *argument)
       intarr = (int *) listArrayPtr(ilist);
 
       if ( cdoVerbose )
-	for ( i = 0; i < nsel; i++ )
-	  printf("int %d = %d\n", i+1, intarr[i]);
+	for ( int i = 0; i < nsel; i++ )
+	  cdoPrint("int %d = %d", i+1, intarr[i]);
     }
 
+  bool *selfound = NULL;
   if ( nsel )
     {
-      selfound = (int*) Malloc(nsel*sizeof(int));
-      for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
+      selfound = (bool*) Malloc(nsel*sizeof(bool));
+      for ( int i = 0; i < nsel; i++ ) selfound[i] = false;
     }
 
   /*
@@ -143,7 +137,7 @@ void *Selvar(void *argument)
 
   int vlistID1 = streamInqVlist(streamID1);
   int nvars = vlistNvars(vlistID1);
-  int *vars = (int*) Malloc(nvars*sizeof(int));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
 
   if ( operatorID == SELGRID && !args_are_numeric && nsel == 1 && strncmp(argnames[0], "var=", 4) == 0 )
     {
@@ -156,7 +150,7 @@ void *Selvar(void *argument)
           vlistInqVarName(vlistID1, varID, varname);
           if ( strcmp(varname, gridvarname) == 0 )
             {
-              gridID = vlistInqVarGrid(vlistID1, varID);
+              int gridID = vlistInqVarGrid(vlistID1, varID);
               gridnum = 1 + vlistGridIndex(vlistID1, gridID);
               args_are_numeric = TRUE;
               intarr = &gridnum;
@@ -170,34 +164,33 @@ void *Selvar(void *argument)
   vlistClearFlag(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
-      vars[varID] = FALSE;
+      vars[varID] = ldelete ? true : false;
 
       vlistInqVarName(vlistID1, varID, varname);
       vlistInqVarStdname(vlistID1, varID, stdname);
-      param    = vlistInqVarParam(vlistID1, varID);
-      code     = vlistInqVarCode(vlistID1, varID);
-      tabnum   = tableInqNum(vlistInqVarTable(vlistID1, varID));
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      grididx  = vlistGridIndex(vlistID1, gridID);
-      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      zaxisidx = vlistZaxisIndex(vlistID1, zaxisID);
-      nlevs    = zaxisInqSize(zaxisID);
+      int param    = vlistInqVarParam(vlistID1, varID);
+      int code     = vlistInqVarCode(vlistID1, varID);
+      int tabnum   = tableInqNum(vlistInqVarTable(vlistID1, varID));
+      int gridID   = vlistInqVarGrid(vlistID1, varID);
+      int grididx  = vlistGridIndex(vlistID1, gridID);
+      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+      int zaxisidx = vlistZaxisIndex(vlistID1, zaxisID);
+      int nlevs    = zaxisInqSize(zaxisID);
       gridName(gridInqType(gridID), gridname);
       zaxisInqName(zaxisID, zaxisname);
       zaxisName(zaxisInqType(zaxisID), zaxistypename);
 
       cdiParamToString(param, paramstr, sizeof(paramstr));
 
-      for ( levID = 0; levID < nlevs; levID++ )
+      for ( int levID = 0; levID < nlevs; levID++ )
 	{
-	  level = zaxisInqLevel(zaxisID, levID);
+	  double level = zaxisInqLevel(zaxisID, levID);
 
-	  if ( operatorID == DELCODE || operatorID == DELNAME || operatorID == DELPARAM )
-	    vlistDefFlag(vlistID1, varID, levID, TRUE);
-
-	  for ( isel = 0; isel < nsel; isel++ )
+	  if ( ldelete ) vlistDefFlag(vlistID1, varID, levID, TRUE);
+          
+	  for ( int isel = 0; isel < nsel; isel++ )
 	    {
-              int found = 0;
+              bool found = false;
 	      if ( operatorID == SELCODE )
 		{
 		  found = intarr[isel] == code;
@@ -266,8 +259,8 @@ void *Selvar(void *argument)
 	      if ( found )
 	        {
 		  vlistDefFlag(vlistID1, varID, levID, !INVERTS_SELECTION(operatorID));
-		  selfound[isel] = TRUE;
-                  vars[varID] = TRUE;
+		  selfound[isel] = true;
+                  vars[varID] = ldelete ? false : true;
 	        }
 	    }
 	}
@@ -286,16 +279,16 @@ void *Selvar(void *argument)
               int psvarid = vlist_get_psvarid(vlistID1, zaxisID);
               if ( psvarid != -1 && !vars[psvarid] )
                 {
-                  vars[psvarid] = TRUE;
+                  vars[psvarid] = true;
                   vlistDefFlag(vlistID1, psvarid, 0, !INVERTS_SELECTION(operatorID));
                 }
             }
         }
     }
 
-  for ( isel = 0; isel < nsel; isel++ )
+  for ( int isel = 0; isel < nsel; isel++ )
     {
-      if ( selfound[isel] == FALSE )
+      if ( selfound[isel] == false )
 	{
 	  if ( operatorID == SELCODE || operatorID == DELCODE )
 	    {
@@ -372,9 +365,10 @@ void *Selvar(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  double *array = NULL;
   if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
+      int gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double*) Malloc(gridsize*sizeof(double));
     }
@@ -386,7 +380,7 @@ void *Selvar(void *argument)
 
       streamDefTimestep(streamID2, tsID);
      
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
