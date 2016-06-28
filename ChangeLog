@@ -3,6 +3,10 @@
 	* using CDI library version 1.7.2
 	* Version 1.7.2 released
 
+2016-06-28  Uwe Schulzweida
+
+	* delete, delcode, delname: wrong variable check (bug fix)
+
 2016-06-27  Uwe Schulzweida
 
 	* round doesn't work as expected, replaced by lround()
