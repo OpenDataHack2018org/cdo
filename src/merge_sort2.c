@@ -88,7 +88,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
       omp_set_nested(1);            
       if ( omp_get_nested() == 0 )
 	cdoWarning("openMP implementation seems to not support nested parallelism.\n"
-	       "Maximum of CPUs used is 2 instead of %i.\n", omp_get_num_threads());
+	       "\tMaximum of CPUs used is 2 instead of %i.\n", omp_get_num_threads());
     }                                    
 #endif
 
