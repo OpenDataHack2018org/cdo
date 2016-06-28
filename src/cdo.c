@@ -209,6 +209,7 @@ void cdo_usage(void)
       fprintf(stderr, "                   Set individual floating-point traps (DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
     }
   fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
+  fprintf(stderr, "    -C, --color    Colorized output messages\n");
   fprintf(stderr, "    -f, --format <format>\n");
   fprintf(stderr, "                   Format of the output file. (grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
@@ -1094,6 +1095,7 @@ int parse_options_long(int argc, char *argv[])
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
       { "operators",               no_argument,    &lprintoperators,  1  },
       { "no_warnings",             no_argument,           &_Verbose,  0  },
+      { "color",                   no_argument,                NULL, 'C' },
       { "format",            required_argument,                NULL, 'f' },
       { "help",                    no_argument,                NULL, 'h' },
       { "history",                 no_argument, &CDO_Append_History,  0  },
