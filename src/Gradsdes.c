@@ -1393,7 +1393,8 @@ void *Gradsdes(void *argument)
     }
   if ( filetype == FILETYPE_GRB2 )
     {
-      cdoAbort("\nThe fileformat GRIB2 is not fully supported yet\nfor the gradsdes operator.\nThe .ctl file %s was generated.\nYou can add the necessary .idx file by running\n\tgribmap -i %s", ctlfile, ctlfile);
+      cdoAbort("The fileformat GRIB2 is not fully supported yet for the gradsdes operator.\n"
+               "The .ctl file %s was generated. You can add the necessary .idx file by running\n\tgribmap -i %s", ctlfile, ctlfile);
       // write_map_grib2(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
 

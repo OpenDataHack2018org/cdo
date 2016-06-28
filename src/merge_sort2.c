@@ -68,7 +68,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   if ( nsplit != 2 )
     {
       cdoAbort("Error: splitting into more than two subsegments not allowed\n"
-	     "       in this implementation of merge sort\n");
+	     "       in this implementation of merge sort!");
     }
 
   idx = (long*) Malloc(num_links*sizeof(long));
@@ -221,7 +221,7 @@ void sort_add(long num_links, double *restrict add1)
 	}
 
       if ( i == num_links ) {
-	cdoAbort("Internal problem; link 1 not found!\n");
+	cdoAbort("Internal problem; link 1 not found!");
 	exit(1);
       }
     }
@@ -284,7 +284,7 @@ void sort_add(long num_links, double *restrict add1)
 	}
 
       if ( i == num_links ) {
-	cdoAbort("Internal problem; link 2 not found!\n");
+	cdoAbort("Internal problem; link 2 not found!");
       }
     }
 

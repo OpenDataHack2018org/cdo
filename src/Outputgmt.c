@@ -707,7 +707,7 @@ void *Outputgmt(void *argument)
 		    }
 		  else if ( lhov )
 		    {
-		      cdoAbort("Implementation for hovmoeller data missing!\n");
+		      cdoAbort("Implementation for hovmoeller data missing!");
 		    }
 		  else
 		    {

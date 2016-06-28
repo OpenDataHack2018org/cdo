@@ -700,7 +700,7 @@ int checkStreamCnt(void)
     {
       if ( Process[processID].streamNames[i].args[0] == '-' )
         {
-          cdoAbort("Output file name %s must not begin with \"-\"!\n",
+          cdoAbort("Output file name %s must not begin with \"-\"!",
                    Process[processID].streamNames[i].args);
         }
       else if ( !obase )
