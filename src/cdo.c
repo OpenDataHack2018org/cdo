@@ -238,13 +238,13 @@ void cdo_usage(void)
 #endif
   fprintf(stderr, "    --percentile <method>\n");
   fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
-  fprintf(stderr, "    -Q             Alphanumeric sorting of NetCDF parameter names\n");
   fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
   fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
   fprintf(stderr, "    -s, --silent   Silent mode\n");
+  fprintf(stderr, "    --sort         Alphanumeric sorting of NetCDF parameter names\n");
   fprintf(stderr, "    -t <codetab>   Set GRIB1 default parameter code table name or file (cgribex only)\n");
   fprintf(stderr, "                   Predefined tables: ");
   for ( int id = 0; id < tableInqNumber(); id++ )
@@ -1100,6 +1100,7 @@ int parse_options_long(int argc, char *argv[])
       { "no_history",              no_argument, &CDO_Append_History,  0  },
       { "regular",                 no_argument,                NULL, 'R' },
       { "silent",                  no_argument,                NULL, 's' },
+      { "sort",                    no_argument,                NULL, 'Q' },
       { "table",             required_argument,                NULL, 't' },
       { "verbose",                 no_argument,                NULL, 'v' },
       { "version",                 no_argument,                NULL, 'V' },

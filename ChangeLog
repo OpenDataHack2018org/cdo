@@ -5,6 +5,7 @@
 
 2016-06-28  Uwe Schulzweida
 
+	* replace option -Q by --sort
 	* delete, delcode, delname: wrong variable check (bug fix)
 
 2016-06-27  Uwe Schulzweida
