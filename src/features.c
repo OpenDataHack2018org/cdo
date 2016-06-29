@@ -76,9 +76,6 @@ void printFeatures(void)
   fprintf(stderr, " Z");
 #endif
   */
-#if defined(HAVE_LIBJASPER)
-  fprintf(stderr, " JASPER");
-#endif
 #if defined(HAVE_LIBUDUNITS2)
   fprintf(stderr, " UDUNITS2");
 #endif
