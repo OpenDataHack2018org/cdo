@@ -116,6 +116,7 @@ case "${HOSTNAME}" in
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
 	;;
+# win7 based cygwin virtual machine
     cdo4windows-cyg)
         CDOLIBS="--with-netcdf=/usr/local \
                  --with-hdf5=/usr/local \
@@ -134,6 +135,7 @@ case "${HOSTNAME}" in
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
+                    --enable-all-static \
                     $CDOLIBS \
 	            CC=gcc CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
                     LDFLAGS='-L/usr/local/lib' \
@@ -420,27 +422,6 @@ case "${HOSTNAME}" in
                     AR="ar -X 64"  LDFLAGS="-brtl" \
 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
-# win7 based cygwin virtual machine
-    cdo4windows-cyg)
-        if  test "$COMP" = gcc ; then
-          ${CONFPATH}configure \
-                      --with-netcdf \
-                      --with-hdf5 \
-                      --with-proj \
-                      --with-fftw3 \
-                      --with-udunits \
-                      CC=gcc CFLAGS='-g -Wall -O3'
-        elif  test "$COMP" = g++ ; then
-          ${CONFPATH}configure \
-                      --with-netcdf \
-                      --with-hdf5 \
-                      --with-proj \
-                      --with-fftw3 \
-                      --with-udunits \
-                      --enable-cxx \
-                      CC=gcc CXX=g++ CFLAGS='-g -Wall -O3' CXXFLAGS='-g -Wall -O3'
-        fi
-        ;;
     *)
 	echo "configuration for hostname $HOSTNAME not found!"
 	;;
