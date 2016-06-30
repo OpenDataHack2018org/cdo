@@ -26,7 +26,7 @@ end
 def dbg(msg); pp msg if @debug; end
 
 # return name of current branch
-def getBranchName; `git branch`.split("\n").grep(/^\*/)[0].split[-1]; end
+def getBranchName; `git branch`.split("\n").grep(/^\*/)[0].split[-1].tr(')',''); end
 
 # wrapper for calling commands locally
 #
