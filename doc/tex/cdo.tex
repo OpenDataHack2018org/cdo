@@ -23,6 +23,19 @@
 
 \usepackage{textcomp}
 
+
+\usepackage{transparent}
+\usepackage{eso-pic}
+\newcommand\BackgroundPic{%
+\put(0,0){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+{\transparent{1.0} \includegraphics[width=16cm,height=\paperheight,%
+keepaspectratio]{cdo_libdep.pdf}}%
+\vfill
+}}}
+
 %\newcommand{\CDO}{{\bfseries\sffamily CDO\ }}
 \newcommand{\CDO}{{\bfseries\sffamily CDO}}
 \newcommand{\cdologo}{\includegraphics{logo/cdo_logo}}
@@ -170,9 +183,11 @@
 
 \begin{document}
 
+\AddToShipoutPicture*{\BackgroundPic}
 
 \begin{titlepage}
-\vspace*{50mm}
+%\vspace*{50mm}
+\vspace*{25mm}
 {\Huge{\CDO}} \ {\Huge\bf User's Guide}
 
 \setlength{\unitlength}{1cm}

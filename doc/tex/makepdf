@@ -1,3 +1,4 @@
+pdflatex cdo_libdep.tex
 pdflatex cdo.tex
 pdflatex cdo.tex
 cat > cdo.ist << 'EOF'

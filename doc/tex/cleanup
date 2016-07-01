@@ -1,17 +1,13 @@
 rm -f *~
-rm -f cdo.aux cdo.cps cdo.fn cdo.html cdo.ky cdo.pdf cdo.pgs cdo.tp
-rm -f cdo.cp cdo.dvi cdo.fns cdo.info cdo.log cdo.pg cdo.ps cdo.toc cdo.vr
-rm -f cdo_over.texi cdo_ref.texi cdo_rmenu.texi
-rm -f cdo.out cdo.idx cdo.ilg cdo.ind 
-rm -f cdo*.aux cdo.tpt cdo.ist
-rm -f cdo_refcard.aux cdo_refcard.dvi cdo_refcard.log cdo_refcard.ps cdo_refcard.pdf
-rm -f test.ist test.ind test.ilg test.tpt test.toc test.pdf
-rm -f test.out test.log test.idx test.aux
+rm -f *.aux *.cps *.fn *.html *.ky *.pgs *.tp
+rm -f *.pdf
+rm -f *.cp *.dvi *.fns *.info *.log *.pg *.ps *.toc *.vr
+rm -f *.texi *.texi *.texi
+rm -f *.out *.idx *.ilg *.ind 
+rm -f *.tpt *.ist
 rm -f ref_man_*.tex ref_list_*.tex catalog.tex cdo_ref_over.tex
 rm -f operator_help.h OPERATORS
 rm -f cdo_refcard.tex
 rm -f x.log cdo_class
 rm -f alphabetic_list.tex
-rm -f cdo_eca.idx cdo_eca.ilg cdo_eca.ind cdo_eca.ist cdo_eca.out cdo_eca.toc
-rm -f cdo_magics.idx cdo_magics.ilg cdo_magics.ind cdo_magics.ist cdo_magics.out cdo_magics.toc
-rm -f cdo_oper.html
+rm -f *.html
