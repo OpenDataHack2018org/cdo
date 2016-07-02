@@ -19,6 +19,7 @@
 #define _UTIL_H
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "percentiles.h"
 
 /* dummy use of unused parameters to silence compiler warnings */
@@ -136,8 +137,8 @@ void init_is_tty(void);
 void progressInit(void);
 void progressStatus(double offset, double refval, double curval);
 
-int fileExists(const char *filename);
-int userFileOverwrite(const char *filename);
+bool fileExists(const char *filename);
+bool userFileOverwrite(const char *filename);
 
 /* convert a CDI datatype to string */
 int datatype2str(int datatype, char *datatypestr);

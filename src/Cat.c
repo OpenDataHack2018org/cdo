@@ -62,8 +62,8 @@ void *Cat(void *argument)
 
       if ( indf == 0 )
 	{
-	  int file_exists = fileExists(cdoStreamName(nfiles)->args);
-	  if ( cdoOverwriteMode ) file_exists = 0;
+	  bool file_exists = false;
+          if ( !cdoOverwriteMode ) file_exists = fileExists(cdoStreamName(nfiles)->args);
 
 	  if ( file_exists )
 	    {

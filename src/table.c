@@ -28,10 +28,9 @@
 
 int defineTable(const char *tablearg)
 {
-  int tableID = CDI_UNDEFID;
   const char *tablename = tablearg;
 
-  if ( fileExists(tablename) ) tableID = tableRead(tablename);
+  int tableID = fileExists(tablename) ? tableRead(tablename) : CDI_UNDEFID;
 
   if ( tableID == CDI_UNDEFID )
     {
@@ -47,11 +46,9 @@ int defineTable(const char *tablearg)
 	}
     }
 
-  if ( tableID == CDI_UNDEFID )
-    tableID = tableInq(-1, 0, tablename);
+  if ( tableID == CDI_UNDEFID ) tableID = tableInq(-1, 0, tablename);
 
-  if ( tableID == CDI_UNDEFID )
-    Error("table <%s> not found", tablename);
+  if ( tableID == CDI_UNDEFID ) Error("table <%s> not found", tablename);
 
   return tableID;
 }

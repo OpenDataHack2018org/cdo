@@ -498,23 +498,23 @@ int month_to_season(int month)
 #include <sys/stat.h>
 //#include <unistd.h>
 
-int fileExists(const char *restrict filename)
+bool fileExists(const char *restrict filename)
 {
-  int status = 0;
+  bool status = false;
   struct stat buf;
 
   if ( stat(filename, &buf) == 0 )
     {
-      if ( S_ISREG(buf.st_mode) && buf.st_size > 0 ) status = 1;
+      if ( S_ISREG(buf.st_mode) && buf.st_size > 0 ) status = true;
     }
 
   return status;
 }
 
 
-int userFileOverwrite(const char *restrict filename)
+bool userFileOverwrite(const char *restrict filename)
 {
-  int status = 0;
+  bool status = false;
 
   if ( !cdoSilentMode && stdin_is_tty && stderr_is_tty )
     {
@@ -527,13 +527,13 @@ int userFileOverwrite(const char *restrict filename)
       if ( len == 3 )
         {
           if ( pline[0] == 'y' && pline[1] == 'e' && pline[2] == 's' )
-            status = 1;
+            status = true;
           else if ( pline[0] == 'Y' && pline[1] == 'E' && pline[2] == 'S' )
-            status = 1;
+            status = true;
         }
       else if ( len == 1 )
         {
-          if ( pline[0] == 'y' || pline[0] == 'Y' ) status = 1;
+          if ( pline[0] == 'y' || pline[0] == 'Y' ) status = true;
         }
     }
 
