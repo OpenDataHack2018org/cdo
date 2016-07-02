@@ -647,6 +647,40 @@ int pstreamOpenWritePipe(const argument_t *argument, int filetype)
 }
 
 static
+void set_comp(int fileID, int filetype)
+{
+  if ( cdoCompress )
+    {
+      if      ( filetype == FILETYPE_GRB )
+        {
+          cdoCompType  = COMPRESS_SZIP;
+          cdoCompLevel = 0;
+        }
+      else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+        {
+          cdoCompType  = COMPRESS_ZIP;
+          cdoCompLevel = 1;
+        }
+    }
+
+  if ( cdoCompType != COMPRESS_NONE )
+    {
+      streamDefCompType(fileID, cdoCompType);
+      streamDefCompLevel(fileID, cdoCompLevel);
+
+      if ( cdoCompType == COMPRESS_SZIP &&
+           (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+        cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
+
+      if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
+        cdoWarning("JPEG compression not available for non GRIB2 data!");
+
+      if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+        cdoWarning("Deflate compression not available for non NetCDF4 data!");
+    }
+}
+
+static
 int pstreamOpenWriteFile(const argument_t *argument, int filetype)
 {
   char *filename = (char*) Malloc(strlen(argument->args)+1);
@@ -695,35 +729,7 @@ int pstreamOpenWriteFile(const argument_t *argument, int filetype)
   if ( cdoDefaultByteorder != CDI_UNDEFID )
     streamDefByteorder(fileID, cdoDefaultByteorder);
 
-  if ( cdoCompress )
-    {
-      if      ( filetype == FILETYPE_GRB )
-        {
-          cdoCompType  = COMPRESS_SZIP;
-          cdoCompLevel = 0;
-        }
-      else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
-        {
-          cdoCompType  = COMPRESS_ZIP;
-          cdoCompLevel = 1;
-        }
-    }
-
-  if ( cdoCompType != COMPRESS_NONE )
-    {
-      streamDefCompType(fileID, cdoCompType);
-      streamDefCompLevel(fileID, cdoCompLevel);
-
-      if ( cdoCompType == COMPRESS_SZIP &&
-           (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-        cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
-
-      if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
-        cdoWarning("JPEG compression not available for non GRIB2 data!");
-
-      if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
-        cdoWarning("Deflate compression not available for non NetCDF4 data!");
-    }
+  set_comp(fileID, filetype);
   /*
     if ( cdoDefaultInstID != CDI_UNDEFID )
     streamDefInstID(fileID, cdoDefaultInstID);
@@ -789,19 +795,25 @@ int pstreamOpenAppend(const argument_t *argument)
       else
 	pthread_mutex_lock(&streamOpenReadMutex);
 #endif
+      
       int fileID = streamOpenAppend(argument->args);
+      
 #if defined(HAVE_LIBPTHREAD)
       if ( cdoLockIO )
 	pthread_mutex_unlock(&streamMutex);
       else
 	pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
+      
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
       if ( fileID < 0 ) cdiOpenError(fileID, "Open failed on >%s<", argument->args);
       /*
       cdoInqHistory(fileID);
       cdoDefHistory(fileID, commandLine());
       */
+      int filetype = streamInqFiletype(fileID);
+      set_comp(fileID, filetype);
+      
       strcpy(filename, argument->args);
 
       pstreamptr->mode   = 'a';
