@@ -24,6 +24,8 @@ do
   shift
 done
 #
+if test -z "$COMP" ; then COMP=gcc ; fi
+#
 set -x
 #
 case "${HOSTNAME}" in
@@ -61,13 +63,15 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
 	            CC=gcc CXX=g++ CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
-        else
+        elif  test "$COMP" = gcc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
 	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -Wwrite-strings -pedantic -O3 -march=native -fstack-protector"
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
+        else
+	  ${CONFPATH}configure  $CDOLIBS  CC=$COMP
         fi
 	;;
     hama*)
