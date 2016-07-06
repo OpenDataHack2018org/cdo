@@ -370,14 +370,9 @@ void input_int(char *arg, int intarr[], int maxint, int *nintfound)
 
 void strtolower(char *str)
 {
-  int i, len;
-
   if ( str )
-    {
-      len = (int) strlen(str);
-      for ( i = 0; i < len; i++ )
-        str[i] = tolower((int) str[i]);
-    }
+    for ( size_t i = 0; str[i]; ++i )
+      str[i] = (char)tolower((int)str[i]);
 }
 
 
