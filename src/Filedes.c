@@ -34,17 +34,16 @@ static
 void printAtts(FILE *fp, int vlistID, int varID)
 {
 #define MAXATT 8192
-  int natts, ia;
+  int natts;
   char attname[1024];
   int atttype, attlen;
   char atttxt[MAXATT];
   int attint[MAXATT];
   double attflt[MAXATT];
-  int i;
 
   vlistInqNatts(vlistID, varID, &natts);
 
-  for ( ia = 0; ia < natts; ++ia )
+  for ( int ia = 0; ia < natts; ++ia )
     {
       vlistInqAtt(vlistID, varID, ia, attname, &atttype, &attlen);
       if ( atttype == DATATYPE_INT )
@@ -52,7 +51,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  vlistInqAttInt(vlistID, varID, attname, attlen, attint);
 	  fprintf(fp, "  %s=", attname);
-	  for ( i = 0; i < attlen; ++i)
+	  for ( int i = 0; i < attlen; ++i)
 	    {
 	      if ( i > 0 ) fprintf(fp, ", ");
 	      fprintf(fp, "%d", attint[i]);
@@ -64,7 +63,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  vlistInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
 	  fprintf(fp, "  %s=", attname);
-	  for ( i = 0; i < attlen; ++i)
+	  for ( int i = 0; i < attlen; ++i)
 	    {
 	      if ( i > 0 ) fprintf(fp, ", ");
 	      fprintf(fp, "%g", attflt[i]);
@@ -111,20 +110,16 @@ void partab(FILE *fp, int streamID, int option)
 {
   int vlistID = streamInqVlist(streamID);
   int varID, datatype = -1;
-  int param;
   char pstr[32];
   char paramstr[32];
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
-  int natts;
-  int chunktype;
-  int linebreak = 1;
-  double missval;
       
   int nvars = vlistNvars(vlistID);
-  if ( option == 4 ) linebreak = 0;
+  bool linebreak = ( option == 4 ) ? false : true;
 
   if ( option == 2 )
     {
+      int natts;
       vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
       if ( natts > 0 )
 	{
@@ -172,8 +167,8 @@ void partab(FILE *fp, int streamID, int option)
       varname[0]     = 0;
       varlongname[0] = 0;
       varunits[0]    = 0;
-      param    = vlistInqVarParam(vlistID, varID);
-      missval  = vlistInqVarMissval(vlistID, varID);
+      int param = vlistInqVarParam(vlistID, varID);
+      double missval = vlistInqVarMissval(vlistID, varID);
       vlistInqVarName(vlistID, varID, varname);
       /* printf("1>%s<\n", varname); */
       vlistInqVarStdname(vlistID, varID, varstdname);
@@ -215,7 +210,7 @@ void partab(FILE *fp, int streamID, int option)
 	    if ( linebreak ) fprintf(fp, "\n");
 	  }
 
-      chunktype = vlistInqVarChunkType(vlistID, varID);
+      int chunktype = vlistInqVarChunkType(vlistID, varID);
       if ( chunktype == CHUNK_AUTO )
 	{
 	  fprintf(fp, "  chunktype=auto");
@@ -244,10 +239,8 @@ void partab(FILE *fp, int streamID, int option)
 static
 void filedes(int streamID)
 {
-  int filetype;
-
   printf("\n");
-  filetype = streamInqFiletype(streamID);
+  int filetype = streamInqFiletype(streamID);
   switch ( filetype )
     {
     case FILETYPE_GRB:
@@ -315,13 +308,6 @@ void filedes(int streamID)
 
 void *Filedes(void *argument)
 {
-  int operatorID;
-  int streamID = 0;
-  int zaxisID;
-  int nvars, ngrids, nzaxis;
-  int type, index;
-  int vlistID;
-
   cdoInitialize(argument);
 
   int GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);
@@ -336,57 +322,53 @@ void *Filedes(void *argument)
   int PARTAB   = cdoOperatorAdd("partab",    0, 0, NULL);
   int PARTAB2  = cdoOperatorAdd("partab2",   0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
 
-  vlistID = streamInqVlist(streamID);
+  int vlistID = streamInqVlist(streamID);
 
-  nvars  = vlistNvars(vlistID);
-  ngrids = vlistNgrids(vlistID);
-  nzaxis = vlistNzaxis(vlistID);
+  int nvars  = vlistNvars(vlistID);
+  int ngrids = vlistNgrids(vlistID);
+  int nzaxis = vlistNzaxis(vlistID);
 
   if ( operatorID == GRIDDES || operatorID == GRIDDES2 )
     {
       int opt = 0;
       if ( operatorID == GRIDDES ) opt = 1;
-      for ( index = 0; index < ngrids; index++ )
+      for ( int index = 0; index < ngrids; index++ )
 	gridPrint(vlistGrid(vlistID, index), index+1, opt);
     }
   else if ( operatorID == ZAXISDES )
     {
-      for ( index = 0; index < nzaxis; index++ )
+      for ( int index = 0; index < nzaxis; index++ )
 	zaxisPrint(vlistZaxis(vlistID, index), index+1);
     }
   else if ( operatorID == VCT || operatorID == VCT2 )
     {
-      for ( index = 0; index < nzaxis; index++)
+      for ( int index = 0; index < nzaxis; index++ )
 	{
-	  zaxisID = vlistZaxis(vlistID, index);
-	  type = zaxisInqType(zaxisID);
+	  int zaxisID = vlistZaxis(vlistID, index);
+	  int type = zaxisInqType(zaxisID);
 	  if ( type == ZAXIS_HYBRID || type == ZAXIS_HYBRID_HALF )
 	    {
-	      int i, vctsize;
-	      const double *vct;
-
-	      vctsize = zaxisInqVctSize(zaxisID);
-	      vct     = zaxisInqVctPtr(zaxisID);
+	      int vctsize = zaxisInqVctSize(zaxisID);
+	      const double *vct     = zaxisInqVctPtr(zaxisID);
 		
 	      if ( vctsize%2 == 0 )
 		{
 		  if ( operatorID == VCT )
 		    {
 		      fprintf(stdout, "#   k         vct_a(k) [Pa]             vct_b(k) []\n");
-		      for ( i = 0; i < vctsize/2; i++ )
+		      for ( int i = 0; i < vctsize/2; i++ )
 			fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
 		    }
 		  else
 		    {
-		      int nbyte0, nbyte;
 		      fprintf(stdout, "vctsize   = %d\n", vctsize);
-		      nbyte0 = fprintf(stdout, "vct       = ");
-		      nbyte = nbyte0;
-		      for ( i = 0; i < vctsize; i++ )
+		      int nbyte0 = fprintf(stdout, "vct       = ");
+		      int nbyte = nbyte0;
+		      for ( int i = 0; i < vctsize; i++ )
 			{
 			  if ( nbyte > 70 || i == vctsize/2 )
 			    {
@@ -399,7 +381,7 @@ void *Filedes(void *argument)
 		    }
 		}
 	      else
-		for ( i = 0; i < vctsize; i++ )
+		for ( int i = 0; i < vctsize; i++ )
 		  fprintf(stdout, "%5d %25.17f\n", i, vct[i]);
 
 	      break;
@@ -412,15 +394,14 @@ void *Filedes(void *argument)
     }
   else if ( operatorID == CODETAB )
     {
-      int varID, code;
       char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
 
-      for ( varID = 0; varID < nvars; varID++ )
+      for ( int varID = 0; varID < nvars; varID++ )
 	{
 	  varname[0]     = 0;
 	  varlongname[0] = 0;
 	  varunits[0]    = 0;
-	  code     = vlistInqVarCode(vlistID, varID);
+	  int code     = vlistInqVarCode(vlistID, varID);
 	  vlistInqVarName(vlistID, varID, varname);
 	  vlistInqVarLongname(vlistID, varID, varlongname);
 	  vlistInqVarUnits(vlistID, varID, varunits);
