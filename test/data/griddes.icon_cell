@@ -6,9 +6,12 @@ gridsize  = 65
 xname     = clon
 xlongname = center longitude
 xunits    = radian
+xdimname  = ncells
 yname     = clat
 ylongname = center latitude
 yunits    = radian
+ydimname  = ncells
+vdimname  = vertices
 nvertex   = 3
 xvals     = 0.993894662193839 0.628318530717959 0.262742399242078 3.14159265358979 
             -2.77601652211391 2.77601652211391 -2.25053172362976 -0.628318530717959 
