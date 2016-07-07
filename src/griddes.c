@@ -116,6 +116,9 @@ void gridInit(griddes_t *grid)
   grid->yname[0]      = 0;
   grid->ylongname[0]  = 0;
   grid->yunits[0]     = 0;
+  grid->xdimname[0]   = 0;
+  grid->ydimname[0]   = 0;
+  grid->vdimname[0]   = 0;
 }
 
 
@@ -501,6 +504,9 @@ int gridDefine(griddes_t grid)
   if ( grid.yname[0]     ) gridDefYname(gridID, grid.yname);
   if ( grid.ylongname[0] ) gridDefYlongname(gridID, grid.ylongname);
   if ( grid.yunits[0]    ) gridDefYunits(gridID, grid.yunits);
+  if ( grid.xdimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_XDIMNAME, strlen(grid.xdimname)+1, grid.xdimname);
+  if ( grid.ydimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_YDIMNAME, strlen(grid.ydimname)+1, grid.ydimname);
+  if ( grid.vdimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_VDIMNAME, strlen(grid.vdimname)+1, grid.vdimname);
 
   return gridID;
 }
@@ -709,6 +715,10 @@ int gridFromFile(FILE *gfp, const char *dname)
 	{
 	  strcpy(grid.xunits, skipSeparator(pline + len));
 	}
+      else if ( cmpstrlen(pline, "xdimname", len)  == 0 )
+	{
+	  strcpy(grid.xdimname, skipSeparator(pline + len));
+	}
       else if ( cmpstrlen(pline, "yname", len)  == 0 )
 	{
 	  strcpy(grid.yname, skipSeparator(pline + len));
@@ -720,6 +730,14 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( cmpstrlen(pline, "yunits", len)  == 0 )
 	{
 	  strcpy(grid.yunits, skipSeparator(pline + len));
+	}
+      else if ( cmpstrlen(pline, "ydimname", len)  == 0 )
+	{
+	  strcpy(grid.ydimname, skipSeparator(pline + len));
+	}
+      else if ( cmpstrlen(pline, "vdimname", len)  == 0 )
+	{
+	  strcpy(grid.vdimname, skipSeparator(pline + len));
 	}
       else if ( cmpstrlen(pline, "nvertex", len)  == 0 )
 	{
@@ -1054,7 +1072,7 @@ int gridFromFile(FILE *gfp, const char *dname)
       else
 	{
 	  if ( grid.type != UNDEFID )
-	    cdoAbort("Invalid grid command : >%s< (line %d file: %s)", pline, lineno, dname);
+	    cdoAbort("Invalid grid command : >%s< (line: %d file: %s)", pline, lineno, dname);
 	}
     }
   /*
@@ -1126,14 +1144,14 @@ int input_darray(FILE *gfp, int n_values, double *array)
 
 int gridFromPingo(FILE *gfp, const char *dname)
 {
+  UNUSED(dname);
   int gridID = -1;
   int i;
-  int nlon, nlat;
-  int lgauss = FALSE;
-  griddes_t grid;
 
+  griddes_t grid;
   gridInit(&grid);
 
+  int nlon, nlat;
   if ( ! input_ival(gfp, &nlon) ) return gridID;
   if ( ! input_ival(gfp, &nlat) ) return gridID;
 
@@ -1208,6 +1226,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	    return gridID;
 	  }
 		    
+      bool lgauss = false;
       if ( nlat > 2 ) /* check if gaussian */
 	{
 	  double *yvals, *yw;
@@ -1221,7 +1240,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	  for ( i = 0; i < (int) grid.ysize; i++ )
 	    if ( fabs(yvals[i] - grid.yvals[i]) > ((yvals[0] - yvals[1])/500) ) break;
 		      
-	  if ( i == (int) grid.ysize ) lgauss = TRUE;
+	  if ( i == (int) grid.ysize ) lgauss = true;
 
 	  Free(yvals);
 	}

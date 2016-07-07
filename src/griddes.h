@@ -1,6 +1,8 @@
 #ifndef _GRIDDES_H
 #define _GRIDDES_H
 
+#include <stdbool.h>
+
 typedef struct {
   int    *mask;
   double *xvals;
@@ -58,9 +60,12 @@ typedef struct {
   char    xname[CDI_MAX_NAME];
   char    xlongname[CDI_MAX_NAME];
   char    xunits[CDI_MAX_NAME];
+  char    xdimname[CDI_MAX_NAME];
   char    yname[CDI_MAX_NAME];
   char    ylongname[CDI_MAX_NAME];
   char    yunits[CDI_MAX_NAME];
+  char    ydimname[CDI_MAX_NAME];
+  char    vdimname[CDI_MAX_NAME];
 }
 griddes_t;
 
