@@ -1041,7 +1041,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "xvals", len)  == 0 )
 	{
-	  int i = 0;
 	  double fval;
 	  char *endptr;
 
@@ -1055,7 +1054,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      pline = skipSeparator(pline + len);
 	      grid.xvals = (double*) Malloc(size*sizeof(double));
 
-	      for ( i = 0; i < size; i++ )
+	      for ( int i = 0; i < size; i++ )
 		{
 		  endptr = pline;
 		  fval = strtod(pline, &endptr);
@@ -1064,7 +1063,6 @@ int gridFromFile(FILE *gfp, const char *dname)
                       lineno++;
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			cdoAbort("Incomplete command: >xvals< (line: %d file: %s)", lineno, dname);
-                      printf("%d %s\n", lineno, line);
 
 		      pline = line;
 		      fval = strtod(pline, &endptr);
@@ -1078,7 +1076,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "yvals", len)  == 0 )
 	{
-	  int i = 0;
 	  double fval;
 	  char *endptr;
 
@@ -1092,7 +1089,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      pline = skipSeparator(pline + len);
 	      grid.yvals = (double*) Malloc(size*sizeof(double));
 
-	      for ( i = 0; i < size; i++ )
+	      for ( int i = 0; i < size; i++ )
 		{
 		  endptr = pline;
 		  fval = strtod(pline, &endptr);
