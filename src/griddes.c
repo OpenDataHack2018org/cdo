@@ -656,12 +656,11 @@ double *readfield4(griddes_t *grid, int record, char *format, char *filename)
 }
 */
 
-double readflt(const char *filename, const char *name, const char *pline)
+static
+double read_value(const char *filename, const char *name, const char *pline)
 {
-  double val;
   char *endptr;
-
-  val = strtod(pline, &endptr);
+  double val = strtod(pline, &endptr);
   if ( pline == endptr )
     cdoAbort("Couldn't read value for %s (grid description file: %s)!", name, filename);
  
@@ -831,87 +830,87 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "xfirst", len)  == 0 )
 	{
-	  grid.xfirst = readflt(dname, "xfirst", skipSeparator(pline + len));
+	  grid.xfirst = read_value(dname, "xfirst", skipSeparator(pline + len));
 	  grid.def_xfirst = TRUE;
 	}
       else if ( cmpstrlen(pline, "lonfirst", len)  == 0 )
 	{
-	  grid.xfirst = readflt(dname, "lonfirst", skipSeparator(pline + len));
+	  grid.xfirst = read_value(dname, "lonfirst", skipSeparator(pline + len));
 	  grid.def_xfirst = TRUE;
 	}
       else if ( cmpstrlen(pline, "yfirst", len)  == 0 )
 	{
-	  grid.yfirst = readflt(dname, "yfirst", skipSeparator(pline + len));
+	  grid.yfirst = read_value(dname, "yfirst", skipSeparator(pline + len));
 	  grid.def_yfirst = TRUE;
 	}
       else if ( cmpstrlen(pline, "latfirst", len)  == 0 )
 	{
-	  grid.yfirst = readflt(dname, "latfirst", skipSeparator(pline + len));
+	  grid.yfirst = read_value(dname, "latfirst", skipSeparator(pline + len));
 	  grid.def_yfirst = TRUE;
 	}
       else if ( cmpstrlen(pline, "xlast", len)  == 0 )
 	{
-	  grid.xlast = readflt(dname, "xlast", skipSeparator(pline + len));
+	  grid.xlast = read_value(dname, "xlast", skipSeparator(pline + len));
 	  grid.def_xlast = TRUE;
 	}
       else if ( cmpstrlen(pline, "lonlast", len)  == 0 )
 	{
-	  grid.xlast = readflt(dname, "lonlast", skipSeparator(pline + len));
+	  grid.xlast = read_value(dname, "lonlast", skipSeparator(pline + len));
 	  grid.def_xlast = TRUE;
 	}
       else if ( cmpstrlen(pline, "ylast", len)  == 0 )
 	{
-	  grid.ylast = readflt(dname, "ylast", skipSeparator(pline + len));
+	  grid.ylast = read_value(dname, "ylast", skipSeparator(pline + len));
 	  grid.def_ylast = TRUE;
 	}
       else if ( cmpstrlen(pline, "latlast", len)  == 0 )
 	{
-	  grid.ylast = readflt(dname, "latlast", skipSeparator(pline + len));
+	  grid.ylast = read_value(dname, "latlast", skipSeparator(pline + len));
 	  grid.def_ylast = TRUE;
 	}
       else if ( cmpstrlen(pline, "xinc", len)  == 0 )
 	{
-	  grid.xinc = readflt(dname, "xinc", skipSeparator(pline + len));
+	  grid.xinc = read_value(dname, "xinc", skipSeparator(pline + len));
 	  grid.def_xinc = TRUE;
 	}
       else if ( cmpstrlen(pline, "loninc", len)  == 0 )
 	{
-	  grid.xinc = readflt(dname, "loninc", skipSeparator(pline + len));
+	  grid.xinc = read_value(dname, "loninc", skipSeparator(pline + len));
 	  grid.def_xinc = TRUE;
 	}
       else if ( cmpstrlen(pline, "yinc", len)  == 0 )
 	{
-	  grid.yinc = readflt(dname, "yinc", skipSeparator(pline + len));
+	  grid.yinc = read_value(dname, "yinc", skipSeparator(pline + len));
 	  grid.def_yinc = TRUE;
 	}
       else if ( cmpstrlen(pline, "latinc", len)  == 0 )
 	{
-	  grid.yinc = readflt(dname, "latinc", skipSeparator(pline + len));
+	  grid.yinc = read_value(dname, "latinc", skipSeparator(pline + len));
 	  grid.def_yinc = TRUE;
 	}
       else if ( cmpstrlen(pline, "originLon", len)  == 0 )
 	{
-	  grid.originLon = readflt(dname, "originLon", skipSeparator(pline + len));
+	  grid.originLon = read_value(dname, "originLon", skipSeparator(pline + len));
 	  grid.def_originLon = TRUE;
 	}
       else if ( cmpstrlen(pline, "originLat", len)  == 0 )
 	{
-	  grid.originLat = readflt(dname, "originLat", skipSeparator(pline + len));
+	  grid.originLat = read_value(dname, "originLat", skipSeparator(pline + len));
 	  grid.def_originLat = TRUE;
 	}
       else if ( cmpstrlen(pline, "lonParY", len)  == 0 )
 	{
-	  grid.lonParY = readflt(dname, "lonParY", skipSeparator(pline + len));
+	  grid.lonParY = read_value(dname, "lonParY", skipSeparator(pline + len));
 	  grid.def_lonParY = TRUE;
 	}
       else if ( cmpstrlen(pline, "lat1", len)  == 0 )
 	{
-	  grid.lat1 = readflt(dname, "lat1", skipSeparator(pline + len));
+	  grid.lat1 = read_value(dname, "lat1", skipSeparator(pline + len));
 	  grid.def_lat1 = TRUE;
 	}
       else if ( cmpstrlen(pline, "lat2", len)  == 0 )
 	{
-	  grid.lat2 = readflt(dname, "lat2", skipSeparator(pline + len));
+	  grid.lat2 = read_value(dname, "lat2", skipSeparator(pline + len));
 	  grid.def_lat2 = TRUE;
 	}
       else if ( cmpstrlen(pline, "projection", len)  == 0 )
@@ -932,52 +931,52 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "lon_0", len)  == 0 )
 	{
-	  grid.lon_0 = readflt(dname, "lon_0", skipSeparator(pline + len));
+	  grid.lon_0 = read_value(dname, "lon_0", skipSeparator(pline + len));
 	  grid.def_lon_0 = TRUE;
 	}
       else if ( cmpstrlen(pline, "lat_0", len)  == 0 )
 	{
-	  grid.lat_0 = readflt(dname, "lat_0", skipSeparator(pline + len));
+	  grid.lat_0 = read_value(dname, "lat_0", skipSeparator(pline + len));
 	  grid.def_lat_0 = TRUE;
 	}
       else if ( cmpstrlen(pline, "lat_1", len)  == 0 )
 	{
-	  grid.lat_1 = readflt(dname, "lat_1", skipSeparator(pline + len));
+	  grid.lat_1 = read_value(dname, "lat_1", skipSeparator(pline + len));
 	  grid.def_lat_1 = TRUE;
 	}
       else if ( cmpstrlen(pline, "lat_2", len)  == 0 )
 	{
-	  grid.lat_2 = readflt(dname, "lat_2", skipSeparator(pline + len));
+	  grid.lat_2 = read_value(dname, "lat_2", skipSeparator(pline + len));
 	  grid.def_lat_2 = TRUE;
 	}
       else if ( cmpstrlen(pline, "xnpole", len)  == 0 )
 	{
-	  grid.xpole = readflt(dname, "xnpole", skipSeparator(pline + len));
+	  grid.xpole = read_value(dname, "xnpole", skipSeparator(pline + len));
 	  grid.isRotated = TRUE;
 	}
       else if ( cmpstrlen(pline, "lonpole", len)  == 0 )
 	{
-	  grid.xpole = readflt(dname, "lonpole", skipSeparator(pline + len));
+	  grid.xpole = read_value(dname, "lonpole", skipSeparator(pline + len));
 	  grid.isRotated = TRUE;
 	}
       else if ( cmpstrlen(pline, "ynpole", len)  == 0 )
 	{
-	  grid.ypole = readflt(dname, "ynpole", skipSeparator(pline + len));
+	  grid.ypole = read_value(dname, "ynpole", skipSeparator(pline + len));
 	  grid.isRotated = TRUE;
 	}
       else if ( cmpstrlen(pline, "latpole", len)  == 0 )
 	{
-	  grid.ypole = readflt(dname, "latpole", skipSeparator(pline + len));
+	  grid.ypole = read_value(dname, "latpole", skipSeparator(pline + len));
 	  grid.isRotated = TRUE;
 	}
       else if ( cmpstrlen(pline, "angle", len)  == 0 )
 	{
-	  grid.angle = readflt(dname, "angle", skipSeparator(pline + len));
+	  grid.angle = read_value(dname, "angle", skipSeparator(pline + len));
 	  grid.isRotated = TRUE;
 	}
       else if ( cmpstrlen(pline, "a", len)  == 0 )
 	{
-	  grid.a = readflt(dname, "a", skipSeparator(pline + len));
+	  grid.a = read_value(dname, "a", skipSeparator(pline + len));
 	}
       else if ( cmpstrlen(pline, "gridlatlon", len)  == 0 )
 	{
