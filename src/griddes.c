@@ -39,15 +39,6 @@
 #include "griddes.h"
 #include "error.h"
 
-/*
-int  extInqPrec(int fileID);
-
-int  extReadHeader(int fileID, int *header);
-int  extReadDataDP(int fileID, double *data);
-
-int  extOpen(const char *filename, const char *mode);
-void extClose(int fileID);
-*/
 
 #define UNDEFID -1
 
@@ -130,15 +121,12 @@ void gridInit(griddes_t *grid)
 
 int getoptname(char *optname, const char *optstring, int nopt)
 {
-  int i, nerr = 0;
+  int nerr = 0;
   size_t namelen;
-  const char *pname;
-  const char *pend;
+  const char *pname = optstring;
+  const char *pend  = optstring;
 
-  pname = optstring;
-  pend  = optstring;
-
-  for ( i = 0; i < nopt; i++ )
+  for ( int i = 0; i < nopt; i++ )
     {
       pend = strchr(pname, ',');
       if ( pend == NULL )
@@ -584,78 +572,6 @@ void fnmexp2(char *out, char *in1, const char *in2)
   *out = '\0';
 }
 
-/*
-double *readfield(griddes_t *grid, int record, char *format, char *filename)
-{
-  int fileID, rxysize, ierr, irec;
-  double *vals;
-
-  if ( grid->size == 0 )  Error("grid size = 0!");
-  if ( format == NULL )   Error("format undefined!");
-  if ( filename == NULL ) Error("file name undefined!");
-
-  vals = (double*) Malloc(grid->size*sizeof(double));
-
-  if ( strcmp(format, "extra") == 0 )
-    {
-      int header[4];
-      fileID = extOpen(filename, "r");
-      if ( fileID == UNDEFID ) SysError(filename);
-
-      for ( irec = 0; irec < record; irec++ )
-	{
-	  ierr = extReadHeader(fileID, header);
-	  if ( ierr <= 0 ) Error("Record %d unexpected EOF in file %s", irec+1, filename);
-	}
-      grid->prec   = extInqPrec(fileID);
-      rxysize = header[3];
-      if ( rxysize != (int) grid->size ) Error("unexpected record size of %d!", rxysize);
-      ierr = extReadDataDP(fileID, vals);
-      extClose(fileID);
-    }
-  else
-    Error("format %s unsupported!", format);
-
-  return vals;
-}
-*/
-/*
-double *readfield4(griddes_t *grid, int record, char *format, char *filename)
-{
-  int fileID, rxysize, ierr, irec;
-  double *vals;
-
-  if ( grid->size == 0 )  Error("grid size = 0!");
-  if ( format == NULL )   Error("format undefined!");
-  if ( filename == NULL ) Error("file name undefined!");
-
-  vals  = (double*) Malloc(4*grid->size*sizeof(double));
-
-  if ( strcmp(format, "extra") == 0 )
-    {
-      int header[4];
-      fileID = extOpen(filename, "r");
-      if ( fileID == UNDEFID ) SysError(filename);
-
-      for ( irec = 0; irec < record; irec++ )
-	{
-	  ierr = extReadHeader(fileID, header);
-	  if ( ierr <= 0 ) Error("Record %d unexpected EOF in file %s", irec+1, filename);
-	}
-      grid->prec   = extInqPrec(fileID);
-      rxysize = header[3];
-      if ( rxysize != (int) (4*grid->size) ) Error("unexpected record size of %d!", rxysize);
-      ierr = extReadDataDP(fileID, vals);
-
-      extClose(fileID);
-    }
-  else
-    Error("format %s unsupported!", format);
-
-  return vals;
-}
-*/
-
 static
 double read_value(const char *filename, const char *name, const char *pline)
 {
@@ -667,31 +583,51 @@ double read_value(const char *filename, const char *name, const char *pline)
   return val;
 }
 
+static
+void read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *gfp, const char *dname)
+{
+  char line[MAX_LINE_LEN];
+  double fval;
+  char *endptr;
+  for ( int i = 0; i < size; i++ )
+    {
+      endptr = pline;
+      fval = strtod(pline, &endptr);
+      if ( pline == endptr )
+        {
+          (*lineno)++;
+          if ( ! readline(gfp, line, MAX_LINE_LEN) )
+            cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name, *lineno, dname);
+          pline = line;
+          fval = strtod(pline, &endptr);
+        }
+      field[i] = fval;
+      pline = endptr;
+    }
+}
+
 
 int gridFromFile(FILE *gfp, const char *dname)
 {
   char line[MAX_LINE_LEN], *pline;
-  int gridID = -1;
   int size;
-  int lerror;
-  size_t i, len;
+  
   griddes_t grid;
-  int lineno = 0;
-
   gridInit(&grid);
 
+  int lineno = 0;
   while ( readline(gfp, line, MAX_LINE_LEN) )
     {
       lineno++;
       if ( line[0] == '#' ) continue;
       if ( line[0] == '\0' ) continue;
-      len = strlen(line);
+      size_t len = strlen(line);
 
-      lerror = FALSE;
-      for ( i = 0; i < len; ++i )
+      bool lerror = false;
+      for ( size_t i = 0; i < len; ++i )
 	if ( !(line[i] == 9 || (line[i] > 31 && line[i] < 127)) )
 	  {
-	    lerror = TRUE;
+	    lerror = true;
 	    line[i] = '#';
 	  }
       if ( lerror ) cdoAbort("Grid description file >%s< contains illegal characters (line: %s)!", dname, line);
@@ -980,13 +916,12 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "gridlatlon", len)  == 0 )
 	{
-	  int i;
 	  double flat = 0, flon = 0;
 	  if ( grid.size == 0 ) grid.size = grid.xsize * grid.ysize;
 	  
 	  grid.xvals = (double*) Malloc(grid.size*sizeof(double));
 	  grid.yvals = (double*) Malloc(grid.size*sizeof(double));
-	  for ( i = 0; i < (int) grid.size; i++ )
+	  for ( int i = 0; i < (int) grid.size; i++ )
 	    {
               lineno++;
 	      if ( ! readline(gfp, line, MAX_LINE_LEN) )
@@ -999,10 +934,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "mask", len)  == 0 )
 	{
-	  int i = 0;
-	  long lval;
-	  char *endptr;
-
 	  size = grid.size;
 
 	  if ( size > 0 )
@@ -1011,10 +942,10 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      pline = skipSeparator(pline + len);
 	      grid.mask = (int*) Malloc(size*sizeof(int));
 
-	      for ( i = 0; i < size; i++ )
+	      for ( int i = 0; i < size; i++ )
 		{
-		  endptr = pline;
-		  lval = strtol(pline, &endptr, 10);
+		  char *endptr = pline;
+		  long lval = strtol(pline, &endptr, 10);
 		  if ( pline == endptr )
 		    {
                       lineno++;
@@ -1040,9 +971,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "xvals", len)  == 0 )
 	{
-	  double fval;
-	  char *endptr;
-
 	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_UNSTRUCTURED )
 	    size = grid.size;
 	  else
@@ -1050,34 +978,15 @@ int gridFromFile(FILE *gfp, const char *dname)
 
 	  if ( size > 0 )
 	    {
-	      pline = skipSeparator(pline + len);
 	      grid.xvals = (double*) Malloc(size*sizeof(double));
-
-	      for ( int i = 0; i < size; i++ )
-		{
-		  endptr = pline;
-		  fval = strtod(pline, &endptr);
-		  if ( pline == endptr )
-		    {
-                      lineno++;
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >xvals< (line: %d file: %s)", lineno, dname);
-
-		      pline = line;
-		      fval = strtod(pline, &endptr);
-		    }
-		  grid.xvals[i] = fval;
-		  pline = endptr;
-		}
+	      pline = skipSeparator(pline + len);
+              read_field("xvals", pline, size, grid.xvals, &lineno, gfp, dname);
 	    }
 	  else
 	    cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
 	}
       else if ( cmpstrlen(pline, "yvals", len)  == 0 )
 	{
-	  double fval;
-	  char *endptr;
-
 	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_UNSTRUCTURED )
 	    size = grid.size;
 	  else
@@ -1085,35 +994,15 @@ int gridFromFile(FILE *gfp, const char *dname)
 
 	  if ( size > 0 )
 	    {
-	      pline = skipSeparator(pline + len);
 	      grid.yvals = (double*) Malloc(size*sizeof(double));
-
-	      for ( int i = 0; i < size; i++ )
-		{
-		  endptr = pline;
-		  fval = strtod(pline, &endptr);
-		  if ( pline == endptr )
-		    {
-                      lineno++;
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >yvals< (line %d file: %s)", lineno, dname);
-
-		      pline = line;
-		      fval = strtod(pline, &endptr);
-		    }
-		  grid.yvals[i] = fval;
-		  pline = endptr;
-		}
+	      pline = skipSeparator(pline + len);
+              read_field("yvals", pline, size, grid.yvals, &lineno, gfp, dname);
 	    }
 	  else
 	    cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
 	}
       else if ( cmpstrlen(pline, "xbounds", len)  == 0 )
 	{
-	  int i = 0;
-	  double fval;
-	  char *endptr;
-
 	  if ( grid.nvertex == 0 )
 	    {
 	      if ( grid.type == GRID_LONLAT      ) grid.nvertex = 2;
@@ -1127,25 +1016,9 @@ int gridFromFile(FILE *gfp, const char *dname)
 
 	  if ( size > 0 && grid.nvertex > 0 )
 	    {	  
-	      pline = skipSeparator(pline + len);
 	      grid.xbounds = (double*) Malloc(size*grid.nvertex*sizeof(double));
-
-	      for ( i = 0; i < (int) (size*grid.nvertex); i++ )
-		{
-		  endptr = pline;
-		  fval = strtod(pline, &endptr);
-		  if ( pline == endptr )
-		    {
-                      lineno++;
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >xbounds< (line %d file: %s)", lineno, dname);
-
-		      pline = line;
-		      fval = strtod(pline, &endptr);
-		    }
-		  grid.xbounds[i] = fval;
-		  pline = endptr;
-		}
+	      pline = skipSeparator(pline + len);
+              read_field("xbounds", pline, size*grid.nvertex, grid.xbounds, &lineno, gfp, dname);
 	    }
 	  else
 	    {
@@ -1155,10 +1028,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "ybounds", len)  == 0 )
 	{
-	  int i = 0;
-	  double fval;
-	  char *endptr;
-
 	  if ( grid.nvertex == 0 )
 	    {
 	      if ( grid.type == GRID_LONLAT      ) grid.nvertex = 2;
@@ -1172,25 +1041,9 @@ int gridFromFile(FILE *gfp, const char *dname)
 
 	  if ( size > 0 && grid.nvertex > 0 )
 	    {	  
-	      pline = skipSeparator(pline + len);
 	      grid.ybounds = (double*) Malloc(size*grid.nvertex*sizeof(double));
-
-	      for ( i = 0; i < (int) (size*grid.nvertex); i++ )
-		{
-		  endptr = pline;
-		  fval = strtod(pline, &endptr);
-		  if ( pline == endptr )
-		    {
-                      lineno++;
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >ybounds< (line %d file: %s)", lineno, dname);
-                      
-		      pline = line;
-		      fval = strtod(pline, &endptr);
-		    }
-		  grid.ybounds[i] = fval;
-		  pline = endptr;
-		}
+	      pline = skipSeparator(pline + len);
+              read_field("ybounds", pline, size*grid.nvertex, grid.ybounds, &lineno, gfp, dname);
 	    }
 	  else
 	    {
@@ -1210,7 +1063,7 @@ int gridFromFile(FILE *gfp, const char *dname)
   printf("xsize %d\n", grid.xsize);
   printf("ysize %d\n", grid.ysize);
   */
-  if ( grid.type != UNDEFID ) gridID = gridDefine(grid);
+  int gridID = (grid.type == UNDEFID ) ? -1 : gridDefine(grid);
 
   return gridID;
 }
@@ -1446,13 +1299,12 @@ int ntr2nlat_linear(int ntr)
 
 int compNlon(int nlat)
 {
-  int n;
   int nlon = 2 * nlat;
 
   /* check that FFT works with nlon */
   while ( 1 )
     {
-      n = nlon;
+      int n = nlon;
       if    ( n % 8 == 0 )  { n /= 8; }
       while ( n % 6 == 0 )  { n /= 6; }
       while ( n % 5 == 0 )  { n /= 5; }
