@@ -1,0 +1,2 @@
+cdo -f nc4 duplicate,10 -topo,global_2 testfile
+cdo remapnn,testfile -add testfile testfile result
