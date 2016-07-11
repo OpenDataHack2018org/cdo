@@ -330,7 +330,7 @@ task :default do |t|
   sh "rake -sT"
 end
 
-desc "generate tags data base for vim amd emacs"
+desc "generate tags database for vim and emacs"
 task :tags do |t|
   srcFiles = Dir.glob("src/**/*.{h,c}") + Dir.glob("libcdi/**/*.{c,h,cpp,hpp,f90,f}")
   Parallel.map(["","-e"]) {|ctagsOutputMode|
