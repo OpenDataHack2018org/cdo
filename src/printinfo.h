@@ -138,9 +138,136 @@ void printFiletype(int streamID, int vlistID)
 }
 
 static
+void print_xvals(int gridID, int dig)
+{
+  int xsize = gridInqXsize(gridID);
+  if ( xsize > 0 && gridInqXvals(gridID, NULL) )
+    {
+      char xname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
+      gridInqXname(gridID, xname);
+      gridInqXunits(gridID, xunits);
+
+      double xfirst = gridInqXval(gridID, 0);
+      double xlast  = gridInqXval(gridID, xsize-1);
+      double xinc   = gridInqXinc(gridID);
+      fprintf(stdout, "%33s : %.*g", xname, dig, xfirst);
+      if ( xsize > 1 )
+        {
+          fprintf(stdout, " to %.*g", dig, xlast);
+          if ( IS_NOT_EQUAL(xinc, 0) )
+            fprintf(stdout, " by %.*g", dig, xinc);
+        }
+      fprintf(stdout, " %s", xunits);
+      if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
+      fprintf(stdout, "\n");
+    }
+}
+
+static
+void print_yvals(int gridID, int dig)
+{
+  int ysize = gridInqYsize(gridID);
+  if ( ysize > 0 && gridInqYvals(gridID, NULL) )
+    {
+      char yname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
+      gridInqYname(gridID, yname);
+      gridInqYunits(gridID, yunits);
+
+      double yfirst = gridInqYval(gridID, 0);
+      double ylast  = gridInqYval(gridID, ysize-1);
+      double yinc   = gridInqYinc(gridID);
+      fprintf(stdout, "%33s : %.*g", yname, dig, yfirst);
+      if ( ysize > 1 )
+        {
+          int gridtype = gridInqType(gridID);
+          fprintf(stdout, " to %.*g", dig, ylast);
+          if ( IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN && gridtype != GRID_GAUSSIAN_REDUCED )
+            fprintf(stdout, " by %.*g", dig, yinc);
+        }
+      fprintf(stdout, " %s", yunits);
+      fprintf(stdout, "\n");
+    }
+}
+
+static
+void print_xyvals2D(int gridID, int dig)
+{
+  if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
+    {
+      char xname[CDI_MAX_NAME], yname[CDI_MAX_NAME], xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
+      gridInqXname(gridID, xname);
+      gridInqYname(gridID, yname);
+      gridInqXunits(gridID, xunits);
+      gridInqYunits(gridID, yunits);
+
+      int gridsize = gridInqSize(gridID);
+      double *xvals2D = (double*) malloc((size_t)gridsize*sizeof(double));
+      double *yvals2D = (double*) malloc((size_t)gridsize*sizeof(double));
+
+      gridInqXvals(gridID, xvals2D);
+      gridInqYvals(gridID, yvals2D);
+
+      double xfirst = xvals2D[0];
+      double xlast  = xvals2D[0];
+      double yfirst = yvals2D[0];
+      double ylast  = yvals2D[0];
+      for ( int i = 1; i < gridsize; i++ )
+        {
+          if ( xvals2D[i] < xfirst ) xfirst = xvals2D[i];
+          if ( xvals2D[i] > xlast  ) xlast  = xvals2D[i];
+          if ( yvals2D[i] < yfirst ) yfirst = yvals2D[i];
+          if ( yvals2D[i] > ylast  ) ylast  = yvals2D[i];
+        }
+
+      double xinc = 0;
+      double yinc = 0;
+      int gridtype = gridInqType(gridID);
+      if ( gridtype == GRID_CURVILINEAR )
+        {
+          int xsize = gridInqXsize(gridID);
+          int ysize = gridInqYsize(gridID);
+          double *xvals = (double*) malloc(xsize*sizeof(double));
+          double *yvals = (double*) malloc(ysize*sizeof(double));
+          for ( int i = 0; i < xsize; ++i ) xvals[i] = xvals2D[i];
+          for ( int i = 0; i < ysize; ++i ) yvals[i] = yvals2D[i*xsize];
+
+          if ( xsize > 1 )
+            {
+              xinc = fabs(xvals[xsize-1] - xvals[0])/(xsize-1);
+              for ( int i = 2; i < xsize; i++ )
+                if ( fabs(fabs(xvals[i-1] - xvals[i]) - xinc) > 0.01*xinc ) { xinc = 0; break; }
+            }
+          if ( ysize > 1 )
+            {
+              yinc = fabs(yvals[ysize-1] - yvals[0])/(ysize-1);
+              for ( int i = 2; i < ysize; i++ )
+                if ( fabs(fabs(yvals[i-1] - yvals[i]) - yinc) > 0.01*yinc ) { yinc = 0; break; }
+            }
+
+          free(xvals);
+          free(yvals);
+        }
+
+      fprintf(stdout, "%33s : %.*g to %.*g", xname, dig, xfirst, dig, xlast);
+      if ( IS_NOT_EQUAL(xinc, 0) )
+        fprintf(stdout, " by %.*g", dig, xinc);
+      fprintf(stdout, " %s", xunits);
+      if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
+      fprintf(stdout, "\n");
+      fprintf(stdout, "%33s : %.*g to %.*g", yname, dig, yfirst, dig, ylast);
+      if ( IS_NOT_EQUAL(yinc, 0) )
+        fprintf(stdout, " by %.*g", dig, yinc);
+      fprintf(stdout, " %s", xunits);
+      fprintf(stdout, "\n");
+
+      free(xvals2D);
+      free(yvals2D);
+    }
+}
+
+static
 void printGridInfo(int vlistID)
 {
-  char xname[CDI_MAX_NAME], yname[CDI_MAX_NAME], xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   unsigned char uuidOfHGrid[CDI_UUID_SIZE];
 
   int ngrids = vlistNgrids(vlistID);
@@ -158,11 +285,6 @@ void printGridInfo(int vlistID)
       // int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
       int dig = 7;
 
-      gridInqXname(gridID, xname);
-      gridInqYname(gridID, yname);
-      gridInqXunits(gridID, xunits);
-      gridInqYunits(gridID, yunits);
-
       fprintf(stdout, "  %4d : %-24s", index+1, gridNamePtr(gridtype));
 
       if ( gridtype == GRID_LONLAT   ||
@@ -173,10 +295,6 @@ void printGridInfo(int vlistID)
 	   gridtype == GRID_GAUSSIAN ||
 	   gridtype == GRID_GAUSSIAN_REDUCED )
 	{
-	  double yfirst = gridInqYval(gridID, 0);
-	  double ylast  = gridInqYval(gridID, ysize-1);
-	  double yinc   = gridInqYinc(gridID);
-
           fprintf(stdout, " : points=%d", gridsize);
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
 	    fprintf(stdout, "  nlat=%d", ysize);
@@ -188,39 +306,8 @@ void printGridInfo(int vlistID)
 
 	  fprintf(stdout, "\n");
 
-          bool lxcoord = true, lycoord = true;
-          if ( gridInqXvals(gridID, NULL) == 0 ) lxcoord = false;
-          if ( gridInqYvals(gridID, NULL) == 0 ) lycoord = false;
-
-	  if ( xsize > 0 && lxcoord )
-	    {
-              double xfirst = gridInqXval(gridID, 0);
-              double xlast  = gridInqXval(gridID, xsize-1);
-              double xinc   = gridInqXinc(gridID);
-              fprintf(stdout, "%33s : %.*g", xname, dig, xfirst);
-              if ( xsize > 1 )
-                {
-                  fprintf(stdout, " to %.*g", dig, xlast);
-                  if ( IS_NOT_EQUAL(xinc, 0) )
-                    fprintf(stdout, " by %.*g", dig, xinc);
-                }
-              fprintf(stdout, " %s", xunits);
-              if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
-              fprintf(stdout, "\n");
-	    }
-
-	  if ( ysize > 0 && lycoord )
-	    {
-	      fprintf(stdout, "%33s : %.*g", yname, dig, yfirst);
-	      if ( ysize > 1 )
-                {
-                  fprintf(stdout, " to %.*g", dig, ylast);
-                  if ( IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN && gridtype != GRID_GAUSSIAN_REDUCED )
-                    fprintf(stdout, " by %.*g", dig, yinc);
-                }
-              fprintf(stdout, " %s", yunits);
-	      fprintf(stdout, "\n");
-	    }
+          print_xvals(gridID, dig);
+          print_yvals(gridID, dig);
 
 	  if ( gridIsRotated(gridID) )
 	    {
@@ -288,11 +375,8 @@ void printGridInfo(int vlistID)
             {
               int number   = gridInqNumber(gridID);
               int position = gridInqPosition(gridID);
-
               if ( number > 0 )
-                {
-                  fprintf(stdout, "%33s : number=%d  position=%d\n", "grid", number, position);
-                }
+                fprintf(stdout, "%33s : number=%d  position=%d\n", "grid", number, position);
 
               if ( gridInqReference(gridID, NULL) )
                 {
@@ -302,34 +386,7 @@ void printGridInfo(int vlistID)
                 }
             }
 
-	  if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
-	    {
-	      double *xvals = (double*) malloc((size_t)gridsize*sizeof(double));
-	      double *yvals = (double*) malloc((size_t)gridsize*sizeof(double));
-
-	      gridInqXvals(gridID, xvals);
-	      gridInqYvals(gridID, yvals);
-
-	      double xfirst = xvals[0];
-	      double xlast  = xvals[0];
-	      double yfirst = yvals[0];
-	      double ylast  = yvals[0];
-	      for ( int i = 1; i < gridsize; i++ )
-		{
-		  if ( xvals[i] < xfirst ) xfirst = xvals[i];
-		  if ( xvals[i] > xlast  ) xlast  = xvals[i];
-		  if ( yvals[i] < yfirst ) yfirst = yvals[i];
-		  if ( yvals[i] > ylast  ) ylast  = yvals[i];
-		}
-
-	      fprintf(stdout, "%33s : %.*g to %.*g %s", xname, dig, xfirst, dig, xlast, xunits);
-	      if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
-	      fprintf(stdout, "\n");
-	      fprintf(stdout, "%33s : %.*g to %.*g %s\n", yname, dig, yfirst, dig, ylast, yunits);
-
-	      free(xvals);
-	      free(yvals);
-	    }
+          print_xyvals2D(gridID, dig);
 	}
       else if ( gridtype == GRID_LCC )
 	{
@@ -348,6 +405,16 @@ void printGridInfo(int vlistID)
 	  fprintf(stdout, "%33s : originLon=%g  originLat=%g  lonParY=%g\n", " ", originLon, originLat, lonParY);
 	  fprintf(stdout, "%33s : lat1=%g  lat2=%g  xinc=%g m  yinc=%g m\n", " ", lat1, lat2, xincm, yincm);
 	}
+      else if ( gridtype == GRID_PROJECTION )
+        {
+	  if ( ysize == 0 )
+	    fprintf(stdout, " : points=%d\n", gridsize);
+	  else
+            fprintf(stdout, " : points=%d (%dx%d)\n", gridsize, xsize, ysize);
+
+          print_xvals(gridID, dig);
+          print_yvals(gridID, dig);
+        }
       else /* if ( gridtype == GRID_GENERIC ) */
 	{
 	  if ( ysize == 0 )
