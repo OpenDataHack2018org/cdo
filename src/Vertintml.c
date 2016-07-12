@@ -41,7 +41,7 @@ void *Vertintml(void *argument)
   enum {ECHAM_MODE, WMO_MODE};
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
-  int recID, nrecs;
+  int nrecs;
   int i, k, offset;
   int varID, levelID;
   int zaxisIDp, zaxisIDh = -1;
@@ -49,22 +49,20 @@ void *Vertintml(void *argument)
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
   int nvct = 0;
-  int sgeopot_needed = FALSE;
+  bool sgeopot_needed = false;
+  bool extrapolate = false;
   int sgeopotID = -1, geopotID = -1, tempID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
-  int code, param;
+  int code;
   int pnum, pcat, pdis;
   //int sortlevels = TRUE;
   int *pnmiss = NULL;
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double minval, maxval;
-  double missval;
   double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
-  int Extrapolate = 0;
   int instNum, tableNum;
-  int useTable;
   gribcode_t gribcodes = {0};
   LIST *flist = listNew(FLT_LIST);
 
@@ -89,14 +87,14 @@ void *Vertintml(void *argument)
 
       if ( envstr && isdigit((int) envstr[0]) )
 	{
-          Extrapolate = atoi(envstr);
-          if ( Extrapolate == 1 )
+          if ( atoi(envstr) == 1 ) extrapolate = true;
+          if ( extrapolate )
             cdoPrint("Extrapolation of missing values enabled!");
 	}
     }
   else if ( operatorID == ML2PLX || operatorID == ML2HLX || operatorID == ML2PLX_LP || operatorID == ML2HLX_LP )
     {
-      Extrapolate = 1;
+      extrapolate = true;
     }
 
   operatorInputArg(cdoOperatorEnter(operatorID));
@@ -188,8 +186,7 @@ void *Vertintml(void *argument)
 
   int maxlev   = nhlevh > nplev ? nhlevh : nplev;
 
-  if ( Extrapolate == 0 )
-    pnmiss = (int*) Malloc(nplev*sizeof(int));
+  if ( !extrapolate ) pnmiss = (int*) Malloc(nplev*sizeof(int));
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -234,13 +231,13 @@ void *Vertintml(void *argument)
   if ( opertype == type_log )
     for ( k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
-  useTable = FALSE;
+  bool useTable = false;
   for ( varID = 0; varID < nvars; varID++ )
     {
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
       if ( tableNum > 0 && tableNum != 255 )
 	{
-	  useTable = TRUE;
+	  useTable = true;
 	  break;
 	}
     }
@@ -257,8 +254,8 @@ void *Vertintml(void *argument)
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
       code     = vlistInqVarCode(vlistID1, varID);
-      param    = vlistInqVarParam(vlistID1, varID);
-
+      
+      int param = vlistInqVarParam(vlistID1, varID);
       cdiParamToString(param, paramstr, sizeof(paramstr));
       cdiDecodeParam(param, &pnum, &pcat, &pdis);
       if ( pdis >= 0 && pdis < 255 ) code = -1;
@@ -368,18 +365,20 @@ void *Vertintml(void *argument)
       if ( gheightID != -1 ) cdoPrint("  %s", var_stdname(geopotential_height));
     }
 
-  if ( tempID != -1 || gheightID != -1 ) sgeopot_needed = TRUE;
+  if ( tempID != -1 || gheightID != -1 ) sgeopot_needed = true;
 
   if ( zaxisIDh != -1 && sgeopot_needed )
     {
       sgeopot = (double*) Malloc(gridsize*sizeof(double));
       if ( sgeopotID == -1 )
 	{
-	  if ( geopotID == -1 )
-	    cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
-	  else
-	    cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
-
+          if ( extrapolate )
+            {
+              if ( geopotID == -1 )
+                cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
+              else
+                cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
+            }
 	  memset(sgeopot, 0, gridsize*sizeof(double));
 	}
     }
@@ -432,7 +431,7 @@ void *Vertintml(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  //gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -465,7 +464,7 @@ void *Vertintml(void *argument)
 		memcpy(sgeopot, vardata1[geopotID]+gridsize*(nhlevf-1), gridsize*sizeof(double));
 
 	      /* check range of surface geopot */
-	      if ( sgeopotID != -1 || geopotID != -1 )
+	      if ( extrapolate && (sgeopotID != -1 || geopotID != -1) )
 		{
 		  minmaxval(gridsize, sgeopot, NULL, &minval, &maxval);
 		  if ( minval < MIN_FIS || maxval > MAX_FIS )
@@ -503,8 +502,7 @@ void *Vertintml(void *argument)
 
 	  genind(vert_index, plev, full_press, gridsize, nplev, nhlevf);
 
-	  if ( Extrapolate == 0 )
-	    genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
+	  if ( !extrapolate ) genindmiss(vert_index, plev, gridsize, nplev, ps_prog, pnmiss);
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -513,7 +511,7 @@ void *Vertintml(void *argument)
 	    {
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	      missval  = vlistInqVarMissval(vlistID1, varID);
+	      double missval  = vlistInqVarMissval(vlistID1, varID);
 	      //gridsize = gridInqSize(gridID);
 	      nlevel   = zaxisInqSize(zaxisID);
 	      if ( varinterp[varID] )
@@ -546,7 +544,7 @@ void *Vertintml(void *argument)
 		    }
 		  else
 		    {
-		      param = vlistInqVarParam(vlistID1, varID);
+		      int param = vlistInqVarParam(vlistID1, varID);
 		      cdiParamToString(param, paramstr, sizeof(paramstr));
 		      cdoAbort("Number of hybrid level differ from full/half level (param=%s)!", paramstr);
 		    }
@@ -562,7 +560,7 @@ void *Vertintml(void *argument)
 		      if ( nlevel == nhlevh )
 			cdoAbort("Temperature on half level unsupported!");
 
-		      if ( opertype == type_log && Extrapolate )
+		      if ( opertype == type_log && extrapolate )
 			cdoAbort("Log. extrapolation of temperature unsupported!");
 
 		      interp_T(sgeopot, vardata1[varID], vardata2[varID],
@@ -584,8 +582,7 @@ void *Vertintml(void *argument)
 			       vert_index, plev, nplev, gridsize, nlevel, missval);
 		    }
 		  
-		  if ( Extrapolate == 0 )
-		    memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
+		  if ( !extrapolate ) memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
 		}
 	    }
 	}
