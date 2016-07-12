@@ -3881,7 +3881,7 @@ static const char *VertintmlHelp[] = {
     "DESCRIPTION",
     "    Interpolate 3D variables on hybrid sigma pressure level to pressure or height levels.",
     "    The input file should contain the log. surface pressure or the surface pressure.",
-    "    To interpolate the temperature, the surface geopotential is also needed.",
+    "    To extrapolate the temperature, the surface geopotential is also needed.",
     "    The pressure, temperature, and surface geopotential are identified by their GRIB1 code number",
     "    or NetCDF CF standard name.",
     "    Supported parameter tables are: WMO standard table number 2 and ECMWF local table number 128.",
