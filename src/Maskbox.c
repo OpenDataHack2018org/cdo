@@ -114,8 +114,7 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
 
 
 static
-void maskbox(int *mask, int gridID,
-	     int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+void maskbox(int *mask, int gridID, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   int nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
@@ -160,7 +159,7 @@ void maskbox_curv(int *mask, int gridID)
   if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
 
   double xval, yval, xfirst, xlast, ylast;
-  int lp2 = FALSE;
+  bool lp2 = false;
 
   if ( xlon1 > xlon2 ) 
     cdoAbort("The second longitude have to be greater than the first one!");
@@ -171,23 +170,21 @@ void maskbox_curv(int *mask, int gridID)
       xlat1 = xlat2;
       xlat2 = xtemp;
     }
-
-  int ilat, ilon;
   
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  for ( int ilat = 0; ilat < nlat; ilat++ )
     {
       xlast = xfact * xvals[ilat*nlon + nlon-1];
       ylast = yfact * yvals[ilat*nlon + nlon-1];
       if ( ylast >= xlat1 && ylast <= xlat2 )
         if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
           {
-            lp2 = TRUE;
+            lp2 = true;
           }
     }
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  for ( int ilat = 0; ilat < nlat; ilat++ )
     {
-      for ( ilon = 0; ilon < nlon; ilon++ )
+      for ( int ilon = 0; ilon < nlon; ilon++ )
         {
           mask[nlon*ilat + ilon] = 1;
 
@@ -236,19 +233,11 @@ void maskbox_curv(int *mask, int gridID)
 static
 void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
-  int i, j;
-  int nlon, nlat;
-  int ilat, ilon;
-  int c;
-  double *xvals, *yvals;
-  double xval, yval;
-  double xmin, xmax, ymin, ymax;
+  int nlon = gridInqXsize(gridID);
+  int nlat = gridInqYsize(gridID);
 
-  nlon = gridInqXsize(gridID);
-  nlat = gridInqYsize(gridID);
-
-  xvals = (double*) Malloc(nlon*sizeof(double));
-  yvals = (double*) Malloc(nlat*sizeof(double));
+  double *xvals = (double*) Malloc(nlon*sizeof(double));
+  double *yvals = (double*) Malloc(nlat*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);  
@@ -262,35 +251,36 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
     grid_to_degree(units, nlat, yvals, "grid center lat");
   }
 
-  xmin = xvals[0];
-  xmax = xvals[0];
-  ymin = yvals[0];
-  ymax = yvals[0];
+  double xmin = xvals[0];
+  double xmax = xvals[0];
+  double ymin = yvals[0];
+  double ymax = yvals[0];
 
-  for ( i = 1; i < nlon; i++ )
+  for ( int i = 1; i < nlon; i++ )
     {
       if ( xvals[i] < xmin ) xmin = xvals[i];
       if ( xvals[i] > xmax ) xmax = xvals[i];
     }
 
-  for ( i = 1; i < nlat; i++ )
+  for ( int i = 1; i < nlat; i++ )
     {
       if ( yvals[i] < ymin ) ymin = yvals[i];
       if ( yvals[i] > ymax ) ymax = yvals[i];
     }
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  for ( int ilat = 0; ilat < nlat; ilat++ )
     {
-      yval = yvals[ilat];
-      for ( ilon = 0; ilon < nlon; ilon++ )
+      double yval = yvals[ilat];
+      for ( int ilon = 0; ilon < nlon; ilon++ )
 	{
-          c = 0;
-	  xval = xvals[ilon];
+          int i, j;
+          int c = 0;
+	  double xval = xvals[ilon];
 	  if (!( ( ( xval > xmin ) || ( xval < xmax ) ) || ( (yval > ymin) || (yval < ymax) ) ) ) c = !c;
 	  	  
           if ( c == 0 )
 	    {
-	      for (i = 0, j = nofcoords-1; i < nofcoords; j = i++)
+	      for ( i = 0, j = nofcoords-1; i < nofcoords; j = i++ )
 	    
 	      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
 		   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
@@ -300,7 +290,7 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 
 	  if ( c == 0 )
 	    {
-	      for (i = 0, j = nofcoords-1; i < nofcoords; j = i++)
+	      for ( i = 0, j = nofcoords-1; i < nofcoords; j = i++ )
 		{
 		  if ( xvals[ilon] > 180 )
 		    {
@@ -314,9 +304,9 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
  
 	  if ( c == 0 )
 	    {
-	      for ( i = 0, j = nofcoords-1; i< nofcoords; j = i++)
+	      for ( i = 0, j = nofcoords-1; i< nofcoords; j = i++ )
 		{		
-		  if ( xval<0 )
+		  if ( xval < 0 )
 		    {
 		      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
 			   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
@@ -326,7 +316,7 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 		}
 	    }
 	     
-	  if( c != 0 ) mask[nlon*ilat+ilon] =  0;
+	  if ( c != 0 ) mask[nlon*ilat+ilon] =  0;
 	}
     }
       
@@ -338,17 +328,10 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 void *Maskbox(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int gridID = -1;
   int index, gridtype = -1;
-  int nmiss;
-  int i, i2;
   int lat1, lat2, lon11, lon12, lon21, lon22;
-  int number = 0, nfiles;
-  double missval;
-  double *xcoords, *ycoords;
-  FILE *fp;
-  const char *polyfile;
 
   cdoInitialize(argument);
 
@@ -381,7 +364,7 @@ void *Maskbox(void *argument)
 	  gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 ) break;
     }
 
-  if ( gridInqType(gridID) == GRID_GAUSSIAN_REDUCED )
+  if ( gridtype == GRID_GAUSSIAN_REDUCED )
     cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
   if ( index == ngrids ) cdoAbort("No regular grid found!");
@@ -412,7 +395,7 @@ void *Maskbox(void *argument)
   int gridsize = gridInqSize(gridID);
   double *array = (double *) Malloc(gridsize*sizeof(double));
   int *mask  = (int *) Malloc(gridsize*sizeof(int));
-  for ( i = 0;  i < gridsize; ++i ) mask[i] = 1;
+  for ( int i = 0;  i < gridsize; ++i ) mask[i] = 1;
  
   if ( operatorID == MASKLONLATBOX )
     {
@@ -433,19 +416,19 @@ void *Maskbox(void *argument)
     }
   if ( operatorID == MASKREGION )
     {
-      xcoords = (double*) Malloc( MAX_VALS*sizeof(double));
-      ycoords = (double*) Malloc( MAX_VALS*sizeof(double));
-      nfiles = operatorArgc();
+      double *xcoords = (double*) Malloc( MAX_VALS*sizeof(double));
+      double *ycoords = (double*) Malloc( MAX_VALS*sizeof(double));
+      int nfiles = operatorArgc();
      
-      for ( i2 = 0; i2 < nfiles; i2++ )
+      for ( int i = 0; i < nfiles; i++ )
 	{
-	  polyfile = operatorArgv()[i2];
-	  fp = fopen(polyfile, "r");
+	  const char *polyfile = operatorArgv()[i];
+	  FILE *fp = fopen(polyfile, "r");
 	 
 	  if ( fp == 0 ) cdoAbort("Open failed on %s", polyfile);   
 	  while ( TRUE )
 	    {
-	      number = ReadCoords (xcoords, ycoords, polyfile, fp );
+	      int number = ReadCoords(xcoords, ycoords, polyfile, fp );
 	      if ( number == 0 ) break;
 	      if ( number < 3 ) cdoAbort( "Too less values in file %s", polyfile );
 	      maskregion(mask, gridID, xcoords, ycoords, number);
@@ -460,26 +443,25 @@ void *Maskbox(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( vars[varID] )
 	    {
+              int nmiss;
 	      streamReadRecord(streamID1, array, &nmiss);
-              missval = vlistInqVarMissval(vlistID1, varID);
+              double missval = vlistInqVarMissval(vlistID1, varID);
              
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		{
 		  if ( mask[i] ) array[i] = missval;
 		}
 		
 	      nmiss = 0;
-
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
 	      streamDefRecord(streamID2, varID, levelID);
