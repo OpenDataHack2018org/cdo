@@ -114,7 +114,7 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
 
 
 static
-void maskbox(int *mask, int gridID, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+void maskbox(bool *mask, int gridID, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   int nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
@@ -123,22 +123,19 @@ void maskbox(int *mask, int gridID, int lat1, int lat2, int lon11, int lon12, in
     for ( int ilon = 0; ilon < nlon; ilon++ )
       if (  (lat1 <= ilat && ilat <= lat2 && 
 	      ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) )
-	mask[nlon*ilat + ilon] = 0;
+	mask[nlon*ilat + ilon] = false;
 }
 
 void getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1, double *xlat2);
-void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
-                       int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
 
 static
-void maskbox_curv(int *mask, int gridID)
+void maskbox_curv(bool *mask, int gridID)
 {
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(0, &xlon1, &xlon2, &xlat1, &xlat2);
 
   int nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
-
   int gridsize = nlon*nlat;
 
   int grid_is_circular = gridIsCircular(gridID);
@@ -186,7 +183,7 @@ void maskbox_curv(int *mask, int gridID)
     {
       for ( int ilon = 0; ilon < nlon; ilon++ )
         {
-          mask[nlon*ilat + ilon] = 1;
+          mask[nlon*ilat + ilon] = true;
 
           xval = xvals[ilat*nlon + ilon];
           yval = yvals[ilat*nlon + ilon];
@@ -206,11 +203,11 @@ void maskbox_curv(int *mask, int gridID)
 
                   if ( xval >= xlon1 && xval <= xlast )
                     {
-                      mask[nlon*ilat + ilon] = 0;
+                      mask[nlon*ilat + ilon] = false;
                     }
                   else if ( xval >= xfirst && xval <= xlon2 )
                     {
-                      mask[nlon*ilat + ilon] = 0;
+                      mask[nlon*ilat + ilon] = false;
                     }
                 }
               else
@@ -219,7 +216,7 @@ void maskbox_curv(int *mask, int gridID)
                         (xval-360 >= xlon1 && xval-360 <= xlon2) ||
                         (xval+360 >= xlon1 && xval+360 <= xlon2)) )
                     {
-                      mask[nlon*ilat + ilon] = 0;
+                      mask[nlon*ilat + ilon] = false;
                     }
                 }
             }
@@ -231,7 +228,7 @@ void maskbox_curv(int *mask, int gridID)
 }
 
 static
-void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
+void maskregion(bool *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
   int nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
@@ -316,7 +313,7 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 		}
 	    }
 	     
-	  if ( c != 0 ) mask[nlon*ilat+ilon] =  0;
+	  if ( c != 0 ) mask[nlon*ilat+ilon] =  false;
 	}
     }
       
@@ -359,7 +356,7 @@ void *Maskbox(void *argument)
       gridtype = gridInqType(gridID);
 
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
-      if ( gridtype == GRID_CURVILINEAR ) break;
+      if ( operatorID != MASKREGION && gridtype == GRID_CURVILINEAR ) break;
       if ( operatorID == MASKINDEXBOX && gridtype == GRID_GENERIC &&
 	  gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 ) break;
     }
@@ -367,7 +364,7 @@ void *Maskbox(void *argument)
   if ( gridtype == GRID_GAUSSIAN_REDUCED )
     cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
-  if ( index == ngrids ) cdoAbort("No regular grid found!");
+  if ( index == ngrids ) cdoAbort("No regular lon/lat grid found!");
   if ( ndiffgrids > 0 )  cdoAbort("Too many different grids!");
 
   operatorInputArg(cdoOperatorEnter(operatorID));
@@ -379,13 +376,13 @@ void *Maskbox(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  int *vars = (int *) Malloc(nvars*sizeof(int));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( gridID == vlistInqVarGrid(vlistID1, varID) )
-	vars[varID] = TRUE;
+	vars[varID] = true;
       else
-	vars[varID] = FALSE;
+	vars[varID] = false;
     }
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -394,8 +391,8 @@ void *Maskbox(void *argument)
 
   int gridsize = gridInqSize(gridID);
   double *array = (double *) Malloc(gridsize*sizeof(double));
-  int *mask  = (int *) Malloc(gridsize*sizeof(int));
-  for ( int i = 0;  i < gridsize; ++i ) mask[i] = 1;
+  bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
+  for ( int i = 0;  i < gridsize; ++i ) mask[i] = true;
  
   if ( operatorID == MASKLONLATBOX )
     {
@@ -453,12 +450,10 @@ void *Maskbox(void *argument)
 	    {
               int nmiss;
 	      streamReadRecord(streamID1, array, &nmiss);
-              double missval = vlistInqVarMissval(vlistID1, varID);
-             
+
+              double missval = vlistInqVarMissval(vlistID1, varID);             
 	      for ( int i = 0; i < gridsize; i++ )
-		{
-		  if ( mask[i] ) array[i] = missval;
-		}
+                if ( mask[i] ) array[i] = missval;
 		
 	      nmiss = 0;
 	      for ( int i = 0; i < gridsize; i++ )

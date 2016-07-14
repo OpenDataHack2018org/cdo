@@ -421,12 +421,10 @@ void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, doub
     cdoAbort("Latitudinal dimension is too small!");
 }
 
-
+static
 void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
                        int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
-{
-  int ilon, ilat;
-  
+{  
   int nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
   int gridsize = nlon*nlat;
@@ -449,7 +447,7 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
   if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
 
   double xval, yval, xfirst, xlast, ylast;
-  int lp2 = FALSE;
+  bool lp2 = false;
 
   if ( xlon1 > xlon2 ) 
     cdoAbort("The second longitude have to be greater than the first one!");
@@ -468,7 +466,7 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
   *lon21 = nlon-1;
   *lon22 = 0;
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  for ( int ilat = 0; ilat < nlat; ilat++ )
     {
       xlast = xfact * xvals[ilat*nlon + nlon-1];
       ylast = yfact * yvals[ilat*nlon + nlon-1];
@@ -477,20 +475,16 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
           {
             *lon11 = nlon-1;
             *lon12 = 0;
-            lp2 = TRUE;
+            lp2 = true;
           }
     }
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  for ( int ilat = 0; ilat < nlat; ilat++ )
     {
-      for ( ilon = 0; ilon < nlon; ilon++ )
+      for ( int ilon = 0; ilon < nlon; ilon++ )
         {
-          xval = xvals[ilat*nlon + ilon];
-          yval = yvals[ilat*nlon + ilon];
-
-          xval *= xfact;
-          yval *= yfact;
-
+          xval = xfact * xvals[ilat*nlon + ilon];
+          yval = yfact * yvals[ilat*nlon + ilon];
           if ( yval >= xlat1 && yval <= xlat2 )
             {
               if ( lp2 )
@@ -588,6 +582,7 @@ void genlonlatbox(int argc_offset, int gridID, int *lat1, int *lat2, int *lon11,
     {
       genlonlatbox_reg(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
     }
+  //printf("lat1, lat2, lon11, lon12, lon21, lon22 %d %d %d %d %d %d\n", *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 }
 
 static
@@ -604,8 +599,6 @@ static
 int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 {
   int cellinc = 4096;
-  char xunits[CDI_MAX_NAME];
-  char yunits[CDI_MAX_NAME];
   
   int argc_offset = 0;
   operatorCheckArgc(argc_offset+4);
@@ -626,10 +619,11 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
   double *xvals = (double*) Malloc(gridsize1*sizeof(double));
   double *yvals = (double*) Malloc(gridsize1*sizeof(double));
-
   gridInqXvals(gridID1, xvals);
   gridInqYvals(gridID1, yvals);
 
+  char xunits[CDI_MAX_NAME];
+  char yunits[CDI_MAX_NAME];
   gridInqXunits(gridID1, xunits);
   gridInqYunits(gridID1, yunits);
 
@@ -646,7 +640,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
       double xval = xvals[i]*xfact;
       double yval = yvals[i]*yfact;
       if ( yval >= xlat1 && yval <= xlat2 )
-	if ( (xval >= xlon1 && xval <= xlon2) ||
+	if ( (xval     >= xlon1 && xval     <= xlon2) ||
 	     (xval+360 >= xlon1 && xval+360 <= xlon2) ||
 	     (xval-360 >= xlon1 && xval-360 <= xlon2)  )
 	  {
@@ -806,11 +800,9 @@ void window(int nwpv, double *array1, int gridID1, double *array2,
 static
 void window_cell(int nwpv, double *array1, int gridID1, double *array2, long gridsize2, int *cellidx)
 {
-  long i;
-
   if ( nwpv == 2 )
     {
-      for ( i = 0; i < gridsize2; ++i )
+      for ( long i = 0; i < gridsize2; ++i )
 	{
 	  array2[i*2]   = array1[cellidx[i]*2];
 	  array2[i*2+1] = array1[cellidx[i]*2+1];
@@ -818,7 +810,7 @@ void window_cell(int nwpv, double *array1, int gridID1, double *array2, long gri
     }
   else
     {
-      for ( i = 0; i < gridsize2; ++i )
+      for ( long i = 0; i < gridsize2; ++i )
 	array2[i] = array1[cellidx[i]];
     }
 }
@@ -827,12 +819,10 @@ void window_cell(int nwpv, double *array1, int gridID1, double *array2, long gri
 void *Selbox(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int gridID1 = -1, gridID2;
   int index, gridtype = -1;
   int nmiss;
-  int i;
-  int nwpv; // number of words per value; real:1  complex:2
   double missval;
   typedef struct {
     int gridID1, gridID2;
@@ -859,8 +849,8 @@ void *Selbox(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  int *vars  = (int *) Malloc(nvars*sizeof(int));
-  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
+  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
   sbox_t *sbox = (sbox_t *) Malloc(ngrids*sizeof(sbox_t));
@@ -897,7 +887,7 @@ void *Selbox(void *argument)
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
-	      vars[varID] = TRUE;
+	      vars[varID] = true;
 	}
       else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID1) <= 1 && gridInqYsize(gridID1) <=1 )
 	{
@@ -923,7 +913,7 @@ void *Selbox(void *argument)
     }
 
   for ( varID = 0; varID < nvars; varID++ )
-    if ( vars[varID] == TRUE ) break;
+    if ( vars[varID] ) break;
 
   if ( varID >= nvars ) cdoWarning("No variables selected!");
 
@@ -946,7 +936,7 @@ void *Selbox(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
@@ -955,7 +945,8 @@ void *Selbox(void *argument)
 
 	  if ( vars[varID] )
 	    {
-	      nwpv    = vlistInqNWPV(vlistID1, varID);
+              // number of words per value; real:1  complex:2
+	      int nwpv = vlistInqNWPV(vlistID1, varID);
 	      
 	      gridID1 = vlistInqVarGrid(vlistID1, varID);
 
@@ -976,7 +967,7 @@ void *Selbox(void *argument)
 		{
 		  nmiss = 0;
 		  missval = vlistInqVarMissval(vlistID2, varID);
-		  for ( i = 0; i < gridsize2; i++ )
+		  for ( int i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 		}
 
