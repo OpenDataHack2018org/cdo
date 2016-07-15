@@ -446,9 +446,6 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
   if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
   if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
 
-  double xval, yval, xfirst, xlast, ylast;
-  bool lp2 = false;
-
   if ( xlon1 > xlon2 ) 
     cdoAbort("The second longitude have to be greater than the first one!");
 
@@ -458,6 +455,11 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
       xlat1 = xlat2;
       xlat2 = xtemp;
     }
+
+  double x0 = 0;
+  for ( int ilat = 0; ilat < nlat; ilat++ ) if ( xvals[ilat*nlon] < x0 ) x0 = xvals[ilat*nlon];
+  xlon2 -= 360 * floor ((xlon1 - x0) / 360);
+  xlon1 -= 360 * floor ((xlon1 - x0) / 360);
 	  
   *lat1 = nlat-1;
   *lat2 = 0;
@@ -466,25 +468,31 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
   *lon21 = nlon-1;
   *lon22 = 0;
 
-  for ( int ilat = 0; ilat < nlat; ilat++ )
+  bool lp2 = false;
+  double xfirst, xlast, ylast;
+  if ( grid_is_circular )
     {
-      xlast = xfact * xvals[ilat*nlon + nlon-1];
-      ylast = yfact * yvals[ilat*nlon + nlon-1];
-      if ( ylast >= xlat1 && ylast <= xlat2 )
-        if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
-          {
-            *lon11 = nlon-1;
-            *lon12 = 0;
-            lp2 = true;
-          }
+      for ( int ilat = 0; ilat < nlat; ilat++ )
+        {
+          xlast = xfact * xvals[ilat*nlon + nlon-1];
+          ylast = yfact * yvals[ilat*nlon + nlon-1];
+          if ( ylast >= xlat1 && ylast <= xlat2 )
+            if ( xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
+              {
+                *lon11 = nlon-1;
+                *lon12 = 0;
+                lp2 = true;
+                break;
+              }
+        }
     }
 
   for ( int ilat = 0; ilat < nlat; ilat++ )
     {
       for ( int ilon = 0; ilon < nlon; ilon++ )
         {
-          xval = xfact * xvals[ilat*nlon + ilon];
-          yval = yfact * yvals[ilat*nlon + ilon];
+          double xval = xfact * xvals[ilat*nlon + ilon];
+          double yval = yfact * yvals[ilat*nlon + ilon];
           if ( yval >= xlat1 && yval <= xlat2 )
             {
               if ( lp2 )
@@ -502,7 +510,7 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
                       if ( ilat < *lat1 ) *lat1 = ilat;
                       if ( ilat > *lat2 ) *lat2 = ilat;
                     }
-                  else if ( xval >= xfirst && xval <= xlon2 )
+                  else if ( xval >= xfirst-360 && xval <= xlon2-360 )
                     {
                       if ( ilon < *lon11 ) *lon11 = ilon;
                       if ( ilon > *lon12 ) *lon12 = ilon;
@@ -526,7 +534,6 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
         }
     }
 
-  // printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d\n", *lon11, *lon12, *lon21, *lon22, *lat1, *lat2);
   if ( *lon12 == 0 && *lon11 > 0 ) *lon11 = -1;
 
   if ( *lat2 - *lat1 + 1 <= 0 )
@@ -582,7 +589,6 @@ void genlonlatbox(int argc_offset, int gridID, int *lat1, int *lat2, int *lon11,
     {
       genlonlatbox_reg(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
     }
-  //printf("lat1, lat2, lon11, lon12, lon21, lon22 %d %d %d %d %d %d\n", *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 }
 
 static

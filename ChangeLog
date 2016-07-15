@@ -1,3 +1,7 @@
+2016-07-15  Uwe Schulzweida
+
+	* sellonlatbox: fix bug with curvilinear grids
+
 2016-07-02  Uwe Schulzweida
 
 	* pstreamOpenAppend: added call to set_comp() (bug fix)
