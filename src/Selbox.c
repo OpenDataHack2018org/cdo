@@ -455,12 +455,14 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
       xlat1 = xlat2;
       xlat2 = xtemp;
     }
-
+  /*
+  printf("xlon1, xlon2 %g %g\n",xlon1, xlon2);
   double x0 = 0;
   for ( int ilat = 0; ilat < nlat; ilat++ ) if ( xvals[ilat*nlon] < x0 ) x0 = xvals[ilat*nlon];
   xlon2 -= 360 * floor ((xlon1 - x0) / 360);
   xlon1 -= 360 * floor ((xlon1 - x0) / 360);
-	  
+  printf("xlon1, xlon2 %g %g\n",xlon1, xlon2);
+  */	  
   *lat1 = nlat-1;
   *lat2 = 0;
   *lon11 = 0;
@@ -510,7 +512,7 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
                       if ( ilat < *lat1 ) *lat1 = ilat;
                       if ( ilat > *lat2 ) *lat2 = ilat;
                     }
-                  else if ( xval >= xfirst-360 && xval <= xlon2-360 )
+                  else if ( xval >= xfirst && xval <= xlon2 )
                     {
                       if ( ilon < *lon11 ) *lon11 = ilon;
                       if ( ilon > *lon12 ) *lon12 = ilon;
