@@ -129,16 +129,12 @@ void maskbox(bool *mask, int gridID, int lat1, int lat2, int lon11, int lon12, i
 void getlonlatparams(int argc_offset, double *xlon1, double *xlon2, double *xlat1, double *xlat2);
 
 static
-void maskbox_curv(bool *mask, int gridID)
+void maskbox_cell(bool *mask, int gridID)
 {
   double xlon1 = 0, xlon2 = 0, xlat1 = 0, xlat2 = 0;
   getlonlatparams(0, &xlon1, &xlon2, &xlat1, &xlat2);
 
-  int nlon = gridInqXsize(gridID);
-  int nlat = gridInqYsize(gridID);
-  int gridsize = nlon*nlat;
-
-  int grid_is_circular = gridIsCircular(gridID);
+  int gridsize = gridInqSize(gridID);
 
   double *xvals = (double *) Malloc(gridsize*sizeof(double));
   double *yvals = (double *) Malloc(gridsize*sizeof(double));
@@ -155,9 +151,6 @@ void maskbox_curv(bool *mask, int gridID)
   if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
   if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
 
-  double xval, yval, xfirst, xlast, ylast;
-  bool lp2 = false;
-
   if ( xlon1 > xlon2 ) 
     cdoAbort("The second longitude have to be greater than the first one!");
 
@@ -168,57 +161,19 @@ void maskbox_curv(bool *mask, int gridID)
       xlat2 = xtemp;
     }
   
-  for ( int ilat = 0; ilat < nlat; ilat++ )
+  for ( int i = 0; i < gridsize; ++i )
     {
-      xlast = xfact * xvals[ilat*nlon + nlon-1];
-      ylast = yfact * yvals[ilat*nlon + nlon-1];
-      if ( ylast >= xlat1 && ylast <= xlat2 )
-        if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
-          {
-            lp2 = true;
-          }
-    }
+      mask[i] = true;
 
-  for ( int ilat = 0; ilat < nlat; ilat++ )
-    {
-      for ( int ilon = 0; ilon < nlon; ilon++ )
+      double xval = xfact*xvals[i];
+      double yval = yfact*yvals[i];
+      if ( yval >= xlat1 && yval <= xlat2 )
         {
-          mask[nlon*ilat + ilon] = true;
-
-          xval = xvals[ilat*nlon + ilon];
-          yval = yvals[ilat*nlon + ilon];
-
-          xval *= xfact;
-          yval *= yfact;
-
-          if ( yval >= xlat1 && yval <= xlat2 )
+          if ( ((xval     >= xlon1 && xval     <= xlon2) ||
+                (xval-360 >= xlon1 && xval-360 <= xlon2) ||
+                (xval+360 >= xlon1 && xval+360 <= xlon2)) )
             {
-              if ( lp2 )
-                {
-                  xfirst = xfact * xvals[ilat*nlon];
-                  if ( xfirst < xlon1 ) xfirst = xlon1;
-                  
-                  xlast = xfact * xvals[ilat*nlon + nlon-1];
-                  if ( xlast > xlon2 ) xlast = xlon2;
-
-                  if ( xval >= xlon1 && xval <= xlast )
-                    {
-                      mask[nlon*ilat + ilon] = false;
-                    }
-                  else if ( xval >= xfirst && xval <= xlon2 )
-                    {
-                      mask[nlon*ilat + ilon] = false;
-                    }
-                }
-              else
-                {
-                  if ( ((xval     >= xlon1 && xval     <= xlon2) ||
-                        (xval-360 >= xlon1 && xval-360 <= xlon2) ||
-                        (xval+360 >= xlon1 && xval+360 <= xlon2)) )
-                    {
-                      mask[nlon*ilat + ilon] = false;
-                    }
-                }
+              mask[i] = false;
             }
         }
     }
@@ -357,6 +312,7 @@ void *Maskbox(void *argument)
 
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
       if ( operatorID != MASKREGION && gridtype == GRID_CURVILINEAR ) break;
+      if ( operatorID != MASKREGION && gridtype == GRID_UNSTRUCTURED ) break;
       if ( operatorID == MASKINDEXBOX && gridtype == GRID_GENERIC &&
 	  gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 ) break;
     }
@@ -396,9 +352,10 @@ void *Maskbox(void *argument)
  
   if ( operatorID == MASKLONLATBOX )
     {
-      if ( gridtype == GRID_CURVILINEAR )
+      if ( gridtype == GRID_CURVILINEAR ||
+           gridtype == GRID_UNSTRUCTURED )
         {
-          maskbox_curv(mask, gridID);
+          maskbox_cell(mask, gridID);
         }
       else
         {
@@ -406,15 +363,15 @@ void *Maskbox(void *argument)
           maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
         }
     }
-  if ( operatorID == MASKINDEXBOX )
+  else if ( operatorID == MASKINDEXBOX )
     {
       genindexbox(0, gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
       maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
     }
-  if ( operatorID == MASKREGION )
+  else if ( operatorID == MASKREGION )
     {
-      double *xcoords = (double*) Malloc( MAX_VALS*sizeof(double));
-      double *ycoords = (double*) Malloc( MAX_VALS*sizeof(double));
+      double *xcoords = (double*) Malloc(MAX_VALS*sizeof(double));
+      double *ycoords = (double*) Malloc(MAX_VALS*sizeof(double));
       int nfiles = operatorArgc();
      
       for ( int i = 0; i < nfiles; i++ )
