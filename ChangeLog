@@ -1,3 +1,7 @@
+2016-07-18  Uwe Schulzweida
+
+	* setgrid: added parameter regularnn
+
 2016-07-15  Uwe Schulzweida
 
 	* masklonlatbox: added support for unstructured grids

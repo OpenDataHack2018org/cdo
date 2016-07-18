@@ -40,7 +40,9 @@ Converts a regular or curvilinear grid to an unstructured grid
 @Item = dereference
 Dereference a reference to a grid
 @Item = regular
-Converts a reduced Gaussian grid to a regular Gaussian grid
+Linear interpolation of a reduced Gaussian grid to a regular Gaussian grid
+@Item = regularnn
+Nearest neighbor interpolation of a reduced Gaussian grid to a regular Gaussian grid
 @Item = lonlat
 Converts a regular lonlat grid stored as a curvilinear grid back to a lonlat grid
 @EndList
