@@ -738,14 +738,13 @@ int qu2reg_subarea(int gridsize, int np, double xfirst, double xlast,
 }
 
 
-void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss)
+void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss, int lnearest)
 {
   int gridtype = gridInqType(gridID1);
   if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced Gaussian grid!");
 
   int lmiss = nmiss > 0;
   int lperio = 1;
-  int lveggy = 0;
 
   int ny = gridInqYsize(gridID1);
   int np = gridInqNP(gridID1);
@@ -762,12 +761,12 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
   int nx = 0;
   if ( fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
     {
-      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon, ny, missval, &iret, lmiss, lperio, lveggy);
+      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon, ny, missval, &iret, lmiss, lperio, lnearest);
     }
   else
     {
       nx = 2*ny;
-      (void) qu2reg3_double(array, rowlon, ny, nx, missval, &iret, lmiss, lperio, lveggy);
+      (void) qu2reg3_double(array, rowlon, ny, nx, missval, &iret, lmiss, lperio, lnearest);
     }
 
   if ( gridInqSize(gridID2) != nx*ny ) Error("Gridsize differ!");

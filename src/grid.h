@@ -50,7 +50,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
 int gridToCurvilinear(int gridID, int lbounds);
 int gridCurvilinearToRegular(int gridID);
 int gridToRegular(int gridID);
-void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss);
+void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss, int lnearest);
 
 /* GME grid */
 struct cart {

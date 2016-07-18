@@ -34,18 +34,16 @@
 void *Setgrid(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
-  int gridID1, gridID2 = -1;
-  int ngrids, index;
+  int varID, levelID;
+  int gridID2 = -1;
   int gridtype = -1;
   int nmiss;
-  int found;
-  long i, gridsize;
-  long areasize = 0;
-  long masksize = 0;
-  int lregular = 0;
-  int ldereference = 0;
-  int ligme = 0;
+  int gridsize;
+  int areasize = 0;
+  int  masksize = 0;
+  bool lregular = false;
+  bool lregularnn = false;
+  bool ldereference = false;
   int number = 0, position = 0;
   int grid2_nvgp;
   int lbounds = TRUE;
@@ -86,10 +84,11 @@ void *Setgrid(void *argument)
       else if ( strcmp(gridname, "unstructured0") == 0 ) {gridtype = GRID_UNSTRUCTURED; lbounds = 0;}
       else if ( strcmp(gridname, "unstructured") == 0 )  {gridtype = GRID_UNSTRUCTURED; lbounds = 1;}
       else if ( strcmp(gridname, "generic") == 0 )        gridtype = GRID_GENERIC;
-      else if ( strcmp(gridname, "dereference") == 0 )    ldereference = 1;
+      else if ( strcmp(gridname, "dereference") == 0 )    ldereference = true;
       else if ( strcmp(gridname, "lonlat") == 0 )         gridtype = GRID_LONLAT;
       else if ( strcmp(gridname, "gaussian") == 0 )       gridtype = GRID_GAUSSIAN;
-      else if ( strcmp(gridname, "regular") == 0 )       {gridtype = GRID_GAUSSIAN; lregular = 1;}
+      else if ( strcmp(gridname, "regularnn") == 0 )     {gridtype = GRID_GAUSSIAN; lregularnn = true;}
+      else if ( strcmp(gridname, "regular") == 0 )       {gridtype = GRID_GAUSSIAN; lregular = true;}
       else cdoAbort("Unsupported grid name: %s", gridname);
     }
   else if ( operatorID == SETGRIDAREA )
@@ -111,7 +110,6 @@ void *Setgrid(void *argument)
       areaweight = (double*) Malloc(areasize*sizeof(double));
   
       streamReadRecord(streamID, areaweight, &nmiss);
-
       streamClose(streamID);
 
       if ( cdoVerbose )
@@ -119,7 +117,7 @@ void *Setgrid(void *argument)
 	  double arrmean = areaweight[0];
 	  double arrmin  = areaweight[0];
 	  double arrmax  = areaweight[0];
-	  for ( i = 1; i < areasize; i++ )
+	  for ( int i = 1; i < areasize; i++ )
 	    {
 	      if ( areaweight[i] < arrmin ) arrmin = areaweight[i];
 	      if ( areaweight[i] > arrmax ) arrmax = areaweight[i];
@@ -149,10 +147,9 @@ void *Setgrid(void *argument)
       gridmask = (double*) Malloc(masksize*sizeof(double));
   
       streamReadRecord(streamID, gridmask, &nmiss);
-
       streamClose(streamID);
 
-      for ( i = 0; i < masksize; i++ )
+      for ( int i = 0; i < masksize; i++ )
 	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
     }
   else if ( operatorID == SETGRIDNUMBER )
@@ -184,11 +181,11 @@ void *Setgrid(void *argument)
 
   if ( operatorID == SETGRID )
     {
-      found = 0;
-      ngrids = vlistNgrids(vlistID1);
-      for ( index = 0; index < ngrids; index++ )
+      int found = 0;
+      int ngrids = vlistNgrids(vlistID1);
+      for ( int index = 0; index < ngrids; index++ )
 	{
-	  gridID1 = vlistGrid(vlistID1, index);
+	  int gridID1 = vlistGrid(vlistID1, index);
 
 	  if ( gridInqSize(gridID1) == gridInqSize(gridID2) )
 	    {
@@ -200,7 +197,7 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI )
     {
-      gridID1 = vlistGrid(vlistID1, 0);
+      int gridID1 = vlistGrid(vlistID1, 0);
 
       if ( operatorID == SETGRIDNUMBER )
 	{
@@ -214,9 +211,9 @@ void *Setgrid(void *argument)
 	  gridDefReference(gridID2, griduri);
 	}
 
-      found = 0;
-      ngrids = vlistNgrids(vlistID1);
-      for ( index = 0; index < ngrids; index++ )
+      int found = 0;
+      int ngrids = vlistNgrids(vlistID1);
+      for ( int index = 0; index < ngrids; index++ )
 	{
 	  gridID1 = vlistGrid(vlistID1, index);
 
@@ -230,20 +227,18 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == SETGRIDTYPE )
     {
-      ngrids = vlistNgrids(vlistID1);
-      for ( index = 0; index < ngrids; index++ )
+      int ngrids = vlistNgrids(vlistID1);
+      for ( int index = 0; index < ngrids; index++ )
 	{
-	  gridID1 = vlistGrid(vlistID1, index);
+	  int gridID1 = vlistGrid(vlistID1, index);
 	  gridID2 = -1;
 
 	  if ( gridInqType(gridID1) == GRID_GENERIC && gridInqSize(gridID1) == 1 ) continue;
 	  
-	  if ( lregular )
+	  if ( lregular || lregularnn )
 	    {
 	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
-		{
-		  gridID2 = gridToRegular(gridID1);
-		}
+                gridID2 = gridToRegular(gridID1);
 	    }
 	  else if ( ldereference )
 	    {
@@ -258,7 +253,8 @@ void *Setgrid(void *argument)
 		}
 	      else if ( gridtype == GRID_UNSTRUCTURED )
 		{
-		  if ( gridInqType(gridID1) == GRID_GME ) ligme = 1;
+                  bool ligme = false;
+		  if ( gridInqType(gridID1) == GRID_GME ) ligme = true;
 		  gridID2 = gridToUnstructured(gridID1, 1);
 
 		  if ( ligme )
@@ -293,7 +289,7 @@ void *Setgrid(void *argument)
 
 	  if ( gridID2 == -1 )
             {
-              if ( lregular )
+              if ( lregular || lregularnn )
                 cdoAbort("No Gaussian reduced grid found!");
               else
                 cdoAbort("Unsupported grid type!");
@@ -304,10 +300,10 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == SETGRIDAREA )
     {
-      ngrids = vlistNgrids(vlistID1);
-      for ( index = 0; index < ngrids; index++ )
+      int ngrids = vlistNgrids(vlistID1);
+      for ( int index = 0; index < ngrids; index++ )
 	{
-	  gridID1  = vlistGrid(vlistID1, index);
+	  int gridID1  = vlistGrid(vlistID1, index);
 	  gridsize = gridInqSize(gridID1);
 	  if ( gridsize == areasize )
 	    {
@@ -319,15 +315,15 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == SETGRIDMASK )
     {
-      ngrids = vlistNgrids(vlistID1);
-      for ( index = 0; index < ngrids; index++ )
+      int ngrids = vlistNgrids(vlistID1);
+      for ( int index = 0; index < ngrids; index++ )
 	{
-	  gridID1  = vlistGrid(vlistID1, index);
+	  int gridID1  = vlistGrid(vlistID1, index);
 	  gridsize = gridInqSize(gridID1);
 	  if ( gridsize == masksize )
 	    {
 	      int *mask = (int*) Malloc(masksize*sizeof(int));
-	      for ( i = 0; i < masksize; i++ )
+	      for ( int i = 0; i < masksize; i++ )
 		{
 		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
 		    mask[i] = 0;
@@ -343,10 +339,10 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == UNSETGRIDMASK )
     {
-      ngrids = vlistNgrids(vlistID1);
-      for ( index = 0; index < ngrids; index++ )
+      int ngrids = vlistNgrids(vlistID1);
+      for ( int index = 0; index < ngrids; index++ )
 	{
-	  gridID1  = vlistGrid(vlistID1, index);
+	  int gridID1  = vlistGrid(vlistID1, index);
 	  gridID2 = gridDuplicate(gridID1);
 	  gridDefMask(gridID2, NULL);
 	  vlistChangeGridIndex(vlistID2, index, gridID2);
@@ -358,7 +354,7 @@ void *Setgrid(void *argument)
   streamDefVlist(streamID2, vlistID2);
   //vlistPrint(vlistID2);
 
-  if ( lregular )
+  if ( lregular || lregularnn )
     gridsize = vlistGridsizeMax(vlistID2);
   else
     gridsize = vlistGridsizeMax(vlistID1);
@@ -373,28 +369,29 @@ void *Setgrid(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
 	  
 	  streamReadRecord(streamID1, array, &nmiss);
 
-	  gridID1 = vlistInqVarGrid(vlistID1, varID);
-	  if ( lregular )
+	  int gridID1 = vlistInqVarGrid(vlistID1, varID);
+	  if ( lregular || lregularnn )
 	    {
 	      gridID2 = vlistInqVarGrid(vlistID2, varID);
 	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
 		{
 		  double missval = vlistInqVarMissval(vlistID1, varID);
-		  field2regular(gridID1, gridID2, missval, array, nmiss);
+                  int lnearst = lregularnn ? 1 : 0;
+                  field2regular(gridID1, gridID2, missval, array, nmiss, lnearst);
 		}
 	    }
 	  else if ( gridInqType(gridID1) == GRID_GME )
 	    {
-	      int j = 0;
 	      gridsize = gridInqSize(gridID1);
-	      for ( i = 0; i < gridsize; i++ )
+	      int j = 0;
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( grid2_vgpm[i] ) array[j++] = array[i];
 	    }
 
