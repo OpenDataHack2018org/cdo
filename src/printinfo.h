@@ -266,186 +266,211 @@ void print_xyvals2D(int gridID, int dig)
 }
 
 static
+void printGridInfoKernel(int gridID, int index, bool lproj)
+{
+  int gridtype = gridInqType(gridID);
+
+  if ( lproj && gridtype != GRID_PROJECTION )
+    fprintf(stderr, "Internal problem (%s): sub grid not equal GRID_PROJECTION!\n", __func__);
+
+  int trunc    = gridInqTrunc(gridID);
+  int gridsize = gridInqSize(gridID);
+  int xsize    = gridInqXsize(gridID);
+  int ysize    = gridInqYsize(gridID);
+  int xysize   = xsize*ysize;
+  // int prec     = gridInqPrec(gridID);
+
+  // int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+  int dig = 7;
+
+  if ( lproj )
+    fprintf(stdout, "         %24s", gridNamePtr(gridtype));
+  else
+    fprintf(stdout, "  %4d : %-24s", index+1, gridNamePtr(gridtype));
+
+  if ( gridtype == GRID_LONLAT   ||
+       gridtype == GRID_LCC2 ||
+       gridtype == GRID_LAEA ||
+       gridtype == GRID_SINUSOIDAL ||
+       gridtype == GRID_GENERIC ||
+       gridtype == GRID_GAUSSIAN ||
+       gridtype == GRID_GAUSSIAN_REDUCED )
+    {
+      fprintf(stdout, " : points=%d", gridsize);
+      if ( gridtype == GRID_GAUSSIAN_REDUCED )
+        fprintf(stdout, "  nlat=%d", ysize);
+      else if ( xysize )
+        fprintf(stdout, " (%dx%d)", xsize, ysize);
+
+      if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED )
+        fprintf(stdout, "  np=%d", gridInqNP(gridID));
+
+      fprintf(stdout, "\n");
+
+      print_xvals(gridID, dig);
+      print_yvals(gridID, dig);
+
+      if ( gridIsRotated(gridID) )
+        {
+          double lonpole = gridInqXpole(gridID);
+          double latpole = gridInqYpole(gridID);
+          double angle   = gridInqAngle(gridID);
+          fprintf(stdout, "%33s : lon=%.*g  lat=%.*g", "northpole", dig, lonpole, dig, latpole);
+          if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%.*g", dig, angle);
+          fprintf(stdout, "\n");
+        }
+
+      if ( gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
+        {
+          fprintf(stdout, "%33s :", "available");
+          if ( gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL) ) fprintf(stdout, " cellbounds");
+          if ( gridHasArea(gridID) )          fprintf(stdout, " area");
+          if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
+          fprintf(stdout, "\n");
+        }
+
+      if ( gridtype == GRID_LAEA )
+        {
+          double a, lon_0, lat_0;
+          gridInqLaea(gridID, &a, &lon_0, &lat_0);
+          fprintf(stdout, "%33s : a=%g  lon_0=%g  lat_0=%g\n", "projpar", a, lon_0, lat_0);
+        }
+
+      if ( gridtype == GRID_LCC2 )
+        {
+          double a, lon_0, lat_0, lat_1, lat_2;
+          gridInqLcc2(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2);
+          fprintf(stdout, "%33s : a=%7.0f  lon_0=%g  lat_0=%g  lat_1=%g  lat_2=%g\n",
+                  "projpar", a, lon_0, lat_0, lat_1, lat_2);
+        }
+    }
+  else if ( gridtype == GRID_SPECTRAL )
+    {
+      fprintf(stdout, " : points=%d  nsp=%d  truncation=%d", gridsize, gridsize/2, trunc);
+      if ( gridInqComplexPacking(gridID) ) fprintf(stdout, "  complexPacking");
+      fprintf(stdout, "\n");
+    }
+  else if ( gridtype == GRID_FOURIER )
+    {
+      fprintf(stdout, " : points=%d  nfc=%d  truncation=%d\n", gridsize, gridsize/2, trunc);
+    }
+  else if ( gridtype == GRID_GME )
+    {
+      int ni = gridInqGMEni(gridID);
+      int nd = gridInqGMEnd(gridID);
+      fprintf(stdout, " : points=%d  nd=%d  ni=%d\n", gridsize, nd, ni);
+    }
+  else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
+    {
+      if ( gridtype == GRID_CURVILINEAR )
+        fprintf(stdout, " : points=%d (%dx%d)", gridsize, xsize, ysize);
+      else
+        fprintf(stdout, " : points=%d", gridsize);
+
+      if ( gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) > 0 )
+        fprintf(stdout, "  nvertex=%d", gridInqNvertex(gridID));
+
+      fprintf(stdout, "\n");
+
+      if ( gridtype == GRID_UNSTRUCTURED )
+        {
+          int number   = gridInqNumber(gridID);
+          int position = gridInqPosition(gridID);
+          if ( number > 0 )
+            fprintf(stdout, "%33s : number=%d  position=%d\n", "grid", number, position);
+
+          if ( gridInqReference(gridID, NULL) )
+            {
+              char reference_link[8192];
+              gridInqReference(gridID, reference_link);
+              fprintf(stdout, "%33s : %s\n", "uri", reference_link);
+            }
+        }
+
+      print_xyvals2D(gridID, dig);
+    }
+  else if ( gridtype == GRID_LCC )
+    {
+      double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
+      int projflag, scanflag;
+
+      gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
+                 &projflag, &scanflag);
+
+      fprintf(stdout, " : points=%d (%dx%d)  ", gridsize, xsize, ysize);
+      if ( (projflag&128) == 0 )
+        fprintf(stdout, "North Pole\n");
+      else
+        fprintf(stdout, "South Pole\n");
+
+      fprintf(stdout, "%33s : originLon=%g  originLat=%g  lonParY=%g\n", " ", originLon, originLat, lonParY);
+      fprintf(stdout, "%33s : lat1=%g  lat2=%g  xinc=%g m  yinc=%g m\n", " ", lat1, lat2, xincm, yincm);
+    }
+  else if ( gridtype == GRID_PROJECTION )
+    {
+      if ( lproj )
+        {
+          char name[CDI_MAX_NAME]; name[0] = 0;
+          cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, name);
+          if ( name[0] == 0 ) strcpy(name, "undefined");
+          fprintf(stdout, " : %s\n", name);
+        }
+      else
+        {
+          if ( ysize == 0 )
+            fprintf(stdout, " : points=%d\n", gridsize);
+          else
+            fprintf(stdout, " : points=%d (%dx%d)\n", gridsize, xsize, ysize);
+        }
+
+      print_xvals(gridID, dig);
+      print_yvals(gridID, dig);
+    }
+  else /* if ( gridtype == GRID_GENERIC ) */
+    {
+      if ( ysize == 0 )
+        fprintf(stdout, " : points=%d\n", gridsize);
+      else
+        fprintf(stdout, " : points=%d (%dx%d)\n", gridsize, xsize, ysize);
+    }
+
+  if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED || gridtype == GRID_LCC )
+    {
+      if ( gridHasArea(gridID) ||
+           gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
+        {
+          fprintf(stdout, "%33s :", "available");
+          if ( gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL) ) fprintf(stdout, " cellbounds");
+          if ( gridHasArea(gridID) )          fprintf(stdout, " area");
+          if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
+          fprintf(stdout, "\n");
+        }
+    }
+
+  unsigned char uuidOfHGrid[CDI_UUID_SIZE];
+  gridInqUUID(gridID, uuidOfHGrid);
+  if ( !cdiUUIDIsNull(uuidOfHGrid) )
+    {
+      char uuidOfHGridStr[37];
+      cdiUUID2Str(uuidOfHGrid, uuidOfHGridStr);
+      if ( uuidOfHGridStr[0] != 0  && strlen(uuidOfHGridStr) == 36 )
+        {
+          fprintf(stdout, "%33s : %s\n", "uuid", uuidOfHGridStr);
+        }
+    }
+}
+
+static
 void printGridInfo(int vlistID)
 {
-  unsigned char uuidOfHGrid[CDI_UUID_SIZE];
-
   int ngrids = vlistNgrids(vlistID);
   for ( int index = 0; index < ngrids; index++ )
     {
-      int gridID   = vlistGrid(vlistID, index);
-      int gridtype = gridInqType(gridID);
-      int trunc    = gridInqTrunc(gridID);
-      int gridsize = gridInqSize(gridID);
-      int xsize    = gridInqXsize(gridID);
-      int ysize    = gridInqYsize(gridID);
-      int xysize   = xsize*ysize;
-      // int prec     = gridInqPrec(gridID);
-
-      // int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
-      int dig = 7;
-
-      fprintf(stdout, "  %4d : %-24s", index+1, gridNamePtr(gridtype));
-
-      if ( gridtype == GRID_LONLAT   ||
-	   gridtype == GRID_LCC2 ||
-	   gridtype == GRID_LAEA ||
-	   gridtype == GRID_SINUSOIDAL ||
-	   gridtype == GRID_GENERIC ||
-	   gridtype == GRID_GAUSSIAN ||
-	   gridtype == GRID_GAUSSIAN_REDUCED )
-	{
-          fprintf(stdout, " : points=%d", gridsize);
-	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
-	    fprintf(stdout, "  nlat=%d", ysize);
-	  else if ( xysize )
-	    fprintf(stdout, " (%dx%d)", xsize, ysize);
-
-	  if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED )
-	    fprintf(stdout, "  np=%d", gridInqNP(gridID));
-
-	  fprintf(stdout, "\n");
-
-          print_xvals(gridID, dig);
-          print_yvals(gridID, dig);
-
-	  if ( gridIsRotated(gridID) )
-	    {
-	      double lonpole = gridInqXpole(gridID);
-	      double latpole = gridInqYpole(gridID);
-	      double angle   = gridInqAngle(gridID);
-	      fprintf(stdout, "%33s : lon=%.*g  lat=%.*g", "northpole", dig, lonpole, dig, latpole);
-	      if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%.*g", dig, angle);
-	      fprintf(stdout, "\n");
-	    }
-
-	  if ( gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
-	    {
-	      fprintf(stdout, "%33s :", "available");
-	      if ( gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL) ) fprintf(stdout, " cellbounds");
-	      if ( gridHasArea(gridID) )          fprintf(stdout, " area");
-	      if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
-	      fprintf(stdout, "\n");
-	    }
-
-	  if ( gridtype == GRID_LAEA )
-	    {
-	      double a, lon_0, lat_0;
-	      gridInqLaea(gridID, &a, &lon_0, &lat_0);
-	      fprintf(stdout, "%33s : a=%g  lon_0=%g  lat_0=%g\n", "projpar", a, lon_0, lat_0);
-	    }
-
-	  if ( gridtype == GRID_LCC2 )
-	    {
-	      double a, lon_0, lat_0, lat_1, lat_2;
-	      gridInqLcc2(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2);
-	      fprintf(stdout, "%33s : a=%7.0f  lon_0=%g  lat_0=%g  lat_1=%g  lat_2=%g\n",
-                      "projpar", a, lon_0, lat_0, lat_1, lat_2);
-	    }
-	}
-      else if ( gridtype == GRID_SPECTRAL )
-	{
-	  fprintf(stdout, " : points=%d  nsp=%d  truncation=%d", gridsize, gridsize/2, trunc);
-          if ( gridInqComplexPacking(gridID) ) fprintf(stdout, "  complexPacking");
-          fprintf(stdout, "\n");
-	}
-      else if ( gridtype == GRID_FOURIER )
-	{
-	  fprintf(stdout, " : points=%d  nfc=%d  truncation=%d\n", gridsize, gridsize/2, trunc);
-	}
-      else if ( gridtype == GRID_GME )
-	{
-	  int ni = gridInqGMEni(gridID);
-	  int nd = gridInqGMEnd(gridID);
-	  fprintf(stdout, " : points=%d  nd=%d  ni=%d\n", gridsize, nd, ni);
-	}
-      else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
-	{
-	  if ( gridtype == GRID_CURVILINEAR )
-	    fprintf(stdout, " : points=%d (%dx%d)", gridsize, xsize, ysize);
-	  else
-	    fprintf(stdout, " : points=%d", gridsize);
-
-          if ( gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) > 0 )
-	    fprintf(stdout, "  nvertex=%d", gridInqNvertex(gridID));
-
-          fprintf(stdout, "\n");
-
-          if ( gridtype == GRID_UNSTRUCTURED )
-            {
-              int number   = gridInqNumber(gridID);
-              int position = gridInqPosition(gridID);
-              if ( number > 0 )
-                fprintf(stdout, "%33s : number=%d  position=%d\n", "grid", number, position);
-
-              if ( gridInqReference(gridID, NULL) )
-                {
-                  char reference_link[8192];
-                  gridInqReference(gridID, reference_link);
-                  fprintf(stdout, "%33s : %s\n", "uri", reference_link);
-                }
-            }
-
-          print_xyvals2D(gridID, dig);
-	}
-      else if ( gridtype == GRID_LCC )
-	{
-	  double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
-	  int projflag, scanflag;
-
-	  gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
-		     &projflag, &scanflag);
-
-	  fprintf(stdout, " : points=%d (%dx%d)  ", gridsize, xsize, ysize);
-	  if ( (projflag&128) == 0 )
-	    fprintf(stdout, "North Pole\n");
-	  else
-	    fprintf(stdout, "South Pole\n");
-
-	  fprintf(stdout, "%33s : originLon=%g  originLat=%g  lonParY=%g\n", " ", originLon, originLat, lonParY);
-	  fprintf(stdout, "%33s : lat1=%g  lat2=%g  xinc=%g m  yinc=%g m\n", " ", lat1, lat2, xincm, yincm);
-	}
-      else if ( gridtype == GRID_PROJECTION )
-        {
-	  if ( ysize == 0 )
-	    fprintf(stdout, " : points=%d\n", gridsize);
-	  else
-            fprintf(stdout, " : points=%d (%dx%d)\n", gridsize, xsize, ysize);
-
-          print_xvals(gridID, dig);
-          print_yvals(gridID, dig);
-        }
-      else /* if ( gridtype == GRID_GENERIC ) */
-	{
-	  if ( ysize == 0 )
-	    fprintf(stdout, " : points=%d\n", gridsize);
-	  else
-            fprintf(stdout, " : points=%d (%dx%d)\n", gridsize, xsize, ysize);
-	}
-
-      if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED || gridtype == GRID_LCC )
-	{
-	  if ( gridHasArea(gridID) ||
-	       gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
-	    {
-	      fprintf(stdout, "%33s :", "available");
-	      if ( gridInqXbounds(gridID, NULL) && gridInqYbounds(gridID, NULL) ) fprintf(stdout, " cellbounds");
-	      if ( gridHasArea(gridID) )          fprintf(stdout, " area");
-	      if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
-	      fprintf(stdout, "\n");
-	    }
-	}
-
-      gridInqUUID(gridID, uuidOfHGrid);
-      if ( !cdiUUIDIsNull(uuidOfHGrid) )
-        {
-          char uuidOfHGridStr[37];
-          cdiUUID2Str(uuidOfHGrid, uuidOfHGridStr);
-          if ( uuidOfHGridStr[0] != 0  && strlen(uuidOfHGridStr) == 36 )
-            {
-	      fprintf(stdout, "%33s : %s\n", "uuid", uuidOfHGridStr);
-            }
-        }
+      int gridID = vlistGrid(vlistID, index);
+      printGridInfoKernel(gridID, index, false);
+      int projID = gridInqProj(gridID);
+      if ( projID != CDI_UNDEFID )
+        printGridInfoKernel(projID, index, true);
     }
 }
 
