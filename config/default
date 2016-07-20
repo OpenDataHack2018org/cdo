@@ -124,6 +124,7 @@ case "${HOSTNAME}" in
     cdo4windows-cyg)
         CDOLIBS="--with-netcdf=/usr/local \
                  --with-hdf5=/usr/local \
+                 --with-grib_api=/usr/local
                  --with-udunits2=/usr \
                  --with-proj=/usr"
 
