@@ -278,34 +278,45 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
   int xsize    = gridInqXsize(gridID);
   int ysize    = gridInqYsize(gridID);
   int xysize   = xsize*ysize;
-  // int prec     = gridInqPrec(gridID);
 
+  // int prec     = gridInqPrec(gridID);
   // int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
   int dig = 7;
 
-  if ( lproj )
-    fprintf(stdout, "         %24s", gridNamePtr(gridtype));
-  else
+  if ( !lproj )
     fprintf(stdout, "  %4d : %-24s", index+1, gridNamePtr(gridtype));
 
-  if ( gridtype == GRID_LONLAT   ||
-       gridtype == GRID_LCC2 ||
-       gridtype == GRID_LAEA ||
+  if ( gridtype == GRID_LONLAT     ||
+       gridtype == GRID_LCC2       ||
+       gridtype == GRID_LAEA       ||
        gridtype == GRID_SINUSOIDAL ||
-       gridtype == GRID_GENERIC ||
-       gridtype == GRID_GAUSSIAN ||
+       gridtype == GRID_PROJECTION ||
+       gridtype == GRID_GENERIC    ||
+       gridtype == GRID_GAUSSIAN   ||
        gridtype == GRID_GAUSSIAN_REDUCED )
     {
-      fprintf(stdout, " : points=%d", gridsize);
-      if ( gridtype == GRID_GAUSSIAN_REDUCED )
-        fprintf(stdout, "  nlat=%d", ysize);
-      else if ( xysize )
-        fprintf(stdout, " (%dx%d)", xsize, ysize);
+      if ( !lproj )
+        {
+          fprintf(stdout, " : points=%d", gridsize);
+          if ( gridtype == GRID_GAUSSIAN_REDUCED )
+            fprintf(stdout, "  nlat=%d", ysize);
+          else if ( xysize )
+            fprintf(stdout, " (%dx%d)", xsize, ysize);
 
-      if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED )
-        fprintf(stdout, "  np=%d", gridInqNP(gridID));
+          if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED )
+            fprintf(stdout, "  np=%d", gridInqNP(gridID));
 
-      fprintf(stdout, "\n");
+          fprintf(stdout, "\n");
+        }
+
+      char name[CDI_MAX_NAME]; name[0] = 0;
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, name);
+      if ( gridtype == GRID_PROJECTION || name[0] )
+        {
+          if ( name[0] == 0 ) strcpy(name, "undefined");
+          fprintf(stdout, "         %24s", "mapping");
+          fprintf(stdout, " : %s\n", name);
+        }
 
       print_xvals(gridID, dig);
       print_yvals(gridID, dig);
@@ -405,26 +416,6 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
 
       fprintf(stdout, "%33s : originLon=%g  originLat=%g  lonParY=%g\n", " ", originLon, originLat, lonParY);
       fprintf(stdout, "%33s : lat1=%g  lat2=%g  xinc=%g m  yinc=%g m\n", " ", lat1, lat2, xincm, yincm);
-    }
-  else if ( gridtype == GRID_PROJECTION )
-    {
-      if ( lproj )
-        {
-          char name[CDI_MAX_NAME]; name[0] = 0;
-          cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, name);
-          if ( name[0] == 0 ) strcpy(name, "undefined");
-          fprintf(stdout, " : %s\n", name);
-        }
-      else
-        {
-          if ( ysize == 0 )
-            fprintf(stdout, " : points=%d\n", gridsize);
-          else
-            fprintf(stdout, " : points=%d (%dx%d)\n", gridsize, xsize, ysize);
-        }
-
-      print_xvals(gridID, dig);
-      print_yvals(gridID, dig);
     }
   else /* if ( gridtype == GRID_GENERIC ) */
     {
