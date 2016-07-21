@@ -38,20 +38,10 @@
 void *Runstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int gridsize;
-  int i;
   int varID;
-  int recID;
-  int nrecs;
   int levelID;
-  int tsID;
-  int otsID;
-  int its;
   int nmiss;
-  int nlevel;
   int runstat_nomiss = 0;
-  double missval;
-  field_t ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
 
   cdoInitialize(argument);
 
@@ -107,13 +97,14 @@ void *Runstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+  field_t ***vars2 = NULL, ***samp1 = NULL;
   if ( !runstat_nomiss )
     samp1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
   if ( lvarstd )
     vars2 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
 
-  for ( its = 0; its < ndates; its++ )
+  for ( int its = 0; its < ndates; its++ )
     {
       vars1[its] = field_malloc(vlistID1, FIELD_PTR);
       if ( !runstat_nomiss )
@@ -123,16 +114,17 @@ void *Runstat(void *argument)
     }
 
   int gridsizemax = vlistGridsizeMax(vlistID1);
-  int *imask = (int*) Malloc(gridsizemax*sizeof(int));
+  bool *imask = (bool*) Malloc(gridsizemax*sizeof(bool));
 
+  int tsID = 0;
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) cdoAbort("File has less then %d timesteps!", ndates);
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
 	
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -149,16 +141,16 @@ void *Runstat(void *argument)
 
 	  if ( !runstat_nomiss )
 	    {
-	      gridsize = gridInqSize(vars1[0][varID][levelID].grid);
-	      missval  = vars1[0][varID][levelID].missval;
+	      int gridsize = gridInqSize(vars1[0][varID][levelID].grid);
+	      double missval  = vars1[0][varID][levelID].missval;
 
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(vars1[tsID][varID][levelID].ptr[i], missval) )
-		  imask[i] = 0;
+		  imask[i] = false;
 		else
-		  imask[i] = 1;
+		  imask[i] = true;
 
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		samp1[tsID][varID][levelID].ptr[i] = (double) imask[i];
 
 #if defined(_OPENMP)
@@ -168,7 +160,7 @@ void *Runstat(void *argument)
 		{
 		  double *ptr = samp1[inp][varID][levelID].ptr;
 		  for ( int i = 0; i < gridsize; i++ )
-		    if ( imask[i] > 0 ) ptr[i]++;
+		    if ( imask[i] ) ptr[i]++;
 		}
 	    }
 
@@ -197,14 +189,14 @@ void *Runstat(void *argument)
 	}
     }
 
-  otsID = 0;
+  int otsID = 0;
   while ( TRUE )
     {
       if ( lmean )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( runstat_nomiss )
@@ -217,7 +209,7 @@ void *Runstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( runstat_nomiss )
@@ -240,7 +232,7 @@ void *Runstat(void *argument)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
       streamDefTimestep(streamID2, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
 	{
 	  varID    = recVarID[recID];
 	  levelID  = recLevelID[recID];
@@ -270,12 +262,12 @@ void *Runstat(void *argument)
 	    vars2[inp] = vars2[inp+1];
 	}
 
-      nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, ndates-1);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  
@@ -286,16 +278,16 @@ void *Runstat(void *argument)
 
 	  if ( !runstat_nomiss )
 	    {
-	      gridsize = gridInqSize(vars1[0][varID][levelID].grid);
-	      missval  = vars1[0][varID][levelID].missval;
+	      int gridsize = gridInqSize(vars1[0][varID][levelID].grid);
+	      double missval  = vars1[0][varID][levelID].missval;
 
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(vars1[ndates-1][varID][levelID].ptr[i], missval) )
-		  imask[i] = 0;
+		  imask[i] = false;
 		else
-		  imask[i] = 1;
+		  imask[i] = true;
 
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		samp1[ndates-1][varID][levelID].ptr[i] = (double) imask[i];
 
 #if defined(_OPENMP)
@@ -305,7 +297,7 @@ void *Runstat(void *argument)
 		{
 		  double *ptr = samp1[inp][varID][levelID].ptr;
 		  for ( int i = 0; i < gridsize; i++ )
-		    if ( imask[i] > 0 ) ptr[i]++;
+		    if ( imask[i] ) ptr[i]++;
 		}
 	    }
 
@@ -336,7 +328,7 @@ void *Runstat(void *argument)
       tsID++;
     }
 
-  for ( its = 0; its < ndates; its++ )
+  for ( int its = 0; its < ndates; its++ )
     {
       field_free(vars1[its], vlistID1);
       if ( !runstat_nomiss ) field_free(samp1[its], vlistID1);

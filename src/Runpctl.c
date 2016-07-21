@@ -31,19 +31,9 @@
 void *Runpctl(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int gridsize;
   int varID;
-  int recID;
-  int nrecs;
   int levelID;
-  int tsID;
-  int otsID;
-  int i, j, inp, its;
   int nmiss;
-  int nlevels;
-  double missval, val;
-  double *array;
-  field_t ***vars1 = NULL;
 
   cdoInitialize(argument);
 
@@ -78,22 +68,21 @@ void *Runpctl(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
-  array = (double*) Malloc(ndates*sizeof(double));
+  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+  double *array = (double*) Malloc(ndates*sizeof(double));
   
-  for ( its = 0; its < ndates; its++ )
-    {
-      vars1[its] = field_malloc(vlistID1, FIELD_PTR);
-    }
+  for ( int its = 0; its < ndates; its++ )
+    vars1[its] = field_malloc(vlistID1, FIELD_PTR);
 
+  int tsID;
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
-      nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) cdoAbort("File has less than %d timesteps!", ndates);
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);
         
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
 
@@ -108,27 +97,27 @@ void *Runpctl(void *argument)
         }
     }
 
-  otsID = 0;
+  int otsID = 0;
   while ( TRUE )
     {
       for ( varID = 0; varID < nvars; varID++ )
         {
           if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
           
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-          missval  = vlistInqVarMissval(vlistID1, varID);
-          nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          double missval  = vlistInqVarMissval(vlistID1, varID);
+          int nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           
           for ( levelID = 0; levelID < nlevels; levelID++ )
             {
               nmiss = 0;  
-              for ( i = 0; i < gridsize; i++ )
+              for ( int i = 0; i < gridsize; i++ )
                 {
-                  for ( inp = 0, j = 0; inp < ndates; inp++ )
+                  int j = 0;
+                  for ( int inp = 0, j = 0; inp < ndates; inp++ )
                     {
-                      val = vars1[inp][varID][levelID].ptr[i];
-                      if ( !DBL_IS_EQUAL(val, missval) )
-                        array[j++] = val;
+                      double val = vars1[inp][varID][levelID].ptr[i];
+                      if ( !DBL_IS_EQUAL(val, missval) ) array[j++] = val;
                     }
                   
                   if ( j > 0 )
@@ -148,7 +137,7 @@ void *Runpctl(void *argument)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
       streamDefTimestep(streamID2, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
         {
           varID    = recVarID[recID];
           levelID  = recLevelID[recID];
@@ -164,17 +153,14 @@ void *Runpctl(void *argument)
       dtlist_shift(dtlist);
 
       vars1[ndates] = vars1[0];
-      for ( inp = 0; inp < ndates; inp++ )
-        {
-          vars1[inp] = vars1[inp+1];
-        }
+      for ( int inp = 0; inp < ndates; inp++ ) vars1[inp] = vars1[inp+1];
 
-      nrecs = streamInqTimestep(streamID1, tsID);
+      int nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, ndates-1);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
           
@@ -185,10 +171,8 @@ void *Runpctl(void *argument)
       tsID++;
     }
 
-  for ( its = 0; its < ndates; its++ )
-    {
-      field_free(vars1[its], vlistID1);
-    }
+  for ( int its = 0; its < ndates; its++ )
+    field_free(vars1[its], vlistID1);
 
   Free(vars1);
   Free(array);

@@ -76,7 +76,8 @@ double esat(double temperature)
 
 /* Source from INTERA */
 
-void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long nvars,
+static
+void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, long nvars,
 		const double *restrict af1, const double *restrict bf1, const double *restrict etah2,
 		const double *restrict af2, const double *restrict bf2, const double *restrict w1, 
 		const double *restrict w2, const long *restrict jl1, const long *restrict jl2,
@@ -98,10 +99,7 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
   long klo;
   long jjblt;
   double zq1, zt1;
-  double zdff, zdffl, ztv, zb, zbb, zc, zps;
-  double zsump, zsumpp, zsumt, zsumtp;
   double dfi, fiadj = 0, dteta = 0;
-  double pbl_lim, pbl_lim_need;
 
   double rair_d_cpair = rair/cpair;
 
@@ -111,8 +109,8 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
   /******* initialise atmospheric fields in old system */
   
   /* pressure */
-  ph1[0]       =  0.0;
-  lnph1[0]     = -1.0; 
+  ph1[0]   =  0.0;
+  lnph1[0] = -1.0; 
   for ( k = 1; k < nlev1p1; ++k )
     {
       ph1[k]   = ah1[k]+bh1[k]*ps1[ij];
@@ -173,15 +171,16 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
 	  jlev = k;
 	  if (fis2[ij] < fi1[k]) break;
 	}
-      zdff = fi1[jlev+1]-fis2[ij];
+
+      double zdff = fi1[jlev+1]-fis2[ij];
       
       /* get the number of points used for estimation of regression coefficients */
       jlevr = 0;
       for ( k = jlev-1; k > 0; --k )
 	{
 	  jlevr = k;
-	  zdffl = fi1[k]-fi1[jlev+1];
-	  if (zdffl >= zdff) break;
+	  double zdffl = fi1[k]-fi1[jlev+1];
+	  if ( zdffl >= zdff ) break;
 	}
 
       jnop = jlev+1-jlevr+1;
@@ -190,10 +189,10 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
 	get coefficients of regression between Tv and lnP ::Tv = B*lnP + C
 	using three levels surounding new orography geopotential
       */
-      zsumt  = 0.0;
-      zsump  = 0.0;
-      zsumpp = 0.0;
-      zsumtp = 0.0;
+      double zsumt  = 0.0;
+      double zsump  = 0.0;
+      double zsumpp = 0.0;
+      double zsumtp = 0.0;
 
       for ( k = jlevr; k <= jlev+1; ++k )
 	{
@@ -204,12 +203,12 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
 	}
 
       /* final regression coefficients */
-      zb = jnop*zsumpp - zsump*zsump;
-      zc = (zsumt*zsumpp-zsump*zsumtp)/zb;
+      double zb = jnop*zsumpp - zsump*zsump;
+      double zc = (zsumt*zsumpp-zsump*zsumtp)/zb;
       zb = (jnop*zsumtp-zsump*zsumt)/zb;
 
       /* calculate preliminary surface pressure, adjust to middle level */
-      zps = lnph1[jlev];
+      double zps = lnph1[jlev];
 
       /* calculate preliminary pressure */
       if ( fabs(zb) < 1.0e-20 )
@@ -220,7 +219,7 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
       else
 	{
 	  /* virtual temperatur not constant near new surface */
-	  zbb = zc*zc + zb*(zps*(zb*zps+2.0*zc)+2.0*(fi1[jlev]-fis2[ij])/rair);
+	  double zbb = zc*zc + zb*(zps*(zb*zps+2.0*zc)+2.0*(fi1[jlev]-fis2[ij])/rair);
 	  ps2[ij] = exp((sqrt(zbb)-zc)/zb);
 	}
     }
@@ -263,12 +262,12 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
   /******* find the new boundary layer top */
 
   /* using the pressure from the old system */
-  pbl_lim = ps1[ij]*eta_pbl;
+  double pbl_lim = ps1[ij]*eta_pbl;
   jjblt = nlev2-1;
   for ( k = nlev2-1; k > 0; --k )
     {
       /* find the next upper level in new system */
-      pbl_lim_need = ps2[ij] *etah2[k];
+      double pbl_lim_need = ps2[ij] *etah2[k];
       if (pbl_lim > pbl_lim_need) break;
       jjblt = jjblt-1;
     }
@@ -399,7 +398,7 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
       /* correct surface pressure */
       dfi = fiadj-(fi2[jlev+1]+(fi2[jlev]-fi2[jlev+1])* 
 		   log(ph2[jlev+1]/p_firef)/log(ph2[jlev+1]/ph2[jlev]));
-      ztv     = (1.0+epsm1i*zq2[nlev2-1])*zt2[nlev2-1];
+      double ztv = (1.0+epsm1i*zq2[nlev2-1])*zt2[nlev2-1];
       ps2[ij] = ps2[ij] *exp(dfi/(rair*ztv));
     }
 
@@ -447,7 +446,7 @@ void hetaeta_sc(int ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2, 
 }
 
 
-void hetaeta(int ltq, int ngp, const int *imiss,
+void hetaeta(bool ltq, int ngp, const int *imiss,
 	     int nlev1, const double *restrict ah1, const double *restrict bh1,
              const double *restrict fis1, const double *restrict ps1, 
              const double *restrict t1, const double *restrict q1,
@@ -947,7 +946,7 @@ int main (int argc, char *argv[])
   double *vars2[5];
 
   int ij, k;
-  int ltq = 1;
+  bool ltq = true;
 
   double *fis1 = (double*) Malloc(NGP*sizeof(double));
   double *ps1  = (double*) Malloc(NGP*sizeof(double));

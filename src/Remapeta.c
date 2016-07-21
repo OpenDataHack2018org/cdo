@@ -220,27 +220,24 @@ double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf)
 void *Remapeta(void *argument)
 {
   int nfis2gp = 0;
-  int recID, nrecs;
-  int i, offset, iv;
+  int nrecs;
+  int i, iv;
   int varID, levelID;
   int nvars3D = 0;
-  int zaxisID;
-  int nlevel;
-  int sgeopotID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1, presID = -1;
-  int code;
+  int sgeopotID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
-  double *fis1 = NULL, *ps1 = NULL, *t1 = NULL, *q1 = NULL;
-  double *fis2 = NULL, *ps2 = NULL, *t2 = NULL, *q2 = NULL;
+  double *fis2 = NULL;
+  double *t1 = NULL, *q1 = NULL;
+  double *t2 = NULL, *q2 = NULL;
   double *tscor = NULL, *pscor = NULL, *secor = NULL;
   int nmiss, nmissout = 0;
-  int ltq = FALSE;
-  int lfis2 = FALSE;
+  bool ltq = false;
+  bool lfis2 = false;
   int varids[MAX_VARS3D];
   int *imiss = NULL;
   int timer_hetaeta = 0;
   long nctop = 0;
-  double *array = NULL;
   double *deltap1 = NULL, *deltap2 = NULL;
   double *half_press1 = NULL, *half_press2 = NULL;
   double *sum1 = NULL, *sum2 = NULL;
@@ -248,7 +245,6 @@ void *Remapeta(void *argument)
   double minval, maxval;
   double missval = 0;
   double cconst = 1.E-6;
-  const char *fname;
   double cptop  = 0; /* min. pressure level for cond. */
 
   if ( cdoTimer ) timer_hetaeta = timer_new("Remapeta_hetaeta");
@@ -290,13 +286,11 @@ void *Remapeta(void *argument)
 
   if ( operatorArgc() == 2 )
     {
-      int streamID;
+      lfis2 = true;
 
-      lfis2 = TRUE;
-      fname = operatorArgv()[1];
-      
+      const char *fname = operatorArgv()[1];
       argument_t *fileargument = file_argument_new(fname);
-      streamID = streamOpenRead(fileargument);
+      int streamID = streamOpenRead(fileargument);
       file_argument_free(fileargument);
 
       int vlistID1 = streamInqVlist(streamID);
@@ -394,11 +388,11 @@ void *Remapeta(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID  = vlistInqVarGrid(vlistID1, varID);
-      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      nlevel  = zaxisInqSize(zaxisID);
+      int gridID  = vlistInqVarGrid(vlistID1, varID);
+      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      int nlevel  = zaxisInqSize(zaxisID);
 
-      code = vlistInqVarCode(vlistID1, varID);
+      int code = vlistInqVarCode(vlistID1, varID);
       /* code = -1; */
       if ( code <= 0 || code == 255 )
 	{
@@ -457,7 +451,7 @@ void *Remapeta(void *argument)
 
   if ( tempID != -1 && sqID != -1 )
     {
-      ltq = TRUE;
+      ltq = true;
     }
   else
     {
@@ -465,14 +459,14 @@ void *Remapeta(void *argument)
       if ( sqID   != -1 ) cdoAbort("Humidity without temperature unsupported!");
     }
   /*
-  if ( ltq == FALSE )
+  if ( ltq == false )
     {
       cdoWarning("Temperature and Humidity not found!");
     }
   */
   if ( operatorID == REMAPETA ) {}
 
-  if ( operatorID == REMAPETAS || operatorID == REMAPETAZ)
+  if ( operatorID == REMAPETAS || operatorID == REMAPETAZ )
     {
       sum1 = (double*) Malloc(gridsize*sizeof(double));
       sum2 = (double*) Malloc(gridsize*sizeof(double));
@@ -486,15 +480,15 @@ void *Remapeta(void *argument)
       half_press2 = (double*) Malloc(gridsize*(nhlevf2+1)*sizeof(double));
     }
 
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  fis1  = (double*) Malloc(gridsize*sizeof(double));
-  ps1   = (double*) Malloc(gridsize*sizeof(double));
+  double *fis1  = (double*) Malloc(gridsize*sizeof(double));
+  double *ps1   = (double*) Malloc(gridsize*sizeof(double));
 
-  if ( lfis2 == FALSE ) fis2  = (double*) Malloc(gridsize*sizeof(double));
-  if ( lfis2 == TRUE && gridsize != nfis2gp ) cdoAbort("Orographies have different grid size!");
+  if ( lfis2 == false ) fis2 = (double*) Malloc(gridsize*sizeof(double));
+  if ( lfis2 == true && gridsize != nfis2gp ) cdoAbort("Orographies have different grid size!");
 
-  ps2   = (double*) Malloc(gridsize*sizeof(double));
+  double *ps2   = (double*) Malloc(gridsize*sizeof(double));
 
   if ( ltq )
     {
@@ -529,7 +523,7 @@ void *Remapeta(void *argument)
       memset(fis1, 0, gridsize*sizeof(double));
     }
 
-  presID = lnpsID;
+  int presID = lnpsID;
   if ( zaxisIDh != -1 && lnpsID == -1 )
     {
       if ( psID == -1 )
@@ -546,21 +540,20 @@ void *Remapeta(void *argument)
 	cdoPrint("using %s", var_stdname(surface_air_pressure));
     }
 
-  if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d", nvars3D, ltq);
+  if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d", nvars3D, (int)ltq);
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  nlevel   = zaxisInqSize(zaxisID);
-	  offset   = gridsize*levelID;
+	  int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	  int nlevel  = zaxisInqSize(zaxisID);
+	  int offset = gridsize*levelID;
 	  streamReadRecord(streamID1, array, &nmiss);
 
 	  if ( zaxisIDh != -1 )
@@ -614,16 +607,16 @@ void *Remapeta(void *argument)
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 	}
 
-      if ( lfis2 == FALSE )
-	for ( i = 0; i < gridsize; i++ ) fis2[i] = fis1[i];
+      if ( lfis2 == false )
+	for ( int i = 0; i < gridsize; i++ ) fis2[i] = fis1[i];
 
       if ( ltq )
 	{
 	  varID = tempID;
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      offset   = gridsize*levelID;
+	      int offset = gridsize*levelID;
 	      single2  = t1 + offset;
 
 	      minmaxval(gridsize, single2, imiss, &minval, &maxval);
@@ -636,7 +629,7 @@ void *Remapeta(void *argument)
 	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      offset   = gridsize*levelID;
+	      int offset = gridsize*levelID;
 	      single2  = q1 + offset;
 
 	      corr_hum(gridsize, single2, MIN_Q);
@@ -690,10 +683,10 @@ void *Remapeta(void *argument)
       if ( ltq )
 	{
 	  varID = tempID;
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      offset   = gridsize*levelID;
+	      int offset = gridsize*levelID;
 	      single2  = t2 + offset;
 
 	      minmaxval(gridsize, single2, imiss, &minval, &maxval);
@@ -710,7 +703,7 @@ void *Remapeta(void *argument)
 	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      offset   = gridsize*levelID;
+	      int offset = gridsize*levelID;
 	      single2  = q2 + offset;
 
 	      corr_hum(gridsize, single2, MIN_Q);
@@ -733,7 +726,7 @@ void *Remapeta(void *argument)
 	{
 	  varID = varids[iv];
 
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
 	  if ( operatorID == REMAPETAS )
 	    {
@@ -765,7 +758,7 @@ void *Remapeta(void *argument)
 
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      offset   = gridsize*levelID;
+	      int offset = gridsize*levelID;
 	      single2  = vars2[iv] + offset;
 
 	      if ( operatorID == REMAPETAS || operatorID == REMAPETAZ )

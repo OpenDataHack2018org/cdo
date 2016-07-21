@@ -33,15 +33,12 @@ void *Replace(void *argument)
 {
   int varID, varID1, varID2;
   int nrecs = 0;
-  int recID, levelID, levelID2;
+  int levelID, levelID2;
   int nrecs2;
   int nchvars = 0;
   int idx;
-  int nlevel1, nlevel2;
   char varname1[CDI_MAX_NAME], varname2[CDI_MAX_NAME];
   int nmiss;
-  int gridsize;
-  int offset;
   int varlist1[MAX_VARS], varlist2[MAX_VARS];
   int **varlevel = NULL;
   int **varnmiss2 = NULL;
@@ -77,13 +74,11 @@ void *Replace(void *argument)
 
       if ( varID1 < nvars1 )
 	{
-	  int gridsize1, gridsize2, nlevel1, nlevel2;
+	  int gridsize1 = gridInqSize(vlistInqVarGrid(vlistID1, varID1));
+	  int nlevel1   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 
-	  gridsize1 = gridInqSize(vlistInqVarGrid(vlistID1, varID1));
-	  nlevel1   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
-
-	  gridsize2 = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
-	  nlevel2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
+	  int gridsize2 = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+	  int nlevel2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
 
 	  if ( gridsize1 != gridsize2 )
 	    cdoAbort("Variables have different gridsize!");
@@ -113,9 +108,9 @@ void *Replace(void *argument)
 	{
 	  varID1 = varlist1[idx];
 	  varID2 = varlist2[idx];
-	  nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
-	  nlevel2  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
+	  int nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
+	  int nlevel2  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID2));
+	  int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  vardata2[idx]  = (double*) Malloc(nlevel2*gridsize*sizeof(double));
 	  varnmiss2[idx] = (int*) Malloc(nlevel2*sizeof(int));
 	  varlevel[idx] = (int*) Malloc(nlevel1*sizeof(int));
@@ -159,7 +154,7 @@ void *Replace(void *argument)
   vlistDefTaxis(vlistID3, taxisID3);
   streamDefVlist(streamID3, vlistID3);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   double *array = (double*) Malloc(gridsize*sizeof(double));
 
   int nts2 = vlistNtsteps(vlistID2);
@@ -175,15 +170,15 @@ void *Replace(void *argument)
 	  if ( nrecs2 == 0 )
 	    cdoAbort("Input streams have different number of timesteps!");
 
-	  for ( recID = 0; recID < nrecs2; recID++ )
+	  for ( int recID = 0; recID < nrecs2; recID++ )
 	    {
 	      streamInqRecord(streamID2, &varID, &levelID);
 	      
 	      for ( idx = 0; idx < nchvars; idx++ )
 		if ( varlist2[idx] == varID )
 		  {
-		    gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-		    offset   = gridsize*levelID;
+		    int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		    int offset   = gridsize*levelID;
 		    parray   = vardata2[idx]+offset;
 		    streamReadRecord(streamID2, parray, &nmiss);
 		    varnmiss2[idx][levelID] = nmiss;
@@ -194,7 +189,7 @@ void *Replace(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -206,8 +201,8 @@ void *Replace(void *argument)
 		levelID2 = varlevel[idx][levelID];
 		if ( levelID2 != -1 )
 		  {
-		    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-		    offset   = gridsize*levelID2;
+		    int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+		    int offset   = gridsize*levelID2;
 		    parray   = vardata2[idx]+offset;
 		    nmiss    = varnmiss2[idx][levelID2];
 		    break;

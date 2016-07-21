@@ -5,7 +5,9 @@
 #include "config.h"
 #endif
 
-void hetaeta(int ltq, int ngp, const int *imiss,
+#include <stdbool.h>
+
+void hetaeta(bool ltq, int ngp, const int *imiss,
 	     int nlev1, const double *restrict ah1, const double *restrict bh1,
              const double *restrict fis1, const double *restrict ps1, 
              const double *restrict t1, const double *restrict q1,
