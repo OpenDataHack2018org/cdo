@@ -177,8 +177,10 @@ void *Diff(void *argument)
 		  fprintf(stdout, ":");
 		  reset_text_color(stdout);
 		
-		  set_text_color(stdout, RESET, BLUE);
+		  set_text_color(stdout, RESET, MAGENTA);
 		  fprintf(stdout, "%s %s ", vdatestr, vtimestr);
+		  reset_text_color(stdout);
+		  set_text_color(stdout, RESET, GREEN);
 		  fprintf(stdout, "%7g ", zaxisInqLevel(zaxisID, levelID));
 		  fprintf(stdout, "%8d %7d ", gridsize, MAX(nmiss1, nmiss2));
 		  fprintf(stdout, "%7d ", ndiff);
@@ -188,6 +190,7 @@ void *Diff(void *argument)
 		  fprintf(stdout, ":");
 		  reset_text_color(stdout);
 		  fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
+		  set_text_color(stdout, RESET, BLUE);
 		  fprintf(stdout, "%#12.5g%#12.5g", absm, relm);
 		  set_text_color(stdout, RESET, BLACK);
 		  fprintf(stdout, " : ");
