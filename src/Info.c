@@ -341,17 +341,19 @@ void *Info(void *argument)
 	      fprintf(stdout, ":");
 	      reset_text_color(stdout);
 	      
-	      set_text_color(stdout, RESET, BLUE);
+              set_text_color(stdout, RESET, MAGENTA);
 	      fprintf(stdout, "%s %s ", vdatestr, vtimestr);
+	      reset_text_color(stdout);
 	      level = zaxisInqLevel(zaxisID, levelID);
+	      set_text_color(stdout, RESET, GREEN);
 	      fprintf(stdout, "%7g ", level);
 	      fprintf(stdout, "%8d %7d ", gridsize, nmiss);
-	      reset_text_color(stdout);
 		
 	      set_text_color(stdout, RESET, BLACK);
 	      fprintf(stdout, ":");
 	      reset_text_color(stdout);
 
+              set_text_color(stdout, RESET, BLUE);
 	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
 		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
 		{
@@ -437,6 +439,7 @@ void *Info(void *argument)
 		      fprintf(stdout, "   -  (%#12.5g,%#12.5g)  -", arrmean_r, arrmean_i);
 		    }
 		}
+	      reset_text_color(stdout);
 
 	      set_text_color(stdout, RESET, BLACK);
 	      fprintf(stdout, " : ");

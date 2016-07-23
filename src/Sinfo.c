@@ -203,21 +203,27 @@ void *Sinfo(void *argument)
               fprintf(stdout, " %6d  ", subtypesize);
               fprintf(stdout, "%3d ", vlistSubtypeIndex(vlistID, subtypeID) + 1);
             }
+	  reset_text_color(stdout);
 
 	  /* layer info */
 	  levelsize = zaxisInqSize(zaxisID);
+	  set_text_color(stdout, RESET, GREEN);
 	  fprintf(stdout, "%6d ", levelsize);
+	  reset_text_color(stdout);
 	  fprintf(stdout, "%3d ", vlistZaxisIndex(vlistID, zaxisID) + 1);
 
 	  /* grid info */
 	  gridsize = gridInqSize(gridID);
+	  set_text_color(stdout, RESET, GREEN);
 	  fprintf(stdout, "%9d ", gridsize);
+	  reset_text_color(stdout);
 	  fprintf(stdout, "%3d ", vlistGridIndex(vlistID, gridID) + 1);
 
 	  /* datatype */
 	  datatype = vlistInqVarDatatype(vlistID, varID);
 	  datatype2str(datatype, pstr);
 
+	  set_text_color(stdout, RESET, BLUE);
 	  fprintf(stdout, " %-3s", pstr);
 
 	  if ( vlistInqVarCompType(vlistID, varID) == COMPRESS_NONE )
