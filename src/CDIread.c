@@ -81,13 +81,11 @@ void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_
 void *CDIread(void *argument)
 {
   int memtype = CDO_Memtype;
-  int streamID;
-  int tsID, varID, levelID;
-  int gridsize, nmiss;
-  int recID, nrecs;
-  int vlistID;
+  int varID, levelID;
+  int nmiss;
+  int nrecs;
   int filetype = -1, datatype = -1;
-  int irun, nruns = 1;
+  int nruns = 1;
   char sinfo[64];
   off_t nvalues = 0;
   double file_size = 0, data_size = 0;
@@ -112,31 +110,31 @@ void *CDIread(void *argument)
 
   // vlistDefNtsteps(vlistID, 1);
 
-  for ( irun = 0; irun < nruns; ++irun )
+  for ( int irun = 0; irun < nruns; ++irun )
     {
       tw0 = timer_val(timer_read);
       data_size = 0;
       nvalues = 0;
 
-      streamID = streamOpenRead(cdoStreamName(0));
+      int streamID = streamOpenRead(cdoStreamName(0));
 
-      vlistID = streamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
       filetype = streamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);
 	  
-      gridsize = vlistGridsizeMax(vlistID);
+      int gridsize = vlistGridsizeMax(vlistID);
       
       if ( darray == NULL ) darray = (double*) Malloc(gridsize*sizeof(double));
       if ( farray == NULL && memtype == MEMTYPE_FLOAT ) farray = (float*) Malloc(gridsize*sizeof(float));
 
       t0 = timer_val(timer_read);
 
-      tsID = 0;
+      int tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	{
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID, &varID, &levelID);
 

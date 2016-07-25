@@ -40,7 +40,7 @@ enum {CONSECSUM, CONSECTS};
 
 static void selEndOfPeriod(field_t *periods, field_t history, field_t current, int isLastTimestep)
 {
-  long   i, len;
+  long   i;
   double pmissval = periods->missval;
   double  *parray = periods->ptr;
   double hmissval = history.missval;
@@ -48,7 +48,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
   double cmissval = current.missval;
   double  *carray = current.ptr;
 
-  len = gridInqSize(periods->grid);
+  long len = gridInqSize(periods->grid);
   if ( len != gridInqSize(current.grid) || (gridInqSize(current.grid) != gridInqSize(history.grid)) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
@@ -119,43 +119,40 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
     if ( DBL_IS_EQUAL(parray[i], pmissval) ) periods->nmiss++;
 }
 
+
 void *Consecstat(void *argument)
 {
-  int operatorID;
-  int istreamID, itaxisID, ivlistID, itsID;
-  int ostreamID, otaxisID, ovlistID, otsID;
   int vdate = 0, vtime = 0;
   int histvdate = 0, histvtime = 0;
-  int recID, nrecs;
-  int varID, nvars;
+  int nrecs;
+  int varID;
   int levelID, nlevels;
   int nmiss;
   double refval = 0.0;
 
-  field_t **vars = NULL, **hist = NULL, **periods = NULL;
-  field_t field;
-
   cdoInitialize(argument);
   cdoOperatorAdd("consecsum",CONSECSUM, 0, "refval");
   cdoOperatorAdd("consects" ,CONSECTS , 0, NULL);
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == CONSECSUM )
     if ( operatorArgc() > 0 ) refval = parameter2double(operatorArgv()[0]);
 
-  istreamID = streamOpenRead(cdoStreamName(0));
+  int istreamID = streamOpenRead(cdoStreamName(0));
 
-  ivlistID = streamInqVlist(istreamID);
-  itaxisID = vlistInqTaxis(ivlistID);
-  ovlistID = vlistDuplicate(ivlistID);
-  otaxisID = taxisDuplicate(itaxisID);
+  int ivlistID = streamInqVlist(istreamID);
+  int itaxisID = vlistInqTaxis(ivlistID);
+  int ovlistID = vlistDuplicate(ivlistID);
+  int otaxisID = taxisDuplicate(itaxisID);
   vlistDefTaxis(ovlistID, otaxisID);
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(vlistGridsizeMax(ovlistID)*sizeof(double));
 
-  nvars     = vlistNvars(ivlistID);
-  vars      = field_calloc(ivlistID, FIELD_PTR);
+  int nvars = vlistNvars(ivlistID);
+  field_t **vars = field_calloc(ivlistID, FIELD_PTR);
+  field_t **hist = NULL, **periods = NULL;
   if ( operatorID == CONSECTS )
     {
       hist      = field_malloc(ivlistID, FIELD_PTR);
@@ -167,12 +164,12 @@ void *Consecstat(void *argument)
       vlistDefVarUnits(ovlistID, varID, "steps"); /* TODO */
     }
 
-  ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(ostreamID, ovlistID);
 
-  itsID = 0;
-  otsID = 0;
+  int itsID = 0;
+  int otsID = 0;
   while ( (nrecs = streamInqTimestep(istreamID, itsID)) )
   {
     vdate = taxisInqVdate(itaxisID);
@@ -197,7 +194,7 @@ void *Consecstat(void *argument)
         break;
     }
 
-    for ( recID = 0; recID < nrecs; recID++ )
+    for ( int recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(istreamID, &varID, &levelID);
       streamReadRecord(istreamID, field.ptr, &nmiss);

@@ -39,14 +39,9 @@ int stringToParam(const char *paramstr);
 
 void *Change(void *argument)
 {
-  int CHCODE, CHTABNUM, CHPARAM, CHNAME, CHUNIT, CHLEVEL, CHLEVELC, CHLEVELV, CHLTYPE;  
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars;
-  int tsID1, recID, varID = 0, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
-  int chints[MAXARG], nch = 0;
+  int varID = 0, levelID;
+  int chints[MAXARG];
   char *chnames[MAXARG];
   char varname[CDI_MAX_NAME];
   char *chname = NULL;
@@ -54,32 +49,30 @@ void *Change(void *argument)
   int param;
   int code, tabnum, i;
   int nmiss;
-  int gridsize;
   int nfound;
   int nzaxis, zaxisID1, zaxisID2, k, nlevs, index; 
   double chlevels[MAXARG];
   int  chltypes[MAXARG];              
   double *levels = NULL;
   double *newlevels = NULL;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
-  CHCODE   = cdoOperatorAdd("chcode",   0, 0, "pairs of old and new code numbers");
-  CHTABNUM = cdoOperatorAdd("chtabnum", 0, 0, "pairs of old and new GRIB1 table numbers");
-  CHPARAM  = cdoOperatorAdd("chparam",  0, 0, "pairs of old and new parameter identifiers");
-  CHNAME   = cdoOperatorAdd("chname",   0, 0, "pairs of old and new variable names");
-  CHUNIT   = cdoOperatorAdd("chunit",   0, 0, "pairs of old and new variable units");
-  CHLEVEL  = cdoOperatorAdd("chlevel",  0, 0, "pairs of old and new levels");
-  CHLEVELC = cdoOperatorAdd("chlevelc", 0, 0, "code number, old and new level");
-  CHLEVELV = cdoOperatorAdd("chlevelv", 0, 0, "variable name, old and new level");
-  CHLTYPE  = cdoOperatorAdd("chltype",  0, 0, "pairs of old and new type");          
+  int CHCODE   = cdoOperatorAdd("chcode",   0, 0, "pairs of old and new code numbers");
+  int CHTABNUM = cdoOperatorAdd("chtabnum", 0, 0, "pairs of old and new GRIB1 table numbers");
+  int CHPARAM  = cdoOperatorAdd("chparam",  0, 0, "pairs of old and new parameter identifiers");
+  int CHNAME   = cdoOperatorAdd("chname",   0, 0, "pairs of old and new variable names");
+  int CHUNIT   = cdoOperatorAdd("chunit",   0, 0, "pairs of old and new variable units");
+  int CHLEVEL  = cdoOperatorAdd("chlevel",  0, 0, "pairs of old and new levels");
+  int CHLEVELC = cdoOperatorAdd("chlevelc", 0, 0, "code number, old and new level");
+  int CHLEVELV = cdoOperatorAdd("chlevelv", 0, 0, "variable name, old and new level");
+  int CHLTYPE  = cdoOperatorAdd("chltype",  0, 0, "pairs of old and new type");          
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  nch = operatorArgc();
+  int nch = operatorArgc();
 
   if ( operatorID == CHCODE || operatorID == CHTABNUM )
     {
@@ -122,13 +115,13 @@ void *Change(void *argument)
 	chltypes[i] = parameter2int(operatorArgv()[i]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( operatorID == CHCODE )
@@ -303,21 +296,21 @@ void *Change(void *argument)
 	}
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID2);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID2);
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID1 = 0;
+  int tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID1);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

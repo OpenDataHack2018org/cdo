@@ -298,16 +298,14 @@ void readcmd(const char *prompt, char *line, int size)
 
 void command_init()
 {
-  int gridsize;
-  int taxisID;
   int varID;
 
   gl_vlistID = streamInqVlist(gl_streamID);
-  taxisID = vlistInqTaxis(gl_vlistID);
+  int taxisID = vlistInqTaxis(gl_vlistID);
 
   UNUSED(taxisID);
 
-  gridsize = vlistGridsizeMax(gl_vlistID);
+  int gridsize = vlistGridsizeMax(gl_vlistID);
   gl_data = (double*) Malloc(gridsize*sizeof(double));
 
   gl_nvars = vlistNvars(gl_vlistID);

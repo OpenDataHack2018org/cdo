@@ -29,33 +29,24 @@
 
 void *Change_e5slm(void *argument)
 {
-  int streamIDslm, streamID1, streamID2;
-  const char *fn_slm;
   char name[CDI_MAX_NAME];
   int nrecs, code;
-  int tsID, recID, varID, levelID;
-  int gridsize;
-  int vlistIDslm, vlistID1, vlistID2 = -1;
-  int nmiss, nvars;
-  int taxisID1, taxisID2;
-  short *codes = NULL;
-  short *lsea = NULL;
+  int varID, levelID;
+  int nmiss;
   long i;
   double minval, maxval;
-  double *array = NULL;
-  double *cland = NULL;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  taxisID1 = vlistInqTaxis(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  vlistID2 = vlistDuplicate(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamDefVlist(streamID2, vlistID2);
@@ -64,20 +55,20 @@ void *Change_e5slm(void *argument)
   /* get filename of SLM */
   operatorInputArg("filename of the sea land mask");
   operatorCheckArgc(1);
-  fn_slm = operatorArgv()[0];
+  const char *fn_slm = operatorArgv()[0];
 
   /* read SLM */
   argument_t *fileargument = file_argument_new(fn_slm);
-  streamIDslm = streamOpenRead(fileargument);
+  int streamIDslm = streamOpenRead(fileargument);
   file_argument_free(fileargument);
 
-  vlistIDslm = streamInqVlist(streamIDslm);
+  int vlistIDslm = streamInqVlist(streamIDslm);
 
-  gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
+  int gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
 
-  array = (double*) Malloc(gridsize*sizeof(double));
-  cland = (double*) Malloc(gridsize*sizeof(double));
-  lsea  = (short*) Malloc(gridsize*sizeof(short));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
+  double *cland = (double*) Malloc(gridsize*sizeof(double));
+  bool *lsea  = (bool*) Malloc(gridsize*sizeof(bool));
 
   streamInqTimestep(streamIDslm, 0);
 
@@ -95,14 +86,14 @@ void *Change_e5slm(void *argument)
   for ( i = 0; i < gridsize; ++i )
     {
       if ( cland[i] > 0 )
-	lsea[i] = FALSE;
+	lsea[i] = false;
       else
-	lsea[i] = TRUE;
+	lsea[i] = true;
     }
 
 
-  nvars = vlistNvars(vlistID1);
-  codes = (short*) Malloc(nvars*sizeof(short));
+  int nvars = vlistNvars(vlistID1);
+  short *codes = (short*) Malloc(nvars*sizeof(short));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -132,14 +123,14 @@ void *Change_e5slm(void *argument)
     }
 
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{ 
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array, &nmiss);

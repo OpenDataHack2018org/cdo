@@ -24,31 +24,25 @@
 
 void *Complextorect(void *argument)
 {
-  // int COMPLEXTORECT;
-  // int operatorID;
-  int streamID1, streamID2, streamID3;
-  int tsID, nrecs;
-  int recID, varID, levelID;
-  int vlistID1, vlistID2, vlistID3;
-  int taxisID1, taxisID2, taxisID3;
-  int i, gridsize;
+  int nrecs;
+  int varID, levelID;
+  int i;
   int datatype;
-  int nmiss, nvars;
-  double *array1 = NULL, *array2 = NULL, *array3 = NULL;
+  int nmiss;
 
   cdoInitialize(argument);
 
-  //  COMPLEXTORECT = cdoOperatorAdd("complextorect", 0, 0, NULL);
+  // int COMPLEXTORECT = cdoOperatorAdd("complextorect", 0, 0, NULL);
 
-  //  operatorID = cdoOperatorID();
+  // int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
-  nvars = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; ++varID )
     {
       datatype = vlistInqVarDatatype(vlistID2, varID);
@@ -61,24 +55,24 @@ void *Complextorect(void *argument)
       vlistDefVarDatatype(vlistID3, varID, datatype);
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) Malloc(2*gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
-  array3 = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(2*gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array3 = (double*) Malloc(gridsize*sizeof(double));
       
-  tsID  = 0;
+  int tsID  = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -87,7 +81,7 @@ void *Complextorect(void *argument)
       streamDefTimestep(streamID2, tsID);
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2, varID, levelID);

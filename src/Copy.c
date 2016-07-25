@@ -35,7 +35,7 @@ void *Copy(void *argument)
   int vlistID2 = CDI_UNDEFID;
   int taxisID2 = CDI_UNDEFID;
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int nmiss;
   int ntsteps, nvars;
   double *array = NULL;
@@ -119,7 +119,7 @@ void *Copy(void *argument)
 
 	  streamDefTimestep(streamID2, tsID2);
 	       
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    { 
 	      if ( lcopy && (operatorID == SELALL || operatorID == SZIP) )
 		{

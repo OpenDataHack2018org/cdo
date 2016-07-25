@@ -30,47 +30,38 @@
 
 void *Cond(void *argument)
 {
-  int IFTHEN, IFNOTTHEN;
-  int operatorID;
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
-  int streamID1, streamID2, streamID3;
-  int gridsize;
-  int ntsteps1, ntsteps2;
-  int nrecs, nrecs2, nvars = 0, nlev, recID;
-  int tsID;
+  int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   int offset;
-  int vlistID1, vlistID2, vlistID3;
   int nmiss1, nmiss2, nmiss3;
   int i;
   double missval1 = -9.E33;
   double missval2 = -9.E33;
-  double *array1, *array2, *array3;
   int **varnmiss1 = NULL;
   double **vardata1 = NULL;
-  int taxisID2, taxisID3;
 
   cdoInitialize(argument);
 
-  IFTHEN    = cdoOperatorAdd("ifthen",    0, 0, NULL);
-  IFNOTTHEN = cdoOperatorAdd("ifnotthen", 0, 0, NULL);
+  int IFTHEN    = cdoOperatorAdd("ifthen",    0, 0, NULL);
+  int IFNOTTHEN = cdoOperatorAdd("ifnotthen", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID2);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID2);
 
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = taxisDuplicate(taxisID2);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisID3 = taxisDuplicate(taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  ntsteps1 = vlistNtsteps(vlistID1);
-  ntsteps2 = vlistNtsteps(vlistID2);
+  int ntsteps1 = vlistNtsteps(vlistID1);
+  int ntsteps2 = vlistNtsteps(vlistID2);
   if ( ntsteps1 == 0 ) ntsteps1 = 1;
   if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
@@ -86,18 +77,18 @@ void *Cond(void *argument)
   nospec(vlistID1);
   nospec(vlistID2);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  gridsize = vlistGridsizeMax(vlistID2);
+  int gridsize = vlistGridsizeMax(vlistID2);
 
   if ( filltype == FILL_REC && gridsize != gridInqSize(vlistGrid(vlistID1, 0)) )
     cdoAbort("Stream1 >%s< has wrong gridsize!", cdoStreamName(0)->args);
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
-  array3 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array3 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( cdoVerbose )
     cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
@@ -122,7 +113,7 @@ void *Cond(void *argument)
 	}
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       if ( tsID == 0 || filltype == FILL_NONE )
@@ -136,7 +127,7 @@ void *Cond(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID2, &varID, &levelID);
 	  streamReadRecord(streamID2, array2, &nmiss2);

@@ -312,7 +312,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 void *Collgrid(void *argument)
 {
   int nxblocks = -1;
-  int varID, recID;
+  int varID;
   int nrecs, nrecs0;
   int levelID;
   int nmiss;
@@ -512,7 +512,7 @@ void *Collgrid(void *argument)
 
       if ( nrecs0 > 0 ) streamDefTimestep(streamID2, tsID);
       
-      for ( recID = 0; recID < nrecs0; recID++ )
+      for ( int recID = 0; recID < nrecs0; recID++ )
 	{
 	  streamInqRecord(ef[0].streamID, &varID, &levelID);
 	  if ( cdoVerbose && tsID == 0 ) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);

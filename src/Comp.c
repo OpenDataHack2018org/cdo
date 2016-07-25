@@ -34,57 +34,49 @@
 
 void *Comp(void *argument)
 {
-  int EQ, NE, LE, LT, GE, GT;
-  int operatorID;
   enum {FILL_NONE, FILL_TS, FILL_REC};
   int filltype = FILL_NONE;
-  int streamIDx1, streamIDx2, streamID1, streamID2, streamID3;
-  int gridsize, gridsize1, gridsize2;
-  int nrecs, nrecs2, nvars = 0, nlev, recID;
-  int tsID;
+  int gridsize1, gridsize2;
+  int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
   int offset;
-  int ntsteps1, ntsteps2;
-  int vlistIDx1, vlistIDx2, vlistID1, vlistID2, vlistID3;
-  int taxisIDx1, taxisID1, taxisID2, taxisID3;
   int nmiss1, nmiss2, nmiss3;
   int i;
   double missval1, missval2 = 0;
   double *missvalx1, *missvalx2;
-  double *arrayx1, *arrayx2, *array1, *array2, *array3;
   double **vardata = NULL;
 
   cdoInitialize(argument);
 
-  EQ = cdoOperatorAdd("eq", 0, 0, NULL);
-  NE = cdoOperatorAdd("ne", 0, 0, NULL);
-  LE = cdoOperatorAdd("le", 0, 0, NULL);
-  LT = cdoOperatorAdd("lt", 0, 0, NULL);
-  GE = cdoOperatorAdd("ge", 0, 0, NULL);
-  GT = cdoOperatorAdd("gt", 0, 0, NULL);
+  int EQ = cdoOperatorAdd("eq", 0, 0, NULL);
+  int NE = cdoOperatorAdd("ne", 0, 0, NULL);
+  int LE = cdoOperatorAdd("le", 0, 0, NULL);
+  int LT = cdoOperatorAdd("lt", 0, 0, NULL);
+  int GE = cdoOperatorAdd("ge", 0, 0, NULL);
+  int GT = cdoOperatorAdd("gt", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  streamIDx1 = streamID1;
-  streamIDx2 = streamID2;
+  int streamIDx1 = streamID1;
+  int streamIDx2 = streamID2;
 
   missvalx1 = &missval1;
   missvalx2 = &missval2;
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistIDx1 = vlistID1;
-  vlistIDx2 = vlistID2;
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistIDx1 = vlistID1;
+  int vlistIDx2 = vlistID2;
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisIDx1 = taxisID1;
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisIDx1 = taxisID1;
 
-  ntsteps1 = vlistNtsteps(vlistID1);
-  ntsteps2 = vlistNtsteps(vlistID2);
+  int ntsteps1 = vlistNtsteps(vlistID1);
+  int ntsteps2 = vlistNtsteps(vlistID2);
   if ( ntsteps1 == 0 ) ntsteps1 = 1;
   if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
@@ -110,14 +102,14 @@ void *Comp(void *argument)
   nospec(vlistID1);
   nospec(vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistIDx1);
+  int gridsize = vlistGridsizeMax(vlistIDx1);
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
-  array3 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array3 = (double*) Malloc(gridsize*sizeof(double));
 
-  arrayx1 = array1;
-  arrayx2 = array2;
+  double *arrayx1 = array1;
+  double *arrayx2 = array2;
 
   if ( cdoVerbose )
     cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
@@ -161,16 +153,16 @@ void *Comp(void *argument)
       missvalx2 = &missval1;
     }
 
-  vlistID3 = vlistDuplicate(vlistIDx1);
+  int vlistID3 = vlistDuplicate(vlistIDx1);
 
-  taxisID3 = taxisDuplicate(taxisIDx1);
+  int taxisID3 = taxisDuplicate(taxisIDx1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamIDx1, tsID)) )
     {
       if ( tsID == 0 || filltype == FILL_NONE )
@@ -184,7 +176,7 @@ void *Comp(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamIDx1, &varID, &levelID);
 	  streamReadRecord(streamIDx1, arrayx1, &nmiss1);

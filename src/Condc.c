@@ -31,59 +31,50 @@
 
 void *Condc(void *argument)
 {
-  int IFTHENC, IFNOTTHENC;
-  int operatorID;
-  int streamID1, streamID2;
-  int gridsize;
-  int nrecs, recID;
-  int tsID;
+  int nrecs;
   int varID, levelID;
-  int vlistID1, vlistID2;
   int nmiss, nmiss2;
   int i;
   double missval;
-  double rc;
-  double *array1, *array2;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
-  IFTHENC    = cdoOperatorAdd("ifthenc",    0, 0, NULL);
-  IFNOTTHENC = cdoOperatorAdd("ifnotthenc", 0, 0, NULL);
+  int IFTHENC    = cdoOperatorAdd("ifthenc",    0, 0, NULL);
+  int IFNOTTHENC = cdoOperatorAdd("ifnotthenc", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg("constant value");
-  rc = parameter2double(operatorArgv()[0]);
+  double rc = parameter2double(operatorArgv()[0]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   nospec(vlistID1);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);

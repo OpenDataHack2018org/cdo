@@ -123,7 +123,7 @@ void pl_index(int *kmax, int *kmin, double pmax, double pmin, long nlevs, double
 void *Cloudlayer(void *argument)
 {
   int gridID, zaxisID;
-  int nlevel, nlevs, nrecs, recID, code;
+  int nlevel, nlevs, nrecs, code;
   int varID, levelID;
   int zrev = FALSE;
   int i;
@@ -135,7 +135,6 @@ void *Cloudlayer(void *argument)
   int kmin[NVARS], kmax[NVARS];
   char varname[CDI_MAX_NAME];
   double sfclevel = 0;
-  double *plevs = NULL;
   double *cloud[NVARS];
   double pmin = 0, pmax = 0;
 
@@ -206,7 +205,7 @@ void *Cloudlayer(void *argument)
 
   if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
     {
-      plevs = (double*) Malloc(nlevel*sizeof(double));
+      double *plevs = (double*) Malloc(nlevel*sizeof(double));
       zaxisInqLevels(zaxisID, plevs);
       if ( plevs[0] > plevs[nlevel-1] )
 	{
@@ -240,18 +239,14 @@ void *Cloudlayer(void *argument)
     }
   else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
     {
-      int nvct;
-
-      nvct = zaxisInqVctSize(zaxisID);
+      int nvct = zaxisInqVctSize(zaxisID);
       if ( nlevel == (nvct/2 - 1) )
 	{
-	  double *vct;
-
-	  vct = (double*) Malloc(nvct*sizeof(double));
+	  double *vct = (double*) Malloc(nvct*sizeof(double));
 	  zaxisInqVct(zaxisID, vct);
 
 	  nlevs = nlevel + 1;
-	  plevs = (double*) Malloc(nlevs*sizeof(double));
+	  double *plevs = (double*) Malloc(nlevs*sizeof(double));
 	  vct2plev(vct, plevs, nlevs);
 	  Free(vct);
 
@@ -324,7 +319,7 @@ void *Cloudlayer(void *argument)
 
       streamDefTimestep(streamID2, tsID);
      
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

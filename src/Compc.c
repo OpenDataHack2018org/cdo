@@ -35,64 +35,55 @@
 
 void *Compc(void *argument)
 {
-  int EQC, NEC, LEC, LTC, GEC, GTC;
-  int operatorID;
-  int streamID1, streamID2;
-  int gridsize;
-  int nrecs, recID;
-  int tsID;
+  int nrecs;
   int varID, levelID;
-  int vlistID1, vlistID2;
   int nmiss, nmiss2;
   int i;
   double missval;
-  double rc;
-  double *array1, *array2;
-  int taxisID1, taxisID2;
   int rc_is_missval;
 
   cdoInitialize(argument);
 
-  EQC = cdoOperatorAdd("eqc", 0, 0, NULL);
-  NEC = cdoOperatorAdd("nec", 0, 0, NULL);
-  LEC = cdoOperatorAdd("lec", 0, 0, NULL);
-  LTC = cdoOperatorAdd("ltc", 0, 0, NULL);
-  GEC = cdoOperatorAdd("gec", 0, 0, NULL);
-  GTC = cdoOperatorAdd("gtc", 0, 0, NULL);
+  int EQC = cdoOperatorAdd("eqc", 0, 0, NULL);
+  int NEC = cdoOperatorAdd("nec", 0, 0, NULL);
+  int LEC = cdoOperatorAdd("lec", 0, 0, NULL);
+  int LTC = cdoOperatorAdd("ltc", 0, 0, NULL);
+  int GEC = cdoOperatorAdd("gec", 0, 0, NULL);
+  int GTC = cdoOperatorAdd("gtc", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg("constant value");
-  rc = parameter2double(operatorArgv()[0]);
+  double rc = parameter2double(operatorArgv()[0]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   nospec(vlistID1);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
