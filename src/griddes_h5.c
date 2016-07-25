@@ -16,20 +16,19 @@
 
 
 #if defined(HAVE_LIBHDF5)
-static herr_t
-obj_info(hid_t loc_id, const char *name, void *objname)
+static
+herr_t obj_info(hid_t loc_id, const char *name, void *objname)
 {
-  H5G_obj_t obj_type;
-  H5G_stat_t statbuf;
   herr_t lexist = 0;
 
+  H5G_stat_t statbuf;
   H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
 
   if ( strcmp(name, (char *) objname) == 0 )
     {
       lexist = 1;
 
-      obj_type = statbuf.type;
+      H5G_obj_t obj_type = statbuf.type;
 
       switch (obj_type) {
       case H5G_GROUP:
@@ -54,12 +53,9 @@ obj_info(hid_t loc_id, const char *name, void *objname)
 
 #if defined(HAVE_LIBHDF5)
 static
-int h5find_object(hid_t file_id, char *name)
+int h5find_object(hid_t file_id, const  char *name)
 {
-  int lexist = 0;
-
-  lexist = (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
-
+  int lexist = (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
   return lexist;
 }
 #endif
@@ -69,12 +65,11 @@ void fill_gridvals(int xsize, int ysize, double *xvals, double *yvals)
 {
   int i, j, ii, jj;
   int index, index2;
-  double xmin, xmax, ymin, ymax;
 
-  xmin = -180;
-  xmax =  180;
-  ymin = -90;
-  ymax =  90;
+  double xmin = -180;
+  double xmax =  180;
+  double ymin = -90;
+  double ymax =  90;
 
   for ( ii = 0; ii < xsize/2; ++ii )
     {
@@ -238,10 +233,9 @@ void fill_gridvals(int xsize, int ysize, double *xvals, double *yvals)
 void correct_sinxvals(int xsize, int ysize, double *xvals)
 {
   long i, j, istart, index;
-  double xmin, xmax;
 
-  xmin = -180;
-  xmax =  180;
+  double xmin = -180;
+  double xmax =  180;
 
   for ( j = 0; j < ysize; ++j )
     {
@@ -292,8 +286,6 @@ int gridFromH5file(const char *gridfile)
 {
   int       gridID = -1;
 #if defined(HAVE_LIBHDF5)
-  hid_t     fapl_id = H5P_DEFAULT;
-  hid_t	    file_id;	    /* HDF5 File ID	        	*/
   hid_t	    lon_id = -1;    /* Dataset ID	        	*/
   hid_t	    lat_id = -1;    /* Dataset ID	        	*/
   hid_t     att_id;
@@ -306,15 +298,15 @@ int gridFromH5file(const char *gridfile)
 
   gridInit(&grid);
 
-  fapl_id = H5Pcreate(H5P_FILE_ACCESS);
+  hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
   H5Pset_fclose_degree(fapl_id, H5F_CLOSE_STRONG);
 
   /* Open an existing file. */
-  file_id = H5Fopen(gridfile, H5F_ACC_RDONLY, fapl_id);
+  hid_t file_id = H5Fopen(gridfile, H5F_ACC_RDONLY, fapl_id);
 
   H5Pclose(fapl_id);
 
-  if ( file_id < 0 ) return(gridID);
+  if ( file_id < 0 ) return gridID;
 
   if ( h5find_object(file_id, "lon") > 0 && 
        h5find_object(file_id, "lat") > 0 )
@@ -331,10 +323,6 @@ int gridFromH5file(const char *gridfile)
   
   if ( lon_id >= 0 && lat_id >= 0 )
     {
-      hid_t type_id;
-      hid_t native_type;
-      int ftype = 0;
-
       dataspace = H5Dget_space(lon_id);    /* dataspace handle */
       rank      = H5Sget_simple_extent_ndims(dataspace);
       status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
@@ -364,9 +352,10 @@ int gridFromH5file(const char *gridfile)
 	     (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
       */
 
-      type_id = H5Dget_type(lon_id);  /* get datatype*/
+      hid_t type_id = H5Dget_type(lon_id);  /* get datatype*/
 
-      native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+      hid_t native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+      int ftype = 0;
       if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0;}
       else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0;}
       else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0;}
@@ -396,12 +385,11 @@ int gridFromH5file(const char *gridfile)
 	}
       else
 	{
-	  int *iarray, i;
-	  iarray = (int*) Malloc(grid.size*sizeof(int));
+	  int *iarray = (int*) Malloc(grid.size*sizeof(int));
 	  status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	  for ( i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
+	  for ( int i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
 	  status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	  for ( i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
+	  for ( int i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
 	  Free(iarray);
 	}
 
@@ -472,10 +460,6 @@ int gridFromH5file(const char *gridfile)
 
       if ( lon_id >= 0 && lat_id >= 0 )
 	{
-	  hid_t type_id;
-	  hid_t native_type;
-	  int ftype = 0;
-
 	  dataspace = H5Dget_space(lon_id);    /* dataspace handle */
 	  rank      = H5Sget_simple_extent_ndims(dataspace);
 	  status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
@@ -490,9 +474,10 @@ int gridFromH5file(const char *gridfile)
 		 (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
 	  */
 
-	  type_id = H5Dget_type(lon_id);  /* get datatype*/
+	  hid_t type_id = H5Dget_type(lon_id);  /* get datatype*/
 
-	  native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+	  hid_t native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+	  int ftype = 0;
 	  if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0;}
 	  else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0;}
 	  else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0;}
@@ -522,12 +507,11 @@ int gridFromH5file(const char *gridfile)
 	    }
 	  else
 	    {
-	      int *iarray, i;
-	      iarray = (int*) Malloc(grid.size*sizeof(int));
+	      int *iarray = (int*) Malloc(grid.size*sizeof(int));
 	      status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	      for ( i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
+	      for ( int i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
 	      status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	      for ( i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
+	      for ( int i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
 	      Free(iarray);
 	    }
 
@@ -556,5 +540,5 @@ int gridFromH5file(const char *gridfile)
   cdoWarning("HDF5 support not compiled in!");
 #endif
 
-  return (gridID);
+  return gridID;
 }
