@@ -34,18 +34,15 @@
 static
 void detrend(long nts, double missval1, double *array1, double *array2)
 {
-  long n;
-  long j;
   double zj;
   double sumj, sumjj;
   double sumx, sumjx;
-  double work1, work2;
   double missval2 = missval1;
 
   sumx = sumjx = 0;
   sumj = sumjj = 0;
-  n = 0;
-  for ( j = 0; j < nts; j++ )
+  long n = 0;
+  for ( long j = 0; j < nts; j++ )
     if ( !DBL_IS_EQUAL(array1[j], missval1) )
       {
         zj = j;
@@ -56,11 +53,11 @@ void detrend(long nts, double missval1, double *array1, double *array2)
 	n++;
       }
 
-  work1 = DIVMN( SUBMN(sumjx, DIVMN( MULMN(sumx, sumj), n) ),
-	      SUBMN(sumjj, DIVMN( MULMN(sumj, sumj), n)) );
-  work2 = SUBMN( DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
+  double work1 = DIVMN( SUBMN(sumjx, DIVMN( MULMN(sumx, sumj), n) ),
+                        SUBMN(sumjj, DIVMN( MULMN(sumj, sumj), n)) );
+  double work2 = SUBMN( DIVMN(sumx, n), MULMN(work1, DIVMN(sumj, n)));
 
-  for ( j = 0; j < nts; j++ )
+  for ( long j = 0; j < nts; j++ )
     array2[j] = SUBMN(array1[j], ADDMN(work2, MULMN(j, work1)));
 }
 
@@ -69,7 +66,7 @@ void *Detrend(void *argument)
 {
   int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
+  int gridID, varID, levelID;
   int i;
   int nalloc = 0;
   int nmiss;
@@ -113,7 +110,7 @@ void *Detrend(void *argument)
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);

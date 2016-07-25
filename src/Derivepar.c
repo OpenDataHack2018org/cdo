@@ -38,7 +38,7 @@ void *Derivepar(void *argument)
 {
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
-  int recID, nrecs;
+  int nrecs;
   int i, offset;
   int varID, levelID;
   int zaxisID;
@@ -293,7 +293,7 @@ void *Derivepar(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);

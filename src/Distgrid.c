@@ -167,9 +167,8 @@ typedef struct
 void *Distgrid(void *argument)
 {
   int gridID1;
-  int varID;
+  int varID, levelID;
   int nrecs;
-  int recID, levelID;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
@@ -307,7 +306,7 @@ void *Distgrid(void *argument)
       for ( index = 0; index < nsplit; index++ )
 	streamDefTimestep(streamIDs[index], tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);

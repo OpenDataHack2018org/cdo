@@ -26,7 +26,7 @@
 void *Deltime(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int vdate /*, vtime */;
   int copytimestep;
   int gridsize;
@@ -125,7 +125,7 @@ void *Deltime(void *argument)
 
 	  streamDefTimestep(streamID2, tsID2++);
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      streamDefRecord(streamID2, varID, levelID);

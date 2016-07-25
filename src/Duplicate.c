@@ -27,10 +27,9 @@
 void *Duplicate(void *argument)
 {
   int nrecs;
-  int gridID, varID, levelID;
+  int varID, levelID;
   int nalloc = 0;
   int nmiss;
-  int nlevel;
   int *vdate = NULL, *vtime = NULL;
   int ndup = 2;
   field_t ***vars = NULL;
@@ -93,7 +92,7 @@ void *Duplicate(void *argument)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
+	  int gridID   = vlistInqVarGrid(vlistID1, varID);
 	  int gridsize = gridInqSize(gridID);
 	  vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
@@ -115,7 +114,7 @@ void *Duplicate(void *argument)
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  if ( vars[tsID][varID][levelID].ptr )
