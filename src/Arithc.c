@@ -66,14 +66,14 @@ int *fill_vars(int vlistID)
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = 1;
     }
 
-  return (vars);
+  return vars;
 }
 
 
 void *Arithc(void *argument)
 {
   int nmiss;
-  int nrecs, recID;
+  int nrecs;
   int varID, levelID;
 
   cdoInitialize(argument);
@@ -120,7 +120,7 @@ void *Arithc(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field.ptr, &nmiss);

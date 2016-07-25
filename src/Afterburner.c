@@ -64,7 +64,7 @@ int stdin_is_tty  = 0;  /* true if stdin  is character device */
 int stdout_is_tty = 0;  /* true if stdout is character device */
 #endif
 
-static int lstdout = 1;
+static bool lstdout = true;
  
 static int Source = 0;
 
@@ -89,11 +89,11 @@ static int oVertID = -1;
 
 static int Lhybrid2pressure = FALSE;
 
-int    TsID;
+static int TsID;
 #if  defined  (HAVE_LIBPTHREAD)
-int    ParallelRead = TRUE;
+static bool ParallelRead = true;
 #else
-int    ParallelRead = FALSE;
+static bool ParallelRead = false;
 #endif
 
 #define TIMESTEP_INTERVAL  -1
@@ -102,8 +102,8 @@ int    ParallelRead = FALSE;
 #define UNLIM_INTERVAL      2
 
 #define MaxHours  24
-int nrqh;
-int hours[MaxHours+1];
+static int nrqh;
+static int hours[MaxHours+1];
 
 static double *LevelFound;
 
@@ -182,7 +182,7 @@ void after_PostProcess(struct Control *globs)
 static
 void after_SwitchFile(struct Control *globs)
 {
-  int echam4 = FALSE;
+  bool echam4 = false;
   int i, n;
   char y3, y2, y1, y0;
   char         m1, m0;
@@ -201,7 +201,7 @@ void after_SwitchFile(struct Control *globs)
 
       if ( ifile[i-3] == '.' )
 	{
-	  echam4 = TRUE;
+	  echam4 = true;
 	  y3 = ifile[i-9]; y2 = ifile[i-8];
 	  y1 = ifile[i-7]; y0 = ifile[i-6];
 	  m1 = ifile[i-5]; m0 = ifile[i-4];
@@ -625,7 +625,7 @@ static
 void after_control(struct Control *globs, struct Variable *vars)
 {
   int i;
-  int tsFirst, nrecs;
+  int nrecs;
   int rdate, rtime;
   int vdate, vtime;
   int code;
@@ -699,7 +699,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 
   globs->OldDate = globs->NewDate;
 
-  tsFirst = TRUE;
+  bool tsFirst = true;
 
   while ( nrecs > 0 )
     {
@@ -708,9 +708,9 @@ void after_control(struct Control *globs, struct Variable *vars)
       rarg.vars  = vars;
       rarg.globs = globs;
 
-      if ( tsFirst || ParallelRead == FALSE )
+      if ( tsFirst || ParallelRead == false )
 	{
-	  if ( ParallelRead == FALSE )
+	  if ( ParallelRead == false )
 	    {
 	      statusp = after_readTimestep(&rarg);
 	    }
@@ -735,7 +735,7 @@ void after_control(struct Control *globs, struct Variable *vars)
 		Error("after_readTimestep error! (status = %d)", *(int *)statusp);
 	    }
 #endif
-	  tsFirst = FALSE;
+	  tsFirst = false;
 	}
 #if defined(HAVE_LIBPTHREAD)
       else
@@ -2285,7 +2285,7 @@ int afterburner(int argc, char *argv[])
       fprintf(stderr, "byte size of type double %d\n", (int) sizeof(double));
       fprintf(stderr, "byte size of type int %d\n",    (int) sizeof(int));
       fprintf(stderr, "byte size of type size_t %d\n", (int) sizeof(size_t));
-      return(1);
+      return 1;
     }
 
   fp = fopen("/pf/m/m214003/doc/afterburner.doc","r");
@@ -2317,7 +2317,7 @@ int afterburner(int argc, char *argv[])
       case 'b': Message( "option -b not longer needed!"); break;
       case 'c': after_printCodes(); break;
       case 'd': globs->Debug = 1; break;
-      case 'p': ParallelRead = TRUE; break;
+      case 'p': ParallelRead = true; break;
       case 'P': numThreads = atoi(optarg); break;
       case 'V': after_version(); break;
       case 'v': Vctfile = optarg; break;
@@ -2326,7 +2326,7 @@ int afterburner(int argc, char *argv[])
       }
 
 #if defined (_OPENMP)
-  /* ParallelRead = TRUE; */
+  /* ParallelRead = true; */
 
   lprintf(stdout);
   if ( numThreads <= 0 ) numThreads = 1;
@@ -2338,7 +2338,7 @@ int afterburner(int argc, char *argv[])
   if ( numThreads > 0 )
     {
       fprintf(stderr, "Option -P failed, OpenMP support not compiled in!\n");
-      return(-1);
+      return -1;
     }
 #endif
 
@@ -2348,7 +2348,7 @@ int afterburner(int argc, char *argv[])
       fprintf(stdout, " Parallel read enabled\n");
 #else
       fprintf(stdout, " Parallel read disabled\n");
-      ParallelRead = FALSE;
+      ParallelRead = false;
 #endif
     }
 
@@ -2429,7 +2429,7 @@ int afterburner(int argc, char *argv[])
 
   Free(globs);
 
-  return(0);
+  return 0;
 }
 #endif
 

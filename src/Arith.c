@@ -38,15 +38,12 @@ void *Arith(void *argument)
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
   int nmiss;
-  int gridsize;
-  int nrecs, nrecs2, nvars = 0, nlev, recID;
+  int nrecs, nrecs2, nvars = 0, nlev;
   int nlevels2 = 1;
-  int tsID, tsID2;
   int varID, levelID;
   int varID2, levelID2;
   int offset;
   int lfill1, lfill2;
-  int streamID3, vlistID3, taxisID3;
   int *varnmiss2 = NULL;
   int **varnmiss = NULL;
   double *vardata2 = NULL;
@@ -144,7 +141,7 @@ void *Arith(void *argument)
 
   if ( filltype == FILL_NONE ) vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  gridsize = vlistGridsizeMax(vlistIDx1);
+  int gridsize = vlistGridsizeMax(vlistIDx1);
 
   field_init(&field1);
   field_init(&field2);
@@ -193,7 +190,7 @@ void *Arith(void *argument)
 	}
     }
 
-  vlistID3 = vlistDuplicate(vlistIDx1);
+  int vlistID3 = vlistDuplicate(vlistIDx1);
   if ( filltype == FILL_TS && vlistIDx1 != vlistID1 )
     {
       nvars  = vlistNvars(vlistID1);
@@ -201,15 +198,15 @@ void *Arith(void *argument)
 	vlistDefVarMissval(vlistID3, varID, vlistInqVarMissval(vlistID1, varID));
     }
 
-  taxisID3 = taxisDuplicate(taxisIDx1);
+  int taxisID3 = taxisDuplicate(taxisIDx1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  tsID = 0;
-  tsID2 = 0;
+  int tsID = 0;
+  int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamIDx1, tsID)) )
     {
       if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
@@ -248,7 +245,7 @@ void *Arith(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamIDx1, &varID, &levelID);
 	  streamReadRecord(streamIDx1, fieldx1->ptr, &nmiss);

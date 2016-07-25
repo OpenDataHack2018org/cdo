@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.m1pg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -32,60 +32,53 @@
 
 void *Arithlat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2;
   int gridtype;
   int gridID, gridID0 = -1;
-  int nrecs, recID;
-  int tsID;
+  int nrecs;
   int varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
   int nmiss;
-  long gridsize, i;
+  long i;
   char units[CDI_MAX_NAME];
   double *scale = NULL;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
   cdoOperatorAdd("mulcoslat", func_mul, 0, NULL);
   cdoOperatorAdd("divcoslat", func_div, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  long gridsize = vlistGridsizeMax(vlistID1);
 
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array, &nmiss);
 	  
-	  gridID = vlistInqVarGrid(vlistID1, varID);
+	  int gridID = vlistInqVarGrid(vlistID1, varID);
 
 	  if ( gridID != gridID0 )
 	    {

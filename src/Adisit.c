@@ -169,46 +169,35 @@ void calc_adipot(long gridsize, long nlevel, double *pressure, field_t t, field_
 
 void *Adisit(void *argument)
 {
-  int operatorID, ADISIT, ADIPOT;
-  int streamID1, streamID2;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int nlevel1, nlevel2;
-  int gridsize;
-  int nvars, code, gridID, zaxisID;
-  int vlistID1, vlistID2;
+  int varID, levelID;
   int offset;
-  int nlevel;
   int i;
   int nmiss;
   int thoID = -1, saoID = -1;
-  int tisID2, saoID2;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
-  int taxisID1, taxisID2;
   double pin = -1;
-  double *pressure;
   double *single;
-  field_t tho, sao, tis;
 
   cdoInitialize(argument);
-  ADISIT = cdoOperatorAdd("adisit", 1, 1, "");
-  ADIPOT = cdoOperatorAdd("adipot", 1, 1, "");
+  int ADISIT = cdoOperatorAdd("adisit", 1, 1, "");
+  int ADIPOT = cdoOperatorAdd("adipot", 1, 1, "");
 
   UNUSED(ADIPOT);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      code = vlistInqVarCode(vlistID1, varID);
+      int code = vlistInqVarCode(vlistID1, varID);
 
       if ( code <= 0 )
 	{
@@ -236,18 +225,18 @@ void *Adisit(void *argument)
   if ( saoID == -1 ) cdoAbort("Sea water salinity not found!");
   if ( thoID == -1 ) cdoAbort("Potential or Insitu temperature not found!");
 
-  gridID = vlistGrid(vlistID1, 0);
-  gridsize = vlist_check_gridsize(vlistID1);
+  int gridID = vlistGrid(vlistID1, 0);
+  int gridsize = vlist_check_gridsize(vlistID1);
 
-  zaxisID = vlistInqVarZaxis(vlistID1, saoID);
-  nlevel1 = zaxisInqSize(zaxisID);
-  zaxisID = vlistInqVarZaxis(vlistID1, thoID);
-  nlevel2 = zaxisInqSize(zaxisID);
+  int zaxisID = vlistInqVarZaxis(vlistID1, saoID);
+  int nlevel1 = zaxisInqSize(zaxisID);
+      zaxisID = vlistInqVarZaxis(vlistID1, thoID);
+  int nlevel2 = zaxisInqSize(zaxisID);
 
   if ( nlevel1 != nlevel2 ) cdoAbort("temperature and salinity have different number of levels!");
-  nlevel = nlevel1;
+  int nlevel = nlevel1;
 
-  pressure = (double*) Malloc(nlevel*sizeof(double));
+  double *pressure = (double*) Malloc(nlevel*sizeof(double));
   zaxisInqLevels(zaxisID, pressure);
 
   if ( pin >= 0 ) 
@@ -262,6 +251,7 @@ void *Adisit(void *argument)
 	cdoPrint("%5d  %g", i+1, pressure[i]);
     }
 
+  field_t tho, sao, tis;
   field_init(&tho);
   field_init(&sao);
   field_init(&tis);
@@ -278,9 +268,9 @@ void *Adisit(void *argument)
   tis.missval = tho.missval;
 
 
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
 
-  tisID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARIABLE);
+  int tisID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARIABLE);
   if (operatorID == ADISIT)
     {
       vlistDefVarParam(vlistID2, tisID2, cdiEncodeParam(20, 255, 255));
@@ -298,7 +288,7 @@ void *Adisit(void *argument)
   vlistDefVarUnits(vlistID2, tisID2, "K");
   vlistDefVarMissval(vlistID2, tisID2, tis.missval);
 
-  saoID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARIABLE);
+  int saoID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARIABLE);
   vlistDefVarParam(vlistID2, saoID2, cdiEncodeParam(5, 255, 255));
   vlistDefVarName(vlistID2, saoID2, "s");
   vlistDefVarLongname(vlistID2, saoID2, "Sea water salinity");
@@ -307,22 +297,22 @@ void *Adisit(void *argument)
   vlistDefVarMissval(vlistID2, saoID2, sao.missval);
 
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; ++recID )
+      for ( int recID = 0; recID < nrecs; ++recID )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -340,7 +330,7 @@ void *Adisit(void *argument)
             }
         }
 
-      if (operatorID == ADISIT )
+      if ( operatorID == ADISIT )
         {
           calc_adisit(gridsize, nlevel, pressure, tho, sao, tis); 
         }

@@ -40,7 +40,6 @@ double dayofyear(int calendar, int vdate, int vtime)
   int month_365[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   int month_366[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   int *dpm;
-  int im, dpy;
   int year, month, day;
   int hour, minute, second;
   double doy = 0;
@@ -48,9 +47,9 @@ double dayofyear(int calendar, int vdate, int vtime)
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
 
-  dpy = days_per_year(calendar, year);
+  int dpy = days_per_year(calendar, year);
 
-  for ( im = 1; im < month; ++im )
+  for ( int im = 1; im < month; ++im )
     {
       if      ( dpy == 360 ) dpm = month_360;
       else if ( dpy == 365 ) dpm = month_365;
@@ -71,61 +70,51 @@ double dayofyear(int calendar, int vdate, int vtime)
 
 void *Arithdays(void *argument)
 {
-  int MULDOY;
-  int operatorID;
-  int operfunc, operfunc2;
-  int streamID1, streamID2;
-  int gridsize;
-  int nrecs, recID;
-  int tsID;
+  int nrecs;
   int varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
-  int vdate, vtime;
   int year, month, day;
-  int calendar;
   int nmiss;
   double rconst;
-  field_t field;
 
   cdoInitialize(argument);
 
-           cdoOperatorAdd("muldpm", func_mul, func_month, NULL);
-           cdoOperatorAdd("divdpm", func_div, func_month, NULL);
-           cdoOperatorAdd("muldpy", func_mul, func_year,  NULL);
-           cdoOperatorAdd("divdpy", func_div, func_year,  NULL);
-  MULDOY = cdoOperatorAdd("muldoy", func_mul,         0,  NULL);
+               cdoOperatorAdd("muldpm", func_mul, func_month, NULL);
+               cdoOperatorAdd("divdpm", func_div, func_month, NULL);
+               cdoOperatorAdd("muldpy", func_mul, func_year,  NULL);
+               cdoOperatorAdd("divdpy", func_div, func_year,  NULL);
+  int MULDOY = cdoOperatorAdd("muldoy", func_mul,         0,  NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
-  operfunc2 = cdoOperatorF2(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
+  int operfunc2 = cdoOperatorF2(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  calendar = taxisInqCalendar(taxisID1);
+  int calendar = taxisInqCalendar(taxisID1);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
   field_init(&field);
   field.ptr    = (double*) Malloc(gridsize*sizeof(double));
   field.weight = NULL;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
@@ -148,7 +137,7 @@ void *Arithdays(void *argument)
       if ( cdoVerbose )
 	cdoPrint("calendar %d  year %d  month %d  result %g", calendar, year, month, rconst);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field.ptr, &nmiss);
