@@ -1427,10 +1427,6 @@ void export_e5res(const char *filename, VAR *vars, int nvars)
 
 void *Echam5ini(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int IMPORT_E5ML, IMPORT_E5RES;
-  int EXPORT_E5ML, EXPORT_E5RES;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs = 0;
   int recID, varID, levelID;
@@ -1442,13 +1438,13 @@ void *Echam5ini(void *argument)
 
   cdoInitialize(argument);
 
-  IMPORT_E5ML  = cdoOperatorAdd("import_e5ml",  func_read,  0, NULL);
-  IMPORT_E5RES = cdoOperatorAdd("import_e5res", func_read,  0, NULL);
-  EXPORT_E5ML  = cdoOperatorAdd("export_e5ml",  func_write, 0, NULL);
-  EXPORT_E5RES = cdoOperatorAdd("export_e5res", func_write, 0, NULL);
+  int IMPORT_E5ML  = cdoOperatorAdd("import_e5ml",  func_read,  0, NULL);
+  int IMPORT_E5RES = cdoOperatorAdd("import_e5res", func_read,  0, NULL);
+  int EXPORT_E5ML  = cdoOperatorAdd("export_e5ml",  func_write, 0, NULL);
+  int EXPORT_E5RES = cdoOperatorAdd("export_e5res", func_write, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
   if ( operatorID == EXPORT_E5ML && processSelf() != 0 )
     cdoAbort("This operator can't be linked with other operators!");

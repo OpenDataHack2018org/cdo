@@ -29,16 +29,8 @@
 
 void *Enlarge(void *argument)
 {
-  int i, index;
-  int recID, nrecs;
-  int varID, levelID;
-  int nmiss;
-  int gridsize1;
-  int gridID1;
-  int xsize1, ysize1;
-  int ix, iy;
-  int linfo = TRUE;
-  double missval;
+  int nrecs;
+  bool linfo = true;
 
   cdoInitialize(argument);
 
@@ -65,7 +57,7 @@ void *Enlarge(void *argument)
     cdoAbort("Gridsize of input stream is greater than new gridsize!");
 
   int ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
+  for ( int index = 0; index < ngrids; index++ )
     {
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
@@ -84,16 +76,17 @@ void *Enlarge(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
+          int varID, levelID, nmiss;
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
 
-	  missval = vlistInqVarMissval(vlistID1, varID);
-	  gridID1 = vlistInqVarGrid(vlistID1, varID);
-	  xsize1 = gridInqXsize(gridID1);
-	  ysize1 = gridInqYsize(gridID1);
-	  gridsize1 = gridInqSize(gridID1);
+	  double missval = vlistInqVarMissval(vlistID1, varID);
+	  int gridID1 = vlistInqVarGrid(vlistID1, varID);
+	  int xsize1 = gridInqXsize(gridID1);
+	  int ysize1 = gridInqYsize(gridID1);
+	  int gridsize1 = gridInqSize(gridID1);
 
 	  if ( xsize1 == 0 ) xsize1 = 1;
 	  if ( ysize1 == 0 ) ysize1 = 1;
@@ -104,11 +97,11 @@ void *Enlarge(void *argument)
 	      if ( linfo )
 		{
 		  cdoPrint("Enlarge zonal");
-		  linfo = FALSE;
+		  linfo = false;
 		}
 	      
-	      for ( iy = 0; iy < ysize2; iy++ )
-		for ( ix = 0; ix < xsize2; ix++ )
+	      for ( int iy = 0; iy < ysize2; iy++ )
+		for ( int ix = 0; ix < xsize2; ix++ )
 		  array2[ix+iy*xsize2] = array1[iy];
 
 	      if ( nmiss ) nmiss *= xsize2;
@@ -118,11 +111,11 @@ void *Enlarge(void *argument)
 	      if ( linfo )
 		{
 		  cdoPrint("Enlarge meridional");
-		  linfo = FALSE;
+		  linfo = false;
 		}
 	      
-	      for ( iy = 0; iy < ysize2; iy++ )
-		for ( ix = 0; ix < xsize2; ix++ )
+	      for ( int iy = 0; iy < ysize2; iy++ )
+		for ( int ix = 0; ix < xsize2; ix++ )
 		  array2[ix+iy*xsize2] = array1[ix];
 
 	      if ( nmiss ) nmiss *= ysize2;
@@ -130,7 +123,7 @@ void *Enlarge(void *argument)
 	  else
 	    {
 	      memcpy(array2, array1, gridsize1*sizeof(double));
-	      for ( i = gridsize1; i < gridsize2; i++ )
+	      for ( int i = gridsize1; i < gridsize2; i++ )
 		{
 		  array2[i] = array1[gridsize1-1];
 		}

@@ -51,33 +51,23 @@ double roc_curve_integrate(const double **roc, const int n);
 
 void *Ensstat3(void *argument)
 {
-  int operatorID;
-  int operfunc, datafunc;
   int i,j;
-  int nvars,nbins, nrecs = 0, nrecs0, nmiss, nens, nfiles;
+  int nrecs = 0, nrecs0, nmiss;
   int cum;
   int chksum;                  // for check of histogram population 
-  int levelID, varID, recID, tsID, binID = 0;
-  int gridsize = 0;
+  int levelID, varID, binID = 0;
+  int vlistID;
   int gridID, gridID2;
   int have_miss = 0;
   int streamID = 0, streamID2 = 0;
-  int vlistID, vlistID1, vlistID2;
-  int taxisID1, taxisID2;
-  int zaxisID2;
-  int *varID2;
-  int time_mode;
   int **array2 = NULL;
   int **ctg_tab = NULL, *hist = NULL;         // contingency table and histogram
   double missval;
-  double *levs;
   double *dat;                  // pointer to ensemble data for ROC
   double *uThresh = NULL, *lThresh = NULL;    // thresholds for histograms
   double **roc = NULL;                 // receiver operating characteristics table
   double val;
   int ival;
-  field_t *field;
-  const char *ofilename;
 
   typedef struct
   {
@@ -85,7 +75,6 @@ void *Ensstat3(void *argument)
     int vlistID;
     double *array;
   } ens_file_t;
-  ens_file_t *ef = NULL;
 
   cdoInitialize(argument);
 
@@ -93,35 +82,35 @@ void *Ensstat3(void *argument)
   cdoOperatorAdd("ensrkhist_space", func_rank, space_data, NULL);
   cdoOperatorAdd("ensrkhist_time",  func_rank, time_data,  NULL);
   
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
-  datafunc = cdoOperatorF2(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
+  int datafunc = cdoOperatorF2(operatorID);
 
-
+  int nbins = 0;
   if ( operfunc == func_roc ) {
     operatorInputArg("Number of eigen functions to write out");
-    nbins       = parameter2int(operatorArgv()[0]);
+    nbins = parameter2int(operatorArgv()[0]);
   }
   
-  nfiles = cdoStreamCnt() - 1;
-  nens = nfiles-1;
+  int nfiles = cdoStreamCnt() - 1;
+  int nens = nfiles-1;
 
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files.", nfiles);
 
-  ofilename = cdoStreamName(nfiles)->args;
+  const char *ofilename = cdoStreamName(nfiles)->args;
 
   if ( !cdoOverwriteMode && fileExists(ofilename) && !userFileOverwrite(ofilename) )
     cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
+  ens_file_t *ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
 
   /* *************************************************** */
   /* should each thread be allocating memory locally???? */
   /* ("first touch strategy")                            */
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
-  field = (field_t*) Malloc(ompNumThreads*sizeof(field_t));
+  field_t *field = (field_t*) Malloc(ompNumThreads*sizeof(field_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);
@@ -146,19 +135,19 @@ void *Ensstat3(void *argument)
   for ( int fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
-  vlistID1 = ef[0].vlistID;
-  vlistID2 = vlistCreate();
-  nvars = vlistNvars(vlistID1);
-  varID2 = (int*) Malloc(nvars*sizeof(int));
+  int vlistID1 = ef[0].vlistID;
+  int vlistID2 = vlistCreate();
+  int nvars = vlistNvars(vlistID1);
+  int *varID2 = (int*) Malloc(nvars*sizeof(int));
 
-  levs = (double*) Calloc(nfiles, sizeof(double));
-  zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nfiles);
+  double *levs = (double*) Calloc(nfiles, sizeof(double));
+  int zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nfiles);
   for ( i=0; i<nfiles; i++ )
     levs[i] = i;
   zaxisDefLevels(zaxisID2,levs);
   zaxisDefName(zaxisID2, "histogram_binID");
 
-  time_mode = datafunc == TIME? TSTEP_INSTANT : TSTEP_CONSTANT;
+  int time_mode = datafunc == TIME? TSTEP_INSTANT : TSTEP_CONSTANT;
 
   for ( varID=0; varID<nvars; varID++) {
 
@@ -182,8 +171,8 @@ void *Ensstat3(void *argument)
     varID2[varID] = vlistDefVar(vlistID2, gridID2, zaxisID2, time_mode);
   }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
   
   for ( varID=0; varID< nvars; varID++ ){
@@ -202,7 +191,7 @@ void *Ensstat3(void *argument)
       streamDefVlist(streamID2, vlistID2);
     }
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
@@ -239,7 +228,7 @@ void *Ensstat3(void *argument)
   }
   
   
-  tsID = 0;
+  int tsID = 0;
   do
     {
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
@@ -265,7 +254,7 @@ void *Ensstat3(void *argument)
 
       //      fprintf(stderr,"TIMESTEP %i varID %i rec %i\n",tsID,varID,recID);
       
-      for ( recID = 0; recID < nrecs0; recID++ )
+      for ( int recID = 0; recID < nrecs0; recID++ )
 	{
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(ef, nfiles)      \
@@ -454,7 +443,6 @@ void *Ensstat3(void *argument)
     fprintf(stdout, "#             :     TP     FP     FN     TN         TPR        FPR\n");
     
     for ( i=0; i<= nbins; i++ )  {
-      int sum;
       int p = ctg_tab[i][TP] + ctg_tab[i][FN];
       int n = ctg_tab[i][FP] + ctg_tab[i][TN];
       double tpr = ctg_tab[i][TP]/(double) p;
@@ -464,7 +452,7 @@ void *Ensstat3(void *argument)
       roc[i][TPR] = tpr;
       roc[i][FPR] = fpr;
       
-      sum = ctg_tab[i][TP] + ctg_tab[i][TN] + ctg_tab[i][FP] + ctg_tab[i][FN];
+      int sum = ctg_tab[i][TP] + ctg_tab[i][TN] + ctg_tab[i][FP] + ctg_tab[i][FN];
 
       fprintf(stdout, "%3i %10.4g: %6i %6i %6i %6i (%6i): %10.4g %10.4g\n",
 	      i,i<nbins?lThresh[i]:1,
@@ -510,12 +498,11 @@ void *Ensstat3(void *argument)
 
 
 double roc_curve_integrate(const double **roc, const int n) {
-  double y1, y0, x1,x0, dx, dy, area;
+  double y1, y0, x1,x0, dx, dy;
   double step_area;
-  int i=0;
-  area = 0;
+  double area = 0;
 
-  for ( i=1; i<=n; i++ ) {
+  for ( int i = 1; i <= n; ++i ) {
     x1 = roc[i][FPR]; x0 = roc[i-1][FPR];
     y1 = roc[i][TPR]; y0 = roc[i-1][TPR];
     dx = x1-x0;

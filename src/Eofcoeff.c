@@ -34,38 +34,28 @@
 void *Eofcoeff(void * argument)
 {
   char eof_name[8], oname[1024], filesuffix[32];
-  const char *refname;
-  //double *w;
   double missval1 = -999, missval2;
-  double *xvals, *yvals;  
-  field_t ***eof;  
   field_t in;  
   field_t out;
-  //int operatorID;  
   int gridsize;
-  int i, varID, recID, levelID, tsID, eofID;    
-  int gridID1, gridID3;
-  int nrecs, nvars, nlevs, neof, nchars, nmiss, ngrids; 
-  int streamID1, streamID2, *streamIDs;
-  int taxisID2, taxisID3;
-  int vlistID1, vlistID2, vlistID3;
+  int i, varID, levelID;    
+  int nrecs, nmiss; 
    
   cdoInitialize(argument);
-  cdoOperatorAdd("eofcoeff",  0,       0, NULL);
-  //operatorID = cdoOperatorID();
+  cdoOperatorAdd("eofcoeff",  0,  0, NULL);
      
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
   
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID2);   
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID2);   
   
   //taxisID1 = vlistInqTaxis(vlistID1);  
-  taxisID2 = vlistInqTaxis(vlistID2); 
-  taxisID3 = taxisDuplicate(taxisID2);
+  int taxisID2 = vlistInqTaxis(vlistID2); 
+  int taxisID3 = taxisDuplicate(taxisID2);
   
-  gridID1 = vlistInqVarGrid(vlistID1, 0);
+  int gridID1 = vlistInqVarGrid(vlistID1, 0);
   //gridID2 = vlistInqVarGrid(vlistID2, 0);
   
   if ( vlistGridsizeMax(vlistID1)==vlistGridsizeMax(vlistID2) )
@@ -80,12 +70,8 @@ void *Eofcoeff(void * argument)
   if ( vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1 )
     cdoAbort("Too many grids in input");
   
-  nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
-  nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
-  //w = (double*) Malloc(gridsize*sizeof(double));
-  //gridWeights(gridID2, w);
-  
-  
+  int nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
+  int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));  
   
   if (vlistGridsizeMax(vlistID2)   != gridsize ||
       vlistInqVarGrid(vlistID2, 0) != gridID1 )
@@ -93,23 +79,23 @@ void *Eofcoeff(void * argument)
  
   
   strcpy(oname, cdoStreamName(2)->args);
-  nchars = strlen(oname);
+  int nchars = strlen(oname);
   
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
   
-  eof = (field_t***) Malloc(nvars * sizeof(field_t**));
+  field_t ***eof = (field_t***) Malloc(nvars * sizeof(field_t**));
   for ( varID=0; varID<nvars; varID++)
     eof[varID] = (field_t**) Malloc(nlevs*sizeof(field_t*));
 
-  eofID = 0;
+  int eofID = 0;
   while ( 1 )       
    {     
      nrecs = streamInqTimestep(streamID1, eofID);
      if ( nrecs == 0) break;
 
-     for ( recID = 0; recID < nrecs; recID++ )
+     for ( int recID = 0; recID < nrecs; recID++ )
        {         
          streamInqRecord(streamID1, &varID, &levelID);
          missval1 = vlistInqVarMissval(vlistID1, varID);
@@ -132,15 +118,15 @@ void *Eofcoeff(void * argument)
        }
      eofID++;
    }
-  neof = eofID;  
+  int neof = eofID;  
   
   if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0)->args, neof);
   // Create 1x1 Grid for output
-  gridID3 = gridCreate(GRID_LONLAT, 1);
+  int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
-  xvals= (double*) Malloc(1*sizeof(double));
-  yvals= (double*) Malloc(1*sizeof(double));
+  double *xvals = (double*) Malloc(1*sizeof(double));
+  double *yvals = (double*) Malloc(1*sizeof(double));
   xvals[0]=0;
   yvals[0]=0;
   gridDefXvals(gridID3, xvals);
@@ -148,7 +134,7 @@ void *Eofcoeff(void * argument)
   
   // Create var-list and time-axis for output
       
-  ngrids = vlistNgrids(vlistID3);
+  int ngrids = vlistNgrids(vlistID3);
   
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID3, i, gridID3);     
@@ -158,7 +144,7 @@ void *Eofcoeff(void * argument)
     vlistDefVarTsteptype(vlistID3, varID, TSTEP_INSTANT);
   
   // open streams for eofcoeff output
-  streamIDs = (int*) Malloc(neof*sizeof(int)); 
+  int *streamIDs = (int*) Malloc(neof*sizeof(int)); 
   for ( eofID = 0; eofID < neof; eofID++)
     {
       oname[nchars] = '\0';                       
@@ -186,7 +172,7 @@ void *Eofcoeff(void * argument)
   out.nmiss = 0;
   out.ptr = (double*) Malloc(1*sizeof(double));
  
-  tsID=0;
+  int tsID = 0;
   while ( 1 )
     {      
       nrecs = streamInqTimestep(streamID2, tsID);
@@ -199,7 +185,7 @@ void *Eofcoeff(void * argument)
           streamDefTimestep(streamIDs[eofID],tsID);
         }
       */
-      for ( recID =0; recID< nrecs; recID++ )
+      for ( int recID = 0; recID< nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
           missval2 = vlistInqVarMissval(vlistID2, varID);

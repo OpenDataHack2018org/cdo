@@ -31,37 +31,30 @@
 static
 void gen_index(int gridID1, int gridID2, int *index)
 {
-  int nlat1, nlon1;
-  int nlat2, nlon2;
-  int gridtype1, gridtype2;
-  int gridsize2;
-  int i, j, k, i1, i2;
-  int *xindex = NULL, *yindex = NULL;
-  double *xvals1 = NULL, *yvals1 = NULL;
-  double *xvals2 = NULL, *yvals2 = NULL;
+  int i1;
 
-  gridtype1 = gridInqType(gridID1);
-  gridtype2 = gridInqType(gridID2);
+  int gridtype1 = gridInqType(gridID1);
+  int gridtype2 = gridInqType(gridID2);
 
-  gridsize2 = gridInqSize(gridID2);
+  int gridsize2 = gridInqSize(gridID2);
 
   if ( gridtype1 != gridtype2 )
     cdoAbort("Input streams have different grid types!");
 
   if ( index == NULL ) cdoAbort("Internal problem, index not allocated!");
 
-  for ( i = 0; i < gridsize2; i++ ) index[i] = -1;
+  for ( int i = 0; i < gridsize2; i++ ) index[i] = -1;
 
   if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN )
     {
       if ( gridIsRotated(gridID1) )
 	cdoAbort("Rotated grids unsupported!");
 
-      nlon1 = gridInqXsize(gridID1);
-      nlat1 = gridInqYsize(gridID1);
+      int nlon1 = gridInqXsize(gridID1);
+      int nlat1 = gridInqYsize(gridID1);
 
-      nlon2 = gridInqXsize(gridID2);
-      nlat2 = gridInqYsize(gridID2);
+      int nlon2 = gridInqXsize(gridID2);
+      int nlat2 = gridInqYsize(gridID2);
 
       if ( ! (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)) )
 	cdoAbort("Grid 1 has no values!");
@@ -69,13 +62,13 @@ void gen_index(int gridID1, int gridID2, int *index)
       if ( ! (gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)) )
 	cdoAbort("Grid 2 has no values!");
 
-      xvals1 = (double*) Malloc(nlon1*sizeof(double));
-      yvals1 = (double*) Malloc(nlat1*sizeof(double));
-      xvals2 = (double*) Malloc(nlon2*sizeof(double));
-      yvals2 = (double*) Malloc(nlat2*sizeof(double));
+      double *xvals1 = (double*) Malloc(nlon1*sizeof(double));
+      double *yvals1 = (double*) Malloc(nlat1*sizeof(double));
+      double *xvals2 = (double*) Malloc(nlon2*sizeof(double));
+      double *yvals2 = (double*) Malloc(nlat2*sizeof(double));
 
-      xindex = (int*) Malloc(nlon2*sizeof(int));
-      yindex = (int*) Malloc(nlat2*sizeof(int));
+      int *xindex = (int*) Malloc(nlon2*sizeof(int));
+      int *yindex = (int*) Malloc(nlat2*sizeof(int));
 
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
@@ -101,7 +94,7 @@ void gen_index(int gridID1, int gridID2, int *index)
 	grid_to_degree(units, nlat2, yvals2, "grid2 center lat");
       }
 
-      for ( i2 = 0; i2 < nlat2; i2++ )
+      for ( int i2 = 0; i2 < nlat2; i2++ )
 	{
 	  for ( i1 = 0; i1 < nlat1; i1++ )
 	    if ( fabs(yvals2[i2]-yvals1[i1]) < 0.001 ) break;
@@ -112,7 +105,7 @@ void gen_index(int gridID1, int gridID2, int *index)
             yindex[i2] = i1;
 	}
 
-      for ( i2 = 0; i2 < nlon2; i2++ )
+      for ( int i2 = 0; i2 < nlon2; i2++ )
 	{
 	  for ( i1 = 0; i1 < nlon1; i1++ )
 	    if ( fabs(xvals2[i2]-xvals1[i1]) < 0.001 ) break;
@@ -143,9 +136,9 @@ void gen_index(int gridID1, int gridID2, int *index)
       for ( i2 = 0; i2 < nlat2; i2++ )
 	printf("y %d %d\n", i2, yindex[i2]);
       */
-      k = 0;
-      for ( j = 0; j < nlat2; j++ )
-	for ( i = 0; i < nlon2; i++ )
+      int k = 0;
+      for ( int j = 0; j < nlat2; j++ )
+	for ( int i = 0; i < nlon2; i++ )
 	  {
 	    if ( xindex[i] == -1 || yindex[j] == -1 )
 	      index[k++] = -1;
@@ -168,13 +161,7 @@ void gen_index(int gridID1, int gridID2, int *index)
 
 void *Enlargegrid(void *argument)
 {
-  int varID;
   int nrecs = 0;
-  int recID, levelID;
-  int nmiss1, nmiss2;
-  int index;
-  int i;
-  double missval1;
 
   cdoInitialize(argument);
 
@@ -191,7 +178,7 @@ void *Enlargegrid(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
 
   int ndiffgrids = 0;
-  for ( index = 1; index < vlistNgrids(vlistID1); index++ )
+  for ( int index = 1; index < vlistNgrids(vlistID1); index++ )
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
 
@@ -211,7 +198,7 @@ void *Enlargegrid(void *argument)
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
+  for ( int index = 0; index < ngrids; index++ )
     {
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
@@ -228,20 +215,21 @@ void *Enlargegrid(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
+          int varID, levelID, nmiss1;
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss1);
 
-	  missval1 = vlistInqVarMissval(vlistID1, varID);
+	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 
-	  for ( i = 0; i < gridsize2; i++ ) array2[i] = missval1;
-	  for ( i = 0; i < gridsize1; i++ )
+	  for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval1;
+	  for ( int i = 0; i < gridsize1; i++ )
 	    if ( gindex[i] >= 0 )
 	      array2[gindex[i]] = array1[i];		
 
-	  nmiss2 = 0;
-	  for ( i = 0; i < gridsize2; i++ )
+	  int nmiss2 = 0;
+	  for ( int i = 0; i < gridsize2; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval1) ) nmiss2++;
 
 	  streamDefRecord(streamID2, varID, levelID);

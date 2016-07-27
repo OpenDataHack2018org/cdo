@@ -46,11 +46,9 @@ int getSurfaceID(int vlistID);
 
 static
 char *exprs_from_arg(const char *arg)
-{
-  char *exprs = NULL;
-  
+{  
   size_t slen = strlen(arg);
-  exprs = (char*) Malloc(slen+2);
+  char *exprs = (char*) Malloc(slen+2);
   strcpy(exprs, operatorArgv()[0]);
   if ( exprs[slen-1] != ';' )
     {
@@ -63,9 +61,7 @@ char *exprs_from_arg(const char *arg)
 
 static
 char *exprs_from_file(const char *exprf)
-{
-  char *exprs = NULL;
-  
+{  
   /* Open expr script file for reading */
   FILE *fp = fopen(exprf, "r");
   if( fp == NULL ) cdoAbort("Open failed on %s", exprf);
@@ -74,7 +70,7 @@ char *exprs_from_file(const char *exprf)
   if ( stat(exprf, &filestat) != 0 ) cdoAbort("Stat failed on %s", exprf);
 
   size_t fsize = (size_t) filestat.st_size;
-  exprs = (char*) Malloc(fsize+1);
+  char *exprs = (char*) Malloc(fsize+1);
 
   int ichar, ipos = 0;
   while ( (ichar = fgetc(fp)) != EOF ) exprs[ipos++] = ichar;

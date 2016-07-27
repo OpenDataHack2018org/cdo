@@ -42,26 +42,20 @@ enum RESTYPE_CRPS { CRPS_RES,CRPS_RELI,CRPS_POT };
 
 void *Ensval(void *argument)
 {
-  int operatorID;
-  int operfunc;
   int i,k;
-  int nvars,nrecs = 0, nrecs0, nmiss, nens, nfiles, nostreams = 0, ngrids;
-  int levelID, varID, recID, tsID;
+  int nrecs = 0, nrecs0, nmiss, nostreams = 0, ngrids;
+  int levelID, varID;
   int gridsize = 0;
-  int gridID = -1, gridID2;
+  int streamID1, vlistID;
+  int gridID = -1;
   int have_miss = 0;
-  int stream, streamID1 = -1, streamID = 0, *streamID2;
-  int vlistID, vlistID1, *vlistID2;
-  int taxisID1, *taxisID2;
-  int zaxisID1, *zaxisID2;
+  int stream, streamID = 0;
   //int xsize,ysize;
   double missval = 0;
   double *alpha, *beta, *alpha_weights, *beta_weights;
   double *brs_g, *brs_o, *brs_g_weights, *brs_o_weights;
-  double *r;                      // Pointer to hold results for single time step
   double xval=0; double yval=0;
   double xa, *x;
-  double *val;
   double *weights, sum_weights = 0;
   double crps_reli, crps_pot, crps;
   double heavyside0, heavysideN;
@@ -69,11 +63,8 @@ void *Ensval(void *argument)
   double g,o,p;
 
   int fileID;
-  const char *ofilebase;
-  char *ofilename;
   char file_suffix[32];
   char type_suffix[10];
-  const char *refname;
 
   typedef struct
   {
@@ -81,16 +72,12 @@ void *Ensval(void *argument)
     int vlistID;
     double *array;
   } ens_file_t;
-  ens_file_t *ef = NULL;
 
 
   // INITIALIZE POINTERS
-  streamID2 = NULL;
   alpha = NULL; beta = NULL; alpha_weights = NULL; beta_weights = NULL; 
   brs_g = NULL; brs_o = NULL; brs_g_weights = NULL; brs_o_weights = NULL;
-  r = NULL;
   x = NULL;
-  val = NULL;
   weights = NULL; 
   //int vlistCheck, gridsizeCheck;
   
@@ -99,11 +86,11 @@ void *Ensval(void *argument)
   cdoOperatorAdd("enscrps",   CRPS,  0,   NULL);
   cdoOperatorAdd("ensbrs",    BRS,   0,   NULL);
   
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  nfiles = cdoStreamCnt() - 1;
-  nens = nfiles-1;
+  int nfiles = cdoStreamCnt() - 1;
+  int nens = nfiles-1;
 
   if ( operfunc == CRPS ) {
     nostreams = 3;
@@ -118,16 +105,16 @@ void *Ensval(void *argument)
   }
 
   // allocate array to hold results 
-  r = (double*) Malloc( nostreams*sizeof(double));
+  double *r = (double*) Malloc( nostreams*sizeof(double));
   
 
   // one stream for each value of the decomposition
-  streamID2 = (int*) Malloc( nostreams*sizeof(int));
-  vlistID2 = (int*) Malloc( nostreams*sizeof(int));
-  taxisID2 = (int*) Malloc( nostreams*sizeof(int));
-  zaxisID2 = (int*) Malloc( nostreams*sizeof(int));
+  int *streamID2 = (int*) Malloc(nostreams*sizeof(int));
+  int *vlistID2 = (int*) Malloc(nostreams*sizeof(int));
+  int *taxisID2 = (int*) Malloc(nostreams*sizeof(int));
+  int *zaxisID2 = (int*) Malloc(nostreams*sizeof(int));
 
-  val = (double*) Calloc( nfiles,sizeof(double));
+  double *val = (double*) Calloc( nfiles,sizeof(double));
   
   if ( operfunc == CRPS ) {
     alpha= (double*) Calloc( nens+1,sizeof(double));
@@ -142,7 +129,7 @@ void *Ensval(void *argument)
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);
 
-  ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
+  ens_file_t *ef = (ens_file_t*) Malloc(nfiles*sizeof(ens_file_t));
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -160,26 +147,26 @@ void *Ensval(void *argument)
     cdoPrint("Opened %i Input Files for Ensemble Operator",nfiles);
   
   /* check for identical contents of all ensemble members */
-  nvars = vlistNvars(ef[0].vlistID);
+  int nvars = vlistNvars(ef[0].vlistID);
   if ( cdoVerbose ) 
     cdoPrint("nvars %i",nvars);
 
   for ( fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
-  vlistID1 = ef[0].vlistID;
-  taxisID1 = vlistInqTaxis(vlistID1);
-  zaxisID1 = vlistInqVarZaxis(vlistID1,0);
+  int vlistID1 = ef[0].vlistID;
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int zaxisID1 = vlistInqVarZaxis(vlistID1,0);
 
-  gridID2 = gridCreate(GRID_LONLAT, 1);
+  int gridID2 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   gridDefXvals(gridID2, &xval);
   gridDefYvals(gridID2, &yval);
 
-  ofilebase = cdoStreamName(nfiles)->args;
+  const char *ofilebase = cdoStreamName(nfiles)->args;
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   memset(file_suffix, 0, sizeof(file_suffix) );
   cdoGenFileSuffix(file_suffix, sizeof(file_suffix), streamInqFiletype(streamID1), vlistID1, refname);
 
@@ -203,7 +190,7 @@ void *Ensval(void *argument)
       break;
     }
 
-    ofilename = (char*) Calloc(namelen, sizeof(char));
+    char *ofilename = (char*) Calloc(namelen, sizeof(char));
 
     sprintf(ofilename, "%s.%s%s", ofilebase, type_suffix, file_suffix);
     // fprintf(stderr, "StreamID %i: %s\n", stream, ofilename);
@@ -238,7 +225,7 @@ void *Ensval(void *argument)
   if ( cdoVerbose ) 
     cdoPrint(" sum_weights %10.6f",sum_weights);
   
-  tsID = 0;
+  int tsID = 0;
   do
     {
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
@@ -255,7 +242,7 @@ void *Ensval(void *argument)
 	if ( nrecs0 > 0 ) streamDefTimestep(streamID2[stream], tsID);
       }
       
-      for ( recID = 0; recID < nrecs0; recID++ )
+      for ( int recID = 0; recID < nrecs0; recID++ )
 	{
 	  for ( fileID = 0; fileID < nfiles; fileID++ ) 
 	    {

@@ -40,14 +40,8 @@
 
 void *Ensstat(void *argument)
 {
-  int i;
-  int varID = 0, recID;
-  int gridID;
-  int nrecs, nrecs0;
-  int levelID = 0;
-  int streamID = 0;
+  int nrecs0;
   int nmiss;
-  double missval;
   typedef struct
   {
     int streamID;
@@ -103,7 +97,7 @@ void *Ensstat(void *argument)
   ens_file_t *ef = (ens_file_t *) Malloc(nfiles*sizeof(ens_file_t));
 
   field_t *field = (field_t *) Malloc(ompNumThreads*sizeof(field_t));
-  for ( i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);
       field[i].size   = nfiles;
@@ -140,12 +134,12 @@ void *Ensstat(void *argument)
   if ( count_data )
     {
       count2 = (double *) Malloc(gridsize*sizeof(double));
-      for ( varID = 0; varID < nvars; ++varID )
+      for ( int varID = 0; varID < nvars; ++varID )
 	{
 	  char name[CDI_MAX_NAME];
 	  vlistInqVarName(vlistID2, varID, name);
 	  strcat(name, "_count");
-	  gridID = vlistInqVarGrid(vlistID2, varID);
+	  int gridID = vlistInqVarGrid(vlistID2, varID);
 	  int zaxisID = vlistInqVarZaxis(vlistID2, varID);
 	  int tsteptype = vlistInqVarTsteptype(vlistID2, varID);
 	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, tsteptype);
@@ -165,8 +159,8 @@ void *Ensstat(void *argument)
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
-	  streamID = ef[fileID].streamID;
-	  nrecs = streamInqTimestep(streamID, tsID);
+	  int streamID = ef[fileID].streamID;
+	  int nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    {
 	      if ( nrecs == 0 )
@@ -183,30 +177,30 @@ void *Ensstat(void *argument)
 	  streamDefTimestep(streamID2, tsID);
 	}
 
-      for ( recID = 0; recID < nrecs0; recID++ )
+      for ( int recID = 0; recID < nrecs0; recID++ )
 	{
+          int varID = 0, levelID;
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(ef, nfiles)         \
-                                         private(streamID, nmiss) \
-                                     lastprivate(varID, levelID)
+#pragma omp parallel for default(none) shared(ef, nfiles) lastprivate(varID, levelID)
 #endif
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
-	      streamID = ef[fileID].streamID;
+              int nmiss;
+	      int streamID = ef[fileID].streamID;
 	      streamInqRecord(streamID, &varID, &levelID);
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
               ef[fileID].missval = vlistInqVarMissval(ef[fileID].vlistID, varID);
 	    }
 
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
+	  int gridID = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
+	  double missval  = vlistInqVarMissval(vlistID1, varID);
 
 	  nmiss = 0;
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( int i = 0; i < gridsize; ++i )
 	    {
 	      int ompthID = cdo_omp_get_thread_num();
 
@@ -264,7 +258,7 @@ void *Ensstat(void *argument)
   if ( array2 ) Free(array2);
   if ( count2 ) Free(count2);
 
-  for ( i = 0; i < ompNumThreads; i++ )
+  for ( int i = 0; i < ompNumThreads; i++ )
     {
       if ( field[i].ptr    ) Free(field[i].ptr);
       if ( field[i].weight ) Free(field[i].weight);

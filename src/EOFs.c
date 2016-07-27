@@ -171,7 +171,7 @@ void *EOFs(void * argument)
   int nlevs = 0 ;
   int nmiss;
   int tsID;
-  int varID, recID, levelID;
+  int varID, levelID;
   int nts = 0;
   int n = 0;
   int grid_space = 0, time_space = 0;
@@ -365,7 +365,7 @@ void *EOFs(void * argument)
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
           streamReadRecord(streamID1, in, &nmiss);
