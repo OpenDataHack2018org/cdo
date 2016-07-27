@@ -46,7 +46,7 @@ void *Ensval(void *argument)
   int nrecs = 0, nrecs0, nmiss, nostreams = 0, ngrids;
   int levelID, varID;
   int gridsize = 0;
-  int streamID1, vlistID;
+  int vlistID;
   int gridID = -1;
   int have_miss = 0;
   int stream, streamID = 0;
@@ -134,14 +134,14 @@ void *Ensval(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = streamOpenRead(cdoStreamName(fileID));
-      if ( fileID == 0 ) streamID1 = streamID;
-
       vlistID = streamInqVlist(streamID);
       
       ef[fileID].streamID = streamID;
       ef[fileID].vlistID  = vlistID;
       ef[fileID].array    = NULL;
     }
+
+  int streamID1 = ef[0].streamID;
 
   if ( cdoVerbose ) 
     cdoPrint("Opened %i Input Files for Ensemble Operator",nfiles);
