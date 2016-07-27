@@ -233,27 +233,25 @@ void print_xyvals2D(int gridID, int dig)
       if ( gridtype == GRID_CURVILINEAR )
         {
           int xsize = gridInqXsize(gridID);
-          int ysize = gridInqYsize(gridID);
-          double *xvals = (double*) malloc(xsize*sizeof(double));
-          double *yvals = (double*) malloc(ysize*sizeof(double));
-          for ( int i = 0; i < xsize; ++i ) xvals[i] = xvals2D[i];
-          for ( int i = 0; i < ysize; ++i ) yvals[i] = yvals2D[i*xsize];
-
           if ( xsize > 1 )
             {
+              double *xvals = (double*) malloc(xsize*sizeof(double));
+              for ( int i = 0; i < xsize; ++i ) xvals[i] = xvals2D[i];
               xinc = fabs(xvals[xsize-1] - xvals[0])/(xsize-1);
               for ( int i = 2; i < xsize; i++ )
                 if ( fabs(fabs(xvals[i-1] - xvals[i]) - xinc) > 0.01*xinc ) { xinc = 0; break; }
+              free(xvals);
             }
+          int ysize = gridInqYsize(gridID);
           if ( ysize > 1 )
             {
+              double *yvals = (double*) malloc(ysize*sizeof(double));
+              for ( int i = 0; i < ysize; ++i ) yvals[i] = yvals2D[i*xsize];
               yinc = fabs(yvals[ysize-1] - yvals[0])/(ysize-1);
               for ( int i = 2; i < ysize; i++ )
                 if ( fabs(fabs(yvals[i-1] - yvals[i]) - yinc) > 0.01*yinc ) { yinc = 0; break; }
+              free(yvals);
             }
-
-          free(xvals);
-          free(yvals);
         }
 
       fprintf(stdout, "%33s : %.*g to %.*g", xname, dig, xfirst, dig, xlast);
