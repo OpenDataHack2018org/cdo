@@ -53,7 +53,7 @@ for STAT in $STATS; do
     if [ "$STAT" = sub ] ; then OP='-' ; fi
     if [ "$STAT" = mul ] ; then OP='*' ; fi
     if [ "$STAT" = div ] ; then OP='/' ; fi
-    OFILE3=expr${STAT}_res
+    OFILE3=arithc_expr${STAT}_res
     INSTR="var130=var130${OP}${VAL};var152=var152${OP}${VAL};var129=var129${OP}${VAL};"
     echo $INSTR
     CDOCOMMAND="$CDO $FORMAT expr,$INSTR $IFILE $OFILE3"
