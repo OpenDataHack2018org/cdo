@@ -468,7 +468,7 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 
   if ( cdoVerbose )
     for ( int i = 0; i < nbpar; ++i )
-      cdoPrint("Proj.param[%ld] = %s", i+1, params[i]);
+      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
 
   projPJ proj = pj_init(nbpar, params);
   if ( !proj )
@@ -852,15 +852,15 @@ void gridCopyMask(int gridID1, int gridID2, long gridsize)
 }
 
 static
-int check_range(long n, double *vals, double valid_min, double valid_max)
+bool check_range(long n, double *vals, double valid_min, double valid_max)
 {
-  int status = 0;
+  bool status = false;
 
   for ( long i = 0; i < n; ++i )
     {
       if ( vals[i] < valid_min || vals[i] > valid_max )
 	{
-	  status = 1;
+	  status = true;
 	  break;
 	}
     }
@@ -1171,17 +1171,16 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
 int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList, int nocoords, int nobounds)
 {
-
   /* transform input grid into a unstructured Version if necessary {{{ */
   int unstructuredGridID;
   if (GRID_UNSTRUCTURED == gridInqType(gridID1))
-  {
-    unstructuredGridID = gridID1;
-  }
+    {
+      unstructuredGridID = gridID1;
+    }
   else
-  {
-    unstructuredGridID = gridToUnstructured(gridID1,!nobounds);
-  }
+    {
+      unstructuredGridID = gridToUnstructured(gridID1,!nobounds);
+    }
   int unstructuredGridSize = gridInqSize(unstructuredGridID);
 
   int unstructuredSelectionGridID = gridCreate(GRID_UNSTRUCTURED,selectionSize);
