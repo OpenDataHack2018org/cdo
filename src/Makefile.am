@@ -281,6 +281,7 @@ cdo_SOURCES += Adisit.c        \
                Seaspctl.c      \
                Seasstat.c      \
                Selbox.c        \
+               Selindex.c      \
                Select.c        \
                Seloperator.c   \
                Selrec.c        \

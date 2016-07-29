@@ -146,6 +146,7 @@ void *Seascount(void *argument);
 void *Seaspctl(void *argument);
 void *Seasstat(void *argument);
 void *Selbox(void *argument);
+void *Selindex(void *argument);
 void *Select(void *argument);
 void *Selvar(void *argument);
 void *Seloperator(void *argument);
@@ -398,6 +399,7 @@ void *Maggraph(void *argument);
 #define  SeaspctlOperators      {"seaspctl"}
 #define  SeasstatOperators      {"seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
+#define  SelindexOperators      {"selindex"}
 #define  SelectOperators        {"select", "delete"}
 #define  SelvarOperators        {"selparam", "selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delparam", "delcode", "delname", "selltype"}
@@ -679,6 +681,7 @@ static modules_t Modules[] =
   { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,      1,   CDI_REAL,  3,  1 },
   { Seasstat,       SeasstatHelp,      SeasstatOperators,      1,   CDI_REAL,  1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,        1,   CDI_BOTH,  1,  1 },
+  { Selindex,       NULL,              SelindexOperators,      1,   CDI_BOTH,  1,  1 },
   { Select,         SelectHelp,        SelectOperators,        1,   CDI_BOTH, -1,  1 },
   { Selvar,         SelvarHelp,        SelvarOperators,        1,   CDI_BOTH,  1,  1 },
   { Selrec,         SelvarHelp,        SelrecOperators,        1,   CDI_BOTH,  1,  1 },

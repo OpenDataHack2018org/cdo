@@ -232,7 +232,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   return gridID2;
 }
 
-static
+
 int gengridcell(int gridID1, int gridsize2, int *cellidx)
 {
   char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
