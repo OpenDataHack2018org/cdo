@@ -33,7 +33,7 @@
 void *Arithlat(void *argument)
 {
   int gridtype;
-  int gridID, gridID0 = -1;
+  int gridID0 = -1;
   int nrecs;
   int varID, levelID;
   int nmiss;

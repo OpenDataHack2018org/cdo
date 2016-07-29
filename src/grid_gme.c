@@ -32,13 +32,13 @@ struct polygon {
   struct geo boundary[6];
 };
 
-const double pid5   =   0.2*M_PI;
-const double pid180 = 180.0/M_PI;
+static const double pid5   =   0.2*M_PI;
+//const double pid180 = 180.0/M_PI;
 
-const int ispokes[12] = { 1,0,-1,-1,0,1,0,1,1,0,-1,-1,};
+static const int ispokes[12] = { 1,0,-1,-1,0,1,0,1,1,0,-1,-1,};
 
-const int pentagon = 5;
-const int hexagon  = 6;
+static const int pentagon = 5;
+static const int hexagon  = 6;
 
 /*****************************************************************************/
 
