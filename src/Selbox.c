@@ -235,19 +235,22 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 
 int gengridcell(int gridID1, int gridsize2, int *cellidx)
 {
-  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
-  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
-
+  int gridID2 = -1;
+  int gridtype  = gridInqType(gridID1);
   int gridsize1 = gridInqSize(gridID1);
+  int prec      = gridInqPrec(gridID1);
 
-  /* printf("gridsize1 = %d, gridsize2 = %d\n", gridsize1, gridsize2); */
+  if ( gridtype == GRID_CURVILINEAR ) gridtype = GRID_UNSTRUCTURED;
 
-  int gridtype = gridInqType(gridID1);
-  int prec     = gridInqPrec(gridID1);
-
-  int gridID2 = gridCreate(gridtype, gridsize2);
+  if ( gridtype == GRID_UNSTRUCTURED )
+    gridID2 = gridCreate(gridtype, gridsize2);
+  else
+    return gridID2;
 
   gridDefPrec(gridID2, prec);
+
+  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
+  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
 
   gridInqXname(gridID1, xname);
   gridInqXlongname(gridID1, xlongname);
@@ -278,9 +281,6 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 	  xvals2[i] = xvals1[cellidx[i]];
 	  yvals2[i] = yvals1[cellidx[i]];
 	}
-
-      if ( cdoVerbose )
-	for ( int i = 0; i < gridsize2; i++ ) printf("lat/lon : %d %g %g\n", i+1, yvals2[i], xvals2[i]);
 
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);

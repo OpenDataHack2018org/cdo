@@ -34,14 +34,20 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx);
 static
 int genindexgrid(int gridID1, int gridsize2, int *cellidx)
 {
+  int gridID0 = gridID1;
   int gridtype1 = gridInqType(gridID1);
 
-  int gridtype = (gridsize2 == 1) ? GRID_LONLAT : GRID_UNSTRUCTURED;
+  if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN || gridtype1 == GRID_PROJECTION )
+    {
+      gridID1 = gridToCurvilinear(gridID1, 0);
+      gridtype1 = GRID_CURVILINEAR;
+    }
 
   int gridID2 = -1;
-  if ( gridtype1 == GRID_UNSTRUCTURED ) gridID2 = gengridcell(gridID1, gridsize2, cellidx);
+  if ( gridtype1 == GRID_UNSTRUCTURED || gridtype1 == GRID_CURVILINEAR )
+    gridID2 = gengridcell(gridID1, gridsize2, cellidx);
 
-  if ( gridID2 == -1 ) cdoAbort("Unsupported grid!");
+  if ( gridID0 != gridID1 ) gridDestroy(gridID1);
 
   return gridID2;
 }
@@ -125,6 +131,12 @@ void *Selindex(void *argument)
         }
 
       gridID2 = genindexgrid(gridID1, nind, indarr);
+
+      if ( gridID2 == -1 )
+        {
+          cdoWarning("Unsupported grid type >%s<, skipped grid %d!", gridNamePtr(gridtype), index+1);
+          continue;
+        }
 	  
       sindex[index].gridID1 = gridID1;
       sindex[index].gridID2 = gridID2;
