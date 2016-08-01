@@ -53,7 +53,7 @@ void *Copy(void *argument)
 
   if ( operatorID == SZIP )
     {
-      cdoCompType  = COMPRESS_SZIP;
+      cdoCompType  = CDI_COMPRESS_SZIP;
       cdoCompLevel = 0;
     }
 

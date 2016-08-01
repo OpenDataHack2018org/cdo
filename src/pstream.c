@@ -653,29 +653,29 @@ void set_comp(int fileID, int filetype)
     {
       if      ( filetype == FILETYPE_GRB )
         {
-          cdoCompType  = COMPRESS_SZIP;
+          cdoCompType  = CDI_COMPRESS_SZIP;
           cdoCompLevel = 0;
         }
       else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
         {
-          cdoCompType  = COMPRESS_ZIP;
+          cdoCompType  = CDI_COMPRESS_ZIP;
           cdoCompLevel = 1;
         }
     }
 
-  if ( cdoCompType != COMPRESS_NONE )
+  if ( cdoCompType != CDI_COMPRESS_NONE )
     {
       streamDefCompType(fileID, cdoCompType);
       streamDefCompLevel(fileID, cdoCompLevel);
 
-      if ( cdoCompType == COMPRESS_SZIP &&
+      if ( cdoCompType == CDI_COMPRESS_SZIP &&
            (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
         cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
 
-      if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
+      if ( cdoCompType == CDI_COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
         cdoWarning("JPEG compression not available for non GRIB2 data!");
 
-      if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+      if ( cdoCompType == CDI_COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
         cdoWarning("Deflate compression not available for non NetCDF4 data!");
     }
 }

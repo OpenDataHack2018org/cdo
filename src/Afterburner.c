@@ -2084,7 +2084,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
       if ( globs->ostreamID < 0 ) cdiError(globs->ostreamID, "Open failed on %s", ofile);
 #endif
 
-      if ( globs->Szip ) streamDefCompType(globs->ostreamID, COMPRESS_SZIP);
+      if ( globs->Szip ) streamDefCompType(globs->ostreamID, CDI_COMPRESS_SZIP);
 
       globs->ovlistID = vlistCreate();
     }
@@ -2094,7 +2094,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
       globs->ostreamID2 = streamOpenWrite(ofile2, ofiletype);
       if ( globs->ostreamID2 < 0 ) cdiError(globs->ostreamID2, "Open failed on %s", ofile2);
 
-      if ( globs->Szip ) streamDefCompType(globs->ostreamID, COMPRESS_SZIP);
+      if ( globs->Szip ) streamDefCompType(globs->ostreamID, CDI_COMPRESS_SZIP);
 
       globs->ovlistID2 = vlistCreate();
     }

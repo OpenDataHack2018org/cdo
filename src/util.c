@@ -92,7 +92,7 @@ int CDO_Reduce_Dim       = FALSE;
 int CDO_Append_History   = TRUE;
 int CDO_Reset_History    = FALSE;
 
-int cdoCompType          = COMPRESS_NONE;  // compression type
+int cdoCompType          = CDI_COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
 int cdoDebug             = 0;
 int cdoChunkType         = CDI_UNDEFID;
@@ -780,7 +780,7 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
               if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
             }
 
-          if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == COMPRESS_SZIP ) lcompsz = true;
+          if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
           if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
         }
     }

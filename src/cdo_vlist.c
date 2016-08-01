@@ -314,7 +314,7 @@ int vlistIsSzipped(int vlistID)
   for ( int varID = 0; varID < nvars; varID++ )
     {						
       int comptype = vlistInqVarCompType(vlistID, varID);
-      if ( comptype == COMPRESS_SZIP )
+      if ( comptype == CDI_COMPRESS_SZIP )
 	{
 	  lszip = TRUE;
 	  break;

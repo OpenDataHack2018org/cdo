@@ -630,22 +630,22 @@ void defineCompress(const char *arg)
 
   if      ( strncmp(arg, "szip", len) == 0 )
     {
-      cdoCompType  = COMPRESS_SZIP;
+      cdoCompType  = CDI_COMPRESS_SZIP;
       cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "jpeg", len) == 0 )
     {
-      cdoCompType = COMPRESS_JPEG;
+      cdoCompType = CDI_COMPRESS_JPEG;
       cdoCompLevel = 0;
     }
   else if ( strncmp(arg, "gzip", len) == 0 )
     {
-      cdoCompType  = COMPRESS_GZIP;
+      cdoCompType  = CDI_COMPRESS_GZIP;
       cdoCompLevel = 6;
     }
   else if ( strncmp(arg, "zip", 3) == 0 )
     {
-      cdoCompType  = COMPRESS_ZIP;
+      cdoCompType  = CDI_COMPRESS_ZIP;
       if ( len == 5 && arg[3] == '_' && isdigit(arg[4]) )
         cdoCompLevel = atoi(&arg[4]);
       else
