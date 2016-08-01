@@ -661,9 +661,9 @@ void defineCompress(const char *arg)
 static
 void defineChunktype(const char *arg)
 {
-  if      ( strcmp("auto",  arg)   == 0 ) cdoChunkType = CHUNK_AUTO;
-  else if ( strcmp("grid",  arg)   == 0 ) cdoChunkType = CHUNK_GRID;
-  else if ( strcmp("lines", arg)   == 0 ) cdoChunkType = CHUNK_LINES;
+  if      ( strcmp("auto",  arg)   == 0 ) cdoChunkType = CDI_CHUNK_AUTO;
+  else if ( strcmp("grid",  arg)   == 0 ) cdoChunkType = CDI_CHUNK_GRID;
+  else if ( strcmp("lines", arg)   == 0 ) cdoChunkType = CDI_CHUNK_LINES;
   else
     {
       fprintf(stderr, "Chunk type '%s' unsupported!\n", arg);

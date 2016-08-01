@@ -211,17 +211,17 @@ void partab(FILE *fp, int streamID, int option)
 	  }
 
       int chunktype = vlistInqVarChunkType(vlistID, varID);
-      if ( chunktype == CHUNK_AUTO )
+      if ( chunktype == CDI_CHUNK_AUTO )
 	{
 	  fprintf(fp, "  chunktype=auto");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
-      else if ( chunktype == CHUNK_GRID )
+      else if ( chunktype == CDI_CHUNK_GRID )
 	{
 	  fprintf(fp, "  chunktype=grid");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
-      if ( chunktype == CHUNK_LINES )
+      if ( chunktype == CDI_CHUNK_LINES )
 	{
 	  fprintf(fp, "  chunktype=lines");
 	  if ( linebreak ) fprintf(fp, "\n");
