@@ -348,7 +348,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
       print_xvals(gridID, dig);
       print_yvals(gridID, dig);
 
-      if ( gridIsRotated(gridID) )
+      if ( gridtype == GRID_LONLAT && gridIsRotated(gridID) )
         {
           double lonpole = gridInqXpole(gridID);
           double latpole = gridInqYpole(gridID);
