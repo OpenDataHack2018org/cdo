@@ -828,12 +828,10 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
     }
   else if ( remap_grid_basis == REMAP_GRID_BASIS_SRC )
     {
-      long nx, ny;
-
       if ( grid->rank != 2 ) cdoAbort("Internal problem, grid rank = %d!", grid->rank);
 
-      nx = grid->dims[0];
-      ny = grid->dims[1];
+      long nx = grid->dims[0];
+      long ny = grid->dims[1];
 
       if ( cdoVerbose ) cdoPrint("Grid: boundbox_from_center");
 
