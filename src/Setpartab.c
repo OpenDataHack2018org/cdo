@@ -288,20 +288,17 @@ static
 void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 {
   FILE *fp = NULL;
-  namelist_t *nml;
   int nml_code, nml_out_code, nml_table, nml_param, nml_out_param, nml_chunktype, nml_datatype, nml_type, nml_name, nml_out_name, nml_stdname;
   int nml_longname, nml_units, nml_comment, nml_ltype, nml_delete, nml_convert, nml_missval, nml_factor;
   int nml_cell_methods, nml_cell_measures;
   int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
-  int i;
+  int nml_exprstr;
   int code, out_code, table, ltype, remove, convert;
   int nml_index = 0;
   int codenum, tabnum, levtype, param;
   int varID, tableID;
-  int num_pt_files;
   double missval, factor;
   double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
-  char *partab = NULL;
   char *chunktypestr = NULL;
   char *datatypestr = NULL;
   char *typestr = NULL;
@@ -310,19 +307,20 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   char *name = NULL, *out_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
   char cell_methods[CDI_MAX_NAME] = "", cell_measures[CDI_MAX_NAME] = "";
   char varname[CDI_MAX_NAME];
+  char exprstr[CDI_MAX_NAME];
   char comment[1024] = "";
 
-  //num_pt_files = operatorArgc();
-  num_pt_files = 1;
+  //int num_pt_files = operatorArgc();
+  int num_pt_files = 1;
 
   for ( int fileID = 0; fileID < num_pt_files; ++fileID )
     {
-      partab = operatorArgv()[fileID];
+      const char *partab = operatorArgv()[fileID];
       if ( fileExists(partab) ) fp = fopen(partab, "r");
       if ( fp == NULL ) cdoAbort("Open failed on parameter table %d file name %s!", fileID+1, partab);
 
       nml_index = 0;
-      nml = namelistNew("parameter");
+      namelist_t *nml = namelistNew("parameter");
       nml->dis = 0;
 
       nml_code            = namelistAdd(nml, "code",            NML_INT,  0, &code, 1);
@@ -350,6 +348,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_comment         = namelistAdd(nml, "comment",         NML_TEXT, 0, comment, sizeof(comment));
       nml_cell_methods    = namelistAdd(nml, "cell_methods",    NML_TEXT, 0, cell_methods, sizeof(cell_methods));
       nml_cell_measures   = namelistAdd(nml, "cell_measures",   NML_TEXT, 0, cell_measures, sizeof(cell_measures));
+      nml_exprstr         = namelistAdd(nml, "expr",            NML_TEXT, 0, exprstr, sizeof(exprstr));
 
       while ( ! feof(fp) )
 	{
@@ -360,10 +359,8 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 	  if ( cdoVerbose ) namelistPrint(nml);
 
 	  bool locc = false;
-	  for ( i = 0; i < nml->size; i++ )
-	    {
-	      if ( nml->entry[i]->occ ) { locc = true; break; }
-	    }
+	  for ( int i = 0; i < nml->size; i++ )
+            if ( nml->entry[i]->occ ) { locc = true; break; }
 
 	  if ( locc )
 	    {
@@ -447,7 +444,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		  if ( nml->entry[nml_cell_methods]->occ  ) defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
 		  if ( nml->entry[nml_cell_measures]->occ ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
 		  if ( nml->entry[nml_delete]->occ && remove == 1 ) vars[varID].remove = true;
-		  if ( nml->entry[nml_convert]->occ )   vars[varID].convert = convert==0 ? false : true;
+		  if ( nml->entry[nml_convert]->occ )   vars[varID].convert = convert != 0;
 		  if ( nml->entry[nml_param]->occ )     vlistDefVarParam(vlistID2, varID, stringToParam(paramstr));
 		  if ( nml->entry[nml_out_param]->occ ) vlistDefVarParam(vlistID2, varID, stringToParam(out_paramstr));
 		  if ( nml->entry[nml_datatype]->occ )
@@ -462,8 +459,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		    }
 		  if ( nml->entry[nml_missval]->occ )
 		    {
-		      double missval_old;
-		      missval_old = vlistInqVarMissval(vlistID2, varID);
+		      double missval_old = vlistInqVarMissval(vlistID2, varID);
 		      if ( ! DBL_IS_EQUAL(missval, missval_old) )
 			{
 			  if ( cdoVerbose ) 
@@ -745,6 +741,7 @@ void *Setpartab(void *argument)
 	  vlistDestroy(vlistID2);
 
 	  vlistID2 = vlistIDx;
+          if ( vlistNvars(vlistID2) == 0 ) cdoAbort("No variable selected!");
 	}
 
       for ( int varID = 0; varID < nvars; ++varID )
