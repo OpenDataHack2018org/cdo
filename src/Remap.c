@@ -532,6 +532,7 @@ bool is_global_grid(int gridID)
   int gridtype = gridInqType(gridID);
 
   if ( (gridtype == GRID_LONLAT && gridIsRotated(gridID)) ||
+       (gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) ||
        (gridtype == GRID_LONLAT && non_global) ||
        (gridtype == GRID_LCC) ||
        (gridtype == GRID_LAEA) ||
@@ -566,18 +567,18 @@ void scale_gridbox_area(long gridsize, const double *restrict array1, long grids
 }
 
 static
-int set_remapgrids(int filetype, int vlistID, int ngrids, int *remapgrids)
+int set_remapgrids(int filetype, int vlistID, int ngrids, bool *remapgrids)
 {
-  int index, gridID, gridtype;
-
+  int index;
   for ( index = 0; index < ngrids; index++ )
     {
-      remapgrids[index] = TRUE;
+      remapgrids[index] = true;
 
-      gridID = vlistGrid(vlistID, index);
-      gridtype = gridInqType(gridID);
+      int gridID = vlistGrid(vlistID, index);
+      int gridtype = gridInqType(gridID);
 
       if ( gridtype != GRID_LONLAT      &&
+           !(gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) &&
 	   gridtype != GRID_GAUSSIAN    &&
 	   gridtype != GRID_LCC         &&
 	   gridtype != GRID_LAEA        &&
@@ -595,7 +596,7 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, int *remapgrids)
 	    }
 	  else if ( gridtype == GRID_GENERIC && gridInqSize(gridID) <= 2 )
             {
-              remapgrids[index] = FALSE;
+              remapgrids[index] = false;
             }
 	  else
             {
@@ -611,7 +612,7 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, int *remapgrids)
     }
 
   for ( index = 0; index < ngrids; index++ )
-    if ( remapgrids[index] == TRUE ) break;
+    if ( remapgrids[index] ) break;
 
   if ( index == ngrids ) cdoAbort("No remappable grid found!");
 
@@ -872,7 +873,7 @@ void *Remap(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int ngrids = vlistNgrids(vlistID1);
-  int remapgrids[ngrids];
+  bool remapgrids[ngrids];
   index = set_remapgrids(filetype, vlistID1, ngrids, remapgrids);
   gridID1 = vlistGrid(vlistID1, index);
 
@@ -911,7 +912,7 @@ void *Remap(void *argument)
       if ( map_type == MAP_TYPE_DISTWGT && !lextrapolate ) remap_extrapolate = true;
       if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = true;
 
-      if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 &&  !is_global_grid(gridID1) )
+      if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
 	{
 	  remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
 	  remaps[0].src_grid.non_global = true;
@@ -1010,7 +1011,7 @@ void *Remap(void *argument)
 
 	  gridID1 = vlistInqVarGrid(vlistID1, varID);
 
-	  if ( remapgrids[vlistGridIndex(vlistID1, gridID1)] == FALSE )
+	  if ( !remapgrids[vlistGridIndex(vlistID1, gridID1)] )
 	    {
 	      if ( lwrite_remap ) continue;
 	      else

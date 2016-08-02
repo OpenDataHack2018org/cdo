@@ -64,8 +64,8 @@
 
 
 
-static int  remap_gen_weights     = TRUE;
-static int  remap_write_remap     = FALSE;
+static bool remap_gen_weights     = true;
+static bool remap_write_remap     = false;
 static int  remap_num_srch_bins   = 180;
 #define  DEFAULT_MAX_ITER  100
 long remap_max_iter        = DEFAULT_MAX_ITER;  /* Max iteration count for i, j iteration */
@@ -73,10 +73,10 @@ long remap_max_iter        = DEFAULT_MAX_ITER;  /* Max iteration count for i, j 
 void remap_set_int(int remapvar, int value)
 {
   if      ( remapvar == REMAP_STORE_LINK_FAST ) remap_store_link_fast = value;
-  else if ( remapvar == REMAP_WRITE_REMAP     ) remap_write_remap     = value;
+  else if ( remapvar == REMAP_WRITE_REMAP     ) remap_write_remap     = value > 0;
   else if ( remapvar == REMAP_MAX_ITER        ) remap_max_iter        = value;
   else if ( remapvar == REMAP_NUM_SRCH_BINS   ) remap_num_srch_bins   = value;
-  else if ( remapvar == REMAP_GENWEIGHTS      ) remap_gen_weights     = value;
+  else if ( remapvar == REMAP_GENWEIGHTS      ) remap_gen_weights     = value > 0;
   else      cdoAbort("Unsupported remap variable (%d)!", remapvar);
 }
 
@@ -193,7 +193,7 @@ void remapgrid_alloc(int map_type, remapgrid_t *grid)
 
   grid->mask     = (int*) Malloc(grid->size*sizeof(int));
 
-  if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
+  if ( remap_write_remap || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
       grid->cell_center_lon = (double*) Malloc(grid->size*sizeof(double));
       grid->cell_center_lat = (double*) Malloc(grid->size*sizeof(double));
@@ -475,7 +475,8 @@ int expand_lonlat_grid(int gridID)
   gridInqXvals(gridID, xvals+2);
   gridInqYvals(gridID, yvals+2);
 
-  int gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
+  int gridtype = gridInqType(gridID);
+  int gridIDnew = gridCreate(gridtype, nxp4*nyp4);
   gridDefXsize(gridIDnew, nxp4);
   gridDefYsize(gridIDnew, nyp4);
 	      
@@ -500,7 +501,13 @@ int expand_lonlat_grid(int gridID)
   Free(xvals);
   Free(yvals);
 
-  if ( gridIsRotated(gridID) )
+  if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
+    {
+      double xpole, ypole, angle;
+      gridInqProjParamRLL(gridID, &xpole, &ypole, &angle);
+      gridDefProjParamRLL(gridIDnew, xpole, ypole, angle);
+    }
+  else if ( gridtype == GRID_LONLAT && gridIsRotated(gridID) )
     {
       gridDefXpole(gridIDnew, gridInqXpole(gridID));
       gridDefYpole(gridIDnew, gridInqYpole(gridID));
@@ -673,7 +680,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 	  gridCompress(gridID);
 	  grid->luse_cell_corners = true;
 	}
-      else if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
+      else if ( remap_write_remap || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
 	  lgrid_destroy = TRUE;
 	  gridID = gridToCurvilinear(grid->gridID, 1);
@@ -721,7 +728,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
       Free(mask);
     }
 
-  if ( remap_write_remap == FALSE && grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
+  if ( !remap_write_remap && grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
 
   if ( !(gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL)) )
     cdoAbort("%s grid cell center coordinates missing!", txt);
@@ -867,7 +874,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
       // else src_grid->remap_grid_type = -1;
     }
 
-  if ( remap_gen_weights == FALSE && IS_REG2D_GRID(gridID2) && tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
+  if ( !remap_gen_weights && IS_REG2D_GRID(gridID2) && tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
       if ( map_type == MAP_TYPE_DISTWGT ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       if ( map_type == MAP_TYPE_BILINEAR && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
@@ -899,6 +906,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
   if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&
        map_type == MAP_TYPE_DISTWGT &&
        ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
+        (gridInqType(gridID1) == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
 	(gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global)) )
     {
       src_grid->gridID = gridID1 = expand_lonlat_grid(gridID1);
