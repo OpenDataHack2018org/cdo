@@ -876,6 +876,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
   size_t gridsize = (size_t) gridInqSize(gridID1);
   int gridID2 = gridCreate(GRID_CURVILINEAR, (int) gridsize);
+  gridDefPrec(gridID2, DATATYPE_FLT32);
 
   bool lrotated = false;
   if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
@@ -883,8 +884,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
       gridtype = GRID_LONLAT;
       lrotated = true;
     }
-
-  gridDefPrec(gridID2, DATATYPE_FLT32);
 
   switch (gridtype)
     {
@@ -1297,6 +1296,13 @@ int gridToUnstructured(int gridID1, int lbounds)
   int gridID2  = gridCreate(GRID_UNSTRUCTURED, gridsize);
   gridDefPrec(gridID2, DATATYPE_FLT32);
 	  
+  bool lrotated = false;
+  if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
+    {
+      gridtype = GRID_LONLAT;
+      lrotated = true;
+    }
+
   switch (gridtype)
     {
     case GRID_LONLAT:
@@ -1326,11 +1332,20 @@ int gridToUnstructured(int gridID1, int lbounds)
 	gridInqXvals(gridID1, xvals);
 	gridInqYvals(gridID1, yvals);
 
-	if ( gridIsRotated(gridID1) )
+	if ( gridIsRotated(gridID1) || lrotated )
 	  {	    
-	    double xpole = gridInqXpole(gridID1);
-	    double ypole = gridInqYpole(gridID1);
-	    double angle = gridInqAngle(gridID1);
+            double xpole = 0, ypole = 0, angle = 0;
+
+            if ( lrotated )
+              {
+                gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
+              }
+            else
+              {
+                xpole = gridInqXpole(gridID1);
+                ypole = gridInqYpole(gridID1);
+                angle = gridInqAngle(gridID1);
+              }
 		
 	    for ( int j = 0; j < ny; j++ )
 	      for ( int i = 0; i < nx; i++ )
