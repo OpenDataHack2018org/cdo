@@ -92,7 +92,13 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   gridDefYlongname(gridID2, ylongname);
   gridDefYunits(gridID2, yunits);
 
-  if ( gridIsRotated(gridID1) )
+  if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
+    {
+      double xpole, ypole, angle;
+      gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
+      gridDefProjParamRLL(gridID2, xpole, ypole, angle);
+    }
+  else if ( gridtype == GRID_LONLAT && gridIsRotated(gridID1) )
     {
       gridDefXpole(gridID2, gridInqXpole(gridID1));
       gridDefYpole(gridID2, gridInqYpole(gridID1));
@@ -869,6 +875,7 @@ void *Selbox(void *argument)
       gridtype = gridInqType(gridID1);
 
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
+           (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
 	   (operatorID == SELINDEXBOX && (gridtype == GRID_GENERIC || gridtype == GRID_SINUSOIDAL) && 
 	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) ||
 	   (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED) )

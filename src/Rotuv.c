@@ -33,14 +33,7 @@
 static
 void rot_uv_back(int gridID, double *us, double *vs)
 {
-  long i, ilat, ilon;
-  double u, v;
-  double xval, yval;
   double xpole, ypole, angle;
-
-  long nlon = gridInqXsize(gridID);
-  long nlat = gridInqYsize(gridID);
-
   if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
     gridInqProjParamRLL(gridID, &xpole, &ypole, &angle);
   else
@@ -50,29 +43,31 @@ void rot_uv_back(int gridID, double *us, double *vs)
       angle = gridInqAngle(gridID);
      }
 
+  long nlon = gridInqXsize(gridID);
+  long nlat = gridInqYsize(gridID);
+
   double *xvals = (double*) Malloc(nlon*sizeof(double));
   double *yvals = (double*) Malloc(nlat*sizeof(double));
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
   /* Convert lat/lon units if required */
-  {
-    char units[CDI_MAX_NAME];
-    gridInqXunits(gridID, units);
-    grid_to_degree(units, 1, &xpole, "xpole");
-    grid_to_degree(units, nlon, xvals, "grid center lon");
-    gridInqYunits(gridID, units);
-    grid_to_degree(units, 1, &ypole, "ypole");
-    grid_to_degree(units, nlat, yvals, "grid center lat");
-  }
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID, units);
+  grid_to_degree(units, 1, &xpole, "xpole");
+  grid_to_degree(units, nlon, xvals, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_degree(units, 1, &ypole, "ypole");
+  grid_to_degree(units, nlat, yvals, "grid center lat");
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
-    for ( ilon = 0; ilon < nlon; ilon++ )
+  double u, v;
+  for ( long ilat = 0; ilat < nlat; ilat++ )
+    for ( long ilon = 0; ilon < nlon; ilon++ )
       {
-	i = ilat*nlon + ilon;
+	long i = ilat*nlon + ilon;
 
-        xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
-        yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
+        double xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
+        double yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
 
 	usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
 	/*
