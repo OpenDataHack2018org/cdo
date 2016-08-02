@@ -33,22 +33,25 @@
 static
 void rot_uv_back(int gridID, double *us, double *vs)
 {
-  long i, ilat, ilon, nlat, nlon;
+  long i, ilat, ilon;
   double u, v;
   double xval, yval;
   double xpole, ypole, angle;
-  double *xvals, *yvals;
 
-  nlon = gridInqXsize(gridID);
-  nlat = gridInqYsize(gridID);
+  long nlon = gridInqXsize(gridID);
+  long nlat = gridInqYsize(gridID);
 
-  xpole = gridInqXpole(gridID);
-  ypole = gridInqYpole(gridID);
-  angle = gridInqAngle(gridID);
+  if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
+    gridInqProjParamRLL(gridID, &xpole, &ypole, &angle);
+  else
+    {
+      xpole = gridInqXpole(gridID);
+      ypole = gridInqYpole(gridID);
+      angle = gridInqAngle(gridID);
+     }
 
-  xvals = (double*) Malloc(nlon*sizeof(double));
-  yvals = (double*) Malloc(nlat*sizeof(double));
-
+  double *xvals = (double*) Malloc(nlon*sizeof(double));
+  double *yvals = (double*) Malloc(nlat*sizeof(double));
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
@@ -174,8 +177,9 @@ void *Rotuv(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
-      if ( ! (gridInqType(gridID) == GRID_LONLAT && gridIsRotated(gridID)) )
-	cdoAbort("Only rotated lon/lat grids supported");
+      if ( ! ((gridInqType(gridID) == GRID_LONLAT && gridIsRotated(gridID)) ||
+              (gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL)) )
+	cdoAbort("Only rotated lon/lat grids supported!");
 
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));

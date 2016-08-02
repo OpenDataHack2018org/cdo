@@ -306,16 +306,12 @@ void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize
     }
 }
 
-
-void gridGenRotBounds(int gridID, int nx, int ny,
+static
+void gridGenRotBounds(double xpole, double ypole, double angle, int nx, int ny,
 		      double *xbounds, double *ybounds, double *xbounds2D, double *ybounds2D)
 {
   double minlon, maxlon;
   double minlat, maxlat;
-
-  double xpole = gridInqXpole(gridID);
-  double ypole = gridInqYpole(gridID);
-  double angle = gridInqAngle(gridID);
 
   for ( int j = 0; j < ny; j++ )
     {
@@ -894,6 +890,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
     case GRID_LAEA:
     case GRID_SINUSOIDAL:
       {
+        double xpole = 0, ypole = 0, angle = 0;
 	double xscale = 1, yscale = 1;
 	double *xvals = NULL, *yvals = NULL;
 	double *xbounds = NULL, *ybounds = NULL;
@@ -932,7 +929,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	double *xvals2D = (double*) Malloc(gridsize*sizeof(double));
 	double *yvals2D = (double*) Malloc(gridsize*sizeof(double));
 
-	if ( gridtype == GRID_LCC )
+        if ( gridtype == GRID_LCC )
 	  {
 	    for ( int j = 0; j < ny; j++ )
 	      for ( int i = 0; i < nx; i++ )
@@ -967,8 +964,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
             
 	    if ( gridIsRotated(gridID1) || lrotated )
 	      {
-                double xpole = 0, ypole = 0, angle = 0;
-
                 if ( lrotated )
                   {
                     gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
@@ -1103,9 +1098,9 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		double *xbounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 		double *ybounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 
-		if ( gridIsRotated(gridID1) )
+		if ( gridIsRotated(gridID1) || lrotated )
 		  {
-		    gridGenRotBounds(gridID1, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
+		    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
 		  }
 		else
 		  {
@@ -1308,6 +1303,7 @@ int gridToUnstructured(int gridID1, int lbounds)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
       {
+        double xpole = 0, ypole = 0, angle = 0;
 	gridDefXname(gridID2, "lon");
 	gridDefYname(gridID2, "lat");
 	gridDefXlongname(gridID2, "longitude");
@@ -1334,8 +1330,6 @@ int gridToUnstructured(int gridID1, int lbounds)
 
 	if ( gridIsRotated(gridID1) || lrotated )
 	  {	    
-            double xpole = 0, ypole = 0, angle = 0;
-
             if ( lrotated )
               {
                 gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
@@ -1402,9 +1396,9 @@ int gridToUnstructured(int gridID1, int lbounds)
 		double *xbounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 		double *ybounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 
-		if ( gridIsRotated(gridID1) )
+		if ( gridIsRotated(gridID1) || lrotated )
 		  {
-		    gridGenRotBounds(gridID1, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
+		    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
 		  }
 		else
 		  {
