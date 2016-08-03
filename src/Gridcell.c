@@ -48,6 +48,8 @@ void grid_cell_area(int gridID, double *array)
        gridtype == GRID_LAEA        ||
        projtype == CDI_PROJ_RLL     ||
        projtype == CDI_PROJ_LAEA    ||
+       projtype == CDI_PROJ_SINU    ||
+       gridtype == GRID_SINUSOIDAL  ||
        gridtype == GRID_LCC         ||
        gridtype == GRID_GME         ||
        gridtype == GRID_CURVILINEAR ||

@@ -467,8 +467,7 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
       cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
 
   projPJ proj = pj_init(nbpar, params);
-  if ( !proj )
-    cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
   for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
 
@@ -931,16 +930,16 @@ int gridToCurvilinear(int gridID1, int lbounds)
   bool lproj_rll   = false;
   bool lproj_laea  = false;
   bool lproj_lcc   = false;
-  bool lproj_lsinu = false;
+  bool lproj_sinu = false;
   if ( gridtype == GRID_PROJECTION )
     {
       int projtype = gridInqProjType(gridID1);
-      if      ( projtype == CDI_PROJ_RLL  ) lproj_rll   = true;
-      else if ( projtype == CDI_PROJ_LAEA ) lproj_laea  = true;
-      else if ( projtype == CDI_PROJ_LCC  ) lproj_lcc   = true;
-      else if ( projtype == CDI_PROJ_SINU ) lproj_lsinu = true;
+      if      ( projtype == CDI_PROJ_RLL  ) lproj_rll  = true;
+      else if ( projtype == CDI_PROJ_LAEA ) lproj_laea = true;
+      else if ( projtype == CDI_PROJ_LCC  ) lproj_lcc  = true;
+      else if ( projtype == CDI_PROJ_SINU ) lproj_sinu = true;
 
-      if ( lproj_rll || lproj_laea || lproj_lcc || lproj_lsinu ) gridtype = GRID_LONLAT;
+      if ( lproj_rll || lproj_laea || lproj_lcc || lproj_sinu ) gridtype = GRID_LONLAT;
     }
 
   switch (gridtype)
@@ -1054,7 +1053,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		      yvals2D[j*nx+i] = yscale*yvals[j];
 		    }
 
-		if ( gridtype == GRID_SINUSOIDAL )
+		if ( gridtype == GRID_SINUSOIDAL || lproj_sinu )
 		  {
 		    sinusoidal_to_geo(gridsize, xvals2D, yvals2D);
 		    /* correct_sinxvals(nx, ny, xvals2D); */
@@ -1144,7 +1143,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	    else if ( ny > 1 )
 	      {
 		ybounds = (double*) Malloc(2*ny*sizeof(double));
-		if ( gridtype == GRID_SINUSOIDAL || 
+		if ( gridtype == GRID_SINUSOIDAL || lproj_sinu || 
 		     gridtype == GRID_LAEA || lproj_laea || 
 		     gridtype == GRID_LCC2 )
 		  grid_gen_bounds(ny, yvals, ybounds);
@@ -1166,7 +1165,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		  }
 		else
 		  {
-		    if ( gridtype == GRID_SINUSOIDAL ||
+		    if ( gridtype == GRID_SINUSOIDAL || lproj_sinu ||
 			 gridtype == GRID_LAEA || lproj_laea || 
 			 gridtype == GRID_LCC2 )
 		      {
@@ -1188,7 +1187,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 			      ybounds2D[index+3] = yscale*ybounds[2*j];
 			    }
 			
-			if ( gridtype == GRID_SINUSOIDAL )
+			if ( gridtype == GRID_SINUSOIDAL || lproj_sinu )
 			  {
 			    sinusoidal_to_geo(4*gridsize, xbounds2D, ybounds2D);
 			    /*
@@ -1794,6 +1793,7 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype == GRID_LAEA        ||
 	   projtype == CDI_PROJ_RLL     ||
 	   projtype == CDI_PROJ_LAEA    ||
+	   projtype == CDI_PROJ_SINU    ||
 	   gridtype == GRID_SINUSOIDAL  ||
 	   gridtype == GRID_GME         ||
 	   gridtype == GRID_CURVILINEAR ||
