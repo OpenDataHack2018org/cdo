@@ -21,6 +21,7 @@
 #define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
 #endif
 
+void grid_def_param_laea(int gridID, double a, double lon0, double lat0);
 
 bool grid_is_distance_generic(int gridID);
 

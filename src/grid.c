@@ -491,8 +491,21 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 #endif
 }
 
+
+void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
+{
+  const char *projection = "lambert_azimuthal_equal_area";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)(strlen(projection)+1), projection);
+  const char *mapvarname = "Lambert_AEA";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)(strlen(mapvarname)+1), mapvarname);
+  
+  vlistDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", DATATYPE_FLT64, 1, &a);
+  vlistDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", DATATYPE_FLT64, 1, &lon_0);
+  vlistDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin", DATATYPE_FLT64, 1, &lat_0);
+}
+
 static
-void grid_get_param_laea(int gridID, double *a, double *lon_0, double *lat_0)
+void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0)
 {
   *a = 0; *lon_0 = 0; *lat_0 = 0;
 
@@ -541,7 +554,7 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   projUV data, res;
   
   double a, lon_0, lat_0;
-  grid_get_param_laea(gridID, &a , &lon_0, &lat_0);
+  grid_inq_param_laea(gridID, &a , &lon_0, &lat_0);
 
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=laea");

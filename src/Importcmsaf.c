@@ -30,6 +30,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "grid.h"
 #include "pstream.h"
 
 
@@ -266,24 +267,25 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
   double *yvals = (double*) Malloc(ny*sizeof(double));
 
   for ( int i = 0; i < nx; ++i )
-    {
-      xvals[i] = xmin + i*dx + dx/2;
-      /* printf("x[%d]=%g\n", i, xvals[i]); */
-    }
+    xvals[i] = xmin + i*dx + dx/2;
 
   for ( int i = 0; i < ny; ++i )
-    {
-      yvals[i] = ymax - i*dy - dy/2;
-      /* printf("y[%d]=%g\n", i, yvals[i]); */
-    }
+    yvals[i] = ymax - i*dy - dy/2;
 
+#ifdef TEST_PROJECTION
+  int gridID = gridCreate(GRID_PROJECTION, nx*ny);
+#else
   int gridID = gridCreate(GRID_LAEA, nx*ny);
+#endif
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
   gridDefXvals(gridID, xvals);
   gridDefYvals(gridID, yvals);
-
+#ifdef TEST_PROJECTION
+  grid_def_param_laea(gridID, a, lon0, lat0);
+#else
   gridDefLaea(gridID, a, lon0, lat0);
+#endif
 
   Free(xvals);
   Free(yvals);
