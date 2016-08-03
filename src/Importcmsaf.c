@@ -134,25 +134,22 @@ static
 double det_lon_atovs(double r, double r0, double lts, double c, double re)
 {
   const double pi = M_PI;
-  double xla;
 
-  xla=(r-r0)*c/re/cos(lts*pi/180.); /* longitude */
+  double xla=(r-r0)*c/re/cos(lts*pi/180.); /* longitude */
   xla=180.*xla/pi;
 
-  return (xla);
+  return xla;
 }
 
 static
 double det_lat_atovs(double s, double s0, double lts, double c, double re)
 {
   const double pi = M_PI;
-  double siphi;
-  double phi;
 
-  siphi=(s-s0)*c*cos(lts*pi/180.)/re;
-  phi=180.*asin(siphi)/pi; /* latitude */
+  double siphi=(s-s0)*c*cos(lts*pi/180.)/re;
+  double phi=180.*asin(siphi)/pi; /* latitude */
 
-  return (phi);
+  return phi;
 }
 
 static
@@ -234,18 +231,17 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   double *yvals = (double*) Malloc(ny*sizeof(double));
 
   for ( int i = 0; i < nx; ++i )
-    {
-      xvals[i] = xmin + i*dx + dx/2;
-      /* printf("x[%d]=%g\n", i, xvals[i]); */
-    }
+    xvals[i] = xmin + i*dx + dx/2;
 
   for ( int i = 0; i < ny; ++i )
-    {
-      yvals[i] = ymax - i*dy - dy/2;
-      /* printf("y[%d]=%g\n", i, yvals[i]); */
-    }
+    yvals[i] = ymax - i*dy - dy/2;
 
+#ifdef TEST_PROJECTION
+  int gridID = gridCreate(GRID_PROJECTION, nx*ny);
+  grid_def_param_sinu(gridID);
+#else
   int gridID = gridCreate(GRID_SINUSOIDAL, nx*ny);
+#endif
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
   gridDefXvals(gridID, xvals);
@@ -254,7 +250,7 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   Free(xvals);
   Free(yvals);
 
-  return (gridID);
+  return gridID;
 }
 
 static
@@ -290,7 +286,7 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
   Free(xvals);
   Free(yvals);
 
-  return (gridID);
+  return gridID;
 }
 
 static
@@ -344,7 +340,7 @@ int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double 
 	}
     }
 
-  return (nfound);
+  return nfound;
 }
 
 static
@@ -608,7 +604,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
       gridID = defLonLatGrid(nx, ny, c0, lts, re);
     }
 
-  return (gridID);
+  return gridID;
 }
 
 static
@@ -749,7 +745,7 @@ int read_region(hid_t loc_id, int nx, int ny)
 			   dx, dy, a, lon0, lat0);
     }
 
-  return (gridID);
+  return gridID;
 }
 
 static
@@ -1368,7 +1364,7 @@ int get_vdate(int vlistID)
 	}
     }
 
-  return (vdate);
+  return vdate;
 }
 
 static

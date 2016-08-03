@@ -491,6 +491,15 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 }
 
 
+void grid_def_param_sinu(int gridID)
+{
+  const char *projection = "sinusoidal";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)(strlen(projection)+1), projection);
+  const char *mapvarname = "Sinusoidal";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)(strlen(mapvarname)+1), mapvarname);
+}
+
+
 void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
 {
   const char *projection = "lambert_azimuthal_equal_area";

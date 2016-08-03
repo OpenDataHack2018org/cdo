@@ -22,6 +22,7 @@
 #endif
 
 void grid_def_param_laea(int gridID, double a, double lon0, double lat0);
+void grid_def_param_sinu(int gridID);
 
 bool grid_is_distance_generic(int gridID);
 
