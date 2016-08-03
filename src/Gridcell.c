@@ -45,7 +45,9 @@ void grid_cell_area(int gridID, double *array)
 
   if ( gridtype == GRID_LONLAT      ||
        gridtype == GRID_GAUSSIAN    ||
-       gridtype == GRID_LAEA || projtype == CDI_PROJ_LAEA ||
+       gridtype == GRID_LAEA        ||
+       projtype == CDI_PROJ_RLL     ||
+       projtype == CDI_PROJ_LAEA    ||
        gridtype == GRID_LCC         ||
        gridtype == GRID_GME         ||
        gridtype == GRID_CURVILINEAR ||
