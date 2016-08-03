@@ -286,8 +286,8 @@ double mod_huiliers_area2(int num_corners, double *cell_corner_lon, double *cell
 int gridGenArea(int gridID, double* area)
 {
   int status = 0;
-  int lgrid_gen_bounds = FALSE;
-  int lgriddestroy = FALSE;
+  bool lgrid_gen_bounds = false;
+  bool lgriddestroy = false;
   long nv;
 
   long gridsize = gridInqSize(gridID);
@@ -314,7 +314,7 @@ int gridGenArea(int gridID, double* area)
     {
       if ( gridtype == GRID_GME )
 	{
-	  lgriddestroy = TRUE;
+	  lgriddestroy = true;
 	  gridID = gridToUnstructured(gridID, 1);
           /*
 	  grid_mask = (int*) Malloc(gridsize*sizeof(int));
@@ -324,9 +324,9 @@ int gridGenArea(int gridID, double* area)
 	}
       else
 	{
-	  lgriddestroy = TRUE;
+	  lgriddestroy = true;
 	  gridID = gridToCurvilinear(gridID, 1);
-	  lgrid_gen_bounds = TRUE;
+	  lgrid_gen_bounds = true;
 	}
     }
 
@@ -336,7 +336,7 @@ int gridGenArea(int gridID, double* area)
 	{
 	  if ( gridInqNumber(gridID) > 0 )
 	    {
-	      lgriddestroy = TRUE;
+	      lgriddestroy = true;
 	      gridID = referenceToGrid(gridID);
 	      if ( gridID == -1 ) return 1;
 	    }

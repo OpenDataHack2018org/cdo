@@ -531,9 +531,11 @@ bool is_global_grid(int gridID)
   bool non_global = remap_non_global || !gridIsCircular(gridID);
 
   int gridtype = gridInqType(gridID);
+  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
   if ( (gridtype == GRID_LONLAT && gridIsRotated(gridID)) ||
-       (gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) ||
-       (gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_LAEA) ||
+       (projtype == CDI_PROJ_RLL) ||
+       (projtype == CDI_PROJ_LAEA) ||
+       (projtype == CDI_PROJ_SINU) ||
        (gridtype == GRID_LONLAT && non_global) ||
        (gridtype == GRID_LCC) ||
        (gridtype == GRID_LAEA) ||
@@ -577,10 +579,12 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, bool *remapgrids)
 
       int gridID = vlistGrid(vlistID, index);
       int gridtype = gridInqType(gridID);
-
+      int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
+  
       if ( gridtype != GRID_LONLAT      &&
-           !(gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) &&
-           !(gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_LAEA) &&
+           projtype != CDI_PROJ_RLL     &&
+           projtype != CDI_PROJ_LAEA    &&
+           projtype != CDI_PROJ_SINU    &&
 	   gridtype != GRID_GAUSSIAN    &&
 	   gridtype != GRID_LCC         &&
 	   gridtype != GRID_LAEA        &&
