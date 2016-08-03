@@ -81,31 +81,19 @@ void grid_cell_area(int gridID, double *array)
 
 void *Gridcell(void *argument)
 {
-  int GRIDAREA, GRIDWGTS, GRIDMASK, GRIDDX, GRIDDY;
-  int operatorID;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
-  int gridID, zaxisID;
-  int gridtype;
   int status;
-  int ngrids;
-  int need_radius;
-  int tsID, varID, levelID, taxisID;
-  long i, gridsize;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
-  GRIDAREA = cdoOperatorAdd("gridarea",     1,  0, NULL);
-  GRIDWGTS = cdoOperatorAdd("gridweights",  1,  0, NULL);
-  GRIDMASK = cdoOperatorAdd("gridmask",     0,  0, NULL);
-  GRIDDX   = cdoOperatorAdd("griddx",       1,  0, NULL);
-  GRIDDY   = cdoOperatorAdd("griddy",       1,  0, NULL);
+  int GRIDAREA = cdoOperatorAdd("gridarea",     1,  0, NULL);
+  int GRIDWGTS = cdoOperatorAdd("gridweights",  1,  0, NULL);
+  int GRIDMASK = cdoOperatorAdd("gridmask",     0,  0, NULL);
+  int GRIDDX   = cdoOperatorAdd("griddx",       1,  0, NULL);
+  int GRIDDY   = cdoOperatorAdd("griddy",       1,  0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  need_radius = cdoOperatorF1(operatorID);
-
+  bool need_radius = cdoOperatorF1(operatorID) > 0;
   if ( need_radius )
     {
       char *envstr = getenv("PLANET_RADIUS");
@@ -118,21 +106,21 @@ void *Gridcell(void *argument)
 
   if ( cdoVerbose ) cdoPrint("PlanetRadius: %g", PlanetRadius);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
 
   if ( ngrids > 1 )
     cdoWarning("Found more than 1 grid, using the first one!");
 
-  gridID  = vlistGrid(vlistID1, 0);
+  int gridID  = vlistGrid(vlistID1, 0);
 
-  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+  int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
-  vlistID2 = vlistCreate();
-  varID    = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_CONSTANT);
+  int vlistID2 = vlistCreate();
+  int varID    = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_CONSTANT);
   vlistDefNtsteps(vlistID2, 0);
 
   if ( operatorID == GRIDAREA )
@@ -166,12 +154,12 @@ void *Gridcell(void *argument)
       vlistDefVarUnits(vlistID2, varID, "m");
     }
 
-  taxisID = taxisCreate(TAXIS_ABSOLUTE);
+  int taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID);
 
 
-  gridsize = gridInqSize(gridID);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  long gridsize = gridInqSize(gridID);
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
 
   if ( operatorID == GRIDAREA )
@@ -193,15 +181,15 @@ void *Gridcell(void *argument)
 	}
       else
 	{
-	  for ( i = 0; i < gridsize; ++i ) mask[i] = 1;
+	  for ( int i = 0; i < gridsize; ++i ) mask[i] = 1;
 	}
 
-      for ( i = 0; i < gridsize; ++i ) array[i] = mask[i];
+      for ( int i = 0; i < gridsize; ++i ) array[i] = mask[i];
       Free(mask);
     }
   else if ( operatorID == GRIDDX || operatorID == GRIDDY )
     {
-      gridtype = gridInqType(gridID);
+      int gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT      ||
 	   gridtype == GRID_GAUSSIAN    ||
 	   gridtype == GRID_LCC         ||
@@ -295,15 +283,15 @@ void *Gridcell(void *argument)
     }
 
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   streamDefTimestep(streamID2, tsID);
 
   varID   = 0;
-  levelID = 0;
+  int levelID = 0;
   streamDefRecord(streamID2, varID, levelID);
   streamWriteRecord(streamID2, array, 0);
 
