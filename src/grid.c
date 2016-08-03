@@ -492,6 +492,48 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 }
 
 static
+void grid_get_param_laea(int gridID, double *a, double *lon_0, double *lat_0)
+{
+  *a = 0; *lon_0 = 0; *lat_0 = 0;
+
+  int gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_LAEA )
+    gridInqLaea(gridID, a , lon_0, lat_0);
+  else
+    {
+      const char *projection = "lambert_azimuthal_equal_area";
+      char mapping[CDI_MAX_NAME]; mapping[0] = 0;
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
+      if ( mapping[0] && strcmp(mapping, projection) == 0 )
+        {
+          int atttype, attlen;
+          char attname[CDI_MAX_NAME+1];
+
+          int natts;
+          vlistInqNatts(gridID, CDI_GLOBAL, &natts);
+
+          for ( int iatt = 0; iatt < natts; ++iatt )
+            {
+              vlistInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
+
+              if ( attlen != 1 ) continue;
+
+              if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
+                {
+                  double attflt;
+                  vlistInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, &attflt);
+                  if      ( strcmp(attname, "earth_radius") == 0 )                    *a     = attflt;
+                  else if ( strcmp(attname, "longitude_of_projection_origin")  == 0 ) *lon_0 = attflt;
+                  else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )   *lat_0 = attflt;
+                }
+            }
+        }
+      else
+        Warning("%s mapping parameter missing!", projection);
+    }
+}
+
+static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
@@ -499,7 +541,7 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   projUV data, res;
   
   double a, lon_0, lat_0;
-  gridInqLaea(gridID, &a , &lon_0, &lat_0);
+  grid_get_param_laea(gridID, &a , &lon_0, &lat_0);
 
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=laea");
@@ -512,8 +554,7 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
       cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
 
   projPJ proj = pj_init(nbpar, &params[0]);
-  if ( !proj )
-    cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
   for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
 
@@ -874,11 +915,19 @@ int gridToCurvilinear(int gridID1, int lbounds)
   int gridID2 = gridCreate(GRID_CURVILINEAR, (int) gridsize);
   gridDefPrec(gridID2, DATATYPE_FLT32);
 
-  bool lrotated = false;
-  if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
+  bool lproj_rll   = false;
+  bool lproj_laea  = false;
+  bool lproj_lcc   = false;
+  bool lproj_lsinu = false;
+  if ( gridtype == GRID_PROJECTION )
     {
-      gridtype = GRID_LONLAT;
-      lrotated = true;
+      int projtype = gridInqProjType(gridID1);
+      if      ( projtype == CDI_PROJ_RLL  ) lproj_rll   = true;
+      else if ( projtype == CDI_PROJ_LAEA ) lproj_laea  = true;
+      else if ( projtype == CDI_PROJ_LCC  ) lproj_lcc   = true;
+      else if ( projtype == CDI_PROJ_SINU ) lproj_lsinu = true;
+
+      if ( lproj_rll || lproj_laea || lproj_lcc || lproj_lsinu ) gridtype = GRID_LONLAT;
     }
 
   switch (gridtype)
@@ -902,7 +951,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	gridInqXunits(gridID1, xunits);
 	gridInqYunits(gridID1, yunits);
 
-	if ( gridtype == GRID_LAEA )
+	if ( gridtype == GRID_LAEA || lproj_laea )
 	  {
 	    bool lvalid_xunits = false;
 	    bool lvalid_yunits = false;
@@ -962,9 +1011,9 @@ int gridToCurvilinear(int gridID1, int lbounds)
             else
               for ( int i = 0; i < ny; ++i ) yvals[i] = 0;
             
-	    if ( gridIsRotated(gridID1) || lrotated )
+	    if ( gridIsRotated(gridID1) || lproj_rll )
 	      {
-                if ( lrotated )
+                if ( lproj_rll )
                   {
                     gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
                     gridDefProj(gridID2, gridID1);
@@ -997,7 +1046,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		    sinusoidal_to_geo(gridsize, xvals2D, yvals2D);
 		    /* correct_sinxvals(nx, ny, xvals2D); */
 		  }
-		else if ( gridtype == GRID_LAEA )
+		else if ( gridtype == GRID_LAEA || lproj_laea )
 		  {
 		    laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
 		  }
@@ -1083,7 +1132,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	      {
 		ybounds = (double*) Malloc(2*ny*sizeof(double));
 		if ( gridtype == GRID_SINUSOIDAL || 
-		     gridtype == GRID_LAEA       || 
+		     gridtype == GRID_LAEA || lproj_laea || 
 		     gridtype == GRID_LCC2 )
 		  grid_gen_bounds(ny, yvals, ybounds);
 		else
@@ -1098,14 +1147,14 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		double *xbounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 		double *ybounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 
-		if ( gridIsRotated(gridID1) || lrotated )
+		if ( gridIsRotated(gridID1) || lproj_rll )
 		  {
 		    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
 		  }
 		else
 		  {
 		    if ( gridtype == GRID_SINUSOIDAL ||
-			 gridtype == GRID_LAEA       || 
+			 gridtype == GRID_LAEA || lproj_laea || 
 			 gridtype == GRID_LCC2 )
 		      {
 			for ( int j = 0; j < ny; j++ )
@@ -1140,7 +1189,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 			    Free(xvals2D);
 			    */
 			  }
-			else if ( gridtype == GRID_LAEA )
+			else if ( gridtype == GRID_LAEA || lproj_laea )
 			  laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
 			else if ( gridtype == GRID_LCC2 )
 			  lcc2_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
@@ -1291,11 +1340,11 @@ int gridToUnstructured(int gridID1, int lbounds)
   int gridID2  = gridCreate(GRID_UNSTRUCTURED, gridsize);
   gridDefPrec(gridID2, DATATYPE_FLT32);
 	  
-  bool lrotated = false;
+  bool lproj_rll = false;
   if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
     {
       gridtype = GRID_LONLAT;
-      lrotated = true;
+      lproj_rll = true;
     }
 
   switch (gridtype)
@@ -1328,9 +1377,9 @@ int gridToUnstructured(int gridID1, int lbounds)
 	gridInqXvals(gridID1, xvals);
 	gridInqYvals(gridID1, yvals);
 
-	if ( gridIsRotated(gridID1) || lrotated )
+	if ( gridIsRotated(gridID1) || lproj_rll )
 	  {	    
-            if ( lrotated )
+            if ( lproj_rll )
               {
                 gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
               }
@@ -1396,7 +1445,7 @@ int gridToUnstructured(int gridID1, int lbounds)
 		double *xbounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 		double *ybounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 
-		if ( gridIsRotated(gridID1) || lrotated )
+		if ( gridIsRotated(gridID1) || lproj_rll )
 		  {
 		    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
 		  }

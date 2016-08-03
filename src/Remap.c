@@ -529,10 +529,11 @@ bool is_global_grid(int gridID)
 {
   bool global_grid = true;
   bool non_global = remap_non_global || !gridIsCircular(gridID);
-  int gridtype = gridInqType(gridID);
 
+  int gridtype = gridInqType(gridID);
   if ( (gridtype == GRID_LONLAT && gridIsRotated(gridID)) ||
        (gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) ||
+       (gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_LAEA) ||
        (gridtype == GRID_LONLAT && non_global) ||
        (gridtype == GRID_LCC) ||
        (gridtype == GRID_LAEA) ||
@@ -579,6 +580,7 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, bool *remapgrids)
 
       if ( gridtype != GRID_LONLAT      &&
            !(gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) &&
+           !(gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_LAEA) &&
 	   gridtype != GRID_GAUSSIAN    &&
 	   gridtype != GRID_LCC         &&
 	   gridtype != GRID_LAEA        &&
