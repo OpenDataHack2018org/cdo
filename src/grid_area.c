@@ -292,12 +292,14 @@ int gridGenArea(int gridID, double* area)
 
   long gridsize = gridInqSize(gridID);
   int gridtype = gridInqType(gridID);
+  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1; 
 
   if ( gridtype != GRID_LONLAT      &&
        gridtype != GRID_GAUSSIAN    &&
        gridtype != GRID_LCC         &&
        gridtype != GRID_LCC2        &&
        gridtype != GRID_LAEA        &&
+       projtype != CDI_PROJ_LAEA    &&
        gridtype != GRID_SINUSOIDAL  &&
        gridtype != GRID_GME         &&
        gridtype != GRID_CURVILINEAR &&

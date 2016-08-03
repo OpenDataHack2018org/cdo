@@ -1761,8 +1761,9 @@ int gridWeights(int gridID, double *grid_wgts)
   int w_status = 1;
   int a_status = 0;
 
-  int gridtype = gridInqType(gridID);
   int gridsize = gridInqSize(gridID);
+  int gridtype = gridInqType(gridID);
+  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1; 
   
   double *grid_area = (double*) Malloc(gridsize*sizeof(double));
 
@@ -1778,6 +1779,7 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype == GRID_LCC         ||
 	   gridtype == GRID_LCC2        ||
 	   gridtype == GRID_LAEA        ||
+	   projtype == CDI_PROJ_LAEA    ||
 	   gridtype == GRID_SINUSOIDAL  ||
 	   gridtype == GRID_GME         ||
 	   gridtype == GRID_CURVILINEAR ||

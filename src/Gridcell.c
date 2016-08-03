@@ -41,8 +41,11 @@ double orthodrome(double px1, double py1, double px2, double py2)
 void grid_cell_area(int gridID, double *array)
 {
   int gridtype = gridInqType(gridID);
+  int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
+
   if ( gridtype == GRID_LONLAT      ||
        gridtype == GRID_GAUSSIAN    ||
+       gridtype == GRID_LAEA || projtype == CDI_PROJ_LAEA ||
        gridtype == GRID_LCC         ||
        gridtype == GRID_GME         ||
        gridtype == GRID_CURVILINEAR ||
@@ -178,8 +181,7 @@ void *Gridcell(void *argument)
   else if ( operatorID == GRIDWGTS )
     {
       status = gridWeights(gridID, array);
-      if ( status != 0 )
-	  cdoWarning("Using constant grid cell area weights!");
+      if ( status != 0 ) cdoWarning("Using constant grid cell area weights!");
     }
   else if ( operatorID == GRIDMASK )
     {
