@@ -35,25 +35,18 @@
 
 void *Vertwind(void *argument)
 {
-  int streamID2;
-  int vlistID2;
-  int taxisID1, taxisID2;
-  int gridID, zaxisID, tsID;
-  int nlevel, nrecs, recID, code;
+  int gridID, zaxisID;
+  int nrecs, nlevel, code;
   int varID, levelID;
-  int nvars, nvct = 0;
+  int nvct = 0;
   int gridsize, i;
   int offset;
   int nmiss, nmiss_out;
-  int temp_code, sq_code, ps_code, omega_code;
   int tempID = -1, sqID = -1, psID = -1, omegaID = -1;
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
   double tv, rho;
-  double *level = NULL;
-  double *temp = NULL, *sq = NULL, *omega = NULL, *wms = NULL;
-  double *fpress = NULL, *hpress = NULL, *ps_prog = NULL;
-  double missval_t, missval_sq, missval_wap, missval_out;
+  double *hpress = NULL, *ps_prog = NULL;
 
   cdoInitialize(argument);
 
@@ -63,12 +56,12 @@ void *Vertwind(void *argument)
 
   vlist_check_gridsize(vlistID1);
 
-  temp_code  = 130;
-  sq_code    = 133;
-  ps_code    = 134;
-  omega_code = 135;
+  int temp_code  = 130;
+  int sq_code    = 133;
+  int ps_code    = 134;
+  int omega_code = 135;
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; ++varID )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -84,10 +77,10 @@ void *Vertwind(void *argument)
 
 	  strtolower(varname);
 
-	  if      ( strcmp(varname, "st")    == 0 ) code = 130;
-	  else if ( strcmp(varname, "sq")    == 0 ) code = 133;
-	  else if ( strcmp(varname, "aps")   == 0 ) code = 134;
-	  else if ( strcmp(varname, "omega") == 0 ) code = 135;
+	  if      ( strcmp(varname, "st")    == 0 ) code = temp_code;
+	  else if ( strcmp(varname, "sq")    == 0 ) code = sq_code;
+	  else if ( strcmp(varname, "aps")   == 0 ) code = ps_code;
+	  else if ( strcmp(varname, "omega") == 0 ) code = omega_code;
 	}
 
       if      ( code == temp_code  ) tempID  = varID;
@@ -105,10 +98,10 @@ void *Vertwind(void *argument)
     }
 
   /* Get missing values */
-  missval_t   = vlistInqVarMissval(vlistID1, tempID);
-  missval_sq  = vlistInqVarMissval(vlistID1, sqID);
-  missval_wap = vlistInqVarMissval(vlistID1, omegaID);
-  missval_out = missval_wap;
+  double missval_t   = vlistInqVarMissval(vlistID1, tempID);
+  double missval_sq  = vlistInqVarMissval(vlistID1, sqID);
+  double missval_wap = vlistInqVarMissval(vlistID1, omegaID);
+  double missval_out = missval_wap;
 
   gridID  = vlistInqVarGrid(vlistID1, omegaID);
   zaxisID = vlistInqVarZaxis(vlistID1, omegaID);
@@ -118,14 +111,14 @@ void *Vertwind(void *argument)
 
   gridsize = gridInqSize(gridID);
   nlevel = zaxisInqSize(zaxisID);
-  level  = (double*) Malloc(nlevel*sizeof(double));
+  double *level  = (double*) Malloc(nlevel*sizeof(double));
   zaxisInqLevels(zaxisID, level);
 
-  temp    = (double*) Malloc(gridsize*nlevel*sizeof(double));
-  sq      = (double*) Malloc(gridsize*nlevel*sizeof(double));
-  omega   = (double*) Malloc(gridsize*nlevel*sizeof(double));
-  wms     = (double*) Malloc(gridsize*nlevel*sizeof(double));
-  fpress  = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  double *temp    = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  double *sq      = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  double *omega   = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  double *wms     = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  double *fpress  = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
 
   if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
@@ -159,7 +152,7 @@ void *Vertwind(void *argument)
   for ( levelID = 0; levelID < nlevel; ++levelID )
     vlistDefFlag(vlistID1, omegaID, levelID, TRUE);
 
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
   vlistDefVarCode(vlistID2, 0, 40);
   vlistDefVarName(vlistID2, 0, "W");
@@ -167,22 +160,22 @@ void *Vertwind(void *argument)
   vlistDefVarUnits(vlistID2, 0, "m/s");
   vlistDefVarMissval(vlistID2, 0, missval_out);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
      
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -215,19 +208,15 @@ void *Vertwind(void *argument)
 		}
 	      else
 		{
-	          /* Virtuelle Temperatur bringt die Feuchteabhaengigkeit hinein */
+	          // Virtuelle Temperatur bringt die Feuchteabhaengigkeit hinein
 	          tv = temp[offset+i] * (1. + 0.608*sq[offset+i]);
 
-	          /*
-		    Die Dichte erhaelt man nun mit der Gasgleichung rho=p/(R*tv)
-		    Level in Pa!
-	          */
+	          // Die Dichte erhaelt man nun mit der Gasgleichung rho=p/(R*tv) Level in Pa!
 	          rho = fpress[offset+i] / (R*tv);
 
 	          /*
-		    Nun daraus die Vertikalgeschwindigkeit im m/s, indem man die
-		    Vertikalgeschwindigkeit in Pa/s durch die Erdbeschleunigung
-		    und die Dichte teilt
+		    Nun daraus die Vertikalgeschwindigkeit im m/s, indem man die Vertikalgeschwindigkeit
+                    in Pa/s durch die Erdbeschleunigung und die Dichte teilt
 	          */
 	          wms[offset+i] = omega[offset+i]/(G*rho);
 	        }
