@@ -34,14 +34,13 @@
 
 void *FC(void *argument)
 {
-  int nrecs, nvars;
-  int recID, varID, levelID;
+  int nrecs;
+  int varID, levelID;
   int index;
   int gridIDsp = -1, gridIDgp = -1, gridIDfc = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
   int nmiss;
-  int *vars;
   int nlon = 0, nlat = 0, ntr = 0;
   int nsp = 0, nfc = 0;
   double *array2 = NULL;
@@ -220,8 +219,8 @@ void *FC(void *argument)
 
   // printf("nfc %d, ntr %d, nlat %d, nlon %d\n", nfc, ntr, nlat, nlon);
 
-  nvars = vlistNvars(vlistID2);
-  vars  = (int*) Malloc(nvars*sizeof(int));
+  int nvars = vlistNvars(vlistID2);
+  int *vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
@@ -252,7 +251,7 @@ void *FC(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

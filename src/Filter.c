@@ -84,11 +84,11 @@ void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_
 static
 void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 {  
-  int lpower2 = FALSE;
+  bool lpower2 = false;
   double *work_r = NULL;
   double *work_i = NULL;
 
-  if ( (nts&(nts-1)) == 0 ) lpower2 = TRUE;
+  if ( (nts&(nts-1)) == 0 ) lpower2 = true;
 
   if ( !lpower2 )
     {
@@ -124,7 +124,7 @@ void *Filter(void *argument)
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
   int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
+  int gridID, varID, levelID;
   int nalloc = 0;
   int nmiss;
   int nlevel;
@@ -195,7 +195,7 @@ void *Filter(void *argument)
    
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
            
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
           gridID   = vlistInqVarGrid(vlistID1, varID);

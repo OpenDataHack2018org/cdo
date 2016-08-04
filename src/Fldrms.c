@@ -30,53 +30,45 @@
 
 void *Fldrms(void *argument)
 {
-  int streamID1, streamID2, streamID3;
-  int vlistID1, vlistID2, vlistID3;
-  int gridID1, gridID2, gridID3, lastgrid = -1;
-  int index, ngrids;
-  int recID, nrecs;
-  int tsID, varID, levelID;
-  int lim;
+  int lastgrid = -1;
+  int index;
+  int nrecs;
+  int varID, levelID;
   int nmiss;
-  int ndiffgrids;
-  int needWeights = FALSE;
-  double slon, slat;
   double sglval;
-  field_t field1, field2, field3;
-  int taxisID1, taxisID3;
 
   cdoInitialize(argument);
 
-  needWeights = TRUE;
+  bool needWeights = true;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  slon = 0;
-  slat = 0;
-  gridID3 = gridCreate(GRID_LONLAT, 1);
+  double slon = 0;
+  double slat = 0;
+  int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
   gridDefXvals(gridID3, &slon);
   gridDefYvals(gridID3, &slat);
 
-  ngrids = vlistNgrids(vlistID1);
-  ndiffgrids = 0;
+  int ngrids = vlistNgrids(vlistID1);
+  int ndiffgrids = 0;
   for ( index = 1; index < ngrids; index++ )
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
       ndiffgrids++;
 
   index = 0;
-  gridID1 = vlistGrid(vlistID1, index);
-  gridID2 = vlistGrid(vlistID2, index);
+  int gridID1 = vlistGrid(vlistID1, index);
+  int gridID2 = vlistGrid(vlistID2, index);
 
   if ( gridInqSize(gridID1) != gridInqSize(gridID2) )
     cdoAbort("Fields have different grid size!");
@@ -91,15 +83,16 @@ void *Fldrms(void *argument)
 
   if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
+  field_t field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field3);
 
-  lim = vlistGridsizeMax(vlistID1);
+  int lim = vlistGridsizeMax(vlistID1);
   field1.ptr    = (double*) Malloc(lim*sizeof(double));
   field1.weight = NULL;
   if ( needWeights )
@@ -111,7 +104,7 @@ void *Fldrms(void *argument)
   field3.ptr  = &sglval;
   field3.grid = gridID3;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       nrecs = streamInqTimestep(streamID2, tsID);
@@ -120,7 +113,7 @@ void *Fldrms(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);

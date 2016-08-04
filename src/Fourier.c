@@ -28,17 +28,13 @@
 
 void *Fourier(void *argument)
 {
-  int bit, sign;
+  int bit;
   int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
-  int tsID;
-  int nts;
+  int gridID, varID, levelID;
   int nalloc = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
+  int nlevel;
   int *vdate = NULL, *vtime = NULL;
   double missval;
   field_t ***vars = NULL;
@@ -49,30 +45,29 @@ void *Fourier(void *argument)
     double *work_r;
     double *work_i;
   } memory_t;
-  memory_t *ompmem = NULL;
 
 
   cdoInitialize(argument);
 
   operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
-  sign = parameter2int(operatorArgv()[0]);
+  int sign = parameter2int(operatorArgv()[0]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
@@ -88,7 +83,7 @@ void *Fourier(void *argument)
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -101,11 +96,11 @@ void *Fourier(void *argument)
       tsID++;
     }
 
-  nts = tsID;
+  int nts = tsID;
 
   for ( bit = nts; !(bit & 1); bit >>= 1 );
 
-  ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
+  memory_t *ompmem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
   for ( int i = 0; i < ompNumThreads; i++ )
     {
       ompmem[i].real = (double*) Malloc(nts*sizeof(double));

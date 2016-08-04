@@ -35,14 +35,11 @@ static
 double correlation_s(const double * restrict in0, const double * restrict in1,
 		     const double * restrict weight, double missval1, double missval2, long gridsize)
 {
-  long i;
   double sum0, sum1, sum00, sum01, sum11, wsum0;
-  double out;
-
   sum0 = sum1 = sum00 = sum01 = sum11 = 0;
   wsum0 = 0;
 	
-  for ( i = 0; i < gridsize; ++i )
+  for ( long i = 0; i < gridsize; ++i )
     {
       if ( IS_NOT_EQUAL(weight[i], missval1) && IS_NOT_EQUAL(in0[i], missval1) && IS_NOT_EQUAL(in1[i], missval2) )
 	    {
@@ -55,12 +52,12 @@ double correlation_s(const double * restrict in0, const double * restrict in1,
 	    }
     }
 
-  out = IS_NOT_EQUAL(wsum0, 0) ?
-        DIVMN((sum01 * wsum0 - sum0 * sum1),
-	     SQRTMN((sum00 * wsum0 - sum0 * sum0) *
-	          (sum11 * wsum0 - sum1 * sum1))) : missval1;
+  double out = IS_NOT_EQUAL(wsum0, 0) ?
+               DIVMN((sum01 * wsum0 - sum0 * sum1),
+	            SQRTMN((sum00 * wsum0 - sum0 * sum0) *
+	                 (sum11 * wsum0 - sum1 * sum1))) : missval1;
 
-  return (out);
+  return out;
 }
 
 /* covariance in space */
@@ -68,14 +65,11 @@ static
 double covariance_s(const double * restrict in0, const double * restrict in1,
 		    const double * restrict weight, double missval1, double missval2, long gridsize)
 {
-  long i;
   double sum0, sum1, sum01, wsum0, wsum00;
-  double out;
-
   sum0 = sum1 = sum01 = 0;
   wsum0 = wsum00 = 0;
 
-  for ( i = 0; i < gridsize; ++i )
+  for ( long i = 0; i < gridsize; ++i )
     {
       if ( IS_NOT_EQUAL(weight[i], missval1) && IS_NOT_EQUAL(in0[i], missval1) && IS_NOT_EQUAL(in1[i], missval2) )
 	{
@@ -87,10 +81,10 @@ double covariance_s(const double * restrict in0, const double * restrict in1,
 	}
     }
 
-  out = IS_NOT_EQUAL(wsum0, 0) ?
-        (sum01 * wsum0 - sum0 * sum1) / (wsum0 * wsum0) : missval1;
+  double out = IS_NOT_EQUAL(wsum0, 0) ?
+               (sum01 * wsum0 - sum0 * sum1) / (wsum0 * wsum0) : missval1;
 
-  return (out);
+  return out;
 }
 
 
@@ -98,12 +92,12 @@ void *Fldstat2(void *argument)
 {
   int gridID, lastgridID = -1;
   int gridID3;
-  int wstatus = FALSE;
   int index;
-  int recID, nrecs, nrecs2;
+  int nrecs, nrecs2;
   int varID, levelID;
-  int needWeights = TRUE;
   int nmiss1, nmiss2, nmiss3;
+  bool wstatus = false;
+  bool needWeights = true;
   double missval1, missval2;
   double sglval = 0;
   char varname[CDI_MAX_NAME];
@@ -178,7 +172,7 @@ void *Fldstat2(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamInqRecord(streamID2, &varID, &levelID);
@@ -190,9 +184,9 @@ void *Fldstat2(void *argument)
 	  if ( needWeights && gridID != lastgridID )
 	    {
 	      lastgridID = gridID;
-	      wstatus = gridWeights(gridID, weight);
+	      wstatus = gridWeights(gridID, weight) != 0;
 	    }
-	  if ( wstatus != 0 && tsID == 0 && levelID == 0 )
+	  if ( wstatus && tsID == 0 && levelID == 0 )
 	    {
 	      vlistInqVarName(vlistID1, varID, varname);
 	      cdoWarning("Using constant grid cell area weights for variable %s!", varname);

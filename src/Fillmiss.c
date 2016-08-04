@@ -413,7 +413,7 @@ void setmisstodis(field_t *field1, field_t *field2, int num_neighbors)
 void *Fillmiss(void *argument)
 {
   int nmiss;
-  int nrecs, recID, varID, levelID;
+  int nrecs, varID, levelID;
   void (*fill_method) (field_t *fin , field_t *fout , int) = NULL;
 
   cdoInitialize(argument);
@@ -489,7 +489,7 @@ void *Fillmiss(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);

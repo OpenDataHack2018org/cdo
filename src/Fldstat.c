@@ -41,48 +41,42 @@ static
 void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr,
 		       int vdate, int vtime)
 {
-  static int showHeader = TRUE;
+  static bool showHeader = true;
+  int code = vlistInqVarCode(vlistID, varID);
+
   int year, month, day, hour, minute, second;
-  int code;
-
-  code = vlistInqVarCode(vlistID, varID);
-
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
 
   if ( gridInqType(gridID) == GRID_GAUSSIAN ||
        gridInqType(gridID) == GRID_LONLAT )
     {
-      int i = 0, j, nlon, nlat;
-      double level;
-      level = zaxisInqLevel(vlistInqVarZaxis(vlistID, varID), levelID);
-      nlon  = gridInqXsize(gridID);
-      nlat  = gridInqYsize(gridID);
-      for ( j = 0; j < nlat; ++j )
-	{
-	  for ( i = 0; i < nlon; ++i )
-	    {
-	      if ( DBL_IS_EQUAL(fieldptr[j*nlon+i], sglval) )
-		{
-		  double xval, yval;
-		  xval = gridInqXval(gridID,i);
-		  yval = gridInqYval(gridID,j);
-		  if ( showHeader )
-		    {
-		      if ( operfunc == func_min )
-			fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
-		      else
-			fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
-		      
-		      showHeader = FALSE;
-		    }
+      double level = zaxisInqLevel(vlistInqVarZaxis(vlistID, varID), levelID);
+      int nlon  = gridInqXsize(gridID);
+      int nlat  = gridInqYsize(gridID);
+      for ( int j = 0; j < nlat; ++j )
+        for ( int i = 0; i < nlon; ++i )
+          {
+            if ( DBL_IS_EQUAL(fieldptr[j*nlon+i], sglval) )
+              {
+                double xval, yval;
+                xval = gridInqXval(gridID,i);
+                yval = gridInqYval(gridID,j);
+                if ( showHeader )
+                  {
+                    if ( operfunc == func_min )
+                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
+                    else
+                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
+                    
+                    showHeader = false;
+                  }
 		  
-		  fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
-			  year, month, day, hour, minute, second,
-			  code, level, xval, yval, sglval);
-		}
-	    }
-	}
+                fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
+                        year, month, day, hour, minute, second,
+                        code, level, xval, yval, sglval);
+              }
+          }
     }
 }
 
@@ -91,7 +85,7 @@ void *Fldstat(void *argument)
 {
   int gridID2, lastgrid = -1;
   int index;
-  int recID, nrecs;
+  int nrecs;
   int varID, levelID;
   int nmiss;
   double sglval;
@@ -207,7 +201,7 @@ void *Fldstat(void *argument)
             }
         }
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field.ptr, &nmiss);
