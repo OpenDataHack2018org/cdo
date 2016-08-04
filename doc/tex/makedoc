@@ -1106,6 +1106,10 @@ sub print_description {
     } elsif ( "$kword" eq "\@ENDLIST" ) {
       print TRFILE "\\end{defalist}\n";
       $list = 0;
+    } elsif ( "$kword" eq "\@BEGINTABLE6" ) {
+      print TRFILE "\\begin{tabular}[t]{|l|l|l|l|l|l|}\n";
+      print TRFILE "\\hline\n";
+      $table = 1;
     } elsif ( "$kword" eq "\@BEGINTABLE5" ) {
       print TRFILE "\\begin{tabular}[t]{|l|l|l|l|l|}\n";
       print TRFILE "\\hline\n";
@@ -1243,6 +1247,7 @@ sub print_description {
 	$docline =~ s/\\_/_/g;
 	$docline =~ s/\\cite//og;
 	$docline =~ s/\\neq/!=/og;
+	$docline =~ s/\\exp /^/og;
 	$docline =~ s/\\exp/^/og;
 	$docline =~ s/\\and/&&/og;
 	$docline =~ s/\\or/||/og;

@@ -61,25 +61,25 @@ the type is a global parameter.
 @boldtt{CODE} selects the variables by the ECHAM GRIB1 code number (1-255). The default value @boldtt{-1} processes all detected codes.
 Derived variables computed by the afterburner:
 
-@BeginTable5
-@bold{Code}  & @bold{Name}      & @bold{Longname}                       & @bold{Level}       & @bold{Needed Codes/Computation}
- 34   & low_cld   & low cloud                      & single      & 223 on modellevel  
- 35   & mid_cld   & mid cloud                      & single      & 223 on modellevel  
- 36   & hih_cld   & high cloud                     & single      & 223 on modellevel  
- 131  & u         & u-velocity                     & atm (ml+pl) & 138, 155           
- 132  & v         & v-velocity                     & atm (ml+pl) & 138, 155           
- 135  & omega     & vertical velocity              & atm (ml+pl) & 138, 152, 155      
- 148  & stream    & streamfunction                 & atm (ml+pl) & 131, 132           
- 149  & velopot   & velocity potential             & atm (ml+pl) & 131, 132           
- 151  & slp       & mean sea level pressure        & surface     & 129, 130, 152       
- 156  & geopoth   & geopotential height            & atm (ml+pl) & 129, 130, 133, 152 
- 157  & rhumidity & relative humidity              & atm (ml+pl) & 130, 133, 152      
- 189  & sclfs     & surface solar cloud forcing    & surface     & 176-185            
- 190  & tclfs     & surface thermal cloud forcing  & surface     & 177-186            
- 191  & sclf0     & top solar cloud forcing        & surface     & 178-187             
- 192  & tclf0     & top thermal cloud forcing      & surface     & 179-188            
- 259  & windspeed & windspeed                      & atm (ml+pl) & sqrt(u*u+v*v)      
- 260  & precip    & total precipitation            & surface     & 142+143            
+@BeginTable6
+@bold{Code}  & @bold{Name}      & @bold{Longname}                       & @bold{Units} & @bold{Level}       & @bold{Needed Codes}
+ 34   & low_cld   & low cloud                      &       & single      & 223 on modellevel  
+ 35   & mid_cld   & mid cloud                      &       & single      & 223 on modellevel  
+ 36   & hih_cld   & high cloud                     &       & single      & 223 on modellevel  
+ 131  & u         & u-velocity                     & m/s   & atm (ml+pl) & 138, 155           
+ 132  & v         & v-velocity                     & m/s   & atm (ml+pl) & 138, 155           
+ 135  & omega     & vertical velocity              & Pa/s  & atm (ml+pl) & 138, 152, 155      
+ 148  & stream    & streamfunction                 & m\exp 2/s & atm (ml+pl) & 131, 132           
+ 149  & velopot   & velocity potential             & m\exp 2/s & atm (ml+pl) & 131, 132           
+ 151  & slp       & mean sea level pressure        & Pa    & surface     & 129, 130, 152       
+ 156  & geopoth   & geopotential height            & m     & atm (ml+pl) & 129, 130, 133, 152 
+ 157  & rhumidity & relative humidity              &       & atm (ml+pl) & 130, 133, 152      
+ 189  & sclfs     & surface solar cloud forcing    &       & surface     & 176-185            
+ 190  & tclfs     & surface thermal cloud forcing  &       & surface     & 177-186            
+ 191  & sclf0     & top solar cloud forcing        &       & surface     & 178-187             
+ 192  & tclf0     & top thermal cloud forcing      &       & surface     & 179-188            
+ 259  & windspeed & windspeed                      & m/s   & atm (ml+pl) & sqrt(u*u+v*v)      
+ 260  & precip    & total precipitation            &       & surface     & 142+143            
 @EndTable
 
 @boldtt{LEVEL} selects the hybrid or pressure levels. The allowed values depends on the parameter @boldtt{TYPE}.
