@@ -1138,18 +1138,20 @@ int gridFromFile(FILE *gfp, const char *dname)
 
       if ( cmpstrlen(pline, "ATTR_TXT_", len)  == 0 )
 	{
-          printf("%s\n", pline);
           pline = read_att_name(pline, len, &attname, &attlen);
 
           if ( *pline == '"' ) pline++;
           char *atttxt = pline;
           for ( int i = 0; i < attlen; ++i ) pline++;
           if ( *pline == '"' ) *pline = 0;
+
+          if ( strcmp(attname, "grid_mapping_name") == 0 )
+              cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(atttxt)+1, atttxt);
+
           vlistDefAttTxt(gridID, CDI_GLOBAL, attname, (int)strlen(atttxt), atttxt);
 	}
       else if ( cmpstrlen(pline, "ATTR_INT_", len)  == 0 )
 	{
-          printf("%s\n", pline);
           pline = read_att_name(pline, len, &attname, &attlen);
 
           int *attint = (int*) Malloc(attlen*sizeof(int));
@@ -1162,7 +1164,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "ATTR_FLT_", len)  == 0 )
 	{
-          printf("%s\n", pline);
           pline = read_att_name(pline, len, &attname, &attlen);
 
           double *attflt = (double*) Malloc(attlen*sizeof(double));
