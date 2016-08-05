@@ -166,6 +166,7 @@ int gridDefine(griddes_t grid)
     case GRID_GENERIC:
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
+    case GRID_PROJECTION:
     case GRID_SINUSOIDAL:
     case GRID_LAEA:
       {
@@ -521,6 +522,22 @@ char *skipSeparator(char *pline)
   return pline;
 }
 
+static
+char *read_att_name(char *pline, int len, char **attname, int *attlen)
+{
+  pline += len;
+  *attlen = atol(pline);
+  while ( isdigit(*pline) ) pline++;
+  pline = skipSeparator(pline);
+  *attname = pline;
+  while ( *pline != ' ' && *pline != '=' && *pline != 0 ) pline++;
+  char *endname = pline;
+  pline = skipSeparator(pline);
+  *endname = 0;
+
+  return pline;
+}
+
 
 void fnmexp2(char *out, char *in1, const char *in2)
 {
@@ -678,6 +695,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_SINUSOIDAL;
 	  else if ( cmpstrlen(pline, "laea", len)  == 0 )
 	    grid.type = GRID_LAEA;
+	  else if ( cmpstrlen(pline, "projection", len)  == 0 )
+	    grid.type = GRID_PROJECTION;
 	  else if ( cmpstrlen(pline, "generic", len)  == 0 )
 	    grid.type = GRID_GENERIC;
 	  else
@@ -1069,6 +1088,18 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      if ( grid.nvertex == 0 ) cdoAbort("nvertex undefined!", dname);
 	    }
 	}
+      else if ( cmpstrlen(pline, "ATTR_TXT", len)  == 0 )
+	{
+          break;
+	}
+      else if ( cmpstrlen(pline, "ATTR_INT", len)  == 0 )
+	{
+          break;
+	}
+      else if ( cmpstrlen(pline, "ATTR_FLT", len)  == 0 )
+	{
+          break;
+	}
       else
 	{
 	  if ( grid.type != UNDEFID )
@@ -1082,6 +1113,71 @@ int gridFromFile(FILE *gfp, const char *dname)
   printf("ysize %d\n", grid.ysize);
   */
   int gridID = (grid.type == UNDEFID ) ? -1 : gridDefine(grid);
+
+  // define attributes
+  int attlen;
+  char *attname;
+  do
+    {
+      if ( line[0] == '#' ) continue;
+      if ( line[0] == '\0' ) continue;
+      size_t len = strlen(line);
+
+      bool lerror = false;
+      for ( size_t i = 0; i < len; ++i )
+	if ( !(line[i] == 9 || (line[i] > 31 && line[i] < 127)) )
+	  {
+	    lerror = true;
+	    line[i] = '#';
+	  }
+      if ( lerror ) cdoAbort("Grid description file >%s< contains illegal characters (line: %s)!", dname, line);
+
+      pline = line;
+      while ( isspace((int) *pline) ) pline++;
+      if ( pline[0] == '\0' ) continue;
+
+      if ( cmpstrlen(pline, "ATTR_TXT_", len)  == 0 )
+	{
+          printf("%s\n", pline);
+          pline = read_att_name(pline, len, &attname, &attlen);
+
+          if ( *pline == '"' ) pline++;
+          char *atttxt = pline;
+          for ( int i = 0; i < attlen; ++i ) pline++;
+          if ( *pline == '"' ) *pline = 0;
+          vlistDefAttTxt(gridID, CDI_GLOBAL, attname, (int)strlen(atttxt), atttxt);
+	}
+      else if ( cmpstrlen(pline, "ATTR_INT_", len)  == 0 )
+	{
+          printf("%s\n", pline);
+          pline = read_att_name(pline, len, &attname, &attlen);
+
+          int *attint = (int*) Malloc(attlen*sizeof(int));
+          double *attflt = (double*) Malloc(attlen*sizeof(double));
+          read_field("attint", pline, attlen, attflt, &lineno, gfp, dname);
+          for ( int i = 0; i < attlen; ++i ) attint[i] = (int)lround(attflt[i]);
+          vlistDefAttInt(gridID, CDI_GLOBAL, attname, DATATYPE_INT32, attlen, attint);
+          free(attint);
+          free(attflt);
+	}
+      else if ( cmpstrlen(pline, "ATTR_FLT_", len)  == 0 )
+	{
+          printf("%s\n", pline);
+          pline = read_att_name(pline, len, &attname, &attlen);
+
+          double *attflt = (double*) Malloc(attlen*sizeof(double));
+          read_field("attflt", pline, attlen, attflt, &lineno, gfp, dname);
+          vlistDefAttFlt(gridID, CDI_GLOBAL, attname, DATATYPE_FLT64, attlen, attflt);
+          free(attflt);
+	}
+      else
+	{
+          cdoAbort("Invalid grid command : >%s< (line: %d file: %s)", pline, lineno, dname);
+	}
+
+      lineno++;
+    }
+  while ( readline(gfp, line, MAX_LINE_LEN) );
 
   return gridID;
 }
