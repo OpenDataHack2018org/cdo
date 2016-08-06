@@ -127,9 +127,8 @@ void *CDIwrite(void *argument)
   if ( operatorArgc() >= 4 ) ntimesteps = parameter2int(operatorArgv()[3]);
   if ( operatorArgc() >= 5 ) nvars = parameter2int(operatorArgv()[4]);
 
-  if ( nruns <  0 ) nruns = 0;
-  if ( nruns > 99 ) nruns = 99;
-
+  if ( nruns <    0 ) nruns = 0;
+  if ( nruns > 9999 ) nruns = 9999;
 
   if ( nlevs <= 0  ) nlevs = 1;
   if ( nlevs > 255 ) nlevs = 255;
