@@ -526,8 +526,14 @@ static
 char *read_att_name(char *pline, int len, char **attname, int *attlen)
 {
   pline += len;
-  *attlen = atol(pline);
-  while ( isdigit(*pline) ) pline++;
+  if ( *pline == '_' )
+    {
+      pline++;
+      *attlen = atol(pline);
+      while ( isdigit(*pline) ) pline++;
+    }
+  else *attlen = 1;
+
   pline = skipSeparator(pline);
   *attname = pline;
   while ( *pline != ' ' && *pline != '=' && *pline != 0 ) pline++;
@@ -1136,21 +1142,20 @@ int gridFromFile(FILE *gfp, const char *dname)
       while ( isspace((int) *pline) ) pline++;
       if ( pline[0] == '\0' ) continue;
 
-      if ( cmpstrlen(pline, "ATTR_TXT_", len)  == 0 )
+      if ( cmpstrlen(pline, "ATTR_TXT", len)  == 0 )
 	{
           pline = read_att_name(pline, len, &attname, &attlen);
 
           if ( *pline == '"' ) pline++;
           char *atttxt = pline;
-          for ( int i = 0; i < attlen; ++i ) pline++;
+          while ( *pline != 0 && *pline != '"' ) pline++;
           if ( *pline == '"' ) *pline = 0;
 
           if ( strcmp(attname, "grid_mapping_name") == 0 )
-              cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(atttxt)+1, atttxt);
-
+            cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(atttxt)+1, atttxt);
           vlistDefAttTxt(gridID, CDI_GLOBAL, attname, (int)strlen(atttxt), atttxt);
 	}
-      else if ( cmpstrlen(pline, "ATTR_INT_", len)  == 0 )
+      else if ( cmpstrlen(pline, "ATTR_INT", len)  == 0 )
 	{
           pline = read_att_name(pline, len, &attname, &attlen);
 
@@ -1162,7 +1167,7 @@ int gridFromFile(FILE *gfp, const char *dname)
           free(attint);
           free(attflt);
 	}
-      else if ( cmpstrlen(pline, "ATTR_FLT_", len)  == 0 )
+      else if ( cmpstrlen(pline, "ATTR_FLT", len)  == 0 )
 	{
           pline = read_att_name(pline, len, &attname, &attlen);
 
