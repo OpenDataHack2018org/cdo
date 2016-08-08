@@ -41,15 +41,15 @@ void printAtts(FILE *fp, int vlistID, int varID)
   int attint[MAXATT];
   double attflt[MAXATT];
 
-  vlistInqNatts(vlistID, varID, &natts);
+  cdiInqNatts(vlistID, varID, &natts);
 
   for ( int ia = 0; ia < natts; ++ia )
     {
-      vlistInqAtt(vlistID, varID, ia, attname, &atttype, &attlen);
+      cdiInqAtt(vlistID, varID, ia, attname, &atttype, &attlen);
       if ( atttype == DATATYPE_INT )
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
-	  vlistInqAttInt(vlistID, varID, attname, attlen, attint);
+	  cdiInqAttInt(vlistID, varID, attname, attlen, attint);
 	  fprintf(fp, "  %s=", attname);
 	  for ( int i = 0; i < attlen; ++i)
 	    {
@@ -61,7 +61,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
       else if ( atttype == DATATYPE_FLT )
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
-	  vlistInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
+	  cdiInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
 	  fprintf(fp, "  %s=", attname);
 	  for ( int i = 0; i < attlen; ++i)
 	    {
@@ -72,7 +72,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 	}
       else if ( atttype == DATATYPE_TXT )
 	{
-	  vlistInqAttTxt(vlistID, varID, attname, sizeof(atttxt), atttxt);
+	  cdiInqAttTxt(vlistID, varID, attname, sizeof(atttxt), atttxt);
 	  atttxt[attlen] = 0;
 	  fprintf(fp, "  %s=\"%s\"\n", attname, atttxt);
 	}
@@ -120,7 +120,7 @@ void partab(FILE *fp, int streamID, int option)
   if ( option == 2 )
     {
       int natts;
-      vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+      cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
       if ( natts > 0 )
 	{
 	  fprintf(fp, "&parameter\n");

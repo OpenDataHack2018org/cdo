@@ -1148,7 +1148,7 @@ int gridFromFile(FILE *gfp, const char *dname)
           if ( strcmp(attname, "grid_mapping_name") == 0 )
               cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(atttxt)+1, atttxt);
 
-          vlistDefAttTxt(gridID, CDI_GLOBAL, attname, (int)strlen(atttxt), atttxt);
+          cdiDefAttTxt(gridID, CDI_GLOBAL, attname, (int)strlen(atttxt), atttxt);
 	}
       else if ( cmpstrlen(pline, "ATTR_INT_", len)  == 0 )
 	{
@@ -1158,7 +1158,7 @@ int gridFromFile(FILE *gfp, const char *dname)
           double *attflt = (double*) Malloc(attlen*sizeof(double));
           read_field("attint", pline, attlen, attflt, &lineno, gfp, dname);
           for ( int i = 0; i < attlen; ++i ) attint[i] = (int)lround(attflt[i]);
-          vlistDefAttInt(gridID, CDI_GLOBAL, attname, DATATYPE_INT32, attlen, attint);
+          cdiDefAttInt(gridID, CDI_GLOBAL, attname, DATATYPE_INT32, attlen, attint);
           free(attint);
           free(attflt);
 	}
@@ -1168,7 +1168,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 
           double *attflt = (double*) Malloc(attlen*sizeof(double));
           read_field("attflt", pline, attlen, attflt, &lineno, gfp, dname);
-          vlistDefAttFlt(gridID, CDI_GLOBAL, attname, DATATYPE_FLT64, attlen, attflt);
+          cdiDefAttFlt(gridID, CDI_GLOBAL, attname, DATATYPE_FLT64, attlen, attflt);
           free(attflt);
 	}
       else

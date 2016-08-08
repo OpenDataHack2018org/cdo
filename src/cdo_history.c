@@ -122,7 +122,7 @@ void cdoDefHistory(int fileID, char *histstring)
 void cdo_def_creation_date(int vlistID)
 {
   if ( strlen(datetimestr) == 0 ) init_strtime();
-  vlistDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int)strlen(datetimestr), datetimestr);
+  cdiDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int)strlen(datetimestr), datetimestr);
 }
 
 
@@ -141,5 +141,5 @@ void cdo_def_tracking_id(int vlistID, const char *uuid_attribute)
 {
   char uuidstr[UUIDSTR_SIZE];
   get_uuid(uuidstr);
-  vlistDefAttTxt(vlistID, CDI_GLOBAL, uuid_attribute, UUIDSTR_SIZE, uuidstr);
+  cdiDefAttTxt(vlistID, CDI_GLOBAL, uuid_attribute, UUIDSTR_SIZE, uuidstr);
 }

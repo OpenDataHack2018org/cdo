@@ -192,7 +192,7 @@ void *Timstat(void *argument)
   if      ( comparelen == DAY_LEN )  freq = "day";
   else if ( comparelen == MON_LEN )  freq = "mon";
   else if ( comparelen == YEAR_LEN ) freq = "year";
-  if ( freq ) vlistDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
+  if ( freq ) cdiDefAttTxt(vlistID2, CDI_GLOBAL, "frequency", (int)strlen(freq), freq);
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 

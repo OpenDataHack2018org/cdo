@@ -152,29 +152,29 @@ static void dump_global_attributes(struct kv **ht, int streamID)
 {
   int natts;
   int vlistID = streamInqVlist(streamID);
-  vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+  cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
   for ( int i = 0; i < natts; i++ )
     {
       char name[CDI_MAX_NAME];
       char *value = NULL;
       char buffer[8];
       int type, len;
-      vlistInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
+      cdiInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
       switch ( type )
         {
         case DATATYPE_TXT:
           value = Malloc(len + 1);
-          vlistInqAttTxt(vlistID, CDI_GLOBAL, name, len, value);
+          cdiInqAttTxt(vlistID, CDI_GLOBAL, name, len, value);
           value[len] = '\0';
           break;
         case DATATYPE_INT32:
           value = Malloc(CDI_MAX_NAME);
-          vlistInqAttInt(vlistID, CDI_GLOBAL, name, len, (int *)buffer);
+          cdiInqAttInt(vlistID, CDI_GLOBAL, name, len, (int *)buffer);
           snprintf(value, CDI_MAX_NAME, "%i", *(int *)buffer);
           break;
         case DATATYPE_FLT64:
           value = Malloc(CDI_MAX_NAME);
-          vlistInqAttFlt(vlistID, CDI_GLOBAL, name, len, (double *)buffer);
+          cdiInqAttFlt(vlistID, CDI_GLOBAL, name, len, (double *)buffer);
           snprintf(value, CDI_MAX_NAME, "%e", *(double *)buffer);
           break;
         default:
@@ -193,7 +193,7 @@ static void dump_special_attributes(struct kv **ht, int streamID)
   char *new_history = get_val(ht, "history", "");
   size_t historysize;
   int natts;
-  vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+  cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
   if ( natts > 0 )
     old_historysize = (size_t) streamInqHistorySize(fileID);
   else
