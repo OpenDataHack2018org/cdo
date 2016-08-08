@@ -533,9 +533,10 @@ bool is_global_grid(int gridID)
   int gridtype = gridInqType(gridID);
   int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
   if ( (gridtype == GRID_LONLAT && gridIsRotated(gridID)) ||
-       (projtype == CDI_PROJ_RLL) ||
+       (projtype == CDI_PROJ_RLL)  ||
        (projtype == CDI_PROJ_LAEA) ||
        (projtype == CDI_PROJ_SINU) ||
+       (projtype == CDI_PROJ_LCC)  ||
        (gridtype == GRID_LONLAT && non_global) ||
        (gridtype == GRID_LCC) ||
        (gridtype == GRID_LAEA) ||
@@ -548,20 +549,15 @@ bool is_global_grid(int gridID)
 static
 void scale_gridbox_area(long gridsize, const double *restrict array1, long gridsize2, double *restrict array2, const double *restrict grid2_area)
 {
-  static bool lgridboxinfo = true;
-  long i;
   double array1sum = 0;
+  for ( long i = 0; i < gridsize; i++ ) array1sum += array1[i];
+
   double array2sum = 0;
+  for ( long i = 0; i < gridsize2; i++ ) array2sum += grid2_area[i];
 
-  for ( i = 0; i < gridsize; i++ )
-    array1sum += array1[i];
+  for ( long i = 0; i < gridsize2; i++ ) array2[i] = grid2_area[i]/array2sum*array1sum;
 
-  for ( i = 0; i < gridsize2; i++ )
-    array2sum += grid2_area[i];
-
-  for ( i = 0; i < gridsize2; i++ )
-    array2[i] = grid2_area[i]/array2sum*array1sum;
-
+  static bool lgridboxinfo = true;
   if ( lgridboxinfo )
     {
       cdoPrint("gridbox_area replaced and scaled to %g", array1sum);
@@ -585,6 +581,7 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, bool *remapgrids)
            projtype != CDI_PROJ_RLL     &&
            projtype != CDI_PROJ_LAEA    &&
            projtype != CDI_PROJ_SINU    &&
+           projtype != CDI_PROJ_LCC     &&
 	   gridtype != GRID_GAUSSIAN    &&
 	   gridtype != GRID_LCC         &&
 	   gridtype != GRID_LAEA        &&

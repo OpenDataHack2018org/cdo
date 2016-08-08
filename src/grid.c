@@ -548,8 +548,55 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0)
                   double attflt;
                   vlistInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, &attflt);
                   if      ( strcmp(attname, "earth_radius") == 0 )                    *a     = attflt;
-                  else if ( strcmp(attname, "longitude_of_projection_origin")  == 0 ) *lon_0 = attflt;
+                  else if ( strcmp(attname, "longitude_of_projection_origin") == 0 )  *lon_0 = attflt;
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )   *lat_0 = attflt;
+                }
+            }
+        }
+      else
+        Warning("%s mapping parameter missing!", projection);
+    }
+}
+
+static
+void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, double *lat_1, double *lat_2)
+{
+  *a = 0; *lon_0 = 0; *lat_0 = 0; *lat_1 = 0, *lat_2 = 0;
+
+  int gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_LCC2 )
+    gridInqLcc2(gridID, a , lon_0, lat_0, lat_1, lat_2);
+  else
+    {
+      const char *projection = "lambert_conformal_conic";
+      char mapping[CDI_MAX_NAME]; mapping[0] = 0;
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
+      if ( mapping[0] && strcmp(mapping, projection) == 0 )
+        {
+          int atttype, attlen;
+          char attname[CDI_MAX_NAME+1];
+
+          int natts;
+          vlistInqNatts(gridID, CDI_GLOBAL, &natts);
+
+          for ( int iatt = 0; iatt < natts; ++iatt )
+            {
+              vlistInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
+
+              if ( attlen > 2 ) continue;
+
+              if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
+                {
+                  double attflt[2];
+                  vlistInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, attflt);
+                  if      ( strcmp(attname, "earth_radius") == 0 )                   *a     = attflt[0];
+                  else if ( strcmp(attname, "longitude_of_central_meridian") == 0 )  *lon_0 = attflt[0];
+                  else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )  *lat_0 = attflt[0];
+                  else if ( strcmp(attname, "standard_parallel") == 0 )
+                    {
+                      *lat_1 = attflt[0];
+                      if ( attlen == 2 ) *lat_2 = attflt[1];
+                    }
                 }
             }
         }
@@ -610,7 +657,7 @@ void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   projUV data, res;
 
   double a, lon_0, lat_0, lat_1, lat_2;
-  gridInqLcc2(gridID, &a , &lon_0, &lat_0, &lat_1, &lat_2);
+  grid_inq_param_lcc(gridID, &a , &lon_0, &lat_0, &lat_1, &lat_2);
 
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
@@ -940,9 +987,9 @@ int gridToCurvilinear(int gridID1, int lbounds)
   int gridID2 = gridCreate(GRID_CURVILINEAR, (int) gridsize);
   gridDefPrec(gridID2, DATATYPE_FLT32);
 
-  bool lproj_rll   = false;
-  bool lproj_laea  = false;
-  bool lproj_lcc   = false;
+  bool lproj_rll  = false;
+  bool lproj_laea = false;
+  bool lproj_lcc  = false;
   bool lproj_sinu = false;
   if ( gridtype == GRID_PROJECTION )
     {
@@ -1075,7 +1122,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		  {
 		    laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
 		  }
-		else if ( gridtype == GRID_LCC2 )
+		else if ( gridtype == GRID_LCC2 || lproj_lcc )
 		  {
 		    lcc2_to_geo(gridID1, gridsize, xvals2D, yvals2D);
 		  }
@@ -1158,7 +1205,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		ybounds = (double*) Malloc(2*ny*sizeof(double));
 		if ( gridtype == GRID_SINUSOIDAL || lproj_sinu || 
 		     gridtype == GRID_LAEA || lproj_laea || 
-		     gridtype == GRID_LCC2 )
+		     gridtype == GRID_LCC2 || lproj_lcc )
 		  grid_gen_bounds(ny, yvals, ybounds);
 		else
 		  {
@@ -1180,7 +1227,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		  {
 		    if ( gridtype == GRID_SINUSOIDAL || lproj_sinu ||
 			 gridtype == GRID_LAEA || lproj_laea || 
-			 gridtype == GRID_LCC2 )
+			 gridtype == GRID_LCC2 || lproj_lcc )
 		      {
 			for ( int j = 0; j < ny; j++ )
 			  for ( int i = 0; i < nx; i++ )
@@ -1216,7 +1263,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 			  }
 			else if ( gridtype == GRID_LAEA || lproj_laea )
 			  laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
-			else if ( gridtype == GRID_LCC2 )
+			else if ( gridtype == GRID_LCC2 || lproj_lcc )
 			  lcc2_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
 		      }
 		    else
@@ -1806,6 +1853,7 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype == GRID_LAEA        ||
 	   projtype == CDI_PROJ_RLL     ||
 	   projtype == CDI_PROJ_LAEA    ||
+	   projtype == CDI_PROJ_LCC     ||
 	   projtype == CDI_PROJ_SINU    ||
 	   gridtype == GRID_SINUSOIDAL  ||
 	   gridtype == GRID_GME         ||

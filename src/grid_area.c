@@ -302,6 +302,7 @@ int gridGenArea(int gridID, double* area)
        projtype != CDI_PROJ_RLL     &&
        projtype != CDI_PROJ_LAEA    &&
        projtype != CDI_PROJ_SINU    &&
+       projtype != CDI_PROJ_LCC     &&
        gridtype != GRID_SINUSOIDAL  &&
        gridtype != GRID_GME         &&
        gridtype != GRID_CURVILINEAR &&
