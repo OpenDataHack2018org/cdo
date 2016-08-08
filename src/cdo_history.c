@@ -122,7 +122,7 @@ void cdoDefHistory(int fileID, char *histstring)
 void cdo_def_creation_date(int vlistID)
 {
   if ( strlen(datetimestr) == 0 ) init_strtime();
-  vlistDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int)strlen(datetimestr)+1, datetimestr);
+  vlistDefAttTxt(vlistID, CDI_GLOBAL, "creation_date", (int)strlen(datetimestr), datetimestr);
 }
 
 

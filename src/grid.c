@@ -498,7 +498,7 @@ void grid_def_param_sinu(int gridID)
   const char *mapvarname = "Sinusoidal";
   cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
 
-  vlistDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection)+1, projection);
+  vlistDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
 }
 
 
@@ -509,7 +509,7 @@ void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
   const char *mapvarname = "Lambert_AEA";
   cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
 
-  vlistDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection)+1, projection);
+  vlistDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
   
   vlistDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", DATATYPE_FLT64, 1, &a);
   vlistDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", DATATYPE_FLT64, 1, &lon_0);

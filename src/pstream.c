@@ -1107,7 +1107,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
         }
 
       if ( CDO_Version_Info )
-        vlistDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment());
+        vlistDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment()), cdoComment());
 
 #if defined(_OPENMP)
       if ( ompNumThreads > 1 )
