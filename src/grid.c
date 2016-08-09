@@ -1070,7 +1070,7 @@ char *grid_get_proj4param(int gridID)
 
 int gridToCurvilinear(int gridID1, int lbounds)
 {
-  long index;
+  int index;
   int gridtype = gridInqType(gridID1);
 
   int nx = gridInqXsize(gridID1);
