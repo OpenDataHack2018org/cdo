@@ -207,7 +207,7 @@ static
 void defineVarAttText(int vlistID2, int varID, const char *attname, const char *atttext)
 {
   int len = strlen(atttext);
-  vlistDefAttTxt(vlistID2, varID, attname, len, atttext);
+  cdiDefAttTxt(vlistID2, varID, attname, len, atttext);
 }
 
 static

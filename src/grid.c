@@ -498,7 +498,7 @@ void grid_def_param_sinu(int gridID)
   const char *mapvarname = "Sinusoidal";
   cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
 
-  vlistDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
+  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
 }
 
 
@@ -509,11 +509,11 @@ void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
   const char *mapvarname = "Lambert_AEA";
   cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
 
-  vlistDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
+  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
   
-  vlistDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", DATATYPE_FLT64, 1, &a);
-  vlistDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", DATATYPE_FLT64, 1, &lon_0);
-  vlistDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin", DATATYPE_FLT64, 1, &lat_0);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", DATATYPE_FLT64, 1, &a);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", DATATYPE_FLT64, 1, &lon_0);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin", DATATYPE_FLT64, 1, &lat_0);
 }
 
 static
@@ -535,18 +535,18 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0)
           char attname[CDI_MAX_NAME+1];
 
           int natts;
-          vlistInqNatts(gridID, CDI_GLOBAL, &natts);
+          cdiInqNatts(gridID, CDI_GLOBAL, &natts);
 
           for ( int iatt = 0; iatt < natts; ++iatt )
             {
-              vlistInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
+              cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
 
               if ( attlen != 1 ) continue;
 
               if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
                 {
                   double attflt;
-                  vlistInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, &attflt);
+                  cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, &attflt);
                   if      ( strcmp(attname, "earth_radius") == 0 )                    *a     = attflt;
                   else if ( strcmp(attname, "longitude_of_projection_origin") == 0 )  *lon_0 = attflt;
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )   *lat_0 = attflt;
@@ -577,18 +577,18 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
           char attname[CDI_MAX_NAME+1];
 
           int natts;
-          vlistInqNatts(gridID, CDI_GLOBAL, &natts);
+          cdiInqNatts(gridID, CDI_GLOBAL, &natts);
 
           for ( int iatt = 0; iatt < natts; ++iatt )
             {
-              vlistInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
+              cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
 
               if ( attlen > 2 ) continue;
 
               if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
                 {
                   double attflt[2];
-                  vlistInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, attflt);
+                  cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, attflt);
                   if      ( strcmp(attname, "earth_radius") == 0 )                   *a     = attflt[0];
                   else if ( strcmp(attname, "longitude_of_central_meridian") == 0 )  *lon_0 = attflt[0];
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )  *lat_0 = attflt[0];

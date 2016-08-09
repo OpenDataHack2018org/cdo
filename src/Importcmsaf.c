@@ -1315,17 +1315,17 @@ void get_global_att(hid_t file_id, const char *obj_path, int vlistID)
       if ( type_class == H5T_STRING )
 	{
 	  H5Aread(attr, atype_mem, attstring);
-	  vlistDefAttTxt(vlistID, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
+	  cdiDefAttTxt(vlistID, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
 	}
       else if ( type_class == H5T_INTEGER )
 	{
 	  H5Aread(attr, H5T_NATIVE_INT, &attint);
-	  vlistDefAttInt(vlistID, CDI_GLOBAL, attname, DATATYPE_INT32, 1, &attint);
+	  cdiDefAttInt(vlistID, CDI_GLOBAL, attname, DATATYPE_INT32, 1, &attint);
 	}
       else if ( type_class == H5T_FLOAT )
 	{
 	  H5Aread(attr, H5T_NATIVE_DOUBLE, &attflt);
-	  vlistDefAttFlt(vlistID, CDI_GLOBAL, attname, DATATYPE_FLT64, 1, &attflt);
+	  cdiDefAttFlt(vlistID, CDI_GLOBAL, attname, DATATYPE_FLT64, 1, &attflt);
 	}
       H5Tclose(atype_mem);
       H5Aclose(attr);
@@ -1345,17 +1345,17 @@ int get_vdate(int vlistID)
   char name[CDI_MAX_NAME];
   char attstr[CDI_MAX_NAME];
 
-  vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+  cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
 
   for ( i = 0; i < natts; ++i )
     {
-      vlistInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
+      cdiInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
       if ( type == DATATYPE_TXT )
 	{
 	  if ( strcmp(name, "DateAndTime") == 0 ||
 	       strcmp(name, "Date_Time") == 0 )
 	    {
-	      vlistInqAttTxt(vlistID, CDI_GLOBAL, name, CDI_MAX_NAME, attstr);
+	      cdiInqAttTxt(vlistID, CDI_GLOBAL, name, CDI_MAX_NAME, attstr);
 	      if ( len > 8 ) len = 8;
 	      attstr[len] = 0;
 	      vdate = atoi(attstr);
@@ -1538,7 +1538,7 @@ void *Importcmsaf(void *argument)
       if ( dsets.obj[ivar].units )
 	vlistDefVarUnits(vlistID, varID,  dsets.obj[ivar].units);
       if ( dsets.obj[ivar].title )
-	vlistDefAttTxt(vlistID, varID, "title", (int)strlen(dsets.obj[ivar].title),
+	cdiDefAttTxt(vlistID, varID, "title", (int)strlen(dsets.obj[ivar].title),
 		       dsets.obj[ivar].title);
 
       /*

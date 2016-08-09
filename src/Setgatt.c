@@ -75,7 +75,7 @@ void *Setgatt(void *argument)
 
   if ( operatorID == SETGATT )
     {
-      vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
+      cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
     }
   else
     {
@@ -111,7 +111,7 @@ void *Setgatt(void *argument)
 	    }
 
 	  if ( attstring && attlen)
-	    vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
+	    cdiDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
 	}
 
       fclose(fp);
