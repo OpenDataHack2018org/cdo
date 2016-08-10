@@ -21,11 +21,8 @@
 #include "pstream.h"
 
 
-
 void *Gridsearch(void *argument)
 {
-  int gridID1, gridID2;
-
   cdoInitialize(argument);
 
   cdoOperatorAdd("testpointsearch",  0,   0, NULL);
@@ -33,8 +30,8 @@ void *Gridsearch(void *argument)
 
   operatorInputArg("source and target grid description file or name");
   operatorCheckArgc(2);
-  gridID1 = cdoDefineGrid(operatorArgv()[0]);
-  gridID2 = cdoDefineGrid(operatorArgv()[1]);
+  int gridID1 = cdoDefineGrid(operatorArgv()[0]);
+  int gridID2 = cdoDefineGrid(operatorArgv()[1]);
 
   cdoFinish();
 

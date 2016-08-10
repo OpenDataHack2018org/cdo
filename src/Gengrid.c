@@ -29,55 +29,45 @@
 
 void *Gengrid(void *argument)
 {
-  int streamID1, streamID2, streamID3;
-  int vlistID1, vlistID2, vlistID3;
-  int gridID1, gridID2, gridID3;
-  int zaxisID3;
-  int datatype;
-  int tsID, varID, levelID;
-  int gridsize, i;
-  int xsize, ysize;
+  int varID, levelID;
   int nmiss1, nmiss2;
-  int taxisID3;
-  double *array1, *array2, *array3;
   double missval = 0;
-  double xminval, xmaxval, yminval, ymaxval;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
 
-  gridID1 = vlistGrid(vlistID1, 0);
-  gridID2 = vlistGrid(vlistID2, 0);
+  int gridID1 = vlistGrid(vlistID1, 0);
+  int gridID2 = vlistGrid(vlistID2, 0);
 
   if ( gridInqSize(gridID1) != gridInqSize(gridID2) )
     cdoAbort("Arrays have different grid size!");
 
-  gridsize = gridInqSize(gridID1);
-  xsize = gridInqXsize(gridID1);
-  ysize = gridInqYsize(gridID1);
+  int gridsize = gridInqSize(gridID1);
+  int xsize = gridInqXsize(gridID1);
+  int ysize = gridInqYsize(gridID1);
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
-  array3 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array3 = (double*) Malloc(gridsize*sizeof(double));
 
   streamInqRecord(streamID1, &varID, &levelID);
   streamReadRecord(streamID1, array1, &nmiss1);
   streamInqRecord(streamID2, &varID, &levelID);
   streamReadRecord(streamID2, array2, &nmiss2);
 
-  datatype = vlistInqVarDatatype(vlistID1, 0);
+  int datatype = vlistInqVarDatatype(vlistID1, 0);
 
   streamClose(streamID2);
   streamClose(streamID1);
 
   if ( nmiss1 || nmiss2 ) cdoAbort("Missing values unsupported!");
 
-  gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
+  int gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
 
   if ( cdoVerbose ) cdoPrint("xsize %d  ysize %d", xsize, ysize);
   if ( xsize*ysize != gridsize )
@@ -93,11 +83,11 @@ void *Gengrid(void *argument)
   else
     gridDefPrec(gridID3, DATATYPE_FLT32);
 
-  xminval = array1[0];
-  xmaxval = array1[0];
-  yminval = array2[0];
-  ymaxval = array2[0];
-  for ( i = 1; i < gridsize; ++i )
+  double xminval = array1[0];
+  double xmaxval = array1[0];
+  double yminval = array2[0];
+  double ymaxval = array2[0];
+  for ( int i = 1; i < gridsize; ++i )
     {
       if ( array1[i] < xminval ) xminval = array1[i];
       if ( array1[i] > xmaxval ) xmaxval = array1[i];
@@ -124,26 +114,26 @@ void *Gengrid(void *argument)
       cdoAbort("Units undefined!");
     }
 
-  zaxisID3 = zaxisCreate(ZAXIS_SURFACE, 1);
+  int zaxisID3 = zaxisCreate(ZAXIS_SURFACE, 1);
 
-  vlistID3 = vlistCreate();
+  int vlistID3 = vlistCreate();
   vlistDefVar(vlistID3, gridID3, zaxisID3, TSTEP_CONSTANT);
   vlistDefVarMissval(vlistID3, 0, missval);
   vlistDefVarName(vlistID3, 0, "dummy");
   vlistDefVarDatatype(vlistID3, 0, DATATYPE_INT8);
 
-  taxisID3 = taxisCreate(TAXIS_ABSOLUTE);
+  int taxisID3 = taxisCreate(TAXIS_ABSOLUTE);
 
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  tsID = 0;
+  int tsID = 0;
   streamDefTimestep(streamID3, tsID);
 
-  for ( i = 0; i < gridsize; ++i ) array3[i] = missval;
+  for ( int i = 0; i < gridsize; ++i ) array3[i] = missval;
 
   streamDefRecord(streamID3, 0, 0);
   streamWriteRecord(streamID3, array3, gridsize);

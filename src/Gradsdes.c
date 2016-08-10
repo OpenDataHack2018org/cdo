@@ -405,7 +405,7 @@ void dumpmap()
 }
 
 static
-void ctl_xydef(FILE *gdp, int gridID, int *yrev)
+void ctl_xydef(FILE *gdp, int gridID, bool *yrev)
 {
   int gridtype;
   int i, j;
@@ -413,7 +413,7 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
   double xfirst, yfirst, xinc, yinc;
   double *xvals, *yvals;
 
-  *yrev = FALSE;
+  *yrev = false;
 
   xsize  = gridInqXsize(gridID);
   ysize  = gridInqYsize(gridID);
@@ -521,7 +521,7 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
           j = 0;
           if ( yvals[0] > yvals[ysize-1] )
             {
-              *yrev = TRUE;
+              *yrev = true;
               for ( i = ysize-1; i >= 0; i-- )
                 {
                   fprintf(gdp, "%7.3f ", yvals[i]);
@@ -558,7 +558,7 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
           if ( IS_EQUAL(yinc, 0) ) yinc = 180.0/ysize;
           if ( yinc < 0)
             {
-              *yrev = TRUE;
+              *yrev = true;
               fprintf(gdp, "YDEF %d LINEAR %f %f\n", ysize, yfirst + yinc * (ysize-1 ), -yinc);
             }
           else
@@ -568,7 +568,7 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
 }
 
 static
-void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
+void ctl_zdef(FILE *gdp, int vlistID, bool *zrev)
 {
   int i, j, index;
   int zaxisIDmax = -1, nlevmax;
@@ -576,7 +576,7 @@ void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
   int lplev = FALSE;
   double *levels, level0, levinc = 0;
 
-  *zrev = FALSE;
+  *zrev = false;
   nzaxis  = vlistNzaxis(vlistID);
 
   nlevmax = 0;
@@ -598,11 +598,11 @@ void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
   if ( nlevmax > 1 )
     {
       if ( levels[0] < levels[1] && zaxisInqType(zaxisIDmax) != ZAXIS_HYBRID )
-        *zrev = TRUE;
+        *zrev = true;
 
       levinc = levels[1] - levels[0];
 
-      if ( IS_EQUAL(levinc, 1) ) *zrev = FALSE;
+      if ( IS_EQUAL(levinc, 1) ) *zrev = false;
 
       for ( i = 1; i < nlevmax; i++ )
         {
@@ -659,9 +659,9 @@ void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
 }
 
 static
-void ctl_options(FILE *gdp, int yrev, int zrev, int sequential, int bigendian, int littleendian, int flt64, int cal365day)
+void ctl_options(FILE *gdp, bool yrev, bool zrev, bool sequential, bool bigendian, bool littleendian, bool flt64, bool cal365day)
 {
-  /* if ( filetype == FILETYPE_GRB ) zrev = FALSE; */
+  /* if ( filetype == FILETYPE_GRB ) zrev = false; */
 
   if ( yrev || zrev || sequential || bigendian || littleendian || flt64 )
     {
@@ -945,19 +945,18 @@ void *Gradsdes(void *argument)
   int gridtype = -1;
   int index;
   int varID;
-  int recID, levelID;
+  int levelID;
   int nrecs;
   int vdate, vtime;
   char *idxfile = NULL;
   char varname[CDI_MAX_NAME];
-  int yrev = FALSE;
-  int zrev = FALSE;
+  bool yrev = false;
+  bool zrev = false;
   int xyheader = 0;
   int nrecords = 0;
-  int bigendian = FALSE, littleendian = FALSE;
-  int flt64 = 0;
-  int cal365day = 0;
-  int sequential = FALSE;
+  bool bigendian = false, littleendian = false;
+  bool sequential = false;
+  bool flt64 = false;
   char Time[30], Incr[10] = {"1mn"};
   const char *IncrKey[] = {"mn","hr","dy","mo","yr"};
   int isd, imn, ihh, iyy, imm, idd;
@@ -1076,7 +1075,7 @@ void *Gradsdes(void *argument)
                filetype == FILETYPE_IEG )
             {
               prec = vlistInqVarDatatype(vlistID, varID);
-              if ( prec == DATATYPE_FLT64 ) flt64 = 1;
+              if ( prec == DATATYPE_FLT64 ) flt64 = true;
             }
           vars[varID] = TRUE;
           recoffset[varID] = nrecsout;
@@ -1102,27 +1101,27 @@ void *Gradsdes(void *argument)
     {
       xyheader = 40;
       if ( flt64 ) xyheader = 72;
-      sequential = TRUE;
-      if ( byteorder == CDI_BIGENDIAN )    bigendian = TRUE;
-      if ( byteorder == CDI_LITTLEENDIAN ) littleendian = TRUE;
+      sequential = true;
+      if ( byteorder == CDI_BIGENDIAN )    bigendian = true;
+      if ( byteorder == CDI_LITTLEENDIAN ) littleendian = true;
     }
 
   if ( filetype == FILETYPE_EXT )
     {
       xyheader = 24;
       if ( flt64 ) xyheader = 40;
-      sequential = TRUE;
-      if ( byteorder == CDI_BIGENDIAN )    bigendian = TRUE;
-      if ( byteorder == CDI_LITTLEENDIAN ) littleendian = TRUE;
+      sequential = true;
+      if ( byteorder == CDI_BIGENDIAN )    bigendian = true;
+      if ( byteorder == CDI_LITTLEENDIAN ) littleendian = true;
     }
 
   if ( filetype == FILETYPE_IEG )
     {
       xyheader = 644;
       if ( flt64 ) xyheader = 1048;
-      sequential = TRUE;
-      if ( byteorder == CDI_BIGENDIAN )    bigendian = TRUE;
-      if ( byteorder == CDI_LITTLEENDIAN ) littleendian = TRUE;
+      sequential = true;
+      if ( byteorder == CDI_BIGENDIAN )    bigendian = true;
+      if ( byteorder == CDI_LITTLEENDIAN ) littleendian = true;
     }
 
   /* ctl file name */
@@ -1200,7 +1199,7 @@ void *Gradsdes(void *argument)
 
   int taxisID = vlistInqTaxis(vlistID);
 
-  if ( taxisInqCalendar(taxisID) == CALENDAR_365DAYS ) cal365day = 1;
+  bool cal365day = (taxisInqCalendar(taxisID) == CALENDAR_365DAYS);
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -1307,7 +1306,7 @@ void *Gradsdes(void *argument)
               bignum = (off_t*) Realloc(bignum, 2*maxrecs*sizeof(off_t));
             }
 
-          for ( recID = 0; recID < nrecs; recID++ )
+          for ( int recID = 0; recID < nrecs; recID++ )
             {
               streamInqRecord(streamID, &varID, &levelID);
               if ( vars[varID] == TRUE )
@@ -1365,8 +1364,8 @@ void *Gradsdes(void *argument)
 
   /* TITLE */
 
-  int xsize  = gridInqXsize(gridID);
-  int ysize  = gridInqYsize(gridID);
+  int xsize = gridInqXsize(gridID);
+  int ysize = gridInqYsize(gridID);
 
   int res = 0;
   if ( gridtype == GRID_GAUSSIAN ) res = nlat2ntr(ysize);
