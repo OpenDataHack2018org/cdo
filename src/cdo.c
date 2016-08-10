@@ -161,7 +161,7 @@ static
 void cdo_version(void)
 {
   const int   filetypes[] = {FILETYPE_SRV, FILETYPE_EXT, FILETYPE_IEG, FILETYPE_GRB, FILETYPE_GRB2, FILETYPE_NC, FILETYPE_NC2, FILETYPE_NC4, FILETYPE_NC4C};
-  const char* typenames[] = {        "srv",        "ext",        "ieg",        "grb",        "grb2",        "nc",        "nc2",        "nc4",        "nc4c"};
+  const char* typenames[] = {        "srv",        "ext",        "ieg",       "grb1",        "grb2",       "nc1",        "nc2",        "nc4",        "nc4c"};
 
   fprintf(stderr, "%s\n", CDO_Version);
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
@@ -201,7 +201,7 @@ void cdo_usage(void)
   set_text_color(stderr, RESET, BLUE);
   fprintf(stderr, "    -a             Generate an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
-  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb/grb2)\n");
+  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
   if ( ITSME )
     {
@@ -211,7 +211,7 @@ void cdo_usage(void)
   fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
   fprintf(stderr, "    -C, --color    Colorized output messages\n");
   fprintf(stderr, "    -f, --format <format>\n");
-  fprintf(stderr, "                   Format of the output file. (grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg)\n");
+  fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h, --help     Help information for the operators\n");
@@ -422,7 +422,7 @@ void setDefaultDataType(const char *datatypestr)
           else
             {
               fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-              fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb/grb2.\n");
+              fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2.\n");
               exit(EXIT_FAILURE);
             }
         }
@@ -512,7 +512,7 @@ void setDefaultDataTypeByte(char *datatypestr)
       else
         {
           fprintf(stderr, "Unsupported datatype %d!\n", datatype);
-          fprintf(stderr, "Use 4/8 for filetype nc/srv/ext/ieg and 1/2/3 for grb/grb2.\n");
+          fprintf(stderr, "Use 4/8 for filetype nc/srv/ext/ieg and 1/2/3 for grb1/grb2.\n");
           exit(EXIT_FAILURE);
         }
     }
@@ -551,7 +551,8 @@ void setDefaultFileType(const char *filetypestr, int labort)
       else if ( cmpstrlen(filetypestr, "nc2",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC2; }
       else if ( cmpstrlen(filetypestr, "nc4c", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC4C;}
       else if ( cmpstrlen(filetypestr, "nc4",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC4; }
-      else if ( cmpstrlen(filetypestr, "nc",   len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC;  }
+      else if ( cmpstrlen(filetypestr, "nc1",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC;  }
+      else if ( cmpstrlen(filetypestr, "nc",   len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC2; }
       else if ( cmpstrlen(filetypestr, "srv",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_SRV; }
       else if ( cmpstrlen(filetypestr, "ext",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_EXT; }
       else if ( cmpstrlen(filetypestr, "ieg",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_IEG; }
@@ -560,7 +561,7 @@ void setDefaultFileType(const char *filetypestr, int labort)
           if ( labort )
             {
               fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-              fprintf(stderr, "Available filetypes: grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg\n");
+              fprintf(stderr, "Available filetypes: grb1/grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg\n");
               exit(EXIT_FAILURE);
             }
           else
@@ -581,8 +582,8 @@ void setDefaultFileType(const char *filetypestr, int labort)
             {
               fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
               fprintf(stderr, "Use format[_nbits] with:\n");
-              fprintf(stderr, "    format = grb, grb2, nc, nc2, nc4, nc4c, srv, ext or ieg\n");
-              fprintf(stderr, "    nbits  = 32/64 for grb2/nc/nc2/nc4/nc4c/srv/ext/ieg; 1 - 24 for grb/grb2\n");
+              fprintf(stderr, "    format = grb1, grb2, nc1, nc2, nc4, nc4c, srv, ext or ieg\n");
+              fprintf(stderr, "    nbits  = 32/64 for grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg; 1 - 24 for grb1/grb2\n");
               exit(EXIT_FAILURE);
             }
         }

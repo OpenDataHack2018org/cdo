@@ -1,3 +1,7 @@
+2016-08-10  Uwe Schulzweida
+
+	* Changed default of option -f nc to netCDF2
+
 2016-07-29  Uwe Schulzweida
 
 	* New operator selindex - Select grid indices
