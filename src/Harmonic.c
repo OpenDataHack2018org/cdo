@@ -31,26 +31,15 @@ void *Harmonic(void *argument)
 {
   int gridsize;
   int nrecs;
-  int varID, levelID, recID;
-  int tsID;
-  int i, j;
-  int nts;
-  int streamID1, streamID2;
-  int *streamIDs;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
+  int varID, levelID;
   int nmiss;
-  int nchars;
   int offset;
-  int nvars, nlevel;
+  int nlevel;
   int vdate = 0, vtime = 0;
-  int n_out, nout, n;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
   double missval;
-  double sine, cosine;
-  double *array;
-  double ***work, ***out;
 
   cdoInitialize(argument);
 
@@ -58,8 +47,8 @@ void *Harmonic(void *argument)
 
   operatorCheckArgc(2);
 
-  n_out = parameter2int(operatorArgv()[0]);
-  n     = parameter2int(operatorArgv()[1]);
+  int n_out = parameter2int(operatorArgv()[0]);
+  int n     = parameter2int(operatorArgv()[1]);
 
   if ( n_out > 9 ) cdoAbort("Maximum number of wave numbers is 9!");
 
@@ -67,32 +56,32 @@ void *Harmonic(void *argument)
     cdoAbort("The wave length must be positive and smaller than "
 	     "2 times the number of requested harmonics (=%d)!", n_out);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID2);
 
   refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
 
-  streamIDs = (int*) Malloc(n_out*sizeof(int));
+  int *streamIDs = (int*) Malloc(n_out*sizeof(int));
 
   strcpy(filename, cdoStreamName(1)->args);
-  nchars = strlen(filename);
+  int nchars = strlen(filename);
 
-  for ( j = 0; j < n_out; ++j )
+  for ( int j = 0; j < n_out; ++j )
     {
       sprintf(filename+nchars, "%1d", j+1);
       if ( filesuffix[0] )
 	sprintf(filename+nchars+1, "%s", filesuffix);
 
       argument_t *fileargument = file_argument_new(filename);
-      streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+      int streamID2 = streamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
       streamIDs[j] = streamID2;
@@ -100,12 +89,12 @@ void *Harmonic(void *argument)
       streamDefVlist(streamID2, vlistID2);
     }
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  out  = (double ***) Malloc(n_out*sizeof(double **));
-  work = (double ***) Malloc(2*n_out*sizeof(double **));
+  double ***out  = (double ***) Malloc(n_out*sizeof(double **));
+  double ***work = (double ***) Malloc(2*n_out*sizeof(double **));
 
-  for ( j = 0; j < n_out; ++j )
+  for ( int j = 0; j < n_out; ++j )
     {
       out[j] = (double **) Malloc(nvars*sizeof(double *));
       for ( varID = 0; varID < nvars; ++varID )
@@ -116,7 +105,7 @@ void *Harmonic(void *argument)
 	}
     }
 
-  for ( j = 0; j < n_out*2; ++j )
+  for ( int j = 0; j < n_out*2; ++j )
     {
       work[j] = (double **) Malloc(nvars*sizeof(double *));
       for ( varID = 0; varID < nvars; ++varID )
@@ -130,9 +119,9 @@ void *Harmonic(void *argument)
 
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID == 0 )
@@ -141,7 +130,7 @@ void *Harmonic(void *argument)
 	  vtime = taxisInqVtime(taxisID1);
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -151,11 +140,11 @@ void *Harmonic(void *argument)
 
 	  if ( nmiss > 0 ) cdoAbort("Missing values are not allowed!");
 
-	  for ( j = 0; j < n_out; ++j )
+	  for ( int j = 0; j < n_out; ++j )
 	    {
-	      sine   = sin (2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
-	      cosine = cos (2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
-	      for ( i = 0; i < gridsize; i++ )
+	      double sine   = sin (2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
+	      double cosine = cos (2 * M_PI * (((j + 1) * (tsID+1)) % n) / n);
+	      for ( int i = 0; i < gridsize; i++ )
 		{
 		  work[j][varID][i+offset]         += array[i] * sine;
 		  work[n_out + j][varID][i+offset] += array[i] * cosine;
@@ -166,7 +155,7 @@ void *Harmonic(void *argument)
       tsID++;
     }
 
-  nts = tsID;
+  int nts = tsID;
 
   if ( array ) Free(array);
 
@@ -179,7 +168,7 @@ void *Harmonic(void *argument)
 	       " does not divide the number of timesteps (=%d)!", n, nts);
     }
 
-  for ( j = 0; j < n_out && 2*(j+1) < n; j++ )
+  for ( int j = 0; j < n_out && 2*(j+1) < n; j++ )
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -188,7 +177,7 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		out[j][varID][i+offset] = sqrt(work[j][varID][i+offset] * work[j][varID][i+offset] +
 					work[n_out+j][varID][i+offset] * work[n_out+j][varID][i+offset]) * 2 / nts;
 	    }
@@ -204,19 +193,19 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		out[n_out - 1][varID][i+offset] = work[2 * n_out - 1][varID][i+offset] / nts;
 	    }
 	}
     }
 
-  nout = n_out;
+  int nout = n_out;
 
   taxisDefVdate(taxisID2, vdate);
   taxisDefVtime(taxisID2, vtime);
-  for ( j = 0; j < nout; j++ )
+  for ( int j = 0; j < nout; j++ )
     {
-      streamID2 = streamIDs[j];
+      int streamID2 = streamIDs[j];
       streamDefTimestep(streamID2, 0);
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -232,7 +221,7 @@ void *Harmonic(void *argument)
 	}
     }
 
-  for ( j = 0; j < n_out && 2 * (j + 1) < n; j++ )
+  for ( int j = 0; j < n_out && 2 * (j + 1) < n; j++ )
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -242,7 +231,7 @@ void *Harmonic(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		{
 		  out[j][varID][i+offset] = work[j][varID][i+offset] || work[n_out+j][varID][i+offset]
 		              ? atan2 (work[j][varID][i+offset], work[n_out+j][varID][i+offset]) *
@@ -260,9 +249,9 @@ void *Harmonic(void *argument)
 
   taxisDefVdate(taxisID2, vdate);
   taxisDefVtime(taxisID2, vtime);
-  for ( j = 0; j < nout; j++ )
+  for ( int j = 0; j < nout; j++ )
     {
-      streamID2 = streamIDs[j];
+      int streamID2 = streamIDs[j];
       streamDefTimestep(streamID2, 1);
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -275,22 +264,22 @@ void *Harmonic(void *argument)
 	      offset = gridsize*levelID;
 	      streamDefRecord(streamID2, varID, levelID);
 	      nmiss = 0;
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(out[j][varID][i+offset], missval) ) nmiss++;
 	      streamWriteRecord(streamID2, out[j][varID]+offset, nmiss);
 	    }
 	}
     }
 
-  for ( j = 0; j < n_out; j++ )
+  for ( int j = 0; j < n_out; j++ )
     {
-      streamID2 = streamIDs[j];
+      int streamID2 = streamIDs[j];
       streamClose(streamID2);
     }
 
   Free(streamIDs);
 
-  for ( j = 0; j < n_out; ++j )
+  for ( int j = 0; j < n_out; ++j )
     {
       for ( varID = 0; varID < nvars; ++varID )
         Free(out[j][varID]);
@@ -300,7 +289,7 @@ void *Harmonic(void *argument)
 
   Free(out);
 
-  for ( j = 0; j < n_out*2; ++j )
+  for ( int j = 0; j < n_out*2; ++j )
     {
       for ( varID = 0; varID < nvars; ++varID )
         Free(work[j][varID]);
