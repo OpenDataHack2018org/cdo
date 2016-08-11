@@ -354,13 +354,6 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
           fprintf(stdout, "\n");
         }
 
-      if ( gridtype == GRID_LAEA )
-        {
-          double a, lon_0, lat_0;
-          gridInqLaea(gridID, &a, &lon_0, &lat_0);
-          fprintf(stdout, "%33s : a=%g  lon_0=%g  lat_0=%g\n", "projpar", a, lon_0, lat_0);
-        }
-
       if ( gridtype == GRID_LCC2 )
         {
           double a, lon_0, lat_0, lat_1, lat_2;
