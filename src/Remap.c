@@ -538,7 +538,6 @@ bool is_global_grid(int gridID)
        (projtype == CDI_PROJ_LCC)  ||
        (gridtype == GRID_LONLAT && non_global) ||
        (gridtype == GRID_LCC) ||
-       (gridtype == GRID_LAEA) ||
        (gridtype == GRID_CURVILINEAR && non_global) ) global_grid = false;
 
   return global_grid;
@@ -582,7 +581,6 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, bool *remapgrids)
            projtype != CDI_PROJ_LCC     &&
 	   gridtype != GRID_GAUSSIAN    &&
 	   gridtype != GRID_LCC         &&
-	   gridtype != GRID_LAEA        &&
 	   gridtype != GRID_GME         &&
 	   gridtype != GRID_CURVILINEAR &&
 	   gridtype != GRID_UNSTRUCTURED )

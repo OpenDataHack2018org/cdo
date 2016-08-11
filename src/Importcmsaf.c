@@ -237,6 +237,7 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
     yvals[i] = ymax - i*dy - dy/2;
 
   int gridID = gridCreate(GRID_PROJECTION, nx*ny);
+
   grid_def_param_sinu(gridID);
 
   gridDefXsize(gridID, nx);
@@ -265,20 +266,14 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
   for ( int i = 0; i < ny; ++i )
     yvals[i] = ymax - i*dy - dy/2;
 
-#ifdef TEST_PROJECTION
   int gridID = gridCreate(GRID_PROJECTION, nx*ny);
-#else
-  int gridID = gridCreate(GRID_LAEA, nx*ny);
-#endif
+
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
   gridDefXvals(gridID, xvals);
   gridDefYvals(gridID, yvals);
-#ifdef TEST_PROJECTION
+
   grid_def_param_laea(gridID, a, lon0, lat0);
-#else
-  gridDefLaea(gridID, a, lon0, lat0);
-#endif
 
   Free(xvals);
   Free(yvals);

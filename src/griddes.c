@@ -164,7 +164,6 @@ int gridDefine(griddes_t grid)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
     case GRID_PROJECTION:
-    case GRID_LAEA:
       {
 	if ( grid.size != 1 )
 	  {
@@ -267,11 +266,6 @@ int gridDefine(griddes_t grid)
 	  {
 	    gridDefMask(gridID, grid.mask);
 	    Free(grid.mask);
-	  }
-
-	if ( grid.type == GRID_LAEA )
-	  {
-	    if ( grid.a > 0 ) gridDefLaea(gridID, grid.a, grid.lon_0, grid.lat_0);
 	  }
 
 	break;
@@ -686,8 +680,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_LCC;
 	  else if ( cmpstrlen(pline, "lambert", len)  == 0 )
 	    grid.type = GRID_LCC;
-	  else if ( cmpstrlen(pline, "laea", len)  == 0 )
-	    grid.type = GRID_LAEA;
 	  else if ( cmpstrlen(pline, "projection", len)  == 0 )
 	    grid.type = GRID_PROJECTION;
 	  else if ( cmpstrlen(pline, "generic", len)  == 0 )

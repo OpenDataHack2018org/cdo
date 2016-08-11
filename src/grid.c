@@ -522,9 +522,7 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
   *a = 0; *lon_0 = 0; *lat_0 = 0, *x_0 = 0, *y_0 = 0;
 
   int gridtype = gridInqType(gridID);
-  if ( gridtype == GRID_LAEA )
-    gridInqLaea(gridID, a, lon_0, lat_0);
-  else
+  if ( gridtype == GRID_PROJECTION )
     {
       const char *projection = "lambert_azimuthal_equal_area";
       char mapping[CDI_MAX_NAME]; mapping[0] = 0;
@@ -1122,7 +1120,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
     case GRID_GAUSSIAN:
     case GRID_LCC:
     case GRID_LCC2:
-    case GRID_LAEA:
       {
         double xpole = 0, ypole = 0, angle = 0;
 	double xscale = 1, yscale = 1;
@@ -1133,7 +1130,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	gridInqXunits(gridID1, xunits);
 	gridInqYunits(gridID1, yunits);
 
-	if ( gridtype == GRID_LAEA || lproj_laea || lproj_lcc || lproj_sinu )
+	if ( lproj_laea || lproj_lcc || lproj_sinu )
 	  {
 	    int len;
 	    len = (int) strlen(xunits);
@@ -1210,7 +1207,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
 		if ( lproj_sinu )
                   sinusoidal_to_geo(gridsize, xvals2D, yvals2D);
-		else if ( gridtype == GRID_LAEA || lproj_laea )
+		else if ( lproj_laea )
                   laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
 		else if ( gridtype == GRID_LCC2 || lproj_lcc )
                   lcc2_to_geo(gridID1, gridsize, xvals2D, yvals2D);
@@ -1293,8 +1290,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	    else if ( ny > 1 )
 	      {
 		ybounds = (double*) Malloc(2*ny*sizeof(double));
-		if ( lproj_sinu || 
-		     gridtype == GRID_LAEA || lproj_laea || 
+		if ( lproj_sinu || lproj_laea || 
 		     gridtype == GRID_LCC2 || lproj_lcc || lproj4 )
 		  grid_gen_bounds(ny, yvals, ybounds);
 		else
@@ -1315,8 +1311,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		  }
 		else
 		  {
-		    if ( lproj_sinu ||
-			 gridtype == GRID_LAEA || lproj_laea || 
+		    if ( lproj_sinu || lproj_laea || 
 			 gridtype == GRID_LCC2 || lproj_lcc || lproj4 )
 		      {
 			for ( int j = 0; j < ny; j++ )
@@ -1339,7 +1334,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 			
 			if ( lproj_sinu )
                           sinusoidal_to_geo(4*gridsize, xbounds2D, ybounds2D);
-			else if ( gridtype == GRID_LAEA || lproj_laea )
+			else if ( lproj_laea )
 			  laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
 			else if ( gridtype == GRID_LCC2 || lproj_lcc )
 			  lcc2_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
@@ -1923,7 +1918,6 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype == GRID_GAUSSIAN    ||
 	   gridtype == GRID_LCC         ||
 	   gridtype == GRID_LCC2        ||
-	   gridtype == GRID_LAEA        ||
 	   projtype == CDI_PROJ_RLL     ||
 	   projtype == CDI_PROJ_LAEA    ||
 	   projtype == CDI_PROJ_LCC     ||
