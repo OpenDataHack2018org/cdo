@@ -134,7 +134,7 @@ void conv_generic_grid(int gridID, int gridsize, double *xvals2D, double *yvals2
 static
 void remap_nn_reg2d_reg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
 {
-  if ( !(gridInqType(gridID) == GRID_LONLAT && !gridIsRotated(gridID)) )
+  if ( gridInqType(gridID) != GRID_LONLAT )
     cdoAbort("Internal error, wrong grid type!");
 
   int nxvals = gridInqXsize(gridID);
@@ -221,7 +221,7 @@ void remap_nn_reg2d_nonreg2d(int nx, int ny, const double *restrict data, int gr
 static
 void remap_nn_reg2d(int nx, int ny, const double *restrict data, int gridID, double *restrict array)
 {
-  if ( gridInqType(gridID) == GRID_LONLAT && !gridIsRotated(gridID) )
+  if ( gridInqType(gridID) == GRID_LONLAT )
     remap_nn_reg2d_reg2d(nx, ny, data, gridID, array);
   else
     remap_nn_reg2d_nonreg2d(nx, ny, data, gridID, array);

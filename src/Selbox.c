@@ -98,12 +98,6 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
       gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
       gridDefParamRLL(gridID2, xpole, ypole, angle);
     }
-  else if ( gridtype == GRID_LONLAT && gridIsRotated(gridID1) )
-    {
-      gridDefXpole(gridID2, gridInqXpole(gridID1));
-      gridDefYpole(gridID2, gridInqYpole(gridID1));
-      gridDefAngle(gridID2, gridInqAngle(gridID1));
-    }
 
   int lxvals = gridInqXvals(gridID1, NULL);
   int lyvals = gridInqYvals(gridID1, NULL);

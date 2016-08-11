@@ -47,9 +47,6 @@ void gen_index(int gridID1, int gridID2, int *index)
 
   if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN )
     {
-      if ( gridIsRotated(gridID1) )
-	cdoAbort("Rotated grids unsupported!");
-
       int nlon1 = gridInqXsize(gridID1);
       int nlat1 = gridInqYsize(gridID1);
 

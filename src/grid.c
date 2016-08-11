@@ -1188,19 +1188,10 @@ int gridToCurvilinear(int gridID1, int lbounds)
             else
               for ( int i = 0; i < ny; ++i ) yvals[i] = 0;
             
-	    if ( gridIsRotated(gridID1) || lproj_rll )
+	    if ( lproj_rll )
 	      {
-                if ( lproj_rll )
-                  {
-                    gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
-                    gridDefProj(gridID2, gridID1);
-                  }
-                else
-                  {
-                    xpole = gridInqXpole(gridID1);
-                    ypole = gridInqYpole(gridID1);
-                    angle = gridInqAngle(gridID1);
-                  }
+                gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
+                gridDefProj(gridID2, gridID1);
 
 		for ( int j = 0; j < ny; j++ )
 		  for ( int i = 0; i < nx; i++ )
@@ -1319,7 +1310,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		double *xbounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 		double *ybounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 
-		if ( gridIsRotated(gridID1) || lproj_rll )
+		if ( lproj_rll )
 		  {
 		    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
 		  }
@@ -1541,18 +1532,9 @@ int gridToUnstructured(int gridID1, int lbounds)
 	gridInqXvals(gridID1, xvals);
 	gridInqYvals(gridID1, yvals);
 
-	if ( gridIsRotated(gridID1) || lproj_rll )
+	if ( lproj_rll )
 	  {	    
-            if ( lproj_rll )
-              {
-                gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
-              }
-            else
-              {
-                xpole = gridInqXpole(gridID1);
-                ypole = gridInqYpole(gridID1);
-                angle = gridInqAngle(gridID1);
-              }
+            gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
 		
 	    for ( int j = 0; j < ny; j++ )
 	      for ( int i = 0; i < nx; i++ )
@@ -1609,7 +1591,7 @@ int gridToUnstructured(int gridID1, int lbounds)
 		double *xbounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 		double *ybounds2D = (double*) Malloc(4*gridsize*sizeof(double));
 
-		if ( gridIsRotated(gridID1) || lproj_rll )
+		if ( lproj_rll )
 		  {
 		    gridGenRotBounds(xpole, ypole, angle, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
 		  }

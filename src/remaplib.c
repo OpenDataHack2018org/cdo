@@ -60,7 +60,7 @@
 #include "remap_store_link_cnsrv.h"
 
 
-#define IS_REG2D_GRID(gridID)  (!gridIsRotated(gridID) && (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN))
+#define IS_REG2D_GRID(gridID)  (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN)
 
 
 
@@ -507,12 +507,6 @@ int expand_lonlat_grid(int gridID)
       gridInqParamRLL(gridID, &xpole, &ypole, &angle);
       gridDefParamRLL(gridIDnew, xpole, ypole, angle);
     }
-  else if ( gridtype == GRID_LONLAT && gridIsRotated(gridID) )
-    {
-      gridDefXpole(gridIDnew, gridInqXpole(gridID));
-      gridDefYpole(gridIDnew, gridInqYpole(gridID));
-      gridDefAngle(gridIDnew, gridInqAngle(gridID));
-    }
 
   return gridIDnew;
 }
@@ -903,8 +897,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 
   if ( !src_grid->lextrapolate && gridInqSize(src_grid->gridID) > 1 &&
        map_type == MAP_TYPE_DISTWGT &&
-       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
-        (gridInqType(gridID1) == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
+       ((gridInqType(gridID1) == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
 	(gridInqType(gridID1) == GRID_LONLAT && src_grid->non_global)) )
     {
       src_grid->gridID = gridID1 = expand_lonlat_grid(gridID1);

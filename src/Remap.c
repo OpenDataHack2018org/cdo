@@ -532,8 +532,7 @@ bool is_global_grid(int gridID)
 
   int gridtype = gridInqType(gridID);
   int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
-  if ( (gridtype == GRID_LONLAT && gridIsRotated(gridID)) ||
-       (projtype == CDI_PROJ_RLL)  ||
+  if ( (projtype == CDI_PROJ_RLL)  ||
        (projtype == CDI_PROJ_LAEA) ||
        (projtype == CDI_PROJ_SINU) ||
        (projtype == CDI_PROJ_LCC)  ||
@@ -1028,10 +1027,7 @@ void *Remap(void *argument)
 	  if ( map_type != MAP_TYPE_CONSERV && map_type != MAP_TYPE_CONSERV_YAC && 
 	       gridInqType(gridID1) == GRID_GME && gridInqType(gridID2) == GRID_GME )
 	    cdoAbort("Only conservative remapping is available to remap between GME grids!");
-	  /*
-	  if ( gridIsRotated(gridID1) && map_type != MAP_TYPE_CONSERV )
-	    cdoAbort("Only conservative remapping is available for rotated grids!");
-	  */
+
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
 

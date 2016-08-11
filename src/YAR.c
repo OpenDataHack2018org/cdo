@@ -789,9 +789,6 @@ void *YAR(void *argument)
       if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
 	cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
 
-      if ( gridIsRotated(gridID1) )
-	cdoAbort("Rotated grids not supported!");
-
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 

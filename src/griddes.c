@@ -59,10 +59,7 @@ void gridInit(griddes_t *grid)
   grid->ysize         = 0;
   grid->np            = 0;
   grid->lcomplex      = 1;
-  grid->xpole         = 0;
-  grid->ypole         = 0;
   grid->prec          = 0;
-  grid->isRotated     = FALSE;
   grid->ntr           = 0;
   grid->nvertex       = 0;
   grid->genBounds     = FALSE;
@@ -265,13 +262,6 @@ int gridDefine(griddes_t grid)
 	  {
 	    gridDefYbounds(gridID, grid.ybounds);
 	    Free(grid.ybounds);
-	  }
-
-	if ( grid.isRotated )
-	  {
-	    gridDefXpole(gridID, grid.xpole);
-	    gridDefYpole(gridID, grid.ypole);
-	    gridDefAngle(gridID, grid.angle);
 	  }
 
 	if ( grid.mask )
@@ -927,31 +917,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	{
 	  grid.lat_2 = read_value(dname, "lat_2", skipSeparator(pline + len));
 	  grid.def_lat_2 = TRUE;
-	}
-      else if ( cmpstrlen(pline, "xnpole", len)  == 0 )
-	{
-	  grid.xpole = read_value(dname, "xnpole", skipSeparator(pline + len));
-	  grid.isRotated = TRUE;
-	}
-      else if ( cmpstrlen(pline, "lonpole", len)  == 0 )
-	{
-	  grid.xpole = read_value(dname, "lonpole", skipSeparator(pline + len));
-	  grid.isRotated = TRUE;
-	}
-      else if ( cmpstrlen(pline, "ynpole", len)  == 0 )
-	{
-	  grid.ypole = read_value(dname, "ynpole", skipSeparator(pline + len));
-	  grid.isRotated = TRUE;
-	}
-      else if ( cmpstrlen(pline, "latpole", len)  == 0 )
-	{
-	  grid.ypole = read_value(dname, "latpole", skipSeparator(pline + len));
-	  grid.isRotated = TRUE;
-	}
-      else if ( cmpstrlen(pline, "angle", len)  == 0 )
-	{
-	  grid.angle = read_value(dname, "angle", skipSeparator(pline + len));
-	  grid.isRotated = TRUE;
 	}
       else if ( cmpstrlen(pline, "a", len)  == 0 )
 	{

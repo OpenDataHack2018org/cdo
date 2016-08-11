@@ -36,12 +36,6 @@ void rot_uv_back(int gridID, double *us, double *vs)
   double xpole, ypole, angle;
   if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
     gridInqParamRLL(gridID, &xpole, &ypole, &angle);
-  else
-    {
-      xpole = gridInqXpole(gridID);
-      ypole = gridInqYpole(gridID);
-      angle = gridInqAngle(gridID);
-     }
 
   long nlon = gridInqXsize(gridID);
   long nlat = gridInqYsize(gridID);
@@ -172,8 +166,7 @@ void *Rotuv(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
-      if ( ! ((gridInqType(gridID) == GRID_LONLAT && gridIsRotated(gridID)) ||
-              (gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL)) )
+      if ( ! (gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) )
 	cdoAbort("Only rotated lon/lat grids supported!");
 
       gridsize = gridInqSize(gridID);
