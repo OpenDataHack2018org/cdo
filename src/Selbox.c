@@ -96,7 +96,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
     {
       double xpole, ypole, angle;
       gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
-      gridDefProjParamRLL(gridID2, xpole, ypole, angle);
+      gridDefParamRLL(gridID2, xpole, ypole, angle);
     }
   else if ( gridtype == GRID_LONLAT && gridIsRotated(gridID1) )
     {

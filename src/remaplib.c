@@ -505,7 +505,7 @@ int expand_lonlat_grid(int gridID)
     {
       double xpole, ypole, angle;
       gridInqParamRLL(gridID, &xpole, &ypole, &angle);
-      gridDefProjParamRLL(gridIDnew, xpole, ypole, angle);
+      gridDefParamRLL(gridIDnew, xpole, ypole, angle);
     }
   else if ( gridtype == GRID_LONLAT && gridIsRotated(gridID) )
     {
