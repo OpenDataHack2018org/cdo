@@ -301,9 +301,6 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
     }
 
   if ( gridtype == GRID_LONLAT     ||
-       gridtype == GRID_LCC2       ||
-       gridtype == GRID_LAEA       ||
-       gridtype == GRID_SINUSOIDAL ||
        gridtype == GRID_PROJECTION ||
        gridtype == GRID_GENERIC    ||
        gridtype == GRID_GAUSSIAN   ||
