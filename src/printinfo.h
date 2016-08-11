@@ -348,16 +348,6 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
       print_xvals(gridID, dig);
       print_yvals(gridID, dig);
 
-      if ( gridtype == GRID_LONLAT && gridIsRotated(gridID) )
-        {
-          double lonpole = gridInqXpole(gridID);
-          double latpole = gridInqYpole(gridID);
-          double angle   = gridInqAngle(gridID);
-          fprintf(stdout, "%33s : lon=%.*g  lat=%.*g", "northpole", dig, lonpole, dig, latpole);
-          if ( IS_NOT_EQUAL(angle, 0) ) fprintf(stdout, "  angle=%.*g", dig, angle);
-          fprintf(stdout, "\n");
-        }
-
       if ( gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
         {
           fprintf(stdout, "%33s :", "available");
