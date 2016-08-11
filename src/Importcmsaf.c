@@ -236,12 +236,9 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   for ( int i = 0; i < ny; ++i )
     yvals[i] = ymax - i*dy - dy/2;
 
-#ifdef TEST_PROJECTION
   int gridID = gridCreate(GRID_PROJECTION, nx*ny);
   grid_def_param_sinu(gridID);
-#else
-  int gridID = gridCreate(GRID_SINUSOIDAL, nx*ny);
-#endif
+
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
   gridDefXvals(gridID, xvals);

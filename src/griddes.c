@@ -164,7 +164,6 @@ int gridDefine(griddes_t grid)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
     case GRID_PROJECTION:
-    case GRID_SINUSOIDAL:
     case GRID_LAEA:
       {
 	if ( grid.size != 1 )
@@ -687,8 +686,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_LCC;
 	  else if ( cmpstrlen(pline, "lambert", len)  == 0 )
 	    grid.type = GRID_LCC;
-	  else if ( cmpstrlen(pline, "sinusoidal", len)  == 0 )
-	    grid.type = GRID_SINUSOIDAL;
 	  else if ( cmpstrlen(pline, "laea", len)  == 0 )
 	    grid.type = GRID_LAEA;
 	  else if ( cmpstrlen(pline, "projection", len)  == 0 )

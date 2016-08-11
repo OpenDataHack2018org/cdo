@@ -928,10 +928,11 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 	}
     }
 
-  if ( gridInqSize(src_grid->gridID) > 1 && 
-       (gridInqType(src_grid->gridID) == GRID_LCC || 
-	gridInqType(src_grid->gridID) == GRID_LAEA || 
-	gridInqType(src_grid->gridID) == GRID_SINUSOIDAL) )
+  int sgridID = src_grid->gridID;
+  if ( gridInqSize(sgridID) > 1 && 
+       (gridInqType(sgridID) == GRID_LCC || 
+	gridInqType(sgridID) == GRID_LAEA || 
+	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_SINU)) )
     {
       src_grid->gridID = gridID1 = gridToCurvilinear(src_grid->gridID, lbounds);
     }

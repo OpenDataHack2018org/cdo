@@ -1123,7 +1123,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
     case GRID_LCC:
     case GRID_LCC2:
     case GRID_LAEA:
-    case GRID_SINUSOIDAL:
       {
         double xpole = 0, ypole = 0, angle = 0;
 	double xscale = 1, yscale = 1;
@@ -1209,7 +1208,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		      yvals2D[j*nx+i] = yscale*yvals[j];
 		    }
 
-		if ( gridtype == GRID_SINUSOIDAL || lproj_sinu )
+		if ( lproj_sinu )
                   sinusoidal_to_geo(gridsize, xvals2D, yvals2D);
 		else if ( gridtype == GRID_LAEA || lproj_laea )
                   laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
@@ -1294,7 +1293,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	    else if ( ny > 1 )
 	      {
 		ybounds = (double*) Malloc(2*ny*sizeof(double));
-		if ( gridtype == GRID_SINUSOIDAL || lproj_sinu || 
+		if ( lproj_sinu || 
 		     gridtype == GRID_LAEA || lproj_laea || 
 		     gridtype == GRID_LCC2 || lproj_lcc || lproj4 )
 		  grid_gen_bounds(ny, yvals, ybounds);
@@ -1316,7 +1315,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		  }
 		else
 		  {
-		    if ( gridtype == GRID_SINUSOIDAL || lproj_sinu ||
+		    if ( lproj_sinu ||
 			 gridtype == GRID_LAEA || lproj_laea || 
 			 gridtype == GRID_LCC2 || lproj_lcc || lproj4 )
 		      {
@@ -1338,7 +1337,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 			      ybounds2D[index+3] = yscale*ybounds[2*j];
 			    }
 			
-			if ( gridtype == GRID_SINUSOIDAL || lproj_sinu )
+			if ( lproj_sinu )
                           sinusoidal_to_geo(4*gridsize, xbounds2D, ybounds2D);
 			else if ( gridtype == GRID_LAEA || lproj_laea )
 			  laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
@@ -1929,7 +1928,6 @@ int gridWeights(int gridID, double *grid_wgts)
 	   projtype == CDI_PROJ_LAEA    ||
 	   projtype == CDI_PROJ_LCC     ||
 	   projtype == CDI_PROJ_SINU    ||
-	   gridtype == GRID_SINUSOIDAL  ||
 	   gridtype == GRID_GME         ||
 	   gridtype == GRID_CURVILINEAR ||
 	   gridtype == GRID_UNSTRUCTURED )

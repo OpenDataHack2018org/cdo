@@ -870,7 +870,7 @@ void *Selbox(void *argument)
 
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
            (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
-	   (operatorID == SELINDEXBOX && (gridtype == GRID_GENERIC || gridtype == GRID_SINUSOIDAL) && 
+	   (operatorID == SELINDEXBOX && gridtype == GRID_GENERIC && 
 	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) ||
 	   (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED) )
 	{
