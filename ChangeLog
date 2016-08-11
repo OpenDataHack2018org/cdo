@@ -1,3 +1,7 @@
+2016-08-11  Uwe Schulzweida
+
+	Changed handling of rotated lon/lat grids
+
 2016-08-10  Uwe Schulzweida
 
 	* Changed default of option -f nc to netCDF2

@@ -173,9 +173,6 @@ Keyword           & Datatype     & Description \\ \hline
 \bf{ysize}        & INTEGER      & Size in y direction (number of latitudes). \\
 \bf{xvals}        & FLOAT ARRAY  & X values of the grid cell center. \\
 \bf{yvals}        & FLOAT ARRAY  & Y values of the grid cell center.\\
-\bf{xnpole}       & FLOAT        & X value of the north pole (rotated grid). \\
-\bf{ynpole}       & FLOAT        & Y value of the north pole (rotated grid). \\
-\bf{angle}        & FLOAT        & Angle of the rotated north pole (default: 0). \\
 \bf{nvertex}      & INTEGER      & Number of the vertices for all grid cells. \\
 \bf{xbounds}      & FLOAT ARRAY  & X bounds of each gridbox. \\
 \bf{ybounds}      & FLOAT ARRAY  & Y bounds of each gridbox. \\
@@ -231,12 +228,6 @@ ysize      & {\bf nlat} & {\bf nlat} & {\bf nlat} & gridsize \\
 xvals      & xsize & xsize & gridsize & gridsize \\
 \hline
 yvals      & ysize & ysize & gridsize & gridsize \\
-\hline
-xnpole     & 0     &       &          &          \\
-\hline
-ynpole     & 90    &       &          &          \\
-\hline
-angle       & 0    &       &          &          \\
 \hline
 nvertex    & 2 & 2 & 4 & {\bf nv} \\
 \hline
@@ -295,28 +286,28 @@ The grid cell corners xbounds and ybounds have to rotate counterclockwise.
 \end{lstlisting}
 %\end{minipage}
 
-\vspace{2mm}
+% \vspace{2mm}
 
-For a lon/lat grid with a rotated pole, the north pole must be defined.
-As far as you define the keywords xnpole/ynpole all coordinate values
-are for the rotated system.
+% For a lon/lat grid with a rotated pole, the north pole must be defined.
+% As far as you define the keywords xnpole/ynpole all coordinate values
+% are for the rotated system.
 
-\vspace{2mm}
+% \vspace{2mm}
 
-%\begin{minipage}[t]{\textwidth}
-{\CDO} grid description example of a regional rotated lon/lat grid:
-\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
-    gridtype = lonlat
-    xsize    = 81
-    ysize    = 91
-    xfirst   =  -19.5
-    xinc     =    0.5
-    yfirst   =  -25.0
-    yinc     =    0.5
-    xnpole   = -170
-    ynpole   =   32.5
-\end{lstlisting}
-%\end{minipage}
+% %\begin{minipage}[t]{\textwidth}
+% {\CDO} grid description example of a regional rotated lon/lat grid:
+% \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
+%     gridtype = lonlat
+%     xsize    = 81
+%     ysize    = 91
+%     xfirst   =  -19.5
+%     xinc     =    0.5
+%     yfirst   =  -25.0
+%     yinc     =    0.5
+%     xnpole   = -170
+%     ynpole   =   32.5
+% \end{lstlisting}
+% %\end{minipage}
 
 Example {\CDO} descriptions of a curvilinear and an unstructured grid can be found
 in \htmlref{Appendix C}{appendixgrid}.
