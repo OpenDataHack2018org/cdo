@@ -504,7 +504,7 @@ int expand_lonlat_grid(int gridID)
   if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
     {
       double xpole, ypole, angle;
-      gridInqProjParamRLL(gridID, &xpole, &ypole, &angle);
+      gridInqParamRLL(gridID, &xpole, &ypole, &angle);
       gridDefProjParamRLL(gridIDnew, xpole, ypole, angle);
     }
   else if ( gridtype == GRID_LONLAT && gridIsRotated(gridID) )

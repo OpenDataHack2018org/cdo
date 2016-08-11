@@ -35,7 +35,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
 {
   double xpole, ypole, angle;
   if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
-    gridInqProjParamRLL(gridID, &xpole, &ypole, &angle);
+    gridInqParamRLL(gridID, &xpole, &ypole, &angle);
   else
     {
       xpole = gridInqXpole(gridID);

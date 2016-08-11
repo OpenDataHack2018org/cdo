@@ -1192,7 +1192,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	      {
                 if ( lproj_rll )
                   {
-                    gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
+                    gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
                     gridDefProj(gridID2, gridID1);
                   }
                 else
@@ -1545,7 +1545,7 @@ int gridToUnstructured(int gridID1, int lbounds)
 	  {	    
             if ( lproj_rll )
               {
-                gridInqProjParamRLL(gridID1, &xpole, &ypole, &angle);
+                gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
               }
             else
               {
