@@ -420,7 +420,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
       double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
       int projflag, scanflag;
 
-      gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
+      gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
                  &projflag, &scanflag);
 
 #ifdef CDO

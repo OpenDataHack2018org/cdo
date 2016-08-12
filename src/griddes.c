@@ -363,63 +363,8 @@ int gridDefine(griddes_t grid)
 	if ( grid.def_xinc      == FALSE ) Error("xinc undefined!");
 	if ( grid.def_yinc      == FALSE ) Error("yinc undefined!");
 
-	gridDefLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
+	gridDefParamLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
 		   grid.lat1, grid.lat2, grid.xinc, grid.yinc, grid.projflag, grid.scanflag);
-
-	if ( grid.mask )
-	  {
-	    gridDefMask(gridID, grid.mask);
-	    Free(grid.mask);
-	  }
-
-	break;
-      }
-    case GRID_LCC2:
-      {
-	if ( grid.xsize == 0 ) Error("xsize undefined!");
-	if ( grid.ysize == 0 ) Error("ysize undefined!");
-
-	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
-
-	gridID = gridCreate(grid.type, grid.size);
-
-	gridDefPrec(gridID, grid.prec);
-
-	gridDefXsize(gridID, grid.xsize);
-	gridDefYsize(gridID, grid.ysize);
-
-	if ( grid.def_xfirst && grid.def_xinc && grid.xvals == NULL )
-	  {
-	    grid.xvals = (double*) Malloc(grid.xsize*sizeof(double));
-	    for ( i = 0; i < grid.xsize; ++i )
-	      grid.xvals[i] = grid.xfirst + i*grid.xinc;
-	  }
-
-	if ( grid.def_yfirst && grid.def_yinc && grid.yvals == NULL )
-	  {
-	    grid.yvals = (double*) Malloc(grid.ysize*sizeof(double));
-	    for ( i = 0; i < grid.ysize; ++i )
-	      grid.yvals[i] = grid.yfirst + i*grid.yinc;
-	  }
-
-	if ( grid.xvals )
-	  {
-	    gridDefXvals(gridID, grid.xvals);
-	    Free(grid.xvals);
-	  }
-
-	if ( grid.yvals )
-	  {
-	    gridDefYvals(gridID, grid.yvals);
-	    Free(grid.yvals);
-	  }	
-
-	if ( grid.def_lon_0     == FALSE ) Error("lon_0 undefined!");
-	if ( grid.def_lat_0     == FALSE ) Error("lat_0 undefined!");
-	if ( grid.def_lat_1     == FALSE ) Error("lat_1 undefined!");
-	if ( grid.def_lat_2     == FALSE ) grid.def_lat_2 = grid.def_lat_1;
-
-	gridDefLcc2(gridID, grid.a, grid.lon_0, grid.lat_0, grid.lat_1, grid.lat_2);
 
 	if ( grid.mask )
 	  {
@@ -674,8 +619,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_UNSTRUCTURED;
 	  else if ( cmpstrlen(pline, "gme", len)  == 0 )
 	    grid.type = GRID_GME;
-	  else if ( cmpstrlen(pline, "lcc2", len)  == 0 )
-	    grid.type = GRID_LCC2;
 	  else if ( cmpstrlen(pline, "lcc", len)  == 0 )
 	    grid.type = GRID_LCC;
 	  else if ( cmpstrlen(pline, "lambert", len)  == 0 )

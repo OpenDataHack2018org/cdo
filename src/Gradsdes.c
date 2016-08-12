@@ -431,7 +431,7 @@ void ctl_xydef(FILE *gdp, int gridID, bool *yrev)
       int nx, ny, ni;
       double inc[] = { 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001 };
 
-      gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
+      gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
                  &projflag, &scanflag);
       fprintf(gdp, "PDEF %d %d LCCR %g %g 1 1 %g %g %g %g %g\n",
               xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);

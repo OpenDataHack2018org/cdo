@@ -424,7 +424,7 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   int projflag, scanflag;
   proj_info_t proj;
 
-  gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm, &projflag, &scanflag);
+  gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm, &projflag, &scanflag);
   /*
     while ( originLon < 0 ) originLon += 360;
     while ( lonParY   < 0 ) lonParY   += 360;
@@ -452,7 +452,7 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 }
 
 static
-void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
+void sinu_to_geo(int gridsize, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
   char *params[20];
@@ -564,9 +564,7 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
   *a = 0; *lon_0 = 0; *lat_0 = 0; *lat_1 = 0, *lat_2 = 0, *x_0 = 0, *y_0 = 0;
 
   int gridtype = gridInqType(gridID);
-  if ( gridtype == GRID_LCC2 )
-    gridInqLcc2(gridID, a, lon_0, lat_0, lat_1, lat_2);
-  else
+  if ( gridtype == GRID_PROJECTION )
     {
       const char *projection = "lambert_conformal_conic";
       char mapping[CDI_MAX_NAME]; mapping[0] = 0;
@@ -1119,7 +1117,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
     case GRID_LCC:
-    case GRID_LCC2:
       {
         double xpole = 0, ypole = 0, angle = 0;
 	double xscale = 1, yscale = 1;
@@ -1205,14 +1202,10 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		      yvals2D[j*nx+i] = yscale*yvals[j];
 		    }
 
-		if ( lproj_sinu )
-                  sinusoidal_to_geo(gridsize, xvals2D, yvals2D);
-		else if ( lproj_laea )
-                  laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
-		else if ( gridtype == GRID_LCC2 || lproj_lcc )
-                  lcc2_to_geo(gridID1, gridsize, xvals2D, yvals2D);
-		else if ( lproj4 )
-                  proj_to_geo(proj4param, gridsize, xvals2D, yvals2D);
+		if      ( lproj_sinu ) sinu_to_geo(gridsize, xvals2D, yvals2D);
+		else if ( lproj_laea ) laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
+		else if ( lproj_lcc  ) lcc2_to_geo(gridID1, gridsize, xvals2D, yvals2D);
+		else if ( lproj4     ) proj_to_geo(proj4param, gridsize, xvals2D, yvals2D);
 	      }
 	  }
 
@@ -1290,8 +1283,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	    else if ( ny > 1 )
 	      {
 		ybounds = (double*) Malloc(2*ny*sizeof(double));
-		if ( lproj_sinu || lproj_laea || 
-		     gridtype == GRID_LCC2 || lproj_lcc || lproj4 )
+		if ( lproj_sinu || lproj_laea || lproj_lcc || lproj4 )
 		  grid_gen_bounds(ny, yvals, ybounds);
 		else
 		  {
@@ -1311,8 +1303,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		  }
 		else
 		  {
-		    if ( lproj_sinu || lproj_laea || 
-			 gridtype == GRID_LCC2 || lproj_lcc || lproj4 )
+		    if ( lproj_sinu || lproj_laea || lproj_lcc || lproj4 )
 		      {
 			for ( int j = 0; j < ny; j++ )
 			  for ( int i = 0; i < nx; i++ )
@@ -1332,14 +1323,10 @@ int gridToCurvilinear(int gridID1, int lbounds)
 			      ybounds2D[index+3] = yscale*ybounds[2*j];
 			    }
 			
-			if ( lproj_sinu )
-                          sinusoidal_to_geo(4*gridsize, xbounds2D, ybounds2D);
-			else if ( lproj_laea )
-			  laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
-			else if ( gridtype == GRID_LCC2 || lproj_lcc )
-			  lcc2_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
-                        else if ( lproj4 )
-                          proj_to_geo(proj4param, 4*gridsize, xbounds2D, ybounds2D);
+			if      ( lproj_sinu ) sinu_to_geo(4*gridsize, xbounds2D, ybounds2D);
+			else if ( lproj_laea ) laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
+			else if ( lproj_lcc  ) lcc2_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
+                        else if ( lproj4     ) proj_to_geo(proj4param, 4*gridsize, xbounds2D, ybounds2D);
 		      }
 		    else
 		      {
@@ -1917,7 +1904,6 @@ int gridWeights(int gridID, double *grid_wgts)
       if ( gridtype == GRID_LONLAT      ||
 	   gridtype == GRID_GAUSSIAN    ||
 	   gridtype == GRID_LCC         ||
-	   gridtype == GRID_LCC2        ||
 	   projtype == CDI_PROJ_RLL     ||
 	   projtype == CDI_PROJ_LAEA    ||
 	   projtype == CDI_PROJ_LCC     ||
