@@ -353,14 +353,6 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
           if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
           fprintf(stdout, "\n");
         }
-
-      if ( gridtype == GRID_LCC2 )
-        {
-          double a, lon_0, lat_0, lat_1, lat_2;
-          gridInqLcc2(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2);
-          fprintf(stdout, "%33s : a=%7.0f  lon_0=%g  lat_0=%g  lat_1=%g  lat_2=%g\n",
-                  "projpar", a, lon_0, lat_0, lat_1, lat_2);
-        }
     }
   else if ( gridtype == GRID_SPECTRAL )
     {
