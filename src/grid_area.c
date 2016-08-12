@@ -297,7 +297,6 @@ int gridGenArea(int gridID, double* area)
   if ( gridtype != GRID_LONLAT      &&
        gridtype != GRID_GAUSSIAN    &&
        gridtype != GRID_LCC         &&
-       gridtype != GRID_LCC2        &&
        projtype != CDI_PROJ_RLL     &&
        projtype != CDI_PROJ_LAEA    &&
        projtype != CDI_PROJ_SINU    &&
