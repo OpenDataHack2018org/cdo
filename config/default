@@ -41,7 +41,7 @@ case "${HOSTNAME}" in
                  --with-libxml2=/usr \
                  --with-magics=$HOME/local/Magics-2.25.3 \
                  --with-proj=/opt/local \
-                 --with-szlib=$HOME/local"
+                 --with-szlib=$HOME/local/libaec-0.3.2"
 
         if  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure --enable-cxx \
@@ -175,7 +175,7 @@ case "${HOSTNAME}" in
         CDOLIBS="--with-grib_api=/sw/squeeze-x64/grib_api-1.13.0-static-gccsys \
                  --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
                  --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
-                 --with-szlib=/sw/squeeze-x64/szip-2.1 \
+                 --with-szlib=/sw/squeeze-x64/libaec-0.3.2-gcc48 \
                  --with-udunits2=/sw/squeeze-x64/udunits-2.1.19 \
                  --with-proj=/sw/squeeze-x64/proj-4.7.0 LIBS=-lz"
 
@@ -219,7 +219,7 @@ case "${HOSTNAME}" in
         CDOLIBS="--with-grib_api=/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48 \
                  --with-netcdf=/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-gcc48 \
                  --with-hdf5=/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48 \
-                 --with-szlib=/sw/rhel6-x64/sys/szip-2.1-gcc48 \
+                 --with-szlib=/sw/rhel6-x64/sys/libaec-0.3.2-gcc48 \
                  --with-udunits2=/sw/rhel6-x64/util/udunits-2.2.17-gcc48 \
                  --with-proj=/sw/rhel6-x64/graphics/proj4-4.9.1-gcc48"
 #                 --with-magics=/sw/rhel6-x64/graphics/magicsxx-2.18.15-gfxonly-gcc48 \
