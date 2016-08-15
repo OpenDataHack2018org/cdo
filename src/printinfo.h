@@ -374,8 +374,8 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
     }
   else if ( gridtype == GRID_GME )
     {
-      int ni = gridInqGMEni(gridID);
-      int nd = gridInqGMEnd(gridID);
+      int nd, ni, ni2, ni3;
+      gridInqParamGME(gridID, &nd, &ni, &ni2, &ni3);
 #ifdef CDO
       set_text_color(stdout, RESET, GREEN);
 #endif
