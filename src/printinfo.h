@@ -501,9 +501,9 @@ void printZaxisInfo(int vlistID)
       int zaxistype = zaxisInqType(zaxisID);
       int ltype     = zaxisInqLtype(zaxisID);
       int levelsize = zaxisInqSize(zaxisID);
-      int prec      = zaxisInqPrec(zaxisID);
-
-      int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+      // int prec      = zaxisInqPrec(zaxisID);
+      // int dig = (prec == DATATYPE_FLT64) ? 15 : 7;
+      int dig = 7;
 
       zaxisName(zaxistype, zaxisname);
       zaxisInqName(zaxisID, zname);
@@ -651,7 +651,7 @@ int printDateTime(int ntimeout, int vdate, int vtime)
 
   fprintf(stdout, " %s %s", vdatestr, vtimestr);
 
-  return (++ntimeout);
+  return ++ntimeout;
 }
 
 #define NUM_TIMESTEP 60
