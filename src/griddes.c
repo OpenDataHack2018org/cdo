@@ -1484,13 +1484,16 @@ void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1
 }
 
 
-int gridFromName(const char *gridname)
+int gridFromName(const char *gridnameptr)
 {
   const char *pline;
   int gridID = UNDEFID;
   griddes_t grid;
   size_t len;
   char *endptr;
+
+  char *gridname = strdup(gridnameptr);
+  strtolower(gridname);
 
   gridInit(&grid);
 
@@ -1716,6 +1719,8 @@ int gridFromName(const char *gridname)
     }
 
   if ( grid.type != -1 ) gridID = gridDefine(grid);
+
+  free(gridname);
 
   return gridID;
 }
