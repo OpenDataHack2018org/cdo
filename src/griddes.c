@@ -401,10 +401,7 @@ int gridDefine(griddes_t grid)
 
 	gridDefPrec(gridID, grid.prec);
 
-	gridDefGMEnd(gridID, grid.nd);
-	gridDefGMEni(gridID, grid.ni);
-	gridDefGMEni2(gridID, grid.ni2);
-	gridDefGMEni3(gridID, grid.ni3);
+	gridDefParamGME(gridID, grid.nd, grid.ni, grid.ni2, grid.ni3);
 	
 	if ( grid.mask )
 	  {

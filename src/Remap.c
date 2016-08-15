@@ -1275,9 +1275,8 @@ void *Remap(void *argument)
 
 	  if ( gridInqType(gridID2) == GRID_GME )
 	    {
-	      int ni, nd;
- 	      ni = gridInqGMEni(gridID2);
-	      nd = gridInqGMEnd(gridID2);
+	      int nd, ni, ni2, ni3;
+ 	      gridInqParamGME(gridID2, &nd, &ni, &ni2, &ni3);
 	      j = remaps[r].tgt_grid.size;
 
 	      for ( i = gridsize2-1; i >=0 ; i-- )

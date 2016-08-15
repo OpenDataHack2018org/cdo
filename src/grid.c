@@ -1613,10 +1613,8 @@ int gridToUnstructured(int gridID1, int lbounds)
 	int nv = 6;
 	double *xbounds = NULL, *ybounds = NULL;
 
-	int nd  = gridInqGMEnd(gridID1);
-	int ni  = gridInqGMEni(gridID1);
-	int ni2 = gridInqGMEni2(gridID1);
-	int ni3 = gridInqGMEni3(gridID1);
+        int nd, ni, ni2, ni3;
+        gridInqParamGME(gridID1, &nd, &ni, &ni2, &ni3);
 
 	int *imask = (int*) Malloc(gridsize*sizeof(int));
 	double *xvals = (double*) Malloc(gridsize*sizeof(double));
