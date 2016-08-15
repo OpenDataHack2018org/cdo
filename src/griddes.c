@@ -16,11 +16,11 @@
 */
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#include "config.h"
 #endif
 
 #if defined(HAVE_LIBNETCDF)
-#  include "netcdf.h"
+#include "netcdf.h"
 #endif
 
 #include <ctype.h>
@@ -62,7 +62,7 @@ void gridInit(griddes_t *grid)
   grid->prec          = 0;
   grid->ntr           = 0;
   grid->nvertex       = 0;
-  grid->genBounds     = FALSE;
+  grid->genBounds     = false;
 
   grid->originLon     = 0;
   grid->originLat     = 0;
@@ -71,28 +71,28 @@ void gridInit(griddes_t *grid)
   grid->lat2          = 0;
   grid->projflag      = 0;
   grid->scanflag      = 64;
-  grid->def_originLon = FALSE;
-  grid->def_originLat = FALSE;
-  grid->def_lonParY   = FALSE;
-  grid->def_lat1      = FALSE;
-  grid->def_lat2      = FALSE;
+  grid->def_originLon = false;
+  grid->def_originLat = false;
+  grid->def_lonParY   = false;
+  grid->def_lat1      = false;
+  grid->def_lat2      = false;
 
   grid->a             = 0;
   grid->lon_0         = 0;
   grid->lat_0         = 0;
   grid->lat_1         = 0;
   grid->lat_2         = 0;
-  grid->def_lon_0     = FALSE;
-  grid->def_lat_0     = FALSE;
-  grid->def_lat_1     = FALSE;
-  grid->def_lat_2     = FALSE;
+  grid->def_lon_0     = false;
+  grid->def_lat_0     = false;
+  grid->def_lat_1     = false;
+  grid->def_lat_2     = false;
 
-  grid->def_xfirst    = FALSE;
-  grid->def_yfirst    = FALSE;
-  grid->def_xlast     = FALSE;
-  grid->def_ylast     = FALSE;
-  grid->def_xinc      = FALSE;
-  grid->def_yinc      = FALSE;
+  grid->def_xfirst    = false;
+  grid->def_yfirst    = false;
+  grid->def_xlast     = false;
+  grid->def_ylast     = false;
+  grid->def_xinc      = false;
+  grid->def_yinc      = false;
   grid->xfirst        = 0;
   grid->yfirst        = 0;
   grid->xlast         = 0;
@@ -122,7 +122,6 @@ void gridInit(griddes_t *grid)
 int getoptname(char *optname, const char *optstring, int nopt)
 {
   int nerr = 0;
-  size_t namelen;
   const char *pname = optstring;
   const char *pend  = optstring;
 
@@ -138,6 +137,7 @@ int getoptname(char *optname, const char *optstring, int nopt)
   if ( pend )
     {
       pend = strchr(pname, ',');
+      size_t namelen;
       if ( pend == NULL )
 	namelen = strlen(pname);
       else
@@ -355,13 +355,13 @@ int gridDefine(griddes_t grid)
 	gridDefXsize(gridID, grid.xsize);
 	gridDefYsize(gridID, grid.ysize);
 
-	if ( grid.def_originLon == FALSE ) Error("originLon undefined!");
-	if ( grid.def_originLat == FALSE ) Error("originLat undefined!");
-	if ( grid.def_lonParY   == FALSE ) Error("lonParY undefined!");
-	if ( grid.def_lat1      == FALSE ) Error("lat1 undefined!");
-	if ( grid.def_lat2      == FALSE ) Error("lat2 undefined!");
-	if ( grid.def_xinc      == FALSE ) Error("xinc undefined!");
-	if ( grid.def_yinc      == FALSE ) Error("yinc undefined!");
+	if ( grid.def_originLon == false ) Error("originLon undefined!");
+	if ( grid.def_originLat == false ) Error("originLat undefined!");
+	if ( grid.def_lonParY   == false ) Error("lonParY undefined!");
+	if ( grid.def_lat1      == false ) Error("lat1 undefined!");
+	if ( grid.def_lat2      == false ) Error("lat2 undefined!");
+	if ( grid.def_xinc      == false ) Error("xinc undefined!");
+	if ( grid.def_yinc      == false ) Error("yinc undefined!");
 
 	gridDefParamLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
 		   grid.lat1, grid.lat2, grid.xinc, grid.yinc, grid.projflag, grid.scanflag);
@@ -729,87 +729,87 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( cmpstrlen(pline, "xfirst", len)  == 0 )
 	{
 	  grid.xfirst = read_value(dname, "xfirst", skipSeparator(pline + len));
-	  grid.def_xfirst = TRUE;
+	  grid.def_xfirst = true;
 	}
       else if ( cmpstrlen(pline, "lonfirst", len)  == 0 )
 	{
 	  grid.xfirst = read_value(dname, "lonfirst", skipSeparator(pline + len));
-	  grid.def_xfirst = TRUE;
+	  grid.def_xfirst = true;
 	}
       else if ( cmpstrlen(pline, "yfirst", len)  == 0 )
 	{
 	  grid.yfirst = read_value(dname, "yfirst", skipSeparator(pline + len));
-	  grid.def_yfirst = TRUE;
+	  grid.def_yfirst = true;
 	}
       else if ( cmpstrlen(pline, "latfirst", len)  == 0 )
 	{
 	  grid.yfirst = read_value(dname, "latfirst", skipSeparator(pline + len));
-	  grid.def_yfirst = TRUE;
+	  grid.def_yfirst = true;
 	}
       else if ( cmpstrlen(pline, "xlast", len)  == 0 )
 	{
 	  grid.xlast = read_value(dname, "xlast", skipSeparator(pline + len));
-	  grid.def_xlast = TRUE;
+	  grid.def_xlast = true;
 	}
       else if ( cmpstrlen(pline, "lonlast", len)  == 0 )
 	{
 	  grid.xlast = read_value(dname, "lonlast", skipSeparator(pline + len));
-	  grid.def_xlast = TRUE;
+	  grid.def_xlast = true;
 	}
       else if ( cmpstrlen(pline, "ylast", len)  == 0 )
 	{
 	  grid.ylast = read_value(dname, "ylast", skipSeparator(pline + len));
-	  grid.def_ylast = TRUE;
+	  grid.def_ylast = true;
 	}
       else if ( cmpstrlen(pline, "latlast", len)  == 0 )
 	{
 	  grid.ylast = read_value(dname, "latlast", skipSeparator(pline + len));
-	  grid.def_ylast = TRUE;
+	  grid.def_ylast = true;
 	}
       else if ( cmpstrlen(pline, "xinc", len)  == 0 )
 	{
 	  grid.xinc = read_value(dname, "xinc", skipSeparator(pline + len));
-	  grid.def_xinc = TRUE;
+	  grid.def_xinc = true;
 	}
       else if ( cmpstrlen(pline, "loninc", len)  == 0 )
 	{
 	  grid.xinc = read_value(dname, "loninc", skipSeparator(pline + len));
-	  grid.def_xinc = TRUE;
+	  grid.def_xinc = true;
 	}
       else if ( cmpstrlen(pline, "yinc", len)  == 0 )
 	{
 	  grid.yinc = read_value(dname, "yinc", skipSeparator(pline + len));
-	  grid.def_yinc = TRUE;
+	  grid.def_yinc = true;
 	}
       else if ( cmpstrlen(pline, "latinc", len)  == 0 )
 	{
 	  grid.yinc = read_value(dname, "latinc", skipSeparator(pline + len));
-	  grid.def_yinc = TRUE;
+	  grid.def_yinc = true;
 	}
       else if ( cmpstrlen(pline, "originLon", len)  == 0 )
 	{
 	  grid.originLon = read_value(dname, "originLon", skipSeparator(pline + len));
-	  grid.def_originLon = TRUE;
+	  grid.def_originLon = true;
 	}
       else if ( cmpstrlen(pline, "originLat", len)  == 0 )
 	{
 	  grid.originLat = read_value(dname, "originLat", skipSeparator(pline + len));
-	  grid.def_originLat = TRUE;
+	  grid.def_originLat = true;
 	}
       else if ( cmpstrlen(pline, "lonParY", len)  == 0 )
 	{
 	  grid.lonParY = read_value(dname, "lonParY", skipSeparator(pline + len));
-	  grid.def_lonParY = TRUE;
+	  grid.def_lonParY = true;
 	}
       else if ( cmpstrlen(pline, "lat1", len)  == 0 )
 	{
 	  grid.lat1 = read_value(dname, "lat1", skipSeparator(pline + len));
-	  grid.def_lat1 = TRUE;
+	  grid.def_lat1 = true;
 	}
       else if ( cmpstrlen(pline, "lat2", len)  == 0 )
 	{
 	  grid.lat2 = read_value(dname, "lat2", skipSeparator(pline + len));
-	  grid.def_lat2 = TRUE;
+	  grid.def_lat2 = true;
 	}
       else if ( cmpstrlen(pline, "projection", len)  == 0 )
 	{
@@ -830,22 +830,22 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( cmpstrlen(pline, "lon_0", len)  == 0 )
 	{
 	  grid.lon_0 = read_value(dname, "lon_0", skipSeparator(pline + len));
-	  grid.def_lon_0 = TRUE;
+	  grid.def_lon_0 = true;
 	}
       else if ( cmpstrlen(pline, "lat_0", len)  == 0 )
 	{
 	  grid.lat_0 = read_value(dname, "lat_0", skipSeparator(pline + len));
-	  grid.def_lat_0 = TRUE;
+	  grid.def_lat_0 = true;
 	}
       else if ( cmpstrlen(pline, "lat_1", len)  == 0 )
 	{
 	  grid.lat_1 = read_value(dname, "lat_1", skipSeparator(pline + len));
-	  grid.def_lat_1 = TRUE;
+	  grid.def_lat_1 = true;
 	}
       else if ( cmpstrlen(pline, "lat_2", len)  == 0 )
 	{
 	  grid.lat_2 = read_value(dname, "lat_2", skipSeparator(pline + len));
-	  grid.def_lat_2 = TRUE;
+	  grid.def_lat_2 = true;
 	}
       else if ( cmpstrlen(pline, "a", len)  == 0 )
 	{
@@ -1520,8 +1520,8 @@ int gridFromName(const char *gridnameptr)
 	      else
 		grid.xsize = compNlon(grid.ysize);
 
-	      grid.def_xfirst = TRUE;
-	      grid.def_yfirst = TRUE;	      
+	      grid.def_xfirst = true;
+	      grid.def_yfirst = true;	      
 	    }
 	}
     }
@@ -1548,8 +1548,8 @@ int gridFromName(const char *gridnameptr)
 	      else
 		grid.xsize = compNlon(grid.ysize);
 
-	      grid.def_xfirst = TRUE;
-	      grid.def_yfirst = TRUE;	      
+	      grid.def_xfirst = true;
+	      grid.def_yfirst = true;	      
 	    }
 	}
     }
@@ -1565,8 +1565,8 @@ int gridFromName(const char *gridnameptr)
 	  grid.ysize = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
 
-	  grid.def_xfirst = TRUE;
-	  grid.def_yfirst = TRUE;
+	  grid.def_xfirst = true;
+	  grid.def_yfirst = true;
 	}
     }
   else if ( gridname[0] == 'l' &&  gridname[1] == 'o' && gridname[2] == 'n' ) /* lon=<LON>_lat=<LAT> */
@@ -1640,7 +1640,7 @@ int gridFromName(const char *gridnameptr)
 	    }
 	  else if ( *pline == 'b' )
 	    {
-	      grid.genBounds = TRUE;
+	      grid.genBounds = true;
 	      pline++;
 	    }
 
@@ -1651,8 +1651,8 @@ int gridFromName(const char *gridnameptr)
 	      grid.ysize = np*2;
 	      if ( !grid.xsize ) grid.xsize = compNlon(grid.ysize);
 
-	      grid.def_xfirst = TRUE;
-	      grid.def_yfirst = TRUE;	      
+	      grid.def_xfirst = true;
+	      grid.def_yfirst = true;	      
 	    }
 	}
     }
