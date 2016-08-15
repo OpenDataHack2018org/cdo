@@ -130,36 +130,32 @@ struct cart circum_center(struct cart *v0, struct cart *v1, struct cart *v2)
   struct cart e2;
   struct cart cu;
 
-  double *ptmp1;
-  double *ptmp2;
-  double *ptmp3;
+  double *ptmp1 = ((double *)e1.x);
+  double *ptmp2 = ((double *)v1->x);
+  double *ptmp3 = ((double *)v0->x);
 
-  int j;
-
-  ptmp1 = ((double *)e1.x);
-  ptmp2 = ((double *)v1->x);
-  ptmp3 = ((double *)v0->x);
-
-  for (j = 0; j < 3; j++) {
+  for ( int j = 0; j < 3; j++ )
     {
-      *ptmp1 = *ptmp2 - *ptmp3;
-      ptmp1++;
+      {
+        *ptmp1 = *ptmp2 - *ptmp3;
+        ptmp1++;
+      }
+      ptmp3++;
+      ptmp2++;
     }
-    ptmp3++;
-    ptmp2++;
-  }
   
   ptmp1 = ((double *)e2.x);
   ptmp2 = ((double *)v2->x);
   ptmp3 = ((double *)v0->x);
-  for (j = 0; j < 3; j++) {
-    { 
-      *ptmp1 = *ptmp2 - *ptmp3;
-      ptmp1++;
+  for ( int j = 0; j < 3; j++ )
+    {
+      { 
+        *ptmp1 = *ptmp2 - *ptmp3;
+        ptmp1++;
+      }
+      ptmp3++;
+      ptmp2++;
     }
-    ptmp3++;
-    ptmp2++;
-  }
 
   cu.x[0] = e1.x[1]*e2.x[2] - e1.x[2]*e2.x[1];
   cu.x[1] = e1.x[2]*e2.x[0] - e1.x[0]*e2.x[2];
@@ -171,13 +167,14 @@ struct cart circum_center(struct cart *v0, struct cart *v1, struct cart *v2)
 
   ptmp1 = ((double *)center.x);
   ptmp2 = ((double *)cu.x);
-  for (j = 0; j < 3; j++) {
+  for ( int j = 0; j < 3; j++ )
     {
-      *ptmp1 = *ptmp2/cnorm;
-      ptmp1++;
+      {
+        *ptmp1 = *ptmp2/cnorm;
+        ptmp1++;
+      }
+      ptmp2++;
     }
-    ptmp2++;
-  }
   
   return center;
 }
@@ -209,7 +206,6 @@ struct geo cc2gc(struct cart *x)
 
   double tln;
   double tlt;
-  double r;
 
   if ( !(fabs(x->x[0]) > 0.0) ) {
     if (x->x[1] >= 0.0) {
@@ -228,7 +224,7 @@ struct geo cc2gc(struct cart *x)
     }
   }
 
-  r = sqrt(x->x[0]*x->x[0] + x->x[1]*x->x[1]);
+  double r = sqrt(x->x[0]*x->x[0] + x->x[1]*x->x[1]);
 
   if ( !(fabs(r) > 0.0) ) {
     if (x->x[2] > 0.0) {
@@ -636,18 +632,17 @@ void tricntr(double *pxn,
              int kjd, int kni)
 {
   (void) knd;
-  int id1, id2, id3, ioffset;
   double r1, r2, r3;
 
-  int j, mi1, mi2;
+  int mi1, mi2;
   double zxnorm;
 
-  id1 = kig1e-kig1s+1;
-  id2 = id1*(kig2e-kig2s+1);
-  id3 = id2*3;
-  ioffset = -(id1+id2+id3);
+  int id1 = kig1e-kig1s+1;
+  int id2 = id1*(kig2e-kig2s+1);
+  int id3 = id2*3;
+  int ioffset = -(id1+id2+id3);
     
-  for (j = 1; j <= 2; ++j) 
+  for (int j = 1; j <= 2; ++j) 
     {
       mi1 = j*kni/3;
       mi2 = (j-1)*kni+1;
@@ -690,34 +685,30 @@ void gcpt(double *pxn,
           int ki1, int kj1, int ki2, int kj2, int ki, int kj)
 {
   (void) knd;
-  int id1, id2, id3, ioffset;
-  double r1, r2, r3;
-    
-  double zbeta, zalpha, zchord, ztheta;
     
   /* Calculate "zchord", the Cartesian distance between x1 and x2 */
 
-  id1 = kig1e-kig1s+1;
-  id2 = id1*(kig2e-kig2s+1);
-  id3 = id2*3;
-  ioffset = -(id1+id2+id3);
+  int id1 = kig1e-kig1s+1;
+  int id2 = id1*(kig2e-kig2s+1);
+  int id3 = id2*3;
+  int ioffset = -(id1+id2+id3);
 
-  r1 = (pxn[ki2+id1*kj2+id2*1+id3*kjd+ioffset] 
-	-pxn[ki1+id1*kj1+id2*1+id3*kjd+ioffset]);
-  r2 = (pxn[ki2+id1*kj2+id2*2+id3*kjd+ioffset] 
-	-pxn[ki1+id1*kj1+id2*2+id3*kjd+ioffset]);
-  r3 = (pxn[ki2+id1*kj2+id2*3+id3*kjd+ioffset] 
-	-pxn[ki1+id1*kj1+id2*3+id3*kjd+ioffset]);
+  double r1 = (pxn[ki2+id1*kj2+id2*1+id3*kjd+ioffset] 
+               -pxn[ki1+id1*kj1+id2*1+id3*kjd+ioffset]);
+  double r2 = (pxn[ki2+id1*kj2+id2*2+id3*kjd+ioffset] 
+               -pxn[ki1+id1*kj1+id2*2+id3*kjd+ioffset]);
+  double r3 = (pxn[ki2+id1*kj2+id2*3+id3*kjd+ioffset] 
+               -pxn[ki1+id1*kj1+id2*3+id3*kjd+ioffset]);
   
-  zchord = sqrt((r1*r1)+(r2*r2)+(r3*r3));
+  double zchord = sqrt((r1*r1)+(r2*r2)+(r3*r3));
     
   /* Calculate "ztheta", the great circle angle between x1 and x2 */
-  ztheta = 2.0*asin(zchord*0.5);
+  double ztheta = 2.0*asin(zchord*0.5);
     
   /* Calculate the weighting factors which follow from the condition */
   /* that x is a point on the unit-sphere, too. */
-  zbeta = sin(pgamma*ztheta)/sin(ztheta);
-  zalpha = sin((1.0-pgamma)*ztheta)/sin(ztheta);
+  double zbeta = sin(pgamma*ztheta)/sin(ztheta);
+  double zalpha = sin((1.0-pgamma)*ztheta)/sin(ztheta);
     
   /* Store the (x,y,z) coordinates of the point x into the array pxn */
   pxn[ki+id1*kj+id2*1+id3*kjd+ioffset] 
@@ -740,14 +731,12 @@ void glo_coor(double *pxn, double *prlon, double *prlat,
               int kig1s, int kig1e, int kig2s, int kig2e, int knd, 
               int kni2, int kni3)
 {
-  int id1, id2, id3, ioffset, joffset;
-
   double zsgn;
   int j1, j2;
-  double zrlon, zcosw, zsinw;
+  double zrlon;
   int jb, jd, ml, mm;
-  double zgamma, zw;
-  int mi1, mi2, ml2, ml3, mni;
+  double zgamma;
+  int mi1, mi2, ml2, ml3;
 
   int *mcosv;
 
@@ -764,18 +753,18 @@ void glo_coor(double *pxn, double *prlon, double *prlat,
       exit (-1);
     }
 
-  id1 = kig1e-kig1s+1;
-  id2 = id1*(kig2e-kig2s+1);
-  id3 = id2*3;
-  ioffset = -(id1+id2+id3);
-  joffset = -(id1+id2);
+  int id1 = kig1e-kig1s+1;
+  int id2 = id1*(kig2e-kig2s+1);
+  int id3 = id2*3;
+  int ioffset = -(id1+id2+id3);
+  int joffset = -(id1+id2);
 
   /* Compute angles associated with the icosahedron. */
 
-  zw = acos(1.0/(sin(pid5)*2.0))*2.0;
-  zcosw = cos(zw);
-  zsinw = sin(zw);
-  mni = pow_ii(2, kni2)*pow_ii(3, kni3);
+  double zw = acos(1.0/(sin(pid5)*2.0))*2.0;
+  double zcosw = cos(zw);
+  double zsinw = sin(zw);
+  int mni = pow_ii(2, kni2)*pow_ii(3, kni3);
   
   /*     Compute the local array mcosv, i.e. the meridian angle locations */
 
@@ -987,8 +976,6 @@ void glo_coor(double *pxn, double *prlon, double *prlat,
 static
 void initmask(int *mask, int ni, int nd)
 {
-  int jd;
-
   int tmp1, tmp2, /*tmp3, tmp4, tmp5,*/ tmp6, tmp7, tmp8, tmp9;
 
   int *ptmp1;
@@ -1034,7 +1021,7 @@ void initmask(int *mask, int ni, int nd)
     }
   }
 
-  for (jd = 1; jd <= 10; jd++) {
+  for (int jd = 1; jd <= 10; jd++) {
     switch (jd) {
     case 1:
       break;
@@ -1225,20 +1212,19 @@ void initmask(int *mask, int ni, int nd)
 
 void gme_grid_restore(double *p, int ni, int nd)
 {
-  int j, jd;
-  int tmp1, tmp2, tmp3, tmp4, tmp5;
+  int j;
 
   struct array pinfo;
 
   pinfo.rank = 3;
   pinfo.offset = 0;
   pinfo.dim[0].lower = 0;
-  tmp1 = ni+1;
+  int tmp1 = ni+1;
   if (tmp1 < 0) tmp1 = 0;
   pinfo.dim[0].extent = tmp1;
   pinfo.dim[0].mult = 1;
   pinfo.offset -= 0;
-  tmp2 = tmp1;
+  int tmp2 = tmp1;
   pinfo.dim[1].lower = 1;
   tmp1 = ni+1;
   if (tmp1 < 0) tmp1 = 0;
@@ -1252,11 +1238,11 @@ void gme_grid_restore(double *p, int ni, int nd)
   pinfo.dim[2].extent = tmp1;
   pinfo.dim[2].mult = tmp2;
   pinfo.offset -= pinfo.dim[2].mult;
-  tmp4 = pinfo.dim[1].mult;
-  tmp5 = pinfo.dim[2].mult;
-  tmp3 = pinfo.offset;
+  int tmp4 = pinfo.dim[1].mult;
+  int tmp5 = pinfo.dim[2].mult;
+  int tmp3 = pinfo.offset;
 
-  for (jd = 1; jd <= 10; jd++) {
+  for (int jd = 1; jd <= 10; jd++) {
     switch (jd) {
     case 1:
       break;
@@ -1299,11 +1285,6 @@ void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
 	      double *blon, double *blat, int *imask,
               int ni, int nd, int ni2, int ni3)
 {
-  int im1s, im1e, im2s, im2e;
-  int i, j;
-  double *xn;
-  double *rlonx, *rlatx;
-
   /* check gridsize */
   if ( (ni+1)*(ni+1)*nd != gridsize )
     {
@@ -1316,14 +1297,14 @@ void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
       exit (-1);
     }
 
-  xn    = (double*) Malloc(gridsize*3*sizeof(double));
-  rlonx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double));
-  rlatx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double));
+  double *xn    = (double*) Malloc(gridsize*3*sizeof(double));
+  double *rlonx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double));
+  double *rlatx = (double*) Malloc((ni+3)*(ni+3)*nd*sizeof(double));
 
-  im1s = 0;
-  im1e = ni;
-  im2s = 1;
-  im2e = ni+1;
+  int im1s = 0;
+  int im1e = ni;
+  int im2s = 1;
+  int im2e = ni+1;
 
   glo_coor(xn, rlon, rlat, im1s, im1e, im2s, im2e, nd, ni2, ni3);
 
@@ -1333,18 +1314,16 @@ void gme_grid(int lbounds, int gridsize, double *rlon, double *rlat,
   initmask(imask,ni,nd);
 
   if ( lbounds )
-    {
-      struct polygon *poly;
-      
-      poly  = (struct polygon*) Malloc((ni+1)*(ni+1)*nd*sizeof(struct polygon));
+    {      
+      struct polygon *poly = (struct polygon*) Malloc((ni+1)*(ni+1)*nd*sizeof(struct polygon));
 
       neighbours(rlonx,rlatx,im1s-1,im1e+1,im2s-1,im2e+1,nd, poly,im1s,im1e,im2s,im2e,nd);
 
       boundary(poly,im1s,im1e,im2s,im2e,nd);
 
-      for ( i = 0; i < gridsize; i++ )
+      for ( int i = 0; i < gridsize; i++ )
 	{
-	  for ( j = 0; j < poly[i].type; j++ )
+	  for ( int j = 0; j < poly[i].type; j++ )
 	    {
 	      blon[i*6+j] = poly[i].boundary[j].lon;
 	      blat[i*6+j] = poly[i].boundary[j].lat;
