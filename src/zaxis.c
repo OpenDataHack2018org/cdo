@@ -38,6 +38,7 @@ typedef struct {
   int     vctsize;
   int     type;
   int     size;
+  bool    lscalar;
   char    name[CDI_MAX_NAME];
   char    longname[CDI_MAX_NAME];
   char    units[CDI_MAX_NAME];
@@ -54,6 +55,7 @@ void zaxisInit(zaxis_t *zaxis)
   zaxis->type        = UNDEFID;
   zaxis->vctsize     = 0;
   zaxis->size        = 0;
+  zaxis->lscalar     = false;
   zaxis->name[0]     = 0;
   zaxis->longname[0] = 0;
   zaxis->units[0]    = 0;
@@ -101,6 +103,8 @@ int zaxisDefine(zaxis_t zaxis)
   if ( zaxis.size ==  0 ) Error("zaxis size undefined!");
 
   int zaxisID = zaxisCreate(zaxis.type, zaxis.size);
+
+  if ( zaxis.size == 1 && zaxis.lscalar ) zaxisDefScalar(zaxisID);
 
   if ( zaxis.vals )
     {
@@ -351,10 +355,50 @@ int zaxisFromFile(FILE *gfp, const char *dname)
   return zaxisID;
 }
 
+static
+void gen_zaxis_height(zaxis_t *zaxis, const char *pline)
+{
+  int zaxistype = ZAXIS_HEIGHT;
 
-int zaxisFromName(const char *zaxisname)
+  if ( *pline != 0 )
+    {
+      if ( *pline == '_' ) pline++;
+      else return;
+
+      if ( *pline == 0 ) return;
+
+      if ( ! isdigit((int) *pline) && !ispunct((int) *pline) ) return;
+
+      char *endptr = (char *) pline;
+      double value = strtod(pline, &endptr);
+      if ( *endptr != 0 )
+        {
+          pline = endptr;
+          if ( *pline == '_' ) pline++;
+          else return;
+          
+          if ( *pline == 0 ) return;
+          const char *units = pline;
+
+          zaxis->type = zaxistype;
+          zaxis->size = 1;
+          // zaxis->lscalar = true;
+          double *levels = (double*) Malloc(sizeof(double));
+          *levels = value;
+          zaxis->vals = levels;
+          strcpy(zaxis->units, units);
+        }
+    }
+}
+
+int zaxisFromName(const char *zaxisnameptr)
 {
   int zaxisID = UNDEFID;
+  size_t len;
+
+  char *zaxisname = strdup(zaxisnameptr);
+  strtolower(zaxisname);
+
   zaxis_t zaxis;
   zaxisInit(&zaxis);
 
@@ -366,8 +410,15 @@ int zaxisFromName(const char *zaxisname)
       zaxis.vals = (double*) Malloc(zaxis.size*sizeof(double));
       zaxis.vals[0] = 0;
     }
+  else if ( cmpstrlen(zaxisname, "height", len) == 0 )
+    {
+      pline = &zaxisname[len];
+      gen_zaxis_height(&zaxis, pline);
+    }
 
   if ( zaxis.type != -1 ) zaxisID = zaxisDefine(zaxis);
+
+  free(zaxisname);
 
   return zaxisID;
 }

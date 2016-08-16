@@ -1,6 +1,10 @@
+2016-08-16  Uwe Schulzweida
+
+	* setzaxis: added support for internal zaxis name height_<value>_<units>
+
 2016-08-11  Uwe Schulzweida
 
-	Changed handling of rotated lon/lat grids
+	* Changed handling of rotated lon/lat grids
 
 2016-08-10  Uwe Schulzweida
 
