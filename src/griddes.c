@@ -1677,44 +1677,40 @@ int gridFromName(const char *gridnameptr)
 	    }
 	}
     }
-  else if ( strncmp(gridname, "germany", 7) == 0 ) /* germany_Xdeg */
+  else if ( cmpstrlen(gridname, "germany", len) == 0 ) /* germany_Xdeg */
     {
       double lon1 =   5.6, lon2 = 15.2;
       double lat1 =  47.1, lat2 = 55.1;
       double dll = 0.1;
 
-      pline = &gridname[7];
-
+      pline = &gridname[len];
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
-  else if ( strncmp(gridname, "europe", 6) == 0 ) /* europe_Xdeg */
+  else if ( cmpstrlen(gridname, "europe", len) == 0 ) /* europe_Xdeg */
     {
       double lon1 = -30, lon2 = 60;
       double lat1 =  30, lat2 = 80;
       double dll = 1;
 
-      pline = &gridname[6];
-
+      pline = &gridname[len];
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
-  else if ( strncmp(gridname, "africa", 6) == 0 ) /* africa_Xdeg */
+  else if ( cmpstrlen(gridname, "africa", len) == 0 ) /* africa_Xdeg */
     {
       double lon1 = -20, lon2 = 60;
       double lat1 = -40, lat2 = 40;
       double dll = 1;
 
-      pline = &gridname[6];
-
+      pline = &gridname[len];
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
-  else if ( strncmp(gridname, "global", 6) == 0 ) /* global_Xdeg */
+  else if ( cmpstrlen(gridname, "global", len) == 0 ) /* global_Xdeg */
     {
       double lon1 = -180, lon2 = 180;
       double lat1 =  -90, lat2 =  90;
       double dll = 1;
 
-      pline = &gridname[6];
-  
+      pline = &gridname[len];
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
 
