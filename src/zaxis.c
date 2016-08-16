@@ -59,18 +59,15 @@ void zaxisInit(zaxis_t *zaxis)
   zaxis->units[0]    = 0;
 }
 
-
-static int getoptname(char *optname, const char *optstring, int nopt)
+static
+int getoptname(char *optname, const char *optstring, int nopt)
 {
-  int i, nerr = 0;
-  size_t namelen;
-  const char *pname;
-  const char *pend;
+  int nerr = 0;
 
-  pname = optstring;
-  pend  = optstring;
+  const char *pname = optstring;
+  const char *pend  = optstring;
 
-  for ( i = 0; i < nopt; i++ )
+  for ( int i = 0; i < nopt; i++ )
     {
       pend = strchr(pname, ',');
       if ( pend == NULL )
@@ -81,6 +78,7 @@ static int getoptname(char *optname, const char *optstring, int nopt)
 
   if ( pend )
     {
+      size_t namelen;
       pend = strchr(pname, ',');
       if ( pend == NULL )
 	namelen = strlen(pname);
@@ -99,13 +97,10 @@ static int getoptname(char *optname, const char *optstring, int nopt)
 
 int zaxisDefine(zaxis_t zaxis)
 {
-  int zaxisID = UNDEFID;
-
   if ( zaxis.type == -1 ) Error("zaxistype undefined!");
+  if ( zaxis.size ==  0 ) Error("zaxis size undefined!");
 
-  if ( zaxis.size == 0 ) Error("zaxis size undefined!");
-
-  zaxisID = zaxisCreate(zaxis.type, zaxis.size);
+  int zaxisID = zaxisCreate(zaxis.type, zaxis.size);
 
   if ( zaxis.vals )
     {
@@ -152,17 +147,16 @@ static char *skipSeparator(char *pline)
 int zaxisFromFile(FILE *gfp, const char *dname)
 {
   char line[MAX_LINE_LEN], *pline;
-  int zaxisID;
-  size_t i, len;
-  zaxis_t zaxis;
+  size_t i;
 
+  zaxis_t zaxis;
   zaxisInit(&zaxis);
 
   while ( readline(gfp, line, MAX_LINE_LEN) )
     {
       if ( line[0] == '#' ) continue;
       if ( line[0] == '\0' ) continue;
-      len = strlen(line);
+      size_t len = strlen(line);
 
       bool lerror = false;
       for ( i = 0; i < len; ++i )
@@ -229,15 +223,12 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "levels", len)  == 0 )
 	{
-	  int i;
-	  double flev;
-
 	  if ( zaxis.size > 0 )
 	    {
 	      pline = skipSeparator(pline + len);
 	  
 	      zaxis.vals = (double*) Malloc(zaxis.size*sizeof(double));
-	      for ( i = 0; i < zaxis.size; i++ )
+	      for ( int i = 0; i < zaxis.size; i++ )
 		{
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
@@ -248,7 +239,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  flev = 0;
+		  double flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.vals[i] = flev;
 		  while ( isalnum((int) *pline) ||
@@ -263,15 +254,11 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "vct", len)  == 0 )
 	{
-	  int i;
-	  double flev;
-
 	  if ( zaxis.vctsize > 0 )
 	    {
 	      pline = skipSeparator(pline + len);
-	  
 	      zaxis.vct = (double*) Malloc(zaxis.vctsize*sizeof(double));
-	      for ( i = 0; i < zaxis.vctsize; i++ )
+	      for ( int i = 0; i < zaxis.vctsize; i++ )
 		{
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
@@ -282,7 +269,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  flev = 0;
+		  double flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.vct[i] = flev;
 		  while ( isalnum((int) *pline) ||
@@ -297,15 +284,11 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "lbounds", len)  == 0 )
 	{
-	  int i;
-	  double flev;
-
 	  if ( zaxis.size > 0 )
 	    {
 	      pline = skipSeparator(pline + len);
-	  
 	      zaxis.lbounds = (double*) Malloc(zaxis.size*sizeof(double));
-	      for ( i = 0; i < zaxis.size; i++ )
+	      for ( int i = 0; i < zaxis.size; i++ )
 		{
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
@@ -316,7 +299,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  flev = 0;
+		  double flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.lbounds[i] = flev;
 		  while ( isalnum((int) *pline) ||
@@ -331,15 +314,11 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "ubounds", len)  == 0 )
 	{
-	  int i;
-	  double flev;
-
 	  if ( zaxis.size > 0 )
 	    {
 	      pline = skipSeparator(pline + len);
-	  
 	      zaxis.ubounds = (double*) Malloc(zaxis.size*sizeof(double));
-	      for ( i = 0; i < zaxis.size; i++ )
+	      for ( int i = 0; i < zaxis.size; i++ )
 		{
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
@@ -350,7 +329,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  flev = 0;
+		  double flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.ubounds[i] = flev;
 		  while ( isalnum((int) *pline) ||
@@ -367,7 +346,7 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	cdoAbort("Invalid zaxis command : >%s< (zaxis description file: %s)", pline, dname);
     }
 
-  zaxisID = zaxisDefine(zaxis);
+  int zaxisID = zaxisDefine(zaxis);
 
   return zaxisID;
 }
@@ -375,13 +354,11 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 
 int zaxisFromName(const char *zaxisname)
 {
-  const char *pline;
   int zaxisID = UNDEFID;
   zaxis_t zaxis;
-
   zaxisInit(&zaxis);
 
-  pline = zaxisname;
+  const char *pline = zaxisname;
   if ( cmpstr(pline, "surface") == 0 ) /* surface */
     {
       zaxis.type = ZAXIS_SURFACE;
@@ -398,10 +375,9 @@ int zaxisFromName(const char *zaxisname)
 
 int cdoDefineZaxis(const char *zaxisfile)
 {
-  FILE *zfp;
   int zaxisID = -1;
 
-  zfp = fopen(zaxisfile, "r");
+  FILE *zfp = fopen(zaxisfile, "r");
   if ( zfp == NULL )
     {
       zaxisID = zaxisFromName(zaxisfile);
@@ -453,12 +429,8 @@ int ztype2ltype(int zaxistype)
 
 int zaxis2ltype(int zaxisID)
 {
-  int ltype;
-  int zaxistype;
-
-  zaxistype = zaxisInqType(zaxisID);
-
-  ltype = zaxisInqLtype(zaxisID);
+  int zaxistype = zaxisInqType(zaxisID);
+  int ltype = zaxisInqLtype(zaxisID);
 
   if ( ltype <= 0 ) ltype = ztype2ltype(zaxistype);
 
