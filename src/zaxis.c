@@ -151,19 +151,20 @@ static char *skipSeparator(char *pline)
 int zaxisFromFile(FILE *gfp, const char *dname)
 {
   char line[MAX_LINE_LEN], *pline;
-  size_t i;
 
   zaxis_t zaxis;
   zaxisInit(&zaxis);
 
+  int lineno = 0;
   while ( readline(gfp, line, MAX_LINE_LEN) )
     {
+      lineno++;
       if ( line[0] == '#' ) continue;
       if ( line[0] == '\0' ) continue;
       size_t len = strlen(line);
 
       bool lerror = false;
-      for ( i = 0; i < len; ++i )
+      for ( size_t i = 0; i < len; ++i )
 	if ( !(line[i] == 9 || (line[i] > 31 && line[i] < 127)) )
 	  {
 	    lerror = true;
@@ -227,124 +228,35 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	}
       else if ( cmpstrlen(pline, "levels", len)  == 0 )
 	{
-	  if ( zaxis.size > 0 )
-	    {
-	      pline = skipSeparator(pline + len);
-	  
-	      zaxis.vals = (double*) Malloc(zaxis.size*sizeof(double));
-	      for ( int i = 0; i < zaxis.size; i++ )
-		{
-		  pline = skipSeparator(pline);
-		  if ( strlen(pline) == 0 )
-		    {
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >levels< (zaxis description file: %s)", dname);
+	  if ( zaxis.size == 0 ) cdoAbort("size undefined (zaxis description file: %s)!", dname);
 
-		      pline = line;
-		      pline = skipSeparator(pline);
-		    }
-		  double flev = 0;
-		  sscanf(pline, "%lg", &flev);
-		  zaxis.vals[i] = flev;
-		  while ( isalnum((int) *pline) ||
-			  isdigit((int) *pline) ||
-			  ispunct((int) *pline) ) pline++;
-		}
-	    }
-	  else
-	    {
-	      cdoAbort("size undefined (zaxis description file: %s)!", dname);
-	    }
+          zaxis.vals = (double*) Malloc(zaxis.size*sizeof(double));
+          pline = skipSeparator(pline + len);
+          cdo_read_field("levels", pline, zaxis.size, zaxis.vals, &lineno, gfp, dname);
 	}
       else if ( cmpstrlen(pline, "vct", len)  == 0 )
 	{
-	  if ( zaxis.vctsize > 0 )
-	    {
-	      pline = skipSeparator(pline + len);
-	      zaxis.vct = (double*) Malloc(zaxis.vctsize*sizeof(double));
-	      for ( int i = 0; i < zaxis.vctsize; i++ )
-		{
-		  pline = skipSeparator(pline);
-		  if ( strlen(pline) == 0 )
-		    {
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >vct< (zaxis description file: %s)", dname);
+	  if ( zaxis.vctsize == 0 ) cdoAbort("vctsize undefined (zaxis description file: %s)!", dname);
 
-		      pline = line;
-		      pline = skipSeparator(pline);
-		    }
-		  double flev = 0;
-		  sscanf(pline, "%lg", &flev);
-		  zaxis.vct[i] = flev;
-		  while ( isalnum((int) *pline) ||
-			  isdigit((int) *pline) ||
-			  ispunct((int) *pline) ) pline++;
-		}
-	    }
-	  else
-	    {
-	      cdoAbort("vctsize undefined (zaxis description file: %s)!", dname);
-	    }
+          pline = skipSeparator(pline + len);
+          zaxis.vct = (double*) Malloc(zaxis.vctsize*sizeof(double));
+          cdo_read_field("vct", pline, zaxis.vctsize, zaxis.vct, &lineno, gfp, dname);
 	}
       else if ( cmpstrlen(pline, "lbounds", len)  == 0 )
 	{
-	  if ( zaxis.size > 0 )
-	    {
-	      pline = skipSeparator(pline + len);
-	      zaxis.lbounds = (double*) Malloc(zaxis.size*sizeof(double));
-	      for ( int i = 0; i < zaxis.size; i++ )
-		{
-		  pline = skipSeparator(pline);
-		  if ( strlen(pline) == 0 )
-		    {
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >lbounds< (zaxis description file: %s)", dname);
+	  if ( zaxis.size == 0 ) cdoAbort("size undefined (zaxis description file: %s)!", dname);
 
-		      pline = line;
-		      pline = skipSeparator(pline);
-		    }
-		  double flev = 0;
-		  sscanf(pline, "%lg", &flev);
-		  zaxis.lbounds[i] = flev;
-		  while ( isalnum((int) *pline) ||
-			  isdigit((int) *pline) ||
-			  ispunct((int) *pline) ) pline++;
-		}
-	    }
-	  else
-	    {
-	      cdoAbort("size undefined (zaxis description file: %s)!", dname);
-	    }
+          pline = skipSeparator(pline + len);
+          zaxis.lbounds = (double*) Malloc(zaxis.size*sizeof(double));
+          cdo_read_field("lbounds", pline, zaxis.size, zaxis.lbounds, &lineno, gfp, dname);
 	}
       else if ( cmpstrlen(pline, "ubounds", len)  == 0 )
 	{
-	  if ( zaxis.size > 0 )
-	    {
-	      pline = skipSeparator(pline + len);
-	      zaxis.ubounds = (double*) Malloc(zaxis.size*sizeof(double));
-	      for ( int i = 0; i < zaxis.size; i++ )
-		{
-		  pline = skipSeparator(pline);
-		  if ( strlen(pline) == 0 )
-		    {
-		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			cdoAbort("Incomplete command: >ubounds< (zaxis description file: %s)", dname);
+	  if ( zaxis.size == 0 ) cdoAbort("size undefined (zaxis description file: %s)!", dname);
 
-		      pline = line;
-		      pline = skipSeparator(pline);
-		    }
-		  double flev = 0;
-		  sscanf(pline, "%lg", &flev);
-		  zaxis.ubounds[i] = flev;
-		  while ( isalnum((int) *pline) ||
-			  isdigit((int) *pline) ||
-			  ispunct((int) *pline) ) pline++;
-		}
-	    }
-	  else
-	    {
-	      cdoAbort("size undefined (zaxis description file: %s)!", dname);
-	    }
+          pline = skipSeparator(pline + len);
+          zaxis.ubounds = (double*) Malloc(zaxis.size*sizeof(double));
+          cdo_read_field("ubounds", pline, zaxis.size, zaxis.ubounds, &lineno, gfp, dname);
 	}
       else
 	cdoAbort("Invalid zaxis command : >%s< (zaxis description file: %s)", pline, dname);

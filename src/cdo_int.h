@@ -163,6 +163,9 @@ int    parameter2intlist(const char *string);
 
 int referenceToGrid(int gridID1);
 
+void cdo_read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *fp, const char *dname);
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

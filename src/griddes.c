@@ -537,8 +537,8 @@ double read_value(const char *filename, const char *name, const char *pline)
   return val;
 }
 
-static
-void read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *gfp, const char *dname)
+
+void cdo_read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *fp, const char *dname)
 {
   char line[MAX_LINE_LEN];
   double fval;
@@ -550,7 +550,7 @@ void read_field(const char *name, char *pline, int size, double *field, int *lin
       if ( pline == endptr )
         {
           (*lineno)++;
-          if ( ! readline(gfp, line, MAX_LINE_LEN) )
+          if ( ! readline(fp, line, MAX_LINE_LEN) )
             cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name, *lineno, dname);
           pline = line;
           fval = strtod(pline, &endptr);
@@ -913,14 +913,11 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else
 	    size = grid.xsize;
 
-	  if ( size > 0 )
-	    {
-	      grid.xvals = (double*) Malloc(size*sizeof(double));
-	      pline = skipSeparator(pline + len);
-              read_field("xvals", pline, size, grid.xvals, &lineno, gfp, dname);
-	    }
-	  else
-	    cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
+	  if ( size > 0 ) cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
+
+          grid.xvals = (double*) Malloc(size*sizeof(double));
+          pline = skipSeparator(pline + len);
+          cdo_read_field("xvals", pline, size, grid.xvals, &lineno, gfp, dname);
 	}
       else if ( cmpstrlen(pline, "yvals", len)  == 0 )
 	{
@@ -929,14 +926,11 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else
 	    size = grid.ysize;
 
-	  if ( size > 0 )
-	    {
-	      grid.yvals = (double*) Malloc(size*sizeof(double));
-	      pline = skipSeparator(pline + len);
-              read_field("yvals", pline, size, grid.yvals, &lineno, gfp, dname);
-	    }
-	  else
-	    cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
+	  if ( size == 0 ) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
+
+          grid.yvals = (double*) Malloc(size*sizeof(double));
+          pline = skipSeparator(pline + len);
+          cdo_read_field("yvals", pline, size, grid.yvals, &lineno, gfp, dname);
 	}
       else if ( cmpstrlen(pline, "xbounds", len)  == 0 )
 	{
@@ -951,17 +945,12 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else
 	    size = grid.xsize;
 
-	  if ( size > 0 && grid.nvertex > 0 )
-	    {	  
-	      grid.xbounds = (double*) Malloc(size*grid.nvertex*sizeof(double));
-	      pline = skipSeparator(pline + len);
-              read_field("xbounds", pline, size*grid.nvertex, grid.xbounds, &lineno, gfp, dname);
-	    }
-	  else
-	    {
-	      if ( size         == 0 ) cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
-	      if ( grid.nvertex == 0 ) cdoAbort("nvertex undefined (file: %s)!", dname);
-	    }
+          if ( size         == 0 ) cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
+          if ( grid.nvertex == 0 ) cdoAbort("nvertex undefined (file: %s)!", dname);
+
+          grid.xbounds = (double*) Malloc(size*grid.nvertex*sizeof(double));
+          pline = skipSeparator(pline + len);
+          cdo_read_field("xbounds", pline, size*grid.nvertex, grid.xbounds, &lineno, gfp, dname);
 	}
       else if ( cmpstrlen(pline, "ybounds", len)  == 0 )
 	{
@@ -976,17 +965,12 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else
 	    size = grid.ysize;
 
-	  if ( size > 0 && grid.nvertex > 0 )
-	    {	  
-	      grid.ybounds = (double*) Malloc(size*grid.nvertex*sizeof(double));
-	      pline = skipSeparator(pline + len);
-              read_field("ybounds", pline, size*grid.nvertex, grid.ybounds, &lineno, gfp, dname);
-	    }
-	  else
-	    {
-	      if ( grid.ysize   == 0 ) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
-	      if ( grid.nvertex == 0 ) cdoAbort("nvertex undefined!", dname);
-	    }
+          if ( grid.ysize   == 0 ) cdoAbort("ysize or gridsize undefined (grid description file: %s)!", dname);
+          if ( grid.nvertex == 0 ) cdoAbort("nvertex undefined!", dname);
+
+          grid.ybounds = (double*) Malloc(size*grid.nvertex*sizeof(double));
+          pline = skipSeparator(pline + len);
+          cdo_read_field("ybounds", pline, size*grid.nvertex, grid.ybounds, &lineno, gfp, dname);
 	}
       else if ( cmpstrlen(pline, "ATTR_TXT", len)  == 0 )
 	{
@@ -1056,7 +1040,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 
           int *attint = (int*) Malloc(attlen*sizeof(int));
           double *attflt = (double*) Malloc(attlen*sizeof(double));
-          read_field("attint", pline, attlen, attflt, &lineno, gfp, dname);
+          cdo_read_field("attint", pline, attlen, attflt, &lineno, gfp, dname);
           for ( int i = 0; i < attlen; ++i ) attint[i] = (int)lround(attflt[i]);
           cdiDefAttInt(gridID, CDI_GLOBAL, attname, DATATYPE_INT32, attlen, attint);
           free(attint);
@@ -1067,7 +1051,7 @@ int gridFromFile(FILE *gfp, const char *dname)
           pline = read_att_name(pline, len, &attname, &attlen);
 
           double *attflt = (double*) Malloc(attlen*sizeof(double));
-          read_field("attflt", pline, attlen, attflt, &lineno, gfp, dname);
+          cdo_read_field("attflt", pline, attlen, attflt, &lineno, gfp, dname);
           cdiDefAttFlt(gridID, CDI_GLOBAL, attname, DATATYPE_FLT64, attlen, attflt);
           free(attflt);
 	}
