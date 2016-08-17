@@ -161,7 +161,6 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   double r0, s0;
   double r, s;
   double xla, phi;
-  double *xvals, *yvals, *xbounds, *ybounds;
 
   get_grid_info(c0, re, &nrx, &nry, &r0, &s0, &c);
 
@@ -171,10 +170,10 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
       return(-1);
     }
 
-  xvals = (double*) Malloc(nx*sizeof(double));
-  yvals = (double*) Malloc(ny*sizeof(double));
-  xbounds = (double*) Malloc(nx*2*sizeof(double));
-  ybounds = (double*) Malloc(nx*2*sizeof(double));
+  double *xvals = (double*) Malloc(nx*sizeof(double));
+  double *yvals = (double*) Malloc(ny*sizeof(double));
+  double *xbounds = (double*) Malloc(nx*2*sizeof(double));
+  double *ybounds = (double*) Malloc(nx*2*sizeof(double));
 
   for ( i = 0; i < nx; ++i )
     {
@@ -214,7 +213,7 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   Free(xbounds);
   Free(ybounds);
 
-  return (gridID);
+  return gridID;
 }
 
 static

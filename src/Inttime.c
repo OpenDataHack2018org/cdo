@@ -35,35 +35,24 @@ int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);
 
 void *Inttime(void *argument)
 {
-  int streamID1, streamID2 = -1;
-  int nrecs, nvars, nlevel;
-  int i, nrecords;
-  int tsID, tsIDo, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
+  int streamID2 = -1;
+  int nlevel;
+  int varID, levelID;
   int vdate, vtime;
   int offset;
-  int ijulinc, incperiod = 0, incunit = 3600, tunit = TUNIT_HOUR;
-  int calendar;
+  int incperiod = 0, incunit = 3600, tunit = TUNIT_HOUR;
   int year, month, day, hour, minute, second;
-  int *recVarID, *recLevelID;
-  int **nmiss1, **nmiss2, nmiss3;
-  const char *datestr, *timestr;
   char *rstr;
-  double missval1, missval2;
-  juldate_t juldate1, juldate2, juldate;
-  double fac1, fac2;
-  double *array, *single1, *single2;
-  double **vardata1, **vardata2, *vardatap;
+  double *single1, *single2;
+  double *vardatap;
 
   cdoInitialize(argument);
 
   operatorInputArg("date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
   if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
 
-  datestr = operatorArgv()[0];
-  timestr = operatorArgv()[1];
+  const char *datestr = operatorArgv()[0];
+  const char *timestr = operatorArgv()[1];
 
   if ( strchr(datestr, '-') )
     {
@@ -99,28 +88,28 @@ void *Inttime(void *argument)
       get_tunits(timeunits, &incperiod, &incunit, &tunit);
     }
   /* increment in seconds */
-  ijulinc = incperiod * incunit;
+  int ijulinc = incperiod * incunit;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
   if ( ijulinc == 0 ) vlistDefNtsteps(vlistID2, 1);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  nmiss1   = (int **) Malloc(nvars*sizeof(int *));
-  nmiss2   = (int **) Malloc(nvars*sizeof(int *));
-  vardata1 = (double **) Malloc(nvars*sizeof(double *));
-  vardata2 = (double **) Malloc(nvars*sizeof(double *));
+  int **nmiss1   = (int **) Malloc(nvars*sizeof(int *));
+  int **nmiss2   = (int **) Malloc(nvars*sizeof(int *));
+  double **vardata1 = (double **) Malloc(nvars*sizeof(double *));
+  double **vardata2 = (double **) Malloc(nvars*sizeof(double *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -132,14 +121,14 @@ void *Inttime(void *argument)
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  calendar = taxisInqCalendar(taxisID1);
+  int calendar = taxisInqCalendar(taxisID1);
 
-  juldate = juldate_encode(calendar, vdate, vtime);
+  juldate_t juldate = juldate_encode(calendar, vdate, vtime);
 
   if ( cdoVerbose )
     {
@@ -148,10 +137,10 @@ void *Inttime(void *argument)
       cdoPrint("ijulinc = %d", ijulinc);
     }
 
-  tsID = 0;
-  nrecs = streamInqTimestep(streamID1, tsID++);
-  juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
-  for ( recID = 0; recID < nrecs; recID++ )
+  int tsID = 0;
+  int nrecs = streamInqTimestep(streamID1, tsID++);
+  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+  for ( int recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(streamID1, &varID, &levelID);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -169,20 +158,20 @@ void *Inttime(void *argument)
   if ( juldate_to_seconds(juldate1) > juldate_to_seconds(juldate) )
     cdoWarning("start time %d %d out of range!", vdate, vtime);
 
-  tsIDo = 0;
+  int tsIDo = 0;
   while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
     {
       nrecs = streamInqTimestep(streamID1, tsID++);
       if ( nrecs == 0 ) break;
 
-      juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
       if ( cdoVerbose )
 	{
 	  cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
 	  cdoPrint("juldate2  = %f", juldate_to_seconds(juldate2));
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -225,12 +214,12 @@ void *Inttime(void *argument)
 	      taxisDefVtime(taxisID2, vtime);
 	      streamDefTimestep(streamID2, tsIDo++);
 
-	      fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
-		     juldate_to_seconds(juldate_sub(juldate2, juldate1));
-	      fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
-	   	     juldate_to_seconds(juldate_sub(juldate2, juldate1));
+	      double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
+                            juldate_to_seconds(juldate_sub(juldate2, juldate1));
+	      double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
+	   	            juldate_to_seconds(juldate_sub(juldate2, juldate1));
 
-	      for ( recID = 0; recID < nrecs; recID++ )
+	      for ( int recID = 0; recID < nrecs; recID++ )
 		{
 		  varID    = recVarID[recID];
 		  levelID  = recLevelID[recID];
@@ -239,14 +228,14 @@ void *Inttime(void *argument)
 		  single1  = vardata1[varID] + offset;
 		  single2  = vardata2[varID] + offset;
 
-		  nmiss3 = 0;
+		  int nmiss3 = 0;
 
 		  if ( nmiss1[varID][levelID] > 0 || nmiss2[varID][levelID] > 0 )
 		    {
-		      missval1 = vlistInqVarMissval(vlistID1, varID);
-		      missval2 = vlistInqVarMissval(vlistID2, varID);
+		      double missval1 = vlistInqVarMissval(vlistID1, varID);
+		      double missval2 = vlistInqVarMissval(vlistID2, varID);
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			{
 			  if ( !DBL_IS_EQUAL(single1[i], missval1) &&
 			       !DBL_IS_EQUAL(single2[i], missval2) )
@@ -266,7 +255,7 @@ void *Inttime(void *argument)
 		    }
 		  else
 		    {
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			array[i] = single1[i]*fac1 + single2[i]*fac2;
 		    }
 

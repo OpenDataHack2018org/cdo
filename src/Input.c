@@ -102,7 +102,6 @@ void *Input(void *argument)
 	  gridsize = gridInqSize(gridID);
 	  date     = 0;
 	  time     = 0;
-
 	  
 	  if ( nrecs == 0 )
 	    array = (double*) Malloc(gridsize*nlevs*sizeof(double));

@@ -150,9 +150,7 @@ void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
 static
 void write_data(int streamID, int nvars, double *data[], int *nmiss)
 {
-  int varID;
-
-  for ( varID = 0; varID < nvars; ++varID )
+  for ( int varID = 0; varID < nvars; ++varID )
     {
       streamDefRecord(streamID, varID, 0);
       streamWriteRecord(streamID, data[varID], nmiss[varID]);
@@ -163,9 +161,7 @@ static
 int getDate(const char *name)
 {
   int date = 0;
-  char *pname;
-
-  pname = (char *)strchr(name, '_');
+  char *pname = (char *)strchr(name, '_');
 
   if ( pname ) date = atoi(pname+1);
 
@@ -175,57 +171,51 @@ int getDate(const char *name)
 
 void *Importamsr(void *argument)
 {
-  int streamID;
   int tsID;
-  int gridID, zaxisID, taxisID, vlistID;
-  int gridsize;
-  int i;
   int nvars;
-  int vdate = 0, vtime = 0;
+  int vtime = 0;
   double xvals[NLON], yvals[NLAT];
   double *data[MAX_VARS];
   int nmiss[MAX_VARS];
-  FILE *fp;
-  size_t fsize;
 
   cdoInitialize(argument);
 
-  fp = fopen(cdoStreamName(0)->args, "r");
+  FILE *fp = fopen(cdoStreamName(0)->args, "r");
   if ( fp == NULL ) { perror(cdoStreamName(0)->args); exit(EXIT_FAILURE); }
 
   fseek(fp, 0L, SEEK_END);
-  fsize = (size_t) ftell(fp);
+  size_t fsize = (size_t) ftell(fp);
   fseek(fp, 0L, SEEK_SET);
 
-  vdate = getDate(cdoStreamName(0)->args);
+  int vdate = getDate(cdoStreamName(0)->args);
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
-  streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   /*
     Longitude  is 0.25*xdim-0.125    degrees east
     Latitude   is 0.25*ydim-90.125
   */
-  gridsize = NLON*NLAT;
-  gridID = gridCreate(GRID_LONLAT, gridsize);
+  int gridsize = NLON*NLAT;
+  int gridID = gridCreate(GRID_LONLAT, gridsize);
   gridDefXsize(gridID, NLON);
   gridDefYsize(gridID, NLAT);
-  for ( i = 0; i < NLON; ++i ) xvals[i] = 0.25*(i+1) - 0.125;
-  for ( i = 0; i < NLAT; ++i ) yvals[i] = 0.25*(i+1) - 90.125;
+  for ( int i = 0; i < NLON; ++i ) xvals[i] = 0.25*(i+1) - 0.125;
+  for ( int i = 0; i < NLAT; ++i ) yvals[i] = 0.25*(i+1) - 90.125;
   gridDefXvals(gridID, xvals);
   gridDefYvals(gridID, yvals);
 
-  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+  int zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
-  taxisID = taxisCreate(TAXIS_ABSOLUTE);
+  int taxisID = taxisCreate(TAXIS_ABSOLUTE);
 
-  vlistID = vlistCreate();
+  int vlistID = vlistCreate();
   vlistDefTaxis(vlistID, taxisID);
 
   if ( fsize == 12441600 )
     {
       nvars = 6;
-      for ( i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
+      for ( int i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
 
       init_amsr_day(vlistID, gridID, zaxisID, nvars);
 
@@ -245,12 +235,12 @@ void *Importamsr(void *argument)
 	  write_data(streamID, nvars, data, nmiss);
 	}
 
-      for ( i = 0; i < nvars; ++i ) Free(data[i]);
+      for ( int i = 0; i < nvars; ++i ) Free(data[i]);
     }
   else if ( fsize == 5184000 )
     {
       nvars = 5;
-      for ( i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
+      for ( int i = 0; i < nvars; ++i ) data[i] = (double*) Malloc(gridsize*sizeof(double));
 
       init_amsr_averaged(vlistID, gridID, zaxisID, nvars);
 
@@ -267,7 +257,7 @@ void *Importamsr(void *argument)
 
       write_data(streamID, nvars, data, nmiss);
 
-      for ( i = 0; i < nvars; ++i ) Free(data[i]);
+      for ( int i = 0; i < nvars; ++i ) Free(data[i]);
     }
   else
     cdoAbort("Unexpected file size for AMSR data!");

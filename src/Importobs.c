@@ -48,13 +48,10 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 static
 void init_data(int vlistID, int nvars, double *data[])
 {
-  int gridsize;
-  double missval;
-
   for ( int varID = 0; varID < nvars; ++varID )
     {
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      missval  = vlistInqVarMissval(vlistID, varID);
+      int gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+      double missval  = vlistInqVarMissval(vlistID, varID);
       
       for ( int i = 0; i < gridsize; ++i ) data[varID][i] = missval;
     } 
@@ -63,18 +60,14 @@ void init_data(int vlistID, int nvars, double *data[])
 static
 void write_data(int streamID, int vlistID, int nvars, double *data[])
 {
-  int nmiss;
-  int gridsize;
-  double missval;
-
   for ( int varID = 0; varID < nvars; ++varID )
     {
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      missval  = vlistInqVarMissval(vlistID, varID);
+      int gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+      double missval  = vlistInqVarMissval(vlistID, varID);
       
       streamDefRecord(streamID, varID, 0);
 
-      nmiss = 0;
+      int nmiss = 0;
       for ( int i = 0; i < gridsize; ++i )
 	if ( DBL_IS_EQUAL(data[varID][i], missval) ) nmiss++;
       
@@ -90,7 +83,7 @@ int getDate(const char *name)
   int date = 0;
   if ( pname ) date = atoi(pname+1);
 
-  return(date);
+  return date;
 }
 
 #define  MAX_LINE_LEN  4096

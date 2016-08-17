@@ -34,13 +34,12 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
   /* source code from PINGO */
   int ilon, ilat, i;
   double x, a, b;
-  double step;
   double level[10];
   int min_n, max_n;
   int bmin = 1, bmax = 1;
   unsigned char c;
 
-  step = (max - min) / 10;
+  double step = (max - min) / 10;
 
   if ( IS_NOT_EQUAL(step, 0) )
     {
@@ -243,7 +242,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 void *Info(void *argument)
 {
   int i;
-  int varID, recID;
+  int varID;
   int gridsize = 0;
   int gridID, zaxisID;
   int code, param;
@@ -301,7 +300,7 @@ void *Info(void *argument)
 	  date2str(vdate, vdatestr, sizeof(vdatestr));
 	  time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{

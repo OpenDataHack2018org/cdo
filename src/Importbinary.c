@@ -70,10 +70,9 @@ void get_dim_vals(dsets_t *pfi, double *vals, int dimlen, int dim)
 static
 void rev_vals(double *vals, int n)
 {
-  int i;
   double dum;
 
-  for ( i = 0; i < n/2; ++i )
+  for ( int i = 0; i < n/2; ++i )
     {
       dum = vals[i];
       vals[i] = vals[n-1-i];
@@ -116,22 +115,20 @@ int y_is_gauss(double *gridyvals, int ysize)
       Free(yvals);
     }
 
-  return (lgauss);
+  return lgauss;
 }
 
 static
 int define_grid(dsets_t *pfi)
 {
   int gridID, gridtype;
-  int nx, ny;
-  double *xvals, *yvals;
   int lgauss = FALSE;
 
-  nx = pfi->dnum[0];
-  ny = pfi->dnum[1];
+  int nx = pfi->dnum[0];
+  int ny = pfi->dnum[1];
 
-  xvals = (double*) Malloc(nx*sizeof(double));
-  yvals = (double*) Malloc(ny*sizeof(double));
+  double *xvals = (double*) Malloc(nx*sizeof(double));
+  double *yvals = (double*) Malloc(ny*sizeof(double));
 
   get_dim_vals(pfi, xvals, nx, 0);
   get_dim_vals(pfi, yvals, ny, 1);
@@ -153,22 +150,18 @@ int define_grid(dsets_t *pfi)
   Free(xvals);
   Free(yvals);
   
-  return (gridID);
+  return gridID;
 }
 
 static
 int define_level(dsets_t *pfi, int nlev)
 {
   int zaxisID = -1;
-  int nz;
-
-  nz = pfi->dnum[2];
+  int nz = pfi->dnum[2];
 
   if ( nz )
     {
-      double *zvals = NULL;
-
-      zvals = (double*) Malloc(nz*sizeof(double));
+      double *zvals = (double*) Malloc(nz*sizeof(double));
 
       get_dim_vals(pfi, zvals, nz, 2);
 
@@ -193,75 +186,67 @@ int define_level(dsets_t *pfi, int nlev)
       zaxisDefLevels(zaxisID, &level);
     }
 
-  return (zaxisID);
+  return zaxisID;
 }
 
 
 void *Importbinary(void *argument)
 {
-  int streamID;
-  int gridID = -1, zaxisID, zaxisIDsfc, taxisID, vlistID;
   int i;
   int nmiss = 0, n_nan;
   int ivar;
   int varID = -1, levelID, tsID;
   int gridsize;
-  int  status;
   int datatype;
   dsets_t pfi;
   int vdate, vtime;
   int tcur, told,fnum;
   int tmin=0,tmax=0;
   char *ch = NULL;
-  int nvars, nlevels, nrecs;
-  int recID;
+  int nlevels;
   int e, flag;
   size_t rc, recsize;
   int recoffset;
   char *rec = NULL;
-  struct gavar *pvar;
   struct dt dtim, dtimi;
   double missval;
   double fmin, fmax;
   double *array;
   double sfclevel = 0;
-  int *recVarID, *recLevelID;
-  int *var_zaxisID;
-  int *var_dfrm = NULL;
   char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);
 
   dsets_init(&pfi);
 
-  status = read_gradsdes(cdoStreamName(0)->args, &pfi);
+  int status = read_gradsdes(cdoStreamName(0)->args, &pfi);
   if ( cdoVerbose ) fprintf(stderr, "status %d\n", status);
   //if ( status ) cdoAbort("Open failed on %s!", pfi.name);
   if ( status ) cdoAbort("Open failed!");
 
-  nrecs = pfi.trecs;
-  nvars = pfi.vnum;
-  pvar  = pfi.pvar1;
+  int nrecs = pfi.trecs;
+  int nvars = pfi.vnum;
+  struct gavar *pvar  = pfi.pvar1;
 
   if ( nvars == 0 ) cdoAbort("No variables found!");
 
-  gridID = define_grid(&pfi);
+  int gridID = define_grid(&pfi);
   if ( cdoVerbose ) gridPrint(gridID, gridID, 1);
 
-  zaxisID = define_level(&pfi, 0);
+  int zaxisID = define_level(&pfi, 0);
   if ( cdoVerbose ) zaxisPrint(zaxisID, zaxisID);
 
-  zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
+  int zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
   zaxisDefLevels(zaxisIDsfc, &sfclevel);
 
-  vlistID = vlistCreate();
+  int vlistID = vlistCreate();
 
-  var_zaxisID = (int*) Malloc(nvars*sizeof(int));
-  recVarID    = (int*) Malloc(nrecs*sizeof(int));
-  recLevelID  = (int*) Malloc(nrecs*sizeof(int));
-  var_dfrm    = (int*) Malloc(nrecs*sizeof(int));
+  int *var_zaxisID = (int*) Malloc(nvars*sizeof(int));
+  int *recVarID    = (int*) Malloc(nrecs*sizeof(int));
+  int *recLevelID  = (int*) Malloc(nrecs*sizeof(int));
+  int *var_dfrm    = (int*) Malloc(nrecs*sizeof(int));
 
-  recID = 0;
+  int recID = 0;
   for ( ivar = 0; ivar < nvars; ++ivar )
     {
       /*
@@ -351,13 +336,13 @@ void *Importbinary(void *argument)
 
   int calendar = CALENDAR_STANDARD;
 
-  taxisID = taxisCreate(TAXIS_RELATIVE);
+  int taxisID = taxisCreate(TAXIS_RELATIVE);
 
   taxisDefCalendar(taxisID, calendar);
 
   vlistDefTaxis(vlistID, taxisID);
 
-  streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID, vlistID);
 

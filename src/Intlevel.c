@@ -35,32 +35,26 @@ static
 void vert_interp_lev(int gridsize, double missval, double *vardata1, double *vardata2,
 		     int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
-  int i;
-  int idx1, idx2;
-  double wgt1, wgt2;
-  double w1, w2;
-  double *var1L1, *var1L2, *var2;
-
   for ( int ilev = 0; ilev < nlev2; ++ilev )
     {
-      idx1 = lev_idx1[ilev];
-      idx2 = lev_idx2[ilev];
-      wgt1 = lev_wgt1[ilev];
-      wgt2 = lev_wgt2[ilev];
-      var2 = vardata2+gridsize*ilev;
+      int idx1 = lev_idx1[ilev];
+      int idx2 = lev_idx2[ilev];
+      double wgt1 = lev_wgt1[ilev];
+      double wgt2 = lev_wgt2[ilev];
+      double *var2 = vardata2+gridsize*ilev;
 
       if ( cdoVerbose ) cdoPrint("level %d: idx1=%d idx2=%d wgt1=%g wgt2=%g", ilev, idx1, idx2, wgt1, wgt2);
 
-      var1L1 = vardata1+gridsize*idx1;
-      var1L2 = vardata1+gridsize*idx2;
+      double *var1L1 = vardata1+gridsize*idx1;
+      double *var1L2 = vardata1+gridsize*idx2;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval) private(w1, w2)
+#pragma omp parallel for default(none) shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval)
 #endif
-      for ( i = 0; i < gridsize; ++i )
+      for ( int i = 0; i < gridsize; ++i )
 	{
-	  w1 = wgt1;
-	  w2 = wgt2;
+	  double w1 = wgt1;
+	  double w2 = wgt2;
 	  if ( DBL_IS_EQUAL(var1L1[i], missval) ) w1 = 0;
 	  if ( DBL_IS_EQUAL(var1L2[i], missval) ) w2 = 0;
 
@@ -163,7 +157,7 @@ void vert_gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev
 void *Intlevel(void *argument)
 {
   int gridsize;
-  int recID, nrecs;
+  int nrecs;
   int i, offset;
   int varID, levelID;
   int nmiss;
@@ -284,7 +278,7 @@ void *Intlevel(void *argument)
     zaxisDefPrec(zaxisID2, zaxisInqPrec(zaxisID1));
   }
 
-  for ( i = 0; i < nzaxis; i++ )
+  for ( int i = 0; i < nzaxis; i++ )
     if ( zaxisID1 == vlistZaxis(vlistID1, i) )
       vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
@@ -336,7 +330,7 @@ void *Intlevel(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -364,7 +358,7 @@ void *Intlevel(void *argument)
 		  offset   = gridsize*levelID;
 		  single2  = vardata2[varID] + offset;
 		  nmiss    = 0;
-		  for ( i = 0; i < gridsize; ++i )
+		  for ( int i = 0; i < gridsize; ++i )
 		    if ( DBL_IS_EQUAL(single2[i], missval) ) nmiss++;
 		  varnmiss[varID][levelID] = nmiss;
 		}

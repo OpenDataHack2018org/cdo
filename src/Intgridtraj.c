@@ -32,7 +32,6 @@
 int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double *ypos)
 {
   int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
-  int date, time;
   int stat;
 
   *xpos = 0;
@@ -43,71 +42,61 @@ int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double
 
   if ( stat != EOF )
     {
-      date = cdiEncodeDate(year, month, day);
-      time = cdiEncodeTime(hour, minute, second);
+      int date = cdiEncodeDate(year, month, day);
+      int time = cdiEncodeTime(hour, minute, second);
       *juldate = juldate_encode(calendar, date, time);
     }
 
-  return (stat);
+  return stat;
 }
 
 
 void *Intgridtraj(void *argument)
 {
-  int streamID1, streamID2;
-  int nrecs, nvars, nlevel;
-  int index, ngrids;
-  int i, nrecords;
-  int tsID, tsIDo, recID, varID, levelID;
-  int gridsize;
-  int vlistID1, vlistID2;
-  int gridID1, gridID2;
-  int taxisID1, taxisID2;
+  int gridID1;
+  int nlevel;
+  int varID, levelID;
   int vdate, vtime;
   int offset;
   int nmiss;
-  int *recVarID, *recLevelID;
-  juldate_t juldate1, juldate2, juldate;
-  double fac1, fac2;
   double point;
-  double *array, *single1, *single2;
-  double **vardata1, **vardata2, *vardatap;
+  double *single1, *single2;
+  double *vardatap;
   double xpos, ypos;
-  char *posfile;
   double missval;
   int calendar = CALENDAR_STANDARD;
-  field_t field1, field2;
-  FILE *fp;
 
   cdoInitialize(argument);
 
   operatorInputArg("filename with grid trajectories");
   operatorCheckArgc(1);
 
-  posfile = operatorArgv()[0];
-  fp = fopen(posfile, "r");
+  char *posfile = operatorArgv()[0];
+  FILE *fp = fopen(posfile, "r");
   if ( fp == NULL ) cdoAbort("Open failed on %s!", posfile);
 
+  juldate_t juldate;
   readnextpos(fp, calendar, &juldate, &xpos, &ypos);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  vardata1 = (double**) Malloc(nvars*sizeof(double*));
-  vardata2 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -117,16 +106,16 @@ void *Intgridtraj(void *argument)
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
-  gridID2 = gridCreate(GRID_TRAJECTORY, 1);
+  int gridID2 = gridCreate(GRID_TRAJECTORY, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   gridDefXvals(gridID2, &xpos);
   gridDefYvals(gridID2, &ypos);
 
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
+  int ngrids = vlistNgrids(vlistID1);
+  for ( int index = 0; index < ngrids; index++ )
     {
       gridID1 = vlistGrid(vlistID1, index);
 
@@ -137,18 +126,18 @@ void *Intgridtraj(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
-  nrecs = streamInqTimestep(streamID1, tsID++);
-  juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
-  for ( recID = 0; recID < nrecs; recID++ )
+  int tsID = 0;
+  int nrecs = streamInqTimestep(streamID1, tsID++);
+  juldate_t juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+  for ( int recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(streamID1, &varID, &levelID);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -158,14 +147,14 @@ void *Intgridtraj(void *argument)
       if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
     }
 
-  tsIDo = 0;
+  int tsIDo = 0;
   while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
     {
       nrecs = streamInqTimestep(streamID1, tsID++);
       if ( nrecs == 0 ) break;
-      juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      juldate_t juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -189,16 +178,16 @@ void *Intgridtraj(void *argument)
 	      taxisDefVtime(taxisID2, vtime);
 	      streamDefTimestep(streamID2, tsIDo++);
 
-	      fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
-		     juldate_to_seconds(juldate_sub(juldate2, juldate1));
-	      fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
-	   	     juldate_to_seconds(juldate_sub(juldate2, juldate1));
+	      double fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
+		            juldate_to_seconds(juldate_sub(juldate2, juldate1));
+	      double fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
+	   	            juldate_to_seconds(juldate_sub(juldate2, juldate1));
 	      /*
 	      printf("      %f %f %f %f %f\n", juldate_to_seconds(juldate),
 	                                       juldate_to_seconds(juldate1), 
 					       juldate_to_seconds(juldate2), fac1, fac2);
 	      */
-	      for ( recID = 0; recID < nrecs; recID++ )
+	      for ( int recID = 0; recID < nrecs; recID++ )
 		{
 		  varID    = recVarID[recID];
 		  levelID  = recLevelID[recID];
@@ -209,7 +198,7 @@ void *Intgridtraj(void *argument)
 		  single1  = vardata1[varID] + offset;
 		  single2  = vardata2[varID] + offset;
 
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( int i = 0; i < gridsize; i++ )
 		    array[i] = single1[i]*fac1 + single2[i]*fac2;
 
 		  field1.grid    = gridID1;

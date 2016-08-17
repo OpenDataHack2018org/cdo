@@ -86,7 +86,7 @@ void invertLevDes(int vlistID)
 void *Invertlev(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int nmiss;
   int nlev, nlevel;
   int gridID, zaxisID, offset;
@@ -154,7 +154,7 @@ void *Invertlev(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

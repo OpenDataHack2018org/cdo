@@ -32,44 +32,38 @@
 
 int genThinoutGrid(int gridID1, int xinc, int yinc)
 {
-  int ilon, ilat, olon, olat;
-  int gridID2, gridtype;
-  int nlon1, nlat1;
-  int gridsize2, nlon2, nlat2;
-  double *xvals1, *yvals1, *xvals2, *yvals2;
+  int gridtype = gridInqType(gridID1);
+  int nlon1 = gridInqXsize(gridID1);
+  int nlat1 = gridInqYsize(gridID1);
 
-  gridtype = gridInqType(gridID1);
-  nlon1 = gridInqXsize(gridID1);
-  nlat1 = gridInqYsize(gridID1);
-
-  nlon2 = nlon1/xinc;
-  nlat2 = nlat1/yinc;
+  int nlon2 = nlon1/xinc;
+  int nlat2 = nlat1/yinc;
   if ( nlon1%xinc ) nlon2++;
   if ( nlat1%yinc ) nlat2++;
-  gridsize2 = nlon2*nlat2;
+  int gridsize2 = nlon2*nlat2;
 
-  gridID2 = gridCreate(GRID_LONLAT, gridsize2);
+  int gridID2 = gridCreate(GRID_LONLAT, gridsize2);
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
     {
-      xvals1 = (double*) Malloc(nlon1*sizeof(double));
-      yvals1 = (double*) Malloc(nlat1*sizeof(double));
-      xvals2 = (double*) Malloc(nlon2*sizeof(double));
-      yvals2 = (double*) Malloc(nlat2*sizeof(double));
+      double *xvals1 = (double*) Malloc(nlon1*sizeof(double));
+      double *yvals1 = (double*) Malloc(nlat1*sizeof(double));
+      double *xvals2 = (double*) Malloc(nlon2*sizeof(double));
+      double *yvals2 = (double*) Malloc(nlat2*sizeof(double));
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
-      olat = 0;
-      for ( ilat = 0; ilat < nlat1; ilat+=yinc )
+      int olat = 0;
+      for ( int ilat = 0; ilat < nlat1; ilat+=yinc )
 	{
 	  yvals2[olat] = yvals1[ilat];
 	  olat++;
 	}
 
-      olon = 0;
-      for ( ilon = 0; ilon < nlon1; ilon+=xinc )
+      int olon = 0;
+      for ( int ilon = 0; ilon < nlon1; ilon+=xinc )
 	{
 	  xvals2[olon] = xvals1[ilon];
 	  olon++;
@@ -77,6 +71,11 @@ int genThinoutGrid(int gridID1, int xinc, int yinc)
 
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
+
+      Free(xvals1);
+      Free(yvals1);
+      Free(xvals2);
+      Free(yvals2);
     }
   else
     {
@@ -90,33 +89,29 @@ int genThinoutGrid(int gridID1, int xinc, int yinc)
 int genBoxavgGrid(int gridID1, int xinc, int yinc)
 {
   int i, j, i1;
-  int gridID2, gridtype;
-  int nlon1, nlat1;
-  int gridsize2, nlon2, nlat2;
-  double *xvals1, *yvals1, *xvals2, *yvals2;
-  double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
-  double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
 
-  gridtype = gridInqType(gridID1);
-  nlon1 = gridInqXsize(gridID1);
-  nlat1 = gridInqYsize(gridID1);
+  int gridtype = gridInqType(gridID1);
+  int nlon1 = gridInqXsize(gridID1);
+  int nlat1 = gridInqYsize(gridID1);
 
-  nlon2 = nlon1/xinc;
-  nlat2 = nlat1/yinc;
+  int nlon2 = nlon1/xinc;
+  int nlat2 = nlat1/yinc;
   if ( nlon1%xinc ) nlon2++;
   if ( nlat1%yinc ) nlat2++;
-  gridsize2 = nlon2*nlat2;
+  int gridsize2 = nlon2*nlat2;
 
-  gridID2 = gridCreate(GRID_LONLAT, gridsize2);
+  int gridID2 = gridCreate(GRID_LONLAT, gridsize2);
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
     {
-      xvals1 = (double*) Malloc(nlon1*sizeof(double));
-      yvals1 = (double*) Malloc(nlat1*sizeof(double));
-      xvals2 = (double*) Malloc(nlon2*sizeof(double));
-      yvals2 = (double*) Malloc(nlat2*sizeof(double));
+      double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
+      double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
+      double *xvals1 = (double*) Malloc(nlon1*sizeof(double));
+      double *yvals1 = (double*) Malloc(nlat1*sizeof(double));
+      double *xvals2 = (double*) Malloc(nlon2*sizeof(double));
+      double *yvals2 = (double*) Malloc(nlat2*sizeof(double));
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
@@ -160,6 +155,11 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
 
+      Free(xvals1);
+      Free(yvals1);
+      Free(xvals2);
+      Free(yvals2);
+
       if ( grid2_corner_lon && grid2_corner_lat )
 	{
 	  gridDefNvertex(gridID2, 2);
@@ -178,57 +178,44 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
   return gridID2;
 }
 
-
+static
 void boxavg(field_t *field1, field_t *field2, int xinc, int yinc)
 {
-  int nlon1, nlat1;
-  int nlon2, nlat2;
-  int ilat, ilon;
-  int gridID1, gridID2;
-  int nmiss;
-  double **xfield1;
-  double *array1, *array2;
-  double missval;
-  int i, j, ii, jj, in;
-  double **xfield2;
-  /* static int index = 0; */
+  int gridID1 = field1->grid;
+  int gridID2 = field2->grid;
+  double *array1  = field1->ptr;
+  double *array2  = field2->ptr;
+  double missval = field1->missval;
 
-  gridID1 = field1->grid;
-  gridID2 = field2->grid;
-  array1  = field1->ptr;
-  array2  = field2->ptr;
-  missval = field1->missval;
+  int nlon1 = gridInqXsize(gridID1);
+  int nlat1 = gridInqYsize(gridID1);
 
-  nlon1 = gridInqXsize(gridID1);
-  nlat1 = gridInqYsize(gridID1);
+  int nlon2 = gridInqXsize(gridID2);
+  int nlat2 = gridInqYsize(gridID2);
 
-  nlon2 = gridInqXsize(gridID2);
-  nlat2 = gridInqYsize(gridID2);
+  double **xfield1 = (double **) Malloc(nlat1*sizeof(double *));
 
-  xfield1 = (double **) Malloc(nlat1*sizeof(double *));
-
-  for ( ilat = 0; ilat < nlat1; ilat++ )
+  for ( int ilat = 0; ilat < nlat1; ilat++ )
     xfield1[ilat] = array1 + ilat*nlon1;
 
+  double **xfield2 = (double **) Malloc(nlat2 * sizeof(double *));
 
-  xfield2 = (double **) Malloc(nlat2 * sizeof(double *));
-
-  for ( ilat = 0; ilat < nlat2; ilat++ )
+  for ( int ilat = 0; ilat < nlat2; ilat++ )
     xfield2[ilat] = array2 + ilat*nlon2;
 
-  for ( ilat = 0; ilat < nlat2; ilat++ )
-    for ( ilon = 0; ilon < nlon2; ilon++ )
+  for ( int ilat = 0; ilat < nlat2; ilat++ )
+    for ( int ilon = 0; ilon < nlon2; ilon++ )
       {
 	xfield2[ilat][ilon] = 0;
 
-	in = 0;
-	for ( j = 0; j < yinc; ++j )
+	int in = 0;
+	for ( int j = 0; j < yinc; ++j )
 	  {
-	    jj = ilat*yinc+j;
+	    int jj = ilat*yinc+j;
 	    if ( jj >= nlat1 ) break;
-	    for ( i = 0; i < xinc; ++i )
+	    for ( int i = 0; i < xinc; ++i )
 	      {
-		ii = ilon*xinc+i;
+		int ii = ilon*xinc+i;
 		if ( ii >= nlon1 ) break;
 		in++;
 		xfield2[ilat][ilon] += xfield1[jj][ii];
@@ -237,8 +224,8 @@ void boxavg(field_t *field1, field_t *field2, int xinc, int yinc)
 	xfield2[ilat][ilon] /= in;
       }
 
-  nmiss = 0;
-  for ( i = 0; i < nlat2*nlon2; i++ )
+  int nmiss = 0;
+  for ( int i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
   field2->nmiss = nmiss;
@@ -247,47 +234,36 @@ void boxavg(field_t *field1, field_t *field2, int xinc, int yinc)
   Free(xfield1);
 }
 
-
+static
 void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
 {
-  int nlon1, nlat1;
-  int nlon2, nlat2;
-  int ilat, ilon, olat, olon;
-  int gridID1, gridID2;
-  int nmiss;
-  double **xfield1;
-  double *array1, *array2;
-  double missval;
-  int i;
-  double **xfield2;
+  int gridID1 = field1->grid;
+  int gridID2 = field2->grid;
+  double *array1  = field1->ptr;
+  double *array2  = field2->ptr;
+  double missval = field1->missval;
 
-  gridID1 = field1->grid;
-  gridID2 = field2->grid;
-  array1  = field1->ptr;
-  array2  = field2->ptr;
-  missval = field1->missval;
+  int nlon1 = gridInqXsize(gridID1);
+  int nlat1 = gridInqYsize(gridID1);
 
-  nlon1 = gridInqXsize(gridID1);
-  nlat1 = gridInqYsize(gridID1);
+  int nlon2 = gridInqXsize(gridID2);
+  int nlat2 = gridInqYsize(gridID2);
 
-  nlon2 = gridInqXsize(gridID2);
-  nlat2 = gridInqYsize(gridID2);
+  double **xfield1 = (double **) Malloc(nlat1*sizeof(double *));
 
-  xfield1 = (double **) Malloc(nlat1*sizeof(double *));
-
-  for ( ilat = 0; ilat < nlat1; ilat++ )
+  for ( int ilat = 0; ilat < nlat1; ilat++ )
     xfield1[ilat] = array1 + ilat*nlon1;
 
-  xfield2 = (double **) Malloc(nlat2*sizeof(double *));
+  double **xfield2 = (double **) Malloc(nlat2*sizeof(double *));
 
-  for ( ilat = 0; ilat < nlat2; ilat++ )
+  for ( int ilat = 0; ilat < nlat2; ilat++ )
     xfield2[ilat] = array2 + ilat*nlon2;
 
-  olat = 0;
-  for ( ilat = 0; ilat < nlat1; ilat+=yinc )
+  int olat = 0;
+  for ( int ilat = 0; ilat < nlat1; ilat+=yinc )
     {
-      olon = 0;
-      for ( ilon = 0; ilon < nlon1; ilon+=xinc )
+      int olon = 0;
+      for ( int ilon = 0; ilon < nlon1; ilon+=xinc )
 	{
 	  xfield2[olat][olon] = xfield1[ilat][ilon];
 	  olon++;
@@ -295,8 +271,8 @@ void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
       olat++;
     }
 
-  nmiss = 0;
-  for ( i = 0; i < nlat2*nlon2; i++ )
+  int nmiss = 0;
+  for ( int i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
   
   field2->nmiss = nmiss;
@@ -310,14 +286,12 @@ void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
 void *Intgrid(void *argument)
 {
   int nrecs;
-  int index;
-  int recID, varID, levelID;
+  int varID, levelID;
   int gridID1 = -1, gridID2 = -1;
   int nmiss;
   int xinc = 0, yinc = 0;
   double missval;
   double slon, slat;
-  field_t field1, field2;
 
   cdoInitialize(argument);
 
@@ -365,7 +339,7 @@ void *Intgrid(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
+  for ( int index = 0; index < ngrids; index++ )
     {
       gridID1 = vlistGrid(vlistID1, index);
 
@@ -407,6 +381,7 @@ void *Intgrid(void *argument)
   gridsize = gridInqSize(gridID2);
   double *array2   = (double*) Malloc(gridsize*sizeof(double));
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
 
@@ -417,7 +392,7 @@ void *Intgrid(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);

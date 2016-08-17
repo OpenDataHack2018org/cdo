@@ -36,21 +36,13 @@
 static
 void invertLonDes(int vlistID)
 {
-  int index, ngrids;
-  int gridID1, gridID2;
-  int nlat, nlon, size;
-  int ilat, ilon;
-  int gridtype, nv, iv;
-  double *xv1, *xv2;
-  double *xb1, *xb2;
-
-  ngrids = vlistNgrids(vlistID);
-  for ( index = 0; index < ngrids; index++ )
+  int ngrids = vlistNgrids(vlistID);
+  for ( int index = 0; index < ngrids; index++ )
     {
-      gridID1 = vlistGrid(vlistID, index);
-      gridID2 = gridDuplicate(gridID1);
+      int gridID1 = vlistGrid(vlistID, index);
+      int gridID2 = gridDuplicate(gridID1);
 
-      gridtype = gridInqType(gridID1);
+      int gridtype = gridInqType(gridID1);
 
       if ( gridtype != GRID_GENERIC && gridtype != GRID_GAUSSIAN &&
 	   gridtype != GRID_LONLAT  && gridtype != GRID_CURVILINEAR )
@@ -58,28 +50,24 @@ void invertLonDes(int vlistID)
 
       if ( gridInqXvals(gridID1, NULL) )
 	{
-	  nlon  = gridInqXsize(gridID1);
-	  nlat  = gridInqYsize(gridID1);
+	  int nlon = gridInqXsize(gridID1);
+	  int nlat = gridInqYsize(gridID1);
+	  int size = (gridtype == GRID_CURVILINEAR) ? nlon*nlat : nlon;
 
-	  if ( gridtype == GRID_CURVILINEAR )
-	    size = nlon*nlat;
-	  else
-            size = nlon;
-
-	  xv1 = (double*) Malloc(size*sizeof(double));
-	  xv2 = (double*) Malloc(size*sizeof(double));
+	  double *xv1 = (double*) Malloc(size*sizeof(double));
+	  double *xv2 = (double*) Malloc(size*sizeof(double));
 
 	  gridInqXvals(gridID1, xv1);
 
 	  if ( gridtype == GRID_CURVILINEAR )
 	    {
-	      for ( ilat = 0; ilat < nlat; ilat++ )
-		for ( ilon = 0; ilon < nlon; ilon++ )
+	      for ( int ilat = 0; ilat < nlat; ilat++ )
+		for ( int ilon = 0; ilon < nlon; ilon++ )
 		  xv2[ilat*nlon + nlon-ilon-1] = xv1[ilat*nlon + ilon];
 	    }
 	  else
 	    {
-	      for ( ilon = 0; ilon < nlon; ilon++ )
+	      for ( int ilon = 0; ilon < nlon; ilon++ )
 		xv2[nlon-ilon-1] = xv1[ilon];
 	    }
 
@@ -91,31 +79,26 @@ void invertLonDes(int vlistID)
 
       if ( gridInqXbounds(gridID1, NULL) )
 	{
-	  nlon  = gridInqXsize(gridID1);
-	  nlat  = gridInqYsize(gridID1);
+	  int nlon = gridInqXsize(gridID1);
+	  int nlat = gridInqYsize(gridID1);
+	  int nv   = gridInqNvertex(gridID1);
+	  int size = (gridtype == GRID_CURVILINEAR) ? nv*nlon*nlat : nv*nlon;
 
-	  nv = gridInqNvertex(gridID1);
-
-	  if ( gridtype == GRID_CURVILINEAR )
-	    size = nv*nlon*nlat;
-	  else
-            size = nv*nlon;
-
-	  xb1 = (double*) Malloc(size*sizeof(double));
-	  xb2 = (double*) Malloc(size*sizeof(double));
+	  double *xb1 = (double*) Malloc(size*sizeof(double));
+	  double *xb2 = (double*) Malloc(size*sizeof(double));
 
 	  gridInqXbounds(gridID1, xb1);
 
 	  if ( gridtype == GRID_CURVILINEAR )
 	    {
-	      for ( ilat = 0; ilat < nlat; ilat++ )
-		for ( ilon = 0; ilon < nlon; ilon++ )
-		  for ( iv = 0; iv < nv; iv++ )
+	      for ( int ilat = 0; ilat < nlat; ilat++ )
+		for ( int ilon = 0; ilon < nlon; ilon++ )
+		  for ( int iv = 0; iv < nv; iv++ )
 		    xb2[ilat*nlon*nv + (nlon-ilon-1)*nv + iv] = xb1[ilat*nlon*nv + ilon*nv + iv];
 	    }
 	  else
 	    {
-		for ( ilon = 0; ilon < nlon; ilon++ )
+		for ( int ilon = 0; ilon < nlon; ilon++ )
 		  {
 		    xb2[nlon*2-ilon*2-1] = xb1[ilon*2];
 		    xb2[nlon*2-ilon*2-2] = xb1[ilon*2+1];
@@ -149,11 +132,9 @@ void invertLatDes(int vlistID)
 
       if ( gridInqYvals(gridID1, NULL) )
 	{
-	  int nlon  = gridInqXsize(gridID1);
-	  int nlat  = gridInqYsize(gridID1);
-
-          int size = nlat;
-	  if ( gridtype == GRID_CURVILINEAR ) size = nlon*nlat;
+	  int nlon = gridInqXsize(gridID1);
+	  int nlat = gridInqYsize(gridID1);
+	  int size = (gridtype == GRID_CURVILINEAR) ? nlon*nlat : nlat;
 
 	  double *yv1 = (double*) Malloc(size*sizeof(double));
 	  double *yv2 = (double*) Malloc(size*sizeof(double));
@@ -193,13 +174,10 @@ void invertLatDes(int vlistID)
 
       if ( gridInqYbounds(gridID1, NULL) )
 	{
-	  int nlon  = gridInqXsize(gridID1);
-	  int nlat  = gridInqYsize(gridID1);
-
-	  int nv = gridInqNvertex(gridID1);
-
-          int size = nlat;
-	  if ( gridtype == GRID_CURVILINEAR ) size = nlon*nlat;
+	  int nlon = gridInqXsize(gridID1);
+	  int nlat = gridInqYsize(gridID1);
+	  int nv   = gridInqNvertex(gridID1);
+	  int size = (gridtype == GRID_CURVILINEAR) ? nv*nlon*nlat : nv*nlat;
 
 	  double *yb1 = (double*) Malloc(size*sizeof(double));
 	  double *yb2 = (double*) Malloc(size*sizeof(double));
@@ -235,26 +213,22 @@ void invertLatDes(int vlistID)
 static
 void invertLonData(double *array1, double *array2, int gridID1)
 {
-  int nlat, nlon;
-  int ilat, ilon;
-  double **field1, **field2;
-
-  nlon = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
+  int nlon = gridInqXsize(gridID1);
+  int nlat = gridInqYsize(gridID1);
 
   if ( nlat > 0 )
     {
-      field1 = (double **) Malloc(nlat*sizeof(double *));
-      field2 = (double **) Malloc(nlat*sizeof(double *));
+      double **field1 = (double **) Malloc(nlat*sizeof(double *));
+      double **field2 = (double **) Malloc(nlat*sizeof(double *));
   
-      for ( ilat = 0; ilat < nlat; ilat++ )
+      for ( int ilat = 0; ilat < nlat; ilat++ )
 	{
 	  field1[ilat] = array1 + ilat*nlon;
 	  field2[ilat] = array2 + ilat*nlon;
 	}
 
-      for ( ilat = 0; ilat < nlat; ilat++ )
-	for ( ilon = 0; ilon < nlon; ilon++ )
+      for ( int ilat = 0; ilat < nlat; ilat++ )
+	for ( int ilon = 0; ilon < nlon; ilon++ )
 	  field2[ilat][nlon-ilon-1] = field1[ilat][ilon];
   
       if ( field1 ) Free(field1);
@@ -269,25 +243,21 @@ void invertLonData(double *array1, double *array2, int gridID1)
 static
 void invertLatData(double *array1, double *array2, int gridID1)
 {
-  int nlat, nlon;
-  int ilat;
-  double **field1, **field2;
-
-  nlon = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
+  int nlon = gridInqXsize(gridID1);
+  int nlat = gridInqYsize(gridID1);
 
   if ( nlat > 0 )
     {
-      field1 = (double **) Malloc(nlat*sizeof(double *));
-      field2 = (double **) Malloc(nlat*sizeof(double *));
+      double **field1 = (double **) Malloc(nlat*sizeof(double *));
+      double **field2 = (double **) Malloc(nlat*sizeof(double *));
   
-      for ( ilat = 0; ilat < nlat; ilat++ )
+      for ( int ilat = 0; ilat < nlat; ilat++ )
 	{
 	  field1[ilat] = array1 + ilat*nlon;
 	  field2[ilat] = array2 + ilat*nlon;
 	}
 
-      for ( ilat = 0; ilat < nlat; ilat++ )
+      for ( int ilat = 0; ilat < nlat; ilat++ )
 	memcpy(field2[nlat-ilat-1], field1[ilat], nlon*sizeof(double));
       
       if ( field1 ) Free(field1);
@@ -303,7 +273,7 @@ void invertLatData(double *array1, double *array2, int gridID1)
 void *Invert(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int gridID1;
   int nmiss;
 
@@ -353,7 +323,7 @@ void *Invert(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
