@@ -227,6 +227,7 @@ void *Setgrid(void *argument)
     }
   else if ( operatorID == SETGRIDTYPE )
     {
+      bool lrgrid = false;
       int ngrids = vlistNgrids(vlistID1);
       for ( int index = 0; index < ngrids; index++ )
 	{
@@ -289,14 +290,19 @@ void *Setgrid(void *argument)
 
 	  if ( gridID2 == -1 )
             {
-              if ( lregular || lregularnn )
-                cdoAbort("No Gaussian reduced grid found!");
-              else
+              if ( !(lregular || lregularnn) )
                 cdoAbort("Unsupported grid type!");
             }
-          
-	  vlistChangeGridIndex(vlistID2, index, gridID2);
-	}
+
+	  if ( gridID2 != -1 )
+            {
+              if ( lregular || lregularnn ) lrgrid = true;
+              vlistChangeGridIndex(vlistID2, index, gridID2);
+            }
+        }
+
+      if ( (lregular || lregularnn) && !lrgrid )
+        cdoWarning("No reduced Gaussian grid found!");
     }
   else if ( operatorID == SETGRIDAREA )
     {
