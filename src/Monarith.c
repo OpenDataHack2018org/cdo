@@ -32,22 +32,11 @@
 
 void *Monarith(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2, streamID3;
-  int gridsize;
-  int nrecs, nrecs2, nvars, nlev, recID;
-  int tsID, tsID2;
+  int nrecs, nrecs2, nlev;
   int varID, levelID;
   int offset;
   int nmiss;
-  int vlistID1, vlistID2, vlistID3;
-  int taxisID1, taxisID2, taxisID3;
-  int vdate;
-  int yearmon1, yearmon2 = -1;
-  field_t field1, field2;
-  int **varnmiss2;
-  double **vardata2;
+  int yearmon2 = -1;
 
   cdoInitialize(argument);
 
@@ -56,39 +45,39 @@ void *Monarith(void *argument)
   cdoOperatorAdd("monmul", func_mul, 0, NULL);
   cdoOperatorAdd("mondiv", func_div, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
   
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
-
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));
   field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  nvars  = vlistNvars(vlistID2);
+  int nvars  = vlistNvars(vlistID2);
 
-  vardata2  = (double **) Malloc(nvars*sizeof(double *));
-  varnmiss2 = (int **) Malloc(nvars*sizeof(int *));
+  double **vardata2  = (double **) Malloc(nvars*sizeof(double *));
+  int **varnmiss2 = (int **) Malloc(nvars*sizeof(int *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -98,13 +87,12 @@ void *Monarith(void *argument)
       varnmiss2[varID] = (int*) Malloc(nlev*sizeof(int));
     }
 
-  tsID  = 0;
-  tsID2 = 0;
+  int tsID  = 0;
+  int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-
-      yearmon1 = vdate / 100;
+      int vdate = taxisInqVdate(taxisID1);
+      int yearmon1 = vdate / 100;
 
       if ( yearmon1 != yearmon2 )
 	{
@@ -120,21 +108,17 @@ void *Monarith(void *argument)
 	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoStreamName(1)->args);
 
 	  vdate = taxisInqVdate(taxisID2);
-
 	  yearmon2 = vdate / 100;
 
 	  if ( yearmon1 != yearmon2 )
 	    {
-	      int year2, mon2;
-
-	      year2 = yearmon2/100;
-	      mon2  = yearmon2 - (yearmon2/100)*100;
-
+	      int year2 = yearmon2/100;
+	      int mon2  = yearmon2 - (yearmon2/100)*100;
 	      cdoAbort("Timestep %d in %s has wrong date! Current year=%4d mon=%2d, expected year=%4d mon=%2d",
 		       tsID2+1, cdoStreamName(1)->args, year2, mon2, year1, mon1);
 	    }
 
-	  for ( recID = 0; recID < nrecs2; recID++ )
+	  for ( int recID = 0; recID < nrecs2; recID++ )
 	    {
 	      streamInqRecord(streamID2, &varID, &levelID);
 
@@ -152,7 +136,7 @@ void *Monarith(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);

@@ -31,19 +31,12 @@
 static
 void gen_index(int gridID1, int gridID2, int *index)
 {
-  int nlat1, nlon1;
-  int nlat2, nlon2;
-  int gridtype1, gridtype2;
-  int gridsize2;
   int i, j, k, i1, i2;
-  int *xindex = NULL, *yindex = NULL;
-  double *xvals1 = NULL, *yvals1 = NULL;
-  double *xvals2 = NULL, *yvals2 = NULL;
 
-  gridtype1 = gridInqType(gridID1);
-  gridtype2 = gridInqType(gridID2);
+  int gridtype1 = gridInqType(gridID1);
+  int gridtype2 = gridInqType(gridID2);
 
-  gridsize2 = gridInqSize(gridID2);
+  int gridsize2 = gridInqSize(gridID2);
 
   if ( gridtype1 != gridtype2 )
     cdoAbort("Input streams have different grid types!");
@@ -54,11 +47,11 @@ void gen_index(int gridID1, int gridID2, int *index)
 
   if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN )
     {
-      nlon1 = gridInqXsize(gridID1);
-      nlat1 = gridInqYsize(gridID1);
+      int nlon1 = gridInqXsize(gridID1);
+      int nlat1 = gridInqYsize(gridID1);
 
-      nlon2 = gridInqXsize(gridID2);
-      nlat2 = gridInqYsize(gridID2);
+      int nlon2 = gridInqXsize(gridID2);
+      int nlat2 = gridInqYsize(gridID2);
 
       if ( ! (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)) )
 	cdoAbort("Grid 1 has no values!");
@@ -66,13 +59,13 @@ void gen_index(int gridID1, int gridID2, int *index)
       if ( ! (gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)) )
 	cdoAbort("Grid 2 has no values!");
 
-      xvals1 = (double*) Malloc(nlon1*sizeof(double));
-      yvals1 = (double*) Malloc(nlat1*sizeof(double));
-      xvals2 = (double*) Malloc(nlon2*sizeof(double));
-      yvals2 = (double*) Malloc(nlat2*sizeof(double));
+      double *xvals1 = (double*) Malloc(nlon1*sizeof(double));
+      double *yvals1 = (double*) Malloc(nlat1*sizeof(double));
+      double *xvals2 = (double*) Malloc(nlon2*sizeof(double));
+      double *yvals2 = (double*) Malloc(nlat2*sizeof(double));
 
-      xindex = (int*) Malloc(nlon2*sizeof(int));
-      yindex = (int*) Malloc(nlat2*sizeof(int));
+      int *xindex = (int*) Malloc(nlon2*sizeof(int));
+      int *yindex = (int*) Malloc(nlat2*sizeof(int));
 
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
@@ -165,37 +158,26 @@ void gen_index(int gridID1, int gridID2, int *index)
 
 void *Mergegrid(void *argument)
 {
-  int varID;
+  int varID, levelID;
   int nrecs = 0;
-  int tsID, recID, levelID;
-  int nrecs2;
-  int streamID1, streamID2, streamID3;
-  int vlistID1 , vlistID2, vlistID3;
   int nmiss1, nmiss2;
-  int gridsize1, gridsize2;
-  int gridID1, gridID2;
-  int taxisID1, taxisID3;
   int index;
-  int i, *gindex = NULL;
-  int ndiffgrids;
-  double missval1, missval2;
-  double *array1, *array2;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
 
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID2 = streamInqVlist(streamID2);
 
   vlistCompare(vlistID1, vlistID2, CMP_NAME | CMP_NLEVEL);
 
-  ndiffgrids = 0;
+  int ndiffgrids = 0;
   for ( index = 1; index < vlistNgrids(vlistID1); index++ )
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
@@ -209,31 +191,31 @@ void *Mergegrid(void *argument)
 
   if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(1)->args);
 
-  gridID1 = vlistGrid(vlistID1, 0);
-  gridID2 = vlistGrid(vlistID2, 0);
+  int gridID1 = vlistGrid(vlistID1, 0);
+  int gridID2 = vlistGrid(vlistID2, 0);
 
-  gridsize1 = gridInqSize(gridID1);
-  gridsize2 = gridInqSize(gridID2);
+  int gridsize1 = gridInqSize(gridID1);
+  int gridsize2 = gridInqSize(gridID2);
 
-  array1 = (double*) Malloc(gridsize1*sizeof(double));
-  array2 = (double*) Malloc(gridsize2*sizeof(double));
-  gindex = (int*) Malloc(gridsize2*sizeof(int));
+  double *array1 = (double*) Malloc(gridsize1*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
+  int *gindex = (int*) Malloc(gridsize2*sizeof(int));
 
   gen_index(gridID1, gridID2, gindex);
 
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   vlistDefTaxis(vlistID3, taxisID3);
   streamDefVlist(streamID3, vlistID3);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID3, taxisID1);
 
-      nrecs2 = streamInqTimestep(streamID2, tsID);
+      int nrecs2 = streamInqTimestep(streamID2, tsID);
       if ( nrecs2 == 0 )
 	cdoAbort("Input streams have different number of timesteps!");
 
@@ -242,19 +224,19 @@ void *Mergegrid(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID2, &varID, &levelID);
 	  streamReadRecord(streamID2, array2, &nmiss2);
 
-	  missval2 = vlistInqVarMissval(vlistID2, varID);
+	  double missval2 = vlistInqVarMissval(vlistID2, varID);
 
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss1);
 
-	  missval1 = vlistInqVarMissval(vlistID1, varID);
+	  double missval1 = vlistInqVarMissval(vlistID1, varID);
 
-	  for ( i = 0; i < gridsize2; i++ )
+	  for ( int i = 0; i < gridsize2; i++ )
 	    {
 	      if ( gindex[i] >= 0 && !DBL_IS_EQUAL(array2[i], missval2) )
 		{
@@ -265,7 +247,7 @@ void *Mergegrid(void *argument)
 	  if ( nmiss1 )
 	    {
 	      nmiss1 = 0;
-	      for ( i = 0; i < gridsize1; i++ )
+	      for ( int i = 0; i < gridsize1; i++ )
 		if ( DBL_IS_EQUAL(array1[i], missval1) ) nmiss1++;
 	    }
 

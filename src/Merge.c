@@ -34,30 +34,22 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 {
   char vname1[CDI_MAX_NAME], vname2[CDI_MAX_NAME];
   int k;
-  int gridID1, gridID2;
-  int zaxisID1, zaxisID2;
-  int varID1, varID2;
-  int param1, param2;
-  int ztype1, ztype2;
-  int gtype1, gtype2;
-  int nlev1,  nlev2;
-  int gsize1, gsize2;
   int mlev1 = 0, mlev2 = 0;
   double *lev1 = NULL, *lev2 = NULL;
 
   int nvars1 = vlistNvars(vlistID1);
   int nvars2 = vlistNvars(vlistID2);
 
-  for ( varID1 = 0; varID1 < nvars1; ++varID1 )
+  for ( int varID1 = 0; varID1 < nvars1; ++varID1 )
     {
       vlistInqVarName(vlistID1, varID1, vname1);
-      param1   = vlistInqVarParam(vlistID1, varID1);
-      gridID1  = vlistInqVarGrid(vlistID1, varID1);
-      zaxisID1 = vlistInqVarZaxis(vlistID1, varID1);
-      gtype1   = gridInqType(gridID1);
-      gsize1   = gridInqSize(gridID1);
-      ztype1   = zaxisInqType(zaxisID1);
-      nlev1    = zaxisInqSize(zaxisID1);
+      int param1   = vlistInqVarParam(vlistID1, varID1);
+      int gridID1  = vlistInqVarGrid(vlistID1, varID1);
+      int zaxisID1 = vlistInqVarZaxis(vlistID1, varID1);
+      int gtype1   = gridInqType(gridID1);
+      int gsize1   = gridInqSize(gridID1);
+      int ztype1   = zaxisInqType(zaxisID1);
+      int nlev1    = zaxisInqSize(zaxisID1);
       if ( nlev1 > mlev1 )
 	{
 	  mlev1 = nlev1;
@@ -65,16 +57,16 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 	}
       zaxisInqLevels(zaxisID1, lev1);
 
-      for ( varID2 = 0; varID2 < nvars2; ++varID2 )
+      for ( int varID2 = 0; varID2 < nvars2; ++varID2 )
 	{
 	  vlistInqVarName(vlistID2, varID2, vname2);
-	  param2   = vlistInqVarParam(vlistID2, varID2);
-	  gridID2  = vlistInqVarGrid(vlistID2, varID2);
-	  zaxisID2 = vlistInqVarZaxis(vlistID2, varID2);
-	  gtype2   = gridInqType(gridID2);
-	  gsize2   = gridInqSize(gridID2);
-	  ztype2   = zaxisInqType(zaxisID2);
-	  nlev2    = zaxisInqSize(zaxisID2);
+	  int param2   = vlistInqVarParam(vlistID2, varID2);
+	  int gridID2  = vlistInqVarGrid(vlistID2, varID2);
+	  int zaxisID2 = vlistInqVarZaxis(vlistID2, varID2);
+	  int gtype2   = gridInqType(gridID2);
+	  int gsize2   = gridInqSize(gridID2);
+	  int ztype2   = zaxisInqType(zaxisID2);
+	  int nlev2    = zaxisInqSize(zaxisID2);
 	  if ( gtype1 == gtype2 && gsize1 == gsize2 && ztype1 == ztype2 && nlev1 == nlev2 )
 	    {
 	      if ( nlev2 > mlev2 )
@@ -92,9 +84,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 		  if ( param1 < 0 || param2 < 0 )
 		    {
 		      if ( strcmp(vname1, vname2) == 0 )
-			{
-			  cdoWarning("Duplicate entry of parameter %s in %s!", vname2, filename);
-			}
+                        cdoWarning("Duplicate entry of parameter %s in %s!", vname2, filename);
 		    }
 		  else
 		    {
@@ -131,33 +121,14 @@ void *Merge(void *argument)
   int streamID1 = -1;
   int varID, varID2;
   int nrecs = 0;
-  int recID, levelID, levelID2;
+  int levelID, levelID2;
   int index;
   int gridsize;
   int nmiss;
-  //int skip_same_var = FALSE;
 
   cdoInitialize(argument);
 
   bool lcopy = UNCHANGED_RECORD;
-
-  /*
-  {
-    char *envstr;
-    envstr = getenv("SKIP_SAME_VAR");
-    if ( envstr )
-      {
-	int ival;
-	ival = atoi(envstr);
-	if ( ival == 1 )
-	  {
-	    skip_same_var = TRUE;
-	    if ( cdoVerbose )
-	      cdoPrint("Set SKIP_SAME_VAR to %d", ival);
-	  }
-      }
-  }
-  */
 
   int streamCnt = cdoStreamCnt();
   int nmerge    = streamCnt - 1;
@@ -310,7 +281,7 @@ void *Merge(void *argument)
 
 	  if ( vlistID1 == -1 ) continue;
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 

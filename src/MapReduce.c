@@ -71,8 +71,7 @@ int countMask(double *maskField, int gridSize, double falseVal)
 void *MapReduce(void *argument)
 {
   int nrecs;
-  int tsID;
-  int varID, levelID, recID;
+  int varID, levelID;
   int nmiss;
   int nobounds = FALSE;
   int nocoords = FALSE;
@@ -90,7 +89,6 @@ void *MapReduce(void *argument)
   if ( cdoDebug ) cdoPrint("MapReduce: input gridSize:%d", inputGridSize);
 
   /* creata an index list of the relevant locations  {{{ */
-  tsID = 0;
   double *inputMaskField = (double*) Malloc(inputGridSize*sizeof(double));
   read_first_record(operatorArgv()[0],inputGridSize, inputMaskField);
 
@@ -166,13 +164,13 @@ void *MapReduce(void *argument)
   double *arrayIn  = (double *)Malloc(inputGridSize*sizeof(double));
   double *arrayOut = (double *)Malloc(maskSize*sizeof(double));
 
-  tsID = 0; 
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
           if (TRUE == vars[varID])

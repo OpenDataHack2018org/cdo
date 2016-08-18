@@ -26,25 +26,21 @@ void dumplogo(const char *logfilename, int dumptype);
 
 void *Log(void *argument)
 {
-  int DUMPLOGS, DAYLOGS, MONLOGS;
-  int operatorID, operfunc;
-  int dumptype;
-
   cdoInitialize(argument);
 
-  DUMPLOGS  = cdoOperatorAdd("dumplogs",   0, 0, NULL);
-  DAYLOGS   = cdoOperatorAdd("daylogs",    0, 0, NULL);
-  MONLOGS   = cdoOperatorAdd("monlogs",    0, 0, NULL);
-              cdoOperatorAdd("dumplogo",   1, 0, NULL);
-              cdoOperatorAdd("snamelogo",  1, 1, NULL);
-              cdoOperatorAdd("scalllogo",  1, 2, NULL);
-              cdoOperatorAdd("smemlogo",   1, 3, NULL);
-              cdoOperatorAdd("stimelogo",  1, 4, NULL);
-              cdoOperatorAdd("sperclogo",  1, 5, NULL);
+  int DUMPLOGS  = cdoOperatorAdd("dumplogs",   0, 0, NULL);
+  int DAYLOGS   = cdoOperatorAdd("daylogs",    0, 0, NULL);
+  int MONLOGS   = cdoOperatorAdd("monlogs",    0, 0, NULL);
+                  cdoOperatorAdd("dumplogo",   1, 0, NULL);
+                  cdoOperatorAdd("snamelogo",  1, 1, NULL);
+                  cdoOperatorAdd("scalllogo",  1, 2, NULL);
+                  cdoOperatorAdd("smemlogo",   1, 3, NULL);
+                  cdoOperatorAdd("stimelogo",  1, 4, NULL);
+                  cdoOperatorAdd("sperclogo",  1, 5, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorF1(operatorID);
-  dumptype   = cdoOperatorF2(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc   = cdoOperatorF1(operatorID);
+  int dumptype   = cdoOperatorF2(operatorID);
 
   if ( cdoStreamName(0)->args[0] == '-' )
     cdoAbort("This operator does not work with pipes!");

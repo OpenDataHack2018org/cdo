@@ -107,7 +107,7 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2, int nmiss,
 void *Mastrfu(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int offset;
   int nmiss, nmiss1;
 
@@ -167,7 +167,7 @@ void *Mastrfu(void *argument)
       streamDefTimestep(streamID2, tsID);
 
       nmiss = 0;
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  offset  = gridsize*levelID;
@@ -177,7 +177,7 @@ void *Mastrfu(void *argument)
 
       mastrfu(gridID, zaxisID, array1, array2, nmiss, missval);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  varID = 0;
 	  levelID = recID;

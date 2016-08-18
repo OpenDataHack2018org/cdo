@@ -37,15 +37,12 @@
 static
 int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 {
-  double xcoord, ycoord;
   int z = 0, number = 0, jumpedlines = 0;
-  int i = 0;
   char line[MAX_LINE];
-  char *linep;
 
   while ( readline(fp, line, MAX_LINE) )
     {
-      i = 0;
+      int i = 0;
       if ( line[0] == '#' ) 
          { 
            jumpedlines++;
@@ -58,14 +55,11 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
          }  
       if ( line[0] == '&' ) break;
 	 
-      linep = &line[0];
+      char *linep = &line[0];
      
-      xcoord = strtod(linep, &linep);
+      double xcoord = strtod(linep, &linep);
       
-      if ( ! (fabs(xcoord) > 0) ) 
-	{
-	  jumpedlines++;
-	}
+      if ( ! (fabs(xcoord) > 0) ) jumpedlines++;
       
       while( ( ( isdigit( (int) *linep ) == FALSE ) && ( *linep!='-' )) && ( i < 64) )
 	{	  
@@ -82,7 +76,7 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 	}    
       if ( ( i >= 63 ) && ( number != 0 ) ) cdoAbort( "Wrong value format in file %s at line %d", polyfile, (number+jumpedlines+1) );
     
-      ycoord = strtod(linep, NULL);
+      double ycoord = strtod(linep, NULL);
      
       xvals[number] = xcoord;
       yvals[number] = ycoord;

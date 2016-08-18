@@ -63,13 +63,12 @@ void rotate_uv2(double *u_i, double *v_j, int ix, int iy,
   double lat_factor;
   double absold, absnew;  /* velocity vector lengths */
   int  i, j, ip1, im1, jp1, jm1;
-  bool change_sign_u, change_sign_v;
   double pi = 3.14159265359;
 
 
   /* specification whether change in sign is needed for the input arrays */
-  change_sign_u = false;
-  change_sign_v = true;
+  bool change_sign_u = false;
+  bool change_sign_v = true;
 
   /* initialization */
   for ( i = 0; i < ix*iy; i++ )
@@ -155,26 +154,23 @@ static
 void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y, 
 		  double *grid2x, double *grid2y, double *grid3x, double *grid3y)
 {
-  int gridsizex;
-  int i, j;
   double gx, gy;
   double gx2, gy2;
-  double *gxhelp, *gyhelp;
 
-  gridsizex = (nlon+2)*nlat;
-  gxhelp  = (double*) Malloc(gridsizex*sizeof(double));
-  gyhelp  = (double*) Malloc(gridsizex*sizeof(double));
+  int gridsizex = (nlon+2)*nlat;
+  double *gxhelp = (double*) Malloc(gridsizex*sizeof(double));
+  double *gyhelp = (double*) Malloc(gridsizex*sizeof(double));
 
   /* load to a help field */
-  for ( j = 0; j < nlat; j++ )
-    for ( i = 0; i < nlon; i++ )
+  for ( int j = 0; j < nlat; j++ )
+    for ( int i = 0; i < nlon; i++ )
       {
 	gxhelp[IX2D(j,i+1,nlon+2)] = grid1x[IX2D(j,i,nlon)];
 	gyhelp[IX2D(j,i+1,nlon+2)] = grid1y[IX2D(j,i,nlon)];
       }
 
   /* make help field cyclic */
-  for ( j = 0; j < nlat; j++ )
+  for ( int j = 0; j < nlat; j++ )
     {
       gxhelp[IX2D(j,0,nlon+2)]      = gxhelp[IX2D(j,nlon,nlon+2)];
       gxhelp[IX2D(j,nlon+1,nlon+2)] = gxhelp[IX2D(j,1,nlon+2)];
@@ -183,8 +179,8 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
     }
 
   /* interpolate u to scalar points */
-  for ( j = 0; j < nlat; j++ )
-    for ( i = 0; i < nlon; i++ )
+  for ( int j = 0; j < nlat; j++ )
+    for ( int i = 0; i < nlon; i++ )
       {
 	grid3x[IX2D(j,i,nlon)] = (gxhelp[IX2D(j,i,nlon+2)]+gxhelp[IX2D(j,i+1,nlon+2)])*0.5;
 	if ( (gxhelp[IX2D(j,i,nlon+2)] > 340 && gxhelp[IX2D(j,i+1,nlon+2)] <  20) ||
@@ -200,15 +196,15 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
       }
 
   /* load to a help field */
-  for ( j = 0; j < nlat; j++ )
-    for ( i = 0; i < nlon; i++ )
+  for ( int j = 0; j < nlat; j++ )
+    for ( int i = 0; i < nlon; i++ )
       {
 	gxhelp[IX2D(j,i+1,nlon+2)] = grid2x[IX2D(j,i,nlon)];
 	gyhelp[IX2D(j,i+1,nlon+2)] = grid2y[IX2D(j,i,nlon)];
       }
 
   /* make help field cyclic */
-  for ( j = 0; j < nlat; j++ )
+  for ( int j = 0; j < nlat; j++ )
     {
       gxhelp[IX2D(j,0,nlon+2)]      = gxhelp[IX2D(j,nlon,nlon+2)];
       gxhelp[IX2D(j,nlon+1,nlon+2)] = gxhelp[IX2D(j,1,nlon+2)];
@@ -217,8 +213,8 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
     }
 
   /* interpolate v to scalar points */
-  for ( j = 1; j < nlat-1; j++ )
-    for ( i = 0; i < nlon; i++ )
+  for ( int j = 1; j < nlat-1; j++ )
+    for ( int i = 0; i < nlon; i++ )
       {
 	gx = (gxhelp[IX2D(j,i+1,nlon+2)]+gxhelp[IX2D(j-1,i+1,nlon+2)])*0.5;
 	if ( (gxhelp[IX2D(j,i+1,nlon+2)] > 340 && gxhelp[IX2D(j-1,i+1,nlon+2)] <  20) ||
@@ -306,12 +302,12 @@ void *Mrotuvb(void *argument)
   int nlon    = gridInqXsize(gridID1);
   int nlat    = gridInqYsize(gridID1);
 
-  double *grid1x  = (double*) Malloc(gridsize*sizeof(double));
-  double *grid1y  = (double*) Malloc(gridsize*sizeof(double));
-  double *grid2x  = (double*) Malloc(gridsize*sizeof(double));
-  double *grid2y  = (double*) Malloc(gridsize*sizeof(double));
-  double *grid3x  = (double*) Malloc(gridsize*sizeof(double));
-  double *grid3y  = (double*) Malloc(gridsize*sizeof(double));
+  double *grid1x = (double*) Malloc(gridsize*sizeof(double));
+  double *grid1y = (double*) Malloc(gridsize*sizeof(double));
+  double *grid2x = (double*) Malloc(gridsize*sizeof(double));
+  double *grid2y = (double*) Malloc(gridsize*sizeof(double));
+  double *grid3x = (double*) Malloc(gridsize*sizeof(double));
+  double *grid3y = (double*) Malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID1, grid1x);
   gridInqYvals(gridID1, grid1y);

@@ -44,9 +44,9 @@ void *Merstat(void *argument)
   int wstatus = FALSE;
   int index;
   int nmiss;
-  int recID, nrecs;
+  int nrecs;
   int varID, levelID;
-  int needWeights = FALSE;
+  bool needWeights = false;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);
@@ -76,7 +76,7 @@ void *Merstat(void *argument)
   if ( operfunc == func_mean || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std ||
        operfunc == func_var1 || operfunc == func_std1 )
-    needWeights = TRUE;
+    needWeights = true;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -138,7 +138,7 @@ void *Merstat(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);

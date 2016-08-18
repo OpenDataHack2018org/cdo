@@ -28,26 +28,19 @@
 static
 int read_cmor_table(const char *filename)
 {
-  void *kvlist;
-  int nlists, listID;
-  int nelements, elemID;
-  const char *listname;
-  const char *ename;
-  const char *evalue;
-
-  kvlist = kvlParseFile(filename);
-  nlists = kvlGetNumLists(kvlist);
+  void *kvlist = kvlParseFile(filename);
+  int nlists = kvlGetNumLists(kvlist);
   printf("# Number of lists: %d\n", nlists);
-  for ( listID = 0; listID < nlists; ++listID )
+  for ( int listID = 0; listID < nlists; ++listID )
     {
-      listname = kvlGetListName(kvlist, listID);
-      nelements = kvlGetListNumElements(kvlist, listID);
+      const char *listname = kvlGetListName(kvlist, listID);
+      int nelements = kvlGetListNumElements(kvlist, listID);
       printf("# list ID: %d;   Number of elements: %d\n", listID, nelements);
       printf("&%s\n", listname);
-      for ( elemID = 0; elemID < nelements; ++elemID )
+      for ( int elemID = 0; elemID < nelements; ++elemID )
 	{
-	  ename  = kvlGetListElementName(kvlist, listID, elemID);
-	  evalue = kvlGetListElementValue(kvlist, listID, elemID);
+	  const char *ename  = kvlGetListElementName(kvlist, listID, elemID);
+	  const char *evalue = kvlGetListElementValue(kvlist, listID, elemID);
 	  printf("  %s = %s\n", ename, evalue);
 	}
       printf("/\n");
@@ -61,37 +54,29 @@ int read_cmor_table(const char *filename)
 static
 int conv_cmor_table(const char *filename)
 {
-  void *kvlist;
-  int nlists, listID;
-  int nelements, elemID;
-  int len;
-  int hasmissval = FALSE;
+  bool hasmissval = false;
   double missval;
-  const char *listname;
-  const char *ename;
-  const char *evalue;
-  char *ovalue;
 
-  kvlist = kvlParseFile(filename);
-  nlists = kvlGetNumLists(kvlist);
+  void *kvlist = kvlParseFile(filename);
+  int nlists = kvlGetNumLists(kvlist);
   //printf("# Number of lists: %d\n", nlists);
-  for ( listID = 0; listID < nlists; ++listID )
+  for ( int listID = 0; listID < nlists; ++listID )
     {
-      listname = kvlGetListName(kvlist, listID);
-      nelements = kvlGetListNumElements(kvlist, listID);
+      const char *listname = kvlGetListName(kvlist, listID);
+      int nelements = kvlGetListNumElements(kvlist, listID);
       //printf("# list ID: %d;   Number of elements: %d\n", listID, nelements);
       if ( strncmp("global", listname, strlen(listname)) == 0 )
 	{
-	  for ( elemID = 0; elemID < nelements; ++elemID )
+	  for ( int elemID = 0; elemID < nelements; ++elemID )
 	    {
-	      ename  = kvlGetListElementName(kvlist, listID, elemID);
-	      evalue = kvlGetListElementValue(kvlist, listID, elemID);
-	      len = strlen(ename);
+	      const char *ename  = kvlGetListElementName(kvlist, listID, elemID);
+	      const char *evalue = kvlGetListElementValue(kvlist, listID, elemID);
+              size_t len = strlen(ename);
 
 	      if ( strncmp("missing_value", ename, len) == 0 )
 		{
 		  missval = atof(evalue);
-		  hasmissval = TRUE;
+		  hasmissval = true;
 		}
 	    }
 	}
@@ -99,11 +84,11 @@ int conv_cmor_table(const char *filename)
 	{
 	  int vlen;
 	  printf("&%s\n", "parameter");
-	  for ( elemID = 0; elemID < nelements; ++elemID )
+	  for ( int elemID = 0; elemID < nelements; ++elemID )
 	    {
-	      ename  = kvlGetListElementName(kvlist, listID, elemID);
-	      evalue = kvlGetListElementValue(kvlist, listID, elemID);
-	      len = strlen(ename);
+	      const char *ename  = kvlGetListElementName(kvlist, listID, elemID);
+	      const char *evalue = kvlGetListElementValue(kvlist, listID, elemID);
+	      int len = strlen(ename);
 	      vlen = strlen(evalue);
 
 	      if ( vlen > 1 && evalue[0] == '"' && evalue[vlen-1] == '"' ) 
@@ -112,7 +97,7 @@ int conv_cmor_table(const char *filename)
 		  evalue++;
 		}
 
-	      ovalue = strdup(evalue);
+	      char *ovalue = strdup(evalue);
 	      for ( int i = 1; i < vlen; ++i )
 		{
 		  if ( ovalue[i-1] == '"' && ovalue[i] == '"' )
@@ -154,22 +139,18 @@ int conv_cmor_table(const char *filename)
 
 void *Kvl(void *argument)
 {
-  int READ_CMOR_TABLE, CONV_CMOR_TABLE, CONV_PARTAB;
-  int operatorID;
-  const char *filename;
-
   cdoInitialize(argument);
 
-  READ_CMOR_TABLE = cdoOperatorAdd("read_cmor_table",   0,   0, NULL);
-  CONV_CMOR_TABLE = cdoOperatorAdd("conv_cmor_table",   0,   0, NULL);
-  CONV_PARTAB     = cdoOperatorAdd("conv_partab",   0,   0, NULL);
+  int READ_CMOR_TABLE = cdoOperatorAdd("read_cmor_table",   0,   0, NULL);
+  int CONV_CMOR_TABLE = cdoOperatorAdd("conv_cmor_table",   0,   0, NULL);
+  int CONV_PARTAB     = cdoOperatorAdd("conv_partab",   0,   0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == READ_CMOR_TABLE )
     {
       if ( operatorArgc() != 1 ) cdoAbort("Too few arguments!");
-      filename = operatorArgv()[0];
+      const char *filename = operatorArgv()[0];
 
       if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
@@ -178,7 +159,7 @@ void *Kvl(void *argument)
   else if ( operatorID == CONV_CMOR_TABLE )
     {
       if ( operatorArgc() != 1 ) cdoAbort("Too few arguments!");
-      filename = operatorArgv()[0];
+      const char *filename = operatorArgv()[0];
 
       if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
@@ -187,7 +168,7 @@ void *Kvl(void *argument)
   else if ( operatorID == CONV_PARTAB )
     {
       if ( operatorArgc() != 1 ) cdoAbort("Too few arguments!");
-      filename = operatorArgv()[0];
+      const char *filename = operatorArgv()[0];
 
       if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
