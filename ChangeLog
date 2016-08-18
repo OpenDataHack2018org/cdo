@@ -1,3 +1,8 @@
+2016-08-18  Uwe Schulzweida
+
+	* using CDI library version 1.8.0rc2
+	* Version 1.8.0rc2 released
+
 2016-08-16  Uwe Schulzweida
 
 	* setzaxis: added support for internal zaxis name height_<value>_<units>
