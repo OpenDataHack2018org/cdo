@@ -32,24 +32,18 @@
 
 void *Setgatt(void *argument)
 {
-  int SETGATT, SETGATTS;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
+  int varID, levelID;
   int gridsize;
   int nmiss;
   char *attname = NULL, *attstring = NULL, *attfile = NULL;
-  double *array = NULL;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
-  SETGATT  = cdoOperatorAdd("setgatt",  0, 0, "attribute name and string");
-  SETGATTS = cdoOperatorAdd("setgatts", 0, 0, NULL);
+  int SETGATT  = cdoOperatorAdd("setgatt",  0, 0, "attribute name and string");
+                 cdoOperatorAdd("setgatts", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == SETGATT )
     {
@@ -62,16 +56,16 @@ void *Setgatt(void *argument)
       attfile   = operatorArgv()[0];
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   if ( operatorID == SETGATT )
     {
@@ -80,10 +74,9 @@ void *Setgatt(void *argument)
   else
     {
       char line[1024];
-      FILE *fp;
       int attlen = 0;
 
-      fp = fopen(attfile, "r");
+      FILE *fp = fopen(attfile, "r");
       if ( fp == 0 ) cdoAbort("Open failed on %s", attfile);
 
       while ( readline(fp, line, 1024) )
@@ -121,16 +114,16 @@ void *Setgatt(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

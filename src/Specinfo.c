@@ -38,16 +38,14 @@
 #define NGP2NI(ngp)           ((int) sqrt((double)ngp/10.) - 1)
 
 
-static void fac(int nlonin, int *nlonout, int *ierr)
-{
-  int n2, n3, n5;
-  int m;
-  
-  n2 = 0;
-  n3 = 0;
-  n5 = 0;
+static
+void fac(int nlonin, int *nlonout, int *ierr)
+{  
+  int n2 = 0;
+  int n3 = 0;
+  int n5 = 0;
 
-  m = nlonin;
+  int m = nlonin;
 
   while (m%2 == 0)
     {
@@ -79,9 +77,8 @@ static void fac(int nlonin, int *nlonout, int *ierr)
 
 static int compnlon(int nlat)
 {
-  int nlon, n;
-
-  nlon = 2 * nlat;
+  int n;
+  int nlon = 2 * nlat;
 
   /* check that FFT works with nlon */
   while ( 1 )
@@ -106,7 +103,7 @@ static int compnlon(int nlat)
 	}
     }
 
-  return (nlon);
+  return nlon;
 }
 
 
@@ -152,7 +149,7 @@ int ipow(int i1, int i2)
 
   for ( i = 0; i < i2; ++i ) i3 *= i1;
 
-  return (i3);
+  return i3;
 }
 
 
@@ -251,7 +248,8 @@ void lookup_rl(int nsp, int *nroot, int *nlevel)
 void *Specinfo(void *argument)
 {
   char arg[128], *parg;
-  int len, i, nout1 = 0, nout2 = 0;
+  bool nout1 = false, nout2 = false;
+  int i;
   int ntr1 = 0, nsp1 = 0, nlat1 = 0, nlon1 = 0, ngp1 = 0, ni1 = 0, ngp_gme1 = 0;
   int ntr2 = 0, nsp2 = 0, nlat2 = 0, nlon2 = 0, ngp2 = 0, ni2 = 0, ngp_gme2 = 0;
   int nlevel1 = 0, nlevel2 = 0, ngp_icon1 = 0, ngp_icon2 = 0;
@@ -261,7 +259,7 @@ void *Specinfo(void *argument)
 
   operatorInputArg("Txx, TLxx, NLON=xx, NLAT=xx, NIxx or ICONRyyLxx");
 
-  len = strlen(operatorArgv()[0]);
+  int len = strlen(operatorArgv()[0]);
 
   if ( (len+1) >= 128 ) cdoAbort("Parameter string too large!");
 
@@ -282,8 +280,8 @@ void *Specinfo(void *argument)
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = FALSE;
-      nout2  = TRUE;
+      nout1  = false;
+      nout2  = true;
     }
   else if ( arg[0] == 'T' )
     {
@@ -299,8 +297,8 @@ void *Specinfo(void *argument)
       lookup_ni(nsp1, &nrootg1, &ni1);
       lookup_rl(nsp1, &nrooti1, &nlevel1);
 
-      nout1  = TRUE;
-      nout2  = FALSE;
+      nout1  = true;
+      nout2  = false;
     }
   else if ( arg[0] == 'N' && arg[1] == 'I' )
     {
@@ -334,8 +332,8 @@ void *Specinfo(void *argument)
       nrooti2 = nrooti1;
       nlevel2 = nlevel1;
 
-      nout1  = TRUE;
-      nout2  = TRUE;
+      nout1  = true;
+      nout2  = true;
     }
   else if ( arg[0] == 'N' && arg[1] == 'L' && arg[2] == 'O' && arg[3] == 'N' )
     {
@@ -364,8 +362,8 @@ void *Specinfo(void *argument)
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = TRUE;
-      nout2  = TRUE;
+      nout1  = true;
+      nout2  = true;
     }
   else if ( arg[0] == 'N' && arg[1] == 'L' && arg[2] == 'A' && arg[3] == 'T' )
     {
@@ -392,8 +390,8 @@ void *Specinfo(void *argument)
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = TRUE;
-      nout2  = TRUE;
+      nout1  = true;
+      nout2  = true;
     }
   else if ( arg[0] == 'N' )
     {
@@ -420,8 +418,8 @@ void *Specinfo(void *argument)
       lookup_ni(nsp2, &nrootg2, &ni2);
       lookup_rl(nsp2, &nrooti2, &nlevel2);
 
-      nout1  = TRUE;
-      nout2  = TRUE;
+      nout1  = true;
+      nout2  = true;
     }
   else if ( arg[0] == 'I' && arg[1] == 'C' && arg[2] == 'O' && arg[3] == 'N' )
     {
@@ -461,8 +459,8 @@ void *Specinfo(void *argument)
       nrooti2 = nrooti1;
       nlevel2 = nlevel1;
 
-      nout1  = TRUE;
-      nout2  = TRUE;
+      nout1  = true;
+      nout2  = true;
     }
   else
     cdoAbort("Unsupported parameter: %s", arg);

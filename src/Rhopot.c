@@ -65,14 +65,10 @@ double potrho_1(double t, double sal, double p)
          r_ak0 = 8.50935e-5, r_ak1 = -6.12293e-6, r_ak2 = 5.2787e-8,
          r_am0 = -9.9348e-7, r_am1 = 2.0816e-8, r_am2 = 9.1697e-10;
 
-  double s, s3h; 
-  double rho;
+  double s = MAX(sal, 0.0);
+  double s3h = sqrt(s*s*s);
 
-    {
-      s = MAX(sal, 0.0);
-      s3h = sqrt(s*s*s);
-
-      rho = (r_a0 + t * (r_a1 + t * (r_a2 + t * (r_a3 + t * (r_a4 + t * r_a5))))
+  double rho = (r_a0 + t * (r_a1 + t * (r_a2 + t * (r_a3 + t * (r_a4 + t * r_a5))))
             + s * (r_b0 + t * (r_b1 + t * (r_b2 + t * (r_b3 + t * r_b4))))    
             + r_d0 * s*s                 
             + s3h * (r_c0 + t * (r_c1 + r_c2 * t)))                           
@@ -85,9 +81,8 @@ double potrho_1(double t, double sal, double p)
                     + r_e0 + t * (r_e1 + t * (r_e2 + t * (r_e3 + t * r_e4)))  
                     + s * (r_f0 + t * (r_f1 + t * (r_f2 + t * r_f3)))         
                     + s3h * (r_g0 + t * (r_g1 + r_g2 * t))));
-    }
 
-  return (rho);
+  return rho;
 }
 
 /*
@@ -132,17 +127,14 @@ void calc_rhopot(long gridsize, long nlevel, double *pressure, field_t to, field
   /* to units:       Celsius */
   /* sao units:      psu     */
 
-  long i, levelID, offset;
-  double *rhoptr, *toptr, *saoptr;
-
-  for ( levelID = 0; levelID < nlevel; ++levelID )
+  for ( long levelID = 0; levelID < nlevel; ++levelID )
     {
-      offset = gridsize*levelID;
-      toptr = to.ptr + offset;
-      saoptr = sao.ptr + offset;
-      rhoptr = rho.ptr + offset;
+      long offset = gridsize*levelID;
+      double *toptr = to.ptr + offset;
+      double *saoptr = sao.ptr + offset;
+      double *rhoptr = rho.ptr + offset;
 
-      for ( i = 0; i < gridsize; ++i )
+      for ( long i = 0; i < gridsize; ++i )
 	{
 	  if ( DBL_IS_EQUAL(toptr[i], to.missval) ||
 	       DBL_IS_EQUAL(saoptr[i], sao.missval) )
@@ -160,21 +152,14 @@ void calc_rhopot(long gridsize, long nlevel, double *pressure, field_t to, field
 
 void *Rhopot(void *argument)
 {
-  int streamID1, streamID2;
   int nrecs;
-  int tsID, recID, varID, levelID;
-  int nlevel1, nlevel2;
-  int nvars, code, zaxisID;
-  int vlistID1, vlistID2;
+  int varID, levelID;
+  int zaxisID;
   int offset;
-  int nlevel;
-  int i;
   int nmiss;
   int toID = -1, saoID = -1, thoID = -1;
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
-  int taxisID1, taxisID2;
   double pin = -1;
-  double *pressure;
   double *single;
   field_t to, sao, rho;
 
@@ -182,16 +167,15 @@ void *Rhopot(void *argument)
 
   if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      code = vlistInqVarCode(vlistID1, varID);
-
+      int code = vlistInqVarCode(vlistID1, varID);
       if ( code <= 0 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
@@ -227,25 +211,25 @@ void *Rhopot(void *argument)
   int gridsize = vlist_check_gridsize(vlistID1);
 
   zaxisID = vlistInqVarZaxis(vlistID1, saoID);
-  nlevel1 = zaxisInqSize(zaxisID);
+  int nlevel1 = zaxisInqSize(zaxisID);
   zaxisID = vlistInqVarZaxis(vlistID1, toID);
-  nlevel2 = zaxisInqSize(zaxisID);
+  int nlevel2 = zaxisInqSize(zaxisID);
 
   if ( nlevel1 != nlevel2 ) cdoAbort("temperature and salinity have different number of levels!");
-  nlevel = nlevel1;
+  int nlevel = nlevel1;
 
-  pressure = (double*) Malloc(nlevel*sizeof(double));
+  double *pressure = (double*) Malloc(nlevel*sizeof(double));
   zaxisInqLevels(zaxisID, pressure);
 
   if ( pin >= 0 ) 
-    for ( i = 0; i < nlevel; ++i ) pressure[i] = pin;
+    for ( int i = 0; i < nlevel; ++i ) pressure[i] = pin;
   else
-    for ( i = 0; i < nlevel; ++i ) pressure[i] /= 10;
+    for ( int i = 0; i < nlevel; ++i ) pressure[i] /= 10;
 
   if ( cdoVerbose )
     {
       cdoPrint("Level Pressure");
-      for ( i = 0; i < nlevel; ++i )
+      for ( int i = 0; i < nlevel; ++i )
 	cdoPrint("%5d  %g", i+1, pressure[i]);
     }
 
@@ -264,8 +248,7 @@ void *Rhopot(void *argument)
   sao.missval = vlistInqVarMissval(vlistID1, saoID);
   rho.missval = to.missval;
 
-
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
   varID = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_INSTANT);
   vlistDefVarParam(vlistID2, varID, cdiEncodeParam(18, 255, 255));
   vlistDefVarName(vlistID2, varID, "rhopoto");
@@ -275,22 +258,21 @@ void *Rhopot(void *argument)
   vlistDefVarMissval(vlistID2, varID, rho.missval);
 
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; ++recID )
+      for ( int recID = 0; recID < nrecs; ++recID )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -316,7 +298,7 @@ void *Rhopot(void *argument)
 	  single = rho.ptr+offset;
 
 	  nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( int i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(single[i], rho.missval) ) nmiss++;
  
 	  streamDefRecord(streamID2, 0, levelID);

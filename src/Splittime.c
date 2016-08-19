@@ -58,17 +58,15 @@ void *Splittime(void *argument)
   int streamID2;
   int varID;
   int nrecs;
-  int tsID, recID, levelID;
+  int levelID;
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
-  char filesuffix[32];
-  char filename[8192];
   int index = 0;
-  int i;
-  int vdate, vtime;
   int gridsize;
   int nmiss;
   int gridID;
   int nlevel;
+  char filesuffix[32];
+  char filename[8192];
   double *array = NULL;
   field_t **vars = NULL;
   const char *format = NULL;
@@ -99,8 +97,8 @@ void *Splittime(void *argument)
   const char *seas_name[4];
   get_season_name(seas_name);
 
-  for ( i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
-  for ( i = 0; i < MAX_STREAMS; i++ ) tsIDs[i] = 0;
+  for ( int i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
+  for ( int i = 0; i < MAX_STREAMS; i++ ) tsIDs[i] = 0;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -154,11 +152,11 @@ void *Splittime(void *argument)
 	}
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
 
       if ( operfunc == func_date )
 	{
@@ -235,7 +233,7 @@ void *Splittime(void *argument)
 	    }
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

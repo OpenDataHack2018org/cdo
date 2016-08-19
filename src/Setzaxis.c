@@ -54,12 +54,12 @@ int getkeyval_dp(const char *keyval, const char *key, double *val)
 void *Setzaxis(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int zaxisID1, zaxisID2 = -1;
   int nzaxis, index;
   int nmiss;
   int found;
-  int lztop = FALSE, lzbot = FALSE;
+  bool lztop = false, lzbot = false;
   double ztop = 0, zbot = 0;
 
   cdoInitialize(argument);
@@ -84,8 +84,8 @@ void *Setzaxis(void *argument)
         {
           if ( cdoVerbose ) cdoPrint("keyval[%d]: %s", i+1, parnames[i]);
           
-          if      ( !lzbot && getkeyval_dp(parnames[i], "zbot", &zbot) ) lzbot = TRUE;
-          else if ( !lztop && getkeyval_dp(parnames[i], "ztop", &ztop) ) lztop = TRUE;
+          if      ( !lzbot && getkeyval_dp(parnames[i], "zbot", &zbot) ) lzbot = true;
+          else if ( !lztop && getkeyval_dp(parnames[i], "ztop", &ztop) ) lztop = true;
           else cdoAbort("Parameter >%s< unsupported! Supported parameter are: zbot, ztop", parnames[i]);
         }
     }
@@ -161,7 +161,7 @@ void *Setzaxis(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

@@ -64,7 +64,7 @@ int compute_scale(int datatype, double fmin, double fmax, double *scale_factor, 
   *scale_factor = sf;
   *add_offset = ao;
 
-  if ( get_type_values(datatype, &tmin, &tmax) ) return (1);
+  if ( get_type_values(datatype, &tmin, &tmax) ) return 1;
 
   if ( IS_NOT_EQUAL(fmin, fmax) )
     {
@@ -83,9 +83,7 @@ void *Pack(void *argument)
 {
   int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
-  int i;
-  int nts;
+  int gridID, varID, levelID;
   int nalloc = 0;
   int nmiss;
   int nlevel;
@@ -120,7 +118,7 @@ void *Pack(void *argument)
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -133,7 +131,7 @@ void *Pack(void *argument)
       tsID++;
     }
 
-  nts = tsID;
+  int nts = tsID;
 
   if ( cdoDefaultDataType != CDI_UNDEFID )
     {
@@ -173,7 +171,7 @@ void *Pack(void *argument)
 	      if ( nmiss > 0 )
 		{
 		  nmisspv += nmiss;
-		  for ( i = 0; i < gridsize; ++i )
+		  for ( int i = 0; i < gridsize; ++i )
 		    {
 		      if ( !DBL_IS_EQUAL(array[i], missval1) )
 			{
@@ -185,7 +183,7 @@ void *Pack(void *argument)
 		}
 	      else
 		{
-		  for ( i = 0; i < gridsize; ++i )
+		  for ( int i = 0; i < gridsize; ++i )
 		    {
 		      if ( array[i] < fmin ) fmin = array[i];
 		      if ( array[i] > fmax ) fmax = array[i];
@@ -213,7 +211,7 @@ void *Pack(void *argument)
 		      double *array =  vars[tsID][varID][levelID].ptr;
 		      nmiss = vars[tsID][varID][levelID].nmiss;
 		      if ( nmiss > 0 )
-			for ( i = 0; i < gridsize; ++i )
+			for ( int i = 0; i < gridsize; ++i )
 			  if ( DBL_IS_EQUAL(array[i], missval1) ) array[i] = missval2;
 		    }
 		}	  

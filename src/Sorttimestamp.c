@@ -49,7 +49,7 @@ int cmpdatetime(const void *s1, const void *s2)
   if      ( x->datetime < y->datetime ) cmp = -1;
   else if ( x->datetime > y->datetime ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 
 
@@ -58,29 +58,25 @@ void *Sorttimestamp(void *argument)
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;
-  int tsID, tsID2, xtsID, lasttsID = -1;
-  int nfiles, fileID;
-  int nts;
+  int tsID, lasttsID = -1;
   int nalloc = 0;
-  int streamID1, streamID2;
-  int vlistID1 = -1, vlistID2 = -1, taxisID1, taxisID2 = -1;
+  int vlistID2 = -1, taxisID2 = -1;
   int nmiss;
   int nvars = 0, nlevel;
   int *vdate = NULL, *vtime = NULL;
   field_t ***vars = NULL;
-  timeinfo_t *timeinfo;
 
   cdoInitialize(argument);
 
-  nfiles = cdoStreamCnt() - 1;
+  int nfiles = cdoStreamCnt() - 1;
 
-  xtsID = 0;
-  for ( fileID = 0; fileID < nfiles; fileID++ )
+  int xtsID = 0;
+  for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      streamID1 = streamOpenRead(cdoStreamName(fileID));
+      int streamID1 = streamOpenRead(cdoStreamName(fileID));
 
-      vlistID1 = streamInqVlist(streamID1);
-      taxisID1 = vlistInqTaxis(vlistID1);
+      int vlistID1 = streamInqVlist(streamID1);
+      int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( fileID == 0 )
 	{
@@ -99,7 +95,7 @@ void *Sorttimestamp(void *argument)
 
       nvars = vlistNvars(vlistID1);
 
-      tsID = 0;
+      int tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
 	  if ( xtsID >= nalloc )
@@ -132,19 +128,16 @@ void *Sorttimestamp(void *argument)
       streamClose(streamID1);
     }
 
-  nts = xtsID;
+  int nts = xtsID;
 
-  timeinfo= (timeinfo_t*) Malloc(nts*sizeof(timeinfo_t));
+  timeinfo_t *timeinfo= (timeinfo_t*) Malloc(nts*sizeof(timeinfo_t));
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
-      int calendar, julday, secofday;
-      double vdatetime;
-
-      calendar = taxisInqCalendar(taxisID2);
-      julday = date_to_julday(calendar, vdate[tsID]);
-      secofday = time_to_sec(vtime[tsID]);
-      vdatetime = julday + secofday / 86400.;
+      int calendar = taxisInqCalendar(taxisID2);
+      int julday = date_to_julday(calendar, vdate[tsID]);
+      int secofday = time_to_sec(vtime[tsID]);
+      double vdatetime = julday + secofday / 86400.;
       timeinfo[tsID].index    = tsID;
       timeinfo[tsID].datetime = vdatetime;
     }
@@ -155,11 +148,11 @@ void *Sorttimestamp(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID2 = 0;
+  int tsID2 = 0;
   for ( tsID = 0; tsID < nts; tsID++ )
     {
       xtsID = timeinfo[tsID].index;

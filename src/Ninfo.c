@@ -38,18 +38,10 @@
 void *Ninfo(void *argument)
 {
   enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL, NGRIDPOINTS, NGRIDS};
-  int operatorID;
-  int operfunc;
-  int varID, zaxisID, gridID;
-  int vdate;
-  int nrecs, nvars, ntsteps, ngrids;
-  int levelsize;
-  int gridsize;
-  int tsID, ndate, date0 = 0;
-  int day, mon0 = 0, mon, nmon, year0 = 0, year, nyear;
-  int taxisID;
-  int streamID;
-  int vlistID;
+  int varID;
+  int nrecs;
+  int date0 = 0;
+  int day, mon0 = 0, mon, year0 = 0, year;
 
   cdoInitialize(argument);
 
@@ -62,28 +54,28 @@ void *Ninfo(void *argument)
   cdoOperatorAdd("ngridpoints" , NGRIDPOINTS , 0 , NULL);
   cdoOperatorAdd("ngrids"      , NGRIDS      , 0 , NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc   = cdoOperatorF1(operatorID);
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
 
-  vlistID = streamInqVlist(streamID);
+  int vlistID = streamInqVlist(streamID);
 
-  nvars   = vlistNvars(vlistID);
-  taxisID = vlistInqTaxis(vlistID);
-  ntsteps = vlistNtsteps(vlistID);
-  ngrids  = vlistNgrids(vlistID);
+  int nvars   = vlistNvars(vlistID);
+  int taxisID = vlistInqTaxis(vlistID);
+  int ntsteps = vlistNtsteps(vlistID);
+  int ngrids  = vlistNgrids(vlistID);
 
   switch ( operfunc )
     {
     case NYEAR:
-      nyear = 0;
-      tsID = 0;
+      {
+      int nyear = 0;
+      int tsID = 0;
       if ( ntsteps != 0 )
 	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	  {
-	    vdate = taxisInqVdate(taxisID);
-
+	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
 	 
 	    if ( tsID == 0 || year0 != year )
@@ -96,14 +88,15 @@ void *Ninfo(void *argument)
 	  }
       fprintf(stdout, "%d\n", nyear);
       break;
+      }
     case NMON:
-      nmon = 0;
-      tsID = 0;
+      {
+      int nmon = 0;
+      int tsID = 0;
       if ( ntsteps != 0 )
 	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	  {
-	    vdate = taxisInqVdate(taxisID);
-	    
+	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
 	 
 	    if ( tsID == 0 || mon0 != mon )
@@ -116,13 +109,15 @@ void *Ninfo(void *argument)
 	  }
       fprintf(stdout, "%d\n", nmon);
       break;
+      }
     case NDATE:
-      ndate = 0;
-      tsID = 0;
+      {
+      int ndate = 0;
+      int tsID = 0;
       if ( ntsteps != 0 )
 	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	  {
-	    vdate = taxisInqVdate(taxisID);
+	    int vdate = taxisInqVdate(taxisID);
 	    
 	    if ( tsID == 0 || date0 != vdate )
 	      {
@@ -134,28 +129,31 @@ void *Ninfo(void *argument)
 	  }
       fprintf(stdout, "%d\n", ndate);
       break;
+      }
     case NTIME:
-      tsID = 0;
+      {
+      int tsID = 0;
       if ( ntsteps != 0 )
 	while ( (nrecs = streamInqTimestep(streamID, tsID)) ) tsID++;
       fprintf(stdout, "%d\n", tsID);
       break;
+      }
     case NPAR:
       fprintf(stdout, "%d\n", nvars);
       break;
     case NLEVEL:
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  zaxisID = vlistInqVarZaxis(vlistID, varID);
-	  levelsize = zaxisInqSize(zaxisID);
+	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
+	  int levelsize = zaxisInqSize(zaxisID);
 	  fprintf(stdout, "%d\n", levelsize);
 	}
       break;
     case NGRIDPOINTS:
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  gridID = vlistInqVarGrid(vlistID, varID);
-	  gridsize = gridInqSize(gridID);
+	  int gridID = vlistInqVarGrid(vlistID, varID);
+	  int gridsize = gridInqSize(gridID);
 	  fprintf(stdout, "%d\n", gridsize);
 	}
       break;

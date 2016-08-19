@@ -28,7 +28,6 @@
 
 void *Nmltest(void *argument)
 {
-  namelist_t *nml;
   int i1[5] = {-99, -99, -99, -99, -99};
   int i2    = -99;
   char lop[99] = "";
@@ -37,7 +36,7 @@ void *Nmltest(void *argument)
 
   cdoInitialize(argument);
 
-  nml = namelistNew("SELECT");
+  namelist_t *nml = namelistNew("SELECT");
 
   namelistAdd(nml, "i1",  NML_INT,    0, i1,   sizeof(i1)/sizeof(int));
   namelistAdd(nml, "i2",  NML_INT,    1, &i2,  sizeof(i2)/sizeof(int));

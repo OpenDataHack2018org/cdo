@@ -31,8 +31,7 @@
 void *Pardup(void *argument)
 {
   int nrecs;
-  int recID, varID, varID2, levelID;
-  int i;
+  int varID, varID2, levelID;
   long offset;
   int nmul = 0;
   int nmiss;
@@ -86,7 +85,7 @@ void *Pardup(void *argument)
       varnmiss[varID] = (int*) Malloc(nlevel*sizeof(int));
     }
 
-  for ( i = 1; i < nmul; i++ )
+  for ( int i = 1; i < nmul; i++ )
     {
       vlistCat(vlistID2, vlistID1);
       for ( varID = 0; varID < nvars; varID++ )
@@ -104,7 +103,7 @@ void *Pardup(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -119,8 +118,8 @@ void *Pardup(void *argument)
 	  varnmiss[varID][levelID] = nmiss;
 	}
 
-      for ( i = 0; i < nmul; i++ )
-	for ( recID = 0; recID < nrecs; recID++ )
+      for ( int i = 0; i < nmul; i++ )
+	for ( int recID = 0; recID < nrecs; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    varID2   = varID + i*nvars;

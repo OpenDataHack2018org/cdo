@@ -30,8 +30,7 @@
 void *Splitrec(void *argument)
 {
   int varID;
-  int recID, levelID;
-  int varID2, levelID2;
+  int levelID;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
@@ -69,7 +68,7 @@ void *Splitrec(void *argument)
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -92,8 +91,8 @@ void *Splitrec(void *argument)
 
 	  streamDefVlist(streamID2, vlistID2);
 
-	  varID2   = vlistFindVar(vlistID2, varID);
-	  levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+	  int varID2   = vlistFindVar(vlistID2, varID);
+	  int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
 	  streamDefTimestep(streamID2, 0);
 	  streamDefRecord(streamID2, varID2, levelID2);

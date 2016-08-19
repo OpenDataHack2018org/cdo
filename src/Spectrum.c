@@ -166,42 +166,33 @@ void *Spectrum(void *argument)
 {
   int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
-  int tsID;
+  int gridID, varID, levelID;
   int i, k;
-  int nts;
   int nalloc = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
+  int nlevel;
   int *vdate = NULL, *vtime = NULL;
-  int freq, nfreq;
-  int seg_l, seg_n, detrend, which_window;
-  double wssum;
-  double *array1, *array2;
-  double *real, *imag, *window;
+  int freq;
   field_t ***vars = NULL;
-  field_t ***vars2 = NULL;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
@@ -217,7 +208,7 @@ void *Spectrum(void *argument)
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -232,7 +223,7 @@ void *Spectrum(void *argument)
       tsID++;
     }
 
-  nts = tsID;
+  int nts = tsID;
 
 
   operatorInputArg("detrend type, length of segments, number of segments, window type\n\n"
@@ -247,10 +238,10 @@ void *Spectrum(void *argument)
 
   operatorCheckArgc(4);
 
-  detrend = parameter2int(operatorArgv()[0]);
-  seg_l = parameter2int(operatorArgv()[1]);
-  seg_n = parameter2int(operatorArgv()[2]);
-  which_window = parameter2int(operatorArgv()[3]);
+  int detrend = parameter2int(operatorArgv()[0]);
+  int seg_l = parameter2int(operatorArgv()[1]);
+  int seg_n = parameter2int(operatorArgv()[2]);
+  int which_window = parameter2int(operatorArgv()[3]);
 
   if ( detrend < 0 || detrend > 3 )
     cdoAbort("Illegal value for detrend (=%d)!",detrend);
@@ -262,17 +253,17 @@ void *Spectrum(void *argument)
     cdoAbort("Number of segments must be positiv and not greater than %d!", nts - seg_l + 1);
 
 
-  nfreq = seg_l/2 + 1;
+  int nfreq = seg_l/2 + 1;
 
-  vars2 = (field_t ***) Malloc(nfreq*sizeof(field_t **));
+  field_t ***vars2 = (field_t ***) Malloc(nfreq*sizeof(field_t **));
   for ( freq = 0; freq < nfreq; freq++ )
     vars2[freq] = field_malloc(vlistID1, FIELD_PTR);
 
-  array1  = (double*) Malloc(nts   * sizeof(double));
-  array2  = (double*) Malloc(nfreq * sizeof(double));
-  real    = (double*) Malloc(seg_l * sizeof(double));
-  imag    = (double*) Malloc(seg_l * sizeof(double));
-  window  = (double*) Malloc(seg_l * sizeof(double));
+  double *array1  = (double*) Malloc(nts   * sizeof(double));
+  double *array2  = (double*) Malloc(nfreq * sizeof(double));
+  double *real    = (double*) Malloc(seg_l * sizeof(double));
+  double *imag    = (double*) Malloc(seg_l * sizeof(double));
+  double *window  = (double*) Malloc(seg_l * sizeof(double));
   	   
   switch (which_window)
     {
@@ -301,7 +292,7 @@ void *Spectrum(void *argument)
       break;
     }
   
-  wssum = 0;
+  double wssum = 0;
   for ( k = 0; k < seg_l; k++ )
     wssum += window[k] * window[k];
 

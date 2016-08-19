@@ -41,9 +41,7 @@
 
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
 {
-  size_t len;
-	
-  len = strlen(unit);
+  size_t len = strlen(unit);
   
   if      ( memcmp(unit, "seconds", len) == 0 ) { *incunit =     1; *tunit = TUNIT_SECOND;  }
   else if ( memcmp(unit, "minutes", len) == 0 ) { *incunit =    60; *tunit = TUNIT_MINUTE;  }
@@ -141,8 +139,7 @@ void gen_bounds(int calendar, int tunit, int vdate, int vtime, int *vdateb, int 
 void *Settime(void *argument)
 {
   int nrecs, newval = 0;
-  int tsID1, recID, varID, levelID;
-  int vdate, vtime;
+  int varID, levelID;
   int vdateb[2], vtimeb[2];
   int sdate = 0, stime = 0;
   int taxisID2 = CDI_UNDEFID;
@@ -152,12 +149,10 @@ void *Settime(void *argument)
   int ijulinc = 0, incperiod = 1, incunit = 86400;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int day0;
-  int copy_timestep = FALSE;
+  bool copy_timestep = false;
   int newcalendar = CALENDAR_STANDARD;
   // int nargs;
-  const char *datestr, *timestr;
   juldate_t juldate;
-  double *array = NULL;
 
   cdoInitialize(argument);
 
@@ -185,8 +180,8 @@ void *Settime(void *argument)
       if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
       if ( operatorArgc() > 3 ) cdoAbort("Too many arguments!");
 
-      datestr = operatorArgv()[0];
-      timestr = operatorArgv()[1];
+      const char *datestr = operatorArgv()[0];
+      const char *timestr = operatorArgv()[1];
 
       if ( strchr(datestr+1, '-') )
 	{
@@ -226,7 +221,7 @@ void *Settime(void *argument)
   else if ( operatorID == SETDATE )
     {
       operatorCheckArgc(1);
-      datestr = operatorArgv()[0];
+      const char *datestr = operatorArgv()[0];
       if ( strchr(datestr, '-') )
 	{
 	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
@@ -240,7 +235,7 @@ void *Settime(void *argument)
   else if ( operatorID == SETTIME )
     {
       operatorCheckArgc(1);
-      timestr = operatorArgv()[0];
+      const char *timestr = operatorArgv()[0];
 
       if ( strchr(timestr, ':') )
 	{
@@ -332,7 +327,7 @@ void *Settime(void *argument)
 
   if ( operatorID == SETREFTIME )
     {
-      copy_timestep = TRUE;
+      copy_timestep = true;
 
       if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
 	{
@@ -348,7 +343,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETTUNITS )
     {
-      copy_timestep = TRUE;
+      copy_timestep = true;
 
       if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
 	{
@@ -362,7 +357,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETCALENDAR )
     {
-      copy_timestep = TRUE;
+      copy_timestep = true;
       /*
       if ( ((char *)argument)[0] == '-' )
 	cdoAbort("This operator does not work with pipes!");
@@ -398,7 +393,7 @@ void *Settime(void *argument)
     }
 
   if ( operatorID != SHIFTTIME )
-    if ( taxis_has_bounds && copy_timestep == FALSE )
+    if ( taxis_has_bounds && !copy_timestep )
       {
 	cdoWarning("Time bounds unsupported by this operator, removed!");
 	taxisDeleteBounds(taxisID2);
@@ -413,13 +408,13 @@ void *Settime(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID1 = 0;
+  int tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
 
       if ( operatorID == SETTAXIS )
 	{
@@ -521,7 +516,7 @@ void *Settime(void *argument)
 
       streamDefTimestep(streamID2, tsID1);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

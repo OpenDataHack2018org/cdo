@@ -89,9 +89,6 @@ void *Sinfo(void *argument)
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  const char *modelptr, *instptr;
-  int streamID = 0;
-  int vlistID;
   int datatype;
   char pstr[4];
 
@@ -113,9 +110,9 @@ void *Sinfo(void *argument)
 
   for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
-      streamID = streamOpenRead(cdoStreamName(indf));
+      int streamID = streamOpenRead(cdoStreamName(indf));
 
-      vlistID = streamInqVlist(streamID);
+      int vlistID = streamInqVlist(streamID);
 
       set_text_color(stdout, BRIGHT, BLACK);
       fprintf(stdout, "   File format");
@@ -159,14 +156,14 @@ void *Sinfo(void *argument)
 	      
 	  set_text_color(stdout, RESET, BLUE);
 	  /* institute info */
-	  instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
+	  const char *instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
 	  strcpy(tmpname, "unknown");
 	  if ( instptr ) strncpy(tmpname, instptr, CDI_MAX_NAME);
 	  limit_string_length(tmpname, CDI_MAX_NAME);
 	  fprintf(stdout, "%-8s ", tmpname);
 
 	  /* source info */
-	  modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
+	  const char *modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
 	  strcpy(tmpname, "unknown");
 	  if ( modelptr ) strncpy(tmpname, modelptr, CDI_MAX_NAME);
 	  limit_string_length(tmpname, CDI_MAX_NAME);

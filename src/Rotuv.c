@@ -81,15 +81,12 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
 void *Rotuv(void *argument)
 {
-  int recID, varID, levelID;
+  int varID, levelID;
   int varID1, varID2, nlevel1, nlevel2;
   int gridsize;
   int code, gridID;
   int offset;
   int nlevel;
-  int lvar = FALSE;
-  int i;
-  int lfound[MAXARG];
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
@@ -102,25 +99,26 @@ void *Rotuv(void *argument)
   int nch = operatorArgc();
   if ( nch%2 ) cdoAbort("Odd number of input arguments!");
 
-  int lcode = TRUE;
+  bool lvar = false;
+  bool lcode = true;
   int len = (int)strlen(operatorArgv()[0]);
-  for ( i = 0; i < len; ++i )
+  for ( int i = 0; i < len; ++i )
     if ( !isdigit(operatorArgv()[0][i]) )
       {
-        lcode = FALSE;
+        lcode = false;
         break;
       }
 
   if ( lcode )
     {
-      lvar = FALSE;
-      for ( i = 0; i < nch; i++ )
+      lvar = false;
+      for ( int i = 0; i < nch; i++ )
 	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
   else
     {
-      lvar = TRUE;
-      for ( i = 0; i < nch; i++ )
+      lvar = true;
+      for ( int i = 0; i < nch; i++ )
 	chvars[i] = operatorArgv()[i];
     }
 
@@ -138,17 +136,18 @@ void *Rotuv(void *argument)
   int **varnmiss    = (int **) Malloc(nvars*sizeof(int *));
   double **vardata  = (double **) Malloc(nvars*sizeof(double *));
 
-  for ( i = 0; i < nch; i++ ) lfound[i] = FALSE;
+  bool lfound[MAXARG];
+  for ( int i = 0; i < nch; i++ ) lfound[i] = false;
 
   if ( lvar )
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  vlistInqVarName(vlistID2, varID, varname);
-	  for ( i = 0; i < nch; i++ )
-	    if ( strcmp(varname, chvars[i]) == 0 ) lfound[i] = TRUE;
+	  for ( int i = 0; i < nch; i++ )
+	    if ( strcmp(varname, chvars[i]) == 0 ) lfound[i] = true;
 	}
-      for ( i = 0; i < nch; i++ )
+      for ( int i = 0; i < nch; i++ )
 	if ( ! lfound[i] ) cdoAbort("Variable %s not found!", chvars[i]);
     }
   else
@@ -156,10 +155,10 @@ void *Rotuv(void *argument)
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  code = vlistInqVarCode(vlistID2, varID);
-	  for ( i = 0; i < nch; i++ )
-	    if ( code == chcodes[i] ) lfound[i] = TRUE;
+	  for ( int i = 0; i < nch; i++ )
+	    if ( code == chcodes[i] ) lfound[i] = true;
 	}
-      for ( i = 0; i < nch; i++ )
+      for ( int i = 0; i < nch; i++ )
 	if ( ! lfound[i] ) cdoAbort("Code %d not found!", chcodes[i]);
     }
 
@@ -190,7 +189,7 @@ void *Rotuv(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -205,7 +204,7 @@ void *Rotuv(void *argument)
 	    cdoAbort("Missing values unsupported for this operator!");
 	}
 
-      for ( i = 0; i < nch; i += 2 )
+      for ( int i = 0; i < nch; i += 2 )
 	{
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
@@ -269,7 +268,7 @@ void *Rotuv(void *argument)
 	    }
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  varID    = recVarID[recID];
 	  levelID  = recLevelID[recID];

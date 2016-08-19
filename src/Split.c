@@ -35,7 +35,7 @@
 
 
 static
-void gen_filename(char *filename, int swap_obase, const char *obase, const char *suffix)
+void gen_filename(char *filename, bool swap_obase, const char *obase, const char *suffix)
 {
   if ( swap_obase ) strcat(filename, obase);
   if ( suffix[0] ) strcat(filename, suffix);
@@ -46,9 +46,7 @@ void *Split(void *argument)
 {
   int nchars = 0;
   int varID;
-  int code, tabnum, param;
-  int nlevs;
-  int recID, levelID, zaxisID, levID;
+  int levelID, levID;
   int varID2, levelID2;
   int vlistID2;
   int *vlistIDs = NULL, *streamIDs = NULL;
@@ -56,13 +54,10 @@ void *Split(void *argument)
   double ftmp[999];
   char filesuffix[32];
   char filename[8192];
-  const char *refname;
   int nsplit = 0;
-  int index;
-  int i;
   int gridsize;
   int nmiss;
-  int swap_obase = FALSE;
+  bool swap_obase = false;
   const char *uuid_attribute = NULL;
 
   cdoInitialize(argument);
@@ -81,10 +76,10 @@ void *Split(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  for( i = 0; i < operatorArgc(); ++i )
+  for( int i = 0; i < operatorArgc(); ++i )
     {
       if ( strcmp("swap", operatorArgv()[i]) == 0 )
-          swap_obase = TRUE;
+          swap_obase = true;
       else if ( strncmp("uuid=", operatorArgv()[i], 5 ) == 0 )
           uuid_attribute = operatorArgv()[i] + 5;
       else cdoAbort("Unknown parameter: >%s<", operatorArgv()[0]); 
@@ -96,13 +91,13 @@ void *Split(void *argument)
 
   int nvars  = vlistNvars(vlistID1);
 
-  if ( swap_obase == 0 )
+  if ( !swap_obase )
     {
       strcpy(filename, cdoStreamName(1)->args);
       nchars = strlen(filename);
     }
 
-  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
+  const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
   
@@ -111,7 +106,8 @@ void *Split(void *argument)
       nsplit = 0;
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  code = vlistInqVarCode(vlistID1, varID);
+	  int code = vlistInqVarCode(vlistID1, varID);
+          int index;
 	  for ( index = 0; index < varID; index++ )
 	    if ( code == vlistInqVarCode(vlistID1, index) ) break;
 
@@ -127,16 +123,15 @@ void *Split(void *argument)
       int codes[nsplit];
       memcpy(codes, itmp, nsplit*sizeof(int));
 
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      code    = vlistInqVarCode(vlistID1, varID);
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+	      int code    = vlistInqVarCode(vlistID1, varID);
 	      if ( codes[index] == code )
 		{
+                  int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  for ( levID = 0; levID < nlevs; levID++ )
 		    {
 		      vlistDefIndex(vlistID1, varID, levID, index);
@@ -176,7 +171,8 @@ void *Split(void *argument)
       nsplit = 0;
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  param = vlistInqVarParam(vlistID1, varID);
+	  int param = vlistInqVarParam(vlistID1, varID);
+          int index;
 	  for ( index = 0; index < varID; index++ )
 	    if ( param == vlistInqVarParam(vlistID1, index) ) break;
 
@@ -192,16 +188,15 @@ void *Split(void *argument)
       int params[nsplit];
       memcpy(params, itmp, nsplit*sizeof(int));
 
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      param   = vlistInqVarParam(vlistID1, varID);
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+	      int param   = vlistInqVarParam(vlistID1, varID);
 	      if ( params[index] == param )
 		{
+                  int nlevs   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  for ( levID = 0; levID < nlevs; levID++ )
 		    {
 		      vlistDefIndex(vlistID1, varID, levID, index);
@@ -230,7 +225,8 @@ void *Split(void *argument)
       nsplit = 0;
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  tabnum  = tableInqNum(vlistInqVarTable(vlistID1, varID));
+          int tabnum  = tableInqNum(vlistInqVarTable(vlistID1, varID));
+          int index;
 	  for ( index = 0; index < varID; index++ )
 	    if ( tabnum == tableInqNum(vlistInqVarTable(vlistID1, index)) ) break;
 
@@ -246,16 +242,15 @@ void *Split(void *argument)
       int tabnums[nsplit];
       memcpy(tabnums, itmp, nsplit*sizeof(int));
 
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      tabnum  = tableInqNum(vlistInqVarTable(vlistID1, varID));
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+	      int tabnum  = tableInqNum(vlistInqVarTable(vlistID1, varID));
 	      if ( tabnums[index] == tabnum )
 		{
+                  int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  for ( levID = 0; levID < nlevs; levID++ )
 		    {
 		      vlistDefIndex(vlistID1, varID, levID, index);
@@ -283,12 +278,11 @@ void *Split(void *argument)
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
 
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	{
 	  vlistClearFlag(vlistID1);
 	  varID = index;
-	  zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	  nlevs   = zaxisInqSize(zaxisID);
+	  int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levID = 0; levID < nlevs; levID++ )
 	    {
 	      vlistDefIndex(vlistID1, varID, levID, index);
@@ -314,13 +308,14 @@ void *Split(void *argument)
       double level;
       int nzaxis = vlistNzaxis(vlistID1);
       nsplit = 0;
-      for ( index = 0; index < nzaxis; index++ )
+      for ( int index = 0; index < nzaxis; index++ )
 	{
-	  zaxisID = vlistZaxis(vlistID1, index);
-	  nlevs   = zaxisInqSize(zaxisID);
+          int zaxisID = vlistZaxis(vlistID1, index);
+	  int nlevs = zaxisInqSize(zaxisID);
 	  for ( levID = 0; levID < nlevs; levID++ )
 	    {
 	      level = zaxisInqLevel(zaxisID, levID);
+              int i;
 	      for ( i = 0; i < nsplit; i++ )
 		if ( IS_EQUAL(level, ftmp[i]) ) break;
 	      if ( i == nsplit )
@@ -333,13 +328,13 @@ void *Split(void *argument)
       double levels[nsplit];
       memcpy(levels, ftmp, nsplit*sizeof(double));
 
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+              int zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      int nlevs = zaxisInqSize(zaxisID);
 	      for ( levID = 0; levID < nlevs; levID++ )
 		{
 		  level = zaxisInqLevel(zaxisID, levID);
@@ -371,19 +366,18 @@ void *Split(void *argument)
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
       int gridIDs[nsplit];
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	gridIDs[index] = vlistGrid(vlistID1, index);
 
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridID  = vlistInqVarGrid(vlistID1, varID);
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
 	      if ( gridIDs[index] == gridID )
 		{
+                  int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  for ( levID = 0; levID < nlevs; levID++ )
 		    {
 		      vlistDefIndex(vlistID1, varID, levID, index);
@@ -405,26 +399,24 @@ void *Split(void *argument)
     }
   else if ( operatorID == SPLITZAXIS )
     {
-      int zaxisID;
-
       nsplit = vlistNzaxis(vlistID1);
 
       vlistIDs  = (int*) Malloc(nsplit*sizeof(int));
       streamIDs = (int*) Malloc(nsplit*sizeof(int));
       int zaxisIDs[nsplit];
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	zaxisIDs[index] = vlistZaxis(vlistID1, index);
 
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	{
 	  vlistClearFlag(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-	      nlevs   = zaxisInqSize(zaxisID);
+	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      if ( zaxisIDs[index] == zaxisID )
 		{
-		  for ( levID = 0; levID < nlevs; levID++ )
+                  int nlevs = zaxisInqSize(zaxisID);
+                  for ( levID = 0; levID < nlevs; levID++ )
 		    {
 		      vlistDefIndex(vlistID1, varID, levID, index);
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
@@ -448,7 +440,7 @@ void *Split(void *argument)
       cdoAbort("not implemented!");
     }
 
-  for ( index = 0; index < nsplit; index++ )
+  for ( int  index = 0; index < nsplit; index++ )
     {
       if ( uuid_attribute ) cdo_def_tracking_id(vlistIDs[index], uuid_attribute);
 
@@ -467,14 +459,14 @@ void *Split(void *argument)
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      for ( index = 0; index < nsplit; index++ )
+      for ( int index = 0; index < nsplit; index++ )
 	streamDefTimestep(streamIDs[index], tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  index    = vlistInqIndex(vlistID1, varID, levelID);
+	  int index    = vlistInqIndex(vlistID1, varID, levelID);
 	  vlistID2 = vlistIDs[index];
 	  varID2   = vlistFindVar(vlistID2, varID);
 	  levelID2 = vlistFindLevel(vlistID2, varID, levelID);
@@ -498,7 +490,7 @@ void *Split(void *argument)
 
   streamClose(streamID1);
 
-  for ( index = 0; index < nsplit; index++ )
+  for ( int index = 0; index < nsplit; index++ )
     {
       streamClose(streamIDs[index]);
       vlistDestroy(vlistIDs[index]);

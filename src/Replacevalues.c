@@ -32,32 +32,22 @@
 
 void *Replacevalues(void *argument)
 {
-  int  SETVALS, SETRTOC, SETRTOC2;
-  int operatorID;
-  int streamID1, streamID2;
-  int gridsize;
-  int nrecs, recID;
-  int tsID;
+  int nrecs;
   int varID, levelID;
-  int vlistID1, vlistID2;
   int nmiss;
   int nvals = 0;
   LIST *flist = listNew(FLT_LIST);
   double *fltarr = NULL;
-  int i, j;
-  double missval;
   double rmin = 0, rmax = 0;
-  double *array;
-  int taxisID1, taxisID2;
   double newval = 0, newval2 = 0;
 
   cdoInitialize(argument);
 
-  SETVALS  = cdoOperatorAdd("setvals" , 0, 0, "I1,O1,...,In,On");
-  SETRTOC  = cdoOperatorAdd("setrtoc",  0, 0, "range (min, max), value");
-  SETRTOC2 = cdoOperatorAdd("setrtoc2", 0, 0, "range (min, max), value1, value2");
+  int SETVALS  = cdoOperatorAdd("setvals" , 0, 0, "I1,O1,...,In,On");
+  int SETRTOC  = cdoOperatorAdd("setrtoc",  0, 0, "range (min, max), value");
+  int SETRTOC2 = cdoOperatorAdd("setrtoc2", 0, 0, "range (min, max), value1, value2");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -85,45 +75,44 @@ void *Replacevalues(void *argument)
       newval2 = parameter2double(operatorArgv()[3]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array, &nmiss);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  missval = vlistInqVarMissval(vlistID1, varID);
+	  double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  if ( operatorID == SETVALS )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    /* printf("\nelem %d val %f ",i,array[i]); */
-		    for (j=0; j < nvals; j++)
+		    for ( int j = 0; j < nvals; j++ )
 		      {
 			if ( DBL_IS_EQUAL(array[i], fltarr[j*2] ) )
 			  {
@@ -131,34 +120,27 @@ void *Replacevalues(void *argument)
 			    /* printf("j=%d %f %f ",j,fltarr[j*2],fltarr[j*2+1]); */
 			    break;
 			  }
-			
 		      }
 		  }
 	    }
 	  else if ( operatorID == SETRTOC )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    if ( array[i] >= rmin && array[i] <= rmax)
-		      {
-			array[i] = newval;
-		      }
+                      array[i] = newval;
 		  }
 	    }
 	  else if ( operatorID == SETRTOC2 )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
 		  {
 		    if ( array[i] >= rmin && array[i] <= rmax )
-		      {
-			array[i] = newval;
-		      }
+                      array[i] = newval;
 		    else
-		      {
-			array[i] = newval2;
-		      }
+                      array[i] = newval2;
 		  }
 	    }
 

@@ -45,7 +45,7 @@ int check_ncorner(int ncorner, const double *lon_bounds, const double *lat_bound
   int ncorner_new = ncorner;
   int k;
 
-  for ( k=ncorner-1; k>0; --k )
+  for ( k = ncorner-1; k > 0; --k )
     if ( IS_NOT_EQUAL(lon_bounds[k], lon_bounds[k-1]) ||
 	 IS_NOT_EQUAL(lat_bounds[k], lat_bounds[k-1]) ) break;
 
@@ -57,20 +57,17 @@ int check_ncorner(int ncorner, const double *lon_bounds, const double *lat_bound
 
 void make_cyclic(double *array1, double *array2, int nlon, int nlat)
 {
-  int i, j;
   int ij1, ij2;
 
-  for ( j = 0; j < nlat; ++j )
-    {
-      for ( i = 0; i < nlon; ++i )
-	{
-	  ij1 = j*nlon+i;
-	  ij2 = j*(nlon+1)+i;
-	  array2[ij2] = array1[ij1];
-	}
-    }
+  for ( int j = 0; j < nlat; ++j )
+    for ( int i = 0; i < nlon; ++i )
+      {
+        ij1 = j*nlon+i;
+        ij2 = j*(nlon+1)+i;
+        array2[ij2] = array1[ij1];
+      }
 
-  for ( j = 0; j < nlat; ++j )
+  for ( int j = 0; j < nlat; ++j )
     {
       ij2 = j*(nlon+1);
       array2[ij2+nlon] = array2[ij2];
@@ -203,25 +200,20 @@ void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double mis
 
 void *Outputgmt(void *argument)
 {
-  int i, j;
   int varID0, recID;
   int gridsize2 = 0;
   int nrecs;
   int levelID;
   int nmiss;
-  int lzon = FALSE, lmer = FALSE, lhov = FALSE;
-  int ncorner = 0, ic;
-  int status;
-  int lgrid_gen_bounds = FALSE, luse_grid_corner = FALSE;
   int ninc = 1;
+  bool lzon = false, lmer = false, lhov = false;
+  bool lgrid_gen_bounds = false, luse_grid_corner = false;
   char varname[CDI_MAX_NAME];
-  double level;
   double *array2 = NULL;
   double *uf = NULL, *vf = NULL, *alpha = NULL, *auv = NULL;
   double *grid_center_lat2 = NULL, *grid_center_lon2 = NULL;
   double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
   int *grid_mask = NULL;
-  FILE *cpt_fp;
   CPT cpt;
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
@@ -248,17 +240,18 @@ void *Outputgmt(void *argument)
     }
 
   if ( operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT )
-    luse_grid_corner = TRUE;
+    luse_grid_corner = true;
 
   if ( operatorID == OUTPUTCENTERCPT || operatorID == OUTPUTBOUNDSCPT || operatorID == OUTPUTVRML )
     {
        operatorCheckArgc(1);
        char *cpt_file = operatorArgv()[0];
 
-      if ( (cpt_fp = fopen (cpt_file, "r")) == NULL )
+       FILE *cpt_fp = fopen(cpt_file, "r");
+       if ( cpt_fp == NULL )
 	cdoAbort("Open failed on color palette table %s", cpt_file);
 
-      status = cptRead(cpt_fp, &cpt);
+      int status = cptRead(cpt_fp, &cpt);
       if ( status != 0 )
 	cdoAbort("Error during read of color palette table %s", cpt_file);
       
@@ -282,7 +275,7 @@ void *Outputgmt(void *argument)
   if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
     {
       gridID = gridToCurvilinear(gridID, 1);
-      lgrid_gen_bounds = TRUE;
+      lgrid_gen_bounds = true;
     }
 
   int gridsize = gridInqSize(gridID);
@@ -298,9 +291,9 @@ void *Outputgmt(void *argument)
 
   if ( gridInqType(gridID) != GRID_UNSTRUCTURED )
     {
-      if ( nlon == 1 && nlat  > 1 && nlev == 1 ) lhov = TRUE;
-      if ( nlon == 1 && nlat  > 1 && nlev  > 1 ) lzon = TRUE;
-      if ( nlon  > 1 && nlat == 1 && nlev  > 1 ) lmer = TRUE;
+      if ( nlon == 1 && nlat  > 1 && nlev == 1 ) lhov = true;
+      if ( nlon == 1 && nlat  > 1 && nlev  > 1 ) lzon = true;
+      if ( nlon  > 1 && nlat == 1 && nlev  > 1 ) lmer = true;
     }
   else
     {
@@ -323,12 +316,9 @@ void *Outputgmt(void *argument)
 	cdoAbort("Bounds not available hovmoeller data!");
     }
 
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
-    ncorner = gridInqNvertex(gridID);
-  else
-    ncorner = 4;
+  int ncorner = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
 
-  int grid_is_circular = gridIsCircular(gridID);
+  bool grid_is_circular = gridIsCircular(gridID);
 
   double *grid_center_lat = (double*) Malloc(gridsize*sizeof(double));
   double *grid_center_lon = (double*) Malloc(gridsize*sizeof(double));
@@ -348,8 +338,6 @@ void *Outputgmt(void *argument)
 
   if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
     {
-      int ij2;
-
       gridsize2 = nlat*(nlon+1);
 
       grid_center_lat2 = (double*) Malloc(gridsize2*sizeof(double));
@@ -358,9 +346,9 @@ void *Outputgmt(void *argument)
       make_cyclic(grid_center_lat, grid_center_lat2, nlon, nlat);
       make_cyclic(grid_center_lon, grid_center_lon2, nlon, nlat);
 
-      for ( j = 0; j < nlat; ++j )
+      for ( int j = 0; j < nlat; ++j )
 	{
-	  ij2 = j*(nlon+1);
+	  int ij2 = j*(nlon+1);
 	  grid_center_lon2[ij2+nlon] += 360;
 	}
 
@@ -415,15 +403,15 @@ void *Outputgmt(void *argument)
       else
 	{
 	  zaxis_lower_lev[0] = zaxis_center_lev[0];
-	  for ( i = 1; i < nlev; ++i )
+	  for ( int i = 1; i < nlev; ++i )
 	    zaxis_lower_lev[i] = 0.5*(zaxis_center_lev[i] + zaxis_center_lev[i-1]);
 
 	  zaxis_upper_lev[nlev-1] = zaxis_center_lev[nlev-1];
-	  for ( i = 0; i < nlev-1; ++i )
+	  for ( int i = 0; i < nlev-1; ++i )
 	    zaxis_upper_lev[i] = zaxis_lower_lev[i+1];
 
 	  if ( cdoVerbose )
-	    for ( i = 0; i < nlev; ++i )
+	    for ( int i = 0; i < nlev; ++i )
 	      fprintf(stderr, "level: %d %g %g %g\n",
 		     i+1, zaxis_lower_lev[i], zaxis_center_lev[i], zaxis_upper_lev[i]);
 	}
@@ -493,7 +481,7 @@ void *Outputgmt(void *argument)
 	  if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
 	    make_cyclic(array, array2, nlon, nlat);
 
-	  level = zaxis_center_lev[levelID];
+	  double level = zaxis_center_lev[levelID];
 
 	  if ( (tsID == 0 || lzon || lmer) && operatorID != OUTPUTTRI )
 	    fprintf(stdout, "# Level = %g\n", level);
@@ -514,10 +502,9 @@ void *Outputgmt(void *argument)
                   fprintf(stderr, "pscoast -O -J -R -Dc -W -B40g20 >> gmtplot.ps\n");
                 }
 
-	      for ( i = 0; i < nvals; i++ )
+	      for ( int i = 0; i < nvals; i++ )
 		{
-		  if ( grid_mask )
-		    if ( grid_mask[i] == 0 ) continue;
+		  if ( grid_mask && grid_mask[i] == 0 ) continue;
 
 		  if ( operatorID == OUTPUTCENTER )
 		    {
@@ -549,27 +536,25 @@ void *Outputgmt(void *argument)
 	  else if ( operatorID == OUTPUTTRI )
 	    {
 	      int c1, c2, c3;
-	      int mlon, ip1;
+	      int ip1;
 	      if ( gridInqType(gridID) != GRID_CURVILINEAR ) cdoAbort("Unsupported grid!");
 
-	      mlon = nlon-1;
+	      int mlon = nlon-1;
 	      /* if ( gridIsCircular(gridID) ) mlon = nlon; */
-	      for ( j = 0; j < nlat-1; ++j )
-		{
-		  for ( i = 0; i < mlon; ++i )
-		    {
-		      ip1 = i+1;
-		      if ( i == nlon-1 ) ip1 = 0;
-		      c1 = (j)*nlon+ip1;
-		      c2 = (j)*nlon+i;
-		      c3 = (j+1)*nlon+i;
-		      fprintf(stdout, "%d   %d   %d\n", c1, c2, c3);
-		      c1 = (j)*nlon+i+1;
-		      c2 = (j+1)*nlon+i;
-		      c3 = (j+1)*nlon+ip1;
-		      fprintf(stdout, "%d   %d   %d\n", c1, c2, c3);
-		    }
-		}
+	      for ( int j = 0; j < nlat-1; ++j )
+                for ( int i = 0; i < mlon; ++i )
+                  {
+                    ip1 = i+1;
+                    if ( i == nlon-1 ) ip1 = 0;
+                    c1 = (j)*nlon+ip1;
+                    c2 = (j)*nlon+i;
+                    c3 = (j+1)*nlon+i;
+                    fprintf(stdout, "%d   %d   %d\n", c1, c2, c3);
+                    c1 = (j)*nlon+i+1;
+                    c2 = (j+1)*nlon+i;
+                    c3 = (j+1)*nlon+ip1;
+                    fprintf(stdout, "%d   %d   %d\n", c1, c2, c3);
+                  }
 	    }
 	  else if ( operatorID == OUTPUTVECTOR )
 	    {
@@ -579,8 +564,8 @@ void *Outputgmt(void *argument)
 	      streamInqRecord(streamID, &varID, &levelID);
 	      streamReadRecord(streamID, vf, &nmiss);
 
-	      for ( j = 0; j < nlat; j += ninc )
-		for ( i = 0; i < nlon; i += ninc )
+	      for ( int j = 0; j < nlat; j += ninc )
+		for ( int i = 0; i < nlon; i += ninc )
 		  {
 		    /* compute length of velocity vector */
 		    auv[IX2D(j,i,nlon)] = sqrt(uf[IX2D(j,i,nlon)]*uf[IX2D(j,i,nlon)] + 
@@ -620,7 +605,7 @@ void *Outputgmt(void *argument)
                   fprintf(stderr, "ps2pdf gmtplot.ps\n");
                 }
 
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		{
 		  if ( grid_mask && grid_mask[i] == 0 ) continue;
 
@@ -664,7 +649,7 @@ void *Outputgmt(void *argument)
 		      double levmax = zaxis_upper_lev[levelID];
 		      double latmin = grid_corner_lat[i*4];
 		      double latmax = grid_corner_lat[i*4];
-		      for ( ic = 1; ic < 4; ic++ )
+		      for ( int ic = 1; ic < 4; ic++ )
 			{
 			  if ( grid_corner_lat[i*4+ic] < latmin ) latmin = grid_corner_lat[i*4+ic];
 			  if ( grid_corner_lat[i*4+ic] > latmax ) latmax = grid_corner_lat[i*4+ic];
@@ -677,7 +662,7 @@ void *Outputgmt(void *argument)
 		      xlat[1] = latmin;
 		      xlat[2] = latmax;
 		      xlat[3] = latmax;
-		      for ( ic = 0; ic < 4; ic++ )
+		      for ( int ic = 0; ic < 4; ic++ )
 			fprintf(stdout, "   %g  %g\n", xlat[ic], xlev[ic]);
 		      fprintf(stdout, "   %g  %g\n", xlat[0], xlev[0]);
 		    }
@@ -688,7 +673,7 @@ void *Outputgmt(void *argument)
 		      double levmax = zaxis_upper_lev[levelID];
 		      double lonmin = grid_corner_lon[i*4];
 		      double lonmax = grid_corner_lon[i*4];
-		      for ( ic = 1; ic < 4; ic++ )
+		      for ( int ic = 1; ic < 4; ic++ )
 			{
 			  if ( grid_corner_lon[i*4+ic] < lonmin ) lonmin = grid_corner_lon[i*4+ic];
 			  if ( grid_corner_lon[i*4+ic] > lonmax ) lonmax = grid_corner_lon[i*4+ic];
@@ -701,7 +686,7 @@ void *Outputgmt(void *argument)
 		      xlon[1] = lonmax;
 		      xlon[2] = lonmax;
 		      xlon[3] = lonmin;
-		      for ( ic = 0; ic < 4; ic++ )
+		      for ( int ic = 0; ic < 4; ic++ )
 			fprintf(stdout, "   %g  %g\n", xlon[ic], xlev[ic]);
 		      fprintf(stdout, "   %g  %g\n", xlon[0], xlev[0]);
 		    }
@@ -715,7 +700,7 @@ void *Outputgmt(void *argument)
 		      const double *lat_bounds = grid_corner_lat+i*ncorner;
 		      int ncorner_new = check_ncorner(ncorner, lon_bounds, lat_bounds);
 
-		      for ( ic = 0; ic < ncorner_new; ic++ )
+		      for ( int ic = 0; ic < ncorner_new; ic++ )
 			fprintf(stdout, "   %g  %g\n", lon_bounds[ic], lat_bounds[ic]);
 		      fprintf(stdout, "   %g  %g\n", lon_bounds[0], lat_bounds[0]);
 		    }

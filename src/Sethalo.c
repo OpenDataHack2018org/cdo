@@ -367,7 +367,7 @@ int gengrid(int gridID1, int lhalo, int rhalo)
       Free(ybounds2);
     }
 
-  return (gridID2);
+  return gridID2;
 }
 
 
@@ -469,37 +469,29 @@ void tpnhalo(double *array1, int gridID1, double *array2)
 
 void *Sethalo(void *argument)
 {
-  int SETHALO, TPNHALO;
-  int operatorID;
-  int streamID1, streamID2;
-  int nrecs, nvars;
-  int tsID, recID, varID, levelID;
+  int nrecs;
+  int varID, levelID;
   int gridsize, gridsize2;
-  int vlistID1, vlistID2;
   int gridID1 = -1, gridID2;
-  int index, ngrids, gridtype;
+  int index, gridtype;
   int nmiss;
-  int *vars;
   int i;
   int lhalo = 0, rhalo = 0;
-  int ndiffgrids;
   double missval;
-  double *array1 = NULL, *array2 = NULL;
-  int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
-  SETHALO = cdoOperatorAdd("sethalo", 0, 0, NULL);
-  TPNHALO = cdoOperatorAdd("tpnhalo", 0, 0, NULL);
+  int SETHALO = cdoOperatorAdd("sethalo", 0, 0, NULL);
+                cdoOperatorAdd("tpnhalo", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-  ngrids = vlistNgrids(vlistID1);
-  ndiffgrids = 0;
+  int ngrids = vlistNgrids(vlistID1);
+  int ndiffgrids = 0;
   for ( index = 1; index < ngrids; index++ )
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
       ndiffgrids++;
@@ -530,10 +522,10 @@ void *Sethalo(void *argument)
       gridID2 = gentpngrid(gridID1);
     }
 
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids = vlistNgrids(vlistID1);
@@ -546,8 +538,8 @@ void *Sethalo(void *argument)
 	}
     }
 
-  nvars = vlistNvars(vlistID1);
-  vars  = (int*) Malloc(nvars*sizeof(int));
+  int nvars = vlistNvars(vlistID1);
+  int *vars  = (int*) Malloc(nvars*sizeof(int));
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
@@ -556,24 +548,23 @@ void *Sethalo(void *argument)
 	vars[varID] = FALSE;
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+ int  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = gridInqSize(gridID1);
-  array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   gridsize2 = gridInqSize(gridID2);
-  array2 = (double*) Malloc(gridsize2*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

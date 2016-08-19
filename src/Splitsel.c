@@ -30,25 +30,19 @@
 void *Splitsel(void *argument)
 {
   int gridsize;
-  //int vdate = 0, vtime = 0;
   int nrecs = 0;
-  int varID, levelID, recID;
-  int tsID, tsID2;
-  int nsets;
+  int varID, levelID;
+  int tsID;
   int nmiss;
   int gridID;
   int nlevel;
-/*   int ndates = 0, noffset = 0, nskip = 0, nargc; */
-  double ndates, noffset, nskip;
   int i2 = 0;
-  int nargc;
-
   /* from Splittime.c */
   int nchars;
   char filesuffix[32];
   char filename[8192];
   const char *refname;
-  int index = 0;
+  double ndates, noffset, nskip;
   double *array = NULL;
   field_t **vars = NULL;
 
@@ -62,8 +56,7 @@ void *Splitsel(void *argument)
 
   /*  operatorInputArg("nsets <noffset <nskip>>"); */
 
-  nargc = operatorArgc();
-
+  int nargc = operatorArgc();
   if ( nargc < 1 )
     cdoAbort("Too few arguments! Need %d found %d.", 1, nargc);
 
@@ -71,7 +64,7 @@ void *Splitsel(void *argument)
 /*   if ( nargc > 1 ) noffset = parameter2int(operatorArgv()[1]); */
 /*   if ( nargc > 2 ) nskip   = parameter2int(operatorArgv()[2]); */
 /*   printf("%s %s %s\n", operatorArgv()[0],operatorArgv()[1],operatorArgv()[2]); */
-  ndates = noffset = nskip = 0.0;
+  noffset = nskip = 0.0;
   ndates = parameter2double(operatorArgv()[0]);
   if ( nargc > 1 ) noffset = parameter2double(operatorArgv()[1]);
   if ( nargc > 2 ) nskip   = parameter2double(operatorArgv()[2]);
@@ -143,7 +136,7 @@ void *Splitsel(void *argument)
 	}
 
       if ( tsID == 0 && nconst )
-	for ( recID = 0; recID < nrecs; recID++ )
+	for ( int recID = 0; recID < nrecs; recID++ )
 	  {
 	    streamInqRecord(streamID1, &varID, &levelID);
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
@@ -154,8 +147,8 @@ void *Splitsel(void *argument)
           }
     }
 
-  index = 0;
-  nsets = 0;
+  int index = 0;
+  int nsets = 0;
   while ( TRUE )
     {
       sprintf(filename+nchars, "%06d", index);
@@ -168,18 +161,12 @@ void *Splitsel(void *argument)
 
       streamDefVlist(streamID2, vlistID2);
 
-      tsID2 = 0;
+      int tsID2 = 0;
 
       for ( ; nsets < (int)(ndates*(index+1)); nsets++ ) 
 	{
 	  nrecs = streamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
-
-	  /*
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
-	  printf("vdate: %d vtime: %d\n", vdate, vtime);
-	   */
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
 	  streamDefTimestep(streamID2, tsID2);
@@ -201,7 +188,7 @@ void *Splitsel(void *argument)
 		}
 	    }
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      
 	      streamInqRecord(streamID1, &varID, &levelID);

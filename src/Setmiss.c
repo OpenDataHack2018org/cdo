@@ -42,7 +42,7 @@ int isnan(const double x);
 
 void *Setmiss(void *argument)
 {
-  int nrecs, recID;
+  int nrecs;
   int varID, levelID;
   int nmiss;
   int i;
@@ -139,10 +139,9 @@ void *Setmiss(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array, &nmiss);

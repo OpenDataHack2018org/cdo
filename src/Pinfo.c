@@ -29,62 +29,50 @@
 
 void *Pinfo(void *argument)
 {
-  int PINFO, PINFOV;
-  int operatorID;
   int i;
-  int indg;
-  int varID, recID;
-  int gridsize = 0;
-  int gridID, zaxisID, code;
+  int varID;
   int nrecs;
   int levelID;
-  int tsID;
-  int taxisID1, taxisID2;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
   int nmiss;
   int ivals = 0, imiss = 0;
-  int vdate, vtime;
   char varname[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
-  double missval;
-  double *array1 = NULL, *array2 = NULL;
   double level;
   double arrmin, arrmax, arrmean, arrvar;
 
   cdoInitialize(argument);
 
-  PINFO  = cdoOperatorAdd("pinfo",  0, 0, NULL);
-  PINFOV = cdoOperatorAdd("pinfov", 0, 0, NULL);
+  int PINFO  = cdoOperatorAdd("pinfo",  0, 0, NULL);
+  int PINFOV = cdoOperatorAdd("pinfov", 0, 0, NULL);
 
   UNUSED(PINFO);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  indg = 0;
-  tsID = 0;
+  int indg = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
+      int vtime = taxisInqVtime(taxisID1);
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
@@ -93,7 +81,7 @@ void *Pinfo(void *argument)
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  if ( tsID == 0 && recID == 0 )
 	    {
@@ -109,11 +97,11 @@ void *Pinfo(void *argument)
 	  streamReadRecord(streamID1, array1, &nmiss);
 
 	  indg += 1;
-	  code     = vlistInqVarCode(vlistID1, varID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+	  int code     = vlistInqVarCode(vlistID1, varID);
+	  int gridID   = vlistInqVarGrid(vlistID1, varID);
+	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+	  double missval  = vlistInqVarMissval(vlistID1, varID);
+	  int gridsize = gridInqSize(gridID);
 
 	  if ( operatorID == PINFOV ) vlistInqVarName(vlistID1, varID, varname);
 

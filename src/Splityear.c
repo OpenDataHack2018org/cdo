@@ -37,10 +37,7 @@ void *Splityear(void *argument)
   int streamID2 = -1;
   int varID;
   int nrecs;
-  int tsID, tsID2, recID, levelID;
-  char filesuffix[32];
-  char filename[8192];
-  int vdate;
+  int levelID;
   int day;
   int year1, year2;
   int mon1, mon2;
@@ -50,6 +47,8 @@ void *Splityear(void *argument)
   int nmiss;
   int gridID;
   int nlevel;
+  char filesuffix[32];
+  char filename[8192];
   double *array = NULL;
   field_t **vars = NULL;
 
@@ -123,11 +122,11 @@ void *Splityear(void *argument)
   int index2;
   year1 = -1;
   mon1  = -1;
-  tsID  = 0;
-  tsID2 = 0;
+  int tsID  = 0;
+  int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
+      int vdate = taxisInqVdate(taxisID1);
       cdiDecodeDate(vdate, &year2, &mon2, &day);
 
       if ( operatorID == SPLITYEAR )
@@ -211,7 +210,7 @@ void *Splityear(void *argument)
 	    }
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

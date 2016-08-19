@@ -39,26 +39,19 @@ void *Pressure(void *argument)
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
   int ps_code = 0, lsp_code = 0;
-  int streamID2;
-  int vlistID2;
-  int recID, nrecs;
+  int nrecs;
   int i, k, offset;
-  int tsID, varID, levelID;
+  int varID, levelID;
   int zaxisIDp, zaxisIDh = -1;
-  int gridID, zaxisID;
   int nhlevf = 0, nhlevh = 0, nlevel = 0;
   int nvct = 0;
-  int psID = -1, lnpsID = -1, pvarID = -1;
-  int code, param;
+  int nmiss;
+  int psID = -1, lnpsID = -1;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   double minval, maxval;
   double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap = NULL;
   double *pout = NULL;
-  double *pdata = NULL;
-  int taxisID1, taxisID2;
-  int nmiss;
-  int instNum, tableNum;
 
   cdoInitialize(argument);
 
@@ -104,8 +97,7 @@ void *Pressure(void *argument)
   bool useTable = false;
   for ( varID = 0; varID < nvars; varID++ )
     {
-      tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
-
+      int tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
       if ( tableNum > 0 && tableNum != 255 )
 	{
 	  useTable = true;
@@ -117,14 +109,13 @@ void *Pressure(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      nlevel   = zaxisInqSize(zaxisID);
-      instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
-      tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
+      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+      int nlevel   = zaxisInqSize(zaxisID);
+      int instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
+      int tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
-      code     = vlistInqVarCode(vlistID1, varID);
-      param    = vlistInqVarParam(vlistID1, varID);
+      int code     = vlistInqVarCode(vlistID1, varID);
+      int param    = vlistInqVarParam(vlistID1, varID);
 
       cdiParamToString(param, paramstr, sizeof(paramstr));
 
@@ -181,10 +172,10 @@ void *Pressure(void *argument)
 	}
     }
 
-  pvarID = lnpsID;
+  int pvarID = lnpsID;
   if ( zaxisIDh != -1 && lnpsID != -1 )
     {
-      gridID = vlistInqVarGrid(vlistID1, lnpsID);
+      int gridID = vlistInqVarGrid(vlistID1, lnpsID);
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	{
 	  lnpsID = -1;
@@ -199,37 +190,35 @@ void *Pressure(void *argument)
 	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
     }
 
-  gridID = vlistInqVarGrid(vlistID1, pvarID);
+  int gridID = vlistInqVarGrid(vlistID1, pvarID);
   if ( gridInqType(gridID) == GRID_SPECTRAL )
     cdoAbort("%s on spectral representation not supported!", var_stdname(surface_air_pressure));
 
-  pdata = (double*) Malloc(gridsize*sizeof(double));
+  double *pdata = (double*) Malloc(gridsize*sizeof(double));
 
-
-  vlistID2 = vlistCreate();
+  int vlistID2 = vlistCreate();
   varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TSTEP_INSTANT);
   vlistDefVarParam(vlistID2, varID, cdiEncodeParam(1, 255, 255));
   vlistDefVarName(vlistID2, varID, "pressure");
   vlistDefVarStdname(vlistID2, varID, "air_pressure");
   vlistDefVarUnits(vlistID2, varID, "Pa");
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

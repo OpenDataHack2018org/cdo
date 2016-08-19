@@ -147,7 +147,7 @@ void paramToStringLong(int param, char *paramstr, int maxlen)
 
 void *Sort(void *argument)
 {
-  int recID, varID, levelID, zaxisID;
+  int varID, levelID, zaxisID;
   int vindex, lindex;
   int nrecs, nlevs, offset;
   int gridsize;
@@ -219,7 +219,7 @@ void *Sort(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

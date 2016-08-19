@@ -644,9 +644,8 @@ static
 int get_norm_opt(void)
 {
   int norm_opt = NORM_OPT_FRACAREA;
-  char *envstr;
 
-  envstr = getenv("CDO_REMAP_NORMALIZE_OPT"); // obsolate
+  char *envstr = getenv("CDO_REMAP_NORMALIZE_OPT"); // obsolate
   if ( envstr && *envstr )
     {
       if      ( memcmp(envstr, "frac", 4) == 0 ) norm_opt = NORM_OPT_FRACAREA;
@@ -770,21 +769,18 @@ void *Remap(void *argument)
   int streamID2 = -1;
   int nrecs;
   int index;
-  int tsID, recID, varID, levelID;
+  int varID, levelID;
   int gridsize, gridsize2;
   int gridID1 = -1, gridID2;
   int nmiss1, nmiss2, i, j, r = -1;
-  int *imask = NULL;
   int nremaps = 0;
   int norm_opt = NORM_OPT_NONE;
   int map_type = -1;
   int submap_type = SUBMAP_TYPE_NONE;
   int num_neighbors = 0;
   int need_gradiants = FALSE;
-  int grid1sizemax;
   char varname[CDI_MAX_NAME];
   double missval;
-  double *array1 = NULL, *array2 = NULL;
   double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;
   remap_t *remaps = NULL;
   char *remap_file = NULL;
@@ -964,7 +960,7 @@ void *Remap(void *argument)
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC ) norm_opt = get_norm_opt();
 
-  grid1sizemax = vlistGridsizeMax(vlistID1);
+  int grid1sizemax = vlistGridsizeMax(vlistID1);
 
   if ( map_type == MAP_TYPE_BICUBIC ) need_gradiants = TRUE;
   if ( map_type == MAP_TYPE_CONSERV && remap_order == 2 )
@@ -982,11 +978,11 @@ void *Remap(void *argument)
       grad1_latlon = (double*) Malloc(grid1sizemax*sizeof(double));
     }
 
-  array1 = (double*) Malloc(grid1sizemax*sizeof(double));
-  imask  = (int*) Malloc(grid1sizemax*sizeof(int));
+  double *array1 = (double*) Malloc(grid1sizemax*sizeof(double));
+  int *imask = (int*) Malloc(grid1sizemax*sizeof(int));
 
   gridsize = gridInqSize(gridID2);
-  array2   = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
   if ( ! lwrite_remap )
     {
@@ -994,7 +990,7 @@ void *Remap(void *argument)
       streamDefVlist(streamID2, vlistID2);
     }
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -1002,7 +998,7 @@ void *Remap(void *argument)
       if ( ! lwrite_remap ) 
 	streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss1);
