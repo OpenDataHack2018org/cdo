@@ -32,18 +32,11 @@
 void *Timselpctl(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int vdate2 = 0, vtime2 = 0;
-  int vdate3 = 0, vtime3 = 0;
   int nrecs = 0;
-  int gridID, varID, levelID, recID;
+  int gridID, varID, levelID;
   int tsID;
-  int nsets = 0;
-  int i;
   int nmiss;
   int nlevels;
-  field_t **vars1 = NULL;
-  field_t field;
-  HISTOGRAM_SET *hset = NULL;
 
   cdoInitialize(argument);
 
@@ -99,11 +92,12 @@ void *Timselpctl(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize * sizeof(double));
 
-  vars1 = field_malloc(vlistID1, FIELD_PTR);
-  hset = hsetCreate(nvars);
+  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  HISTOGRAM_SET *hset = hsetCreate(nvars);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -118,7 +112,7 @@ void *Timselpctl(void *argument)
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -143,21 +137,21 @@ void *Timselpctl(void *argument)
       if ( nrecs != streamInqTimestep(streamID3, otsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
 
-      vdate2 = taxisInqVdate(taxisID2);
-      vtime2 = taxisInqVtime(taxisID2);
-      vdate3 = taxisInqVdate(taxisID3);
-      vtime3 = taxisInqVtime(taxisID3);
+      int vdate2 = taxisInqVdate(taxisID2);
+      int vtime2 = taxisInqVtime(taxisID2);
+      int vdate3 = taxisInqVdate(taxisID3);
+      int vtime3 = taxisInqVtime(taxisID3);
       if ( vdate2 != vdate3 || vtime2 != vtime3 )
         cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
           streamReadRecord(streamID2, vars1[varID][levelID].ptr, &nmiss);
           vars1[varID][levelID].nmiss = nmiss;
         }
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID3, &varID, &levelID);
           streamReadRecord(streamID3, field.ptr, &nmiss);
@@ -168,7 +162,7 @@ void *Timselpctl(void *argument)
           hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID], &field);
         }
 
-      nsets = 0;
+      int nsets = 0;
       if ( nrecs )
 	for ( nsets = 0; nsets < ndates; nsets++ )
 	  {
@@ -177,7 +171,7 @@ void *Timselpctl(void *argument)
 
 	    dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 
-	    for ( recID = 0; recID < nrecs; recID++ )
+	    for ( int recID = 0; recID < nrecs; recID++ )
 	      {
 		streamInqRecord(streamID1, &varID, &levelID);
 
@@ -210,7 +204,7 @@ void *Timselpctl(void *argument)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
       streamDefTimestep(streamID4, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
@@ -224,7 +218,7 @@ void *Timselpctl(void *argument)
       if ( nrecs == 0 ) break;
       otsID++;
 
-      for ( i = 0; i < nskip; i++ )
+      for ( int i = 0; i < nskip; i++ )
 	{
 	  nrecs = streamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;

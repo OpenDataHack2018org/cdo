@@ -33,23 +33,14 @@
 void *Seaspctl(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int vdate1 = 0;
-  int vdate2 = 0, vtime2 = 0;
-  int vdate3 = 0, vtime3 = 0;
   int nrecs;
-  int gridID, varID, levelID, recID;
-  int tsID;
-  int otsID;
-  long nsets;
-  int year, month, day, seas, seas0 = 0;
+  int gridID, varID, levelID;
+  int year, month, day, seas0 = 0;
   int nmiss;
   int nlevels;
-  int newseas, oldmon = 0, newmon;
-  double missval;
-  field_t **vars1 = NULL;
-  field_t field;
-  HISTOGRAM_SET *hset = NULL;
+  int oldmon = 0;
   int season_start;
+  double missval;
 
   cdoInitialize(argument);
 
@@ -97,10 +88,12 @@ void *Seaspctl(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
+  field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  vars1 = (field_t **) Malloc(nvars * sizeof(field_t *));
-  hset = hsetCreate(nvars);
+  field_t **vars1 = (field_t **) Malloc(nvars * sizeof(field_t *));
+  HISTOGRAM_SET *hset = hsetCreate(nvars);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -121,29 +114,29 @@ void *Seaspctl(void *argument)
 	}
     }
 
-  tsID    = 0;
-  otsID   = 0;
+  int tsID    = 0;
+  int otsID   = 0;
   while ( TRUE )
     {
       nrecs = streamInqTimestep(streamID2, otsID);
       if ( nrecs != streamInqTimestep(streamID3, otsID) )
         cdoAbort("Number of records at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
       
-      vdate2 = taxisInqVdate(taxisID2);
-      vtime2 = taxisInqVtime(taxisID2);
-      vdate3 = taxisInqVdate(taxisID3);
-      vtime3 = taxisInqVtime(taxisID3);
+      int vdate2 = taxisInqVdate(taxisID2);
+      int vtime2 = taxisInqVtime(taxisID2);
+      int vdate3 = taxisInqVdate(taxisID3);
+      int vtime3 = taxisInqVtime(taxisID3);
       if ( vdate2 != vdate3 || vtime2 != vtime3 )
         cdoAbort("Verification dates at time step %d of %s and %s differ!", otsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
 	  streamReadRecord(streamID2, vars1[varID][levelID].ptr, &nmiss);
           vars1[varID][levelID].nmiss = nmiss;
         }
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID3, &varID, &levelID);
 	  streamReadRecord(streamID3, field.ptr, &nmiss);
@@ -154,20 +147,20 @@ void *Seaspctl(void *argument)
 	  hsetDefVarLevelBounds(hset, varID, levelID, &vars1[varID][levelID], &field);
         }
 
-      nsets   = 0;
-      newseas = FALSE;
+      int nsets   = 0;
+      bool newseas = false;
       while ( nrecs && (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-	  vdate1 = dtlist_get_vdate(dtlist, nsets);
+	  int vdate1 = dtlist_get_vdate(dtlist, nsets);
 
 	  cdiDecodeDate(vdate1, &year, &month, &day);
 
-	  newmon = month;
+	  int newmon = month;
 
 	  if ( season_start == START_DEC && newmon == 12 ) newmon = 0;
 
-          seas = month_to_season(month);
+          int seas = month_to_season(month);
 
 	  if ( nsets == 0 )
 	    {
@@ -175,13 +168,13 @@ void *Seaspctl(void *argument)
 	      oldmon = newmon;
 	    }
 
-	  if ( newmon < oldmon ) newseas = TRUE;
+	  if ( newmon < oldmon ) newseas = true;
 
 	  if ( (seas != seas0) || newseas ) break;
 
 	  oldmon = newmon;
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      if ( tsID == 0 )
@@ -213,7 +206,7 @@ void *Seaspctl(void *argument)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID4, nsets);
       streamDefTimestep(streamID4, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];

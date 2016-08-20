@@ -67,54 +67,44 @@ void *Test2(void *argument)
 
 void *Testdata(void *argument)
 {
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int tsID1, tsID2, recID, varID, levelID;
-  int gridsize, i;
-  int vlistID1, vlistID2 = -1;
+  int varID, levelID;
   int nmiss;
-  int taxisID1, taxisID2 = CDI_UNDEFID;
-  double *array = NULL;
-  float *fval;
-  int *ival;
-  unsigned char *cval;
-  unsigned char *cval2;
-  FILE *fp;
 
   cdoInitialize(argument);
 
-  tsID2 = 0;
+  int tsID2 = 0;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  taxisID1 = vlistInqTaxis(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  vlistID2 = vlistDuplicate(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array = (double*) Malloc(gridsize*sizeof(double));
-  fval = (float*) Malloc(gridsize*sizeof(float));
-  ival = (int*) Malloc(gridsize*sizeof(int));
-  cval = (unsigned char*) Malloc(gridsize*sizeof(unsigned char)*4);
-  cval2 = (unsigned char*) Malloc(gridsize*sizeof(unsigned char)*4);
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array = (double*) Malloc(gridsize*sizeof(double));
+  float *fval = (float*) Malloc(gridsize*sizeof(float));
+  int *ival = (int*) Malloc(gridsize*sizeof(int));
+  unsigned char *cval = (unsigned char*) Malloc(gridsize*sizeof(unsigned char)*4);
+  unsigned char *cval2 = (unsigned char*) Malloc(gridsize*sizeof(unsigned char)*4);
 
-  fp = fopen("testdata", "w");
+  FILE *fp = fopen("testdata", "w");
 
-  tsID1 = 0;
+  int tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID2);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
@@ -122,7 +112,7 @@ void *Testdata(void *argument)
 	  streamReadRecord(streamID1, array, &nmiss);
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( int i = 0; i < gridsize; ++i )
 	    {
 	      fval[i] = (float) array[i];
 

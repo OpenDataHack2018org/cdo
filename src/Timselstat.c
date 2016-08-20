@@ -40,10 +40,9 @@ void *Timselstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
   int nrecs = 0;
-  int varID, levelID, recID;
+  int varID, levelID;
   int tsID;
   int nsets;
-  int i;
   int nmiss;
   int nlevel;
 
@@ -116,7 +115,7 @@ void *Timselstat(void *argument)
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -144,7 +143,7 @@ void *Timselstat(void *argument)
 
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
@@ -166,7 +165,7 @@ void *Timselstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i],
 					  vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
@@ -186,11 +185,11 @@ void *Timselstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			{
 			  samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( i = 0; i < gridsize; i++ )
+			  for ( int i = 0; i < gridsize; i++ )
 			    samp1[varID][levelID].ptr[i] = nsets;
 			}
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i]++;
 		    }
@@ -261,7 +260,7 @@ void *Timselstat(void *argument)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
       streamDefTimestep(streamID2, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
@@ -275,7 +274,7 @@ void *Timselstat(void *argument)
       if ( nrecs == 0 ) break;
       otsID++;
 
-      for ( i = 0; i < nskip; i++ )
+      for ( int i = 0; i < nskip; i++ )
 	{
 	  nrecs = streamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;

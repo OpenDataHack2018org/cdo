@@ -24,34 +24,26 @@
 
 void *Tocomplex(void *argument)
 {
-  int RETOCOMPLEX, IMTOCOMPLEX;
-  int operatorID;
-  int streamID1, streamID2;
-  int tsID, tsID2, nrecs;
-  int recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
-  int i, gridsize;
-  int datatype;
-  int nmiss, nvars;
-  double *array1 = NULL, *array2 = NULL;
+  int nrecs;
+  int varID, levelID;
+  int nmiss;
 
   cdoInitialize(argument);
 
-  RETOCOMPLEX = cdoOperatorAdd("retocomplex", 0, 0, NULL);
-  IMTOCOMPLEX = cdoOperatorAdd("imtocomplex", 0, 0, NULL);
+  int RETOCOMPLEX = cdoOperatorAdd("retocomplex", 0, 0, NULL);
+  int IMTOCOMPLEX = cdoOperatorAdd("imtocomplex", 0, 0, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  nvars = vlistNvars(vlistID2);
+  int nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; ++varID )
     {
-      datatype = vlistInqVarDatatype(vlistID2, varID);
+      int datatype = vlistInqVarDatatype(vlistID2, varID);
       if ( datatype == DATATYPE_FLT64 )
 	datatype = DATATYPE_CPX64;
       else
@@ -60,28 +52,27 @@ void *Tocomplex(void *argument)
       vlistDefVarDatatype(vlistID2, varID, datatype);
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( cdoFiletype() != FILETYPE_EXT ) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(2*gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(2*gridsize*sizeof(double));
       
-  tsID  = 0;
-  tsID2 = 0;
+  int tsID  = 0;
+  int tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID2++);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2, varID, levelID);
@@ -92,7 +83,7 @@ void *Tocomplex(void *argument)
 
 	  if ( operatorID == RETOCOMPLEX )
 	    {
-	      for ( i = 0; i < gridsize; ++i )
+	      for ( int i = 0; i < gridsize; ++i )
 		{
 		  array2[2*i]   = array1[i];
 		  array2[2*i+1] = 0;
@@ -100,7 +91,7 @@ void *Tocomplex(void *argument)
 	    }
 	  else if ( operatorID == IMTOCOMPLEX )
 	    {
-	      for ( i = 0; i < gridsize; ++i )
+	      for ( int i = 0; i < gridsize; ++i )
 		{
 		  array2[2*i]   = 0;
 		  array2[2*i+1] = array1[i];

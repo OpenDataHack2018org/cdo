@@ -127,7 +127,7 @@ double datestr_to_double(const char *datestr, int opt)
 static
 int datelist(LIST *flist)
 {
-  int set2 = TRUE;
+  bool set2 = true;
   double fval = 0;
 
   int nsel = operatorArgc();
@@ -149,7 +149,7 @@ int datelist(LIST *flist)
 	{
 	  fval = datestr_to_double(operatorArgv()[i], 0);
 	  if ( strchr(operatorArgv()[i], 'T') )
-	    set2 = FALSE;
+	    set2 = false;
 	  else if ( nsel > 1 && i > 0 )
 	    fval += 0.999;
 	}
@@ -157,7 +157,7 @@ int datelist(LIST *flist)
       listSetFlt(flist, i, fval);
     }
 
-  if ( nsel == 1 && set2 == TRUE )
+  if ( nsel == 1 && set2 )
     {
       fval += 0.999;
       listSetFlt(flist, nsel, fval);

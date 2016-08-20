@@ -24,29 +24,21 @@
 
 void *Tests(void *argument)
 {
-  int NORMAL, STUDENTT, CHISQUARE, BETA, FISHER;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
-  int i;
-  int tsID, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int gridsize;
+  int varID, levelID;
   int nmiss;
-  int taxisID1, taxisID2;
   double degree_of_freedom = 0, p = 0, q = 0, n = 0, d = 0;
   double missval;
-  double *array1 = NULL, *array2 = NULL;
 
   cdoInitialize(argument);
 
-  NORMAL    = cdoOperatorAdd("normal",    0, 0, NULL);
-  STUDENTT  = cdoOperatorAdd("studentt",  0, 0, "degree of freedom");
-  CHISQUARE = cdoOperatorAdd("chisquare", 0, 0, "degree of freedom");
-  BETA      = cdoOperatorAdd("beta",      0, 0, "p and q");
-  FISHER    = cdoOperatorAdd("fisher",    0, 0, "degree of freedom of nominator and of denominator");
+  int NORMAL    = cdoOperatorAdd("normal",    0, 0, NULL);
+  int STUDENTT  = cdoOperatorAdd("studentt",  0, 0, "degree of freedom");
+  int CHISQUARE = cdoOperatorAdd("chisquare", 0, 0, "degree of freedom");
+  int BETA      = cdoOperatorAdd("beta",      0, 0, "p and q");
+  int FISHER    = cdoOperatorAdd("fisher",    0, 0, "degree of freedom of nominator and of denominator");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == STUDENTT || operatorID == CHISQUARE )
     {
@@ -84,31 +76,31 @@ void *Tests(void *argument)
 	cdoAbort("both degrees must be positive!");
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);	  
 	  streamReadRecord(streamID1, array1, &nmiss);
@@ -118,25 +110,25 @@ void *Tests(void *argument)
 
 	  if ( operatorID == NORMAL )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  normal(array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == STUDENTT )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  student_t(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == CHISQUARE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  chi_square(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == BETA )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		{
 		  if ( array1[i] < 0 || array1[i] > 1 )
 		    cdoAbort("Value out of range (0-1)!");
@@ -147,7 +139,7 @@ void *Tests(void *argument)
 	    }
 	  else if ( operatorID == FISHER )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
 		  fisher(n, d, array1[i], processInqPrompt());
 	    }

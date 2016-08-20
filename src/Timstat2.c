@@ -31,12 +31,11 @@ static
 int correlation_t(long gridsize, double missval1, double missval2, int *nofvals, 
 		  double *work0, double *work1, double *work2, double *work3, double *work4)
 {
-  long i;
   int nvals, nmiss = 0;
   double temp0, temp1, temp2, temp3, temp4, temp5, temp6;
   double cor;
 
-  for ( i = 0; i < gridsize; i++ )
+  for ( long i = 0; i < gridsize; i++ )
     {	  
       nvals = nofvals[i];
 
@@ -74,13 +73,12 @@ static
 int covariance_t(long gridsize, double missval1, double missval2, int *nofvals, 
 		 double *work0, double *work1, double *work2)
 {
-  long i;
   int nvals, nmiss = 0;
   double temp;
   double dnvals;
   double covar;
 
-  for ( i = 0; i < gridsize; i++ )
+  for ( long i = 0; i < gridsize; i++ )
     {	  
       nvals = nofvals[i];
       dnvals = nvals;
