@@ -109,7 +109,7 @@ void *Timstat2(void *argument)
   int vdate = 0, vtime = 0;
   int nrecs2, nlevs;
   long i, gridsize;
-  int varID, recID, levelID, gridID;
+  int varID, levelID, gridID;
   int nmiss;
   double missval1, missval2;
 
@@ -189,7 +189,7 @@ void *Timstat2(void *argument)
       if ( nrecs != nrecs2 )
         cdoWarning("Input streams have different number of records!");
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamInqRecord(streamID2, &varID, &levelID);
@@ -248,7 +248,7 @@ void *Timstat2(void *argument)
   taxisDefVtime(taxisID3, vtime);
   streamDefTimestep(streamID3, tsID);
 
-  for ( recID = 0; recID < nrecs3; recID++ )
+  for ( int recID = 0; recID < nrecs3; recID++ )
     {
       varID    = recVarID[recID];
       levelID  = recLevelID[recID];

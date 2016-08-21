@@ -91,7 +91,7 @@ void *Writerandom(void *argument)
 	}
 
       /*
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	printf("recID %d %d\n", recID, recindex[recID]);
       */
       for ( int recID = 0; recID < nrecs; recID++ )

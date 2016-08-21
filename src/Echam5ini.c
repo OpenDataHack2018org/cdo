@@ -1429,7 +1429,7 @@ void *Echam5ini(void *argument)
 {
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs = 0;
-  int recID, varID, levelID;
+  int varID, levelID;
   int vlistID1, vlistID2;
   int nvars = 0;
   int iv, nlev;
@@ -1596,7 +1596,7 @@ void *Echam5ini(void *argument)
 	  vtime = 120000;
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

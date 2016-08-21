@@ -387,7 +387,7 @@ static
 void *after_readTimestep(void *arg)
 {
   int i;
-  int recID, varID, gridID, zaxisID, levelID, timeID;
+  int varID, gridID, zaxisID, levelID, timeID;
   int code, leveltype;
   int nmiss;
   RARG *rarg = (RARG *) arg;
@@ -402,7 +402,7 @@ void *after_readTimestep(void *arg)
   int level = 0;
   int levelOffset = 0;
 
-  for ( recID = 0; recID < nrecs; recID++ )
+  for ( int recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(globs->istreamID, &varID, &levelID);
 

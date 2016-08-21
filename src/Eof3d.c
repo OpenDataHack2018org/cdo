@@ -51,7 +51,7 @@ void *EOF3d(void * argument)
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
   int temp_size = 0;
-  int i, i2, j, j1, j2, eofID, varID, recID, levelID, tsID;
+  int i, i2, j, j1, j2, eofID, varID, levelID, tsID;
   int missval_warning=0;
   int nmiss,ngrids,n=0,nlevs=0,npack=0,nts=0;
   int offset;
@@ -204,7 +204,7 @@ void *EOF3d(void * argument)
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
 

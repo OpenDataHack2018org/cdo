@@ -36,11 +36,8 @@
 
 void *Output(void *argument)
 {
-  int OUTPUT, OUTPUTINT, OUTPUTSRV, OUTPUTEXT, OUTPUTF, OUTPUTTS, OUTPUTFLD, OUTPUTARR, OUTPUTXYZ, OUTPUTTAB;
-  int operatorID;
   int i;
-  int indf;
-  int varID, recID;
+  int varID;
   int gridsize = 0;
   int gridID, zaxisID, code, vdate, vtime;
   int param;
@@ -78,20 +75,20 @@ void *Output(void *argument)
 
   cdoInitialize(argument);
 
-  OUTPUT    = cdoOperatorAdd("output",    0, 0, NULL);
-  OUTPUTINT = cdoOperatorAdd("outputint", 0, 0, NULL);
-  OUTPUTSRV = cdoOperatorAdd("outputsrv", 0, 0, NULL);
-  OUTPUTEXT = cdoOperatorAdd("outputext", 0, 0, NULL);
-  OUTPUTF   = cdoOperatorAdd("outputf",   0, 0, NULL);
-  OUTPUTTS  = cdoOperatorAdd("outputts",  0, 0, NULL);
-  OUTPUTFLD = cdoOperatorAdd("outputfld", 0, 0, NULL);
-  OUTPUTARR = cdoOperatorAdd("outputarr", 0, 0, NULL);
-  OUTPUTXYZ = cdoOperatorAdd("outputxyz", 0, 0, NULL);
-  OUTPUTTAB = cdoOperatorAdd("outputtab", 0, 0, NULL);
+  int OUTPUT    = cdoOperatorAdd("output",    0, 0, NULL);
+  int OUTPUTINT = cdoOperatorAdd("outputint", 0, 0, NULL);
+  int OUTPUTSRV = cdoOperatorAdd("outputsrv", 0, 0, NULL);
+  int OUTPUTEXT = cdoOperatorAdd("outputext", 0, 0, NULL);
+  int OUTPUTF   = cdoOperatorAdd("outputf",   0, 0, NULL);
+  int OUTPUTTS  = cdoOperatorAdd("outputts",  0, 0, NULL);
+  int OUTPUTFLD = cdoOperatorAdd("outputfld", 0, 0, NULL);
+  int OUTPUTARR = cdoOperatorAdd("outputarr", 0, 0, NULL);
+  int OUTPUTXYZ = cdoOperatorAdd("outputxyz", 0, 0, NULL);
+  int OUTPUTTAB = cdoOperatorAdd("outputtab", 0, 0, NULL);
 
   UNUSED(OUTPUT);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   if ( operatorID == OUTPUTF )
     {
@@ -155,7 +152,7 @@ void *Output(void *argument)
 	}
     }
 
-  for ( indf = 0; indf < cdoStreamCnt(); indf++ )
+  for ( int indf = 0; indf < cdoStreamCnt(); indf++ )
     {
       streamID = streamOpenRead(cdoStreamName(indf));
 
@@ -210,7 +207,7 @@ void *Output(void *argument)
 
 	  cdiDecodeDate(vdate, &year, &month, &day);
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID, &varID, &levelID);
 

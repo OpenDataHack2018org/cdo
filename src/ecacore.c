@@ -43,7 +43,7 @@ void eca1(const ECA_REQUEST_1 *request)
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
   int nrecs, nrecords;
-  int gridID, zaxisID, varID, levelID, recID;
+  int gridID, zaxisID, varID, levelID;
   int itsID;
   int otsID;
   long nsets;
@@ -196,7 +196,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
-          for ( recID = 0; recID < nrecs; recID++ )
+          for ( int recID = 0; recID < nrecs; recID++ )
             {
               streamInqRecord(istreamID, &varID, &levelID);
 
@@ -411,7 +411,7 @@ void eca2(const ECA_REQUEST_2 *request)
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
   int nrecs, nrecords;
-  int gridID, zaxisID, varID, levelID, recID;
+  int gridID, zaxisID, varID, levelID;
   int itsID;
   int otsID;
   long nsets;
@@ -575,7 +575,7 @@ void eca2(const ECA_REQUEST_2 *request)
 
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
-          for ( recID = 0; recID < nrecs; recID++ )
+          for ( int recID = 0; recID < nrecs; recID++ )
             {
               streamInqRecord(istreamID1, &varID, &levelID);
               streamInqRecord(istreamID2, &varID, &levelID);
@@ -802,7 +802,7 @@ void eca3(const ECA_REQUEST_3 *request)
   int ivdate2 = 0, ivtime2 = 0;
   int ovdate = 0, ovtime = 0;
   int nrecs, nrecords;
-  int gridID, zaxisID, varID, levelID, recID;
+  int gridID, zaxisID, varID, levelID;
   int itsID;
   int otsID;
   long nsets;
@@ -913,7 +913,7 @@ void eca3(const ECA_REQUEST_3 *request)
 
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
-          for ( recID = 0; recID < nrecs; recID++ )
+          for ( int recID = 0; recID < nrecs; recID++ )
             {
               streamInqRecord(istreamID1, &varID, &levelID);
               streamInqRecord(istreamID2, &varID, &levelID);
@@ -1011,7 +1011,7 @@ void eca4(const ECA_REQUEST_4 *request)
   int ovdate = 0, ovtime = 0;
   int month, yearcnt = 0;
   int nrecs, nrecords;
-  int gridID, zaxisID, varID, ovarID1, ovarID2, levelID, recID;
+  int gridID, zaxisID, varID, ovarID1, ovarID2, levelID;
   int itsID;
   int otsID;
   long nsets;
@@ -1209,7 +1209,7 @@ void eca4(const ECA_REQUEST_4 *request)
             break;
           }
 
-          for ( recID = 0; recID < nrecs; recID++ )
+          for ( int recID = 0; recID < nrecs; recID++ )
             {
               streamInqRecord(istreamID1, &varID, &levelID);
 

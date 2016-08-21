@@ -29,7 +29,7 @@
 void *CDItest(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int nmiss;
   int max_copy = 3;
   double s_utime, s_stime;
@@ -78,7 +78,7 @@ void *CDItest(void *argument)
 
 	  streamDefTimestep(streamID2, tsID2);
 	       
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      streamDefRecord(streamID2,  varID,  levelID);

@@ -465,7 +465,7 @@ void *Importbinary(void *argument)
 	  taxisDefVtime(taxisID, vtime);
 	  streamDefTimestep(streamID, tsID);
 
-	  for ( recID = 0; recID < nrecs; ++recID )
+	  for ( int recID = 0; recID < nrecs; ++recID )
 	    {
 	      /* record size depends on data type */
 	      if (var_dfrm[recID] == 1) {
