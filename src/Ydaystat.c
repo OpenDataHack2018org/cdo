@@ -64,10 +64,10 @@ void *Ydaystat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
-  int lstd    = operfunc == func_std || operfunc == func_std1;
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor = operfunc == func_std1 || operfunc == func_var1;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int divisor  = operfunc == func_std1 || operfunc == func_var1;
 
   for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     {

@@ -47,7 +47,6 @@ date_time_t;
 void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 {
   int year, month, day;
-
   cdiDecodeDate(vdate_new, &year, &month, &day);
   if ( month == 12 ) vdate_new = cdiEncodeDate(year-1, month, day);
 
@@ -63,7 +62,6 @@ void *Yseasstat(void *argument)
 {
   int i;
   int varID;
-  int recID;
   int vdate, vtime;
   int year, month, day, seas;
   int nrecs;
@@ -99,10 +97,10 @@ void *Yseasstat(void *argument)
       datetime[seas].vtime = 0;
     }
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
-  int lstd    = operfunc == func_std || operfunc == func_std1;
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor = operfunc == func_std1 || operfunc == func_var1;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int divisor  = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -150,7 +148,7 @@ void *Yseasstat(void *argument)
 	    vars2[seas] = field_malloc(vlistID1, FIELD_PTR);
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -270,7 +268,7 @@ void *Yseasstat(void *argument)
 	taxisDefVtime(taxisID2, datetime[seas].vtime);
 	streamDefTimestep(streamID2, otsID);
 
-	for ( recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];

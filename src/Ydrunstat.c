@@ -60,11 +60,9 @@ static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 void *Ydrunstat(void *argument)
 {
   int varID;
-  int recID;
   int nrecs;
   int levelID;
   int tsID;
-  int otsID;
   int inp, its;
   int nmiss;
   int vdate, vtime;
@@ -88,7 +86,7 @@ void *Ydrunstat(void *argument)
   operatorInputArg("number of timesteps");
   int ndates = parameter2int(operatorArgv()[0]);
 
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -136,7 +134,7 @@ void *Ydrunstat(void *argument)
       datetime[tsID].date = taxisInqVdate(taxisID1);
       datetime[tsID].time = taxisInqVtime(taxisID1);
 	
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -199,7 +197,7 @@ void *Ydrunstat(void *argument)
       datetime[ndates-1].date = taxisInqVdate(taxisID1);
       datetime[ndates-1].time = taxisInqVtime(taxisID1);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  
@@ -247,7 +245,7 @@ void *Ydrunstat(void *argument)
   */
   ydstatFinalize(stats, operfunc);
 
-  otsID = 0;
+  int otsID = 0;
 
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( stats->nsets[dayoy] )
@@ -256,7 +254,7 @@ void *Ydrunstat(void *argument)
 	taxisDefVtime(taxisID2, stats->vtime[dayoy]);
 	streamDefTimestep(streamID2, otsID);
 
-	for ( recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID   = recVarID[recID];
 	    levelID = recLevelID[recID];

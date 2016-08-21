@@ -33,13 +33,10 @@
 void *Yearmonstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int nrecs;
-  int varID, levelID, recID;
-  int tsID;
-  int otsID;
+  int varID, levelID;
   int i;
   int dpm;
   int year0 = 0, month0 = 0;
@@ -49,8 +46,6 @@ void *Yearmonstat(void *argument)
   long nsets;
   double dsets;
   char vdatestr[32], vtimestr[32];
-  field_t **vars1 = NULL, **samp1 = NULL;
-  field_t field;
 
   cdoInitialize(argument);
 
@@ -84,16 +79,17 @@ void *Yearmonstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, calendar);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  vars1 = field_malloc(vlistID1, FIELD_PTR);
-  samp1 = field_malloc(vlistID1, FIELD_NONE);
+  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
 
-  tsID    = 0;
-  otsID   = 0;
+  int tsID    = 0;
+  int otsID   = 0;
   while ( TRUE )
     {
       nsets = 0;
@@ -122,7 +118,7 @@ void *Yearmonstat(void *argument)
 
 	  dpm = days_per_month(calendar, year, month);
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
@@ -213,7 +209,7 @@ void *Yearmonstat(void *argument)
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
       streamDefTimestep(streamID2, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];

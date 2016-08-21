@@ -29,46 +29,40 @@
 
 void *Writerandom(void *argument)
 {
-  int streamID1, streamID2;
-  int vlistID1, vlistID2;
   int gridsize;
-  int recID, nrecs;
-  int tsID, varID, levelID;
-  int index, rindex, ipos;
-  double **recdata = NULL;
-  int *recvarID, *reclevelID, *recnmiss, *recindex;
-  int taxisID1, taxisID2;
-
+  int nrecs;
+  int varID, levelID;
+  int rindex;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      recdata    = (double**) Malloc(nrecs*sizeof(double*));
-      recvarID   = (int*) Malloc(nrecs*sizeof(int));
-      reclevelID = (int*) Malloc(nrecs*sizeof(int));
-      recnmiss   = (int*) Malloc(nrecs*sizeof(int));
-      recindex   = (int*) Malloc(nrecs*sizeof(int));
+      double **recdata    = (double**) Malloc(nrecs*sizeof(double*));
+      int *recvarID   = (int*) Malloc(nrecs*sizeof(int));
+      int *reclevelID = (int*) Malloc(nrecs*sizeof(int));
+      int *recnmiss   = (int*) Malloc(nrecs*sizeof(int));
+      int *recindex   = (int*) Malloc(nrecs*sizeof(int));
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -78,14 +72,14 @@ void *Writerandom(void *argument)
 	  streamReadRecord(streamID1, recdata[recID], &recnmiss[recID]);
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ ) recindex[recID] = -1;
+      for ( int recID = 0; recID < nrecs; recID++ ) recindex[recID] = -1;
 
       for ( rindex = nrecs-1; rindex >= 0; rindex-- )
 	{
-	  index = (int) (rindex*((double)rand())/((double)RAND_MAX));
+	  int index = (int) (rindex*((double)rand())/((double)RAND_MAX));
 	  /*	printf("rindex %d %d\n", rindex, index); */
-	  ipos = -1;
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  int ipos = -1;
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      if ( recindex[recID] == -1 ) ipos++;
 	      if ( recindex[recID] == -1 && ipos == index )
@@ -100,11 +94,11 @@ void *Writerandom(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	printf("recID %d %d\n", recID, recindex[recID]);
       */
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	if ( recindex[recID] == -1 )
 	  cdoAbort("Internal problem! Random initialize.");
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  rindex   = recindex[recID];
 	  varID    = recvarID[rindex];
@@ -114,7 +108,7 @@ void *Writerandom(void *argument)
 	  streamWriteRecord(streamID2, recdata[rindex], recnmiss[rindex]);
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ ) Free(recdata[recID]);
+      for ( int recID = 0; recID < nrecs; recID++ ) Free(recdata[recID]);
 
       Free(recdata);
       Free(recvarID);

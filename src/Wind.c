@@ -35,7 +35,7 @@
 void *Wind(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
+  int varID, levelID;
   int nlev = 0;
   int index, ngrids;
   int gridIDsp = -1, gridIDgp = -1;
@@ -319,7 +319,7 @@ void *Wind(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

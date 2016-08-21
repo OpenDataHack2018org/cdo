@@ -60,20 +60,12 @@ int hour_of_year(int vdate, int vtime)
 
 void *Yhourarith(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int streamID1, streamID2, streamID3;
-  int gridsize;
-  int nrecs, nvars, nlev, recID;
-  int tsID;
+  int nrecs, nlev;
   int varID, levelID;
   int offset;
-  int vlistID1, vlistID2, vlistID3;
-  int taxisID1, taxisID2, taxisID3;
   int vdate, vtime;
   int nmiss;
   int houroy;
-  field_t field1, field2;
   int **varnmiss2[MAX_HOUR];
   double **vardata2[MAX_HOUR];
 
@@ -84,39 +76,40 @@ void *Yhourarith(void *argument)
   cdoOperatorAdd("yhourmul", func_mul, 0, NULL);
   cdoOperatorAdd("yhourdiv", func_div, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
-  vlistID3 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));
   field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  nvars  = vlistNvars(vlistID2);
+  int nvars  = vlistNvars(vlistID2);
 
   for ( houroy = 0; houroy < MAX_HOUR ; ++houroy ) vardata2[houroy] = NULL;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       vdate = taxisInqVdate(taxisID2);
@@ -136,7 +129,7 @@ void *Yhourarith(void *argument)
 	  varnmiss2[houroy][varID] = (int*) Malloc(nlev*sizeof(int));
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID2, &varID, &levelID);
 
@@ -164,7 +157,7 @@ void *Yhourarith(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);

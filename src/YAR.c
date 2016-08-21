@@ -741,7 +741,7 @@ void *YAR(void *argument)
 {
   int nrecs;
   int index;
-  int recID, varID, levelID;
+  int varID, levelID;
   int gridID1 = -1;
   int nmiss;
   int xinc = 0, yinc = 0;
@@ -797,19 +797,18 @@ void *YAR(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
-  double *array1   = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
 
   gridsize = gridInqSize(gridID2);
-  double *array2   = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
   int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);

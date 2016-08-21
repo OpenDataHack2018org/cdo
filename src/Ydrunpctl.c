@@ -42,20 +42,18 @@ int getmonthday(int date)
 void *Ydrunpctl(void *argument)
 {
   int varID;
-  int recID;
   int gridID;
   int nrecs;
   int levelID;
   int inp, its;
   int nmiss;
   int nlevels;
-  field_t ***vars1 = NULL, **vars2[NDAY];
-  cdo_datetime_t *datetime;
+  int year, month, day, dayoy;
   int vdate, vtime;
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY] /*, vtimes2[NDAY]*/;
   int nsets[NDAY];
-  int year, month, day, dayoy;
+  field_t **vars2[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
     
   cdoInitialize(argument);
@@ -114,9 +112,9 @@ void *Ydrunpctl(void *argument)
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
+  cdo_datetime_t *datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
   
-  vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
   
   for ( its = 0; its < ndates; its++ )
     {
@@ -164,13 +162,13 @@ void *Ydrunpctl(void *argument)
 	    }
 	}
       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
 	  streamReadRecord(streamID2, vars2[dayoy][varID][levelID].ptr, &nmiss);
           vars2[dayoy][varID][levelID].nmiss = nmiss;
         }
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID3, &varID, &levelID);
 	  streamReadRecord(streamID3, field.ptr, &nmiss);
@@ -193,7 +191,7 @@ void *Ydrunpctl(void *argument)
       datetime[tsID].date = taxisInqVdate(taxisID1);
       datetime[tsID].time = taxisInqVtime(taxisID1);
 	
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -256,7 +254,7 @@ void *Ydrunpctl(void *argument)
       datetime[ndates-1].date = taxisInqVdate(taxisID1);
       datetime[ndates-1].time = taxisInqVtime(taxisID1);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  
@@ -306,7 +304,7 @@ void *Ydrunpctl(void *argument)
 	taxisDefVtime(taxisID4, vtimes1[dayoy]);
 	streamDefTimestep(streamID4, otsID);
 
-	for ( recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
