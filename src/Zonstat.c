@@ -45,7 +45,7 @@ void *Zonstat(void *argument)
   int zongridID = -1;
   int index;
   int nmiss;
-  int recID, nrecs;
+  int nrecs;
   int varID, levelID;
 
   cdoInitialize(argument);
@@ -151,7 +151,7 @@ void *Zonstat(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);
