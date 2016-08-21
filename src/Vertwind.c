@@ -35,17 +35,13 @@
 
 void *Vertwind(void *argument)
 {
-  int gridID, zaxisID;
-  int nrecs, nlevel, code;
+  int nrecs;
   int varID, levelID;
   int nvct = 0;
-  int gridsize, i;
-  int offset;
-  int nmiss, nmiss_out;
+  int nmiss;
   int tempID = -1, sqID = -1, psID = -1, omegaID = -1;
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
-  double tv, rho;
   double *hpress = NULL, *ps_prog = NULL;
 
   cdoInitialize(argument);
@@ -64,17 +60,11 @@ void *Vertwind(void *argument)
   int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(zaxisID);
-
-      code = vlistInqVarCode(vlistID1, varID);
+      int code = vlistInqVarCode(vlistID1, varID);
 
       if ( code <= 0 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
-
 	  strtolower(varname);
 
 	  if      ( strcmp(varname, "st")    == 0 ) code = temp_code;
@@ -103,14 +93,14 @@ void *Vertwind(void *argument)
   double missval_wap = vlistInqVarMissval(vlistID1, omegaID);
   double missval_out = missval_wap;
 
-  gridID  = vlistInqVarGrid(vlistID1, omegaID);
-  zaxisID = vlistInqVarZaxis(vlistID1, omegaID);
+  int gridID  = vlistInqVarGrid(vlistID1, omegaID);
+  int zaxisID = vlistInqVarZaxis(vlistID1, omegaID);
 
   if ( psID == -1 && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
     cdoAbort("Surface pressure (code 134) not found!");
 
-  gridsize = gridInqSize(gridID);
-  nlevel = zaxisInqSize(zaxisID);
+  int gridsize = gridInqSize(gridID);
+  int nlevel = zaxisInqSize(zaxisID);
   double *level  = (double*) Malloc(nlevel*sizeof(double));
   zaxisInqLevels(zaxisID, level);
 
@@ -125,8 +115,8 @@ void *Vertwind(void *argument)
     {
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
-	  offset = levelID*gridsize;
-	  for ( i = 0; i < gridsize; ++i )
+	  size_t offset = (size_t)levelID*gridsize;
+	  for ( int i = 0; i < gridsize; ++i )
 	    fpress[offset+i] = level[levelID];
 	}
     }
@@ -172,14 +162,13 @@ void *Vertwind(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
      
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  offset = levelID*gridsize;
+	  size_t offset = (size_t)levelID*gridsize;
 
 	  if      ( varID == tempID )
 	    streamReadRecord(streamID1, temp+offset, &nmiss);
@@ -196,9 +185,9 @@ void *Vertwind(void *argument)
 
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
-	  offset = levelID*gridsize;
+	  size_t offset = (size_t)levelID*gridsize;
 
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( int i = 0; i < gridsize; ++i )
 	    {
 	      if ( DBL_IS_EQUAL(temp[offset+i],missval_t)    || 
 		   DBL_IS_EQUAL(omega[offset+i],missval_wap) ||
@@ -209,11 +198,10 @@ void *Vertwind(void *argument)
 	      else
 		{
 	          // Virtuelle Temperatur bringt die Feuchteabhaengigkeit hinein
-	          tv = temp[offset+i] * (1. + 0.608*sq[offset+i]);
+	          double tv = temp[offset+i] * (1. + 0.608*sq[offset+i]);
 
 	          // Die Dichte erhaelt man nun mit der Gasgleichung rho=p/(R*tv) Level in Pa!
-	          rho = fpress[offset+i] / (R*tv);
-
+	          double rho = fpress[offset+i] / (R*tv);
 	          /*
 		    Nun daraus die Vertikalgeschwindigkeit im m/s, indem man die Vertikalgeschwindigkeit
                     in Pa/s durch die Erdbeschleunigung und die Dichte teilt
@@ -225,12 +213,12 @@ void *Vertwind(void *argument)
 
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
-	  nmiss_out = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  size_t offset = (size_t)levelID*gridsize;
+
+	  int nmiss_out = 0;
+	  for ( int i = 0; i < gridsize; i++ )
             if ( DBL_IS_EQUAL(wms[offset+i],missval_out) )
 	      nmiss_out++;
-
-	  offset = levelID*gridsize;
 
 	  streamDefRecord(streamID2, 0, levelID);
 	  streamWriteRecord(streamID2, wms+offset, nmiss_out);

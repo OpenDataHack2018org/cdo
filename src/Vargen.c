@@ -234,10 +234,8 @@ void *Vargen(void *argument)
 {
   int ntimesteps, nlevels = 1;
   int varID, varID2 = -1, levelID;
-  int i;
   int gridID = -1, gridIDdata = -1, zaxisID;
-  int vdate, vtime;
-  double rval, rstart = 0, rstop = 0, rinc = 0;
+  double rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
   double *levels = NULL;
   double lon[NLON], lat[NLAT];
@@ -333,7 +331,7 @@ void *Vargen(void *argument)
       levels  = (double *) listArrayPtr(flist);
       //listDelete(flist);
 
-      if ( cdoVerbose ) for ( i = 0; i < nlevels; ++i ) printf("levels %d: %g\n", i, levels[i]);
+      if ( cdoVerbose ) for ( int i = 0; i < nlevels; ++i ) printf("levels %d: %g\n", i, levels[i]);
 
       gridID = gridCreate(GRID_LONLAT, 1);
       gridDefXsize(gridID, 1);
@@ -429,9 +427,9 @@ void *Vargen(void *argument)
 
   for ( int tsID = 0; tsID < ntimesteps; tsID++ )
     {
-      rval  = rstart + rinc*tsID;
-      vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
-      vtime = 0;
+      double rval  = rstart + rinc*tsID;
+      int vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
+      int vtime = 0;
       taxisDefVdate(taxisID, vdate);
       taxisDefVtime(taxisID, vtime);
       streamDefTimestep(streamID, tsID);
@@ -445,7 +443,7 @@ void *Vargen(void *argument)
 
               if ( operatorID == RANDOM )
                 {
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( int i = 0; i < gridsize; i++ )
                     array[i] = ((double)rand())/((double)RAND_MAX);
                 }
               else if ( operatorID == SINCOS || operatorID == COSHILL )
@@ -477,12 +475,12 @@ void *Vargen(void *argument)
                   
 		  if ( operatorID == SINCOS )
 		    {
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			array[i] = cos(1.0 * xvals[i]) * sin(2.0 * yvals[i]);
 		    }
 		  else if ( operatorID == COSHILL )
 		    {		     
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			array[i] = 2 - cos(acos(cos(xvals[i]) * cos(yvals[i]))/1.2);
 		    }
 
@@ -491,13 +489,13 @@ void *Vargen(void *argument)
 		}
               else if ( operatorID == CONST )
                 {
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( int i = 0; i < gridsize; i++ )
                     array[i] = rconst;
                 }
               else if ( operatorID == TOPO )
                 {
 #if defined(ENABLE_DATA)
-                  for ( i = 0; i < datasize; i++ )
+                  for ( int i = 0; i < datasize; i++ )
                     data[i] = etopo[i]/etopo_scale - etopo_offset;
 #else
                   cdoAbort("Operator support disabled!");
@@ -506,7 +504,7 @@ void *Vargen(void *argument)
               else if ( operatorID == TEMP )
                 {
 #if defined(ENABLE_DATA)
-                  for ( i = 0; i < datasize; i++ )
+                  for ( int i = 0; i < datasize; i++ )
                     data[i] = temp[i]/temp_scale - temp_offset;
 #else
                   cdoAbort("Operator support disabled!");
@@ -515,7 +513,7 @@ void *Vargen(void *argument)
               else if ( operatorID == MASK )
                 {
 #if defined(ENABLE_DATA)
-                  for ( i = 0; i < datasize; i++ )
+                  for ( int i = 0; i < datasize; i++ )
                     data[i] = mask[i]/mask_scale - mask_offset;
 #else
                   cdoAbort("Operator support disabled!");

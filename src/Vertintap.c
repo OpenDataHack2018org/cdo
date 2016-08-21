@@ -69,19 +69,15 @@ void *Vertintap(void *argument)
   int i, k, offset;
   int varID, levelID;
   int zaxisIDp, zaxisIDh = -1;
-  int gridID, zaxisID;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int *vert_index = NULL;
   int apressID = -1, dpressID = -1;
   int psID = -1, tempID = -1;
-  int param;
   //int sortlevels = TRUE;
   int *pnmiss = NULL;
   char paramstr[32];
   char stdname[CDI_MAX_NAME];
   char varname[CDI_MAX_NAME];
-  double minval, maxval;
-  double missval;
   double *vct = NULL;
   double *single1, *single2;
   double *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
@@ -193,9 +189,9 @@ void *Vertintap(void *argument)
   if ( apressID == -1 ) cdoAbort("%s not found!", var_stdname(air_pressure));
 
   int nzaxis = vlistNzaxis(vlistID1);
-  for ( i = 0; i < nzaxis; i++ )
+  for ( int i = 0; i < nzaxis; i++ )
     {
-      zaxisID = vlistZaxis(vlistID1, i);
+      int zaxisID = vlistZaxis(vlistID1, i);
       if ( zaxisID == vlistInqVarZaxis(vlistID1, apressID) )
         {
           bool mono_level = true;
@@ -272,7 +268,7 @@ void *Vertintap(void *argument)
       height2pressure(phlev, plev, nplev);
 
       if ( cdoVerbose )
-	for ( i = 0; i < nplev; ++i )
+	for ( int i = 0; i < nplev; ++i )
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
       memcpy(plev, phlev, nplev*sizeof(double));
@@ -283,9 +279,9 @@ void *Vertintap(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      nlevel   = zaxisInqSize(zaxisID);
+      int gridID   = vlistInqVarGrid(vlistID1, varID);
+      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+      int nlevel   = zaxisInqSize(zaxisID);
 
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
@@ -338,7 +334,6 @@ void *Vertintap(void *argument)
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -385,6 +380,7 @@ void *Vertintap(void *argument)
 	    }
 
 	  /* check range of ps_prog */
+          double minval, maxval;
 	  minmaxval(gridsize, ps_prog, NULL, &minval, &maxval);
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
@@ -410,9 +406,9 @@ void *Vertintap(void *argument)
 	{
 	  if ( vars[varID] )
 	    {
-	      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	      missval  = vlistInqVarMissval(vlistID1, varID);
-	      nlevel   = zaxisInqSize(zaxisID);
+	      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+	      int nlevel   = zaxisInqSize(zaxisID);
+	      double missval  = vlistInqVarMissval(vlistID1, varID);
 	      if ( varinterp[varID] )
 		{
 		  if ( nlevel == nhlevf )
@@ -421,7 +417,7 @@ void *Vertintap(void *argument)
 		    }
 		  else
 		    {
-		      param = vlistInqVarParam(vlistID1, varID);
+		      int param = vlistInqVarParam(vlistID1, varID);
 		      cdiParamToString(param, paramstr, sizeof(paramstr));
 		      cdoAbort("Number of generalized height level differ from full/half level (param=%s)!", paramstr);
 		    }
@@ -445,7 +441,7 @@ void *Vertintap(void *argument)
 	{
 	  if ( vars[varID] )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  offset   = gridsize*levelID;
