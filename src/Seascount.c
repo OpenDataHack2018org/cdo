@@ -31,74 +31,62 @@
 
 void *Seascount(void *argument)
 {
-  int gridsize;
-  int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
-  int nrecs, nrecords;
-  int varID, levelID, recID;
-  int tsID;
-  int otsID;
+  int nrecs;
+  int varID, levelID;
   int nmiss;
-  long nsets;
-  int i;
-  int year, month, day, seas, seas0 = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
-  int nwpv; // number of words per value; real:1  complex:2
-  int *recVarID, *recLevelID;
-  int newseas, oldmon = 0, newmon;
-  field_t **vars1 = NULL;
-  field_t field;
-  int season_start;
+  int year, month, day, seas0 = 0;
+  int oldmon = 0;
 
   cdoInitialize(argument);
 
   cdoOperatorAdd("seascount", 0, 0, NULL);
 
-  season_start = get_season_start();
+  int season_start = get_season_start();
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nrecords = vlistNrecs(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
 
-  tsID    = 0;
-  otsID   = 0;
+  int tsID    = 0;
+  int otsID   = 0;
   while ( TRUE )
     {
-      nsets = 0;
-      newseas = FALSE;
+      int nsets = 0;
+      bool newseas = false;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
         {
-          vdate = taxisInqVdate(taxisID1);
-          vtime = taxisInqVtime(taxisID1);
+          int vdate = taxisInqVdate(taxisID1);
+          int vtime = taxisInqVtime(taxisID1);
 	  cdiDecodeDate(vdate, &year, &month, &day);
 
-	  newmon = month;
+	  int newmon = month;
 	  if ( season_start == START_DEC && newmon == 12 ) newmon = 0;
 
-          seas = month_to_season(month);
+          int seas = month_to_season(month);
 
           if ( nsets == 0 )
             {
@@ -106,13 +94,13 @@ void *Seascount(void *argument)
               oldmon = newmon;
             }
 
-          if ( newmon < oldmon ) newseas = TRUE;
+          if ( newmon < oldmon ) newseas = true;
 
           if ( (seas != seas0) || newseas ) break;
 
           oldmon = newmon;
 
-          for ( recID = 0; recID < nrecs; recID++ )
+          for ( int recID = 0; recID < nrecs; recID++ )
             {
               streamInqRecord(streamID1, &varID, &levelID);
 
@@ -121,13 +109,13 @@ void *Seascount(void *argument)
                   recVarID[recID]   = varID;
                   recLevelID[recID] = levelID;
                 }
-
-	      nwpv     = vars1[varID][levelID].nwpv;
+              // number of words per value; real:1  complex:2
+	      int nwpv = vars1[varID][levelID].nwpv;
               gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
               if ( nsets == 0 )
                 {
-                  for ( i = 0; i < nwpv*gridsize; i++ )
+                  for ( int i = 0; i < nwpv*gridsize; i++ )
                     vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
 		  vars1[varID][levelID].nmiss = gridsize;
                 }
@@ -152,7 +140,7 @@ void *Seascount(void *argument)
       taxisDefVtime(taxisID2, vtime0);
       streamDefTimestep(streamID2, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
         {
           varID   = recVarID[recID];
           levelID = recLevelID[recID];

@@ -32,7 +32,7 @@
 void *Mergetime(void *argument)
 {
   int streamID1;
-  int tsID2 = 0, recID, varID, levelID;
+  int tsID2 = 0, varID, levelID;
   int vlistID1, vlistID2;
   int fileID;
   int taxisID1, taxisID2 = CDI_UNDEFID;
@@ -56,8 +56,7 @@ void *Mergetime(void *argument)
   cdoInitialize(argument);
 
   {
-    char *envstr;
-    envstr = getenv("SKIP_SAME_TIME");
+    char *envstr = getenv("SKIP_SAME_TIME");
     if ( envstr )
       {
 	int ival;
@@ -183,7 +182,7 @@ void *Mergetime(void *argument)
 
 	  streamDefTimestep(streamID2, tsID2);
 	       
-	  for ( recID = 0; recID < sf[fileID].nrecs; recID++ )
+	  for ( int recID = 0; recID < sf[fileID].nrecs; recID++ )
 	    {
 	      streamInqRecord(sf[fileID].streamID, &varID, &levelID);
 

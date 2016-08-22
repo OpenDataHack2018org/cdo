@@ -34,26 +34,12 @@
 
 void *Timcount(void *argument)
 {
-  int operatorID;
-  int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
-  int gridsize;
-  int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
-  int nrecs, nrecords;
-  int varID, levelID, recID;
-  int tsID;
-  int otsID;
-  long nsets;
-  int i;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
-  int nvars;
+  int nrecs;
+  int varID, levelID;
   int nmiss;
   int nwpv; // number of words per value; real:1  complex:2
-  int *recVarID, *recLevelID;
-  field_t **vars1 = NULL;
-  field_t field;
 
   cdoInitialize(argument);
 
@@ -63,57 +49,58 @@ void *Timcount(void *argument)
   cdoOperatorAdd("daycount",  0,  6, NULL);
   cdoOperatorAdd("hourcount", 0,  4, NULL);
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
+  int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
       vlistDefVarUnits(vlistID2, varID, "No.");
 
   if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(vlistID2, 1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nrecords = vlistNrecs(vlistID1);
-  recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int nrecords = vlistNrecs(vlistID1);
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
 
-  tsID    = 0;
-  otsID   = 0;
+  int tsID    = 0;
+  int otsID   = 0;
   while ( TRUE )
     {
-      nsets = 0;
+      int nsets = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
+	  int vdate = taxisInqVdate(taxisID1);
+	  int vtime = taxisInqVtime(taxisID1);
 
 	  if ( nsets == 0 ) SET_DATE(indate2, vdate, vtime);
 	  SET_DATE(indate1, vdate, vtime);
 
 	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
@@ -128,7 +115,7 @@ void *Timcount(void *argument)
 
 	      if ( nsets == 0 )
 		{
-		  for ( i = 0; i < nwpv*gridsize; i++ )
+		  for ( int i = 0; i < nwpv*gridsize; i++ )
 		    vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
 		  vars1[varID][levelID].nmiss = gridsize;
 		}
@@ -153,7 +140,7 @@ void *Timcount(void *argument)
       taxisDefVtime(taxisID2, vtime0);
       streamDefTimestep(streamID2, otsID);
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];

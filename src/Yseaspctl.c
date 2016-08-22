@@ -44,7 +44,6 @@ int getmonthday(int date);
 void *Yseaspctl(void *argument)
 {
   int varID;
-  int recID;
   int gridID;
   int vdate, vtime;
   int year, month, day, seas;
@@ -146,13 +145,13 @@ void *Yseaspctl(void *argument)
 	    }
 	}
       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
 	  streamReadRecord(streamID2, vars1[seas][varID][levelID].ptr, &nmiss);
           vars1[seas][varID][levelID].nmiss = nmiss;
         }
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID3, &varID, &levelID);
 	  streamReadRecord(streamID3, field.ptr, &nmiss);
@@ -188,7 +187,7 @@ void *Yseaspctl(void *argument)
       if ( vars1[seas] == NULL )
         cdoAbort("No data for season %d in %s and %s", seas, cdoStreamName(1)->args, cdoStreamName(2)->args);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -229,7 +228,7 @@ void *Yseaspctl(void *argument)
 	taxisDefVtime(taxisID4, datetime1[seas].vtime);
 	streamDefTimestep(streamID4, otsID);
 
-	for ( recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];

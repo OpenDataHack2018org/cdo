@@ -59,7 +59,7 @@ void *Setbox(void *argument)
   int operatorID;
   int streamID1, streamID2;
   int nrecs, nvars;
-  int tsID, recID, varID, levelID;
+  int tsID, varID, levelID;
   int gridsize;
   int vlistID1, vlistID2;
   int gridID = -1;
@@ -145,10 +145,9 @@ void *Setbox(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 

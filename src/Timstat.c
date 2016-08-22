@@ -88,7 +88,7 @@ void *Timstat(void *argument)
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
   int nmiss;
-  int lvfrac = FALSE;
+  bool lvfrac = false;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
@@ -158,7 +158,7 @@ void *Timstat(void *argument)
 
       if ( oargc == 1 )
 	{
-	  lvfrac = TRUE;
+	  lvfrac = true;
 	  vfrac = atof(oargv[0]);
 	  if ( cdoVerbose ) cdoPrint("Set vfrac to %g", vfrac);
 	  if ( vfrac < 0 || vfrac > 1 ) cdoAbort("vfrac out of range!");

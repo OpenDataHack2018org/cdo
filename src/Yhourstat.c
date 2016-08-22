@@ -65,28 +65,17 @@ int hour_of_year(int vdate, int vtime)
 
 void *Yhourstat(void *argument)
 {
-  int operatorID;
-  int operfunc;
-  int gridsize;
   int i;
   int varID;
-  int recID;
   int vdate, vtime;
   int houroy;
-  int nrecs, nrecords;
+  int nrecs;
   int levelID;
-  int tsID;
-  int otsID;
   int nsets[MAX_HOUR];
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
-  int *recVarID, *recLevelID;
+  int nlevel;
   int vdates[MAX_HOUR], vtimes[MAX_HOUR];
-  int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
   field_t **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
-  field_t field;
 
   cdoInitialize(argument);
 
@@ -100,12 +89,12 @@ void *Yhourstat(void *argument)
   cdoOperatorAdd("yhourstd",  func_std,  0, NULL);
   cdoOperatorAdd("yhourstd1", func_std1, 0, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
+  int operatorID = cdoOperatorID();
+  int operfunc = cdoOperatorF1(operatorID);
 
-  lmean   = operfunc == func_mean || operfunc == func_avg;
-  lstd    = operfunc == func_std || operfunc == func_std1;
-  lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor = operfunc == func_std1 || operfunc == func_var1;
 
   for ( houroy = 0; houroy < MAX_HOUR; ++houroy )
@@ -116,32 +105,34 @@ void *Yhourstat(void *argument)
       nsets[houroy] = 0;
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
+  int nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
+
+  field_t field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
-  otsID = 0;
+  int tsID = 0;
+  int otsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
@@ -162,7 +153,7 @@ void *Yhourstat(void *argument)
 	    vars2[houroy] = field_malloc(vlistID1, FIELD_PTR);
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -282,7 +273,7 @@ void *Yhourstat(void *argument)
 	taxisDefVtime(taxisID2, vtimes[houroy]);
 	streamDefTimestep(streamID2, otsID);
 
-	for ( recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];

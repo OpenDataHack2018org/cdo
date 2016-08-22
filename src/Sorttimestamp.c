@@ -57,7 +57,7 @@ void *Sorttimestamp(void *argument)
 {
   int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
+  int gridID, varID, levelID;
   int tsID, lasttsID = -1;
   int nalloc = 0;
   int vlistID2 = -1, taxisID2 = -1;
@@ -111,7 +111,7 @@ void *Sorttimestamp(void *argument)
 
 	  vars[xtsID] = field_malloc(vlistID1, FIELD_NONE);
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      gridID   = vlistInqVarGrid(vlistID1, varID);

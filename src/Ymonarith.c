@@ -40,13 +40,11 @@
 void *Ymonarith(void *argument)
 {
   enum {MONTHLY, SEASONAL};
-  int nrecs, nvars, nlev, recID;
-  int tsID;
+  int nrecs, nlev;
   int varID, levelID;
   int offset;
   int nmiss;
   int vdate, year, mon, day;
-  field_t field1, field2;
   int **varnmiss2[MAX_MON];
   double **vardata2[MAX_MON];
   const char *seas_name[4];
@@ -77,6 +75,7 @@ void *Ymonarith(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));
@@ -91,13 +90,13 @@ void *Ymonarith(void *argument)
 
   streamDefVlist(streamID3, vlistID3);
 
-  nvars  = vlistNvars(vlistID2);
+  int nvars  = vlistNvars(vlistID2);
 
   if ( opertype == SEASONAL ) get_season_name(seas_name);
 
   for ( mon = 0; mon < MAX_MON ; mon++ ) vardata2[mon] = NULL;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       vdate = taxisInqVdate(taxisID2);
@@ -127,7 +126,7 @@ void *Ymonarith(void *argument)
 	  varnmiss2[mon][varID] = (int*) Malloc(nlev*sizeof(int));
 	}
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID2, &varID, &levelID);
 
@@ -162,10 +161,9 @@ void *Ymonarith(void *argument)
 	}
 
       taxisCopyTimestep(taxisID3, taxisID1);
-
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);

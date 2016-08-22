@@ -43,12 +43,11 @@
 int getSurfaceID(int vlistID)
 {
   int surfID = -1;
-  int zaxisID;
   int nzaxis = vlistNzaxis(vlistID);
 
   for ( int index = 0; index < nzaxis; ++index )
     {
-      zaxisID = vlistZaxis(vlistID, index);
+      int zaxisID = vlistZaxis(vlistID, index);
       if ( IS_SURFACE_LEVEL(zaxisID) )
 	{
 	  surfID = vlistZaxis(vlistID, index);
@@ -64,12 +63,11 @@ int getSurfaceID(int vlistID)
 static
 void setSurfaceID(int vlistID, int surfID)
 {
-  int zaxisID;
   int nzaxis = vlistNzaxis(vlistID);
 
   for ( int index = 0; index < nzaxis; ++index )
     {
-      zaxisID = vlistZaxis(vlistID, index);
+      int zaxisID = vlistZaxis(vlistID, index);
       if ( zaxisID != surfID || !IS_SURFACE_LEVEL(zaxisID) )
 	vlistChangeZaxisIndex(vlistID, index, surfID);
     }
@@ -97,7 +95,7 @@ void genLayerBounds(int nlev, double *levels, double *lbounds, double *ubounds)
 }
 
 
-int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
+int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights)
 {
   int status = 0;
   int i;
@@ -156,12 +154,10 @@ int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *t
 
 void *Vertstat(void *argument)
 {
-  int recID, nrecs;
+  int nrecs;
   int gridID;
-  int i;
   int varID, levelID;
   int nmiss;
-  double missval;
   typedef struct {
     int zaxisID;
     int status;
@@ -184,14 +180,14 @@ void *Vertstat(void *argument)
                  cdoOperatorAdd("vertstd",  func_std,  1, NULL);
                  cdoOperatorAdd("vertstd1", func_std1, 1, NULL);
 
-  int operatorID  = cdoOperatorID();
-  int operfunc    = cdoOperatorF1(operatorID);
-  int needWeights = cdoOperatorF2(operatorID);
+  int operatorID   = cdoOperatorID();
+  int operfunc     = cdoOperatorF1(operatorID);
+  bool needWeights = cdoOperatorF2(operatorID);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
-  int lstd    = operfunc == func_std || operfunc == func_std1;
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor = operfunc == func_std1 || operfunc == func_var1;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int divisor  = operfunc == func_std1 || operfunc == func_var1;
 
   //int applyWeights = lmean;
 
@@ -219,7 +215,7 @@ void *Vertstat(void *argument)
   vert_t vert[nzaxis];
   if ( needWeights )
     {
-      int genbounds = FALSE;
+      bool genbounds = false;
       unsigned npar = operatorArgc();
       if ( npar > 0 )
 	{
@@ -229,7 +225,7 @@ void *Vertstat(void *argument)
 	    for ( unsigned i = 0; i < npar; i++ )
 	      cdoPrint("key %d = %s", i+1, parnames[i]);
 
-	  if ( strcmp(parnames[0], "genbounds") == 0 ) genbounds = TRUE;
+	  if ( strcmp(parnames[0], "genbounds") == 0 ) genbounds = true;
 	  else cdoAbort("Parameter >%s< unsupported! Supported parameter are: genbounds", parnames[0]);
 	}
       
@@ -271,7 +267,7 @@ void *Vertstat(void *argument)
       gridID   = vlistInqVarGrid(vlistID1, varID);
       gridsize = gridInqSize(gridID);
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-      missval  = vlistInqVarMissval(vlistID1, varID);
+      double missval = vlistInqVarMissval(vlistID1, varID);
 
       field_init(&vars1[varID]);
       field_init(&samp1[varID]);
@@ -299,10 +295,9 @@ void *Vertstat(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -360,7 +355,7 @@ void *Vertstat(void *argument)
 		  if ( samp1[varID].ptr == NULL )
 		    samp1[varID].ptr = (double *) Malloc(gridsize*sizeof(double));
 
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( int i = 0; i < gridsize; i++ )
 		    if ( DBL_IS_EQUAL(vars1[varID].ptr[i], vars1[varID].missval) )
 		      samp1[varID].ptr[i] = 0.;
 		    else
@@ -382,11 +377,11 @@ void *Vertstat(void *argument)
 		  if ( samp1[varID].ptr == NULL )
 		    {
 		      samp1[varID].ptr = (double*) Malloc(gridsize*sizeof(double));
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			samp1[varID].ptr[i] = vars1[varID].nsamp;
 		    }
 
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( int i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID].missval) )
 		      samp1[varID].ptr[i] += layer_weight;
 		}

@@ -41,7 +41,6 @@ int getmonth(int date)
 void *Ymonpctl(void *argument)
 {
   int varID;
-  int recID;
   int gridID;
   int vdate, vtime;
   int year, month, day;
@@ -139,13 +138,13 @@ void *Ymonpctl(void *argument)
 	    }
 	}
       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
 	  streamReadRecord(streamID2, vars1[month][varID][levelID].ptr, &nmiss);
           vars1[month][varID][levelID].nmiss = nmiss;
         }
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID3, &varID, &levelID);
 	  streamReadRecord(streamID3, field.ptr, &nmiss);
@@ -177,7 +176,7 @@ void *Ymonpctl(void *argument)
       if ( vars1[month] == NULL )
         cdoAbort("No data for month %d in %s and %s", month, cdoStreamName(1)->args, cdoStreamName(2)->args);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -218,7 +217,7 @@ void *Ymonpctl(void *argument)
 	taxisDefVtime(taxisID4, vtimes1[month]);
 	streamDefTimestep(streamID4, otsID);
 
-	for ( recID = 0; recID < nrecords; recID++ )
+	for ( int recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];

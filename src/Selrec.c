@@ -32,15 +32,8 @@
 
 void *Selrec(void *argument)
 {
-  int streamID1, streamID2;
-  int tsID, nrecs;
-  int recID, varID, levelID;
-  int *intarr, nsel = 0;
-  int vlistID1 = -1, vlistID2 = -1;
-  int i;
-  int recordID;
-  int filetype;
-  int taxisID1, taxisID2;
+  int nrecs;
+  int varID, levelID;
   LIST *ilist = listNew(INT_LIST);
 
   cdoInitialize(argument);
@@ -49,48 +42,48 @@ void *Selrec(void *argument)
 
   operatorInputArg("records");
 
-  nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
+  int nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
 
-  intarr = (int *) listArrayPtr(ilist);
+  int *intarr = (int *) listArrayPtr(ilist);
 
   if ( cdoVerbose )
     {
-      for ( i = 0; i < nsel; i++ )
+      for ( int i = 0; i < nsel; i++ )
 	cdoPrint("intarr entry: %d %d", i, intarr[i]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  filetype = streamInqFiletype(streamID1);
+  int filetype = streamInqFiletype(streamID1);
 
   if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
     cdoAbort("This operator does not work on NetCDF data!");
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  recordID = 0;
-  tsID = 0;
+  int recordID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
      
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  recordID++;
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  for ( i = 0; i < nsel; i++ )
+	  for ( int i = 0; i < nsel; i++ )
 	    {
 	      if ( recordID == intarr[i] )
 		{

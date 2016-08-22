@@ -30,21 +30,17 @@
 
 void transxy(int gridID, double *array1, double *array2)
 {
-  int i, j;
-  int nx, ny;
-  double **a2D1, **a2D2;
+  int nx = gridInqXsize(gridID);
+  int ny = gridInqYsize(gridID);
 
-  nx = gridInqXsize(gridID);
-  ny = gridInqYsize(gridID);
+  double **a2D1 = (double **) Malloc(ny*sizeof(double *));
+  double **a2D2 = (double **) Malloc(nx*sizeof(double *));
 
-  a2D1 = (double **) Malloc(ny*sizeof(double *));
-  a2D2 = (double **) Malloc(nx*sizeof(double *));
+  for ( int j = 0; j < ny; ++j ) a2D1[j] = array1+j*nx;
+  for ( int i = 0; i < nx; ++i ) a2D2[i] = array2+i*ny;
 
-  for ( j = 0; j < ny; ++j ) a2D1[j] = array1+j*nx;
-  for ( i = 0; i < nx; ++i ) a2D2[i] = array2+i*ny;
-
-  for ( j = 0; j < ny; ++j )
-    for ( i = 0; i < nx; ++i )
+  for ( int j = 0; j < ny; ++j )
+    for ( int i = 0; i < nx; ++i )
       a2D2[i][j] = a2D1[j][i];
 
   Free(a2D1);
@@ -54,32 +50,25 @@ void transxy(int gridID, double *array1, double *array2)
 
 void *Transpose(void *argument)
 {
-  int streamID1, streamID2;
-  int gridsize;
-  int ngrids, index;
   int gridID1, gridID2;
-  int nx, ny;
-  int nrecs, recID;
-  int gridID, tsID;
+  int nrecs;
+  int gridID;
   int varID, levelID;
-  int vlistID1, vlistID2;
   int nmiss;
-  int taxisID1, taxisID2;
-  double *array1, *array2;
 
   cdoInitialize(argument);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-  ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
+  int ngrids = vlistNgrids(vlistID1);
+  for ( int index = 0; index < ngrids; index++ )
     {
       gridID1 = vlistGrid(vlistID1, index);
-      nx = gridInqXsize(gridID1);
-      ny = gridInqYsize(gridID1);
+      int nx = gridInqXsize(gridID1);
+      int ny = gridInqYsize(gridID1);
 
       gridID2 = gridCreate(GRID_GENERIC, nx*ny);
       gridDefXsize(gridID2, ny);
@@ -88,27 +77,27 @@ void *Transpose(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
-  array1 = (double*) Malloc(gridsize*sizeof(double));
-  array2 = (double*) Malloc(gridsize*sizeof(double));
+  double *array1 = (double*) Malloc(gridsize*sizeof(double));
+  double *array2 = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);

@@ -24,13 +24,13 @@
 void *Seloperator(void *argument)
 {
   int nrecs;
-  int recID, varID, levelID;
-  double slevel = 0, level;
+  int varID, levelID;
   int nlevs, code, zaxisID, selfound = FALSE;
   int levID, ltype = 0;
   int varID2, levelID2;
   int sellevel, selcode, selltype;
   int gridsize, nmiss;
+  double slevel = 0, level;
   double *array = NULL;
 
   cdoInitialize(argument);
@@ -112,7 +112,7 @@ void *Seloperator(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )

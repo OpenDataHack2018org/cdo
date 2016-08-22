@@ -200,7 +200,7 @@ void output_vrml(int nlon, int nlat, int ngp, double *restrict array, double mis
 
 void *Outputgmt(void *argument)
 {
-  int varID0, recID;
+  int varID0;
   int gridsize2 = 0;
   int nrecs;
   int levelID;
@@ -469,7 +469,7 @@ void *Outputgmt(void *argument)
 
       varID0 = varID;
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID, &varID, &levelID);
 

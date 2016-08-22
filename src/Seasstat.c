@@ -40,18 +40,14 @@
 void *Seasstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
-  int gridsize;
-  int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int vdate1 = 0, vtime1 = 0;
   int nrecs;
-  int varID, levelID, recID;
-  int nsets;
-  int i;
-  int year, month, day, seas, seas0 = 0;
+  int varID, levelID;
+  int year, month, day, seas0 = 0;
   int nmiss;
   int nlevel;
-  int newseas, oldmon = 0, newmon;
+  int oldmon = 0;
   int nseason = 0;
   const char *seas_name[4];
 
@@ -102,7 +98,7 @@ void *Seasstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
 
   field_t field;
   field_init(&field);
@@ -117,21 +113,21 @@ void *Seasstat(void *argument)
   int otsID   = 0;
   while ( TRUE )
     {
-      nsets = 0;
-      newseas = FALSE;
+      long nsets = 0;
+      bool newseas = false;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
-	  vdate = dtlist_get_vdate(dtlist, nsets);
-	  vtime = dtlist_get_vtime(dtlist, nsets);
+	  int vdate = dtlist_get_vdate(dtlist, nsets);
+	  int vtime = dtlist_get_vtime(dtlist, nsets);
 
 	  cdiDecodeDate(vdate, &year, &month, &day);
 
-	  newmon = month;
+	  int newmon = month;
 
 	  if ( season_start == START_DEC && newmon == 12 ) newmon = 0;
 
-          seas = month_to_season(month);
+          int seas = month_to_season(month);
 
 	  if ( nsets == 0 )
 	    {
@@ -142,13 +138,13 @@ void *Seasstat(void *argument)
 	      oldmon = newmon;
 	    }
 
-	  if ( newmon < oldmon ) newseas = TRUE;
+	  if ( newmon < oldmon ) newseas = true;
 
 	  if ( (seas != seas0) || newseas ) break;
 
 	  oldmon = newmon;
 
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
@@ -170,7 +166,7 @@ void *Seasstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i],
 					  vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
@@ -190,11 +186,11 @@ void *Seasstat(void *argument)
 		      if ( samp1[varID][levelID].ptr == NULL )
 			{
 			  samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
-			  for ( i = 0; i < gridsize; i++ )
+			  for ( int i = 0; i < gridsize; i++ )
 			    samp1[varID][levelID].ptr[i] = nsets;
 			}
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i]++;
 		    }
@@ -288,7 +284,7 @@ void *Seasstat(void *argument)
 		     otsID+1, vdatestr, nsets, nsets == 1 ? "" : "s");
 	}
 
-      for ( recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];

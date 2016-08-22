@@ -30,60 +30,50 @@
 
 void *Varrms(void *argument)
 {
-  int streamID1, streamID2, streamID3;
-  int vlistID1, vlistID2, vlistID3;
-  int gridID1, gridID3, lastgrid = -1;
+  int lastgrid = -1;
   int wstatus = FALSE;
-  int code = 0, oldcode = 0;
-  int index, ngrids;
-  int recID, nrecs;
-  int nvars, nlevel;
+  int oldcode = 0;
+  int nrecs;
   int gridsize;
   int nmiss;
-  int tsID, varID, levelID;
-  int lim;
-  int needWeights = FALSE;
+  int varID, levelID;
   long offset;
   double *single;
-  double **vardata1 = NULL, **vardata2 = NULL;
-  double slon, slat;
   double sglval;
-  field_t field1, field2, field3;
-  int taxisID1, taxisID3;
 
   cdoInitialize(argument);
 
-  needWeights = TRUE;
+  bool needWeights = true;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
 
-  slon = 0;
-  slat = 0;
-  gridID3 = gridCreate(GRID_LONLAT, 1);
+  double slon = 0;
+  double slat = 0;
+  int gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
   gridDefXvals(gridID3, &slon);
   gridDefYvals(gridID3, &slat);
 
   vlistClearFlag(vlistID1);
-  nvars    = vlistNvars(vlistID1);
+  int nvars    = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
-  vlistID3 = vlistCreate();
+  int vlistID3 = vlistCreate();
   vlistCopyFlag(vlistID3, vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  ngrids = vlistNgrids(vlistID1);
-  index = 0;
-  gridID1 = vlistGrid(vlistID1, index);
+  int ngrids = vlistNgrids(vlistID1);
+  int index = 0;
+  int gridID1 = vlistGrid(vlistID1, index);
   
   if ( needWeights &&
        gridInqType(gridID1) != GRID_LONLAT &&
@@ -93,26 +83,27 @@ void *Varrms(void *argument)
   vlistChangeGridIndex(vlistID3, index, gridID3);
   if ( ngrids > 1 ) cdoAbort("Too many different grids!");
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  vardata1 = (double**) Malloc(nvars*sizeof(double*));
-  vardata2 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
+  field_t field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field2);
 
-  lim = vlistGridsizeMax(vlistID1);
+  int lim = vlistGridsizeMax(vlistID1);
   field1.weight = NULL;
   if ( needWeights )
     field1.weight = (double*) Malloc(lim*sizeof(double));
@@ -122,7 +113,7 @@ void *Varrms(void *argument)
   field3.ptr  = &sglval;
   field3.grid = gridID3;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       nrecs = streamInqTimestep(streamID2, tsID);
@@ -131,7 +122,7 @@ void *Varrms(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -163,7 +154,7 @@ void *Varrms(void *argument)
 	      lastgrid = field1.grid;
 	      wstatus = gridWeights(field1.grid, field1.weight);
 	    }
-	  code = vlistInqVarCode(vlistID1, varID);
+	  int code = vlistInqVarCode(vlistID1, varID);
 	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
 	    cdoWarning("Using constant area weights for code %d!", oldcode=code);
 

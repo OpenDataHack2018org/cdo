@@ -33,49 +33,40 @@
 
 int stringToParam(const char *paramstr)
 {
-  int param = 0;
   int pnum = -1, pcat = 255, pdis = 255;
-
   sscanf(paramstr, "%d.%d.%d", &pnum, &pcat, &pdis);
   
   if ( cdoVerbose ) cdoPrint("pnum, pcat, pdis: %d.%d.%d", pnum, pcat, pdis);
 
-  param = cdiEncodeParam(pnum, pcat, pdis);
+  int param = cdiEncodeParam(pnum, pcat, pdis);
 
-  return (param);
+  return param;
 }
 
 
 void *Set(void *argument)
 {
-  int SETCODE, SETPARAM, SETNAME, SETUNIT, SETLEVEL, SETLTYPE, SETTABNUM;
-  int operatorID;
-  int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars, newval = -1, tabnum = 0;
-  int tsID1, recID, varID, levelID;
-  int vlistID1, vlistID2;
-  int taxisID1, taxisID2;
+  int varID, levelID;
   int nmiss;
-  int gridsize;
   int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int zaxistype;
   int newparam    = 0;
   char *newname   = NULL, *newunit = NULL;
   double newlevel = 0;
   double *levels  = NULL;
-  double *array   = NULL;
 
   cdoInitialize(argument);
 
-  SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");
-  SETPARAM   = cdoOperatorAdd("setparam",   0, 0, "parameter identifier (format: code[.tabnum] or num[.cat[.dis]])");
-  SETNAME    = cdoOperatorAdd("setname",    0, 0, "variable name");
-  SETUNIT    = cdoOperatorAdd("setunit",    0, 0, "variable unit");
-  SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
-  SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
-  SETTABNUM  = cdoOperatorAdd("settabnum",  0, 0, "GRIB table number");
+  int SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");
+  int SETPARAM   = cdoOperatorAdd("setparam",   0, 0, "parameter identifier (format: code[.tabnum] or num[.cat[.dis]])");
+  int SETNAME    = cdoOperatorAdd("setname",    0, 0, "variable name");
+  int SETUNIT    = cdoOperatorAdd("setunit",    0, 0, "variable unit");
+  int SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
+  int SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
+  int SETTABNUM  = cdoOperatorAdd("settabnum",  0, 0, "GRIB table number");
 
-  operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
   if ( operatorID == SETCODE || operatorID == SETLTYPE )
@@ -103,14 +94,14 @@ void *Set(void *argument)
       newlevel = parameter2double(operatorArgv()[0]);
     }
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
   /* vlistPrint(vlistID2);*/
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   if ( operatorID == SETCODE )
@@ -171,22 +162,21 @@ void *Set(void *argument)
     }
 
   /* vlistPrint(vlistID2);*/
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = (double*) Malloc(gridsize*sizeof(double));
+  double *array = (double*) Malloc(gridsize*sizeof(double));
 
-  tsID1 = 0;
+  int tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID1);
 	       
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);

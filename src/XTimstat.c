@@ -162,11 +162,10 @@ void *XTimstat(void *argument)
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int varID;
-  int nsets;
   int streamID3 = -1;
   int vlistID3, taxisID3 = -1;
   int nmiss;
-  int lvfrac = FALSE;
+  bool lvfrac = false;
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
@@ -206,10 +205,10 @@ void *XTimstat(void *argument)
   int operfunc   = cdoOperatorF1(operatorID);
   int comparelen = cdoOperatorF2(operatorID);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
-  int lstd    = operfunc == func_std || operfunc == func_std1;
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor = operfunc == func_std1 || operfunc == func_var1;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int divisor  = operfunc == func_std1 || operfunc == func_var1;
 
   if ( operfunc == func_mean )
     {
@@ -218,7 +217,7 @@ void *XTimstat(void *argument)
 
       if ( oargc == 1 )
 	{
-	  lvfrac = TRUE;
+	  lvfrac = true;
 	  vfrac = atof(oargv[0]);
 	  if ( cdoVerbose ) cdoPrint("Set vfrac to %g", vfrac);
 	  if ( vfrac < 0 || vfrac > 1 ) cdoAbort("vfrac out of range!");
@@ -305,7 +304,7 @@ void *XTimstat(void *argument)
   readarg.vars = input_vars;
 
   int lparallelread = CDO_Parallel_Read;
-  int ltsfirst = TRUE;
+  bool ltsfirst = true;
   void *read_task = NULL;
   void *readresult = NULL;
 
@@ -328,7 +327,7 @@ void *XTimstat(void *argument)
   tsID++;
   while ( TRUE )
     {
-      nsets = 0;
+      int nsets = 0;
       while ( nrecs > 0 )
 	{
 	  dtlist_taxisInqTimestep(dtlist, taxisID1, nsets);
@@ -346,7 +345,7 @@ void *XTimstat(void *argument)
 
           if ( ltsfirst || lparallelread == FALSE )
             {
-              ltsfirst = FALSE;
+              ltsfirst = false;
               readresult = cdoReadTimestep(&readarg);
             }
           else

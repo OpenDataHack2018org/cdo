@@ -65,46 +65,31 @@ void trms(field_t field1, field_t field2, double *dp, field_t *field3)
 
 void *Trms(void *argument)
 {
-  int streamID1, streamID2, streamID3;
-  int vlistID1, vlistID2, vlistID3;
   int gridID1, gridID3, lastgrid = -1;
-  int wstatus = FALSE;
   int code = 0, oldcode = 0;
   int zaxisID;
-  int index, ngrids, nzaxis;
-  int recID, nrecs;
-  int nvars, nlevel;
-  int gridsize;
-  int i, k;
+  int nrecs;
   int nmiss;
-  int tsID, varID, levelID;
-  int lim;
+  int varID, levelID;
   int pcode = 152, pvarID = -1;
-  int needWeights = FALSE;
   long offset;
   size_t vctsize = 0;
-  const double *vct, *va = NULL, *vb = NULL;
-  double dp1, dp2;
-  double *dp;
+  const double *va = NULL, *vb = NULL;
   double *single;
-  double **vardata1 = NULL, **vardata2 = NULL;
-  double slon, slat;
   double sglval;
-  field_t field1, field2, field3;
-  int taxisID1, taxisID3;
 
   cdoInitialize(argument);
 
-  needWeights = TRUE;
+  bool needWeights = true;
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
 
-  slon = 0;
-  slat = 0;
+  double slon = 0;
+  double slat = 0;
   gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
@@ -112,7 +97,7 @@ void *Trms(void *argument)
   gridDefYvals(gridID3, &slat);
 
   vlistClearFlag(vlistID1);
-  nvars    = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( vlistInqVarCode(vlistID1, varID) == pcode )
@@ -123,15 +108,15 @@ void *Trms(void *argument)
 
   if ( pvarID == -1 ) cdoAbort("pressure variable missing!");
 
-  vlistID3 = vlistCreate();
+  int vlistID3 = vlistCreate();
   vlistCopyFlag(vlistID3, vlistID1);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID3 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  ngrids = vlistNgrids(vlistID1);
-  index = 0;
+  int ngrids = vlistNgrids(vlistID1);
+  int index = 0;
   gridID1 = vlistGrid(vlistID1, index);
   
   if ( needWeights &&
@@ -142,14 +127,14 @@ void *Trms(void *argument)
   vlistChangeGridIndex(vlistID3, index, gridID3);
   if ( ngrids > 1 ) cdoAbort("Too many different grids!");
 
-  nzaxis = vlistNzaxis(vlistID1);
+  int nzaxis = vlistNzaxis(vlistID1);
   for ( index = 0; index < nzaxis; index++ )
     {
       zaxisID = vlistZaxis(vlistID1, index);
       if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	{
 	  vctsize = zaxisInqVctSize(zaxisID);
-	  vct     = zaxisInqVctPtr(zaxisID);
+	  const double *vct = zaxisInqVctPtr(zaxisID);
 	  va = vct;
 	  vb = vct + vctsize/2;
 	  /*
@@ -166,16 +151,16 @@ void *Trms(void *argument)
 
   if ( vctsize == 0 ) cdoAbort("VCT missing!");
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  vardata1 = (double**) Malloc(nvars*sizeof(double*));
-  vardata2 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
 
-  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
-  nlevel   = vctsize/2 - 1;
-  dp = (double*) Malloc(gridsize*nlevel*sizeof(double));
+  int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
+  int nlevel   = vctsize/2 - 1;
+  double *dp = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -185,11 +170,12 @@ void *Trms(void *argument)
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
+  field_t field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field3);
 
-  lim = vlistGridsizeMax(vlistID1);
+  int lim = vlistGridsizeMax(vlistID1);
   field1.weight = NULL;
   if ( needWeights )
     field1.weight = (double*) Malloc(lim*sizeof(double));
@@ -199,7 +185,7 @@ void *Trms(void *argument)
   field3.ptr  = &sglval;
   field3.grid = gridID3;
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       nrecs = streamInqTimestep(streamID2, tsID);
@@ -208,7 +194,7 @@ void *Trms(void *argument)
 
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
@@ -228,20 +214,20 @@ void *Trms(void *argument)
 	}
 
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, pvarID));
-      for ( i = 0; i < gridsize; i++ )
+      for ( int i = 0; i < gridsize; i++ )
 	{
 	  vardata1[pvarID][i] = exp(vardata1[pvarID][i]);
 	  vardata2[pvarID][i] = exp(vardata2[pvarID][i]);
 	}
 
       nlevel = vctsize/2 - 1;
-      for ( k = 0; k < nlevel; k++ )
+      for ( int k = 0; k < nlevel; k++ )
 	{
 	  offset = gridsize*k;
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( int i = 0; i < gridsize; i++ )
 	    {
-	      dp1 = (va[k+1] + vb[k+1]*vardata1[pvarID][i]) - (va[k] + vb[k]*vardata1[pvarID][i]);
-	      dp2 = (va[k+1] + vb[k+1]*vardata2[pvarID][i]) - (va[k] + vb[k]*vardata2[pvarID][i]);
+	      double dp1 = (va[k+1] + vb[k+1]*vardata1[pvarID][i]) - (va[k] + vb[k]*vardata1[pvarID][i]);
+	      double dp2 = (va[k+1] + vb[k+1]*vardata2[pvarID][i]) - (va[k] + vb[k]*vardata2[pvarID][i]);
 
 	      dp[offset+i] = 0.5 * (dp1 + dp2);
 	    }
@@ -255,6 +241,7 @@ void *Trms(void *argument)
 	  field1.zaxis   = vlistInqVarZaxis(vlistID1, varID);
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
+          bool wstatus = false;
 	  if ( needWeights && field1.grid != lastgrid )
 	    {
 	      lastgrid = field1.grid;

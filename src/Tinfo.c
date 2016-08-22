@@ -52,8 +52,7 @@ void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incu
 
   if ( lperiod < 0 )
     {
-      int tmp;
-      tmp = vdate1;
+      int tmp = vdate1;
       vdate1 = vdate0;
       vdate0 = tmp;
       lperiod = -lperiod;
@@ -219,14 +218,13 @@ void *Tinfo(void *argument)
   int vdate_first = 0, vtime_first = 0;
   int vdate0 = 0, vtime0 = 0;
   int vdate = 0, vtime = 0;
-  int fdate = 0, ftime = 0;
   int nrecs;
   int tsID = 0, ntimeout;
   int calendar;
   int year0, month0, day0;
   int year, month, day;
   int unit;
-  int lforecast = FALSE;
+  bool lforecast = false;
   int incperiod0 = 0, incunit0 = 0;
   int incperiod = 0, incunit = 0;
   int its = 0, igap;
@@ -284,8 +282,8 @@ void *Tinfo(void *argument)
 
 	      if ( taxisInqType(taxisID) == TAXIS_FORECAST )
 		{
-		  fdate = taxisInqFdate(taxisID);
-		  ftime = taxisInqFtime(taxisID);
+		  int fdate = taxisInqFdate(taxisID);
+		  int ftime = taxisInqFtime(taxisID);
 	      
 		  date2str(fdate, vdatestr, sizeof(vdatestr));
 		  time2str(ftime, vtimestr, sizeof(vtimestr));
@@ -297,12 +295,12 @@ void *Tinfo(void *argument)
 
 		  fprintf(stdout, "\n");
 
-		  lforecast = TRUE;
+		  lforecast = true;
 		}
 	    }
 	}
 
-      calendar = taxisInqCalendar(taxisID);
+      int calendar = taxisInqCalendar(taxisID);
 
       fprintf(stdout, "\n");
       fprintf(stdout, "         Verification Time              ");
@@ -317,7 +315,7 @@ void *Tinfo(void *argument)
 	fprintf(stdout, " YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference");
       fprintf(stdout, "\n");
 
-      tsID = 0;
+      int tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	{  
 	  vdate = taxisInqVdate(taxisID);
@@ -353,8 +351,8 @@ void *Tinfo(void *argument)
 
 	  if ( lforecast )
 	    {
-	      fdate = taxisInqFdate(taxisID);
-	      ftime = taxisInqFtime(taxisID);
+	      int fdate = taxisInqFdate(taxisID);
+	      int ftime = taxisInqFtime(taxisID);
 	      
 	      date2str(fdate, vdatestr, sizeof(vdatestr));
 	      time2str(ftime, vtimestr, sizeof(vtimestr));

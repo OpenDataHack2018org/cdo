@@ -45,9 +45,9 @@ double tstepcount(long nts, double missval1, double *array1, double refval)
     }
 
   if ( j == nts )
-    return (missval1);
+    return missval1;
   else
-    return ((double) n);
+    return (double) n;
 }
 
 
@@ -55,15 +55,10 @@ void *Tstepcount(void *argument)
 {
   int gridsize;
   int nrecs;
-  int gridID, varID, levelID, recID;
-  int tsID;
-  int i;
-  int nts;
+  int gridID, varID, levelID;
   int nalloc = 0;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
+  int nlevel;
   int vdate = 0, vtime = 0;
   double missval;
   double refval = 0;
@@ -72,34 +67,33 @@ void *Tstepcount(void *argument)
   {
     double *array1;
   } memory_t;
-  memory_t *mem = NULL;
 
   cdoInitialize(argument);
 
   if ( operatorArgc() == 1 ) refval = parameter2double(operatorArgv()[0]);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
   vlistDefNtsteps(vlistID2, 1);
 
-  nvars = vlistNvars(vlistID1);
+  int nvars = vlistNvars(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
       vlistDefVarUnits(vlistID2, varID, "steps");
     }
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisDuplicate(taxisID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       if ( tsID >= nalloc )
@@ -113,7 +107,7 @@ void *Tstepcount(void *argument)
 
       vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -126,10 +120,10 @@ void *Tstepcount(void *argument)
       tsID++;
     }
 
-  nts = tsID;
+  int nts = tsID;
 
-  mem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
-  for ( i = 0; i < ompNumThreads; i++ )
+  memory_t *mem = (memory_t*) Malloc(ompNumThreads*sizeof(memory_t));
+  for ( int i = 0; i < ompNumThreads; i++ )
     {
       mem[i].array1 = (double*) Malloc(nts*sizeof(double));
     }
@@ -158,10 +152,8 @@ void *Tstepcount(void *argument)
 	}
     }
 
-  for ( i = 0; i < ompNumThreads; i++ )
-    {
-      Free(mem[i].array1);
-    }
+  for ( int i = 0; i < ompNumThreads; i++ )
+    Free(mem[i].array1);
   Free(mem);
 
   taxisDefVdate(taxisID2, vdate);
@@ -180,7 +172,7 @@ void *Tstepcount(void *argument)
 	  streamDefRecord(streamID2, varID, levelID);
 
 	  nmiss = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( int i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(vars[0][varID][levelID].ptr[i], missval) ) nmiss++;
 
 	  streamWriteRecord(streamID2, vars[0][varID][levelID].ptr, nmiss);
@@ -189,7 +181,7 @@ void *Tstepcount(void *argument)
 
   for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
 
-  if ( vars  ) Free(vars);
+  if ( vars ) Free(vars);
 
   streamClose(streamID2);
   streamClose(streamID1);

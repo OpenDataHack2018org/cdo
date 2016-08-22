@@ -35,8 +35,8 @@
 
 void *Intlevel3d(void *argument)
 {
-  int gridsize,gridSize,gridsizei,gridsizeo;
-  int recID, nrecs;
+  int gridsize, gridSize, gridsizei, gridsizeo;
+  int nrecs;
   int i, offset;
   int tsID, varID, levelID;
   int nvars,nvct;
@@ -114,7 +114,7 @@ void *Intlevel3d(void *argument)
     nrecs      = streamInqTimestep(streamID0, 0);
     if (cdoVerbose) cdoPrint("%d records input 3d vertical height",nrecs);
 
-    for ( recID = 0; recID < nrecs; recID++ )
+    for ( int recID = 0; recID < nrecs; recID++ )
       {
         streamInqRecord(streamID0, &varID, &levelID);
         gridsize = gridInqSize(vlistInqVarGrid(vlistID0, varID));
@@ -150,7 +150,7 @@ void *Intlevel3d(void *argument)
     nrecs       = streamInqTimestep(streamID2, 0);
     if (cdoVerbose) cdoPrint("%d records target 3d vertical height and gridsize %d",nrecs,gridsize);
 
-    for ( recID = 0; recID < nrecs; recID++ )
+    for ( int recID = 0; recID < nrecs; recID++ )
       {
 	streamInqRecord(streamID2, &varID, &levelID);
 	gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
@@ -390,13 +390,12 @@ void *Intlevel3d(void *argument)
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = false;
 
       taxisCopyTimestep(taxisID3, taxisID1);
-
       streamDefTimestep(streamID3, tsID);
 
       /*
        * Read the whole 3d data field
        */
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
           vlistInqVarName(vlistID1, varID, varname); 

@@ -480,7 +480,7 @@ void *Ensval(void *argument)
 	    memset(brs_g, 0, (nens+1)*sizeof(double) );
 	    break;
 	  }
-	}   // for ( recID = 0; recID < nrecs; recID++ ) 
+	}   // for ( int recID = 0; recID < nrecs; recID++ ) 
       tsID++;
     }  while ( nrecs );
       

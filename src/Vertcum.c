@@ -57,12 +57,10 @@ void add_vars_mv(int gridsize, double missval, const double *restrict var1, cons
 
 void *Vertcum(void *argument)
 {
-  int recID, nrecs;
-  int i, gridsize, nlevs = 0, nlevs2 = 0, nlevshl = 0;
-  int varID, levelID, zaxisID;
+  int nrecs;
+  int i, nlevshl = 0;
+  int varID, levelID;
   int nmiss;
-  double *single;
-  double missval;
 
   cdoInitialize(argument);
 
@@ -88,10 +86,10 @@ void *Vertcum(void *argument)
       double *vct = NULL;
       int lhybrid = FALSE;
       int nzaxis  = vlistNzaxis(vlistID1);
-      for ( i = 0; i < nzaxis; ++i )
+      for ( int i = 0; i < nzaxis; ++i )
         {
-          zaxisID = vlistZaxis(vlistID1, i);
-          nlevs   = zaxisInqSize(zaxisID);
+          int zaxisID = vlistZaxis(vlistID1, i);
+          int nlevs   = zaxisInqSize(zaxisID);
 
           if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevs > 1 )
             {
@@ -126,9 +124,9 @@ void *Vertcum(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+      int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      int nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      int nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
       varnmiss[varID] = (int*) Malloc(nlevs*sizeof(int));
       vardata1[varID] = (double**) Malloc(nlevs*sizeof(double*));
@@ -154,7 +152,7 @@ void *Vertcum(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
           streamReadRecord(streamID1, vardata1[varID][levelID], &varnmiss[varID][levelID]);
@@ -162,9 +160,9 @@ void *Vertcum(void *argument)
 
       for ( varID = 0; varID < nvars; ++varID )
 	{
-          missval  = vlistInqVarMissval(vlistID2, varID);
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          double missval  = vlistInqVarMissval(vlistID2, varID);
+          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          int nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
           if ( operatorID == VERTCUMHL && nlevs2 == nlevshl )
             {
@@ -178,13 +176,9 @@ void *Vertcum(void *argument)
           for ( levelID = 1; levelID < nlevs2; ++levelID )
             {
               if ( operatorID == VERTCUMHL && nlevs2 == nlevshl )
-                {
-                  add_vars_mv(gridsize, missval, vardata1[varID][levelID-1], vardata2[varID][levelID-1], vardata2[varID][levelID]);
-                }
+                add_vars_mv(gridsize, missval, vardata1[varID][levelID-1], vardata2[varID][levelID-1], vardata2[varID][levelID]);
               else
-                {
-                  add_vars_mv(gridsize, missval, vardata1[varID][levelID], vardata2[varID][levelID-1], vardata2[varID][levelID]);
-                }
+                add_vars_mv(gridsize, missval, vardata1[varID][levelID], vardata2[varID][levelID-1], vardata2[varID][levelID]);
             }
 
           if ( operatorID == VERTCUMHL && nlevs2 == nlevshl )
@@ -206,15 +200,15 @@ void *Vertcum(void *argument)
 
       for ( varID = 0; varID < nvars; ++varID )
 	{
-          missval  = vlistInqVarMissval(vlistID2, varID);
-          gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-          nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+          double missval  = vlistInqVarMissval(vlistID2, varID);
+          int gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+          int nlevs2   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
           for ( levelID = 0; levelID < nlevs2; ++levelID )
 	    {
-              single = vardata2[varID][levelID];
+              double *single = vardata2[varID][levelID];
 
               nmiss = 0;
-              for ( i = 0; i < gridsize; ++i )
+              for ( int i = 0; i < gridsize; ++i )
                 if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
 
               streamDefRecord(streamID2, varID, levelID);
@@ -227,8 +221,8 @@ void *Vertcum(void *argument)
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      nlevs  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      nlevs2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+      int nlevs  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      int nlevs2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
       for ( levelID = 0; levelID < nlevs; ++levelID ) Free(vardata1[varID][levelID]);
       for ( levelID = 0; levelID < nlevs2; ++levelID ) Free(vardata2[varID][levelID]);
       Free(vardata1[varID]);

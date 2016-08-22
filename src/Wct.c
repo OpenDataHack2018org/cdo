@@ -82,49 +82,41 @@ static void farexpr(field_t *field1, field_t field2, double (*expression)(double
    
 void *Wct(void *argument)
 {
-  int streamID1, streamID2, streamID3;
-  int gridsize;
-  int nrecs, nrecs2, recID;
-  int tsID;
+  int nrecs, nrecs2;
   int nmiss;
-  int gridID, zaxisID;
-  int varID1, varID2, varID3;
+  int varID1, varID2;
   int levelID1, levelID2;
-  int vlistID1, vlistID2, vlistID3;
-  int taxisID1, taxisID2, taxisID3;
-  field_t field1, field2;
 
   cdoInitialize(argument);
   cdoOperatorAdd("wct", 0, 0, NULL);
 
-  streamID1 = streamOpenRead(cdoStreamName(0));
-  streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = streamOpenRead(cdoStreamName(1));
 
-  vlistID1 = streamInqVlist(streamID1);
-  vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = streamInqVlist(streamID2);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = vlistInqTaxis(vlistID2);
+  int taxisID1 = vlistInqTaxis(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, CMP_DIM);
   
-  gridsize = vlistGridsizeMax(vlistID1);
+  int gridsize = vlistGridsizeMax(vlistID1);
   
+  field_t field1, field2;
   field_init(&field1);
   field_init(&field2);
-
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));
   field2.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   if ( cdoVerbose )
     cdoPrint("Number of timesteps: file1 %d, file2 %d", vlistNtsteps(vlistID1), vlistNtsteps(vlistID2));
 
-  vlistID3 = vlistCreate();
-  gridID   = vlistInqVarGrid(vlistID1, FIRST_VAR);
-  zaxisID  = vlistInqVarZaxis(vlistID1, FIRST_VAR);
-  varID3   = vlistDefVar(vlistID3, gridID, zaxisID, TSTEP_INSTANT);
+  int vlistID3 = vlistCreate();
+  int gridID   = vlistInqVarGrid(vlistID1, FIRST_VAR);
+  int zaxisID  = vlistInqVarZaxis(vlistID1, FIRST_VAR);
+  int varID3   = vlistDefVar(vlistID3, gridID, zaxisID, TSTEP_INSTANT);
 
-  taxisID3 = taxisCreate(TAXIS_RELATIVE);
+  int taxisID3 = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(taxisID3, TUNIT_MINUTE);
   taxisDefCalendar(taxisID3, CALENDAR_STANDARD);
   taxisDefRdate(taxisID3, 19550101);
@@ -135,11 +127,11 @@ void *Wct(void *argument)
   vlistDefVarLongname(vlistID3, varID3, WCT_LONGNAME);
   vlistDefVarUnits(vlistID3, varID3, WCT_UNITS);
 
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID3, vlistID3);
 
-  tsID = 0;
+  int tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       nrecs2 = streamInqTimestep(streamID2, tsID);
@@ -149,7 +141,7 @@ void *Wct(void *argument)
       taxisCopyTimestep(taxisID3, taxisID1);
       streamDefTimestep(streamID3, tsID);
 
-      for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID1, &levelID1);
 	  streamReadRecord(streamID1, field1.ptr, &nmiss);

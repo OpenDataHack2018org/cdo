@@ -30,22 +30,15 @@
 
 void *Writegrid(void *argument)
 {
-  int streamID;
-  int vlistID;
-  int gridID;
-  long gridsize, i;
-  int gridtype;
-  int *mask = NULL;
-
   cdoInitialize(argument);
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = streamOpenRead(cdoStreamName(0));
 
-  vlistID = streamInqVlist(streamID);
-  gridID  = vlistGrid(vlistID, 0);
+  int vlistID = streamInqVlist(streamID);
+  int gridID  = vlistGrid(vlistID, 0);
 
-  gridtype = gridInqType(gridID);
-  gridsize = gridInqSize(gridID);
+  int gridtype = gridInqType(gridID);
+  int gridsize = gridInqSize(gridID);
 
   if ( gridtype == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
 
@@ -55,7 +48,7 @@ void *Writegrid(void *argument)
   if ( gridInqXbounds(gridID, NULL) == 0 || gridInqYbounds(gridID, NULL) == 0 )
     cdoAbort("Grid corner missing!");
 
-  mask = (int*) Malloc(gridsize*sizeof(int));
+  int *mask = (int*) Malloc(gridsize*sizeof(int));
 
   if ( gridInqMask(gridID, NULL) )
     {
@@ -63,7 +56,7 @@ void *Writegrid(void *argument)
     }
   else
     {
-      for ( i = 0; i < gridsize; i++ ) mask[i] = 1;
+      for ( int i = 0; i < gridsize; i++ ) mask[i] = 1;
     }
       
   writeNCgrid(cdoStreamName(1)->args, gridID, mask);
