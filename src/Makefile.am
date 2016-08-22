@@ -197,6 +197,7 @@ cdo_SOURCES += Adisit.c        \
                Condc.c         \
                Consecstat.c    \
                Copy.c          \
+               Deltat.c        \
                Deltime.c       \
                Derivepar.c     \
                Detrend.c       \
@@ -315,7 +316,6 @@ cdo_SOURCES += Adisit.c        \
                Templates.c     \
                Test.c          \
                Tests.c         \
-               Timedt.c        \
                Timcount.c      \
                Timpctl.c       \
                Timselpctl.c    \

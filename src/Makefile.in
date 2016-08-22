@@ -169,10 +169,10 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
-	cdo-Deltime.$(OBJEXT) cdo-Derivepar.$(OBJEXT) \
-	cdo-Detrend.$(OBJEXT) cdo-Diff.$(OBJEXT) \
-	cdo-Distgrid.$(OBJEXT) cdo-Duplicate.$(OBJEXT) \
-	cdo-EOFs.$(OBJEXT) cdo-Eof3d.$(OBJEXT) \
+	cdo-Deltat.$(OBJEXT) cdo-Deltime.$(OBJEXT) \
+	cdo-Derivepar.$(OBJEXT) cdo-Detrend.$(OBJEXT) \
+	cdo-Diff.$(OBJEXT) cdo-Distgrid.$(OBJEXT) \
+	cdo-Duplicate.$(OBJEXT) cdo-EOFs.$(OBJEXT) cdo-Eof3d.$(OBJEXT) \
 	cdo-EcaIndices.$(OBJEXT) cdo-Echam5ini.$(OBJEXT) \
 	cdo-Enlarge.$(OBJEXT) cdo-Enlargegrid.$(OBJEXT) \
 	cdo-Ensstat.$(OBJEXT) cdo-Ensstat3.$(OBJEXT) \
@@ -224,13 +224,13 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Splitsel.$(OBJEXT) cdo-Splittime.$(OBJEXT) \
 	cdo-Splityear.$(OBJEXT) cdo-Subtrend.$(OBJEXT) \
 	cdo-Tee.$(OBJEXT) cdo-Templates.$(OBJEXT) cdo-Test.$(OBJEXT) \
-	cdo-Tests.$(OBJEXT) cdo-Timedt.$(OBJEXT) \
-	cdo-Timcount.$(OBJEXT) cdo-Timpctl.$(OBJEXT) \
-	cdo-Timselpctl.$(OBJEXT) cdo-Timselstat.$(OBJEXT) \
-	cdo-Timsort.$(OBJEXT) cdo-Timstat.$(OBJEXT) \
-	cdo-Timstat2.$(OBJEXT) cdo-Timstat3.$(OBJEXT) \
-	cdo-Tinfo.$(OBJEXT) cdo-Tocomplex.$(OBJEXT) \
-	cdo-Transpose.$(OBJEXT) cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
+	cdo-Tests.$(OBJEXT) cdo-Timcount.$(OBJEXT) \
+	cdo-Timpctl.$(OBJEXT) cdo-Timselpctl.$(OBJEXT) \
+	cdo-Timselstat.$(OBJEXT) cdo-Timsort.$(OBJEXT) \
+	cdo-Timstat.$(OBJEXT) cdo-Timstat2.$(OBJEXT) \
+	cdo-Timstat3.$(OBJEXT) cdo-Tinfo.$(OBJEXT) \
+	cdo-Tocomplex.$(OBJEXT) cdo-Transpose.$(OBJEXT) \
+	cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
 	cdo-Tstepcount.$(OBJEXT) cdo-Vargen.$(OBJEXT) \
 	cdo-Varrms.$(OBJEXT) cdo-Vertintml.$(OBJEXT) \
 	cdo-Vertintap.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
@@ -549,41 +549,41 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Arithdays.c Arithlat.c CDItest.c CDIread.c CDIwrite.c Cat.c \
 	Change.c Change_e5slm.c Cloudlayer.c CMOR.c Collgrid.c \
 	Command.c Comp.c Compc.c Complextorect.c Cond.c Cond2.c \
-	Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c \
-	Diff.c Distgrid.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c \
-	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c \
-	Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c \
-	Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c \
-	Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c Gridsearch.c \
-	Harmonic.c Hi.c Histogram.c Importamsr.c Importbinary.c \
-	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
-	Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c Inttime.c \
-	Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c Log.c \
-	MapReduce.c Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c \
-	Mergetime.c Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c \
-	Nmltest.c Output.c Outputgmt.c Pack.c Pardup.c Pinfo.c \
-	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
-	Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
+	Condc.c Consecstat.c Copy.c Deltat.c Deltime.c Derivepar.c \
+	Detrend.c Diff.c Distgrid.c Duplicate.c EOFs.c Eof3d.c \
+	EcaIndices.c Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c \
+	Ensstat3.c Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c \
+	Filedes.c Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c \
+	Fourier.c Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c \
+	Gridsearch.c Harmonic.c Hi.c Histogram.c Importamsr.c \
+	Importbinary.c Importcmsaf.c Importobs.c Info.c Input.c \
+	Intgrid.c Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c \
+	Inttime.c Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c \
+	Log.c MapReduce.c Maskbox.c Mastrfu.c Math.c Merge.c \
+	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
+	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pack.c \
+	Pardup.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
+	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Selindex.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
 	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
 	Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth.c \
 	Sort.c Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c \
 	Split.c Splitrec.c Splitsel.c Splittime.c Splityear.c \
-	Subtrend.c Tee.c Templates.c Test.c Tests.c Timedt.c \
-	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
-	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
-	Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c Varrms.c \
-	Vertintml.c Vertintap.c Vertstat.c Vertcum.c Vertwind.c \
-	Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
-	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
-	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
-	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
-	nearpt3c.h Magplot.c Magvector.c Maggraph.c template_parser.h \
-	template_parser.c results_template_parser.h \
-	results_template_parser.c magics_template_parser.h \
-	magics_template_parser.c StringUtilities.h StringUtilities.c \
-	CdoMagicsMapper.h CdoMagicsMapper.c
+	Subtrend.c Tee.c Templates.c Test.c Tests.c Timcount.c \
+	Timpctl.c Timselpctl.c Timselstat.c Timsort.c Timstat.c \
+	Timstat2.c Timstat3.c Tinfo.c Tocomplex.c Transpose.c Trend.c \
+	Trms.c Tstepcount.c Vargen.c Varrms.c Vertintml.c Vertintap.c \
+	Vertstat.c Vertcum.c Vertwind.c Verifygrid.c Wct.c Wind.c \
+	Writegrid.c Writerandom.c XTimstat.c YAR.c Yearmonstat.c \
+	Ydayarith.c Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c \
+	Yhourarith.c Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c \
+	Yseaspctl.c Yseasstat.c Zonstat.c cdo.h nearpt3c.h Magplot.c \
+	Magvector.c Maggraph.c template_parser.h template_parser.c \
+	results_template_parser.h results_template_parser.c \
+	magics_template_parser.h magics_template_parser.c \
+	StringUtilities.h StringUtilities.c CdoMagicsMapper.h \
+	CdoMagicsMapper.c
 #endif
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
@@ -802,6 +802,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Condc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Consecstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Copy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Deltat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Deltime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Derivepar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Detrend.Po@am__quote@
@@ -925,7 +926,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Tests.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timcount.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timedt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timselpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timselstat.Po@am__quote@
@@ -2098,6 +2098,20 @@ cdo-Copy.obj: Copy.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Copy.c' object='cdo-Copy.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Copy.obj `if test -f 'Copy.c'; then $(CYGPATH_W) 'Copy.c'; else $(CYGPATH_W) '$(srcdir)/Copy.c'; fi`
+
+cdo-Deltat.o: Deltat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Deltat.o -MD -MP -MF $(DEPDIR)/cdo-Deltat.Tpo -c -o cdo-Deltat.o `test -f 'Deltat.c' || echo '$(srcdir)/'`Deltat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Deltat.Tpo $(DEPDIR)/cdo-Deltat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Deltat.c' object='cdo-Deltat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Deltat.o `test -f 'Deltat.c' || echo '$(srcdir)/'`Deltat.c
+
+cdo-Deltat.obj: Deltat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Deltat.obj -MD -MP -MF $(DEPDIR)/cdo-Deltat.Tpo -c -o cdo-Deltat.obj `if test -f 'Deltat.c'; then $(CYGPATH_W) 'Deltat.c'; else $(CYGPATH_W) '$(srcdir)/Deltat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Deltat.Tpo $(DEPDIR)/cdo-Deltat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Deltat.c' object='cdo-Deltat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Deltat.obj `if test -f 'Deltat.c'; then $(CYGPATH_W) 'Deltat.c'; else $(CYGPATH_W) '$(srcdir)/Deltat.c'; fi`
 
 cdo-Deltime.o: Deltime.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Deltime.o -MD -MP -MF $(DEPDIR)/cdo-Deltime.Tpo -c -o cdo-Deltime.o `test -f 'Deltime.c' || echo '$(srcdir)/'`Deltime.c
@@ -3750,20 +3764,6 @@ cdo-Tests.obj: Tests.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Tests.c' object='cdo-Tests.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Tests.obj `if test -f 'Tests.c'; then $(CYGPATH_W) 'Tests.c'; else $(CYGPATH_W) '$(srcdir)/Tests.c'; fi`
-
-cdo-Timedt.o: Timedt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timedt.o -MD -MP -MF $(DEPDIR)/cdo-Timedt.Tpo -c -o cdo-Timedt.o `test -f 'Timedt.c' || echo '$(srcdir)/'`Timedt.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Timedt.Tpo $(DEPDIR)/cdo-Timedt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Timedt.c' object='cdo-Timedt.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timedt.o `test -f 'Timedt.c' || echo '$(srcdir)/'`Timedt.c
-
-cdo-Timedt.obj: Timedt.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timedt.obj -MD -MP -MF $(DEPDIR)/cdo-Timedt.Tpo -c -o cdo-Timedt.obj `if test -f 'Timedt.c'; then $(CYGPATH_W) 'Timedt.c'; else $(CYGPATH_W) '$(srcdir)/Timedt.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Timedt.Tpo $(DEPDIR)/cdo-Timedt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Timedt.c' object='cdo-Timedt.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timedt.obj `if test -f 'Timedt.c'; then $(CYGPATH_W) 'Timedt.c'; else $(CYGPATH_W) '$(srcdir)/Timedt.c'; fi`
 
 cdo-Timcount.o: Timcount.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timcount.o -MD -MP -MF $(DEPDIR)/cdo-Timcount.Tpo -c -o cdo-Timcount.o `test -f 'Timcount.c' || echo '$(srcdir)/'`Timcount.c

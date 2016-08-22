@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-     Timedt    timedt         Delta t
+     Deltat    deltat         Delta t
 */
 
 
@@ -28,7 +28,7 @@
 #include "pstream.h"
 
 
-void *Timedt(void *argument)
+void *Deltat(void *argument)
 {
   int varID, levelID;
   int nmiss;

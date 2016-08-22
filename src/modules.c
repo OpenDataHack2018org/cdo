@@ -64,6 +64,7 @@ void *Cond2(void *argument);
 void *Condc(void *argument);
 void *Consecstat(void *argument);
 void *Copy(void *argument);
+void *Deltat(void *argument);
 void *Deltime(void *argument);
 void *Derivepar(void *argument);
 void *Detrend(void *argument);
@@ -183,7 +184,6 @@ void *Test(void *argument);
 void *Test2(void *argument);
 void *Testdata(void *argument);
 void *Tests(void *argument);
-void *Timedt(void *argument);
 void *Timsort(void *argument);
 void *Timcount(void *argument);
 void *Timpctl(void *argument);
@@ -300,6 +300,7 @@ void *Maggraph(void *argument);
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
 #define  ConsecstatOperators    {"consects", "consecsum"}
 #define  CopyOperators          {"copy", "selall", "szip"}
+#define  DeltatOperators        {"deltat"}
 #define  DeltimeOperators       {"delday", "del29feb"}
 #define  DeriveparOperators     {"gheight", "sealevelpressure"}
 #define  DetrendOperators       {"detrend"}
@@ -442,7 +443,6 @@ void *Maggraph(void *argument);
 #define  Test2Operators         {"test2"}
 #define  TestdataOperators      {"testdata"}
 #define  TestsOperators         {"normal", "studentt", "chisquare", "beta", "fisher"}
-#define  TimedtOperators        {"timedt"}
 #define  TimsortOperators       {"timsort"}
 #define  TimcountOperators      {"timcount"}
 #define    YearcountOperators   {"yearcount"}
@@ -587,6 +587,7 @@ static modules_t Modules[] =
   { Condc,          CondcHelp,         CondcOperators,         1,   CDI_REAL,  1,  1 },
   { Consecstat,     ConsecstatHelp,    ConsecstatOperators,    1,   CDI_REAL,  1,  1 },
   { Copy,           CopyHelp,          CopyOperators,          1,   CDI_REAL, -1,  1 },
+  { Deltat,         NULL,              DeltatOperators,        1,   CDI_REAL,  1,  1 },
   { Deltime,        NULL,              DeltimeOperators,       1,   CDI_REAL,  1,  1 },
   { Derivepar,      DeriveparHelp,     DeriveparOperators,     1,   CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       1,   CDI_REAL,  1,  1 },
@@ -731,7 +732,6 @@ static modules_t Modules[] =
   { Timpctl,        DaypctlHelp,       DaypctlOperators,       1,   CDI_REAL,  3,  1 },
   { Timpctl,        HourpctlHelp,      HourpctlOperators,      1,   CDI_REAL,  3,  1 },
   { Timselpctl,     TimselpctlHelp,    TimselpctlOperators,    1,   CDI_REAL,  3,  1 },
-  { Timedt,         NULL,              TimedtOperators,        1,   CDI_REAL,  1,  1 },
   { Timsort,        TimsortHelp,       TimsortOperators,       1,   CDI_REAL,  1,  1 },
   { Timselstat,     TimselstatHelp,    TimselstatOperators,    1,   CDI_REAL,  1,  1 },
   { XTimstat,       NULL,              XTimstatOperators,      0,   CDI_BOTH,  1,  1 },
