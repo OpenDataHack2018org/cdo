@@ -1783,7 +1783,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
       nvals++;
     }
 
-  if ( cdoVerbose ) cdoPrint("Total area = %g steradians", total_area);
+  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
 
   for ( int i = 0; i < gridsize; i++ )
     {
