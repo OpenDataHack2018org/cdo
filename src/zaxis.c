@@ -287,7 +287,6 @@ void gen_zaxis_height(zaxis_t *zaxis, const char *pline)
         {
           pline = endptr;
           if ( *pline == '_' ) pline++;
-          else return;
           
           if ( *pline == 0 ) return;
           const char *units = pline;
@@ -302,6 +301,7 @@ void gen_zaxis_height(zaxis_t *zaxis, const char *pline)
         }
     }
 }
+
 
 int zaxisFromName(const char *zaxisnameptr)
 {
