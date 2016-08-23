@@ -105,20 +105,14 @@ void printFiletype(int streamID, int vlistID)
 
   if ( filetype == FILETYPE_GRB || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
     {
-      int nvars, varID;
-      int comptype;
-
-      nvars = vlistNvars(vlistID);
-
-      for ( varID = 0; varID < nvars; varID++ )
+      int nvars = vlistNvars(vlistID);
+      for ( int varID = 0; varID < nvars; varID++ )
 	{
-	  comptype = vlistInqVarCompType(vlistID, varID);
+	  int comptype = vlistInqVarCompType(vlistID, varID);
 	  if ( comptype )
 	    {
-	      if ( comptype == CDI_COMPRESS_SZIP )
-		printf(" SZIP");
-	      else if ( comptype == CDI_COMPRESS_ZIP )
-		printf(" ZIP");
+	      if      ( comptype == CDI_COMPRESS_SZIP ) printf(" SZIP");
+	      else if ( comptype == CDI_COMPRESS_ZIP  ) printf(" ZIP");
 
 	      break;
 	    }
@@ -127,16 +121,13 @@ void printFiletype(int streamID, int vlistID)
 
   if ( filetype == FILETYPE_GRB2 )
     {
-      int comptype;
       int nvars = vlistNvars(vlistID);
       for ( int varID = 0; varID < nvars; varID++ )
 	{
-	  comptype = vlistInqVarCompType(vlistID, varID);
+	  int comptype = vlistInqVarCompType(vlistID, varID);
 	  if ( comptype )
 	    {
-	      if ( comptype == CDI_COMPRESS_JPEG )
-		printf(" JPEG");
-
+	      if ( comptype == CDI_COMPRESS_JPEG ) printf(" JPEG");
 	      break;
 	    }
 	}
@@ -526,6 +517,8 @@ void printZaxisInfo(int vlistID)
       set_text_color(stdout, RESET, GREEN);
 #endif
       fprintf(stdout, " levels=%d", levelsize);
+      bool zscalar = (levelsize == 1) ? zaxisInqScalar(zaxisID) : false;
+      if ( zscalar ) fprintf(stdout, "  scalar");
       my_reset_text_color(stdout);
       fprintf(stdout, "\n");
 
@@ -538,12 +531,13 @@ void printZaxisInfo(int vlistID)
           double zlast  = levels[levelsize-1];
           if ( levelsize > 2 )
             {
-              int levelID;
               zinc = (levels[levelsize-1] - levels[0]) / (levelsize-1);
-              for ( levelID = 2; levelID < levelsize; ++levelID )
-                if ( fabs(fabs(levels[levelID] - levels[levelID-1]) - zinc) > 0.001*zinc ) break;
-
-              if ( levelID < levelsize ) zinc = 0;
+              for ( int levelID = 2; levelID < levelsize; ++levelID )
+                if ( fabs(fabs(levels[levelID] - levels[levelID-1]) - zinc) > 0.001*zinc )
+                  {
+                    zinc = 0;
+                    break;
+                  }
             }
 
           fprintf(stdout, "%33s : %.*g", zname, dig, zfirst);
