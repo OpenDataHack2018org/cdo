@@ -38,7 +38,7 @@ typedef struct {
   int     vctsize;
   int     type;
   int     size;
-  bool    lscalar;
+  bool    scalar;
   char    name[CDI_MAX_NAME];
   char    longname[CDI_MAX_NAME];
   char    units[CDI_MAX_NAME];
@@ -55,7 +55,7 @@ void zaxisInit(zaxis_t *zaxis)
   zaxis->type        = UNDEFID;
   zaxis->vctsize     = 0;
   zaxis->size        = 0;
-  zaxis->lscalar     = false;
+  zaxis->scalar      = false;
   zaxis->name[0]     = 0;
   zaxis->longname[0] = 0;
   zaxis->units[0]    = 0;
@@ -104,7 +104,7 @@ int zaxisDefine(zaxis_t zaxis)
 
   int zaxisID = zaxisCreate(zaxis.type, zaxis.size);
 
-  if ( zaxis.size == 1 && zaxis.lscalar ) zaxisDefScalar(zaxisID);
+  if ( zaxis.size == 1 && zaxis.scalar ) zaxisDefScalar(zaxisID);
 
   if ( zaxis.vals )
     {
@@ -210,6 +210,11 @@ int zaxisFromFile(FILE *gfp, const char *dname)
 	{
 	  zaxis.size = atol(skipSeparator(pline + len));
 	}
+      else if ( cmpstrlen(pline, "scalar", len)  == 0 )
+	{
+          if ( strcmp("true", skipSeparator(pline + len)) == 0 )
+            zaxis.scalar = true;
+	}
       else if ( cmpstrlen(pline, "vctsize", len)  == 0 )
 	{
 	  zaxis.vctsize = atol(skipSeparator(pline + len));
@@ -293,7 +298,7 @@ void gen_zaxis_height(zaxis_t *zaxis, const char *pline)
 
           zaxis->type = zaxistype;
           zaxis->size = 1;
-          // zaxis->lscalar = true;
+          // zaxis->scalar = true;
           double *levels = (double*) Malloc(sizeof(double));
           *levels = value;
           zaxis->vals = levels;
