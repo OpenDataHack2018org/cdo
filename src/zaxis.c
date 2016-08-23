@@ -303,6 +303,13 @@ void gen_zaxis_height(zaxis_t *zaxis, const char *pline)
           *levels = value;
           zaxis->vals = levels;
           strcpy(zaxis->units, units);
+
+          size_t len = strlen(units);
+          if ( len > 2 && units[len-2] == '_' && units[len-1] == 's' )
+            {
+              zaxis->units[len-2] = 0;
+              zaxis->scalar = true;
+            }
         }
     }
 }
