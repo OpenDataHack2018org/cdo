@@ -353,7 +353,7 @@ void *Filedes(void *argument)
 	  if ( type == ZAXIS_HYBRID || type == ZAXIS_HYBRID_HALF )
 	    {
 	      int vctsize = zaxisInqVctSize(zaxisID);
-	      const double *vct     = zaxisInqVctPtr(zaxisID);
+	      const double *vct = zaxisInqVctPtr(zaxisID);
 		
 	      if ( vctsize%2 == 0 )
 		{
