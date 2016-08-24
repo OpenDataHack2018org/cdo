@@ -165,7 +165,7 @@ int getDate(const char *name)
 
   if ( pname ) date = atoi(pname+1);
 
-  return(date);
+  return date;
 }
 
 

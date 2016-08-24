@@ -107,15 +107,14 @@ static int compnlon(int nlat)
 }
 
 
-static int nlat2nlon(int nlat)
+static
+int nlat2nlon(int nlat)
 {
-  int nlon, m, ierr;
+  if ( nlat == 0 ) cdoAbort("nlat = 0!");
 
-  if ( nlat == 0 )
-    cdoAbort("nlat = 0!");
+  int nlon = 2*nlat;
 
-  nlon = 2*nlat;
-
+  int m, ierr;
   fac(nlon, &m, &ierr);
   /* adjust till fft is possible */
   while (ierr != 0) 
@@ -126,7 +125,7 @@ static int nlat2nlon(int nlat)
       fac(nlon, &m, &ierr);
     }
 
-  return (nlon);
+  return nlon;
 }
 
 
@@ -138,16 +137,15 @@ int ngp2ntr(int ngp)
 
   ntr = (2*nlatl-1)/2;
 
-  return (ntr);
+  return ntr;
 }
 
 
 int ipow(int i1, int i2)
 {
-  int i;
   int i3 = 1;
 
-  for ( i = 0; i < i2; ++i ) i3 *= i1;
+  for ( int i = 0; i < i2; ++i ) i3 *= i1;
 
   return i3;
 }

@@ -61,13 +61,11 @@ static void namelist_init(namelist_t *namelist, const char *name)
 
 namelist_t *namelistNew(const char *name)
 {
-  namelist_t *namelist;
-
-  namelist = (namelist_t*) Malloc(sizeof(namelist_t));
+  namelist_t *namelist = (namelist_t*) Malloc(sizeof(namelist_t));
 
   namelist_init(namelist, name);
 
-  return (namelist);
+  return namelist;
 }
 
 
@@ -191,7 +189,7 @@ int namelistAdd(namelist_t *nml, const char *name, int type, int dis, void *ptr,
   entry = nml->size;
   nml->entry[nml->size++] = nml_entry;
 
-  return (entry);
+  return entry;
 }
 
 
@@ -215,16 +213,16 @@ int namelistNum(namelist_t *nml, const char *name)
   if ( i == nml->size )
     fprintf(stderr, "Namelist entry %s not found in %s\n", name, nml->name);
 
-  return (nocc);
+  return nocc;
 }
 
 static
 void getnite(FILE *nmlfp, namelist_t *nml)
 {
-  int nst, i, j;
+  int i, j;
   int linelen;
 
-  nst = nml->line.namitl + 1;
+  int nst = nml->line.namitl + 1;
 
   while ( TRUE )
     {
@@ -404,13 +402,13 @@ void rdnlsgl(namelist_t *nml, void *var, int ntyp, int nlen, int *nocc)
 
 static void nml_print_entry(nml_entry_t *entry, int ife)
 {
-  int nout, j;
+  int j;
 
   if ( entry->size == 0 ) return;
 
   if ( entry->type == NML_NPR ) return;
 
-  nout = entry->occ;
+  int nout = entry->occ;
 
   if ( ife != PRINT_ALL )
     if ( entry->occ > entry->dis ) nout = entry->dis;
@@ -437,9 +435,7 @@ static void nml_print_entry(nml_entry_t *entry, int ife)
 
 static void nml_print(namelist_t *nml, int ife)
 {
-  int i;
-
-  for ( i = 0; i < nml->size; i++ )
+  for ( int i = 0; i < nml->size; i++ )
     nml_print_entry(nml->entry[i], ife);
 }
 

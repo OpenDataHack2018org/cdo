@@ -1383,7 +1383,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
 
   int unstructuredSelectionGridID = gridCreate(GRID_UNSTRUCTURED,selectionSize);
 
-  if ( nocoords ) return (unstructuredSelectionGridID);
+  if ( nocoords ) return unstructuredSelectionGridID;
   /* }}} */
 
   /* copy meta data of coordinates {{{*/
@@ -1466,7 +1466,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   Free(xvals);
   Free(yvals);
 
-  return (unstructuredSelectionGridID);
+  return unstructuredSelectionGridID;
 }
 
 int gridToUnstructured(int gridID1, int lbounds)

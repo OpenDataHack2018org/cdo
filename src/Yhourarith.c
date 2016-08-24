@@ -54,7 +54,7 @@ int hour_of_year(int vdate, int vtime)
       cdoAbort("Hour of year %d out of range (%s %s)!", houroy, vdatestr, vtimestr);
     }
 
-  return (houroy);
+  return houroy;
 }
 
 

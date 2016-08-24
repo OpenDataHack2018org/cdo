@@ -40,7 +40,7 @@
 
 long get_nfft(void)
 {
-  return ((long) NFFT);
+  return (long) NFFT;
 }
 
 

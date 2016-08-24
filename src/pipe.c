@@ -123,13 +123,11 @@ void pipe_init(pipe_t *pipe)
 
 pipe_t *pipeNew()
 {
-  pipe_t *pipe;
-
-  pipe = (pipe_t*) Malloc(sizeof(pipe_t));
+  pipe_t *pipe = (pipe_t*) Malloc(sizeof(pipe_t));
 
   pipe_init(pipe);
 
-  return (pipe);
+  return pipe;
 }
 
 
@@ -211,7 +209,7 @@ int pipeInqVlist(pstream_t *pstreamptr)
   pthread_mutex_unlock(pipe->mutex);
   // UNLOCK
 
-  return (vlistID);
+  return vlistID;
 }
 
 
@@ -267,7 +265,7 @@ int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
 
   pthread_cond_signal(pipe->tsInq);
 
-  return (nrecs);
+  return nrecs;
 }
 
 

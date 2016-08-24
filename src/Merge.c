@@ -112,7 +112,7 @@ int vlistConstVars(int vlistID)
   for ( int varID = 0; varID < nvars; ++varID )
     if ( vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT ) return 0;
 
-  return (1);
+  return 1;
 }
 */
 

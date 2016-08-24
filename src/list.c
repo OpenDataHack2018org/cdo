@@ -50,7 +50,7 @@ LIST *listNew(int type)
       listInit(list, type);
     }
 
-  return (list);
+  return list;
 }
 
 
@@ -66,7 +66,7 @@ void listDelete(LIST *list)
 
 void *listArrayPtr(LIST *list)
 {
-  return (list->array);
+  return list->array;
 }
 
 
@@ -101,28 +101,24 @@ void listSetFlt(LIST *list, int num, double fval)
 
 int listGetInt(LIST *list, int num)
 {
-  int ival;
+  int ival = ((int *) list->array)[num];
 
-  ival = ((int *) list->array)[num];
-
-  return (ival);
+  return ival;
 }
 
 
 double listGetFlt(LIST *list, int num)
 {
-  double fval;
+  double fval = ((double *) list->array)[num];
 
-  fval = ((double *) list->array)[num];
-
-  return (fval);
+  return fval;
 }
 
 static
 int get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
 {
-  int ival = idefault;
   int i;
+  int ival = idefault;
 
   for ( i = istart; i < iend; i++ )
     {
@@ -138,16 +134,14 @@ int get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
 
   *ilast = i;
 
-  return (ival);
+  return ival;
 }
 
 
 void split_intstring(const char *intstr, int *first, int *last, int *inc)
 {
   int i, start;
-  int istrlen;
-
-  istrlen = strlen(intstr);
+  int istrlen = strlen(intstr);
   *first = parameter2intlist(intstr);
   *last  = *first;
   *inc   = 1;
@@ -186,7 +180,7 @@ int args2intlist(int argc, char **argv, LIST *list)
 	}
     }
 
-  return (nint);
+  return nint;
 }
 
 
@@ -235,5 +229,5 @@ int args2fltlist(int argc, char **argv, LIST *list)
 	}
     }
 
-  return (nint);
+  return nint;
 }

@@ -90,7 +90,7 @@ int kvlNewList(kvl_t *kvl)
   kvl->num_lists++;
   assert(kvl->num_lists < MAX_KVLISTS);
 
-  return (kvl->num_lists-1);
+  return kvl->num_lists-1;
 }
 
 static
@@ -101,7 +101,7 @@ int kvlNewListElement(kvl_t *kvl, int listID)
   kvl->lists[listID].num_elements++;
   assert(kvl->lists[listID].num_elements < MAX_KVELEMENTS);
 
-  return (kvl->lists[listID].num_elements-1);
+  return kvl->lists[listID].num_elements-1;
 }
 
 static
@@ -111,7 +111,7 @@ int kvlAddList(kvl_t *kvl, const char *name)
 
   strcpy(kvl->lists[listID].name, name);
 
-  return (listID);
+  return listID;
 }
 
 static
@@ -147,7 +147,7 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
 
   if ( *buffersize == 0 && ipos == 0 ) buffer = NULL;
 
-  return (buffer);
+  return buffer;
 }
 
 static
@@ -163,7 +163,7 @@ char *skipSeparator(char *pline)
   if ( *pline == '=' || *pline == ':' ) pline++;
   while ( isspace((int) *pline) ) pline++;
 
-  return (pline);
+  return pline;
 }
 
 static
@@ -179,7 +179,7 @@ char *getElementName(char *pline, char *name)
   name[pos] = 0;
 
   pline += pos;
-  return (pline);
+  return pline;
 }
 
 static
@@ -191,7 +191,7 @@ char *getElementValue(char *pline)
   len = strlen(pline);
   while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--;}
 
-  return (pline);
+  return pline;
 }
 
 static
@@ -268,42 +268,36 @@ void kvlParseBuffer(kvl_t *kvl)
 
 void *kvlParseFile(const char *filename)
 {
-  kvl_t *kvl = NULL;
-  FILE *fp;
-  char *buffer;
-  size_t filesize;
-  size_t nitems;
-
   assert(filename != NULL);
 
-  filesize = fileSize(filename);
+  size_t filesize = fileSize(filename);
 
-  fp = fopen(filename, "r");
+  FILE *fp = fopen(filename, "r");
   if ( fp == NULL )
     {
       fprintf(stderr, "Open failed on %s: %s\n", filename, strerror(errno));
-      return (kvl);
+      return NULL;
     }
 
-  buffer = (char*) Malloc(filesize);
-  nitems = fread(buffer, 1, filesize, fp);
+  char *buffer = (char*) Malloc(filesize);
+  size_t nitems = fread(buffer, 1, filesize, fp);
 
   fclose(fp);
 
   if ( nitems != filesize )
     {
       fprintf(stderr, "Read failed on %s!\n", filename);
-      return (kvl);
+      return NULL;
     }
  
-  kvl = (kvl_t*) Calloc(1, sizeof(kvl_t));
+  kvl_t *kvl = (kvl_t*) Calloc(1, sizeof(kvl_t));
   kvl->buffer = buffer;
   kvl->buffersize = filesize;
   kvl->filename = strdup(filename);
 
   kvlParseBuffer(kvl);
   
-  return ((void *) kvl);
+  return (void *) kvl;
 }
 
 
@@ -326,60 +320,56 @@ int kvlGetNumLists(void *kvlist)
 
   assert(kvl != NULL);
 
-  return(kvl->num_lists);
+  return kvl->num_lists;
 }
 
 
 const char *kvlGetListName(void *kvlist, int listID)
 {
   kvl_t *kvl = (kvl_t *) kvlist;
-  char *listname = NULL;
   
   assert(listID < kvl->num_lists);
   
-  listname = kvl->lists[listID].name;
+  const char *listname = kvl->lists[listID].name;
 
-  return (listname);
+  return listname;
 }
 
 int kvlGetListNumElements(void *kvlist, int listID)
 {
   kvl_t *kvl = (kvl_t *) kvlist;
-  int nelements = 0;
 
   assert(listID < kvl->num_lists);
 
-  nelements = kvl->lists[listID].num_elements;
+  int nelements = kvl->lists[listID].num_elements;
 
-  return (nelements);
+  return nelements;
 }
 
 
 const char *kvlGetListElementName(void *kvlist, int listID, int elemID)
 {
   kvl_t *kvl = (kvl_t *) kvlist;
-  char *ename = NULL;
 
   assert(listID < kvl->num_lists);
   assert(elemID < kvl->lists[listID].num_elements);
 
-  ename = kvl->lists[listID].elements[elemID].name;
+  char *ename = kvl->lists[listID].elements[elemID].name;
 
-  return (ename);
+  return ename;
 }
 
 
 const char *kvlGetListElementValue(void *kvlist, int listID, int elemID)
 {
   kvl_t *kvl = (kvl_t *) kvlist;
-  char *evalue = NULL;
 
   assert(listID < kvl->num_lists);
   assert(elemID < kvl->lists[listID].num_elements);
 
-  evalue = kvl->lists[listID].elements[elemID].value;
+  const char *evalue = kvl->lists[listID].elements[elemID].value;
 
-  return (evalue);
+  return evalue;
 }
 
 /*

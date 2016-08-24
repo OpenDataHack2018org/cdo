@@ -88,7 +88,7 @@ int valid_argument (char *caller, char *arg)
       fprintf (stderr, "%s: Argument required.\n", caller);
       return 0;
     }
-  return (1);
+  return 1;
 }
 
 /* Print out help for ARG, or for all of the commands if ARG is not present. */
@@ -226,13 +226,11 @@ int com_vars(const char *arg)
    command. Return a NULL pointer if NAME isn't a command name. */
 command_t *find_command(char *name)
 {
-  int i;
-
-  for ( i = 0; commands[i].name; i++ )
+  for ( int i = 0; commands[i].name; i++ )
     if ( strcmp(name, commands[i].name) == 0)
-      return (&commands[i]);
+      return &commands[i];
 
-  return ((command_t *)NULL);
+  return (command_t *)NULL;
 }
 
 /* Execute a command line. */
@@ -261,7 +259,7 @@ int execute_line(char *line)
 
   word = line + i;
   /* Call the function. */
-  return ((*(command->func)) (word));
+  return (*(command->func)) (word);
 }
 
 /* Strip isspace from the start and end of STRING. Return a pointer into STRING. */
@@ -271,7 +269,7 @@ char *stripwhite(char *string)
   for (s = string; isspace(*s); s++)
     ;
   if (*s == 0)
-    return (s);
+    return s;
   t = s + strlen (s) - 1;
   while (t > s && isspace(*t))
     t--;

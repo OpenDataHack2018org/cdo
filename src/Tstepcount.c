@@ -36,7 +36,7 @@ double tstepcount(long nts, double missval1, double *array1, double refval)
   long j;
   long n = 0;
 
-  if ( DBL_IS_EQUAL(refval, missval1) ) return (missval1);
+  if ( DBL_IS_EQUAL(refval, missval1) ) return missval1;
 
   for ( j = 0; j < nts; j++ )
     {

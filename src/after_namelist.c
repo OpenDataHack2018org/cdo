@@ -8,12 +8,10 @@
 static
 char *amatch(char *msr, const char *sub)
 {
-  int i,nm,ns;
+  int nm = strlen(msr);
+  int ns = strlen(sub);
 
-  nm = strlen(msr);
-  ns = strlen(sub);
-
-  for (i = 0; i < nm-ns; i++)
+  for ( int i = 0; i < nm-ns; i++ )
     if (strncmp (msr+i,sub,ns) == 0) return (msr+i+ns);
 
   return NULL;
@@ -22,28 +20,26 @@ char *amatch(char *msr, const char *sub)
 
 int scan_par_obsolate(char *namelist, const char *name, int def)
 {
-  char *cp;
   int value;
 
-  cp = amatch(namelist, name);
+  char *cp = amatch(namelist, name);
 
   if ( cp == NULL ) value = def;
-  else              value = atoi (cp);
+  else              value = atoi(cp);
   /*
   fprintf(stdout, " %16.16s = %6d ", name, value);
   if ( value == def ) fprintf(stdout, " (default)\n");
   else                fprintf(stdout, "          \n");
   */
-  return (value);
+  return value;
 }
 
 
 int scan_par(int verbose, char *namelist, const char *name, int def)
 {
-  char *cp;
   int value;
 
-  cp = amatch(namelist, name);
+  char *cp = amatch(namelist, name);
 
   if ( cp == NULL ) value = def;
   else              value = atoi (cp);
@@ -55,17 +51,16 @@ int scan_par(int verbose, char *namelist, const char *name, int def)
       else                fprintf(stdout, "          \n");
     }
   
-  return (value);
+  return value;
 }
 
 
 int scan_time(int verbose, char *namelist, int *hours, int max_hours)
 {
-  char *cp, *icp;
-  int time;
+  char *icp;
   int nrqh = 0;
 
-  cp = amatch (namelist, "timesel");
+  char *cp = amatch (namelist, "timesel");
   if ( cp == NULL )
     {
       hours[nrqh++] = -1;
@@ -73,7 +68,7 @@ int scan_time(int verbose, char *namelist, int *hours, int max_hours)
       return (nrqh);
     }
 
-  time = (int) strtol (cp, &icp, 10);
+  int time = (int) strtol (cp, &icp, 10);
 
   while ((char *)icp != (char *)cp && nrqh < max_hours)
     {
@@ -89,19 +84,19 @@ int scan_time(int verbose, char *namelist, int *hours, int max_hours)
       fprintf(stdout, "\n");
     }
   
-  return (nrqh);
+  return nrqh;
 }
 
 
 void scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCodes)
 {
-  char *cp, *icp;
-  int code, ncodes = 0;
+  char *icp;
+  int ncodes = 0;
 
-  cp = amatch(namelist, "code");
+  char *cp = amatch(namelist, "code");
   if ( cp != NULL )
     {
-      code = (int) strtol(cp,&icp,10);
+      int code = (int) strtol(cp,&icp,10);
       while ( code > 0 && code < maxCodes )
 	{
 	  ncodes++;
@@ -117,11 +112,11 @@ void scan_code(char *namelist, struct Variable *vars, int maxCodes, int *numCode
 
 void scan_darray(char *namelist, const char *name, double *values, int maxValues, int *numValues)
 {
-  char *cp,*icp;
+  char *icp;
   double val;
   int nval = 0;
 
-  cp = amatch(namelist, name);
+  char *cp = amatch(namelist, name);
 
   if ( cp != NULL )
     {

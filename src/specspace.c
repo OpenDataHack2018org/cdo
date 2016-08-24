@@ -166,7 +166,7 @@ SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
   for ( int jgl = 0; jgl < nlat; ++jgl )
     sptrans->rcoslat[jgl] = 1.0 / sptrans->coslat[jgl];
 
-  return (sptrans);
+  return sptrans;
 }
 
 
@@ -201,7 +201,7 @@ DVTRANS *dvtrans_new(int ntr)
 
   geninx(ntr, dvtrans->f1, dvtrans->f2);
 
-  return (dvtrans);
+  return dvtrans;
 }
 
 
@@ -283,4 +283,3 @@ void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev,
 
   Free(fpwork);
 }
-

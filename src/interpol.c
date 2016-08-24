@@ -30,7 +30,7 @@ long find_element(double x, long nelem, const double *restrict array)
   if ( array[0] < array[nelem-1] ) // ascending order
     {
       /* return the length of the array if x is out of bounds */
-      if ( x < array[0] || x > array[nelem-1] ) return (nelem);
+      if ( x < array[0] || x > array[nelem-1] ) return nelem;
 
       /* search for the interval in which x fits */
       // implementation: binary search algorithm
@@ -56,7 +56,7 @@ long find_element(double x, long nelem, const double *restrict array)
   else
     {
       /* return the length of the array if x is out of bounds */
-      if ( x < array[nelem-1] || x > array[0] ) return (nelem);
+      if ( x < array[nelem-1] || x > array[0] ) return nelem;
 
       /* search for the interval in which x fits */
       // implementation: binary search algorithm
@@ -82,7 +82,7 @@ long find_element(double x, long nelem, const double *restrict array)
 
   if ( mid > 1 && IS_EQUAL(x,array[mid-1]) ) mid--;
 
-  return (mid);
+  return mid;
 }
 
 /*
@@ -101,7 +101,7 @@ long find_element(double x, long nelem, const double *array)
 	if ( x >= array[ii] && x <= array[ii-1] ) break;
     }
 
-  return (ii);
+  return ii;
 }
 */
 
@@ -118,7 +118,7 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
       if ( *ii < nxm ) lfound = 1;
     }
 
-  return (lfound);
+  return lfound;
 }
 
 
@@ -171,7 +171,7 @@ int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm
 	}
     }
 
-  return (lfound);
+  return lfound;
 }
 
 
@@ -663,11 +663,9 @@ double intlin(double x, double y1, double x1, double y2, double x2)
 
     Uwe Schulzweida  04/05/1995
   */
-  double value;
-  
-  value = (y2*(x-x1)+y1*(x2-x)) / (x2-x1);
+  double value = (y2*(x-x1)+y1*(x2-x)) / (x2-x1);
 
-  return (value);
+  return value;
 }
 
 
@@ -678,10 +676,8 @@ void intlinarr(long nxm, double *ym, double *xm, int nx, double *y, double *x)
 
     Uwe Schulzweida  04/05/1995
   */
-  long j, jj;
-
-  for ( jj = 1; jj < nxm; jj++ )
-    for ( j = 0; j < nx; j++ )
+  for ( long jj = 1; jj < nxm; jj++ )
+    for ( long j = 0; j < nx; j++ )
       if ( x[j] >= xm[jj-1] && x[j] <= xm[jj] )
 	y[j] = intlin(x[j], ym[jj-1], xm[jj-1], ym[jj], xm[jj]);
 }

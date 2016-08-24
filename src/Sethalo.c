@@ -172,7 +172,7 @@ int gentpngrid(int gridID1)
 	}
     }
 
-  return (gridID2);
+  return gridID2;
 }
 
 static
@@ -374,15 +374,12 @@ int gengrid(int gridID1, int lhalo, int rhalo)
 static
 int genindexgrid(int gridID1, int *lhalo, int *rhalo)
 {
-  int gridID2;
-  int nlon1;
-
   operatorCheckArgc(2);
 
   *lhalo = parameter2int(operatorArgv()[0]);
   *rhalo = parameter2int(operatorArgv()[1]);
 
-  nlon1 = gridInqXsize(gridID1);
+  int nlon1 = gridInqXsize(gridID1);
 
   if ( *lhalo > nlon1 )
     {
@@ -408,36 +405,32 @@ int genindexgrid(int gridID1, int *lhalo, int *rhalo)
       cdoWarning("right halo out of range. Set to %d.", rhalo);
     }
 
-  gridID2 = gengrid(gridID1, *lhalo, *rhalo);
+  int gridID2 = gengrid(gridID1, *lhalo, *rhalo);
 
-  return (gridID2);
+  return gridID2;
 }
 
 
 static
 void halo(double *array1, int gridID1, double *array2, int lhalo, int rhalo)
 {
-  int nlon1, nlat;
-  int ilat, ilon;
-  int nmin, nmax;
+  int nlon1 = gridInqXsize(gridID1);
+  int nlat  = gridInqYsize(gridID1);
 
-  nlon1 = gridInqXsize(gridID1);
-  nlat  = gridInqYsize(gridID1);
-
-  nmin = 0;
-  nmax = nlon1;
+  int nmin = 0;
+  int nmax = nlon1;
   if ( lhalo < 0 ) nmin  = -lhalo;
   if ( rhalo < 0 ) nmax +=  rhalo;
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  for ( int ilat = 0; ilat < nlat; ilat++ )
     {
-      for ( ilon = nlon1-lhalo; ilon < nlon1; ilon++ )
+      for ( int ilon = nlon1-lhalo; ilon < nlon1; ilon++ )
 	*array2++ = array1[ilat*nlon1 + ilon];
 
-      for ( ilon = nmin; ilon < nmax; ilon++ )
+      for ( int ilon = nmin; ilon < nmax; ilon++ )
 	*array2++ = array1[ilat*nlon1 + ilon];
 
-      for ( ilon = 0; ilon < rhalo; ilon++ )
+      for ( int ilon = 0; ilon < rhalo; ilon++ )
 	*array2++ = array1[ilat*nlon1 + ilon];
     }
 }
@@ -446,21 +439,16 @@ void halo(double *array1, int gridID1, double *array2, int lhalo, int rhalo)
 static
 void tpnhalo(double *array1, int gridID1, double *array2)
 {
-  int nlon, nlat;
-  int ilat, ilon, ilonr;
+  int nlon = gridInqXsize(gridID1);
+  int nlat = gridInqYsize(gridID1);
 
-  nlon = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
+  for ( int ilat = 0; ilat < nlat; ilat++ )
+    for ( int ilon = 0; ilon < nlon; ilon++ )
+      array2[(ilat+2)*nlon + ilon] = array1[ilat*nlon + ilon];
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  for ( int ilon = 0; ilon < nlon; ilon++ )
     {
-      for ( ilon = 0; ilon < nlon; ilon++ )
-	array2[(ilat+2)*nlon + ilon] = array1[ilat*nlon + ilon];
-    }
-
-  for ( ilon = 0; ilon < nlon; ilon++ )
-    {
-      ilonr = nlon - ilon - 1;
+      int ilonr = nlon - ilon - 1;
       array2[1*nlon + ilon] = array2[2*nlon + ilonr]; /* syncronise line 2 with line 3 */
       array2[0*nlon + ilon] = array2[3*nlon + ilonr]; /* syncronise line 1 with line 4 */
     }

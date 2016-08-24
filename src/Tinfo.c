@@ -209,7 +209,7 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
       ntsm[ngaps] = its;
     }
 
-  return (its);
+  return its;
 }
 
 

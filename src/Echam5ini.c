@@ -271,7 +271,7 @@ int import_e5ml(const char *filename, VAR **vars)
   cdoAbort("NetCDF support not compiled in!");
 #endif
 
-  return (nvars);
+  return nvars;
 }
 
 static
@@ -1078,7 +1078,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   cdoAbort("NetCDF support not compiled in!");
 #endif
 
-  return (nvars);
+  return nvars;
 }
 
 static

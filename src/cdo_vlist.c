@@ -160,7 +160,7 @@ int cmpnames(const void *s1, const void *s2)
 void vlistCompare(int vlistID1, int vlistID2, int flag)
 {
   int varID;
-  int lchecknames = FALSE;
+  bool lchecknames = false;
 
   if ( vlistNvars(vlistID1) != vlistNvars(vlistID2) )
     cdoAbort("Input streams have different number of variables per timestep!");
@@ -184,7 +184,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	      if ( strcmp(name1, name2) != 0 )
 		{
 		  cdoWarning("Input streams have different parameters!");
-		  lchecknames = TRUE;
+		  lchecknames = true;
 		  flag -= CMP_NAME;
 		  //    break;
 		}
@@ -214,16 +214,16 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
               zaxisInqLevels(zaxisID1, lev1);
               zaxisInqLevels(zaxisID2, lev2);
               
-              int ldiffer = FALSE;
+              bool ldiffer = false;
               for ( int i = 0; i < nlev1; ++i )
                 if ( IS_NOT_EQUAL(lev1[i], lev2[i]) )
-                  { ldiffer = TRUE; break; }
+                  { ldiffer = true; break; }
               if ( ldiffer )
                 {
-                  ldiffer = FALSE;
+                  ldiffer = false;
                   for ( int i = 0; i < nlev1; ++i )
                     if ( IS_NOT_EQUAL(lev1[i], lev2[nlev1-1-i]) )
-                      { ldiffer = TRUE; break; }
+                      { ldiffer = true; break; }
 
                   if ( ldiffer )
                     cdoWarning("Input parameters have different levels!");
@@ -239,10 +239,8 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 
   if ( flag & CMP_GRID )
     {
-      int gridID1, gridID2;
-
-      gridID1 = vlistInqVarGrid(vlistID1, 0);
-      gridID2 = vlistInqVarGrid(vlistID2, 0);
+      int gridID1 = vlistInqVarGrid(vlistID1, 0);
+      int gridID2 = vlistInqVarGrid(vlistID2, 0);
 
       compareGrids(gridID1, gridID2);
     }
@@ -294,10 +292,8 @@ int vlistCompareX(int vlistID1, int vlistID2, int flag)
 
   if ( flag & CMP_GRID )
     {
-      int gridID1, gridID2;
-
-      gridID1 = vlistInqVarGrid(vlistID1, 0);
-      gridID2 = vlistInqVarGrid(vlistID2, 0);
+      int gridID1 = vlistInqVarGrid(vlistID1, 0);
+      int gridID2 = vlistInqVarGrid(vlistID2, 0);
 
       compareGrids(gridID1, gridID2);
     }
@@ -341,7 +337,7 @@ int vlistInqNWPV(int vlistID, int varID)
 
 int vlist_check_gridsize(int vlistID)
 {
-  int lerror = FALSE;
+  bool lerror = false;
   int ngrids = vlistNgrids(vlistID);
   int gridID = vlistGrid(vlistID, 0);
   int ngp    = gridInqSize(gridID);
@@ -352,7 +348,7 @@ int vlist_check_gridsize(int vlistID)
       gridID = vlistGrid(vlistID, index);
       if ( ngp != gridInqSize(gridID) )
 	{
-	  lerror = TRUE;
+	  lerror = true;
 	  break;
 	}
     }

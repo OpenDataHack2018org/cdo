@@ -164,7 +164,7 @@ int datelist(LIST *flist)
       nsel = 2;
     }
 
-  return (nsel);
+  return nsel;
 }
 
 

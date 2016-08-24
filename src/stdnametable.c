@@ -39,28 +39,28 @@ static int stdnametable_idx(int varid)
 
   assert( idx < num_entries );
 
-  return (idx);
+  return idx;
 }
 
 
 int var_echamcode(int varid)
 {
-  return (stdnametable[stdnametable_idx(varid)].echamcode);
+  return stdnametable[stdnametable_idx(varid)].echamcode;
 }
 
 const char* var_name(int varid)
 {
-  return (stdnametable[stdnametable_idx(varid)].name);
+  return stdnametable[stdnametable_idx(varid)].name;
 }
 
 const char* var_stdname(int varid)
 {
-  return (stdnametable[stdnametable_idx(varid)].stdname);
+  return stdnametable[stdnametable_idx(varid)].stdname;
 }
 
 const char* var_units(int varid)
 {
-  return (stdnametable[stdnametable_idx(varid)].units);
+  return stdnametable[stdnametable_idx(varid)].units;
 }
 
 int echamcode_from_stdname(const char* stdname)
@@ -75,7 +75,7 @@ int echamcode_from_stdname(const char* stdname)
   else if ( strcmp(stdname, var_stdname(air_pressure_at_sea_level)) == 0 ) code = 151;
   else if ( strcmp(stdname, var_stdname(geopotential_height))       == 0 ) code = 156;
 
-  return (code);
+  return code;
 }
 
 

@@ -72,21 +72,14 @@ int getoptname(char *optname, const char *optstring, int nopt)
   for ( int i = 0; i < nopt; i++ )
     {
       pend = strchr(pname, ',');
-      if ( pend == NULL )
-	break;
-      else
-	pname = pend + 1;
+      if ( pend == NULL ) break;
+      pname = pend + 1;
     }
 
   if ( pend )
     {
-      size_t namelen;
       pend = strchr(pname, ',');
-      if ( pend == NULL )
-	namelen = strlen(pname);
-      else
-	namelen = pend - pname;
-
+      size_t namelen = (pend == NULL) ? strlen(pname) : (size_t)(pend-pname);
       memcpy(optname, pname, namelen);
       optname[namelen] = '\0';
     }

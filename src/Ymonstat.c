@@ -49,7 +49,7 @@ int cmpint(const void *s1, const void *s2)
   if      ( *x < *y ) cmp = -1;
   else if ( *x > *y ) cmp =  1;
 
-  return (cmp);
+  return cmp;
 }
 */
 

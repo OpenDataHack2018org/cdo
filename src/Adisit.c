@@ -54,26 +54,22 @@ double adisit_1(double tpot, double sal, double p)
          a_d = 4.1057E-9,
          a_e1 = 1.6056E-10, a_e2 = 5.0484E-12;
 
-  double dc, dv, dvs, fne, fst, qc, qn3, qnq, qv, qvs, t, tpo;
+  double qc = p * (a_a1 + p * (a_c1 - a_e1 * p));
+  double qv = p * (a_b1 - a_d * p);
+  double dc = 1. + p * (-a_a2 + p * (a_c2 - a_e2 * p));
+  double dv = a_b2 * p;
+  double qnq  = -p * (-a_a3 + p * a_c3);
+  double qn3  = -p * a_a4;
 
-  qc = p * (a_a1 + p * (a_c1 - a_e1 * p));
-  qv = p * (a_b1 - a_d * p);
-  dc = 1. + p * (-a_a2 + p * (a_c2 - a_e2 * p));
-  dv = a_b2 * p;
-  qnq  = -p * (-a_a3 + p * a_c3);
-  qn3  = -p * a_a4;
+  double tpo = tpot;
+  double qvs = qv*(sal - 35.) + qc;
+  double dvs = dv*(sal - 35.) + dc;
+  double t   = (tpo + qvs)/dvs;
+  double fne = - qvs + t*(dvs + t*(qnq + t*qn3)) - tpo;
+  double fst = dvs + t*(2.*qnq + 3.*qn3*t);
+  t = t - fne/fst;
 
-    {
-      tpo = tpot;
-      qvs = qv*(sal - 35.) + qc;
-      dvs = dv*(sal - 35.) + dc;
-      t   = (tpo + qvs)/dvs;
-      fne = - qvs + t*(dvs + t*(qnq + t*qn3)) - tpo;
-      fst = dvs + t*(2.*qnq + 3.*qn3*t);
-      t = t - fne/fst;
-    }
-
-  return (t);
+  return t;
 }
 
 /* compute potential temperature from insitu temperature */
@@ -87,19 +83,17 @@ double adipot(double t, double s, double p)
          a_d = 4.1057E-9,
          a_e1 = 1.6056E-10, a_e2 = 5.0484E-12;
 
-  double aa,bb,cc,cc1,dd,tpot,s_rel;
+  double s_rel = s - 35.0;
 
-  s_rel = s - 35.0;
+  double aa = (a_a1+ t*(a_a2 - t*(a_a3 - a_a4*t)));
+  double bb = s_rel*(a_b1 -a_b2*t)     ;
+  double cc = (a_c1 + t*(-a_c2 + a_c3*t));
+  double cc1 = a_d*s_rel;
+  double dd = (-a_e1 + a_e2*t);
 
-   aa = (a_a1+ t*(a_a2 - t*(a_a3 - a_a4*t)));
-   bb = s_rel*(a_b1 -a_b2*t)     ;
-   cc = (a_c1 + t*(-a_c2 + a_c3*t));
-  cc1 = a_d*s_rel;
-   dd = (-a_e1 + a_e2*t);
+  double tpot = t-p*(aa + bb + p*(cc - cc1 + p*dd));
 
-   tpot=t-p*(aa + bb + p*(cc - cc1 + p*dd));
-
-  return (tpot);
+  return tpot;
 }
 
 static
@@ -109,17 +103,14 @@ void calc_adisit(long gridsize, long nlevel, double *pressure, field_t tho, fiel
   /* tho units:      Celsius */
   /* sao units:      psu     */
 
-  long i, levelID, offset;
-  double *tisptr, *thoptr, *saoptr;
-
-  for ( levelID = 0; levelID < nlevel; ++levelID )
+  for ( long levelID = 0; levelID < nlevel; ++levelID )
     {
-      offset = gridsize*levelID;
-      thoptr = tho.ptr + offset;
-      saoptr = sao.ptr + offset;
-      tisptr = tis.ptr + offset;
+      long offset = gridsize*levelID;
+      double *thoptr = tho.ptr + offset;
+      double *saoptr = sao.ptr + offset;
+      double *tisptr = tis.ptr + offset;
 
-      for ( i = 0; i < gridsize; ++i )
+      for ( long i = 0; i < gridsize; ++i )
 	{
 	  if ( DBL_IS_EQUAL(thoptr[i], tho.missval) ||
 	       DBL_IS_EQUAL(saoptr[i], sao.missval) )
@@ -141,17 +132,14 @@ void calc_adipot(long gridsize, long nlevel, double *pressure, field_t t, field_
   /* t units:      Celsius */
   /* s units:      psu     */
 
-  long i, levelID, offset;
-  double *tpotptr, *tptr, *sptr;
-
-  for ( levelID = 0; levelID < nlevel; ++levelID )
+  for ( long levelID = 0; levelID < nlevel; ++levelID )
     {
-      offset = gridsize*levelID;
-      tptr = t.ptr + offset;
-      sptr = s.ptr + offset;
-      tpotptr = tpot.ptr + offset;
+      long offset = gridsize*levelID;
+      double *tptr = t.ptr + offset;
+      double *sptr = s.ptr + offset;
+      double *tpotptr = tpot.ptr + offset;
 
-      for ( i = 0; i < gridsize; ++i )
+      for ( long i = 0; i < gridsize; ++i )
 	{
 	  if ( DBL_IS_EQUAL(tptr[i], t.missval) ||
 	       DBL_IS_EQUAL(sptr[i], s.missval) )
@@ -331,13 +319,9 @@ void *Adisit(void *argument)
         }
 
       if ( operatorID == ADISIT )
-        {
-          calc_adisit(gridsize, nlevel, pressure, tho, sao, tis); 
-        }
+        calc_adisit(gridsize, nlevel, pressure, tho, sao, tis); 
       else
-        {
-          calc_adipot(gridsize, nlevel, pressure, tho, sao, tis); 
-        }
+        calc_adipot(gridsize, nlevel, pressure, tho, sao, tis); 
 
 
       for ( levelID = 0; levelID < nlevel; ++levelID )

@@ -123,7 +123,7 @@ double get_time_val(void *mark0)
 
   dt -= tm_shift;
 
-  return (dt);
+  return dt;
 }
 
 int ntests = 100; /* tests need about n microsecs on pwr4 */
@@ -131,40 +131,36 @@ int ntests = 100; /* tests need about n microsecs on pwr4 */
 static
 double m1(void)
 {
-  double dt, dt0;
-  int i;
   char mark[32];
 
-  dt0 = 1.0;
-  for ( i = 0; i < ntests; i++ )
+  double dt0 = 1.0;
+  for ( int i = 0; i < ntests; i++ )
     {
       set_time_mark(mark);
-      dt = get_time_val(mark);
+      double dt = get_time_val(mark);
       if ( dt < dt0 ) dt0 = dt;
     }
 
-  return (dt0);
+  return dt0;
 }
 
 static
 double m2(void)
 {
   char mark1[32], mark2[32];
-  double dt1, dt2, dt0;
-  int i;
 
-  dt0 = 1.0;
-  for ( i = 0; i < ntests; i++ )
+  double dt0 = 1.0;
+  for ( int i = 0; i < ntests; i++ )
     {
       set_time_mark(mark2);
       set_time_mark(mark1);
-      dt1 = get_time_val(mark1);
-      dt2 = get_time_val(mark2);
+      double dt1 = get_time_val(mark1);
+      double dt2 = get_time_val(mark2);
       if ( dt2 < dt0 ) dt0 = dt2;
       if ( dt2 < dt1 ) fprintf(rt_unit, "estimate_overhead: internal error\n");
     }
 
-  return (dt0);
+  return dt0;
 }
 
 static
@@ -210,7 +206,7 @@ int timer_new(const char *text)
 
   if ( text ) strcpy(rt[it].text, text);
 
-  return (it);
+  return it;
 }
 
 static
@@ -223,19 +219,17 @@ void timer_check(int it)
 
 double timer_val(int it)
 {
-  double val, dt;
-
   timer_check(it);
 
-  val = rt[it].tot;
+  double val = rt[it].tot;
 
   if ( rt[it].stat == rt_stat_on )
     {
-      dt = get_time_val(rt[it].mark1);
+      double dt = get_time_val(rt[it].mark1);
       val += dt;
     }
 
-  return (val);
+  return val;
 }
 
 static
@@ -249,23 +243,19 @@ void timer_header(void)
 
 void timer_report(void)
 {
-  int it;
-  double total, avg;
-
   timer_header();
 
-  for ( it = 0; it < top_timer; it++ )
+  for ( int it = 0; it < top_timer; it++ )
     {
-      total = timer_val(it);
+      double total = timer_val(it);
 
-      avg = rt[it].tot;
+      double avg = rt[it].tot;
       if ( rt[it].calls > 0 ) avg /= rt[it].calls;
 
       if ( rt[it].stat != rt_stat_undef )
 	fprintf(rt_unit, "%4d %7d %12.4g %12.4g %12.4g %12.4g  %s\n",
 		it, rt[it].calls, rt[it].min, avg, rt[it].max, total, rt[it].text);
     }
-
 }
 
 
@@ -284,8 +274,6 @@ void timer_start(int it)
 
 void timer_stop(int it)
 {
-  double dt;
-
   timer_check(it);
 
   if ( rt[it].stat != rt_stat_on )
@@ -296,7 +284,7 @@ void timer_stop(int it)
         fprintf(rt_unit, "timer_stop: undefined timer >%s<\n", rt[it].text);
     }
 
-  dt = get_time_val(rt[it].mark1);
+  double dt = get_time_val(rt[it].mark1);
 
   rt[it].last  = dt;
   rt[it].tot  += dt;
@@ -336,5 +324,5 @@ void counter_stop(counter_t *counter)
 
 double counter_cputime(counter_t counter)
 {
-  return (counter.cputime);
+  return counter.cputime;
 }

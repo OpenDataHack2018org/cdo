@@ -168,7 +168,7 @@ void *get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
       return NULL;
     }
 
-  return ((void *) ut_units_converter);
+  return (void *) ut_units_converter;
 }
 #endif
 

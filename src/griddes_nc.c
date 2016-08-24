@@ -42,7 +42,7 @@ int cdf_openread(const char *filename)
   cdoWarning("NetCDF support not compiled in!");
 #endif
 
-  return (fileID);
+  return fileID;
 }
 
 
@@ -87,7 +87,7 @@ int gridFromNCfile(const char *gridfile)
 	   nc_inq_varid(nc_file_id, "grid_center_lat", &nc_gridlat_id)  != NC_NOERR || 
 	   nc_inq_varid(nc_file_id, "grid_center_lon", &nc_gridlon_id)  != NC_NOERR || 
 	   nc_inq_varid(nc_file_id, "grid_corner_lat", &nc_gridclat_id) != NC_NOERR || 
-	   nc_inq_varid(nc_file_id, "grid_corner_lon", &nc_gridclon_id) != NC_NOERR ) return (gridID);
+	   nc_inq_varid(nc_file_id, "grid_corner_lon", &nc_gridclon_id) != NC_NOERR ) return gridID;
 
       nce(nc_get_var_int(nc_file_id, nc_griddims_id, grid_dims));
 
@@ -154,7 +154,7 @@ int gridFromNCfile(const char *gridfile)
   cdoWarning("NetCDF support not compiled in!");
 #endif
 
-  return (gridID);
+  return gridID;
 }
 
 

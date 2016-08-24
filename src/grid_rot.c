@@ -19,18 +19,17 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
 
     result : longitude in the geographical system
   */
-  double zsinpol, zcospol, zlampol;
-  double zphirot, zlamrot, zarg1, zarg2;
+  double zarg1, zarg2;
   double zgam;
   double result = 0;
 
-  zsinpol = sin(DEG2RAD*polphi);
-  zcospol = cos(DEG2RAD*polphi);
+  double zsinpol = sin(DEG2RAD*polphi);
+  double zcospol = cos(DEG2RAD*polphi);
 
-  zlampol = DEG2RAD*pollam;
-  zphirot = DEG2RAD*phirot;
+  double zlampol = DEG2RAD*pollam;
+  double zphirot = DEG2RAD*phirot;
   if ( lamrot > 180.0 ) lamrot -= 360.0;
-  zlamrot = DEG2RAD*lamrot;
+  double zlamrot = DEG2RAD*lamrot;
 
   if ( fabs(polgam) > 0 )
     {
@@ -58,7 +57,7 @@ double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam,
   if ( fabs(zarg2) > 0 ) result = RAD2DEG*atan2(zarg1, zarg2);
   if ( fabs(result) < 9.e-14 ) result = 0;
 
-  return (result);
+  return result;
 }
 
 
@@ -79,16 +78,15 @@ double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
 
     result : latitude in the geographical system
   */
-  double zsinpol, zcospol;
-  double zphirot, zlamrot, zarg;
+  double zarg;
   double zgam;
 
-  zsinpol = sin(DEG2RAD*polphi);
-  zcospol = cos(DEG2RAD*polphi);
+  double zsinpol = sin(DEG2RAD*polphi);
+  double zcospol = cos(DEG2RAD*polphi);
 
-  zphirot   = DEG2RAD*phirot;
+  double zphirot   = DEG2RAD*phirot;
   if ( lamrot > 180.0 ) lamrot -= 360.0;
-  zlamrot   = DEG2RAD*lamrot;
+  double zlamrot   = DEG2RAD*lamrot;
 
   if ( fabs(polgam) > 0 )
     {
@@ -99,7 +97,7 @@ double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
   else
     zarg   = zcospol*cos(zphirot)*cos(zlamrot) + zsinpol*sin(zphirot);
 
-  return (RAD2DEG*asin(zarg));
+  return RAD2DEG*asin(zarg);
 }
 
 static
@@ -115,24 +113,21 @@ double rl_to_rls(double phi, double rla, double polphi, double pollam)
 
     result : Rotierte Laenge
   */
-  double zsinpol, zcospol, zlampol;
-  double zphi, zrla, zarg1, zarg2;
-
-  zsinpol = sin(DEG2RAD*polphi);
-  zcospol = cos(DEG2RAD*polphi);
-  zlampol =     DEG2RAD*pollam;
+  double zsinpol = sin(DEG2RAD*polphi);
+  double zcospol = cos(DEG2RAD*polphi);
+  double zlampol =     DEG2RAD*pollam;
 
   if ( rla > 180.0 ) rla -= 360.0;
 
-  zrla = DEG2RAD*rla;
-  zphi = DEG2RAD*phi;
+  double zrla = DEG2RAD*rla;
+  double zphi = DEG2RAD*phi;
 
-  zarg1  = - sin(zrla-zlampol)*cos(zphi);
-  zarg2  = - zsinpol*cos(zphi)*cos(zrla-zlampol)+zcospol*sin(zphi);
+  double zarg1  = - sin(zrla-zlampol)*cos(zphi);
+  double zarg2  = - zsinpol*cos(zphi)*cos(zrla-zlampol)+zcospol*sin(zphi);
 
   if ( fabs(zarg2) < 1.0e-20 ) zarg2 = 1.0e-20;
 
-  return (RAD2DEG*atan2(zarg1,zarg2));
+  return RAD2DEG*atan2(zarg1,zarg2);
 }
 
 static
@@ -148,20 +143,17 @@ double ph_to_phs(double phi, double rla, double polphi, double pollam)
 
     result : Rotierte Breite
   */
-  double zsinpol, zcospol, zlampol;
-  double zphi, zrla, zarg;
+  double zsinpol = sin(DEG2RAD*polphi);
+  double zcospol = cos(DEG2RAD*polphi);
+  double zlampol =     DEG2RAD*pollam;
 
-  zsinpol = sin(DEG2RAD*polphi);
-  zcospol = cos(DEG2RAD*polphi);
-  zlampol =     DEG2RAD*pollam;
-
-  zphi = DEG2RAD*phi;
+  double zphi = DEG2RAD*phi;
   if ( rla > 180.0 ) rla -= 360.0;
-  zrla = DEG2RAD*rla;
+  double zrla = DEG2RAD*rla;
 
-  zarg = zcospol*cos(zphi)*cos(zrla-zlampol) + zsinpol*sin(zphi);
+  double zarg = zcospol*cos(zphi)*cos(zrla-zlampol) + zsinpol*sin(zphi);
 
-  return (RAD2DEG*asin(zarg));
+  return RAD2DEG*asin(zarg);
 }
 
 
@@ -182,28 +174,26 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
     u      : zonaler wind im geographischen system
     v      : merid. wind im geographischen system
   */
-  double zpolphi, zpollam, zrla, pollamd, zrlas, zarg, zbeta;
-
   /* umrechnung von grad in bogenmass */
-  zpolphi = polphi*DEG2RAD;
-  zpollam = pollam*DEG2RAD;
+  double zpolphi = polphi*DEG2RAD;
+  double zpollam = pollam*DEG2RAD;
   if ( rla < 0.0 ) rla += 360.0;
-  zrla    = rla   *DEG2RAD;
-  pollamd = pollam;
+  double zrla    = rla   *DEG2RAD;
+  double pollamd = pollam;
   if ( pollamd < 0.0 ) pollamd += 360.0;
 
   /* laenge im rotierten system berechnen */
-  zrlas = rl_to_rls(phi, rla, polphi, pollam)*DEG2RAD;
+  double zrlas = rl_to_rls(phi, rla, polphi, pollam)*DEG2RAD;
 
   /* winkel zbeta berechen (schnittwinkel der breitenkreise) */
-  zarg = - sin(zpolphi)*sin(zrla-zpollam)*sin(zrlas) - cos(zrla-zpollam)*cos(zrlas);
+  double zarg = - sin(zpolphi)*sin(zrla-zpollam)*sin(zrlas) - cos(zrla-zpollam)*cos(zrlas);
   if ( zarg >  1.0 ) zarg =  1.0;
   if ( zarg < -1.0 ) zarg = -1.0;
   /*
   zbeta = acos(zarg);
   zbeta = sign(zbeta, -(rla - (pollamd-180.0)));
   */
-  zbeta = fabs(acos(zarg));
+  double zbeta = fabs(acos(zarg));
   /*  if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta;*/
   if ( (-(rla - (pollamd-180.0)) < 0) && (-(rla - (pollamd-180.0)) >= -180) ) zbeta = -zbeta;
 

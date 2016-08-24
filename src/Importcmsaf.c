@@ -167,7 +167,7 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   if ( nx != nrx || ny != nry )
     {
       printf("nrx=%d nry=%d\n", nrx, nry);
-      return(-1);
+      return -1;
     }
 
   double *xvals = (double*) Malloc(nx*sizeof(double));
