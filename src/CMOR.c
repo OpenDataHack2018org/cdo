@@ -5,6 +5,7 @@
 
 #if defined(HAVE_LIBCMOR)
 #include <ctype.h>
+#include <unistd.h>
 #include "uthash.h"
 #include "cmor.h"
 
@@ -138,11 +139,11 @@ static char *get_val(struct kv **ht, char *key, char *def)
   return e ? e->value : def;
 }
 
-static char *substitute(struct kv **ht, char *word)
+static char *key_rename(struct kv **ht, char *word)
 {
   struct kv *e;
   char *key = (char *) Malloc(strlen(word) + 12);
-  sprintf(key, "substitute_%s", word);
+  sprintf(key, "__rename_%s", word);
   HASH_FIND_STR(*ht, key, e);
   Free(key);
   return e ? e->value : word;
@@ -271,6 +272,43 @@ static int in_list(char **list, const char *needle)
   return 0;
 }
 
+static void translate_calendar(struct kv **ht, int calendar)
+{
+  switch ( calendar )
+    {
+    case CALENDAR_STANDARD:
+      hinsert(ht, "calendar", "gregorian");
+      break;
+    case CALENDAR_PROLEPTIC:
+      hinsert(ht, "calendar", "proleptic_gregorian");
+      break;
+    case CALENDAR_360DAYS:
+      hinsert(ht, "calendar", "360_day");
+      break;
+    case CALENDAR_365DAYS:
+      hinsert(ht, "calendar", "noleap");
+      break;
+    case CALENDAR_366DAYS:
+      hinsert(ht, "calendar", "all_leap");
+      break;
+    default:
+      cdoWarning("Unsupported calendar type %i.\n", calendar);
+    }
+}
+
+static char *dump_ht_to_json_file(struct kv **ht, char *filename)
+{
+  int fd = mkstemp(filename);
+
+  dprintf(fd, "{\n");
+  for ( struct kv *entry = *ht; entry != NULL; entry = entry->hh.next )
+    if ( strncmp(entry->key, "__", 2) != 0 )
+      dprintf(fd, "\t\"%s\":\t\t\"%s\",\n", entry->key, entry->value);
+  dprintf(fd, "}\n");
+  close(fd);
+  return filename;
+}
+
 static void setup(struct kv **ht, int streamID, char *table)
 {
   int netcdf_file_action;
@@ -300,73 +338,13 @@ static void setup(struct kv **ht, int streamID, char *table)
              logfile,
              &create_subdirectories);
 
-  char *calendar;
   int taxisID = vlistInqTaxis(streamInqVlist(streamID));
-  switch ( taxisInqCalendar(taxisID) )
-    {
-    case CALENDAR_STANDARD:
-      calendar = "gregorian";
-      break;
-    case CALENDAR_PROLEPTIC:
-      calendar = "proleptic_gregorian";
-      break;
-    case CALENDAR_360DAYS:
-      calendar = "360_day";
-      break;
-    case CALENDAR_365DAYS:
-      calendar = "noleap";
-      break;
-    case CALENDAR_366DAYS:
-      calendar = "all_leap";
-      break;
-    default:
-      cdoAbort("Unsupported calendar type.");
-    }
+  translate_calendar(ht, taxisInqCalendar(taxisID));
 
-  int *month_lengths;
-  char *ml = get_val(ht, "month_lengths", NULL);
-  if ( ml )
-    {
-      char *mlc = Malloc(strlen(ml) + 1);
-      char *month_str = strtok(mlc, ",");
-      int month = 0;
-      month_lengths = Malloc(12 * sizeof(int));
-      while ( month < 12 && month_str != NULL )
-        {
-          month_lengths[month++] = atoi(month_str);
-          month_str = strtok(NULL, ",");
-        }
-      Free(mlc);
-      if ( month != 12 )
-        cdoAbort("Invalid format for month_lengths");
-    }
-  else
-    {
-      month_lengths = NULL;
-    }
-
-  double branch_time = atof(get_val(ht, "branch_time", "0.0"));
-  cmor_dataset(get_val(ht, "outpath", "./"),
-               get_val(ht, "experiment_id", ""),
-               get_val(ht, "institution", ""),
-               get_val(ht, "source", ""),
-               calendar,
-               atoi(get_val(ht, "realization", "1")),
-               get_val(ht, "contact", ""),
-               get_val(ht, "history", ""),
-               get_val(ht, "comment", ""),
-               get_val(ht, "references", ""),
-               atoi(get_val(ht, "leap_year", "0")),
-               atoi(get_val(ht, "leap_month", "0")),
-               month_lengths,
-               get_val(ht, "model_id", ""),
-               get_val(ht, "forcing", ""),
-               atoi(get_val(ht, "initialization_method", "1")),
-               atoi(get_val(ht, "physics_version", "1")),
-               get_val(ht, "institute_id", ""),
-               get_val(ht, "parent_experiment_id", ""),
-               &branch_time,
-               get_val(ht, "parent_experiment_rip", ""));
+  char filename[20];
+  snprintf(filename, sizeof(filename), "dataset.json_XXXXXX");
+  cmor_dataset_json(dump_ht_to_json_file(ht, filename));
+  unlink(filename);
 
   int table_id;
   cmor_load_table(table, &table_id);
@@ -424,7 +402,7 @@ static void define_variables(struct kv **ht, int streamID,
           int ndims = 0;
           /* Time-Axis */
           cmor_axis(&axis_ids[ndims++],
-                    substitute(ht, "time"),
+                    key_rename(ht, "time"),
                     taxis_units,
                     0,
                     NULL,
@@ -445,7 +423,7 @@ static void define_variables(struct kv **ht, int streamID,
               zaxisInqName(zaxisID, name);
               zaxisInqUnits(zaxisID, units);
               cmor_axis(&axis_ids[ndims++],
-                        substitute(ht, name),
+                        key_rename(ht, name),
                         units,
                         levels,
                         (void *)coord_vals,
@@ -470,7 +448,7 @@ static void define_variables(struct kv **ht, int streamID,
               cell_bounds = NULL;
             }
           cmor_axis(&axis_ids[ndims++],
-                    substitute(ht, name),
+                    key_rename(ht, name),
                     units,
                     length,
                     (void *)coord_vals,
@@ -493,7 +471,7 @@ static void define_variables(struct kv **ht, int streamID,
               cell_bounds = NULL;
             }
           cmor_axis(&axis_ids[ndims++],
-                    substitute(ht, name),
+                    key_rename(ht, name),
                     units,
                     length,
                     (void *)coord_vals,
@@ -523,7 +501,7 @@ static void define_variables(struct kv **ht, int streamID,
               var->data = Malloc(gridsize * levels * sizeof(double));
             }
           cmor_variable(&var->cmor_varID,
-                        substitute(ht, name),
+                        key_rename(ht, name),
                         units,
                         ndims,
                         axis_ids,
@@ -619,7 +597,6 @@ static void write_variables(int streamID, struct cc_var vars[], int nvars)
         cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
-                   NULL,
                    1,
                    &time_val,
                    time_bndsp,
