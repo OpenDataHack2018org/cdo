@@ -198,6 +198,8 @@ void grid_check_lat_borders(int n, double *ybounds)
 void grid_cell_center_to_bounds_X2D(const char* xunitstr, long xsize, long ysize, const double* restrict grid_center_lon, 
 				    double* restrict grid_corner_lon, double dlon)
 {
+  (void)xunitstr;
+
   if ( ! (dlon > 0) ) dlon = 360./xsize;
   /*
   if ( xsize == 1 || (grid_center_lon[xsize-1]-grid_center_lon[0]+dlon) < 359 )
@@ -252,6 +254,8 @@ double genYmax(double y1, double y2)
 
 void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize, const double* restrict grid_center_lat, double* restrict grid_corner_lat)
 {
+  (void)yunitstr;
+
   double minlat, maxlat;
 
   double firstlat = grid_center_lat[0];

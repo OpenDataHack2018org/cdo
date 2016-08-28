@@ -15,7 +15,7 @@
 */
 
 #if defined(HAVE_CONFIG_H)
-#  include "config.h"
+#include "config.h"
 #endif
 
 #if defined(HAVE_LIBCURL)
@@ -47,24 +47,20 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
   // As curl_easy_init calls non-thread safe curl_global_init the libcurl developer advice
   // to call curl_global_init first and before potential thread spawning.
 
-  CURLcode ret;  
-  CURL *hd;
-  double length;
-  int status;
   int curlflags = CURL_GLOBAL_DEFAULT;
 
 #if defined(CURL_GLOBAL_ACK_EINTR)
   curlflags |= CURL_GLOBAL_ACK_EINTR;
 #endif
 
-  ret = curl_global_init(curlflags);
+  CURLcode ret = curl_global_init(curlflags);
   if(ret != 0)
     {
       fprintf(stderr, "ERROR: %s!\n", curl_easy_strerror(ret));
       return -1;
     }
 
-  hd = curl_easy_init();
+  CURL *hd = curl_easy_init();
   if (hd == NULL)
     {
       fprintf(stderr, "ERROR: could not get curl handler.\n");
@@ -72,8 +68,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
     }
   else
     {
-      FILE *fp;
-      fp = fopen(basename, "w");
+      FILE *fp = fopen(basename, "w");
       if (fp == NULL)
 	{
 	  fprintf(stderr, "ERROR: could not open local output file %s. %s.\n", basename, strerror(errno));
@@ -98,20 +93,21 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
 
 	  if ( strstr(ctype, "html") == NULL ) // no html content
 	    {
+              double length;
 	      curl_easy_getinfo(hd, CURLINFO_SIZE_DOWNLOAD, &length);
 	      if ( cdoVerbose ) cdoPrint("File %s downloaded - size: %.0lf byte", basename, length); 
 	      rval = 0;
 	    }
 	  else
 	    {
-	      status = remove(basename);
+	      int status = remove(basename);
 	      if (status == -1) perror(basename);
 	      if ( cdoVerbose ) cdoPrint("The requested URL was not found on this server!");
 	    }
 	}
       else
 	{
-	  status = remove(basename);
+	  int status = remove(basename);
 	  if (status == -1) perror(basename);
 	  fprintf(stderr, "ERROR: %s. Download %s failed.\n\n", curl_easy_strerror(ret), basename);
 	}
@@ -119,6 +115,9 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
       curl_easy_cleanup(hd);
     }
 #else
+  (void) uri;
+  (void) basename;
+
   cdoWarning("CURL support not compiled in!");
 #endif  
 
@@ -173,16 +172,16 @@ int referenceToGrid(int gridID1)
     }
   else
     {
-      int lgriduri = TRUE;
+      bool lgriduri = true;
       int status;
       int streamID;
-      int number, position;
+      int position;
 
       char *basename = strrchr(griduri, '/');
       if ( basename == NULL )
 	{
 	  basename = griduri;
-	  lgriduri = FALSE;
+	  lgriduri = false;
 	}
       else
 	{
@@ -224,7 +223,7 @@ int referenceToGrid(int gridID1)
       
 	  gridsize = gridInqSize(gridID1);
 
-	  number = gridInqNumber(gridID1);
+	  // int number = gridInqNumber(gridID1);
 	  position = gridInqPosition(gridID1);
 
 	  streamID = streamOpenRead(gridpath);

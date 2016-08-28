@@ -36,7 +36,7 @@
  * pointer */
 /* DON'T MOVE IT! is necessary to have the pstream.h file included AFTER this
  * function definition */
-void read_first_record(char *filename, int gridSize, double *field)
+void read_first_record(char *filename, double *field)
 {
   int nmiss,varID,levelID;
   int streamID = streamOpenRead(filename);
@@ -90,7 +90,7 @@ void *MapReduce(void *argument)
 
   /* creata an index list of the relevant locations  {{{ */
   double *inputMaskField = (double*) Malloc(inputGridSize*sizeof(double));
-  read_first_record(operatorArgv()[0],inputGridSize, inputMaskField);
+  read_first_record(operatorArgv()[0], inputMaskField);
 
   /* non-zero values mark the relevant points */
   int maskSize = countMask(inputMaskField, inputGridSize, 0.0);

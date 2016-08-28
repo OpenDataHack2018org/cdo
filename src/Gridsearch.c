@@ -30,8 +30,8 @@ void *Gridsearch(void *argument)
 
   operatorInputArg("source and target grid description file or name");
   operatorCheckArgc(2);
-  int gridID1 = cdoDefineGrid(operatorArgv()[0]);
-  int gridID2 = cdoDefineGrid(operatorArgv()[1]);
+  //int gridID1 = cdoDefineGrid(operatorArgv()[0]);
+  //int gridID2 = cdoDefineGrid(operatorArgv()[1]);
 
   cdoFinish();
 

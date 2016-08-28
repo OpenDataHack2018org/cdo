@@ -60,6 +60,7 @@ void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 
 void four2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
+  (void)gridIDin;
   int nlev  = 1;
   int ntr   = gridInqTrunc(gridIDout);
   int nlat  = sptrans->nlat;

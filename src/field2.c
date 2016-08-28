@@ -71,10 +71,6 @@ void farcpy(field_t *field1, field_t field2)
   int nwpv = field1->nwpv;
   int gridsize1 = field1->size;
   int gridsize2 = field2.size;
-  int nmiss1 = field1->nmiss;
-  int nmiss2 = field2.nmiss;
-  double missval1 = field1->missval;
-  double missval2 = field2.missval;
   double *restrict array1 = field1->ptr;
   const double *restrict array2 = field2.ptr;
   const float *restrict array2f = field2.ptrf;

@@ -59,6 +59,7 @@ double yac_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_
   return area;
 }
 */
+
 static
 void cross_product(const double *restrict a, const double *restrict b, double *restrict c)
 {
@@ -67,31 +68,33 @@ void cross_product(const double *restrict a, const double *restrict b, double *r
   c[2] = a[0]*b[1] - a[1]*b[0];
 }
 
+/*
 static
 double scalar_product(const double *restrict a, const double *restrict b)
 {
   return (a[0]*b[0] + a[1]*b[1] + a[2]*b[2]);
 }
+*/
 
 static
 double norm(const double *restrict a)
 {
   return (a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
 }
-
+/*
 static
 double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corner_lat)
 {
   if ( num_corners < 3 ) return 0;
 
-  /* generalised version based on the ICON code, mo_base_geometry.f90
-     provided by Luis Kornblueh, MPI-M. */
+  // generalised version based on the ICON code, mo_base_geometry.f90
+  // provided by Luis Kornblueh, MPI-M.
 
   int M = num_corners; // number of vertices
   int m; // loop index over number of vertices M
   int i; // loop index over the three dimensions
 
-  double area;
+  double area = 0.0;
   double s[M];
   double ca[M];
   double a[M];
@@ -99,27 +102,22 @@ double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corn
   double p[M][3];
   double u[M][3];
 
-  /* Convert into cartesian coordinates */
-
+  // Convert into cartesian coordinates
   for ( m = 0; m < M; m++ )
     lonlat_to_xyz(cell_corner_lon[m], cell_corner_lat[m], p[m]);
 
-  /* First, compute cross products Uij = Vi x Vj. */
-
+  // First, compute cross products Uij = Vi x Vj.
   for ( m = 0; m < M; m++ )
     cross_product(p[m], p[(m+1)%M], u[m]);
 
-  /*  Normalize Uij to unit vectors. */
-
-  area = 0.0;
-
+  //  Normalize Uij to unit vectors.
   for ( m = 0; m < M; m++ )
     {
       s[m] = norm(u[m]);
       area += s[m];
     }
 
-  /* Test for a degenerated cells associated with collinear vertices. */
+  // Test for a degenerated cells associated with collinear vertices.
 
   if ( fabs(area) > 0.0 )
     {
@@ -130,19 +128,18 @@ double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corn
 	for ( i = 0; i < 3; i++ )
 	  u[m][i] = u[m][i]/s[m];
 
-      /*  Compute interior angles Ai as the dihedral angles between planes
-	  by using the definition of the scalar product
+      //  Compute interior angles Ai as the dihedral angles between planes
+      //  by using the definition of the scalar product
+      //
+      //	    ab = |a| |b| cos (phi)
+      //
+      //  As a and b are already normalised this reduces to
+      //
+      //            ab = cos (phi)
 
-	            ab = |a| |b| cos (phi)
-
-	  As a and b are already normalised this reduces to
-
-                    ab = cos (phi)
-
-          There is no explanation so far for the - in the loop below.
-	  But otherwise we don't get the correct results for triangles
-	  and cells. Must have something to do with the theorem.
-      */
+      //  There is no explanation so far for the - in the loop below.
+      //  But otherwise we don't get the correct results for triangles
+      //  and cells. Must have something to do with the theorem.
 
       for ( m = 0; m < M; m++ )
 	{
@@ -152,22 +149,19 @@ double mod_cell_area(int num_corners, double *cell_corner_lon, double *cell_corn
 	  a[m] = acos(ca[m]);
 	}
 
-      /*  Compute areas = a1 + a2 + a3 - (M-2) * pi.
-
-	  here for a unit sphere: */
-
+      //  Compute areas = a1 + a2 + a3 - (M-2) * pi. here for a unit sphere:
       area = - (double) (M-2) * M_PI;
 
       for ( m = 0; m < M; m++ )
 	area += a[m];
 
-      //   area *= EarthRadius * EarthRadius;
-
+      // area *= EarthRadius * EarthRadius;
       if ( area < 0.0 ) area = 0.0;
     }
 
   return area;
 }
+*/
 
 /** area of a spherical triangle based on L'Huilier's Theorem
   *

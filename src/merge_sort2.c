@@ -57,9 +57,9 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   int nsplit = NSPLIT;                      /* (only 2 allowed) number of segments to split 
 						the data */
   int nl[NSPLIT];                            /* number of links in each sub-array              */
-  int who_am_i,depth,my_depth;               /* current depth, depth of children and index
+  int who_am_i,depth;                        /* current depth, depth of children and index
 						to be parent in next call to sort_par          */
-  int add_srt[NSPLIT], add_end[NSPLIT];      /* arrays for start and end index of sub array    */
+  int add_srt[NSPLIT];                       /* array for start index of sub array    */
   double *add1s[NSPLIT];                     /* pointers to sub arrays for sort and merge step */
   double *tmp;                               /* pointer to buffer for merging of address lists */
   long *idx;                                 /* index list to merge sub-arrays                 */
@@ -77,7 +77,6 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   add_srt[0] = 0;                  add_srt[1] = num_links/nsplit;
   add1s[0]   = &add1[add_srt[0]];  add1s[1]   = &add1[add_srt[1]];
   nl[0]      = num_links/nsplit;   nl[1]      = num_links-nl[0];
-  add_end[0] = nl[0];              add_end[1] = num_links;
 
   depth = (int) (log(parent)/log(2));
 
@@ -94,18 +93,20 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
 
 #if defined(_OPENMP)
 #pragma omp parallel for if(depth<par_depth) \
-  private(i,who_am_i,my_depth) \
+  private(i,who_am_i) \
   num_threads(2)
 #endif
   for ( i=0; i < nsplit; i++ )
     {
       who_am_i = nsplit*parent+i;
-      my_depth = (int) (log(parent)/log(2))+1;
 
 #if defined(_OPENMP)
       /*      if ( 0 )
-      	cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i)",
-	who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
+        {
+          int my_depth = (int) (log(parent)/log(2))+1;
+      	  cdoPrint("I am %i (parent %i), my_depth is: %i thread_num %i (%i)",
+	  who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
+        }
       */
 #endif
             
@@ -322,7 +323,7 @@ void sort_iter_single(long num_links, double *restrict add1, int parent)
 
   static int MERGE_SORT_LIMIT_SIZE = 16384; 
   static int first_sort_iter_call = 1;
-  static double merge_time;
+  // static double merge_time;
 
   int par_depth = 1;
               
@@ -347,7 +348,7 @@ void sort_iter_single(long num_links, double *restrict add1, int parent)
     //    merge_time = merge_time * (info.numer / info.denom)/1000./num_links;
     //    fprintf(stderr,"%12.8g ",merge_time);
     
-    merge_time = 0;
+    // merge_time = 0;
   }
 
   return;

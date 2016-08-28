@@ -141,7 +141,6 @@ void farround(field_t *field)
 {
   int    grid     = field->grid;
   double missval1 = field->missval;
-  double missval2 = field->missval;
   double *array   = field->ptr;
 
   int len = gridInqSize(grid);

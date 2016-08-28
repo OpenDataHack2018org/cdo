@@ -536,6 +536,8 @@ int gridFromH5file(const char *gridfile)
   /* Close file */
   if ( file_id >= 0 )  status = H5Fclose(file_id);
 
+  (void)status;
+
 #else
   cdoWarning("HDF5 support not compiled in!");
 #endif

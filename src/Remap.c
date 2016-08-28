@@ -215,6 +215,7 @@ void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_
   char tmpstr[256];
 
   line[0] = 0;
+  (void)operfunc;
   /*
   if      ( operfunc == REMAPBIL  || operfunc == GENBIL  )  strcpy(line, "SCRIP bilinear");
   else if ( operfunc == REMAPBIC  || operfunc == GENBIC  )  strcpy(line, "SCRIP bicubic");

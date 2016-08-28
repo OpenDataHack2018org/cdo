@@ -331,43 +331,6 @@ void boundbox_from_center(bool lonIsCyclic, long size, long nx, long ny, const d
     }
 }
 
-static
-void check_lon_range2(long nc, long nlons, double *corners, double *centers)
-{
-  long n, k;
-
-  assert(corners != NULL);
-  /*
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(nlons, lons)
-#endif
-  */
-  for ( n = 0; n < nlons; ++n )
-    {
-      bool lneg = false, lpos = false;
-
-      for ( k = 0; k < nc; ++k )
-	{
- 	  if      ( !lneg && corners[n*nc+k] > -PI && corners[n*nc+k] < 0. ) lneg = true;
-	  else if ( !lpos && corners[n*nc+k] <  PI && corners[n*nc+k] > 0. ) lpos = true;
-	}
-
-      if ( lneg && lpos )
-	{
-	  if ( centers[n] > PI )
-	    for ( k = 0; k < nc; ++k ) corners[n*nc+k] += PI2;
-	}
-      else
-	{
-	  for ( k = 0; k < nc; ++k )
-	    {
-	      if ( corners[n*nc+k] > PI2  ) corners[n*nc+k] -= PI2;
-	      if ( corners[n*nc+k] < ZERO ) corners[n*nc+k] += PI2;
-	    }
-	}
-    }
-}
-
 
 void remapgrid_get_lonlat(remapgrid_t *grid, unsigned cell_add, double *plon, double *plat)
 {
@@ -773,10 +736,8 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
   check_lon_range(grid->size, grid->cell_center_lon);
 
   if ( grid->num_cell_corners && grid->lneed_cell_corners )
-    {
-      //check_lon_range2(grid->num_cell_corners, grid->size, grid->cell_corner_lon, grid->cell_center_lon);
-	check_lon_range(grid->num_cell_corners*grid->size, grid->cell_corner_lon);
-    }
+    check_lon_range(grid->num_cell_corners*grid->size, grid->cell_corner_lon);
+
   /*  Make sure input latitude range is within the machine values for +/- pi/2 */
 
   check_lat_range(grid->size, grid->cell_center_lat);

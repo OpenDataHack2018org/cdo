@@ -612,18 +612,19 @@ void writeGslStream(int ostreamID, int otaxisID, int otsID,
                     field_t *gslDuration, field_t *gslFirstDay,
                     int vdate, int vtime, int nlevels)
 {
-  int levelID;
+  (void)ivlistID1;
+  (void)first_var_id;
 
   taxisDefVdate(otaxisID, vdate);
   taxisDefVtime(otaxisID, vtime);
   streamDefTimestep(ostreamID, otsID);
 
-  for ( levelID = 0; levelID < nlevels; levelID++ )
+  for ( int levelID = 0; levelID < nlevels; levelID++ )
     {
       streamDefRecord(ostreamID, ovarID1, levelID);
       streamWriteRecord(ostreamID, gslDuration[levelID].ptr, gslDuration[levelID].nmiss);
     }
-  for ( levelID = 0; levelID < nlevels; levelID++ )
+  for ( int levelID = 0; levelID < nlevels; levelID++ )
     {
       streamDefRecord(  ostreamID, ovarID2, levelID);
       streamWriteRecord(ostreamID, gslFirstDay[levelID].ptr, gslFirstDay[levelID].nmiss);
