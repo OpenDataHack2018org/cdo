@@ -342,7 +342,7 @@ void *Maggraph(void *argument);
 #define  ImportobsOperators     {"import_obs"}
 #define  InfoOperators          {"info", "infop", "infon", "infoc", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
-#define  IntgridOperators       {"intgridbil", "intgridcon", "intpoint", "interpolate", "boxavg", "thinout"}
+#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  IntlevelOperators      {"intlevel", "intlevelx"}
 #define  Intlevel3dOperators    {"intlevel3d", "intlevelx3d"}

@@ -291,12 +291,10 @@ void *Intgrid(void *argument)
   int nmiss;
   int xinc = 0, yinc = 0;
   double missval;
-  double slon, slat;
 
   cdoInitialize(argument);
 
   int INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
-  int INTGRIDCON  = cdoOperatorAdd("intgridcon",  0, 0, NULL);
   int INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
   int INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   int BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
@@ -306,7 +304,7 @@ void *Intgrid(void *argument)
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
-  if ( operatorID == INTGRIDBIL || operatorID == INTGRIDCON || operatorID == INTERPOLATE )
+  if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
     {
       operatorInputArg("grid description file or name");
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
@@ -315,8 +313,8 @@ void *Intgrid(void *argument)
     {
       operatorInputArg("longitude and latitude");
       operatorCheckArgc(2);
-      slon = parameter2double(operatorArgv()[0]);
-      slat = parameter2double(operatorArgv()[1]);
+      double slon = parameter2double(operatorArgv()[0]);
+      double slat = parameter2double(operatorArgv()[1]);
       gridID2 = gridCreate(GRID_LONLAT, 1);
       gridDefXsize(gridID2, 1);
       gridDefYsize(gridID2, 1);
@@ -410,8 +408,6 @@ void *Intgrid(void *argument)
 
 	  if ( operatorID == INTGRIDBIL || operatorID == INTPOINT )
 	    intgridbil(&field1, &field2);
-	  if ( operatorID == INTGRIDCON )
-	    intgridcon(&field1, &field2);
 	  else if ( operatorID == INTERPOLATE )
 	    interpolate(&field1, &field2);
 	  else if ( operatorID == BOXAVG )
