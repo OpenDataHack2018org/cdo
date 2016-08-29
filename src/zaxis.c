@@ -270,6 +270,8 @@ void gen_zaxis_height(zaxis_t *zaxis, const char *pline)
 {
   int zaxistype = ZAXIS_HEIGHT;
 
+  if ( CDO_CMOR_Mode ) zaxis->scalar = true;
+
   if ( *pline != 0 )
     {
       if ( *pline == '_' ) pline++;
