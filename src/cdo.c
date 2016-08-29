@@ -298,13 +298,10 @@ void cdoPrintHelp(const char *phelp[]/*, char *xoperator*/)
     fprintf(stderr, "No help available for this operator!\n");
   else
     {
-      int lprint;
+      bool lprint;
       while ( *phelp )
         {
-          lprint = TRUE;
-          if ( *phelp[0] == '\0' )
-            if ( *(phelp+1) )
-              if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
+          lprint = !(*phelp[0] == '\0' && *(phelp+1) && *(phelp+1)[0] == ' ');
           
           if ( lprint )
             {
@@ -375,38 +372,18 @@ void setDefaultDataType(const char *datatypestr)
   enum {D_UINT, D_INT, D_FLT, D_CPX};
   int dtype = -1;
 
-  if      ( *datatypestr == 'i' || *datatypestr == 'I' )
-    {
-      dtype = D_INT;
-      datatypestr++;
-    }
-  else if ( *datatypestr == 'u' || *datatypestr == 'U' )
-    {
-      dtype = D_UINT;
-      datatypestr++;
-    }
-  else if ( *datatypestr == 'f' || *datatypestr == 'F' )
-    {
-      dtype = D_FLT;
-      datatypestr++;
-    }
-  else if ( *datatypestr == 'c' || *datatypestr == 'C' )
-    {
-      dtype = D_CPX;
-      datatypestr++;
-    }
-  else if ( *datatypestr == 'p' || *datatypestr == 'P' )
-    {
-      datatypestr++;
-    }
+  int datatype = tolower(*datatypestr);
+  if      ( datatype == 'i' ) { dtype = D_INT;  datatypestr++; }
+  else if ( datatype == 'u' ) { dtype = D_UINT; datatypestr++; }
+  else if ( datatype == 'f' ) { dtype = D_FLT;  datatypestr++; }
+  else if ( datatype == 'c' ) { dtype = D_CPX;  datatypestr++; }
+  else if ( datatype == 'p' ) { datatypestr++; }
 
   if ( isdigit((int) *datatypestr) )
     {
       nbits = atoi(datatypestr);
-      if ( nbits < 10 )
-        datatypestr += 1;
-      else
-        datatypestr += 2;
+      datatypestr += 1;
+      if ( nbits >= 10 ) datatypestr += 1;
 
       if ( dtype == -1 )
         {
@@ -1313,6 +1290,7 @@ int parse_options_long(int argc, char *argv[])
           break;
         case 'v':
           cdoVerbose = TRUE;
+          _Verbose = 1;
           break;
         case 'W': /* Warning messages */
           _Verbose = 1;
