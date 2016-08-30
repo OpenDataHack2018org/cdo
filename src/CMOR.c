@@ -9,6 +9,8 @@
 #include "uthash.h"
 #include "cmor.h"
 
+#define CMOR_UNDEFID (CMOR_MAX_AXES + 1)
+
 struct cc_var
 {
   int cdi_varID;
@@ -24,9 +26,9 @@ struct kv
   UT_hash_handle hh;
 };
 
-static struct cc_var *find_var(int cdi_varID, struct cc_var vars[], int nvars)
+static struct cc_var *find_var(int cdi_varID, struct cc_var vars[])
 {
-  for ( int i = 0; i < nvars; i++ )
+  for ( int i = 0; vars[i].cdi_varID >= 0; i++ )
     if ( cdi_varID == vars[i].cdi_varID )
       return &vars[i];
   return NULL;
@@ -272,7 +274,7 @@ static int in_list(char **list, const char *needle)
   return 0;
 }
 
-static void translate_calendar(struct kv **ht, int calendar)
+static void register_cmor_calendar(struct kv **ht, int calendar)
 {
   switch ( calendar )
     {
@@ -299,7 +301,6 @@ static void translate_calendar(struct kv **ht, int calendar)
 static char *dump_ht_to_json_file(struct kv **ht, char *filename)
 {
   int fd = mkstemp(filename);
-
   dprintf(fd, "{\n");
   for ( struct kv *entry = *ht; entry != NULL; entry = entry->hh.next )
     if ( strncmp(entry->key, "__", 2) != 0 )
@@ -309,54 +310,240 @@ static char *dump_ht_to_json_file(struct kv **ht, char *filename)
   return filename;
 }
 
-static void setup(struct kv **ht, int streamID, char *table)
+static int get_netcdf_file_action(struct kv **ht)
 {
-  int netcdf_file_action;
   char *chunk = get_val(ht, "chunk", "replace");
-  if ( strcasecmp(chunk, "replace") == 0 )
-    netcdf_file_action = CMOR_REPLACE;
-  else if ( strcasecmp(chunk, "append") == 0 )
-    netcdf_file_action = CMOR_APPEND;
+  if ( strcasecmp(chunk, "append") == 0 )
+    return CMOR_APPEND;
+  else
+    return CMOR_REPLACE;
+}
 
-  int set_verbosity = CMOR_NORMAL;
+static int get_cmor_verbosity(struct kv **ht)
+{
   if ( strcasecmp(get_val(ht, "set_verbosity", ""), "CMOR_QUIET") == 0 )
-    set_verbosity = CMOR_QUIET;
+    return CMOR_QUIET;
+  else
+    return CMOR_NORMAL;
+}
 
-  int exit_control = CMOR_NORMAL;
+static int get_cmor_exit_control(struct kv **ht)
+{
   if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_MAJOR") == 0 )
-    exit_control = CMOR_EXIT_ON_MAJOR;
-  if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_WARNING")
+    return CMOR_EXIT_ON_MAJOR;
+  else if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_WARNING")
        == 0 )
-    exit_control = CMOR_EXIT_ON_WARNING;
+    return CMOR_EXIT_ON_WARNING;
+  else
+    return CMOR_NORMAL;
+}
 
-  char *logfile = get_val(ht, "logfile", NULL);
-  int create_subdirectories = atoi(get_val(ht, "create_subdirectories", "0"));
-  cmor_setup(get_val(ht, "inpath", "/usr/share/cmor/"),
-             &netcdf_file_action,
-             &set_verbosity,
-             &exit_control,
-             logfile,
-             &create_subdirectories);
-
-  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
-  translate_calendar(ht, taxisInqCalendar(taxisID));
-
+static void feed_json_to_cmor_dataset(struct kv **ht)
+{
   char filename[20];
   snprintf(filename, sizeof(filename), "dataset.json_XXXXXX");
   cmor_dataset_json(dump_ht_to_json_file(ht, filename));
   unlink(filename);
-
-  int table_id;
-  cmor_load_table(table, &table_id);
-  cmor_set_table(table_id);
 }
 
-static void define_variables(struct kv **ht, int streamID,
-                             struct cc_var vars[], int *nvars)
+static void setup(struct kv **ht, int streamID)
 {
-  int vlistID = streamInqVlist(streamID);
-  int taxisID = vlistInqTaxis(vlistID);
-  char taxis_units[CMOR_MAX_STRING];
+  int netcdf_file_action = get_netcdf_file_action(ht);
+  int set_verbosity = get_cmor_verbosity(ht);
+  int exit_control = get_cmor_exit_control(ht);
+  char *logfile = get_val(ht, "__logfile", NULL);
+  int create_subdirectories = atoi(get_val(ht, "create_subdirectories", "0"));
+
+  cmor_setup(get_val(ht, "__inpath", "/usr/share/cmor/"),
+             &netcdf_file_action, &set_verbosity, &exit_control,
+             logfile, &create_subdirectories);
+
+  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
+  register_cmor_calendar(ht, taxisInqCalendar(taxisID));
+
+  feed_json_to_cmor_dataset(ht);
+}
+
+static int *new_axis_id(int *axis_ids)
+{
+  int i;
+  for ( i = 0; axis_ids[i] != CMOR_UNDEFID; i++ );
+  axis_ids[i + 1] = CMOR_UNDEFID;
+  return &axis_ids[i];
+}
+
+static int count_axis_ids(int *axis_ids)
+{
+  int i;
+  for ( i = 0; axis_ids[i] != CMOR_UNDEFID; i++ );
+  return i;
+}
+
+static void register_x_axis(int gridID, char* name, int *axis_ids)
+{
+  double *coord_vals;
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID, units);
+  int length = gridInqXsize(gridID);
+  coord_vals = Malloc(length * sizeof(double));
+  gridInqXvals(gridID, coord_vals);
+  double *cell_bounds = Malloc(2 * length * sizeof(double));
+  int nbounds = gridInqXbounds(gridID, cell_bounds);
+  if ( nbounds != 2 * length )
+    {
+      Free(cell_bounds);
+      cell_bounds = NULL;
+    }
+  cmor_axis(new_axis_id(axis_ids), name, units, length,
+            (void *)coord_vals, 'd', (void *)cell_bounds, 2, NULL);
+  Free(coord_vals);
+  if ( cell_bounds ) Free(cell_bounds);
+}
+
+static void register_y_axis(int gridID, char* name, int *axis_ids)
+{
+  double *coord_vals;
+  char units[CDI_MAX_NAME];
+  gridInqYunits(gridID, units);
+  int length = gridInqYsize(gridID);
+  coord_vals = Malloc(length * sizeof(double));
+  gridInqYvals(gridID, coord_vals);
+  double *cell_bounds = Malloc(2 * length * sizeof(double));
+  int nbounds = gridInqYbounds(gridID, cell_bounds);
+  if ( nbounds != 2 * length )
+    {
+      Free(cell_bounds);
+      cell_bounds = NULL;
+    }
+  cmor_axis(new_axis_id(axis_ids), name, units, length,
+            (void *)coord_vals, 'd', (void *)cell_bounds, 2, NULL);
+  Free(coord_vals);
+  if ( cell_bounds ) Free(cell_bounds);
+}
+
+static void register_z_axis(struct kv **ht, int zaxisID, int *axis_ids)
+{
+  char name[CDI_MAX_NAME];
+  int levels = zaxisInqSize(zaxisID);
+  char units[CDI_MAX_NAME];
+  double *coord_vals;
+  if ( zaxisInqType(zaxisID) != ZAXIS_SURFACE )
+    {
+      coord_vals = Malloc(levels * sizeof(double));
+      zaxisInqLevels(zaxisID, coord_vals);
+      zaxisInqName(zaxisID, name);
+      zaxisInqUnits(zaxisID, units);
+      cmor_axis(new_axis_id(axis_ids), key_rename(ht, name), units,
+                levels, (void *)coord_vals, 'd', NULL, 0, NULL);
+      Free(coord_vals);
+    }
+}
+
+static void register_xy_only(int gridID, int *axis_ids)
+{
+  char name[CDI_MAX_NAME];
+  gridInqYlongname(gridID, name);
+  register_y_axis(gridID, name, axis_ids);
+  gridInqXlongname(gridID, name);
+  register_x_axis(gridID, name, axis_ids);
+}
+
+static int register_cmor_grid(int gridID, int *axis_ids)
+{
+  int gridsize = gridInqSize(gridID);
+  double *latitude = Malloc(gridsize * sizeof(double));
+  gridInqYvals(gridID, latitude);
+  double *latitude_vertices = Malloc(4 * gridsize * sizeof(double));
+  gridInqYbounds(gridID, latitude_vertices);
+
+  double *longitude = Malloc(gridsize * sizeof(double));
+  gridInqXvals(gridID, longitude);
+  double *longitude_vertices = Malloc(4 * gridsize * sizeof(double));
+  gridInqXbounds(gridID, longitude_vertices);
+  int cmor_grid_id;
+  cmor_grid(&cmor_grid_id, count_axis_ids(axis_ids), axis_ids, 'd',
+            (void *)latitude, (void *)longitude, 4,
+            (void *)latitude_vertices, (void *)longitude_vertices
+            );
+  return cmor_grid_id;
+}
+
+static void register_cmor_grid_mapping(int projID, int cmor_grid_id)
+{
+  char mapping[CDI_MAX_NAME];
+
+  mapping[0] = 0;
+  cdiGridInqKeyStr(projID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
+
+  if ( mapping[0] )
+    {
+      int atttype, attlen;
+      char attname[CDI_MAX_NAME];
+      int natts, nparameters;
+      cdiInqNatts(projID, CDI_GLOBAL, &natts);
+      char parameter_names[natts][CDI_MAX_NAME];
+      double parameter_values[natts];
+      char parameter_units[natts][1];
+
+      nparameters = 0;
+      for ( int iatt = 0; iatt < natts; ++iatt )
+        {
+          cdiInqAtt(projID, CDI_GLOBAL, iatt, attname,
+                    &atttype, &attlen);
+
+          if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
+            {
+              double attflt[attlen];
+              cdiInqAttFlt(projID, CDI_GLOBAL, attname,
+                           attlen, attflt);
+              strcpy(parameter_names[nparameters], attname);
+              parameter_values[nparameters] = attflt[0];
+              parameter_units[nparameters][0] = 0;
+              nparameters++;
+            }
+        }
+      cmor_set_grid_mapping(cmor_grid_id, mapping, nparameters,
+                            (char **)parameter_names, CDI_MAX_NAME,
+                            parameter_values,
+                            (char **)parameter_units, 1);
+    }
+}
+
+static void register_projected_grid(int gridID, int *axis_ids)
+{
+  char name[CDI_MAX_NAME];
+  int projID = gridInqProj(gridID);
+  int proj_axis_ids[3];
+  proj_axis_ids[0] = CMOR_UNDEFID;
+  gridInqYstdname(projID, name);
+  register_y_axis(projID, name, proj_axis_ids);
+  gridInqXstdname(projID, name);
+  register_x_axis(projID, name, proj_axis_ids);
+  int cmor_grid_id = register_cmor_grid(gridID, proj_axis_ids);
+  register_cmor_grid_mapping(projID, cmor_grid_id);
+  int *id = new_axis_id(axis_ids);
+  *id = cmor_grid_id;
+}
+
+static void register_xy_and_grid(int gridID, int table_id, int grid_table_id,
+                                 int *axis_ids)
+{
+  if ( gridInqProj(gridID) > 0 )
+    {
+      if ( grid_table_id == 0 )
+        cdoAbort("__grid_table not specified!");
+      cmor_set_table(grid_table_id);
+      register_projected_grid(gridID, axis_ids);
+      cmor_set_table(table_id);
+    }
+  else
+    {
+      register_xy_only(gridID, axis_ids);
+    }
+}
+
+static void get_taxis_units(char *units, int taxisID)
+{
   int timeunit = taxisInqTunit(taxisID);
   int year, month, day, hour, minute, second;
   cdiDecodeDate(taxisInqRdate(taxisID), &year, &month, &day);
@@ -368,12 +555,24 @@ static void define_variables(struct kv **ht, int streamID,
        timeunit == TUNIT_12HOURS )
     timeunit = TUNIT_HOUR;
 
-  sprintf(taxis_units, "%s since %d-%d-%d %02d:%02d:%02d",
+  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d",
           tunitNamePtr(timeunit), year, month, day, hour,
           minute, second);
+}
 
-  char **name_list;
+static int get_grid_table_id(struct kv **ht)
+{
+  int table_id = 0;
+  if ( get_val(ht, "__grid_table", NULL) )
+    cmor_load_table(get_val(ht, "__grid_table", NULL), &table_id);
+  return table_id;
+}
+
+static char **get_requested_variables(struct kv **ht)
+{
+  char **name_list = NULL;
   char *select_vars = get_val(ht, "var", NULL);
+
   if ( select_vars )
     {
       name_list = Malloc((strlen(select_vars) + 1) * sizeof(char *));
@@ -386,223 +585,209 @@ static void define_variables(struct kv **ht, int streamID,
         }
       name_list[i] = NULL;
     }
+  return name_list;
+}
+
+static void register_variable(int vlistID, int varID, int *axis_ids,
+                              struct cc_var *var)
+{
+  char name[CDI_MAX_NAME];
+  char units[CDI_MAX_NAME];
+  vlistInqVarUnits(vlistID, varID, units);
+  vlistInqVarName(vlistID, varID, name);
+  char missing_value[sizeof(double)];
+  double tolerance = 1e-4;
+  size_t gridsize = vlistGridsizeMax(vlistID);
+  int levels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+  var->cdi_varID = varID;
+  if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
+    {
+      var->datatype = 'f';
+      *(float *) missing_value = vlistInqVarMissval(vlistID, varID);
+      var->data = Malloc(gridsize * levels * sizeof(float));
+    }
   else
     {
-      name_list = NULL;
+      var->datatype = 'd';
+      *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
+      var->data = Malloc(gridsize * levels * sizeof(double));
     }
+  cmor_variable(&var->cmor_varID, name, units,
+                count_axis_ids(axis_ids), axis_ids,
+                var->datatype, (void *) missing_value, &tolerance,
+                NULL, NULL, NULL, NULL);
+}
 
-  *nvars = 0;
+static struct cc_var *new_var(struct cc_var *vars)
+{
+  int i;
+  for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
+  vars[i + 1].cdi_varID = CDI_UNDEFID;
+  return &vars[i];
+}
+
+static void define_variables(struct kv **ht, int table_id, int streamID,
+                             struct cc_var vars[])
+{
+  int vlistID = streamInqVlist(streamID);
+  int taxisID = vlistInqTaxis(vlistID);
+  char taxis_units[CMOR_MAX_STRING];
+  get_taxis_units(taxis_units, taxisID);
+  char **requested_variables = get_requested_variables(ht);
+  int grid_table_id = get_grid_table_id(ht);
+  cmor_set_table(table_id);
+
   for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
     {
       char name[CDI_MAX_NAME];
       int axis_ids[CMOR_MAX_AXES];
+      axis_ids[0] = CMOR_UNDEFID;
       vlistInqVarName(vlistID, varID, name);
-      if ( name_list == NULL || in_list(name_list, name) )
+      if ( requested_variables == NULL || in_list(requested_variables, name) )
         {
-          int ndims = 0;
-          /* Time-Axis */
-          cmor_axis(&axis_ids[ndims++],
-                    key_rename(ht, "time"),
-                    taxis_units,
-                    0,
-                    NULL,
-                    0,
-                    NULL,
-                    0,
-                    NULL);
-
-          /* Z-Axis */
+          cmor_axis(new_axis_id(axis_ids), "time", taxis_units, 0,
+                    NULL, 0, NULL, 0, NULL);
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
-          int levels = zaxisInqSize(zaxisID);
-          char units[CDI_MAX_NAME];
-          double *coord_vals;
-          if ( zaxisInqType(zaxisID) != ZAXIS_SURFACE )
-            {
-              coord_vals = Malloc(levels * sizeof(double));
-              zaxisInqLevels(zaxisID, coord_vals);
-              zaxisInqName(zaxisID, name);
-              zaxisInqUnits(zaxisID, units);
-              cmor_axis(&axis_ids[ndims++],
-                        key_rename(ht, name),
-                        units,
-                        levels,
-                        (void *)coord_vals,
-                        'd',
-                        NULL,
-                        0,
-                        NULL);
-            }
-
-          /* Y-Axis */
+          register_z_axis(ht, zaxisID, axis_ids);
           int gridID = vlistInqVarGrid(vlistID, varID);
-          gridInqYname(gridID, name);
-          gridInqYunits(gridID, units);
-          int length = gridInqYsize(gridID);
-          coord_vals = Malloc(length * sizeof(double));
-          gridInqYvals(gridID, coord_vals);
-          double *cell_bounds = Malloc(2 * length * sizeof(double));
-          int nbounds = gridInqYbounds(gridID, cell_bounds);
-          if ( nbounds != 2 * length )
-            {
-              Free(cell_bounds);
-              cell_bounds = NULL;
-            }
-          cmor_axis(&axis_ids[ndims++],
-                    key_rename(ht, name),
-                    units,
-                    length,
-                    (void *)coord_vals,
-                    'd',
-                    (void *)cell_bounds,
-                    2,
-                    NULL);
-
-          /* X-Axis */
-          gridInqXname(gridID, name);
-          gridInqXunits(gridID, units);
-          length = gridInqXsize(gridID);
-          coord_vals = Malloc(length * sizeof(double));
-          gridInqXvals(gridID, coord_vals);
-          cell_bounds = Malloc(2 * length * sizeof(double));
-          nbounds = gridInqXbounds(gridID, cell_bounds);
-          if ( nbounds != 2 * length )
-            {
-              Free(cell_bounds);
-              cell_bounds = NULL;
-            }
-          cmor_axis(&axis_ids[ndims++],
-                    key_rename(ht, name),
-                    units,
-                    length,
-                    (void *)coord_vals,
-                    'd',
-                    (void *)cell_bounds,
-                    2,
-                    NULL);
-
-          /* Variable */
-          vlistInqVarUnits(vlistID, varID, units);
-          vlistInqVarName(vlistID, varID, name);
-          char missing_value[sizeof(double)];
-          double tolerance = 1e-4;
-          size_t gridsize = vlistGridsizeMax(vlistID);
-          struct cc_var *var = &vars[(*nvars)++];
-          var->cdi_varID = varID;
-          if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
-            {
-              var->datatype = 'f';
-              *(float *) missing_value = vlistInqVarMissval(vlistID, varID);
-              var->data = Malloc(gridsize * levels * sizeof(float));
-            }
-          else
-            {
-              var->datatype = 'd';
-              *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
-              var->data = Malloc(gridsize * levels * sizeof(double));
-            }
-          cmor_variable(&var->cmor_varID,
-                        key_rename(ht, name),
-                        units,
-                        ndims,
-                        axis_ids,
-                        var->datatype,
-                        (void *) missing_value,
-                        &tolerance,
-                        NULL,
-                        NULL,
-                        NULL,
-                        NULL);
+          register_xy_and_grid(gridID, table_id, grid_table_id, axis_ids);
+          register_variable(vlistID, varID, axis_ids, new_var(vars));
         }
     }
-  if ( name_list ) Free(name_list);
+  if ( requested_variables ) Free(requested_variables);
 }
 
-static void write_variables(int streamID, struct cc_var vars[], int nvars)
+static int time_unit_in_seconds(int taxisID)
+{
+  switch ( taxisInqTunit(taxisID) )
+    {
+    case TUNIT_MINUTE: return 60;
+    case TUNIT_HOUR: return 3600;
+    case TUNIT_DAY: return 86400;
+    default: return 3600;
+    }
+}
+
+static double get_cmor_time_val(int taxisID, juldate_t ref_date)
+{
+  int tunitsec = time_unit_in_seconds(taxisID);
+  int calendar = taxisInqCalendar(taxisID);
+  juldate_t juldate = juldate_encode(calendar,
+                                     taxisInqVdate(taxisID),
+                                     taxisInqVtime(taxisID));
+  return juldate_to_seconds(juldate_sub(juldate, ref_date)) / tunitsec;
+}
+
+static double *get_cmor_time_bounds(int taxisID, juldate_t ref_date,
+                                    double *bounds)
+{
+  if ( taxisHasBounds(taxisID) )
+    {
+      int vdate0b, vdate1b, vtime0b, vtime1b;
+      taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
+      taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
+
+      int tunitsec = time_unit_in_seconds(taxisID);
+      int calendar = taxisInqCalendar(taxisID);
+      juldate_t date = juldate_encode(calendar, vdate0b, vtime0b);
+      bounds[0] = juldate_to_seconds(juldate_sub(date, ref_date)) / tunitsec;
+
+      date = juldate_encode(calendar, vdate1b, vtime1b);
+      bounds[1] = juldate_to_seconds(juldate_sub(date, ref_date)) / tunitsec;
+      return bounds;
+    }
+  else
+    {
+      return NULL;
+    }
+}
+
+static void read_record(int streamID, double *buffer, size_t gridsize,
+                        struct cc_var vars[])
+{
+  int varID, levelID;
+  streamInqRecord(streamID, &varID, &levelID);
+  struct cc_var *var = find_var(varID, vars);
+  if ( var )
+    {
+      int nmiss;
+      if ( var->datatype == 'f' )
+        {
+          streamReadRecord(streamID, buffer, &nmiss);
+          for ( size_t i = 0; i < gridsize; i++ )
+            ((float *)var->data)[gridsize * levelID + i] =
+              (float)buffer[i];
+        }
+      else
+        {
+          streamReadRecord(streamID, (double *)var->data + gridsize * levelID,
+                           &nmiss);
+        }
+    }
+}
+
+static void write_variables(int streamID, struct cc_var vars[])
 {
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
-  int tunitsec;
-  switch ( taxisInqTunit(taxisID) )
-    {
-    case TUNIT_MINUTE: tunitsec = 60; break;
-    case TUNIT_HOUR: tunitsec = 3600; break;
-    case TUNIT_DAY: tunitsec = 86400; break;
-    default: tunitsec = 3600;
-    }
-
   int calendar = taxisInqCalendar(taxisID);
-  juldate_t r_juldate = juldate_encode(calendar,
+  juldate_t ref_date = juldate_encode(calendar,
                                        taxisInqRdate(taxisID),
                                        taxisInqRtime(taxisID));
   size_t gridsize = vlistGridsizeMax(vlistID);
-  double *buffer = (double *) Malloc(gridsize * sizeof(double));
+  double *buffer = (double *) Malloc(vlistGridsizeMax(vlistID) *
+                                     sizeof(double));
   int tsID = 0;
   int nrecs;
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
-      double time_bnds[2];
-      double *time_bndsp;
-      double time_val;
-      juldate_t juldate = juldate_encode(calendar,
-                                         taxisInqVdate(taxisID),
-                                         taxisInqVtime(taxisID));
-      time_val = juldate_to_seconds(juldate_sub(juldate, r_juldate))
-        / tunitsec;
-
-      if ( taxisHasBounds(taxisID) )
-        {
-          int vdate0b, vdate1b, vtime0b, vtime1b;
-          taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
-          taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
-
-          juldate = juldate_encode(calendar, vdate0b, vtime0b);
-          time_bnds[0] = juldate_to_seconds(juldate_sub(juldate, r_juldate))
-            / tunitsec;
-
-          juldate = juldate_encode(calendar, vdate1b, vtime1b);
-          time_bnds[1] = juldate_to_seconds(juldate_sub(juldate, r_juldate))
-            / tunitsec;
-          time_bndsp = time_bnds;
-        }
-      else
-        {
-          time_bndsp = NULL;
-        }
-
       while ( nrecs-- )
-        {
-          int varID, levelID;
-          streamInqRecord(streamID, &varID, &levelID);
-          struct cc_var *var = find_var(varID, vars, nvars);
-          if ( var )
-            {
-              int nmiss;
-              if ( var->datatype == 'f' )
-                {
-                  streamReadRecord(streamID, buffer, &nmiss);
-                  for ( size_t i = 0; i < gridsize; i++ )
-                    ((float *)var->data)[gridsize * levelID + i] =
-                      (float)buffer[i];
-                }
-              else
-                {
-                  streamReadRecord(streamID,
-                                   (double *)var->data + gridsize * levelID,
-                                   &nmiss);
-                }
-            }
-        }
+        read_record(streamID, buffer, gridsize, vars);
 
-      for ( int i = 0; i < nvars; i++ )
-        cmor_write(vars[i].cmor_varID,
-                   vars[i].data,
-                   vars[i].datatype,
-                   1,
-                   &time_val,
-                   time_bndsp,
+      double time_val = get_cmor_time_val(taxisID, ref_date);
+      double time_bnds[2];
+      for ( int i = 0; vars[i].cdi_varID >= 0; i++ )
+        cmor_write(vars[i].cmor_varID, vars[i].data, vars[i].datatype,
+                   1, &time_val,
+                   get_cmor_time_bounds(taxisID, ref_date, time_bnds),
                    NULL);
     }
   Free(buffer);
+}
+
+static int load_and_set_table(char *table)
+{
+  int table_id;
+  cmor_load_table(table, &table_id);
+  cmor_set_table(table_id);
+  return table_id;
+}
+
+static void destruct_hash_table(struct kv **ht)
+{
+  struct kv *s, *tmp;
+  HASH_ITER(hh, *ht, s, tmp)
+    {
+      Free(s->key);
+      Free(s->value);
+      Free(s);
+    }
+}
+
+static void destruct_vars(struct cc_var *vars)
+{
+  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+    Free(vars[i].data);
+  Free(vars);
+}
+
+static struct cc_var *construct_vars(int streamID)
+{
+  int nvars_max = vlistNvars(streamInqVlist(streamID));
+  struct cc_var *vars = (struct cc_var *) Malloc((nvars_max + 1) *
+                                                 sizeof(struct cc_var));
+  vars[0].cdi_varID = CDI_UNDEFID;
+  return vars;
 }
 #endif
 
@@ -627,28 +812,18 @@ void *CMOR(void *argument)
   dump_global_attributes(&ht, streamID);
   dump_special_attributes(&ht, streamID);
 
-  int nvars;
-  int nvars_max = vlistNvars(streamInqVlist(streamID));
-  struct cc_var *vars = (struct cc_var *) Malloc(nvars_max
-                                                 * sizeof(struct cc_var));
-  setup(&ht, streamID, params[0]);
-  define_variables(&ht, streamID, vars, &nvars);
-  write_variables(streamID, vars, nvars);
+  setup(&ht, streamID);
+  int table_id = load_and_set_table(params[0]);
+
+  struct cc_var *vars = construct_vars(streamID);
+  define_variables(&ht, table_id, streamID, vars);
+  write_variables(streamID, vars);
+  destruct_vars(vars);
+  destruct_hash_table(&ht);
 
   streamClose(streamID);
   cmor_close();
 
-  for ( int i = 0; i < nvars; i++ )
-    Free(vars[i].data);
-  Free(vars);
-
-  struct kv *s, *tmp;
-  HASH_ITER(hh, ht, s, tmp)
-    {
-      Free(s->key);
-      Free(s->value);
-      Free(s);
-    }
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
