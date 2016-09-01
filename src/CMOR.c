@@ -11,7 +11,7 @@
 
 #define CMOR_UNDEFID (CMOR_MAX_AXES + 1)
 
-struct cc_var
+struct mapping
 {
   int cdi_varID;
   int cmor_varID;
@@ -25,14 +25,6 @@ struct kv
   char *value;
   UT_hash_handle hh;
 };
-
-static struct cc_var *find_var(int cdi_varID, struct cc_var vars[])
-{
-  for ( int i = 0; vars[i].cdi_varID >= 0; i++ )
-    if ( cdi_varID == vars[i].cdi_varID )
-      return &vars[i];
-  return NULL;
-}
 
 static char *trim(char *s)
 {
@@ -243,7 +235,7 @@ static void dump_special_attributes(struct kv **ht, int streamID)
 static void read_config_files(struct kv **ht)
 {
   /* Files from info key in command line. */
-  char *info = get_val(ht, "info", "");
+  char *info = get_val(ht, "__info", "");
   char *infoc = Malloc(strlen(info) + 1);
   strcpy(infoc, info);
   char *filename = strtok(infoc, ",");
@@ -264,14 +256,6 @@ static void read_config_files(struct kv **ht)
 
   /* System wide configuration. */
   parse_kv_file(ht, "/etc/cdocmor.info", 0);
-}
-
-static int in_list(char **list, const char *needle)
-{
-  while ( *list )
-    if ( strcmp(*list++, needle) == 0 )
-      return 1;
-  return 0;
 }
 
 static void register_cmor_calendar(struct kv **ht, int calendar)
@@ -312,7 +296,7 @@ static char *dump_ht_to_json_file(struct kv **ht, char *filename)
 
 static int get_netcdf_file_action(struct kv **ht)
 {
-  char *chunk = get_val(ht, "chunk", "replace");
+  char *chunk = get_val(ht, "__chunk", "replace");
   if ( strcasecmp(chunk, "append") == 0 )
     return CMOR_APPEND;
   else
@@ -321,7 +305,7 @@ static int get_netcdf_file_action(struct kv **ht)
 
 static int get_cmor_verbosity(struct kv **ht)
 {
-  if ( strcasecmp(get_val(ht, "set_verbosity", ""), "CMOR_QUIET") == 0 )
+  if ( strcasecmp(get_val(ht, "__set_verbosity", ""), "CMOR_QUIET") == 0 )
     return CMOR_QUIET;
   else
     return CMOR_NORMAL;
@@ -329,10 +313,11 @@ static int get_cmor_verbosity(struct kv **ht)
 
 static int get_cmor_exit_control(struct kv **ht)
 {
-  if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_MAJOR") == 0 )
+  if ( strcasecmp(get_val(ht, "__exit_control", ""),
+                  "CMOR_EXIT_ON_MAJOR") == 0 )
     return CMOR_EXIT_ON_MAJOR;
-  else if ( strcasecmp(get_val(ht, "exit_control", ""), "CMOR_EXIT_ON_WARNING")
-       == 0 )
+  else if ( strcasecmp(get_val(ht, "__exit_control", ""),
+                       "CMOR_EXIT_ON_WARNING")  == 0 )
     return CMOR_EXIT_ON_WARNING;
   else
     return CMOR_NORMAL;
@@ -346,13 +331,13 @@ static void feed_json_to_cmor_dataset(struct kv **ht)
   unlink(filename);
 }
 
-static void setup(struct kv **ht, int streamID)
+static void setup_dataset(struct kv **ht, int streamID)
 {
   int netcdf_file_action = get_netcdf_file_action(ht);
   int set_verbosity = get_cmor_verbosity(ht);
   int exit_control = get_cmor_exit_control(ht);
   char *logfile = get_val(ht, "__logfile", NULL);
-  int create_subdirectories = atoi(get_val(ht, "create_subdirectories", "0"));
+  int create_subdirectories = atoi(get_val(ht, "__create_subdirectories", "0"));
 
   cmor_setup(get_val(ht, "__inpath", "/usr/share/cmor/"),
              &netcdf_file_action, &set_verbosity, &exit_control,
@@ -360,7 +345,6 @@ static void setup(struct kv **ht, int streamID)
 
   int taxisID = vlistInqTaxis(streamInqVlist(streamID));
   register_cmor_calendar(ht, taxisInqCalendar(taxisID));
-
   feed_json_to_cmor_dataset(ht);
 }
 
@@ -394,8 +378,8 @@ static void register_x_axis(int gridID, char* name, int *axis_ids)
       Free(cell_bounds);
       cell_bounds = NULL;
     }
-  cmor_axis(new_axis_id(axis_ids), name, units, length,
-            (void *)coord_vals, 'd', (void *)cell_bounds, 2, NULL);
+  cmor_axis(new_axis_id(axis_ids), name, units, length, (void *)coord_vals,
+            'd', (void *)cell_bounds, 2, NULL);
   Free(coord_vals);
   if ( cell_bounds ) Free(cell_bounds);
 }
@@ -415,15 +399,14 @@ static void register_y_axis(int gridID, char* name, int *axis_ids)
       Free(cell_bounds);
       cell_bounds = NULL;
     }
-  cmor_axis(new_axis_id(axis_ids), name, units, length,
-            (void *)coord_vals, 'd', (void *)cell_bounds, 2, NULL);
+  cmor_axis(new_axis_id(axis_ids), name, units, length, (void *)coord_vals,
+            'd', (void *)cell_bounds, 2, NULL);
   Free(coord_vals);
   if ( cell_bounds ) Free(cell_bounds);
 }
 
-static void register_z_axis(struct kv **ht, int zaxisID, int *axis_ids)
+static void register_z_axis(int zaxisID, char *name, int *axis_ids)
 {
-  char name[CDI_MAX_NAME];
   int levels = zaxisInqSize(zaxisID);
   char units[CDI_MAX_NAME];
   double *coord_vals;
@@ -431,10 +414,9 @@ static void register_z_axis(struct kv **ht, int zaxisID, int *axis_ids)
     {
       coord_vals = Malloc(levels * sizeof(double));
       zaxisInqLevels(zaxisID, coord_vals);
-      zaxisInqName(zaxisID, name);
       zaxisInqUnits(zaxisID, units);
-      cmor_axis(new_axis_id(axis_ids), key_rename(ht, name), units,
-                levels, (void *)coord_vals, 'd', NULL, 0, NULL);
+      cmor_axis(new_axis_id(axis_ids), name, units, levels, (void *)coord_vals,
+                'd', NULL, 0, NULL);
       Free(coord_vals);
     }
 }
@@ -448,7 +430,7 @@ static void register_xy_only(int gridID, int *axis_ids)
   register_x_axis(gridID, name, axis_ids);
 }
 
-static int register_cmor_grid(int gridID, int *axis_ids)
+static void register_cmor_grid(int gridID, int *axis_ids, int *cmor_grid_id)
 {
   int gridsize = gridInqSize(gridID);
   double *latitude = Malloc(gridsize * sizeof(double));
@@ -460,22 +442,22 @@ static int register_cmor_grid(int gridID, int *axis_ids)
   gridInqXvals(gridID, longitude);
   double *longitude_vertices = Malloc(4 * gridsize * sizeof(double));
   gridInqXbounds(gridID, longitude_vertices);
-  int cmor_grid_id;
-  cmor_grid(&cmor_grid_id, count_axis_ids(axis_ids), axis_ids, 'd',
+  cmor_grid(cmor_grid_id, count_axis_ids(axis_ids), axis_ids, 'd',
             (void *)latitude, (void *)longitude, 4,
             (void *)latitude_vertices, (void *)longitude_vertices
             );
-  return cmor_grid_id;
+  Free(latitude);
+  Free(latitude_vertices);
+  Free(longitude);
+  Free(longitude_vertices);
 }
 
 static void register_cmor_grid_mapping(int projID, int cmor_grid_id)
 {
-  char mapping[CDI_MAX_NAME];
+  char grid_mapping[CDI_MAX_NAME] = "";
+  cdiGridInqKeyStr(projID, CDI_KEY_MAPPING, CDI_MAX_NAME, grid_mapping);
 
-  mapping[0] = 0;
-  cdiGridInqKeyStr(projID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
-
-  if ( mapping[0] )
+  if ( grid_mapping[0] )
     {
       int atttype, attlen;
       char attname[CDI_MAX_NAME];
@@ -488,21 +470,18 @@ static void register_cmor_grid_mapping(int projID, int cmor_grid_id)
       nparameters = 0;
       for ( int iatt = 0; iatt < natts; ++iatt )
         {
-          cdiInqAtt(projID, CDI_GLOBAL, iatt, attname,
-                    &atttype, &attlen);
-
+          cdiInqAtt(projID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
           if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
             {
               double attflt[attlen];
-              cdiInqAttFlt(projID, CDI_GLOBAL, attname,
-                           attlen, attflt);
+              cdiInqAttFlt(projID, CDI_GLOBAL, attname, attlen, attflt);
               strcpy(parameter_names[nparameters], attname);
               parameter_values[nparameters] = attflt[0];
               parameter_units[nparameters][0] = 0;
               nparameters++;
             }
         }
-      cmor_set_grid_mapping(cmor_grid_id, mapping, nparameters,
+      cmor_set_grid_mapping(cmor_grid_id, grid_mapping, nparameters,
                             (char **)parameter_names, CDI_MAX_NAME,
                             parameter_values,
                             (char **)parameter_units, 1);
@@ -519,10 +498,9 @@ static void register_projected_grid(int gridID, int *axis_ids)
   register_y_axis(projID, name, proj_axis_ids);
   gridInqXstdname(projID, name);
   register_x_axis(projID, name, proj_axis_ids);
-  int cmor_grid_id = register_cmor_grid(gridID, proj_axis_ids);
-  register_cmor_grid_mapping(projID, cmor_grid_id);
-  int *id = new_axis_id(axis_ids);
-  *id = cmor_grid_id;
+  int *cmor_grid_id = new_axis_id(axis_ids);
+  register_cmor_grid(gridID, proj_axis_ids, cmor_grid_id);
+  register_cmor_grid_mapping(projID, *cmor_grid_id);
 }
 
 static void register_xy_and_grid(int gridID, int table_id, int grid_table_id,
@@ -550,28 +528,38 @@ static void get_taxis_units(char *units, int taxisID)
   cdiDecodeTime(taxisInqRtime(taxisID), &hour, &minute, &second);
   if ( timeunit == TUNIT_QUARTER || timeunit == TUNIT_30MINUTES )
     timeunit = TUNIT_MINUTE;
-  if ( timeunit == TUNIT_3HOURS ||
-       timeunit == TUNIT_6HOURS ||
+  if ( timeunit == TUNIT_3HOURS || timeunit == TUNIT_6HOURS ||
        timeunit == TUNIT_12HOURS )
     timeunit = TUNIT_HOUR;
 
-  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d",
-          tunitNamePtr(timeunit), year, month, day, hour,
-          minute, second);
+  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
+          year, month, day, hour, minute, second);
+}
+
+static int get_table_id(char *table)
+{
+  int table_id;
+  cmor_load_table(table, &table_id);
+  return table_id;
 }
 
 static int get_grid_table_id(struct kv **ht)
 {
-  int table_id = 0;
   if ( get_val(ht, "__grid_table", NULL) )
-    cmor_load_table(get_val(ht, "__grid_table", NULL), &table_id);
-  return table_id;
+    {
+      return get_table_id(get_val(ht, "__grid_table", NULL));
+    }
+  else
+    {
+      cdoAbort("Grid table required but not defined. Set __grid_table!");
+      return 0;
+    }
 }
 
 static char **get_requested_variables(struct kv **ht)
 {
   char **name_list = NULL;
-  char *select_vars = get_val(ht, "var", NULL);
+  char *select_vars = get_val(ht, "__var", NULL);
 
   if ( select_vars )
     {
@@ -589,12 +577,12 @@ static char **get_requested_variables(struct kv **ht)
 }
 
 static void register_variable(int vlistID, int varID, int *axis_ids,
-                              struct cc_var *var)
+                              struct mapping *var)
 {
   char name[CDI_MAX_NAME];
+  vlistInqVarName(vlistID, varID, name);
   char units[CDI_MAX_NAME];
   vlistInqVarUnits(vlistID, varID, units);
-  vlistInqVarName(vlistID, varID, name);
   char missing_value[sizeof(double)];
   double tolerance = 1e-4;
   size_t gridsize = vlistGridsizeMax(vlistID);
@@ -618,7 +606,7 @@ static void register_variable(int vlistID, int varID, int *axis_ids,
                 NULL, NULL, NULL, NULL);
 }
 
-static struct cc_var *new_var(struct cc_var *vars)
+static struct mapping *new_var_mapping(struct mapping vars[])
 {
   int i;
   for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
@@ -626,8 +614,16 @@ static struct cc_var *new_var(struct cc_var *vars)
   return &vars[i];
 }
 
-static void define_variables(struct kv **ht, int table_id, int streamID,
-                             struct cc_var vars[])
+static int in_list(char **list, const char *needle)
+{
+  for ( ; *list; list++ )
+    if ( strcmp(*list, needle) == 0 )
+      return 1;
+  return 0;
+}
+
+static void register_axes_and_variables(struct kv **ht, int table_id,
+                                        int streamID, struct mapping vars[])
 {
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
@@ -639,19 +635,22 @@ static void define_variables(struct kv **ht, int table_id, int streamID,
 
   for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
     {
-      char name[CDI_MAX_NAME];
+      char var_name[CDI_MAX_NAME];
       int axis_ids[CMOR_MAX_AXES];
       axis_ids[0] = CMOR_UNDEFID;
-      vlistInqVarName(vlistID, varID, name);
-      if ( requested_variables == NULL || in_list(requested_variables, name) )
+      vlistInqVarName(vlistID, varID, var_name);
+      if ( requested_variables == NULL ||
+           in_list(requested_variables, var_name) )
         {
           cmor_axis(new_axis_id(axis_ids), "time", taxis_units, 0,
                     NULL, 0, NULL, 0, NULL);
           int zaxisID = vlistInqVarZaxis(vlistID, varID);
-          register_z_axis(ht, zaxisID, axis_ids);
+          char z_name[CDI_MAX_NAME];
+          zaxisInqName(zaxisID, z_name);
+          register_z_axis(zaxisID, key_rename(ht, z_name), axis_ids);
           int gridID = vlistInqVarGrid(vlistID, varID);
           register_xy_and_grid(gridID, table_id, grid_table_id, axis_ids);
-          register_variable(vlistID, varID, axis_ids, new_var(vars));
+          register_variable(vlistID, varID, axis_ids, new_var_mapping(vars));
         }
     }
   if ( requested_variables ) Free(requested_variables);
@@ -672,8 +671,7 @@ static double get_cmor_time_val(int taxisID, juldate_t ref_date)
 {
   int tunitsec = time_unit_in_seconds(taxisID);
   int calendar = taxisInqCalendar(taxisID);
-  juldate_t juldate = juldate_encode(calendar,
-                                     taxisInqVdate(taxisID),
+  juldate_t juldate = juldate_encode(calendar, taxisInqVdate(taxisID),
                                      taxisInqVtime(taxisID));
   return juldate_to_seconds(juldate_sub(juldate, ref_date)) / tunitsec;
 }
@@ -702,12 +700,20 @@ static double *get_cmor_time_bounds(int taxisID, juldate_t ref_date,
     }
 }
 
+static struct mapping *map_var(int cdi_varID, struct mapping vars[])
+{
+  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+    if ( cdi_varID == vars[i].cdi_varID )
+      return &vars[i];
+  return NULL;
+}
+
 static void read_record(int streamID, double *buffer, size_t gridsize,
-                        struct cc_var vars[])
+                        struct mapping vars[])
 {
   int varID, levelID;
   streamInqRecord(streamID, &varID, &levelID);
-  struct cc_var *var = find_var(varID, vars);
+  struct mapping *var = map_var(varID, vars);
   if ( var )
     {
       int nmiss;
@@ -726,14 +732,13 @@ static void read_record(int streamID, double *buffer, size_t gridsize,
     }
 }
 
-static void write_variables(int streamID, struct cc_var vars[])
+static void write_variables(int streamID, struct mapping vars[])
 {
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
   int calendar = taxisInqCalendar(taxisID);
-  juldate_t ref_date = juldate_encode(calendar,
-                                       taxisInqRdate(taxisID),
-                                       taxisInqRtime(taxisID));
+  juldate_t ref_date = juldate_encode(calendar, taxisInqRdate(taxisID),
+                                      taxisInqRtime(taxisID));
   size_t gridsize = vlistGridsizeMax(vlistID);
   double *buffer = (double *) Malloc(vlistGridsizeMax(vlistID) *
                                      sizeof(double));
@@ -746,21 +751,12 @@ static void write_variables(int streamID, struct cc_var vars[])
 
       double time_val = get_cmor_time_val(taxisID, ref_date);
       double time_bnds[2];
-      for ( int i = 0; vars[i].cdi_varID >= 0; i++ )
+      for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
         cmor_write(vars[i].cmor_varID, vars[i].data, vars[i].datatype,
                    1, &time_val,
-                   get_cmor_time_bounds(taxisID, ref_date, time_bnds),
-                   NULL);
+                   get_cmor_time_bounds(taxisID, ref_date, time_bnds), NULL);
     }
   Free(buffer);
-}
-
-static int load_and_set_table(char *table)
-{
-  int table_id;
-  cmor_load_table(table, &table_id);
-  cmor_set_table(table_id);
-  return table_id;
 }
 
 static void destruct_hash_table(struct kv **ht)
@@ -774,18 +770,18 @@ static void destruct_hash_table(struct kv **ht)
     }
 }
 
-static void destruct_vars(struct cc_var *vars)
+static void destruct_var_mapping(struct mapping vars[])
 {
   for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
     Free(vars[i].data);
   Free(vars);
 }
 
-static struct cc_var *construct_vars(int streamID)
+static struct mapping *construct_var_mapping(int streamID)
 {
   int nvars_max = vlistNvars(streamInqVlist(streamID));
-  struct cc_var *vars = (struct cc_var *) Malloc((nvars_max + 1) *
-                                                 sizeof(struct cc_var));
+  struct mapping *vars =
+    (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
   vars[0].cdi_varID = CDI_UNDEFID;
   return vars;
 }
@@ -812,13 +808,14 @@ void *CMOR(void *argument)
   dump_global_attributes(&ht, streamID);
   dump_special_attributes(&ht, streamID);
 
-  setup(&ht, streamID);
-  int table_id = load_and_set_table(params[0]);
+  setup_dataset(&ht, streamID);
+  int table_id = get_table_id(params[0]);
+  cmor_set_table(table_id);
 
-  struct cc_var *vars = construct_vars(streamID);
-  define_variables(&ht, table_id, streamID, vars);
+  struct mapping *vars = construct_var_mapping(streamID);
+  register_axes_and_variables(&ht, table_id, streamID, vars);
   write_variables(streamID, vars);
-  destruct_vars(vars);
+  destruct_var_mapping(vars);
   destruct_hash_table(&ht);
 
   streamClose(streamID);
