@@ -52,10 +52,12 @@ if [ "@ENABLE_NETCDF@" = yes ] ; then
   $CDO -O -f nc -temp,r18x9 temp.small
   $CDO -O -f nc -temp,global_10 temp.global
   $CDO -O -f nc -merge temp.small temp.global temp.2grids
-  if test 2 -eq $($CDOCOMMAND temp.2grids) ; then  echo "ok $NTEST - $CDOCOMMAND temp.2grids"; else echo "not ok $NTEST - $CDOCOMMAND temp.2grids"; fi; let NTEST+=1
-  else
-    test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP netCDF not enabled"
-  fi
-
+  if test 2 -eq $($CDOCOMMAND temp.2grids) ; then  echo "ok $NTEST - $CDOCOMMAND temp.2grids";
+  else echo "not ok $NTEST - $CDOCOMMAND temp.2grids"; fi
+  let NTEST+=1
+  rm -f temp.small temp.global temp.2grids
+else
+  test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP netCDF not enabled"
+fi
 #
 exit 0
