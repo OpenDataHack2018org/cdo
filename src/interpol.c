@@ -207,35 +207,26 @@ void intlinarr2(double missval, int lon_is_circular,
 		long nxm, long nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
 		long gridsize2, double *field, const double *restrict x, const double *restrict y)
 {
-  long ii, jj;
-  long gridsize1;
   long nlon1 = nxm;
   double findex = 0;
-  int *grid1_mask = NULL;
 
   if ( lon_is_circular ) nlon1--;
-  gridsize1 = nlon1*nym;
+  long gridsize1 = nlon1*nym;
 
-  grid1_mask = (int*) Calloc(1, gridsize1*sizeof(int));
-  for ( jj = 0; jj < nym; ++jj )
-    for ( ii = 0; ii < nlon1; ++ii )
-      {
-	if ( !DBL_IS_EQUAL(fieldm[jj*nlon1+ii], missval) ) grid1_mask[jj*nlon1+ii] = 1;
-      }
+  bool *grid1_mask = (bool*) Malloc(gridsize1*sizeof(bool));
+  for ( long jj = 0; jj < nym; ++jj )
+    for ( long ii = 0; ii < nlon1; ++ii )
+      grid1_mask[jj*nlon1+ii] = !DBL_IS_EQUAL(fieldm[jj*nlon1+ii], missval);
 
   progressInit();
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask) \
-  private(jj,ii)
+  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask)
 #endif
   for ( int i = 0; i < gridsize2; ++i )
     {
       int src_add[4];                /*  address for the four source points    */
-      long n;
-      long iix;
-      int lfound;
       int lprogress = 1;
       if ( cdo_omp_get_thread_num() != 0 ) lprogress = 0;
 
@@ -247,11 +238,12 @@ void intlinarr2(double missval, int lon_is_circular,
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
 
-      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
+      long ii, jj;
+      int lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
 
       if ( lfound )
 	{
-	  iix = ii;
+	  long iix = ii;
 	  if ( lon_is_circular && iix == (nxm-1) ) iix = 0;
 	  src_add[0] = (jj-1)*nlon1+(ii-1);
 	  src_add[1] = (jj-1)*nlon1+(iix);
@@ -259,14 +251,13 @@ void intlinarr2(double missval, int lon_is_circular,
 	  src_add[3] = (jj)*nlon1+(iix);
 
 	  /* Check to see if points are missing values */
-	  for ( n = 0; n < 4; ++n )
+	  for ( int n = 0; n < 4; ++n )
 	    if ( ! grid1_mask[src_add[n]] ) lfound = 0;
 	}
 
       if ( lfound )
 	{
 	  double wgts[4];
-
 	  wgts[0] = (x[i]-xm[ii])   * (y[i]-ym[jj])   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]));
 	  wgts[1] = (x[i]-xm[ii-1]) * (y[i]-ym[jj])   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]));
 	  wgts[3] = (x[i]-xm[ii-1]) * (y[i]-ym[jj-1]) / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
@@ -289,7 +280,7 @@ void intlinarr2(double missval, int lon_is_circular,
 
 	  
 	  field[i] = 0;
-	  for ( n = 0; n < 4; ++n )
+	  for ( int n = 0; n < 4; ++n )
 	    field[i] += fieldm[src_add[n]] * wgts[n];
 	}
     }
@@ -337,9 +328,6 @@ void intgridbil(field_t *field1, field_t *field2)
   double *array2 = field2->ptr;
   double missval = field1->missval;
 
-  int gridtype1 = gridInqType(gridID1);
-  int gridtype2 = gridInqType(gridID2);
-
   int nlon1 = gridInqXsize(gridID1);
   int nlat1 = gridInqYsize(gridID1);
 
@@ -385,7 +373,6 @@ void intgridbil(field_t *field1, field_t *field2)
   if ( xsize2 == 1 && ysize2 == 1 )
     {
       double lon2, lat2;
-
       gridInqXvals(gridID2, &lon2);
       gridInqYvals(gridID2, &lat2);
 
