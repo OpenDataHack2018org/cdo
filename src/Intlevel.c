@@ -264,7 +264,7 @@ void *Intlevel(void *argument)
   int zaxisID2 = zaxisCreate(zaxisInqType(zaxisID1), nlev2);
   zaxisDefLevels(zaxisID2, lev2);
   {
-    char str[256];
+    char str[CDI_MAX_NAME];
     str[0] = 0;
     zaxisInqName(zaxisID1, str);
     zaxisDefName(zaxisID2, str);
