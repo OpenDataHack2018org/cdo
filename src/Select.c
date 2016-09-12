@@ -31,33 +31,6 @@
 
 double datestr_to_double(const char *datestr, int opt);
 
-int vlist_get_psvarid(int vlistID, int zaxisID)
-{
-  int psvarid = -1;
-  char name[CDI_MAX_NAME];
-  char psname[CDI_MAX_NAME];
-  psname[0] = 0;
-  zaxisInqPsName(zaxisID, psname);
-
-  if ( psname[0] )
-    {
-      int nvars = vlistNvars(vlistID);
-      for ( int varID = 0; varID < nvars; ++varID )
-        {
-          vlistInqVarName(vlistID, varID, name);
-          if ( strcmp(name, psname) == 0 )
-            {
-              psvarid = varID;
-              break;
-            }
-        }
-      if ( cdoVerbose && psvarid == -1 )
-        cdoWarning("Surface pressure variable not found - %s", psname);
-    }
-
-  return psvarid;
-}
-
 static
 void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
 {
