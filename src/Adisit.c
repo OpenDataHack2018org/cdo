@@ -255,11 +255,15 @@ void *Adisit(void *argument)
   sao.missval = vlistInqVarMissval(vlistID1, saoID);
   tis.missval = tho.missval;
 
+  int datatype = DATATYPE_FLT32;
+  if ( vlistInqVarDatatype(vlistID1, thoID) == DATATYPE_FLT64 &&
+       vlistInqVarDatatype(vlistID1, saoID) == DATATYPE_FLT64 )
+    datatype = DATATYPE_FLT64;
 
   int vlistID2 = vlistCreate();
 
   int tisID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARIABLE);
-  if (operatorID == ADISIT)
+  if ( operatorID == ADISIT )
     {
       vlistDefVarParam(vlistID2, tisID2, cdiEncodeParam(20, 255, 255));
       vlistDefVarName(vlistID2, tisID2, "to");
@@ -275,6 +279,7 @@ void *Adisit(void *argument)
     }
   vlistDefVarUnits(vlistID2, tisID2, "K");
   vlistDefVarMissval(vlistID2, tisID2, tis.missval);
+  vlistDefVarDatatype(vlistID2, tisID2, datatype);
 
   int saoID2 = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARIABLE);
   vlistDefVarParam(vlistID2, saoID2, cdiEncodeParam(5, 255, 255));
@@ -283,6 +288,7 @@ void *Adisit(void *argument)
   vlistDefVarStdname(vlistID2, saoID2, "sea_water_salinity");
   vlistDefVarUnits(vlistID2, saoID2, "psu");
   vlistDefVarMissval(vlistID2, saoID2, sao.missval);
+  vlistDefVarDatatype(vlistID2, saoID2, datatype);
 
 
   int taxisID1 = vlistInqTaxis(vlistID1);

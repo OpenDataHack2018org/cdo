@@ -248,6 +248,11 @@ void *Rhopot(void *argument)
   sao.missval = vlistInqVarMissval(vlistID1, saoID);
   rho.missval = to.missval;
 
+  int datatype = DATATYPE_FLT32;
+  if ( vlistInqVarDatatype(vlistID1, toID) == DATATYPE_FLT64 &&
+       vlistInqVarDatatype(vlistID1, saoID) == DATATYPE_FLT64 )
+    datatype = DATATYPE_FLT64;
+
   int vlistID2 = vlistCreate();
   varID = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_INSTANT);
   vlistDefVarParam(vlistID2, varID, cdiEncodeParam(18, 255, 255));
@@ -256,7 +261,7 @@ void *Rhopot(void *argument)
   vlistDefVarStdname(vlistID2, varID, "sea_water_potential_density");
   vlistDefVarUnits(vlistID2, varID, "kg m-3");
   vlistDefVarMissval(vlistID2, varID, rho.missval);
-
+  vlistDefVarDatatype(vlistID2, varID, datatype);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
