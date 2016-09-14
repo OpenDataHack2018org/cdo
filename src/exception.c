@@ -35,7 +35,7 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 	case FILETYPE_GRB:
           break;
 	case FILETYPE_GRB2:
-          fprintf(stderr, "To create a CDO application with GRIB2 support use: ./configure --with-netcdf=<GRIB_API root directory> ...\n");
+          fprintf(stderr, "To create a CDO application with GRIB2 support use: ./configure --with-grib_api=<GRIB_API root directory> ...\n");
           break;
 	case FILETYPE_SRV:
           break;
