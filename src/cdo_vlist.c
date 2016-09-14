@@ -528,9 +528,8 @@ int vlist_get_psvarid(int vlistID, int zaxisID)
 {
   int psvarid = -1;
   char name[CDI_MAX_NAME];
-  char psname[CDI_MAX_NAME];
-  psname[0] = 0;
-  zaxisInqPsName(zaxisID, psname);
+  char psname[CDI_MAX_NAME]; psname[0] = 0;
+  cdiZaxisInqKeyStr(zaxisID, CDI_KEY_PSNAME, CDI_MAX_NAME, psname);
 
   if ( psname[0] )
     {

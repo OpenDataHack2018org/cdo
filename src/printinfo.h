@@ -575,9 +575,8 @@ void printZaxisInfo(int vlistID)
 
       if ( zaxistype == ZAXIS_HYBRID )
         {
-          char psname[CDI_MAX_NAME];
-          psname[0] = 0;
-          zaxisInqPsName(zaxisID, psname);
+          char psname[CDI_MAX_NAME]; psname[0] = 0;
+          cdiZaxisInqKeyStr(zaxisID, CDI_KEY_PSNAME, CDI_MAX_NAME, psname);
           int vctsize = zaxisInqVctSize(zaxisID);
           if ( vctsize || psname[0] )
             {
