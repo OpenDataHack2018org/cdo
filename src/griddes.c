@@ -913,7 +913,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else
 	    size = grid.xsize;
 
-	  if ( size > 0 ) cdoAbort("xsize or gridsize undefined (file: %s)!", dname);
+	  if ( size == 0 ) cdoAbort("xsize or gridsize undefined (grid description file: %s)!", dname);
 
           grid.xvals = (double*) Malloc(size*sizeof(double));
           pline = skipSeparator(pline + len);
