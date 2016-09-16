@@ -298,6 +298,7 @@ cdo_SOURCES += Adisit.c        \
                Setrcaname.c    \
                Settime.c       \
                Setzaxis.c      \
+               Shiftxy.c       \
                Showinfo.c      \
                Sinfo.c         \
                Smooth.c        \

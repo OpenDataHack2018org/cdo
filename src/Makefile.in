@@ -216,8 +216,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Sethalo.$(OBJEXT) cdo-Setmiss.$(OBJEXT) \
 	cdo-Setpartab.$(OBJEXT) cdo-Setrcaname.$(OBJEXT) \
 	cdo-Settime.$(OBJEXT) cdo-Setzaxis.$(OBJEXT) \
-	cdo-Showinfo.$(OBJEXT) cdo-Sinfo.$(OBJEXT) \
-	cdo-Smooth.$(OBJEXT) cdo-Sort.$(OBJEXT) \
+	cdo-Shiftxy.$(OBJEXT) cdo-Showinfo.$(OBJEXT) \
+	cdo-Sinfo.$(OBJEXT) cdo-Smooth.$(OBJEXT) cdo-Sort.$(OBJEXT) \
 	cdo-Sorttimestamp.$(OBJEXT) cdo-Specinfo.$(OBJEXT) \
 	cdo-Spectral.$(OBJEXT) cdo-Spectrum.$(OBJEXT) \
 	cdo-Split.$(OBJEXT) cdo-Splitrec.$(OBJEXT) \
@@ -567,23 +567,23 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Selindex.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
 	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
-	Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth.c \
-	Sort.c Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c \
-	Split.c Splitrec.c Splitsel.c Splittime.c Splityear.c \
-	Subtrend.c Tee.c Templates.c Test.c Tests.c Timcount.c \
-	Timpctl.c Timselpctl.c Timselstat.c Timsort.c Timstat.c \
-	Timstat2.c Timstat3.c Tinfo.c Tocomplex.c Transpose.c Trend.c \
-	Trms.c Tstepcount.c Vargen.c Varrms.c Vertintml.c Vertintap.c \
-	Vertstat.c Vertcum.c Vertwind.c Verifygrid.c Wct.c Wind.c \
-	Writegrid.c Writerandom.c XTimstat.c YAR.c Yearmonstat.c \
-	Ydayarith.c Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c \
-	Yhourarith.c Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c \
-	Yseaspctl.c Yseasstat.c Zonstat.c cdo.h nearpt3c.h Magplot.c \
-	Magvector.c Maggraph.c template_parser.h template_parser.c \
-	results_template_parser.h results_template_parser.c \
-	magics_template_parser.h magics_template_parser.c \
-	StringUtilities.h StringUtilities.c CdoMagicsMapper.h \
-	CdoMagicsMapper.c
+	Setrcaname.c Settime.c Setzaxis.c Shiftxy.c Showinfo.c Sinfo.c \
+	Smooth.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
+	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
+	Splityear.c Subtrend.c Tee.c Templates.c Test.c Tests.c \
+	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
+	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
+	Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c Varrms.c \
+	Vertintml.c Vertintap.c Vertstat.c Vertcum.c Vertwind.c \
+	Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
+	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
+	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
+	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
+	nearpt3c.h Magplot.c Magvector.c Maggraph.c template_parser.h \
+	template_parser.c results_template_parser.h \
+	results_template_parser.c magics_template_parser.h \
+	magics_template_parser.c StringUtilities.h StringUtilities.c \
+	CdoMagicsMapper.h CdoMagicsMapper.c
 #endif
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
@@ -906,6 +906,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setrcaname.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Settime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setzaxis.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Shiftxy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Showinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Sinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Smooth.Po@am__quote@
@@ -3512,6 +3513,20 @@ cdo-Setzaxis.obj: Setzaxis.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Setzaxis.c' object='cdo-Setzaxis.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Setzaxis.obj `if test -f 'Setzaxis.c'; then $(CYGPATH_W) 'Setzaxis.c'; else $(CYGPATH_W) '$(srcdir)/Setzaxis.c'; fi`
+
+cdo-Shiftxy.o: Shiftxy.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Shiftxy.o -MD -MP -MF $(DEPDIR)/cdo-Shiftxy.Tpo -c -o cdo-Shiftxy.o `test -f 'Shiftxy.c' || echo '$(srcdir)/'`Shiftxy.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Shiftxy.Tpo $(DEPDIR)/cdo-Shiftxy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Shiftxy.c' object='cdo-Shiftxy.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Shiftxy.o `test -f 'Shiftxy.c' || echo '$(srcdir)/'`Shiftxy.c
+
+cdo-Shiftxy.obj: Shiftxy.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Shiftxy.obj -MD -MP -MF $(DEPDIR)/cdo-Shiftxy.Tpo -c -o cdo-Shiftxy.obj `if test -f 'Shiftxy.c'; then $(CYGPATH_W) 'Shiftxy.c'; else $(CYGPATH_W) '$(srcdir)/Shiftxy.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Shiftxy.Tpo $(DEPDIR)/cdo-Shiftxy.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Shiftxy.c' object='cdo-Shiftxy.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Shiftxy.obj `if test -f 'Shiftxy.c'; then $(CYGPATH_W) 'Shiftxy.c'; else $(CYGPATH_W) '$(srcdir)/Shiftxy.c'; fi`
 
 cdo-Showinfo.o: Showinfo.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Showinfo.o -MD -MP -MF $(DEPDIR)/cdo-Showinfo.Tpo -c -o cdo-Showinfo.o `test -f 'Showinfo.c' || echo '$(srcdir)/'`Showinfo.c

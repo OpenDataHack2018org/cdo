@@ -163,6 +163,7 @@ void *Setpartab(void *argument);
 void *Setrcaname(void *argument);
 void *Settime(void *argument);
 void *Setzaxis(void *argument);
+void *Shiftxy(void *argument);
 void *Showinfo(void *argument);
 void *Sinfo(void *argument);
 void *Smooth(void *argument);
@@ -421,6 +422,7 @@ void *Maggraph(void *argument);
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "settbounds", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis", "genlevelbounds"}
+#define  ShiftxyOperators       {"shiftx", "shifty"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
                                  "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
@@ -700,6 +702,7 @@ static modules_t Modules[] =
   { Setrcaname,     NULL,              SetrcanameOperators,    1,   CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       1,   CDI_BOTH,  1,  1 },
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,      1,   CDI_BOTH,  1,  1 },
+  { Shiftxy,        NULL,              ShiftxyOperators,       1,   CDI_REAL,  1,  1 },
   { Showinfo,       ShowinfoHelp,      ShowinfoOperators,      1,   CDI_BOTH,  1,  0 },
   { Sinfo,          SinfoHelp,         SinfoOperators,         1,   CDI_BOTH, -1,  0 },
   { Smooth,         SmoothHelp,        SmoothOperators,        1,   CDI_REAL,  1,  1 },

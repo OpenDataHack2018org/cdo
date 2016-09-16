@@ -146,7 +146,6 @@ void p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 {
   int i, j, jp1, ip1;
 
-  
   /* interpolate scalar to u points */
   for ( j = 0; j < nlat; j++ )
     for ( i = 0; i < nlon; i++ )
