@@ -455,6 +455,7 @@ void namelistRead(FILE *nmlfp, namelist_t *nml)
   size_t len;
   char namecx[MAX_WORD_LEN], *pnamecx = NULL;
   int nparam;
+  int started = 0;
 
   nparam = nml->size;
 
@@ -463,6 +464,11 @@ void namelistRead(FILE *nmlfp, namelist_t *nml)
  L2000:
 
   getnite(nmlfp, nml);
+
+
+  if ( match < 0 && nml->line.nptype != NML_NIX && started == 1)
+    getnite(nmlfp, nml);
+  started = 1;
 
   if ( nml->line.nptype == NML_NIX )
     {
@@ -486,7 +492,10 @@ void namelistRead(FILE *nmlfp, namelist_t *nml)
 	    if ( memcmp(pnamecx, "select", 6) == 0 || 
 		 memcmp(pnamecx, "params", 6) == 0 || 
 		 memcmp(pnamecx, nml->name, strlen(nml->name)) == 0 )
-	      goto L2000;
+	      {
+                started = 0;
+                goto L2000;
+              }
 
 	  goto L3000;
         }
