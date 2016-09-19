@@ -1,3 +1,7 @@
+2016-09-19  Uwe Schulzweida
+
+	* New operator shiftx/shifty - Shift fields on rectangular grid in x/y direction
+
 2016-08-29  Uwe Schulzweida
 
 	* CDO option -v includes -W

@@ -30,11 +30,8 @@
 
 
 static
-void shiftx(bool lcyclic, int nshift, int gridID, double *array1, double *array2, double missval)
+void shiftx(bool lcyclic, int nshift, int nx, int ny, const double *array1, double *array2, double missval)
 {
-  int nx = gridInqXsize(gridID);
-  int ny = gridInqYsize(gridID);
-
   for ( int i = 0; i < nx; i++ )
     {
       bool is_cyclic = false;
@@ -56,11 +53,8 @@ void shiftx(bool lcyclic, int nshift, int gridID, double *array1, double *array2
 }
 
 static
-void shifty(bool lcyclic, int nshift, int gridID, double *array1, double *array2, double missval)
+void shifty(bool lcyclic, int nshift, int nx, int ny, const double *array1, double *array2, double missval)
 {
-  int nx = gridInqXsize(gridID);
-  int ny = gridInqYsize(gridID);
-
   for ( int j = 0; j < ny; j++ )
     {
       bool is_cyclic = false;
@@ -82,9 +76,89 @@ void shifty(bool lcyclic, int nshift, int gridID, double *array1, double *array2
     }
 }
 
+static
+int shiftx_coord(bool lcyclic, int nshift, int gridID1)
+{
+  int gridID2 = gridDuplicate(gridID1);
+
+  int nx = gridInqXsize(gridID1);
+  int ny = gridInqYsize(gridID1);
+  if ( gridInqType(gridID1) != GRID_CURVILINEAR ) ny = 1;
+
+  double *array1 = (double*) Malloc(nx*ny*sizeof(double));
+  double *array2 = (double*) Malloc(nx*ny*sizeof(double));
+
+  gridInqXvals(gridID1, array1);
+  shiftx(lcyclic, nshift, nx, ny, array1, array2, 0);
+  gridDefXvals(gridID2, array2);
+
+  if ( gridInqXbounds(gridID1, NULL) )
+    {
+      int nv = 4;
+      if ( gridInqType(gridID1) != GRID_CURVILINEAR ) nv = 2;
+      
+      double *bounds = (double*) Malloc(nx*ny*nv*sizeof(double));
+      gridInqXbounds(gridID1, bounds);
+      for ( int k = 0; k < nv; ++k )
+        {
+          for ( int i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
+          shiftx(lcyclic, nshift, nx, ny, array1, array2, 0);
+          for ( int i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
+        }
+      gridDefXbounds(gridID2, bounds);
+      Free(bounds);
+    }
+
+  Free(array2);
+  Free(array1);
+
+  return gridID2;
+}
+
+static
+int shifty_coord(bool lcyclic, int nshift, int gridID1)
+{
+  int gridID2 = gridDuplicate(gridID1);
+
+  int nx = gridInqXsize(gridID1);
+  int ny = gridInqYsize(gridID1);
+  if ( gridInqType(gridID1) != GRID_CURVILINEAR ) nx = 1;
+
+  double *array1 = (double*) Malloc(nx*ny*sizeof(double));
+  double *array2 = (double*) Malloc(nx*ny*sizeof(double));
+
+  gridInqYvals(gridID1, array1);
+  shifty(lcyclic, nshift, nx, ny, array1, array2, 0);
+  gridDefYvals(gridID2, array2);
+
+  if ( gridInqYbounds(gridID1, NULL) )
+    {
+      int nv = 4;
+      if ( gridInqType(gridID1) != GRID_CURVILINEAR ) nv = 2;
+      
+      double *bounds = (double*) Malloc(nx*ny*nv*sizeof(double));
+      gridInqYbounds(gridID1, bounds);
+      for ( int k = 0; k < nv; ++k )
+        {
+          for ( int i = 0; i < nx*ny; ++i ) array1[i] = bounds[i*nv+k];
+          shifty(lcyclic, nshift, nx, ny, array1, array2, 0);
+          for ( int i = 0; i < nx*ny; ++i ) bounds[i*nv+k] = array2[i];
+        }
+      gridDefYbounds(gridID2, bounds);
+      Free(bounds);
+    }
+
+  Free(array2);
+  Free(array1);
+
+  return gridID2;
+}
+
 
 void *Shiftxy(void *argument)
 {
+  bool lcyclic = false;
+  bool lcoord = false;
   int nrecs;
   int varID, levelID;
   int nmiss;
@@ -99,8 +173,14 @@ void *Shiftxy(void *argument)
   int nshift = 1;
   if ( operatorArgc() > 0 )
     {
-      operatorCheckArgc(1);
       nshift = parameter2int(operatorArgv()[0]);
+      int pargc = operatorArgc();
+      char **pargv = operatorArgv();
+      for ( int ic = 1; ic < pargc; ++ic )
+        {
+          if      ( strcmp(pargv[ic], "cyclic") == 0 ) lcyclic = true;
+          else if ( strcmp(pargv[ic], "coord") == 0 ) lcoord = true;
+        }
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
@@ -113,11 +193,10 @@ void *Shiftxy(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
-
   for ( int index = 0; index < ngrids; index++ )
     {
       int gridID1  = vlistGrid(vlistID1, index);
@@ -127,13 +206,14 @@ void *Shiftxy(void *argument)
            (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
 	   (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) )
 	{
-          if ( operatorID == SHIFTX )
+          if ( lcoord )
             {
-              
+              int gridID2 = -1;
+              if      ( operatorID == SHIFTX ) gridID2 = shiftx_coord(lcyclic, nshift, gridID1);
+              else if ( operatorID == SHIFTY ) gridID2 = shifty_coord(lcyclic, nshift, gridID1);
+
+              vlistChangeGridIndex(vlistID2, index, gridID2);
             }
-          /*
-	  vlistChangeGridIndex(vlistID2, index, gridID2);
-          */
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
@@ -183,8 +263,11 @@ void *Shiftxy(void *argument)
 	      int gridsize = gridInqSize(gridID1);
               double missval = vlistInqVarMissval(vlistID2, varID);
                   
-              if      ( operatorID == SHIFTX ) shiftx(false, nshift, gridID1, array1, array2, missval);
-              else if ( operatorID == SHIFTY ) shifty(false, nshift, gridID1, array1, array2, missval);
+              int nx = gridInqXsize(gridID1);
+              int ny = gridInqYsize(gridID1);
+
+              if      ( operatorID == SHIFTX ) shiftx(lcyclic, nshift, nx, ny, array1, array2, missval);
+              else if ( operatorID == SHIFTY ) shifty(lcyclic, nshift, nx, ny, array1, array2, missval);
 
               nmiss = 0;
               for ( int i = 0; i < gridsize; i++ )
