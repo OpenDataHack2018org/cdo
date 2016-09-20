@@ -232,7 +232,7 @@ void *Sort(void *argument)
 	      vlistInqVarName(vlistID1, varID, varInfo[varID].name);
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      varInfo[varID].levInfo[levelID].levelID = levelID;
-	      varInfo[varID].levInfo[levelID].level   = zaxisInqLevel(zaxisID, levelID);
+	      varInfo[varID].levInfo[levelID].level   = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1;
 	    }
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));

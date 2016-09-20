@@ -60,7 +60,7 @@ void *Seloperator(void *argument)
 
       for ( levID = 0; levID < nlevs; levID++ )
 	{
-	  level = zaxisInqLevel(zaxisID, levID);
+	  level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levID) : levID+1;
 
 	  if ( operatorArgc() == 3 )
 	    sellevel = IS_EQUAL(level, slevel);

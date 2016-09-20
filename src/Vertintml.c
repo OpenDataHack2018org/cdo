@@ -190,7 +190,7 @@ void *Vertintml(void *argument)
       int nlev = zaxisInqSize(zaxisIDh);
       if ( nlev != nhlev ) cdoAbort("Internal error, wrong number of hybrid level!");
       double levels[nlev];
-      zaxisInqLevels(zaxisIDh, levels);
+      cdoZaxisInqLevels(zaxisIDh, levels);
 
       for ( int ilev = 0; ilev < nlev; ++ilev )
 	{

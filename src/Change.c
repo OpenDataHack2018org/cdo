@@ -196,33 +196,36 @@ void *Change(void *argument)
       for ( index = 0; index < nzaxis; index++ )
 	{
 	  zaxisID1 = vlistZaxis(vlistID2, index);
-	  nlevs = zaxisInqSize(zaxisID1);
-	  levels = (double*) Malloc(nlevs*sizeof(double));
-	  newlevels = (double*) Malloc(nlevs*sizeof(double));
-	  zaxisInqLevels(zaxisID1, levels);
+          if ( zaxisInqLevels(zaxisID1, NULL) )
+            {
+              nlevs = zaxisInqSize(zaxisID1);
+              levels = (double*) Malloc(nlevs*sizeof(double));
+              newlevels = (double*) Malloc(nlevs*sizeof(double));
+              zaxisInqLevels(zaxisID1, levels);
 
-	  for ( k = 0; k < nlevs; k++ ) newlevels[k] = levels[k];
+              for ( k = 0; k < nlevs; k++ ) newlevels[k] = levels[k];
 
-	  nfound = 0;
-	  for ( i = 0; i < nch; i += 2 )
-	    for ( k = 0; k < nlevs; k++ )
-	      if ( fabs(levels[k] - chlevels[i]) < 0.0001 ) nfound++;
+              nfound = 0;
+              for ( i = 0; i < nch; i += 2 )
+                for ( k = 0; k < nlevs; k++ )
+                  if ( fabs(levels[k] - chlevels[i]) < 0.0001 ) nfound++;
 
-	  if ( nfound )
-	    {
-	      zaxisID2 = zaxisDuplicate(zaxisID1);
-	      for ( i = 0; i < nch; i += 2 )
-		for ( k = 0; k < nlevs; k++ )
-		  if ( fabs(levels[k] - chlevels[i]) < 0.001 )
-		    newlevels[k] = chlevels[i+1];
+              if ( nfound )
+                {
+                  zaxisID2 = zaxisDuplicate(zaxisID1);
+                  for ( i = 0; i < nch; i += 2 )
+                    for ( k = 0; k < nlevs; k++ )
+                      if ( fabs(levels[k] - chlevels[i]) < 0.001 )
+                        newlevels[k] = chlevels[i+1];
 
-	      zaxisDefLevels(zaxisID2, newlevels);
-	      vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
-	    }
+                  zaxisDefLevels(zaxisID2, newlevels);
+                  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
+                }
 
-	  Free(levels);
-	  Free(newlevels);
-	}
+              Free(levels);
+              Free(newlevels);
+            }
+        }
     }
   else if ( operatorID == CHLEVELC || operatorID == CHLEVELV )
     {
@@ -247,27 +250,30 @@ void *Change(void *argument)
 	}
 
       zaxisID1 = vlistInqVarZaxis(vlistID2, varID);
-      nlevs = zaxisInqSize(zaxisID1);
-      levels = (double*) Malloc(nlevs*sizeof(double));
-      zaxisInqLevels(zaxisID1, levels);
-      nfound = 0;
-      for ( k = 0; k < nlevs; k++ )
-	if ( fabs(levels[k] - chlevels[0]) < 0.0001 ) nfound++;
+      if ( zaxisInqLevels(zaxisID1, NULL) )
+        {
+          nlevs = zaxisInqSize(zaxisID1);
+          levels = (double*) Malloc(nlevs*sizeof(double));
+          zaxisInqLevels(zaxisID1, levels);
+          nfound = 0;
+          for ( k = 0; k < nlevs; k++ )
+            if ( fabs(levels[k] - chlevels[0]) < 0.0001 ) nfound++;
 
-      if ( nfound )
-	{
-	  zaxisID2 = zaxisDuplicate(zaxisID1);
-	  for ( k = 0; k < nlevs; k++ )
-	    if ( fabs(levels[k] - chlevels[0]) < 0.001 )
-	      levels[k] = chlevels[1];
+          if ( nfound )
+            {
+              zaxisID2 = zaxisDuplicate(zaxisID1);
+              for ( k = 0; k < nlevs; k++ )
+                if ( fabs(levels[k] - chlevels[0]) < 0.001 )
+                  levels[k] = chlevels[1];
 
-	  zaxisDefLevels(zaxisID2, levels);
-	  vlistChangeVarZaxis(vlistID2, varID, zaxisID2);
-	}
-      else
-	cdoAbort("Level %g not found!", chlevels[0]);
+              zaxisDefLevels(zaxisID2, levels);
+              vlistChangeVarZaxis(vlistID2, varID, zaxisID2);
+            }
+          else
+            cdoAbort("Level %g not found!", chlevels[0]);
 
-      Free(levels);
+          Free(levels);
+        }
     }
   else if ( operatorID == CHLTYPE )                
     {

@@ -103,7 +103,7 @@ int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *
   double *lbounds = (double *) Malloc(nlev*sizeof(double));
   double *ubounds = (double *) Malloc(nlev*sizeof(double));
 
-  zaxisInqLevels(zaxisID, levels);
+  cdoZaxisInqLevels(zaxisID, levels);
   if ( genbounds )
     {
       status = 2;

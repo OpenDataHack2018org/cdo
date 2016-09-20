@@ -22,6 +22,22 @@
 #include "error.h"
 
 
+int cdoZaxisInqLevels(int zaxisID, double *levels)
+{
+  int size = zaxisInqLevels(zaxisID, NULL);
+
+  if ( levels )
+    {
+      if ( size )
+        zaxisInqLevels(zaxisID, levels);
+      else
+        for ( int i = 0; i < size; ++i ) levels[i] = i+1;
+    }
+
+  return size;
+}
+
+
 static
 void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
 {
@@ -211,8 +227,8 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 
               double *lev1 = (double*) Malloc(nlev1*sizeof(double));
               double *lev2 = (double*) Malloc(nlev1*sizeof(double));
-              zaxisInqLevels(zaxisID1, lev1);
-              zaxisInqLevels(zaxisID2, lev2);
+              cdoZaxisInqLevels(zaxisID1, lev1);
+              cdoZaxisInqLevels(zaxisID2, lev2);
               
               bool ldiffer = false;
               for ( int i = 0; i < nlev1; ++i )
@@ -390,7 +406,7 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 	{
 	  int l;
 	  double *level = (double*) Malloc(nlevel*sizeof(double));
-	  zaxisInqLevels(zaxisID, level);
+	  cdoZaxisInqLevels(zaxisID, level);
 	  for ( l = 0; l < nlevel; l++ )
 	    {
 	      if ( (l+1) != (int) (level[l]+0.5) ) break;

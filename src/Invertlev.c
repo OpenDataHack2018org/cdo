@@ -41,7 +41,7 @@ void invertLevDes(int vlistID)
       int nlev = zaxisInqSize(zaxisID1);
       if ( nlev <= 1 ) continue;
 
-      /* if ( zaxisInqLevels(zaxisID1, NULL) ) */
+      if ( zaxisInqLevels(zaxisID1, NULL) )
 	{
 	  double yv1[nlev], yv2[nlev];
 	  zaxisInqLevels(zaxisID1, yv1);

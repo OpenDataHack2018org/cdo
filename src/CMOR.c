@@ -413,7 +413,7 @@ static void register_z_axis(int zaxisID, char *name, int *axis_ids)
   if ( zaxisInqType(zaxisID) != ZAXIS_SURFACE )
     {
       coord_vals = Malloc(levels * sizeof(double));
-      zaxisInqLevels(zaxisID, coord_vals);
+      cdoZaxisInqLevels(zaxisID, coord_vals);
       zaxisInqUnits(zaxisID, units);
       cmor_axis(new_axis_id(axis_ids), name, units, levels, (void *)coord_vals,
                 'd', NULL, 0, NULL);

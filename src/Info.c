@@ -343,7 +343,7 @@ void *Info(void *argument)
               set_text_color(stdout, RESET, MAGENTA);
 	      fprintf(stdout, "%s %s ", vdatestr, vtimestr);
 	      reset_text_color(stdout);
-	      level = zaxisInqLevel(zaxisID, levelID);
+	      level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1;
 	      set_text_color(stdout, RESET, GREEN);
 	      fprintf(stdout, "%7g ", level);
 	      fprintf(stdout, "%8d %7d ", gridsize, nmiss);

@@ -123,7 +123,7 @@ void *Isosurface(void *argument)
 
   int nlev1 = nlevel;
   double *lev1  = (double*) Malloc(nlev1*sizeof(double));
-  zaxisInqLevels(zaxisID1, lev1);
+  cdoZaxisInqLevels(zaxisID1, lev1);
 
   int zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
   for ( i = 0; i < nzaxis; i++ )

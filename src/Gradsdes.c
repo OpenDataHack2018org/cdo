@@ -571,15 +571,14 @@ static
 void ctl_zdef(FILE *gdp, int vlistID, bool *zrev)
 {
   int i, j, index;
-  int zaxisIDmax = -1, nlevmax;
-  int nzaxis, zaxisID, nlev;
-  int lplev = FALSE;
-  double *levels, level0, levinc = 0;
+  int zaxisIDmax = -1;
+  int zaxisID, nlev;
+  double levinc = 0;
 
   *zrev = false;
-  nzaxis  = vlistNzaxis(vlistID);
+  int nzaxis  = vlistNzaxis(vlistID);
 
-  nlevmax = 0;
+  int nlevmax = 0;
   for ( index = 0; index < nzaxis; index++ )
     {
       zaxisID = vlistZaxis(vlistID, index);
@@ -591,10 +590,10 @@ void ctl_zdef(FILE *gdp, int vlistID, bool *zrev)
         }
     }
 
-  levels = (double*) Malloc(nlevmax*sizeof(double));
-  zaxisInqLevels(zaxisIDmax, levels);
-  if ( zaxisInqType(zaxisIDmax) == ZAXIS_PRESSURE ) lplev = TRUE;
-  level0 = levels[0];
+  double *levels = (double*) Malloc(nlevmax*sizeof(double));
+  cdoZaxisInqLevels(zaxisIDmax, levels);
+  bool lplev = (zaxisInqType(zaxisIDmax) == ZAXIS_PRESSURE);
+  double level0 = levels[0];
   if ( nlevmax > 1 )
     {
       if ( levels[0] < levels[1] && zaxisInqType(zaxisIDmax) != ZAXIS_HYBRID )

@@ -100,8 +100,8 @@ void *Pinfo(void *argument)
 	  int code     = vlistInqVarCode(vlistID1, varID);
 	  int gridID   = vlistInqVarGrid(vlistID1, varID);
 	  int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  double missval  = vlistInqVarMissval(vlistID1, varID);
 	  int gridsize = gridInqSize(gridID);
+	  double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  if ( operatorID == PINFOV ) vlistInqVarName(vlistID1, varID, varname);
 
@@ -110,7 +110,7 @@ void *Pinfo(void *argument)
 	  else
 	    fprintf(stdout, "%6d :%s %s %3d", indg, vdatestr, vtimestr, code);
 
-	  level = zaxisInqLevel(zaxisID, levelID);
+	  level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1;
 	  fprintf(stdout, " %7g ", level);
 
 	  fprintf(stdout, "%7d %7d :", gridsize, nmiss);

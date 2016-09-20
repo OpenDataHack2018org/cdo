@@ -314,7 +314,7 @@ void *Split(void *argument)
 	  int nlevs = zaxisInqSize(zaxisID);
 	  for ( levID = 0; levID < nlevs; levID++ )
 	    {
-	      level = zaxisInqLevel(zaxisID, levID);
+	      level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levID) : levID+1;
               int i;
 	      for ( i = 0; i < nsplit; i++ )
 		if ( IS_EQUAL(level, ftmp[i]) ) break;
@@ -337,7 +337,7 @@ void *Split(void *argument)
 	      int nlevs = zaxisInqSize(zaxisID);
 	      for ( levID = 0; levID < nlevs; levID++ )
 		{
-		  level = zaxisInqLevel(zaxisID, levID);
+                  level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levID) : levID+1;
 		  if ( IS_EQUAL(levels[index], level) )
 		    {
 		      vlistDefIndex(vlistID1, varID, levID, index);

@@ -130,8 +130,9 @@ void *Setzaxis(void *argument)
 
           if ( nlev > 1 )
             {
-              zaxisInqLevels(zaxisID1, levels);
+              cdoZaxisInqLevels(zaxisID1, levels);
               zaxisID2 = zaxisDuplicate(zaxisID1);
+              if ( !zaxisInqLevels(zaxisID1, NULL) ) zaxisDefLevels(zaxisID2, levels);
 
               genLayerBounds(nlev, levels, lbounds, ubounds);
 

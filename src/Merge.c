@@ -55,7 +55,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 	  mlev1 = nlev1;
 	  lev1 = (double*) Realloc(lev1, mlev1*sizeof(double));
 	}
-      zaxisInqLevels(zaxisID1, lev1);
+      cdoZaxisInqLevels(zaxisID1, lev1);
 
       for ( int varID2 = 0; varID2 < nvars2; ++varID2 )
 	{
@@ -74,7 +74,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 		  mlev2 = nlev2;
 		  lev2 = (double*) Realloc(lev2, mlev2*sizeof(double));
 		}
-	      zaxisInqLevels(zaxisID2, lev2);
+	      cdoZaxisInqLevels(zaxisID2, lev2);
 
 	      for ( k = 0; k < nlev2; ++k )
 		if ( !IS_EQUAL(lev1[k], lev2[k]) ) break;

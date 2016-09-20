@@ -164,7 +164,7 @@ void *Selvar(void *argument)
   vlistClearFlag(vlistID1);
   for ( varID = 0; varID < nvars; varID++ )
     {
-      vars[varID] = ldelete ? true : false;
+      vars[varID] = ldelete;
 
       vlistInqVarName(vlistID1, varID, varname);
       vlistInqVarStdname(vlistID1, varID, stdname);
@@ -184,7 +184,7 @@ void *Selvar(void *argument)
 
       for ( int levID = 0; levID < nlevs; levID++ )
 	{
-	  double level = zaxisInqLevel(zaxisID, levID);
+	  double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levID) : levID+1;
 
 	  if ( ldelete ) vlistDefFlag(vlistID1, varID, levID, TRUE);
           

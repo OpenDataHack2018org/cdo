@@ -51,7 +51,8 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
   if ( gridInqType(gridID) == GRID_GAUSSIAN ||
        gridInqType(gridID) == GRID_LONLAT )
     {
-      double level = zaxisInqLevel(vlistInqVarZaxis(vlistID, varID), levelID);
+      int zaxisID = vlistInqVarZaxis(vlistID, varID);
+      double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1;
       int nlon  = gridInqXsize(gridID);
       int nlat  = gridInqYsize(gridID);
       for ( int j = 0; j < nlat; ++j )
@@ -73,8 +74,7 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
                   }
 		  
                 fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
-                        year, month, day, hour, minute, second,
-                        code, level, xval, yval, sglval);
+                        year, month, day, hour, minute, second, code, level, xval, yval, sglval);
               }
           }
     }

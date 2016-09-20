@@ -77,7 +77,7 @@ void *Setrcaname(void *argument)
 			  cdoWarning("Maybe environment variable SPLIT_LTYPE_105 is not set.");
 			  continue;
 			}
-		      level = (int) zaxisInqLevel(zaxisID, 0);
+		      level = zaxisInqLevels(zaxisID, NULL) ? (int) zaxisInqLevel(zaxisID, 0) : 0;
 		      if ( sltype == 105 && slevel == level )
 			{
 			  vlistDefVarName(vlistID2, varID, sname);

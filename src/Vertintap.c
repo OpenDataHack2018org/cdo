@@ -200,7 +200,7 @@ void *Vertintap(void *argument)
           if ( is_height_axis(zaxisID, nlevel) )
             {
               double *level = (double *) Malloc(nlevel*sizeof(double));
-              zaxisInqLevels(zaxisID, level);
+              cdoZaxisInqLevels(zaxisID, level);
               int l;
               for ( l = 0; l < nlevel; l++ )
                 {

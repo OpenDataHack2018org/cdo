@@ -213,7 +213,7 @@ void *Intlevel(void *argument)
 
   int nlev1 = nlevel;
   double *lev1 = (double*) Malloc((nlev1+2)*sizeof(double));
-  zaxisInqLevels(zaxisID1, lev1+1);
+  cdoZaxisInqLevels(zaxisID1, lev1+1);
 
   bool lup = false;
   bool ldown = false;

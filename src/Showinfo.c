@@ -254,7 +254,7 @@ void *Showinfo(void *argument)
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
 	  nlevs = zaxisInqSize(zaxisID);
 	  for ( levelID = 0; levelID < nlevs; levelID++ )
-	    fprintf(stdout, " %.9g", zaxisInqLevel(zaxisID, levelID));
+	    fprintf(stdout, " %.9g", zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1);
 	  fprintf(stdout, "\n");
 	}
     }

@@ -122,8 +122,8 @@ void *Replace(void *argument)
 	    {
 	      double *level1 = (double*) Malloc(nlevel1*sizeof(double));
 	      double *level2 = (double*) Malloc(nlevel2*sizeof(double));
-	      zaxisInqLevels(vlistInqVarZaxis(vlistID1, varID1), level1);
-	      zaxisInqLevels(vlistInqVarZaxis(vlistID2, varID2), level2);
+	      cdoZaxisInqLevels(vlistInqVarZaxis(vlistID1, varID1), level1);
+	      cdoZaxisInqLevels(vlistInqVarZaxis(vlistID2, varID2), level2);
 
 	      for ( levelID = 0; levelID < nlevel1; levelID++ )
 		varlevel[idx][levelID] = -1;

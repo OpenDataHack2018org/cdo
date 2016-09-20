@@ -427,7 +427,7 @@ void *Expr(void *argument)
               size_t nlev = parse_arg.coords[i].size;
               double *data = (double*) Malloc(nlev*sizeof(double));
               parse_arg.coords[i].data = data;
-              zaxisInqLevels(zaxisID, data);
+              cdoZaxisInqLevels(zaxisID, data);
             }
           else
             cdoAbort("Computation of coordinate %c not implemented!", coord);

@@ -125,7 +125,7 @@ void *Cloudlayer(void *argument)
   int gridID, zaxisID;
   int nlevel, nlevs, nrecs, code;
   int varID, levelID;
-  int zrev = FALSE;
+  bool zrev = false;
   int i;
   int offset;
   int nmiss;
@@ -210,7 +210,7 @@ void *Cloudlayer(void *argument)
       if ( plevs[0] > plevs[nlevel-1] )
 	{
 	  double ptmp;
-	  zrev = TRUE;
+	  zrev = true;
 	  for ( levelID = 0; levelID < nlevel/2; ++levelID )
 	    {
 	      ptmp = plevs[levelID];

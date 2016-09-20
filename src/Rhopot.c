@@ -219,7 +219,7 @@ void *Rhopot(void *argument)
   int nlevel = nlevel1;
 
   double *pressure = (double*) Malloc(nlevel*sizeof(double));
-  zaxisInqLevels(zaxisID, pressure);
+  cdoZaxisInqLevels(zaxisID, pressure);
 
   if ( pin >= 0 ) 
     for ( int i = 0; i < nlevel; ++i ) pressure[i] = pin;

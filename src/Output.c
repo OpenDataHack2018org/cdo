@@ -205,8 +205,8 @@ void *Output(void *argument)
 	      int gridsize = gridInqSize(gridID);
 	      int nlon     = gridInqXsize(gridID);
 	      int nlat     = gridInqYsize(gridID);
-	      double level    = zaxisInqLevel(zaxisID, levelID);
-              double missval  = vlistInqVarMissval(vlistID, varID);
+	      double level   = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1;
+              double missval = vlistInqVarMissval(vlistID, varID);
    
 	      cdiParamToString(param, paramstr, sizeof(paramstr));
 

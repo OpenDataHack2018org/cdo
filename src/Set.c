@@ -139,7 +139,7 @@ void *Set(void *argument)
 	  zaxisID2 = zaxisDuplicate(zaxisID1);
 	  nlevs = zaxisInqSize(zaxisID2);
 	  levels = (double*) Malloc(nlevs*sizeof(double));
-	  zaxisInqLevels(zaxisID2, levels);
+	  cdoZaxisInqLevels(zaxisID2, levels);
 	  levels[0] = newlevel;
 	  zaxisDefLevels(zaxisID2, levels);
 	  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);

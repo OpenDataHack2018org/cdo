@@ -45,7 +45,7 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2, int nmiss,
   double **field1 = (double**) Malloc(nlev*sizeof(double*));
   double **field2 = (double**) Malloc(nlev*sizeof(double*));
 
-  zaxisInqLevels(zaxisID, plevel);
+  cdoZaxisInqLevels(zaxisID, plevel);
 
   // gaussaw(phi, dummy, nlat);
   

@@ -361,7 +361,7 @@ void *Outputgmt(void *argument)
   double *zaxis_lower_lev  = (double*) Malloc(nlev*sizeof(double));
   double *zaxis_upper_lev  = (double*) Malloc(nlev*sizeof(double));
 
-  zaxisInqLevels(zaxisID, zaxis_center_lev);
+  cdoZaxisInqLevels(zaxisID, zaxis_center_lev);
 
   if ( luse_grid_corner )
     {

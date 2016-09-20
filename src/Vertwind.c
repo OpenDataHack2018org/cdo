@@ -101,8 +101,8 @@ void *Vertwind(void *argument)
 
   int gridsize = gridInqSize(gridID);
   int nlevel = zaxisInqSize(zaxisID);
-  double *level  = (double*) Malloc(nlevel*sizeof(double));
-  zaxisInqLevels(zaxisID, level);
+  double *level = (double*) Malloc(nlevel*sizeof(double));
+  cdoZaxisInqLevels(zaxisID, level);
 
   double *temp    = (double*) Malloc(gridsize*nlevel*sizeof(double));
   double *sq      = (double*) Malloc(gridsize*nlevel*sizeof(double));
