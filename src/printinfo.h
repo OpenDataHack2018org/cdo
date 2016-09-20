@@ -522,36 +522,39 @@ void printZaxisInfo(int vlistID)
       my_reset_text_color(stdout);
       fprintf(stdout, "\n");
 
-      double *levels = (double*) malloc((size_t)levelsize*sizeof(double));
-      zaxisInqLevels(zaxisID, levels);
-
-      if ( !(zaxistype == ZAXIS_SURFACE && levelsize == 1 && !(fabs(levels[0]) > 0)) )
+      if ( zaxisInqLevels(zaxisID, NULL) )
         {
-          double zfirst = levels[0];
-          double zlast  = levels[levelsize-1];
-          if ( levelsize > 2 )
+          double *levels = (double*) malloc((size_t)levelsize*sizeof(double));
+          zaxisInqLevels(zaxisID, levels);
+
+          if ( !(zaxistype == ZAXIS_SURFACE && levelsize == 1 && !(fabs(levels[0]) > 0)) )
             {
-              zinc = (levels[levelsize-1] - levels[0]) / (levelsize-1);
-              for ( int levelID = 2; levelID < levelsize; ++levelID )
-                if ( fabs(fabs(levels[levelID] - levels[levelID-1]) - zinc) > 0.001*zinc )
-                  {
-                    zinc = 0;
-                    break;
-                  }
+              double zfirst = levels[0];
+              double zlast  = levels[levelsize-1];
+              if ( levelsize > 2 )
+                {
+                  zinc = (levels[levelsize-1] - levels[0]) / (levelsize-1);
+                  for ( int levelID = 2; levelID < levelsize; ++levelID )
+                    if ( fabs(fabs(levels[levelID] - levels[levelID-1]) - zinc) > 0.001*zinc )
+                      {
+                        zinc = 0;
+                        break;
+                      }
+                }
+
+              fprintf(stdout, "%33s : %.*g", zname, dig, zfirst);
+              if ( levelsize > 1 )
+                {
+                  fprintf(stdout, " to %.*g", dig, zlast);
+                  if ( IS_NOT_EQUAL(zinc, 0) )
+                    fprintf(stdout, " by %.*g", dig, zinc);
+                }
+              fprintf(stdout, " %s", zunits);
+              fprintf(stdout, "\n");
             }
 
-          fprintf(stdout, "%33s : %.*g", zname, dig, zfirst);
-          if ( levelsize > 1 )
-            {
-              fprintf(stdout, " to %.*g", dig, zlast);
-              if ( IS_NOT_EQUAL(zinc, 0) )
-                fprintf(stdout, " by %.*g", dig, zinc);
-            }
-          fprintf(stdout, " %s", zunits);
-          fprintf(stdout, "\n");
+          free(levels);
         }
-
-      free(levels);
 
       if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
         {
