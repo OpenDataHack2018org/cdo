@@ -76,25 +76,28 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 		}
 	      cdoZaxisInqLevels(zaxisID2, lev2);
 
-	      for ( k = 0; k < nlev2; ++k )
-		if ( !IS_EQUAL(lev1[k], lev2[k]) ) break;
+              if ( zaxisInqLevels(zaxisID1, NULL) && zaxisInqLevels(zaxisID2, NULL) )
+                {
+                  for ( k = 0; k < nlev2; ++k )
+                    if ( !IS_EQUAL(lev1[k], lev2[k]) ) break;
 
-	      if ( k == nlev2 )
-		{
-		  if ( param1 < 0 || param2 < 0 )
-		    {
-		      if ( strcmp(vname1, vname2) == 0 )
-                        cdoWarning("Duplicate entry of parameter %s in %s!", vname2, filename);
-		    }
-		  else
-		    {
-		      if ( param1 == param2 )
-			{
-			  char paramstr[32];
-			  cdiParamToString(param2, paramstr, sizeof(paramstr));
-			  cdoWarning("Duplicate entry of parameter %s in %s!", paramstr, filename);
-			}
-		    }
+                  if ( k == nlev2 )
+                    {
+                      if ( param1 < 0 || param2 < 0 )
+                        {
+                          if ( strcmp(vname1, vname2) == 0 )
+                            cdoWarning("Duplicate entry of parameter %s in %s!", vname2, filename);
+                        }
+                      else
+                        {
+                          if ( param1 == param2 )
+                            {
+                              char paramstr[32];
+                              cdiParamToString(param2, paramstr, sizeof(paramstr));
+                              cdoWarning("Duplicate entry of parameter %s in %s!", paramstr, filename);
+                            }
+                        }
+                    }
 		}
 	    }
 	}
