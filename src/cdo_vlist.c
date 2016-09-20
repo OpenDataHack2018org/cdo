@@ -31,7 +31,10 @@ int cdoZaxisInqLevels(int zaxisID, double *levels)
       if ( size )
         zaxisInqLevels(zaxisID, levels);
       else
-        for ( int i = 0; i < size; ++i ) levels[i] = i+1;
+        {
+          size = zaxisInqSize(zaxisID);
+          for ( int i = 0; i < size; ++i ) levels[i] = i+1;
+        }
     }
 
   return size;
