@@ -3,6 +3,20 @@
    Dietrich 2008)*/
 #include <stdlib.h>
 
+#include "kdtree.h"
+
+static int
+qcmp(const void *p1, const void *p2, int axis)
+{
+    struct kd_point *a = (struct kd_point *) p1;
+    struct kd_point *b = (struct kd_point *) p2;
+
+    int ret = (a->point[axis] > b->point[axis]) ? 1 : (a->point[axis] < b->point[axis]) ? -1 : 0;
+    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
+
+    return ret;
+}
+
 /*-
  * Copyright (c) 1980, 1983 The Regents of the University of California.
  * All rights reserved.
@@ -34,13 +48,11 @@
 #define		THRESH		4       /* threshold for insertion */
 #define		MTHRESH		6       /* threshold for median */
 
-static int (*qcmp) (const void *, const void *, int axis);      /* the comparison routine */
 static int qsz;                 /* size of each record */
 static int thresh;              /* THRESHold in chars */
 static int mthresh;             /* MTHRESHold in chars */
 
-void qsortR(const void *base0, size_t n, size_t size,
-            int (*compar) (const void *, const void *, int), int axis);
+void qsortR(const void *base0, size_t n, size_t size, int axis);
 
 /*
  * qst:
@@ -171,8 +183,7 @@ qst(char *base, char *max, int axis)
  */
 
 void
-qsortR(const void *base0, size_t n, size_t size,
-       int (*compar) (const void *, const void *, int axis), int axis)
+qsortR(const void *base0, size_t n, size_t size, int axis)
 {
     char *base = (char *) base0;
     char c, *i, *j, *lo, *hi;
@@ -181,7 +192,6 @@ qsortR(const void *base0, size_t n, size_t size,
     if (n <= 1)
         return;
     qsz = size;
-    qcmp = compar;
     thresh = qsz * THRESH;
     mthresh = qsz * MTHRESH;
     max = base + n * qsz;

@@ -9,7 +9,7 @@
 
 extern int pmergesort(void *base, size_t nmemb, size_t size,
 #if defined(KDTEST)
-                      int (*compar) (const void *, const void *, int), int axis,
+                      int axis,
 #else
                       int (*compar) (const void *, const void *),
 #endif
@@ -206,7 +206,7 @@ kd_doBuildTree(void *threadarg)
     else                      qcomp = _compPoints2;
 
 #if defined(KDTEST)
-    pmergesort(points, nPoints, sizeof(struct kd_point), _compPoints, sortaxis, max_threads);
+    pmergesort(points, nPoints, sizeof(struct kd_point), sortaxis, max_threads);
 #else
     pmergesort(points, nPoints, sizeof(struct kd_point), qcomp, max_threads);
 #endif

@@ -3,6 +3,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "kdtree.h"
+
+static int
+_compPoints(const void *p1, const void *p2, int axis)
+{
+    struct kd_point *a = (struct kd_point *) p1;
+    struct kd_point *b = (struct kd_point *) p2;
+
+    int ret = (a->point[axis] > b->point[axis]) ? 1 : (a->point[axis] < b->point[axis]) ? -1 : 0;
+    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
+
+    return ret;
+}
+
 
 typedef struct param_t {
     char *a;
@@ -12,28 +26,25 @@ typedef struct param_t {
     size_t size;
 #if defined(KDTEST)
     int axis;
-    int (*cmp) (const void *, const void *, int axis);
 #else
     int (*cmp) (const void *, const void *);
 #endif
     int max_threads;
 } param_t;
 
-extern void qsortR(const void *base0, size_t n, size_t size,
-                   int (*compar) (const void *, const void *, int axis),
-                   int axis);
+extern void qsortR(const void *base0, size_t n, size_t size, int axis);
 
 void pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                     size_t nmemb, size_t size,
 #if defined(KDTEST)
-                    int (*cmp) (const void *, const void *, int), int axis,
+                    int axis,
 #else
                     int (*cmp) (const void *, const void *),
 #endif                   
                     int max_threads);
 int pmergesort(void *base, size_t nmemb, size_t size,
 #if defined(KDTEST)
-               int (*compar) (const void *, const void *, int), int axis,
+               int axis,
 #else
                int (*compar) (const void *, const void *),
 #endif
@@ -44,7 +55,7 @@ void *mergesort_t(void *args);
 int
 pmergesort(void *base, size_t nmemb, size_t size,
 #if defined(KDTEST)
-           int (*compar) (const void *, const void *, int), int axis,
+           int axis,
 #else
            int (*compar) (const void *, const void *),
 #endif
@@ -62,9 +73,10 @@ pmergesort(void *base, size_t nmemb, size_t size,
     args.first = 0;
     args.nmemb = nmemb;
     args.size = size;
-    args.cmp = compar;
 #if defined(KDTEST)
     args.axis = axis;
+#else
+    args.cmp = compar;
 #endif
     args.max_threads = max_threads;
 
@@ -78,7 +90,7 @@ void
 pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                size_t nmemb, size_t size,
 #if defined(KDTEST)
-               int (*cmp) (const void *, const void *, int), int axis,
+               int axis,
 #else
                int (*cmp) (const void *, const void *),
 #endif
@@ -90,9 +102,10 @@ pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
     p->first = first;
     p->nmemb = nmemb;
     p->size = size;
-    p->cmp = cmp;
 #if defined(KDTEST)
     p->axis = axis;
+#else
+    p->cmp = cmp;
 #endif
     p->max_threads = max_threads;
 }
@@ -112,7 +125,7 @@ mergesort_t(void *args)
          * branch. Proceed with sequential sort of this chunk. 
          */
 #if defined(KDTEST)
-        qsortR(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp, mya->axis);
+        qsortR(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->axis);
 #else
         qsort(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp);
 #endif
@@ -121,9 +134,11 @@ mergesort_t(void *args)
          * Start two new threads, each sorting half of array a 
          */
         pm_buildparams(&larg, mya->a, mya->b, mya->first, mya->nmemb / 2,
-                       mya->size, mya->cmp,
+                       mya->size,
 #if defined(KDTEST)
                        mya->axis,
+#else
+                       mya->cmp,
 #endif
                        mya->max_threads / 2);
         /*
@@ -135,9 +150,11 @@ mergesort_t(void *args)
         }
 
         pm_buildparams(&rarg, mya->a, mya->b, mya->first + mya->nmemb / 2,
-                       mya->nmemb - mya->nmemb / 2, mya->size, mya->cmp,
+                       mya->nmemb - mya->nmemb / 2, mya->size,
 #if defined(KDTEST)
                        mya->axis,
+#else
+                       mya->cmp,
 #endif
                        mya->max_threads / 2);
         /*
@@ -178,12 +195,16 @@ mergesort_t(void *args)
              * We can still copy from both chunks, copy the smaller
              * element 
              */
-            else if (mya->cmp(mya->a + li * mya->size,
-                              mya->a + ri * mya->size
+            else if (
 #if defined(KDTEST)
-                            , mya->axis
+                     _compPoints(mya->a + li * mya->size,
+                                 mya->a + ri * mya->size,
+                                 mya->axis)
+#else
+                     mya->cmp(mya->a + li * mya->size,
+                              mya->a + ri * mya->size)
 #endif
-                              ) < 1) {
+                               < 1) {
                 memcpy(mya->b + i * mya->size, mya->a + li * mya->size,
                        mya->size);
                 li++;
