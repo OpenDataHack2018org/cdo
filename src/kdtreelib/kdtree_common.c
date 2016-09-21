@@ -92,18 +92,6 @@ kd_printTree(struct kdNode *node)
    ******************************************************************** */
 
 static int
-_compPoints(const void *p1, const void *p2, int axis)
-{
-    struct kd_point *a = (struct kd_point *) p1;
-    struct kd_point *b = (struct kd_point *) p2;
-
-    int ret = (a->point[axis] > b->point[axis]) ? 1 : (a->point[axis] < b->point[axis]) ? -1 : 0;
-    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
-
-    return ret;
-}
-
-static int
 _compPoints0(const void *p1, const void *p2)
 {
     struct kd_point *a = (struct kd_point *) p1;
@@ -200,14 +188,14 @@ kd_doBuildTree(void *threadarg)
      * If this iteration is allowed to start more threads, we first
      * use them to parallelize the sorting 
      */
+#if defined(KDTEST)
+    pmergesort(points, nPoints, sizeof(struct kd_point), sortaxis, max_threads);
+#else
     int (*qcomp) (const void *, const void *);
     if      ( sortaxis == 0 ) qcomp = _compPoints0;
     else if ( sortaxis == 1 ) qcomp = _compPoints1;
     else                      qcomp = _compPoints2;
 
-#if defined(KDTEST)
-    pmergesort(points, nPoints, sizeof(struct kd_point), sortaxis, max_threads);
-#else
     pmergesort(points, nPoints, sizeof(struct kd_point), qcomp, max_threads);
 #endif
 

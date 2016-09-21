@@ -5,18 +5,6 @@
 
 #include "kdtree.h"
 
-static int
-_compPoints(const void *p1, const void *p2, int axis)
-{
-    struct kd_point *a = (struct kd_point *) p1;
-    struct kd_point *b = (struct kd_point *) p2;
-
-    int ret = (a->point[axis] > b->point[axis]) ? 1 : (a->point[axis] < b->point[axis]) ? -1 : 0;
-    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
-
-    return ret;
-}
-
 
 typedef struct param_t {
     char *a;
@@ -197,9 +185,9 @@ mergesort_t(void *args)
              */
             else if (
 #if defined(KDTEST)
-                     _compPoints(mya->a + li * mya->size,
-                                 mya->a + ri * mya->size,
-                                 mya->axis)
+                     qcmp(mya->a + li * mya->size,
+                          mya->a + ri * mya->size,
+                          mya->axis)
 #else
                      mya->cmp(mya->a + li * mya->size,
                               mya->a + ri * mya->size)
