@@ -20,7 +20,7 @@ typedef struct param_t {
     int max_threads;
 } param_t;
 
-extern void qsortR(const void *base0, size_t n, size_t size, int axis);
+extern void qsortR(void *base0, size_t n, int axis);
 
 void pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                     size_t nmemb, size_t size,
@@ -113,7 +113,7 @@ mergesort_t(void *args)
          * branch. Proceed with sequential sort of this chunk. 
          */
 #if defined(KDTEST)
-        qsortR(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->axis);
+        qsortR(mya->a + mya->first * mya->size, mya->nmemb, mya->axis);
 #else
         qsort(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp);
 #endif
@@ -185,8 +185,8 @@ mergesort_t(void *args)
              */
             else if (
 #if defined(KDTEST)
-                     qcmp(mya->a + li * mya->size,
-                          mya->a + ri * mya->size,
+                     qcmp((struct kd_point *)(mya->a + li * mya->size),
+                          (struct kd_point *)(mya->a + ri * mya->size),
                           mya->axis)
 #else
                      mya->cmp(mya->a + li * mya->size,

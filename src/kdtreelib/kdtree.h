@@ -50,15 +50,18 @@ typedef struct kd_point {
 
 
 static inline
-int qcmp(const void *p1, const void *p2, int axis)
+int qcmp(struct kd_point *a, struct kd_point *b, int axis)
 {
-    struct kd_point *a = (struct kd_point *) p1;
-    struct kd_point *b = (struct kd_point *) p2;
+  int ret = (a->point[axis] > b->point[axis]) ? 1 : (a->point[axis] < b->point[axis]) ? -1 : 0;
+  if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
 
-    int ret = (a->point[axis] > b->point[axis]) ? 1 : (a->point[axis] < b->point[axis]) ? -1 : 0;
-    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
+  return ret;
+}
 
-    return ret;
+static inline
+int qcmp2(struct kd_point *a, struct kd_point *b, int axis)
+{
+  return (a->point[axis] < b->point[axis]) ? -1 : 0;
 }
 
 
