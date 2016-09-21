@@ -123,6 +123,27 @@ _compPoints2(const void *p1, const void *p2)
     return ret;
 }
 
+/*
+void kd_quick_sort(struct kd_point *a, int n, int idx)
+{
+    int i, j;
+    struct kd_point p, t;
+    if ( n < 2 ) return;
+    p = a[n / 2];
+    for ( i = 0, j = n - 1;; i++, j-- )
+      {
+        while ( a[i].point[idx] < p.point[idx] ) i++;
+        while ( p.point[idx] < a[j].point[idx] ) j--;
+        if ( i >= j ) break;
+        t = a[i];
+        a[i] = a[j];
+        a[j] = t;
+      }
+    kd_quick_sort(a, i, idx);
+    kd_quick_sort(a + i, n - i, idx);
+}
+*/
+
 void *
 kd_doBuildTree(void *threadarg)
 {
