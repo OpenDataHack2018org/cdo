@@ -150,6 +150,7 @@ libcdo_la_SOURCES +=           \
                kdtreelib/kdtree_cartesian.c  \
                kdtreelib/kdtree_common.c     \
                kdtreelib/kdtree_spherical.c  \
+               kdtreelib/qsort.c             \
                kdtreelib/pmergesort.c        \
                kdtreelib/pqueue.c            \
                kdtreelib/pqueue.h

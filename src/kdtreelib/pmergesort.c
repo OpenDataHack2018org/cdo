@@ -10,24 +10,44 @@ typedef struct param_t {
     size_t first;
     size_t nmemb;
     size_t size;
+#if defined(KDTEST)
+    int axis;
+    int (*cmp) (const void *, const void *, int axis);
+#else
     int (*cmp) (const void *, const void *);
+#endif
     int max_threads;
 } param_t;
 
+extern void qsortR(const void *base0, size_t n, size_t size,
+                   int (*compar) (const void *, const void *, int axis),
+                   int axis);
 
 void pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                     size_t nmemb, size_t size,
+#if defined(KDTEST)
+                    int (*cmp) (const void *, const void *, int), int axis,
+#else
                     int (*cmp) (const void *, const void *),
+#endif                   
                     int max_threads);
 int pmergesort(void *base, size_t nmemb, size_t size,
+#if defined(KDTEST)
+               int (*compar) (const void *, const void *, int), int axis,
+#else
                int (*compar) (const void *, const void *),
+#endif
                int max_threads);
 void *mergesort_t(void *args);
 
 
 int
 pmergesort(void *base, size_t nmemb, size_t size,
+#if defined(KDTEST)
+           int (*compar) (const void *, const void *, int), int axis,
+#else
            int (*compar) (const void *, const void *),
+#endif
            int max_threads)
 {
     void *tmp;
@@ -43,6 +63,9 @@ pmergesort(void *base, size_t nmemb, size_t size,
     args.nmemb = nmemb;
     args.size = size;
     args.cmp = compar;
+#if defined(KDTEST)
+    args.axis = axis;
+#endif
     args.max_threads = max_threads;
 
     mergesort_t(&args);
@@ -54,7 +77,11 @@ pmergesort(void *base, size_t nmemb, size_t size,
 void
 pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
                size_t nmemb, size_t size,
+#if defined(KDTEST)
+               int (*cmp) (const void *, const void *, int), int axis,
+#else
                int (*cmp) (const void *, const void *),
+#endif
                int max_threads)
 {
 
@@ -64,6 +91,9 @@ pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
     p->nmemb = nmemb;
     p->size = size;
     p->cmp = cmp;
+#if defined(KDTEST)
+    p->axis = axis;
+#endif
     p->max_threads = max_threads;
 }
 
@@ -81,13 +111,21 @@ mergesort_t(void *args)
          * Reached maximum number of threads allocated to this
          * branch. Proceed with sequential sort of this chunk. 
          */
+#if defined(KDTEST)
+        qsortR(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp, mya->axis);
+#else
         qsort(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp);
+#endif
     } else {
         /*
          * Start two new threads, each sorting half of array a 
          */
         pm_buildparams(&larg, mya->a, mya->b, mya->first, mya->nmemb / 2,
-                       mya->size, mya->cmp, mya->max_threads / 2);
+                       mya->size, mya->cmp,
+#if defined(KDTEST)
+                       mya->axis,
+#endif
+                       mya->max_threads / 2);
         /*
          * Recursively sort the left half 
          */
@@ -97,8 +135,11 @@ mergesort_t(void *args)
         }
 
         pm_buildparams(&rarg, mya->a, mya->b, mya->first + mya->nmemb / 2,
-                       mya->nmemb - mya->nmemb / 2, mya->size,
-                       mya->cmp, mya->max_threads / 2);
+                       mya->nmemb - mya->nmemb / 2, mya->size, mya->cmp,
+#if defined(KDTEST)
+                       mya->axis,
+#endif
+                       mya->max_threads / 2);
         /*
          * Recursively sort the right half 
          */
@@ -138,7 +179,11 @@ mergesort_t(void *args)
              * element 
              */
             else if (mya->cmp(mya->a + li * mya->size,
-                              mya->a + ri * mya->size) < 1) {
+                              mya->a + ri * mya->size
+#if defined(KDTEST)
+                            , mya->axis
+#endif
+                              ) < 1) {
                 memcpy(mya->b + i * mya->size, mya->a + li * mya->size,
                        mya->size);
                 li++;

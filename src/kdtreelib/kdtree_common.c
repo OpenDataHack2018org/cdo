@@ -8,7 +8,11 @@
 
 
 extern int pmergesort(void *base, size_t nmemb, size_t size,
+#if defined(KDTEST)
+                      int (*compar) (const void *, const void *, int), int axis,
+#else
                       int (*compar) (const void *, const void *),
+#endif
                       int max_threads);
 
 
@@ -86,6 +90,18 @@ kd_printTree(struct kdNode *node)
    Functions for building and destroying trees 
 
    ******************************************************************** */
+
+static int
+_compPoints(const void *p1, const void *p2, int axis)
+{
+    struct kd_point *a = (struct kd_point *) p1;
+    struct kd_point *b = (struct kd_point *) p2;
+
+    int ret = (a->point[axis] > b->point[axis]) ? 1 : (a->point[axis] < b->point[axis]) ? -1 : 0;
+    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
+
+    return ret;
+}
 
 static int
 _compPoints0(const void *p1, const void *p2)
@@ -189,7 +205,11 @@ kd_doBuildTree(void *threadarg)
     else if ( sortaxis == 1 ) qcomp = _compPoints1;
     else                      qcomp = _compPoints2;
 
+#if defined(KDTEST)
+    pmergesort(points, nPoints, sizeof(struct kd_point), _compPoints, sortaxis, max_threads);
+#else
     pmergesort(points, nPoints, sizeof(struct kd_point), qcomp, max_threads);
+#endif
 
     pivot = nPoints / 2;
     if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)

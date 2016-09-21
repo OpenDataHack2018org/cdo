@@ -144,7 +144,7 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	kdtreelib/libcdo_la-kdtree_cartesian.lo \
 	kdtreelib/libcdo_la-kdtree_common.lo \
 	kdtreelib/libcdo_la-kdtree_spherical.lo \
-	kdtreelib/libcdo_la-pmergesort.lo \
+	kdtreelib/libcdo_la-qsort.lo kdtreelib/libcdo_la-pmergesort.lo \
 	kdtreelib/libcdo_la-pqueue.lo clipping/libcdo_la-clipping.lo \
 	clipping/libcdo_la-area.lo \
 	clipping/libcdo_la-ensure_array_size.lo \
@@ -528,12 +528,13 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	table.c text.c text.h timebase.h timer.c userlog.c uthash.h \
 	util.c util.h zaxis.c kdtreelib/kdtree.h \
 	kdtreelib/kdtree_cartesian.c kdtreelib/kdtree_common.c \
-	kdtreelib/kdtree_spherical.c kdtreelib/pmergesort.c \
-	kdtreelib/pqueue.c kdtreelib/pqueue.h clipping/clipping.c \
-	clipping/clipping.h clipping/area.c clipping/area.h \
-	clipping/ensure_array_size.c clipping/ensure_array_size.h \
-	clipping/geometry.h clipping/grid.h clipping/points.h \
-	clipping/dep_list.h clipping/grid_cell.c clipping/grid_cell.h \
+	kdtreelib/kdtree_spherical.c kdtreelib/qsort.c \
+	kdtreelib/pmergesort.c kdtreelib/pqueue.c kdtreelib/pqueue.h \
+	clipping/clipping.c clipping/clipping.h clipping/area.c \
+	clipping/area.h clipping/ensure_array_size.c \
+	clipping/ensure_array_size.h clipping/geometry.h \
+	clipping/grid.h clipping/points.h clipping/dep_list.h \
+	clipping/grid_cell.c clipping/grid_cell.h \
 	clipping/intersection.c clipping/utils.c clipping/utils.h
 #
 #if ENABLE_NEARPT3
@@ -674,6 +675,8 @@ kdtreelib/libcdo_la-kdtree_cartesian.lo: kdtreelib/$(am__dirstamp) \
 kdtreelib/libcdo_la-kdtree_common.lo: kdtreelib/$(am__dirstamp) \
 	kdtreelib/$(DEPDIR)/$(am__dirstamp)
 kdtreelib/libcdo_la-kdtree_spherical.lo: kdtreelib/$(am__dirstamp) \
+	kdtreelib/$(DEPDIR)/$(am__dirstamp)
+kdtreelib/libcdo_la-qsort.lo: kdtreelib/$(am__dirstamp) \
 	kdtreelib/$(DEPDIR)/$(am__dirstamp)
 kdtreelib/libcdo_la-pmergesort.lo: kdtreelib/$(am__dirstamp) \
 	kdtreelib/$(DEPDIR)/$(am__dirstamp)
@@ -1067,6 +1070,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-kdtree_spherical.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-pmergesort.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-pqueue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@kdtreelib/$(DEPDIR)/libcdo_la-qsort.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1693,6 +1697,13 @@ kdtreelib/libcdo_la-kdtree_spherical.lo: kdtreelib/kdtree_spherical.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtreelib/kdtree_spherical.c' object='kdtreelib/libcdo_la-kdtree_spherical.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kdtreelib/libcdo_la-kdtree_spherical.lo `test -f 'kdtreelib/kdtree_spherical.c' || echo '$(srcdir)/'`kdtreelib/kdtree_spherical.c
+
+kdtreelib/libcdo_la-qsort.lo: kdtreelib/qsort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kdtreelib/libcdo_la-qsort.lo -MD -MP -MF kdtreelib/$(DEPDIR)/libcdo_la-qsort.Tpo -c -o kdtreelib/libcdo_la-qsort.lo `test -f 'kdtreelib/qsort.c' || echo '$(srcdir)/'`kdtreelib/qsort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) kdtreelib/$(DEPDIR)/libcdo_la-qsort.Tpo kdtreelib/$(DEPDIR)/libcdo_la-qsort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='kdtreelib/qsort.c' object='kdtreelib/libcdo_la-qsort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kdtreelib/libcdo_la-qsort.lo `test -f 'kdtreelib/qsort.c' || echo '$(srcdir)/'`kdtreelib/qsort.c
 
 kdtreelib/libcdo_la-pmergesort.lo: kdtreelib/pmergesort.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT kdtreelib/libcdo_la-pmergesort.lo -MD -MP -MF kdtreelib/$(DEPDIR)/libcdo_la-pmergesort.Tpo -c -o kdtreelib/libcdo_la-pmergesort.lo `test -f 'kdtreelib/pmergesort.c' || echo '$(srcdir)/'`kdtreelib/pmergesort.c
