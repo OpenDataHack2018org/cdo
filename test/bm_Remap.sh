@@ -1,10 +1,12 @@
 #!/bin/sh
 #
+export DYLD_LIBRARY_PATH=/opt/intel/lib:$DYLD_LIBRARY_PATH
 CDO=src/cdo
 #CDO=cdo-1.6.2
 #
 RMODS="bil bic nn con ycon"
 #
+$CDO -V
 #$CDO -setrtomiss,0,10000 -topo topo05
 $CDO -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
 #
@@ -43,6 +45,20 @@ done
 #   8                                      24s
 #      4024MB     5836MB     1240MB
 ####################################################
+#
+# CDO 1.8.0 ----------------------------------------
+#
+# result on hama2: gcc 6.1.0 avx2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.5    1.1   0.6   138     92
+# curv     22     22    74   138    172
+#
+# result on hama2: icc 16.0.2 avx2
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.6    1.3   0.7   120     90
+# curv     21     21    74   120    163
 #
 # CDO 1.6.8 ----------------------------------------
 #

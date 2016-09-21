@@ -28,7 +28,7 @@
 #include "time.h"
 
 /* Quicksort is called with a pointer to the array to be sorted and an integer indicating its length. */
-
+static
 void quick_sort(double * array, int array_length)
 {
   int i, j;
@@ -53,7 +53,7 @@ void quick_sort(double * array, int array_length)
 }
 
 /* Quicksort is called with a pointer to the array of center points to be sorted and an integer indicating its length. It sorts the array by its longitude coordinates */
-
+static
 void quick_sort_by_lon(double * array, int array_length)
 {
   int i, j;
@@ -91,7 +91,7 @@ void quick_sort_by_lon(double * array, int array_length)
 }
 
 /* This uses quicksort to sort the latitude coordinates in a subarray of all coordinates. */
-
+static
 void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subarray_end)
 {
   int subarray_length = (subarray_end - subarray_start) / 2 + 1;     
@@ -112,8 +112,6 @@ void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subar
     subarray_index += 1;	  
   }            
 }
-
-
 
 
 static

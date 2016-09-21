@@ -95,7 +95,7 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --enable-cxx --prefix=$HOME/local \
                     $CDOLIBS \
 	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
-        elif  test "$COMP" = icpc ; then
+        elif  test "$COMP" = icc ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
 	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
