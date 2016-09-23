@@ -402,7 +402,7 @@ int gridFromH5file(const char *gridfile)
       fill_gridvals(grid.xsize, grid.ysize, grid.xvals, grid.yvals);
 
       grid.type = GRID_CURVILINEAR;
-      grid.prec = DATATYPE_FLT32;
+      grid.prec = CDI_DATATYPE_FLT32;
 
       gridID = gridDefine(grid);
     }
@@ -525,7 +525,7 @@ int gridFromH5file(const char *gridfile)
 	  for ( i = 0; i < grid.size; ++i ) grid.yvals[i] = grid.yvals[i]*yscale + yoffset;
 
 	  grid.type = GRID_CURVILINEAR;
-	  grid.prec = DATATYPE_FLT32;
+	  grid.prec = CDI_DATATYPE_FLT32;
 
 	  gridID = gridDefine(grid);
 	}

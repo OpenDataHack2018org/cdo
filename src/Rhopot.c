@@ -248,10 +248,10 @@ void *Rhopot(void *argument)
   sao.missval = vlistInqVarMissval(vlistID1, saoID);
   rho.missval = to.missval;
 
-  int datatype = DATATYPE_FLT32;
-  if ( vlistInqVarDatatype(vlistID1, toID) == DATATYPE_FLT64 &&
-       vlistInqVarDatatype(vlistID1, saoID) == DATATYPE_FLT64 )
-    datatype = DATATYPE_FLT64;
+  int datatype = CDI_DATATYPE_FLT32;
+  if ( vlistInqVarDatatype(vlistID1, toID) == CDI_DATATYPE_FLT64 &&
+       vlistInqVarDatatype(vlistID1, saoID) == CDI_DATATYPE_FLT64 )
+    datatype = CDI_DATATYPE_FLT64;
 
   int vlistID2 = vlistCreate();
   varID = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_INSTANT);

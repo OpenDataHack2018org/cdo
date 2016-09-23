@@ -78,10 +78,10 @@ void *Gengrid(void *argument)
   gridDefXvals(gridID3, array1);
   gridDefYvals(gridID3, array2);
 
-  if ( datatype == DATATYPE_FLT64 )
-    gridDefPrec(gridID3, DATATYPE_FLT64);
+  if ( datatype == CDI_DATATYPE_FLT64 )
+    gridDefPrec(gridID3, CDI_DATATYPE_FLT64);
   else
-    gridDefPrec(gridID3, DATATYPE_FLT32);
+    gridDefPrec(gridID3, CDI_DATATYPE_FLT32);
 
   double xminval = array1[0];
   double xmaxval = array1[0];
@@ -120,7 +120,7 @@ void *Gengrid(void *argument)
   vlistDefVar(vlistID3, gridID3, zaxisID3, TSTEP_CONSTANT);
   vlistDefVarMissval(vlistID3, 0, missval);
   vlistDefVarName(vlistID3, 0, "dummy");
-  vlistDefVarDatatype(vlistID3, 0, DATATYPE_INT8);
+  vlistDefVarDatatype(vlistID3, 0, CDI_DATATYPE_INT8);
 
   int taxisID3 = taxisCreate(TAXIS_ABSOLUTE);
 

@@ -56,7 +56,7 @@ void init_amsr_day(int vlistID, int gridID, int zaxisID, int nvars)
       varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
-      vlistDefVarDatatype(vlistID, varID, DATATYPE_INT16);
+      vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_INT16);
       vlistDefVarMissval(vlistID, varID, 254);
       vlistDefVarScalefactor(vlistID, varID, xscale[i]);
       vlistDefVarAddoffset(vlistID, varID, xminval[i]);
@@ -103,7 +103,7 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
       varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
-      vlistDefVarDatatype(vlistID, varID, DATATYPE_INT16);
+      vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_INT16);
       vlistDefVarMissval(vlistID, varID, 254);
       vlistDefVarScalefactor(vlistID, varID, xscale[i]);
       vlistDefVarAddoffset(vlistID, varID, xminval[i]);

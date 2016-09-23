@@ -344,8 +344,8 @@ int vlistInqNWPV(int vlistID, int varID)
 {
   int nwpv; // number of words per value; real:1  complex:2
 
-  if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX32 || 
-       vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX64 )
+  if ( vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX32 || 
+       vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX64 )
     nwpv = 2;
   else
     nwpv = 1;

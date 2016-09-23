@@ -55,7 +55,7 @@ void *Trend(void *argument)
   int nrecords = vlistNrecs(vlistID1);
 
   for ( varID = 0; varID < nvars; varID++ )
-    vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
+    vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());

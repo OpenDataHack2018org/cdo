@@ -1074,7 +1074,7 @@ void *Gradsdes(void *argument)
                filetype == CDI_FILETYPE_IEG )
             {
               prec = vlistInqVarDatatype(vlistID, varID);
-              if ( prec == DATATYPE_FLT64 ) flt64 = true;
+              if ( prec == CDI_DATATYPE_FLT64 ) flt64 = true;
             }
           vars[varID] = TRUE;
           recoffset[varID] = nrecsout;

@@ -44,10 +44,10 @@ void *Tocomplex(void *argument)
   for ( varID = 0; varID < nvars; ++varID )
     {
       int datatype = vlistInqVarDatatype(vlistID2, varID);
-      if ( datatype == DATATYPE_FLT64 )
-	datatype = DATATYPE_CPX64;
+      if ( datatype == CDI_DATATYPE_FLT64 )
+	datatype = CDI_DATATYPE_CPX64;
       else
-	datatype = DATATYPE_CPX32;
+	datatype = CDI_DATATYPE_CPX32;
 
       vlistDefVarDatatype(vlistID2, varID, datatype);
     }

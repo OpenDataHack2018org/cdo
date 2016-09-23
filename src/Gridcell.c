@@ -132,17 +132,17 @@ void *Gridcell(void *argument)
       vlistDefVarStdname(vlistID2, varID, "area");
       vlistDefVarLongname(vlistID2, varID, "area of grid cell");
       vlistDefVarUnits(vlistID2, varID, "m2");
-      vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
+      vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
     }
   else if ( operatorID == GRIDWGTS )
     {
       vlistDefVarName(vlistID2, varID, "cell_weights");
-      vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
+      vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
     }
   else if ( operatorID == GRIDMASK )
     {
       vlistDefVarName(vlistID2, varID, "grid_mask");
-      vlistDefVarDatatype(vlistID2, varID, DATATYPE_UINT8);
+      vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_UINT8);
     }
   else if ( operatorID == GRIDDX )
     {

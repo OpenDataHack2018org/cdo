@@ -1368,11 +1368,11 @@ void after_parini(struct Control *globs, struct Variable *vars)
   if ( precision )
     switch ( precision )
       {
-      case  8: DataType = DATATYPE_PACK8;  break;
-      case 16: DataType = DATATYPE_PACK16; break;
-      case 24: DataType = DATATYPE_PACK24; break;
-      case 32: DataType = DATATYPE_FLT32;  break;
-      case 64: DataType = DATATYPE_FLT64;  break;
+      case  8: DataType = CDI_DATATYPE_PACK8;  break;
+      case 16: DataType = CDI_DATATYPE_PACK16; break;
+      case 24: DataType = CDI_DATATYPE_PACK24; break;
+      case 32: DataType = CDI_DATATYPE_FLT32;  break;
+      case 64: DataType = CDI_DATATYPE_FLT64;  break;
       default: Error( "unsupported data precision %d", precision);
       }
 

@@ -391,11 +391,11 @@ void setDefaultDataType(const char *datatypestr)
           else if ( nbits == 32 )
             {
               if ( cdoDefaultFileType == CDI_FILETYPE_GRB )
-                cdoDefaultDataType = DATATYPE_PACK32;
+                cdoDefaultDataType = CDI_DATATYPE_PACK32;
               else
-                cdoDefaultDataType = DATATYPE_FLT32;
+                cdoDefaultDataType = CDI_DATATYPE_FLT32;
             }
-          else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
+          else if ( nbits == 64 ) cdoDefaultDataType = CDI_DATATYPE_FLT64;
           else
             {
               fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
@@ -407,9 +407,9 @@ void setDefaultDataType(const char *datatypestr)
         {
           if ( dtype == D_INT )
             {
-              if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_INT8;
-              else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_INT16;
-              else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_INT32;
+              if      ( nbits ==  8 ) cdoDefaultDataType = CDI_DATATYPE_INT8;
+              else if ( nbits == 16 ) cdoDefaultDataType = CDI_DATATYPE_INT16;
+              else if ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_INT32;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype INT!\n", nbits);
@@ -418,9 +418,9 @@ void setDefaultDataType(const char *datatypestr)
             }
           else if ( dtype == D_UINT )
             {
-              if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_UINT8;
-              else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_UINT16;
-              else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_UINT32;
+              if      ( nbits ==  8 ) cdoDefaultDataType = CDI_DATATYPE_UINT8;
+              else if ( nbits == 16 ) cdoDefaultDataType = CDI_DATATYPE_UINT16;
+              else if ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_UINT32;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype UINT!\n", nbits);
@@ -429,8 +429,8 @@ void setDefaultDataType(const char *datatypestr)
             }
           else if ( dtype == D_FLT )
             {
-              if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_FLT32;
-              else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
+              if      ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_FLT32;
+              else if ( nbits == 64 ) cdoDefaultDataType = CDI_DATATYPE_FLT64;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype FLT!\n", nbits);
@@ -439,8 +439,8 @@ void setDefaultDataType(const char *datatypestr)
             }
           else if ( dtype == D_CPX )
             {
-              if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_CPX32;
-              else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_CPX64;
+              if      ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_CPX32;
+              else if ( nbits == 64 ) cdoDefaultDataType = CDI_DATATYPE_CPX64;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype CPX!\n", nbits);
@@ -481,11 +481,11 @@ void setDefaultDataTypeByte(char *datatypestr)
       datatype = atoi(datatypestr);
       datatypestr++;
 
-      if      ( datatype == 1 ) cdoDefaultDataType = DATATYPE_PACK8;
-      else if ( datatype == 2 ) cdoDefaultDataType = DATATYPE_PACK16;
-      else if ( datatype == 3 ) cdoDefaultDataType = DATATYPE_PACK24;
-      else if ( datatype == 4 ) cdoDefaultDataType = DATATYPE_FLT32;
-      else if ( datatype == 8 ) cdoDefaultDataType = DATATYPE_FLT64;
+      if      ( datatype == 1 ) cdoDefaultDataType = CDI_DATATYPE_PACK8;
+      else if ( datatype == 2 ) cdoDefaultDataType = CDI_DATATYPE_PACK16;
+      else if ( datatype == 3 ) cdoDefaultDataType = CDI_DATATYPE_PACK24;
+      else if ( datatype == 4 ) cdoDefaultDataType = CDI_DATATYPE_FLT32;
+      else if ( datatype == 8 ) cdoDefaultDataType = CDI_DATATYPE_FLT64;
       else
         {
           fprintf(stderr, "Unsupported datatype %d!\n", datatype);

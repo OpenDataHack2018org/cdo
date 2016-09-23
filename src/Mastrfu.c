@@ -150,7 +150,7 @@ void *Mastrfu(void *argument)
   vlistDefVarName(vlistID2, 0, "mastrfu");
   vlistDefVarLongname(vlistID2, 0, "mass stream function");
   vlistDefVarUnits(vlistID2, 0, "kg/s");
-  vlistDefVarDatatype(vlistID2, 0, DATATYPE_FLT32);
+  vlistDefVarDatatype(vlistID2, 0, CDI_DATATYPE_FLT32);
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 

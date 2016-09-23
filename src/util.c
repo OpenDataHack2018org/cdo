@@ -591,18 +591,18 @@ int datatype2str(int datatype, char *datatypestr)
 {
   int status = 0;
 
-  if      ( datatype == DATATYPE_PACK   ) strcpy(datatypestr, "P0");
+  if      ( datatype == CDI_DATATYPE_PACK   ) strcpy(datatypestr, "P0");
   else if ( datatype > 0 && datatype <= 32  ) sprintf(datatypestr, "P%d", datatype);
-  else if ( datatype == DATATYPE_CPX32  ) strcpy(datatypestr, "C32");
-  else if ( datatype == DATATYPE_CPX64  ) strcpy(datatypestr, "C64");
-  else if ( datatype == DATATYPE_FLT32  ) strcpy(datatypestr, "F32");
-  else if ( datatype == DATATYPE_FLT64  ) strcpy(datatypestr, "F64");
-  else if ( datatype == DATATYPE_INT8   ) strcpy(datatypestr, "I8");
-  else if ( datatype == DATATYPE_INT16  ) strcpy(datatypestr, "I16");
-  else if ( datatype == DATATYPE_INT32  ) strcpy(datatypestr, "I32");
-  else if ( datatype == DATATYPE_UINT8  ) strcpy(datatypestr, "U8");
-  else if ( datatype == DATATYPE_UINT16 ) strcpy(datatypestr, "U16");
-  else if ( datatype == DATATYPE_UINT32 ) strcpy(datatypestr, "U32");
+  else if ( datatype == CDI_DATATYPE_CPX32  ) strcpy(datatypestr, "C32");
+  else if ( datatype == CDI_DATATYPE_CPX64  ) strcpy(datatypestr, "C64");
+  else if ( datatype == CDI_DATATYPE_FLT32  ) strcpy(datatypestr, "F32");
+  else if ( datatype == CDI_DATATYPE_FLT64  ) strcpy(datatypestr, "F64");
+  else if ( datatype == CDI_DATATYPE_INT8   ) strcpy(datatypestr, "I8");
+  else if ( datatype == CDI_DATATYPE_INT16  ) strcpy(datatypestr, "I16");
+  else if ( datatype == CDI_DATATYPE_INT32  ) strcpy(datatypestr, "I32");
+  else if ( datatype == CDI_DATATYPE_UINT8  ) strcpy(datatypestr, "U8");
+  else if ( datatype == CDI_DATATYPE_UINT16 ) strcpy(datatypestr, "U16");
+  else if ( datatype == CDI_DATATYPE_UINT32 ) strcpy(datatypestr, "U32");
   else                                  { strcpy(datatypestr, "-1"); status = -1;}
 
   return status;
@@ -619,21 +619,21 @@ int str2datatype(const char *datatypestr)
   if ( len > 1 )
     {
       int ilen = atoi(datatypestr+1);
-      if      ( strncmp(datatypestr, "P0",  len) == 0 ) datatype = DATATYPE_PACK;
+      if      ( strncmp(datatypestr, "P0",  len) == 0 ) datatype = CDI_DATATYPE_PACK;
       else if ( strncmp(datatypestr, "P",     1) == 0 &&
                 ilen > 0 && ilen <= 32 )               datatype = atoi(datatypestr+1);
-      else if ( strncmp(datatypestr, "C32", len) == 0 ) datatype = DATATYPE_CPX32;
-      else if ( strncmp(datatypestr, "C64", len) == 0 ) datatype = DATATYPE_CPX64;
-      else if ( strncmp(datatypestr, "F32", len) == 0 ) datatype = DATATYPE_FLT32;
-      else if ( strncmp(datatypestr, "F64", len) == 0 ) datatype = DATATYPE_FLT64;
-      else if ( strncmp(datatypestr, "I8",  len) == 0 ) datatype = DATATYPE_INT8;
-      else if ( strncmp(datatypestr, "I16", len) == 0 ) datatype = DATATYPE_INT16;
-      else if ( strncmp(datatypestr, "I32", len) == 0 ) datatype = DATATYPE_INT32;
-      else if ( strncmp(datatypestr, "U8",  len) == 0 ) datatype = DATATYPE_UINT8;
-      else if ( strncmp(datatypestr, "U16", len) == 0 ) datatype = DATATYPE_UINT16;
-      else if ( strncmp(datatypestr, "U32", len) == 0 ) datatype = DATATYPE_UINT32;
-      else if ( strncmp(datatypestr, "real",   len) == 0 ) datatype = DATATYPE_FLT32;
-      else if ( strncmp(datatypestr, "double", len) == 0 ) datatype = DATATYPE_FLT64;
+      else if ( strncmp(datatypestr, "C32", len) == 0 ) datatype = CDI_DATATYPE_CPX32;
+      else if ( strncmp(datatypestr, "C64", len) == 0 ) datatype = CDI_DATATYPE_CPX64;
+      else if ( strncmp(datatypestr, "F32", len) == 0 ) datatype = CDI_DATATYPE_FLT32;
+      else if ( strncmp(datatypestr, "F64", len) == 0 ) datatype = CDI_DATATYPE_FLT64;
+      else if ( strncmp(datatypestr, "I8",  len) == 0 ) datatype = CDI_DATATYPE_INT8;
+      else if ( strncmp(datatypestr, "I16", len) == 0 ) datatype = CDI_DATATYPE_INT16;
+      else if ( strncmp(datatypestr, "I32", len) == 0 ) datatype = CDI_DATATYPE_INT32;
+      else if ( strncmp(datatypestr, "U8",  len) == 0 ) datatype = CDI_DATATYPE_UINT8;
+      else if ( strncmp(datatypestr, "U16", len) == 0 ) datatype = CDI_DATATYPE_UINT16;
+      else if ( strncmp(datatypestr, "U32", len) == 0 ) datatype = CDI_DATATYPE_UINT32;
+      else if ( strncmp(datatypestr, "real",   len) == 0 ) datatype = CDI_DATATYPE_FLT32;
+      else if ( strncmp(datatypestr, "double", len) == 0 ) datatype = CDI_DATATYPE_FLT64;
     }
 
   return datatype;

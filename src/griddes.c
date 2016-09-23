@@ -1042,7 +1042,7 @@ int gridFromFile(FILE *gfp, const char *dname)
           double *attflt = (double*) Malloc(attlen*sizeof(double));
           cdo_read_field("attint", pline, attlen, attflt, &lineno, gfp, dname);
           for ( int i = 0; i < attlen; ++i ) attint[i] = (int)lround(attflt[i]);
-          cdiDefAttInt(gridID, CDI_GLOBAL, attname, DATATYPE_INT32, attlen, attint);
+          cdiDefAttInt(gridID, CDI_GLOBAL, attname, CDI_DATATYPE_INT32, attlen, attint);
           free(attint);
           free(attflt);
 	}
@@ -1052,7 +1052,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 
           double *attflt = (double*) Malloc(attlen*sizeof(double));
           cdo_read_field("attflt", pline, attlen, attflt, &lineno, gfp, dname);
-          cdiDefAttFlt(gridID, CDI_GLOBAL, attname, DATATYPE_FLT64, attlen, attflt);
+          cdiDefAttFlt(gridID, CDI_GLOBAL, attname, CDI_DATATYPE_FLT64, attlen, attflt);
           free(attflt);
 	}
       else

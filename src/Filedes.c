@@ -46,7 +46,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
   for ( int ia = 0; ia < natts; ++ia )
     {
       cdiInqAtt(vlistID, varID, ia, attname, &atttype, &attlen);
-      if ( atttype == DATATYPE_INT )
+      if ( atttype == CDI_DATATYPE_INT )
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  cdiInqAttInt(vlistID, varID, attname, attlen, attint);
@@ -58,7 +58,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 	    }
 	  fprintf(fp, "\n");
 	}
-      else if ( atttype == DATATYPE_FLT )
+      else if ( atttype == CDI_DATATYPE_FLT )
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  cdiInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
@@ -70,7 +70,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 	    }
 	  fprintf(fp, "\n");
 	}
-      else if ( atttype == DATATYPE_TXT )
+      else if ( atttype == CDI_DATATYPE_TXT )
 	{
 	  cdiInqAttTxt(vlistID, varID, attname, sizeof(atttxt), atttxt);
 	  atttxt[attlen] = 0;

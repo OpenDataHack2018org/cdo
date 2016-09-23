@@ -255,10 +255,10 @@ void *Adisit(void *argument)
   sao.missval = vlistInqVarMissval(vlistID1, saoID);
   tis.missval = tho.missval;
 
-  int datatype = DATATYPE_FLT32;
-  if ( vlistInqVarDatatype(vlistID1, thoID) == DATATYPE_FLT64 &&
-       vlistInqVarDatatype(vlistID1, saoID) == DATATYPE_FLT64 )
-    datatype = DATATYPE_FLT64;
+  int datatype = CDI_DATATYPE_FLT32;
+  if ( vlistInqVarDatatype(vlistID1, thoID) == CDI_DATATYPE_FLT64 &&
+       vlistInqVarDatatype(vlistID1, saoID) == CDI_DATATYPE_FLT64 )
+    datatype = CDI_DATATYPE_FLT64;
 
   int vlistID2 = vlistCreate();
 

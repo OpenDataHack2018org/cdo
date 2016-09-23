@@ -298,26 +298,26 @@ void *Importbinary(void *argument)
       }
 
       missval  = pfi.undef;
-      datatype = DATATYPE_FLT32;
+      datatype = CDI_DATATYPE_FLT32;
 
       if      ( pvar->dfrm ==  1 ) {
-	datatype = DATATYPE_UINT8;
+	datatype = CDI_DATATYPE_UINT8;
 	if ( missval < 0 || missval > 255 ) missval = 255;
       }
       else if ( pvar->dfrm ==  2 )  {
-	datatype = DATATYPE_UINT16;
+	datatype = CDI_DATATYPE_UINT16;
 	if ( missval < 0 || missval > 65535 ) missval = 65535;
       }
       else if ( pvar->dfrm == -2 )  {
-	datatype = DATATYPE_INT16;
+	datatype = CDI_DATATYPE_INT16;
 	if ( missval < -32768 || missval > 32767 ) missval = -32768;
       }
       else if ( pvar->dfrm ==  4 )  {
-	datatype = DATATYPE_INT32;
+	datatype = CDI_DATATYPE_INT32;
 	if ( missval < -2147483648 || missval > 2147483647 ) missval = -2147483646;
       }
       else if ( pfi.flt64 )
-	datatype = DATATYPE_FLT64;
+	datatype = CDI_DATATYPE_FLT64;
       
       vlistDefVarDatatype(vlistID, varID, datatype);
       vlistDefVarMissval(vlistID, varID, missval);

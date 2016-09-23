@@ -49,18 +49,18 @@ const char *datatypestr(int datatype)
   str[0] = 0;
   sprintf(str, "%d bit packed", datatype);
 
-  if      ( datatype == DATATYPE_PACK   ) return ("P0");
+  if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
   else if ( datatype > 0 && datatype <= 32 ) return (str);
-  else if ( datatype == DATATYPE_CPX32  ) return ("C32");
-  else if ( datatype == DATATYPE_CPX64  ) return ("C64");
-  else if ( datatype == DATATYPE_FLT32  ) return ("32 bit floats");
-  else if ( datatype == DATATYPE_FLT64  ) return ("64 bit floats");
-  else if ( datatype == DATATYPE_INT8   ) return ("I8");
-  else if ( datatype == DATATYPE_INT16  ) return ("I16");
-  else if ( datatype == DATATYPE_INT32  ) return ("I32");
-  else if ( datatype == DATATYPE_UINT8  ) return ("U8");
-  else if ( datatype == DATATYPE_UINT16 ) return ("U16");
-  else if ( datatype == DATATYPE_UINT32 ) return ("U32");
+  else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
+  else if ( datatype == CDI_DATATYPE_CPX64  ) return ("C64");
+  else if ( datatype == CDI_DATATYPE_FLT32  ) return ("32 bit floats");
+  else if ( datatype == CDI_DATATYPE_FLT64  ) return ("64 bit floats");
+  else if ( datatype == CDI_DATATYPE_INT8   ) return ("I8");
+  else if ( datatype == CDI_DATATYPE_INT16  ) return ("I16");
+  else if ( datatype == CDI_DATATYPE_INT32  ) return ("I32");
+  else if ( datatype == CDI_DATATYPE_UINT8  ) return ("U8");
+  else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
+  else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
   else                                    return ("");
 }
 

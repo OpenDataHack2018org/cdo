@@ -157,17 +157,17 @@ static void dump_global_attributes(struct kv **ht, int streamID)
       cdiInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
       switch ( type )
         {
-        case DATATYPE_TXT:
+        case CDI_DATATYPE_TXT:
           value = Malloc(len + 1);
           cdiInqAttTxt(vlistID, CDI_GLOBAL, name, len, value);
           value[len] = '\0';
           break;
-        case DATATYPE_INT32:
+        case CDI_DATATYPE_INT32:
           value = Malloc(CDI_MAX_NAME);
           cdiInqAttInt(vlistID, CDI_GLOBAL, name, len, (int *)buffer);
           snprintf(value, CDI_MAX_NAME, "%i", *(int *)buffer);
           break;
-        case DATATYPE_FLT64:
+        case CDI_DATATYPE_FLT64:
           value = Malloc(CDI_MAX_NAME);
           cdiInqAttFlt(vlistID, CDI_GLOBAL, name, len, (double *)buffer);
           snprintf(value, CDI_MAX_NAME, "%e", *(double *)buffer);
@@ -471,7 +471,7 @@ static void register_cmor_grid_mapping(int projID, int cmor_grid_id)
       for ( int iatt = 0; iatt < natts; ++iatt )
         {
           cdiInqAtt(projID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
-          if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
+          if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
             {
               double attflt[attlen];
               cdiInqAttFlt(projID, CDI_GLOBAL, attname, attlen, attflt);
@@ -588,7 +588,7 @@ static void register_variable(int vlistID, int varID, int *axis_ids,
   size_t gridsize = vlistGridsizeMax(vlistID);
   int levels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
   var->cdi_varID = varID;
-  if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
+  if ( vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_FLT32 )
     {
       var->datatype = 'f';
       *(float *) missing_value = vlistInqVarMissval(vlistID, varID);

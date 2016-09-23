@@ -765,7 +765,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   int i, k;
   int ftype = 0;
   int len;
-  int dtype = DATATYPE_FLT32;
+  int dtype = CDI_DATATYPE_FLT32;
   char attstring[4096];     /* Buffer to read string attribute back */
   char varname[CDI_MAX_NAME];
   short *mask = NULL;
@@ -802,14 +802,14 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   }
   */
   native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
-  if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0; dtype = DATATYPE_INT8;}
-  else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0; dtype = DATATYPE_UINT8;}
-  else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0; dtype = DATATYPE_INT16;}
-  else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) {ftype=0; dtype = DATATYPE_UINT16;}
-  else if ( H5Tequal(native_type, H5T_NATIVE_INT)    > 0 ) {ftype=0; dtype = DATATYPE_INT32;}
-  else if ( H5Tequal(native_type, H5T_NATIVE_UINT)   > 0 ) {ftype=0; dtype = DATATYPE_UINT32;}
-  else if ( H5Tequal(native_type, H5T_NATIVE_FLOAT)  > 0 ) {ftype=1; dtype = DATATYPE_FLT32;}
-  else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) {ftype=1; dtype = DATATYPE_FLT64;}
+  if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0; dtype = CDI_DATATYPE_INT8;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0; dtype = CDI_DATATYPE_UINT8;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0; dtype = CDI_DATATYPE_INT16;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) {ftype=0; dtype = CDI_DATATYPE_UINT16;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_INT)    > 0 ) {ftype=0; dtype = CDI_DATATYPE_INT32;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_UINT)   > 0 ) {ftype=0; dtype = CDI_DATATYPE_UINT32;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_FLOAT)  > 0 ) {ftype=1; dtype = CDI_DATATYPE_FLT32;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) {ftype=1; dtype = CDI_DATATYPE_FLT64;}
   else
     {
       cdoWarning("Dataset %s skipped, unsupported native datatype!", varname);
@@ -1052,7 +1052,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if ( ftype )
 	{
-	  if ( dtype == DATATYPE_FLT32 )
+	  if ( dtype == CDI_DATATYPE_FLT32 )
 	    {
 	      float *farray;
 	      int i;
@@ -1126,13 +1126,13 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g  missval = %g",
 		 varname, dtype,  minval, maxval, missval);
 
-      if ( dtype == DATATYPE_UINT8 )
+      if ( dtype == CDI_DATATYPE_UINT8 )
 	{
-	  if ( minval >= 0 && maxval <= 127 ) dtype = DATATYPE_INT8;
+	  if ( minval >= 0 && maxval <= 127 ) dtype = CDI_DATATYPE_INT8;
 	}
-      else if ( dtype == DATATYPE_UINT16 )
+      else if ( dtype == CDI_DATATYPE_UINT16 )
 	{
-	  if ( minval >= 0 && maxval <= 32767 ) dtype = DATATYPE_INT16;
+	  if ( minval >= 0 && maxval <= 32767 ) dtype = CDI_DATATYPE_INT16;
 	}
 
       laddoffset   = IS_NOT_EQUAL(addoffset,   0);
@@ -1172,10 +1172,10 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	{
 	  if ( ! (missval < minval || missval > maxval) )
 	    {
-	      if ( DBL_IS_EQUAL(missval, 255.) && dtype == DATATYPE_UINT8 )
+	      if ( DBL_IS_EQUAL(missval, 255.) && dtype == CDI_DATATYPE_UINT8 )
 		{
 		  missval = -255;
-		  dtype   = DATATYPE_INT16;
+		  dtype   = CDI_DATATYPE_INT16;
 		  cdoPrint("Dataset %s: changed missval to %g and datatype to INT16!",
 			   varname, missval);
 
@@ -1311,12 +1311,12 @@ void get_global_att(hid_t file_id, const char *obj_path, int vlistID)
       else if ( type_class == H5T_INTEGER )
 	{
 	  H5Aread(attr, H5T_NATIVE_INT, &attint);
-	  cdiDefAttInt(vlistID, CDI_GLOBAL, attname, DATATYPE_INT32, 1, &attint);
+	  cdiDefAttInt(vlistID, CDI_GLOBAL, attname, CDI_DATATYPE_INT32, 1, &attint);
 	}
       else if ( type_class == H5T_FLOAT )
 	{
 	  H5Aread(attr, H5T_NATIVE_DOUBLE, &attflt);
-	  cdiDefAttFlt(vlistID, CDI_GLOBAL, attname, DATATYPE_FLT64, 1, &attflt);
+	  cdiDefAttFlt(vlistID, CDI_GLOBAL, attname, CDI_DATATYPE_FLT64, 1, &attflt);
 	}
       H5Tclose(atype_mem);
       H5Aclose(attr);
@@ -1341,7 +1341,7 @@ int get_vdate(int vlistID)
   for ( i = 0; i < natts; ++i )
     {
       cdiInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
-      if ( type == DATATYPE_TXT )
+      if ( type == CDI_DATATYPE_TXT )
 	{
 	  if ( strcmp(name, "DateAndTime") == 0 ||
 	       strcmp(name, "Date_Time") == 0 )

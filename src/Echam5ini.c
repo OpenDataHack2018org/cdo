@@ -1478,7 +1478,7 @@ void *Echam5ini(void *argument)
 	  if ( vars[iv].name )     vlistDefVarName(vlistID2, varID, vars[iv].name);
 	  if ( vars[iv].longname ) vlistDefVarLongname(vlistID2, varID, vars[iv].longname);
           if ( vars[iv].units )    vlistDefVarUnits(vlistID2, varID, vars[iv].units);
-	  vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
+	  vlistDefVarDatatype(vlistID2, varID, CDI_DATATYPE_FLT64);
 	}
 
       for ( iatt = 0; iatt < atts.natxt; ++iatt )
