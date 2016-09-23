@@ -58,31 +58,31 @@ void printFiletype(int streamID, int vlistID)
 
   switch ( filetype )
     {
-    case FILETYPE_GRB:
+    case CDI_FILETYPE_GRB:
       printf("GRIB");
       break;
-    case FILETYPE_GRB2:
+    case CDI_FILETYPE_GRB2:
       printf("GRIB2");
       break;
-    case FILETYPE_NC:
+    case CDI_FILETYPE_NC:
       printf("NetCDF");
       break;
-    case FILETYPE_NC2:
+    case CDI_FILETYPE_NC2:
       printf("NetCDF2");
       break;
-    case FILETYPE_NC4:
+    case CDI_FILETYPE_NC4:
       printf("NetCDF4");
       break;
-    case FILETYPE_NC4C:
+    case CDI_FILETYPE_NC4C:
       printf("NetCDF4 classic");
       break;
-    case FILETYPE_SRV:
+    case CDI_FILETYPE_SRV:
       printf("SERVICE");
       break;
-    case FILETYPE_EXT:
+    case CDI_FILETYPE_EXT:
       printf("EXTRA");
       break;
-    case FILETYPE_IEG:
+    case CDI_FILETYPE_IEG:
       printf("IEG");
       break;
     default:
@@ -90,7 +90,7 @@ void printFiletype(int streamID, int vlistID)
       break;
     }
 
-  if ( filetype == FILETYPE_SRV || filetype == FILETYPE_EXT || filetype == FILETYPE_IEG )
+  if ( filetype == CDI_FILETYPE_SRV || filetype == CDI_FILETYPE_EXT || filetype == CDI_FILETYPE_IEG )
     {
       switch ( streamInqByteorder(streamID) )
 	{
@@ -103,7 +103,7 @@ void printFiletype(int streamID, int vlistID)
 	}
     }
 
-  if ( filetype == FILETYPE_GRB || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+  if ( filetype == CDI_FILETYPE_GRB || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
     {
       int nvars = vlistNvars(vlistID);
       for ( int varID = 0; varID < nvars; varID++ )
@@ -119,7 +119,7 @@ void printFiletype(int streamID, int vlistID)
 	}
     }
 
-  if ( filetype == FILETYPE_GRB2 )
+  if ( filetype == CDI_FILETYPE_GRB2 )
     {
       int nvars = vlistNvars(vlistID);
       for ( int varID = 0; varID < nvars; varID++ )

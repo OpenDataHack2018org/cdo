@@ -116,7 +116,7 @@ void writeNcFile(const char path[], const double array[], int length)
   taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID, taxisID);
   
-  streamID = streamOpenWrite(path, FILETYPE_NC);
+  streamID = streamOpenWrite(path, CDI_FILETYPE_NC);
   if ( streamID < 0 ) 
     {
       fprintf(stderr, "%s\n", cdiStringError(streamID));

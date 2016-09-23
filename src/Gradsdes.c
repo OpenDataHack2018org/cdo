@@ -660,7 +660,7 @@ void ctl_zdef(FILE *gdp, int vlistID, bool *zrev)
 static
 void ctl_options(FILE *gdp, bool yrev, bool zrev, bool sequential, bool bigendian, bool littleendian, bool flt64, bool cal365day)
 {
-  /* if ( filetype == FILETYPE_GRB ) zrev = false; */
+  /* if ( filetype == CDI_FILETYPE_GRB ) zrev = false; */
 
   if ( yrev || zrev || sequential || bigendian || littleendian || flt64 )
     {
@@ -721,7 +721,7 @@ void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
 
           fprintf(gdp, "  %3d", nlev);
 
-          if ( filetype == FILETYPE_GRB )
+          if ( filetype == CDI_FILETYPE_GRB )
             {
               code = vlistInqVarCode(vlistID, varID);
               /*
@@ -732,7 +732,7 @@ void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
               */
               fprintf(gdp, "  %d,%d", code, ltype);
             }
-          else if ( filetype == FILETYPE_NC )
+          else if ( filetype == CDI_FILETYPE_NC )
             {
               int xyz = vlistInqVarXYZ(vlistID, varID);
 
@@ -1030,17 +1030,17 @@ void *Gradsdes(void *argument)
   int filetype  = streamInqFiletype(streamID);
   int byteorder = streamInqByteorder(streamID);
 
-  if ( filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 ) filetype = FILETYPE_NC;
+  if ( filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 ) filetype = CDI_FILETYPE_NC;
 
-  if ( filetype != FILETYPE_SRV &&
-       filetype != FILETYPE_EXT &&
-       filetype != FILETYPE_IEG &&
-       filetype != FILETYPE_GRB )
+  if ( filetype != CDI_FILETYPE_SRV &&
+       filetype != CDI_FILETYPE_EXT &&
+       filetype != CDI_FILETYPE_IEG &&
+       filetype != CDI_FILETYPE_GRB )
     {
-      if ( filetype == FILETYPE_NC )
+      if ( filetype == CDI_FILETYPE_NC )
         //        cdoAbort("Unsupported file format: NetCDF");
         ;
-      else if ( filetype == FILETYPE_GRB2 )
+      else if ( filetype == CDI_FILETYPE_GRB2 )
         //cdoAbort("Unsupported file format: GRIB2");
         ;
       else
@@ -1069,9 +1069,9 @@ void *Gradsdes(void *argument)
     {
       if ( vlistInqVarGrid(vlistID, varID) == gridID )
         {
-          if ( filetype == FILETYPE_SRV ||
-               filetype == FILETYPE_EXT ||
-               filetype == FILETYPE_IEG )
+          if ( filetype == CDI_FILETYPE_SRV ||
+               filetype == CDI_FILETYPE_EXT ||
+               filetype == CDI_FILETYPE_IEG )
             {
               prec = vlistInqVarDatatype(vlistID, varID);
               if ( prec == DATATYPE_FLT64 ) flt64 = true;
@@ -1093,10 +1093,10 @@ void *Gradsdes(void *argument)
         }
     }
 
-  if ( filetype != FILETYPE_GRB && nvars != nvarsout )
+  if ( filetype != CDI_FILETYPE_GRB && nvars != nvarsout )
     cdoAbort("Too many different grids!");
 
-  if ( filetype == FILETYPE_SRV )
+  if ( filetype == CDI_FILETYPE_SRV )
     {
       xyheader = 40;
       if ( flt64 ) xyheader = 72;
@@ -1105,7 +1105,7 @@ void *Gradsdes(void *argument)
       if ( byteorder == CDI_LITTLEENDIAN ) littleendian = true;
     }
 
-  if ( filetype == FILETYPE_EXT )
+  if ( filetype == CDI_FILETYPE_EXT )
     {
       xyheader = 24;
       if ( flt64 ) xyheader = 40;
@@ -1114,7 +1114,7 @@ void *Gradsdes(void *argument)
       if ( byteorder == CDI_LITTLEENDIAN ) littleendian = true;
     }
 
-  if ( filetype == FILETYPE_IEG )
+  if ( filetype == CDI_FILETYPE_IEG )
     {
       xyheader = 644;
       if ( flt64 ) xyheader = 1048;
@@ -1154,19 +1154,19 @@ void *Gradsdes(void *argument)
    * DTYPE Print file type
    * INDEX Print filename of the control/index file .ctl/.idx
    */
-  if ( filetype == FILETYPE_GRB ||  filetype == FILETYPE_GRB2 )
+  if ( filetype == CDI_FILETYPE_GRB ||  filetype == CDI_FILETYPE_GRB2 )
     {
       idxfile = strdup(ctlfile);
       char *pidxfile = idxfile;
 
       // print GRIB[12] file type
       // generate the index file
-      if ( filetype == FILETYPE_GRB )
+      if ( filetype == CDI_FILETYPE_GRB )
         {
           fprintf(gdp, "DTYPE  GRIB\n");
           repl_filetypeext(idxfile, ".ctl", ".gmp");
         }
-      else if ( filetype == FILETYPE_GRB2 )
+      else if ( filetype == CDI_FILETYPE_GRB2 )
         {
           fprintf(gdp, "DTYPE  GRIB2\n");
           repl_filetypeext(pidxfile, ".ctl", ".idx");
@@ -1186,7 +1186,7 @@ void *Gradsdes(void *argument)
       gridsize = vlistGridsizeMax(vlistID);
       array = (double*) Malloc(gridsize*sizeof(double));
     }
-  else if ( filetype == FILETYPE_NC )
+  else if ( filetype == CDI_FILETYPE_NC )
     {
       fprintf(gdp, "DTYPE  NetCDF\n");
     }
@@ -1294,7 +1294,7 @@ void *Gradsdes(void *argument)
           iyys = iyy;
         }
 
-      if ( filetype == FILETYPE_GRB )
+      if ( filetype == CDI_FILETYPE_GRB )
         {
           nrecords += nrecsout;
           if ( nrecords >= maxrecs )
@@ -1385,11 +1385,11 @@ void *Gradsdes(void *argument)
 
 
   /* INDEX file */
-  if ( filetype == FILETYPE_GRB )
+  if ( filetype == CDI_FILETYPE_GRB )
     {
       write_map_grib1(idxfile, map_version, nrecords, intnum, fltnum, bignum);
     }
-  if ( filetype == FILETYPE_GRB2 )
+  if ( filetype == CDI_FILETYPE_GRB2 )
     {
       cdoAbort("The fileformat GRIB2 is not fully supported yet for the gradsdes operator.\n"
                "The .ctl file %s was generated. You can add the necessary .idx file by running\n\tgribmap -i %s", ctlfile, ctlfile);

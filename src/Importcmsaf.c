@@ -1412,7 +1412,7 @@ void *Importcmsaf(void *argument)
   cdoInitialize(argument);
 
   if ( cdoDefaultFileType == CDI_UNDEFID )
-    cdoDefaultFileType = FILETYPE_NC;
+    cdoDefaultFileType = CDI_FILETYPE_NC;
 
 #if defined(HAVE_LIBHDF5)
   dsets_init(&dsets);

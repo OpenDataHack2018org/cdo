@@ -32,23 +32,23 @@ void cdiOpenError(int cdiErrno, const char *fmt, const char *path)
 
       switch (filetype)
 	{
-	case FILETYPE_GRB:
+	case CDI_FILETYPE_GRB:
           break;
-	case FILETYPE_GRB2:
+	case CDI_FILETYPE_GRB2:
           fprintf(stderr, "To create a CDO application with GRIB2 support use: ./configure --with-grib_api=<GRIB_API root directory> ...\n");
           break;
-	case FILETYPE_SRV:
+	case CDI_FILETYPE_SRV:
           break;
-	case FILETYPE_EXT:
+	case CDI_FILETYPE_EXT:
           break;
-	case FILETYPE_IEG:
+	case CDI_FILETYPE_IEG:
           break;
-	case FILETYPE_NC:
-	case FILETYPE_NC2:
-	case FILETYPE_NC4:
-	case FILETYPE_NC4C:
+	case CDI_FILETYPE_NC:
+	case CDI_FILETYPE_NC2:
+	case CDI_FILETYPE_NC4:
+	case CDI_FILETYPE_NC4C:
           {
-            const char *ncv = (filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C) ? "4" : ((filetype == FILETYPE_NC2) ? "2" : "");
+            const char *ncv = (filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C) ? "4" : ((filetype == CDI_FILETYPE_NC2) ? "2" : "");
 #if defined HAVE_LIBNETCDF
             fprintf(stderr, "CDO was build with a NetCDF version which doesn't support NetCDF%s data!\n", ncv);
 #else

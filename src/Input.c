@@ -58,7 +58,7 @@ void *Input(void *argument)
   int vlistID = -1;
   int i;
   int code = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
-  int output_filetype = FILETYPE_GRB;
+  int output_filetype = CDI_FILETYPE_GRB;
   int ihead[8];
   double missval = 0;
   double levels[1];
@@ -120,7 +120,7 @@ void *Input(void *argument)
       else if ( operatorID == INPUTEXT )
 	{
 	  output_filetype = cdoDefaultFileType;
-	  if ( output_filetype == CDI_UNDEFID ) output_filetype = FILETYPE_EXT;
+	  if ( output_filetype == CDI_UNDEFID ) output_filetype = CDI_FILETYPE_EXT;
 
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
 		   " of record %d (or EOF(=^D))!", nrecs+1);
@@ -164,7 +164,7 @@ void *Input(void *argument)
       else if ( operatorID == INPUTSRV )
 	{
 	  output_filetype = cdoDefaultFileType;
-	  if ( output_filetype == CDI_UNDEFID ) output_filetype = FILETYPE_SRV;
+	  if ( output_filetype == CDI_UNDEFID ) output_filetype = CDI_FILETYPE_SRV;
 	  
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
 		   " of record %d (or EOF(=^D))!", nrecs+1);

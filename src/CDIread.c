@@ -27,15 +27,15 @@ const char *filetypestr(int filetype)
 {
   switch ( filetype )
     {
-    case FILETYPE_GRB:  return ("GRIB");            break;
-    case FILETYPE_GRB2: return ("GRIB2");           break;
-    case FILETYPE_NC:   return ("NetCDF");          break;
-    case FILETYPE_NC2:  return ("NetCDF2");         break;
-    case FILETYPE_NC4:  return ("NetCDF4");         break;
-    case FILETYPE_NC4C: return ("NetCDF4 classic"); break;
-    case FILETYPE_SRV:  return ("SERVICE");         break;
-    case FILETYPE_EXT:  return ("EXTRA");           break;
-    case FILETYPE_IEG:  return ("IEG");             break;
+    case CDI_FILETYPE_GRB:  return ("GRIB");            break;
+    case CDI_FILETYPE_GRB2: return ("GRIB2");           break;
+    case CDI_FILETYPE_NC:   return ("NetCDF");          break;
+    case CDI_FILETYPE_NC2:  return ("NetCDF2");         break;
+    case CDI_FILETYPE_NC4:  return ("NetCDF4");         break;
+    case CDI_FILETYPE_NC4C: return ("NetCDF4 classic"); break;
+    case CDI_FILETYPE_SRV:  return ("SERVICE");         break;
+    case CDI_FILETYPE_EXT:  return ("EXTRA");           break;
+    case CDI_FILETYPE_IEG:  return ("IEG");             break;
     default:            return ("");
     }
 }

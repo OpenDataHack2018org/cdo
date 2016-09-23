@@ -666,15 +666,15 @@ const char *filetypeext(int filetype)
 {
   switch ( filetype )
     {
-    case FILETYPE_GRB:
-    case FILETYPE_GRB2: return ".grb";   break;
-    case FILETYPE_NC:
-    case FILETYPE_NC2:
-    case FILETYPE_NC4:
-    case FILETYPE_NC4C: return ".nc";    break;
-    case FILETYPE_SRV:  return ".srv";   break;
-    case FILETYPE_EXT:  return ".ext";   break;
-    case FILETYPE_IEG:  return ".ieg";   break;
+    case CDI_FILETYPE_GRB:
+    case CDI_FILETYPE_GRB2: return ".grb";   break;
+    case CDI_FILETYPE_NC:
+    case CDI_FILETYPE_NC2:
+    case CDI_FILETYPE_NC4:
+    case CDI_FILETYPE_NC4C: return ".nc";    break;
+    case CDI_FILETYPE_SRV:  return ".srv";   break;
+    case CDI_FILETYPE_EXT:  return ".ext";   break;
+    case CDI_FILETYPE_IEG:  return ".ieg";   break;
     default:            return "";
     }
 }
@@ -743,20 +743,20 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
                       switch (firstchar)
                         {
                         case 'g':
-                          if ( cdoDefaultFileType == FILETYPE_GRB || cdoDefaultFileType == FILETYPE_GRB2 ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_GRB || cdoDefaultFileType == CDI_FILETYPE_GRB2 ) lready = true;
                           break;
                         case 'n':
-                          if ( cdoDefaultFileType == FILETYPE_NC || cdoDefaultFileType == FILETYPE_NC2 ||
-                               cdoDefaultFileType == FILETYPE_NC4 || cdoDefaultFileType == FILETYPE_NC4C ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_NC || cdoDefaultFileType == CDI_FILETYPE_NC2 ||
+                               cdoDefaultFileType == CDI_FILETYPE_NC4 || cdoDefaultFileType == CDI_FILETYPE_NC4C ) lready = true;
                           break;
                         case 's':
-                          if ( cdoDefaultFileType == FILETYPE_SRV ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_SRV ) lready = true;
                           break;
                         case 'e':
-                          if ( cdoDefaultFileType == FILETYPE_EXT ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_EXT ) lready = true;
                           break;
                         case 'i':
-                          if ( cdoDefaultFileType == FILETYPE_IEG ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_IEG ) lready = true;
                           break;
                         }
                     }
@@ -777,10 +777,10 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
           if ( !lready )
             {
               strncat(filesuffix, streamFilesuffix(cdoDefaultFileType), maxlen-1);
-              if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
+              if ( cdoDefaultFileType == CDI_FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
             }
 
-          if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
+          if ( cdoDefaultFileType == CDI_FILETYPE_GRB && cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
           if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
         }
     }
@@ -791,7 +791,7 @@ int cdoFiletype(void)
 {
   if ( cdoDefaultFileType == CDI_UNDEFID )
     {
-      cdoDefaultFileType = FILETYPE_GRB;
+      cdoDefaultFileType = CDI_FILETYPE_GRB;
       if ( ! cdoSilentMode )
         cdoPrint("Set default filetype to GRIB");
     }

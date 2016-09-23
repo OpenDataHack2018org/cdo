@@ -651,12 +651,12 @@ void set_comp(int fileID, int filetype)
 {
   if ( cdoCompress )
     {
-      if      ( filetype == FILETYPE_GRB )
+      if      ( filetype == CDI_FILETYPE_GRB )
         {
           cdoCompType  = CDI_COMPRESS_SZIP;
           cdoCompLevel = 0;
         }
-      else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+      else if ( filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
         {
           cdoCompType  = CDI_COMPRESS_ZIP;
           cdoCompLevel = 1;
@@ -669,13 +669,13 @@ void set_comp(int fileID, int filetype)
       streamDefCompLevel(fileID, cdoCompLevel);
 
       if ( cdoCompType == CDI_COMPRESS_SZIP &&
-           (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+           (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2 && filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C) )
         cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
 
-      if ( cdoCompType == CDI_COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
+      if ( cdoCompType == CDI_COMPRESS_JPEG && filetype != CDI_FILETYPE_GRB2 )
         cdoWarning("JPEG compression not available for non GRIB2 data!");
 
-      if ( cdoCompType == CDI_COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+      if ( cdoCompType == CDI_COMPRESS_ZIP && (filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C) )
         cdoWarning("Deflate compression not available for non NetCDF4 data!");
     }
 }
@@ -692,7 +692,7 @@ int pstreamOpenWriteFile(const argument_t *argument, int filetype)
   
   if ( PSTREAM_Debug ) Message("file %s", argument->args);
 
-  if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
+  if ( filetype == CDI_UNDEFID ) filetype = CDI_FILETYPE_GRB;
 
   if ( cdoInteractive )
     {
@@ -1027,15 +1027,15 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 
       int datatype = varlist[varID].datatype;
 
-      if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+      if ( filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
 	{
-	  if ( datatype == DATATYPE_UINT8 && (filetype == FILETYPE_NC || filetype == FILETYPE_NC2) )
+	  if ( datatype == DATATYPE_UINT8 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2) )
 	    {
 	      datatype = DATATYPE_INT16;
 	      varlist[varID].datatype = datatype;
 	    }
 
-	  if ( datatype == DATATYPE_UINT16 && (filetype == FILETYPE_NC || filetype == FILETYPE_NC2) )
+	  if ( datatype == DATATYPE_UINT16 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2) )
 	    {
 	      datatype = DATATYPE_INT32;
 	      varlist[varID].datatype = datatype;

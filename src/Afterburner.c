@@ -688,7 +688,7 @@ void after_control(struct Control *globs, struct Variable *vars)
       rtime = after_getTime(globs->StartDate);
     }
 
-  if ( ofiletype == FILETYPE_NC || ofiletype == FILETYPE_NC2 || ofiletype == FILETYPE_NC4 )
+  if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 || ofiletype == CDI_FILETYPE_NC4 )
     {
       taxisDefCalendar(globs->taxisID2, CALENDAR_PROLEPTIC);
       taxisDefType(globs->taxisID2, TAXIS_RELATIVE);
@@ -1350,19 +1350,19 @@ void after_parini(struct Control *globs, struct Variable *vars)
 #if defined(CDO)
     case -1: ofiletype = -1;            break;
 #else
-    case -1: ofiletype = FILETYPE_SRV;  break;
+    case -1: ofiletype = CDI_FILETYPE_SRV;  break;
 #endif
-    case  0: ofiletype = FILETYPE_SRV;  break;
-    case  1: ofiletype = FILETYPE_GRB;  break;
-    case  2: ofiletype = FILETYPE_NC;   break;
-    case  3: ofiletype = FILETYPE_EXT;  break;
-    case  4: ofiletype = FILETYPE_NC2;  break;
-    case  6: ofiletype = FILETYPE_NC4;  break;
+    case  0: ofiletype = CDI_FILETYPE_SRV;  break;
+    case  1: ofiletype = CDI_FILETYPE_GRB;  break;
+    case  2: ofiletype = CDI_FILETYPE_NC;   break;
+    case  3: ofiletype = CDI_FILETYPE_EXT;  break;
+    case  4: ofiletype = CDI_FILETYPE_NC2;  break;
+    case  6: ofiletype = CDI_FILETYPE_NC4;  break;
     default: Error( "unknown file format %d", fileFormat);
     }
 
-  if ( gribFormat )  ofiletype = FILETYPE_GRB;
-  if ( cdfFormat  )  ofiletype = FILETYPE_NC;
+  if ( gribFormat )  ofiletype = CDI_FILETYPE_GRB;
+  if ( cdfFormat  )  ofiletype = CDI_FILETYPE_NC;
 
   int precision = scan_par(globs->Verbose, namelist, "precision", 0);
   if ( precision )
@@ -2117,7 +2117,7 @@ void after_processing(struct Control *globs, struct Variable *vars)
   if ( ! globs->AnalysisData )
     for (i = 0; i < globs->NumLevelRequest; i++)
       {
-	if ( (globs->LevelRequest[i] >= 65535) && globs->unitsel && ofiletype == FILETYPE_GRB )
+	if ( (globs->LevelRequest[i] >= 65535) && globs->unitsel && ofiletype == CDI_FILETYPE_GRB )
 	  {
 	    fprintf(stderr,"\n Level %9.2f out of range (max=65535)!\n", globs->LevelRequest[i]);
 	    exit(1);
@@ -2149,10 +2149,10 @@ void after_processing(struct Control *globs, struct Variable *vars)
 
   if ( globs->Type == 10 || globs->Type == 40 || globs->Type == 60 )
     {
-      if ( ofiletype == FILETYPE_GRB )
+      if ( ofiletype == CDI_FILETYPE_GRB )
 	Error("Can't write fourier coefficients to GRIB!");
-      else if ( ofiletype == FILETYPE_NC || ofiletype == FILETYPE_NC2 ||
-		ofiletype == FILETYPE_NC4 )
+      else if ( ofiletype == CDI_FILETYPE_NC || ofiletype == CDI_FILETYPE_NC2 ||
+		ofiletype == CDI_FILETYPE_NC4 )
 	Error("Can't write fourier coefficients to NetCDF!");
     }
 
