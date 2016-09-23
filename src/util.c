@@ -591,18 +591,18 @@ int datatype2str(int datatype, char *datatypestr)
 {
   int status = 0;
 
-  if      ( datatype == DATATYPE_PACK   ) strcpy(datatypestr, "P0");
+  if      ( datatype == CDI_DATATYPE_PACK   ) strcpy(datatypestr, "P0");
   else if ( datatype > 0 && datatype <= 32  ) sprintf(datatypestr, "P%d", datatype);
-  else if ( datatype == DATATYPE_CPX32  ) strcpy(datatypestr, "C32");
-  else if ( datatype == DATATYPE_CPX64  ) strcpy(datatypestr, "C64");
-  else if ( datatype == DATATYPE_FLT32  ) strcpy(datatypestr, "F32");
-  else if ( datatype == DATATYPE_FLT64  ) strcpy(datatypestr, "F64");
-  else if ( datatype == DATATYPE_INT8   ) strcpy(datatypestr, "I8");
-  else if ( datatype == DATATYPE_INT16  ) strcpy(datatypestr, "I16");
-  else if ( datatype == DATATYPE_INT32  ) strcpy(datatypestr, "I32");
-  else if ( datatype == DATATYPE_UINT8  ) strcpy(datatypestr, "U8");
-  else if ( datatype == DATATYPE_UINT16 ) strcpy(datatypestr, "U16");
-  else if ( datatype == DATATYPE_UINT32 ) strcpy(datatypestr, "U32");
+  else if ( datatype == CDI_DATATYPE_CPX32  ) strcpy(datatypestr, "C32");
+  else if ( datatype == CDI_DATATYPE_CPX64  ) strcpy(datatypestr, "C64");
+  else if ( datatype == CDI_DATATYPE_FLT32  ) strcpy(datatypestr, "F32");
+  else if ( datatype == CDI_DATATYPE_FLT64  ) strcpy(datatypestr, "F64");
+  else if ( datatype == CDI_DATATYPE_INT8   ) strcpy(datatypestr, "I8");
+  else if ( datatype == CDI_DATATYPE_INT16  ) strcpy(datatypestr, "I16");
+  else if ( datatype == CDI_DATATYPE_INT32  ) strcpy(datatypestr, "I32");
+  else if ( datatype == CDI_DATATYPE_UINT8  ) strcpy(datatypestr, "U8");
+  else if ( datatype == CDI_DATATYPE_UINT16 ) strcpy(datatypestr, "U16");
+  else if ( datatype == CDI_DATATYPE_UINT32 ) strcpy(datatypestr, "U32");
   else                                  { strcpy(datatypestr, "-1"); status = -1;}
 
   return status;
@@ -619,21 +619,21 @@ int str2datatype(const char *datatypestr)
   if ( len > 1 )
     {
       int ilen = atoi(datatypestr+1);
-      if      ( strncmp(datatypestr, "P0",  len) == 0 ) datatype = DATATYPE_PACK;
+      if      ( strncmp(datatypestr, "P0",  len) == 0 ) datatype = CDI_DATATYPE_PACK;
       else if ( strncmp(datatypestr, "P",     1) == 0 &&
                 ilen > 0 && ilen <= 32 )               datatype = atoi(datatypestr+1);
-      else if ( strncmp(datatypestr, "C32", len) == 0 ) datatype = DATATYPE_CPX32;
-      else if ( strncmp(datatypestr, "C64", len) == 0 ) datatype = DATATYPE_CPX64;
-      else if ( strncmp(datatypestr, "F32", len) == 0 ) datatype = DATATYPE_FLT32;
-      else if ( strncmp(datatypestr, "F64", len) == 0 ) datatype = DATATYPE_FLT64;
-      else if ( strncmp(datatypestr, "I8",  len) == 0 ) datatype = DATATYPE_INT8;
-      else if ( strncmp(datatypestr, "I16", len) == 0 ) datatype = DATATYPE_INT16;
-      else if ( strncmp(datatypestr, "I32", len) == 0 ) datatype = DATATYPE_INT32;
-      else if ( strncmp(datatypestr, "U8",  len) == 0 ) datatype = DATATYPE_UINT8;
-      else if ( strncmp(datatypestr, "U16", len) == 0 ) datatype = DATATYPE_UINT16;
-      else if ( strncmp(datatypestr, "U32", len) == 0 ) datatype = DATATYPE_UINT32;
-      else if ( strncmp(datatypestr, "real",   len) == 0 ) datatype = DATATYPE_FLT32;
-      else if ( strncmp(datatypestr, "double", len) == 0 ) datatype = DATATYPE_FLT64;
+      else if ( strncmp(datatypestr, "C32", len) == 0 ) datatype = CDI_DATATYPE_CPX32;
+      else if ( strncmp(datatypestr, "C64", len) == 0 ) datatype = CDI_DATATYPE_CPX64;
+      else if ( strncmp(datatypestr, "F32", len) == 0 ) datatype = CDI_DATATYPE_FLT32;
+      else if ( strncmp(datatypestr, "F64", len) == 0 ) datatype = CDI_DATATYPE_FLT64;
+      else if ( strncmp(datatypestr, "I8",  len) == 0 ) datatype = CDI_DATATYPE_INT8;
+      else if ( strncmp(datatypestr, "I16", len) == 0 ) datatype = CDI_DATATYPE_INT16;
+      else if ( strncmp(datatypestr, "I32", len) == 0 ) datatype = CDI_DATATYPE_INT32;
+      else if ( strncmp(datatypestr, "U8",  len) == 0 ) datatype = CDI_DATATYPE_UINT8;
+      else if ( strncmp(datatypestr, "U16", len) == 0 ) datatype = CDI_DATATYPE_UINT16;
+      else if ( strncmp(datatypestr, "U32", len) == 0 ) datatype = CDI_DATATYPE_UINT32;
+      else if ( strncmp(datatypestr, "real",   len) == 0 ) datatype = CDI_DATATYPE_FLT32;
+      else if ( strncmp(datatypestr, "double", len) == 0 ) datatype = CDI_DATATYPE_FLT64;
     }
 
   return datatype;
@@ -666,15 +666,15 @@ const char *filetypeext(int filetype)
 {
   switch ( filetype )
     {
-    case FILETYPE_GRB:
-    case FILETYPE_GRB2: return ".grb";   break;
-    case FILETYPE_NC:
-    case FILETYPE_NC2:
-    case FILETYPE_NC4:
-    case FILETYPE_NC4C: return ".nc";    break;
-    case FILETYPE_SRV:  return ".srv";   break;
-    case FILETYPE_EXT:  return ".ext";   break;
-    case FILETYPE_IEG:  return ".ieg";   break;
+    case CDI_FILETYPE_GRB:
+    case CDI_FILETYPE_GRB2: return ".grb";   break;
+    case CDI_FILETYPE_NC:
+    case CDI_FILETYPE_NC2:
+    case CDI_FILETYPE_NC4:
+    case CDI_FILETYPE_NC4C: return ".nc";    break;
+    case CDI_FILETYPE_SRV:  return ".srv";   break;
+    case CDI_FILETYPE_EXT:  return ".ext";   break;
+    case CDI_FILETYPE_IEG:  return ".ieg";   break;
     default:            return "";
     }
 }
@@ -743,20 +743,20 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
                       switch (firstchar)
                         {
                         case 'g':
-                          if ( cdoDefaultFileType == FILETYPE_GRB || cdoDefaultFileType == FILETYPE_GRB2 ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_GRB || cdoDefaultFileType == CDI_FILETYPE_GRB2 ) lready = true;
                           break;
                         case 'n':
-                          if ( cdoDefaultFileType == FILETYPE_NC || cdoDefaultFileType == FILETYPE_NC2 ||
-                               cdoDefaultFileType == FILETYPE_NC4 || cdoDefaultFileType == FILETYPE_NC4C ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_NC || cdoDefaultFileType == CDI_FILETYPE_NC2 ||
+                               cdoDefaultFileType == CDI_FILETYPE_NC4 || cdoDefaultFileType == CDI_FILETYPE_NC4C ) lready = true;
                           break;
                         case 's':
-                          if ( cdoDefaultFileType == FILETYPE_SRV ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_SRV ) lready = true;
                           break;
                         case 'e':
-                          if ( cdoDefaultFileType == FILETYPE_EXT ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_EXT ) lready = true;
                           break;
                         case 'i':
-                          if ( cdoDefaultFileType == FILETYPE_IEG ) lready = true;
+                          if ( cdoDefaultFileType == CDI_FILETYPE_IEG ) lready = true;
                           break;
                         }
                     }
@@ -777,10 +777,10 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
           if ( !lready )
             {
               strncat(filesuffix, streamFilesuffix(cdoDefaultFileType), maxlen-1);
-              if ( cdoDefaultFileType == FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
+              if ( cdoDefaultFileType == CDI_FILETYPE_GRB && vlistIsSzipped(vlistID) ) lcompsz = true;
             }
 
-          if ( cdoDefaultFileType == FILETYPE_GRB && cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
+          if ( cdoDefaultFileType == CDI_FILETYPE_GRB && cdoCompType == CDI_COMPRESS_SZIP ) lcompsz = true;
           if ( lcompsz ) strncat(filesuffix, ".sz", maxlen-1);
         }
     }
@@ -791,7 +791,7 @@ int cdoFiletype(void)
 {
   if ( cdoDefaultFileType == CDI_UNDEFID )
     {
-      cdoDefaultFileType = FILETYPE_GRB;
+      cdoDefaultFileType = CDI_FILETYPE_GRB;
       if ( ! cdoSilentMode )
         cdoPrint("Set default filetype to GRIB");
     }

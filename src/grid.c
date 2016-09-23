@@ -515,9 +515,9 @@ void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
 
   cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
   
-  cdiDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", DATATYPE_FLT64, 1, &a);
-  cdiDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", DATATYPE_FLT64, 1, &lon_0);
-  cdiDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin", DATATYPE_FLT64, 1, &lat_0);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", CDI_DATATYPE_FLT64, 1, &a);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", CDI_DATATYPE_FLT64, 1, &lon_0);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin", CDI_DATATYPE_FLT64, 1, &lat_0);
 }
 
 static
@@ -545,7 +545,7 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
 
               if ( attlen != 1 ) continue;
 
-              if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
+              if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
                 {
                   double attflt;
                   cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, &attflt);
@@ -587,7 +587,7 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
 
               if ( attlen > 2 ) continue;
 
-              if ( atttype == DATATYPE_FLT32 || atttype == DATATYPE_FLT64 )
+              if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
                 {
                   double attflt[2];
                   cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, attflt);
@@ -1052,7 +1052,7 @@ char *grid_get_proj4param(int gridID)
         {
           cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
 
-          if ( atttype == DATATYPE_TXT )
+          if ( atttype == CDI_DATATYPE_TXT )
             {
               if ( attlen > atttxtlen )
                 {
@@ -1088,7 +1088,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
   int gridsize = gridInqSize(gridID1);
   int gridID2 = gridCreate(GRID_CURVILINEAR, gridsize);
-  gridDefPrec(gridID2, DATATYPE_FLT32);
+  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
 
   char *proj4param = NULL;
   bool lproj4     = false;
@@ -1478,7 +1478,7 @@ int gridToUnstructured(int gridID1, int lbounds)
   int gridtype = gridInqType(gridID1);
   int gridsize = gridInqSize(gridID1);
   int gridID2  = gridCreate(GRID_UNSTRUCTURED, gridsize);
-  gridDefPrec(gridID2, DATATYPE_FLT32);
+  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
 	  
   bool lproj_rll = false;
   if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
@@ -1743,7 +1743,7 @@ int gridCurvilinearToRegular(int gridID1)
       gridDefXsize(gridID2, nx);
       gridDefYsize(gridID2, ny);
       
-      //  gridDefPrec(gridID2, DATATYPE_FLT32);
+      //  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
 
       gridInqXunits(gridID1, xunits);
       gridInqYunits(gridID1, yunits);

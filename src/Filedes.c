@@ -46,7 +46,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
   for ( int ia = 0; ia < natts; ++ia )
     {
       cdiInqAtt(vlistID, varID, ia, attname, &atttype, &attlen);
-      if ( atttype == DATATYPE_INT )
+      if ( atttype == CDI_DATATYPE_INT )
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  cdiInqAttInt(vlistID, varID, attname, attlen, attint);
@@ -58,7 +58,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 	    }
 	  fprintf(fp, "\n");
 	}
-      else if ( atttype == DATATYPE_FLT )
+      else if ( atttype == CDI_DATATYPE_FLT )
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  cdiInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
@@ -70,7 +70,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 	    }
 	  fprintf(fp, "\n");
 	}
-      else if ( atttype == DATATYPE_TXT )
+      else if ( atttype == CDI_DATATYPE_TXT )
 	{
 	  cdiInqAttTxt(vlistID, varID, attname, sizeof(atttxt), atttxt);
 	  atttxt[attlen] = 0;
@@ -243,25 +243,25 @@ void filedes(int streamID)
   int filetype = streamInqFiletype(streamID);
   switch ( filetype )
     {
-    case FILETYPE_GRB:
+    case CDI_FILETYPE_GRB:
       printf("  GRIB data\n");
       break;
-    case FILETYPE_GRB2:
+    case CDI_FILETYPE_GRB2:
       printf("  GRIB2 data\n");
       break;
-    case FILETYPE_NC:
+    case CDI_FILETYPE_NC:
       printf("  NetCDF data\n");
       break;
-    case FILETYPE_NC2:
+    case CDI_FILETYPE_NC2:
       printf("  NetCDF2 data\n");
       break;
-    case FILETYPE_NC4:
+    case CDI_FILETYPE_NC4:
       printf("  NetCDF4 data\n");
       break;
-    case FILETYPE_NC4C:
+    case CDI_FILETYPE_NC4C:
       printf("  NetCDF4 classic data\n");
       break;
-    case FILETYPE_SRV:
+    case CDI_FILETYPE_SRV:
       printf("  SERVICE data\n");
       switch ( streamInqByteorder(streamID) )
 	{
@@ -273,7 +273,7 @@ void filedes(int streamID)
 	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
 	}
       break;
-    case FILETYPE_EXT:
+    case CDI_FILETYPE_EXT:
       printf("  EXTRA data\n");
       switch ( streamInqByteorder(streamID) )
 	{
@@ -285,7 +285,7 @@ void filedes(int streamID)
 	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
 	}
       break;
-    case FILETYPE_IEG:
+    case CDI_FILETYPE_IEG:
       printf("  IEG data\n");
       switch ( streamInqByteorder(streamID) )
 	{

@@ -27,15 +27,15 @@ const char *filetypestr(int filetype)
 {
   switch ( filetype )
     {
-    case FILETYPE_GRB:  return ("GRIB");            break;
-    case FILETYPE_GRB2: return ("GRIB2");           break;
-    case FILETYPE_NC:   return ("NetCDF");          break;
-    case FILETYPE_NC2:  return ("NetCDF2");         break;
-    case FILETYPE_NC4:  return ("NetCDF4");         break;
-    case FILETYPE_NC4C: return ("NetCDF4 classic"); break;
-    case FILETYPE_SRV:  return ("SERVICE");         break;
-    case FILETYPE_EXT:  return ("EXTRA");           break;
-    case FILETYPE_IEG:  return ("IEG");             break;
+    case CDI_FILETYPE_GRB:  return ("GRIB");            break;
+    case CDI_FILETYPE_GRB2: return ("GRIB2");           break;
+    case CDI_FILETYPE_NC:   return ("NetCDF");          break;
+    case CDI_FILETYPE_NC2:  return ("NetCDF2");         break;
+    case CDI_FILETYPE_NC4:  return ("NetCDF4");         break;
+    case CDI_FILETYPE_NC4C: return ("NetCDF4 classic"); break;
+    case CDI_FILETYPE_SRV:  return ("SERVICE");         break;
+    case CDI_FILETYPE_EXT:  return ("EXTRA");           break;
+    case CDI_FILETYPE_IEG:  return ("IEG");             break;
     default:            return ("");
     }
 }
@@ -48,18 +48,18 @@ const char *datatypestr(int datatype)
   str[0] = 0;
   sprintf(str, "%d bit packed", datatype);
 
-  if      ( datatype == DATATYPE_PACK   ) return ("P0");
+  if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
   else if ( datatype > 0 && datatype <= 32 ) return (str);
-  else if ( datatype == DATATYPE_CPX32  ) return ("C32");
-  else if ( datatype == DATATYPE_CPX64  ) return ("C64");
-  else if ( datatype == DATATYPE_FLT32  ) return ("32 bit floats");
-  else if ( datatype == DATATYPE_FLT64  ) return ("64 bit floats");
-  else if ( datatype == DATATYPE_INT8   ) return ("I8");
-  else if ( datatype == DATATYPE_INT16  ) return ("I16");
-  else if ( datatype == DATATYPE_INT32  ) return ("I32");
-  else if ( datatype == DATATYPE_UINT8  ) return ("U8");
-  else if ( datatype == DATATYPE_UINT16 ) return ("U16");
-  else if ( datatype == DATATYPE_UINT32 ) return ("U32");
+  else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
+  else if ( datatype == CDI_DATATYPE_CPX64  ) return ("C64");
+  else if ( datatype == CDI_DATATYPE_FLT32  ) return ("32 bit floats");
+  else if ( datatype == CDI_DATATYPE_FLT64  ) return ("64 bit floats");
+  else if ( datatype == CDI_DATATYPE_INT8   ) return ("I8");
+  else if ( datatype == CDI_DATATYPE_INT16  ) return ("I16");
+  else if ( datatype == CDI_DATATYPE_INT32  ) return ("I32");
+  else if ( datatype == CDI_DATATYPE_UINT8  ) return ("U8");
+  else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
+  else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
   else                                    return ("");
 }
 

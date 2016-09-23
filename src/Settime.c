@@ -364,7 +364,7 @@ void *Settime(void *argument)
       */
       if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
 	{/*
-	  if ( cdoFiletype() != FILETYPE_NC )
+	  if ( cdoFiletype() != CDI_FILETYPE_NC )
 	    cdoAbort("This operator does not work on an absolute time axis!");
 	 */
 	  cdoPrint("Changing absolute to relative time axis!");

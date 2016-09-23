@@ -160,7 +160,7 @@ void cdo_sig_handler(int signo)
 static
 void cdo_version(void)
 {
-  const int   filetypes[] = {FILETYPE_SRV, FILETYPE_EXT, FILETYPE_IEG, FILETYPE_GRB, FILETYPE_GRB2, FILETYPE_NC, FILETYPE_NC2, FILETYPE_NC4, FILETYPE_NC4C};
+  const int   filetypes[] = {CDI_FILETYPE_SRV, CDI_FILETYPE_EXT, CDI_FILETYPE_IEG, CDI_FILETYPE_GRB, CDI_FILETYPE_GRB2, CDI_FILETYPE_NC, CDI_FILETYPE_NC2, CDI_FILETYPE_NC4, CDI_FILETYPE_NC4C};
   const char* typenames[] = {        "srv",        "ext",        "ieg",       "grb1",        "grb2",       "nc1",        "nc2",        "nc4",        "nc4c"};
 
   fprintf(stderr, "%s\n", CDO_Version);
@@ -390,12 +390,12 @@ void setDefaultDataType(const char *datatypestr)
           if      ( nbits > 0 && nbits < 32 ) cdoDefaultDataType = nbits;
           else if ( nbits == 32 )
             {
-              if ( cdoDefaultFileType == FILETYPE_GRB )
-                cdoDefaultDataType = DATATYPE_PACK32;
+              if ( cdoDefaultFileType == CDI_FILETYPE_GRB )
+                cdoDefaultDataType = CDI_DATATYPE_PACK32;
               else
-                cdoDefaultDataType = DATATYPE_FLT32;
+                cdoDefaultDataType = CDI_DATATYPE_FLT32;
             }
-          else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
+          else if ( nbits == 64 ) cdoDefaultDataType = CDI_DATATYPE_FLT64;
           else
             {
               fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
@@ -407,9 +407,9 @@ void setDefaultDataType(const char *datatypestr)
         {
           if ( dtype == D_INT )
             {
-              if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_INT8;
-              else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_INT16;
-              else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_INT32;
+              if      ( nbits ==  8 ) cdoDefaultDataType = CDI_DATATYPE_INT8;
+              else if ( nbits == 16 ) cdoDefaultDataType = CDI_DATATYPE_INT16;
+              else if ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_INT32;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype INT!\n", nbits);
@@ -418,9 +418,9 @@ void setDefaultDataType(const char *datatypestr)
             }
           else if ( dtype == D_UINT )
             {
-              if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_UINT8;
-              else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_UINT16;
-              else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_UINT32;
+              if      ( nbits ==  8 ) cdoDefaultDataType = CDI_DATATYPE_UINT8;
+              else if ( nbits == 16 ) cdoDefaultDataType = CDI_DATATYPE_UINT16;
+              else if ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_UINT32;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype UINT!\n", nbits);
@@ -429,8 +429,8 @@ void setDefaultDataType(const char *datatypestr)
             }
           else if ( dtype == D_FLT )
             {
-              if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_FLT32;
-              else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
+              if      ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_FLT32;
+              else if ( nbits == 64 ) cdoDefaultDataType = CDI_DATATYPE_FLT64;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype FLT!\n", nbits);
@@ -439,8 +439,8 @@ void setDefaultDataType(const char *datatypestr)
             }
           else if ( dtype == D_CPX )
             {
-              if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_CPX32;
-              else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_CPX64;
+              if      ( nbits == 32 ) cdoDefaultDataType = CDI_DATATYPE_CPX32;
+              else if ( nbits == 64 ) cdoDefaultDataType = CDI_DATATYPE_CPX64;
               else
                 {
                   fprintf(stderr, "Unsupported number of bits = %d for datatype CPX!\n", nbits);
@@ -481,11 +481,11 @@ void setDefaultDataTypeByte(char *datatypestr)
       datatype = atoi(datatypestr);
       datatypestr++;
 
-      if      ( datatype == 1 ) cdoDefaultDataType = DATATYPE_PACK8;
-      else if ( datatype == 2 ) cdoDefaultDataType = DATATYPE_PACK16;
-      else if ( datatype == 3 ) cdoDefaultDataType = DATATYPE_PACK24;
-      else if ( datatype == 4 ) cdoDefaultDataType = DATATYPE_FLT32;
-      else if ( datatype == 8 ) cdoDefaultDataType = DATATYPE_FLT64;
+      if      ( datatype == 1 ) cdoDefaultDataType = CDI_DATATYPE_PACK8;
+      else if ( datatype == 2 ) cdoDefaultDataType = CDI_DATATYPE_PACK16;
+      else if ( datatype == 3 ) cdoDefaultDataType = CDI_DATATYPE_PACK24;
+      else if ( datatype == 4 ) cdoDefaultDataType = CDI_DATATYPE_FLT32;
+      else if ( datatype == 8 ) cdoDefaultDataType = CDI_DATATYPE_FLT64;
       else
         {
           fprintf(stderr, "Unsupported datatype %d!\n", datatype);
@@ -522,17 +522,17 @@ void setDefaultFileType(const char *filetypestr, int labort)
       const char *ftstr = filetypestr;
       size_t len;
 
-      if      ( cmpstrlen(filetypestr, "grb2", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_GRB2;}
-      else if ( cmpstrlen(filetypestr, "grb1", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_GRB; }
-      else if ( cmpstrlen(filetypestr, "grb",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_GRB; }
-      else if ( cmpstrlen(filetypestr, "nc2",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC2; }
-      else if ( cmpstrlen(filetypestr, "nc4c", len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC4C;}
-      else if ( cmpstrlen(filetypestr, "nc4",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC4; }
-      else if ( cmpstrlen(filetypestr, "nc1",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC;  }
-      else if ( cmpstrlen(filetypestr, "nc",   len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_NC2; }
-      else if ( cmpstrlen(filetypestr, "srv",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_SRV; }
-      else if ( cmpstrlen(filetypestr, "ext",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_EXT; }
-      else if ( cmpstrlen(filetypestr, "ieg",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = FILETYPE_IEG; }
+      if      ( cmpstrlen(filetypestr, "grb2", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB2;}
+      else if ( cmpstrlen(filetypestr, "grb1", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB; }
+      else if ( cmpstrlen(filetypestr, "grb",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_GRB; }
+      else if ( cmpstrlen(filetypestr, "nc2",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC2; }
+      else if ( cmpstrlen(filetypestr, "nc4c", len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC4C;}
+      else if ( cmpstrlen(filetypestr, "nc4",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC4; }
+      else if ( cmpstrlen(filetypestr, "nc1",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC;  }
+      else if ( cmpstrlen(filetypestr, "nc",   len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_NC2; }
+      else if ( cmpstrlen(filetypestr, "srv",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_SRV; }
+      else if ( cmpstrlen(filetypestr, "ext",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_EXT; }
+      else if ( cmpstrlen(filetypestr, "ieg",  len)  == 0 ) { ftstr += len; cdoDefaultFileType = CDI_FILETYPE_IEG; }
       else
         {
           if ( labort )

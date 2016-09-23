@@ -110,13 +110,13 @@ void writeNcFile(const char path[], const double array[], int length)
   
   varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
   vlistDefVarName(vlistID, varID, "test_values");
-  vlistDefVarDatatype(vlistID, varID, DATATYPE_FLT64);
+  vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_FLT64);
   vlistDefVarMissval(vlistID, varID, MISSVAL);
   
   taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID, taxisID);
   
-  streamID = streamOpenWrite(path, FILETYPE_NC);
+  streamID = streamOpenWrite(path, CDI_FILETYPE_NC);
   if ( streamID < 0 ) 
     {
       fprintf(stderr, "%s\n", cdiStringError(streamID));

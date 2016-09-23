@@ -41,7 +41,7 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
       vlistDefVarParam(vlistID, varID, cdiEncodeParam(code[i], 255, 255));
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
-      vlistDefVarDatatype(vlistID, varID, DATATYPE_FLT32);
+      vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_FLT32);
     }
 }
 

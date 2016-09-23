@@ -588,7 +588,7 @@ int set_remapgrids(int filetype, int vlistID, int ngrids, bool *remapgrids)
 	{
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
 	    {
-	      if ( !cdoRegulargrid && filetype == FILETYPE_GRB )
+	      if ( !cdoRegulargrid && filetype == CDI_FILETYPE_GRB )
 		cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!", gridNamePtr(gridtype));
 	      else
 		cdoAbort("Unsupported grid type: %s, use CDO operator -setgridtype,regular to convert reduced to regular grid!", gridNamePtr(gridtype));

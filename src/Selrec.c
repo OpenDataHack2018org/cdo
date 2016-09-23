@@ -56,7 +56,7 @@ void *Selrec(void *argument)
 
   int filetype = streamInqFiletype(streamID1);
 
-  if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+  if ( filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
     cdoAbort("This operator does not work on NetCDF data!");
 
   int vlistID1 = streamInqVlist(streamID1);

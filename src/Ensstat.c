@@ -144,7 +144,7 @@ void *Ensstat(void *argument)
 	  int tsteptype = vlistInqVarTsteptype(vlistID2, varID);
 	  int cvarID = vlistDefVar(vlistID2, gridID, zaxisID, tsteptype);
 	  vlistDefVarName(vlistID2, cvarID, name);
-	  vlistDefVarDatatype(vlistID2, cvarID, DATATYPE_INT16);
+	  vlistDefVarDatatype(vlistID2, cvarID, CDI_DATATYPE_INT16);
 	  if ( cvarID != (varID+nvars) ) cdoAbort("Internal error, varIDs do not match!");
 	}
     }

@@ -46,10 +46,10 @@ void *Complextorect(void *argument)
   for ( varID = 0; varID < nvars; ++varID )
     {
       datatype = vlistInqVarDatatype(vlistID2, varID);
-      if ( datatype == DATATYPE_CPX64 )
-	datatype = DATATYPE_FLT64;
+      if ( datatype == CDI_DATATYPE_CPX64 )
+	datatype = CDI_DATATYPE_FLT64;
       else
-	datatype = DATATYPE_FLT32;
+	datatype = CDI_DATATYPE_FLT32;
 
       vlistDefVarDatatype(vlistID2, varID, datatype);
       vlistDefVarDatatype(vlistID3, varID, datatype);

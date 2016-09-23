@@ -651,12 +651,12 @@ void set_comp(int fileID, int filetype)
 {
   if ( cdoCompress )
     {
-      if      ( filetype == FILETYPE_GRB )
+      if      ( filetype == CDI_FILETYPE_GRB )
         {
           cdoCompType  = CDI_COMPRESS_SZIP;
           cdoCompLevel = 0;
         }
-      else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+      else if ( filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
         {
           cdoCompType  = CDI_COMPRESS_ZIP;
           cdoCompLevel = 1;
@@ -669,13 +669,13 @@ void set_comp(int fileID, int filetype)
       streamDefCompLevel(fileID, cdoCompLevel);
 
       if ( cdoCompType == CDI_COMPRESS_SZIP &&
-           (filetype != FILETYPE_GRB && filetype != FILETYPE_GRB2 && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+           (filetype != CDI_FILETYPE_GRB && filetype != CDI_FILETYPE_GRB2 && filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C) )
         cdoWarning("SZIP compression not available for non GRIB/NetCDF4 data!");
 
-      if ( cdoCompType == CDI_COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
+      if ( cdoCompType == CDI_COMPRESS_JPEG && filetype != CDI_FILETYPE_GRB2 )
         cdoWarning("JPEG compression not available for non GRIB2 data!");
 
-      if ( cdoCompType == CDI_COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
+      if ( cdoCompType == CDI_COMPRESS_ZIP && (filetype != CDI_FILETYPE_NC4 && filetype != CDI_FILETYPE_NC4C) )
         cdoWarning("Deflate compression not available for non NetCDF4 data!");
     }
 }
@@ -692,7 +692,7 @@ int pstreamOpenWriteFile(const argument_t *argument, int filetype)
   
   if ( PSTREAM_Debug ) Message("file %s", argument->args);
 
-  if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
+  if ( filetype == CDI_UNDEFID ) filetype = CDI_FILETYPE_GRB;
 
   if ( cdoInteractive )
     {
@@ -1027,26 +1027,26 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 
       int datatype = varlist[varID].datatype;
 
-      if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
+      if ( filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2 || filetype == CDI_FILETYPE_NC4 || filetype == CDI_FILETYPE_NC4C )
 	{
-	  if ( datatype == DATATYPE_UINT8 && (filetype == FILETYPE_NC || filetype == FILETYPE_NC2) )
+	  if ( datatype == CDI_DATATYPE_UINT8 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2) )
 	    {
-	      datatype = DATATYPE_INT16;
+	      datatype = CDI_DATATYPE_INT16;
 	      varlist[varID].datatype = datatype;
 	    }
 
-	  if ( datatype == DATATYPE_UINT16 && (filetype == FILETYPE_NC || filetype == FILETYPE_NC2) )
+	  if ( datatype == CDI_DATATYPE_UINT16 && (filetype == CDI_FILETYPE_NC || filetype == CDI_FILETYPE_NC2) )
 	    {
-	      datatype = DATATYPE_INT32;
+	      datatype = CDI_DATATYPE_INT32;
 	      varlist[varID].datatype = datatype;
 	    }
 
 	  if ( laddoffset || lscalefactor )
 	    {
-	      if ( datatype == DATATYPE_INT8   ||
-		   datatype == DATATYPE_UINT8  ||
-		   datatype == DATATYPE_INT16  ||
-		   datatype == DATATYPE_UINT16 )
+	      if ( datatype == CDI_DATATYPE_INT8   ||
+		   datatype == CDI_DATATYPE_UINT8  ||
+		   datatype == CDI_DATATYPE_INT16  ||
+		   datatype == CDI_DATATYPE_UINT16 )
 		varlist[varID].check_datarange = TRUE;
 	    }
 	  else if ( cdoCheckDatarange )
@@ -1082,7 +1082,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 	  for ( varID = 0; varID < nvars; ++varID )
 	    vlistDefVarDatatype(vlistID, varID, cdoDefaultDataType);
 
-	  if ( cdoDefaultDataType == DATATYPE_FLT64 || cdoDefaultDataType == DATATYPE_FLT32 )
+	  if ( cdoDefaultDataType == CDI_DATATYPE_FLT64 || cdoDefaultDataType == CDI_DATATYPE_FLT32 )
 	    {
 	      for ( varID = 0; varID < nvars; varID++ )
 		{
@@ -1111,7 +1111,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 
 #if defined(_OPENMP)
       if ( ompNumThreads > 1 )
-	cdiDefAttInt(vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", DATATYPE_INT32, 1, &ompNumThreads);
+	cdiDefAttInt(vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", CDI_DATATYPE_INT32, 1, &ompNumThreads);
 #endif
       pstreamDefVarlist(pstreamptr, vlistID);
 
@@ -1276,8 +1276,8 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
       double smin = (arrmin - addoffset)/scalefactor;
       double smax = (arrmax - addoffset)/scalefactor;
 
-      if ( datatype == DATATYPE_INT8  || datatype == DATATYPE_UINT8 ||
-	   datatype == DATATYPE_INT16 || datatype == DATATYPE_UINT16 )
+      if ( datatype == CDI_DATATYPE_INT8  || datatype == CDI_DATATYPE_UINT8 ||
+	   datatype == CDI_DATATYPE_INT16 || datatype == CDI_DATATYPE_UINT16 )
 	{
 	  smin = (int)lround(smin);
 	  smax = (int)lround(smax);
@@ -1285,20 +1285,20 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
 
       double vmin = 0, vmax = 0;
 
-      if      ( datatype == DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }
-      else if ( datatype == DATATYPE_UINT8  ) { vmin =           0.; vmax =        255.; }
-      else if ( datatype == DATATYPE_INT16  ) { vmin =      -32768.; vmax =      32767.; }
-      else if ( datatype == DATATYPE_UINT16 ) { vmin =           0.; vmax =      65535.; }
-      else if ( datatype == DATATYPE_INT32  ) { vmin = -2147483648.; vmax = 2147483647.; }
-      else if ( datatype == DATATYPE_UINT32 ) { vmin =           0.; vmax = 4294967295.; }
-      else if ( datatype == DATATYPE_FLT32  ) { vmin = -3.40282e+38; vmax = 3.40282e+38; }
+      if      ( datatype == CDI_DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }
+      else if ( datatype == CDI_DATATYPE_UINT8  ) { vmin =           0.; vmax =        255.; }
+      else if ( datatype == CDI_DATATYPE_INT16  ) { vmin =      -32768.; vmax =      32767.; }
+      else if ( datatype == CDI_DATATYPE_UINT16 ) { vmin =           0.; vmax =      65535.; }
+      else if ( datatype == CDI_DATATYPE_INT32  ) { vmin = -2147483648.; vmax = 2147483647.; }
+      else if ( datatype == CDI_DATATYPE_UINT32 ) { vmin =           0.; vmax = 4294967295.; }
+      else if ( datatype == CDI_DATATYPE_FLT32  ) { vmin = -3.40282e+38; vmax = 3.40282e+38; }
       else                                    { vmin =     -1.e+300; vmax =     1.e+300; }
 
       if ( smin < vmin || smax > vmax )
 	cdoWarning("Some data values (min=%g max=%g) are outside the\n"
 		   "    valid range (%g - %g) of the used output precision!\n"
 		   "    Use the CDO option%s -b 64 to increase the output precision.",
-		   smin, smax, vmin, vmax, (datatype == DATATYPE_FLT32) ? "" : " -b 32 or");
+		   smin, smax, vmin, vmax, (datatype == CDI_DATATYPE_FLT32) ? "" : " -b 32 or");
     }
 }
 

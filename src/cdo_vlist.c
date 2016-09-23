@@ -101,8 +101,8 @@ void compare_lon_reg2d(int xsize, int gridID1, int gridID2)
 static
 void compare_grid_unstructured(int gridID1, int gridID2)
 {
-  if ( gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL) &&
-       gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL) )
+  if ( gridInqXvals(gridID1, NULL) && gridInqXvals(gridID1, NULL) == gridInqXvals(gridID2, NULL) &&
+       gridInqYvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) == gridInqYvals(gridID2, NULL) )
     {
       int gridsize = gridInqSize(gridID1);
       
@@ -344,8 +344,8 @@ int vlistInqNWPV(int vlistID, int varID)
 {
   int nwpv; // number of words per value; real:1  complex:2
 
-  if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX32 || 
-       vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX64 )
+  if ( vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX32 || 
+       vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_CPX64 )
     nwpv = 2;
   else
     nwpv = 1;

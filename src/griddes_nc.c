@@ -115,8 +115,8 @@ int gridFromNCfile(const char *gridfile)
       grid.ybounds = (double*) Malloc(grid.nvertex*grid.size*sizeof(double));
 
       nce(nc_inq_vartype(nc_file_id, nc_gridlat_id, &xtype));
-      if ( xtype == NC_FLOAT )  grid.prec = DATATYPE_FLT32;
-      else                      grid.prec = DATATYPE_FLT64;
+      if ( xtype == NC_FLOAT )  grid.prec = CDI_DATATYPE_FLT32;
+      else                      grid.prec = CDI_DATATYPE_FLT64;
 
       nce(nc_get_var_double(nc_file_id, nc_gridlon_id, grid.xvals));
       nce(nc_get_var_double(nc_file_id, nc_gridlat_id, grid.yvals));
@@ -185,7 +185,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   gridtype = gridInqType(gridID);
   gridsize = gridInqSize(gridID);
 
-  if ( gridInqPrec(gridID) == DATATYPE_FLT64 ) xtype = NC_DOUBLE;
+  if ( gridInqPrec(gridID) == CDI_DATATYPE_FLT64 ) xtype = NC_DOUBLE;
   else                                         xtype = NC_FLOAT;
 
   if ( gridtype == GRID_CURVILINEAR )

@@ -369,7 +369,7 @@ void *Vargen(void *argument)
     varID2 = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_CONSTANT);
 
   if ( operatorID == MASK )
-    vlistDefVarDatatype(vlistID, varID, DATATYPE_INT8);
+    vlistDefVarDatatype(vlistID, varID, CDI_DATATYPE_INT8);
 
   if ( operatorID == STDATM )
     {
