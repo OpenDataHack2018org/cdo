@@ -101,8 +101,8 @@ void faradd(field_t *field1, field_t field2)
   int nmiss2 = field2.nmiss;
   double missval1 = field1->missval;
   double missval2 = field2.missval;
-  double *restrict array1  = field1->ptr;
-  const double *restrict array2  = field2.ptr;
+  double *restrict array1 = field1->ptr;
+  const double *restrict array2 = field2.ptr;
   const float *restrict array2f = field2.ptrf;
 
   if ( nwpv != 2 ) nwpv = 1;
