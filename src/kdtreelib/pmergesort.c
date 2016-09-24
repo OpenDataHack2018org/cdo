@@ -7,65 +7,36 @@
 
 
 typedef struct param_t {
-    char *a;
-    char *b;
+    struct kd_point *a;
+    struct kd_point *b;
     size_t first;
     size_t nmemb;
-    size_t size;
-#if defined(KDTEST)
     int axis;
-#else
-    int (*cmp) (const void *, const void *);
-#endif
     int max_threads;
 } param_t;
 
 extern void qsortR(void *base0, size_t n, int axis);
 
-void pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
-                    size_t nmemb, size_t size,
-#if defined(KDTEST)
-                    int axis,
-#else
-                    int (*cmp) (const void *, const void *),
-#endif                   
-                    int max_threads);
-int pmergesort(void *base, size_t nmemb, size_t size,
-#if defined(KDTEST)
-               int axis,
-#else
-               int (*compar) (const void *, const void *),
-#endif
-               int max_threads);
+void pm_buildparams(struct param_t *p, struct kd_point *a, struct kd_point *b, size_t first,
+                    size_t nmemb, int axis, int max_threads);
+int pmergesort(struct kd_point *base, size_t nmemb, int axis, int max_threads);
 void *mergesort_t(void *args);
 
 
-int
-pmergesort(void *base, size_t nmemb, size_t size,
-#if defined(KDTEST)
-           int axis,
-#else
-           int (*compar) (const void *, const void *),
-#endif
-           int max_threads)
+int pmergesort(struct kd_point *base, size_t nmemb, int axis, int max_threads)
 {
-    void *tmp;
+    struct kd_point *tmp;
     param_t args;
 
-    if ((tmp = calloc(nmemb, size)) == NULL) {
+    if ((tmp = (struct kd_point*)calloc(nmemb, sizeof(struct kd_point))) == NULL) {
         perror("malloc");
         return 0;
     }
-    args.a = (char *) base;
-    args.b = (char *) tmp;
+    args.a = base;
+    args.b = tmp;
     args.first = 0;
     args.nmemb = nmemb;
-    args.size = size;
-#if defined(KDTEST)
     args.axis = axis;
-#else
-    args.cmp = compar;
-#endif
     args.max_threads = max_threads;
 
     mergesort_t(&args);
@@ -75,26 +46,14 @@ pmergesort(void *base, size_t nmemb, size_t size,
 }
 
 void
-pm_buildparams(struct param_t *p, void *a, void *b, size_t first,
-               size_t nmemb, size_t size,
-#if defined(KDTEST)
-               int axis,
-#else
-               int (*cmp) (const void *, const void *),
-#endif
-               int max_threads)
+pm_buildparams(struct param_t *p, struct kd_point *a, struct kd_point *b, size_t first,
+               size_t nmemb, int axis, int max_threads)
 {
-
-    p->a = (char *)a;
-    p->b = (char *)b;
+    p->a = a;
+    p->b = b;
     p->first = first;
     p->nmemb = nmemb;
-    p->size = size;
-#if defined(KDTEST)
     p->axis = axis;
-#else
-    p->cmp = cmp;
-#endif
     p->max_threads = max_threads;
 }
 
@@ -112,23 +71,12 @@ mergesort_t(void *args)
          * Reached maximum number of threads allocated to this
          * branch. Proceed with sequential sort of this chunk. 
          */
-#if defined(KDTEST)
-        qsortR(mya->a + mya->first * mya->size, mya->nmemb, mya->axis);
-#else
-        qsort(mya->a + mya->first * mya->size, mya->nmemb, mya->size, mya->cmp);
-#endif
+        qsortR(mya->a + mya->first, mya->nmemb, mya->axis);
     } else {
         /*
          * Start two new threads, each sorting half of array a 
          */
-        pm_buildparams(&larg, mya->a, mya->b, mya->first, mya->nmemb / 2,
-                       mya->size,
-#if defined(KDTEST)
-                       mya->axis,
-#else
-                       mya->cmp,
-#endif
-                       mya->max_threads / 2);
+        pm_buildparams(&larg, mya->a, mya->b, mya->first, mya->nmemb / 2, mya->axis, mya->max_threads / 2);
         /*
          * Recursively sort the left half 
          */
@@ -138,13 +86,7 @@ mergesort_t(void *args)
         }
 
         pm_buildparams(&rarg, mya->a, mya->b, mya->first + mya->nmemb / 2,
-                       mya->nmemb - mya->nmemb / 2, mya->size,
-#if defined(KDTEST)
-                       mya->axis,
-#else
-                       mya->cmp,
-#endif
-                       mya->max_threads / 2);
+                       mya->nmemb - mya->nmemb / 2, mya->axis, mya->max_threads / 2);
         /*
          * Recursively sort the right half 
          */
@@ -167,46 +109,31 @@ mergesort_t(void *args)
                  * We already copied everything from the left chunk,
                  * now copy from the right 
                  */
-                memcpy(mya->b + i * mya->size, mya->a + ri * mya->size,
-                       mya->size);
+                memcpy(mya->b + i, mya->a + ri, sizeof(struct kd_point));
                 ri++;
             } else if (ri >= rarg.first + rarg.nmemb) {
                 /*
                  * We already copied everything from the right chunk,
                  * now copy from the left 
                  */
-                memcpy(mya->b + i * mya->size, mya->a + li * mya->size,
-                       mya->size);
+                memcpy(mya->b + i, mya->a + li, sizeof(struct kd_point));
                 li++;
             }
             /*
-             * We can still copy from both chunks, copy the smaller
-             * element 
+             * We can still copy from both chunks, copy the smaller element 
              */
-            else if (
-#if defined(KDTEST)
-                     qcmp((struct kd_point *)(mya->a + li * mya->size),
-                          (struct kd_point *)(mya->a + ri * mya->size),
-                          mya->axis)
-#else
-                     mya->cmp(mya->a + li * mya->size,
-                              mya->a + ri * mya->size)
-#endif
-                               < 1) {
-                memcpy(mya->b + i * mya->size, mya->a + li * mya->size,
-                       mya->size);
+            else if ( qcmp(mya->a + li, mya->a + ri, mya->axis) < 1) {
+                memcpy(mya->b + i, mya->a + li, sizeof(struct kd_point));
                 li++;
             } else {
-                memcpy(mya->b + i * mya->size, mya->a + ri * mya->size,
-                       mya->size);
+                memcpy(mya->b + i, mya->a + ri, sizeof(struct kd_point));
                 ri++;
             }
         }
         /*
          * Now b is sorted, copy it back to a 
          */
-        memcpy(mya->a + mya->size * mya->first,
-               mya->b + mya->size * mya->first, mya->size * mya->nmemb);
+        memcpy(mya->a + mya->first, mya->b + mya->first, mya->nmemb*sizeof(struct kd_point));
     }
     return NULL;
 }

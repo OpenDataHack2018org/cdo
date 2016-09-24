@@ -7,13 +7,7 @@
 #include "pqueue.h"
 
 
-extern int pmergesort(void *base, size_t nmemb, size_t size,
-#if defined(KDTEST)
-                      int axis,
-#else
-                      int (*compar) (const void *, const void *),
-#endif
-                      int max_threads);
+extern int pmergesort(struct kd_point *base, size_t nmemb, int axis, int max_threads);
 
 
 /* ********************************************************************
@@ -34,7 +28,7 @@ kd_malloc(size_t size, const char *msg)
 kdata_t
 kd_sqr(kdata_t x)
 {
-    return x == 0 ? 0 : x * x;
+  return (x < 0 || x > 0) ? x * x : 0;
 }
 
 int
@@ -91,44 +85,7 @@ kd_printTree(struct kdNode *node)
 
    ******************************************************************** */
 
-static int
-_compPoints0(const void *p1, const void *p2)
-{
-    struct kd_point *a = (struct kd_point *) p1;
-    struct kd_point *b = (struct kd_point *) p2;
-
-    int ret = (a->point[0] > b->point[0]) ? 1 : (a->point[0] < b->point[0]) ? -1 : 0;
-    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
-
-    return ret;
-}
-
-static int
-_compPoints1(const void *p1, const void *p2)
-{
-    struct kd_point *a = (struct kd_point *) p1;
-    struct kd_point *b = (struct kd_point *) p2;
-
-    int ret = (a->point[1] > b->point[1]) ? 1 : (a->point[1] < b->point[1]) ? -1 : 0;
-    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
-
-    return ret;
-}
-
-static int
-_compPoints2(const void *p1, const void *p2)
-{
-    struct kd_point *a = (struct kd_point *) p1;
-    struct kd_point *b = (struct kd_point *) p2;
-
-    int ret = (a->point[2] > b->point[2]) ? 1 : (a->point[2] < b->point[2]) ? -1 : 0;
-    if ( ret == 0 ) ret = (a->index > b->index) ? 1 : (a->index < b->index) ? -1 : 0;
-
-    return ret;
-}
-
-void *
-kd_doBuildTree(void *threadarg)
+void *kd_doBuildTree(void *threadarg)
 {
     int sortaxis;
     unsigned long pivot;
@@ -167,16 +124,7 @@ kd_doBuildTree(void *threadarg)
      * If this iteration is allowed to start more threads, we first
      * use them to parallelize the sorting 
      */
-#if defined(KDTEST)
-    pmergesort(points, nPoints, sizeof(struct kd_point), sortaxis, max_threads);
-#else
-    int (*qcomp) (const void *, const void *);
-    if      ( sortaxis == 0 ) qcomp = _compPoints0;
-    else if ( sortaxis == 1 ) qcomp = _compPoints1;
-    else                      qcomp = _compPoints2;
-
-    pmergesort(points, nPoints, sizeof(struct kd_point), qcomp, max_threads);
-#endif
+    pmergesort(points, nPoints, sortaxis, max_threads);
 
     pivot = nPoints / 2;
     if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)

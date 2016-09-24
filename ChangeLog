@@ -1,3 +1,7 @@
+2016-09-24  Uwe Schulzweida
+
+	* remapnn: optimize sort in kdtree (speedup ~20%)
+
 2016-09-19  Uwe Schulzweida
 
 	* New operator shiftx/shifty - Shift fields on rectangular grid in x/y direction
