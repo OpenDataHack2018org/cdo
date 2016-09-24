@@ -181,7 +181,7 @@ void qst(struct kd_point *base, struct kd_point *max, int axis)
  * It's not...
  */
 
-void XXXqsortR(void *base0, size_t n, int axis)
+void NotUsed_qsortR(void *base0, size_t n, int axis)
 {
   struct kd_point *base = (struct kd_point *) base0;
   struct kd_point c, *i, *j, *lo, *hi;
@@ -254,11 +254,9 @@ void XXXqsortR(void *base0, size_t n, int axis)
 //
 //  * This function assumes it is called with valid parameters.
 //
-//  * Example calls:
-//    quickSort(&myArray[0],5); // sorts elements 0, 1, 2, 3, and 4
-//    quickSort(&myArray[3],5); // sorts elements 3, 4, 5, 6, and 7
+//  Code from: http://alienryderflex.com/quicksort
 
-void XqsortR(void *base0, size_t n, int axis)
+void qsortR(void *base0, size_t n, int axis)
 {
   struct kd_point *base = (struct kd_point *) base0;
   struct kd_point piv;
@@ -298,17 +296,20 @@ void XqsortR(void *base0, size_t n, int axis)
 }
 
 
-void qsortR(void *base0, size_t n, int idx)
+void XqsortR(void *base0, size_t n, int idx)
 {
   if ( n < 2 ) return;
   struct kd_point *a = (struct kd_point *) base0;
   struct kd_point t;
-  kdata_t p = a[n / 2].point[idx];
+  // kdata_t p = a[n/2].point[idx];
+  kd_point p = a[n/2];
   int i, j;
   for ( i = 0, j = n - 1;; i++, j-- )
     {
-      while ( a[i].point[idx] < p ) i++;
-      while ( p < a[j].point[idx] ) j--;
+      // while ( a[i].point[idx] < p ) i++;
+      // while ( p < a[j].point[idx] ) j--;
+      while ( qcmp(a+i, &p, idx) < 0 ) i++;
+      while ( qcmp(&p, a+j, idx) < 0 ) j--;
       if ( i >= j ) break;
       t = a[i];
       a[i] = a[j];
