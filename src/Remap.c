@@ -274,8 +274,7 @@ void get_remap_env(void)
   envstr = getenv("MAX_REMAPS");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
+      int ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  max_remaps = ival;
@@ -287,8 +286,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_MAX_ITER");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
+      int ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  remap_set_int(REMAP_MAX_ITER, ival);
@@ -300,8 +298,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_ORDER");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
+      int ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  remap_order = ival;
@@ -316,8 +313,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_TEST");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
+      int ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  remap_test = ival;
@@ -351,8 +347,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_THRESHHOLD");
   if ( envstr )
     {
-      double fval;
-      fval = atof(envstr);
+      double fval = atof(envstr);
       if ( fval > 0 )
 	{
 	  remap_threshhold = fval;
@@ -366,8 +361,7 @@ void get_remap_env(void)
   envstr = getenv("CDO_REMAP_RADIUS");
   if ( envstr )
     {
-      double fval;
-      fval = atof(envstr);
+      double fval = atof(envstr);
       if ( fval < 0 || fval > 180 )
 	{
 	  cdoAbort("CDO_REMAP_RADIUS=%g out of bounds (0-180)", fval);
@@ -383,8 +377,7 @@ void get_remap_env(void)
   envstr = getenv("CDO_GRIDSEARCH_RADIUS");
   if ( envstr )
     {
-      double fval;
-      fval = atof(envstr);
+      double fval = atof(envstr);
       if ( fval < 0 || fval > 180 )
 	{
 	  cdoAbort("CDO_GRIDSEARCH_RADIUS=%g out of bounds (0-180)", fval);
@@ -403,8 +396,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_AREA_MIN");
   if ( envstr )
     {
-      double fval;
-      fval = atof(envstr);
+      double fval = atof(envstr);
       if ( fval > 0 )
 	{
 	  remap_frac_min = fval;
@@ -416,8 +408,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_NUM_SRCH_BINS");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
+      int ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  remap_num_srch_bins = ival;
@@ -430,8 +421,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_NON_GLOBAL");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
+      int ival = atoi(envstr);
       if ( ival >= 0 )
 	{
 	  remap_non_global = ival;
@@ -445,8 +435,7 @@ void get_remap_env(void)
   envstr = getenv("REMAP_STORE_LINK_FAST");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
+      int ival = atoi(envstr);
       if ( ival >= 0 )
 	{
 	  remap_store_link_fast = ival;
@@ -1027,11 +1016,9 @@ void *Remap(void *argument)
 	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = true;
 	  if ( map_type == MAP_TYPE_DISTWGT && !remap_extrapolate && gridInqSize(gridID1) > 1 && !is_global_grid(gridID1) )
 	    {
-	      int gridsize_new;
-	      int nx, ny;
-	      nx = gridInqXsize(gridID1);
-	      ny = gridInqYsize(gridID1);
-	      gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
+	      int nx = gridInqXsize(gridID1);
+	      int ny = gridInqYsize(gridID1);
+	      int gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
 	      if ( gridsize_new > grid1sizemax )
 		{
 		  grid1sizemax = gridsize_new;
@@ -1243,16 +1230,15 @@ void *Remap(void *argument)
 
 	  if ( operfunc == REMAPSUM )
 	    {
-	      double array1sum = 0;
-	      double array2sum = 0;
-   
 	      for ( i = 0; i < gridsize; i++ )
 		printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].src_grid.cell_frac[i], remaps[r].src_grid.cell_area[i],remaps[r].src_grid.cell_frac[i]);
+	      double array1sum = 0;
 	      for ( i = 0; i < gridsize; i++ )
 		array1sum += remaps[r].src_grid.cell_area[i];
 
 	      for ( i = 0; i < gridsize2; i++ )
 		printf("2 %d %g %g %g %g\n", i, array2[i], remaps[r].tgt_grid.cell_frac[i],remaps[r].tgt_grid.cell_area[i],remaps[r].tgt_grid.cell_frac[i]);
+	      double array2sum = 0;
 	      for ( i = 0; i < gridsize2; i++ )
 		array2sum += remaps[r].tgt_grid.cell_area[i];
 
