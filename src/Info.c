@@ -325,6 +325,7 @@ void *Info(void *argument)
 	      code     = vlistInqVarCode(vlistID, varID);
 	      gridID   = vlistInqVarGrid(vlistID, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID, varID);
+              int zaxistype = zaxisInqType(zaxisID);
 	      missval  = vlistInqVarMissval(vlistID, varID);
 	      gridsize = gridInqSize(gridID);
 	      number   = vlistInqVarNumber(vlistID, varID);
@@ -343,7 +344,8 @@ void *Info(void *argument)
               set_text_color(stdout, RESET, MAGENTA);
 	      fprintf(stdout, "%s %s ", vdatestr, vtimestr);
 	      reset_text_color(stdout);
-	      level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1;
+	      level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) :
+                (zaxistype == ZAXIS_SURFACE) ? 0 : levelID+1;
 	      set_text_color(stdout, RESET, GREEN);
 	      fprintf(stdout, "%7g ", level);
 	      fprintf(stdout, "%8d %7d ", gridsize, nmiss);
