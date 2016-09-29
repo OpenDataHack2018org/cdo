@@ -33,7 +33,10 @@ int cdoZaxisInqLevels(int zaxisID, double *levels)
       else
         {
           size = zaxisInqSize(zaxisID);
-          for ( int i = 0; i < size; ++i ) levels[i] = i+1;
+          if ( size == 1 && zaxisInqType(zaxisID) == ZAXIS_SURFACE )
+            levels[0] = 0;
+          else
+            for ( int i = 0; i < size; ++i ) levels[i] = i+1;
         }
     }
 
@@ -232,7 +235,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
               double *lev2 = (double*) Malloc(nlev1*sizeof(double));
               cdoZaxisInqLevels(zaxisID1, lev1);
               cdoZaxisInqLevels(zaxisID2, lev2);
-              
+
               bool ldiffer = false;
               for ( int i = 0; i < nlev1; ++i )
                 if ( IS_NOT_EQUAL(lev1[i], lev2[i]) )
