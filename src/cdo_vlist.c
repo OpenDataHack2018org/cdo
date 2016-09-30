@@ -213,7 +213,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	      strtolower(name2);
 	      if ( strcmp(name1, name2) != 0 )
 		{
-		  cdoWarning("Input streams have different parameters!");
+		  cdoWarning("Input streams have different parameter names!");
 		  lchecknames = true;
 		  flag -= CMP_NAME;
 		  //    break;
@@ -271,7 +271,6 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
     {
       int gridID1 = vlistInqVarGrid(vlistID1, 0);
       int gridID2 = vlistInqVarGrid(vlistID2, 0);
-
       compareGrids(gridID1, gridID2);
     }
 
@@ -289,7 +288,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	if ( strcmp(names1[varID], names2[varID]) != 0 ) break;
 
       if ( varID == nvars )
-	cdoPrint("Use the CDO option -Q to sort the parameter names, if you have NetCDF input files!");
+	cdoPrint("Use CDO option --sort to sort the parameter names (NetCDF only)!");
     }
 }
 
