@@ -22,6 +22,15 @@
 #include "error.h"
 
 
+double cdoZaxisInqLevel(int zaxisID, int levelID)
+{
+  int zaxistype  = zaxisInqType(zaxisID);
+  double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) :
+                 (zaxistype == ZAXIS_SURFACE) ? 0 : levelID+1;
+  return level;
+}
+
+
 int cdoZaxisInqLevels(int zaxisID, double *levels)
 {
   int size = zaxisInqLevels(zaxisID, NULL);
@@ -42,7 +51,6 @@ int cdoZaxisInqLevels(int zaxisID, double *levels)
 
   return size;
 }
-
 
 static
 void compare_lat_reg2d(int ysize, int gridID1, int gridID2)

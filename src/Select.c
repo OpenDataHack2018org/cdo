@@ -252,7 +252,7 @@ void *Select(void *argument)
                       for ( int levID = 0; levID < nlevs; ++levID )
                         {
                           levidx = levID + 1;
-                          level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levID) : levidx;
+                          level = cdoZaxisInqLevel(zaxisID, levID);
                           if ( !vars[varID] && PML_NOCC(pml, levidx) && PML_CHECK_INT(pml, levidx) ) vars[varID] = true;
                           if ( !vars[varID] && PML_NOCC(pml, level)  && PML_CHECK_FLT(pml, level)  ) vars[varID] = true;
                         }
@@ -282,7 +282,7 @@ void *Select(void *argument)
 		  for ( int levID = 0; levID < nlevs; ++levID )
 		    {
 		      levidx = levID + 1;
-                      level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levID) : levidx;
+                      level = cdoZaxisInqLevel(zaxisID, levID);
 		      
 		      if ( nlevs == 1 && IS_EQUAL(level, 0) )
 			{

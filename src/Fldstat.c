@@ -52,7 +52,7 @@ void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gr
        gridInqType(gridID) == GRID_LONLAT )
     {
       int zaxisID = vlistInqVarZaxis(vlistID, varID);
-      double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) : levelID+1;
+      double level = cdoZaxisInqLevel(zaxisID, levelID);
       int nlon  = gridInqXsize(gridID);
       int nlat  = gridInqYsize(gridID);
       for ( int j = 0; j < nlat; ++j )

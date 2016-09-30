@@ -241,22 +241,14 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 
 void *Info(void *argument)
 {
-  int i;
-  int varID;
-  int gridsize = 0;
-  int gridID, zaxisID;
-  int code, param;
+  int varID, levelID;
   int nrecs;
-  int levelID;
   int nmiss;
-  int number;
   int ivals = 0, nvals = 0;
   int imiss = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  double missval;
-  double level;
   double arrmin = 0, arrmax = 0, arrmean = 0;
   // double arrvar = 0;
 
@@ -284,10 +276,10 @@ void *Info(void *argument)
 
       if ( vlistNvars(vlistID) == 0 ) continue;
 
-      gridsize = vlistGridsizeMax(vlistID);
-      if ( vlistNumber(vlistID) != CDI_REAL ) gridsize *= 2;
+      int gridsizemax = vlistGridsizeMax(vlistID);
+      if ( vlistNumber(vlistID) != CDI_REAL ) gridsizemax *= 2;
 
-      double *array = (double*) Malloc(gridsize*sizeof(double));
+      double *array = (double*) Malloc(gridsizemax*sizeof(double));
 
       int indg = 0;
       int tsID = 0;
@@ -321,14 +313,14 @@ void *Info(void *argument)
 	      streamReadRecord(streamID, array, &nmiss);
 
 	      indg += 1;
-	      param    = vlistInqVarParam(vlistID, varID);
-	      code     = vlistInqVarCode(vlistID, varID);
-	      gridID   = vlistInqVarGrid(vlistID, varID);
-	      zaxisID  = vlistInqVarZaxis(vlistID, varID);
-              int zaxistype = zaxisInqType(zaxisID);
-	      missval  = vlistInqVarMissval(vlistID, varID);
-	      gridsize = gridInqSize(gridID);
-	      number   = vlistInqVarNumber(vlistID, varID);
+	      int param    = vlistInqVarParam(vlistID, varID);
+	      int code     = vlistInqVarCode(vlistID, varID);
+	      int gridID   = vlistInqVarGrid(vlistID, varID);
+	      int zaxisID  = vlistInqVarZaxis(vlistID, varID);
+	      int gridsize = gridInqSize(gridID);
+	      int number   = vlistInqVarNumber(vlistID, varID);
+	      double level = cdoZaxisInqLevel(zaxisID, levelID);
+	      double missval = vlistInqVarMissval(vlistID, varID);
 
 	      cdiParamToString(param, paramstr, sizeof(paramstr));
 
@@ -344,8 +336,7 @@ void *Info(void *argument)
               set_text_color(stdout, RESET, MAGENTA);
 	      fprintf(stdout, "%s %s ", vdatestr, vtimestr);
 	      reset_text_color(stdout);
-	      level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levelID) :
-                (zaxistype == ZAXIS_SURFACE) ? 0 : levelID+1;
+
 	      set_text_color(stdout, RESET, GREEN);
 	      fprintf(stdout, "%7g ", level);
 	      fprintf(stdout, "%8d %7d ", gridsize, nmiss);
@@ -371,7 +362,7 @@ void *Info(void *argument)
 			  //arrvar  = 0;
 			  arrmin  =  1.e300;
 			  arrmax  = -1.e300;
-			  for ( i = 0; i < gridsize; ++i )
+			  for ( int i = 0; i < gridsize; ++i )
 			    {
 			      if ( !DBL_IS_EQUAL(array[i], missval) )
 				{
@@ -393,7 +384,7 @@ void *Info(void *argument)
 			  arrmax  = array[0];
                           // #pragma omp parallel for default(none) shared(arrmin, arrmax, array, gridsize) reduction(+:arrmean, arrvar)
                           // #pragma omp simd reduction(+:arrmean) reduction(min:arrmin) reduction(max:arrmax) aligned(array:16)
-			  for ( i = 1; i < gridsize; i++ )
+			  for ( int i = 1; i < gridsize; i++ )
 			    {
 			      if ( array[i] < arrmin ) arrmin = array[i];
 			      if ( array[i] > arrmax ) arrmax = array[i];
@@ -421,7 +412,7 @@ void *Info(void *argument)
 		      arrsum_r = 0;
 		      arrsum_i = 0;
 		      
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( int i = 0; i < gridsize; i++ )
 			{
 			  if ( !DBL_IS_EQUAL(array[i*2],   missval) && 
 			       !DBL_IS_EQUAL(array[i*2+1], missval) )

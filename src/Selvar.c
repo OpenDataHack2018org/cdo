@@ -184,7 +184,7 @@ void *Selvar(void *argument)
 
       for ( int levID = 0; levID < nlevs; levID++ )
 	{
-	  double level = zaxisInqLevels(zaxisID, NULL) ? zaxisInqLevel(zaxisID, levID) : levID+1;
+	  double level = cdoZaxisInqLevel(zaxisID, levID);
 
 	  if ( ldelete ) vlistDefFlag(vlistID1, varID, levID, TRUE);
           
