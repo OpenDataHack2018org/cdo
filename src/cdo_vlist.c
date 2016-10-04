@@ -192,13 +192,13 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
   int varID;
   bool lchecknames = false;
 
-  if ( vlistNvars(vlistID1) != vlistNvars(vlistID2) )
+  int nvars = vlistNvars(vlistID1);
+
+  if ( nvars != vlistNvars(vlistID2) )
     cdoAbort("Input streams have different number of variables per timestep!");
 
   if ( vlistNrecs(vlistID1) != vlistNrecs(vlistID2) )
-    cdoAbort("Input streams have different number of records per timestep!");
-
-  int nvars = vlistNvars(vlistID1);
+    cdoAbort("Input streams have different number of %s per timestep!", nvars==1 ? "layers" : "records");
 
   for ( varID = 0; varID < nvars; varID++ )
     {
