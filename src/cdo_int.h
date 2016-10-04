@@ -183,6 +183,10 @@ void gaussaw(double *restrict pa, double *restrict pw, size_t nlat);
 int qu2reg3_double(double *pfield, int *kpoint, int klat, int klon,
 		   double msval, int *kret, int omisng, int operio, int oveggy);
 
+void cdoCompareGrids(int gridID1, int gridID2);
+void vlistCompare(int vlistID1, int vlistID2, int flag);
+int  vlistCompareX(int vlistID1, int vlistID2, int flag);
+
 #if defined (__cplusplus)
 }
 #endif

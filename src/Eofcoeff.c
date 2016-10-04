@@ -37,7 +37,6 @@ void *Eofcoeff(void * argument)
   double missval1 = -999, missval2;
   field_t in;  
   field_t out;
-  int gridsize;
   int i, varID, levelID;    
   int nrecs, nmiss; 
    
@@ -56,27 +55,19 @@ void *Eofcoeff(void * argument)
   int taxisID3 = taxisDuplicate(taxisID2);
   
   int gridID1 = vlistInqVarGrid(vlistID1, 0);
-  //gridID2 = vlistInqVarGrid(vlistID2, 0);
+  int gridID2 = vlistInqVarGrid(vlistID2, 0);
   
-  if ( vlistGridsizeMax(vlistID1)==vlistGridsizeMax(vlistID2) )
-    gridsize = vlistGridsizeMax(vlistID1);  
-  else
-    {
-      gridsize = -1;
-      cdoAbort ("Gridsize of input files does not match");
-    }
+  int gridsize = vlistGridsizeMax(vlistID1);  
+  if ( gridsize != vlistGridsizeMax(vlistID2) )
+    cdoAbort("Gridsize of input files does not match!");
       
-  
   if ( vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1 )
-    cdoAbort("Too many grids in input");
+    cdoAbort("Too many different grids in input!");
   
   int nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
   int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));  
-  
-  if (vlistGridsizeMax(vlistID2)   != gridsize ||
-      vlistInqVarGrid(vlistID2, 0) != gridID1 )
-    cdoAbort("EOFs (%s) and data (%s) defined on different grids", cdoStreamName(0)->args, cdoStreamName(1)->args);    
- 
+
+  if ( gridID1 != gridID2 ) cdoCompareGrids(gridID1, gridID2);
   
   strcpy(oname, cdoStreamName(2)->args);
   int nchars = strlen(oname);
@@ -86,7 +77,7 @@ void *Eofcoeff(void * argument)
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
   
   field_t ***eof = (field_t***) Malloc(nvars * sizeof(field_t**));
-  for ( varID=0; varID<nvars; varID++)
+  for ( varID=0; varID<nvars; varID++ )
     eof[varID] = (field_t**) Malloc(nlevs*sizeof(field_t*));
 
   int eofID = 0;
@@ -162,7 +153,6 @@ void *Eofcoeff(void * argument)
         cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname, streamIDs[eofID], eofID+1);
       
       streamDefVlist(streamIDs[eofID], vlistID3);
-    
     }
   
   // ALLOCATE temporary fields for data read and write
@@ -192,7 +182,7 @@ void *Eofcoeff(void * argument)
           streamReadRecord(streamID2, in.ptr, &nmiss);  
           in.nmiss = (size_t) nmiss;
           
-          for (eofID = 0; eofID < neof; eofID++ )
+          for ( eofID = 0; eofID < neof; eofID++ )
             {
               if ( recID == 0 ) streamDefTimestep(streamIDs[eofID],tsID);
               //if ( recID == 0 ) fprintf(stderr, "ts%i rec%i eof%i\n", tsID, recID, eofID);
@@ -221,6 +211,7 @@ void *Eofcoeff(void * argument)
           if ( levelID >= nlevs )
             cdoAbort("Internal error - too high levelID");                              
         }
+
       tsID++;
     }
   

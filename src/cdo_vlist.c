@@ -143,8 +143,8 @@ void compare_grid_unstructured(int gridID1, int gridID2)
     }
 }
 
-static
-void compareGrids(int gridID1, int gridID2)
+
+void cdoCompareGrids(int gridID1, int gridID2)
 {
   /* compare grids of first variable */
 
@@ -271,7 +271,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
     {
       int gridID1 = vlistInqVarGrid(vlistID1, 0);
       int gridID2 = vlistInqVarGrid(vlistID2, 0);
-      compareGrids(gridID1, gridID2);
+      cdoCompareGrids(gridID1, gridID2);
     }
 
   if ( lchecknames )
@@ -323,8 +323,7 @@ int vlistCompareX(int vlistID1, int vlistID2, int flag)
     {
       int gridID1 = vlistInqVarGrid(vlistID1, 0);
       int gridID2 = vlistInqVarGrid(vlistID2, 0);
-
-      compareGrids(gridID1, gridID2);
+      cdoCompareGrids(gridID1, gridID2);
     }
 
   return nlevels2;

@@ -36,7 +36,6 @@ void *Eofcoeff3d(void * argument)
   char eof_name[6], oname[1024], filesuffix[32];
   double missval1 = -999, missval2 = -999;
   field_t in;  
-  int gridsize;
   int i, varID, levelID;    
   int nrecs, nmiss; 
    
@@ -54,29 +53,19 @@ void *Eofcoeff3d(void * argument)
   int taxisID3 = taxisDuplicate(taxisID2);
   
   int gridID1 = vlistInqVarGrid(vlistID1, 0);
-  //gridID2 = vlistInqVarGrid(vlistID2, 0);
+  int gridID2 = vlistInqVarGrid(vlistID2, 0);
   
-  if ( vlistGridsizeMax(vlistID1)==vlistGridsizeMax(vlistID2) )
-    gridsize = vlistGridsizeMax(vlistID1);  
-  else 
-    {
-      gridsize = -1;
-      cdoAbort("Gridsize of input files does not match");
-    }
-      
+  int gridsize = vlistGridsizeMax(vlistID1);  
+  if ( gridsize != vlistGridsizeMax(vlistID2) )
+    cdoAbort("Gridsize of input files does not match!");     
   
   if ( vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1 )
     cdoAbort("Too many grids in input");
   
   int nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
   int nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
-  //w = (double*) Malloc(gridsize*sizeof(double));
-  //gridWeights(gridID2, w);
   
-  
-  if (vlistGridsizeMax(vlistID2)   != gridsize ||
-      vlistInqVarGrid(vlistID2, 0) != gridID1 )
-    cdoAbort("EOFs (%s) and data (%s) defined on different grids", cdoStreamName(0)->args, cdoStreamName(1)->args);    
+  if ( gridID1 != gridID2 ) cdoCompareGrids(gridID1, gridID2);
  
   strcpy(oname, cdoStreamName(2)->args);
   int nchars = strlen(oname);
@@ -86,7 +75,7 @@ void *Eofcoeff3d(void * argument)
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
  
   field_t ***eof = (field_t***) Malloc(nvars * sizeof(field_t**));
-  for ( varID=0; varID<nvars; varID++)
+  for ( varID=0; varID<nvars; varID++ )
     eof[varID] = (field_t**) Malloc(nlevs*sizeof(field_t*));
 
   int eofID = 0;
@@ -195,7 +184,7 @@ void *Eofcoeff3d(void * argument)
 
       taxisCopyTimestep(taxisID3, taxisID2);
 
-      for ( int recID =0; recID< nrecs; recID++ )
+      for ( int recID = 0; recID< nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
           missval2 = vlistInqVarMissval(vlistID2, varID);
