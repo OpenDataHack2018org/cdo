@@ -49,6 +49,24 @@ void scale_vec(double scalefactor, long nvals, double *restrict values)
 }
 
 
+void grid_copy_attributes(int gridID1, int gridID2)
+{
+  char string[CDI_MAX_NAME];
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_XNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_XLONGNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XLONGNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YLONGNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YLONGNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XUNITS, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YUNITS, strlen(string)+1, string);
+}
+
+
 void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description)
 {
   if ( cmpstr(units, "degree") == 0 )
@@ -1376,13 +1394,10 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   /* transform input grid into a unstructured Version if necessary {{{ */
   int unstructuredGridID;
   if (GRID_UNSTRUCTURED == gridInqType(gridID1))
-    {
-      unstructuredGridID = gridID1;
-    }
+    unstructuredGridID = gridID1;
   else
-    {
-      unstructuredGridID = gridToUnstructured(gridID1,!nobounds);
-    }
+    unstructuredGridID = gridToUnstructured(gridID1,!nobounds);
+
   int unstructuredGridSize = gridInqSize(unstructuredGridID);
 
   int unstructuredSelectionGridID = gridCreate(GRID_UNSTRUCTURED,selectionSize);
@@ -1391,22 +1406,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   /* }}} */
 
   /* copy meta data of coordinates {{{*/
-  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
-  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
-
-  gridInqXname(unstructuredGridID, xname);
-  gridInqXlongname(unstructuredGridID, xlongname);
-  gridInqXunits(unstructuredGridID, xunits);
-  gridInqYname(unstructuredGridID, yname);
-  gridInqYlongname(unstructuredGridID, ylongname);
-  gridInqYunits(unstructuredGridID, yunits);
-
-  gridDefXname(unstructuredSelectionGridID, xname);
-  gridDefXlongname(unstructuredSelectionGridID, xlongname);
-  gridDefXunits(unstructuredSelectionGridID, xunits);
-  gridDefYname(unstructuredSelectionGridID, yname);
-  gridDefYlongname(unstructuredSelectionGridID, ylongname);
-  gridDefYunits(unstructuredSelectionGridID, yunits);
+  grid_copy_attributes(unstructuredGridID, unstructuredSelectionGridID);
   /* }}} */
 
   /* TODO: select bounds */
@@ -1472,6 +1472,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
 
   return unstructuredSelectionGridID;
 }
+
 
 int gridToUnstructured(int gridID1, int lbounds)
 {
@@ -1736,17 +1737,17 @@ int gridCurvilinearToRegular(int gridID1)
   Free(yvals2D);
 
   if ( lx && ly )
-    {
-      char xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
-      
+    {      
       gridID2  = gridCreate(GRID_LONLAT, gridsize);
       gridDefXsize(gridID2, nx);
       gridDefYsize(gridID2, ny);
       
       //  gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
 
-      gridInqXunits(gridID1, xunits);
-      gridInqYunits(gridID1, yunits);
+      char xunits[CDI_MAX_NAME]; xunits[0] = 0;
+      char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+      cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+      cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
       grid_to_degree(xunits, nx, xvals, "grid1 center lon");
       grid_to_degree(yunits, ny, yvals, "grid1 center lat");

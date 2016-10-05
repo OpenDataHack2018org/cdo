@@ -426,8 +426,6 @@ void check_lat_boundbox_range(long nlats, restr_t *restrict bound_box, double *r
 static
 int expand_lonlat_grid(int gridID)
 {
-  char units[CDI_MAX_NAME];
-
   long nx = gridInqXsize(gridID);
   long ny = gridInqYsize(gridID);
   long nxp4 = nx+4;
@@ -442,11 +440,8 @@ int expand_lonlat_grid(int gridID)
   int gridIDnew = gridCreate(gridtype, nxp4*nyp4);
   gridDefXsize(gridIDnew, nxp4);
   gridDefYsize(gridIDnew, nyp4);
-	      
-  gridInqXunits(gridID,    units);
-  gridDefXunits(gridIDnew, units);
-  gridInqYunits(gridID,    units);
-  gridDefYunits(gridIDnew, units);
+
+  grid_copy_attributes(gridID, gridIDnew);
 
   xvals[0] = xvals[2] - 2*gridInqXinc(gridID);
   xvals[1] = xvals[2] - gridInqXinc(gridID);
@@ -477,7 +472,6 @@ int expand_lonlat_grid(int gridID)
 static
 int expand_curvilinear_grid(int gridID)
 {
-  char units[CDI_MAX_NAME];
   long i, j;
 
   long gridsize = gridInqSize(gridID);
@@ -496,10 +490,7 @@ int expand_curvilinear_grid(int gridID)
   gridDefXsize(gridIDnew, nxp4);
   gridDefYsize(gridIDnew, nyp4);
 
-  gridInqXunits(gridID,   units);
-  gridDefXunits(gridIDnew, units);
-  gridInqYunits(gridID,   units);
-  gridDefYunits(gridIDnew, units);
+  grid_copy_attributes(gridID, gridIDnew);
 
   for ( j = ny-1; j >= 0; j-- )
     for ( i = nx-1; i >= 0; i-- )

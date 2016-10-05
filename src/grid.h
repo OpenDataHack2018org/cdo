@@ -21,6 +21,8 @@
 #define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
 #endif
 
+void grid_copy_attributes(int gridID1, int gridID2);
+
 void grid_def_param_laea(int gridID, double a, double lon0, double lat0);
 void grid_def_param_sinu(int gridID);
 

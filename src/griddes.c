@@ -424,15 +424,15 @@ int gridDefine(griddes_t grid)
 
   if ( grid.uuid[0] )      gridDefUUID(gridID, grid.uuid);
 
-  if ( grid.xname[0]     ) gridDefXname(gridID, grid.xname);
-  if ( grid.xlongname[0] ) gridDefXlongname(gridID, grid.xlongname);
-  if ( grid.xunits[0]    ) gridDefXunits(gridID, grid.xunits);
-  if ( grid.yname[0]     ) gridDefYname(gridID, grid.yname);
-  if ( grid.ylongname[0] ) gridDefYlongname(gridID, grid.ylongname);
-  if ( grid.yunits[0]    ) gridDefYunits(gridID, grid.yunits);
-  if ( grid.xdimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_XDIMNAME, strlen(grid.xdimname)+1, grid.xdimname);
-  if ( grid.ydimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_YDIMNAME, strlen(grid.ydimname)+1, grid.ydimname);
-  if ( grid.vdimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_VDIMNAME, strlen(grid.vdimname)+1, grid.vdimname);
+  if ( grid.xname[0]     ) cdiGridDefKeyStr(gridID, CDI_KEY_XNAME,     strlen(grid.xname)+1, grid.xname);
+  if ( grid.xlongname[0] ) cdiGridDefKeyStr(gridID, CDI_KEY_XLONGNAME, strlen(grid.xlongname)+1, grid.xlongname);
+  if ( grid.xunits[0]    ) cdiGridDefKeyStr(gridID, CDI_KEY_XUNITS,    strlen(grid.xunits)+1, grid.xunits);
+  if ( grid.yname[0]     ) cdiGridDefKeyStr(gridID, CDI_KEY_YNAME,     strlen(grid.yname)+1, grid.yname);
+  if ( grid.ylongname[0] ) cdiGridDefKeyStr(gridID, CDI_KEY_YLONGNAME, strlen(grid.ylongname)+1, grid.ylongname);
+  if ( grid.yunits[0]    ) cdiGridDefKeyStr(gridID, CDI_KEY_YUNITS,    strlen(grid.yunits)+1, grid.yunits);
+  if ( grid.xdimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_XDIMNAME,  strlen(grid.xdimname)+1, grid.xdimname);
+  if ( grid.ydimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_YDIMNAME,  strlen(grid.ydimname)+1, grid.ydimname);
+  if ( grid.vdimname[0]  ) cdiGridDefKeyStr(gridID, CDI_KEY_VDIMNAME,  strlen(grid.vdimname)+1, grid.vdimname);
 
   return gridID;
 }

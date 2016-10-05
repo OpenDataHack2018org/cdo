@@ -21,6 +21,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 #include "util.h"
 
 
@@ -289,21 +290,9 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   Free(yvals);
   Free(xyinfo);
 
-  char string[1024];
-  string[0] = 0;
   gridID = vlistGrid(ef[0].vlistID, igrid);
-  gridInqXname(gridID, string);
-  gridDefXname(gridID2, string);
-  gridInqYname(gridID, string);
-  gridDefYname(gridID2, string);
-  gridInqXlongname(gridID, string);
-  gridDefXlongname(gridID2, string);
-  gridInqYlongname(gridID, string);
-  gridDefYlongname(gridID2, string);
-  gridInqXunits(gridID, string);
-  gridDefXunits(gridID2, string);
-  gridInqYunits(gridID, string);
-  gridDefYunits(gridID2, string);
+
+  grid_copy_attributes(gridID, gridID2);
 
   return gridID2;
 }

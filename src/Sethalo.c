@@ -35,8 +35,6 @@ int gentpngrid(int gridID1)
   int nlon2, nlat2;
   int prec;
   int ilat, ilon, ilonr, k, kr;
-  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
-  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
   double *xbounds1 = NULL, *ybounds1 = NULL;
@@ -57,19 +55,12 @@ int gentpngrid(int gridID1)
 
   gridDefPrec(gridID2, prec);
 
-  gridInqXname(gridID1, xname);
-  gridInqXlongname(gridID1, xlongname);
-  gridInqXunits(gridID1, xunits);
-  gridInqYname(gridID1, yname);
-  gridInqYlongname(gridID1, ylongname);
-  gridInqYunits(gridID1, yunits);
+  grid_copy_attributes(gridID1, gridID2);
 
-  gridDefXname(gridID2, xname);
-  gridDefXlongname(gridID2, xlongname);
-  gridDefXunits(gridID2, xunits);
-  gridDefYname(gridID2, yname);
-  gridDefYlongname(gridID2, ylongname);
-  gridDefYunits(gridID2, yunits);
+  char xunits[CDI_MAX_NAME]; xunits[0] = 0;
+  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+  cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 	
   if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
     {
@@ -185,8 +176,6 @@ int gengrid(int gridID1, int lhalo, int rhalo)
   int i;
   int prec;
   int ilat, ilon;
-  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
-  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
   double *xbounds1 = NULL, *ybounds1 = NULL;
@@ -218,19 +207,12 @@ int gengrid(int gridID1, int lhalo, int rhalo)
 
   gridDefPrec(gridID2, prec);
 
-  gridInqXname(gridID1, xname);
-  gridInqXlongname(gridID1, xlongname);
-  gridInqXunits(gridID1, xunits);
-  gridInqYname(gridID1, yname);
-  gridInqYlongname(gridID1, ylongname);
-  gridInqYunits(gridID1, yunits);
+  grid_copy_attributes(gridID1, gridID2);
 
-  gridDefXname(gridID2, xname);
-  gridDefXlongname(gridID2, xlongname);
-  gridDefXunits(gridID2, xunits);
-  gridDefYname(gridID2, yname);
-  gridDefYlongname(gridID2, ylongname);
-  gridDefYunits(gridID2, yunits);
+  char xunits[CDI_MAX_NAME]; xunits[0] = 0;
+  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+  cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
   if ( memcmp(xunits, "degree", 6) == 0 ) cpi2 *= RAD2DEG;
 

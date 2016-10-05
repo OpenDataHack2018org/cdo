@@ -52,8 +52,6 @@ void correct_xvals(long nlon, long inc, double *xvals)
 static
 int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
-  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
-  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
   double *xbounds1 = NULL, *ybounds1 = NULL;
@@ -78,19 +76,12 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 
   gridDefPrec(gridID2, prec);
 
-  gridInqXname(gridID1, xname);
-  gridInqXlongname(gridID1, xlongname);
-  gridInqXunits(gridID1, xunits);
-  gridInqYname(gridID1, yname);
-  gridInqYlongname(gridID1, ylongname);
-  gridInqYunits(gridID1, yunits);
+  grid_copy_attributes(gridID1, gridID2);
 
-  gridDefXname(gridID2, xname);
-  gridDefXlongname(gridID2, xlongname);
-  gridDefXunits(gridID2, xunits);
-  gridDefYname(gridID2, yname);
-  gridDefYlongname(gridID2, ylongname);
-  gridDefYunits(gridID2, yunits);
+  char xunits[CDI_MAX_NAME]; xunits[0] = 0;
+  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+  cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
   if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
     {
@@ -249,22 +240,7 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 
   gridDefPrec(gridID2, prec);
 
-  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
-  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
-
-  gridInqXname(gridID1, xname);
-  gridInqXlongname(gridID1, xlongname);
-  gridInqXunits(gridID1, xunits);
-  gridInqYname(gridID1, yname);
-  gridInqYlongname(gridID1, ylongname);
-  gridInqYunits(gridID1, yunits);
-
-  gridDefXname(gridID2, xname);
-  gridDefXlongname(gridID2, xlongname);
-  gridDefXunits(gridID2, xunits);
-  gridDefYname(gridID2, yname);
-  gridDefYlongname(gridID2, ylongname);
-  gridDefYunits(gridID2, yunits);
+  grid_copy_attributes(gridID1, gridID2);
 
   if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
     {
@@ -330,8 +306,6 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, double xlat2,
 		      int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int ilon, ilat;
-
   int nlon = gridInqXsize(gridID);
   int nlat = gridInqYsize(gridID);
 
@@ -350,8 +324,8 @@ void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, doub
   if ( strncmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
   if ( strncmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
 
-  for ( ilat = 0; ilat < nlat; ilat++ ) yvals[ilat] *= yfact;
-  for ( ilon = 0; ilon < nlon; ilon++ ) xvals[ilon] *= xfact;
+  for ( int ilat = 0; ilat < nlat; ilat++ ) yvals[ilat] *= yfact;
+  for ( int ilon = 0; ilon < nlon; ilon++ ) xvals[ilon] *= xfact;
 
   if ( IS_NOT_EQUAL(xlon1, xlon2) )
     {
