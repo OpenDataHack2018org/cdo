@@ -399,22 +399,22 @@ int vlist_check_gridsize(int vlistID)
 
 double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int *rnhlevf, int *rnhlevh)
 {
+  double *vct = NULL;
   int zaxisIDh = -1;
   int nhlev = 0, nhlevf = 0, nhlevh = 0;
   int nvct = 0;
-  double *vct = NULL;
   
   bool lhavevct = false;
   int nzaxis = vlistNzaxis(vlistID);
-  for ( int i = 0; i < nzaxis; ++i )
+  for ( int iz = 0; iz < nzaxis; ++iz )
     {
       // bool mono_level = false;
       bool mono_level = true;
-      int zaxisID = vlistZaxis(vlistID, i);
+      int zaxisID = vlistZaxis(vlistID, iz);
       int nlevel  = zaxisInqSize(zaxisID);
+      int zaxistype = zaxisInqType(zaxisID);
 
-      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
-	   nlevel > 1 )
+      if ( (zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF) && nlevel > 1 && !mono_level )
 	{
 	  int l;
 	  double *level = (double*) Malloc(nlevel*sizeof(double));
@@ -427,8 +427,7 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 	  Free(level);
 	}
 
-      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
-	   nlevel > 1 && mono_level )
+      if ( (zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF) && nlevel > 1 && mono_level )
 	{
 	  nvct = zaxisInqVctSize(zaxisID);
 	  if ( nlevel == (nvct/2 - 1) )
@@ -482,7 +481,7 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 
 		      /* calculate VCT for LM */
 
-		      for ( i = 0; i < vctsize/2; i++ )
+		      for ( int i = 0; i < vctsize/2; i++ )
 			{
 			  if ( rvct[voff+i] >= rvct[voff] && rvct[voff+i] <= rvct[3] )
 			    {
@@ -498,7 +497,7 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 		      
 		      if ( cdoVerbose )
 			{
-			  for ( i = 0; i < vctsize/2; i++ )
+			  for ( int i = 0; i < vctsize/2; i++ )
 			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
 			}
 		    }
@@ -523,7 +522,7 @@ void vlist_change_hybrid_zaxis(int vlistID1, int vlistID2, int zaxisID1, int zax
   int nvct0 = 0;
   double *vct = NULL;
 
-  int nzaxis  = vlistNzaxis(vlistID1);
+  int nzaxis = vlistNzaxis(vlistID1);
   for ( int i = 0; i < nzaxis; ++i )
     {
       int zaxisID = vlistZaxis(vlistID1, i);

@@ -35,6 +35,32 @@
 #include "constants.h"
 
 
+static
+bool zaxis_is_hybrid(int zaxistype)
+{
+  return (zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF);
+}
+
+static
+void change_hybrid_zaxis(int vlistID1, int vlistID2, int nvct, double *vct, int zaxisID2)
+{
+  int nzaxis = vlistNzaxis(vlistID1);
+  for ( int iz = 0; iz < nzaxis; ++iz )
+    {
+      int zaxisID = vlistZaxis(vlistID1, iz);
+      int nlevel  = zaxisInqSize(zaxisID);
+      int zaxistype = zaxisInqType(zaxisID);
+
+      if ( zaxis_is_hybrid(zaxistype) && nlevel > 1 )
+	{
+	  int nvct2 = zaxisInqVctSize(zaxisID);
+          if ( nvct2 == nvct && memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
+            vlistChangeZaxisIndex(vlistID2, iz, zaxisID2);
+	}
+    }
+}
+
+
 void *Vertintml(void *argument)
 {
   int mode;
@@ -42,23 +68,15 @@ void *Vertintml(void *argument)
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
   int nrecs;
-  int i, k, offset;
   int varID, levelID;
-  int zaxisIDp, zaxisIDh = -1;
-  int nhlev = 0, nhlevf = 0, nhlevh = 0;
-  int *vert_index = NULL;
-  int nvct = 0;
   bool sgeopot_needed = false;
   bool extrapolate = false;
-  int sgeopotID = -1, geopotID = -1, tempID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
-  //int sortlevels = TRUE;
-  int *pnmiss = NULL;
+  int sgeopotID = -1, geopotID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
+  // bool sortlevels = true;
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double minval, maxval;
-  double *rvct = NULL; /* reduced VCT for LM */
-  double *single1, *single2;
-  double *sgeopot = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
+  double *sgeopot = NULL;
   gribcode_t gribcodes = {0};
   LIST *flist = listNew(FLT_LIST);
 
@@ -80,7 +98,6 @@ void *Vertintml(void *argument)
   if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {
       char *envstr = getenv("EXTRAPOLATE");
-
       if ( envstr && isdigit((int) envstr[0]) )
 	{
           if ( atoi(envstr) == 1 ) extrapolate = true;
@@ -104,7 +121,7 @@ void *Vertintml(void *argument)
           double stdlev[] = { 10, 50, 100, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
           plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
         }
       else
         {
@@ -116,7 +133,7 @@ void *Vertintml(void *argument)
                              10000,  7000,  5000,  3000,  2000, 1000 };
           nplev = sizeof(stdlev)/sizeof(*stdlev);
           plev  = (double *) Malloc(nplev*sizeof(double));
-          for ( i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
+          for ( int i = 0; i < nplev; ++i ) plev[i] = stdlev[i];
         }
     }
   else
@@ -136,16 +153,15 @@ void *Vertintml(void *argument)
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
-  if ( operfunc == func_hl )
-    zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
-  else
-    zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
-
+  int zaxisIDp = (operfunc == func_hl) ? zaxisCreate(ZAXIS_HEIGHT, nplev) : zaxisCreate(ZAXIS_PRESSURE, nplev);
   zaxisDefLevels(zaxisIDp, plev);
 
+  int nvct = 0;
+  int zaxisIDh = -1;
+  int nhlev = 0, nhlevf = 0, nhlevh = 0;
   double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
-  vlist_change_hybrid_zaxis(vlistID1, vlistID2, zaxisIDh, zaxisIDp);
+  change_hybrid_zaxis(vlistID1, vlistID2, nvct, vct, zaxisIDp);
 
   int psvarID = -1;
   bool linvertvct = false;
@@ -153,9 +169,9 @@ void *Vertintml(void *argument)
     {
       psvarID = vlist_get_psvarid(vlistID1, zaxisIDh);
 
+      int i;
       for ( i = nvct/2+1; i < nvct; i++ )
         if ( vct[i] > vct[i-1] ) break;
-
       if ( i == nvct ) linvertvct = true;
     }
 
@@ -165,7 +181,7 @@ void *Vertintml(void *argument)
     {
       double vctbuf[nvct];
       memcpy(vctbuf, vct, nvct*sizeof(double));
-      for ( i = 0; i < nvct/2; i++ )
+      for ( int i = 0; i < nvct/2; i++ )
         {
           vct[nvct/2-1-i] = vctbuf[i];
           vct[nvct-1-i] = vctbuf[i+nvct/2];
@@ -175,14 +191,14 @@ void *Vertintml(void *argument)
   int nvars = vlistNvars(vlistID1);
 
   bool vars[nvars];
+  bool varinterp[nvars];
+  int *varnmiss[nvars];
   double *vardata1[nvars];
   double *vardata2[nvars];
-  int *varnmiss[nvars];
-  int varinterp[nvars];
 
-  int maxlev   = nhlevh > nplev ? nhlevh : nplev;
+  int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
-  if ( !extrapolate ) pnmiss = (int*) Malloc(nplev*sizeof(int));
+  int *pnmiss = extrapolate ? NULL : (int*) Malloc(nplev*sizeof(int));
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -196,12 +212,14 @@ void *Vertintml(void *argument)
 	{
 	  if ( (ilev+1) != (int)levels[ilev] )
 	    {
-	      //sortlevels = FALSE;
+	      //sortlevels = false;
 	      break;
 	    }
 	}
     }
 
+  int *vert_index = NULL;
+  double *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   if ( zaxisIDh != -1 && gridsize > 0 )
     {
       vert_index = (int*) Malloc(gridsize*nplev*sizeof(int));
@@ -218,14 +236,14 @@ void *Vertintml(void *argument)
       height2pressure(phlev, plev, nplev);
 
       if ( cdoVerbose )
-	for ( i = 0; i < nplev; ++i )
+	for ( int i = 0; i < nplev; ++i )
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
       memcpy(plev, phlev, nplev*sizeof(double));
     }
 
   if ( opertype == type_log )
-    for ( k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
+    for ( int k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   bool useTable = false;
   for ( varID = 0; varID < nvars; varID++ )
@@ -244,6 +262,7 @@ void *Vertintml(void *argument)
     {
       int gridID   = vlistInqVarGrid(vlistID1, varID);
       int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+      int zaxistype = zaxisInqType(zaxisID);
       // gridsize = gridInqSize(gridID);
       int nlevel   = zaxisInqSize(zaxisID);
       int instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
@@ -320,7 +339,7 @@ void *Vertintml(void *argument)
 	  else if ( code == gribcodes.ps      && nlevel == 1      ) psID      = varID;
 	}
 
-      if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+      if ( gridInqType(gridID) == GRID_SPECTRAL && zaxis_is_hybrid(zaxistype) )
 	cdoAbort("Spectral data on model level unsupported!");
 
       if ( gridInqType(gridID) == GRID_SPECTRAL )
@@ -331,21 +350,21 @@ void *Vertintml(void *argument)
       else
 	vardata1[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
 
-      /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
+      /* if ( zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && nlevel == nhlev ) */
       if ( zaxisID == zaxisIDh ||
-	   (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
+	   (zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
 	{
-	  varinterp[varID] = TRUE;
+	  varinterp[varID] = true;
 	  vardata2[varID]  = (double*) Malloc(gridsize*nplev*sizeof(double));
 	  varnmiss[varID]  = (int*) Malloc(maxlev*sizeof(int));
 	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
 	}
       else
 	{
-	  if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel > 1 )
+	  if ( zaxis_is_hybrid(zaxistype) && zaxisIDh != -1 && nlevel > 1 )
 	    cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
 		       varID+1, paramstr, nlevel);
-	  varinterp[varID] = FALSE;
+	  varinterp[varID] = false;
 	  vardata2[varID]  = vardata1[varID];
 	  varnmiss[varID]  = (int*) Malloc(nlevel*sizeof(int));
 	}
@@ -383,7 +402,7 @@ void *Vertintml(void *argument)
   if ( zaxisIDh != -1 && gheightID != -1 && tempID == -1 )
     cdoAbort("Temperature not found, needed for vertical interpolation of geopotheight!");
 
-  presID = lnpsID;
+  int presID = lnpsID;
   if ( psvarID != -1 ) presID = psvarID;
 
   if ( zaxisIDh != -1 && presID == -1 )
@@ -407,7 +426,7 @@ void *Vertintml(void *argument)
   if ( zaxisIDh != -1 )
     {
       double suma = 0, sumb = 0;
-      for ( i = 0; i < nhlevh; i++ )
+      for ( int i = 0; i < nhlevh; i++ )
         {
           suma += vct[i];
           sumb += vct[i+nhlevh];
@@ -443,10 +462,10 @@ void *Vertintml(void *argument)
           if ( linvertvct && zaxisIDh != -1 && zaxisID == zaxisIDh )
             levelID = nlevel-1-levelID;
 
-	  offset   = gridsize*levelID;
-	  single1  = vardata1[varID] + offset;
+	  size_t offset  = gridsize*levelID;
+	  double *single = vardata1[varID] + offset;
 
-	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+	  streamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
 	  vars[varID] = true;
 	}
 
@@ -471,7 +490,7 @@ void *Vertintml(void *argument)
 	    }
 
 	  if ( presID == lnpsID )
-	    for ( i = 0; i < gridsize; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
+	    for ( int i = 0; i < gridsize; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
 	  else if ( presID != -1 )
 	    memcpy(ps_prog, vardata1[presID], gridsize*sizeof(double));
 
@@ -485,14 +504,14 @@ void *Vertintml(void *argument)
 
 	  if ( opertype == type_log )
 	    {
-	      for ( i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
+	      for ( int i = 0; i < gridsize; i++ ) ps_prog[i] = log(ps_prog[i]);
 
-	      for ( k = 0; k < nhlevh; k++ )
-		for ( i = 0; i < gridsize; i++ )
+	      for ( int k = 0; k < nhlevh; k++ )
+		for ( int i = 0; i < gridsize; i++ )
 		  half_press[k*gridsize+i] = log(half_press[k*gridsize+i]);
 
-	      for ( k = 0; k < nhlevf; k++ )
-		for ( i = 0; i < gridsize; i++ )
+	      for ( int k = 0; k < nhlevf; k++ )
+		for ( int i = 0; i < gridsize; i++ )
 		  full_press[k*gridsize+i] = log(full_press[k*gridsize+i]);
 	    }
 
@@ -507,7 +526,7 @@ void *Vertintml(void *argument)
 	    {
 	      int zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	      int nlevel   = zaxisInqSize(zaxisID);
-	      double missval  = vlistInqVarMissval(vlistID1, varID);
+	      double missval = vlistInqVarMissval(vlistID1, varID);
 	      if ( varinterp[varID] )
 		{
 		  /*
@@ -516,11 +535,11 @@ void *Vertintml(void *argument)
 		      int i, k;
 		      double *vl1, *vl2;
 
-		      for ( k = 1; k < nlevel; k++ )
+		      for ( int k = 1; k < nlevel; k++ )
 			{
 			  vl1  = vardata1[varID] + gridsize*(k-1);
 			  vl2  = vardata1[varID] + gridsize*(k);
-			  for ( i = 0; i < gridsize; i++ )
+			  for ( int i = 0; i < gridsize; i++ )
 			    vl1[i] = 0.5*(vl1[i] + vl2[i]);
 			}
 		      
@@ -528,14 +547,8 @@ void *Vertintml(void *argument)
 		    }
 		  */
                   double *hyb_press = NULL;
-		  if ( nlevel == nhlevh )
-		    {
-		      hyb_press = half_press;
-		    }
-		  else if ( nlevel == nhlevf )
-		    {
-		      hyb_press = full_press;
-		    }
+		  if      ( nlevel == nhlevh ) hyb_press = half_press;
+		  else if ( nlevel == nhlevf ) hyb_press = full_press;
 		  else
 		    {
 		      int param = vlistInqVarParam(vlistID1, varID);
@@ -563,7 +576,7 @@ void *Vertintml(void *argument)
 		    }
 		  else if ( varID == gheightID )
 		    {
-		      for ( i = 0; i < gridsize; ++i )
+		      for ( int i = 0; i < gridsize; ++i )
 			vardata1[varID][gridsize*nlevel+i] = sgeopot[i]/PlanetGrav;
 
 		      interp_Z(sgeopot, vardata1[varID], vardata2[varID],
@@ -589,10 +602,10 @@ void *Vertintml(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  //gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-		  offset   = gridsize*levelID;
-		  single2  = vardata2[varID] + offset;
+		  size_t offset  = gridsize*levelID;
+		  double *single = vardata2[varID] + offset;
 		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
+		  streamWriteRecord(streamID2, single, varnmiss[varID][levelID]);
 		}
 	    }
 	}
@@ -611,14 +624,12 @@ void *Vertintml(void *argument)
     }
 
   if ( pnmiss     ) Free(pnmiss);
-
   if ( sgeopot    ) Free(sgeopot);
   if ( ps_prog    ) Free(ps_prog);
   if ( vert_index ) Free(vert_index);
   if ( full_press ) Free(full_press);
   if ( half_press ) Free(half_press);
   if ( vct        ) Free(vct);
-  if ( rvct       ) Free(rvct);
 
   listDelete(flist);
 

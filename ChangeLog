@@ -1,3 +1,12 @@
+2016-10-05  Uwe Schulzweida
+
+	* ml2pl: interpolation failed for data on hybrid half levels [Bug #7225]
+
+2016-10-04  Uwe Schulzweida
+
+	* using CDI library version 1.8.0rc3
+	* Version 1.8.0rc3 release
+
 2016-09-24  Uwe Schulzweida
 
 	* remapnn: optimize sort in kdtree (speedup ~20%)
