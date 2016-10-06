@@ -14,7 +14,7 @@
 @Parameter = grid
 
 @BeginDescription
-Enlarge all fields of @file{ifile} to a user given grid. Normally only the last 
+Enlarge all fields of @file{ifile} to a user given horizontal grid. Normally only the last 
 field element is used for the enlargement. If however the input and output
 grid are regular lon/lat grids, a zonal or meridional enlargement is possible.
 Zonal enlargement takes place, if the xsize of the input field is 1 and 
