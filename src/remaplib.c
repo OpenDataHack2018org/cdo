@@ -111,26 +111,24 @@ void remapGridFree(remapgrid_t *grid)
 
 void remapVarsFree(remapvars_t *rv)
 {
-  long i, num_blks;
-
-  if ( rv->pinit == TRUE )
+  if ( rv->pinit )
     {
-      rv->pinit    = FALSE;
-      rv->sort_add = FALSE;
+      rv->pinit    = false;
+      rv->sort_add = false;
 
       if ( rv->src_cell_add ) Free(rv->src_cell_add);
       if ( rv->tgt_cell_add ) Free(rv->tgt_cell_add);
       if ( rv->wts ) Free(rv->wts);
 
-      if ( rv->links.option == TRUE )
+      if ( rv->links.option )
 	{
-	  rv->links.option = FALSE;
+	  rv->links.option = false;
 
 	  if ( rv->links.num_blks )
 	    {
 	      Free(rv->links.num_links);
-	      num_blks = rv->links.num_blks;
-	      for ( i = 0; i < num_blks; ++i )
+	      long num_blks = rv->links.num_blks;
+	      for ( long i = 0; i < num_blks; ++i )
 		{
 		  Free(rv->links.src_add[i]);
 		  Free(rv->links.dst_add[i]);
@@ -186,8 +184,6 @@ void remapgrid_init(remapgrid_t *grid)
 
 void remapgrid_alloc(int map_type, remapgrid_t *grid)
 {
-  long nalloc;
-
   if ( grid->nvgp )
     grid->vgpm   = (int*) Malloc(grid->nvgp*sizeof(int));
 
@@ -216,7 +212,7 @@ void remapgrid_alloc(int map_type, remapgrid_t *grid)
 	}
       else
 	{
-	  nalloc = grid->num_cell_corners*grid->size;
+	  long nalloc = grid->num_cell_corners*grid->size;
 
 	  grid->cell_corner_lon = (double*) Malloc(nalloc*sizeof(double));
 	  memset(grid->cell_corner_lon, 0, nalloc*sizeof(double));
@@ -610,12 +606,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 static
 void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *txt)
 {
-  char xunitstr[CDI_MAX_NAME];
-  char yunitstr[CDI_MAX_NAME];
-  long gridsize;
-  long i;
-  int lgrid_destroy = FALSE;
-  int lgrid_gen_bounds = FALSE;
+  bool lgrid_destroy = false;
+  bool lgrid_gen_bounds = false;
   int gridID_gme = -1;
 
   if ( gridInqType(grid->gridID) != GRID_UNSTRUCTURED && gridInqType(grid->gridID) != GRID_CURVILINEAR )
@@ -630,13 +622,13 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 	}
       else if ( remap_write_remap || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
-	  lgrid_destroy = TRUE;
+	  lgrid_destroy = true;
 	  gridID = gridToCurvilinear(grid->gridID, 1);
-	  lgrid_gen_bounds = TRUE;
+	  lgrid_gen_bounds = true;
 	}
     }
 
-  gridsize = grid->size = gridInqSize(gridID);
+  long gridsize = grid->size = gridInqSize(gridID);
 
   grid->dims[0] = gridInqXsize(gridID);
   grid->dims[1] = gridInqYsize(gridID);
@@ -665,13 +657,13 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(gridsize, grid)
 #endif
-  for ( i = 0; i < gridsize; ++i ) grid->mask[i] = TRUE;
+  for ( long i = 0; i < gridsize; ++i ) grid->mask[i] = TRUE;
 
   if ( gridInqMask(gridID, NULL) )
     {
       int *mask = (int*) Malloc(gridsize*sizeof(int));
       gridInqMask(gridID, mask);
-      for ( i = 0; i < gridsize; ++i )
+      for ( long i = 0; i < gridsize; ++i )
 	if ( mask[i] == 0 ) grid->mask[i] = FALSE;
       Free(mask);
     }
@@ -684,6 +676,8 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
   gridInqXvals(gridID, grid->cell_center_lon);
   gridInqYvals(gridID, grid->cell_center_lat);
 
+  char xunitstr[CDI_MAX_NAME];
+  char yunitstr[CDI_MAX_NAME];
   gridInqXunits(gridID, xunitstr);
   gridInqYunits(gridID, yunitstr);
 
@@ -797,7 +791,6 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 
 void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid)
 {
-  int lbounds = TRUE;
   int reg2d_src_gridID = gridID1;
   int reg2d_tgt_gridID = gridID2;
 
@@ -886,6 +879,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LAEA) || 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_SINU)) )
     {
+      int lbounds = TRUE;
       src_grid->gridID = gridID1 = gridToCurvilinear(src_grid->gridID, lbounds);
     }
 
@@ -935,9 +929,9 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remapvars_t *rv)
 {
   /* Initialize all pointer */
-  if ( rv->pinit == FALSE )
+  if ( rv->pinit == false )
     {
-      rv->pinit = TRUE;
+      rv->pinit = true;
 
       rv->src_cell_add = NULL;
       rv->tgt_cell_add = NULL;
@@ -949,21 +943,21 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 #if defined(_OPENMP)
   if ( ompNumThreads > 1 )
     {
-      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = FALSE;
+      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = true;
+      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = false;
+      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = false;
+      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = false;
+      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = false;
       else cdoAbort("Unknown mapping method!");
     }
   else
 #endif
     {
-      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = FALSE;
+      if      ( map_type == MAP_TYPE_CONSERV     ) rv->sort_add = true;
+      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = false;
+      else if ( map_type == MAP_TYPE_BILINEAR    ) rv->sort_add = false;
+      else if ( map_type == MAP_TYPE_BICUBIC     ) rv->sort_add = false;
+      else if ( map_type == MAP_TYPE_DISTWGT     ) rv->sort_add = false;
       else cdoAbort("Unknown mapping method!");
     }
 
@@ -994,7 +988,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
       rv->wts = (double*) Malloc(rv->num_wts*rv->max_links*sizeof(double));
     }
 
-  rv->links.option    = FALSE;
+  rv->links.option    = false;
   rv->links.max_links = 0;
   rv->links.num_blks  = 0;
   rv->links.num_links = NULL;
@@ -1088,7 +1082,7 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 
   if ( iorder == 1 )   /* First order remapping */
     {
-      if ( links.option == TRUE )
+      if ( links.option )
 	{
 	  long j;
 	  for ( j = 0; j < links.num_blks; ++j )
@@ -1142,17 +1136,13 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 static
 long get_max_add(long num_links, long size, const int *restrict add)
 {
-  long n, i;
-  long max_add;
-  int *isum;
-
-  isum = (int*) Malloc(size*sizeof(int));
+  int *isum = (int*) Malloc(size*sizeof(int));
   memset(isum, 0, size*sizeof(int));
 
-  for ( n = 0; n < num_links; ++n ) isum[add[n]]++;
+  for ( long n = 0; n < num_links; ++n ) isum[add[n]]++;
 
-  max_add = 0;
-  for ( i = 0; i < size; ++i ) if ( isum[i] > max_add ) max_add = isum[i];
+  long max_add = 0;
+  for ( long i = 0; i < size; ++i ) if ( isum[i] > max_add ) max_add = isum[i];
   Free(isum);
 
   return (max_add);
@@ -1208,50 +1198,43 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   */
 
   /* Local variables */
-  long i, n, k, ncls, imax;
-  long max_cls;
-  double wts;
-  double *src_cls;
-  double *src_wts;
-#if defined(_OPENMP)
-  double **src_cls2;
-  double **src_wts2;
-#endif
+  long n, k;
 
-  for ( i = 0; i < dst_size; ++i ) dst_array[i] = missval;
+  for ( long i = 0; i < dst_size; ++i ) dst_array[i] = missval;
 
   if ( num_links == 0 ) return;
 
-  max_cls = get_max_add(num_links, dst_size, dst_add);
+  long max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #if defined(_OPENMP)
-  src_cls2 = (double **) Malloc(ompNumThreads*sizeof(double *));
-  src_wts2 = (double **) Malloc(ompNumThreads*sizeof(double *));
-  for ( i = 0; i < ompNumThreads; ++i )
+  double **src_cls2 = (double **) Malloc(ompNumThreads*sizeof(double *));
+  double **src_wts2 = (double **) Malloc(ompNumThreads*sizeof(double *));
+  for ( long i = 0; i < ompNumThreads; ++i )
     {
       src_cls2[i] = (double*) Malloc(max_cls*sizeof(double));
       src_wts2[i] = (double*) Malloc(max_cls*sizeof(double));
     }
 #else
-  src_cls = (double*) Malloc(max_cls*sizeof(double));
-  src_wts = (double*) Malloc(max_cls*sizeof(double));
+  double *src_cls = (double*) Malloc(max_cls*sizeof(double));
+  double *src_wts = (double*) Malloc(max_cls*sizeof(double));
 #endif
 
-  for ( n = 0; n < num_links; ++n )
+  for ( long n = 0; n < num_links; ++n )
     if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)					\
-  private(n, k, src_cls, src_wts, ncls, imax, wts) \
+  private(n, k) \
   schedule(dynamic,1)
 #endif
-  for ( i = 0; i < dst_size; ++i )
+  for ( long i = 0; i < dst_size; ++i )
     {
+      long ncls;
 #if defined(_OPENMP)
       int ompthID = cdo_omp_get_thread_num();
-      src_cls = src_cls2[ompthID];
-      src_wts = src_wts2[ompthID];
+      double *src_cls = src_cls2[ompthID];
+      double *src_wts = src_wts2[ompthID];
 #endif
       memset(src_cls, 0, max_cls*sizeof(double));
       memset(src_wts, 0, max_cls*sizeof(double));
@@ -1313,8 +1296,8 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
       
       if ( ncls )
 	{
-	  imax = 0;
-	  wts = src_wts[0];
+	  long imax = 0;
+	  double wts = src_wts[0];
 	  for ( k = 1; k < ncls; ++k )
 	    {
 	      if ( src_wts[k] > wts )
@@ -1329,7 +1312,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
     }
 
 #if defined(_OPENMP)
-  for ( i = 0; i < ompNumThreads; ++i )
+  for ( long i = 0; i < ompNumThreads; ++i )
     {
       Free(src_cls2[i]);
       Free(src_wts2[i]);
@@ -1362,25 +1345,22 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
     int num_wts          ! num of weights used in remapping
 
     double *map_wts      ! remapping weights for each link
-
     double *src_array    ! array with source field to be remapped
 
     output variables:
 
     double *dst_array    ! array for remapped field on destination grid
   */
-  /* Local variables */
-  long n;
 
-  for ( n = 0; n < dst_size; ++n ) dst_array[n] = missval;
+  for ( long n = 0; n < dst_size; ++n ) dst_array[n] = missval;
 
 #ifdef SX
 #pragma cdir nodep
 #endif
-  for ( n = 0; n < num_links; ++n )
+  for ( long n = 0; n < num_links; ++n )
     if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
-  for ( n = 0; n < num_links; ++n )
+  for ( long n = 0; n < num_links; ++n )
     {
       /*
 	printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
@@ -1396,22 +1376,18 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
 
 void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv, const double *restrict array1, 
 		const double *restrict array2, double missval)
-{
-  long n, ns, i;
-  long idiff, imax, imin, icount;
-  int *tgt_count;
-	  
+{	  
   if ( remap_order == 2 )
     cdoPrint("Second order mapping from grid1 to grid2:");
   else
     cdoPrint("First order mapping from grid1 to grid2:");
   cdoPrint("----------------------------------------");
 
-  ns = 0;
+  long ns = 0;
   double sum = 0;
   double minval =  DBL_MAX;
   double maxval = -DBL_MAX;
-  for ( n = 0; n < src_grid.size; ++n )
+  for ( long n = 0; n < src_grid.size; ++n )
     {
       if ( !DBL_IS_EQUAL(array1[n], missval) )
 	{
@@ -1428,7 +1404,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   sum = 0;
   minval =  DBL_MAX;
   maxval = -DBL_MAX;
-  for ( n = 0; n < tgt_grid.size; ++n )
+  for ( long n = 0; n < tgt_grid.size; ++n )
     {
       if ( !DBL_IS_EQUAL(array2[n], missval) )
 	{
@@ -1447,13 +1423,13 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
     {
       cdoPrint("Conservation:");
       sum = 0;
-      for ( n = 0; n < src_grid.size; ++n )
+      for ( long n = 0; n < src_grid.size; ++n )
 	if ( !DBL_IS_EQUAL(array1[n], missval) )
 	  sum += array1[n]*src_grid.cell_area[n]*src_grid.cell_frac[n];
       cdoPrint("Grid1 Integral = %g", sum);
 
       sum = 0;
-      for ( n = 0; n < tgt_grid.size; ++n )
+      for ( long n = 0; n < tgt_grid.size; ++n )
 	if ( !DBL_IS_EQUAL(array2[n], missval) )
 	  sum += array2[n]*tgt_grid.cell_area[n]*tgt_grid.cell_frac[n];
       cdoPrint("Grid2 Integral = %g", sum);
@@ -1468,27 +1444,27 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   cdoPrint("number of sparse matrix entries %d", rv.num_links);
   cdoPrint("total number of dest cells %d", tgt_grid.size);
 
-  tgt_count = (int*) Malloc(tgt_grid.size*sizeof(int));
+  int *tgt_count = (int*) Malloc(tgt_grid.size*sizeof(int));
 
-  for ( n = 0; n < tgt_grid.size; ++n ) tgt_count[n] = 0;
+  for ( long n = 0; n < tgt_grid.size; ++n ) tgt_count[n] = 0;
 
 #if defined(SX)
 #pragma vdir nodep
 #endif
-  for ( n = 0; n < rv.num_links; ++n ) tgt_count[rv.tgt_cell_add[n]]++;
+  for ( long n = 0; n < rv.num_links; ++n ) tgt_count[rv.tgt_cell_add[n]]++;
 
-  imin = INT_MAX;
-  imax = INT_MIN;
-  for ( n = 0; n < tgt_grid.size; ++n )
+  long imin = INT_MAX;
+  long imax = INT_MIN;
+  for ( long n = 0; n < tgt_grid.size; ++n )
     {
       if ( tgt_count[n] > 0 )
 	if ( tgt_count[n] < imin ) imin = tgt_count[n];
       if ( tgt_count[n] > imax ) imax = tgt_count[n];
     }
 
-  idiff =  (imax - imin)/10 + 1;
-  icount = 0;
-  for ( i = 0; i < tgt_grid.size; ++i )
+  long idiff =  (imax - imin)/10 + 1;
+  long icount = 0;
+  for ( long i = 0; i < tgt_grid.size; ++i )
     if ( tgt_count[i] > 0 ) icount++;
 
   cdoPrint("number of cells participating in remap %d", icount);
@@ -1499,10 +1475,10 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
       cdoPrint("max no of entries/row = %d", imax);
 
       imax = imin + idiff;
-      for ( n = 0; n < 10; ++n )
+      for ( long n = 0; n < 10; ++n )
 	{
 	  icount = 0;
-	  for ( i = 0; i < tgt_grid.size; ++i )
+	  for ( long i = 0; i < tgt_grid.size; ++i )
 	    if ( tgt_count[i] >= imin && tgt_count[i] < imax ) icount++;
 
 	  if ( icount )
@@ -1525,7 +1501,6 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 void remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat,
 		     double *restrict grad_lon, double *restrict grad_latlon)
 {
-  long nx, ny, grid_size;
   long i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw;
   double delew, delns;
   double grad_lat_zero, grad_lon_zero;
@@ -1533,9 +1508,9 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
   if ( grid.rank != 2 )
     cdoAbort("Internal problem (remap_gradients), grid rank = %d!", grid.rank);
 
-  grid_size = grid.size;
-  nx = grid.dims[0];
-  ny = grid.dims[1];
+  long grid_size = grid.size;
+  long nx = grid.dims[0];
+  long ny = grid.dims[1];
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
@@ -1728,19 +1703,16 @@ void remap_gradients(remapgrid_t grid, const double *restrict array, double *res
 void reorder_links(remapvars_t *rv)
 {
   long j, nval = 0, num_blks = 0;
-  long lastval;
-  long nlinks;
-  long max_links = 0;
   long n;
-  long num_links;
 
-  num_links = rv->num_links;
+  long num_links = rv->num_links;
 
   printf("reorder_links\n");
   printf("  num_links %ld\n", num_links);
-  rv->links.option = TRUE;
+  rv->links.option = true;
 
-  lastval = -1;
+  long lastval = -1;
+  long max_links = 0;
   for ( n = 0; n < num_links; n++ )
     {
       if ( rv->tgt_cell_add[n] == lastval ) nval++;
@@ -1777,7 +1749,7 @@ void reorder_links(remapvars_t *rv)
     {
       nval = 0;
       lastval = -1;
-      nlinks = 0;
+      long nlinks = 0;
 
       for ( n = 0; n < num_links; n++ )
 	{

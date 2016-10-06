@@ -81,7 +81,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   char tgt_grid_name[64] = "dest grid";
   const char *src_grid_units = "radians";
   const char *tgt_grid_units = "radians";
-  int lgridarea = FALSE;
+  bool lgridarea = false;
   int writemode = NC_CLOBBER;
 
   switch ( rv.norm_opt )
@@ -100,7 +100,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   switch ( map_type )
     {
     case MAP_TYPE_CONSERV:
-      lgridarea = TRUE;
+      lgridarea = true;
       if ( submap_type == SUBMAP_TYPE_LAF )
 	{
 	  strcpy(map_method, "Largest area fraction");
@@ -112,7 +112,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 	  break;
 	}
     case MAP_TYPE_CONSERV_YAC:
-      lgridarea = TRUE;
+      lgridarea = true;
       /*
       if ( submap_type == SUBMAP_TYPE_LAF )
 	{
@@ -394,7 +394,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   // Local variables
 
-  int lgridarea = FALSE;
+  bool lgridarea = false;
   int status;
   int nc_file_id;           /* id for NetCDF file                       */
   int nc_srcgrdsize_id;     /* id for source grid size                  */
@@ -459,7 +459,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "normalization", &attlen));
   normalize_opt[attlen] = 0;
 
-  rv->sort_add = FALSE;
+  rv->sort_add = false;
 
   if ( strcmp(normalize_opt, "none") == 0 )
     rv->norm_opt = NORM_OPT_NONE;
@@ -521,7 +521,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( cdoVerbose )
     cdoPrint("map_type = %s", map_method);
 
-  if ( rv->map_type == MAP_TYPE_CONSERV ) lgridarea = TRUE;
+  if ( rv->map_type == MAP_TYPE_CONSERV ) lgridarea = true;
 
   *map_type = rv->map_type;
 
@@ -625,7 +625,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   if ( gridInqType(gridID1) == GRID_GME ) gridInqMaskGME(gridID1_gme_c, src_grid->vgpm);    
 
-  rv->pinit = TRUE;
+  rv->pinit = true;
   rv->wts = NULL;
 
   rv->max_links = rv->num_links;
@@ -769,7 +769,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   cdoAbort("NetCDF support not compiled in!");
 #endif
 
-  rv->links.option    = FALSE;
+  rv->links.option    = false;
   rv->links.max_links = 0;
   rv->links.num_blks  = 0;
   rv->links.num_links = NULL;

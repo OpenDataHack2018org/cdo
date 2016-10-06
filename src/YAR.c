@@ -205,7 +205,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 
   remap.src_grid.num_srch_bins = 0;
   remap.tgt_grid.num_srch_bins = 0;
-  remap.vars.pinit = FALSE;
+  remap.vars.pinit = false;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
   remap_grids_init(MAP_TYPE_BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
@@ -454,7 +454,7 @@ void yar_remap_con(field_t *field1, field_t *field2)
 
   remap.src_grid.num_srch_bins = 0;
   remap.tgt_grid.num_srch_bins = 0;
-  remap.vars.pinit = FALSE;
+  remap.vars.pinit = false;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
   remap_grids_init(MAP_TYPE_CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);

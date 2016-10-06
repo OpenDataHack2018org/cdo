@@ -1122,7 +1122,7 @@ void *Remap(void *argument)
 		  remap_set_int(REMAP_NUM_SRCH_BINS, remap_num_srch_bins);
 
 		  remaps[r].vars.norm_opt = norm_opt;
-		  remaps[r].vars.pinit = FALSE;
+		  remaps[r].vars.pinit = false;
 		  
 		  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC) &&
 		       (gridInqType(gridID1) == GRID_GME || gridInqType(gridID1) == GRID_UNSTRUCTURED) )

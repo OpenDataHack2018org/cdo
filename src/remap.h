@@ -117,7 +117,7 @@ typedef struct {
 remapgrid_t;
 
 typedef struct {
-  int      option;
+  bool     option;
   int      max_links;
   int      num_blks;
   int*     num_links;
@@ -128,8 +128,8 @@ typedef struct {
 remaplink_t;
 
 typedef struct {
-  int      sort_add;
-  int      pinit;            /* TRUE if the pointers are initialized     */
+  bool     sort_add;
+  bool     pinit;            /* true: if the pointers are initialized    */
   long     max_links;        /* current size of link arrays              */
   long     num_links;        /* actual number of links for remapping     */
   long     num_wts;          /* num of weights used in remapping         */
