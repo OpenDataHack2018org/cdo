@@ -561,8 +561,6 @@ void grid_check_lat_borders_rad(int n, double *ybounds)
 static
 void remap_define_reg2d(int gridID, remapgrid_t *grid)
 {
-  char unitstr[CDI_MAX_NAME];
-
   long nx = grid->dims[0];
   long ny = grid->dims[1];
 
@@ -584,10 +582,11 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 
   /* Convert lat/lon units if required */
 
-  gridInqYunits(gridID, unitstr);
+  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
-  grid_to_radian(unitstr, nx, grid->reg2d_center_lon, "grid reg2d center lon"); 
-  grid_to_radian(unitstr, ny, grid->reg2d_center_lat, "grid reg2d center lat"); 
+  grid_to_radian(yunits, nx, grid->reg2d_center_lon, "grid reg2d center lon"); 
+  grid_to_radian(yunits, ny, grid->reg2d_center_lat, "grid reg2d center lat"); 
 
   if ( grid->is_cyclic ) grid->reg2d_center_lon[nx] = grid->reg2d_center_lon[0] + PI2;
 
@@ -638,7 +637,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
       if ( grid->dims[1] == 0 ) cdoAbort("%s grid without latitude coordinates!", gridNamePtr(gridInqType(grid->gridID)));
     }
 
-  grid->is_cyclic = gridIsCircular(gridID) ? true : false;
+  grid->is_cyclic = (gridIsCircular(gridID) > 0);
 
   if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
     grid->rank = 1;
@@ -676,11 +675,10 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
   gridInqXvals(gridID, grid->cell_center_lon);
   gridInqYvals(gridID, grid->cell_center_lat);
 
-  char xunitstr[CDI_MAX_NAME];
-  char yunitstr[CDI_MAX_NAME];
-  gridInqXunits(gridID, xunitstr);
-  gridInqYunits(gridID, yunitstr);
-
+  char xunits[CDI_MAX_NAME]; xunits[0] = 0;
+  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+  cdiGridInqKeyStr(gridID, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
   if ( grid->lneed_cell_corners )
     {
@@ -691,8 +689,8 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 	}
       else if ( lgrid_gen_bounds )
 	{
-	  grid_cell_center_to_bounds_X2D(xunitstr, grid->dims[0], grid->dims[1], grid->cell_center_lon, grid->cell_corner_lon, 0);
-	  grid_cell_center_to_bounds_Y2D(yunitstr, grid->dims[0], grid->dims[1], grid->cell_center_lat, grid->cell_corner_lat);
+	  grid_cell_center_to_bounds_X2D(xunits, grid->dims[0], grid->dims[1], grid->cell_center_lon, grid->cell_corner_lon, 0);
+	  grid_cell_center_to_bounds_Y2D(yunits, grid->dims[0], grid->dims[1], grid->cell_center_lat, grid->cell_corner_lat);
 	}
       else
 	{
@@ -705,13 +703,13 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 
   /* Convert lat/lon units if required */
 
-  grid_to_radian(xunitstr, grid->size, grid->cell_center_lon, "grid center lon"); 
-  grid_to_radian(yunitstr, grid->size, grid->cell_center_lat, "grid center lat"); 
+  grid_to_radian(xunits, grid->size, grid->cell_center_lon, "grid center lon"); 
+  grid_to_radian(yunits, grid->size, grid->cell_center_lat, "grid center lat"); 
   /* Note: using units from cell center instead from bounds */
   if ( grid->num_cell_corners && grid->lneed_cell_corners )
     {
-      grid_to_radian(xunitstr, grid->num_cell_corners*grid->size, grid->cell_corner_lon, "grid corner lon"); 
-      grid_to_radian(yunitstr, grid->num_cell_corners*grid->size, grid->cell_corner_lat, "grid corner lat"); 
+      grid_to_radian(xunits, grid->num_cell_corners*grid->size, grid->cell_corner_lon, "grid corner lon"); 
+      grid_to_radian(yunits, grid->num_cell_corners*grid->size, grid->cell_corner_lat, "grid corner lat"); 
     }
 
   if ( lgrid_destroy ) gridDestroy(gridID);

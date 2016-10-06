@@ -320,8 +320,7 @@ void intlinarr(long nxm, double *ym, double *xm, int nx, double *y, double *x)
 
 void intgridbil(field_t *field1, field_t *field2)
 {
-  char units[CDI_MAX_NAME];
-
+  char xunits[CDI_MAX_NAME];
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
   double *array1 = field1->ptr;
@@ -359,10 +358,10 @@ void intgridbil(field_t *field1, field_t *field2)
     {
       if ( lon_is_circular ) lon1[nlon1-1] = 0;
 
-      gridInqXunits(gridID1, units);
+      gridInqXunits(gridID1, xunits);
 
-      grid_to_radian(units, nlon1, lon1, "grid1 center lon"); 
-      grid_to_radian(units, nlat1, lat1, "grid1 center lat"); 
+      grid_to_radian(xunits, nlon1, lon1, "grid1 center lon"); 
+      grid_to_radian(xunits, nlat1, lat1, "grid1 center lat"); 
 
       if ( lon_is_circular ) lon1[nlon1-1] = lon1[0] + 2*M_PI;
     }
@@ -376,10 +375,10 @@ void intgridbil(field_t *field1, field_t *field2)
       gridInqXvals(gridID2, &lon2);
       gridInqYvals(gridID2, &lat2);
 
-      gridInqXunits(gridID2, units);
+      gridInqXunits(gridID2, xunits);
 
-      grid_to_radian(units, xsize2, &lon2, "grid2 center lon"); 
-      grid_to_radian(units, ysize2, &lat2, "grid2 center lat"); 
+      grid_to_radian(xunits, xsize2, &lon2, "grid2 center lon"); 
+      grid_to_radian(xunits, ysize2, &lat2, "grid2 center lat"); 
 
       if ( lon2 < lon1[0] ) lon2 += 2*M_PI;
 
@@ -437,10 +436,10 @@ void intgridbil(field_t *field1, field_t *field2)
           gridInqXvals(gridID2, xvals2);
           gridInqYvals(gridID2, yvals2);
 
-          gridInqXunits(gridID2, units);
+          gridInqXunits(gridID2, xunits);
           
-          grid_to_radian(units, gridsize2, xvals2, "grid2 center lon"); 
-          grid_to_radian(units, gridsize2, yvals2, "grid2 center lat"); 
+          grid_to_radian(xunits, gridsize2, xvals2, "grid2 center lon"); 
+          grid_to_radian(xunits, gridsize2, yvals2, "grid2 center lat"); 
 
           for ( int i = 0; i < gridsize2; ++i )
             {
