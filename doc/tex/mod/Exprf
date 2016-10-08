@@ -31,7 +31,7 @@ The following operators are supported:
      -      & subtraction         & x - y     & Difference of x and y    
      *      & multiplication      & x * y     & Product of x and y 
      /      & division            & x / y     & Quotient of x and y
-     \exp      & exponentiation      & x \exp y     & Exponentiates x with y 
+     \exp       & exponentiation      & x \exp y      & Exponentiates x with y 
      ==     & equal to            & x == y    &  1, if x equal to y; else 0
      !=     & not equal to        & x != y    &  1, if x not equal to y; else 0
      >      & greater than        & x > y     &  1, if x greater than y; else 0
@@ -182,6 +182,11 @@ STRING  Processing instructions (need to be 'quoted' in most cases)
 @Item = filename
 STRING  File with processing instructions
 @EndParameter
+
+
+@BeginNote
+The expr commands sellevel(x,k) and sellevidx(x,k) are only avaiable with @oper{exprf}/@oper{aexprf}.
+@EndNote
 
 
 @BeginExample

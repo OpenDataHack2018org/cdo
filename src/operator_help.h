@@ -1264,7 +1264,7 @@ static const char *EnlargeHelp[] = {
     "    enlarge,grid  ifile ofile",
     "",
     "DESCRIPTION",
-    "    Enlarge all fields of ifile to a user given grid. Normally only the last ",
+    "    Enlarge all fields of ifile to a user given horizontal grid. Normally only the last ",
     "    field element is used for the enlargement. If however the input and output",
     "    grid are regular lon/lat grids, a zonal or meridional enlargement is possible.",
     "    Zonal enlargement takes place, if the xsize of the input field is 1 and ",
@@ -1359,7 +1359,7 @@ static const char *ExprHelp[] = {
     "         -      & subtraction         & x - y     & Difference of x and y    ",
     "         *      & multiplication      & x * y     & Product of x and y ",
     "         /      & division            & x / y     & Quotient of x and y",
-    "         ^     & exponentiation      & x ^y     & Exponentiates x with y ",
+    "         ^      & exponentiation      & x ^y      & Exponentiates x with y ",
     "         ==     & equal to            & x == y    &  1, if x equal to y; else 0",
     "         !=     & not equal to        & x != y    &  1, if x not equal to y; else 0",
     "         >      & greater than        & x > y     &  1, if x greater than y; else 0",
@@ -1436,6 +1436,9 @@ static const char *ExprHelp[] = {
     "PARAMETER",
     "    instr     STRING  Processing instructions (need to be 'quoted' in most cases)",
     "    filename  STRING  File with processing instructions",
+    "",
+    "NOTE",
+    "    The expr commands sellevel(x,k) and sellevidx(x,k) are only avaiable with exprf/aexprf.",
     NULL
 };
 
