@@ -1,6 +1,17 @@
 CDO NEWS
 --------
 
+Version 1.8.0 (26 October 2016):
+
+   New features:
+     * NetCDF: Improved support for horizontal and vertical grids 
+     * Changed default of option -f nc to netCDF2
+     * masklonlatbox: added support for unstructured grids
+   New operators:
+   Changed operators:
+   Fixed bugs:
+     * ml2pl: interpolation failed for data on hybrid half levels [Bug #7225]
+
 Version 1.7.2 (28 June 2016):
 
    New operators:
