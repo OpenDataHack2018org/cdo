@@ -1438,7 +1438,8 @@ static const char *ExprHelp[] = {
     "    filename  STRING  File with processing instructions",
     "",
     "NOTE",
-    "    The expr commands sellevel(x,k) and sellevidx(x,k) are only avaiable with exprf/aexprf.",
+    "    The expr commands sellevel(x,k) and sellevidx(x,k) are only available with exprf/aexprf.",
+    "    If the input stream contains duplicate entries of the same variable name then the last one is used.",
     NULL
 };
 

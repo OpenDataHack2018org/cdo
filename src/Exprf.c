@@ -41,8 +41,10 @@ Constansts: M_PI, M_E
 #include "grid.h"
 #include "expr.h"
 
+
 void grid_cell_area(int gridID, double *array);
 int getSurfaceID(int vlistID);
+
 
 static
 char *exprs_from_arg(const char *arg)
@@ -97,6 +99,7 @@ paramType *params_new(int vlistID)
   char name[CDI_MAX_NAME];
   char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
+
   for ( int varID = 0; varID < nvars1; varID++ )
     {
       int gridID     = vlistInqVarGrid(vlistID, varID);
@@ -171,6 +174,7 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
 {
   char longname[CDI_MAX_NAME];
   char units[CDI_MAX_NAME];
+
   int ngrids = vlistNgrids(vlistID);
   for ( int index = 0; index < ngrids; ++index )
     {
@@ -184,6 +188,7 @@ void params_add_coordinates(int vlistID, parse_param_t *parse_arg)
       params_add_coord(parse_arg, 'a', gridID, size, "m^2", "grid cell area");
       params_add_coord(parse_arg, 'w', gridID, size, NULL, "grid cell area weights");
     }
+
   int nzaxis = vlistNzaxis(vlistID);
   for ( int index = 0; index < nzaxis; ++index )
     {
@@ -234,6 +239,7 @@ void params_delete(paramType *params)
       Free(params);
     }
 }
+
 
 void *Expr(void *argument)
 {

@@ -185,7 +185,8 @@ STRING  File with processing instructions
 
 
 @BeginNote
-The expr commands sellevel(x,k) and sellevidx(x,k) are only avaiable with @oper{exprf}/@oper{aexprf}.
+The expr commands sellevel(x,k) and sellevidx(x,k) are only available with @oper{exprf}/@oper{aexprf}.
+If the input stream contains duplicate entries of the same variable name then the last one is used.
 @EndNote
 
 
