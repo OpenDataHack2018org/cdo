@@ -1,0 +1,95 @@
+\chapter{Introduction}
+
+The Climate Data Operators ({\CDO}) software is a collection of operators
+for standard processing of climate and forecast model data.
+
+This document describes the additional {\CDO} operator cmor. This
+operator is an interface to the CMOR library version 3 from PCMDI.
+The CMOR support is available with {\CDO} release 1.8.0 or later.
+
+The CMOR (Climate Model Output Rewriter) library comprises a set of
+functions, that can be used to produce CF-compliant NetCDF files that 
+fulfill the requirements of many of the climate community's standard
+model experiments. These experiments are collectively referred to as
+MIP's and include, for example, AMIP, CMIP, CFMIP, PMIP, APE, and IPCC 
+scenario runs. The output resulting from CMOR is "self-describing" and
+facilitates analysis of results across models.
+
+Much of the metadata written to the output files is defined in
+MIP-specific tables, typically made available from each MIP's web
+site. CMOR relies on these tables to provide much of the metadata 
+that is needed in the MIP context, thereby reducing the programming 
+effort required of the individual MIP contributors.
+
+The CDO operator cmor reads the data with the internal IO library CDI
+and writes the NetCDF result directly with the CMOR library. 
+
+\chapter{Building CDO with CMOR}
+
+This section describes how to build and install {\CDO} with CMOR
+support on a UNIX system.
+
+\section{CMOR}
+ 
+CMOR version 3 needs to be installed before building {\CDO}.
+CMOR depends on the following external libraries:
+netCDF-4.0 , HDF5, UDUNITS-2, zlib and uuid.
+Make sure that you use exactly the same libraries for the {\CDO}
+installation, otherwise the operator cmor will possibly not working correctly.
+
+\section{Compilation}
+
+First go to the {\CDO}  \href{https://code.zmaw.de/projects/cdo}{\tt download} page
+({\tt https://code.zmaw.de/projects/cdo}) to get the latest distribution,
+if you do not have it yet.
+Compilation is done by performing the following steps:
+
+\begin{enumerate}
+\item Unpack the archive, if you haven't done that yet:
+   
+\begin{verbatim}
+    gunzip cdo-$VERSION.tar.gz    # uncompress the archive
+    tar xf cdo-$VERSION.tar       # unpack it
+    cd cdo-$VERSION
+\end{verbatim}
+
+\item Configure {\CDO} with CMOR support:
+
+The configuration depends on the location of the external libraries. Here is one example:
+
+\begin{verbatim}
+./configure --with-cmor=<CMOR root directory> --with-netcdf=<NetCDFroot directory> \
+            --with-uuid --with-udunits2 LIBS=-lossp-uuid                           \
+            CPPFLAGS="-I<CMOR root dir>/include/cdTime -I<CMOR root dir>/include/json-c"
+\end{verbatim}
+
+For an overview of other configuration options use
+
+\begin{verbatim}
+    ./configure --help
+\end{verbatim}
+
+\item Compile the program by running make:
+
+\begin{verbatim}
+    make
+\end{verbatim}
+
+\end{enumerate}
+
+The program should compile without problems and the binary ({\tt cdo}) 
+should be available in the {\tt src} directory of the distribution.
+
+
+\section{Installation}
+
+After the compilation of the source code do a {\tt make install},
+possibly as root if the destination permissions require that.
+
+\begin{verbatim}
+    make install
+\end{verbatim} 
+
+The binary is installed into the directory {\tt $<$prefix$>$/bin}.
+{\tt $<$prefix$>$} defaults to {\tt /usr/local} but can be changed with 
+the {\tt --prefix} option of the configure script. 

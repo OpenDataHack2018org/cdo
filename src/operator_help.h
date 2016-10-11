@@ -5130,6 +5130,25 @@ static const char *MaggraphHelp[] = {
     NULL
 };
 
+static const char *CMORHelp[] = {
+    "NAME",
+    "    cmor - CMOR",
+    "",
+    "SYNOPSIS",
+    "    cmor,tab[,options]  ifile",
+    "",
+    "DESCRIPTION",
+    "    Options is a comma separated list of \"key=value\" pairs with optional parameters.",
+    "",
+    "PARAMETER",
+    "    tab       STRING   Name of the CMOR table as specified from PCMDI",
+    "    var       STRING   Comma separated list of variables",
+    "    expinfo   STRING   Experiment specific parameter file",
+    "    modinfo   STRING   Model specific parameter file",
+    "    userinfo  STRING   User/institute specific parameter file",
+    NULL
+};
+
 static const char *EcaCddHelp[] = {
     "NAME",
     "    eca_cdd - Consecutive dry days index per time period",

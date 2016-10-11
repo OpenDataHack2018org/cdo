@@ -2,7 +2,7 @@
 @NewPage
 @Name      = CMOR
 @Title     = CMOR
-@Section   = Miscellaneous
+@Section   = CMOR
 @Arguments = ifile
 @Operators = cmor
 

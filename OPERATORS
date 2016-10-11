@@ -556,6 +556,10 @@ Operator catalog:
    Magvector     vector          Vector arrows plot
    Maggraph      graph           Line graph plot
 -------------------------------------------------------------
+   CMOR
+-------------------------------------------------------------
+   CMOR          cmor            CMOR
+-------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------
    EcaCdd        eca_cdd         Consecutive dry days index per time period

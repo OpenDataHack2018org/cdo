@@ -142,6 +142,7 @@ Hurr          Miscellaneous
 Magplot       Magics
 Magvector     Magics
 Maggraph      Magics
+CMOR          CMOR
 EcaCdd        Climate indices
 EcaCfd        Climate indices
 EcaCsu        Climate indices
