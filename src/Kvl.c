@@ -29,6 +29,8 @@ static
 int read_cmor_table(const char *filename)
 {
   void *kvlist = kvlParseFile(filename);
+  if ( kvlist == NULL ) return -1;
+  
   int nlists = kvlGetNumLists(kvlist);
   printf("# Number of lists: %d\n", nlists);
   for ( int listID = 0; listID < nlists; ++listID )
@@ -54,10 +56,12 @@ int read_cmor_table(const char *filename)
 static
 int conv_cmor_table(const char *filename)
 {
+  void *kvlist = kvlParseFile(filename);
+  if ( kvlist == NULL ) return -1;
+
   bool hasmissval = false;
   double missval;
 
-  void *kvlist = kvlParseFile(filename);
   int nlists = kvlGetNumLists(kvlist);
   //printf("# Number of lists: %d\n", nlists);
   for ( int listID = 0; listID < nlists; ++listID )

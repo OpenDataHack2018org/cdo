@@ -169,10 +169,9 @@ char *skipSeparator(char *pline)
 static
 char *getElementName(char *pline, char *name)
 {
-  int pos = 0, len;
-
   while ( isspace((int) *pline) ) pline++;
-  len = strlen(pline);
+  size_t len = strlen(pline);
+  size_t pos = 0;
   while ( pos < len && !isspace((int) *(pline+pos)) && *(pline+pos) != '=' && *(pline+pos) != ':' ) pos++;
 
   strncpy(name, pline, pos);
@@ -185,13 +184,17 @@ char *getElementName(char *pline, char *name)
 static
 char *getElementValue(char *pline)
 {
-  int len;
-
   while ( isspace((int) *pline) ) pline++;
-  len = strlen(pline);
+  size_t len = strlen(pline);
   while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--;}
 
   return pline;
+}
+
+static
+void kvlParseBufferJson(kvl_t *kvl)
+{
+  cdoAbort("JSON formatted CMOR tables unsupported!");
 }
 
 static
@@ -201,10 +204,10 @@ void kvlParseBuffer(kvl_t *kvl)
   char name[256];
   char *pline;
   char *buffer = kvl->buffer;
-  size_t buffersize = kvl->buffersize;
-  int linenumber = 0;
   char listkey1[] = "axis_entry:";
   char listkey2[] = "variable_entry:";
+  size_t buffersize = kvl->buffersize;
+  int linenumber = 0;
   int listtype = 0;
   int listID = -1;
 
@@ -295,7 +298,10 @@ void *kvlParseFile(const char *filename)
   kvl->buffersize = filesize;
   kvl->filename = strdup(filename);
 
-  kvlParseBuffer(kvl);
+  if ( buffer[0] == '{' )
+    kvlParseBufferJson(kvl);
+  else
+    kvlParseBuffer(kvl);
   
   return (void *) kvl;
 }
