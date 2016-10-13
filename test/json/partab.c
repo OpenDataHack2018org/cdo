@@ -24,6 +24,7 @@ void jsmn_fill_token(jsmntok_t *token, jsmntype_t type, int start, int end)
   token->start = start;
   token->end = end;
   token->size = 0;
+  printf("token: type %d start %d end %d\n", (int) type, start, end);
 }
 
 /**
