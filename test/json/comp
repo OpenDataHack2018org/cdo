@@ -1,0 +1,2 @@
+gcc -g -Wall -o dump_json jsmn.c jsmndump.c
+gcc -g -Wall -o dump_partab partab.c partabdump.c

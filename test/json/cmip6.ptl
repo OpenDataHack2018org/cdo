@@ -1,0 +1,32 @@
+&
+        name= a,
+            long_name= "vertical coordinate formula term: a(k)", 
+            units= "", 
+            type= double
+/
+&
+        name= orog,
+            standard_name= surface_altitude, 
+            units= "m", 
+            long_name= "Surface Altitude", 
+            comment= "The surface called 'surface' means the lower boundary of the atmosphere. Altitude is the (geometric) height above the geoid, which is the reference geopotential surface. The geoid is similar to mean sea level.", 
+            out_name= orog, 
+            type= real, 
+            valid_min= -700, 
+            valid_max= 1.00E+04, 
+/
+&
+        name= tasmax,
+            standard_name= air_temperature, 
+            units= "K", 
+            cell_methods= "area= areacella", 
+            cell_measures= "time= maximum within days time= mean over days", 
+            long_name= "Daily Maximum Near-Surface Air Temperature", 
+            comment= "maximum near-surface (usually, 2 meter) air temperature (add cell_method attribute 'time= max')", 
+            out_name= tasmax, 
+            type= real, 
+            valid_min= 181.9, 
+            valid_max  = 341.9, 
+            ok_min_mean_abs = 264.9, 
+            ok_max_mean_abs= 294
+/
