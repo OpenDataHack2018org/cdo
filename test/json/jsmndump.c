@@ -44,6 +44,7 @@ int dump(const char *js, jsmntok_t *t, size_t count, int indent)
   else if (t->type == JSMN_OBJECT)
     {
       printf("\n");
+      printf("Object: size %d\n", t->size);
       j = 0;
       for (i = 0; i < t->size; i++)
         {

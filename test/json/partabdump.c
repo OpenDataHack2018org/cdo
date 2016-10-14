@@ -44,6 +44,7 @@ int dump(const char *js, jsmntok_t *t, size_t count, int indent)
   else if (t->type == JSMN_OBJECT)
     {
       printf("\n");
+      printf("Object: size %d\n", t->size);
       j = 0;
       for (i = 0; i < t->size; i++)
         {
@@ -76,7 +77,8 @@ int main() {
 	int eof_expected = 0;
 	char *js = NULL;
 	size_t jslen = 0;
-	char buf[BUFSIZ];
+	char buf[BUFSIZ*2];
+        printf("BUFSIZ %d\n", BUFSIZ*2);
 
 	jsmn_parser p;
 	jsmntok_t *tok;
@@ -117,6 +119,7 @@ int main() {
 
 again:
 		r = jsmn_parse(&p, js, jslen, tok, tokcount);
+                printf("num tokens %d %d\n", r, tokcount);
 		if (r < 0) {
 			if (r == JSMN_ERROR_NOMEM) {
 				tokcount = tokcount * 2;

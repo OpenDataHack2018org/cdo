@@ -14,6 +14,8 @@ jsmntok_t *jsmn_alloc_token(jsmn_parser *parser, jsmntok_t *tokens, size_t num_t
   return tok;
 }
 
+const char *Types[] = {"Undefined", "Object", "Array", "String", "Primitive"};
+
 /**
  * Fills token type and boundaries.
  */
@@ -24,7 +26,7 @@ void jsmn_fill_token(jsmntok_t *token, jsmntype_t type, int start, int end)
   token->start = start;
   token->end = end;
   token->size = 0;
-  printf("token: type %d start %d end %d\n", (int) type, start, end);
+ printf("token: start %d end %d %s\n", start, end, Types[type]);
 }
 
 /**
@@ -41,7 +43,7 @@ static int jsmn_parse_primitive(jsmn_parser *parser, const char *js, size_t len,
         {
 #ifndef JSMN_STRICT
         /* In strict mode primitive must be followed by "," or "}" or "]" */
-        case ':':
+        case ':': case '=':
 #endif
         case '\t' : case '\r' : case '\n' : case ' ' :
         case ','  : case ']'  : case '}' : case '/' : 
@@ -112,7 +114,7 @@ static int jsmn_parse_string(jsmn_parser *parser, const char *js, size_t len, js
           parser->pos++;
           switch (js[parser->pos]) {
             /* Allowed escaped symbols */
-          case '\"': /* case '/' */ case '\\' : case 'b' :
+          case '\"': /* case '/' : */ case '\\' : case 'b' :
           case 'f' : case 'r' : case 'n'  : case 't' :
             break;
             /* Allows escaped symbol \uXXXX */
@@ -152,16 +154,10 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
   jsmntok_t *token;
   int count = parser->toknext;
 
-  for (; parser->pos < len && js[parser->pos] != '\0'; parser->pos++)
+  if ( parser->pos == 0 )
     {
-      jsmntype_t type;
-
-      char c = js[parser->pos];
-      switch (c)
-        {
-        case '&':
           count++;
-          if (tokens == NULL) break;
+          if (tokens == NULL) return JSMN_ERROR_NOMEM;
           token = jsmn_alloc_token(parser, tokens, num_tokens);
           if (token == NULL) return JSMN_ERROR_NOMEM;
           if (parser->toksuper != -1)
@@ -170,8 +166,60 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
             }
           token->type = JSMN_OBJECT;
           token->start = parser->pos;
+          printf("xstart %d\n", token->start);
+          parser->toksuper = parser->toknext - 1;
+    }
+
+  for (; parser->pos < len && js[parser->pos] != '\0'; parser->pos++)
+    {
+      jsmntype_t type;
+
+      char c = js[parser->pos];
+      switch (c)
+        {
+        case '&':
+          /*
+          parser->pos++;
+          r = jsmn_parse_primitive(parser, js, len, tokens, num_tokens);
+          if (r < 0) return r;
+          count++;
+          if (parser->toksuper != -1 && tokens != NULL)
+            tokens[parser->toksuper].size++;
+          */
+          /*
+          // parser->pos++;
+          if (tokens == NULL) break;
+          // count++;
+          if (parser->toksuper != -1 && tokens != NULL)
+            tokens[parser->toksuper].size++;
+          token = jsmn_alloc_token(parser, tokens, num_tokens);
+          if (token == NULL)
+            {
+              printf("return1\n");
+              //parser->pos = start;
+              return JSMN_ERROR_NOMEM;
+            }
+          jsmn_fill_token(token, JSMN_PRIMITIVE, parser->pos, parser->pos);
+          //parser->pos++;
+          */
+
+          count++;
+          if (tokens == NULL) break;
+          token = jsmn_alloc_token(parser, tokens, num_tokens);
+          if (token == NULL)
+            {
+              printf("return2\n");
+              return JSMN_ERROR_NOMEM;
+            }
+          if (parser->toksuper != -1)
+            {
+              tokens[parser->toksuper].size++;
+            }
+          token->type = JSMN_OBJECT;
+          token->start = parser->pos;
           printf("start %d\n", token->start);
           parser->toksuper = parser->toknext - 1;
+
           break;
         case '/':
           if (tokens == NULL) break;
@@ -258,6 +306,34 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
           return JSMN_ERROR_INVAL;
 #endif
         }
+    }
+
+  if ( parser->pos == len )
+    {
+          if (tokens == NULL) return JSMN_ERROR_NOMEM;
+          int type = JSMN_OBJECT;
+          for (i = parser->toknext - 1; i >= 0; i--)
+            {
+              token = &tokens[i];
+              if (token->start != -1 && token->end == -1)
+                {
+                  if (token->type != type) return JSMN_ERROR_INVAL;
+                  parser->toksuper = -1;
+                  token->end = parser->pos + 1;
+                  break;
+                }
+            }
+          printf("xend %d\n", token->end);
+          /* Error if unmatched closing bracket */
+          if (i == -1) return JSMN_ERROR_INVAL;
+          for (; i >= 0; i--)
+            {
+              token = &tokens[i];
+              if (token->start != -1 && token->end == -1) {
+                parser->toksuper = i;
+                break;
+              }
+            }
     }
 
   if (tokens != NULL)

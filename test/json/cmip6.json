@@ -111,7 +111,7 @@
             "ok_min_mean_abs": "", 
             "ok_max_mean_abs": ""
         },
-        "tasmax": {
+        "": {
             "modeling_realm": "atmos", 
             "standard_name": "air_temperature", 
             "units": "K", 
@@ -123,6 +123,7 @@
             "out_name": "tasmax", 
             "type": "real", 
             "positive": "", 
+            "valid_range": ["181.9", "341.9"],
             "valid_min": "181.9", 
             "valid_max": "341.9", 
             "ok_min_mean_abs": "264.9", 
