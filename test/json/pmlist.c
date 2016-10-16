@@ -337,11 +337,21 @@ int main(void)
   printf("kvlist of name=pressure:\n");
   kvlist_print(kvl);
 
+  printf("\n");
   int n = kvl->n;
   for ( int i = 0; i < n; ++i )
     {
       struct keyvalues *kv = kvlist_entry(kvl, i);
       if ( kv ) printf("  %d: key=%s  val0=%s\n", i+1, kv->key, kv->values[0]);
+    }
+
+  printf("\n");
+  int i = 0;
+  for ( struct kvlist_node *node = kvl->head; node; node=node->next )
+    {
+      struct keyvalues *kv = &(node->kv);
+      if ( kv ) printf("  %d: key=%s  val0=%s\n", i+1, kv->key, kv->values[0]);
+      ++i;
     }
   
   pmlist_delete(&pml);
