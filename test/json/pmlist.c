@@ -20,7 +20,7 @@ struct kvlist_node {
 struct kvlist {
   struct kvlist_node *head;
   char *name;
-  int n;
+  int length;
 };
 
 
@@ -92,7 +92,7 @@ void kvlist_append(struct kvlist *kvl, struct kvlist_node *node)
       struct kvlist_node **list = &(kvl->head);
       while ( *list ) list = &(*list)->next;
       *list = node;
-      kvl->n++;
+      kvl->length++;
     }
 }
 
@@ -132,7 +132,7 @@ void kvlist_print(struct kvlist *kvl)
 {
   if ( kvl )
     {
-      printf("  kvlist=%s n=%d:\n", kvl->name, kvl->n);
+      printf("  kvlist=%s n=%d:\n", kvl->name, kvl->length);
       struct kvlist_node *node = kvl->head;
       while ( node )
         {
@@ -148,7 +148,7 @@ struct kvlist *kvlist_new(const char *name)
   struct kvlist *kvl = (struct kvlist *) malloc(sizeof(struct kvlist));
   kvl->head = NULL;
   kvl->name = name ? strdup(name) : NULL;
-  kvl->n = 0;
+  kvl->length = 0;
   return kvl;
 };
 
@@ -162,7 +162,7 @@ struct param_node {
 struct pmlist{
   struct param_node *head;
   char *name;
-  int n;
+  int length;
 };
 
 
@@ -171,7 +171,7 @@ struct pmlist *pmlist_new(const char *name)
   struct pmlist *pml = (struct pmlist *) malloc(sizeof(struct pmlist));
   pml->head = NULL;
   pml->name = name ? strdup(name) : NULL;
-  pml->n = 0;
+  pml->length = 0;
   return pml;
 };
 
@@ -203,7 +203,7 @@ void pmlist_print(struct pmlist *pml)
 {
   if ( pml )
     {
-      printf("pmlist=%s n=%d:\n", pml->name, pml->n);
+      printf("pmlist=%s n=%d:\n", pml->name, pml->length);
       struct param_node *node = pml->head;
       while ( node )
         {
@@ -224,7 +224,7 @@ void pmlist_append(struct pmlist *pml, struct kvlist *kvl)
       node->next = NULL;
       node->kvl = kvl;
       *list = node;
-      pml->n++;
+      pml->length++;
     }
 }
 
@@ -338,7 +338,7 @@ int main(void)
   kvlist_print(kvl);
 
   printf("\n");
-  int n = kvl->n;
+  int n = kvl->length;
   for ( int i = 0; i < n; ++i )
     {
       struct keyvalues *kv = kvlist_entry(kvl, i);
