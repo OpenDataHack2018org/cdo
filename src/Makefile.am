@@ -104,6 +104,8 @@ libcdo_la_SOURCES =            \
                pipe.h          \
                pml.c           \
                pml.h           \
+               pmlist.c        \
+               pmlist.h        \
                pragma_omp_atomic_update.h \
                printinfo.h     \
                process.c       \

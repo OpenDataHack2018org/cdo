@@ -15,8 +15,8 @@
   GNU General Public License for more details.
 */
 
-#ifndef _PMLIST_H
-#define _PMLIST_H
+#ifndef _PML_H
+#define _PML_H
 
 #define  PML_INT         1
 #define  PML_FLT         2
