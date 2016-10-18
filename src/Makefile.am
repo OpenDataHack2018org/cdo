@@ -82,6 +82,8 @@ libcdo_la_SOURCES =            \
                kvlist.h        \
                listarray.c     \
                listarray.h     \
+               list.c          \
+               list.h          \
 	       merge_sort2.c   \
 	       merge_sort2.h   \
                modules.c       \

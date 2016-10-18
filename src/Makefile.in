@@ -123,8 +123,9 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
 	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
 	libcdo_la-grid_search.lo libcdo_la-kvlist.lo \
-	libcdo_la-listarray.lo libcdo_la-merge_sort2.lo \
-	libcdo_la-modules.lo libcdo_la-namelist.lo libcdo_la-normal.lo \
+	libcdo_la-listarray.lo libcdo_la-list.lo \
+	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
+	libcdo_la-namelist.lo libcdo_la-normal.lo \
 	libcdo_la-nth_element.lo libcdo_la-par_io.lo \
 	libcdo_la-percentiles_hist.lo libcdo_la-percentiles.lo \
 	libcdo_la-pipe.lo libcdo_la-pmlist.lo libcdo_la-process.lo \
@@ -511,27 +512,27 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	grid_rot.c gridreference.c griddes.c griddes.h griddes_h5.c \
 	griddes_nc.c hetaeta.c hetaeta.h institution.c interpol.c \
 	interpol.h job.c juldate.c grid_search.c grid_search.h \
-	kvlist.c kvlist.h listarray.c listarray.h merge_sort2.c \
-	merge_sort2.h modules.c modules.h namelist.c namelist.h \
-	normal.c nth_element.c nth_element.h operator_help.h par_io.c \
-	par_io.h percentiles_hist.c percentiles_hist.h percentiles.c \
-	percentiles.h pipe.c pipe.h pmlist.c pmlist.h \
-	pragma_omp_atomic_update.h printinfo.h process.c process.h \
-	pstream.c pstream.h pstream_write.h pstream_int.h \
-	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
-	remaplib.c remapsort.c remap_scrip_io.c remap_search_reg2d.c \
-	remap_search_latbins.c remap_store_link.c remap_store_link.h \
-	remap_store_link_cnsrv.c remap_store_link_cnsrv.h \
-	remap_conserv.c remap_conserv_scrip.c remap_distwgt.c \
-	remap_bicubic_scrip.c remap_bilinear_scrip.c stdnametable.c \
-	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
-	table.c text.c text.h timebase.h timer.c userlog.c uthash.h \
-	util.c util.h zaxis.c kdtreelib/kdtree.h \
-	kdtreelib/kdtree_cartesian.c kdtreelib/kdtree_common.c \
-	kdtreelib/kdtree_spherical.c kdtreelib/qsort.c \
-	kdtreelib/pmergesort.c kdtreelib/pqueue.c kdtreelib/pqueue.h \
-	clipping/clipping.c clipping/clipping.h clipping/area.c \
-	clipping/area.h clipping/ensure_array_size.c \
+	kvlist.c kvlist.h listarray.c listarray.h list.c list.h \
+	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
+	namelist.h normal.c nth_element.c nth_element.h \
+	operator_help.h par_io.c par_io.h percentiles_hist.c \
+	percentiles_hist.h percentiles.c percentiles.h pipe.c pipe.h \
+	pmlist.c pmlist.h pragma_omp_atomic_update.h printinfo.h \
+	process.c process.h pstream.c pstream.h pstream_write.h \
+	pstream_int.h pthread_debug.c pthread_debug.h readline.c \
+	realtime.c remap.h remaplib.c remapsort.c remap_scrip_io.c \
+	remap_search_reg2d.c remap_search_latbins.c remap_store_link.c \
+	remap_store_link.h remap_store_link_cnsrv.c \
+	remap_store_link_cnsrv.h remap_conserv.c remap_conserv_scrip.c \
+	remap_distwgt.c remap_bicubic_scrip.c remap_bilinear_scrip.c \
+	stdnametable.c stdnametable.h specspace.c specspace.h \
+	statistic.c statistic.h table.c text.c text.h timebase.h \
+	timer.c userlog.c uthash.h util.c util.h zaxis.c \
+	kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
+	kdtreelib/kdtree_common.c kdtreelib/kdtree_spherical.c \
+	kdtreelib/qsort.c kdtreelib/pmergesort.c kdtreelib/pqueue.c \
+	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
+	clipping/area.c clipping/area.h clipping/ensure_array_size.c \
 	clipping/ensure_array_size.h clipping/geometry.h \
 	clipping/grid.h clipping/points.h clipping/dep_list.h \
 	clipping/grid_cell.c clipping/grid_cell.h \
@@ -1022,6 +1023,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-job.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-juldate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-kvlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-listarray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-merge_sort2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-modules.Plo@am__quote@
@@ -1424,6 +1426,13 @@ libcdo_la-listarray.lo: listarray.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='listarray.c' object='libcdo_la-listarray.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-listarray.lo `test -f 'listarray.c' || echo '$(srcdir)/'`listarray.c
+
+libcdo_la-list.lo: list.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-list.lo -MD -MP -MF $(DEPDIR)/libcdo_la-list.Tpo -c -o libcdo_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-list.Tpo $(DEPDIR)/libcdo_la-list.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='list.c' object='libcdo_la-list.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
 
 libcdo_la-merge_sort2.lo: merge_sort2.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-merge_sort2.lo -MD -MP -MF $(DEPDIR)/libcdo_la-merge_sort2.Tpo -c -o libcdo_la-merge_sort2.lo `test -f 'merge_sort2.c' || echo '$(srcdir)/'`merge_sort2.c
