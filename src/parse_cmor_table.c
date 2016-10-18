@@ -1,6 +1,8 @@
 #include <errno.h>
 #include "cdo_int.h"
 #include "pmlist.h"
+#include "json/jsmn.h"
+
 
 static
 char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
@@ -41,7 +43,6 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
   return buffer;
 }
 
-
 static
 char *skipSeparator(char *pline)
 {
@@ -77,7 +78,8 @@ char *getElementValue(char *pline)
   return pline;
 }
 
-void pml_parse_buffer(list_t *pml, size_t buffersize, char *buffer)
+
+void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
 {
   char line[4096];
   char name[256];
@@ -95,10 +97,7 @@ void pml_parse_buffer(list_t *pml, size_t buffersize, char *buffer)
       while ( isspace((int) *pline) ) pline++;
       if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
       //  len = (int) strlen(pline);
-      if ( listtype == 0 && *pline == '&' )
-	{
-	  listtype = 1;
-	}
+      if ( listtype == 0 && *pline == '&' ) listtype = 1;
       
       if ( strncmp(pline, listkey1, strlen(listkey1)) == 0 )
 	{
@@ -141,15 +140,138 @@ void pml_parse_buffer(list_t *pml, size_t buffersize, char *buffer)
             }
 
 	  if ( *pline ) kvlist_append(kvl, name, (const char **)&pline, 1);
-
-	    {
-	      //fprintf(stderr, "%d skip line %3d: %s\n", newlist, linenumber, pline);
-	    }
 	}
-
-      //   printf("%s\n", pline);
     }
 }
+
+static
+int dump_json(const char *js, jsmntok_t *t, size_t count, int level)
+{
+  int i, j, k;
+  if (count == 0)  return 0;
+
+  if (t->type == JSMN_PRIMITIVE)
+    {
+      printf("%.*s", t->end - t->start, js+t->start);
+      return 1;
+    }
+  else if (t->type == JSMN_STRING)
+    {
+      printf("'%.*s'", t->end - t->start, js+t->start);
+      return 1;
+    }
+  else if (t->type == JSMN_OBJECT)
+    {
+      printf("\n");
+      //  printf("Object: size %d\n", t->size);
+      printf("Object: size %d count %d level %d\n", t->size, (int)count, level);
+      j = 0;
+      for (i = 0; i < t->size; i++)
+        {
+          for (k = 0; k < level; k++) printf("  ");
+          j += dump_json(js, t+1+j, count-j, level+1);
+          printf(": ");
+          j += dump_json(js, t+1+j, count-j, level+1);
+          printf("\n");
+        }
+      return j+1;
+    }
+  else if (t->type == JSMN_ARRAY)
+    {
+      j = 0;
+      printf("\n");
+      for (i = 0; i < t->size; i++)
+        {
+          for (k = 0; k < level-1; k++) printf("  ");
+          printf("   - ");
+          j += dump_json(js, t+1+j, count-j, level+1);
+          printf("\n");
+        }
+      return j+1;
+    }
+  return 0;
+}
+
+static
+int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, size_t count, int level)
+{
+  int i, j, k;
+  if (count == 0)  return 0;
+
+  if (t->type == JSMN_PRIMITIVE)
+    {
+      printf("%.*s", t->end - t->start, js+t->start);
+      return 1;
+    }
+  else if (t->type == JSMN_STRING)
+    {
+      printf("'%.*s'", t->end - t->start, js+t->start);
+      return 1;
+    }
+  else if (t->type == JSMN_OBJECT)
+    {
+      printf("\n");
+      //  printf("Object: size %d\n", t->size);
+      printf("Object: size %d count %d level %d\n", t->size, (int)count, level);
+      j = 0;
+      for (i = 0; i < t->size; i++)
+        {
+          for (k = 0; k < level; k++) printf("  ");
+          j += json_to_pml(pml, js, t+1+j, count-j, level+1);
+          printf(": ");
+          j += json_to_pml(pml, js, t+1+j, count-j, level+1);
+          printf("\n");
+        }
+      return j+1;
+    }
+  else if (t->type == JSMN_ARRAY)
+    {
+      j = 0;
+      printf("\n");
+      for (i = 0; i < t->size; i++)
+        {
+          for (k = 0; k < level-1; k++) printf("  ");
+          printf("   - ");
+          j += json_to_pml(pml, js, t+1+j, count-j, level+1);
+          printf("\n");
+        }
+      return j+1;
+    }
+  return 0;
+}
+
+
+void parse_json_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
+{
+  int r;
+  char *js = buffer;
+  size_t jslen = buffersize;
+        
+  jsmn_parser p;
+  jsmntok_t *tok;
+  size_t tokcount = 2;
+
+  /* Prepare parser */
+  jsmn_init(&p);
+
+  /* Allocate some tokens as a start */
+  tok = Malloc(sizeof(*tok) * tokcount);
+
+ again:
+  r = jsmn_parse(&p, js, jslen, tok, tokcount);
+  if ( r < 0 )
+    {
+      if ( r == JSMN_ERROR_NOMEM )
+        {
+          tokcount = tokcount * 2;
+          tok = Realloc(tok, sizeof(*tok) * tokcount);
+          goto again;
+        }
+    }
+
+  dump_json(js, tok, p.toknext, 0);
+}
+
 
 list_t *cdo_parse_cmor_file(const char *filename)
 {
@@ -177,12 +299,10 @@ list_t *cdo_parse_cmor_file(const char *filename)
  
   list_t *pml = list_new(sizeof(list_t *), free_kvlist, filename);
 
-  /*
   if ( buffer[0] == '{' )
-    kvlParseBufferJson(kvl);
+    parse_json_buffer_to_pml(pml, filesize, buffer);
   else
-  */
-  pml_parse_buffer(pml, filesize, buffer);
+    parse_buffer_to_pml(pml, filesize, buffer);
   
   return pml;
 }
