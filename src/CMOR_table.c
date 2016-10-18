@@ -324,7 +324,7 @@ int conv_cmor_table(const char *filename)
 }
 
 
-void *Kvl(void *argument)
+void *CMOR_table(void *argument)
 {
   cdoInitialize(argument);
 
@@ -338,7 +338,6 @@ void *Kvl(void *argument)
 
   if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
-  // if      ( operatorID == READ_CMOR_TABLE ) read_cmor_table(filename);
   if      ( operatorID == READ_CMOR_TABLE ) read_cmor_table(filename);
   else if ( operatorID == CONV_CMOR_TABLE ) conv_cmor_table(filename);
 

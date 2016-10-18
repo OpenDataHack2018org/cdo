@@ -54,6 +54,7 @@ void *Change(void *argument);
 void *Change_e5slm(void *argument);
 void *Cloudlayer(void *argument);
 void *CMOR(void *argument);
+void *CMOR_table(void *argument);
 void *Collgrid(void *argument);
 void *Command(void *argument);
 void *Comp(void *argument);
@@ -113,7 +114,6 @@ void *Intyear(void *argument);
 void *Invert(void *argument);
 void *Invertlev(void *argument);
 void *Isosurface(void *argument);
-void *Kvl(void *argument);
 void *Log(void *argument);
 void *MapReduce(void *argument);
 void *Maskbox(void *argument);
@@ -291,6 +291,7 @@ void *Maggraph(void *argument);
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}
 #define  CMOROperators          {"cmor"}
+#define  CMORtableOperators     {"read_cmor_table", "conv_cmor_table"}
 #define  CollgridOperators      {"collgrid"}
 #define  CommandOperators       {"command", "com", "cmd"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
@@ -353,7 +354,6 @@ void *Maggraph(void *argument);
 #define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", "invertlatdata", "invertlondata"}
 #define  InvertlevOperators     {"invertlev"}
 #define  IsosurfaceOperators    {"isosurface"}
-#define  KvlOperators           {"read_cmor_table", "conv_cmor_table"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
 #define  MapReduceOperators     {"reducegrid"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
@@ -579,6 +579,7 @@ static modules_t Modules[] =
   { Change_e5slm,   NULL,              Change_e5slmOperators,  0,   CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    1,   CDI_REAL,  1,  1 },
   { CMOR,           CMORHelp,          CMOROperators,          1,   CDI_REAL,  1,  0 },
+  { CMOR_table,     NULL,              CMORtableOperators,     1,   CDI_REAL,  0,  0 },
   { Collgrid,       CollgridHelp,      CollgridOperators,      1,   CDI_REAL, -1,  1 },
   { Command,        NULL,              CommandOperators,       0,   CDI_REAL,  1,  0 },
   { Comp,           CompHelp,          CompOperators,          1,   CDI_REAL,  2,  1 },
@@ -639,7 +640,6 @@ static modules_t Modules[] =
   { Invert,         InvertHelp,        InvertOperators,        1,   CDI_REAL,  1,  1 },
   { Invertlev,      InvertlevHelp,     InvertlevOperators,     1,   CDI_REAL,  1,  1 },
   { Isosurface,     NULL,              IsosurfaceOperators,    1,   CDI_REAL,  1,  1 },
-  { Kvl,            NULL,              KvlOperators,           1,   CDI_REAL,  0,  0 },
   { Log,            NULL,              LogOperators,           0,   CDI_REAL,  1,  0 },
   { MapReduce,      MapReduceHelp,     MapReduceOperators,     1,   CDI_REAL,  1,  1 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,       1,   CDI_REAL,  1,  1 },
