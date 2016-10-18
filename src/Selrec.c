@@ -34,7 +34,7 @@ void *Selrec(void *argument)
 {
   int nrecs;
   int varID, levelID;
-  LIST *ilist = listNew(INT_LIST);
+  lista_t *ilista = lista_new(INT_LISTA);
 
   cdoInitialize(argument);
 
@@ -42,9 +42,9 @@ void *Selrec(void *argument)
 
   operatorInputArg("records");
 
-  int nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
+  int nsel = args2int_lista(operatorArgc(), operatorArgv(), ilista);
 
-  int *intarr = (int *) listArrayPtr(ilist);
+  int *intarr = (int *) lista_dataptr(ilista);
 
   if ( cdoVerbose )
     {
@@ -101,7 +101,7 @@ void *Selrec(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  listDelete(ilist);
+  lista_destroy(ilista);
 
   cdoFinish();
 

@@ -83,7 +83,7 @@ void *Vertintap(void *argument)
   double *ps_prog = NULL, *full_press = NULL, *dpress = NULL;
   double *hyb_press = NULL;
   int Extrapolate = 0;
-  LIST *flist = listNew(FLT_LIST);
+  lista_t *flista = lista_new(FLT_LISTA);
 
   cdoInitialize(argument);
 
@@ -142,8 +142,8 @@ void *Vertintap(void *argument)
     }
   else
     {
-      nplev = args2fltlist(operatorArgc(), operatorArgv(), flist);
-      plev  = (double *) listArrayPtr(flist);
+      nplev = args2flt_lista(operatorArgc(), operatorArgv(), flista);
+      plev  = (double *) lista_dataptr(flista);
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
@@ -472,7 +472,7 @@ void *Vertintap(void *argument)
   if ( dpress     ) Free(dpress);
   if ( vct        ) Free(vct);
 
-  listDelete(flist);
+  lista_destroy(flista);
 
   cdoFinish();
 

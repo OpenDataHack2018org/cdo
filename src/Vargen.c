@@ -324,12 +324,12 @@ void *Vargen(void *argument)
   else if ( operatorID == STDATM )
     {
       double lon = 0, lat = 0;
-      LIST *flist = listNew(FLT_LIST);
+      lista_t *flista = lista_new(FLT_LISTA);
 
       operatorInputArg(cdoOperatorEnter(operatorID));
-      nlevels = args2fltlist(operatorArgc(), operatorArgv(), flist);
-      levels  = (double *) listArrayPtr(flist);
-      //listDelete(flist);
+      nlevels = args2flt_lista(operatorArgc(), operatorArgv(), flista);
+      levels  = (double *) lista_dataptr(flista);
+      //lista_destroy(flista);
 
       if ( cdoVerbose ) for ( int i = 0; i < nlevels; ++i ) printf("levels %d: %g\n", i, levels[i]);
 

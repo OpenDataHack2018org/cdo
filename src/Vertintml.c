@@ -78,7 +78,7 @@ void *Vertintml(void *argument)
   double minval, maxval;
   double *sgeopot = NULL;
   gribcode_t gribcodes = {0};
-  LIST *flist = listNew(FLT_LIST);
+  lista_t *flista = lista_new(FLT_LISTA);
 
   cdoInitialize(argument);
 
@@ -138,8 +138,8 @@ void *Vertintml(void *argument)
     }
   else
     {
-      nplev = args2fltlist(operatorArgc(), operatorArgv(), flist);
-      plev  = (double *) listArrayPtr(flist);
+      nplev = args2flt_lista(operatorArgc(), operatorArgv(), flista);
+      plev  = (double *) lista_dataptr(flista);
     }
   
   int streamID1 = streamOpenRead(cdoStreamName(0));
@@ -631,7 +631,7 @@ void *Vertintml(void *argument)
   if ( half_press ) Free(half_press);
   if ( vct        ) Free(vct);
 
-  listDelete(flist);
+  lista_destroy(flista);
 
   cdoFinish();
 

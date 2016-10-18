@@ -59,8 +59,8 @@ void *Selvar(void *argument)
   char **argnames = NULL;
   int nmiss;
   int gridnum = 0;
-  LIST *ilist = listNew(INT_LIST);
-  LIST *flist = listNew(FLT_LIST);
+  lista_t *ilista = lista_new(INT_LISTA);
+  lista_t *flista = lista_new(FLT_LISTA);
 
   cdoInitialize(argument);
 
@@ -105,8 +105,8 @@ void *Selvar(void *argument)
     }
   else if ( TAKES_FLOATS(operatorID) )
     {
-      nsel = args2fltlist(operatorArgc(), operatorArgv(), flist);
-      fltarr = (double *) listArrayPtr(flist);
+      nsel = args2flt_lista(operatorArgc(), operatorArgv(), flista);
+      fltarr = (double *) lista_dataptr(flista);
 
       if ( cdoVerbose )
 	for ( int i = 0; i < nsel; i++ )
@@ -114,8 +114,8 @@ void *Selvar(void *argument)
     }
   else
     {
-      nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
-      intarr = (int *) listArrayPtr(ilist);
+      nsel = args2int_lista(operatorArgc(), operatorArgv(), ilista);
+      intarr = (int *) lista_dataptr(ilista);
 
       if ( cdoVerbose )
 	for ( int i = 0; i < nsel; i++ )
@@ -416,8 +416,8 @@ void *Selvar(void *argument)
 
   if ( selfound ) Free(selfound);
 
-  listDelete(ilist);
-  listDelete(flist);
+  lista_destroy(ilista);
+  lista_destroy(flista);
 
   cdoFinish();
 

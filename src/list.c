@@ -27,89 +27,89 @@
 #define  DEFAULT_ALLINC  1024
 
 
-static void listInit(LIST *list, int type)
+static void listaInit(lista_t *lista, int type)
 {
-  list->array  = NULL;
-  list->nalloc = 0;
-  list->allinc = DEFAULT_ALLINC;
-  list->type   = type;
+  lista->array  = NULL;
+  lista->nalloc = 0;
+  lista->allinc = DEFAULT_ALLINC;
+  lista->type   = type;
 }
 
 
-LIST *listNew(int type)
+lista_t *lista_new(int type)
 {
-  LIST *list = NULL;
+  lista_t *lista = NULL;
 
-  if ( type != INT_LIST && type != FLT_LIST )
+  if ( type != INT_LISTA && type != FLT_LISTA )
     {
       fprintf(stderr, "%s: type %d unsupported!\n", __func__, type);
     }
   else
     {
-      list = (LIST*) Malloc(sizeof(LIST));
-      listInit(list, type);
+      lista = (lista_t*) Malloc(sizeof(lista_t));
+      listaInit(lista, type);
     }
 
-  return list;
+  return lista;
 }
 
 
-void listDelete(LIST *list)
+void lista_destroy(lista_t *lista)
 {
-  if ( list )
+  if ( lista )
     {
-      if ( list->array ) Free(list->array);
-      Free(list);
+      if ( lista->array ) Free(lista->array);
+      Free(lista);
     }
 }
 
 
-void *listArrayPtr(LIST *list)
+void *lista_dataptr(lista_t *lista)
 {
-  return list->array;
+  return lista->array;
 }
 
 
-static void listCheck(LIST *list, int num)
+static void listaCheck(lista_t *lista, int num)
 {
-  while ( list->nalloc < (num+1) )
+  while ( lista->nalloc < (num+1) )
     {
-      list->nalloc += list->allinc;
-      if ( list->type == INT_LIST )
-	list->array = (int*) Realloc(list->array, list->nalloc*sizeof(int));
+      lista->nalloc += lista->allinc;
+      if ( lista->type == INT_LISTA )
+	lista->array = (int*) Realloc(lista->array, lista->nalloc*sizeof(int));
       else
-	list->array = (double*) Realloc(list->array, list->nalloc*sizeof(double));
+	lista->array = (double*) Realloc(lista->array, lista->nalloc*sizeof(double));
     }
 }
 
 
-void listSetInt(LIST *list, int num, int ival)
+void lista_set_int(lista_t *lista, int num, int ival)
 {
-  listCheck(list, num);
+  listaCheck(lista, num);
 
-  ((int *) list->array)[num] = ival;
+  ((int *) lista->array)[num] = ival;
 }
 
 
-void listSetFlt(LIST *list, int num, double fval)
+void lista_set_flt(lista_t *lista, int num, double fval)
 {
-  listCheck(list, num);
+  listaCheck(lista, num);
 
-  ((double *) list->array)[num] = fval;
+  ((double *) lista->array)[num] = fval;
 }
 
 
-int listGetInt(LIST *list, int num)
+int listaGetInt(lista_t *lista, int num)
 {
-  int ival = ((int *) list->array)[num];
+  int ival = ((int *) lista->array)[num];
 
   return ival;
 }
 
 
-double listGetFlt(LIST *list, int num)
+double listaGetFlt(lista_t *lista, int num)
 {
-  double fval = ((double *) list->array)[num];
+  double fval = ((double *) lista->array)[num];
 
   return fval;
 }
@@ -157,7 +157,7 @@ void split_intstring(const char *intstr, int *first, int *last, int *inc)
 }
 
 
-int args2intlist(int argc, char **argv, LIST *list)
+int args2int_lista(int argc, char **argv, lista_t *lista)
 {
   int nint = 0;
   int ival;
@@ -171,12 +171,12 @@ int args2intlist(int argc, char **argv, LIST *list)
       if ( inc >= 0 )
 	{
 	  for ( ival = first; ival <= last; ival += inc )
-	    listSetInt(list, nint++, ival);
+	    lista_set_int(lista, nint++, ival);
 	}
       else
 	{
 	  for ( ival = first; ival >= last; ival += inc )
-	    listSetInt(list, nint++, ival);
+	    lista_set_int(lista, nint++, ival);
 	}
     }
 
@@ -184,7 +184,7 @@ int args2intlist(int argc, char **argv, LIST *list)
 }
 
 
-int args2fltlist(int argc, char **argv, LIST *list)
+int args2flt_lista(int argc, char **argv, lista_t *lista)
 {
   int i, nint = 0;
   int ival;
@@ -210,7 +210,7 @@ int args2fltlist(int argc, char **argv, LIST *list)
 	  */                                    
 	    tmp_val = parameter2double(argv[iarg]);
 
-	  listSetFlt(list, nint++, tmp_val);
+	  lista_set_flt(lista, nint++, tmp_val);
 	}
       else
 	{
@@ -219,12 +219,12 @@ int args2fltlist(int argc, char **argv, LIST *list)
 	  if ( inc >= 0 )
 	    {
 	      for ( ival = first; ival <= last; ival += inc )
-		listSetFlt(list, nint++, (double) ival);
+		lista_set_flt(lista, nint++, (double) ival);
 	    }
 	  else
 	    {
 	      for ( ival = first; ival >= last; ival += inc )
-		listSetFlt(list, nint++, (double) ival);
+		lista_set_flt(lista, nint++, (double) ival);
 	    }
 	}
     }

@@ -36,7 +36,7 @@ void *Replacevalues(void *argument)
   int varID, levelID;
   int nmiss;
   int nvals = 0;
-  LIST *flist = listNew(FLT_LIST);
+  lista_t *flista = lista_new(FLT_LISTA);
   double *fltarr = NULL;
   double rmin = 0, rmax = 0;
   double newval = 0, newval2 = 0;
@@ -53,10 +53,10 @@ void *Replacevalues(void *argument)
 
   if ( operatorID == SETVALS )
     {
-      nvals = args2fltlist(operatorArgc(), operatorArgv(), flist);
+      nvals = args2flt_lista(operatorArgc(), operatorArgv(), flista);
       if ( nvals < 2 ) cdoAbort("Too few arguments!");
       if ( nvals % 2 != 0 )  cdoAbort("Need pairs of arguments!");
-      fltarr = (double *) listArrayPtr(flist);
+      fltarr = (double *) lista_dataptr(flista);
       nvals = nvals / 2;
     }
   else if ( operatorID == SETRTOC )
@@ -155,7 +155,7 @@ void *Replacevalues(void *argument)
 
   if ( array ) Free(array);
 
-  listDelete(flist);
+  lista_destroy(flista);
 
   cdoFinish();
 

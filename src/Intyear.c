@@ -43,10 +43,10 @@ void *Intyear(void *argument)
 
   operatorInputArg("years");
 
-  LIST *ilist = listNew(INT_LIST);
-  int nyears = args2intlist(operatorArgc(), operatorArgv(), ilist);
+  lista_t *ilist = lista_new(INT_LISTA);
+  int nyears = args2int_lista(operatorArgc(), operatorArgv(), ilist);
 
-  int *iyears = (int *) listArrayPtr(ilist);
+  int *iyears = (int *) lista_dataptr(ilist);
 
   int *streamIDs = (int*) Malloc(nyears*sizeof(int));
 
@@ -183,7 +183,7 @@ void *Intyear(void *argument)
 
   Free(streamIDs);
 
-  listDelete(ilist);
+  lista_destroy(ilist);
 
   cdoFinish();
 

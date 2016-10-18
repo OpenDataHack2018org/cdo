@@ -64,7 +64,7 @@ void season_to_months(const char *season, int *imonths)
 }
 
 static
-int seaslist(LIST *ilist)
+int seaslist(lista_t *ilista)
 {
   int imon[13]; /* 1-12 ! */
   for ( int i = 0; i < 13; ++i ) imon[i] = 0;
@@ -89,7 +89,7 @@ int seaslist(LIST *ilist)
     }
 
   nsel = 0;
-  for ( int i = 1; i < 13; ++i ) if ( imon[i] ) listSetInt(ilist, nsel++, i);
+  for ( int i = 1; i < 13; ++i ) if ( imon[i] ) lista_set_int(ilista, nsel++, i);
 
   return nsel;
 }
@@ -125,7 +125,7 @@ double datestr_to_double(const char *datestr, int opt)
 }
 
 static
-int datelist(LIST *flist)
+int datelist(lista_t *flista)
 {
   bool set2 = true;
   double fval = 0;
@@ -143,7 +143,7 @@ int datelist(LIST *flist)
 	  else
 	    fval =  99999999999.;
 
-	  listSetFlt(flist, i,  fval);
+	  lista_set_flt(flista, i,  fval);
 	}
       else
 	{
@@ -154,13 +154,13 @@ int datelist(LIST *flist)
 	    fval += 0.999;
 	}
 
-      listSetFlt(flist, i, fval);
+      lista_set_flt(flista, i, fval);
     }
 
   if ( nsel == 1 && set2 )
     {
       fval += 0.999;
-      listSetFlt(flist, nsel, fval);
+      lista_set_flt(flista, nsel, fval);
       nsel = 2;
     }
 
@@ -182,8 +182,8 @@ void *Seltime(void *argument)
   int its1 = 0, its2 = 0;
   double selfval = 0;
   double *array = NULL;
-  LIST *ilist = listNew(INT_LIST);
-  LIST *flist = listNew(FLT_LIST);
+  lista_t *ilista = lista_new(INT_LISTA);
+  lista_t *flista = lista_new(FLT_LISTA);
   bool copy_nts2 = false;
   bool lconstout = false;
   bool process_nts1 = false, process_nts2 = false;
@@ -214,11 +214,11 @@ void *Seltime(void *argument)
 
   if ( operatorID == SELSEASON )
     {
-      nsel = seaslist(ilist);
+      nsel = seaslist(ilista);
     }
   else if ( operatorID == SELDATE )
     {
-      nsel = datelist(flist);
+      nsel = datelist(flista);
     }
   else if ( operatorID == SELTIME )
     {
@@ -229,23 +229,23 @@ void *Seltime(void *argument)
 	  if ( strchr(operatorArgv()[i], ':') )
 	    {
 	      sscanf(operatorArgv()[i], "%d:%d:%d", &hour, &minute, &second);
-	      listSetInt(ilist, i, cdiEncodeTime(hour, minute, second));
+	      lista_set_int(ilista, i, cdiEncodeTime(hour, minute, second));
 	    }
 	  else
 	    {
-	      listSetInt(ilist, i, parameter2int(operatorArgv()[i]));
+	      lista_set_int(ilista, i, parameter2int(operatorArgv()[i]));
 	    }
 	}
     }
   else
     {
-      nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
+      nsel = args2int_lista(operatorArgc(), operatorArgv(), ilista);
     }
 
   if ( nsel < 1 ) cdoAbort("No timestep selected!");
 
-  int *intarr = (int *) listArrayPtr(ilist);
-  double *fltarr = (double *) listArrayPtr(flist);
+  int *intarr = (int *) lista_dataptr(ilista);
+  double *fltarr = (double *) lista_dataptr(flista);
 
   if ( operatorID == SELSMON )
     {
@@ -648,7 +648,8 @@ void *Seltime(void *argument)
 
   if ( selfound ) Free(selfound);
 
-  listDelete(ilist);
+  lista_destroy(ilista);
+  lista_destroy(flista);
 
   if ( lnts1 || nconst )
     {

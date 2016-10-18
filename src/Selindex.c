@@ -73,7 +73,7 @@ void *Selindex(void *argument)
   typedef struct {
     int gridID1, gridID2;
   } sindex_t;
-  LIST *ilist = listNew(INT_LIST);
+  lista_t *ilista = lista_new(INT_LISTA);
 
   cdoInitialize(argument);
 
@@ -81,8 +81,8 @@ void *Selindex(void *argument)
 
   operatorInputArg(cdoOperatorEnter(0));
 
-  int nind = args2intlist(operatorArgc(), operatorArgv(), ilist);
-  int *indarr = (int*) listArrayPtr(ilist);
+  int nind = args2int_lista(operatorArgc(), operatorArgv(), ilista);
+  int *indarr = (int*) lista_dataptr(ilista);
 
   int indmin = indarr[0];
   int indmax = indarr[0];
@@ -221,7 +221,7 @@ void *Selindex(void *argument)
   if ( array1 ) Free(array1);
   if ( sindex ) Free(sindex);
 
-  listDelete(ilist);
+  lista_destroy(ilista);
 
   cdoFinish();
 

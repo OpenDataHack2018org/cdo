@@ -15,11 +15,11 @@
   GNU General Public License for more details.
 */
 
-#ifndef _LIST_H
-#define _LIST_H
+#ifndef _LISTA_H
+#define _LISTA_H
 
-#define  INT_LIST  1
-#define  FLT_LIST  2
+#define  INT_LISTA  1
+#define  FLT_LISTA  2
 
 
 typedef struct {
@@ -28,17 +28,17 @@ typedef struct {
   int allinc;
   int type;
 }
-LIST;
+lista_t;
 
 
-LIST *listNew(int type);
-void listDelete(LIST *list);
-void *listArrayPtr(LIST *list);
-void listSetInt(LIST *list, int num, int ival);
-void listSetFlt(LIST *list, int num, double fval);
-int listGetInt(LIST *list, int num);
-double listGetFlt(LIST *list, int num);
-int args2intlist(int argc, char **argv, LIST *list);
-int args2fltlist(int argc, char **argv, LIST *list);
+lista_t *lista_new(int type);
+void lista_destroy(lista_t *lista);
+void *lista_dataptr(lista_t *lista);
+void lista_set_int(lista_t *lista, int num, int ival);
+void lista_set_flt(lista_t *lista, int num, double fval);
+int listaGetInt(lista_t *lista, int num);
+double listaGetFlt(lista_t *lista, int num);
+int args2int_lista(int argc, char **argv, lista_t *lista);
+int args2flt_lista(int argc, char **argv, lista_t *lista);
 
-#endif  /* _LIST_H */
+#endif  /* _LISTA_H */

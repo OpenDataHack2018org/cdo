@@ -181,9 +181,9 @@ void *Intlevel(void *argument)
 
   operatorInputArg("levels");
 
-  LIST *flist = listNew(FLT_LIST);
-  int nlev2 = args2fltlist(operatorArgc(), operatorArgv(), flist);
-  double *lev2  = (double *) listArrayPtr(flist);
+  lista_t *flista = lista_new(FLT_LISTA);
+  int nlev2 = args2flt_lista(operatorArgc(), operatorArgv(), flista);
+  double *lev2  = (double *) lista_dataptr(flista);
 
   if ( cdoVerbose ) for ( i = 0; i < nlev2; ++i ) printf("lev2 %d: %g\n", i, lev2[i]);
 
@@ -407,7 +407,7 @@ void *Intlevel(void *argument)
 
   Free(lev1);
 
-  listDelete(flist);
+  lista_destroy(flista);
 
   cdoFinish();
 

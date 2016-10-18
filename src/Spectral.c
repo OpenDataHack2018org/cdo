@@ -51,7 +51,7 @@ void *Spectral(void *argument)
   double *array2 = NULL;
   int nlon, nlat, ntr;
   SPTRANS *sptrans = NULL;
-  LIST *ilist = listNew(INT_LIST);
+  lista_t *ilista = lista_new(INT_LISTA);
 
   cdoInitialize(argument);
 
@@ -201,8 +201,8 @@ void *Spectral(void *argument)
       if ( gridID1 != -1 )
 	{
 	  maxntr = 1+gridInqTrunc(gridID1);
-	  ncut = args2intlist(operatorArgc(), operatorArgv(), ilist);
-	  wnums = (int *) listArrayPtr(ilist);
+	  ncut = args2int_lista(operatorArgc(), operatorArgv(), ilista);
+	  wnums = (int *) lista_dataptr(ilista);
 	  waves = (int*) Malloc(maxntr*sizeof(int));
 	  for ( i = 0; i < maxntr; i++ ) waves[i] = 1;
 	  for ( i = 0; i < ncut; i++ )
@@ -299,7 +299,7 @@ void *Spectral(void *argument)
   if ( vars )   Free(vars);
   if ( waves )  Free(waves);
 
-  listDelete(ilist);
+  lista_destroy(ilista);
 
   sptrans_delete(sptrans);
 
