@@ -28,7 +28,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "after_vertint.h"
-#include "list.h"
+#include "listarray.h"
 #include "stdnametable.h"
 
 

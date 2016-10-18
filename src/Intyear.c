@@ -28,7 +28,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "interpol.h"
-#include "list.h"
+#include "listarray.h"
 
 
 void *Intyear(void *argument)

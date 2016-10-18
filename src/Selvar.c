@@ -41,7 +41,7 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-#include "list.h"
+#include "listarray.h"
 
 
 void *Selvar(void *argument)

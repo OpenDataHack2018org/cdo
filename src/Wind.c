@@ -29,7 +29,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "specspace.h"
-#include "list.h"
+#include "listarray.h"
 
 
 void *Wind(void *argument)

@@ -25,7 +25,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
-#include "list.h"
+#include "listarray.h"
 #include "pstream.h"
 
 

@@ -37,7 +37,7 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-#include "list.h"
+#include "listarray.h"
 
 
 void season_to_months(const char *season, int *imonths)

@@ -28,7 +28,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "list.h"
+#include "listarray.h"
 
 
 static

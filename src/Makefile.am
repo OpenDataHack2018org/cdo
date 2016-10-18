@@ -80,8 +80,8 @@ libcdo_la_SOURCES =            \
                grid_search.h   \
                kvlist.c        \
                kvlist.h        \
-               list.c          \
-               list.h          \
+               listarray.c     \
+               listarray.h     \
 	       merge_sort2.c   \
 	       merge_sort2.h   \
                modules.c       \
