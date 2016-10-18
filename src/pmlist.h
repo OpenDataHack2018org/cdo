@@ -18,6 +18,6 @@ bool pml_print_iter(void *data);
 void free_keyval(void *data);
 void free_kvlist(void *data);
 
-void kvlist_append(list_t *kvl, const char *key, const char *values[], int nvalues);
+void kvlist_append(list_t *kvl, const char *key, const char **values, int nvalues);
 
 #endif

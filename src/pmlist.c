@@ -75,13 +75,13 @@ void free_keyval(void *data)
 void free_kvlist(void *data)
 {
   list_t *kvl = *(list_t **)data;
-  int n = list_size(kvl);
+  //int n = list_size(kvl);
   list_destroy(kvl);
-  printf("Successfully freed %d keyvalues...\n", n);
+  //printf("Successfully freed %d keyvalues...\n", n);
 }
 
 
-void kvlist_append(list_t *kvl, const char *key, const char *values[], int nvalues)
+void kvlist_append(list_t *kvl, const char *key, const char **values, int nvalues)
 {
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
@@ -164,7 +164,7 @@ int main(void)
 
   printf("\n");
   int i = 0;
-  for ( listNode_t *node = kvl->head; node; node=node->next )
+  for ( listNode_t *node = kvl->head; node; node = node->next )
     {
       keyValues_t *kv = *(keyValues_t **)node->data;
       if ( kv ) printf("  %d: key=%s  val0=%s\n", i+1, kv->key, kv->values[0]);
