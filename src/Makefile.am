@@ -94,6 +94,7 @@ libcdo_la_SOURCES =            \
                operator_help.h \
                par_io.c        \
                par_io.h        \
+               parse_cmor_table.c   \
                percentiles_hist.c   \
                percentiles_hist.h   \
                percentiles.c   \

@@ -32,6 +32,7 @@
 #include <ctype.h>
 #include <stdarg.h>
 
+#include "list.h"
 #include "compare.h"
 #include "timebase.h"
 #include "field.h"
@@ -168,6 +169,7 @@ void cdo_read_field(const char *name, char *pline, int size, double *field, int 
 double cdoZaxisInqLevel(int zaxisID, int levelID);
 int cdoZaxisInqLevels(int zaxisID, double *levels);
 
+list_t *cdo_parse_cmor_file(const char *filename);
 
 #ifdef __cplusplus
 extern "C" {
