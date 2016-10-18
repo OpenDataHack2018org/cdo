@@ -102,8 +102,8 @@ libcdo_la_SOURCES =            \
                percentiles.h   \
                pipe.c          \
                pipe.h          \
-               pmlist.c        \
-               pmlist.h        \
+               pml.c           \
+               pml.h           \
                pragma_omp_atomic_update.h \
                printinfo.h     \
                process.c       \

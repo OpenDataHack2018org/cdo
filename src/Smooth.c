@@ -28,7 +28,7 @@
 #include "pstream.h"
 #include "grid.h"
 #include "constants.h" // planet radius
-#include "pmlist.h"
+#include "pml.h"
 
 #include "grid_search.h"
 

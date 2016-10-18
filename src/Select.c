@@ -27,7 +27,7 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-#include "pmlist.h"
+#include "pml.h"
 
 double datestr_to_double(const char *datestr, int opt);
 

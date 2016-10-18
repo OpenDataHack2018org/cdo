@@ -1,5 +1,5 @@
 #include "cdo_int.h"
-#include "pmlist.h"
+#include "pml.h"
 
 static
 void pml_init(pml_t *pml, const char *name)
