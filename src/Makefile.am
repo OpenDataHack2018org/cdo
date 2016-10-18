@@ -148,6 +148,9 @@ libcdo_la_SOURCES =            \
                util.h          \
                zaxis.c
 libcdo_la_SOURCES +=           \
+               json/jsmn.h     \
+               json/jsmn.c
+libcdo_la_SOURCES +=           \
                kdtreelib/kdtree.h            \
                kdtreelib/kdtree_cartesian.c  \
                kdtreelib/kdtree_common.c     \
