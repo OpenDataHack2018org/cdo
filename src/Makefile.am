@@ -78,8 +78,6 @@ libcdo_la_SOURCES =            \
                juldate.c       \
                grid_search.c   \
                grid_search.h   \
-               kvlist.c        \
-               kvlist.h        \
                listarray.c     \
                listarray.h     \
                list.c          \
