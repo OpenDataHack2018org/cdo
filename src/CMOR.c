@@ -8,16 +8,9 @@
 #include <unistd.h>
 #include "uthash.h"
 #include "cmor.h"
+#include "netcdf.h"
 
 #define CMOR_UNDEFID (CMOR_MAX_AXES + 1)
-
-struct mapping
-{
-  int cdi_varID;
-  int cmor_varID;
-  char datatype;
-  void *data;
-};
 
 struct kv
 {
@@ -25,6 +18,46 @@ struct kv
   char *value;
   UT_hash_handle hh;
 };
+
+struct mapping
+{
+  int help_var;
+  int cdi_varID;
+  int cmor_varID;
+  char datatype;
+  void *data;
+};
+
+static struct mapping *map_var(int cdi_varID, struct mapping vars[])
+{
+  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+    if ( cdi_varID == vars[i].cdi_varID )
+      return &vars[i];
+  return NULL;
+}
+
+static struct mapping *new_var_mapping(struct mapping vars[])
+{
+  int i;
+  for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
+  vars[i + 1].cdi_varID = CDI_UNDEFID;
+  return &vars[i];
+}
+
+static int *new_axis_id(int *axis_ids)
+{
+  int i;
+  for ( i = 0; axis_ids[i] != CMOR_UNDEFID; i++ );
+  axis_ids[i + 1] = CMOR_UNDEFID;
+  return &axis_ids[i];
+}
+
+static int count_axis_ids(int *axis_ids)
+{
+  int i;
+  for ( i = 0; axis_ids[i] != CMOR_UNDEFID; i++ );
+  return i;
+}
 
 static char *trim(char *s)
 {
@@ -73,28 +106,50 @@ static void parse_kv(struct kv **ht, char *kvstr)
 {
   char *key = trim(strtok(kvstr, "="));
   char *value = trim(strtok(NULL, "="));
-  if ( key && value )
-    hinsert(ht, key, value);
+  char *keylower = trim(strtok(kvstr, "="));
+
+  if ( key )
+    {
+      int i = 0;
+      while( key[i] ) 
+       {
+         keylower[i]=tolower(key[i]);
+         i++;
+       }
+      if ( value )
+        hinsert(ht, keylower, value);
+    }
 }
 
+static int file_exist(const char *tfilename, int force)
+{
+  FILE *tfp = fopen(tfilename, "r");
+  if ( tfp == NULL && force )
+      cdoAbort("cannot open '%s'", tfilename);
+  if ( tfp == NULL && !force )
+    {
+      cdoWarning("cannot open '%s'", tfilename);
+      return 0;
+    }
+  fclose(tfp);
+  return 1;
+}
+  
 static int parse_kv_file(struct kv **ht, const char *filename, int verbose)
 {
-  FILE *fp = fopen(filename, "r");
-  if ( fp == NULL )
+  if ( file_exist(filename, 0) )
     {
-      if ( verbose )
-        cdoWarning("cannot open '%s'", filename);
-      return 1;
-    }
+      FILE *fp = fopen(filename, "r");
 
-  char line[CMOR_MAX_STRING];
-  while ( fgets(line, sizeof(line), fp) != NULL )
-    {
-      char *comment = strchr(line, '#');
-      if ( comment ) *comment = '\0';
-      parse_kv(ht, line);
+      char line[CMOR_MAX_STRING];
+      while ( fgets(line, sizeof(line), fp) != NULL )
+        {
+          char *comment = strchr(line, '#');
+          if ( comment ) *comment = '\0';
+          parse_kv(ht, line);
+        }
+      fclose(fp);
     }
-  fclose(fp);
   return 0;
 }
 
