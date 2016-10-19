@@ -770,19 +770,34 @@ static void get_zcell_bounds(int zaxisID, double *zcell_bounds, double *levels, 
   Free(ubounds);
 }
 
-static void register_projected_grid(int gridID, int *axis_ids)
+static void get_zhybrid(int zaxisID, char *varname, double *p0, double *alev_val, double *alev_bnds, double *b_val, double *b_bnds, double *ap_val, double *ap_bnds)
 {
-  char name[CDI_MAX_NAME];
-  int projID = gridInqProj(gridID);
-  int proj_axis_ids[3];
-  proj_axis_ids[0] = CMOR_UNDEFID;
-  gridInqYstdname(projID, name);
-  register_y_axis(projID, name, proj_axis_ids);
-  gridInqXstdname(projID, name);
-  register_x_axis(projID, name, proj_axis_ids);
-  int *cmor_grid_id = new_axis_id(axis_ids);
-  register_cmor_grid(gridID, proj_axis_ids, cmor_grid_id);
-  register_cmor_grid_mapping(projID, *cmor_grid_id);
+  int zsize = zaxisInqSize(zaxisID);
+
+  int vctsize = zaxisInqVctSize(zaxisID);
+  double *vct = Malloc(vctsize * sizeof(double) );
+  zaxisInqVct(zaxisID, vct);
+  if ( strcmp(varname, "ps") != 0 )
+    {
+      for ( int i = 0; i<(zsize+1); i++)
+        {
+          ap_bnds[i] = vct[i];
+          b_bnds[i] = vct[zsize+1+i];
+        }
+      for ( int i = 0; i<zsize; i++)
+        {
+          ap_val[i] = (ap_bnds[i]+ ap_bnds[i+1]) / 2.0;
+          b_val[i] = (b_bnds[i]+ b_bnds[i+1]) / 2.0;
+          alev_val[i] = ap_val[i]/p0[0] + b_val[i];
+          alev_bnds[i] = ap_bnds[i]/p0[0] + b_bnds[i];
+        }
+      alev_bnds[zsize] = ap_bnds[zsize]/p0[0] + b_bnds[zsize];
+    }
+  else
+    {
+      cdoAbort("Surface Pressure in hybrid z coordinate not yet enabled!");
+    }
+  Free(vct);
 }
 
 static void register_xy_and_grid(int gridID, int table_id, int grid_table_id,
