@@ -1499,19 +1499,94 @@ static void write_variables(struct kv **ht, int streamID, struct mapping vars[],
   int taxisID = vlistInqTaxis(vlistID);
   int tsID = 0;
   int nrecs;
+  int invert_lat = 0;
+  if ( get_val(ht, "invert_lat", NULL) )
+    invert_lat = 1;
+  size_t gridsize = vlistGridsizeMax(vlistID);
+  double *buffer = (double *) Malloc(gridsize * sizeof(double));
+
+  int sdate, stime, time_unit, calendar;
+  get_taxis(get_val(ht, "req_time_units", ""), get_val(ht, "calendar", ""), &sdate, &stime, &time_unit, &calendar);
+  int tunitsec = get_tunitsec(time_unit);
+  juldate_t ref_date = juldate_encode(calendar, sdate, stime);
+/*  char *frequency = get_frequency(streamID, vlistID, taxisID); */
+  char frequency[4];
+  strcpy(frequency, "mon\0");
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
-      while ( nrecs-- )
-        read_record(streamID, buffer, gridsize, vars);
-
-      double time_val = get_cmor_time_val(taxisID, ref_date);
       double time_bnds[2];
+      double *time_bndsp;
+      double time_val;
+      if ( strcmp(get_val(ht, "time_axis", NULL), "none") != 0 )
+        {
+          time_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar);
+          time_bndsp = get_time_bounds(taxisID, frequency, ref_date, time_val, calendar, tunitsec, time_bnds);
+        }
+      while ( nrecs-- )
+        read_record(streamID, buffer, gridsize, vars, invert_lat, vlistID);
+      int ps_index = -1;
+      check_for_sfc_pressure(&ps_index, vars, vlistID, tsID);
       for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
-        cmor_write(vars[i].cmor_varID, vars[i].data, vars[i].datatype,
-                   1, &time_val,
-                   get_cmor_time_bounds(taxisID, ref_date, time_bnds), NULL);
+        {
+          if ( !vars[i].help_var )
+            {
+              char *file_suffix = get_val(ht, "file_suffix", NULL);
+              if ( strcmp (get_val(ht, "oflag", ""), "append") != 0 )
+                file_suffix = NULL;
+              if ( strcmp(get_val(ht, "time_axis", ""), "none") != 0 )
+                {
+                  cmor_write(vars[i].cmor_varID,
+                   vars[i].data,
+                   vars[i].datatype,
+                   file_suffix,
+                   1,
+                   &time_val,
+                   time_bndsp,
+                   NULL); 
+                  if ( zaxisInqType(vlistInqVarZaxis(vlistID, vars[i].cdi_varID)) == ZAXIS_HYBRID )
+                    cmor_write(*zfactor_id,
+                       vars[ps_index].data,
+                       vars[ps_index].datatype,
+                       file_suffix,
+                       1,
+                       &time_val,
+                       time_bndsp,
+                       &vars[i].cmor_varID); 
+                }
+              else
+                cmor_write(vars[i].cmor_varID,
+                   vars[i].data,
+                   vars[i].datatype,
+                   file_suffix, 0, 0, 0, NULL);
+            }
+        }
+    }
+  char file_name[CMOR_MAX_STRING];
+  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+    {
+      if ( !vars[i].help_var )
+        {
+          cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
+          printf("*******Successfully written file: '%s' with cmor!*******\n", file_name);
+        }
     }
   Free(buffer);
+}
+
+static struct mapping *construct_var_mapping(int streamID)
+{
+  int nvars_max = vlistNvars(streamInqVlist(streamID));
+  struct mapping *vars =
+    (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
+  vars[0].cdi_varID = CDI_UNDEFID;
+  return vars;
+}
+
+static void destruct_var_mapping(struct mapping vars[])
+{
+  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+    Free(vars[i].data);
+  Free(vars);
 }
 
 static void destruct_hash_table(struct kv **ht)
@@ -1523,22 +1598,6 @@ static void destruct_hash_table(struct kv **ht)
       Free(s->value);
       Free(s);
     }
-}
-
-static void destruct_var_mapping(struct mapping vars[])
-{
-  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
-    Free(vars[i].data);
-  Free(vars);
-}
-
-static struct mapping *construct_var_mapping(int streamID)
-{
-  int nvars_max = vlistNvars(streamInqVlist(streamID));
-  struct mapping *vars =
-    (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
-  vars[0].cdi_varID = CDI_UNDEFID;
-  return vars;
 }
 #endif
 
@@ -1552,6 +1611,9 @@ void *CMOR(void *argument)
   struct kv *ht = NULL;
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
+  /* check MIP table*/
+  file_exist(params[0], 1);  
+
   /* Command line config has highest priority. */
   parse_kv_cmdline(&ht, nparams - 1, &params[1]);
 
@@ -1560,22 +1622,32 @@ void *CMOR(void *argument)
 
   int streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
-  dump_global_attributes(&ht, streamID);
   dump_special_attributes(&ht, streamID);
 
-  setup_dataset(&ht, streamID);
-  int table_id = get_table_id(params[0]);
-  cmor_set_table(table_id);
+  /* Check for attributes and member name */
+  printf("*******Start to check attributes.*******\n");
+  check_attr(&ht);
+  check_mem(&ht);
+  printf("*******Succesfully checked global attributes.*******\n");
+
+ /* dump_global_attributes(&ht, streamID); */
 
   struct mapping *vars = construct_var_mapping(streamID);
-  register_axes_and_variables(&ht, table_id, streamID, vars);
-  write_variables(streamID, vars);
+
+  setup_dataset(&ht, streamID);
+
+  int table_id;
+  cmor_load_table(params[0], &table_id);
+  cmor_set_table(table_id);
+
+  int zfactor_id = 0;
+  register_all_dimensions(&ht, streamID, vars, table_id, &zfactor_id);
+  write_variables(&ht, streamID, vars, &zfactor_id);
+
   destruct_var_mapping(vars);
   destruct_hash_table(&ht);
 
   streamClose(streamID);
-  cmor_close();
-
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
