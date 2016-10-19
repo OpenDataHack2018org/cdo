@@ -1145,54 +1145,55 @@ static void register_grid(struct kv **ht, int vlistID, int varID, int *axis_ids,
   Free(ycoord_vals);
 }
 
-static void register_variable(int vlistID, int varID, int *axis_ids,
-                              struct mapping *var)
+static void register_variable(struct kv **ht, int vlistID, int varID, int *axis_ids,
+                              struct mapping *var, int *grid_ids)
 {
   char name[CDI_MAX_NAME];
   vlistInqVarName(vlistID, varID, name);
   char units[CDI_MAX_NAME];
   vlistInqVarUnits(vlistID, varID, units);
+  char *attunits = get_val(ht, "units", "" );
+  char *attname = get_val(ht, "out_name", "" );
+  check_compare_set(name, attname, "out_name");
+  check_compare_set(units, attunits, "units");
   char missing_value[sizeof(double)];
   double tolerance = 1e-4;
   size_t gridsize = vlistGridsizeMax(vlistID);
-  int levels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+  int zsize = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
   var->cdi_varID = varID;
-  if ( vlistInqVarDatatype(vlistID, varID) == CDI_DATATYPE_FLT32 )
+  var->help_var = 0;
+  if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
     {
       var->datatype = 'f';
       *(float *) missing_value = vlistInqVarMissval(vlistID, varID);
-      var->data = Malloc(gridsize * levels * sizeof(float));
+      var->data = Malloc(gridsize * zsize * sizeof(float));
     }
   else
     {
       var->datatype = 'd';
       *(double *) missing_value = vlistInqVarMissval(vlistID, varID);
-      var->data = Malloc(gridsize * levels * sizeof(double));
+      var->data = Malloc(gridsize * zsize * sizeof(double));
     }
-  cmor_variable(&var->cmor_varID, name, units,
-                count_axis_ids(axis_ids), axis_ids,
-                var->datatype, (void *) missing_value, &tolerance,
-                NULL, NULL, NULL, NULL);
+  if ( grid_ids[0] != 0 )
+    {
+      int *tmp_id = new_axis_id(axis_ids);
+      *tmp_id = grid_ids[0];
+      cmor_variable(&var->cmor_varID,
+            name,units,(count_axis_ids(axis_ids)), axis_ids, var->datatype,
+            (void *) missing_value, &tolerance, get_val(ht, "positive", NULL),
+                        NULL, NULL, NULL);
+    }
+  else
+    {
+      cmor_variable(&var->cmor_varID,
+           name, units, count_axis_ids(axis_ids),  axis_ids,   var->datatype,
+          (void *) missing_value, &tolerance, get_val(ht, "positive", NULL),
+                        NULL, NULL, NULL);
+    }
 }
 
-static struct mapping *new_var_mapping(struct mapping vars[])
-{
-  int i;
-  for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
-  vars[i + 1].cdi_varID = CDI_UNDEFID;
-  return &vars[i];
-}
-
-static int in_list(char **list, const char *needle)
-{
-  for ( ; *list; list++ )
-    if ( strcmp(*list, needle) == 0 )
-      return 1;
-  return 0;
-}
-
-static void register_axes_and_variables(struct kv **ht, int table_id,
-                                        int streamID, struct mapping vars[])
+static void register_all_dimensions(struct kv **ht, int streamID,
+                             struct mapping vars[], int table_id, int *zfactor_id)
 {
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
