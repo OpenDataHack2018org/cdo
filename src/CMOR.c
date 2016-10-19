@@ -466,39 +466,119 @@ static int get_cmor_verbosity(struct kv **ht)
 
 static int get_cmor_exit_control(struct kv **ht)
 {
-  if ( strcasecmp(get_val(ht, "__exit_control", ""),
+  if ( strcasecmp(get_val(ht, "exit_control", ""),
                   "CMOR_EXIT_ON_MAJOR") == 0 )
     return CMOR_EXIT_ON_MAJOR;
-  else if ( strcasecmp(get_val(ht, "__exit_control", ""),
+  else if ( strcasecmp(get_val(ht, "exit_control", ""),
                        "CMOR_EXIT_ON_WARNING")  == 0 )
     return CMOR_EXIT_ON_WARNING;
   else
     return CMOR_NORMAL;
 }
 
-static void feed_json_to_cmor_dataset(struct kv **ht)
+static char *get_calendar_ptr(int calendar)
 {
-  char filename[20];
-  snprintf(filename, sizeof(filename), "dataset.json_XXXXXX");
-  cmor_dataset_json(dump_ht_to_json_file(ht, filename));
-  unlink(filename);
+  char *calendar_ptr = Malloc(CMOR_MAX_STRING * sizeof(char));
+  switch ( calendar )
+    {
+    case CALENDAR_STANDARD:
+      strcpy(calendar_ptr, "gregorian");
+    case CALENDAR_PROLEPTIC:
+      strcpy(calendar_ptr, "proleptic_gregorian");
+    case CALENDAR_360DAYS:
+      strcpy(calendar_ptr, "360_day");
+    case CALENDAR_365DAYS:
+      strcpy(calendar_ptr, "noleap");
+    case CALENDAR_366DAYS:
+      strcpy(calendar_ptr, "all_leap");
+    default:
+      strcpy(calendar_ptr, "");
+    }
+  return calendar_ptr;
+}
+
+static int get_calendar_int(char *calendar)
+{
+  if ( strcmp(calendar, "gregorian") == 0 )
+    return CALENDAR_STANDARD;
+  else if ( strcmp(calendar, "proleptic_gregorian") == 0 )
+    return CALENDAR_PROLEPTIC;
+  else if ( strcmp(calendar, "360_day") == 0 )
+    return CALENDAR_360DAYS;
+  else if ( strcmp(calendar, "noleap") == 0 )
+    return  CALENDAR_365DAYS;
+  else if ( strcmp(calendar, "all_leap") == 0 )
+    return  CALENDAR_366DAYS;
+  else
+    {
+      cdoWarning("Calendar type %s is not supported by CMOR.\n");
+      return 0;
+    }
 }
 
 static void setup_dataset(struct kv **ht, int streamID)
 {
+  printf("*******Start to process cmor_setup and cmor_dataset.*******\n");
   int netcdf_file_action = get_netcdf_file_action(ht);
   int set_verbosity = get_cmor_verbosity(ht);
   int exit_control = get_cmor_exit_control(ht);
-  char *logfile = get_val(ht, "__logfile", NULL);
-  int create_subdirectories = atoi(get_val(ht, "__create_subdirectories", "0"));
 
-  cmor_setup(get_val(ht, "__inpath", "/usr/share/cmor/"),
-             &netcdf_file_action, &set_verbosity, &exit_control,
-             logfile, &create_subdirectories);
+  char *logfile = get_val(ht, "logfile", NULL);
+  int create_subdirectories = atoi(get_val(ht, "create_subdirectories", "0"));
+  cmor_setup(get_val(ht, "inpath", "/usr/share/cmor/"),
+             &netcdf_file_action,
+             &set_verbosity,
+             &exit_control,
+             logfile,
+             &create_subdirectories);
 
   int taxisID = vlistInqTaxis(streamInqVlist(streamID));
-  register_cmor_calendar(ht, taxisInqCalendar(taxisID));
-  feed_json_to_cmor_dataset(ht);
+  char *attcalendar = get_val(ht, "calendar", "");
+  char *calendar = get_calendar_ptr(taxisInqCalendar(taxisID));
+  printf("Checking attribute 'calendar' from configuration.\n");
+  if ( get_calendar_int(attcalendar) )
+    check_compare_set(calendar, attcalendar, "calendar");
+  else 
+    {
+      printf("Try to use Ifile calendar.\n");
+      if ( !get_calendar_int(calendar) )
+        cdoAbort("No valid configuration and no valid Ifile calendar found.");
+      else
+        hreplace(ht, "calendar", calendar);
+    }
+#if defined(CMOR_VERSION_MAJOR)
+  int cmor_version_exists = 1;
+  if ( CMOR_VERSION_MAJOR == 2 && CMOR_VERSION_MINOR == 9 )
+    {
+      double branch_time = atof(get_val(ht, "branch_time", "0.0"));
+      cmor_dataset(get_val(ht, "outpath", "./"),
+               get_val(ht, "experiment_id", ""),
+               get_val(ht, "institution", ""),
+               get_val(ht, "source", ""),
+               calendar,
+               atoi(get_val(ht, "realization", "")),
+               get_val(ht, "contact", ""),
+               get_val(ht, "history", ""),
+               get_val(ht, "comment", ""),
+               get_val(ht, "references", ""),
+               atoi(get_val(ht, "leap_year", "")),
+               atoi(get_val(ht, "leap_month", "")),
+               NULL,
+               get_val(ht, "model_id", ""),
+               get_val(ht, "forcing", ""),
+               atoi(get_val(ht, "initialization_method", "")),
+               atoi(get_val(ht, "physics_version", "")),
+               get_val(ht, "institute_id", ""),
+               get_val(ht, "parent_experiment_id", ""),
+               &branch_time,
+               get_val(ht, "parent_experiment_rip", ""));
+    }
+  else
+    cdoAbort("Cmor version %d.%d not yet enabled!\n", (int) CMOR_VERSION_MAJOR, (int) CMOR_VERSION_MINOR);
+#endif
+  if ( !cmor_version_exists )
+    cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
+  printf("*******Setup finished successfully.*******\n");
 }
 
 static int *new_axis_id(int *axis_ids)
