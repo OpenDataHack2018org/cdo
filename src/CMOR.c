@@ -358,6 +358,7 @@ static void dump_global_attributes(struct kv **ht, int streamID)
       if ( value ) Free(value);
     }
 }
+*/
 
 static void dump_special_attributes(struct kv **ht, int streamID)
 {
@@ -404,87 +405,60 @@ static void dump_special_attributes(struct kv **ht, int streamID)
       hreplace(ht, "history", history);
       Free(history);
     }
-
-  const char *value = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, 0));
-  if ( value ) hinsert(ht, "institution", value);
-  value = modelInqNamePtr(vlistInqVarModel(vlistID, 0));
-  if ( value ) hinsert(ht, "source", value);
 }
 
 static void read_config_files(struct kv **ht)
 {
   /* Files from info key in command line. */
-  char *info = get_val(ht, "__info", "");
-  char *infoc = Malloc(strlen(info) + 1);
-  strcpy(infoc, info);
-  char *filename = strtok(infoc, ",");
-  while ( filename != NULL )
+  char *info = get_val(ht, "info", "");
+  char *workfile = Malloc(strlen(info) + 1);
+  strcpy(workfile, info);
+  char *restfile;
+  while ( strtok_r(workfile, ",", &restfile) != NULL )
     {
-      parse_kv_file(ht, trim(filename), 1);
-      filename = strtok(NULL, ",");
+      parse_kv_file(ht, trim(workfile), 1);
+      strcpy(workfile, restfile);
     }
-  Free(infoc);
 
   /* Config file in user's $HOME directory. */
   char *home = getenv("HOME");
   const char *dotconfig = ".cdocmorinfo";
-  filename = Malloc(strlen(home) + strlen(dotconfig) + 2);
-  sprintf(filename, "%s/%s", home, dotconfig);
-  parse_kv_file(ht, filename, 0);
-  Free(filename);
+  workfile = Malloc(strlen(home) + strlen(dotconfig) + 2);
+  sprintf(workfile, "%s/%s", home, dotconfig);
+  parse_kv_file(ht, workfile, 0);
+  Free(workfile);
 
   /* System wide configuration. */
   parse_kv_file(ht, "/etc/cdocmor.info", 0);
 }
 
-static void register_cmor_calendar(struct kv **ht, int calendar)
+static int in_list(char **list, const char *needle)
 {
-  switch ( calendar )
-    {
-    case CALENDAR_STANDARD:
-      hinsert(ht, "calendar", "gregorian");
-      break;
-    case CALENDAR_PROLEPTIC:
-      hinsert(ht, "calendar", "proleptic_gregorian");
-      break;
-    case CALENDAR_360DAYS:
-      hinsert(ht, "calendar", "360_day");
-      break;
-    case CALENDAR_365DAYS:
-      hinsert(ht, "calendar", "noleap");
-      break;
-    case CALENDAR_366DAYS:
-      hinsert(ht, "calendar", "all_leap");
-      break;
-    default:
-      cdoWarning("Unsupported calendar type %i.\n", calendar);
-    }
-}
-
-static char *dump_ht_to_json_file(struct kv **ht, char *filename)
-{
-  int fd = mkstemp(filename);
-  dprintf(fd, "{\n");
-  for ( struct kv *entry = *ht; entry != NULL; entry = entry->hh.next )
-    if ( strncmp(entry->key, "__", 2) != 0 )
-      dprintf(fd, "\t\"%s\":\t\t\"%s\",\n", entry->key, entry->value);
-  dprintf(fd, "}\n");
-  close(fd);
-  return filename;
+  while ( *list )
+    if ( strcmp(*list++, needle) == 0 )
+      return 1;
+  return 0;
 }
 
 static int get_netcdf_file_action(struct kv **ht)
 {
-  char *chunk = get_val(ht, "__chunk", "replace");
-  if ( strcasecmp(chunk, "append") == 0 )
+  char *chunk = get_val(ht, "oflag", "");
+  if ( strcmp(chunk, "replace") == 0 )
+    return CMOR_REPLACE;
+  else if ( strcmp(chunk, "append") == 0 )
+    return CMOR_APPEND;
+  else if ( strcmp(chunk, "preserve") == 0 )
     return CMOR_APPEND;
   else
-    return CMOR_REPLACE;
+    {
+      cdoWarning("No valid CMOR output mode! \nAttribute oflag is '%s', but valid are 'append', 'replace' or 'preserve'.\nCMOR output mode is set to: replace.\n", chunk);
+      return CMOR_REPLACE;
+    }
 }
 
 static int get_cmor_verbosity(struct kv **ht)
 {
-  if ( strcasecmp(get_val(ht, "__set_verbosity", ""), "CMOR_QUIET") == 0 )
+  if ( strcmp(get_val(ht, "set_verbosity", ""), "CMOR_QUIET") == 0 )
     return CMOR_QUIET;
   else
     return CMOR_NORMAL;
