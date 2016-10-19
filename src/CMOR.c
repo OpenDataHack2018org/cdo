@@ -1195,34 +1195,91 @@ static void register_variable(struct kv **ht, int vlistID, int varID, int *axis_
 static void register_all_dimensions(struct kv **ht, int streamID,
                              struct mapping vars[], int table_id, int *zfactor_id)
 {
+  printf("\n*******Start to register all dimensions via cmor_axis.******\n");
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
-  char taxis_units[CMOR_MAX_STRING];
-  get_taxis_units(taxis_units, taxisID);
-  char **requested_variables = get_requested_variables(ht);
-  int grid_table_id = get_grid_table_id(ht);
-  cmor_set_table(table_id);
 
+  char *time_units = get_time_units(taxisID);
+  char *req_time_units = get_val(ht, "req_time_units", "");
+  printf("Checking attribute 'req_time_units' from configuration.\n");
+  if ( check_time_units(req_time_units) )
+    check_compare_set(time_units, req_time_units, "time_units");
+  else 
+    cdoAbort("Required Attribute 'req_time_units' from configuration is invalid!");
+
+  char **requested_variables = get_requested_variables(ht);
+
+  int foundName = 0;
+  int ps_required = 0;
+  int ps_in_file = 0;
   for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
     {
-      char var_name[CDI_MAX_NAME];
+      char name[CDI_MAX_NAME];
       int axis_ids[CMOR_MAX_AXES];
       axis_ids[0] = CMOR_UNDEFID;
-      vlistInqVarName(vlistID, varID, var_name);
-      if ( requested_variables == NULL ||
-           in_list(requested_variables, var_name) )
+      int zaxisID = vlistInqVarZaxis(vlistID, varID);
+      vlistInqVarName(vlistID, varID, name);
+      if ( requested_variables == NULL && vlistNvars(vlistID) > 1 )
+        cdoWarning("You have not requested any specific variable but there are several in input! Notice that all command line configuration attributes including out_name and units will be used for every variable!\n");
+      if ( requested_variables == NULL || in_list(requested_variables, name) )
         {
-          cmor_axis(new_axis_id(axis_ids), "time", taxis_units, 0,
-                    NULL, 0, NULL, 0, NULL);
-          int zaxisID = vlistInqVarZaxis(vlistID, varID);
-          char z_name[CDI_MAX_NAME];
-          zaxisInqName(zaxisID, z_name);
-          register_z_axis(zaxisID, key_rename(ht, z_name), axis_ids);
-          int gridID = vlistInqVarGrid(vlistID, varID);
-          register_xy_and_grid(gridID, table_id, grid_table_id, axis_ids);
-          register_variable(vlistID, varID, axis_ids, new_var_mapping(vars));
+          if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+            {
+              printf("Since the zaxis of variable '%s' is of type HYBRID, surface pressure is required from Ifile.\n It is required to have code nr. 134!\n", name);
+              ps_required++;
+            }
+          printf("\n *******Start to define variable with ID: '%d' and name: '%s'*******\n", varID, name);
+          foundName++;
+          /* Time-Axis */
+          char cmor_time_name[CMOR_MAX_STRING];
+          get_time_method(ht, vlistID, varID, cmor_time_name);  
+          if ( strcmp(cmor_time_name, "none") != 0 )
+            cmor_axis(new_axis_id(axis_ids),
+                    cmor_time_name,
+                    time_units,
+                    0,NULL, 0, NULL, 0, NULL);
+
+          /* Grid: */
+          int grid_ids[CMOR_MAX_GRIDS];
+          register_grid(ht, vlistID, varID, axis_ids, grid_ids);
+          cmor_set_table(table_id);
+          /* Z-Axis */
+          register_z_axis(ht, zaxisID, name, axis_ids, zfactor_id);
+          /* Variable */
+/*          struct mapping *var = &vars[(*nvars)++];*/
+          register_variable(ht, vlistID, varID, axis_ids, new_var_mapping(vars), grid_ids);
         }
     }
+  if ( ps_required )
+    {
+      printf("\n *******Start to find surface pressure.\n");
+      for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
+        if ( vlistInqVarCode(vlistID, varID) == 134 )
+          {
+            ps_in_file++;
+            struct mapping *var = new_var_mapping(vars);
+            size_t gridsize = vlistGridsizeMax(vlistID);
+            var->cdi_varID = varID;
+            var->help_var = 1;
+            if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
+              {
+                var->datatype = 'f';
+                var->data = Malloc(gridsize * sizeof(float));
+              }
+            else
+              {
+                var->datatype = 'd';
+                var->data = Malloc(gridsize * sizeof(double));
+              }
+          }
+    }
+  if ( ps_required && !ps_in_file )
+    cdoAbort("No surface pressure found in Ifile but required for a hybrid sigma pressure z axis!");
+  if ( !foundName && requested_variables == NULL )
+    cdoAbort("No variables from your table %s found in Ifile.\n");
+  if ( !foundName && requested_variables )
+    cdoAbort("The given variables to process by attribute var: '%s' are not found in Ifile.\n", get_val(ht, "vars", ""));
+  printf("*******Called register_all_dimensions for %d variables succesfully.*******\n", foundName);
   if ( requested_variables ) Free(requested_variables);
 }
 
