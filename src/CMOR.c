@@ -882,21 +882,82 @@ static void register_z_axis(struct kv **ht, int zaxisID, char *varname, int *axi
     }
   if ( zsize == 1 && get_val(ht, "szc", NULL) != NULL )
     {
-      register_xy_only(gridID, axis_ids);
-    }
+      char *szc_name = get_val(ht, "szc", NULL);
+      char *szc_value;
+      strtok_r(szc_name, "_", &szc_value);
+      levels = Malloc(sizeof(double));
+      levels[0] = (double) atof(szc_value);
+      printf("Attribute szc is found.\nScalar z coordinate name is: '%s'\nScalar z coordinate value is: '%f'\n", szc_name, levels[0]);
+      cmor_axis(new_axis_id(axis_ids),
+                      szc_name,
+                      "m",
+                      zsize,
+                      (void *) levels,
+                      'd', NULL, 0, NULL);
+   }
 }
 
-static void get_taxis_units(char *units, int taxisID)
+static void register_character_dimension(int *axis_ids, char *filename)
 {
-  int timeunit = taxisInqTunit(taxisID);
-  int year, month, day, hour, minute, second;
-  cdiDecodeDate(taxisInqRdate(taxisID), &year, &month, &day);
-  cdiDecodeTime(taxisInqRtime(taxisID), &hour, &minute, &second);
-  if ( timeunit == TUNIT_QUARTER || timeunit == TUNIT_30MINUTES )
-    timeunit = TUNIT_MINUTE;
-  if ( timeunit == TUNIT_3HOURS || timeunit == TUNIT_6HOURS ||
-       timeunit == TUNIT_12HOURS )
-    timeunit = TUNIT_HOUR;
+  printf("The grid type is generic and a dimension 'basin' is found.\nTherefore, it is tried to read the character dimension.\n");
+  int nc_file_id, nfiledims, nvars, ngatts, unlimdimid;
+  nc_type xtypep;
+  int varndims, varnattsp;
+  int *vardimids;
+
+  char *varname = malloc(36 * sizeof(char));
+  char *dimname = malloc(36 * sizeof(char));
+
+  size_t dimlength, dimstrlength;
+
+  nc_open(filename, NC_NOWRITE, &nc_file_id);
+  nc_inq(nc_file_id, &nfiledims, &nvars, &ngatts, &unlimdimid);
+  vardimids = malloc(nfiledims * sizeof(int));
+  void *final_chardim;
+  for ( int i = 0; i < nvars; i++ )
+    {
+      nc_inq_var(nc_file_id, i, varname, &xtypep, &varndims, vardimids, &varnattsp);
+      if ( strcmp(varname, "region") == 0 )
+        {
+          nc_inq_dim(nc_file_id, vardimids[1], dimname, &dimstrlength);
+          nc_inq_dim(nc_file_id, vardimids[0], dimname, &dimlength);
+
+          final_chardim = (void *)malloc(dimstrlength * dimlength *sizeof(char));
+          nc_get_var(nc_file_id, i, final_chardim);
+        }
+    }
+  nc_close(nc_file_id);
+  cmor_axis(new_axis_id(axis_ids), dimname, "", dimlength, final_chardim, 'c',  NULL, dimstrlength, NULL); 
+}
+
+static void invert_ygriddes(struct kv **ht, int vlistID, int *gridID, int ylength, double *ycoord_vals, double *ycell_bounds, int *ynbounds)
+{
+  if ( ( ycoord_vals[0] - ycoord_vals[1] ) > 0 )
+    {
+      cdoWarning("Latitudes go north to south => reverting latitudes!\n");
+      hinsert(ht, "invert_lat", "yes");
+          
+      int gridID2 = gridDuplicate(*gridID);
+      double *yv2;
+      double *yb2;
+
+      yv2 = Malloc(ylength * sizeof(double));
+      for ( int ilat = 0; ilat < ylength; ilat++ )
+        yv2[ylength-ilat-1] = ycoord_vals[ilat];
+      gridDefYvals(gridID2, yv2);
+
+      yb2 = Malloc(2* ylength * sizeof(double));
+      for ( int ilat = 0; ilat < ylength; ilat++ )
+        {
+          yb2[ylength*2-ilat*2-1] = ycell_bounds[ilat*2];
+          yb2[ylength*2-ilat*2-2] = ycell_bounds[ilat*2+1];
+        }
+      gridDefYbounds(gridID2, yb2);
+      vlistChangeGrid(vlistID, *gridID, gridID2);
+      gridInqYvals(*gridID, ycoord_vals);
+      *ynbounds = gridInqYbounds(*gridID, ycell_bounds);
+    }
+}
 
   sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
           year, month, day, hour, minute, second);
