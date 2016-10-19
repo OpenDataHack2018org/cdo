@@ -959,48 +959,190 @@ static void invert_ygriddes(struct kv **ht, int vlistID, int *gridID, int ylengt
     }
 }
 
-  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
-          year, month, day, hour, minute, second);
+static void change_grid(char *grid_file, int *gridID, int vlistID)
+{
+  printf("You configured a grid_info file. For a successfull read, the file probably needs to have at least one variable with ID 0.\n");
+  argument_t *fileargument = file_argument_new(grid_file);
+  int streamID2 = streamOpenRead(fileargument); 
+  int vlistID2 = streamInqVlist(streamID2);
+  int gridID2 = vlistInqVarGrid(vlistID2, 0); 
+  vlistChangeGrid(vlistID, *gridID, gridID2);
 }
 
-static int get_table_id(char *table)
+static void inquire_vals_and_bounds(int gridID, int *xnbounds, int *ynbounds, double *xcoord_vals, double *ycoord_vals, double *xcell_bounds, double *ycell_bounds)
 {
-  int table_id;
-  cmor_load_table(table, &table_id);
-  return table_id;
+  gridInqYvals(gridID, ycoord_vals);
+  gridInqXvals(gridID, xcoord_vals);
+  *xnbounds = gridInqXbounds(gridID, xcell_bounds);
+  *ynbounds = gridInqYbounds(gridID, ycell_bounds);
 }
 
-static int get_grid_table_id(struct kv **ht)
+static void get_cmor_table(struct kv **ht)
 {
-  if ( get_val(ht, "__grid_table", NULL) )
+  int gridtable_id;
+  char gridtable[CMOR_MAX_STRING];
+  char *mip_table_dir = get_val(ht, "mip_table_dir", NULL);
+  char *project_id = get_val(ht, "project_id", NULL);
+  if ( mip_table_dir && project_id )
     {
-      return get_table_id(get_val(ht, "__grid_table", NULL));
+      strcpy(gridtable, mip_table_dir);
+      strcat(gridtable, "/");
+      strcat(gridtable, project_id);
+      strcat(gridtable, "_grids");
+      if ( file_exist(gridtable, 1) )  
+        {
+          cmor_load_table(gridtable, &gridtable_id);
+          cmor_set_table(gridtable_id);
+        }
     }
   else
     {
-      cdoAbort("Grid table required but not defined. Set __grid_table!");
-      return 0;
+      cdoAbort("A project grid table is required for this type of grid but not found in the mip table directory. Check attributes \n mip_table_dir \n and \n project_id !");
+    } 
+}
+
+static void check_and_gen_bounds(int gridID, int nbounds, int length, double *coord_vals, double *cell_bounds, int x)
+{
+  if ( nbounds != 2 * length )
+    {
+      gen_bounds(length, coord_vals, cell_bounds);
+      if ( x )
+        {
+          gridDefNvertex(gridID, 2);
+          gridDefXbounds(gridID, cell_bounds);
+        }
+      else
+        gridDefYbounds(gridID, cell_bounds);
     }
 }
 
-static char **get_requested_variables(struct kv **ht)
+static void select_and_register_character_dimension(char *grid_file, int *axis_ids)
 {
-  char **name_list = NULL;
-  char *select_vars = get_val(ht, "__var", NULL);
+  char *ifile = cdoStreamName(0)->args;
+  if ( strcmp(grid_file, "") == 0 )  
+    register_character_dimension(axis_ids, ifile);
+  else
+    register_character_dimension(axis_ids, grid_file);
+}
 
-  if ( select_vars )
+static void register_grid(struct kv **ht, int vlistID, int varID, int *axis_ids, int *grid_ids)
+{
+  int gridID = vlistInqVarGrid(vlistID, varID);
+
+  char *grid_file = get_val(ht, "ginfo", "");
+  if ( strcmp(grid_file, "") != 0 )
+    change_grid(grid_file, &gridID, vlistID);
+
+  int type = gridInqType(gridID);
+  int ylength = gridInqYsize(gridID);
+  int xlength = gridInqXsize(gridID);
+  int totalsize = gridInqSize(gridID);
+
+  double *xcoord_vals;
+  double *ycoord_vals;
+  double *xcell_bounds;
+  double *ycell_bounds;
+  int xnbounds;
+  int ynbounds;
+
+  /* Cmor call per Gridtype */
+  if ( type == GRID_GAUSSIAN || type == GRID_LONLAT )
     {
-      name_list = Malloc((strlen(select_vars) + 1) * sizeof(char *));
-      char *var_name = strtok(select_vars, ",");
-      int i = 0;
-      while ( var_name != NULL )
-        {
-          name_list[i++] = trim(var_name);
-          var_name = strtok(NULL, ",");
-        }
-      name_list[i] = NULL;
+      grid_ids[0] = 0;
+      xcoord_vals = Malloc(xlength * sizeof(double));
+      ycoord_vals = Malloc(ylength * sizeof(double));
+      xcell_bounds = Malloc(2 * xlength * sizeof(double));
+      ycell_bounds = Malloc(2 * ylength * sizeof(double));
+      inquire_vals_and_bounds(gridID, &xnbounds, &ynbounds, xcoord_vals, ycoord_vals, xcell_bounds, ycell_bounds);
+
+      check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
+      check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
+
+      invert_ygriddes(ht, vlistID, &gridID, ylength, ycoord_vals, ycell_bounds, &ynbounds);
+
+      cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
+      cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd', 
+   (void *)xcell_bounds,    2,    NULL);
+
+      Free(xcell_bounds);
+      Free(ycell_bounds);
     }
-  return name_list;
+  else if ( type == GRID_CURVILINEAR || type == GRID_UNSTRUCTURED)
+    {
+      xcoord_vals = Malloc(totalsize * sizeof(double));
+      ycoord_vals = Malloc(totalsize * sizeof(double));
+/* maximal 4 gridbounds per gridcell permitted */
+      xcell_bounds = Malloc(4 * totalsize * sizeof(double));
+      ycell_bounds = Malloc(4 * totalsize * sizeof(double));
+      inquire_vals_and_bounds(gridID, &xnbounds, &ynbounds, xcoord_vals, ycoord_vals, xcell_bounds, ycell_bounds);
+      get_cmor_table(ht);
+      int grid_axis[2];
+      if ( type == GRID_CURVILINEAR )
+        {
+          double *xncoord_vals;
+          double *yncoord_vals;
+          xncoord_vals = Malloc(xlength * sizeof(double));
+          yncoord_vals = Malloc(ylength * sizeof(double)); 
+          for (int j=0; j<ylength; j++) 
+            yncoord_vals[j]= (double) j;
+          for (int j=0; j<xlength; j++)
+            xncoord_vals[j]= (double) j;
+
+          cmor_axis(&grid_axis[0], "j_index",    "1",    ylength,    (void *)yncoord_vals,
+    'd', 0, 0, NULL);
+          cmor_axis(&grid_axis[1], "i_index",    "1",    xlength,    (void *)xncoord_vals,    'd', 0, 0, NULL);
+          cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)ycell_bounds,    (void *)xcell_bounds);
+        }
+      /*else
+        { 
+          cmor_axis(&grid_axis[0],    "grid_longitude",   "degrees",    xlength,    (void *)xcoord_vals,    'd', 0, 0, NULL);
+          cmor_axis(&grid_axis[1],    "grid_latitude",    "degrees",    ylength,    (void *)ycoord_vals,    'd', 0, 0, NULL);
+          cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    2,     (void *)ycell_bounds,    (void *)xcell_bounds); 
+        }*/
+      Free(xcell_bounds);
+      Free(ycell_bounds);
+    }
+  else if ( type == GRID_GENERIC && gridInqSize(gridID) > 1 )
+    {
+      grid_ids[0] = 0;
+      xcoord_vals = Malloc(xlength * sizeof(double));
+      gridInqXvals(gridID, xcoord_vals);
+      ycoord_vals = Malloc(ylength * sizeof(double));
+      gridInqYvals(gridID, ycoord_vals);
+      char yname[CDI_MAX_NAME];
+      cdiGridInqKeyStr(gridID, CDI_KEY_YDIMNAME, CDI_MAX_NAME, yname);
+      if ( strcmp(yname, "basin") != 0 )
+        {
+          invert_ygriddes(ht, vlistID, &gridID, ylength, ycoord_vals, ycell_bounds, &ynbounds);
+          ycell_bounds = Malloc(2 * ylength * sizeof(double));
+          ynbounds = gridInqYbounds(gridID, ycell_bounds);
+          check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
+          cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
+          Free(ycell_bounds);
+        }
+      else
+        select_and_register_character_dimension(grid_file, axis_ids);
+
+      char xname[CDI_MAX_NAME];
+      cdiGridInqKeyStr(gridID, CDI_KEY_XDIMNAME, CDI_MAX_NAME, xname);
+      if ( strcmp(xname, "basin") != 0 )
+        {
+          xcell_bounds = Malloc(2 * xlength * sizeof(double));
+          xnbounds = gridInqXbounds(gridID, xcell_bounds);
+          check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
+          cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
+          Free(xcell_bounds);
+        }
+      else
+        select_and_register_character_dimension(grid_file, axis_ids);
+    }
+  else
+    {
+      grid_ids[0] = 0;
+      cdoWarning("Either the grid type is unknown or a registration is not necessary. However, it is not registered by cdo.\n");
+    }
+  Free(xcoord_vals);
+  Free(ycoord_vals);
 }
 
 static void register_variable(int vlistID, int varID, int *axis_ids,
