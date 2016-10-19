@@ -696,80 +696,78 @@ static char **get_requested_variables(struct kv **ht)
 
   if ( select_vars )
     {
-      coord_vals = Malloc(levels * sizeof(double));
-      cdoZaxisInqLevels(zaxisID, coord_vals);
-      zaxisInqUnits(zaxisID, units);
-      cmor_axis(new_axis_id(axis_ids), name, units, levels, (void *)coord_vals,
-                'd', NULL, 0, NULL);
-      Free(coord_vals);
-    }
-}
-
-static void register_xy_only(int gridID, int *axis_ids)
-{
-  char name[CDI_MAX_NAME];
-  name[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XLONGNAME, CDI_MAX_NAME, name);
-  register_y_axis(gridID, name, axis_ids);
-  name[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_YLONGNAME, CDI_MAX_NAME, name);
-  register_x_axis(gridID, name, axis_ids);
-}
-
-static void register_cmor_grid(int gridID, int *axis_ids, int *cmor_grid_id)
-{
-  int gridsize = gridInqSize(gridID);
-  double *latitude = Malloc(gridsize * sizeof(double));
-  gridInqYvals(gridID, latitude);
-  double *latitude_vertices = Malloc(4 * gridsize * sizeof(double));
-  gridInqYbounds(gridID, latitude_vertices);
-
-  double *longitude = Malloc(gridsize * sizeof(double));
-  gridInqXvals(gridID, longitude);
-  double *longitude_vertices = Malloc(4 * gridsize * sizeof(double));
-  gridInqXbounds(gridID, longitude_vertices);
-  cmor_grid(cmor_grid_id, count_axis_ids(axis_ids), axis_ids, 'd',
-            (void *)latitude, (void *)longitude, 4,
-            (void *)latitude_vertices, (void *)longitude_vertices
-            );
-  Free(latitude);
-  Free(latitude_vertices);
-  Free(longitude);
-  Free(longitude_vertices);
-}
-
-static void register_cmor_grid_mapping(int projID, int cmor_grid_id)
-{
-  char grid_mapping[CDI_MAX_NAME] = "";
-  cdiGridInqKeyStr(projID, CDI_KEY_MAPPING, CDI_MAX_NAME, grid_mapping);
-
-  if ( grid_mapping[0] )
-    {
-      int atttype, attlen;
-      char attname[CDI_MAX_NAME];
-      int natts, nparameters;
-      cdiInqNatts(projID, CDI_GLOBAL, &natts);
-      char parameter_names[natts][CDI_MAX_NAME];
-      double parameter_values[natts];
-      char parameter_units[natts][1];
-
-      nparameters = 0;
-      for ( int iatt = 0; iatt < natts; ++iatt )
+      name_list = Malloc((strlen(select_vars) + 1) * sizeof(char *));
+      char *var_name = strtok(select_vars, ",");
+      int i = 0;
+      while ( var_name != NULL )
         {
-          cdiInqAtt(projID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
-          if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
-            {
-              double attflt[attlen];
-              cdiInqAttFlt(projID, CDI_GLOBAL, attname, attlen, attflt);
-              strcpy(parameter_names[nparameters], attname);
-              parameter_values[nparameters] = attflt[0];
-              parameter_units[nparameters][0] = 0;
-              nparameters++;
-            }
+          name_list[i++] = trim(var_name);
+          var_name = strtok(NULL, ",");
         }
-      cmor_set_grid_mapping(cmor_grid_id, grid_mapping, nparameters,
-                            (char **)parameter_names, CDI_MAX_NAME,
-                            parameter_values,
-                            (char **)parameter_units, 1);
+      name_list[i] = NULL;
     }
+  return name_list;
+}
+
+static void get_time_method(struct kv **ht, int vlistID, int varID, char *cmor_time_name)
+{
+  char *time_method = Malloc(8192 * sizeof(char));
+  cdiInqAttTxt(vlistID, varID, "cell_methods", 8192, time_method);
+  char *att_time_method = get_val(ht, "cell_methods", "");
+  check_compare_set(time_method, att_time_method, "cell_methods");
+  if ( time_method[0] == 'm' || strcmp(time_method, "time: mean") == 0 ) strcpy(cmor_time_name, "time \0");
+  else if ( time_method[0] == 'p' ) strcpy(cmor_time_name, "time1\0");
+  else if ( time_method[0] == 'c' ) strcpy(cmor_time_name, "time2\0");
+  else if ( time_method[0] == 'n' ) strcpy(cmor_time_name, "none\0");
+  else
+    {
+      cdoWarning("Found configuration time cell method '%s' is not valid. Check CF-conventions for allowed time cell methods.\nTime cell method is set to 'mean'. \n", time_method);
+      strcpy(cmor_time_name, "time \0");
+    }
+  hreplace(ht, "time_axis", cmor_time_name); 
+}
+
+static void gen_bounds(int n, double *vals, double *bounds)
+{
+  for ( int i = 0; i < n-1; ++i )
+    {
+      bounds[2*i+1]   = 0.5*(vals[i] + vals[i+1]);
+      bounds[2*(i+1)] = 0.5*(vals[i] + vals[i+1]);
+    }
+
+  bounds[0]     = 2*vals[0] - bounds[1];
+  bounds[2*n-1] = 2*vals[n-1] - bounds[2*(n-1)];
+}
+
+static void get_zcell_bounds(int zaxisID, double *zcell_bounds, double *levels, int zsize)
+{
+  double *lbounds;
+  lbounds = Malloc(zsize * sizeof(double));
+  zaxisInqLbounds(zaxisID, lbounds);
+  double *ubounds;
+  ubounds = Malloc(zsize * sizeof(double));
+  zaxisInqUbounds(zaxisID, ubounds);
+
+  if ( !lbounds || !ubounds || ubounds[0] == ubounds[1] || lbounds[0] == lbounds[1] )
+    gen_bounds(zsize, levels, zcell_bounds);
+  else
+    {
+      if ( lbounds )
+        zcell_bounds[0] = lbounds[0];
+      else
+        zcell_bounds[0] = 0; 
+      for ( int i = 0; i < zsize-1; ++i )
+        {
+          zcell_bounds[2*i+1]   = ubounds[i];
+          zcell_bounds[2*(i+1)] = lbounds[i+1];
+        }
+      if ( ubounds )
+        zcell_bounds[2*zsize-1] = ubounds[zsize-1];
+      else
+        zcell_bounds[2*zsize-1] = levels[zsize-1] + ( levels[zsize-1] - zcell_bounds[2*zsize-2] );
+    }
+  Free(lbounds);
+  Free(ubounds);
 }
 
 static void register_projected_grid(int gridID, int *axis_ids)
