@@ -800,18 +800,87 @@ static void get_zhybrid(int zaxisID, char *varname, double *p0, double *alev_val
   Free(vct);
 }
 
-static void register_xy_and_grid(int gridID, int table_id, int grid_table_id,
-                                 int *axis_ids)
+static void register_z_axis(struct kv **ht, int zaxisID, char *varname, int *axis_ids, int *zfactor_id)
 {
-  if ( gridInqProj(gridID) > 0 )
+
+  int zsize = zaxisInqSize(zaxisID);
+  char units[CDI_MAX_NAME];
+  double *levels;
+  if ( zsize > 1)
     {
-      if ( grid_table_id == 0 )
-        cdoAbort("__grid_table not specified!");
-      cmor_set_table(grid_table_id);
-      register_projected_grid(gridID, axis_ids);
-      cmor_set_table(table_id);
+      levels = Malloc(zsize * sizeof(double));
+      zaxisInqLevels(zaxisID, levels);
+      double *zcell_bounds;
+      zcell_bounds = Malloc( 2*zsize * sizeof(double) );
+      get_zcell_bounds(zaxisID, zcell_bounds, levels, zsize);
+      if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
+        {
+          cmor_axis(new_axis_id(axis_ids),
+                        "plevs",
+                        "Pa",
+                        zsize,
+                        (void *)levels,
+                        'd', NULL, 0, NULL);
+        }
+      else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+        {
+          double *alev_val = Malloc(zsize * sizeof(double));
+          double *alev_bnds = Malloc((zsize + 1) * sizeof(double));
+          double *ap_val = Malloc(zsize * sizeof(double));
+          double *ap_bnds = Malloc((zsize + 1) * sizeof(double));
+          double *b_val = Malloc(zsize * sizeof(double));
+          double *b_bnds = Malloc((zsize + 1) * sizeof(double));
+          double *p0 = Malloc(sizeof(double));
+          p0[0] = 101325.0;
+          get_zhybrid(zaxisID, varname, p0, alev_val, alev_bnds, b_val, b_bnds, ap_val, ap_bnds);
+/*cmor_zfactor (int *zfactor_id,int zaxis_id, char *zfactor_name, char *units, int ndims, int axis_ids[], char type, void *zfactor_values, void *zfactor_bounds)*/
+          cmor_axis(new_axis_id(axis_ids),
+                        "alternate_hybrid_sigma",
+                        "",
+                        zsize,
+                        (void *)alev_val,
+                        'd', alev_bnds,  1, NULL);
+          int lev_id = axis_ids[count_axis_ids(axis_ids)-1];
+          int lev_id_array[2];
+          lev_id_array[0] = lev_id;
+          cmor_zfactor(zfactor_id, lev_id, "p0", "Pa", 0, 0, 'd', (void *)p0, NULL);
+          cmor_zfactor(zfactor_id, lev_id, "b", "", 1, &lev_id_array[0], 'd', (void *)b_val, (void *)b_bnds);
+          cmor_zfactor(zfactor_id, lev_id, "ap", "Pa", 1, &lev_id_array[0], 'd', (void *)ap_val, (void *)ap_bnds);
+          cmor_zfactor(zfactor_id, lev_id, "ps", "Pa", count_axis_ids(axis_ids)-1, axis_ids, 'd', NULL, NULL);  
+          Free(alev_val);  
+          Free(alev_bnds);  
+          Free(ap_val);  
+          Free(ap_bnds);  
+          Free(b_val);  
+          Free(b_bnds);  
+        }
+      else if ( zaxisInqType(zaxisID) == ZAXIS_DEPTH_BELOW_SEA )
+        {
+          zcell_bounds[0] = (double) 0;
+          cmor_axis(new_axis_id(axis_ids),
+                        "depth_coord",
+                        "m",
+                        zsize,
+                        (void *)levels,
+                        'd', zcell_bounds,  2, NULL);
+        }
+      else if ( zaxisInqType(zaxisID) == ZAXIS_DEPTH_BELOW_LAND )
+        {
+          zcell_bounds[0] = (double) 0;
+          cmor_axis(new_axis_id(axis_ids),
+                        "sdepth",
+                        "m",
+                        zsize,
+                        (void *)levels,
+                        'd', zcell_bounds, 2, NULL);
+        }
+      else if ( zaxisInqType(zaxisID) == ZAXIS_GENERIC || zaxisInqType(zaxisID) == ZAXIS_HEIGHT)
+        cdoAbort("Z-axis type %d not yet enabled. \n", zaxisInqType(zaxisID));
+      else
+        cdoAbort("Invalid Z-axis type %d . \n", zaxisInqType(zaxisID));
+      if (zcell_bounds) Free(zcell_bounds);
     }
-  else
+  if ( zsize == 1 && get_val(ht, "szc", NULL) != NULL )
     {
       register_xy_only(gridID, axis_ids);
     }
