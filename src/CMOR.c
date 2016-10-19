@@ -1432,7 +1432,7 @@ static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date,
 
 
 static void read_record(int streamID, double *buffer, size_t gridsize,
-                        struct mapping vars[])
+                        struct mapping vars[], int invert_lat, int vlistID)
 {
   int varID, levelID;
   streamInqRecord(streamID, &varID, &levelID);
@@ -1440,31 +1440,63 @@ static void read_record(int streamID, double *buffer, size_t gridsize,
   if ( var )
     {
       int nmiss;
-      if ( var->datatype == 'f' )
+      if ( invert_lat )
         {
           streamReadRecord(streamID, buffer, &nmiss);
+          double *array2 = (double*) Malloc(gridsize*sizeof(double));
+          int gridID = vlistInqVarGrid(vlistID, varID);
+	  invertLatDataCmor(buffer, array2, gridID);
           for ( size_t i = 0; i < gridsize; i++ )
-            ((float *)var->data)[gridsize * levelID + i] =
-              (float)buffer[i];
+            {
+              if ( var->datatype == 'f' )
+                {
+                  ((float *)var->data)[gridsize * levelID + i] =
+                  (float)array2[i];
+                }
+              else
+                {
+                  ((double *)var->data)[gridsize * levelID + i] =
+                  (double)array2[i];
+                }
+            }
         }
       else
         {
-          streamReadRecord(streamID, (double *)var->data + gridsize * levelID,
+          if ( var->datatype == 'f' )
+            {
+              streamReadRecord(streamID, buffer, &nmiss);
+              for ( size_t i = 0; i < gridsize; i++ )
+                ((float *)var->data)[gridsize * levelID + i] =
+                  (float)buffer[i];
+            }
+          else
+            {
+              streamReadRecord(streamID, (double *)var->data + gridsize * levelID,
                            &nmiss);
+            }
         }
     }
 }
 
-static void write_variables(int streamID, struct mapping vars[])
+static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vlistID, int timestep)
 {
+  int ps_required = 0;
+  for ( int j = 0; vars[j].cdi_varID != CDI_UNDEFID; j++ )
+    {
+      if ( vlistInqVarCode(vlistID, vars[j].cdi_varID) == 134 )
+        *ps_index = j;
+      else if ( zaxisInqType(vlistInqVarZaxis(vlistID, vars[j].cdi_varID)) == ZAXIS_HYBRID )
+        ps_required ++;
+    }
+  if ( ps_index < 0 && ps_required )
+    cdoAbort("No surface pressure found for time step %d but required in Hybrid-sigma-pressure-coordinates! \n", timestep);
+}
+
+static void write_variables(struct kv **ht, int streamID, struct mapping vars[], int *zfactor_id)
+{
+  printf("\n*******Start to write variables via cmor_write.******\n");
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
-  int calendar = taxisInqCalendar(taxisID);
-  juldate_t ref_date = juldate_encode(calendar, taxisInqRdate(taxisID),
-                                      taxisInqRtime(taxisID));
-  size_t gridsize = vlistGridsizeMax(vlistID);
-  double *buffer = (double *) Malloc(vlistGridsizeMax(vlistID) *
-                                     sizeof(double));
   int tsID = 0;
   int nrecs;
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
