@@ -194,6 +194,7 @@ cdo_SOURCES += Adisit.c        \
                Change_e5slm.c  \
                Cloudlayer.c    \
                CMOR.c          \
+               CMOR_lite.c     \
                CMOR_table.c    \
                Collgrid.c      \
                Command.c       \
