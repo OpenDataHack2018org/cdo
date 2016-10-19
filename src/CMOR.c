@@ -581,12 +581,42 @@ static void setup_dataset(struct kv **ht, int streamID)
   printf("*******Setup finished successfully.*******\n");
 }
 
-static int *new_axis_id(int *axis_ids)
+
+/*************************/
+/* From Invert.c: */
+/*************************/
+
+static
+void invertLatDataCmor(double *array1, double *array2, int gridID1)
 {
-  int i;
-  for ( i = 0; axis_ids[i] != CMOR_UNDEFID; i++ );
-  axis_ids[i + 1] = CMOR_UNDEFID;
-  return &axis_ids[i];
+  int nlat, nlon;
+  int ilat;
+  double **field1, **field2;
+
+  nlon = gridInqXsize(gridID1);
+  nlat = gridInqYsize(gridID1);
+
+  if ( nlat > 0 )
+    {
+      field1 = (double **) Malloc(nlat*sizeof(double *));
+      field2 = (double **) Malloc(nlat*sizeof(double *));
+  
+      for ( ilat = 0; ilat < nlat; ilat++ )
+	{
+	  field1[ilat] = array1 + ilat*nlon;
+	  field2[ilat] = array2 + ilat*nlon;
+	}
+
+      for ( ilat = 0; ilat < nlat; ilat++ )
+	memcpy(field2[nlat-ilat-1], field1[ilat], nlon*sizeof(double));
+      
+      if ( field1 ) Free(field1);
+      if ( field2 ) Free(field2);
+    }
+  else
+    {
+      array2[0] = array1[0];
+    }
 }
 
 static int count_axis_ids(int *axis_ids)
