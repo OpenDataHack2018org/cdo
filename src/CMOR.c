@@ -188,16 +188,140 @@ static char *get_val(struct kv **ht, char *key, char *def)
   return e ? e->value : def;
 }
 
-static char *key_rename(struct kv **ht, char *word)
+static void check_compare_set(char *finalset, char *attribute, char *attname)
 {
-  struct kv *e;
-  char *key = (char *) Malloc(strlen(word) + 12);
-  sprintf(key, "__rename_%s", word);
-  HASH_FIND_STR(*ht, key, e);
-  Free(key);
-  return e ? e->value : word;
+  if ( strcmp(attribute, "") != 0 )
+    if ( strcmp(attribute, finalset) != 0 )
+      {
+        cdoWarning("%s of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\nCmor libary is called with attribute unit '%s'.\n", attname, finalset, attname, attribute, attribute);
+        strcpy(finalset, attribute);
+      }
+  else
+    if ( !finalset )
+      cdoAbort("Required attribute '%s' is not found in the configuration.", attname);
 }
 
+static int check_attr(struct kv **ht)
+{
+  struct kv *s, *project, *pos;
+  const char *reqAtt[] = {"institute_id", "institution", "contact", "model_id", "source",
+            "experiment_id", "req_time_units", "project_id", NULL};
+  const char *reqAttCMIP5[] = {"product", "member", NULL};
+  const char *reqAttCORDEX[] = {"product", "member", "cordex_domain", "driving_model_id", NULL};
+/* In all Projects needed Attributes are tested first */
+  int i = 0;
+  while ( reqAtt[i] != NULL )
+    {
+      HASH_FIND_STR(*ht, reqAtt[i], s);
+      if ( !s || strcmp(s->value, "notSet") == 0 ) cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAtt[i]);
+      printf("Attribute %s is %s \n", reqAtt[i], s->value);
+      i++;
+    }
+/* Set default attributes */
+  HASH_FIND_STR(*ht, "references", s);
+  if ( !s || strcmp(s->value, "notSet") == 0 )
+    {
+      char *references = (char *) Malloc(strlen(get_val(ht, "model_id", "")) + 28);
+      strcpy(references, "No references available for ");
+      strcat(references, get_val(ht, "model_id", ""));
+      cdoWarning("Attribute references is set to '%s' ", references);
+      hreplace(ht, "references", references);  
+    }
+/* Special check for CMIP5 or CORDEX projects */
+  i=0;
+  HASH_FIND_STR(*ht, "project_id", project);
+  if ( strcmp(project->value, "CMIP6") == 0 )
+    {
+      cdoAbort("Not yet possible to create data for project CMIP6 since cmor version 2.9 is used in this operator.\n");
+    }
+  if ( strcmp(project->value, "CMIP5") == 0 )
+    {
+      printf("Since the project id is %s further attributes are tested. \n", project->value);
+      while ( reqAttCMIP5[i] != NULL )
+        {
+          HASH_FIND_STR(*ht, reqAttCMIP5[i], s);
+          if ( !s || strcmp(s->value, "notSet") == 0 )cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
+          printf("Attribute %s is %s \n", reqAttCMIP5[i], s->value);
+          i++;
+        }
+    }
+  else if (strcmp(project->value, "CORDEX") == 0 )
+    {
+      printf("Since the project id is %s further attributes are tested", project->value);
+      i=0;
+      while ( reqAttCORDEX[i] != NULL )
+        {
+          HASH_FIND_STR(*ht, reqAttCORDEX[i], s);
+          if ( !s || strcmp(s->value, "notSet") == 0 ) cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCORDEX[i]);
+          printf("Attribute %s is %s \n", reqAttCORDEX[i], s->value);
+          i++;
+        }
+    }
+  HASH_FIND_STR(*ht, "positive", pos);
+  if ( pos )
+    if ( ( strcmp(pos->value, "notSet") == 0 ) || ( strcmp(pos->value, "") != 0 && strcmp(pos->value, "u") != 0 && strcmp(pos->value, "d") != 0 ) )
+      {
+        cdoWarning("Invalid value '%s' is set for attribute 'positive'. The default (blank) is used.\n", pos-> value);
+        hreplace(ht, "positive", "");
+      }
+  return 0;
+} 
+
+static int check_mem(struct kv **ht)
+{
+  char *member = get_val(ht, "member", "");
+  char *project_id = get_val(ht, "project_id", "");
+  char *crealiz, *cinitial, *cphysics;
+  char workchar[CMOR_MAX_STRING]; 
+  int realization, initialization_method, physics_version;
+  int ipos=0, ppos=0;
+
+/* Test for the right member, else abort or warn */ 
+  if ( strlen(member) >= 6 && member[0] == 'r' )
+    {
+      crealiz = cinitial = cphysics = (char *) Malloc(strlen(member));
+      strcpy(crealiz, &member[1]);
+      if ( strtok_r(crealiz, "i", &cinitial) )
+        {
+          strtok_r(cinitial, "p", &cphysics); 
+          realization = strtol(crealiz, NULL, 10);
+          initialization_method = strtol(cinitial, NULL, 10);
+          physics_version = strtol(cphysics, NULL, 10);
+        }
+      else cphysics=NULL;
+    }
+  else crealiz=cinitial=cphysics=NULL;
+  if ( realization && initialization_method && physics_version)
+    {
+      strcpy(workchar, "realization=");
+      strcat(workchar, crealiz);
+      printf("If no other command line values were set, \n%s \n", workchar);
+      parse_kv(ht, workchar); 
+      strcpy(workchar, "initialization_method=");
+      strcat(workchar, cinitial);
+      printf("%s \n", workchar);
+      parse_kv(ht, workchar);
+      strcpy(workchar, "physics_version=");
+      strcat(workchar, cphysics);
+      printf("%s \n", workchar);
+      parse_kv(ht, workchar);
+      return 1;
+    }
+/* Now abort or warn */ 
+  if (strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CORDEX") == 0)
+    cdoAbort("The member has no RIP format (at least 6 characters and in RIP order)! Found for \n member: %s. This is interpreted as \n Realization: %s \n Initialization: %s \n Physics: %s \n   But three Integers are needed", member, crealiz, cinitial, cphysics);
+  else if ( strcmp(member, "notSet") == 0 )
+    {
+      cdoWarning("The member has no RIP format! We set \n Attribute realization=-1 \n Attribute initialization_method=-1 \n Attribute physics_version=-1 \n");
+      hreplace(ht, "realization", "-1"); 
+      hreplace(ht, "initialization_method", "-1"); 
+      hreplace(ht, "physics_version", "-1"); 
+    }
+  return 0;
+} 
+
+
+/*
 static void dump_global_attributes(struct kv **ht, int streamID)
 {
   int natts;
