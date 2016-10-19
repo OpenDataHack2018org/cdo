@@ -1283,57 +1283,153 @@ static void register_all_dimensions(struct kv **ht, int streamID,
   if ( requested_variables ) Free(requested_variables);
 }
 
-static int time_unit_in_seconds(int taxisID)
+static char *get_frequency(int streamID, int vlistID, int taxisID)
 {
-  switch ( taxisInqTunit(taxisID) )
+  char *frequency;
+  frequency = Malloc(CMOR_MAX_STRING * sizeof(char));
+  int ntsteps = vlistNtsteps(vlistID);
+  int reccounter = 0;
+  int recdummy = 0;
+
+  int streamID2 = streamOpenRead(cdoStreamName(0));
+  int vlistID2 = streamInqVlist(streamID2);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  if ( ntsteps < 0 )
     {
-    case TUNIT_MINUTE: return 60;
-    case TUNIT_HOUR: return 3600;
-    case TUNIT_DAY: return 86400;
+      while ( recdummy = streamInqTimestep(streamID2, reccounter++) );
+      ntsteps = reccounter;
+    }    
+  int fyear, lyear, fmonth, lmonth, dummyone, dummytwo;
+  if ( ntsteps > 2 )
+    {
+      int recfirst = streamInqTimestep(streamID2, 1);
+      cdiDecodeDate(taxisInqVdate(taxisID2), &fyear, &fmonth, &dummytwo);
+      int reclast = streamInqTimestep(streamID2, ntsteps-1);    
+      cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
+
+      double covered_years = lyear-fyear + 1.0;
+      if ( ntsteps / covered_years <= 1 )
+        {
+          strcpy(frequency, "yr");
+          printf("Found %d time steps in %f covered years.\nTherefore, the frequency is %s.\n", ntsteps, covered_years, frequency);
+        }
+      else 
+        {
+          int step_per_year = 0;
+          int step_per_month = 0;
+          reccounter = 0;
+          printf("Frequency is calculated by counting all timesteps in year %d\nin order to calculate time bounds in case they are not given.\n", fyear, fmonth);
+          while ( recdummy = streamInqTimestep(streamID2, reccounter++) )
+            {
+              int reqyear;
+              cdiDecodeDate(taxisInqVdate(taxisID2), &reqyear, &dummyone, &dummytwo);
+              if ( reqyear == ( fyear + 1 ) )
+                break;
+              step_per_year++;
+            } 
+          if ( step_per_year > 366 )
+            cdoAbort("Frequency is sub-daily! Not yet enabled.");
+          if ( step_per_year <= 366 )
+            {
+              strcpy(frequency, "day");
+              if ( step_per_year <= 12 )
+                {/*
+                  reccounter = 0;
+                  while ( recdummy = streamInqTimestep(streamID, reccounter++) )
+                    {
+                      int reqmonth;
+                      cdiDecodeDate(taxisInqVdate(taxisID), &dummyone, &reqmonth, &dummytwo);
+                      if ( dummytwo > 28 && step_per_month == 0 )
+                        {
+                          strcpy(frequency, "mon");
+                          break;
+                        }
+                      if ( reqmonth == ( fmonth + 1 ) )
+                        break;
+                      step_per_month++;
+                    }
+                 if ( step_per_month <= 1) */
+                   strcpy(frequency, "mon");
+                }
+            }
+            printf("Found %d time steps in year %d.\nTherefore, the frequency is %s.\n", step_per_year, fyear, frequency);
+ /*         if ( step_per_month == 0 )
+            printf("In month '%d' either no or time steps at the end of the month were found.\nIn this case, frequency is set to 'month'.\n", fmonth);
+          else
+            printf("Found %d time steps in year %d and %d time steps in month %d of the year.\nTherefore, the frequency is %s.\n", step_per_year, fyear, step_per_month, fmonth, frequency);*/
+        }      
+    }
+  else
+    {
+      if ( !taxisHasBounds(taxisID2) && ntsteps > 0 )
+        cdoAbort("No time bounds are found in Ifile and for %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nDefine time bounds before cdo cmor.", ntsteps);
+      else
+        cdoWarning("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nTime bounds of the rec are used.\n", ntsteps);
+    }
+  return frequency;
+}
+
+static int get_tunitsec(int tunit)
+{
+  switch ( tunit )
+    {
+    case TUNIT_MINUTE: return 60; 
+    case TUNIT_HOUR: return 3600; 
+    case TUNIT_DAY: return 86400; 
     default: return 3600;
     }
 }
 
-static double get_cmor_time_val(int taxisID, juldate_t ref_date)
+static double get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec, int calendar)
 {
-  int tunitsec = time_unit_in_seconds(taxisID);
-  int calendar = taxisInqCalendar(taxisID);
   juldate_t juldate = juldate_encode(calendar, taxisInqVdate(taxisID),
                                      taxisInqVtime(taxisID));
   return juldate_to_seconds(juldate_sub(juldate, ref_date)) / tunitsec;
 }
 
-static double *get_cmor_time_bounds(int taxisID, juldate_t ref_date,
-                                    double *bounds)
+static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date, double time_val, int calendar, int tunitsec, double *time_bnds)
 {
-  if ( taxisHasBounds(taxisID) )
+  int vdate0b, vdate1b, vtime0b, vtime1b;
+  int year, month, day;
+  cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);
+  if ( !taxisHasBounds(taxisID) )
     {
-      int vdate0b, vdate1b, vtime0b, vtime1b;
-      taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
-      taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
-
-      int tunitsec = time_unit_in_seconds(taxisID);
-      int calendar = taxisInqCalendar(taxisID);
-      juldate_t date = juldate_encode(calendar, vdate0b, vtime0b);
-      bounds[0] = juldate_to_seconds(juldate_sub(date, ref_date)) / tunitsec;
-
-      date = juldate_encode(calendar, vdate1b, vtime1b);
-      bounds[1] = juldate_to_seconds(juldate_sub(date, ref_date)) / tunitsec;
-      return bounds;
+      if ( strcmp(frequency, "yr") == 0 )
+        {
+          vdate0b = cdiEncodeDate(year,   1, 1);
+          vdate1b = cdiEncodeDate(year+1, 1, 1);
+        }     
+      if ( strcmp(frequency, "mon") == 0 )
+        {
+          vdate0b = cdiEncodeDate(year, month, 1);
+          month++;
+          if ( month > 12 ) { month = 1; year++; }
+          vdate1b = cdiEncodeDate(year, month, 1);
+        }  
+      if ( strcmp(frequency, "day") == 0 )
+        {
+          time_bnds[0] = time_val - 0.5;
+          time_bnds[1] = time_val + 0.5;
+        }  
+      vtime0b = 0;
+      vtime1b = 0;
     }
   else
     {
-      return NULL;
+      taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
+      taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
     }
+
+  juldate_t juldate = juldate_encode(calendar, vdate0b, vtime0b);
+  time_bnds[0] = juldate_to_seconds(juldate_sub(juldate, ref_date))
+                / tunitsec;
+
+  juldate = juldate_encode(calendar, vdate1b, vtime1b);
+  time_bnds[1] = juldate_to_seconds(juldate_sub(juldate, ref_date))
+              / tunitsec;
+  return time_bnds;
 }
 
-static struct mapping *map_var(int cdi_varID, struct mapping vars[])
-{
-  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
-    if ( cdi_varID == vars[i].cdi_varID )
-      return &vars[i];
-  return NULL;
-}
 
 static void read_record(int streamID, double *buffer, size_t gridsize,
                         struct mapping vars[])
