@@ -619,61 +619,82 @@ void invertLatDataCmor(double *array1, double *array2, int gridID1)
     }
 }
 
-static int count_axis_ids(int *axis_ids)
+/*************************/
+/* Until here */
+/*************************/
+
+
+static char *get_time_units(int taxisID)
 {
-  int i;
-  for ( i = 0; axis_ids[i] != CMOR_UNDEFID; i++ );
-  return i;
+  char *units = Malloc ( CMOR_MAX_STRING * sizeof(char) );
+  int timeunit = taxisInqTunit(taxisID);
+  int year, month, day, hour, minute, second;
+  cdiDecodeDate(taxisInqRdate(taxisID), &year, &month, &day);
+  cdiDecodeTime(taxisInqRtime(taxisID), &hour, &minute, &second);
+  if ( timeunit == TUNIT_QUARTER || timeunit == TUNIT_30MINUTES )
+    timeunit = TUNIT_MINUTE;
+  if ( timeunit == TUNIT_3HOURS || timeunit == TUNIT_6HOURS ||
+       timeunit == TUNIT_12HOURS )
+    timeunit = TUNIT_HOUR;
+
+  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
+          year, month, day, hour, minute, second);
+  return units;
 }
 
-static void register_x_axis(int gridID, char* name, int *axis_ids)
+static int get_time_step_int(char *time_step)
 {
-  double *coord_vals;
-  char units[CDI_MAX_NAME];
-  gridInqXunits(gridID, units);
-  int length = gridInqXsize(gridID);
-  coord_vals = Malloc(length * sizeof(double));
-  gridInqXvals(gridID, coord_vals);
-  double *cell_bounds = Malloc(2 * length * sizeof(double));
-  int nbounds = gridInqXbounds(gridID, cell_bounds);
-  if ( nbounds != 2 * length )
+  if ( strcmp(time_step, "hours") == 0  )
+    return TUNIT_HOUR;
+  else if ( strcmp(time_step, "days") == 0 ) 
+    return TUNIT_DAY;
+  else if ( strcmp(time_step, "months") ==  0 )
+    return TUNIT_MONTH;
+  else if ( strcmp(time_step, "years") == 0  )
+    return TUNIT_YEAR;
+  else
     {
-      Free(cell_bounds);
-      cell_bounds = NULL;
+      cdoWarning("Timeunit %s not yet implemented in cmor.\n", time_step);
+      return 0;
     }
-  cmor_axis(new_axis_id(axis_ids), name, units, length, (void *)coord_vals,
-            'd', (void *)cell_bounds, 2, NULL);
-  Free(coord_vals);
-  if ( cell_bounds ) Free(cell_bounds);
 }
 
-static void register_y_axis(int gridID, char* name, int *axis_ids)
+static int check_time_units(char *time_units)
 {
-  double *coord_vals;
-  char units[CDI_MAX_NAME];
-  gridInqYunits(gridID, units);
-  int length = gridInqYsize(gridID);
-  coord_vals = Malloc(length * sizeof(double));
-  gridInqYvals(gridID, coord_vals);
-  double *cell_bounds = Malloc(2 * length * sizeof(double));
-  int nbounds = gridInqYbounds(gridID, cell_bounds);
-  if ( nbounds != 2 * length )
+  int attyear, attmonth, attday, atthour, attminute, attsecond;
+  char time_step[CMOR_MAX_STRING];
+  if ( sscanf(time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s",
+                  time_step, &attyear, &attmonth, &attday, &atthour,
+                  &attminute, &attsecond) != 7)
     {
-      Free(cell_bounds);
-      cell_bounds = NULL;
+      cdoWarning("Could not read all 7 required time unit values.");
+      return 0;
     }
-  cmor_axis(new_axis_id(axis_ids), name, units, length, (void *)coord_vals,
-            'd', (void *)cell_bounds, 2, NULL);
-  Free(coord_vals);
-  if ( cell_bounds ) Free(cell_bounds);
+  if ( !get_time_step_int(time_step) )
+    return 0;
+  return 1;
 }
 
-static void register_z_axis(int zaxisID, char *name, int *axis_ids)
+static void get_taxis(char *req_time_units, char *attcalendar, int *sdate, int *stime, int *timeunit, int *calendar)
 {
-  int levels = zaxisInqSize(zaxisID);
-  char units[CDI_MAX_NAME];
-  double *coord_vals;
-  if ( zaxisInqType(zaxisID) != ZAXIS_SURFACE )
+  int attyear, attmonth, attday, atthour, attminute, attsecond;
+  char atttimeunit[CMOR_MAX_STRING];
+
+  sscanf(req_time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s",
+                  atttimeunit, &attyear, &attmonth, &attday, &atthour,
+                  &attminute, &attsecond);
+  *sdate = cdiEncodeDate(attyear, attmonth, attday);
+  *stime = cdiEncodeTime(atthour, attminute, attsecond);
+  *timeunit = get_time_step_int(atttimeunit);
+  *calendar = get_calendar_int(attcalendar);
+}
+
+static char **get_requested_variables(struct kv **ht)
+{
+  char **name_list = NULL;
+  char *select_vars = get_val(ht, "vars", NULL);
+
+  if ( select_vars )
     {
       coord_vals = Malloc(levels * sizeof(double));
       cdoZaxisInqLevels(zaxisID, coord_vals);
