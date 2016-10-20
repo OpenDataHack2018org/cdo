@@ -51,7 +51,7 @@ double *fld_weights(int gridID, size_t ngp)
 }
 
 
-int getLayerThickness(int genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights);
+int getLayerThickness(bool genbounds, int index, int zaxisID, int nlev, double *thickness, double *weights);
 
 double *vert_weights(int zaxisID, size_t nlev)
 {

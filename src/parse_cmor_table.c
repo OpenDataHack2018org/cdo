@@ -288,7 +288,7 @@ void parse_json_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
 
   /* Allocate some tokens as a start */
   size_t tokcount = 2;
-  jsmntok_t *tok = Malloc(sizeof(*tok) * tokcount);
+  jsmntok_t *tok = (jsmntok_t *) Malloc(sizeof(*tok) * tokcount);
 
   int r;
  AGAIN:
@@ -298,7 +298,7 @@ void parse_json_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
       if ( r == JSMN_ERROR_NOMEM )
         {
           tokcount = tokcount * 2;
-          tok = Realloc(tok, sizeof(*tok) * tokcount);
+          tok = (jsmntok_t *) Realloc(tok, sizeof(*tok) * tokcount);
           goto AGAIN;
         }
     }
