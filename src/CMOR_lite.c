@@ -261,7 +261,7 @@ void convertVarUnits(var_t *vars, int varID, char *name)
 }
 
 static
-void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units)
+void defineVarUnits(var_t *vars, int vlistID2, int varID, const char *units)
 {
   char units_old[CDI_MAX_NAME];
 
@@ -310,142 +310,158 @@ list_t *pml_search_kvl_ventry(list_t *pml, const char *key, const char *value, i
 }
 
 
-static
-void read_partab(int nvars, int vlistID2, var_t *vars)
+list_t *pml_get_kvl_ventry(list_t *pml, int nentry, const char **entry)
 {
+  if ( pml )
+    {
+      listNode_t *node = pml->head;
+      while ( node )
+        {
+          if ( node->data )
+            {
+              list_t *kvl = *(list_t **)node->data;
+              const char *listname = list_name(kvl);
+              for ( int i = 0; i < nentry; ++i )
+                if ( strcmp(listname, entry[i]) == 0 ) return kvl;
+            }
+          node = node->next;
+        }
+    }
+
+  return NULL;
+}
+
+static
+void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars)
+{
+  const char *hentry[] = {"Header"};
   const char *ventry[] = {"variable_entry"};
   int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
-  int code, out_code, table, ltype, remove, convert;
-  int nml_index = 0;
-  double missval, factor;
-  double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
-  char *chunktypestr = NULL;
-  char *datatypestr = NULL;
-  char *typestr = NULL;
-  char *paramstr = NULL;
-  char *out_paramstr = NULL;
-  char *name = NULL, *out_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
-  char cell_methods[CDI_MAX_NAME] = "", cell_measures[CDI_MAX_NAME] = "";
+  int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char varname[CDI_MAX_NAME];
-  char exprstr[CDI_MAX_NAME];
-  char comment[1024] = "";
-
-  const char *filename = operatorArgv()[0];
 
   list_t *pml = cdo_parse_cmor_file(filename);
-  if ( pml == NULL ) return -1;
+  if ( pml == NULL ) return;
 
-  // get missval from Header
+  // search for global missing value
+  bool lmissval = false;
+  double missval;
+  list_t *kvl = pml_get_kvl_ventry(pml, nhentry, hentry);
+  if ( kvl )
+    {
+      keyValues_t *kv = kvlist_search(kvl, "missing_value");
+      if ( kv && kv->nvalues > 0 )
+        {
+          lmissval = true;
+          missval = parameter2double(kv->values[0]);
+        }
+    }
 
   for ( int varID = 0; varID < nvars; varID++ )
     {
       vlistInqVarName(vlistID2, varID, varname);
-      printf("Process: %s\n", varname);
+
+      strcpy(vars[varID].name, varname);
+      if ( lmissval )
+        {
+          double missval_old = vlistInqVarMissval(vlistID2, varID);
+          if ( ! DBL_IS_EQUAL(missval, missval_old) )
+            {
+              vars[varID].changemissval = true;
+              vars[varID].missval_old = missval_old;
+              vlistDefVarMissval(vlistID2, varID, missval);
+            }
+        }
 
       list_t *kvl = pml_search_kvl_ventry(pml, "name", varname, nventry, ventry);
       if ( kvl )
         {
-          const int nkv = list_size(kvl);
-          const char *keys[nkv];
-          const char *values[nkv];
-          printf("kvl size %d\n", nkv);
-          int i = 0;
+          // int pnum, ptab, pdum;
+          // cdiDecodeParam(vlistInqVarParam(vlistID2, varID), &pnum, &ptab, &pdum);
+          // const int nkv = list_size(kvl);
+          bool lvalid_min = false, lvalid_max = false;
+
           for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
-	    {
+            {
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
-              keys[i] = kv->key;
-              values[i] = kv->values[0];
-              i++;
+              const char *key = kv->key;
+              const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
+              if ( !value ) continue;
+              
+              //printf("key=%s  value=%s\n", key, value);
+
+              if      ( STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
+              else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
+              else if ( STR_IS_EQ(key, "units")         ) defineVarUnits(vars, vlistID2, varID, value);
+              else if ( STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
+              else if ( STR_IS_EQ(key, "out_name")      )
+                {
+                  vlistDefVarName(vlistID2, varID, parameter2word(value));
+                  defineVarAttText(vlistID2, varID, "original_name", vars[varID].name);
+                }
+              else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
+              else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
+              // else if ( STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              // else if ( STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              else if ( STR_IS_EQ(key, "comment")       ) defineVarAttText(vlistID2, varID, "comment", value);
+              else if ( STR_IS_EQ(key, "cell_methods")  ) defineVarAttText(vlistID2, varID, "cell_methods", value);
+              else if ( STR_IS_EQ(key, "cell_measures") ) defineVarAttText(vlistID2, varID, "cell_measures", value);
+              else if ( STR_IS_EQ(key, "delete")        ) vars[varID].remove = parameter2bool(value);
+              else if ( STR_IS_EQ(key, "convert")       ) vars[varID].convert = parameter2bool(value);
+              else if ( STR_IS_EQ(key, "factor")        )
+                {
+                  vars[varID].lfactor = true;
+                  vars[varID].factor = parameter2double(value);
+                  if ( cdoVerbose ) cdoPrint("%s - scale factor %g", varname, vars[varID].factor);
+                }
+              else if ( STR_IS_EQ(key, "missval") )
+                {
+                  double missval = parameter2double(value);
+                  double missval_old = vlistInqVarMissval(vlistID2, varID);
+                  if ( ! DBL_IS_EQUAL(missval, missval_old) )
+                    {
+                      if ( cdoVerbose ) cdoPrint("%s - change missval from %g to %g", varname, missval_old, missval);
+                      vars[varID].changemissval = true;
+                      vars[varID].missval_old = missval_old;
+                      vlistDefVarMissval(vlistID2, varID, missval);
+                    }
+                }
+              else if ( STR_IS_EQ(key, "valid_min") )
+                {
+                  lvalid_min = true;
+                  vars[varID].valid_min = parameter2double(value);
+                }
+              else if ( STR_IS_EQ(key, "valid_max") )
+                {
+                  lvalid_max = true;
+                  vars[varID].valid_max = parameter2double(value);
+                }
+              else if ( STR_IS_EQ(key, "ok_min_mean_abs") )
+                {
+                  vars[varID].check_min_mean_abs = true;
+                  vars[varID].ok_min_mean_abs = parameter2double(value);
+                }
+              else if ( STR_IS_EQ(key, "ok_max_mean_abs") )
+                {
+                  vars[varID].check_max_mean_abs = true;
+                  vars[varID].ok_max_mean_abs = parameter2double(value);
+                }
+              else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") )
+                {
+                  int datatype = str2datatype(parameter2word(value));
+                  if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
+                }
+              else
+                {
+                  if ( cdoVerbose ) cdoPrint("Key >%s< not supported!", key);
+                }
             }
 
-          for ( i = 0; i < nkv; ++i )
-            {
-              const char *key = keys[i];
-              const char *value = values[i];
-              if ( strcmp(key, "standard_name") == 0 ) vlistDefVarStdname(vlistID2, varID, value);
-              if ( strcmp(key, "long_name")     == 0 ) vlistDefVarLongname(vlistID2, varID, value);
-              if ( strcmp(key, "units")         == 0 ) defineVarUnits(vars, vlistID2, varID, value);
-            }
+          if ( lvalid_min && lvalid_max ) vars[varID].checkvalid = true;
         }
     }
 
   list_destroy(pml);
-
- 
-  /*
-	      if ( varID < nvars )
-		{
-                  int pnum, ptab, pdum;
-                  cdiDecodeParam(vlistInqVarParam(vlistID2, varID), &pnum, &ptab, &pdum);
-		  if ( nml->entry[nml_code]->occ     )  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(code, ptab, 255));
-		  if ( nml->entry[nml_out_code]->occ )  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(out_code, ptab, 255));
-		  if ( nml->entry[nml_name]->occ     )  strcpy(vars[varID].name, name);
-		  if ( nml->entry[nml_name]->occ     )  vlistDefVarName(vlistID2, varID, name);
-		  if ( nml->entry[nml_out_name]->occ )  vlistDefVarName(vlistID2, varID, out_name);
-		  if ( nml->entry[nml_out_name]->occ )  defineVarAttText(vlistID2, varID, "original_name", vars[varID].name);
-		  if ( nml->entry[nml_comment]->occ  )  defineVarAttText(vlistID2, varID, "comment", comment);
-		  if ( nml->entry[nml_cell_methods]->occ  ) defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
-		  if ( nml->entry[nml_cell_measures]->occ ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
-		  if ( nml->entry[nml_delete]->occ && remove == 1 ) vars[varID].remove = true;
-		  if ( nml->entry[nml_convert]->occ )   vars[varID].convert = convert != 0;
-		  if ( nml->entry[nml_param]->occ )     vlistDefVarParam(vlistID2, varID, stringToParam(paramstr));
-		  if ( nml->entry[nml_out_param]->occ ) vlistDefVarParam(vlistID2, varID, stringToParam(out_paramstr));
-		  if ( nml->entry[nml_datatype]->occ )
-		    {
-		      int datatype = str2datatype(datatypestr);
-		      if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
-		    }
-		  if ( nml->entry[nml_type]->occ )
-		    {
-		      int datatype = str2datatype(typestr);
-		      if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
-		    }
-		  if ( nml->entry[nml_missval]->occ )
-		    {
-		      double missval_old = vlistInqVarMissval(vlistID2, varID);
-		      if ( ! DBL_IS_EQUAL(missval, missval_old) )
-			{
-			  if ( cdoVerbose ) 
-			    cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
-			  vars[varID].changemissval = true;
-			  vars[varID].missval_old = missval_old;
-			  vlistDefVarMissval(vlistID2, varID, missval);
-			}
-		    }
-		  if ( nml->entry[nml_factor]->occ )
-		    {
-		      vars[varID].lfactor = true;
-		      vars[varID].factor = factor;
-		      if ( cdoVerbose ) 
-			cdoPrint("%s - scale factor %g", name, factor);
-		    }
-		  if ( nml->entry[nml_valid_min]->occ && nml->entry[nml_valid_max]->occ )
-		    {
-		      vars[varID].checkvalid = true;
-		      vars[varID].valid_min = valid_min;
-		      vars[varID].valid_max = valid_max;
-		    }
-		  if ( nml->entry[nml_ok_min_mean_abs]->occ )
-		    {
-		      vars[varID].check_min_mean_abs = true;
-		      vars[varID].ok_min_mean_abs = ok_min_mean_abs;
-		    }
-		  if ( nml->entry[nml_ok_max_mean_abs]->occ )
-		    {
-		      vars[varID].check_max_mean_abs = true;
-		      vars[varID].ok_max_mean_abs = ok_max_mean_abs;
-		    }
-		}
-	    }
-	  else
-	    break;
-	}
-  
-      namelistDelete(nml);
-
-      fclose(fp);
-    }
-  */
 }
 
 static
@@ -558,7 +574,8 @@ void *CMOR_lite(void *argument)
   if ( convert_data )
     for ( varID = 0; varID < nvars; ++varID ) vars[varID].convert = true;
 
-  read_partab(nvars, vlistID2, vars);
+  const char *filename = operatorArgv()[0];
+  apply_cmor_table(filename, nvars, vlistID2, vars);
 
   for ( int varID = 0; varID < nvars; ++varID )
     if ( vars[varID].remove )

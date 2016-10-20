@@ -50,4 +50,6 @@
 #  define IS_EQUAL(x,y)     (!IS_NOT_EQUAL(x,y))
 #endif
 
+#define STR_IS_EQ(x,y) ((*x)==(*y) && strcmp(x,y) == 0)
+
 #endif  /* _COMPARE_H */

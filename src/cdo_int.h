@@ -127,7 +127,6 @@ int ntr2nlat(int ntr);
 int ntr2nlat_linear(int ntr);
 int compNlon(int nlat);
 
-void param2str(int param, char *paramstr, int maxlen);
 void datetime2str(int date, int time, char *datetimestr, int maxlen);
 void date2str(int date, char *datestr, int maxlen);
 void time2str(int time, char *timestr, int maxlen);
@@ -158,7 +157,9 @@ off_t fileSize(const char *restrict filename);
 
 char *expand_filename(const char *string);
 
+const char *parameter2word(const char *string);
 double parameter2double(const char *string);
+bool   parameter2bool(const char *string);
 int    parameter2int(const char *string);
 int    parameter2intlist(const char *string);
 

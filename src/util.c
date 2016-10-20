@@ -376,12 +376,45 @@ void strtolower(char *str)
 }
 
 
+const char *parameter2word(const char *string)
+{
+  size_t len = strlen(string);
+
+  for ( size_t i = 0; i < len; ++i )
+    {
+      int c = string[i];
+      if ( !isalnum(c) && c != '_' && c != '.' && c != ':' )
+        cdoAbort("Word parameter >%s< contains invalid character at position %d!", string, i+1);
+    }
+
+  if ( len == 0 ) cdoAbort("Word parameter >%s< is empty!", string);
+
+  return string;
+}
+
+
+bool parameter2bool(const char *str)
+{
+  size_t len = strlen(str);
+
+  if ( len == 1 )
+    {
+      if ( *str == 't' || *str == 'T' || *str == '1' ) return true;
+      if ( *str == 'f' || *str == 'F' || *str == '0' ) return false;
+    }
+  else if ( len == 4 && (STR_IS_EQ(str, "true")  || STR_IS_EQ(str, "TRUE")  || STR_IS_EQ(str, "True"))  ) return true;
+  else if ( len == 5 && (STR_IS_EQ(str, "false") || STR_IS_EQ(str, "FALSE") || STR_IS_EQ(str, "False")) ) return false;
+
+  cdoAbort("Boolean parameter >%s< contains invalid characters!", str);
+
+  return false;
+}
+
+
 double parameter2double(const char *string)
 {
   char *endptr = NULL;
-
   double fval = strtod(string, &endptr);
-
   if ( *endptr != 0 )
     cdoAbort("Float parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));
@@ -393,9 +426,7 @@ double parameter2double(const char *string)
 int parameter2int(const char *string)
 {
   char *endptr = NULL;
-
   int ival = (int) strtol(string, &endptr, 10);
-
   if ( *endptr != 0 )
     cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));

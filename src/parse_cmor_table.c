@@ -314,6 +314,11 @@ list_t *cdo_parse_cmor_file(const char *filename)
   assert(filename != NULL);
 
   size_t filesize = fileSize(filename);
+  if ( filesize == 0 )
+    {
+      fprintf(stderr, "Empty table file: %s\n", filename);
+      return NULL;
+    }
 
   FILE *fp = fopen(filename, "r");
   if ( fp == NULL )
