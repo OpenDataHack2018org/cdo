@@ -55,6 +55,10 @@ int read_cmor_table(const char *filename)
 static
 int conv_cmor_table(const char *filename)
 {
+  const char *hname = "Header";
+  const char *vname = "variable";
+  //const char *aname = "axis";
+
   list_t *pml = cdo_parse_cmor_file(filename);
   if ( pml == NULL ) return -1;
 
@@ -66,7 +70,7 @@ int conv_cmor_table(const char *filename)
       list_t *kvl = *(list_t **)pmnode->data;
       const char *listname = list_name(kvl);
 
-      if ( strncmp("global", listname, strlen(listname)) == 0 )
+      if ( strncmp(listname, hname, strlen(hname)) == 0  )
 	{
           for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
 	    {
@@ -82,7 +86,7 @@ int conv_cmor_table(const char *filename)
 		}
 	    }
 	}
-      else if ( strncmp("variable", listname, strlen(listname)) == 0 )
+      else if ( strncmp(listname, vname, strlen(vname)) == 0 )
 	{
 	  printf("&%s\n", "parameter");
           for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
@@ -110,22 +114,25 @@ int conv_cmor_table(const char *filename)
 		    }
 		}
 
-	      if ( strncmp("name", ename, len)            == 0 ||
-		   strncmp("standard_name", ename, len)   == 0 ||
-		   strncmp("out_name", ename, len)        == 0 ||
-		   strncmp("type", ename, len)            == 0 ||
-		   strncmp("valid_min", ename, len)       == 0 ||
-		   strncmp("valid_max", ename, len)       == 0 ||
-		   strncmp("ok_min_mean_abs", ename, len) == 0 ||
-		   strncmp("ok_max_mean_abs", ename, len) == 0 )
-		printf("  %-15s = %s\n", ename, ovalue);
-	      else if ( strncmp("long_name", ename, len)  == 0 ||
-		   strncmp("units", ename, len)           == 0 ||
-		   strncmp("cell_methods", ename, len)    == 0 ||
-		   strncmp("cell_measures", ename, len)   == 0 ||
-		   strncmp("comment", ename, len)         == 0 )
-		printf("  %-15s = \"%.*s\"\n", ename, vlen, ovalue);
-
+              if ( vlen )
+                {
+                  if ( strncmp("name", ename, len)            == 0 ||
+                       strncmp("standard_name", ename, len)   == 0 ||
+                       strncmp("out_name", ename, len)        == 0 ||
+                       strncmp("type", ename, len)            == 0 ||
+                       strncmp("valid_min", ename, len)       == 0 ||
+                       strncmp("valid_max", ename, len)       == 0 ||
+                       strncmp("ok_min_mean_abs", ename, len) == 0 ||
+                       strncmp("ok_max_mean_abs", ename, len) == 0 )
+                    printf("  %-15s = %s\n", ename, ovalue);
+                  else if ( strncmp("long_name", ename, len)  == 0 ||
+                            strncmp("units", ename, len)           == 0 ||
+                            strncmp("cell_methods", ename, len)    == 0 ||
+                            strncmp("cell_measures", ename, len)   == 0 ||
+                            strncmp("comment", ename, len)         == 0 )
+                    printf("  %-15s = \"%.*s\"\n", ename, vlen, ovalue);
+                }
+              
 	      Free(ovalue);
 	    }
 	  if ( hasmissval ) printf("  %-15s = %g\n", "missing_value", missval);

@@ -124,6 +124,8 @@ void *Splitsel(void *argument)
 	}
     }
 
+  int index = 0;
+  int nsets = 0;
 
   /* offset */
   for ( tsID = 0; tsID < noffset; tsID++ )
@@ -147,8 +149,6 @@ void *Splitsel(void *argument)
           }
     }
 
-  int index = 0;
-  int nsets = 0;
   while ( TRUE )
     {
       sprintf(filename+nchars, "%06d", index);

@@ -1,3 +1,11 @@
+2016-10-20  Uwe Schulzweida
+
+	* New operator cmorlite: apply variable_entry of cmor tables
+
+2016-10-19  Uwe Schulzweida
+
+	* conv_cmor_table: added support for CMOR CMIP6 tables
+
 2016-10-05  Uwe Schulzweida
 
 	* ml2pl: interpolation failed for data on hybrid half levels [Bug #7225]

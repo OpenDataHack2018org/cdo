@@ -54,6 +54,7 @@ void *Change(void *argument);
 void *Change_e5slm(void *argument);
 void *Cloudlayer(void *argument);
 void *CMOR(void *argument);
+void *CMOR_lite(void *argument);
 void *CMOR_table(void *argument);
 void *Collgrid(void *argument);
 void *Command(void *argument);
@@ -291,6 +292,7 @@ void *Maggraph(void *argument);
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}
 #define  CMOROperators          {"cmor"}
+#define  CMORliteOperators      {"cmorlite"}
 #define  CMORtableOperators     {"read_cmor_table", "conv_cmor_table"}
 #define  CollgridOperators      {"collgrid"}
 #define  CommandOperators       {"command", "com", "cmd"}
@@ -579,6 +581,7 @@ static modules_t Modules[] =
   { Change_e5slm,   NULL,              Change_e5slmOperators,  0,   CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    1,   CDI_REAL,  1,  1 },
   { CMOR,           CMORHelp,          CMOROperators,          1,   CDI_REAL,  1,  0 },
+  { CMOR_lite,      NULL,              CMORliteOperators,      1,   CDI_REAL,  1,  1 },
   { CMOR_table,     NULL,              CMORtableOperators,     1,   CDI_REAL,  0,  0 },
   { Collgrid,       CollgridHelp,      CollgridOperators,      1,   CDI_REAL, -1,  1 },
   { Command,        NULL,              CommandOperators,       0,   CDI_REAL,  1,  0 },
