@@ -44,7 +44,6 @@
 #include "pstream.h"
 #include "util.h"
 #include "pmlist.h"
-#include "namelist.h"
 
 int stringToParam(const char *paramstr);
 
