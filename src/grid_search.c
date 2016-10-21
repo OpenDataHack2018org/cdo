@@ -543,7 +543,7 @@ struct gsknn *gridsearch_knn_new(unsigned size)
   
   knn->ndist   = size;
   knn->size    = size;
-  knn->mask    = (int*) Malloc(size*sizeof(int));       // mask at nearest neighbors
+  knn->mask    = (bool*) Malloc(size*sizeof(bool));     // mask at nearest neighbors
   knn->add     = (int*) Malloc(size*sizeof(int));       // source address at nearest neighbors
   knn->dist    = (double*) Malloc(size*sizeof(double)); // angular distance of the nearest neighbors
   knn->tmpadd  = NULL;

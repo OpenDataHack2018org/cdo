@@ -46,9 +46,9 @@ typedef struct {
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-double smooth_knn_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, struct gsknn *knn, double search_radius, double weight0, double weightR)
+double smooth_knn_compute_weights(unsigned num_neighbors, const bool *restrict src_grid_mask, struct gsknn *knn, double search_radius, double weight0, double weightR)
 {
-  int *restrict nbr_mask = knn->mask;
+  bool *restrict nbr_mask = knn->mask;
   const int *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
@@ -57,12 +57,12 @@ double smooth_knn_compute_weights(unsigned num_neighbors, const int *restrict sr
 
   for ( unsigned n = 0; n < num_neighbors; ++n )
     {
-      nbr_mask[n] = FALSE;
+      nbr_mask[n] = false;
       if ( nbr_add[n] >= 0 && src_grid_mask[nbr_add[n]] )
         {
           nbr_dist[n] = intlin(nbr_dist[n], weight0, 0, weightR, search_radius);
           dist_tot += nbr_dist[n];
-          nbr_mask[n] = TRUE;
+          nbr_mask[n] = true;
         }
     }
 
@@ -72,7 +72,7 @@ double smooth_knn_compute_weights(unsigned num_neighbors, const int *restrict sr
 
 unsigned smooth_knn_normalize_weights(unsigned num_neighbors, double dist_tot, struct gsknn *knn)
 {
-  const int *restrict nbr_mask = knn->mask;
+  const bool *restrict nbr_mask = knn->mask;
   int *restrict nbr_add = knn->add;
   double *restrict nbr_dist = knn->dist;
 
@@ -101,9 +101,9 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
   unsigned num_neighbors = spoint.maxpoints;
   if ( num_neighbors > gridsize ) num_neighbors = gridsize;
 
-  int *mask = (int*) Malloc(gridsize*sizeof(int));
+  bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
   for ( unsigned i = 0; i < gridsize; ++i )
-    mask[i] = DBL_IS_EQUAL(array1[i], missval) ? 0 : 1;
+    mask[i] = !DBL_IS_EQUAL(array1[i], missval);
   
   double *xvals = (double*) Malloc(gridsize*sizeof(double));
   double *yvals = (double*) Malloc(gridsize*sizeof(double));
@@ -210,7 +210,7 @@ void smooth(int gridID, double missval, const double *restrict array1, double *r
 }
 
 static inline
-void smooth9_sum(size_t ij, short *mask, double sfac, const double *restrict array, double *avg, double *divavg)
+void smooth9_sum(size_t ij, bool *mask, double sfac, const double *restrict array, double *avg, double *divavg)
 {
   if ( mask[ij] ) { *avg += sfac*array[ij]; *divavg += sfac; }
 }
@@ -223,13 +223,10 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
   size_t nlat = gridInqYsize(gridID);
   int grid_is_cyclic = gridIsCircular(gridID);
 
-  short *mask = (short*) Malloc(gridsize*sizeof(short));
+  bool *mask = (bool*) Malloc(gridsize*sizeof(bool));
 
   for ( size_t i = 0; i < gridsize; ++i ) 
-    {		
-      if ( DBL_IS_EQUAL(missval, array1[i]) ) mask[i] = 0;
-      else mask[i] = 1;
-    }
+    mask[i] = !DBL_IS_EQUAL(missval, array1[i]);
  
   *nmiss = 0;
   for ( size_t i = 0; i < nlat; i++ )
@@ -292,7 +289,7 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
             }
           else if ( mask[j+nlon*i] )
             {			 
-              avg += array1[j+nlon*i]; divavg+= 1;
+              avg += array1[j+nlon*i]; divavg += 1;
 			    
               smooth9_sum(((i-1)*nlon)+j-1, mask, 0.3, array1, &avg, &divavg);
               smooth9_sum(((i-1)*nlon)+j,   mask, 0.5, array1, &avg, &divavg);
