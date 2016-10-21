@@ -291,7 +291,8 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
 #if defined(HAVE_LIBPTHREAD)
   int pstreamID = pstreamptr->self;
 
-  char *pipename = (char*) Malloc(16);
+  size_t pnlen = 16;
+  char *pipename = (char*) Malloc(pnlen);
   // struct sched_param param;
   
   argument_t *newargument = (argument_t*) Malloc(sizeof(argument_t));
@@ -303,9 +304,9 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   char *operatorName = getOperatorName(operatorArg);
 
   size_t len = strlen(argument->args);
-  char *newarg = (char*) Malloc(len+16);
+  char *newarg = (char*) Malloc(len+pnlen);
   strcpy(newarg, argument->args);
-  sprintf(pipename, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
+  snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
   newarg[len] = ' ';
   strcpy(&newarg[len+1], pipename);
 
@@ -1677,7 +1678,7 @@ void cdoFinish(void)
 	}
 
       if ( memmax )
-	sprintf(memstring, " %ld%c ", memmax, mu[muindex]);
+	snprintf(memstring, sizeof(memstring), " %ld%c ", memmax, mu[muindex]);
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime  = p_usertime + p_systime;

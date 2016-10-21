@@ -136,8 +136,9 @@ static char *get_val(struct kv **ht, char *key, char *def)
 static char *key_rename(struct kv **ht, char *word)
 {
   struct kv *e;
-  char *key = (char *) Malloc(strlen(word) + 12);
-  sprintf(key, "__rename_%s", word);
+  size_t len = strlen(word) + 12;
+  char *key = (char *) Malloc(len);
+  snprintf(key, len, "__rename_%s", word);
   HASH_FIND_STR(*ht, key, e);
   Free(key);
   return e ? e->value : word;
@@ -532,7 +533,7 @@ static void get_taxis_units(char *units, int taxisID)
        timeunit == TUNIT_12HOURS )
     timeunit = TUNIT_HOUR;
 
-  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
+  snprintf(units, CMOR_MAX_STRING, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
           year, month, day, hour, minute, second);
 }
 

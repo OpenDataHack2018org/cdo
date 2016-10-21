@@ -195,16 +195,18 @@ int dump_json(const char *js, jsmntok_t *t, size_t count, int level)
 static
 void kvlist_append_json(list_t *kvl, const char *key, const char *js, jsmntok_t *t, int nvalues)
 {
-  char name[1024];
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
   keyval->nvalues = nvalues;
   keyval->values = (char **) malloc(nvalues*sizeof(char*));
   for ( int i = 0; i < nvalues; ++i )
     {
-      sprintf(name, "%.*s", t[i].end - t[i].start, js+t[i].start);
-      // printf("set %s: '%s'\n", key, name);
-      keyval->values[i] = strdup(name);
+      size_t len = t[i].end - t[i].start;
+      char *value = (char*) malloc((len+1)*sizeof(char));
+      snprintf(value, len+1, "%.*s", (int)len, js+t[i].start);
+      value[len] = 0;
+      // printf("set %s: '%s'\n", key, value);
+      keyval->values[i] = value;
     }
   list_append(kvl, &keyval);
 }
@@ -213,7 +215,7 @@ static
 int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
 {
   bool debug = false;
-  char name[1024];
+  char name[4096];
   list_t *kvl = NULL;
   int pmlname = -1;
   int i = 0;
@@ -228,7 +230,8 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
           {
             int ic = 0;
           NEXT:
-            sprintf(name, "%.*s", t[pmlname].end - t[pmlname].start, js+t[pmlname].start);
+            snprintf(name, sizeof(name), "%.*s", t[pmlname].end - t[pmlname].start, js+t[pmlname].start);
+            name[sizeof(name)-1] = 0;
             // printf("new object: %s\n", name);
             kvl = list_new(sizeof(keyValues_t *), free_keyval, name);
             list_append(pml, &kvl);
@@ -247,7 +250,8 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
             for ( int jb = 0; jb < n; ++jb )
               {
                 ++i;
-                sprintf(name, "%.*s", t[i].end - t[i].start, js+t[i].start);
+                snprintf(name, sizeof(name), "%.*s", t[i].end - t[i].start, js+t[i].start);
+                name[sizeof(name)-1] = 0;
                 if ( debug ) printf("    %.*s:", t[i].end - t[i].start, js+t[i].start);
                 ++i;
                 if ( t[i].type == JSMN_ARRAY )

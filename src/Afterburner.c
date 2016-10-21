@@ -1714,7 +1714,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
   char histstring[99];
   int datatype;
 
-  sprintf(histstring, "afterburner version %s  type = %d", VERSION, globs->Type);
+  snprintf(histstring, sizeof(histstring), "afterburner version %s  type = %d", VERSION, globs->Type);
 
 #if defined(AFTERBURNER)
   afterInqHistory(globs->istreamID);

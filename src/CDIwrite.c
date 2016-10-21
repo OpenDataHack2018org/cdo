@@ -47,7 +47,7 @@ const char *datatypestr(int datatype)
   static char str[20];
 
   str[0] = 0;
-  sprintf(str, "%d bit packed", datatype);
+  snprintf(str, sizeof(str), "%d bit packed", datatype);
 
   if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
   else if ( datatype > 0 && datatype <= 32 ) return (str);
@@ -272,7 +272,7 @@ void *CDIwrite(void *argument)
 
       file_size = (double) fileSize(cdoStreamName(0)->args);
 
-      if ( nruns > 1 ) sprintf(sinfo, "(run %d)", irun+1);
+      if ( nruns > 1 ) snprintf(sinfo, sizeof(sinfo), "(run %d)", irun+1);
 
       print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size, file_size, tw);
     }

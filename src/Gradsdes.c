@@ -1356,8 +1356,8 @@ void *Gradsdes(void *argument)
         }
     }
 
-  sprintf(Time, "%02d:%02dZ%02d%s%04d", ihh0, imn0, idd0, cmons[imm0-1], iyy0);
-  sprintf(Incr, "%d%s", dt, IncrKey[iik]);
+  snprintf(Time, sizeof(Time), "%02d:%02dZ%02d%s%04d", ihh0, imn0, idd0, cmons[imm0-1], iyy0);
+  snprintf(Incr, sizeof(Incr), "%d%s", dt, IncrKey[iik]);
 
   fprintf(gdp, "TDEF %d LINEAR %s %s\n", tsID, Time, Incr);
 

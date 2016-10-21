@@ -235,9 +235,9 @@ void *Wind(void *argument)
 	      char gridname[20];
 
 	      if ( operatorID == DV2UV )
-		sprintf(gridname, "t%dgrid", gridInqTrunc(gridIDsp));
+		snprintf(gridname, sizeof(gridname), "t%dgrid", gridInqTrunc(gridIDsp));
 	      else
-		sprintf(gridname, "tl%dgrid", gridInqTrunc(gridIDsp));
+		snprintf(gridname, sizeof(gridname), "tl%dgrid", gridInqTrunc(gridIDsp));
 	  
 	      gridIDgp = gridFromName(gridname);
 	    }

@@ -204,7 +204,7 @@ void *FC(void *argument)
 	  if ( gridIDgp == -1 )
 	    {
 	      char gridname[20];
-	      sprintf(gridname, "t%dgrid", ntr);
+	      snprintf(gridname, sizeof(gridname), "t%dgrid", ntr);
 
 	      gridIDgp = gridFromName(gridname);
 	    }

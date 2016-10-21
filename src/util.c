@@ -623,7 +623,7 @@ int datatype2str(int datatype, char *datatypestr)
   int status = 0;
 
   if      ( datatype == CDI_DATATYPE_PACK   ) strcpy(datatypestr, "P0");
-  else if ( datatype > 0 && datatype <= 32  ) sprintf(datatypestr, "P%d", datatype);
+  else if ( datatype > 0 && datatype <= 32  ) snprintf(datatypestr, 4, "P%d", datatype);
   else if ( datatype == CDI_DATATYPE_CPX32  ) strcpy(datatypestr, "C32");
   else if ( datatype == CDI_DATATYPE_CPX64  ) strcpy(datatypestr, "C64");
   else if ( datatype == CDI_DATATYPE_FLT32  ) strcpy(datatypestr, "F32");

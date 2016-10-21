@@ -186,22 +186,22 @@ void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid,
 
   strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
   if ( src_grid->rank == 2 )
-    sprintf(tmpstr, " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
   else
-    sprintf(tmpstr, " (%d)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%d)", src_grid->dims[0]);
   strcat(line, tmpstr);
   strcat(line, " to ");
   strcat(line, gridNamePtr(gridInqType(tgt_grid->gridID)));
   if ( tgt_grid->rank == 2 )
-    sprintf(tmpstr, " (%dx%d)", tgt_grid->dims[0], tgt_grid->dims[1]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%dx%d)", tgt_grid->dims[0], tgt_grid->dims[1]);
   else
-    sprintf(tmpstr, " (%d)", tgt_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%d)", tgt_grid->dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
   if ( nmiss > 0 )
     {
-      sprintf(tmpstr, ", with source mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), ", with source mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
       strcat(line, tmpstr);
     }
 
@@ -234,15 +234,15 @@ void print_remap_warning(const char *remap_file, int operfunc, remapgrid_t *src_
   strcat(line, " not used, ");
   strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
   if ( src_grid->rank == 2 )
-    sprintf(tmpstr, " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
   else
-    sprintf(tmpstr, " (%d)", src_grid->dims[0]);
+    snprintf(tmpstr, sizeof(tmpstr), " (%d)", src_grid->dims[0]);
   strcat(line, tmpstr);
   strcat(line, " grid");
 
   if ( nmiss > 0 )
     {
-      sprintf(tmpstr, " with mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      snprintf(tmpstr, sizeof(tmpstr), " with mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
       strcat(line, tmpstr);
     }
 
