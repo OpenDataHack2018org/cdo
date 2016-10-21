@@ -45,9 +45,21 @@ list_t *pml_search_kvl(list_t *pml, const char *key, const char *value)
 bool kvl_print_iter(void *data)
 {
   keyValues_t *keyval = *(keyValues_t **)data;
-  //  printf("Found %s list with %d keys: \n", list_name(keyval), list_size(keyval));
-  printf("  key=%s  val0=%s\n", keyval->key, keyval->values[0]);
+  char *key = keyval->key;
+  char **values = keyval->values;
+  int nvalues = keyval->nvalues;
+  printf("  key=%s  value%s=", key, (nvalues > 1) ? "s" : "");
+  for ( int i = 0; i < nvalues; ++i ) printf(" '%s'", values[i]);
+  printf("\n");
+
   return true;
+}
+
+
+void kvlist_print(list_t *kvl)
+{
+  printf("Key/Value list %s:\n", list_name(kvl));
+  list_for_each(kvl, kvl_print_iter);
 }
 
 
@@ -91,6 +103,42 @@ void kvlist_append(list_t *kvl, const char *key, const char **values, int nvalue
   list_append(kvl, &keyval);
 }
 
+
+int kvlist_parse_cmdline(list_t *kvl, int nparams, char **params)
+{
+  /* Assume key = value pairs. That is, if params[i] contains no '='
+   * then treat it as if it belongs to the values of params[i-1]. */
+  char key[256];
+  int i = 0;
+  while ( i < nparams )
+    {
+      char *end = strchr(params[i], '=');
+      if ( end == NULL )
+        {
+          fprintf(stderr, "Missing '=' in key/value string: >%s<\n", params[i]);
+          return -1;
+        }
+
+      snprintf(key, sizeof(key), "%.*s", (int)(end-params[i]), params[i]);
+      key[sizeof(key)-1] = 0;
+
+      int j = 1;
+      while ( i + j < nparams && strchr(params[i + j], '=') == NULL ) j++;
+
+      int nvalues = j;
+      const char *values[nvalues];
+
+      values[0] = end + 1;
+      if ( *values[0] == 0 ) nvalues = 0;
+      for ( j = 1; j < nvalues; ++j ) values[j] = params[i + j];
+      
+      kvlist_append(kvl, key, values, nvalues);
+      
+      i += j;
+    }
+
+  return 0;
+}
 /*
 int main(void)
 {
