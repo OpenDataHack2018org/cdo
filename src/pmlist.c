@@ -93,6 +93,18 @@ void free_kvlist(void *data)
 }
 
 
+list_t *kvlist_new(const char *name)
+{
+  return list_new(sizeof(keyValues_t *), free_keyval, name);
+}
+
+
+void kvlist_destroy(list_t *list)
+{
+  list_destroy(list);
+}
+
+
 void kvlist_append(list_t *kvl, const char *key, const char **values, int nvalues)
 {
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));

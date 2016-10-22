@@ -20,8 +20,9 @@ void kvlist_print(list_t *kvl);
 void free_keyval(void *data);
 void free_kvlist(void *data);
 
+list_t *kvlist_new(const char *name);
+void kvlist_destroy(list_t *list);
 void kvlist_append(list_t *kvl, const char *key, const char **values, int nvalues);
-
 int kvlist_parse_cmdline(list_t *kvl, int nparams, char **params);
 
 #endif

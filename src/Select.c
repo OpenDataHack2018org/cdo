@@ -28,6 +28,7 @@
 #include "error.h"
 #include "util.h"
 #include "pml.h"
+#include "pmlist.h"
 
 double datestr_to_double(const char *datestr, int opt);
 
@@ -58,6 +59,7 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
     }
 }  
 
+//#define TEST_KVL
 
 void *Select(void *argument)
 {
@@ -96,9 +98,17 @@ void *Select(void *argument)
   int nsel = operatorArgc();
   char **argnames = operatorArgv();
 
+  if ( nsel == 0 ) cdoAbort("Parameter missing!");
+
   if ( cdoVerbose )
     for ( int i = 0; i < nsel; ++i )
       cdoPrint("name %d = %s", i+1, argnames[i]);
+
+#ifdef TEST_KVL
+  list_t *kvl = kvlist_new("SELECT");
+  if ( kvlist_parse_cmdline(kvl, nsel, argnames) != 0 ) cdoAbort("Parse error!");
+  if ( cdoVerbose ) kvlist_print(kvl);
+#endif
 
   pml_t *pml = pml_create("SELECT");
 
@@ -198,7 +208,7 @@ void *Select(void *argument)
 	      int gridID  = vlistInqVarGrid(vlistID1, varID);
 	      int zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      int nlevs   = zaxisInqSize(zaxisID);
-	      ltype   = zaxis2ltype(zaxisID);
+	      ltype = zaxis2ltype(zaxisID);
 
               zaxisnum = vlistZaxisIndex(vlistID1, zaxisID)+1;
               int zaxistype = zaxisInqType(zaxisID);
@@ -655,6 +665,10 @@ void *Select(void *argument)
   vlistDestroy(vlistID2);
 
   pml_destroy(pml);
+
+#ifdef TEST_KVL
+  kvlist_destroy(kvl);
+#endif
 
   if ( array ) Free(array);
   if ( vars ) Free(vars);
