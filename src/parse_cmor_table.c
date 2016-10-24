@@ -69,12 +69,57 @@ char *getElementName(char *pline, char *name)
 }
 
 static
-char *getElementValue(char *pline)
+char *getElementValues(char *pline, char **values, int *nvalues)
 {
+  char *restline;
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
-  while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--;}
 
+  *nvalues = 0;
+  int i = 0;
+  while ( i < len && len )
+    {
+      if ( *(pline+i) == ',')
+        {
+          char *value;
+          value = pline;
+          *(value+i) = 0;
+          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
+          strncpy(values[*nvalues], value, strlen(value)+1);
+          i++; (*nvalues)++;
+          pline+=i;
+        }
+      else if ( *(pline+i) == '"' )
+        {
+          i++;
+          pline++;
+          while ( *(pline+i) != '"' )
+            {
+              i++;
+              if ( *(pline+i) == 0 )
+                cdoAbort("Found a start quote sign for a value but no end quote sign.\n");
+            }
+          i++;
+        }
+      else if ( isspace((int) *(pline+i)) )
+        {
+          char *value;
+          value = pline;
+          if ( *(value+i-1) == '"' )
+            *(value+i-1) = 0;
+          else
+            *(value+i) = 0;
+          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
+          strncpy(values[*nvalues], value, strlen(value)+1);
+          i++; (*nvalues)++;
+          pline+=i;
+          break;          
+        }
+      else if ( *(pline+i) == '=' || *(pline+i) == ':' )
+        cdoAbort("Found unexpected separator sign in value: '%c'.", *(pline+i) );
+      else
+        i++;
+    }
   return pline;
 }
 
@@ -84,8 +129,7 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
   char line[4096];
   char name[256];
   char *pline;
-  char listkey1[] = "axis_entry:";
-  char listkey2[] = "variable_entry:";
+  char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter"};
   int linenumber = 0;
   int listtype = 0;
   list_t *kvl = NULL;
