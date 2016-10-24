@@ -142,48 +142,35 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
       if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
       //  len = (int) strlen(pline);
       if ( listtype == 0 && *pline == '&' ) listtype = 1;
-      
-      if ( strncmp(pline, listkey1, strlen(listkey1)) == 0 )
-	{
-	  pline += strlen(listkey1);
+/* MAXNVALUES*/
+      int nvalues;
 
-	  listtype = 2;
-
-          kvl = list_new(sizeof(keyValues_t *), free_keyval, listkey1);
-          list_append(pml, &kvl);
-
-	  pline = skipSeparator(pline);
-	  pline = getElementValue(pline);
-
-	  if ( *pline ) kvlist_append(kvl, "name", (const char **)&pline, 1);
-	}
-      else if ( strncmp(pline, listkey2, strlen(listkey2)) == 0 )
-	{
-	  pline += strlen(listkey2);
-
-	  listtype = 2;
-
-          kvl = list_new(sizeof(keyValues_t *), free_keyval, listkey2);
-          list_append(pml, &kvl);
-
-	  pline = skipSeparator(pline);
-	  pline = getElementValue(pline);
-
-	  if ( *pline ) kvlist_append(kvl, "name", (const char **)&pline, 1);
-	}
-      else
-	{
-	  pline = getElementName(pline, name);
-	  pline = skipSeparator(pline);
-	  pline = getElementValue(pline);
-
-	  if ( kvl == NULL )
+      int i = 0;
+      while ( listkeys[i] )
+        {
+          if ( strncmp(pline, listkeys[i], strlen(listkeys[i])) == 0 )
             {
-              kvl = list_new(sizeof(keyValues_t *), free_keyval, "Header");
+	      pline += strlen(listkeys[i]);
+ 	      listtype = 2;
+              kvl = list_new(sizeof(keyValues_t *), free_keyval, listkeys[i]);
               list_append(pml, &kvl);
-            }
+              break;
+	    }
+          i++;
+        }
+      if ( listtype == 0 )
+        cdoAbort("No valid list key.\n");
 
-	  if ( *pline ) kvlist_append(kvl, name, (const char **)&pline, 1);
+      while ( *pline != 0 )
+        {
+          char **values = malloc( 5 * sizeof(char *) );
+          pline = getElementName(pline, name);
+	  pline = skipSeparator(pline);
+	  pline = getElementValues(pline, values, &nvalues);
+          kvlist_append(kvl, name, (const char **)values, nvalues);
+          if ( *pline == '/' )
+            *pline = 0;
+          free(values);         
 	}
     }
 }
