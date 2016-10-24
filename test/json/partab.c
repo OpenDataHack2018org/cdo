@@ -16,17 +16,19 @@ jsmntok_t *jsmn_alloc_token(jsmn_parser *parser, jsmntok_t *tokens, size_t num_t
 
 const char *Types[] = {"Undefined", "Object", "Array", "String", "Primitive"};
 
+const char *JS;
 /**
  * Fills token type and boundaries.
  */
 static
 void jsmn_fill_token(jsmntok_t *token, jsmntype_t type, int start, int end)
 {
+  static int tok = 0;
   token->type = type;
   token->start = start;
   token->end = end;
   token->size = 0;
- printf("token: start %d end %d %s\n", start, end, Types[type]);
+  printf("    token %d: start %d end %d %s >%.*s<\n", ++tok, start, end, Types[type],  end - start, JS+start);
 }
 
 /**
@@ -61,7 +63,7 @@ static int jsmn_parse_primitive(jsmn_parser *parser, const char *js, size_t len,
   return JSMN_ERROR_PART;
 #endif
 
-found:
+ found:
   if (tokens == NULL)
     {
       parser->pos--;
@@ -149,6 +151,7 @@ static int jsmn_parse_string(jsmn_parser *parser, const char *js, size_t len, js
  */
 int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *tokens, unsigned int num_tokens)
 {
+  JS=js;
   int r;
   int i;
   jsmntok_t *token;
@@ -166,7 +169,7 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
             }
           token->type = JSMN_OBJECT;
           token->start = parser->pos;
-          printf("xstart %d\n", token->start);
+          printf("xstart object %d\n", token->start);
           parser->toksuper = parser->toknext - 1;
     }
 
@@ -186,12 +189,12 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
           if (parser->toksuper != -1 && tokens != NULL)
             tokens[parser->toksuper].size++;
           */
-          /*
+
           // parser->pos++;
           if (tokens == NULL) break;
           // count++;
-          if (parser->toksuper != -1 && tokens != NULL)
-            tokens[parser->toksuper].size++;
+          //  if (parser->toksuper != -1 && tokens != NULL)
+          //  tokens[parser->toksuper].size++;
           token = jsmn_alloc_token(parser, tokens, num_tokens);
           if (token == NULL)
             {
@@ -199,16 +202,17 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
               //parser->pos = start;
               return JSMN_ERROR_NOMEM;
             }
-          jsmn_fill_token(token, JSMN_PRIMITIVE, parser->pos, parser->pos);
+          jsmn_fill_token(token, JSMN_PRIMITIVE, parser->pos+1, parser->pos+1);
           //parser->pos++;
-          */
-
+          count++;
+          if (parser->toksuper != -1 && tokens != NULL)
+            tokens[parser->toksuper].size++;
+ 
           count++;
           if (tokens == NULL) break;
           token = jsmn_alloc_token(parser, tokens, num_tokens);
           if (token == NULL)
             {
-              printf("return2\n");
               return JSMN_ERROR_NOMEM;
             }
           if (parser->toksuper != -1)
@@ -217,7 +221,7 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
             }
           token->type = JSMN_OBJECT;
           token->start = parser->pos;
-          printf("start %d\n", token->start);
+          printf("  start object %d\n", token->start);
           parser->toksuper = parser->toknext - 1;
 
           break;
@@ -235,7 +239,7 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
                   break;
                 }
             }
-          printf("end %d\n", token->end);
+          printf("  end %d\n", token->end);
           /* Error if unmatched closing bracket */
           if (i == -1) return JSMN_ERROR_INVAL;
           for (; i >= 0; i--)
@@ -254,6 +258,9 @@ int jsmn_parse(jsmn_parser *parser, const char *js, size_t len, jsmntok_t *token
           if (parser->toksuper != -1 && tokens != NULL)
             tokens[parser->toksuper].size++;
           break;
+        case '#': case '!': // Skip to end of line
+          for (; parser->pos < len && js[parser->pos] != '\0'; parser->pos++)
+            if ( js[parser->pos] == '\r' || js[parser->pos] == '\n' ) break;
         case '\t' : case '\r' : case '\n' : case ' ':
           break;
         case ':': case '=':
