@@ -290,7 +290,7 @@ void parse_json_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
   jsmn_init(&p);
 
   /* Allocate some tokens as a start */
-  size_t tokcount = 2;
+  size_t tokcount = 32;
   jsmntok_t *tok = (jsmntok_t *) Malloc(sizeof(*tok) * tokcount);
 
   int r;
