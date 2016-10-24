@@ -293,7 +293,7 @@ void *Maggraph(void *argument);
 #define  CloudlayerOperators    {"cloudlayer"}
 #define  CMOROperators          {"cmor"}
 #define  CMORliteOperators      {"cmorlite"}
-#define  CMORtableOperators     {"read_cmor_table", "conv_cmor_table"}
+#define  CMORtableOperators     {"dump_cmor_table", "conv_cmor_table"}
 #define  CollgridOperators      {"collgrid"}
 #define  CommandOperators       {"command", "com", "cmd"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}

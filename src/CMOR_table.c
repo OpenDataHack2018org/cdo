@@ -26,7 +26,7 @@
 
 
 static
-int read_cmor_table(const char *filename)
+int dump_cmor_table(const char *filename)
 {
   list_t *pml = cdo_parse_cmor_file(filename);
   if ( pml == NULL ) return -1;
@@ -150,7 +150,7 @@ void *CMOR_table(void *argument)
 {
   cdoInitialize(argument);
 
-  int READ_CMOR_TABLE = cdoOperatorAdd("read_cmor_table",   0,   0, NULL);
+  int DUMP_CMOR_TABLE = cdoOperatorAdd("dump_cmor_table",   0,   0, NULL);
   int CONV_CMOR_TABLE = cdoOperatorAdd("conv_cmor_table",   0,   0, NULL);
 
   int operatorID = cdoOperatorID();
@@ -160,7 +160,7 @@ void *CMOR_table(void *argument)
 
   if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
 
-  if      ( operatorID == READ_CMOR_TABLE ) read_cmor_table(filename);
+  if      ( operatorID == DUMP_CMOR_TABLE ) dump_cmor_table(filename);
   else if ( operatorID == CONV_CMOR_TABLE ) conv_cmor_table(filename);
 
   cdoFinish();
