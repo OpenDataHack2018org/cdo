@@ -121,7 +121,7 @@ void        argument_fill(argument_t *argument, int argc, char *argv[]);
 
 char *getProgname(char *string);
 char *getOperator(const char *argument);
-char *getOperatorName(const char *xoperator);
+const char *getOperatorName(const char *xoperator);
 const char *cdoComment(void);
 
 argument_t makeArgument(int argc, char *argv[]);

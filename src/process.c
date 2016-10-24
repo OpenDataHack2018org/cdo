@@ -77,7 +77,7 @@ typedef struct {
   short       streamCnt;
   argument_t *streamNames;
   char       *xoperator;
-  char       *operatorName;
+  const char *operatorName;
   char       *operatorArg;
   int         oargc;
   char       *oargv[MAX_OARGC];
@@ -304,7 +304,7 @@ const char *processInqOpername(void)
 }
 
 
-void processDefPrompt(char *opername)
+void processDefPrompt(const char *opername)
 {
   int processID = processSelf();
 

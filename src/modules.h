@@ -18,15 +18,17 @@
 #ifndef _MODULES_H
 #define _MODULES_H
 
-void *(*operatorModule(char *operatorName))(void *);
+#include <stdbool.h>
 
-const char **operatorHelp(char *operatorName);
+void *(*operatorModule(const char *operatorName))(void *);
 
-int operatorStreamInCnt(char *operatorName);
-int operatorStreamOutCnt(char *operatorName);
-int operatorStreamNumber(char *operatorName);
+const char **operatorHelp(const char *operatorName);
+
+int operatorStreamInCnt(const char *operatorName);
+int operatorStreamOutCnt(const char *operatorName);
+int operatorStreamNumber(const char *operatorName);
 
 void operatorPrintAll(void);
-void operatorPrintList(void);
+void operatorPrintList(bool print_no_output);
 
 #endif  /* _MODULES_H */

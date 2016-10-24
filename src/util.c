@@ -213,9 +213,9 @@ char *getOperator(const char *argument)
   return operatorArg;
 }
 
-char *operatorAlias(char *operatorName);
+const char *operatorAlias(const char *operatorName);
 
-char *getOperatorName(const char *operatorArg)
+const char *getOperatorName(const char *operatorArg)
 {
   char *commapos;
   char *operatorName = NULL;
@@ -239,8 +239,7 @@ char *getOperatorName(const char *operatorArg)
     }
 
   /*  return operatorName; */
-  char * alias = operatorAlias(operatorName);
-  return alias;
+  return operatorAlias(operatorName);
 }
 
 

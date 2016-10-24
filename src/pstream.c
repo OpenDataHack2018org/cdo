@@ -301,7 +301,7 @@ void pstreamOpenReadPipe(const argument_t *argument, pstream_t *pstreamptr)
   memcpy(newargument->argv, argument->argv, argument->argc*sizeof(char *));
 
   char *operatorArg  = argument->argv[0];
-  char *operatorName = getOperatorName(operatorArg);
+  const char *operatorName = getOperatorName(operatorArg);
 
   size_t len = strlen(argument->args);
   char *newarg = (char*) Malloc(len+pnlen);

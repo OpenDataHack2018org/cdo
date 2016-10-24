@@ -914,7 +914,7 @@ int similar(const char *a, const char *b, int alen, int blen)
 }
 
 
-const char *operatorAlias(char *operatorName)
+const char *operatorAlias(const char *operatorName)
 {
   int i;
 
@@ -1015,31 +1015,31 @@ int operatorInqModID(const char *operatorName)
   return modID;
 }
 
-void *(*operatorModule(char *operatorName))(void *)
+void *(*operatorModule(const char *operatorName))(void *)
 {
   int modID = operatorInqModID(operatorName);
   return Modules[modID].func;
 }
 
-const char **operatorHelp(char *operatorName)
+const char **operatorHelp(const char *operatorName)
 {
   int modID = operatorInqModID(operatorName);
   return Modules[modID].help;
 }
 
-int operatorStreamInCnt(char *operatorName)
+int operatorStreamInCnt(const char *operatorName)
 {
   int modID = operatorInqModID(operatorAlias(operatorName));
   return Modules[modID].streamInCnt;
 }
 
-int operatorStreamOutCnt(char *operatorName)
+int operatorStreamOutCnt(const char *operatorName)
 {
   int modID = operatorInqModID(operatorAlias(operatorName));
   return Modules[modID].streamOutCnt;
 }
 
-int operatorStreamNumber(char *operatorName)
+int operatorStreamNumber(const char *operatorName)
 {
   int modID = operatorInqModID(operatorAlias(operatorName));
   return Modules[modID].number;
@@ -1091,7 +1091,7 @@ void operatorPrintAll(void)
 }
 
 
-void operatorPrintList(void)
+void operatorPrintList(bool print_no_output)
 {
   int i, j, nbyte, nop = 0;
   const char *opernames[4096];
@@ -1108,10 +1108,7 @@ void operatorPrintList(void)
     }
 
   // Add operator aliases
-  for ( i = 0; i < nopalias; i++ )
-    {
-      opernames[nop++] = opalias[i][0];
-    }
+  for ( i = 0; i < nopalias; i++ ) opernames[nop++] = opalias[i][0];
 
   qsort(opernames, nop, sizeof(char *), cmpname);
 
@@ -1191,10 +1188,13 @@ void operatorPrintList(void)
             }      
         }
 
-      nbyte = fprintf(pout, "%s ", opernames[i]);
-      for ( int i = nbyte; i <= 16; ++i ) fprintf(pout, " ");
-      if ( pdes ) fprintf(pout, "%s", pdes);
-      else if ( ialias >= 0 )  fprintf(pout, "--> %s", opalias[ialias][1]);
-      fprintf(pout, "\n");
+      if ( !print_no_output || operatorStreamOutCnt(opernames[i]) == 0 )
+        {
+          nbyte = fprintf(pout, "%s ", opernames[i]);
+          for ( int i = nbyte; i <= 16; ++i ) fprintf(pout, " ");
+          if ( pdes ) fprintf(pout, "%s", pdes);
+          else if ( ialias >= 0 )  fprintf(pout, "--> %s", opalias[ialias][1]);
+          fprintf(pout, "\n");
+        }
     }
 }
