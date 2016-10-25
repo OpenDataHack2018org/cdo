@@ -26,7 +26,7 @@ static inline void *realloc_it(void *ptrmem, size_t size) {
  */
 
 //#define FULLDUMP
-
+static int tok = 0;
 static
 int dump(const char *js, jsmntok_t *t, size_t count, int indent)
 {
@@ -36,26 +36,26 @@ int dump(const char *js, jsmntok_t *t, size_t count, int indent)
   if (t->type == JSMN_PRIMITIVE)
     {
       if ( t->end == t->start )
-        printf("unknown");
+        printf("token %d: Primitive unknown", ++tok);
       else
-        printf("%.*s", t->end - t->start, js+t->start);
+        printf("token %d: Primitive %.*s", ++tok, t->end - t->start, js+t->start);
       return 1;
     }
   else if (t->type == JSMN_STRING)
     {
       if ( t->end == t->start )
-        printf("unknown");
+        printf("token %d: String unknown", ++tok);
       else
-        printf("'%.*s'", t->end - t->start, js+t->start);
+        printf("token %d: String '%.*s'", ++tok, t->end - t->start, js+t->start);
       return 1;
     }
   else if (t->type == JSMN_OBJECT)
     {
       printf("\n");
 #ifdef FULLDUMP
-      printf("Object: size %d >%.*s<\n", t->size, t->end - t->start, js+t->start);
+      printf("token %d: Object size %d >%.*s<\n", ++tok, t->size, t->end - t->start, js+t->start);
 #else
-      printf("Object: size %d\n", t->size);
+      printf("token %d: Object size %d\n", ++tok, t->size);
 #endif
       j = 0;
       for (i = 0; i < t->size; i++)
