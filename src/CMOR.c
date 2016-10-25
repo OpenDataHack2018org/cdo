@@ -7,11 +7,304 @@
 #include <ctype.h>
 #include <unistd.h>
 #include "uthash.h"
+#include "util.h"
 #include "cmor.h"
 #include "netcdf.h"
+#include "pmlist.h"
 
 #define CMOR_UNDEFID (CMOR_MAX_AXES + 1)
 
+/* */
+/* Read Mapping Table */
+/* */
+int stringToParam(const char *paramstr);
+
+list_t *pml_search_kvl_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
+list_t *pml_get_kvl_ventry(list_t *pml, int nentry, const char **entry);
+
+static
+char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
+{
+  int ichar;
+  size_t ipos = 0;
+
+  while ( *buffersize )
+    {
+      ichar = *buffer;
+      (*buffersize)--;
+      buffer++;
+      if ( ichar == '\r' )
+        {
+          if ( *buffersize )
+            {
+              ichar = *buffer;
+              if ( ichar == '\n' )
+                {
+                  (*buffersize)--;
+                  buffer++;
+                }
+            }
+          break;
+        }
+      if ( ichar == '\n' ) break;
+      line[ipos++] = ichar;
+      if ( ipos >= len )
+        {
+          fprintf(stderr, "readLineFromBuffer: end of line not found (maxlen = %ld)!\n", len);
+          break;
+        }
+    }
+  line[ipos] = 0;
+
+  if ( *buffersize == 0 && ipos == 0 ) buffer = NULL;
+
+  return buffer;
+}
+
+static
+char *skipSeparator(char *pline)
+{
+  while ( isspace((int) *pline) ) pline++;
+  if ( *pline == '=' || *pline == ':' ) pline++;
+  while ( isspace((int) *pline) ) pline++;
+
+  return pline;
+}
+
+static
+char *getElementName(char *pline, char *name)
+{
+  while ( isspace((int) *pline) ) pline++;
+  size_t len = strlen(pline);
+  size_t pos = 0;
+  while ( pos < len && !isspace((int) *(pline+pos)) && *(pline+pos) != '=' && *(pline+pos) != ':' ) pos++;
+
+  strncpy(name, pline, pos);
+  name[pos] = 0;
+
+  pline += pos;
+  return pline;
+}
+
+static
+char *getElementValues(char *pline, char **values, int *nvalues)
+{
+  char *restline;
+  while ( isspace((int) *pline) ) pline++;
+  size_t len = strlen(pline);
+
+  *nvalues = 0;
+  int i = 0;
+  while ( i < len && len )
+    {
+      if ( *(pline+i) == ',')
+        {
+          char *value;
+          value = pline;
+          *(value+i) = 0;
+          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
+          strncpy(values[*nvalues], value, strlen(value)+1);
+          i++; (*nvalues)++;
+          pline+=i;
+        }
+      else if ( *(pline+i) == '"' )
+        {
+          i++;
+          pline++;
+          while ( *(pline+i) != '"' )
+            {
+              i++;
+              if ( *(pline+i) == 0 )
+                cdoAbort("Found a start quote sign for a value but no end quote sign.\n");
+            }
+          i++;
+        }
+      else if ( isspace((int) *(pline+i)) )
+        {
+          char *value;
+          value = pline;
+          if ( *(value+i-1) == '"' )
+            *(value+i-1) = 0;
+          else
+            *(value+i) = 0;
+          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
+          strncpy(values[*nvalues], value, strlen(value)+1);
+          i++; (*nvalues)++;
+          pline+=i;
+          break;          
+        }
+      else if ( *(pline+i) == '=' || *(pline+i) == ':' )
+        cdoAbort("Found unexpected separator sign in value: '%c'.", *(pline+i) );
+      else
+        i++;
+    }
+  return pline;
+}
+
+
+void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
+{
+  char line[4096];
+  char name[256];
+  char *pline;
+  char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter"};
+  int linenumber = 0;
+  int listtype = 0;
+  list_t *kvl = NULL;
+
+  while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
+    {
+      linenumber++;
+      pline = line;
+      while ( isspace((int) *pline) ) pline++;
+      if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
+      //  len = (int) strlen(pline);
+      if ( listtype == 0 && *pline == '&' ) listtype = 1;
+/* MAXNVALUES*/
+      int nvalues;
+
+      int i = 0;
+      while ( listkeys[i] )
+        {
+          if ( strncmp(pline, listkeys[i], strlen(listkeys[i])) == 0 )
+            {
+	      pline += strlen(listkeys[i]);
+ 	      listtype = 2;
+              kvl = list_new(sizeof(keyValues_t *), free_keyval, listkeys[i]);
+              list_append(pml, &kvl);
+              break;
+	    }
+          i++;
+        }
+      if ( listtype == 0 )
+        cdoAbort("No valid list key.\n");
+
+      while ( *pline != 0 )
+        {
+          char **values = malloc( 5 * sizeof(char *) );
+          pline = getElementName(pline, name);
+	  pline = skipSeparator(pline);
+	  pline = getElementValues(pline, values, &nvalues);
+          kvlist_append(kvl, name, (const char **)values, nvalues);
+          if ( *pline == '/' )
+            *pline = 0;
+          free(values);         
+	}
+    }
+}
+
+list_t *cdo_parse_cmor_file(const char *filename)
+{
+  assert(filename != NULL);
+
+  size_t filesize = fileSize(filename);
+  if ( filesize == 0 )
+    {
+      fprintf(stderr, "Empty table file: %s\n", filename);
+      return NULL;
+    }
+
+  FILE *fp = fopen(filename, "r");
+  if ( fp == NULL )
+    {
+      fprintf(stderr, "Open failed on %s: %s\n", filename, strerror(errno));
+      return NULL;
+    }
+
+  char *buffer = (char*) Malloc(filesize);
+  size_t nitems = fread(buffer, 1, filesize, fp);
+
+  fclose(fp);
+
+  if ( nitems != filesize )
+    {
+      fprintf(stderr, "Read failed on %s!\n", filename);
+      return NULL;
+    }
+ 
+  list_t *pml = list_new(sizeof(list_t *), free_kvlist, filename);
+
+/*  if ( buffer[0] == '{' )
+    parse_json_buffer_to_pml(pml, filesize, buffer);
+  else */
+  parse_buffer_to_pml(pml, filesize, buffer);
+
+  Free(buffer);
+  
+  return pml;
+}
+
+static
+void apply_cmor_table(const char *filename, int nvars, int vlistID)
+{
+  const char *ventry[] = {"&parameter"};
+  int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
+  char varcodestring[CDI_MAX_NAME];
+  int varcode;
+
+  list_t *pml = cdo_parse_cmor_file(filename);
+  if ( pml == NULL ) return;
+
+  for ( int varID = 0; varID < nvars; varID++ )
+    {
+      varcode = vlistInqVarCode(vlistID, varID);
+      sprintf(varcodestring, "%d", varcode);
+      list_t *kvl = pml_search_kvl_ventry(pml, "code", varcodestring, nventry, ventry);
+      if ( kvl )
+        {
+          for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+            {
+              keyValues_t *kv = *(keyValues_t **)kvnode->data;
+              const char *key = kv->key;
+              const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
+              printf("'%s' = '%s'\n", key, value);
+              if ( !value ) continue;
+
+              else if ( STR_IS_EQ(key, "name")          ) vlistDefVarName(vlistID, varID, parameter2word(value));
+              else if ( STR_IS_EQ(key, "out_name")      )
+                {
+                  char name[CDI_MAX_NAME];
+                  vlistInqVarName(vlistID, varID, name);
+                  if ( name[0] != 0 )
+                    cdiDefAttTxt(vlistID, varID, "original_name", strlen(name)+1, parameter2word(name));
+                  vlistDefVarName(vlistID, varID, parameter2word(value));
+                }
+              else if ( STR_IS_EQ(key, "units")         ) vlistDefVarUnits(vlistID, varID, value);
+              else if ( STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID, varID, "cell_methods", strlen(value)+1, parameter2word(value));
+              else if ( STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID, varID, value);
+              else if ( STR_IS_EQ(key, "factor")        ) {}
+              else if ( STR_IS_EQ(key, "delete")        ) {}
+/* Not in mapping table right now: */
+
+              else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID, varID, value);
+              else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID, varID, stringToParam(parameter2word(value)));
+              else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID, varID, stringToParam(parameter2word(value)));
+              // else if ( STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              // else if ( STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              else if ( STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID, varID, "comment", strlen(value)+1, parameter2word(value));
+
+              else if ( STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID, varID, "cell_measures", strlen(value)+1, parameter2word(value));
+
+              else if ( STR_IS_EQ(key, "convert")       ) {} 
+              else if ( STR_IS_EQ(key, "missval")       )   {}  
+              else if ( STR_IS_EQ(key, "valid_min")     ){}
+              else if ( STR_IS_EQ(key, "valid_max")     ){}
+              else if ( STR_IS_EQ(key, "ok_min_mean_abs") ) {}
+              else if ( STR_IS_EQ(key, "ok_max_mean_abs") ){}
+              else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") ) {}
+              else
+                {
+                  if ( cdoVerbose ) cdoPrint("Key >%s< not supported!", key);
+                }
+            }
+        }
+    }
+
+  list_destroy(pml);
+}
+/* */
+/*... until here */
+/* */
 struct kv
 {
   char *key;
@@ -1599,6 +1892,17 @@ static void destruct_hash_table(struct kv **ht)
       Free(s);
     }
 }
+
+static void read_maptab(struct kv **ht, int streamID)
+{
+  char *maptab = get_val(ht, "mapping_table", "");
+  if ( strcmp(maptab, "") != 0 )
+    {
+      int vlistID = streamInqVlist(streamID);
+      int nvars = vlistNvars(vlistID);
+      apply_cmor_table(maptab, nvars, vlistID);
+    }
+}
 #endif
 
 void *CMOR(void *argument)
@@ -1631,6 +1935,9 @@ void *CMOR(void *argument)
   printf("*******Succesfully checked global attributes.*******\n");
 
  /* dump_global_attributes(&ht, streamID); */
+
+ /* read mapping table */
+  read_maptab(&ht, streamID);
 
   struct mapping *vars = construct_var_mapping(streamID);
 
