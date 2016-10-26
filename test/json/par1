@@ -1,0 +1,5 @@
+& name =  val, units= m/
+&"name"  =  val2, units = kg/
+&par3 name=p1, units= kg/
+&par4 name=p2, val=1,2,  4/
+& name=p3, val= "surf temp"/
