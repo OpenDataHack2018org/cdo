@@ -23,7 +23,7 @@
 
 #include "cdo.h"
 #include "cdo_int.h"
-#include "namelist.h"
+#include "nml.h"
 
 
 void *Nmltest(void *argument)

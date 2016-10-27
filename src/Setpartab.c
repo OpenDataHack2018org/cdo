@@ -43,7 +43,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "util.h"
-#include "namelist.h"
+#include "nml.h"
 
 int stringToParam(const char *paramstr);
 

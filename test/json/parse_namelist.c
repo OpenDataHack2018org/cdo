@@ -6,13 +6,13 @@
 #include <sys/stat.h>
 
 
-typedef enum {
+enum namelisttype {
   NAMELIST_UNDEFINED = 0,
   NAMELIST_OBJECT    = 1,
   NAMELIST_KEY       = 2,
   NAMELIST_STRING    = 3,
   NAMELIST_WORD      = 4
-} namelisttype_t;
+};
 
 
 enum namelisterr {
@@ -26,7 +26,7 @@ enum namelisterr {
 
 // NAMELIST token description.
 typedef struct {
-  namelisttype_t type; // type (object, key, string word)
+  int type;            // type (object, key, string word)
   int start;           // start position in NAMELIST buffer
   int end;             // end position in NAMELIST buffer
 } namelisttok_t;
@@ -94,7 +94,7 @@ namelisttok_t *namelist_alloc_token(namelist_parser *parser)
 
 // Fills token type and boundaries.
 static
-void namelist_fill_token(namelisttok_t *token, namelisttype_t type, int start, int end)
+void namelist_fill_token(namelisttok_t *token, int type, int start, int end)
 {
   token->type = type;
   token->start = start;
@@ -207,15 +207,15 @@ int namelist_parse_string(namelist_parser *parser, const char *buf, size_t len)
 static
 int namelist_check_keyname(const char *buf, namelisttok_t *t)
 {
-  switch ((int)(t->type))
+  switch (t->type)
     {
-    case (int)NAMELIST_STRING:
+    case NAMELIST_STRING:
       while ( isspace((int) buf[t->start]) && t->start < t->end ) t->start++;
       while ( isspace((int) buf[t->end-1]) && t->start < t->end ) t->end--;
       if ( (t->end - t->start) < 1 ) return NAMELIST_ERROR_EMKEY;
       for ( int i = t->start; i < t->end; ++i )
         if ( isspace((int)buf[i]) ) return NAMELIST_ERROR_INKEY;
-    case (int)NAMELIST_WORD:
+    case NAMELIST_WORD:
       t->type = NAMELIST_KEY;
       break;
     default:
@@ -367,12 +367,19 @@ int main(int argc, char *argv[])
 
   int status = namelist_parse(p, buffer, filesize);
   printf("Processed number of lines: %d\n", p->lineno-1);
-  if ( status == NAMELIST_ERROR_INVAL ) fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]);
-  if ( status == NAMELIST_ERROR_PART  ) fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", filename, p->lineno);
-  if ( status == NAMELIST_ERROR_INKEY ) fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", filename, p->lineno);
-  if ( status == NAMELIST_ERROR_INTYP ) fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", filename, p->lineno);
-  if ( status == NAMELIST_ERROR_INOBJ ) fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", filename, p->lineno);
-  if ( status == NAMELIST_ERROR_EMKEY ) fprintf(stderr, "Namelsit error: Emtry key name in %s (line=%d)!\n", filename, p->lineno);
+  if ( status != 0 )
+    {
+      switch (status)
+        {
+        case NAMELIST_ERROR_INVAL: fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]); break;
+        case NAMELIST_ERROR_PART:  fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", filename, p->lineno); break;
+        case NAMELIST_ERROR_INKEY: fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", filename, p->lineno); break;
+        case NAMELIST_ERROR_INTYP: fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", filename, p->lineno); break;
+        case NAMELIST_ERROR_INOBJ: fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", filename, p->lineno); break;
+        case NAMELIST_ERROR_EMKEY: fprintf(stderr, "Namelsit error: Emtry key name in %s (line=%d)!\n", filename, p->lineno); break;
+        default:                   fprintf(stderr, "Namelsit error in %s (line=%d)!\n", filename, p->lineno); break;
+        }
+    }
 
   namelist_dump(p, buffer);
 
