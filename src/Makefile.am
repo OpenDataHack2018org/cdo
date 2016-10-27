@@ -86,6 +86,8 @@ libcdo_la_SOURCES =            \
 	       merge_sort2.h   \
                modules.c       \
                modules.h       \
+               namelist.c      \
+               namelist.h      \
                nml.c           \
                nml.h           \
                normal.c        \
