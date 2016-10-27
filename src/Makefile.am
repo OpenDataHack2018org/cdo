@@ -27,6 +27,8 @@ libcdo_la_SOURCES =            \
                color.h         \
                commandline.c   \
                const.h         \
+               convert_units.c \
+               convert_units.h \
                counter.h       \
                datetime.c      \
                datetime.h      \
