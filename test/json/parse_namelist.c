@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 #include <sys/stat.h>
 
@@ -19,7 +20,8 @@ enum namelisterr {
   NAMELIST_ERROR_PART  = -2,   // The string is not a full NAMELIST packet, more bytes expected 
   NAMELIST_ERROR_INKEY = -3,   // Invalid character inside NAMELIST key
   NAMELIST_ERROR_INTYP = -4,   // Invalid NAMELIST key type
-  NAMELIST_ERROR_INOBJ = -5    // Invalid NAMELIST object
+  NAMELIST_ERROR_INOBJ = -5,   // Invalid NAMELIST object
+  NAMELIST_ERROR_EMKEY = -6    // Empty key name
 };
 
 // NAMELIST token description.
@@ -208,13 +210,11 @@ int namelist_check_keyname(const char *buf, namelisttok_t *t)
   switch ((int)(t->type))
     {
     case (int)NAMELIST_STRING:
+      while ( isspace((int) buf[t->start]) && t->start < t->end ) t->start++;
+      while ( isspace((int) buf[t->end-1]) && t->start < t->end ) t->end--;
+      if ( (t->end - t->start) < 1 ) return NAMELIST_ERROR_EMKEY;
       for ( int i = t->start; i < t->end; ++i )
-        {
-          switch(buf[i])
-            {
-            case '\t': case ' ': return NAMELIST_ERROR_INKEY;
-            }
-        }
+        if ( isspace((int)buf[i]) ) return NAMELIST_ERROR_INKEY;
     case (int)NAMELIST_WORD:
       t->type = NAMELIST_KEY;
       break;
@@ -257,9 +257,7 @@ int namelist_parse(namelist_parser *parser, const char *buf, size_t len)
         case '\t': case ' ':
           break;
         case '\r':
-          parser->lineno++;
           if ( parser->pos+1 < len && buf[parser->pos+1] == '\n' ) parser->pos++;
-          break;
         case '\n':
           parser->lineno++;
           break;
@@ -369,11 +367,13 @@ int main(int argc, char *argv[])
 
   int status = namelist_parse(p, buffer, filesize);
   printf("Processed number of lines: %d\n", p->lineno-1);
-  if ( status == NAMELIST_ERROR_INVAL ) fprintf(stderr, "Namelist parser error: invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]);
-  if ( status == NAMELIST_ERROR_PART  ) fprintf(stderr, "Namelist parser error: end of string not found in %s (line=%d)!\n", filename, p->lineno);
-  if ( status == NAMELIST_ERROR_INKEY ) fprintf(stderr, "Namelist parser error: invalid key word in %s (line=%d)!\n", filename, p->lineno);
-  if ( status == NAMELIST_ERROR_INTYP ) fprintf(stderr, "Namelist parser error: invalid key word type in %s (line=%d)!\n", filename, p->lineno);
-  if ( status == NAMELIST_ERROR_INOBJ ) fprintf(stderr, "Namelist parser error: invalid object in %s (line=%d)!\n", filename, p->lineno);
+  if ( status == NAMELIST_ERROR_INVAL ) fprintf(stderr, "Namelist error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]);
+  if ( status == NAMELIST_ERROR_PART  ) fprintf(stderr, "Namelist error: End of string not found in %s (line=%d)!\n", filename, p->lineno);
+  if ( status == NAMELIST_ERROR_INKEY ) fprintf(stderr, "Namelist error: Invalid key word in %s (line=%d)!\n", filename, p->lineno);
+  if ( status == NAMELIST_ERROR_INTYP ) fprintf(stderr, "Namelist error: Invalid key word type in %s (line=%d)!\n", filename, p->lineno);
+  if ( status == NAMELIST_ERROR_INOBJ ) fprintf(stderr, "Namelist error: Invalid object in %s (line=%d)!\n", filename, p->lineno);
+  if ( status == NAMELIST_ERROR_EMKEY ) fprintf(stderr, "Namelsit error: Emtry key name in %s (line=%d)!\n", filename, p->lineno);
+
   namelist_dump(p, buffer);
 
   namelist_destroy(p);
