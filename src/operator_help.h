@@ -4974,6 +4974,39 @@ static const char *HurrHelp[] = {
     NULL
 };
 
+static const char *CMORliteHelp[] = {
+    "NAME",
+    "    cmorlite - CMOR lite",
+    "",
+    "SYNOPSIS",
+    "    cmorlite,table  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "",
+    "PARAMETER",
+    "    tab  STRING   Name of the CMOR table as specified from PCMDI",
+    NULL
+};
+
+static const char *CMORHelp[] = {
+    "NAME",
+    "    cmor - CMOR",
+    "",
+    "SYNOPSIS",
+    "    cmor,tab[,options]  ifile",
+    "",
+    "DESCRIPTION",
+    "    Options is a comma separated list of \"key=value\" pairs with optional parameters.",
+    "",
+    "PARAMETER",
+    "    tab       STRING   Name of the CMOR table as specified from PCMDI",
+    "    var       STRING   Comma separated list of variables",
+    "    expinfo   STRING   Experiment specific parameter file",
+    "    modinfo   STRING   Model specific parameter file",
+    "    userinfo  STRING   User/institute specific parameter file",
+    NULL
+};
+
 static const char *MagplotHelp[] = {
     "NAME",
     "    contour, shaded, grfill - Lat/Lon plot",
@@ -5127,25 +5160,6 @@ static const char *MaggraphHelp[] = {
     "",
     "PARAMETER",
     "    params  STRING   Comma separated list of plot parameters",
-    NULL
-};
-
-static const char *CMORHelp[] = {
-    "NAME",
-    "    cmor - CMOR",
-    "",
-    "SYNOPSIS",
-    "    cmor,tab[,options]  ifile",
-    "",
-    "DESCRIPTION",
-    "    Options is a comma separated list of \"key=value\" pairs with optional parameters.",
-    "",
-    "PARAMETER",
-    "    tab       STRING   Name of the CMOR table as specified from PCMDI",
-    "    var       STRING   Comma separated list of variables",
-    "    expinfo   STRING   Experiment specific parameter file",
-    "    modinfo   STRING   Model specific parameter file",
-    "    userinfo  STRING   User/institute specific parameter file",
     NULL
 };
 
