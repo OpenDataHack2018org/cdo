@@ -73,7 +73,10 @@ char *getElementValue(char *pline)
 {
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
-  while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--;}
+  if ( *pline != '"' && *pline != '\'' )
+    for ( size_t i = 1; i < len; ++i )
+      if ( pline[i] == '!' ) { pline[i] = 0; len = i; break; }
+  while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--; }
 
   return pline;
 }
@@ -84,8 +87,8 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
   char line[4096];
   char name[256];
   char *pline;
-  char listkey1[] = "axis_entry:";
-  char listkey2[] = "variable_entry:";
+  char listkey1[] = "axis_entry";
+  char listkey2[] = "variable_entry";
   int linenumber = 0;
   int listtype = 0;
   list_t *kvl = NULL;
@@ -345,8 +348,10 @@ list_t *cdo_parse_cmor_file(const char *filename)
 
   if ( buffer[0] == '{' )
     parse_json_buffer_to_pml(pml, filesize, buffer);
-  else
+  else if ( strncmp(buffer, "table_id:", 9) == 0 )
     parse_buffer_to_pml(pml, filesize, buffer);
+  else
+    cdoAbort("Invalid CMOR table (file: %s)!", filename);
 
   Free(buffer);
   

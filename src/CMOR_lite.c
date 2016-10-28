@@ -279,11 +279,15 @@ void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars
                 }
               else
                 {
-                  if ( cdoVerbose ) cdoPrint("Key >%s< not supported!", key);
+                  if ( cdoVerbose ) cdoPrint("Attribute %s:%s not supported!", varname,  key);
                 }
             }
 
           if ( lvalid_min && lvalid_max ) vars[varID].checkvalid = true;
+        }
+      else
+        {
+          cdoPrint("Variable %s not found!", varname);
         }
     }
 
