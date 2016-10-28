@@ -99,6 +99,7 @@ libcdo_la_SOURCES =            \
                par_io.c        \
                par_io.h        \
                parse_cmor_table.c   \
+               parse_namelist.c     \
                percentiles_hist.c   \
                percentiles_hist.h   \
                percentiles.c   \
