@@ -25,4 +25,7 @@ void kvlist_destroy(list_t *list);
 void kvlist_append(list_t *kvl, const char *key, const char **values, int nvalues);
 int kvlist_parse_cmdline(list_t *kvl, int nparams, char **params);
 
+list_t *pml_search_kvl_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
+list_t *pml_get_kvl_ventry(list_t *pml, int nentry, const char **entry);
+
 #endif

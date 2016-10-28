@@ -109,54 +109,6 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, const char *units)
     }
 }
 
-
-list_t *pml_search_kvl_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry)
-{
-  if ( pml && key && value )
-    {
-      listNode_t *node = pml->head;
-      while ( node )
-        {
-          if ( node->data )
-            {
-              list_t *kvl = *(list_t **)node->data;
-              const char *listname = list_name(kvl);
-              for ( int i = 0; i < nentry; ++i )
-                if ( strcmp(listname, entry[i]) == 0 )
-                  {
-                    keyValues_t *kv = kvlist_search(kvl, key);
-                    if ( kv && kv->nvalues > 0 && *(kv->values[0]) == *value && strcmp(kv->values[0], value) == 0 ) return kvl;
-                  }
-            }
-          node = node->next;
-        }
-    }
-
-  return NULL;
-}
-
-
-list_t *pml_get_kvl_ventry(list_t *pml, int nentry, const char **entry)
-{
-  if ( pml )
-    {
-      listNode_t *node = pml->head;
-      while ( node )
-        {
-          if ( node->data )
-            {
-              list_t *kvl = *(list_t **)node->data;
-              const char *listname = list_name(kvl);
-              for ( int i = 0; i < nentry; ++i )
-                if ( strcmp(listname, entry[i]) == 0 ) return kvl;
-            }
-          node = node->next;
-        }
-    }
-
-  return NULL;
-}
-
 static
 void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars)
 {
