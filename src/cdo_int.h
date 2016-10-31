@@ -173,6 +173,12 @@ int cdoZaxisInqLevels(int zaxisID, double *levels);
 list_t *cdo_parse_cmor_file(const char *filename);
 list_t *cdo_parse_namelist(const char *filename);
 
+
+int literal_get_datatype(const char *literal);
+int literal_to_int(const char *literal);
+double literal_to_double(const char *literal);
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
