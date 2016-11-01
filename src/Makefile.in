@@ -125,13 +125,12 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
 	libcdo_la-grid_search.lo libcdo_la-listarray.lo \
 	libcdo_la-list.lo libcdo_la-merge_sort2.lo \
-	libcdo_la-modules.lo libcdo_la-namelist.lo libcdo_la-nml.lo \
-	libcdo_la-normal.lo libcdo_la-nth_element.lo \
-	libcdo_la-par_io.lo libcdo_la-parse_cmor_table.lo \
-	libcdo_la-parse_namelist.lo libcdo_la-parse_literal.lo \
-	libcdo_la-percentiles_hist.lo libcdo_la-percentiles.lo \
-	libcdo_la-pipe.lo libcdo_la-pml.lo libcdo_la-pmlist.lo \
-	libcdo_la-process.lo libcdo_la-pstream.lo \
+	libcdo_la-modules.lo libcdo_la-namelist.lo libcdo_la-normal.lo \
+	libcdo_la-nth_element.lo libcdo_la-par_io.lo \
+	libcdo_la-parse_cmor_table.lo libcdo_la-parse_namelist.lo \
+	libcdo_la-parse_literal.lo libcdo_la-percentiles_hist.lo \
+	libcdo_la-percentiles.lo libcdo_la-pipe.lo libcdo_la-pml.lo \
+	libcdo_la-pmlist.lo libcdo_la-process.lo libcdo_la-pstream.lo \
 	libcdo_la-pthread_debug.lo libcdo_la-readline.lo \
 	libcdo_la-realtime.lo libcdo_la-remaplib.lo \
 	libcdo_la-remapsort.lo libcdo_la-remap_scrip_io.lo \
@@ -518,23 +517,22 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	hetaeta.c hetaeta.h institution.c interpol.c interpol.h job.c \
 	juldate.c grid_search.c grid_search.h listarray.c listarray.h \
 	list.c list.h merge_sort2.c merge_sort2.h modules.c modules.h \
-	namelist.c namelist.h nml.c nml.h normal.c nth_element.c \
-	nth_element.h operator_help.h par_io.c par_io.h \
-	parse_cmor_table.c parse_namelist.c parse_literal.c \
-	percentiles_hist.c percentiles_hist.h percentiles.c \
-	percentiles.h pipe.c pipe.h pml.c pml.h pmlist.c pmlist.h \
-	pragma_omp_atomic_update.h printinfo.h process.c process.h \
-	pstream.c pstream.h pstream_write.h pstream_int.h \
-	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
-	remaplib.c remapsort.c remap_scrip_io.c remap_search_reg2d.c \
-	remap_search_latbins.c remap_store_link.c remap_store_link.h \
-	remap_store_link_cnsrv.c remap_store_link_cnsrv.h \
-	remap_conserv.c remap_conserv_scrip.c remap_distwgt.c \
-	remap_bicubic_scrip.c remap_bilinear_scrip.c stdnametable.c \
-	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
-	table.c text.c text.h timebase.h timer.c userlog.c uthash.h \
-	util.c util.h zaxis.c json/jsmn.h json/jsmn.c \
-	kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
+	namelist.c namelist.h normal.c nth_element.c nth_element.h \
+	operator_help.h par_io.c par_io.h parse_cmor_table.c \
+	parse_namelist.c parse_literal.c percentiles_hist.c \
+	percentiles_hist.h percentiles.c percentiles.h pipe.c pipe.h \
+	pml.c pml.h pmlist.c pmlist.h pragma_omp_atomic_update.h \
+	printinfo.h process.c process.h pstream.c pstream.h \
+	pstream_write.h pstream_int.h pthread_debug.c pthread_debug.h \
+	readline.c realtime.c remap.h remaplib.c remapsort.c \
+	remap_scrip_io.c remap_search_reg2d.c remap_search_latbins.c \
+	remap_store_link.c remap_store_link.h remap_store_link_cnsrv.c \
+	remap_store_link_cnsrv.h remap_conserv.c remap_conserv_scrip.c \
+	remap_distwgt.c remap_bicubic_scrip.c remap_bilinear_scrip.c \
+	stdnametable.c stdnametable.h specspace.c specspace.h \
+	statistic.c statistic.h table.c text.c text.h timebase.h \
+	timer.c userlog.c uthash.h util.c util.h zaxis.c json/jsmn.h \
+	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
 	kdtreelib/kdtree_common.c kdtreelib/kdtree_spherical.c \
 	kdtreelib/qsort.c kdtreelib/pmergesort.c kdtreelib/pqueue.c \
 	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
@@ -1045,7 +1043,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-merge_sort2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-modules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-namelist.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-nml.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-normal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-nth_element.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-par_io.Plo@am__quote@
@@ -1477,13 +1474,6 @@ libcdo_la-namelist.lo: namelist.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='namelist.c' object='libcdo_la-namelist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-namelist.lo `test -f 'namelist.c' || echo '$(srcdir)/'`namelist.c
-
-libcdo_la-nml.lo: nml.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-nml.lo -MD -MP -MF $(DEPDIR)/libcdo_la-nml.Tpo -c -o libcdo_la-nml.lo `test -f 'nml.c' || echo '$(srcdir)/'`nml.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-nml.Tpo $(DEPDIR)/libcdo_la-nml.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nml.c' object='libcdo_la-nml.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-nml.lo `test -f 'nml.c' || echo '$(srcdir)/'`nml.c
 
 libcdo_la-normal.lo: normal.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-normal.lo -MD -MP -MF $(DEPDIR)/libcdo_la-normal.Tpo -c -o libcdo_la-normal.lo `test -f 'normal.c' || echo '$(srcdir)/'`normal.c

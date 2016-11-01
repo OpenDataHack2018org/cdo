@@ -90,8 +90,6 @@ libcdo_la_SOURCES =            \
                modules.h       \
                namelist.c      \
                namelist.h      \
-               nml.c           \
-               nml.h           \
                normal.c        \
                nth_element.c   \
                nth_element.h   \
