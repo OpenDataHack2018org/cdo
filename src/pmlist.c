@@ -48,7 +48,7 @@ bool kvl_print_iter(void *data)
   char *key = keyval->key;
   char **values = keyval->values;
   int nvalues = keyval->nvalues;
-  printf("  key=%s  value%s=", key, (nvalues > 1) ? "s" : "");
+  printf("  %s =", key);
   for ( int i = 0; i < nvalues; ++i ) printf(" '%s'", values[i]);
   printf("\n");
 
@@ -66,7 +66,7 @@ void kvlist_print(list_t *kvl)
 bool pml_print_iter(void *data)
 {
   list_t *kvl = *(list_t **)data;
-  printf("Found %s list with %d keys: \n", list_name(kvl), list_size(kvl));
+  printf("\nFound %s list with %d key/values: \n", list_name(kvl), list_size(kvl));
   list_for_each(kvl, kvl_print_iter);
   return true;
 }

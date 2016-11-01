@@ -20,36 +20,21 @@
 
 */
 
-
 #include "cdo.h"
 #include "cdo_int.h"
-#include "nml.h"
+#include "pmlist.h"
 
 
 void *Nmltest(void *argument)
 {
-  int i1[5] = {-99, -99, -99, -99, -99};
-  int i2    = -99;
-  char lop[99] = "";
-  double dm = 0;
-  char *var[3];
-
   cdoInitialize(argument);
 
-  namelist_t *nml = namelistNew("SELECT");
+  //  list_t *pml = cdo_parse_namelist(stdin);
+  list_t *pml = cdo_parse_namelist("test.tab");
+  if ( pml == NULL ) return;
 
-  namelistAdd(nml, "i1",  NML_INT,    0, i1,   sizeof(i1)/sizeof(int));
-  namelistAdd(nml, "i2",  NML_INT,    1, &i2,  sizeof(i2)/sizeof(int));
-  namelistAdd(nml, "lop", NML_TEXT,   2, lop,  sizeof(lop)/sizeof(char));
-  namelistAdd(nml, "dm",  NML_FLT, 1, &dm,  sizeof(dm)/sizeof(double));
-  namelistAdd(nml, "var", NML_WORD,   0, var,  sizeof(var)/sizeof(char *));
-
-  namelistRead(stdin, nml);
-
-  namelistPrint(nml);
-
-  namelistDelete(nml);
-
+  list_for_each(pml, pml_print_iter);
+  
   cdoFinish();
 
   return 0;
