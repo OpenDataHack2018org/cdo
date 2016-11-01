@@ -70,7 +70,7 @@ void cdo_check_data(int vlistID2, int varID2, var_t *var, long gridsize, double 
 
 
 static
-void read_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID2, var_t *vars)
+void apply_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = {"Header"};
   const char *ventry[] = {"variable_entry", "parameter"};
@@ -411,7 +411,7 @@ void *Setpartab(void *argument)
   else
     {
       const char *filename = operatorArgv()[0];
-      read_partab(ptmode, filename, nvars, vlistID2, vars);
+      apply_partab(ptmode, filename, nvars, vlistID2, vars);
 
       for ( int varID = 0; varID < nvars; ++varID )
 	if ( vars[varID].remove )
