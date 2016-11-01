@@ -188,11 +188,26 @@ void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars
   list_t *kvl = pml_get_kvl_ventry(pml, nhentry, hentry);
   if ( kvl )
     {
-      keyValues_t *kv = kvlist_search(kvl, "missing_value");
-      if ( kv && kv->nvalues > 0 )
+      for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
         {
-          lmissval = true;
-          missval = parameter2double(kv->values[0]);
+          keyValues_t *kv = *(keyValues_t **)kvnode->data;
+          const char *key = kv->key;
+          const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
+          if ( !value ) continue;
+
+          if ( STR_IS_EQ(key, "missing_value") )
+            {
+              lmissval = true;
+              missval = parameter2double(kv->values[0]);
+            }
+          else if ( STR_IS_EQ(key, "table_id") ||
+                    STR_IS_EQ(key, "modeling_realm") ||
+                    STR_IS_EQ(key, "realm") ||
+                    STR_IS_EQ(key, "project_id") ||
+                    STR_IS_EQ(key, "frequency") )
+            {
+              cdiDefAttTxt(vlistID2, CDI_GLOBAL, key, (int)strlen(value), value);
+            }
         }
     }
 
@@ -313,6 +328,8 @@ void *CMOR_lite(void *argument)
   double missval;
 
   cdoInitialize(argument);
+
+  CDO_CMOR_Mode = 1;
 
   cdoOperatorAdd("cmorlite",  0, 0, "parameter table name");
 
