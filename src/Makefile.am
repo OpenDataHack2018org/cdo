@@ -11,6 +11,7 @@ libcdo_la_SOURCES =            \
                cdo_task.h      \
                cdo_history.c   \
                cdi_uuid.h      \
+               cmortable_parser.c   \
                after_sptrans.c \
                after_fctrans.c \
                after_dvtrans.c \
@@ -99,7 +100,6 @@ libcdo_la_SOURCES =            \
                operator_help.h \
                par_io.c        \
                par_io.h        \
-               parse_cmor_table.c   \
                parse_literal.c      \
                percentiles_hist.c   \
                percentiles_hist.h   \
