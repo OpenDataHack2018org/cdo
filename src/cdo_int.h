@@ -171,9 +171,9 @@ void cdo_read_field(const char *name, char *pline, int size, double *field, int 
 double cdoZaxisInqLevel(int zaxisID, int levelID);
 int cdoZaxisInqLevels(int zaxisID, double *levels);
 
-list_t *cdo_parse_cmor_file(const char *filename);
 list_t *namelistbuf_to_pmlist(listbuf_t *listbuf);
 list_t *namelist_to_pmlist(FILE *fp, const char *name);
+list_t *cmortable_to_pmlist(FILE *fp, const char *name);
 
 int literal_get_datatype(const char *literal);
 int literal_to_int(const char *literal);

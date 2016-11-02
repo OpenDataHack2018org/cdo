@@ -116,10 +116,11 @@ list_t *namelistbuf_to_pmlist(listbuf_t *listbuf)
   return pmlist;
 }
 
+
 list_t *namelist_to_pmlist(FILE *fp, const char *name)
 {
   listbuf_t *listbuf = listbuf_new();
-  if ( listbuf_read(listbuf, fp, name) ) cdoAbort("Namelist read error!");
+  if ( listbuf_read(listbuf, fp, name) ) cdoAbort("Read error on namelist %s!", name);
   
   list_t *pmlist = namelistbuf_to_pmlist(listbuf);
   if ( pmlist == NULL ) cdoAbort("Namelist not found!");

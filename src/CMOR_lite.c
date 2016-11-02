@@ -171,16 +171,13 @@ void cdo_check_data(int vlistID2, int varID2, var_t *var, long gridsize, double 
 }
 
 static
-void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars)
+void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = {"Header"};
   const char *ventry[] = {"variable_entry"};
   int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
   int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char varname[CDI_MAX_NAME];
-
-  list_t *pmlist = cdo_parse_cmor_file(filename);
-  if ( pmlist == NULL ) return;
 
   // search for global missing value
   bool lmissval = false;
@@ -311,11 +308,9 @@ void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars
         }
       else
         {
-          cdoPrint("Variable %s not found!", varname);
+          cdoPrint("Variable %s not found in cmor table!", varname);
         }
     }
-
-  list_destroy(pmlist);
 }
 
 
@@ -362,7 +357,14 @@ void *CMOR_lite(void *argument)
     for ( varID = 0; varID < nvars; ++varID ) vars[varID].convert = true;
 
   const char *filename = operatorArgv()[0];
-  apply_cmor_table(filename, nvars, vlistID2, vars);
+  FILE *fp = fopen(filename, "r");
+  if ( fp == NULL ) cdoAbort("Open failed on: %s\n", filename);
+      
+  list_t *pmlist = cmortable_to_pmlist(fp, filename);
+  fclose(fp);
+
+  apply_cmorlist(pmlist, nvars, vlistID2, vars);
+  list_destroy(pmlist);
 
   for ( int varID = 0; varID < nvars; ++varID )
     if ( vars[varID].remove )

@@ -36,6 +36,7 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
           break;
         }
     }
+
   line[ipos] = 0;
 
   if ( *buffersize == 0 && ipos == 0 ) buffer = NULL;
@@ -82,7 +83,7 @@ char *getElementValue(char *pline)
 }
 
 
-void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
+void cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
 {
   char line[4096];
   char name[256];
@@ -91,7 +92,7 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
   char listkey2[] = "variable_entry";
   int linenumber = 0;
   int listtype = 0;
-  list_t *kvl = NULL;
+  list_t *kvlist = NULL;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
     {
@@ -108,13 +109,13 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
 
 	  listtype = 2;
 
-          kvl = kvlist_new(listkey1);
-          list_append(pml, &kvl);
+          kvlist = kvlist_new(listkey1);
+          list_append(pmlist, &kvlist);
 
 	  pline = skipSeparator(pline);
 	  pline = getElementValue(pline);
 
-	  if ( *pline ) kvlist_append(kvl, "name", (const char **)&pline, 1);
+	  if ( *pline ) kvlist_append(kvlist, "name", (const char **)&pline, 1);
 	}
       else if ( strncmp(pline, listkey2, strlen(listkey2)) == 0 )
 	{
@@ -122,13 +123,13 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
 
 	  listtype = 2;
 
-          kvl = kvlist_new(listkey2);
-          list_append(pml, &kvl);
+          kvlist = kvlist_new(listkey2);
+          list_append(pmlist, &kvlist);
 
 	  pline = skipSeparator(pline);
 	  pline = getElementValue(pline);
 
-	  if ( *pline ) kvlist_append(kvl, "name", (const char **)&pline, 1);
+	  if ( *pline ) kvlist_append(kvlist, "name", (const char **)&pline, 1);
 	}
       else
 	{
@@ -136,13 +137,13 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
 	  pline = skipSeparator(pline);
 	  pline = getElementValue(pline);
 
-	  if ( kvl == NULL )
+	  if ( kvlist == NULL )
             {
-              kvl = kvlist_new("Header");
-              list_append(pml, &kvl);
+              kvlist = kvlist_new("Header");
+              list_append(pmlist, &kvlist);
             }
 
-	  if ( *pline ) kvlist_append(kvl, name, (const char **)&pline, 1);
+	  if ( *pline ) kvlist_append(kvlist, name, (const char **)&pline, 1);
 	}
     }
 }
@@ -196,7 +197,7 @@ int dump_json(const char *js, jsmntok_t *t, size_t count, int level)
 }
 
 static
-void kvlist_append_json(list_t *kvl, const char *key, const char *js, jsmntok_t *t, int nvalues)
+void kvlist_append_json(list_t *kvlist, const char *key, const char *js, jsmntok_t *t, int nvalues)
 {
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
@@ -211,11 +212,11 @@ void kvlist_append_json(list_t *kvl, const char *key, const char *js, jsmntok_t 
       // printf("set %s: '%s'\n", key, value);
       keyval->values[i] = value;
     }
-  list_append(kvl, &keyval);
+  list_append(kvlist, &keyval);
 }
 
 static
-int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
+int json_to_pmlist(list_t *pmlist, const char *js, jsmntok_t *t, int count)
 {
   bool debug = false;
   char name[4096];
@@ -235,8 +236,8 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
             snprintf(name, sizeof(name), "%.*s", t[pmlname].end - t[pmlname].start, js+t[pmlname].start);
             name[sizeof(name)-1] = 0;
             // printf("new object: %s\n", name);
-            list_t *kvl = kvlist_new(name);
-            list_append(pml, &kvl);
+            list_t *kvlist = kvlist_new(name);
+            list_append(pmlist, &kvlist);
                 
             if ( t[i+2].type == JSMN_OBJECT )
               {
@@ -244,7 +245,7 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
                 else           ic--;
                 
                 ++i;
-                kvlist_append_json(kvl, "name", js, &t[i], 1);
+                kvlist_append_json(kvlist, "name", js, &t[i], 1);
                 if ( debug ) printf("    name: '%.*s'\n", t[i].end - t[i].start, js+t[i].start);
                 ++i;
               }
@@ -259,7 +260,7 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
                 if ( t[i].type == JSMN_ARRAY )
                   {
                     int nae = t[i].size;
-                    kvlist_append_json(kvl, name, js, &t[i+1], nae);
+                    kvlist_append_json(kvlist, name, js, &t[i+1], nae);
                     while ( nae-- )
                       {
                         ++i;
@@ -268,7 +269,7 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
                   }
                 else
                   {
-                    kvlist_append_json(kvl, name, js, &t[i], 1);
+                    kvlist_append_json(kvlist, name, js, &t[i], 1);
                     if ( debug ) printf(" '%.*s'", t[i].end - t[i].start, js+t[i].start);
                   }
                 if ( debug ) printf("\n");
@@ -283,7 +284,7 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
 }
 
 
-void parse_json_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
+void cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer)
 {
   char *js = buffer;
   size_t jslen = buffersize;
@@ -309,51 +310,27 @@ void parse_json_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
         }
     }
 
-  json_to_pml(pml, js, tok, (int)p.toknext);
+  json_to_pmlist(pmlist, js, tok, (int)p.toknext);
 
   Free(tok);
 }
 
 
-list_t *cdo_parse_cmor_file(const char *filename)
+list_t *cmortable_to_pmlist(FILE *fp, const char *name)
 {
-  assert(filename != NULL);
-
-  size_t filesize = fileSize(filename);
-  if ( filesize == 0 )
-    {
-      fprintf(stderr, "Empty table file: %s\n", filename);
-      return NULL;
-    }
-
-  FILE *fp = fopen(filename, "r");
-  if ( fp == NULL )
-    {
-      fprintf(stderr, "Open failed on %s: %s\n", filename, strerror(errno));
-      return NULL;
-    }
-
-  char *buffer = (char*) Malloc(filesize);
-  size_t nitems = fread(buffer, 1, filesize, fp);
-
-  fclose(fp);
-
-  if ( nitems != filesize )
-    {
-      fprintf(stderr, "Read failed on %s!\n", filename);
-      return NULL;
-    }
- 
-  list_t *pml = list_new(sizeof(list_t *), free_kvlist, filename);
-
-  if ( buffer[0] == '{' )
-    parse_json_buffer_to_pml(pml, filesize, buffer);
-  else if ( strncmp(buffer, "table_id:", 9) == 0 )
-    parse_buffer_to_pml(pml, filesize, buffer);
-  else
-    cdoAbort("Invalid CMOR table (file: %s)!", filename);
-
-  Free(buffer);
+  listbuf_t *listbuf = listbuf_new();
+  if ( listbuf_read(listbuf, fp, name) ) cdoAbort("Read error on CMOR table %s!", name);
   
-  return pml;
+  list_t *pmlist = list_new(sizeof(list_t *), free_kvlist, name);
+
+  if ( listbuf->buffer[0] == '{' )
+    cmortablebuf_to_pmlist_json(pmlist, listbuf->size, listbuf->buffer);
+  else if ( strncmp(listbuf->buffer, "table_id:", 9) == 0 )
+    cmortablebuf_to_pmlist(pmlist, listbuf->size, listbuf->buffer);
+  else
+    cdoAbort("Invalid CMOR table (file: %s)!", name);
+
+  listbuf_destroy(listbuf);
+
+  return pmlist;
 }

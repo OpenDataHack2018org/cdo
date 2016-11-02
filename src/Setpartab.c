@@ -409,10 +409,10 @@ void *Setpartab(void *argument)
       FILE *fp = fopen(filename, "r");
       if ( fp == NULL ) cdoAbort("Open failed on: %s\n", filename);
       
-      list_t *pmlist = namelist_to_pmlist(fp, "filename");
+      list_t *pmlist = namelist_to_pmlist(fp, filename);
+      fclose(fp);
 
       apply_parameterlist(ptmode, pmlist, nvars, vlistID2, vars);
-
       list_destroy(pmlist);
 
       for ( int varID = 0; varID < nvars; ++varID )
