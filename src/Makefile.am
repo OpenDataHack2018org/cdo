@@ -92,6 +92,7 @@ libcdo_la_SOURCES =            \
                modules.h       \
                namelist.c      \
                namelist.h      \
+               namelist_parser.c     \
                normal.c        \
                nth_element.c   \
                nth_element.h   \
@@ -99,7 +100,6 @@ libcdo_la_SOURCES =            \
                par_io.c        \
                par_io.h        \
                parse_cmor_table.c   \
-               parse_namelist.c     \
                parse_literal.c      \
                percentiles_hist.c   \
                percentiles_hist.h   \
