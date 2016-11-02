@@ -12,6 +12,7 @@ void namelist_init(namelist_parser *parser)
   parser->num_tokens = 0;
   parser->toknext = 0;
   parser->pos = 0;
+  parser->lineno = 0;
 }
 
 

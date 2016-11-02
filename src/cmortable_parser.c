@@ -284,35 +284,24 @@ int json_to_pmlist(list_t *pmlist, const char *js, jsmntok_t *t, int count)
 }
 
 
-void cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer)
+void cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer, const char *filename)
 {
-  char *js = buffer;
-  size_t jslen = buffersize;
-
   /* Prepare parser */
-  jsmn_parser p;
-  jsmn_init(&p);
+  jsmn_parser *p = jsmn_new();
 
-  /* Allocate some tokens as a start */
-  size_t tokcount = 32;
-  jsmntok_t *tok = (jsmntok_t *) Malloc(sizeof(*tok) * tokcount);
-
-  int r;
- AGAIN:
-  r = jsmn_parse(&p, js, jslen, tok, tokcount);
-  if ( r < 0 )
+  int status = jsmn_parse(p, buffer, buffersize);
+  if ( status != 0 )
     {
-      if ( r == JSMN_ERROR_NOMEM )
+      switch (status)
         {
-          tokcount = tokcount * 2;
-          tok = (jsmntok_t *) Realloc(tok, sizeof(*tok) * tokcount);
-          goto AGAIN;
+        case JSMN_ERROR_INVAL: fprintf(stderr, "JSON error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]); break;
+        case JSMN_ERROR_PART:  fprintf(stderr, "JSON error: End of string not found in %s (line=%d)!\n", filename, p->lineno); break;
+        default:               fprintf(stderr, "JSON error in %s (line=%d)\n", filename, p->lineno); break;
         }
     }
 
-  json_to_pmlist(pmlist, js, tok, (int)p.toknext);
-
-  Free(tok);
+  json_to_pmlist(pmlist, buffer, p->tokens, (int)p->toknext);
+  jsmn_destroy(p);
 }
 
 
@@ -324,7 +313,7 @@ list_t *cmortable_to_pmlist(FILE *fp, const char *name)
   list_t *pmlist = list_new(sizeof(list_t *), free_kvlist, name);
 
   if ( listbuf->buffer[0] == '{' )
-    cmortablebuf_to_pmlist_json(pmlist, listbuf->size, listbuf->buffer);
+    cmortablebuf_to_pmlist_json(pmlist, listbuf->size, listbuf->buffer, name);
   else if ( strncmp(listbuf->buffer, "table_id:", 9) == 0 )
     cmortablebuf_to_pmlist(pmlist, listbuf->size, listbuf->buffer);
   else
