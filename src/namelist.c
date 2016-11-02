@@ -39,12 +39,11 @@ static
 namelisttok_t *namelist_alloc_token(namelist_parser *parser)
 {
   const unsigned int TOK_MEM_INCR = 64;
-  namelisttok_t *tok;
 
   if ( parser->toknext >= parser->num_tokens )
     {
       parser->num_tokens += TOK_MEM_INCR;
-      parser->tokens = (namelisttok_t *) realloc(parser->tokens, sizeof(*tok) * parser->num_tokens);
+      parser->tokens = (namelisttok_t *) realloc(parser->tokens, sizeof(namelisttok_t) * parser->num_tokens);
       if ( parser->tokens == NULL )
         {
           fprintf(stderr, "%s: Failed to allocated more memory!", __func__);
@@ -52,7 +51,7 @@ namelisttok_t *namelist_alloc_token(namelist_parser *parser)
         }
     }
 
-  tok = &parser->tokens[parser->toknext++];
+  namelisttok_t *tok = &parser->tokens[parser->toknext++];
   tok->start = tok->end = -1;
   return tok;
 }
@@ -112,7 +111,6 @@ int namelist_parse_word(namelist_parser *parser, const char *buf, size_t len)
 static
 int namelist_parse_string(namelist_parser *parser, const char *buf, size_t len)
 {
-  namelisttok_t *token;
   int start = parser->pos;
 
   parser->pos++;
@@ -125,7 +123,7 @@ int namelist_parse_string(namelist_parser *parser, const char *buf, size_t len)
       /* Quote: end of string */
       if ( c == '\"' )
         {
-          token = namelist_alloc_token(parser);
+          namelisttok_t *token = namelist_alloc_token(parser);
           namelist_fill_token(token, NAMELIST_STRING, start+1, parser->pos);
           return 0;
         }

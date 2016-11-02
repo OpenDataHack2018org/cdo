@@ -179,16 +179,16 @@ void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars
   int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char varname[CDI_MAX_NAME];
 
-  list_t *pml = cdo_parse_cmor_file(filename);
-  if ( pml == NULL ) return;
+  list_t *pmlist = cdo_parse_cmor_file(filename);
+  if ( pmlist == NULL ) return;
 
   // search for global missing value
   bool lmissval = false;
   double missval;
-  list_t *kvl = pml_get_kvl_ventry(pml, nhentry, hentry);
-  if ( kvl )
+  list_t *kvlist = pmlist_get_kvlist_ventry(pmlist, nhentry, hentry);
+  if ( kvlist )
     {
-      for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
         {
           keyValues_t *kv = *(keyValues_t **)kvnode->data;
           const char *key = kv->key;
@@ -228,12 +228,12 @@ void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars
             }
         }
 
-      list_t *kvl = pml_search_kvl_ventry(pml, "name", varname, nventry, ventry);
-      if ( kvl )
+      list_t *kvlist = pmlist_search_kvlist_ventry(pmlist, "name", varname, nventry, ventry);
+      if ( kvlist )
         {
           bool lvalid_min = false, lvalid_max = false;
 
-          for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+          for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
             {
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
               const char *key = kv->key;
@@ -315,7 +315,7 @@ void apply_cmor_table(const char *filename, int nvars, int vlistID2, var_t *vars
         }
     }
 
-  list_destroy(pml);
+  list_destroy(pmlist);
 }
 
 

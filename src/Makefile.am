@@ -84,6 +84,8 @@ libcdo_la_SOURCES =            \
                listarray.h     \
                list.c          \
                list.h          \
+               listbuf.c       \
+               listbuf.h       \
 	       merge_sort2.c   \
 	       merge_sort2.h   \
                modules.c       \

@@ -70,7 +70,7 @@ void cdo_check_data(int vlistID2, int varID2, var_t *var, long gridsize, double 
 
 
 static
-void apply_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID2, var_t *vars)
+void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = {"Header"};
   const char *ventry[] = {"variable_entry", "parameter"};
@@ -80,16 +80,13 @@ void apply_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID
   char varname[CDI_MAX_NAME];
   int codenum;
 
-  list_t *pml = cdo_parse_namelist(filename);
-  if ( pml == NULL ) return;
-
   // search for global missing value
   bool lmissval = false;
   double missval;
-  list_t *kvl = pml_get_kvl_ventry(pml, nhentry, hentry);
-  if ( kvl )
+  list_t *kvlist = pmlist_get_kvlist_ventry(pmlist, nhentry, hentry);
+  if ( kvlist )
     {
-      keyValues_t *kv = kvlist_search(kvl, "missing_value");
+      keyValues_t *kv = kvlist_search(kvlist, "missing_value");
       if ( kv && kv->nvalues > 0 )
         {
           lmissval = true;
@@ -114,24 +111,24 @@ void apply_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID
             }
         }
 
-      list_t *kvl = NULL;
+      list_t *kvlist = NULL;
       if ( ptmode == CODE_NUMBER )
         {
           codenum = vlistInqVarCode(vlistID2, varID);          
           snprintf(valstr, sizeof(valstr), "%d", codenum);
-          kvl = pml_search_kvl_ventry(pml, "code", valstr, nventry, ventry);
-          if ( kvl )
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "code", valstr, nventry, ventry);
+          if ( kvlist )
             {
               int tableID = vlistInqVarTable(vlistID2, varID);
               int tabnum  = tableInqNum(tableID);
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
               int table = tabnum;
               int ltype = levtype;
-              keyValues_t *kv = kvlist_search(kvl, "table");
+              keyValues_t *kv = kvlist_search(kvlist, "table");
               if ( kv && kv->nvalues == 1 ) table = parameter2int(kv->values[0]);
-              kv = kvlist_search(kvl, "ltype");
+              kv = kvlist_search(kvlist, "ltype");
               if ( kv && kv->nvalues == 1 ) ltype = parameter2int(kv->values[0]);
-              if ( !(tabnum == table && levtype == ltype) ) kvl = NULL;
+              if ( !(tabnum == table && levtype == ltype) ) kvlist = NULL;
             }
         }
       else if ( ptmode == PARAMETER_ID )
@@ -140,28 +137,28 @@ void apply_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID
           int param   = vlistInqVarParam(vlistID2, varID);
           paramToStringLong(param, paramstr, sizeof(paramstr));
           snprintf(valstr, sizeof(valstr), "%s", paramstr);
-          kvl = pml_search_kvl_ventry(pml, "param", valstr, nventry, ventry);
-          if ( kvl )
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "param", valstr, nventry, ventry);
+          if ( kvlist )
             {
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
               int ltype = levtype;
-              keyValues_t *kv = kvlist_search(kvl, "ltype");
+              keyValues_t *kv = kvlist_search(kvlist, "ltype");
               if ( kv && kv->nvalues == 1 ) ltype = parameter2int(kv->values[0]);
-              if ( !(levtype == ltype) ) kvl = NULL;
+              if ( !(levtype == ltype) ) kvlist = NULL;
             }  
         }
       else if ( ptmode == VARIABLE_NAME )
         {
-          kvl = pml_search_kvl_ventry(pml, "name", varname, nventry, ventry);
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "name", varname, nventry, ventry);
         }
 
-      if ( kvl )
+      if ( kvlist )
         {
           int pnum, ptab, pdum;
           cdiDecodeParam(vlistInqVarParam(vlistID2, varID), &pnum, &ptab, &pdum);
           bool lvalid_min = false, lvalid_max = false;
 
-          for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+          for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
             {
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
               const char *key = kv->key;
@@ -288,11 +285,9 @@ void apply_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID
         }
       else
         {
-          cdoPrint("Variable %s not found!", varname);
+          cdoPrint("Variable %s not found in parameter table!", varname);
         }
     }
-
-  list_destroy(pml);
 }
 
 
@@ -411,7 +406,14 @@ void *Setpartab(void *argument)
   else
     {
       const char *filename = operatorArgv()[0];
-      apply_partab(ptmode, filename, nvars, vlistID2, vars);
+      FILE *fp = fopen(filename, "r");
+      if ( fp == NULL ) cdoAbort("Open failed on: %s\n", filename);
+      
+      list_t *pmlist = namelist_to_pmlist(fp, "filename");
+
+      apply_parameterlist(ptmode, pmlist, nvars, vlistID2, vars);
+
+      list_destroy(pmlist);
 
       for ( int varID = 0; varID < nvars; ++varID )
 	if ( vars[varID].remove )

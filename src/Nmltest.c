@@ -22,19 +22,18 @@
 
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pmlist.h"
 
 
 void *Nmltest(void *argument)
 {
   cdoInitialize(argument);
 
-  //  list_t *pml = cdo_parse_namelist(stdin);
-  list_t *pml = cdo_parse_namelist("test.tab");
-  if ( pml == NULL ) return;
+  list_t *pmlist = namelist_to_pmlist(stdin, "STDIN");
 
-  list_for_each(pml, pml_print_iter);
-  
+  list_for_each(pmlist, pmlist_print_iter);
+
+  list_destroy(pmlist);
+
   cdoFinish();
 
   return 0;
