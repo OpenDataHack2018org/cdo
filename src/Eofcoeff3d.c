@@ -40,6 +40,9 @@ void *Eofcoeff3d(void * argument)
   int nrecs, nmiss; 
    
   cdoInitialize(argument);
+
+  if ( processSelf() != 0 ) cdoAbort("This operator can't be combined with other operators!");
+
   cdoOperatorAdd("eofcoeff3d",  0,  0, NULL);
      
   int streamID1 = streamOpenRead(cdoStreamName(0));
