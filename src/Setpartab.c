@@ -163,35 +163,35 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
               const char *key = kv->key;
               const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
-              if ( !value ) continue;
+              bool lv1 = (kv->nvalues == 1);
               
-              // printf("key=%s  value=%s\n", key, value);
+              printf("key=%s  value=%s\n", key, value ? value : "");
 
-              if      ( STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
-              else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
-              else if ( STR_IS_EQ(key, "units")         ) cdo_define_var_units(var, vlistID2, varID, value);
-              else if ( STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
-              else if ( STR_IS_EQ(key, "out_name")      )
+              if      ( lv1 && STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
+              else if ( lv1 && STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
+              else if ( lv1 && STR_IS_EQ(key, "units")         ) cdo_define_var_units(var, vlistID2, varID, value);
+              else if ( lv1 && STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
+              else if ( lv1 && STR_IS_EQ(key, "out_name")      )
                 {
                   vlistDefVarName(vlistID2, varID, parameter2word(value));
                   cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
                 }
-              else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
-              else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
-              else if ( STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
-              else if ( STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
-              else if ( STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
-              else if ( STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
-              else if ( STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
-              else if ( STR_IS_EQ(key, "delete")        ) var->remove = parameter2bool(value);
-              else if ( STR_IS_EQ(key, "convert")       ) var->convert = parameter2bool(value);
-              else if ( STR_IS_EQ(key, "factor")        )
+              else if ( lv1 && STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
+              else if ( lv1 && STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
+              else if ( lv1 && STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              else if ( lv1 && STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              else if ( lv1 && STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "delete")        ) var->remove = parameter2bool(value);
+              else if ( lv1 && STR_IS_EQ(key, "convert")       ) var->convert = parameter2bool(value);
+              else if ( lv1 && STR_IS_EQ(key, "factor")        )
                 {
                   var->lfactor = true;
                   var->factor = parameter2double(value);
                   if ( cdoVerbose ) cdoPrint("%s - scale factor %g", varname, var->factor);
                 }
-              else if ( STR_IS_EQ(key, "missval") || STR_IS_EQ(key, "missing_value") )
+              else if ( lv1 && (STR_IS_EQ(key, "missval") || STR_IS_EQ(key, "missing_value")) )
                 {
                   double missval = parameter2double(value);
                   double missval_old = vlistInqVarMissval(vlistID2, varID);
@@ -203,59 +203,64 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
                       vlistDefVarMissval(vlistID2, varID, missval);
                     }
                 }
-              else if ( STR_IS_EQ(key, "valid_min") )
+              else if ( lv1 && STR_IS_EQ(key, "valid_min") )
                 {
                   lvalid_min = true;
                   var->valid_min = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "valid_max") )
+              else if ( lv1 && STR_IS_EQ(key, "valid_max") )
                 {
                   lvalid_max = true;
                   var->valid_max = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "ok_min_mean_abs") )
+              else if ( lv1 && STR_IS_EQ(key, "ok_min_mean_abs") )
                 {
                   var->check_min_mean_abs = true;
                   var->ok_min_mean_abs = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "ok_max_mean_abs") )
+              else if ( lv1 && STR_IS_EQ(key, "ok_max_mean_abs") )
                 {
                   var->check_max_mean_abs = true;
                   var->ok_max_mean_abs = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") )
+              else if ( lv1 && (STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type")) )
                 {
                   int datatype = str2datatype(parameter2word(value));
                   if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
                 }
-              else if ( STR_IS_EQ(key, "dimensions") )
+              else if ( lv1 && STR_IS_EQ(key, "dimensions") )
                 {
                 }
               else
                 {
                   int nvalues = kv->nvalues;
-                  int dtype = literal_get_datatype(kv->values[0]);
-                  if ( dtype != -1 )
-                    for ( int i = 1; i < nvalues; ++i )
-                      {
-                        int xtype = literal_get_datatype(kv->values[i]);
-                        if ( dtype != xtype )
+                  if ( nvalues == 1 && !*value ) nvalues = 0;
+                  int dtype = -1;
+                  if ( nvalues )
+                    {
+                      dtype = literal_get_datatype(kv->values[0]);
+                      if ( dtype != -1 )
+                        for ( int i = 1; i < nvalues; ++i )
                           {
-                            if ( xtype == CDI_DATATYPE_FLT32 || xtype == CDI_DATATYPE_FLT64 )
+                            int xtype = literal_get_datatype(kv->values[i]);
+                            if ( dtype != xtype )
                               {
-                                if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+                                if ( xtype == CDI_DATATYPE_FLT32 || xtype == CDI_DATATYPE_FLT64 )
                                   {
-                                    if ( xtype > dtype ) dtype = xtype;
+                                    if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+                                      {
+                                        if ( xtype > dtype ) dtype = xtype;
+                                      }
+                                    else dtype = xtype;
                                   }
-                                else dtype = xtype;
-                              }
-                            else
-                              {
-                                if ( !(dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64) )
+                                else
                                   {
-                                    if ( xtype > dtype ) dtype = xtype;
+                                    if ( !(dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64) )
+                                      {
+                                        if ( xtype > dtype ) dtype = xtype;
+                                      }
+                                    else dtype = xtype;
                                   }
-                                else dtype = xtype;
                               }
                           }
                       }
@@ -276,7 +281,8 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
                     }
                   else
                     {
-                      cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+                      int len = (value && *value) ? (int) strlen(value) : 0;
+                      cdiDefAttTxt(vlistID2, varID, key, len, value);
                     }
                 }
             }

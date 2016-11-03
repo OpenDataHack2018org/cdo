@@ -9,20 +9,18 @@ void kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer,
   keyval->key = strdup(key);
   keyval->nvalues = nvalues;
   keyval->values = NULL;
-  if ( nvalues > 0 )
+
+  if ( nvalues > 0 ) keyval->values = (char **) malloc(nvalues*sizeof(char*));
+  for ( int i = 0; i < nvalues; ++i )
     {
-      keyval->values = (char **) malloc(nvalues*sizeof(char*));
-      for ( int i = 0; i < nvalues; ++i )
-        {
-          size_t len = t[i].end - t[i].start;
-          char *value = (char*) malloc((len+1)*sizeof(char));
-          //printf(" value >%.*s<\n", len, buffer+t[i].start);
-          snprintf(value, len+1, "%.*s", (int)len, buffer+t[i].start);
-          value[len] = 0;
-          keyval->values[i] = value;
-        }
-      list_append(kvlist, &keyval);
+      size_t len = t[i].end - t[i].start;
+      char *value = (char*) malloc((len+1)*sizeof(char));
+      //printf(" value >%.*s<\n", len, buffer+t[i].start);
+      snprintf(value, len+1, "%.*s", (int)len, buffer+t[i].start);
+      value[len] = 0;
+      keyval->values[i] = value;
     }
+  list_append(kvlist, &keyval);
 }
 
 static
