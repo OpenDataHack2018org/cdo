@@ -66,7 +66,8 @@ void kvlist_print(list_t *kvlist)
 bool pmlist_print_iter(void *data)
 {
   list_t *kvlist = *(list_t **)data;
-  printf("\nFound %s list with %d key/values: \n", list_name(kvlist), list_size(kvlist));
+  const char *listname = list_name(kvlist);
+  printf("\nFound %s list with %d key/values: \n", listname?listname:"", list_size(kvlist));
   list_for_each(kvlist, kvlist_print_iter);
   return true;
 }
