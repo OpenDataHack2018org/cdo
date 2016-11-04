@@ -291,6 +291,14 @@ case "${HOSTNAME}" in
                       CC=$COMP CFLAGS="-g -Wall -O3" LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
         ;;
       g++|clang++)
+        case "$COMP" in
+          g++)
+            CC=gcc
+            ;;
+          clang++)
+            CC=clang
+            ;;
+        esac
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
                     --enable-maintainer-mode \
@@ -305,7 +313,7 @@ case "${HOSTNAME}" in
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
-                      CC=$COMP CFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
+                      CC=$CC CXX=$COMP CFLAGS="-g -Wall -O2" CXXFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
 	;;
       esac
     ;;
