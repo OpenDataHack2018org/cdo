@@ -26,19 +26,16 @@
 
 
 static
-int dump_cmor_table(const char *filename)
-{
-  list_t *pml = cdo_parse_cmor_file(filename);
-  if ( pml == NULL ) return -1;
-  
-  printf("# Number of lists: %d\n", list_size(pml));
+void dump_cmor_table(list_t *pmlist)
+{  
+  printf("# Number of lists: %d\n", list_size(pmlist));
   int i = 0;
-  for ( listNode_t *pmnode = pml->head; pmnode; pmnode = pmnode->next )
+  for ( listNode_t *pmnode = pmlist->head; pmnode; pmnode = pmnode->next )
     {
-      list_t *kvl = *(list_t **)pmnode->data;
-      printf("# list ID: %d;   Number of elements: %d\n", i, list_size(kvl));
-      printf("&%s\n", list_name(kvl));
-      for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+      list_t *kvlist = *(list_t **)pmnode->data;
+      printf("# list ID: %d;   Number of elements: %d\n", i, list_size(kvlist));
+      printf("&%s\n", list_name(kvlist));
+      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
         {
           keyValues_t *kv = *(keyValues_t **)kvnode->data;
           if ( kv ) printf("  %s = %s\n", kv->key, kv->values[0]);
@@ -46,33 +43,26 @@ int dump_cmor_table(const char *filename)
       printf("/\n");
       ++i;
     }
-
-  list_destroy(pml);
-
-  return 0;
 }
 
 static
-int conv_cmor_table(const char *filename)
+void conv_cmor_table(list_t *pmlist)
 {
   const char *hname = "Header";
   const char *vname = "variable";
   //const char *aname = "axis";
 
-  list_t *pml = cdo_parse_cmor_file(filename);
-  if ( pml == NULL ) return -1;
-
   bool hasmissval = false;
   double missval;
 
-  for ( listNode_t *pmnode = pml->head; pmnode; pmnode = pmnode->next )
+  for ( listNode_t *pmnode = pmlist->head; pmnode; pmnode = pmnode->next )
     {
-      list_t *kvl = *(list_t **)pmnode->data;
-      const char *listname = list_name(kvl);
+      list_t *kvlist = *(list_t **)pmnode->data;
+      const char *listname = list_name(kvlist);
 
       if ( strncmp(listname, hname, strlen(hname)) == 0  )
 	{
-          for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+          for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
 	    {
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
               const char *ename  = kv->key;
@@ -89,7 +79,7 @@ int conv_cmor_table(const char *filename)
       else if ( strncmp(listname, vname, strlen(vname)) == 0 )
 	{
 	  printf("&%s\n", "parameter");
-          for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+          for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
 	    {
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
               const char *ename  = kv->key;
@@ -139,10 +129,6 @@ int conv_cmor_table(const char *filename)
 	  printf("/\n");
 	}
     }
-
-  list_destroy(pml);
-
-  return 0;
 }
 
 
@@ -159,9 +145,17 @@ void *CMOR_table(void *argument)
   const char *filename = operatorArgv()[0];
 
   if ( cdoVerbose ) cdoPrint("Parse file: %s", filename);
+  
+  FILE *fp = fopen(filename, "r");
+  if ( fp == NULL ) cdoAbort("Open failed on: %s\n", filename);
+      
+  list_t *pmlist = cmortable_to_pmlist(fp, filename);
+  fclose(fp);
 
-  if      ( operatorID == DUMP_CMOR_TABLE ) dump_cmor_table(filename);
-  else if ( operatorID == CONV_CMOR_TABLE ) conv_cmor_table(filename);
+  if      ( operatorID == DUMP_CMOR_TABLE ) dump_cmor_table(pmlist);
+  else if ( operatorID == CONV_CMOR_TABLE ) conv_cmor_table(pmlist);
+
+  list_destroy(pmlist);
 
   cdoFinish();
 

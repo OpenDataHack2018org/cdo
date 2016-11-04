@@ -46,7 +46,7 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+	            CC=icc CXX="icpc --std=c++11" CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -54,7 +54,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = clang++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=clang CXX=clang++ CFLAGS="-g -Wall -O3"
+	            CC=clang CXX="clang++ --std=c++11" CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -62,7 +62,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = g++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=gcc CXX=g++ CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
+	            CC=gcc CXX="g++ --std=c++11" CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         elif  test "$COMP" = gcc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \

@@ -889,10 +889,10 @@ static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));
 
 
 static
-int similar(const char *a, const char *b, int alen, int blen)
+bool similar(const char *a, const char *b, int alen, int blen)
 {
   if ( alen > 2 && blen > 2 && strstr(b, a) )
-    return TRUE;
+    return true;
 
   while ( *a && *b && *a == *b )
     { 
@@ -900,17 +900,17 @@ int similar(const char *a, const char *b, int alen, int blen)
       b++;
     }
   if ( !*a && !*b )
-    return TRUE;
+    return true;
   /*
     printf("%d %d %s %s\n", alen, blen, a, b);
   */
   if ( alen >= 2 && blen >= 1 && *a && similar(a+1, b, alen-2, blen-1) )
-    return TRUE;
+    return true;
 
   if ( alen >= 1 && blen >= 2 && *b && similar(a, b+1, alen-1, blen-2) )
-    return TRUE;
+    return true;
 
-  return FALSE; 
+  return false; 
 }
 
 
@@ -966,41 +966,47 @@ int operatorInqModID(const char *operatorName)
 
   if ( modID == -1 )
     {
-      int nbyte;
-      int error = TRUE;
+      bool lfound = false;
       FILE *fp = fopen(operatorName, "r");
       if ( fp )
 	{
 	  fclose(fp);
 	  fprintf(stderr, "Use commandline option -h for help.");
-	  Error("operator missing! %s is a file on disk!", operatorName);
+	  Error("Operator missing, %s is a file on disk!", operatorName);
 	}
 
       fprintf(stderr, "Operator >%s< not found!\n", operatorName);
       fprintf(stderr, "Similar operators are:\n");
-      nbyte = fprintf(stderr, "   ");
+      int nbyte = fprintf(stderr, "   ");
       if ( operatorName )
-	for ( i = 0; i < NumModules; i++ )
-	  {
-	    if ( Modules[i].help == NULL ) continue;
-	    j = 0;
-	    while ( Modules[i].operators[j] )
-	      {
-		if( similar(operatorName, Modules[i].operators[j],
-			    strlen(operatorName), strlen(Modules[i].operators[j])) )
-		  {
-		    if ( nbyte > 75 )
-		      {
-			fprintf(stdout, "\n");
-			nbyte = fprintf(stderr, "   ");
-		      }
-		    nbyte += fprintf(stderr, " %s", Modules[i].operators[j]);
-		    error = FALSE ;
-		  }
-		j++;
-	      }
-	  }
-      if ( error )
+        {
+          int len = strlen(operatorName);
+          char *opname = strdup(operatorName);
+          strtolower(opname);
+          for ( i = 0; i < NumModules; i++ )
+            {
+              if ( Modules[i].help == NULL ) continue;
+              j = 0;
+              while ( Modules[i].operators[j] )
+                {
+                  if ( similar(opname, Modules[i].operators[j],
+                               len, strlen(Modules[i].operators[j])) )
+                    {
+                      if ( nbyte > 75 )
+                        {
+                          fprintf(stdout, "\n");
+                          nbyte = fprintf(stderr, "   ");
+                        }
+                      nbyte += fprintf(stderr, " %s", Modules[i].operators[j]);
+                      lfound = true;
+                    }
+                  j++;
+                }
+            }
+          free(opname);
+        }
+
+      if ( !lfound )
 	fprintf(stderr, "(not found)\n") ;
       else
 	fprintf(stderr, "\n");

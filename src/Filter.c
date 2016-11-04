@@ -84,11 +84,10 @@ void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_
 static
 void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 {  
-  bool lpower2 = false;
+  bool lpower2 = ((nts&(nts-1)) == 0);
+
   double *work_r = NULL;
   double *work_i = NULL;
-
-  if ( (nts&(nts-1)) == 0 ) lpower2 = true;
 
   if ( !lpower2 )
     {
@@ -122,18 +121,16 @@ void *Filter(void *argument)
   enum {BANDPASS, HIGHPASS, LOWPASS};
   const char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};
-  int gridsize;
   int nrecs;
-  int gridID, varID, levelID;
+  int varID, levelID;
   int nalloc = 0;
   int nmiss;
-  int nlevel;
   int incperiod0, incunit0, incunit;
   int year0, month0, day0;
+  bool use_fftw = false;
+  double fmin = 0, fmax = 0;
   double fdata = 0;
   field_t ***vars = NULL;
-  double fmin = 0, fmax = 0;
-  int use_fftw = FALSE;
   dtlist_type *dtlist = dtlist_new();
   typedef struct
   {
@@ -161,13 +158,13 @@ void *Filter(void *argument)
     {
 #if defined(HAVE_LIBFFTW3) 
       if ( cdoVerbose ) cdoPrint("Using fftw3 lib");
-      use_fftw = TRUE;
+      use_fftw = true;
 #else
       if ( cdoVerbose ) cdoPrint("LIBFFTW3 support not compiled in!");
 #endif
     }
       
-  if ( cdoVerbose && use_fftw  == FALSE ) cdoPrint("Using intrinsic FFT function!");
+  if ( cdoVerbose && !use_fftw ) cdoPrint("Using intrinsic FFT function!");
   
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -198,8 +195,8 @@ void *Filter(void *argument)
       for ( int recID = 0; recID < nrecs; recID++ )
         {
           streamInqRecord(streamID1, &varID, &levelID);
-          gridID   = vlistInqVarGrid(vlistID1, varID);
-          gridsize = gridInqSize(gridID);
+          int gridID   = vlistInqVarGrid(vlistID1, varID);
+          int gridsize = gridInqSize(gridID);
           vars[tsID][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
           streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
@@ -309,25 +306,25 @@ void *Filter(void *argument)
   int *fmasc = (int*) Calloc(nts, sizeof(int));
   create_fmasc(nts, fdata, fmin, fmax, fmasc);
 
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( int varID = 0; varID < nvars; varID++ )
     {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      int gridID   = vlistInqVarGrid(vlistID1, varID);
+      int gridsize = gridInqSize(gridID);
+      int nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       
-      for ( levelID = 0; levelID < nlevel; levelID++ )
+      for ( int levelID = 0; levelID < nlevel; levelID++ )
         {
           if ( use_fftw )
             {
 #if defined(HAVE_LIBFFTW3) 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(tsID)
+#pragma omp parallel for default(shared)
 #endif
               for ( int i = 0; i < gridsize; i++ )
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 
-                  for ( tsID = 0; tsID < nts; tsID++ )                              
+                  for ( int tsID = 0; tsID < nts; tsID++ )                              
                     {
                       ompmem[ompthID].in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
                       ompmem[ompthID].in_fft[tsID][1] = 0;
@@ -335,30 +332,28 @@ void *Filter(void *argument)
 
                   filter_fftw(nts, fmasc, ompmem[ompthID].out_fft, &ompmem[ompthID].p_T2S, &ompmem[ompthID].p_S2T);
                   
-                  for ( tsID = 0; tsID < nts; tsID++ )
-                    {
-                      vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;  
-                    }
+                  for ( int tsID = 0; tsID < nts; tsID++ )
+                    vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].in_fft[tsID][0] / nts;  
                 }
 #endif
             }
           else
             {
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(tsID)
+#pragma omp parallel for default(shared)
 #endif
               for ( int i = 0; i < gridsize; i++ )  
                 {
             	  int ompthID = cdo_omp_get_thread_num();
 
-                  for ( tsID = 0; tsID < nts; tsID++ )
+                  for ( int tsID = 0; tsID < nts; tsID++ )
                     ompmem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
                   memset(ompmem[ompthID].array2, 0, nts*sizeof(double));
 
                   filter_intrinsic(nts, fmasc, ompmem[ompthID].array1, ompmem[ompthID].array2);
 
-                  for ( tsID = 0; tsID < nts; tsID++ )
+                  for ( int tsID = 0; tsID < nts; tsID++ )
                     vars[tsID][varID][levelID].ptr[i] = ompmem[ompthID].array1[tsID];
                 }
             }
@@ -390,19 +385,19 @@ void *Filter(void *argument)
   
   streamDefVlist(streamID2, vlistID2);
  
-  for ( tsID = 0; tsID < nts; tsID++ )
+  for ( int tsID = 0; tsID < nts; tsID++ )
     {
       dtlist_taxisDefTimestep(dtlist, taxisID2, tsID);
       streamDefTimestep(streamID2, tsID);
     
-      for ( varID = 0; varID < nvars; varID++ )
+      for ( int varID = 0; varID < nvars; varID++ )
         {
-          nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-          for ( levelID = 0; levelID < nlevel; levelID++ )
+          int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for ( int levelID = 0; levelID < nlevel; levelID++ )
             {
               if ( vars[tsID][varID][levelID].ptr )
                 {
-                  nmiss = vars[tsID][varID][levelID].nmiss;
+                  int nmiss = vars[tsID][varID][levelID].nmiss;
                   streamDefRecord(streamID2, varID, levelID);
                   streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 

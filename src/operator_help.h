@@ -4537,6 +4537,9 @@ static const char *FilterHelp[] = {
     "PARAMETER",
     "    fmin  FLOAT	Minimum frequency per year that passes the filter.",
     "    fmax  FLOAT	Maximum frequency per year that passes the filter.  ",
+    "",
+    "NOTE",
+    "    For better performace of these operators use the CDO configure option --with-fftw3.",
     NULL
 };
 
@@ -4984,7 +4987,7 @@ static const char *CMORliteHelp[] = {
     "DESCRIPTION",
     "",
     "PARAMETER",
-    "    tab  STRING   Name of the CMOR table as specified from PCMDI",
+    "    table  STRING   Name of the CMOR table as specified from PCMDI",
     NULL
 };
 

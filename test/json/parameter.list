@@ -1,5 +1,6 @@
 &_global_  missval = -1.e33 /
-&topo
+&parameter
+  name = topo
   att-name-dashes = 4
   att.name.dots   = 5
   att+name+plusses = 6

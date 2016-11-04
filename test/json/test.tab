@@ -8,8 +8,8 @@
   type            = real
   valid_min       = -700
   valid_max       = 1.00E+04
-  attint          = 1, 5, 7
-  attflt          = 23.1 1.e2 88
+  attint          = 1, 5, 7, 85281
+  attflt          = 23 1.e2 88.1
   attstring       = "test string"
   attword         = word
   missing_value   = 1e+20

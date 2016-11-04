@@ -3,41 +3,38 @@
 #include <errno.h>
 #include <limits.h>
 #include <float.h>
+#include "cdo_int.h"
+#include "cdi.h"
 
-enum literal_type {E_LTYPE_NONE = 1, E_LTYPE_BYTE, E_LTYPE_SHORT, E_LTYPE_INT, E_LTYPE_FLOAT, E_LTYPE_DOUBLE};
-
-int literal_get_type(const char *literal)
+int literal_get_datatype(const char *literal)
 {
   if ( literal && *literal )
     {
       char *endptr;
       errno = 0;
       long lval = strtol(literal, &endptr, 10);
-      if ( errno == 0 && *endptr == 0 ) return E_LTYPE_INT;
+      if ( errno == 0 && *endptr == 0 ) return CDI_DATATYPE_INT32;
       else if ( errno == 0 && *(endptr+1) == 0 )
         {
-          if      ( *endptr == 's' && ( lval >= SHRT_MIN && lval <= SHRT_MAX) )
-            return E_LTYPE_SHORT;
-          else if ( *endptr == 'b' && ( lval >= SCHAR_MIN && lval <= SCHAR_MAX) )
-            return E_LTYPE_BYTE;
+          if      ( *endptr == 's' && lval >= SHRT_MIN && lval <= SHRT_MAX )
+            return CDI_DATATYPE_INT16;
+          else if ( *endptr == 'b' && lval >= SCHAR_MIN && lval <= SCHAR_MAX )
+            return CDI_DATATYPE_INT8;
         }
       else
         {
           errno = 0;
-          float fval = strtof(literal, &endptr);
-          (void) fval;
-          if ( errno == 0 && (*endptr == 0 || (*(endptr+1) == 0 && *endptr == 'f')) )
-            return E_LTYPE_FLOAT;
-          else
+          double dval = strtod(literal, &endptr);
+          if ( errno == 0 && *endptr == 0 ) return CDI_DATATYPE_FLT64;
+          else if ( errno == 0 && *(endptr+1) == 0 )
             {
-              double dval = strtod(literal, &endptr);
-              (void)dval;
-              if ( *endptr == 0 ) return E_LTYPE_DOUBLE;
+              if ( *endptr == 'f' && dval >= -FLT_MAX && dval <= FLT_MAX )
+                return CDI_DATATYPE_FLT32;
             }
         }
     }
 
-  return E_LTYPE_NONE;
+  return -1;
 }
 
 
@@ -69,6 +66,7 @@ double literal_to_double(const char *literal)
 }
 
 
+#ifdef TEST_LITERAL
 
 int main(void)
 {
@@ -77,14 +75,14 @@ int main(void)
 
   for ( int i = 0; i < nliterals; ++i )
     {
-      int ltype = literal_get_type(literals[i]);
-      printf("%d %s type = %d", i+1, literals[i], ltype);
-      if ( ltype == E_LTYPE_BYTE || ltype == E_LTYPE_SHORT || ltype == E_LTYPE_INT )
+      int dtype = literal_get_datatype(literals[i]);
+      printf("%d %s type = %d", i+1, literals[i], dtype);
+      if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
         {
           int ival = literal_to_int(literals[i]);
           printf("  ival = %d", ival);
         }
-      else if ( ltype == E_LTYPE_FLOAT || ltype == E_LTYPE_DOUBLE )
+      else if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
         {
           double dval = literal_to_double(literals[i]);
           printf("  dval = %g", dval);
@@ -99,3 +97,5 @@ int main(void)
   
   return 0;
 }
+
+#endif

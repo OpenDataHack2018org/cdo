@@ -65,38 +65,12 @@ typedef struct
 } var_t;
 
 
-static
-void defineVarAttText(int vlistID2, int varID, const char *attname, const char *atttext)
-{
-  int len = strlen(atttext);
-  cdiDefAttTxt(vlistID2, varID, attname, len, atttext);
-}
+void cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units);
+void cdo_check_data(int vlistID2, int varID2, var_t *var, long gridsize, double missval, double *array);
+
 
 static
-void defineVarUnits(var_t *vars, int vlistID2, int varID, const char *units)
-{
-  char units_old[CDI_MAX_NAME];
-
-  vlistInqVarUnits(vlistID2, varID, units_old);
-  size_t len1 = strlen(units_old);
-  size_t len2 = strlen(units);
-
-  if ( strcmp(units, units_old) != 0 )
-    {
-      if ( len1 > 0 && len2 > 0 )
-	{
-	  vars[varID].changeunits = true;
-	  strcpy(vars[varID].units_old, units_old);
-	  strcpy(vars[varID].units, units);
-	}
-
-      vlistDefVarUnits(vlistID2, varID, units);
-      defineVarAttText(vlistID2, varID, "original_units", units_old);
-    }
-}
-
-static
-void read_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID2, var_t *vars)
+void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = {"Header"};
   const char *ventry[] = {"variable_entry", "parameter"};
@@ -106,16 +80,13 @@ void read_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID2
   char varname[CDI_MAX_NAME];
   int codenum;
 
-  list_t *pml = cdo_parse_namelist(filename);
-  if ( pml == NULL ) return;
-
   // search for global missing value
   bool lmissval = false;
   double missval;
-  list_t *kvl = pml_get_kvl_ventry(pml, nhentry, hentry);
-  if ( kvl )
+  list_t *kvlist = pmlist_get_kvlist_ventry(pmlist, nhentry, hentry);
+  if ( kvlist )
     {
-      keyValues_t *kv = kvlist_search(kvl, "missing_value");
+      keyValues_t *kv = kvlist_search(kvlist, "missing_value");
       if ( kv && kv->nvalues > 0 )
         {
           lmissval = true;
@@ -125,38 +96,39 @@ void read_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID2
 
   for ( int varID = 0; varID < nvars; varID++ )
     {
+      var_t *var = &vars[varID];
       vlistInqVarName(vlistID2, varID, varname);
 
-      strcpy(vars[varID].name, varname);
+      strcpy(var->name, varname);
       if ( lmissval )
         {
           double missval_old = vlistInqVarMissval(vlistID2, varID);
           if ( ! DBL_IS_EQUAL(missval, missval_old) )
             {
-              vars[varID].changemissval = true;
-              vars[varID].missval_old = missval_old;
+              var->changemissval = true;
+              var->missval_old = missval_old;
               vlistDefVarMissval(vlistID2, varID, missval);
             }
         }
 
-      list_t *kvl = NULL;
+      list_t *kvlist = NULL;
       if ( ptmode == CODE_NUMBER )
         {
           codenum = vlistInqVarCode(vlistID2, varID);          
           snprintf(valstr, sizeof(valstr), "%d", codenum);
-          kvl = pml_search_kvl_ventry(pml, "code", valstr, nventry, ventry);
-          if ( kvl )
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "code", valstr, nventry, ventry);
+          if ( kvlist )
             {
               int tableID = vlistInqVarTable(vlistID2, varID);
               int tabnum  = tableInqNum(tableID);
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
               int table = tabnum;
               int ltype = levtype;
-              keyValues_t *kv = kvlist_search(kvl, "table");
+              keyValues_t *kv = kvlist_search(kvlist, "table");
               if ( kv && kv->nvalues == 1 ) table = parameter2int(kv->values[0]);
-              kv = kvlist_search(kvl, "ltype");
+              kv = kvlist_search(kvlist, "ltype");
               if ( kv && kv->nvalues == 1 ) ltype = parameter2int(kv->values[0]);
-              if ( !(tabnum == table && levtype == ltype) ) kvl = NULL;
+              if ( !(tabnum == table && levtype == ltype) ) kvlist = NULL;
             }
         }
       else if ( ptmode == PARAMETER_ID )
@@ -165,180 +137,162 @@ void read_partab(pt_mode_t ptmode, const char *filename, int nvars, int vlistID2
           int param   = vlistInqVarParam(vlistID2, varID);
           paramToStringLong(param, paramstr, sizeof(paramstr));
           snprintf(valstr, sizeof(valstr), "%s", paramstr);
-          kvl = pml_search_kvl_ventry(pml, "param", valstr, nventry, ventry);
-          if ( kvl )
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "param", valstr, nventry, ventry);
+          if ( kvlist )
             {
               int levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
               int ltype = levtype;
-              keyValues_t *kv = kvlist_search(kvl, "ltype");
+              keyValues_t *kv = kvlist_search(kvlist, "ltype");
               if ( kv && kv->nvalues == 1 ) ltype = parameter2int(kv->values[0]);
-              if ( !(levtype == ltype) ) kvl = NULL;
+              if ( !(levtype == ltype) ) kvlist = NULL;
             }  
         }
       else if ( ptmode == VARIABLE_NAME )
         {
-          kvl = pml_search_kvl_ventry(pml, "name", varname, nventry, ventry);
+          kvlist = pmlist_search_kvlist_ventry(pmlist, "name", varname, nventry, ventry);
         }
 
-      if ( kvl )
+      if ( kvlist )
         {
           int pnum, ptab, pdum;
           cdiDecodeParam(vlistInqVarParam(vlistID2, varID), &pnum, &ptab, &pdum);
           bool lvalid_min = false, lvalid_max = false;
 
-          for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+          for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
             {
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
               const char *key = kv->key;
-              const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
-              if ( !value ) continue;
+              const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
+              bool lv1 = (kv->nvalues == 1);
               
-              // printf("key=%s  value=%s\n", key, value);
+              printf("key=%s  value=%s\n", key, value ? value : "");
 
-              if      ( STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
-              else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
-              else if ( STR_IS_EQ(key, "units")         ) defineVarUnits(vars, vlistID2, varID, value);
-              else if ( STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
-              else if ( STR_IS_EQ(key, "out_name")      )
+              if      ( lv1 && STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
+              else if ( lv1 && STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
+              else if ( lv1 && STR_IS_EQ(key, "units")         ) cdo_define_var_units(var, vlistID2, varID, value);
+              else if ( lv1 && STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
+              else if ( lv1 && STR_IS_EQ(key, "out_name")      )
                 {
                   vlistDefVarName(vlistID2, varID, parameter2word(value));
-                  defineVarAttText(vlistID2, varID, "original_name", vars[varID].name);
+                  cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
                 }
-              else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
-              else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
-              else if ( STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
-              else if ( STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
-              else if ( STR_IS_EQ(key, "comment")       ) defineVarAttText(vlistID2, varID, "comment", value);
-              else if ( STR_IS_EQ(key, "cell_methods")  ) defineVarAttText(vlistID2, varID, "cell_methods", value);
-              else if ( STR_IS_EQ(key, "cell_measures") ) defineVarAttText(vlistID2, varID, "cell_measures", value);
-              else if ( STR_IS_EQ(key, "delete")        ) vars[varID].remove = parameter2bool(value);
-              else if ( STR_IS_EQ(key, "convert")       ) vars[varID].convert = parameter2bool(value);
-              else if ( STR_IS_EQ(key, "factor")        )
+              else if ( lv1 && STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
+              else if ( lv1 && STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
+              else if ( lv1 && STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              else if ( lv1 && STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+              else if ( lv1 && STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "delete")        ) var->remove = parameter2bool(value);
+              else if ( lv1 && STR_IS_EQ(key, "convert")       ) var->convert = parameter2bool(value);
+              else if ( lv1 && STR_IS_EQ(key, "factor")        )
                 {
-                  vars[varID].lfactor = true;
-                  vars[varID].factor = parameter2double(value);
-                  if ( cdoVerbose ) cdoPrint("%s - scale factor %g", varname, vars[varID].factor);
+                  var->lfactor = true;
+                  var->factor = parameter2double(value);
+                  if ( cdoVerbose ) cdoPrint("%s - scale factor %g", varname, var->factor);
                 }
-              else if ( STR_IS_EQ(key, "missval") )
+              else if ( lv1 && (STR_IS_EQ(key, "missval") || STR_IS_EQ(key, "missing_value")) )
                 {
                   double missval = parameter2double(value);
                   double missval_old = vlistInqVarMissval(vlistID2, varID);
                   if ( ! DBL_IS_EQUAL(missval, missval_old) )
                     {
                       if ( cdoVerbose ) cdoPrint("%s - change missval from %g to %g", varname, missval_old, missval);
-                      vars[varID].changemissval = true;
-                      vars[varID].missval_old = missval_old;
+                      var->changemissval = true;
+                      var->missval_old = missval_old;
                       vlistDefVarMissval(vlistID2, varID, missval);
                     }
                 }
-              else if ( STR_IS_EQ(key, "valid_min") )
+              else if ( lv1 && STR_IS_EQ(key, "valid_min") )
                 {
                   lvalid_min = true;
-                  vars[varID].valid_min = parameter2double(value);
+                  var->valid_min = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "valid_max") )
+              else if ( lv1 && STR_IS_EQ(key, "valid_max") )
                 {
                   lvalid_max = true;
-                  vars[varID].valid_max = parameter2double(value);
+                  var->valid_max = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "ok_min_mean_abs") )
+              else if ( lv1 && STR_IS_EQ(key, "ok_min_mean_abs") )
                 {
-                  vars[varID].check_min_mean_abs = true;
-                  vars[varID].ok_min_mean_abs = parameter2double(value);
+                  var->check_min_mean_abs = true;
+                  var->ok_min_mean_abs = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "ok_max_mean_abs") )
+              else if ( lv1 && STR_IS_EQ(key, "ok_max_mean_abs") )
                 {
-                  vars[varID].check_max_mean_abs = true;
-                  vars[varID].ok_max_mean_abs = parameter2double(value);
+                  var->check_max_mean_abs = true;
+                  var->ok_max_mean_abs = parameter2double(value);
                 }
-              else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") )
+              else if ( lv1 && (STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type")) )
                 {
                   int datatype = str2datatype(parameter2word(value));
                   if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
                 }
+              else if ( lv1 && STR_IS_EQ(key, "dimensions") )
+                {
+                }
               else
                 {
-                  if ( cdoVerbose ) cdoPrint("Attribute %s:%s not supported!", varname,  key);
+                  int nvalues = kv->nvalues;
+                  if ( nvalues == 1 && !*value ) nvalues = 0;
+                  int dtype = -1;
+                  if ( nvalues )
+                    {
+                      dtype = literal_get_datatype(kv->values[0]);
+                      if ( dtype != -1 )
+                        for ( int i = 1; i < nvalues; ++i )
+                          {
+                            int xtype = literal_get_datatype(kv->values[i]);
+                            if ( dtype != xtype )
+                              {
+                                if ( xtype == CDI_DATATYPE_FLT32 || xtype == CDI_DATATYPE_FLT64 )
+                                  {
+                                    if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+                                      {
+                                        if ( xtype > dtype ) dtype = xtype;
+                                      }
+                                    else dtype = xtype;
+                                  }
+                                else
+                                  {
+                                    if ( !(dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64) )
+                                      {
+                                        if ( xtype > dtype ) dtype = xtype;
+                                      }
+                                    else dtype = xtype;
+                                  }
+                              }
+                          }
+                      }
+                  
+                  if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
+                    {
+                      int *ivals = (int*) Malloc(nvalues*sizeof(int));
+                      for ( int i = 0; i < nvalues; ++i ) ivals[i] = literal_to_int(kv->values[i]);
+                      cdiDefAttInt(vlistID2, varID, key, dtype, nvalues, ivals);
+                      Free(ivals);
+                    }
+                  else if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+                    {
+                      double *dvals = (double*) Malloc(nvalues*sizeof(double));
+                      for ( int i = 0; i < nvalues; ++i ) dvals[i] = literal_to_double(kv->values[i]);
+                      cdiDefAttFlt(vlistID2, varID, key, dtype, nvalues, dvals);
+                      Free(dvals);
+                    }
+                  else
+                    {
+                      int len = (value && *value) ? (int) strlen(value) : 0;
+                      cdiDefAttTxt(vlistID2, varID, key, len, value);
+                    }
                 }
             }
 
-          if ( lvalid_min && lvalid_max ) vars[varID].checkvalid = true;
+          if ( lvalid_min && lvalid_max ) var->checkvalid = true;
         }
       else
         {
-          cdoPrint("Variable %s not found!", varname);
+          cdoPrint("Variable %s not found in parameter table!", varname);
         }
-    }
-
-  list_destroy(pml);
-}
-
-static
-void check_data(int vlistID2, int varID2, int varID, var_t *vars, long gridsize, double missval, double *array)
-{
-  char varname[CDI_MAX_NAME];
-  int nvals = 0;
-  double amean = 0, aval;
-  double amin  =  1.e300;
-  double amax  = -1.e300;
-  
-  for ( long i = 0; i < gridsize; ++i )
-    {
-      aval = array[i];
-      if ( !DBL_IS_EQUAL(aval, missval) )
-	{
-	  if ( aval < amin ) amin = aval;
-	  if ( aval > amax ) amax = aval;
-	  amean += aval;
-	  nvals++;
-	}
-    }
-
-  if ( nvals > 0 ) amean /= nvals;
-
-  int n_lower_min = 0;
-  int n_greater_max = 0;
-  for ( long i = 0; i < gridsize; ++i )
-    {
-      aval = array[i];
-      if ( !DBL_IS_EQUAL(aval, missval) )
-	{
-	  if ( aval < vars[varID].valid_min ) n_lower_min++;
-	  if ( aval > vars[varID].valid_max ) n_greater_max++;
-	}
-    }
-
-  vlistInqVarName(vlistID2, varID2, varname);
-
-  if ( n_lower_min > 0 )
-    cdoWarning("Invalid value(s) detected for variable '%s': %i values were lower than minimum valid value (%.4g).",
-	       varname, n_lower_min, vars[varID].valid_min);
-  if ( n_greater_max > 0 )
-    cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
-	       varname, n_greater_max, vars[varID].valid_max);
-
-  amean = fabs(amean);
-
-  if ( vars[varID].check_min_mean_abs )
-    {
-      if ( amean < .1*vars[varID].ok_min_mean_abs )
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
-		 varname, amean, vars[varID].ok_min_mean_abs);
-
-      if ( amean < vars[varID].ok_min_mean_abs)
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower than minimum allowed: %.4g",
-		   varname, amean, vars[varID].ok_min_mean_abs);
-    }
-
-  if ( vars[varID].check_max_mean_abs )
-    {
-      if ( amean > 10.*vars[varID].ok_max_mean_abs )
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
-		 varname, amean, vars[varID].ok_max_mean_abs);
-      
-      if ( amean > vars[varID].ok_max_mean_abs )
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater than maximum allowed: %.4g",
-		   varname, amean, vars[varID].ok_max_mean_abs);
     }
 }
 
@@ -348,9 +302,9 @@ void *Setpartab(void *argument)
   int nrecs;
   int varID, levelID;
   int nmiss;
-  bool delvars = false;
   int tableID = -1;
   int tableformat = 0;
+  bool delvars = false;
   double missval;
 
   cdoInitialize(argument);
@@ -458,7 +412,14 @@ void *Setpartab(void *argument)
   else
     {
       const char *filename = operatorArgv()[0];
-      read_partab(ptmode, filename, nvars, vlistID2, vars);
+      FILE *fp = fopen(filename, "r");
+      if ( fp == NULL ) cdoAbort("Open failed on: %s\n", filename);
+      
+      list_t *pmlist = namelist_to_pmlist(fp, filename);
+      fclose(fp);
+
+      apply_parameterlist(ptmode, pmlist, nvars, vlistID2, vars);
+      list_destroy(pmlist);
 
       for ( int varID = 0; varID < nvars; ++varID )
 	if ( vars[varID].remove )
@@ -530,12 +491,13 @@ void *Setpartab(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
+          var_t *var = &vars[varID];
 	  int varID2 = varID;
 	  int levelID2 = levelID;
 
 	  if ( delvars )
 	    {
-	      if ( vars[varID].remove ) continue;
+	      if ( var->remove ) continue;
 
 	      if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
 		{
@@ -552,47 +514,47 @@ void *Setpartab(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
 	  if ( vlistInqVarNumber(vlistID2, varID2) != CDI_REAL ) gridsize *= 2;
 
-	  if ( nmiss > 0 && vars[varID].changemissval )
+	  if ( nmiss > 0 && var->changemissval )
 	    {
 	      for ( long i = 0; i < gridsize; ++i )
 		{
-		  if ( DBL_IS_EQUAL(array[i], vars[varID].missval_old) ) array[i] = missval;
+		  if ( DBL_IS_EQUAL(array[i], var->missval_old) ) array[i] = missval;
 		}
 	    }
 
-	  if ( vars[varID].lfactor )
+	  if ( var->lfactor )
 	    {
 	      for ( long i = 0; i < gridsize; ++i )
 		{
-		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= vars[varID].factor;
+		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= var->factor;
 		}
 	    }
 
 #if defined(HAVE_UDUNITS2)
-	  if ( vars[varID].changeunits )
+	  if ( var->changeunits )
 	    {
 	      int nerr = 0;
 	      for ( long i = 0; i < gridsize; ++i )
 		{
 		  if ( !DBL_IS_EQUAL(array[i], missval) )
 		    {
-		      array[i] = cv_convert_double((const cv_converter*)vars[varID].ut_converter, array[i]);
+		      array[i] = cv_convert_double((const cv_converter*)var->ut_converter, array[i]);
 		      if ( ut_get_status() != UT_SUCCESS ) nerr++;
 		    }
 		}
 	      if ( nerr )
 		{
 		  cdoWarning("Udunits: Error converting units from [%s] to [%s], parameter: %s",
-			     vars[varID].units_old, vars[varID].units, vars[varID].name);
-		  vars[varID].changeunits = false;
+			     var->units_old, var->units, var->name);
+		  var->changeunits = false;
 		}
 	    }
 #endif
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
 
-	  if ( vars[varID].checkvalid || vars[varID].check_min_mean_abs || vars[varID].check_max_mean_abs )
-	    check_data(vlistID2, varID2, varID, vars, gridsize, missval, array);
+	  if ( var->checkvalid || var->check_min_mean_abs || var->check_max_mean_abs )
+	    cdo_check_data(vlistID2, varID2, var, gridsize, missval, array);
 	}
       tsID1++;
     }
