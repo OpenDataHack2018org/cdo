@@ -44,7 +44,7 @@ Suppresses all variability outside the frequency range specified by [@var{fmin},
 
 
 @BeginOperator_highpass
-@Title      = Highpass filtering
+@Title     = Highpass filtering
 @Parameter = fmin
 
 @BeginDescription
@@ -71,7 +71,13 @@ FLOAT	Minimum frequency per year that passes the filter.
 @Item = fmax
 FLOAT	Maximum frequency per year that passes the filter.  
 @EndParameter
-	
+
+
+@BeginNote
+For better performace of these operators use the CDO configure option --with-fftw3.
+@EndNote
+
+
 @BeginExample
 Now assume your data are still hourly for a time period of 5 years but with a 365/366-day-
 calendar and you want to suppress the variability on timescales greater or equal to one year
