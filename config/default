@@ -134,7 +134,7 @@ case "${HOSTNAME}" in
                     --enable-cxx \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=g++ CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
+	            CC=gcc CXX=g++ CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
                     LDFLAGS='-L/usr/local/lib' \
                     LIBS='-lpthread -lm -lcurl -lhdf5_hl -lhdf5 -lz  -lsz -laec -ldl'
         else
