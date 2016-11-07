@@ -230,18 +230,34 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
     }
 }
 
-      while ( *pline != 0 )
+
+static void kv_insert_a_val(list_t *kvl, const char *key, char *value, int replace)
+{
+  if ( key )
+    {
+      keyValues_t *kv = kvlist_search(kvl, key);
+      if ( !kv )
         {
-          char **values = malloc( 5 * sizeof(char *) );
-          pline = getElementName(pline, name);
-	  pline = skipSeparator(pline);
-	  pline = getElementValues(pline, values, &nvalues);
-          kvlist_append(kvl, name, (const char **)values, nvalues);
-          if ( *pline == '/' )
-            *pline = 0;
-          free(values);         
-	}
+          const char *apvalue[] = {value};
+          kvlist_append(kvl, key, apvalue, 1);
+        }
+      else if ( replace )
+        {
+          free(kv->values[0]);
+          kv->values[0] = strdup((const char *) value);
+        }
     }
+}
+
+static char *kv_get_a_val(list_t *kvl, const char *key, char *replacer)
+{
+  keyValues_t *kv = kvlist_search(kvl, key);
+  if ( kv )
+    {
+      char *outval = strdup(kv->values[0]);
+      return outval;
+    }
+  return replacer;
 }
 
 list_t *cdo_parse_cmor_file(const char *filename)
