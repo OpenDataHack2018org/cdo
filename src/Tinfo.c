@@ -315,7 +315,7 @@ void *Tinfo(void *argument)
 	fprintf(stdout, " YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference");
       fprintf(stdout, "\n");
 
-      int tsID = 0;
+      tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	{  
 	  vdate = taxisInqVdate(taxisID);
