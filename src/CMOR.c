@@ -159,6 +159,39 @@ char *getElementValues(char *pline, char **values, int *nvalues)
   return pline;
 }
 
+static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int checkpml, int lowprior)
+{
+  char name[256];
+  int i = 0, nvalues;
+  list_t *kvl = NULL;
+  if ( checkpml )
+    {
+      kvl = list_new(sizeof(keyValues_t *), free_keyval, kvlname);
+      list_append(list, &kvl);
+    }
+  while ( *pline != 0 )
+    {
+      char **values = malloc( 5 * sizeof(char *) );
+      pline = getElementName(pline, name);
+      pline = skipSeparator(pline);
+      pline = getElementValues(pline, values, &nvalues);
+      if ( checkpml )
+        kvlist_append(kvl, name, (const char **)values, nvalues);
+      else
+        {
+          if ( lowprior )
+            {
+              keyValues_t *already = kvlist_search(list, name);
+              if ( already )
+                continue;
+            }
+          kvlist_append(list, name, (const char **)values, nvalues);
+        }
+      if ( *pline == '/' )
+        *pline = 0;
+      free(values);         
+    }
+}
 
 void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
 {
