@@ -553,57 +553,21 @@ static int file_exist(const char *tfilename, int force)
   return 1;
 }
   
-static int parse_kv_file(struct kv **ht, const char *filename, int verbose)
+static int parse_kv_file(list_t *kvl, const char *filename)
 {
-  if ( file_exist(filename, 0) )
-    {
-      FILE *fp = fopen(filename, "r");
+  if ( !file_exist(filename, 1) )
+    cdoAbort("Configuration failed.\n");
 
-      char line[CMOR_MAX_STRING];
-      while ( fgets(line, sizeof(line), fp) != NULL )
-        {
-          char *comment = strchr(line, '#');
-          if ( comment ) *comment = '\0';
-          parse_kv(ht, line);
-        }
-      fclose(fp);
-    }
+  FILE *fp = fopen(filename, "r");
+  size_t filesize = fileSize(filename);
+  char *buffer = (char*) Malloc(filesize);
+  size_t nitems = fread(buffer, 1, filesize, fp);
+  fclose(fp);
+
+  parse_buffer_to_list(kvl, filesize, buffer, 0, 1);
+
+  Free(buffer);
   return 0;
-}
-
-static void parse_kv_cmdline(struct kv **ht, int nparams, char **params)
-{
-  /* Assume key = value pairs. That is, if params[i] contains no '='
-   * then treat it as if it belongs to the value of params[i-1],
-   * separated by a ','.*/
-  int i = 0;
-  while ( i < nparams )
-    {
-      int j = 1;
-      int size = strlen(params[i]) + 1;
-      while ( i + j < nparams && strchr(params[i + j], '=') == NULL )
-        {
-          size += strlen(params[i + j]) + 1;
-          j++;
-        }
-      char *p = (char *) Malloc(size);
-      strcpy(p, params[i]);
-      for (int k = 1; k < j; k++)
-        {
-          strcat(p, ",");
-          strcat(p, params[i + k]);
-        }
-      parse_kv(ht, p);
-      Free(p);
-      i += j;
-    }
-}
-
-static char *get_val(struct kv **ht, char *key, char *def)
-{
-  struct kv *e;
-  HASH_FIND_STR(*ht, key, e);
-  return e ? e->value : def;
 }
 
 static void check_compare_set(char *finalset, char *attribute, char *attname)
