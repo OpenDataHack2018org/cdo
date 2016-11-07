@@ -77,40 +77,46 @@ char *getElementName(char *pline, char *name)
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
   size_t pos = 0;
-  while ( pos < len && !isspace((int) *(pline+pos)) && *(pline+pos) != '=' && *(pline+pos) != ':' ) pos++;
-
-  strncpy(name, pline, pos);
+  while ( pos < len && !isspace((int) *(pline+pos)) && *(pline+pos) != '=' && *(pline+pos) != ':' )
+    {
+      name[pos] = tolower(*(pline+pos));
+      pos++;
+    }
   name[pos] = 0;
 
   pline += pos;
   return pline;
 }
 
+static void copy_value(char *value, char **values, int *nvalues)
+{
+  values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
+  strncpy(values[*nvalues], value, strlen(value)+1);
+  (*nvalues)++;
+}
+
 static
 char *getElementValues(char *pline, char **values, int *nvalues)
 {
-  char *restline;
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
-
   *nvalues = 0;
   int i = 0;
   while ( i < len && len )
     {
       if ( *(pline+i) == ',')
         {
-          char *value;
-          value = pline;
-          *(value+i) = 0;
-          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
-          strncpy(values[*nvalues], value, strlen(value)+1);
-          i++; (*nvalues)++;
+          copy_value(pline, values, nvalues);
+          *(values[*nvalues-1]+i) = 0;
+
+          i++;
           pline+=i;
+          len-=i;
+          i=0;
         }
       else if ( *(pline+i) == '"' )
         {
           i++;
-          pline++;
           while ( *(pline+i) != '"' )
             {
               i++;
@@ -121,15 +127,15 @@ char *getElementValues(char *pline, char **values, int *nvalues)
         }
       else if ( isspace((int) *(pline+i)) )
         {
-          char *value;
-          value = pline;
-          if ( *(value+i-1) == '"' )
-            *(value+i-1) = 0;
+          copy_value(pline, values, nvalues);
+          if ( *(values[*nvalues-1]+i-1) == '"' || *(values[*nvalues-1]+i-1) == '\'' )
+            {
+              values[*nvalues-1]++;
+              *(values[*nvalues-1]+i-2) = 0;
+            }
           else
-            *(value+i) = 0;
-          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
-          strncpy(values[*nvalues], value, strlen(value)+1);
-          i++; (*nvalues)++;
+            *(values[*nvalues-1]+i) = 0;
+          i++; 
           pline+=i;
           break;          
         }
@@ -137,6 +143,18 @@ char *getElementValues(char *pline, char **values, int *nvalues)
         cdoAbort("Found unexpected separator sign in value: '%c'.", *(pline+i) );
       else
         i++;
+    }
+  if ( i == len && len )
+    {
+      copy_value(pline, values, nvalues);
+      if ( *(values[*nvalues-1]+i-1) == '"' )
+        {
+          values[*nvalues-1]++;
+          *(values[*nvalues-1]+i-2) = 0;
+        }
+      else
+        *(values[*nvalues-1]+i) = 0;
+      *pline = 0;
     }
   return pline;
 }
