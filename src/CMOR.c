@@ -783,34 +783,40 @@ static void dump_special_attributes(list_t *kvl, int streamID)
         {
           strcpy(history, new_history);
         }
-      hreplace(ht, "history", history);
+      kv_insert_a_val(kvl, "history", history, 1);
       Free(history);
     }
 }
 
-static void read_config_files(struct kv **ht)
+static void read_config_files(list_t *kvl)
 {
   /* Files from info key in command line. */
-  char *info = get_val(ht, "info", "");
-  char *workfile = Malloc(strlen(info) + 1);
-  strcpy(workfile, info);
-  char *restfile;
-  while ( strtok_r(workfile, ",", &restfile) != NULL )
-    {
-      parse_kv_file(ht, trim(workfile), 1);
-      strcpy(workfile, restfile);
-    }
+  keyValues_t *info = kvlist_search(kvl, "info");
+  int i = 0;
+  if ( info )
+    while ( i < info->nvalues )
+      {
+        parse_kv_file(kvl, info->values[i]);
+        i++;
+      }
 
   /* Config file in user's $HOME directory. */
   char *home = getenv("HOME");
   const char *dotconfig = ".cdocmorinfo";
-  workfile = Malloc(strlen(home) + strlen(dotconfig) + 2);
+  char *workfile = Malloc(strlen(home) + strlen(dotconfig) + 2);
   sprintf(workfile, "%s/%s", home, dotconfig);
-  parse_kv_file(ht, workfile, 0);
+  parse_kv_file(kvl, workfile);
   Free(workfile);
-
-  /* System wide configuration. */
-  parse_kv_file(ht, "/etc/cdocmor.info", 0);
+  
+  if ( i == 0 )
+    {
+      keyValues_t *info2 = kvlist_search(kvl, "info");
+      while ( i < info2->nvalues )
+        {
+          parse_kv_file(kvl, info2->values[i]);
+          i++;
+        }
+    }
 }
 
 static int in_list(char **list, const char *needle)
