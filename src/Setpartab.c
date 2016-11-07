@@ -78,6 +78,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
   int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char valstr[CDI_MAX_NAME];
   char varname[CDI_MAX_NAME];
+  char paramstr[32];
   int codenum;
 
   // search for global missing value
@@ -133,8 +134,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
         }
       else if ( ptmode == PARAMETER_ID )
         {
-          char paramstr[32];
-          int param   = vlistInqVarParam(vlistID2, varID);
+          int param = vlistInqVarParam(vlistID2, varID);
           paramToStringLong(param, paramstr, sizeof(paramstr));
           snprintf(valstr, sizeof(valstr), "%s", paramstr);
           kvlist = pmlist_search_kvlist_ventry(pmlist, "param", valstr, nventry, ventry);
@@ -165,7 +165,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
               bool lv1 = (kv->nvalues == 1);
               
-              printf("key=%s  value=%s\n", key, value ? value : "");
+              // printf("key=%s  value=%s\n", key, value ? value : "");
 
               if      ( lv1 && STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
               else if ( lv1 && STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
@@ -291,7 +291,9 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
         }
       else
         {
-          cdoPrint("Variable %s not found in parameter table!", varname);
+          if      ( ptmode == CODE_NUMBER )   cdoPrint("Code number %d not found in parameter table!", codenum);
+          else if ( ptmode == PARAMETER_ID )  cdoPrint("Parameter ID %s not found in parameter table!", paramstr);
+          else if ( ptmode == VARIABLE_NAME ) cdoPrint("Variable %s not found in parameter table!", varname);
         }
     }
 }
