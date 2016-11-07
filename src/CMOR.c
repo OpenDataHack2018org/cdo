@@ -1724,6 +1724,16 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID)
   int reccounter = 0;
   int recdummy = 0;
 
+  if ( cdoStreamName(0)->args[0] == '-' )
+    {
+      cdoWarning("Cdo cmor cannot check frequency of Ifile recs since you piped several cdo operators.\nIt is tried to use a configuration attribute frequency.");
+      strcpy(frequency, kv_get_a_val(kvl, "frequency", ""));
+      if ( strcmp(frequency, "") == 0 )
+        cdoAbort("No attribute frequency is found.");
+      else
+        return frequency;
+    } 
+  
   int streamID2 = streamOpenRead(cdoStreamName(0));
   int vlistID2 = streamInqVlist(streamID2);
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -1843,6 +1853,7 @@ static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date,
         {
           time_bnds[0] = time_val - 0.5;
           time_bnds[1] = time_val + 0.5;
+          return time_bnds;
         }  
       vtime0b = 0;
       vtime1b = 0;
