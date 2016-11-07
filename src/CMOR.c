@@ -1936,7 +1936,7 @@ static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vli
     cdoAbort("No surface pressure found for time step %d but required in Hybrid-sigma-pressure-coordinates! \n", timestep);
 }
 
-static void write_variables(struct kv **ht, int streamID, struct mapping vars[], int *zfactor_id)
+static void write_variables(list_t *kvl, int streamID, struct mapping vars[], int *zfactor_id)
 {
   printf("\n*******Start to write variables via cmor_write.******\n");
   int vlistID = streamInqVlist(streamID);
@@ -1944,24 +1944,25 @@ static void write_variables(struct kv **ht, int streamID, struct mapping vars[],
   int tsID = 0;
   int nrecs;
   int invert_lat = 0;
-  if ( get_val(ht, "invert_lat", NULL) )
+  if ( strcmp(kv_get_a_val(kvl, "invert_lat", ""), "") != 0 )
     invert_lat = 1;
   size_t gridsize = vlistGridsizeMax(vlistID);
   double *buffer = (double *) Malloc(gridsize * sizeof(double));
 
   int sdate, stime, time_unit, calendar;
-  get_taxis(get_val(ht, "req_time_units", ""), get_val(ht, "calendar", ""), &sdate, &stime, &time_unit, &calendar);
+  get_taxis(kv_get_a_val(kvl, "req_time_units", ""), kv_get_a_val(kvl, "calendar", ""), &sdate, &stime, &time_unit, &calendar);
   int tunitsec = get_tunitsec(time_unit);
   juldate_t ref_date = juldate_encode(calendar, sdate, stime);
-/*  char *frequency = get_frequency(streamID, vlistID, taxisID); */
-  char frequency[4];
-  strcpy(frequency, "mon\0");
+  char *frequency;
+  char *timeaxis = kv_get_a_val(kvl, "time_axis", "");
+  if ( strcmp(timeaxis, "none") != 0 )
+    frequency = get_frequency(kvl, streamID, vlistID, taxisID);
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
       double time_bnds[2];
       double *time_bndsp;
       double time_val;
-      if ( strcmp(get_val(ht, "time_axis", NULL), "none") != 0 )
+      if ( strcmp(timeaxis, "none") != 0 )
         {
           time_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar);
           time_bndsp = get_time_bounds(taxisID, frequency, ref_date, time_val, calendar, tunitsec, time_bnds);
@@ -1974,10 +1975,10 @@ static void write_variables(struct kv **ht, int streamID, struct mapping vars[],
         {
           if ( !vars[i].help_var )
             {
-              char *file_suffix = get_val(ht, "file_suffix", NULL);
-              if ( strcmp (get_val(ht, "oflag", ""), "append") != 0 )
+              char *file_suffix = kv_get_a_val(kvl, "file_suffix", "");
+              if ( strcmp (kv_get_a_val(kvl, "oflag", ""), "append") != 0 )
                 file_suffix = NULL;
-              if ( strcmp(get_val(ht, "time_axis", ""), "none") != 0 )
+              if ( strcmp(timeaxis, "none") != 0 )
                 {
                   cmor_write(vars[i].cmor_varID,
                    vars[i].data,
@@ -2033,25 +2034,73 @@ static void destruct_var_mapping(struct mapping vars[])
   Free(vars);
 }
 
-static void destruct_hash_table(struct kv **ht)
+static void read_maptab(list_t *kvl, int streamID)
 {
-  struct kv *s, *tmp;
-  HASH_ITER(hh, *ht, s, tmp)
-    {
-      Free(s->key);
-      Free(s->value);
-      Free(s);
-    }
-}
+  char *maptab = kv_get_a_val(kvl, "mapping_table", "");
+  char *maptabdir = kv_get_a_val(kvl, "mapping_table_dir", "");
+  keyValues_t *kvvars = kvlist_search(kvl, "vars");
 
-static void read_maptab(struct kv **ht, int streamID)
-{
-  char *maptab = get_val(ht, "mapping_table", "");
+  if ( strcmp(maptab, "") != 0 && strcmp(maptabdir, "") != 0 && maptab[0] != '/' )
+    {
+      char *maptabbuild = malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
+      sprintf(maptabbuild, "%s/%s\0", maptabdir, maptab);
+      maptab = malloc(strlen(maptabbuild) * sizeof(char));
+      strcpy(maptab, maptabbuild);
+      free(maptabbuild);
+    }
   if ( strcmp(maptab, "") != 0 )
     {
       int vlistID = streamInqVlist(streamID);
       int nvars = vlistNvars(vlistID);
-      apply_cmor_table(maptab, nvars, vlistID);
+      if ( kvvars )
+        {
+          const char **vars = Malloc((kvvars->nvalues + 1) * sizeof(char *));
+          int i;
+          for ( i = 0; i < kvvars->nvalues; i++ )
+            vars[i] = strdup(kvvars->values[i]);
+          vars[kvvars->nvalues] = NULL;
+          apply_mapping_table(maptab, nvars, vlistID, vars);
+        }
+      else
+        apply_mapping_table(maptab, nvars, vlistID, NULL);
+      if ( maptab ) Free(maptab);
+    }
+}
+
+static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
+{
+  list_t *kvl = NULL;
+  kvl = list_new(sizeof(keyValues_t *), free_keyval, ventry);
+  list_append(pml, &kvl);
+
+  char *key = NULL;
+  char **values = NULL;
+  int i = 1, j = 0;
+  int MAX_VALUES = 50; 
+  while ( params[i] )
+    {
+      if ( strchr(params[i], '=')  )
+        {
+          if ( key && values[0] )
+            kvlist_append(kvl, (const char *)key, (const char **) values, j);
+          else if ( key )
+            cdoAbort("Found no value for key '%s'.", key);
+          values = malloc(MAX_VALUES * sizeof(char *));
+          key = strtok(params[i], "=");
+          values[0] = strtok(NULL, "");
+          j = 1;
+        }
+      else
+        {
+          if ( !key )
+            cdoAbort("Found no key for value '%s'.", params[i]);
+          else
+            {
+              values[j] = params[i];
+              j++;
+            }
+        }
+      i++;
     }
 }
 #endif
