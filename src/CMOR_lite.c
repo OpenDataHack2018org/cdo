@@ -325,6 +325,7 @@ void *CMOR_lite(void *argument)
   cdoInitialize(argument);
 
   CDO_CMOR_Mode = 1;
+  if ( CDO_CMOR_Mode ) cdiDefGlobal("CMOR_MODE", CDO_CMOR_Mode);
 
   cdoOperatorAdd("cmorlite",  0, 0, "parameter table name");
 
