@@ -522,67 +522,34 @@ static char *trim(char *s)
   return s;
 }
 
-static void hinsert(struct kv **ht, const char *key, const char *value)
-{
-  /* Insert new keys. Do not overwrite values of existing keys. */
-  struct kv *e, *s;
-  HASH_FIND_STR(*ht, key, s);
-  if ( s == NULL)
-    {
-      e = Malloc(sizeof(struct kv));
-      e->key = Malloc(strlen(key) + 1);
-      e->value = Malloc(strlen(value) + 1);
-      strcpy(e->key, key);
-      strcpy(e->value, value);
-      HASH_ADD_KEYPTR(hh, *ht, e->key, strlen(e->key), e);
-    }
-}
-
-static void hreplace(struct kv **ht, const char *key, const char *value)
-{
-  /* Overwrites values of existing keys. */
-  struct kv *s;
-  HASH_FIND_STR(*ht, key, s);
-  if ( s )
-    {
-      HASH_DEL(*ht, s);
-      Free(s->key);
-      Free(s->value);
-      Free(s);
-    }
-  hinsert(ht, key, value);
-}
-
-static void parse_kv(struct kv **ht, char *kvstr)
-{
-  char *key = trim(strtok(kvstr, "="));
-  char *value = trim(strtok(NULL, "="));
-  char *keylower = trim(strtok(kvstr, "="));
-
-  if ( key )
-    {
-      int i = 0;
-      while( key[i] ) 
-       {
-         keylower[i]=tolower(key[i]);
-         i++;
-       }
-      if ( value )
-        hinsert(ht, keylower, value);
-    }
-}
-
 static int file_exist(const char *tfilename, int force)
 {
-  FILE *tfp = fopen(tfilename, "r");
-  if ( tfp == NULL && force )
-      cdoAbort("cannot open '%s'", tfilename);
-  if ( tfp == NULL && !force )
+  assert(tfilename != NULL);
+  size_t filesize = fileSize(tfilename);
+  if ( filesize == 0 && force)
+    {
+      fprintf(stderr, "Empty table file: %s\n", tfilename);
+      return 0;
+    }
+  else if ( filesize == 0 && !force )
     {
       cdoWarning("cannot open '%s'", tfilename);
       return 0;
     }
-  fclose(tfp);
+
+  FILE *fp = fopen(tfilename, "r");
+  if ( fp == NULL && force )
+    {
+      fprintf(stderr, "Open failed on %s: %s\n", tfilename, strerror(errno));
+      return 0;
+    }
+  else if ( fp == NULL && !force )
+    {
+      cdoWarning("cannot open '%s'", tfilename);
+      return 0;
+    }
+
+  fclose(fp);
   return 1;
 }
   
