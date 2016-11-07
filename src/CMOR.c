@@ -2102,6 +2102,35 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
         }
       i++;
     }
+  if ( key && values )
+    {
+      kvlist_append(kvl, (const char *)key, (const char **) values, j);
+      Free(values);
+    }
+  else if ( values )
+    cdoAbort("Found no key for value '%s'.", params[i-1]);
+}
+
+static char *get_mip_table(char *params, list_t *kvl)
+{
+  if ( !params )
+    cdoAbort("A mip table name or path is required as first argument. No first argument found.");
+  if ( file_exist(params, 0) )
+    return params;
+  else
+    {
+      cdoWarning("Your first argument could not be opened as a file. It is tried to build a path with additional configuration attributes 'mip_table_dir' and 'project_id'");
+      char *miptabdir = kv_get_a_val(kvl, "mip_table_dir", "");
+      char *projid = kv_get_a_val(kvl, "project_id", "");
+      if ( strcmp(miptabdir, "") != 0 && strcmp(projid, "") != 0 )
+        {
+          char *miptab = malloc((strlen(miptabdir)+strlen(projid)+strlen(params)+3) * sizeof(char));
+          sprintf(miptab, "%s/%s_%s\0", miptabdir, projid, params);
+          return miptab;
+        }
+      else
+        cdoAbort("Could not build a mip table path.");
+    }        
 }
 #endif
 
@@ -2112,47 +2141,57 @@ void *CMOR(void *argument)
 #if defined(HAVE_LIBCMOR)
   int nparams = operatorArgc();
   char **params = operatorArgv();
-  struct kv *ht = NULL;
+
+  /* Definition of pml: */
+  list_t *pml = list_new(sizeof(list_t *), free_kvlist, "pml");
+  /*Name and size of kvl: */
+  const char *ventry[] = {"keyvals"};
+  int nentry = (int) sizeof(ventry)/sizeof(ventry[0]);
+
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
-  /* check MIP table*/
-  file_exist(params[0], 1);  
+  /* Define kvl and read cmdline */
+  parse_cmdline(pml, params, nparams, (char *)ventry[0]);
 
-  /* Command line config has highest priority. */
-  parse_kv_cmdline(&ht, nparams - 1, &params[1]);
+  /* Get kvl and use it from now on instead of pml */
+  list_t *kvl = pml_get_kvl_ventry(pml, nentry, ventry);
 
   /* Config files are read with descending priority. */
-  read_config_files(&ht);
+  read_config_files(kvl);
+
+  /* check MIP table */
+  char *mip_table = get_mip_table(params[0], kvl);
 
   int streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
-  dump_special_attributes(&ht, streamID);
+  dump_special_attributes(kvl, streamID);
 
   /* Check for attributes and member name */
   printf("*******Start to check attributes.*******\n");
-  check_attr(&ht);
-  check_mem(&ht);
+  check_attr(kvl);
+  check_mem(kvl);
   printf("*******Succesfully checked global attributes.*******\n");
 
- /* dump_global_attributes(&ht, streamID); */
+ /* dump_global_attributes(pml, streamID); */
 
  /* read mapping table */
-  read_maptab(&ht, streamID);
+  read_maptab(kvl, streamID);
 
   struct mapping *vars = construct_var_mapping(streamID);
 
-  setup_dataset(&ht, streamID);
+  setup_dataset(kvl, streamID);
 
   int table_id;
-  cmor_load_table(params[0], &table_id);
+  cmor_load_table(mip_table, &table_id);
   cmor_set_table(table_id);
 
   int zfactor_id = 0;
-  register_all_dimensions(&ht, streamID, vars, table_id, &zfactor_id);
-  write_variables(&ht, streamID, vars, &zfactor_id);
+  register_all_dimensions(kvl, streamID, vars, table_id, &zfactor_id);
+  write_variables(kvl, streamID, vars, &zfactor_id);
 
   destruct_var_mapping(vars);
-  destruct_hash_table(&ht);
+
+  list_destroy(pml);
 
   streamClose(streamID);
 #else
