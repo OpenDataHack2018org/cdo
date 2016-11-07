@@ -193,15 +193,14 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
     }
 }
 
-void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
+void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int checkpml, int lowprior)
 {
   char line[4096];
   char name[256];
   char *pline;
-  char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter"};
+  char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter", NULL};
   int linenumber = 0;
   int listtype = 0;
-  list_t *kvl = NULL;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
     {
@@ -212,23 +211,24 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
       //  len = (int) strlen(pline);
       if ( listtype == 0 && *pline == '&' ) listtype = 1;
 /* MAXNVALUES*/
-      int nvalues;
-
       int i = 0;
       while ( listkeys[i] )
         {
-          if ( strncmp(pline, listkeys[i], strlen(listkeys[i])) == 0 )
-            {
-	      pline += strlen(listkeys[i]);
- 	      listtype = 2;
-              kvl = list_new(sizeof(keyValues_t *), free_keyval, listkeys[i]);
-              list_append(pml, &kvl);
-              break;
-	    }
+          if ( strlen(pline) > strlen(listkeys[i]) )
+            if ( strncmp(pline, listkeys[i], strlen(listkeys[i])) == 0 )
+              {
+	        pline += strlen(listkeys[i]);
+ 	        listtype = 2;
+                break;
+	      }
           i++;
         }
-      if ( listtype == 0 )
-        cdoAbort("No valid list key.\n");
+      if ( listtype )
+        parse_line_to_list(list, pline, listkeys[i], checkpml, lowprior);
+      else
+        parse_line_to_list(list, pline, "keyvals", checkpml, lowprior);
+    }
+}
 
       while ( *pline != 0 )
         {
