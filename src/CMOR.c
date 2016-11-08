@@ -425,9 +425,9 @@ static void register_z_axis(int zaxisID, char *name, int *axis_ids)
 static void register_xy_only(int gridID, int *axis_ids)
 {
   char name[CDI_MAX_NAME];
-  name[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XLONGNAME, CDI_MAX_NAME, name);
-  register_y_axis(gridID, name, axis_ids);
   name[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_YLONGNAME, CDI_MAX_NAME, name);
+  register_y_axis(gridID, name, axis_ids);
+  name[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XLONGNAME, CDI_MAX_NAME, name);
   register_x_axis(gridID, name, axis_ids);
 }
 
