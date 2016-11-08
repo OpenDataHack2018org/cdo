@@ -19,8 +19,8 @@
 /* */
 int stringToParam(const char *paramstr);
 
-list_t *pml_search_kvl_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
-list_t *pml_get_kvl_ventry(list_t *pml, int nentry, const char **entry);
+list_t *pmlist_search_kvlist_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
+list_t *pmlist_get_kvlist_ventry(list_t *pml, int nentry, const char **entry);
 
 static
 char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
@@ -375,7 +375,7 @@ static int map_via_key(list_t *pml, int vlistID, int varID, int nventry, const c
   char ifilevalue[CDI_MAX_NAME];
   get_ifilevalue(ifilevalue, key, vlistID, varID);
 
-  list_t *kvl = pml_search_kvl_ventry(pml, key, ifilevalue, nventry, ventry);
+  list_t *kvl = pmlist_search_kvlist_ventry(pml, key, ifilevalue, nventry, ventry);
   if ( ifilevalue[0] )
     {
       if ( kvl )
@@ -421,7 +421,7 @@ static void map_via_vars(list_t *pml, const char **vars, int vlistID, int nvars,
   while ( vars[j] )
     {
       printf("*******Try to map requested variable: '%s'********\n", vars[j]);
-      list_t *kvl_oname = pml_search_kvl_ventry(pml, "out_name", vars[j], nventry, ventry);
+      list_t *kvl_oname = pmlist_search_kvlist_ventry(pml, "out_name", vars[j], nventry, ventry);
       if ( kvl_oname )
         {
           if ( map_via_vars_and_key(kvl_oname, vlistID, nvars, "name") )
@@ -2154,7 +2154,7 @@ void *CMOR(void *argument)
   parse_cmdline(pml, params, nparams, (char *)ventry[0]);
 
   /* Get kvl and use it from now on instead of pml */
-  list_t *kvl = pml_get_kvl_ventry(pml, nentry, ventry);
+  list_t *kvl = pmlist_get_kvlist_ventry(pml, nentry, ventry);
 
   /* Config files are read with descending priority. */
   read_config_files(kvl);
