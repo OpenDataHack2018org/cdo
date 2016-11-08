@@ -174,7 +174,7 @@ static
 void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = {"Header"};
-  const char *ventry[] = {"variable_entry"};
+  const char *ventry[] = {"variable_entry", "parameter"};
   int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
   int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char varname[CDI_MAX_NAME];
@@ -261,7 +261,7 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
                   var->factor = parameter2double(value);
                   if ( cdoVerbose ) cdoPrint("%s - scale factor %g", varname, var->factor);
                 }
-              else if ( STR_IS_EQ(key, "missval") )
+              else if ( STR_IS_EQ(key, "missval") || STR_IS_EQ(key, "missing_value") )
                 {
                   double missval = parameter2double(value);
                   double missval_old = vlistInqVarMissval(vlistID2, varID);
@@ -308,7 +308,7 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
         }
       else
         {
-          cdoPrint("Variable %s not found in cmor table!", varname);
+          cdoPrint("Variable %s not found in CMOR table!", varname);
         }
     }
 }

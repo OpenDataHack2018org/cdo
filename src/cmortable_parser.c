@@ -296,12 +296,22 @@ list_t *cmortable_to_pmlist(FILE *fp, const char *name)
   listbuf_t *listbuf = listbuf_new();
   if ( listbuf_read(listbuf, fp, name) ) cdoAbort("Read error on CMOR table %s!", name);
   
-  list_t *pmlist = list_new(sizeof(list_t *), free_kvlist, name);
+  list_t *pmlist = NULL;
 
   if ( listbuf->buffer[0] == '{' )
-    cmortablebuf_to_pmlist_json(pmlist, listbuf->size, listbuf->buffer, name);
+    {
+      pmlist = list_new(sizeof(list_t *), free_kvlist, name);
+      cmortablebuf_to_pmlist_json(pmlist, listbuf->size, listbuf->buffer, name);
+    }
   else if ( strncmp(listbuf->buffer, "table_id:", 9) == 0 )
-    cmortablebuf_to_pmlist(pmlist, listbuf->size, listbuf->buffer);
+    {
+      pmlist = list_new(sizeof(list_t *), free_kvlist, name);
+      cmortablebuf_to_pmlist(pmlist, listbuf->size, listbuf->buffer);
+    }
+  else if ( listbuf->buffer[0] == '&' || listbuf->buffer[0] == '#' )
+    {
+      pmlist = namelistbuf_to_pmlist(listbuf);
+    }
   else
     cdoAbort("Invalid CMOR table (file: %s)!", name);
 
