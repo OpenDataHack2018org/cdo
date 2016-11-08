@@ -214,6 +214,47 @@ case "${HOSTNAME}" in
                     CC=gcc CFLAGS='-g -Wall -O3'
 	fi
 	;;
+# jessie workstation x64
+    breeze*)
+        CDOLIBS="--with-grib_api=/sw/jessie-x64/grib_api-1.14.3-static-gccsys \
+                 --with-netcdf=/sw/jessie-x64/netcdf-4.3.3.1-gccsys \
+                 --with-udunits2=/sw/jessie-x64/udunits-2.2.20-gccsys \
+                 --with-proj=/sw/jessie-x64/proj4-4.9.3-gccsys LIBS=-lz"
+        if  test "$COMP" = icpc ; then
+          ${CONFPATH}configure --enable-cxx --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = icc ; then
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=icc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = pgcc ; then
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    $CDOLIBS \
+	            CC=pgcc CFLAGS="-g"
+        elif  test "$COMP" = clang ; then
+          ${CONFPATH}configure              --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=clang CXX=clang++ CFLAGS="-g -O2"
+        elif  test "$COMP" = clang++ ; then
+          ${CONFPATH}configure --enable-cxx --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+	            CC=clang CXX=clang++ CFLAGS="-g -O2"
+        elif  test "$COMP" = g++ ; then
+	  ${CONFPATH}configure --enable-cxx \
+                    $CDOLIBS \
+	            CC=gcc CXX=g++ CFLAGS="-g -Wall -O3"
+	else
+          ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/thunder \
+                    --with-fftw3 \
+                    $CDOLIBS \
+                    CC=gcc CFLAGS='-g -Wall -O3'
+	fi
+	;;
 # mistral
     mlogin*)
         CDOLIBS="--with-grib_api=/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48 \
