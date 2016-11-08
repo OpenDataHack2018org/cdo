@@ -88,10 +88,9 @@ void cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
   char line[4096];
   char name[256];
   char *pline;
-  char listkey1[] = "axis_entry";
-  char listkey2[] = "variable_entry";
+  const char *listentry[] = {"axis_entry", "variable_entry"};
+  int nentry = sizeof(listentry)/sizeof(listentry[0]);
   int linenumber = 0;
-  int listtype = 0;
   list_t *kvlist = NULL;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
@@ -101,29 +100,16 @@ void cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
       while ( isspace((int) *pline) ) pline++;
       if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
       //  len = (int) strlen(pline);
-      if ( listtype == 0 && *pline == '&' ) listtype = 1;
+
+      int ientry = -1;
+      for ( ientry = 0; ientry < nentry; ++ientry )
+        if ( strncmp(pline, listentry[ientry], strlen(listentry[ientry])) == 0 ) break;
       
-      if ( strncmp(pline, listkey1, strlen(listkey1)) == 0 )
+      if ( ientry < nentry )
 	{
-	  pline += strlen(listkey1);
+	  pline += strlen(listentry[ientry]);
 
-	  listtype = 2;
-
-          kvlist = kvlist_new(listkey1);
-          list_append(pmlist, &kvlist);
-
-	  pline = skipSeparator(pline);
-	  pline = getElementValue(pline);
-
-	  if ( *pline ) kvlist_append(kvlist, "name", (const char **)&pline, 1);
-	}
-      else if ( strncmp(pline, listkey2, strlen(listkey2)) == 0 )
-	{
-	  pline += strlen(listkey2);
-
-	  listtype = 2;
-
-          kvlist = kvlist_new(listkey2);
+          kvlist = kvlist_new(listentry[ientry]);
           list_append(pmlist, &kvlist);
 
 	  pline = skipSeparator(pline);
