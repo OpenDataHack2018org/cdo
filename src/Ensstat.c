@@ -30,7 +30,6 @@
       Ensstat    enspctl         Ensemble percentiles
 */
 
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -41,7 +40,6 @@
 void *Ensstat(void *argument)
 {
   int nrecs0;
-  int nmiss;
   typedef struct
   {
     int streamID;
@@ -78,10 +76,10 @@ void *Ensstat(void *argument)
       argc--;
     }
 
-  int count_data = FALSE;
+  bool count_data = false;
   if ( argc == 1 )
     {
-      if ( strcmp("count", operatorArgv()[nargc-1]) == 0 ) count_data = TRUE;
+      if ( strcmp("count", operatorArgv()[nargc-1]) == 0 ) count_data = true;
       else cdoAbort("Unknown parameter: >%s<", operatorArgv()[nargc-1]); 
     }
     
@@ -153,6 +151,8 @@ void *Ensstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  bool lwarning = false;
+  bool lerror = false;
   int tsID = 0;
   do
     {
@@ -164,10 +164,22 @@ void *Ensstat(void *argument)
 	  if ( nrecs != nrecs0 )
 	    {
 	      if ( nrecs == 0 )
-		cdoAbort("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(fileID)->args);
+                {
+                  lwarning = true;
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(fileID)->args);
+                }
+	      else if ( nrecs0 == 0 )
+                {
+                  lwarning = true;
+                  cdoWarning("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(0)->args);
+                }
 	      else
-		cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-			 tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+                {
+                  lerror = true;
+                  cdoWarning("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
+                             tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
+                }
+              goto CLEANUP;
 	    }
 	}
 
@@ -194,9 +206,9 @@ void *Ensstat(void *argument)
 
 	  int gridID = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  double missval  = vlistInqVarMissval(vlistID1, varID);
+	  double missval = vlistInqVarMissval(vlistID1, varID);
 
-	  nmiss = 0;
+	  int nmiss = 0;
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
@@ -245,6 +257,11 @@ void *Ensstat(void *argument)
       tsID++;
     }
   while ( nrecs0 > 0 );
+
+ CLEANUP:
+
+  if ( lwarning ) cdoWarning("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
+  if ( lerror ) cdoAbort("Inconsistent ensemble, processed only the first %d timesteps!", tsID);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     streamClose(ef[fileID].streamID);

@@ -1,0 +1,22 @@
+&parameter
+  name            = orog
+  standard_name   = surface_altitude
+  units           = "m"
+  long_name       = "Surface Altitude"
+  comment         = "height above the geoid; as defined here, 'the geoid' is a surface of constant geopotential that, if the ocean were at rest, would coincide with mean sea level. Under this definition, the geoid changes as the mean volume of the ocean changes (e.g., due to glacial melt, or global warming of the ocean).  Report here the height above the present-day geoid.  Over ocean, report as 0.0"
+  out_name        = orog
+  type            = real
+  valid_min       = -700
+  valid_max       = 1.00E+04
+  attint          = 1, 5, 7, 85281
+  attflt          = 23 1.e2 88.1
+  attstring       = "test string"
+  attword         = word
+  missing_value   = 1e+20
+/
+&parameter
+  name            = p0
+  long_name       = "vertical coordinate formula term: reference pressure"
+  units           = "Pa"
+  missing_value   = 1e+20
+/

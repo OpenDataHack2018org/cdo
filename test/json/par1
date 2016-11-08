@@ -1,0 +1,9 @@
+# skip it 
+& name =  val, units= m/ ! comment
+&"name"  =  val2
+units : kg
+/ ! other comment
+&par3 name=p1, units= 'kg'/
+&par4 name=p2, val=1 2
+4, 8/
+& name=p3, val= "surf temp"/

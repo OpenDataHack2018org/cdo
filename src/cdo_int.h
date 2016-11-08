@@ -32,7 +32,8 @@
 #include <ctype.h>
 #include <stdarg.h>
 
-#include "list.h"
+#include "pmlist.h"
+#include "listbuf.h"
 #include "compare.h"
 #include "timebase.h"
 #include "field.h"
@@ -170,7 +171,14 @@ void cdo_read_field(const char *name, char *pline, int size, double *field, int 
 double cdoZaxisInqLevel(int zaxisID, int levelID);
 int cdoZaxisInqLevels(int zaxisID, double *levels);
 
-list_t *cdo_parse_cmor_file(const char *filename);
+list_t *namelistbuf_to_pmlist(listbuf_t *listbuf);
+list_t *namelist_to_pmlist(FILE *fp, const char *name);
+list_t *cmortable_to_pmlist(FILE *fp, const char *name);
+
+int literal_get_datatype(const char *literal);
+int literal_to_int(const char *literal);
+double literal_to_double(const char *literal);
+
 
 #ifdef __cplusplus
 extern "C" {

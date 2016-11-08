@@ -36,6 +36,7 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
           break;
         }
     }
+
   line[ipos] = 0;
 
   if ( *buffersize == 0 && ipos == 0 ) buffer = NULL;
@@ -74,6 +75,11 @@ char *getElementValues(char *pline, char **values, int *nvalues)
   char *restline;
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
+
+  if ( *pline != '"' && *pline != '\'' )
+    for ( size_t i = 1; i < len; ++i )
+      if ( pline[i] == '!' ) { pline[i] = 0; len = i; break; }
+  while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--; }
 
   *nvalues = 0;
   int i = 0;
@@ -124,7 +130,7 @@ char *getElementValues(char *pline, char **values, int *nvalues)
 }
 
 
-void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
+void cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
 {
   char line[4096];
   char name[256];
@@ -132,7 +138,7 @@ void parse_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
   char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter"};
   int linenumber = 0;
   int listtype = 0;
-  list_t *kvl = NULL;
+  list_t *kvlist = NULL;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
     {
@@ -224,45 +230,47 @@ int dump_json(const char *js, jsmntok_t *t, size_t count, int level)
 }
 
 static
-void kvlist_append_json(list_t *kvl, const char *key, const char *js, jsmntok_t *t, int nvalues)
+void kvlist_append_json(list_t *kvlist, const char *key, const char *js, jsmntok_t *t, int nvalues)
 {
-  char name[1024];
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
   keyval->nvalues = nvalues;
   keyval->values = (char **) malloc(nvalues*sizeof(char*));
   for ( int i = 0; i < nvalues; ++i )
     {
-      sprintf(name, "%.*s", t[i].end - t[i].start, js+t[i].start);
-      // printf("set %s: '%s'\n", key, name);
-      keyval->values[i] = strdup(name);
+      size_t len = t[i].end - t[i].start;
+      char *value = (char*) malloc((len+1)*sizeof(char));
+      snprintf(value, len+1, "%.*s", (int)len, js+t[i].start);
+      value[len] = 0;
+      // printf("set %s: '%s'\n", key, value);
+      keyval->values[i] = value;
     }
-  list_append(kvl, &keyval);
+  list_append(kvlist, &keyval);
 }
 
 static
-int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
+int json_to_pmlist(list_t *pmlist, const char *js, jsmntok_t *t, int count)
 {
   bool debug = false;
-  char name[1024];
-  list_t *kvl = NULL;
-  int pmlname = -1;
+  char name[4096];
   int i = 0;
+  int nobj = t[0].size;
   if ( t[0].type == JSMN_OBJECT )
-    for ( int ib = 0; ib < t[0].size; ++ib )
+    while ( nobj-- )
       {
         ++i;
-        pmlname = i;
+        int pmlname = i;
         if ( debug ) printf("  object: %.*s\n", t[i].end - t[i].start, js+t[i].start);
         ++i;
         if ( t[i].type == JSMN_OBJECT )
           {
             int ic = 0;
           NEXT:
-            sprintf(name, "%.*s", t[pmlname].end - t[pmlname].start, js+t[pmlname].start);
+            snprintf(name, sizeof(name), "%.*s", t[pmlname].end - t[pmlname].start, js+t[pmlname].start);
+            name[sizeof(name)-1] = 0;
             // printf("new object: %s\n", name);
-            kvl = list_new(sizeof(keyValues_t *), free_keyval, name);
-            list_append(pml, &kvl);
+            list_t *kvlist = kvlist_new(name);
+            list_append(pmlist, &kvlist);
                 
             if ( t[i+2].type == JSMN_OBJECT )
               {
@@ -270,22 +278,23 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
                 else           ic--;
                 
                 ++i;
-                kvlist_append_json(kvl, "name", js, &t[i], 1);
+                kvlist_append_json(kvlist, "name", js, &t[i], 1);
                 if ( debug ) printf("    name: '%.*s'\n", t[i].end - t[i].start, js+t[i].start);
                 ++i;
               }
             int n = t[i].size;
-            for ( int jb = 0; jb < n; ++jb )
+            while ( n-- )
               {
                 ++i;
-                sprintf(name, "%.*s", t[i].end - t[i].start, js+t[i].start);
+                snprintf(name, sizeof(name), "%.*s", t[i].end - t[i].start, js+t[i].start);
+                name[sizeof(name)-1] = 0;
                 if ( debug ) printf("    %.*s:", t[i].end - t[i].start, js+t[i].start);
                 ++i;
                 if ( t[i].type == JSMN_ARRAY )
                   {
-                    int nk = t[i].size;
-                    kvlist_append_json(kvl, name, js, &t[i+1], nk);
-                    for ( int k = 0; k < nk; ++k )
+                    int nae = t[i].size;
+                    kvlist_append_json(kvlist, name, js, &t[i+1], nae);
+                    while ( nae-- )
                       {
                         ++i;
                         if ( debug ) printf(" '%.*s'", t[i].end - t[i].start, js+t[i].start);
@@ -293,7 +302,7 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
                   }
                 else
                   {
-                    kvlist_append_json(kvl, name, js, &t[i], 1);
+                    kvlist_append_json(kvlist, name, js, &t[i], 1);
                     if ( debug ) printf(" '%.*s'", t[i].end - t[i].start, js+t[i].start);
                   }
                 if ( debug ) printf("\n");
@@ -308,75 +317,42 @@ int json_to_pml(list_t *pml, const char *js, jsmntok_t *t, int count)
 }
 
 
-void parse_json_buffer_to_pml(list_t *pml, size_t buffersize, char *buffer)
+void cmortablebuf_to_pmlist_json(list_t *pmlist, size_t buffersize, char *buffer, const char *filename)
 {
-  char *js = buffer;
-  size_t jslen = buffersize;
-
   /* Prepare parser */
-  jsmn_parser p;
-  jsmn_init(&p);
+  jsmn_parser *p = jsmn_new();
 
-  /* Allocate some tokens as a start */
-  size_t tokcount = 2;
-  jsmntok_t *tok = (jsmntok_t *) Malloc(sizeof(*tok) * tokcount);
-
-  int r;
- AGAIN:
-  r = jsmn_parse(&p, js, jslen, tok, tokcount);
-  if ( r < 0 )
+  int status = jsmn_parse(p, buffer, buffersize);
+  if ( status != 0 )
     {
-      if ( r == JSMN_ERROR_NOMEM )
+      switch (status)
         {
-          tokcount = tokcount * 2;
-          tok = (jsmntok_t *) Realloc(tok, sizeof(*tok) * tokcount);
-          goto AGAIN;
+        case JSMN_ERROR_INVAL: fprintf(stderr, "JSON error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]); break;
+        case JSMN_ERROR_PART:  fprintf(stderr, "JSON error: End of string not found in %s (line=%d)!\n", filename, p->lineno); break;
+        default:               fprintf(stderr, "JSON error in %s (line=%d)\n", filename, p->lineno); break;
         }
     }
 
-  json_to_pml(pml, js, tok, (int)p.toknext);
-
-  Free(tok);
+  json_to_pmlist(pmlist, buffer, p->tokens, (int)p->toknext);
+  jsmn_destroy(p);
 }
 
 
-list_t *cdo_parse_cmor_file(const char *filename)
+list_t *cmortable_to_pmlist(FILE *fp, const char *name)
 {
-  assert(filename != NULL);
-
-  size_t filesize = fileSize(filename);
-  if ( filesize == 0 )
-    {
-      fprintf(stderr, "Empty table file: %s\n", filename);
-      return NULL;
-    }
-
-  FILE *fp = fopen(filename, "r");
-  if ( fp == NULL )
-    {
-      fprintf(stderr, "Open failed on %s: %s\n", filename, strerror(errno));
-      return NULL;
-    }
-
-  char *buffer = (char*) Malloc(filesize);
-  size_t nitems = fread(buffer, 1, filesize, fp);
-
-  fclose(fp);
-
-  if ( nitems != filesize )
-    {
-      fprintf(stderr, "Read failed on %s!\n", filename);
-      return NULL;
-    }
- 
-  list_t *pml = list_new(sizeof(list_t *), free_kvlist, filename);
-
-  if ( buffer[0] == '{' )
-    parse_json_buffer_to_pml(pml, filesize, buffer);
-  else
-    parse_buffer_to_pml(pml, filesize, buffer);
-
-  Free(buffer);
+  listbuf_t *listbuf = listbuf_new();
+  if ( listbuf_read(listbuf, fp, name) ) cdoAbort("Read error on CMOR table %s!", name);
   
-  return pml;
+  list_t *pmlist = list_new(sizeof(list_t *), free_kvlist, name);
+
+  if ( listbuf->buffer[0] == '{' )
+    cmortablebuf_to_pmlist_json(pmlist, listbuf->size, listbuf->buffer, name);
+  else if ( strncmp(listbuf->buffer, "table_id:", 9) == 0 )
+    cmortablebuf_to_pmlist(pmlist, listbuf->size, listbuf->buffer);
+  else
+    cdoAbort("Invalid CMOR table (file: %s)!", name);
+
+  listbuf_destroy(listbuf);
+
+  return pmlist;
 }

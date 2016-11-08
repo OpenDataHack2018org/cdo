@@ -17,8 +17,8 @@
       "CC": ["gcc"]
     },
     "jessie-mpi": {
-      "hostname": "mpipc149.mpi.zmaw.de",
-      "dir": "/scratch/local1/m300064/builds/remote",
+      "hostname": "breeze.mpi.zmaw.de",
+      "dir": "/home/mpim/m300064/builds/remote",
       "envConfigFiles": ["/etc/profile",".profile"],
       "CC": ["gcc","g++","clang","clang++"]
     },

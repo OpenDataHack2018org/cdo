@@ -461,43 +461,47 @@ void *XTimstat(void *argument)
       if ( nrecs == 0 && nsets == 0 ) break;
 
       if ( lmean )
+        {
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(vlistID1, nsets, maxrecs, recinfo, vars1, samp1) if(maxrecs>1)
 #endif
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_t *pvar1 = &vars1[varID][levelID];
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_t *pvar1 = &vars1[varID][levelID];
 
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-            if ( samp1[varID][levelID].ptr == NULL )
-              farcdiv(pvar1, (double)nsets);
-            else
-              fardiv(pvar1, samp1[varID][levelID]);
-	  }
+              if ( samp1[varID][levelID].ptr == NULL )
+                farcdiv(pvar1, (double)nsets);
+              else
+                fardiv(pvar1, samp1[varID][levelID]);
+            }
+        }
       else if ( lvarstd )
-        for ( int recID = 0; recID < maxrecs; recID++ )
-          {
-            int varID   = recinfo[recID].varID;
-            int levelID = recinfo[recID].levelID;
-            field_t *pvar1 = &vars1[varID][levelID];
-            field_t *pvar2 = &vars2[varID][levelID];
+        {
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_t *pvar1 = &vars1[varID][levelID];
+              field_t *pvar2 = &vars2[varID][levelID];
 
-            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-            if ( samp1[varID][levelID].ptr == NULL )
-              {
-                if ( lstd ) farcstd(pvar1, *pvar2, nsets, divisor);
-                else        farcvar(pvar1, *pvar2, nsets, divisor);
-              }
-            else
-              {
-                if ( lstd ) farstd(pvar1, *pvar2, samp1[varID][levelID], divisor);
-                else        farvar(pvar1, *pvar2, samp1[varID][levelID], divisor);
-	      }
-	  }
+              if ( samp1[varID][levelID].ptr == NULL )
+                {
+                  if ( lstd ) farcstd(pvar1, *pvar2, nsets, divisor);
+                  else        farcvar(pvar1, *pvar2, nsets, divisor);
+                }
+              else
+                {
+                  if ( lstd ) farstd(pvar1, *pvar2, samp1[varID][levelID], divisor);
+                  else        farvar(pvar1, *pvar2, samp1[varID][levelID], divisor);
+                }
+            }
+        }
 
       if ( cdoVerbose )
 	{

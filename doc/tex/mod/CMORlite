@@ -1,0 +1,26 @@
+@BeginModule
+@NewPage
+@Name      = CMORlite
+@Title     = CMOR lite
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = cmorlite
+
+@BeginDescription
+@EndDescription
+@EndModule
+
+
+@BeginOperator_cmorlite
+@Title     = CMOR lite
+@Parameter = table
+@EndOperator
+
+
+@BeginParameter
+@Item = table
+STRING   Name of the CMOR table as specified from PCMDI
+@EndParameter
+
+@BeginExample
+@EndExample

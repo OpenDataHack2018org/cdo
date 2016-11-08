@@ -1,0 +1,16 @@
+&_global_  missval = -1.e33 /
+&parameter
+  name = topo
+  att-name-dashes = 4
+  att.name.dots   = 5
+  att+name+plusses = 6
+  att@name@ats   = 7
+  att_byte = 0b, 127b, -128b, -1b
+  att_short = -32768s, 0s, 32767s
+  att_int = -2147483647, 0, 2147483647
+  att_float = -1.e+36f, 0.f, 1.e+36f
+  att_double = -1.e+308, 0., 1.e+308
+  att_char_empty = ""
+  att_char_single = "x"
+  att_char_string = "abcd\tZ$&"
+/

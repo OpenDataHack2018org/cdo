@@ -1051,6 +1051,7 @@ int parse_options_long(int argc, char *argv[])
   int lgridsearchradius;
   int lremap_genweights;
   int lpercentile;
+  int lprintoperatorsno = 0;
   int lprintoperators = 0;
   int lenableexcept;
   int ltimestat_date;
@@ -1071,6 +1072,7 @@ int parse_options_long(int argc, char *argv[])
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "float",                   no_argument,        &CDO_Memtype,  MEMTYPE_FLOAT  },
       { "rusage",                  no_argument,         &CDO_Rusage,  1  },
+      { "operators_no_output",     no_argument,  &lprintoperatorsno,  1  },
       { "operators",               no_argument,    &lprintoperators,  1  },
       { "no_warnings",             no_argument,           &_Verbose,  0  },
       { "color",                   no_argument,                NULL, 'C' },
@@ -1307,15 +1309,16 @@ int parse_options_long(int argc, char *argv[])
         }
     }
 
-  if ( lprintoperators )
+  if ( lprintoperators || lprintoperatorsno )
     {
       set_text_color(stderr, RESET, GREEN);
-      operatorPrintList();
+      bool print_no_output = lprintoperatorsno > 0;
+      operatorPrintList(print_no_output);
       //operatorPrintAll();
       reset_text_color(stderr);
       return 1;
     }
-  
+ 
   return 0;
 }
 
@@ -1350,7 +1353,6 @@ int main(int argc, char *argv[])
   int lstop = FALSE;
   int noff = 0;
   int status = 0;
-  char *operatorName = NULL;
   char *operatorArg = NULL;
   argument_t *argument = NULL;
 
@@ -1465,7 +1467,7 @@ int main(int argc, char *argv[])
 
   if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
 
-  operatorName = getOperatorName(operatorArg);
+  const char *operatorName = getOperatorName(operatorArg);
 
   if ( Help )
     {

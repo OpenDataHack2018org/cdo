@@ -213,9 +213,9 @@ char *getOperator(const char *argument)
   return operatorArg;
 }
 
-char *operatorAlias(char *operatorName);
+const char *operatorAlias(const char *operatorName);
 
-char *getOperatorName(const char *operatorArg)
+const char *getOperatorName(const char *operatorArg)
 {
   char *commapos;
   char *operatorName = NULL;
@@ -239,8 +239,7 @@ char *getOperatorName(const char *operatorArg)
     }
 
   /*  return operatorName; */
-  char * alias = operatorAlias(operatorName);
-  return alias;
+  return operatorAlias(operatorName);
 }
 
 
@@ -623,7 +622,7 @@ int datatype2str(int datatype, char *datatypestr)
   int status = 0;
 
   if      ( datatype == CDI_DATATYPE_PACK   ) strcpy(datatypestr, "P0");
-  else if ( datatype > 0 && datatype <= 32  ) sprintf(datatypestr, "P%d", datatype);
+  else if ( datatype > 0 && datatype <= 32  ) snprintf(datatypestr, 4, "P%d", datatype);
   else if ( datatype == CDI_DATATYPE_CPX32  ) strcpy(datatypestr, "C32");
   else if ( datatype == CDI_DATATYPE_CPX64  ) strcpy(datatypestr, "C64");
   else if ( datatype == CDI_DATATYPE_FLT32  ) strcpy(datatypestr, "F32");

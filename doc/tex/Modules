@@ -139,10 +139,11 @@ Strwin        Miscellaneous
 Strbre        Miscellaneous
 Strgal        Miscellaneous
 Hurr          Miscellaneous
+CMORlite      Miscellaneous
+CMOR          Miscellaneous
 Magplot       Magics
 Magvector     Magics
 Maggraph      Magics
-CMOR          CMOR
 EcaCdd        Climate indices
 EcaCfd        Climate indices
 EcaCsu        Climate indices

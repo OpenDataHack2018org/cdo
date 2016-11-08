@@ -1,6 +1,7 @@
+# docu
 &
-        name= a,
-            long_name= "vertical coordinate formula term: a(k)", 
+        name= a,  # text
+            long_name= "vertical coordinate formula term: a(k)",  !more text
             units= "", 
             type= double
 /
@@ -26,7 +27,8 @@
             out_name= tasmax, 
             type= real, 
             valid_min= 181.9, 
-            valid_max  = 341.9, 
+            valid_max  = 341.9,
+            valid_range = 181.9, 341.9,
             ok_min_mean_abs = 264.9, 
             ok_max_mean_abs= 294
 /

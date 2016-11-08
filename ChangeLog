@@ -1,3 +1,12 @@
+2016-11-04  Uwe Schulzweida
+
+	* using CDI library version 1.8.0rc4
+	* Version 1.8.0rc4 release
+
+2016-10-31  Uwe Schulzweida
+
+	* Setpartab: added support for user defined attributes
+
 2016-10-20  Uwe Schulzweida
 
 	* New operator cmorlite: apply variable_entry of cmor tables

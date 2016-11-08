@@ -62,9 +62,17 @@ void *Cat(void *argument)
 
       if ( indf == 0 )
 	{
-	  bool file_exists = false;
-          if ( !cdoOverwriteMode ) file_exists = fileExists(cdoStreamName(nfiles)->args);
-
+          int ntsteps = vlistNtsteps(vlistID1);
+          int nvars   = vlistNvars(vlistID1);
+          if ( ntsteps == 1 )
+            {
+              for ( varID = 0; varID < nvars; ++varID )
+                if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
+		  
+              if ( varID == nvars ) ntsteps = 0;
+            }
+	      
+	  bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoStreamName(nfiles)->args) : false;
 	  if ( file_exists )
 	    {
 	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
@@ -76,7 +84,9 @@ void *Cat(void *argument)
 
 	      tsID2 = vlistNtsteps(vlistID2);
 	      if ( tsID2 == 0 ) tsID2 = 1; /* bug fix for time constant data only */
-	    }
+
+              if ( ntsteps == 0 ) lconstvars = false;
+            }
 	  else
 	    {
 	      if ( cdoVerbose )
@@ -87,17 +97,6 @@ void *Cat(void *argument)
 	      vlistID2 = vlistDuplicate(vlistID1);
 	      taxisID2 = taxisDuplicate(taxisID1);
 	      vlistDefTaxis(vlistID2, taxisID2);
-	  
-	      int ntsteps = vlistNtsteps(vlistID1);
-	      int nvars   = vlistNvars(vlistID1);
-	      
-	      if ( ntsteps == 1 )
-		{
-		  for ( varID = 0; varID < nvars; ++varID )
-		    if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
-		  
-		  if ( varID == nvars ) ntsteps = 0;
-		}
 
 	      if ( ntsteps == 0 && nfiles > 1 )
 		{
@@ -125,11 +124,8 @@ void *Cat(void *argument)
       int tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{          
-	  {
-	    double fstatus = indf+1.;
-	    if ( ntsteps > 1 ) fstatus = indf+(tsID1+1.)/ntsteps;
-	    if ( !cdoVerbose ) progressStatus(0, 1, fstatus/nfiles);
-	  }
+          double fstatus = (ntsteps > 1) ? indf+(tsID1+1.)/ntsteps : indf+1.;
+          if ( !cdoVerbose ) progressStatus(0, 1, fstatus/nfiles);
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
 
@@ -143,7 +139,7 @@ void *Cat(void *argument)
                 if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                   continue;
 
-	      streamDefRecord(streamID2,  varID,  levelID);
+	      streamDefRecord(streamID2, varID, levelID);
 
 	      if ( lcopy )
 		{

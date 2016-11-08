@@ -11,6 +11,7 @@ libcdo_la_SOURCES =            \
                cdo_task.h      \
                cdo_history.c   \
                cdi_uuid.h      \
+               cmortable_parser.c   \
                after_sptrans.c \
                after_fctrans.c \
                after_dvtrans.c \
@@ -27,6 +28,8 @@ libcdo_la_SOURCES =            \
                color.h         \
                commandline.c   \
                const.h         \
+               convert_units.c \
+               convert_units.h \
                counter.h       \
                datetime.c      \
                datetime.h      \
@@ -82,19 +85,22 @@ libcdo_la_SOURCES =            \
                listarray.h     \
                list.c          \
                list.h          \
+               listbuf.c       \
+               listbuf.h       \
 	       merge_sort2.c   \
 	       merge_sort2.h   \
                modules.c       \
                modules.h       \
                namelist.c      \
                namelist.h      \
+               namelist_parser.c     \
                normal.c        \
                nth_element.c   \
                nth_element.h   \
                operator_help.h \
                par_io.c        \
                par_io.h        \
-               parse_cmor_table.c   \
+               parse_literal.c      \
                percentiles_hist.c   \
                percentiles_hist.h   \
                percentiles.c   \

@@ -104,11 +104,12 @@ libcdo_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-cdo_getopt.lo libcdo_la-cdo_task.lo \
-	libcdo_la-cdo_history.lo libcdo_la-after_sptrans.lo \
-	libcdo_la-after_fctrans.lo libcdo_la-after_dvtrans.lo \
-	libcdo_la-after_vertint.lo libcdo_la-after_namelist.lo \
-	libcdo_la-afterburnerlib.lo libcdo_la-constants.lo \
-	libcdo_la-color.lo libcdo_la-commandline.lo \
+	libcdo_la-cdo_history.lo libcdo_la-cmortable_parser.lo \
+	libcdo_la-after_sptrans.lo libcdo_la-after_fctrans.lo \
+	libcdo_la-after_dvtrans.lo libcdo_la-after_vertint.lo \
+	libcdo_la-after_namelist.lo libcdo_la-afterburnerlib.lo \
+	libcdo_la-constants.lo libcdo_la-color.lo \
+	libcdo_la-commandline.lo libcdo_la-convert_units.lo \
 	libcdo_la-datetime.lo libcdo_la-ecacore.lo \
 	libcdo_la-ecautil.lo libcdo_la-exception.lo libcdo_la-expr.lo \
 	libcdo_la-expr_fun.lo libcdo_la-expr_lex.lo \
@@ -123,12 +124,14 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
 	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
 	libcdo_la-grid_search.lo libcdo_la-listarray.lo \
-	libcdo_la-list.lo libcdo_la-merge_sort2.lo \
-	libcdo_la-modules.lo libcdo_la-namelist.lo libcdo_la-normal.lo \
-	libcdo_la-nth_element.lo libcdo_la-par_io.lo \
-	libcdo_la-parse_cmor_table.lo libcdo_la-percentiles_hist.lo \
-	libcdo_la-percentiles.lo libcdo_la-pipe.lo libcdo_la-pml.lo \
-	libcdo_la-pmlist.lo libcdo_la-process.lo libcdo_la-pstream.lo \
+	libcdo_la-list.lo libcdo_la-listbuf.lo \
+	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
+	libcdo_la-namelist.lo libcdo_la-namelist_parser.lo \
+	libcdo_la-normal.lo libcdo_la-nth_element.lo \
+	libcdo_la-par_io.lo libcdo_la-parse_literal.lo \
+	libcdo_la-percentiles_hist.lo libcdo_la-percentiles.lo \
+	libcdo_la-pipe.lo libcdo_la-pml.lo libcdo_la-pmlist.lo \
+	libcdo_la-process.lo libcdo_la-pstream.lo \
 	libcdo_la-pthread_debug.lo libcdo_la-readline.lo \
 	libcdo_la-realtime.lo libcdo_la-remaplib.lo \
 	libcdo_la-remapsort.lo libcdo_la-remap_scrip_io.lo \
@@ -500,10 +503,11 @@ top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	cdo_getopt.c cdo_getopt.h cdo_task.c cdo_task.h cdo_history.c \
-	cdi_uuid.h after_sptrans.c after_fctrans.c after_dvtrans.c \
-	after_vertint.c after_vertint.h after_namelist.c \
-	afterburnerlib.c afterburner.h vct_l191.h calendar.h \
-	constants.h constants.c color.c color.h commandline.c const.h \
+	cdi_uuid.h cmortable_parser.c after_sptrans.c after_fctrans.c \
+	after_dvtrans.c after_vertint.c after_vertint.h \
+	after_namelist.c afterburnerlib.c afterburner.h vct_l191.h \
+	calendar.h constants.h constants.c color.c color.h \
+	commandline.c const.h convert_units.c convert_units.h \
 	counter.h datetime.c datetime.h dmemory.h ecacore.c ecacore.h \
 	ecautil.c ecautil.h error.h etopo.h temp.h mask.h exception.c \
 	expr.c expr.h expr_fun.c expr_fun.h expr_lex.c expr_yacc.c \
@@ -513,23 +517,24 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	grid_rot.c gridreference.c griddes.c griddes.h griddes_h5.c \
 	griddes_nc.c hetaeta.c hetaeta.h institution.c interpol.c \
 	interpol.h job.c juldate.c grid_search.c grid_search.h \
-	listarray.c listarray.h list.c list.h merge_sort2.c \
-	merge_sort2.h modules.c modules.h namelist.c namelist.h \
-	normal.c nth_element.c nth_element.h operator_help.h par_io.c \
-	par_io.h parse_cmor_table.c percentiles_hist.c \
-	percentiles_hist.h percentiles.c percentiles.h pipe.c pipe.h \
-	pml.c pml.h pmlist.c pmlist.h pragma_omp_atomic_update.h \
-	printinfo.h process.c process.h pstream.c pstream.h \
-	pstream_write.h pstream_int.h pthread_debug.c pthread_debug.h \
-	readline.c realtime.c remap.h remaplib.c remapsort.c \
-	remap_scrip_io.c remap_search_reg2d.c remap_search_latbins.c \
-	remap_store_link.c remap_store_link.h remap_store_link_cnsrv.c \
-	remap_store_link_cnsrv.h remap_conserv.c remap_conserv_scrip.c \
-	remap_distwgt.c remap_bicubic_scrip.c remap_bilinear_scrip.c \
-	stdnametable.c stdnametable.h specspace.c specspace.h \
-	statistic.c statistic.h table.c text.c text.h timebase.h \
-	timer.c userlog.c uthash.h util.c util.h zaxis.c json/jsmn.h \
-	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
+	listarray.c listarray.h list.c list.h listbuf.c listbuf.h \
+	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
+	namelist.h namelist_parser.c normal.c nth_element.c \
+	nth_element.h operator_help.h par_io.c par_io.h \
+	parse_literal.c percentiles_hist.c percentiles_hist.h \
+	percentiles.c percentiles.h pipe.c pipe.h pml.c pml.h pmlist.c \
+	pmlist.h pragma_omp_atomic_update.h printinfo.h process.c \
+	process.h pstream.c pstream.h pstream_write.h pstream_int.h \
+	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
+	remaplib.c remapsort.c remap_scrip_io.c remap_search_reg2d.c \
+	remap_search_latbins.c remap_store_link.c remap_store_link.h \
+	remap_store_link_cnsrv.c remap_store_link_cnsrv.h \
+	remap_conserv.c remap_conserv_scrip.c remap_distwgt.c \
+	remap_bicubic_scrip.c remap_bilinear_scrip.c stdnametable.c \
+	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
+	table.c text.c text.h timebase.h timer.c userlog.c uthash.h \
+	util.c util.h zaxis.c json/jsmn.h json/jsmn.c \
+	kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
 	kdtreelib/kdtree_common.c kdtreelib/kdtree_spherical.c \
 	kdtreelib/qsort.c kdtreelib/pmergesort.c kdtreelib/pqueue.c \
 	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
@@ -1000,9 +1005,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_pthread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_task.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_vlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cmortable_parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-color.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-commandline.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-constants.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-convert_units.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-datetime.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-ecacore.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-ecautil.Plo@am__quote@
@@ -1036,13 +1043,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-juldate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-listarray.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-listbuf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-merge_sort2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-modules.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-namelist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-namelist_parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-normal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-nth_element.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-par_io.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-parse_cmor_table.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-parse_literal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-percentiles.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-percentiles_hist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-pipe.Plo@am__quote@
@@ -1147,6 +1156,13 @@ libcdo_la-cdo_history.lo: cdo_history.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-cdo_history.lo `test -f 'cdo_history.c' || echo '$(srcdir)/'`cdo_history.c
 
+libcdo_la-cmortable_parser.lo: cmortable_parser.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-cmortable_parser.lo -MD -MP -MF $(DEPDIR)/libcdo_la-cmortable_parser.Tpo -c -o libcdo_la-cmortable_parser.lo `test -f 'cmortable_parser.c' || echo '$(srcdir)/'`cmortable_parser.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-cmortable_parser.Tpo $(DEPDIR)/libcdo_la-cmortable_parser.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmortable_parser.c' object='libcdo_la-cmortable_parser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-cmortable_parser.lo `test -f 'cmortable_parser.c' || echo '$(srcdir)/'`cmortable_parser.c
+
 libcdo_la-after_sptrans.lo: after_sptrans.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-after_sptrans.lo -MD -MP -MF $(DEPDIR)/libcdo_la-after_sptrans.Tpo -c -o libcdo_la-after_sptrans.lo `test -f 'after_sptrans.c' || echo '$(srcdir)/'`after_sptrans.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-after_sptrans.Tpo $(DEPDIR)/libcdo_la-after_sptrans.Plo
@@ -1209,6 +1225,13 @@ libcdo_la-commandline.lo: commandline.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='commandline.c' object='libcdo_la-commandline.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-commandline.lo `test -f 'commandline.c' || echo '$(srcdir)/'`commandline.c
+
+libcdo_la-convert_units.lo: convert_units.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-convert_units.lo -MD -MP -MF $(DEPDIR)/libcdo_la-convert_units.Tpo -c -o libcdo_la-convert_units.lo `test -f 'convert_units.c' || echo '$(srcdir)/'`convert_units.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-convert_units.Tpo $(DEPDIR)/libcdo_la-convert_units.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='convert_units.c' object='libcdo_la-convert_units.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-convert_units.lo `test -f 'convert_units.c' || echo '$(srcdir)/'`convert_units.c
 
 libcdo_la-datetime.lo: datetime.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-datetime.lo -MD -MP -MF $(DEPDIR)/libcdo_la-datetime.Tpo -c -o libcdo_la-datetime.lo `test -f 'datetime.c' || echo '$(srcdir)/'`datetime.c
@@ -1441,6 +1464,13 @@ libcdo_la-list.lo: list.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-list.lo `test -f 'list.c' || echo '$(srcdir)/'`list.c
 
+libcdo_la-listbuf.lo: listbuf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-listbuf.lo -MD -MP -MF $(DEPDIR)/libcdo_la-listbuf.Tpo -c -o libcdo_la-listbuf.lo `test -f 'listbuf.c' || echo '$(srcdir)/'`listbuf.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-listbuf.Tpo $(DEPDIR)/libcdo_la-listbuf.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='listbuf.c' object='libcdo_la-listbuf.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-listbuf.lo `test -f 'listbuf.c' || echo '$(srcdir)/'`listbuf.c
+
 libcdo_la-merge_sort2.lo: merge_sort2.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-merge_sort2.lo -MD -MP -MF $(DEPDIR)/libcdo_la-merge_sort2.Tpo -c -o libcdo_la-merge_sort2.lo `test -f 'merge_sort2.c' || echo '$(srcdir)/'`merge_sort2.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-merge_sort2.Tpo $(DEPDIR)/libcdo_la-merge_sort2.Plo
@@ -1461,6 +1491,13 @@ libcdo_la-namelist.lo: namelist.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='namelist.c' object='libcdo_la-namelist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-namelist.lo `test -f 'namelist.c' || echo '$(srcdir)/'`namelist.c
+
+libcdo_la-namelist_parser.lo: namelist_parser.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-namelist_parser.lo -MD -MP -MF $(DEPDIR)/libcdo_la-namelist_parser.Tpo -c -o libcdo_la-namelist_parser.lo `test -f 'namelist_parser.c' || echo '$(srcdir)/'`namelist_parser.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-namelist_parser.Tpo $(DEPDIR)/libcdo_la-namelist_parser.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='namelist_parser.c' object='libcdo_la-namelist_parser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-namelist_parser.lo `test -f 'namelist_parser.c' || echo '$(srcdir)/'`namelist_parser.c
 
 libcdo_la-normal.lo: normal.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-normal.lo -MD -MP -MF $(DEPDIR)/libcdo_la-normal.Tpo -c -o libcdo_la-normal.lo `test -f 'normal.c' || echo '$(srcdir)/'`normal.c
@@ -1483,12 +1520,12 @@ libcdo_la-par_io.lo: par_io.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-par_io.lo `test -f 'par_io.c' || echo '$(srcdir)/'`par_io.c
 
-libcdo_la-parse_cmor_table.lo: parse_cmor_table.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-parse_cmor_table.lo -MD -MP -MF $(DEPDIR)/libcdo_la-parse_cmor_table.Tpo -c -o libcdo_la-parse_cmor_table.lo `test -f 'parse_cmor_table.c' || echo '$(srcdir)/'`parse_cmor_table.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-parse_cmor_table.Tpo $(DEPDIR)/libcdo_la-parse_cmor_table.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='parse_cmor_table.c' object='libcdo_la-parse_cmor_table.lo' libtool=yes @AMDEPBACKSLASH@
+libcdo_la-parse_literal.lo: parse_literal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-parse_literal.lo -MD -MP -MF $(DEPDIR)/libcdo_la-parse_literal.Tpo -c -o libcdo_la-parse_literal.lo `test -f 'parse_literal.c' || echo '$(srcdir)/'`parse_literal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-parse_literal.Tpo $(DEPDIR)/libcdo_la-parse_literal.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='parse_literal.c' object='libcdo_la-parse_literal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-parse_cmor_table.lo `test -f 'parse_cmor_table.c' || echo '$(srcdir)/'`parse_cmor_table.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-parse_literal.lo `test -f 'parse_literal.c' || echo '$(srcdir)/'`parse_literal.c
 
 libcdo_la-percentiles_hist.lo: percentiles_hist.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-percentiles_hist.lo -MD -MP -MF $(DEPDIR)/libcdo_la-percentiles_hist.Tpo -c -o libcdo_la-percentiles_hist.lo `test -f 'percentiles_hist.c' || echo '$(srcdir)/'`percentiles_hist.c

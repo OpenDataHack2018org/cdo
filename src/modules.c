@@ -293,7 +293,7 @@ void *Maggraph(void *argument);
 #define  CloudlayerOperators    {"cloudlayer"}
 #define  CMOROperators          {"cmor"}
 #define  CMORliteOperators      {"cmorlite"}
-#define  CMORtableOperators     {"read_cmor_table", "conv_cmor_table"}
+#define  CMORtableOperators     {"dump_cmor_table", "conv_cmor_table"}
 #define  CollgridOperators      {"collgrid"}
 #define  CommandOperators       {"command", "com", "cmd"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
@@ -889,10 +889,10 @@ static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));
 
 
 static
-int similar(const char *a, const char *b, int alen, int blen)
+bool similar(const char *a, const char *b, int alen, int blen)
 {
   if ( alen > 2 && blen > 2 && strstr(b, a) )
-    return TRUE;
+    return true;
 
   while ( *a && *b && *a == *b )
     { 
@@ -900,21 +900,21 @@ int similar(const char *a, const char *b, int alen, int blen)
       b++;
     }
   if ( !*a && !*b )
-    return TRUE;
+    return true;
   /*
     printf("%d %d %s %s\n", alen, blen, a, b);
   */
   if ( alen >= 2 && blen >= 1 && *a && similar(a+1, b, alen-2, blen-1) )
-    return TRUE;
+    return true;
 
   if ( alen >= 1 && blen >= 2 && *b && similar(a, b+1, alen-1, blen-2) )
-    return TRUE;
+    return true;
 
-  return FALSE; 
+  return false; 
 }
 
 
-const char *operatorAlias(char *operatorName)
+const char *operatorAlias(const char *operatorName)
 {
   int i;
 
@@ -966,41 +966,47 @@ int operatorInqModID(const char *operatorName)
 
   if ( modID == -1 )
     {
-      int nbyte;
-      int error = TRUE;
+      bool lfound = false;
       FILE *fp = fopen(operatorName, "r");
       if ( fp )
 	{
 	  fclose(fp);
 	  fprintf(stderr, "Use commandline option -h for help.");
-	  Error("operator missing! %s is a file on disk!", operatorName);
+	  Error("Operator missing, %s is a file on disk!", operatorName);
 	}
 
       fprintf(stderr, "Operator >%s< not found!\n", operatorName);
       fprintf(stderr, "Similar operators are:\n");
-      nbyte = fprintf(stderr, "   ");
+      int nbyte = fprintf(stderr, "   ");
       if ( operatorName )
-	for ( i = 0; i < NumModules; i++ )
-	  {
-	    if ( Modules[i].help == NULL ) continue;
-	    j = 0;
-	    while ( Modules[i].operators[j] )
-	      {
-		if( similar(operatorName, Modules[i].operators[j],
-			    strlen(operatorName), strlen(Modules[i].operators[j])) )
-		  {
-		    if ( nbyte > 75 )
-		      {
-			fprintf(stdout, "\n");
-			nbyte = fprintf(stderr, "   ");
-		      }
-		    nbyte += fprintf(stderr, " %s", Modules[i].operators[j]);
-		    error = FALSE ;
-		  }
-		j++;
-	      }
-	  }
-      if ( error )
+        {
+          int len = strlen(operatorName);
+          char *opname = strdup(operatorName);
+          strtolower(opname);
+          for ( i = 0; i < NumModules; i++ )
+            {
+              if ( Modules[i].help == NULL ) continue;
+              j = 0;
+              while ( Modules[i].operators[j] )
+                {
+                  if ( similar(opname, Modules[i].operators[j],
+                               len, strlen(Modules[i].operators[j])) )
+                    {
+                      if ( nbyte > 75 )
+                        {
+                          fprintf(stdout, "\n");
+                          nbyte = fprintf(stderr, "   ");
+                        }
+                      nbyte += fprintf(stderr, " %s", Modules[i].operators[j]);
+                      lfound = true;
+                    }
+                  j++;
+                }
+            }
+          free(opname);
+        }
+
+      if ( !lfound )
 	fprintf(stderr, "(not found)\n") ;
       else
 	fprintf(stderr, "\n");
@@ -1015,31 +1021,31 @@ int operatorInqModID(const char *operatorName)
   return modID;
 }
 
-void *(*operatorModule(char *operatorName))(void *)
+void *(*operatorModule(const char *operatorName))(void *)
 {
   int modID = operatorInqModID(operatorName);
   return Modules[modID].func;
 }
 
-const char **operatorHelp(char *operatorName)
+const char **operatorHelp(const char *operatorName)
 {
   int modID = operatorInqModID(operatorName);
   return Modules[modID].help;
 }
 
-int operatorStreamInCnt(char *operatorName)
+int operatorStreamInCnt(const char *operatorName)
 {
   int modID = operatorInqModID(operatorAlias(operatorName));
   return Modules[modID].streamInCnt;
 }
 
-int operatorStreamOutCnt(char *operatorName)
+int operatorStreamOutCnt(const char *operatorName)
 {
   int modID = operatorInqModID(operatorAlias(operatorName));
   return Modules[modID].streamOutCnt;
 }
 
-int operatorStreamNumber(char *operatorName)
+int operatorStreamNumber(const char *operatorName)
 {
   int modID = operatorInqModID(operatorAlias(operatorName));
   return Modules[modID].number;
@@ -1091,7 +1097,7 @@ void operatorPrintAll(void)
 }
 
 
-void operatorPrintList(void)
+void operatorPrintList(bool print_no_output)
 {
   int i, j, nbyte, nop = 0;
   const char *opernames[4096];
@@ -1108,10 +1114,7 @@ void operatorPrintList(void)
     }
 
   // Add operator aliases
-  for ( i = 0; i < nopalias; i++ )
-    {
-      opernames[nop++] = opalias[i][0];
-    }
+  for ( i = 0; i < nopalias; i++ ) opernames[nop++] = opalias[i][0];
 
   qsort(opernames, nop, sizeof(char *), cmpname);
 
@@ -1191,10 +1194,13 @@ void operatorPrintList(void)
             }      
         }
 
-      nbyte = fprintf(pout, "%s ", opernames[i]);
-      for ( int i = nbyte; i <= 16; ++i ) fprintf(pout, " ");
-      if ( pdes ) fprintf(pout, "%s", pdes);
-      else if ( ialias >= 0 )  fprintf(pout, "--> %s", opalias[ialias][1]);
-      fprintf(pout, "\n");
+      if ( !print_no_output || operatorStreamOutCnt(opernames[i]) == 0 )
+        {
+          nbyte = fprintf(pout, "%s ", opernames[i]);
+          for ( int i = nbyte; i <= 16; ++i ) fprintf(pout, " ");
+          if ( pdes ) fprintf(pout, "%s", pdes);
+          else if ( ialias >= 0 )  fprintf(pout, "--> %s", opalias[ialias][1]);
+          fprintf(pout, "\n");
+        }
     }
 }

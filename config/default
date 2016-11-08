@@ -46,7 +46,7 @@ case "${HOSTNAME}" in
         if  test "$COMP" = icpc ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+	            CC=icc CXX="icpc --std=c++11" CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = icc ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -54,7 +54,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = clang++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=clang CXX=clang++ CFLAGS="-g -Wall -O3"
+	            CC=clang CXX="clang++ --std=c++11" CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
@@ -62,7 +62,7 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = g++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
-	            CC=gcc CXX=g++ CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
+	            CC=gcc CXX="g++ --std=c++11" CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         elif  test "$COMP" = gcc ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
@@ -134,7 +134,7 @@ case "${HOSTNAME}" in
                     --enable-cxx \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=g++ CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
+	            CC=gcc CXX=g++ CFLAGS="-g -Wall -O2 -DPIC -pie -mwindows" \
                     LDFLAGS='-L/usr/local/lib' \
                     LIBS='-lpthread -lm -lcurl -lhdf5_hl -lhdf5 -lz  -lsz -laec -ldl'
         else
@@ -291,6 +291,14 @@ case "${HOSTNAME}" in
                       CC=$COMP CFLAGS="-g -Wall -O3" LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
         ;;
       g++|clang++)
+        case "$COMP" in
+          g++)
+            CC=gcc
+            ;;
+          clang++)
+            CC=clang
+            ;;
+        esac
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
                     --enable-maintainer-mode \
@@ -305,7 +313,7 @@ case "${HOSTNAME}" in
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
-                      CC=$COMP CFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
+                      CC=$CC CXX=$COMP CFLAGS="-g -Wall -O2" CXXFLAGS="-g -Wall -O2" LIBS=-lopenjpeg
 	;;
       esac
     ;;

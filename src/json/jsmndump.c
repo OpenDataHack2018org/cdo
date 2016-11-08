@@ -2,29 +2,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/stat.h>
 #include "jsmn.h"
 
-/* Function realloc_it() is a wrapper function for standart realloc()
- * with one difference - it frees old memory pointer in case of realloc
- * failure. Thus, DO NOT use old data pointer in anyway after call to
- * realloc_it(). If your code has some kind of fallback algorithm if
- * memory can't be re-allocated - use standart realloc() instead.
- */
-static inline void *realloc_it(void *ptrmem, size_t size) {
-	void *p = realloc(ptrmem, size);
-	if (!p)  {
-		free (ptrmem);
-		fprintf(stderr, "realloc(): errno=%d\n", errno);
-	}
-	return p;
-}
 
 /*
  * An example of reading JSON from stdin and printing its content to stdout.
  * The output looks like YAML, but I'm not sure if it's really compatible.
  */
-
 static
 int dump(const char *js, jsmntok_t *t, size_t count, int indent)
 {
@@ -72,66 +57,50 @@ int dump(const char *js, jsmntok_t *t, size_t count, int indent)
   return 0;
 }
 
-int main() {
-	int r;
-	int eof_expected = 0;
-	char *js = NULL;
-	size_t jslen = 0;
-	char buf[BUFSIZ];
 
-	jsmn_parser p;
-	jsmntok_t *tok;
-	size_t tokcount = 2;
+int main()
+{
+  FILE *fp = stdin;
+  int filedes = fileno(fp);
+  struct stat buf;
+  size_t filesize = 0;
+  if ( fstat(filedes, &buf) == 0 ) filesize = (size_t) buf.st_size;
 
-	/* Prepare parser */
-	jsmn_init(&p);
+  if ( filesize == 0 )
+    {
+      fprintf(stderr, "Empty stream!\n");
+      return -1;
+    }
 
-	/* Allocate some tokens as a start */
-	tok = malloc(sizeof(*tok) * tokcount);
-	if (tok == NULL) {
-		fprintf(stderr, "malloc(): errno=%d\n", errno);
-		return 3;
-	}
+  char *buffer = (char*) malloc(filesize);
+  size_t nitems = fread(buffer, 1, filesize, fp);
 
-	for (;;) {
-		/* Read another chunk */
-		r = fread(buf, 1, sizeof(buf), stdin);
-		if (r < 0) {
-			fprintf(stderr, "fread(): %d, errno=%d\n", r, errno);
-			return 1;
-		}
-		if (r == 0) {
-			if (eof_expected != 0) {
-				return 0;
-			} else {
-				fprintf(stderr, "fread(): unexpected EOF\n");
-				return 2;
-			}
-		}
+  if ( nitems != filesize )
+    {
+      free(buffer);
+      fprintf(stderr, "Read failed on stdin!\n");
+      return -1;
+    }
 
-		js = realloc_it(js, jslen + r + 1);
-		if (js == NULL) {
-			return 3;
-		}
-		strncpy(js + jslen, buf, r);
-		jslen = jslen + r;
+  /* Prepare parser */
+  jsmn_parser *p = jsmn_new();
 
-again:
-		r = jsmn_parse(&p, js, jslen, tok, tokcount);
-		if (r < 0) {
-			if (r == JSMN_ERROR_NOMEM) {
-				tokcount = tokcount * 2;
-				tok = realloc_it(tok, sizeof(*tok) * tokcount);
-				if (tok == NULL) {
-					return 3;
-				}
-				goto again;
-			}
-		} else {
-			dump(js, tok, p.toknext, 0);
-			eof_expected = 1;
-		}
-	}
+  int status = jsmn_parse(p, buffer, filesize);
+  if ( status != 0 )
+    {
+      const char *filename = "stdin";
+      switch (status)
+        {
+        case JSMN_ERROR_INVAL: fprintf(stderr, "JSON error: Invalid character in %s (line=%d character='%c')!\n", filename, p->lineno, buffer[p->pos]); break;
+        case JSMN_ERROR_PART:  fprintf(stderr, "JSON error: End of string not found in %s (line=%d)!\n", filename, p->lineno); break;
+        default:               fprintf(stderr, "JSON error in %s (line=%d)\n", filename, p->lineno); break;
+        }
+    }
 
-	return EXIT_SUCCESS;
+  dump(buffer, p->tokens, p->toknext, 0);
+  free(buffer);
+
+  jsmn_destroy(p);
+
+  return EXIT_SUCCESS;
 }

@@ -34,7 +34,7 @@ char *FieldName(int code, const char *text)
 {
   static char name[256];
 
-  sprintf(name, "[%3d].%s", code, text);
+  snprintf(name, sizeof(name), "[%3d].%s", code, text);
 
   return name;
 }
