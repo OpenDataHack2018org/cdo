@@ -24,7 +24,7 @@
 #include "cdo_int.h"
 
 
-void *Nmltest(void *argument)
+void *Nmldump(void *argument)
 {
   cdoInitialize(argument);
 

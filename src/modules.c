@@ -128,7 +128,7 @@ void *Monarith(void *argument);
 void *Mrotuv(void *argument);
 void *Mrotuvb(void *argument);
 void *Ninfo(void *argument);
-void *Nmltest(void *argument);
+void *Nmldump(void *argument);
 void *Output(void *argument);
 void *Outputgmt(void *argument);
 void *Pack(void *argument);
@@ -371,7 +371,7 @@ void *Maggraph(void *argument);
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel", "ngridpoints", "ngrids"}
-#define  NmltestOperators       {"nmltest"}
+#define  NmldumpOperators       {"nmldump"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr", "outputxyz"}
 #define  OutputtabOperators     {"outputtab"}
@@ -657,7 +657,7 @@ static modules_t Modules[] =
   { Mrotuv,         NULL,              MrotuvOperators,        1,   CDI_REAL,  1,  2 },
   { Mrotuvb,        NULL,              MrotuvbOperators,       1,   CDI_REAL,  2,  1 },
   { Ninfo,          NinfoHelp,         NinfoOperators,         1,   CDI_BOTH,  1,  0 },
-  { Nmltest,        NULL,              NmltestOperators,       0,   CDI_REAL,  0,  0 },
+  { Nmldump,        NULL,              NmldumpOperators,       0,   CDI_REAL,  0,  0 },
   { Output,         OutputHelp,        OutputOperators,        1,   CDI_REAL, -1,  0 },
   { Output,         OutputtabHelp,     OutputtabOperators,     1,   CDI_REAL, -1,  0 },
   { Outputgmt,      OutputgmtHelp,     OutputgmtOperators,     1,   CDI_REAL,  1,  0 },

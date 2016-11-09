@@ -276,7 +276,7 @@ cdo_SOURCES += Adisit.c        \
                Mrotuv.c        \
                Mrotuvb.c       \
                Ninfo.c         \
-               Nmltest.c       \
+               Nmldump.c       \
                Output.c        \
                Outputgmt.c     \
                Pack.c          \

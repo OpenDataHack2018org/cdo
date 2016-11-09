@@ -204,7 +204,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
 	cdo-Monarith.$(OBJEXT) cdo-Mrotuv.$(OBJEXT) \
 	cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
-	cdo-Nmltest.$(OBJEXT) cdo-Output.$(OBJEXT) \
+	cdo-Nmldump.$(OBJEXT) cdo-Output.$(OBJEXT) \
 	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) \
 	cdo-Pardup.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
@@ -569,7 +569,7 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
 	Invertlev.c Isosurface.c Log.c MapReduce.c Maskbox.c Mastrfu.c \
 	Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c \
-	Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c \
+	Mrotuv.c Mrotuvb.c Ninfo.c Nmldump.c Output.c Outputgmt.c \
 	Pack.c Pardup.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
 	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Selindex.c Select.c \
@@ -891,7 +891,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Mrotuv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Mrotuvb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ninfo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Nmltest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Nmldump.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Outputgmt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pack.Po@am__quote@
@@ -3109,19 +3109,19 @@ cdo-Ninfo.obj: Ninfo.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ninfo.obj `if test -f 'Ninfo.c'; then $(CYGPATH_W) 'Ninfo.c'; else $(CYGPATH_W) '$(srcdir)/Ninfo.c'; fi`
 
-cdo-Nmltest.o: Nmltest.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Nmltest.o -MD -MP -MF $(DEPDIR)/cdo-Nmltest.Tpo -c -o cdo-Nmltest.o `test -f 'Nmltest.c' || echo '$(srcdir)/'`Nmltest.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Nmltest.Tpo $(DEPDIR)/cdo-Nmltest.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Nmltest.c' object='cdo-Nmltest.o' libtool=no @AMDEPBACKSLASH@
+cdo-Nmldump.o: Nmldump.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Nmldump.o -MD -MP -MF $(DEPDIR)/cdo-Nmldump.Tpo -c -o cdo-Nmldump.o `test -f 'Nmldump.c' || echo '$(srcdir)/'`Nmldump.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Nmldump.Tpo $(DEPDIR)/cdo-Nmldump.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Nmldump.c' object='cdo-Nmldump.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Nmltest.o `test -f 'Nmltest.c' || echo '$(srcdir)/'`Nmltest.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Nmldump.o `test -f 'Nmldump.c' || echo '$(srcdir)/'`Nmldump.c
 
-cdo-Nmltest.obj: Nmltest.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Nmltest.obj -MD -MP -MF $(DEPDIR)/cdo-Nmltest.Tpo -c -o cdo-Nmltest.obj `if test -f 'Nmltest.c'; then $(CYGPATH_W) 'Nmltest.c'; else $(CYGPATH_W) '$(srcdir)/Nmltest.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Nmltest.Tpo $(DEPDIR)/cdo-Nmltest.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Nmltest.c' object='cdo-Nmltest.obj' libtool=no @AMDEPBACKSLASH@
+cdo-Nmldump.obj: Nmldump.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Nmldump.obj -MD -MP -MF $(DEPDIR)/cdo-Nmldump.Tpo -c -o cdo-Nmldump.obj `if test -f 'Nmldump.c'; then $(CYGPATH_W) 'Nmldump.c'; else $(CYGPATH_W) '$(srcdir)/Nmldump.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Nmldump.Tpo $(DEPDIR)/cdo-Nmldump.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Nmldump.c' object='cdo-Nmldump.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Nmltest.obj `if test -f 'Nmltest.c'; then $(CYGPATH_W) 'Nmltest.c'; else $(CYGPATH_W) '$(srcdir)/Nmltest.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Nmldump.obj `if test -f 'Nmldump.c'; then $(CYGPATH_W) 'Nmldump.c'; else $(CYGPATH_W) '$(srcdir)/Nmldump.c'; fi`
 
 cdo-Output.o: Output.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Output.o -MD -MP -MF $(DEPDIR)/cdo-Output.Tpo -c -o cdo-Output.o `test -f 'Output.c' || echo '$(srcdir)/'`Output.c
