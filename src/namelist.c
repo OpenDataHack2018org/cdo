@@ -288,3 +288,18 @@ void namelist_dump(namelist_parser *parser, const char *buf)
       printf("\n");
     }
 }
+
+
+int namelist_verify(namelist_parser *parser, const char *buf)
+{
+  unsigned int ntok = parser->toknext;
+
+  if ( ntok )
+    {
+      namelisttok_t *t = &parser->tokens[0];
+      if ( t->type != NAMELIST_OBJECT && t->type != NAMELIST_KEY )
+        return -1;
+    }
+
+  return 0;
+}

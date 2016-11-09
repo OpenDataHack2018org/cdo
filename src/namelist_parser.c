@@ -111,6 +111,12 @@ list_t *namelistbuf_to_pmlist(listbuf_t *listbuf)
     }
 
   // namelist_dump(p, listbuf->buffer);
+  status = namelist_verify(p, listbuf->buffer);
+  if ( status )
+    {
+      fprintf(stderr, "Namelist error: Invalid contents in %s!\n", name);
+      cdoAbort("Namelist error!");      
+    }
 
   list_t *pmlist = list_new(sizeof(list_t *), free_kvlist, listbuf->name);
 
