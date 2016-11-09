@@ -62,11 +62,17 @@ typedef struct
   char name[CDI_MAX_NAME];
   // converter
   void *ut_converter;
+
+  double amean;
+  long nvals, n_lower_min, n_greater_max;
 } var_t;
 
 
 void cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units);
-void cdo_check_data(int vlistID2, int varID2, var_t *var, long gridsize, double missval, double *array);
+
+void cmor_check_init(int nvars, var_t *vars);
+void cmor_check_eval(int vlistID, int nvars, var_t *vars);
+void cmor_check_prep(var_t *var, long gridsize, double missval, double *array);
 
 
 static
@@ -489,6 +495,8 @@ void *Setpartab(void *argument)
 
       streamDefTimestep(streamID2, tsID1);
 	       
+      cmor_check_init(nvars, vars);
+
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
@@ -555,9 +563,11 @@ void *Setpartab(void *argument)
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
 
-	  if ( var->checkvalid || var->check_min_mean_abs || var->check_max_mean_abs )
-	    cdo_check_data(vlistID2, varID2, var, gridsize, missval, array);
+          cmor_check_prep(var, gridsize, missval, array);
 	}
+
+      cmor_check_eval(vlistID2, nvars, vars);
+
       tsID1++;
     }
 
