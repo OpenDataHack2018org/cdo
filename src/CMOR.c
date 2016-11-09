@@ -324,12 +324,15 @@ static int get_cmor_exit_control(struct kv **ht)
     return CMOR_NORMAL;
 }
 
+static char json_filename[20];
+static void unlink_json_filename(void) { unlink(json_filename); }
+
 static void feed_json_to_cmor_dataset(struct kv **ht)
 {
-  char filename[20];
-  snprintf(filename, sizeof(filename), "dataset.json_XXXXXX");
-  cmor_dataset_json(dump_ht_to_json_file(ht, filename));
-  unlink(filename);
+  snprintf(json_filename, sizeof(json_filename), "dataset.json_XXXXXX");
+  atexit(unlink_json_filename);
+  cmor_dataset_json(dump_ht_to_json_file(ht, json_filename));
+  unlink(json_filename);
 }
 
 static void setup_dataset(struct kv **ht, int streamID)
