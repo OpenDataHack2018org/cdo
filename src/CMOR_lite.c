@@ -287,8 +287,12 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
               else if ( STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
               else if ( STR_IS_EQ(key, "out_name")      )
                 {
-                  vlistDefVarName(vlistID2, varID, parameter2word(value));
-                  cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
+                  const char *outname = parameter2word(value);
+                  if ( !STR_IS_EQ(var->name, outname) )
+                    {
+                      vlistDefVarName(vlistID2, varID, outname);
+                      cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
+                    }
                 }
               else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
               else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
