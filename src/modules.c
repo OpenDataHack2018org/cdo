@@ -188,6 +188,7 @@ void *Testdata(void *argument);
 void *Tests(void *argument);
 void *Timsort(void *argument);
 void *Timcount(void *argument);
+void *Timcumsum(void *argument);
 void *Timpctl(void *argument);
 void *Timselpctl(void *argument);
 void *Timselstat(void *argument);
@@ -453,6 +454,7 @@ void *Maggraph(void *argument);
 #define    MoncountOperators    {"moncount"}
 #define    DaycountOperators    {"daycount"}
 #define    HourcountOperators   {"hourcount"}
+#define  TimcumsumOperators     {"timcumsum"}
 #define  TimpctlOperators       {"timpctl"}
 #define    YearpctlOperators    {"yearpctl"}
 #define    MonpctlOperators     {"monpctl"}
@@ -732,6 +734,7 @@ static modules_t Modules[] =
   { Timcount,       NULL,              MoncountOperators,      1,   CDI_BOTH,  1,  1 },
   { Timcount,       NULL,              DaycountOperators,      1,   CDI_BOTH,  1,  1 },
   { Timcount,       NULL,              HourcountOperators,     1,   CDI_BOTH,  1,  1 },
+  { Timcumsum,      NULL,              TimcumsumOperators,     1,   CDI_BOTH,  1,  1 },
   { Timpctl,        TimpctlHelp,       TimpctlOperators,       1,   CDI_REAL,  3,  1 },
   { Timpctl,        YearpctlHelp,      YearpctlOperators,      1,   CDI_REAL,  3,  1 },
   { Timpctl,        MonpctlHelp,       MonpctlOperators,       1,   CDI_REAL,  3,  1 },

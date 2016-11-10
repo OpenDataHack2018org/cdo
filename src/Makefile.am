@@ -332,6 +332,7 @@ cdo_SOURCES += Adisit.c        \
                Test.c          \
                Tests.c         \
                Timcount.c      \
+               Timcumsum.c     \
                Timpctl.c       \
                Timselpctl.c    \
                Timselstat.c    \

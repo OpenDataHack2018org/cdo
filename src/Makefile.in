@@ -230,12 +230,12 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Splityear.$(OBJEXT) cdo-Subtrend.$(OBJEXT) \
 	cdo-Tee.$(OBJEXT) cdo-Templates.$(OBJEXT) cdo-Test.$(OBJEXT) \
 	cdo-Tests.$(OBJEXT) cdo-Timcount.$(OBJEXT) \
-	cdo-Timpctl.$(OBJEXT) cdo-Timselpctl.$(OBJEXT) \
-	cdo-Timselstat.$(OBJEXT) cdo-Timsort.$(OBJEXT) \
-	cdo-Timstat.$(OBJEXT) cdo-Timstat2.$(OBJEXT) \
-	cdo-Timstat3.$(OBJEXT) cdo-Tinfo.$(OBJEXT) \
-	cdo-Tocomplex.$(OBJEXT) cdo-Transpose.$(OBJEXT) \
-	cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
+	cdo-Timcumsum.$(OBJEXT) cdo-Timpctl.$(OBJEXT) \
+	cdo-Timselpctl.$(OBJEXT) cdo-Timselstat.$(OBJEXT) \
+	cdo-Timsort.$(OBJEXT) cdo-Timstat.$(OBJEXT) \
+	cdo-Timstat2.$(OBJEXT) cdo-Timstat3.$(OBJEXT) \
+	cdo-Tinfo.$(OBJEXT) cdo-Tocomplex.$(OBJEXT) \
+	cdo-Transpose.$(OBJEXT) cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
 	cdo-Tstepcount.$(OBJEXT) cdo-Vargen.$(OBJEXT) \
 	cdo-Varrms.$(OBJEXT) cdo-Vertintml.$(OBJEXT) \
 	cdo-Vertintap.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
@@ -579,8 +579,8 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Smooth.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
 	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
 	Splityear.c Subtrend.c Tee.c Templates.c Test.c Tests.c \
-	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
-	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
+	Timcount.c Timcumsum.c Timpctl.c Timselpctl.c Timselstat.c \
+	Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
 	Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c Varrms.c \
 	Vertintml.c Vertintap.c Vertstat.c Vertcum.c Vertwind.c \
 	Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
@@ -948,6 +948,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Tests.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timcount.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timcumsum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timselpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Timselstat.Po@am__quote@
@@ -3892,6 +3893,20 @@ cdo-Timcount.obj: Timcount.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Timcount.c' object='cdo-Timcount.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timcount.obj `if test -f 'Timcount.c'; then $(CYGPATH_W) 'Timcount.c'; else $(CYGPATH_W) '$(srcdir)/Timcount.c'; fi`
+
+cdo-Timcumsum.o: Timcumsum.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timcumsum.o -MD -MP -MF $(DEPDIR)/cdo-Timcumsum.Tpo -c -o cdo-Timcumsum.o `test -f 'Timcumsum.c' || echo '$(srcdir)/'`Timcumsum.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Timcumsum.Tpo $(DEPDIR)/cdo-Timcumsum.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Timcumsum.c' object='cdo-Timcumsum.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timcumsum.o `test -f 'Timcumsum.c' || echo '$(srcdir)/'`Timcumsum.c
+
+cdo-Timcumsum.obj: Timcumsum.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timcumsum.obj -MD -MP -MF $(DEPDIR)/cdo-Timcumsum.Tpo -c -o cdo-Timcumsum.obj `if test -f 'Timcumsum.c'; then $(CYGPATH_W) 'Timcumsum.c'; else $(CYGPATH_W) '$(srcdir)/Timcumsum.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Timcumsum.Tpo $(DEPDIR)/cdo-Timcumsum.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Timcumsum.c' object='cdo-Timcumsum.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timcumsum.obj `if test -f 'Timcumsum.c'; then $(CYGPATH_W) 'Timcumsum.c'; else $(CYGPATH_W) '$(srcdir)/Timcumsum.c'; fi`
 
 cdo-Timpctl.o: Timpctl.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timpctl.o -MD -MP -MF $(DEPDIR)/cdo-Timpctl.Tpo -c -o cdo-Timpctl.o `test -f 'Timpctl.c' || echo '$(srcdir)/'`Timpctl.c
