@@ -26,6 +26,12 @@ STATS="min max sum avg mean std std1 var var1"
 #
 IFILE=ts_mm_5years
 for STAT in $STATS; do
+  $CDO $FORMAT seas${STAT} $IFILE seas${STAT}_ref
+done
+exit
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
   $CDO $FORMAT run${STAT},12 $IFILE run${STAT}_ref
 done
 #

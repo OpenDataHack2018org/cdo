@@ -21060,7 +21060,7 @@ ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweigh
 
 ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Vertint.test"
 
-ac_config_files="$ac_config_files test/Timstat.test test/Timselstat.test test/Runstat.test"
+ac_config_files="$ac_config_files test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test"
 
 ac_config_files="$ac_config_files test/Ymonstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test"
 
@@ -22234,6 +22234,7 @@ do
     "test/Vertint.test") CONFIG_FILES="$CONFIG_FILES test/Vertint.test" ;;
     "test/Timstat.test") CONFIG_FILES="$CONFIG_FILES test/Timstat.test" ;;
     "test/Timselstat.test") CONFIG_FILES="$CONFIG_FILES test/Timselstat.test" ;;
+    "test/Seasstat.test") CONFIG_FILES="$CONFIG_FILES test/Seasstat.test" ;;
     "test/Runstat.test") CONFIG_FILES="$CONFIG_FILES test/Runstat.test" ;;
     "test/Ymonstat.test") CONFIG_FILES="$CONFIG_FILES test/Ymonstat.test" ;;
     "test/Fldstat.test") CONFIG_FILES="$CONFIG_FILES test/Fldstat.test" ;;
@@ -23759,6 +23760,7 @@ _LT_EOF
     "test/Vertint.test":F) chmod a+x "$ac_file" ;;
     "test/Timstat.test":F) chmod a+x "$ac_file" ;;
     "test/Timselstat.test":F) chmod a+x "$ac_file" ;;
+    "test/Seasstat.test":F) chmod a+x "$ac_file" ;;
     "test/Runstat.test":F) chmod a+x "$ac_file" ;;
     "test/Ymonstat.test":F) chmod a+x "$ac_file" ;;
     "test/Fldstat.test":F) chmod a+x "$ac_file" ;;
