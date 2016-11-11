@@ -86,16 +86,17 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Gridarea.test.in $(srcdir)/Genweights.test.in \
 	$(srcdir)/Remap.test.in $(srcdir)/Select.test.in \
 	$(srcdir)/Spectral.test.in $(srcdir)/Timstat.test.in \
-	$(srcdir)/Vertint.test.in $(srcdir)/Ymonstat.test.in \
-	$(srcdir)/Fldstat.test.in $(srcdir)/Fldpctl.test.in \
-	$(srcdir)/Ensstat.test.in $(srcdir)/Enspctl.test.in \
-	$(srcdir)/Merstat.test.in $(srcdir)/Zonstat.test.in \
-	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
-	$(srcdir)/Arithc.test.in $(srcdir)/Arith.test.in \
-	$(srcdir)/Expr.test.in $(srcdir)/Gradsdes.test.in \
-	$(srcdir)/Collgrid.test.in $(srcdir)/threads.test.in \
-	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
-	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
+	$(srcdir)/Timselstat.test.in $(srcdir)/Vertint.test.in \
+	$(srcdir)/Ymonstat.test.in $(srcdir)/Fldstat.test.in \
+	$(srcdir)/Fldpctl.test.in $(srcdir)/Ensstat.test.in \
+	$(srcdir)/Enspctl.test.in $(srcdir)/Merstat.test.in \
+	$(srcdir)/Zonstat.test.in $(srcdir)/Afterburner.test.in \
+	$(srcdir)/Detrend.test.in $(srcdir)/Arithc.test.in \
+	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
+	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
+	$(srcdir)/threads.test.in $(srcdir)/tsformat.test.in \
+	$(srcdir)/wildcard.test.in $(srcdir)/MapReduce.test.in \
+	$(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -108,12 +109,12 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Cat.test Gridarea.test Genweights.test \
-	Remap.test Select.test Spectral.test Timstat.test Vertint.test \
-	Ymonstat.test Fldstat.test Fldpctl.test Ensstat.test \
-	Enspctl.test Merstat.test Zonstat.test Afterburner.test \
-	Detrend.test Arithc.test Arith.test Expr.test Gradsdes.test \
-	Collgrid.test threads.test tsformat.test wildcard.test \
-	MapReduce.test Ninfo.test
+	Remap.test Select.test Spectral.test Timstat.test \
+	Timselstat.test Vertint.test Ymonstat.test Fldstat.test \
+	Fldpctl.test Ensstat.test Enspctl.test Merstat.test \
+	Zonstat.test Afterburner.test Detrend.test Arithc.test \
+	Arith.test Expr.test Gradsdes.test Collgrid.test threads.test \
+	tsformat.test wildcard.test MapReduce.test Ninfo.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -524,7 +525,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 # tests which should pass
 TESTS = threads.test tsformat.test wildcard.test File.test Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
         Detrend.test Genweights.test Remap.test Select.test Spectral.test \
-        Ensstat.test Enspctl.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test Timstat.test Ymonstat.test \
+        Ensstat.test Enspctl.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test Timstat.test Timselstat.test Ymonstat.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
         Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
 
@@ -596,6 +597,8 @@ Select.test: $(top_builddir)/config.status $(srcdir)/Select.test.in
 Spectral.test: $(top_builddir)/config.status $(srcdir)/Spectral.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Timstat.test: $(top_builddir)/config.status $(srcdir)/Timstat.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Timselstat.test: $(top_builddir)/config.status $(srcdir)/Timselstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Vertint.test: $(top_builddir)/config.status $(srcdir)/Vertint.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
