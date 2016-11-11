@@ -1,4 +1,4 @@
-BeginModule
+@BeginModule
 @NewPage
 @Name      = Timcumsum
 @Title     = Cumulative sum over all timesteps
@@ -19,9 +19,11 @@ Missing values are treated as numeric zero when summing.
 
 @BeginDescription
 @IfMan
+
 o(t,x) = sum{i(t',x), 0<t'<=t}
 @EndifMan
 @IfDoc
+ \ \newline
 @BeginMath
 o(t,x) = \mbox{\textbf{sum}}\{i(t',x), 0 < t' \leq t\}
 @EndMath

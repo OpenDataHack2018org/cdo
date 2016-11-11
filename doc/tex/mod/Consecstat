@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Consecstat
 @Title     = Consecute timestep periods
 @Section   = Statistical values

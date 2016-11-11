@@ -1708,6 +1708,21 @@ static const char *ArithdaysHelp[] = {
     NULL
 };
 
+static const char *TimcumsumHelp[] = {
+    "NAME",
+    "    timcumsum - Cumulative sum over all timesteps",
+    "",
+    "SYNOPSIS",
+    "    timcumsum  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    The timcumsum operator calculates the cumulative sum over all timesteps.",
+    "    Missing values are treated as numeric zero when summing.",
+    "    ",
+    "    o(t,x) = sum{i(t',x), 0<t'<=t}",
+    NULL
+};
+
 static const char *ConsecstatHelp[] = {
     "NAME",
     "    consecsum, consects - Consecute timestep periods",

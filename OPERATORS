@@ -231,6 +231,7 @@ Operator catalog:
 -------------------------------------------------------------
    Statistical values
 -------------------------------------------------------------
+   Timcumsum     timcumsum       Cumulative sum over all timesteps
    Consecstat    consecsum       Consecutive Sum
    Consecstat    consects        Consecutive Timesteps
    Ensstat       ensmin          Ensemble minimum

@@ -734,7 +734,7 @@ static modules_t Modules[] =
   { Timcount,       NULL,              MoncountOperators,      1,   CDI_BOTH,  1,  1 },
   { Timcount,       NULL,              DaycountOperators,      1,   CDI_BOTH,  1,  1 },
   { Timcount,       NULL,              HourcountOperators,     1,   CDI_BOTH,  1,  1 },
-  { Timcumsum,      NULL,              TimcumsumOperators,     1,   CDI_BOTH,  1,  1 },
+  { Timcumsum,      TimcumsumHelp,     TimcumsumOperators,     1,   CDI_BOTH,  1,  1 },
   { Timpctl,        TimpctlHelp,       TimpctlOperators,       1,   CDI_REAL,  3,  1 },
   { Timpctl,        YearpctlHelp,      YearpctlOperators,      1,   CDI_REAL,  3,  1 },
   { Timpctl,        MonpctlHelp,       MonpctlOperators,       1,   CDI_REAL,  3,  1 },
