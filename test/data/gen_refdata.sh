@@ -6,7 +6,7 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
-# Timstat
+# Timstat Yearstat Monstat Daystat Runstat
 #
 IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
 OFILE=ts_6h_5years
@@ -23,6 +23,11 @@ $CDO $FORMAT monmean $IFILE $OFILE
 $CDO selyear,1991 $IFILE ts_1d_1year
 #
 STATS="min max sum avg mean std std1 var var1"
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT run${STAT},12 $IFILE run${STAT}_ref
+done
 #
 IFILE=ts_mm_5years
 for STAT in $STATS; do
