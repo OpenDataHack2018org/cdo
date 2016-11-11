@@ -8,7 +8,7 @@ CDOOUT=cout$$
 CDOERR=cerr$$
 FORMAT="-f srv -b 32"
 #
-TYPE=fld
+TYPE=mer
 STATS="min max sum avg mean std std1 var var1"
 #
 IFILE=$DATAPATH/t21_geosp_tsurf.grb

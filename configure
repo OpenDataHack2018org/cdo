@@ -21062,6 +21062,8 @@ ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timst
 
 ac_config_files="$ac_config_files test/Ymonstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test"
 
+ac_config_files="$ac_config_files test/Merstat.test test/Zonstat.test"
+
 ac_config_files="$ac_config_files test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test"
 
 ac_config_files="$ac_config_files test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test"
@@ -22234,6 +22236,8 @@ do
     "test/Fldpctl.test") CONFIG_FILES="$CONFIG_FILES test/Fldpctl.test" ;;
     "test/Ensstat.test") CONFIG_FILES="$CONFIG_FILES test/Ensstat.test" ;;
     "test/Enspctl.test") CONFIG_FILES="$CONFIG_FILES test/Enspctl.test" ;;
+    "test/Merstat.test") CONFIG_FILES="$CONFIG_FILES test/Merstat.test" ;;
+    "test/Zonstat.test") CONFIG_FILES="$CONFIG_FILES test/Zonstat.test" ;;
     "test/Afterburner.test") CONFIG_FILES="$CONFIG_FILES test/Afterburner.test" ;;
     "test/Detrend.test") CONFIG_FILES="$CONFIG_FILES test/Detrend.test" ;;
     "test/Arithc.test") CONFIG_FILES="$CONFIG_FILES test/Arithc.test" ;;
@@ -23755,6 +23759,8 @@ _LT_EOF
     "test/Fldpctl.test":F) chmod a+x "$ac_file" ;;
     "test/Ensstat.test":F) chmod a+x "$ac_file" ;;
     "test/Enspctl.test":F) chmod a+x "$ac_file" ;;
+    "test/Merstat.test":F) chmod a+x "$ac_file" ;;
+    "test/Zonstat.test":F) chmod a+x "$ac_file" ;;
     "test/Afterburner.test":F) chmod a+x "$ac_file" ;;
     "test/Detrend.test":F) chmod a+x "$ac_file" ;;
     "test/Arithc.test":F) chmod a+x "$ac_file" ;;

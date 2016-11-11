@@ -7,6 +7,26 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Zonstat
+#
+STATS="min max sum avg mean std std1 var var1"
+IFILE=t21_geosp_tsurf.grb
+for STAT in $STATS; do
+  $CDO $FORMAT zon$STAT $IFILE zon${STAT}_ref
+done
+exit
+########################################################################
+#
+# Merstat
+#
+STATS="min max sum avg mean std std1 var var1"
+IFILE=t21_geosp_tsurf.grb
+for STAT in $STATS; do
+  $CDO $FORMAT mer$STAT $IFILE mer${STAT}_ref
+done
+exit
+########################################################################
+#
 # MapReduce
 #
 for grid  in r18x9 icon_cell; do
