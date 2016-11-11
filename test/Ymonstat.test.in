@@ -1,40 +1,47 @@
 #! @SHELL@
-echo 1..9 # Number of tests to be executed.
+echo 1..36 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
 CDOOUT=cout$$
 CDOERR=cerr$$
+TYPES="ymon yday yhour yseas"
 STATS="min max sum avg mean std std1 var var1"
 #
 IFILE=$DATAPATH/ts_mm_5years
 NTEST=1
 #
-for STAT in $STATS; do
-  RSTAT=0
-  RFILE=$DATAPATH/ymon${STAT}_ref
-  OFILE=ymon${STAT}_res
+for TYPE in $TYPES; do
+  for STAT in $STATS; do
+    RSTAT=0
+    if [ $TYPE = yday -o $TYPE = yhour ] ; then
+      RFILE=$DATAPATH/ymon${STAT}_ref
+    else
+      RFILE=$DATAPATH/${TYPE}${STAT}_ref
+    fi
+    OFILE=${TYPE}${STAT}_res
 
-  CDOTEST="ymon$STAT"
-  CDOCOMMAND="$CDO ymon${STAT} $IFILE $OFILE"
+    CDOTEST="${TYPE}$STAT"
+    CDOCOMMAND="$CDO ${TYPE}${STAT} $IFILE $OFILE"
 
-  echo "Running test: $NTEST"
-  echo "$CDOCOMMAND"
+    echo "Running test: $NTEST"
+    echo "$CDOCOMMAND"
 
-  $CDOCOMMAND
-  test $? -eq 0 || let RSTAT+=1
+    $CDOCOMMAND
+    test $? -eq 0 || let RSTAT+=1
 
-  $CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
-  test $? -eq 0 || let RSTAT+=1
-  test -s $CDOOUT && let RSTAT+=1
-  cat $CDOOUT $CDOERR
+    $CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
+    test $? -eq 0 || let RSTAT+=1
+    test -s $CDOOUT && let RSTAT+=1
+    cat $CDOOUT $CDOERR
 
-  test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
-  test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
+    test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
+    test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 
-  let NTEST+=1
-  rm -f $OFILE
+    let NTEST+=1
+    rm -f $OFILE
+  done
 done
 #
 rm -f $CDOOUT $CDOERR

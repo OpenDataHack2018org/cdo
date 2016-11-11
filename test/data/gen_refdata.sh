@@ -6,6 +6,21 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Ymonstat
+#
+STATS="min max sum avg mean std std1 var var1"
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT ymon$STAT $IFILE ymon${STAT}_ref
+done
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT yseas$STAT $IFILE yseas${STAT}_ref
+done
+########################################################################
+#
 # Timstat Yearstat Monstat Daystat Runstat
 #
 IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
@@ -19,7 +34,7 @@ $CDO selmon,1 -selyear,1991 $IFILE ts_6h_1mon
 #
 IFILE=$OFILE
 OFILE=ts_mm_5years
-$CDO $FORMAT monmean $IFILE $OFILE
+$CDO $FORMAT -settime,12:00:00 -setday,15 -monmean $IFILE $OFILE
 $CDO selyear,1991 $IFILE ts_1d_1year
 #
 STATS="min max sum avg mean std std1 var var1"
@@ -28,7 +43,6 @@ IFILE=ts_mm_5years
 for STAT in $STATS; do
   $CDO $FORMAT seas${STAT} $IFILE seas${STAT}_ref
 done
-exit
 #
 IFILE=ts_mm_5years
 for STAT in $STATS; do
@@ -133,16 +147,6 @@ for PCTL in $PCTLS; do
   $CDO $FORMAT enspctl,$PCTL $IFILE enspctl${PCTL}_ref
 done
 rm -f $IFILE
-exit
-########################################################################
-#
-# Ymonstat
-#
-STATS="min max sum avg mean std std1 var var1"
-IFILE=ts_mm_5years
-for STAT in $STATS; do
-  $CDO $FORMAT ymon$STAT $IFILE ymon${STAT}_ref
-done
 exit
 ########################################################################
 #
