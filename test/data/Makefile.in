@@ -294,6 +294,9 @@ GRIB_REF = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile02_si
 NETCDF_REF = netcdf_testfile01_sinfon_ref netcdf_testfile01_infon_ref netcdf_testfile02_sinfon_ref netcdf_testfile02_infon_ref
 YMONSTAT_REF = ymonmin_ref ymonmax_ref ymonsum_ref ymonavg_ref ymonmean_ref ymonstd_ref ymonstd1_ref ymonvar_ref ymonvar1_ref
 TIMSTAT_REF = timmin_ref timmax_ref timsum_ref timavg_ref timmean_ref timstd_ref timstd1_ref timvar_ref timvar1_ref
+YEARSTAT_REF = yearmin_ref yearmax_ref yearsum_ref yearavg_ref yearmean_ref yearstd_ref yearstd1_ref yearvar_ref yearvar1_ref
+MONSTAT_REF = monmin_ref monmax_ref monsum_ref monavg_ref monmean_ref monstd_ref monstd1_ref monvar_ref monvar1_ref
+DAYSTAT_REF = daymin_ref daymax_ref daysum_ref dayavg_ref daymean_ref daystd_ref daystd1_ref dayvar_ref dayvar1_ref
 FLDSTAT_REF = fldmin_ref fldmax_ref fldsum_ref fldavg_ref fldmean_ref fldstd_ref fldstd1_ref fldvar_ref fldvar1_ref
 FLDPSTAT_REF = fldpctl1_ref fldpctl20_ref fldpctl25_ref fldpctl33_ref fldpctl50_ref fldpctl66_ref fldpctl75_ref fldpctl80_ref fldpctl99_ref fldpctl100_ref
 MERSTAT_REF = mermin_ref mermax_ref mersum_ref meravg_ref mermean_ref merstd_ref merstd1_ref mervar_ref mervar1_ref
@@ -311,7 +314,7 @@ THREAD_REF = thread1_ref tsformat1_ref
 GRADSDES_REF = pl_data.ctl pl_data.gmp
 ARITH_REF = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
 MAPREDUCE = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
-EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(YMONSTAT_REF) $(TIMSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)
+EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(YMONSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)
 all: all-am
 
 .SUFFIXES:
