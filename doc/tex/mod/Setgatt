@@ -53,7 +53,7 @@ To set the global text attribute "myatt" to "myattcontents" in a NetCDF file use
 @BeginVerbatim
    cdo setgatt,myatt,myattcontents ifile ofile
 @EndVerbatim
-Result of '{\tt ncdump -h ofile}':
+Result of '\texttt{ncdump -h ofile}':
 @BeginListing
 netcdf ofile {
 dimensions: ...

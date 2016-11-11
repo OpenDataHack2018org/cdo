@@ -36,10 +36,10 @@ o(4,x) = pth percentile {i(t,x), month(i(t)) = 09, 10, 11}
 
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{pth percentile}} \{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{pth percentile}} \{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{pth percentile}} \{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{pth percentile}} \{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc

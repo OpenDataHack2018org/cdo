@@ -35,24 +35,24 @@ Water vapour:     Vertically integrated water vapour (HTW), layered vertically
 \setlength{\miniwidth}{\textwidth}
 \addtolength{\miniwidth}{-0mm}
 \hspace*{0mm}\begin{minipage}{\miniwidth}
-\begin{defalist}{\bf Cloud para\ }
-\item[{\bf Cloud parameters:}]
+\begin{defalist}{\textbf{Cloud para}\ }
+\item[\textbf{Cloud parameters:}]
                   cloud fraction (CFC), cloud type (CTY), cloud phase (CPH), 
                   cloud top height, pressure and temperature (CTH,CTP,CTT), 
                   cloud optical thickness (COT), cloud water path (CWP).
 
-\item[{\bf Surface radiation components:}]
+\item[\textbf{Surface radiation components:}]
                   Surface albedo (SAL); surface incoming (SIS) 
                   and net (SNS) shortwave radiation; surface downward (SDL) 
                   and outgoing (SOL) longwave radiation, surface net longwave 
                   radiation (SNL) and surface radiation budget (SRB).
 
-\item[{\bf Top-of-atmosphere radiation components:}]
+\item[\textbf{Top-of-atmosphere radiation components:}]
                   Incoming (TIS) and reflected (TRS) 
                   solar radiative flux at top-of-atmosphere. Emitted thermal 
                   radiative flux at top-of-atmosphere (TET).
 
-\item[{\bf Water vapour:}]
+\item[\textbf{Water vapour:}]
                   Vertically integrated water vapour (HTW), layered vertically 
                   integrated water vapour and layer mean temperature and relative 
                   humidity for 5 layers (HLW), temperature and mixing ratio at 

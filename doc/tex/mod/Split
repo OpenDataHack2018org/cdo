@@ -130,7 +130,7 @@ To split this dataset into three pieces, one for each code number use:
 @BeginVerbatim
    cdo splitcode ifile code
 @EndVerbatim
-Result of '{\tt dir code*}':
+Result of '\texttt{dir code*}':
 @BeginListing
    code129.grb code130.grb code139.grb
 @EndListing

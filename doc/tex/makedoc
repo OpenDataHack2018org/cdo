@@ -123,7 +123,7 @@ print TRCARD "\\setlength{\\parindent}{0in}\n";
 print TRCARD "\n";
 print TRCARD "\\newenvironment{defalist}[1]\n";
 print TRCARD "{\\begin{list}{}\n";
-print TRCARD "{\\settowidth{\\labelwidth}{\\bf #1\\ \\ }\n";
+print TRCARD "{\\settowidth{\\labelwidth}{\\textbf{#1}\\ \\ }\n";
 print TRCARD "\\setlength{\\topsep}{-0.5mm}\n";
 print TRCARD "\\setlength{\\parsep}{0mm}\n";
 print TRCARD "\\setlength{\\itemsep}{0mm}\n";
@@ -286,13 +286,13 @@ while (<MOFILE>) {
 	print TRCARD "\\makebox[1.8in][c]{Available statistical functions} &\n";
 	print TRCARD "\\makebox[0.65in][c]{\$<\\!stat\\!>\$} \\\\ \n";
 #	print TRCARD "\\makebox[0.65in][c]{\$<\\!stat\\!>\$} \\\\ \\hline\n";
-	print TRCARD "minimum  & {\\bf min}   \\\\ \n";
-	print TRCARD "maximum  & {\\bf max}   \\\\ \n";
-	print TRCARD "sum      & {\\bf sum}  \\\\ \n";
-	print TRCARD "mean     & {\\bf mean}  \\\\ \n";
-	print TRCARD "average            & {\\bf avg}  \\\\ \n";
-	print TRCARD "variance           & {\\bf var, var1}  \\\\ \n";
-	print TRCARD "standard deviation & {\\bf std, std1}  \\\\ \n";
+	print TRCARD "minimum  & \\textbf{min}   \\\\ \n";
+	print TRCARD "maximum  & \\textbf{max}   \\\\ \n";
+	print TRCARD "sum      & \\textbf{sum}  \\\\ \n";
+	print TRCARD "mean     & \\textbf{mean}  \\\\ \n";
+	print TRCARD "average            & \\textbf{avg}  \\\\ \n";
+	print TRCARD "variance           & \\textbf{var, var1}  \\\\ \n";
+	print TRCARD "standard deviation & \\textbf{std, std1}  \\\\ \n";
 	print TRCARD "\\hline\n";
 	print TRCARD "\\end{tabular*}\n";
 	print TRCARD "\\vspace{2mm}\n\n";
@@ -518,7 +518,7 @@ while (<MOFILE>) {
     if ( $istart > 0 )  {
       $parameter = @oper_parameter[0];
       print HELPFILE "    \"    <operator>${parameter}  ${marguments}\",\n";
-      print TRFILE "\\hspace*{8mm}{\$<\\!operator\\!>\$}{\\sl $parameter} \\ {\\tt $marguments}\n\n";
+      print TRFILE "\\hspace*{8mm}{\$<\\!operator\\!>\$}\\textsl{$parameter} \\ \\texttt{$marguments}\n\n";
     }
 
    for ( $i = $istart; $i <= $#hkeys; $i++ ) {
@@ -527,7 +527,7 @@ while (<MOFILE>) {
       printf HELPFILE ("    \"    %s%s  %s\",\n", $operator, $parameter, $marguments);
       $operatorx = $operator;
       $operatorx =~ s/_/\\_/g;
-      print TRFILE "\\hspace*{8mm}{\\bf $operatorx}{\\sl $parameter} \\ {\\tt $marguments}\n\n";
+      print TRFILE "\\hspace*{8mm}\\textbf{$operatorx}\\textsl{$parameter} \\ \\texttt{$marguments}\n\n";
     }
 
     print HELPFILE "    \"\",\n";
@@ -620,9 +620,9 @@ while (<MOFILE>) {
       if ( $#hkeys > 0 ) {
 	printf HELPFILE ("    \"    %-*s%s\",\n", $maxlen, $operator, $otitle);
 	if ( $xopercnt == 1 ) {
-	  print TRFILE "\\begin{defalist2}{\\bf $maxitem \\ }\n";
+	  print TRFILE "\\begin{defalist2}{\\textbf{$maxitem \\ }}\n";
 	}
-	print TRFILE "\\item[{\\bf $operatorx}\\ \\ \\hfill]\n";
+	print TRFILE "\\item[\\textbf{$operatorx}\\ \\ \\hfill]\n";
 	print TRFILE "$otitle \\\\\n";
       }
 
@@ -631,9 +631,9 @@ while (<MOFILE>) {
 #	  print TRCARD "\\rowcolor[gray]{.9}\n";
 	  print TRCARD "\\multicolumn{2}{|>{\\columncolor{pcolor3}}l|}";
 	  if ( $xopercnt == 2 ) {
-	    print TRCARD "{{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments}} ";
+	    print TRCARD "{\\textbf{$opernamex}\\textsl{$operpara} \ \\texttt{$marguments}} ";
 	  } else {
-	    print TRCARD "{{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments}} ";
+	    print TRCARD "{{\$<\\!operator\\!>\$}\\textsl{$operpara} \ \\texttt{$marguments}} ";
 	  }
 	  print TRCARD "\\\\ \\hline \n";
 	  $xopercnt = 1;
@@ -651,16 +651,16 @@ while (<MOFILE>) {
 
 	$operatorx = $operator;
 	$operatorx =~ s/_/\\_/g;
- 	print TCFILE "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} ";
+ 	print TCFILE "\\hspace*{5mm}\\makebox[3cm][l]{\\textbf{\\htmlref{$operatorx}{$operator}}} ";
  	print TCFILE "& $otitle ";
  	print TCFILE "\\\\ \n";
-        push @oplist, "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} & $otitle \\\\ \n";
+        push @oplist, "\\hspace*{5mm}\\makebox[3cm][l]{\\textbf{\\htmlref{$operatorx}{$operator}}} & $otitle \\\\ \n";
 
 	$otitlem = $otitle;
 	$otitlem =~ s/</\$<\$/og;
 	$otitlem =~ s/>/\$>\$/og;
 	$otitlem =~ s/ wrt / w.r.t. /og;
- 	print TRLIST "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} ";
+ 	print TRLIST "\\hspace*{5mm}\\makebox[3cm][l]{\\textbf{\\htmlref{$operatorx}{$operator}}} ";
  	print TRLIST "& $otitlem ";
  	print TRLIST "\\\\ \n";
 
@@ -674,12 +674,12 @@ while (<MOFILE>) {
 	}
 	if ( $refskip == 0 && $norefoper == 0 ) {
 	  if ( $statfunc == 0 ) {
-	    print TRCARD "\\makebox[$len2][l]{\\bf {$operatorx}} ";
+	    print TRCARD "\\makebox[$len2][l]{\\textbf{$operatorx}} ";
 	    print TRCARD "& \\makebox[$len3][l]{$otitle} ";
 	    print TRCARD "\\\\ \n";
 	  }
 	  elsif ( $statfunc == 1 && $operfunc eq "min" ) {
-	    print TRCARD "\\makebox[$len2][l]{\\bf {$modulname\$<\\!stat\\!>\$}} ";
+	    print TRCARD "\\makebox[$len2][l]{\\textbf{$modulname\$<\\!stat\\!>\$}} ";
 	    print TRCARD "& \\makebox[$len3][l]{$mtitle} ";
 	    print TRCARD "\\\\ \n";
 	  }
@@ -797,7 +797,7 @@ while (<MOFILE>) {
 
       print TRFILE "\n\\subsection*{Parameter}\n\n";
       begin_minipage();
-      print TRFILE "\\begin{defalist}{\\sl $maxitem \\ }\n";
+      print TRFILE "\\begin{defalist}{\\textsl{$maxitem \\ }}\n";
 
       $lines = 0;
       foreach $tag (@parlines) {
@@ -809,7 +809,7 @@ while (<MOFILE>) {
 	  ($kopt, $value) = split(/\s*=\s*/, $line, 2);
 	  printf HELPFILE ("    \"    %-*s  ", $maxlen, $value);
 	  $value =~ s/_/\\_/g;
-	  print TRFILE "\\item[{\\sl $value}\\ \\ \\hfill]\n";
+	  print TRFILE "\\item[\\textsl{$value}\\ \\ \\hfill]\n";
 	  $lines = 1;
 	} else {
 	  $line =~ s/^DOUBLE/FLOAT/g;
@@ -820,9 +820,9 @@ while (<MOFILE>) {
 	    printf HELPFILE ("    \"    %-*s  ", $maxlen, " ");
 	  }
 	  print HELPFILE "$hline\",\n";
-	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
-	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
-	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
+	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\textsf{\\small FLOAT}}/;
+	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\textsf{\\small INTEGER}}/;
+	  $line =~ s/^STRING/\\makebox[20mm][l]{\\textsf{\\small STRING}}/;
 	  $line =~ s/_/\\_/g;
           $line =~ s/>/\$>\$/og;
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
@@ -877,7 +877,7 @@ while (<MOFILE>) {
 
       print TRFILE "\n\\subsection*{Environment}\n\n";
       begin_minipage();
-      print TRFILE "\\begin{defalist}{\\tt $maxitem \\ }\n";
+      print TRFILE "\\begin{defalist}{\\texttt{$maxitem} \\ }\n";
 
       foreach $tag (@parlines) {
 	$line = $tag;
@@ -888,7 +888,7 @@ while (<MOFILE>) {
 	  ($kopt, $value) = split(/\s*=\s*/, $line, 2);
 	  printf HELPFILE ("    \"    %-*s\",\n", $maxlen, $value);
 	  $value =~ s/_/\\_/g;
-	  print TRFILE "\\item[{\\tt $value}\\ \\ \\hfill]\n";
+	  print TRFILE "\\item[\\texttt{$value}\\ \\ \\hfill]\n";
 	} else {
 	  $hline = $line;
 	  $hline =~ s/\"/\\\"/g;
@@ -901,12 +901,12 @@ while (<MOFILE>) {
 	    print HELPFILE "    \"        $hline\",\n";
 #	  }
 #	    $line = /\sFLOAT/XXX
-	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
-	  $line =~ s/^DOUBLE/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
-	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
-	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
+	  $line =~ s/^FLOAT/\\makebox[20mm][l]\\textsf{\\small FLOAT}/;
+	  $line =~ s/^DOUBLE/\\makebox[20mm][l]\\textsf{\\small FLOAT}/;
+	  $line =~ s/^INTEGER/\\makebox[20mm][l]\\textsf{\\small INTEGER}/;
+	  $line =~ s/^STRING/\\makebox[20mm][l]\\textsf{\\small STRING}/;
 	  $line =~ s/_/\\_/g;
-	  $line =~ s/\@env\{([^}]*)\}/{\\tt \1}/og;
+	  $line =~ s/\@env\{([^}]*)\}/\\texttt{\1}/og;
 	  print TRFILE "$line\n";
 	  $lines = $lines + 1;
 	}
@@ -1039,9 +1039,9 @@ while (<MOFILE>) {
     $opernamex =~ s/_/\\_/g;
     if ( $refskip == 0 ) {
       if ( $xopercnt == 1 ) {
-	print TRCARD "{{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments}} ";
+	print TRCARD "{\\textbf{$opernamex}\\textsl{$operpara} \ \\texttt{$marguments}} ";
       } else {
-	print TRCARD "{{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments}} ";
+	print TRCARD "{{\$<\\!operator\\!>\$}\\textsl{$operpara} \ \\texttt{$marguments}} ";
       }
       print TRCARD "\\\\ \\hline \n";
 
@@ -1203,21 +1203,21 @@ sub print_description {
 #	  $line =~ s/CDO_PCTL_NBINS/CDO\\_PCTL\\_NBINS/og;
 	  $line =~ s/_/\\_/og;
 	  $line =~ s/\@newline/ \\\\/og;
-	  $line =~ s/ ifile / {\\tt ifile} /og;
-	  $line =~ s/ ifile1 / {\\tt ifile1} /og;
-	  $line =~ s/ ifile2 / {\\tt ifile2} /og;
-	  $line =~ s/ ofile / {\\tt ofile} /og;
-	  $line =~ s/ ifiles / {\\tt ifiles} /og;
+	  $line =~ s/ ifile / \\texttt{ifile} /og;
+	  $line =~ s/ ifile1 / \\texttt{ifile1} /og;
+	  $line =~ s/ ifile2 / \\texttt{ifile2} /og;
+	  $line =~ s/ ofile / \\texttt{ofile} /og;
+	  $line =~ s/ ifiles / \\texttt{ifiles} /og;
 	  $line =~ s/\@math\{([^}]*)\}/\\begin{math}\1\\end{math}/og;
-	  $line =~ s/\@file\{([^}]*)\}/{\\tt \1}/og;
-	  $line =~ s/\@var\{([^}]*)\}/{\\it \1}/og;
+	  $line =~ s/\@file\{([^}]*)\}/\\texttt{\1}/og;
+	  $line =~ s/\@var\{([^}]*)\}/\\textit{\1}/og;
 	  $line =~ s/\@oper\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@mod\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@ref\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
-	  $line =~ s/\@env\{([^}]*)\}/{\\tt \1}/og;
+	  $line =~ s/\@env\{([^}]*)\}/\\texttt{\1}/og;
 	  $line =~ s/\@cite\{([^}]*)\}/\\cite{\1}/og;
 	  $line =~ s/\@boldtt\{([^}]*)\}/{\\ttfamily \\bfseries \1}/og;
-	  $line =~ s/\@bold\{([^}]*)\}/{\\bf \1}/og;
+	  $line =~ s/\@bold\{([^}]*)\}/\\textbf{\1}/og;
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  $line =~ s/</\$<\$/og;
 	  $line =~ s/>/\$>\$/og;

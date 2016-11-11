@@ -37,7 +37,7 @@ the same season it is: \\
 \vspace*{1mm}
 
 @BeginMath
-o(t,x) = \mbox{\bf pth percentile}\{i(t',x), t_1 < t' \le t_n\}
+o(t,x) = \mbox{\textbf{pth percentile}}\{i(t',x), t_1 < t' \le t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

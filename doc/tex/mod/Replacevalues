@@ -36,8 +36,8 @@ o(t,x) =
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
- \mbox{c}   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl rmin} \wedge i(t,x) \leq \mbox{\sl rmax}  \\
- i(t,x) & \mbox{if} \;\; i(t,x) < \mbox{\sl rmin} \vee i(t,x) > \mbox{\sl rmax}  \\
+ \mbox{c}   & \mbox{if} \;\; i(t,x) \geq \mbox{\textsl{rmin}} \wedge i(t,x) \leq \mbox{\textsl{rmax}}  \\
+ i(t,x) & \mbox{if} \;\; i(t,x) < \mbox{\textsl{rmin}} \vee i(t,x) > \mbox{\textsl{rmax}}  \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -59,8 +59,8 @@ o(t,x) =
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
- \mbox{c}   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl rmin} \wedge i(t,x) \leq \mbox{\sl rmax}  \\
- \mbox{c2} & \mbox{if} \;\; i(t,x) < \mbox{\sl rmin} \vee i(t,x) > \mbox{\sl rmax}  \\
+ \mbox{c}   & \mbox{if} \;\; i(t,x) \geq \mbox{\textsl{rmin}} \wedge i(t,x) \leq \mbox{\textsl{rmax}}  \\
+ \mbox{c2} & \mbox{if} \;\; i(t,x) < \mbox{\textsl{rmin}} \vee i(t,x) > \mbox{\textsl{rmax}}  \\
 \end{array}   \right.
 @EndMath
 @EndifDoc

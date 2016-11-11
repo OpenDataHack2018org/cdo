@@ -5,8 +5,8 @@
 \newcommand{\CDO}{{\bfseries\sffamily CDO\ }}
 \newcommand{\cdologo}{\includegraphics{logo/cdo_logo}}
 \vspace*{0mm}
-{\LARGE\CDO \bf Reference Card}
-%{\raisebox{-2.5mm}{\scalebox{0.25}{\cdologo}}}{\LARGE\bf{\ Reference Card}}
+{\LARGE\CDO \textbf{Reference Card}}
+%{\raisebox{-2.5mm}{\scalebox{0.25}{\cdologo}}}{\LARGE\textbf{\ Reference Card}}
 
 \setlength{\unitlength}{1in}
 \begin{picture}(3.95,0.0)
@@ -14,7 +14,7 @@
 \put(0,0.0){\line(1,0){3.95}}
 \end{picture}
 \begin{flushright}
-{\small{Climate Data Operators \\ Version 1.8.0 \\ October 2016}}
+{\small{Climate Data Operators \\ Version 1.8.0 \\ January 2017}}
 \end{flushright}
 
 \vspace*{0mm}
@@ -31,34 +31,34 @@
 \vspace*{2mm}
 \subsection*{Syntax}
 \framebox[3.95in][l]{
-{\bf{cdo \ \ [Options] \ \ Operator1 [ --Operator2 [ --OperatorN ] ]}}
+{\textbf{cdo \ \ [Options] \ \ Operator1 [ --Operator2 [ --OperatorN ] ]}}
 }
 
 \vspace*{2mm}
 \subsection*{Options}
 \noindent
 \begin{tabular*}{3.95in}{|>{\columncolor{pcolor2}}l>{\columncolor{pcolor1}}l|} \hline
-\makebox[0.85in][l]{{\bf{-a}}                  } & \makebox[2.76in][l]{Generate an absolute time axis} \\ %\hline
-\makebox[0.85in][l]{{\bf{-b}} $<\!nbits\!>$    } & \makebox[2.76in][l]{Set the number of bits for the output precision} \\
+\makebox[0.85in][l]{{\textbf{-a}}                  } & \makebox[2.76in][l]{Generate an absolute time axis} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-b}} $<\!nbits\!>$    } & \makebox[2.76in][l]{Set the number of bits for the output precision} \\
                                                  & (I8/I16/I32/F32/F64 for nc1,nc2,nc4,nc4c; \\
                                                  &  F32/F64 for grb2,srv,ext,ieg;  1-24 for grb1,grb2) \\
                                                  & Add L or B for Little or Big endian byteorder\\ %\hline
-\makebox[0.85in][l]{{\bf{-f}} $<\!format\!>$   } & \makebox[2.76in][l]{Outputformat: grb1,grb2,nc1,nc2,nc4,nc4c,srv,ext,ieg} \\ %\hline
-\makebox[0.85in][l]{{\bf{-g}} $<\!grid\!>$     } & \makebox[2.76in][l]{Grid or file name} \\
-                                                 & Grid names: {\tt r<NX>x<NY>}, {\tt n<N>}, {\tt gme<NI>} \\ %\hline
-\makebox[0.85in][l]{{\bf{-h}}                  } & \makebox[2.76in][l]{Help information for the operators} \\ %\hline
-\makebox[0.85in][l]{{\bf{-M}}                  } & \makebox[2.76in][l]{Indicate that the I/O streams have missing values} \\ %\hline
-\makebox[0.85in][l]{{\bf{-m}} $<\!missval\!>$  } & \makebox[2.76in][l]{Set the default missing value (default: {\tt-9e+33})} \\ %\hline 
-\makebox[0.85in][l]{{\bf{-O}}                  } & \makebox[2.76in][l]{Overwrite existing output file, if checked} \\ %\hline
-\makebox[0.85in][l]{{\bf{-R}}                  } & \makebox[2.76in][l]{Convert GRIB1 data from reduced to regular grid} \\ %\hline
-\makebox[0.85in][l]{{\bf{-r}}                  } & \makebox[2.76in][l]{Generate a relative time axis} \\ %\hline
-\makebox[0.85in][l]{{\bf{-s}}                  } & \makebox[2.76in][l]{Silent mode} \\ %\hline
-\makebox[0.85in][l]{{\bf{-t}} $<\!table\!>$    } & \makebox[2.76in][l]{Set the parameter table name or file} \\
+\makebox[0.85in][l]{{\textbf{-f}} $<\!format\!>$   } & \makebox[2.76in][l]{Outputformat: grb1,grb2,nc1,nc2,nc4,nc4c,srv,ext,ieg} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-g}} $<\!grid\!>$     } & \makebox[2.76in][l]{Grid or file name} \\
+                                                 & Grid names: \texttt{r<NX>x<NY>}, \texttt{n<N>}, \texttt{gme<NI>} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-h}}                  } & \makebox[2.76in][l]{Help information for the operators} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-M}}                  } & \makebox[2.76in][l]{Indicate that the I/O streams have missing values} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-m}} $<\!missval\!>$  } & \makebox[2.76in][l]{Set the default missing value (default: {\tt-9e+33})} \\ %\hline 
+\makebox[0.85in][l]{{\textbf{-O}}                  } & \makebox[2.76in][l]{Overwrite existing output file, if checked} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-R}}                  } & \makebox[2.76in][l]{Convert GRIB1 data from reduced to regular grid} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-r}}                  } & \makebox[2.76in][l]{Generate a relative time axis} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-s}}                  } & \makebox[2.76in][l]{Silent mode} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-t}} $<\!table\!>$    } & \makebox[2.76in][l]{Set the parameter table name or file} \\
                                                  & Predefined tables:  echam4 echam5 mpiom1 \\ %\hline
-\makebox[0.85in][l]{{\bf{-V}}                  } & \makebox[2.76in][l]{Print the version number} \\ %\hline
-\makebox[0.85in][l]{{\bf{-v}}                  } & \makebox[2.76in][l]{Print extra details for some operators} \\ %\hline
-\makebox[0.85in][l]{{\bf{-z}} szip             } & \makebox[2.76in][l]{SZIP compression of GRIB1 records} \\ \hline
-% \makebox[0.85in][l]{{\bf{\ \ }} jpeg            } & \makebox[2.76in][l]{JPEG compression of GRIB2 records} \\ %\hline
-% \makebox[0.85in][l]{{\bf{\ \ }} zip            } & \makebox[2.76in][l]{Deflate compression of NetCDF4 variables} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-V}}                  } & \makebox[2.76in][l]{Print the version number} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-v}}                  } & \makebox[2.76in][l]{Print extra details for some operators} \\ %\hline
+\makebox[0.85in][l]{{\textbf{-z}} szip             } & \makebox[2.76in][l]{SZIP compression of GRIB1 records} \\ \hline
+% \makebox[0.85in][l]{{\textbf{\ \ }} jpeg            } & \makebox[2.76in][l]{JPEG compression of GRIB2 records} \\ %\hline
+% \makebox[0.85in][l]{{\textbf{\ \ }} zip            } & \makebox[2.76in][l]{Deflate compression of NetCDF4 variables} \\ %\hline
 \end{tabular*}
 

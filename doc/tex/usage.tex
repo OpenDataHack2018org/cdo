@@ -13,9 +13,9 @@ All options have to be placed before the first operator.
 The following options are available for all operators:
 
 \begin{tabbing}
-\makebox[1.5in][l]{\hspace*{1cm}\sl -a}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-a}}
          \= Generate an absolute time axis. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -b $<$nbits$>$}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-b $<$nbits$>$}}
          \> Set the number of bits for the output precision. The valid precisions depend \\
          \> on the file format:\\
          \> \parbox[r]{3in}{
@@ -23,104 +23,104 @@ The following options are available for all operators:
               \hspace*{0cm}\begin{tabular}{|l|l|}
               \hline
               \rowcolor{pcolor2}
-                \sl $<$format$>$ & \sl $<$nbits$>$ \\
-                {\tt grb1, grb2}           & {\tt P1 - P24}              \\
-                {\tt nc1, nc2, nc4, nc4c}  & {\tt I8/I16/I32/F32/F64}  \\
-                {\tt grb2, srv, ext, ieg}       & {\tt F32/F64}             \\
+                \textsl{$<$format$>$} & \textsl{$<$nbits$>$} \\
+                \texttt{grb1, grb2}           & \texttt{P1 - P24}              \\
+                \texttt{nc1, nc2, nc4, nc4c}  & \texttt{I8/I16/I32/F32/F64}  \\
+                \texttt{grb2, srv, ext, ieg}       & \texttt{F32/F64}             \\
               \hline
               \end{tabular}
               \vspace*{1mm}
             } \\
-         \> For {\tt srv}, {\tt ext} and {\tt ieg} format the letter {\tt L} or {\tt B} can be added to set the byteorder \\
-         \> to {\tt L}ittle or {\tt B}ig endian. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-cmor}
+         \> For \texttt{srv}, \texttt{ext} and \texttt{ieg} format the letter \texttt{L} or \texttt{B} can be added to set the byteorder \\
+         \> to \texttt{L}ittle or \texttt{B}ig endian. \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-cmor}}
          \> CMOR conform NetCDF output. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -C, -\,-color}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-C, -\,-color}}
          \> Colorized output messages. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -f $<$format$>$}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-f $<$format$>$}}
          \> Set the output file format. The valid file formats are: \\
          \> \parbox[r]{3in}{
               \vspace*{1mm}
               \hspace*{0cm}\begin{tabular}{|l|l|}
               \hline
               \rowcolor{pcolor2}
-              {\bf File format}          & \sl $<$format$>$ \\
-               GRIB version 1            & {\tt grb1/grb}  \\
-               GRIB version 2            & {\tt grb2} \\
-               NetCDF                    & {\tt nc1}   \\
-               NetCDF version 2 (64-bit) & {\tt nc2/nc}  \\
-               NetCDF-4 (HDF5)           & {\tt nc4}  \\
-               NetCDF-4 classic          & {\tt nc4c} \\
-               SERVICE                   & {\tt srv}  \\
-               EXTRA                     & {\tt ext}  \\
-               IEG                       & {\tt ieg}  \\
+              \textbf{File format}          & \textsl{$<$format$>$}\\
+               GRIB version 1            & \texttt{grb1/grb}  \\
+               GRIB version 2            & \texttt{ grb2} \\
+               NetCDF                    & \texttt{nc1}   \\
+               NetCDF version 2 (64-bit) & \texttt{nc2/nc}  \\
+               NetCDF-4 (HDF5)           & \texttt{nc4}  \\
+               NetCDF-4 classic          & \texttt{nc4c} \\
+               SERVICE                   & \texttt{srv}  \\
+               EXTRA                     & \texttt{ext}  \\
+               IEG                       & \texttt{ieg}  \\
               \hline
               \end{tabular}
               \vspace*{1mm}
             } \\
          \> GRIB2 is only available if {\CDO} was compiled with GRIB\_API support and all \\
          \> NetCDF file types are only available if {\CDO} was compiled with NetCDF support! \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -g $<$grid$>$}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-g $<$grid$>$}}
          \> Define the default grid description by name or from file (see chapter 1.3 on page \pageref{GRID_DESCRIPTION}). \\
-         \> Available grid names are: {\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>}, {\tt gme<NI>} \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -h, -\,-help}
+         \> Available grid names are: \texttt{r<NX>x<NY>}, \texttt{lon=<LON>/lat=<LAT>}, \texttt{n<N>}, \texttt{gme<NI>} \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-h, -\,-help}}
          \> Help information for the operators. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-no\_history}
-         \> Do not append to NetCDF {\it history} global attribute. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-netcdf\_hdr\_pad, -\,-hdr\_pad, -\,-header\_pad $<$nbr$>$}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-no\_history}}
+         \> Do not append to NetCDF \textit{history} global attribute. \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-netcdf\_hdr\_pad, -\,-hdr\_pad, -\,-header\_pad $<$nbr$>$}}
          \> \\
 \makebox[1.5in][l]{\hspace*{1cm}}
-         \> Pad NetCDF output header with {\it nbr} bytes. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -k $<$chunktype$>$}
+         \> Pad NetCDF output header with \textit{nbr} bytes. \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-k $<$chunktype$>$}}
          \> NetCDF4 chunk type: auto, grid or lines. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -L}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-L}}
          \> Lock I/O (sequential access). \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -M}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-M}}
          \> Switch to indicate that the I/O streams have missing values. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -m $<$missval$>$}
-         \> Set the missing value of non NetCDF files (default: {\tt-9e+33}). \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -O}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-m $<$missval$>$}}
+         \> Set the missing value of non NetCDF files (default: \texttt{-9e+33}). \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-O}}
          \> Overwrite existing output file, if checked. \\
-         \> Existing output file is checked only for: {\tt ens<STAT>}, {\tt merge}, {\tt mergetime} \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-operators}
+         \> Existing output file is checked only for: \texttt{ens<STAT>}, \texttt{merge}, \texttt{mergetime} \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-operators}}
          \> List of all operators. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -P $<$nthreads$>$}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-P $<$nthreads$>$}}
          \> Set number of OpenMP threads (Only available if OpenMP support was compiled in). \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-percentile $<$method$>$}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-percentile $<$method$>$}}
          \> \\
 \makebox[1.5in][l]{\hspace*{1cm}}
-         \> Percentile method: {\tt nrank nist numpy numpy\_lower numpy\_higher numpy\_nearest} \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-reduce\_dim}
+         \> Percentile method: \texttt{nrank nist numpy numpy\_lower numpy\_higher numpy\_nearest} \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-reduce\_dim}}
          \> Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT). \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -R, -\,-regular}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-R, -\,-regular}}
          \> Convert GRIB1 data from reduced to regular grid (only with cgribex lib). \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -r}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-r}}
          \> Generate a relative time axis. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -S}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-S}}
          \> Create an extra output stream for the module TIMSTAT. This stream contains  \\
          \> the number of non missing values for each output period. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -s, -\,-silent}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-s, -\,-silent}}
          \> Silent mode. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-sort}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-sort}}
          \> Alphanumeric sorting of NetCDF parameter names. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -t $<$partab$>$}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-t $<$partab$>$}}
          \> Set the GRIB1 (cgribex) default parameter table name or file (see chapter 1.6 on page \pageref{PARAMETER_TABLE}).\\
-         \> Predefined tables are:  {\tt echam4 echam5 echam6 mpiom1 ecmwf remo}\\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -\,-timestat\_date $<$srcdate$>$}
+         \> Predefined tables are:  \texttt{echam4 echam5 echam6 mpiom1 ecmwf remo}\\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-\,-timestat\_date $<$srcdate$>$}}
          \> \\
 \makebox[1.5in][l]{\hspace*{1cm}}
-         \> Target timestamp (time statistics): {\tt first, middle, midhigh} or {\tt last} source timestep. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -V, -\,-version}
+         \> Target timestamp (time statistics): \texttt{first, middle, midhigh} or \texttt{last} source timestep. \\
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-V, -\,-version}}
          \> Print the version number. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -v, -\,-verbose}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-v, -\,-verbose}}
          \> Print extra details for some operators. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -W}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-W}}
          \> Print extra warning messages. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -z szip}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{-z szip}}
          \> SZIP compression of GRIB1 records. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl \ \ jpeg}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{\ \ jpeg}}
          \> JPEG compression of GRIB2 records. \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl \ \ zip[\_1-9]}
+\makebox[1.5in][l]{\hspace*{1cm}\textsl{\ \ zip[\_1-9]}}
          \> Deflate compression of NetCDF4 variables. \\
 \end{tabbing}
 %\footnotemark
@@ -143,9 +143,9 @@ C shell (csh):        & setenv CDO\_RESET\_HISTORY 1 \\
 \subsection{Operators}
 
 There are more than 700 operators available.
-% See section {\bf \htmlref{Operator catalog}{opercat}} for a short overview of all operators.
+% See section \textbf{\htmlref{Operator catalog}{opercat}} for a short overview of all operators.
 A detailed description of all operators can be found in the
-{\bf \htmlref{Reference Manual}{refman}} section.
+\textbf{\htmlref{Reference Manual}{refman}} section.
 
 
 \subsection{Operator chaining}
@@ -170,20 +170,20 @@ instead of
    rm tmp1 tmp2
 \end{verbatim}
 
-{\bf Note:}
+\textbf{Note:}
 Operator chaining is implemented over POSIX Threads (pthreads).
 Therefore this {\CDO} feature is not available on operating systems without POSIX Threads support!
 
-All operators with an arbitrary number of input streams ({\tt ifiles})
+All operators with an arbitrary number of input streams (\texttt{ifiles})
 can't be combined with other operators if these operators are used
 with more than one input stream. Here is an incomplete list of
 these operators:
-{\bf \htmlref{copy}{copy}},
-{\bf \htmlref{cat}{cat}},
-{\bf \htmlref{merge}{merge}},
-{\bf \htmlref{mergetime}{mergetime}},
-{\bf \htmlref{select}{select}},
-{\bf \htmlref{ens$<\!STAT\!>$}{ENSSTAT}} \\
+\textbf{\htmlref{copy}{copy}},
+\textbf{\htmlref{cat}{cat}},
+\textbf{\htmlref{merge}{merge}},
+\textbf{\htmlref{mergetime}{mergetime}},
+\textbf{\htmlref{select}{select}},
+\textbf{\htmlref{ens$<\!STAT\!>$}{ENSSTAT}} \\
 Use single quotes if the input stream names are generated with
 wildcards. In this case CDO will do the pattern matching and the
 output can be combined with other operators. Here is an example for
@@ -192,18 +192,18 @@ this feature:
    cdo timavg -select,name=temperature 'ifile?' ofile
 \end{verbatim}
 
-The CDO internal wildcard expansion is using the {\it glob()} function. 
-Therefore internal wildcard expansion is not available on operating systems without the {\it glob()} function!
+The CDO internal wildcard expansion is using the \textit{glob()} function. 
+Therefore internal wildcard expansion is not available on operating systems without the \textit{glob()} function!
 
 All operators with one input stream will process only one input
 stream! You need to take care when mixing those operators with
 operator with an arbitrary number of input streams. 
 The following examples illustrate this problem.
 \begin{enumerate}
-\item {\tt cdo info -timavg ifile?}
-\item {\tt cdo info -timavg ifile1 ifile2}
-\item {\tt cdo timavg ifile1 tmpfile} \\
-{\tt cdo info tmpfile ifile2}
+\item \texttt{cdo info -timavg ifile?}
+\item \texttt{cdo info -timavg ifile1 ifile2}
+\item \texttt{cdo timavg ifile1 tmpfile} \\
+\texttt{cdo info tmpfile ifile2}
 \end{enumerate}
  All three examples produce identical results. 
 The time average will be computed only on the first input file. 
@@ -211,7 +211,7 @@ The time average will be computed only on the first input file.
 
 Some of the {\CDO} operators are shared memory parallelized with OpenMP.
 An OpenMP-enabled C compiler is needed to use this feature.
-Users may request a specific number of OpenMP threads {\tt nthreads} with the '{\tt -P}' switch.
+Users may request a specific number of OpenMP threads \texttt{nthreads} with the ' \texttt{-P}' switch.
 
 Here is an example to distribute the bilinear interpolation on 8 OpenMP threads:
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor2}, basicstyle=\ttfamily, columns=flexible]
@@ -230,7 +230,7 @@ Some operators need one or more parameter. A list of parameter is indicated by t
 \item STRING
 
 Unquoted characters without blanks and tabs.
-The following command select variables with the name {\tt pressure} and {\tt tsurf}:
+The following command select variables with the name \texttt{pressure} and \texttt{tsurf}:
 \begin{verbatim}
    cdo selvar,pressure,tsurf ifile ofile
 \end{verbatim}
@@ -238,7 +238,7 @@ The following command select variables with the name {\tt pressure} and {\tt tsu
 \item FLOAT
 
 Floating point number in any representation.
-The following command sets the range between {\tt 0} and {\tt 273.15}
+The following command sets the range between \texttt{0} and \texttt{273.15}
 of all fields to missing value:
 \begin{verbatim}
    cdo setrtomiss,0,273.15 ifile ofile
@@ -246,7 +246,7 @@ of all fields to missing value:
 
 \item INTEGER
 
-A range of integer parameter can be specified by {\it first}/{\it last}[/{\it inc}].
+A range of integer parameter can be specified by \textit{first}/\textit{last}[/\textit{inc}].
 To select the days 5, 6, 7, 8 and 9 use:
 \begin{verbatim}
    cdo selday,5/9 ifile ofile
@@ -278,6 +278,6 @@ The result is the same as:
 % \begin{itemize}
 % \item Converts single value vertical coordinate to scalar coordinate variable
 % \item Stores hybrid sigma pressure level conform to the CF convention
-% \item Generates new {\tt tracking\_id} attribute
-% \item Generates new {\tt creation\_date} attribute
+% \item Generates new \texttt{tracking\_id} attribute
+% \item Generates new \texttt{creation\_date} attribute
 % \end{itemize}

@@ -29,10 +29,10 @@ o(4,x) = min{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{min}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{min}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{min}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{min}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -53,10 +53,10 @@ o(4,x) = max{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -77,10 +77,10 @@ o(4,x) = sum{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{sum}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{sum}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{sum}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{sum}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -101,10 +101,10 @@ o(4,x) = mean{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{mean}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{mean}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{mean}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{mean}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -125,10 +125,10 @@ o(4,x) = avg{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{avg}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{avg}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{avg}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{avg}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -149,10 +149,10 @@ o(4,x) = var{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{var}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{var}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{var}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{var}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -173,10 +173,10 @@ o(4,x) = var1{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf var1}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf var1}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf var1}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf var1}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{var1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{var1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{var1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{var1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -197,10 +197,10 @@ o(4,x) = std{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{std}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{std}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{std}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{std}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -221,10 +221,10 @@ o(4,x) = std1{i(t,x), month(i(t)) = 09, 10, 11}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf std1}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf std1}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf std1}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf std1}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+o(\mbox{1},x) = \mbox{\textbf{std1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\textbf{std1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\textbf{std1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\textbf{std1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc

@@ -27,7 +27,7 @@ o(t,1) = min{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf min}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{min}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -46,7 +46,7 @@ o(t,1) = max{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf max}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{max}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -65,7 +65,7 @@ o(t,1) = sum{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf sum}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{sum}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -84,7 +84,7 @@ o(t,1) = mean{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf mean}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{mean}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
@@ -104,7 +104,7 @@ o(t,1) = avg{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf avg}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{avg}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
@@ -124,7 +124,7 @@ o(t,1) = var{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 Normalize by n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf var}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{var}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
@@ -144,7 +144,7 @@ o(t,1) = var1{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 Normalize by (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf var1}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{var1}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
@@ -164,7 +164,7 @@ o(t,1) = std{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 Normalize by n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf std}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{std}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
@@ -184,7 +184,7 @@ o(t,1) = std1{i(t,x'), x_1<x'<=x_n}
 @IfDoc
 Normalize by (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf std1}\{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{std1}}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
@@ -205,7 +205,7 @@ o(t,1) = pth percentile {i(t,x'), x_1<x'<=x_n}
 @IfDoc
 For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
-o(t,1) = \mbox{\bf pth percentile} \{i(t,x'), x_1 < x' \leq x_n\}
+o(t,1) = \mbox{\textbf{pth percentile}} \{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 @EndDescription

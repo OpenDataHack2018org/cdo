@@ -36,9 +36,9 @@ o(12,x) = pth percentile {i(t,x), month(i(t)) = 12}
 
 @BeginMath
 \begin{array}{c}
-o(\mbox{01},x) = \mbox{\bf pth percentile}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
+o(\mbox{01},x) = \mbox{\textbf{pth percentile}}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
 \vdots \\
-o(\mbox{12},x) = \mbox{\bf pth percentile}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
+o(\mbox{12},x) = \mbox{\textbf{pth percentile}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc

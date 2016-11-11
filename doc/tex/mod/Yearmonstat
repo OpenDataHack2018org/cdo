@@ -26,7 +26,7 @@ o(t,x) = mean{i(t',x), t_1<t'<=t_n}
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same year it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{mean}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

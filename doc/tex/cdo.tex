@@ -98,8 +98,8 @@ keepaspectratio]{cdo_libdep.pdf}}%
 %cat > cdo.ist << 'EOF'
 %delim_0        "{\\idxdotfill} "
 %headings_flag  1
-%heading_prefix "{\\centerline {\\Large \\bf "
-%heading_suffix "}}"
+%heading_prefix "{\\centerline {\\Large \\textbf{"
+%heading_suffix "}}}"
 %EOF
 %makeindex -s cdo.ist cdo.idx
 %pdflatex cdo
@@ -188,7 +188,7 @@ keepaspectratio]{cdo_libdep.pdf}}%
 \begin{titlepage}
 \vspace*{50mm}
 %\vspace*{25mm}
-{\Huge{\CDO}} \ {\Huge\bf User's Guide}
+{\Huge{\CDO}} \ {\Huge \textbf{User's Guide}}
 
 \setlength{\unitlength}{1cm}
 \begin{picture}(16,0.4)
@@ -198,15 +198,12 @@ keepaspectratio]{cdo_libdep.pdf}}%
 \end{picture}
 
 \begin{flushright}
-\large\bf{Climate Data Operators \\ Version 1.8.0 \\ October 2016}
+\large \textbf{Climate Data Operators \\ Version 1.8.0 \\ January 2017}
 \end{flushright}
 
 \vfill
 
-\Large{\bf Uwe Schulzweida -- \sl MPI for Meteorology}
-%\Large{\bf Uwe Schulzweida, Luis Kornblueh -- \sl MPI for Meteorology}
-
-%\Large{\bf Ralf Quast -- \sl Brockmann Consult}
+\Large{\textbf{Uwe Schulzweida} -- \textsl{MPI for Meteorology}}
 
 \begin{picture}(16,1)
 \linethickness{1.0mm}

@@ -34,9 +34,9 @@ o(366,x) = pth percentile {i(t,x), day(i(t)) = 366}
 
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\textbf{pth percentile}} \{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\textbf{pth percentile}} \{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc

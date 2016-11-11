@@ -29,9 +29,9 @@ o(t,x) = <    0   if i(t,x) NE c     AND  i(t,x),c NE miss
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) = \mbox{c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}      \\
-  0   & \mbox{if} \;\; i(t,x) \neq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
+  1   & \mbox{if} \;\; i(t,x) = \mbox{c}    & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}      \\
+  0   & \mbox{if} \;\; i(t,x) \neq \mbox{\textsl{c}} & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+ \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\textsl{c}} = \mbox{miss}          \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -53,9 +53,9 @@ o(t,x) = <    0   if i(t,x) EQ c     AND  i(t,x),c NE miss
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) \neq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) = \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
+  1   & \mbox{if} \;\; i(t,x) \neq \mbox{\textsl{c}} & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+  0   & \mbox{if} \;\; i(t,x) = \mbox{\textsl{c}}    & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+ \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\textsl{c}} = \mbox{miss}          \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -77,9 +77,9 @@ o(t,x) = <    0   if i(t,x) GT c     AND  i(t,x),c NE miss
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) \leq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) > \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
+  1   & \mbox{if} \;\; i(t,x) \leq \mbox{\textsl{c}} & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+  0   & \mbox{if} \;\; i(t,x) > \mbox{\textsl{c}}    & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+ \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\textsl{c}} = \mbox{miss}          \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -101,9 +101,9 @@ o(t,x) = <    0   if i(t,x) GE c     AND  i(t,x),c NE miss
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) < \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
+  1   & \mbox{if} \;\; i(t,x) < \mbox{\textsl{c}}    & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+  0   & \mbox{if} \;\; i(t,x) \geq \mbox{\textsl{c}} & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+ \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\textsl{c}} = \mbox{miss}          \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -125,9 +125,9 @@ o(t,x) = <    0   if i(t,x) LT c     AND  i(t,x),c NE miss
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) < \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
+  1   & \mbox{if} \;\; i(t,x) \geq \mbox{\textsl{c}} & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+  0   & \mbox{if} \;\; i(t,x) < \mbox{\textsl{c}}    & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+ \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\textsl{c}} = \mbox{miss}          \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -149,9 +149,9 @@ o(t,x) = <    0   if i(t,x) LE c     AND  i(t,x),c NE miss
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) > \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) \leq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
+  1   & \mbox{if} \;\; i(t,x) > \mbox{\textsl{c}}    & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+  0   & \mbox{if} \;\; i(t,x) \leq \mbox{\textsl{c}} & \wedge \;\; i(t,x), \mbox{\textsl{c}} \neq \mbox{miss}  \\
+ \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\textsl{c}} = \mbox{miss}          \\
 \end{array}   \right.
 @EndMath
 @EndifDoc

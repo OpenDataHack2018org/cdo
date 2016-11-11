@@ -103,7 +103,7 @@ variables into one separate file use:
 @BeginVerbatim
    cdo splitmon ifile mon
 @EndVerbatim
-Result of '{\tt dir mon*}':
+Result of '\texttt{dir mon*}':
 @BeginListing
    mon01.grb  mon02.grb  mon03.grb  mon04.grb  mon05.grb  mon06.grb
    mon07.grb  mon08.grb  mon09.grb  mon10.grb  mon11.grb  mon12.grb

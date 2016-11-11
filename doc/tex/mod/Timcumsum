@@ -1,0 +1,30 @@
+BeginModule
+@NewPage
+@Name      = Timcumsum
+@Title     = Cumulative sum over all timesteps
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = timcumsum
+
+@BeginDescription
+The timcumsum operator calculates the cumulative sum over all timesteps.
+Missing values are treated as numeric zero when summing.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_timcumsum
+@Title     = Cumulative sum over all timesteps
+
+@BeginDescription
+@IfMan
+o(t,x) = sum{i(t',x), 0<t'<=t}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\textbf{sum}}\{i(t',x), 0 < t' \leq t\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator

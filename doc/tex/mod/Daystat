@@ -28,7 +28,7 @@ o(t,x) = min{i(t',x), t_1<t'<=t_n}
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{min}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -47,7 +47,7 @@ o(t,x) = max{i(t',x), t_1<t'<=t_n}
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{max}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -66,7 +66,7 @@ o(t,x) = sum{i(t',x), t_1<t'<=t_n}
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{sum}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -85,7 +85,7 @@ o(t,x) = mean{i(t',x), t_1<t'<=t_n}
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{mean}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -104,7 +104,7 @@ o(t,x) = avg{i(t',x), t_1<t'<=t_n}
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{avg}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -123,7 +123,7 @@ o(t,x) = var{i(t',x), t_1<t'<=t_n}
 @IfDoc
 Normalize by n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{var}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -142,7 +142,7 @@ o(t,x) = var1{i(t',x), t_1<t'<=t_n}
 @IfDoc
 Normalize by (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{var1}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -161,7 +161,7 @@ o(t,x) = std{i(t',x), t_1<t'<=t_n}
 @IfDoc
 Normalize by n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{std}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -180,7 +180,7 @@ o(t,x) = std1{i(t',x), t_1<t'<=t_n}
 @IfDoc
 Normalize by (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{std1}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

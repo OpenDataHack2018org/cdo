@@ -27,7 +27,7 @@ o(t,x) = min{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf min}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{min}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -42,7 +42,7 @@ o(t,x) = max{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf max}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{max}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -58,7 +58,7 @@ o(t,x) = sum{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf sum}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{sum}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -74,7 +74,7 @@ o(t,x) = mean{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf mean}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{mean}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -90,7 +90,7 @@ o(t,x) = avg{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf avg}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{avg}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -108,7 +108,7 @@ o(t,x) = std{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf std}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{std}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -126,7 +126,7 @@ o(t,x) = std1{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf std1}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{std1}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -144,7 +144,7 @@ o(t,x) = var{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf var}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{var}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -162,7 +162,7 @@ o(t,x) = var1{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf var1}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{var1}}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -179,7 +179,7 @@ o(t,x) = pth percentile {i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf pth percentile} \{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\textbf{pth percentile}} \{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription

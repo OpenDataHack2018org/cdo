@@ -49,25 +49,25 @@ As now described, there are several possibilities to define a horizontal grid.
 
 Predefined grids are available for global regular, gaussian or icosahedral-hexagonal GME grids.
 % They have the following predefined grid names: 
-%{\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>} and {\tt gme<NI>}
+%\texttt{r<NX>x<NY>}, \texttt{lon=<LON>/lat=<LAT>}, \texttt{n<N>} and \texttt{gme<NI>}
 
-\subsubsection*{Global regular grid: {\tt global\_<DXY>}}
-    {\tt global\_<DXY>} defines a global regular lon/lat grid.
-    The grid increment {\tt <DXY>} can be selected at will.
-    The longitudes start at {\tt  <DXY>}/2 - 180$^\circ$ and the
-    latitudes start at {\tt <DXY>}/2 - 90$^\circ$.
+\subsubsection*{Global regular grid: \texttt{global\_<DXY>}}
+    \texttt{global\_<DXY>} defines a global regular lon/lat grid.
+    The grid increment \texttt{<DXY>} can be selected at will.
+    The longitudes start at \texttt{<DXY>}/2 - 180$^\circ$ and the
+    latitudes start at \texttt{<DXY>}/2 - 90$^\circ$.
 
-\subsubsection*{Global regular grid: {\tt r<NX>x<NY>}}
-    {\tt r<NX>x<NY>} defines a global regular lon/lat grid.
-    The number of the longitudes {\tt <NX>} and the latitudes {\tt <NY>} can be selected at will.
-    The longitudes start at 0$^\circ$ with an increment of (360/{\tt <NX>})$^\circ$.
-    The latitudes go from south to north with an increment of (180/{\tt <NY>})$^\circ$.
+\subsubsection*{Global regular grid: \texttt{r<NX>x<NY>}}
+    \texttt{r<NX>x<NY>} defines a global regular lon/lat grid.
+    The number of the longitudes \texttt{<NX>} and the latitudes \texttt{<NY>} can be selected at will.
+    The longitudes start at 0$^\circ$ with an increment of (360/\texttt{<NX>})$^\circ$.
+    The latitudes go from south to north with an increment of (180/\texttt{<NY>})$^\circ$.
 
-\subsubsection*{One grid point: {\tt lon=<LON>/lat=<LAT>}}
-    {\tt lon=<LON>/lat=<LAT>} defines a lon/lat grid with only one grid point.
+\subsubsection*{One grid point: \texttt{lon=<LON>/lat=<LAT>}}
+    \texttt{lon=<LON>/lat=<LAT>} defines a lon/lat grid with only one grid point.
 
-\subsubsection*{Global Gaussian grid: {\tt n<N>}}
-    {\tt n<N>} defines a global Gaussian grid. {\tt N} specifies the number of
+\subsubsection*{Global Gaussian grid: \texttt{n<N>}}
+    \texttt{n<N>} defines a global Gaussian grid. \texttt{N} specifies the number of
     latitudes lines between the Pole and the Equator.
     The longitudes start at 0$^\circ$ with an increment of (360/nlon)$^\circ$.
     The gaussian latitudes go from north to south.
@@ -76,9 +76,9 @@ Predefined grids are available for global regular, gaussian or icosahedral-hexag
 %    t$<$RES$>$spec defines the spectral coefficients of a global gaussian grid.
 %    Each valid triangular resolution can be used for $<$RES$>$.
 
-\subsubsection*{Global icosahedral-hexagonal GME grid: {\tt gme<NI>}}
-    {\tt gme<NI>} defines a global icosahedral-hexagonal GME grid.
-    {\tt NI} specifies the number of intervals on a main triangle side.
+\subsubsection*{Global icosahedral-hexagonal GME grid: \texttt{gme<NI>}}
+    \texttt{gme<NI>} defines a global icosahedral-hexagonal GME grid.
+    \texttt{NI} specifies the number of intervals on a main triangle side.
 
 \subsubsection{Grids from data files}
 
@@ -167,24 +167,24 @@ The following keywords can be used to describe a grid:
 \vspace{3mm}
 \begin{tabular}[b]{lll}
 Keyword           & Datatype     & Description \\ \hline
-\bf{gridtype}     & STRING       & Type of the grid (gaussian, lonlat, curvilinear, unstructured). \\
-\bf{gridsize}     & INTEGER      & Size of the grid. \\
-\bf{xsize}        & INTEGER      & Size in x direction (number of longitudes). \\
-\bf{ysize}        & INTEGER      & Size in y direction (number of latitudes). \\
-\bf{xvals}        & FLOAT ARRAY  & X values of the grid cell center. \\
-\bf{yvals}        & FLOAT ARRAY  & Y values of the grid cell center.\\
-\bf{nvertex}      & INTEGER      & Number of the vertices for all grid cells. \\
-\bf{xbounds}      & FLOAT ARRAY  & X bounds of each gridbox. \\
-\bf{ybounds}      & FLOAT ARRAY  & Y bounds of each gridbox. \\
+\textbf{gridtype}     & STRING       & Type of the grid (gaussian, lonlat, curvilinear, unstructured). \\
+\textbf{gridsize}     & INTEGER      & Size of the grid. \\
+\textbf{xsize}        & INTEGER      & Size in x direction (number of longitudes). \\
+\textbf{ysize}        & INTEGER      & Size in y direction (number of latitudes). \\
+\textbf{xvals}        & FLOAT ARRAY  & X values of the grid cell center. \\
+\textbf{yvals}        & FLOAT ARRAY  & Y values of the grid cell center.\\
+\textbf{nvertex}      & INTEGER      & Number of the vertices for all grid cells. \\
+\textbf{xbounds}      & FLOAT ARRAY  & X bounds of each gridbox. \\
+\textbf{ybounds}      & FLOAT ARRAY  & Y bounds of each gridbox. \\
 %xname        & STRING       & name of the x axis \\
 %xlongname    & STRING       & longname of the x axis \\
 %xunits       & STRING       & units of the x axis \\
 %yname        & STRING       & name of the y axis \\
 %ylongname    & STRING       & longname of the y axis \\
 %yunits       & STRING       & units of the y axis \\
-\bf{xfirst, xinc} & FLOAT, FLOAT & Macros to define xvals with a constant increment, \\
+\textbf{xfirst, xinc} & FLOAT, FLOAT & Macros to define xvals with a constant increment, \\
                          &                         & xfirst is the x value of the first grid cell center. \\
-\bf{yfirst, yinc} & FLOAT, FLOAT & Macros to define yvals with a constant increment, \\
+\textbf{yfirst, yinc} & FLOAT, FLOAT & Macros to define yvals with a constant increment, \\
                          &                         & yfirst is the y value of the first grid cell center. \\
 \end{tabular}
 
@@ -219,17 +219,17 @@ with respect to the different grid types.
 \cellcolor{pcolor2}
 gridtype   & lonlat      & gaussian    & curvilinear & unstructured \\
 \hline
-gridsize   & xsize*ysize & xsize*ysize & xsize*ysize & {\bf ncell} \\
+gridsize   & xsize*ysize & xsize*ysize & xsize*ysize & \textbf{ncell} \\
 \hline
-xsize      & {\bf nlon} & {\bf nlon} & {\bf nlon} & gridsize \\
+xsize      & \textbf{nlon} & \textbf{nlon} & \textbf{nlon} & gridsize \\
 \hline
-ysize      & {\bf nlat} & {\bf nlat} & {\bf nlat} & gridsize \\
+ysize      & \textbf{nlat} & \textbf{nlat} & \textbf{nlat} & gridsize \\
 \hline
 xvals      & xsize & xsize & gridsize & gridsize \\
 \hline
 yvals      & ysize & ysize & gridsize & gridsize \\
 \hline
-nvertex    & 2 & 2 & 4 & {\bf nv} \\
+nvertex    & 2 & 2 & 4 & \textbf{nv} \\
 \hline
 xbounds    & 2*xsize & 2*xsize & 4*gridsize & nv*gridsize \\
 \hline

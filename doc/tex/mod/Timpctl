@@ -30,7 +30,7 @@ o(1,x) = pth percentile {i(t',x), t_1<t'<=t_n}
 @IfDoc
 \vspace*{5mm}
 @BeginMath
-o(1,x) = \mbox{\bf pth percentile} \{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{pth percentile}} \{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

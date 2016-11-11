@@ -31,7 +31,7 @@ method               & \multirow{-2}{*}{Description} \\
 
 \vspace{3mm}
 
-The percentile method can be selected with the {\CDO} option {\tt -\,-percentile}.
+The percentile method can be selected with the {\CDO} option \texttt{-\,-percentile}.
 The Nearest Rank method is the default percentile method in {\CDO}.
 
 The different percentile methods can lead to different results,
@@ -73,5 +73,5 @@ All data values need to held in memory to calculate the percentile.
 The percentile over timesteps uses a histogram algorithm, to limit the
 amount of required memory. The default number of histogram bins is 101.
 That means the histogram algorithm is used, when the dataset has more than 101 time steps.
-The default can be overridden by setting the environment variable {\tt CDO\_PCTL\_NBINS} to a different value.
+The default can be overridden by setting the environment variable \texttt{CDO\_PCTL\_NBINS} to a different value.
 The histogram algorithm is implemented only for the Nearest Rank method.

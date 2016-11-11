@@ -27,9 +27,9 @@ o(8784,x) = min{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{min}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{min}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -49,9 +49,9 @@ o(8784,x) = max{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{max}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -71,9 +71,9 @@ o(8784,x) = sum{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf sum}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{sum}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf sum}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{sum}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -93,9 +93,9 @@ o(8784,x) = mean{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{mean}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{mean}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -115,9 +115,9 @@ o(8784,x) = avg{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{avg}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{avg}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -139,9 +139,9 @@ o(8784,x) = var{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{var}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{var}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -163,9 +163,9 @@ o(8784,x) = var1{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf var1}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{var1}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf var1}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{var1}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -187,9 +187,9 @@ o(8784,x) = std{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{std}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{std}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -211,9 +211,9 @@ o(8784,x) = std1{i(t,x), day(i(t)) = 8784}
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{0001},x) = \mbox{\bf std1}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+o(\mbox{0001},x) = \mbox{\textbf{std1}}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
 \vdots \\
-o(\mbox{8784},x) = \mbox{\bf std1}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+o(\mbox{8784},x) = \mbox{\textbf{std1}}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 \end{array}
 @EndMath
 @EndifDoc

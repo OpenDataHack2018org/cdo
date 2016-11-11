@@ -38,8 +38,8 @@ The Fortran and NetCDF support can be disabled when building Magics from source.
 
 \section{Compilation}
 
-First go to the {\CDO}  \href{https://code.zmaw.de/projects/cdo}{\tt download} page
-({\tt https://code.zmaw.de/projects/cdo}) to get the latest distribution,
+First go to the {\CDO}  \href{https://code.zmaw.de/projects/cdo}{\texttt{download}} page
+(\texttt{https://code.zmaw.de/projects/cdo}) to get the latest distribution,
 if you do not have it yet.
 Compilation is done by performing the following steps:
 
@@ -72,19 +72,19 @@ For an overview of other configuration options use
 
 \end{enumerate}
 
-The program should compile without problems and the binary ({\tt cdo}) 
-should be available in the {\tt src} directory of the distribution.
+The program should compile without problems and the binary (\texttt{cdo}) 
+should be available in the \texttt{src} directory of the distribution.
 
 
 \section{Installation}
 
-After the compilation of the source code do a {\tt make install},
+After the compilation of the source code do a \texttt{make install},
 possibly as root if the destination permissions require that.
 
 \begin{verbatim}
     make install
 \end{verbatim} 
 
-The binary is installed into the directory {\tt $<$prefix$>$/bin}.
-{\tt $<$prefix$>$} defaults to {\tt /usr/local} but can be changed with 
-the {\tt --prefix} option of the configure script. 
+The binary is installed into the directory \texttt{$<$prefix$>$/bin}.
+\texttt{$<$prefix$>$} defaults to \texttt{/usr/local} but can be changed with 
+the \texttt{--prefix} option of the configure script. 

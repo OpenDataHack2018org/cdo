@@ -80,8 +80,8 @@
 %cat > cdo.ist << 'EOF'
 %delim_0        "{\\idxdotfill} "
 %headings_flag  1
-%heading_prefix "{\\centerline {\\Large \\bf "
-%heading_suffix "}}"
+%heading_prefix "{\\centerline {\\Large \\textbf{"
+%heading_suffix "}}}"
 %EOF
 %makeindex -s cdo.ist cdo.idx
 %pdflatex cdo
@@ -168,7 +168,7 @@
 
 \begin{titlepage}
 \vspace*{50mm}
-{\Huge{\bf CMOR support in \CDO}}
+{\Huge\textbf{CMOR support in \CDO}}
 
 \setlength{\unitlength}{1cm}
 \begin{picture}(16,0.4)
@@ -177,18 +177,18 @@
 \put(0,0.1){\line(1,0){16.3}}
 \end{picture}
 \begin{flushright}
-\large\bf{CMORizing of climate model data \\ October 2016}
+\large\textbf{CMORizing of climate model data \\ January 2017}
 \end{flushright}
 
 \vfill
 
-\Large{\bf Karl--Hermann Wieners, Uwe Schulzweida}
+\Large\textbf{Karl--Hermann Wieners, Uwe Schulzweida}
 
-\Large{\sl Max Planck Institute for Meteorology}
+\Large\textsl{Max Planck Institute for Meteorology}
 
-\Large{\bf Mathis Rosenhauer}
+\Large\textbf{Mathis Rosenhauer}
 
-\Large{\sl Deutsches Klimarechenzentrum (DKRZ)}
+\Large\textsl{Deutsches Klimarechenzentrum (DKRZ)}
 
 \begin{picture}(16,1)
 \linethickness{1.0mm}

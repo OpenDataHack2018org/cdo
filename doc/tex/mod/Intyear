@@ -50,7 +50,7 @@ To interpolate the years between 1985 and 1990 month by month use:
 @BeginVerbatim
    cdo intyear,1986,1987,1988,1989 ifile1 ifile2 year
 @EndVerbatim
-Example result of '{\tt dir year*}' for NetCDF datasets:
+Example result of '\texttt{dir year*}' for NetCDF datasets:
 @BeginListing
    year1986.nc year1987.nc year1988.nc year1989.nc
 @EndListing
