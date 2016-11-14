@@ -140,12 +140,12 @@ void *Comp(void *argument)
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-	      vardata[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
+	      vardata[varID] = (double*) Malloc(nlev*gridsize*sizeof(double));
 	    }
 	}
     }
 
-  if ( filltype != FILL_NONE && ntsteps1 == 1 )
+  if ( filltype != FILL_NONE && ntsteps1 == 1 && ntsteps2 != 1 )
     {
       arrayx1 = array2;
       arrayx2 = array1;

@@ -3,6 +3,10 @@
 	* using CDI library version 1.8.0rc5
 	* Version 1.8.0rc5 release
 
+2016-11-14  Uwe Schulzweida
+
+	* Cond: bug fix for ntsteps1 == 1 && ntsteps2 != 1 
+
 2016-11-10  Uwe Schulzweida
 
 	* New operator timcumsum: Cumulative sum over time.
