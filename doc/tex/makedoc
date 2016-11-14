@@ -1216,7 +1216,7 @@ sub print_description {
 	  $line =~ s/\@ref\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@env\{([^}]*)\}/\\texttt{\1}/og;
 	  $line =~ s/\@cite\{([^}]*)\}/\\cite{\1}/og;
-	  $line =~ s/\@boldtt\{([^}]*)\}/{\\ttfamily \\bfseries \1}/og;
+	  $line =~ s/\@boldtt\{([^}]*)\}/\\textbf{\\texttt{\1}}/og;
 	  $line =~ s/\@bold\{([^}]*)\}/\\textbf{\1}/og;
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  $line =~ s/</\$<\$/og;

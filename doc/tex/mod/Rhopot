@@ -12,7 +12,7 @@
 @Parameter = [pressure]
 
 @BeginDescription
-This is a special operator for the post processing of the ocean and sea ice model @ref{MPIOM}.
+This is a special operator for the post processing of the ocean and sea ice model @cite{MPIOM}.
 It calculates the sea water potential density (name=rhopoto; code=18). Required input fields 
 are sea water in-situ temperature (name=to; code=20) and sea water salinity (name=sao; code=5).
 Pressure is calculated from the level information or can be specified by the optional parameter.

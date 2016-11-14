@@ -22,7 +22,7 @@ These interpolation weights can be reused for every remapping process with the o
 This operator remaps all input fields to a new horizontal grid. The remap type and 
 the interpolation weights of one input grid are read from a NetCDF file. More weights 
 are computed if the input fields are on different grids. The NetCDF file with the 
-weights should follow the @ref{SCRIP} convention. Normally these weights come from a previous
+weights should follow the @cite{SCRIP} convention. Normally these weights come from a previous
 call to one of the genXXX operators (e.g. @mod{genbil}) or were created by the original SCRIP package.
 @EndDescription
 @EndOperator

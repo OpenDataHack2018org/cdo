@@ -79,7 +79,6 @@ prompt> cat mypartab
   name            = t
   out_name        = ta
   standard_name   = air_temperature
-  convert         = 1
   units           = "K"
   missing_value   = 1e+20
   valid_min       = 157.1

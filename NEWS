@@ -8,6 +8,8 @@ Version 1.8.0 (26 October 2016):
      * Changed default of option -f nc to netCDF2
      * masklonlatbox: added support for unstructured grids
    New operators:
+     * timcumsum: Cumulative sum over time.
+     * cmorlite: Apply variable_entry of cmor tables
    Changed operators:
    Fixed bugs:
      * ml2pl: interpolation failed for data on hybrid half levels [Bug #7225]

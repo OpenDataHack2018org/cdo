@@ -14,12 +14,12 @@ Options is a comma separated list of "key=value" pairs with optional parameters.
 
 @BeginOperator_cmor
 @Title     = CMOR
-@Parameter = tab [options]
+@Parameter = table [options]
 @EndOperator
 
 
 @BeginParameter
-@Item = tab
+@Item = table
 STRING   Name of the CMOR table as specified from PCMDI
 @Item = var
 STRING   Comma separated list of variables
