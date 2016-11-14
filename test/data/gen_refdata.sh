@@ -6,6 +6,18 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Comparision
+#
+STATS="eqc nec lec ltc gec gtc"
+#
+IFILE=comptest.srv
+cdo $FORMAT copy t21_geosp_tsurf.grb $IFILE
+for STAT in $STATS; do
+  $CDO $FORMAT $STAT,300 $IFILE comp_${STAT}_ref
+done
+exit
+########################################################################
+#
 # Ymonstat
 #
 STATS="min max sum avg mean std std1 var var1"

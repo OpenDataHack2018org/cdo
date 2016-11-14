@@ -248,6 +248,7 @@ AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_PROG_AWK
 
 AC_CONFIG_FILES([test/File.test test/Read_grib.test test/Read_netcdf.test test/Copy_netcdf.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Comp.test test/Compc.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Select.test test/Spectral.test test/Vertint.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test test/Multiyearstat.test],[chmod a+x "$ac_file"])
