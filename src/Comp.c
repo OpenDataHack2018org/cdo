@@ -80,15 +80,20 @@ void *Comp(void *argument)
   if ( ntsteps1 == 0 ) ntsteps1 = 1;
   if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
+  bool fillstream1 = false;
+
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
       filltype = FILL_REC;
       cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1)->args);
+      if ( ntsteps2 != 1 ) cdoAbort("stream2 has more than 1 timestep!");
     }
   else if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
       filltype = FILL_REC;
       cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0)->args);
+      if ( ntsteps1 != 1 ) cdoAbort("stream1 has more than 1 timestep!");
+      fillstream1 = true;
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
       vlistIDx1 = vlistID2;
@@ -125,6 +130,7 @@ void *Comp(void *argument)
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
+          fillstream1 = true;
 	  streamIDx1 = streamID2;
           streamIDx2 = streamID1;
 	  vlistIDx1 = vlistID2;
@@ -134,8 +140,8 @@ void *Comp(void *argument)
 
       if ( filltype == FILL_TS )
 	{
-	  nvars  = vlistNvars(vlistIDx2);
-	  vardata  = (double **) Malloc(nvars*sizeof(double *));
+	  nvars = vlistNvars(vlistIDx2);
+	  vardata = (double **) Malloc(nvars*sizeof(double *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
@@ -145,7 +151,7 @@ void *Comp(void *argument)
 	}
     }
 
-  if ( filltype != FILL_NONE && ntsteps1 == 1 && ntsteps2 != 1 )
+  if ( fillstream1 )
     {
       arrayx1 = array2;
       arrayx2 = array1;
