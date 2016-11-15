@@ -39,9 +39,6 @@ void *Comp(void *argument)
   int gridsize1, gridsize2;
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
-  int offset;
-  int nmiss1, nmiss2, nmiss3;
-  int i;
   double missval1, missval2 = 0;
   double *missvalx1, *missvalx2;
   double **vardata = NULL;
@@ -184,6 +181,7 @@ void *Comp(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
+          int nmiss1;
 	  streamInqRecord(streamIDx1, &varID, &levelID);
 	  streamReadRecord(streamIDx1, arrayx1, &nmiss1);
 
@@ -191,21 +189,22 @@ void *Comp(void *argument)
 	    {
 	      if ( recID == 0 || filltype != FILL_REC )
 		{
+                  int nmiss2;
 		  streamInqRecord(streamIDx2, &varID, &levelID);
 		  streamReadRecord(streamIDx2, arrayx2, &nmiss2);
 		}
 
 	      if ( filltype == FILL_TS )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-		  offset   = gridsize*levelID;
+		  int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+		  int offset = gridsize*levelID;
 		  memcpy(vardata[varID]+offset, arrayx2, gridsize*sizeof(double));
 		}
 	    }
 	  else if ( filltype == FILL_TS )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-	      offset   = gridsize*levelID;
+	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+	      int offset = gridsize*levelID;
 	      memcpy(arrayx2, vardata[varID]+offset, gridsize*sizeof(double));
 	    }
 
@@ -230,37 +229,37 @@ void *Comp(void *argument)
 
 	  if ( operatorID == EQ )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : DBL_IS_EQUAL(array1[i], array2[i]));
 	    }
 	  else if ( operatorID == NE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : !DBL_IS_EQUAL(array1[i], array2[i]));
 	    }
 	  else if ( operatorID == LE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] <= array2[i]);
 	    }
 	  else if ( operatorID == LT )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] < array2[i]);
 	    }
 	  else if ( operatorID == GE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] >= array2[i]);
 	    }
 	  else if ( operatorID == GT )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] > array2[i]);
 	    }
@@ -269,8 +268,8 @@ void *Comp(void *argument)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  nmiss3 = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  int nmiss3 = 0;
+	  for ( int i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array3[i], missval1) ) nmiss3++;
 
 	  streamDefRecord(streamID3, varID, levelID);
