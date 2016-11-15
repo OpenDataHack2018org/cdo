@@ -32,27 +32,35 @@ void transxy(int gridID, double *array1, double *array2)
 {
   int nx = gridInqXsize(gridID);
   int ny = gridInqYsize(gridID);
+  int gridsize = nx*ny;
 
-  double **a2D1 = (double **) Malloc(ny*sizeof(double *));
-  double **a2D2 = (double **) Malloc(nx*sizeof(double *));
+  if ( gridsize > 0 )
+    {
+      double **a2D1 = (double **) Malloc(ny*sizeof(double *));
+      double **a2D2 = (double **) Malloc(nx*sizeof(double *));
 
-  for ( int j = 0; j < ny; ++j ) a2D1[j] = array1+j*nx;
-  for ( int i = 0; i < nx; ++i ) a2D2[i] = array2+i*ny;
+      for ( int j = 0; j < ny; ++j ) a2D1[j] = array1+j*nx;
+      for ( int i = 0; i < nx; ++i ) a2D2[i] = array2+i*ny;
 
-  for ( int j = 0; j < ny; ++j )
-    for ( int i = 0; i < nx; ++i )
-      a2D2[i][j] = a2D1[j][i];
+      for ( int j = 0; j < ny; ++j )
+        for ( int i = 0; i < nx; ++i )
+          a2D2[i][j] = a2D1[j][i];
 
-  Free(a2D1);
-  Free(a2D2);
+      Free(a2D1);
+      Free(a2D2);
+    }
+  else
+    {
+      gridsize = gridInqSize(gridID);
+      for ( int i = 0; i < gridsize; ++i )
+        array2[i] = array1[i];
+    }
 }
 
 
 void *Transpose(void *argument)
 {
-  int gridID1, gridID2;
   int nrecs;
-  int gridID;
   int varID, levelID;
   int nmiss;
 
@@ -66,15 +74,17 @@ void *Transpose(void *argument)
   int ngrids = vlistNgrids(vlistID1);
   for ( int index = 0; index < ngrids; index++ )
     {
-      gridID1 = vlistGrid(vlistID1, index);
+      int gridID1 = vlistGrid(vlistID1, index);
       int nx = gridInqXsize(gridID1);
       int ny = gridInqYsize(gridID1);
-
-      gridID2 = gridCreate(GRID_GENERIC, nx*ny);
-      gridDefXsize(gridID2, ny);
-      gridDefYsize(gridID2, nx);
-
-      vlistChangeGridIndex(vlistID2, index, gridID2);
+      int gridsize = nx*ny;
+      if ( gridsize > 0 )
+        {
+          int gridID2 = gridCreate(GRID_GENERIC, gridsize);
+          gridDefXsize(gridID2, ny);
+          gridDefYsize(gridID2, nx);
+          vlistChangeGridIndex(vlistID2, index, gridID2);
+        }
     }
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -94,7 +104,6 @@ void *Transpose(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
@@ -102,9 +111,8 @@ void *Transpose(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
 
-	  gridID = vlistInqVarGrid(vlistID1, varID);
-
-	  transxy(gridID, array1, array2);
+	  int gridID = vlistInqVarGrid(vlistID1, varID);
+          transxy(gridID, array1, array2);
 
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, array2, nmiss);
