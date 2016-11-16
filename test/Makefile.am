@@ -14,7 +14,8 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test \
         Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
         Detrend.test Genweights.test Remap.test Select.test Spectral.test \
-        Ensstat.test Enspctl.test Gridboxstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
+        Ensstat.test Enspctl.test Gridboxstat.test \
+        Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test \
         Runstat.test Multiyearstat.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \

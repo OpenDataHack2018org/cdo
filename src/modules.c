@@ -312,8 +312,7 @@ void *Maggraph(void *argument);
 #define  DiffOperators          {"diff", "diffp", "diffn", "diffc"}
 #define  DistgridOperators      {"distgrid"}
 #define  DuplicateOperators     {"duplicate"}
-#define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
-                                 "export_e5ml", "export_e5res"}
+#define  Echam5iniOperators     {"import_e5ml", "import_e5res", "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl"}

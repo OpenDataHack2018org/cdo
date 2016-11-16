@@ -90,15 +90,16 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Timstat.test.in $(srcdir)/Timselstat.test.in \
 	$(srcdir)/Seasstat.test.in $(srcdir)/Runstat.test.in \
 	$(srcdir)/Multiyearstat.test.in $(srcdir)/Gridboxstat.test.in \
-	$(srcdir)/Fldstat.test.in $(srcdir)/Fldpctl.test.in \
-	$(srcdir)/Ensstat.test.in $(srcdir)/Enspctl.test.in \
-	$(srcdir)/Merstat.test.in $(srcdir)/Zonstat.test.in \
-	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
-	$(srcdir)/Arithc.test.in $(srcdir)/Arith.test.in \
-	$(srcdir)/Expr.test.in $(srcdir)/Gradsdes.test.in \
-	$(srcdir)/Collgrid.test.in $(srcdir)/threads.test.in \
-	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
-	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
+	$(srcdir)/Vertstat.test.in $(srcdir)/Fldstat.test.in \
+	$(srcdir)/Fldpctl.test.in $(srcdir)/Ensstat.test.in \
+	$(srcdir)/Enspctl.test.in $(srcdir)/Merstat.test.in \
+	$(srcdir)/Zonstat.test.in $(srcdir)/Afterburner.test.in \
+	$(srcdir)/Detrend.test.in $(srcdir)/Arithc.test.in \
+	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
+	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
+	$(srcdir)/threads.test.in $(srcdir)/tsformat.test.in \
+	$(srcdir)/wildcard.test.in $(srcdir)/MapReduce.test.in \
+	$(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -113,11 +114,12 @@ CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Comp.test Compc.test Cat.test Gridarea.test \
 	Genweights.test Remap.test Select.test Spectral.test \
 	Vertint.test Timstat.test Timselstat.test Seasstat.test \
-	Runstat.test Multiyearstat.test Gridboxstat.test Fldstat.test \
-	Fldpctl.test Ensstat.test Enspctl.test Merstat.test \
-	Zonstat.test Afterburner.test Detrend.test Arithc.test \
-	Arith.test Expr.test Gradsdes.test Collgrid.test threads.test \
-	tsformat.test wildcard.test MapReduce.test Ninfo.test
+	Runstat.test Multiyearstat.test Gridboxstat.test Vertstat.test \
+	Fldstat.test Fldpctl.test Ensstat.test Enspctl.test \
+	Merstat.test Zonstat.test Afterburner.test Detrend.test \
+	Arithc.test Arith.test Expr.test Gradsdes.test Collgrid.test \
+	threads.test tsformat.test wildcard.test MapReduce.test \
+	Ninfo.test
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -529,7 +531,8 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test \
         Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
         Detrend.test Genweights.test Remap.test Select.test Spectral.test \
-        Ensstat.test Enspctl.test Gridboxstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
+        Ensstat.test Enspctl.test Gridboxstat.test \
+        Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test \
         Runstat.test Multiyearstat.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
@@ -619,6 +622,8 @@ Runstat.test: $(top_builddir)/config.status $(srcdir)/Runstat.test.in
 Multiyearstat.test: $(top_builddir)/config.status $(srcdir)/Multiyearstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Gridboxstat.test: $(top_builddir)/config.status $(srcdir)/Gridboxstat.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+Vertstat.test: $(top_builddir)/config.status $(srcdir)/Vertstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Fldstat.test: $(top_builddir)/config.status $(srcdir)/Fldstat.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@

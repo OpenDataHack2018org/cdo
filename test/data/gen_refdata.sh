@@ -6,6 +6,16 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Vertstat
+#
+STATS="min max sum avg mean std std1 var var1 int"
+IFILE=pl_data.grb
+for STAT in $STATS; do
+  $CDO $FORMAT vert$STAT $IFILE vert${STAT}_ref
+done
+exit
+########################################################################
+#
 # Comparision
 #
 STATS="eqc nec lec ltc gec gtc"
