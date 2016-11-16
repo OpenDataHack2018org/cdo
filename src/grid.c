@@ -52,6 +52,12 @@ void scale_vec(double scalefactor, long nvals, double *restrict values)
 void grid_copy_attributes(int gridID1, int gridID2)
 {
   char string[CDI_MAX_NAME];
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_XDIMNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XDIMNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YDIMNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YDIMNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_VDIMNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_VDIMNAME, strlen(string)+1, string);
   string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_XNAME, CDI_MAX_NAME, string);
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XNAME, strlen(string)+1, string);
   string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YNAME, CDI_MAX_NAME, string);
