@@ -21060,7 +21060,7 @@ ac_config_files="$ac_config_files test/Comp.test test/Compc.test"
 
 ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test"
 
-ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Vertint.test"
+ac_config_files="$ac_config_files test/EOF.test test/Select.test test/Spectral.test test/Vertint.test"
 
 ac_config_files="$ac_config_files test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test test/Multiyearstat.test"
 
@@ -22233,6 +22233,7 @@ do
     "test/Gridarea.test") CONFIG_FILES="$CONFIG_FILES test/Gridarea.test" ;;
     "test/Genweights.test") CONFIG_FILES="$CONFIG_FILES test/Genweights.test" ;;
     "test/Remap.test") CONFIG_FILES="$CONFIG_FILES test/Remap.test" ;;
+    "test/EOF.test") CONFIG_FILES="$CONFIG_FILES test/EOF.test" ;;
     "test/Select.test") CONFIG_FILES="$CONFIG_FILES test/Select.test" ;;
     "test/Spectral.test") CONFIG_FILES="$CONFIG_FILES test/Spectral.test" ;;
     "test/Vertint.test") CONFIG_FILES="$CONFIG_FILES test/Vertint.test" ;;
@@ -23763,6 +23764,7 @@ _LT_EOF
     "test/Gridarea.test":F) chmod a+x "$ac_file" ;;
     "test/Genweights.test":F) chmod a+x "$ac_file" ;;
     "test/Remap.test":F) chmod a+x "$ac_file" ;;
+    "test/EOF.test":F) chmod a+x "$ac_file" ;;
     "test/Select.test":F) chmod a+x "$ac_file" ;;
     "test/Spectral.test":F) chmod a+x "$ac_file" ;;
     "test/Vertint.test":F) chmod a+x "$ac_file" ;;

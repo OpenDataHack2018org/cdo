@@ -6,6 +6,18 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# EOF
+#
+export CDO_FILE_SUFFIX=NULL
+#export CDO_SVD_MODE=danielson_lanczos
+export CDO_WEIGHT_MODE=off
+#
+IFILE=psl_DJF_anom.srv
+cdo eof,1 $IFILE eval_ref eof_ref
+cdo eofcoeff eof_ref $IFILE pcoeff
+exit
+########################################################################
+#
 # Vertstat
 #
 STATS="min max sum avg mean std std1 var var1 int"

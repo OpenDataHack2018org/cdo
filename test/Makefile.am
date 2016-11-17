@@ -18,6 +18,7 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test \
         Runstat.test Multiyearstat.test \
+        EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
         Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
 

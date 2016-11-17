@@ -1,11 +1,12 @@
 INPUTDATA = ts_mm_5years ts_6h_1mon ts_1d_1year hl_l19.grb t21_geosp_tsurf.grb bathy4.grb pl_data pl_data.grb detrend_data \
             grib_testfile01.grb grib_testfile02.grb grib_testfile03.grb netcdf_testfile01.nc netcdf_testfile02.nc testfile01c.nc \
-            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv
+            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.srv
 
 FILE_REF     = file_F32_srv_ref
 GRIB_REF     = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile02_sinfo_ref grib_testfile02_info_ref grib_testfile03_sinfo_ref grib_testfile03_info_ref
 NETCDF_REF   = netcdf_testfile01_sinfon_ref netcdf_testfile01_infon_ref netcdf_testfile02_sinfon_ref netcdf_testfile02_infon_ref
 COMP_REF     = comp_eqc_ref comp_gec_ref comp_gtc_ref comp_lec_ref comp_ltc_ref comp_nec_ref comptest.srv
+EOF_REF      = eval_ref eof_ref pcoeff00000
 YMONSTAT_REF = ymonmin_ref ymonmax_ref ymonsum_ref ymonavg_ref ymonmean_ref ymonstd_ref ymonstd1_ref ymonvar_ref ymonvar1_ref
 YSEASSTAT_REF = yseasmin_ref yseasmax_ref yseassum_ref yseasavg_ref yseasmean_ref yseasstd_ref yseasstd1_ref yseasvar_ref yseasvar1_ref
 SEASSTAT_REF = seasmin_ref seasmax_ref seassum_ref seasavg_ref seasmean_ref seasstd_ref seasstd1_ref seasvar_ref seasvar1_ref
@@ -32,4 +33,4 @@ GRADSDES_REF = pl_data.ctl pl_data.gmp
 ARITH_REF    = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
 MAPREDUCE    = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
 
-EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(COMP_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) $(RUNSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(VERTSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)
+EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(EOF_REF) $(COMP_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) $(RUNSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(VERTSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)

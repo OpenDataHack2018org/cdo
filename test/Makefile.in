@@ -85,21 +85,21 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Copy_netcdf.test.in $(srcdir)/Comp.test.in \
 	$(srcdir)/Compc.test.in $(srcdir)/Cat.test.in \
 	$(srcdir)/Gridarea.test.in $(srcdir)/Genweights.test.in \
-	$(srcdir)/Remap.test.in $(srcdir)/Select.test.in \
-	$(srcdir)/Spectral.test.in $(srcdir)/Vertint.test.in \
-	$(srcdir)/Timstat.test.in $(srcdir)/Timselstat.test.in \
-	$(srcdir)/Seasstat.test.in $(srcdir)/Runstat.test.in \
-	$(srcdir)/Multiyearstat.test.in $(srcdir)/Gridboxstat.test.in \
-	$(srcdir)/Vertstat.test.in $(srcdir)/Fldstat.test.in \
-	$(srcdir)/Fldpctl.test.in $(srcdir)/Ensstat.test.in \
-	$(srcdir)/Enspctl.test.in $(srcdir)/Merstat.test.in \
-	$(srcdir)/Zonstat.test.in $(srcdir)/Afterburner.test.in \
-	$(srcdir)/Detrend.test.in $(srcdir)/Arithc.test.in \
-	$(srcdir)/Arith.test.in $(srcdir)/Expr.test.in \
-	$(srcdir)/Gradsdes.test.in $(srcdir)/Collgrid.test.in \
-	$(srcdir)/threads.test.in $(srcdir)/tsformat.test.in \
-	$(srcdir)/wildcard.test.in $(srcdir)/MapReduce.test.in \
-	$(srcdir)/Ninfo.test.in README
+	$(srcdir)/Remap.test.in $(srcdir)/EOF.test.in \
+	$(srcdir)/Select.test.in $(srcdir)/Spectral.test.in \
+	$(srcdir)/Vertint.test.in $(srcdir)/Timstat.test.in \
+	$(srcdir)/Timselstat.test.in $(srcdir)/Seasstat.test.in \
+	$(srcdir)/Runstat.test.in $(srcdir)/Multiyearstat.test.in \
+	$(srcdir)/Gridboxstat.test.in $(srcdir)/Vertstat.test.in \
+	$(srcdir)/Fldstat.test.in $(srcdir)/Fldpctl.test.in \
+	$(srcdir)/Ensstat.test.in $(srcdir)/Enspctl.test.in \
+	$(srcdir)/Merstat.test.in $(srcdir)/Zonstat.test.in \
+	$(srcdir)/Afterburner.test.in $(srcdir)/Detrend.test.in \
+	$(srcdir)/Arithc.test.in $(srcdir)/Arith.test.in \
+	$(srcdir)/Expr.test.in $(srcdir)/Gradsdes.test.in \
+	$(srcdir)/Collgrid.test.in $(srcdir)/threads.test.in \
+	$(srcdir)/tsformat.test.in $(srcdir)/wildcard.test.in \
+	$(srcdir)/MapReduce.test.in $(srcdir)/Ninfo.test.in README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -112,7 +112,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = File.test Read_grib.test Read_netcdf.test \
 	Copy_netcdf.test Comp.test Compc.test Cat.test Gridarea.test \
-	Genweights.test Remap.test Select.test Spectral.test \
+	Genweights.test Remap.test EOF.test Select.test Spectral.test \
 	Vertint.test Timstat.test Timselstat.test Seasstat.test \
 	Runstat.test Multiyearstat.test Gridboxstat.test Vertstat.test \
 	Fldstat.test Fldpctl.test Ensstat.test Enspctl.test \
@@ -535,6 +535,7 @@ TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test 
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test \
         Runstat.test Multiyearstat.test \
+        EOF.test \
         Vertint.test Afterburner.test Arithc.test Arith.test Expr.test \
         Gradsdes.test Collgrid.test MapReduce.test Ninfo.test
 
@@ -604,6 +605,8 @@ Gridarea.test: $(top_builddir)/config.status $(srcdir)/Gridarea.test.in
 Genweights.test: $(top_builddir)/config.status $(srcdir)/Genweights.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Remap.test: $(top_builddir)/config.status $(srcdir)/Remap.test.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+EOF.test: $(top_builddir)/config.status $(srcdir)/EOF.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 Select.test: $(top_builddir)/config.status $(srcdir)/Select.test.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
