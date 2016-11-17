@@ -1,6 +1,6 @@
 INPUTDATA = ts_mm_5years ts_6h_1mon ts_1d_1year hl_l19.grb t21_geosp_tsurf.grb bathy4.grb pl_data pl_data.grb detrend_data \
             grib_testfile01.grb grib_testfile02.grb grib_testfile03.grb netcdf_testfile01.nc netcdf_testfile02.nc testfile01c.nc \
-            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.srv
+            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.grb
 
 FILE_REF     = file_F32_srv_ref
 GRIB_REF     = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile02_sinfo_ref grib_testfile02_info_ref grib_testfile03_sinfo_ref grib_testfile03_info_ref

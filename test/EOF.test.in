@@ -11,10 +11,10 @@ export CDO_WEIGHT_MODE=off
 #
 CDOOUT=cout$$
 CDOERR=cerr$$
-FORMAT=""
+FORMAT="-f srv -b 32"
 NTEST=1
 ######################################################
-IFILE=$DATAPATH/psl_DJF_anom.srv
+IFILE=$DATAPATH/psl_DJF_anom.grb
 RFILE1=$DATAPATH/eval_ref
 RFILE2=$DATAPATH/eof_ref
 RFILE3=$DATAPATH/pcoeff00000
@@ -56,7 +56,7 @@ for MODE in jacobi danielson_lanczos; do
   test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 #
   let NTEST+=1
-  rm -f $OFILE1 $OFILE2 $OFILE3
+  rm -f $OFILE1 $OFILE2 ${OFILE3}00000
 done
 #
 rm -f $CDOOUT $CDOERR
