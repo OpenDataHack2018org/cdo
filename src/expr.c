@@ -39,15 +39,15 @@ int surfaceID = -1;
 
 enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 
-#define    COMPLT(x,y)  ((x) < (y) ? 1 : 0)
-#define    COMPGT(x,y)  ((x) > (y) ? 1 : 0)
-#define    COMPLE(x,y)  ((x) <= (y) ? 1 : 0)
-#define    COMPGE(x,y)  ((x) >= (y) ? 1 : 0)
-#define    COMPNE(x,y)  (IS_NOT_EQUAL(x,y) ? 1 : 0)
-#define    COMPEQ(x,y)  (IS_EQUAL(x,y) ? 1 : 0)
-#define   COMPLEG(x,y)  ((x) < (y) ? -1 : ((x) > (y) ? 1 : 0))
-#define   COMPAND(x,y)  (IS_NOT_EQUAL(x,0) && IS_NOT_EQUAL(y,0) ? 1 : 0)
-#define    COMPOR(x,y)  (IS_NOT_EQUAL(x,0) || IS_NOT_EQUAL(y,0) ? 1 : 0)
+#define    COMPLT(x,y)  ((x) < (y))
+#define    COMPGT(x,y)  ((x) > (y))
+#define    COMPLE(x,y)  ((x) <= (y))
+#define    COMPGE(x,y)  ((x) >= (y))
+#define    COMPNE(x,y)  IS_NOT_EQUAL(x,y)
+#define    COMPEQ(x,y)  IS_EQUAL(x,y)
+#define   COMPLEG(x,y)  ((x) < (y) ? -1. : ((x) > (y)))
+#define   COMPAND(x,y)  (IS_NOT_EQUAL(x,0) && IS_NOT_EQUAL(y,0))
+#define    COMPOR(x,y)  (IS_NOT_EQUAL(x,0) || IS_NOT_EQUAL(y,0))
 #define  MVCOMPLT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLT(x,y))
 #define  MVCOMPGT(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPGT(x,y))
 #define  MVCOMPLE(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPLE(x,y))
@@ -701,8 +701,8 @@ nodeType *expr(int init, int oper, nodeType *p1, nodeType *p2)
         case '*':  coper = "*"; break;
         case '/':  coper = "/"; break;
         case '^':  coper = "^"; break;
-        case LT:   coper = ">"; break;
-        case GT:   coper = "<"; break;
+        case LT:   coper = "<"; break;
+        case GT:   coper = ">"; break;
         case LE:   coper = "<="; break;
         case GE:   coper = ">="; break;
         case NE:   coper = "!="; break;
@@ -1076,12 +1076,12 @@ nodeType *ex_uminus_var(int init, nodeType *p1)
 
       if ( nmiss > 0 )
         {
-          for ( size_t i = 0; i < ngp*nlev; i++ )
+          for ( size_t i = 0; i < ngp*nlev; ++i )
             pdata[i] = DBL_IS_EQUAL(p1data[i], missval) ? missval : -(p1data[i]);
         }
       else
         {
-          for ( size_t i = 0; i < ngp*nlev; i++ )
+          for ( size_t i = 0; i < ngp*nlev; ++i )
             pdata[i] = -(p1data[i]);
         }
 
@@ -1136,13 +1136,13 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
     {
       fprintf(stderr, "cdo expr:\t%s\tifelse\t%s[L%lu][N%lu] ? ", ExIn[init], p1->u.var.nm, p1->param.nlev, p1->param.ngp);
       if ( p2->type == typeCon )
-        printf("%g : ", p2->u.con.value);
+        fprintf(stderr, "%g : ", p2->u.con.value);
       else
-        printf("%s[L%lu][N%lu] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
+        fprintf(stderr, "%s[L%lu][N%lu] : ", p2->u.var.nm, p2->param.nlev, p2->param.ngp);
       if ( p3->type == typeCon )
-        printf("%g\n", p3->u.con.value);
+        fprintf(stderr, "%g\n", p3->u.con.value);
       else
-        printf("%s[L%lu][N%lu]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
+        fprintf(stderr, "%s[L%lu][N%lu]\n", p3->u.var.nm, p3->param.nlev, p3->param.ngp);
     }
 
   size_t nmiss1 = p1->param.nmiss;
@@ -1230,17 +1230,10 @@ nodeType *ex_ifelse(int init, nodeType *p1, nodeType *p2, nodeType *p3)
 
       for ( size_t k = 0; k < nlev; ++k )
         {
-          size_t loff1, loff2, loff3;
-          size_t loff = k*ngp;
-
-          if ( nlev1 == 1 ) loff1 = 0;
-          else              loff1 = k*ngp;
-
-          if ( nlev2 == 1 ) loff2 = 0;
-          else              loff2 = k*ngp;
-
-          if ( nlev3 == 1 ) loff3 = 0;
-          else              loff3 = k*ngp;
+          size_t loff  = k*ngp;
+          size_t loff1 = (nlev1 == 1) ? 0 : loff;
+          size_t loff2 = (nlev2 == 1) ? 0 : loff;
+          size_t loff3 = (nlev3 == 1) ? 0 : loff;
 
           const double *restrict idat1 = pdata1+loff1;
           const double *restrict idat2 = pdata2+loff2;

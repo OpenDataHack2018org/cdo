@@ -303,7 +303,7 @@ void *Expr(void *argument)
     parse_arg.needed[varID] = ! REPLACES_VARIABLES(operatorID);
 
   int vartsID = params_add_ts(&parse_arg);
-  parse_arg.tsID       = vartsID;
+  parse_arg.tsID = vartsID;
   params_add_coordinates(vlistID1, &parse_arg);
                   
   CDO_parser_errorno = 0;
@@ -321,7 +321,7 @@ void *Expr(void *argument)
   if ( cdoVerbose )
     for ( int varID = 0; varID < parse_arg.nparams; varID++ )
       cdoPrint("var: %d %s ngp=%lu nlev=%lu coord=%c",
-               varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord);
+               varID, params[varID].name, params[varID].ngp, params[varID].nlev, params[varID].coord==0?' ':params[varID].coord);
 
   int *varIDmap = (int*) Malloc(parse_arg.nparams*sizeof(int));
 
