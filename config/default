@@ -107,6 +107,10 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
 	            CC=clang CFLAGS="-g -Wall -Wwrite-strings -Ofast -march=native"
+        elif  test "$COMP" = pgcc ; then
+	  ${CONFPATH}configure  \
+                    $CDOLIBS \
+	            CC=pgcc CFLAGS="-g -fast"
         elif  test "$COMP" = g++ ; then
 	  ${CONFPATH}configure --enable-cxx \
                     $CDOLIBS \
