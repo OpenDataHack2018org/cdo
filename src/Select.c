@@ -20,6 +20,7 @@
 
       Select      select         Select fields
 */
+//#define TEST_KVL
 
 #include <cdi.h>
 #include "cdo.h"
@@ -29,6 +30,9 @@
 #include "util.h"
 #include "pml.h"
 #include "pmlist.h"
+#ifdef TEST_KVL
+#include "sellist.h"
+#endif
 
 double datestr_to_double(const char *datestr, int opt);
 
@@ -59,7 +63,6 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
     }
 }  
 
-//#define TEST_KVL
 
 void *Select(void *argument)
 {
@@ -105,9 +108,35 @@ void *Select(void *argument)
       cdoPrint("name %d = %s", i+1, argnames[i]);
 
 #ifdef TEST_KVL
-  list_t *kvl = kvlist_new("SELECT");
-  if ( kvlist_parse_cmdline(kvl, nsel, argnames) != 0 ) cdoAbort("Parse error!");
-  if ( cdoVerbose ) kvlist_print(kvl);
+  //src/cdo infon -select,name=var129,var152,level=0 ../../test/data/pl_data
+  list_t *kvlist = kvlist_new("SELECT");
+  if ( kvlist_parse_cmdline(kvlist, nsel, argnames) != 0 ) cdoAbort("Parse error!");
+  if ( cdoVerbose ) kvlist_print(kvlist);
+
+  sellist_t *sellist = sellist_create(kvlist);
+
+  SELLIST_ADD_INT(sellist, timestep_of_year, "Timestep of year");
+  SELLIST_ADD_INT(sellist, timestep,         "Timestep");
+  SELLIST_ADD_INT(sellist, year,             "Year");
+  SELLIST_ADD_INT(sellist, month,            "Month");
+  SELLIST_ADD_INT(sellist, day,              "Day");
+  SELLIST_ADD_INT(sellist, hour,             "Hour");
+  SELLIST_ADD_INT(sellist, minute,           "Minute");
+  SELLIST_ADD_INT(sellist, code,             "Code number");
+  SELLIST_ADD_INT(sellist, levidx,           "Level index");
+  SELLIST_ADD_INT(sellist, ltype,            "Level type");
+  SELLIST_ADD_INT(sellist, zaxisnum,         "Zaxis number");
+  SELLIST_ADD_INT(sellist, gridnum,          "Grid number");
+  SELLIST_ADD_FLT(sellist, level,            "Level");
+  SELLIST_ADD_WORD(sellist, name,            "Variable name");
+  SELLIST_ADD_WORD(sellist, param,           "Parameter");
+  SELLIST_ADD_WORD(sellist, zaxisname,       "Zaxis name");
+  SELLIST_ADD_WORD(sellist, gridname,        "Grid name");
+  SELLIST_ADD_WORD(sellist, steptype,        "Time step type");
+  SELLIST_ADD_WORD(sellist, startdate,       "Start date");
+  SELLIST_ADD_WORD(sellist, enddate,         "End date");
+  SELLIST_ADD_WORD(sellist, season,          "Season");
+  SELLIST_ADD_WORD(sellist, date,            "Date");
 #endif
 
   pml_t *pml = pml_create("SELECT");
@@ -160,7 +189,7 @@ void *Select(void *argument)
 
       if ( indf == 0 )
 	{
-          bool xresult = false;
+          bool xresult = true;
 
 	  // vlistID0 = vlistDuplicate(vlistID1);
 
@@ -179,15 +208,30 @@ void *Select(void *argument)
 		    vlistDefFlag(vlistID1, varID, levID, TRUE);
 		}
 	    }
-	  else if ( operatorID == SELECT )
-	    {
-	      xresult = true;
-	    }
 
+#ifdef TEST_KVL
+          bool lvarsel = SELLIST_NOCC(sellist, code) || SELLIST_NOCC(sellist, ltype) || SELLIST_NOCC(sellist, zaxisnum) ||
+            SELLIST_NOCC(sellist, gridnum) || SELLIST_NOCC(sellist, name) || SELLIST_NOCC(sellist, param) ||
+            SELLIST_NOCC(sellist, zaxisname) || SELLIST_NOCC(sellist, gridname) || SELLIST_NOCC(sellist, steptype);
+
+          bool llevsel = SELLIST_NOCC(sellist, level) || SELLIST_NOCC(sellist, levidx);
+
+	  ltimsel = SELLIST_NOCC(sellist, date) || SELLIST_NOCC(sellist, startdate) || SELLIST_NOCC(sellist, enddate) || SELLIST_NOCC(sellist, season) ||
+            SELLIST_NOCC(sellist, timestep_of_year) || SELLIST_NOCC(sellist, timestep) || SELLIST_NOCC(sellist, year) || SELLIST_NOCC(sellist, month) ||
+            SELLIST_NOCC(sellist, day) || SELLIST_NOCC(sellist, hour) || SELLIST_NOCC(sellist, minute);
+
+          printf("lvarsel=%d llevsel=%d ltimsel=%d\n", lvarsel, llevsel, ltimsel);
+#else
           bool lvarsel = PML_NOCC(pml, code) || PML_NOCC(pml, ltype) || PML_NOCC(pml, zaxisnum) ||
             PML_NOCC(pml, gridnum) || PML_NOCC(pml, name) || PML_NOCC(pml, param) ||
             PML_NOCC(pml, zaxisname) || PML_NOCC(pml, gridname) || PML_NOCC(pml, steptype);
+
           bool llevsel = PML_NOCC(pml, level) || PML_NOCC(pml, levidx);
+
+	  ltimsel = PML_NOCC(pml, date) || PML_NOCC(pml, startdate) || PML_NOCC(pml, enddate) || PML_NOCC(pml, season) ||
+            PML_NOCC(pml, timestep_of_year) || PML_NOCC(pml, timestep) || PML_NOCC(pml, year) || PML_NOCC(pml, month) ||
+            PML_NOCC(pml, day) || PML_NOCC(pml, hour) || PML_NOCC(pml, minute);
+#endif
 
 	  ltimsel = PML_NOCC(pml, date) || PML_NOCC(pml, startdate) || PML_NOCC(pml, enddate) || PML_NOCC(pml, season) ||
             PML_NOCC(pml, timestep_of_year) || PML_NOCC(pml, timestep) || PML_NOCC(pml, year) || PML_NOCC(pml, month) ||
@@ -667,7 +711,8 @@ void *Select(void *argument)
   pml_destroy(pml);
 
 #ifdef TEST_KVL
-  kvlist_destroy(kvl);
+  sellist_destroy(sellist);
+  kvlist_destroy(kvlist);
 #endif
 
   if ( array ) Free(array);

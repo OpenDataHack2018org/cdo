@@ -131,7 +131,7 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-par_io.lo libcdo_la-parse_literal.lo \
 	libcdo_la-percentiles_hist.lo libcdo_la-percentiles.lo \
 	libcdo_la-pipe.lo libcdo_la-pml.lo libcdo_la-pmlist.lo \
-	libcdo_la-process.lo libcdo_la-pstream.lo \
+	libcdo_la-sellist.lo libcdo_la-process.lo libcdo_la-pstream.lo \
 	libcdo_la-pthread_debug.lo libcdo_la-readline.lo \
 	libcdo_la-realtime.lo libcdo_la-remaplib.lo \
 	libcdo_la-remapsort.lo libcdo_la-remap_scrip_io.lo \
@@ -523,18 +523,18 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	nth_element.h operator_help.h par_io.c par_io.h \
 	parse_literal.c percentiles_hist.c percentiles_hist.h \
 	percentiles.c percentiles.h pipe.c pipe.h pml.c pml.h pmlist.c \
-	pmlist.h pragma_omp_atomic_update.h printinfo.h process.c \
-	process.h pstream.c pstream.h pstream_write.h pstream_int.h \
-	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
-	remaplib.c remapsort.c remap_scrip_io.c remap_search_reg2d.c \
-	remap_search_latbins.c remap_store_link.c remap_store_link.h \
-	remap_store_link_cnsrv.c remap_store_link_cnsrv.h \
-	remap_conserv.c remap_conserv_scrip.c remap_distwgt.c \
-	remap_bicubic_scrip.c remap_bilinear_scrip.c stdnametable.c \
-	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
-	table.c text.c text.h timebase.h timer.c userlog.c uthash.h \
-	util.c util.h zaxis.c json/jsmn.h json/jsmn.c \
-	kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
+	pmlist.h sellist.c sellist.h pragma_omp_atomic_update.h \
+	printinfo.h process.c process.h pstream.c pstream.h \
+	pstream_write.h pstream_int.h pthread_debug.c pthread_debug.h \
+	readline.c realtime.c remap.h remaplib.c remapsort.c \
+	remap_scrip_io.c remap_search_reg2d.c remap_search_latbins.c \
+	remap_store_link.c remap_store_link.h remap_store_link_cnsrv.c \
+	remap_store_link_cnsrv.h remap_conserv.c remap_conserv_scrip.c \
+	remap_distwgt.c remap_bicubic_scrip.c remap_bilinear_scrip.c \
+	stdnametable.c stdnametable.h specspace.c specspace.h \
+	statistic.c statistic.h table.c text.c text.h timebase.h \
+	timer.c userlog.c uthash.h util.c util.h zaxis.c json/jsmn.h \
+	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
 	kdtreelib/kdtree_common.c kdtreelib/kdtree_spherical.c \
 	kdtreelib/qsort.c kdtreelib/pmergesort.c kdtreelib/pqueue.c \
 	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
@@ -1075,6 +1075,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remap_store_link_cnsrv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remaplib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-remapsort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-sellist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-specspace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-statistic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-stdnametable.Plo@am__quote@
@@ -1562,6 +1563,13 @@ libcdo_la-pmlist.lo: pmlist.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pmlist.c' object='libcdo_la-pmlist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-pmlist.lo `test -f 'pmlist.c' || echo '$(srcdir)/'`pmlist.c
+
+libcdo_la-sellist.lo: sellist.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-sellist.lo -MD -MP -MF $(DEPDIR)/libcdo_la-sellist.Tpo -c -o libcdo_la-sellist.lo `test -f 'sellist.c' || echo '$(srcdir)/'`sellist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-sellist.Tpo $(DEPDIR)/libcdo_la-sellist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='sellist.c' object='libcdo_la-sellist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-sellist.lo `test -f 'sellist.c' || echo '$(srcdir)/'`sellist.c
 
 libcdo_la-process.lo: process.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-process.lo -MD -MP -MF $(DEPDIR)/libcdo_la-process.Tpo -c -o libcdo_la-process.lo `test -f 'process.c' || echo '$(srcdir)/'`process.c

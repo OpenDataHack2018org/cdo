@@ -21,8 +21,6 @@
 #define  PML_INT         1
 #define  PML_FLT         2
 #define  PML_WORD        3
-#define  PML_DATE        4
-#define  PML_TIME        4
 
 #define  PML_INIT(name, size)                 memset(flag_##name, 0, size * sizeof(bool))
 #define  PML_DEF(name, size)                  bool flag_##name[size]

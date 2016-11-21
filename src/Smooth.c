@@ -362,11 +362,11 @@ void smooth_set_parameter(int *xnsmooth, smoothpoint_t *spoint)
     { 
       char **pargv = operatorArgv();
 
-      list_t *kvl = list_new(sizeof(keyValues_t *), free_keyval, "SMOOTH");
-      if ( kvlist_parse_cmdline(kvl, pargc, pargv) != 0 ) cdoAbort("Parse error!");
-      if ( cdoVerbose ) kvlist_print(kvl);
+      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "SMOOTH");
+      if ( kvlist_parse_cmdline(kvlist, pargc, pargv) != 0 ) cdoAbort("Parse error!");
+      if ( cdoVerbose ) kvlist_print(kvlist);
 
-      for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
         {
           keyValues_t *kv = *(keyValues_t **)kvnode->data;
           const char *key = kv->key;
@@ -383,7 +383,7 @@ void smooth_set_parameter(int *xnsmooth, smoothpoint_t *spoint)
           else cdoAbort("Invalid parameter key >%s<!", key);
         }          
           
-      list_destroy(kvl);
+      list_destroy(kvlist);
     }
       
   if ( cdoVerbose )
