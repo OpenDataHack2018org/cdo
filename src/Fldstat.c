@@ -106,7 +106,7 @@ void *Fldstat(void *argument)
 
   int operatorID  = cdoOperatorID();
   int operfunc    = cdoOperatorF1(operatorID);
-  int needWeights = cdoOperatorF2(operatorID);
+  bool needWeights = cdoOperatorF2(operatorID) != 0;
 
   double pn = 0;
   if ( operfunc == func_pctl )
@@ -116,7 +116,7 @@ void *Fldstat(void *argument)
       percentile_check_number(pn);
     }
 
-  int useweights = TRUE;
+  bool useweights = true;
 
   if ( needWeights )
     {
@@ -129,7 +129,7 @@ void *Fldstat(void *argument)
 	    for ( unsigned i = 0; i < npar; i++ )
 	      cdoPrint("key %u = %s", i+1, parnames[i]);
 
-	  if ( strcmp(parnames[0], "noweights") == 0 ) useweights = FALSE;
+	  if ( strcmp(parnames[0], "noweights") == 0 ) useweights = false;
 	  else cdoAbort("Parameter >%s< unsupported! Supported parameter are: noweights", parnames[0]);
 	}
     }
@@ -216,7 +216,7 @@ void *Fldstat(void *argument)
 	      field.weight[0] = 1;
 	      if ( useweights && field.size > 1 )
 		{
-		  int wstatus = gridWeights(field.grid, field.weight);
+		  bool wstatus = gridWeights(field.grid, field.weight) != 0;
 		  if ( wstatus && tsID == 0 && levelID == 0 )
 		    {
 		      char varname[CDI_MAX_NAME];
