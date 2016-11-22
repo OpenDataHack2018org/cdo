@@ -456,11 +456,16 @@ void *Timstat(void *argument)
           
 	  if ( cdoDiag )
 	    {
-	      if ( samp1[varID][levelID].ptr )
-		{
-		  streamDefRecord(streamID3, varID, levelID);
-		  streamWriteRecord(streamID3, samp1[varID][levelID].ptr, 0);
-		}
+              double *sampptr = field.ptr;
+	      if ( samp1[varID][levelID].ptr ) sampptr = samp1[varID][levelID].ptr;
+              else
+                {
+                  gridsize = gridInqSize(pvar1->grid);
+                  for ( int i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
+                }
+
+              streamDefRecord(streamID3, varID, levelID);
+              streamWriteRecord(streamID3, sampptr, 0);
 	    }
 	}
 
