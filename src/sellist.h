@@ -16,7 +16,7 @@ typedef struct {
   bool *flag;
   int type;
   char *txt;
-  cvalues_t *cvalues;
+  void *cvalues;
 } selentry_t;
 
 

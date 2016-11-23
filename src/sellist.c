@@ -5,9 +5,9 @@
 
 sellist_t *sellist_create(list_t *kvlist)
 {
-  sellist_t *sellist = (sellist_t *) malloc(sizeof(sellist_t));
+  sellist_t *sellist = (sellist_t *) Malloc(sizeof(sellist_t));
   sellist->size = list_size(kvlist);
-  sellist->entry = (selentry_t *) malloc(sellist->size*sizeof(selentry_t));
+  sellist->entry = (selentry_t *) Malloc(sellist->size*sizeof(selentry_t));
 
   int i = 0;
   for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
@@ -30,11 +30,6 @@ sellist_t *sellist_create(list_t *kvlist)
       selentry_t *e = &(sellist->entry[i]);
       e->flag = NULL;
       e->cvalues = NULL;
-      if ( e->nvalues )
-        {
-          e->flag = (bool*) calloc(e->nvalues, sizeof(bool));
-          e->cvalues = (cvalues_t*) calloc(e->nvalues, sizeof(cvalues_t));
-        }
 #ifdef SELDEBUG
       printf("%s =", e->key);
       for ( int ii = 0; ii < e->nvalues; ++ii ) printf(" '%s'", e->values[ii]);
@@ -53,15 +48,16 @@ void sellist_destroy(sellist_t *sellist)
       for ( int i = 0; i < sellist->size; ++i )
         {
           selentry_t *e = &(sellist->entry[i]);
-          if ( e->flag ) free(e->flag);
-          if ( e->txt ) free(e->txt);
-          if ( e->cvalues ) free(e->cvalues);
+          if ( e->txt ) Free(e->txt);
+          if ( e->flag ) Free(e->flag);
+          if ( e->cvalues ) Free(e->cvalues);
         }
 
-      free(sellist);
+      Free(sellist);
     }
 }
 
+void split_intstring(const char *intstr, int *first, int *last, int *inc);
 
 int sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
 {
@@ -84,22 +80,68 @@ int sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
           selentry_t *e = &(sellist->entry[idx]);
           e->type = type;
           e->txt = strdup(txt);
+          if ( e->nvalues && e->cvalues == NULL )
+            {
+              switch (type)
+                {
+                case SELLIST_INT:  e->cvalues = Malloc(e->nvalues*sizeof(int)); break;
+                case SELLIST_FLT:  e->cvalues = Malloc(e->nvalues*sizeof(double)); break;
+                case SELLIST_WORD: e->cvalues = Malloc(e->nvalues*sizeof(char*)); break;
+                }
+            }
+
+          int j = 0;
           int nvalues = e->nvalues;
           for ( int i = 0; i < nvalues; ++i )
             switch (type)
               {
-              case SELLIST_INT:  e->cvalues[i].ival = parameter2int(e->values[i]); break;
-              case SELLIST_FLT:  e->cvalues[i].dval = parameter2double(e->values[i]); break;
-              case SELLIST_WORD: e->cvalues[i].cval = parameter2word(e->values[i]); break;
+              case SELLIST_INT:
+                {
+                  int first, last, inc;
+                  split_intstring(e->values[i], &first, &last, &inc);
+
+                  if ( first == last )
+                    {
+                      ((int*)e->cvalues)[j++] = parameter2int(e->values[i]);
+                    }
+                  else
+                    {
+                      int k = 0;
+                      if ( inc >= 0 )
+                        for ( int ival = first; ival <= last; ival += inc ) k++;
+                      else
+                        for ( int ival = first; ival >= last; ival += inc ) k++;
+
+                      e->nvalues += k-1;
+                      e->cvalues = Realloc(e->cvalues, e->nvalues*sizeof(int));
+
+                      if ( inc >= 0 )
+                        {
+                          for ( int ival = first; ival <= last; ival += inc )
+                            ((int*)e->cvalues)[j++] = ival;
+                        }
+                      else
+                        {
+                          for ( int ival = first; ival >= last; ival += inc )
+                            ((int*)e->cvalues)[j++] = ival;
+                        }
+                    }
+
+                  break;
+                }
+              case SELLIST_FLT:  ((double*)e->cvalues)[i] = parameter2double(e->values[i]); break;
+              case SELLIST_WORD: ((const char**)e->cvalues)[i] = parameter2word(e->values[i]); break;
               }
+
+          if ( e->nvalues ) e->flag = (bool*) Calloc(e->nvalues, sizeof(bool));      
 #ifdef SELDEBUG          
           printf("%s =", e->key);
-          for ( int i = 0; i < nvalues; ++i )
+          for ( int i = 0; i < e->nvalues; ++i )
             switch (type)
               {
-              case SELLIST_INT:  printf(" %d", e->cvalues[i].ival); break;
-              case SELLIST_FLT:  printf(" %g", e->cvalues[i].dval); break;
-              case SELLIST_WORD: printf(" %s", e->cvalues[i].cval); break;
+              case SELLIST_INT:  printf(" %d", ((int*)e->cvalues)[i]); break;
+              case SELLIST_FLT:  printf(" %g", ((double*)e->cvalues)[i]); break;
+              case SELLIST_WORD: printf(" %s", ((char**)e->cvalues)[i]); break;
               }
           printf("\n");
 #endif
@@ -130,7 +172,13 @@ void sellist_check_flag(sellist_t *sellist, int idx)
     {
       selentry_t *e = &(sellist->entry[idx]);
       for ( int i = 0; i < nvalues; ++i )
-        if ( e->flag[i] == false ) cdoWarning("%s >%s< not found!", e->txt, e->values[i]);
+        if ( e->flag[i] == false )
+          switch (e->type)
+            {
+            case SELLIST_INT:  cdoWarning("%s >%d< not found!", e->txt, ((int*)e->cvalues)[i]); break;
+            case SELLIST_FLT:  cdoWarning("%s >%g< not found!", e->txt, ((double*)e->cvalues)[i]); break;
+            case SELLIST_WORD: cdoWarning("%s >%s< not found!", e->txt, ((char**)e->cvalues)[i]); break;
+            }
     }
 }
 
@@ -151,9 +199,9 @@ bool sellist_check(sellist_t *sellist, int idx, void *par)
         {
           switch (type)
             {
-            case SELLIST_INT:  if ( *(int*)par == e->cvalues[i].ival )                     { found = true; e->flag[i] = true; } break;
-            case SELLIST_FLT:  if ( fabs(*(double*)par - e->cvalues[i].dval) < 1.e-4 )     { found = true; e->flag[i] = true; } break;
-            case SELLIST_WORD: if ( wildcardmatch(e->cvalues[i].cval, *(char**)par) == 0 ) { found = true; e->flag[i] = true; } break;
+            case SELLIST_INT:  if ( *(int*)par == ((int*)e->cvalues)[i] )                       { found = true; e->flag[i] = true; } break;
+            case SELLIST_FLT:  if ( fabs(*(double*)par - ((double*)e->cvalues)[i]) < 1.e-4 )    { found = true; e->flag[i] = true; } break;
+            case SELLIST_WORD: if ( wildcardmatch(((char**)e->cvalues)[i], *(char**)par) == 0 ) { found = true; e->flag[i] = true; } break;
             }
         }
     }
@@ -244,9 +292,9 @@ void sellist_get_par(sellist_t *sellist, int idx, int vindex, void *par)
         {
           switch (type)
             {
-            case SELLIST_INT:  *(int*)par = e->cvalues[vindex].ival; break;
-            case SELLIST_FLT:  *(double*)par = e->cvalues[vindex].dval; break;
-            case SELLIST_WORD: *(const char**)par = e->cvalues[vindex].cval; break;
+            case SELLIST_INT:  *(int*)par = ((int*)e->cvalues)[vindex]; break;
+            case SELLIST_FLT:  *(double*)par = ((double*)e->cvalues)[vindex]; break;
+            case SELLIST_WORD: *(const char**)par = ((const char**)e->cvalues)[vindex]; break;
             }
         }
     }
@@ -267,9 +315,9 @@ void sellist_def_par(sellist_t *sellist, int idx, int vindex, void *par)
         {
           switch (type)
             {
-            case SELLIST_INT:  e->cvalues[vindex].ival = *(int*)par; break;
-            case SELLIST_FLT:  e->cvalues[vindex].dval = *(double*)par; break;
-            case SELLIST_WORD: e->cvalues[vindex].cval = *(const char**)par; break;
+            case SELLIST_INT:  ((int*)e->cvalues)[vindex] = *(int*)par; break;
+            case SELLIST_FLT:  ((double*)e->cvalues)[vindex] = *(double*)par; break;
+            case SELLIST_WORD: ((const char**)e->cvalues)[vindex] = *(const char**)par; break;
             }
         }
     }

@@ -140,13 +140,12 @@ int get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
 
 void split_intstring(const char *intstr, int *first, int *last, int *inc)
 {
-  int i, start;
   int istrlen = strlen(intstr);
   *first = parameter2intlist(intstr);
   *last  = *first;
   *inc   = 1;
 
-  start = 1;
+  int i, start = 1;
   *last = get_ival(intstr, *first, start, istrlen, &i);
 
   if ( i < istrlen )
