@@ -131,19 +131,18 @@ int pml_add_entry(pml_entry_t *entry, char *arg)
 
   if ( entry->type == PML_INT )
     {
-      int ival, first, last, inc;
-
+      int first, last, inc;
       split_intstring(arg, &first, &last, &inc);
 
       if ( inc >= 0 )
 	{
-	  for ( ival = first; ival <= last; ival += inc )
+	  for ( int ival = first; ival <= last; ival += inc )
 	    if ( entry->occ < (int) entry->size )
 	      ((int *) entry->ptr)[entry->occ++] = ival;
 	}
       else
 	{
-	  for ( ival = first; ival >= last; ival += inc )
+	  for ( int ival = first; ival >= last; ival += inc )
 	    if ( entry->occ < (int) entry->size )
 	      ((int *) entry->ptr)[entry->occ++] = ival;
 	}

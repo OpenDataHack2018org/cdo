@@ -137,8 +137,7 @@ void *Select(void *argument)
   SELLIST_ADD_WORD(sellist, enddate,         "End date");
   SELLIST_ADD_WORD(sellist, season,          "Season");
   SELLIST_ADD_WORD(sellist, date,            "Date");
-#endif
-
+#else
   pml_t *pml = pml_create("SELECT");
 
   PML_ADD_INT(pml, timestep_of_year, 4096, "Timestep of year");
@@ -167,7 +166,7 @@ void *Select(void *argument)
   int status = pml_read(pml, nsel, argnames);
   if ( cdoVerbose ) pml_print(pml);
   if ( status != 0 ) cdoAbort("Parameter read error!");
-
+#endif
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
 
@@ -219,8 +218,6 @@ void *Select(void *argument)
 	  ltimsel = SELLIST_NOCC(date) || SELLIST_NOCC(startdate) || SELLIST_NOCC(enddate) || SELLIST_NOCC(season) ||
             SELLIST_NOCC(timestep_of_year) || SELLIST_NOCC(timestep) || SELLIST_NOCC(year) || SELLIST_NOCC(month) ||
             SELLIST_NOCC(day) || SELLIST_NOCC(hour) || SELLIST_NOCC(minute);
-
-          printf("lvarsel=%d llevsel=%d ltimsel=%d\n", lvarsel, llevsel, ltimsel);
 #else
           bool lvarsel = PML_NOCC(pml, code) || PML_NOCC(pml, ltype) || PML_NOCC(pml, zaxisnum) ||
             PML_NOCC(pml, gridnum) || PML_NOCC(pml, name) || PML_NOCC(pml, param) ||
@@ -363,6 +360,11 @@ void *Select(void *argument)
 		      
 		      if ( nlevs == 1 && IS_EQUAL(level, 0) )
 			{
+#ifdef TEST_KVL
+                          SELLIST_CHECK(level);
+#else
+                          PML_CHECK_FLT(pml, level);
+#endif
 			  vlistDefFlag(vlistID1, varID, levID, xresult);
 			}
 		      else
@@ -507,7 +509,11 @@ void *Select(void *argument)
 	    }
 
 	  ntsteps2 = ntsteps;
+#ifdef TEST_KVL
+	  if ( operatorID == SELECT && SELLIST_NOCC(timestep) == 1 ) ntsteps2 = 1;
+#else
 	  if ( operatorID == SELECT && PML_NOCC(pml, timestep) == 1 ) ntsteps2 = 1;
+#endif
 	  
 	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {
@@ -517,16 +523,36 @@ void *Select(void *argument)
 	    }
 
 	  // support for negative timestep values
+#ifdef TEST_KVL
+	  if ( SELLIST_NOCC(timestep) > 0 && ntsteps > 0 && nfiles == 1 )
+#else
 	  if ( PML_NOCC(pml, timestep) > 0 && ntsteps > 0 && nfiles == 1 )
+#endif
 	    {
+#ifdef TEST_KVL
+	      for ( int i = 0; i < SELLIST_NOCC(timestep); ++i )
+#else
 	      for ( int i = 0; i < PML_NOCC(pml, timestep); ++i )
+#endif
 		{
+#ifdef TEST_KVL
+                  int ptimestep;
+                  SELLIST_GET_PAR(timestep, i, &ptimestep);
+		  if ( ptimestep < 0 )
+		    {
+		      if ( cdoVerbose )
+			cdoPrint("timestep %d changed to %d", ptimestep, ptimestep + ntsteps + 1);
+		      ptimestep += ntsteps + 1;
+                      SELLIST_DEF_PAR(timestep, i, &ptimestep);
+		    }
+#else
 		  if ( par_timestep[i] < 0 )
 		    {
 		      if ( cdoVerbose )
 			cdoPrint("timestep %d changed to %d", par_timestep[i], par_timestep[i] + ntsteps + 1);
 		      par_timestep[i] += ntsteps + 1;
 		    }
+#endif
 		}
 	    }
 
@@ -537,10 +563,17 @@ void *Select(void *argument)
 	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
 
+#ifdef TEST_KVL
+	  SELLIST_GET_PAR(startdate, 0, &startdate);
+	  SELLIST_GET_PAR(enddate, 0, &enddate);
+	  if ( SELLIST_NOCC(startdate) ) fstartdate = datestr_to_double(startdate, 0);
+	  if ( SELLIST_NOCC(enddate)   ) fenddate   = datestr_to_double(enddate, 1);
+#else
 	  startdate = par_startdate[0];
 	  enddate   = par_enddate[0];
 	  if ( PML_NOCC(pml, startdate) ) fstartdate = datestr_to_double(startdate, 0);
 	  if ( PML_NOCC(pml, enddate)   ) fenddate   = datestr_to_double(enddate, 1);
+#endif
 	}
       else
 	{
@@ -571,11 +604,24 @@ void *Select(void *argument)
 	    {
 	      copytimestep = false;
 
+#ifdef TEST_KVL
+	      if ( operatorID == SELECT && SELLIST_NOCC(timestep) > 0 )
+		{
+                  int ptimestep;
+                  SELLIST_GET_PAR(timestep, SELLIST_NOCC(timestep)-1, &ptimestep);
+                  if ( timestep > ptimestep )
+                    {
+                      lstop = true;
+                      break;
+                    }
+                }
+#else
 	      if ( operatorID == SELECT && PML_NOCC(pml, timestep) > 0 && timestep > par_timestep[PML_NOCC(pml, timestep)-1] )
 		{
 		  lstop = true;
 		  break;
 		}
+#endif
 
 	      int vdate = taxisInqVdate(taxisID1);
 	      int vtime = taxisInqVtime(taxisID1);
@@ -592,6 +638,24 @@ void *Select(void *argument)
 
 	      timestep_of_year++;
 
+#ifdef TEST_KVL
+	      if ( SELLIST_CHECK(timestep) ) copytimestep = true;
+	      if ( SELLIST_CHECK(timestep_of_year) ) copytimestep = true;
+
+	      if ( !copytimestep && SELLIST_NOCC(date) == 0 && SELLIST_NOCC(timestep) == 0 && SELLIST_NOCC(timestep_of_year) == 0 )
+		{
+		  bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
+
+		  if ( SELLIST_NOCC(season) == 0 || SELLIST_CHECK_SEASON(season, month) ) lseason   = true;
+		  if ( SELLIST_NOCC(year)   == 0 || SELLIST_CHECK(year)   ) lyear   = true;
+		  if ( SELLIST_NOCC(month)  == 0 || SELLIST_CHECK(month)  ) lmonth  = true;
+		  if ( SELLIST_NOCC(day)    == 0 || SELLIST_CHECK(day)    ) lday    = true;
+		  if ( SELLIST_NOCC(hour)   == 0 || SELLIST_CHECK(hour)   ) lhour   = true;
+		  if ( SELLIST_NOCC(minute) == 0 || SELLIST_CHECK(minute) ) lminute = true;
+
+		  if ( lseason && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
+		}
+#else
 	      if ( PML_NOCC(pml, timestep) && PML_CHECK_INT(pml, timestep) ) copytimestep = true;
 	      if ( PML_NOCC(pml, timestep_of_year) && PML_CHECK_INT(pml, timestep_of_year) ) copytimestep = true;
 
@@ -608,47 +672,61 @@ void *Select(void *argument)
 
 		  if ( lseason && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
 		}
+#endif
 
 	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
 
+#ifdef TEST_KVL
+	      if ( SELLIST_NOCC(enddate) )
+#else
 	      if ( PML_NOCC(pml, enddate) )
+#endif
 		{
+                  copytimestep = (fdate <= fenddate);
 		  if ( fdate > fenddate )
 		    {
+#ifdef TEST_KVL
+                      SELLIST_DEF_FLAG(enddate, 0, true);
+#else
 		      flag_enddate[0] = true;
-		      copytimestep = false;
+#endif
 		      if ( operatorID == SELECT )
 			{
 			  lstop = true;
 			  break;
 			}
 		    }
-		  else
-		    {
-		      copytimestep = true;
-		    }
 		}
 
+#ifdef TEST_KVL
+	      if ( SELLIST_NOCC(startdate) )
+#else
 	      if ( PML_NOCC(pml, startdate) )
+#endif
 		{
-		  if ( fdate < fstartdate )
-		    {
-		      copytimestep = false;
-		    }
-		  else
-		    {
-		      flag_startdate[0] = true;
-		      copytimestep = true;
-		    }
+                  copytimestep = (fdate >= fstartdate);
+#ifdef TEST_KVL
+		  if ( fdate >= fstartdate ) SELLIST_DEF_FLAG(startdate, 0, true);
+#else
+		  if ( fdate >= fstartdate ) flag_startdate[0] = true;
+#endif
 		}
 
               
+#ifdef TEST_KVL
+              if ( SELLIST_NOCC(date) )
+#else
               if ( PML_NOCC(pml, date) )
+#endif
                 {
                   char vdatetimestr[64];
                   datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
                   date = vdatetimestr;
+#ifdef TEST_KVL
+                  if ( SELLIST_CHECK_DATE(date) ) copytimestep = true;
+#else
                   if ( PML_CHECK_DATE(pml, date) ) copytimestep = true;
+#endif
                 }
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
@@ -741,6 +819,19 @@ void *Select(void *argument)
 
   if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, 1);    
 
+#ifdef TEST_KVL
+  SELLIST_CHECK_FLAG(timestep_of_year);
+  SELLIST_CHECK_FLAG(timestep);
+  SELLIST_CHECK_FLAG(year);
+  SELLIST_CHECK_FLAG(month);
+  SELLIST_CHECK_FLAG(day);
+  SELLIST_CHECK_FLAG(hour);
+  SELLIST_CHECK_FLAG(minute);
+  SELLIST_CHECK_FLAG(startdate);
+  //  SELLIST_CHECK_FLAG(enddate);
+  SELLIST_CHECK_FLAG(season);
+  SELLIST_CHECK_FLAG(date);
+#else
   PML_CHECK_INT_FLAG(pml, timestep_of_year);
   PML_CHECK_INT_FLAG(pml, timestep);
   PML_CHECK_INT_FLAG(pml, year);
@@ -752,17 +843,19 @@ void *Select(void *argument)
   //  PML_CHECK_WORD_FLAG(pml, enddate);
   PML_CHECK_WORD_FLAG(pml, season);
   PML_CHECK_WORD_FLAG(pml, date);
+#endif
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);
 
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);
 
-  pml_destroy(pml);
 
 #ifdef TEST_KVL
   sellist_destroy(sellist);
   kvlist_destroy(kvlist);
+#else
+  pml_destroy(pml);
 #endif
 
   if ( array ) Free(array);

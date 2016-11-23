@@ -30,22 +30,32 @@ typedef struct {
 #define  SELLIST_FLT         2
 #define  SELLIST_WORD        3
 
-#define  SELLIST_DEF_INT(name)                  int x_##name = 0
-#define  SELLIST_DEF_FLT(name)                  double x_##name = 0
-#define  SELLIST_DEF_WORD(name)                 const char *x_##name = 0
-#define  SELLIST_ADD_INT(sellist, name, txt)    SELLIST_DEF_INT(name);  int xpid_##name = sellist_add(sellist, txt, #name, SELLIST_INT)
-#define  SELLIST_ADD_FLT(sellist, name, txt)    SELLIST_DEF_FLT(name);  int xpid_##name = sellist_add(sellist, txt, #name, SELLIST_FLT)
-#define  SELLIST_ADD_WORD(sellist, name, txt)   SELLIST_DEF_WORD(name); int xpid_##name = sellist_add(sellist, txt, #name, SELLIST_WORD)
-#define  SELLIST_NOCC(name)                     sellist_nvalues(sellist, xpid_##name)
-#define  SELLIST_CHECK(name)                    sellist_check(sellist, xpid_##name, &x_##name)
-#define  SELLIST_CHECK_FLAG(name)               sellist_check_flag(sellist, xpid_##name)
+#define  SELLIST_DEF_INT(name)                  int name = 0
+#define  SELLIST_DEF_FLT(name)                  double name = 0
+#define  SELLIST_DEF_WORD(name)                 const char *name = 0
+#define  SELLIST_ADD_INT(sellist, name, txt)    SELLIST_DEF_INT(name);  int idx_##name = sellist_add(sellist, txt, #name, SELLIST_INT)
+#define  SELLIST_ADD_FLT(sellist, name, txt)    SELLIST_DEF_FLT(name);  int idx_##name = sellist_add(sellist, txt, #name, SELLIST_FLT)
+#define  SELLIST_ADD_WORD(sellist, name, txt)   SELLIST_DEF_WORD(name); int idx_##name = sellist_add(sellist, txt, #name, SELLIST_WORD)
+#define  SELLIST_NOCC(name)                     sellist_nvalues(sellist, idx_##name)
+#define  SELLIST_CHECK_FLAG(name)               sellist_check_flag(sellist, idx_##name)
+#define  SELLIST_CHECK(name)                    sellist_check(sellist, idx_##name, &name)
+#define  SELLIST_CHECK_DATE(name)               sellist_check_date(sellist, idx_##name, name)
+#define  SELLIST_CHECK_SEASON(name, month)      sellist_check_season(sellist, idx_##name, month)
+#define  SELLIST_DEF_FLAG(name, vindex, flag)   sellist_def_flag(sellist, idx_##name, vindex, flag)
+#define  SELLIST_GET_PAR(name, vindex, par)     sellist_get_par(sellist, idx_##name, vindex, par)
+#define  SELLIST_DEF_PAR(name, vindex, par)     sellist_def_par(sellist, idx_##name, vindex, par)
 
 
 sellist_t *sellist_create(list_t *kvlist);
 void sellist_destroy(sellist_t *sellist);
 int sellist_add(sellist_t *sellist, const char *txt, const char *name, int type);
 int sellist_nvalues(sellist_t *sellist, int idx);
-bool sellist_check(sellist_t *sellist, int idx, void *par);
 void sellist_check_flag(sellist_t *sellist, int idx);
+bool sellist_check(sellist_t *sellist, int idx, void *par);
+bool sellist_check_date(sellist_t *sellist, int idx, const char *par);
+bool sellist_check_season(sellist_t *sellist, int idx, int month);
+void sellist_def_flag(sellist_t *sellist, int idx, int vindex, bool flag);
+void sellist_get_par(sellist_t *sellist, int idx, int vindex, void *par);
+void sellist_def_par(sellist_t *sellist, int idx, int vindex, void *par);
 
 #endif

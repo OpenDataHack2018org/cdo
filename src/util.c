@@ -382,7 +382,7 @@ const char *parameter2word(const char *string)
   for ( size_t i = 0; i < len; ++i )
     {
       int c = string[i];
-      if ( !isalnum(c) && c != '_' && c != '.' && c != ':' )
+      if ( iscntrl(c) || isblank(c) )
         cdoAbort("Word parameter >%s< contains invalid character at position %d!", string, i+1);
     }
 
@@ -437,9 +437,7 @@ int parameter2int(const char *string)
 int parameter2intlist(const char *string)
 {
   char *endptr = NULL;
-
   int ival = (int) strtol(string, &endptr, 10);
-
   if ( *endptr != 0 && *endptr != '/' && (endptr - string) == 0 )
     cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));
