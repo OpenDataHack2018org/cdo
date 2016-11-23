@@ -528,7 +528,7 @@ static int file_exist(const char *tfilename, int force)
   size_t filesize = fileSize(tfilename);
   if ( filesize == 0 && force)
     {
-      fprintf(stderr, "Empty table file: %s\n", tfilename);
+      fprintf(stderr, "Empty file: %s\n", tfilename);
       return 0;
     }
   else if ( filesize == 0 && !force )
@@ -536,7 +536,8 @@ static int file_exist(const char *tfilename, int force)
       cdoWarning("cannot open '%s'", tfilename);
       return 0;
     }
-
+  if ( strstr(tfilename, ".nc") || strstr(tfilename, ".grb") )
+    return 1;
   FILE *fp = fopen(tfilename, "r");
   if ( fp == NULL && force )
     {
@@ -644,6 +645,7 @@ static int check_attr(list_t *kvl)
           i++;
         }
     }
+
 /* Check for special attributes */
   keyValues_t *kv_pos = kvlist_search(kvl, "p");
   if ( kv_pos )
@@ -829,16 +831,16 @@ static int in_list(char **list, const char *needle)
 
 static int get_netcdf_file_action(list_t *kvl)
 {
-  char *chunk = kv_get_a_val(kvl, "chunk", "");
-  if ( strcmp(chunk, "replace") == 0 )
+  char *chunk = kv_get_a_val(kvl, "oflag", "");
+  if ( strcmp(chunk, "r") == 0 )
     return CMOR_REPLACE;
-  else if ( strcmp(chunk, "append") == 0 )
+  else if ( strcmp(chunk, "a") == 0 )
     return CMOR_APPEND;
-  else if ( strcmp(chunk, "preserve") == 0 )
+  else if ( strcmp(chunk, "p") == 0 )
     return CMOR_APPEND;
   else
     {
-      cdoWarning("No valid CMOR output mode! \nAttribute oflag is '%s', but valid are 'append', 'replace' or 'preserve'.\nCMOR output mode is set to: replace.\n", chunk);
+      cdoWarning("No valid CMOR output mode! \nAttribute oflag is '%s', but valid are 'a' for append, 'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.\n", chunk);
       return CMOR_REPLACE;
     }
 }
@@ -931,10 +933,10 @@ static void setup_dataset(list_t *kvl, int streamID)
   int netcdf_file_action = get_netcdf_file_action(kvl);
   int set_verbosity = get_cmor_verbosity(kvl);
   int exit_control = get_cmor_exit_control(kvl);
+  int creat_subs = atol(kv_get_a_val(kvl, "drs", "0"));
 
   int vlistID = streamInqVlist(streamID);
 
-  int creat_subs = atol(kv_get_a_val(kvl, "create_subdirectories", "0"));
   cmor_setup(kv_get_a_val(kvl, "inpath", "/usr/share/cmor/"),
              &netcdf_file_action,
              &set_verbosity,
@@ -965,7 +967,7 @@ static void setup_dataset(list_t *kvl, int streamID)
   if ( CMOR_VERSION_MAJOR == 2 && CMOR_VERSION_MINOR == 9 )
     {
       double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
-      cmor_dataset(kv_get_a_val(kvl, "outpath", "./"),
+      cmor_dataset(kv_get_a_val(kvl, "odir", "./"),
                kv_get_a_val(kvl, "experiment_id", ""),
                kv_get_a_val(kvl, "institution", ""),
                kv_get_a_val(kvl, "source", ""),
@@ -1433,6 +1435,129 @@ static void check_and_gen_bounds(int gridID, int nbounds, int length, double *co
     }
 }
 
+static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, int xlength, double *xcoord_vals, double *xcell_bounds, int ynbounds, int ylength, double *ycoord_vals, double *ycell_bounds)
+{
+  if ( xnbounds != 4 * totalsize || ynbounds != 4 * totalsize || (xcell_bounds[1] == 0.00 && xcell_bounds[2] == 0.00) || (ycell_bounds[1] == 0.00 && ycell_bounds[2] == 0.00) )
+    {
+      for ( int j = 1; j < ylength-1; j++ )
+        for ( int i = 1; i < xlength-1; i++ )
+          {
+            ycell_bounds[4*(j*xlength+i)]   = ( ( ycoord_vals[j*xlength+i] + ycoord_vals[xlength*(j+1)+i] ) * 0.5 + ( ycoord_vals[xlength*j+i-1] + ycoord_vals[xlength*(j+1)+i-1] ) * 0.5 ) * 0.5;
+            ycell_bounds[4*(j*xlength+i)+1] = ( ( ycoord_vals[j*xlength+i] + ycoord_vals[xlength*(j-1)+i] ) * 0.5 + ( ycoord_vals[xlength*j+i-1] + ycoord_vals[xlength*(j-1)+i-1] ) * 0.5 ) * 0.5;
+            ycell_bounds[4*(j*xlength+i)+2] = ( ( ycoord_vals[j*xlength+i] + ycoord_vals[xlength*(j-1)+i] ) * 0.5 + ( ycoord_vals[xlength*j+i+1] + ycoord_vals[xlength*(j-1)+i+1] ) *0.5 ) * 0.5;
+            ycell_bounds[4*(j*xlength+i)+3] = ( ( ycoord_vals[j*xlength+i] + ycoord_vals[xlength*(j+1)+i] ) * 0.5 + ( ycoord_vals[xlength*j+i+1] + ycoord_vals[xlength*(j+1)+i+1] ) * 0.5 ) * 0.5;
+            xcell_bounds[4*(j*xlength+i)]   = ( ( xcoord_vals[j*xlength+i] + xcoord_vals[xlength*j+i-1] ) * 0.5 + ( xcoord_vals[xlength*(j+1)+i] + xcoord_vals[xlength*(j+1)+i-1] ) * 0.5 ) * 0.5;
+            xcell_bounds[4*(j*xlength+i)+1] = ( ( xcoord_vals[j*xlength+i] + xcoord_vals[xlength*j+i-1] ) * 0.5 + ( xcoord_vals[xlength*(j-1)+i] + xcoord_vals[xlength*(j-1)+i-1] ) * 0.5 ) * 0.5;
+            xcell_bounds[4*(j*xlength+i)+2] = ( ( xcoord_vals[j*xlength+i] + xcoord_vals[xlength*j+i+1] ) * 0.5 + ( xcoord_vals[xlength*(j-1)+i] + xcoord_vals[xlength*(j-1)+i+1] ) *0.5 ) * 0.5;
+            xcell_bounds[4*(j*xlength+i)+3] = ( ( xcoord_vals[j*xlength+i] + xcoord_vals[xlength*j+i+1] ) * 0.5 + ( xcoord_vals[xlength*(j+1)+i] + xcoord_vals[xlength*(j+1)+i+1] ) * 0.5 ) * 0.5;
+          }
+/* */
+/* Bottom left */
+/* */
+      ycell_bounds[0] = ( ycoord_vals[0] + ycoord_vals[1] ) * 0.5;
+      ycell_bounds[1] =   ycoord_vals[0] + ( ycoord_vals[0] - ycoord_vals[1] ) * 0.5;
+      ycell_bounds[2] =   ycoord_vals[0] + ( ycoord_vals[0] - ycoord_vals[1] ) * 0.5;
+      ycell_bounds[3] = ( ycoord_vals[0] + ycoord_vals[1] ) * 0.5;
+      xcell_bounds[0] =   xcoord_vals[0] + ( xcoord_vals[0] - xcoord_vals[xlength] ) * 0.5;
+      xcell_bounds[1] =   xcoord_vals[0] + ( xcoord_vals[0] - xcoord_vals[xlength] ) * 0.5;
+      xcell_bounds[2] = ( xcoord_vals[0] + xcoord_vals[xlength] ) * 0.5;
+      xcell_bounds[3] = ( xcoord_vals[0] + xcoord_vals[xlength] ) * 0.5;
+
+/* */
+/* Bottom right */
+/* */
+      ycell_bounds[4*(xlength-1)]   = ( ycoord_vals[xlength-1] +   ycoord_vals[2*xlength-1] ) * 0.5;
+      ycell_bounds[4*(xlength-1)+1] =   ycoord_vals[xlength-1] + ( ycoord_vals[xlength-1] - ycoord_vals[2*xlength-1] ) * 0.5;
+      ycell_bounds[4*(xlength-1)+2] =   ycoord_vals[xlength-1] + ( ycoord_vals[xlength-1] - ycoord_vals[2*xlength-1] ) * 0.5;
+      ycell_bounds[4*(xlength-1)+3] = ( ycoord_vals[xlength-1] +   ycoord_vals[2*xlength-1] ) * 0.5;
+      xcell_bounds[4*(xlength-1)]   = ( xcoord_vals[xlength-1] +   xcoord_vals[xlength-2] ) * 0.5;
+      xcell_bounds[4*(xlength-1)+1] = ( xcoord_vals[xlength-1] +   xcoord_vals[xlength-2] ) * 0.5;
+      xcell_bounds[4*(xlength-1)+2] =   xcoord_vals[xlength-1] + ( xcoord_vals[xlength-1] - xcoord_vals[xlength-2] ) * 0.5;
+      xcell_bounds[4*(xlength-1)+3] =   xcoord_vals[xlength-1] + ( xcoord_vals[xlength-1] - xcoord_vals[xlength-2] ) * 0.5;
+
+/* */
+/* Top left */
+/* */
+      ycell_bounds[4*(totalsize-xlength)]   =   ycoord_vals[totalsize-xlength] + ( ycoord_vals[totalsize-xlength] - ycoord_vals[totalsize-2*xlength] ) * 0.5;
+      ycell_bounds[4*(totalsize-xlength)+1] = ( ycoord_vals[totalsize-xlength] + ycoord_vals[totalsize-2*xlength] ) * 0.5;
+      ycell_bounds[4*(totalsize-xlength)+2] = ( ycoord_vals[totalsize-xlength] + ycoord_vals[totalsize-2*xlength] ) * 0.5;
+      ycell_bounds[4*(totalsize-xlength)+3] =   ycoord_vals[totalsize-xlength] + ( ycoord_vals[totalsize-xlength] - ycoord_vals[totalsize-2*xlength] ) * 0.5;
+      xcell_bounds[4*(totalsize-xlength)]   =   xcoord_vals[totalsize-xlength] + ( xcoord_vals[totalsize-xlength] - xcoord_vals[totalsize-xlength+1] ) * 0.5;
+      xcell_bounds[4*(totalsize-xlength)+1] =   xcoord_vals[totalsize-xlength] + ( xcoord_vals[totalsize-xlength] - xcoord_vals[totalsize-xlength+1] ) * 0.5;
+      xcell_bounds[4*(totalsize-xlength)+2] = ( xcoord_vals[totalsize-xlength] + xcoord_vals[totalsize-xlength+1] ) * 0.5;
+      xcell_bounds[4*(totalsize-xlength)+3] = ( xcoord_vals[totalsize-xlength] + xcoord_vals[totalsize-xlength+1] ) * 0.5;
+
+/* */
+/* Top right */
+/* */
+      ycell_bounds[4*totalsize-4] =    ycoord_vals[totalsize-1] + ( ycoord_vals[totalsize-1] - ycoord_vals[totalsize-1-xlength] ) * 0.5;
+      ycell_bounds[4*totalsize-3] = (  ycoord_vals[totalsize-1] + ycoord_vals[totalsize-1-xlength] ) * 0.5;
+      ycell_bounds[4*totalsize-2] = (  ycoord_vals[totalsize-1] + ycoord_vals[totalsize-1-xlength] ) * 0.5;
+      ycell_bounds[4*totalsize-1] =    ycoord_vals[totalsize-1] + ( ycoord_vals[totalsize-1] - ycoord_vals[totalsize-1-xlength] ) * 0.5;
+      xcell_bounds[4*totalsize-4] = (  xcoord_vals[totalsize-1] + xcoord_vals[totalsize-2] ) * 0.5;
+      xcell_bounds[4*totalsize-3] = (  xcoord_vals[totalsize-1] + xcoord_vals[totalsize-2] ) * 0.5;
+      xcell_bounds[4*totalsize-2] =    xcoord_vals[totalsize-1] + ( xcoord_vals[totalsize-1] - xcoord_vals[totalsize-2] ) * 0.5;
+      xcell_bounds[4*totalsize-1] =    xcoord_vals[totalsize-1] + ( xcoord_vals[totalsize-1] - xcoord_vals[totalsize-2] ) * 0.5;
+
+      for ( int i = 1; i < xlength-1; i++)
+        {
+/* */
+/*first values: */
+/* */
+          ycell_bounds[4*i]   = ( ( ycoord_vals[i] + ycoord_vals[i+xlength] ) * 0.5 + ( ycoord_vals[i-1] + ycoord_vals[i+xlength-1] ) * 0.5 ) * 0.5;
+          ycell_bounds[4*i+1] =     ycoord_vals[i] + ( ycoord_vals[i] - ycoord_vals[i+xlength] ) * 0.5;
+          ycell_bounds[4*i+2] =     ycoord_vals[i] + ( ycoord_vals[i] - ycoord_vals[i+xlength] ) * 0.5;
+          ycell_bounds[4*i+3] = ( ( ycoord_vals[i] + ycoord_vals[i+xlength] ) * 0.5 + ( ycoord_vals[i+1] + ycoord_vals[i+xlength+1] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*i]   = ( ( xcoord_vals[i] + xcoord_vals[i-1] ) * 0.5 + ( xcoord_vals[i+xlength] + xcoord_vals[i+xlength-1] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*i+1] =   ( xcoord_vals[i] + xcoord_vals[i-1] ) * 0.5;
+          xcell_bounds[4*i+2] =   ( xcoord_vals[i] + xcoord_vals[i+1] ) * 0.5;
+          xcell_bounds[4*i+3] = ( ( xcoord_vals[i] + xcoord_vals[i+1] ) * 0.5 + ( xcoord_vals[i+xlength] + xcoord_vals[i+xlength+1] ) * 0.5 ) * 0.5;
+/* */
+/*last values: */
+/* */
+          ycell_bounds[4*(totalsize-xlength+i)]   =     ycoord_vals[totalsize-xlength+i] + ( ycoord_vals[totalsize-xlength+i] - ycoord_vals[totalsize-2*xlength+i] ) * 0.5;
+          ycell_bounds[4*(totalsize-xlength+i)+1] = ( ( ycoord_vals[totalsize-xlength+i] + ycoord_vals[totalsize-2*xlength+i] ) * 0.5 + ( ycoord_vals[totalsize-xlength+i-1] + ycoord_vals[totalsize-2*xlength+i-1] ) * 0.5 ) * 0.5;
+          ycell_bounds[4*(totalsize-xlength+i)+2] = ( ( ycoord_vals[totalsize-xlength+i] + ycoord_vals[totalsize-2*xlength+i] ) * 0.5 + ( ycoord_vals[totalsize-xlength+i+1] + ycoord_vals[totalsize-2*xlength+i+1] ) * 0.5 ) * 0.5;
+          ycell_bounds[4*(totalsize-xlength+i)+3] =     ycoord_vals[totalsize-xlength+i] + ( ycoord_vals[totalsize-xlength+i] - ycoord_vals[totalsize-2*xlength+i] ) * 0.5;
+
+          xcell_bounds[4*(totalsize-xlength+i)]   = ( xcoord_vals[totalsize-xlength+i] + xcoord_vals[totalsize-xlength+i-1] ) * 0.5;
+          xcell_bounds[4*(totalsize-xlength+i)+1] = ( ( xcoord_vals[totalsize-xlength+i] + xcoord_vals[totalsize-xlength+i-1] ) * 0.5 + ( xcoord_vals[totalsize-2*xlength+i] + xcoord_vals[totalsize-2*xlength+i-1] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*(totalsize-xlength+i)+2] = ( ( xcoord_vals[totalsize-xlength+i] + xcoord_vals[totalsize-xlength+i+1] ) * 0.5 + ( xcoord_vals[totalsize-2*xlength+i] + xcoord_vals[totalsize-2*xlength+i+1] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*(totalsize-xlength+i)+3] = ( xcoord_vals[totalsize-xlength+i] + xcoord_vals[totalsize-xlength+i+1] ) * 0.5;
+        }
+
+     for ( int j = 1; j < ylength-1; j++)
+        {
+/* */
+/*first values: */
+/* */
+          ycell_bounds[4*j*xlength]   = (   ycoord_vals[j*xlength] + ycoord_vals[(j+1)*xlength] ) * 0.5;
+          ycell_bounds[4*j*xlength+1] = (   ycoord_vals[j*xlength] + ycoord_vals[(j-1)*xlength] ) * 0.5;
+          ycell_bounds[4*j*xlength+2] = ( ( ycoord_vals[j*xlength] + ycoord_vals[(j-1)*xlength] ) * 0.5 + ( ycoord_vals[j*xlength+1] + ycoord_vals[(j-1)*xlength+1] ) * 0.5 ) * 0.5;
+          ycell_bounds[4*j*xlength+3] = ( ( ycoord_vals[j*xlength] + ycoord_vals[(j+1)*xlength] ) * 0.5 + ( ycoord_vals[j*xlength+1] + ycoord_vals[(j+1)*xlength+1] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*j*xlength]   =     xcoord_vals[j*xlength] + ( xcoord_vals[j*xlength] - xcoord_vals[j*xlength+1] ) * 0.5;
+          xcell_bounds[4*j*xlength+1] =     xcoord_vals[j*xlength] + ( xcoord_vals[j*xlength] - xcoord_vals[j*xlength+1] ) * 0.5; 
+          xcell_bounds[4*j*xlength+2] = ( ( xcoord_vals[j*xlength] + xcoord_vals[j*xlength+1] ) * 0.5 + ( xcoord_vals[(j-1)*xlength] + xcoord_vals[(j-1)*xlength+1] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*j*xlength+3] = ( ( xcoord_vals[j*xlength] + xcoord_vals[j*xlength+1] ) * 0.5 + ( xcoord_vals[(j+1)*xlength] + xcoord_vals[(j+1)*xlength+1] ) * 0.5 ) * 0.5;
+/* */
+/*last values: */
+/* */
+          ycell_bounds[4*(j+1)*xlength-4] =  ( ( ycoord_vals[(j+1)*xlength-1] + ycoord_vals[(j+2)*xlength-1] ) * 0.5 + ( ycoord_vals[(j+1)*xlength-2] + ycoord_vals[(j+2)*xlength-2] ) * 0.5 ) * 0.5;
+          ycell_bounds[4*(j+1)*xlength-3] =  ( ( ycoord_vals[(j+1)*xlength-1] + ycoord_vals[j*xlength-1] )     * 0.5 + ( ycoord_vals[(j+1)*xlength-2] + ycoord_vals[j*xlength-2] )     * 0.5 ) * 0.5;
+          ycell_bounds[4*(j+1)*xlength-2] =  (   ycoord_vals[(j+1)*xlength-1] + ycoord_vals[j*xlength-1] ) * 0.5;
+          ycell_bounds[4*(j+1)*xlength-1] =  (   ycoord_vals[(j+1)*xlength-1] + ycoord_vals[(j+2)*xlength-1] ) * 0.5;
+
+          xcell_bounds[4*(j+1)*xlength-4] =  ( ( xcoord_vals[(j+1)*xlength-1] + xcoord_vals[(j+1)*xlength-2] ) * 0.5 + ( xcoord_vals[(j+2)*xlength-1] + xcoord_vals[(j+2)*xlength-2] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*(j+1)*xlength-3] =  ( ( xcoord_vals[(j+1)*xlength-1] + xcoord_vals[(j+1)*xlength-2] ) * 0.5 + ( xcoord_vals[j*xlength-1] + xcoord_vals[j*xlength-2] ) * 0.5 ) * 0.5;
+          xcell_bounds[4*(j+1)*xlength-2] =      xcoord_vals[(j+1)*xlength-1] + ( xcoord_vals[(j+1)*xlength-1] - xcoord_vals[(j+1)*xlength-2] ) * 0.5;
+          xcell_bounds[4*(j+1)*xlength-1] =      xcoord_vals[(j+1)*xlength-1] + ( xcoord_vals[(j+1)*xlength-1] - xcoord_vals[(j+1)*xlength-2] ) * 0.5;
+        }
+      gridDefNvertex(gridID, 4);
+      gridDefXbounds(gridID, xcell_bounds);
+      gridDefYbounds(gridID, ycell_bounds);
+    } 
+}
+
 static void select_and_register_character_dimension(char *grid_file, int *axis_ids)
 {
   char *ifile = cdoStreamName(0)->args;
@@ -1461,6 +1586,8 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   double *ycoord_vals;
   double *xcell_bounds;
   double *ycell_bounds;
+  double *x2cell_bounds;
+  double *y2cell_bounds;
   int xnbounds;
   int ynbounds;
 
@@ -1478,8 +1605,8 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
 
       check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
       check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
-
-      invert_ygriddes(kvl, vlistID, &gridID, ylength, ycoord_vals, ycell_bounds, &ynbounds);
+      
+/*      invert_ygriddes(kvl, vlistID, &gridID, ylength, ycoord_vals, ycell_bounds, &ynbounds); */
 
       cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
       cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd', 
@@ -1498,8 +1625,11 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       xcell_bounds = Malloc(4 * totalsize * sizeof(double));
       ycell_bounds = Malloc(4 * totalsize * sizeof(double));
       inquire_vals_and_bounds(gridID, &xnbounds, &ynbounds, xcoord_vals, ycoord_vals, xcell_bounds, ycell_bounds);
+      x2cell_bounds = Malloc(4 * totalsize * sizeof(double));
+      y2cell_bounds = Malloc(4 * totalsize * sizeof(double));
       get_cmor_table(kvl);
       int grid_axis[2];
+      check_and_gen_bounds_curv(gridID, totalsize, xnbounds, xlength, xcoord_vals, x2cell_bounds, ynbounds, ylength, ycoord_vals, y2cell_bounds);
       if ( type == GRID_CURVILINEAR )
         {
           double *xncoord_vals;
@@ -1510,11 +1640,10 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
             yncoord_vals[j]= (double) j;
           for (int j=0; j<xlength; j++)
             xncoord_vals[j]= (double) j;
-
           cmor_axis(&grid_axis[0], "j_index",    "1",    ylength,    (void *)yncoord_vals,
     'd', 0, 0, NULL);
           cmor_axis(&grid_axis[1], "i_index",    "1",    xlength,    (void *)xncoord_vals,    'd', 0, 0, NULL);
-          cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)ycell_bounds,    (void *)xcell_bounds);
+          cmor_grid(&grid_ids[0],    2,    grid_axis,    'd',    (void *)ycoord_vals,    (void *)xcoord_vals,    4,     (void *)y2cell_bounds,    (void *)x2cell_bounds);
           Free(xncoord_vals);
           Free(yncoord_vals);
         }
@@ -1528,6 +1657,8 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       Free(ycoord_vals);
       Free(xcell_bounds);
       Free(ycell_bounds);
+      Free(x2cell_bounds);
+      Free(y2cell_bounds);
     }
   else if ( type == GRID_GENERIC )
     {
@@ -1745,7 +1876,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID)
   int fyear, lyear, fmonth, lmonth, dummyone, dummytwo;
   if ( ntsteps > 2 )
     {
-      int recfirst = streamInqTimestep(streamID2, 1);
+      int recfirst = streamInqTimestep(streamID2, 0);
       cdiDecodeDate(taxisInqVdate(taxisID2), &fyear, &fmonth, &dummytwo);
       int reclast = streamInqTimestep(streamID2, ntsteps-1);    
       cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
@@ -1851,8 +1982,8 @@ static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date,
         }  
       if ( strcmp(frequency, "day") == 0 )
         {
-          time_bnds[0] = time_val - 0.5;
-          time_bnds[1] = time_val + 0.5;
+          time_bnds[0] = floor(time_val);
+          time_bnds[1] = ceil(time_val);
           return time_bnds;
         }  
       vtime0b = 0;
@@ -1880,43 +2011,38 @@ static void read_record(int streamID, double *buffer, size_t gridsize,
 {
   int varID, levelID;
   streamInqRecord(streamID, &varID, &levelID);
+  int gridID = vlistInqVarGrid(vlistID, varID);
+  int type = gridInqType(gridID);
   struct mapping *var = map_var(varID, vars);
   if ( var )
     {
+      int zaxisID = vlistInqVarZaxis(vlistID, varID);
+      int latdim = gridInqYsize(gridID);
+      int levdim = zaxisInqSize(zaxisID);
+      int chardim = gridsize/latdim;
       int nmiss;
-      if ( invert_lat )
+      streamReadRecord(streamID, buffer, &nmiss);
+      for ( size_t i = 0; i < gridsize; i++ )
         {
-          streamReadRecord(streamID, buffer, &nmiss);
-          double *array2 = (double*) Malloc(gridsize*sizeof(double));
-          int gridID = vlistInqVarGrid(vlistID, varID);
-	  invertLatDataCmor(buffer, array2, gridID);
-          for ( size_t i = 0; i < gridsize; i++ )
-            {
-              if ( var->datatype == 'f' )
-                {
-                  ((float *)var->data)[gridsize * levelID + i] =
-                  (float)array2[i];
-                }
-              else
-                {
-                  ((double *)var->data)[gridsize * levelID + i] =
-                  (double)array2[i];
-                }
-            }
-        }
-      else
-        {
+/* Wrong:  (lat x basin, lev ) gridsize * levelID + i */
+/* Wrong:  (basin x lat, lev) gridsize * levelID + i * chardim - ( int ) floor(i / latdim) * gridsize + ( int ) floor(i/latdim)
+/* Wrong:  (basin x lev, lat ) gridsize/latdim * levdim * ( i - ( int ) floor(i/latdim) * latdim ) + ( int ) floor(i/latdim) + gridsize/latdim * levelID; */
+/* Wrong:  (lat x lev, basin ) latdim * levdim * ( int ) floor(i/latdim) + ( i - ( int ) floor(i/latdim) * latdim ) + levelID * latdim*/
+/* (lev x lat, basin ) */
+          int newIndex;
+          if ( levdim > 1 && type == GRID_CURVILINEAR )
+            newIndex = i + gridsize*levelID;
+          else if ( levdim > 1 )
+            newIndex = i * levdim + levelID;
+          else
+            newIndex = i;
           if ( var->datatype == 'f' )
             {
-              streamReadRecord(streamID, buffer, &nmiss);
-              for ( size_t i = 0; i < gridsize; i++ )
-                ((float *)var->data)[gridsize * levelID + i] =
-                  (float)buffer[i];
+              ((float *)var->data)[newIndex] = (float)buffer[i];
             }
           else
             {
-              streamReadRecord(streamID, (double *)var->data + gridsize * levelID,
-                           &nmiss);
+              ((double *)var->data)[newIndex] = (double)buffer[i];
             }
         }
     }
@@ -1936,6 +2062,229 @@ static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vli
     cdoAbort("No surface pressure found for time step %d but required in Hybrid-sigma-pressure-coordinates! \n", timestep);
 }
 
+
+static int check_append_and_size(list_t *kvl, int vlistID, char *test, int ifreq)
+{
+  size_t filesize = fileSize(test);
+  char old_start_date[CMOR_MAX_STRING];
+  char old_end_date[CMOR_MAX_STRING];
+  int i = 0, j = 0;
+/* Get dates from chunk string */
+  while ( *(test+i) != 0 )
+    {
+      if ( *(test+i) == '_' )
+        {
+          test+=(i+1);
+          i = 0;
+        }
+      if ( *(test+i) == '-' )
+        j = i;
+      i++;
+    }
+  if ( !i || !j || *(test+j+1) == 0 || *(test+2*j) == 0 )
+    {
+      cdoWarning("Error while checking chunk size for append mode.\nNew data will be appended.");
+      return 0;
+    }
+
+  strncpy(old_start_date, test, j);
+  old_start_date[j] = 0;
+  test += (j + 1);
+  strncpy(old_end_date, test, j);
+  old_end_date[j] = 0;
+
+/* Check frequency of chunk with frequency of file */
+
+  if ( (j == 8 && ifreq !=3) || (ifreq == 3 && j != 8)
+    || (j == 6 && ifreq !=2) || (ifreq == 2 && j != 6)
+    || (j == 4 && ifreq !=1) || (ifreq == 1 && j != 4) )
+    cdoAbort("Frequency of chunk file does not agree with frequency of the working file.");
+
+/* Encode in julseconds depending on frequency */
+
+  int old_start_year, old_start_month = 1, old_start_day = 1;
+  int old_end_year, old_end_month = 1, old_end_day = 1;
+  int new_end_year, new_end_month = 1, new_end_day = 1;
+
+  switch ( j )
+    {
+    case ( 8 ):
+      sscanf(old_start_date, "%04d%02d%02d", &old_start_year, &old_start_month, &old_start_day);
+      sscanf(old_end_date, "%04d%02d%02d", &old_end_year, &old_end_month, &old_end_day);
+      break;
+    case ( 6 ):
+      sscanf(old_start_date, "%04d%02d", &old_start_year, &old_start_month);
+      sscanf(old_end_date, "%04d%02d", &old_end_year, &old_end_month);
+      break;
+    case ( 4 ):
+      old_start_year = atol(old_start_date);
+      old_end_year = atol(old_end_date);
+      break;
+    default:
+      cdoAbort("Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\nA new file will be written.");
+    }
+
+  char *attcalendar = kv_get_a_val(kvl, "calendar", "");
+  int calendar = get_calendar_int(attcalendar);
+  int cdi_startdate = cdiEncodeDate(old_start_year, old_start_month, old_start_day);
+  int cdi_enddate = cdiEncodeDate(old_end_year, old_end_month, old_end_day);
+  int cdi_time = cdiEncodeTime(0, 0, 0);
+  juldate_t julostart = juldate_encode(calendar, cdi_startdate, cdi_time);
+  juldate_t juloend = juldate_encode(calendar, cdi_enddate, cdi_time);
+
+/* Read in first vdate in case not piped */
+  if ( cdoStreamName(0)->args[0] == '-' )
+    {
+      cdoWarning("Cdo cmor cannot enable append mode since you piped several cdo operators.\nA new file will be written.");
+      return 0;
+    }
+      
+  int streamID2 = streamOpenRead(cdoStreamName(0));
+  int vlistID2 = streamInqVlist(streamID2);
+  int taxisID2 = vlistInqTaxis(vlistID2);
+  juldate_t firstdate = juldate_encode(calendar, taxisInqVdate(taxisID2),
+                                     taxisInqVtime(taxisID2));
+
+/* Check temporal distance between last chunk date and first file date */
+  double append_distance = juldate_to_seconds(juldate_sub(firstdate, juloend)) / 3600.0;
+
+  if ( ( j == 8 && append_distance > 48.0 )
+     ||( j == 6 && append_distance/24.0 > 45.0 )
+     ||( j == 4 && append_distance/24.0/30.5 > 19.0 ) )
+    cdoAbort("A temporal gap is diagnosed between end date of chunk file and first date of working file of: '%f' hours. Maximal valid gaps are:\n47 hours for daily frequency\n45 days for monthly frequency\n19 month for yearly frequency", append_distance);
+
+/* Check file size */
+  double old_interval_sec = juldate_to_seconds(juldate_sub(juloend, julostart));
+  double size_per_sec = (double) filesize / old_interval_sec;
+
+  int maxsizegb = atol(kv_get_a_val(kvl, "maxsizegb", "2"));
+  int maxsizeb = maxsizegb * 1024 * 1024 * 1024;
+
+  int ntsteps = vlistNtsteps(vlistID);
+  if ( ntsteps < 0 )
+    {
+      cdoWarning("Could not check expected file size for exceeding maximal file size: %s gb.\nA new file will be written.", maxsizegb);
+      return 0;
+    }
+  
+  double estimated_size;
+  switch ( j )
+    {
+    case ( 8 ):
+      estimated_size = ntsteps * 60 * 60 * 24 * size_per_sec + (double) filesize ;
+      break;
+    case ( 6 ):
+      estimated_size = ntsteps * 60 * 60 * 24 * 30.5 * size_per_sec + (double) filesize;
+      break;
+    case ( 4 ):
+      estimated_size = ntsteps * 60 * 60 * 24 * 365.25 * size_per_sec + (double) filesize;
+      break;
+    default:
+      cdoAbort("Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\nA new file will be written.");
+    }
+
+  if ( (unsigned int)estimated_size > (unsigned int) maxsizeb )
+    {
+      cdoWarning("Estimated file size of appended file is : '%f'gb and exceeds maximal allowed file size: '%d'gb.\nA new file will be written.", estimated_size/1024.0/1024.0/1024.0, maxsizegb);
+      return 0;
+    }
+  return 1;
+}
+
+static char *use_chunk_file_des(list_t *kvl, int vlistID, int var_id, char *att_chunk_des_file, int ifreq)
+{
+  char name[CDI_MAX_NAME];
+  vlistInqVarName(vlistID, var_id, name);
+  char chunk_des_file[CMOR_MAX_STRING];
+  sprintf(chunk_des_file, "APPEND_FILE_%s_%s.txt", name, att_chunk_des_file);
+  printf("It is tried to open a chunk description file named: '%s' where the chunk file name should be noted\n", chunk_des_file); 
+  if ( file_exist(chunk_des_file, 0) )
+    {
+      FILE *fp = fopen(chunk_des_file, "r");
+      size_t filesize = fileSize(chunk_des_file);
+      char *buffer = (char*) Malloc(filesize);
+      char *appendFile = Malloc(4096 * sizeof(char));
+      size_t nitems = fread(buffer, 1, filesize, fp);
+      buffer = readLineFromBuffer(buffer, &filesize, appendFile, 4096);
+      fclose(fp);
+      if ( file_exist(appendFile, 0) && check_append_and_size(kvl, vlistID, appendFile, ifreq) )
+        return appendFile;
+      else
+        cdoWarning("Append chunk :'%s' configured via chunk description file could not be opened.\nA new file will be written", appendFile);
+    }
+  else
+    cdoWarning("Chunk description file '%s' could not be opened.\nA new file will be written.", chunk_des_file);
+  return " ";  
+}
+
+static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, int ifreq)
+{
+  char **append_files;
+
+  char *timeaxis = kv_get_a_val(kvl, "time_axis", "");
+  char *att_append_file = kv_get_a_val(kvl, "append_file", " ");
+  int create_subs = atol(kv_get_a_val(kvl, "drs", "0"));
+/* For chunk description file : */
+  char att_chunk_des_file[CMOR_MAX_STRING];
+  char *description_atts[] = {"miptab_freq", "model_id", "experiment_id", "member", NULL};
+  strcpy(att_chunk_des_file, kv_get_a_val(kvl, description_atts[0], ""));
+  int i = 1;
+  while ( description_atts[i] != NULL )
+    {
+      strcat(att_chunk_des_file, "_");
+      strcat(att_chunk_des_file, kv_get_a_val(kvl, description_atts[i], ""));
+      i++;
+    }
+  for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
+  append_files = Malloc(i * sizeof(char *));
+
+  for ( int j = 0; vars[j].cdi_varID != CDI_UNDEFID; j++ )
+    {
+      if ( strcmp (kv_get_a_val(kvl, "oflag", ""), "a") == 0 )
+        { 
+          if ( strcmp(timeaxis, "none") != 0 )
+            {
+              if ( ( i > 1 && strcmp(att_append_file, " ") == 0 ) || i == 1 )
+                {
+                  if ( create_subs && strcmp(att_append_file, " ") == 0 )
+                    {  
+                      printf("It is tried to open a chunk description file for varID: '%d'.\n", vars[j].cdi_varID);
+                      char *chunk_file=use_chunk_file_des(kvl, vlistID, vars[j].cdi_varID, att_chunk_des_file, ifreq);  
+                      append_files[j] = strdup(chunk_file);
+                      continue;      
+                    }
+                  else if ( strcmp(att_append_file, " ") != 0 )
+                    {
+                      if ( file_exist(att_append_file, 0) && check_append_and_size(kvl, vlistID, att_append_file, ifreq) )
+                        {
+                          append_files[j] = strdup(att_append_file);
+                          continue;
+                        }
+                      else
+                        {
+                          cdoWarning("Previous chunk configuration via attribute 'append_file': '%s' could not be opened.", att_append_file);
+                        }      
+                    }
+                  else
+                    {
+                      cdoWarning("Previous chunk configuration via chunk file description not possible if DRS is not created.\nNew files will be written");
+                    }
+                }
+              else
+                {
+                  cdoWarning("Previous chunk configuration via attribute 'append_file' not possible if more than one variables are requested.\nNew files will be written");
+                }
+            }
+          else
+            {
+              cdoWarning("CMOR mode APPEND not possible for time independent variables.\nA new file will be written");
+            }
+        }
+      append_files[j] = strdup(" ");
+    }
+  return append_files;
+}
+
 static void write_variables(list_t *kvl, int streamID, struct mapping vars[], int *zfactor_id)
 {
   printf("\n*******Start to write variables via cmor_write.******\n");
@@ -1953,10 +2302,23 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
   get_taxis(kv_get_a_val(kvl, "req_time_units", ""), kv_get_a_val(kvl, "calendar", ""), &sdate, &stime, &time_unit, &calendar);
   int tunitsec = get_tunitsec(time_unit);
   juldate_t ref_date = juldate_encode(calendar, sdate, stime);
-  char *frequency;
+  char *frequency = NULL;
   char *timeaxis = kv_get_a_val(kvl, "time_axis", "");
   if ( strcmp(timeaxis, "none") != 0 )
     frequency = get_frequency(kvl, streamID, vlistID, taxisID);
+
+  int ifreq = 0;
+  if ( frequency )
+    {
+      if ( strcmp(frequency,"yr") == 0 )
+        ifreq = 1;
+      if ( strcmp(frequency,"mon") == 0 )
+        ifreq = 2;
+      if ( strcmp(frequency,"day") == 0 )
+        ifreq = 3;
+    }
+  char **append_files = get_append_files(kvl, vars, vlistID, ifreq);
+
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
       double time_bnds[2];
@@ -1975,15 +2337,12 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
         {
           if ( !vars[i].help_var )
             {
-              char *file_suffix = kv_get_a_val(kvl, "file_suffix", "");
-              if ( strcmp (kv_get_a_val(kvl, "oflag", ""), "append") != 0 )
-                file_suffix = NULL;
               if ( strcmp(timeaxis, "none") != 0 )
                 {
                   cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
-                   file_suffix,
+                   append_files[i],
                    1,
                    &time_val,
                    time_bndsp,
@@ -1992,7 +2351,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
                     cmor_write(*zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
-                       file_suffix,
+                       append_files[i],
                        1,
                        &time_val,
                        time_bndsp,
@@ -2002,7 +2361,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
                 cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
-                   file_suffix, 0, 0, 0, NULL);
+                   append_files[i], 0, 0, 0, NULL);
             }
         }
     }
@@ -2126,11 +2485,29 @@ static char *get_mip_table(char *params, list_t *kvl)
         {
           char *miptab = malloc((strlen(miptabdir)+strlen(projid)+strlen(params)+3) * sizeof(char));
           sprintf(miptab, "%s/%s_%s\0", miptabdir, projid, params);
-          return miptab;
+          if ( file_exist(miptab, 0) )
+            return miptab;
+          else
+            cdoAbort("Could not open mip table '%s'.", miptab);
         }
       else
         cdoAbort("Could not build a mip table path.");
     }        
+}
+
+static void save_miptab_freq(list_t *kvl, char *mip_table)
+{
+  char *freq = strdup(mip_table);
+  int fpos = 0, j = 0;
+  while ( *(mip_table + j) )
+    {
+      j++;
+      if ( *(mip_table + j) == '_' && *(mip_table + j + 1) )
+        fpos = j + 1;
+    }
+  freq += fpos;
+  if ( freq != NULL && fpos )
+    kv_insert_a_val(kvl, "miptab_freq", freq, 0);
 }
 #endif
 
@@ -2161,6 +2538,7 @@ void *CMOR(void *argument)
 
   /* check MIP table */
   char *mip_table = get_mip_table(params[0], kvl);
+  save_miptab_freq(kvl, mip_table);
 
   int streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
