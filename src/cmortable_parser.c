@@ -130,7 +130,7 @@ char *getElementValues(char *pline, char **values, int *nvalues)
 }
 
 
-void cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
+void cmortablebuf_to_pmlist(list_t *pml, size_t buffersize, char *buffer)
 {
   char line[4096];
   char name[256];
@@ -138,7 +138,7 @@ void cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
   char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter"};
   int linenumber = 0;
   int listtype = 0;
-  list_t *kvlist = NULL;
+  list_t *kvl = NULL;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
     {
