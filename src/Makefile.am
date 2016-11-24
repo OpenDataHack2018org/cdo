@@ -107,8 +107,6 @@ libcdo_la_SOURCES =            \
                percentiles.h   \
                pipe.c          \
                pipe.h          \
-               pml.c           \
-               pml.h           \
                pmlist.c        \
                pmlist.h        \
                sellist.c       \
