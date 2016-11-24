@@ -106,28 +106,28 @@ void *Select(void *argument)
 
   sellist_t *sellist = sellist_create(kvlist);
 
-  SELLIST_ADD_INT(sellist, timestep_of_year, "Timestep of year");
-  SELLIST_ADD_INT(sellist, timestep,         "Timestep");
-  SELLIST_ADD_INT(sellist, year,             "Year");
-  SELLIST_ADD_INT(sellist, month,            "Month");
-  SELLIST_ADD_INT(sellist, day,              "Day");
-  SELLIST_ADD_INT(sellist, hour,             "Hour");
-  SELLIST_ADD_INT(sellist, minute,           "Minute");
-  SELLIST_ADD_INT(sellist, code,             "Code number");
-  SELLIST_ADD_INT(sellist, levidx,           "Level index");
-  SELLIST_ADD_INT(sellist, ltype,            "Level type");
-  SELLIST_ADD_INT(sellist, zaxisnum,         "Zaxis number");
-  SELLIST_ADD_INT(sellist, gridnum,          "Grid number");
-  SELLIST_ADD_FLT(sellist, level,            "Level");
-  SELLIST_ADD_WORD(sellist, name,            "Variable name");
-  SELLIST_ADD_WORD(sellist, param,           "Parameter");
-  SELLIST_ADD_WORD(sellist, zaxisname,       "Zaxis name");
-  SELLIST_ADD_WORD(sellist, gridname,        "Grid name");
-  SELLIST_ADD_WORD(sellist, steptype,        "Time step type");
-  SELLIST_ADD_WORD(sellist, startdate,       "Start date");
-  SELLIST_ADD_WORD(sellist, enddate,         "End date");
-  SELLIST_ADD_WORD(sellist, season,          "Season");
-  SELLIST_ADD_WORD(sellist, date,            "Date");
+  SELLIST_ADD_INT(timestep_of_year, "Timestep of year");
+  SELLIST_ADD_INT(timestep,         "Timestep");
+  SELLIST_ADD_INT(year,             "Year");
+  SELLIST_ADD_INT(month,            "Month");
+  SELLIST_ADD_INT(day,              "Day");
+  SELLIST_ADD_INT(hour,             "Hour");
+  SELLIST_ADD_INT(minute,           "Minute");
+  SELLIST_ADD_INT(code,             "Code number");
+  SELLIST_ADD_INT(levidx,           "Level index");
+  SELLIST_ADD_INT(ltype,            "Level type");
+  SELLIST_ADD_INT(zaxisnum,         "Zaxis number");
+  SELLIST_ADD_INT(gridnum,          "Grid number");
+  SELLIST_ADD_FLT(level,            "Level");
+  SELLIST_ADD_WORD(name,            "Variable name");
+  SELLIST_ADD_WORD(param,           "Parameter");
+  SELLIST_ADD_WORD(zaxisname,       "Zaxis name");
+  SELLIST_ADD_WORD(gridname,        "Grid name");
+  SELLIST_ADD_WORD(steptype,        "Time step type");
+  SELLIST_ADD_WORD(startdate,       "Start date");
+  SELLIST_ADD_WORD(enddate,         "End date");
+  SELLIST_ADD_WORD(season,          "Season");
+  SELLIST_ADD_WORD(date,            "Date");
 
   if ( cdoVerbose ) sellist_print(sellist);
 
@@ -172,15 +172,15 @@ void *Select(void *argument)
 		}
 	    }
 
-          bool lvarsel = SELLIST_NOCC(code) || SELLIST_NOCC(ltype) || SELLIST_NOCC(zaxisnum) ||
-            SELLIST_NOCC(gridnum) || SELLIST_NOCC(name) || SELLIST_NOCC(param) ||
-            SELLIST_NOCC(zaxisname) || SELLIST_NOCC(gridname) || SELLIST_NOCC(steptype);
+          bool lvarsel = SELLIST_NVAL(code) || SELLIST_NVAL(ltype) || SELLIST_NVAL(zaxisnum) ||
+            SELLIST_NVAL(gridnum) || SELLIST_NVAL(name) || SELLIST_NVAL(param) ||
+            SELLIST_NVAL(zaxisname) || SELLIST_NVAL(gridname) || SELLIST_NVAL(steptype);
 
-          bool llevsel = SELLIST_NOCC(level) || SELLIST_NOCC(levidx);
+          bool llevsel = SELLIST_NVAL(level) || SELLIST_NVAL(levidx);
 
-	  ltimsel = SELLIST_NOCC(date) || SELLIST_NOCC(startdate) || SELLIST_NOCC(enddate) || SELLIST_NOCC(season) ||
-            SELLIST_NOCC(timestep_of_year) || SELLIST_NOCC(timestep) || SELLIST_NOCC(year) || SELLIST_NOCC(month) ||
-            SELLIST_NOCC(day) || SELLIST_NOCC(hour) || SELLIST_NOCC(minute);
+	  ltimsel = SELLIST_NVAL(date) || SELLIST_NVAL(startdate) || SELLIST_NVAL(enddate) || SELLIST_NVAL(season) ||
+            SELLIST_NVAL(timestep_of_year) || SELLIST_NVAL(timestep) || SELLIST_NVAL(year) || SELLIST_NVAL(month) ||
+            SELLIST_NVAL(day) || SELLIST_NVAL(hour) || SELLIST_NVAL(minute);
           
 	  for ( varID = 0; varID < nvars; ++varID )
 	    {
@@ -235,9 +235,9 @@ void *Select(void *argument)
               bool found_zname = SELLIST_CHECK(zaxisname);
 
               bool lvar  = found_code || found_name || found_param;
-              bool lstep = SELLIST_NOCC(steptype) ? found_stype : true;
-              bool lgrid = (SELLIST_NOCC(gridnum) || SELLIST_NOCC(gridname)) ? (found_grid || found_gname) : true;
-              bool lvert = (SELLIST_NOCC(ltype) || SELLIST_NOCC(zaxisnum) || SELLIST_NOCC(zaxisname)) ? (found_ltype || found_zaxis || found_zname) : true;
+              bool lstep = SELLIST_NVAL(steptype) ? found_stype : true;
+              bool lgrid = (SELLIST_NVAL(gridnum) || SELLIST_NVAL(gridname)) ? (found_grid || found_gname) : true;
+              bool lvert = (SELLIST_NVAL(ltype) || SELLIST_NVAL(zaxisnum) || SELLIST_NVAL(zaxisname)) ? (found_ltype || found_zaxis || found_zname) : true;
 	     
               if ( !vars[varID] && lgrid && lvar ) vars[varID] = true;
               if ( !vars[varID] && lvert && lvar ) vars[varID] = true;
@@ -248,7 +248,7 @@ void *Select(void *argument)
                   if      ( found_grid || found_gname ) vars[varID] = true;
                   else if ( found_stype ) vars[varID] = true;
                   else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = true;
-                  else if ( !lvarsel && (SELLIST_NOCC(levidx) || SELLIST_NOCC(level)) )
+                  else if ( !lvarsel && (SELLIST_NVAL(levidx) || SELLIST_NVAL(level)) )
                     {
                       for ( int levID = 0; levID < nlevs; ++levID )
                         {
@@ -292,12 +292,12 @@ void *Select(void *argument)
 			}
 		      else
 			{
-			  if ( SELLIST_NOCC(levidx) )
+			  if ( SELLIST_NVAL(levidx) )
 			    {
 			      if ( SELLIST_CHECK(levidx) )
 				vlistDefFlag(vlistID1, varID, levID, xresult);
 			    }
-			  else if ( SELLIST_NOCC(level) )
+			  else if ( SELLIST_NVAL(level) )
 			    {
 			      if ( SELLIST_CHECK(level) )
 				vlistDefFlag(vlistID1, varID, levID, xresult);
@@ -404,7 +404,7 @@ void *Select(void *argument)
 	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
 
-	  ntsteps2 = (operatorID == SELECT && SELLIST_NOCC(timestep) == 1) ? 1 : ntsteps;
+	  ntsteps2 = (operatorID == SELECT && SELLIST_NVAL(timestep) == 1) ? 1 : ntsteps;
 	  
 	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {
@@ -414,18 +414,18 @@ void *Select(void *argument)
 	    }
 
 	  // support for negative timestep values
-	  if ( SELLIST_NOCC(timestep) > 0 && ntsteps > 0 && nfiles == 1 )
+	  if ( SELLIST_NVAL(timestep) > 0 && ntsteps > 0 && nfiles == 1 )
 	    {
-	      for ( int i = 0; i < SELLIST_NOCC(timestep); ++i )
+	      for ( int i = 0; i < SELLIST_NVAL(timestep); ++i )
 		{
                   int ptimestep;
-                  SELLIST_GET_PAR(timestep, i, &ptimestep);
+                  SELLIST_GET_VAL(timestep, i, &ptimestep);
 		  if ( ptimestep < 0 )
 		    {
 		      if ( cdoVerbose )
 			cdoPrint("timestep %d changed to %d", ptimestep, ptimestep + ntsteps + 1);
 		      ptimestep += ntsteps + 1;
-                      SELLIST_DEF_PAR(timestep, i, &ptimestep);
+                      SELLIST_DEF_VAL(timestep, i, &ptimestep);
 		    }
 		}
 	    }
@@ -437,10 +437,10 @@ void *Select(void *argument)
 	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
 
-	  SELLIST_GET_PAR(startdate, 0, &startdate);
-	  SELLIST_GET_PAR(enddate, 0, &enddate);
-	  if ( SELLIST_NOCC(startdate) ) fstartdate = datestr_to_double(startdate, 0);
-	  if ( SELLIST_NOCC(enddate)   ) fenddate   = datestr_to_double(enddate, 1);
+	  SELLIST_GET_VAL(startdate, 0, &startdate);
+	  SELLIST_GET_VAL(enddate, 0, &enddate);
+	  if ( SELLIST_NVAL(startdate) ) fstartdate = datestr_to_double(startdate, 0);
+	  if ( SELLIST_NVAL(enddate)   ) fenddate   = datestr_to_double(enddate, 1);
 	}
       else
 	{
@@ -471,10 +471,10 @@ void *Select(void *argument)
 	    {
 	      copytimestep = false;
 
-	      if ( operatorID == SELECT && SELLIST_NOCC(timestep) > 0 )
+	      if ( operatorID == SELECT && SELLIST_NVAL(timestep) > 0 )
 		{
                   int ptimestep;
-                  SELLIST_GET_PAR(timestep, SELLIST_NOCC(timestep)-1, &ptimestep);
+                  SELLIST_GET_VAL(timestep, SELLIST_NVAL(timestep)-1, &ptimestep);
                   if ( timestep > ptimestep )
                     {
                       lstop = true;
@@ -500,23 +500,23 @@ void *Select(void *argument)
 	      if ( SELLIST_CHECK(timestep) ) copytimestep = true;
 	      if ( SELLIST_CHECK(timestep_of_year) ) copytimestep = true;
 
-	      if ( !copytimestep && SELLIST_NOCC(date) == 0 && SELLIST_NOCC(timestep) == 0 && SELLIST_NOCC(timestep_of_year) == 0 )
+	      if ( !copytimestep && SELLIST_NVAL(date) == 0 && SELLIST_NVAL(timestep) == 0 && SELLIST_NVAL(timestep_of_year) == 0 )
 		{
 		  bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
 
-		  if ( SELLIST_NOCC(season) == 0 || SELLIST_CHECK_SEASON(season, month) ) lseason   = true;
-		  if ( SELLIST_NOCC(year)   == 0 || SELLIST_CHECK(year)   ) lyear   = true;
-		  if ( SELLIST_NOCC(month)  == 0 || SELLIST_CHECK(month)  ) lmonth  = true;
-		  if ( SELLIST_NOCC(day)    == 0 || SELLIST_CHECK(day)    ) lday    = true;
-		  if ( SELLIST_NOCC(hour)   == 0 || SELLIST_CHECK(hour)   ) lhour   = true;
-		  if ( SELLIST_NOCC(minute) == 0 || SELLIST_CHECK(minute) ) lminute = true;
+		  if ( SELLIST_NVAL(season) == 0 || SELLIST_CHECK_SEASON(season, month) ) lseason   = true;
+		  if ( SELLIST_NVAL(year)   == 0 || SELLIST_CHECK(year)   ) lyear   = true;
+		  if ( SELLIST_NVAL(month)  == 0 || SELLIST_CHECK(month)  ) lmonth  = true;
+		  if ( SELLIST_NVAL(day)    == 0 || SELLIST_CHECK(day)    ) lday    = true;
+		  if ( SELLIST_NVAL(hour)   == 0 || SELLIST_CHECK(hour)   ) lhour   = true;
+		  if ( SELLIST_NVAL(minute) == 0 || SELLIST_CHECK(minute) ) lminute = true;
 
 		  if ( lseason && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
 		}
 
 	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
 
-	      if ( SELLIST_NOCC(enddate) )
+	      if ( SELLIST_NVAL(enddate) )
 		{
                   copytimestep = (fdate <= fenddate);
 		  if ( fdate > fenddate )
@@ -530,13 +530,13 @@ void *Select(void *argument)
 		    }
 		}
 
-	      if ( SELLIST_NOCC(startdate) )
+	      if ( SELLIST_NVAL(startdate) )
 		{
                   copytimestep = (fdate >= fstartdate);
 		  if ( fdate >= fstartdate ) SELLIST_DEF_FLAG(startdate, 0, true);
 		}
 
-              if ( SELLIST_NOCC(date) )
+              if ( SELLIST_NVAL(date) )
                 {
                   char vdatetimestr[64];
                   datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));

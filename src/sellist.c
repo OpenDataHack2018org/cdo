@@ -277,7 +277,7 @@ void sellist_def_flag(sellist_t *sellist, int idx, int vindex, bool flag)
 }
 
 
-void sellist_get_par(sellist_t *sellist, int idx, int vindex, void *par)
+void sellist_get_val(sellist_t *sellist, int idx, int vindex, void *val)
 {
   if ( idx < 0 || idx >= sellist->size ) return;
 
@@ -290,16 +290,16 @@ void sellist_get_par(sellist_t *sellist, int idx, int vindex, void *par)
         {
           switch (e->type)
             {
-            case SELLIST_INT:  *(int*)par = ((int*)e->cvalues)[vindex]; break;
-            case SELLIST_FLT:  *(double*)par = ((double*)e->cvalues)[vindex]; break;
-            case SELLIST_WORD: *(const char**)par = ((const char**)e->cvalues)[vindex]; break;
+            case SELLIST_INT:  *(int*)val = ((int*)e->cvalues)[vindex]; break;
+            case SELLIST_FLT:  *(double*)val = ((double*)e->cvalues)[vindex]; break;
+            case SELLIST_WORD: *(const char**)val = ((const char**)e->cvalues)[vindex]; break;
             }
         }
     }
 }
 
 
-void sellist_def_par(sellist_t *sellist, int idx, int vindex, void *par)
+void sellist_def_val(sellist_t *sellist, int idx, int vindex, void *val)
 {
   if ( idx < 0 || idx >= sellist->size ) return;
 
@@ -312,9 +312,9 @@ void sellist_def_par(sellist_t *sellist, int idx, int vindex, void *par)
         {
           switch (e->type)
             {
-            case SELLIST_INT:  ((int*)e->cvalues)[vindex] = *(int*)par; break;
-            case SELLIST_FLT:  ((double*)e->cvalues)[vindex] = *(double*)par; break;
-            case SELLIST_WORD: ((const char**)e->cvalues)[vindex] = *(const char**)par; break;
+            case SELLIST_INT:  ((int*)e->cvalues)[vindex] = *(int*)val; break;
+            case SELLIST_FLT:  ((double*)e->cvalues)[vindex] = *(double*)val; break;
+            case SELLIST_WORD: ((const char**)e->cvalues)[vindex] = *(const char**)val; break;
             }
         }
     }
