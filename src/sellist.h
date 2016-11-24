@@ -57,5 +57,6 @@ bool sellist_check_season(sellist_t *sellist, int idx, int month);
 void sellist_def_flag(sellist_t *sellist, int idx, int vindex, bool flag);
 void sellist_get_par(sellist_t *sellist, int idx, int vindex, void *par);
 void sellist_def_par(sellist_t *sellist, int idx, int vindex, void *par);
+void sellist_print(sellist_t *sellist);
 
 #endif

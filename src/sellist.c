@@ -194,10 +194,9 @@ bool sellist_check(sellist_t *sellist, int idx, void *par)
   if ( nvalues )
     {
       selentry_t *e = &(sellist->entry[idx]);
-      int type = e->type;
       for ( int i = 0; i < nvalues; ++i )
         {
-          switch (type)
+          switch (e->type)
             {
             case SELLIST_INT:  if ( *(int*)par == ((int*)e->cvalues)[i] )                       { found = true; e->flag[i] = true; } break;
             case SELLIST_FLT:  if ( fabs(*(double*)par - ((double*)e->cvalues)[i]) < 1.e-4 )    { found = true; e->flag[i] = true; } break;
@@ -287,10 +286,9 @@ void sellist_get_par(sellist_t *sellist, int idx, int vindex, void *par)
   if ( nvalues )
     {
       selentry_t *e = &(sellist->entry[idx]);
-      int type = e->type;
       if ( vindex >= 0 && vindex < nvalues )
         {
-          switch (type)
+          switch (e->type)
             {
             case SELLIST_INT:  *(int*)par = ((int*)e->cvalues)[vindex]; break;
             case SELLIST_FLT:  *(double*)par = ((double*)e->cvalues)[vindex]; break;
@@ -310,10 +308,9 @@ void sellist_def_par(sellist_t *sellist, int idx, int vindex, void *par)
   if ( nvalues )
     {
       selentry_t *e = &(sellist->entry[idx]);
-      int type = e->type;
       if ( vindex >= 0 && vindex < nvalues )
         {
-          switch (type)
+          switch (e->type)
             {
             case SELLIST_INT:  ((int*)e->cvalues)[vindex] = *(int*)par; break;
             case SELLIST_FLT:  ((double*)e->cvalues)[vindex] = *(double*)par; break;
@@ -322,3 +319,30 @@ void sellist_def_par(sellist_t *sellist, int idx, int vindex, void *par)
         }
     }
 }
+
+
+void sellist_print(sellist_t *sellist)
+{
+  if ( sellist )
+    {
+      // printf("Parameter list: %s\n", sellist->
+      printf("Num  Name             Type  Size  Entries\n");
+      for ( int idx = 0; idx < sellist->size; ++idx )
+        {
+          selentry_t *e = &(sellist->entry[idx]);
+          printf("%3d  %-16s %4d  %4d ", idx+1, e->key, e->type, e->nvalues);
+          int nvalues = e->nvalues;
+          if ( nvalues > 12 ) nvalues = 12;
+          for ( int i = 0; i < nvalues; ++i )
+            switch (e->type)
+              {
+              case SELLIST_INT:  printf(" %d", ((int*)e->cvalues)[i]); break;
+              case SELLIST_FLT:  printf(" %g", ((double*)e->cvalues)[i]); break;
+              case SELLIST_WORD: printf(" %s", ((char**)e->cvalues)[i]); break;
+              }
+          if ( nvalues < e->nvalues ) printf(" ...");
+          printf("\n");
+        }
+    }
+}
+

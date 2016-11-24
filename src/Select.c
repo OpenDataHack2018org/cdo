@@ -20,7 +20,6 @@
 
       Select      select         Select fields
 */
-//#define TEST_KVL
 
 #include <cdi.h>
 #include "cdo.h"
@@ -28,11 +27,9 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-#include "pml.h"
 #include "pmlist.h"
-#ifdef TEST_KVL
 #include "sellist.h"
-#endif
+
 
 double datestr_to_double(const char *datestr, int opt);
 
@@ -103,12 +100,6 @@ void *Select(void *argument)
 
   if ( nsel == 0 ) cdoAbort("Parameter missing!");
 
-  if ( cdoVerbose )
-    for ( int i = 0; i < nsel; ++i )
-      cdoPrint("name %d = %s", i+1, argnames[i]);
-
-#ifdef TEST_KVL
-  //src/cdo infon -select,name=var129,var152,level=0 ../../test/data/pl_data
   list_t *kvlist = kvlist_new("SELECT");
   if ( kvlist_parse_cmdline(kvlist, nsel, argnames) != 0 ) cdoAbort("Parse error!");
   if ( cdoVerbose ) kvlist_print(kvlist);
@@ -137,36 +128,9 @@ void *Select(void *argument)
   SELLIST_ADD_WORD(sellist, enddate,         "End date");
   SELLIST_ADD_WORD(sellist, season,          "Season");
   SELLIST_ADD_WORD(sellist, date,            "Date");
-#else
-  pml_t *pml = pml_create("SELECT");
 
-  PML_ADD_INT(pml, timestep_of_year, 4096, "Timestep of year");
-  PML_ADD_INT(pml, timestep,         4096, "Timestep");
-  PML_ADD_INT(pml, year,             1024, "Year");
-  PML_ADD_INT(pml, month,              32, "Month");
-  PML_ADD_INT(pml, day,                32, "Day");
-  PML_ADD_INT(pml, hour,               24, "Hour");
-  PML_ADD_INT(pml, minute,             60, "Minute");
-  PML_ADD_INT(pml, code,             1024, "Code number");
-  PML_ADD_INT(pml, levidx,           1024, "Level index");
-  PML_ADD_INT(pml, ltype,             256, "Level type");
-  PML_ADD_INT(pml, zaxisnum,          256, "Zaxis number");
-  PML_ADD_INT(pml, gridnum,           256, "Grid number");
-  PML_ADD_FLT(pml, level,            1024, "Level");
-  PML_ADD_WORD(pml, name,            1024, "Variable name");
-  PML_ADD_WORD(pml, param,           1024, "Parameter");
-  PML_ADD_WORD(pml, zaxisname,        256, "Zaxis name");
-  PML_ADD_WORD(pml, gridname,         256, "Grid name");
-  PML_ADD_WORD(pml, steptype,          32, "Time step type");
-  PML_ADD_WORD(pml, startdate,          1, "Start date");
-  PML_ADD_WORD(pml, enddate,            1, "End date");
-  PML_ADD_WORD(pml, season,            12, "Season");
-  PML_ADD_WORD(pml, date,            1024, "Date");
+  if ( cdoVerbose ) sellist_print(sellist);
 
-  int status = pml_read(pml, nsel, argnames);
-  if ( cdoVerbose ) pml_print(pml);
-  if ( status != 0 ) cdoAbort("Parameter read error!");
-#endif
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
 
@@ -208,7 +172,6 @@ void *Select(void *argument)
 		}
 	    }
 
-#ifdef TEST_KVL
           bool lvarsel = SELLIST_NOCC(code) || SELLIST_NOCC(ltype) || SELLIST_NOCC(zaxisnum) ||
             SELLIST_NOCC(gridnum) || SELLIST_NOCC(name) || SELLIST_NOCC(param) ||
             SELLIST_NOCC(zaxisname) || SELLIST_NOCC(gridname) || SELLIST_NOCC(steptype);
@@ -218,17 +181,6 @@ void *Select(void *argument)
 	  ltimsel = SELLIST_NOCC(date) || SELLIST_NOCC(startdate) || SELLIST_NOCC(enddate) || SELLIST_NOCC(season) ||
             SELLIST_NOCC(timestep_of_year) || SELLIST_NOCC(timestep) || SELLIST_NOCC(year) || SELLIST_NOCC(month) ||
             SELLIST_NOCC(day) || SELLIST_NOCC(hour) || SELLIST_NOCC(minute);
-#else
-          bool lvarsel = PML_NOCC(pml, code) || PML_NOCC(pml, ltype) || PML_NOCC(pml, zaxisnum) ||
-            PML_NOCC(pml, gridnum) || PML_NOCC(pml, name) || PML_NOCC(pml, param) ||
-            PML_NOCC(pml, zaxisname) || PML_NOCC(pml, gridname) || PML_NOCC(pml, steptype);
-
-          bool llevsel = PML_NOCC(pml, level) || PML_NOCC(pml, levidx);
-
-	  ltimsel = PML_NOCC(pml, date) || PML_NOCC(pml, startdate) || PML_NOCC(pml, enddate) || PML_NOCC(pml, season) ||
-            PML_NOCC(pml, timestep_of_year) || PML_NOCC(pml, timestep) || PML_NOCC(pml, year) || PML_NOCC(pml, month) ||
-            PML_NOCC(pml, day) || PML_NOCC(pml, hour) || PML_NOCC(pml, minute);
-#endif
           
 	  for ( varID = 0; varID < nvars; ++varID )
 	    {
@@ -271,7 +223,7 @@ void *Select(void *argument)
               else                                    steptype = "unknown";
               
 	      vars[varID] = false;
-#ifdef TEST_KVL
+
               bool found_code  = SELLIST_CHECK(code);
               bool found_name  = SELLIST_CHECK(name);
               bool found_param = SELLIST_CHECK(param);
@@ -286,22 +238,6 @@ void *Select(void *argument)
               bool lstep = SELLIST_NOCC(steptype) ? found_stype : true;
               bool lgrid = (SELLIST_NOCC(gridnum) || SELLIST_NOCC(gridname)) ? (found_grid || found_gname) : true;
               bool lvert = (SELLIST_NOCC(ltype) || SELLIST_NOCC(zaxisnum) || SELLIST_NOCC(zaxisname)) ? (found_ltype || found_zaxis || found_zname) : true;
-#else
-              bool found_code  = PML_NOCC(pml, code)      && PML_CHECK_INT(pml, code);
-              bool found_name  = PML_NOCC(pml, name)      && PML_CHECK_WORD(pml, name);
-              bool found_param = PML_NOCC(pml, param)     && PML_CHECK_WORD(pml, param);
-              bool found_grid  = PML_NOCC(pml, gridnum)   && PML_CHECK_INT(pml, gridnum);
-              bool found_gname = PML_NOCC(pml, gridname)  && PML_CHECK_WORD(pml, gridname);
-              bool found_stype = PML_NOCC(pml, steptype)  && PML_CHECK_WORD(pml, steptype);
-              bool found_ltype = PML_NOCC(pml, ltype)     && PML_CHECK_INT(pml, ltype);
-              bool found_zaxis = PML_NOCC(pml, zaxisnum)  && PML_CHECK_INT(pml, zaxisnum);
-              bool found_zname = PML_NOCC(pml, zaxisname) && PML_CHECK_WORD(pml, zaxisname);
-
-              bool lvar  = found_code || found_name || found_param;
-              bool lstep = PML_NOCC(pml, steptype) ? found_stype : true;
-              bool lgrid = (PML_NOCC(pml, gridnum) || PML_NOCC(pml, gridname)) ? (found_grid || found_gname) : true;
-              bool lvert = (PML_NOCC(pml, ltype) || PML_NOCC(pml, zaxisnum) || PML_NOCC(pml, zaxisname)) ? (found_ltype || found_zaxis || found_zname) : true;
-#endif
 	     
               if ( !vars[varID] && lgrid && lvar ) vars[varID] = true;
               if ( !vars[varID] && lvert && lvar ) vars[varID] = true;
@@ -312,23 +248,14 @@ void *Select(void *argument)
                   if      ( found_grid || found_gname ) vars[varID] = true;
                   else if ( found_stype ) vars[varID] = true;
                   else if ( found_ltype || found_zaxis || found_zname ) vars[varID] = true;
-#ifdef TEST_KVL
                   else if ( !lvarsel && (SELLIST_NOCC(levidx) || SELLIST_NOCC(level)) )
-#else
-                  else if ( !lvarsel && (PML_NOCC(pml, levidx) || PML_NOCC(pml, level)) )
-#endif
                     {
                       for ( int levID = 0; levID < nlevs; ++levID )
                         {
                           levidx = levID + 1;
                           level = cdoZaxisInqLevel(zaxisID, levID);
-#ifdef TEST_KVL
                           if ( !vars[varID] && SELLIST_CHECK(levidx) ) vars[varID] = true;
                           if ( !vars[varID] && SELLIST_CHECK(level)  ) vars[varID] = true;
-#else
-                          if ( !vars[varID] && PML_NOCC(pml, levidx) && PML_CHECK_INT(pml, levidx) ) vars[varID] = true;
-                          if ( !vars[varID] && PML_NOCC(pml, level)  && PML_CHECK_FLT(pml, level)  ) vars[varID] = true;
-#endif
                         }
                     }
                 }
@@ -360,16 +287,11 @@ void *Select(void *argument)
 		      
 		      if ( nlevs == 1 && IS_EQUAL(level, 0) )
 			{
-#ifdef TEST_KVL
                           SELLIST_CHECK(level);
-#else
-                          PML_CHECK_FLT(pml, level);
-#endif
 			  vlistDefFlag(vlistID1, varID, levID, xresult);
 			}
 		      else
 			{
-#ifdef TEST_KVL
 			  if ( SELLIST_NOCC(levidx) )
 			    {
 			      if ( SELLIST_CHECK(levidx) )
@@ -380,18 +302,6 @@ void *Select(void *argument)
 			      if ( SELLIST_CHECK(level) )
 				vlistDefFlag(vlistID1, varID, levID, xresult);
 			    }
-#else
-			  if ( PML_NOCC(pml, levidx) )
-			    {
-			      if ( PML_CHECK_INT(pml, levidx) )
-				vlistDefFlag(vlistID1, varID, levID, xresult);
-			    }
-			  else if ( PML_NOCC(pml, level) )
-			    {
-			      if ( PML_CHECK_FLT(pml, level) )
-				vlistDefFlag(vlistID1, varID, levID, xresult);
-			    }
-#endif
 			  else
 			    {
 			      vlistDefFlag(vlistID1, varID, levID, xresult);
@@ -401,7 +311,6 @@ void *Select(void *argument)
 		}
 	    }
 
-#ifdef TEST_KVL
 	  SELLIST_CHECK_FLAG(code);
 	  SELLIST_CHECK_FLAG(levidx);
 	  SELLIST_CHECK_FLAG(ltype);
@@ -413,19 +322,6 @@ void *Select(void *argument)
 	  SELLIST_CHECK_FLAG(zaxisname);
 	  SELLIST_CHECK_FLAG(gridname);
 	  SELLIST_CHECK_FLAG(steptype);
-#else
-	  PML_CHECK_INT_FLAG(pml, code);
-	  PML_CHECK_INT_FLAG(pml, levidx);
-	  PML_CHECK_INT_FLAG(pml, ltype);
-	  PML_CHECK_INT_FLAG(pml, zaxisnum);
-	  PML_CHECK_INT_FLAG(pml, gridnum);
-	  PML_CHECK_FLT_FLAG(pml, level);
-	  PML_CHECK_WORD_FLAG(pml, name);
-	  PML_CHECK_WORD_FLAG(pml, param);
-	  PML_CHECK_WORD_FLAG(pml, zaxisname);
-	  PML_CHECK_WORD_FLAG(pml, gridname);
-	  PML_CHECK_WORD_FLAG(pml, steptype);
-#endif
 
 	  int npar = 0;
 	  for ( varID = 0; varID < nvars; ++varID )
@@ -508,12 +404,7 @@ void *Select(void *argument)
 	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
 
-	  ntsteps2 = ntsteps;
-#ifdef TEST_KVL
-	  if ( operatorID == SELECT && SELLIST_NOCC(timestep) == 1 ) ntsteps2 = 1;
-#else
-	  if ( operatorID == SELECT && PML_NOCC(pml, timestep) == 1 ) ntsteps2 = 1;
-#endif
+	  ntsteps2 = (operatorID == SELECT && SELLIST_NOCC(timestep) == 1) ? 1 : ntsteps;
 	  
 	  if ( ntsteps2 == 0 && nfiles > 1 )
 	    {
@@ -523,19 +414,10 @@ void *Select(void *argument)
 	    }
 
 	  // support for negative timestep values
-#ifdef TEST_KVL
 	  if ( SELLIST_NOCC(timestep) > 0 && ntsteps > 0 && nfiles == 1 )
-#else
-	  if ( PML_NOCC(pml, timestep) > 0 && ntsteps > 0 && nfiles == 1 )
-#endif
 	    {
-#ifdef TEST_KVL
 	      for ( int i = 0; i < SELLIST_NOCC(timestep); ++i )
-#else
-	      for ( int i = 0; i < PML_NOCC(pml, timestep); ++i )
-#endif
 		{
-#ifdef TEST_KVL
                   int ptimestep;
                   SELLIST_GET_PAR(timestep, i, &ptimestep);
 		  if ( ptimestep < 0 )
@@ -545,14 +427,6 @@ void *Select(void *argument)
 		      ptimestep += ntsteps + 1;
                       SELLIST_DEF_PAR(timestep, i, &ptimestep);
 		    }
-#else
-		  if ( par_timestep[i] < 0 )
-		    {
-		      if ( cdoVerbose )
-			cdoPrint("timestep %d changed to %d", par_timestep[i], par_timestep[i] + ntsteps + 1);
-		      par_timestep[i] += ntsteps + 1;
-		    }
-#endif
 		}
 	    }
 
@@ -563,17 +437,10 @@ void *Select(void *argument)
 	      array = (double*) Malloc(gridsize*sizeof(double));
 	    }
 
-#ifdef TEST_KVL
 	  SELLIST_GET_PAR(startdate, 0, &startdate);
 	  SELLIST_GET_PAR(enddate, 0, &enddate);
 	  if ( SELLIST_NOCC(startdate) ) fstartdate = datestr_to_double(startdate, 0);
 	  if ( SELLIST_NOCC(enddate)   ) fenddate   = datestr_to_double(enddate, 1);
-#else
-	  startdate = par_startdate[0];
-	  enddate   = par_enddate[0];
-	  if ( PML_NOCC(pml, startdate) ) fstartdate = datestr_to_double(startdate, 0);
-	  if ( PML_NOCC(pml, enddate)   ) fenddate   = datestr_to_double(enddate, 1);
-#endif
 	}
       else
 	{
@@ -604,7 +471,6 @@ void *Select(void *argument)
 	    {
 	      copytimestep = false;
 
-#ifdef TEST_KVL
 	      if ( operatorID == SELECT && SELLIST_NOCC(timestep) > 0 )
 		{
                   int ptimestep;
@@ -615,13 +481,6 @@ void *Select(void *argument)
                       break;
                     }
                 }
-#else
-	      if ( operatorID == SELECT && PML_NOCC(pml, timestep) > 0 && timestep > par_timestep[PML_NOCC(pml, timestep)-1] )
-		{
-		  lstop = true;
-		  break;
-		}
-#endif
 
 	      int vdate = taxisInqVdate(taxisID1);
 	      int vtime = taxisInqVtime(taxisID1);
@@ -638,7 +497,6 @@ void *Select(void *argument)
 
 	      timestep_of_year++;
 
-#ifdef TEST_KVL
 	      if ( SELLIST_CHECK(timestep) ) copytimestep = true;
 	      if ( SELLIST_CHECK(timestep_of_year) ) copytimestep = true;
 
@@ -655,41 +513,15 @@ void *Select(void *argument)
 
 		  if ( lseason && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
 		}
-#else
-	      if ( PML_NOCC(pml, timestep) && PML_CHECK_INT(pml, timestep) ) copytimestep = true;
-	      if ( PML_NOCC(pml, timestep_of_year) && PML_CHECK_INT(pml, timestep_of_year) ) copytimestep = true;
-
-	      if ( !copytimestep && PML_NOCC(pml, date) == 0 && PML_NOCC(pml, timestep) == 0 && PML_NOCC(pml, timestep_of_year) == 0 )
-		{
-		  bool lseason = false, lyear = false, lmonth = false, lday = false, lhour = false, lminute = false;
-
-		  if ( PML_NOCC(pml, season) == 0 || (PML_NOCC(pml, season) && PML_CHECK_SEASON(pml, season, month)) ) lseason   = true;
-		  if ( PML_NOCC(pml, year)   == 0 || (PML_NOCC(pml, year)   && PML_CHECK_INT(pml, year))   ) lyear   = true;
-		  if ( PML_NOCC(pml, month)  == 0 || (PML_NOCC(pml, month)  && PML_CHECK_INT(pml, month))  ) lmonth  = true;
-		  if ( PML_NOCC(pml, day)    == 0 || (PML_NOCC(pml, day)    && PML_CHECK_INT(pml, day))    ) lday    = true;
-		  if ( PML_NOCC(pml, hour)   == 0 || (PML_NOCC(pml, hour)   && PML_CHECK_INT(pml, hour))   ) lhour   = true;
-		  if ( PML_NOCC(pml, minute) == 0 || (PML_NOCC(pml, minute) && PML_CHECK_INT(pml, minute)) ) lminute = true;
-
-		  if ( lseason && lyear && lmonth && lday && lhour && lminute ) copytimestep = true;
-		}
-#endif
 
 	      double fdate = ((double)vdate) + ((double)vtime)/1000000.;
 
-#ifdef TEST_KVL
 	      if ( SELLIST_NOCC(enddate) )
-#else
-	      if ( PML_NOCC(pml, enddate) )
-#endif
 		{
                   copytimestep = (fdate <= fenddate);
 		  if ( fdate > fenddate )
 		    {
-#ifdef TEST_KVL
                       SELLIST_DEF_FLAG(enddate, 0, true);
-#else
-		      flag_enddate[0] = true;
-#endif
 		      if ( operatorID == SELECT )
 			{
 			  lstop = true;
@@ -698,35 +530,18 @@ void *Select(void *argument)
 		    }
 		}
 
-#ifdef TEST_KVL
 	      if ( SELLIST_NOCC(startdate) )
-#else
-	      if ( PML_NOCC(pml, startdate) )
-#endif
 		{
                   copytimestep = (fdate >= fstartdate);
-#ifdef TEST_KVL
 		  if ( fdate >= fstartdate ) SELLIST_DEF_FLAG(startdate, 0, true);
-#else
-		  if ( fdate >= fstartdate ) flag_startdate[0] = true;
-#endif
 		}
 
-              
-#ifdef TEST_KVL
               if ( SELLIST_NOCC(date) )
-#else
-              if ( PML_NOCC(pml, date) )
-#endif
                 {
                   char vdatetimestr[64];
                   datetime2str(vdate, vtime, vdatetimestr, sizeof(vdatetimestr));
                   date = vdatetimestr;
-#ifdef TEST_KVL
                   if ( SELLIST_CHECK_DATE(date) ) copytimestep = true;
-#else
-                  if ( PML_CHECK_DATE(pml, date) ) copytimestep = true;
-#endif
                 }
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
@@ -819,7 +634,6 @@ void *Select(void *argument)
 
   if ( !cdoVerbose && nfiles > 1 ) progressStatus(0, 1, 1);    
 
-#ifdef TEST_KVL
   SELLIST_CHECK_FLAG(timestep_of_year);
   SELLIST_CHECK_FLAG(timestep);
   SELLIST_CHECK_FLAG(year);
@@ -831,32 +645,14 @@ void *Select(void *argument)
   //  SELLIST_CHECK_FLAG(enddate);
   SELLIST_CHECK_FLAG(season);
   SELLIST_CHECK_FLAG(date);
-#else
-  PML_CHECK_INT_FLAG(pml, timestep_of_year);
-  PML_CHECK_INT_FLAG(pml, timestep);
-  PML_CHECK_INT_FLAG(pml, year);
-  PML_CHECK_INT_FLAG(pml, month);
-  PML_CHECK_INT_FLAG(pml, day);
-  PML_CHECK_INT_FLAG(pml, hour);
-  PML_CHECK_INT_FLAG(pml, minute);
-  PML_CHECK_WORD_FLAG(pml, startdate);
-  //  PML_CHECK_WORD_FLAG(pml, enddate);
-  PML_CHECK_WORD_FLAG(pml, season);
-  PML_CHECK_WORD_FLAG(pml, date);
-#endif
 
   if ( streamID2 != CDI_UNDEFID ) streamClose(streamID2);
 
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);
 
-
-#ifdef TEST_KVL
   sellist_destroy(sellist);
   kvlist_destroy(kvlist);
-#else
-  pml_destroy(pml);
-#endif
 
   if ( array ) Free(array);
   if ( vars ) Free(vars);
