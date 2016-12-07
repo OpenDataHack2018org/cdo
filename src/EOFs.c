@@ -265,6 +265,8 @@ void *EOFs(void * argument)
 	  nts = tsID;
 	  if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
 	}
+      else
+        if ( cdoVerbose ) cdoPrint("Found %i timeSteps", nts);
 
       streamClose(streamID1);
 
