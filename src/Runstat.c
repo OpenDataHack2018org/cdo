@@ -82,6 +82,9 @@ void *Runstat(void *argument)
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
+  /*  Number of timestep will be reduced compared to the input
+   *  error handling in case of not enough timesteps is done per record */
+  vlistDefNtsteps(vlistID2,vlistNtsteps(vlistID1)-ndates+1);
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
