@@ -324,6 +324,7 @@ case "${HOSTNAME}" in
                     --program-suffix=-dev \
                     --enable-maintainer-mode \
                     --enable-data \
+	            --with-magics \
 	            --with-netcdf \
 	              --with-hdf5 \
                      --with-szlib \
@@ -333,7 +334,7 @@ case "${HOSTNAME}" in
                   --with-fftw3    \
                   --with-proj     \
                       --with-pic  \
-                      CC=$COMP CFLAGS="-g -Wall -O3" LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
+                      CC=$COMP CPPFLAGS=-I/usr/include/magics CFLAGS="-g -Wall -O3" LIBS="-lopenjpeg" LDFLAGS='-lelf -v'
         ;;
       g++|clang++)
         case "$COMP" in
