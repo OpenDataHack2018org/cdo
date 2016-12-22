@@ -506,7 +506,7 @@ void printZaxisInfo(int vlistID)
       set_text_color(stdout, RESET, BLUE);
 #endif
       if ( zaxistype == ZAXIS_GENERIC && ltype != 0 )
-        fprintf(stdout, "%-12s (ltype=%3d) :", zaxisname, ltype);
+        fprintf(stdout, "%-12s (ltype=%3d)", zaxisname, ltype);
       else
         fprintf(stdout, "%-24s", zaxisname);
       my_reset_text_color(stdout);
