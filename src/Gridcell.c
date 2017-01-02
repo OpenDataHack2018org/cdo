@@ -198,8 +198,6 @@ void *Gridcell(void *argument)
 	   gridtype == GRID_LCC         ||
 	   gridtype == GRID_CURVILINEAR )
 	{
-	  long i, j, xsize, ysize;
-	  double *xv, *yv;
 	  double len1 = 0, len2 = 0;
 	  char units[CDI_MAX_NAME];
 
@@ -207,11 +205,11 @@ void *Gridcell(void *argument)
 	    gridID = gridToCurvilinear(gridID, 1);
 
 	  gridsize = gridInqSize(gridID);
-	  xsize = gridInqXsize(gridID);
-	  ysize = gridInqYsize(gridID);
+	  long xsize = gridInqXsize(gridID);
+	  long ysize = gridInqYsize(gridID);
 
-	  xv = (double*) Malloc(gridsize*sizeof(double));
-	  yv = (double*) Malloc(gridsize*sizeof(double));
+	  double *xv = (double*) Malloc(gridsize*sizeof(double));
+	  double *yv = (double*) Malloc(gridsize*sizeof(double));
 
 	  gridInqXvals(gridID, xv);
 	  gridInqYvals(gridID, yv);
@@ -220,13 +218,13 @@ void *Gridcell(void *argument)
 
 	  gridInqXunits(gridID, units);
 
-	  grid_to_radian(units, gridsize, yv, "grid longitudes");
+	  grid_to_radian(units, gridsize, xv, "grid longitudes");
 	  grid_to_radian(units, gridsize, yv, "grid latitudes");
 
 	  if ( operatorID == GRIDDX )
 	    {
-	      for ( j = 0; j < ysize; ++j )
-		for ( i = 0; i < xsize; ++i )
+	      for ( long j = 0; j < ysize; ++j )
+		for ( long i = 0; i < xsize; ++i )
 		  {
 		    if ( i == 0 )
 		      {
@@ -249,8 +247,8 @@ void *Gridcell(void *argument)
 	    }
 	  else
 	    {
-	      for ( i = 0; i < xsize; ++i )
-	        for ( j = 0; j < ysize; ++j )
+	      for ( long i = 0; i < xsize; ++i )
+	        for ( long j = 0; j < ysize; ++j )
 		  {
 		    if ( j == 0 )
 		      {
@@ -293,7 +291,7 @@ void *Gridcell(void *argument)
   int tsID = 0;
   streamDefTimestep(streamID2, tsID);
 
-  varID   = 0;
+  varID = 0;
   int levelID = 0;
   streamDefRecord(streamID2, varID, levelID);
   streamWriteRecord(streamID2, array, 0);
