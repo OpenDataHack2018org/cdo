@@ -1050,6 +1050,7 @@ int parse_options_long(int argc, char *argv[])
   int lgridsearchnn;
   int lgridsearchradius;
   int lremap_genweights;
+  int lprecision;
   int lpercentile;
   int lprintoperatorsno = 0;
   int lprintoperators = 0;
@@ -1058,6 +1059,7 @@ int parse_options_long(int argc, char *argv[])
 
   struct cdo_option opt_long[] =
     {
+      { "precision",         required_argument,        &lprecision,   1  },
       { "percentile",        required_argument,        &lpercentile,  1  },
       { "netcdf_hdr_pad",    required_argument,    &lnetcdf_hdr_pad,  1  },
       { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
@@ -1093,6 +1095,7 @@ int parse_options_long(int argc, char *argv[])
 
   while ( 1 )
     {
+      lprecision = 0;
       lpercentile = 0;
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
@@ -1122,6 +1125,9 @@ int parse_options_long(int argc, char *argv[])
             {
               int netcdf_hdr_pad = str_to_int(CDO_optarg);
               if ( netcdf_hdr_pad >= 0 ) CDO_netcdf_hdr_pad = netcdf_hdr_pad;
+            }
+          else if ( lprecision )
+            {
             }
           else if ( lpercentile )
             {
