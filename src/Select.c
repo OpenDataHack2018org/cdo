@@ -131,6 +131,8 @@ void *Select(void *argument)
 
   if ( cdoVerbose ) sellist_print(sellist);
 
+  sellist_verify(sellist);
+
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
 

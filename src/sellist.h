@@ -48,6 +48,7 @@ typedef struct {
 
 sellist_t *sellist_create(list_t *kvlist);
 void sellist_destroy(sellist_t *sellist);
+void sellist_verify(sellist_t *sellist);
 int sellist_add(sellist_t *sellist, const char *txt, const char *name, int type);
 int sellist_nvalues(sellist_t *sellist, int idx);
 void sellist_check_flag(sellist_t *sellist, int idx);

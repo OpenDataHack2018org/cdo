@@ -57,6 +57,19 @@ void sellist_destroy(sellist_t *sellist)
     }
 }
 
+
+void sellist_verify(sellist_t *sellist)
+{
+  if ( sellist )
+    {
+      for ( int i = 0; i < sellist->size; ++i )
+        {
+          selentry_t *e = &(sellist->entry[i]);
+          if ( e->type == 0 ) cdoAbort("Unsupported selection keyword: '%s'!", e->key);
+        }
+    }
+}
+
 void split_intstring(const char *intstr, int *first, int *last, int *inc);
 
 int sellist_add(sellist_t *sellist, const char *txt, const char *name, int type)
