@@ -20,7 +20,6 @@
  
  Eofcoeff             eofcoeff             process eof coefficients
 */
-#define WEIGHTS 1
 
 #include "cdi.h"
 #include "cdo.h"
