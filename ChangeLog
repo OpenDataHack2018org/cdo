@@ -3,6 +3,10 @@
 	* using CDI library version 1.8.0rc6
 	* Version 1.8.0rc6 release
 
+2017-01-03  Uwe Schulzweida
+
+	* eofcoeff: changed docu to "non weighted" (bug fix) [report: Torben Kunz]
+
 2017-01-02  Reiner Schnur
 
 	* griddx/griddy: changed yv to xv in call to grid_to_radian() (bug fix)
@@ -14,7 +18,7 @@
 
 2016-11-14  Uwe Schulzweida
 
-	* Cond: bug fix for ntsteps1 == 1 && ntsteps2 != 1 
+	* Cond: bug fix for ntsteps1 == 1 && ntsteps2 != 1
 
 2016-11-10  Uwe Schulzweida
 

@@ -12,16 +12,19 @@ This module calculates the time series of the principal coefficients for given E
 (empirical orthogonal functions) and data. Time steps in @file{ifile1} are assumed to be the EOFs,
 time steps in @file{ifile2} are assumed to be the time series.
 @C Weights are taken into account, which is why EOF output is @bold{not} weighted.
-Note, that this operator calculates a weighted dot product of the fields in @file{ifile1} and @file{ifile2}.
+Note, that this operator calculates a non weighted dot product of the fields in @file{ifile1} and @file{ifile2}.
 For consistency set the environment variable @env{CDO_WEIGHT_MODE=off} when using @mod{eof} or @mod{eof3d}.
 @IfDoc
 Given a set of EOFs @math{e_j} and a time series of data @math{z(t)} 
 with @math{p} entries for each timestep from which @math{e_j} have been calculated, this 
 operator calculates the time series of the projections of data onto each EOF
+@C @BeginDisplayMath
+@C o_j(t) = \sum_{x=1}^{p} W(x,x) z(t,x)e_j(x)
+@C @EndDisplayMath
+@C where @math{W} is the diagonal matrix containing area weights as above. 
 @BeginDisplayMath
-o_j(t) = \sum_{x=1}^{p} W(x,x) z(t,x)e_j(x)
+o_j(t) = \sum_{x=1}^{p} z(t,x)e_j(x)
 @EndDisplayMath
-where @math{W} is the diagonal matrix containing area weights as above. 
 There will be a seperate file @math{o_j} for the principal coefficients of each EOF.
 
 As the EOFs @math{e_j} are uncorrelated, so are their principal coefficients, i.e.

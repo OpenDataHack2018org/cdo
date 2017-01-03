@@ -3487,7 +3487,7 @@ static const char *EofcoeffHelp[] = {
     "    This module calculates the time series of the principal coefficients for given EOF",
     "    (empirical orthogonal functions) and data. Time steps in ifile1 are assumed to be the EOFs,",
     "    time steps in ifile2 are assumed to be the time series.",
-    "    Note, that this operator calculates a weighted dot product of the fields in ifile1 and ifile2.",
+    "    Note, that this operator calculates a non weighted dot product of the fields in ifile1 and ifile2.",
     "    For consistency set the environment variable CDO_WEIGHT_MODE=off when using eof or eof3d.",
     "    ",
     "    There will be a separate file containing a time series of principal coefficients",
