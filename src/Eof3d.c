@@ -50,24 +50,20 @@ void *EOF3d(void * argument)
 {
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
-  int temp_size = 0;
-  int i, i2, j, j1, j2, eofID, varID, levelID, tsID;
-  int missval_warning=0;
-  int nmiss,ngrids,n=0,nlevs=0,npack=0,nts=0;
+  size_t temp_size = 0, npack = 0;
+  int i, eofID, varID, levelID, tsID;
+  int missval_warning = 0;
+  int nmiss, ngrids, n = 0, nlevs = 0, nts = 0;
   int offset;
   int timer_cov = 0, timer_eig = 0;
-  int *varID2;
 
   int calendar = CALENDAR_STANDARD;
   juldate_t juldate;
 
   double missval=0;
-  double sum_w, sum;
+  double sum_w;
   double **cov = NULL;                                /* TODO: covariance matrix / eigenvectors after solving */
   double *eigv;
-  double *xvals, *yvals, *zvals;
-  double *df1p, *df2p;
-
 
   if ( cdoTimer )
     {
@@ -84,7 +80,7 @@ void *EOF3d(void * argument)
   int operfunc    = cdoOperatorF1(operatorID);
 
   operatorInputArg("Number of eigen functions to write out");
-  int n_eig       = parameter2int(operatorArgv()[0]);
+  int n_eig = parameter2int(operatorArgv()[0]);
 
   enum T_EIGEN_MODE eigen_mode = get_eigenmode();
   enum T_WEIGHT_MODE weight_mode = get_weightmode();
@@ -97,7 +93,7 @@ void *EOF3d(void * argument)
   int nrecs;
 
   double *weight = (double *) Malloc(gridsize*sizeof(double));
-  for ( i = 0; i < gridsize; ++i ) weight[i] = 1.;
+  for ( int i = 0; i < gridsize; ++i ) weight[i] = 1.;
 
   if ( weight_mode == WEIGHT_ON )
     {
@@ -130,6 +126,8 @@ void *EOF3d(void * argument)
       nts = tsID;
       if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
     }
+  else
+    if ( cdoVerbose ) cdoPrint("Found %i timeSteps", nts);
 
   streamClose(streamID1);
 
@@ -161,7 +159,7 @@ void *EOF3d(void * argument)
     {
       gridsize            = vlistGridsizeMax(vlistID1);
       nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      temp_size           = gridsize * nlevs;
+      temp_size           = ((size_t)gridsize) * nlevs;
       missval             = vlistInqVarMissval(vlistID1, varID);
 
       datacounts[varID]   = (int*) Malloc(nlevs*sizeof(int));
@@ -170,10 +168,10 @@ void *EOF3d(void * argument)
       for ( tsID = 0; tsID < nts; tsID++ )
 	{
 	  datafields[varID][tsID] = (double *) Malloc(temp_size*sizeof(double));
-	  for ( i = 0; i < temp_size; ++i ) datafields[varID][tsID][i] = 0;
+	  for ( size_t i = 0; i < temp_size; ++i ) datafields[varID][tsID][i] = 0;
 	}
       datacounts[varID] = (int *) Malloc(temp_size*sizeof(int));	      
-      for( i = 0; i < temp_size; i++) datacounts[varID][i] = 0;
+      for( size_t i = 0; i < temp_size; i++) datacounts[varID][i] = 0;
       
       eigenvectors[varID] = (double **) Malloc(n_eig*sizeof(double *));
       eigenvalues[varID]  = (double **) Malloc(nts*sizeof(double *));
@@ -183,7 +181,7 @@ void *EOF3d(void * argument)
 	  if ( i < n_eig )
 	    {
 	      eigenvectors[varID][i] = (double *) Malloc(temp_size*sizeof(double));
-	      for ( i2 = 0; i2 < temp_size; ++i2 )
+	      for ( size_t i2 = 0; i2 < temp_size; ++i2 )
 		eigenvectors[varID][i][i2] = missval;
 	    }
 	  
@@ -225,7 +223,7 @@ void *EOF3d(void * argument)
 		{
 		  if ( missval_warning == 0 )
 		    {
-		      cdoWarning("Missing Value Support not Checked for this Operator!");
+		      cdoWarning("Missing Value Support not checked for this Operator!");
 		      cdoWarning("Does not work with changing locations of missing values in time.");
 		      missval_warning = 1;
 		    }
@@ -244,8 +242,8 @@ void *EOF3d(void * argument)
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-      nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      temp_size = gridsize * nlevs;
+      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      temp_size = ((size_t)gridsize) * nlevs;
 
       if ( cdoVerbose )  {
 	char vname[64];
@@ -258,9 +256,9 @@ void *EOF3d(void * argument)
 
       if ( cdoTimer ) timer_start(timer_cov);
       
-      for ( i = 0; i < temp_size ; i++ )
+      for ( size_t i = 0; i < temp_size ; i++ )
 	{
-	  if ( datacounts[varID][i] > 1)
+	  if ( datacounts[varID][i] > 1 )
 	    {
 	      pack[npack] = i;
 	      npack++;
@@ -271,7 +269,7 @@ void *EOF3d(void * argument)
       if ( weight_mode == WEIGHT_ON )
 	{
 	  sum_w = 0;
-	  for ( i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
+	  for ( size_t i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
 	}
 
       if ( npack < 1 ) {
@@ -283,29 +281,32 @@ void *EOF3d(void * argument)
 
 	  
       cov = (double **) Malloc(nts*sizeof(double*));
-      for ( j1 = 0; j1 < nts; j1++)
+      for ( int j1 = 0; j1 < nts; j1++)
 	cov[j1] = (double *) Malloc(nts*sizeof(double));
       eigv = (double *) Malloc(n*sizeof(double));
 
-      if ( cdoVerbose )  {
-	cdoPrint("varID %i allocated eigv and cov with nts=%i and n=%i",varID,nts,n);
-	cdoPrint("   npack=%i, nts=%i temp_size=%i",npack,nts,temp_size);
-      }
+      if ( cdoVerbose )
+        {
+          cdoPrint("varID %i allocated eigv and cov with nts=%i and n=%i", varID, nts, n);
+          cdoPrint("   npack=%zu, nts=%i temp_size=%zu", npack, nts, temp_size);
+        }
 
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(j1,j2,sum,df1p,df2p) default(shared) schedule(static,2000)
+#pragma omp parallel for default(shared) schedule(static,2000)
 #endif 
-      for ( j1 = 0; j1 < nts; j1++)
-	for ( j2 = j1; j2 < nts; j2++ )
-	  {
-	    sum = 0;
-	    df1p = datafields[varID][j1];
-	    df2p = datafields[varID][j2];
-	    for ( i = 0; i < npack; i++ )
-	      sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
-	    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
-	  }
+      for ( int j1 = 0; j1 < nts; j1++ )
+        {
+          double *df1p = datafields[varID][j1];
+          for ( int j2 = j1; j2 < nts; j2++ )
+            {
+              double *df2p = datafields[varID][j2];
+              double sum = 0;
+              for ( size_t i = 0; i < npack; i++ )
+                sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
+              cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
+            }
+        }
       
       if ( cdoVerbose ) cdoPrint("calculated cov-matrix");
 
@@ -316,7 +317,7 @@ void *EOF3d(void * argument)
       if ( cdoTimer ) timer_start(timer_eig);
 
       if ( cdoVerbose ) 
-	cdoPrint("Processed correlation matrix for var %2i | npack: %4i",varID,n);
+	cdoPrint("Processed correlation matrix for var %2i | npack: %zu", varID, n);
 
       if ( eigen_mode == JACOBI ) 
 	parallel_eigen_solution_of_symmetric_matrix(cov, eigv, n, __func__);
@@ -337,23 +338,24 @@ void *EOF3d(void * argument)
 	  double *eigenvec = eigenvectors[varID][eofID];
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) private(j,sum) shared(varID,nts,eofID,npack,pack,cov,datafields,eigenvec)
+#pragma omp parallel for default(none) shared(varID,nts,eofID,npack,pack,cov,datafields,eigenvec)
 #endif 
-	  for ( i = 0; i < npack; i++ )
+	  for ( size_t i = 0; i < npack; i++ )
 	    {
-	      sum = 0;
-	      for ( j = 0; j < nts; j++ )
+	      double sum = 0;
+	      for ( int j = 0; j < nts; j++ )
 		sum += datafields[varID][j][pack[i]] * cov[eofID][j];
 
 	      eigenvec[pack[i]] = sum;
 	    }
+
 	  // NORMALIZING
-	  sum = 0;
+	  double sum = 0;
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)  shared(eigenvec,weight,pack,npack,gridsize) reduction(+:sum)
 #endif 
-	  for ( i = 0; i < npack; i++ )
+	  for ( size_t i = 0; i < npack; i++ )
 	    sum +=  weight[pack[i]%gridsize] *
 	            eigenvec[pack[i]] * eigenvec[pack[i]];
 
@@ -363,7 +365,7 @@ void *EOF3d(void * argument)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(sum,npack,eigenvec,pack)
 #endif
-	      for( i = 0; i < npack; i++ )
+	      for ( size_t i = 0; i < npack; i++ )
 		eigenvec[pack[i]] /= sum;
 	    }
 	  else
@@ -371,7 +373,7 @@ void *EOF3d(void * argument)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(eigenvec,pack,missval,npack)
 #endif
-	      for( i = 0; i < npack; i++ )
+	      for( size_t i = 0; i < npack; i++ )
 		eigenvec[pack[i]] = missval;
 	    }
 	}     /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
@@ -385,36 +387,32 @@ void *EOF3d(void * argument)
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
   /*  eigenvalues */
-  int streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  int taxisID2    = taxisDuplicate(taxisID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
 
-  int gridID2     = gridCreate(GRID_LONLAT, 1);
+  int gridID2 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
-  xvals       = (double*) Malloc(1*sizeof(double));
-  yvals       = (double*) Malloc(1*sizeof(double));
-  zvals       = (double*) Malloc(1*sizeof(double));
-  xvals[0]    = 0;
-  yvals[0]    = 0;
-  zvals[0]    = 0;
-  gridDefXvals(gridID2, xvals);
-  gridDefYvals(gridID2, yvals);
+  double xvals = 0, yvals = 0;
+  gridDefXvals(gridID2, &xvals);
+  gridDefYvals(gridID2, &yvals);
 
-  int zaxisID2 = zaxisCreate(ZAXIS_GENERIC,1);
-  zaxisDefLevels(zaxisID2,zvals);
-  zaxisDefName(zaxisID2,"zaxis_Reduced");
-  zaxisDefLongname(zaxisID2,"Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
+  int zaxisID2 = zaxisCreate(ZAXIS_GENERIC, 1);
+  double zvals = 0;
+  zaxisDefLevels(zaxisID2, &zvals);
+  zaxisDefName(zaxisID2, "zaxis_Reduced");
+  zaxisDefLongname(zaxisID2, "Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
 
   int vlistID2 = vlistCreate();
   taxisDefRdate(taxisID2, 0);
   taxisDefRtime(taxisID2, 0);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  varID2 = (int*) Malloc(nvars*sizeof(int));
+  int *varID2 = (int*) Malloc(nvars*sizeof(int));
   for ( varID=0; varID<nvars; varID++ )
     varID2[varID] = vlistDefVar(vlistID2, gridID2, zaxisID2, TSTEP_INSTANT);
-  ngrids      = vlistNgrids(vlistID2);
+  ngrids = vlistNgrids(vlistID2);
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
@@ -473,9 +471,9 @@ void *EOF3d(void * argument)
 
   for ( varID = 0; varID < nvars; varID++)
     {
-      for( i = 0; i < nts; i++)
+      for ( i = 0; i < nts; i++)
 	{
-	  Free(datafields[varID][tsID]);
+	  Free(datafields[varID][i]);
 	  if ( i < n_eig )
 	    Free(eigenvectors[varID][i]);
 	  Free(eigenvalues[varID][i]);
@@ -492,6 +490,7 @@ void *EOF3d(void * argument)
   Free(eigenvectors);
   Free(eigenvalues);
   Free(in);
+  Free(varID2);
 
   Free(pack);
   Free(weight);
