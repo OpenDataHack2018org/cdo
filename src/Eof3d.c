@@ -51,16 +51,16 @@ void *EOF3d(void * argument)
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
   size_t temp_size = 0, npack = 0;
-  int i, eofID, varID, levelID, tsID;
+  int i, varID, levelID;
   int missval_warning = 0;
-  int nmiss, ngrids, n = 0, nlevs = 0, nts = 0;
+  int nmiss, ngrids, n = 0, nlevs = 0;
   int offset;
   int timer_cov = 0, timer_eig = 0;
 
   int calendar = CALENDAR_STANDARD;
   juldate_t juldate;
 
-  double missval=0;
+  double missval = 0;
   double sum_w;
   double **cov = NULL;                                /* TODO: covariance matrix / eigenvectors after solving */
   double *eigv;
@@ -98,7 +98,7 @@ void *EOF3d(void * argument)
   if ( weight_mode == WEIGHT_ON )
     {
       int wstatus = gridWeights(gridID1, weight);
-      if ( wstatus != 0  )
+      if ( wstatus != 0 )
 	{
 	  weight_mode = WEIGHT_OFF;
 	  cdoWarning("Using constant grid cell area weights!");
@@ -110,10 +110,10 @@ void *EOF3d(void * argument)
   if ( operfunc == EOF3D_SPATIAL )
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
 
-  tsID = 0;
+  int tsID = 0;
 
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
-  nts = vlistNtsteps(vlistID1);
+  int nts = vlistNtsteps(vlistID1);
   if ( nts == -1 )
     {
       while ( TRUE )
@@ -245,12 +245,13 @@ void *EOF3d(void * argument)
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       temp_size = ((size_t)gridsize) * nlevs;
 
-      if ( cdoVerbose )  {
-	char vname[64];
-	vlistInqVarName(vlistID1,varID,&vname[0]);
-	cdoPrint("============================================================================");
-	cdoPrint("Calculating covariance matrix and SVD for var%i (%s)",varID,vname);
-      }
+      if ( cdoVerbose )
+        {
+          char vname[64];
+          vlistInqVarName(vlistID1,varID,&vname[0]);
+          cdoPrint("============================================================================");
+          cdoPrint("Calculating covariance matrix and SVD for var%i (%s)",varID,vname);
+        }
 
       npack = 0;    // TODO already set to 0
 
@@ -272,12 +273,13 @@ void *EOF3d(void * argument)
 	  for ( size_t i = 0; i < npack; i++ )  sum_w += weight[pack[i]];
 	}
 
-      if ( npack < 1 ) {
-	char vname[64];
-	vlistInqVarName(vlistID1,varID,&vname[0]);
-	cdoWarning("Refusing to calculate EOF from a single time step for var%i (%s)",varID,&vname[0]);
-	continue;
-      }
+      if ( npack < 1 )
+        {
+          char vname[64];
+          vlistInqVarName(vlistID1,varID,&vname[0]);
+          cdoWarning("Refusing to calculate EOF from a single time step for var%i (%s)",varID,&vname[0]);
+          continue;
+        }
 
 	  
       cov = (double **) Malloc(nts*sizeof(double*));
@@ -328,12 +330,12 @@ void *EOF3d(void * argument)
       if ( cdoVerbose ) 
 	cdoPrint("Processed SVD decomposition for var %i from %i x %i matrix",varID,n,n);
 
-      for( eofID=0; eofID<n; eofID++ )
+      for( int eofID = 0; eofID < n; eofID++ )
 	eigenvalues[varID][eofID][0] = eigv[eofID];
       
       if ( cdoTimer ) timer_stop(timer_eig);
 
-      for ( eofID = 0; eofID < n_eig; eofID++ )
+      for ( int eofID = 0; eofID < n_eig; eofID++ )
 	{
 	  double *eigenvec = eigenvectors[varID][eofID];
 
@@ -379,9 +381,8 @@ void *EOF3d(void * argument)
 	}     /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
 
       if ( eigv ) Free(eigv);
-      for ( i=0; i<n; i++ )
-	if ( cov[i] ) 
-	  Free(cov[i]);
+      for ( i = 0; i < n; i++ )
+	if ( cov[i] ) Free(cov[i]);
     }         /* for ( varID = 0; varID < nvars; varID++ )    */
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
@@ -416,10 +417,10 @@ void *EOF3d(void * argument)
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
-  int streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
-  int vlistID3    = vlistDuplicate(vlistID1);
-  int taxisID3    = taxisDuplicate(taxisID1);
+  int vlistID3 = vlistDuplicate(vlistID1);
+  int taxisID3 = taxisDuplicate(taxisID1);
   taxisDefRdate(taxisID3, 0);
   taxisDefRtime(taxisID3, 0);
   vlistDefTaxis(vlistID3, taxisID3);

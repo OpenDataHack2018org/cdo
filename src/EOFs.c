@@ -169,7 +169,6 @@ void *EOFs(void * argument)
 
   int nlevs = 0 ;
   int nmiss;
-  int tsID;
   int varID, levelID;
   int nts = 0;
   int n = 0;
@@ -240,7 +239,7 @@ void *EOFs(void * argument)
 
   /* eigenvalues */
 
-  tsID = 0;
+  int tsID = 0;
 
   /* COUNT NUMBER OF TIMESTEPS if EOF_ or EOF_TIME */
   if ( operfunc == EOF_ || operfunc == EOF_TIME )
