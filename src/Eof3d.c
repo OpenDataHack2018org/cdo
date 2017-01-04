@@ -110,20 +110,13 @@ void *EOF3d(void * argument)
   if ( operfunc == EOF3D_SPATIAL )
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
 
-  int tsID = 0;
-
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
   int nts = vlistNtsteps(vlistID1);
   if ( nts == -1 )
     {
-      while ( TRUE )
-	{
-	  nrecs = streamInqTimestep(streamID1, tsID);
-	  if ( nrecs == 0 )  break;
-	  tsID++;
-	}
-      
-      nts = tsID;
+      nts = 0;
+      while ( streamInqTimestep(streamID1, nts) ) nts++;
+
       if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
     }
   else
@@ -165,7 +158,7 @@ void *EOF3d(void * argument)
       datacounts[varID]   = (int*) Malloc(nlevs*sizeof(int));
       datafields[varID]   = (double **) Malloc(nts*sizeof(double *));
 
-      for ( tsID = 0; tsID < nts; tsID++ )
+      for ( int tsID = 0; tsID < nts; tsID++ )
 	{
 	  datafields[varID][tsID] = (double *) Malloc(temp_size*sizeof(double));
 	  for ( size_t i = 0; i < temp_size; ++i ) datafields[varID][tsID][i] = 0;
@@ -194,7 +187,7 @@ void *EOF3d(void * argument)
     cdoPrint("allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%i for processing in %s",
 	     nts,n,gridsize,"time_space");
   
-  tsID = 0;
+  int tsID = 0;
 
   /* read the data and create covariance matrices for each var & level */
   while ( TRUE )

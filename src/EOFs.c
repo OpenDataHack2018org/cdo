@@ -239,8 +239,6 @@ void *EOFs(void * argument)
 
   /* eigenvalues */
 
-  int tsID = 0;
-
   /* COUNT NUMBER OF TIMESTEPS if EOF_ or EOF_TIME */
   if ( operfunc == EOF_ || operfunc == EOF_TIME )
     {
@@ -249,14 +247,9 @@ void *EOFs(void * argument)
       nts = vlistNtsteps(vlistID1);
       if ( nts == -1 )
 	{
-	  while ( TRUE )
-	    {
-	      nrecs = streamInqTimestep(streamID1, tsID);
-	      if ( nrecs == 0 )  break;
-	      tsID++;
-	    }
+          nts = 0;
+	  while ( streamInqTimestep(streamID1, nts) ) nts++;
 
-	  nts = tsID;
 	  if ( cdoVerbose ) cdoPrint("Counted %i timeSteps", nts);
 	}
       else
@@ -352,7 +345,7 @@ void *EOFs(void * argument)
   double **covar = NULL;
   double sum_w = 1.;
 
-  tsID = 0;
+  int tsID = 0;
 
   /* read the data and create covariance matrices for each var & level */
   while ( TRUE )
@@ -455,7 +448,7 @@ void *EOFs(void * argument)
   taxisDefRtime(taxisID2, 0);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridID2     = gridCreate(GRID_LONLAT, 1);
+  int gridID2 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   double xvals = 0, yvals = 0;
