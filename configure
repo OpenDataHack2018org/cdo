@@ -18942,7 +18942,19 @@ fi
 
 
                             if test "x$NC_CONFIG" != "x"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's nc2 support" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's OpenDAP support" >&5
+$as_echo_n "checking netcdf's OpenDAP support... " >&6; }
+                                   if test "x$($NC_CONFIG --has-dap)" = "xyes"; then :
+
+$as_echo "#define HAVE_LIBNC_DAP 1" >>confdefs.h
+
+                                          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+                                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's nc2 support" >&5
 $as_echo_n "checking netcdf's nc2 support... " >&6; }
                                    if test "x$($NC_CONFIG --has-nc2)" = "xyes"; then :
 
@@ -19204,7 +19216,7 @@ for ac_lib in '' netcdf; do
     ac_res="none required"
   else
     ac_res=-l$ac_lib
-    LIBS="-l$ac_lib -lhdf5_hl -lhdf5 $ac_func_search_save_LIBS"
+    LIBS="-l$ac_lib -lhdf5 $ac_func_search_save_LIBS"
   fi
   if ac_fn_c_try_link "$LINENO"; then :
   ac_cv_search_H5TS_mutex_lock=$ac_res
