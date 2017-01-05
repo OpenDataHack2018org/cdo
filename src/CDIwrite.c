@@ -50,7 +50,7 @@ const char *datatypestr(int datatype)
   snprintf(str, sizeof(str), "%d bit packed", datatype);
 
   if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
-  else if ( datatype > 0 && datatype <= 32 ) return (str);
+  else if ( datatype > 0 && datatype <= 32  ) return (str);
   else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
   else if ( datatype == CDI_DATATYPE_CPX64  ) return ("C64");
   else if ( datatype == CDI_DATATYPE_FLT32  ) return ("32 bit floats");
@@ -61,18 +61,16 @@ const char *datatypestr(int datatype)
   else if ( datatype == CDI_DATATYPE_UINT8  ) return ("U8");
   else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
   else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
-  else                                    return ("");
+  else                                        return ("");
 }
 
 static
 void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
 {
-  double rout;
-
   nvalues /= 1000000;
   data_size /= 1024.*1024.*1024.;
 
-  rout = 0;
+  double rout = 0;
   if ( tw > 0 ) rout = nvalues/tw;
 
   if ( memtype == MEMTYPE_FLOAT )
@@ -223,6 +221,7 @@ void *CDIwrite(void *argument)
 
       filetype = streamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);
+      if ( datatype == CDI_UNDEFID ) datatype = CDI_DATATYPE_FLT32;
 	  
       julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
 
