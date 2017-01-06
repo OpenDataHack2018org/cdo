@@ -1,10 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <limits.h>
-#include <float.h>
 #include "cdo_int.h"
 #include "cdi.h"
+
 
 int literal_get_datatype(const char *literal)
 {
@@ -14,7 +12,7 @@ int literal_get_datatype(const char *literal)
       errno = 0;
       long lval = strtol(literal, &endptr, 10);
       if ( errno == 0 && *endptr == 0 ) return CDI_DATATYPE_INT32;
-      else if ( errno == 0 && *(endptr+1) == 0 )
+      else if ( errno == 0 && *(endptr+1) == 0 && (*endptr == 's' || *endptr == 'b') )
         {
           if      ( *endptr == 's' && lval >= SHRT_MIN && lval <= SHRT_MAX )
             return CDI_DATATYPE_INT16;
@@ -107,7 +105,7 @@ double literal_to_double(const char *literal)
 
 int main(void)
 {
-  const char *literals[] = {"127b", "-32768s", "-2147483647", "-1.e+36f", "1.e+308", "temperature", "surface pressure"};
+  const char *literals[] = {"127b", "-32768s", "-2147483647", "-1.e+36f", "1.e+308", "temperature", "surface pressure", "1000."};
   int nliterals = sizeof(literals) / sizeof(literals[0]);
 
   for ( int i = 0; i < nliterals; ++i )
