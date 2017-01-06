@@ -38,6 +38,43 @@ int literal_get_datatype(const char *literal)
 }
 
 
+int literals_find_datatype(int n, char **literals)
+{
+  int dtype = -1;
+
+  if ( n )
+    {
+      dtype = literal_get_datatype(literals[0]);
+      if ( dtype != -1 )
+        for ( int i = 1; i < n; ++i )
+          {
+            int xtype = literal_get_datatype(literals[i]);
+            if ( dtype != xtype )
+              {
+                if ( xtype == CDI_DATATYPE_FLT32 || xtype == CDI_DATATYPE_FLT64 )
+                  {
+                    if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+                      {
+                        if ( xtype > dtype ) dtype = xtype;
+                      }
+                    else dtype = xtype;
+                  }
+                else
+                  {
+                    if ( !(dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64) )
+                      {
+                        if ( xtype > dtype ) dtype = xtype;
+                      }
+                    else dtype = xtype;
+                  }
+              }
+          }
+    }
+
+  return dtype;
+}
+
+
 int literal_to_int(const char *literal)
 {
   int ival = INT_MAX;

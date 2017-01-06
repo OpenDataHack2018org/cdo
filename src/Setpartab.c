@@ -245,35 +245,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
                 {
                   int nvalues = kv->nvalues;
                   if ( nvalues == 1 && !*value ) nvalues = 0;
-                  int dtype = -1;
-                  if ( nvalues )
-                    {
-                      dtype = literal_get_datatype(kv->values[0]);
-                      if ( dtype != -1 )
-                        for ( int i = 1; i < nvalues; ++i )
-                          {
-                            int xtype = literal_get_datatype(kv->values[i]);
-                            if ( dtype != xtype )
-                              {
-                                if ( xtype == CDI_DATATYPE_FLT32 || xtype == CDI_DATATYPE_FLT64 )
-                                  {
-                                    if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
-                                      {
-                                        if ( xtype > dtype ) dtype = xtype;
-                                      }
-                                    else dtype = xtype;
-                                  }
-                                else
-                                  {
-                                    if ( !(dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64) )
-                                      {
-                                        if ( xtype > dtype ) dtype = xtype;
-                                      }
-                                    else dtype = xtype;
-                                  }
-                              }
-                          }
-                      }
+                  int dtype = literals_find_datatype(nvalues, kv->values);
                   
                   if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
                     {

@@ -175,6 +175,7 @@ list_t *namelistbuf_to_pmlist(listbuf_t *listbuf);
 list_t *namelist_to_pmlist(FILE *fp, const char *name);
 list_t *cmortable_to_pmlist(FILE *fp, const char *name);
 
+int literals_find_datatype(int n, char **literals);
 int literal_get_datatype(const char *literal);
 int literal_to_int(const char *literal);
 double literal_to_double(const char *literal);
