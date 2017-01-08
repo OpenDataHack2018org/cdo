@@ -334,15 +334,20 @@ void *Filedes(void *argument)
 
   if ( operatorID == GRIDDES || operatorID == GRIDDES2 )
     {
-      int opt = 0;
-      if ( operatorID == GRIDDES ) opt = 1;
+      int opt = (operatorID == GRIDDES) ? 1 : 0;
       for ( int index = 0; index < ngrids; index++ )
-	gridPrint(vlistGrid(vlistID, index), index+1, opt);
+        {
+          printf("#\n" "# gridID %d\n" "#\n", index+1);
+          gridPrint(vlistGrid(vlistID, index), opt);
+        }
     }
   else if ( operatorID == ZAXISDES )
     {
       for ( int index = 0; index < nzaxis; index++ )
-	zaxisPrint(vlistZaxis(vlistID, index), index+1);
+        {
+          printf("#\n" "# zaxisID %d\n" "#\n", index+1);
+          zaxisPrint(vlistZaxis(vlistID, index));
+        }
     }
   else if ( operatorID == VCT || operatorID == VCT2 )
     {
