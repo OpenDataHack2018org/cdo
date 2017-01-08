@@ -24,10 +24,38 @@
 #include "cdo.h"
 #include "cdo_int.h"
 
+static
+void trim_flt(char *ss)
+{
+  char *cp = ss;
+  if ( *cp == '-' ) cp++;
+  while ( isdigit((int)*cp ) || *cp == '.' ) cp++;
+  if ( *--cp == '.' ) return;
+
+  char *ep = cp+1;
+  while ( *cp == '0' ) cp--;
+  cp++;
+  if ( cp == ep ) return;
+  while ( *ep ) *cp++ = *ep++;
+  *cp = '\0';
+
+  return;
+}
+
+
+char *double_to_attstr(int digits, char *str, int len, double value)
+{
+  int ret = snprintf(str, len, "%#.*g", digits, value);
+  assert(ret != -1 && ret < len);
+  trim_flt(str);
+  return str;
+}
+
 
 static
 void print_values(int nvalues, char **values)
 {
+  char fltstr[128];
   if ( nvalues && values )
     {
       int dtype = literals_find_datatype(nvalues, values);
@@ -39,8 +67,8 @@ void print_values(int nvalues, char **values)
             case CDI_DATATYPE_INT8:  printf("%db", literal_to_int(values[i])); break;
             case CDI_DATATYPE_INT16: printf("%ds", literal_to_int(values[i])); break;
             case CDI_DATATYPE_INT32: printf("%d",  literal_to_int(values[i])); break;
-            case CDI_DATATYPE_FLT32: printf("%gf", literal_to_double(values[i])); break;
-            case CDI_DATATYPE_FLT64: printf("%g",  literal_to_double(values[i])); break;
+            case CDI_DATATYPE_FLT32: printf("%sf", double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr), literal_to_double(values[i]))); break;
+            case CDI_DATATYPE_FLT64: printf("%s",  double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr), literal_to_double(values[i]))); break;
             default: printf("\"%s\"", values[i]);
             }
         }

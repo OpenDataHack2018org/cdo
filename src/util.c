@@ -78,6 +78,9 @@ int cdoDefaultTimeType   = CDI_UNDEFID;
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 
+int CDO_flt_digits       = 7;
+int CDO_dbl_digits       = 15;
+
 int CDO_Color            = FALSE;
 int CDO_Use_FFTW         = TRUE;
 int CDO_Version_Info     = TRUE;

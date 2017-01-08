@@ -58,7 +58,6 @@
 #endif
 
 #include "modules.h"
-#include "util.h"
 #include "error.h"
 
 #if defined(_OPENMP)
@@ -154,6 +153,25 @@ void cdo_sig_handler(int signo)
     {
       cdo_stackframe();
       cdoAbort("floating-point exception!");
+    }
+}
+
+static
+void cdo_set_digits(const char *optarg)
+{
+  char *ptr1 = 0;
+  if ( optarg != 0 && (int) strlen(optarg) > 0 && optarg[0] != ',' )
+    CDO_flt_digits = (int)strtol(optarg, &ptr1, 10);
+
+  if ( CDO_flt_digits < 1 || CDO_flt_digits > 20 )
+    cdoAbort("Unreasonable value for float significant digits: %d", CDO_flt_digits);
+
+  if ( ptr1 && *ptr1 == ',' )
+    {
+      char *ptr2 = 0;
+      CDO_dbl_digits = (int)strtol(ptr1+1, &ptr2, 10);
+      if  ( ptr2 == ptr1+1 || CDO_dbl_digits < 1 || CDO_dbl_digits > 20 )
+        cdoAbort("Unreasonable value for double significant digits: %d", CDO_dbl_digits);
     }
 }
 
@@ -1128,6 +1146,7 @@ int parse_options_long(int argc, char *argv[])
             }
           else if ( lprecision )
             {
+              cdo_set_digits(CDO_optarg);
             }
           else if ( lpercentile )
             {

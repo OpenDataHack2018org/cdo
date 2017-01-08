@@ -52,9 +52,13 @@ extern int CDO_Append_History;
 extern int CDO_Reset_History;
 extern int timer_read, timer_write; // refactor: both pstream.c and CDIread.c CDIwrite.c defined in cdo.c
 
-extern int   CDO_optind;
+extern int CDO_optind;
 extern const char *CDO_optarg;
 extern int CDO_opterr;
+
+extern int CDO_flt_digits;
+extern int CDO_dbl_digits;
+
 extern int remap_genweights;
 
 extern const char *cdoExpName;
