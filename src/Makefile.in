@@ -119,12 +119,12 @@ am_libcdo_la_OBJECTS = libcdo_la-cdo_pthread.lo libcdo_la-cdo_vlist.lo \
 	libcdo_la-fieldzon.lo libcdo_la-gradsdeslib.lo \
 	libcdo_la-grid.lo libcdo_la-grid_area.lo libcdo_la-grid_gme.lo \
 	libcdo_la-grid_lcc.lo libcdo_la-grid_rot.lo \
-	libcdo_la-gridreference.lo libcdo_la-griddes.lo \
-	libcdo_la-griddes_h5.lo libcdo_la-griddes_nc.lo \
-	libcdo_la-hetaeta.lo libcdo_la-institution.lo \
-	libcdo_la-interpol.lo libcdo_la-job.lo libcdo_la-juldate.lo \
-	libcdo_la-grid_search.lo libcdo_la-listarray.lo \
-	libcdo_la-list.lo libcdo_la-listbuf.lo \
+	libcdo_la-grid_print.lo libcdo_la-gridreference.lo \
+	libcdo_la-griddes.lo libcdo_la-griddes_h5.lo \
+	libcdo_la-griddes_nc.lo libcdo_la-hetaeta.lo \
+	libcdo_la-institution.lo libcdo_la-interpol.lo \
+	libcdo_la-job.lo libcdo_la-juldate.lo libcdo_la-grid_search.lo \
+	libcdo_la-listarray.lo libcdo_la-list.lo libcdo_la-listbuf.lo \
 	libcdo_la-merge_sort2.lo libcdo_la-modules.lo \
 	libcdo_la-namelist.lo libcdo_la-namelist_parser.lo \
 	libcdo_la-normal.lo libcdo_la-nth_element.lo \
@@ -514,12 +514,12 @@ libcdo_la_SOURCES = cdo_int.h compare.h cdo_pthread.c cdo_vlist.c \
 	expr_yacc.h features.c field.c field.h field2.c fieldc.c \
 	fieldmem.c fieldmer.c fieldzon.c functs.h gradsdeslib.c \
 	gradsdeslib.h grid.c grid.h grid_area.c grid_gme.c grid_lcc.c \
-	grid_rot.c gridreference.c griddes.c griddes.h griddes_h5.c \
-	griddes_nc.c hetaeta.c hetaeta.h institution.c interpol.c \
-	interpol.h job.c juldate.c grid_search.c grid_search.h \
-	listarray.c listarray.h list.c list.h listbuf.c listbuf.h \
-	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
-	namelist.h namelist_parser.c normal.c nth_element.c \
+	grid_rot.c grid_print.c gridreference.c griddes.c griddes.h \
+	griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h institution.c \
+	interpol.c interpol.h job.c juldate.c grid_search.c \
+	grid_search.h listarray.c listarray.h list.c list.h listbuf.c \
+	listbuf.h merge_sort2.c merge_sort2.h modules.c modules.h \
+	namelist.c namelist.h namelist_parser.c normal.c nth_element.c \
 	nth_element.h operator_help.h par_io.c par_io.h \
 	parse_literal.c percentiles_hist.c percentiles_hist.h \
 	percentiles.c percentiles.h pipe.c pipe.h pmlist.c pmlist.h \
@@ -1031,6 +1031,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_area.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_gme.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_lcc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_print.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_rot.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_search.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-griddes.Plo@am__quote@
@@ -1380,6 +1381,13 @@ libcdo_la-grid_rot.lo: grid_rot.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='grid_rot.c' object='libcdo_la-grid_rot.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid_rot.lo `test -f 'grid_rot.c' || echo '$(srcdir)/'`grid_rot.c
+
+libcdo_la-grid_print.lo: grid_print.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_print.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_print.Tpo -c -o libcdo_la-grid_print.lo `test -f 'grid_print.c' || echo '$(srcdir)/'`grid_print.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_print.Tpo $(DEPDIR)/libcdo_la-grid_print.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='grid_print.c' object='libcdo_la-grid_print.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid_print.lo `test -f 'grid_print.c' || echo '$(srcdir)/'`grid_print.c
 
 libcdo_la-gridreference.lo: gridreference.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-gridreference.lo -MD -MP -MF $(DEPDIR)/libcdo_la-gridreference.Tpo -c -o libcdo_la-gridreference.lo `test -f 'gridreference.c' || echo '$(srcdir)/'`gridreference.c

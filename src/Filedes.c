@@ -30,6 +30,8 @@
 #include "util.h"
 
 
+void cdo_print_grid(int gridID, int opt);
+
 static
 void printAtts(FILE *fp, int vlistID, int varID)
 {
@@ -338,7 +340,7 @@ void *Filedes(void *argument)
       for ( int index = 0; index < ngrids; index++ )
         {
           printf("#\n" "# gridID %d\n" "#\n", index+1);
-          gridPrint(vlistGrid(vlistID, index), opt);
+          cdo_print_grid(vlistGrid(vlistID, index), opt);
         }
     }
   else if ( operatorID == ZAXISDES )
