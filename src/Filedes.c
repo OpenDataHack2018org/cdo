@@ -92,6 +92,7 @@ void printHistory(FILE *fp, int streamID)
       history[historysize] = 0;
       streamInqHistoryString(fileID, history);
       fprintf(fp, "  history=%s\n", history);
+      Free(history);
     }
 }
 
@@ -172,11 +173,8 @@ void partab(FILE *fp, int streamID, int option)
       int param = vlistInqVarParam(vlistID, varID);
       double missval = vlistInqVarMissval(vlistID, varID);
       vlistInqVarName(vlistID, varID, varname);
-      /* printf("1>%s<\n", varname); */
       vlistInqVarStdname(vlistID, varID, varstdname);
-      /* printf("2>%s<\n", varname); */
       vlistInqVarLongname(vlistID, varID, varlongname);
-      /* printf("3>%s<\n", varname); */
       vlistInqVarUnits(vlistID, varID, varunits);
             
       fprintf(fp, "  name=%s", varname);
@@ -245,64 +243,32 @@ void filedes(int streamID)
   int filetype = streamInqFiletype(streamID);
   switch ( filetype )
     {
-    case CDI_FILETYPE_GRB:
-      printf("  GRIB data\n");
-      break;
-    case CDI_FILETYPE_GRB2:
-      printf("  GRIB2 data\n");
-      break;
-    case CDI_FILETYPE_NC:
-      printf("  NetCDF data\n");
-      break;
-    case CDI_FILETYPE_NC2:
-      printf("  NetCDF2 data\n");
-      break;
-    case CDI_FILETYPE_NC4:
-      printf("  NetCDF4 data\n");
-      break;
-    case CDI_FILETYPE_NC4C:
-      printf("  NetCDF4 classic data\n");
-      break;
-    case CDI_FILETYPE_SRV:
-      printf("  SERVICE data\n");
-      switch ( streamInqByteorder(streamID) )
-	{
-	case CDI_BIGENDIAN:
-	  printf("  byteorder is BIGENDIAN\n"); break;
-	case CDI_LITTLEENDIAN:
-	  printf("  byteorder is LITTLEENDIAN\n"); break;
-	default:
-	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
-	}
-      break;
-    case CDI_FILETYPE_EXT:
-      printf("  EXTRA data\n");
-      switch ( streamInqByteorder(streamID) )
-	{
-	case CDI_BIGENDIAN:
-	  printf("  byteorder is BIGENDIAN\n"); break;
-	case CDI_LITTLEENDIAN:
-	  printf("  byteorder is LITTLEENDIAN\n"); break;
-	default:
-	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
-	}
-      break;
-    case CDI_FILETYPE_IEG:
-      printf("  IEG data\n");
-      switch ( streamInqByteorder(streamID) )
-	{
-	case CDI_BIGENDIAN:
-	  printf("  byteorder is BIGENDIAN\n"); break;
-	case CDI_LITTLEENDIAN:
-	  printf("  byteorder is LITTLEENDIAN\n"); break;
-	default:
-	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
-	}
-      break;
-    default:
-      printf("  unsupported filetype %d\n" , filetype);
-      break;
+    case CDI_FILETYPE_GRB:  printf("  GRIB data\n"); break;
+    case CDI_FILETYPE_GRB2: printf("  GRIB2 data\n"); break;
+    case CDI_FILETYPE_NC:   printf("  NetCDF data\n"); break;
+    case CDI_FILETYPE_NC2:  printf("  NetCDF2 data\n"); break;
+    case CDI_FILETYPE_NC4:  printf("  NetCDF4 data\n"); break;
+    case CDI_FILETYPE_NC4C: printf("  NetCDF4 classic data\n"); break;
+    case CDI_FILETYPE_SRV:  printf("  SERVICE data\n"); break;
+    case CDI_FILETYPE_EXT:  printf("  EXTRA data\n"); break;
+    case CDI_FILETYPE_IEG:  printf("  IEG data\n"); break;
+    default: printf("  unsupported filetype %d\n" , filetype);
     }
+
+  switch ( filetype )
+    {
+    case CDI_FILETYPE_SRV:
+    case CDI_FILETYPE_EXT:
+    case CDI_FILETYPE_IEG:
+      {
+        switch ( streamInqByteorder(streamID) )
+          {
+          case CDI_BIGENDIAN:    printf("  byteorder is BIGENDIAN\n"); break;
+          case CDI_LITTLEENDIAN: printf("  byteorder is LITTLEENDIAN\n"); break;
+          default:  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
+          }
+       }
+    }  
   
   printf("\n");
 }
