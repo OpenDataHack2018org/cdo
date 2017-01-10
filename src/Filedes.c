@@ -374,15 +374,15 @@ void *Filedes(void *argument)
 	  varname[0]     = 0;
 	  varlongname[0] = 0;
 	  varunits[0]    = 0;
-	  int code     = vlistInqVarCode(vlistID, varID);
+	  int code = vlistInqVarCode(vlistID, varID);
 	  vlistInqVarName(vlistID, varID, varname);
 	  vlistInqVarLongname(vlistID, varID, varlongname);
 	  vlistInqVarUnits(vlistID, varID, varunits);
 	  fprintf(stdout, "%4d  %-12s", code, varname);
-	  if ( strlen(varlongname) )
+	  if ( varlongname[0] )
 	    {
 	      fprintf(stdout, "  %s", varlongname);
-	      if ( strlen(varunits) )
+	      if ( varunits[0] )
 		fprintf(stdout, " [%s]", varunits);
 	    }
 	  fprintf(stdout, "\n");
