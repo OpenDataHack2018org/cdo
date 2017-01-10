@@ -4,13 +4,13 @@
 gridtype  = unstructured
 gridsize  = 65
 xname     = clon
+xdimname  = ncells
 xlongname = center longitude
 xunits    = radian
-xdimname  = ncells
 yname     = clat
+ydimname  = ncells
 ylongname = center latitude
 yunits    = radian
-ydimname  = ncells
 vdimname  = vertices
 nvertex   = 3
 xvals     = 0.9938946 0.6283185 0.2627424 3.141593 -2.776016 2.776016 -2.250532 -0.6283185 
