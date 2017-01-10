@@ -5,38 +5,37 @@
 #include <cdi.h>
 #include "cdo_int.h"
 
-static void
-printDblsPrefixAutoBrk(FILE *fp, int dig, const char prefix[], size_t nbyte0,
-                       size_t n, const double vals[])
+static
+void printDblsPrefixAutoBrk(FILE *fp, int dig, const char prefix[], int nbyte0, size_t n, const double vals[])
 {
   fputs(prefix, fp);
-  size_t nbyte = nbyte0;
+  int nbyte = nbyte0;
   for ( size_t i = 0; i < n; i++ )
     {
       if ( nbyte > 80 )
         {
-          fprintf(fp, "\n%*s", (int)nbyte0, "");
+          fprintf(fp, "\n%*s", nbyte0, "");
           nbyte = nbyte0;
         }
-      nbyte += (size_t)fprintf(fp, "%.*g ", dig, vals[i]);
+      nbyte += fprintf(fp, "%.*g ", dig, vals[i]);
     }
   fputs("\n", fp);
 }
 
 static void
-printIntsPrefixAutoBrk(FILE *fp, const char prefix[], size_t nbyte0,
+printIntsPrefixAutoBrk(FILE *fp, const char prefix[], int nbyte0,
                        size_t n, const int vals[])
 {
   fputs(prefix, fp);
-  size_t nbyte = nbyte0;
+  int nbyte = nbyte0;
   for ( size_t i = 0; i < n; i++ )
     {
       if ( nbyte > 80 )
         {
-          fprintf(fp, "\n%*s", (int)nbyte0, "");
+          fprintf(fp, "\n%*s", nbyte0, "");
           nbyte = nbyte0;
         }
-      nbyte += (size_t)fprintf(fp, "%d ", vals[i]);
+      nbyte += fprintf(fp, "%d ", vals[i]);
     }
   fputs("\n", fp);
 }
@@ -278,7 +277,7 @@ void gridPrintKernel(int gridID, int opt, FILE *fp)
                 double *xvals = (double*) Malloc(nxvals*sizeof(double));
                 gridInqXvals(gridID, xvals);
                 static const char prefix[] = "xvals     = ";
-                printDblsPrefixAutoBrk(fp, dig, prefix, sizeof(prefix)-1, nxvals, xvals);
+                printDblsPrefixAutoBrk(fp, dig, prefix, (int)sizeof(prefix)-1, nxvals, xvals);
                 Free(xvals);
 	      }
 	  }
@@ -313,7 +312,7 @@ void gridPrintKernel(int gridID, int opt, FILE *fp)
                 double *yvals = (double*) Malloc(nyvals*sizeof(double));
                 gridInqYvals(gridID, yvals);
                 static const char prefix[] = "yvals     = ";
-                printDblsPrefixAutoBrk(fp, dig, prefix, sizeof(prefix)-1, nyvals, yvals);
+                printDblsPrefixAutoBrk(fp, dig, prefix, (int)sizeof(prefix)-1, nyvals, yvals);
                 Free(yvals);
 	      }
 	  }
@@ -332,7 +331,7 @@ void gridPrintKernel(int gridID, int opt, FILE *fp)
             double *area = (double*) Malloc(gridsize*sizeof(double));
             gridInqArea(gridID, area);
             static const char prefix[] = "area      = ";
-            printDblsPrefixAutoBrk(fp, dig, prefix, sizeof(prefix)-1, gridsize, area);
+            printDblsPrefixAutoBrk(fp, dig, prefix, (int)sizeof(prefix)-1, gridsize, area);
             Free(area);
 	  }
 
@@ -341,7 +340,7 @@ void gridPrintKernel(int gridID, int opt, FILE *fp)
             static const char prefix[] = "rowlon    = ";
             int *rowlon = (int *)Malloc((size_t)ysize*sizeof(int));
             gridInqRowlon(gridID, rowlon);
-            printIntsPrefixAutoBrk(fp, prefix, sizeof(prefix)-1,
+            printIntsPrefixAutoBrk(fp, prefix, (int)sizeof(prefix)-1,
                                    (size_t)(ysize > 0 ? ysize : 0), rowlon);
             Free(rowlon);
           }
