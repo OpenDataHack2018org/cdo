@@ -120,6 +120,8 @@ int     readline(FILE *fp, char *line, int len);
 
 int zaxis2ltype(int zaxisID);
 
+double radius_str_to_deg(const char *string);
+
 void datetime2str(int date, int time, char *datetimestr, int maxlen);
 void date2str(int date, char *datestr, int maxlen);
 void time2str(int time, char *timestr, int maxlen);

@@ -361,37 +361,23 @@ void get_remap_env(void)
   envstr = getenv("CDO_REMAP_RADIUS");
   if ( envstr )
     {
-      double fval = atof(envstr);
-      if ( fval < 0 || fval > 180 )
-	{
-	  cdoAbort("CDO_REMAP_RADIUS=%g out of bounds (0-180)", fval);
-	}
-      else
-	{
-	  gridsearch_radius = fval;
-	  if ( cdoVerbose )
-	    cdoPrint("Set CDO_REMAP_RADIUS to %g", gridsearch_radius);
-	}
+      double fval = radius_str_to_deg(envstr);
+      if ( fval < 0 || fval > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_REMAP_RADIUS", fval);
+      gridsearch_radius = fval;
+      if ( cdoVerbose ) cdoPrint("Set CDO_REMAP_RADIUS to %g", gridsearch_radius);
     }
 
   envstr = getenv("CDO_GRIDSEARCH_RADIUS");
   if ( envstr )
     {
-      double fval = atof(envstr);
-      if ( fval < 0 || fval > 180 )
-	{
-	  cdoAbort("CDO_GRIDSEARCH_RADIUS=%g out of bounds (0-180)", fval);
-	}
-      else
-	{
-	  gridsearch_radius = fval;
-	  if ( cdoVerbose )
-	    cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", gridsearch_radius);
-	}
+      double fval = radius_str_to_deg(envstr);
+      if ( fval < 0 || fval > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_GRIDSEARCH_RADIUS", fval);
+      gridsearch_radius = fval;
+      if ( cdoVerbose ) cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", gridsearch_radius);
     }
   
   if ( cdoVerbose )
-    cdoPrint("remap_radius = %g", gridsearch_radius);
+    cdoPrint("remap_radius = %g deg", gridsearch_radius);
 
   envstr = getenv("REMAP_AREA_MIN");
   if ( envstr )
