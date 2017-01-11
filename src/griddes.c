@@ -44,6 +44,8 @@
 
 #define MAX_LINE_LEN 65536
 
+int grid_read_pingo(FILE *gfp, const char *dname);
+
 
 void gridInit(griddes_t *grid)
 {
@@ -467,63 +469,6 @@ char *read_att_name(char *pline, int len, char **attname, int *attlen)
   *endname = 0;
 
   return pline;
-}
-
-
-void fnmexp2(char *out, char *in1, const char *in2)
-{
-  const char *pos, *ch;
-  char envv[20], *envr;
-  int i,j;
-
-  if ( *in1=='$' )
-    {
-      in1++;
-      i = 0;
-      while (*in1!='/' && *in1!='\0' && i<16)
-	{
-	  envv[i] = *in1;
-	  i++; in1++;
-	}
-      envv[i] = '\0';
-      envr = getenv(envv);
-      if (envr)
-	{
-	  i = 0; j = 0;
-	  while (*(envr+j))
-	    {
-	      *(out+i) = *(envr+j);
-	      i++; j++;
-	    }
-	  while (*in1!='\0' && *in1!=' ' && *in1!='\n')
-	    {
-	      *(out+i) = *in1;
-	      i++; in1++;
-	    }
-	  *(out+i) = '\0';
-	}
-      return;
-    }
-  ch = in2;
-  pos=NULL;
-  while (*ch!='\0' && *ch!=' ' && *ch!='\n')
-    {
-      if (*ch=='/') pos=ch;
-      ch++;
-    }
-  if (pos) pos++;
-  while (pos!=NULL && in2<pos)
-    {
-      *out = *in2;
-      out++; in2++;
-    }
-  in1++;
-  while (*in1!='\0' && *in1!=' ' && *in1!='\n')
-    {
-      *out = *in1;
-      out++; in1++;
-    }
-  *out = '\0';
 }
 
 static
@@ -1063,176 +1008,6 @@ int gridFromFile(FILE *gfp, const char *dname)
       lineno++;
     }
   while ( readline(gfp, line, MAX_LINE_LEN) );
-
-  return gridID;
-}
-
-
-void skip_nondigit_lines(FILE *gfp)
-{
-  int c;
-
-  if ( feof(gfp) ) return;
-
-  while (1)
-    {
-      do
-	c = fgetc(gfp);
-      while ( (isspace(c) || c == ',') && c != EOF );
-
-      if ( c == EOF || isdigit (c) || c == '.' || c == '+' || c == '-' ) break;
-      else
-	while ( c != '\n' && c != EOF )
-	  c = fgetc(gfp);
-    }
-
-  ungetc(c, gfp);
-}
-
-
-int input_ival(FILE *gfp, int *ival)
-{
-  skip_nondigit_lines(gfp);
-
-  if ( feof(gfp) ) return 0;
-
-  *ival = 0;
-  int read_items = fscanf(gfp, "%d", ival);
-
-  return read_items;
-}
-
-
-int input_darray(FILE *gfp, int n_values, double *array)
-{
-  if ( n_values <= 0 ) return 0;
-
-  int read_items = 0;
-  for ( int i = 0; i < n_values; i++ )
-    {
-      skip_nondigit_lines(gfp);
-
-      if ( feof(gfp) ) break;
-
-      read_items += fscanf(gfp, "%lg", &array[i]);
-
-      if ( feof(gfp) ) break;
-    }
-
-  return read_items;
-}
-
-
-int gridFromPingo(FILE *gfp, const char *dname)
-{
-  UNUSED(dname);
-  int gridID = -1;
-  int i;
-
-  griddes_t grid;
-  gridInit(&grid);
-
-  int nlon, nlat;
-  if ( ! input_ival(gfp, &nlon) ) return gridID;
-  if ( ! input_ival(gfp, &nlat) ) return gridID;
-
-  if ( nlon > 0 && nlon < 9999 && nlat > 0 && nlat < 9999 )
-    {
-      grid.xsize = nlon;
-      grid.ysize = nlat;
-
-      grid.xvals = (double*) Malloc(grid.xsize*sizeof(double));
-      grid.yvals = (double*) Malloc(grid.ysize*sizeof(double));
-
-      if ( ! input_ival(gfp, &nlon) ) return gridID;
-      if ( nlon == 2 )
-	{
-	  if ( input_darray(gfp, 2, grid.xvals) != 2 ) return gridID;
-	  grid.xvals[1] -= 360 * floor((grid.xvals[1] - grid.xvals[0]) / 360);
-
-	  if ( grid.xsize > 1 )
-	    if ( IS_EQUAL(grid.xvals[0], grid.xvals[1]) )
-	      grid.xvals[1] += 360;
-
-	  for ( i = 0; i < (int)grid.xsize; i++ )
-	    grid.xvals[i] = grid.xvals[0] + i*(grid.xvals[1] - grid.xvals[0]);
-	}
-      else if ( nlon == (int)grid.xsize )
-	{
-	  if ( input_darray(gfp, nlon, grid.xvals) != nlon ) return gridID;
-	  for ( i = 0; i < nlon - 1; i++ )
-	    if ( grid.xvals[i+1] <= grid.xvals[i] ) break;
-
-	  for ( i++; i < nlon; i++ )
-	    {
-	      grid.xvals[i] += 360;
-	      if ( i < nlon - 1 && grid.xvals[i+1] + 360 <= grid.xvals[i] )
-		{
-		  Message("Longitudes are not in ascending order!");
-		  return gridID;
-		}
-	    }
-	}
-      else
-	return gridID;
-
-      if ( ! input_ival(gfp, &nlat) ) return gridID;
-      if ( nlat == 2 )
-	{
-	  if ( input_darray(gfp, 2, grid.yvals) != 2 ) return gridID;
-	  for ( i = 0; i < (int)grid.ysize; i++ )
-	    grid.yvals[i] = grid.yvals[0] + i*(grid.yvals[1] - grid.yvals[0]);
-	}
-      else if ( nlat == (int)grid.ysize )
-	{
-	  if ( input_darray(gfp, nlat, grid.yvals) != nlat ) return gridID;
-	}
-      else
-	return gridID;
-
-      if ( grid.yvals[0]      >  90.001  || 
-	   grid.yvals[nlat-1] >  90.001  || 
-	   grid.yvals[0]      < -90.001  || 
-	   grid.yvals[nlat-1] < -90.001 )
-	{
-	  Message("Latitudes must be between 90 and -90!");
-	  return gridID;
-	}
-
-      for ( i = 0; i < nlat - 1; i++ )
-	if ( IS_EQUAL(grid.yvals[i+1], grid.yvals[i]) || (i < nlat - 2 &&
-	    ((grid.yvals[i+1] > grid.yvals[i]) != (grid.yvals[i+2] > grid.yvals[i+1]))) )
-	  {
-	    Message("Latitudes must be in descending or ascending order!");
-	    return gridID;
-	  }
-		    
-      bool lgauss = false;
-      if ( nlat > 2 ) /* check if gaussian */
-	{
-	  double *yvals, *yw;
-	  yvals = (double*) Malloc(grid.ysize*sizeof(double));
-	  yw    = (double*) Malloc(grid.ysize*sizeof(double));
-	  gaussaw(yvals, yw, grid.ysize);
-	  Free(yw);
-	  for ( i = 0; i < (int) grid.ysize; i++ )
-	    yvals[i] = asin(yvals[i])*RAD2DEG;
-
-	  for ( i = 0; i < (int) grid.ysize; i++ )
-	    if ( fabs(yvals[i] - grid.yvals[i]) > ((yvals[0] - yvals[1])/500) ) break;
-		      
-	  if ( i == (int) grid.ysize ) lgauss = true;
-
-	  Free(yvals);
-	}
-
-      if ( lgauss )
-	grid.type = GRID_GAUSSIAN;
-      else
-	grid.type = GRID_LONLAT;
-    }
-  
-  if ( grid.type != UNDEFID ) gridID = gridDefine(grid);
 
   return gridID;
 }
@@ -1797,7 +1572,7 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cdoDebug ) cdoPrint("grid from PINGO file");
 	  FILE *gfp = fopen(filename, "r");
-	  gridID = gridFromPingo(gfp, filename);
+	  gridID = grid_read_pingo(gfp, filename);
 	  fclose(gfp);
 	}
 

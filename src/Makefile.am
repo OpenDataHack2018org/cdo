@@ -67,6 +67,7 @@ libcdo_la_SOURCES =            \
                grid_gme.c      \
                grid_lcc.c      \
                grid_rot.c      \
+               grid_read_pingo.c  \
                grid_print.c    \
                gridreference.c \
                griddes.c       \
