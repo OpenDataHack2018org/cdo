@@ -1023,7 +1023,7 @@ int cdoDefineGrid(const char *gridfile)
   if ( filename )
     lalloc = true;
   else
-    filename =  (char *) gridfile;
+    filename = (char *) gridfile;
 
   int fileno = open(filename, O_RDONLY);
   if ( fileno >= 0 )
@@ -1116,7 +1116,7 @@ int cdoDefineGrid(const char *gridfile)
 }
 
 
-void defineGrid(const char *gridarg)
+void cdo_set_grids(const char *gridarg)
 {
   char gridfile[4096];
   int nfile = 0;

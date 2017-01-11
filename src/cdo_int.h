@@ -127,7 +127,7 @@ void time2str(int time, char *timestr, int maxlen);
 const char * tunit2str(int tunits);
 const char * calendar2str(int calendar);
 
-void    defineGrid(const char *gridarg);
+void    cdo_set_grids(const char *gridarg);
 void    defineInstitution(const char *instarg);
 int     defineTable(const char *tablearg);
 

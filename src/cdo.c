@@ -1247,7 +1247,7 @@ int parse_options_long(int argc, char *argv[])
           setDefaultFileType(CDO_optarg, 1);
           break;
         case 'g':
-          defineGrid(CDO_optarg);
+          cdo_set_grids(CDO_optarg);
           break;
         case 'h':        
           Help = 1;
