@@ -29,8 +29,8 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
 #include "grid.h"
+#include "pstream.h"
 
 
 /*
@@ -1367,7 +1367,7 @@ void *Gradsdes(void *argument)
   int ysize = gridInqYsize(gridID);
 
   int res = 0;
-  if ( gridtype == GRID_GAUSSIAN ) res = nlat2ntr(ysize);
+  if ( gridtype == GRID_GAUSSIAN ) res = nlat_to_ntr(ysize);
 
   if ( res )
     fprintf(gdp, "TITLE  %s  T%d grid\n", datfile, res);

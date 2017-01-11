@@ -26,6 +26,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "grid.h"
 #include "pstream.h"
 
 
@@ -74,39 +75,6 @@ void fac(int nlonin, int *nlonout, int *ierr)
   return;
 }
 
-
-static int compnlon(int nlat)
-{
-  int n;
-  int nlon = 2 * nlat;
-
-  /* check that FFT works with nlon */
-  while ( 1 )
-    {
-      n = nlon;
-      if    ( n % 8 == 0 )  { n /= 8; }
-      while ( n % 6 == 0 )  { n /= 6; }
-      while ( n % 5 == 0 )  { n /= 5; }
-      while ( n % 4 == 0 )  { n /= 4; }
-      while ( n % 3 == 0 )  { n /= 3; }
-      if    ( n % 2 == 0 )  { n /= 2; }
-
-      if ( n <= 8 ) break;
-
-      nlon = nlon + 4;
-
-      if ( nlon > 9999 )
-	{
-	  nlon = 2 * nlat;
-	  fprintf(stderr, "FFT does not work with len %d!\n", nlon);
-	  break;
-	}
-    }
-
-  return nlon;
-}
-
-
 static
 int nlat2nlon(int nlat)
 {
@@ -132,7 +100,7 @@ int nlat2nlon(int nlat)
 int ngp2ntr(int ngp)
 {
   int ntr   = (int)lround(sqrt(0.25+ngp)-1.5);
-  int nlonl = compnlon(ntr2nlat_linear(ntr));
+  int nlonl = nlat_to_nlon(ntr_to_nlat_linear(ntr));
   int nlatl = nlonl/2;
 
   ntr = (2*nlatl-1)/2;
@@ -271,8 +239,8 @@ void *Specinfo(void *argument)
       if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
       ntr2   = atoi(parg);
       nsp2   = NTR2NSP(ntr2);
-      nlat2  = ntr2nlat_linear(ntr2);
-      nlon2  = compnlon(nlat2);
+      nlat2  = ntr_to_nlat_linear(ntr2);
+      nlon2  = nlat_to_nlon(nlat2);
       ngp2   = nlon2*nlat2;
 
       lookup_ni(nsp2, &nrootg2, &ni2);
@@ -288,8 +256,8 @@ void *Specinfo(void *argument)
       if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
       ntr1   = atoi(parg);
       nsp1   = NTR2NSP(ntr1);
-      nlat1  = ntr2nlat(ntr1);
-      nlon1  = compnlon(nlat1);
+      nlat1  = ntr_to_nlat(ntr1);
+      nlon1  = nlat_to_nlon(nlat1);
       ngp1   = nlon1*nlat1;
 
       lookup_ni(nsp1, &nrootg1, &ni1);
@@ -314,12 +282,12 @@ void *Specinfo(void *argument)
       ntr1 = NSP2NTR(nsp1);
       ntr2 = ntr1;
 
-      nlat1 = ntr2nlat(ntr1);
-      nlon1 = compnlon(nlat1);
+      nlat1 = ntr_to_nlat(ntr1);
+      nlon1 = nlat_to_nlon(nlat1);
       nlat1 = nlon1/2;
 
-      nlat2 = ntr2nlat_linear(ntr2);
-      nlon2 = compnlon(nlat2);
+      nlat2 = ntr_to_nlat_linear(ntr2);
+      nlon2 = nlat_to_nlon(nlat2);
       nlat2 = nlon2/2;
 
       /* lookup_ni(nsp1, &nrootg1, &ni1); */
@@ -441,12 +409,12 @@ void *Specinfo(void *argument)
       ntr1 = NSP2NTR(nsp1);
       ntr2 = ntr1;
 
-      nlat1 = ntr2nlat(ntr1);
-      nlon1 = compnlon(nlat1);
+      nlat1 = ntr_to_nlat(ntr1);
+      nlon1 = nlat_to_nlon(nlat1);
       nlat1 = nlon1/2;
 
-      nlat2 = ntr2nlat_linear(ntr2);
-      nlon2 = compnlon(nlat2);
+      nlat2 = ntr_to_nlat_linear(ntr2);
+      nlon2 = nlat_to_nlon(nlat2);
       nlat2 = nlon2/2;
 
       lookup_ni(nsp1, &nrootg1, &ni1);

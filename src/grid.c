@@ -36,6 +36,96 @@
 #include "grid.h"
 
 
+int nfc_to_nlat(int nfc, int ntr)
+{
+  int nlat = nfc / (ntr+1);
+  nlat /= 2;
+
+  return nlat;
+}
+
+
+int nlat_to_ntr(int nlat)
+{
+  int ntr = (nlat*2 - 1) / 3;
+
+  return ntr;
+}
+
+
+int nlat_to_ntr_linear(int nlat)
+{
+  int ntr = (nlat*2 - 1) / 2;
+
+  return ntr;
+}
+
+
+int ntr_to_nlat(int ntr)
+{
+  int nlat = (int)lround((ntr*3.+1.)/2.);
+  if ( (nlat % 2) > 0 )
+    {
+      nlat  = nlat + 1;
+      /*
+      int nlat2 = (int)lround(((ntr+1)*3.+1.)/2.);
+      if ( nlat == nlat2 )
+	Error("Computation of latitudes failed for truncation %d", ntr);
+      */
+    }
+
+  return nlat;
+}
+
+
+int ntr_to_nlat_linear(int ntr)
+{
+  int nlat = (int)lround((ntr*2.+1.)/2.);
+  if ( (nlat % 2) > 0 )
+    {
+      nlat  = nlat + 1;
+      /*
+      int nlat2 = (int)lround(((ntr+1)*2.+1.)/2.);
+      if ( nlat == nlat2 )
+	Error("Computation of latitudes failed for truncation %d", ntr);
+      */
+    }
+
+  return nlat;
+}
+
+
+int nlat_to_nlon(int nlat)
+{
+  int nlon = 2 * nlat;
+
+  /* check that FFT works with nlon */
+  while ( 1 )
+    {
+      int n = nlon;
+      if    ( n % 8 == 0 )  { n /= 8; }
+      while ( n % 6 == 0 )  { n /= 6; }
+      while ( n % 5 == 0 )  { n /= 5; }
+      while ( n % 4 == 0 )  { n /= 4; }
+      while ( n % 3 == 0 )  { n /= 3; }
+      if    ( n % 2 == 0 )  { n /= 2; }
+
+      if ( n <= 8 ) break;
+
+      nlon = nlon + 2;
+
+      if ( nlon > 9999 )
+	{
+	  nlon = 2 * nlat;
+	  fprintf(stderr, "FFT does not work with len %d!\n", nlon);
+	  break;
+	}
+    }
+
+  return nlon;
+}
+
+
 static
 void scale_vec(double scalefactor, long nvals, double *restrict values)
 {

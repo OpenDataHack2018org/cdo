@@ -120,14 +120,6 @@ int     readline(FILE *fp, char *line, int len);
 
 int zaxis2ltype(int zaxisID);
 
-
-int nfc2nlat(int nfc, int ntr);
-int nlat2ntr(int nlat);
-int nlat2ntr_linear(int nlat);
-int ntr2nlat(int ntr);
-int ntr2nlat_linear(int ntr);
-int compNlon(int nlat);
-
 void datetime2str(int date, int time, char *datetimestr, int maxlen);
 void date2str(int date, char *datestr, int maxlen);
 void time2str(int time, char *timestr, int maxlen);

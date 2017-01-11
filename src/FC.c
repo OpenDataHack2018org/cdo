@@ -28,6 +28,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 #include "specspace.h"
 #include "listarray.h"
 
@@ -109,7 +110,7 @@ void *FC(void *argument)
 	{
 	  nfc  = gridInqSize(gridID1);
 	  ntr  = gridInqTrunc(gridID1);
-	  nlat = nfc2nlat(nfc, ntr);
+	  nlat = nfc_to_nlat(nfc, ntr);
 
 	  if ( gridIDsp != -1 )
 	    if ( ntr != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
@@ -138,7 +139,7 @@ void *FC(void *argument)
       if ( gridID1 != -1 )
 	{
 	  ntr  = gridInqTrunc(gridID1);
-	  nlat = ntr2nlat(ntr);
+	  nlat = ntr_to_nlat(ntr);
 
 	  if ( gridIDfc != -1 )
 	    {
@@ -168,7 +169,7 @@ void *FC(void *argument)
 	{
 	  nlon = gridInqXsize(gridID1);
 	  nlat = gridInqYsize(gridID1);
-	  ntr  = nlat2ntr(nlat);
+	  ntr  = nlat_to_ntr(nlat);
 
 	  if ( gridIDfc != -1 )
 	    if ( ntr != gridInqTrunc(gridIDfc) ) gridIDfc = -1;
@@ -194,7 +195,7 @@ void *FC(void *argument)
 	{
 	  nfc  = gridInqSize(gridID1);
 	  ntr  = gridInqTrunc(gridID1);
-	  nlat = nfc2nlat(nfc, ntr);
+	  nlat = nfc_to_nlat(nfc, ntr);
 
 	  if ( gridIDgp != -1 )
 	    {
@@ -206,7 +207,7 @@ void *FC(void *argument)
 	      char gridname[20];
 	      snprintf(gridname, sizeof(gridname), "t%dgrid", ntr);
 
-	      gridIDgp = gridFromName(gridname);
+	      gridIDgp = grid_from_name(gridname);
 	    }
 
 	  gridID2 = gridIDgp;

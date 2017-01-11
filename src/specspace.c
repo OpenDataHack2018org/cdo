@@ -76,7 +76,7 @@ void spec2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
   int nlev  = 1;
   int ntr   = gridInqTrunc(gridIDin);
   int nfc   = gridInqSize(gridIDout);
-  int nlat  = nfc2nlat(nfc, ntr);
+  int nlat  = nfc_to_nlat(nfc, ntr);
   int waves = ntr + 1;
   nfc   = waves * 2;
 

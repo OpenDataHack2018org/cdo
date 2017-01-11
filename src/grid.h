@@ -21,6 +21,14 @@
 #define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
 #endif
 
+
+int nfc_to_nlat(int nfc, int ntr);
+int nlat_to_ntr(int nlat);
+int nlat_to_ntr_linear(int nlat);
+int ntr_to_nlat(int ntr);
+int ntr_to_nlat_linear(int ntr);
+int nlat_to_nlon(int nlat);
+
 void grid_copy_attributes(int gridID1, int gridID2);
 
 void grid_def_param_laea(int gridID, double a, double lon0, double lat0);

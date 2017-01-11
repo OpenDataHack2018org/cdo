@@ -212,7 +212,7 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
 void writeNCgrid(const char *gridfile, int gridID, int *imask);
 void defineZaxis(const char *zaxisarg);
 
-int gridFromName(const char *gridname);
+int grid_from_name(const char *gridname);
 int zaxisFromName(const char *zaxisname);
 
 /* refactor: moved here from cdo.h */
