@@ -23,6 +23,67 @@
 
 #define MAX_LINE_LEN 65536
 
+void cdo_read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *fp, const char *dname)
+{
+  char line[MAX_LINE_LEN];
+  double fval;
+  char *endptr;
+  for ( int i = 0; i < size; i++ )
+    {
+      endptr = pline;
+      fval = strtod(pline, &endptr);
+      if ( pline == endptr )
+        {
+          (*lineno)++;
+          if ( ! readline(fp, line, MAX_LINE_LEN) )
+            cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name, *lineno, dname);
+          pline = line;
+          fval = strtod(pline, &endptr);
+        }
+      field[i] = fval;
+      pline = endptr;
+    }
+}
+
+//#define TEST_NEWFORMAT
+
+#ifdef TEST_NEWFORMAT
+
+int grid_read(FILE *gfp, const char *dname)
+{
+  list_t *pmlist = namelist_to_pmlist(gfp, dname);
+  if ( pmlist == NULL ) return -1;
+  list_t *kvlist = *(list_t **)pmlist->head->data;
+  if ( kvlist == NULL ) return -1;
+
+  griddes_t grid;
+  gridInit(&grid);
+
+  const char *listname = list_name(kvlist);
+  if ( listname ) printf("&%s\n", list_name(kvlist));
+  for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
+    {
+      keyValues_t *kv = *(keyValues_t **)kvnode->data;
+      const char *key = kv->key;
+      if ( listname ) printf("  ");
+      printf("%s = ", key);
+      if ( kv->values && kv->values[0] )
+        printf("%s", kv->values[0]);
+        
+      //print_values(kv->nvalues, kv->values);
+      printf("\n");
+    }
+  if ( listname ) printf("/\n");
+
+  list_destroy(pmlist);
+
+  int gridID = (grid.type == CDI_UNDEFID ) ? -1 : gridDefine(grid);
+
+  return gridID;
+}
+
+#else
+
 static
 char *skipSeparator(char *pline)
 {
@@ -64,29 +125,6 @@ char *read_att_name(char *pline, int len, char **attname, int *attlen)
   *endname = 0;
 
   return pline;
-}
-
-
-void cdo_read_field(const char *name, char *pline, int size, double *field, int *lineno, FILE *fp, const char *dname)
-{
-  char line[MAX_LINE_LEN];
-  double fval;
-  char *endptr;
-  for ( int i = 0; i < size; i++ )
-    {
-      endptr = pline;
-      fval = strtod(pline, &endptr);
-      if ( pline == endptr )
-        {
-          (*lineno)++;
-          if ( ! readline(fp, line, MAX_LINE_LEN) )
-            cdoAbort("Incomplete command: >%s< (line: %d file: %s)", name, *lineno, dname);
-          pline = line;
-          fval = strtod(pline, &endptr);
-        }
-      field[i] = fval;
-      pline = endptr;
-    }
 }
 
 
@@ -595,3 +633,4 @@ int grid_read(FILE *gfp, const char *dname)
 
   return gridID;
 }
+#endif
