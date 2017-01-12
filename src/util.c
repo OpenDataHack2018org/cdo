@@ -356,6 +356,33 @@ char *getFileArg(char *argument)
   return fileArg;
 }
 
+static
+void trim_flt(char *ss)
+{
+  char *cp = ss;
+  if ( *cp == '-' ) cp++;
+  while ( isdigit((int)*cp ) || *cp == '.' ) cp++;
+  if ( *--cp == '.' ) return;
+
+  char *ep = cp+1;
+  while ( *cp == '0' ) cp--;
+  cp++;
+  if ( cp == ep ) return;
+  while ( *ep ) *cp++ = *ep++;
+  *cp = '\0';
+
+  return;
+}
+
+
+char *double_to_attstr(int digits, char *str, size_t len, double value)
+{
+  int ret = snprintf(str, len, "%#.*g", digits, value);
+  assert(ret != -1 && ret < (int)len);
+  trim_flt(str);
+  return str;
+}
+
 
 void input_int(char *arg, int intarr[], int maxint, int *nintfound)
 {

@@ -24,33 +24,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 
-static
-void trim_flt(char *ss)
-{
-  char *cp = ss;
-  if ( *cp == '-' ) cp++;
-  while ( isdigit((int)*cp ) || *cp == '.' ) cp++;
-  if ( *--cp == '.' ) return;
-
-  char *ep = cp+1;
-  while ( *cp == '0' ) cp--;
-  cp++;
-  if ( cp == ep ) return;
-  while ( *ep ) *cp++ = *ep++;
-  *cp = '\0';
-
-  return;
-}
-
-
-char *double_to_attstr(int digits, char *str, int len, double value)
-{
-  int ret = snprintf(str, len, "%#.*g", digits, value);
-  assert(ret != -1 && ret < len);
-  trim_flt(str);
-  return str;
-}
-
 
 static
 void print_values(int nvalues, char **values)

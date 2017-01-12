@@ -138,6 +138,8 @@ int month_to_season(int month);
 
 void init_is_tty(void);
 
+char *double_to_attstr(int digits, char *str, size_t len, double value);
+
 void progressInit(void);
 void progressStatus(double offset, double refval, double curval);
 
