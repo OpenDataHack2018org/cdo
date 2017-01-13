@@ -49,6 +49,12 @@ void cdo_read_field(const char *name, char *pline, int size, double *field, int 
 
 #ifdef TEST_NEWFORMAT
 
+typedef struct {
+  keyValues_t *kv;
+  bool isValid;
+} kvmap_t;
+
+
 int grid_read(FILE *gfp, const char *dname)
 {
   list_t *pmlist = namelist_to_pmlist(gfp, dname);
@@ -59,25 +65,79 @@ int grid_read(FILE *gfp, const char *dname)
   griddes_t grid;
   gridInit(&grid);
 
-  const char *listname = list_name(kvlist);
-  if ( listname ) printf("&%s\n", list_name(kvlist));
+  size_t nkv = list_size(kvlist);
+  if ( nkv == 0 ) return -1;
+  kvmap_t *kvmap = (kvmap_t*) Malloc(nkv*sizeof(kvmap_t));
+  for ( size_t i = 0; i < nkv; ++i ) kvmap[i].isValid = false;
+
+  size_t i = 0;
   for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
     {
       keyValues_t *kv = *(keyValues_t **)kvnode->data;
+      if ( i == 0 && !STR_IS_EQ(kv->key, "gridtype") )
+        cdoAbort("First grid description parameter must be >gridtype< (found: %s)!", kv->key);
+
+      if ( kv->nvalues == 0 )
+        {
+          cdoWarning("Grid description parameter %s has no values, skipped!", kv->key);
+        }
+      else
+        {
+          kvmap[i].isValid = true;
+          kvmap[i].kv = kv;
+        }
+      i++;
+    }
+
+  for ( size_t i = 0; i < nkv; ++i )
+    {
+      if ( !kvmap[i].isValid ) continue;
+
+      keyValues_t *kv = kvmap[i].kv;
       const char *key = kv->key;
-      if ( listname ) printf("  ");
+      const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
+      bool lv1 = (kv->nvalues == 1);
+
       printf("%s = ", key);
       if ( kv->values && kv->values[0] )
         printf("%s", kv->values[0]);
         
       //print_values(kv->nvalues, kv->values);
       printf("\n");
+
+      if ( STR_IS_EQ(key, "gridtype") )
+        {
+          const char *gridtype = parameter2word(value);
+
+          if      ( STR_IS_EQ(gridtype, "lonlat") )       grid.type = GRID_LONLAT;
+          else if ( STR_IS_EQ(gridtype, "latlon") )       grid.type = GRID_LONLAT;
+          else if ( STR_IS_EQ(gridtype, "gaussian") )     grid.type = GRID_GAUSSIAN;
+          else if ( STR_IS_EQ(gridtype, "curvilinear") )  grid.type = GRID_CURVILINEAR;
+          else if ( STR_IS_EQ(gridtype, "unstructured") ) grid.type = GRID_UNSTRUCTURED;
+          else if ( STR_IS_EQ(gridtype, "cell") )         grid.type = GRID_UNSTRUCTURED;
+          else if ( STR_IS_EQ(gridtype, "spectral") )     grid.type = GRID_SPECTRAL;
+          else if ( STR_IS_EQ(gridtype, "gme") )          grid.type = GRID_GME;
+          else if ( STR_IS_EQ(gridtype, "lcc") )          grid.type = GRID_LCC;
+          else if ( STR_IS_EQ(gridtype, "lambert") )      grid.type = GRID_LCC;
+          else if ( STR_IS_EQ(gridtype, "projection") )   grid.type = GRID_PROJECTION;
+          else if ( STR_IS_EQ(gridtype, "generic") )      grid.type = GRID_GENERIC;
+	  else cdoAbort("Invalid gridtype : %s (grid description file: %s)", gridtype, dname);
+            
+          if ( grid.type == GRID_LONLAT || grid.type == GRID_GAUSSIAN ) grid.nvertex = 2;
+          else if ( grid.type == GRID_CURVILINEAR ) grid.nvertex = 4;
+        }
+      else if ( STR_IS_EQ(key, "gridprec") )       grid.prec = parameter2int(value);
+      else if ( STR_IS_EQ(key, "gridsize") )       grid.size = parameter2int(value);
+      else if ( STR_IS_EQ(key, "truncation") )     grid.ntr = parameter2int(value);
+      else if ( STR_IS_EQ(key, "np") )             grid.np = parameter2int(value);
+      else if ( STR_IS_EQ(key, "complexpacking") ) grid.lcomplex = parameter2int(value);
     }
-  if ( listname ) printf("/\n");
 
   list_destroy(pmlist);
 
-  int gridID = (grid.type == CDI_UNDEFID ) ? -1 : gridDefine(grid);
+  int gridID = (grid.type == CDI_UNDEFID) ? -1 : gridDefine(grid);
+
+  Free(kvmap);
 
   return gridID;
 }
@@ -175,12 +235,12 @@ int grid_read(FILE *gfp, const char *dname)
 	      grid.type = GRID_CURVILINEAR;
 	      grid.nvertex = 4;
 	    }
-	  else if ( cmpstrlen(pline, "spectral", len)  == 0 )
-	    grid.type = GRID_SPECTRAL;
 	  else if ( cmpstrlen(pline, "unstructured", len)  == 0 )
 	    grid.type = GRID_UNSTRUCTURED;
 	  else if ( cmpstrlen(pline, "cell", len)  == 0 )
 	    grid.type = GRID_UNSTRUCTURED;
+	  else if ( cmpstrlen(pline, "spectral", len)  == 0 )
+	    grid.type = GRID_SPECTRAL;
 	  else if ( cmpstrlen(pline, "gme", len)  == 0 )
 	    grid.type = GRID_GME;
 	  else if ( cmpstrlen(pline, "lcc", len)  == 0 )
