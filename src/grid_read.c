@@ -226,6 +226,21 @@ int grid_read(FILE *gfp, const char *dname)
 	      grid.xvals[i] = parameter2double(kv->values[2*i+1]);
             }
         }
+      else if ( STR_IS_EQ(key, "mask") )
+        {
+          size_t size = grid.size;
+          if ( grid.size == 0 ) cdoAbort("gridsize undefined (grid description file: %s)!", dname);
+          if ( size != nvalues )
+            cdoAbort("Number of mask values=%zu and size of grid=%zu differ (grid description file: %s)!", nvalues, size, dname);
+          grid.mask = (int*) Malloc(size*sizeof(int));
+          size_t count = 0;
+          for ( size_t i = 0; i < size; ++i )
+            {
+              grid.mask[i] = parameter2int(kv->values[i]);
+              if ( grid.mask[i] == 1 ) count++;
+            }
+          if ( count == size ) { Free(grid.mask); grid.mask = NULL; }
+        }
       else if ( STR_IS_EQ(key, "grid_mapping_name") ) { igmap = ik; break; }
       else cdoAbort("Invalid parameter : >%s< (grid description file: %s)", key, dname);
     }
