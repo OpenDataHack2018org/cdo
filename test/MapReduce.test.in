@@ -27,8 +27,9 @@ for OPERATOR in reducegrid; do
       $CDOCOMMAND
       test $? -eq 0 || let RSTAT+=1
 
-      $CDO griddes reduced_${grid}.nc > griddes.${grid}
-      cmp griddes.${grid} $REF
+#      $CDO griddes reduced_${grid}.nc > griddes.${grid}
+      $CDO griddes reduced_${grid}.nc | sed -e s-\"--g > griddes.${grid}
+      diff griddes.${grid} $REF
       test $? -eq 0 || let RSTAT+=1
 
       rm reduced_${grid}.nc
