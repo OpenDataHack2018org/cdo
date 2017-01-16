@@ -1,4 +1,4 @@
-//#define TEST_NEWFORMAT 1
+#define TEST_NEWFORMAT 1
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
