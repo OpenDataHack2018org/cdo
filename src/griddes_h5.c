@@ -55,8 +55,7 @@ herr_t obj_info(hid_t loc_id, const char *name, void *objname)
 static
 int h5find_object(hid_t file_id, const  char *name)
 {
-  int lexist = (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
-  return lexist;
+  return (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
 }
 #endif
 
@@ -333,19 +332,8 @@ int gridFromH5file(const char *gridfile)
 	  goto RETURN;
 	}
 
-      att_id = H5Aopen_name(lon_id, "bounds");
-      if ( att_id >= 0 )
-	{
-	  H5Aclose(att_id);
-	  goto RETURN;
-	}
-
-      att_id = H5Aopen_name(lat_id, "bounds");
-      if ( att_id >= 0 )
-	{
-	  H5Aclose(att_id);
-	  goto RETURN;
-	}
+      if ( H5Aexists(lon_id, "bounds") ) goto RETURN;
+      if ( H5Aexists(lat_id, "bounds") ) goto RETURN;
 
       /*
       printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
