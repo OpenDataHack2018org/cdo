@@ -263,11 +263,11 @@ int grid_read(FILE *gfp, const char *dname)
 
           if ( STR_IS_EQ(key, "grid_mapping") )
             {
-              cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(value)+1, value);
+              cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(value)+1, value);
               continue;
             }
           if ( STR_IS_EQ(key, "grid_mapping_name") )
-            cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(value)+1, value);
+            cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(value)+1, value);
 
           int dtype = literals_find_datatype(nvalues, kv->values);
 
@@ -815,7 +815,7 @@ int grid_read(FILE *gfp, const char *dname)
           if ( *pline == '"' ) *pline = 0;
 
           if ( strcmp(attname, "grid_mapping_name") == 0 )
-            cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(atttxt)+1, atttxt);
+            cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(atttxt)+1, atttxt);
 
           cdiDefAttTxt(gridID, CDI_GLOBAL, attname, (int)strlen(atttxt), atttxt);
 	}

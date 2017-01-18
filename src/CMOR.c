@@ -459,7 +459,7 @@ static void register_cmor_grid(int gridID, int *axis_ids, int *cmor_grid_id)
 static void register_cmor_grid_mapping(int projID, int cmor_grid_id)
 {
   char grid_mapping[CDI_MAX_NAME] = "";
-  cdiGridInqKeyStr(projID, CDI_KEY_MAPPING, CDI_MAX_NAME, grid_mapping);
+  cdiGridInqKeyStr(projID, CDI_KEY_MAPNAME, CDI_MAX_NAME, grid_mapping);
 
   if ( grid_mapping[0] )
     {

@@ -612,9 +612,9 @@ void sinu_to_geo(int gridsize, double *xvals, double *yvals)
 void grid_def_param_sinu(int gridID)
 {
   const char *projection = "sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(projection)+1, projection);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
   const char *mapvarname = "Sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
 
   cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
 }
@@ -623,9 +623,9 @@ void grid_def_param_sinu(int gridID)
 void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
 {
   const char *projection = "lambert_azimuthal_equal_area";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(projection)+1, projection);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
   const char *mapvarname = "Lambert_AEA";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
 
   cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
   
@@ -644,7 +644,7 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
     {
       const char *projection = "lambert_azimuthal_equal_area";
       char mapping[CDI_MAX_NAME]; mapping[0] = 0;
-      cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, mapping);
       if ( mapping[0] && strcmp(mapping, projection) == 0 )
         {
           int atttype, attlen;
@@ -686,7 +686,7 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
     {
       const char *projection = "lambert_conformal_conic";
       char mapping[CDI_MAX_NAME]; mapping[0] = 0;
-      cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, mapping);
       if ( mapping[0] && strcmp(mapping, projection) == 0 )
         {
           int atttype, attlen;

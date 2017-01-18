@@ -381,9 +381,9 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
 
         if ( type == GRID_PROJECTION )
           {
-            attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, attstr);
-            if ( attstr[0] )  fprintf(fp, "grid_mapping = %s\n", attstr);
             attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, attstr);
+            if ( attstr[0] )  fprintf(fp, "grid_mapping = %s\n", attstr);
+            attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, attstr);
             if ( attstr[0] )  fprintf(fp, "grid_mapping_name = %s\n", attstr);
             grid_print_attributes(fp, gridID);
           }
