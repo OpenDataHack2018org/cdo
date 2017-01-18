@@ -106,6 +106,8 @@ void grid_print_attributes(FILE *fp, int gridID)
 
       if ( attlen == 0 ) continue;
 
+      if ( strcmp(attname, "grid_mapping_name") == 0 ) continue;
+
       if ( atttype == CDI_DATATYPE_TXT )
         {
           size_t attSize = (size_t)(attlen+1)*sizeof(char);
@@ -377,7 +379,14 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
             Free(rowlon);
           }
 
-        if ( type == GRID_PROJECTION ) grid_print_attributes(fp, gridID);
+        if ( type == GRID_PROJECTION )
+          {
+            attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, attstr);
+            if ( attstr[0] )  fprintf(fp, "grid_mapping = %s\n", attstr);
+            attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, attstr);
+            if ( attstr[0] )  fprintf(fp, "grid_mapping_name = %s\n", attstr);
+            grid_print_attributes(fp, gridID);
+          }
 
 	break;
       }
