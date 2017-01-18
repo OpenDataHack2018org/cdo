@@ -241,6 +241,7 @@ int grid_read(FILE *gfp, const char *dname)
             }
           if ( count == size ) { Free(grid.mask); grid.mask = NULL; }
         }
+      else if ( STR_IS_EQ(key, "grid_mapping_name") ) { igmap = ik; break; }
       else if ( STR_IS_EQ(key, "grid_mapping") ) { igmap = ik; break; }
       else cdoAbort("Invalid parameter : >%s< (grid description file: %s)", key, dname);
     }
@@ -266,6 +267,7 @@ int grid_read(FILE *gfp, const char *dname)
               cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(value)+1, value);
               continue;
             }
+
           if ( STR_IS_EQ(key, "grid_mapping_name") )
             cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(value)+1, value);
 
