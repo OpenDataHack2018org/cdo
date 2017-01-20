@@ -30,8 +30,8 @@ the number of observations being larger than all ensembles.
 ensrkhistspace computes a ranked histogram at each timestep reducing each 
 horizontal grid to a 1x1 grid and keeping the time axis as in @file{obsfile}. 
 Contrary ensrkhistspace  computes a histogram at each grid point keeping the 
-horizontal grid for each variable and reducing the time-axis. The time infor-
-mation is that from the last timestep in @file{obsfile}. 
+horizontal grid for each variable and reducing the time-axis. The time information
+is that from the last timestep in @file{obsfile}. 
 @EndDescription
 @EndModule
 

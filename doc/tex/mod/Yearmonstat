@@ -16,10 +16,10 @@
 @BeginDescription
 This operator computes the yearly mean of a monthly time series.
 Each month is weighted with the number of days per month. 
-The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
+The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile}.
 
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:
 
 o(t,x) = mean{i(t',x), t_1<t'<=t_n}
 @EndifMan

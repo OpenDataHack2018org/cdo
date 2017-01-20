@@ -8,7 +8,7 @@
 
 @BeginDescription
 This module computes running percentiles over a selected number of timesteps in @file{ifile}.
-The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
+The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile}.
 @EndDescription
 @EndModule
 

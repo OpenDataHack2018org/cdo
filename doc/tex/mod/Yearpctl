@@ -8,13 +8,11 @@
 
 @BeginDescription
 This operator computes percentiles over all timesteps of the same year in @file{ifile1}.
-The algorithm uses histograms with minimum and maximum bounds given in
-@file{ifile2} and @file{ifile3}, respectively. The default number of
-histogram bins is 101. The default can be overridden by setting the
-environment variable @env{CDO_PCTL_NBINS} to a different value. The files
-@file{ifile2} and @file{ifile3} should be the result of corresponding
-@mod{yearmin} and @mod{yearmax} operations, respectively.
-The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile1}.
+The algorithm uses histograms with minimum and maximum bounds given in @file{ifile2} and
+@file{ifile3}, respectively. The default number of histogram bins is 101. The default can be
+overridden by defining the environment variable @env{CDO_PCTL_NBINS}. The files @file{ifile2} and
+@file{ifile3} should be the result of corresponding @mod{yearmin} and @mod{yearmax} operations, respectively.
+The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile1}.
 @EndDescription
 @EndModule
 
@@ -25,7 +23,7 @@ The time stamp in @file{ofile} is from the middle contributing timestep of @file
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:
 
 o(t,x) = pth percentile {i(t',x), t_1<t'<=t_n}
 @EndifMan

@@ -12,7 +12,7 @@ The algorithm uses histograms with minimum and maximum bounds given in @file{ifi
 respectively. The default number of histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files @file{ifile2} and @file{ifile3} 
 should be the result of corresponding @mod{timselmin} and @mod{timselmax} operations, respectively.
-The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile1}.
+The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile1}.
 @EndDescription
 @EndModule
 
@@ -23,15 +23,13 @@ The time stamp in @file{ofile} is from the middle contributing timestep of @file
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-selected time range it is
+For every adjacent sequence t1, ...., tn of timesteps of the same selected time range it is:
 
 o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
 \vspace*{1mm}
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-selected time range it is: \\
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same selected time range it is: \\
 \vspace*{1mm}
 
 @BeginMath

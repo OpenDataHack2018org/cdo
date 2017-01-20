@@ -45,7 +45,7 @@ from the triangular truncation by:
 @BeginDescription
 Calculate U and V wind on a Gaussian grid from spherical harmonic 
 coefficients of relative divergence and vorticity. The divergence and vorticity 
-need tohave the names sd and svo or code numbers 155 and 138.
+need to have the names sd and svo or code numbers 155 and 138.
 The number of latitudes of the resulting Gaussian grid is calculated 
 from the triangular truncation by:
 @IfMan
