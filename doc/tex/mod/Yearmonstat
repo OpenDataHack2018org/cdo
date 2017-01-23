@@ -4,7 +4,7 @@
 @Title     = Yearly mean from monthly data
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = yearmonmean
 
 @EndModule
@@ -16,7 +16,7 @@
 @BeginDescription
 This operator computes the yearly mean of a monthly time series.
 Each month is weighted with the number of days per month. 
-The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile}.
+The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 
 @IfMan
 For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is:
@@ -35,13 +35,13 @@ o(t,x) = \mbox{\textbf{mean}}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginEnvironment
 @Item = CDO_TIMESTAT_DATE
-Sets the date information in ofile to the "first", "middle" or "last" contributing timestep of ifile.
+Sets the date information in outfile to the "first", "middle" or "last" contributing timestep of infile.
 @EndEnvironment
 
 
 @BeginExample
 To compute the yearly mean of a monthly time series use:
 @BeginVerbatim
-   cdo yearmonmean ifile ofile
+   cdo yearmonmean infile outfile
 @EndVerbatim
 @EndExample

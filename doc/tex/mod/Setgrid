@@ -4,7 +4,7 @@
 @Title     = Set grid information
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = setgrid setgridtype setgridarea
 
 @BeginDescription
@@ -77,6 +77,6 @@ Assuming a dataset has fields on a grid with 2048 elements without or with wrong
 grid description.
 To set the grid description of all input fields to a Gaussian N32 grid (8192 gridpoints) use:
 @BeginVerbatim
-   cdo setgrid,n32 ifile ofile
+   cdo setgrid,n32 infile outfile
 @EndVerbatim
 @EndExample

@@ -4,7 +4,7 @@
 @Title     = Reduce fields to user-defined mask
 @Section   = Conditional selection
 @Class     = Conditional
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = reducegrid
 
 @BeginDescription
@@ -19,7 +19,7 @@ coordinates a completely suppressed.
 @BeginOperator_reducegrid
 @Name      = reducegrid
 @Title     = Reduce input file variables to locations, where mask is non-zero.
-             Horizontal grids of @file{mask} and @file{ifile} must be identical
+             Horizontal grids of @file{mask} and @file{infile} must be identical
 @Parameter = mask[,limitCoordsOutput]
 
 @EndOperator

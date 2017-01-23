@@ -3,7 +3,7 @@
 @Title     = Detrend time series
 @Section   = Regression
 @Class     = Regression
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = detrend
 @EndModule
 
@@ -13,11 +13,11 @@
 
 @BeginDescription
 @IfMan
-Every time series in @file{ifile} is linearly detrended. For every field element x 
+Every time series in @file{infile} is linearly detrended. For every field element x 
 only those timesteps t belong to the sample S(x), which have i(t,x) NE miss.
 @EndifMan
 @IfDoc
-Every time series in @file{ifile} is linearly detrended.
+Every time series in @file{infile} is linearly detrended.
 For every field element \begin{math}x\end{math} only those timesteps \begin{math}t\end{math} belong to the sample
 \begin{math}S(x)\end{math}, which have \begin{math}i(t,x) \neq \mbox{miss}\end{math}.
 With
@@ -46,8 +46,8 @@ If not enough memory is available use the operators @mod{trend} and @mod{subtren
 
 
 @BeginExample
-To detrend the data in @file{ifile} and to store the detrended data in @file{ofile} use:
+To detrend the data in @file{infile} and to store the detrended data in @file{outfile} use:
 @BeginVerbatim
-  cdo detrend ifile ofile
+  cdo detrend infile outfile
 @EndVerbatim
 @EndExample

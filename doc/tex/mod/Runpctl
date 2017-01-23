@@ -3,12 +3,12 @@
 @Title     = Running percentile values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = runpctl
 
 @BeginDescription
-This module computes running percentiles over a selected number of timesteps in @file{ifile}.
-The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile}.
+This module computes running percentiles over a selected number of timesteps in @file{infile}.
+The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
 @EndModule
 
@@ -43,6 +43,6 @@ INTEGER  Number of timesteps
 @BeginExample
 To compute the running 50th percentile (median) over 9 timesteps use:
 @BeginVerbatim
-   cdo runpctl,50,9 ifile ofile
+   cdo runpctl,50,9 infile outfile
 @EndVerbatim
 @EndExample

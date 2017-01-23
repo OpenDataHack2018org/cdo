@@ -4,17 +4,17 @@
 @Title     = Humidity index (°C)
 @Section   = Miscellaneous
 @Class     = Arithmetic
-@Arguments = ifile1 ifile2 ifile3 ofile
+@Arguments = infile1 infile2 infile3 outfile
 @Operators = hi
 
 @BeginDescription
-Let @file{ifile1}, @file{ifile2} and @file{ifile3} be time series
+Let @file{infile1}, @file{infile2} and @file{infile3} be time series
 of temperature, vapour pressure and relative humidity records.
 Then a corresponding time series of resulting humidity index values
-is written to @file{ofile}. The humidity index calculation is only
+is written to @file{outfile}. The humidity index calculation is only
 valid for a temperature of T >= 26Â° C and a relative humidity of
 R >= 40 %. Whenever these conditions are not satisfied, a missing
-value is written to @{ofile}. Note that the temperature have to be given
+value is written to @{outfile}. Note that the temperature have to be given
 in degrees Celsius, the vapour pressure have to be given in TBD, and the
 relative humidity have to be given in percent.
 @EndDescription

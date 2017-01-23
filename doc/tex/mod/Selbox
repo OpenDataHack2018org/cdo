@@ -4,7 +4,7 @@
 @Title     = Select a box of a field
 @Section   = Selection
 @Class     = Selection
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = sellonlatbox selindexbox
 
 @BeginDescription
@@ -59,10 +59,10 @@ INTEGER  Index of last latitude
 @BeginExample
 To select the region with the longitudes from 30W to 60E and latitudes from 30N to 80S from all input fields use:
 @BeginVerbatim
-   cdo sellonlatbox,-30,60,30,80 ifile ofile
+   cdo sellonlatbox,-30,60,30,80 infile outfile
 @EndVerbatim
 If the input dataset has fields on a Gaussian N16 grid, the same box can be selected with @oper{selindexbox} by:
 @BeginVerbatim
-   cdo selindexbox,60,11,3,11 ifile ofile
+   cdo selindexbox,60,11,3,11 infile outfile
 @EndVerbatim
 @EndExample

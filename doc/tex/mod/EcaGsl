@@ -4,11 +4,11 @@
 @Title     = Thermal Growing season length index
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = eca_gsl
 
 @BeginDescription
-Let @file{ifile1} be a time series of the daily mean temperature TG, and @file{ifile2} be a land-water mask.
+Let @file{infile1} be a time series of the daily mean temperature TG, and @file{infile2} be a land-water mask.
 Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:
 @BeginItemize
 @Item = first occurrence of at least nday consecutive days with TG > @math{T}
@@ -25,7 +25,7 @@ a grid point that have to be covered by land in order to be included in the calc
 is the start day of year of the growing season. Note that TG have to be given in units of Kelvin, whereas @math{T} 
 have to be given in degrees Celsius.
 
-The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
+The date information of a timestep in @file{outfile} is the date of the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -49,6 +49,6 @@ FLOAT    Land fraction threshold (default: fland = 0.5)
 @BeginExample
 To get the growing season length of a time series of daily mean temperatures use:
 @BeginVerbatim
-   cdo eca_gsl tgfile maskfile ofile
+   cdo eca_gsl tgfile maskfile outfile
 @EndVerbatim
 @EndExample

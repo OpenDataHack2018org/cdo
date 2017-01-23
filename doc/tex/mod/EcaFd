@@ -3,15 +3,15 @@
 @Title     = Frost days index per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_fd
 
 @BeginDescription
-Let @file{ifile} be a time series of the daily minimum temperature TN,
+Let @file{infile} be a time series of the daily minimum temperature TN,
 then the number of days where TN < 0 @celsius is counted. Note
 that TN have to be given in units of Kelvin.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile}.
+The date information of a timestep in @file{outfile} is the date of
+the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -25,6 +25,6 @@ the last contributing timestep in @file{ifile}.
 To get the number of frost days of a time series of daily
 minimum temperatures use:
 @BeginVerbatim
-   cdo eca_fd tnfile ofile
+   cdo eca_fd tnfile outfile
 @EndVerbatim
 @EndExample

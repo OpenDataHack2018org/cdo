@@ -4,7 +4,7 @@
 @Title     = Spectral transformation
 @Section   = Transformation
 @Class     = Transformation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp
 
 @BeginDescription
@@ -129,10 +129,10 @@ INTEGER  New spectral resolution
 @BeginExample
 To transform spectral coefficients from T106 to N80 Gaussian grid use:
 @BeginVerbatim
-   cdo sp2gp ifile ofile
+   cdo sp2gp infile outfile
 @EndVerbatim
 To transform spectral coefficients from TL159 to N80 Gaussian grid use:
 @BeginVerbatim
-   cdo sp2gpl ifile ofile
+   cdo sp2gpl infile outfile
 @EndVerbatim
 @EndExample

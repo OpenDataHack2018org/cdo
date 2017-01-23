@@ -3,7 +3,7 @@
 @Name      = Outputgmt
 @Title     = GMT output
 @Section   = Import/Export
-@Arguments = ifile
+@Arguments = infile
 @Operators = gmtxyz gmtcells
 
 @BeginDescription

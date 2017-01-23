@@ -3,7 +3,7 @@
 @Name      = Replacevalues
 @Title     = Replace variable values
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = setvals setrtoc setrtoc2
 
 @BeginDescription

@@ -3,13 +3,13 @@
 @Title     = Very heavy precipitation days index per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_r20mm
 
 @BeginDescription
-Let @file{ifile} be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),
-then the number of days where RR is at least 20 mm is counted. The date information of a timestep in @file{ofile}
-is the date of the last contributing timestep in @file{ifile}.
+Let @file{infile} be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),
+then the number of days where RR is at least 20 mm is counted. The date information of a timestep in @file{outfile}
+is the date of the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -23,6 +23,6 @@ is the date of the last contributing timestep in @file{ifile}.
 To get the number of days with precipitation greater than 20 mm for
 a time series of daily precipitation amounts use:
 @BeginVerbatim
-   cdo eca_r20mm rrfile ofile
+   cdo eca_r20mm rrfile outfile
 @EndVerbatim
 @EndExample

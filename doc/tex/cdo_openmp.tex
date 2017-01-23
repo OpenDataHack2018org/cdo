@@ -4,7 +4,7 @@ Some of the {\CDO} operators are parallelized with OpenMP.
 To use {\CDO} with multiple OpenMP threads, you have to set the number of threads with the option '-P'.
 Here is an example to distribute the bilinear interpolation on 8 OpenMP threads:
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor2}, basicstyle=\ttfamily, columns=flexible]
-   cdo -P 8  remapbil,targetgrid  ifile  ofile
+   cdo -P 8  remapbil,targetgrid  infile  outfile
 \end{lstlisting}
 The following {\CDO} operators are parallelized with OpenMP:
 

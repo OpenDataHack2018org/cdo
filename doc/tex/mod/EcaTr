@@ -4,14 +4,14 @@
 @Title     = Tropical nights index per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_tr
 
 @BeginDescription
-Let @file{ifile} be a time series of the daily minimum temperature TN, then the number of days where 
+Let @file{infile} be a time series of the daily minimum temperature TN, then the number of days where 
 TN > @math{T} is counted. The number @math{T} is an optional parameter with default @math{T} = 20@celsius. 
 Note that TN have to be given in units of Kelvin, whereas @math{T} have to be given in degrees Celsius.
-The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
+The date information of a timestep in @file{outfile} is the date of the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -31,6 +31,6 @@ FLOAT   Temperature threshold (unit: @celsius; default: T = 20@celsius)
 @BeginExample
 To get the number of tropical nights of a time series of daily minimum temperatures use:
 @BeginVerbatim
-   cdo eca_tr tnfile ofile
+   cdo eca_tr tnfile outfile
 @EndVerbatim
 @EndExample

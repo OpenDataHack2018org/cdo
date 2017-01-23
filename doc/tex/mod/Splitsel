@@ -2,7 +2,7 @@
 @Name      = Splitsel
 @Title     = Split selected timesteps
 @Section   = File operations
-@Arguments = ifile obase
+@Arguments = infile obase
 @Operators = splitsel
 
 @C @BeginDescription
@@ -17,7 +17,7 @@
 @Parameter = nsets [noffset] [nskip]
 
 @BeginDescription
-This operator splits @file{ifile} into pieces, one for each adjacent
+This operator splits @file{infile} into pieces, one for each adjacent
 sequence @math{t_1, ...., t_n} of timesteps of the same selected time range.
 The output files will be named @file{<obase><nnnnnn><suffix>} where @file{nnnnnn} is the 
 sequence number and @file{suffix} is the filename extension derived from the file format.

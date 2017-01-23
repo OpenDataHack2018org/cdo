@@ -3,14 +3,14 @@
 @Title     = Summer days index per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_su
 
 @BeginDescription
-Let @file{ifile} be a time series of the daily maximum temperature TX, then the number of days where 
+Let @file{infile} be a time series of the daily maximum temperature TX, then the number of days where 
 TX > @math{T} is counted. The number @math{T} is an optional parameter with default @math{T} = 25@celsius. 
 Note that TX have to be given in units of Kelvin, whereas @math{T} have to be given in degrees Celsius.
-The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
+The date information of a timestep in @file{outfile} is the date of the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -30,6 +30,6 @@ FLOAT   Temperature threshold (unit: @celsius; default: T = 25@celsius)
 @BeginExample
 To get the number of summer days of a time series of daily maximum temperatures use:
 @BeginVerbatim
-   cdo eca_su txfile ofile
+   cdo eca_su txfile outfile
 @EndVerbatim
 @EndExample

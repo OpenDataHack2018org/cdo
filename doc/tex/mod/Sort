@@ -3,7 +3,7 @@
 @Name      = Sort
 @Title     = Sort
 @Section   = Sorting
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = 
 @EndModule
 

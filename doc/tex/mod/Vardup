@@ -2,7 +2,7 @@
 @Name      = Vardup
 @Title     = Parameter duplication
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = pardup parmul
 
 @BeginDescription

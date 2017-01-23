@@ -4,7 +4,7 @@
 @Title     = Mask a box
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = masklonlatbox maskindexbox
 
 @BeginDescription
@@ -60,10 +60,10 @@ INTEGER  Index of last latitude
 @BeginExample
 To mask the region with the longitudes from 120E to 90W and latitudes from 20N to 20S on all input fields use:
 @BeginVerbatim
-   cdo masklonlatbox,120,-90,20,-20 ifile ofile
+   cdo masklonlatbox,120,-90,20,-20 infile outfile
 @EndVerbatim
 If the input dataset has fields on a Gaussian N16 grid, the same box can be masked with @oper{maskindexbox} by:
 @BeginVerbatim
-   cdo maskindexbox,23,48,13,20 ifile ofile
+   cdo maskindexbox,23,48,13,20 infile outfile
 @EndVerbatim
 @EndExample

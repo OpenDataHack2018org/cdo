@@ -4,18 +4,18 @@
 @Title     = Cold wave duration index wrt mean of reference period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = eca_cwdi
 
 @BeginDescription
-Let @file{ifile1} be a time series of the daily minimum temperature TN, and let @file{ifile2} be the mean 
+Let @file{infile1} be a time series of the daily minimum temperature TN, and let @file{infile2} be the mean 
 TNnorm of daily minimum temperatures for any period used as reference. Then counted is the number of days
 where, in intervals of at least @math{nday} consecutive days, TN < TNnorm - @math{T}.
 The numbers @math{nday} and @math{T} are optional parameters with default @math{nday} = 6 and @math{T} = 5@celsius. 
 A further output variable is the number of cold waves longer than or equal to @math{nday} days.
 TNnorm is calculated as the mean of minimum temperatures of a five day window centred on each calendar day 
 of a given climate reference period. Note that both TN and TNnorm have to be given in the same units.
-The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile1}.
+The date information of a timestep in @file{outfile} is the date of the last contributing timestep in @file{infile1}.
 @EndDescription
 @EndModule
 
@@ -37,6 +37,6 @@ FLOAT    Temperature offset (unit: @celsius; default: T = 5@celsius)
 @BeginExample
 To compute the cold wave duration index of a time series of daily minimum temperatures use:
 @BeginVerbatim
-   cdo eca_cwdi tnfile tnnormfile ofile
+   cdo eca_cwdi tnfile tnnormfile outfile
 @EndVerbatim
 @EndExample

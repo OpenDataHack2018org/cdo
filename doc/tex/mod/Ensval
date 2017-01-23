@@ -4,23 +4,23 @@
 @Title     = Ensemble validation tools
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = rfile ifiles ofilebase
+@Arguments = rfile infiles outfilebase
 @Operators = enscrps ensbrs
 
 @BeginDescription
 This module computes ensemble validation scores and their decomposition such as 
 the Brier and cumulative ranked probability score (CRPS). 
 The first file is used as a reference it can be a climatology, observation or 
-reanalysis against which the skill of the ensembles given in ifiles is measured. 
+reanalysis against which the skill of the ensembles given in infiles is measured. 
 Depending on the operator a number of output files is generated each containing 
 the skill score and its decomposition corresponding to the operator. 
 The output is averaged  over horizontal fields using appropriate weights 
 for each level and timestep in rfile. 
 
 All input files need to have the same structure with the same variables.
-The date information of a timestep in @file{ofile} is the date of the first input file.
+The date information of a timestep in @file{outfile} is the date of the first input file.
 The output files are named as 
-@file{<ofilebase>.<type>.<filesuffix>} where @file{<type>} depends on the 
+@file{<outfilebase>.<type>.<filesuffix>} where @file{<type>} depends on the 
 operator and @file{<filesuffix>} is determined from the output file type. 
 There are three output files for operator enscrps and four output files 
 for operator ensbrs.
@@ -37,7 +37,7 @@ CRPS = CRPS_{pot} + RELI
 @EndMath 
 holds. 	  
 
-The Brier score of the Ensemble given by @file{ifiles} with respect to the 
+The Brier score of the Ensemble given by @file{infiles} with respect to the 
 reference given in @file{rfile} and the threshold x is calculated. 
 In the four output files @file{<type>} has the following meaning: 
 @file{brs} for the Brier score wrt threshold  x; 

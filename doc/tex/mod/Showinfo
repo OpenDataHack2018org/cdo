@@ -4,7 +4,7 @@
 @Title     = Show variables, levels or times
 @Section   = Information
 @Class     = Information
-@Arguments = ifile
+@Arguments = infile
 @Operators = showformat showcode showname showstdname showlevel showltype showyear showmon showdate showtime showtimestamp
 
 @BeginDescription
@@ -115,7 +115,7 @@ Prints timestamp of all timesteps (format YYYY-MM-DDThh:mm:ss).
 @BeginExample
 To print the code number of all variables in a dataset use:
 @BeginVerbatim
-   cdo showcode ifile
+   cdo showcode infile
 @EndVerbatim
 This is an example result of a dataset with three variables:
 @BeginListing
@@ -123,7 +123,7 @@ This is an example result of a dataset with three variables:
 @EndListing
 To print all months in a dataset use:
 @BeginVerbatim
-   cdo showmon ifile
+   cdo showmon infile
 @EndVerbatim
 This is an examples result of a dataset with an annual cycle:
 @BeginListing

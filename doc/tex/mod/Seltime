@@ -4,11 +4,11 @@
 @Title     = Select timesteps
 @Section   = Selection
 @Class     = Selection
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = seltimestep seltime selhour selday selmonth selyear selseason seldate selsmon
 
 @BeginDescription
-This module selects user specified timesteps from @file{ifile} and writes them to @file{ofile}.
+This module selects user specified timesteps from @file{infile} and writes them to @file{outfile}.
 The timesteps selected depends on the chosen operator and the parameters.
 @EndDescription
 @EndModule

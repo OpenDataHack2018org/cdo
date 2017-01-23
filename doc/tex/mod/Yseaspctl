@@ -3,16 +3,16 @@
 @Title     = Multi-year seasonal percentile values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile1 ifile2 ifile3 ofile
+@Arguments = infile1 infile2 infile3 outfile
 @Operators = yseaspctl
 
 @BeginDescription
-This operator writes a certain percentile of each season in @file{ifile1} to @file{ofile}.
+This operator writes a certain percentile of each season in @file{infile1} to @file{outfile}.
 The algorithm uses histograms with minimum and maximum bounds given in
-@file{ifile2} and @file{ifile3}, respectively. The default number of
+@file{infile2} and @file{infile3}, respectively. The default number of
 histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files
-@file{ifile2} and @file{ifile3} should be the result of corresponding
+@file{infile2} and @file{infile3} should be the result of corresponding
 @mod{yseasmin} and @mod{yseasmax} operations, respectively.
 The date information in an output field is the date of the last
 contributing input field.
@@ -62,12 +62,12 @@ Sets the number of histogram bins. The default number is 101.
 @BeginExample
 To compute the seasonal 90th percentile over all input years use:
 @BeginVerbatim
-   cdo yseasmin ifile minfile
-   cdo yseasmax ifile maxfile
-   cdo yseaspctl,90 ifile minfile maxfile ofile
+   cdo yseasmin infile minfile
+   cdo yseasmax infile maxfile
+   cdo yseaspctl,90 infile minfile maxfile outfile
 @EndVerbatim
 Or shorter using operator piping:
 @BeginVerbatim
-   cdo yseaspctl,90 ifile -yseasmin ifile -yseasmax ifile ofile
+   cdo yseaspctl,90 infile -yseasmin infile -yseasmax infile outfile
 @EndVerbatim
 @EndExample

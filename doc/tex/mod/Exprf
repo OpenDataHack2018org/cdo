@@ -12,7 +12,7 @@ Constansts: M_PI, M_E
 @Title     = Evaluate expressions
 @Section   = Arithmetic
 @Class     = Arithmetic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = expr exprf aexpr aexprf
 
 @BeginDescription
@@ -195,11 +195,11 @@ Assume an input dataset contains at least the variables 'aprl', 'aprc' and 'ts'.
 To create a new variable 'var1' with the sum of 'aprl' and 'aprc' and a variable 'var2'
 which convert the temperature 'ts' from Kelvin to Celsius use:
 @BeginVerbatim
-   cdo expr,'var1=aprl+aprc;var2=ts-273.15;' ifile ofile
+   cdo expr,'var1=aprl+aprc;var2=ts-273.15;' infile outfile
 @EndVerbatim
 The same example, but the instructions are read from a file:
 @BeginVerbatim
-   cdo exprf,myexpr ifile ofile
+   cdo exprf,myexpr infile outfile
 @EndVerbatim
 The file @file{myexpr} contains:
 @BeginListing

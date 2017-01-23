@@ -2,7 +2,7 @@
 @Name      = Rhopot
 @Title     = Calculates potential density
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = rhopot
 @EndModule
 
@@ -29,6 +29,6 @@ FLOAT   Pressure in bar (constant value assigned to all levels)
 @BeginExample
 To compute the sea water potential density from the potential temperature use this operator in combination with @mod{adisit}:
 @BeginVerbatim
-   cdo rhopot -adisit ifile ofile
+   cdo rhopot -adisit infile outfile
 @EndVerbatim
 @EndExample

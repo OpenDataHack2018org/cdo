@@ -3,13 +3,13 @@
 @Title     = Simple daily intensity index per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_sdii
 
 @BeginDescription
-Let @file{ifile} be a time series of the daily precipitation amount RR, then the mean precipitation amount at 
-wet days (RR > @math{R}) is written to @file{ofile}. @math{R} is an optional parameter with default @math{R} = 1 mm.
-The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
+Let @file{infile} be a time series of the daily precipitation amount RR, then the mean precipitation amount at 
+wet days (RR > @math{R}) is written to @file{outfile}. @math{R} is an optional parameter with default @math{R} = 1 mm.
+The date information of a timestep in @file{outfile} is the date of the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -29,6 +29,6 @@ FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)
 @BeginExample
 To get the daily intensity index of a time series of daily precipitation amounts use:
 @BeginVerbatim
-   cdo eca_sdii rrfile ofile
+   cdo eca_sdii rrfile outfile
 @EndVerbatim
 @EndExample

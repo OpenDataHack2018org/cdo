@@ -2,12 +2,12 @@
 @Name      = Condc
 @Title     = Conditional select a constant
 @Section   = Conditional selection
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = ifthenc ifnotthenc
 
 @BeginDescription
 This module creates fields with a constant value or missing value.
-The fields in @file{ifile} are handled as a mask. A value not equal 
+The fields in @file{infile} are handled as a mask. A value not equal 
 to zero is treated as "true", zero is treated as "false".
 @EndDescription
 @EndModule
@@ -67,8 +67,8 @@ FLOAT  Constant
 
 @BeginExample
 To create fields with the constant value 7 if the corresponding field element
-of @file{ifile} is greater than 0 use:
+of @file{infile} is greater than 0 use:
 @BeginVerbatim
-   cdo ifthenc,7 ifile ofile
+   cdo ifthenc,7 infile outfile
 @EndVerbatim
 @EndExample

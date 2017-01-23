@@ -4,12 +4,12 @@
 @Title     = Change field header
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = chcode chparam chname chunit chlevel chlevelc chlevelv
 
 @BeginDescription
-This module reads fields from @file{ifile}, changes some header values
-and writes the results to @file{ofile}. The kind of changes depends on 
+This module reads fields from @file{infile}, changes some header values
+and writes the results to @file{outfile}. The kind of changes depends on 
 the chosen operator.
 @EndDescription
 @EndModule
@@ -108,6 +108,6 @@ FLOAT    Pairs of old and new levels
 @BeginExample
 To change the code number 98 to 179 and 99 to 211 use:
 @BeginVerbatim
-   cdo chcode,98,179,99,211 ifile ofile
+   cdo chcode,98,179,99,211 infile outfile
 @EndVerbatim
 @EndExample

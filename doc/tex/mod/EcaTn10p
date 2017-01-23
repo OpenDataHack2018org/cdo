@@ -4,19 +4,19 @@
 @Title     = Cold nights percent wrt 10th percentile of reference period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = eca_tn10p
 
 @BeginDescription
-Let @file{ifile1} be a time serie of the daily minimum temperature TN, and
-@file{ifile2} be the 10th percentile TNn10 of daily minimum temperatures
+Let @file{infile1} be a time serie of the daily minimum temperature TN, and
+@file{infile2} be the 10th percentile TNn10 of daily minimum temperatures
 for any period used as reference. Then the percentage of time where TN < TNn10 
 is calculated.
 TNn10 is calculated as the 10th percentile of daily minimum temperatures of a five 
 day window centred on each calendar day of a given climate reference period.
 Note that both TN and TNn10 have to be given in the same units.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile1}.
+The date information of a timestep in @file{outfile} is the date of
+the last contributing timestep in @file{infile1}.
 @EndDescription
 @EndModule
 
@@ -31,6 +31,6 @@ To compute the percentage of timesteps with a daily minimum temperature
 smaller than the 10th percentile of the daily minimum temperatures for
 a given reference period use:
 @BeginVerbatim
-   cdo eca_tn10p tnfile tnn10file ofile
+   cdo eca_tn10p tnfile tnn10file outfile
 @EndVerbatim
 @EndExample

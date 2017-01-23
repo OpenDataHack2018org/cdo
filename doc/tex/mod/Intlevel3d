@@ -4,7 +4,7 @@
 @Title     = Linear level interpolation from/to 3d vertical coordinates
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = intlevel3d intlevelx3d
 
 @BeginDescription
@@ -28,7 +28,7 @@ with given 3D vertical coordinates.
 @BeginParameter
 @Item = icoordinate
 STRING  filename for vertical source coordinates variable
-@Item = ifile2
+@Item = infile2
 STRING  target vertical coordinate field (intlevel3d only)
 @EndParameter
 
@@ -39,12 +39,12 @@ To interpolate 3D variables from one set of 3d height levels into another one wh
 @Item
 @file{icoordinate} contains a single 3d variable, which represents the input 3d vertical coordinate
 @Item 
-@file{ifile1} contains the source data, which the vertical coordinate from icoordinate belongs to
+@file{infile1} contains the source data, which the vertical coordinate from icoordinate belongs to
 @Item
-@file{ifile2} only contains the target 3d height levels
+@file{infile2} only contains the target 3d height levels
 @EndItemize
 @BeginVerbatim
-   cdo intlevel3d,icoordinate ifile1 ifile2 ofile
+   cdo intlevel3d,icoordinate infile1 infile2 outfile
 @EndVerbatim
 @EndExample
 @EndifDoc

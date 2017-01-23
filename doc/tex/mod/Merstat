@@ -4,13 +4,13 @@
 @Title     = Meridional statistical values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = mermin mermax mersum mermean meravg merstd merstd1 mervar mervar1 merpctl
 
 @BeginDescription
 This module computes meridional statistical values of the input fields.
 According to the chosen operator the meridional minimum, maximum, sum, average,
-variance, standard deviation or a certain percentile is written to @file{ofile}.
+variance, standard deviation or a certain percentile is written to @file{outfile}.
 This operator requires all variables on the same regular lon/lat grid.
 @EndDescription
 @EndModule
@@ -116,11 +116,11 @@ FLOAT  Percentile number in {0, ..., 100}
 @BeginExample
 To compute the meridional mean of all input fields use:
 @BeginVerbatim
-   cdo mermean ifile ofile
+   cdo mermean infile outfile
 @EndVerbatim
 
 To compute the 50th meridional percentile (median) of all input fields use:
 @BeginVerbatim
-   cdo merpctl,50 ifile ofile
+   cdo merpctl,50 infile outfile
 @EndVerbatim
 @EndExample

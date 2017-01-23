@@ -4,6 +4,6 @@
 @Title     = Write random
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = writerandom
 @EndModule

@@ -4,13 +4,13 @@
 @Title     = Statistical values over a field
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldstd1 fldvar fldvar1 fldpctl
 
 @BeginDescription
 This module computes statistical values of the input fields. According to the chosen 
 operator the field minimum, maximum, sum, average, variance, standard deviation or 
-a certain percentile is written to @file{ofile}.
+a certain percentile is written to @file{outfile}.
 @EndDescription
 @EndModule
 
@@ -227,11 +227,11 @@ FLOAT  Percentile number in {0, ..., 100}
 @BeginExample
 To compute the field mean of all input fields use:
 @BeginVerbatim
-   cdo fldmean ifile ofile
+   cdo fldmean infile outfile
 @EndVerbatim
 
 To compute the 90th percentile of all input fields use:
 @BeginVerbatim
-   cdo fldpctl,90 ifile ofile
+   cdo fldpctl,90 infile outfile
 @EndVerbatim
 @EndExample

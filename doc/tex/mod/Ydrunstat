@@ -4,11 +4,11 @@
 @Title     = Multi-year daily running statistical values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = ydrunmin ydrunmax ydrunsum ydrunmean ydrunavg ydrunstd ydrunstd1 ydrunvar ydrunvar1
 
 @BeginDescription
-This module writes running statistical values for each day of year in @file{ifile} to @file{ofile}.
+This module writes running statistical values for each day of year in @file{infile} to @file{outfile}.
 Depending on the chosen operator, the minimum, maximum, sum, average, variance or standard deviation 
 of all timesteps in running windows of which the medium timestep corresponds to a certain day of
 year is computed. The date information in an output field is the date of the timestep in the middle 
@@ -248,12 +248,12 @@ Assume the input data provide a continuous time series of daily measurements. To
 the running multi-year daily mean over all input timesteps for a running window of five
 days use:
 @BeginVerbatim
-   cdo ydrunmean,5 ifile ofile
+   cdo ydrunmean,5 infile outfile
 @EndVerbatim
 Note that except for the standard deviation the results of the operators in this module
 are equivalent to a composition of corresponding operators from the @mod{YDAYSTAT} and
 @mod{RUNSTAT} modules. For instance, the above command yields the same result as:
 @BeginVerbatim
-   cdo ydaymean -runmean,5 ifile ofile
+   cdo ydaymean -runmean,5 infile outfile
 @EndVerbatim
 @EndExample

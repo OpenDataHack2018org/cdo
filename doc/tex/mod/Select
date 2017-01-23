@@ -4,12 +4,12 @@
 @Title     = Select fields
 @Section   = Selection
 @Class     = Selection
-@Arguments = ifiles ofile
+@Arguments = infiles outfile
 @Operators = select delete
 
 @BeginDescription
-This module selects some fields from @file{ifiles} and writes them to @file{ofile}.
-@file{ifiles} is an arbitrary number of input files. All input files need to have 
+This module selects some fields from @file{infiles} and writes them to @file{outfile}.
+@file{infiles} is an arbitrary number of input files. All input files need to have 
 the same structure with the same variables on different timesteps.
 The fields selected depends on the chosen parameters. Parameter is a comma
 separated list of "key=value" pairs. Wildcards can be used for string parameter.
@@ -89,6 +89,6 @@ INTEGER Comma separated list of timesteps of year.
 Assume you have 3 inputfiles. Each inputfile contains the same variables for a different time period.
 To select the variable T,U and V on the levels 200, 500 and 850 from all 3 input files, use:
 @BeginVerbatim
-   cdo select,name=T,U,V,level=200,500,850 ifile1 ifile2 ifile3 ofile
+   cdo select,name=T,U,V,level=200,500,850 infile1 infile2 infile3 outfile
 @EndVerbatim
 @EndExample

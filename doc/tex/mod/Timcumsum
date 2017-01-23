@@ -4,7 +4,7 @@
 @Title     = Cumulative sum over all timesteps
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = timcumsum
 
 @BeginDescription

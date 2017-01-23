@@ -4,16 +4,16 @@
 @Title     = Statistical values over an ensemble
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifiles ofile
+@Arguments = infiles outfile
 @Operators = ensmin ensmax enssum ensmean ensavg ensstd ensstd1 ensvar ensvar1 enspctl
 
 @BeginDescription
 This module computes statistical values over an ensemble of input files.
 Depending on the chosen operator the minimum, maximum, sum, average, variance,
 standard deviation or a certain percentile over all input files is written
-to @file{ofile}.
+to @file{outfile}.
 All input files need to have the same structure with the same variables.
-The date information of a timestep in @file{ofile} is the date of the first input file.
+The date information of a timestep in @file{outfile} is the date of the first input file.
 @EndDescription
 @EndModule
 
@@ -201,15 +201,15 @@ The maximum number of open files depends on the operating system!
 @BeginExample
 To compute the ensemble mean over 6 input files use:
 @BeginVerbatim
-   cdo ensmean ifile1 ifile2 ifile3 ifile4 ifile5 ifile6 ofile
+   cdo ensmean infile1 infile2 infile3 infile4 infile5 infile6 outfile
 @EndVerbatim
 Or shorter with filename substitution:
 @BeginVerbatim
-   cdo ensmean ifile[1-6] ofile
+   cdo ensmean infile[1-6] outfile
 @EndVerbatim
 
 To compute the 50th percentile (median) over 6 input files use:
 @BeginVerbatim
-   cdo enspctl,50 ifile1 ifile2 ifile3 ifile4 ifile5 ifile6 ofile
+   cdo enspctl,50 infile1 infile2 infile3 infile4 infile5 infile6 outfile
 @EndVerbatim
 @EndExample

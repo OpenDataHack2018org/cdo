@@ -3,31 +3,31 @@
 @Name      = Filter
 @Title     = Time series filtering
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = bandpass lowpass highpass
 
 
 @BeginDescription
-This module takes the time series for each gridpoint in @file{ifile} and (fast fourier) transforms it 
+This module takes the time series for each gridpoint in @file{infile} and (fast fourier) transforms it 
 into the frequency domain. According to the particular operator and its parameters certain frequencies 
 are filtered (set to zero) in the frequency domain and the spectrum is (inverse fast fourier) transformed 
 back into the time domain.
-To determine the frequency the time-axis of @file{ifile} is used. (Data should have a constant time increment 
+To determine the frequency the time-axis of @file{infile} is used. (Data should have a constant time increment 
 since this assumption applies for transformation. However, the time increment has to be different from zero.)
 All frequencies given as parameter are interpreted per year. This is done by the assumption of a 365-day calendar. 
 Consequently if you want to perform multiyear-filtering accurately you have to delete the 29th of February. 
-If your @file{ifile} has a 360 year calendar the frequency parameters @var{fmin} respectively @var{fmax} should be 
+If your @file{infile} has a 360 year calendar the frequency parameters @var{fmin} respectively @var{fmax} should be 
 multiplied with a factor of 360/365 in order to obtain accurate results.  
 For the set up of a frequency filter the frequency parameters have to be adjusted to a frequency in the data. 
 Here @var{fmin} is rounded down and @var{fmax} is always rounded up. Consequently it is possible to use bandpass with 
-@var{fmin=fmax} without getting a zero-field for @file{ofile}. 
+@var{fmin=fmax} without getting a zero-field for @file{outfile}. 
 Hints for efficient usage: 
 @BeginItemize
 @Item = to get reliable results the time-series has to be detrended (cdo detrend)
-@Item = the lowest frequency greater zero that can be contained in ifile is 1/(N*dT), 
+@Item = the lowest frequency greater zero that can be contained in infile is 1/(N*dT), 
 @Item = the greatest frequency is 1/(2dT) (Nyquist frequency),
 @EndItemize
-with N the number of timesteps and dT the time increment of @file{ifile} in years. 
+with N the number of timesteps and dT the time increment of @file{infile} in years. 
 @EndDescription
 @EndModule	
 
@@ -86,18 +86,18 @@ frequencies around the peak (if there is one) as well due to the issue that the 
 infinite length). 
 Therefor you can use the following:
 @BeginVerbatim
-   cdo highpass,x -del29feb ifile ofile
+   cdo highpass,x -del29feb infile outfile
 @EndVerbatim
 
 Accordingly you might use the following to suppress variability on timescales shorter than one year:
 @BeginVerbatim
-   cdo lowpass,1 -del29feb ifile ofile
+   cdo lowpass,1 -del29feb infile outfile
 @EndVerbatim
 
 Finally you might be interested in 2-year variability. If you want to suppress the seasonal cycle as 	
 well as say the longer cycles in climate system you might use
 @BeginVerbatim
-   cdo bandpass,x,y -del29feb ifile ofile
+   cdo bandpass,x,y -del29feb infile outfile
 @EndVerbatim
 with x<=0.5 and y >=0.5.
 @EndExample

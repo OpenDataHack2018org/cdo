@@ -3,7 +3,7 @@
 @Title     = Invert levels
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = invertlev
 
 @BeginDescription

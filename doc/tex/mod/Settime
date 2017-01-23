@@ -4,7 +4,7 @@
 @Title     = Set time
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = setdate settime setday setmon setyear settunits settaxis settbounds setreftime setcalendar shifttime
 
 @BeginDescription
@@ -152,18 +152,18 @@ STRING   Shift value (e.g. -3hour)
 To set the time axis to 1987-01-16 12:00:00 with an increment of one
 month for each timestep use:
 @BeginVerbatim
-   cdo settaxis,1987-01-16,12:00:00,1mon ifile ofile
+   cdo settaxis,1987-01-16,12:00:00,1mon infile outfile
 @EndVerbatim
-Result of '\texttt{cdo showdate ofile}' for a dataset with 12 timesteps:
+Result of '\texttt{cdo showdate outfile}' for a dataset with 12 timesteps:
 @BeginListing
    1987-01-16 1987-02-16 1987-03-16 1987-04-16 1987-05-16 1987-06-16 \
    1987-07-16 1987-08-16 1987-09-16 1987-10-16 1987-11-16 1987-12-16
 @EndListing
 To shift this time axis by -15 days use:
 @BeginVerbatim
-   cdo shifttime,-15days ifile ofile
+   cdo shifttime,-15days infile outfile
 @EndVerbatim
-Result of '\texttt{cdo showdate ofile}':
+Result of '\texttt{cdo showdate outfile}':
 @BeginListing
    1987-01-01 1987-02-01 1987-03-01 1987-04-01 1987-05-01 1987-06-01 \
    1987-07-01 1987-08-01 1987-09-01 1987-10-01 1987-11-01 1987-12-01

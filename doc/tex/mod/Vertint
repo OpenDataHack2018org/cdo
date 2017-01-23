@@ -4,7 +4,7 @@
 @Title     = Vertical interpolation
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = ml2pl ml2hl
 
 @BeginDescription
@@ -61,6 +61,6 @@ If set to 1 extrapolate missing values.
 @BeginExample
 To interpolate hybrid model level data to pressure levels of 925, 850, 500 and 200 hPa use:
 @BeginVerbatim
-   cdo ml2pl,92500,85000,50000,20000 ifile ofile
+   cdo ml2pl,92500,85000,50000,20000 infile outfile
 @EndVerbatim
 @EndExample

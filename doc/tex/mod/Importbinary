@@ -3,7 +3,7 @@
 @Name      = Importbinary
 @Title     = Import binary data sets
 @Section   = Import/Export
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = import_binary
 
 @BeginDescription
@@ -43,11 +43,11 @@ Only 32-bit IEEE floats are supported for standard binary files!
 @BeginExample
 To convert a binary data file to NetCDF use:
 @BeginVerbatim
-   cdo -f nc import_binary ifile.ctl ofile.nc
+   cdo -f nc import_binary infile.ctl outfile.nc
 @EndVerbatim
 Here is an example of a GrADS data descriptor file:
 @BeginListing
-   DSET  ^ifile.bin
+   DSET  ^infile.bin
    OPTIONS sequential
    UNDEF  -9e+33
    XDEF 360 LINEAR -179.5 1
@@ -58,6 +58,6 @@ Here is an example of a GrADS data descriptor file:
    param  1  99  description of the variable
    ENDVARS
 @EndListing
-The binary data file ifile.bin contains one parameter on a global 1 degree lon/lat 
+The binary data file infile.bin contains one parameter on a global 1 degree lon/lat 
 grid written with FORTRAN record length headers (sequential).
 @EndExample

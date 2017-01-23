@@ -3,7 +3,7 @@
 @Name      = CMOR
 @Title     = CMOR
 @Section   = Miscellaneous
-@Arguments = ifile
+@Arguments = infile
 @Operators = cmor
 
 @BeginDescription

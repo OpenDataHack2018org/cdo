@@ -4,7 +4,7 @@
 @Title     = First order conservative remapping
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = remapycon genycon
 
 @BeginDescription
@@ -75,9 +75,9 @@ of this variable is 0.0.
 
 
 @BeginExample
-Say @file{ifile} contains fields on a quadrilateral curvilinear grid.
+Say @file{infile} contains fields on a quadrilateral curvilinear grid.
 To remap all fields conservative to a Gaussian N32 grid, type:
 @BeginVerbatim
-   cdo remapycon,n32 ifile ofile
+   cdo remapycon,n32 infile outfile
 @EndVerbatim
 @EndExample

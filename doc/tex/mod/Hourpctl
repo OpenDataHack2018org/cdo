@@ -4,17 +4,17 @@
 @Title     = Hourly percentile values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile1 ifile2 ifile3 ofile
+@Arguments = infile1 infile2 infile3 outfile
 @Operators = hourpctl
 
 @BeginDescription
-This operator computes percentiles over all timesteps of the same hour in @file{ifile1}.
-The algorithm uses histograms with minimum and maximum bounds given in @file{ifile2} and
-@file{ifile3}, respectively. The default number of histogram bins is 101.
+This operator computes percentiles over all timesteps of the same hour in @file{infile1}.
+The algorithm uses histograms with minimum and maximum bounds given in @file{infile2} and
+@file{infile3}, respectively. The default number of histogram bins is 101.
 The default can be overridden by defining the environment variable @env{CDO_PCTL_NBINS}.
-The files @file{ifile2} and @file{ifile3} should be the result of corresponding @mod{hourmin}
+The files @file{infile2} and @file{infile3} should be the result of corresponding @mod{hourmin}
 and @mod{hourmax} operations, respectively.
-The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile1}.
+The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile1}.
 @EndDescription
 @EndModule
 
@@ -57,12 +57,12 @@ Sets the number of histogram bins. The default number is 101.
 @BeginExample
 To compute the hourly 90th percentile of a time series use:
 @BeginVerbatim
-   cdo hourmin ifile minfile
-   cdo hourmax ifile maxfile
-   cdo hourpctl,90 ifile minfile maxfile ofile
+   cdo hourmin infile minfile
+   cdo hourmax infile maxfile
+   cdo hourpctl,90 infile minfile maxfile outfile
 @EndVerbatim
 Or shorter using operator piping:
 @BeginVerbatim
-   cdo hourpctl,90 ifile -hourmin ifile -hourmax ifile ofile
+   cdo hourpctl,90 infile -hourmin infile -hourmax infile outfile
 @EndVerbatim
 @EndExample

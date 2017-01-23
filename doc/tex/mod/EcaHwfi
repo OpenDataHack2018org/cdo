@@ -4,12 +4,12 @@
 @Title     = Warm spell days index wrt 90th percentile of reference period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = eca_hwfi
 
 @BeginDescription
-Let @file{ifile1} be a time series of the daily mean temperature TG, and 
-@file{ifile2} be the 90th percentile TGn90 of daily mean temperatures
+Let @file{infile1} be a time series of the daily mean temperature TG, and 
+@file{infile2} be the 90th percentile TGn90 of daily mean temperatures
 for any period used as reference. Then counted is the number of days
 where, in intervals of at least @math{nday} consecutive days, TG > TGn90. The
 number @math{nday} is an optional parameter with default @math{nday} = 6. A further
@@ -18,8 +18,8 @@ equal to @math{nday} days.
 TGn90 is calculated as the 90th percentile of daily mean temperatures of a five 
 day window centred on each calendar day of a given climate reference period.
 Note that both TG and TGn90 have to be given in the same units.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile1}.
+The date information of a timestep in @file{outfile} is the date of
+the last contributing timestep in @file{infile1}.
 @EndDescription
 @EndModule
 
@@ -40,6 +40,6 @@ INTEGER  Number of consecutive days (default: nday = 6)
 To compute the number of warm-spell days of a time series of
 daily mean temperatures use:
 @BeginVerbatim
-   cdo eca_hwfi tgfile tgn90file ofile
+   cdo eca_hwfi tgfile tgn90file outfile
 @EndVerbatim
 @EndExample

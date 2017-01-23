@@ -4,15 +4,15 @@
 @Title     = Monthly arithmetic
 @Section   = Arithmetic
 @Class     = Arithmetic
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = monadd monsub monmul mondiv
 
 @BeginDescription
 This module performs simple arithmetic of a time series and one
-timestep with the same month and year. For each field in @file{ifile1}
-the corresponding field of the timestep in @file{ifile2} with the
-same month and year is used. The header information in @file{ifile1}
-have to be the same as in @file{ifile2}. Usually @file{ifile2} is generated
+timestep with the same month and year. For each field in @file{infile1}
+the corresponding field of the timestep in @file{infile2} with the
+same month and year is used. The header information in @file{infile1}
+have to be the same as in @file{infile2}. Usually @file{infile2} is generated
 by an operator of the module @mod{MONSTAT}.
 @EndDescription
 @EndModule
@@ -57,6 +57,6 @@ Divides a time series and a monthly time series.
 @BeginExample
 To subtract a monthly time average from a time series use:
 @BeginVerbatim
-   cdo monsub ifile -monavg ifile ofile
+   cdo monsub infile -monavg infile outfile
 @EndVerbatim
 @EndExample

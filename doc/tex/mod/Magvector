@@ -3,12 +3,12 @@
 @Name      = Magvector
 @Title     = Lat/Lon vector plot
 @Section   = Magics
-@Arguments = ifile obase
+@Arguments = infile obase
 @Operators = vector
 
 @BeginDescription
 This operator generates 2D Lon/Lat vector plots.
-The data for the plot is read from @file{ifile}. The input is expected to contain two velocity
+The data for the plot is read from @file{infile}. The input is expected to contain two velocity
 components. Only data on rectilinear Lon/Lat grids are supported.
 The output file will be named <obase>.<device> where device is the device name. 
 The default output file format is postscript, this can be changed with the device parameter.

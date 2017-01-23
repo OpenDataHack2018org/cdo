@@ -4,14 +4,14 @@
 @Title     = Monthly statistical values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = monmin monmax monsum monmean monavg monstd monstd1 monvar monvar1
 
 @BeginDescription
 This module computes statistical values over timesteps of the same month.
 Depending on the chosen operator the minimum, maximum, sum, average, variance
-or standard deviation of timesteps of the same month is written to @file{ofile}.
-The time of @file{ofile} is determined by the time in the middle of all contributing timesteps of @file{ifile}.
+or standard deviation of timesteps of the same month is written to @file{outfile}.
+The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
 @EndModule
 
@@ -190,6 +190,6 @@ o(t,x) = \mbox{\textbf{std1}}\{i(t',x), t_1 < t' \leq t_n\}
 @BeginExample
 To compute the monthly mean of a time series use:
 @BeginVerbatim
-   cdo monmean ifile ofile
+   cdo monmean infile outfile
 @EndVerbatim
 @EndExample

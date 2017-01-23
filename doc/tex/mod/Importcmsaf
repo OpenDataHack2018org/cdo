@@ -3,7 +3,7 @@
 @Name      = Importcmsaf
 @Title     = Import CM-SAF HDF5 files
 @Section   = Import/Export
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = import_cmsaf
 
 @BeginDescription
@@ -96,7 +96,7 @@ functionality.
 @BeginExample
 @C To convert a CM-SAF HDF5 file to NetCDF use:
 @C @BeginVerbatim
-@C    cdo -f nc import_cmsaf ifile.h5 ofile.nc
+@C    cdo -f nc import_cmsaf infile.h5 outfile.nc
 @C @EndVerbatim
 A typical sequence of commands with this operator could look like this:
 @BeginVerbatim

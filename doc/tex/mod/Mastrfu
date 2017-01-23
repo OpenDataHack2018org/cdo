@@ -2,7 +2,7 @@
 @Name      = Mastrfu
 @Title     = Mass stream function
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = mastrfu
 @EndModule
 
@@ -21,6 +21,6 @@ to be a zonal mean of v-velocity [m/s] (code=132) on pressure levels.
 @BeginExample
 To compute the mass stream function from a zonal mean v-velocity dataset use:
 @BeginVerbatim
-   cdo mastrfu ifile ofile
+   cdo mastrfu infile outfile
 @EndVerbatim
 @EndExample

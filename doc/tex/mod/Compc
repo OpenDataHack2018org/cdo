@@ -4,7 +4,7 @@
 @Title     = Comparison of a field with a constant
 @Section   = Comparison
 @Class     = Comparison
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eqc nec lec ltc gec gtc
 
 @BeginDescription
@@ -168,6 +168,6 @@ FLOAT  Constant
 @BeginExample
 To create a mask containing 1 if the field element is greater than 273.15 and 0 if not use:
 @BeginVerbatim
-   cdo gtc,273.15 ifile ofile
+   cdo gtc,273.15 infile outfile
 @EndVerbatim
 @EndExample

@@ -3,7 +3,7 @@
 @Name      = Output
 @Title     = Formatted output
 @Section   = Import/Export
-@Arguments = ifiles
+@Arguments = infiles
 @Operators = output outputf outputint outputsrv outputext
 
 @BeginDescription
@@ -78,7 +78,7 @@ INTEGER Number of elements for each row (default: nelem = 1)
 To print all field elements of a dataset formatted with "%8.4g"
 and 8 values per line use:
 @BeginVerbatim
-   cdo outputf,%8.4g,8 ifile
+   cdo outputf,%8.4g,8 infile
 @EndVerbatim
 Example result of a dataset with one field on 64 grid points:
 @BeginListing

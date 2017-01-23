@@ -2,7 +2,7 @@
 @Name      = Gridcell
 @Title     = Grid cell quantities
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = gridarea gridweights
 
 @BeginDescription

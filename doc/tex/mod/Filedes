@@ -4,7 +4,7 @@
 @Title     = Dataset description
 @Section   = Information
 @Class     = Information
-@Arguments = ifile
+@Arguments = infile
 @Operators = partab codetab griddes zaxisdes vct
 
 @BeginDescription
@@ -65,7 +65,7 @@ Prints the vertical coordinate table.
 @C Assume an input dataset having three parameters with the names geosp, t and tslm1.
 @C To print the description of these parameters use:
 @C @BeginVerbatim
-@C    cdo codetab ifile
+@C    cdo codetab infile
 @C @EndVerbatim
 @C Result:
 @C @BeginVerbatim
@@ -76,7 +76,7 @@ Prints the vertical coordinate table.
 Assume all variables of the dataset are on a Gausssian N16 grid.
 To print the grid description of this dataset use:
 @BeginVerbatim
-   cdo griddes ifile
+   cdo griddes infile
 @EndVerbatim
 Result:
 @BeginListing

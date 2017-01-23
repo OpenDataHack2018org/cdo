@@ -4,16 +4,16 @@
 @Title     = Intra-period extreme temperature range
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = eca_etr
 
 @BeginDescription
-Let @file{ifile1} and @file{ifile2} be time series of thr maximum and minimum
+Let @file{infile1} and @file{infile2} be time series of thr maximum and minimum
 temperature TX and TN, respectively. Then the extreme temperature
 range is the difference of the maximum of TX and the minimum of TN.
 Note that TX and TN have to be given in the same units.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timesteps in @file{ifile1} and @file{ifile2}.
+The date information of a timestep in @file{outfile} is the date of
+the last contributing timesteps in @file{infile1} and @file{infile2}.
 @EndDescription
 @EndModule
 
@@ -27,6 +27,6 @@ the last contributing timesteps in @file{ifile1} and @file{ifile2}.
 To get the intra-period extreme temperature range for two time
 series of maximum and minimum temperatures use:
 @BeginVerbatim
-   cdo eca_etr txfile tnfile ofile
+   cdo eca_etr txfile tnfile outfile
 @EndVerbatim
 @EndExample

@@ -3,12 +3,12 @@
 @Name      = Outputtab
 @Title     = Table output
 @Section   = Import/Export
-@Arguments = ifiles ofile
+@Arguments = infiles outfile
 @Operators = outputtab
 
 @BeginDescription
 This operator prints a table of all input datasets to standard output.
-@file{ifiles} is an arbitrary number of input files. All input files need to have 
+@file{infiles} is an arbitrary number of input files. All input files need to have 
 the same structure with the same variables on different timesteps.
 All input fields need to have the same horizontal grid.
 
@@ -54,7 +54,7 @@ STRING   Comma separated list of keynames, one for each column of the table
 @BeginExample
 To print a table with name, date, lon, lat and value information use: 
 @BeginVerbatim
-cdo  outputtab,name,date,lon,lat,value  ifile
+cdo  outputtab,name,date,lon,lat,value  infile
 @EndVerbatim
 Here is an example output of a time series with the yearly mean temperatur at lon=10/lat=53.5:
 @BeginListing

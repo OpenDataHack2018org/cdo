@@ -4,7 +4,7 @@
 @Title     = Grid interpolation
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = interpolate
 
 
@@ -76,9 +76,9 @@ STRING  Target grid description file or name
 
 
 @BeginExample
-Say @file{ifile} contains fields on a regular lon/lat grid.
+Say @file{infile} contains fields on a regular lon/lat grid.
 To interpolate all fields bilinear to a Gaussian N32 grid use:
 @BeginVerbatim
-   cdo intgridbil,n32 ifile ofile
+   cdo intgridbil,n32 infile outfile
 @EndVerbatim
 @EndExample

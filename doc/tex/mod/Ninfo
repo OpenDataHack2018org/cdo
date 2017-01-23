@@ -4,7 +4,7 @@
 @Title     = Print the number of parameters, levels or times
 @Section   = Information
 @Class     = Information
-@Arguments = ifile
+@Arguments = infile
 @Operators = npar nlevel nyear nmon ndate ntime ngridpoints ngrids
 
 @BeginDescription
@@ -90,10 +90,10 @@ Prints the number of horizontal grids.
 @BeginExample
 To print the number of parameters (variables) in a dataset use:
 @BeginVerbatim
-   cdo npar ifile
+   cdo npar infile
 @EndVerbatim
 To print the number of months in a dataset use:
 @BeginVerbatim
-   cdo nmon ifile
+   cdo nmon infile
 @EndVerbatim
 @EndExample

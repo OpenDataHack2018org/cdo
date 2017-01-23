@@ -3,7 +3,7 @@
 @Name      = Setmiss
 @Title     = Set missing value
 @Section   = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = setmissval setctomiss setmisstoc setrtomiss setvrange setmisstonn setmisstodis
 
 @BeginDescription
@@ -185,14 +185,14 @@ FLOAT    Upper bound
 Assume an input dataset has one field with temperatures in the range from 246 to 304 Kelvin.
 To set all values below 273.15 Kelvin to missing value use:
 @BeginVerbatim
-   cdo setrtomiss,0,273.15 ifile ofile
+   cdo setrtomiss,0,273.15 infile outfile
 @EndVerbatim
-Result of '\texttt{cdo info ifile}':
+Result of '\texttt{cdo info infile}':
 @BeginListing
    -1 :       Date  Time    Code Level  Size  Miss :  Minimum     Mean  Maximum
     1 : 1987-12-31 12:00:00 139      0  2048     0 :   246.27   276.75   303.71
 @EndListing
-Result of '\texttt{cdo info ofile}':
+Result of '\texttt{cdo info outfile}':
 @BeginListing
    -1 :       Date  Time    Code Level  Size  Miss :  Minimum     Mean  Maximum
     1 : 1987-12-31 12:00:00 139      0  2048   871 :   273.16   287.08   303.71
@@ -202,7 +202,7 @@ Result of '\texttt{cdo info ofile}':
 
 Set all missing values to the nearest non missing value:
 @BeginVerbatim
-   cdo setmisstonn ifile ofile
+   cdo setmisstonn infile outfile
 @EndVerbatim
 @IfDoc
 Below is a schematic illustration of this example:

@@ -160,13 +160,13 @@ This can improve the performance by:
 \end{itemize}
 Use
 \begin{verbatim}
-   cdo sub -dayavg ifile2 -timavg ifile1 ofile
+   cdo sub -dayavg infile2 -timavg infile1 outfile
 \end{verbatim}
 instead of
 \begin{verbatim}
-   cdo timavg ifile1 tmp1
-   cdo dayavg ifile2 tmp2
-   cdo sub tmp2 tmp1 ofile
+   cdo timavg infile1 tmp1
+   cdo dayavg infile2 tmp2
+   cdo sub tmp2 tmp1 outfile
    rm tmp1 tmp2
 \end{verbatim}
 
@@ -174,7 +174,7 @@ instead of
 Operator chaining is implemented over POSIX Threads (pthreads).
 Therefore this {\CDO} feature is not available on operating systems without POSIX Threads support!
 
-All operators with an arbitrary number of input streams (\texttt{ifiles})
+All operators with an arbitrary number of input streams (\texttt{infiles})
 can't be combined with other operators if these operators are used
 with more than one input stream. Here is an incomplete list of
 these operators:
@@ -189,7 +189,7 @@ wildcards. In this case CDO will do the pattern matching and the
 output can be combined with other operators. Here is an example for
 this feature:
 \begin{verbatim}
-   cdo timavg -select,name=temperature 'ifile?' ofile
+   cdo timavg -select,name=temperature 'infile?' outfile
 \end{verbatim}
 
 The CDO internal wildcard expansion is using the \textit{glob()} function. 
@@ -200,10 +200,10 @@ stream! You need to take care when mixing those operators with
 operator with an arbitrary number of input streams. 
 The following examples illustrate this problem.
 \begin{enumerate}
-\item \texttt{cdo info -timavg ifile?}
-\item \texttt{cdo info -timavg ifile1 ifile2}
-\item \texttt{cdo timavg ifile1 tmpfile} \\
-\texttt{cdo info tmpfile ifile2}
+\item \texttt{cdo info -timavg infile?}
+\item \texttt{cdo info -timavg infile1 infile2}
+\item \texttt{cdo timavg infile1 tmpfile} \\
+\texttt{cdo info tmpfile infile2}
 \end{enumerate}
  All three examples produce identical results. 
 The time average will be computed only on the first input file. 
@@ -215,7 +215,7 @@ Users may request a specific number of OpenMP threads \texttt{nthreads} with the
 
 Here is an example to distribute the bilinear interpolation on 8 OpenMP threads:
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor2}, basicstyle=\ttfamily, columns=flexible]
-   cdo -P 8  remapbil,targetgrid  ifile  ofile
+   cdo -P 8  remapbil,targetgrid  infile  outfile
 \end{lstlisting}
 
 Many {\CDO} operators are I/O-bound. This means most of the time is spend in reading and writing the data. 
@@ -232,7 +232,7 @@ Some operators need one or more parameter. A list of parameter is indicated by t
 Unquoted characters without blanks and tabs.
 The following command select variables with the name \texttt{pressure} and \texttt{tsurf}:
 \begin{verbatim}
-   cdo selvar,pressure,tsurf ifile ofile
+   cdo selvar,pressure,tsurf infile outfile
 \end{verbatim}
 
 \item FLOAT
@@ -241,7 +241,7 @@ Floating point number in any representation.
 The following command sets the range between \texttt{0} and \texttt{273.15}
 of all fields to missing value:
 \begin{verbatim}
-   cdo setrtomiss,0,273.15 ifile ofile
+   cdo setrtomiss,0,273.15 infile outfile
 \end{verbatim}
 
 \item INTEGER
@@ -249,11 +249,11 @@ of all fields to missing value:
 A range of integer parameter can be specified by \textit{first}/\textit{last}[/\textit{inc}].
 To select the days 5, 6, 7, 8 and 9 use:
 \begin{verbatim}
-   cdo selday,5/9 ifile ofile
+   cdo selday,5/9 infile outfile
 \end{verbatim}
 The result is the same as:
 \begin{verbatim}
-   cdo selday,5,6,7,8,9 ifile ofile
+   cdo selday,5,6,7,8,9 infile outfile
 \end{verbatim}
 \end{itemize}
 

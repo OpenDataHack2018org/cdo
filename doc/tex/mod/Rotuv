@@ -3,7 +3,7 @@
 @Name      = Rotuvb
 @Title     = Rotation
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = rotuvb
 @EndModule
 
@@ -30,6 +30,6 @@ STRING  Pairs of zonal and meridional velocity components (use variable names or
 To transform the u and v velocity of a dataset from a rotated
 spherical system to a geographical system use:
 @BeginVerbatim
-   cdo rotuvb,u,v ifile ofile
+   cdo rotuvb,u,v infile outfile
 @EndVerbatim
 @EndExample

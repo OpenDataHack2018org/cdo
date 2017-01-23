@@ -4,7 +4,7 @@
 @Title     = Wind transformation
 @Section   = Transformation
 @Class     = Transformation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = dv2uv dv2uvl uv2dv uv2dvl dv2ps
 
 @BeginDescription
@@ -123,6 +123,6 @@ vorticity need to have the names sd and svo or code numbers 155 and 138.
 Assume a dataset has at least spherical harmonic coefficients of divergence and vorticity.
 To transform the spectral divergence and vorticity to U and V wind on a Gaussian grid use:
 @BeginVerbatim
-   cdo dv2uv ifile ofile
+   cdo dv2uv infile outfile
 @EndVerbatim
 @EndExample

@@ -4,7 +4,7 @@
 @Title     = Covariance in grid space
 @Section   = Correlation and co.
 @Class     = Correlation and co.
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = fldcovar
 @EndModule
 

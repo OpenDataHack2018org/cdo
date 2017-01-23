@@ -3,7 +3,7 @@
 @Name      = Adisit
 @Title     = Potential temperature to in-situ temperature and vice versa
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = adisit adipot
 @EndModule
 

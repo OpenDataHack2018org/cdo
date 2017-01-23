@@ -3,7 +3,7 @@
 @Title     = Duplicates a dataset
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = duplicate
 @EndModule
 
@@ -13,7 +13,7 @@
 @Parameter = [ndup]
 
 @BeginDescription
-This operator duplicates the contents of @file{ifile} and writes the result to @file{ofile}.
+This operator duplicates the contents of @file{infile} and writes the result to @file{outfile}.
 The optional parameter sets the number of duplicates, the default is 2.
 @EndDescription
 @EndOperator

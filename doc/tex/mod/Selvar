@@ -4,11 +4,11 @@
 @Title     = Select fields
 @Section   = Selection
 @Class     = Selection
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = selparam delparam selcode delcode selname delname selstdname sellevel sellevidx selgrid selzaxis selzaxisname selltype seltabnum
 
 @BeginDescription
-This module selects some fields from @file{ifile} and writes them to @file{ofile}.
+This module selects some fields from @file{infile} and writes them to @file{outfile}.
 The fields selected depends on the chosen operator and the parameters.
 @EndDescription
 @EndModule
@@ -217,10 +217,10 @@ INTEGER  Comma separated list of parameter table numbers
 Assume an input dataset has three variables with the code numbers 129, 130 and 139.
 To select the variables with the code number 129 and 139 use:
 @BeginVerbatim
-   cdo selcode,129,139 ifile ofile
+   cdo selcode,129,139 infile outfile
 @EndVerbatim
 You can also select the code number 129 and 139 by deleting the code number 130 with:
 @BeginVerbatim
-   cdo delcode,130 ifile ofile
+   cdo delcode,130 infile outfile
 @EndVerbatim
 @EndExample

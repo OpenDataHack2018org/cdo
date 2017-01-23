@@ -4,13 +4,13 @@
 @Title     = Multi-year seasonal statistical values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = yseasmin yseasmax yseassum yseasmean yseasavg yseasstd yseasstd1 yseasvar yseasvar1
 
 @BeginDescription
 This module computes statistical values of each season.
 Depending on the chosen operator the minimum, maximum, sum, average, variance
-or standard deviation of each season in @file{ifile} is written to @file{ofile}.
+or standard deviation of each season in @file{infile} is written to @file{outfile}.
 The date information in an output field is the date of the last contributing input field.
 @EndDescription
 @EndModule
@@ -235,6 +235,6 @@ o(\mbox{4},x) = \mbox{\textbf{std1}}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10,
 @BeginExample
 To compute the seasonal mean over all input years use:
 @BeginVerbatim
-   cdo yseasmean ifile ofile
+   cdo yseasmean infile outfile
 @EndVerbatim
 @EndExample
