@@ -3,6 +3,10 @@
 	* using CDI library version 1.8.0
 	* Version 1.8.0 release
 
+2017-01-24  Uwe Schulzweida
+
+	* write_remap_scrip: write NeCDF4 for data larger than 8GB
+
 2017-01-19  Uwe Schulzweida
 
 	* using CDI library version 1.8.0rc6
