@@ -1082,27 +1082,65 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
     {
       if ( links.option )
 	{
-	  long j;
-	  for ( j = 0; j < links.num_blks; ++j )
+	  for ( long j = 0; j < links.num_blks; ++j )
 	    {
+              const int *restrict dst_addx = links.dst_add[j];
+              const int *restrict src_addx = links.src_add[j];
+              const int *restrict windex = links.w_index[j];
 #ifdef SX
 #pragma cdir nodep
 #endif
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
 	      for ( n = 0; n < links.num_links[j]; ++n )
 		{
-		  dst_array[links.dst_add[j][n]] += src_array[links.src_add[j][n]]*map_wts[num_wts*links.w_index[j][n]];
+		  dst_array[dst_addx[n]] += src_array[src_addx[n]]*map_wts[num_wts*windex[n]];
 		}
 	    }
 	}
       else
 	{
-	  for ( n = 0; n < num_links; ++n )
-	    {
-	      /*
-		printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
-	      */
-	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
-	    }
+          /*
+          int doff = 1;
+          int ival = dst_add[0];
+          for ( n = 1; n < num_links; ++n )
+            if ( dst_add[n] == ival ) doff++;
+            else break;
+
+          if ( num_links%doff != 0 ) doff = -1;
+          else if ( doff > 1 )
+            {
+              for ( n = 1; n < num_links/doff; ++n )
+                {
+                  ival = dst_add[n*doff];
+                  for ( int k = 1; k < doff; ++k )
+                    if ( dst_add[n*doff+k] != ival )
+                      {
+                        doff = -1;
+                        break;
+                      }
+                  if ( doff == -1 ) break;
+                }
+            }
+
+          if ( doff > 0 )
+            {
+              for ( n = 0; n < num_links/doff; ++n )
+                {
+                  for ( int k = 0; k < doff; ++k )
+                    dst_array[dst_add[n*doff+k]] += src_array[src_add[n*doff+k]]*map_wts[num_wts*(n*doff+k)];
+                }
+            }
+          else
+          */
+            {
+              for ( n = 0; n < num_links; ++n )
+                {
+                  // printf("%5d %5d %5ld %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
+                  dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
+                }
+            }
 	}
     }
   else                 /* Second order remapping */
