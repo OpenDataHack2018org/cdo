@@ -478,6 +478,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "normalization", &attlen));
   normalize_opt[attlen] = 0;
 
+  rv->links_per_value = -1;
   rv->sort_add = false;
 
   if ( strcmp(normalize_opt, "none") == 0 )

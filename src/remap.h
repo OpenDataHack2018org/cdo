@@ -120,14 +120,15 @@ typedef struct {
   bool     option;
   int      max_links;
   int      num_blks;
-  int*     num_links;
-  int**    src_add;
-  int**    dst_add;
-  int**    w_index;
+  int     *num_links;
+  int    **src_add;
+  int    **dst_add;
+  int    **w_index;
 }
 remaplink_t;
 
 typedef struct {
+  int      links_per_value;
   bool     sort_add;
   bool     pinit;            /* true: if the pointers are initialized    */
   long     max_links;        /* current size of link arrays              */
@@ -137,10 +138,10 @@ typedef struct {
   int      norm_opt;         /* option for normalization (conserv only)  */
   int      resize_increment; /* default amount to increase array size    */
 
-  int*     src_cell_add;     /* source grid address for each link        */
-  int*     tgt_cell_add;     /* target grid address for each link        */
+  int     *src_cell_add;     /* source grid address for each link        */
+  int     *tgt_cell_add;     /* target grid address for each link        */
 
-  double*  wts;              /* map weights for each link [max_links*num_wts] */
+  double  *wts;              /* map weights for each link [max_links*num_wts] */
 
   remaplink_t links;
 }
@@ -176,7 +177,7 @@ void remapGridFree(remapgrid_t *grid);
 void remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts, 
 	   long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array, 
 	   const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3,
-	   remaplink_t links);
+	   remaplink_t links, long links_per_value);
 
 void remap_laf(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
 	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array);

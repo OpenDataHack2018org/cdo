@@ -3,6 +3,10 @@
 	* using CDI library version 1.8.0
 	* Version 1.8.0 release
 
+2017-01-25  Uwe Schulzweida
+
+	* remap:  optimzation for constant links per value
+
 2017-01-24  Uwe Schulzweida
 
 	* write_remap_scrip: write NeCDF4 for data larger than 8GB
