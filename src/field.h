@@ -106,6 +106,7 @@ void      field_free(field_t **field, const int vlistID);
 /* field.c */
 
 double fldfun(field_t field, int function);
+double fldrange(field_t field);
 double fldmin(field_t field);
 double fldmax(field_t field);
 double fldsum(field_t field);

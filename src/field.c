@@ -29,19 +29,20 @@ double fldfun(field_t field, int function)
 
   switch (function)
     {
-    case func_min:    rval = fldmin(field);  break;
-    case func_max:    rval = fldmax(field);  break;
-    case func_sum:    rval = fldsum(field);  break;
-    case func_mean:   rval = fldmean(field); break;
-    case func_avg:    rval = fldavg(field);  break;
-    case func_std:    rval = fldstd(field);  break;
-    case func_std1:   rval = fldstd1(field); break;
-    case func_var:    rval = fldvar(field);  break;
-    case func_var1:   rval = fldvar1(field); break;
-    case func_crps:   rval = fldcrps(field); break;
-    case func_brs:    rval = fldbrs(field);  break;
-    case func_rank:   rval = fldrank(field); break;
-    case func_roc:    rval = fldroc(field);  break;
+    case func_range:  rval = fldrange(field);  break;
+    case func_min:    rval = fldmin(field);    break;
+    case func_max:    rval = fldmax(field);    break;
+    case func_sum:    rval = fldsum(field);    break;
+    case func_mean:   rval = fldmean(field);   break;
+    case func_avg:    rval = fldavg(field);    break;
+    case func_std:    rval = fldstd(field);    break;
+    case func_std1:   rval = fldstd1(field);   break;
+    case func_var:    rval = fldvar(field);    break;
+    case func_var1:   rval = fldvar1(field);   break;
+    case func_crps:   rval = fldcrps(field);   break;
+    case func_brs:    rval = fldbrs(field);    break;
+    case func_rank:   rval = fldrank(field);   break;
+    case func_roc:    rval = fldroc(field);    break;
     default: cdoAbort("%s: function %d not implemented!", __func__, function);
     }
   
@@ -136,6 +137,47 @@ double fldbrs(field_t field)
 }
 
 
+double fldrange(field_t field)
+{
+  const int nmiss      = field.nmiss > 0;
+  const size_t len     = field.size;
+  const double missval = field.missval;
+  const double *restrict array = field.ptr;
+  double rmin =  DBL_MAX;
+  double rmax = -DBL_MAX;
+  double range = 0;
+
+  assert(array!=NULL);
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; i++ ) 
+	if ( !DBL_IS_EQUAL(array[i], missval) )
+          {
+            if ( array[i] < rmin ) rmin = array[i];
+            if ( array[i] > rmax ) rmax = array[i];
+          }
+
+      if ( IS_EQUAL(rmin,  DBL_MAX) && IS_EQUAL(rmax, -DBL_MAX) )
+        range = missval;
+      else
+        range = rmax-rmin;
+    }
+  else
+    {
+      //#pragma simd reduction(min:rmin) 
+      for ( size_t i = 0; i < len; i++ )
+        {
+          if ( array[i] < rmin ) rmin = array[i];
+          if ( array[i] > rmax ) rmax = array[i];
+        }
+      range = rmax-rmin;
+    }
+
+  return range;
+}
+
+
 double fldmin(field_t field)
 {
   const int nmiss      = field.nmiss > 0;
@@ -152,14 +194,13 @@ double fldmin(field_t field)
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  if ( array[i] < rmin ) rmin = array[i];
 
-      if ( IS_EQUAL(rmin, DBL_MAX) )
-	rmin = missval;
+      if ( IS_EQUAL(rmin, DBL_MAX) ) rmin = missval;
     }
   else
     {
       //#pragma simd reduction(min:rmin) 
       for ( size_t i = 0; i < len; i++ ) 
-	if ( array[i] < rmin )  rmin = array[i];
+	if ( array[i] < rmin ) rmin = array[i];
     }
 
   return rmin;
@@ -182,13 +223,12 @@ double fldmax(field_t field)
         if ( !DBL_IS_EQUAL(array[i], missval) )
           if ( array[i] > rmax ) rmax = array[i];
       
-      if ( IS_EQUAL(rmax, -DBL_MAX) )
-        rmax = missval;
+      if ( IS_EQUAL(rmax, -DBL_MAX) ) rmax = missval;
     }
   else
     {
       for ( size_t i = 0; i < len; i++ ) 
-        if ( array[i] > rmax )  rmax = array[i];
+        if ( array[i] > rmax ) rmax = array[i];
     }
 
   return rmax;

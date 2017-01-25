@@ -329,7 +329,7 @@ void *Maggraph(void *argument);
 #define  FillmissOperators      {"fillmiss", "fillmiss2"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
-#define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
+#define  FldstatOperators       {"fldrange", "fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
 #define  FldcorOperators        {"fldcor"}
 #define  FldcovarOperators      {"fldcovar"}
 #define  FourierOperators       {"fourier"}
