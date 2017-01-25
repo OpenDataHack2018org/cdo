@@ -5,7 +5,8 @@
 
 2017-01-25  Uwe Schulzweida
 
-	* New operator fldrange: range of a field (max-min)
+	* New operator timrange: time range (timmax-timmin)
+	* New operator fldrange: field range (fldmax-fldmin)
 	* remap:  optimzation for constant links per value
 
 2017-01-24  Uwe Schulzweida

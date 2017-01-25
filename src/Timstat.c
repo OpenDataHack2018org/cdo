@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Timstat    timrange        Time range
       Timstat    timmin          Time minimum
       Timstat    timmax          Time maximum
       Timstat    timsum          Time sum
@@ -27,6 +28,7 @@
       Timstat    timvar1         Time variance [Normalize by (n-1)]
       Timstat    timstd          Time standard deviation
       Timstat    timstd1         Time standard deviation [Normalize by (n-1)]
+      Hourstat   hourrange       Hourly range
       Hourstat   hourmin         Hourly minimum
       Hourstat   hourmax         Hourly maximum
       Hourstat   hoursum         Hourly sum
@@ -36,6 +38,7 @@
       Hourstat   hourvar1        Hourly variance [Normalize by (n-1)]
       Hourstat   hourstd         Hourly standard deviation
       Hourstat   hourstd1        Hourly standard deviation [Normalize by (n-1)]
+      Daystat    dayrange        Daily range
       Daystat    daymin          Daily minimum
       Daystat    daymax          Daily maximum
       Daystat    daysum          Daily sum
@@ -45,6 +48,7 @@
       Daystat    dayvar1         Daily variance [Normalize by (n-1)]
       Daystat    daystd          Daily standard deviation
       Daystat    daystd1         Daily standard deviation [Normalize by (n-1)]
+      Monstat    monrange        Monthly range
       Monstat    monmin          Monthly minimum
       Monstat    monmax          Monthly maximum
       Monstat    monsum          Monthly sum
@@ -54,6 +58,7 @@
       Monstat    monvar1         Monthly variance [Normalize by (n-1)]
       Monstat    monstd          Monthly standard deviation
       Monstat    monstd1         Monthly standard deviation [Normalize by (n-1)]
+      Yearstat   yearrange       Yearly range
       Yearstat   yearmin         Yearly minimum
       Yearstat   yearmax         Yearly maximum
       Yearstat   yearsum         Yearly sum
@@ -96,6 +101,7 @@ void *Timstat(void *argument)
 
   cdoInitialize(argument);
 
+  cdoOperatorAdd("timrange",  func_range, DATE_LEN, NULL);
   cdoOperatorAdd("timmin",    func_min,   DATE_LEN, NULL);
   cdoOperatorAdd("timmax",    func_max,   DATE_LEN, NULL);
   cdoOperatorAdd("timsum",    func_sum,   DATE_LEN, NULL);
@@ -105,6 +111,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("timvar1",   func_var1,  DATE_LEN, NULL);
   cdoOperatorAdd("timstd",    func_std,   DATE_LEN, NULL);
   cdoOperatorAdd("timstd1",   func_std1,  DATE_LEN, NULL);
+  cdoOperatorAdd("yearrange", func_range, YEAR_LEN, NULL);
   cdoOperatorAdd("yearmin",   func_min,   YEAR_LEN, NULL);
   cdoOperatorAdd("yearmax",   func_max,   YEAR_LEN, NULL);
   cdoOperatorAdd("yearsum",   func_sum,   YEAR_LEN, NULL);
@@ -114,6 +121,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("yearvar1",  func_var1,  YEAR_LEN, NULL);
   cdoOperatorAdd("yearstd",   func_std,   YEAR_LEN, NULL);
   cdoOperatorAdd("yearstd1",  func_std1,  YEAR_LEN, NULL);
+  cdoOperatorAdd("monrange",  func_range, MON_LEN, NULL);
   cdoOperatorAdd("monmin",    func_min,   MON_LEN, NULL);
   cdoOperatorAdd("monmax",    func_max,   MON_LEN, NULL);
   cdoOperatorAdd("monsum",    func_sum,   MON_LEN, NULL);
@@ -123,6 +131,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("monvar1",   func_var1,  MON_LEN, NULL);
   cdoOperatorAdd("monstd",    func_std,   MON_LEN, NULL);
   cdoOperatorAdd("monstd1",   func_std1,  MON_LEN, NULL);
+  cdoOperatorAdd("dayrange",  func_range, DAY_LEN, NULL);
   cdoOperatorAdd("daymin",    func_min,   DAY_LEN, NULL);
   cdoOperatorAdd("daymax",    func_max,   DAY_LEN, NULL);
   cdoOperatorAdd("daysum",    func_sum,   DAY_LEN, NULL);
@@ -132,6 +141,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("dayvar1",   func_var1,  DAY_LEN, NULL);
   cdoOperatorAdd("daystd",    func_std,   DAY_LEN, NULL);
   cdoOperatorAdd("daystd1",   func_std1,  DAY_LEN, NULL);
+  cdoOperatorAdd("hourrange", func_range, HOUR_LEN, NULL);
   cdoOperatorAdd("hourmin",   func_min,   HOUR_LEN, NULL);
   cdoOperatorAdd("hourmax",   func_max,   HOUR_LEN, NULL);
   cdoOperatorAdd("hoursum",   func_sum,   HOUR_LEN, NULL);
@@ -146,10 +156,11 @@ void *Timstat(void *argument)
   int operfunc   = cdoOperatorF1(operatorID);
   int comparelen = cdoOperatorF2(operatorID);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
-  int lstd    = operfunc == func_std || operfunc == func_std1;
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor = operfunc == func_std1 || operfunc == func_var1;
+  bool lrange  = operfunc == func_range;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int divisor  = operfunc == func_std1 || operfunc == func_var1;
 
   if ( operfunc == func_mean )
     {
@@ -249,7 +260,7 @@ void *Timstat(void *argument)
   field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_t **vars2 = NULL;
-  if ( lvarstd ) vars2 = field_malloc(vlistID1, FIELD_PTR);
+  if ( lvarstd || lrange ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID  = 0;
   int otsID = 0;
@@ -286,6 +297,14 @@ void *Timstat(void *argument)
 		{
 		  streamReadRecord(streamID1, pvar1->ptr, &nmiss);
 		  pvar1->nmiss = (size_t)nmiss;
+                  if ( lrange )
+                    {
+                      field_t *pvar2 = &vars2[varID][levelID];
+		      for ( int i = 0; i < nwpv*gridsize; i++ )
+                        pvar2->ptr[i] = pvar1->ptr[i];
+                      pvar2->nmiss = (size_t)nmiss;
+                    }
+
 		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
@@ -328,6 +347,12 @@ void *Timstat(void *argument)
 		      farsumq(pvar2, field);
 		      farsum(pvar1, field);
 		    }
+                  else if ( lrange )
+                    {
+                      field_t *pvar2 = &vars2[varID][levelID];
+                      farmin(pvar2, field);
+                      farmax(pvar1, field);
+                    }
 		  else
 		    {
 		      farfun(pvar1, field, operfunc);
@@ -390,6 +415,18 @@ void *Timstat(void *argument)
                 if ( lstd ) farstd(pvar1, *pvar2, samp1[varID][levelID], divisor);
                 else        farvar(pvar1, *pvar2, samp1[varID][levelID], divisor);
 	      }
+	  }
+      else if ( lrange )
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_t *pvar1 = &vars1[varID][levelID];
+            field_t *pvar2 = &vars2[varID][levelID];
+
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+            farsub(pvar1, *pvar2);
 	  }
 
       if ( cdoVerbose )
@@ -476,7 +513,7 @@ void *Timstat(void *argument)
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if ( lvarstd ) field_free(vars2, vlistID1);
+  if ( lvarstd || lrange ) field_free(vars2, vlistID1);
 
   dtlist_delete(dtlist);
 
