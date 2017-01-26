@@ -221,13 +221,13 @@ void cdo_usage(void)
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
+  fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
+  fprintf(stderr, "    -C, --color    Colorized output messages\n");
   if ( ITSME )
     {
       fprintf(stderr, "    --enableexcept <except>\n");
       fprintf(stderr, "                   Set individual floating-point traps (DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
     }
-  fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
-  fprintf(stderr, "    -C, --color    Colorized output messages\n");
   fprintf(stderr, "    -f, --format <format>\n");
   fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
