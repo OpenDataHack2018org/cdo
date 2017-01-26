@@ -549,6 +549,9 @@ Operator catalog:
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
    CMORlite      cmorlite        CMOR lite
+-------------------------------------------------------------
+   CMOR
+-------------------------------------------------------------
    CMOR          cmor            CMOR
 -------------------------------------------------------------
    Magics
