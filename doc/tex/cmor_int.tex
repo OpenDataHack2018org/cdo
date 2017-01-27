@@ -7,7 +7,7 @@ This document describes the additional {\CDO} operator cmor. This
 operator is an interface to the CMOR library version 3 from PCMDI.
 The CMOR support is available with {\CDO} release 1.8.0 or later.
 
-The CMOR (Climate Model Output Rewriter) library comprises a set of
+The \cite{CMOR} (Climate Model Output Rewriter) library comprises a set of
 functions, that can be used to produce CF-compliant NetCDF files that 
 fulfill the requirements of many of the climate community's standard
 model experiments. These experiments are collectively referred to as
@@ -21,8 +21,9 @@ site. CMOR relies on these tables to provide much of the metadata
 that is needed in the MIP context, thereby reducing the programming 
 effort required of the individual MIP contributors.
 
-The CDO operator cmor reads the data with the internal IO library CDI
-and writes the NetCDF result directly with the CMOR library. 
+The  {\CDO} operator cmor was developed at the DKRZ and MPI for
+Meteorology to provide an easy interface to the \cite{CMOR} library for a
+standardized preparation of CMIP6 data.
 
 \chapter{Building CDO with CMOR}
 

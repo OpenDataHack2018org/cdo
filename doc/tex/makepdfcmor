@@ -1,3 +1,10 @@
+cp ref_man_cmor.tex ref_man_cmor_mod.tex
+ed ref_man_cmor_mod.tex << EOR
+1,5d
+w
+q
+EOR
+#
 pdflatex cdo_cmor
 pdflatex cdo_cmor
 cat > cdo_cmor.ist << 'EOF'
