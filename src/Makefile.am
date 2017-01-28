@@ -1,6 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES =            \
+               array.h         \
+               array.c         \
                cdo_int.h       \
                compare.h       \
                cdo_pthread.c   \
