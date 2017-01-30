@@ -168,8 +168,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
             writemode |= NC_NETCDF4 | NC_CLASSIC_MODEL;
             if ( cdoVerbose ) cdoPrint("Store weights and links to NetCDF4!");
 #else
-            cdoMessage("Number of remap links %lz exceeds maximum of %lz and NetCDF 4 not available!",
-                       nlinks, maxlinks);
+            cdoPrint("Number of remap links %lz exceeds maximum of %lz and NetCDF 4 not available!",
+                     nlinks, maxlinks);
 #endif
           }
         else
@@ -178,7 +178,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
             writemode |= NC_64BIT_OFFSET;
             if ( cdoVerbose ) cdoPrint("Store weights and links to NetCDF2!");
 #else
-            cdoMessage("Filesize for remap weights maybe too large!");
+            cdoPrint("Filesize for remap weights maybe too large!");
 #endif
           }
       }
