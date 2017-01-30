@@ -69,9 +69,9 @@ void *Arith(void *argument)
   int streamIDx1 = streamID1;
   int streamIDx2 = streamID2;
 
-  field_t field1, field2;
-  field_t *fieldx1 = &field1;
-  field_t *fieldx2 = &field2;
+  field_type field1, field2;
+  field_type *fieldx1 = &field1;
+  field_type *fieldx2 = &field2;
 
   int vlistID1 = streamInqVlist(streamID1);
   int vlistID2 = streamInqVlist(streamID2);

@@ -190,7 +190,7 @@ void *Seltime(void *argument)
   bool *selfound = NULL;
   int *vdate_list = NULL, *vtime_list = NULL;
   double *single;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
 
   cdoInitialize(argument);
 
@@ -330,7 +330,7 @@ void *Seltime(void *argument)
 	  nts1 = 1;
 	}
 
-      vars  = (field_t ***) Malloc(nts1*sizeof(field_t **));
+      vars  = (field_type ***) Malloc(nts1*sizeof(field_type **));
 
       for ( int tsID = 0; tsID < nts1; tsID++ )
 	{

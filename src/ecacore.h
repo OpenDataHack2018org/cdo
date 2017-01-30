@@ -27,9 +27,9 @@ typedef enum {
 }
 ECA_EPILOG;
 
-typedef void (*ECA_FUNC_1)(field_t *, double);
-typedef void (*ECA_FUNC_2)(field_t *, field_t);
-typedef void (*ECA_FUNC_3)(field_t *, field_t, double);
+typedef void (*ECA_FUNC_1)(field_type *, double);
+typedef void (*ECA_FUNC_2)(field_type *, field_type);
+typedef void (*ECA_FUNC_3)(field_type *, field_type, double);
 
 /**
  * Structure describing a processing request of the form

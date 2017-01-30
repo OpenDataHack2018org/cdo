@@ -105,12 +105,12 @@ void *Runstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
-  field_t ***vars2 = NULL, ***samp1 = NULL;
+  field_type ***vars1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
+  field_type ***vars2 = NULL, ***samp1 = NULL;
   if ( !runstat_nomiss )
-    samp1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+    samp1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
   if ( lvarstd )
-    vars2 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+    vars2 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
 
   for ( int its = 0; its < ndates; its++ )
     {

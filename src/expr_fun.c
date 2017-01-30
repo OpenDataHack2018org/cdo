@@ -19,7 +19,7 @@
 #include "grid.h"
 
 
-void fld_field_init(field_t *field, size_t nmiss, double missval, size_t ngp, double *array, double *w)
+void fld_field_init(field_type *field, size_t nmiss, double missval, size_t ngp, double *array, double *w)
 {
   field_init(field);
 

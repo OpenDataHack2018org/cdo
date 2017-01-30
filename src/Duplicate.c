@@ -32,7 +32,7 @@ void *Duplicate(void *argument)
   int nmiss;
   int *vdate = NULL, *vtime = NULL;
   int ndup = 2;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
 
   cdoInitialize(argument);
 
@@ -81,7 +81,7 @@ void *Duplicate(void *argument)
 	  nalloc += NALLOC_INC;
 	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
 	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_t***) Realloc(vars, nalloc*sizeof(field_t**));
+	  vars  = (field_type***) Realloc(vars, nalloc*sizeof(field_type**));
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);

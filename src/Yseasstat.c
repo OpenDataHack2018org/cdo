@@ -70,7 +70,7 @@ void *Yseasstat(void *argument)
   int nmiss;
   int nlevel;
   date_time_t datetime[NSEAS];
-  field_t **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
+  field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
 
   cdoInitialize(argument);
 
@@ -124,7 +124,7 @@ void *Yseasstat(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 

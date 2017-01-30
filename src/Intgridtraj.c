@@ -82,7 +82,7 @@ void *Intgridtraj(void *argument)
 
   int vlistID1 = streamInqVlist(streamID1);
 
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
 

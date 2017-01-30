@@ -137,7 +137,7 @@ void *Zonstat(void *argument)
 
   int lim = vlistGridsizeMax(vlistID1);
 
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field2);
   field_init(&field2);
   field1.ptr  = (double*) Malloc(lim*sizeof(double));

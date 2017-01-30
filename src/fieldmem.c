@@ -9,17 +9,17 @@
 #include "util.h"
 
 
-void field_init(field_t *field)
+void field_init(field_type *field)
 {
-  memset(field, 0, sizeof(field_t));
+  memset(field, 0, sizeof(field_type));
 }
 
 
-field_t **field_allocate(int vlistID, int ptype, int init)
+field_type **field_allocate(int vlistID, int ptype, int init)
 {
   int nvars = vlistNvars(vlistID);
 
-  field_t **field = (field_t **) Malloc(nvars*sizeof(field_t *));
+  field_type **field = (field_type **) Malloc(nvars*sizeof(field_type *));
 
   for ( int varID = 0; varID < nvars; ++varID )
     {
@@ -30,7 +30,7 @@ field_t **field_allocate(int vlistID, int ptype, int init)
       int nlevel   = zaxisInqSize(zaxisID);
       double missval  = vlistInqVarMissval(vlistID, varID);
 
-      field[varID] = (field_t*) Malloc(nlevel*sizeof(field_t));
+      field[varID] = (field_type*) Malloc(nlevel*sizeof(field_type));
 
       for ( int levelID = 0; levelID < nlevel; ++levelID )
 	{
@@ -88,19 +88,19 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 }
 
 
-field_t **field_malloc(int vlistID, int ptype)
+field_type **field_malloc(int vlistID, int ptype)
 {
   return field_allocate(vlistID, ptype, 0);
 }
 
 
-field_t **field_calloc(int vlistID, int ptype)
+field_type **field_calloc(int vlistID, int ptype)
 {
   return field_allocate(vlistID, ptype, 1);
 }
 
 
-void field_free(field_t **field, int vlistID)
+void field_free(field_type **field, int vlistID)
 {
   int nvars = vlistNvars(vlistID);
   for ( int varID = 0; varID < nvars; ++varID )

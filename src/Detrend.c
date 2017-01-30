@@ -72,7 +72,7 @@ void *Detrend(void *argument)
   int nmiss;
   int nlevel;
   double missval;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
   typedef struct
   {
@@ -103,7 +103,7 @@ void *Detrend(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars   = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
+	  vars   = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
 	}
 
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);

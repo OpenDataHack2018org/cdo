@@ -23,7 +23,7 @@
 
 double crps_det_integrate(double *a, const double d, const size_t n);
 
-double fldfun(field_t field, int function)
+double fldfun(field_type field, int function)
 {
   double rval = 0;
 
@@ -50,7 +50,7 @@ double fldfun(field_t field, int function)
 }
 
 
-double fldrank(field_t field) 
+double fldrank(field_type field) 
 {
   double res = 0;
   // Using first value as reference (observation)
@@ -78,12 +78,12 @@ double fldrank(field_t field)
 }
 
 
-double fldroc(field_t field) 
+double fldroc(field_type field) 
 {
   return field.missval;
 }
 
-double fldcrps(field_t field)
+double fldcrps(field_type field)
 {
   const size_t len     = field.size;
   const int    nmiss   = field.nmiss;
@@ -104,7 +104,7 @@ double fldcrps(field_t field)
 }
 
 
-double fldbrs(field_t field) 
+double fldbrs(field_type field) 
 {
   const int     nmiss   = field.nmiss;
   const size_t    len   = field.size;
@@ -137,7 +137,7 @@ double fldbrs(field_t field)
 }
 
 
-double fldrange(field_t field)
+double fldrange(field_type field)
 {
   const int nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
@@ -178,7 +178,7 @@ double fldrange(field_t field)
 }
 
 
-double fldmin(field_t field)
+double fldmin(field_type field)
 {
   const int nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
@@ -207,7 +207,7 @@ double fldmin(field_t field)
 }
 
 
-double fldmax(field_t field)
+double fldmax(field_type field)
 {
   const int nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
@@ -235,7 +235,7 @@ double fldmax(field_t field)
 }
 
 
-double fldsum(field_t field)
+double fldsum(field_type field)
 {
   const int nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
@@ -268,7 +268,7 @@ double fldsum(field_t field)
 }
 
 
-double fldmean(field_t field)
+double fldmean(field_type field)
 {
   const int nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
@@ -301,7 +301,7 @@ double fldmean(field_t field)
 }
 
 
-double fldavg(field_t field)
+double fldavg(field_type field)
 {
   const int nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
@@ -376,7 +376,7 @@ void prevarsum(const double *restrict array, const double *restrict w, size_t le
 }
 
 
-double fldvar(field_t field)
+double fldvar(field_type field)
 {
   const int    nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
@@ -393,7 +393,7 @@ double fldvar(field_t field)
 }
 
 
-double fldvar1(field_t field)
+double fldvar1(field_type field)
 {
   const int    nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
@@ -426,19 +426,19 @@ double var_to_std(double rvar, double missval)
   return rstd;
 }
 
-double fldstd(field_t field)
+double fldstd(field_type field)
 {
   return var_to_std(fldvar(field), field.missval);
 }
 
 
-double fldstd1(field_t field)
+double fldstd1(field_type field)
 {
   return var_to_std(fldvar1(field), field.missval);
 }
 
 
-void fldrms(field_t field, field_t field2, field_t *field3)
+void fldrms(field_type field, field_type field2, field_type *field3)
 {
   size_t   i;
   size_t len;
@@ -490,7 +490,7 @@ void fldrms(field_t field, field_t field2, field_t *field3)
 }
 
 
-void varrms(field_t field, field_t field2, field_t *field3)
+void varrms(field_type field, field_type field2, field_type *field3)
 {
   size_t   i, k, nlev, len;
   int    rnmiss = 0;
@@ -544,7 +544,7 @@ void varrms(field_t field, field_t field2, field_t *field3)
 }
 
 /* RQ */
-double fldpctl(field_t field, const double pn)
+double fldpctl(field_type field, const double pn)
 {
   const size_t len     = field.size;
   const int    nmiss   = field.nmiss;
@@ -577,9 +577,9 @@ double fldpctl(field_t field, const double pn)
 }
 /* QR */
 
-/*  field_t UTILITIES */
+/*  field_type UTILITIES */
 /*  update the number non missing values */
-void fldunm(field_t *field)
+void fldunm(field_type *field)
 {
   size_t i;
 
@@ -589,10 +589,10 @@ void fldunm(field_t *field)
 }
 
 /*  check for non missval values */
-int fldhvs(field_t *fieldPtr, const size_t nlevels)
+int fldhvs(field_type *fieldPtr, const size_t nlevels)
 {
   size_t level;
-  field_t field;
+  field_type field;
 
   for ( level = 0; level < nlevels; level++)
     {

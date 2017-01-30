@@ -42,7 +42,7 @@ unsigned long day_of_year(int date);
  * @param field1 the 1st input field, also holds the result
  * @param field2 the 2nd input field  
  */  
-void farnum(field_t *field1, field_t field2);
+void farnum(field_type *field1, field_type field2);
 
 /**
  * Counts the number of consecutive nonmissing values in a field.
@@ -58,7 +58,7 @@ void farnum(field_t *field1, field_t field2);
  * @param field1 the 1st input field, also holds the result
  * @param field2 the 2nd input field  
  */  
-void farnum2(field_t *field1, field_t field2);
+void farnum2(field_type *field1, field_type field2);
 
 /**
  * Counts the number of values in series of at least n consecutive
@@ -76,7 +76,7 @@ void farnum2(field_t *field1, field_t field2);
  * @param n      the number of consecutive values, must be an exact
  *               mathematical integer
  */  
-void farnum3(field_t *field1, field_t field2, double n);
+void farnum3(field_type *field1, field_type field2, double n);
 
 /**
  * Selects field elements according to a given mask. The result of
@@ -91,7 +91,7 @@ void farnum3(field_t *field1, field_t field2, double n);
  * @param field1  the input field, also holds the result
  * @param field2  the mask
  */  
-void farsel(field_t *field1, field_t field2);
+void farsel(field_type *field1, field_type field2);
 
 /**
  * Selects all field elements that are less than or equal to the
@@ -107,7 +107,7 @@ void farsel(field_t *field1, field_t field2);
  * @param field1 the input field, also holds the result
  * @param field2 the reference field
  */  
-void farselle(field_t *field1, field_t field2);
+void farselle(field_type *field1, field_type field2);
 
 /**
  * Selects all field elements that are less than the
@@ -123,7 +123,7 @@ void farselle(field_t *field1, field_t field2);
  * @param field1 the input field, also holds the result
  * @param field2 the reference field
  */  
-void farsellt(field_t *field1, field_t field2);
+void farsellt(field_type *field1, field_type field2);
 
 /**
  * Selects all field elements that are greater than or equal to
@@ -139,7 +139,7 @@ void farsellt(field_t *field1, field_t field2);
  * @param field1 the input field, also holds the result
  * @param field2 the reference field
  */  
-void farselge(field_t *field1, field_t field2);
+void farselge(field_type *field1, field_type field2);
 
 /**
  * Selects all field elements that are greater than the
@@ -155,7 +155,7 @@ void farselge(field_t *field1, field_t field2);
  * @param field1 the input field, also holds the result
  * @param field2 the reference field
  */  
-void farselgt(field_t *field1, field_t field2);
+void farselgt(field_type *field1, field_type field2);
 
 /**
  * Selects all field elements that are equal to the
@@ -171,7 +171,7 @@ void farselgt(field_t *field1, field_t field2);
  * @param field1 the input field, also holds the result
  * @param field2 the reference field
  */  
-void farseleq(field_t *field1, field_t field2);
+void farseleq(field_type *field1, field_type field2);
 
 /**
  * Selects all field elements that are not equal to the
@@ -187,7 +187,7 @@ void farseleq(field_t *field1, field_t field2);
  * @param field1 the input field, also holds the result
  * @param field2 the reference field
  */  
-void farselne(field_t *field1, field_t field2);
+void farselne(field_type *field1, field_type field2);
 
 /**
  * Selects all field elements that are less than or equal to a
@@ -203,7 +203,7 @@ void farselne(field_t *field1, field_t field2);
  * @param field the input field, also holds the result
  * @param c     the reference value
  */  
-void farsellec(field_t *field, double c);
+void farsellec(field_type *field, double c);
 
 /**
  * Selects all field elements that are less a
@@ -219,7 +219,7 @@ void farsellec(field_t *field, double c);
  * @param field the input field, also holds the result
  * @param c     the reference value
  */  
-void farselltc(field_t *field, double c);
+void farselltc(field_type *field, double c);
 
 /**
  * Selects all field elements that are greater than or equal to a
@@ -235,7 +235,7 @@ void farselltc(field_t *field, double c);
  * @param field the input field, also holds the result
  * @param c     the reference value
  */  
-void farselgec(field_t *field, double c);
+void farselgec(field_type *field, double c);
 
 /**
  * Selects all field elements that are greater than a
@@ -251,7 +251,7 @@ void farselgec(field_t *field, double c);
  * @param field the input field, also holds the result
  * @param c     the reference value
  */  
-void farselgtc(field_t *field, double c);
+void farselgtc(field_type *field, double c);
 
 /**
  * Selects all field elements that are equal to a
@@ -267,7 +267,7 @@ void farselgtc(field_t *field, double c);
  * @param field the input field, also holds the result
  * @param c     the reference value
  */  
-void farseleqc(field_t *field, double c);
+void farseleqc(field_type *field, double c);
 
 /**
  * Selects all field elements that are not equal to a
@@ -283,7 +283,7 @@ void farseleqc(field_t *field, double c);
  * @param field the input field, also holds the result
  * @param c     the reference value
  */  
-void farselnec(field_t *field, double c);
+void farselnec(field_type *field, double c);
 
 /**
  * reset the fields real values to the missval for all levels
@@ -295,7 +295,7 @@ void farselnec(field_t *field, double c);
  * @param yvals     list of latitudes
  * @param onlyNorth boolean for processing only the norther hemisphere
  */
-void updateHist(field_t *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth);
+void updateHist(field_type *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth);
 
 /*
  * Compute the Gsl and its starting day
@@ -306,20 +306,20 @@ void updateHist(field_t *field[2], int nlevels, int gridsize, double *yvals, int
  * @param int ysize = number of gridpoints in lat-direction
  * @param double missval
  * @param int ovdate = the last year, which has been fully processed
- * @param field_t *startDate
- * @param field_t *endDate
- * @param field_t *startDateWithHist[2]
- * @param field_t *endDateWithHist[2]
- * @param field_t *gslDuration
- * @param field_t *gslFirstDay
+ * @param field_type *startDate
+ * @param field_type *endDate
+ * @param field_type *startDateWithHist[2]
+ * @param field_type *endDateWithHist[2]
+ * @param field_type *gslDuration
+ * @param field_type *gslFirstDay
  * @param int useCurrentYear = if TRUE, only measurements of the current year
  *                             (index 0) are used for computation, i.e. that
  *                             gsl can only be computed for the northern
  *                             hemisphere (see definition of GSL: EcaGsl()
  */
 void computeGsl(int nlevels, int gridsize, double *yvals, double missval, 
-                field_t *startDateWithHist[2], field_t *endDateWithHist[2],
-                field_t *gslDuration, field_t *gslFirstDay,
+                field_type *startDateWithHist[2], field_type *endDateWithHist[2],
+                field_type *gslDuration, field_type *gslFirstDay,
                 int useCurrentYear);
 
 /*
@@ -329,13 +329,13 @@ void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
  * for southern hemisphere
  */
 void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int ovdate,
-                   field_t *startDateWithHist[2], field_t *endDateWithHist[2]);
+                   field_type *startDateWithHist[2], field_type *endDateWithHist[2]);
 /*
  * Write GSL related fields to an output stream
  */
 void writeGslStream(int ostreamID, int otaxisID, int otsID, 
                     int ovarID1, int ovarID2, int ivlistID1,
                     int first_var_id,
-                    field_t *gslDuration, field_t *gslFirstDay,
+                    field_type *gslDuration, field_type *gslFirstDay,
                     int vdate, int vtime,  int nlevels);
 #endif /*ECAUTIL_H_*/

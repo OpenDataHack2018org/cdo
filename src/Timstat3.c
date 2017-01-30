@@ -46,8 +46,8 @@ void *Timstat3(void *argument)
   double missval, missval1, missval2;
   double fractil_1, fractil_2, statistic;
   int ***iwork[NIWORK];
-  field_t **fwork[NFWORK];
-  field_t in[NIN], out[NOUT];
+  field_type **fwork[NFWORK];
+  field_type in[NIN], out[NOUT];
   int reached_eof[NIN];
   int n_in = NIN;
 
@@ -117,7 +117,7 @@ void *Timstat3(void *argument)
     }
 				 
   for ( int iw = 0; iw < NFWORK; ++iw )
-    fwork[iw] = (field_t **) Malloc(nvars*sizeof(field_t *));
+    fwork[iw] = (field_type **) Malloc(nvars*sizeof(field_type *));
   for ( int iw = 0; iw < NIWORK; ++iw )
     iwork[iw] = (int ***) Malloc(nvars*sizeof(int **));
 
@@ -130,7 +130,7 @@ void *Timstat3(void *argument)
       // missval2 = vlistInqVarMissval(vlistID[1], varID); 
 
       for ( int iw = 0; iw < NFWORK; ++iw )
-	fwork[iw][varID] = (field_t*) Malloc(nlevs*sizeof(field_t));
+	fwork[iw][varID] = (field_type*) Malloc(nlevs*sizeof(field_type));
       for ( int iw = 0; iw < NIWORK; ++iw )
 	iwork[iw][varID] = (int **) Malloc(nlevs*sizeof(int *));  
 

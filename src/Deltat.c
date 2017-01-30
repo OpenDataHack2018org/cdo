@@ -48,7 +48,7 @@ void *Deltat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  field_t **vars = field_malloc(vlistID1, FIELD_PTR);
+  field_type **vars = field_malloc(vlistID1, FIELD_PTR);
   
   int gridsizemax = vlistGridsizeMax(vlistID1);
   double *array1 = (double*) Malloc(gridsizemax*sizeof(double));

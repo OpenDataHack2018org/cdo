@@ -172,7 +172,7 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weigh
 
 } /* store_link_bilin */
 
-void yar_remap_bil(field_t *field1, field_t *field2)
+void yar_remap_bil(field_type *field1, field_type *field2)
 {
   int nlonIn, nlatIn;
   int nlonOut, nlatOut;
@@ -423,7 +423,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 }
 
 
-void yar_remap_con(field_t *field1, field_t *field2)
+void yar_remap_con(field_type *field1, field_type *field2)
 {
   int nlonIn, nlatIn;
   int nlonOut, nlatOut;
@@ -766,7 +766,7 @@ void *YAR(void *argument)
 
   operatorInputArg("grid description file or name");
 
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
 

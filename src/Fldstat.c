@@ -90,7 +90,7 @@ void *Fldstat(void *argument)
   int varID, levelID;
   int nmiss;
   double sglval;
-  field_t field;
+  field_type field;
 
   cdoInitialize(argument);
 

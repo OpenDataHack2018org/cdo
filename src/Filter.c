@@ -130,7 +130,7 @@ void *Filter(void *argument)
   bool use_fftw = false;
   double fmin = 0, fmax = 0;
   double fdata = 0;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
   typedef struct
   {
@@ -185,7 +185,7 @@ void *Filter(void *argument)
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-          vars   = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
+          vars   = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
         }
                        
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);

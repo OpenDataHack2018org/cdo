@@ -67,8 +67,8 @@ void *Ymonstat(void *argument)
   int vdates[NMONTH], vtimes[NMONTH];
   int mon[NMONTH];
   int nmon = 0;
-  field_t **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
-  field_t field;
+  field_type **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
+  field_type field;
 
   cdoInitialize(argument);
 

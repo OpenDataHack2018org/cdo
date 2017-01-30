@@ -43,7 +43,7 @@ static double windchillTemperature(double t, double ff, double missval)
 }
 
 
-static void farexpr(field_t *field1, field_t field2, double (*expression)(double, double, double))
+static void farexpr(field_type *field1, field_type field2, double (*expression)(double, double, double))
 {
   int   i, len;
   const int     grid1    = field1->grid;
@@ -102,7 +102,7 @@ void *Wct(void *argument)
   
   int gridsize = vlistGridsizeMax(vlistID1);
   
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));

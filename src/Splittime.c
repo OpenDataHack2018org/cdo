@@ -68,7 +68,7 @@ void *Splittime(void *argument)
   char filesuffix[32];
   char filename[8192];
   double *array = NULL;
-  field_t **vars = NULL;
+  field_type **vars = NULL;
   const char *format = NULL;
 
   cdoInitialize(argument);
@@ -130,7 +130,7 @@ void *Splittime(void *argument)
 
   if ( nconst )
     {
-      vars = (field_t **) Malloc(nvars*sizeof(field_t *));
+      vars = (field_type **) Malloc(nvars*sizeof(field_type *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -140,7 +140,7 @@ void *Splittime(void *argument)
 	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      gridsize = gridInqSize(gridID);
 		  
-	      vars[varID] = (field_t*) Malloc(nlevel*sizeof(field_t));
+	      vars[varID] = (field_type*) Malloc(nlevel*sizeof(field_type));
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{

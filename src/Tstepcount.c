@@ -62,7 +62,7 @@ void *Tstepcount(void *argument)
   int vdate = 0, vtime = 0;
   double missval;
   double refval = 0;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
   typedef struct
   {
     double *array1;
@@ -99,7 +99,7 @@ void *Tstepcount(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars  = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
+	  vars  = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
 	}
 
       vdate = taxisInqVdate(taxisID1);

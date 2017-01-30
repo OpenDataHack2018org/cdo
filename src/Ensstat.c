@@ -94,7 +94,7 @@ void *Ensstat(void *argument)
 
   ens_file_t *ef = (ens_file_t *) Malloc(nfiles*sizeof(ens_file_t));
 
-  field_t *field = (field_t *) Malloc(ompNumThreads*sizeof(field_t));
+  field_type *field = (field_type *) Malloc(ompNumThreads*sizeof(field_type));
   for ( int i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);

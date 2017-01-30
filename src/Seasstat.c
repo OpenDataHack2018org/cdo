@@ -100,13 +100,13 @@ void *Seasstat(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  field_t **samp1 = field_malloc(vlistID1, FIELD_NONE);
-  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
-  field_t **vars2 = NULL;
+  field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
+  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_type **vars2 = NULL;
   if ( lvarstd ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID    = 0;

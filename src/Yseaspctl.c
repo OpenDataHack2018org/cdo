@@ -53,7 +53,7 @@ void *Yseaspctl(void *argument)
   int nlevels;
   long nsets[NSEAS];
   date_time_t datetime1[NSEAS], datetime2[NSEAS];
-  field_t **vars1[NSEAS];
+  field_type **vars1[NSEAS];
   HISTOGRAM_SET *hsets[NSEAS];
 
   cdoInitialize(argument);
@@ -107,7 +107,7 @@ void *Yseaspctl(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 

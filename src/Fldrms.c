@@ -87,7 +87,7 @@ void *Fldrms(void *argument)
 
   streamDefVlist(streamID3, vlistID3);
 
-  field_t field1, field2, field3;
+  field_type field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field3);

@@ -20,7 +20,7 @@
 #include <cdi.h>
 
 
-void farcfun(field_t *field, double rconst, int function)
+void farcfun(field_type *field, double rconst, int function)
 {
   if      ( function == func_add ) farcadd(field, rconst);
   else if ( function == func_sub ) farcsub(field, rconst);
@@ -30,7 +30,7 @@ void farcfun(field_t *field, double rconst, int function)
   else    cdoAbort("%s: function %d not implemented!", __func__, function);
 }
 
-void farcmul(field_t *field, double rconst)
+void farcmul(field_type *field, double rconst)
 {
   int i, len;
   int    nwpv     = field->nwpv;
@@ -62,7 +62,7 @@ void farcmul(field_t *field, double rconst)
 }
 
 
-void farcdiv(field_t *field, double rconst)
+void farcdiv(field_type *field, double rconst)
 {
   int i, len;
   int    grid     = field->grid;
@@ -88,7 +88,7 @@ void farcdiv(field_t *field, double rconst)
 }
 
 
-void farcadd(field_t *field, double rconst)
+void farcadd(field_type *field, double rconst)
 {
   int i, len;
   int    grid     = field->grid;
@@ -112,13 +112,13 @@ void farcadd(field_t *field, double rconst)
 }
 
 
-void farcsub(field_t *field, double rconst)
+void farcsub(field_type *field, double rconst)
 {
   farcadd(field, -rconst);
 }
 
 
-void farinv(field_t *field)
+void farinv(field_type *field)
 {
   int i, len;
   int    grid     = field->grid;
@@ -137,7 +137,7 @@ void farinv(field_t *field)
 }
 
 
-void farround(field_t *field)
+void farround(field_type *field)
 {
   int    grid     = field->grid;
   double missval1 = field->missval;
@@ -154,7 +154,7 @@ void farround(field_t *field)
 }
 
 
-void farmod(field_t *field, double divisor)
+void farmod(field_type *field, double divisor)
 {
   int i, len;
   int    grid     = field->grid;

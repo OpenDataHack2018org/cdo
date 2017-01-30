@@ -75,7 +75,7 @@ void *Yhourstat(void *argument)
   int nmiss;
   int nlevel;
   int vdates[MAX_HOUR], vtimes[MAX_HOUR];
-  field_t **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
+  field_type **vars1[MAX_HOUR], **vars2[MAX_HOUR], **samp1[MAX_HOUR];
 
   cdoInitialize(argument);
 
@@ -127,7 +127,7 @@ void *Yhourstat(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 

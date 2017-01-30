@@ -121,7 +121,7 @@ int main (int argc, char *argv[])
 */
 
 static
-void calc_rhopot(long gridsize, long nlevel, double *pressure, field_t to, field_t sao, field_t rho)
+void calc_rhopot(long gridsize, long nlevel, double *pressure, field_type to, field_type sao, field_type rho)
 {
   /* pressure units: hPa     */
   /* to units:       Celsius */
@@ -161,7 +161,7 @@ void *Rhopot(void *argument)
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double pin = -1;
   double *single;
-  field_t to, sao, rho;
+  field_type to, sao, rho;
 
   cdoInitialize(argument);
 

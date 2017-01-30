@@ -145,7 +145,7 @@ unsigned long day_of_year(int date)
  * @param mode   the counting mode, must be an exact mathematical
  *               integer
  */  
-static void count(field_t *field1, const field_t *field2, double mode)
+static void count(field_type *field1, const field_type *field2, double mode)
 {
   int   i, len;
   const int     grid1    = field1->grid;
@@ -229,7 +229,7 @@ static void count(field_t *field1, const field_t *field2, double mode)
  * @param field2  the reference field
  * @param compare the comparator
  */  
-static void selcomp(field_t *field1, const field_t *field2, int (*compare)(double, double))
+static void selcomp(field_type *field1, const field_type *field2, int (*compare)(double, double))
 {
   int   i, len;
   const int     grid1    = field1->grid;
@@ -280,7 +280,7 @@ static void selcomp(field_t *field1, const field_t *field2, int (*compare)(doubl
  * @param c       the refence value
  * @param compare the comparator
  */  
-static void selcompc(field_t *field, double c, int (*compare)(double, double))
+static void selcompc(field_type *field, double c, int (*compare)(double, double))
 {
   int   i, len;
   const int     grid    = field->grid;
@@ -350,25 +350,25 @@ static int ne(double a, double b)
 }
 
 
-void farnum(field_t *field1, field_t field2)
+void farnum(field_type *field1, field_type field2)
 {
   count(field1, &field2, 0.0);
 }
 
 
-void farnum2(field_t *field1, field_t field2)
+void farnum2(field_type *field1, field_type field2)
 {
   count(field1, &field2, 1.0);
 }
 
 
-void farnum3(field_t *field1, field_t field2, double n)
+void farnum3(field_type *field1, field_type field2, double n)
 {
   count(field1, &field2, n);
 }
 
 
-void farsel(field_t *field1, field_t field2)
+void farsel(field_type *field1, field_type field2)
 {
   int   i, len;
   const int     grid1    = field1->grid;
@@ -402,78 +402,78 @@ void farsel(field_t *field1, field_t field2)
 }
 
 
-void farselle(field_t *field1, field_t field2)
+void farselle(field_type *field1, field_type field2)
 {
   selcomp(field1, &field2, le);
 }
 
 
-void farsellt(field_t *field1, field_t field2)
+void farsellt(field_type *field1, field_type field2)
 {
   selcomp(field1, &field2, lt);
 }
 
 
-void farselge(field_t *field1, field_t field2)
+void farselge(field_type *field1, field_type field2)
 {
   selcomp(field1, &field2, ge);
 }
 
 
-void farselgt(field_t *field1, field_t field2)
+void farselgt(field_type *field1, field_type field2)
 {
   selcomp(field1, &field2, gt);
 }
 
 
-void farseleq(field_t *field1, field_t field2)
+void farseleq(field_type *field1, field_type field2)
 {
   selcomp(field1, &field2, eq);
 }
 
 
-void farselne(field_t *field1, field_t field2)
+void farselne(field_type *field1, field_type field2)
 {
   selcomp(field1, &field2, ne);
 }
 
 
-void farsellec(field_t *field, double c)
+void farsellec(field_type *field, double c)
 {
   selcompc(field, c, le);
 }
 
 
-void farselltc(field_t *field, double c)
+void farselltc(field_type *field, double c)
 {
   selcompc(field, c, lt);
 }
 
 
-void farselgec(field_t *field, double c)
+void farselgec(field_type *field, double c)
 {
   selcompc(field, c, ge);
 }
 
 
-void farseleqc(field_t *field, double c)
+void farseleqc(field_type *field, double c)
 {
   selcompc(field, c, eq);
 }
 
 
-void farselnec(field_t *field, double c)
+void farselnec(field_type *field, double c)
 {
   selcompc(field, c, ne);
 }
 
 
-void farselgtc(field_t *field, double c)
+void farselgtc(field_type *field, double c)
 {
   selcompc(field, c, gt);
 }
 
-void updateHist(field_t *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth)
+void updateHist(field_type *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth)
 {
   int levelID,i;
 
@@ -489,7 +489,7 @@ void updateHist(field_t *field[2], int nlevels, int gridsize, double *yvals, int
 }
 
 void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int ovdate,
-                field_t *startDateWithHist[2], field_t *endDateWithHist[2])
+                field_type *startDateWithHist[2], field_type *endDateWithHist[2])
 {
   int levelID, i, ovdateSouth;
 
@@ -526,8 +526,8 @@ void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int
 }
 
 void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
-                field_t *startDateWithHist[2], field_t *endDateWithHist[2],
-                field_t *gslDuration, field_t *gslFirstDay,
+                field_type *startDateWithHist[2], field_type *endDateWithHist[2],
+                field_type *gslDuration, field_type *gslFirstDay,
                 int useCurrentYear)
 {
   int levelID, i;
@@ -609,7 +609,7 @@ void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
 void writeGslStream(int ostreamID, int otaxisID, int otsID,
                     int ovarID1, int ovarID2, int ivlistID1,
                     int first_var_id,
-                    field_t *gslDuration, field_t *gslFirstDay,
+                    field_type *gslDuration, field_type *gslFirstDay,
                     int vdate, int vtime, int nlevels)
 {
   (void)ivlistID1;

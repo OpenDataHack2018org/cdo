@@ -837,7 +837,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
         }
       else if ( functype == FT_FLD )
         {
-          field_t field;
+          field_type field;
           double *weights = NULL;
           //if ( funcflag == 1 ) weights = fld_weights(p1->param.gridID, ngp);
           if ( funcflag == 1 )
@@ -846,7 +846,7 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
               assert(weights!=NULL);
             }
           
-          double (*exprfunc)(field_t) = (double (*)(field_t)) fun_sym_tbl[funcID].func;
+          double (*exprfunc)(field_type) = (double (*)(field_type)) fun_sym_tbl[funcID].func;
           for ( size_t k = 0; k < nlev; k++ )
             {
               fld_field_init(&field, nmiss, missval, ngp, p1data+k*ngp, weights);
@@ -856,11 +856,11 @@ nodeType *ex_fun_var(int init, int funcID, nodeType *p1)
         }
       else if ( functype == FT_VERT )
         {
-          field_t field;
+          field_type field;
           double *weights = NULL;
           if ( funcflag == 1 ) weights = vert_weights(p1->param.zaxisID, nlev);
           double *array = (double*) Malloc(nlev*sizeof(double));
-          double (*exprfunc)(field_t) = (double (*)(field_t)) fun_sym_tbl[funcID].func;
+          double (*exprfunc)(field_type) = (double (*)(field_type)) fun_sym_tbl[funcID].func;
           for ( size_t i = 0; i < ngp; i++ )
             {
               for ( size_t k = 0; k < nlev; k++ ) array[k] = p1data[k*ngp+i];

@@ -62,7 +62,7 @@ void *Ydayarith(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));
