@@ -129,10 +129,7 @@ void faradd(field_t *field1, field_t field2)
         }
       else
         {
-          //#if defined(_OPENMP)
-          //#pragma omp parallel for default(none) shared(a,b)
-          //#endif
-          for ( int i = 0; i < len; i++ ) array1[i] += array2[i];
+          int fpeRaised = array_add_array(len, array1, array2);
         }
     }
 }
@@ -184,7 +181,7 @@ void farsum(field_t *field1, field_t field2)
         }
       else
         {
-          for ( int i = 0; i < len; i++ ) array1[i] += array2[i];
+          array_add_array(len, array1, array2);
         }
     }
 }

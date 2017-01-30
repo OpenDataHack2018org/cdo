@@ -350,6 +350,7 @@ void *Info(void *argument)
 	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
 		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
 		{
+                  //fpeRaised = array_minmaxmean_val(gridsize, array, NULL, NULL, NULL);
 		  fprintf(stdout, "            %#12.5g            ", array[0]);
 		}
 	      else
@@ -377,16 +378,16 @@ void *Info(void *argument)
                           fpeRaised = 0;
 			  imiss = gridsize - ivals;
 			  nvals = ivals;
+                          if ( nvals ) arrmean /= nvals;
 			}
 		      else
 			{
-                          fpeRaised = array_minmaxmean_val(array, gridsize, &arrmin, &arrmax, &arrmean);
+                          fpeRaised = array_minmaxmean_val(gridsize, array, &arrmin, &arrmax, &arrmean);
 			  nvals = gridsize;
 			}
 
 		      if ( nvals )
 			{
-			  arrmean = arrmean/nvals;
 			  // arrvar  = arrvar/nvals - arrmean*arrmean;
 			  fprintf(stdout, "%#12.5g%#12.5g%#12.5g", arrmin, arrmean, arrmax);
 			}

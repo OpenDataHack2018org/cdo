@@ -277,6 +277,7 @@ double fldmean(field_t field)
   const double *restrict array = field.ptr;
   const double *restrict w     = field.weight;
   double rsum = 0, rsumw = 0;
+  double ravg = 0;
 
   assert(array!=NULL);
   assert(w!=NULL);
@@ -289,17 +290,12 @@ double fldmean(field_t field)
 	    rsum  += w[i] * array[i];
 	    rsumw += w[i];
 	  }
+      ravg = DIVMN(rsum, rsumw);
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ ) 
-	{
-	  rsum  += w[i] * array[i];
-	  rsumw += w[i];
-	}
+      int fpeRaised = array_mean_val_weighted(len, array, w, missval1, &ravg);
     }
-
-  double ravg = DIVMN(rsum, rsumw);
 
   return ravg;
 }

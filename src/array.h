@@ -3,7 +3,11 @@
 
 const char *fpe_errstr(int fpeRaised);
 
-int array_minmaxmean_val(const double *array, size_t len, double *rmin, double *rmax, double *rmean);
+int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *rmax, double *rmean);
+
+int array_mean_val_weighted(size_t len, const double *restrict array, const double *restrict w, double missval, double *rmean);
+
+int array_add_array(size_t len, double *restrict array1, const double *restrict array2);
 
 #endif // _ARRAY_H
 

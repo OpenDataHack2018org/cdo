@@ -79,6 +79,7 @@ static inline
 double FSQRTMN(double x, double missval1) { return MSQRTMN(x);}
 
 typedef struct {
+  int      fpeRaised;
   int      nwpv; // number of words per value; real:1  complex:2
   int      memtype;
   int      grid;
