@@ -809,6 +809,8 @@ while (<MOFILE>) {
 	  ($kopt, $value) = split(/\s*=\s*/, $line, 2);
 	  printf HELPFILE ("    \"    %-*s  ", $maxlen, $value);
 	  $value =~ s/_/\\_/g;
+	  $value =~ s/</\$<\$/g;
+	  $value =~ s/>/\$>\$/g;
 	  print TRFILE "\\item[\\textsl{$value}\\ \\ \\hfill]\n";
 	  $lines = 1;
 	} else {
