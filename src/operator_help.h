@@ -5046,7 +5046,7 @@ static const char *CMORHelp[] = {
     "    ",
     "    A comma separated list of \"key=value\" pairs with optional parameters can be specified.",
     "    These optional parameters can be set to overwrite all entries of a parameter",
-    "    table defined by the {\\texttt __info} command line parameter.",
+    "    table defined by the __info command line parameter.",
     "    Entries with two leading underscores are used for cdo/cmor internal purposes.",
     "    CMOR itself uses entries with one leading underscore internally. The remaining k-v pairs are",
     "    used as attributes. Unknown (to CMOR) keys are simply copied as global attributes.",

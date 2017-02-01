@@ -1221,6 +1221,7 @@ sub print_description {
 	  $line =~ s/\@boldtt\{([^}]*)\}/\\textbf{\\texttt{\1}}/og;
 	  $line =~ s/\@bold\{([^}]*)\}/\\textbf{\1}/og;
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
+	  $line =~ s/ CDO / {\\CDO} /og;
 	  $line =~ s/</\$<\$/og;
 	  $line =~ s/>/\$>\$/og;
 	  $line =~ s/\\exp/\\^\\/og;

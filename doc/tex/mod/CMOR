@@ -7,10 +7,10 @@
 
 @BeginDescription
 
-@C The CDO operator cmor reads the data with the internal IO library CDI
+@C The CDO operator @bold{cmor} reads the data with the internal IO library CDI
 @C and writes the NetCDF result directly with the CMOR library.
 
-The CDO operator cmor selects variables from @file{infile}
+The CDO operator @bold{cmor} selects variables from @file{infile}
 and writes them directly with the CMOR library.
 Each output file contains a single output variable with there coordinates and metadata.
 Much of the metadata written to the output files is defined in the table file.
@@ -18,9 +18,9 @@ The name of the output files are derived from the metadata.
 The supported format of the table file is CMOR3/json.
 These tables are typically made available from MIP web sites.
 
-A comma separated list of "key=value" pairs with optional parameters can be specified.
+A comma separated list of "@var{key=value}" pairs with optional parameters can be specified.
 These optional parameters can be set to overwrite all entries of a parameter
-table defined by the {\texttt __info} command line parameter.
+table defined by the @var{__info} command line parameter.
 Entries with two leading underscores are used for cdo/cmor internal purposes.
 CMOR itself uses entries with one leading underscore internally. The remaining k-v pairs are
 used as attributes. Unknown (to CMOR) keys are simply copied as global attributes.
