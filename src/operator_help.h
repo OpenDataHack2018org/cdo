@@ -5026,46 +5026,6 @@ static const char *CMORliteHelp[] = {
     NULL
 };
 
-static const char *CMORHelp[] = {
-    "NAME",
-    "    cmor - CMOR",
-    "",
-    "SYNOPSIS",
-    "    cmor,table[,options]  infile",
-    "",
-    "DESCRIPTION",
-    "    ",
-    "    ",
-    "    The CDO operator cmor selects variables from infile",
-    "    and writes them directly with the CMOR library.",
-    "    Each output file contains a single output variable with there coordinates and metadata.",
-    "    Much of the metadata written to the output files is defined in the table file.",
-    "    The name of the output files are derived from the metadata.",
-    "    The supported format of the table file is CMOR3/json.",
-    "    These tables are typically made available from MIP web sites.",
-    "    ",
-    "    A comma separated list of \"key=value\" pairs with optional parameters can be specified.",
-    "    These optional parameters can be set to overwrite all entries of a parameter",
-    "    table defined by the __info command line parameter.",
-    "    Entries with two leading underscores are used for cdo/cmor internal purposes.",
-    "    CMOR itself uses entries with one leading underscore internally. The remaining k-v pairs are",
-    "    used as attributes. Unknown (to CMOR) keys are simply copied as global attributes.",
-    "",
-    "PARAMETER",
-    "    table                    STRING   Name of the MIP table as specified from PCMDI",
-    "    __var                    STRING   Comma separated list of variables. Default is to process all variables.",
-    "    __info                   STRING   Configuration file name",
-    "    __grid_table             STRING   Name of the MIP grid definition table as specified from PCMDI",
-    "    __rename_<axis name>     STRING   Rename z-axis to match the grid_table",
-    "    __inpath                 STRING   All remaining parameters are for cmor_setup().",
-    "    __chunk                  STRING   netcdf_file_action parameter of cmor_setup()",
-    "    __set_verbosity          STRING",
-    "    __exit_control           STRING",
-    "    __logfile                STRING",
-    "    __create_subdirectories  INTEGER",
-    NULL
-};
-
 static const char *MagplotHelp[] = {
     "NAME",
     "    contour, shaded, grfill - Lat/Lon plot",

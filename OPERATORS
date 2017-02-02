@@ -550,10 +550,6 @@ Operator catalog:
    Hurr          hurr            Hurricane days index per time period
    CMORlite      cmorlite        CMOR lite
 -------------------------------------------------------------
-   CMOR
--------------------------------------------------------------
-   CMOR          cmor            CMOR
--------------------------------------------------------------
    Magics
 -------------------------------------------------------------
    Magplot       contour         Contour plot
