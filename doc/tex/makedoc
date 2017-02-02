@@ -818,6 +818,7 @@ while (<MOFILE>) {
 	  $hline = $line;
 	  $hline =~ s/\\%/%/g;
 	  $hline =~ s/\@celsius/°C/og;
+	  $hline =~ s/\@href\{([^}]*)\}\{([^}]*)\}/\2/g;
 	  if ( $lines > 1 )  {
 	    printf HELPFILE ("    \"    %-*s  ", $maxlen, " ");
 	  }
@@ -826,8 +827,10 @@ while (<MOFILE>) {
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\textsf{\\small INTEGER}}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\textsf{\\small STRING}}/;
 	  $line =~ s/_/\\_/g;
+          $line =~ s/</\$<\$/og;
           $line =~ s/>/\$>\$/og;
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
+	  $line =~ s/\@href\{([^}]*)\}\{([^}]*)\}/\\href{\1}{\\texttt \2}/g;
 	  print TRFILE "$line\n";
 	  $lines = $lines + 1;
 	}
