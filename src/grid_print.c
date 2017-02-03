@@ -1,5 +1,3 @@
-#define TEST_NEWFORMAT 1
-
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -93,9 +91,7 @@ void grid_print_attributes(FILE *fp, int gridID)
   char attname[CDI_MAX_NAME+1];
   void *attBuf = NULL;
   size_t attBufSize = 0;
-#ifdef TEST_NEWFORMAT
   char fltstr[128];
-#endif
 
   int natts;
   cdiInqNatts(cdiID, varID, &natts);
@@ -114,11 +110,7 @@ void grid_print_attributes(FILE *fp, int gridID)
           char *atttxt = (char *)resizeBuffer(&attBuf, &attBufSize, attSize);
           cdiInqAttTxt(cdiID, varID, attname, attlen, atttxt);
           atttxt[attlen] = 0;
-#ifdef TEST_NEWFORMAT
           fprintf(fp, "%s = \"%s\"\n", attname, atttxt);
-#else
-          fprintf(fp, "ATTR_TXT: %s = \"%s\"\n", attname, atttxt);
-#endif
         }
       else if ( atttype == CDI_DATATYPE_INT8  || atttype == CDI_DATATYPE_UINT8  ||
                 atttype == CDI_DATATYPE_INT16 || atttype == CDI_DATATYPE_UINT16 ||
@@ -127,16 +119,8 @@ void grid_print_attributes(FILE *fp, int gridID)
           size_t attSize = (size_t)attlen*sizeof(int);
           int *attint = (int *)resizeBuffer(&attBuf, &attBufSize, attSize);
           cdiInqAttInt(cdiID, varID, attname, attlen, &attint[0]);
-#ifdef TEST_NEWFORMAT
           fprintf(fp, "%s =", attname);
           for ( int i = 0; i < attlen; ++i ) fprintf(fp, " %d", attint[i]);
-#else
-          if ( attlen == 1 )
-            fprintf(fp, "ATTR_INT: %s =", attname);
-          else
-            fprintf(fp, "ATTR_INT_%d: %s =", attlen, attname);
-          for ( int i = 0; i < attlen; ++i ) fprintf(fp, " %d", attint[i]);
-#endif
           fprintf(fp, "\n");
         }
       else if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
@@ -144,20 +128,11 @@ void grid_print_attributes(FILE *fp, int gridID)
           size_t attSize = (size_t)attlen * sizeof(double);
           double *attflt = (double *)resizeBuffer(&attBuf, &attBufSize, attSize);
           cdiInqAttFlt(cdiID, varID, attname, attlen, attflt);
-#ifdef TEST_NEWFORMAT
           fprintf(fp, "%s =", attname);
           if ( atttype == CDI_DATATYPE_FLT32 )
             for ( int i = 0; i < attlen; ++i ) fprintf(fp, " %sf", double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr), attflt[i]));
           else
             for ( int i = 0; i < attlen; ++i ) fprintf(fp, " %s", double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr), attflt[i]));
-#else
-          int dig = (atttype == CDI_DATATYPE_FLT64) ? 15 : 7;
-          if ( attlen == 1 )
-            fprintf(fp, "ATTR_FLT: %s =", attname);
-          else
-            fprintf(fp, "ATTR_FLT_%d: %s =", attlen, attname);
-          for ( int i = 0; i < attlen; ++i ) fprintf(fp, " %.*g", dig, attflt[i]);
-#endif
           fprintf(fp, "\n");
         }
     }
@@ -202,17 +177,9 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
           attstr2[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XDIMNAME, CDI_MAX_NAME, attstr2);
           if ( attstr2[0] && strcmp(attstr, attstr2) )  fprintf(fp, "xdimname  = %s\n", attstr2);
           attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XLONGNAME, CDI_MAX_NAME, attstr);
-#ifdef TEST_NEWFORMAT
           if ( attstr[0] )  fprintf(fp, "xlongname = \"%s\"\n", attstr);
-#else
-          if ( attstr[0] )  fprintf(fp, "xlongname = %s\n", attstr);
-#endif
           attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XUNITS, CDI_MAX_NAME, attstr);
-#ifdef TEST_NEWFORMAT
           if ( attstr[0] )  fprintf(fp, "xunits    = \"%s\"\n", attstr);
-#else
-          if ( attstr[0] )  fprintf(fp, "xunits    = %s\n", attstr);
-#endif
         }
 
       if ( nyvals > 0 )
@@ -222,17 +189,9 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
           attstr2[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_YDIMNAME, CDI_MAX_NAME, attstr2);
           if ( attstr2[0] && strcmp(attstr, attstr2) )  fprintf(fp, "ydimname  = %s\n", attstr2);
           attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_YLONGNAME, CDI_MAX_NAME, attstr);
-#ifdef TEST_NEWFORMAT
           if ( attstr[0] )  fprintf(fp, "ylongname = \"%s\"\n", attstr);
-#else
-          if ( attstr[0] )  fprintf(fp, "ylongname = %s\n", attstr);
-#endif
           attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_YUNITS, CDI_MAX_NAME, attstr);
-#ifdef TEST_NEWFORMAT
           if ( attstr[0] )  fprintf(fp, "yunits    = \"%s\"\n", attstr);
-#else
-          if ( attstr[0] )  fprintf(fp, "yunits    = %s\n", attstr);
-#endif
         }
 
       if ( type == GRID_UNSTRUCTURED || type == GRID_CURVILINEAR )
@@ -454,6 +413,17 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
       printMask(fp, prefix, sizeof(prefix)-1, (size_t)(gridsize > 0 ? gridsize : 0), mask);
       if ( mask ) Free(mask);
     }
+  /*
+  int projID = gridInqProj(gridID);
+  if ( projID != CDI_UNDEFID && gridInqType(projID) == GRID_PROJECTION )
+    {
+      attstr[0] = 0; cdiGridInqKeyStr(projID, CDI_KEY_MAPPING, CDI_MAX_NAME, attstr);
+      if ( attstr[0] ) fprintf(fp, "grid_mapping = %s\n", attstr);
+      attstr[0] = 0; cdiGridInqKeyStr(projID, CDI_KEY_MAPNAME, CDI_MAX_NAME, attstr);
+      if ( attstr[0] ) fprintf(fp, "grid_mapping_name = %s\n", attstr);
+      grid_print_attributes(fp, projID);
+    }
+  */
 }
 
 
