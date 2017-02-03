@@ -1174,7 +1174,7 @@ static const char *ShiftxyHelp[] = {
     "",
     "DESCRIPTION",
     "    This module contains operators to shift all fields in x or y direction.",
-    "    All fields need to have the same horizontal rectilinear grid.",
+    "    All fields need to have the same horizontal rectilinear or curvilinear grid.",
     "",
     "OPERATORS",
     "    shiftx  Shift x",

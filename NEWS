@@ -11,7 +11,7 @@ Version 1.8.0 (26 October 2016):
    New operators:
      * timcumsum: Cumulative sum over time.
      * cmorlite: Apply variable_entry of cmor tables
-     * shiftx/shifty: Shift fields on rectangular grid in x/y direction
+     * shiftx/shifty: Shift fields on rectilinear/curvilinear grids in x/y direction
    Changed operators:
      * Tim<STAT> (e.g. monmean): 
    Fixed bugs:
