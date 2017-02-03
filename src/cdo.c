@@ -1071,6 +1071,7 @@ int parse_options_long(int argc, char *argv[])
   int lprintoperators = 0;
   int lenableexcept;
   int ltimestat_date;
+  int ltimestat_bounds;
 
   struct cdo_option opt_long[] =
     {
@@ -1085,6 +1086,7 @@ int parse_options_long(int argc, char *argv[])
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "enableexcept",      required_argument,      &lenableexcept,  1  },
       { "timestat_date",     required_argument,     &ltimestat_date,  1  },
+      { "timestat_bounds",         no_argument,   &ltimestat_bounds,  1  },
       { "cmor",                    no_argument,      &CDO_CMOR_Mode,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "float",                   no_argument,        &CDO_Memtype,  MEMTYPE_FLOAT  },
@@ -1119,6 +1121,7 @@ int parse_options_long(int argc, char *argv[])
       lremap_genweights = 0;
       lenableexcept = 0;
       ltimestat_date = 0;
+      ltimestat_bounds = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1172,6 +1175,11 @@ int parse_options_long(int argc, char *argv[])
               if ( timestatdate < 0 ) cdoAbort("option --%s: unsupported argument: %s", "timestat_date", CDO_optarg);
               extern int CDO_Timestat_Date;
               CDO_Timestat_Date = timestatdate;
+            }
+          else if ( ltimestat_bounds )
+            {
+              extern bool CDO_Timestat_Bounds;
+              CDO_Timestat_Bounds = true;
             }
           else if ( luse_fftw )
             {
