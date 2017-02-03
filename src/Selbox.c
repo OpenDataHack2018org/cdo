@@ -50,40 +50,11 @@ void correct_xvals(long nlon, long inc, double *xvals)
 }
 
 static
-int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+void gengridxyvals(int gridtype, int gridID1, int gridID2, int nlon, int nlat, int nlon2, int nlat2,
+                   int lat1, int lat2, int lon11, int lon12, int lon21, int lon22, const char *xunits)
 {
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
-  double *xbounds1 = NULL, *ybounds1 = NULL;
-  double *xbounds2 = NULL, *ybounds2 = NULL;
-
-  int nlon = gridInqXsize(gridID1);
-  int nlat = gridInqYsize(gridID1);
-
-  int nlon21 = lon12 - lon11 + 1;
-  int nlon22 = lon22 - lon21 + 1;
-  int nlon2 = nlon21 + nlon22;
-  int nlat2 = lat2 - lat1 + 1;
-
-  int gridtype = gridInqType(gridID1);
-  int prec     = gridInqPrec(gridID1);
-
-  int gridID2 = gridCreate(gridtype, nlon2*nlat2);
-  gridDefXsize(gridID2, nlon2);
-  gridDefYsize(gridID2, nlat2);
-
-  gridDefNP(gridID2, gridInqNP(gridID1));
-
-  gridDefPrec(gridID2, prec);
-
-  grid_copy_attributes(gridID1, gridID2);
-
-  if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridID1, gridID2);
-
-  char xunits[CDI_MAX_NAME]; xunits[0] = 0;
-  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
-  cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
-  cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
 
   int lxvals = gridInqXvals(gridID1, NULL);
   int lyvals = gridInqYvals(gridID1, NULL);
@@ -135,7 +106,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 	{
 	  for ( int i = lon21; i <= lon22; i++ ) *pxvals2++ = xvals1[i];
 	  for ( int i = lon11; i <= lon12; i++ ) *pxvals2++ = xvals1[i];
-	  if ( strncmp(xunits, "degree", 6) == 0 ) correct_xvals(nlon2, 1, xvals2);
+	  if ( xunits && strncmp(xunits, "degree", 6) == 0 ) correct_xvals(nlon2, 1, xvals2);
 	}
       
       if ( lyvals ) for ( int i = lat1;  i <= lat2;  i++ ) *pyvals2++ = yvals1[i];
@@ -151,9 +122,47 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   if ( yvals1 ) Free(yvals1);
   if ( xvals2 ) Free(xvals2);
   if ( yvals2 ) Free(yvals2);
+}
+
+static
+int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+{
+  int nlon = gridInqXsize(gridID1);
+  int nlat = gridInqYsize(gridID1);
+
+  int nlon21 = lon12 - lon11 + 1;
+  int nlon22 = lon22 - lon21 + 1;
+  int nlon2 = nlon21 + nlon22;
+  int nlat2 = lat2 - lat1 + 1;
+
+  int gridtype = gridInqType(gridID1);
+  int prec     = gridInqPrec(gridID1);
+
+  int gridID2 = gridCreate(gridtype, nlon2*nlat2);
+  gridDefXsize(gridID2, nlon2);
+  gridDefYsize(gridID2, nlat2);
+
+  gridDefNP(gridID2, gridInqNP(gridID1));
+
+  gridDefPrec(gridID2, prec);
+
+  grid_copy_attributes(gridID1, gridID2);
+
+  if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridID1, gridID2);
+
+  char xunits[CDI_MAX_NAME]; xunits[0] = 0;
+  char yunits[CDI_MAX_NAME]; yunits[0] = 0;
+  cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
+  cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
+
+  gengridxyvals(gridtype, gridID1, gridID2, nlon, nlat, nlon2, nlat2,
+                lat1, lat2, lon11, lon12, lon21, lon22, xunits);
 
   if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
     {
+      double *xbounds1 = NULL, *ybounds1 = NULL;
+      double *xbounds2 = NULL, *ybounds2 = NULL;
+
       if ( gridtype == GRID_CURVILINEAR )
 	{
 	  xbounds1 = (double*) Malloc(4*nlon*nlat*sizeof(double));
@@ -215,10 +224,20 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
       Free(ybounds2);
     }
 
-  int projID = gridInqProj(gridID1);
-  if ( projID != CDI_UNDEFID && gridInqType(projID) == GRID_PROJECTION )
+  int projID1 = gridInqProj(gridID1);
+  if ( projID1 != CDI_UNDEFID && gridInqType(projID1) == GRID_PROJECTION )
     {
-      grid_copy_mapping(projID, gridID2);
+      int projID2 = gridCreate(GRID_PROJECTION, nlon2*nlat2);
+      gridDefXsize(projID2, nlon2);
+      gridDefYsize(projID2, nlat2);
+
+      grid_copy_attributes(projID1, projID2);
+      grid_copy_mapping(projID1, projID2);
+
+      gengridxyvals(GRID_PROJECTION, projID1, projID2, nlon, nlat, nlon2, nlat2,
+                    lat1, lat2, lon11, lon12, lon21, lon22, NULL);
+
+      gridDefProj(gridID2, projID2);
     }
 
   return gridID2;
