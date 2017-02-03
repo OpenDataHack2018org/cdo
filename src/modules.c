@@ -706,7 +706,7 @@ static modules_t Modules[] =
   { Setrcaname,     NULL,              SetrcanameOperators,    1,   CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       1,   CDI_BOTH,  1,  1 },
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,      1,   CDI_BOTH,  1,  1 },
-  { Shiftxy,        NULL,              ShiftxyOperators,       1,   CDI_REAL,  1,  1 },
+  { Shiftxy,        ShiftxyHelp,       ShiftxyOperators,       1,   CDI_REAL,  1,  1 },
   { Showinfo,       ShowinfoHelp,      ShowinfoOperators,      1,   CDI_BOTH,  1,  0 },
   { Sinfo,          SinfoHelp,         SinfoOperators,         1,   CDI_BOTH, -1,  0 },
   { Smooth,         SmoothHelp,        SmoothOperators,        1,   CDI_REAL,  1,  1 },

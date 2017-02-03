@@ -33,6 +33,7 @@ Setzaxis      Modification
 Setgatt       Modification
 Invert        Modification
 Invertlev     Modification
+Shiftxy       Modification
 Maskregion    Modification
 Maskbox       Modification
 Setbox        Modification

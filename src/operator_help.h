@@ -1165,6 +1165,30 @@ static const char *InvertlevHelp[] = {
     NULL
 };
 
+static const char *ShiftxyHelp[] = {
+    "NAME",
+    "    shiftx, shifty - Shift field",
+    "",
+    "SYNOPSIS",
+    "    <operator>,<nshift>,<cyclic>,<coord>  infile outfile",
+    "",
+    "DESCRIPTION",
+    "    This module contains operators to shift all fields in x or y direction.",
+    "    All fields need to have the same horizontal rectilinear grid.",
+    "",
+    "OPERATORS",
+    "    shiftx  Shift x",
+    "            Shifts all fields in x direction.",
+    "    shifty  Shift y",
+    "            Shifts all fields in y direction.",
+    "",
+    "PARAMETER",
+    "    nshift  INTEGER  Number of grid cells to shift (default: 1)",
+    "    cyclic  STRING   If set, cells are filled up cyclic (default: missing value)",
+    "    coord   STRING   If set, coordinates are also shifted",
+    NULL
+};
+
 static const char *MaskregionHelp[] = {
     "NAME",
     "    maskregion - Mask regions",

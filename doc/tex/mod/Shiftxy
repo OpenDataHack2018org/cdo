@@ -1,0 +1,56 @@
+@BeginModule
+@NewPage
+@Name      = Shiftxy
+@Title     = Shift field
+@Section   = Modification
+@Class     = Modification
+@Arguments = infile outfile
+@Operators = shiftx shifty
+
+@BeginDescription
+This module contains operators to shift all fields in x or y direction.
+All fields need to have the same horizontal rectilinear grid.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_shiftx
+@Title     = Shift x
+@Parameter = <nshift> <cyclic> <coord>
+
+@BeginDescription
+Shifts all fields in x direction.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_shifty
+@Title     = Shift y
+@Parameter = <nshift> <cyclic> <coord>
+
+@BeginDescription
+Shifts all fields in y direction.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter nshift
+@Item = nshift
+INTEGER  Number of grid cells to shift (default: 1)
+@Item = cyclic
+STRING   If set, cells are filled up cyclic (default: missing value)
+@Item = coord
+STRING   If set, coordinates are also shifted
+@EndParameter
+
+
+@BeginExample
+To shift all input fields in the x direction by +1 cells and fill the new cells with missing value, use:
+@BeginVerbatim
+   cdo shiftx infile outfile
+@EndVerbatim
+To shift all input fields in the x direction by +1 cells and fill the new cells cyclic, use:
+@BeginVerbatim
+   cdo shiftx,1,cyclic infile outfile
+@EndVerbatim
+@EndExample

@@ -157,6 +157,8 @@ Operator catalog:
    Setgatt       setgatts        Set global attributes
    Invert        invertlat       Invert latitudes
    Invertlev     invertlev       Invert levels
+   Shiftxy       shiftx          Shift x
+   Shiftxy       shifty          Shift y
    Maskregion    maskregion      Mask regions
    Maskbox       masklonlatbox   Mask a longitude/latitude box
    Maskbox       maskindexbox    Mask an index box
