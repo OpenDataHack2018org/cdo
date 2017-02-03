@@ -5,6 +5,11 @@
 
 2017-02-03  Uwe Schulzweida
 
+	* using CDI library version 1.8.0rc7
+	* Version 1.8.0rc7 release
+
+2017-02-03  Uwe Schulzweida
+
 	* Reverse: adjust date/time by -1 second (introduced in last revision)
 
 2017-01-28  Uwe Schulzweida
