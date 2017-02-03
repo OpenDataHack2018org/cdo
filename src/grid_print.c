@@ -413,17 +413,10 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
       printMask(fp, prefix, sizeof(prefix)-1, (size_t)(gridsize > 0 ? gridsize : 0), mask);
       if ( mask ) Free(mask);
     }
-  /*
+
   int projID = gridInqProj(gridID);
   if ( projID != CDI_UNDEFID && gridInqType(projID) == GRID_PROJECTION )
-    {
-      attstr[0] = 0; cdiGridInqKeyStr(projID, CDI_KEY_MAPPING, CDI_MAX_NAME, attstr);
-      if ( attstr[0] ) fprintf(fp, "grid_mapping = %s\n", attstr);
-      attstr[0] = 0; cdiGridInqKeyStr(projID, CDI_KEY_MAPNAME, CDI_MAX_NAME, attstr);
-      if ( attstr[0] ) fprintf(fp, "grid_mapping_name = %s\n", attstr);
-      grid_print_attributes(fp, projID);
-    }
-  */
+    grid_print_kernel(projID, opt, fp);
 }
 
 
