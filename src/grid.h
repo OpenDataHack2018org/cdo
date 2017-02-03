@@ -30,6 +30,7 @@ int ntr_to_nlat_linear(int ntr);
 int nlat_to_nlon(int nlat);
 
 void grid_copy_attributes(int gridID1, int gridID2);
+void grid_copy_mapping(int gridID1, int gridID2);
 
 void grid_def_param_laea(int gridID, double a, double lon0, double lat0);
 void grid_def_param_sinu(int gridID);

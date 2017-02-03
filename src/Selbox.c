@@ -78,17 +78,12 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 
   grid_copy_attributes(gridID1, gridID2);
 
+  if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridID1, gridID2);
+
   char xunits[CDI_MAX_NAME]; xunits[0] = 0;
   char yunits[CDI_MAX_NAME]; yunits[0] = 0;
   cdiGridInqKeyStr(gridID1, CDI_KEY_XUNITS, CDI_MAX_NAME, xunits);
   cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, yunits);
-
-  if ( gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL )
-    {
-      double xpole, ypole, angle;
-      gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
-      gridDefParamRLL(gridID2, xpole, ypole, angle);
-    }
 
   int lxvals = gridInqXvals(gridID1, NULL);
   int lyvals = gridInqYvals(gridID1, NULL);
@@ -218,6 +213,12 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
       Free(ybounds1);
       Free(xbounds2);
       Free(ybounds2);
+    }
+
+  int projID = gridInqProj(gridID1);
+  if ( projID != CDI_UNDEFID && gridInqType(projID) == GRID_PROJECTION )
+    {
+      grid_copy_mapping(projID, gridID2);
     }
 
   return gridID2;
@@ -733,11 +734,9 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
 static
 int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int gridID2;
-
   genindexbox(0, gridID1, lat1, lat2, lon11, lon12, lon21, lon22);
 
-  gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
+  int gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 
   return gridID2;
 }
@@ -746,10 +745,8 @@ static
 void window(int nwpv, double *array1, int gridID1, double *array2,
 	    long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  long nlon;
   long ilat, ilon;
-
-  nlon = gridInqXsize(gridID1);
+  long nlon = gridInqXsize(gridID1);
 
   if ( nwpv == 2 )
     {

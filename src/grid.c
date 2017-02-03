@@ -163,6 +163,18 @@ void grid_copy_attributes(int gridID1, int gridID2)
 }
 
 
+void grid_copy_mapping(int gridID1, int gridID2)
+{
+  char string[CDI_MAX_NAME];
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_MAPPING, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_MAPPING, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_MAPNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_MAPNAME, strlen(string)+1, string);
+
+  cdiCopyAtts(gridID1, CDI_GLOBAL, gridID2, CDI_GLOBAL);
+}
+
+
 void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description)
 {
   if ( cmpstr(units, "degree") == 0 )
