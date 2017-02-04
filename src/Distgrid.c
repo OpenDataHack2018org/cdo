@@ -27,6 +27,7 @@ static
 void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, int nyblocks,
 	      int **gridindex, int *ogridsize, int nsplit)
 {
+  double *xpvals = NULL, *ypvals = NULL;
   int gridtype = gridInqType(gridID1);
   bool lregular = true;
   if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC )
@@ -145,19 +146,27 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
             bool lxpcoord = gridInqXvals(projID1, NULL) > 0;
             if ( lxpcoord )
               {
-                gridInqXvals(projID1, xvals);
-                gridDefXvals(projID2, xvals+ix*nxvals);
+                if ( !xpvals )
+                  {
+                    xpvals = (double*) Malloc(nx*sizeof(double));
+                    gridInqXvals(projID1, xpvals);
+                  }
+                gridDefXvals(projID2, xpvals+ix*nxvals);
               }
             bool lypcoord = gridInqYvals(projID1, NULL) > 0;
             if ( lypcoord )
               {
-                gridInqYvals(projID1, yvals);
-                gridDefYvals(projID2, yvals+iy*nyvals);
+                if ( !ypvals )
+                  {
+                    ypvals = (double*) Malloc(ny*sizeof(double));
+                    gridInqYvals(projID1, ypvals);
+                  }
+                gridDefYvals(projID2, ypvals+iy*nyvals);
               }
 
             gridDefProj(gridID2, projID2);
           }
-        
+
 	gridIDs[index] = gridID2;
 	ogridsize[index] = gridsize2;
 
@@ -168,10 +177,12 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 
   if ( xvals2 ) Free(xvals2);
   if ( yvals2 ) Free(yvals2);
-  Free(xvals);
-  Free(yvals);
-  Free(xlsize);
-  Free(ylsize);
+  if ( xvals ) Free(xvals);
+  if ( yvals ) Free(yvals);
+  if ( xpvals ) Free(xpvals);
+  if ( ypvals ) Free(ypvals);
+  if ( xlsize ) Free(xlsize);
+  if ( ylsize ) Free(ylsize);
 }
 
 static

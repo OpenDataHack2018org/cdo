@@ -106,7 +106,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       gridID   = vlistGrid(ef[fileID].vlistID, igrid);
-      gridtype = gridInqType(gridID);
+      int gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
         lregular = true;
       else if ( gridtype == GRID_CURVILINEAR )
@@ -291,6 +291,8 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   gridID = vlistGrid(ef[0].vlistID, igrid);
 
   grid_copy_attributes(gridID, gridID2);
+
+  if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridID, gridID2);
 
   return gridID2;
 }
