@@ -136,15 +136,13 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   int nlat2 = lat2 - lat1 + 1;
 
   int gridtype = gridInqType(gridID1);
-  int prec     = gridInqPrec(gridID1);
 
   int gridID2 = gridCreate(gridtype, nlon2*nlat2);
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 
   gridDefNP(gridID2, gridInqNP(gridID1));
-
-  gridDefPrec(gridID2, prec);
+  gridDefPrec(gridID2, gridInqPrec(gridID1));
 
   grid_copy_attributes(gridID1, gridID2);
 

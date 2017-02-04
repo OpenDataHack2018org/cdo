@@ -18,6 +18,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "grid.h"
 #include "pstream.h"
 
 #define  MAX_BLOCKS  65536
@@ -38,10 +39,8 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
   int nx = gridInqXsize(gridID1);
   int ny = gridInqYsize(gridID1);
 
-  bool lxcoord = true;
-  bool lycoord = true;
-  if ( gridInqXvals(gridID1, NULL) == 0 ) lxcoord = false;
-  if ( gridInqYvals(gridID1, NULL) == 0 ) lycoord = false;
+  bool lxcoord = gridInqXvals(gridID1, NULL) > 0;
+  bool lycoord = gridInqYvals(gridID1, NULL) > 0;
 
   double *xvals = NULL, *yvals = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
@@ -115,6 +114,13 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 	gridDefXsize(gridID2, xlsize[ix]);
 	gridDefYsize(gridID2, ylsize[iy]);
 
+        gridDefNP(gridID2, gridInqNP(gridID1));
+        gridDefPrec(gridID2, gridInqPrec(gridID1));
+
+        grid_copy_attributes(gridID1, gridID2);
+
+        if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridID1, gridID2);
+
         if ( lregular )
           {
             if ( lxcoord ) gridDefXvals(gridID2, xvals+ix*nxvals);
@@ -124,6 +130,32 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
           {
             if ( lxcoord ) gridDefXvals(gridID2, xvals2);
             if ( lycoord ) gridDefYvals(gridID2, yvals2);
+          }
+
+        int projID1 = gridInqProj(gridID1);
+        if ( projID1 != CDI_UNDEFID && gridInqType(projID1) == GRID_PROJECTION )
+          {
+            int projID2 = gridCreate(GRID_PROJECTION, gridsize2);
+            gridDefXsize(projID2, xlsize[ix]);
+            gridDefYsize(projID2, ylsize[iy]);
+
+            grid_copy_attributes(projID1, projID2);
+            grid_copy_mapping(projID1, projID2);
+
+            bool lxpcoord = gridInqXvals(projID1, NULL) > 0;
+            if ( lxpcoord )
+              {
+                gridInqXvals(projID1, xvals);
+                gridDefXvals(projID2, xvals+ix*nxvals);
+              }
+            bool lypcoord = gridInqYvals(projID1, NULL) > 0;
+            if ( lypcoord )
+              {
+                gridInqYvals(projID1, yvals);
+                gridDefYvals(projID2, yvals+iy*nyvals);
+              }
+
+            gridDefProj(gridID2, projID2);
           }
         
 	gridIDs[index] = gridID2;
