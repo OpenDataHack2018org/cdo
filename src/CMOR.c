@@ -27,7 +27,6 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
 {
   int ichar;
   size_t ipos = 0;
-
   while ( *buffersize )
     {
       ichar = *buffer;
@@ -55,9 +54,7 @@ char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t le
         }
     }
   line[ipos] = 0;
-
   if ( *buffersize == 0 && ipos == 0 ) buffer = NULL;
-
   return buffer;
 }
 
@@ -173,7 +170,19 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
     {
       char **values = malloc( 5 * sizeof(char *) );
       pline = getElementName(pline, name);
+      if ( *pline == 0 )
+        {
+          if ( cdoVerbose )
+            printf("Could not find values for: '%s'\n", name);
+          break;
+        }
       pline = skipSeparator(pline);
+      if ( *pline == 0 )
+        {
+          if ( cdoVerbose )
+            printf("Could not find values for: '%s'\n", name);
+          break;
+        }
       pline = getElementValues(pline, values, &nvalues);
       if ( checkpml )
         kvlist_append(kvl, name, (const char **)values, nvalues);
@@ -187,9 +196,10 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
             }
           kvlist_append(list, name, (const char **)values, nvalues);
         }
+      while ( isspace((int) *pline) ) pline++;
       if ( *pline == '/' )
         *pline = 0;
-      free(values);         
+      free(values);     
     }
 }
 
@@ -310,7 +320,9 @@ static void map_it(list_t *kvl, int vlistID, int varID)
       const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
 /*      printf("'%s' = '%s'\n", key, value); */
       if ( !value ) continue;
+/* Not necessary because out_name is what we use for renaming :
       else if ( STR_IS_EQ(key, "name")          ) vlistDefVarName(vlistID, varID, parameter2word(value));
+*/
       else if ( STR_IS_EQ(key, "out_name")      )
         {
           char name[CDI_MAX_NAME];
@@ -328,6 +340,7 @@ static void map_it(list_t *kvl, int vlistID, int varID)
       else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID, varID, value);
       else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID, varID, stringToParam(parameter2word(value)));
       else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID, varID, stringToParam(parameter2word(value)));
+      else if ( STR_IS_EQ(key, "code")          ) {}
               // else if ( STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               // else if ( STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
       else if ( STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID, varID, "comment", (int) strlen(value), value);
@@ -384,6 +397,7 @@ static int map_via_key(list_t *pml, int vlistID, int varID, int nventry, const c
           return 1;
         }
       cdoWarning("Variable with name '%s' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.\n", ifilevalue, key, key);
+      return 0;
     }
   else
     {
@@ -420,7 +434,8 @@ static void map_via_vars(list_t *pml, const char **vars, int vlistID, int nvars,
   int j = 0;
   while ( vars[j] )
     {
-      printf("*******Try to map requested variable: '%s'********\n", vars[j]);
+      if ( cdoVerbose )
+        printf("*******Try to map requested variable: '%s'********\n", vars[j]);
       list_t *kvl_oname = pmlist_search_kvlist_ventry(pml, "out_name", vars[j], nventry, ventry);
       if ( kvl_oname )
         {
@@ -445,7 +460,8 @@ static void map_via_vars(list_t *pml, const char **vars, int vlistID, int nvars,
 static
 void apply_mapping_table(const char *filename, int nvars, int vlistID, const char **request)
 {
-  printf("*******Try to apply mapping table: '%s'*******\n", filename);
+  if ( cdoVerbose )
+    printf("*******Try to apply mapping table: '%s'*******\n", filename);
   const char *ventry[] = {"&parameter"};
   int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
 
