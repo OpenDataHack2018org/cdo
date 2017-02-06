@@ -1421,6 +1421,7 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
     }
 }
 
+/*
 static void register_character_dimension(int *axis_ids, char *filename)
 {
   printf("The grid type is generic and a dimension 'basin' is found.\nTherefore, it is tried to read the character dimension.\n");
@@ -1456,6 +1457,7 @@ static void register_character_dimension(int *axis_ids, char *filename)
   Free(dimname);
   Free(vardimids);
 }
+*/
 
 static void invert_ygriddes(list_t *kvl, int vlistID, int *gridID, int ylength, double *ycoord_vals, double *ycell_bounds, int *ynbounds)
 {
@@ -1490,12 +1492,30 @@ static void invert_ygriddes(list_t *kvl, int vlistID, int *gridID, int ylength, 
 
 static void change_grid(char *grid_file, int *gridID, int vlistID)
 {
-  printf("You configured a grid_info file. For a successfull read, the file probably needs to have at least one variable with ID 0.\n");
+  if ( cdoVerbose )
+    printf("You configured a grid_info file. For a successfull read, the file probably needs to have at least one variable with ID 0.\n");
   argument_t *fileargument = file_argument_new(grid_file);
   int streamID2 = streamOpenRead(fileargument); 
   int vlistID2 = streamInqVlist(streamID2);
   int gridID2 = vlistInqVarGrid(vlistID2, 0); 
   vlistChangeGrid(vlistID, *gridID, gridID2);
+}
+
+static void move_lons(double *xcoord_vals, double *xcell_bounds, int xsize, int xboundsize, int xnbounds)
+{  
+  int testbool = 0;
+  for ( int i = 0; i < xsize; i++)
+    if ( xcoord_vals[i] < 0.0 )
+      {
+        testbool = 1;
+        break;
+      }
+  if ( testbool > 0 )
+    for ( int i = 0; i < xsize; i++ )
+      xcoord_vals[i] += 180.0;
+  if ( xnbounds > 1 && testbool > 0 )
+    for ( int j = 0; j < xboundsize; j++ )
+      xcell_bounds[j] += 180.0;
 }
 
 static void inquire_vals_and_bounds(int gridID, int *xnbounds, int *ynbounds, double *xcoord_vals, double *ycoord_vals, double *xcell_bounds, double *ycell_bounds)
@@ -1665,6 +1685,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
     } 
 }
 
+/*
 static void select_and_register_character_dimension(char *grid_file, int *axis_ids)
 {
   char *ifile = cdoStreamName(0)->args;
@@ -1675,6 +1696,7 @@ static void select_and_register_character_dimension(char *grid_file, int *axis_i
   else
     register_character_dimension(axis_ids, grid_file);
 }
+*/
 
 static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids)
 {
@@ -1700,7 +1722,6 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
 
   if ( totalsize > 1 )
   {
-  /* Cmor call per Gridtype */
   if ( type == GRID_GAUSSIAN || type == GRID_LONLAT )
     {
       grid_ids[0] = 0;
@@ -1713,8 +1734,6 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
       check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
       
-/*      invert_ygriddes(kvl, vlistID, &gridID, ylength, ycoord_vals, ycell_bounds, &ynbounds); */
-
       cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
       cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd', 
    (void *)xcell_bounds,    2,    NULL);
@@ -1732,6 +1751,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       xcell_bounds = Malloc(4 * totalsize * sizeof(double));
       ycell_bounds = Malloc(4 * totalsize * sizeof(double));
       inquire_vals_and_bounds(gridID, &xnbounds, &ynbounds, xcoord_vals, ycoord_vals, xcell_bounds, ycell_bounds);
+      move_lons(xcoord_vals, xcell_bounds, totalsize, 4 * totalsize, xnbounds);   
       x2cell_bounds = Malloc(4 * totalsize * sizeof(double));
       y2cell_bounds = Malloc(4 * totalsize * sizeof(double));
       get_cmor_table(kvl);
@@ -1767,7 +1787,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       Free(x2cell_bounds);
       Free(y2cell_bounds);
     }
-  else if ( type == GRID_GENERIC )
+/*  else if ( type == GRID_GENERIC )
     {
       grid_ids[0] = 0;
       xcoord_vals = Malloc(xlength * sizeof(double));
