@@ -346,7 +346,7 @@ void remapgrid_get_lonlat(remapgrid_t *grid, unsigned cell_add, double *plon, do
     }
 }
 
-static
+
 void check_lon_range(long nlons, double *lons)
 {
   assert(lons != NULL);
@@ -365,7 +365,7 @@ void check_lon_range(long nlons, double *lons)
     }
 }
 
-static
+
 void check_lat_range(long nlats, double *lats)
 {
   assert(lats != NULL);
@@ -639,17 +639,11 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 
   grid->is_cyclic = (gridIsCircular(gridID) > 0);
 
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
-    grid->rank = 1;
-  else
-    grid->rank = 2;
+  grid->rank = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? 1 : 2;
 
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
-    grid->num_cell_corners = gridInqNvertex(gridID);
-  else
-    grid->num_cell_corners = 4;
+  grid->num_cell_corners = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
 
- remapgrid_alloc(map_type, grid);
+  remapgrid_alloc(map_type, grid);
 
   /* Initialize logical mask */
 

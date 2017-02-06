@@ -301,20 +301,17 @@ static
 void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon,
 			     const double *restrict corner_lat, restr_t *restrict bound_box)
 {
-  long inc, j;
-  restr_t clon, clat;
+  long inc = ic*nc;
 
-  inc = ic*nc;
-
-  clat = RESTR_SCALE(corner_lat[inc]);
-  clon = RESTR_SCALE(corner_lon[inc]);
+  restr_t clat = RESTR_SCALE(corner_lat[inc]);
+  restr_t clon = RESTR_SCALE(corner_lon[inc]);
 
   bound_box[0] = clat;
   bound_box[1] = clat;
   bound_box[2] = clon;
   bound_box[3] = clon;
 
-  for ( j = 1; j < nc; ++j )
+  for ( long j = 1; j < nc; ++j )
     {
       clat = RESTR_SCALE(corner_lat[inc+j]);
       clon = RESTR_SCALE(corner_lon[inc+j]);

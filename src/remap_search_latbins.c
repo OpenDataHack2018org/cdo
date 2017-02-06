@@ -241,7 +241,7 @@ long get_srch_cells(long tgt_cell_add, long nbins, int *bin_addr1, int *bin_addr
 	}
     }
 
-  return (num_srch_cells);
+  return num_srch_cells;
 }
 
 static
