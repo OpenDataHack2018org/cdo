@@ -2043,8 +2043,9 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   if ( !foundName && requested_variables == NULL )
     cdoAbort("No variables from your table %s found in Ifile.\n");
   if ( !foundName && requested_variables )
-    cdoAbort("The given variables to process by attribute var: '%s' are not found in Ifile.\n", kv_get_a_val(kvl, "vars", ""));
-  printf("*******Called register_all_dimensions for %d variables succesfully.*******\n", foundName);
+    cdoAbort("The given variables to process by attribute vars: '%s' are not found in Ifile.\n", kv_get_a_val(kvl, "vars", ""));
+  if ( cdoVerbose )
+    printf("*******Called register_all_dimensions for %d variables successfully.*******\n", foundName);
   if ( requested_variables ) Free(requested_variables);
 }
 
@@ -2056,90 +2057,105 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID)
   int reccounter = 0;
   int recdummy = 0;
 
-  if ( cdoStreamName(0)->args[0] == '-' )
-    {
-      cdoWarning("Cdo cmor cannot check frequency of Ifile recs since you piped several cdo operators.\nIt is tried to use a configuration attribute frequency.");
-      strcpy(frequency, kv_get_a_val(kvl, "frequency", ""));
-      if ( strcmp(frequency, "") == 0 )
-        cdoAbort("No attribute frequency is found.");
-      else
-        return frequency;
-    } 
-  
-  int streamID2 = streamOpenRead(cdoStreamName(0));
-  int vlistID2 = streamInqVlist(streamID2);
-  int taxisID2 = vlistInqTaxis(vlistID2);
-  if ( ntsteps < 0 )
-    {
-      while ( recdummy = streamInqTimestep(streamID2, reccounter++) );
-      ntsteps = reccounter;
-    }    
-  int fyear, lyear, fmonth, lmonth, dummyone, dummytwo;
-  if ( ntsteps > 2 )
-    {
-      int recfirst = streamInqTimestep(streamID2, 0);
-      cdiDecodeDate(taxisInqVdate(taxisID2), &fyear, &fmonth, &dummytwo);
-      int reclast = streamInqTimestep(streamID2, ntsteps-1);    
-      cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
-
-      double covered_years = lyear-fyear + 1.0;
-      if ( ntsteps / covered_years <= 1 )
-        {
-          strcpy(frequency, "yr");
-          printf("Found %d time steps in %f covered years.\nTherefore, the frequency is %s.\n", ntsteps, covered_years, frequency);
-        }
-      else 
-        {
-          int step_per_year = 0;
-          int step_per_month = 0;
-          reccounter = 0;
-          printf("Frequency is calculated by counting all timesteps in year %d\nin order to calculate time bounds in case they are not given.\n", fyear, fmonth);
-          while ( recdummy = streamInqTimestep(streamID2, reccounter++) )
-            {
-              int reqyear;
-              cdiDecodeDate(taxisInqVdate(taxisID2), &reqyear, &dummyone, &dummytwo);
-              if ( reqyear == ( fyear + 1 ) )
-                break;
-              step_per_year++;
-            } 
-          if ( step_per_year > 366 )
-            cdoAbort("Frequency is sub-daily! Not yet enabled.");
-          if ( step_per_year <= 366 )
-            {
-              strcpy(frequency, "day");
-              if ( step_per_year <= 12 )
-                {/*
-                  reccounter = 0;
-                  while ( recdummy = streamInqTimestep(streamID, reccounter++) )
-                    {
-                      int reqmonth;
-                      cdiDecodeDate(taxisInqVdate(taxisID), &dummyone, &reqmonth, &dummytwo);
-                      if ( dummytwo > 28 && step_per_month == 0 )
-                        {
-                          strcpy(frequency, "mon");
-                          break;
-                        }
-                      if ( reqmonth == ( fmonth + 1 ) )
-                        break;
-                      step_per_month++;
-                    }
-                 if ( step_per_month <= 1) */
-                   strcpy(frequency, "mon");
-                }
-            }
-            printf("Found %d time steps in year %d.\nTherefore, the frequency is %s.\n", step_per_year, fyear, frequency);
- /*         if ( step_per_month == 0 )
-            printf("In month '%d' either no or time steps at the end of the month were found.\nIn this case, frequency is set to 'month'.\n", fmonth);
-          else
-            printf("Found %d time steps in year %d and %d time steps in month %d of the year.\nTherefore, the frequency is %s.\n", step_per_year, fyear, step_per_month, fmonth, frequency);*/
-        }      
-    }
+  char *mipfreq = kv_get_a_val(kvl, "miptab_freq", "");
+  if ( strstr(mipfreq, "yr") )
+    strcpy(frequency, "yr");
+  else if ( strstr(mipfreq, "mon") )
+    strcpy(frequency, "mon");
+  else if ( strstr(mipfreq, "day") )
+    strcpy(frequency, "day");
+  else if ( strstr(mipfreq, "6hr") )
+    strcpy(frequency, "6hr");
+  else if ( strstr(mipfreq, "3hr") )
+    strcpy(frequency, "3hr");
   else
     {
-      if ( !taxisHasBounds(taxisID2) && ntsteps > 0 )
-        cdoAbort("No time bounds are found in Ifile and for %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nDefine time bounds before cdo cmor.", ntsteps);
+      if ( cdoStreamName(0)->args[0] == '-' )
+        {
+          cdoWarning("Cdo cmor cannot check frequency of Ifile recs since you piped several cdo operators.\nIt is tried to use a configuration attribute frequency.");
+          strcpy(frequency, kv_get_a_val(kvl, "frequency", ""));
+          if ( strcmp(frequency, "") == 0 )
+            cdoAbort("No attribute frequency is found.");
+          else
+            return frequency;
+        } 
+      
+      int streamID2 = streamOpenRead(cdoStreamName(0));
+          int vlistID2 = streamInqVlist(streamID2);
+      int taxisID2 = vlistInqTaxis(vlistID2);
+      if ( ntsteps < 0 )
+        {
+          while ( recdummy = streamInqTimestep(streamID2, reccounter++) );
+          ntsteps = reccounter;
+        }    
+      ntsteps-=1;
+      int fyear, lyear, fmonth, lmonth, dummyone, dummytwo;
+
+      if ( ntsteps > 2 )
+        {
+          int recfirst = streamInqTimestep(streamID2, 0);
+          cdiDecodeDate(taxisInqVdate(taxisID2), &fyear, &fmonth, &dummytwo);
+          int reclast = streamInqTimestep(streamID2, ntsteps);    
+          cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
+
+          double covered_years = lyear-fyear + 1.0;
+          if ( DBL_IS_EQUAL(ntsteps / covered_years, 1) )
+            strcpy(frequency, "yr");
+          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 12) )
+            strcpy(frequency, "mon");
+          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365) ||
+                    DBL_IS_EQUAL(ntsteps / covered_years, 365.25) ||
+                    DBL_IS_EQUAL(ntsteps / covered_years, 366) )
+            strcpy(frequency, "day");
+          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365*4) ||
+                    DBL_IS_EQUAL(ntsteps / covered_years, 365.25*4) ||
+                    DBL_IS_EQUAL(ntsteps / covered_years, 366*4) )
+            strcpy(frequency, "6hr");
+          else if ( DBL_IS_EQUAL(ntsteps / covered_years, 365*8) ||
+                    DBL_IS_EQUAL(ntsteps / covered_years, 365.25*8) ||
+                    DBL_IS_EQUAL(ntsteps / covered_years, 366*8) )
+            strcpy(frequency, "3hr");
+          else 
+            {
+              int step_per_year = 0;
+              reccounter = 0;
+              if ( cdoVerbose )
+                printf("Frequency is calculated by counting all timesteps in year %d\nin order to calculate time bounds in case they are not given.\n", fyear, fmonth);
+              while ( recdummy = streamInqTimestep(streamID2, reccounter++) )
+                {
+                  int reqyear;
+                  cdiDecodeDate(taxisInqVdate(taxisID2), &reqyear, &lmonth, &dummytwo);
+                  if ( reqyear == ( fyear + 1 ) )
+                    break;
+                  step_per_year++;
+                } 
+              int covered_months = lmonth-fmonth+1;
+              if ( step_per_year > 366*8 )
+                cdoAbort("Frequency is sub-3hourly! Not yet enabled.");
+              else
+                {
+                  if ( (double)step_per_year / (double)covered_months > 31*8 )
+                    cdoAbort("Frequency is sub-3hourly! Not yet enabled.");
+                  else if ( (double)step_per_year / (double)covered_months > 31*4 )
+                    strcpy(frequency, "3hr");
+                  else if ( (double)step_per_year / (double)covered_months > 31 )
+                    strcpy(frequency, "6hr");
+                  else if ( (double)step_per_year / (double)covered_months > 1 )
+                    strcpy(frequency, "day");
+                  else
+                    strcpy(frequency, "mon");
+                }
+              if ( cdoVerbose )
+                printf("Found %d time steps in year %d.\nTherefore, the frequency is %s.\n", step_per_year, fyear, frequency);
+            }
+        }
       else
-        cdoWarning("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nTime bounds of the rec are used.\n", ntsteps);
+        {
+          if ( !taxisHasBounds(taxisID2) && ntsteps > 0 )
+            cdoAbort("No time bounds are found in Ifile and for %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nDefine time bounds before cdo cmor.", ntsteps);
+          else
+            cdoWarning("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nTime bounds of the rec are used.\n", ntsteps);
+        }
     }
   return frequency;
 }
