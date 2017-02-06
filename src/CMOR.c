@@ -1823,6 +1823,69 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       Free(xcoord_vals);
       Free(ycoord_vals);
     }
+*/
+  else if ( type == GRID_CHARXY )
+    {
+      grid_ids[0] = 0;
+      char *xname = Malloc(CDI_MAX_NAME * sizeof(char));
+      char *yname = Malloc(CDI_MAX_NAME * sizeof(char));
+      gridInqXname(gridID, xname);
+      gridInqYname(gridID, yname);
+      char *xdimname = Malloc(CDI_MAX_NAME * sizeof(char));
+      char *ydimname = Malloc(CDI_MAX_NAME * sizeof(char));
+      cdiGridInqKeyStr(gridID, 902, CDI_MAX_NAME, xdimname);
+      cdiGridInqKeyStr(gridID, 912, CDI_MAX_NAME, ydimname);
+      int dimstrlen;   
+      if ( dimstrlen = gridInqXIsc(gridID) )
+        {
+          char **xchars = (char **)Malloc( xlength * dimstrlen * sizeof(char));
+          gridInqXCvals(gridID, xchars);
+          void *xcharcmor = (void *) Malloc ( xlength * dimstrlen * sizeof(char));
+          sprintf((char *)xcharcmor, "%s", xchars[0]);
+          for ( int i = 1; i < xlength; i++ )
+            {
+              sprintf((char *)xcharcmor, "%s%s", (char *)xcharcmor, xchars[i]);
+              Free(xchars[i]);
+            }
+          cmor_axis(new_axis_id(axis_ids), xdimname, "", xlength, (void *)xcharcmor, 'c',  NULL, dimstrlen, NULL); 
+          Free(xchars);
+        }
+      else
+        {
+          xcoord_vals = Malloc(xlength * sizeof(double));
+          gridInqXvals(gridID, xcoord_vals);
+          xcell_bounds = Malloc(2 * xlength * sizeof(double));
+          xnbounds = gridInqXbounds(gridID, xcell_bounds);
+          check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
+          cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
+          Free(xcell_bounds);
+        }
+      if ( dimstrlen = gridInqYIsc(gridID) )
+        {
+          char **ychars = (char **) Malloc( ylength * dimstrlen * sizeof(char));
+          gridInqYCvals(gridID, ychars);
+          void *ycharcmor = (void *) Malloc ( ylength * dimstrlen * sizeof(char));
+          sprintf((char *)ycharcmor, "%s", ychars[0]);
+          for ( int i = 1; i < ylength; i++ )
+            {
+              sprintf((char *)ycharcmor, "%s%s", (char *)ycharcmor, ychars[i]);
+              Free(ychars[i]);
+            }
+          cmor_axis(new_axis_id(axis_ids), ydimname, "", ylength, (void *)ycharcmor, 'c',  NULL, dimstrlen, NULL); 
+          Free(ychars);
+        }
+      else
+        {
+          ycoord_vals = Malloc(ylength * sizeof(double));
+          gridInqYvals(gridID, ycoord_vals);
+          invert_ygriddes(kvl, vlistID, &gridID, ylength, ycoord_vals, ycell_bounds, &ynbounds);
+          ycell_bounds = Malloc(2 * ylength * sizeof(double));
+          ynbounds = gridInqYbounds(gridID, ycell_bounds);
+          check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
+          cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
+          Free(ycell_bounds);  
+        }
+    }
   else
     {
       grid_ids[0] = 0;
