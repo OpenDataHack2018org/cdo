@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -58,7 +58,6 @@
 #endif
 
 #include "modules.h"
-#include "util.h"
 #include "error.h"
 
 #if defined(_OPENMP)
@@ -158,6 +157,25 @@ void cdo_sig_handler(int signo)
 }
 
 static
+void cdo_set_digits(const char *optarg)
+{
+  char *ptr1 = 0;
+  if ( optarg != 0 && (int) strlen(optarg) > 0 && optarg[0] != ',' )
+    CDO_flt_digits = (int)strtol(optarg, &ptr1, 10);
+
+  if ( CDO_flt_digits < 1 || CDO_flt_digits > 20 )
+    cdoAbort("Unreasonable value for float significant digits: %d", CDO_flt_digits);
+
+  if ( ptr1 && *ptr1 == ',' )
+    {
+      char *ptr2 = 0;
+      CDO_dbl_digits = (int)strtol(ptr1+1, &ptr2, 10);
+      if  ( ptr2 == ptr1+1 || CDO_dbl_digits < 1 || CDO_dbl_digits > 20 )
+        cdoAbort("Unreasonable value for double significant digits: %d", CDO_dbl_digits);
+    }
+}
+
+static
 void cdo_version(void)
 {
   const int   filetypes[] = {CDI_FILETYPE_SRV, CDI_FILETYPE_EXT, CDI_FILETYPE_IEG, CDI_FILETYPE_GRB, CDI_FILETYPE_GRB2, CDI_FILETYPE_NC, CDI_FILETYPE_NC2, CDI_FILETYPE_NC4, CDI_FILETYPE_NC4C};
@@ -203,13 +221,10 @@ void cdo_usage(void)
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc1/nc2/nc4/nc4c; F32/F64 for grb2/srv/ext/ieg; P1 - P24 for grb1/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
-  if ( ITSME )
-    {
-      fprintf(stderr, "    --enableexcept <except>\n");
-      fprintf(stderr, "                   Set individual floating-point traps (DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
-    }
   fprintf(stderr, "    --cmor         CMOR conform NetCDF output\n");
   fprintf(stderr, "    -C, --color    Colorized output messages\n");
+  fprintf(stderr, "    --enableexcept <except>\n");
+  fprintf(stderr, "                   Set individual floating-point traps (DIVBYZERO, INEXACT, INVALID, OVERFLOW, UNDERFLOW, ALL_EXCEPT)\n");
   fprintf(stderr, "    -f, --format <format>\n");
   fprintf(stderr, "                   Format of the output file. (grb1/grb2/nc1/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
@@ -273,7 +288,7 @@ void cdo_usage(void)
   */
 
   fprintf(stderr, "\n");
-  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2016 Uwe Schulzweida\n", VERSION);
+  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2017 Uwe Schulzweida\n", VERSION);
   //  fprintf(stderr, "  Available from <http://mpimet.mpg.de/cdo>\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
   fprintf(stderr, "  Report bugs to <http://mpimet.mpg.de/cdo>\n");
@@ -1050,14 +1065,17 @@ int parse_options_long(int argc, char *argv[])
   int lgridsearchnn;
   int lgridsearchradius;
   int lremap_genweights;
+  int lprecision;
   int lpercentile;
   int lprintoperatorsno = 0;
   int lprintoperators = 0;
   int lenableexcept;
   int ltimestat_date;
+  int ltimestat_bounds;
 
   struct cdo_option opt_long[] =
     {
+      { "precision",         required_argument,        &lprecision,   1  },
       { "percentile",        required_argument,        &lpercentile,  1  },
       { "netcdf_hdr_pad",    required_argument,    &lnetcdf_hdr_pad,  1  },
       { "header_pad",        required_argument,    &lnetcdf_hdr_pad,  1  },
@@ -1068,6 +1086,7 @@ int parse_options_long(int argc, char *argv[])
       { "remap_genweights",  required_argument,  &lremap_genweights,  1  },
       { "enableexcept",      required_argument,      &lenableexcept,  1  },
       { "timestat_date",     required_argument,     &ltimestat_date,  1  },
+      { "timestat_bounds",         no_argument,   &ltimestat_bounds,  1  },
       { "cmor",                    no_argument,      &CDO_CMOR_Mode,  1  },
       { "reduce_dim",              no_argument,     &CDO_Reduce_Dim,  1  },
       { "float",                   no_argument,        &CDO_Memtype,  MEMTYPE_FLOAT  },
@@ -1093,6 +1112,7 @@ int parse_options_long(int argc, char *argv[])
 
   while ( 1 )
     {
+      lprecision = 0;
       lpercentile = 0;
       lnetcdf_hdr_pad = 0;
       luse_fftw = 0;
@@ -1101,6 +1121,7 @@ int parse_options_long(int argc, char *argv[])
       lremap_genweights = 0;
       lenableexcept = 0;
       ltimestat_date = 0;
+      ltimestat_bounds = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1122,6 +1143,10 @@ int parse_options_long(int argc, char *argv[])
             {
               int netcdf_hdr_pad = str_to_int(CDO_optarg);
               if ( netcdf_hdr_pad >= 0 ) CDO_netcdf_hdr_pad = netcdf_hdr_pad;
+            }
+          else if ( lprecision )
+            {
+              cdo_set_digits(CDO_optarg);
             }
           else if ( lpercentile )
             {
@@ -1151,6 +1176,11 @@ int parse_options_long(int argc, char *argv[])
               extern int CDO_Timestat_Date;
               CDO_Timestat_Date = timestatdate;
             }
+          else if ( ltimestat_bounds )
+            {
+              extern bool CDO_Timestat_Bounds;
+              CDO_Timestat_Bounds = true;
+            }
           else if ( luse_fftw )
             {
               int intarg = parameter2int(CDO_optarg);
@@ -1165,11 +1195,9 @@ int parse_options_long(int argc, char *argv[])
           else if ( lgridsearchradius )
             {
               extern double gridsearch_radius;
-              double fval = atof(CDO_optarg);
-              if ( fval < 0 || fval > 180 )
-                cdoAbort("gridsearchradius=%g out of bounds (0-180)", fval);
-              else
-                gridsearch_radius = fval;
+              double fval = radius_str_to_deg(CDO_optarg);
+              if ( fval < 0 || fval > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "gridsearchradius", fval);
+              gridsearch_radius = fval;
             }
           else if ( lremap_genweights )
             {
@@ -1222,7 +1250,7 @@ int parse_options_long(int argc, char *argv[])
           setDefaultFileType(CDO_optarg, 1);
           break;
         case 'g':
-          defineGrid(CDO_optarg);
+          cdo_set_grids(CDO_optarg);
           break;
         case 'h':        
           Help = 1;

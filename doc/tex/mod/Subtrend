@@ -3,7 +3,7 @@
 @Title     = Subtract a trend
 @Section   = Regression
 @Class     = Regression
-@Arguments = ifile1 ifile2 ifile3 ofile
+@Arguments = infile1 infile2 infile3 outfile
 @Operators = subtrend
 @EndModule
 
@@ -30,13 +30,13 @@ where t is the timesteps.
 
 
 @BeginExample
-The typical call for detrending the data in @file{ifile} and storing the detrended data in @file{ofile} is:
+The typical call for detrending the data in @file{infile} and storing the detrended data in @file{outfile} is:
 @BeginVerbatim
-  cdo trend ifile afile bfile
-  cdo subtrend ifile afile bfile ofile
+  cdo trend infile afile bfile
+  cdo subtrend infile afile bfile outfile
 @EndVerbatim
 The result is identical to a call of the operator @mod{detrend}:
 @BeginVerbatim
-  cdo detrend ifile ofile
+  cdo detrend infile outfile
 @EndVerbatim
 @EndExample

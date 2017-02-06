@@ -32,13 +32,13 @@ herr_t obj_info(hid_t loc_id, const char *name, void *objname)
 
       switch (obj_type) {
       case H5G_GROUP:
-	if ( cdoVerbose ) cdoPrint(" Object with name %s is a group", name);
+	if ( cdoVerbose ) cdoPrint("HDF5 object '%s' is a group", name);
 	break;
       case H5G_DATASET: 
-	if ( cdoVerbose ) cdoPrint(" Object with name %s is a dataset", name);
+	if ( cdoVerbose ) cdoPrint("HDF5 object '%s' is a dataset", name);
 	break;
       case H5G_TYPE: 
-	if ( cdoVerbose ) cdoPrint(" Object with name %s is a named datatype", name);
+	if ( cdoVerbose ) cdoPrint("HDF5 object '%s' is a named datatype", name);
 	break;
       default:
 	/*cdoAbort(" Unable to identify an object %s", name);*/
@@ -55,8 +55,7 @@ herr_t obj_info(hid_t loc_id, const char *name, void *objname)
 static
 int h5find_object(hid_t file_id, const  char *name)
 {
-  int lexist = (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
-  return lexist;
+  return (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
 }
 #endif
 
@@ -333,19 +332,12 @@ int gridFromH5file(const char *gridfile)
 	  goto RETURN;
 	}
 
-      att_id = H5Aopen_name(lon_id, "bounds");
-      if ( att_id >= 0 )
-	{
-	  H5Aclose(att_id);
-	  goto RETURN;
-	}
+      // check for netcdf4 attribute
+      if ( H5Aexists(lon_id, "DIMENSION_LIST") ) goto RETURN;
+      if ( H5Aexists(lat_id, "DIMENSION_LIST") ) goto RETURN;
 
-      att_id = H5Aopen_name(lat_id, "bounds");
-      if ( att_id >= 0 )
-	{
-	  H5Aclose(att_id);
-	  goto RETURN;
-	}
+      if ( H5Aexists(lon_id, "bounds") ) goto RETURN;
+      if ( H5Aexists(lat_id, "bounds") ) goto RETURN;
 
       /*
       printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
@@ -537,6 +529,8 @@ int gridFromH5file(const char *gridfile)
   if ( file_id >= 0 )  status = H5Fclose(file_id);
 
   (void)status;
+
+  if ( gridID != -1 && cdoVerbose ) cdoPrint("%s: grid created.", __func__);
 
 #else
   cdoWarning("HDF5 support not compiled in!");

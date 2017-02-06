@@ -1,36 +1,73 @@
 @BeginModule
-@NewPage
 @Name      = CMOR
 @Title     = CMOR
-@Section   = Miscellaneous
-@Arguments = ifile
+@Section   = CMOR
+@Arguments = infile
 @Operators = cmor
 
 @BeginDescription
-Options is a comma separated list of "key=value" pairs with optional parameters.
+
+@C The CDO operator @bold{cmor} reads the data with the internal IO library CDI
+@C and writes the NetCDF result directly with the CMOR library.
+
+The CDO operator @bold{cmor} selects variables from @file{infile}
+and writes them directly with the CMOR library.
+Each output file contains a single output variable with there coordinates and metadata.
+Much of the metadata written to the output files is defined in the table file.
+The name of the output files are derived from the metadata.
+The supported format of the table file is CMOR3/json.
+These tables are typically made available from MIP web sites.
+
+A comma separated list of "@var{key=value}" pairs with optional parameters can be specified.
+These optional parameters can be set to overwrite all entries of a parameter
+table defined by the @var{__info} command line parameter.
+Entries with two leading underscores are used for cdo/cmor internal purposes.
+CMOR itself uses entries with one leading underscore internally. The remaining k-v pairs are
+used as attributes. Unknown (to CMOR) keys are simply copied as global attributes.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_cmor
 @Title     = CMOR
-@Parameter = tab [options]
+@Parameter = table [options]
 @EndOperator
 
 
 @BeginParameter
-@Item = tab
-STRING   Name of the CMOR table as specified from PCMDI
-@Item = var
-STRING   Comma separated list of variables
-@Item = expinfo
-STRING   Experiment specific parameter file
-@Item = modinfo
-STRING   Model specific parameter file
-@Item = userinfo
-STRING   User/institute specific parameter file
+@Item = table
+STRING   Name of the MIP table as specified from PCMDI
+@Item = __var
+STRING   Comma separated list of variables. Default is to process all variables.
+@Item = __info
+STRING   Configuration file name
+@Item = __grid_table
+STRING   Name of the MIP grid definition table as specified from PCMDI
+@Item = __rename_<axis name>
+STRING   Rename z-axis to match the grid_table
+@Item = __inpath
+STRING   All remaining parameters are for @href{http://cmor.llnl.gov/mydoc_cmor3_api/}{cmor_setup()}.
+@Item = __chunk
+STRING   netcdf_file_action parameter of cmor_setup()
+@Item = __set_verbosity
+STRING
+@Item = __exit_control
+STRING
+@Item = __logfile
+STRING
+@Item = __create_subdirectories
+INTEGER
 @EndParameter
 
 
 @BeginExample
+Process file with CMOR. In this case a grid mapping is used. The file
+{\texttt cmor.rc} contains metadata CMOR expects for
+\href{http://cmor.llnl.gov/mydoc_cmor3_api/#cmordatasetjson}
+{\texttt cmor_dataset_json()}.
+
+@BeginVerbatim
+cdo cmor,Tables/CMIP6_day.json,__grid_table=Tables/CMIP6_grids.json,__info=cmor.rc \
+CNRM-CERFACS_rllc.nc
+@EndVerbatim
 @EndExample

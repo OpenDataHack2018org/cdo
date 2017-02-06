@@ -65,11 +65,11 @@ void *Seascount(void *argument)
   int gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  field_t **vars1 = field_malloc(vlistID1, FIELD_PTR);
+  field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
 
   int tsID    = 0;
   int otsID   = 0;

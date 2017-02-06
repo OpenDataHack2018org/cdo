@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -140,13 +140,12 @@ int get_ival(const char *intstr, int idefault, int istart, int iend, int *ilast)
 
 void split_intstring(const char *intstr, int *first, int *last, int *inc)
 {
-  int i, start;
   int istrlen = strlen(intstr);
   *first = parameter2intlist(intstr);
   *last  = *first;
   *inc   = 1;
 
-  start = 1;
+  int i, start = 1;
   *last = get_ival(intstr, *first, start, istrlen, &i);
 
   if ( i < istrlen )

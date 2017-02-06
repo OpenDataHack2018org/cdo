@@ -4,12 +4,12 @@
 @Title     = Short information
 @Section   = Information
 @Class     = Information
-@Arguments = ifiles
+@Arguments = infiles
 @Operators = sinfo sinfon
 
 @BeginDescription
-This module writes information about the structure of @file{ifiles} to standard output.
-@file{ifiles} is an arbitrary number of input files. All input files need to have 
+This module writes information about the structure of @file{infiles} to standard output.
+@file{infiles} is an arbitrary number of input files. All input files need to have 
 the same structure with the same variables on different timesteps.
 The information displayed depends on the chosen operator.
 @EndDescription
@@ -50,7 +50,7 @@ identifier to label the parameter.
 @BeginExample
 To print short information of a dataset use:
 @BeginVerbatim
-   cdo sinfon ifile
+   cdo sinfon infile
 @EndVerbatim
 This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
 @BeginListing

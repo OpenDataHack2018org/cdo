@@ -4,12 +4,12 @@
 @Title     = Arithmetic with a constant
 @Section   = Arithmetic
 @Class     = Arithmetic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = addc subc mulc divc
 
 @BeginDescription
 This module performs simple arithmetic with all field elements of a dataset and 
-a constant. The fields in @file{ofile} inherit the meta data from @file{ifile}.
+a constant. The fields in @file{outfile} inherit the meta data from @file{infile}.
 @EndDescription
 @EndModule
 
@@ -71,6 +71,6 @@ FLOAT  Constant
 @BeginExample
 To sum all input fields with the constant -273.15 use:
 @BeginVerbatim
-   cdo addc,-273.15 ifile ofile
+   cdo addc,-273.15 infile outfile
 @EndVerbatim
 @EndExample

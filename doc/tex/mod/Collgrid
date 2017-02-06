@@ -4,7 +4,7 @@
 @Title     = Collect horizontal grid
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifiles ofile
+@Arguments = infiles outfile
 @Operators = collgrid
 @EndModule
 
@@ -39,7 +39,7 @@ The maximum number of open files depends on the operating system!
 @BeginExample
 Collect the horizonal grid of 6 input files. Each input file contains a lon/lat region of the target grid: 
 @BeginVerbatim
-   cdo collgrid ifile[1-6] ofile
+   cdo collgrid infile[1-6] outfile
 @EndVerbatim
 @IfDoc
 Below is a schematic illustration of this example:

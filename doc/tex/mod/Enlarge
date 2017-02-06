@@ -4,7 +4,7 @@
 @Title     = Enlarge fields
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = enlarge
 @EndModule
 
@@ -14,7 +14,7 @@
 @Parameter = grid
 
 @BeginDescription
-Enlarge all fields of @file{ifile} to a user given horizontal grid. Normally only the last 
+Enlarge all fields of @file{infile} to a user given horizontal grid. Normally only the last 
 field element is used for the enlargement. If however the input and output
 grid are regular lon/lat grids, a zonal or meridional enlargement is possible.
 Zonal enlargement takes place, if the xsize of the input field is 1 and 
@@ -36,11 +36,11 @@ Assumed you want to add two datasets. The first dataset is a field on a global g
 Before you can add these two datasets the second dataset have to be enlarged to the 
 grid size of the first dataset:
 @BeginVerbatim
-   cdo enlarge,ifile1 ifile2 tmpfile
-   cdo add ifile1 tmpfile ofile
+   cdo enlarge,infile1 infile2 tmpfile
+   cdo add infile1 tmpfile outfile
 @EndVerbatim
 Or shorter using operator piping:
 @BeginVerbatim
-   cdo add ifile1 -enlarge,ifile1 ifile2 ofile
+   cdo add infile1 -enlarge,infile1 infile2 outfile
 @EndVerbatim
 @EndExample

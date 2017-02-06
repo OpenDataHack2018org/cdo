@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -69,9 +69,9 @@ void *Arith(void *argument)
   int streamIDx1 = streamID1;
   int streamIDx2 = streamID2;
 
-  field_t field1, field2;
-  field_t *fieldx1 = &field1;
-  field_t *fieldx2 = &field2;
+  field_type field1, field2;
+  field_type *fieldx1 = &field1;
+  field_type *fieldx2 = &field2;
 
   int vlistID1 = streamInqVlist(streamID1);
   int vlistID2 = streamInqVlist(streamID2);

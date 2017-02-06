@@ -4,7 +4,7 @@
 @Title     = Replace variables
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = replace
 @EndModule
 
@@ -13,17 +13,17 @@
 @Title     = Replace variables
 
 @BeginDescription
-The replace operator replaces variables in @file{ifile1} by variables from @file{ifile2} and write
-the result to @file{ofile}. Both input datasets need to have the same number of timesteps.
+The replace operator replaces variables in @file{infile1} by variables from @file{infile2} and write
+the result to @file{outfile}. Both input datasets need to have the same number of timesteps.
 @EndDescription
 @EndOperator
 
 
 @BeginExample
-Assume the first input dataset @file{ifile1} has three variables with the names geosp, t and tslm1
-and the second input dataset @file{ifile2} has only the variable tslm1.
-To replace the variable tslm1 in @file{ifile1} by tslm1 from @file{ifile2} use:
+Assume the first input dataset @file{infile1} has three variables with the names geosp, t and tslm1
+and the second input dataset @file{infile2} has only the variable tslm1.
+To replace the variable tslm1 in @file{infile1} by tslm1 from @file{infile2} use:
 @BeginVerbatim
-   cdo replace ifile1 ifile2 ofile
+   cdo replace infile1 infile2 outfile
 @EndVerbatim
 @EndExample

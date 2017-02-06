@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -110,7 +110,7 @@ void *Ensstat3(void *argument)
   /* ("first touch strategy")                            */
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
-  field_t *field = (field_t*) Malloc(ompNumThreads*sizeof(field_t));
+  field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
   for ( i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);

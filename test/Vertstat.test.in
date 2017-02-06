@@ -1,23 +1,27 @@
 #! @SHELL@
-echo 1..9 # Number of tests to be executed.
+echo 1..10 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
 #
 CDOOUT=cout$$
 CDOERR=cerr$$
-STATS="min max sum avg mean std std1 var var1"
+FORMAT="-f srv -b 32"
 #
-IFILE=$DATAPATH/ts_mm_5years
+TYPE=vert
+STATS="min max sum avg mean std std1 var var1 int"
+#
+IFILE=$DATAPATH/pl_data.grb
+#
 NTEST=1
 #
 for STAT in $STATS; do
   RSTAT=0
-  RFILE=$DATAPATH/ymon${STAT}_ref
-  OFILE=ymon${STAT}_res
+  RFILE=$DATAPATH/${TYPE}${STAT}_ref
+  OFILE=${TYPE}${STAT}_res
 
-  CDOTEST="ymon$STAT"
-  CDOCOMMAND="$CDO ymon${STAT} $IFILE $OFILE"
+  CDOTEST="${TYPE}$STAT"
+  CDOCOMMAND="$CDO $FORMAT ${TYPE}${STAT} $IFILE $OFILE"
 
   echo "Running test: $NTEST"
   echo "$CDOCOMMAND"

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -23,25 +23,26 @@
 
 double crps_det_integrate(double *a, const double d, const size_t n);
 
-double fldfun(field_t field, int function)
+double fldfun(field_type field, int function)
 {
   double rval = 0;
 
   switch (function)
     {
-    case func_min:    rval = fldmin(field);  break;
-    case func_max:    rval = fldmax(field);  break;
-    case func_sum:    rval = fldsum(field);  break;
-    case func_mean:   rval = fldmean(field); break;
-    case func_avg:    rval = fldavg(field);  break;
-    case func_std:    rval = fldstd(field);  break;
-    case func_std1:   rval = fldstd1(field); break;
-    case func_var:    rval = fldvar(field);  break;
-    case func_var1:   rval = fldvar1(field); break;
-    case func_crps:   rval = fldcrps(field); break;
-    case func_brs:    rval = fldbrs(field);  break;
-    case func_rank:   rval = fldrank(field); break;
-    case func_roc:    rval = fldroc(field);  break;
+    case func_range:  rval = fldrange(field);  break;
+    case func_min:    rval = fldmin(field);    break;
+    case func_max:    rval = fldmax(field);    break;
+    case func_sum:    rval = fldsum(field);    break;
+    case func_mean:   rval = fldmean(field);   break;
+    case func_avg:    rval = fldavg(field);    break;
+    case func_std:    rval = fldstd(field);    break;
+    case func_std1:   rval = fldstd1(field);   break;
+    case func_var:    rval = fldvar(field);    break;
+    case func_var1:   rval = fldvar1(field);   break;
+    case func_crps:   rval = fldcrps(field);   break;
+    case func_brs:    rval = fldbrs(field);    break;
+    case func_rank:   rval = fldrank(field);   break;
+    case func_roc:    rval = fldroc(field);    break;
     default: cdoAbort("%s: function %d not implemented!", __func__, function);
     }
   
@@ -49,7 +50,7 @@ double fldfun(field_t field, int function)
 }
 
 
-double fldrank(field_t field) 
+double fldrank(field_type field) 
 {
   double res = 0;
   // Using first value as reference (observation)
@@ -77,12 +78,12 @@ double fldrank(field_t field)
 }
 
 
-double fldroc(field_t field) 
+double fldroc(field_type field) 
 {
   return field.missval;
 }
 
-double fldcrps(field_t field)
+double fldcrps(field_type field)
 {
   const size_t len     = field.size;
   const int    nmiss   = field.nmiss;
@@ -103,7 +104,7 @@ double fldcrps(field_t field)
 }
 
 
-double fldbrs(field_t field) 
+double fldbrs(field_type field) 
 {
   const int     nmiss   = field.nmiss;
   const size_t    len   = field.size;
@@ -136,7 +137,48 @@ double fldbrs(field_t field)
 }
 
 
-double fldmin(field_t field)
+double fldrange(field_type field)
+{
+  const int nmiss      = field.nmiss > 0;
+  const size_t len     = field.size;
+  const double missval = field.missval;
+  const double *restrict array = field.ptr;
+  double rmin =  DBL_MAX;
+  double rmax = -DBL_MAX;
+  double range = 0;
+
+  assert(array!=NULL);
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; i++ ) 
+	if ( !DBL_IS_EQUAL(array[i], missval) )
+          {
+            if ( array[i] < rmin ) rmin = array[i];
+            if ( array[i] > rmax ) rmax = array[i];
+          }
+
+      if ( IS_EQUAL(rmin,  DBL_MAX) && IS_EQUAL(rmax, -DBL_MAX) )
+        range = missval;
+      else
+        range = rmax-rmin;
+    }
+  else
+    {
+      //#pragma simd reduction(min:rmin) 
+      for ( size_t i = 0; i < len; i++ )
+        {
+          if ( array[i] < rmin ) rmin = array[i];
+          if ( array[i] > rmax ) rmax = array[i];
+        }
+      range = rmax-rmin;
+    }
+
+  return range;
+}
+
+
+double fldmin(field_type field)
 {
   const int nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
@@ -152,21 +194,20 @@ double fldmin(field_t field)
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  if ( array[i] < rmin ) rmin = array[i];
 
-      if ( IS_EQUAL(rmin, DBL_MAX) )
-	rmin = missval;
+      if ( IS_EQUAL(rmin, DBL_MAX) ) rmin = missval;
     }
   else
     {
       //#pragma simd reduction(min:rmin) 
       for ( size_t i = 0; i < len; i++ ) 
-	if ( array[i] < rmin )  rmin = array[i];
+	if ( array[i] < rmin ) rmin = array[i];
     }
 
   return rmin;
 }
 
 
-double fldmax(field_t field)
+double fldmax(field_type field)
 {
   const int nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
@@ -182,20 +223,19 @@ double fldmax(field_t field)
         if ( !DBL_IS_EQUAL(array[i], missval) )
           if ( array[i] > rmax ) rmax = array[i];
       
-      if ( IS_EQUAL(rmax, -DBL_MAX) )
-        rmax = missval;
+      if ( IS_EQUAL(rmax, -DBL_MAX) ) rmax = missval;
     }
   else
     {
       for ( size_t i = 0; i < len; i++ ) 
-        if ( array[i] > rmax )  rmax = array[i];
+        if ( array[i] > rmax ) rmax = array[i];
     }
 
   return rmax;
 }
 
 
-double fldsum(field_t field)
+double fldsum(field_type field)
 {
   const int nmiss      = field.nmiss > 0;
   const size_t len     = field.size;
@@ -228,7 +268,7 @@ double fldsum(field_t field)
 }
 
 
-double fldmean(field_t field)
+double fldmean(field_type field)
 {
   const int nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
@@ -237,6 +277,7 @@ double fldmean(field_t field)
   const double *restrict array = field.ptr;
   const double *restrict w     = field.weight;
   double rsum = 0, rsumw = 0;
+  double ravg = 0;
 
   assert(array!=NULL);
   assert(w!=NULL);
@@ -249,23 +290,18 @@ double fldmean(field_t field)
 	    rsum  += w[i] * array[i];
 	    rsumw += w[i];
 	  }
+      ravg = DIVMN(rsum, rsumw);
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ ) 
-	{
-	  rsum  += w[i] * array[i];
-	  rsumw += w[i];
-	}
+      int fpeRaised = array_mean_val_weighted(len, array, w, missval1, &ravg);
     }
-
-  double ravg = DIVMN(rsum, rsumw);
 
   return ravg;
 }
 
 
-double fldavg(field_t field)
+double fldavg(field_type field)
 {
   const int nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
@@ -340,7 +376,7 @@ void prevarsum(const double *restrict array, const double *restrict w, size_t le
 }
 
 
-double fldvar(field_t field)
+double fldvar(field_type field)
 {
   const int    nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
@@ -357,7 +393,7 @@ double fldvar(field_t field)
 }
 
 
-double fldvar1(field_t field)
+double fldvar1(field_type field)
 {
   const int    nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
@@ -390,19 +426,19 @@ double var_to_std(double rvar, double missval)
   return rstd;
 }
 
-double fldstd(field_t field)
+double fldstd(field_type field)
 {
   return var_to_std(fldvar(field), field.missval);
 }
 
 
-double fldstd1(field_t field)
+double fldstd1(field_type field)
 {
   return var_to_std(fldvar1(field), field.missval);
 }
 
 
-void fldrms(field_t field, field_t field2, field_t *field3)
+void fldrms(field_type field, field_type field2, field_type *field3)
 {
   size_t   i;
   size_t len;
@@ -454,7 +490,7 @@ void fldrms(field_t field, field_t field2, field_t *field3)
 }
 
 
-void varrms(field_t field, field_t field2, field_t *field3)
+void varrms(field_type field, field_type field2, field_type *field3)
 {
   size_t   i, k, nlev, len;
   int    rnmiss = 0;
@@ -508,7 +544,7 @@ void varrms(field_t field, field_t field2, field_t *field3)
 }
 
 /* RQ */
-double fldpctl(field_t field, const double pn)
+double fldpctl(field_type field, const double pn)
 {
   const size_t len     = field.size;
   const int    nmiss   = field.nmiss;
@@ -541,9 +577,9 @@ double fldpctl(field_t field, const double pn)
 }
 /* QR */
 
-/*  field_t UTILITIES */
+/*  field_type UTILITIES */
 /*  update the number non missing values */
-void fldunm(field_t *field)
+void fldunm(field_type *field)
 {
   size_t i;
 
@@ -553,10 +589,10 @@ void fldunm(field_t *field)
 }
 
 /*  check for non missval values */
-int fldhvs(field_t *fieldPtr, const size_t nlevels)
+int fldhvs(field_type *fieldPtr, const size_t nlevels)
 {
   size_t level;
-  field_t field;
+  field_type field;
 
   for ( level = 0; level < nlevels; level++)
     {

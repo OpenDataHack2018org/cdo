@@ -2,7 +2,7 @@
 @Name      = Sethalo
 @Title     = Set the left and right bounds of a field
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = sethalo
 
 @BeginDescription

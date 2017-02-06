@@ -53,8 +53,8 @@ void eca1(const ECA_REQUEST_1 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  field_t *var12 = NULL, *samp1 = NULL, *samp2 = NULL, *var13 = NULL, *var21 = NULL, *var23 = NULL, *var;
-  field_t field1, field2;
+  field_type *var12 = NULL, *samp1 = NULL, *samp2 = NULL, *var13 = NULL, *var21 = NULL, *var23 = NULL, *var;
+  field_type field1, field2;
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
@@ -124,16 +124,16 @@ void eca1(const ECA_REQUEST_1 *request)
 
   nlevels = zaxisInqSize(zaxisID);
 
-  var12 = (field_t*) Malloc(nlevels*sizeof(field_t));
-  samp1 = (field_t*) Malloc(nlevels*sizeof(field_t));
-  samp2 = (field_t*) Malloc(nlevels*sizeof(field_t));
+  var12 = (field_type*) Malloc(nlevels*sizeof(field_type));
+  samp1 = (field_type*) Malloc(nlevels*sizeof(field_type));
+  samp2 = (field_type*) Malloc(nlevels*sizeof(field_type));
   if ( IS_SET(request->var1.f3) ) 
-    var13 = (field_t*) Malloc(nlevels*sizeof(field_t));
+    var13 = (field_type*) Malloc(nlevels*sizeof(field_type));
     
   if ( IS_SET(request->var2.h2) ) 
-    var21 = (field_t*) Malloc(nlevels*sizeof(field_t));
+    var21 = (field_type*) Malloc(nlevels*sizeof(field_type));
   if ( IS_SET(request->var2.h3) ) 
-    var23 = (field_t*) Malloc(nlevels*sizeof(field_t));
+    var23 = (field_type*) Malloc(nlevels*sizeof(field_type));
       
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
@@ -421,8 +421,8 @@ void eca2(const ECA_REQUEST_2 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval1, missval2;
-  field_t *var14 = NULL, *samp1 = NULL, *samp2 = NULL, *samp3 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL, *var;
-  field_t field1, field2;
+  field_type *var14 = NULL, *samp1 = NULL, *samp2 = NULL, *samp3 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL, *var;
+  field_type field1, field2;
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
@@ -493,17 +493,17 @@ void eca2(const ECA_REQUEST_2 *request)
 
   nlevels = zaxisInqSize(zaxisID);
   
-  var14 = (field_t*) Malloc(nlevels*sizeof(field_t));
-  samp1 = (field_t*) Malloc(nlevels*sizeof(field_t));
-  samp2 = (field_t*) Malloc(nlevels*sizeof(field_t));
-  samp3 = (field_t*) Malloc(nlevels*sizeof(field_t));
+  var14 = (field_type*) Malloc(nlevels*sizeof(field_type));
+  samp1 = (field_type*) Malloc(nlevels*sizeof(field_type));
+  samp2 = (field_type*) Malloc(nlevels*sizeof(field_type));
+  samp3 = (field_type*) Malloc(nlevels*sizeof(field_type));
   
   if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
-    total = (field_t*) Malloc(nlevels*sizeof(field_t));
+    total = (field_type*) Malloc(nlevels*sizeof(field_type));
   if ( IS_SET(request->var1.f5) )
-    var15 = (field_t*) Malloc(nlevels*sizeof(field_t));
+    var15 = (field_type*) Malloc(nlevels*sizeof(field_type));
   if ( IS_SET(request->var2.h2) )
-    var22 = (field_t*) Malloc(nlevels*sizeof(field_t));
+    var22 = (field_type*) Malloc(nlevels*sizeof(field_type));
       
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
@@ -812,8 +812,8 @@ void eca3(const ECA_REQUEST_3 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  field_t *var1 = NULL, *var2 = NULL;
-  field_t field1, field2;
+  field_type *var1 = NULL, *var2 = NULL;
+  field_type field1, field2;
   
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
@@ -870,8 +870,8 @@ void eca3(const ECA_REQUEST_3 *request)
 
   nlevels = zaxisInqSize(zaxisID);
 
-  var1 = (field_t*) Malloc(nlevels*sizeof(field_t));
-  var2 = (field_t*) Malloc(nlevels*sizeof(field_t));
+  var1 = (field_type*) Malloc(nlevels*sizeof(field_type));
+  var2 = (field_type*) Malloc(nlevels*sizeof(field_type));
         
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
@@ -1021,10 +1021,10 @@ void eca4(const ECA_REQUEST_4 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  field_t *startCount          , *endCount;
-  field_t *startDateWithHist[2], *endDateWithHist[2];
-  field_t *gslDuration, *gslFirstDay;
-  field_t fieldGt, fieldLt, mask;
+  field_type *startCount          , *endCount;
+  field_type *startDateWithHist[2], *endDateWithHist[2];
+  field_type *gslDuration, *gslFirstDay;
+  field_type fieldGt, fieldLt, mask;
   int resetAtJan = FALSE, resetAtJul = FALSE;
   int isFirstYear = TRUE;
 
@@ -1110,18 +1110,18 @@ void eca4(const ECA_REQUEST_4 *request)
 
   nlevels     = zaxisInqSize(zaxisID);
 
-  startCount  = (field_t*) Malloc(nlevels*sizeof(field_t));
-  endCount    = (field_t*) Malloc(nlevels*sizeof(field_t));
-  gslDuration = (field_t*) Malloc(nlevels*sizeof(field_t));
-  gslFirstDay = (field_t*) Malloc(nlevels*sizeof(field_t));
+  startCount  = (field_type*) Malloc(nlevels*sizeof(field_type));
+  endCount    = (field_type*) Malloc(nlevels*sizeof(field_type));
+  gslDuration = (field_type*) Malloc(nlevels*sizeof(field_type));
+  gslFirstDay = (field_type*) Malloc(nlevels*sizeof(field_type));
 
   /* because of the different definitions for northern and southern hemisphere,
    * the values of the last year have to be present
    * THE LAST YEAR HAS THE INDEX 1 */
   for ( int h = 0; h < 2; h++ )
   {
-    startDateWithHist[h] = (field_t*) Malloc(nlevels*sizeof(field_t));
-    endDateWithHist[h]   = (field_t*) Malloc(nlevels*sizeof(field_t));
+    startDateWithHist[h] = (field_type*) Malloc(nlevels*sizeof(field_type));
+    endDateWithHist[h]   = (field_type*) Malloc(nlevels*sizeof(field_type));
   }
 
   for ( levelID = 0; levelID < nlevels; levelID++ )

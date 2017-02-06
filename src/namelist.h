@@ -44,4 +44,6 @@ int namelist_parse(namelist_parser *parser, const char *buf, size_t len);
 
 void namelist_dump(namelist_parser *parser, const char *buf);
 
+int namelist_verify(namelist_parser *parser, const char *buf);
+
 #endif // __NAMELIST_H_

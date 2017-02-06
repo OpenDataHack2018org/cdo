@@ -4,14 +4,14 @@
 @Title     = Precipitation days index per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_pd eca_r10mm eca_r20mm
 
 @BeginDescription
-Let @file{ifile} be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),
+Let @file{infile} be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),
 then the number of days where RR is at least @math{x} mm is counted. 
 eca_r10mm and eca_r20mm are specific ECA operators with a daily precipitation amount of 10 and 20 mm respectively.
-The date information of a timestep in ofile is the date of the last contributing timestep in @file{ifile}.
+The date information of a timestep in outfile is the date of the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -57,6 +57,6 @@ Apart from metadata information the result of eca_pd,1 and eca_rr1 is the same.
 @BeginExample
 To get the number of days with precipitation greater than 25 mm for a time series of daily precipitation amounts use:
 @BeginVerbatim
-   cdo eca_pd,25 ifile ofile
+   cdo eca_pd,25 infile outfile
 @EndVerbatim
 @EndExample

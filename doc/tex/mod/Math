@@ -4,7 +4,7 @@
 @Title     = Mathematical functions
 @Section   = Arithmetic
 @Class     = Arithmetic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = abs int nint pow sqr sqrt exp ln log10 sin cos tan asin acos atan reci
 
 @BeginDescription
@@ -289,6 +289,6 @@ o(t,x) = 1 / i(t,x)
 @BeginExample
 To calculate the square root for all field elements use:
 @BeginVerbatim
-   cdo sqrt ifile ofile
+   cdo sqrt infile outfile
 @EndVerbatim
 @EndExample

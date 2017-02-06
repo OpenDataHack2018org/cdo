@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -179,7 +179,7 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
 }
 
 static
-void boxavg(field_t *field1, field_t *field2, int xinc, int yinc)
+void boxavg(field_type *field1, field_type *field2, int xinc, int yinc)
 {
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
@@ -235,7 +235,7 @@ void boxavg(field_t *field1, field_t *field2, int xinc, int yinc)
 }
 
 static
-void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
+void thinout(field_type *field1, field_type *field2, int xinc, int yinc)
 {
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
@@ -379,7 +379,7 @@ void *Intgrid(void *argument)
   gridsize = gridInqSize(gridID2);
   double *array2   = (double*) Malloc(gridsize*sizeof(double));
 
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
 

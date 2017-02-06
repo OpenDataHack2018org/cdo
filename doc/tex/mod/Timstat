@@ -4,14 +4,14 @@
 @Title     = Statistical values over all timesteps
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = timmin timmax timsum timmean timavg timstd timstd1 timvar timvar1
 
 @BeginDescription
-This module computes statistical  values over all timesteps in @file{ifile}. Depending on 
+This module computes statistical  values over all timesteps in @file{infile}. Depending on 
 the chosen operator the minimum, maximum, sum, average, variance or standard deviation of 
-all timesteps read from @file{ifile} is written to @file{ofile}.
-The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
+all timesteps read from @file{infile} is written to @file{outfile}.
+The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
 @EndModule
 
@@ -25,7 +25,7 @@ o(1,x) = min{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{min}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -41,7 +41,7 @@ o(1,x) = max{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{max}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -57,7 +57,7 @@ o(1,x) = sum{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{sum}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -73,7 +73,7 @@ o(1,x) = mean{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{mean}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -89,7 +89,7 @@ o(1,x) = avg{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{avg}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -107,7 +107,7 @@ o(1,x) = var{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{var}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -125,7 +125,7 @@ o(1,x) = var1{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{var1}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -143,7 +143,7 @@ o(1,x) = std{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{std}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -161,7 +161,7 @@ o(1,x) = std1{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
-o(1,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \leq t_n\}
+o(1,x) = \mbox{\textbf{std1}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -171,6 +171,6 @@ o(1,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \leq t_n\}
 @BeginExample
 To compute the mean over all input timesteps use:
 @BeginVerbatim
-   cdo timmean ifile ofile
+   cdo timmean infile outfile
 @EndVerbatim
 @EndExample

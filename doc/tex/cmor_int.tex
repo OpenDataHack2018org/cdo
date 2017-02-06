@@ -3,11 +3,11 @@
 The Climate Data Operators ({\CDO}) software is a collection of operators
 for standard processing of climate and forecast model data.
 
-This document describes the additional {\CDO} operator cmor. This
+This document describes the additional {\CDO} operator \textbf{cmor}. This
 operator is an interface to the CMOR library version 3 from PCMDI.
 The CMOR support is available with {\CDO} release 1.8.0 or later.
 
-The CMOR (Climate Model Output Rewriter) library comprises a set of
+The \cite{CMOR} (Climate Model Output Rewriter) library comprises a set of
 functions, that can be used to produce CF-compliant NetCDF files that 
 fulfill the requirements of many of the climate community's standard
 model experiments. These experiments are collectively referred to as
@@ -21,26 +21,27 @@ site. CMOR relies on these tables to provide much of the metadata
 that is needed in the MIP context, thereby reducing the programming 
 effort required of the individual MIP contributors.
 
-The CDO operator cmor reads the data with the internal IO library CDI
-and writes the NetCDF result directly with the CMOR library. 
+The  {\CDO} operator \textbf{cmor} was developed at the DKRZ and MPI for
+Meteorology to provide an easy interface to the \cite{CMOR} library for a
+standardized preparation of CMIP6 data.
 
 \chapter{Building CDO with CMOR}
 
 This section describes how to build and install {\CDO} with CMOR
 support on a UNIX system.
 
-\section{CMOR}
+\section{CMOR library}
  
 CMOR version 3 needs to be installed before building {\CDO}.
-CMOR depends on the following external libraries:
-netCDF-4.0 , HDF5, UDUNITS-2, zlib and uuid.
+The CMOR library depends on the following external libraries:
+netCDF4, HDF5, UDUNITS2, zlib and uuid.
 Make sure that you use exactly the same libraries for the {\CDO}
-installation, otherwise the operator cmor will possibly not working correctly.
+installation, otherwise the operator \textbf{cmor} will possibly not working correctly.
 
 \section{Compilation}
 
-First go to the {\CDO}  \href{https://code.zmaw.de/projects/cdo}{\tt download} page
-({\tt https://code.zmaw.de/projects/cdo}) to get the latest distribution,
+First go to the {\CDO}  \href{https://code.zmaw.de/projects/cdo}{\texttt{download}} page
+(\texttt{https://code.zmaw.de/projects/cdo}) to get the latest distribution,
 if you do not have it yet.
 Compilation is done by performing the following steps:
 
@@ -77,19 +78,19 @@ For an overview of other configuration options use
 
 \end{enumerate}
 
-The program should compile without problems and the binary ({\tt cdo}) 
-should be available in the {\tt src} directory of the distribution.
+The program should compile without problems and the binary (\texttt{cdo}) 
+should be available in the \texttt{src} directory of the distribution.
 
 
 \section{Installation}
 
-After the compilation of the source code do a {\tt make install},
+After the compilation of the source code do a \texttt{make install},
 possibly as root if the destination permissions require that.
 
 \begin{verbatim}
     make install
 \end{verbatim} 
 
-The binary is installed into the directory {\tt $<$prefix$>$/bin}.
-{\tt $<$prefix$>$} defaults to {\tt /usr/local} but can be changed with 
-the {\tt --prefix} option of the configure script. 
+The binary is installed into the directory \texttt{$<$prefix$>$/bin}.
+\texttt{$<$prefix$>$} defaults to \texttt{/usr/local} but can be changed with 
+the \texttt{--prefix} option of the configure script. 

@@ -53,7 +53,7 @@ void *Ydrunpctl(void *argument)
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY] /*, vtimes2[NDAY]*/;
   int nsets[NDAY];
-  field_t **vars2[NDAY];
+  field_type **vars2[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
     
   cdoInitialize(argument);
@@ -108,13 +108,13 @@ void *Ydrunpctl(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
   cdo_datetime_t *datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
   
-  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+  field_type ***vars1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
   
   for ( its = 0; its < ndates; its++ )
     {

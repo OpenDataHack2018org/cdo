@@ -144,24 +144,43 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
     cdoAbort("Number of remap links is 0, no remap weights found!");
   */
   {
+    size_t nlinks = rv.num_links;
     size_t nele1 = 4*8 + 4;
     size_t nele2 = 4*8 + 4;
     if ( src_grid.lneed_cell_corners ) nele1 += src_grid.num_cell_corners*2*8;
     if ( tgt_grid.lneed_cell_corners ) nele2 += tgt_grid.num_cell_corners*2*8;
     size_t filesize = src_grid.size*(nele1) +
                       tgt_grid.size*(nele2) +
-                      rv.num_links*(4 + 4 + rv.num_wts*8);
+                      nlinks*(4 + 4 + rv.num_wts*8);
 
     if ( cdoVerbose )
-      cdoPrint("Filesize for remap weights: ~%lu", (unsigned long) filesize);
-    
+      {
+        cdoPrint("Number of remap links:       %zu", nlinks);
+        cdoPrint("Filesize for remap weights: ~%zu", filesize);
+      }
+
     if ( filesize > 0x7FFFFC00 ) // 2**31 - 1024 (<2GB)
       {
-#if defined(NC_64BIT_OFFSET)
-	writemode = NC_CLOBBER | NC_64BIT_OFFSET;
+        size_t maxlinks = 0x3FFFFFFF; // 1GB
+        if ( nlinks > maxlinks || filesize > 8*maxlinks )
+          {
+#if defined (HAVE_NETCDF4)
+            writemode |= NC_NETCDF4 | NC_CLASSIC_MODEL;
+            if ( cdoVerbose ) cdoPrint("Store weights and links to NetCDF4!");
 #else
-	cdoAbort("Filesize for remap weights maybe too large!");
+            cdoPrint("Number of remap links %lz exceeds maximum of %lz and NetCDF 4 not available!",
+                     nlinks, maxlinks);
 #endif
+          }
+        else
+          {
+#if defined (NC_64BIT_OFFSET)
+            writemode |= NC_64BIT_OFFSET;
+            if ( cdoVerbose ) cdoPrint("Store weights and links to NetCDF2!");
+#else
+            cdoPrint("Filesize for remap weights maybe too large!");
+#endif
+          }
       }
   }
 
@@ -459,6 +478,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "normalization", &attlen));
   normalize_opt[attlen] = 0;
 
+  rv->links_per_value = -1;
   rv->sort_add = false;
 
   if ( strcmp(normalize_opt, "none") == 0 )

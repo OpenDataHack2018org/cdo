@@ -3,7 +3,7 @@
 @Name      = Afterburner
 @Title     = ECHAM standard post processor
 @Section   = Miscellaneous
-@Arguments = ifiles ofile
+@Arguments = infiles outfile
 @Operators = after
 @EndModule
 
@@ -120,7 +120,7 @@ STRING  File with VCT in ASCII format
 @BeginExample
 To interpolate ECHAM hybrid model level data to pressure levels of 925, 850, 500 and 200 hPa, use:
 @BeginVerbatim
-   cdo after ifile ofile << EON
+   cdo after infile outfile << EON
       TYPE=30  LEVEL=92500,85000,50000,20000
    EON
 @EndVerbatim

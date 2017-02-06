@@ -7,13 +7,23 @@ Version 1.8.0 (26 October 2016):
      * NetCDF: Improved support for horizontal and vertical grids 
      * Changed default of option -f nc to netCDF2
      * masklonlatbox: added support for unstructured grids
+     * setpartabn: added support for user defined attributes
+     * Reverse: adjust date/time by -1 second (introduced in last revision)
    New operators:
+     * timcumsum: Cumulative sum over time.
+     * cmorlite: Apply variable_entry of cmor tables
+     * shiftx/shifty: Shift fields on rectilinear/curvilinear grids in x/y direction
    Changed operators:
+     * Tim<STAT> (e.g. monmean): 
    Fixed bugs:
+     * Cond: bug fix for ntsteps1 == 1 && ntsteps2 != 1
      * ml2pl: interpolation failed for data on hybrid half levels [Bug #7225]
 
 Version 1.7.2 (28 June 2016):
 
+   New features:
+     * Adjust date/time by -1 second if the varification time is 00:00:00 and
+       the verification date is equal to upper time bound
    New operators:
      * smooth: Smooth grid points
      * ap2hl: Air pressure to height level interpolation

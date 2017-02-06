@@ -46,7 +46,7 @@ static double humidityIndex(double t, double e, double r, double missval)
 }
 
 
-static void farexpr(field_t *field1, field_t field2, field_t field3, double (*expression)(double, double, double, double))
+static void farexpr(field_type *field1, field_type field2, field_type field3, double (*expression)(double, double, double, double))
 {
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -113,7 +113,7 @@ void *Hi(void *argument)
   
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field1, field2, field3;
+  field_type field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field3);

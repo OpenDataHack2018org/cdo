@@ -1,3 +1,65 @@
+2017-02-14  Uwe Schulzweida
+
+	* Using CDI library version 1.8.0
+	* Version 1.8.0 release
+
+2017-02-03  Uwe Schulzweida
+
+	* using CDI library version 1.8.0rc7
+	* Version 1.8.0rc7 release
+
+2017-02-03  Uwe Schulzweida
+
+	* Reverse: adjust date/time by -1 second (introduced in last revision)
+
+2017-01-28  Uwe Schulzweida
+
+	* Info: check floating-point exceptions
+
+2017-01-25  Uwe Schulzweida
+
+	* New operator timrange: time range (timmax-timmin)
+	* New operator fldrange: field range (fldmax-fldmin)
+	* remap:  optimzation for constant links per value
+
+2017-01-24  Uwe Schulzweida
+
+	* write_remap_scrip: write NeCDF4 for data larger than 8GB
+
+2017-01-19  Uwe Schulzweida
+
+	* using CDI library version 1.8.0rc6
+	* Version 1.8.0rc6 release
+
+2017-01-17  Uwe Schulzweida
+
+	* check hdf5 grid files for NetCDF4 attributes [Bug #7480]
+
+2017-01-11  Uwe Schulzweida
+
+	* env CDO_GRIDSEARCH_RADIUS: added support for units deg, rad, km, m [request: Stefan Hagemann]
+
+2017-01-03  Uwe Schulzweida
+
+	* eofcoeff: changed docu to "non weighted" (bug fix) [report: Torben Kunz]
+
+2017-01-02  Reiner Schnur
+
+	* griddx/griddy: changed yv to xv in call to grid_to_radian() (bug fix)
+
+2016-11-24  Uwe Schulzweida
+
+	* using CDI library version 1.8.0rc5
+	* Version 1.8.0rc5 release
+
+2016-11-14  Uwe Schulzweida
+
+	* Cond: bug fix for ntsteps1 == 1 && ntsteps2 != 1
+
+2016-11-10  Uwe Schulzweida
+
+	* New operator timcumsum: Cumulative sum over time.
+
 2016-11-04  Uwe Schulzweida
 
 	* using CDI library version 1.8.0rc4

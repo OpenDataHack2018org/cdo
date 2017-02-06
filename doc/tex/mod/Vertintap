@@ -3,7 +3,7 @@
 @Title     = Vertical interpolation
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = ap2pl ap2hl
 
 @BeginDescription
@@ -61,6 +61,6 @@ This is a specific implementation for NetCDF files from the ICON model, it may n
 @BeginExample
 To interpolate 3D variables on hybrid sigma height level to pressure levels of 925, 850, 500 and 200 hPa use:
 @BeginVerbatim
-   cdo ap2pl,92500,85000,50000,20000 ifile ofile
+   cdo ap2pl,92500,85000,50000,20000 infile outfile
 @EndVerbatim
 @EndExample

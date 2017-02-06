@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -97,7 +97,7 @@ double adipot(double t, double s, double p)
 }
 
 static
-void calc_adisit(long gridsize, long nlevel, double *pressure, field_t tho, field_t sao, field_t tis)
+void calc_adisit(long gridsize, long nlevel, double *pressure, field_type tho, field_type sao, field_type tis)
 {
   /* pressure units: hPa     */
   /* tho units:      Celsius */
@@ -126,7 +126,7 @@ void calc_adisit(long gridsize, long nlevel, double *pressure, field_t tho, fiel
 }
 
 static
-void calc_adipot(long gridsize, long nlevel, double *pressure, field_t t, field_t s, field_t tpot)
+void calc_adipot(long gridsize, long nlevel, double *pressure, field_type t, field_type s, field_type tpot)
 {
   /* pressure units: hPa     */
   /* t units:      Celsius */
@@ -239,7 +239,7 @@ void *Adisit(void *argument)
 	cdoPrint("%5d  %g", i+1, pressure[i]);
     }
 
-  field_t tho, sao, tis;
+  field_type tho, sao, tis;
   field_init(&tho);
   field_init(&sao);
   field_init(&tis);

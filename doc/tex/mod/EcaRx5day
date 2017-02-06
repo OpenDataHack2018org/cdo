@@ -4,14 +4,14 @@
 @Title     = Highest five-day precipitation amount per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_rx5day
 
 @BeginDescription
-Let @file{ifile} be a time series of 5-day precipitation totals RR, then the maximum of RR is written to @file{ofile}. 
+Let @file{infile} be a time series of 5-day precipitation totals RR, then the maximum of RR is written to @file{outfile}. 
 A further output variable is the number of 5 day period with precipitation totals greater than @math{x} mm, where @math{x} 
 is an optional parameter with default @math{x} = 50 mm.
-The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
+The date information of a timestep in @file{outfile} is the date of the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -31,10 +31,10 @@ FLOAT   Precipitation threshold (unit: mm; default: x = 50 mm)
 @BeginExample
 To get the maximum of a time series of 5-day precipitation totals use:
 @BeginVerbatim
-   cdo eca_rx5day rrfile ofile
+   cdo eca_rx5day rrfile outfile
 @EndVerbatim
 Apart from metadata information, the above operation yields the same as:
 @BeginVerbatim
-   cdo timmax rrfile ofile
+   cdo timmax rrfile outfile
 @EndVerbatim
 @EndExample

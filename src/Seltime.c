@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -190,7 +190,7 @@ void *Seltime(void *argument)
   bool *selfound = NULL;
   int *vdate_list = NULL, *vtime_list = NULL;
   double *single;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
 
   cdoInitialize(argument);
 
@@ -330,7 +330,7 @@ void *Seltime(void *argument)
 	  nts1 = 1;
 	}
 
-      vars  = (field_t ***) Malloc(nts1*sizeof(field_t **));
+      vars  = (field_type ***) Malloc(nts1*sizeof(field_type **));
 
       for ( int tsID = 0; tsID < nts1; tsID++ )
 	{

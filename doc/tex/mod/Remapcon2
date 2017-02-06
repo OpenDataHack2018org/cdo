@@ -4,7 +4,7 @@
 @Title     = Second order conservative remapping
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = remapcon2 gencon2
 
 @BeginDescription
@@ -80,9 +80,9 @@ The SCRIP conservative remapping method doesn't work correctly for some grid com
 
 
 @BeginExample
-Say @file{ifile} contains fields on a quadrilateral curvilinear grid.
+Say @file{infile} contains fields on a quadrilateral curvilinear grid.
 To remap all fields conservative (2nd order) to a Gaussian N32 grid, type:
 @BeginVerbatim
-   cdo remapcon2,n32 ifile ofile
+   cdo remapcon2,n32 infile outfile
 @EndVerbatim
 @EndExample

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -77,6 +77,9 @@ int cdoDefaultTimeType   = CDI_UNDEFID;
 
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
+
+int CDO_flt_digits       = 7;
+int CDO_dbl_digits       = 15;
 
 int CDO_Color            = FALSE;
 int CDO_Use_FFTW         = TRUE;
@@ -353,6 +356,33 @@ char *getFileArg(char *argument)
   return fileArg;
 }
 
+static
+void trim_flt(char *ss)
+{
+  char *cp = ss;
+  if ( *cp == '-' ) cp++;
+  while ( isdigit((int)*cp ) || *cp == '.' ) cp++;
+  if ( *--cp == '.' ) return;
+
+  char *ep = cp+1;
+  while ( *cp == '0' ) cp--;
+  cp++;
+  if ( cp == ep ) return;
+  while ( *ep ) *cp++ = *ep++;
+  *cp = '\0';
+
+  return;
+}
+
+
+char *double_to_attstr(int digits, char *str, size_t len, double value)
+{
+  int ret = snprintf(str, len, "%#.*g", digits, value);
+  assert(ret != -1 && ret < (int)len);
+  trim_flt(str);
+  return str;
+}
+
 
 void input_int(char *arg, int intarr[], int maxint, int *nintfound)
 {
@@ -382,7 +412,7 @@ const char *parameter2word(const char *string)
   for ( size_t i = 0; i < len; ++i )
     {
       int c = string[i];
-      if ( !isalnum(c) && c != '_' && c != '.' && c != ':' )
+      if ( iscntrl(c) || isblank(c) )
         cdoAbort("Word parameter >%s< contains invalid character at position %d!", string, i+1);
     }
 
@@ -437,9 +467,7 @@ int parameter2int(const char *string)
 int parameter2intlist(const char *string)
 {
   char *endptr = NULL;
-
   int ival = (int) strtol(string, &endptr, 10);
-
   if ( *endptr != 0 && *endptr != '/' && (endptr - string) == 0 )
     cdoAbort("Integer parameter >%s< contains invalid character at position %d!",
 	     string, (int)(endptr-string+1));

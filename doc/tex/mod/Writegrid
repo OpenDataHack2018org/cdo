@@ -4,7 +4,7 @@
 @Title     = Set grid type
 @Section   = Information
 @Class     = Information
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = writegrid
 @EndModule
 

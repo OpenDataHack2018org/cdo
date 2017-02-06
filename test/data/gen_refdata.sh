@@ -3,8 +3,126 @@
 CDO=cdo
 #
 FORMAT="-f srv -b F32"
-
 #
+########################################################################
+#
+# EOF
+#
+export CDO_FILE_SUFFIX=NULL
+#export CDO_SVD_MODE=danielson_lanczos
+export CDO_WEIGHT_MODE=off
+#
+IFILE=psl_DJF_anom.grb
+cdo $FORMAT eof,1 $IFILE eval_ref eof_ref
+cdo $FORMAT eofcoeff eof_ref $IFILE pcoeff
+exit
+########################################################################
+#
+# Vertstat
+#
+STATS="min max sum avg mean std std1 var var1 int"
+IFILE=pl_data.grb
+for STAT in $STATS; do
+  $CDO $FORMAT vert$STAT $IFILE vert${STAT}_ref
+done
+exit
+########################################################################
+#
+# Comparision
+#
+STATS="eqc nec lec ltc gec gtc"
+#
+IFILE=comptest.srv
+cdo $FORMAT copy t21_geosp_tsurf.grb $IFILE
+for STAT in $STATS; do
+  $CDO $FORMAT $STAT,300 $IFILE comp_${STAT}_ref
+done
+exit
+########################################################################
+#
+# Ymonstat
+#
+STATS="min max sum avg mean std std1 var var1"
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT ymon$STAT $IFILE ymon${STAT}_ref
+done
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT yseas$STAT $IFILE yseas${STAT}_ref
+done
+########################################################################
+#
+# Timstat Yearstat Monstat Daystat Runstat
+#
+IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
+OFILE=ts_6h_5years
+$CDO $FORMAT remapnn,lon=55_lat=10 $IFILE $OFILE
+#
+IFILE=$OFILE
+OFILE=ts_1d_5years
+$CDO $FORMAT daymean $IFILE $OFILE
+$CDO selmon,1 -selyear,1991 $IFILE ts_6h_1mon
+#
+IFILE=$OFILE
+OFILE=ts_mm_5years
+$CDO $FORMAT -settime,12:00:00 -setday,15 -monmean $IFILE $OFILE
+$CDO selyear,1991 $IFILE ts_1d_1year
+#
+STATS="min max sum avg mean std std1 var var1"
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT seas${STAT} $IFILE seas${STAT}_ref
+done
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT run${STAT},12 $IFILE run${STAT}_ref
+done
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT tim$STAT $IFILE tim${STAT}_ref
+done
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT year$STAT $IFILE year${STAT}_ref
+done
+#
+IFILE=ts_1d_1year
+for STAT in $STATS; do
+  $CDO $FORMAT mon$STAT $IFILE mon${STAT}_ref
+done
+#
+IFILE=ts_6h_1mon
+for STAT in $STATS; do
+  $CDO $FORMAT day$STAT $IFILE day${STAT}_ref
+done
+exit
+########################################################################
+#
+# Zonstat
+#
+STATS="min max sum avg mean std std1 var var1"
+IFILE=t21_geosp_tsurf.grb
+for STAT in $STATS; do
+  $CDO $FORMAT zon$STAT $IFILE zon${STAT}_ref
+done
+exit
+########################################################################
+#
+# Merstat
+#
+STATS="min max sum avg mean std std1 var var1"
+IFILE=t21_geosp_tsurf.grb
+for STAT in $STATS; do
+  $CDO $FORMAT mer$STAT $IFILE mer${STAT}_ref
+done
+exit
 ########################################################################
 #
 # MapReduce
@@ -66,16 +184,6 @@ rm -f $IFILE
 exit
 ########################################################################
 #
-# Ymonstat
-#
-STATS="min max sum avg mean std std1 var var1"
-IFILE=ts_mm_5years
-for STAT in $STATS; do
-  $CDO $FORMAT ymon$STAT $IFILE ymon${STAT}_ref
-done
-exit
-########################################################################
-#
 # Test File
 #
 $CDO $FORMAT cdiwrite,1,global_10,3,3,3 file_F32_srv_ref
@@ -106,27 +214,6 @@ for FILE in $IFILES; do
   $CDO infon $IFILE > $OFILE
 done
 exit
-########################################################################
-#
-# Timstat
-#
-IFILE=EH5_AMIP_1_TSURF_6H_1991-1995.grb
-OFILE=ts_6h_5years
-$CDO $FORMAT remapnn,lon=55_lat=10 $IFILE $OFILE
-#
-IFILE=$OFILE
-OFILE=ts_1d_5years
-$CDO $FORMAT daymean $IFILE $OFILE
-#
-IFILE=$OFILE
-OFILE=ts_mm_5years
-$CDO $FORMAT monmean $IFILE $OFILE
-#
-STATS="min max sum avg mean std std1 var var1"
-IFILE=$OFILE
-for STAT in $STATS; do
-  $CDO $FORMAT tim$STAT $IFILE tim${STAT}_ref
-done
 ########################################################################
 #
 # Vertint

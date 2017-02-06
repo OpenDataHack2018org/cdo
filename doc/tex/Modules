@@ -33,6 +33,7 @@ Setzaxis      Modification
 Setgatt       Modification
 Invert        Modification
 Invertlev     Modification
+Shiftxy       Modification
 Maskregion    Modification
 Maskbox       Modification
 Setbox        Modification
@@ -48,6 +49,7 @@ Ydayarith     Arithmetic
 Ymonarith     Arithmetic
 Yseasarith    Arithmetic
 Arithdays     Arithmetic
+Timcumsum     Statistical values
 Consecstat    Statistical values
 Ensstat       Statistical values
 Ensstat2      Statistical values
@@ -140,7 +142,6 @@ Strbre        Miscellaneous
 Strgal        Miscellaneous
 Hurr          Miscellaneous
 CMORlite      Miscellaneous
-CMOR          Miscellaneous
 Magplot       Magics
 Magvector     Magics
 Maggraph      Magics

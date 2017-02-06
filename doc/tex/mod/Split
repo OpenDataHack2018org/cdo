@@ -4,11 +4,11 @@
 @Title     = Split a dataset
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifile obase
+@Arguments = infile obase
 @Operators = splitcode splitparam splitname splitlevel splitgrid splitzaxis splittabnum
 
 @BeginDescription
-This module splits @file{ifile} into pieces. The output files will be named @file{<obase><xxx><suffix>}
+This module splits @file{infile} into pieces. The output files will be named @file{<obase><xxx><suffix>}
 where @file{suffix} is the filename extension derived from the file format. @file{xxx} and the contents 
 of the output files depends on the chosen operator. 
 params is a comma separated list of processing parameters.
@@ -128,9 +128,9 @@ The maximum number of open files depends on the operating system!
 Assume an input GRIB1 dataset with three variables, e.g. code number 129, 130 and 139.
 To split this dataset into three pieces, one for each code number use:
 @BeginVerbatim
-   cdo splitcode ifile code
+   cdo splitcode infile code
 @EndVerbatim
-Result of '{\tt dir code*}':
+Result of '\texttt{dir code*}':
 @BeginListing
    code129.grb code130.grb code139.grb
 @EndListing

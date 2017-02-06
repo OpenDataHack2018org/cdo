@@ -4,7 +4,7 @@
 #  autoconf 2.68
 #  libtool  2.4.2
 
-AC_INIT([cdo], [1.8.0rc5], [http://mpimet.mpg.de/cdo])
+AC_INIT([cdo], [1.8.0], [http://mpimet.mpg.de/cdo])
 
 AC_DEFINE_UNQUOTED(CDO, ["$PACKAGE_VERSION"], [CDO version])
 
@@ -248,9 +248,12 @@ AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_PROG_AWK
 
 AC_CONFIG_FILES([test/File.test test/Read_grib.test test/Read_netcdf.test test/Copy_netcdf.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Comp.test test/Compc.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/Ymonstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/EOF.test test/Select.test test/Spectral.test test/Vertint.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test test/Multiyearstat.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Gridboxstat.test test/Vertstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Merstat.test test/Zonstat.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Afterburner.test test/Detrend.test test/Arithc.test test/Arith.test test/Expr.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gradsdes.test test/Collgrid.test test/threads.test test/tsformat.test test/wildcard.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/MapReduce.test test/Ninfo.test],[chmod a+x "$ac_file"])

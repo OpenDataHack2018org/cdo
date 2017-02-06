@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -87,8 +87,6 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   bool lregular = false;
   bool lcurvilinear = false;
   int gridID2 = -1;
-  int idx;
-  int ny, ix, iy, i, j, ij, offset;
   double *xvals2 = NULL, *yvals2 = NULL;
 
   int nx = -1;
@@ -108,7 +106,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       gridID   = vlistGrid(ef[fileID].vlistID, igrid);
-      gridtype = gridInqType(gridID);
+      int gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
         lregular = true;
       else if ( gridtype == GRID_CURVILINEAR )
@@ -199,13 +197,13 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
       if ( nx <= 0 ) nx = nfiles;
     }
 
-  ny = nfiles/nx;
+  int ny = nfiles/nx;
   if ( nx*ny != nfiles ) cdoAbort("Number of input files (%d) and number of blocks (%dx%d) differ!", nfiles, nx, ny);
  
   int xsize2 = 0;
-  for ( i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
+  for ( int i = 0; i < nx; ++i ) xsize2 += xsize[xyinfo[i].id];
   int ysize2 = 0;
-  for ( j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
+  for ( int j = 0; j < ny; ++j ) ysize2 += ysize[xyinfo[j*nx].id];
   if ( cdoVerbose ) cdoPrint("xsize2 %d  ysize2 %d", xsize2, ysize2);
 
   if ( lregular )
@@ -223,17 +221,17 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   int *yoff = (int*) Malloc((ny+1)*sizeof(int));
 
   xoff[0] = 0;
-  for ( i = 0; i < nx; ++i )
+  for ( int i = 0; i < nx; ++i )
     {
-      idx = xyinfo[i].id;
+      int idx = xyinfo[i].id;
       if ( lregular ) memcpy(xvals2+xoff[i], xvals[idx], xsize[idx]*sizeof(double));
       xoff[i+1] = xoff[i] + xsize[idx];
     }
 
   yoff[0] = 0;
-  for ( j = 0; j < ny; ++j )
+  for ( int j = 0; j < ny; ++j )
     {
-      idx = xyinfo[j*nx].id;
+      int idx = xyinfo[j*nx].id;
       if ( lregular ) memcpy(yvals2+yoff[j], yvals[idx], ysize[idx]*sizeof(double));
       yoff[j+1] = yoff[j] + ysize[idx];
     }
@@ -242,18 +240,18 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
     {
       for ( int fileID = 0; fileID < nfiles; fileID++ )
 	{
-	  idx = xyinfo[fileID].id;
-	  iy = fileID/nx;
-	  ix = fileID - iy*nx;
+	  int idx = xyinfo[fileID].id;
+	  int iy = fileID/nx;
+	  int ix = fileID - iy*nx;
 
-          offset = yoff[iy]*xsize2 + xoff[ix];
+          int offset = yoff[iy]*xsize2 + xoff[ix];
 	  /*
 	  printf("fileID %d %d, iy %d, ix %d, offset %d\n",
 		 fileID, xyinfo[fileID].id, iy, ix, offset);
 	  */
-	  ij = 0;
-	  for ( j = 0; j < ysize[idx]; ++j )
-	    for ( i = 0; i < xsize[idx]; ++i )
+	  int ij = 0;
+	  for ( int j = 0; j < ysize[idx]; ++j )
+	    for ( int i = 0; i < xsize[idx]; ++i )
 	      {
                 if ( lcurvilinear )
                   {
@@ -293,6 +291,8 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
   gridID = vlistGrid(ef[0].vlistID, igrid);
 
   grid_copy_attributes(gridID, gridID2);
+
+  if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridID, gridID2);
 
   return gridID2;
 }

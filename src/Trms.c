@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@
 #include "grid.h"
 
 
-void trms(field_t field1, field_t field2, double *dp, field_t *field3)
+void trms(field_type field1, field_type field2, double *dp, field_type *field3)
 {
   int i, k, nlev, len, rnmiss = 0;
   int    zaxis    = field1.zaxis;
@@ -170,7 +170,7 @@ void *Trms(void *argument)
       vardata2[varID] = (double*) Malloc(gridsize*nlevel*sizeof(double));
     }
 
-  field_t field1, field2, field3;
+  field_type field1, field2, field3;
   field_init(&field1);
   field_init(&field2);
   field_init(&field3);

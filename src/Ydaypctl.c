@@ -45,7 +45,7 @@ void *Ydaypctl(void *argument)
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY];
   long nsets[NDAY];
-  field_t **vars1[NDAY];
+  field_type **vars1[NDAY];
   HISTOGRAM_SET *hsets[NDAY];
 
   cdoInitialize(argument);
@@ -95,7 +95,7 @@ void *Ydaypctl(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 

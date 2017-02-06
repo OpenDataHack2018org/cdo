@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -67,8 +67,8 @@ void *Ymonstat(void *argument)
   int vdates[NMONTH], vtimes[NMONTH];
   int mon[NMONTH];
   int nmon = 0;
-  field_t **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
-  field_t field;
+  field_type **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
+  field_type field;
 
   cdoInitialize(argument);
 

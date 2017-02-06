@@ -4,14 +4,14 @@
 @Title     = Running statistical values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = runmin runmax runsum runmean runavg runstd runstd1 runvar runvar1
 
 @BeginDescription
 This module computes running statistical values over a selected number of timesteps. Depending on 
 the chosen operator the minimum, maximum, sum, average, variance or standard deviation of a selected 
-number of consecutive timesteps read from @file{ifile} is written to @file{ofile}. 
-The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
+number of consecutive timesteps read from @file{infile} is written to @file{outfile}. 
+The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
 @EndModule
 
@@ -26,7 +26,7 @@ o(t+(nts-1)/2,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{min}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -43,7 +43,7 @@ o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{max}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -60,7 +60,7 @@ o(t+(nts-1)/2,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf sum}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{sum}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -77,7 +77,7 @@ o(t+(nts-1)/2,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{mean}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -94,7 +94,7 @@ o(t+(nts-1)/2,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{avg}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -113,7 +113,7 @@ o(t+(nts-1)/2,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{var}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -132,7 +132,7 @@ o(t+(nts-1)/2,x) = var1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf var1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{var1}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -151,7 +151,7 @@ o(t+(nts-1)/2,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{std}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -170,7 +170,7 @@ o(t+(nts-1)/2,x) = std1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf std1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\textbf{std1}}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -185,13 +185,13 @@ INTEGER  Number of timesteps
 
 @BeginEnvironment
 @Item = CDO_TIMESTAT_DATE
-Sets the time stamp in ofile to the "first", "middle" or "last" contributing timestep of ifile.
+Sets the time stamp in outfile to the "first", "middle" or "last" contributing timestep of infile.
 @EndEnvironment
 
 
 @BeginExample
 To compute the running mean over 9 timesteps use:
 @BeginVerbatim
-   cdo runmean,9 ifile ofile
+   cdo runmean,9 infile outfile
 @EndVerbatim
 @EndExample

@@ -4,15 +4,15 @@
 @Title     = Comparison of two fields
 @Section   = Comparison
 @Class     = Comparison
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = eq  ne  le  lt  ge  gt
 
 @BeginDescription
 This module compares two datasets field by field. The resulting
 field is a mask containing 1 if the comparison is true and 0 if not. 
-The number of fields in @file{ifile1} should be the same as in @file{ifile2}.
+The number of fields in @file{infile1} should be the same as in @file{infile2}.
 One of the input files can contain only one timestep or one field.
-The fields in @file{ofile} inherit the meta data from @file{ifile1} or @file{ifile2}.
+The fields in @file{outfile} inherit the meta data from @file{infile1} or @file{infile2}.
 The type of comparison depends on the chosen operator.
 @EndDescription
 @EndModule
@@ -160,6 +160,6 @@ o(t,x) = \left\{
 To create a mask containing 1 if the elements of two fields are the same and 
 0 if the elements are different use:
 @BeginVerbatim
-   cdo eq ifile1 ifile2 ofile
+   cdo eq infile1 infile2 outfile
 @EndVerbatim
 @EndExample

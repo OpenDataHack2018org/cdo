@@ -4,7 +4,7 @@
 @Title     = Distribute horizontal grid
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifile obase
+@Arguments = infile obase
 @Operators = distgrid
 @EndModule
 
@@ -40,7 +40,7 @@ The maximum number of open files depends on the operating system!
 @BeginExample
 Distribute a file into 6 smaller files, each output file receives one half of x and a third of y of the source grid:
 @BeginVerbatim
-   cdo distgrid,2,3 ifile.nc obase
+   cdo distgrid,2,3 infile.nc obase
 @EndVerbatim
 @IfDoc
 Below is a schematic illustration of this example:

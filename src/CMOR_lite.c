@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -76,6 +76,9 @@ typedef struct
   char name[CDI_MAX_NAME];
   // converter
   void *ut_converter;
+
+  double amean;
+  long nvals, n_lower_min, n_greater_max;
 } var_t;
 
 
@@ -102,71 +105,110 @@ void cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units
 }
 
 
-void cdo_check_data(int vlistID2, int varID2, var_t *var, long gridsize, double missval, double *array)
+void cmor_check_init(int nvars, var_t *vars)
+{
+  for ( int varID = 0; varID < nvars; ++varID )
+    {
+      var_t *var = &vars[varID];
+      if ( var->checkvalid || var->check_min_mean_abs || var->check_max_mean_abs )
+        {
+          var->amean = 0;
+          var->nvals = 0;
+          var->n_lower_min = 0;
+          var->n_greater_max = 0;
+        }
+    }
+}
+
+
+void cmor_check_eval(int vlistID, int nvars, var_t *vars)
 {
   char varname[CDI_MAX_NAME];
-  int nvals = 0;
-  double amean = 0, aval;
-  double amin  =  1.e300;
-  double amax  = -1.e300;
-  
-  for ( long i = 0; i < gridsize; ++i )
+
+  for ( int varID = 0; varID < nvars; ++varID )
     {
-      aval = array[i];
-      if ( !DBL_IS_EQUAL(aval, missval) )
-	{
-	  if ( aval < amin ) amin = aval;
-	  if ( aval > amax ) amax = aval;
-	  amean += aval;
-	  nvals++;
-	}
-    }
+      var_t *var = &vars[varID];
+      if ( var->checkvalid || var->check_min_mean_abs || var->check_max_mean_abs )
+        {
+          double amean = var->amean;
+          long nvals = var->nvals;
 
-  if ( nvals > 0 ) amean /= nvals;
+          if ( nvals > 0 ) amean /= nvals;
 
-  int n_lower_min = 0;
-  int n_greater_max = 0;
-  for ( long i = 0; i < gridsize; ++i )
-    {
-      aval = array[i];
-      if ( !DBL_IS_EQUAL(aval, missval) )
-	{
-	  if ( aval < var->valid_min ) n_lower_min++;
-	  if ( aval > var->valid_max ) n_greater_max++;
-	}
-    }
+          long n_lower_min = var->n_lower_min;
+          long n_greater_max = var->n_greater_max;
 
-  vlistInqVarName(vlistID2, varID2, varname);
+          vlistInqVarName(vlistID, varID, varname);
 
-  if ( n_lower_min > 0 )
-    cdoWarning("Invalid value(s) detected for variable '%s': %i values were lower than minimum valid value (%.4g).",
-	       varname, n_lower_min, var->valid_min);
-  if ( n_greater_max > 0 )
-    cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
-	       varname, n_greater_max, var->valid_max);
+          if ( n_lower_min > 0 )
+            cdoWarning("Invalid value(s) detected for variable '%s': %i values were lower than minimum valid value (%.4g).",
+                       varname, n_lower_min, var->valid_min);
+          if ( n_greater_max > 0 )
+            cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
+                       varname, n_greater_max, var->valid_max);
 
-  amean = fabs(amean);
+          if ( var->check_min_mean_abs )
+            {
+              if ( amean < .1*var->ok_min_mean_abs )
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
+                           varname, amean, var->ok_min_mean_abs);
 
-  if ( var->check_min_mean_abs )
-    {
-      if ( amean < .1*var->ok_min_mean_abs )
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
-		 varname, amean, var->ok_min_mean_abs);
+              if ( amean < var->ok_min_mean_abs)
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower than minimum allowed: %.4g",
+                           varname, amean, var->ok_min_mean_abs);
+            }
 
-      if ( amean < var->ok_min_mean_abs)
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower than minimum allowed: %.4g",
-		   varname, amean, var->ok_min_mean_abs);
-    }
-
-  if ( var->check_max_mean_abs )
-    {
-      if ( amean > 10.*var->ok_max_mean_abs )
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
-		 varname, amean, var->ok_max_mean_abs);
+          if ( var->check_max_mean_abs )
+            {
+              if ( amean > 10.*var->ok_max_mean_abs )
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
+                           varname, amean, var->ok_max_mean_abs);
       
-      if ( amean > var->ok_max_mean_abs )
-	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater than maximum allowed: %.4g",
-		   varname, amean, var->ok_max_mean_abs);
+              if ( amean > var->ok_max_mean_abs )
+                cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater than maximum allowed: %.4g",
+                           varname, amean, var->ok_max_mean_abs);
+            }
+        }
+    }
+}
+
+
+void cmor_check_prep(var_t *var, long gridsize, double missval, double *array)
+{
+  if ( var->checkvalid || var->check_min_mean_abs || var->check_max_mean_abs )
+    {
+      double aval;
+      double amean = 0;
+      long nvals = 0;
+  
+      for ( long i = 0; i < gridsize; ++i )
+        {
+          aval = array[i];
+          if ( !DBL_IS_EQUAL(aval, missval) )
+            {
+              amean += fabs(aval);
+              nvals++;
+            }
+        }
+
+      var->amean += amean;
+      var->nvals += nvals;
+
+      long n_lower_min = 0;
+      long n_greater_max = 0;
+
+      for ( long i = 0; i < gridsize; ++i )
+        {
+          aval = array[i];
+          if ( !DBL_IS_EQUAL(aval, missval) )
+            {
+              if ( aval < var->valid_min ) n_lower_min++;
+              if ( aval > var->valid_max ) n_greater_max++;
+            }
+        }
+
+      var->n_lower_min += n_lower_min;
+      var->n_greater_max += n_greater_max;
     }
 }
 
@@ -174,7 +216,9 @@ static
 void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = {"Header"};
+
   const char *ventry[] = {"variable_entry", "&parameter"};
+
   int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
   int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char varname[CDI_MAX_NAME];
@@ -245,8 +289,12 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
               else if ( STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
               else if ( STR_IS_EQ(key, "out_name")      )
                 {
-                  vlistDefVarName(vlistID2, varID, parameter2word(value));
-                  cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
+                  const char *outname = parameter2word(value);
+                  if ( !STR_IS_EQ(var->name, outname) )
+                    {
+                      vlistDefVarName(vlistID2, varID, outname);
+                      cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
+                    }
                 }
               else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
               else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
@@ -261,7 +309,7 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
                   var->factor = parameter2double(value);
                   if ( cdoVerbose ) cdoPrint("%s - scale factor %g", varname, var->factor);
                 }
-              else if ( STR_IS_EQ(key, "missval") )
+              else if ( STR_IS_EQ(key, "missval") || STR_IS_EQ(key, "missing_value") )
                 {
                   double missval = parameter2double(value);
                   double missval_old = vlistInqVarMissval(vlistID2, varID);
@@ -308,7 +356,7 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
         }
       else
         {
-          cdoPrint("Variable %s not found in cmor table!", varname);
+          cdoPrint("Variable %s not found in CMOR table!", varname);
         }
     }
 }
@@ -325,6 +373,7 @@ void *CMOR_lite(void *argument)
   cdoInitialize(argument);
 
   CDO_CMOR_Mode = 1;
+  if ( CDO_CMOR_Mode ) cdiDefGlobal("CMOR_MODE", CDO_CMOR_Mode);
 
   cdoOperatorAdd("cmorlite",  0, 0, "parameter table name");
 
@@ -430,7 +479,9 @@ void *CMOR_lite(void *argument)
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID1);
-	       
+
+      cmor_check_init(nvars, vars);
+
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
@@ -497,9 +548,11 @@ void *CMOR_lite(void *argument)
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
 
-	  if ( var->checkvalid || var->check_min_mean_abs || var->check_max_mean_abs )
-	    cdo_check_data(vlistID2, varID2, var, gridsize, missval, array);
+          cmor_check_prep(var, gridsize, missval, array);
 	}
+
+      cmor_check_eval(vlistID2, nvars, vars);
+
       tsID1++;
     }
 

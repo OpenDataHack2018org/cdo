@@ -4,9 +4,9 @@ pdflatex cdo.tex
 cat > cdo.ist << 'EOF'
 delim_0        "{\\idxdotfill} "
 headings_flag  1
-heading_prefix "{\\centerline {\\Large \\bf "
+heading_prefix "{\\centerline {\\Large \\textbf{ "
 %heading_prefix "{\\centerline {\\bfseries "
-heading_suffix "}}"
+heading_suffix "}}}"
 EOF
 makeindex -s cdo.ist cdo.idx
 pdflatex cdo

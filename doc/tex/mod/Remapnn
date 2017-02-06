@@ -4,7 +4,7 @@
 @Title     = Nearest neighbor remapping
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = remapnn gennn
 
 @BeginDescription

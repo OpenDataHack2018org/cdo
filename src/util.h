@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -52,9 +52,13 @@ extern int CDO_Append_History;
 extern int CDO_Reset_History;
 extern int timer_read, timer_write; // refactor: both pstream.c and CDIread.c CDIwrite.c defined in cdo.c
 
-extern int   CDO_optind;
+extern int CDO_optind;
 extern const char *CDO_optarg;
 extern int CDO_opterr;
+
+extern int CDO_flt_digits;
+extern int CDO_dbl_digits;
+
 extern int remap_genweights;
 
 extern const char *cdoExpName;
@@ -134,6 +138,8 @@ int month_to_season(int month);
 
 void init_is_tty(void);
 
+char *double_to_attstr(int digits, char *str, size_t len, double value);
+
 void progressInit(void);
 void progressStatus(double offset, double refval, double curval);
 
@@ -208,7 +214,7 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
 void writeNCgrid(const char *gridfile, int gridID, int *imask);
 void defineZaxis(const char *zaxisarg);
 
-int gridFromName(const char *gridname);
+int grid_from_name(const char *gridname);
 int zaxisFromName(const char *zaxisname);
 
 /* refactor: moved here from cdo.h */

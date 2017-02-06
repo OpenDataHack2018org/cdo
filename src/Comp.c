@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -39,9 +39,6 @@ void *Comp(void *argument)
   int gridsize1, gridsize2;
   int nrecs, nrecs2, nvars = 0, nlev;
   int varID, levelID;
-  int offset;
-  int nmiss1, nmiss2, nmiss3;
-  int i;
   double missval1, missval2 = 0;
   double *missvalx1, *missvalx2;
   double **vardata = NULL;
@@ -80,15 +77,20 @@ void *Comp(void *argument)
   if ( ntsteps1 == 0 ) ntsteps1 = 1;
   if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
+  bool fillstream1 = false;
+
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
       filltype = FILL_REC;
       cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1)->args);
+      if ( ntsteps2 != 1 ) cdoAbort("stream2 has more than 1 timestep!");
     }
   else if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
       filltype = FILL_REC;
       cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0)->args);
+      if ( ntsteps1 != 1 ) cdoAbort("stream1 has more than 1 timestep!");
+      fillstream1 = true;
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
       vlistIDx1 = vlistID2;
@@ -125,6 +127,7 @@ void *Comp(void *argument)
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
+          fillstream1 = true;
 	  streamIDx1 = streamID2;
           streamIDx2 = streamID1;
 	  vlistIDx1 = vlistID2;
@@ -134,18 +137,18 @@ void *Comp(void *argument)
 
       if ( filltype == FILL_TS )
 	{
-	  nvars  = vlistNvars(vlistIDx2);
-	  vardata  = (double **) Malloc(nvars*sizeof(double *));
+	  nvars = vlistNvars(vlistIDx2);
+	  vardata = (double **) Malloc(nvars*sizeof(double *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
 	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
-	      vardata[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
+	      vardata[varID] = (double*) Malloc(nlev*gridsize*sizeof(double));
 	    }
 	}
     }
 
-  if ( filltype != FILL_NONE && ntsteps1 == 1 )
+  if ( fillstream1 )
     {
       arrayx1 = array2;
       arrayx2 = array1;
@@ -178,6 +181,7 @@ void *Comp(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
+          int nmiss1;
 	  streamInqRecord(streamIDx1, &varID, &levelID);
 	  streamReadRecord(streamIDx1, arrayx1, &nmiss1);
 
@@ -185,21 +189,22 @@ void *Comp(void *argument)
 	    {
 	      if ( recID == 0 || filltype != FILL_REC )
 		{
+                  int nmiss2;
 		  streamInqRecord(streamIDx2, &varID, &levelID);
 		  streamReadRecord(streamIDx2, arrayx2, &nmiss2);
 		}
 
 	      if ( filltype == FILL_TS )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-		  offset   = gridsize*levelID;
+		  int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+		  int offset = gridsize*levelID;
 		  memcpy(vardata[varID]+offset, arrayx2, gridsize*sizeof(double));
 		}
 	    }
 	  else if ( filltype == FILL_TS )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-	      offset   = gridsize*levelID;
+	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+	      int offset = gridsize*levelID;
 	      memcpy(arrayx2, vardata[varID]+offset, gridsize*sizeof(double));
 	    }
 
@@ -224,37 +229,37 @@ void *Comp(void *argument)
 
 	  if ( operatorID == EQ )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : DBL_IS_EQUAL(array1[i], array2[i]));
 	    }
 	  else if ( operatorID == NE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : !DBL_IS_EQUAL(array1[i], array2[i]));
 	    }
 	  else if ( operatorID == LE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] <= array2[i]);
 	    }
 	  else if ( operatorID == LT )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] < array2[i]);
 	    }
 	  else if ( operatorID == GE )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] >= array2[i]);
 	    }
 	  else if ( operatorID == GT )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( int i = 0; i < gridsize; i++ )
 		array3[i] = (DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) ?
 			     missval1 : array1[i] > array2[i]);
 	    }
@@ -263,8 +268,8 @@ void *Comp(void *argument)
 	      cdoAbort("Operator not implemented!");
 	    }
 
-	  nmiss3 = 0;
-	  for ( i = 0; i < gridsize; i++ )
+	  int nmiss3 = 0;
+	  for ( int i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array3[i], missval1) ) nmiss3++;
 
 	  streamDefRecord(streamID3, varID, levelID);

@@ -4,7 +4,7 @@
 @Title     = Remap vertical hybrid level
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = remapeta
 
 @BeginDescription
@@ -16,9 +16,9 @@ few adjustments. The basic tasks are the following one:
 @BeginItemize
 @Item = at first integration of hydrostatic equation
 @Item = extrapolation of surface pressure
-@Item = Planetary Boundary-Layer (PBL) profile interpolation
+@Item = Planetary Boundary-Layer (PBL) proutfile interpolation
 @Item = interpolation in free atmosphere
-@Item = merging of both profiles
+@Item = merging of both proutfiles
 @Item = final surface pressure correction
 @EndItemize
 
@@ -28,7 +28,7 @@ troposhere. Therefore the total mass above a given reference level is conserved.
 the geopotential height of the 400 hPa level is used. Near the surface the correction can affect 
 the vertical structure of the PBL. Therefore the interpolation is done using the potential temperature. 
 But in the free atmosphere above a certain n (n=0.8 defining the top of the PBL) the interpolation 
-is done linearly. After the interpolation both profiles are merged. With the resulting 
+is done linearly. After the interpolation both proutfiles are merged. With the resulting 
 temperature/pressure correction the hydrostatic equation is integrated again and adjusted to the 
 reference level finding the final surface pressure correction. A more detailed description of
 the interpolation can be found in @cite{INTERA}. This operator requires all variables on the same horizontal grid.
@@ -85,7 +85,7 @@ See section "1.4 Z-axis description" for an example how to define a hybrid Z-axi
 @BeginExample
 To remap between different hybrid model level data use:
 @BeginVerbatim
-   cdo remapeta,vct ifile ofile
+   cdo remapeta,vct infile outfile
 @EndVerbatim
 Here is an example vct file with 19 hybrid model level:
 @BeginListing

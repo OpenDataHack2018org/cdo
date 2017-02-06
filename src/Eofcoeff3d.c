@@ -2,7 +2,7 @@
  This file is part of CDO. CDO is a collection of Operators to
  manipulate and analyse Climate model Data.
  
- Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+ Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
  See COPYING file for copying and redistribution conditions.
  
  This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,6 @@
  
  Eofcoeff             eofcoeff             process eof coefficients
 */
-#define WEIGHTS 1
 
 #include "cdi.h"
 #include "cdo.h"
@@ -35,7 +34,7 @@ void *Eofcoeff3d(void * argument)
 {
   char eof_name[6], oname[1024], filesuffix[32];
   double missval1 = -999, missval2 = -999;
-  field_t in;  
+  field_type in;  
   int i, varID, levelID;    
   int nrecs, nmiss; 
    
@@ -77,9 +76,9 @@ void *Eofcoeff3d(void * argument)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
  
-  field_t ***eof = (field_t***) Malloc(nvars * sizeof(field_t**));
+  field_type ***eof = (field_type***) Malloc(nvars * sizeof(field_type**));
   for ( varID=0; varID<nvars; varID++ )
-    eof[varID] = (field_t**) Malloc(nlevs*sizeof(field_t*));
+    eof[varID] = (field_type**) Malloc(nlevs*sizeof(field_type*));
 
   int eofID = 0;
   while ( 1 )       
@@ -92,9 +91,9 @@ void *Eofcoeff3d(void * argument)
          streamInqRecord(streamID1, &varID, &levelID);
          missval1 = vlistInqVarMissval(vlistID1, varID);
          if ( eofID == 0 )
-           eof[varID][levelID] = (field_t*) Malloc(1*sizeof(field_t));
+           eof[varID][levelID] = (field_type*) Malloc(1*sizeof(field_type));
          else
-           eof[varID][levelID] = (field_t*) Realloc(eof[varID][levelID], (eofID+1)*sizeof(field_t));
+           eof[varID][levelID] = (field_type*) Realloc(eof[varID][levelID], (eofID+1)*sizeof(field_type));
          eof[varID][levelID][eofID].grid   = gridID1;
          eof[varID][levelID][eofID].nmiss  = 0;
          eof[varID][levelID][eofID].missval= missval1;
@@ -162,9 +161,9 @@ void *Eofcoeff3d(void * argument)
   // ALLOCATE temporary fields for data read and write
   in.ptr = (double*) Malloc(gridsize*sizeof(double));
   in.grid = gridID1;  
-  field_t **out = (field_t**) Malloc(nvars*sizeof(field_t*));
+  field_type **out = (field_type**) Malloc(nvars*sizeof(field_type*));
   for ( varID = 0; varID < nvars; varID++ ) {
-    out[varID] = (field_t*) Malloc( neof * sizeof(field_t));
+    out[varID] = (field_type*) Malloc( neof * sizeof(field_type));
     for ( eofID=0; eofID<neof; eofID++ ) {
       out[varID][eofID].missval = missval1;
       out[varID][eofID].nmiss = 0;

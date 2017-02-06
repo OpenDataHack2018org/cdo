@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,8 @@
 #include "pstream.h"
 #include "util.h"
 
+
+void cdo_print_grid(int gridID, int opt);
 
 static
 void printAtts(FILE *fp, int vlistID, int varID)
@@ -90,6 +92,7 @@ void printHistory(FILE *fp, int streamID)
       history[historysize] = 0;
       streamInqHistoryString(fileID, history);
       fprintf(fp, "  history=%s\n", history);
+      Free(history);
     }
 }
 
@@ -170,11 +173,8 @@ void partab(FILE *fp, int streamID, int option)
       int param = vlistInqVarParam(vlistID, varID);
       double missval = vlistInqVarMissval(vlistID, varID);
       vlistInqVarName(vlistID, varID, varname);
-      /* printf("1>%s<\n", varname); */
       vlistInqVarStdname(vlistID, varID, varstdname);
-      /* printf("2>%s<\n", varname); */
       vlistInqVarLongname(vlistID, varID, varlongname);
-      /* printf("3>%s<\n", varname); */
       vlistInqVarUnits(vlistID, varID, varunits);
             
       fprintf(fp, "  name=%s", varname);
@@ -243,64 +243,32 @@ void filedes(int streamID)
   int filetype = streamInqFiletype(streamID);
   switch ( filetype )
     {
-    case CDI_FILETYPE_GRB:
-      printf("  GRIB data\n");
-      break;
-    case CDI_FILETYPE_GRB2:
-      printf("  GRIB2 data\n");
-      break;
-    case CDI_FILETYPE_NC:
-      printf("  NetCDF data\n");
-      break;
-    case CDI_FILETYPE_NC2:
-      printf("  NetCDF2 data\n");
-      break;
-    case CDI_FILETYPE_NC4:
-      printf("  NetCDF4 data\n");
-      break;
-    case CDI_FILETYPE_NC4C:
-      printf("  NetCDF4 classic data\n");
-      break;
-    case CDI_FILETYPE_SRV:
-      printf("  SERVICE data\n");
-      switch ( streamInqByteorder(streamID) )
-	{
-	case CDI_BIGENDIAN:
-	  printf("  byteorder is BIGENDIAN\n"); break;
-	case CDI_LITTLEENDIAN:
-	  printf("  byteorder is LITTLEENDIAN\n"); break;
-	default:
-	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
-	}
-      break;
-    case CDI_FILETYPE_EXT:
-      printf("  EXTRA data\n");
-      switch ( streamInqByteorder(streamID) )
-	{
-	case CDI_BIGENDIAN:
-	  printf("  byteorder is BIGENDIAN\n"); break;
-	case CDI_LITTLEENDIAN:
-	  printf("  byteorder is LITTLEENDIAN\n"); break;
-	default:
-	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
-	}
-      break;
-    case CDI_FILETYPE_IEG:
-      printf("  IEG data\n");
-      switch ( streamInqByteorder(streamID) )
-	{
-	case CDI_BIGENDIAN:
-	  printf("  byteorder is BIGENDIAN\n"); break;
-	case CDI_LITTLEENDIAN:
-	  printf("  byteorder is LITTLEENDIAN\n"); break;
-	default:
-	  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
-	}
-      break;
-    default:
-      printf("  unsupported filetype %d\n" , filetype);
-      break;
+    case CDI_FILETYPE_GRB:  printf("  GRIB data\n"); break;
+    case CDI_FILETYPE_GRB2: printf("  GRIB2 data\n"); break;
+    case CDI_FILETYPE_NC:   printf("  NetCDF data\n"); break;
+    case CDI_FILETYPE_NC2:  printf("  NetCDF2 data\n"); break;
+    case CDI_FILETYPE_NC4:  printf("  NetCDF4 data\n"); break;
+    case CDI_FILETYPE_NC4C: printf("  NetCDF4 classic data\n"); break;
+    case CDI_FILETYPE_SRV:  printf("  SERVICE data\n"); break;
+    case CDI_FILETYPE_EXT:  printf("  EXTRA data\n"); break;
+    case CDI_FILETYPE_IEG:  printf("  IEG data\n"); break;
+    default: printf("  unsupported filetype %d\n" , filetype);
     }
+
+  switch ( filetype )
+    {
+    case CDI_FILETYPE_SRV:
+    case CDI_FILETYPE_EXT:
+    case CDI_FILETYPE_IEG:
+      {
+        switch ( streamInqByteorder(streamID) )
+          {
+          case CDI_BIGENDIAN:    printf("  byteorder is BIGENDIAN\n"); break;
+          case CDI_LITTLEENDIAN: printf("  byteorder is LITTLEENDIAN\n"); break;
+          default:  printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
+          }
+       }
+    }  
   
   printf("\n");
 }
@@ -334,15 +302,20 @@ void *Filedes(void *argument)
 
   if ( operatorID == GRIDDES || operatorID == GRIDDES2 )
     {
-      int opt = 0;
-      if ( operatorID == GRIDDES ) opt = 1;
+      int opt = (operatorID == GRIDDES) ? 1 : 0;
       for ( int index = 0; index < ngrids; index++ )
-	gridPrint(vlistGrid(vlistID, index), index+1, opt);
+        {
+          printf("#\n" "# gridID %d\n" "#\n", index+1);
+          cdo_print_grid(vlistGrid(vlistID, index), opt);
+        }
     }
   else if ( operatorID == ZAXISDES )
     {
       for ( int index = 0; index < nzaxis; index++ )
-	zaxisPrint(vlistZaxis(vlistID, index), index+1);
+        {
+          printf("#\n" "# zaxisID %d\n" "#\n", index+1);
+          zaxisPrint(vlistZaxis(vlistID, index));
+        }
     }
   else if ( operatorID == VCT || operatorID == VCT2 )
     {
@@ -401,15 +374,15 @@ void *Filedes(void *argument)
 	  varname[0]     = 0;
 	  varlongname[0] = 0;
 	  varunits[0]    = 0;
-	  int code     = vlistInqVarCode(vlistID, varID);
+	  int code = vlistInqVarCode(vlistID, varID);
 	  vlistInqVarName(vlistID, varID, varname);
 	  vlistInqVarLongname(vlistID, varID, varlongname);
 	  vlistInqVarUnits(vlistID, varID, varunits);
 	  fprintf(stdout, "%4d  %-12s", code, varname);
-	  if ( strlen(varlongname) )
+	  if ( varlongname[0] )
 	    {
 	      fprintf(stdout, "  %s", varlongname);
-	      if ( strlen(varunits) )
+	      if ( varunits[0] )
 		fprintf(stdout, " [%s]", varunits);
 	    }
 	  fprintf(stdout, "\n");

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 #include "percentiles.h"
 
 
-void merfun(field_t field1, field_t *field2, int function)
+void merfun(field_type field1, field_type *field2, int function)
 {
   if      ( function == func_min )  mermin(field1, field2);
   else if ( function == func_max )  mermax(field1, field2);  
@@ -36,7 +36,7 @@ void merfun(field_t field1, field_t *field2, int function)
 }
 
 
-void mermin(field_t field1, field_t *field2)
+void mermin(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -78,7 +78,7 @@ void mermin(field_t field1, field_t *field2)
 }
 
 
-void mermax(field_t field1, field_t *field2)
+void mermax(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -120,7 +120,7 @@ void mermax(field_t field1, field_t *field2)
 }
 
 
-void mersum(field_t field1, field_t *field2)
+void mersum(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   long   nvals   = 0;
@@ -167,7 +167,7 @@ void mersum(field_t field1, field_t *field2)
 }
 
 
-void mermean(field_t field1, field_t *field2)
+void mermean(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -216,7 +216,7 @@ void mermean(field_t field1, field_t *field2)
 }
 
 
-void meravg(field_t field1, field_t *field2)
+void meravg(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -297,7 +297,7 @@ void prevarsum_mer(const double *restrict array, const double *restrict w, int n
 }
 
 
-void mervar(field_t field1, field_t *field2)
+void mervar(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -327,7 +327,7 @@ void mervar(field_t field1, field_t *field2)
 }
 
 
-void mervar1(field_t field1, field_t *field2)
+void mervar1(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -357,7 +357,7 @@ void mervar1(field_t field1, field_t *field2)
 }
 
 
-void merstd(field_t field1, field_t *field2)
+void merstd(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -381,7 +381,7 @@ void merstd(field_t field1, field_t *field2)
 }
 
 
-void merstd1(field_t field1, field_t *field2)
+void merstd1(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -405,7 +405,7 @@ void merstd1(field_t field1, field_t *field2)
 }
 
 /* RQ */
-void merpctl(field_t field1, field_t *field2, int p)
+void merpctl(field_type field1, field_type *field2, int p)
 {
   long   i, j, l;
   int    rnmiss = 0;

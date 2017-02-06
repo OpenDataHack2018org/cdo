@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -445,7 +445,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 }
 
 static
-void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statfunc)
+void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int statfunc)
 {
   bool useWeight = false;
   /*
@@ -456,7 +456,7 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   if ( field1->weight ) useWeight = true;
 
   int gridsize = xinc*yinc;
-  field_t *field = (field_t*) Malloc(ompNumThreads*sizeof(field_t));
+  field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
   for ( int i = 0; i < ompNumThreads; i++ )
     {
       field[i].size    = gridsize;
@@ -595,7 +595,7 @@ void *Gridboxstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
 

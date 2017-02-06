@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ void *Ydaystat(void *argument)
   int nmiss;
   int nlevel;
   int vdates[MAX_DOY], vtimes[MAX_DOY];
-  field_t **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
+  field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
   cdoInitialize(argument);
 
@@ -99,7 +99,7 @@ void *Ydaystat(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 

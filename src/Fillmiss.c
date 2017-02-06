@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 #include "clipping/geometry.h"
 
 
-void fillmiss(field_t *field1, field_t *field2, int nfill)
+void fillmiss(field_type *field1, field_type *field2, int nfill)
 {
   int nx, ny, i, j;
   int nmiss2 = 0;
@@ -147,7 +147,7 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
 }
 
 
-void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
+void fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 {
   int gridID, nx, ny, i, j;
   int nmiss2 = 0;
@@ -276,7 +276,7 @@ double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_
 unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
 
 static
-void setmisstodis(field_t *field1, field_t *field2, int num_neighbors)
+void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 {
   int gridID = field1->grid;
   int gridID0 = gridID;
@@ -414,7 +414,7 @@ void *Fillmiss(void *argument)
 {
   int nmiss;
   int nrecs, varID, levelID;
-  void (*fill_method) (field_t *fin , field_t *fout , int) = NULL;
+  void (*fill_method) (field_type *fin , field_type *fout , int) = NULL;
 
   cdoInitialize(argument);
 
@@ -476,7 +476,7 @@ void *Fillmiss(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field1, field2;
+  field_type field1, field2;
   field_init(&field1);
   field_init(&field2);
   field1.ptr = (double*) Malloc(gridsize*sizeof(double));

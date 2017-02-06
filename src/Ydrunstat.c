@@ -42,8 +42,8 @@
 typedef struct {
   int       vdate[NDAY];
   int       vtime[NDAY];  
-  field_t **vars1[NDAY]; 
-  field_t **vars2[NDAY];
+  field_type **vars1[NDAY]; 
+  field_type **vars2[NDAY];
   int       nsets[NDAY];
   int       vlist;
 }
@@ -53,7 +53,7 @@ YDAY_STATS;
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);
 static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
-  field_t **vars1, field_t **vars2, int nsets, int operfunc);
+  field_type **vars1, field_type **vars2, int nsets, int operfunc);
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
 
@@ -113,10 +113,10 @@ void *Ydrunstat(void *argument)
   cdo_datetime_t *datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
   
   YDAY_STATS *stats = ydstatCreate(vlistID1);
-  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
-  field_t ***vars2 = NULL;
+  field_type ***vars1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
+  field_type ***vars2 = NULL;
   if ( lvarstd )
-    vars2 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+    vars2 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
   
   for ( its = 0; its < ndates; its++ )
     {
@@ -352,7 +352,7 @@ void ydstatDestroy(YDAY_STATS *stats)
 
 static
 void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
-		  field_t **vars1, field_t **vars2, int nsets, int operfunc)
+		  field_type **vars1, field_type **vars2, int nsets, int operfunc)
 {
   int varID, levelID, nvars, nlevels;
   int gridsize;

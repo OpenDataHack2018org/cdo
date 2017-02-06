@@ -4,7 +4,7 @@
 @Title     = Time interpolation
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = inttime intntime
 
 @BeginDescription
@@ -51,6 +51,6 @@ INTEGER Number of timesteps from one timestep to the next
 Assumed a 6 hourly dataset starts at 1987-01-01 12:00:00.
 To interpolate this time series to a one hourly dataset use:
 @BeginVerbatim
-   cdo inttime,1987-01-01,12:00:00,1hour ifile ofile
+   cdo inttime,1987-01-01,12:00:00,1hour infile outfile
 @EndVerbatim
 @EndExample

@@ -2,7 +2,7 @@
 @Name      = Rhopot
 @Title     = Calculates potential density
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = rhopot
 @EndModule
 
@@ -12,7 +12,7 @@
 @Parameter = [pressure]
 
 @BeginDescription
-This is a special operator for the post processing of the ocean and sea ice model @ref{MPIOM}.
+This is a special operator for the post processing of the ocean and sea ice model @cite{MPIOM}.
 It calculates the sea water potential density (name=rhopoto; code=18). Required input fields 
 are sea water in-situ temperature (name=to; code=20) and sea water salinity (name=sao; code=5).
 Pressure is calculated from the level information or can be specified by the optional parameter.
@@ -29,6 +29,6 @@ FLOAT   Pressure in bar (constant value assigned to all levels)
 @BeginExample
 To compute the sea water potential density from the potential temperature use this operator in combination with @mod{adisit}:
 @BeginVerbatim
-   cdo rhopot -adisit ifile ofile
+   cdo rhopot -adisit infile outfile
 @EndVerbatim
 @EndExample

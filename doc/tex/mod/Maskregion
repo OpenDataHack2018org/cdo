@@ -4,7 +4,7 @@
 @Title     = Mask regions
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = maskregion
 @EndModule
 
@@ -37,7 +37,7 @@ STRING Comma separated list of ASCII formatted files with different regions
 To mask the region with the longitudes from 120E to 90W and
 latitudes from 20N to 20S on all input fields use:
 @BeginVerbatim
-   cdo maskregion,myregion ifile ofile
+   cdo maskregion,myregion infile outfile
 @EndVerbatim
 For this example the  polygon description file @file{myregion} should contain 
 the following four coordinates:

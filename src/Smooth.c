@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -316,22 +316,18 @@ void smooth9(int gridID, double missval, const double *restrict array1, double *
   Free(mask);
 }
 
-static
-double convert_radius(const char *string)
+
+double radius_str_to_deg(const char *string)
 {
   char *endptr = NULL;
   double radius = strtod(string, &endptr);
 
   if ( *endptr != 0 )
     {
-      if ( strcmp(endptr, "km") == 0 )
-        radius = 360*((radius*1000)/(2*PlanetRadius*M_PI));
-      else if ( strncmp(endptr, "m", 1) == 0 )
-        radius = 360*((radius)/(2*PlanetRadius*M_PI));
-      else if ( strncmp(endptr, "deg", 3) == 0 )
-        ;
-      else if ( strncmp(endptr, "rad", 3) == 0 )
-        radius *= RAD2DEG;
+      if      ( strcmp(endptr, "km") == 0 )      radius = 360*((radius*1000)/(2*PlanetRadius*M_PI));
+      else if ( strncmp(endptr, "m", 1) == 0 )   radius = 360*((radius)/(2*PlanetRadius*M_PI));
+      else if ( strncmp(endptr, "deg", 3) == 0 ) ;
+      else if ( strncmp(endptr, "rad", 3) == 0 ) radius *= RAD2DEG;
       else
         cdoAbort("Float parameter >%s< contains invalid character at position %d!",
                  string, (int)(endptr-string+1));
@@ -362,11 +358,11 @@ void smooth_set_parameter(int *xnsmooth, smoothpoint_t *spoint)
     { 
       char **pargv = operatorArgv();
 
-      list_t *kvl = list_new(sizeof(keyValues_t *), free_keyval, "SMOOTH");
-      if ( kvlist_parse_cmdline(kvl, pargc, pargv) != 0 ) cdoAbort("Parse error!");
-      if ( cdoVerbose ) kvlist_print(kvl);
+      list_t *kvlist = list_new(sizeof(keyValues_t *), free_keyval, "SMOOTH");
+      if ( kvlist_parse_cmdline(kvlist, pargc, pargv) != 0 ) cdoAbort("Parse error!");
+      if ( cdoVerbose ) kvlist_print(kvlist);
 
-      for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
+      for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
         {
           keyValues_t *kv = *(keyValues_t **)kvnode->data;
           const char *key = kv->key;
@@ -378,16 +374,16 @@ void smooth_set_parameter(int *xnsmooth, smoothpoint_t *spoint)
           else if ( STR_IS_EQ(key, "maxpoints") ) spoint->maxpoints = parameter2int(value);
           else if ( STR_IS_EQ(key, "weight0")   ) spoint->weight0 = parameter2double(value);
           else if ( STR_IS_EQ(key, "weightR")   ) spoint->weightR = parameter2double(value);
-          else if ( STR_IS_EQ(key, "radius")    ) spoint->radius = convert_radius(value);
+          else if ( STR_IS_EQ(key, "radius")    ) spoint->radius = radius_str_to_deg(value);
           else if ( STR_IS_EQ(key, "form")      ) spoint->form = convert_form(value);
           else cdoAbort("Invalid parameter key >%s<!", key);
         }          
           
-      list_destroy(kvl);
+      list_destroy(kvlist);
     }
       
   if ( cdoVerbose )
-    cdoPrint("nsmooth = %d, maxpoints = %d, radius = %gdegree, form = %s, weight0 = %g, weightR = %g",
+    cdoPrint("nsmooth = %d, maxpoints = %d, radius = %gdeg, form = %s, weight0 = %g, weightR = %g",
              *xnsmooth, spoint->maxpoints, spoint->radius, Form[spoint->form], spoint->weight0, spoint->weightR);
 }
 
@@ -413,6 +409,8 @@ void *Smooth(void *argument)
   int operatorID = cdoOperatorID();
 
   if ( operatorID == SMOOTH ) smooth_set_parameter(&xnsmooth, &spoint);
+
+  if ( spoint.radius < 0 || spoint.radius > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "radius", spoint.radius);
 
   spoint.radius *= DEG2RAD;
 

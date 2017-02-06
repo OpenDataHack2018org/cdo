@@ -3,7 +3,7 @@
 @Name      = Timsort
 @Title     = Timsort
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = timsort
 @EndModule
 
@@ -31,6 +31,6 @@ o(t_1,x) <= o(t_2,x)   \mbox{\hspace*{1cm}}   \forall(t_1<t_2),x
 @BeginExample
 To sort all field elements of a dataset over all timesteps use:
 @BeginVerbatim
-   cdo timsort ifile ofile
+   cdo timsort infile outfile
 @EndVerbatim
 @EndExample

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -130,7 +130,7 @@ void *Filter(void *argument)
   bool use_fftw = false;
   double fmin = 0, fmax = 0;
   double fdata = 0;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
   dtlist_type *dtlist = dtlist_new();
   typedef struct
   {
@@ -185,7 +185,7 @@ void *Filter(void *argument)
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-          vars   = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
+          vars   = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
         }
                        
       dtlist_taxisInqTimestep(dtlist, taxisID1, tsID);

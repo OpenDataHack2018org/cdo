@@ -3,16 +3,16 @@
 @Name      = Cond
 @Title     = Conditional select one field
 @Section   = Conditional selection
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = ifthen ifnotthen
 
 @BeginDescription
-This module selects field elements from @file{ifile2} with respect to @file{ifile1} and writes them 
-to @file{ofile}. The fields in @file{ifile1} are handled as a mask. A value 
+This module selects field elements from @file{infile2} with respect to @file{infile1} and writes them 
+to @file{outfile}. The fields in @file{infile1} are handled as a mask. A value 
 not equal to zero is treated as "true", zero is treated as "false".
-The number of fields in @file{ifile1} has either to be the same as in @file{ifile2} or the
-same as in one timestep of @file{ifile2} or only one.
-The fields in @file{ofile} inherit the meta data from @file{ifile2}.
+The number of fields in @file{infile1} has either to be the same as in @file{infile2} or the
+same as in one timestep of @file{infile2} or only one.
+The fields in @file{outfile} inherit the meta data from @file{infile2}.
 @EndDescription
 @EndModule
 
@@ -62,9 +62,9 @@ o(t,x) = \left\{
 
 
 @BeginExample
-To select all field elements of @file{ifile2} if the corresponding field
-element of @file{ifile1} is greater than 0 use:
+To select all field elements of @file{infile2} if the corresponding field
+element of @file{infile1} is greater than 0 use:
 @BeginVerbatim
-   cdo ifthen ifile1 ifile2 ofile
+   cdo ifthen infile1 infile2 outfile
 @EndVerbatim
 @EndExample

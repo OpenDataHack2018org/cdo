@@ -1,6 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES =            \
+               array.h         \
+               array.c         \
                cdo_int.h       \
                compare.h       \
                cdo_pthread.c   \
@@ -67,6 +69,10 @@ libcdo_la_SOURCES =            \
                grid_gme.c      \
                grid_lcc.c      \
                grid_rot.c      \
+               grid_from_name.c   \
+               grid_read.c        \
+               grid_read_pingo.c  \
+               grid_print.c    \
                gridreference.c \
                griddes.c       \
                griddes.h       \
@@ -107,10 +113,10 @@ libcdo_la_SOURCES =            \
                percentiles.h   \
                pipe.c          \
                pipe.h          \
-               pml.c           \
-               pml.h           \
                pmlist.c        \
                pmlist.h        \
+               sellist.c       \
+               sellist.h       \
                pragma_omp_atomic_update.h \
                printinfo.h     \
                process.c       \
@@ -276,7 +282,7 @@ cdo_SOURCES += Adisit.c        \
                Mrotuv.c        \
                Mrotuvb.c       \
                Ninfo.c         \
-               Nmltest.c       \
+               Nmldump.c       \
                Output.c        \
                Outputgmt.c     \
                Pack.c          \
@@ -332,6 +338,7 @@ cdo_SOURCES += Adisit.c        \
                Test.c          \
                Tests.c         \
                Timcount.c      \
+               Timcumsum.c     \
                Timpctl.c       \
                Timselpctl.c    \
                Timselstat.c    \

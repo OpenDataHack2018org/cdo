@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Fldstat    fldrange        Field range (max-min)
       Fldstat    fldmin          Field minimum
       Fldstat    fldmax          Field maximum
       Fldstat    fldsum          Field sum
@@ -89,24 +90,25 @@ void *Fldstat(void *argument)
   int varID, levelID;
   int nmiss;
   double sglval;
-  field_t field;
+  field_type field;
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("fldmin",  func_min,  0, NULL);
-  cdoOperatorAdd("fldmax",  func_max,  0, NULL);
-  cdoOperatorAdd("fldsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("fldmean", func_mean, 1, NULL);
-  cdoOperatorAdd("fldavg",  func_avg,  1, NULL);
-  cdoOperatorAdd("fldstd",  func_std,  1, NULL);
-  cdoOperatorAdd("fldstd1", func_std1, 1, NULL);
-  cdoOperatorAdd("fldvar",  func_var,  1, NULL);
-  cdoOperatorAdd("fldvar1", func_var1, 1, NULL);
-  cdoOperatorAdd("fldpctl", func_pctl, 0, NULL);
+  cdoOperatorAdd("fldrange", func_range, 0, NULL);
+  cdoOperatorAdd("fldmin",   func_min,   0, NULL);
+  cdoOperatorAdd("fldmax",   func_max,   0, NULL);
+  cdoOperatorAdd("fldsum",   func_sum,   0, NULL);
+  cdoOperatorAdd("fldmean",  func_mean,  1, NULL);
+  cdoOperatorAdd("fldavg",   func_avg,   1, NULL);
+  cdoOperatorAdd("fldstd",   func_std,   1, NULL);
+  cdoOperatorAdd("fldstd1",  func_std1,  1, NULL);
+  cdoOperatorAdd("fldvar",   func_var,   1, NULL);
+  cdoOperatorAdd("fldvar1",  func_var1,  1, NULL);
+  cdoOperatorAdd("fldpctl",  func_pctl,  0, NULL);
 
   int operatorID  = cdoOperatorID();
   int operfunc    = cdoOperatorF1(operatorID);
-  int needWeights = cdoOperatorF2(operatorID);
+  bool needWeights = cdoOperatorF2(operatorID) != 0;
 
   double pn = 0;
   if ( operfunc == func_pctl )
@@ -116,7 +118,7 @@ void *Fldstat(void *argument)
       percentile_check_number(pn);
     }
 
-  int useweights = TRUE;
+  bool useweights = true;
 
   if ( needWeights )
     {
@@ -129,7 +131,7 @@ void *Fldstat(void *argument)
 	    for ( unsigned i = 0; i < npar; i++ )
 	      cdoPrint("key %u = %s", i+1, parnames[i]);
 
-	  if ( strcmp(parnames[0], "noweights") == 0 ) useweights = FALSE;
+	  if ( strcmp(parnames[0], "noweights") == 0 ) useweights = false;
 	  else cdoAbort("Parameter >%s< unsupported! Supported parameter are: noweights", parnames[0]);
 	}
     }
@@ -216,7 +218,7 @@ void *Fldstat(void *argument)
 	      field.weight[0] = 1;
 	      if ( useweights && field.size > 1 )
 		{
-		  int wstatus = gridWeights(field.grid, field.weight);
+		  bool wstatus = gridWeights(field.grid, field.weight) != 0;
 		  if ( wstatus && tsID == 0 && levelID == 0 )
 		    {
 		      char varname[CDI_MAX_NAME];

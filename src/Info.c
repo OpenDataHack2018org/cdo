@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -241,6 +241,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 
 void *Info(void *argument)
 {
+  int fpeRaised = 0;
   int varID, levelID;
   int nrecs;
   int nmiss;
@@ -349,6 +350,7 @@ void *Info(void *argument)
 	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
 		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
 		{
+                  //fpeRaised = array_minmaxmean_val(gridsize, array, NULL, NULL, NULL);
 		  fprintf(stdout, "            %#12.5g            ", array[0]);
 		}
 	      else
@@ -373,30 +375,19 @@ void *Info(void *argument)
 				  ivals++;
 				}
 			    }
+                          fpeRaised = 0;
 			  imiss = gridsize - ivals;
 			  nvals = ivals;
+                          if ( nvals ) arrmean /= nvals;
 			}
 		      else
 			{
-			  arrmean = array[0];
-			  //arrvar  = array[0];
-			  arrmin  = array[0];
-			  arrmax  = array[0];
-                          // #pragma omp parallel for default(none) shared(arrmin, arrmax, array, gridsize) reduction(+:arrmean, arrvar)
-                          // #pragma omp simd reduction(+:arrmean) reduction(min:arrmin) reduction(max:arrmax) aligned(array:16)
-			  for ( int i = 1; i < gridsize; i++ )
-			    {
-			      if ( array[i] < arrmin ) arrmin = array[i];
-			      if ( array[i] > arrmax ) arrmax = array[i];
-			      arrmean += array[i];
-			      // arrvar  += array[i]*array[i];
-			    }
+                          fpeRaised = array_minmaxmean_val(gridsize, array, &arrmin, &arrmax, &arrmean);
 			  nvals = gridsize;
 			}
 
 		      if ( nvals )
 			{
-			  arrmean = arrmean/nvals;
 			  // arrvar  = arrvar/nvals - arrmean*arrmean;
 			  fprintf(stdout, "%#12.5g%#12.5g%#12.5g", arrmin, arrmean, arrmax);
 			}
@@ -423,6 +414,7 @@ void *Info(void *argument)
 			      nvals_i++;
 			    }
 			}
+                      fpeRaised = 0;
 
 		      imiss = gridsize - nvals_r;
 
@@ -456,14 +448,14 @@ void *Info(void *argument)
 	      fprintf(stdout, "\n");
 
 	      if ( imiss != nmiss && nmiss > 0 )
-		fprintf(stdout, "Found %d of %d missing values!\n", imiss, nmiss);
+		cdoPrint("Found %d of %d missing values!", imiss, nmiss);
+
+              if ( fpeRaised > 0 ) cdoWarning("floating-point exception reported: %s!", fpe_errstr(fpeRaised));
 
 	      if ( operatorID == MAP )
-		{
-		  int nlon, nlat;
-		  
-		  nlon = gridInqXsize(gridID);
-		  nlat = gridInqYsize(gridID);
+		{		  
+		  int nlon = gridInqXsize(gridID);
+		  int nlat = gridInqYsize(gridID);
 
 		  if ( gridInqType(gridID) == GRID_GAUSSIAN    ||
 		       gridInqType(gridID) == GRID_LONLAT      ||

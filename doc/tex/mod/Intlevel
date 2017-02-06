@@ -3,7 +3,7 @@
 @Title     = Linear level interpolation
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = intlevel
 
 @BeginDescription
@@ -27,6 +27,6 @@ FLOAT  Target levels
 @BeginExample
 To interpolate 3D variables on height levels to a new set of height levels use:
 @BeginVerbatim
-   cdo intlevel,10,50,100,500,1000 ifile ofile
+   cdo intlevel,10,50,100,500,1000 infile outfile
 @EndVerbatim
 @EndExample

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -62,11 +62,17 @@ typedef struct
   char name[CDI_MAX_NAME];
   // converter
   void *ut_converter;
+
+  double amean;
+  long nvals, n_lower_min, n_greater_max;
 } var_t;
 
 
 void cdo_define_var_units(var_t *var, int vlistID2, int varID, const char *units);
-void cdo_check_data(int vlistID2, int varID2, var_t *var, long gridsize, double missval, double *array);
+
+void cmor_check_init(int nvars, var_t *vars);
+void cmor_check_eval(int vlistID, int nvars, var_t *vars);
+void cmor_check_prep(var_t *var, long gridsize, double missval, double *array);
 
 
 static
@@ -78,6 +84,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
   int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char valstr[CDI_MAX_NAME];
   char varname[CDI_MAX_NAME];
+  char paramstr[32];
   int codenum;
 
   // search for global missing value
@@ -133,8 +140,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
         }
       else if ( ptmode == PARAMETER_ID )
         {
-          char paramstr[32];
-          int param   = vlistInqVarParam(vlistID2, varID);
+          int param = vlistInqVarParam(vlistID2, varID);
           paramToStringLong(param, paramstr, sizeof(paramstr));
           snprintf(valstr, sizeof(valstr), "%s", paramstr);
           kvlist = pmlist_search_kvlist_ventry(pmlist, "param", valstr, nventry, ventry);
@@ -165,7 +171,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
               bool lv1 = (kv->nvalues == 1);
               
-              printf("key=%s  value=%s\n", key, value ? value : "");
+              // printf("key=%s  value=%s\n", key, value ? value : "");
 
               if      ( lv1 && STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
               else if ( lv1 && STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
@@ -173,8 +179,12 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               else if ( lv1 && STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
               else if ( lv1 && STR_IS_EQ(key, "out_name")      )
                 {
-                  vlistDefVarName(vlistID2, varID, parameter2word(value));
-                  cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
+                  const char *outname = parameter2word(value);
+                  if ( !STR_IS_EQ(var->name, outname) )
+                    {
+                      vlistDefVarName(vlistID2, varID, outname);
+                      cdiDefAttTxt(vlistID2, varID, "original_name", (int)strlen(var->name), var->name);
+                    }
                 }
               else if ( lv1 && STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
               else if ( lv1 && STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID2, varID, stringToParam(parameter2word(value)));
@@ -235,35 +245,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
                 {
                   int nvalues = kv->nvalues;
                   if ( nvalues == 1 && !*value ) nvalues = 0;
-                  int dtype = -1;
-                  if ( nvalues )
-                    {
-                      dtype = literal_get_datatype(kv->values[0]);
-                      if ( dtype != -1 )
-                        for ( int i = 1; i < nvalues; ++i )
-                          {
-                            int xtype = literal_get_datatype(kv->values[i]);
-                            if ( dtype != xtype )
-                              {
-                                if ( xtype == CDI_DATATYPE_FLT32 || xtype == CDI_DATATYPE_FLT64 )
-                                  {
-                                    if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
-                                      {
-                                        if ( xtype > dtype ) dtype = xtype;
-                                      }
-                                    else dtype = xtype;
-                                  }
-                                else
-                                  {
-                                    if ( !(dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64) )
-                                      {
-                                        if ( xtype > dtype ) dtype = xtype;
-                                      }
-                                    else dtype = xtype;
-                                  }
-                              }
-                          }
-                      }
+                  int dtype = literals_find_datatype(nvalues, kv->values);
                   
                   if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
                     {
@@ -291,7 +273,9 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
         }
       else
         {
-          cdoPrint("Variable %s not found in parameter table!", varname);
+          if      ( ptmode == CODE_NUMBER )   cdoPrint("Code number %d not found in parameter table!", codenum);
+          else if ( ptmode == PARAMETER_ID )  cdoPrint("Parameter ID %s not found in parameter table!", paramstr);
+          else if ( ptmode == VARIABLE_NAME ) cdoPrint("Variable %s not found in parameter table!", varname);
         }
     }
 }
@@ -487,6 +471,8 @@ void *Setpartab(void *argument)
 
       streamDefTimestep(streamID2, tsID1);
 	       
+      cmor_check_init(nvars, vars);
+
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
@@ -553,9 +539,11 @@ void *Setpartab(void *argument)
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
 
-	  if ( var->checkvalid || var->check_min_mean_abs || var->check_max_mean_abs )
-	    cdo_check_data(vlistID2, varID2, var, gridsize, missval, array);
+          cmor_check_prep(var, gridsize, missval, array);
 	}
+
+      cmor_check_eval(vlistID2, nvars, vars);
+
       tsID1++;
     }
 

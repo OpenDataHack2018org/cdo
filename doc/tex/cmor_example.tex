@@ -1,0 +1,189 @@
+\appendix
+
+\chapter{Example}
+
+In this simple example a prepared ECHAM NetCDF file with the two 3D
+variables \textbf{ta} and \textbf{ua} are cmorized with the {\CDO} operator \textbf{cmor}. 
+Here is the NetCDF header of the input file named example.nc:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
+dimensions:
+   lon = 192 ;
+   bnds = 2 ;
+   lat = 96 ;
+   plev = 17 ;
+   time = UNLIMITED ; // (120 currently)
+variables:
+   float lon(lon) ;
+      lon:standard_name = "longitude" ;
+      lon:long_name = "longitude" ;
+      lon:units = "degrees_east" ;
+      lon:bounds = "lon_bnds" ;
+   float lon_bnds(lon, bnds) ;
+   float lat(lat) ;
+      lat:standard_name = "latitude" ;
+      lat:long_name = "latitude" ;
+      lat:units = "degrees_north" ;
+      lat:bounds = "lat_bnds" ;
+   float lat_bnds(lat, bnds) ;
+   double plev(plev) ;
+      plev:standard_name = "air_pressure" ;
+      plev:long_name = "pressure" ;
+      plev:units = "Pa" ;
+      plev:positive = "down" ;
+   double time(time) ;
+      time:standard_name = "time" ;
+      time:bounds = "time_bnds" ;
+      time:units = "days since 1850-1-1 00:00:00" ;
+      time:calendar = "proleptic_gregorian" ;
+   double time_bnds(time, bnds) ;
+   float ta(time, plev, lat, lon) ;
+      ta:units = "K" ;
+   float ua(time, plev, lat, lon) ;
+      ua:units = "m s-1" ;
+\end{lstlisting}
+The example file contains no global attributes and only the units
+attribute for the variables \textbf{ta} and \textbf{ua}.
+
+The {\CDO} \textbf{cmor} command is:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
+   cdo cmor,CMIP6_Amon.json,__info=cmor.rc example.nc
+\end{lstlisting}
+The follwing two output files will be produced:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
+CMIP6/ta_Amon_piControl_MPI-ESM_r1i1p1f1_185001-185912.nc
+CMIP6/ua_Amon_piControl_MPI-ESM_r1i1p1f1_185001-185912.nc
+\end{lstlisting}
+CMIP6\_Amon.json is the CMIP6 table file for monthly mean atmosphere
+data from PCMDI. The option \texttt{\_\_info=cmor.rc} will read settting from
+the config file cmor.rc.
+Here is the contents of this config file:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1},  basicstyle=\footnotesize]
+__inpath                 = "/<XXX>/CMOR/cmip6-cmor-tables/Tables"
+__grid_table             = "CMIP6_grids.json"
+_control_vocabulary_file = "CMIP6_CV.json"
+_cmip6_option            = "CMIP6"
+
+activity_id              = "CMIP"
+outpath                  = "CMIP6"
+experiment_id            = "piControl"
+realization_index        = 1
+initialization_index     = 1
+physics_index            = 1
+forcing_index            = 1
+source_type              = "AOGCM"
+sub_experiment           = "none"
+sub_experiment_id        = "none"
+mip_era                  = "CMIP6"
+contact                  = "cmip5-mpi-esm@dkrz.de"
+institution_id           = "MPI-M"
+model_id                 = "MPI-ESM-MR"
+references               = "ECHAM6: n/a; JSBACH: n/a; MPIOM: n/a;  HAMOCC: n/a;"
+branch_time              = 0
+branch_method            = "standard"
+
+grid                     = "native atmosphere T63 gaussian grid (64x128 latxlon)"
+grid_label               = "gn"
+grid_resolution          = "5 km"
+
+institution              = "Max Planck Institute for Meteorology"
+
+run_variant              = "MPI-ESM-MR model output prepared for CMIP5 pre-industrial control"
+source_id                = "MPI-ESM"
+source                   = "MPI-ESM:"
+output_file_template     = "<variable_id><table><experiment_id><source_id><variant_label>"
+
+license                  = "N/A"
+
+# Rename axis
+__rename_plev            = plev17
+\end{lstlisting}
+
+NetCDF header of the output file ta\_Amon\_piControl\_MPI-ESM\_r1i1p1f1\_185001-185912.nc:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
+dimensions:
+   time = UNLIMITED ; // (120 currently)
+   plev = 17 ;
+   lat = 96 ;
+   lon = 192 ;
+   bnds = 2 ;
+variables:
+   double time(time) ;
+      time:bounds = "time_bnds" ;
+      time:units = "days since 1850-1-1 00:00:00" ;
+      time:calendar = "proleptic_gregorian" ;
+      time:axis = "T" ;
+      time:long_name = "time" ;
+      time:standard_name = "time" ;
+   double time_bnds(time, bnds) ;
+   double plev(plev) ;
+      plev:units = "Pa" ;
+      plev:axis = "Z" ;
+      plev:positive = "down" ;
+      plev:long_name = "pressure" ;
+      plev:standard_name = "air_pressure" ;
+   double lat(lat) ;
+      lat:bounds = "lat_bnds" ;
+      lat:units = "degrees_north" ;
+      lat:axis = "Y" ;
+      lat:long_name = "latitude" ;
+      lat:standard_name = "latitude" ;
+   double lat_bnds(lat, bnds) ;
+   double lon(lon) ;
+      lon:bounds = "lon_bnds" ;
+      lon:units = "degrees_east" ;
+      lon:axis = "X" ;
+      lon:long_name = "longitude" ;
+      lon:standard_name = "longitude" ;
+   double lon_bnds(lon, bnds) ;
+   float ta(time, plev, lat, lon) ;
+      ta:standard_name = "air_temperature" ;
+      ta:long_name = "Air Temperature" ;
+      ta:comment = "Air Temperature" ;
+      ta:units = "K" ;
+      ta:history = "2017-01-31T11:23:09Z altered by CMOR: replaced missing value flag (-9e+33) with standard missing value (1e+20)." ;
+      ta:missing_values = 1.e+20f ;
+      ta:_FillValue = 1.e+20f ;
+
+// global attributes:
+      :Conventions = "CF-1.6 CMIP-6.0" ;
+      :activity_id = "CMIP" ;
+      :additional_source_type = "CHEM AER" ;
+      :branch_method = "standard" ;
+      :branch_time = 0. ;
+      :contact = "cmip5-mpi-esm@dkrz.de" ;
+      :creation_date = "2017-01-31T11:23:09Z" ;
+      :data_specs_version = "01.beta.36" ;
+      :experiment = "pre-Industrial control" ;
+      :experiment_id = "piControl" ;
+      :forcing_index = 1 ;
+      :frequency = "mon" ;
+      :further_info_url = "http://furtherinfo.es-doc.org/CMIP6/MPI-M.MPI-ESM.piControl.none.r1i1p1f1" ;
+      :grid = "native atmosphere T63 gaussian grid (64x128 latxlon)" ;
+      :grid_label = "gn" ;
+      :grid_resolution = "5 km" ;
+      :history = "2017-01-31T11:23:09Z CMOR rewrote data to be consistent with CF standards and CMIP6 requirements." ;
+      :initialization_index = 1 ;
+      :institution = "Max Planck Institute for Meteorology" ;
+      :institution_id = "MPI-M" ;
+      :mip_era = "CMIP6" ;
+      :model_id = "MPI-ESM-MR" ;
+      :physics_index = 1 ;
+      :product = "output" ;
+      :realization_index = 1 ;
+      :realm = "atmos atmosChem" ;
+      :references = "ECHAM6: n/a; JSBACH: n/a; MPIOM: n/a;  HAMOCC: n/a;" ;
+      :run_variant = "MPI-ESM-MR model output prepared for CMIP5 pre-industrial control" ;
+      :source = "MPI-ESM:" ;
+      :source_id = "MPI-ESM" ;
+      :source_type = "AOGCM" ;
+      :sub_experiment = "none" ;
+      :sub_experiment_id = "none" ;
+      :table_id = "Amon" ;
+      :table_info = "Creation Date:(11 October 2016) MD5:77b461da88bd079bd1932066c0c7ad4a" ;
+      :title = "MPI-ESM model output prepared for CMIP6" ;
+      :variable_id = "ta" ;
+      :variant_label = "r1i1p1f1" ;
+      :license = "N/A" ;
+      :cmor_version = "3.1.0" ;
+      :tracking_id = "57138bf0-d93b-495e-82d0-cf287a0849c1" ;
+\end{lstlisting}

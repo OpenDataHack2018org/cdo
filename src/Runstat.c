@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -82,6 +82,14 @@ void *Runstat(void *argument)
   int taxisID1 = vlistInqTaxis(vlistID1);
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
+  /*  Number of timestep will be reduced compared to the input
+   *  error handling in case of not enough timesteps is done per record */
+  int nsteps = vlistNtsteps(vlistID1);
+  if ( nsteps != -1 )
+    {
+      nsteps -= ndates-1;
+      if ( nsteps > 0 ) vlistDefNtsteps(vlistID2, nsteps);
+    }
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -97,12 +105,12 @@ void *Runstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
-  field_t ***vars2 = NULL, ***samp1 = NULL;
+  field_type ***vars1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
+  field_type ***vars2 = NULL, ***samp1 = NULL;
   if ( !runstat_nomiss )
-    samp1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+    samp1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
   if ( lvarstd )
-    vars2 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+    vars2 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
 
   for ( int its = 0; its < ndates; its++ )
     {

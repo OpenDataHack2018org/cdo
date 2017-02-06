@@ -4,14 +4,14 @@
 @Title     = Daily statistical values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = daymin daymax daysum daymean dayavg daystd daystd1 dayvar dayvar1
 
 @BeginDescription
 This module computes statistical values over timesteps of the same day.
 Depending on the chosen operator the minimum, maximum, sum, average, variance
-or standard deviation of timesteps of the same day is written to @file{ofile}.
-The time stamp in @file{ofile} is from the middle contributing timestep of @file{ifile}.
+or standard deviation of timesteps of the same day is written to @file{outfile}.
+The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
 @EndModule
 
@@ -21,14 +21,14 @@ The time stamp in @file{ofile} is from the middle contributing timestep of @file
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = min{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{min}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -40,14 +40,14 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = max{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{max}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -59,14 +59,14 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = sum{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{sum}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -78,14 +78,14 @@ o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = mean{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{mean}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -97,14 +97,14 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = avg{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{avg}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -116,14 +116,14 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = var{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 Normalize by n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{var}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -135,14 +135,14 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = var1{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 Normalize by (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{var1}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -154,14 +154,14 @@ o(t,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+Normalize by n. For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = std{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 Normalize by n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{std}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -173,14 +173,14 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is
+Normalize by (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same day it is:
 
 o(t,x) = std1{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 Normalize by (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same day it is: \\
 @BeginMath
-o(t,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \leq t_n\}
+o(t,x) = \mbox{\textbf{std1}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -190,6 +190,6 @@ o(t,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \leq t_n\}
 @BeginExample
 To compute the daily mean of a time series use:
 @BeginVerbatim
-   cdo daymean ifile ofile
+   cdo daymean infile outfile
 @EndVerbatim
 @EndExample

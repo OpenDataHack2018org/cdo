@@ -8,6 +8,7 @@ CDOOUT=cout$$
 CDOERR=cerr$$
 FORMAT="-f srv -b 32"
 #
+TYPE=fld
 STATS="min max sum avg mean std std1 var var1"
 #
 IFILE=$DATAPATH/t21_geosp_tsurf.grb
@@ -16,11 +17,11 @@ NTEST=1
 #
 for STAT in $STATS; do
   RSTAT=0
-  RFILE=$DATAPATH/fld${STAT}_ref
-  OFILE=fld${STAT}_res
+  RFILE=$DATAPATH/${TYPE}${STAT}_ref
+  OFILE=${TYPE}${STAT}_res
 
-  CDOTEST="fld$STAT"
-  CDOCOMMAND="$CDO $FORMAT fld${STAT} $IFILE $OFILE"
+  CDOTEST="${TYPE}$STAT"
+  CDOCOMMAND="$CDO $FORMAT ${TYPE}${STAT} $IFILE $OFILE"
 
   echo "Running test: $NTEST"
   echo "$CDOCOMMAND"

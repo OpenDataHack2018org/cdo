@@ -3,7 +3,7 @@
 @Name      = Input
 @Title     = Formatted input
 @Section   = Import/Export
-@Arguments = ofile
+@Arguments = outfile
 @Operators = input inputsrv inputext
 
 @BeginDescription
@@ -20,7 +20,7 @@ input depends on the chosen operator.
 
 @BeginDescription
 Reads fields with ASCII numbers from standard input and stores them
-in @file{ofile}. The numbers read are exactly that ones which are written 
+in @file{outfile}. The numbers read are exactly that ones which are written 
 out by the @mod{output} operator.
 @EndDescription
 @EndOperator
@@ -31,7 +31,7 @@ out by the @mod{output} operator.
 
 @BeginDescription
 Reads fields with ASCII numbers from standard input and stores them 
-in @file{ofile}. Each field should have a header of 8 integers (SERVICE likely).
+in @file{outfile}. Each field should have a header of 8 integers (SERVICE likely).
 The numbers that are read are exactly that ones which are written out by 
 the @mod{outputsrv} operator.
 @EndDescription
@@ -43,7 +43,7 @@ the @mod{outputsrv} operator.
 
 @BeginDescription
 Read fields with ASCII numbers from standard input and stores them 
-in @file{ofile}. Each field should have header of 4 integers (EXTRA likely).
+in @file{outfile}. Each field should have header of 4 integers (EXTRA likely).
 The numbers read are exactly that ones which are written out by 
 the @mod{outputext} operator.
 @EndDescription
@@ -62,6 +62,6 @@ STRING  Z-axis description file
 Assume an ASCII dataset contains a field on a global regular grid with 32 longitudes 
 and 16 latitudes (512 elements). To create a GRIB1 dataset from the ASCII dataset use:
 @BeginVerbatim
-   cdo -f grb input,r32x16 ofile.grb < my_ascii_data
+   cdo -f grb input,r32x16 outfile.grb < my_ascii_data
 @EndVerbatim
 @EndExample

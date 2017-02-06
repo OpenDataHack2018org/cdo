@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -29,8 +29,8 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "pstream.h"
 #include "grid.h"
+#include "pstream.h"
 
 
 /*
@@ -1367,7 +1367,7 @@ void *Gradsdes(void *argument)
   int ysize = gridInqYsize(gridID);
 
   int res = 0;
-  if ( gridtype == GRID_GAUSSIAN ) res = nlat2ntr(ysize);
+  if ( gridtype == GRID_GAUSSIAN ) res = nlat_to_ntr(ysize);
 
   if ( res )
     fprintf(gdp, "TITLE  %s  T%d grid\n", datfile, res);

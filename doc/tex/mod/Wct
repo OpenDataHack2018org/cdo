@@ -4,16 +4,16 @@
 @Title     = Windchill temperature
 @Section   = Miscellaneous
 @Class     = Arithmetic
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = wct
 
 @BeginDescription
-Let @file{ifile1} and @file{ifile2} be time series of temperature and wind
+Let @file{infile1} and @file{infile2} be time series of temperature and wind
 speed records, then a corresponding time series of resulting windchill
-temperatures is written to @file{ofile}. The wind chill temperature
+temperatures is written to @file{outfile}. The wind chill temperature
 calculation is only valid for a temperature of T <= 33 @celsius and a wind speed
 of v >= 1.39 m/s. Whenever these conditions are not satisfied, a missing
-value is written to @file{ofile}. Note that temperature and wind speed records
+value is written to @file{outfile}. Note that temperature and wind speed records
 have to be given in units of @celsius and m/s, respectively.
 @EndDescription
 @EndModule

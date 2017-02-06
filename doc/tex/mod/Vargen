@@ -2,7 +2,7 @@
 @Name      = Vargen
 @Title     = Generate a field
 @Section   = Miscellaneous
-@Arguments = ofile
+@Arguments = outfile
 @Operators = const random topo for stdatm
 
 @BeginDescription
@@ -122,7 +122,7 @@ FLOAT   Target levels in metre above surface
 @BeginExample
 To create a standard atmosphere dataset on a given horizontal grid:
 @BeginVerbatim
-   cdo enlarge,gridfile -stdatm,10000,8000,5000,3000,2000,1000,500,200,0 ofile
+   cdo enlarge,gridfile -stdatm,10000,8000,5000,3000,2000,1000,500,200,0 outfile
 @EndVerbatim
 @EndExample
 @EndOperator

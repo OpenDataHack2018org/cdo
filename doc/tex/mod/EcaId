@@ -3,15 +3,15 @@
 @Title     = Ice days index per time period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = eca_id
 
 @BeginDescription
-Let @file{ifile} be a time series of the daily maximum temperature TX,
+Let @file{infile} be a time series of the daily maximum temperature TX,
 then the number of days where TX < 0 @celsius is counted. Note
 that TX have to be given in units of Kelvin.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile}.
+The date information of a timestep in @file{outfile} is the date of
+the last contributing timestep in @file{infile}.
 @EndDescription
 @EndModule
 
@@ -25,6 +25,6 @@ the last contributing timestep in @file{ifile}.
 To get the number of ice days of a time series of daily
 maximum temperatures use:
 @BeginVerbatim
-   cdo eca_id txfile ofile
+   cdo eca_id txfile outfile
 @EndVerbatim
 @EndExample

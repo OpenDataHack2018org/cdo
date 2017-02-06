@@ -4,7 +4,7 @@
 @Title     = Regression
 @Section   = Regression
 @Class     = Regression
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = regres
 @EndModule
 
@@ -14,13 +14,13 @@
 
 @BeginDescription
 @IfMan
-The values of the input file @file{ifile} are assumed to be distributed as
+The values of the input file @file{infile} are assumed to be distributed as
 N(a+b*t,S^2) with unknown a, b and S^2. This operator estimates the
 parameter b. For every field element x only those timesteps 
 t belong to the sample S(x), which have i(t,x) NE miss.
 @EndifMan
 @IfDoc
-The values of the input file @file{ifile} are assumed to be distributed as
+The values of the input file @file{infile} are assumed to be distributed as
 \begin{math}N(a+b t,\sigma^2)\end{math} with unknown @math{a},
 @math{b} and \begin{math}\sigma^2\end{math}. This operator estimates the
 parameter @math{b}.

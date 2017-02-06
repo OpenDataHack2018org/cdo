@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@
 #include "pmlist.h"
 #include "listbuf.h"
 #include "compare.h"
+#include "array.h"
 #include "timebase.h"
 #include "field.h"
 #include "functs.h"
@@ -120,13 +121,7 @@ int     readline(FILE *fp, char *line, int len);
 
 int zaxis2ltype(int zaxisID);
 
-
-int nfc2nlat(int nfc, int ntr);
-int nlat2ntr(int nlat);
-int nlat2ntr_linear(int nlat);
-int ntr2nlat(int ntr);
-int ntr2nlat_linear(int ntr);
-int compNlon(int nlat);
+double radius_str_to_deg(const char *string);
 
 void datetime2str(int date, int time, char *datetimestr, int maxlen);
 void date2str(int date, char *datestr, int maxlen);
@@ -135,7 +130,7 @@ void time2str(int time, char *timestr, int maxlen);
 const char * tunit2str(int tunits);
 const char * calendar2str(int calendar);
 
-void    defineGrid(const char *gridarg);
+void    cdo_set_grids(const char *gridarg);
 void    defineInstitution(const char *instarg);
 int     defineTable(const char *tablearg);
 
@@ -175,6 +170,7 @@ list_t *namelistbuf_to_pmlist(listbuf_t *listbuf);
 list_t *namelist_to_pmlist(FILE *fp, const char *name);
 list_t *cmortable_to_pmlist(FILE *fp, const char *name);
 
+int literals_find_datatype(int n, char **literals);
 int literal_get_datatype(const char *literal);
 int literal_to_int(const char *literal);
 double literal_to_double(const char *literal);

@@ -3,19 +3,19 @@
 @Title     = Very cold days percent wrt 10th percentile of reference period
 @Section   = Climate indices
 @Class     = Climate index
-@Arguments = ifile1 ifile2 ofile
+@Arguments = infile1 infile2 outfile
 @Operators = eca_tx10p
 
 @BeginDescription
-Let @file{ifile1} be a time series of the daily maximum temperature TX, and
-@file{ifile2} be the 10th percentile TXn10 of daily maximum temperatures
+Let @file{infile1} be a time series of the daily maximum temperature TX, and
+@file{infile2} be the 10th percentile TXn10 of daily maximum temperatures
 for any period used as reference. Then the percentage of time where TX < TXn10.
 is calculated.
 TXn10 is calculated as the 10th percentile of daily maximum temperatures of a five 
 day window centred on each calendar day of a given climate reference period.
 Note that both TX and TXn10 have to be givenin the same units.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile1}.
+The date information of a timestep in @file{outfile} is the date of
+the last contributing timestep in @file{infile1}.
 @EndDescription
 @EndModule
 
@@ -30,6 +30,6 @@ To compute the percentage of timesteps with a daily maximum temperature
 smaller than the 10th percentile of the daily maximum temperatures for
 a given reference period use:
 @BeginVerbatim
-   cdo eca_tx10p txfile txn10file ofile
+   cdo eca_tx10p txfile txn10file outfile
 @EndVerbatim
 @EndExample

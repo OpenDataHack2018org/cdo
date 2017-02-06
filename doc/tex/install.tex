@@ -4,41 +4,41 @@ This section describes how to build {\CDO} from the sources on a UNIX system.
 {\CDO} uses the GNU configure and build system for compilation.
 The only requirement is a working ANSI C99 compiler.
 
-%First go to the \href{http://www.mpimet.mpg.de/cdo/download.html}{\tt download} page
-%({\tt http://www.mpimet.mpg.de/\\,cdo/download.html}) to get the latest distribution,
-%First go to the \href{http://www.mpimet.mpg.de/cdo}{\tt download} page
-%({\tt http://www.mpimet.mpg.de/cdo}) to get the latest distribution,
-First go to the \href{https://code.zmaw.de/projects/cdo}{\tt download} page
-({\tt https://code.zmaw.de/projects/cdo}) to get the latest distribution,
+%First go to the \href{http://www.mpimet.mpg.de/cdo/download.html}{\texttt{download}} page
+%(\texttt{http://www.mpimet.mpg.de/\\,cdo/download.html}) to get the latest distribution,
+%First go to the \href{http://www.mpimet.mpg.de/cdo}{\texttt{download}} page
+%(\texttt{http://www.mpimet.mpg.de/cdo}) to get the latest distribution,
+First go to the \href{https://code.zmaw.de/projects/cdo}{\texttt{download}} page
+(\texttt{https://code.zmaw.de/projects/cdo}) to get the latest distribution,
 if you do not have it yet.
 
 To take full advantage of {\CDO} features the following additional libraries should be installed:
 
 \begin{itemize}
 \item Unidata \href{https://www.unidata.ucar.edu/software/netcdf}{NetCDF} library
-      ({\tt https://www.unidata.ucar.edu/software/netcdf})
+      (\texttt{https://www.unidata.ucar.edu/software/netcdf})
       version 3 or higher. \\
       This library is needed to process NetCDF \cite{NetCDF} files with {\CDO}. 
 \item The ECMWF \href{http://www.ecmwf.int/products/data/software/grib_api.html}{GRIB\_API}
-      ({\tt http://www.ecmwf.int/products/data/software/grib\_api.html})
+      (\texttt{http://www.ecmwf.int/products/data/software/grib\_api.html})
       version 1.12 or higher.
       This library is needed to process GRIB2 files with {\CDO}. 
 \item HDF5 \href{http://www.hdfgroup.org/doc_resource/SZIP}{szip} library
-      ({\tt http://www.hdfgroup.org/doc\_resource/SZIP})
+      (\texttt{http://www.hdfgroup.org/doc\_resource/SZIP})
       version 2.1 or higher. \\
       This library is needed to process szip compressed GRIB \cite{GRIB} files with {\CDO}. 
 \item \href{http://www.hdfgroup.org/HDF5}{HDF5} library
-      ({\tt http://www.hdfgroup.org/HDF5})
+      (\texttt{http://www.hdfgroup.org/HDF5})
       version 1.6 or higher. \\
       This library is needed to import  CM-SAF \cite{CM-SAF} HDF5 files with the {\CDO}
-      operator {\bf import\_cmsaf}. 
+      operator \textbf{import\_cmsaf}. 
 \item \href{http://trac.osgeo.org/proj}{PROJ.4} library
-      ({\tt http://trac.osgeo.org/proj})
+      (\texttt{http://trac.osgeo.org/proj})
       version 4.6 or higher. \\
       This library is needed to convert Sinusoidal and Lambert Azimuthal Equal Area coordinates
       to geographic coordinates, for e.g. remapping. 
 \item \href{https://software.ecmwf.int/wiki/display/MAGP/Magics}{Magics} library
-      ({\tt https://software.ecmwf.int/wiki/display/MAGP/Magics})
+      (\texttt{https://software.ecmwf.int/wiki/display/MAGP/Magics})
       version 2.18 or higher. \\
       This library is needed to create contour, vector and graph plots with {\CDO}.
 \end{itemize}
@@ -110,22 +110,22 @@ For an overview of other configuration options use
 
 \end{enumerate}
 
-The program should compile without problems and the binary ({\tt cdo}) 
-should be available in the {\tt src} directory of the distribution.
+The program should compile without problems and the binary (\texttt{cdo}) 
+should be available in the \texttt{src} directory of the distribution.
 
 
 \subsection{Installation}
 
-After the compilation of the source code do a {\tt make install},
+After the compilation of the source code do a \texttt{make install},
 possibly as root if the destination permissions require that.
 
 \begin{verbatim}
     make install
 \end{verbatim} 
 
-The binary is installed into the directory {\tt $<$prefix$>$/bin}.
-{\tt $<$prefix$>$} defaults to {\tt /usr/local} but can be changed with 
-the {\tt --prefix} option of the configure script. 
+The binary is installed into the directory \texttt{$<$prefix$>$/bin}.
+\texttt{$<$prefix$>$} defaults to \texttt{/usr/local} but can be changed with 
+the \texttt{--prefix} option of the configure script. 
 
-Alternatively, you can also copy the binary from the {\tt src} directory
-manually to some {\tt bin} directory in your search path.
+Alternatively, you can also copy the binary from the \texttt{src} directory
+manually to some \texttt{bin} directory in your search path.

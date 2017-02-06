@@ -4,11 +4,11 @@
 @Title     = Merge datasets
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifiles ofile
+@Arguments = infiles outfile
 @Operators = merge mergetime
 
 @BeginDescription
-This module reads datasets from several input files, merges them and writes the resulting dataset to @file{ofile}.
+This module reads datasets from several input files, merges them and writes the resulting dataset to @file{outfile}.
 @EndDescription
 @EndModule
 
@@ -18,7 +18,7 @@ This module reads datasets from several input files, merges them and writes the 
 
 @BeginDescription
 Merges time series of different fields from several input datasets. The number 
-of fields per timestep written to @file{ofile} is the sum of the field numbers 
+of fields per timestep written to @file{outfile} is the sum of the field numbers 
 per timestep in all input datasets. The time series on all input datasets are 
 required to have different fields and the same number of timesteps.
 The fields in each different input file either have to be different variables
@@ -34,7 +34,7 @@ different levels in different input files is not allowed.
 @BeginDescription
 Merges all timesteps of all input files sorted by date and time.
 All input files need to have the same structure with the same variables on 
-different timesteps. After this operation every input timestep is in @file{ofile} 
+different timesteps. After this operation every input timestep is in @file{outfile} 
 and all timesteps are sorted by date and time.
 @EndDescription
 @EndOperator
@@ -56,11 +56,11 @@ The maximum number of open files depends on the operating system!
 Assume three datasets with the same number of timesteps and different variables in each dataset.
 To merge these datasets to a new dataset use:
 @BeginVerbatim
-   cdo merge ifile1 ifile2 ifile3 ofile
+   cdo merge infile1 infile2 infile3 outfile
 @EndVerbatim
 Assume you split a 6 hourly dataset with @oper{splithour}. This produces four datasets, one for each hour.
 The following command merges them together:
 @BeginVerbatim
-   cdo mergetime ifile1 ifile2 ifile3 ifile4 ofile
+   cdo mergetime infile1 infile2 infile3 infile4 outfile
 @EndVerbatim
 @EndExample

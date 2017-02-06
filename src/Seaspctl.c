@@ -88,11 +88,11 @@ void *Seaspctl(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
-  field_t **vars1 = (field_t **) Malloc(nvars * sizeof(field_t *));
+  field_type **vars1 = (field_type **) Malloc(nvars * sizeof(field_type *));
   HISTOGRAM_SET *hset = hsetCreate(nvars);
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -102,7 +102,7 @@ void *Seaspctl(void *argument)
       nlevels   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval  = vlistInqVarMissval(vlistID1, varID);
 
-      vars1[varID] = (field_t*) Malloc(nlevels * sizeof(field_t));
+      vars1[varID] = (field_type*) Malloc(nlevels * sizeof(field_type));
       hsetCreateVarLevels(hset, varID, nlevels, gridID);
 
       for ( levelID = 0; levelID < nlevels; levelID++ )

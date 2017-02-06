@@ -4,7 +4,7 @@
 @Title     = Year interpolation
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile1 ifile2 obase
+@Arguments = infile1 infile2 obase
 @Operators = intyear
 @EndModule
 
@@ -48,9 +48,9 @@ Assume there are two monthly mean datasets over a year. The first dataset
 has 12 timesteps for the year 1985 and the second one for the year 1990.
 To interpolate the years between 1985 and 1990 month by month use:
 @BeginVerbatim
-   cdo intyear,1986,1987,1988,1989 ifile1 ifile2 year
+   cdo intyear,1986,1987,1988,1989 infile1 infile2 year
 @EndVerbatim
-Example result of '{\tt dir year*}' for NetCDF datasets:
+Example result of '\texttt{dir year*}' for NetCDF datasets:
 @BeginListing
    year1986.nc year1987.nc year1988.nc year1989.nc
 @EndListing

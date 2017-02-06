@@ -3,7 +3,7 @@
 @Name      = Smooth
 @Title     = Smooth grid points
 @Section   = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = smooth smooth9
 
 @BeginDescription

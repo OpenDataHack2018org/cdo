@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,96 @@
 #include "grid.h"
 
 
+int nfc_to_nlat(int nfc, int ntr)
+{
+  int nlat = nfc / (ntr+1);
+  nlat /= 2;
+
+  return nlat;
+}
+
+
+int nlat_to_ntr(int nlat)
+{
+  int ntr = (nlat*2 - 1) / 3;
+
+  return ntr;
+}
+
+
+int nlat_to_ntr_linear(int nlat)
+{
+  int ntr = (nlat*2 - 1) / 2;
+
+  return ntr;
+}
+
+
+int ntr_to_nlat(int ntr)
+{
+  int nlat = (int)lround((ntr*3.+1.)/2.);
+  if ( (nlat % 2) > 0 )
+    {
+      nlat  = nlat + 1;
+      /*
+      int nlat2 = (int)lround(((ntr+1)*3.+1.)/2.);
+      if ( nlat == nlat2 )
+	Error("Computation of latitudes failed for truncation %d", ntr);
+      */
+    }
+
+  return nlat;
+}
+
+
+int ntr_to_nlat_linear(int ntr)
+{
+  int nlat = (int)lround((ntr*2.+1.)/2.);
+  if ( (nlat % 2) > 0 )
+    {
+      nlat  = nlat + 1;
+      /*
+      int nlat2 = (int)lround(((ntr+1)*2.+1.)/2.);
+      if ( nlat == nlat2 )
+	Error("Computation of latitudes failed for truncation %d", ntr);
+      */
+    }
+
+  return nlat;
+}
+
+
+int nlat_to_nlon(int nlat)
+{
+  int nlon = 2 * nlat;
+
+  /* check that FFT works with nlon */
+  while ( 1 )
+    {
+      int n = nlon;
+      if    ( n % 8 == 0 )  { n /= 8; }
+      while ( n % 6 == 0 )  { n /= 6; }
+      while ( n % 5 == 0 )  { n /= 5; }
+      while ( n % 4 == 0 )  { n /= 4; }
+      while ( n % 3 == 0 )  { n /= 3; }
+      if    ( n % 2 == 0 )  { n /= 2; }
+
+      if ( n <= 8 ) break;
+
+      nlon = nlon + 2;
+
+      if ( nlon > 9999 )
+	{
+	  nlon = 2 * nlat;
+	  fprintf(stderr, "FFT does not work with len %d!\n", nlon);
+	  break;
+	}
+    }
+
+  return nlon;
+}
+
+
 static
 void scale_vec(double scalefactor, long nvals, double *restrict values)
 {
@@ -52,6 +142,12 @@ void scale_vec(double scalefactor, long nvals, double *restrict values)
 void grid_copy_attributes(int gridID1, int gridID2)
 {
   char string[CDI_MAX_NAME];
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_XDIMNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XDIMNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YDIMNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YDIMNAME, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_VDIMNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_VDIMNAME, strlen(string)+1, string);
   string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_XNAME, CDI_MAX_NAME, string);
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XNAME, strlen(string)+1, string);
   string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YNAME, CDI_MAX_NAME, string);
@@ -64,6 +160,18 @@ void grid_copy_attributes(int gridID1, int gridID2)
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_XUNITS, strlen(string)+1, string);
   string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_YUNITS, CDI_MAX_NAME, string);
   if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_YUNITS, strlen(string)+1, string);
+}
+
+
+void grid_copy_mapping(int gridID1, int gridID2)
+{
+  char string[CDI_MAX_NAME];
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_MAPPING, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_MAPPING, strlen(string)+1, string);
+  string[0] = 0;   cdiGridInqKeyStr(gridID1, CDI_KEY_MAPNAME, CDI_MAX_NAME, string);
+  if ( string[0] ) cdiGridDefKeyStr(gridID2, CDI_KEY_MAPNAME, strlen(string)+1, string);
+
+  cdiCopyAtts(gridID1, CDI_GLOBAL, gridID2, CDI_GLOBAL);
 }
 
 
@@ -516,9 +624,9 @@ void sinu_to_geo(int gridsize, double *xvals, double *yvals)
 void grid_def_param_sinu(int gridID)
 {
   const char *projection = "sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(projection)+1, projection);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
   const char *mapvarname = "Sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
 
   cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
 }
@@ -527,9 +635,9 @@ void grid_def_param_sinu(int gridID)
 void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
 {
   const char *projection = "lambert_azimuthal_equal_area";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(projection)+1, projection);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
   const char *mapvarname = "Lambert_AEA";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(mapvarname)+1, mapvarname);
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
 
   cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
   
@@ -548,7 +656,7 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
     {
       const char *projection = "lambert_azimuthal_equal_area";
       char mapping[CDI_MAX_NAME]; mapping[0] = 0;
-      cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, mapping);
       if ( mapping[0] && strcmp(mapping, projection) == 0 )
         {
           int atttype, attlen;
@@ -590,7 +698,7 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
     {
       const char *projection = "lambert_conformal_conic";
       char mapping[CDI_MAX_NAME]; mapping[0] = 0;
-      cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, mapping);
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, mapping);
       if ( mapping[0] && strcmp(mapping, projection) == 0 )
         {
           int atttype, attlen;

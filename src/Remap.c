@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -361,37 +361,23 @@ void get_remap_env(void)
   envstr = getenv("CDO_REMAP_RADIUS");
   if ( envstr )
     {
-      double fval = atof(envstr);
-      if ( fval < 0 || fval > 180 )
-	{
-	  cdoAbort("CDO_REMAP_RADIUS=%g out of bounds (0-180)", fval);
-	}
-      else
-	{
-	  gridsearch_radius = fval;
-	  if ( cdoVerbose )
-	    cdoPrint("Set CDO_REMAP_RADIUS to %g", gridsearch_radius);
-	}
+      double fval = radius_str_to_deg(envstr);
+      if ( fval < 0 || fval > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_REMAP_RADIUS", fval);
+      gridsearch_radius = fval;
+      if ( cdoVerbose ) cdoPrint("Set CDO_REMAP_RADIUS to %g", gridsearch_radius);
     }
 
   envstr = getenv("CDO_GRIDSEARCH_RADIUS");
   if ( envstr )
     {
-      double fval = atof(envstr);
-      if ( fval < 0 || fval > 180 )
-	{
-	  cdoAbort("CDO_GRIDSEARCH_RADIUS=%g out of bounds (0-180)", fval);
-	}
-      else
-	{
-	  gridsearch_radius = fval;
-	  if ( cdoVerbose )
-	    cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", gridsearch_radius);
-	}
+      double fval = radius_str_to_deg(envstr);
+      if ( fval < 0 || fval > 180 ) cdoAbort("%s=%g out of bounds (0-180 deg)!", "CDO_GRIDSEARCH_RADIUS", fval);
+      gridsearch_radius = fval;
+      if ( cdoVerbose ) cdoPrint("Set CDO_GRIDSEARCH_RADIUS to %g", gridsearch_radius);
     }
   
   if ( cdoVerbose )
-    cdoPrint("remap_radius = %g", gridsearch_radius);
+    cdoPrint("remap_radius = %g deg", gridsearch_radius);
 
   envstr = getenv("REMAP_AREA_MIN");
   if ( envstr )
@@ -731,6 +717,37 @@ void init_remap_timer(void)
 }
 
 static
+void links_per_value(remapvars_t *remapvars)
+{
+  long num_links = remapvars->num_links;
+  const int *restrict dst_add = remapvars->tgt_cell_add;
+
+  int lpv = 1;
+  int ival = dst_add[0];
+  for ( long n = 1; n < num_links; ++n )
+    if ( dst_add[n] == ival ) lpv++;
+    else break;
+
+  if ( num_links%lpv != 0 ) lpv = -1;
+  else if ( lpv > 1 )
+    {
+      for ( long n = 1; n < num_links/lpv; ++n )
+        {
+          ival = dst_add[n*lpv];
+          for ( int k = 1; k < lpv; ++k )
+            if ( dst_add[n*lpv+k] != ival )
+              {
+                lpv = -1;
+                break;
+              }
+          if ( lpv == -1 ) break;
+        }
+    }
+
+  remapvars->links_per_value = lpv;
+}
+
+static
 void sort_remap_add(remapvars_t *remapvars)
 {
   if ( cdoTimer ) timer_start(timer_remap_sort);
@@ -888,6 +905,9 @@ void *Remap(void *argument)
 
       read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &submap_type, &num_neighbors,
 		       &remap_order, &remaps[0].src_grid, &remaps[0].tgt_grid, &remaps[0].vars);
+
+      if ( remaps[0].vars.links_per_value == -1 ) links_per_value(&remaps[0].vars);
+            
       nremaps = 1;
       gridsize = remaps[0].src_grid.size;
       remaps[0].gridID   = gridID1;
@@ -1173,6 +1193,7 @@ void *Remap(void *argument)
 		    resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
 		  
 		  if ( remaps[r].vars.sort_add ) sort_remap_add(&remaps[r].vars);
+		  if ( remaps[r].vars.links_per_value == -1 ) links_per_value(&remaps[r].vars);
 
 		  if ( lwrite_remap ) goto WRITE_REMAP;
 
@@ -1208,7 +1229,7 @@ void *Remap(void *argument)
 	      else
 		remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
 		      remaps[r].vars.num_wts, remaps[r].vars.tgt_cell_add, remaps[r].vars.src_cell_add,
-		      array1, grad1_lat, grad1_lon, grad1_latlon, remaps[r].vars.links);
+		      array1, grad1_lat, grad1_lon, grad1_latlon, remaps[r].vars.links, remaps[r].vars.links_per_value);
 	    }
 	  else
 	    {

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 static
-void isosurface(double isoval, long nlev1, double *lev1, field_t *field3D, field_t *field2D)
+void isosurface(double isoval, long nlev1, double *lev1, field_type *field3D, field_type *field2D)
 {
   bool lmiss1, lmiss2;
 
@@ -136,7 +136,7 @@ void *Isosurface(void *argument)
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
-  field_t field;
+  field_type field;
   field_init(&field);
   field.ptr = (double*) Malloc(gridsize*sizeof(double));
 
@@ -144,7 +144,7 @@ void *Isosurface(void *argument)
 
   bool *liso = (bool*)     Malloc(nvars*sizeof(bool));
   int *vars  = (int*)     Malloc(nvars*sizeof(int));
-  field_t *vars1 = (field_t*) Malloc(nvars*sizeof(field_t));
+  field_type *vars1 = (field_type*) Malloc(nvars*sizeof(field_type));
 
   for ( varID = 0; varID < nvars; varID++ )
     {

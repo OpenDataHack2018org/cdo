@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "grid.h"
 #include "pstream.h"
 #include "specspace.h"
 #include "listarray.h"
@@ -165,9 +166,9 @@ void *Wind(void *argument)
 	  if ( gridID1 != -1 )
 	    {
 	      if ( operatorID == UV2DV )
-		ntr = nlat2ntr(gridInqYsize(gridID1));
+		ntr = nlat_to_ntr(gridInqYsize(gridID1));
 	      else
-		ntr = nlat2ntr_linear(gridInqYsize(gridID1));
+		ntr = nlat_to_ntr_linear(gridInqYsize(gridID1));
 
 	      if ( gridIDsp != -1 )
 		if ( ntr != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
@@ -223,9 +224,9 @@ void *Wind(void *argument)
 	  if ( gridIDgp != -1 )
 	    {
 	      if ( operatorID == DV2UV )
-		ntr = nlat2ntr(gridInqYsize(gridIDgp));
+		ntr = nlat_to_ntr(gridInqYsize(gridIDgp));
 	      else
-		ntr = nlat2ntr_linear(gridInqYsize(gridIDgp));
+		ntr = nlat_to_ntr_linear(gridInqYsize(gridIDgp));
 	      
 	      if ( gridInqTrunc(gridIDsp) != ntr ) gridIDgp = -1;
 	    }
@@ -239,7 +240,7 @@ void *Wind(void *argument)
 	      else
 		snprintf(gridname, sizeof(gridname), "tl%dgrid", gridInqTrunc(gridIDsp));
 	  
-	      gridIDgp = gridFromName(gridname);
+	      gridIDgp = grid_from_name(gridname);
 	    }
 
 	  gridID2 = gridIDgp;

@@ -4,7 +4,7 @@
 @Title     = Fill missing values
 @Section   = Miscellaneous
 @Class     = Miscellaneous
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = fillmiss fillmiss2
 @EndModule
 

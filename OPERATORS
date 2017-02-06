@@ -157,6 +157,8 @@ Operator catalog:
    Setgatt       setgatts        Set global attributes
    Invert        invertlat       Invert latitudes
    Invertlev     invertlev       Invert levels
+   Shiftxy       shiftx          Shift x
+   Shiftxy       shifty          Shift y
    Maskregion    maskregion      Mask regions
    Maskbox       masklonlatbox   Mask a longitude/latitude box
    Maskbox       maskindexbox    Mask an index box
@@ -231,6 +233,7 @@ Operator catalog:
 -------------------------------------------------------------
    Statistical values
 -------------------------------------------------------------
+   Timcumsum     timcumsum       Cumulative sum over all timesteps
    Consecstat    consecsum       Consecutive Sum
    Consecstat    consects        Consecutive Timesteps
    Ensstat       ensmin          Ensemble minimum
@@ -548,7 +551,6 @@ Operator catalog:
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
    CMORlite      cmorlite        CMOR lite
-   CMOR          cmor            CMOR
 -------------------------------------------------------------
    Magics
 -------------------------------------------------------------

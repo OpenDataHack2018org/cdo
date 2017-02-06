@@ -4,7 +4,7 @@
 @Title     = Compare two datasets field by field
 @Section   = Information
 @Class     = Information
-@Arguments = ifile1 ifile2
+@Arguments = infile1 infile2
 @Operators = diff diffn
 
 @BeginDescription
@@ -55,7 +55,7 @@ identifier to label the parameter.
 @BeginExample
 To print the difference for each field of two datasets use:
 @BeginVerbatim
-   cdo diffn ifile1 ifile2
+   cdo diffn infile1 infile2
 @EndVerbatim
 This is an example result of two datasets with one 2D parameter over 12 timesteps:
 @BeginListing

@@ -4,13 +4,13 @@
 @Title     = Vertical statistical values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = vertmin vertmax vertsum vertmean vertavg vertstd vertstd1 vertvar vertvar1
 
 @BeginDescription
 This module computes statistical values over all levels of the input variables.
 According to chosen operator the vertical minimum, maximum, sum, average, variance
-or standard deviation is written to @file{ofile}.
+or standard deviation is written to @file{outfile}.
 @EndDescription
 @EndModule
 
@@ -99,6 +99,6 @@ For every gridpoint the standard deviation over all levels is computed. Normaliz
 @BeginExample
 To compute the vertical sum of all input variables use:
 @BeginVerbatim
-   cdo vertsum ifile ofile
+   cdo vertsum infile outfile
 @EndVerbatim
 @EndExample

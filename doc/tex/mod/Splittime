@@ -4,11 +4,11 @@
 @Title     = Split timesteps of a dataset
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifile obase
+@Arguments = infile obase
 @Operators = splithour splitday splitseas splityear splityearmon splitmon
 
 @BeginDescription
-This module splits @file{ifile} into  timesteps pieces. The output files will be named
+This module splits @file{infile} into  timesteps pieces. The output files will be named
 @file{<obase><xxx><suffix>} where @file{suffix} is the filename extension derived from the file format. 
 @file{xxx} and the contents of the output files depends on the chosen operator. 
 @EndDescription
@@ -101,9 +101,9 @@ Assume the input GRIB1 dataset has timesteps from
 January to December. To split each month with all
 variables into one separate file use:
 @BeginVerbatim
-   cdo splitmon ifile mon
+   cdo splitmon infile mon
 @EndVerbatim
-Result of '{\tt dir mon*}':
+Result of '\texttt{dir mon*}':
 @BeginListing
    mon01.grb  mon02.grb  mon03.grb  mon04.grb  mon05.grb  mon06.grb
    mon07.grb  mon08.grb  mon09.grb  mon10.grb  mon11.grb  mon12.grb

@@ -2,7 +2,8 @@
 #include "cdo_int.h"
 #include "datetime.h"
 
-int CDO_Timestat_Date = -1;
+int  CDO_Timestat_Date = -1;
+bool CDO_Timestat_Bounds = false ;
 
 static
 void get_timestat_date(int *tstat_date)
@@ -105,7 +106,8 @@ void dtlist_taxisInqTimestep(dtlist_type *dtlist, int taxisID, int tsID)
       taxisInqVdateBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].date), &(dtlist->dtinfo[tsID].b[1].date));
       taxisInqVtimeBounds(taxisID, &(dtlist->dtinfo[tsID].b[0].time), &(dtlist->dtinfo[tsID].b[1].time));
 
-      if ( dtlist->dtinfo[tsID].v.date == dtlist->dtinfo[tsID].b[1].date &&
+      if ( CDO_Timestat_Bounds &&
+           dtlist->dtinfo[tsID].v.date == dtlist->dtinfo[tsID].b[1].date &&
            dtlist->dtinfo[tsID].v.time == dtlist->dtinfo[tsID].b[1].time )
         {
           int calendar = dtlist->calendar;

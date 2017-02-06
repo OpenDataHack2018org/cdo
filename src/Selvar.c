@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -191,70 +191,37 @@ void *Selvar(void *argument)
 	  for ( int isel = 0; isel < nsel; isel++ )
 	    {
               bool found = false;
-	      if ( operatorID == SELCODE )
-		{
-		  found = intarr[isel] == code;
-		}
+	      if ( operatorID == SELCODE ) found = intarr[isel] == code;
 	      else if ( operatorID == SELPARAM )
-		{
-		  found = wildcardmatch(argnames[isel], paramstr) == 0;
-		}
+                found = wildcardmatch(argnames[isel], paramstr) == 0;
 	      else if ( operatorID == SELNAME )
-		{
-		  found = wildcardmatch(argnames[isel], varname) == 0;
-		}
+                found = wildcardmatch(argnames[isel], varname) == 0;
 	      else if ( operatorID == SELSTDNAME )
-		{
-		  found = wildcardmatch(argnames[isel], stdname) == 0;
-		}
+                found = wildcardmatch(argnames[isel], stdname) == 0;
 	      else if ( operatorID == SELLEVEL )
-		{
-		  found = fabs(fltarr[isel] - level) < 0.0001;
-		}
+                found = fabs(fltarr[isel] - level) < 0.0001;
 	      else if ( operatorID == SELLEVIDX )
-		{
-		  found = intarr[isel] == (levID+1);
-		}
+                found = intarr[isel] == (levID+1);
 	      else if ( operatorID == SELGRID && args_are_numeric )
-		{
-		  found = intarr[isel] == (grididx+1);
-		}
+                found = intarr[isel] == (grididx+1);
 	      else if ( operatorID == SELGRID && !args_are_numeric )
-		{
-		  found = memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0;
-		}
+                found = memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0;
 	      else if ( operatorID == SELZAXIS && args_are_numeric )
-		{
-		  found = intarr[isel] == (zaxisidx+1);
-		}
+                found = intarr[isel] == (zaxisidx+1);
 	      else if ( operatorID == SELZAXIS && !args_are_numeric )
-		{
-		  found = memcmp(argnames[isel], zaxistypename, strlen(argnames[isel])) == 0;
-		}
+                found = memcmp(argnames[isel], zaxistypename, strlen(argnames[isel])) == 0;
 	      else if ( operatorID == SELZAXISNAME )
-		{
-		  found = wildcardmatch(argnames[isel], zaxisname) == 0;
-		}
+                found = wildcardmatch(argnames[isel], zaxisname) == 0;
 	      else if ( operatorID == SELTABNUM )
-		{
-		  found = intarr[isel] == tabnum;
-		}
+                found = intarr[isel] == tabnum;
 	      else if ( operatorID == DELCODE )
-		{
-		  found = intarr[isel] == code;
-		}
+                found = intarr[isel] == code;
 	      else if ( operatorID == DELNAME )
-		{
-		  found = wildcardmatch(argnames[isel], varname) == 0;
-		}
+                found = wildcardmatch(argnames[isel], varname) == 0;
 	      else if ( operatorID == DELPARAM )
-		{
-		  found = strcmp(argnames[isel], paramstr) == 0;
-		}
+                found = strcmp(argnames[isel], paramstr) == 0;
 	      else if ( operatorID == SELLTYPE )
-		{
-		  found = intarr[isel] == zaxis2ltype(zaxisID);
-		}
+                found = intarr[isel] == zaxis2ltype(zaxisID);
 
 	      if ( found )
 	        {
@@ -291,57 +258,31 @@ void *Selvar(void *argument)
       if ( selfound[isel] == false )
 	{
 	  if ( operatorID == SELCODE || operatorID == DELCODE )
-	    {
-	      cdoWarning("Code number %d not found!", intarr[isel]);
-	    }
+            cdoWarning("Code number %d not found!", intarr[isel]);
 	  else if ( operatorID == SELPARAM || operatorID == DELPARAM )
-	    {
-	      cdoWarning("Parameter %s not found!", argnames[isel]);
-	    }
+            cdoWarning("Parameter %s not found!", argnames[isel]);
 	  else if ( operatorID == SELNAME || operatorID == DELNAME )
-	    {
-	      cdoWarning("Variable name %s not found!", argnames[isel]);
-	    }
+            cdoWarning("Variable name %s not found!", argnames[isel]);
 	  else if ( operatorID == SELSTDNAME )
-	    {
-	      cdoWarning("Variable with standard name %s not found!", argnames[isel]);
-	    }
+            cdoWarning("Variable with standard name %s not found!", argnames[isel]);
 	  else if ( operatorID == SELLEVEL )
-	    {
-	      cdoWarning("Level %g not found!", fltarr[isel]);
-	    }
+            cdoWarning("Level %g not found!", fltarr[isel]);
 	  else if ( operatorID == SELLEVIDX )
-	    {
-	      cdoWarning("Level index %d not found!", intarr[isel]);
-	    }
+            cdoWarning("Level index %d not found!", intarr[isel]);
 	  else if ( operatorID == SELGRID && args_are_numeric )
-	    {
-	      cdoWarning("Grid %d not found!", intarr[isel]);
-	    }
+            cdoWarning("Grid %d not found!", intarr[isel]);
 	  else if ( operatorID == SELGRID && !args_are_numeric )
-	    {
-	      cdoWarning("Grid name %s not found!", argnames[isel]);
-	    }
+            cdoWarning("Grid name %s not found!", argnames[isel]);
 	  else if ( operatorID == SELZAXIS && args_are_numeric )
-	    {
-	      cdoWarning("Zaxis %d not found!", intarr[isel]);
-	    }
+            cdoWarning("Zaxis %d not found!", intarr[isel]);
 	  else if ( operatorID == SELZAXIS && !args_are_numeric )
-	    {
-	      cdoWarning("Zaxis type %s not found!", argnames[isel]);
-	    }
+            cdoWarning("Zaxis type %s not found!", argnames[isel]);
 	  else if ( operatorID == SELZAXISNAME )
-	    {
-	      cdoWarning("Zaxis name %s not found!", argnames[isel]);
-	    }
+            cdoWarning("Zaxis name %s not found!", argnames[isel]);
 	  else if ( operatorID == SELTABNUM )
-	    {
-	      cdoWarning("Table number %d not found!", intarr[isel]);
-	    }
+            cdoWarning("Table number %d not found!", intarr[isel]);
 	  else if ( operatorID == SELLTYPE )
-	    {
-	      cdoWarning("GRIB level type %d not found!", intarr[isel]);
-	    }
+            cdoWarning("GRIB level type %d not found!", intarr[isel]);
 	}
     }
 

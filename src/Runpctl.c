@@ -68,7 +68,7 @@ void *Runpctl(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  field_t ***vars1 = (field_t ***) Malloc((ndates+1)*sizeof(field_t **));
+  field_type ***vars1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
   double *array = (double*) Malloc(ndates*sizeof(double));
   
   for ( int its = 0; its < ndates; its++ )

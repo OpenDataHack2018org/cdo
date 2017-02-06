@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -173,7 +173,7 @@ void *Spectrum(void *argument)
   int nlevel;
   int *vdate = NULL, *vtime = NULL;
   int freq;
-  field_t ***vars = NULL;
+  field_type ***vars = NULL;
 
   cdoInitialize(argument);
 
@@ -200,7 +200,7 @@ void *Spectrum(void *argument)
 	  nalloc += NALLOC_INC;
 	  vdate = (int*) Realloc(vdate, nalloc*sizeof(int));
 	  vtime = (int*) Realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_t ***) Realloc(vars, nalloc*sizeof(field_t **));
+	  vars  = (field_type ***) Realloc(vars, nalloc*sizeof(field_type **));
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);
@@ -255,7 +255,7 @@ void *Spectrum(void *argument)
 
   int nfreq = seg_l/2 + 1;
 
-  field_t ***vars2 = (field_t ***) Malloc(nfreq*sizeof(field_t **));
+  field_type ***vars2 = (field_type ***) Malloc(nfreq*sizeof(field_type **));
   for ( freq = 0; freq < nfreq; freq++ )
     vars2[freq] = field_malloc(vlistID1, FIELD_PTR);
 

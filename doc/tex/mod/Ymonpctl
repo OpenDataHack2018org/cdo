@@ -4,16 +4,16 @@
 @Title     = Multi-year monthly percentile values
 @Section   = Statistical values
 @Class     = Statistic
-@Arguments = ifile1 ifile2 ifile3 ofile
+@Arguments = infile1 infile2 infile3 outfile
 @Operators = ymonpctl
 
 @BeginDescription
-This operator writes a certain percentile of each month of year in @file{ifile1} to @file{ofile}.
+This operator writes a certain percentile of each month of year in @file{infile1} to @file{outfile}.
 The algorithm uses histograms with minimum and maximum bounds given in
-@file{ifile2} and @file{ifile3}, respectively. The default number of
+@file{infile2} and @file{infile3}, respectively. The default number of
 histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files
-@file{ifile2} and @file{ifile3} should be the result of corresponding
+@file{infile2} and @file{infile3} should be the result of corresponding
 @mod{ymonmin} and @mod{ymonmax} operations, respectively.
 The date information in an output field is the date of the last
 contributing input field.
@@ -36,9 +36,9 @@ o(12,x) = pth percentile {i(t,x), month(i(t)) = 12}
 
 @BeginMath
 \begin{array}{c}
-o(\mbox{01},x) = \mbox{\bf pth percentile}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
+o(\mbox{01},x) = \mbox{\textbf{pth percentile}}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
 \vdots \\
-o(\mbox{12},x) = \mbox{\bf pth percentile}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
+o(\mbox{12},x) = \mbox{\textbf{pth percentile}}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -61,12 +61,12 @@ Sets the number of histogram bins. The default number is 101.
 @BeginExample
 To compute the monthly 90th percentile over all input years use:
 @BeginVerbatim
-   cdo ymonmin ifile minfile
-   cdo ymonmax ifile maxfile
-   cdo ymonpctl,90 ifile minfile maxfile ofile
+   cdo ymonmin infile minfile
+   cdo ymonmax infile maxfile
+   cdo ymonpctl,90 infile minfile maxfile outfile
 @EndVerbatim
 Or shorter using operator piping:
 @BeginVerbatim
-   cdo ymonpctl,90 ifile -ymonmin ifile -ymonmax ifile ofile
+   cdo ymonpctl,90 infile -ymonmin infile -ymonmax infile outfile
 @EndVerbatim
 @EndExample

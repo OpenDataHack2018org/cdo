@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2016 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -128,7 +128,7 @@ void *Monarith(void *argument);
 void *Mrotuv(void *argument);
 void *Mrotuvb(void *argument);
 void *Ninfo(void *argument);
-void *Nmltest(void *argument);
+void *Nmldump(void *argument);
 void *Output(void *argument);
 void *Outputgmt(void *argument);
 void *Pack(void *argument);
@@ -188,6 +188,7 @@ void *Testdata(void *argument);
 void *Tests(void *argument);
 void *Timsort(void *argument);
 void *Timcount(void *argument);
+void *Timcumsum(void *argument);
 void *Timpctl(void *argument);
 void *Timselpctl(void *argument);
 void *Timselstat(void *argument);
@@ -311,8 +312,7 @@ void *Maggraph(void *argument);
 #define  DiffOperators          {"diff", "diffp", "diffn", "diffc"}
 #define  DistgridOperators      {"distgrid"}
 #define  DuplicateOperators     {"duplicate"}
-#define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
-                                 "export_e5ml", "export_e5res"}
+#define  Echam5iniOperators     {"import_e5ml", "import_e5res", "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl"}
@@ -329,7 +329,7 @@ void *Maggraph(void *argument);
 #define  FillmissOperators      {"fillmiss", "fillmiss2"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
-#define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
+#define  FldstatOperators       {"fldrange", "fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
 #define  FldcorOperators        {"fldcor"}
 #define  FldcovarOperators      {"fldcovar"}
 #define  FourierOperators       {"fourier"}
@@ -371,7 +371,7 @@ void *Maggraph(void *argument);
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel", "ngridpoints", "ngrids"}
-#define  NmltestOperators       {"nmltest"}
+#define  NmldumpOperators       {"nmldump", "kvldump"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr", "outputxyz"}
 #define  OutputtabOperators     {"outputtab"}
@@ -453,6 +453,7 @@ void *Maggraph(void *argument);
 #define    MoncountOperators    {"moncount"}
 #define    DaycountOperators    {"daycount"}
 #define    HourcountOperators   {"hourcount"}
+#define  TimcumsumOperators     {"timcumsum"}
 #define  TimpctlOperators       {"timpctl"}
 #define    YearpctlOperators    {"yearpctl"}
 #define    MonpctlOperators     {"monpctl"}
@@ -463,11 +464,11 @@ void *Maggraph(void *argument);
 #define  XTimstatOperators      {"xtimmin",  "xtimmax",  "xtimsum",  "xtimmean",  "xtimavg",  "xtimvar",  "xtimvar1",  "xtimstd",  "xtimstd1", \
                                  "xyearmin", "xyearmax", "xyearsum", "xyearmean", "xyearavg", "xyearvar", "xyearvar1", "xyearstd", "xyearstd1", \
                                  "xmonmin",  "xmonmax",  "xmonsum",  "xmonmean",  "xmonavg",  "xmonvar",  "xmonvar1",  "xmonstd",  "xmonstd1"}
-#define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timvar",  "timvar1",  "timstd",  "timstd1"}
-#define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearvar", "yearvar1", "yearstd", "yearstd1"}
-#define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monvar1",  "monstd",  "monstd1"}
-#define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "dayvar1",  "daystd",  "daystd1"}
-#define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourvar1", "hourstd", "hourstd1"}
+#define  TimstatOperators       {"timrange",  "timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timvar",  "timvar1",  "timstd",  "timstd1"}
+#define    YearstatOperators    {"yearrange", "yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearvar", "yearvar1", "yearstd", "yearstd1"}
+#define    MonstatOperators     {"monrange",  "monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monvar1",  "monstd",  "monstd1"}
+#define    DaystatOperators     {"dayrange",  "daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "dayvar1",  "daystd",  "daystd1"}
+#define    HourstatOperators    {"hourrange", "hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourvar1", "hourstd", "hourstd1"}
 #define  TimcorOperators        {"timcor"}
 #define  TimcovarOperators      {"timcovar"}
 #define  Timstat3Operators      {"meandiff2test", "varquot2test"}
@@ -580,8 +581,8 @@ static modules_t Modules[] =
   { Change,         ChangeHelp,        ChangeOperators,        1,   CDI_REAL,  1,  1 },
   { Change_e5slm,   NULL,              Change_e5slmOperators,  0,   CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    1,   CDI_REAL,  1,  1 },
-  { CMOR,           CMORHelp,          CMOROperators,          1,   CDI_REAL,  1,  0 },
-  { CMOR_lite,      NULL,              CMORliteOperators,      1,   CDI_REAL,  1,  1 },
+  { CMOR,           NULL,              CMOROperators,          1,   CDI_REAL,  1,  0 },
+  { CMOR_lite,      CMORliteHelp,      CMORliteOperators,      1,   CDI_REAL,  1,  1 },
   { CMOR_table,     NULL,              CMORtableOperators,     1,   CDI_REAL,  0,  0 },
   { Collgrid,       CollgridHelp,      CollgridOperators,      1,   CDI_REAL, -1,  1 },
   { Command,        NULL,              CommandOperators,       0,   CDI_REAL,  1,  0 },
@@ -657,7 +658,7 @@ static modules_t Modules[] =
   { Mrotuv,         NULL,              MrotuvOperators,        1,   CDI_REAL,  1,  2 },
   { Mrotuvb,        NULL,              MrotuvbOperators,       1,   CDI_REAL,  2,  1 },
   { Ninfo,          NinfoHelp,         NinfoOperators,         1,   CDI_BOTH,  1,  0 },
-  { Nmltest,        NULL,              NmltestOperators,       0,   CDI_REAL,  0,  0 },
+  { Nmldump,        NULL,              NmldumpOperators,       0,   CDI_REAL,  0,  0 },
   { Output,         OutputHelp,        OutputOperators,        1,   CDI_REAL, -1,  0 },
   { Output,         OutputtabHelp,     OutputtabOperators,     1,   CDI_REAL, -1,  0 },
   { Outputgmt,      OutputgmtHelp,     OutputgmtOperators,     1,   CDI_REAL,  1,  0 },
@@ -705,7 +706,7 @@ static modules_t Modules[] =
   { Setrcaname,     NULL,              SetrcanameOperators,    1,   CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       1,   CDI_BOTH,  1,  1 },
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,      1,   CDI_BOTH,  1,  1 },
-  { Shiftxy,        NULL,              ShiftxyOperators,       1,   CDI_REAL,  1,  1 },
+  { Shiftxy,        ShiftxyHelp,       ShiftxyOperators,       1,   CDI_REAL,  1,  1 },
   { Showinfo,       ShowinfoHelp,      ShowinfoOperators,      1,   CDI_BOTH,  1,  0 },
   { Sinfo,          SinfoHelp,         SinfoOperators,         1,   CDI_BOTH, -1,  0 },
   { Smooth,         SmoothHelp,        SmoothOperators,        1,   CDI_REAL,  1,  1 },
@@ -732,6 +733,7 @@ static modules_t Modules[] =
   { Timcount,       NULL,              MoncountOperators,      1,   CDI_BOTH,  1,  1 },
   { Timcount,       NULL,              DaycountOperators,      1,   CDI_BOTH,  1,  1 },
   { Timcount,       NULL,              HourcountOperators,     1,   CDI_BOTH,  1,  1 },
+  { Timcumsum,      TimcumsumHelp,     TimcumsumOperators,     1,   CDI_BOTH,  1,  1 },
   { Timpctl,        TimpctlHelp,       TimpctlOperators,       1,   CDI_REAL,  3,  1 },
   { Timpctl,        YearpctlHelp,      YearpctlOperators,      1,   CDI_REAL,  3,  1 },
   { Timpctl,        MonpctlHelp,       MonpctlOperators,       1,   CDI_REAL,  3,  1 },

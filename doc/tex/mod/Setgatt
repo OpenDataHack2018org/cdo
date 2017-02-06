@@ -4,7 +4,7 @@
 @Title     = Set global attribute
 @Section   = Modification
 @Class     = Modification
-@Arguments = ifile ofile
+@Arguments = infile outfile
 @Operators = setgatt setgatts
 
 @BeginDescription
@@ -51,11 +51,11 @@ Besides NetCDF none of the supported data formats supports global attributes.
 @BeginExample
 To set the global text attribute "myatt" to "myattcontents" in a NetCDF file use:
 @BeginVerbatim
-   cdo setgatt,myatt,myattcontents ifile ofile
+   cdo setgatt,myatt,myattcontents infile outfile
 @EndVerbatim
-Result of '{\tt ncdump -h ofile}':
+Result of '\texttt{ncdump -h outfile}':
 @BeginListing
-netcdf ofile {
+netcdf outfile {
 dimensions: ...
 
 variables: ...

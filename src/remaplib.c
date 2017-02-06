@@ -966,6 +966,8 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   else if ( map_type == MAP_TYPE_DISTWGT     ) rv->num_wts = 1;
   else cdoAbort("Unknown mapping method!");
 
+  rv->links_per_value = -1;
+
    /*
     Initialize num_links and set max_links to four times the largest 
     of the destination grid sizes initially (can be changed later).
@@ -1032,7 +1034,7 @@ void resize_remap_vars(remapvars_t *rv, int increment)
 void remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts, 
 	   long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array, 
 	   const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3,
-	   remaplink_t links)
+	   remaplink_t links, long links_per_value)
 {
   /*
     Input arrays:
@@ -1057,59 +1059,100 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
     double *dst_array    ! array for remapped field on destination grid
   */
 
-  /* Local variables */
-  long n;
-  int iorder;
   extern int timer_remap;
 
-  /* Check the order of the interpolation */
+  // Check the order of the interpolation
 
-  if ( src_grad1 )
-    iorder = 2;
-  else
-    iorder = 1;
+  int iorder = (src_grad1 == NULL) ? 1 : 2;
 
-  for ( n = 0; n < dst_size; ++n ) dst_array[n] = missval;
+  for ( long n = 0; n < dst_size; ++n ) dst_array[n] = missval;
 
   if ( cdoTimer ) timer_start(timer_remap);
 
-#ifdef SX
-#pragma cdir nodep
-#endif
-  for ( n = 0; n < num_links; ++n ) dst_array[dst_add[n]] = 0.;
-
-  if ( iorder == 1 )   /* First order remapping */
+  if ( iorder == 1 )   // First order remapping
     {
       if ( links.option )
 	{
-	  long j;
-	  for ( j = 0; j < links.num_blks; ++j )
-	    {
 #ifdef SX
 #pragma cdir nodep
 #endif
-	      for ( n = 0; n < links.num_links[j]; ++n )
+          for ( long n = 0; n < num_links; ++n ) dst_array[dst_add[n]] = 0.;
+
+	  for ( long j = 0; j < links.num_blks; ++j )
+	    {
+              const int *restrict dst_addx = links.dst_add[j];
+              const int *restrict src_addx = links.src_add[j];
+              const int *restrict windex = links.w_index[j];
+
+#if defined(HAVE_OPENMP4)
+#pragma omp simd
+#endif
+	      for ( long n = 0; n < links.num_links[j]; ++n )
 		{
-		  dst_array[links.dst_add[j][n]] += src_array[links.src_add[j][n]]*map_wts[num_wts*links.w_index[j][n]];
+		  dst_array[dst_addx[n]] += src_array[src_addx[n]]*map_wts[num_wts*windex[n]];
 		}
 	    }
 	}
       else
 	{
-	  for ( n = 0; n < num_links; ++n )
-	    {
-	      /*
-		printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
-	      */
-	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
-	    }
+          long lpv = links_per_value;
+          if ( lpv > 0 )
+            {
+              long nlinks = num_links/lpv;
+
+              if ( lpv == 4 )
+                {
+#if defined(_OPENMP)
+#pragma omp parallel for default(none)  shared(dst_array, src_array, dst_add, src_add, map_wts, num_wts, nlinks, lpv)
+#endif
+                  for ( long n = 0; n < nlinks; ++n )
+                    {
+                      long noff = n*lpv;
+                      dst_array[dst_add[noff]] = src_array[src_add[noff]]*map_wts[num_wts*(noff)] +
+                                                 src_array[src_add[noff+1]]*map_wts[num_wts*(noff+1)] +
+                                                 src_array[src_add[noff+2]]*map_wts[num_wts*(noff+2)] +
+                                                 src_array[src_add[noff+3]]*map_wts[num_wts*(noff+3)];
+                    }
+                }
+              else
+                {
+#if defined(_OPENMP)
+#pragma omp parallel for default(none)  shared(dst_array, src_array, dst_add, src_add, map_wts, num_wts, nlinks, lpv)
+#endif
+                  for ( long n = 0; n < nlinks; ++n )
+                    {
+                      long noff = n*lpv;
+                      dst_array[dst_add[noff]] = src_array[src_add[noff]]*map_wts[num_wts*noff];
+                      for ( long k = 1; k < lpv; ++k )
+                        dst_array[dst_add[noff]] += src_array[src_add[noff+k]]*map_wts[num_wts*(noff+k)];
+                    }
+                }
+            }
+          else
+            {
+#ifdef SX
+#pragma cdir nodep
+#endif
+              for ( long n = 0; n < num_links; ++n ) dst_array[dst_add[n]] = 0.;
+
+              for ( long n = 0; n < num_links; ++n )
+                {
+                  // printf("%5d %5d %5ld %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
+                  dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
+                }
+            }
 	}
     }
-  else                 /* Second order remapping */
+  else                 // Second order remapping
     {
+#ifdef SX
+#pragma cdir nodep
+#endif
+      for ( long n = 0; n < num_links; ++n ) dst_array[dst_add[n]] = 0.;
+
       if ( num_wts == 3 )
 	{
-	  for ( n = 0; n < num_links; ++n )
+	  for ( long n = 0; n < num_links; ++n )
 	    {
 	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[3*n] +
                                        src_grad1[src_add[n]]*map_wts[3*n+1] +
@@ -1118,7 +1161,7 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 	}
       else if ( num_wts == 4 )
 	{
-      	  for ( n = 0; n < num_links; ++n )
+      	  for ( long n = 0; n < num_links; ++n )
 	    {
               dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[4*n] +
                                        src_grad1[src_add[n]]*map_wts[4*n+1] +
@@ -1222,7 +1265,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)					\
+  shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, num_wts, dst_array, max_cls)  \
   private(n, k) \
   schedule(dynamic,1)
 #endif
@@ -1439,8 +1482,9 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
       */
     }
 
-  cdoPrint("number of sparse matrix entries %d", rv.num_links);
-  cdoPrint("total number of dest cells %d", tgt_grid.size);
+  cdoPrint("Number of weights %d", rv.num_wts);
+  cdoPrint("Number of sparse matrix entries %d", rv.num_links);
+  cdoPrint("Total number of dest cells %d", tgt_grid.size);
 
   int *tgt_count = (int*) Malloc(tgt_grid.size*sizeof(int));
 
@@ -1456,8 +1500,10 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   for ( long n = 0; n < tgt_grid.size; ++n )
     {
       if ( tgt_count[n] > 0 )
-	if ( tgt_count[n] < imin ) imin = tgt_count[n];
-      if ( tgt_count[n] > imax ) imax = tgt_count[n];
+        {
+          if ( tgt_count[n] < imin ) imin = tgt_count[n];
+          if ( tgt_count[n] > imax ) imax = tgt_count[n];
+        }
     }
 
   long idiff =  (imax - imin)/10 + 1;
@@ -1465,12 +1511,12 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   for ( long i = 0; i < tgt_grid.size; ++i )
     if ( tgt_count[i] > 0 ) icount++;
 
-  cdoPrint("number of cells participating in remap %d", icount);
+  cdoPrint("Number of cells participating in remap %d", icount);
 
   if ( icount )
     {
-      cdoPrint("min no of entries/row = %d", imin);
-      cdoPrint("max no of entries/row = %d", imax);
+      cdoPrint("Min no of entries/row = %d", imin);
+      cdoPrint("Max no of entries/row = %d", imax);
 
       imax = imin + idiff;
       for ( long n = 0; n < 10; ++n )
@@ -1480,7 +1526,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 	    if ( tgt_count[i] >= imin && tgt_count[i] < imax ) icount++;
 
 	  if ( icount )
-	    cdoPrint("num of rows with entries between %d - %d  %d", imin, imax-1, icount);
+	    cdoPrint("Num of rows with entries between %d - %d  %d", imin, imax-1, icount);
 
 	  imin = imin + idiff;
 	  imax = imax + idiff;
@@ -1489,8 +1535,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 
   Free(tgt_count);
 
-  if ( rv.sort_add )
-    cdoPrint("Sparse matrix entries are explicitly sorted.");
+  if ( rv.sort_add ) cdoPrint("Sparse matrix entries are explicitly sorted.");
 
 } /* remap_stat */
 
