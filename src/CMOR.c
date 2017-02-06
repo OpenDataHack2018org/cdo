@@ -491,6 +491,7 @@ struct mapping
   int help_var;
   int cdi_varID;
   int cmor_varID;
+  int zfactor_id;
   char datatype;
   void *data;
 };
@@ -582,7 +583,6 @@ static int parse_kv_file(list_t *kvl, const char *filename)
   fclose(fp);
 
   parse_buffer_to_list(kvl, filesize, buffer, 0, 1);
-
   Free(buffer);
   return 0;
 }
@@ -626,7 +626,7 @@ static int check_attr(list_t *kvl)
       char *references = (char *) Malloc(strlen(kv_model_id->values[0]) + 28);
       strcpy(references, "No references available for ");
       strcat(references, kv_model_id->values[0]);
-      cdoWarning("Attribute references is set to '%s' ", references);
+      cdoWarning("Attribute 'references' is set to '%s' ", references);
       kv_insert_a_val(kvl, "references", references, 1);
       Free(references);
     }
@@ -638,26 +638,30 @@ static int check_attr(list_t *kvl)
     cdoAbort("Not yet possible to create data for project CMIP6 since cmor version 2.9 is used in this operator.\n");
   if ( strcmp(kv_project_id, "CMIP5") == 0 )
     {
-      printf("Since the project id is %s further attributes are tested. \n", kv_project_id);
+      if ( cdoVerbose )
+        printf("Since the project id is %s further attributes are tested. \n", kv_project_id);
       while ( reqAttCMIP5[i] != NULL )
         {
           keyValues_t *kv_reqattCMIP5 = kvlist_search(kvl, reqAttCMIP5[i]);
           if ( !kv_reqattCMIP5 || strcmp(kv_reqattCMIP5->values[0], "notSet") == 0 )
             cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
-          printf("Attribute %s is %s \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
+          if ( cdoVerbose )
+            printf("Attribute '%s' is %s \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
           i++;
         }
     }
   else if (strcmp(kv_project_id, "CORDEX") == 0 )
     {
-      printf("Since the project id is %s further attributes are tested", kv_project_id);
+      if ( cdoVerbose )
+        printf("Since the project id is %s further attributes are tested", kv_project_id);
       i=0;
       while ( reqAttCORDEX[i] != NULL )
         {
           keyValues_t *kv_reqattCORDEX = kvlist_search(kvl, reqAttCORDEX[i]);
           if ( !kv_reqattCORDEX || strcmp(kv_reqattCORDEX->values[0], "notSet") == 0 )
             cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCORDEX[i]);
-          printf("Attribute %s is %s \n", reqAttCORDEX[i], kv_reqattCORDEX->values[0]);
+          if ( cdoVerbose )
+            printf("Attribute '%s' is %s \n", reqAttCORDEX[i], kv_reqattCORDEX->values[0]);
           i++;
         }
     }
@@ -829,11 +833,12 @@ static void read_config_files(list_t *kvl)
   if ( i == 0 )
     {
       keyValues_t *info2 = kvlist_search(kvl, "info");
-      while ( i < info2->nvalues )
-        {
-          parse_kv_file(kvl, info2->values[i]);
-          i++;
-        }
+      if ( info2 )
+        while ( i < info2->nvalues )
+          {
+            parse_kv_file(kvl, info2->values[i]);
+            i++;
+          }
     }
 }
 
@@ -945,7 +950,8 @@ static char *get_txtatt(int vlistID, int varID, char *key)
 
 static void setup_dataset(list_t *kvl, int streamID)
 {
-  printf("*******Start to process cmor_setup and cmor_dataset.*******\n");
+  if ( cdoVerbose )
+    printf("*******Start to process cmor_setup and cmor_dataset.*******\n");
   int netcdf_file_action = get_netcdf_file_action(kvl);
   int set_verbosity = get_cmor_verbosity(kvl);
   int exit_control = get_cmor_exit_control(kvl);
@@ -967,12 +973,14 @@ static void setup_dataset(list_t *kvl, int streamID)
   
   char *attcalendar = kv_get_a_val(kvl, "calendar", "");
   char *calendar = get_calendar_ptr(taxisInqCalendar(taxisID));
-  printf("Checking attribute 'calendar' from configuration.\n");
+  if ( cdoVerbose )
+    printf("Checking attribute 'calendar' from configuration.\n");
   if ( get_calendar_int(attcalendar) )
     check_compare_set(calendar, attcalendar, "calendar");
   else 
     {
-      printf("Try to use Ifile calendar.\n");
+      if ( cdoVerbose )
+        printf("Try to use Ifile calendar.\n");
       if ( !get_calendar_int(calendar) )
         cdoAbort("No valid configuration and no valid Ifile calendar found.");
       else
@@ -991,7 +999,7 @@ static void setup_dataset(list_t *kvl, int streamID)
                atoi(kv_get_a_val(kvl, "realization", "")),
                kv_get_a_val(kvl, "contact", ""),
                kv_get_a_val(kvl, "history", ""),
-               kv_get_a_val(kvl, "comment", ""),
+               kv_get_a_val(kvl, "vcomm", ""),
                kv_get_a_val(kvl, "references", ""),
                atoi(kv_get_a_val(kvl, "leap_year", "")),
                atoi(kv_get_a_val(kvl, "leap_month", "")),
@@ -1010,7 +1018,8 @@ static void setup_dataset(list_t *kvl, int streamID)
 #endif
   if ( !cmor_version_exists )
     cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
-  printf("*******Setup finished successfully.*******\n");
+  if ( cdoVerbose )
+    printf("*******Setup finished successfully.*******\n");
 }
 
 
