@@ -2666,21 +2666,27 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
   kvl = list_new(sizeof(keyValues_t *), free_keyval, ventry);
   list_append(pml, &kvl);
 
-  char *key = NULL;
+  char *key = NULL, *eqpos = NULL;
   char **values = NULL;
   int i = 1, j = 0;
-  int MAX_VALUES = 50; 
+  int MAX_VALUES = 50;
   while ( params[i] )
     {
-      if ( strchr(params[i], '=')  )
+      if ( eqpos = strchr(params[i], '=')  )
         {
           if ( key && values[0] )
-            kvlist_append(kvl, (const char *)key, (const char **) values, j);
+            {
+              kvlist_append(kvl, (const char *)key, (const char **) values, j);
+              Free(key);
+              Free(values);
+            }
           else if ( key )
             cdoAbort("Found no value for key '%s'.", key);
-          values = malloc(MAX_VALUES * sizeof(char *));
-          key = strtok(params[i], "=");
-          values[0] = strtok(NULL, "");
+          if ( strlen(eqpos) == 1 )
+            cdoAbort("Could not find values for in commandline parameter: '%s'\n", params[i]);
+          key = strdup(strtok(params[i], "="));
+          values = malloc(MAX_VALUES * sizeof(char *));          
+          values[0] = strdup(strtok(NULL, ""));
           j = 1;
         }
       else
@@ -2689,7 +2695,7 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
             cdoAbort("Found no key for value '%s'.", params[i]);
           else
             {
-              values[j] = params[i];
+              values[j] = strdup(params[i]);
               j++;
             }
         }
@@ -2732,15 +2738,19 @@ static char *get_mip_table(char *params, list_t *kvl)
 static void save_miptab_freq(list_t *kvl, char *mip_table)
 {
   char *freq = strdup(mip_table);
-  int fpos = 0, j = 0;
+  int fpos = 0, k = 0, j = 0;
   while ( *(mip_table + j) )
     {
       j++;
+      if ( *(mip_table + j) == '/' )
+        k = j + 1;
       if ( *(mip_table + j) == '_' && *(mip_table + j + 1) )
         fpos = j + 1;
     }
-  freq += fpos;
-  if ( freq != NULL && fpos )
+  freq += k;
+  if ( fpos > k )
+    freq += fpos-k;
+  if ( freq != NULL )
     kv_insert_a_val(kvl, "miptab_freq", freq, 0);
 }
 #endif
@@ -2779,10 +2789,12 @@ void *CMOR(void *argument)
   dump_special_attributes(kvl, streamID);
 
   /* Check for attributes and member name */
-  printf("*******Start to check attributes.*******\n");
+  if ( cdoVerbose )
+    printf("*******Start to check attributes.*******\n");
   check_attr(kvl);
   check_mem(kvl);
-  printf("*******Succesfully checked global attributes.*******\n");
+  if ( cdoVerbose )
+    printf("*******Successfully checked global attributes.*******\n");
 
  /* dump_global_attributes(pml, streamID); */
 
@@ -2797,9 +2809,8 @@ void *CMOR(void *argument)
   cmor_load_table(mip_table, &table_id);
   cmor_set_table(table_id);
 
-  int zfactor_id = 0;
-  register_all_dimensions(kvl, streamID, vars, table_id, &zfactor_id);
-  write_variables(kvl, streamID, vars, &zfactor_id);
+  register_all_dimensions(kvl, streamID, vars, table_id);
+  write_variables(kvl, streamID, vars);
 
   destruct_var_mapping(vars);
 
