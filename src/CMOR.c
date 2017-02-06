@@ -2203,6 +2203,18 @@ static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date,
           time_bnds[1] = ceil(time_val);
           return time_bnds;
         }  
+      if ( strcmp(frequency, "6hr") == 0 || strcmp(frequency, "3hr") == 0 )
+        {
+          time_bnds[0] = time_val - 0.125;
+          time_bnds[1] = time_val + 0.125;
+          return time_bnds;
+        }  
+      if ( strcmp(frequency, "3hr") == 0 )
+        {
+          time_bnds[0] = time_val - 0.0625;
+          time_bnds[1] = time_val + 0.0625;
+          return time_bnds;
+        }  
       vtime0b = 0;
       vtime1b = 0;
     }
@@ -2211,7 +2223,6 @@ static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date,
       taxisInqVdateBounds(taxisID, &vdate0b, &vdate1b);
       taxisInqVtimeBounds(taxisID, &vtime0b, &vtime1b);
     }
-
   juldate_t juldate = juldate_encode(calendar, vdate0b, vtime0b);
   time_bnds[0] = juldate_to_seconds(juldate_sub(juldate, ref_date))
                 / tunitsec;
@@ -2414,7 +2425,8 @@ static char *use_chunk_file_des(list_t *kvl, int vlistID, int var_id, char *att_
   vlistInqVarName(vlistID, var_id, name);
   char chunk_des_file[CMOR_MAX_STRING];
   sprintf(chunk_des_file, "APPEND_FILE_%s_%s.txt", name, att_chunk_des_file);
-  printf("It is tried to open a chunk description file named: '%s' where the chunk file name should be noted\n", chunk_des_file); 
+  if ( cdoVerbose )
+    printf("It is tried to open a chunk description file named: '%s' where the chunk file name should be noted\n", chunk_des_file); 
   if ( file_exist(chunk_des_file, 0) )
     {
       FILE *fp = fopen(chunk_des_file, "r");
@@ -2465,7 +2477,8 @@ static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, 
                 {
                   if ( create_subs && strcmp(att_append_file, " ") == 0 )
                     {  
-                      printf("It is tried to open a chunk description file for varID: '%d'.\n", vars[j].cdi_varID);
+                      if ( cdoVerbose )
+                        printf("It is tried to open a chunk description file for varID: '%d'.\n", vars[j].cdi_varID);
                       char *chunk_file=use_chunk_file_des(kvl, vlistID, vars[j].cdi_varID, att_chunk_des_file, ifreq);  
                       append_files[j] = strdup(chunk_file);
                       continue;      
@@ -2502,9 +2515,10 @@ static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, 
   return append_files;
 }
 
-static void write_variables(list_t *kvl, int streamID, struct mapping vars[], int *zfactor_id)
+static void write_variables(list_t *kvl, int streamID, struct mapping vars[])
 {
-  printf("\n*******Start to write variables via cmor_write.******\n");
+  if ( cdoVerbose )
+    printf("\n*******Start to write variables via cmor_write.******\n");
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
   int tsID = 0;
@@ -2544,14 +2558,17 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
       if ( strcmp(timeaxis, "none") != 0 )
         {
           time_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar);
-          time_bndsp = get_time_bounds(taxisID, frequency, ref_date, time_val, calendar, tunitsec, time_bnds);
+          time_bndsp = ( strcmp(timeaxis, "time1") != 0 ) ? get_time_bounds(taxisID, frequency, ref_date, time_val, calendar, tunitsec, time_bnds) : 0;
         }
       while ( nrecs-- )
         read_record(streamID, buffer, gridsize, vars, invert_lat, vlistID);
+
       int ps_index = -1;
       check_for_sfc_pressure(&ps_index, vars, vlistID, tsID);
       for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
         {
+          char name[CDI_MAX_NAME];
+          vlistInqVarName(vlistID, vars[i].cdi_varID, name);
           if ( !vars[i].help_var )
             {
               if ( strcmp(timeaxis, "none") != 0 )
@@ -2564,8 +2581,8 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
                    &time_val,
                    time_bndsp,
                    NULL); 
-                  if ( zaxisInqType(vlistInqVarZaxis(vlistID, vars[i].cdi_varID)) == ZAXIS_HYBRID )
-                    cmor_write(*zfactor_id,
+                  if ( vars[i].zfactor_id > 0 )
+                    cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
                        append_files[i],
@@ -2588,7 +2605,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
       if ( !vars[i].help_var )
         {
           cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
-          printf("*******Successfully written file: '%s' with cmor!*******\n", file_name);
+          printf("*******      File stored in:  '%s' with cmor!*******\n", file_name);
         }
     }
   Free(buffer);
