@@ -1948,15 +1948,17 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
 }
 
 static void register_all_dimensions(list_t *kvl, int streamID,
-                             struct mapping vars[], int table_id, int *zfactor_id)
+                             struct mapping vars[], int table_id)
 {
-  printf("\n*******Start to register all dimensions via cmor_axis.******\n");
+  if ( cdoVerbose )
+    printf("\n*******Start to register all dimensions via cmor_axis.******\n");
   int vlistID = streamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   char *time_units = get_time_units(taxisID);
   char *req_time_units = kv_get_a_val(kvl, "req_time_units", "");
-  printf("Checking attribute 'req_time_units' from configuration.\n");
+  if ( cdoVerbose )
+    printf("Checking attribute 'req_time_units' from configuration.\n");
   if ( check_time_units(req_time_units) )
     check_compare_set(time_units, req_time_units, "time_units");
   else 
@@ -1965,7 +1967,6 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   char **requested_variables = get_requested_variables(kvl);
   if ( requested_variables == NULL && vlistNvars(vlistID) > 1 )
     cdoWarning("You have not requested any specific variable but there are several in input! Notice that all command line configuration attributes including out_name and units will be used for every variable!\n");
-
   int foundName = 0;
   int ps_required = 0;
   int ps_in_file = 0;
@@ -1978,12 +1979,14 @@ static void register_all_dimensions(list_t *kvl, int streamID,
       vlistInqVarName(vlistID, varID, name);
       if ( requested_variables == NULL || in_list(requested_variables, name) )
         {
+          if ( cdoVerbose )
+            printf("\n *******Start to define variable with ID: '%d' and name: '%s'*******\n", varID, name);
           if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
             {
-              printf("Since the zaxis of variable '%s' is of type HYBRID, surface pressure is required from Ifile.\n It is required to have code nr. 134!\n", name);
+              if ( cdoVerbose )
+                printf("Since the zaxis of variable '%s' is of type HYBRID, surface pressure is required from Ifile.\n It is required to have code nr. 134!\n", name);
               ps_required++;
             }
-          printf("\n *******Start to define variable with ID: '%d' and name: '%s'*******\n", varID, name);
           foundName++;
           /* Time-Axis */
           char cmor_time_name[CMOR_MAX_STRING];
@@ -1999,31 +2002,39 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           register_grid(kvl, vlistID, varID, axis_ids, grid_ids);
           cmor_set_table(table_id);
           /* Z-Axis */
-          register_z_axis(kvl, zaxisID, name, axis_ids, zfactor_id);
+          struct mapping *var = new_var_mapping(vars);
+          register_z_axis(kvl, zaxisID, name, axis_ids, &var->zfactor_id);
           /* Variable */
-          register_variable(kvl, vlistID, varID, axis_ids, new_var_mapping(vars), grid_ids);
+          register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids);          
         }
     }
   if ( ps_required )
     {
-      printf("\n *******Start to find surface pressure.\n");
+      if ( cdoVerbose )
+        printf("\n *******Start to find surface pressure.\n");
       for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
         if ( vlistInqVarCode(vlistID, varID) == 134 )
           {
             ps_in_file++;
-            struct mapping *var = new_var_mapping(vars);
-            size_t gridsize = vlistGridsizeMax(vlistID);
-            var->cdi_varID = varID;
-            var->help_var = 1;
-            if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
-              {
-                var->datatype = 'f';
-                var->data = Malloc(gridsize * sizeof(float));
-              }
+            if ( requested_variables == NULL || in_list(requested_variables, "ps") )
+              break;
             else
               {
-                var->datatype = 'd';
-                var->data = Malloc(gridsize * sizeof(double));
+                struct mapping *var = new_var_mapping(vars);
+                size_t gridsize = vlistGridsizeMax(vlistID);
+                var->cdi_varID = varID;
+                var->help_var = 1;
+                if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_FLT32 )
+                  {
+                    var->datatype = 'f';
+                    var->data = Malloc(gridsize * sizeof(float));
+                  }
+                else
+                  {
+                    var->datatype = 'd';
+                    var->data = Malloc(gridsize * sizeof(double));
+                  }
+                break;
               }
           }
     }
