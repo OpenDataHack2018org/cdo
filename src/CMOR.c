@@ -1202,8 +1202,7 @@ static void get_zcell_bounds(int zaxisID, double *zcell_bounds, double *levels, 
   double *ubounds;
   ubounds = Malloc(zsize * sizeof(double));
   zaxisInqUbounds(zaxisID, ubounds);
-
-  if ( !lbounds || !ubounds || ubounds[0] == ubounds[1] || lbounds[0] == lbounds[1] )
+  if ( !lbounds || !ubounds || pow((ubounds[1] - ubounds[0]),2) < 0.001 || pow((lbounds[1] - lbounds[0]), 2) < 0.001 )
     gen_bounds(zsize, levels, zcell_bounds);
   else
     {
@@ -1257,6 +1256,7 @@ static void get_zhybrid(int zaxisID, char *varname, double *p0, double *alev_val
 
 static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_ids, int *zfactor_id)
 {
+  *zfactor_id = 0;
   int zsize = zaxisInqSize(zaxisID);
   double *levels;
   if ( zsize > 1)
@@ -1268,12 +1268,52 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
       get_zcell_bounds(zaxisID, zcell_bounds, levels, zsize);
       if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
         {
-          cmor_axis(new_axis_id(axis_ids),
+          char *mipfreq = kv_get_a_val(kvl, "miptab_freq", "");
+          char *project = kv_get_a_val(kvl, "project_id", "");
+          if ( strcmp(project, "CMIP5") != 0 )
+            cmor_axis(new_axis_id(axis_ids),
                         "plevs",
                         "Pa",
                         zsize,
                         (void *)levels,
                         'd', NULL, 0, NULL);
+          else
+            {            
+              if ( strcmp(mipfreq, "cfMon") == 0 || strcmp(mipfreq, "cfDay") == 0 )
+                {
+                  cmor_axis(new_axis_id(axis_ids),
+                        "plev7",
+                        "Pa",
+                        zsize,
+                        (void *)levels,
+                        'd', NULL, 0, NULL);
+                }
+              else if ( strcmp(mipfreq, "day") == 0 )
+                {
+                  cmor_axis(new_axis_id(axis_ids),
+                        "plev8",
+                        "Pa",
+                        zsize,
+                        (void *)levels,
+                        'd', NULL, 0, NULL);
+                }
+              else if ( strcmp(mipfreq, "6hrPlev") == 0 )
+                {
+                  cmor_axis(new_axis_id(axis_ids),
+                        "plev3",
+                        "Pa",
+                        zsize,
+                        (void *)levels,
+                        'd', NULL, 0, NULL);
+                }
+              else
+                cmor_axis(new_axis_id(axis_ids),
+                        "plevs",
+                        "Pa",
+                        zsize,
+                        (void *)levels,
+                        'd', NULL, 0, NULL);
+            }
         }
       else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
         {
@@ -1328,7 +1368,35 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
                         'd', zcell_bounds, 2, NULL);
         }
       else if ( zaxisInqType(zaxisID) == ZAXIS_GENERIC || zaxisInqType(zaxisID) == ZAXIS_HEIGHT)
-        cdoAbort("Z-axis type %d not yet enabled. \n", zaxisInqType(zaxisID));
+        {
+          char *zaxisname = Malloc(CDI_MAX_NAME * sizeof(char));
+          zaxisInqName(zaxisID, zaxisname);
+          if ( strcmp(zaxisname, "rho") == 0 )
+            {
+              char *zaxisunits = Malloc(CDI_MAX_NAME * sizeof(char));
+              zaxisInqUnits(zaxisID, zaxisunits);
+              if ( strcmp(zaxisunits, "kg m-3") != 0 )
+                {
+                  cdoAbort("For zaxis with name 'rho' the units must be kg m-3 but are: '%s'", zaxisunits);
+                }
+              else
+                {
+                  levels = Malloc(zsize * sizeof(double));
+                  zaxisInqLevels(zaxisID, levels);
+                  double *zcell_bounds;
+                  zcell_bounds = Malloc( 2*zsize * sizeof(double) );
+                  get_zcell_bounds(zaxisID, zcell_bounds, levels, zsize);
+                  cmor_axis(new_axis_id(axis_ids),
+                      "rho",
+                      "kg m-3",
+                      zsize,
+                      (void *) levels,
+                      'd', zcell_bounds, 2, NULL);
+                }
+            }
+          else
+            cdoAbort("Z-axis type %d with name '%s' not yet enabled.", zaxisInqType(zaxisID), zaxisname);
+        }
       else
         cdoAbort("Invalid Z-axis type %d . \n", zaxisInqType(zaxisID));
       Free(zcell_bounds);
@@ -1341,7 +1409,8 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
       strtok_r(szc_name, "_", &szc_value);
       levels = Malloc(sizeof(double));
       levels[0] = (double) atof(szc_value);
-      printf("Attribute szc is found.\nScalar z coordinate name is: '%s'\nScalar z coordinate value is: '%f'\n", szc_name, levels[0]);
+      if ( cdoVerbose )
+        printf("Attribute szc is found.\nScalar z coordinate name is: '%s'\nScalar z coordinate value is: '%f'\n", szc_name, levels[0]);
       cmor_axis(new_axis_id(axis_ids),
                       szc_name,
                       "m",
