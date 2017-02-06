@@ -1132,40 +1132,53 @@ static void get_taxis(char *req_time_units, char *attcalendar, int *sdate, int *
 
 static char **get_requested_variables(list_t *kvl)
 {
-  char **name_list = NULL;
-  char *select_vars = kv_get_a_val(kvl, "vars", "");
-
-  if ( strcmp(select_vars, "") != 0 )
+  keyValues_t *kv = kvlist_search(kvl, "vars");
+  char **req_vars = NULL;
+  if ( kv )
     {
-      name_list = Malloc((strlen(select_vars) + 1) * sizeof(char *));
-      char *var_name = strtok(select_vars, ",");
-      int i = 0;
-      while ( var_name != NULL )
-        {
-          name_list[i++] = trim(var_name);
-          var_name = strtok(NULL, ",");
-        }
-      name_list[i] = NULL;
+      req_vars = Malloc((kv->nvalues + 1) * sizeof(char *));
+      for ( int i = 0; i < kv->nvalues; i++ )
+        req_vars[i] = strdup(kv->values[i]);
     }
-  return name_list;
+  if ( req_vars )
+    req_vars[kv->nvalues] = NULL;
+  return req_vars;
 }
 
 static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time_name)
 {
-  char *time_method = Malloc(8192 * sizeof(char));
-  cdiInqAttTxt(vlistID, varID, "cell_methods", 8192, time_method);
-  char *att_time_method = kv_get_a_val(kvl, "cell_methods", "");
-  check_compare_set(time_method, att_time_method, "cell_methods");
-  if ( time_method[0] == 'm' || strcmp(time_method, "time: mean") == 0 ) strcpy(cmor_time_name, "time \0");
-  else if ( time_method[0] == 'p' ) strcpy(cmor_time_name, "time1\0");
-  else if ( time_method[0] == 'c' ) strcpy(cmor_time_name, "time2\0");
-  else if ( time_method[0] == 'n' ) strcpy(cmor_time_name, "none\0");
-  else
+  char *mipfreq = kv_get_a_val(kvl, "miptab_freq", "");
+  char *project = kv_get_a_val(kvl, "project_id", "");
+  if (strcmp(project, "CMIP5") == 0 )
     {
-      cdoWarning("Found configuration time cell method '%s' is not valid. Check CF-conventions for allowed time cell methods.\nTime cell method is set to 'mean'. \n", time_method);
-      strcpy(cmor_time_name, "time \0");
+      if ( strcmp(mipfreq, "Oclim") == 0 )
+        strcpy(cmor_time_name, "time2");
+      if ( strcmp(mipfreq, "Oyr") == 0 )
+        strcpy(cmor_time_name, "time");
+      if ( strcmp(mipfreq, "day") == 0 )
+        strcpy(cmor_time_name, "time");
+      if ( strcmp(mipfreq, "6hrPlev") == 0 )
+        strcpy(cmor_time_name, "time1");
+      if ( strcmp(mipfreq, "6hrLev") == 0 )
+      strcpy(cmor_time_name, "time1");
     }
-  Free(time_method);
+  if ( cmor_time_name[0] != 't' )
+    {
+      char *time_method = Malloc(8192 * sizeof(char));
+      cdiInqAttTxt(vlistID, varID, "cell_methods", 8192, time_method);
+      char *att_time_method = kv_get_a_val(kvl, "cell_methods", "");
+      check_compare_set(time_method, att_time_method, "cell_methods");
+      if ( time_method[0] == 'm' || strcmp(time_method, "time: mean") == 0 ) strcpy(cmor_time_name, "time \0");
+      else if ( time_method[0] == 'p' ) strcpy(cmor_time_name, "time1\0");
+      else if ( time_method[0] == 'c' ) strcpy(cmor_time_name, "time2\0");
+      else if ( time_method[0] == 'n' ) strcpy(cmor_time_name, "none\0");
+      else
+        {
+          cdoWarning("Found configuration time cell method '%s' is not valid. Check CF-conventions for allowed time cell methods.\nTime cell method is set to 'mean'. \n", time_method);
+          strcpy(cmor_time_name, "time \0");
+        }
+      Free(time_method);
+    }
   kv_insert_a_val(kvl, "time_axis", cmor_time_name, 1); 
 }
 
