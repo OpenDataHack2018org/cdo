@@ -191,6 +191,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               else if ( lv1 && STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               else if ( lv1 && STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               else if ( lv1 && STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "chunktype")     ) ;
               else if ( lv1 && STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
               else if ( lv1 && STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
               else if ( lv1 && STR_IS_EQ(key, "delete")        ) var->remove = parameter2bool(value);
