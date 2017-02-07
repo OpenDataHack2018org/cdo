@@ -219,7 +219,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Selbox.$(OBJEXT) cdo-Selindex.$(OBJEXT) \
 	cdo-Select.$(OBJEXT) cdo-Seloperator.$(OBJEXT) \
 	cdo-Selrec.$(OBJEXT) cdo-Seltime.$(OBJEXT) \
-	cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
+	cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) \
+	cdo-Setattribute.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
 	cdo-Setgatt.$(OBJEXT) cdo-Setgrid.$(OBJEXT) \
 	cdo-Sethalo.$(OBJEXT) cdo-Setmiss.$(OBJEXT) \
 	cdo-Setpartab.$(OBJEXT) cdo-Setrcaname.$(OBJEXT) \
@@ -577,8 +578,8 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Pack.c Pardup.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
 	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Selindex.c Select.c \
-	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
-	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
+	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setattribute.c \
+	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
 	Setrcaname.c Settime.c Setzaxis.c Shiftxy.c Showinfo.c Sinfo.c \
 	Smooth.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
 	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
@@ -922,6 +923,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seltime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selvar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Set.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setattribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setgatt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setgrid.Po@am__quote@
@@ -3531,6 +3533,20 @@ cdo-Set.obj: Set.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Set.c' object='cdo-Set.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Set.obj `if test -f 'Set.c'; then $(CYGPATH_W) 'Set.c'; else $(CYGPATH_W) '$(srcdir)/Set.c'; fi`
+
+cdo-Setattribute.o: Setattribute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Setattribute.o -MD -MP -MF $(DEPDIR)/cdo-Setattribute.Tpo -c -o cdo-Setattribute.o `test -f 'Setattribute.c' || echo '$(srcdir)/'`Setattribute.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Setattribute.Tpo $(DEPDIR)/cdo-Setattribute.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Setattribute.c' object='cdo-Setattribute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Setattribute.o `test -f 'Setattribute.c' || echo '$(srcdir)/'`Setattribute.c
+
+cdo-Setattribute.obj: Setattribute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Setattribute.obj -MD -MP -MF $(DEPDIR)/cdo-Setattribute.Tpo -c -o cdo-Setattribute.obj `if test -f 'Setattribute.c'; then $(CYGPATH_W) 'Setattribute.c'; else $(CYGPATH_W) '$(srcdir)/Setattribute.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Setattribute.Tpo $(DEPDIR)/cdo-Setattribute.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Setattribute.c' object='cdo-Setattribute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Setattribute.obj `if test -f 'Setattribute.c'; then $(CYGPATH_W) 'Setattribute.c'; else $(CYGPATH_W) '$(srcdir)/Setattribute.c'; fi`
 
 cdo-Setbox.o: Setbox.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Setbox.o -MD -MP -MF $(DEPDIR)/cdo-Setbox.Tpo -c -o cdo-Setbox.o `test -f 'Setbox.c' || echo '$(srcdir)/'`Setbox.c

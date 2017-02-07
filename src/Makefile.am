@@ -309,6 +309,7 @@ cdo_SOURCES += Adisit.c        \
                Seltime.c       \
                Selvar.c        \
                Set.c           \
+               Setattribute.c  \
                Setbox.c        \
                Setgatt.c       \
                Setgrid.c       \

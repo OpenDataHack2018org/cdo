@@ -155,6 +155,7 @@ void *Seloperator(void *argument);
 void *Selrec(void *argument);
 void *Seltime(void *argument);
 void *Set(void *argument);
+void *Setattribute(void *argument);
 void *Setbox(void *argument);
 void *Setgatt(void *argument);
 void *Setgrid(void *argument);
@@ -412,6 +413,7 @@ void *Maggraph(void *argument);
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseason", "selmonth", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
 #define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
+#define  SetattributeOperators  {"setattribute"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber", "setgriduri"}
@@ -695,6 +697,7 @@ static modules_t Modules[] =
   { Seloperator,    NULL,              SeloperatorOperators,   1,   CDI_REAL,  1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,       1,   CDI_BOTH,  1,  1 },
   { Set,            SetHelp,           SetOperators,           1,   CDI_BOTH,  1,  1 },
+  { Setattribute,   NULL,              SetattributeOperators,  1,   CDI_BOTH,  1,  1 },
   { Setbox,         SetboxHelp,        SetboxOperators,        1,   CDI_REAL,  1,  1 },
   { Setgatt,        SetgattHelp,       SetgattOperators,       1,   CDI_BOTH,  1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,       1,   CDI_BOTH,  1,  1 },
