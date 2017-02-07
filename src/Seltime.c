@@ -29,7 +29,6 @@
       Seltime    selsmon         Select single month
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

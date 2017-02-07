@@ -29,7 +29,6 @@
 
 #include <signal.h>
 #include <fenv.h>
-#include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
 #if defined(HAVE_GETRLIMIT)

@@ -23,7 +23,6 @@
       Pressure    deltap               Difference of two half hybrid levels
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

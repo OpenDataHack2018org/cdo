@@ -21,7 +21,6 @@
       Specinfo specinfo  Spectral information
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

@@ -4,7 +4,6 @@
 #include "pstream.h"
 
 #if defined(HAVE_LIBCMOR)
-#include <ctype.h>
 #include <unistd.h>
 #include "uthash.h"
 #include "cmor.h"

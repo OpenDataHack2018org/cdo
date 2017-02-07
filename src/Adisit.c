@@ -22,7 +22,6 @@
       Adisit      adipot          compute potential from insitu temperature
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

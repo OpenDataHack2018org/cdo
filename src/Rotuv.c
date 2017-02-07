@@ -21,7 +21,6 @@
       Rotuv      rotuvb          Backward rotation
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"
