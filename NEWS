@@ -10,11 +10,9 @@ Version 1.8.0 (26 October 2016):
      * setpartabn: added support for user defined attributes
      * Reverse: adjust date/time by -1 second (introduced in last revision)
    New operators:
-     * timcumsum: Cumulative sum over time.
      * cmorlite: Apply variable_entry of cmor tables
+     * timcumsum: Cumulative sum over time.
      * shiftx/shifty: Shift fields on rectilinear/curvilinear grids in x/y direction
-   Changed operators:
-     * Tim<STAT> (e.g. monmean): 
    Fixed bugs:
      * Cond: bug fix for ntsteps1 == 1 && ntsteps2 != 1
      * ml2pl: interpolation failed for data on hybrid half levels [Bug #7225]
