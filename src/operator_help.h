@@ -884,6 +884,7 @@ static const char *SetpartabHelp[] = {
     "     delete          & INTEGER     & Set to 1 to delete variable",
     "     convert         & INTEGER     & Set to 1 to convert the unit if necessary",
     "    ",
+    "    Unsupported parameter table entries are stored as variable attributes.",
     "    The search key for the variable depends on the operator. Use setpartabn to search variables by the name.",
     "    This is typically used for NetCDF datasets. The operator setpartabp searches variables by the parameter ID.",
     "",
