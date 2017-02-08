@@ -1,7 +1,3 @@
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include <cdi.h>
 #include "cdi_uuid.h"
 #include "cdo_int.h"
@@ -395,14 +391,14 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
       }
     }
 
-  unsigned char uuidOfHGrid[CDI_UUID_SIZE];
-  gridInqUUID(gridID, uuidOfHGrid);
-  if ( !cdiUUIDIsNull(uuidOfHGrid) )
+  unsigned char uuid[CDI_UUID_SIZE];
+  gridInqUUID(gridID, uuid);
+  if ( !cdiUUIDIsNull(uuid) )
     {
-      char uuidOfHGridStr[37];
-      cdiUUID2Str(uuidOfHGrid, uuidOfHGridStr);
-      if ( uuidOfHGridStr[0] != 0 && strlen(uuidOfHGridStr) == 36 )
-        fprintf(fp, "uuid      = %s\n", uuidOfHGridStr);
+      char uuidStr[37];
+      cdiUUID2Str(uuid, uuidStr);
+      if ( uuidStr[0] != 0 && strlen(uuidStr) == 36 )
+        fprintf(fp, "uuid      = %s\n", uuidStr);
     }
 
   if ( gridInqMask(gridID, NULL) )

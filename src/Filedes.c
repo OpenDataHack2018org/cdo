@@ -31,6 +31,7 @@
 
 
 void cdo_print_grid(int gridID, int opt);
+void cdo_print_zaxis(int zaxisID);
 
 static
 void printAtts(FILE *fp, int vlistID, int varID)
@@ -314,7 +315,7 @@ void *Filedes(void *argument)
       for ( int index = 0; index < nzaxis; index++ )
         {
           printf("#\n" "# zaxisID %d\n" "#\n", index+1);
-          zaxisPrint(vlistZaxis(vlistID, index));
+          cdo_print_zaxis(vlistZaxis(vlistID, index));
         }
     }
   else if ( operatorID == VCT || operatorID == VCT2 )

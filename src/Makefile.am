@@ -159,6 +159,7 @@ libcdo_la_SOURCES =            \
                uthash.h        \
                util.c          \
                util.h          \
+               zaxis_print.c   \
                zaxis.c
 libcdo_la_SOURCES +=           \
                json/jsmn.h     \

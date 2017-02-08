@@ -147,7 +147,8 @@ am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
 	libcdo_la-table.lo libcdo_la-text.lo libcdo_la-timer.lo \
-	libcdo_la-userlog.lo libcdo_la-util.lo libcdo_la-zaxis.lo \
+	libcdo_la-userlog.lo libcdo_la-util.lo \
+	libcdo_la-zaxis_print.lo libcdo_la-zaxis.lo \
 	json/libcdo_la-jsmn.lo kdtreelib/libcdo_la-kdtree_cartesian.lo \
 	kdtreelib/libcdo_la-kdtree_common.lo \
 	kdtreelib/libcdo_la-kdtree_spherical.lo \
@@ -538,12 +539,13 @@ libcdo_la_SOURCES = array.h array.c cdo_int.h compare.h cdo_pthread.c \
 	remap_distwgt.c remap_bicubic_scrip.c remap_bilinear_scrip.c \
 	stdnametable.c stdnametable.h specspace.c specspace.h \
 	statistic.c statistic.h table.c text.c text.h timebase.h \
-	timer.c userlog.c uthash.h util.c util.h zaxis.c json/jsmn.h \
-	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
-	kdtreelib/kdtree_common.c kdtreelib/kdtree_spherical.c \
-	kdtreelib/qsort.c kdtreelib/pmergesort.c kdtreelib/pqueue.c \
-	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
-	clipping/area.c clipping/area.h clipping/ensure_array_size.c \
+	timer.c userlog.c uthash.h util.c util.h zaxis_print.c zaxis.c \
+	json/jsmn.h json/jsmn.c kdtreelib/kdtree.h \
+	kdtreelib/kdtree_cartesian.c kdtreelib/kdtree_common.c \
+	kdtreelib/kdtree_spherical.c kdtreelib/qsort.c \
+	kdtreelib/pmergesort.c kdtreelib/pqueue.c kdtreelib/pqueue.h \
+	clipping/clipping.c clipping/clipping.h clipping/area.c \
+	clipping/area.h clipping/ensure_array_size.c \
 	clipping/ensure_array_size.h clipping/geometry.h \
 	clipping/grid.h clipping/points.h clipping/dep_list.h \
 	clipping/grid_cell.c clipping/grid_cell.h \
@@ -1095,6 +1097,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-userlog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis_print.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-area.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-clipping.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-ensure_array_size.Plo@am__quote@
@@ -1783,6 +1786,13 @@ libcdo_la-util.lo: util.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='util.c' object='libcdo_la-util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-util.lo `test -f 'util.c' || echo '$(srcdir)/'`util.c
+
+libcdo_la-zaxis_print.lo: zaxis_print.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-zaxis_print.lo -MD -MP -MF $(DEPDIR)/libcdo_la-zaxis_print.Tpo -c -o libcdo_la-zaxis_print.lo `test -f 'zaxis_print.c' || echo '$(srcdir)/'`zaxis_print.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-zaxis_print.Tpo $(DEPDIR)/libcdo_la-zaxis_print.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='zaxis_print.c' object='libcdo_la-zaxis_print.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-zaxis_print.lo `test -f 'zaxis_print.c' || echo '$(srcdir)/'`zaxis_print.c
 
 libcdo_la-zaxis.lo: zaxis.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-zaxis.lo -MD -MP -MF $(DEPDIR)/libcdo_la-zaxis.Tpo -c -o libcdo_la-zaxis.lo `test -f 'zaxis.c' || echo '$(srcdir)/'`zaxis.c
