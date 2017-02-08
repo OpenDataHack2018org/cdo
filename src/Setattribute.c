@@ -24,8 +24,18 @@
 static
 void set_attributes(list_t *kvlist, int vlistID)
 {
-  int nvars = vlistNvars(vlistID);
+  enum {Undefined=-99};
   const int delim = '@';
+  int nvars = vlistNvars(vlistID);
+  int ngrids = vlistNgrids(vlistID);
+  int nzaxis = vlistNzaxis(vlistID);
+  int maxvars = nvars+ngrids*2+nzaxis;
+  int *varIDs = (int*) Malloc(maxvars*sizeof(int));
+
+  int kvn = list_size(kvlist);
+  char **wname = (char**) Malloc(kvn*sizeof(char*));
+  for ( int i = 0; i < kvn; ++i ) wname[i] = NULL;
+
   char name[CDI_MAX_NAME];
   char buffer[CDI_MAX_NAME];
   for ( listNode_t *kvnode = kvlist->head; kvnode; kvnode = kvnode->next )
@@ -47,53 +57,116 @@ void set_attributes(list_t *kvlist, int vlistID)
 
       if ( *attname == 0 ) cdoAbort("Attribute name missing in >%s<!", kv->key);
 
-      int cdiID = -2;
+      int nv = 0;
+      int cdiID = Undefined;
       if ( varname && *varname )
         {
-          for ( int varID = 0; varID < nvars; varID++ )
+          for ( int idx = 0; idx < nvars; idx++ )
             {
-              vlistInqVarName(vlistID, varID, name);
+              vlistInqVarName(vlistID, idx, name);
               if ( wildcardmatch(varname, name) == 0 )
                 {
-                  cdiID = varID;
-                  break;
+                  cdiID = vlistID;
+                  varIDs[nv++] = idx;
                 }
             }
-          if ( cdiID < 0 ) cdoWarning("Variable >%s< not found!");
+
+          if ( cdiID == Undefined )
+            {
+              /*
+              for ( int idx = 0; idx < ngrids; idx++ )
+                {
+                  int gridID = vlistGrid(vlistID, idx);
+                  gridInqXname(gridID, name);
+                  if ( wildcardmatch(varname, name) == 0 )
+                    {
+                      cdiID = gridID;
+                      varIDs[nv++] = CDI_GLOBAL;
+                    }
+                  gridInqYname(gridID, name);
+                  if ( wildcardmatch(varname, name) == 0 )
+                    {
+                      cdiID = gridID;
+                      varIDs[nv++] = CDI_GLOBAL;
+                    }
+                }
+              */
+              for ( int idx = 0; idx < nzaxis; idx++ )
+                {
+                  int zaxisID = vlistZaxis(vlistID, idx);
+                  zaxisInqName(zaxisID, name);
+                  if ( wildcardmatch(varname, name) == 0 )
+                    {
+                      cdiID = zaxisID;
+                      varIDs[nv++] = CDI_GLOBAL;
+                    }
+                }
+            }
+
+          if ( cdiID == Undefined )
+            {
+              bool lwarn = true;
+              for ( int i = 0; i < kvn; ++i )
+                {
+                  if ( wname[i] == NULL )
+                    {
+                      wname[i] = strdup(varname);
+                      break;
+                    }
+                  if ( STR_IS_EQ(wname[i], varname) )
+                    {
+                      lwarn = false;
+                      break;
+                    }
+                }
+              if ( lwarn )
+                {
+                  cdoWarning("Variable >%s< not found!", varname);
+                }
+            }
         }
       else
         {
-          cdiID = CDI_GLOBAL;
+          cdiID = vlistID;
+          varIDs[nv++] = CDI_GLOBAL;
         }
 
-      if ( cdiID != -2 )
+      if ( cdiID != Undefined && nv > 0 )
         {
           const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
           int nvalues = kv->nvalues;
           if ( nvalues == 1 && !*value ) nvalues = 0;
           int dtype = literals_find_datatype(nvalues, kv->values);
-                  
-          if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
+
+          for ( int idx = 0; idx < nv; ++idx )
             {
-              int *ivals = (int*) Malloc(nvalues*sizeof(int));
-              for ( int i = 0; i < nvalues; ++i ) ivals[i] = literal_to_int(kv->values[i]);
-              cdiDefAttInt(vlistID, cdiID, attname, dtype, nvalues, ivals);
-              Free(ivals);
-            }
-          else if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
-            {
-              double *dvals = (double*) Malloc(nvalues*sizeof(double));
-              for ( int i = 0; i < nvalues; ++i ) dvals[i] = literal_to_double(kv->values[i]);
-              cdiDefAttFlt(vlistID, cdiID, attname, dtype, nvalues, dvals);
-              Free(dvals);
-            }
-          else
-            {
-              int len = (value && *value) ? (int) strlen(value) : 0;
-              cdiDefAttTxt(vlistID, cdiID, attname, len, value);
+              int varID = varIDs[idx];
+              printf("varID, cdiID, attname %d %d %s\n", varID, cdiID, attname);
+              if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
+                {
+                  int *ivals = (int*) Malloc(nvalues*sizeof(int));
+                  for ( int i = 0; i < nvalues; ++i ) ivals[i] = literal_to_int(kv->values[i]);
+                  cdiDefAttInt(cdiID, varID, attname, dtype, nvalues, ivals);
+                  Free(ivals);
+                }
+              else if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+                {
+                  double *dvals = (double*) Malloc(nvalues*sizeof(double));
+                  for ( int i = 0; i < nvalues; ++i ) dvals[i] = literal_to_double(kv->values[i]);
+                  cdiDefAttFlt(cdiID, varID, attname, dtype, nvalues, dvals);
+                  Free(dvals);
+                }
+              else
+                {
+                  int len = (value && *value) ? (int) strlen(value) : 0;
+                  cdiDefAttTxt(cdiID, varID, attname, len, value);
+                }
             }
          }
     }
+
+  Free(varIDs);
+  for ( int i = 0; i < kvn; ++i ) if ( wname[i] ) free(wname[i]);
 }
 
 
