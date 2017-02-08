@@ -54,7 +54,7 @@ typedef struct {
 static
 void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *iproj, size_t *igmap, const char *dname)
 {
-  char uuidOfHGridStr[256];
+  char uuidStr[256];
 
   for ( size_t ik = ikv; ik < nkv; ++ik )
     {
@@ -118,7 +118,7 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
       else if ( STR_IS_EQ(key, "xunits") )    strcpy(grid->xunits, value);
       else if ( STR_IS_EQ(key, "yunits") )    strcpy(grid->yunits, value);
       else if ( STR_IS_EQ(key, "path") )      strcpy(grid->path, value);
-      else if ( STR_IS_EQ(key, "uuid") )      { strcpy(uuidOfHGridStr, value); cdiStr2UUID(uuidOfHGridStr, grid->uuid); }
+      else if ( STR_IS_EQ(key, "uuid") )      { strcpy(uuidStr, value); cdiStr2UUID(uuidStr, grid->uuid); }
       else if ( STR_IS_EQ(key, "xfirst") )    { grid->xfirst = parameter2double(value); grid->def_xfirst = true; }
       else if ( STR_IS_EQ(key, "yfirst") )    { grid->yfirst = parameter2double(value); grid->def_yfirst = true; }
       else if ( STR_IS_EQ(key, "xlast") )     { grid->xlast = parameter2double(value); grid->def_xlast = true; }
