@@ -137,7 +137,7 @@ typedef struct {
 } kvmap_t;
 
 static
-void zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, const char *dname)
+void zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, size_t *iatt, const char *dname)
 {
   // char uuidStr[256];
 
@@ -199,7 +199,45 @@ void zaxis_read_data(size_t nkv, kvmap_t *kvmap, zaxis_t *zaxis, const char *dna
           for ( size_t i = 0; i < (size_t) zaxis->vctsize; ++i ) zaxis->vct[i] = parameter2double(kv->values[i]);
         }
       else
-	cdoAbort("Invalid zaxis command : >%s< (zaxis description file: %s)", key, dname);
+        {
+          *iatt = ik; break;
+        }
+    }
+}
+
+static
+void zaxis_read_attributes(size_t iatt, size_t nkv, kvmap_t *kvmap, int zaxisID)
+{
+  for ( size_t ik = iatt; ik < nkv; ++ik )
+    {
+      if ( !kvmap[ik].isValid ) continue;
+
+      keyValues_t *kv = kvmap[ik].kv;
+      const char *key = kv->key;
+      size_t nvalues = kv->nvalues;
+      const char *value = (kv->nvalues > 0) ? kv->values[0] : NULL;
+      
+      int dtype = literals_find_datatype(nvalues, kv->values);
+
+      if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
+        {
+          int *ivals = (int*) Malloc(nvalues*sizeof(int));
+          for ( size_t i = 0; i < nvalues; ++i ) ivals[i] = literal_to_int(kv->values[i]);
+          cdiDefAttInt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, ivals);
+          Free(ivals);
+        }
+      else if ( dtype == CDI_DATATYPE_FLT32 || dtype == CDI_DATATYPE_FLT64 )
+        {
+          double *dvals = (double*) Malloc(nvalues*sizeof(double));
+          for ( size_t i = 0; i < nvalues; ++i ) dvals[i] = literal_to_double(kv->values[i]);
+          cdiDefAttFlt(zaxisID, CDI_GLOBAL, key, dtype, nvalues, dvals);
+          Free(dvals);
+        }
+      else
+        {
+          int len = (value && *value) ? (int) strlen(value) : 0;
+          cdiDefAttTxt(zaxisID, CDI_GLOBAL, key, len, value);
+        }
     }
 }
 
@@ -238,9 +276,15 @@ int zaxisFromFile(FILE *gfp, const char *dname)
   zaxis_t zaxis;
   zaxisInit(&zaxis);
 
-  zaxis_read_data(nkv, kvmap, &zaxis, dname);
+  size_t iatt = 0;
+  zaxis_read_data(nkv, kvmap, &zaxis, &iatt, dname);
 
   int zaxisID = (zaxis.type == CDI_UNDEFID) ? CDI_UNDEFID : zaxisDefine(zaxis);
+
+  if ( zaxisID != CDI_UNDEFID && iatt > 0 )
+    {
+      zaxis_read_attributes(iatt, nkv, kvmap, zaxisID);
+    }
 
   list_destroy(pmlist);
 
