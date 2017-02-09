@@ -279,6 +279,10 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
   // int prec     = gridInqPrec(gridID);
   // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
   int dig = 7;
+#ifdef CDO
+  extern int CDO_flt_digits;
+  dig = CDO_flt_digits;
+#endif
 
   if ( !lproj )
     {
@@ -495,6 +499,10 @@ void printZaxisInfo(int vlistID)
       // int prec      = zaxisInqPrec(zaxisID);
       // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
       int dig = 7;
+#ifdef CDO
+      extern int CDO_flt_digits;
+      dig = CDO_flt_digits;
+#endif
 
       zaxisName(zaxistype, zaxisname);
       zaxisInqName(zaxisID, zname);
