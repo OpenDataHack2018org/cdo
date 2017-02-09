@@ -87,8 +87,8 @@ char *getElementName(char *pline, char *name)
 
 static void copy_value(char *value, char **values, int *nvalues)
 {
-  if ( !values[*nvalues] )
-    values = realloc(values, *nvalues+1 * sizeof(*values));
+  if ( *nvalues > 100 )
+    cdoAbort("More than 100 values for a key are not supported.");
   values[*nvalues] = strdup(value);
   (*nvalues)++;
   values[*nvalues] = NULL;
@@ -187,7 +187,7 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
     }
   while ( *pline != 0 )
     {
-      char **values = (char **) Malloc( sizeof(char *) );
+      char **values = (char **) Malloc( 100 * sizeof(char *) );
       
       pline = getElementName(pline, name);
       if ( *pline == 0 )
@@ -1692,11 +1692,22 @@ static void register_lat_axis(int gridID, int ylength, int *axis_ids)
     }
 }
 
+static void register_char_axis(int numchar, char **charvals, int *axis_ids, char *chardim)
+{
+  void *charcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
+  sprintf((char *)charcmor, "%s", charvals[0]);
+  for ( int i = 1; i < numchar; i++ )
+    sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
+  cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
+  Free(charcmor);
+}
+
 static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids, char *project_id)
 {
   int gridID = vlistInqVarGrid(vlistID, varID);
 
   char *grid_file = kv_get_a_val(kvl, "ginfo", "");
+  char *chardim = kv_get_a_val(kvl, "char_dim", "");
   if ( strcmp(grid_file, "") != 0 )
     change_grid(grid_file, &gridID, vlistID);
 
@@ -1705,32 +1716,6 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   int xlength = gridInqXsize(gridID);
   int totalsize = gridInqSize(gridID);
 
-  char *chardim = kv_get_a_val(kvl, "char_dim", "");
-  if ( strcmp(chardim, "oline") == 0 || strcmp(chardim, "basin") == 0 )
-    {
-      grid_ids[0] = 0;
-      if ( xlength && ylength )
-        cdoAbort("You configured a character coordinate '%s' but you also registered a grid with '%d' numerical values on X axis and '%d' numerical values on Y axis. Both is not supported!", chardim, xlength, ylength);
-      int numchar = 0;
-      char **charvals = kv_get_vals(kvl, "char_dim_vals", &numchar);
-      if ( charvals )
-        {
-          void *xcharcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
-          sprintf((char *)xcharcmor, "%s", charvals[0]);
-          for ( int i = 1; i < numchar; i++ )
-            sprintf((char *)xcharcmor, "%s%s", (char *)xcharcmor, charvals[i]);
-          cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)xcharcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
-          Free(xcharcmor);
-        }
-      else
-        cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
-      if ( xlength )
-        register_lon_axis(gridID, xlength, axis_ids);
-      if ( ylength )
-        register_lat_axis(gridID, ylength, axis_ids);
-    }
-  else
-  {          
   double *xcoord_vals;
   double *ycoord_vals;
   double *xcell_bounds;
@@ -1807,8 +1792,28 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       Free(x2cell_bounds);
       Free(y2cell_bounds);
     }
-/*  else if ( type == GRID_GENERIC )
+  else if ( type == GRID_GENERIC && ( strcmp(chardim, "oline") == 0 || strcmp(chardim, "basin") == 0 ))
     {
+      grid_ids[0] = 0;
+      int numchar = 0;
+      char **charvals = kv_get_vals(kvl, "char_dim_vals", &numchar);
+      if ( ( xlength > 0 && xlength != numchar ) && ( ylength > 0 && ylength != numchar ) )
+        cdoAbort("You configured a character coordinate '%s' with '%d' string values but you also registered a grid with '%d' numerical values on X axis and '%d' numerical values on Y axis. Both is not supported!", chardim, numchar, xlength, ylength);
+      if ( !charvals )
+        cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
+      if ( charvals && ( xlength == numchar || xlength == 0 ) )
+        {
+          register_char_axis(numchar, charvals, axis_ids, chardim);
+          if ( ylength > 0 )
+            register_lat_axis(gridID, ylength, axis_ids);
+        }
+      else
+        {
+          register_lon_axis(gridID, xlength, axis_ids);
+          register_char_axis(numchar, charvals, axis_ids, chardim);
+        }
+    }
+/*
       grid_ids[0] = 0;
       xcoord_vals = Malloc(xlength * sizeof(double));
       gridInqXvals(gridID, xcoord_vals);
@@ -1842,8 +1847,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
         select_and_register_character_dimension(grid_file, axis_ids);
       Free(xcoord_vals);
       Free(ycoord_vals);
-    }
-*/
+    */
   else if ( type == GRID_CHARXY )
     {
       grid_ids[0] = 0;
@@ -1855,41 +1859,35 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       char *ydimname = Malloc(CDI_MAX_NAME * sizeof(char));
       cdiGridInqKeyStr(gridID, 902, CDI_MAX_NAME, xdimname);
       cdiGridInqKeyStr(gridID, 912, CDI_MAX_NAME, ydimname);
+      if ( strcmp(xdimname, "line") == 0 )
+        strcpy(xdimname, "oline");
       int dimstrlen;   
       if ( dimstrlen = gridInqXIsc(gridID) )
         {
-          char **xchars = (char **)Malloc( xlength * sizeof(char *));
+          char **xchars = (char **)Malloc( (xlength+1) * sizeof(char *));
           for ( int i = 0; i < xlength; i++ )
-            xchars[i] = (char *)Malloc( dimstrlen * sizeof(char));
+            xchars[i] = (char *)Malloc( (dimstrlen+1) * sizeof(char));
           gridInqXCvals(gridID, xchars);
-          void *xcharcmor = (void *) Malloc ( xlength * dimstrlen * sizeof(char));
-          sprintf((char *)xcharcmor, "%s", xchars[0]);
-          for ( int i = 1; i < xlength; i++ )
-            {
-              sprintf((char *)xcharcmor, "%s%s", (char *)xcharcmor, xchars[i]);
-              Free(xchars[i]);
-            }
-          cmor_axis(new_axis_id(axis_ids), xdimname, "", xlength, (void *)xcharcmor, 'c',  NULL, dimstrlen, NULL); 
-          Free(xchars);
-          Free(xcharcmor);
+          for ( int j = 0; j < xlength; j++ )
+            xchars[j][dimstrlen] = 0;
+          xchars[xlength] = NULL;
+          register_char_axis(xlength, xchars, axis_ids, xdimname);
+          free_array(xchars);
         }
       else if ( xlength)
         register_lon_axis(gridID, xlength, axis_ids);
 
       if ( dimstrlen = gridInqYIsc(gridID) )
         {
-          char **ychars = (char **) Malloc( ylength * dimstrlen * sizeof(char));
+          char **ychars = (char **) Malloc( (ylength + 1) * sizeof(char));
+          for ( int i = 0; i < ylength; i++ )
+            ychars[i] = (char *)Malloc( (dimstrlen +1) * sizeof(char));
           gridInqYCvals(gridID, ychars);
-          void *ycharcmor = (void *) Malloc ( ylength * dimstrlen * sizeof(char));
-          sprintf((char *)ycharcmor, "%s", ychars[0]);
-          for ( int i = 1; i < ylength; i++ )
-            {
-              sprintf((char *)ycharcmor, "%s%s", (char *)ycharcmor, ychars[i]);
-              Free(ychars[i]);
-            }
-          cmor_axis(new_axis_id(axis_ids), ydimname, "", ylength, (void *)ycharcmor, 'c',  NULL, dimstrlen, NULL); 
-          Free(ychars);
-          Free(ycharcmor);
+          for ( int j = 0; j < ylength; j++ )
+            ychars[j][dimstrlen] = 0;
+          ychars[ylength] = NULL;
+          register_char_axis(ylength, ychars, axis_ids, ydimname);
+          free_array(ychars);
         }
       else if ( ylength )
         register_lat_axis(gridID, ylength, axis_ids);
@@ -1903,7 +1901,6 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   }
   else
     grid_ids[0] = 0;
-  }
 }
 
 static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids,
@@ -2015,7 +2012,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           struct mapping *var = new_var_mapping(vars);
           register_z_axis(kvl, zaxisID, name, axis_ids, &var->zfactor_id, project_id, miptab_freq);
           /* Variable */
-          register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids);          
+          register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids);      
         }
     }
   if ( ps_required )
@@ -2054,7 +2051,6 @@ static void register_all_dimensions(list_t *kvl, int streamID,
     cdoAbort("No variables from your table %s found in Ifile.\n");
   if ( !foundName && requested_variables )
     cdoAbort("The given variables to process by attribute vars: '%s' are not found in Ifile.\n", kv_get_a_val(kvl, "vars", ""));
-  if ( requested_variables ) free_array(requested_variables);
   if ( time_units) Free(time_units);
   if ( cdoVerbose )
     printf("*******Called register_all_dimensions for %d variables successfully.*******\n", foundName);
@@ -2669,7 +2665,6 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
   char *key = NULL, *eqpos = NULL;
   char **values = NULL;
   int i = 1, j = 0;
-  int MAX_VALUES = 50;
   while ( params[i] )
     {
       if ( eqpos = strchr(params[i], '=')  )
@@ -2678,26 +2673,23 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
             {
               kvlist_append(kvl, (const char *)key, (const char **) values, j);
               Free(key);
-              Free(values);
+              free_array(values);
             }
           else if ( key )
             cdoAbort("Found no value for key '%s'.", key);
           if ( strlen(eqpos) == 1 )
-            cdoAbort("Could not find values for in commandline parameter: '%s'\n", params[i]);
+            cdoAbort("Could not find values for commandline parameter: '%s'\n", params[i]);
           key = strdup(strtok(params[i], "="));
-          values = Malloc(MAX_VALUES * sizeof(char *));          
-          values[0] = strdup(strtok(NULL, ""));
-          j = 1;
+          values = Malloc(100 * sizeof(char *));
+          j = 0;   
+          copy_value(strtok(NULL, ""), values, &j);  
         }
       else
         {
           if ( !key )
             cdoAbort("Found no key for value '%s'.", params[i]);
           else
-            {
-              values[j] = strdup(params[i]);
-              j++;
-            }
+            copy_value(params[i], values, &j);
         }
       i++;
     }
