@@ -154,7 +154,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
   int nvertex  = gridInqNvertex(gridID);
   int prec     = gridInqPrec(gridID);
 
-  int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
+  int dig = (prec == CDI_DATATYPE_FLT64) ? CDO_dbl_digits : CDO_flt_digits;
 
   fprintf(fp, "gridtype  = %s\n" "gridsize  = %d\n", gridNamePtr(type), gridsize);
 
