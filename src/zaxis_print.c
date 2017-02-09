@@ -2,6 +2,7 @@
 #include "cdi_uuid.h"
 #include "cdo_int.h"
 
+void cdo_print_attributes(FILE *fp, int cdiID, int varID, int nblanks);
 
 static
 void printDblsPrefixAutoBrk(FILE *fp, int dig, const char prefix[], int nbyte0, size_t n, const double vals[], size_t extbreak)
@@ -29,7 +30,7 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
   int prec    = zaxisInqPrec(zaxisID);
   size_t nvals = (size_t) zaxisInqLevels(zaxisID, NULL);
 
-  int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
+  int dig = (prec == CDI_DATATYPE_FLT64) ? CDO_dbl_digits : CDO_flt_digits;
 
   fprintf(fp, "zaxistype = %s\n", zaxisNamePtr(type));
   fprintf(fp, "size      = %d\n", nlevels);
@@ -72,9 +73,9 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
   if ( type == ZAXIS_HYBRID || type == ZAXIS_HYBRID_HALF )
     {
       int vctsize = zaxisInqVctSize(zaxisID);
-      fprintf(fp, "vctsize   = %d\n", vctsize);
       if ( vctsize )
         {
+          fprintf(fp, "vctsize   = %d\n", vctsize);
           double *vct = (double*) Malloc(vctsize*sizeof(double));
           zaxisInqVct(zaxisID, vct);
           static const char prefix[] = "vct       = ";
@@ -95,6 +96,8 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
             fprintf(fp, "uuid      = %s\n", uuidStr);
         }
     }
+
+  cdo_print_attributes(fp, zaxisID, CDI_GLOBAL, 0);
 }
 
 
