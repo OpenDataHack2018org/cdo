@@ -87,9 +87,34 @@ char *getElementName(char *pline, char *name)
 
 static void copy_value(char *value, char **values, int *nvalues)
 {
-  values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
-  strncpy(values[*nvalues], value, strlen(value)+1);
+  if ( !values[*nvalues] )
+    values = realloc(values, *nvalues+1 * sizeof(*values));
+  values[*nvalues] = strdup(value);
   (*nvalues)++;
+  values[*nvalues] = NULL;
+}
+
+static void free_array(char **tofree)
+{
+  int i = 0;
+  while ( tofree[i] )
+    {
+      free(tofree[i]);
+      i++;
+    }
+  Free(tofree);
+}
+
+static void quote_replace(char **values, int nvalues, int i)
+{
+  char *source = values[nvalues];
+  char *useful;
+  *source++;
+  source[i-2] = 0;
+  useful = strdup(source);
+  free(values[nvalues]);
+  values[nvalues] = strdup(useful);
+  free(useful);
 }
 
 static
@@ -126,10 +151,7 @@ char *getElementValues(char *pline, char **values, int *nvalues)
         {
           copy_value(pline, values, nvalues);
           if ( *(values[*nvalues-1]+i-1) == '"' || *(values[*nvalues-1]+i-1) == '\'' )
-            {
-              values[*nvalues-1]++;
-              *(values[*nvalues-1]+i-2) = 0;
-            }
+            quote_replace(values, *nvalues-1,i);
           else
             *(values[*nvalues-1]+i) = 0;
           i++; 
@@ -145,10 +167,7 @@ char *getElementValues(char *pline, char **values, int *nvalues)
     {
       copy_value(pline, values, nvalues);
       if ( *(values[*nvalues-1]+i-1) == '"' )
-        {
-          values[*nvalues-1]++;
-          *(values[*nvalues-1]+i-2) = 0;
-        }
+        quote_replace(values, *nvalues-1, i);
       else
         *(values[*nvalues-1]+i) = 0;
       *pline = 0;
@@ -168,7 +187,8 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
     }
   while ( *pline != 0 )
     {
-      char **values = malloc( 5 * sizeof(char *) );
+      char **values = (char **) Malloc( sizeof(char *) );
+      
       pline = getElementName(pline, name);
       if ( *pline == 0 )
         {
@@ -199,7 +219,7 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
       while ( isspace((int) *pline) ) pline++;
       if ( *pline == '/' )
         *pline = 0;
-      free(values);     
+      free_array(values);
     }
 }
 
@@ -253,7 +273,7 @@ static void kv_insert_a_val(list_t *kvl, const char *key, char *value, int repla
         }
       else if ( replace )
         {
-          free(kv->values[0]);
+          Free(kv->values[0]);
           kv->values[0] = strdup((const char *) value);
         }
     }
@@ -263,11 +283,16 @@ static char *kv_get_a_val(list_t *kvl, const char *key, char *replacer)
 {
   keyValues_t *kv = kvlist_search(kvl, key);
   if ( kv )
-    {
-      char *outval = strdup(kv->values[0]);
-      return outval;
-    }
+    return kv->values[0];
   return replacer;
+}
+
+static char **kv_get_vals(list_t *kvl, const char *key, int *numvals)
+{
+  keyValues_t *kv = kvlist_search(kvl, key);
+  if ( kv )
+    { *numvals = kv->nvalues; return kv->values; }
+  return NULL;
 }
 
 list_t *cdo_parse_cmor_file(const char *filename)
@@ -306,7 +331,7 @@ list_t *cdo_parse_cmor_file(const char *filename)
   else */
   parse_buffer_to_list(pml, filesize, buffer, 1, 0);
 
-  Free(buffer);
+  if ( buffer ) Free(buffer);
   
   return pml;
 }
@@ -496,6 +521,22 @@ struct mapping
   void *data;
 };
 
+static struct mapping *construct_var_mapping(int streamID)
+{
+  int nvars_max = vlistNvars(streamInqVlist(streamID));
+  struct mapping *vars =
+    (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
+  vars[0].cdi_varID = CDI_UNDEFID;
+  return vars;
+}
+
+static void destruct_var_mapping(struct mapping vars[])
+{
+  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+    Free(vars[i].data);
+  Free(vars);
+}
+
 static struct mapping *map_var(int cdi_varID, struct mapping vars[])
 {
   for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
@@ -583,7 +624,8 @@ static int parse_kv_file(list_t *kvl, const char *filename)
   fclose(fp);
 
   parse_buffer_to_list(kvl, filesize, buffer, 0, 1);
-  Free(buffer);
+
+  if ( buffer ) Free(buffer);
   return 0;
 }
 
@@ -600,10 +642,11 @@ static void check_compare_set(char *finalset, char *attribute, char *attname)
       cdoAbort("Required attribute '%s' is not found in the configuration.", attname);
 }
 
-static int check_attr(list_t *kvl)
+static int check_attr(list_t *kvl, char *project_id)
 {
+/* Project id moved to main void fct */
   const char *reqAtt[] = {"institute_id", "institution", "contact", "model_id", "source",
-            "experiment_id", "req_time_units", "project_id", NULL};
+            "experiment_id", "req_time_units", NULL};
   const char *reqAttCMIP5[] = {"product", "member", NULL};
   const char *reqAttCORDEX[] = {"product", "member", "cordex_domain", "driving_model_id", NULL};
 /* In all Projects needed Attributes are tested first */
@@ -633,13 +676,12 @@ static int check_attr(list_t *kvl)
 
 /* Special check for CMIP5 or CORDEX projects */
   i=0;
-  char *kv_project_id = kv_get_a_val(kvl, "project_id", "");
-  if ( strcmp(kv_project_id, "CMIP6") == 0 )
+  if ( strcmp(project_id, "CMIP6") == 0 )
     cdoAbort("Not yet possible to create data for project CMIP6 since cmor version 2.9 is used in this operator.\n");
-  if ( strcmp(kv_project_id, "CMIP5") == 0 )
+  if ( strcmp(project_id, "CMIP5") == 0 )
     {
       if ( cdoVerbose )
-        printf("Since the project id is %s further attributes are tested. \n", kv_project_id);
+        printf("Since the project id is %s further attributes are tested. \n", project_id);
       while ( reqAttCMIP5[i] != NULL )
         {
           keyValues_t *kv_reqattCMIP5 = kvlist_search(kvl, reqAttCMIP5[i]);
@@ -650,10 +692,10 @@ static int check_attr(list_t *kvl)
           i++;
         }
     }
-  else if (strcmp(kv_project_id, "CORDEX") == 0 )
+  else if (strcmp(project_id, "CORDEX") == 0 )
     {
       if ( cdoVerbose )
-        printf("Since the project id is %s further attributes are tested", kv_project_id);
+        printf("Since the project id is %s further attributes are tested", project_id);
       i=0;
       while ( reqAttCORDEX[i] != NULL )
         {
@@ -672,16 +714,15 @@ static int check_attr(list_t *kvl)
     if ( ( strcmp(kv_pos->values[0], "notSet") == 0 ) || ( strcmp(kv_pos->values[0], "") != 0 && strcmp(kv_pos->values[0], "u") != 0 && strcmp(kv_pos->values[0], "d") != 0 ) )
       {
         cdoWarning("Invalid value '%s' is set for attribute 'positive'. The default (blank) is used.\n", kv_pos->values[0]);
-        free(kv_pos->values[0]);
+        Free(kv_pos->values[0]);
         kv_pos->values[0] = strdup(" ");
       }
   return 1;
 } 
 
-static int check_mem(list_t *kvl)
+static int check_mem(list_t *kvl, char *project_id)
 {
   char *kv_member = kv_get_a_val(kvl, "member", "");
-  char *kv_project_id = kv_get_a_val(kvl, "project_id", "");
   char *ripchar[] = {"realization", "initialization", "physics_version"};
   char *crealiz, *cinitial, *cphysics;
   char workchar[CMOR_MAX_STRING]; 
@@ -717,7 +758,7 @@ static int check_mem(list_t *kvl)
         kv_insert_a_val(kvl, (const char *)ripchar[i], "-1", 1);
     }
 /* Now abort or warn */ 
-  if (strcmp(kv_project_id, "CMIP5") == 0 || strcmp(kv_project_id, "CORDEX") == 0)
+  if (strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CORDEX") == 0)
     cdoAbort("The member has no RIP format (at least 6 characters and in RIP order)! Found for \n member: %s. This is interpreted as \n Realization: %s \n Initialization: %s \n Physics: %s \n   But three Integers are needed", kv_member, crealiz, cinitial, cphysics);
 
   return 0;
@@ -842,10 +883,10 @@ static void read_config_files(list_t *kvl)
     }
 }
 
-static int in_list(char **list, const char *needle)
+static int in_list(char **list, const char *needle, int num)
 {
-  while ( *list )
-    if ( strcmp(*list++, needle) == 0 )
+  for ( int i = 0; i < num; i++ )
+    if ( strcmp(list[i], needle) == 0 )
       return 1;
   return 0;
 }
@@ -930,10 +971,10 @@ static char *get_txtatt(int vlistID, int varID, char *key)
 {
   int natts;
   cdiInqNatts(vlistID, varID, &natts);
+  char *txtatt = NULL;
   for ( int i = 0; i < natts; i++ )
     {
       char name[CDI_MAX_NAME];
-      char *txtatt = NULL;
       char buffer[8];
       int type, len;
       cdiInqAtt(vlistID, varID, i, name, &type, &len);
@@ -945,7 +986,9 @@ static char *get_txtatt(int vlistID, int varID, char *key)
           return txtatt;
         }
     }
-  return "";
+  txtatt = Malloc(CMOR_MAX_STRING * sizeof(char));
+  strcpy(txtatt, "");
+  return txtatt;
 }
 
 static void setup_dataset(list_t *kvl, int streamID)
@@ -1018,51 +1061,11 @@ static void setup_dataset(list_t *kvl, int streamID)
 #endif
   if ( !cmor_version_exists )
     cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
+  Free(calendar);
+  Free(comment);
   if ( cdoVerbose )
     printf("*******Setup finished successfully.*******\n");
 }
-
-
-/*************************/
-/* From Invert.c: */
-/*************************/
-
-static
-void invertLatDataCmor(double *array1, double *array2, int gridID1)
-{
-  int nlat, nlon;
-  int ilat;
-  double **field1, **field2;
-
-  nlon = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
-
-  if ( nlat > 0 )
-    {
-      field1 = (double **) Malloc(nlat*sizeof(double *));
-      field2 = (double **) Malloc(nlat*sizeof(double *));
-  
-      for ( ilat = 0; ilat < nlat; ilat++ )
-	{
-	  field1[ilat] = array1 + ilat*nlon;
-	  field2[ilat] = array2 + ilat*nlon;
-	}
-
-      for ( ilat = 0; ilat < nlat; ilat++ )
-	memcpy(field2[nlat-ilat-1], field1[ilat], nlon*sizeof(double));
-      
-      Free(field1);
-      Free(field2);
-    }
-  else
-    {
-      array2[0] = array1[0];
-    }
-}
-
-/*************************/
-/* Until here */
-/*************************/
 
 
 static char *get_time_units(int taxisID)
@@ -1130,38 +1133,17 @@ static void get_taxis(char *req_time_units, char *attcalendar, int *sdate, int *
   *calendar = get_calendar_int(attcalendar);
 }
 
-static char **get_requested_variables(list_t *kvl)
+static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time_name, char *project_id, int miptab_freq)
 {
-  keyValues_t *kv = kvlist_search(kvl, "vars");
-  char **req_vars = NULL;
-  if ( kv )
-    {
-      req_vars = Malloc((kv->nvalues + 1) * sizeof(char *));
-      for ( int i = 0; i < kv->nvalues; i++ )
-        req_vars[i] = strdup(kv->values[i]);
-    }
-  if ( req_vars )
-    req_vars[kv->nvalues] = NULL;
-  return req_vars;
-}
-
-static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time_name)
-{
-  char *mipfreq = kv_get_a_val(kvl, "miptab_freq", "");
-  char *project = kv_get_a_val(kvl, "project_id", "");
-  if (strcmp(project, "CMIP5") == 0 )
-    {
-      if ( strcmp(mipfreq, "Oclim") == 0 )
-        strcpy(cmor_time_name, "time2");
-      if ( strcmp(mipfreq, "Oyr") == 0 )
-        strcpy(cmor_time_name, "time");
-      if ( strcmp(mipfreq, "day") == 0 )
-        strcpy(cmor_time_name, "time");
-      if ( strcmp(mipfreq, "6hrPlev") == 0 )
-        strcpy(cmor_time_name, "time1");
-      if ( strcmp(mipfreq, "6hrLev") == 0 )
-      strcpy(cmor_time_name, "time1");
-    }
+  if (strcmp(project_id, "CMIP5") == 0 && miptab_freq )
+    switch ( miptab_freq )
+      {
+      case 1: strcpy(cmor_time_name, "time2"); break;
+      case 2: strcpy(cmor_time_name, "time"); break;
+      case 4: strcpy(cmor_time_name, "time"); break;
+      case 5: strcpy(cmor_time_name, "time1"); break;
+      case 6: strcpy(cmor_time_name, "time1"); break;
+      }
   if ( cmor_time_name[0] != 't' )
     {
       char *time_method = Malloc(8192 * sizeof(char));
@@ -1254,11 +1236,31 @@ static void get_zhybrid(int zaxisID, char *varname, double *p0, double *alev_val
   Free(vct);
 }
 
-static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_ids, int *zfactor_id)
+static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_ids, int *zfactor_id, char *project_id, int miptab_freq)
 {
   *zfactor_id = 0;
   int zsize = zaxisInqSize(zaxisID);
   double *levels;
+
+  char *chardim = kv_get_a_val(kvl, "char_dim", "");
+  if ( strcmp(chardim, "vegtype") == 0 )
+    {
+      if ( zsize )
+        cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis is ignored for '%s'.", chardim, zsize, varname);
+      int numchar = 0;
+      char **charvals = kv_get_vals(kvl, "char_dim_vals", &numchar);
+      if ( charvals )
+        {
+          void *charcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
+          sprintf((char *)charcmor, "%s", charvals[0]);
+          for ( int i = 1; i < numchar; i++ )
+            sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
+          cmor_axis(new_axis_id(axis_ids), chardim, "", sizeof(charvals)/sizeof(charvals[0]), (void *)charcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
+          Free(charcmor);
+        }
+      else
+        cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
+    }
   if ( zsize > 1)
     {
       levels = Malloc(zsize * sizeof(double));
@@ -1268,9 +1270,7 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
       get_zcell_bounds(zaxisID, zcell_bounds, levels, zsize);
       if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
         {
-          char *mipfreq = kv_get_a_val(kvl, "miptab_freq", "");
-          char *project = kv_get_a_val(kvl, "project_id", "");
-          if ( strcmp(project, "CMIP5") != 0 )
+          if ( strcmp(project_id, "CMIP5") != 0 )
             cmor_axis(new_axis_id(axis_ids),
                         "plevs",
                         "Pa",
@@ -1278,41 +1278,34 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
                         (void *)levels,
                         'd', NULL, 0, NULL);
           else
-            {            
-              if ( strcmp(mipfreq, "cfMon") == 0 || strcmp(mipfreq, "cfDay") == 0 )
+            {  
+              switch ( miptab_freq )
                 {
-                  cmor_axis(new_axis_id(axis_ids),
+                case 3: cmor_axis(new_axis_id(axis_ids),
                         "plev7",
                         "Pa",
                         zsize,
                         (void *)levels,
-                        'd', NULL, 0, NULL);
-                }
-              else if ( strcmp(mipfreq, "day") == 0 )
-                {
-                  cmor_axis(new_axis_id(axis_ids),
+                        'd', NULL, 0, NULL); break;
+                case 4: cmor_axis(new_axis_id(axis_ids),
                         "plev8",
                         "Pa",
                         zsize,
                         (void *)levels,
-                        'd', NULL, 0, NULL);
-                }
-              else if ( strcmp(mipfreq, "6hrPlev") == 0 )
-                {
-                  cmor_axis(new_axis_id(axis_ids),
+                        'd', NULL, 0, NULL); break;
+                case 5: cmor_axis(new_axis_id(axis_ids),
                         "plev3",
                         "Pa",
                         zsize,
                         (void *)levels,
-                        'd', NULL, 0, NULL);
-                }
-              else
-                cmor_axis(new_axis_id(axis_ids),
+                        'd', NULL, 0, NULL); break;
+                default: cmor_axis(new_axis_id(axis_ids),
                         "plevs",
                         "Pa",
                         zsize,
                         (void *)levels,
-                        'd', NULL, 0, NULL);
+                        'd', NULL, 0, NULL); break;
+                }                
             }
         }
       else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
@@ -1393,9 +1386,11 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
                       (void *) levels,
                       'd', zcell_bounds, 2, NULL);
                 }
+              Free(zaxisunits);
             }
           else
             cdoAbort("Z-axis type %d with name '%s' not yet enabled.", zaxisInqType(zaxisID), zaxisname);
+          Free(zaxisname);
         }
       else
         cdoAbort("Invalid Z-axis type %d . \n", zaxisInqType(zaxisID));
@@ -1430,14 +1425,14 @@ static void register_character_dimension(int *axis_ids, char *filename)
   int varndims, varnattsp;
   int *vardimids;
 
-  char *varname = malloc(36 * sizeof(char));
-  char *dimname = malloc(36 * sizeof(char));
+  char *varname = Malloc(36 * sizeof(char));
+  char *dimname = Malloc(36 * sizeof(char));
 
   size_t dimlength, dimstrlength;
 
   nc_open(filename, NC_NOWRITE, &nc_file_id);
   nc_inq(nc_file_id, &nfiledims, &nvars, &ngatts, &unlimdimid);
-  vardimids = malloc(nfiledims * sizeof(int));
+  vardimids = Malloc(nfiledims * sizeof(int));
   void *final_chardim;
   for ( int i = 0; i < nvars; i++ )
     {
@@ -1447,7 +1442,7 @@ static void register_character_dimension(int *axis_ids, char *filename)
           nc_inq_dim(nc_file_id, vardimids[1], dimname, &dimstrlength);
           nc_inq_dim(nc_file_id, vardimids[0], dimname, &dimlength);
 
-          final_chardim = (void *)malloc(dimstrlength * dimlength *sizeof(char));
+          final_chardim = (void *)Malloc(dimstrlength * dimlength *sizeof(char));
           nc_get_var(nc_file_id, i, final_chardim);
         }
     }
@@ -1458,37 +1453,6 @@ static void register_character_dimension(int *axis_ids, char *filename)
   Free(vardimids);
 }
 */
-
-static void invert_ygriddes(list_t *kvl, int vlistID, int *gridID, int ylength, double *ycoord_vals, double *ycell_bounds, int *ynbounds)
-{
-  if ( ( ycoord_vals[0] - ycoord_vals[1] ) > 0 )
-    {
-      cdoWarning("Latitudes go north to south => reverting latitudes!\n");
-      kv_insert_a_val(kvl, "invert_lat", "yes", 0);
-          
-      int gridID2 = gridDuplicate(*gridID);
-      double *yv2;
-      double *yb2;
-
-      yv2 = Malloc(ylength * sizeof(double));
-      for ( int ilat = 0; ilat < ylength; ilat++ )
-        yv2[ylength-ilat-1] = ycoord_vals[ilat];
-      gridDefYvals(gridID2, yv2);
-
-      yb2 = Malloc(2* ylength * sizeof(double));
-      for ( int ilat = 0; ilat < ylength; ilat++ )
-        {
-          yb2[ylength*2-ilat*2-1] = ycell_bounds[ilat*2];
-          yb2[ylength*2-ilat*2-2] = ycell_bounds[ilat*2+1];
-        }
-      gridDefYbounds(gridID2, yb2);
-      vlistChangeGrid(vlistID, *gridID, gridID2);
-      gridInqYvals(*gridID, ycoord_vals);
-      *ynbounds = gridInqYbounds(*gridID, ycell_bounds);
-      Free(yv2);
-      Free(yb2);
-    }
-}
 
 static void change_grid(char *grid_file, int *gridID, int vlistID)
 {
@@ -1526,12 +1490,11 @@ static void inquire_vals_and_bounds(int gridID, int *xnbounds, int *ynbounds, do
   *ynbounds = gridInqYbounds(gridID, ycell_bounds);
 }
 
-static void get_cmor_table(list_t *kvl)
+static void get_cmor_table(list_t *kvl, char *project_id)
 {
   int gridtable_id;
   char gridtable[CMOR_MAX_STRING];
   char *mip_table_dir = kv_get_a_val(kvl, "mip_table_dir", "");
-  char *project_id = kv_get_a_val(kvl, "project_id", "");
   if ( mip_table_dir && project_id )
     {
       sprintf(gridtable, "%s/%s_grids\0", mip_table_dir, project_id);
@@ -1697,8 +1660,39 @@ static void select_and_register_character_dimension(char *grid_file, int *axis_i
     register_character_dimension(axis_ids, grid_file);
 }
 */
+static void register_lon_axis(int gridID, int xlength, int *axis_ids)
+{
+  double *xcoord_vals = Malloc(xlength * sizeof(double));
+  if ( gridInqXvals(gridID, xcoord_vals) == 0 )
+    Free(xcoord_vals);
+  else
+    {
+      double *xcell_bounds = Malloc(2 * xlength * sizeof(double));
+      int xnbounds = gridInqXbounds(gridID, xcell_bounds);
+      check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
+      cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
+      if ( xcell_bounds ) Free(xcell_bounds);
+      if ( xcoord_vals ) Free(xcoord_vals);
+    }
+}
 
-static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids)
+static void register_lat_axis(int gridID, int ylength, int *axis_ids)
+{
+  double *ycoord_vals = Malloc(ylength * sizeof(double));
+  if ( gridInqYvals(gridID, ycoord_vals) == 0 )
+    Free(ycoord_vals);
+  else
+    {
+      double *ycell_bounds = Malloc(2 * ylength * sizeof(double));
+      int ynbounds = gridInqYbounds(gridID, ycell_bounds);
+      check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
+      cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
+      if ( ycell_bounds ) Free(ycell_bounds);
+      if ( ycoord_vals ) Free(ycoord_vals);  
+    }
+}
+
+static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, int *grid_ids, char *project_id)
 {
   int gridID = vlistInqVarGrid(vlistID, varID);
 
@@ -1711,6 +1705,32 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   int xlength = gridInqXsize(gridID);
   int totalsize = gridInqSize(gridID);
 
+  char *chardim = kv_get_a_val(kvl, "char_dim", "");
+  if ( strcmp(chardim, "oline") == 0 || strcmp(chardim, "basin") == 0 )
+    {
+      grid_ids[0] = 0;
+      if ( xlength && ylength )
+        cdoAbort("You configured a character coordinate '%s' but you also registered a grid with '%d' numerical values on X axis and '%d' numerical values on Y axis. Both is not supported!", chardim, xlength, ylength);
+      int numchar = 0;
+      char **charvals = kv_get_vals(kvl, "char_dim_vals", &numchar);
+      if ( charvals )
+        {
+          void *xcharcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
+          sprintf((char *)xcharcmor, "%s", charvals[0]);
+          for ( int i = 1; i < numchar; i++ )
+            sprintf((char *)xcharcmor, "%s%s", (char *)xcharcmor, charvals[i]);
+          cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)xcharcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
+          Free(xcharcmor);
+        }
+      else
+        cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
+      if ( xlength )
+        register_lon_axis(gridID, xlength, axis_ids);
+      if ( ylength )
+        register_lat_axis(gridID, ylength, axis_ids);
+    }
+  else
+  {          
   double *xcoord_vals;
   double *ycoord_vals;
   double *xcell_bounds;
@@ -1754,7 +1774,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       move_lons(xcoord_vals, xcell_bounds, totalsize, 4 * totalsize, xnbounds);   
       x2cell_bounds = Malloc(4 * totalsize * sizeof(double));
       y2cell_bounds = Malloc(4 * totalsize * sizeof(double));
-      get_cmor_table(kvl);
+      get_cmor_table(kvl, project_id);
       int grid_axis[2];
       check_and_gen_bounds_curv(gridID, totalsize, xnbounds, xlength, xcoord_vals, x2cell_bounds, ynbounds, ylength, ycoord_vals, y2cell_bounds);
       if ( type == GRID_CURVILINEAR )
@@ -1838,7 +1858,9 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       int dimstrlen;   
       if ( dimstrlen = gridInqXIsc(gridID) )
         {
-          char **xchars = (char **)Malloc( xlength * dimstrlen * sizeof(char));
+          char **xchars = (char **)Malloc( xlength * sizeof(char *));
+          for ( int i = 0; i < xlength; i++ )
+            xchars[i] = (char *)Malloc( dimstrlen * sizeof(char));
           gridInqXCvals(gridID, xchars);
           void *xcharcmor = (void *) Malloc ( xlength * dimstrlen * sizeof(char));
           sprintf((char *)xcharcmor, "%s", xchars[0]);
@@ -1849,17 +1871,11 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
             }
           cmor_axis(new_axis_id(axis_ids), xdimname, "", xlength, (void *)xcharcmor, 'c',  NULL, dimstrlen, NULL); 
           Free(xchars);
+          Free(xcharcmor);
         }
-      else
-        {
-          xcoord_vals = Malloc(xlength * sizeof(double));
-          gridInqXvals(gridID, xcoord_vals);
-          xcell_bounds = Malloc(2 * xlength * sizeof(double));
-          xnbounds = gridInqXbounds(gridID, xcell_bounds);
-          check_and_gen_bounds(gridID, xnbounds, xlength, xcoord_vals, xcell_bounds, 1);
-          cmor_axis(new_axis_id(axis_ids),    "longitude",    "degrees_east",    xlength,    (void *)xcoord_vals,    'd',    (void *)xcell_bounds,    2,    NULL);
-          Free(xcell_bounds);
-        }
+      else if ( xlength)
+        register_lon_axis(gridID, xlength, axis_ids);
+
       if ( dimstrlen = gridInqYIsc(gridID) )
         {
           char **ychars = (char **) Malloc( ylength * dimstrlen * sizeof(char));
@@ -1873,18 +1889,11 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
             }
           cmor_axis(new_axis_id(axis_ids), ydimname, "", ylength, (void *)ycharcmor, 'c',  NULL, dimstrlen, NULL); 
           Free(ychars);
+          Free(ycharcmor);
         }
-      else
-        {
-          ycoord_vals = Malloc(ylength * sizeof(double));
-          gridInqYvals(gridID, ycoord_vals);
-          invert_ygriddes(kvl, vlistID, &gridID, ylength, ycoord_vals, ycell_bounds, &ynbounds);
-          ycell_bounds = Malloc(2 * ylength * sizeof(double));
-          ynbounds = gridInqYbounds(gridID, ycell_bounds);
-          check_and_gen_bounds(gridID, ynbounds, ylength, ycoord_vals, ycell_bounds, 0);
-          cmor_axis(new_axis_id(axis_ids),    "latitude",    "degrees_north",    ylength,    (void *)ycoord_vals,    'd',    (void *)ycell_bounds,    2,    NULL);
-          Free(ycell_bounds);  
-        }
+      else if ( ylength )
+        register_lat_axis(gridID, ylength, axis_ids);
+      Free(xname); Free(yname); Free(xdimname); Free(ydimname);
     }
   else
     {
@@ -1894,6 +1903,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   }
   else
     grid_ids[0] = 0;
+  }
 }
 
 static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids,
@@ -1948,7 +1958,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
 }
 
 static void register_all_dimensions(list_t *kvl, int streamID,
-                             struct mapping vars[], int table_id)
+                             struct mapping vars[], int table_id, char *project_id, int miptab_freq)
 {
   if ( cdoVerbose )
     printf("\n*******Start to register all dimensions via cmor_axis.******\n");
@@ -1964,7 +1974,8 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   else 
     cdoAbort("Required Attribute 'req_time_units' from configuration is invalid!");
 
-  char **requested_variables = get_requested_variables(kvl);
+  int numvals = 0;
+  char **requested_variables = kv_get_vals(kvl, "vars", &numvals);
   if ( requested_variables == NULL && vlistNvars(vlistID) > 1 )
     cdoWarning("You have not requested any specific variable but there are several in input! Notice that all command line configuration attributes including out_name and units will be used for every variable!\n");
   int foundName = 0;
@@ -1977,7 +1988,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
       axis_ids[0] = CMOR_UNDEFID;
       int zaxisID = vlistInqVarZaxis(vlistID, varID);
       vlistInqVarName(vlistID, varID, name);
-      if ( requested_variables == NULL || in_list(requested_variables, name) )
+      if ( requested_variables == NULL || in_list(requested_variables, name, numvals) )
         {
           if ( cdoVerbose )
             printf("\n *******Start to define variable with ID: '%d' and name: '%s'*******\n", varID, name);
@@ -1990,20 +2001,19 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           foundName++;
           /* Time-Axis */
           char cmor_time_name[CMOR_MAX_STRING];
-          get_time_method(kvl, vlistID, varID, cmor_time_name);
+          get_time_method(kvl, vlistID, varID, cmor_time_name, project_id, miptab_freq);
           if ( strcmp(cmor_time_name, "none") != 0 )
             cmor_axis(new_axis_id(axis_ids),
                     cmor_time_name,
                     time_units,
                     0,NULL, 0, NULL, 0, NULL);
-
           /* Grid: */
           int grid_ids[CMOR_MAX_GRIDS];
-          register_grid(kvl, vlistID, varID, axis_ids, grid_ids);
+          register_grid(kvl, vlistID, varID, axis_ids, grid_ids, project_id);
           cmor_set_table(table_id);
           /* Z-Axis */
           struct mapping *var = new_var_mapping(vars);
-          register_z_axis(kvl, zaxisID, name, axis_ids, &var->zfactor_id);
+          register_z_axis(kvl, zaxisID, name, axis_ids, &var->zfactor_id, project_id, miptab_freq);
           /* Variable */
           register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids);          
         }
@@ -2016,7 +2026,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
         if ( vlistInqVarCode(vlistID, varID) == 134 )
           {
             ps_in_file++;
-            if ( requested_variables == NULL || in_list(requested_variables, "ps") )
+            if ( requested_variables == NULL || in_list(requested_variables, "ps", numvals) )
               break;
             else
               {
@@ -2044,12 +2054,13 @@ static void register_all_dimensions(list_t *kvl, int streamID,
     cdoAbort("No variables from your table %s found in Ifile.\n");
   if ( !foundName && requested_variables )
     cdoAbort("The given variables to process by attribute vars: '%s' are not found in Ifile.\n", kv_get_a_val(kvl, "vars", ""));
+  if ( requested_variables ) free_array(requested_variables);
+  if ( time_units) Free(time_units);
   if ( cdoVerbose )
     printf("*******Called register_all_dimensions for %d variables successfully.*******\n", foundName);
-  if ( requested_variables ) Free(requested_variables);
 }
 
-static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID)
+static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, int miptab_freq)
 {
   char *frequency;
   frequency = Malloc(CMOR_MAX_STRING * sizeof(char));
@@ -2057,18 +2068,19 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID)
   int reccounter = 0;
   int recdummy = 0;
 
-  char *mipfreq = kv_get_a_val(kvl, "miptab_freq", "");
-  if ( strstr(mipfreq, "yr") )
-    strcpy(frequency, "yr");
-  else if ( strstr(mipfreq, "mon") )
-    strcpy(frequency, "mon");
-  else if ( strstr(mipfreq, "day") )
-    strcpy(frequency, "day");
-  else if ( strstr(mipfreq, "6hr") )
-    strcpy(frequency, "6hr");
-  else if ( strstr(mipfreq, "3hr") )
-    strcpy(frequency, "3hr");
-  else
+  switch ( miptab_freq )
+    {
+    case 11: strcpy(frequency, "yr"); break;
+    case 2: strcpy(frequency, "yr"); break;
+    case 12: strcpy(frequency, "mon"); break;
+    case 3: strcpy(frequency, "mon"); break;
+    case 13: strcpy(frequency, "day"); break;
+    case 4: strcpy(frequency, "day"); break;
+    case 14: strcpy(frequency, "6hr"); break;
+    case 5: strcpy(frequency, "6hr"); break;
+    case 6: strcpy(frequency, "6hr"); break;
+    case 15: strcpy(frequency, "3hr"); break;
+    default:
     {
       if ( cdoStreamName(0)->args[0] == '-' )
         {
@@ -2156,6 +2168,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID)
           else
             cdoWarning("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nTime bounds of the rec are used.\n", ntsteps);
         }
+    }
     }
   return frequency;
 }
@@ -2440,6 +2453,7 @@ static char *use_chunk_file_des(list_t *kvl, int vlistID, int var_id, char *att_
         return appendFile;
       else
         cdoWarning("Append chunk :'%s' configured via chunk description file could not be opened.\nA new file will be written", appendFile);
+      Free(buffer); Free(appendFile);
     }
   else
     cdoWarning("Chunk description file '%s' could not be opened.\nA new file will be written.", chunk_des_file);
@@ -2466,6 +2480,7 @@ static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, 
     }
   for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
   append_files = Malloc(i * sizeof(char *));
+  append_files[i] = NULL;
 
   for ( int j = 0; vars[j].cdi_varID != CDI_UNDEFID; j++ )
     {
@@ -2481,6 +2496,7 @@ static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, 
                         printf("It is tried to open a chunk description file for varID: '%d'.\n", vars[j].cdi_varID);
                       char *chunk_file=use_chunk_file_des(kvl, vlistID, vars[j].cdi_varID, att_chunk_des_file, ifreq);  
                       append_files[j] = strdup(chunk_file);
+                      Free(chunk_file);
                       continue;      
                     }
                   else if ( strcmp(att_append_file, " ") != 0 )
@@ -2515,7 +2531,7 @@ static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, 
   return append_files;
 }
 
-static void write_variables(list_t *kvl, int streamID, struct mapping vars[])
+static void write_variables(list_t *kvl, int streamID, struct mapping vars[], int miptab_freq)
 {
   if ( cdoVerbose )
     printf("\n*******Start to write variables via cmor_write.******\n");
@@ -2536,7 +2552,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[])
   char *frequency = NULL;
   char *timeaxis = kv_get_a_val(kvl, "time_axis", "");
   if ( strcmp(timeaxis, "none") != 0 )
-    frequency = get_frequency(kvl, streamID, vlistID, taxisID);
+    frequency = get_frequency(kvl, streamID, vlistID, taxisID, miptab_freq);
 
   int ifreq = 0;
   if ( frequency )
@@ -2608,23 +2624,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[])
           printf("*******      File stored in:  '%s' with cmor!*******\n", file_name);
         }
     }
-  Free(buffer);
-}
-
-static struct mapping *construct_var_mapping(int streamID)
-{
-  int nvars_max = vlistNvars(streamInqVlist(streamID));
-  struct mapping *vars =
-    (struct mapping *) Malloc((nvars_max + 1) * sizeof(struct mapping));
-  vars[0].cdi_varID = CDI_UNDEFID;
-  return vars;
-}
-
-static void destruct_var_mapping(struct mapping vars[])
-{
-  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
-    Free(vars[i].data);
-  Free(vars);
+  Free(buffer); Free(frequency); free_array(append_files);
 }
 
 static void read_maptab(list_t *kvl, int streamID)
@@ -2635,11 +2635,11 @@ static void read_maptab(list_t *kvl, int streamID)
 
   if ( strcmp(maptab, "") != 0 && strcmp(maptabdir, "") != 0 && maptab[0] != '/' )
     {
-      char *maptabbuild = malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
+      char *maptabbuild = Malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
       sprintf(maptabbuild, "%s/%s\0", maptabdir, maptab);
-      maptab = malloc(strlen(maptabbuild) * sizeof(char));
+      maptab = Malloc(strlen(maptabbuild) * sizeof(char));
       strcpy(maptab, maptabbuild);
-      free(maptabbuild);
+      Free(maptabbuild);
     }
   if ( strcmp(maptab, "") != 0 )
     {
@@ -2685,7 +2685,7 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
           if ( strlen(eqpos) == 1 )
             cdoAbort("Could not find values for in commandline parameter: '%s'\n", params[i]);
           key = strdup(strtok(params[i], "="));
-          values = malloc(MAX_VALUES * sizeof(char *));          
+          values = Malloc(MAX_VALUES * sizeof(char *));          
           values[0] = strdup(strtok(NULL, ""));
           j = 1;
         }
@@ -2704,13 +2704,13 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
   if ( key && values )
     {
       kvlist_append(kvl, (const char *)key, (const char **) values, j);
-      Free(values);
+      free_array(values);
     }
   else if ( values )
     cdoAbort("Found no key for value '%s'.", params[i-1]);
 }
 
-static char *get_mip_table(char *params, list_t *kvl)
+static char *get_mip_table(char *params, list_t *kvl, char *project_id)
 {
   if ( !params )
     cdoAbort("A mip table name or path is required as first argument. No first argument found.");
@@ -2720,11 +2720,10 @@ static char *get_mip_table(char *params, list_t *kvl)
     {
       cdoWarning("Your first argument could not be opened as a file. It is tried to build a path with additional configuration attributes 'mip_table_dir' and 'project_id'");
       char *miptabdir = kv_get_a_val(kvl, "mip_table_dir", "");
-      char *projid = kv_get_a_val(kvl, "project_id", "");
-      if ( strcmp(miptabdir, "") != 0 && strcmp(projid, "") != 0 )
+      if ( strcmp(miptabdir, "") != 0 && strcmp(project_id, "") != 0 )
         {
-          char *miptab = malloc((strlen(miptabdir)+strlen(projid)+strlen(params)+3) * sizeof(char));
-          sprintf(miptab, "%s/%s_%s\0", miptabdir, projid, params);
+          char *miptab = Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
+          sprintf(miptab, "%s/%s_%s\0", miptabdir, project_id, params);
           if ( file_exist(miptab, 0) )
             return miptab;
           else
@@ -2735,7 +2734,7 @@ static char *get_mip_table(char *params, list_t *kvl)
     }        
 }
 
-static void save_miptab_freq(list_t *kvl, char *mip_table)
+static void save_miptab_freq(list_t *kvl, char *mip_table, int *miptab_freq)
 {
   char *freq = strdup(mip_table);
   int fpos = 0, k = 0, j = 0;
@@ -2751,8 +2750,33 @@ static void save_miptab_freq(list_t *kvl, char *mip_table)
   if ( fpos > k )
     freq += fpos-k;
   if ( freq != NULL )
-    kv_insert_a_val(kvl, "miptab_freq", freq, 0);
+    {
+      if ( strstr(freq, "yr") || strstr(freq, "Yr") )
+        *miptab_freq = 11;
+      else if ( strstr(freq, "mon") || strstr(freq, "Mon") )
+        *miptab_freq = 12;
+      else if ( strstr(freq, "day") || strstr(freq, "Day") )
+        *miptab_freq = 13;
+      else if ( strstr(freq, "6hr") )
+        *miptab_freq = 14;
+      else if ( strstr(freq, "3hr") )
+        *miptab_freq = 15;
+
+      else if ( strcmp(freq, "Oclim") == 0 )
+        *miptab_freq = 1;
+      else if ( strcmp(freq, "Oyr") == 0 )
+        *miptab_freq = 2;
+      else if ( strcmp(freq, "cfMon") == 0 )
+        *miptab_freq = 3;
+      else if ( strcmp(freq, "day") == 0 )
+        *miptab_freq = 4;
+      else if ( strcmp(freq, "6hrPlev") == 0 )
+        *miptab_freq = 5;
+      else if ( strcmp(freq, "6hrLev") == 0 )
+        *miptab_freq = 6;
+    }
 }
+
 #endif
 
 void *CMOR(void *argument)
@@ -2779,10 +2803,12 @@ void *CMOR(void *argument)
 
   /* Config files are read with descending priority. */
   read_config_files(kvl);
+  char *project_id = strdup(kv_get_a_val(kvl, "project_id", ""));;
+  int miptab_freq = 0;
 
   /* check MIP table */
-  char *mip_table = get_mip_table(params[0], kvl);
-  save_miptab_freq(kvl, mip_table);
+  char *mip_table = get_mip_table(params[0], kvl, project_id);
+  save_miptab_freq(kvl, mip_table, &miptab_freq);
 
   int streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
@@ -2791,8 +2817,8 @@ void *CMOR(void *argument)
   /* Check for attributes and member name */
   if ( cdoVerbose )
     printf("*******Start to check attributes.*******\n");
-  check_attr(kvl);
-  check_mem(kvl);
+  check_attr(kvl, project_id);
+  check_mem(kvl, project_id);
   if ( cdoVerbose )
     printf("*******Successfully checked global attributes.*******\n");
 
@@ -2809,18 +2835,18 @@ void *CMOR(void *argument)
   cmor_load_table(mip_table, &table_id);
   cmor_set_table(table_id);
 
-  register_all_dimensions(kvl, streamID, vars, table_id);
-  write_variables(kvl, streamID, vars);
+  register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq);
+  write_variables(kvl, streamID, vars, miptab_freq);
 
   destruct_var_mapping(vars);
 
+  Free(mip_table); Free(project_id);
   list_destroy(pml);
 
   streamClose(streamID);
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif
-
   cdoFinish();
   return 0;
 }
