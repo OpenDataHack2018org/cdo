@@ -141,7 +141,7 @@ void set_attributes(list_t *kvlist, int vlistID)
           for ( int idx = 0; idx < nv; ++idx )
             {
               int varID = varIDs[idx];
-              if ( cdoVerbose ) printf("varID, cdiID, attname %d %d %s\n", varID, cdiID, attname);
+              if ( cdoVerbose ) printf("varID, cdiID, attname %d %d %s %d\n", varID, cdiID, attname, (int)strlen(attname));
               if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
                 {
                   int *ivals = (int*) Malloc(nvalues*sizeof(int));

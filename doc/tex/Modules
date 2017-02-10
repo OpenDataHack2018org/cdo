@@ -30,7 +30,7 @@ Settime       Modification
 Change        Modification
 Setgrid       Modification
 Setzaxis      Modification
-Setgatt       Modification
+Setattributes Modification
 Invert        Modification
 Invertlev     Modification
 Shiftxy       Modification

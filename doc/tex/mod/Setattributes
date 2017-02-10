@@ -1,0 +1,75 @@
+@BeginModule
+@NewPage
+@Name      = Setattribute
+@Title     = Set attributes
+@Section   = Modification
+@Class     = Modification
+@Arguments = infile outfile
+@Operators = setattribute
+
+@BeginDescription
+This operator sets attributes of a dataset. Each attribute has the following structure:
+
+  [@bold{var_nm}@]@bold{att_nm}=@bold{att_val}
+
+@IfMan
+   var_nm  Variable name (optional). Example: pressure
+   att_nm  Attribute name. Example: units
+   att_val Comma separated list of attribute values. Example: pascal
+@EndifMan
+@IfDoc
+\begin{defalist}{\textbf{var_nm}}
+\item[\ \ \ \textbf{var_nm}\ \ \hfill]  Variable name (optional). Example: pressure
+\item[\ \ \ \textbf{att_nm}\ \ \hfill]  Attribute name. Example: units
+\item[\ \ \ \textbf{att_val}\ \ \hfill]  Comma separated list of attribute values. Example: pascal
+\end{defalist}
+@EndifDoc
+
+The value of @bold{var_nm} is the name of the variable containing the attribute (named @bold{att_nm}) that
+you want to set. Use wildcards to set the attribute @bold{att_nm} to more than one variable.
+A value of @bold{var_nm} of '@bold{*}' will set the attribute @bold{att_nm} to all data variables.
+If @bold{var_nm} is missing then @bold{att_nm} refers to a global attribute.
+
+The value of @bold{att_nm} is the name of the attribute you want to set.
+
+The value of @bold{att_val} is the contents of the attribute @bold{att_nm}. @bold{att_val} may be a single value
+or one-dimensional array of elements. The type of the attribute value will be detected
+automaticly from the contents of the value.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_setattribute
+@Title     = Set attributes
+@Parameter = attributes
+
+@EndOperator
+
+
+@BeginParameter
+@Item = attributes
+STRING  Comma separated list of attributes. 
+@EndParameter
+
+
+@BeginExample
+To set the units of the variable pressure to pascal use:
+@BeginVerbatim
+   cdo  setattribute,pressure@units=pascal  infile  outfile
+@EndVerbatim
+To set the global text attribute "my_att" to "my contents", use:
+@BeginVerbatim
+   cdo  setattribute,my_att="my contents"  infile  outfile
+@EndVerbatim
+Result of '\texttt{ncdump -h outfile}':
+@BeginListing
+netcdf outfile {
+dimensions: ...
+
+variables: ...
+
+// global attributes:
+                :my_att = "my contents" ;
+}
+@EndListing
+@EndExample
