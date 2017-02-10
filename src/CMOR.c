@@ -1279,6 +1279,7 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
                         'd', NULL, 0, NULL);
           else
             {  
+              printf("Schau: %d\n", miptab_freq);
               switch ( miptab_freq )
                 {
                 case 3: cmor_axis(new_axis_id(axis_ids),
@@ -2475,7 +2476,7 @@ static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, 
       i++;
     }
   for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
-  append_files = Malloc(i * sizeof(char *));
+  append_files = Malloc((i+1) * sizeof(char *));
   append_files[i] = NULL;
 
   for ( int j = 0; vars[j].cdi_varID != CDI_UNDEFID; j++ )
@@ -2561,7 +2562,6 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
         ifreq = 3;
     }
   char **append_files = get_append_files(kvl, vars, vlistID, ifreq);
-
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
       double time_bnds[2];
@@ -2754,7 +2754,7 @@ static void save_miptab_freq(list_t *kvl, char *mip_table, int *miptab_freq)
       else if ( strstr(freq, "3hr") )
         *miptab_freq = 15;
 
-      else if ( strcmp(freq, "Oclim") == 0 )
+      if ( strcmp(freq, "Oclim") == 0 )
         *miptab_freq = 1;
       else if ( strcmp(freq, "Oyr") == 0 )
         *miptab_freq = 2;
