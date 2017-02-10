@@ -1073,6 +1073,8 @@ int parse_options_long(int argc, char *argv[])
   int lenableexcept;
   int ltimestat_date;
   int ltimestat_bounds;
+  int lsortname;
+  int lsortparam;
 
   struct cdo_option opt_long[] =
     {
@@ -1103,6 +1105,8 @@ int parse_options_long(int argc, char *argv[])
       { "regular",                 no_argument,                NULL, 'R' },
       { "silent",                  no_argument,                NULL, 's' },
       { "sort",                    no_argument,                NULL, 'Q' },
+      { "sortname",                no_argument,          &lsortname,  1  },
+      { "sortparam",               no_argument,         &lsortparam,  1  },
       { "table",             required_argument,                NULL, 't' },
       { "verbose",                 no_argument,                NULL, 'v' },
       { "version",                 no_argument,                NULL, 'V' },
@@ -1123,6 +1127,8 @@ int parse_options_long(int argc, char *argv[])
       lenableexcept = 0;
       ltimestat_date = 0;
       ltimestat_bounds = 0;
+      lsortname = 0;
+      lsortparam = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1206,6 +1212,14 @@ int parse_options_long(int argc, char *argv[])
               if ( intarg != 0 && intarg != 1 )
                 cdoAbort("Unsupported value for option --remap_genweights=%d [range: 0-1]", intarg);
               remap_genweights = intarg;
+            }
+          else if ( lsortname )
+            {
+              cdiDefGlobal("SORTNAME", TRUE);
+            }
+          else if ( lsortparam )
+            {
+              cdiDefGlobal("SORTPARAM", TRUE);
             }
           break;
         case 'a':
