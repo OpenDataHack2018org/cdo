@@ -259,6 +259,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
                     cdoWarning("Input parameters have different levels!");
                   else
                     cdoWarning("Z-axis orientation differ!");
+                  break;
                 }
               
               Free(lev1);
