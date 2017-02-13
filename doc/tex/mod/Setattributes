@@ -35,6 +35,9 @@ The value of @bold{att_nm} is the name of the attribute you want to set.
 The value of @bold{att_val} is the contents of the attribute @bold{att_nm}. @bold{att_val} may be a single value
 or one-dimensional array of elements. The type of the attribute value will be detected
 automaticly from the contents of the value.
+
+A special meaning has the attribute name @bold{FILE}. If this is the 1st attribute then all attributes
+are read from a file specified in the value of @bold{att_val}.
 @EndDescription
 @EndModule
 

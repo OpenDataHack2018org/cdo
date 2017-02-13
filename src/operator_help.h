@@ -849,6 +849,41 @@ static const char *CompcHelp[] = {
     NULL
 };
 
+static const char *SetattributeHelp[] = {
+    "NAME",
+    "    setattribute - Set attributes",
+    "",
+    "SYNOPSIS",
+    "    setattribute,attributes  infile outfile",
+    "",
+    "DESCRIPTION",
+    "    This operator sets attributes of a dataset. Each attribute has the following structure:",
+    "    ",
+    "      [var_nm@]att_nm=att_val",
+    "    ",
+    "       var_nm  Variable name (optional). Example: pressure",
+    "       att_nm  Attribute name. Example: units",
+    "       att_val Comma separated list of attribute values. Example: pascal",
+    "    ",
+    "    The value of var_nm is the name of the variable containing the attribute (named att_nm) that",
+    "    you want to set. Use wildcards to set the attribute att_nm to more than one variable.",
+    "    A value of var_nm of '*' will set the attribute att_nm to all data variables.",
+    "    If var_nm is missing then att_nm refers to a global attribute.",
+    "    ",
+    "    The value of att_nm is the name of the attribute you want to set.",
+    "    ",
+    "    The value of att_val is the contents of the attribute att_nm. att_val may be a single value",
+    "    or one-dimensional array of elements. The type of the attribute value will be detected",
+    "    automaticly from the contents of the value.",
+    "    ",
+    "    A special meaning has the attribute name FILE. If this is the 1st attribute then all attributes",
+    "    are read from a file specified in the value of att_val.",
+    "",
+    "PARAMETER",
+    "    attributes  STRING  Comma separated list of attributes. ",
+    NULL
+};
+
 static const char *SetpartabHelp[] = {
     "NAME",
     "    setpartabp, setpartabn - Set parameter table",
@@ -1111,38 +1146,6 @@ static const char *SetzaxisHelp[] = {
     "    zaxis  STRING  Z-axis description file or name of the target z-axis",
     "    zbot   FLOAT   Specifying the bottom of the vertical column. Must have the same units as z-axis. ",
     "    ztop   FLOAT   Specifying the top of the vertical column. Must have the same units as z-axis. ",
-    NULL
-};
-
-static const char *SetattributeHelp[] = {
-    "NAME",
-    "    setattribute - Set attributes",
-    "",
-    "SYNOPSIS",
-    "    setattribute,attributes  infile outfile",
-    "",
-    "DESCRIPTION",
-    "    This operator sets attributes of a dataset. Each attribute has the following structure:",
-    "    ",
-    "      [var_nm@]att_nm=att_val",
-    "    ",
-    "       var_nm  Variable name (optional). Example: pressure",
-    "       att_nm  Attribute name. Example: units",
-    "       att_val Comma separated list of attribute values. Example: pascal",
-    "    ",
-    "    The value of var_nm is the name of the variable containing the attribute (named att_nm) that",
-    "    you want to set. Use wildcards to set the attribute att_nm to more than one variable.",
-    "    A value of var_nm of '*' will set the attribute att_nm to all data variables.",
-    "    If var_nm is missing then att_nm refers to a global attribute.",
-    "    ",
-    "    The value of att_nm is the name of the attribute you want to set.",
-    "    ",
-    "    The value of att_val is the contents of the attribute att_nm. att_val may be a single value",
-    "    or one-dimensional array of elements. The type of the attribute value will be detected",
-    "    automaticly from the contents of the value.",
-    "",
-    "PARAMETER",
-    "    attributes  STRING  Comma separated list of attributes. ",
     NULL
 };
 

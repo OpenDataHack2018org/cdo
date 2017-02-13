@@ -141,7 +141,7 @@ void set_attributes(list_t *kvlist, int vlistID)
           for ( int idx = 0; idx < nv; ++idx )
             {
               int varID = varIDs[idx];
-              if ( cdoVerbose ) printf("varID, cdiID, attname %d %d %s %d\n", varID, cdiID, attname, (int)strlen(attname));
+              // if ( cdoVerbose ) printf("varID, cdiID, attname %d %d %s %d\n", varID, cdiID, attname, (int)strlen(attname));
               if ( dtype == CDI_DATATYPE_INT8 || dtype == CDI_DATATYPE_INT16 || dtype == CDI_DATATYPE_INT32 )
                 {
                   int *ivals = (int*) Malloc(nvalues*sizeof(int));
@@ -196,8 +196,9 @@ void *Setattribute(void *argument)
   if ( natts == 1 )
     {
       keyValues_t *kv = *(keyValues_t **)kvlist->head->data;
-      if ( STR_IS_EQ(kv->key, "file") )
+      if ( STR_IS_EQ(kv->key, "FILE") )
         {
+          if ( cdoVerbose ) cdoPrint("Reading attributes from: %s", kv->values[0]);
           const char *filename = parameter2word(kv->values[0]);
           FILE *fp = fopen(filename, "r");
           if ( fp == NULL ) cdoAbort("Open failed on: %s\n", filename);

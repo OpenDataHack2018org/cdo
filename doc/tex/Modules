@@ -24,13 +24,13 @@ Condc         Conditional selection
 MapReduce     Conditional selection
 Comp	      Comparison
 Compc	      Comparison
+Setattributes Modification
 Setpartab     Modification
 Set           Modification
 Settime       Modification
 Change        Modification
 Setgrid       Modification
 Setzaxis      Modification
-Setattributes Modification
 Invert        Modification
 Invertlev     Modification
 Shiftxy       Modification

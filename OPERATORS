@@ -121,6 +121,7 @@ Operator catalog:
 -------------------------------------------------------------
    Modification
 -------------------------------------------------------------
+   Setattributes setattribute    Set attributes
    Setpartab     setpartabp      Set parameter table
    Setpartab     setpartabn      Set parameter table
    Set           setcodetab      Set parameter code table
@@ -153,7 +154,6 @@ Operator catalog:
    Setgrid       setgridarea     Set grid cell area
    Setzaxis      setzaxis        Set z-axis
    Setzaxis      genlevelbounds  Generate level bounds
-   Setattributes setattribute    Set attributes
    Invert        invertlat       Invert latitudes
    Invertlev     invertlev       Invert levels
    Shiftxy       shiftx          Shift x
