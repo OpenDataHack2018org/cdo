@@ -452,7 +452,7 @@ void *Select(void *argument)
 
       if ( nvars2 == 0 )
 	{
-	  cdoWarning("No resulting variables available!");
+	  cdoWarning("No variable selected!");
 	  goto END_LABEL;
 	}
 
