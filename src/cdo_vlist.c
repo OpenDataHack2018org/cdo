@@ -284,12 +284,13 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	vlistInqVarName(vlistID2, varID, names2[varID]);
 
       qsort(names1[0], nvars, CDI_MAX_NAME, cmpnames);
+      qsort(names2[0], nvars, CDI_MAX_NAME, cmpnames);
 
       for ( varID = 0; varID < nvars; varID++ )
 	if ( strcmp(names1[varID], names2[varID]) != 0 ) break;
 
       if ( varID == nvars )
-	cdoPrint("Use CDO option --sort to sort the parameter names (NetCDF only)!");
+	cdoPrint("Use CDO option --sortname to sort the parameter by name (NetCDF only)!");
     }
 }
 
