@@ -981,14 +981,12 @@ static char *get_txtatt(int vlistID, int varID, char *key)
       cdiInqAtt(vlistID, varID, i, name, &type, &len);
       if ( strcmp(name, key) == 0 )
         {
-          txtatt = Malloc((len + 1) * sizeof(char));
+          txtatt = Malloc(CMOR_MAX_STRING * sizeof(char));
           cdiInqAttTxt(vlistID, varID, name, len, txtatt);
           txtatt[len] = '\0';
           return txtatt;
         }
     }
-  txtatt = Malloc(CMOR_MAX_STRING * sizeof(char));
-  strcpy(txtatt, "");
   return txtatt;
 }
 
@@ -1063,7 +1061,7 @@ static void setup_dataset(list_t *kvl, int streamID)
   if ( !cmor_version_exists )
     cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
   Free(calendar);
-  Free(comment);
+  if (comment) Free(comment);
   if ( cdoVerbose )
     printf("*******Setup finished successfully.*******\n");
 }
@@ -1147,8 +1145,7 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
       }
   if ( cmor_time_name[0] != 't' )
     {
-      char *time_method = Malloc(8192 * sizeof(char));
-      cdiInqAttTxt(vlistID, varID, "cell_methods", 8192, time_method);
+      char *time_method = get_txtatt(vlistID, varID, "cell_methods");
       char *att_time_method = kv_get_a_val(kvl, "cell_methods", "");
       check_compare_set(time_method, att_time_method, "cell_methods");
       if ( time_method[0] == 'm' || strcmp(time_method, "time: mean") == 0 ) strcpy(cmor_time_name, "time \0");
@@ -1244,10 +1241,8 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
   double *levels;
 
   char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
-  char *chardim = Malloc(8192 * sizeof(char));
-  cdiInqAttTxt(vlistID, varID, "char_dim", 8192, chardim);
-  chardim[strlen(chardim)]=0;
-  if ( strcmp(chardimatt, "") != 0 || chardim[0] )
+  char *chardim = get_txtatt(vlistID, varID, "char_dim");
+  if ( strcmp(chardimatt, "") != 0 || chardim )
     check_compare_set(chardim, chardimatt, "char_dim");
 
   if ( strcmp(chardim, "vegtype") == 0 )
@@ -1720,10 +1715,8 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
 
   char *grid_file = kv_get_a_val(kvl, "ginfo", "");
   char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
-  char *chardim = Malloc(8192 * sizeof(char));
-  cdiInqAttTxt(vlistID, varID, "char_dim", 8192, chardim);
-  chardim[strlen(chardim)]=0;
-  if ( strcmp(chardimatt, "") != 0 || chardim[0] )
+  char *chardim = get_txtatt(vlistID, varID, "char_dim");
+  if ( strcmp(chardimatt, "") != 0 || chardim )
     check_compare_set(chardim, chardimatt, "char_dim");
   if ( strcmp(grid_file, "") != 0 )
     change_grid(grid_file, &gridID, vlistID);
@@ -1973,6 +1966,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
           (void *) missing_value, &tolerance, positive,
                         NULL, NULL, NULL);
     }
+  if (positive) Free(positive);
 }
 
 static void register_all_dimensions(list_t *kvl, int streamID,
