@@ -358,6 +358,7 @@ static void map_it(list_t *kvl, int vlistID, int varID)
          }
       else if ( STR_IS_EQ(key, "units")         ) vlistDefVarUnits(vlistID, varID, value);
       else if ( STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID, varID, "cell_methods", (int) strlen(value), value);
+      else if ( STR_IS_EQ(key, "char_dim")  ) cdiDefAttTxt(vlistID, varID, "char_dim", (int) strlen(value), value);
       else if ( STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID, varID, value);
       else if ( STR_IS_EQ(key, "factor")        ) {}
       else if ( STR_IS_EQ(key, "delete")        ) {}
@@ -1236,19 +1237,25 @@ static void get_zhybrid(int zaxisID, char *varname, double *p0, double *alev_val
   Free(vct);
 }
 
-static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_ids, int *zfactor_id, char *project_id, int miptab_freq)
+static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname, int *axis_ids, int *zfactor_id, char *project_id, int miptab_freq)
 {
   *zfactor_id = 0;
   int zsize = zaxisInqSize(zaxisID);
   double *levels;
 
-  char *chardim = kv_get_a_val(kvl, "char_dim", "");
+  char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
+  char *chardim = Malloc(8192 * sizeof(char));
+  cdiInqAttTxt(vlistID, varID, "char_dim", 8192, chardim);
+  chardim[strlen(chardim)]=0;
+  if ( strcmp(chardimatt, "") != 0 || chardim[0] )
+    check_compare_set(chardim, chardimatt, "char_dim");
+
   if ( strcmp(chardim, "vegtype") == 0 )
     {
       if ( zsize )
         cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis is ignored for '%s'.", chardim, zsize, varname);
       int numchar = 0;
-      char **charvals = kv_get_vals(kvl, "char_dim_vals", &numchar);
+      char **charvals = kv_get_vals(kvl, "char_dim_vegtype", &numchar);
       if ( charvals )
         {
           void *charcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
@@ -1260,7 +1267,10 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
         }
       else
         cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
+      Free(chardim);
     }
+  else
+  {
   if ( zsize > 1)
     {
       levels = Malloc(zsize * sizeof(double));
@@ -1415,6 +1425,7 @@ static void register_z_axis(list_t *kvl, int zaxisID, char *varname, int *axis_i
                       'd', NULL, 0, NULL);
       Free(levels);
     }
+  }
 }
 
 /*
@@ -1708,7 +1719,12 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   int gridID = vlistInqVarGrid(vlistID, varID);
 
   char *grid_file = kv_get_a_val(kvl, "ginfo", "");
-  char *chardim = kv_get_a_val(kvl, "char_dim", "");
+  char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
+  char *chardim = Malloc(8192 * sizeof(char));
+  cdiInqAttTxt(vlistID, varID, "char_dim", 8192, chardim);
+  chardim[strlen(chardim)]=0;
+  if ( strcmp(chardimatt, "") != 0 || chardim[0] )
+    check_compare_set(chardim, chardimatt, "char_dim");
   if ( strcmp(grid_file, "") != 0 )
     change_grid(grid_file, &gridID, vlistID);
 
@@ -1797,7 +1813,10 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
     {
       grid_ids[0] = 0;
       int numchar = 0;
-      char **charvals = kv_get_vals(kvl, "char_dim_vals", &numchar);
+      char *charvalstring = Malloc(CMOR_MAX_STRING * sizeof(char));
+      sprintf(charvalstring, "char_dim_%s", chardim);
+      char **charvals = kv_get_vals(kvl, charvalstring, &numchar);
+      Free(charvalstring);
       if ( ( xlength > 0 && xlength != numchar ) && ( ylength > 0 && ylength != numchar ) )
         cdoAbort("You configured a character coordinate '%s' with '%d' string values but you also registered a grid with '%d' numerical values on X axis and '%d' numerical values on Y axis. Both is not supported!", chardim, numchar, xlength, ylength);
       if ( !charvals )
@@ -1813,6 +1832,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
           register_lon_axis(gridID, xlength, axis_ids);
           register_char_axis(numchar, charvals, axis_ids, chardim);
         }
+      Free(chardim);
     }
 /*
       grid_ids[0] = 0;
@@ -2011,7 +2031,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           cmor_set_table(table_id);
           /* Z-Axis */
           struct mapping *var = new_var_mapping(vars);
-          register_z_axis(kvl, zaxisID, name, axis_ids, &var->zfactor_id, project_id, miptab_freq);
+          register_z_axis(kvl, vlistID, varID, zaxisID, name, axis_ids, &var->zfactor_id, project_id, miptab_freq);
           /* Variable */
           register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids);      
         }
