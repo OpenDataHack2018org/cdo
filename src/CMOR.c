@@ -630,26 +630,26 @@ static int parse_kv_file(list_t *kvl, const char *filename)
   return 0;
 }
 
-static void check_compare_set(char *finalset, char *attribute, char *attname, const char *returner)
+static void check_compare_set(char **finalset, char *attribute, char *attname, const char *returner)
 {
-  if ( !finalset )
+  if ( !(*finalset) )
     {
       if ( strcmp(attribute, "") == 0 )
         {
           if ( returner )
-            finalset = strdup(returner);
+            *finalset = strdup(returner);
           else
             cdoAbort("Required value for attribute '%s' is neither found in input file nor in the configuration.", attname);
         }
       else
-        strcpy(finalset, attribute);
+        strcpy(*finalset, attribute);
     }
   else if ( strcmp(attribute, "") != 0 )
     {
-      if ( strcmp(attribute, finalset) != 0 )
+      if ( strcmp(attribute, *finalset) != 0 )
         {
           cdoWarning("%s of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\nCmor libary is called with attribute unit '%s'.\n", attname, finalset, attname, attribute, attribute);
-          strcpy(finalset, attribute);
+          strcpy(*finalset, attribute);
         }
     }
 }
@@ -945,17 +945,17 @@ static char *get_calendar_ptr(int calendar)
   switch ( calendar )
     {
     case CALENDAR_STANDARD:
-      strcpy(calendar_ptr, "gregorian");
+      strcpy(calendar_ptr, "gregorian"); break;
     case CALENDAR_PROLEPTIC:
-      strcpy(calendar_ptr, "proleptic_gregorian");
+      strcpy(calendar_ptr, "proleptic_gregorian"); break;
     case CALENDAR_360DAYS:
-      strcpy(calendar_ptr, "360_day");
+      strcpy(calendar_ptr, "360_day"); break;
     case CALENDAR_365DAYS:
-      strcpy(calendar_ptr, "noleap");
+      strcpy(calendar_ptr, "noleap"); break;
     case CALENDAR_366DAYS:
-      strcpy(calendar_ptr, "all_leap");
+      strcpy(calendar_ptr, "all_leap"); break;
     default:
-      strcpy(calendar_ptr, "");
+      Free(calendar_ptr); return NULL;
     }
   return calendar_ptr;
 }
@@ -1031,7 +1031,7 @@ static void setup_dataset(list_t *kvl, int streamID)
   if ( cdoVerbose )
     printf("Checking attribute 'calendar' from configuration.\n");
   if ( get_calendar_int(attcalendar) )
-    check_compare_set(calendar, attcalendar, "calendar", NULL);
+    check_compare_set(&calendar, attcalendar, "calendar", NULL);
   else 
     {
       if ( cdoVerbose )
@@ -1159,7 +1159,7 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
     {
       char *time_method = get_txtatt(vlistID, varID, "cell_methods");
       char *att_time_method = kv_get_a_val(kvl, "cell_methods", "");
-      check_compare_set(time_method, att_time_method, "cell_methods", NULL);
+      check_compare_set(&time_method, att_time_method, "cell_methods", " ");
       if ( time_method[0] == 'm' ) strcpy(cmor_time_name, "time \0");
       else if ( time_method[0] == 'p' ) strcpy(cmor_time_name, "time1\0");
       else if ( time_method[0] == 'c' ) strcpy(cmor_time_name, "time2\0");
@@ -1169,7 +1169,6 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
           cdoWarning("Found configuration time cell method '%s' is not valid. Check CF-conventions for allowed time cell methods.\nTime cell method is set to 'mean'. \n", time_method);
           strcpy(cmor_time_name, "time \0");
         }
-      printf("Jeapi\n");
       Free(time_method);
     }
   kv_insert_a_val(kvl, "time_axis", cmor_time_name, 1); 
@@ -1255,7 +1254,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
 
   char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
   char *chardim = get_txtatt(vlistID, varID, "char_dim");
-  check_compare_set(chardim, chardimatt, "char_dim", "notSet");
+  check_compare_set(&chardim, chardimatt, "char_dim", "notSet");
   if ( strcmp(chardim, "vegtype") == 0 )
     {
       if ( zsize )
@@ -1727,7 +1726,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   char *grid_file = kv_get_a_val(kvl, "ginfo", "");
   char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
   char *chardim = get_txtatt(vlistID, varID, "char_dim");
-  check_compare_set(chardim, chardimatt, "char_dim", "notSet");
+  check_compare_set(&chardim, chardimatt, "char_dim", "notSet");
   if ( strcmp(grid_file, "") != 0 )
     change_grid(grid_file, &gridID, vlistID);
 
@@ -1931,16 +1930,16 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
                               struct mapping *var, int *grid_ids)
 {
   char *positive = get_txtatt(vlistID, varID, "positive");
-  char name[CDI_MAX_NAME];
+  char *name = Malloc(CDI_MAX_NAME * sizeof(char));
   vlistInqVarName(vlistID, varID, name);
-  char units[CDI_MAX_NAME];
+  char *units = Malloc(CDI_MAX_NAME * sizeof(char));
   vlistInqVarUnits(vlistID, varID, units);
   char *attunits = kv_get_a_val(kvl, "units", "");
   char *attname = kv_get_a_val(kvl, "out_name", "");
   char *attp = kv_get_a_val(kvl, "p", "");
-  check_compare_set(positive, attp, "positive", " ");
-  check_compare_set(name, attname, "out_name", NULL);
-  check_compare_set(units, attunits, "units", NULL);
+  check_compare_set(&positive, attp, "positive", "");
+  check_compare_set(&name, attname, "out_name", NULL);
+  check_compare_set(&units, attunits, "units", NULL);
   char missing_value[sizeof(double)];
   double tolerance = 1e-4;
   size_t gridsize = vlistGridsizeMax(vlistID);
@@ -1975,7 +1974,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
           (void *) missing_value, &tolerance, positive,
                         NULL, NULL, NULL);
     }
-  if (positive) Free(positive);
+  if (positive) Free(positive); Free(name); Free(units);
 }
 
 static void register_all_dimensions(list_t *kvl, int streamID,
@@ -1991,7 +1990,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   if ( cdoVerbose )
     printf("Checking attribute 'req_time_units' from configuration.\n");
   if ( check_time_units(req_time_units) )
-    check_compare_set(time_units, req_time_units, "time_units", NULL);
+    check_compare_set(&time_units, req_time_units, "time_units", NULL);
   else 
     cdoAbort("Required Attribute 'req_time_units' from configuration is invalid!");
 
@@ -2022,9 +2021,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           foundName++;
           /* Time-Axis */
           char cmor_time_name[CMOR_MAX_STRING];
-          printf("Wat is dein prob\n");
           get_time_method(kvl, vlistID, varID, cmor_time_name, project_id, miptab_freq);
-          printf("Wat is dein prob\n");
           if ( strcmp(cmor_time_name, "none") != 0 )
             cmor_axis(new_axis_id(axis_ids),
                     cmor_time_name,
@@ -2038,7 +2035,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           struct mapping *var = new_var_mapping(vars);
           register_z_axis(kvl, vlistID, varID, zaxisID, name, axis_ids, &var->zfactor_id, project_id, miptab_freq);
           /* Variable */
-          register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids);      
+          register_variable(kvl, vlistID, varID, axis_ids, var, grid_ids);     
         }
     }
   if ( ps_required )
