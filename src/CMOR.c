@@ -1243,26 +1243,27 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
   char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
   char *chardim = get_txtatt(vlistID, varID, "char_dim");
   if ( strcmp(chardimatt, "") != 0 || chardim )
-    check_compare_set(chardim, chardimatt, "char_dim");
-
-  if ( strcmp(chardim, "vegtype") == 0 )
     {
-      if ( zsize )
-        cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis is ignored for '%s'.", chardim, zsize, varname);
-      int numchar = 0;
-      char **charvals = kv_get_vals(kvl, "char_dim_vegtype", &numchar);
-      if ( charvals )
+      check_compare_set(chardim, chardimatt, "char_dim");
+      if ( strcmp(chardim, "vegtype") == 0 )
         {
-          void *charcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
-          sprintf((char *)charcmor, "%s", charvals[0]);
-          for ( int i = 1; i < numchar; i++ )
-            sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
-          cmor_axis(new_axis_id(axis_ids), chardim, "", sizeof(charvals)/sizeof(charvals[0]), (void *)charcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
-          Free(charcmor);
+          if ( zsize )
+            cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis is ignored for '%s'.", chardim, zsize, varname);
+          int numchar = 0;
+          char **charvals = kv_get_vals(kvl, "char_dim_vegtype", &numchar);
+          if ( charvals )
+            {
+              void *charcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
+              sprintf((char *)charcmor, "%s", charvals[0]);
+              for ( int i = 1; i < numchar; i++ )
+                sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
+              cmor_axis(new_axis_id(axis_ids), chardim, "", sizeof(charvals)/sizeof(charvals[0]), (void *)charcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
+              Free(charcmor);
+            }
+          else
+            cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
+          Free(chardim);
         }
-      else
-        cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
-      Free(chardim);
     }
   else
   {
@@ -1533,7 +1534,7 @@ static void check_and_gen_bounds(int gridID, int nbounds, int length, double *co
 }
 
 static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, int xlength, double *xcoord_vals, double *xcell_bounds, int ynbounds, int ylength, double *ycoord_vals, double *ycell_bounds)
-{
+{ 
   if ( xnbounds != 4 * totalsize || ynbounds != 4 * totalsize || (xcell_bounds[1] == 0.00 && xcell_bounds[2] == 0.00) || (ycell_bounds[1] == 0.00 && ycell_bounds[2] == 0.00) )
     {
       for ( int j = 1; j < ylength-1; j++ )
