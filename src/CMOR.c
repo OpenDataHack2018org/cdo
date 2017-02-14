@@ -648,8 +648,9 @@ static void check_compare_set(char **finalset, char *attribute, char *attname, c
     {
       if ( strcmp(attribute, *finalset) != 0 )
         {
-          cdoWarning("%s of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\nCmor libary is called with attribute unit '%s'.\n", attname, finalset, attname, attribute, attribute);
+          cdoWarning("%s of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\nCmor libary is called with attribute unit '%s'.\n", attname, *finalset, attname, attribute, attribute);
           strcpy(*finalset, attribute);
+          printf("Jo\n");
         }
     }
 }
@@ -1993,6 +1994,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
     check_compare_set(&time_units, req_time_units, "time_units", NULL);
   else 
     cdoAbort("Required Attribute 'req_time_units' from configuration is invalid!");
+  printf("Schau: %s\n", time_units);
 
   int numvals = 0;
   char **requested_variables = kv_get_vals(kvl, "vars", &numvals);
