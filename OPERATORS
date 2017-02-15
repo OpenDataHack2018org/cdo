@@ -121,7 +121,7 @@ Operator catalog:
 -------------------------------------------------------------
    Modification
 -------------------------------------------------------------
-   Setattributes setattribute    Set attributes
+   Setattribute  setattribute    Set attributes
    Setpartab     setpartabp      Set parameter table
    Setpartab     setpartabn      Set parameter table
    Set           setcodetab      Set parameter code table

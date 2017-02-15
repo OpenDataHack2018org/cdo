@@ -24,7 +24,7 @@ Condc         Conditional selection
 MapReduce     Conditional selection
 Comp	      Comparison
 Compc	      Comparison
-Setattributes Modification
+Setattribute  Modification
 Setpartab     Modification
 Set           Modification
 Settime       Modification
