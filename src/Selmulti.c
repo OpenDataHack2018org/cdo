@@ -1107,7 +1107,7 @@ void printSelectionTuples()
         if ( cdoDebugExt ) cdoPrint(" Selection tuple [%d]: ncodes=%d, nlevelTypes=%d, nlevels=%d",ii,tuplerec->ncodes,tuplerec->nlevelTypes,tuplerec->nlevels);
         for (ri=0; ri< tuplerec->ncodes; ri++)
         {
-                 sprintf(bff,"%d", listaGetInt(tuplerec->codeLST, ri) );
+                 sprintf(bff,"%d", lista_get_int(tuplerec->codeLST, ri) );
                  strcat(strval,bff);
                  if ( (ri+1)< tuplerec->ncodes )
                         strcat(strval,"/");
@@ -1115,7 +1115,7 @@ void printSelectionTuples()
         }
         for (ri=0; ri< tuplerec->nlevelTypes; ri++)
         {
-                 sprintf(bff,"%d", listaGetInt(tuplerec->levelTypeLST, ri) );
+                 sprintf(bff,"%d", lista_get_int(tuplerec->levelTypeLST, ri) );
                  strcat(strval,bff);
                  if ( (ri+1)< tuplerec->nlevelTypes )
                         strcat(strval,"/");
@@ -1123,7 +1123,7 @@ void printSelectionTuples()
         }
         for (ri=0; ri< tuplerec->nlevels; ri++)
         {
-                 sprintf(bff,"%d", listaGetInt(tuplerec->levelLST, ri) );
+                 sprintf(bff,"%d", lista_get_int(tuplerec->levelLST, ri) );
                  strcat(strval,bff);
                  if ( (ri+1)< tuplerec->nlevels )
                         strcat(strval,"/");
