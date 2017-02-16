@@ -218,9 +218,9 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Runstat.$(OBJEXT) cdo-Seascount.$(OBJEXT) \
 	cdo-Seaspctl.$(OBJEXT) cdo-Seasstat.$(OBJEXT) \
 	cdo-Selbox.$(OBJEXT) cdo-Selindex.$(OBJEXT) \
-	cdo-Select.$(OBJEXT) cdo-Seloperator.$(OBJEXT) \
-	cdo-Selrec.$(OBJEXT) cdo-Seltime.$(OBJEXT) \
-	cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) \
+	cdo-Select.$(OBJEXT) cdo-Selmulti.$(OBJEXT) \
+	cdo-Seloperator.$(OBJEXT) cdo-Selrec.$(OBJEXT) \
+	cdo-Seltime.$(OBJEXT) cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) \
 	cdo-Setattribute.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
 	cdo-Setgatt.$(OBJEXT) cdo-Setgrid.$(OBJEXT) \
 	cdo-Sethalo.$(OBJEXT) cdo-Setmiss.$(OBJEXT) \
@@ -580,22 +580,22 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Pack.c Pardup.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
 	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Selindex.c Select.c \
-	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setattribute.c \
-	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
-	Setrcaname.c Settime.c Setzaxis.c Shiftxy.c Showinfo.c Sinfo.c \
-	Smooth.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
-	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
-	Splityear.c Subtrend.c Tee.c Templates.c Test.c Tests.c \
-	Timcount.c Timcumsum.c Timpctl.c Timselpctl.c Timselstat.c \
-	Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
-	Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c Varrms.c \
-	Vertintml.c Vertintap.c Vertstat.c Vertcum.c Vertwind.c \
-	Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
-	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
-	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
-	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
-	nearpt3c.h Magplot.c Magvector.c Maggraph.c template_parser.h \
-	template_parser.c results_template_parser.h \
+	Selmulti.c Seloperator.c Selrec.c Seltime.c Selvar.c Set.c \
+	Setattribute.c Setbox.c Setgatt.c Setgrid.c Sethalo.c \
+	Setmiss.c Setpartab.c Setrcaname.c Settime.c Setzaxis.c \
+	Shiftxy.c Showinfo.c Sinfo.c Smooth.c Sort.c Sorttimestamp.c \
+	Specinfo.c Spectral.c Spectrum.c Split.c Splitrec.c Splitsel.c \
+	Splittime.c Splityear.c Subtrend.c Tee.c Templates.c Test.c \
+	Tests.c Timcount.c Timcumsum.c Timpctl.c Timselpctl.c \
+	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
+	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c \
+	Varrms.c Vertintml.c Vertintap.c Vertstat.c Vertcum.c \
+	Vertwind.c Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c \
+	XTimstat.c YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c \
+	Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c \
+	Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c \
+	Zonstat.c cdo.h nearpt3c.h Magplot.c Magvector.c Maggraph.c \
+	template_parser.h template_parser.c results_template_parser.h \
 	results_template_parser.c magics_template_parser.h \
 	magics_template_parser.c StringUtilities.h StringUtilities.c \
 	CdoMagicsMapper.h CdoMagicsMapper.c
@@ -920,6 +920,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Select.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selindex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selmulti.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seloperator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selrec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seltime.Po@am__quote@
@@ -3473,6 +3474,20 @@ cdo-Select.obj: Select.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Select.c' object='cdo-Select.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Select.obj `if test -f 'Select.c'; then $(CYGPATH_W) 'Select.c'; else $(CYGPATH_W) '$(srcdir)/Select.c'; fi`
+
+cdo-Selmulti.o: Selmulti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selmulti.o -MD -MP -MF $(DEPDIR)/cdo-Selmulti.Tpo -c -o cdo-Selmulti.o `test -f 'Selmulti.c' || echo '$(srcdir)/'`Selmulti.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selmulti.Tpo $(DEPDIR)/cdo-Selmulti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selmulti.c' object='cdo-Selmulti.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selmulti.o `test -f 'Selmulti.c' || echo '$(srcdir)/'`Selmulti.c
+
+cdo-Selmulti.obj: Selmulti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selmulti.obj -MD -MP -MF $(DEPDIR)/cdo-Selmulti.Tpo -c -o cdo-Selmulti.obj `if test -f 'Selmulti.c'; then $(CYGPATH_W) 'Selmulti.c'; else $(CYGPATH_W) '$(srcdir)/Selmulti.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selmulti.Tpo $(DEPDIR)/cdo-Selmulti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selmulti.c' object='cdo-Selmulti.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selmulti.obj `if test -f 'Selmulti.c'; then $(CYGPATH_W) 'Selmulti.c'; else $(CYGPATH_W) '$(srcdir)/Selmulti.c'; fi`
 
 cdo-Seloperator.o: Seloperator.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Seloperator.o -MD -MP -MF $(DEPDIR)/cdo-Seloperator.Tpo -c -o cdo-Seloperator.o `test -f 'Seloperator.c' || echo '$(srcdir)/'`Seloperator.c
