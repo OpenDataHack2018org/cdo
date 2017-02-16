@@ -137,7 +137,6 @@ int getIntFromList(int index, lista_t *list, int arraylen);
 #define MAX_TUPLES 1000
 static int NUMTUPLES = 0;
 static TUPLEREC *SelTUPLEREC[MAX_TUPLES];
-static int NUMCHTUPLES = 0;
 
 
 TUPLEREC *TUPLERECNew();
@@ -163,16 +162,14 @@ void *Selmulti(void *argument)
     int tsID, recID, varID, levelID;
     int vlistID1, vlistID2;
     int taxisID1, taxisID2;
-    int scode, sltype;
-    double slevel = 0, level;
-    int nvars, nlevs, code, zaxisID, selfound = FALSE;
+    double level;
+    int nvars, nlevs, code, zaxisID;
     int ltype = 0;
     int varID2, levelID2;
     int sellevel, selcode, selltype;
     int lcopy = FALSE;
     int gridsize, nmiss;
     double *array = NULL;
-    field_type field;
     int SELMULTI, DELMULTI, CHANGEMULTI;
     int operatorID;
     int simpleMath=0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
@@ -244,7 +241,6 @@ void *Selmulti(void *argument)
                     continue;
                 }
 
-            int found=0;
             int ii;
             for (ii=0; ii<NUMTUPLES; ii++)
             {
@@ -263,26 +259,32 @@ void *Selmulti(void *argument)
                         case 0:   // operator decides ...
                             vlistDefFlag(vlistID1, varID, levelID, TRUE);
                             if ( cdoDebugExt )
+                              {
                                 if (!tuplerec->simpleMath)
                                      cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
                                 else
                                      cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                              }
                             break;
                         case 1:
                             vlistDefFlag(vlistID1, varID, levelID, TRUE);
                             if ( cdoDebugExt )
+                              {
                                 if (!tuplerec->simpleMath)
                                      cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
                                 else
                                      cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                              }
                             break;
                         case 2:
                             vlistDefFlag(vlistID1, varID, levelID, FALSE);
                             if ( cdoDebugExt )
+                              {
                                 if (!tuplerec->simpleMath)
                                      cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
                                 else
                                     cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                              }
                             break;
                     }
                 } else
@@ -293,39 +295,42 @@ void *Selmulti(void *argument)
                         case 0:   // operator decides ...
                             vlistDefFlag(vlistID1, varID, levelID, FALSE);
                             if ( cdoDebugExt )
+                              {
                                 if (!tuplerec->simpleMath)
                                      cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
                                 else
                                     cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                              }
                             break;
                         case 1:
                             vlistDefFlag(vlistID1, varID, levelID, TRUE);
                             if ( cdoDebugExt )
+                              {
                                 if (!tuplerec->simpleMath)
                                      cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
                                 else
                                      cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                              }
                             break;
                         case 2:
                             vlistDefFlag(vlistID1, varID, levelID, FALSE);
                             if ( cdoDebugExt )
+                              {
                                 if (!tuplerec->simpleMath)
                                      cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
                                 else
                                     cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                              }
                             break;
                     }
                 }
-                selfound = TRUE;
-                found=1; break;
+                break;
                 }
             } //end for ( .. NUMTUPLES
         } //end for ( levelID
     } // end for ( varID
 
     if ( cdoDebugExt ) cdoPrint(" Writing the selected fields ...");
-    //if ( selfound == FALSE )
-    //  cdoWarning("Code %d, ltype %d, level %g not found!", scode, sltype, slevel);
 
     vlistID2 = vlistCreate();
     vlistCopyFlag(vlistID2, vlistID1);
@@ -434,7 +439,7 @@ void *Selmulti(void *argument)
                     else  // 1:  simple array arithmetics ( *,+)
                     {
                         if ( cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",recID, code, ltype, (int)(level), varID,levelID,scale,offset);
-                        size_t li;
+                        int li;
                         for ( li = 0; li < gridsize; ++li )
                             if (! DBL_IS_EQUAL(array[li], missval) )
                             {
@@ -614,9 +619,8 @@ char *goToNextSeparator(char *pline)
 
 
 static
-char *strContains(char * str, char * substr)
+char *strContains(char *str, const char *substr)
 {
-
   if (str==NULL) return NULL;
   if (substr==NULL) return NULL;
 
@@ -762,7 +766,7 @@ int multiSelectionParser(const char *filenameOrString)
       }
   }
 
-  while ( strToParsePtr = readlineForParsing(gfp, strToParsePtr, line) )
+  while ( (strToParsePtr = readlineForParsing(gfp, strToParsePtr, line)) )
   {
       if ( line[0] == '#' ) continue;
       if ( line[0] == '\0' ) continue;
