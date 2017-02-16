@@ -37,7 +37,7 @@ void *lista_dataptr(lista_t *lista);
 void lista_set_int(lista_t *lista, int num, int ival);
 void lista_set_flt(lista_t *lista, int num, double fval);
 int lista_get_int(lista_t *lista, int num);
-double listaGetFlt(lista_t *lista, int num);
+double lista_get_flt(lista_t *lista, int num);
 int args2int_lista(int argc, char **argv, lista_t *lista);
 int args2flt_lista(int argc, char **argv, lista_t *lista);
 
