@@ -279,6 +279,11 @@ void *Magplot(void *argument);
 void *Magvector(void *argument);
 void *Maggraph(void *argument);
 
+// HIRLAM_EXTENSIONS
+void *Selmulti(void *argument);   // "selmulti", "delmulti"
+void *WindTrans(void *argument);  // "uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"
+void *SampleGrid(void *argument); // "samplegrid", "subgrid"
+
 
 #define  AdisitOperators        {"adisit", "adipot"}
 #define  AfterburnerOperators   {"after"}
@@ -562,6 +567,12 @@ void *Maggraph(void *argument);
 #define  MagvectorOperators     {"vector"}
 #define  MaggraphOperators      {"graph"}
 
+// HIRLAM_EXTENSIONS
+#define  SelmultiOperators      {"selmulti", "delmulti", "changemulti"}
+#define  WindTransOperators     {"uvDestag", "rotuvN","rotuvNorth", "projuvLatLon"}
+#define  SampleGridOperators    {"samplegrid", "subgrid"}
+
+
 static modules_t Modules[] =
 {
   // stream in  -1 means: unlimited number of input streams
@@ -831,6 +842,10 @@ static modules_t Modules[] =
   { Magplot,        MagplotHelp,       MagplotOperators,       1,   CDI_REAL,  1,  1 },
   { Magvector,      MagvectorHelp,     MagvectorOperators,     1,   CDI_REAL,  1,  1 },
   { Maggraph,       MaggraphHelp,      MaggraphOperators,      1,   CDI_REAL, -1,  1 },
+  // HIRLAM_EXTENSIONS
+  { SampleGrid,     NULL,              SampleGridOperators,    1,   CDI_REAL,  1,  1 },
+  { Selmulti,       NULL,              SelmultiOperators,      1,   CDI_REAL,  1,  1 },
+  { WindTrans,      NULL,              WindTransOperators,     1,   CDI_REAL,  1,  1 },
 };							       
 							       
 static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
