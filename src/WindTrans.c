@@ -58,8 +58,6 @@ extern int cdoDebugExt;             //  debug level for the KNMI extensions
 extern int cdoGribDataScanningMode; // -1: not used; allowed modes: <0, 64, 96>; Default is 64
 
 int define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets);
-const double *gridInqXvalsPtr(int gridID);
-const double *gridInqYvalsPtr(int gridID);
 */
 
 void *DestaggerUV();
@@ -94,10 +92,10 @@ void *DestaggerUV()
     int streamID1, streamID2;
     int nrecs, nvars;
     int tsID, recID, varID, levelID;
-    int varID1 = -1, varID2 = -1, nlevel1, nlevel2;
+    int varID1 = -1, varID2 = -1;
     int zaxisID1 = -1, zaxisID2 = -1;
     int varID1stg = -1, varID2stg = -1;
-    int nlev = 0,level, gridsize;
+    int level, gridsize;
     int lvar = FALSE;
     int i, nch;
     int chcodes[MAXARG];
@@ -106,7 +104,6 @@ void *DestaggerUV()
     double destagGridOffsets[MAXARG];
     int index, ngrids;
     int vlistID1, vlistID2;
-    int gridIDsp = -1, gridIDgp = -1;
     int gridID1 = -1, gridID2 = -1;
     int gridID0 = -1;
     int gridID;
@@ -114,14 +111,12 @@ void *DestaggerUV()
     int lcopy = FALSE;
     int UorV;
     int taxisID1, taxisID2;
-    int nlon, nlat, ntr = -1;
+    int nlon = 0, nlat = 0, ntr = -1;
     int code, param;
     int zaxisID, ltype, nlevs;
     int pnum, pcat, pdis;
-    int offset;
     double *ivar = NULL, *ovar = NULL;
-    double dxU, dyU, dxV, dyV;
-    int destagGridOffsetsGiven = FALSE;
+    double dxU = 0, dyU = 0, dxV = 0, dyV = 0;
 
     //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
 
@@ -157,7 +152,6 @@ void *DestaggerUV()
       {
         for ( i = 2; i < (2+2); i++ )
           destagGridOffsets[i-2] = atof(operatorArgv()[i]);
-        destagGridOffsetsGiven = TRUE;
       }
 
     if ( cdoDebugExt ) cdoPrint("destagGridOffsets = (%01.1f,%01.1f)", destagGridOffsets[0],destagGridOffsets[1]);
@@ -223,7 +217,7 @@ void *DestaggerUV()
     if ( lvar ) {\
         if ( strcmp((char*)(varname), (char*)(chvars)[0]) == 0 ) VarIsU = 1;\
         else \
-            if ( strcmp((char*)(varname), '10u') == 0 ) VarIsU = 1;\
+            if ( strcmp((char*)(varname), "10u") == 0 ) VarIsU = 1;\
     } else \
         if ( code == chcodes[0] ) VarIsU = 1;\
     }
@@ -232,7 +226,7 @@ void *DestaggerUV()
     if ( lvar ) {\
         if ( strcmp((char*)(varname), (char*)(chvars)[1]) == 0 ) VarIsV = 1;\
         else \
-            if ( strcmp((char*)(varname), '10v') == 0 ) VarIsV = 1;\
+            if ( strcmp((char*)(varname), "10v") == 0 ) VarIsV = 1;\
     } else \
         if ( code == chcodes[1] ) VarIsV = 1;\
     }
@@ -250,9 +244,8 @@ void *DestaggerUV()
     for ( varID = 0; varID < nvars; varID++ )
     {
         param = vlistInqVarParam(vlistID1, varID);  /*  vlistInqVarParam(int vlistID, int varID): Get the parameter number of a Variable */
-        //cdiDecodeParam(param, &pnum, &pcat, &pdis);
-        //code = pnum;
-        code    = vlistInqVarCode(vlistID1, varID);
+        cdiDecodeParam(param, &pnum, &pcat, &pdis);
+        code = pnum;
         zaxisID = vlistInqVarZaxis(vlistID1, varID);
         ltype   = zaxis2ltype(zaxisID);
         nlevs   = zaxisInqSize(zaxisID);
@@ -284,7 +277,7 @@ void *DestaggerUV()
         // If there will be no temperature field we will define grid the grid
         if ( lvar )  // We have a list of variables
         {
-            if ( strcmp(varname, 't') == 0 ) gridID0 = vlistInqVarGrid(vlistID1, varID);
+            if ( strcmp(varname, "t") == 0 ) gridID0 = vlistInqVarGrid(vlistID1, varID);
         }
         else
         {
@@ -371,15 +364,21 @@ void *DestaggerUV()
 
         if ( cdoDebugExt ) cdoPrint("Grid info: nlon=%d, nlat=%d, ntr=%d ",nlon,nlat,ntr);
 
-        if (dxU<0)
-          if ( cdoDebugExt ) cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
-        else
-          if ( cdoDebugExt ) cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
+        if ( cdoDebugExt )
+          {
+            if (dxU<0)
+              cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
+            else
+              cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
+          }
 
-        if (dyV<0)
-          if ( cdoDebugExt ) cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
-        else
-          if ( cdoDebugExt ) cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
+        if ( cdoDebugExt )
+          {
+            if (dyV<0)
+              cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
+            else
+              cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
+          }
 
         for ( index = 0; index < ngrids; index++ )
         {
@@ -408,12 +407,12 @@ void *DestaggerUV()
             cdoAbort("gridSize of U-wind != gridSize of V-wind!  This should not happen!");
 
         if ( cdoDebugExt ) cdoPrint("Allocating memory for maximum gridsize (for input) = %ld [%4.3f MB]",gridsize, gridsize*sizeof(double)/(1024.0*1024));
-        ivar = (double *) malloc(gridsize*sizeof(double));  // storage for other fields than
+        ivar = (double *) Malloc(gridsize*sizeof(double));  // storage for other fields than
 
         gridsize = gridInqSize(gridID1);  // actual size of U-wind should be same as V-wind
         if ( cdoDebugExt )
             cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; nlon=%d, nlat=%d",gridsize,nlon,nlat );
-        ovar = (double *) malloc(gridsize*sizeof(double));
+        ovar = (double *) Malloc(gridsize*sizeof(double));
     } // end of  if (!lcopy)
 
 
@@ -543,8 +542,8 @@ void *DestaggerUV()
     //if ( cdoDebugExt ) cdoPrint("ivar1=%x, ivar2=%x, ovar1=%x, ovar2=%x",ivar1, ivar2, ovar1, ovar2);
 
 
-    if ( ivar ) free(ivar);
-    if ( ovar ) free(ovar);
+    if ( ivar ) Free(ivar);
+    if ( ovar ) Free(ovar);
 
     cdoFinish();
 
@@ -560,8 +559,6 @@ void destaggerUorV(double *fu, double *fuOut,
     double u0,u1;
     double u_dstg;
     long idx, next;
-    long int gridsize;
-    gridsize = klev*nlat*nlon;
     /* This does de-staggering (-0.5; -0.5) */
 
     idx=offset;
@@ -609,8 +606,6 @@ void destaggerUorV_positiveOrder(double *fu, double *fuOut,
     double u0,u1;
     double u_dstg;
     long idx, next;
-    long int gridsize;
-    gridsize = klev*nlat*nlon;
     /* This does de-staggering (+0.5; +0.5) */
 
     idx=offset;
@@ -660,15 +655,14 @@ void *TransformUV(int operatorID)
     int nrecs;
     int tsID, recID, varID, levelID;
     int varID1, varID2, nlevel1, nlevel2;
-    int gridsize;
+    int gridsize = 0;
     int nvars, code, gridID;
     int param, ltype, level, nlevs, zaxisID;
+    int pnum, pcat, pdis;
     int vlistID1, vlistID2;
     int offset;
-    int nlevel;
     int lvar = FALSE;
     int i, nch;
-    int lfound[MAXARG];
     int chcodes[MAXARG];
     char *chvars[MAXARG];
     char varname[CDI_MAX_NAME];
@@ -708,11 +702,11 @@ void *TransformUV(int operatorID)
     nvars = vlistNvars(vlistID1);
     nrecs = vlistNrecs(vlistID1);
 
-    recVarID   = (int *) malloc(nrecs*sizeof(int));
-    recLevelID = (int *) malloc(nrecs*sizeof(int));
+    recVarID   = (int *) Malloc(nrecs*sizeof(int));
+    recLevelID = (int *) Malloc(nrecs*sizeof(int));
 
-    varnmiss   = (int **) malloc(nvars*sizeof(int *));
-    vardata    = (double **) malloc(nvars*sizeof(double *));
+    varnmiss   = (int **) Malloc(nvars*sizeof(int *));
+    vardata    = (double **) Malloc(nvars*sizeof(double *));
 
 
 //extern int cdoGribChangeModeUvRelativeToGrid;  // -1: don't set; 0: set to '0'; 1: set to '1'
@@ -727,15 +721,13 @@ void *TransformUV(int operatorID)
     {
         varnmiss[varID] = NULL;
         vardata[varID]  = NULL;
-        //param = vlistInqVarParam(vlistID1, varID);  /*  vlistInqVarParam(int vlistID, int varID): Get the parameter number of a Variable */
-        //cdiDecodeParam(param, &pnum, &pcat, &pdis);
-        //code = pnum;
-        code    = vlistInqVarCode(vlistID1, varID);
+        param = vlistInqVarParam(vlistID1, varID);  /*  vlistInqVarParam(int vlistID, int varID): Get the parameter number of a Variable */
+        cdiDecodeParam(param, &pnum, &pcat, &pdis);
+        code = pnum;
         zaxisID = vlistInqVarZaxis(vlistID1, varID);
         ltype   = zaxis2ltype(zaxisID);
         nlevs   = zaxisInqSize(zaxisID);
         vlistInqVarName(vlistID1, varID, varname); /* vlistInqVarName(int vlistID, int varID, char *name): Get the name of a Variable */
-        int gridIDx = vlistInqVarGrid(vlistID1, varID);
         strtolower(varname);
 
         gridID = vlistInqVarGrid(vlistID1, varID);
@@ -751,14 +743,14 @@ void *TransformUV(int operatorID)
             gridsize = gridInqSize(gridID);
             if ( cdoDebugExt )
                 cdoPrint("Allocating memory for variableID %4d (code=%3d): gridsize(%d)*nlevels(%d) = %ld [%4.3f MB]", varID, vlistInqVarCode(vlistID2, varID), gridsize, nlevs, gridsize*nlevs,gridsize*nlevs*sizeof(double)/(1024.0*1024));
-            varnmiss[varID] = (int *)    malloc(nlevs*sizeof(int));
-            vardata[varID]  = (double *) malloc(gridsize*nlevs*sizeof(double));
+            varnmiss[varID] = (int *)    Malloc(nlevs*sizeof(int));
+            vardata[varID]  = (double *) Malloc(gridsize*nlevs*sizeof(double));
         }
     }
 
     double *ivar = NULL;
     int nmiss;
-    ivar = (double *) malloc(gridsize*sizeof(double));  // storage for other fields than wind-uv
+    ivar = (double *) Malloc(gridsize*sizeof(double));  // storage for other fields than wind-uv
 
     if ( cdoDebugExt )
         cdoPrint("Neccessary memory has been allocated.");
@@ -867,7 +859,7 @@ void *TransformUV(int operatorID)
                     cdoPrint("Checking V-wind: Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",varID2, code2, varname, ltype2, nlevel2, zaxisID2);
                 CheckVarIsV(varID2,varname,code2);
                 if (!VarIsV) continue;
-                if (!(( ltype1 == ltype1 ) &&  ( nlevel1 == nlevel2 ) && ( zaxisID1 == zaxisID2 )))
+                if (!(( ltype1 == ltype2 ) &&  ( nlevel1 == nlevel2 ) && ( zaxisID1 == zaxisID2 )))
                     continue;
                 if ( cdoDebugExt>=10 )
                     cdoPrint("** FOUND V-wind; Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",varID2, code2, varname, ltype1, nlevel2, zaxisID2);
@@ -904,9 +896,9 @@ void *TransformUV(int operatorID)
                         }
                         if (cdoDebugExt)
                         {
-                          double xpole = 0, ypole = 0, angle = 0;
-                          if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
-                            gridInqParamRLL(gridID, &xpole, &ypole, &angle);
+                            double xpole = 0, ypole = 0, angle = 0;
+                            if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
+                              gridInqParamRLL(gridID, &xpole, &ypole, &angle);
                           
                             cdoPrint("GRID_PROJECTION(id: %d) && CDI_PROJ_RLL:",gridID);
                             cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID), gridInqYsize(gridID));
@@ -934,11 +926,6 @@ void *TransformUV(int operatorID)
                                 for (ii=gridInqSize(gridIDcurvl)-10; ii< gridInqSize(gridIDcurvl); ii++)
                                     printf("%4.3f ", gridInqYval(gridIDcurvl,ii));
                                 printf("\n");
-                                //const double *xvals = gridInqXvalsPtr(gridIDcurvl);
-                                //const double *yvals = gridInqYvalsPtr(gridIDcurvl);
-                                //cdoPrint("CHECK: xvals=%x, yvals=%x", xvals,yvals);
-                                //cdoPrint("CHECK: xvals[0]=%f, xvals[1]=%f", xvals[0], xvals[1]);
-                                //cdoPrint("CHECK: yvals[0]=%f, yvals[1]=%f\n", yvals[0], yvals[1]);
                             }
                         } // end of if (cdoDebugExt)
                         if ( cdoDebugExt )
@@ -1001,22 +988,22 @@ void *TransformUV(int operatorID)
     streamClose(streamID1);
 
     if (gridIDcurvl!=-1)
-        gridDestroy(gridIDcurvl);  // at the end must free the allocated curvilinear grid definition...
+        gridDestroy(gridIDcurvl);  // at the end must Free the allocated curvilinear grid definition...
 
     for ( varID = 0; varID < nvars; varID++ )
     {
         if (varnmiss[varID]!=NULL)
-            free(varnmiss[varID]);
+            Free(varnmiss[varID]);
         if (vardata[varID]!=NULL)
-            free(vardata[varID]);
+            Free(vardata[varID]);
     }
 
     if (rotationMatrixArray != NULL)
 
-    free(recVarID );
-    free(recLevelID );
+    Free(recVarID );
+    Free(recLevelID );
 
-    free(ivar);
+    Free(ivar);
 
     cdoFinish();
     return (0);
@@ -1043,7 +1030,6 @@ void rot_uv_north(int gridID, double *us, double *vs)
     double lon_pntNorth, lat_pntNorth;
     double dLatEast, dLonEast;
     double dLatNorth, dLonNorth;
-    double lon_pntCenter, lat_pntCenter;
     double xpntEastSph,ypntEastSph, zpntEastSph;
     double xpntNorthSph, ypntNorthSph, zpntNorthSph;
     double xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot;
@@ -1052,15 +1038,12 @@ void rot_uv_north(int gridID, double *us, double *vs)
     double xncross,  yncross,  zncross;
     double vecAngle;
     long idx, idx4;
-    int nx, ny, i,j;
-    double distEasting, distNorthing;
+    int i,j;
     double VJaa,VJab,VJba,VJbb;
     double u,v;
     double magnitude, newMagnitude;
     double uu;
     double vv;
-    const double *xvals = gridInqXvalsPtr(gridID);
-    const double *yvals = gridInqYvalsPtr(gridID);
 
     // The following "correction for the grid-step direction" from funtion project_uv_latlon()
     // cannot be used here!
@@ -1087,8 +1070,14 @@ void rot_uv_north(int gridID, double *us, double *vs)
         iDirectionIncrementInDegrees = 0.1;
     */
 
-    nx = gridInqXsize(gridID);
-    ny = gridInqYsize(gridID);
+    int nx = gridInqXsize(gridID);
+    int ny = gridInqYsize(gridID);
+    
+    double *xvals = (double *) Malloc(nx*sizeof(double));
+    double *yvals = (double *) Malloc(ny*sizeof(double));
+
+    gridInqXvals(gridID, xvals);
+    gridInqYvals(gridID, yvals);
 
     // TODO
     /*
@@ -1137,7 +1126,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
         if ( cdoDebugExt>0 )
             cdoPrint("About to compute rotationMatrixArray for the whole grid [%d x %d]\n", nx,ny);
 
-       rotationMatrixArray = (double *) malloc(4*nx*ny*sizeof(double));
+       rotationMatrixArray = (double *) Malloc(4*nx*ny*sizeof(double));
        for ( j = 0; j < ny; j++ )
             for ( i = 0; i < nx; i++ )
             {
@@ -1222,7 +1211,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
 
                 // This would create in 3D the rotated Easting vector; but we don't need it in this routine.
                 // Left out to optimize the computation..
-                // CrossProd( xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xnormSph, ynormSph, znormSph,\
+                // CrossProd( xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xnormSph, ynormSph, znormSph,
                 //            xpntEastSph,  ypntEastSphRot,  zpntEastSphRot ); //vecxRot = CrossProd(vecy,vecz)
 
                 vecAngle = acos( (xpntNorthSph*xpntNorthSphRot + ypntNorthSph*ypntNorthSphRot + zpntNorthSph*zpntNorthSphRot) ) ;
@@ -1261,7 +1250,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
                              i,j, lon_pnt0, lat_pnt0,lon_pntNorth, lat_pntNorth, rad2deg*dLonNorth, rad2deg*dLatNorth );
                    cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; dLonEast =%3.6f; dLatEast =%3.6f (Easting grid relative ) ",\
                             i,j, lon_pnt0, lat_pnt0,lon_pntEast,lat_pntEast, rad2deg*dLonEast, rad2deg*dLatEast );
-                    //cdoPrint("(xpntNorthSph, ypntNorthSph)= [%3.6f,%3.6f]; (xpntEastSph,ypntEastSph) = [%3.6f,%3.6f];",\
+                    //cdoPrint("(xpntNorthSph, ypntNorthSph)= [%3.6f,%3.6f]; (xpntEastSph,ypntEastSph) = [%3.6f,%3.6f];",
                     //         xpntNorthSph, ypntNorthSph, xpntEastSph,ypntEastSph );
                     //vecAngle = rad2deg * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph + zpntEastSph*zpntNorthSph) );
                     //vecAngle = rad2deg * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph) );
@@ -1303,6 +1292,9 @@ void rot_uv_north(int gridID, double *us, double *vs)
         }
     if ( cdoDebugExt>=20 )
         cdoPrint("rot_uv_north(gridname=%s) finished.", gridNamePtr(gridInqType(gridID)));
+
+    Free(xvals);
+    Free(yvals);
 }
 
 void rot_uv_back_mode64(int gridID, double *us, double *vs)
@@ -1311,13 +1303,12 @@ void rot_uv_back_mode64(int gridID, double *us, double *vs)
   // This routine expects the data to be in scanning-mode 64.
   // This routine gives comparable (not numerically same) results as rot_uv_north().
   // rot_uv_back_mode64() is significantly slower than rot_uv_north().
-  long i, ilat, ilon, nlat, nlon;
+  long i, ilat, ilon;
   double u, v;
   double xval, yval;
-  double *xvals, *yvals;
 
-  nlon = gridInqXsize(gridID);
-  nlat = gridInqYsize(gridID);
+  long nlon = gridInqXsize(gridID);
+  long nlat = gridInqYsize(gridID);
 
   // TODO
   /*
@@ -1340,8 +1331,8 @@ void rot_uv_back_mode64(int gridID, double *us, double *vs)
   if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
     gridInqParamRLL(gridID, &xpole, &ypole, &angle);
 
-  xvals = (double *) malloc(nlon*sizeof(double));
-  yvals = (double *) malloc(nlat*sizeof(double));
+  double *xvals = (double *) Malloc(nlon*sizeof(double));
+  double *yvals = (double *) Malloc(nlat*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -1350,11 +1341,11 @@ void rot_uv_back_mode64(int gridID, double *us, double *vs)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID, units);
-    grid_to_degree(units, "xpole", 1, &xpole);
-    grid_to_degree(units, "grid center lon", nlon, xvals);
+    grid_to_degree(units, 1, &xpole, "xpole");
+    grid_to_degree(units, nlon, xvals, "grid center lon");
     gridInqYunits(gridID, units);
-    grid_to_degree(units, "ypole", 1, &ypole);
-    grid_to_degree(units, "grid center lat", nlat, yvals);
+    grid_to_degree(units, 1, &ypole, "ypole");
+    grid_to_degree(units, nlat, yvals, "grid center lat");
   }
 
   for ( ilat = 0; ilat < nlat; ilat++ )
@@ -1375,8 +1366,8 @@ void rot_uv_back_mode64(int gridID, double *us, double *vs)
         vs[i] = v;
       }
 
-  free(xvals);
-  free(yvals);
+  Free(xvals);
+  Free(yvals);
 }
 
 
@@ -1403,7 +1394,7 @@ void project_uv_latlon(int gridID, double *us, double *vs)
     double xpntEast,ypntEast;
     double xpntNorth, ypntNorth;
     long idx;
-    int nx, ny, i,j;
+    int i, j;
     double distLon;
     double distLat;
     double VJaa,VJab,VJba,VJbb;
@@ -1411,14 +1402,18 @@ void project_uv_latlon(int gridID, double *us, double *vs)
     double magnitude, newMagnitude;
     double uu;
     double vv;
-    const double *xvals = gridInqXvalsPtr(gridID);
-    const double *yvals = gridInqYvalsPtr(gridID);
+
+    int nx = gridInqXsize(gridID);
+    int ny = gridInqYsize(gridID);
+    
+    double *xvals = (double *) Malloc(nx*sizeof(double));
+    double *yvals = (double *) Malloc(ny*sizeof(double));
+
+    gridInqXvals(gridID, xvals);
+    gridInqYvals(gridID, yvals);
 
     int signLon=( (xvals[1] - xvals[0]) < 0 )?-1:1;
     int signLat=( (yvals[1] - yvals[0]) < 0 )?-1:1;
-
-    nx = gridInqXsize(gridID);
-    ny = gridInqYsize(gridID);
 
     if (cdoDebugExt)
         cdoPrint("rot_uv_north(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", gridNamePtr(gridInqType(gridID)), nx, ny );
@@ -1491,6 +1486,9 @@ void project_uv_latlon(int gridID, double *us, double *vs)
     if ( cdoDebugExt>=20 )
         cdoPrint("rot_uv_north(gridname=%s) finished.", gridNamePtr(gridInqType(gridID)));
     printCNT= 1;
+
+    Free(xvals);
+    Free(yvals);
 }
 
 
