@@ -15,15 +15,8 @@
   GNU General Public License for more details.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
-#include "error.h"
 
 #define UNDEFID -1
 
@@ -92,8 +85,8 @@ int getoptname(char *optname, const char *optstring, int nopt)
 
 int zaxisDefine(zaxis_t zaxis)
 {
-  if ( zaxis.type == -1 ) Error("zaxistype undefined!");
-  if ( zaxis.size ==  0 ) Error("zaxis size undefined!");
+  if ( zaxis.type == -1 ) cdoAbort("zaxistype undefined!");
+  if ( zaxis.size ==  0 ) cdoAbort("zaxis size undefined!");
 
   int zaxisID = zaxisCreate(zaxis.type, zaxis.size);
 
@@ -124,7 +117,7 @@ int zaxisDefine(zaxis_t zaxis)
       if ( zaxis.vctsize && zaxis.vct )
 	zaxisDefVct(zaxisID, zaxis.vctsize, zaxis.vct);
       else
-	Warning("vct undefined!");	    
+	cdoWarning("vct undefined!");	    
     }
 
   return zaxisID;

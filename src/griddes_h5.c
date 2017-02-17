@@ -9,10 +9,8 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
 #include "griddes.h"
-#include "error.h"
 
 
 #if defined(HAVE_LIBHDF5)

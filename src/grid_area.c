@@ -15,9 +15,7 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
-#include "error.h"
 #include "grid.h"
 
 

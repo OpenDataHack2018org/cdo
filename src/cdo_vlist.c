@@ -15,11 +15,8 @@
   GNU General Public License for more details.
 */
 
-#include <stdlib.h>
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
-#include "error.h"
 
 
 double cdoZaxisInqLevel(int zaxisID, int levelID)

@@ -22,12 +22,8 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "error.h"
-#include "util.h"
-#include "pmlist.h"
 #include "sellist.h"
 
 
