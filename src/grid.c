@@ -30,9 +30,7 @@
 #endif
 
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
-#include "error.h"
 #include "grid.h"
 
 
@@ -70,7 +68,7 @@ int ntr_to_nlat(int ntr)
       /*
       int nlat2 = (int)lround(((ntr+1)*3.+1.)/2.);
       if ( nlat == nlat2 )
-	Error("Computation of latitudes failed for truncation %d", ntr);
+	cdoAbort("Computation of latitudes failed for truncation %d", ntr);
       */
     }
 
@@ -87,7 +85,7 @@ int ntr_to_nlat_linear(int ntr)
       /*
       int nlat2 = (int)lround(((ntr+1)*2.+1.)/2.);
       if ( nlat == nlat2 )
-	Error("Computation of latitudes failed for truncation %d", ntr);
+	cdoAbort("Computation of latitudes failed for truncation %d", ntr);
       */
     }
 
@@ -235,7 +233,7 @@ int gridToZonal(int gridID1)
     }
   else
     {
-      Error("Gridtype %s unsupported!", gridNamePtr(gridtype));
+      cdoAbort("Gridtype %s unsupported!", gridNamePtr(gridtype));
     }
 
   return gridID2;
@@ -268,7 +266,7 @@ int gridToMeridional(int gridID1)
     }
   else
     {
-      Error("Gridtype %s unsupported!", gridNamePtr(gridtype));
+      cdoAbort("Gridtype %s unsupported!", gridNamePtr(gridtype));
     }
 
   return gridID2;
@@ -560,11 +558,11 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
     while ( lonParY   < 0 ) lonParY   += 360;
   */
   if ( IS_NOT_EQUAL(xincm, yincm) )
-    Warning("X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", 
+    cdoWarning("X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", 
 	    xincm, yincm);
   /*
   if ( IS_NOT_EQUAL(lat1, lat2) )
-    Warning("Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
+    cdoWarning("Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
 	    lat1, lat2);
   */
   map_set(PROJ_LC, originLat, originLon, xincm, lonParY, lat1, lat2, &proj);
@@ -684,7 +682,7 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
             }
         }
       else
-        Warning("%s mapping parameter missing!", projection);
+        cdoWarning("%s mapping parameter missing!", projection);
     }
 }
 
@@ -731,7 +729,7 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
             }
         }
       else
-        Warning("%s mapping parameter missing!", projection);
+        cdoWarning("%s mapping parameter missing!", projection);
     }
 }
 
@@ -1032,7 +1030,7 @@ int qu2reg_subarea(int gridsize, int np, double xfirst, double xlast,
 void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss, int lnearest)
 {
   int gridtype = gridInqType(gridID1);
-  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced Gaussian grid!");
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) cdoAbort("Not a reduced Gaussian grid!");
 
   int lmiss = nmiss > 0;
   int lperio = 1;
@@ -1060,7 +1058,7 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
       (void) qu2reg3_double(array, rowlon, ny, nx, missval, &iret, lmiss, lperio, lnearest);
     }
 
-  if ( gridInqSize(gridID2) != nx*ny ) Error("Gridsize differ!");
+  if ( gridInqSize(gridID2) != nx*ny ) cdoAbort("Gridsize differ!");
 
   Free(rowlon);
 }
@@ -1072,7 +1070,7 @@ int gridToRegular(int gridID1)
   double *xvals = NULL;
 
   int gridtype = gridInqType(gridID1);
-  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced Gaussian grid!");
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) cdoAbort("Not a reduced Gaussian grid!");
 
   int ny = gridInqYsize(gridID1);
   int np = gridInqNP(gridID1);
@@ -1785,7 +1783,7 @@ int gridToUnstructured(int gridID1, int lbounds)
       }
     default:
       {
-	Error("Grid type >%s< unsupported!", gridNamePtr(gridtype));
+	cdoAbort("Grid type >%s< unsupported!", gridNamePtr(gridtype));
 	break;
       }
     }

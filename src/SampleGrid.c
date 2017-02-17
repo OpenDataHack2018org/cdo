@@ -198,8 +198,7 @@ void *SampleGrid(void *argument)
         if ( ( gridtype != GRID_CURVILINEAR ) && (   gridInqXsize(gridSrcID) > 0 && gridInqYsize(gridSrcID) > 0 ) )
         {
             if (operatorID == SAMPLEGRID)
-              // TODO  gridIDsampled = define_sample_grid(gridSrcID, resampleFactor);
-              cdoAbort("Call to define_sample_grid() missing");
+              gridIDsampled = cdo_define_sample_grid(gridSrcID, resampleFactor);
             else
                 if (operatorID == SUBGRID)
                 {

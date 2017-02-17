@@ -129,4 +129,7 @@ int W3FB12(double xi, double xj, double alat1, double elon1, double dx,
 	   double elonv, double alatan, double *alat, double *elon);
 */
 
+// Define a sampled grid of another grid
+int cdo_define_sample_grid(int gridID, int sampleFactor);
+
 #endif  /* _GRID_H */
