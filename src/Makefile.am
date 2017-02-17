@@ -365,6 +365,7 @@ cdo_SOURCES += Adisit.c        \
                Verifygrid.c    \
                Wct.c           \
                Wind.c          \
+               WindTrans.c     \
                Writegrid.c     \
                Writerandom.c   \
                XTimstat.c      \

@@ -246,17 +246,18 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Vertintap.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
 	cdo-Vertcum.$(OBJEXT) cdo-Vertwind.$(OBJEXT) \
 	cdo-Verifygrid.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) \
-	cdo-Writegrid.$(OBJEXT) cdo-Writerandom.$(OBJEXT) \
-	cdo-XTimstat.$(OBJEXT) cdo-YAR.$(OBJEXT) \
-	cdo-Yearmonstat.$(OBJEXT) cdo-Ydayarith.$(OBJEXT) \
-	cdo-Ydaypctl.$(OBJEXT) cdo-Ydaystat.$(OBJEXT) \
-	cdo-Ydrunpctl.$(OBJEXT) cdo-Ydrunstat.$(OBJEXT) \
-	cdo-Yhourarith.$(OBJEXT) cdo-Yhourstat.$(OBJEXT) \
-	cdo-Ymonarith.$(OBJEXT) cdo-Ymonpctl.$(OBJEXT) \
-	cdo-Ymonstat.$(OBJEXT) cdo-Yseaspctl.$(OBJEXT) \
-	cdo-Yseasstat.$(OBJEXT) cdo-Zonstat.$(OBJEXT) \
-	cdo-Magplot.$(OBJEXT) cdo-Magvector.$(OBJEXT) \
-	cdo-Maggraph.$(OBJEXT) cdo-template_parser.$(OBJEXT) \
+	cdo-WindTrans.$(OBJEXT) cdo-Writegrid.$(OBJEXT) \
+	cdo-Writerandom.$(OBJEXT) cdo-XTimstat.$(OBJEXT) \
+	cdo-YAR.$(OBJEXT) cdo-Yearmonstat.$(OBJEXT) \
+	cdo-Ydayarith.$(OBJEXT) cdo-Ydaypctl.$(OBJEXT) \
+	cdo-Ydaystat.$(OBJEXT) cdo-Ydrunpctl.$(OBJEXT) \
+	cdo-Ydrunstat.$(OBJEXT) cdo-Yhourarith.$(OBJEXT) \
+	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
+	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
+	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
+	cdo-Zonstat.$(OBJEXT) cdo-Magplot.$(OBJEXT) \
+	cdo-Magvector.$(OBJEXT) cdo-Maggraph.$(OBJEXT) \
+	cdo-template_parser.$(OBJEXT) \
 	cdo-results_template_parser.$(OBJEXT) \
 	cdo-magics_template_parser.$(OBJEXT) \
 	cdo-StringUtilities.$(OBJEXT) cdo-CdoMagicsMapper.$(OBJEXT)
@@ -590,15 +591,16 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
 	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c \
 	Varrms.c Vertintml.c Vertintap.c Vertstat.c Vertcum.c \
-	Vertwind.c Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c \
-	XTimstat.c YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c \
-	Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c \
-	Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c \
-	Zonstat.c cdo.h nearpt3c.h Magplot.c Magvector.c Maggraph.c \
-	template_parser.h template_parser.c results_template_parser.h \
-	results_template_parser.c magics_template_parser.h \
-	magics_template_parser.c StringUtilities.h StringUtilities.c \
-	CdoMagicsMapper.h CdoMagicsMapper.c
+	Vertwind.c Verifygrid.c Wct.c Wind.c WindTrans.c Writegrid.c \
+	Writerandom.c XTimstat.c YAR.c Yearmonstat.c Ydayarith.c \
+	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
+	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
+	Yseasstat.c Zonstat.c cdo.h nearpt3c.h Magplot.c Magvector.c \
+	Maggraph.c template_parser.h template_parser.c \
+	results_template_parser.h results_template_parser.c \
+	magics_template_parser.h magics_template_parser.c \
+	StringUtilities.h StringUtilities.c CdoMagicsMapper.h \
+	CdoMagicsMapper.c
 #endif
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
@@ -981,6 +983,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertwind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Wct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Wind.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-WindTrans.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Writegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Writerandom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-XTimstat.Po@am__quote@
@@ -4314,6 +4317,20 @@ cdo-Wind.obj: Wind.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Wind.c' object='cdo-Wind.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Wind.obj `if test -f 'Wind.c'; then $(CYGPATH_W) 'Wind.c'; else $(CYGPATH_W) '$(srcdir)/Wind.c'; fi`
+
+cdo-WindTrans.o: WindTrans.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-WindTrans.o -MD -MP -MF $(DEPDIR)/cdo-WindTrans.Tpo -c -o cdo-WindTrans.o `test -f 'WindTrans.c' || echo '$(srcdir)/'`WindTrans.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-WindTrans.Tpo $(DEPDIR)/cdo-WindTrans.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='WindTrans.c' object='cdo-WindTrans.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-WindTrans.o `test -f 'WindTrans.c' || echo '$(srcdir)/'`WindTrans.c
+
+cdo-WindTrans.obj: WindTrans.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-WindTrans.obj -MD -MP -MF $(DEPDIR)/cdo-WindTrans.Tpo -c -o cdo-WindTrans.obj `if test -f 'WindTrans.c'; then $(CYGPATH_W) 'WindTrans.c'; else $(CYGPATH_W) '$(srcdir)/WindTrans.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-WindTrans.Tpo $(DEPDIR)/cdo-WindTrans.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='WindTrans.c' object='cdo-WindTrans.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-WindTrans.obj `if test -f 'WindTrans.c'; then $(CYGPATH_W) 'WindTrans.c'; else $(CYGPATH_W) '$(srcdir)/WindTrans.c'; fi`
 
 cdo-Writegrid.o: Writegrid.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Writegrid.o -MD -MP -MF $(DEPDIR)/cdo-Writegrid.Tpo -c -o cdo-Writegrid.o `test -f 'Writegrid.c' || echo '$(srcdir)/'`Writegrid.c
