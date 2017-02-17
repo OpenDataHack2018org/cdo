@@ -20,9 +20,7 @@ HIRLAM extensions ..
 #include "pstream.h"
 #include "specspace.h"
 #include "list.h"
-#include "math.h"
 
-#ifdef HIRLAM_EXTENSIONS
 
 extern int cdoDebugExt; // defined in cdo.c
 
@@ -33,7 +31,6 @@ void sampleData(int nwpv, double *array1, int gridID1, double *array2, int gridI
     long nlon1, nlat1;
     long nlon2, nlat2;
     long ilat1, ilon1;
-    long ilat2, ilon2;
 
     nlon1 = gridInqXsize(gridID1);
     nlat1 = gridInqYsize(gridID1);
@@ -55,6 +52,7 @@ void sampleData(int nwpv, double *array1, int gridID1, double *array2, int gridI
     if ( nwpv == 2 ) // complex numbers ... unsupported yet ...
     {
     /*
+    long ilat2, ilon2;
     for ( ilat = lat1; ilat <= lat2; ilat++ )
     {
       for ( ilon = lon21; ilon <= lon22; ilon++ )
@@ -74,17 +72,13 @@ void sampleData(int nwpv, double *array1, int gridID1, double *array2, int gridI
 static
 void cropData(int nwpv, double *array1, int gridID1, double *array2, int gridID2, int subI0, int subI1, int  subJ0, int  subJ1 )
 {
-    long nlon1, nlat1;
-    long nlon2, nlat2;
-    long ilat1, ilon1;
-    long ilat2, ilon2;
+    long nlon1;
+    long nlon2;
+    long ilat1;
     long array2Idx=0;
 
     nlon1 = gridInqXsize(gridID1);
-    nlat1 = gridInqYsize(gridID1);
-
     nlon2 = gridInqXsize(gridID2);
-    nlat2 = gridInqYsize(gridID2);
     long rowLen;
     rowLen =  subI1 - subI0 +1; // must be same as   nlon1
 
@@ -123,7 +117,7 @@ void *SampleGrid(void *argument)
     int vlistID1, vlistID2;
     int gridSrcID = -1, gridIDsampled;
     int resampleFactor;
-    int subI0,subI1, subJ0, subJ1;
+    int subI0 = 0,subI1 = 0, subJ0 = 0, subJ1 = 0;
     int index, ngrids, gridtype = -1;
     int nmiss;
     int *vars = NULL;
@@ -146,7 +140,6 @@ void *SampleGrid(void *argument)
     SUBGRID  = cdoOperatorAdd("subgrid",  0, 0, " sub-grid indices: i0,i1,j0,j1");
 
     operatorID = cdoOperatorID();
-
 
     int nch = operatorArgc();
 
@@ -205,7 +198,8 @@ void *SampleGrid(void *argument)
         if ( ( gridtype != GRID_CURVILINEAR ) && (   gridInqXsize(gridSrcID) > 0 && gridInqYsize(gridSrcID) > 0 ) )
         {
             if (operatorID == SAMPLEGRID)
-                gridIDsampled = define_sample_grid(gridSrcID, resampleFactor);
+              // TODO  gridIDsampled = define_sample_grid(gridSrcID, resampleFactor);
+              cdoAbort("Call to define_sample_grid() missing");
             else
                 if (operatorID == SUBGRID)
                 {
@@ -221,15 +215,16 @@ void *SampleGrid(void *argument)
                         cdoAbort("cdo SampleGrid: define_subgrid_grid() Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
                     }
 
-                    gridIDsampled = define_subgrid_grid(gridSrcID, gridIDcurvl, subI0,subI1, subJ0, subJ1);
-
+                    // TODO gridIDsampled = define_subgrid_grid(gridSrcID, gridIDcurvl, subI0,subI1, subJ0, subJ1);
+                    cdoAbort("Call to define_subgrid_grid() missing!");
+                    
                     gridDestroy(gridIDcurvl);
                 }
             sbox[index].gridSrcID = gridSrcID;
             sbox[index].gridIDsampled = gridIDsampled;
 
-            if ( cdoDebugExt>=10 ) gridPrint(gridSrcID, 1,0);
-            if ( cdoDebugExt>=10 ) gridPrint(gridIDsampled, 1,0);
+            // TODO if ( cdoDebugExt>=10 ) gridPrint(gridSrcID, 1,0);
+            // if ( cdoDebugExt>=10 ) gridPrint(gridIDsampled, 1,0);
 
             vlistChangeGridIndex(vlistID2, index, gridIDsampled);
             for ( varID = 0; varID < nvars; varID++ )
@@ -286,8 +281,8 @@ void *SampleGrid(void *argument)
 
             if ( vars[varID] )
             {
-                if (  vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX32 ||
-                    vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX64 )
+                if (  vlistInqVarDatatype(vlistID1, varID) == CDI_DATATYPE_CPX32 ||
+                    vlistInqVarDatatype(vlistID1, varID) == CDI_DATATYPE_CPX64 )
                     nwpv = 2;
                 else
                     nwpv = 1;
@@ -350,5 +345,3 @@ void *SampleGrid(void *argument)
 
     return (0);
 }
-
-#endif
