@@ -1,8 +1,4 @@
 /*
-HIRLAM extensions ..
-*/
-
-/*
    This module "SampleGrid" contains the following operators:
 
     samplegrid      Resample current grid with given factor, typically 2 (which will half the resolution);
@@ -10,337 +6,254 @@ HIRLAM extensions ..
     subgrid         Similar to selindexbox but this operator works for LCC grids (tested on HARMONIE NWP model).
 */
 
-#include <ctype.h>
-#include "cdo.h"
 #include "cdi.h"
 #include "cdo_int.h"
 #include "grid.h"
-
 #include "griddes.h"
 #include "pstream.h"
-#include "specspace.h"
-#include "list.h"
 
 
 extern int cdoDebugExt; // defined in cdo.c
 
-
 static
-void sampleData(int nwpv, double *array1, int gridID1, double *array2, int gridID2, int resampleFactor )
+void sampleData(double *array1, int gridID1, double *array2, int gridID2, int resampleFactor)
 {
-    long nlon1, nlat1;
-    long nlon2, nlat2;
-    long ilat1, ilon1;
+  long nlon1 = gridInqXsize(gridID1);
+  long nlat1 = gridInqYsize(gridID1);
 
-    nlon1 = gridInqXsize(gridID1);
-    nlat1 = gridInqYsize(gridID1);
+  long nlon2 = gridInqXsize(gridID2);
+  long nlat2 = gridInqYsize(gridID2);
 
-    nlon2 = gridInqXsize(gridID2);
-    nlat2 = gridInqYsize(gridID2);
+  if ( cdoDebugExt >= 100 )
+    cdoPrint("sampleData():: (nlon1: %d; nlat1: %d) => (nlon2: %d; nlat2: %d); gridID1: %d; gridID2: %d; resampleFactor: %d)",
+             nlon1,nlat1, nlon2,nlat2, gridID1, gridID2, resampleFactor);
 
-    if ( cdoDebugExt >= 100) cdoPrint("sampleData():: (nlon1: %d; nlat1: %d) => (nlon2: %d; nlat2: %d); gridID1: %d; gridID2: %d; resampleFactor: %d)",nlon1,nlat1, nlon2,nlat2, gridID1, gridID2, resampleFactor);
-
-    if ( nwpv == 1 )
-    {
-        for ( ilat1 = 0; ilat1 < nlat1; ilat1+=resampleFactor )
-        {
-            for ( ilon1 = 0; ilon1 < nlon1; ilon1+=resampleFactor )
-                *array2++ = array1[ilat1*nlon1 + ilon1];
-        }
-    }
-    else
-    if ( nwpv == 2 ) // complex numbers ... unsupported yet ...
-    {
-    /*
-    long ilat2, ilon2;
-    for ( ilat = lat1; ilat <= lat2; ilat++ )
-    {
-      for ( ilon = lon21; ilon <= lon22; ilon++ )
-        {
-          *array2++ = array1[ilat*nlon1*2 + ilon*2];
-          *array2++ = array1[ilat*nlon1*2 + ilon*2+1];
-        }
-      for ( ilon = lon11; ilon <= lon12; ilon++ )
-        {
-          *array2++ = array1[ilat*nlon1*2 + ilon*2];
-          *array2++ = array1[ilat*nlon1*2 + ilon*2+1];
-        }
-    } */
-    }
+  for ( long ilat1 = 0; ilat1 < nlat1; ilat1+=resampleFactor )
+    for ( long ilon1 = 0; ilon1 < nlon1; ilon1+=resampleFactor )
+      *array2++ = array1[ilat1*nlon1 + ilon1];
 }
 
 static
-void cropData(int nwpv, double *array1, int gridID1, double *array2, int gridID2, int subI0, int subI1, int  subJ0, int  subJ1 )
+void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI0, int subI1, int  subJ0, int  subJ1 )
 {
-    long nlon1;
-    long nlon2;
-    long ilat1;
-    long array2Idx=0;
+  long nlon1 = gridInqXsize(gridID1);
+  long nlon2 = gridInqXsize(gridID2);
+  long rowLen = subI1 - subI0 + 1; // must be same as   nlon1
 
-    nlon1 = gridInqXsize(gridID1);
-    nlon2 = gridInqXsize(gridID2);
-    long rowLen;
-    rowLen =  subI1 - subI0 +1; // must be same as   nlon1
+  if ( rowLen!= nlon2 )
+    cdoAbort("cropData() rowLen!= nlon2 [%d != %d]", rowLen, nlon2);
 
-    if (rowLen!= nlon2)
-        cdoAbort("cropData() rowLen!= nlon2 [%d != %d]", rowLen, nlon2);
+  if ( cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...\n",subI0,subI1, subJ0, subJ1 );
 
-
-    if ( nwpv == 1 )
+  long array2Idx = 0;
+  for ( long ilat1 = subJ0; ilat1 <= subJ1; ilat1++ ) // copy the last row as well..
     {
-        if ( cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...\n",subI0,subI1, subJ0, subJ1 );
-
-        for ( ilat1 = subJ0; ilat1 <= subJ1; ilat1++ ) // copy the last row as well..
-        {
-            //if ( cdoDebugExt>20 ) cdoPrint("cropData(): ilat1=%d; subJ0=%d; subJ1=%d; rowLen=%d ", ilat1, subJ0, subJ1, rowLen );
-            memcpy((void*)&array2[array2Idx], (void*)&array1[ilat1*nlon1 + subI0], rowLen*sizeof(double));
-            array2Idx += rowLen;
-        }
-
-    }
-    else
-    if ( nwpv == 2 ) // complex numbers ... unsupported yet ...
-    {
+      //if ( cdoDebugExt>20 ) cdoPrint("cropData(): ilat1=%d; subJ0=%d; subJ1=%d; rowLen=%d ", ilat1, subJ0, subJ1, rowLen );
+      memcpy((void*)&array2[array2Idx], (void*)&array1[ilat1*nlon1 + subI0], rowLen*sizeof(double));
+      array2Idx += rowLen;
     }
 }
 
 
 void *SampleGrid(void *argument)
 {
-    int SAMPLEGRID;
-    int SUBGRID;
-    int operatorID;
-    int streamID1, streamID2;
-    int nrecs, nvars;
-    int tsID, recID, varID, levelID;
-    int gridsize, gridsize2;
-    int vlistID1, vlistID2;
-    int gridSrcID = -1, gridIDsampled;
-    int resampleFactor;
-    int subI0 = 0,subI1 = 0, subJ0 = 0, subJ1 = 0;
-    int index, ngrids, gridtype = -1;
-    int nmiss;
-    int *vars = NULL;
-    int i;
-    int nwpv; // number of words per value; real:1  complex:2
-    double missval;
-    double *array1 = NULL, *array2 = NULL;
-    int taxisID1, taxisID2;
-    typedef struct {
-        int gridSrcID, gridIDsampled;
-        int *cellidx, nvals;
-        int subI0,subI1, subJ0, subJ1;
-    } sbox_t;
-    sbox_t *sbox = NULL;
+  int nrecs;
+  int varID, levelID;
+  int resampleFactor;
+  int subI0 = 0, subI1 = 0, subJ0 = 0, subJ1 = 0;
+  int index;
+  int nmiss;
+  typedef struct {
+    int gridSrcID, gridIDsampled;
+    int *cellidx, nvals;
+    int subI0,subI1, subJ0, subJ1;
+  } sbox_t;
 
+  cdoInitialize(argument);
 
-    cdoInitialize(argument);
+  int SAMPLEGRID  = cdoOperatorAdd("samplegrid",  0, 0, "resample factor, typically 2 (which will half the resolution)");
+  int SUBGRID  = cdoOperatorAdd("subgrid",  0, 0, " sub-grid indices: i0,i1,j0,j1");
 
-    SAMPLEGRID  = cdoOperatorAdd("samplegrid",  0, 0, "resample factor, typically 2 (which will half the resolution)");
-    SUBGRID  = cdoOperatorAdd("subgrid",  0, 0, " sub-grid indices: i0,i1,j0,j1");
+  int operatorID = cdoOperatorID();
 
-    operatorID = cdoOperatorID();
+  int nch = operatorArgc();
 
-    int nch = operatorArgc();
-
-    if (operatorID == SAMPLEGRID)
+  if ( operatorID == SAMPLEGRID )
     {
-        if ( cdoDebugExt ) cdoPrint("samplegrid operator requested..");
-        if ( nch<1 ) cdoAbort("Number of input arguments < 1; At least 1 argument needed: resample-factor (2,3,4, .. etc)");
-        if ( ! isdigit(*operatorArgv()[0]) )
-            cdoAbort("The input argument is not a number !");
-        resampleFactor = atoi(operatorArgv()[0]);
+      if ( cdoDebugExt ) cdoPrint("samplegrid operator requested..");
+      if ( nch<1 ) cdoAbort("Number of input arguments < 1; At least 1 argument needed: resample-factor (2,3,4, .. etc)");
+      if ( ! isdigit(*operatorArgv()[0]) )
+        cdoAbort("The input argument is not a number !");
+      resampleFactor = atoi(operatorArgv()[0]);
 
-        if ( cdoDebugExt ) cdoPrint("resampleFactor = %d", resampleFactor);
+      if ( cdoDebugExt ) cdoPrint("resampleFactor = %d", resampleFactor);
     }
-    else
-    if (operatorID == SUBGRID)
+  else if ( operatorID == SUBGRID )
     {
-        if ( cdoDebugExt ) cdoPrint("subgrid operator requested..");
-        if ( nch<4 ) cdoAbort("Number of input arguments < 4; Must specify sub-grid indices: i0,i1,j0,j1; This works only with LCC grid. For other grids use: selindexbox");
-        if ( ! isdigit(*operatorArgv()[0]) )
-            cdoAbort("The input argument is not a number !");
-        subI0 = atoi(operatorArgv()[0]);
-        subI1 = atoi(operatorArgv()[1]);
-        subJ0 = atoi(operatorArgv()[2]);
-        subJ1 = atoi(operatorArgv()[3]);
-
-        resampleFactor = atoi(operatorArgv()[0]);
-
-        if ( cdoDebugExt ) cdoPrint("resampleFactor = %d", resampleFactor);
+      if ( cdoDebugExt ) cdoPrint("subgrid operator requested..");
+      if ( nch<4 ) cdoAbort("Number of input arguments < 4; Must specify sub-grid indices: i0,i1,j0,j1; This works only with LCC grid. For other grids use: selindexbox");
+      if ( ! isdigit(*operatorArgv()[0]) )
+        cdoAbort("The input argument is not a number !");
+      subI0 = atoi(operatorArgv()[0]);
+      subI1 = atoi(operatorArgv()[1]);
+      subJ0 = atoi(operatorArgv()[2]);
+      subJ1 = atoi(operatorArgv()[3]);
     }
-    else
-        cdoAbort("Unknown operator ...");
+  else
+    cdoAbort("Unknown operator ...");
 
-    streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-    vlistID1 = streamInqVlist(streamID1);
-    vlistID2 = vlistDuplicate(vlistID1);
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-    taxisID1 = vlistInqTaxis(vlistID1);
-    taxisID2 = taxisDuplicate(taxisID1);
-    vlistDefTaxis(vlistID2, taxisID2);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
 
-    nvars = vlistNvars(vlistID1);
-    vars  = (int *) malloc(nvars*sizeof(int));
-    for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+  int nvars = vlistNvars(vlistID1);
+  bool *vars  = (bool *) Malloc(nvars*sizeof(bool));
+  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
 
-    ngrids = vlistNgrids(vlistID1);
+  int ngrids = vlistNgrids(vlistID1);
 
-    if ( cdoDebugExt ) cdoPrint("ngrids = %d", ngrids);
+  if ( cdoDebugExt ) cdoPrint("ngrids = %d", ngrids);
 
-    sbox = (sbox_t *) malloc(ngrids*sizeof(sbox_t));
+  sbox_t *sbox = (sbox_t *) Malloc(ngrids*sizeof(sbox_t));
 
-    for ( index = 0; index < ngrids; index++ )
+  for ( int index = 0; index < ngrids; index++ )
     {
-        gridSrcID  = vlistGrid(vlistID1, index);
-        gridtype = gridInqType(gridSrcID);
-        if ( ( gridtype != GRID_CURVILINEAR ) && (   gridInqXsize(gridSrcID) > 0 && gridInqYsize(gridSrcID) > 0 ) )
+      int gridSrcID = vlistGrid(vlistID1, index);
+      int gridIDsampled = -1;
+      int gridtype = gridInqType(gridSrcID);
+      if ( (gridtype != GRID_CURVILINEAR) && (gridInqXsize(gridSrcID) > 0 && gridInqYsize(gridSrcID) > 0 ) )
         {
-            if (operatorID == SAMPLEGRID)
-              gridIDsampled = cdo_define_sample_grid(gridSrcID, resampleFactor);
-            else
-                if (operatorID == SUBGRID)
+          if ( operatorID == SAMPLEGRID )
+            gridIDsampled = cdo_define_sample_grid(gridSrcID, resampleFactor);
+          else if ( operatorID == SUBGRID )
+            {
+              if ( gridtype != GRID_LCC )
+                cdoAbort("Unsupported grid type: %s; This works only with LCC grid. For other grids use: selindexbox", gridNamePtr(gridtype));
+
+              int gridIDcurvl = gridToCurvilinear(gridSrcID, 1);
+              if ( gridInqType(gridIDcurvl) != GRID_CURVILINEAR )
                 {
-                    if ( gridtype != GRID_LCC )
-                        cdoAbort("Unsupported grid type: %s; This works only with LCC grid. For other grids use: selindexbox", gridNamePtr(gridtype));
-
-                    int gridIDcurvl;
-
-                    gridIDcurvl = gridToCurvilinear(gridSrcID, 1);
-                    if ( gridInqType(gridIDcurvl) != GRID_CURVILINEAR )
-                    {
-                        gridDestroy(gridIDcurvl);
-                        cdoAbort("cdo SampleGrid: define_subgrid_grid() Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
-                    }
-
-                    // TODO gridIDsampled = define_subgrid_grid(gridSrcID, gridIDcurvl, subI0,subI1, subJ0, subJ1);
-                    cdoAbort("Call to define_subgrid_grid() missing!");
-                    
-                    gridDestroy(gridIDcurvl);
+                  gridDestroy(gridIDcurvl);
+                  cdoAbort("cdo SampleGrid: define_subgrid_grid() Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
                 }
-            sbox[index].gridSrcID = gridSrcID;
-            sbox[index].gridIDsampled = gridIDsampled;
 
-            // TODO if ( cdoDebugExt>=10 ) gridPrint(gridSrcID, 1,0);
-            // if ( cdoDebugExt>=10 ) gridPrint(gridIDsampled, 1,0);
+              // TODO gridIDsampled = define_subgrid_grid(gridSrcID, gridIDcurvl, subI0,subI1, subJ0, subJ1);
+              cdoAbort("Call to define_subgrid_grid() missing!");
+                    
+              gridDestroy(gridIDcurvl);
+            }
 
-            vlistChangeGridIndex(vlistID2, index, gridIDsampled);
-            for ( varID = 0; varID < nvars; varID++ )
-                if ( gridSrcID == vlistInqVarGrid(vlistID1, varID) )
-                    vars[varID] = TRUE;
+          sbox[index].gridSrcID = gridSrcID;
+          sbox[index].gridIDsampled = gridIDsampled;
+
+          // TODO if ( cdoDebugExt>=10 ) gridPrint(gridSrcID, 1,0);
+          // if ( cdoDebugExt>=10 ) gridPrint(gridIDsampled, 1,0);
+
+          vlistChangeGridIndex(vlistID2, index, gridIDsampled);
+          for ( varID = 0; varID < nvars; varID++ )
+            if ( gridSrcID == vlistInqVarGrid(vlistID1, varID) )
+              vars[varID] = true;
         }
-        else
+      else
         {
           cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
         }
     }
 
-
-    if ( cdoDebugExt )
+  if ( cdoDebugExt )
     {
-        if (operatorID == SAMPLEGRID)
-            cdoPrint("Resampled grid has been created.");
-        if (operatorID == SUBGRID)
-            cdoPrint("Sub-grid has been created.");
+      if ( operatorID == SAMPLEGRID ) cdoPrint("Resampled grid has been created.");
+      if ( operatorID == SUBGRID    ) cdoPrint("Sub-grid has been created.");
     }
 
-    streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-    streamDefVlist(streamID2, vlistID2);
+  streamDefVlist(streamID2, vlistID2);
 
-    gridsize = vlistGridsizeMax(vlistID1);
-    if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-    array1 = (double *) malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
+  double *array1 = (double *) Malloc(gridsize*sizeof(double));
 
-    gridsize2 = vlistGridsizeMax(vlistID2);
-    if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
-    array2 = (double *) malloc(gridsize2*sizeof(double));
+  int gridsize2 = vlistGridsizeMax(vlistID2);
+  if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
+  double *array2 = (double *) Malloc(gridsize2*sizeof(double));
 
-    if ( cdoDebugExt )
+  if ( cdoDebugExt ) cdoPrint("gridsize = %ld, gridsize2 = %ld", gridsize, gridsize2);
+
+  int tsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-        cdoPrint("gridsize = %ld, gridsize2 = %ld, ", gridsize, gridsize2);
-    }
+      taxisCopyTimestep(taxisID2, taxisID1);
 
-    tsID = 0;
-    while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
-    {
-        taxisCopyTimestep(taxisID2, taxisID1);
+      streamDefTimestep(streamID2, tsID);
 
-        streamDefTimestep(streamID2, tsID);
-
-        for ( recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
-            streamInqRecord(streamID1, &varID, &levelID);
-            streamReadRecord(streamID1, array1, &nmiss);
+          streamInqRecord(streamID1, &varID, &levelID);
+          streamReadRecord(streamID1, array1, &nmiss);
 
-            streamDefRecord(streamID2, varID, levelID);
+          streamDefRecord(streamID2, varID, levelID);
 
-            if ( cdoDebugExt>=20 ) cdoPrint("Processing record (%d) of %d.",recID, nrecs);
+          if ( cdoDebugExt>=20 ) cdoPrint("Processing record (%d) of %d.",recID, nrecs);
 
-            if ( vars[varID] )
+          if ( vars[varID] )
             {
-                if (  vlistInqVarDatatype(vlistID1, varID) == CDI_DATATYPE_CPX32 ||
-                    vlistInqVarDatatype(vlistID1, varID) == CDI_DATATYPE_CPX64 )
-                    nwpv = 2;
-                else
-                    nwpv = 1;
+              int gridSrcID = vlistInqVarGrid(vlistID1, varID);
 
-                gridSrcID = vlistInqVarGrid(vlistID1, varID);
+              for ( index = 0; index < ngrids; index++ )
+                if ( gridSrcID == sbox[index].gridSrcID ) break;
 
-                for ( index = 0; index < ngrids; index++ )
-                    if ( gridSrcID == sbox[index].gridSrcID ) break;
+              if ( index == ngrids ) cdoAbort("Internal problem, grid not found!");
 
-                if ( index == ngrids ) cdoAbort("Internal problem, grid not found!");
+              int gridIDsampled = sbox[index].gridIDsampled;
+              gridsize2 = gridInqSize(gridIDsampled);
 
-                gridsize2 = gridInqSize(sbox[index].gridIDsampled);
-                gridIDsampled = sbox[index].gridIDsampled;
-
-                if (operatorID == SAMPLEGRID) {
-                    //if ( cdoDebugExt ) cdoPrint("Calling sampleData gridSrcID: %d; gridIDsampled: %d",gridSrcID, gridIDsampled);
-                    sampleData(nwpv, array1, gridSrcID, array2, gridIDsampled, resampleFactor);
-                }
-                else
-                    if (operatorID == SUBGRID) {
-                        cropData(nwpv, array1, gridSrcID, array2, gridIDsampled, subI0,subI1, subJ0, subJ1);
-                    }
-
-
-                if ( nmiss )
+              if (operatorID == SAMPLEGRID)
                 {
-                    nmiss = 0;
-                    missval = vlistInqVarMissval(vlistID2, varID);
-                    for ( i = 0; i < gridsize2; i++ )
-                        if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+                  //if ( cdoDebugExt ) cdoPrint("Calling sampleData gridSrcID: %d; gridIDsampled: %d",gridSrcID, gridIDsampled);
+                  sampleData(array1, gridSrcID, array2, gridIDsampled, resampleFactor);
                 }
-//    if ( cdoDebugExt ) cdoPrint("AAA1");
+              else if (operatorID == SUBGRID)
+                {
+                  cropData(array1, gridSrcID, array2, gridIDsampled, subI0,subI1, subJ0, subJ1);
+                }
 
-                streamWriteRecord(streamID2, array2, nmiss);
-                //streamWriteRecord(streamID2, array1, nmiss);
+              if ( nmiss )
+                {
+                  nmiss = 0;
+                  double missval = vlistInqVarMissval(vlistID2, varID);
+                  for ( int i = 0; i < gridsize2; i++ )
+                    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+                }
+
+              streamWriteRecord(streamID2, array2, nmiss);
             }
-            else
+          else
             {
-                streamWriteRecord(streamID2, array1, nmiss);
+              streamWriteRecord(streamID2, array1, nmiss);
             }
         }
-        tsID++;
+
+      tsID++;
     }
 
-    streamClose(streamID2);
-    streamClose(streamID1);
+  streamClose(streamID2);
+  streamClose(streamID1);
 
-    vlistDestroy(vlistID2);
+  vlistDestroy(vlistID2);
 
-    if ( vars   ) free(vars);
-    if ( array2 ) free(array2);
-    if ( array1 ) free(array1);
+  if ( vars ) Free(vars);
+  if ( array2 ) Free(array2);
+  if ( array1 ) Free(array1);
 
-    if ( sbox )
-    {
-        free(sbox);
-    }
+  if ( sbox ) Free(sbox);
 
-    cdoFinish();
+  cdoFinish();
 
-    return (0);
+  return 0;
 }
