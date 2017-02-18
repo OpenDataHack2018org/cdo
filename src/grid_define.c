@@ -242,7 +242,7 @@ int cdo_define_subgrid_grid(int gridSrcID, int gridIDcurvl, int subI0, int subI1
     {
         Message("cdo SampleGrid: define_subgrid_grid() Original LCC grid:");
         Message("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridSrcID), gridInqYsize(gridSrcID));
-        Message("originLon %4.3f, originLon %4.3f", originLon, originLat);
+        Message("originLon %4.3f, originLat %4.3f", originLon, originLat);
         Message("grid Xinc   %4.3f, grid Yinc   %4.3f", xinc, yinc);
     }
     originLon = gridInqXval(gridIDcurvl, 0);
@@ -254,7 +254,7 @@ int cdo_define_subgrid_grid(int gridSrcID, int gridIDcurvl, int subI0, int subI1
         Message("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
         Message("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
         Message("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
-        Message("originLon %4.3f, originLon %4.3f", originLon, originLat);
+        Message("originLon %4.3f, originLat %4.3f", originLon, originLat);
     }
 
 
@@ -282,7 +282,7 @@ int cdo_define_subgrid_grid(int gridSrcID, int gridIDcurvl, int subI0, int subI1
     {
         Message("\ncdo SampleGrid: define_subgrid_grid()  Sub-grid:");
         Message("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID_sampled), gridInqYsize(gridID_sampled));
-        Message("originLon %4.3f, originLon %4.3f", originLon, originLat);
+        Message("originLon %4.3f, originLat %4.3f", originLon, originLat);
     }
 
     grid_sampled->lcc_originLon   = originLon;
