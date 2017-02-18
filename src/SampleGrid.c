@@ -126,43 +126,43 @@ void *SampleGrid(void *argument)
       int gridSrcID = vlistGrid(vlistID1, index);
       int gridIDsampled = -1;
       int gridtype = gridInqType(gridSrcID);
-      if ( (gridtype != GRID_CURVILINEAR) && (gridInqXsize(gridSrcID) > 0 && gridInqYsize(gridSrcID) > 0 ) )
+
+      if ( ! (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION ||
+              gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC) )
+        cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
+
+      if ( operatorID == SAMPLEGRID )
         {
-          if ( operatorID == SAMPLEGRID )
-            gridIDsampled = cdo_define_sample_grid(gridSrcID, resampleFactor);
-          else if ( operatorID == SUBGRID )
+          gridIDsampled = cdo_define_sample_grid(gridSrcID, resampleFactor);
+        }
+      else if ( operatorID == SUBGRID )
+        {
+          if ( gridtype != GRID_LCC )
+            cdoAbort("Unsupported grid type: %s; This works only with LCC grid. For other grids use: selindexbox", gridNamePtr(gridtype));
+
+          int gridIDcurvl = gridToCurvilinear(gridSrcID, 1);
+          if ( gridInqType(gridIDcurvl) != GRID_CURVILINEAR )
             {
-              if ( gridtype != GRID_LCC )
-                cdoAbort("Unsupported grid type: %s; This works only with LCC grid. For other grids use: selindexbox", gridNamePtr(gridtype));
-
-              int gridIDcurvl = gridToCurvilinear(gridSrcID, 1);
-              if ( gridInqType(gridIDcurvl) != GRID_CURVILINEAR )
-                {
-                  gridDestroy(gridIDcurvl);
-                  cdoAbort("cdo SampleGrid: define_subgrid_grid() Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
-                }
-
-              // TODO gridIDsampled = define_subgrid_grid(gridSrcID, gridIDcurvl, subI0,subI1, subJ0, subJ1);
-              cdoAbort("Call to define_subgrid_grid() missing!");
-                    
               gridDestroy(gridIDcurvl);
+              cdoAbort("cdo SampleGrid: define_subgrid_grid() Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
             }
 
-          sbox[index].gridSrcID = gridSrcID;
-          sbox[index].gridIDsampled = gridIDsampled;
-
-          // TODO if ( cdoDebugExt>=10 ) gridPrint(gridSrcID, 1,0);
-          // if ( cdoDebugExt>=10 ) gridPrint(gridIDsampled, 1,0);
-
-          vlistChangeGridIndex(vlistID2, index, gridIDsampled);
-          for ( varID = 0; varID < nvars; varID++ )
-            if ( gridSrcID == vlistInqVarGrid(vlistID1, varID) )
-              vars[varID] = true;
+          // TODO gridIDsampled = define_subgrid_grid(gridSrcID, gridIDcurvl, subI0,subI1, subJ0, subJ1);
+          cdoAbort("Call to define_subgrid_grid() missing!");
+          
+          gridDestroy(gridIDcurvl);
         }
-      else
-        {
-          cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
-        }
+
+      sbox[index].gridSrcID = gridSrcID;
+      sbox[index].gridIDsampled = gridIDsampled;
+
+      // TODO if ( cdoDebugExt>=10 ) gridPrint(gridSrcID, 1,0);
+      // if ( cdoDebugExt>=10 ) gridPrint(gridIDsampled, 1,0);
+      
+      vlistChangeGridIndex(vlistID2, index, gridIDsampled);
+      for ( varID = 0; varID < nvars; varID++ )
+        if ( gridSrcID == vlistInqVarGrid(vlistID1, varID) )
+          vars[varID] = true;
     }
 
   if ( cdoDebugExt )

@@ -56,6 +56,11 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
        cdoPrint("cdo_define_sample_grid(gridSrcID=%d, sampleFactor=%d) ...\n",gridSrcID, sampleFactor);
 
     int gridtype = gridInqType(gridSrcID);
+
+    if ( ! (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION ||
+            gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC) )
+      cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
+    
     int gridXsize = gridInqXsize(gridSrcID);
     int gridYsize = gridInqYsize(gridSrcID);
 
@@ -64,17 +69,6 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
                  sampleFactor, gridXsize, gridYsize);
 
     // TODO if ( cdoDebugExt>20 )  gridPrint(gridSrcID,1,0);
-
-    //const double *xvals   = gridInqXvalsPtr(gridSrcID);
-    //const double *yvals   = gridInqYvalsPtr(gridSrcID);
-    /*
-    double xfirst = gridInqXval(gridSrcID,0);   // staggered grid of u-wind
-    double yfirst = gridInqYval(gridSrcID,0);
-    double xlast  = gridInqXval(gridSrcID, gridXsize-1);
-    double ylast  = gridInqYval(gridSrcID, gridYsize-1);
-    double xinc     = gridInqXinc(gridSrcID);
-    double yinc     = gridInqYinc(gridSrcID);
-    */
 
     int xsize = (gridXsize + (sampleFactor-1)) / sampleFactor; // HARM36_L25: (789 + 2-1) / 2 = 395
     int ysize = (gridYsize + (sampleFactor-1)) / sampleFactor;
@@ -102,17 +96,41 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
     grid_sampled->yinc   = grid_src->yinc * sampleFactor;
     */
 
-    double *xvals = (double *) Malloc(gridXsize*sizeof(double));
-    gridInqXvals(gridSrcID, xvals);
-    for ( int i = 0, j = 0; i < gridXsize; i += sampleFactor ) xvals[j++] = xvals[i];
-    gridDefXvals(gridID_sampled, xvals);
-    Free(xvals);
+    if ( gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL) )
+      {
+        if ( gridtype == GRID_CURVILINEAR )
+          {
+            double *vals = (double *) Malloc(gridXsize*gridYsize*sizeof(double));
+            gridInqXvals(gridSrcID, vals);
+            double *pvals = vals;
+            for ( int j = 0; j < gridYsize; j += sampleFactor )
+              for ( int i = 0; i < gridXsize; i += sampleFactor )
+                *pvals++ = vals[j*gridXsize+i];
+            gridDefXvals(gridID_sampled, vals);
 
-    double *yvals = (double *) Malloc(gridYsize*sizeof(double));
-    gridInqYvals(gridSrcID, yvals);
-    for ( int i = 0, j = 0; i < gridYsize; i += sampleFactor ) yvals[j++] = yvals[i];
-    gridDefYvals(gridID_sampled, yvals);
-    Free(yvals);
+            gridInqYvals(gridSrcID, vals);
+            pvals = vals;
+            for ( int j = 0; j < gridYsize; j += sampleFactor )
+              for ( int i = 0; i < gridXsize; i += sampleFactor )
+                *pvals++ = vals[j*gridXsize+i];
+            gridDefYvals(gridID_sampled, vals);
+            Free(vals);
+          }
+        else
+          {
+            double *xvals = (double *) Malloc(gridXsize*sizeof(double));
+            gridInqXvals(gridSrcID, xvals);
+            for ( int i = 0, j = 0; i < gridXsize; i += sampleFactor ) xvals[j++] = xvals[i];
+            gridDefXvals(gridID_sampled, xvals);
+            Free(xvals);
+
+            double *yvals = (double *) Malloc(gridYsize*sizeof(double));
+            gridInqYvals(gridSrcID, yvals);
+            for ( int i = 0, j = 0; i < gridYsize; i += sampleFactor ) yvals[j++] = yvals[i];
+            gridDefYvals(gridID_sampled, yvals);
+            Free(yvals);
+          }
+      }
 
     // TODO
     /*
