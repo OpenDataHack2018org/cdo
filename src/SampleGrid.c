@@ -82,9 +82,7 @@ void *SampleGrid(void *argument)
     {
       if ( cdoDebugExt ) cdoPrint("samplegrid operator requested..");
       if ( nch<1 ) cdoAbort("Number of input arguments < 1; At least 1 argument needed: resample-factor (2,3,4, .. etc)");
-      if ( ! isdigit(*operatorArgv()[0]) )
-        cdoAbort("The input argument is not a number !");
-      resampleFactor = atoi(operatorArgv()[0]);
+      resampleFactor = parameter2int(operatorArgv()[0]);
 
       if ( cdoDebugExt ) cdoPrint("resampleFactor = %d", resampleFactor);
     }
@@ -92,12 +90,10 @@ void *SampleGrid(void *argument)
     {
       if ( cdoDebugExt ) cdoPrint("subgrid operator requested..");
       if ( nch<4 ) cdoAbort("Number of input arguments < 4; Must specify sub-grid indices: i0,i1,j0,j1; This works only with LCC grid. For other grids use: selindexbox");
-      if ( ! isdigit(*operatorArgv()[0]) )
-        cdoAbort("The input argument is not a number !");
-      subI0 = atoi(operatorArgv()[0]);
-      subI1 = atoi(operatorArgv()[1]);
-      subJ0 = atoi(operatorArgv()[2]);
-      subJ1 = atoi(operatorArgv()[3]);
+      subI0 = parameter2int(operatorArgv()[0]);
+      subI1 = parameter2int(operatorArgv()[1]);
+      subJ0 = parameter2int(operatorArgv()[2]);
+      subJ1 = parameter2int(operatorArgv()[3]);
     }
   else
     cdoAbort("Unknown operator ...");
@@ -147,8 +143,7 @@ void *SampleGrid(void *argument)
               cdoAbort("cdo SampleGrid: define_subgrid_grid() Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
             }
 
-          // TODO gridIDsampled = define_subgrid_grid(gridSrcID, gridIDcurvl, subI0,subI1, subJ0, subJ1);
-          cdoAbort("Call to define_subgrid_grid() missing!");
+          gridIDsampled = cdo_define_subgrid_grid(gridSrcID, gridIDcurvl, subI0, subI1, subJ0, subJ1);
           
           gridDestroy(gridIDcurvl);
         }
