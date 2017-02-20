@@ -118,10 +118,10 @@ void *SampleGrid(void *argument)
     {
       int gridSrcID = vlistGrid(vlistID1, index);
       int gridIDsampled = -1;
-      int gridtype = gridInqType(gridSrcID);
 
+      int gridtype = gridInqType(gridSrcID);
       if ( ! (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION ||
-              gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC) )
+              gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC || gridtype == GRID_LCC) )
         cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
 
       if ( operatorID == SAMPLEGRID )
@@ -143,8 +143,8 @@ void *SampleGrid(void *argument)
       sbox[index].gridSrcID = gridSrcID;
       sbox[index].gridIDsampled = gridIDsampled;
 
-      // TODO if ( cdoDebugExt>=10 ) gridPrint(gridSrcID, 1,0);
-      // if ( cdoDebugExt>=10 ) gridPrint(gridIDsampled, 1,0);
+      // if ( cdoDebugExt>=10 ) cdo_print_grid(gridSrcID, 1);
+      // if ( cdoDebugExt>=10 ) cdo_print_grid(gridIDsampled, 1);
       
       vlistChangeGridIndex(vlistID2, index, gridIDsampled);
       for ( varID = 0; varID < nvars; varID++ )
@@ -202,7 +202,6 @@ void *SampleGrid(void *argument)
 
               if (operatorID == SAMPLEGRID)
                 {
-                  //if ( cdoDebugExt ) cdoPrint("Calling sampleData gridSrcID: %d; gridIDsampled: %d",gridSrcID, gridIDsampled);
                   sampleData(array1, gridSrcID, array2, gridIDsampled, resampleFactor);
                 }
               else if (operatorID == SUBGRID)

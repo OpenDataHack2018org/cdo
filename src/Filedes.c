@@ -30,7 +30,6 @@
 #include "util.h"
 
 
-void cdo_print_grid(int gridID, int opt);
 void cdo_print_zaxis(int zaxisID);
 
 void cdo_print_attributes(FILE *fp, int cdiID, int varID, int nblanks)

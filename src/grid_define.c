@@ -52,12 +52,12 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
             projection = northpole
 */
     if ( cdoDebugExt )
-       cdoPrint("cdo_define_sample_grid(gridSrcID=%d, sampleFactor=%d) ...\n",gridSrcID, sampleFactor);
+       cdoPrint("cdo_define_sample_grid(gridSrcID=%d, sampleFactor=%d) ...", gridSrcID, sampleFactor);
 
     int gridtype = gridInqType(gridSrcID);
 
     if ( ! (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION ||
-            gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC) )
+            gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC || gridtype == GRID_LCC) )
       cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
     
     int gridXsize = gridInqXsize(gridSrcID);
@@ -67,7 +67,7 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
         cdoAbort("cdo_define_sample_grid() Unsupported sampleFactor (%d)! Note that: gridXsize = %d, gridYsize = %d",
                  sampleFactor, gridXsize, gridYsize);
 
-    // TODO if ( cdoDebugExt>20 )  gridPrint(gridSrcID,1,0);
+    if ( cdoDebugExt>20 ) cdo_print_grid(gridSrcID, 1);
 
     int xsize = (gridXsize + (sampleFactor-1)) / sampleFactor; // HARM36_L25: (789 + 2-1) / 2 = 395
     int ysize = (gridYsize + (sampleFactor-1)) / sampleFactor;
@@ -85,17 +85,26 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
     gridDefXsize(gridID_sampled, xsize);
     gridDefYsize(gridID_sampled, ysize);
 
-    // for the case of Lambert projection ...
-    // TODO
-    /*
-    grid_sampled->lcc_xinc   = grid_src->lcc_xinc * sampleFactor;
-    grid_sampled->lcc_yinc   = grid_src->lcc_yinc * sampleFactor;
+    gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
+    gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
 
-    grid_sampled->xinc   = grid_src->xinc * sampleFactor;
-    grid_sampled->yinc   = grid_src->yinc * sampleFactor;
-    */
+    grid_copy_attributes(gridSrcID, gridID_sampled);
+  
+    if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridSrcID, gridID_sampled);
 
-    if ( gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL) )
+    if ( gridtype == GRID_LCC )
+      {
+        double originLon, originLat, lonParY, lat1, lat2, xinc, yinc;
+        int projflag, scanflag;
+
+        gridInqParamLCC(gridSrcID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xinc, &yinc, &projflag, &scanflag);
+
+        xinc *= sampleFactor;
+        yinc *= sampleFactor;
+        
+	gridDefParamLCC(gridID_sampled, originLon, originLat, lonParY, lat1, lat2, xinc, yinc, projflag, scanflag);
+      }
+    else if ( gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL) )
       {
         if ( gridtype == GRID_CURVILINEAR )
           {
@@ -131,17 +140,10 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
           }
       }
 
-    // TODO
-    /*
-    if ( grid_sampled->type == GRID_LCC )
-        gridDefLCC( gridID_sampled, grid_sampled->lcc_originLon, grid_sampled->lcc_originLat, grid_sampled->lcc_lonParY,
-                    grid_sampled->lcc_lat1, grid_sampled->lcc_lat2, grid_sampled->lcc_xinc, grid_sampled->lcc_yinc,
-                    grid_sampled->lcc_projflag, grid_sampled->lcc_scanflag);
-    */
     if ( cdoDebugExt>20 )
       {
-        printf("cdo SampleGrid: define_sample_grid(): \n");
-        // TODO gridPrint(gridID_sampled, 1,0);
+        cdoPrint("cdo SampleGrid: define_sample_grid(): ");
+        cdo_print_grid(gridID_sampled, 1);
       }
 
     return gridID_sampled;
