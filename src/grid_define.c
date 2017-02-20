@@ -64,8 +64,8 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
     int gridYsize = gridInqYsize(gridSrcID);
 
     if ( (sampleFactor<1) || (gridXsize<1) || (gridYsize<1) || (sampleFactor > (gridXsize/4) ) || (sampleFactor > (gridYsize/4)) )
-        cdoAbort("cdo_define_sample_grid() Unsupported sampleFactor (%d)! Note that: gridXsize = %d, gridYsize = %d",
-                 sampleFactor, gridXsize, gridYsize);
+        cdoAbort("%s(): Unsupported sampleFactor (%d)! Note that: gridXsize = %d, gridYsize = %d",
+                 __func__, sampleFactor, gridXsize, gridYsize);
 
     if ( cdoDebugExt>20 ) cdo_print_grid(gridSrcID, 1);
 

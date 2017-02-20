@@ -119,6 +119,8 @@ void *Samplegrid(void *argument)
       int gridSrcID = vlistGrid(vlistID1, index);
       int gridIDsampled = -1;
 
+      if ( gridInqSize(gridSrcID ) <= 1 ) continue;
+
       int gridtype = gridInqType(gridSrcID);
       if ( ! (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION ||
               gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC || gridtype == GRID_LCC) )
@@ -147,6 +149,7 @@ void *Samplegrid(void *argument)
       // if ( cdoDebugExt>=10 ) cdo_print_grid(gridIDsampled, 1);
       
       vlistChangeGridIndex(vlistID2, index, gridIDsampled);
+
       for ( varID = 0; varID < nvars; varID++ )
         if ( gridSrcID == vlistInqVarGrid(vlistID1, varID) )
           vars[varID] = true;
