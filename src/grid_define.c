@@ -2,7 +2,6 @@
 #include "cdo_int.h"
 #include "grid.h"
 
-extern int cdoDebugExt;
 /*
 @Function  define_sample_grid
 @Title     Define a sampled grid of another grid

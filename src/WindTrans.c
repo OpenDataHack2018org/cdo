@@ -27,34 +27,13 @@
                       rotuvNorth : rotate grid-relative wind(u,v) to North_pole-relative
 */
 
-static int cdoDebugExt                        =  0;      //  Debug level for the KNMI extensions
-
-#include <ctype.h>
-#include "cdo.h"
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo_int.h"
-#include "grid.h"
-
-#include "griddes.h"
 #include "pstream.h"
-#include "specspace.h"
-
-
-#ifndef M_PI
-#define M_PI        3.14159265358979323846  // pi
-#endif
-
-#ifndef  rad2deg
-#define  rad2deg  (180./M_PI)   // conversion for rad to deg
-#endif
-
-#ifndef  deg2rad
-#define  deg2rad  (M_PI/180.)   // conversion for deg to rad
-#endif
+#include "grid.h"
 
 
 /*
-extern int cdoDebugExt;             //  debug level for the KNMI extensions
 extern int cdoGribDataScanningMode; // -1: not used; allowed modes: <0, 64, 96>; Default is 64
 
 int define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets);
@@ -1111,7 +1090,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
 
 #define OPTrotuvNorth 1   // ACTIVATE SPEED - OPTIMIZATION
 
-#define radians(aDeg) (deg2rad*aDeg)
+#define radians(aDeg) (DEG2RAD*aDeg)
 #define NormVector(vec0,vec1,vec2) {\
     double vecLen = sqrt(vec0*vec0 + vec1*vec1 + vec2*vec2);\
     vec0 = vec0/vecLen; vec1 = vec1/vecLen; vec2 = vec2/vecLen; }
@@ -1247,13 +1226,13 @@ void rot_uv_north(int gridID, double *us, double *vs)
                 if ( ((i<3) && (j<3)) || ((i>(nx-3)) && (j>(ny-3))  ) )
                 {
                     cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid relative) ",\
-                             i,j, lon_pnt0, lat_pnt0,lon_pntNorth, lat_pntNorth, rad2deg*dLonNorth, rad2deg*dLatNorth );
+                             i,j, lon_pnt0, lat_pnt0,lon_pntNorth, lat_pntNorth, RAD2DEG*dLonNorth, RAD2DEG*dLatNorth );
                    cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; dLonEast =%3.6f; dLatEast =%3.6f (Easting grid relative ) ",\
-                            i,j, lon_pnt0, lat_pnt0,lon_pntEast,lat_pntEast, rad2deg*dLonEast, rad2deg*dLatEast );
+                            i,j, lon_pnt0, lat_pnt0,lon_pntEast,lat_pntEast, RAD2DEG*dLonEast, RAD2DEG*dLatEast );
                     //cdoPrint("(xpntNorthSph, ypntNorthSph)= [%3.6f,%3.6f]; (xpntEastSph,ypntEastSph) = [%3.6f,%3.6f];",
                     //         xpntNorthSph, ypntNorthSph, xpntEastSph,ypntEastSph );
-                    //vecAngle = rad2deg * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph + zpntEastSph*zpntNorthSph) );
-                    //vecAngle = rad2deg * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph) );
+                    //vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph + zpntEastSph*zpntNorthSph) );
+                    //vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph) );
                     cdoPrint("(xpntNorthSph, ypntNorthSph, zpntNorthSph)= [%3.6f,%3.6f,%3.6f]; (xpntEastSph,ypntEastSph, zpntEastSph) = [%3.6f,%3.6f,%3.6f]; vecAngle= %3.6f",\
                              xpntNorthSph, ypntNorthSph, zpntNorthSph, xpntEastSph, ypntEastSph, zpntEastSph, vecAngle );
                     cdoPrint("rotation matrix for grid point [%03d,%03d] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)",\

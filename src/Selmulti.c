@@ -16,12 +16,10 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "listarray.h"
 
-int cdoDebugExt                        =  0;      //  Debug level for the KNMI extensions
 
 /*
 Supported notations:
@@ -148,11 +146,6 @@ int getNumberOfSelectionTuples();
 int getNumberOfDeleteSelectionTuples();
 
 int multiSelectionParser(const char *filenameOrString);
-
-//extern static void cdoSetDebug(int level); // defined in cdo.c
-extern int cdoDebugExt; // defined in cdo.c
-
-// Defined in stream_grd.c:
 
 
 void *Selmulti(void *argument)

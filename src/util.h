@@ -89,6 +89,7 @@ extern int cdoDebug;
 extern int cdoCompress;
 extern int cdoInteractive;
 extern int cdoParIO;
+extern int cdoDebugExt;
 
 extern int cdoCompType;
 extern int cdoCompLevel;

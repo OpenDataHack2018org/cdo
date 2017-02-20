@@ -6,14 +6,11 @@
     subgrid         Similar to selindexbox but this operator works for LCC grids (tested on HARMONIE NWP model).
 */
 
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo_int.h"
-#include "grid.h"
-#include "griddes.h"
 #include "pstream.h"
+#include "grid.h"
 
-
-extern int cdoDebugExt; // defined in cdo.c
 
 static
 void sampleData(double *array1, int gridID1, double *array2, int gridID2, int resampleFactor)
@@ -43,7 +40,7 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
   if ( rowLen!= nlon2 )
     cdoAbort("cropData() rowLen!= nlon2 [%d != %d]", rowLen, nlon2);
 
-  if ( cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...\n",subI0,subI1, subJ0, subJ1 );
+  if ( cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...\n", subI0, subI1, subJ0, subJ1 );
 
   long array2Idx = 0;
   for ( long ilat1 = subJ0; ilat1 <= subJ1; ilat1++ ) // copy the last row as well..
@@ -81,7 +78,7 @@ void *SampleGrid(void *argument)
   if ( operatorID == SAMPLEGRID )
     {
       if ( cdoDebugExt ) cdoPrint("samplegrid operator requested..");
-      if ( nch<1 ) cdoAbort("Number of input arguments < 1; At least 1 argument needed: resample-factor (2,3,4, .. etc)");
+      if ( nch < 1 ) cdoAbort("Number of input arguments < 1; At least 1 argument needed: resample-factor (2,3,4, .. etc)");
       resampleFactor = parameter2int(operatorArgv()[0]);
 
       if ( cdoDebugExt ) cdoPrint("resampleFactor = %d", resampleFactor);
@@ -89,7 +86,7 @@ void *SampleGrid(void *argument)
   else if ( operatorID == SUBGRID )
     {
       if ( cdoDebugExt ) cdoPrint("subgrid operator requested..");
-      if ( nch<4 ) cdoAbort("Number of input arguments < 4; Must specify sub-grid indices: i0,i1,j0,j1; This works only with LCC grid. For other grids use: selindexbox");
+      if ( nch < 4 ) cdoAbort("Number of input arguments < 4; Must specify sub-grid indices: i0,i1,j0,j1; This works only with LCC grid. For other grids use: selindexbox");
       subI0 = parameter2int(operatorArgv()[0]);
       subI1 = parameter2int(operatorArgv()[1]);
       subJ0 = parameter2int(operatorArgv()[2]);
@@ -137,11 +134,6 @@ void *SampleGrid(void *argument)
             cdoAbort("Unsupported grid type: %s; This works only with LCC grid. For other grids use: selindexbox", gridNamePtr(gridtype));
 
           int gridIDcurvl = gridToCurvilinear(gridSrcID, 1);
-          if ( gridInqType(gridIDcurvl) != GRID_CURVILINEAR )
-            {
-              gridDestroy(gridIDcurvl);
-              cdoAbort("cdo SampleGrid: define_subgrid_grid() Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
-            }
 
           gridIDsampled = cdo_define_subgrid_grid(gridSrcID, gridIDcurvl, subI0, subI1, subJ0, subJ1);
           

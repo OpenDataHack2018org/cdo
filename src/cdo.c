@@ -1075,6 +1075,7 @@ int parse_options_long(int argc, char *argv[])
   int ltimestat_bounds;
   int lsortname;
   int lsortparam;
+  int ldebLevel;
 
   struct cdo_option opt_long[] =
     {
@@ -1110,6 +1111,7 @@ int parse_options_long(int argc, char *argv[])
       { "table",             required_argument,                NULL, 't' },
       { "verbose",                 no_argument,                NULL, 'v' },
       { "version",                 no_argument,                NULL, 'V' },
+      { "Dkext",             required_argument,          &ldebLevel,  1  },
       { NULL,                                0,                NULL,  0  }
     };
 
@@ -1117,6 +1119,8 @@ int parse_options_long(int argc, char *argv[])
 
   while ( 1 )
     {
+      // IMPORTANT: BY EVERY OPTION that takes arguments you MUST set its trigger variable to ZERO;
+      // otherwise the parameters of other options get wrongly assigned.
       lprecision = 0;
       lpercentile = 0;
       lnetcdf_hdr_pad = 0;
@@ -1129,6 +1133,7 @@ int parse_options_long(int argc, char *argv[])
       ltimestat_bounds = 0;
       lsortname = 0;
       lsortparam = 0;
+      ldebLevel = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1220,6 +1225,11 @@ int parse_options_long(int argc, char *argv[])
           else if ( lsortparam )
             {
               cdiDefGlobal("SORTPARAM", TRUE);
+            }
+          else if ( ldebLevel )
+            {
+              int newDebLevelVal = parameter2int(CDO_optarg);
+              if ( newDebLevelVal > 0 ) cdoDebugExt = newDebLevelVal;
             }
           break;
         case 'a':
