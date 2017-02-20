@@ -1,5 +1,6 @@
 2017-02-20  Uwe Schulzweida
 
+	* New operator samplegrid: resample grid (patch from Michal Koutek, KMNI)
 	* setgridtype,curvilinear: bug fix for source gridtype GRID_LCC
 
 2017-02-16  Uwe Schulzweida

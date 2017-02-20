@@ -52,7 +52,7 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
 }
 
 
-void *SampleGrid(void *argument)
+void *Samplegrid(void *argument)
 {
   int nrecs;
   int varID, levelID;

@@ -282,7 +282,7 @@ void *Maggraph(void *argument);
 // HIRLAM_EXTENSIONS
 void *Selmulti(void *argument);   // "selmulti", "delmulti"
 void *WindTrans(void *argument);  // "uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"
-void *SampleGrid(void *argument); // "samplegrid", "subgrid"
+void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 
 
 #define  AdisitOperators        {"adisit", "adipot"}
@@ -570,7 +570,7 @@ void *SampleGrid(void *argument); // "samplegrid", "subgrid"
 // HIRLAM_EXTENSIONS
 #define  SelmultiOperators      {"selmulti", "delmulti", "changemulti"}
 #define  WindTransOperators     {"uvDestag", "rotuvN","rotuvNorth", "projuvLatLon"}
-#define  SampleGridOperators    {"samplegrid", "subgrid"}
+#define  SamplegridOperators    {"samplegrid", "subgrid"}
 
 
 static modules_t Modules[] =
@@ -843,7 +843,7 @@ static modules_t Modules[] =
   { Magvector,      MagvectorHelp,     MagvectorOperators,     1,   CDI_REAL,  1,  1 },
   { Maggraph,       MaggraphHelp,      MaggraphOperators,      1,   CDI_REAL, -1,  1 },
   // HIRLAM_EXTENSIONS
-  { SampleGrid,     NULL,              SampleGridOperators,    1,   CDI_REAL,  1,  1 },
+  { Samplegrid,     SamplegridHelp,    SamplegridOperators,    1,   CDI_REAL,  1,  1 },
   { Selmulti,       NULL,              SelmultiOperators,      1,   CDI_REAL,  1,  1 },
   { WindTrans,      NULL,              WindTransOperators,     1,   CDI_REAL,  1,  1 },
 };							       

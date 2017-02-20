@@ -1,0 +1,26 @@
+@BeginModule
+@NewPage
+@Name      = Samplegrid
+@Title     = Resample grid
+@Section   = Selection
+@Class     = Selection
+@Arguments = infile outfile
+@Operators = samplegrid
+
+@BeginDescription
+This is a special operator for resampling the horizontal grid.
+No interpolation takes place. Factor=2 mean every second grid point is removed.
+Only rectilinear and curvilinear source grids are supported by this operator.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_samplegrid
+@Title     = Resample grid
+@Parameter = resamplefactor
+@EndOperator
+
+@BeginParameter
+@Item = resamplefactor
+FLOAT   typically 2, which will half the resolution
+@EndParameter

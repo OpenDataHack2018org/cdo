@@ -426,9 +426,9 @@ static const char *DistgridHelp[] = {
     "    distgrid,nx[,ny]  infile obase",
     "",
     "DESCRIPTION",
-    "    This operator distributes a dataset into smaller pieces. Each output file contains a different region of the horizontal ",
-    "    source grid. A target grid region contains a structured longitude/latitude box of the source grid. Only rectilinear and",
-    "    curvilinear source grids are supported by this operator.",
+    "    This operator distributes a dataset into smaller pieces. Each output file contains a different region of the",
+    "    horizontal source grid. A target grid region contains a structured longitude/latitude box of the source grid.",
+    "    Only rectilinear and curvilinear source grids are supported by this operator.",
     "    The number of different regions can be specified with the parameter nx and ny. The output files will be named ",
     "    <obase><xxx><suffix> where suffix is the filename extension derived from the file format. xxx will have five digits with ",
     "    the number of the target region.",
@@ -645,7 +645,7 @@ static const char *SelboxHelp[] = {
     "    selindexbox,idx1,idx2,idy1,idy2  infile outfile",
     "",
     "DESCRIPTION",
-    "    Selects a box of the rectangularly understood field. All input fields need to have the same horizontal grid.",
+    "    Selects a box of the rectangularly understood field.",
     "",
     "OPERATORS",
     "    sellonlatbox  Select a longitude/latitude box",
@@ -665,6 +665,23 @@ static const char *SelboxHelp[] = {
     "    idx2  INTEGER  Index of last longitude",
     "    idy1  INTEGER  Index of first latitude",
     "    idy2  INTEGER  Index of last latitude",
+    NULL
+};
+
+static const char *SamplegridHelp[] = {
+    "NAME",
+    "    samplegrid - Resample grid",
+    "",
+    "SYNOPSIS",
+    "    samplegrid,resamplefactor  infile outfile",
+    "",
+    "DESCRIPTION",
+    "    This is a special operator for resampling the horizontal grid.",
+    "    No interpolation takes place. Factor=2 mean every second grid point is removed.",
+    "    Only rectilinear and curvilinear source grids are supported by this operator.",
+    "",
+    "PARAMETER",
+    "    resamplefactor  FLOAT   typically 2, which will half the resolution",
     NULL
 };
 

@@ -94,6 +94,7 @@ Operator catalog:
    Seltime       selsmon         Select single month
    Selbox        sellonlatbox    Select a longitude/latitude box
    Selbox        selindexbox     Select an index box
+   Samplegrid    samplegrid      Resample grid
 -------------------------------------------------------------
    Conditional selection
 -------------------------------------------------------------

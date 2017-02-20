@@ -8,7 +8,7 @@
 @Operators = sellonlatbox selindexbox
 
 @BeginDescription
-Selects a box of the rectangularly understood field. All input fields need to have the same horizontal grid.
+Selects a box of the rectangularly understood field.
 @EndDescription
 @EndModule
 

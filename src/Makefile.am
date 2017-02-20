@@ -300,7 +300,7 @@ cdo_SOURCES += Adisit.c        \
                Rotuv.c         \
                Runpctl.c       \
                Runstat.c       \
-               SampleGrid.c    \
+               Samplegrid.c    \
                Seascount.c     \
                Seaspctl.c      \
                Seasstat.c      \
