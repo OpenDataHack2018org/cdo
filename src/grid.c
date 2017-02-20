@@ -1208,7 +1208,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
   int ny = gridInqYsize(gridID1);
 
   bool lxyvals = gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL);
-  if ( !lxyvals ) cdoAbort("Grid coordinates missing!");
+  if ( !lxyvals && gridtype != GRID_LCC ) cdoAbort("Grid coordinates missing!");
 
   int gridsize = gridInqSize(gridID1);
   int gridID2 = gridCreate(GRID_CURVILINEAR, gridsize);
