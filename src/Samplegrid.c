@@ -22,8 +22,8 @@ void sampleData(double *array1, int gridID1, double *array2, int gridID2, int re
   long nlat2 = gridInqYsize(gridID2);
 
   if ( cdoDebugExt >= 100 )
-    cdoPrint("sampleData():: (nlon1: %d; nlat1: %d) => (nlon2: %d; nlat2: %d); gridID1: %d; gridID2: %d; resampleFactor: %d)",
-             nlon1,nlat1, nlon2,nlat2, gridID1, gridID2, resampleFactor);
+    cdoPrint("%s(): (nlon1: %d; nlat1: %d) => (nlon2: %d; nlat2: %d); gridID1: %d; gridID2: %d; resampleFactor: %d)",
+             __func__, nlon1, nlat1, nlon2,nlat2, gridID1, gridID2, resampleFactor);
 
   for ( long ilat1 = 0; ilat1 < nlat1; ilat1+=resampleFactor )
     for ( long ilon1 = 0; ilon1 < nlon1; ilon1+=resampleFactor )
@@ -35,12 +35,12 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
 {
   long nlon1 = gridInqXsize(gridID1);
   long nlon2 = gridInqXsize(gridID2);
-  long rowLen = subI1 - subI0 + 1; // must be same as   nlon1
+  long rowLen = subI1 - subI0 + 1; // must be same as nlon1
 
   if ( rowLen!= nlon2 )
     cdoAbort("cropData() rowLen!= nlon2 [%d != %d]", rowLen, nlon2);
 
-  if ( cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...\n", subI0, subI1, subJ0, subJ1 );
+  if ( cdoDebugExt>=10 ) cdoPrint("cropData(%d,%d,%d,%d) ...", subI0, subI1, subJ0, subJ1 );
 
   long array2Idx = 0;
   for ( long ilat1 = subJ0; ilat1 <= subJ1; ilat1++ ) // copy the last row as well..
@@ -63,7 +63,7 @@ void *Samplegrid(void *argument)
   typedef struct {
     int gridSrcID, gridIDsampled;
     int *cellidx, nvals;
-    int subI0,subI1, subJ0, subJ1;
+    int subI0, subI1, subJ0, subJ1;
   } sbox_t;
 
   cdoInitialize(argument);
@@ -132,14 +132,7 @@ void *Samplegrid(void *argument)
         }
       else if ( operatorID == SUBGRID )
         {
-          if ( gridtype != GRID_LCC )
-            cdoAbort("Unsupported grid type: %s; This works only with LCC grid. For other grids use: selindexbox", gridNamePtr(gridtype));
-
-          int gridIDcurvl = gridToCurvilinear(gridSrcID, 1);
-
-          gridIDsampled = cdo_define_subgrid_grid(gridSrcID, gridIDcurvl, subI0, subI1, subJ0, subJ1);
-          
-          gridDestroy(gridIDcurvl);
+          gridIDsampled = cdo_define_subgrid_grid(gridSrcID, subI0, subI1, subJ0, subJ1);
         }
 
       sbox[index].gridSrcID = gridSrcID;
