@@ -350,7 +350,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  ImportbinaryOperators  {"import_binary"}
 #define  ImportcmsafOperators   {"import_cmsaf"}
 #define  ImportobsOperators     {"import_obs"}
-#define  InfoOperators          {"info", "infop", "infon", "infoc", "map"}
+#define  InfoOperators          {"info", "infop", "infon", "infoc", "xinfon", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}

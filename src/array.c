@@ -20,6 +20,29 @@ const char *fpe_errstr(int fpeRaised)
 }
 
 
+int array_minmaxsum_val(size_t len, const double *array, double *rmin, double *rmax, double *rsum)
+{
+  double min = *rmin;
+  double max = *rmax;
+  double sum = *rsum;
+
+  // #pragma omp parallel for default(none) shared(min, max, array, gridsize) reduction(+:mean)
+  // #pragma omp simd reduction(+:mean) reduction(min:min) reduction(max:max) aligned(array:16)
+  for ( size_t i = 0; i < len; ++i )
+    {
+      if ( array[i] < min ) min = array[i];
+      if ( array[i] > max ) max = array[i];
+      sum += array[i];
+    }
+    
+  if ( rmin ) *rmin = min;
+  if ( rmax ) *rmax = max;
+  if ( rsum ) *rsum = sum;
+
+  return 0;
+}
+
+
 int array_minmaxmean_val(size_t len, const double *array, double *rmin, double *rmax, double *rmean)
 {
   int excepts = FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW;
