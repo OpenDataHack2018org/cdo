@@ -135,6 +135,8 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   int nlon2 = nlon21 + nlon22;
   int nlat2 = lat2 - lat1 + 1;
 
+  if ( cdoVerbose ) cdoPrint("nlon=%d nlat=%d", nlon2, nlat2);
+
   int gridtype = gridInqType(gridID1);
 
   int gridID2 = gridCreate(gridtype, nlon2*nlat2);
@@ -669,9 +671,6 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
 void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int nlon, nlat;
-  int temp;
-
   operatorCheckArgc(argc_offset+4);
 
   *lon11 = parameter2int(operatorArgv()[argc_offset+0]);
@@ -681,20 +680,20 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
 
   if ( *lat1 > *lat2 )
     {
-      temp = *lat1;
+      int temp = *lat1;
       *lat1 = *lat2;
       *lat2 = temp;
     }
 
-  nlon = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
+  int nlon = gridInqXsize(gridID1);
+  int nlat = gridInqYsize(gridID1);
 
   if ( *lat1 < 1 )
     {
       cdoWarning("First latitude index out of range, set to 1!");
       *lat1 = 1;
     }
-  if ( *lat2 > nlat )
+  if ( *lat1 > nlat )
     {
       cdoWarning("First latitude index out of range, set to %d!", nlat);
       *lat1 = nlat;
@@ -713,6 +712,16 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
     {
       cdoWarning("First longitude index out of range, set to 1!");
       *lon11 = 1;
+    }
+  if ( *lon11 > nlon )
+    {
+      cdoWarning("First longitude index out of range, set to %d!", nlon);
+      *lon11 = nlon;
+    }
+  if ( *lon12 < 1 )
+    {
+      cdoWarning("Last longitude index out of range, set to 1!");
+      *lon12 = 1;
     }
   if ( *lon12 > nlon+1 )
     {
