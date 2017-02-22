@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
 
+2017-02-22  Uwe Schulzweida
+
+	* option -k auto: set chunk_size_max to 128MB.
+
 2017-02-21  Uwe Schulzweida
 
 	* New operator xinfon:
