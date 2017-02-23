@@ -41,7 +41,6 @@
 
 void *Showinfo(void *argument)
 {
-  int zaxisID;
   int vdate, vtime;
   int nrecs;
   int nlevs, levelID;
@@ -65,6 +64,7 @@ void *Showinfo(void *argument)
   int SHOWLEVEL     = cdoOperatorAdd("showlevel",     0, 0, NULL);
   int SHOWLTYPE     = cdoOperatorAdd("showltype",     0, 0, NULL);
   int SHOWFORMAT    = cdoOperatorAdd("showformat",    0, 0, NULL);
+  int SHOWGRID      = cdoOperatorAdd("showgrid",      0, 0, NULL); 
 
   int operatorID = cdoOperatorID();
 
@@ -196,6 +196,18 @@ void *Showinfo(void *argument)
 	}
       fprintf(stdout, "\n");
     }
+  else if ( operatorID == SHOWGRID )  
+    {
+      fprintf(stdout, "# param nr | grid nr | z-axis nr:   /* Use in combination with operatores: griddes and zaxisdes */ \n");	  	  
+      for ( int varID = 0; varID < nvars; varID++ )
+	{
+	  int gridID  = vlistInqVarGrid(vlistID, varID);
+	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
+
+	  fprintf(stdout, "      %3d     %3d      %3d\n",
+                  vlistInqVarCode(vlistID, varID), vlistGridIndex(vlistID, gridID) + 1, vlistZaxisIndex(vlistID, zaxisID) + 1);
+	}
+    }    
   else if ( operatorID == SHOWUNIT )
     {
       char varunits[CDI_MAX_NAME];
@@ -251,7 +263,7 @@ void *Showinfo(void *argument)
     {
       for ( int varID = 0; varID < nvars; varID++ )
 	{
-	  zaxisID = vlistInqVarZaxis(vlistID, varID);
+	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
 	  nlevs = zaxisInqSize(zaxisID);
 	  for ( levelID = 0; levelID < nlevs; levelID++ )
 	    fprintf(stdout, " %.9g", cdoZaxisInqLevel(zaxisID, levelID));
@@ -263,7 +275,7 @@ void *Showinfo(void *argument)
       int nzaxis = vlistNzaxis(vlistID);
       for ( int index = 0; index < nzaxis; index++ )
 	{
-	  zaxisID = vlistZaxis(vlistID, index);
+	  int zaxisID = vlistZaxis(vlistID, index);
 
 	  ltype = zaxis2ltype(zaxisID);
 

@@ -433,7 +433,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  SetzaxisOperators      {"setzaxis", "genlevelbounds"}
 #define  ShiftxyOperators       {"shiftx", "shifty"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
-                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
+                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat", "showgrid"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
 #define  SmoothOperators        {"smooth", "smooth9"}
 #define  SortOperators          {"sortcode", "sortparam", "sortname", "sortlevel"}
