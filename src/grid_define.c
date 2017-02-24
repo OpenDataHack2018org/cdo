@@ -3,16 +3,131 @@
 #include "grid.h"
 
 /*
-@Function  define_sample_grid
+@Function  cdo_define_destagered_grid
+@Title     Define a de-staggered grid for U and V
+
+@Prototype int cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets)
+@Parameter
+    @Item  grid_u_stag       Staggered grid of u-wind component
+    @Item  grid_v_stag       Staggered grid of v-wind component
+    @Item  grid_uv_destag    Destaggered grid of uv-wind
+
+@Description
+The function @func{cdo_define_destagered_grid} defines a de-staggered grid for U and V
+
+@EndFunction
+*/
+int cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets)
+{
+/* Example of horizontal grids (Hirlam LAMH_D11):
+     U : lonlat       > size      : dim = 399300  nlon = 726  nlat = 550
+                        rlon      : first = -30.15  last = 42.35  inc = 0.1  degrees
+                        rlat      : first = -30.8  last = 24.1  inc = 0.1  degrees
+                        northpole : lon = -195  lat = 30
+     V : lonlat       > size      : dim = 399300  nlon = 726  nlat = 550
+                        rlon      : first = -30.2  last = 42.3  inc = 0.1  degrees
+                        rlat      : first = -30.75  last = 24.15  inc = 0.1  degrees
+                        northpole : lon = -195  lat = 30
+=>   RESULT:
+     R : lonlat       > size      : dim = 399300  nlon = 726  nlat = 550
+                        rlon      : first = -30.2  last = 42.3  inc = 0.1  degrees
+                        rlat      : first = -30.8  last = 24.1  inc = 0.1  degrees
+                        northpole : lon = -195  lat = 30
+*/
+  if ( cdoDebugExt )
+    cdoPrint("%s(gridID_u=%d,gridID_v=%d,destagGridOffsets(%02.1f,%02.1f)) ...\n",
+             __func__, gridID_u_stag, gridID_v_stag, destagGridOffsets[0],destagGridOffsets[1]);
+
+  if ( cdoDebugExt > 1 )
+    {
+      cdo_print_grid(gridID_u_stag, 1);
+      cdo_print_grid(gridID_v_stag, 1);
+    }
+
+  int gridtype = gridInqType(gridID_u_stag);
+  int xsize = gridInqXsize(gridID_u_stag);
+  int ysize = gridInqYsize(gridID_u_stag);
+
+  double xfirst_U = gridInqXval(gridID_u_stag, 0);   // staggered grid of u-wind
+  double yfirst_U = gridInqYval(gridID_u_stag, 0);
+  double xlast_U  = gridInqXval(gridID_u_stag, xsize-1);
+  double ylast_U  = gridInqYval(gridID_u_stag, ysize-1);
+  double xfirst_V = gridInqXval(gridID_v_stag, 0);   // staggered grid of v-wind
+  double yfirst_V = gridInqYval(gridID_v_stag, 0);
+  double xlast_V  = gridInqXval(gridID_v_stag, xsize-1);
+  double ylast_V  = gridInqYval(gridID_v_stag, ysize-1);
+  double xinc     = gridInqXinc(gridID_u_stag);
+  double yinc     = gridInqYinc(gridID_u_stag);
+
+  int gridID_uv_destag = gridDuplicate(gridID_u_stag);
+
+  // TODO
+  /*
+    grid_uv_destag->scanningMode          = grid_u_stag->scanningMode;
+    grid_uv_destag->iScansNegatively      = grid_u_stag->iScansNegatively;
+    grid_uv_destag->jScansPositively      = grid_u_stag->jScansPositively;
+    grid_uv_destag->jPointsAreConsecutive = grid_u_stag->jPointsAreConsecutive;
+    grid_uv_destag->uvRelativeToGrid      = grid_u_stag->uvRelativeToGrid;
+  */
+  cdo_print_grid(gridID_uv_destag, 1);
+
+  if ( cdoDebugExt )
+    {
+      cdoPrint("%s(): (gridXsize=%d, gridYsize=%d)", __func__, xsize, ysize);
+      cdoPrint("%s(): (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f)", __func__, xfirst_U, yfirst_U, xfirst_V, yfirst_V);
+      cdoPrint("%s(): (xlast_U  = %3.2f; ylast_U  = %3.2f); (xlast_V  = %3.2f; ylast_V  = %3.2f)", __func__, xlast_U, ylast_U, xlast_V, ylast_V);
+    }
+
+  double xfirst = 0, xlast = 0, yfirst = 0, ylast = 0;
+  if ( IS_EQUAL(destagGridOffsets[0], -0.5) && IS_EQUAL(destagGridOffsets[1], -0.5) )
+    {
+      xfirst =  xfirst_V;
+      xlast  =  xlast_V;
+      
+      yfirst =  yfirst_U;
+      ylast  =  ylast_U;
+    }
+  else if ( IS_EQUAL(destagGridOffsets[0], 0.5) && IS_EQUAL(destagGridOffsets[1], 0.5) )
+    {
+      xfirst =  xfirst_V + xinc*destagGridOffsets[0];
+      xlast  =  xlast_V  + xinc*destagGridOffsets[0];
+
+      yfirst =  yfirst_U + yinc*destagGridOffsets[1];
+      ylast  =  ylast_U  + yinc*destagGridOffsets[1];
+    }
+  else
+    cdoAbort("%s() Unsupported destaggered grid offsets! We support only: (-0.5,-0.5) or (0.5,0.5)", __func__);
+
+  double *xvals = (double *) Malloc(xsize*sizeof(double));
+  gridGenXvals(xsize, xfirst, xlast, xinc, xvals);
+  gridDefXvals(gridID_uv_destag, xvals);
+  Free(xvals);
+  
+  double *yvals = (double *) Malloc(ysize*sizeof(double));
+  gridGenYvals(gridtype, ysize, yfirst, ylast, yinc, yvals);
+  gridDefYvals(gridID_uv_destag, yvals);
+  Free(yvals);
+  
+  if ( cdoDebugExt )
+    {
+      cdoPrint("%s():", __func__);
+      cdo_print_grid(gridID_uv_destag, 1);
+    }
+
+  return gridID_uv_destag;
+}
+
+/*
+@Function  cdo_define_sample_grid
 @Title     Define a sampled grid of another grid
 
-@Prototype int define_sample_grid(int gridSrcID, int sampleFactor)
+@Prototype int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
 @Parameter
     @Item  gridSrcID       Source grid
     @Item  sampleFactor    sampleFactor; typically 2,3,4 ...
 
 @Description
-The function @func{define_sample_grid} defines a sampled grid of another grid
+The function @func{cdo_define_sample_grid} defines a sampled grid of another grid
 
 @EndFunction
 */
@@ -52,7 +167,7 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
             projection = northpole
 */
   if ( cdoDebugExt )
-    cdoPrint("cdo_define_sample_grid(gridSrcID=%d, sampleFactor=%d) ...", gridSrcID, sampleFactor);
+    cdoPrint("%s(gridSrcID=%d, sampleFactor=%d) ...", __func__, gridSrcID, sampleFactor);
 
   int gridtype = gridInqType(gridSrcID);
   if ( ! (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION ||
@@ -150,16 +265,16 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
 
 
 /*
-@Function  define_subgrid_grid
+@Function  cdo_define_subgrid_grid
 @Title     Define a sub-grid of another grid (LCC)
 
-@Prototype int define_subgrid_grid(int gridIDsrc, int subI0, int subI1, int subJ0, int subJ1)
+@Prototype int cdo_define_subgrid_grid(int gridIDsrc, int subI0, int subI1, int subJ0, int subJ1)
 @Parameter
     @Item  gridSrcID                    Source grid
     @Item  subI0,subI1, subJ0, subJ1    Sub-grid indices
 
 @Description
-The function @func{define_subgrid_grid} defines a sub-grid of another grid (LCC)
+The function @func{cdo_define_subgrid_grid} defines a sub-grid of another grid (LCC)
 
 @EndFunction
 */

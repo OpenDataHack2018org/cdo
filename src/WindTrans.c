@@ -316,8 +316,7 @@ void *DestaggerUV()
         /* define output grid */
         if ( gridID0 == -1 ) {
           if ( cdoDebugExt ) cdoPrint("Calling define_destagered_grid( destagGridOffsets = (%01.1f,%01.1f) )", destagGridOffsets[0],destagGridOffsets[1]);
-          // TODO gridID0 = define_destagered_grid(gridID1, gridID2, destagGridOffsets);
-          cdoAbort("Call to define_destagered_grid() missing.");
+          gridID0 = cdo_define_destagered_grid(gridID1, gridID2, destagGridOffsets);
         }
 
         if ( gridID0 == -1 ) cdoAbort(" Cannot define DESTAGGERED grid for U, V.");
