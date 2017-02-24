@@ -381,7 +381,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
       {
         int nd, ni, ni2, ni3;
         gridInqParamGME(gridID, &nd, &ni, &ni2, &ni3);
-        fprintf(fp, "ni        = %d\n", ni );
+        fprintf(fp, "ni        = %d\n", ni);
         break;
       }
    default:
@@ -409,6 +409,11 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
       printMask(fp, prefix, sizeof(prefix)-1, (size_t)(gridsize > 0 ? gridsize : 0), mask);
       if ( mask ) Free(mask);
     }
+
+  int uvRelativeToGrid = gridInqUvRelativeToGrid(gridID);
+  if ( uvRelativeToGrid > 0 )
+    fprintf(fp, "uvRelativeToGrid = %d\n", uvRelativeToGrid);
+    
 
   int projID = gridInqProj(gridID);
   if ( projID != CDI_UNDEFID && gridInqType(projID) == GRID_PROJECTION )

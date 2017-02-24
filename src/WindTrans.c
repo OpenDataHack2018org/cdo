@@ -321,7 +321,7 @@ void *DestaggerUV()
 
         if ( gridID0 == -1 ) cdoAbort(" Cannot define DESTAGGERED grid for U, V.");
 
-        // TODO if ( cdoDebugExt>=10 ) gridPrint(gridID0, 1,0);
+        if ( cdoDebugExt>=10 ) cdo_print_grid(gridID0, 1);
 
         xfirst_R =gridInqXval(gridID0,0);   // reference grid for non-staggered fields (default: search for temperature; otherwise: create a new grid)
         yfirst_R =gridInqYval(gridID0,0);
@@ -910,8 +910,7 @@ void *TransformUV(int operatorID)
                             cdoPrint("LAT-LON grid created.");
                     }// end of if (gridIDcurvl==-1)
                 }// end of if (operatorID != ROTUVN)
-                // TODO int uvRelativeFlag  = gridInqUvRelativeToGrid(gridID);
-                int uvRelativeFlag  = 1;
+                int uvRelativeFlag  = gridInqUvRelativeToGrid(gridID);
                 if (uvRelativeFlag!=1)
                 {
                     cdoPrint("NOTICE: grid with id:%d has NOT uv relative to grid.", gridID);

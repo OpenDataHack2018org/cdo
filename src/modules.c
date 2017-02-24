@@ -569,7 +569,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 
 // HIRLAM_EXTENSIONS
 #define  SelmultiOperators      {"selmulti", "delmulti", "changemulti"}
-#define  WindTransOperators     {"uvDestag", "rotuvN","rotuvNorth", "projuvLatLon"}
+#define  WindTransOperators     {"uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"}
 #define  SamplegridOperators    {"samplegrid", "subgrid"}
 
 
