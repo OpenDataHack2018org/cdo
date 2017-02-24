@@ -62,6 +62,7 @@ void *Setgrid(void *argument)
   int UNSETGRIDMASK = cdoOperatorAdd("unsetgridmask", 0, 0, NULL);
   int SETGRIDNUMBER = cdoOperatorAdd("setgridnumber", 0, 0, "grid number and optionally grid position");
   int SETGRIDURI    = cdoOperatorAdd("setgriduri",    0, 0, "reference URI of the horizontal grid");
+  int USEGRIDNUMBER = cdoOperatorAdd("usegridnumber", 0, 0, "use existing grid identified by grid number");
 
   int operatorID = cdoOperatorID();
 
@@ -152,6 +153,11 @@ void *Setgrid(void *argument)
       for ( int i = 0; i < masksize; i++ )
 	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
     }
+  else if ( operatorID == USEGRIDNUMBER )
+    {
+      operatorCheckArgc(1);
+      number = parameter2int(operatorArgv()[0]);
+    }
   else if ( operatorID == SETGRIDNUMBER )
     {
       if ( operatorArgc() >= 1 && operatorArgc() <= 2 )
@@ -195,7 +201,7 @@ void *Setgrid(void *argument)
 	}
       if ( ! found ) cdoWarning("No grid with %d points found!", gridInqSize(gridID2));
     }
-  else if ( operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI )
+  else if ( operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI || operatorID == USEGRIDNUMBER )
     {
       int gridID1 = vlistGrid(vlistID1, 0);
 
@@ -205,6 +211,13 @@ void *Setgrid(void *argument)
 	  gridDefNumber(gridID2, number);
 	  gridDefPosition(gridID2, position);
 	}
+      else if ( operatorID == USEGRIDNUMBER ) 
+        {
+	  if ( number < 1 || number > vlistNgrids(vlistID1) )
+	    cdoAbort("Invalid grid number: %d (max = %d)!", number, vlistNgrids(vlistID1));
+          
+	  gridID2 = vlistGrid(vlistID1, number-1);
+        }
       else
 	{
 	  gridID2 = gridDuplicate(gridID1);
