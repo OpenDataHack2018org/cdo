@@ -69,10 +69,10 @@ int cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *des
     grid_uv_destag->jPointsAreConsecutive = grid_u_stag->jPointsAreConsecutive;
     grid_uv_destag->uvRelativeToGrid      = grid_u_stag->uvRelativeToGrid;
   */
-  cdo_print_grid(gridID_uv_destag, 1);
-
   if ( cdoDebugExt )
     {
+      cdo_print_grid(gridID_uv_destag, 1);
+
       cdoPrint("%s(): (gridXsize=%d, gridYsize=%d)", __func__, xsize, ysize);
       cdoPrint("%s(): (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f)", __func__, xfirst_U, yfirst_U, xfirst_V, yfirst_V);
       cdoPrint("%s(): (xlast_U  = %3.2f; ylast_U  = %3.2f); (xlast_V  = %3.2f; ylast_V  = %3.2f)", __func__, xlast_U, ylast_U, xlast_V, ylast_V);
