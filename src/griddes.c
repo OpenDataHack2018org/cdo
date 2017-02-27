@@ -63,6 +63,8 @@ void gridInit(griddes_t *grid)
   grid->def_lat1      = false;
   grid->def_lat2      = false;
 
+  grid->uvRelativeToGrid = 0;
+
   grid->a             = 0;
   grid->lon_0         = 0;
   grid->lat_0         = 0;
@@ -142,7 +144,6 @@ int getoptname(char *optname, const char *optstring, int nopt)
 int gridDefine(griddes_t grid)
 {
   int gridID = CDI_UNDEFID;
-  int i;
 
   switch ( grid.type )
     {
@@ -173,6 +174,9 @@ int gridDefine(griddes_t grid)
 
 	gridDefPrec(gridID, grid.prec);
 
+        if ( grid.uvRelativeToGrid ) gridDefUvRelativeToGrid(gridID, 1);
+	if ( grid.nvertex ) gridDefNvertex(gridID, grid.nvertex);
+
 	if ( (grid.def_xfirst || grid.def_xlast || grid.def_xinc) && grid.xvals == NULL )
 	  {
 	    grid.xvals = (double*) Malloc(grid.xsize*sizeof(double));
@@ -182,7 +186,7 @@ int gridDefine(griddes_t grid)
 	      {
 		grid.nvertex = 2;
 		grid.xbounds = (double*) Malloc(grid.xsize*grid.nvertex*sizeof(double));
-		for ( i = 0; i < (int) grid.xsize-1; i++ )
+		for ( int i = 0; i < (int) grid.xsize-1; i++ )
 		  {
 		    grid.xbounds[2*i+1]   = 0.5*(grid.xvals[i] + grid.xvals[i+1]);
 		    grid.xbounds[2*(i+1)] = 0.5*(grid.xvals[i] + grid.xvals[i+1]);
@@ -202,7 +206,7 @@ int gridDefine(griddes_t grid)
 	      {
 		grid.nvertex = 2;
 		grid.ybounds = (double*) Malloc(grid.ysize*grid.nvertex*sizeof(double));
-		for ( i = 0; i < (int) grid.ysize-1; i++ )
+		for ( int i = 0; i < (int) grid.ysize-1; i++ )
 		  {
 		    grid.ybounds[2*i+1]   = 0.5*(grid.yvals[i] + grid.yvals[i+1]);
 		    grid.ybounds[2*(i+1)] = 0.5*(grid.yvals[i] + grid.yvals[i+1]);
@@ -221,38 +225,11 @@ int gridDefine(griddes_t grid)
 	      }
 	  }
 
-	if ( grid.xvals )
-	  {
-	    gridDefXvals(gridID, grid.xvals);
-	    Free(grid.xvals);
-	  }
-
-	if ( grid.yvals )
-	  {
-	    gridDefYvals(gridID, grid.yvals);
-	    Free(grid.yvals);
-	  }
-
-	if ( grid.nvertex )
-	  gridDefNvertex(gridID, grid.nvertex);
-
-	if ( grid.xbounds )
-	  {
-	    gridDefXbounds(gridID, grid.xbounds);
-	    Free(grid.xbounds);
-	  }
-
-	if ( grid.ybounds )
-	  {
-	    gridDefYbounds(gridID, grid.ybounds);
-	    Free(grid.ybounds);
-	  }
-
-	if ( grid.mask )
-	  {
-	    gridDefMask(gridID, grid.mask);
-	    Free(grid.mask);
-	  }
+	if ( grid.xvals )   { gridDefXvals(gridID, grid.xvals); Free(grid.xvals); }
+	if ( grid.yvals )   { gridDefYvals(gridID, grid.yvals); Free(grid.yvals); }
+	if ( grid.xbounds ) { gridDefXbounds(gridID, grid.xbounds); Free(grid.xbounds); }
+	if ( grid.ybounds ) { gridDefYbounds(gridID, grid.ybounds); Free(grid.ybounds); }
+	if ( grid.mask )    { gridDefMask(gridID, grid.mask); Free(grid.mask); }
 
 	break;
       }
@@ -260,12 +237,7 @@ int gridDefine(griddes_t grid)
     case GRID_UNSTRUCTURED:
       {
 	if ( grid.size == 0 )
-	  {
-	    if ( grid.type == GRID_CURVILINEAR )
-	      grid.size = grid.xsize*grid.ysize;
-	    else
-	      grid.size = grid.xsize;
-	  }
+          grid.size = (grid.type == GRID_CURVILINEAR) ? grid.xsize*grid.ysize : grid.xsize;
 
 	gridID = gridCreate(grid.type, grid.size);
 
@@ -289,41 +261,12 @@ int gridDefine(griddes_t grid)
 	    if ( *grid.path ) gridDefReference(gridID, grid.path);
 	  }
 
-	if ( grid.xvals )
-	  {
-	    gridDefXvals(gridID, grid.xvals);
-	    Free(grid.xvals);
-	  }
-
-	if ( grid.yvals )
-	  {
-	    gridDefYvals(gridID, grid.yvals);
-	    Free(grid.yvals);
-	  }
-
-	if ( grid.area )
-	  {
-	    gridDefArea(gridID, grid.area);
-	    Free(grid.area);
-	  }
-
-	if ( grid.xbounds )
-	  {
-	    gridDefXbounds(gridID, grid.xbounds);
-	    Free(grid.xbounds);
-	  }
-
-	if ( grid.ybounds )
-	  {
-	    gridDefYbounds(gridID, grid.ybounds);
-	    Free(grid.ybounds);
-	  }
-
-	if ( grid.mask )
-	  {
-	    gridDefMask(gridID, grid.mask);
-	    Free(grid.mask);
-	  }
+	if ( grid.xvals )   { gridDefXvals(gridID, grid.xvals); Free(grid.xvals); }
+	if ( grid.yvals )   { gridDefYvals(gridID, grid.yvals); Free(grid.yvals); }
+	if ( grid.area )    { gridDefArea(gridID, grid.area); Free(grid.area); }
+	if ( grid.xbounds ) { gridDefXbounds(gridID, grid.xbounds); Free(grid.xbounds); }
+	if ( grid.ybounds ) { gridDefYbounds(gridID, grid.ybounds); Free(grid.ybounds); }
+	if ( grid.mask )    { gridDefMask(gridID, grid.mask); Free(grid.mask); }
 
 	break;
       }
@@ -337,7 +280,6 @@ int gridDefine(griddes_t grid)
 	gridID = gridCreate(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
-
 	gridDefXsize(gridID, grid.xsize);
 	gridDefYsize(gridID, grid.ysize);
 
@@ -352,11 +294,9 @@ int gridDefine(griddes_t grid)
 	gridDefParamLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
 		   grid.lat1, grid.lat2, grid.xinc, grid.yinc, grid.projflag, grid.scanflag);
 
-	if ( grid.mask )
-	  {
-	    gridDefMask(gridID, grid.mask);
-	    Free(grid.mask);
-	  }
+        if ( grid.uvRelativeToGrid ) gridDefUvRelativeToGrid(gridID, 1);
+
+	if ( grid.mask ) { gridDefMask(gridID, grid.mask); Free(grid.mask); }
 
 	break;
       }
@@ -370,9 +310,7 @@ int gridDefine(griddes_t grid)
 	gridID = gridCreate(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
-
 	gridDefTrunc(gridID, grid.ntr);
-
 	gridDefComplexPacking(gridID, grid.lcomplex);
 
 	break;
@@ -386,14 +324,9 @@ int gridDefine(griddes_t grid)
 	gridID = gridCreate(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
-
 	gridDefParamGME(gridID, grid.nd, grid.ni, grid.ni2, grid.ni3);
 	
-	if ( grid.mask )
-	  {
-	    gridDefMask(gridID, grid.mask);
-	    Free(grid.mask);
-	  }
+	if ( grid.mask ) { gridDefMask(gridID, grid.mask); Free(grid.mask); }
 
 	break;
       }
