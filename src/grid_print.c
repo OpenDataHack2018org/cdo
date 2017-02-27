@@ -334,6 +334,11 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
             Free(rowlon);
           }
 
+
+        int uvRelativeToGrid = gridInqUvRelativeToGrid(gridID);
+        if ( uvRelativeToGrid > 0 )
+          fprintf(fp, "uvRelativeToGrid = %d\n", uvRelativeToGrid);
+
         if ( type == GRID_PROJECTION )
           {
             attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, attstr);
@@ -364,7 +369,13 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
                 dig, originLon, dig, originLat, dig, lonParY,
                 dig, lat1, dig, lat2, dig, xincm, dig, yincm,
                 (projflag & 128) == 0 ? "northpole" : "southpole");
-	break;
+
+
+        int uvRelativeToGrid = gridInqUvRelativeToGrid(gridID);
+        if ( uvRelativeToGrid > 0 )
+          fprintf(fp, "uvRelativeToGrid = %d\n", uvRelativeToGrid);
+
+        break;
       }
     case GRID_SPECTRAL:
       {
@@ -408,12 +419,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
       static const char prefix[] = "mask      = ";
       printMask(fp, prefix, sizeof(prefix)-1, (size_t)(gridsize > 0 ? gridsize : 0), mask);
       if ( mask ) Free(mask);
-    }
-
-  int uvRelativeToGrid = gridInqUvRelativeToGrid(gridID);
-  if ( uvRelativeToGrid > 0 )
-    fprintf(fp, "uvRelativeToGrid = %d\n", uvRelativeToGrid);
-    
+    }    
 
   int projID = gridInqProj(gridID);
   if ( projID != CDI_UNDEFID && gridInqType(projID) == GRID_PROJECTION )

@@ -26,6 +26,7 @@ typedef struct {
   bool    def_lonParY;
   bool    def_lat1;
   bool    def_lat2;
+  bool    uvRelativeToGrid;
   double  a;
   double  lon_0;
   double  lat_0;

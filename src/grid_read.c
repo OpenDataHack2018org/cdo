@@ -133,11 +133,12 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
       else if ( STR_IS_EQ(key, "lat_0") )     { grid->lat_0 = parameter2double(value); grid->def_lat_0 = true; }
       else if ( STR_IS_EQ(key, "lat_1") )     { grid->lat_1 = parameter2double(value); grid->def_lat_1 = true; }
       else if ( STR_IS_EQ(key, "lat_2") )     { grid->lat_2 = parameter2double(value); grid->def_lat_2 = true; }
-      else if ( STR_IS_EQ(key, "a") )         grid->a = parameter2double(value);
+      else if ( STR_IS_EQ(key, "a") )                 grid->a = parameter2double(value);
+      else if ( STR_IS_EQ(key, "uvRelativeToGrid") )  grid->uvRelativeToGrid = parameter2bool(value);
       else if ( STR_IS_EQ(key, "projection") )
         {
-          if      ( STR_IS_EQ(value, "north") ) { grid->projflag = 0;    grid->scanflag = 64; }
-	  else if ( STR_IS_EQ(value, "south") ) { grid->projflag = 128;  grid->scanflag = 64; }
+          if      ( STR_IS_EQ(value, "northpole") ) { grid->projflag = 0;    grid->scanflag = 64; }
+	  else if ( STR_IS_EQ(value, "southpole") ) { grid->projflag = 128;  grid->scanflag = 64; }
 	  else cdoAbort("Invalid projection : %s (grid description file: %s)", value, dname);
         }
       else if ( STR_IS_EQ(key, "xvals") )
