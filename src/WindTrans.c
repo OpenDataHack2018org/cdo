@@ -35,11 +35,7 @@
 
 /*
 extern int cdoGribDataScanningMode; // -1: not used; allowed modes: <0, 64, 96>; Default is 64
-
-int define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *destagGridOffsets);
 */
-
-void *DestaggerUV();
 
 void destaggerUorV(double *fu, double *fuOut,
                    int klev, int nlat, int nlon, int UorV, long int offset);
@@ -66,87 +62,82 @@ int ROTUVNORTH;
 int ROTUVN;            // Fixed version of rotuvb operator !
 int PROJUVLATLON;
 
+static
 void *DestaggerUV()
 {
-    int streamID1, streamID2;
-    int nrecs, nvars;
-    int tsID, recID, varID, levelID;
-    int varID1 = -1, varID2 = -1;
-    int zaxisID1 = -1, zaxisID2 = -1;
-    int varID1stg = -1, varID2stg = -1;
-    int level, gridsize;
-    int lvar = FALSE;
-    int i, nch;
-    int chcodes[MAXARG];
-    char *chvars[MAXARG];
-    char varname[CDI_MAX_NAME];
-    double destagGridOffsets[MAXARG];
-    int index, ngrids;
-    int vlistID1, vlistID2;
-    int gridID1 = -1, gridID2 = -1;
-    int gridID0 = -1;
-    int gridID;
-    int nmiss;
-    int lcopy = FALSE;
-    int UorV;
-    int taxisID1, taxisID2;
-    int nlon = 0, nlat = 0, ntr = -1;
-    int code, param;
-    int zaxisID, ltype, nlevs;
-    int pnum, pcat, pdis;
-    double *ivar = NULL, *ovar = NULL;
-    double dxU = 0, dyU = 0, dxV = 0, dyV = 0;
+  int nrecs;
+  int recID, varID, levelID;
+  int varID1 = -1, varID2 = -1;
+  int zaxisID1 = -1, zaxisID2 = -1;
+  int varID1stg = -1, varID2stg = -1;
+  int level, gridsize;
+  int i;
+  int chcodes[MAXARG];
+  char *chvars[MAXARG];
+  char varname[CDI_MAX_NAME];
+  double destagGridOffsets[MAXARG];
+  int index;
+  int gridID1 = -1, gridID2 = -1;
+  int gridID0 = -1;
+  int gridID;
+  int nmiss;
+  int lcopy = FALSE;
+  int UorV;
+  int nlon = 0, nlat = 0, ntr = -1;
+  int code, param;
+  int zaxisID, ltype, nlevs;
+  int pnum, pcat, pdis;
+  double *ivar = NULL, *ovar = NULL;
+  double dxU = 0, dyU = 0, dxV = 0, dyV = 0;
 
-    //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
+  //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
 
-    operatorInputArg("Pair of u and v in the staggered system:\n\
-    Usage: uvDestag,u,v -or- uvDestag,33,34 -or- uvDestag,u,v,-0.5,-0.5 -or- uvDestag,33,34,-0.5,-0.5\n\
-    Destaggered grid offsets <,-/+0.5,-/+0.5> are optional.\n\
+  operatorInputArg("Pair of u and v in the staggered system:\n\
+    Usage: uvDestag,u,v -or- uvDestag,33,34 -or- uvDestag,u,v,-0.5,-0.5 -or- uvDestag,33,34,-0.5,-0.5\n \
+    Destaggered grid offsets <,-/+0.5,-/+0.5> are optional.\n           \
     If file contains grid with temperature (name='t' or code=11) then grid_temp will be used for destaggered wind.");
 
-    if ( cdoDebugExt ) cdoPrint("UVDESTAG (destaggering) requested)..");
+  if ( cdoDebugExt ) cdoPrint("UVDESTAG (destaggering) requested)..");
 
-    nch = operatorArgc();
-    if ( nch<2 ) cdoAbort("Number of input arguments < 2; At least 2 arguments needed: uvDestag,33,34<,-0.5,-0.5> optional");
-    if ( nch>=MAXARG ) cdoAbort("Number of input arguments >= %d", MAXARG);
+  int nch = operatorArgc();
+  if ( nch<2 ) cdoAbort("Number of input arguments < 2; At least 2 arguments needed: uvDestag,33,34<,-0.5,-0.5> optional");
+  if ( nch>=MAXARG ) cdoAbort("Number of input arguments >= %d", MAXARG);
 
-    if ( isdigit(*operatorArgv()[0]) )
+  bool lvar = false;
+  if ( isdigit(*operatorArgv()[0]) )
     {
-        lvar = FALSE;  // We have a list of codes
-        for ( i = 0; i < nch; i++ )
-            chcodes[i] = atoi(operatorArgv()[i]);
+      lvar = false;  // We have a list of codes
+      for ( int i = 0; i < 2; i++ ) chcodes[i] = parameter2int(operatorArgv()[i]);
     }
-    else
+  else
     {
-        lvar = TRUE;  // We have a list of variables
-        for ( i = 0; i < nch; i++ )
-            chvars[i] = operatorArgv()[i];
+      lvar = true;  // We have a list of variables
+      for ( int i = 0; i < 2; i++ ) chvars[i] = operatorArgv()[i];
     }
 
+  destagGridOffsets[0] = -0.5;
+  destagGridOffsets[1] = -0.5;
 
-    destagGridOffsets[0] = -0.5;
-    destagGridOffsets[1] = -0.5;
+  if ( nch > 2 )
+    {
+      for ( int i = 2; i < (2+2); i++ )
+        destagGridOffsets[i-2] = parameter2double(operatorArgv()[i]);
+    }
 
-    if ( nch>2 )
-      {
-        for ( i = 2; i < (2+2); i++ )
-          destagGridOffsets[i-2] = atof(operatorArgv()[i]);
-      }
+  if ( cdoDebugExt ) cdoPrint("destagGridOffsets = (%01.1f,%01.1f)", destagGridOffsets[0],destagGridOffsets[1]);
 
-    if ( cdoDebugExt ) cdoPrint("destagGridOffsets = (%01.1f,%01.1f)", destagGridOffsets[0],destagGridOffsets[1]);
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-    streamID1 = streamOpenRead(cdoStreamName(0));
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
 
-    vlistID1 = streamInqVlist(streamID1);
-    vlistID2 = vlistDuplicate(vlistID1);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
 
-    taxisID1 = vlistInqTaxis(vlistID1);
-    taxisID2 = taxisDuplicate(taxisID1);
-    vlistDefTaxis(vlistID2, taxisID2);
-
-    // Find the first occurance of staggered U and V variables (for example codes 33,34).
-    // We assume that one (grib-)file contains only 1 sort of horizontal grids and at most 2 staggered grids.
-    /*
+  // Find the first occurance of staggered U and V variables (for example codes 33,34).
+  // We assume that one (grib-)file contains only 1 sort of horizontal grids and at most 2 staggered grids.
+  /*
     [Hirlam/hip_work] >cdo sinfo LAMH_D11_201302150000_00000_GB_only_UV
     File format: GRIB
     -1 : Institut Source   Param       Ttype   Dtype  Gridsize Num  Levels Num
@@ -184,14 +175,14 @@ void *DestaggerUV()
      4 : meansea            level : 0
      5 : pressure              Pa : 5000 10000 20000 25000 30000 40000 50000 70000
                                     85000 92500 100000
-    */
-    int VarIsU,VarIsV;
-    int VarsUVareStaggered;
+  */
+  int VarIsU,VarIsV;
+  int VarsUVareStaggered;
 
-    // NOTE: Variable with codes (3[3,4],105,10) will get from CDO typically a name: "10u", resp. "10v"
-    // Mostly u & v at level type 105 is not staggered, but test it to be sure..
+  // NOTE: Variable with codes (3[3,4],105,10) will get from CDO typically a name: "10u", resp. "10v"
+  // Mostly u & v at level type 105 is not staggered, but test it to be sure..
 
-    #define CheckVarIsU(varID,varname,code) {\
+#define CheckVarIsU(varID,varname,code) {       \
     VarIsU = 0;\
     if ( lvar ) {\
         if ( strcmp((char*)(varname), (char*)(chvars)[0]) == 0 ) VarIsU = 1;\
@@ -200,7 +191,7 @@ void *DestaggerUV()
     } else \
         if ( code == chcodes[0] ) VarIsU = 1;\
     }
-    #define CheckVarIsV(varID,varname,code) {\
+#define CheckVarIsV(varID,varname,code) {       \
     VarIsV = 0;\
     if ( lvar ) {\
         if ( strcmp((char*)(varname), (char*)(chvars)[1]) == 0 ) VarIsV = 1;\
@@ -209,7 +200,7 @@ void *DestaggerUV()
     } else \
         if ( code == chcodes[1] ) VarIsV = 1;\
     }
-    #define CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2) {\
+#define CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2) { \
     VarsUVareStaggered = 1;\
     int gridID1tmp = vlistInqVarGrid(vlistID1, varID1);\
     int gridID2tmp = vlistInqVarGrid(vlistID1, varID2);\
@@ -218,314 +209,312 @@ void *DestaggerUV()
     if (gridID1tmp==gridID2tmp) VarsUVareStaggered = 0;\
     }
 
-    // Search for staggered u and v wind:
-    nvars = vlistNvars(vlistID1);
-    for ( varID = 0; varID < nvars; varID++ )
+  // Search for staggered u and v wind:
+  int nvars = vlistNvars(vlistID1);
+  for ( varID = 0; varID < nvars; varID++ )
     {
-        param = vlistInqVarParam(vlistID1, varID);  /*  vlistInqVarParam(int vlistID, int varID): Get the parameter number of a Variable */
-        cdiDecodeParam(param, &pnum, &pcat, &pdis);
-        code = pnum;
-        zaxisID = vlistInqVarZaxis(vlistID1, varID);
-        ltype   = zaxis2ltype(zaxisID);
-        nlevs   = zaxisInqSize(zaxisID);
-        vlistInqVarName(vlistID1, varID, varname); /* vlistInqVarName(int vlistID, int varID, char *name): Get the name of a Variable */
-        int gridIDx = vlistInqVarGrid(vlistID1, varID);
-        strtolower(varname);
-        if ( cdoDebugExt>=20 ) cdoPrint("Var.id [%4d] with grib code:3%d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",varID, code, varname, ltype, nlevs, gridIDx, zaxisID);
+      param = vlistInqVarParam(vlistID1, varID);  /*  vlistInqVarParam(int vlistID, int varID): Get the parameter number of a Variable */
+      cdiDecodeParam(param, &pnum, &pcat, &pdis);
+      code = pnum;
+      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      ltype   = zaxis2ltype(zaxisID);
+      nlevs   = zaxisInqSize(zaxisID);
+      vlistInqVarName(vlistID1, varID, varname); /* vlistInqVarName(int vlistID, int varID, char *name): Get the name of a Variable */
+      int gridIDx = vlistInqVarGrid(vlistID1, varID);
+      strtolower(varname);
+      if ( cdoDebugExt>=20 ) cdoPrint("Var.id [%4d] with grib code:3%d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",varID, code, varname, ltype, nlevs, gridIDx, zaxisID);
 
-        CheckVarIsU(varID,varname,code);
-        CheckVarIsV(varID,varname,code);
-        if (VarIsU) { varID1 = varID; zaxisID1 = zaxisID; }
-        else
-            if (VarIsV) { varID2 = varID; zaxisID2 = zaxisID; }
+      CheckVarIsU(varID,varname,code);
+      CheckVarIsV(varID,varname,code);
+      if      (VarIsU) { varID1 = varID; zaxisID1 = zaxisID; }
+      else if (VarIsV) { varID2 = varID; zaxisID2 = zaxisID; }
 
-        if ( (varID1stg == -1) && (varID2stg == -1) )
-            if ( (varID1 != -1) && (varID2 != -1) )
-            {
-                CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2);
-                if (VarsUVareStaggered) {
-                    gridID1 = vlistInqVarGrid(vlistID1, varID1);
-                    gridID2 = vlistInqVarGrid(vlistID1, varID2);
-                    if ( cdoDebugExt ) cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",varID1,gridID2, varID2, gridID1);
-                    varID1stg = varID1;
-                    varID2stg = varID2;
-                }
+      if ( (varID1stg == -1) && (varID2stg == -1) )
+        if ( (varID1 != -1) && (varID2 != -1) )
+          {
+            CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2);
+            if (VarsUVareStaggered) {
+              gridID1 = vlistInqVarGrid(vlistID1, varID1);
+              gridID2 = vlistInqVarGrid(vlistID1, varID2);
+              if ( cdoDebugExt ) cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",varID1, gridID2, varID2, gridID1);
+              varID1stg = varID1;
+              varID2stg = varID2;
             }
-        /* search for a reference (non-staggered) grid */
-        // We take temperature for example as the new (horizontal) grid for de-staggered uv
-        // If there will be no temperature field we will define grid the grid
-        if ( lvar )  // We have a list of variables
+          }
+      /* search for a reference (non-staggered) grid */
+      // We take temperature for example as the new (horizontal) grid for de-staggered uv
+      // If there will be no temperature field we will define grid the grid
+      if ( lvar )  // We have a list of variables
         {
-            if ( strcmp(varname, "t") == 0 ) gridID0 = vlistInqVarGrid(vlistID1, varID);
+          if ( strcmp(varname, "t") == 0 ) gridID0 = vlistInqVarGrid(vlistID1, varID);
         }
-        else
+      else
         {
-            if ( code == 11 ) gridID0 = vlistInqVarGrid(vlistID1, varID);
+          if ( code == 11 ) gridID0 = vlistInqVarGrid(vlistID1, varID);
         }
     } // end of for ( varID = 0; varID < nvars; ..
 
-    if (gridID0>=0)
-        if ( cdoDebugExt ) cdoPrint("Found DESTAGGERED grid for U, V: gridID0=%d",gridID0);
+  if (gridID0>=0)
+    if ( cdoDebugExt ) cdoPrint("Found DESTAGGERED grid for U, V: gridID0=%d",gridID0);
 
-    if ( (varID1stg == -1) && (varID2stg == -1 ) )
+  if ( (varID1stg == -1) && (varID2stg == -1 ) )
     {
-        cdoPrint("NOTE: We did not find any staggered U,V wind components. Performing file-copy.");
-        lcopy = TRUE;
-        gridID0 = gridID1;
+      cdoPrint("NOTE: We did not find any staggered U,V wind components. Performing file-copy.");
+      lcopy = TRUE;
+      gridID0 = gridID1;
     }
 
-    ngrids = vlistNgrids(vlistID1);
-    /*
+  int ngrids = vlistNgrids(vlistID1);
+  /*
     #define  GRID_LONLAT              4  // Regular longitude/latitude grid
     #define  GRID_LCC                11  // Lambert Conformal Conic (GRIB)
 
     #define  GRID_GAUSSIAN            2  // Regular Gaussian lon/lat grid
     #define  GRID_GAUSSIAN_REDUCED    3  // Reduced Gaussian lon/lat grid
+  */
 
-    */
+  double xincU     = gridInqXinc(gridID1);
+  double yincU     = gridInqXinc(gridID1);
+  double xincV     = gridInqXinc(gridID2);
+  double yincV     = gridInqXinc(gridID2);
 
-    double xincU     = gridInqXinc(gridID1);
-    double yincU     = gridInqXinc(gridID1);
-    double xincV     = gridInqXinc(gridID2);
-    double yincV     = gridInqXinc(gridID2);
-
-    if (!lcopy)
+  if (!lcopy)
     {
-        if ( gridInqXsize(gridID1)!=gridInqXsize(gridID2) )  cdoAbort("Xsize(gridID1) != Xsize(gridID2)");
-        if ( gridInqYsize(gridID1)!=gridInqYsize(gridID2) )  cdoAbort("Ysize(gridID1) != Ysize(gridID2)");
-        if ( gridInqTrunc(gridID1)!=gridInqTrunc(gridID2) )  cdoAbort("Trunc(gridID1) != Trunc(gridID2)");
+      if ( gridInqXsize(gridID1)!=gridInqXsize(gridID2) )  cdoAbort("Xsize(gridID1) != Xsize(gridID2)");
+      if ( gridInqYsize(gridID1)!=gridInqYsize(gridID2) )  cdoAbort("Ysize(gridID1) != Ysize(gridID2)");
+      if ( gridInqTrunc(gridID1)!=gridInqTrunc(gridID2) )  cdoAbort("Trunc(gridID1) != Trunc(gridID2)");
+      
+      nlon = gridInqXsize(gridID1);
+      nlat = gridInqYsize(gridID1);
+      ntr  = gridInqTrunc(gridID1);
 
-        nlon = gridInqXsize(gridID1);
-        nlat = gridInqYsize(gridID1);
-        ntr  = gridInqTrunc(gridID1);
+      double xfirst_R;
+      double yfirst_R;
+      double xfirst_U;
+      double yfirst_U;
+      double xfirst_V;
+      double yfirst_V;
 
-        double xfirst_R;
-        double yfirst_R;
-        double xfirst_U;
-        double yfirst_U;
-        double xfirst_V;
-        double yfirst_V;
-
-        if ( (gridInqType(gridID1) != GRID_LONLAT) || (gridInqType(gridID2) != GRID_LONLAT) )
+      if ( (gridInqType(gridID1) != GRID_LONLAT) || (gridInqType(gridID2) != GRID_LONLAT) )
         {
-            cdoPrint("U - wind: Grid nr. %d is gridtype: %d (%s)", gridID1, gridInqType(gridID1), gridNamePtr(gridInqType(gridID1)));
-            cdoPrint("V - wind: Grid nr. %d is gridtype: %d (%s)", gridID2, gridInqType(gridID2), gridNamePtr(gridInqType(gridID2)));
-            cdoAbort("Destaggering supports only grid type = 'lonlat' (GRID_LONLAT).");
+          cdoPrint("U - wind: Grid nr. %d is gridtype: %d (%s)", gridID1, gridInqType(gridID1), gridNamePtr(gridInqType(gridID1)));
+          cdoPrint("V - wind: Grid nr. %d is gridtype: %d (%s)", gridID2, gridInqType(gridID2), gridNamePtr(gridInqType(gridID2)));
+          cdoAbort("Destaggering supports only grid type = 'lonlat' (GRID_LONLAT).");
         }
 
-        /* define output grid */
-        if ( gridID0 == -1 ) {
-          if ( cdoDebugExt ) cdoPrint("Calling define_destagered_grid( destagGridOffsets = (%01.1f,%01.1f) )", destagGridOffsets[0],destagGridOffsets[1]);
-          gridID0 = cdo_define_destagered_grid(gridID1, gridID2, destagGridOffsets);
+      /* define output grid */
+      if ( gridID0 == -1 ) {
+        if ( cdoDebugExt ) cdoPrint("Calling define_destagered_grid( destagGridOffsets = (%01.1f,%01.1f) )", destagGridOffsets[0],destagGridOffsets[1]);
+        gridID0 = cdo_define_destagered_grid(gridID1, gridID2, destagGridOffsets);
+      }
+
+      if ( gridID0 == -1 ) cdoAbort(" Cannot define DESTAGGERED grid for U, V.");
+
+      if ( cdoDebugExt>=10 ) cdo_print_grid(gridID0, 1);
+
+      xfirst_R =gridInqXval(gridID0,0);   // reference grid for non-staggered fields (default: search for temperature; otherwise: create a new grid)
+      yfirst_R =gridInqYval(gridID0,0);
+      xfirst_U =gridInqXval(gridID1,0);   // grid of u-wind
+      yfirst_U =gridInqYval(gridID1,0);
+      xfirst_V =gridInqXval(gridID2,0);   // grid of v-wind
+      yfirst_V =gridInqYval(gridID2,0);
+
+      dxU = -xfirst_U + xfirst_R;
+      dyU = -yfirst_U + yfirst_R;
+      dxV = -xfirst_V + xfirst_R;
+      dyV = -yfirst_V + yfirst_R;
+      //cdoDebugExt = 1;
+
+      if ( cdoDebugExt ) cdoPrint("Grid info: (xfirst_R = %3.2f; yfirst_R = %3.2f); (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f);",xfirst_R,yfirst_R,xfirst_U,yfirst_U,xfirst_V,yfirst_V);
+
+      if ( cdoDebugExt ) cdoPrint("Grid info: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) ",dxU,dyU, dxV,dyV);
+
+      if ( cdoDebugExt ) cdoPrint("Grid info: nlon=%d, nlat=%d, ntr=%d ",nlon,nlat,ntr);
+
+      if ( cdoDebugExt )
+        {
+          if (dxU<0)
+            cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
+          else
+            cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
         }
 
-        if ( gridID0 == -1 ) cdoAbort(" Cannot define DESTAGGERED grid for U, V.");
-
-        if ( cdoDebugExt>=10 ) cdo_print_grid(gridID0, 1);
-
-        xfirst_R =gridInqXval(gridID0,0);   // reference grid for non-staggered fields (default: search for temperature; otherwise: create a new grid)
-        yfirst_R =gridInqYval(gridID0,0);
-        xfirst_U =gridInqXval(gridID1,0);   // grid of u-wind
-        yfirst_U =gridInqYval(gridID1,0);
-        xfirst_V =gridInqXval(gridID2,0);   // grid of v-wind
-        yfirst_V =gridInqYval(gridID2,0);
-
-        dxU = -xfirst_U + xfirst_R;
-        dyU = -yfirst_U + yfirst_R;
-        dxV = -xfirst_V + xfirst_R;
-        dyV = -yfirst_V + yfirst_R;
-        //cdoDebugExt = 1;
-
-        if ( cdoDebugExt ) cdoPrint("Grid info: (xfirst_R = %3.2f; yfirst_R = %3.2f); (xfirst_U = %3.2f; yfirst_U = %3.2f); (xfirst_V = %3.2f; yfirst_V = %3.2f);",xfirst_R,yfirst_R,xfirst_U,yfirst_U,xfirst_V,yfirst_V);
-
-        if ( cdoDebugExt ) cdoPrint("Grid info: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) ",dxU,dyU, dxV,dyV);
-
-        if ( cdoDebugExt ) cdoPrint("Grid info: nlon=%d, nlat=%d, ntr=%d ",nlon,nlat,ntr);
-
-        if ( cdoDebugExt )
-          {
-            if (dxU<0)
-              cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
-            else
-              cdoPrint("About to perform destaggering (U-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
-          }
-
-        if ( cdoDebugExt )
-          {
-            if (dyV<0)
-              cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
-            else
-              cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
-          }
-
-        for ( index = 0; index < ngrids; index++ )
+      if ( cdoDebugExt )
         {
-            gridID = vlistGrid(vlistID1, index);
-            if ( cdoDebugExt>=10 ) cdoPrint("Grid nr. %d is gridtype: %d (%s)", index, gridInqType(gridID), gridNamePtr(gridInqType(gridID)));
+          if (dyV<0)
+            cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - default order ", dxU,dyV);
+          else
+            cdoPrint("About to perform destaggering (V-wind): (%3.2f; %3.2f) - positive order ", dxU,dyV);
         }
-        nvars = vlistNvars(vlistID1);
 
-        if (gridID0 == -1)
+      for ( index = 0; index < ngrids; index++ )
         {
-            if ( cdoDebugExt ) cdoPrint("Last trial to find a reference grid for destaggered wind.");
-            for ( varID = 0; varID < nvars; varID++ )
+          gridID = vlistGrid(vlistID1, index);
+          if ( cdoDebugExt>=10 ) cdoPrint("Grid nr. %d is gridtype: %d (%s)", index, gridInqType(gridID), gridNamePtr(gridInqType(gridID)));
+        }
+
+      nvars = vlistNvars(vlistID1);
+
+      if (gridID0 == -1)
+        {
+          if ( cdoDebugExt ) cdoPrint("Last trial to find a reference grid for destaggered wind.");
+          for ( varID = 0; varID < nvars; varID++ )
             {
-                gridID = vlistInqVarGrid(vlistID1, varID);
-                if ( cdoDebugExt ) cdoPrint("Var.id %d has grid nr:%d", varID,  gridID);
-                if ( (varID!=varID1stg) && (varID!=varID2stg) )
-                    // this will the new (horizontal) grid for de-staggered
-                    gridID0 = vlistInqVarGrid(vlistID1, varID);
+              gridID = vlistInqVarGrid(vlistID1, varID);
+              if ( cdoDebugExt ) cdoPrint("Var.id %d has grid nr:%d", varID,  gridID);
+              if ( (varID!=varID1stg) && (varID!=varID2stg) )
+                // this will the new (horizontal) grid for de-staggered
+                gridID0 = vlistInqVarGrid(vlistID1, varID);
             }
         }
-        if ( gridID0 == -1 ) cdoAbort("Referencial horizontal grid not found!");
+      if ( gridID0 == -1 ) cdoAbort("Referencial horizontal grid not found!");
 
-        gridsize = vlistGridsizeMax(vlistID1);
+      gridsize = vlistGridsizeMax(vlistID1);
 
-        if ( gridInqSize(gridID2)!= gridInqSize(gridID1) )
-            cdoAbort("gridSize of U-wind != gridSize of V-wind!  This should not happen!");
+      if ( gridInqSize(gridID2)!= gridInqSize(gridID1) )
+        cdoAbort("gridSize of U-wind != gridSize of V-wind!  This should not happen!");
 
-        if ( cdoDebugExt ) cdoPrint("Allocating memory for maximum gridsize (for input) = %ld [%4.3f MB]",gridsize, gridsize*sizeof(double)/(1024.0*1024));
-        ivar = (double *) Malloc(gridsize*sizeof(double));  // storage for other fields than
+      if ( cdoDebugExt ) cdoPrint("Allocating memory for maximum gridsize (for input) = %ld [%4.3f MB]",gridsize, gridsize*sizeof(double)/(1024.0*1024));
+      ivar = (double *) Malloc(gridsize*sizeof(double));  // storage for other fields than
 
-        gridsize = gridInqSize(gridID1);  // actual size of U-wind should be same as V-wind
-        if ( cdoDebugExt )
-            cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; nlon=%d, nlat=%d",gridsize,nlon,nlat );
-        ovar = (double *) Malloc(gridsize*sizeof(double));
+      gridsize = gridInqSize(gridID1);  // actual size of U-wind should be same as V-wind
+      if ( cdoDebugExt )
+        cdoPrint("Allocating memory for gridsize (destaggered output)= %ld; nlon=%d, nlat=%d",gridsize,nlon,nlat );
+      ovar = (double *) Malloc(gridsize*sizeof(double));
     } // end of  if (!lcopy)
 
 
-    //cdoDebugExt = 0;
+  //cdoDebugExt = 0;
 
-    streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-    streamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
-    vlistID2 = streamInqVlist(streamID2); // refresh it
-    tsID = 0;
-    while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  streamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
+  vlistID2 = streamInqVlist(streamID2); // refresh it
+  
+  int tsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-        taxisCopyTimestep(taxisID2, taxisID1);
-        streamDefTimestep(streamID2, tsID);
-        if (!lcopy)
+      taxisCopyTimestep(taxisID2, taxisID1);
+      streamDefTimestep(streamID2, tsID);
+      if (!lcopy)
         {
-            if ( cdoDebugExt) cdoPrint("Processing timestep: %d",tsID);
-            if ( cdoDebugExt) cdoPrint("Starting destaggering. Total records to be processed: %05d", nrecs);
+          if ( cdoDebugExt) cdoPrint("Processing timestep: %d",tsID);
+          if ( cdoDebugExt) cdoPrint("Starting destaggering. Total records to be processed: %05d", nrecs);
         }
 
-        for ( recID = 0; recID < nrecs; recID++ )
+      for ( recID = 0; recID < nrecs; recID++ )
         {
+          streamInqRecord(streamID1, &varID, &levelID);
+          param = vlistInqVarParam(vlistID1, varID);
+          code    = vlistInqVarCode(vlistID1, varID);
+          zaxisID = vlistInqVarZaxis(vlistID1, varID);
+          ltype   = zaxis2ltype(zaxisID);
+          level = zaxisInqLevel(zaxisID, levelID);
 
-            streamInqRecord(streamID1, &varID, &levelID);
-            param = vlistInqVarParam(vlistID1, varID);
-            code    = vlistInqVarCode(vlistID1, varID);
-            zaxisID = vlistInqVarZaxis(vlistID1, varID);
-            ltype   = zaxis2ltype(zaxisID);
-            level = zaxisInqLevel(zaxisID, levelID);
-
-            if (!lcopy)
+          if (!lcopy)
             {
-                CheckVarIsU(varID,varname,code);
-                CheckVarIsV(varID,varname,code);
-                UorV = -1;            // -1: not U, neither V
-                if (VarIsU) UorV = 0; // 0: U-wind; 1: V-wind
-                else
-                    if (VarIsV) UorV = 1;
-                if (UorV>=0)
+              CheckVarIsU(varID,varname,code);
+              CheckVarIsV(varID,varname,code);
+              UorV = -1;            // -1: not U, neither V
+              if      (VarIsU) UorV = 0; // 0: U-wind; 1: V-wind
+              else if (VarIsV) UorV = 1;
+              if (UorV>=0)
                 {
-                    gridID = vlistInqVarGrid(vlistID1, varID);
-                    if (UorV==0)
+                  gridID = vlistInqVarGrid(vlistID1, varID);
+                  if (UorV==0)
                     {
-                        if (gridID==gridID1) // Has this variable the staggered grid?
+                      if (gridID==gridID1) // Has this variable the staggered grid?
                         {
-                            int pcode;
-                            cdiDecodeParam(vlistInqVarParam(vlistID1, varID), &pcode, &pcat, &pdis);
-                            vlistChangeVarGrid(vlistID2, varID, gridID0);   // set the variable onto the non-staggered grid
-                            vlistDefVarParam(vlistID2, varID, cdiEncodeParam(pcode, pcat, pdis)); // NOTE pcat: - grid table number; pdis: - center number
-                            vlistDefVarName(vlistID2, varID, "u");
-                            vlistDefVarLongname(vlistID2, varID, "u-velocity");
-                            vlistDefVarUnits(vlistID2, varID, "m/s");
-                            if ( cdoDebugExt>=10 ) cdoPrint("Destaggering U-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
+                          int pcode;
+                          cdiDecodeParam(vlistInqVarParam(vlistID1, varID), &pcode, &pcat, &pdis);
+                          vlistChangeVarGrid(vlistID2, varID, gridID0);   // set the variable onto the non-staggered grid
+                          vlistDefVarParam(vlistID2, varID, cdiEncodeParam(pcode, pcat, pdis)); // NOTE pcat: - grid table number; pdis: - center number
+                          vlistDefVarName(vlistID2, varID, "u");
+                          vlistDefVarLongname(vlistID2, varID, "u-velocity");
+                          vlistDefVarUnits(vlistID2, varID, "m/s");
+                          if ( cdoDebugExt>=10 ) cdoPrint("Destaggering U-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
                         }
-                        else UorV=-1;  // this U is not staggered, just copy the record..
+                      else UorV=-1;  // this U is not staggered, just copy the record..
                     }
-                    if (UorV==1)
+                  if (UorV==1)
                     {
-                        if (gridID==gridID2) // Has this variable the staggered grid?
+                      if (gridID==gridID2) // Has this variable the staggered grid?
                         {
-                            int pcode;
-                            cdiDecodeParam(vlistInqVarParam(vlistID1, varID), &pcode, &pcat, &pdis);
-                            vlistChangeVarGrid(vlistID2, varID, gridID0);   // set the variable onto the non-staggered grid
-                            vlistDefVarParam(vlistID2, varID, cdiEncodeParam(pcode, pcat, pdis)); // NOTE pcat: - grid table number; pdis: - center number
-                            vlistDefVarName(vlistID2, varID, "v");
-                            vlistDefVarLongname(vlistID2, varID, "v-velocity");
-                            vlistDefVarUnits(vlistID2, varID, "m/s");
-                            if ( cdoDebugExt>=10 ) cdoPrint("Destaggering V-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
+                          int pcode;
+                          cdiDecodeParam(vlistInqVarParam(vlistID1, varID), &pcode, &pcat, &pdis);
+                          vlistChangeVarGrid(vlistID2, varID, gridID0);   // set the variable onto the non-staggered grid
+                          vlistDefVarParam(vlistID2, varID, cdiEncodeParam(pcode, pcat, pdis)); // NOTE pcat: - grid table number; pdis: - center number
+                          vlistDefVarName(vlistID2, varID, "v");
+                          vlistDefVarLongname(vlistID2, varID, "v-velocity");
+                          vlistDefVarUnits(vlistID2, varID, "m/s");
+                          if ( cdoDebugExt>=10 ) cdoPrint("Destaggering V-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
                         }
-                        else UorV=-1;  // this V is not staggered, just copy the record..
+                      else UorV=-1;  // this V is not staggered, just copy the record..
                     }
                 } // end of: if (UorV>=0)
-                if (UorV>=0)  // re-check again since it could mean that current record with U or V is not staggered
+              if (UorV>=0)  // re-check again since it could mean that current record with U or V is not staggered
                 {
-                    streamReadRecord(streamID1, ivar, &nmiss);
-                    // read the original record with staggered u or v
-                    gridsize = gridInqSize(gridID1);
+                  streamReadRecord(streamID1, ivar, &nmiss);
+                  // read the original record with staggered u or v
+                  gridsize = gridInqSize(gridID1);
 
-                    //void destaggerUorV(double *fu, double *fuOut,
-                    //                   int klev, int nlat, int nlon, int UorV, long int offset);
-                    // We handle one level at the time; klev=1;offset=0.
-                    if ( (dxU<0.0) && (dyV<0.0))
-                        // UorV = 0: U-wind; 1: V-wind
-                        destaggerUorV(ivar, ovar,1, nlat, nlon, UorV, 0);
-                    else
+                  //void destaggerUorV(double *fu, double *fuOut,
+                  //                   int klev, int nlat, int nlon, int UorV, long int offset);
+                  // We handle one level at the time; klev=1;offset=0.
+                  if ( (dxU<0.0) && (dyV<0.0))
+                    // UorV = 0: U-wind; 1: V-wind
+                    destaggerUorV(ivar, ovar,1, nlat, nlon, UorV, 0);
+                  else
                     if ( (dyU>0.0) && (dxV>0.0))
-                        // UorV = 0: U-wind; 1: V-wind
-                        destaggerUorV_positiveOrder(ivar, ovar,1, nlat, nlon, UorV, 0);
+                      // UorV = 0: U-wind; 1: V-wind
+                      destaggerUorV_positiveOrder(ivar, ovar,1, nlat, nlon, UorV, 0);
                     else
-                        cdoAbort("Unsupported destaggering grid offset: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) where: xincU=%3.2f, yincU=%3.2f, xincV=%3.2f, yincV=%3.2f",dxU,dyU, dxV,dyV, xincU, yincU, xincV, yincV);
+                      cdoAbort("Unsupported destaggering grid offset: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) where: xincU=%3.2f, yincU=%3.2f, xincV=%3.2f, yincV=%3.2f",dxU,dyU, dxV,dyV, xincU, yincU, xincV, yincV);
 
-                    // Typical Hirlam LAMH_D11 situation with destaggering on (-0.5,-0.5)
-                    // cdo uvDestag: Grid info: (xfirst_R = -30.20; yfirst_R = -30.80); (xfirst_U = -30.15; yfirst_U = -30.80); (xfirst_V = -30.20; yfirst_V = -30.75);
-                    // cdo uvDestag: Grid info: (dxU; dyU) = (-0.05; 0.00); (dxV; dyV) = (0.00; -0.05)
+                  // Typical Hirlam LAMH_D11 situation with destaggering on (-0.5,-0.5)
+                  // cdo uvDestag: Grid info: (xfirst_R = -30.20; yfirst_R = -30.80); (xfirst_U = -30.15; yfirst_U = -30.80); (xfirst_V = -30.20; yfirst_V = -30.75);
+                  // cdo uvDestag: Grid info: (dxU; dyU) = (-0.05; 0.00); (dxV; dyV) = (0.00; -0.05)
 
-                    // Less typical would be to choose destaggering on (+0.5,+0.5)
-                    // cdo uvDestag: Grid info: (xfirst_R = -30.15; yfirst_R = -30.75); (xfirst_U = -30.15; yfirst_U = -30.80); (xfirst_V = -30.20; yfirst_V = -30.75);
-                    // cdo uvDestag: Grid info: (dxU; dyU) = (0.00; 0.05); (dxV; dyV) = (0.05; 0.00)
-                    if ( cdoDebugExt>=20 ) cdoPrint("Setting GRID id from: %d => to: %d", vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID) );
+                  // Less typical would be to choose destaggering on (+0.5,+0.5)
+                  // cdo uvDestag: Grid info: (xfirst_R = -30.15; yfirst_R = -30.75); (xfirst_U = -30.15; yfirst_U = -30.80); (xfirst_V = -30.20; yfirst_V = -30.75);
+                  // cdo uvDestag: Grid info: (dxU; dyU) = (0.00; 0.05); (dxV; dyV) = (0.05; 0.00)
+                  if ( cdoDebugExt>=20 ) cdoPrint("Setting GRID id from: %d => to: %d", vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID) );
 
-                    streamDefRecord(streamID2, varID, levelID);
-                    streamWriteRecord(streamID2, ovar, nmiss);
-                    //streamWriteRecord(streamID2, ovar, 0);
+                  streamDefRecord(streamID2, varID, levelID);
+                  streamWriteRecord(streamID2, ovar, nmiss);
+                  //streamWriteRecord(streamID2, ovar, 0);
                 }
-                else
+              else
                 {   // copy the record to the output unchanged...
-                    streamDefRecord(streamID2, varID, levelID);
-                    //if ( cdoDebugExt>10 ) cdoPrint("Copying data record.. %05d (timestep:%05d)", recID, tsID);
-                    if ( cdoDebugExt>=20 ) cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",recID, tsID, varID, code, ltype, level, levelID);
-                    streamCopyRecord(streamID2, streamID1);
+                  streamDefRecord(streamID2, varID, levelID);
+                  //if ( cdoDebugExt>10 ) cdoPrint("Copying data record.. %05d (timestep:%05d)", recID, tsID);
+                  if ( cdoDebugExt>=20 ) cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",recID, tsID, varID, code, ltype, level, levelID);
+                  streamCopyRecord(streamID2, streamID1);
                 }
             }  // end of: if (!lcopy)
-            else
+          else
             {   // copy the record to the output unchanged...
-                streamDefRecord(streamID2, varID, levelID);
-                if ( cdoDebugExt>=20 ) cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",recID, tsID, varID, code, ltype, level, levelID);
-                streamCopyRecord(streamID2, streamID1);
+              streamDefRecord(streamID2, varID, levelID);
+              if ( cdoDebugExt>=20 ) cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",recID, tsID, varID, code, ltype, level, levelID);
+              streamCopyRecord(streamID2, streamID1);
             }
 
         } // end of for ( recID = ...
         tsID++;
     } // end of while ( (nrecs ...
 
-    streamClose(streamID2);
-    streamClose(streamID1);
+  streamClose(streamID2);
+  streamClose(streamID1);
 
-    //if ( cdoDebugExt ) cdoPrint("ivar1=%x, ivar2=%x, ovar1=%x, ovar2=%x",ivar1, ivar2, ovar1, ovar2);
+  //if ( cdoDebugExt ) cdoPrint("ivar1=%x, ivar2=%x, ovar1=%x, ovar2=%x",ivar1, ivar2, ovar1, ovar2);
 
 
-    if ( ivar ) Free(ivar);
-    if ( ovar ) Free(ovar);
+  if ( ivar ) Free(ivar);
+  if ( ovar ) Free(ovar);
 
-    cdoFinish();
+  cdoFinish();
 
-    return (0);
+  return 0;
 }
 
 
@@ -910,8 +899,7 @@ void *TransformUV(int operatorID)
                             cdoPrint("LAT-LON grid created.");
                     }// end of if (gridIDcurvl==-1)
                 }// end of if (operatorID != ROTUVN)
-                int uvRelativeFlag  = gridInqUvRelativeToGrid(gridID);
-                if (uvRelativeFlag!=1)
+                if ( gridInqUvRelativeToGrid(gridID) != 1 )
                 {
                     cdoPrint("NOTICE: grid with id:%d has NOT uv relative to grid.", gridID);
                 } else
@@ -983,7 +971,7 @@ void *TransformUV(int operatorID)
     Free(ivar);
 
     cdoFinish();
-    return (0);
+    return 0;
 }
 
 //grid_t *grid_to_pointer(int idx); // defined in: libcdi/src/grid.c
