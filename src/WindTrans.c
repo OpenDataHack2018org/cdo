@@ -170,16 +170,16 @@ void *DestaggerUV()
 {
   int nrecs;
   int varID, levelID;
-  int varID1 = -1, varID2 = -1;
-  int zaxisID1 = -1, zaxisID2 = -1;
-  int varID1stg = -1, varID2stg = -1;
+  int varID1 = CDI_UNDEFID, varID2 = CDI_UNDEFID;
+  int zaxisID1 = CDI_UNDEFID, zaxisID2 = CDI_UNDEFID;
+  int varID1stg = CDI_UNDEFID, varID2stg = CDI_UNDEFID;
   int gridsize;
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
   double destagGridOffsets[MAXARG];
-  int gridID1 = -1, gridID2 = -1;
-  int gridID0 = -1;
+  int gridID1 = CDI_UNDEFID, gridID2 = CDI_UNDEFID;
+  int gridID0 = CDI_UNDEFID;
   int gridID;
   bool lcopy = false;
   int UorV;
@@ -324,8 +324,8 @@ void *DestaggerUV()
         cdoPrint("Var.id [%4d] with grib code:3%d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",
                  varID, code, varname, ltype, nlevs, gridIDx, zaxisID);
 
-      CheckVarIsU(varID,varname,code);
-      CheckVarIsV(varID,varname,code);
+      CheckVarIsU(varID, varname, code);
+      CheckVarIsV(varID, varname, code);
       if      (VarIsU) { varID1 = varID; zaxisID1 = zaxisID; }
       else if (VarIsV) { varID2 = varID; zaxisID2 = zaxisID; }
 
@@ -333,14 +333,15 @@ void *DestaggerUV()
         if ( (varID1 != -1) && (varID2 != -1) )
           {
             CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2);
-            if (VarsUVareStaggered) {
-              gridID1 = vlistInqVarGrid(vlistID1, varID1);
-              gridID2 = vlistInqVarGrid(vlistID1, varID2);
-              if ( cdoDebugExt )
-                cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",varID1, gridID2, varID2, gridID1);
-              varID1stg = varID1;
-              varID2stg = varID2;
-            }
+            if ( VarsUVareStaggered )
+              {
+                gridID1 = vlistInqVarGrid(vlistID1, varID1);
+                gridID2 = vlistInqVarGrid(vlistID1, varID2);
+                if ( cdoDebugExt )
+                  cdoPrint("Found STAGGERED U & V: varID1=%d (gridID1=%d), varID2=%d (gridID2=%d)",varID1, gridID2, varID2, gridID1);
+                varID1stg = varID1;
+                varID2stg = varID2;
+              }
           }
       // search for a reference (non-staggered) grid
       // We take temperature for example as the new (horizontal) grid for de-staggered uv
@@ -358,7 +359,7 @@ void *DestaggerUV()
   if (gridID0>=0)
     if ( cdoDebugExt ) cdoPrint("Found DESTAGGERED grid for U, V: gridID0=%d",gridID0);
 
-  if ( (varID1stg == -1) && (varID2stg == -1 ) )
+  if ( (varID1stg == -1) && (varID2stg == -1) )
     {
       cdoPrint("NOTE: We did not find any staggered U,V wind components. Performing file-copy.");
       lcopy = true;
@@ -441,8 +442,6 @@ void *DestaggerUV()
           if ( cdoDebugExt>=10 ) cdoPrint("Grid nr. %d is gridtype: %d (%s)", index, gridInqType(gridID), gridNamePtr(gridInqType(gridID)));
         }
 
-      nvars = vlistNvars(vlistID1);
-
       if (gridID0 == -1)
         {
           if ( cdoDebugExt ) cdoPrint("Last trial to find a reference grid for destaggered wind.");
@@ -451,8 +450,10 @@ void *DestaggerUV()
               gridID = vlistInqVarGrid(vlistID1, varID);
               if ( cdoDebugExt ) cdoPrint("Var.id %d has grid nr:%d", varID,  gridID);
               if ( (varID!=varID1stg) && (varID!=varID2stg) )
-                // this will the new (horizontal) grid for de-staggered
-                gridID0 = vlistInqVarGrid(vlistID1, varID);
+                {
+                  // this will the new (horizontal) grid for de-staggered
+                  gridID0 = vlistInqVarGrid(vlistID1, varID);
+                }
             }
         }
       if ( gridID0 == -1 ) cdoAbort("Referencial horizontal grid not found!");
@@ -473,7 +474,13 @@ void *DestaggerUV()
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
+  if ( varID1stg != CDI_UNDEFID && varID2stg != CDI_UNDEFID )
+    {
+      vlistChangeVarGrid(vlistID2, varID1stg, gridID0);   // set the variable onto the non-staggered grid
+      vlistChangeVarGrid(vlistID2, varID2stg, gridID0);   // set the variable onto the non-staggered grid
+    }
+
+  streamDefVlist(streamID2, vlistID2);  // from this point the stream is using a different vlistID !!!!!
   vlistID2 = streamInqVlist(streamID2); // refresh it
   
   int tsID = 0;
@@ -481,6 +488,7 @@ void *DestaggerUV()
     {
       taxisCopyTimestep(taxisID2, taxisID1);
       streamDefTimestep(streamID2, tsID);
+
       if ( !lcopy && cdoDebugExt )
         {
           cdoPrint("Processing timestep: %d",tsID);
@@ -495,16 +503,18 @@ void *DestaggerUV()
           cdiDecodeParam(param, &pnum, &pcat, &pdis);
           int code = pnum;
           int zaxisID = vlistInqVarZaxis(vlistID1, varID);
-          int ltype   = zaxis2ltype(zaxisID);
-          double level = zaxisInqLevel(zaxisID, levelID);
+          int ltype = zaxis2ltype(zaxisID);
+          int level = (int) zaxisInqLevel(zaxisID, levelID);
 
           if ( !lcopy )
             {
-              CheckVarIsU(varID,varname,code);
-              CheckVarIsV(varID,varname,code);
+              VarIsU = (varID == varID1stg);
+              VarIsV = (varID == varID2stg);
+
               UorV = -1;            // -1: not U, neither V
               if      (VarIsU) UorV = 0; // 0: U-wind; 1: V-wind
               else if (VarIsV) UorV = 1;
+
               if (UorV>=0)
                 {
                   gridID = vlistInqVarGrid(vlistID1, varID);
@@ -512,14 +522,9 @@ void *DestaggerUV()
                     {
                       if (gridID==gridID1) // Has this variable the staggered grid?
                         {
-                          int pcode;
-                          cdiDecodeParam(vlistInqVarParam(vlistID1, varID), &pcode, &pcat, &pdis);
-                          vlistChangeVarGrid(vlistID2, varID, gridID0);   // set the variable onto the non-staggered grid
-                          vlistDefVarParam(vlistID2, varID, cdiEncodeParam(pcode, pcat, pdis)); // NOTE pcat: - grid table number; pdis: - center number
-                          vlistDefVarName(vlistID2, varID, "u");
-                          vlistDefVarLongname(vlistID2, varID, "u-velocity");
-                          vlistDefVarUnits(vlistID2, varID, "m/s");
-                          if ( cdoDebugExt>=10 ) cdoPrint("Destaggering U-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
+                          if ( cdoDebugExt>=10 )
+                            cdoPrint("Destaggering U-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",
+                                     recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
                         }
                       else UorV=-1;  // this U is not staggered, just copy the record..
                     }
@@ -527,18 +532,14 @@ void *DestaggerUV()
                     {
                       if (gridID==gridID2) // Has this variable the staggered grid?
                         {
-                          int pcode;
-                          cdiDecodeParam(vlistInqVarParam(vlistID1, varID), &pcode, &pcat, &pdis);
-                          vlistChangeVarGrid(vlistID2, varID, gridID0);   // set the variable onto the non-staggered grid
-                          vlistDefVarParam(vlistID2, varID, cdiEncodeParam(pcode, pcat, pdis)); // NOTE pcat: - grid table number; pdis: - center number
-                          vlistDefVarName(vlistID2, varID, "v");
-                          vlistDefVarLongname(vlistID2, varID, "v-velocity");
-                          vlistDefVarUnits(vlistID2, varID, "m/s");
-                          if ( cdoDebugExt>=10 ) cdoPrint("Destaggering V-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
+                          if ( cdoDebugExt>=10 )
+                            cdoPrint("Destaggering V-wind record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d); GridID %d => %d  *** <===",
+                                     recID, tsID, varID, code, ltype, level, levelID, vlistInqVarGrid(vlistID1, varID), vlistInqVarGrid(vlistID2, varID));
                         }
                       else UorV=-1;  // this V is not staggered, just copy the record..
                     }
                 } // end of: if (UorV>=0)
+
               if (UorV>=0)  // re-check again since it could mean that current record with U or V is not staggered
                 {
                   int nmiss;
@@ -552,12 +553,12 @@ void *DestaggerUV()
                   if ( (dxU<0.0) && (dyV<0.0))
                     // UorV = 0: U-wind; 1: V-wind
                     destaggerUorV(ivar, ovar,1, nlat, nlon, UorV, 0);
+                  else if ( (dyU>0.0) && (dxV>0.0))
+                    // UorV = 0: U-wind; 1: V-wind
+                    destaggerUorV_positiveOrder(ivar, ovar,1, nlat, nlon, UorV, 0);
                   else
-                    if ( (dyU>0.0) && (dxV>0.0))
-                      // UorV = 0: U-wind; 1: V-wind
-                      destaggerUorV_positiveOrder(ivar, ovar,1, nlat, nlon, UorV, 0);
-                    else
-                      cdoAbort("Unsupported destaggering grid offset: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) where: xincU=%3.2f, yincU=%3.2f, xincV=%3.2f, yincV=%3.2f",dxU,dyU, dxV,dyV, xincU, yincU, xincV, yincV);
+                    cdoAbort("Unsupported destaggering grid offset: (dxU; dyU) = (%3.2f; %3.2f); (dxV; dyV) = (%3.2f; %3.2f) where: xincU=%3.2f, yincU=%3.2f, xincV=%3.2f, yincV=%3.2f",
+                             dxU,dyU, dxV,dyV, xincU, yincU, xincV, yincV);
 
                   // Typical Hirlam LAMH_D11 situation with destaggering on (-0.5,-0.5)
                   // cdo uvDestag: Grid info: (xfirst_R = -30.20; yfirst_R = -30.80); (xfirst_U = -30.15; yfirst_U = -30.80); (xfirst_V = -30.20; yfirst_V = -30.75);
@@ -590,6 +591,7 @@ void *DestaggerUV()
             }
 
         } // end of for ( recID = ...
+
         tsID++;
     } // end of while ( (nrecs ...
 
