@@ -56,7 +56,39 @@ void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
           vardata2[varID2c] = NULL;
         }
     }
-}  
+}
+
+static
+void eval_timestepmask(const char *maskfile, list_t *kvlist)
+{
+  int n = 0;
+  bool *imask = cdo_read_timestepmask(maskfile, &n);
+
+  int nvals = 0;
+  for ( int i = 0; i < n; ++i ) if ( imask[i] ) nvals++;
+  if ( nvals == 0 ) cdoPrint("timestepmask has no values!");
+  else
+    {
+      char **values = (char**) Malloc(nvals*sizeof(char*));
+      int j = 0;
+      for ( int i = 0; i < n; ++i )
+        {
+          if ( imask[i] )
+            {
+              size_t length = (size_t)log10(j+1)+2;
+              values[j] = (char*) Malloc(length*sizeof(char));
+              sprintf(values[j++], "%d", i+1);
+            }
+        }
+
+      kvlist_append(kvlist, "timestep", (const char **)values, nvals);
+
+      for ( int i = 0; i < nvals; ++i ) Free(values[i]);
+      Free(values);
+    }
+      
+  Free(imask);
+}
 
 
 void *Select(void *argument)
@@ -102,6 +134,13 @@ void *Select(void *argument)
   if ( kvlist_parse_cmdline(kvlist, nsel, argnames) != 0 ) cdoAbort("Parse error!");
   if ( cdoVerbose ) kvlist_print(kvlist);
 
+  keyValues_t *kv = kvlist_search(kvlist, "timestepmask");
+  if ( kv && kv->nvalues > 0 )
+    {
+      if ( kvlist_search(kvlist, "timestep") ) cdoAbort("Parameter timestep and timestepmask can't be combined!");
+      eval_timestepmask(kv->values[0], kvlist);
+    }
+
   sellist_t *sellist = sellist_create(kvlist);
 
   SELLIST_ADD_INT(timestep_of_year, "Timestep of year");
@@ -130,18 +169,10 @@ void *Select(void *argument)
 
   if ( cdoVerbose ) sellist_print(sellist);
 
-  if ( SELLIST_NVAL(timestepmask) )
-    {
-      if ( SELLIST_NVAL(timestep) ) cdoAbort("Parameter timestep and timestepmask can't be combined!");
-      SELLIST_GET_VAL(timestepmask, 0, &timestepmask);
-      printf("mask: %s\n", timestepmask);
-      int n = 0;
-      bool *imask = cdo_read_timestepmask(timestepmask, &n);
-      for ( int i = 0; i < n; ++i ) printf("%d %d\n", i+1, imask[i]);
-      Free(imask);
-    }
-
   sellist_verify(sellist);
+
+  if ( SELLIST_NVAL(timestepmask) > 1 ) cdoAbort("Key timestepmask has too many values!");
+  UNUSED(timestepmask);
 
   int streamCnt = cdoStreamCnt();
   int nfiles = streamCnt - 1;
