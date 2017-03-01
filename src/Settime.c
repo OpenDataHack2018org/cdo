@@ -66,13 +66,12 @@ int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
 static
 void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
 {
-  int year, month, day;
   int vdate = *pdate;
   int vtime = *ptime;
-  juldate_t juldate;
 
   if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
     {
+      int year, month, day;
       cdiDecodeDate(vdate, &year, &month, &day);
 	      
       month += ijulinc;
@@ -86,6 +85,7 @@ void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
     }
   else
     {
+      juldate_t juldate;
       juldate = juldate_encode(calendar, vdate, vtime);
       juldate = juldate_add_seconds(ijulinc, juldate);
       juldate_decode(calendar, juldate, &vdate, &vtime);

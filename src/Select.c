@@ -29,6 +29,8 @@
 
 double datestr_to_double(const char *datestr, int opt);
 
+bool *cdo_read_timestepmask(const char *maskfile, int *n);
+
 static
 void write_const_vars(int streamID2, int vlistID2, int nvars, double **vardata2)
 {
@@ -124,8 +126,20 @@ void *Select(void *argument)
   SELLIST_ADD_WORD(enddate,         "End date");
   SELLIST_ADD_WORD(season,          "Season");
   SELLIST_ADD_WORD(date,            "Date");
+  SELLIST_ADD_WORD(timestepmask,    "Timestep mask");
 
   if ( cdoVerbose ) sellist_print(sellist);
+
+  if ( SELLIST_NVAL(timestepmask) )
+    {
+      if ( SELLIST_NVAL(timestep) ) cdoAbort("Parameter timestep and timestepmask can't be combined!");
+      SELLIST_GET_VAL(timestepmask, 0, &timestepmask);
+      printf("mask: %s\n", timestepmask);
+      int n = 0;
+      bool *imask = cdo_read_timestepmask(timestepmask, &n);
+      for ( int i = 0; i < n; ++i ) printf("%d %d\n", i+1, imask[i]);
+      Free(imask);
+    }
 
   sellist_verify(sellist);
 

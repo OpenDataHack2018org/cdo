@@ -12,6 +12,7 @@ libcdo_la_SOURCES =            \
                cdo_task.c      \
                cdo_task.h      \
                cdo_history.c   \
+               cdo_read.c      \
                cdi_uuid.h      \
                cmortable_parser.c   \
                after_sptrans.c \
