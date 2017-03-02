@@ -46,21 +46,19 @@ long get_nfft(void)
 
 void fft_set(double *trigs, long *ifax, long n)
 {
-  long j, k, nfax, len = n;
-  long nhl;
-  double del, angle;
-
-  del = 4.0*asin(1.0) / n;
-  nhl = n / 2;
-  for ( k = 0; k < nhl; k++ )
+  long j, len = n;
+  long nhl = n / 2;
+  double del = 4.0*asin(1.0) / n;
+  double angle;
+  for ( long k = 0; k < nhl; k++ )
     {
       angle = k * del;
       trigs[2*k  ] = cos(angle);
       trigs[2*k+1] = sin(angle);
     }  
 
-  nfax = 0;
-  for (k = 0; k < 9; ++k) ifax[k] = 0;
+  long nfax = 0;
+  for ( long k = 0; k < 9; ++k ) ifax[k] = 0;
 
   ifax[9] = n;
 
@@ -82,7 +80,7 @@ void fft_set(double *trigs, long *ifax, long n)
 #if defined(__uxp__)
 #pragma loop scalar
 #endif
-  for ( k = 0; k < nfax / 2; k++ )
+  for ( long k = 0; k < nfax / 2; k++ )
     {
       j = ifax[k + 1];
       ifax[k + 1] = ifax[nfax - k];
@@ -91,7 +89,7 @@ void fft_set(double *trigs, long *ifax, long n)
 
   if ( n > 8 )
     {
-      fprintf(stderr, "fft does not work with len %ld\n", len);
+      fprintf(stderr, "FFT does not work with len=%ld (n=%ld)!\n", len, n);
       exit(1);
     }
 }

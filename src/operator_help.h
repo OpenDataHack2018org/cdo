@@ -509,6 +509,7 @@ static const char *SelectHelp[] = {
     "    year              INTEGER Comma separated list of years.",
     "    timestep          INTEGER Comma separated list of timesteps. Negative values selects timesteps from the end (NetCDF only).",
     "    timestep_of_year  INTEGER Comma separated list of timesteps of year.",
+    "    timestepmask      STRING Read timesteps from a mask file.",
     NULL
 };
 

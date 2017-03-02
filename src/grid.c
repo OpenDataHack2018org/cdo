@@ -111,13 +111,14 @@ int nlat_to_nlon(int nlat)
       if ( n <= 8 ) break;
 
       nlon = nlon + 2;
-
+      /*
       if ( nlon > 9999 )
 	{
 	  nlon = 2 * nlat;
 	  fprintf(stderr, "FFT does not work with len %d!\n", nlon);
 	  break;
 	}
+      */
     }
 
   return nlon;
