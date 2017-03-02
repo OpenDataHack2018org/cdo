@@ -887,9 +887,15 @@ void cdo_check_round(void)
   if ( !checked )
     {
       checked = true;
-      double rval1 = round(1.45678921);
-      double rval2 = round(1.54678921);
-      if ( IS_NOT_EQUAL(rval1, 1.) || IS_NOT_EQUAL(rval2, 2.) )
-        cdoAbort("Function round() produces wrong results!");
+#define NMAX 3
+      double vals2[NMAX];
+      double vals[NMAX] = {2783.333, 1.45678921, 1.54678921};
+      double rvals[NMAX] = {2783, 1, 2};
+      for ( int i = 0; i < NMAX; ++i )
+        {
+          vals2[i] = round(vals[i]);
+          if ( IS_NOT_EQUAL(vals2[i], rvals[i]) )
+            cdoAbort("Function round() produces wrong results!");
+        }
     }
 }
