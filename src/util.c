@@ -879,3 +879,12 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
   *minval = xmin;
   *maxval = xmax;
 }
+
+
+void cdo_check_round(void)
+{
+  double rval1 = round(1.45678921);
+  double rval2 = round(1.54678921);
+  if ( IS_NOT_EQUAL(rval1, 1.) || IS_NOT_EQUAL(rval2, 2.) )
+    cdoAbort("Function round() produces wrong results!");
+}

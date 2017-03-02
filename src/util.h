@@ -229,4 +229,6 @@ void printLibraries(void);  // features.c
 
 int wildcardmatch(const char *w, const char *s);
 
+void cdo_check_round(void);
+
 #endif  /* _UTIL_H */

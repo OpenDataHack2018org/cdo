@@ -71,6 +71,8 @@ void *Math(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
+  if ( operfunc == FNINT ) cdo_check_round();
+
   double rc = 0;
   if ( operfunc == POW )
     {
