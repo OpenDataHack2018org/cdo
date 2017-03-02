@@ -37,6 +37,7 @@ for grid  in r18x9 ni4 ni96 global_10 t63grid; do
   let NTEST+=1
 done
 # some addional test for operator: ngrids
+CDOTEST="ngrids"
 CDOCOMMAND="$CDO -O -s -ngrids"
 $CDOCOMMAND -topo,global_10
 test $? -eq 0 || let RSTAT+=1
