@@ -120,19 +120,18 @@ void farcsub(field_type *field, double rconst)
 
 void farinv(field_type *field)
 {
-  int i, len;
   int    grid     = field->grid;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array   = field->ptr;
 
-  len    = gridInqSize(grid);
+  int len = gridInqSize(grid);
 
-  for ( i = 0; i < len; i++ ) 
+  for ( int i = 0; i < len; i++ ) 
     array[i] = DIVMN(1.0, array[i]);
 
   field->nmiss = 0;
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array[i], missval1) ) field->nmiss++;
 }
 
@@ -146,7 +145,7 @@ void farround(field_type *field)
   int len = gridInqSize(grid);
 
   for ( int i = 0; i < len; i++ ) 
-    array[i] = (double)lround(array[i]);
+    array[i] = round(array[i]);
 
   field->nmiss = 0;
   for ( int i = 0; i < len; i++ )
@@ -156,14 +155,13 @@ void farround(field_type *field)
 
 void farmod(field_type *field, double divisor)
 {
-  int i, len;
   int    grid     = field->grid;
   double missval1 = field->missval;
   double *array   = field->ptr;
 
-  len    = gridInqSize(grid);
+  int len = gridInqSize(grid);
 
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     {
       array[i] = DBL_IS_EQUAL(array[i], missval1) ? missval1 : fmod(array[i], divisor);
     }
