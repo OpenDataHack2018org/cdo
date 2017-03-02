@@ -179,6 +179,8 @@ int get_funcID(const char *fun)
 
   if ( funcID == -1 ) cdoAbort("Function >%s< not available!", fun);
 
+  if ( strcmp(fun_sym_tbl[funcID].name, "nint") == 0 ) cdo_check_round();
+
   return funcID;
 }
 
