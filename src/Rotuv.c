@@ -63,11 +63,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
         double yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
 
 	usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
-	/*
-	if ( i%100 == 0 )
-	fprintf(stderr, "%d %d %g %g %g %g %g %g %g %g\n",
-		ilat, ilon, us[i], vs[i], yvals[ilat], xvals[ilon], ypole, xpole, u, v);
-	*/
+
 	us[i] = u;
 	vs[i] = v;
       }

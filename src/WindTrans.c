@@ -33,29 +33,49 @@
 #include "grid.h"
 
 
-/*
-extern int cdoGribDataScanningMode; // -1: not used; allowed modes: <0, 64, 96>; Default is 64
-*/
-
-void *TransformUV(int operatorID);
-void rot_uv_north(int gridID, double *us, double *vs);
-void project_uv_latlon(int gridID, double *us, double *vs);
-void rot_uv_back_mode64(int gridID, double *us, double *vs);
-
-
 #define  MAXARG 10
 
 // Defined in stream_grb.c
 // extern int cdoGribChangeModeUvRelativeToGrid;  // -1: don't set; 0: set to '0'; 1: set to '1'
 int cdoGribChangeModeUvRelativeToGrid; // TODO
 
-//extern int cdoGribDataScanningMode; // -1: not used; allowed modes: <0, 64, 96>; Default is 64
-int cdoGribDataScanningMode; // TODO
 
 int UVDESTAG;
 int ROTUVNORTH;
 int ROTUVN;            // Fixed version of rotuvb operator !
 int PROJUVLATLON;
+
+
+// NOTE: Variable with codes (3[3,4],105,10) will get from CDO typically a name: "10u", resp. "10v"
+// Mostly u & v at level type 105 is not staggered, but test it to be sure..
+
+#define CheckVarIsU(varID,varname,code) {       \
+    VarIsU = 0;\
+    if ( lvar ) {\
+        if ( strcmp((char*)(varname), (char*)(chvars)[0]) == 0 ) VarIsU = 1;\
+        else \
+            if ( strcmp((char*)(varname), "10u") == 0 ) VarIsU = 1;\
+    } else \
+        if ( code == chcodes[0] ) VarIsU = 1;\
+    }
+#define CheckVarIsV(varID,varname,code) {       \
+    VarIsV = 0;\
+    if ( lvar ) {\
+        if ( strcmp((char*)(varname), (char*)(chvars)[1]) == 0 ) VarIsV = 1;\
+        else \
+            if ( strcmp((char*)(varname), "10v") == 0 ) VarIsV = 1;\
+    } else \
+        if ( code == chcodes[1] ) VarIsV = 1;\
+    }
+#define CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2) { \
+    VarsUVareStaggered = 1;\
+    int gridID1tmp = vlistInqVarGrid(vlistID1, varID1);\
+    int gridID2tmp = vlistInqVarGrid(vlistID1, varID2);\
+    if (zaxisID1 != zaxisID2) VarsUVareStaggered = 0;\
+    else \
+    if (gridID1tmp==gridID2tmp) VarsUVareStaggered = 0;\
+    }
+
 
 static
 void destaggerUorV(double *fu, double *fuOut,
@@ -275,36 +295,6 @@ void *DestaggerUV()
   */
   int VarIsU,VarIsV;
   int VarsUVareStaggered;
-
-  // NOTE: Variable with codes (3[3,4],105,10) will get from CDO typically a name: "10u", resp. "10v"
-  // Mostly u & v at level type 105 is not staggered, but test it to be sure..
-
-#define CheckVarIsU(varID,varname,code) {       \
-    VarIsU = 0;\
-    if ( lvar ) {\
-        if ( strcmp((char*)(varname), (char*)(chvars)[0]) == 0 ) VarIsU = 1;\
-        else \
-            if ( strcmp((char*)(varname), "10u") == 0 ) VarIsU = 1;\
-    } else \
-        if ( code == chcodes[0] ) VarIsU = 1;\
-    }
-#define CheckVarIsV(varID,varname,code) {       \
-    VarIsV = 0;\
-    if ( lvar ) {\
-        if ( strcmp((char*)(varname), (char*)(chvars)[1]) == 0 ) VarIsV = 1;\
-        else \
-            if ( strcmp((char*)(varname), "10v") == 0 ) VarIsV = 1;\
-    } else \
-        if ( code == chcodes[1] ) VarIsV = 1;\
-    }
-#define CheckUVisStaggered(varID1,varID2, zaxisID1, zaxisID2) { \
-    VarsUVareStaggered = 1;\
-    int gridID1tmp = vlistInqVarGrid(vlistID1, varID1);\
-    int gridID2tmp = vlistInqVarGrid(vlistID1, varID2);\
-    if (zaxisID1 != zaxisID2) VarsUVareStaggered = 0;\
-    else \
-    if (gridID1tmp==gridID2tmp) VarsUVareStaggered = 0;\
-    }
 
   // Search for staggered u and v wind:
   int nvars = vlistNvars(vlistID1);
@@ -606,408 +596,48 @@ void *DestaggerUV()
   return 0;
 }
 
-double *rotationMatrixArray = NULL;
-
-void *TransformUV(int operatorID)
-{
-    int streamID1, streamID2;
-    int nrecs;
-    int tsID, recID, varID, levelID;
-    int varID1, varID2, nlevel1, nlevel2;
-    int gridsize = 0;
-    int nvars, code, gridID;
-    int param, ltype, level, nlevs, zaxisID;
-    int pnum, pcat, pdis;
-    int vlistID1, vlistID2;
-    int offset;
-    int lvar = FALSE;
-    int i, nch;
-    int chcodes[MAXARG];
-    char *chvars[MAXARG];
-    char varname[CDI_MAX_NAME];
-    int taxisID1, taxisID2;
-    int *recVarID, *recLevelID;
-    int **varnmiss;
-    double **vardata, *single, *usvar = NULL, *vsvar = NULL;
-    int gridIDcurvl = -1;
-    int gridIDlastused = -1;
-
-    //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
-
-    operatorInputArg("Pairs of u and v in the rotated system;\n usage:  rotuvNorth,u,v  -or- rotuvNorth,33,34");
-
-    nch = operatorArgc();
-    if ( nch!=2 ) cdoAbort("Number of input arguments != 2");
-    if ( nch>=MAXARG ) cdoAbort("Number of input arguments >= %d", MAXARG);
-
-    if ( isdigit(*operatorArgv()[0]) )
-    {
-        lvar = FALSE;  // We have a list of codes
-        for ( i = 0; i < nch; i++ )
-            chcodes[i] = atoi(operatorArgv()[i]);
-    }
-    else
-    {
-        lvar = TRUE;  // We have a list of variables
-        for ( i = 0; i < nch; i++ )
-            chvars[i] = operatorArgv()[i];
-    }
-
-    streamID1 = streamOpenRead(cdoStreamName(0));
-
-    vlistID1 = streamInqVlist(streamID1);
-    vlistID2 = vlistDuplicate(vlistID1);
-
-    nvars = vlistNvars(vlistID1);
-    nrecs = vlistNrecs(vlistID1);
-
-    recVarID   = (int *) Malloc(nrecs*sizeof(int));
-    recLevelID = (int *) Malloc(nrecs*sizeof(int));
-
-    varnmiss   = (int **) Malloc(nvars*sizeof(int *));
-    vardata    = (double **) Malloc(nvars*sizeof(double *));
-
-
-//extern int cdoGribChangeModeUvRelativeToGrid;  // -1: don't set; 0: set to '0'; 1: set to '1'
-    cdoGribChangeModeUvRelativeToGrid = 0; // U & V are NOT grid relative
-
-    int VarIsU,VarIsV;
-
-    // NOTE: Variable with codes (3[3,4],105,10) will get from CDO typically a name: "10u", resp. "10v"
-
-
-    for ( varID = 0; varID < nvars; varID++ )
-    {
-        varnmiss[varID] = NULL;
-        vardata[varID]  = NULL;
-        param = vlistInqVarParam(vlistID1, varID);  /*  vlistInqVarParam(int vlistID, int varID): Get the parameter number of a Variable */
-        cdiDecodeParam(param, &pnum, &pcat, &pdis);
-        code = pnum;
-        zaxisID = vlistInqVarZaxis(vlistID1, varID);
-        ltype   = zaxis2ltype(zaxisID);
-        nlevs   = zaxisInqSize(zaxisID);
-        vlistInqVarName(vlistID1, varID, varname); /* vlistInqVarName(int vlistID, int varID, char *name): Get the name of a Variable */
-        strtolower(varname);
-
-        gridID = vlistInqVarGrid(vlistID1, varID);
-        if ( cdoDebugExt>=20 ) cdoPrint("Var.id [%4d] with grib code:%3d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",varID, code, varname, ltype, nlevs, gridID, zaxisID);
-
-        if ( ! (gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) )
-          cdoAbort("Only rotated lon/lat grids supported");
-
-        CheckVarIsU(varID,varname,code);
-        CheckVarIsV(varID,varname,code);
-        if (VarIsU || VarIsV)
-        {
-            gridsize = gridInqSize(gridID);
-            if ( cdoDebugExt )
-                cdoPrint("Allocating memory for variableID %4d (code=%3d): gridsize(%d)*nlevels(%d) = %ld [%4.3f MB]", varID, vlistInqVarCode(vlistID2, varID), gridsize, nlevs, gridsize*nlevs,gridsize*nlevs*sizeof(double)/(1024.0*1024));
-            varnmiss[varID] = (int *)    Malloc(nlevs*sizeof(int));
-            vardata[varID]  = (double *) Malloc(gridsize*nlevs*sizeof(double));
-        }
-    }
-
-    double *ivar = NULL;
-    int nmiss;
-    ivar = (double *) Malloc(gridsize*sizeof(double));  // storage for other fields than wind-uv
-
-    if ( cdoDebugExt )
-        cdoPrint("Neccessary memory has been allocated.");
-
-
-    taxisID1 = vlistInqTaxis(vlistID1);
-    taxisID2 = taxisDuplicate(taxisID1);
-    vlistDefTaxis(vlistID2, taxisID2);
-
-    streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-    streamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
-    vlistID2 = streamInqVlist(streamID2); // refresh it
-
-    tsID = 0;
-    while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
-    {
-        taxisCopyTimestep(taxisID2, taxisID1);
-
-        streamDefTimestep(streamID2, tsID);
-
-        if ( cdoDebugExt )
-            cdoPrint("About to read U & V data to memory. Other data will be stream-copied to the output file.");
-
-        for ( recID = 0; recID < nrecs; recID++ )
-        {
-            streamInqRecord(streamID1, &varID, &levelID);
-            code    = vlistInqVarCode(vlistID1, varID);
-            zaxisID = vlistInqVarZaxis(vlistID1, varID);
-            ltype   = zaxis2ltype(zaxisID);
-            level = zaxisInqLevel(zaxisID, levelID);
-
-            if (vardata[varID]== NULL)
-            {   // This means that it is not eighter U neither V.
-                recVarID[recID]   = -1;  // We will NOT record/store this field in memory
-                recLevelID[recID] = -1;
-                // We will stream-copy this data
-                streamDefRecord(streamID2, varID, levelID);
-                //if ( cdoDebugExt>10 ) cdoPrint("Copying data record.. %05d (timestep:%05d)", recID, tsID);
-                if ( cdoDebugExt>=20 ) cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",recID, tsID, varID, code, ltype, level, levelID);
-                streamCopyRecord(streamID2, streamID1);  // cannot do this ! We have to set the flag uvGridRelative = 0
-                //streamReadRecord(streamID1, ivar, &nmiss);
-                //streamWriteRecord(streamID2, ivar, nmiss);
-            }
-            else
-            {
-                recVarID[recID]   = varID;
-                recLevelID[recID] = levelID;
-                gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-                offset  = gridsize*levelID;
-                single  = vardata[varID] + offset;
-                if ( cdoDebugExt>=10 ) cdoPrint("Memmory-read data record:   %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",recID, tsID, varID, code, ltype, level, levelID);
-                streamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
-                if ( varnmiss[varID][levelID] )
-                    cdoAbort("Missing values unsupported for this operator!");
-            }
-        } // end of for ( recID = 0; recID < nrecs; ..
-        if ( cdoDebugExt )
-            cdoPrint("All neccessary U & V data are in memory. About to transform the windvectors...");
-
-        int code1, zaxisID1, ltype1;
-        int code2, zaxisID2, ltype2;
-        if ( cdoDebugExt )
-            cdoPrint("Looping over %d variables to look for U-wind..",nvars);
-
-        // find u-variables:
-        for ( varID1 = 0; varID1 < nvars; varID1++ )
-        if (vardata[varID1]==NULL)
-        {
-            //if ( cdoDebugExt ) cdoPrint("Checking U-wind: vardata[%d]== NULL ",varID1);
-        }
-        else // This means that it is U or V.
-        {
-            code1    = vlistInqVarCode(vlistID2, varID1);
-            zaxisID1 = vlistInqVarZaxis(vlistID2, varID1);
-            ltype1   = zaxis2ltype(zaxisID1);
-            nlevel1   = zaxisInqSize(zaxisID1);
-            vlistInqVarName(vlistID2, varID1, varname);
-            strtolower(varname);
-            CheckVarIsV(varID1,varname,code1);
-            if (VarIsV) continue;
-            if ( cdoDebugExt>=20 )
-                cdoPrint("Checking U-wind: Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",varID1, code1, varname, ltype1, nlevel1, zaxisID1);
-            CheckVarIsU(varID1,varname,code1);
-            if (!VarIsU) continue;
-            if ( cdoDebugExt>=10 )
-                cdoPrint("** FOUND U-wind; Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",varID1, code1, varname, ltype1, nlevel1, zaxisID1);
-            usvar = vardata[varID1];
-            // find corresponding v-variable to u-variable:
-            for ( varID2 = 0; varID2 < nvars; varID2++ )
-            if (vardata[varID2]==NULL)
-            {
-                //if ( cdoDebugExt ) cdoPrint("Checking V-wind: vardata[%d]== NULL ",varID1);
-            }
-            else // This means that it is U or V.
-            {
-                code2   = vlistInqVarCode(vlistID2, varID2);
-                zaxisID2 = vlistInqVarZaxis(vlistID2, varID2);
-                ltype2   = zaxis2ltype(zaxisID2);
-                nlevel2   = zaxisInqSize(zaxisID2);
-                vlistInqVarName(vlistID2, varID2, varname);
-                strtolower(varname);
-                CheckVarIsU(varID2,varname,code2);
-                if (VarIsU) continue;
-                if ( cdoDebugExt>=20 )
-                    cdoPrint("Checking V-wind: Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",varID2, code2, varname, ltype2, nlevel2, zaxisID2);
-                CheckVarIsV(varID2,varname,code2);
-                if (!VarIsV) continue;
-                if (!(( ltype1 == ltype2 ) &&  ( nlevel1 == nlevel2 ) && ( zaxisID1 == zaxisID2 )))
-                    continue;
-                if ( cdoDebugExt>=10 )
-                    cdoPrint("** FOUND V-wind; Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",varID2, code2, varname, ltype1, nlevel2, zaxisID2);
-                vsvar = vardata[varID2];
-                if ( cdoDebugExt>=20 )
-                    cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
-                                vlistInqVarCode(vlistID1, varID1), code1,
-                                vlistInqVarCode(vlistID1, varID2), code2);
-                gridID   = vlistInqVarGrid(vlistID1, varID1);
-                gridsize = gridInqSize(gridID);
-                if (operatorID != ROTUVN)  // ROTUVN operator does not need creation of gridIDcurvl ...
-                {
-                    if  ( (gridIDcurvl!=-1) && (gridIDlastused !=gridID) )
-                        cdoAbort("The gridID (%d) used just previously for uv-wind tranformation is not same this time(%d)!",gridIDlastused, gridID);
-                    if (gridIDcurvl==-1)
-                    {
-                        if ( cdoDebugExt )
-                            cdoPrint("Building LAT-LON grid for the direction to the North. (First time only).");
-                        gridIDlastused = gridID;
-                        // Compute 2D array with latlons only once. We expect that all horizontal grids for UV are same.
-                        // NOTE: At this stage U and V cannot be staggered!
-                        gridIDcurvl = gridToCurvilinear(gridID, 1);
-                        if (cdoDebugExt)
-                            cdoPrint("Transformed rotated-latLon grid (id:%d) to curvilinear (id:%d) with true lat-lon coordinates.", gridID, gridIDcurvl);
-                        // Grid definition with id: "gridIDcurvl" contains latlons of every gridpoint..
-                        // For details see: ./libcdi/src/cdi.h; Setgridtype to GRID_CURVILINEAR
-
-                        if ( gridIDcurvl == -1 ) cdoAbort("Creation of curvilinear grid definition failed!");
-
-                        if ( gridInqType(gridIDcurvl) != GRID_CURVILINEAR )
-                        {
-                            gridDestroy(gridIDcurvl);
-                            cdoAbort("Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
-                        }
-                        if (cdoDebugExt)
-                        {
-                            double xpole = 0, ypole = 0, angle = 0;
-                            if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
-                              gridInqParamRLL(gridID, &xpole, &ypole, &angle);
-                          
-                            cdoPrint("GRID_PROJECTION(id: %d) && CDI_PROJ_RLL:",gridID);
-                            cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID), gridInqYsize(gridID));
-                            cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridID, 0), gridInqYval(gridID, 0));
-                            cdoPrint("grid Xinc   %4.3f, grid Yinc   %4.3f", gridInqXinc(gridID),gridInqYinc(gridID));
-                            cdoPrint("grid Xpole   %4.3f, grid Ypole   %4.3f", xpole, ypole);
-                            cdoPrint("GRID_CURVILINEAR (id: %d):",gridIDcurvl);
-                            cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
-                            cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
-                            cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
-                            if ( cdoDebugExt>=20 )
-                            {
-                                printf("Xvals (size=%d):\n",gridInqSize(gridIDcurvl));
-                                int ii;
-                                for (ii=0; ii< 10; ii++)
-                                    printf("%4.3f ", gridInqXval(gridIDcurvl,ii));
-                                printf("\n...\n");
-                                for (ii=gridInqSize(gridIDcurvl)-10; ii< gridInqSize(gridIDcurvl); ii++)
-                                    printf("%4.3f ", gridInqXval(gridIDcurvl,ii));
-                                printf("\n");
-                                printf("Yvals (size=%d):\n",gridInqSize(gridIDcurvl));
-                                for (ii=0; ii< 10; ii++)
-                                    printf("%4.3f ", gridInqYval(gridIDcurvl,ii));
-                                printf("\n...\n");
-                                for (ii=gridInqSize(gridIDcurvl)-10; ii< gridInqSize(gridIDcurvl); ii++)
-                                    printf("%4.3f ", gridInqYval(gridIDcurvl,ii));
-                                printf("\n");
-                            }
-                        } // end of if (cdoDebugExt)
-                        if ( cdoDebugExt )
-                            cdoPrint("LAT-LON grid created.");
-                    }// end of if (gridIDcurvl==-1)
-                }// end of if (operatorID != ROTUVN)
-                if ( gridInqUvRelativeToGrid(gridID) != 1 )
-                {
-                    cdoPrint("NOTICE: grid with id:%d has NOT uv relative to grid.", gridID);
-                } else
-                {
-                    for ( levelID = 0; levelID < nlevel1; levelID++ )
-                    {
-                        if ( cdoDebugExt ) cdoPrint("RotuvNorth(): processing  level type: %d; level %d (out of [0:%d])", ltype1, levelID, nlevel1-1);
-                        offset = gridsize*levelID;
-                        if (operatorID == ROTUVNORTH)
-                        {
-                            rot_uv_north(gridIDcurvl, usvar + offset, vsvar + offset);
-                            //rot_uv_north(gridIDlastused, usvar + offset, vsvar + offset);
-                            // transform "in-place" the uv from grid relative into north-pole related
-                        }
-                        else
-                        if (operatorID == PROJUVLATLON)
-                            project_uv_latlon(gridIDcurvl, usvar + offset, vsvar + offset);
-                        else
-                        if (operatorID == ROTUVN)
-                            rot_uv_back_mode64(gridID, usvar + offset, vsvar + offset);
-                    }
-                }
-                if ( cdoDebugExt ) cdoPrint("Finished processing level type: %d",ltype1);
-                break;
-            } // end  for ( varID2
-        } // end  for ( varID1
-
-        for ( recID = 0; recID < nrecs; recID++ )
-        {
-            varID    = recVarID[recID];
-            if (varID!= -1)
-            {
-                levelID  = recLevelID[recID];
-                code    = vlistInqVarCode(vlistID1, varID);
-                zaxisID = vlistInqVarZaxis(vlistID1, varID);
-                ltype   = zaxis2ltype(zaxisID);
-                level = zaxisInqLevel(zaxisID, levelID);
-                if ( cdoDebugExt>=10 )
-                    cdoPrint("Write modified data record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",recID, tsID, varID, code, ltype, level, levelID);
-                gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-                offset   = gridsize*levelID;
-                single   = vardata[varID] + offset;
-                streamDefRecord(streamID2, varID,  levelID);
-                streamWriteRecord(streamID2, single, varnmiss[varID][levelID]);
-            }
-        }
-        tsID++;
-    } // end of while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
-
-    streamClose(streamID2);
-    streamClose(streamID1);
-
-    if (gridIDcurvl!=-1)
-        gridDestroy(gridIDcurvl);  // at the end must Free the allocated curvilinear grid definition...
-
-    for ( varID = 0; varID < nvars; varID++ )
-    {
-        if (varnmiss[varID]!=NULL)
-            Free(varnmiss[varID]);
-        if (vardata[varID]!=NULL)
-            Free(vardata[varID]);
-    }
-
-    if (rotationMatrixArray != NULL)
-
-    Free(recVarID );
-    Free(recLevelID );
-
-    Free(ivar);
-
-    cdoFinish();
-    return 0;
-}
-
-//grid_t *grid_to_pointer(int idx); // defined in: libcdi/src/grid.c
-
+static
 void rot_uv_north(int gridID, double *us, double *vs)
 {
-    // Function transforms grid-relative UV into north-pole relative UV in the (spherical) lat-lon coordinate space.
-    // Input:  u,v : grid relative (u,v); NOT staggered
-    //
-    // This function needs that the gridpoint coordinates have been transformed from modelspace
-    // into LatLon space using function gridToCurvilinear().
-    //
-    // xvals[], yvals[] contains the Lon-Lat coordinates.
+  // Function transforms grid-relative UV into north-pole relative UV in the (spherical) lat-lon coordinate space.
+  // Input:  u,v : grid relative (u,v); NOT staggered
+  //
+  // This function needs that the gridpoint coordinates have been transformed from modelspace
+  // into LatLon space using function gridToCurvilinear().
+  //
+  // xvals[], yvals[] contains the Lon-Lat coordinates.
 
-    if ( gridInqType(gridID) != GRID_CURVILINEAR )
-        cdoAbort("rot_uv_north(gridname=%s) grid must be GRID_CURVILINEAR!", gridNamePtr(gridInqType(gridID)));
-        // this should never happen
+  if ( gridInqType(gridID) != GRID_CURVILINEAR )
+    cdoAbort("%s(gridname=%s) grid must be GRID_CURVILINEAR!", __func__, gridNamePtr(gridInqType(gridID)));
+  // this should never happen
 
-    double lon_pnt0, lat_pnt0;
-    double lon_pntEast, lat_pntEast;
-    double lon_pntNorth, lat_pntNorth;
-    double dLatEast, dLonEast;
-    double dLatNorth, dLonNorth;
-    double xpntEastSph,ypntEastSph, zpntEastSph;
-    double xpntNorthSph, ypntNorthSph, zpntNorthSph;
-    double xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot;
-    double xpnt0Sph, ypnt0Sph, zpnt0Sph;
-    double xnormSph, ynormSph, znormSph;
-    double xncross,  yncross,  zncross;
-    double vecAngle;
-    long idx, idx4;
-    int i,j;
-    double VJaa,VJab,VJba,VJbb;
-    double u,v;
-    double magnitude, newMagnitude;
-    double uu;
-    double vv;
+  static double *rotationMatrixArray = NULL;
+  double lon_pnt0, lat_pnt0;
+  double lon_pntEast = 0, lat_pntEast = 0;
+  double lon_pntNorth, lat_pntNorth;
+  double dLatEast = 0, dLonEast = 0;
+  double dLatNorth, dLonNorth;
+  double xpntEastSph,ypntEastSph, zpntEastSph = 0;
+  double xpntNorthSph, ypntNorthSph, zpntNorthSph;
+  double xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot;
+  double xpnt0Sph, ypnt0Sph, zpnt0Sph;
+  double xnormSph, ynormSph, znormSph;
+  double xncross,  yncross,  zncross;
+  double vecAngle;
+  long idx, idx4;
+  int i,j;
+  double VJaa,VJab,VJba,VJbb;
+  double u,v;
+  double magnitude, newMagnitude;
+  double uu;
+  double vv;
 
-    // The following "correction for the grid-step direction" from funtion project_uv_latlon()
-    // cannot be used here!
-    // This cannot be done in the geographic lon/lan (on the globe).
-    //int signLon=( (xvals[1] - xvals[0]) < 0 )?-1:1;
-    //int signLat=( (yvals[1] - yvals[0]) < 0 )?-1:1;
-    /*
+  // The following "correction for the grid-step direction" from funtion project_uv_latlon()
+  // cannot be used here!
+  // This cannot be done in the geographic lon/lan (on the globe).
+  //int signLon=( (xvals[1] - xvals[0]) < 0 )?-1:1;
+  //int signLat=( (yvals[1] - yvals[0]) < 0 )?-1:1;
+  /*
       Tested for scanning mode 64 LAMH_D11:
       -------------------------------------
       iScansNegatively = 0;
@@ -1025,46 +655,47 @@ void rot_uv_north(int gridID, double *us, double *vs)
         #-READ ONLY- alternativeRowScanning = 0;
         jDirectionIncrementInDegrees = 0.1;  // this should be -0.1 ??
         iDirectionIncrementInDegrees = 0.1;
-    */
+  */
 
-    int nx = gridInqXsize(gridID);
-    int ny = gridInqYsize(gridID);
+  int nx = gridInqXsize(gridID);
+  int ny = gridInqYsize(gridID);
     
-    double *xvals = (double *) Malloc(nx*sizeof(double));
-    double *yvals = (double *) Malloc(ny*sizeof(double));
+  double *xvals = (double *) Malloc(nx*ny*sizeof(double));
+  double *yvals = (double *) Malloc(nx*ny*sizeof(double));
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
 
-    gridInqXvals(gridID, xvals);
-    gridInqYvals(gridID, yvals);
-
-    // TODO
-    /*
+  // TODO
+  /*
     int  scanningMode =  gridInqScanningMode(gridID);
     int  iScansNegatively, jScansPositively,  jPointsAreConsecutive;
     gridInqScanningModeBits(gridID, &iScansNegatively, &jScansPositively,  &jPointsAreConsecutive);
-    */
-    int  scanningMode = 0;
-    int  iScansNegatively = 0, jScansPositively = 0,  jPointsAreConsecutive = 0;
-    if (scanningMode==64)
+  */
+  int scanningMode = 64;
+  int jScansPositively = 1;
+  if (scanningMode==64)
     {
-        if ( cdoDebugExt>1 )
-            cdoPrint("NOTICE: Processing data with scanning mode(%d); gridID=%d", scanningMode, gridID);
-    } else
-    if (scanningMode==0)
+      if ( cdoDebugExt>1 )
+        cdoPrint("NOTICE: Processing data with scanning mode(%d); gridID=%d", scanningMode, gridID);
+    }
+  else if (scanningMode==0)
     {
-        if ( cdoDebugExt>1 )
-            cdoPrint("NOTICE: Processing data with scanning mode(%d); gridID=%d", scanningMode, gridID);
-    } else
+      if ( cdoDebugExt>1 )
+        cdoPrint("NOTICE: Processing data with scanning mode(%d); gridID=%d", scanningMode, gridID);
+    }
+  else
     {
-        cdoAbort("\n***\n***\n WARNING! Unsupported data scanning mode(%d); gridID=%d; For this operation we support only: 64,00 \n          RESULT will be probably incorrect!\n***\n***", scanningMode, gridID);
+      cdoAbort("\n***\n***\n WARNING! Unsupported data scanning mode(%d); gridID=%d; For this operation we support only: 64,00 \n"
+               "RESULT will be probably incorrect!\n***\n***", scanningMode, gridID);
     }
 
 
-    if (cdoDebugExt)
-        cdoPrint("rot_uv_north(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", gridNamePtr(gridInqType(gridID)), nx, ny );
+  if (cdoDebugExt)
+    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
 
-    if (gridInqSize(gridID) != (nx*ny) )
-            cdoAbort("Incorrect gridsize (%d) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
-            // this should never happen
+  if (gridInqSize(gridID) != (nx*ny) )
+    cdoAbort("Incorrect gridsize (%d) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
+  // this should never happen
 
 #define OPTrotuvNorth 1   // ACTIVATE SPEED - OPTIMIZATION
 
@@ -1078,247 +709,240 @@ void rot_uv_north(int gridID, double *us, double *vs)
     vecz1 = vecx2*vecy0 - vecy2*vecx0;\
     vecz2 = vecx0*vecy1 - vecy0*vecx1; }
 
-   if (rotationMatrixArray== NULL)
-   {
-        if ( cdoDebugExt>0 )
-            cdoPrint("About to compute rotationMatrixArray for the whole grid [%d x %d]\n", nx,ny);
+  if ( rotationMatrixArray == NULL )
+    {
+      if ( cdoDebugExt>0 )
+        cdoPrint("About to compute rotationMatrixArray for the whole grid [%d x %d]", nx,ny);
 
-       rotationMatrixArray = (double *) Malloc(4*nx*ny*sizeof(double));
-       for ( j = 0; j < ny; j++ )
-            for ( i = 0; i < nx; i++ )
-            {
-                idx = j*nx+i;
-                lon_pnt0 = xvals[idx];
-                lat_pnt0 = yvals[idx];
+      rotationMatrixArray = (double *) Malloc(4*nx*ny*sizeof(double));
+      for ( j = 0; j < ny; j++ )
+        for ( i = 0; i < nx; i++ )
+          {
+            idx = j*nx+i;
+            lon_pnt0 = xvals[idx];
+            lat_pnt0 = yvals[idx];
 #ifndef OPTrotuvNorth
-                // For speed - optimization not used and not needed. Kept only for clarity.
-                if ((i+1)<nx)
-                {   lon_pntEast = xvals[idx+1];  // longitude of grid point towards east
-                    lat_pntEast = yvals[idx+1]; }//  latitude of grid point towards east
-                else
-                {   lon_pntEast = lon_pnt0 + 1.0*(lon_pnt0 - xvals[idx-1]); // at the grid border define extended gridpoint
-                    lat_pntEast = lat_pnt0 + 1.0*(lat_pnt0 - yvals[idx-1]); }
+            // For speed - optimization not used and not needed. Kept only for clarity.
+            if ((i+1)<nx)
+              {   lon_pntEast = xvals[idx+1];  // longitude of grid point towards east
+                lat_pntEast = yvals[idx+1]; }//  latitude of grid point towards east
+            else
+              {   lon_pntEast = lon_pnt0 + 1.0*(lon_pnt0 - xvals[idx-1]); // at the grid border define extended gridpoint
+                lat_pntEast = lat_pnt0 + 1.0*(lat_pnt0 - yvals[idx-1]); }
 #endif //#ifdef OPTrotuvNorth
-                if ((j+1)<ny)
-                {   lon_pntNorth = xvals[idx+nx];  // longitude of grid point towards north
-                    lat_pntNorth = yvals[idx+nx]; }//  latitude of grid point towards north
-                else
-                {   lon_pntNorth = lon_pnt0 + 1.0*(lon_pnt0 - xvals[idx-nx]); // at the grid border define extended gridpoint
-                    lat_pntNorth = lat_pnt0 + 1.0*(lat_pnt0 - yvals[idx-nx]); }
+            if ((j+1)<ny)
+              {   lon_pntNorth = xvals[idx+nx];  // longitude of grid point towards north
+                lat_pntNorth = yvals[idx+nx]; }//  latitude of grid point towards north
+            else
+              {   lon_pntNorth = lon_pnt0 + 1.0*(lon_pnt0 - xvals[idx-nx]); // at the grid border define extended gridpoint
+                lat_pntNorth = lat_pnt0 + 1.0*(lat_pnt0 - yvals[idx-nx]); }
 
-                // (lon_pntNorth, lat_pntNorth)
-                //     ^
-                //     |       (lon_pntCenter, lat_pntCenter)   center of the cell-diagonal
-                //     |
-                // (lon_pnt0,lat_pnt0) ----> (lon_pntEast,lat_pntEast)
+            // (lon_pntNorth, lat_pntNorth)
+            //     ^
+            //     |       (lon_pntCenter, lat_pntCenter)   center of the cell-diagonal
+            //     |
+            // (lon_pnt0,lat_pnt0) ----> (lon_pntEast,lat_pntEast)
 
-                //lon_pntCenter = 0.5*(lon_pntNorth + lon_pntEast);
-                //lat_pntCenter = 0.5*(lat_pntNorth + lat_pntEast);
-                //lon_pnt0 -= lon_pntCenter; lon_pntEast -= lon_pntCenter; lon_pntNorth -= lon_pntCenter;
-                //lat_pnt0 -= lat_pntCenter; lat_pntEast -= lat_pntCenter; lat_pntNorth -= lat_pntCenter;
+            //lon_pntCenter = 0.5*(lon_pntNorth + lon_pntEast);
+            //lat_pntCenter = 0.5*(lat_pntNorth + lat_pntEast);
+            //lon_pnt0 -= lon_pntCenter; lon_pntEast -= lon_pntCenter; lon_pntNorth -= lon_pntCenter;
+            //lat_pnt0 -= lat_pntCenter; lat_pntEast -= lat_pntCenter; lat_pntNorth -= lat_pntCenter;
 
-                // This is the local coordinate system of a grid cell where we have (u,v) at location (xpnt0,ypnt0).
+            // This is the local coordinate system of a grid cell where we have (u,v) at location (xpnt0,ypnt0).
 
-                // The local coordinate system is now centered around (lon_pnt0,lat_pnt0)
-                // The vector towards north pole (UP-VECTOR) at this location will be (0,1,0)
-                // The tangent plane at this location is XY wil a normal (0, 0, 1)
+            // The local coordinate system is now centered around (lon_pnt0,lat_pnt0)
+            // The vector towards north pole (UP-VECTOR) at this location will be (0,1,0)
+            // The tangent plane at this location is XY wil a normal (0, 0, 1)
 
-                // Nummerical approach using projection onto a unit sphere
-                lon_pnt0 = radians(lon_pnt0); lat_pnt0 = radians(lat_pnt0);
-                xpnt0Sph = cos(lat_pnt0) * cos(lon_pnt0);
-                ypnt0Sph = cos(lat_pnt0) * sin(lon_pnt0);   // # Get [lon_pnt0,lat_pnt0] on the unit sphere.
-                zpnt0Sph = sin(lat_pnt0);                   // # Only XY plane is needed.
-                dLonNorth = radians(lon_pntNorth); dLatNorth = radians(lat_pntNorth);
-                xpntNorthSph = cos(dLatNorth) * cos(dLonNorth);
-                ypntNorthSph = cos(dLatNorth) * sin(dLonNorth); // # Get [dLonNorth,dLatNorth] on the unit sphere.
-                zpntNorthSph = sin(dLatNorth);                   //# Only XY plane is needed.
-                xpntNorthSph-= xpnt0Sph, ypntNorthSph-= ypnt0Sph; zpntNorthSph-= zpnt0Sph;
-                NormVector( xpntNorthSph, ypntNorthSph, zpntNorthSph );  // vecy
+            // Nummerical approach using projection onto a unit sphere
+            lon_pnt0 = radians(lon_pnt0); lat_pnt0 = radians(lat_pnt0);
+            xpnt0Sph = cos(lat_pnt0) * cos(lon_pnt0);
+            ypnt0Sph = cos(lat_pnt0) * sin(lon_pnt0);   // # Get [lon_pnt0,lat_pnt0] on the unit sphere.
+            zpnt0Sph = sin(lat_pnt0);                   // # Only XY plane is needed.
+            dLonNorth = radians(lon_pntNorth); dLatNorth = radians(lat_pntNorth);
+            xpntNorthSph = cos(dLatNorth) * cos(dLonNorth);
+            ypntNorthSph = cos(dLatNorth) * sin(dLonNorth); // # Get [dLonNorth,dLatNorth] on the unit sphere.
+            zpntNorthSph = sin(dLatNorth);                   //# Only XY plane is needed.
+            xpntNorthSph-= xpnt0Sph, ypntNorthSph-= ypnt0Sph; zpntNorthSph-= zpnt0Sph;
+            NormVector( xpntNorthSph, ypntNorthSph, zpntNorthSph );  // vecy
 
 
 #ifndef OPTrotuvNorth
-                // For speed - optimization not used and not needed. Kept only for clarity.
-                dLonEast = radians(lon_pntEast); dLatEast = radians(lat_pntEast);
-                xpntEastSph = cos(dLatEast) * cos(dLonEast);
-                ypntEastSph = cos(dLatEast) * sin(dLonEast);  // # Get [dLonEast,dLatEast] on the unit sphere.
-                zpntEastSph = sin(dLatEast);                  // # Only XY plane is needed.
-                xpntEastSph -= xpnt0Sph; ypntEastSph -= ypnt0Sph; zpntEastSph -= zpnt0Sph;  // make vectors from points
-                NormVector( xpntEastSph,  ypntEastSph,  zpntEastSph );  // vecx
-                //vecz = CrossProd(vecx,vecy)
-                CrossProd( xpntEastSph,  ypntEastSph,  zpntEastSph,  xpntNorthSph, ypntNorthSph, zpntNorthSph, \
-                           xnormSph, ynormSph, znormSph);  // vec z
+            // For speed - optimization not used and not needed. Kept only for clarity.
+            dLonEast = radians(lon_pntEast); dLatEast = radians(lat_pntEast);
+            xpntEastSph = cos(dLatEast) * cos(dLonEast);
+            ypntEastSph = cos(dLatEast) * sin(dLonEast);  // # Get [dLonEast,dLatEast] on the unit sphere.
+            zpntEastSph = sin(dLatEast);                  // # Only XY plane is needed.
+            xpntEastSph -= xpnt0Sph; ypntEastSph -= ypnt0Sph; zpntEastSph -= zpnt0Sph;  // make vectors from points
+            NormVector( xpntEastSph,  ypntEastSph,  zpntEastSph );  // vecx
+            //vecz = CrossProd(vecx,vecy)
+            CrossProd( xpntEastSph,  ypntEastSph,  zpntEastSph,  xpntNorthSph, ypntNorthSph, zpntNorthSph, \
+                       xnormSph, ynormSph, znormSph);  // vec z
 #else
-                xnormSph = xpnt0Sph; ynormSph = ypnt0Sph; znormSph = zpnt0Sph;
-                NormVector(xnormSph, ynormSph, znormSph);  // vec z ... normal vector to the sphere at pnt0 (lon_pnt0,lat_pnt0)
+            xnormSph = xpnt0Sph; ynormSph = ypnt0Sph; znormSph = zpnt0Sph;
+            NormVector(xnormSph, ynormSph, znormSph);  // vec z ... normal vector to the sphere at pnt0 (lon_pnt0,lat_pnt0)
 #endif //#ifdef OPTrotuvNorth
 
-                //# vecUP = (0.0,0.0,1.0) .. up-vector in a global coordinate system
-                //#   ^^ up-vector & vector-towards-north-pole & shere-normal-vector belong to ONE plane
-                //#      that crosses north pole and point pnt0 (lon_pnt0,lat_pnt0)
-                //# Project vecUP onto plane XY, where plane-normal is vecz
-                //# vecnProjXY = vecUP - D*vecz;   D= a*x1+b*y1+c*z1;  vecz=(a,b,c); vecUP = (x1,y1,z1)=(0,0,1)
-                //#                               D= vecz[2]*1;
-                //# vecyRot = NormVector( (0.0 - vecz[2]*vecz[0],0.0  - vecz[2]*vecz[1], 1.0  - vecz[2]*vecz[2]) )
+            //# vecUP = (0.0,0.0,1.0) .. up-vector in a global coordinate system
+            //#   ^^ up-vector & vector-towards-north-pole & shere-normal-vector belong to ONE plane
+            //#      that crosses north pole and point pnt0 (lon_pnt0,lat_pnt0)
+            //# Project vecUP onto plane XY, where plane-normal is vecz
+            //# vecnProjXY = vecUP - D*vecz;   D= a*x1+b*y1+c*z1;  vecz=(a,b,c); vecUP = (x1,y1,z1)=(0,0,1)
+            //#                               D= vecz[2]*1;
+            //# vecyRot = NormVector( (0.0 - vecz[2]*vecz[0],0.0  - vecz[2]*vecz[1], 1.0  - vecz[2]*vecz[2]) )
 
-                //double Dist =  xnormSph * 0.0 +  ynormSph * 0.0 + znormSph * 1.0; // Left out for optimization
-                xpntNorthSphRot =     - znormSph*xnormSph;  // xpntNorthSphRot = 0.0 - Dist*xnormSph;
-                ypntNorthSphRot =     - znormSph*ynormSph;  // ypntNorthSphRot = 0.0 - Dist*ynormSph;
-                zpntNorthSphRot = 1.0 - znormSph*znormSph;  // zpntNorthSphRot = 1.0 - Dist*znormSph;
-                NormVector(xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot);
+            //double Dist =  xnormSph * 0.0 +  ynormSph * 0.0 + znormSph * 1.0; // Left out for optimization
+            xpntNorthSphRot =     - znormSph*xnormSph;  // xpntNorthSphRot = 0.0 - Dist*xnormSph;
+            ypntNorthSphRot =     - znormSph*ynormSph;  // ypntNorthSphRot = 0.0 - Dist*ynormSph;
+            zpntNorthSphRot = 1.0 - znormSph*znormSph;  // zpntNorthSphRot = 1.0 - Dist*znormSph;
+            NormVector(xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot);
 
-                // This would create in 3D the rotated Easting vector; but we don't need it in this routine.
-                // Left out to optimize the computation..
-                // CrossProd( xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xnormSph, ynormSph, znormSph,
-                //            xpntEastSph,  ypntEastSphRot,  zpntEastSphRot ); //vecxRot = CrossProd(vecy,vecz)
+            // This would create in 3D the rotated Easting vector; but we don't need it in this routine.
+            // Left out to optimize the computation..
+            // CrossProd( xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xnormSph, ynormSph, znormSph,
+            //            xpntEastSph,  ypntEastSphRot,  zpntEastSphRot ); //vecxRot = CrossProd(vecy,vecz)
 
-                vecAngle = acos( (xpntNorthSph*xpntNorthSphRot + ypntNorthSph*ypntNorthSphRot + zpntNorthSph*zpntNorthSphRot) ) ;
-                // Determine the sign of the angle
-                CrossProd( xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xpntNorthSph, ypntNorthSph, zpntNorthSph,\
-                           xncross,  yncross,  zncross);
-                if ( (xncross*xnormSph + yncross*ynormSph + zncross*znormSph) > 0.0)  // dotProduct
-                    vecAngle *=-1.0;
+            vecAngle = acos( (xpntNorthSph*xpntNorthSphRot + ypntNorthSph*ypntNorthSphRot + zpntNorthSph*zpntNorthSphRot) ) ;
+            // Determine the sign of the angle
+            CrossProd( xpntNorthSphRot, ypntNorthSphRot, zpntNorthSphRot, xpntNorthSph, ypntNorthSph, zpntNorthSph, \
+                       xncross,  yncross,  zncross);
+            if ( (xncross*xnormSph + yncross*ynormSph + zncross*znormSph) > 0.0)  // dotProduct
+              vecAngle *=-1.0;
 
-                if (jScansPositively!=1) vecAngle += radians(180.0);  // this is needed in scanning mode 00
+            if (jScansPositively!=1) vecAngle += radians(180.0);  // this is needed in scanning mode 00
 
-                xpntNorthSph = sin(vecAngle);    // Rotate the point/vector (0,1) around Z-axis with vecAngle
-                ypntNorthSph = cos(vecAngle);
-                xpntEastSph  =   ypntNorthSph;   // Rotate the same point/vector around Z-axis with 90 degrees
-                ypntEastSph  =  -xpntNorthSph;
+            xpntNorthSph = sin(vecAngle);    // Rotate the point/vector (0,1) around Z-axis with vecAngle
+            ypntNorthSph = cos(vecAngle);
+            xpntEastSph  =   ypntNorthSph;   // Rotate the same point/vector around Z-axis with 90 degrees
+            ypntEastSph  =  -xpntNorthSph;
 
-                //zpntNorthSph = 0; zpntEastSph = 0;  // not needed in 2D
+            //zpntNorthSph = 0; zpntEastSph = 0;  // not needed in 2D
 
-                // 1) Build the rotation matrix and put the axes-base vectors into the matrix
-                VJaa = xpntEastSph ;
-                VJab = xpntNorthSph;
-                VJba = ypntEastSph ;
-                VJbb = ypntNorthSph;
+            // 1) Build the rotation matrix and put the axes-base vectors into the matrix
+            VJaa = xpntEastSph ;
+            VJab = xpntNorthSph;
+            VJba = ypntEastSph ;
+            VJbb = ypntNorthSph;
 
-                idx4 = 4*idx;
-                // Caching the rotation matrix for later usage ..
-                rotationMatrixArray[idx4++] = VJaa;
-                rotationMatrixArray[idx4++] = VJab;
-                rotationMatrixArray[idx4++] = VJba;
-                rotationMatrixArray[idx4++] = VJbb;
+            idx4 = 4*idx;
+            // Caching the rotation matrix for later usage ..
+            rotationMatrixArray[idx4++] = VJaa;
+            rotationMatrixArray[idx4++] = VJab;
+            rotationMatrixArray[idx4++] = VJba;
+            rotationMatrixArray[idx4++] = VJbb;
 
             if ( cdoDebugExt>=20 )
-                if ( ((i<3) && (j<3)) || ((i>(nx-3)) && (j>(ny-3))  ) )
+              if ( ((i<3) && (j<3)) || ((i>(nx-3)) && (j>(ny-3))  ) )
                 {
-                    cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid relative) ",\
-                             i,j, lon_pnt0, lat_pnt0,lon_pntNorth, lat_pntNorth, RAD2DEG*dLonNorth, RAD2DEG*dLatNorth );
-                   cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; dLonEast =%3.6f; dLatEast =%3.6f (Easting grid relative ) ",\
-                            i,j, lon_pnt0, lat_pnt0,lon_pntEast,lat_pntEast, RAD2DEG*dLonEast, RAD2DEG*dLatEast );
-                    //cdoPrint("(xpntNorthSph, ypntNorthSph)= [%3.6f,%3.6f]; (xpntEastSph,ypntEastSph) = [%3.6f,%3.6f];",
-                    //         xpntNorthSph, ypntNorthSph, xpntEastSph,ypntEastSph );
-                    //vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph + zpntEastSph*zpntNorthSph) );
-                    //vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph) );
-                    cdoPrint("(xpntNorthSph, ypntNorthSph, zpntNorthSph)= [%3.6f,%3.6f,%3.6f]; (xpntEastSph,ypntEastSph, zpntEastSph) = [%3.6f,%3.6f,%3.6f]; vecAngle= %3.6f",\
-                             xpntNorthSph, ypntNorthSph, zpntNorthSph, xpntEastSph, ypntEastSph, zpntEastSph, vecAngle );
-                    cdoPrint("rotation matrix for grid point [%03d,%03d] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)",\
-                             i,j, lon_pnt0, lat_pnt0, VJaa, VJab, VJba, VJbb);
+                  cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntNorth, lat_pntNorth) = [%3.6f,%3.6f]; dLonNorth=%3.6f; dLatNorth=%3.6f (Northing grid relative) ",
+                           i,j, lon_pnt0, lat_pnt0,lon_pntNorth, lat_pntNorth, RAD2DEG*dLonNorth, RAD2DEG*dLatNorth );
+                  cdoPrint("grid point [%03d,%03d] with latlon[%3.6f,%3.6f]; (lon_pntEast,lat_pntEast    )= [%3.6f,%3.6f]; dLonEast =%3.6f; dLatEast =%3.6f (Easting grid relative ) ",
+                           i,j, lon_pnt0, lat_pnt0,lon_pntEast,lat_pntEast, RAD2DEG*dLonEast, RAD2DEG*dLatEast );
+                  //cdoPrint("(xpntNorthSph, ypntNorthSph)= [%3.6f,%3.6f]; (xpntEastSph,ypntEastSph) = [%3.6f,%3.6f];",
+                  //         xpntNorthSph, ypntNorthSph, xpntEastSph,ypntEastSph );
+                  //vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph + zpntEastSph*zpntNorthSph) );
+                  //vecAngle = RAD2DEG * acos( (xpntEastSph*xpntNorthSph + ypntEastSph*ypntNorthSph) );
+                  cdoPrint("(xpntNorthSph, ypntNorthSph, zpntNorthSph)= [%3.6f,%3.6f,%3.6f]; (xpntEastSph,ypntEastSph, zpntEastSph) = [%3.6f,%3.6f,%3.6f]; vecAngle= %3.6f",
+                           xpntNorthSph, ypntNorthSph, zpntNorthSph, xpntEastSph, ypntEastSph, zpntEastSph, vecAngle );
+                  cdoPrint("rotation matrix for grid point [%03d,%03d] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)",
+                           i,j, lon_pnt0, lat_pnt0, VJaa, VJab, VJba, VJbb);
                 }
 
-                } // end of for ( i = 0; i < nx; i++ )
+          } // end of for ( i = 0; i < nx; i++ )
     }  // end of if (rotationMatrixArray== NULL)
 
-   // Take the rotation matrix from the cache
-   for ( j = 0; j < ny; j++ )
-        for ( i = 0; i < nx; i++ )
-        {
-            idx = (j*nx+i); idx4 = 4*idx;
-            VJaa = rotationMatrixArray[idx4++];
-            VJab = rotationMatrixArray[idx4++];
-            VJba = rotationMatrixArray[idx4++];
-            VJbb = rotationMatrixArray[idx4++];
+  // Take the rotation matrix from the cache
+  for ( j = 0; j < ny; j++ )
+    for ( i = 0; i < nx; i++ )
+      {
+        idx = (j*nx+i); idx4 = 4*idx;
+        VJaa = rotationMatrixArray[idx4++];
+        VJab = rotationMatrixArray[idx4++];
+        VJba = rotationMatrixArray[idx4++];
+        VJbb = rotationMatrixArray[idx4++];
 
-            // 2) Transform the UV vector with jacobian matrix
-            u = us[idx]; v = vs[idx];
-            //u = 6.0;  v = 0.0; // test: 6 m/s along the easting direction of the grid
-            magnitude=hypot(u, v);  // old vector magnitude in the model space
-            //(uu) =   (VJaa VJab) * ( u )
-            //(vv)     (VJba VJbb)   ( v )
-            uu = VJaa*u+VJab*v;
-            vv = VJba*u+VJbb*v;
-            //(uu) =   (VJaa VJab VJac) * ( u )
-            //(vv)     (VJba VJbb VJbc)   ( v )
-            //(ww)     (VJba VJbb VJcc)   ( w )
+        // 2) Transform the UV vector with jacobian matrix
+        u = us[idx]; v = vs[idx];
+        //u = 6.0;  v = 0.0; // test: 6 m/s along the easting direction of the grid
+        magnitude=hypot(u, v);  // old vector magnitude in the model space
+        //(uu) =   (VJaa VJab) * ( u )
+        //(vv)     (VJba VJbb)   ( v )
+        uu = VJaa*u+VJab*v;
+        vv = VJba*u+VJbb*v;
+        //(uu) =   (VJaa VJab VJac) * ( u )
+        //(vv)     (VJba VJbb VJbc)   ( v )
+        //(ww)     (VJba VJbb VJcc)   ( w )
+        
+        // 3) Apply scaling of the vector so that the vector keeps the original length (model space)
+        newMagnitude = hypot(uu, vv);
+        us[idx] = uu*magnitude/newMagnitude;
+        vs[idx] = vv*magnitude/newMagnitude;
+      }
+  
+  if ( cdoDebugExt>=20 )
+    cdoPrint("%s(gridname=%s) finished.", __func__, gridNamePtr(gridInqType(gridID)));
 
-            // 3) Apply scaling of the vector so that the vector keeps the original length (model space)
-            newMagnitude = hypot(uu, vv);
-            us[idx] = uu*magnitude/newMagnitude;
-            vs[idx] = vv*magnitude/newMagnitude;
-        }
-    if ( cdoDebugExt>=20 )
-        cdoPrint("rot_uv_north(gridname=%s) finished.", gridNamePtr(gridInqType(gridID)));
-
-    Free(xvals);
-    Free(yvals);
+  Free(xvals);
+  Free(yvals);
 }
 
+static
 void rot_uv_back_mode64(int gridID, double *us, double *vs)
 {
   // This function is partially based on rot_uv_back() of the CDO rotuv operator.
   // This routine expects the data to be in scanning-mode 64.
   // This routine gives comparable (not numerically same) results as rot_uv_north().
   // rot_uv_back_mode64() is significantly slower than rot_uv_north().
-  long i, ilat, ilon;
-  double u, v;
-  double xval, yval;
-
-  long nlon = gridInqXsize(gridID);
-  long nlat = gridInqYsize(gridID);
 
   // TODO
   /*
     int  scanningMode =  gridInqScanningMode(gridID);
     int  iScansNegatively, jScansPositively,  jPointsAreConsecutive;
-    gridInqScanningModeBits(gridID, &iScansNegatively, &jScansPositively,  &jPointsAreConsecutive);
   */
-    int  scanningMode =  0;
-    int  iScansNegatively = 0, jScansPositively = 0,  jPointsAreConsecutive = 0;
-    if (scanningMode==64)
+  int scanningMode = 64;
+  if ( scanningMode==64 )
     {
-        if ( cdoDebugExt>1 )
-            cdoPrint("NOTICE: Processing data with scanning mode(%d); gridID=%d", scanningMode, gridID);
-    } else
+      if ( cdoDebugExt>1 )
+        cdoPrint("NOTICE: Processing data with scanning mode(%d); gridID=%d", scanningMode, gridID);
+    }
+  else
     {
-        cdoPrint("\n***\n***\n WARNING! Unsupported data scanning mode(%d); gridID=%d; For this operation we support only: 64\n          RESULT will be probably incorrect!\n***\n***", scanningMode, gridID);
+      cdoPrint("\n***\n***\n WARNING! Unsupported data scanning mode(%d); gridID=%d; For this operation we support only: 64\n"
+               "RESULT will be probably incorrect!\n***\n***", scanningMode, gridID);
     }
 
   double xpole = 0, ypole = 0, angle = 0;
   if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
     gridInqParamRLL(gridID, &xpole, &ypole, &angle);
 
+  long nlon = gridInqXsize(gridID);
+  long nlat = gridInqYsize(gridID);
+
   double *xvals = (double *) Malloc(nlon*sizeof(double));
   double *yvals = (double *) Malloc(nlat*sizeof(double));
-
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
   /* Convert lat/lon units if required */
-  {
-    char units[CDI_MAX_NAME];
-    gridInqXunits(gridID, units);
-    grid_to_degree(units, 1, &xpole, "xpole");
-    grid_to_degree(units, nlon, xvals, "grid center lon");
-    gridInqYunits(gridID, units);
-    grid_to_degree(units, 1, &ypole, "ypole");
-    grid_to_degree(units, nlat, yvals, "grid center lat");
-  }
+  char units[CDI_MAX_NAME];
+  gridInqXunits(gridID, units);
+  grid_to_degree(units, 1, &xpole, "xpole");
+  grid_to_degree(units, nlon, xvals, "grid center lon");
+  gridInqYunits(gridID, units);
+  grid_to_degree(units, 1, &ypole, "ypole");
+  grid_to_degree(units, nlat, yvals, "grid center lat");
 
-  for ( ilat = 0; ilat < nlat; ilat++ )
-    for ( ilon = 0; ilon < nlon; ilon++ )
+  double u, v;
+  for ( long ilat = 0; ilat < nlat; ilat++ )
+    for ( long ilon = 0; ilon < nlon; ilon++ )
       {
-        i = ilat*nlon + ilon;
+        long i = ilat*nlon + ilon;
 
-        xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
-        yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
+        double xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
+        double yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
 
         usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
-        /*
-          if ( i%100 == 0 )
-          fprintf(stderr, "%d %d %g %g %g %g %g %g %g %g\n",
-          ilat, ilon, us[i], vs[i], yvals[ilat], xvals[ilon], ypole, xpole, u, v);
-        */
+
         us[i] = u;
         vs[i] = v;
       }
@@ -1327,77 +951,75 @@ void rot_uv_back_mode64(int gridID, double *us, double *vs)
   Free(yvals);
 }
 
-
-static int printCNT = 0;
+static
 void project_uv_latlon(int gridID, double *us, double *vs)
 {
-    // The function project_uv_latlon() is WARPING the UV-vector from grid-relative to North-pole-relative definition
-    // in LAT-LON projection, flatten into 2D space.
-    // The resulting vectors do NOT exit in a SPHERICAL LAT-LON space
-    // BUT in a strongly WARPED (2D) LAT-LON projection space.
-    // Imagine what happens to the grid-points and grid-cells close to the poles.
-    // And what affect it has on the "grid-cell relative UV-vectors" in NON-rectangular grid-cells.
-    // This routine is VERY fast as it uses JACOBIANs.
-    // Depending on shape distorsion of each cell we see the "flow" vectors to adapt.
-    // The resulting UV-vectors can by directly plot with (2D) plotting tools in LAT-LON.
-    // Even (2D) streamlines can be used on this way transformed vectors.
-    // This function expectes scaning-mode 64.
+  // The function project_uv_latlon() is WARPING the UV-vector from grid-relative to North-pole-relative definition
+  // in LAT-LON projection, flatten into 2D space.
+  // The resulting vectors do NOT exit in a SPHERICAL LAT-LON space
+  // BUT in a strongly WARPED (2D) LAT-LON projection space.
+  // Imagine what happens to the grid-points and grid-cells close to the poles.
+  // And what affect it has on the "grid-cell relative UV-vectors" in NON-rectangular grid-cells.
+  // This routine is VERY fast as it uses JACOBIANs.
+  // Depending on shape distorsion of each cell we see the "flow" vectors to adapt.
+  // The resulting UV-vectors can by directly plot with (2D) plotting tools in LAT-LON.
+  // Even (2D) streamlines can be used on this way transformed vectors.
+  // This function expectes scaning-mode 64.
 
-    if ( gridInqType(gridID) != GRID_CURVILINEAR )
-        cdoAbort("rot_uv_north(gridname=%s) transformation grid must be GRID_CURVILINEAR!", gridNamePtr(gridInqType(gridID)));
-        // this should never happen
+  if ( gridInqType(gridID) != GRID_CURVILINEAR )
+    cdoAbort("%s(gridname=%s) transformation grid must be GRID_CURVILINEAR!", __func__, gridNamePtr(gridInqType(gridID)));
+  // this should never happen
 
-    double xpnt0,ypnt0;
-    double xpntEast,ypntEast;
-    double xpntNorth, ypntNorth;
-    long idx;
-    int i, j;
-    double distLon;
-    double distLat;
-    double VJaa,VJab,VJba,VJbb;
-    double u,v;
-    double magnitude, newMagnitude;
-    double uu;
-    double vv;
+  double xpnt0,ypnt0;
+  double xpntEast,ypntEast;
+  double xpntNorth, ypntNorth;
+  long idx;
+  int i, j;
+  double distLon;
+  double distLat;
+  double VJaa,VJab,VJba,VJbb;
+  double u,v;
+  double magnitude, newMagnitude;
+  double uu;
+  double vv;
 
-    int nx = gridInqXsize(gridID);
-    int ny = gridInqYsize(gridID);
+  int nx = gridInqXsize(gridID);
+  int ny = gridInqYsize(gridID);
     
-    double *xvals = (double *) Malloc(nx*sizeof(double));
-    double *yvals = (double *) Malloc(ny*sizeof(double));
+  double *xvals = (double *) Malloc(nx*ny*sizeof(double));
+  double *yvals = (double *) Malloc(nx*ny*sizeof(double));
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);
 
-    gridInqXvals(gridID, xvals);
-    gridInqYvals(gridID, yvals);
+  int signLon=( (xvals[1] - xvals[0]) < 0 )?-1:1;
+  int signLat=( (yvals[1] - yvals[0]) < 0 )?-1:1;
 
-    int signLon=( (xvals[1] - xvals[0]) < 0 )?-1:1;
-    int signLat=( (yvals[1] - yvals[0]) < 0 )?-1:1;
+  if (cdoDebugExt)
+    cdoPrint("%s(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", __func__, gridNamePtr(gridInqType(gridID)), nx, ny );
 
-    if (cdoDebugExt)
-        cdoPrint("rot_uv_north(gridname=%s) .. processing grid with UV [nx*ny] (%d * %d)", gridNamePtr(gridInqType(gridID)), nx, ny );
+  if (gridInqSize(gridID) != (nx*ny) )
+    cdoAbort("Incorrect gridsize (%d) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
+  // this should never happen
 
-    if (gridInqSize(gridID) != (nx*ny) )
-            cdoAbort("Incorrect gridsize (%d) != nx*ny (%d * %d)", gridInqSize(gridID), nx, ny);
-            // this should never happen
-
-    for ( j = 0; j < ny; j++ )
-        for ( i = 0; i < nx; i++ )
-        {
-            idx = j*nx+i;
-            xpnt0 = xvals[idx];
-            ypnt0 = yvals[idx];
-            if ((i+1)<nx)
-            {   xpntEast = xvals[idx+1];  // longitude of grid point towards east
-                ypntEast = yvals[idx+1]; }//  latitude of grid point towards east
-            else
-            {   xpntEast = xpnt0 + 0.01*(xpnt0 - xvals[idx-1]); // at the grid border define extended gridpoint
-                ypntEast = ypnt0 + 0.01*(ypnt0 - yvals[idx-1]); }
-            if ((j+1)<ny)
-            {   xpntNorth = xvals[idx+nx];  // longitude of grid point towards north
-                ypntNorth = yvals[idx+nx]; }//  latitude of grid point towards north
-            else
-            {   xpntNorth = xpnt0 + 0.01*(xpnt0 - xvals[idx-nx]); // at the grid border define extended gridpoint
-                ypntNorth = ypnt0 + 0.01*(ypnt0 - yvals[idx-nx]); }
-            /*
+  for ( j = 0; j < ny; j++ )
+    for ( i = 0; i < nx; i++ )
+      {
+        idx = j*nx+i;
+        xpnt0 = xvals[idx];
+        ypnt0 = yvals[idx];
+        if ((i+1)<nx)
+          {   xpntEast = xvals[idx+1];  // longitude of grid point towards east
+            ypntEast = yvals[idx+1]; }//  latitude of grid point towards east
+        else
+          {   xpntEast = xpnt0 + 0.01*(xpnt0 - xvals[idx-1]); // at the grid border define extended gridpoint
+            ypntEast = ypnt0 + 0.01*(ypnt0 - yvals[idx-1]); }
+        if ((j+1)<ny)
+          {   xpntNorth = xvals[idx+nx];  // longitude of grid point towards north
+            ypntNorth = yvals[idx+nx]; }//  latitude of grid point towards north
+        else
+          {   xpntNorth = xpnt0 + 0.01*(xpnt0 - xvals[idx-nx]); // at the grid border define extended gridpoint
+            ypntNorth = ypnt0 + 0.01*(ypnt0 - yvals[idx-nx]); }
+        /*
             This is the local coordinate system of a grid cell where we have (u,v) at location (xpnt0,ypnt0).
             Gridpoint coordinates have been transformed from modelspace into LatLon space
             using function gridToCurvilinear().
@@ -1415,37 +1037,393 @@ void project_uv_latlon(int gridID, double *us, double *vs)
 
             distLon = hypot(modelXLon-lo, modelYLon-la);
             distLat = hypot(modelXLat-lo, modelYLat-la);
-            */
-            ///  Basically transforms grid-relative UV into north pole relative UV (~ lat-lon space)
-            ///  u,v : grid relative (u,v) not staggered
-            // get(u); get(v)
-            // 1) Build the jacobian matrix
-            distLon = hypot(xpntEast -xpnt0, ypntEast -ypnt0);
-            distLat = hypot(xpntNorth-xpnt0, ypntNorth-ypnt0);
-            VJaa = signLon*(xpntEast-xpnt0)/distLon;
-            VJab = signLon*(xpntNorth-xpnt0)/distLat;
-            VJba = signLat*(ypntEast-ypnt0)/distLon;
-            VJbb = signLat*(ypntNorth-ypnt0)/distLat;
-            if ( cdoDebugExt>=20 )
-                if ( ((i<3) && (j<3)) || ((i>(nx-3)) && (j>(ny-3))  ) )
-                    cdoPrint("Jacobian for grid point [%03d,%03d] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)", i,j, xpnt0, ypnt0, VJaa, VJab, VJba, VJbb);
-            // 2) Transform the UV vector with jacobian matrix
-            u = us[idx]; v = vs[idx];
-            //u = 6.0;  v = 0.0; // test: 6 m/s along the easting direction of the grid
-            magnitude=hypot(u, v);  // old vector magnitude in the model space
-            uu = VJaa*u+VJab*v;
-            vv = VJba*u+VJbb*v;
-            // 3) Apply scaling of the vector so that the vector keeps the original length (model space)
-            newMagnitude = hypot(uu, vv);
-            us[idx] = uu*magnitude/newMagnitude;
-            vs[idx] = vv*magnitude/newMagnitude;
-        }
-    if ( cdoDebugExt>=20 )
-        cdoPrint("rot_uv_north(gridname=%s) finished.", gridNamePtr(gridInqType(gridID)));
-    printCNT= 1;
+        */
+        ///  Basically transforms grid-relative UV into north pole relative UV (~ lat-lon space)
+        ///  u,v : grid relative (u,v) not staggered
+        // get(u); get(v)
+        // 1) Build the jacobian matrix
+        distLon = hypot(xpntEast -xpnt0, ypntEast -ypnt0);
+        distLat = hypot(xpntNorth-xpnt0, ypntNorth-ypnt0);
+        VJaa = signLon*(xpntEast-xpnt0)/distLon;
+        VJab = signLon*(xpntNorth-xpnt0)/distLat;
+        VJba = signLat*(ypntEast-ypnt0)/distLon;
+        VJbb = signLat*(ypntNorth-ypnt0)/distLat;
+        if ( cdoDebugExt>=20 )
+          if ( ((i<3) && (j<3)) || ((i>(nx-3)) && (j>(ny-3))  ) )
+            cdoPrint("Jacobian for grid point [%03d,%03d] with latlon[%3.6f,%3.6f]: (VJaa, VJab, VJba, VJbb) = (%3.6f,%3.6f,%3.6f,%3.6f)", i,j, xpnt0, ypnt0, VJaa, VJab, VJba, VJbb);
+        // 2) Transform the UV vector with jacobian matrix
+        u = us[idx]; v = vs[idx];
+        //u = 6.0;  v = 0.0; // test: 6 m/s along the easting direction of the grid
+        magnitude=hypot(u, v);  // old vector magnitude in the model space
+        uu = VJaa*u+VJab*v;
+        vv = VJba*u+VJbb*v;
+        // 3) Apply scaling of the vector so that the vector keeps the original length (model space)
+        newMagnitude = hypot(uu, vv);
+        us[idx] = uu*magnitude/newMagnitude;
+        vs[idx] = vv*magnitude/newMagnitude;
+      }
+  
+  if ( cdoDebugExt>=20 )
+    cdoPrint("%s(gridname=%s) finished.", __func__, gridNamePtr(gridInqType(gridID)));
 
-    Free(xvals);
-    Free(yvals);
+  Free(xvals);
+  Free(yvals);
+}
+
+
+void *TransformUV(int operatorID)
+{
+  int varID, levelID;
+  int varID1, varID2, nlevel1, nlevel2;
+  int gridsize = 0;
+  int code, gridID;
+  int param, ltype, level, nlevs, zaxisID;
+  int pnum, pcat, pdis;
+  int offset;
+  int chcodes[MAXARG];
+  char *chvars[MAXARG];
+  char varname[CDI_MAX_NAME];
+  double *single, *usvar = NULL, *vsvar = NULL;
+  int gridIDcurvl = -1;
+  int gridIDlastused = -1;
+
+  //Note: Already initialized by the caller! Don't call again: cdoInitialize(argument);
+
+  operatorInputArg("Pairs of u and v in the rotated system;\n usage:  rotuvNorth,u,v  -or- rotuvNorth,33,34");
+
+  int nch = operatorArgc();
+  if ( nch != 2 ) cdoAbort("Number of input arguments != 2");
+  if ( nch >= MAXARG ) cdoAbort("Number of input arguments >= %d", MAXARG);
+
+  bool lvar = false;
+  if ( isdigit(*operatorArgv()[0]) )
+    {
+      lvar = false;  // We have a list of codes
+      for ( int i = 0; i < nch; i++ )
+        chcodes[i] = parameter2int(operatorArgv()[i]);
+    }
+  else
+    {
+      lvar = true;  // We have a list of variables
+      for ( int i = 0; i < nch; i++ )
+        chvars[i] = operatorArgv()[i];
+    }
+
+  int streamID1 = streamOpenRead(cdoStreamName(0));
+
+  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID2 = vlistDuplicate(vlistID1);
+
+  int nvars = vlistNvars(vlistID1);
+  int nrecs = vlistNrecs(vlistID1);
+
+  int *recVarID   = (int *) Malloc(nrecs*sizeof(int));
+  int *recLevelID = (int *) Malloc(nrecs*sizeof(int));
+
+  int **varnmiss   = (int **) Malloc(nvars*sizeof(int *));
+  double **vardata = (double **) Malloc(nvars*sizeof(double *));
+
+  // TODO
+//extern int cdoGribChangeModeUvRelativeToGrid;  // -1: don't set; 0: set to '0'; 1: set to '1'
+  cdoGribChangeModeUvRelativeToGrid = 0; // U & V are NOT grid relative
+
+  int VarIsU,VarIsV;
+
+  // NOTE: Variable with codes (3[3,4],105,10) will get from CDO typically a name: "10u", resp. "10v"
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      varnmiss[varID] = NULL;
+      vardata[varID]  = NULL;
+      param = vlistInqVarParam(vlistID1, varID);  /*  vlistInqVarParam(int vlistID, int varID): Get the parameter number of a Variable */
+      cdiDecodeParam(param, &pnum, &pcat, &pdis);
+      code = pnum;
+      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      ltype   = zaxis2ltype(zaxisID);
+      nlevs   = zaxisInqSize(zaxisID);
+      vlistInqVarName(vlistID1, varID, varname); /* vlistInqVarName(int vlistID, int varID, char *name): Get the name of a Variable */
+      strtolower(varname);
+
+      gridID = vlistInqVarGrid(vlistID1, varID);
+      if ( cdoDebugExt>=20 )
+        cdoPrint("Var.id [%4d] with grib code:%3d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",
+                 varID, code, varname, ltype, nlevs, gridID, zaxisID);
+
+      if ( ! (gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL) )
+        cdoAbort("Only rotated lon/lat grids supported!");
+
+      CheckVarIsU(varID,varname,code);
+      CheckVarIsV(varID,varname,code);
+      if (VarIsU || VarIsV)
+        {
+          gridsize = gridInqSize(gridID);
+          if ( cdoDebugExt )
+            cdoPrint("Allocating memory for variableID %4d (code=%3d): gridsize(%d)*nlevels(%d) = %ld [%4.3f MB]",
+                     varID, vlistInqVarCode(vlistID2, varID), gridsize, nlevs, gridsize*nlevs,gridsize*nlevs*sizeof(double)/(1024.0*1024));
+          varnmiss[varID] = (int *)    Malloc(nlevs*sizeof(int));
+          vardata[varID]  = (double *) Malloc(gridsize*nlevs*sizeof(double));
+        }
+    }
+
+  if ( cdoDebugExt )
+    cdoPrint("Neccessary memory has been allocated.");
+
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
+
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+
+  streamDefVlist(streamID2, vlistID2); // from this point the stream is using a different vlistID !!!!!
+  vlistID2 = streamInqVlist(streamID2); // refresh it
+
+  int tsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+    {
+      taxisCopyTimestep(taxisID2, taxisID1);
+
+      streamDefTimestep(streamID2, tsID);
+
+      if ( cdoDebugExt )
+        cdoPrint("About to read U & V data to memory. Other data will be stream-copied to the output file.");
+
+      for ( int recID = 0; recID < nrecs; recID++ )
+        {
+          streamInqRecord(streamID1, &varID, &levelID);
+          code    = vlistInqVarCode(vlistID1, varID);
+          zaxisID = vlistInqVarZaxis(vlistID1, varID);
+          ltype   = zaxis2ltype(zaxisID);
+          level = zaxisInqLevel(zaxisID, levelID);
+
+          if ( vardata[varID] == NULL )
+            {   // This means that it is not eighter U neither V.
+              recVarID[recID]   = -1;  // We will NOT record/store this field in memory
+              recLevelID[recID] = -1;
+              // We will stream-copy this data
+              streamDefRecord(streamID2, varID, levelID);
+              //if ( cdoDebugExt>10 ) cdoPrint("Copying data record.. %05d (timestep:%05d)", recID, tsID);
+              if ( cdoDebugExt>=20 )
+                cdoPrint("Stream-copy data record:    %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
+                         recID, tsID, varID, code, ltype, level, levelID);
+              streamCopyRecord(streamID2, streamID1);  // cannot do this ! We have to set the flag uvGridRelative = 0
+            }
+          else
+            {
+              recVarID[recID]   = varID;
+              recLevelID[recID] = levelID;
+              gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+              offset  = gridsize*levelID;
+              single  = vardata[varID] + offset;
+              if ( cdoDebugExt>=10 )
+                cdoPrint("Memmory-read data record:   %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
+                         recID, tsID, varID, code, ltype, level, levelID);
+              streamReadRecord(streamID1, single, &varnmiss[varID][levelID]);
+              if ( varnmiss[varID][levelID] )
+                cdoAbort("Missing values unsupported for this operator!");
+            }
+        } // end of for ( recID = 0; recID < nrecs; ..
+
+      if ( cdoDebugExt )
+        cdoPrint("All neccessary U & V data are in memory. About to transform the windvectors...");
+
+      int code1, zaxisID1, ltype1;
+      int code2, zaxisID2, ltype2;
+      if ( cdoDebugExt )
+        cdoPrint("Looping over %d variables to look for U-wind..",nvars);
+
+      // find u-variables:
+      for ( varID1 = 0; varID1 < nvars; varID1++ )
+        if ( vardata[varID1] == NULL )
+          {
+            //if ( cdoDebugExt ) cdoPrint("Checking U-wind: vardata[%d]== NULL ",varID1);
+          }
+        else // This means that it is U or V.
+          {
+            code1    = vlistInqVarCode(vlistID2, varID1);
+            zaxisID1 = vlistInqVarZaxis(vlistID2, varID1);
+            ltype1   = zaxis2ltype(zaxisID1);
+            nlevel1   = zaxisInqSize(zaxisID1);
+            vlistInqVarName(vlistID2, varID1, varname);
+            strtolower(varname);
+            CheckVarIsV(varID1,varname,code1);
+            if (VarIsV) continue;
+            if ( cdoDebugExt>=20 )
+              cdoPrint("Checking U-wind: Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",
+                       varID1, code1, varname, ltype1, nlevel1, zaxisID1);
+            CheckVarIsU(varID1,varname,code1);
+            if (!VarIsU) continue;
+            if ( cdoDebugExt>=10 )
+              cdoPrint("** FOUND U-wind; Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",
+                       varID1, code1, varname, ltype1, nlevel1, zaxisID1);
+            usvar = vardata[varID1];
+            // find corresponding v-variable to u-variable:
+            for ( varID2 = 0; varID2 < nvars; varID2++ )
+              if ( vardata[varID2]==NULL )
+                {
+                  //if ( cdoDebugExt ) cdoPrint("Checking V-wind: vardata[%d]== NULL ",varID1);
+                }
+              else // This means that it is U or V.
+                {
+                  code2   = vlistInqVarCode(vlistID2, varID2);
+                  zaxisID2 = vlistInqVarZaxis(vlistID2, varID2);
+                  ltype2   = zaxis2ltype(zaxisID2);
+                  nlevel2   = zaxisInqSize(zaxisID2);
+                  vlistInqVarName(vlistID2, varID2, varname);
+                  strtolower(varname);
+                  CheckVarIsU(varID2,varname,code2);
+                  if (VarIsU) continue;
+                  if ( cdoDebugExt>=20 )
+                    cdoPrint("Checking V-wind: Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",
+                             varID2, code2, varname, ltype2, nlevel2, zaxisID2);
+                  CheckVarIsV(varID2,varname,code2);
+                  if (!VarIsV) continue;
+                  if (!(( ltype1 == ltype2 ) &&  ( nlevel1 == nlevel2 ) && ( zaxisID1 == zaxisID2 )))
+                    continue;
+                  if ( cdoDebugExt>=10 )
+                    cdoPrint("** FOUND V-wind; Var.id [%4d] with grib code:%3d; name: %6s; level type: %3d; number of levels: %3d; zaxisID: %d",
+                             varID2, code2, varname, ltype1, nlevel2, zaxisID2);
+                  vsvar = vardata[varID2];
+                  if ( cdoDebugExt>=20 )
+                    cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
+                             vlistInqVarCode(vlistID1, varID1), code1,
+                             vlistInqVarCode(vlistID1, varID2), code2);
+                  gridID   = vlistInqVarGrid(vlistID1, varID1);
+                  gridsize = gridInqSize(gridID);
+                  if ( operatorID != ROTUVN )  // ROTUVN operator does not need creation of gridIDcurvl ...
+                    {
+                      if  ( (gridIDcurvl != -1) && (gridIDlastused !=gridID) )
+                        cdoAbort("The gridID (%d) used just previously for uv-wind tranformation is not same this time(%d)!",gridIDlastused, gridID);
+                      
+                      if (gridIDcurvl==-1)
+                        {
+                          if ( cdoDebugExt )
+                            cdoPrint("Building LAT-LON grid for the direction to the North. (First time only).");
+                          gridIDlastused = gridID;
+                          // Compute 2D array with latlons only once. We expect that all horizontal grids for UV are same.
+                          // NOTE: At this stage U and V cannot be staggered!
+                          gridIDcurvl = gridToCurvilinear(gridID, 1);
+                          if (cdoDebugExt)
+                            cdoPrint("Transformed rotated-latLon grid (id:%d) to curvilinear (id:%d) with true lat-lon coordinates.", gridID, gridIDcurvl);
+                          // Grid definition with id: "gridIDcurvl" contains latlons of every gridpoint..
+                          // For details see: ./libcdi/src/cdi.h; Setgridtype to GRID_CURVILINEAR
+                          
+                          if ( gridIDcurvl == -1 ) cdoAbort("Creation of curvilinear grid definition failed!");
+
+                          if ( gridInqType(gridIDcurvl) != GRID_CURVILINEAR )
+                            {
+                              gridDestroy(gridIDcurvl);
+                              cdoAbort("Creation of curvilinear grid definition failed: type != GRID_CURVILINEAR");
+                            }
+                          if (cdoDebugExt)
+                            {
+                              double xpole = 0, ypole = 0, angle = 0;
+                              if ( gridInqType(gridID) == GRID_PROJECTION && gridInqProjType(gridID) == CDI_PROJ_RLL )
+                                gridInqParamRLL(gridID, &xpole, &ypole, &angle);
+                              
+                              cdoPrint("GRID_PROJECTION(id: %d) && CDI_PROJ_RLL:",gridID);
+                              cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID), gridInqYsize(gridID));
+                              cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridID, 0), gridInqYval(gridID, 0));
+                              cdoPrint("grid Xinc   %4.3f, grid Yinc   %4.3f", gridInqXinc(gridID),gridInqYinc(gridID));
+                              cdoPrint("grid Xpole   %4.3f, grid Ypole   %4.3f", xpole, ypole);
+                              cdoPrint("GRID_CURVILINEAR (id: %d):",gridIDcurvl);
+                              cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
+                              cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
+                              cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
+                              if ( cdoDebugExt>=20 )
+                                {
+                                  printf("Xvals (size=%d):\n",gridInqSize(gridIDcurvl));
+                                  int ii;
+                                  for (ii=0; ii< 10; ii++)
+                                    printf("%4.3f ", gridInqXval(gridIDcurvl,ii));
+                                  printf("\n...\n");
+                                  for (ii=gridInqSize(gridIDcurvl)-10; ii< gridInqSize(gridIDcurvl); ii++)
+                                    printf("%4.3f ", gridInqXval(gridIDcurvl,ii));
+                                  printf("\n");
+                                  printf("Yvals (size=%d):\n",gridInqSize(gridIDcurvl));
+                                  for (ii=0; ii< 10; ii++)
+                                    printf("%4.3f ", gridInqYval(gridIDcurvl,ii));
+                                  printf("\n...\n");
+                                  for (ii=gridInqSize(gridIDcurvl)-10; ii< gridInqSize(gridIDcurvl); ii++)
+                                    printf("%4.3f ", gridInqYval(gridIDcurvl,ii));
+                                  printf("\n");
+                                }
+                            } // end of if (cdoDebugExt)
+                          if ( cdoDebugExt )
+                            cdoPrint("LAT-LON grid created.");
+                        }// end of if (gridIDcurvl==-1)
+                    }// end of if (operatorID != ROTUVN)
+                  
+                  if ( gridInqUvRelativeToGrid(gridID) != 1 )
+                    {
+                      cdoPrint("NOTICE: grid with id:%d has NOT uv relative to grid.", gridID);
+                    }
+                  else
+                    {
+                      for ( levelID = 0; levelID < nlevel1; levelID++ )
+                        {
+                          if ( cdoDebugExt ) cdoPrint("RotuvNorth(): processing  level type: %d; level %d (out of [0:%d])", ltype1, levelID, nlevel1-1);
+                          offset = gridsize*levelID;
+                          if (operatorID == ROTUVNORTH)
+                            {
+                              rot_uv_north(gridIDcurvl, usvar + offset, vsvar + offset);
+                              //rot_uv_north(gridIDlastused, usvar + offset, vsvar + offset);
+                              // transform "in-place" the uv from grid relative into north-pole related
+                            }
+                          else if (operatorID == PROJUVLATLON)
+                            project_uv_latlon(gridIDcurvl, usvar + offset, vsvar + offset);
+                          else if (operatorID == ROTUVN)
+                            rot_uv_back_mode64(gridID, usvar + offset, vsvar + offset);
+                        }
+                    }
+
+                  if ( cdoDebugExt ) cdoPrint("Finished processing level type: %d",ltype1);
+                  break;
+                } // end  for ( varID2
+          } // end  for ( varID1
+      
+      for ( int recID = 0; recID < nrecs; recID++ )
+        {
+          varID = recVarID[recID];
+          if (varID != -1)
+            {
+              levelID  = recLevelID[recID];
+              code    = vlistInqVarCode(vlistID1, varID);
+              zaxisID = vlistInqVarZaxis(vlistID1, varID);
+              ltype   = zaxis2ltype(zaxisID);
+              level = zaxisInqLevel(zaxisID, levelID);
+              if ( cdoDebugExt>=10 )
+                cdoPrint("Write modified data record: %05d (timestep:%d); Var.id [%4d]; (code=%3d; ltype=%3d; level=%4d; levelID=%3d)",
+                         recID, tsID, varID, code, ltype, level, levelID);
+              gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+              offset   = gridsize*levelID;
+              single   = vardata[varID] + offset;
+
+              streamDefRecord(streamID2, varID,  levelID);
+              streamWriteRecord(streamID2, single, varnmiss[varID][levelID]);
+            }
+        }
+
+      tsID++;
+    } // end of while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+
+  streamClose(streamID2);
+  streamClose(streamID1);
+  
+  if ( gridIDcurvl != -1 )
+    gridDestroy(gridIDcurvl);  // at the end must Free the allocated curvilinear grid definition...
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      if ( varnmiss[varID] ) Free(varnmiss[varID]);
+      if ( vardata[varID]  ) Free(vardata[varID]);
+    }
+
+  Free(recVarID);
+  Free(recLevelID);
+
+  cdoFinish();
+
+  return 0;
 }
 
 

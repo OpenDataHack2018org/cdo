@@ -3,6 +3,12 @@
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
 
+2017-03-03  Uwe Schulzweida
+
+	* New operator uvDestag: Destaggering of u-, v- wind components (patch from Michal Koutek, KMNI)
+	* New operator rotuvNorth: Rotate grid-relative wind(u,v) to North_pole-relative (patch from Michal Koutek, KMNI)
+	* New operator projuvLatLon: Cylindrical Equidistant projection (patch from Michal Koutek, KMNI)
+
 2017-02-28  Uwe Schulzweida
 
 	* New operator uvDestag: destaggering of wind components (patch from Michal Koutek, KMNI)
