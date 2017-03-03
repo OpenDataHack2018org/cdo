@@ -509,7 +509,7 @@ static const char *SelectHelp[] = {
     "    year              INTEGER Comma separated list of years.",
     "    timestep          INTEGER Comma separated list of timesteps. Negative values selects timesteps from the end (NetCDF only).",
     "    timestep_of_year  INTEGER Comma separated list of timesteps of year.",
-    "    timestepmask      STRING Read timesteps from a mask file.",
+    "    timestepmask      STRING  Read timesteps from a mask file.",
     NULL
 };
 
@@ -4763,6 +4763,37 @@ static const char *VargenHelp[] = {
     "    end     FLOAT   End value of the loop",
     "    inc     FLOAT   Increment of the loop [default: 1]",
     "    levels  FLOAT   Target levels in metre above surface",
+    NULL
+};
+
+static const char *WindTransHelp[] = {
+    "NAME",
+    "    uvDestag, rotuvNorth, projuvLatLon - Wind Transformation",
+    "",
+    "SYNOPSIS",
+    "    uvDestag,u,v[,-/+0.5[,-/+0.5]]  infile outfile",
+    "    rotuvNorth,u,v  infile outfile",
+    "    projuvLatLon,u,v  infile outfile",
+    "",
+    "DESCRIPTION",
+    "    This module contains special operators for datsets with wind components on a rotated lon/lat grid, ",
+    "    e.g. data from the regional model HIRLAM or REMO. ",
+    "",
+    "OPERATORS",
+    "    uvDestag      Destaggering of u/v wind components",
+    "                  This is a special operator for destaggering of wind components.",
+    "                  If the file contains a grid with temperature (name='t' or code=11)",
+    "                  then grid_temp will be used for destaggered wind.",
+    "    rotuvNorth    Rotate u/v wind to North pole.",
+    "                  This is an operator for transformation of wind-vectors from grid-relative to north-pole",
+    "                  relative for the whole file. (FAST implementation with JACOBIANS)",
+    "    projuvLatLon  Cylindrical Equidistant projection",
+    "                  Thus is an operator for transformation of wind-vectors from the globe-spherical coordinate system",
+    "                  into a flat Cylindrical Equidistant (lat-lon) projection. (FAST JACOBIAN implementation)",
+    "",
+    "PARAMETER",
+    "    u,v            STRING  Pair of u,v wind components (use variable names or code numbers)",
+    "    -/+0.5,-/+0.5  STRING  Destaggered grid offsets are optional (default -0.5,-0.5)",
     NULL
 };
 

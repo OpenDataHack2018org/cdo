@@ -533,6 +533,9 @@ Operator catalog:
    Vargen        topo            Create a field with topography
    Vargen        for             Create a time series
    Vargen        stdatm          Create values for pressure and temperature for hydrostatic atmosphere
+   WindTrans     uvDestag        Destaggering of u/v wind components
+   WindTrans     rotuvNorth      Rotate u/v wind to North pole.
+   WindTrans     projuvLatLon    Cylindrical Equidistant projection
    Rotuv         rotuvb          Backward rotation
    Mastrfu       mastrfu         Mass stream function
    Derivepar     sealevelpressure Sea level pressure

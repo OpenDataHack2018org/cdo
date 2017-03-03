@@ -845,7 +845,7 @@ static modules_t Modules[] =
   // HIRLAM_EXTENSIONS
   { Samplegrid,     SamplegridHelp,    SamplegridOperators,    1,   CDI_REAL,  1,  1 },
   { Selmulti,       NULL,              SelmultiOperators,      1,   CDI_REAL,  1,  1 },
-  { WindTrans,      NULL,              WindTransOperators,     1,   CDI_REAL,  1,  1 },
+  { WindTrans,      WindTransHelp,     WindTransOperators,     1,   CDI_REAL,  1,  1 },
 };							       
 							       
 static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
