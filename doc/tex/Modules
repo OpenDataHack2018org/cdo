@@ -15,6 +15,7 @@ Splitsel      File operations
 Distgrid      File operations
 Collgrid      File operations
 Select        Selection
+Selmulti      Selection
 Selvar        Selection
 Seltime       Selection
 Selbox        Selection

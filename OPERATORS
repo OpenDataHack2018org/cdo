@@ -69,6 +69,9 @@ Operator catalog:
 -------------------------------------------------------------
    Select        select          Select fields
    Select        delete          Delete fields
+   Selmulti      selmulti        Select multiple fields
+   Selmulti      delmulti        Delete multiple fields
+   Selmulti      changemulti     Change identication of multiple fields
    Selvar        selparam        Select parameters by identifier
    Selvar        delparam        Delete parameters by identifier
    Selvar        selcode         Select parameters by code number

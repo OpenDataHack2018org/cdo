@@ -150,21 +150,14 @@ int multiSelectionParser(const char *filenameOrString);
 
 void *Selmulti(void *argument)
 {
-    int streamID1, streamID2 = CDI_UNDEFID;
-    int nrecs;
-    int tsID, recID, varID, levelID;
-    int vlistID1, vlistID2;
-    int taxisID1, taxisID2;
+    int varID, levelID;
     double level;
-    int nvars, nlevs, code, zaxisID;
+    int nlevs, code, zaxisID;
     int ltype = 0;
     int varID2, levelID2;
     int sellevel, selcode, selltype;
-    int lcopy = FALSE;
-    int gridsize, nmiss;
-    double *array = NULL;
-    int SELMULTI, DELMULTI, CHANGEMULTI;
-    int operatorID;
+    bool lcopy = false;
+    int nmiss;
     int simpleMath=0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
     float scale = 1.0;
     float offset = 0.0; // If SCALE and/or OFFSET are defined, then the data values are scaled as SCALE*(VALUE-OFFSET).
@@ -173,11 +166,11 @@ void *Selmulti(void *argument)
 
     cdoInitialize(argument);
 
-    SELMULTI       = cdoOperatorAdd("selmulti",       0, 0, "filename/string with selection specification ");
-    DELMULTI       = cdoOperatorAdd("delmulti",       0, 0, "filename/string with selection specification ");
-    CHANGEMULTI    = cdoOperatorAdd("changemulti",       0, 0, "filename/string with selection specification ");
+    int SELMULTI       = cdoOperatorAdd("selmulti",       0, 0, "filename/string with selection specification ");
+    int DELMULTI       = cdoOperatorAdd("delmulti",       0, 0, "filename/string with selection specification ");
+    int CHANGEMULTI    = cdoOperatorAdd("changemulti",       0, 0, "filename/string with selection specification ");
 
-    operatorID = cdoOperatorID();
+    int operatorID = cdoOperatorID();
 
     operatorInputArg(cdoOperatorEnter(operatorID));
 
@@ -207,12 +200,12 @@ void *Selmulti(void *argument)
         if (getNumberOfSelectionTuples()==0)
             cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'CHANGE,  .. or (/;;|;;;)'\nCheck the file: %s",filenameOrString);
 
-    streamID1 = streamOpenRead(cdoStreamName(0));
+    int streamID1 = streamOpenRead(cdoStreamName(0));
 
-    vlistID1 = streamInqVlist(streamID1);
+    int vlistID1 = streamInqVlist(streamID1);
 
     vlistClearFlag(vlistID1);
-    nvars = vlistNvars(vlistID1);
+    int nvars = vlistNvars(vlistID1);
 
     if ( cdoDebugExt ) cdoPrint(" Total number of variables: %d", nvars);
 
@@ -325,7 +318,7 @@ void *Selmulti(void *argument)
 
     if ( cdoDebugExt ) cdoPrint(" Writing the selected fields ...");
 
-    vlistID2 = vlistCreate();
+    int vlistID2 = vlistCreate();
     vlistCopyFlag(vlistID2, vlistID1);
 
     nvars = vlistNvars(vlistID2);
@@ -333,27 +326,27 @@ void *Selmulti(void *argument)
     if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
     if ( varID == nvars ) vlistDefNtsteps(vlistID2, 0);
 
-    taxisID1 = vlistInqTaxis(vlistID1);
-    taxisID2 = taxisDuplicate(taxisID1);
+    int taxisID1 = vlistInqTaxis(vlistID1);
+    int taxisID2 = taxisDuplicate(taxisID1);
     vlistDefTaxis(vlistID2, taxisID2);
 
-    nrecs = vlistNrecs(vlistID2);
+    int nrecs = vlistNrecs(vlistID2);
 
-    streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+    int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
     streamDefVlist(streamID2, vlistID2);
 
-    gridsize = vlistGridsizeMax(vlistID1);
+    int gridsize = vlistGridsizeMax(vlistID1);
     if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-    array = (double *) malloc(gridsize*sizeof(double));
+    double *array = (double *) malloc(gridsize*sizeof(double));
 
-    tsID = 0;
+    int tsID = 0;
     while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
         taxisCopyTimestep(taxisID2, taxisID1);
         streamDefTimestep(streamID2, tsID);
 
-        for ( recID = 0; recID < nrecs; recID++ )
+        for ( int recID = 0; recID < nrecs; recID++ )
         {
             streamInqRecord(streamID1, &varID, &levelID);
             missval = vlistInqVarMissval(vlistID1, varID);
@@ -375,7 +368,7 @@ void *Selmulti(void *argument)
                     selcode  = checkListContainsInt(code, tuplerec->codeLST, tuplerec->ncodes);
                     selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
                     sellevel = checkListContainsInt((int)level, tuplerec->levelLST, tuplerec->nlevels);
-                    lcopy = TRUE;
+                    lcopy = true;
                     if ( selcode && selltype && sellevel )
                     {
                         if (operatorID == CHANGEMULTI)
@@ -399,7 +392,7 @@ void *Selmulti(void *argument)
                         {
                             scale = tuplerec->scale;
                             offset = tuplerec->offset;
-                            lcopy = FALSE;
+                            lcopy = false;
                         }
                         break; // get out of this for loop
                     }
@@ -469,8 +462,9 @@ void *Selmulti(void *argument)
 
     cdoFinish();
 
-    cdoDebugExt =0;
-    return (0);
+    cdoDebugExt = 0;
+
+    return 0;
 }
 
 
@@ -496,7 +490,7 @@ TUPLEREC *TUPLERECNew()
   tpl->changedLevelType = -1;
   tpl->changedLevel = -1;
 
-  return (tpl);
+  return tpl;
 }
 
 void push_backSelTuple(TUPLEREC *tp)
@@ -569,7 +563,7 @@ char *removeSpaces(char *pline)
 {
   if (pline==NULL) return NULL;
   while ( isspace((int) *pline) ) pline++;
-  return (pline);
+  return pline;
 }
 
 
@@ -580,7 +574,7 @@ char *skipSeparator(char *pline)
   while ( isspace((int) *pline) ) pline++;
   if ( *pline == '=' || *pline == ':' || *pline == '/' || *pline == ',' ) pline++;
   while ( isspace((int) *pline) ) pline++;
-  return (pline);
+  return pline;
 }
 
 
@@ -607,7 +601,7 @@ char *goToNextSeparator(char *pline)
   if ( cdoDebugExt>=100 ) cdoPrint("goToNextSeparator():  pline= ('%s') ", pline);
   //while ( isspace((int) *pline) ) pline++;
   pline = removeSpaces(pline);
-  return (pline);
+  return pline;
 }
 
 

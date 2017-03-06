@@ -844,7 +844,7 @@ static modules_t Modules[] =
   { Maggraph,       MaggraphHelp,      MaggraphOperators,      1,   CDI_REAL, -1,  1 },
   // HIRLAM_EXTENSIONS
   { Samplegrid,     SamplegridHelp,    SamplegridOperators,    1,   CDI_REAL,  1,  1 },
-  { Selmulti,       NULL,              SelmultiOperators,      1,   CDI_REAL,  1,  1 },
+  { Selmulti,       SelmultiHelp,      SelmultiOperators,      1,   CDI_REAL,  1,  1 },
   { WindTrans,      WindTransHelp,     WindTransOperators,     1,   CDI_REAL,  1,  1 },
 };							       
 							       
