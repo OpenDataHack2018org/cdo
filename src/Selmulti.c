@@ -20,6 +20,9 @@
 #include "pstream.h"
 #include "listarray.h"
 
+// NOTE: All operators in this module works only on GRIB edition 1 files!
+
+void streamGrbChangeParameterIdentification(int code, int ltype, int lev);
 
 /*
 Supported notations:
@@ -168,7 +171,7 @@ void *Selmulti(void *argument)
 
     int SELMULTI       = cdoOperatorAdd("selmulti",       0, 0, "filename/string with selection specification ");
     int DELMULTI       = cdoOperatorAdd("delmulti",       0, 0, "filename/string with selection specification ");
-    int CHANGEMULTI    = cdoOperatorAdd("changemulti",       0, 0, "filename/string with selection specification ");
+    int CHANGEMULTI    = cdoOperatorAdd("changemulti",    0, 0, "filename/string with selection specification ");
 
     int operatorID = cdoOperatorID();
 
@@ -360,8 +363,7 @@ void *Selmulti(void *argument)
                 zaxisID = vlistInqVarZaxis(vlistID1, varID);
                 level = zaxisInqLevel(zaxisID, levelID);
                 ltype = zaxis2ltype(zaxisID);
-                int ii;
-                for (ii=0; ii<NUMTUPLES; ii++)
+                for ( int ii=0; ii<NUMTUPLES; ii++ )
                 {
                     TUPLEREC *tuplerec = getSelTuple(ii);
                     // Note: When the list is Empty then function checkListContainsInt() also returns true !
@@ -371,17 +373,18 @@ void *Selmulti(void *argument)
                     lcopy = true;
                     if ( selcode && selltype && sellevel )
                     {
-                        if (operatorID == CHANGEMULTI)
+                        if ( operatorID == CHANGEMULTI )
                         {
-                            if ( cdoDebugExt ) cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d => (selcode %d, selltype %d, sellevel %d) => change (%d,%d,%d)", code, ltype, (int)level, nvars, varID, selcode, selltype, sellevel, tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
-                            if ((tuplerec->changedCode==-1) && (tuplerec->changedLevelType==-1) && (tuplerec->changedLevel==-1))
-                                cdoPrint(" WARNING: Cannot CHANGE identification!");
+                            if ( cdoDebugExt )
+                              cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d => (selcode %d, selltype %d, sellevel %d) => change (%d,%d,%d)",
+                                       code, ltype, (int)level, nvars, varID, selcode, selltype, sellevel, tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
+                            if ( (tuplerec->changedCode==-1) && (tuplerec->changedLevelType==-1) && (tuplerec->changedLevel==-1) )
+                              cdoPrint(" WARNING: Cannot CHANGE identification!");
                             else
-                              cdoAbort("Call to streamGrbChangeParameterIdentification() missing!");
-                            // streamGrbChangeParameterIdentification(tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
-                                // Calling PROXY function streamGrbChangeParameterIdentification()
-                                // which results in later calling func. gribapiChangeParameterIdentification(); see stream_gribapi.c
-                                // The change happens during the last step of writing a grib-record into a file.
+                              streamGrbChangeParameterIdentification(tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
+                              // Calling PROXY function streamGrbChangeParameterIdentification()
+                              // which results in later calling func. gribapiChangeParameterIdentification(); see stream_gribapi.c
+                              // The change happens during the last step of writing a grib-record into a file.
                         }
                         else
                         {
