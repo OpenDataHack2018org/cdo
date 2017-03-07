@@ -2892,6 +2892,7 @@ static char *check_short_key(char *key)
   else if ( strcmp(key, "output_mode") == 0 ) short_key = strdup("om");
   else if ( strcmp(key, "max_size") == 0 ) short_key = strdup("ms");
   else if ( strcmp(key, "drs_root") == 0 ) short_key = strdup("dr");
+  else if ( strcmp(key, "chunk_files") == 0 ) short_key = strdup("cf");
   return short_key;
 }
 
