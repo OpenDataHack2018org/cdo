@@ -336,7 +336,7 @@ list_t *cdo_parse_cmor_file(const char *filename)
   return pml;
 }
 
-static void map_it(list_t *kvl, int vlistID, int varID)
+static void map_it(list_t *kvl, int vlistID, int varID, int setcn)
 {
   for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
     {
@@ -345,10 +345,10 @@ static void map_it(list_t *kvl, int vlistID, int varID)
       const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
 /*      printf("'%s' = '%s'\n", key, value); */
       if ( !value ) continue;
-/* Not necessary because out_name is what we use for renaming :
+/* Not necessary because cmor_name is what we use for renaming :
       else if ( STR_IS_EQ(key, "name")          ) vlistDefVarName(vlistID, varID, parameter2word(value));
 */
-      else if ( STR_IS_EQ(key, "out_name")      )
+      else if ( STR_IS_EQ(key, "cmor_name") && setcn )
         {
           char name[CDI_MAX_NAME];
           vlistInqVarName(vlistID, varID, name);
@@ -356,36 +356,35 @@ static void map_it(list_t *kvl, int vlistID, int varID)
             cdiDefAttTxt(vlistID, varID, "original_name", (int) strlen(name), parameter2word(name));
           vlistDefVarName(vlistID, varID, parameter2word(value));
          }
-      else if ( STR_IS_EQ(key, "units")         ) vlistDefVarUnits(vlistID, varID, value);
+      else if ( STR_IS_EQ(key, "units")        ) vlistDefVarUnits(vlistID, varID, value);
       else if ( STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID, varID, "cell_methods", (int) strlen(value), value);
-      else if ( STR_IS_EQ(key, "char_dim")  ) cdiDefAttTxt(vlistID, varID, "char_dim", (int) strlen(value), value);
-      else if ( STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID, varID, value);
-      else if ( STR_IS_EQ(key, "factor")        ) {}
+      else if ( STR_IS_EQ(key, "character_axis")  ) cdiDefAttTxt(vlistID, varID, "character_axis", (int) strlen(value), value);
+/*      else if ( STR_IS_EQ(key, "factor")        ) {}
       else if ( STR_IS_EQ(key, "delete")        ) {}
-/* Not in mapping table right now: */
       else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID, varID, value);
       else if ( STR_IS_EQ(key, "param")         ) vlistDefVarParam(vlistID, varID, stringToParam(parameter2word(value)));
       else if ( STR_IS_EQ(key, "out_param")     ) vlistDefVarParam(vlistID, varID, stringToParam(parameter2word(value)));
       else if ( STR_IS_EQ(key, "code")          ) {}
               // else if ( STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               // else if ( STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
+*/
       else if ( STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID, varID, "comment", (int) strlen(value), value);
       else if ( STR_IS_EQ(key, "p")       )
         {
           if ( !isspace(value[0]) )
             cdiDefAttTxt(vlistID, varID, "positive", (int) strlen(value), value);
         }
-      else if ( STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID, varID, "cell_measures", (int) strlen(value), value);
+/*      else if ( STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID, varID, "cell_measures", (int) strlen(value), value);
       else if ( STR_IS_EQ(key, "convert")       ) {} 
       else if ( STR_IS_EQ(key, "missval")       )   {}  
       else if ( STR_IS_EQ(key, "valid_min")     ){}
       else if ( STR_IS_EQ(key, "valid_max")     ){}
       else if ( STR_IS_EQ(key, "ok_min_mean_abs") ) {}
       else if ( STR_IS_EQ(key, "ok_max_mean_abs") ){}
-      else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") ) {}
+      else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") ) {} */
       else
         {
-          if ( cdoVerbose ) cdoPrint("Key >%s< not supported!", key);
+          if ( cdoVerbose ) printf("Mapping key '%s' is ingored.\n", key);
         }
     }
 }
@@ -419,7 +418,7 @@ static int map_via_key(list_t *pml, int vlistID, int varID, int nventry, const c
     {
       if ( kvl )
         {
-          map_it(kvl, vlistID, varID);
+          map_it(kvl, vlistID, varID, 1);
           return 1;
         }
       cdoWarning("Variable with name '%s' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.\n", ifilevalue, key, key);
@@ -432,7 +431,7 @@ static int map_via_key(list_t *pml, int vlistID, int varID, int nventry, const c
     }
 }
 
-static int map_via_vars_and_key(list_t *kvl_oname, int vlistID, int nvars, char *key)
+static int map_via_vars_and_key(list_t *kvl_oname, int vlistID, int nvars, char *key, int setcn)
 {
   keyValues_t *kv = kvlist_search(kvl_oname, key);
   if ( kv )
@@ -444,7 +443,7 @@ static int map_via_vars_and_key(list_t *kvl_oname, int vlistID, int nvars, char 
 
           if ( ifilevalue[0] && strcmp(ifilevalue, kv->values[0]) == 0 )
             {
-              map_it(kvl_oname, vlistID, varID);
+              map_it(kvl_oname, vlistID, varID, setcn);
               return 1;
             }
         }
@@ -455,59 +454,65 @@ static int map_via_vars_and_key(list_t *kvl_oname, int vlistID, int nvars, char 
   return 0;
 }
 
-static void map_via_vars(list_t *pml, const char **vars, int vlistID, int nvars, int nventry, const char **ventry)
+static int change_name_via_name(int vlistID, char *map_name, char *cmor_name)
 {
-  int j = 0;
-  while ( vars[j] )
+  char name[CDI_MAX_NAME];
+  for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
+    {
+      vlistInqVarName(vlistID, varID, name);
+      if ( strcmp(name, map_name) == 0 )
+        {
+          vlistDefVarName(vlistID, varID, parameter2word((const char *) cmor_name));
+          return 1;
+        }
+    }
+  return 0;
+}
+
+static int change_name_via_code(int vlistID, char *map_code, char *cmor_name)
+{
+  int code;
+  char codestring[4];
+  for ( int varID = 0; varID < vlistNvars(vlistID); varID++ )
+    {
+      code = vlistInqVarCode(vlistID, varID);
+      sprintf(codestring, "%03d", code);
+      if ( strcmp(codestring, map_code) == 0 )
+        {
+          vlistDefVarName(vlistID, varID, parameter2word((const char *) cmor_name));
+          return 1;
+        }
+    }
+  return 0;
+}
+
+static void map_via_request(list_t *pml, char **request, int vlistID, int nvars, int nventry, const char **ventry, int numvals, const char *selkey, int setcn)
+{
+  for ( int j = 0; j<numvals; j++)
     {
       if ( cdoVerbose )
-        printf("*******Try to map requested variable: '%s'********\n", vars[j]);
-      list_t *kvl_oname = pmlist_search_kvlist_ventry(pml, "out_name", vars[j], nventry, ventry);
+        printf("*******Try to use variable '%s': '%s' as mapping entry.********\n", selkey, request[j]);
+      list_t *kvl_oname = pmlist_search_kvlist_ventry(pml, selkey, request[j], nventry, ventry);
       if ( kvl_oname )
         {
-          if ( map_via_vars_and_key(kvl_oname, vlistID, nvars, "name") )
-            j++;
-          else if ( map_via_vars_and_key(kvl_oname, vlistID, nvars, "code") )
-            j++;
+          if ( map_via_vars_and_key(kvl_oname, vlistID, nvars, "name", setcn) )
+            {printf("*******Succesfully used variable '%s': '%s' as mapping entry.********\n", selkey, request[j]); continue;}
+          else if ( map_via_vars_and_key(kvl_oname, vlistID, nvars, "code", setcn) )
+            {printf("*******Succesfully used variable '%s': '%s' as mapping entry.********\n", selkey, request[j]); continue;}
           else
             {
-              cdoWarning("Could not map requested variable '%s'\n", vars[j]);
-              j++;
+              cdoWarning("Could not map via variable '%s': '%s'\n", selkey, request[j]);
+              continue;
             }
         }
       else
         {
-          cdoWarning("Requested variable '%s' (via attribute vars) is not found in row 'out_name' of mapping table.'\n", vars[j]);
-          j++;
+          cdoWarning("Requested variable '%s' (via attribute vars) is not found in row 'cmor_name' of mapping table.'\n", request[j]);
+          continue;
         }
     }
 }
 
-static
-void apply_mapping_table(const char *filename, int nvars, int vlistID, const char **request)
-{
-  if ( cdoVerbose )
-    printf("*******Try to apply mapping table: '%s'*******\n", filename);
-  const char *ventry[] = {"&parameter"};
-  int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
-
-  list_t *pml = cdo_parse_cmor_file(filename);
-  if ( pml == NULL ) return;
-  if ( request )
-    map_via_vars(pml, request, vlistID, nvars, nventry, ventry);
-  else
-    {
-      for ( int varID = 0; varID < nvars; varID++ )
-        {
-          if ( map_via_key(pml, vlistID, varID, nventry, ventry, "name") )
-            continue;
-          if ( map_via_key(pml, vlistID, varID, nventry, ventry, "code") )
-            continue;
-          cdoWarning("Could not map variable with id '%d'.", varID);
-        }
-    }
-  list_destroy(pml);
-}
 /* */
 /*... until here */
 /* */
