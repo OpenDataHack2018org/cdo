@@ -1575,7 +1575,7 @@ static void get_cmor_table(list_t *kvl, char *project_id)
 {
   int gridtable_id;
   char gridtable[CMOR_MAX_STRING];
-  char *mip_table_dir = kv_get_a_val(kvl, "mip_table_dir", "");
+  char *mip_table_dir = kv_get_a_val(kvl, "mip_table_dir", NULL);
   if ( mip_table_dir && project_id )
     {
       sprintf(gridtable, "%s/%s_grids\0", mip_table_dir, project_id);
@@ -1775,11 +1775,19 @@ static void register_lat_axis(int gridID, int ylength, int *axis_ids)
 
 static void register_char_axis(int numchar, char **charvals, int *axis_ids, char *chardim)
 {
-  void *charcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
-  sprintf((char *)charcmor, "%s", charvals[0]);
+  int maxlen = get_strmaxlen(charvals, numchar);
+  void *charcmor = (void *) Malloc ( numchar * maxlen * sizeof(char));
+  sprintf((char *)charcmor, "%.*s", strlen(charvals[0]), charvals[0]);
+  char blanks[maxlen];
+  for ( int i = 0; i < maxlen; i++)
+    blanks[i] = ' ';
+  sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[0]), blanks);
   for ( int i = 1; i < numchar; i++ )
-    sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
-  cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
+    {
+      sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
+      sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[i]), blanks);   
+    }
+  cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
   Free(charcmor);
 }
 
@@ -1787,12 +1795,17 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
 {
   int gridID = vlistInqVarGrid(vlistID, varID);
 
-  char *grid_file = kv_get_a_val(kvl, "ginfo", "");
-  char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
-  char *chardim = get_txtatt(vlistID, varID, "char_dim");
-  check_compare_set(&chardim, chardimatt, "char_dim", "notSet");
-  if ( strcmp(grid_file, "") != 0 )
-    change_grid(grid_file, &gridID, vlistID);
+  char *grid_file = kv_get_a_val(kvl, "gi", NULL);
+
+  char *chardimatt = kv_get_a_val(kvl, "ca", NULL);
+  char *chardim = get_txtatt(vlistID, varID, "character_axis");
+  check_compare_set(&chardim, chardimatt, "character_axis", "notSet");
+
+  if ( grid_file )
+    {
+      change_grid(grid_file, gridID, vlistID);
+      gridID = vlistInqVarGrid(vlistID, varID);
+    }
 
   int type = gridInqType(gridID);
   int ylength = gridInqYsize(gridID);
