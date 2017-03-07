@@ -1273,15 +1273,24 @@ static void get_zhybrid(int zaxisID, char *varname, double *p0, double *alev_val
   Free(vct);
 }
 
+static int get_strmaxlen(char **array, int len)
+{
+  int result = 0, i;
+  for (i = 0; i < len; i++)
+    if ( result < strlen(array[i]) )
+      result = strlen(array[i]);
+  return result;     
+}
+
 static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, char *varname, int *axis_ids, int *zfactor_id, char *project_id, int miptab_freq)
 {
   *zfactor_id = 0;
   int zsize = zaxisInqSize(zaxisID);
   double *levels;
 
-  char *chardimatt = kv_get_a_val(kvl, "char_dim", "");
-  char *chardim = get_txtatt(vlistID, varID, "char_dim");
-  check_compare_set(&chardim, chardimatt, "char_dim", "notSet");
+  char *chardimatt = kv_get_a_val(kvl, "ca", NULL);
+  char *chardim = get_txtatt(vlistID, varID, "character_axis");
+  check_compare_set(&chardim, chardimatt, "character_axis", "notSet");
   if ( strcmp(chardim, "vegtype") == 0 )
     {
       if ( zsize )
@@ -1290,11 +1299,19 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       char **charvals = kv_get_vals(kvl, "char_dim_vegtype", &numchar);
       if ( charvals )
         {
-          void *charcmor = (void *) Malloc ( numchar * strlen(charvals[0]) * sizeof(char));
+          int maxlen = get_strmaxlen(charvals, numchar);
+          void *charcmor = (void *) Malloc ( numchar * maxlen * sizeof(char));
           sprintf((char *)charcmor, "%s", charvals[0]);
+          char blanks[maxlen];
+          for ( int i = 0; i < maxlen; i++)
+            blanks[i] = ' ';
+          sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[0]), blanks);         
           for ( int i = 1; i < numchar; i++ )
-            sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
-          cmor_axis(new_axis_id(axis_ids), chardim, "", sizeof(charvals)/sizeof(charvals[0]), (void *)charcmor, 'c',  NULL, strlen(charvals[0]), NULL); 
+            {
+              sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
+              sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[i]), blanks);         
+            }
+          cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
           Free(charcmor);
         }
       else
@@ -1321,7 +1338,6 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
                         'd', NULL, 0, NULL);
           else
             {  
-              printf("Schau: %d\n", miptab_freq);
               switch ( miptab_freq )
                 {
                 case 3: cmor_axis(new_axis_id(axis_ids),
@@ -1440,8 +1456,8 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       Free(zcell_bounds);
       Free(levels);
     }
-  char *szc_name = kv_get_a_val(kvl, "szc", "");
-  if ( zsize == 1 &&  strcmp(szc_name, "") != 0 )
+  char *szc_name = kv_get_a_val(kvl, "szc", NULL);
+  if ( zsize == 1 &&  szc_name )
     {
       char *szc_value;
       strtok_r(szc_name, "_", &szc_value);
