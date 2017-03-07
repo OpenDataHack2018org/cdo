@@ -639,36 +639,46 @@ static void check_compare_set(char **finalset, char *attribute, char *attname, c
 {
   if ( !(*finalset) )
     {
-      if ( strcmp(attribute, "") == 0 )
+      if ( !attribute )
         {
           if ( returner )
             *finalset = strdup(returner);
           else
             cdoAbort("Required value for attribute '%s' is neither found in input file nor in the configuration.", attname);
         }
-      else
-        strcpy(*finalset, attribute);
+      else 
+        *finalset = strdup(attribute);
     }
-  else if ( strcmp(attribute, "") != 0 )
+  else if ( attribute )
     {
       if ( strcmp(attribute, *finalset) != 0 )
         {
           cdoWarning("%s of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\nCmor libary is called with attribute unit '%s'.\n", attname, *finalset, attname, attribute, attribute);
           strcpy(*finalset, attribute);
-          printf("Jo\n");
         }
     }
 }
 
 static int check_attr(list_t *kvl, char *project_id)
 {
+  const char *longAtt[] = {"req_time_units", "calendar", "grid_info", NULL};
+  const char *shortAtt[] = {"rtu", "l", "gi", NULL};
+
+  int i = 0;
+  while ( longAtt[i] != NULL )
+    {
+      keyValues_t *kv_latt = kvlist_search(kvl, longAtt[i]);      
+      if ( kv_latt )
+        kv_insert_a_val(kvl, shortAtt[i], kv_latt->values[0], 0);
+      i++;
+    }
+
 /* Project id moved to main void fct */
   const char *reqAtt[] = {"institute_id", "institution", "contact", "model_id", "source",
             "experiment_id", "req_time_units", NULL};
   const char *reqAttCMIP5[] = {"product", "member", NULL};
   const char *reqAttCORDEX[] = {"product", "member", "cordex_domain", "driving_model_id", NULL};
 /* In all Projects needed Attributes are tested first */
-  int i = 0;
 
   while ( reqAtt[i] != NULL )
     {
@@ -676,6 +686,8 @@ static int check_attr(list_t *kvl, char *project_id)
       
       if ( !kv_reqatt || strcmp(kv_reqatt->values[0], "notSet") == 0 )
         cdoAbort("Attribute '%s' is required. Either it is missing or notSet.", reqAtt[i]);
+      if ( cdoVerbose )
+        printf("Attribute '%s' is '%s' \n", reqAtt[i], kv_reqatt->values[0]);
       i++;
     }
 /* Set default attributes */
@@ -706,14 +718,14 @@ static int check_attr(list_t *kvl, char *project_id)
           if ( !kv_reqattCMIP5 || strcmp(kv_reqattCMIP5->values[0], "notSet") == 0 )
             cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
           if ( cdoVerbose )
-            printf("Attribute '%s' is %s \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
+            printf("Attribute '%s' is '%s' \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
           i++;
         }
     }
   else if (strcmp(project_id, "CORDEX") == 0 )
     {
       if ( cdoVerbose )
-        printf("Since the project id is %s further attributes are tested", project_id);
+        printf("\nSince the project id is %s further attributes are tested\n", project_id);
       i=0;
       while ( reqAttCORDEX[i] != NULL )
         {
@@ -721,20 +733,10 @@ static int check_attr(list_t *kvl, char *project_id)
           if ( !kv_reqattCORDEX || strcmp(kv_reqattCORDEX->values[0], "notSet") == 0 )
             cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCORDEX[i]);
           if ( cdoVerbose )
-            printf("Attribute '%s' is %s \n", reqAttCORDEX[i], kv_reqattCORDEX->values[0]);
+            printf("Attribute '%s' is '%s' \n", reqAttCORDEX[i], kv_reqattCORDEX->values[0]);
           i++;
         }
     }
-
-/* Check for special attributes */
-  keyValues_t *kv_pos = kvlist_search(kvl, "p");
-  if ( kv_pos )
-    if ( ( strcmp(kv_pos->values[0], "notSet") == 0 ) || ( strcmp(kv_pos->values[0], "") != 0 && strcmp(kv_pos->values[0], "u") != 0 && strcmp(kv_pos->values[0], "d") != 0 ) )
-      {
-        cdoWarning("Invalid value '%s' is set for attribute 'positive'. The default (blank) is used.\n", kv_pos->values[0]);
-        Free(kv_pos->values[0]);
-        kv_pos->values[0] = strdup(" ");
-      }
   return 1;
 } 
 
@@ -827,7 +829,7 @@ static void dump_special_attributes(list_t *kvl, int streamID)
   int vlistID = streamInqVlist(streamID);
   int fileID = pstreamFileID(streamID);
   size_t old_historysize;
-  char *new_history = kv_get_a_val(kvl, "history", "");
+  char *new_history = kv_get_a_val(kvl, "history", NULL);
   size_t historysize;
   int natts;
   cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
@@ -842,7 +844,7 @@ static void dump_special_attributes(list_t *kvl, int streamID)
       if ( new_history )
         historysize += strlen(new_history) + 1;
     }
-  else
+  else if ( new_history )
     {
       historysize = strlen(new_history);
     }
@@ -872,11 +874,13 @@ static void dump_special_attributes(list_t *kvl, int streamID)
 static void read_config_files(list_t *kvl)
 {
   /* Files from info key in command line. */
-  keyValues_t *info = kvlist_search(kvl, "info");
+  keyValues_t *info = kvlist_search(kvl, "i");
   int i = 0;
   if ( info )
     while ( i < info->nvalues )
       {
+        if ( cdoVerbose )
+          printf("Try to parse file: '%s' configured with key 'info'.\n", info->values[i]);
         parse_kv_file(kvl, info->values[i]);
         i++;
       }
@@ -886,15 +890,19 @@ static void read_config_files(list_t *kvl)
   const char *dotconfig = ".cdocmorinfo";
   char *workfile = Malloc(strlen(home) + strlen(dotconfig) + 2);
   sprintf(workfile, "%s/%s", home, dotconfig);
+  if ( cdoVerbose )
+    printf("Try to parse default file: '%s'\n", workfile);
   parse_kv_file(kvl, workfile);
   Free(workfile);
   
   if ( i == 0 )
     {
-      keyValues_t *info2 = kvlist_search(kvl, "info");
+      keyValues_t *info2 = kvlist_search(kvl, "i");
       if ( info2 )
         while ( i < info2->nvalues )
           {
+            if ( cdoVerbose )
+              printf("Try to parse file: '%s' configured with key 'info' in file '.cdocmorinfo'.\n", info2->values[i]);
             parse_kv_file(kvl, info2->values[i]);
             i++;
           }
@@ -911,23 +919,28 @@ static int in_list(char **list, const char *needle, int num)
 
 static int get_netcdf_file_action(list_t *kvl)
 {
-  char *chunk = kv_get_a_val(kvl, "oflag", "");
-  if ( strcmp(chunk, "r") == 0 )
-    return CMOR_REPLACE;
-  else if ( strcmp(chunk, "a") == 0 )
-    return CMOR_APPEND;
-  else if ( strcmp(chunk, "p") == 0 )
-    return CMOR_APPEND;
-  else
+  char *chunk = kv_get_a_val(kvl, "om", NULL);
+  if ( chunk )
     {
-      cdoWarning("No valid CMOR output mode! \nAttribute oflag is '%s', but valid are 'a' for append, 'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.\n", chunk);
-      return CMOR_REPLACE;
+      if ( strcmp(chunk, "r") == 0 )
+        return CMOR_REPLACE;
+      else if ( strcmp(chunk, "a") == 0 )
+        return CMOR_APPEND;
+      else
+        {
+          cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append, 'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.\n", chunk);
+          return CMOR_REPLACE;
+        }
     }
+  cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append, 'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.\n", chunk);
+  return CMOR_REPLACE;  
 }
 
 static int get_cmor_verbosity(list_t *kvl)
 {
-  char *verbos = kv_get_a_val(kvl, "set_verbosity", "");
+  char *verbos = kv_get_a_val(kvl, "set_verbosity", NULL);
+  if ( !verbos )
+    return CMOR_NORMAL;
   if ( strcmp(verbos, "CMOR_QUIET") == 0 )
     return CMOR_QUIET;
   else
@@ -936,7 +949,9 @@ static int get_cmor_verbosity(list_t *kvl)
 
 static int get_cmor_exit_control(list_t *kvl)
 {
-  char *exit = kv_get_a_val(kvl, "exit_control", "");
+  char *exit = kv_get_a_val(kvl, "exit_control", NULL);
+  if ( !exit )
+    return CMOR_NORMAL;
   if ( strcasecmp(exit,"CMOR_EXIT_ON_MAJOR") == 0 )
     return CMOR_EXIT_ON_MAJOR;
   else if ( strcasecmp(exit,"CMOR_EXIT_ON_WARNING")  == 0 )
@@ -968,6 +983,11 @@ static char *get_calendar_ptr(int calendar)
 
 static int get_calendar_int(char *calendar)
 {
+  if ( !calendar )
+    {
+      cdoWarning("Calendar type %s is not supported by CMOR.\n");
+      return 0;
+    }
   if ( strcmp(calendar, "gregorian") == 0 )
     return CALENDAR_STANDARD;
   else if ( strcmp(calendar, "proleptic_gregorian") == 0 )
@@ -1007,14 +1027,14 @@ static char *get_txtatt(int vlistID, int varID, char *key)
   return txtatt;
 }
 
-static void setup_dataset(list_t *kvl, int streamID)
+static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 {
   if ( cdoVerbose )
     printf("*******Start to process cmor_setup and cmor_dataset.*******\n");
   int netcdf_file_action = get_netcdf_file_action(kvl);
   int set_verbosity = get_cmor_verbosity(kvl);
   int exit_control = get_cmor_exit_control(kvl);
-  int creat_subs = atol(kv_get_a_val(kvl, "drs", "0"));
+  int creat_subs = atol(kv_get_a_val(kvl, "r", "0"));
 
   int vlistID = streamInqVlist(streamID);
 
@@ -1028,39 +1048,41 @@ static void setup_dataset(list_t *kvl, int streamID)
   int taxisID = vlistInqTaxis(streamInqVlist(streamID));
 
 /*
-  char *attcomment = kv_get_a_val(kvl, "comment", "");
+  char *attcomment = kv_get_a_val(kvl, "comment", NULL);
   char *comment = get_txtatt(vlistID, CDI_GLOBAL, "comment");
 */
   
-  char *attcalendar = kv_get_a_val(kvl, "calendar", "");
-  char *calendar = get_calendar_ptr(taxisInqCalendar(taxisID));
+  char *attcalendar = kv_get_a_val(kvl, "l", NULL);
+  char *calendarptr = get_calendar_ptr(taxisInqCalendar(taxisID));
   if ( cdoVerbose )
     printf("Checking attribute 'calendar' from configuration.\n");
-  if ( get_calendar_int(attcalendar) )
-    check_compare_set(&calendar, attcalendar, "calendar", NULL);
+  if ( *calendar = get_calendar_int(attcalendar) )
+    check_compare_set(&calendarptr, attcalendar, "calendar", NULL);
   else 
     {
       if ( cdoVerbose )
         printf("Try to use Ifile calendar.\n");
-      if ( !get_calendar_int(calendar) )
+      if ( !get_calendar_int(calendarptr) )
         cdoAbort("No valid configuration and no valid Ifile calendar found.");
       else
-        kv_insert_a_val(kvl, "calendar", calendar, 1);
+        *calendar = get_calendar_int(calendarptr);
     }
+
 #if defined(CMOR_VERSION_MAJOR)
   int cmor_version_exists = 1;
   if ( CMOR_VERSION_MAJOR == 2 && CMOR_VERSION_MINOR == 9 )
     {
       double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
-      cmor_dataset(kv_get_a_val(kvl, "odir", "./"),
+      cmor_dataset(kv_get_a_val(kvl, "dr", "./"),
                kv_get_a_val(kvl, "experiment_id", ""),
                kv_get_a_val(kvl, "institution", ""),
                kv_get_a_val(kvl, "source", ""),
-               calendar,
+               calendarptr,
                atoi(kv_get_a_val(kvl, "realization", "")),
                kv_get_a_val(kvl, "contact", ""),
                kv_get_a_val(kvl, "history", ""),
-               kv_get_a_val(kvl, "vcomm", ""),
+/* comment:*/
+               kv_get_a_val(kvl, "k", ""),
                kv_get_a_val(kvl, "references", ""),
                atoi(kv_get_a_val(kvl, "leap_year", "")),
                atoi(kv_get_a_val(kvl, "leap_month", "")),
@@ -1079,7 +1101,7 @@ static void setup_dataset(list_t *kvl, int streamID)
 #endif
   if ( !cmor_version_exists )
     cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
-  Free(calendar);
+  Free(calendarptr);
   if ( cdoVerbose )
     printf("*******Setup finished successfully.*******\n");
 }
@@ -1122,6 +1144,7 @@ static int get_time_step_int(char *time_step)
 
 static int check_time_units(char *time_units)
 {
+/* Required attribute in check_att */
   int attyear, attmonth, attday, atthour, attminute, attsecond;
   char time_step[CMOR_MAX_STRING];
   if ( sscanf(time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s",
@@ -1136,7 +1159,7 @@ static int check_time_units(char *time_units)
   return 1;
 }
 
-static void get_taxis(char *req_time_units, char *attcalendar, int *sdate, int *stime, int *timeunit, int *calendar)
+static void get_taxis(char *req_time_units, int *sdate, int *stime, int *timeunit)
 {
   int attyear, attmonth, attday, atthour, attminute, attsecond;
   char atttimeunit[CMOR_MAX_STRING];
@@ -1147,10 +1170,9 @@ static void get_taxis(char *req_time_units, char *attcalendar, int *sdate, int *
   *sdate = cdiEncodeDate(attyear, attmonth, attday);
   *stime = cdiEncodeTime(atthour, attminute, attsecond);
   *timeunit = get_time_step_int(atttimeunit);
-  *calendar = get_calendar_int(attcalendar);
 }
 
-static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time_name, char *project_id, int miptab_freq)
+static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time_name, char *project_id, int miptab_freq, int *time_axis)
 {
   if (strcmp(project_id, "CMIP5") == 0 && miptab_freq )
     switch ( miptab_freq )
@@ -1164,12 +1186,12 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
   if ( cmor_time_name[0] != 't' )
     {
       char *time_method = get_txtatt(vlistID, varID, "cell_methods");
-      char *att_time_method = kv_get_a_val(kvl, "cell_methods", "");
+      char *att_time_method = kv_get_a_val(kvl, "cm", NULL);
       check_compare_set(&time_method, att_time_method, "cell_methods", " ");
-      if ( time_method[0] == 'm' ) strcpy(cmor_time_name, "time \0");
-      else if ( time_method[0] == 'p' ) strcpy(cmor_time_name, "time1\0");
-      else if ( time_method[0] == 'c' ) strcpy(cmor_time_name, "time2\0");
-      else if ( time_method[0] == 'n' ) strcpy(cmor_time_name, "none\0");
+      if ( time_method[0] == 'm' )      { strcpy(cmor_time_name, "time \0"); *time_axis=0; }
+      else if ( time_method[0] == 'p' ) { strcpy(cmor_time_name, "time1\0"); *time_axis=1; }
+      else if ( time_method[0] == 'c' ) { strcpy(cmor_time_name, "time2\0"); *time_axis=2; }
+      else if ( time_method[0] == 'n' ) { strcpy(cmor_time_name, "none\0"); *time_axis=3; }
       else
         {
           cdoWarning("Found configuration time cell method '%s' is not valid. Check CF-conventions for allowed time cell methods.\nTime cell method is set to 'mean'. \n", time_method);
@@ -1177,7 +1199,6 @@ static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time
         }
       Free(time_method);
     }
-  kv_insert_a_val(kvl, "time_axis", cmor_time_name, 1); 
 }
 
 static void gen_bounds(int n, double *vals, double *bounds)
