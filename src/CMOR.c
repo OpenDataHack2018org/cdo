@@ -661,8 +661,8 @@ static void check_compare_set(char **finalset, char *attribute, char *attname, c
 
 static int check_attr(list_t *kvl, char *project_id)
 {
-  const char *longAtt[] = {"req_time_units", "calendar", "grid_info", NULL};
-  const char *shortAtt[] = {"rtu", "l", "gi", NULL};
+  const char *longAtt[] = {"req_time_units", "calendar", "grid_info", "mapping_table", NULL};
+  const char *shortAtt[] = {"rtu", "l", "gi", "mt", NULL};
 
   int i = 0;
   while ( longAtt[i] != NULL )
@@ -2845,6 +2845,8 @@ static void read_maptab(list_t *kvl, int streamID)
           if ( kvn->nvalues > 1 )
             cdoWarning("Only the first value of variable selection key 'name' is processed.");
           map_via_request(pml, kvn->values, vlistID, nvars, nventry, ventry, 1, "name", 0);
+          if ( cdoVerbose )
+            printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
       else if ( kvc )
         {
@@ -2852,11 +2854,15 @@ static void read_maptab(list_t *kvl, int streamID)
           if ( kvc->nvalues > 1 )
             cdoWarning("Only the first value of variable selection key 'code' is processed.");
           map_via_request(pml, kvc->values, vlistID, nvars, nventry, ventry, 1, "code", 0);
+          if ( cdoVerbose )
+            printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
       else if ( kvcn )
         { 
           if ( cdoVerbose ) printf("Request via 'cmor_name' is mapped.\n");
           map_via_request(pml, kvcn->values, vlistID, nvars, nventry, ventry, kvcn->nvalues, "cmor_name", 1); 
+          if ( cdoVerbose )
+            printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
       else
         for ( int varID = 0; varID < nvars; varID++ )
@@ -2870,6 +2876,8 @@ static void read_maptab(list_t *kvl, int streamID)
       list_destroy(pml);
       if ( maptabbuild ) Free(maptabbuild);
     }
+  else if ( cdoVerbose )
+    printf("*******No mapping table found.*******\n");
 }
 
 static char *check_short_key(char *key)
@@ -3103,8 +3111,6 @@ void *CMOR(void *argument)
   if ( cdoVerbose )
     printf("*******Start to read mapping table.*******\n");
   read_maptab(kvl, streamID);
-  if ( cdoVerbose )
-    printf("*******Successfully read mapping table.*******\n");
 
   struct mapping *vars = construct_var_mapping(streamID);
 
