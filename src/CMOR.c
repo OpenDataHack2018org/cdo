@@ -1514,15 +1514,36 @@ static void register_character_dimension(int *axis_ids, char *filename)
 }
 */
 
-static void change_grid(char *grid_file, int *gridID, int vlistID)
+static void change_grid(char *grid_file, int gridID, int vlistID)
 {
   if ( cdoVerbose )
-    printf("You configured a grid_info file. For a successfull read, the file probably needs to have at least one variable with ID 0.\n");
+    printf("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n");
   argument_t *fileargument = file_argument_new(grid_file);
   int streamID2 = streamOpenRead(fileargument); 
   int vlistID2 = streamInqVlist(streamID2);
   int gridID2 = vlistInqVarGrid(vlistID2, 0); 
-  vlistChangeGrid(vlistID, *gridID, gridID2);
+
+  if ( !gridID2 )
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because of internal problems.", grid_file);
+
+  int a,b;
+  a = gridInqSize(gridID);
+  b = gridInqSize(gridID2);
+  if ( a != b )
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because total size of $IFILE: '%d' is not identical to total size of ginfo file: '%d'.", grid_file, a, b);
+
+  a = gridInqYsize(gridID);
+  b = gridInqYsize(gridID2);
+  if ( a != b )
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because ysize of $IFILE: '%d' is not identical to ysize of ginfo file: '%d'.", grid_file, a, b);
+
+  a = gridInqXsize(gridID);
+  b = gridInqXsize(gridID2);
+  if ( a != b )
+    cdoAbort("Could not use grid from file '%s' configured via attribute 'ginfo'\n because xsize of $IFILE: '%d' is not identical to xsize of ginfo file: '%d'.", grid_file, a, b);
+
+  vlistChangeGrid(vlistID, gridID, gridID2);
+  printf("Succesfully substituted grid.\n");
 }
 
 static void move_lons(double *xcoord_vals, double *xcell_bounds, int xsize, int xboundsize, int xnbounds)
