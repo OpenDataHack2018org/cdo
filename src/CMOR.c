@@ -2790,49 +2790,109 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
             }
         }
     }
+  if ( cdoVerbose )
+    printf("\n*******Succesfully written variables via cmor_write.******\n");
+  if ( cdoVerbose )
+    printf("\n*******Start to close files and free allocated memory.******\n");
   char file_name[CMOR_MAX_STRING];
   for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
     {
       if ( !vars[i].help_var )
         {
           cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
-          printf("*******      File stored in:  '%s' with cmor!*******\n", file_name);
+          printf("*******File stored in:  '%s' with cmor!*******\n", file_name);
         }
     }
-  Free(buffer); Free(frequency); free_array(append_files);
+  Free(buffer); if (frequency) Free(frequency); if (append_files) free_array(append_files);
+  if ( cdoVerbose )
+    printf("\n*******Succesfully closed files and freed allocated memory.******\n");
 }
 
 static void read_maptab(list_t *kvl, int streamID)
 {
-  char *maptab = kv_get_a_val(kvl, "mapping_table", "");
-  char *maptabdir = kv_get_a_val(kvl, "mapping_table_dir", "");
-  keyValues_t *kvvars = kvlist_search(kvl, "vars");
+  char *maptab = kv_get_a_val(kvl, "mt", NULL);
+  char *maptabdir = kv_get_a_val(kvl, "mapping_table_dir", NULL);
+  char *maptabbuild = NULL;
+  keyValues_t *kvn = kvlist_search(kvl, "n");
+  keyValues_t *kvc = kvlist_search(kvl, "c");
+  keyValues_t *kvcn = kvlist_search(kvl, "cn");
 
-  if ( strcmp(maptab, "") != 0 && strcmp(maptabdir, "") != 0 && maptab[0] != '/' )
+  if ( maptab && maptabdir ) if ( maptab[0] != '/' )
     {
-      char *maptabbuild = Malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
+      maptabbuild = Malloc((strlen(maptab)+strlen(maptabdir)+2) * sizeof(char));
       sprintf(maptabbuild, "%s/%s\0", maptabdir, maptab);
-      maptab = Malloc(strlen(maptabbuild) * sizeof(char));
-      strcpy(maptab, maptabbuild);
-      Free(maptabbuild);
     }
-  if ( strcmp(maptab, "") != 0 )
+  if ( maptab )
     {
+      if ( maptabbuild ) maptab = maptabbuild;
       int vlistID = streamInqVlist(streamID);
       int nvars = vlistNvars(vlistID);
-      if ( kvvars )
+
+      if ( cdoVerbose )
+        printf("*******Try to apply mapping table: '%s'*******\n", maptab);
+      list_t *pml = cdo_parse_cmor_file(maptab);
+      if ( pml == NULL )
         {
-          const char **vars = Malloc((kvvars->nvalues + 1) * sizeof(char *));
-          int i;
-          for ( i = 0; i < kvvars->nvalues; i++ )
-            vars[i] = strdup(kvvars->values[i]);
-          vars[kvvars->nvalues] = NULL;
-          apply_mapping_table(maptab, nvars, vlistID, vars);
+          cdoWarning("Mapping table: '%s' could not be parsed. Operator continues.", maptab);
+          return;
+        }
+      const char *ventry[] = {"&parameter"};
+      int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
+
+      if ( kvn )
+        {
+          if ( cdoVerbose ) printf("Request via 'name' is mapped.\n");
+          if ( kvn->nvalues > 1 )
+            cdoWarning("Only the first value of variable selection key 'name' is processed.");
+          map_via_request(pml, kvn->values, vlistID, nvars, nventry, ventry, 1, "name", 0);
+        }
+      else if ( kvc )
+        {
+          if ( cdoVerbose ) printf("Request via 'code' is mapped.\n");
+          if ( kvc->nvalues > 1 )
+            cdoWarning("Only the first value of variable selection key 'code' is processed.");
+          map_via_request(pml, kvc->values, vlistID, nvars, nventry, ventry, 1, "code", 0);
+        }
+      else if ( kvcn )
+        { 
+          if ( cdoVerbose ) printf("Request via 'cmor_name' is mapped.\n");
+          map_via_request(pml, kvcn->values, vlistID, nvars, nventry, ventry, kvcn->nvalues, "cmor_name", 1); 
         }
       else
-        apply_mapping_table(maptab, nvars, vlistID, NULL);
-      if ( maptab ) Free(maptab);
+        for ( int varID = 0; varID < nvars; varID++ )
+          {
+            if ( map_via_key(pml, vlistID, varID, nventry, ventry, "name") )
+              continue;
+            if ( map_via_key(pml, vlistID, varID, nventry, ventry, "code") )
+              continue;
+            cdoWarning("Could not map variable with id '%d'.", varID);
+          }
+      list_destroy(pml);
+      if ( maptabbuild ) Free(maptabbuild);
     }
+}
+
+static char *check_short_key(char *key)
+{
+  char *short_key = NULL;
+  if ( strcmp(key, "cmor_name") == 0 ) short_key = strdup("cn");
+  else if ( strcmp(key, "name") == 0 ) short_key = strdup("n");
+  else if ( strcmp(key, "code") == 0 ) short_key = strdup("c");
+  else if ( strcmp(key, "units") == 0 ) short_key = strdup("u");
+  else if ( strcmp(key, "cell_methods") == 0 ) short_key = strdup("cm");
+  else if ( strcmp(key, "comment") == 0 ) short_key = strdup("k");
+  else if ( strcmp(key, "positive") == 0 ) short_key = strdup("p");
+  else if ( strcmp(key, "scalar_z_coordinate") == 0 ) short_key = strdup("szc");
+  else if ( strcmp(key, "info") == 0 ) short_key = strdup("i");
+  else if ( strcmp(key, "character_axis") == 0 ) short_key = strdup("ca");
+  else if ( strcmp(key, "grid_info") == 0 ) short_key = strdup("gi");
+  else if ( strcmp(key, "req_time_units") == 0 ) short_key = strdup("rtu");
+  else if ( strcmp(key, "mapping_table") == 0 ) short_key = strdup("mt");
+  else if ( strcmp(key, "calendar") == 0 ) short_key = strdup("l");
+  else if ( strcmp(key, "output_mode") == 0 ) short_key = strdup("om");
+  else if ( strcmp(key, "max_size") == 0 ) short_key = strdup("ms");
+  else if ( strcmp(key, "drs_root") == 0 ) short_key = strdup("dr");
+  return short_key;
 }
 
 static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
@@ -2850,6 +2910,16 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
         {
           if ( key && values[0] )
             {
+              if ( strlen(key) > 3 )
+                {
+                  char *short_key = check_short_key(key);
+                  if (short_key)
+                    {
+                      Free(key);
+                      key = strdup(short_key);
+                      Free(short_key);
+                    }
+                }
               kvlist_append(kvl, (const char *)key, (const char **) values, j);
               Free(key);
               free_array(values);
@@ -2874,6 +2944,16 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
     }
   if ( key && values )
     {
+      if ( strlen(key) > 3 )
+        {
+          char *short_key = check_short_key(key);
+          if (short_key)
+            {
+              Free(key);
+              key = strdup(short_key);
+              Free(short_key);
+            }
+        }
       kvlist_append(kvl, (const char *)key, (const char **) values, j);
       free_array(values);
     }
@@ -2890,8 +2970,8 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
   else
     {
       cdoWarning("Your first argument could not be opened as a file. It is tried to build a path with additional configuration attributes 'mip_table_dir' and 'project_id'");
-      char *miptabdir = kv_get_a_val(kvl, "mip_table_dir", "");
-      if ( strcmp(miptabdir, "") != 0 && strcmp(project_id, "") != 0 )
+      char *miptabdir = kv_get_a_val(kvl, "mip_table_dir", NULL);
+      if ( miptabdir && project_id )
         {
           char *miptab = Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
           sprintf(miptab, "%s/%s_%s\0", miptabdir, project_id, params);
@@ -2905,9 +2985,9 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
     }        
 }
 
-static void save_miptab_freq(list_t *kvl, char *mip_table, int *miptab_freq)
+static char *freq_from_path(char *mip_table)
 {
-  char *freq = strdup(mip_table);
+  char *freq = mip_table;
   int fpos = 0, k = 0, j = 0;
   while ( *(mip_table + j) )
     {
@@ -2920,6 +3000,12 @@ static void save_miptab_freq(list_t *kvl, char *mip_table, int *miptab_freq)
   freq += k;
   if ( fpos > k )
     freq += fpos-k;
+  return freq;
+}
+
+static void save_miptab_freq(list_t *kvl, char *mip_table, int *miptab_freq)
+{
+  char *freq = freq_from_path(mip_table);
   if ( freq != NULL )
     {
       if ( strstr(freq, "yr") || strstr(freq, "Yr") )
@@ -2968,18 +3054,35 @@ void *CMOR(void *argument)
 
   /* Define kvl and read cmdline */
   parse_cmdline(pml, params, nparams, (char *)ventry[0]);
-
+  
   /* Get kvl and use it from now on instead of pml */
   list_t *kvl = pmlist_get_kvlist_ventry(pml, nentry, ventry);
+  char *name = kv_get_a_val(kvl, "n", NULL);
+  char *code = kv_get_a_val(kvl, "c", NULL);
+  if ( name && code )
+    cdoAbort("Mapping via command line is only allowed with one variable selector but you registered both, 'name' and 'code'.");
 
   /* Config files are read with descending priority. */
+  if ( cdoVerbose )
+    printf("*******Start to read configuration files.*******\n");
   read_config_files(kvl);
-  char *project_id = strdup(kv_get_a_val(kvl, "project_id", ""));;
-  int miptab_freq = 0;
+  if ( cdoVerbose )
+    printf("*******Successfully read configuration files.*******\n");
 
-  /* check MIP table */
+  /* check MIP table, MIP table frequency and project_id*/
+  if ( cdoVerbose )
+    printf("*******Start to check MIP table, MIP table frequency and project_id.*******\n");
+  int miptab_freq = 0, time_axis = 0, calendar = 0;
+  char *project_id, *dummy;
+  if ( !(dummy = kv_get_a_val(kvl, "project_id", NULL) ) )
+    cdoAbort("Value for attribute 'project_id' is required.");
+  else
+    project_id = strdup(dummy);
   char *mip_table = get_mip_table(params[0], kvl, project_id);
   save_miptab_freq(kvl, mip_table, &miptab_freq);
+  if ( cdoVerbose )
+    printf("*******Successfully checked MIP table, MIP table frequency and project_id.*******\n");
+
 
   int streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
@@ -2996,23 +3099,31 @@ void *CMOR(void *argument)
  /* dump_global_attributes(pml, streamID); */
 
  /* read mapping table */
+  if ( cdoVerbose )
+    printf("*******Start to read mapping table.*******\n");
   read_maptab(kvl, streamID);
+  if ( cdoVerbose )
+    printf("*******Successfully read mapping table.*******\n");
 
   struct mapping *vars = construct_var_mapping(streamID);
 
-  setup_dataset(kvl, streamID);
+  if ( cdoVerbose )
+    printf("*******Start to use cmor_setup.*******\n");
+  setup_dataset(kvl, streamID, &calendar);
+  if ( cdoVerbose )
+    printf("*******Succesfully used cmor_setup.*******\n");
 
   int table_id;
   cmor_load_table(mip_table, &table_id);
   cmor_set_table(table_id);
 
-  register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq);
-  write_variables(kvl, streamID, vars, miptab_freq);
+  register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq, &time_axis);
+  char *miptab_freqptr = strdup(freq_from_path(mip_table));
+  write_variables(kvl, streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
 
   destruct_var_mapping(vars);
-
-  Free(mip_table); Free(project_id);
-  list_destroy(pml);
+  Free(mip_table); Free(project_id); 
+  list_destroy(pml); 
 
   streamClose(streamID);
 #else
