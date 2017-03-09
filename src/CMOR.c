@@ -336,7 +336,7 @@ list_t *cdo_parse_cmor_file(const char *filename)
   return pml;
 }
 
-static void map_it(list_t *kvl, int vlistID, int varID, int setcn)
+static void map_it(list_t *kvl, int vlistID, int varID)
 {
   for ( listNode_t *kvnode = kvl->head; kvnode; kvnode = kvnode->next )
     {
@@ -348,7 +348,7 @@ static void map_it(list_t *kvl, int vlistID, int varID, int setcn)
 /* Not necessary because cmor_name is what we use for renaming :
       else if ( STR_IS_EQ(key, "name")          ) vlistDefVarName(vlistID, varID, parameter2word(value));
 */
-      else if ( STR_IS_EQ(key, "cmor_name") && setcn )
+      else if ( STR_IS_EQ(key, "cmor_name") )
         {
           char name[CDI_MAX_NAME];
           vlistInqVarName(vlistID, varID, name);
@@ -408,52 +408,6 @@ static void get_ifilevalue(char *ifilevalue, const char *key, int vlistID, int v
     }
 }
 
-static int map_via_key(list_t *pml, int vlistID, int varID, int nventry, const char **ventry, const char *key)
-{
-  char ifilevalue[CDI_MAX_NAME];
-  get_ifilevalue(ifilevalue, key, vlistID, varID);
-
-  list_t *kvl = pmlist_search_kvlist_ventry(pml, key, ifilevalue, nventry, ventry);
-  if ( ifilevalue[0] )
-    {
-      if ( kvl )
-        {
-          map_it(kvl, vlistID, varID, 1);
-          return 1;
-        }
-      cdoWarning("Variable with name '%s' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.\n", ifilevalue, key, key);
-      return 0;
-    }
-  else
-    {
-      cdoWarning("Variable with varID '%d' could not be mapped via '%s' because it does not possess a '%s' in Ifile.", varID, key, key);
-      return 0;
-    }
-}
-
-static int map_via_vars_and_key(list_t *kvl_oname, int vlistID, int nvars, char *key, int setcn)
-{
-  keyValues_t *kv = kvlist_search(kvl_oname, key);
-  if ( kv )
-    {
-      for ( int varID = 0; varID < nvars; varID++ )
-        {
-          char ifilevalue[CDI_MAX_NAME];
-          get_ifilevalue(ifilevalue, key, vlistID, varID);
-
-          if ( ifilevalue[0] && strcmp(ifilevalue, kv->values[0]) == 0 )
-            {
-              map_it(kvl_oname, vlistID, varID, setcn);
-              return 1;
-            }
-        }
-      cdoWarning("The requested variable (via attribute vars) could not be mapped via key '%s' because no Ifile variable '%s' equals '%s'.", key, key, kv->values[0]);
-    }
-  else
-    cdoWarning("The requested variable (via attribute vars) could not be mapped via key '%s' because it possesses no corresponding key '%s' in mapping file.", key, key);
-  return 0;
-}
-
 static int change_name_via_name(int vlistID, char *map_name, char *cmor_name)
 {
   char name[CDI_MAX_NAME];
@@ -486,28 +440,106 @@ static int change_name_via_code(int vlistID, char *map_code, char *cmor_name)
   return 0;
 }
 
-static void map_via_request(list_t *pml, char **request, int vlistID, int nvars, int nventry, const char **ventry, int numvals, const char *selkey, int setcn)
+
+static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, const char **ventry, const char *key)
+{
+  char ifilevalue[CDI_MAX_NAME];
+  get_ifilevalue(ifilevalue, key, vlistID, varID);
+
+  list_t *kvl = pmlist_search_kvlist_ventry(pml, key, ifilevalue, nventry, ventry);
+  if ( ifilevalue[0] )
+    {
+      if ( kvl )
+        {
+          map_it(kvl, vlistID, varID);
+          return 1;
+        }
+      cdoWarning("Variable with name '%s' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.\n", ifilevalue, key, key);
+      return 0;
+    }
+  else
+    {
+      cdoWarning("Variable with varID '%d' could not be mapped via '%s' because it does not possess a '%s' in Ifile.", varID, key, key);
+      return 0;
+    }
+}
+
+static int maptab_via_cn_and_key(list_t *kvl_oname, int vlistID, int nvars, char *key)
+{
+  keyValues_t *kv = kvlist_search(kvl_oname, key);
+  if ( kv )
+    {
+      for ( int varID = 0; varID < nvars; varID++ )
+        {
+          char ifilevalue[CDI_MAX_NAME];
+          get_ifilevalue(ifilevalue, key, vlistID, varID);
+
+          if ( ifilevalue[0] && strcmp(ifilevalue, kv->values[0]) == 0 )
+            {
+              map_it(kvl_oname, vlistID, varID);
+              return 1;
+            }
+        }
+      cdoWarning("Could not map via key '%s' because no Ifile variable '%s' equals '%s'.", key, key, kv->values[0]);
+    }
+  else
+    cdoWarning("Could not map via key '%s' because it possesses no corresponding key '%s' in mapping file.", key, key);
+  return 0;
+}
+
+static int getVarIDToMap(int vlistID, int nvars, char *key, char *value)
+{
+  for ( int varID = 0; varID < nvars; varID++ )
+    {
+      char ifilevalue[CDI_MAX_NAME];
+      get_ifilevalue(ifilevalue, key, vlistID, varID);
+      if ( strcmp(ifilevalue, value) == 0 )
+        return varID;
+    }
+  return CDI_UNDEFID;
+}
+
+static void maptab_via_cmd(list_t *pml, char *origValue, int vlistID, int nvars, int nventry, const char **ventry, char *key, char *cmorName)
+{
+  int varIDToMap = getVarIDToMap(vlistID, nvars, key, origValue);
+  if ( varIDToMap == CDI_UNDEFID )
+    cdoAbort("Could not find variable with name '%s' in Ifile.", origValue);
+  list_t *kvl_maptab = pmlist_search_kvlist_ventry(pml, "cmor_name", cmorName, nventry, ventry);
+  if ( !kvl_maptab )
+    {
+      cdoWarning("Could not find cmor_name '%s' in mapping table.\n No mapping table is applied.", cmorName);
+      vlistDefVarName(vlistID, varIDToMap, parameter2word((const char *) cmorName));
+    }
+  else
+    map_it(kvl_maptab, vlistID, varIDToMap);
+}
+
+static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, int nventry, const char **ventry, int numvals)
 {
   for ( int j = 0; j<numvals; j++)
     {
-      if ( cdoVerbose )
-        printf("*******Try to use variable '%s': '%s' as mapping entry.********\n", selkey, request[j]);
-      list_t *kvl_oname = pmlist_search_kvlist_ventry(pml, selkey, request[j], nventry, ventry);
+      list_t *kvl_oname = pmlist_search_kvlist_ventry(pml, "cmor_name", request[j], nventry, ventry);
       if ( kvl_oname )
         {
-          if ( map_via_vars_and_key(kvl_oname, vlistID, nvars, "name", setcn) )
-            {printf("*******Succesfully used variable '%s': '%s' as mapping entry.********\n", selkey, request[j]); continue;}
-          else if ( map_via_vars_and_key(kvl_oname, vlistID, nvars, "code", setcn) )
-            {printf("*******Succesfully used variable '%s': '%s' as mapping entry.********\n", selkey, request[j]); continue;}
+          if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "name") )
+            {
+              printf("*******Succesfully mapped variable via name to cmor_name: '%s'.********\n", request[j]); 
+              continue;
+            }
+          else if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "code") )
+            {
+              printf("*******Succesfully mapped variable via code to cmor_name '%s'.********\n", request[j]); 
+              continue;
+            }
           else
             {
-              cdoWarning("Could not map via variable '%s': '%s'\n", selkey, request[j]);
+              cdoWarning("No identification 'name' or 'key' in mapping table line of cmor_name '%s'. Varaible not mapped.\n", request[j]);
               continue;
             }
         }
       else
         {
-          cdoWarning("Requested variable '%s' (via attribute vars) is not found in row 'cmor_name' of mapping table.'\n", request[j]);
+          cdoWarning("Requested cmor_name: '%s' is not found in mapping table.'\n", request[j]);
           continue;
         }
     }
@@ -661,7 +693,7 @@ static void check_compare_set(char **finalset, char *attribute, char *attname, c
 
 static int check_attr(list_t *kvl, char *project_id)
 {
-  const char *longAtt[] = {"req_time_units", "calendar", "grid_info", "mapping_table", NULL};
+  const char *longAtt[] = {"required_time_units", "calendar", "grid_info", "mapping_table", NULL};
   const char *shortAtt[] = {"rtu", "l", "gi", "mt", NULL};
 
   int i = 0;
@@ -675,7 +707,7 @@ static int check_attr(list_t *kvl, char *project_id)
 
 /* Project id moved to main void fct */
   const char *reqAtt[] = {"institute_id", "institution", "contact", "model_id", "source",
-            "experiment_id", "req_time_units", NULL};
+            "experiment_id", "required_time_units", NULL};
   const char *reqAttCMIP5[] = {"product", "member", NULL};
   const char *reqAttCORDEX[] = {"product", "member", "cordex_domain", "driving_model_id", NULL};
 /* In all Projects needed Attributes are tested first */
@@ -1034,7 +1066,9 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
   int netcdf_file_action = get_netcdf_file_action(kvl);
   int set_verbosity = get_cmor_verbosity(kvl);
   int exit_control = get_cmor_exit_control(kvl);
-  int creat_subs = atol(kv_get_a_val(kvl, "r", "0"));
+  int creat_subs = 1;
+  if ( kv_get_a_val(kvl, "nd", NULL) )
+    creat_subs = 0;
 
   int vlistID = streamInqVlist(streamID);
 
@@ -1082,7 +1116,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
                kv_get_a_val(kvl, "contact", ""),
                kv_get_a_val(kvl, "history", ""),
 /* comment:*/
-               kv_get_a_val(kvl, "k", ""),
+               kv_get_a_val(kvl, "vc", ""),
                kv_get_a_val(kvl, "references", ""),
                atoi(kv_get_a_val(kvl, "leap_year", "")),
                atoi(kv_get_a_val(kvl, "leap_month", "")),
@@ -1159,12 +1193,12 @@ static int check_time_units(char *time_units)
   return 1;
 }
 
-static void get_taxis(char *req_time_units, int *sdate, int *stime, int *timeunit)
+static void get_taxis(char *required_time_units, int *sdate, int *stime, int *timeunit)
 {
   int attyear, attmonth, attday, atthour, attminute, attsecond;
   char atttimeunit[CMOR_MAX_STRING];
 
-  sscanf(req_time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s",
+  sscanf(required_time_units, "%s since %d-%d-%d%*1s%02d:%02d:%02d%*1s",
                   atttimeunit, &attyear, &attmonth, &attday, &atthour,
                   &attminute, &attsecond);
   *sdate = cdiEncodeDate(attyear, attmonth, attday);
@@ -2011,10 +2045,11 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
   char *positive = get_txtatt(vlistID, varID, "positive");
   char *units = Malloc(CDI_MAX_NAME * sizeof(char));
   vlistInqVarUnits(vlistID, varID, units);
-  if ( !name[0] ) { Free(units); units = NULL; }
   char *attunits = kv_get_a_val(kvl, "u", NULL);
   char *attp = kv_get_a_val(kvl, "p", NULL);
   check_compare_set(&positive, attp, "positive", "");
+  if ( strcmp(positive, " ") == 0 )
+    strcpy(positive, "");
   check_compare_set(&units, attunits, "units", NULL);
   if ( cdoVerbose )
     printf("*******Succesfully retrieved 'positive': '%s' and 'units' : '%s'.******\n", positive, units);
@@ -2059,35 +2094,6 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
   if (positive) Free(positive); Free(units);
 }
 
-static int cmdline_mapping(list_t *kvl, int vlistID, char *cmor_name)
-{
-  char varcodestring[4];
-  char *map_name = kv_get_a_val(kvl, "n", NULL);
-  char *map_code = kv_get_a_val(kvl, "c", NULL);
-  char *map_tab = kv_get_a_val(kvl, "mt", NULL);
-  if ( map_name || map_code )
-    {
-      if ( cdoVerbose )
-        printf("*******Start to rename via command line.******\n");
-      if ( map_name )
-        if ( change_name_via_name(vlistID, map_name, cmor_name) )
-          {
-            if ( cdoVerbose )
-              printf("*******Succesfully renamed via command line.******\n"); 
-            return 1;
-          }
-      else if ( map_code )
-        if ( change_name_via_code(vlistID, map_code, cmor_name) )
-          {
-            if ( cdoVerbose )
-              printf("*******Succesfully renamed via command line.******\n"); 
-            return 1;
-          }   
-      cdoWarning("Renaming via command line failed. Could not rename: '%s'.\n", map_name);
-    }
-  return 0;
-}
-
 static void register_all_dimensions(list_t *kvl, int streamID,
                              struct mapping vars[], int table_id, char *project_id, int miptab_freq, int *time_axis)
 {
@@ -2095,24 +2101,32 @@ static void register_all_dimensions(list_t *kvl, int streamID,
   int taxisID = vlistInqTaxis(vlistID);
 
   if ( cdoVerbose )
-    printf("*******Start to check attribute 'req_time_units'.******\n");
+    printf("*******Start to check attribute 'required_time_units'.******\n");
   char *time_units = get_time_units(taxisID);
-  char *req_time_units = kv_get_a_val(kvl, "req_time_units", NULL);
-  if ( check_time_units(req_time_units) )
-    check_compare_set(&time_units, req_time_units, "time_units", NULL);
+  char *required_time_units = kv_get_a_val(kvl, "required_time_units", NULL);
+  if ( check_time_units(required_time_units) )
+    check_compare_set(&time_units, required_time_units, "time_units", NULL);
   else 
-    cdoAbort("Required Attribute 'req_time_units' from configuration is invalid!");
+    cdoAbort("Required Attribute 'required_time_units' from configuration is invalid!");
   if ( cdoVerbose )
-    printf("*******Succesfully checked attribute 'req_time_units'.*******\n");
+    printf("*******Succesfully checked attribute 'required_time_units'.*******\n");
 
   if ( cdoVerbose )
     printf("*******Start to retrieve requested variables.******\n");
 
   int numvals = 0;
   char **cmor_names = kv_get_vals(kvl, "cn", &numvals);
-  if ( cmor_names )
-    if ( cmdline_mapping(kvl, vlistID, cmor_names[0]) )
-      numvals = 1;
+
+/* Cmdlinemapping: */
+  char *mapname, *mapcode;
+  if ( kv_get_a_val(kvl, "mt", NULL) && numvals )
+    {
+      if ( mapname = kv_get_a_val(kvl, "n", NULL) )
+        change_name_via_name(vlistID, mapname, cmor_names[0]);
+      else if ( mapcode = kv_get_a_val(kvl, "c", NULL) )
+        change_name_via_code(vlistID, mapcode, cmor_names[0]);
+    }
+
   if ( cmor_names == NULL && vlistNvars(vlistID) > 1 )
     cdoWarning("You have not requested any specific variable but there are several in input! Notice that all command line configuration attributes including cmor_name and units will be used for every variable!\n");
   if ( cdoVerbose )
@@ -2462,8 +2476,9 @@ static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vli
 }
 
 
-static int check_append_and_size(list_t *kvl, int vlistID, char *test, int ifreq, int calendar)
+static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifreq, int calendar)
 {
+  char *test = testIn;
   size_t filesize = fileSize(test);
   char old_start_date[CMOR_MAX_STRING];
   char old_end_date[CMOR_MAX_STRING];
@@ -2545,9 +2560,9 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *test, int ifreq
 /* Check temporal distance between last chunk date and first file date */
   double append_distance = juldate_to_seconds(juldate_sub(firstdate, juloend)) / 3600.0;
 
-  if ( ( j == 8 && append_distance > 48.0 )
-     ||( j == 6 && append_distance/24.0 > 61.0 )
-     ||( j == 4 && append_distance/24.0/30.5 > 23.0 ) )
+  if ( ( j == 8 && ( append_distance > 48.0 || append_distance < 0 ) )
+     ||( j == 6 && ( append_distance/24.0 > 61.0 || append_distance < 0 ) )
+     ||( j == 4 && ( append_distance/24.0/30.5 > 23.0 || append_distance < 0 ) ) )
     cdoAbort("A temporal gap is diagnosed between end date of chunk file and first date of working file of: '%f' hours. Maximal valid gaps are:\n47 hours for daily frequency\n45 days for monthly frequency\n19 month for yearly frequency", append_distance);
 
 /* Check file size */
@@ -2588,121 +2603,125 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *test, int ifreq
   return 1;
 }
 
-static char *use_chunk_file_des(list_t *kvl, int vlistID, int var_id, char *att_chunk_des_file, int ifreq, int calendar)
+static char *use_chunk_des_files(list_t *kvl, int vlistID, int var_id, char *chunk_des_file, int ifreq, int calendar)
 {
-  char name[CDI_MAX_NAME];
-  vlistInqVarName(vlistID, var_id, name);
-  char *chunk_des_file = Malloc(CMOR_MAX_STRING * sizeof(char));
-  sprintf(chunk_des_file, "APPEND_FILE_%s_%s.txt\0", name, att_chunk_des_file);
-  if ( cdoVerbose )
-    printf("It is tried to open a chunk description file named: '%s' where the chunk file name should be noted\n", chunk_des_file); 
+  char *chunk_file = Malloc(4096 * sizeof(char));
   if ( file_exist(chunk_des_file, 0) )
     {
       FILE *fp = fopen(chunk_des_file, "r");
       size_t filesize = fileSize(chunk_des_file);
       char *buffer = (char*) Malloc(filesize);
-      char *appendFile = Malloc(4096 * sizeof(char));
       size_t nitems = fread(buffer, 1, filesize, fp);
-      buffer = readLineFromBuffer(buffer, &filesize, appendFile, 4096);
+      buffer = readLineFromBuffer(buffer, &filesize, chunk_file, 4096);
       fclose(fp);
-      if ( file_exist(appendFile, 0) && check_append_and_size(kvl, vlistID, appendFile, ifreq, calendar) )
-        {
-          Free(chunk_des_file);
-          return appendFile;
-        }
+      if ( file_exist(chunk_file, 0) && check_append_and_size(kvl, vlistID, chunk_file, ifreq, calendar) )
+        return chunk_file;
       else
-        cdoWarning("Append chunk :'%s' configured via chunk description file could not be opened.\nA new file will be written", appendFile);
-      Free(appendFile);
+        cdoWarning("Chunk '%s' configured via chunk description file could not be opened.\nSwitched to replace mode.", chunk_file);
     }
   else
-    cdoWarning("Chunk description file '%s' could not be opened.\nA new file will be written.", chunk_des_file);
-  strcpy(chunk_des_file, " \0");
-  return chunk_des_file;
+    cdoWarning("Chunk description file '%s' could not be opened.\nSwitched to replace mode.", chunk_des_file);
+  strcpy(chunk_file, " \0");
+  return chunk_file;
 }
 
-static char **get_append_files(list_t *kvl, struct mapping vars[], int vlistID, int ifreq, int time_axis, int calendar, char *miptab_freqptr)
+static char **empty_array(struct mapping vars[], char ***chunk_files)
 {
-  char **append_files;
+  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+    (*chunk_files)[i] = NULL;
+  return *chunk_files;
+}
+
+static char **get_chunk_des_files(list_t *kvl, struct mapping vars[], char *miptab_freqptr, int nreq, int vlistID)
+{
+  char **chunk_des_files = Malloc((nreq+1) * sizeof(char *));
+  chunk_des_files[nreq] = NULL;
+
+  char *trunk = Malloc(CMOR_MAX_STRING * sizeof(char));
+  char *description_atts[] = {"model_id", "experiment_id", "member", NULL};
+  strcpy(trunk, miptab_freqptr);
+  for ( int i = 0; description_atts[i]; i++ )
+    {
+      strcat(trunk, "_");
+      strcat(trunk, kv_get_a_val(kvl, description_atts[i], ""));
+    }
+
+  for ( int j = 0; vars[j].cdi_varID != CDI_UNDEFID; j++)
+    {
+      char *name = Malloc(CDI_MAX_NAME * sizeof(char));
+      vlistInqVarName(vlistID, vars[j].cdi_varID, name);
+      chunk_des_files[j] = Malloc(CMOR_MAX_STRING * sizeof(char));
+      sprintf(chunk_des_files[j], "CHUNK_FILE_%s_%s.txt\0", name, trunk);
+      Free(name);
+    }
+  return chunk_des_files;  
+}
+
+static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, int ifreq, int time_axis, int calendar, char *miptab_freqptr)
+{
   int i = 0;
   for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ );
-  append_files = Malloc((i+1) * sizeof(char *));
-  append_files[i] = NULL;
+  char **chunk_files = Malloc((i+1) * sizeof(char *));
+  chunk_files[i] = NULL;
   
   char *dummy = kv_get_a_val(kvl, "om", NULL);
   if ( !dummy || strcmp(dummy, "a") != 0 )
+    return empty_array(vars, &chunk_files);
+  else if ( time_axis == 3 )
     {
-      for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
-        append_files[i] = NULL;
-      return append_files;
+      printf("CMOR APPEND mode not possible for time independent variables.\nSwitched to replace mode");
+      return empty_array(vars, &chunk_files);
     }
 
   if ( cdoVerbose )
     printf("\n*******Start to retrieve chunk files to append .******\n");
 
-  char *att_append_file = kv_get_a_val(kvl, "cf", " ");
-  int create_subs = atol(kv_get_a_val(kvl, "r", "0"));
-/* For chunk description file : */
-  char att_chunk_des_file[CMOR_MAX_STRING];
-  char *description_atts[] = {"model_id", "experiment_id", "member", NULL};
-  strcpy(att_chunk_des_file, miptab_freqptr);
-  i = 0;
-  while ( description_atts[i] != NULL )
+  int num_aaf = 0;
+  char **chunk_att_files = kv_get_vals(kvl, "cf", &num_aaf);
+  char **chunk_des_files = NULL;
+  if ( num_aaf != i && num_aaf > 0 )
     {
-      strcat(att_chunk_des_file, "_");
-      strcat(att_chunk_des_file, kv_get_a_val(kvl, description_atts[i], ""));
-      i++;
+      printf("Number of chunk files '%d' disagree with number of requested variables '%d'.\n Switched to replace mode.\n", num_aaf, i); 
+      return empty_array(vars, &chunk_files);
+    }  
+  else if ( num_aaf == 0 )
+    {
+      int nd = atol(kv_get_a_val(kvl, "nd", "0"));
+/* For chunk description file : */
+      if ( !nd )
+        chunk_des_files = get_chunk_des_files(kvl, vars, miptab_freqptr, i, vlistID);
+      else if ( cdoVerbose )
+        {
+          printf("Automatic chunk configuration via file not possible if DRS is not created.\nSwichted to replace mode.");
+          return empty_array(vars, &chunk_files);
+        }
     }
 
   for ( int j = 0; vars[j].cdi_varID != CDI_UNDEFID; j++ )
     {
-          append_files[j] = strdup(" ");
-          if ( time_axis != 3 )
-            {
-              if ( ( i > 1 && strcmp(att_append_file, " ") == 0 ) || i == 1 )
-                {
-                  if ( create_subs && strcmp(att_append_file, " ") == 0 )
-                    {  
-                      if ( cdoVerbose )
-                        printf("It is tried to open a chunk description file for varID: '%d'.\n", vars[j].cdi_varID);
-                      char *chunk_file=use_chunk_file_des(kvl, vlistID, vars[j].cdi_varID, att_chunk_des_file, ifreq, calendar);  
-                      Free(append_files[j]);
-                      append_files[j] = strdup(chunk_file);
-                      Free(chunk_file);
-                      continue;      
-                    }
-                  else if ( strcmp(att_append_file, " ") != 0 )
-                    {
-                      if ( file_exist(att_append_file, 0) && check_append_and_size(kvl, vlistID, att_append_file, ifreq, calendar) )
-                        {
-                          Free(append_files[j]);
-                          append_files[j] = strdup(att_append_file);
-                          continue;
-                        }
-                      else
-                        {
-                          cdoWarning("Previous chunk configuration via attribute 'append_file': '%s' could not be opened.", att_append_file);
-                        }      
-                    }
-                  else
-                    {
-                      cdoWarning("Previous chunk configuration via chunk file description not possible if DRS is not created.\nNew files will be written");
-                    }
-                }
-              else
-                {
-                  cdoWarning("Previous chunk configuration via attribute 'append_file' not possible if more than one variables are requested.\nNew files will be written");
-                }
-            }
+      if ( num_aaf != 0 )
+        {
+          if ( file_exist(chunk_att_files[j], 0) && check_append_and_size(kvl, vlistID, chunk_att_files[j], ifreq, calendar) )
+            chunk_files[j] = strdup(chunk_att_files[j]);
           else
             {
-              cdoWarning("CMOR mode APPEND not possible for time independent variables.\nA new file will be written");
-            }
-          if ( cdoVerbose && strcmp(append_files[j], " ") != 0 )
-            printf("\n*******Chunk file to append on for var with CDI ID %d is: '%s' .******\n", vars[j].cdi_varID, append_files[j]);
+              cdoWarning("Chunk '%s' could not be used.\nSwitched to replace mode for this variable.\n", chunk_att_files[j]);
+              chunk_files[j] = strdup(" ");
+            }   
+        }
+      else 
+        {
+          if ( cdoVerbose )
+            printf("It is tried to open a chunk description file for varID: '%d'.\n", vars[j].cdi_varID);
+          chunk_files[j] = use_chunk_des_files(kvl, vlistID, vars[j].cdi_varID, chunk_des_files[j], ifreq, calendar);  
+        }
+      if ( cdoVerbose && strcmp(chunk_files[j], " ") != 0 )
+        printf("\n*******Chunk file to append on var with CDI ID %d is: '%s' .******\n", vars[j].cdi_varID, chunk_files[j]);
     }
+  if ( chunk_des_files ) free_array(chunk_des_files);
   if ( cdoVerbose )
     printf("\n*******Successfully processed chunk file retrieval.******\n");
-  return append_files;
+  return chunk_files;
 }
 
 static void write_variables(list_t *kvl, int streamID, struct mapping vars[], int miptab_freq, int time_axis, int calendar, char *miptab_freqptr)
@@ -2715,7 +2734,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
   double *buffer = (double *) Malloc(gridsize * sizeof(double));
 
   if ( cdoVerbose )
-    printf("\n*******Start to retrieve relative start time value from 'req_time_units' and file and start to retrieve frequency.******\n");
+    printf("\n*******Start to retrieve relative start time value from 'required_time_units' and file and start to retrieve frequency.******\n");
   int sdate, stime, time_unit;
   get_taxis(kv_get_a_val(kvl, "rtu", NULL), &sdate, &stime, &time_unit);
   int tunitsec = get_tunitsec(time_unit);
@@ -2724,7 +2743,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
   if ( time_axis != 3 )
     frequency = get_frequency(kvl, streamID, vlistID, taxisID, miptab_freq);
   if ( cdoVerbose )
-    printf("\n*******Succesfully retrieved time value from 'req_time_units' and frequency.******\n");
+    printf("\n*******Succesfully retrieved time value from 'required_time_units' and frequency.******\n");
 
   int ifreq = 0;
   if ( frequency )
@@ -2737,10 +2756,11 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
         ifreq = 3;
     }
 
-  char **append_files = get_append_files(kvl, vars, vlistID, ifreq, time_axis, calendar, miptab_freqptr);
+  char **chunk_files = get_chunk_files(kvl, vars, vlistID, ifreq, time_axis, calendar, miptab_freqptr);
 
   if ( cdoVerbose )
     printf("\n*******Start to write variables via cmor_write.******\n");
+  int i = 0;
   while ( (nrecs = streamInqTimestep(streamID, tsID++)) )
     {
       double time_bnds[2];
@@ -2756,7 +2776,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
 
       int ps_index = -1;
       check_for_sfc_pressure(&ps_index, vars, vlistID, tsID);
-      for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+      for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
         {
 /*          char name[CDI_MAX_NAME];
           vlistInqVarName(vlistID, vars[i].cdi_varID, name); */
@@ -2767,7 +2787,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
                   cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
-                   append_files[i],
+                   chunk_files[i],
                    1,
                    &time_val,
                    time_bndsp,
@@ -2776,7 +2796,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
                     cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
-                       append_files[i],
+                       chunk_files[i],
                        1,
                        &time_val,
                        time_bndsp,
@@ -2786,7 +2806,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
                 cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
-                   append_files[i], 0, 0, 0, NULL);
+                   chunk_files[i], 0, 0, 0, NULL);
             }
         }
     }
@@ -2794,16 +2814,37 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
     printf("\n*******Succesfully written variables via cmor_write.******\n");
   if ( cdoVerbose )
     printf("\n*******Start to close files and free allocated memory.******\n");
+  char **chunkdf = NULL;
+  if ( strcmp(kv_get_a_val(kvl, "om", ""), "a") == 0 && strcmp(kv_get_a_val(kvl, "nd", ""), "1") != 0 )
+    chunkdf = get_chunk_des_files(kvl, vars, miptab_freqptr, i, vlistID);
+
   char file_name[CMOR_MAX_STRING];
-  for ( int i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
+  for ( i = 0; vars[i].cdi_varID != CDI_UNDEFID; i++ )
     {
       if ( !vars[i].help_var )
         {
           cmor_close_variable(vars[i].cmor_varID, file_name, NULL);
           printf("*******File stored in:  '%s' with cmor!*******\n", file_name);
+          if ( chunkdf )
+            {
+              if ( cdoVerbose )
+                printf("*******Start to write a chunk description file.******\n");
+              FILE *fp = fopen(chunkdf[i], "w+"); 
+              if ( fp )
+                fprintf(fp, "%s", file_name);
+              else
+                {
+                  if ( cdoVerbose )
+                    printf("Could not open a chunk description file '%s'.\n", chunkdf[i]);
+                  continue;
+                }
+              fclose(fp);  
+              if ( cdoVerbose )
+                printf("*******Succesfully written a chunk description file '%s'******\n" , chunkdf[i]);            
+            }         
         }
     }
-  Free(buffer); if (frequency) Free(frequency); if (append_files) free_array(append_files);
+  Free(buffer); if (frequency) Free(frequency); if (chunk_files) free_array(chunk_files); if (chunkdf) free_array(chunkdf);
   if ( cdoVerbose )
     printf("\n*******Succesfully closed files and freed allocated memory.******\n");
 }
@@ -2841,35 +2882,32 @@ static void read_maptab(list_t *kvl, int streamID)
 
       if ( kvn )
         {
-          if ( cdoVerbose ) printf("Request via 'name' is mapped.\n");
           if ( kvn->nvalues > 1 )
             cdoWarning("Only the first value of variable selection key 'name' is processed.");
-          map_via_request(pml, kvn->values, vlistID, nvars, nventry, ventry, 1, "name", 0);
+          maptab_via_cmd(pml, kvn->values[0], vlistID, nvars, nventry, ventry, "name", kvcn->values[0]);
           if ( cdoVerbose )
             printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
       else if ( kvc )
         {
-          if ( cdoVerbose ) printf("Request via 'code' is mapped.\n");
           if ( kvc->nvalues > 1 )
             cdoWarning("Only the first value of variable selection key 'code' is processed.");
-          map_via_request(pml, kvc->values, vlistID, nvars, nventry, ventry, 1, "code", 0);
+          maptab_via_cmd(pml, kvc->values[0], vlistID, nvars, nventry, ventry, "code", kvcn->values[0]);
           if ( cdoVerbose )
             printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
       else if ( kvcn )
         { 
-          if ( cdoVerbose ) printf("Request via 'cmor_name' is mapped.\n");
-          map_via_request(pml, kvcn->values, vlistID, nvars, nventry, ventry, kvcn->nvalues, "cmor_name", 1); 
+          maptab_via_cn(pml, kvcn->values, vlistID, nvars, nventry, ventry, kvcn->nvalues); 
           if ( cdoVerbose )
             printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
       else
         for ( int varID = 0; varID < nvars; varID++ )
           {
-            if ( map_via_key(pml, vlistID, varID, nventry, ventry, "name") )
+            if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "name") )
               continue;
-            if ( map_via_key(pml, vlistID, varID, nventry, ventry, "code") )
+            if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "code") )
               continue;
             cdoWarning("Could not map variable with id '%d'.", varID);
           }
@@ -2882,8 +2920,13 @@ static void read_maptab(list_t *kvl, int streamID)
 
 static char *check_short_key(char *key)
 {
-  char *short_key = NULL;
-  if ( strcmp(key, "cmor_name") == 0 ) short_key = strdup("cn");
+  char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "l", "om", "ms", "dr", "nd", "cf", NULL};
+  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "calendar", "output_mode", "max_size", "drs_root", "no_drs", "chunk_files", NULL};
+
+  for ( int i = 0; short_keys[i]; i++ )
+    if ( strcmp(key, long_keys[i]) == 0 )
+      return short_keys[i];
+/*  if ( strcmp(key, "cmor_name") == 0 ) short_key = strdup("cn");
   else if ( strcmp(key, "name") == 0 ) short_key = strdup("n");
   else if ( strcmp(key, "code") == 0 ) short_key = strdup("c");
   else if ( strcmp(key, "units") == 0 ) short_key = strdup("u");
@@ -2894,14 +2937,15 @@ static char *check_short_key(char *key)
   else if ( strcmp(key, "info") == 0 ) short_key = strdup("i");
   else if ( strcmp(key, "character_axis") == 0 ) short_key = strdup("ca");
   else if ( strcmp(key, "grid_info") == 0 ) short_key = strdup("gi");
-  else if ( strcmp(key, "req_time_units") == 0 ) short_key = strdup("rtu");
+  else if ( strcmp(key, "required_time_units") == 0 ) short_key = strdup("rtu");
   else if ( strcmp(key, "mapping_table") == 0 ) short_key = strdup("mt");
   else if ( strcmp(key, "calendar") == 0 ) short_key = strdup("l");
   else if ( strcmp(key, "output_mode") == 0 ) short_key = strdup("om");
   else if ( strcmp(key, "max_size") == 0 ) short_key = strdup("ms");
   else if ( strcmp(key, "drs_root") == 0 ) short_key = strdup("dr");
-  else if ( strcmp(key, "chunk_files") == 0 ) short_key = strdup("cf");
-  return short_key;
+  else if ( strcmp(key, "no_drs") == 0 ) short_key = strdup("nd");
+  else if ( strcmp(key, "chunk_files") == 0 ) short_key = strdup("cf"); */
+  return NULL;
 }
 
 static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
@@ -2926,7 +2970,6 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
                     {
                       Free(key);
                       key = strdup(short_key);
-                      Free(short_key);
                     }
                 }
               kvlist_append(kvl, (const char *)key, (const char **) values, j);
@@ -2960,7 +3003,6 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
             {
               Free(key);
               key = strdup(short_key);
-              Free(short_key);
             }
         }
       kvlist_append(kvl, (const char *)key, (const char **) values, j);
@@ -3068,8 +3110,11 @@ void *CMOR(void *argument)
   list_t *kvl = pmlist_get_kvlist_ventry(pml, nentry, ventry);
   char *name = kv_get_a_val(kvl, "n", NULL);
   char *code = kv_get_a_val(kvl, "c", NULL);
-  if ( name && code )
-    cdoAbort("Mapping via command line is only allowed with one variable selector but you registered both, 'name' and 'code'.");
+  char *cn = kv_get_a_val(kvl, "cn", NULL);
+  if ( ( name && code ) )
+    cdoAbort("Mapping via command line failed. Only one variable selector of 'name' and 'code' is allowed.");
+  if ( ( name && !cn ) || ( code && !cn ) )
+    cdoAbort("Mapping via command line failed. A corresponding 'cmor_name' is needed.");
 
   /* Config files are read with descending priority. */
   if ( cdoVerbose )
@@ -3129,7 +3174,8 @@ void *CMOR(void *argument)
   write_variables(kvl, streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
 
   destruct_var_mapping(vars);
-  Free(mip_table); Free(project_id); 
+  Free(mip_table);
+  Free(project_id); 
   list_destroy(pml); 
 
   streamClose(streamID);
