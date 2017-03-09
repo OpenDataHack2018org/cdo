@@ -409,7 +409,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  SeaspctlOperators      {"seaspctl"}
 #define  SeasstatOperators      {"seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
-#define  SelindexOperators      {"selindex"}
+#define  SelindexOperators      {"selindex", "delindex"}
 #define  SelectOperators        {"select", "delete"}
 #define  SelvarOperators        {"selparam", "selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delparam", "delcode", "delname", "selltype"}

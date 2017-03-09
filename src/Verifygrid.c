@@ -618,8 +618,18 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
         
       int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, actual_number_of_corners + 1, center_point_plane_projection);
 
+      // if ( winding_number == 0 ) printf("%d,", cell_no+1);
       if ( winding_number == 0 )
 	no_of_cells_with_center_points_out_of_bounds += 1;
+
+      if ( cdoVerbose && winding_number == 0 )
+        {
+          printf("cell_no %d: ", cell_no+1);
+          printf(" lon=%g lat=%g : ", grid_center_lon[cell_no], grid_center_lat[cell_no]);
+          for ( int corner_no = 0; corner_no < ncorner; corner_no++ )
+            printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no]);
+          printf("\n");
+        }
     }
 
   int no_nonunique_cells = gridsize - no_unique_center_points;
