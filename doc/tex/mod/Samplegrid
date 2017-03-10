@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Samplegrid
 @Title     = Resample grid
 @Section   = Selection

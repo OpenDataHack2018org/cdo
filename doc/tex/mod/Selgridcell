@@ -1,0 +1,38 @@
+@BeginModule
+@NewPage
+@Name      = Selgridcell
+@Title     = Select grid cells
+@Section   = Selection
+@Class     = Selection
+@Arguments = infile outfile
+@Operators = selgridcell delgridcell
+
+@BeginDescription
+Selects grid cells of all fields from infile. The user has to give the indexes of each
+grid cell. The resulting grid in outfile is unstructured.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_selgridcell
+@Title     = Select grid cells
+@Parameter = indexes
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_delgridcell
+@Title     = Delete grid cells
+@Parameter = indexes
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = indexes
+INTEGER  Comma separated list of indexes
+@EndParameter

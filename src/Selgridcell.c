@@ -62,7 +62,7 @@ void sel_index(double *array1, double *array2, int nind, int *indarr)
 }
 
 
-void *Selindex(void *argument)
+void *Selgridcell(void *argument)
 {
   int nrecs;
   int varID, levelID;
@@ -77,10 +77,10 @@ void *Selindex(void *argument)
 
   cdoInitialize(argument);
 
-  int SELINDEX = cdoOperatorAdd("selindex", 0, 0, "grid cell indices (1-N)");
-  int DELINDEX = cdoOperatorAdd("delindex", 0, 0, "grid cell indices (1-N)");
+  int SELGRIDCELL = cdoOperatorAdd("selgridcell", 0, 0, "grid cell indices (1-N)");
+  int DELGRIDCELL = cdoOperatorAdd("delgridcell", 0, 0, "grid cell indices (1-N)");
 
-  UNUSED(SELINDEX);
+  UNUSED(SELGRIDCELL);
 
   operatorInputArg(cdoOperatorEnter(0));
 
@@ -124,7 +124,7 @@ void *Selindex(void *argument)
 
   int ncells = nind;
   int *cellidx = indarr;
-  if ( operatorID == DELINDEX )
+  if ( operatorID == DELGRIDCELL )
     {
       int gridsize = vlistGridsizeMax(vlistID1);
       ncells = gridsize - nind;
@@ -243,7 +243,7 @@ void *Selindex(void *argument)
 
   lista_destroy(ilista);
 
-  if ( operatorID == DELINDEX ) Free(cellidx);
+  if ( operatorID == DELGRIDCELL ) Free(cellidx);
 
   cdoFinish();
 

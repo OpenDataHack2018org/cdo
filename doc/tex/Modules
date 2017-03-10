@@ -19,6 +19,7 @@ Selmulti      Selection
 Selvar        Selection
 Seltime       Selection
 Selbox        Selection
+Selgridcell   Selection
 Samplegrid    Selection
 Cond          Conditional selection
 Cond2         Conditional selection

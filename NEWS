@@ -1,6 +1,12 @@
 CDO NEWS
 --------
 
+Version 1.8.1 (24 March 2017):
+
+   New operators:
+     * selgridcell - Select grid cells
+     * delgridcell - Delete grid cells
+
 Version 1.8.0 (26 October 2016):
 
    New features:

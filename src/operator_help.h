@@ -719,6 +719,26 @@ static const char *SelboxHelp[] = {
     NULL
 };
 
+static const char *SelgridcellHelp[] = {
+    "NAME",
+    "    selgridcell, delgridcell - Select grid cells",
+    "",
+    "SYNOPSIS",
+    "    <operator>,indexes  infile outfile",
+    "",
+    "DESCRIPTION",
+    "    Selects grid cells of all fields from infile. The user has to give the indexes of each",
+    "    grid cell. The resulting grid in outfile is unstructured.",
+    "",
+    "OPERATORS",
+    "    selgridcell  Select grid cells",
+    "    delgridcell  Delete grid cells",
+    "",
+    "PARAMETER",
+    "    indexes  INTEGER  Comma separated list of indexes",
+    NULL
+};
+
 static const char *SamplegridHelp[] = {
     "NAME",
     "    samplegrid - Resample grid",

@@ -5,7 +5,7 @@
 
 2017-03-09  Uwe Schulzweida
 
-	* New operator delindex - Delete grid cells by indices
+	* New operator delgridcell - Delete grid cells by indexes
 
 2017-03-06  Uwe Schulzweida
 

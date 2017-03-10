@@ -148,7 +148,7 @@ void *Seascount(void *argument);
 void *Seaspctl(void *argument);
 void *Seasstat(void *argument);
 void *Selbox(void *argument);
-void *Selindex(void *argument);
+void *Selgridcell(void *argument);
 void *Select(void *argument);
 void *Selvar(void *argument);
 void *Seloperator(void *argument);
@@ -409,7 +409,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  SeaspctlOperators      {"seaspctl"}
 #define  SeasstatOperators      {"seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
-#define  SelindexOperators      {"selindex", "delindex"}
+#define  SelgridcellOperators   {"selgridcell", "delgridcell"}
 #define  SelectOperators        {"select", "delete"}
 #define  SelvarOperators        {"selparam", "selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delparam", "delcode", "delname", "selltype"}
@@ -701,7 +701,7 @@ static modules_t Modules[] =
   { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,      1,   CDI_REAL,  3,  1 },
   { Seasstat,       SeasstatHelp,      SeasstatOperators,      1,   CDI_REAL,  1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,        1,   CDI_BOTH,  1,  1 },
-  { Selindex,       NULL,              SelindexOperators,      1,   CDI_BOTH,  1,  1 },
+  { Selgridcell,    SelgridcellHelp,   SelgridcellOperators,   1,   CDI_BOTH,  1,  1 },
   { Select,         SelectHelp,        SelectOperators,        1,   CDI_BOTH, -1,  1 },
   { Selvar,         SelvarHelp,        SelvarOperators,        1,   CDI_BOTH,  1,  1 },
   { Selrec,         SelvarHelp,        SelrecOperators,        1,   CDI_BOTH,  1,  1 },
@@ -860,8 +860,6 @@ static const char *opalias[][2] =
   {"covar0r",             "fldcovar"},
   {"gather",              "collgrid"},
   {"geopotheight",        "gheight"},
-  {"ggstat",              "info"},
-  {"ggstats",             "sinfo"},
   {"globavg",             "fldavg"},
   {"import_grads",        "import_binary"},
   {"infos",               "sinfo"},
@@ -903,6 +901,8 @@ static const char *opalias[][2] =
   {"outputbounds",        "gmtcells"},
   {"selseas",             "selseason"},
   {"selmon",              "selmonth"},
+  {"selindex",            "selgridcell"},
+  {"delindex",            "delgridcell"},
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));

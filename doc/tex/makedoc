@@ -1208,11 +1208,11 @@ sub print_description {
 #	  $line =~ s/CDO_PCTL_NBINS/CDO\\_PCTL\\_NBINS/og;
 	  $line =~ s/_/\\_/og;
 	  $line =~ s/\@newline/ \\\\/og;
-	  $line =~ s/ infile / \\texttt{infile} /og;
-	  $line =~ s/ infile1 / \\texttt{infile1} /og;
-	  $line =~ s/ infile2 / \\texttt{infile2} /og;
-	  $line =~ s/ outfile / \\texttt{outfile} /og;
-	  $line =~ s/ infiles / \\texttt{infiles} /og;
+	  $line =~ s/infiles/\\texttt{infiles}/og;
+	  $line =~ s/infile1/\\texttt{infile1}/og;
+	  $line =~ s/infile2/\\texttt{infile2}/og;
+	  $line =~ s/infile/\\texttt{infile}/og;
+	  $line =~ s/outfile/\\texttt{outfile}/og;
 	  $line =~ s/\@math\{([^}]*)\}/\\begin{math}\1\\end{math}/og;
 	  $line =~ s/\@file\{([^}]*)\}/\\texttt{\1}/og;
 	  $line =~ s/\@var\{([^}]*)\}/\\textit{\1}/og;
