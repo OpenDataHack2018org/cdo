@@ -357,9 +357,9 @@ void sellist_print(sellist_t *sellist)
           printf("%3d  %-16s %4d  %4d ", idx+1, e->key, e->type, e->nvalues);
           int nvalues = e->nvalues;
           if ( nvalues > 12 ) nvalues = 11;
-          for ( int i = 0; i < nvalues; ++i ) sellist_print_val(e->type, e->cvalues, i);
+          for ( int i = 0; i < nvalues; ++i ) sellist_print_val(e->type, (cvalues_t *)e->cvalues, i);
           if ( nvalues < e->nvalues ) printf(" ...");
-          sellist_print_val(e->type, e->cvalues, e->nvalues-1);
+          sellist_print_val(e->type, (cvalues_t *)e->cvalues, e->nvalues-1);
           printf("\n");
         }
     }
