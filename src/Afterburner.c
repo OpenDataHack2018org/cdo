@@ -1,3 +1,15 @@
+/* ============================================================= */
+/*                                                               */
+/* postprocessing program for ECHAM data and ECMWF analysis data */
+/*                                                               */
+/* Luis     Kornblueh   - MPI    Hamburg                         */
+/* Uwe      Schulzweida - MPI    Hamburg                         */
+/* Arno     Hellbach    - DKRZ   Hamburg                         */
+/* Edilbert Kirk        - MI Uni Hamburg                         */
+/* Michael  Ponater     - DLR    Oberpfaffenhofen                */
+/*                                                               */
+/* ============================================================= */
+
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
