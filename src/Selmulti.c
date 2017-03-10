@@ -153,295 +153,292 @@ int multiSelectionParser(const char *filenameOrString);
 
 void *Selmulti(void *argument)
 {
-    int varID, levelID;
-    double level;
-    int nlevs, code, zaxisID;
-    int ltype = 0;
-    int varID2, levelID2;
-    int sellevel, selcode, selltype;
-    bool lcopy = false;
-    int nmiss;
-    int simpleMath=0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
-    float scale = 1.0;
-    float offset = 0.0; // If SCALE and/or OFFSET are defined, then the data values are scaled as SCALE*(VALUE-OFFSET).
-                        // The default value for SCALE is 1.0; the default for OFFSET is 0.0.
-    double  missval;
+  int varID, levelID;
+  int nlevs, code, zaxisID;
+  int ltype = 0;
+  int varID2, levelID2;
+  int sellevel, selcode, selltype;
+  bool lcopy = false;
+  int nmiss;
+  int simpleMath=0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
+  float scale = 1.0;
+  float offset = 0.0; // If SCALE and/or OFFSET are defined, then the data values are scaled as SCALE*(VALUE-OFFSET).
+                      // The default value for SCALE is 1.0; the default for OFFSET is 0.0.
+  double  missval;
 
-    cdoInitialize(argument);
+  cdoInitialize(argument);
 
-    int SELMULTI       = cdoOperatorAdd("selmulti",       0, 0, "filename/string with selection specification ");
-    int DELMULTI       = cdoOperatorAdd("delmulti",       0, 0, "filename/string with selection specification ");
-    int CHANGEMULTI    = cdoOperatorAdd("changemulti",    0, 0, "filename/string with selection specification ");
+  int SELMULTI       = cdoOperatorAdd("selmulti",       0, 0, "filename/string with selection specification ");
+  int DELMULTI       = cdoOperatorAdd("delmulti",       0, 0, "filename/string with selection specification ");
+  int CHANGEMULTI    = cdoOperatorAdd("changemulti",    0, 0, "filename/string with selection specification ");
 
-    int operatorID = cdoOperatorID();
+  int operatorID = cdoOperatorID();
 
-    operatorInputArg(cdoOperatorEnter(operatorID));
+  operatorInputArg(cdoOperatorEnter(operatorID));
 
-    char *filenameOrString;
+  char *filenameOrString;
 
-    //operatorCheckArgc(1);
-    filenameOrString = operatorArgv()[0];
-    if ( cdoDebugExt )
+  //operatorCheckArgc(1);
+  filenameOrString = operatorArgv()[0];
+  if ( cdoDebugExt )
     {
-        printf("Given operator arguments (nr=%d): \n", operatorArgc());
-        for (int i=0; i < operatorArgc(); i++)
-            printf("%s",operatorArgv()[i]);
-        printf("\n");
+      printf("Given operator arguments (nr=%d): \n", operatorArgc());
+      for (int i=0; i < operatorArgc(); i++)
+        printf("%s",operatorArgv()[i]);
+      printf("\n");
     }
-    if (!multiSelectionParser(filenameOrString))
+  if (!multiSelectionParser(filenameOrString))
     cdoWarning("Error processing file with selection description!\n%s",filenameOrString);
 
-    if (operatorID == SELMULTI)
-        if (getNumberOfSelectionTuples()==0)
-            cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'SELECT,  .. or sel(/;;) or (/;;)'\nCheck the file: %s",filenameOrString);
+  if (operatorID == SELMULTI)
+    if (getNumberOfSelectionTuples()==0)
+      cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'SELECT,  .. or sel(/;;) or (/;;)'\nCheck the file: %s",filenameOrString);
 
-    if (operatorID == DELMULTI)
-        if (getNumberOfDeleteSelectionTuples()==0)
-            cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'DELETE,  .. or del(/;;) or (/;;)'\nCheck the file: %s",filenameOrString);
+  if (operatorID == DELMULTI)
+    if (getNumberOfDeleteSelectionTuples()==0)
+      cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'DELETE,  .. or del(/;;) or (/;;)'\nCheck the file: %s",filenameOrString);
 
-    if (operatorID == CHANGEMULTI)
-        if (getNumberOfSelectionTuples()==0)
-            cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'CHANGE,  .. or (/;;|;;;)'\nCheck the file: %s",filenameOrString);
+  if (operatorID == CHANGEMULTI)
+    if (getNumberOfSelectionTuples()==0)
+      cdoAbort("Error! You must provide at lease ONE selection tuple!\nNotations: 'CHANGE,  .. or (/;;|;;;)'\nCheck the file: %s",filenameOrString);
 
-    int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = streamOpenRead(cdoStreamName(0));
 
-    int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = streamInqVlist(streamID1);
 
-    vlistClearFlag(vlistID1);
-    int nvars = vlistNvars(vlistID1);
+  vlistClearFlag(vlistID1);
+  int nvars = vlistNvars(vlistID1);
 
-    if ( cdoDebugExt ) cdoPrint(" Total number of variables: %d", nvars);
+  if ( cdoDebugExt ) cdoPrint(" Total number of variables: %d", nvars);
 
-    for ( varID = 0; varID < nvars; varID++ )
+  for ( varID = 0; varID < nvars; varID++ )
     {
-        code    = vlistInqVarCode(vlistID1, varID);
-        zaxisID = vlistInqVarZaxis(vlistID1, varID);
-        ltype = zaxis2ltype(zaxisID);
-        nlevs   = zaxisInqSize(zaxisID);
+      code    = vlistInqVarCode(vlistID1, varID);
+      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      ltype = zaxis2ltype(zaxisID);
+      nlevs   = zaxisInqSize(zaxisID);
 
-        for ( levelID = 0; levelID < nlevs; levelID++ )
+      for ( levelID = 0; levelID < nlevs; levelID++ )
         {
-            level = zaxisInqLevel(zaxisID, levelID);
+          double level = zaxisInqLevel(zaxisID, levelID);
 
-            if (operatorID == DELMULTI) vlistDefFlag(vlistID1, varID, levelID, TRUE); // set initially, override bellow if in selection
-            if (operatorID == CHANGEMULTI)
-                {
-                    vlistDefFlag(vlistID1, varID, levelID, TRUE); // change operation copies all fields
-                    continue;
-                }
-
-            int ii;
-            for (ii=0; ii<NUMTUPLES; ii++)
+          if (operatorID == DELMULTI) vlistDefFlag(vlistID1, varID, levelID, TRUE); // set initially, override bellow if in selection
+          if (operatorID == CHANGEMULTI)
             {
-                TUPLEREC *tuplerec = getSelTuple(ii);
-                //if ( cdoDebugExt ) cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d", code, ltype, (int)level, nvars, varID);
-                // Note: When the list is Empty then function checkListContainsInt() also returns true !
-                selcode  = checkListContainsInt(code, tuplerec->codeLST, tuplerec->ncodes);
-                selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
-                sellevel = checkListContainsInt((int)level, tuplerec->levelLST, tuplerec->nlevels);
-                if ( selcode && selltype && sellevel )
+              vlistDefFlag(vlistID1, varID, levelID, TRUE); // change operation copies all fields
+              continue;
+            }
+
+          for ( int ii=0; ii<NUMTUPLES; ii++ )
+            {
+              TUPLEREC *tuplerec = getSelTuple(ii);
+              //if ( cdoDebugExt ) cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d", code, ltype, (int)level, nvars, varID);
+              // Note: When the list is Empty then function checkListContainsInt() also returns true !
+              selcode  = checkListContainsInt(code, tuplerec->codeLST, tuplerec->ncodes);
+              selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
+              sellevel = checkListContainsInt((int)level, tuplerec->levelLST, tuplerec->nlevels);
+              if ( selcode && selltype && sellevel )
                 {
-                if (operatorID == SELMULTI)
-                {
-                    switch (tuplerec->sel_or_del_or_change)
+                  if (operatorID == SELMULTI)
                     {
+                      switch (tuplerec->sel_or_del_or_change)
+                        {
                         case 0:   // operator decides ...
-                            vlistDefFlag(vlistID1, varID, levelID, TRUE);
-                            if ( cdoDebugExt )
-                              {
-                                if (!tuplerec->simpleMath)
-                                     cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
-                                else
-                                     cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
-                              }
-                            break;
+                          vlistDefFlag(vlistID1, varID, levelID, TRUE);
+                          if ( cdoDebugExt )
+                            {
+                              if (!tuplerec->simpleMath)
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
+                              else
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                            }
+                          break;
                         case 1:
-                            vlistDefFlag(vlistID1, varID, levelID, TRUE);
-                            if ( cdoDebugExt )
-                              {
-                                if (!tuplerec->simpleMath)
-                                     cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
-                                else
-                                     cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
-                              }
-                            break;
+                          vlistDefFlag(vlistID1, varID, levelID, TRUE);
+                          if ( cdoDebugExt )
+                            {
+                              if (!tuplerec->simpleMath)
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
+                              else
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                            }
+                          break;
                         case 2:
-                            vlistDefFlag(vlistID1, varID, levelID, FALSE);
-                            if ( cdoDebugExt )
-                              {
-                                if (!tuplerec->simpleMath)
-                                     cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
-                                else
-                                    cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
-                              }
-                            break;
+                          vlistDefFlag(vlistID1, varID, levelID, FALSE);
+                          if ( cdoDebugExt )
+                            {
+                              if (!tuplerec->simpleMath)
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
+                              else
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                            }
+                          break;
+                        }
                     }
-                } else
-                if (operatorID == DELMULTI)
-                {
-                    switch (tuplerec->sel_or_del_or_change)
+                  else if (operatorID == DELMULTI)
                     {
+                      switch (tuplerec->sel_or_del_or_change)
+                        {
                         case 0:   // operator decides ...
-                            vlistDefFlag(vlistID1, varID, levelID, FALSE);
-                            if ( cdoDebugExt )
-                              {
-                                if (!tuplerec->simpleMath)
-                                     cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
-                                else
-                                    cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
-                              }
-                            break;
+                          vlistDefFlag(vlistID1, varID, levelID, FALSE);
+                          if ( cdoDebugExt )
+                            {
+                              if (!tuplerec->simpleMath)
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
+                              else
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                            }
+                          break;
                         case 1:
-                            vlistDefFlag(vlistID1, varID, levelID, TRUE);
-                            if ( cdoDebugExt )
-                              {
-                                if (!tuplerec->simpleMath)
-                                     cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
-                                else
-                                     cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
-                              }
-                            break;
+                          vlistDefFlag(vlistID1, varID, levelID, TRUE);
+                          if ( cdoDebugExt )
+                            {
+                              if (!tuplerec->simpleMath)
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
+                              else
+                                cdoPrint(" Selecting : (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                            }
+                          break;
                         case 2:
-                            vlistDefFlag(vlistID1, varID, levelID, FALSE);
-                            if ( cdoDebugExt )
-                              {
-                                if (!tuplerec->simpleMath)
-                                     cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
-                                else
-                                    cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
-                              }
-                            break;
+                          vlistDefFlag(vlistID1, varID, levelID, FALSE);
+                          if ( cdoDebugExt )
+                            {
+                              if (!tuplerec->simpleMath)
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]", code, ltype, (int)(level), varID, levelID);
+                              else
+                                cdoPrint(" Selecting for removal: (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f", code, ltype, (int)(level), varID, levelID, tuplerec->scale,tuplerec->offset);
+                            }
+                          break;
+                        }
                     }
-                }
-                break;
+                  break;
                 }
             } //end for ( .. NUMTUPLES
         } //end for ( levelID
     } // end for ( varID
 
-    if ( cdoDebugExt ) cdoPrint(" Writing the selected fields ...");
+  if ( cdoDebugExt ) cdoPrint(" Writing the selected fields ...");
 
-    int vlistID2 = vlistCreate();
-    vlistCopyFlag(vlistID2, vlistID1);
+  int vlistID2 = vlistCreate();
+  vlistCopyFlag(vlistID2, vlistID1);
 
-    nvars = vlistNvars(vlistID2);
-    for ( varID = 0; varID < nvars; ++varID )
+  nvars = vlistNvars(vlistID2);
+  for ( varID = 0; varID < nvars; ++varID )
     if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
-    if ( varID == nvars ) vlistDefNtsteps(vlistID2, 0);
+  if ( varID == nvars ) vlistDefNtsteps(vlistID2, 0);
 
-    int taxisID1 = vlistInqTaxis(vlistID1);
-    int taxisID2 = taxisDuplicate(taxisID1);
-    vlistDefTaxis(vlistID2, taxisID2);
+  int taxisID1 = vlistInqTaxis(vlistID1);
+  int taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
 
-    int nrecs = vlistNrecs(vlistID2);
+  int nrecs = vlistNrecs(vlistID2);
 
-    int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-    streamDefVlist(streamID2, vlistID2);
+  streamDefVlist(streamID2, vlistID2);
 
-    int gridsize = vlistGridsizeMax(vlistID1);
-    if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-    double *array = (double *) malloc(gridsize*sizeof(double));
+  int gridsize = vlistGridsizeMax(vlistID1);
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
+  double *array = (double *) malloc(gridsize*sizeof(double));
 
-    int tsID = 0;
-    while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  int tsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-        taxisCopyTimestep(taxisID2, taxisID1);
-        streamDefTimestep(streamID2, tsID);
+      taxisCopyTimestep(taxisID2, taxisID1);
+      streamDefTimestep(streamID2, tsID);
 
-        for ( int recID = 0; recID < nrecs; recID++ )
+      for ( int recID = 0; recID < nrecs; recID++ )
         {
-            streamInqRecord(streamID1, &varID, &levelID);
-            missval = vlistInqVarMissval(vlistID1, varID);
+          streamInqRecord(streamID1, &varID, &levelID);
+          missval = vlistInqVarMissval(vlistID1, varID);
 
-            if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
+          if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
             {
-                simpleMath=0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
-                scale = 1.0;
-                offset = 0.0;
-                code    = vlistInqVarCode(vlistID1, varID);
-                zaxisID = vlistInqVarZaxis(vlistID1, varID);
-                level = zaxisInqLevel(zaxisID, levelID);
-                ltype = zaxis2ltype(zaxisID);
-                for ( int ii=0; ii<NUMTUPLES; ii++ )
+              simpleMath=0;  // 1:  simple array arithmetics ( *,+), 0: do nothing
+              scale = 1.0;
+              offset = 0.0;
+              code    = vlistInqVarCode(vlistID1, varID);
+              zaxisID = vlistInqVarZaxis(vlistID1, varID);
+              double level = zaxisInqLevel(zaxisID, levelID);
+              ltype = zaxis2ltype(zaxisID);
+              for ( int ii=0; ii<NUMTUPLES; ii++ )
                 {
-                    TUPLEREC *tuplerec = getSelTuple(ii);
-                    // Note: When the list is Empty then function checkListContainsInt() also returns true !
-                    selcode  = checkListContainsInt(code, tuplerec->codeLST, tuplerec->ncodes);
-                    selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
-                    sellevel = checkListContainsInt((int)level, tuplerec->levelLST, tuplerec->nlevels);
-                    lcopy = true;
-                    if ( selcode && selltype && sellevel )
+                  TUPLEREC *tuplerec = getSelTuple(ii);
+                  // Note: When the list is Empty then function checkListContainsInt() also returns true !
+                  selcode  = checkListContainsInt(code, tuplerec->codeLST, tuplerec->ncodes);
+                  selltype = checkListContainsInt(ltype, tuplerec->levelTypeLST, tuplerec->nlevelTypes);
+                  sellevel = checkListContainsInt((int)level, tuplerec->levelLST, tuplerec->nlevels);
+                  lcopy = true;
+                  if ( selcode && selltype && sellevel )
                     {
-                        if ( operatorID == CHANGEMULTI )
+                      if ( operatorID == CHANGEMULTI )
                         {
-                            if ( cdoDebugExt )
-                              cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d => (selcode %d, selltype %d, sellevel %d) => change (%d,%d,%d)",
-                                       code, ltype, (int)level, nvars, varID, selcode, selltype, sellevel, tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
-                            if ( (tuplerec->changedCode==-1) && (tuplerec->changedLevelType==-1) && (tuplerec->changedLevel==-1) )
-                              cdoPrint(" WARNING: Cannot CHANGE identification!");
-                            else
-                              streamGrbChangeParameterIdentification(tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
-                              // Calling PROXY function streamGrbChangeParameterIdentification()
-                              // which results in later calling func. gribapiChangeParameterIdentification(); see stream_gribapi.c
-                              // The change happens during the last step of writing a grib-record into a file.
+                          if ( cdoDebugExt )
+                            cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d => (selcode %d, selltype %d, sellevel %d) => change (%d,%d,%d)",
+                                     code, ltype, (int)level, nvars, varID, selcode, selltype, sellevel, tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
+                          if ( (tuplerec->changedCode==-1) && (tuplerec->changedLevelType==-1) && (tuplerec->changedLevel==-1) )
+                            cdoPrint(" WARNING: Cannot CHANGE identification!");
+                          else
+                            streamGrbChangeParameterIdentification(tuplerec->changedCode, tuplerec->changedLevelType, tuplerec->changedLevel);
+                          // Calling PROXY function streamGrbChangeParameterIdentification()
+                          // which results in later calling func. gribapiChangeParameterIdentification(); see stream_gribapi.c
+                          // The change happens during the last step of writing a grib-record into a file.
                         }
-                        else
+                      else
                         {
-                            if ( cdoDebugExt ) cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d => (selcode %d, selltype %d, sellevel %d)", code, ltype, (int)level, nvars, varID, selcode, selltype, sellevel);
+                          if ( cdoDebugExt ) cdoPrint(" Processing: (code %d, ltype %d, level %d);  nvars=%d, varID=%d => (selcode %d, selltype %d, sellevel %d)", code, ltype, (int)level, nvars, varID, selcode, selltype, sellevel);
                         }
-                        simpleMath = tuplerec->simpleMath;  // 1:  simple array arithmetics ( *,+), 0: do nothing
-                        if (simpleMath)
+                      simpleMath = tuplerec->simpleMath;  // 1:  simple array arithmetics ( *,+), 0: do nothing
+                      if (simpleMath)
                         {
-                            scale = tuplerec->scale;
-                            offset = tuplerec->offset;
-                            lcopy = false;
+                          scale = tuplerec->scale;
+                          offset = tuplerec->offset;
+                          lcopy = false;
                         }
-                        break; // get out of this for loop
+                      break; // get out of this for loop
                     }
                 } // end of for (ii=0; ii<NUMTUPLES ..
 
-                varID2   = vlistFindVar(vlistID2, varID);
-                levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+              varID2   = vlistFindVar(vlistID2, varID);
+              levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
-                // tijdelijk PATCH M.K.
-                if ((varID2==-1) || (levelID2==-1)) {
-                    cdoPrint(" Warning: Missing varID or levelID with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)] .. #2[varID(%d),levelID(%d)]",code, ltype, (int)(level), varID,levelID, varID2, levelID2);
-                    continue;
-                }
-                streamDefRecord(streamID2, varID2, levelID2);
+              // tijdelijk PATCH M.K.
+              if ((varID2==-1) || (levelID2==-1)) {
+                cdoPrint(" Warning: Missing varID or levelID with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)] .. #2[varID(%d),levelID(%d)]",code, ltype, (int)(level), varID,levelID, varID2, levelID2);
+                continue;
+              }
+              streamDefRecord(streamID2, varID2, levelID2);
 
-                if ( lcopy )
+              if ( lcopy )
                 {
-                    if ( cdoDebugExt ) cdoPrint(" Copying record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",recID, code, ltype, (int)(level), varID,levelID);
-                    streamCopyRecord(streamID2, streamID1);
+                  if ( cdoDebugExt ) cdoPrint(" Copying record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",recID, code, ltype, (int)(level), varID,levelID);
+                  streamCopyRecord(streamID2, streamID1);
                 }
-                else
+              else
                 {
-                    streamReadRecord(streamID1, array, &nmiss);
+                  streamReadRecord(streamID1, array, &nmiss);
 
-                    if (!simpleMath)
+                  if (!simpleMath)
                     {
-                        if ( cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",recID, code, ltype, (int)(level), varID,levelID);
-                        streamWriteRecord(streamID2, array, nmiss);
+                      if ( cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]",recID, code, ltype, (int)(level), varID,levelID);
+                      streamWriteRecord(streamID2, array, nmiss);
                     }
-                    else  // 1:  simple array arithmetics ( *,+)
+                  else  // 1:  simple array arithmetics ( *,+)
                     {
-                        if ( cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",recID, code, ltype, (int)(level), varID,levelID,scale,offset);
-                        int li;
-                        for ( li = 0; li < gridsize; ++li )
-                            if (! DBL_IS_EQUAL(array[li], missval) )
-                            {
-                                array[li] = scale*(array[li] - offset);
-                               // If SCALE and/or OFFSET are defined, then the data values are scaled as SCALE*(VALUE-OFFSET).
-                            }
-                        streamWriteRecord(streamID2, array, nmiss);
+                      if ( cdoDebugExt ) cdoPrint(" Writing record [%4d] with (code %3i, ltype %3i, level %3i)   [varID(%d),levelID(%d)]; SCALE=%f; OFFSET=%f",recID, code, ltype, (int)(level), varID,levelID,scale,offset);
+                      for ( int li = 0; li < gridsize; ++li )
+                        if (! DBL_IS_EQUAL(array[li], missval) )
+                          {
+                            array[li] = scale*(array[li] - offset);
+                            // If SCALE and/or OFFSET are defined, then the data values are scaled as SCALE*(VALUE-OFFSET).
+                          }
+                      streamWriteRecord(streamID2, array, nmiss);
                     }
                 } // end of else ( lcopy )
             } // end if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
         } // end for ( recID ..
 
-        /*if ( vlistInqFlag(vlistID1, varID, levelID) == FALSE )
+      /*if ( vlistInqFlag(vlistID1, varID, levelID) == FALSE )
         if (operatorID == DELMULTI)
         {
         code    = vlistInqVarCode(vlistID1, varID);
@@ -452,22 +449,22 @@ void *Selmulti(void *argument)
         }
         else*/
 
-        tsID++;
+      tsID++;
     } // end while ( (nrecs
 
-    streamClose(streamID1);
-    streamClose(streamID2);
+  streamClose(streamID1);
+  streamClose(streamID2);
 
-    vlistDestroy(vlistID2);
+  vlistDestroy(vlistID2);
 
-    if ( ! lcopy )
+  if ( ! lcopy )
     if ( array ) free(array);
 
-    cdoFinish();
+  cdoFinish();
 
-    cdoDebugExt = 0;
+  cdoDebugExt = 0;
 
-    return 0;
+  return 0;
 }
 
 
@@ -682,31 +679,34 @@ char *findTupleEnd(char *str)
 
 char *readlineForParsing(FILE *gfp, char *strToParsePtr, char *line)
 {
-  if (gfp!=NULL) // file is open => we parse text from a file
-    return (readline(gfp, line, MAX_LINE_LEN));
+  if ( gfp != NULL ) // file is open => we parse text from a file
+    {
+      int status = readline(gfp, line, MAX_LINE_LEN);
+      return (status == 0) ? NULL : line;
+    }
   else
-      if (strToParsePtr!=NULL)  // we parse a given string
+    if (strToParsePtr!=NULL)  // we parse a given string
       {
-          if ( cdoDebugExt>=30 ) cdoPrint("readlineForParsing(): Parsing selection string:  %s", strToParsePtr);
-          char *tpEnd = NULL;
-          if (strlen(strToParsePtr)>0)
-              tpEnd = findTupleEnd(strToParsePtr);
-          if (tpEnd==NULL)
+        if ( cdoDebugExt>=30 ) cdoPrint("%s(): Parsing selection string:  %s", __func__, strToParsePtr);
+        char *tpEnd = NULL;
+        if (strlen(strToParsePtr)>0)
+          tpEnd = findTupleEnd(strToParsePtr);
+        if (tpEnd==NULL)
           {
-              if ( cdoDebugExt>=100 ) cdoPrint("readlineForParsing(): End of selection string reached.");
-              return NULL;
+            if ( cdoDebugExt>=100 ) cdoPrint("%s(): End of selection string reached.", __func__);
+            return NULL;
           }
-          else
+        else
           {
             tpEnd[0] = 0;
             if (strlen(strToParsePtr)<=MAX_LINE_LEN)
-                strcpy(line,strToParsePtr);
-            if ( cdoDebugExt>=100) cdoPrint("readlineForParsing(): Current selection line=%s", line);
+              strcpy(line,strToParsePtr);
+            if ( cdoDebugExt>=100) cdoPrint("%s(): Current selection line=%s", __func__, line);
             strToParsePtr = tpEnd +1;
             return strToParsePtr;
           }
       }
-      else
+    else
       {
         cdoAbort(" Cannot parse selection string:  %s", strToParsePtr);
         return NULL;
