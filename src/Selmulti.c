@@ -22,7 +22,13 @@
 
 // NOTE: All operators in this module works only on GRIB edition 1 files!
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void streamGrbChangeParameterIdentification(int code, int ltype, int lev);
+#if defined (__cplusplus)
+}
+#endif
 
 /*
 Supported notations:
