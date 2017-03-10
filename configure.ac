@@ -25,6 +25,9 @@ AM_PROG_AR
 AC_MSG_NOTICE([setting up libtool])
 LT_INIT
 
+# bash
+AC_PATH_TOOL([BASH],[bash],[:])
+
 # Check building environment
 AC_CHECK_TOOL([CC],[gcc],[:])
 AC_CHECK_TOOL([CXX],[g++],[:])

@@ -1,4 +1,4 @@
-#! @SHELL@
+#! @BASH@
 
 # Checks whether cdo handles the inputargument right,
 # most of the operators accept only one input argument.
