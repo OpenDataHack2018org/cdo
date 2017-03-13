@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
 
+2017-03-13  Uwe Schulzweida
+
+	* selindexbox: added support for LCC grid
+
 2017-03-09  Uwe Schulzweida
 
 	* New operator delgridcell - Delete grid cells by indexes

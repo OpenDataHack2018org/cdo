@@ -45,7 +45,6 @@ void cropData(double *array1, int gridID1, double *array2, int gridID2, int subI
   long array2Idx = 0;
   for ( long ilat1 = subJ0; ilat1 <= subJ1; ilat1++ ) // copy the last row as well..
     {
-      //if ( cdoDebugExt>20 ) cdoPrint("cropData(): ilat1=%d; subJ0=%d; subJ1=%d; rowLen=%d ", ilat1, subJ0, subJ1, rowLen );
       memcpy((void*)&array2[array2Idx], (void*)&array1[ilat1*nlon1 + subI0], rowLen*sizeof(double));
       array2Idx += rowLen;
     }
@@ -68,8 +67,8 @@ void *Samplegrid(void *argument)
 
   cdoInitialize(argument);
 
-  int SAMPLEGRID  = cdoOperatorAdd("samplegrid",  0, 0, "resample factor, typically 2 (which will half the resolution)");
-  int SUBGRID  = cdoOperatorAdd("subgrid",  0, 0, " sub-grid indices: i0,i1,j0,j1");
+  int SAMPLEGRID = cdoOperatorAdd("samplegrid",  0, 0, "resample factor, typically 2 (which will half the resolution)");
+  int SUBGRID    = cdoOperatorAdd("subgrid",  0, 0, " sub-grid indices: i0,i1,j0,j1");
 
   int operatorID = cdoOperatorID();
 
@@ -202,7 +201,7 @@ void *Samplegrid(void *argument)
                 }
               else if (operatorID == SUBGRID)
                 {
-                  cropData(array1, gridSrcID, array2, gridIDsampled, subI0,subI1, subJ0, subJ1);
+                  cropData(array1, gridSrcID, array2, gridIDsampled, subI0, subI1, subJ0, subJ1);
                 }
 
               if ( nmiss )

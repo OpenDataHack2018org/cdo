@@ -762,7 +762,11 @@ int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int 
 {
   genindexbox(0, gridID1, lat1, lat2, lon11, lon12, lon21, lon22);
 
-  int gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
+  int gridID2 = -1;
+  if ( gridInqType(gridID1) == GRID_LCC )
+    gridID2 = cdo_define_subgrid_grid(gridID1, *lon11, *lon12, *lat1, *lat2);
+  else
+    gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 
   return gridID2;
 }
@@ -865,7 +869,7 @@ void *Selbox(void *argument)
       gridID1  = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
 
-      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
+      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR || gridtype == GRID_LCC ||
            (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
 	   (operatorID == SELINDEXBOX && gridtype == GRID_GENERIC && 
 	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) ||
