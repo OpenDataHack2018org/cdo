@@ -744,15 +744,15 @@ static const char *SamplegridHelp[] = {
     "    samplegrid - Resample grid",
     "",
     "SYNOPSIS",
-    "    samplegrid,resamplefactor  infile outfile",
+    "    samplegrid,factor  infile outfile",
     "",
     "DESCRIPTION",
     "    This is a special operator for resampling the horizontal grid.",
-    "    No interpolation takes place. Factor=2 mean every second grid point is removed.",
+    "    No interpolation takes place. Resample factor=2 means every second grid point is removed.",
     "    Only rectilinear and curvilinear source grids are supported by this operator.",
     "",
     "PARAMETER",
-    "    resamplefactor  FLOAT   typically 2, which will half the resolution",
+    "    factor  INTEGER Resample factor, typically 2, which will half the resolution",
     NULL
 };
 

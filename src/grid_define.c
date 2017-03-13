@@ -188,19 +188,19 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
 
   int gridID_sampled = gridCreate(gridtype, xsize*ysize);
 
+  gridDefXsize(gridID_sampled, xsize);
+  gridDefYsize(gridID_sampled, ysize);
+
+  gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
+  gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
+  if ( gridInqUvRelativeToGrid(gridSrcID) ) gridDefUvRelativeToGrid(gridID_sampled, 1);
   // TODO
   /*
     grid_sampled->scanningMode          = grid_src->scanningMode;
     grid_sampled->iScansNegatively      = grid_src->iScansNegatively;
     grid_sampled->jScansPositively      = grid_src->jScansPositively;
     grid_sampled->jPointsAreConsecutive = grid_src->jPointsAreConsecutive;
-    grid_sampled->uvRelativeToGrid      = grid_src->uvRelativeToGrid;
   */
-  gridDefXsize(gridID_sampled, xsize);
-  gridDefYsize(gridID_sampled, ysize);
-
-  gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
-  gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
   
@@ -367,20 +367,19 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
 
   int gridID_sampled = gridCreate(gridtype, xsize*ysize);
   
+  gridDefXsize(gridID_sampled, xsize);
+  gridDefYsize(gridID_sampled, ysize);
+
+  gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
+  gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
+  if ( gridInqUvRelativeToGrid(gridSrcID) ) gridDefUvRelativeToGrid(gridID_sampled, 1);
   // TODO
   /*
     grid_sampled->scanningMode          = grid_src->scanningMode;
     grid_sampled->iScansNegatively      = grid_src->iScansNegatively;
     grid_sampled->jScansPositively      = grid_src->jScansPositively;
     grid_sampled->jPointsAreConsecutive = grid_src->jPointsAreConsecutive;
-    grid_sampled->uvRelativeToGrid      = grid_src->uvRelativeToGrid;
   */
-
-  gridDefXsize(gridID_sampled, xsize);
-  gridDefYsize(gridID_sampled, ysize);
-
-  gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
-  gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
   
