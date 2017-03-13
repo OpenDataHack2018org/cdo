@@ -712,10 +712,10 @@ static const char *SelboxHelp[] = {
     "    lon2  FLOAT    Eastern longitude",
     "    lat1  FLOAT    Southern or northern latitude",
     "    lat2  FLOAT    Northern or southern latitude",
-    "    idx1  INTEGER  Index of first longitude",
-    "    idx2  INTEGER  Index of last longitude",
-    "    idy1  INTEGER  Index of first latitude",
-    "    idy2  INTEGER  Index of last latitude",
+    "    idx1  INTEGER  Index of first longitude (1 - nlon)",
+    "    idx2  INTEGER  Index of last longitude (1 - nlon)",
+    "    idy1  INTEGER  Index of first latitude (1 - nlat)",
+    "    idy2  INTEGER  Index of last latitude (1 - nlat)",
     NULL
 };
 
@@ -752,7 +752,7 @@ static const char *SamplegridHelp[] = {
     "    Only rectilinear and curvilinear source grids are supported by this operator.",
     "",
     "PARAMETER",
-    "    factor  INTEGER Resample factor, typically 2, which will half the resolution",
+    "    factor  INTEGER  Resample factor, typically 2, which will half the resolution",
     NULL
 };
 
