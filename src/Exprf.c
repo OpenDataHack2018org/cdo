@@ -214,7 +214,7 @@ int params_add_ts(parse_param_t *parse_arg)
       params[varID].name     = strdup("_ts");
       params[varID].gridID   = parse_arg->pointID;
       params[varID].zaxisID  = parse_arg->surfaceID;
-      params[varID].steptype = TIME_VARIABLE;
+      params[varID].steptype = TSTEP_INSTANT;
       params[varID].ngp      = 1;
       params[varID].nlev     = 1;
       

@@ -1807,7 +1807,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	if ( globs->Mean != 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID, globs->taxisID2);
-	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, TIME_VARIABLE);
+	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, TSTEP_INSTANT);
 	    vlistDefVarCode(globs->ovlistID, ovarID, code);
 	    vars[code].ovarID = ovarID;
 	    vlistDefVarInstitut(globs->ovlistID, ovarID, instID);
@@ -1824,7 +1824,7 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	if ( globs->Mean >= 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID2, globs->taxisID2);
-	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, TIME_VARIABLE);
+	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, TSTEP_INSTANT);
 	    vlistDefVarCode(globs->ovlistID2, ovarID2, code);
 	    vars[code].ovarID2 = ovarID2;
 	    vlistDefVarInstitut(globs->ovlistID2, ovarID2, instID);
