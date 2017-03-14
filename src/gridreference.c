@@ -40,6 +40,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
 #endif
 
 /* code from grid_tools.2 */
+static
 int download_gridfile(const char *restrict uri, const char *restrict basename)
 {
   int rval = 1;
@@ -131,13 +132,12 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
 /*
  * Search for filename.
  */
+static
 int search_file(const char *restrict directory, const char *restrict filename)
 {
 #if defined(HAVE_SYS_STAT_H)
   struct stat buf;
-  int status;
-
-  status = stat(directory, &buf);
+  int status = stat(directory, &buf);
 
   if ( status == 0 )
     {
@@ -157,7 +157,6 @@ int search_file(const char *restrict directory, const char *restrict filename)
 int referenceToGrid(int gridID1)
 {
   int gridID2 = -1;
-  int gridsize;
   char griduri[8912];
   char gridpath[8912];
 
@@ -173,9 +172,6 @@ int referenceToGrid(int gridID1)
   else
     {
       bool lgriduri = true;
-      int status;
-      int streamID;
-      int position;
 
       char *basename = strrchr(griduri, '/');
       if ( basename == NULL )
@@ -193,7 +189,7 @@ int referenceToGrid(int gridID1)
       if ( cdoVerbose ) cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
   
       /* scan local directory for file */
-      status = search_file("./", gridpath);
+      int status = search_file("./", gridpath);
       if ( status != 0 )
 	{
 	  if ( cdoGridSearchDir != NULL)
@@ -221,21 +217,19 @@ int referenceToGrid(int gridID1)
 	{
 	  if ( cdoVerbose ) cdoPrint("Horizontal grid file used: %s", gridpath);
       
-	  gridsize = gridInqSize(gridID1);
+	  int gridsize = gridInqSize(gridID1);
 
 	  // int number = gridInqNumber(gridID1);
-	  position = gridInqPosition(gridID1);
+	  int position = gridInqPosition(gridID1);
 
-	  streamID = streamOpenRead(gridpath);
+	  int streamID = streamOpenRead(gridpath);
 	  if ( streamID < 0 ) cdiOpenError(streamID, "Open failed on horizontal grid file >%s<", gridpath);
 
-	  int vlistID, gridID = -1;
-	  int ngrids;
-	  vlistID = streamInqVlist(streamID);
-	  ngrids = vlistNgrids(vlistID);
+	  int vlistID = streamInqVlist(streamID);
+	  int ngrids = vlistNgrids(vlistID);
 	  if ( position > 0 && position <= ngrids )
 	    {
-	      gridID = vlistGrid(vlistID, position-1);
+	      int gridID = vlistGrid(vlistID, position-1);
 	      if ( gridInqSize(gridID) == gridsize )
 		gridID2 = gridDuplicate(gridID);
 	      else
@@ -245,12 +239,12 @@ int referenceToGrid(int gridID1)
 	    {
 	      for ( int grididx = 0; grididx < ngrids; ++grididx )
 		{
-		  gridID = vlistGrid(vlistID, grididx);
+		  int gridID = vlistGrid(vlistID, grididx);
 		  if ( gridInqSize(gridID) == gridsize )
 		    {
 		      gridID2 = gridDuplicate(gridID);
 		      break;
-			}
+                    }
 		}
 	    }
 	  else
