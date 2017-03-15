@@ -85,6 +85,7 @@ void *Rotuv(void *argument)
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
+  char varname2[CDI_MAX_NAME];
   double *single, *usvar = NULL, *vsvar = NULL;
 
   cdoInitialize(argument);
@@ -97,7 +98,8 @@ void *Rotuv(void *argument)
   bool lvar = false;
   bool lcode = true;
   int len = (int)strlen(operatorArgv()[0]);
-  for ( int i = 0; i < len; ++i )
+  int ix = (operatorArgv()[0][0] == '-') ? 1 : 0;
+  for ( int i = ix; i < len; ++i )
     if ( !isdigit(operatorArgv()[0][i]) )
       {
         lcode = false;
@@ -244,10 +246,21 @@ void *Rotuv(void *argument)
 	  varID2 = varID;
 
 	  if ( cdoVerbose )
-	    cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
-		     vlistInqVarCode(vlistID1, varID1), chcodes[i],
-		     vlistInqVarCode(vlistID1, varID2), chcodes[i+1]);
-	  
+            {
+              if ( lvar )
+                {
+                  vlistInqVarName(vlistID2, varID1, varname);
+                  vlistInqVarName(vlistID2, varID2, varname2);
+                  cdoPrint("Using var %s [%s](u) and var %s [%s](v)",
+                           varname, chvars[i],
+                           varname2, chvars[i+1]);
+                }
+              else
+                cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
+                         vlistInqVarCode(vlistID1, varID1), chcodes[i],
+                         vlistInqVarCode(vlistID1, varID2), chcodes[i+1]);
+            }
+
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
 	  nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
