@@ -1352,7 +1352,7 @@ void *TransformUV(int operatorID)
                             cdoPrint("LAT-LON grid created.");
                         }// end of if (gridIDcurvl==-1)
                     }// end of if (operatorID != ROTUVN)
-                  
+
                   if ( gridInqUvRelativeToGrid(gridID) != 1 )
                     {
                       cdoPrint("NOTICE: grid with id:%d has NOT uv relative to grid.", gridID);

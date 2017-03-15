@@ -194,7 +194,7 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   zbeta = sign(zbeta, -(rla - (pollamd-180.0)));
   */
   double zbeta = fabs(acos(zarg));
-  /*  if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta;*/
+  /* if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta; */
   if ( (-(rla - (pollamd-180.0)) < 0) && (-(rla - (pollamd-180.0)) >= -180) ) zbeta = -zbeta;
 
   /* us - wind transformieren */
@@ -225,19 +225,18 @@ int main(void)
       x0 = i *20.0;
       printf("rot in: %g %g\n", x0, y0);
 
-      double x1 = lamrot_to_lam(y0, x0, polphi, pollam, angle);
-      double y1 = phirot_to_phi(y0, x0, polphi, angle);
-
+      x1 = lamrot_to_lam(y0, x0, polphi, pollam, angle);
+      y1 = phirot_to_phi(y0, x0, polphi, angle);
       printf("geo: %g %g\n", x1, y1);
 
-      double x2 = lam_to_lamrot(y1, x1, polphi, pollam);
-      double y2 = phi_to_phirot(y1, x1, polphi, pollam);
-
+      x2 = lam_to_lamrot(y1, x1, polphi, pollam);
+      y2 = phi_to_phirot(y1, x1, polphi, pollam);
       printf("rot out:%g %g\n", x2, y2);
     }
 
   usvs_to_uv(30.0, 20.0, 30.0, 0.0, polphi, pollam, &x1, &x2);
-  printf("usvs_to_uv %g %g %g %g\n", polphi, pollam, x1, x2);
+  printf("usvs_to_uv: %g %g %g %g\n", polphi, pollam, x1, x2);
+  printf("usvs_to_uv: 32.5 -170 26.3124 24.6507 <-- reference\n");
 
   return 0;
 }
