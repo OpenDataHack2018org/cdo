@@ -628,6 +628,8 @@ BUILD_AVX_TESTS_FALSE
 BUILD_AVX_TESTS_TRUE
 BUILD_SSE42_TESTS_FALSE
 BUILD_SSE42_TESTS_TRUE
+ENABLE_HIRLAM_EXTENSIONS_FALSE
+ENABLE_HIRLAM_EXTENSIONS_TRUE
 ENABLE_ALL_STATIC_FALSE
 ENABLE_ALL_STATIC_TRUE
 subdirs
@@ -839,6 +841,7 @@ with_magics
 with_libxml2
 enable_cdi_lib
 enable_all_static
+enable_hirlam_extensions
 enable_cxx
 '
       ac_precious_vars='build_alias
@@ -1500,6 +1503,8 @@ Optional Features:
                           [default=no]
   --enable-all-static     build a completely statically linked CDO binary
                           [default=no]
+  --enable-hirlam-extensions
+                          HIRLAM extensions [default=no]
   --enable-cxx            Use CXX as default compiler [default=no]
 
 Optional Packages:
@@ -20934,6 +20939,35 @@ else
   ENABLE_ALL_STATIC_FALSE=
 fi
 
+#  ----------------------------------------------------------------------
+#  Build CDO with HIRLAM extensions
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for HIRLAM extensions" >&5
+$as_echo_n "checking for HIRLAM extensions... " >&6; }
+# Check whether --enable-hirlam-extensions was given.
+if test "${enable_hirlam_extensions+set}" = set; then :
+  enableval=$enable_hirlam_extensions; if test "x$enable_hirlam_extensions" != "xno"; then :
+
+$as_echo "#define HIRLAM_EXTENSIONS 1" >>confdefs.h
+
+                     enable_hirlam_extensions=yes
+else
+  enable_hirlam_extensions=no
+fi
+else
+  enable_hirlam_extensions=no
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_hirlam_extensions" >&5
+$as_echo "$enable_hirlam_extensions" >&6; }
+ if test x$enable_hirlam_extensions = 'xyes'; then
+  ENABLE_HIRLAM_EXTENSIONS_TRUE=
+  ENABLE_HIRLAM_EXTENSIONS_FALSE='#'
+else
+  ENABLE_HIRLAM_EXTENSIONS_TRUE='#'
+  ENABLE_HIRLAM_EXTENSIONS_FALSE=
+fi
+
+#
 
 
 #  ----------------------------------------------------------------------
@@ -21340,6 +21374,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_ALL_STATIC_TRUE}" && test -z "${ENABLE_ALL_STATIC_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_ALL_STATIC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_HIRLAM_EXTENSIONS_TRUE}" && test -z "${ENABLE_HIRLAM_EXTENSIONS_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_HIRLAM_EXTENSIONS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUILD_SSE42_TESTS_TRUE}" && test -z "${BUILD_SSE42_TESTS_FALSE}"; then
