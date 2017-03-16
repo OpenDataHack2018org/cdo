@@ -35,10 +35,13 @@
 
 #define  MAXARG 10
 
-// Defined in stream_grb.c
-// extern int cdoGribChangeModeUvRelativeToGrid;  // -1: don't set; 0: set to '0'; 1: set to '1'
-int cdoGribChangeModeUvRelativeToGrid; // TODO
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+void streamGrbChangeModeUvRelativeToGrid(int mode);
+#if defined (__cplusplus)
+}
+#endif
 
 int UVDESTAG;
 int ROTUVNORTH;
@@ -668,11 +671,9 @@ void rot_uv_north(int gridID, double *us, double *vs)
   // TODO
   /*
     int  scanningMode =  gridInqScanningMode(gridID);
-    int  iScansNegatively, jScansPositively,  jPointsAreConsecutive;
-    gridInqScanningModeBits(gridID, &iScansNegatively, &jScansPositively,  &jPointsAreConsecutive);
   */
   int scanningMode = 64;
-  int jScansPositively = 1;
+  bool jScansPositively = (scanningMode == 64);
   if (scanningMode==64)
     {
       if ( cdoDebugExt>1 )
@@ -809,7 +810,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
             if ( (xncross*xnormSph + yncross*ynormSph + zncross*znormSph) > 0.0)  // dotProduct
               vecAngle *=-1.0;
 
-            if (jScansPositively!=1) vecAngle += radians(180.0);  // this is needed in scanning mode 00
+            if ( !jScansPositively ) vecAngle += radians(180.0);  // this is needed in scanning mode 00
 
             xpntNorthSph = sin(vecAngle);    // Rotate the point/vector (0,1) around Z-axis with vecAngle
             ypntNorthSph = cos(vecAngle);
@@ -897,7 +898,6 @@ void rot_uv_back_mode64(int gridID, double *us, double *vs)
   // TODO
   /*
     int  scanningMode =  gridInqScanningMode(gridID);
-    int  iScansNegatively, jScansPositively,  jPointsAreConsecutive;
   */
   int scanningMode = 64;
   if ( scanningMode==64 )
@@ -1123,9 +1123,8 @@ void *TransformUV(int operatorID)
   int **varnmiss   = (int **) Malloc(nvars*sizeof(int *));
   double **vardata = (double **) Malloc(nvars*sizeof(double *));
 
-  // TODO
-//extern int cdoGribChangeModeUvRelativeToGrid;  // -1: don't set; 0: set to '0'; 1: set to '1'
-  cdoGribChangeModeUvRelativeToGrid = 0; // U & V are NOT grid relative
+  // -1: don't set; 0: set to '0'; 1: set to '1'
+  streamGrbChangeModeUvRelativeToGrid(0); // U & V are NOT grid relative
 
   int VarIsU,VarIsV;
 

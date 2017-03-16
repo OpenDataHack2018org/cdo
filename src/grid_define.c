@@ -67,7 +67,6 @@ int cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *des
     grid_uv_destag->iScansNegatively      = grid_u_stag->iScansNegatively;
     grid_uv_destag->jScansPositively      = grid_u_stag->jScansPositively;
     grid_uv_destag->jPointsAreConsecutive = grid_u_stag->jPointsAreConsecutive;
-    grid_uv_destag->uvRelativeToGrid      = grid_u_stag->uvRelativeToGrid;
   */
   if ( cdoDebugExt )
     {
