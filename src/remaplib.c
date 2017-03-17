@@ -206,12 +206,8 @@ void remapgrid_alloc(int map_type, remapgrid_t *grid)
 
   if ( grid->lneed_cell_corners )
     {
-      if ( grid->num_cell_corners == 0 )
-	{
-	  cdoAbort("Grid cell corner missing!");
-	}
-      else
-	{
+      if ( grid->num_cell_corners > 0 )
+        {
 	  long nalloc = grid->num_cell_corners*grid->size;
 
 	  grid->cell_corner_lon = (double*) Malloc(nalloc*sizeof(double));
