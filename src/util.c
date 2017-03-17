@@ -390,6 +390,13 @@ void strtolower(char *str)
       str[i] = (char)tolower((int)str[i]);
 }
 
+void strtoupper(char *str)
+{
+  if ( str )
+    for ( size_t i = 0; str[i]; ++i )
+      str[i] = (char)toupper((int)str[i]);
+}
+
 
 const char *parameter2word(const char *string)
 {

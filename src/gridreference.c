@@ -55,14 +55,14 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
 #endif
 
   CURLcode ret = curl_global_init(curlflags);
-  if(ret != 0)
+  if ( ret != 0 )
     {
       fprintf(stderr, "ERROR: %s!\n", curl_easy_strerror(ret));
       return -1;
     }
 
   CURL *hd = curl_easy_init();
-  if (hd == NULL)
+  if ( hd == NULL )
     {
       fprintf(stderr, "ERROR: could not get curl handler.\n");
       return -1;
@@ -70,7 +70,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
   else
     {
       FILE *fp = fopen(basename, "w");
-      if (fp == NULL)
+      if ( fp == NULL )
 	{
 	  fprintf(stderr, "ERROR: could not open local output file %s. %s.\n", basename, strerror(errno));
 	  return -1;
@@ -109,7 +109,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
       else
 	{
 	  int status = remove(basename);
-	  if (status == -1) perror(basename);
+	  if ( status == -1 ) perror(basename);
 	  fprintf(stderr, "ERROR: %s. Download %s failed.\n\n", curl_easy_strerror(ret), basename);
 	}
       
@@ -197,7 +197,7 @@ int referenceToGrid(int gridID1)
 	      strcpy(gridpath, cdoGridSearchDir);
 	      strcat(gridpath, basename);
 	      if ( cdoVerbose ) cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
-  
+
 	      /* scan directory given by environment variable */
 	      status = search_file(cdoGridSearchDir, gridpath);
 	    }
