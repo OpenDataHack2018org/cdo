@@ -22,6 +22,31 @@ int stringToParam(const char *paramstr);
 list_t *pmlist_search_kvlist_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
 list_t *pmlist_get_kvlist_ventry(list_t *pml, int nentry, const char **entry);
 
+list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab)
+{
+  if ( pmlist && cmorname && miptab )
+    {
+      listNode_t *node = pmlist->head;
+      while ( node )
+        {
+          if ( node->data )
+            {
+              list_t *kvlist = *(list_t **)node->data;
+              keyValues_t *kvcn = kvlist_search(kvlist, "cmor_name");
+              if ( kvcn && kvcn->nvalues > 0 && *(kvcn->values[0]) == *cmorname && strcmp(kvcn->values[0], cmorname) == 0 )
+                {
+                  keyValues_t *kvmt = kvlist_search(kvlist, "mip_table");
+                  if ( ( kvmt && kvmt->nvalues > 0 && *(kvmt->values[0]) == *miptab && strcmp(kvmt->values[0], miptab) == 0 ) || !kvmt )
+                    return kvlist;
+                }
+            }
+          node = node->next;
+        }
+    }
+
+  return NULL;
+}
+
 static
 char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
 {
@@ -499,12 +524,12 @@ static int getVarIDToMap(int vlistID, int nvars, char *key, char *value)
   return CDI_UNDEFID;
 }
 
-static void maptab_via_cmd(list_t *pml, char *origValue, int vlistID, int nvars, int nventry, const char **ventry, char *key, char *cmorName)
+static void maptab_via_cmd(list_t *pml, char *origValue, int vlistID, int nvars, char *key, char *cmorName, char *miptabfreq)
 {
   int varIDToMap = getVarIDToMap(vlistID, nvars, key, origValue);
   if ( varIDToMap == CDI_UNDEFID )
     cdoAbort("Could not find variable with name '%s' in Ifile.", origValue);
-  list_t *kvl_maptab = pmlist_search_kvlist_ventry(pml, "cmor_name", cmorName, nventry, ventry);
+  list_t *kvl_maptab = maptab_search_miptab(pml, cmorName, miptabfreq);
   if ( !kvl_maptab )
     {
       cdoWarning("Could not find cmor_name '%s' in mapping table.\n No mapping table is applied.", cmorName);
@@ -514,11 +539,11 @@ static void maptab_via_cmd(list_t *pml, char *origValue, int vlistID, int nvars,
     map_it(kvl_maptab, vlistID, varIDToMap);
 }
 
-static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, int nventry, const char **ventry, int numvals)
+static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, int numvals, char *miptabfreq)
 {
   for ( int j = 0; j<numvals; j++)
     {
-      list_t *kvl_oname = pmlist_search_kvlist_ventry(pml, "cmor_name", request[j], nventry, ventry);
+      list_t *kvl_oname = maptab_search_miptab(pml, request[j], miptabfreq);
       if ( kvl_oname )
         {
           if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "name") )
@@ -693,15 +718,18 @@ static void check_compare_set(char **finalset, char *attribute, char *attname, c
 
 static int check_attr(list_t *kvl, char *project_id)
 {
-  const char *longAtt[] = {"required_time_units", "calendar", "grid_info", "mapping_table", NULL};
-  const char *shortAtt[] = {"rtu", "l", "gi", "mt", NULL};
+  const char *longAtt[] = {"required_time_units", "grid_info", "mapping_table", NULL};
+  const char *shortAtt[] = {"rtu", "gi", "mt", NULL};
 
   int i = 0;
   while ( longAtt[i] != NULL )
     {
       keyValues_t *kv_latt = kvlist_search(kvl, longAtt[i]);      
-      if ( kv_latt )
-        kv_insert_a_val(kvl, shortAtt[i], kv_latt->values[0], 0);
+      keyValues_t *kv_satt = kvlist_search(kvl, shortAtt[i]);      
+      if ( kv_latt && !kv_satt )
+        kv_insert_a_val(kvl, shortAtt[i], kv_latt->values[0], 1);
+      else if ( !kv_latt && kv_satt )
+        kv_insert_a_val(kvl, longAtt[i], kv_satt->values[0], 1);      
       i++;
     }
 
@@ -951,21 +979,18 @@ static int in_list(char **list, const char *needle, int num)
 
 static int get_netcdf_file_action(list_t *kvl)
 {
-  char *chunk = kv_get_a_val(kvl, "om", NULL);
-  if ( chunk )
+  char *chunk = kv_get_a_val(kvl, "om", "r");
+  if ( chunk[0] == 'r' )
+    return CMOR_REPLACE;
+  else if ( chunk[0] == 'a')
+    return CMOR_APPEND;
+  else if ( chunk[0] == 'p')
+    return CMOR_PRESERVE;
+  else
     {
-      if ( strcmp(chunk, "r") == 0 )
-        return CMOR_REPLACE;
-      else if ( strcmp(chunk, "a") == 0 )
-        return CMOR_APPEND;
-      else
-        {
-          cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append, 'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.\n", chunk);
-          return CMOR_REPLACE;
-        }
+      cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append ,'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.", chunk);
+      return CMOR_REPLACE;
     }
-  cdoWarning("No valid CMOR output mode! \nAttribute output_mode is '%s', but valid are 'a' for append, 'r' for replace or 'p' for preserve.\nCMOR output mode is set to: replace.\n", chunk);
-  return CMOR_REPLACE;  
 }
 
 static int get_cmor_verbosity(list_t *kvl)
@@ -1016,10 +1041,7 @@ static char *get_calendar_ptr(int calendar)
 static int get_calendar_int(char *calendar)
 {
   if ( !calendar )
-    {
-      cdoWarning("Calendar type %s is not supported by CMOR.\n");
-      return 0;
-    }
+    return 0;
   if ( strcmp(calendar, "gregorian") == 0 )
     return CALENDAR_STANDARD;
   else if ( strcmp(calendar, "proleptic_gregorian") == 0 )
@@ -1032,7 +1054,7 @@ static int get_calendar_int(char *calendar)
     return  CALENDAR_366DAYS;
   else
     {
-      cdoWarning("Calendar type %s is not supported by CMOR.\n");
+      cdoWarning("Calendar type %s is not supported by CMOR.\n", calendar);
       return 0;
     }
 }
@@ -1067,8 +1089,14 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
   int set_verbosity = get_cmor_verbosity(kvl);
   int exit_control = get_cmor_exit_control(kvl);
   int creat_subs = 1;
-  if ( kv_get_a_val(kvl, "nd", NULL) )
+  char *drs = kv_get_a_val(kvl, "d", "y");
+  if ( drs[0] == 'n' )
     creat_subs = 0;
+  else if ( drs[0] != 'y' )
+    {
+      cdoWarning("Unknown value for keyword 'drs' is found: '%s'.\nAllowed are: 'n' or 'y'. DRS is set to 'y'.", drs);
+      kv_insert_a_val(kvl, "d", "y", 1);
+    }
 
   int vlistID = streamInqVlist(streamID);
 
@@ -1086,7 +1114,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
   char *comment = get_txtatt(vlistID, CDI_GLOBAL, "comment");
 */
   
-  char *attcalendar = kv_get_a_val(kvl, "l", NULL);
+  char *attcalendar = kv_get_a_val(kvl, "calendar", NULL);
   char *calendarptr = get_calendar_ptr(taxisInqCalendar(taxisID));
   if ( cdoVerbose )
     printf("Checking attribute 'calendar' from configuration.\n");
@@ -1116,7 +1144,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
                kv_get_a_val(kvl, "contact", ""),
                kv_get_a_val(kvl, "history", ""),
 /* comment:*/
-               kv_get_a_val(kvl, "vc", ""),
+               kv_get_a_val(kvl, "comment", ""),
                kv_get_a_val(kvl, "references", ""),
                atoi(kv_get_a_val(kvl, "leap_year", "")),
                atoi(kv_get_a_val(kvl, "leap_month", "")),
@@ -1493,8 +1521,10 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
   char *szc_name = kv_get_a_val(kvl, "szc", NULL);
   if ( zsize == 1 &&  szc_name )
     {
-      char *szc_value;
+      char *szc_value = NULL;
       strtok_r(szc_name, "_", &szc_value);
+      if ( !szc_value || !szc_value[0] )
+        cdoAbort("Could not find an underscore '_' in szc value '%s' to seperate axis name from axis value", szc_name);
       levels = Malloc(sizeof(double));
       levels[0] = (double) atof(szc_value);
       if ( cdoVerbose )
@@ -1591,10 +1621,12 @@ static void move_lons(double *xcoord_vals, double *xcell_bounds, int xsize, int 
       }
   if ( testbool > 0 )
     for ( int i = 0; i < xsize; i++ )
-      xcoord_vals[i] += 180.0;
+      if ( xcoord_vals[i] < 0 )
+        xcoord_vals[i] += 360.0;
   if ( xnbounds > 1 && testbool > 0 )
     for ( int j = 0; j < xboundsize; j++ )
-      xcell_bounds[j] += 180.0;
+      if ( xcell_bounds[j] < 0 )
+        xcell_bounds[j] += 360.0;
 }
 
 static void inquire_vals_and_bounds(int gridID, int *xnbounds, int *ynbounds, double *xcoord_vals, double *ycoord_vals, double *xcell_bounds, double *ycell_bounds)
@@ -1640,13 +1672,149 @@ static void check_and_gen_bounds(int gridID, int nbounds, int length, double *co
     }
 }
 
+static double lonbnds_mids_trans_check(double value1, double value2)
+{
+  if ( abs(value1 - value2) < 180.0 )
+    return (value1 + value2) * 0.5;
+  else 
+    {
+      if ( value1 + value2 < 360.0 )
+        return (value1 + value2 + 360.0) * 0.5;
+      else
+        return (value1 + value2 + 360.0) * 0.5 - 360.0;
+    }
+}
+
+static double lonbnds_bnds_trans_check(double value1, double value2)
+{
+  if ( abs(value1 - value2) < 180 )
+    {
+      if ( 2*value1 < value2 )
+        return (2*value1 - value2 + 360.0);
+      else if ( 2*value1 > value2 + 360.0 )
+        return (2*value1 - value2 - 360.0);
+      else
+        return (2*value1 - value2);
+    }
+  else if ( value1 - value2 > 180  )
+    return (2*value1 - value2 - 360.0);
+  else
+    return (2*value1 - value2 + 360.0);
+}
+
 static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, int xlength, double *xcoord_vals, double *xcell_bounds, int ynbounds, int ylength, double *ycoord_vals, double *ycell_bounds)
 { 
+  if ( xnbounds != 4 * totalsize || ynbounds != 4 * totalsize || (xcell_bounds[1] == 0.00 && xcell_bounds[2] == 0.00) || (ycell_bounds[1] == 0.00 && ycell_bounds[2] == 0.00) )
+    {
+      double halflons[xlength+1][ylength];
+      double halflats[xlength][ylength+1];
+      double halflonsOnhalflats[xlength+1][ylength+1];
+      double halflatsOnhalflons[xlength+1][ylength+1];
+
+/**/
+/*************Half-lons with 360-0 transmission check**************/
+/**/
+      for ( int j = 0; j < ylength; j++ )
+        {
+          for ( int i = 1; i < xlength; i++ )
+            halflons[i][j] = lonbnds_mids_trans_check(xcoord_vals[i-1+j*xlength], xcoord_vals[i+j*xlength]);
+/*left and right boundary: */
+          halflons[0][j]       = lonbnds_bnds_trans_check(xcoord_vals[j*xlength], halflons[1][j]);
+          halflons[xlength][j] = lonbnds_bnds_trans_check(xcoord_vals[j*xlength-1], halflons[xlength-1][j]);
+        }
+/**/
+/*************Half-lats **************/
+/**/
+      for ( int i = 0; i < xlength; i++ )
+        {
+          for ( int j = 1; j < ylength; j++ )
+            halflats[i][j] = (ycoord_vals[i+(j-1)*xlength] + ycoord_vals[i+j*xlength]) * 0.5;
+/*upper and lower boundary: */
+          halflats[i][0]       = 2*ycoord_vals[i] - halflats[i][1];
+          halflats[i][ylength] = 2*ycoord_vals[i+(ylength-1)*xlength] - halflats[i][ylength-1];
+        }
+/**/
+/****************Half-lons-on-half-lats with 0-360 transmission check**********/
+/****************Half-lats-on-half-lons                              **********/
+/**/
+
+      for ( int i = 1; i < xlength; i++ )
+        {
+          for ( int j = 1; j < ylength; j++ )
+            {
+              halflonsOnhalflats[i][j] = lonbnds_mids_trans_check(halflons[i][j-1], halflons[i][j]);
+              halflatsOnhalflons[i][j] = ( halflats[i-1][j] + halflats[i][j] ) * 0.5;
+            }
+/*upper and lower boundary: */
+          halflonsOnhalflats[i][0]       = lonbnds_bnds_trans_check(halflons[i][0], halflonsOnhalflats[i][1]);
+          halflonsOnhalflats[i][ylength] = lonbnds_bnds_trans_check(halflons[i][ylength-1], halflonsOnhalflats[i][ylength-1]);
+          halflatsOnhalflons[i][0]       = ( halflats[i-1][0] + halflats[i][0] ) * 0.5;
+          halflatsOnhalflons[i][ylength] = ( halflats[i-1][ylength] + halflats[i][ylength] ) * 0.5;
+        }      
+
+/*left and right boundary: */
+      for ( int j = 1; j < ylength; j++ )
+        {
+          halflonsOnhalflats[0][j]       = lonbnds_mids_trans_check(halflons[0][j-1], halflons[0][j]);
+          halflonsOnhalflats[xlength][j] = lonbnds_mids_trans_check(halflons[xlength][j-1], halflons[xlength][j]);
+
+          halflatsOnhalflons[0][j]       = 2*halflats[0][j] - halflatsOnhalflons[1][j];
+          halflatsOnhalflons[xlength][j] = 2*halflats[xlength-1][j] - halflatsOnhalflons[xlength-1][j];
+        }
+      halflatsOnhalflons[0][0]             = 2*halflats[0][0] - halflatsOnhalflons[1][0];
+      halflatsOnhalflons[0][ylength]       = 2*halflats[0][ylength] - halflatsOnhalflons[1][ylength];
+      halflatsOnhalflons[xlength][0]       = 2*halflats[xlength-1][0] - halflatsOnhalflons[xlength-1][0];
+      halflatsOnhalflons[xlength][ylength] = 2*halflats[xlength-1][ylength] - halflatsOnhalflons[xlength-1][ylength];
+
+      halflonsOnhalflats[0][0]             = lonbnds_bnds_trans_check(halflons[0][0], halflonsOnhalflats[0][1]);
+      halflonsOnhalflats[0][ylength]       = lonbnds_bnds_trans_check(halflons[0][ylength-1], halflonsOnhalflats[0][ylength-1]);
+      halflonsOnhalflats[xlength][0]       = lonbnds_bnds_trans_check(halflons[xlength][0], halflonsOnhalflats[xlength][1]);
+      halflonsOnhalflats[xlength][ylength] = lonbnds_bnds_trans_check(halflons[xlength][ylength-1], halflonsOnhalflats[xlength-1][ylength]);
+
+      for ( int i = 0; i < xlength; i++ )
+        for ( int j = 0; j < ylength; j++ )
+          {
+            xcell_bounds[4*(j*xlength+i)]   = halflonsOnhalflats[i][j+1];
+            xcell_bounds[4*(j*xlength+i)+1] = halflonsOnhalflats[i][j];
+            xcell_bounds[4*(j*xlength+i)+2] = halflonsOnhalflats[i+1][j];
+            xcell_bounds[4*(j*xlength+i)+3] = halflonsOnhalflats[i+1][j+1];
+            ycell_bounds[4*(j*xlength+i)]   = halflatsOnhalflons[i][j+1];
+            ycell_bounds[4*(j*xlength+i)+1] = halflatsOnhalflons[i][j];
+            ycell_bounds[4*(j*xlength+i)+2] = halflatsOnhalflons[i+1][j];
+            ycell_bounds[4*(j*xlength+i)+3] = halflatsOnhalflons[i+1][j+1];
+          }
+      gridDefNvertex(gridID, 4);
+      gridDefXbounds(gridID, xcell_bounds);
+      gridDefYbounds(gridID, ycell_bounds);
+    }
+}
+/*
+
   if ( xnbounds != 4 * totalsize || ynbounds != 4 * totalsize || (xcell_bounds[1] == 0.00 && xcell_bounds[2] == 0.00) || (ycell_bounds[1] == 0.00 && ycell_bounds[2] == 0.00) )
     {
       for ( int j = 1; j < ylength-1; j++ )
         for ( int i = 1; i < xlength-1; i++ )
           {
+            double *star[9] =
+ { &xcoord_vals[(j-1)*xlength+(i-1)], &xcoord_vals[j*xlength+(i-1)], &xcoord_vals[(j+1)*xlength+(i-1)],
+   &xcoord_vals[(j-1)*xlength+i],     &xcoord_vals[j*xlength+i],     &xcoord_vals[(j+1)*xlength+i],
+   &xcoord_vals[(j-1)*xlength+(i+1)], &xcoord_vals[j*xlength+(i+1)], &xcoord_vals[(j+1)*xlength+i+1] };
+            double max = 0, min = 0;
+            for ( int k = 0; k < 9; k++ )
+              {
+                max = (max < *star[k]) ? *star[k] : max;
+                min = (min > *star[k]) ? *star[k] : min;
+              }
+            if ( ( max - min ) > 270 )
+              {
+                if ( *star[4] < 90 )
+                  for ( int l = 0; l < 9; l++)
+                    *star[l] = (*star[l] > 270 ) ? *star[l] - 360.0 : *star[l];
+                else if ( *star[4] > 270 )
+                  for ( int l = 0; l < 9; l++)
+                    *star[l] = (*star[l] < 90 ) ? *star[l] + 360.0 : *star[l];
+              }
+
             ycell_bounds[4*(j*xlength+i)]   = ( ( ycoord_vals[j*xlength+i] + ycoord_vals[xlength*(j+1)+i] ) * 0.5 + ( ycoord_vals[xlength*j+i-1] + ycoord_vals[xlength*(j+1)+i-1] ) * 0.5 ) * 0.5;
             ycell_bounds[4*(j*xlength+i)+1] = ( ( ycoord_vals[j*xlength+i] + ycoord_vals[xlength*(j-1)+i] ) * 0.5 + ( ycoord_vals[xlength*j+i-1] + ycoord_vals[xlength*(j-1)+i-1] ) * 0.5 ) * 0.5;
             ycell_bounds[4*(j*xlength+i)+2] = ( ( ycoord_vals[j*xlength+i] + ycoord_vals[xlength*(j-1)+i] ) * 0.5 + ( ycoord_vals[xlength*j+i+1] + ycoord_vals[xlength*(j-1)+i+1] ) *0.5 ) * 0.5;
@@ -1655,22 +1823,34 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
             xcell_bounds[4*(j*xlength+i)+1] = ( ( xcoord_vals[j*xlength+i] + xcoord_vals[xlength*j+i-1] ) * 0.5 + ( xcoord_vals[xlength*(j-1)+i] + xcoord_vals[xlength*(j-1)+i-1] ) * 0.5 ) * 0.5;
             xcell_bounds[4*(j*xlength+i)+2] = ( ( xcoord_vals[j*xlength+i] + xcoord_vals[xlength*j+i+1] ) * 0.5 + ( xcoord_vals[xlength*(j-1)+i] + xcoord_vals[xlength*(j-1)+i+1] ) *0.5 ) * 0.5;
             xcell_bounds[4*(j*xlength+i)+3] = ( ( xcoord_vals[j*xlength+i] + xcoord_vals[xlength*j+i+1] ) * 0.5 + ( xcoord_vals[xlength*(j+1)+i] + xcoord_vals[xlength*(j+1)+i+1] ) * 0.5 ) * 0.5;
+            for ( int m = 0; m < 4; m++ )
+              {
+                if ( xcell_bounds[4*(j*xlength+i)+m] > 360 ) 
+                  xcell_bounds[4*(j*xlength+i)+m] = xcell_bounds[4*(j*xlength+i)+m] - 360.0;
+                else if ( xcell_bounds[4*(j*xlength+i)+m] < 0 ) 
+                  xcell_bounds[4*(j*xlength+i)+m] = xcell_bounds[4*(j*xlength+i)+m] + 360.0;
+              }
+            for ( int l = 0; l < 9; l++)
+              {
+                *star[l] = (*star[l] > 360 ) ? *star[l] - 360.0 : *star[l];
+                *star[l] = (*star[l] < 0 )   ? *star[l] + 360.0 : *star[l];
+              }
           }
-/* */
-/* Bottom left */
-/* */
+
       ycell_bounds[0] = ( ycoord_vals[0] + ycoord_vals[1] ) * 0.5;
       ycell_bounds[1] =   ycoord_vals[0] + ( ycoord_vals[0] - ycoord_vals[1] ) * 0.5;
       ycell_bounds[2] =   ycoord_vals[0] + ( ycoord_vals[0] - ycoord_vals[1] ) * 0.5;
       ycell_bounds[3] = ( ycoord_vals[0] + ycoord_vals[1] ) * 0.5;
+      double xcyclicKorr;
+      if ( xcyclicKorr =  xcoord_vals[0] - xcoord_vals[xlength] > 270 )
+        if ( xcoord_vals[0] < 90 )
+           xcyclicKorr -= 
       xcell_bounds[0] =   xcoord_vals[0] + ( xcoord_vals[0] - xcoord_vals[xlength] ) * 0.5;
       xcell_bounds[1] =   xcoord_vals[0] + ( xcoord_vals[0] - xcoord_vals[xlength] ) * 0.5;
       xcell_bounds[2] = ( xcoord_vals[0] + xcoord_vals[xlength] ) * 0.5;
       xcell_bounds[3] = ( xcoord_vals[0] + xcoord_vals[xlength] ) * 0.5;
 
-/* */
-/* Bottom right */
-/* */
+
       ycell_bounds[4*(xlength-1)]   = ( ycoord_vals[xlength-1] +   ycoord_vals[2*xlength-1] ) * 0.5;
       ycell_bounds[4*(xlength-1)+1] =   ycoord_vals[xlength-1] + ( ycoord_vals[xlength-1] - ycoord_vals[2*xlength-1] ) * 0.5;
       ycell_bounds[4*(xlength-1)+2] =   ycoord_vals[xlength-1] + ( ycoord_vals[xlength-1] - ycoord_vals[2*xlength-1] ) * 0.5;
@@ -1680,9 +1860,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
       xcell_bounds[4*(xlength-1)+2] =   xcoord_vals[xlength-1] + ( xcoord_vals[xlength-1] - xcoord_vals[xlength-2] ) * 0.5;
       xcell_bounds[4*(xlength-1)+3] =   xcoord_vals[xlength-1] + ( xcoord_vals[xlength-1] - xcoord_vals[xlength-2] ) * 0.5;
 
-/* */
-/* Top left */
-/* */
+
       ycell_bounds[4*(totalsize-xlength)]   =   ycoord_vals[totalsize-xlength] + ( ycoord_vals[totalsize-xlength] - ycoord_vals[totalsize-2*xlength] ) * 0.5;
       ycell_bounds[4*(totalsize-xlength)+1] = ( ycoord_vals[totalsize-xlength] + ycoord_vals[totalsize-2*xlength] ) * 0.5;
       ycell_bounds[4*(totalsize-xlength)+2] = ( ycoord_vals[totalsize-xlength] + ycoord_vals[totalsize-2*xlength] ) * 0.5;
@@ -1692,9 +1870,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
       xcell_bounds[4*(totalsize-xlength)+2] = ( xcoord_vals[totalsize-xlength] + xcoord_vals[totalsize-xlength+1] ) * 0.5;
       xcell_bounds[4*(totalsize-xlength)+3] = ( xcoord_vals[totalsize-xlength] + xcoord_vals[totalsize-xlength+1] ) * 0.5;
 
-/* */
-/* Top right */
-/* */
+
       ycell_bounds[4*totalsize-4] =    ycoord_vals[totalsize-1] + ( ycoord_vals[totalsize-1] - ycoord_vals[totalsize-1-xlength] ) * 0.5;
       ycell_bounds[4*totalsize-3] = (  ycoord_vals[totalsize-1] + ycoord_vals[totalsize-1-xlength] ) * 0.5;
       ycell_bounds[4*totalsize-2] = (  ycoord_vals[totalsize-1] + ycoord_vals[totalsize-1-xlength] ) * 0.5;
@@ -1706,9 +1882,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
 
       for ( int i = 1; i < xlength-1; i++)
         {
-/* */
-/*first values: */
-/* */
+
           ycell_bounds[4*i]   = ( ( ycoord_vals[i] + ycoord_vals[i+xlength] ) * 0.5 + ( ycoord_vals[i-1] + ycoord_vals[i+xlength-1] ) * 0.5 ) * 0.5;
           ycell_bounds[4*i+1] =     ycoord_vals[i] + ( ycoord_vals[i] - ycoord_vals[i+xlength] ) * 0.5;
           ycell_bounds[4*i+2] =     ycoord_vals[i] + ( ycoord_vals[i] - ycoord_vals[i+xlength] ) * 0.5;
@@ -1717,9 +1891,8 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
           xcell_bounds[4*i+1] =   ( xcoord_vals[i] + xcoord_vals[i-1] ) * 0.5;
           xcell_bounds[4*i+2] =   ( xcoord_vals[i] + xcoord_vals[i+1] ) * 0.5;
           xcell_bounds[4*i+3] = ( ( xcoord_vals[i] + xcoord_vals[i+1] ) * 0.5 + ( xcoord_vals[i+xlength] + xcoord_vals[i+xlength+1] ) * 0.5 ) * 0.5;
-/* */
-/*last values: */
-/* */
+
+
           ycell_bounds[4*(totalsize-xlength+i)]   =     ycoord_vals[totalsize-xlength+i] + ( ycoord_vals[totalsize-xlength+i] - ycoord_vals[totalsize-2*xlength+i] ) * 0.5;
           ycell_bounds[4*(totalsize-xlength+i)+1] = ( ( ycoord_vals[totalsize-xlength+i] + ycoord_vals[totalsize-2*xlength+i] ) * 0.5 + ( ycoord_vals[totalsize-xlength+i-1] + ycoord_vals[totalsize-2*xlength+i-1] ) * 0.5 ) * 0.5;
           ycell_bounds[4*(totalsize-xlength+i)+2] = ( ( ycoord_vals[totalsize-xlength+i] + ycoord_vals[totalsize-2*xlength+i] ) * 0.5 + ( ycoord_vals[totalsize-xlength+i+1] + ycoord_vals[totalsize-2*xlength+i+1] ) * 0.5 ) * 0.5;
@@ -1733,9 +1906,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
 
      for ( int j = 1; j < ylength-1; j++)
         {
-/* */
-/*first values: */
-/* */
+
           ycell_bounds[4*j*xlength]   = (   ycoord_vals[j*xlength] + ycoord_vals[(j+1)*xlength] ) * 0.5;
           ycell_bounds[4*j*xlength+1] = (   ycoord_vals[j*xlength] + ycoord_vals[(j-1)*xlength] ) * 0.5;
           ycell_bounds[4*j*xlength+2] = ( ( ycoord_vals[j*xlength] + ycoord_vals[(j-1)*xlength] ) * 0.5 + ( ycoord_vals[j*xlength+1] + ycoord_vals[(j-1)*xlength+1] ) * 0.5 ) * 0.5;
@@ -1744,9 +1915,8 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
           xcell_bounds[4*j*xlength+1] =     xcoord_vals[j*xlength] + ( xcoord_vals[j*xlength] - xcoord_vals[j*xlength+1] ) * 0.5; 
           xcell_bounds[4*j*xlength+2] = ( ( xcoord_vals[j*xlength] + xcoord_vals[j*xlength+1] ) * 0.5 + ( xcoord_vals[(j-1)*xlength] + xcoord_vals[(j-1)*xlength+1] ) * 0.5 ) * 0.5;
           xcell_bounds[4*j*xlength+3] = ( ( xcoord_vals[j*xlength] + xcoord_vals[j*xlength+1] ) * 0.5 + ( xcoord_vals[(j+1)*xlength] + xcoord_vals[(j+1)*xlength+1] ) * 0.5 ) * 0.5;
-/* */
-/*last values: */
-/* */
+
+
           ycell_bounds[4*(j+1)*xlength-4] =  ( ( ycoord_vals[(j+1)*xlength-1] + ycoord_vals[(j+2)*xlength-1] ) * 0.5 + ( ycoord_vals[(j+1)*xlength-2] + ycoord_vals[(j+2)*xlength-2] ) * 0.5 ) * 0.5;
           ycell_bounds[4*(j+1)*xlength-3] =  ( ( ycoord_vals[(j+1)*xlength-1] + ycoord_vals[j*xlength-1] )     * 0.5 + ( ycoord_vals[(j+1)*xlength-2] + ycoord_vals[j*xlength-2] )     * 0.5 ) * 0.5;
           ycell_bounds[4*(j+1)*xlength-2] =  (   ycoord_vals[(j+1)*xlength-1] + ycoord_vals[j*xlength-1] ) * 0.5;
@@ -1761,7 +1931,7 @@ static void check_and_gen_bounds_curv(int gridID, int totalsize, int xnbounds, i
       gridDefXbounds(gridID, xcell_bounds);
       gridDefYbounds(gridID, ycell_bounds);
     } 
-}
+} */
 
 /*
 static void select_and_register_character_dimension(char *grid_file, int *axis_ids)
@@ -2043,14 +2213,20 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
   if ( cdoVerbose )
     printf("*******Start to retrieve 'positive' and 'units'.******\n");
   char *positive = get_txtatt(vlistID, varID, "positive");
+  char *origname = get_txtatt(vlistID, varID, "original_name");
+  char *history = get_txtatt(vlistID, varID, "history");
   char *units = Malloc(CDI_MAX_NAME * sizeof(char));
   vlistInqVarUnits(vlistID, varID, units);
   char *attunits = kv_get_a_val(kvl, "u", NULL);
   char *attp = kv_get_a_val(kvl, "p", NULL);
+  char *attorigname = kv_get_a_val(kvl, "original_name", NULL);
   check_compare_set(&positive, attp, "positive", "");
   if ( strcmp(positive, " ") == 0 )
     strcpy(positive, "");
   check_compare_set(&units, attunits, "units", NULL);
+  check_compare_set(&origname, attorigname, "original_name", "");
+  if ( strcmp(origname, "") == 0 )
+    origname = NULL;
   if ( cdoVerbose )
     printf("*******Succesfully retrieved 'positive': '%s' and 'units' : '%s'.******\n", positive, units);
   char missing_value[sizeof(double)];
@@ -2080,18 +2256,23 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
       cmor_variable(&var->cmor_varID,
             name,units,(count_axis_ids(axis_ids)), axis_ids, var->datatype,
             (void *) missing_value, &tolerance, positive,
-                        NULL, NULL, NULL);
+                        origname,
+                        history,
+                        kv_get_a_val(kvl, "vc", NULL));
     }
   else
     {
       cmor_variable(&var->cmor_varID,
            name, units, count_axis_ids(axis_ids),  axis_ids,   var->datatype,
           (void *) missing_value, &tolerance, positive,
-                        NULL, NULL, NULL);
+                        origname,
+                        history,
+                        kv_get_a_val(kvl, "vc", NULL));
     }
   if ( cdoVerbose )
     printf("*******Succesfully called cmor_variable.******\n");
-  if (positive) Free(positive); Free(units);
+  if (positive) Free(positive); 
+  if (units) Free(units);
 }
 
 static void register_all_dimensions(list_t *kvl, int streamID,
@@ -2677,7 +2858,7 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
     printf("\n*******Start to retrieve chunk files to append .******\n");
 
   int num_aaf = 0;
-  char **chunk_att_files = kv_get_vals(kvl, "cf", &num_aaf);
+  char **chunk_att_files = kv_get_vals(kvl, "lc", &num_aaf);
   char **chunk_des_files = NULL;
   if ( num_aaf != i && num_aaf > 0 )
     {
@@ -2686,9 +2867,9 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
     }  
   else if ( num_aaf == 0 )
     {
-      int nd = atol(kv_get_a_val(kvl, "nd", "0"));
+      char *nd = kv_get_a_val(kvl, "d", "y");
 /* For chunk description file : */
-      if ( !nd )
+      if ( nd[0] == 'y' )
         chunk_des_files = get_chunk_des_files(kvl, vars, miptab_freqptr, i, vlistID);
       else if ( cdoVerbose )
         {
@@ -2815,7 +2996,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
   if ( cdoVerbose )
     printf("\n*******Start to close files and free allocated memory.******\n");
   char **chunkdf = NULL;
-  if ( strcmp(kv_get_a_val(kvl, "om", ""), "a") == 0 && strcmp(kv_get_a_val(kvl, "nd", ""), "1") != 0 )
+  if ( strcmp(kv_get_a_val(kvl, "om", ""), "a") == 0 && strcmp(kv_get_a_val(kvl, "d", "y"), "y") == 0 )
     chunkdf = get_chunk_des_files(kvl, vars, miptab_freqptr, i, vlistID);
 
   char file_name[CMOR_MAX_STRING];
@@ -2849,7 +3030,7 @@ static void write_variables(list_t *kvl, int streamID, struct mapping vars[], in
     printf("\n*******Succesfully closed files and freed allocated memory.******\n");
 }
 
-static void read_maptab(list_t *kvl, int streamID)
+static void read_maptab(list_t *kvl, int streamID, char *miptabfreq)
 {
   char *maptab = kv_get_a_val(kvl, "mt", NULL);
   char *maptabdir = kv_get_a_val(kvl, "mapping_table_dir", NULL);
@@ -2884,7 +3065,7 @@ static void read_maptab(list_t *kvl, int streamID)
         {
           if ( kvn->nvalues > 1 )
             cdoWarning("Only the first value of variable selection key 'name' is processed.");
-          maptab_via_cmd(pml, kvn->values[0], vlistID, nvars, nventry, ventry, "name", kvcn->values[0]);
+          maptab_via_cmd(pml, kvn->values[0], vlistID, nvars,  "name", kvcn->values[0], miptabfreq);
           if ( cdoVerbose )
             printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
@@ -2892,13 +3073,13 @@ static void read_maptab(list_t *kvl, int streamID)
         {
           if ( kvc->nvalues > 1 )
             cdoWarning("Only the first value of variable selection key 'code' is processed.");
-          maptab_via_cmd(pml, kvc->values[0], vlistID, nvars, nventry, ventry, "code", kvcn->values[0]);
+          maptab_via_cmd(pml, kvc->values[0], vlistID, nvars, "code", kvcn->values[0], miptabfreq);
           if ( cdoVerbose )
             printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
       else if ( kvcn )
         { 
-          maptab_via_cn(pml, kvcn->values, vlistID, nvars, nventry, ventry, kvcn->nvalues); 
+          maptab_via_cn(pml, kvcn->values, vlistID, nvars, kvcn->nvalues, miptabfreq); 
           if ( cdoVerbose )
             printf("*******Successfully read mapping '%s' table.*******\n", maptab);
         }
@@ -2920,11 +3101,11 @@ static void read_maptab(list_t *kvl, int streamID)
 
 static char *check_short_key(char *key)
 {
-  char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "l", "om", "ms", "dr", "nd", "cf", NULL};
-  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "calendar", "output_mode", "max_size", "drs_root", "no_drs", "chunk_files", NULL};
+  char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "om", "ms", "dr", "d", "lc", NULL};
+  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "output_mode", "max_size", "drs_root", "drs", "last_chunks", NULL};
 
   for ( int i = 0; short_keys[i]; i++ )
-    if ( strcmp(key, long_keys[i]) == 0 )
+    if ( strcmp(key, short_keys[i]) == 0 || strcmp(key, long_keys[i]) == 0 )
       return short_keys[i];
 /*  if ( strcmp(key, "cmor_name") == 0 ) short_key = strdup("cn");
   else if ( strcmp(key, "name") == 0 ) short_key = strdup("n");
@@ -2943,8 +3124,9 @@ static char *check_short_key(char *key)
   else if ( strcmp(key, "output_mode") == 0 ) short_key = strdup("om");
   else if ( strcmp(key, "max_size") == 0 ) short_key = strdup("ms");
   else if ( strcmp(key, "drs_root") == 0 ) short_key = strdup("dr");
-  else if ( strcmp(key, "no_drs") == 0 ) short_key = strdup("nd");
-  else if ( strcmp(key, "chunk_files") == 0 ) short_key = strdup("cf"); */
+  else if ( strcmp(key, "no_drs") == 0 ) short_key = strdup("d");
+  else if ( strcmp(key, "last_chunks") == 0 ) short_key = strdup("lc"); */
+  cdoWarning("Unknown commandline keyword: '%s'\n", key);
   return NULL;
 }
 
@@ -2963,16 +3145,16 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
         {
           if ( key && values[0] )
             {
-              if ( strlen(key) > 3 )
+              char *short_key = check_short_key(key);
+              if ( short_key )
                 {
-                  char *short_key = check_short_key(key);
-                  if (short_key)
+                  if ( strcmp(short_key, key) != 0 )
                     {
                       Free(key);
                       key = strdup(short_key);
                     }
+                  kvlist_append(kvl, (const char *)key, (const char **) values, j);
                 }
-              kvlist_append(kvl, (const char *)key, (const char **) values, j);
               Free(key);
               free_array(values);
             }
@@ -2996,16 +3178,17 @@ static void parse_cmdline(list_t *pml, char **params, int nparams, char *ventry)
     }
   if ( key && values )
     {
-      if ( strlen(key) > 3 )
+      char *short_key = check_short_key(key);
+      if ( short_key )
         {
-          char *short_key = check_short_key(key);
-          if (short_key)
+          if ( strcmp(short_key, key) != 0 )
             {
               Free(key);
               key = strdup(short_key);
             }
+          kvlist_append(kvl, (const char *)key, (const char **) values, j);
         }
-      kvlist_append(kvl, (const char *)key, (const char **) values, j);
+      Free(key);
       free_array(values);
     }
   else if ( values )
@@ -3097,17 +3280,15 @@ void *CMOR(void *argument)
 
   /* Definition of pml: */
   list_t *pml = list_new(sizeof(list_t *), free_kvlist, "pml");
-  /*Name and size of kvl: */
-  const char *ventry[] = {"keyvals"};
-  int nentry = (int) sizeof(ventry)/sizeof(ventry[0]);
 
   if ( nparams < 1 ) cdoAbort("Too few arguments!");
 
   /* Define kvl and read cmdline */
-  parse_cmdline(pml, params, nparams, (char *)ventry[0]);
+  parse_cmdline(pml, params, nparams, "cmdline");
   
+  const char *pmlistHelper[] = {"cmdline"};
   /* Get kvl and use it from now on instead of pml */
-  list_t *kvl = pmlist_get_kvlist_ventry(pml, nentry, ventry);
+  list_t *kvl = pmlist_get_kvlist_ventry(pml, 1, pmlistHelper);
   char *name = kv_get_a_val(kvl, "n", NULL);
   char *code = kv_get_a_val(kvl, "c", NULL);
   char *cn = kv_get_a_val(kvl, "cn", NULL);
@@ -3155,7 +3336,7 @@ void *CMOR(void *argument)
  /* read mapping table */
   if ( cdoVerbose )
     printf("*******Start to read mapping table.*******\n");
-  read_maptab(kvl, streamID);
+  read_maptab(kvl, streamID, params[0]);
 
   struct mapping *vars = construct_var_mapping(streamID);
 
