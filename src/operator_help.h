@@ -4019,7 +4019,7 @@ static const char *VertintmlHelp[] = {
     "           Interpolates 3D variables on hybrid sigma pressure level to pressure level.",
     "    ml2hl  Model to height level interpolation",
     "           Interpolates 3D variables on hybrid sigma pressure level to height level.",
-    "           The procedure is the same as for the operator mh2pl except for",
+    "           The procedure is the same as for the operator ml2pl except for",
     "           the pressure levels being calculated from the heights by:",
     "           plevel = 101325*exp(hlevel/-7000)",
     "",

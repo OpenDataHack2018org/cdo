@@ -221,6 +221,7 @@ int zaxisFromName(const char *zaxisname);
 /* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
 void strtolower(char *str);
+void strtoupper(char *str);
 
 /* refactor: moved here from cdo.c */
 void exp_run(int argc, char *argv[], const char *cdoExpName); // job.c
