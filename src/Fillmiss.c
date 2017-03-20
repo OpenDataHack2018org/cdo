@@ -272,8 +272,8 @@ void fillmiss_one_step(field_type *field1, field_type *field2, int maxfill)
 
 
 int grid_search_nbr(struct gridsearch *gs, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist, double plon, double plat);
-double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, int *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist);
-unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const int *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
+double nbr_compute_weights(unsigned num_neighbors, const int *restrict src_grid_mask, bool *restrict nbr_mask, const int *restrict nbr_add, double *restrict nbr_dist);
+unsigned nbr_normalize_weights(unsigned num_neighbors, double dist_tot, const bool *restrict nbr_mask, int *restrict nbr_add, double *restrict nbr_dist);
 
 static
 void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
@@ -340,7 +340,7 @@ void setmisstodis(field_type *field1, field_type *field2, int num_neighbors)
 
   if ( nv != nvals ) cdoAbort("Internal problem, number of valid values differ!");
   
-  int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
+  bool nbr_mask[num_neighbors];   /* mask at nearest neighbors                   */
   int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
 
