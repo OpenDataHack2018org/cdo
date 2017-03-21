@@ -2785,11 +2785,16 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   int maxsizegb = atol(kv_get_a_val(kvl, "ms", "2"));
   int maxsizeb = maxsizegb * 1024 * 1024 * 1024;
 
-  int ntsteps = vlistNtsteps(vlistID);
+  int ntsteps = vlistNtsteps(vlistID2);
   if ( ntsteps < 0 )
     {
-      cdoWarning("Could not check expected file size for exceeding maximal file size: %d gb.\nSwitched to replace mode.", maxsizegb);
-      return 0;
+      ntsteps = 0;
+      while ( streamInqTimestep(streamID2, ntsteps++)) ;
+      if ( ntsteps == 0 )
+        {
+          cdoWarning("A mistake occured during timesteps determination.\nSwitched to replace mode.");
+          return 0;
+        }
     }
   
   double estimated_size;
