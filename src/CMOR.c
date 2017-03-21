@@ -22,25 +22,33 @@ int stringToParam(const char *paramstr);
 list_t *pmlist_search_kvlist_ventry(list_t *pml, const char *key, const char *value, int nentry, const char **entry);
 list_t *pmlist_get_kvlist_ventry(list_t *pml, int nentry, const char **entry);
 
-list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab)
+list_t *maptab_search_miptab(list_t *pmlist, const char *cmorname, const char *miptab, char *key)
 {
   if ( pmlist && cmorname && miptab )
     {
       listNode_t *node = pmlist->head;
+      list_t *listlatest = NULL;
       while ( node )
         {
           if ( node->data )
             {
               list_t *kvlist = *(list_t **)node->data;
-              keyValues_t *kvcn = kvlist_search(kvlist, "cmor_name");
+              keyValues_t *kvcn = kvlist_search(kvlist, key);
               if ( kvcn && kvcn->nvalues > 0 && *(kvcn->values[0]) == *cmorname && strcmp(kvcn->values[0], cmorname) == 0 )
                 {
                   keyValues_t *kvmt = kvlist_search(kvlist, "mip_table");
                   if ( ( kvmt && kvmt->nvalues > 0 && *(kvmt->values[0]) == *miptab && strcmp(kvmt->values[0], miptab) == 0 ) || !kvmt )
                     return kvlist;
+                  else
+                    listlatest = kvlist;
                 }
             }
           node = node->next;
+        }
+      if ( listlatest )
+        {
+          printf("No attribute 'mip_table' found in mapping table line for cmorname '%s'.\n The latest line of the mapping table is used.", cmorname);
+          return listlatest;
         }
     }
 
@@ -154,7 +162,10 @@ char *getElementValues(char *pline, char **values, int *nvalues)
       if ( *(pline+i) == ',')
         {
           copy_value(pline, values, nvalues);
-          *(values[*nvalues-1]+i) = 0;
+          if ( *(values[*nvalues-1]+i-1) == '"' || *(values[*nvalues-1]+i-1) == '\'' )
+            quote_replace(values, *nvalues-1,i);
+          else
+            *(values[*nvalues-1]+i) = 0;
 
           i++;
           pline+=i;
@@ -409,7 +420,7 @@ static void map_it(list_t *kvl, int vlistID, int varID)
       else if ( STR_IS_EQ(key, "datatype") || STR_IS_EQ(key, "type") ) {} */
       else
         {
-          if ( cdoVerbose ) printf("Mapping key '%s' is ingored.\n", key);
+          if ( cdoVerbose ) printf("For Mapping key '%s' is ignored.\n", key);
         }
     }
 }
@@ -466,20 +477,21 @@ static int change_name_via_code(int vlistID, char *map_code, char *cmor_name)
 }
 
 
-static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, const char **ventry, const char *key)
+static int maptab_via_key(list_t *pml, int vlistID, int varID, int nventry, const char **ventry, const char *key, char *miptabfreq)
 {
   char ifilevalue[CDI_MAX_NAME];
   get_ifilevalue(ifilevalue, key, vlistID, varID);
 
-  list_t *kvl = pmlist_search_kvlist_ventry(pml, key, ifilevalue, nventry, ventry);
   if ( ifilevalue[0] )
     {
+      list_t *kvl = maptab_search_miptab(pml, ifilevalue, miptabfreq, (char *)key);
       if ( kvl )
         {
+          printf("Started mapping of variable via '%s'.\n", key);
           map_it(kvl, vlistID, varID);
           return 1;
         }
-      cdoWarning("Variable with name '%s' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.\n", ifilevalue, key, key);
+      cdoWarning("Variable named '%s' with varID '%d' could not be mapped via '%s' because no corresponding key '%s' was found in mapping table file.", ifilevalue, varID, key, key);
       return 0;
     }
   else
@@ -501,6 +513,7 @@ static int maptab_via_cn_and_key(list_t *kvl_oname, int vlistID, int nvars, char
 
           if ( ifilevalue[0] && strcmp(ifilevalue, kv->values[0]) == 0 )
             {
+              printf("Started mapping of variable via '%s'.\n", key);
               map_it(kvl_oname, vlistID, varID);
               return 1;
             }
@@ -528,22 +541,25 @@ static void maptab_via_cmd(list_t *pml, char *origValue, int vlistID, int nvars,
 {
   int varIDToMap = getVarIDToMap(vlistID, nvars, key, origValue);
   if ( varIDToMap == CDI_UNDEFID )
-    cdoAbort("Could not find variable with name '%s' in Ifile.", origValue);
-  list_t *kvl_maptab = maptab_search_miptab(pml, cmorName, miptabfreq);
+    cdoAbort("Could not find variable with '%s': '%s' in Ifile.", key, origValue);
+  list_t *kvl_maptab = maptab_search_miptab(pml, cmorName, miptabfreq, "cmor_name");
   if ( !kvl_maptab )
     {
       cdoWarning("Could not find cmor_name '%s' in mapping table.\n No mapping table is applied.", cmorName);
       vlistDefVarName(vlistID, varIDToMap, parameter2word((const char *) cmorName));
     }
   else
-    map_it(kvl_maptab, vlistID, varIDToMap);
+    {
+      printf("Started mapping of variable via '%s'.\n", key);
+      map_it(kvl_maptab, vlistID, varIDToMap);
+    }
 }
 
 static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, int numvals, char *miptabfreq)
 {
   for ( int j = 0; j<numvals; j++)
     {
-      list_t *kvl_oname = maptab_search_miptab(pml, request[j], miptabfreq);
+      list_t *kvl_oname = maptab_search_miptab(pml, request[j], miptabfreq, "cmor_name");
       if ( kvl_oname )
         {
           if ( maptab_via_cn_and_key(kvl_oname, vlistID, nvars, "name") )
@@ -558,7 +574,7 @@ static void maptab_via_cn(list_t *pml, char **request, int vlistID, int nvars, i
             }
           else
             {
-              cdoWarning("No identification 'name' or 'key' in mapping table line of cmor_name '%s'. Varaible not mapped.\n", request[j]);
+              cdoWarning("No identification 'name' or 'key' in mapping table line of cmor_name '%s'. Variable not mapped.\n", request[j]);
               continue;
             }
         }
@@ -1353,12 +1369,15 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
   char *chardimatt = kv_get_a_val(kvl, "ca", NULL);
   char *chardim = get_txtatt(vlistID, varID, "character_axis");
   check_compare_set(&chardim, chardimatt, "character_axis", "notSet");
-  if ( strcmp(chardim, "vegtype") == 0 )
+  if ( strcmp(chardim, "vegtype") == 0 || strcmp(chardim, "oline") == 0  )
     {
       if ( zsize )
-        cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis is ignored for '%s'.", chardim, zsize, varname);
+        cdoWarning("You configured a character coordinate '%s' but a zaxis is found with '%d' numerical values. The zaxis attributes are ignored and the '%d' levels are interpreted as the character coordinates in the order they are given for '%s'.", chardim, zsize, zsize, varname);
       int numchar = 0;
-      char **charvals = kv_get_vals(kvl, "char_dim_vegtype", &numchar);
+      char *charvalstring = Malloc(CMOR_MAX_STRING * sizeof(char));
+      sprintf(charvalstring, "char_axis_%s", chardim);
+      char **charvals = kv_get_vals(kvl, charvalstring, &numchar);
+      Free(charvalstring);
       if ( charvals )
         {
           int maxlen = get_strmaxlen(charvals, numchar);
@@ -1373,7 +1392,10 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
               sprintf((char *)charcmor, "%s%s", (char *)charcmor, charvals[i]);
               sprintf((char *)charcmor, "%s%.*s", (char *)charcmor, maxlen-strlen(charvals[i]), blanks);         
             }
-          cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
+          if ( numchar == zsize )
+            cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
+          else
+            cdoAbort("The number of registered character coordinates differ from the number of axis levels.");
           Free(charcmor);
         }
       else
@@ -2097,7 +2119,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
       grid_ids[0] = 0;
       int numchar = 0;
       char *charvalstring = Malloc(CMOR_MAX_STRING * sizeof(char));
-      sprintf(charvalstring, "char_dim_%s", chardim);
+      sprintf(charvalstring, "char_axis_%s", chardim);
       char **charvals = kv_get_vals(kvl, charvalstring, &numchar);
       Free(charvalstring);
       if ( ( xlength > 0 && xlength != numchar ) && ( ylength > 0 && ylength != numchar ) )
@@ -2893,7 +2915,7 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
       else 
         {
           if ( cdoVerbose )
-            printf("It is tried to open a chunk description file for varID: '%d'.\n", vars[j].cdi_varID);
+            printf("It is tried to open a chunk description file for varID: '%d': '%s'.\n", vars[j].cdi_varID, chunk_des_files[j]);
           chunk_files[j] = use_chunk_des_files(kvl, vlistID, vars[j].cdi_varID, chunk_des_files[j], ifreq, calendar);  
         }
       if ( cdoVerbose && strcmp(chunk_files[j], " ") != 0 )
@@ -3086,10 +3108,16 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq)
       else
         for ( int varID = 0; varID < nvars; varID++ )
           {
-            if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "name") )
-              continue;
-            if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "code") )
-              continue;
+            if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "name", miptabfreq) )
+              {
+                printf("*******Successfully mapped varID '%d' via name.*******\n", varID);
+                continue;
+              }
+            if ( maptab_via_key(pml, vlistID, varID, nventry, ventry, "code", miptabfreq) )
+              {
+                printf("*******Successfully mapped varID '%d' via code.*******\n", varID);
+                continue;
+              }
             cdoWarning("Could not map variable with id '%d'.", varID);
           }
       list_destroy(pml);
@@ -3203,7 +3231,7 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
     return params;
   else
     {
-      cdoWarning("Your first argument could not be opened as a file. It is tried to build a path with additional configuration attributes 'mip_table_dir' and 'project_id'");
+      cdoWarning("Your first argument is not an existing file. It is tried to build a path with additional configuration attributes 'mip_table_dir' and 'project_id'");
       char *miptabdir = kv_get_a_val(kvl, "mip_table_dir", NULL);
       if ( miptabdir && project_id )
         {
