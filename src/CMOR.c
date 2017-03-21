@@ -2682,11 +2682,12 @@ static void check_for_sfc_pressure(int *ps_index, struct mapping vars[], int vli
 static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifreq, int calendar)
 {
   char *test = testIn;
-  size_t filesize = fileSize(test);
+  size_t filesize = fileSize((const char *)testIn);
   char old_start_date[CMOR_MAX_STRING];
   char old_end_date[CMOR_MAX_STRING];
   int i = 0, j = 0;
 /* Get dates from chunk string */
+  if ( cdoVerbose) printf("*******Start to retrieve dates from chunk string.******\n");
   while ( *(test+i) != 0 )
     {
       if ( *(test+i) == '_' )
@@ -2710,6 +2711,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   strncpy(old_end_date, test, j);
   old_end_date[j] = 0;
 
+  if ( cdoVerbose) printf("*******Succesfully retrieved start date: '%s' and end date: '%s' chunk string.******\n", old_start_date, old_end_date);
 /* Check frequency of chunk with frequency of file */
 
   if ( (j == 8 && ifreq !=3) || (ifreq == 3 && j != 8)
@@ -2718,6 +2720,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
     cdoAbort("Frequency of chunk file does not agree with frequency of the working file.");
 
 /* Encode in julseconds depending on frequency */
+  if ( cdoVerbose) printf("*******Start to encode dates with frequencies to julseconds.******\n");
 
   int old_start_year, old_start_month = 1, old_start_day = 1;
   int old_end_year, old_end_month = 1, old_end_day = 1;
@@ -2747,7 +2750,9 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   juldate_t julostart = juldate_encode(calendar, cdi_startdate, cdi_time);
   juldate_t juloend = juldate_encode(calendar, cdi_enddate, cdi_time);
 
+  if ( cdoVerbose) printf("*******Succesfully calculated juldates.******\n", old_start_date);
 /* Read in first vdate in case not piped */
+  if ( cdoVerbose) printf("*******Start to calculate temporal gap between chunk and working file.******\n");
   if ( cdoStreamName(0)->args[0] == '-' )
     {
       cdoWarning("Cdo cmor cannot enable append mode since you piped several cdo operators.\nA new file will be written.");
@@ -2766,9 +2771,14 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   if ( ( j == 8 && ( append_distance > 48.0 || append_distance < 0 ) )
      ||( j == 6 && ( append_distance/24.0 > 61.0 || append_distance < 0 ) )
      ||( j == 4 && ( append_distance/24.0/30.5 > 23.0 || append_distance < 0 ) ) )
-    cdoAbort("A temporal gap is diagnosed between end date of chunk file and first date of working file of: '%f' hours. Maximal valid gaps are:\n47 hours for daily frequency\n45 days for monthly frequency\n19 month for yearly frequency", append_distance);
+    {
+      cdoWarning("A temporal gap is diagnosed between end date of chunk file and first date of working file of: '%f' hours. Maximal valid gaps are:\n47 hours for daily frequency\n45 days for monthly frequency\n19 month for yearly frequency.\nSwitched to replace mode.", append_distance);
+      return 0;
+    }
 
+  if ( cdoVerbose) printf("*******Succesfully checked temporal gap.******\n");
 /* Check file size */
+  if ( cdoVerbose) printf("*******Start to check file size of chunk + working file.******\n");
   double old_interval_sec = juldate_to_seconds(juldate_sub(juloend, julostart));
   double size_per_sec = (double) filesize / old_interval_sec;
 
@@ -2778,7 +2788,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   int ntsteps = vlistNtsteps(vlistID);
   if ( ntsteps < 0 )
     {
-      cdoWarning("Could not check expected file size for exceeding maximal file size: %s gb.\nA new file will be written.", maxsizegb);
+      cdoWarning("Could not check expected file size for exceeding maximal file size: %d gb.\nSwitched to replace mode.", maxsizegb);
       return 0;
     }
   
@@ -2795,7 +2805,10 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
       estimated_size = ntsteps * 60 * 60 * 24 * 365.25 * size_per_sec + (double) filesize;
       break;
     default:
-      cdoAbort("Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\nA new file will be written.");
+      {
+        cdoWarning("Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\nA new file will be written.");
+        return 0;
+      }
     }
 
   if ( (unsigned int)estimated_size > (unsigned int) maxsizeb )
@@ -2803,6 +2816,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
       cdoWarning("Estimated file size of appended file is : '%f'gb and exceeds maximal allowed file size: '%d'gb.\nA new file will be written.", estimated_size/1024.0/1024.0/1024.0, maxsizegb);
       return 0;
     }
+  if ( cdoVerbose) printf("*******Succesfully checked file size of chunk + working file.******\n");
   return 1;
 }
 
