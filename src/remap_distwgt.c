@@ -441,7 +441,6 @@ void remap_distwgt_weights(unsigned num_neighbors, remapgrid_t *src_grid, remapg
       for ( unsigned n = 0; n < nadds; ++n )
         if ( nbr_mask[n] ) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
-      //printf("%d: %d %d %d %d %g %g %g %g\n", tgt_cell_add, nbr_add[0], nbr_add[1], nbr_add[2], nbr_add[3], nbr_dist[0], nbr_dist[1], nbr_dist[2], nbr_dist[3]);
       store_weightlinks(0, nadds, nbr_add, nbr_dist, tgt_cell_add, weightlinks);
     }
 
@@ -546,7 +545,6 @@ void remap_distwgt(unsigned num_neighbors, remapgrid_t *src_grid, remapgrid_t *t
       for ( unsigned n = 0; n < nadds; ++n )
         if ( nbr_mask[n] ) tgt_grid->cell_frac[tgt_cell_add] = ONE;
 
-      // printf("%d: %d %d %d %d %g %g %g %g\n", tgt_cell_add, nbr_add[0], nbr_add[1], nbr_add[2], nbr_add[3], nbr_dist[0], nbr_dist[1], nbr_dist[2], nbr_dist[3]);
       if ( nadds > 1 ) sort_add_and_wgts(nadds, nbr_add, nbr_dist);
 
       if ( nadds ) distwgt_remap(&tgt_array[tgt_cell_add], src_array, nadds, nbr_dist, nbr_add);
