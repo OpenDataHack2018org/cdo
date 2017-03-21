@@ -729,17 +729,30 @@ void links_per_value(remapvars_t *remapvars)
     else break;
 
   if ( num_links%lpv != 0 ) lpv = -1;
+  else if ( lpv == 1 )
+    {
+      for ( long n = 1; n < num_links; ++n )
+        {
+          if ( dst_add[n] == dst_add[n-1] )
+            {
+              lpv = -1;
+              break;
+            }
+        }
+    }
   else if ( lpv > 1 )
     {
       for ( long n = 1; n < num_links/lpv; ++n )
         {
           ival = dst_add[n*lpv];
           for ( int k = 1; k < lpv; ++k )
-            if ( dst_add[n*lpv+k] != ival )
-              {
-                lpv = -1;
-                break;
-              }
+            {
+              if ( dst_add[n*lpv+k] != ival )
+                {
+                  lpv = -1;
+                  break;
+                }
+            }
           if ( lpv == -1 ) break;
         }
     }

@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
 
+2017-03-21  Uwe Schulzweida
+
+	* remapdis: potentialy wrong results on non global grids (bug fix) (bug was introduced in last revision)
+
 2017-03-13  Uwe Schulzweida
 
 	* selindexbox: added support for LCC grid
