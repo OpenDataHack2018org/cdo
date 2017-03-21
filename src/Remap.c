@@ -720,40 +720,44 @@ static
 void links_per_value(remapvars_t *remapvars)
 {
   long num_links = remapvars->num_links;
-  const int *restrict dst_add = remapvars->tgt_cell_add;
+  int lpv = -1;
 
-  int lpv = 1;
-  int ival = dst_add[0];
-  for ( long n = 1; n < num_links; ++n )
-    if ( dst_add[n] == ival ) lpv++;
-    else break;
-
-  if ( num_links%lpv != 0 ) lpv = -1;
-  else if ( lpv == 1 )
+  if ( num_links > 0 )
     {
+      lpv = 1;
+      const int *restrict dst_add = remapvars->tgt_cell_add;
+      int ival = dst_add[0];
       for ( long n = 1; n < num_links; ++n )
+        if ( dst_add[n] == ival ) lpv++;
+        else break;
+
+      if ( num_links%lpv != 0 ) lpv = -1;
+      else if ( lpv == 1 )
         {
-          if ( dst_add[n] == dst_add[n-1] )
+          for ( long n = 1; n < num_links; ++n )
             {
-              lpv = -1;
-              break;
-            }
-        }
-    }
-  else if ( lpv > 1 )
-    {
-      for ( long n = 1; n < num_links/lpv; ++n )
-        {
-          ival = dst_add[n*lpv];
-          for ( int k = 1; k < lpv; ++k )
-            {
-              if ( dst_add[n*lpv+k] != ival )
+              if ( dst_add[n] == dst_add[n-1] )
                 {
                   lpv = -1;
                   break;
                 }
             }
-          if ( lpv == -1 ) break;
+        }
+      else if ( lpv > 1 )
+        {
+          for ( long n = 1; n < num_links/lpv; ++n )
+            {
+              ival = dst_add[n*lpv];
+              for ( int k = 1; k < lpv; ++k )
+                {
+                  if ( dst_add[n*lpv+k] != ival )
+                    {
+                      lpv = -1;
+                      break;
+                    }
+                }
+              if ( lpv == -1 ) break;
+            }
         }
     }
 
