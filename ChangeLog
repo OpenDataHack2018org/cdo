@@ -5,7 +5,7 @@
 
 2017-03-21  Uwe Schulzweida
 
-	* remapdis: potentialy wrong results on non global grids (bug fix) (bug was introduced in last revision)
+	* remapdis: potentialy wrong results on non global grids [Bug #7626]  (bug was introduced in last revision)
 
 2017-03-13  Uwe Schulzweida
 

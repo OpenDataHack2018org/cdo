@@ -10,6 +10,9 @@ Version 1.8.1 (24 March 2017):
      * delmulti - Delete multiple fields (KMNI extension)
      * changemulti - Change identication of multiple fields (KMNI extension)
      * samplegrid - Resample grid (KMNI extension)
+   Fixed bugs:
+     * Remapping bug for non global grids [Bug #7625]
+     * remapdis and remapcon produces wrong results for some grid combinations [Bug #7626] (introduced in last revision)
 
 Version 1.8.0 (26 October 2016):
 

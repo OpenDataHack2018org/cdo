@@ -30,11 +30,9 @@
 void *Change_e5slm(void *argument)
 {
   char name[CDI_MAX_NAME];
-  int nrecs, code;
+  int nrecs;
   int varID, levelID;
   int nmiss;
-  long i;
-  double minval, maxval;
 
   cdoInitialize(argument);
 
@@ -64,7 +62,7 @@ void *Change_e5slm(void *argument)
 
   int vlistIDslm = streamInqVlist(streamIDslm);
 
-  int gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
+  long gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
 
   double *array = (double*) Malloc(gridsize*sizeof(double));
   double *cland = (double*) Malloc(gridsize*sizeof(double));
@@ -77,13 +75,14 @@ void *Change_e5slm(void *argument)
 
   if ( nmiss > 0 ) cdoAbort("SLM with missing values are unsupported!");
 
+  double minval, maxval;
   minmaxval(gridsize, cland, NULL, &minval, &maxval);
   if ( minval < 0 || maxval > 1 )
     cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval , maxval);
 
   streamClose(streamIDslm);
 
-  for ( i = 0; i < gridsize; ++i )
+  for ( long i = 0; i < gridsize; ++i )
     {
       if ( cland[i] > 0 )
 	lsea[i] = false;
@@ -100,7 +99,7 @@ void *Change_e5slm(void *argument)
       if ( gridsize != gridInqSize(vlistInqVarGrid(vlistID1, varID)) )
 	cdoAbort("gridsize differ!");
 
-      code = vlistInqVarCode(vlistID1, varID);
+      int code = vlistInqVarCode(vlistID1, varID);
       vlistInqVarName(vlistID1, varID, name);
 
       if ( code < 0 )
@@ -135,23 +134,23 @@ void *Change_e5slm(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array, &nmiss);
 
-	  code = codes[varID];
+	  int code = codes[varID];
 	  if ( code == 172 )
 	    {
 	      cdoPrint("SLM changed!");
-	      for ( i = 0; i < gridsize; ++i )
+	      for ( long i = 0; i < gridsize; ++i )
 		array[i] = cland[i];
 	    }
 	  else if ( code == 99 )
 	    {
 	      cdoPrint("ALAKE set all values to zero!");
-	      for ( i = 0; i < gridsize; ++i )
+	      for ( long i = 0; i < gridsize; ++i )
 		array[i] = 0;
 	    }
 	  else if ( code == 232 )
 	    {
 	      cdoPrint("GLAC set sea points to %g!", array[0]);
-	      for ( i = 0; i < gridsize; ++i )
+	      for ( long i = 0; i < gridsize; ++i )
 		if ( cland[i] < 0.5 ) array[i] = array[0];
 	    }
 	  else if ( code ==  70 || code ==  71 || code == 140 ||
@@ -160,7 +159,7 @@ void *Change_e5slm(void *argument)
 		    code == 229 )
 	    {
 	      cdoPrint("Code %d set sea points to %g!", code, array[0]);
-	      for ( i = 0; i < gridsize; ++i )
+	      for ( long i = 0; i < gridsize; ++i )
 		if ( lsea[i] ) array[i] = array[0];
 	    }
 
