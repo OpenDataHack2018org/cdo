@@ -106,57 +106,12 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 {
   int operfunc = -1;
 
-  if ( map_type == MAP_TYPE_CONSERV )
-    {
-      if ( remap_order == 2 )
-	{
-	  operfunc = REMAPCON2;
-	  // cdoPrint("Using remapcon2");
-	}
-      else
-	{
-	  operfunc = REMAPCON;
-	  // cdoPrint("Using remapcon");
-	}
-    }
-  else if ( map_type == MAP_TYPE_CONSERV_YAC )
-    {
-      if ( submap_type == SUBMAP_TYPE_LAF )
-	{
-	  operfunc = REMAPLAF;
-	  // cdoPrint("Using remaplaf");
-	}
-      else
-	{
-	  operfunc = REMAPYCON;
-	  // cdoPrint("Using remapycon");
-	}
-    }
-  else if ( map_type == MAP_TYPE_BILINEAR )
-    {
-      operfunc = REMAPBIL;
-      // cdoPrint("Using remapbil");
-    }
-  else if ( map_type == MAP_TYPE_BICUBIC )
-    {
-      operfunc = REMAPBIC;
-      // cdoPrint("Using remapbic");
-    }
-  else if ( map_type == MAP_TYPE_DISTWGT )
-    {
-      if ( num_neighbors == 1 )
-	{
-	  operfunc = REMAPNN;
-	  // cdoPrint("Using remapnn");
-	}
-      else
-	{
-	  operfunc = REMAPDIS;
-	  // cdoPrint("Using remapdis");
-	}
-    }
-  else
-    cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
+  if      ( map_type == MAP_TYPE_CONSERV )     operfunc = (remap_order == 2) ? REMAPCON2 : REMAPCON;
+  else if ( map_type == MAP_TYPE_CONSERV_YAC ) operfunc = (submap_type == SUBMAP_TYPE_LAF) ? REMAPLAF : REMAPYCON;
+  else if ( map_type == MAP_TYPE_BILINEAR )    operfunc = REMAPBIL;
+  else if ( map_type == MAP_TYPE_BICUBIC )     operfunc = REMAPBIC;
+  else if ( map_type == MAP_TYPE_DISTWGT )     operfunc = (num_neighbors == 1) ? REMAPNN : REMAPDIS;
+  else  cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
 
   return operfunc;
 } 
@@ -164,8 +119,7 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 static
 void print_remap_info(int operfunc, int remap_genweights, remapgrid_t *src_grid, remapgrid_t *tgt_grid, int nmiss)
 {
-  char line[256];
-  char tmpstr[256];
+  char line[256], tmpstr[256];
 
   line[0] = 0;
 
@@ -323,10 +277,7 @@ void get_remap_env(void)
     }
 
 #if defined(_OPENMP)
-  if ( ompNumThreads == 1 )
-    sort_mode = HEAP_SORT;
-  else
-    sort_mode = MERGE_SORT;
+  sort_mode = (ompNumThreads == 1) ? HEAP_SORT : MERGE_SORT;
 #endif
 
   envstr = getenv("REMAP_SORT_MODE");
@@ -805,7 +756,6 @@ void *Remap(void *argument)
   int need_gradiants = FALSE;
   char varname[CDI_MAX_NAME];
   double missval;
-  double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;
   remap_t *remaps = NULL;
   char *remap_file = NULL;
 
@@ -953,13 +903,12 @@ void *Remap(void *argument)
       gridsize2 = gridInqSize(gridID2);
       if ( gridInqType(gridID2) == GRID_GME )
 	{
-	  int gridID2_gme;
-	  int isize = 0;
 	  remaps[0].tgt_grid.nvgp = gridInqSize(gridID2);
 	  remaps[0].tgt_grid.vgpm = (int*) Realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2)*sizeof(int));
-	  gridID2_gme = gridToUnstructured(gridID2, 1);
+	  int gridID2_gme = gridToUnstructured(gridID2, 1);
 	  gridInqMaskGME(gridID2_gme, remaps[0].tgt_grid.vgpm);
-	  for ( i = 0; i < gridsize2; ++i )
+	  int isize = 0;
+	  for ( int i = 0; i < gridsize2; ++i )
 	    if ( remaps[0].tgt_grid.vgpm[i] ) isize++;
 	  gridsize2 = isize;
 	}
@@ -998,12 +947,9 @@ void *Remap(void *argument)
   else
     remap_order = 1;
 
-  if ( need_gradiants )
-    {
-      grad1_lat    = (double*) Malloc(grid1sizemax*sizeof(double));
-      grad1_lon    = (double*) Malloc(grid1sizemax*sizeof(double));
-      grad1_latlon = (double*) Malloc(grid1sizemax*sizeof(double));
-    }
+  double *grad1_lat    = need_gradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
+  double *grad1_lon    = need_gradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
+  double *grad1_latlon = need_gradiants ? (double*) Malloc(grid1sizemax*sizeof(double)) : NULL;
 
   double *array1 = (double*) Malloc(grid1sizemax*sizeof(double));
   int *imask = (int*) Malloc(grid1sizemax*sizeof(int));
@@ -1081,10 +1027,7 @@ void *Remap(void *argument)
 	    }
 
 	  for ( i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array1[i], missval) )
-	      imask[i] = FALSE;
-	    else
-	      imask[i] = TRUE;
+            imask[i] = DBL_IS_EQUAL(array1[i], missval) ? FALSE : TRUE;
 
 	  for ( r = nremaps-1; r >= 0; r-- )
 	    {
@@ -1109,12 +1052,6 @@ void *Remap(void *argument)
 		}
 	      else
 		{
-                  /*
-		  r = nremaps - 1;
-                  remapVarsFree(&remaps[r].vars);
-                  remapGridFree(&remaps[r].src_grid);
-                  remapGridFree(&remaps[r].tgt_grid);
-                  */
                   int n0 = 0;
                   if ( max_remaps > 1 && remaps[0].nused > remaps[1].nused ) n0 = 1;
                   remapVarsFree(&remaps[n0].vars);
