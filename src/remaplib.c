@@ -224,25 +224,20 @@ static
 void boundbox_from_corners(long size, long nc, const double *restrict corner_lon,
 			   const double *restrict corner_lat, restr_t *restrict bound_box)
 {
-  long i4, inc, j;
-  restr_t clon, clat;
-
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)        \
-  shared(bound_box, corner_lat, corner_lon, nc, size)	\
-  private(i4, inc, j, clon, clat)
+#pragma omp parallel for default(none)  shared(bound_box, corner_lat, corner_lon, nc, size)
 #endif
   for ( long i = 0; i < size; ++i )
     {
-      i4 = i<<2; // *4
-      inc = i*nc;
-      clat = RESTR_SCALE(corner_lat[inc]);
-      clon = RESTR_SCALE(corner_lon[inc]);
+      long i4 = i<<2; // *4
+      long inc = i*nc;
+      restr_t clat = RESTR_SCALE(corner_lat[inc]);
+      restr_t clon = RESTR_SCALE(corner_lon[inc]);
       bound_box[i4  ] = clat;
       bound_box[i4+1] = clat;
       bound_box[i4+2] = clon;
       bound_box[i4+3] = clon;
-      for ( j = 1; j < nc; ++j )
+      for ( long j = 1; j < nc; ++j )
 	{
 	  clat = RESTR_SCALE(corner_lat[inc+j]);
 	  clon = RESTR_SCALE(corner_lon[inc+j]);
@@ -1177,7 +1172,7 @@ long get_max_add(long num_links, long size, const int *restrict add)
   for ( long i = 0; i < size; ++i ) if ( isum[i] > max_add ) max_add = isum[i];
   Free(isum);
 
-  return (max_add);
+  return max_add;
 }
 
 static 
