@@ -512,17 +512,7 @@ int expand_curvilinear_grid(int gridID)
       yvals[(nyp4-2)*nxp4+i] = intlin(2.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
       yvals[(nyp4-1)*nxp4+i] = intlin(3.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
     }
-  /*
-    {
-    FILE *fp;
-    fp = fopen("xvals.asc", "w");
-    for ( i = 0; i < gridsize_new; i++ ) fprintf(fp, "%g\n", xvals[i]);
-    fclose(fp);
-    fp = fopen("yvals.asc", "w");
-    for ( i = 0; i < gridsize_new; i++ ) fprintf(fp, "%g\n", yvals[i]);
-    fclose(fp);
-    }
-  */
+
   gridDefXvals(gridIDnew, xvals);
   gridDefYvals(gridIDnew, yvals);
   
