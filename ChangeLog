@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
 
+2017-03-24  Uwe Schulzweida
+
+	* remap_grids_init: bug fix for CDI_PROJ_LCC
+
 2017-03-21  Uwe Schulzweida
 
 	* remapdis: potentialy wrong results on non global grids [Bug #7626]  (bug was introduced in last revision)
