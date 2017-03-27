@@ -79,6 +79,14 @@ static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 static const char *username;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void streamGrbDefDataScanningMode(int scanmode);
+#if defined (__cplusplus)
+}
+#endif
+
 void gridsearch_set_method(const char *methodstr);
 
 #define PRINT_RLIMIT(resource) \
@@ -279,6 +287,10 @@ void cdo_usage(void)
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
   fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
+#ifdef HIRLAM_EXTENSIONS
+  fprintf(stderr, "    --Dkext <debLev>   Setting debugLevel for extensions\n");
+  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib scanning mode for data in output file <0, 64, 96>; Default is 64\n");
+#endif // HIRLAM_EXTENSIONS
   reset_text_color(stderr);
   fprintf(stderr, "\n");
 
@@ -1078,6 +1090,7 @@ int parse_options_long(int argc, char *argv[])
   int lsortname;
   int lsortparam;
   int ldebLevel;
+  int lscmode;
 
   struct cdo_option opt_long[] =
     {
@@ -1114,6 +1127,7 @@ int parse_options_long(int argc, char *argv[])
       { "verbose",                 no_argument,                NULL, 'v' },
       { "version",                 no_argument,                NULL, 'V' },
       { "Dkext",             required_argument,          &ldebLevel,  1  },
+      { "outputGribDataScanningMode", required_argument,  &lscmode,   1  },
       { NULL,                                0,                NULL,  0  }
     };
 
@@ -1136,6 +1150,7 @@ int parse_options_long(int argc, char *argv[])
       lsortname = 0;
       lsortparam = 0;
       ldebLevel = 0;
+      lscmode = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1228,11 +1243,28 @@ int parse_options_long(int argc, char *argv[])
             {
               cdiDefGlobal("SORTPARAM", TRUE);
             }
+#ifdef HIRLAM_EXTENSIONS
           else if ( ldebLevel )
             {
               int newDebLevelVal = parameter2int(CDO_optarg);
               if ( newDebLevelVal > 0 ) cdoDebugExt = newDebLevelVal;
             }
+          else if ( lscmode )
+            {
+              int scanningModeValue = atoi(CDO_optarg);
+              if ( cdoDebugExt ) printf("scanningModeValue=%d\n", scanningModeValue);
+              
+              if ( (scanningModeValue==0) || (scanningModeValue==64) || (scanningModeValue==96) )
+                {
+                  streamGrbDefDataScanningMode(scanningModeValue); // -1: not used; allowed modes: <0, 64, 96>; Default is 64
+                }
+              else
+                {
+                  cdoAbort("Warning: %d not in allowed modes: <0, 64, 96>; Using default: 64\n", scanningModeValue);
+                  streamGrbDefDataScanningMode(64);
+                }
+            }
+#endif
           break;
         case 'a':
           cdoDefaultTimeType = TAXIS_ABSOLUTE;

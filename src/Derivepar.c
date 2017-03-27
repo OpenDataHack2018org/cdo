@@ -36,7 +36,6 @@ double *vlist_hybrid_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlevf);
 void *Derivepar(void *argument)
 {
   int mode;
-  enum {ECHAM_MODE, WMO_MODE};
   int nrecs;
   int i, offset;
   int varID, levelID;
@@ -128,6 +127,14 @@ void *Derivepar(void *argument)
 	    {
 	      mode = ECHAM_MODE;
 	      echam_gribcodes(&gribcodes);
+	    }
+          //  KNMI: HIRLAM model version 7.2 uses tableNum=1    (LAMH_D11*)
+          //  KNMI: HARMONIE model version 36 uses tableNum=1   (grib*)   (opreational NWP version)
+          //  KNMI: HARMONIE model version 38 uses tableNum=253 (grib,grib_md) and tableNum=1 (grib_sfx) (research version)
+	  else if ( tableNum == 1 || tableNum == 253 )
+	    {
+	      mode = HIRLAM_MODE;
+	      hirlam_harmonie_gribcodes(&gribcodes);
 	    }
 	  else
 	    mode = -1;

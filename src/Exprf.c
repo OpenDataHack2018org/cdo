@@ -367,6 +367,14 @@ void *Expr(void *argument)
       varIDmap[varID] = pidx;
     }
 
+  if ( cdoVerbose ) 
+    {
+      for ( int varID = 0; varID < nvars1; varID++ )
+        if ( parse_arg.needed[varID] )
+          printf("needed: %d %s\n", varID, parse_arg.params[varID].name);
+      cdoPrint("vlistNvars(vlistID1)=%d, vlistNvars(vlistID2)=%d",vlistNvars(vlistID1),vlistNvars(vlistID2));
+    }
+
   int nvars2 = vlistNvars(vlistID2);
   if ( nvars2 == 0 ) cdoAbort("No output variable found!");
 

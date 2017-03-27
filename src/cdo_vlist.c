@@ -413,6 +413,10 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
       int nlevel  = zaxisInqSize(zaxisID);
       int zaxistype = zaxisInqType(zaxisID);
 
+      if ( cdoVerbose )
+        cdoPrint("ZAXIS_HYBRID = %d ZAXIS_HYBRID_HALF=%d nlevel=%d mono_level=%d",
+                 zaxisInqType(zaxisID) == ZAXIS_HYBRID,  zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF, nlevel, mono_level);
+
       if ( (zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF) && nlevel > 1 && !mono_level )
 	{
 	  int l;
@@ -441,6 +445,9 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 	      
 		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
+                  if ( cdoVerbose )
+                    cdoPrint("Detected half-level model definition : nlevel == (nvct/2 - 1) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
+                             nlevel, nvct,nhlevf, nhlevh);  
 		}
 	    }
 	  else if ( nlevel == (nvct/2) )
@@ -455,6 +462,9 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 	      
 		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
+                  if ( cdoVerbose )
+                    cdoPrint("Detected full-level model definition : nlevel == (nvct/2) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
+                             nlevel, nvct,nhlevf, nhlevh);  
 		}
 	    }
 	  else if ( nlevel == (nvct - 4 - 1) )

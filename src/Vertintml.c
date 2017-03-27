@@ -62,7 +62,6 @@ void change_hybrid_zaxis(int vlistID1, int vlistID2, int nvct, double *vct, int 
 void *Vertintml(void *argument)
 {
   int mode;
-  enum {ECHAM_MODE, WMO_MODE};
   enum {func_pl, func_hl};
   enum {type_lin, type_log};
   int nrecs;
@@ -286,6 +285,14 @@ void *Vertintml(void *argument)
 	      mode = ECHAM_MODE;
 	      echam_gribcodes(&gribcodes);
 	    }
+      //  KNMI: HIRLAM model version 7.2 uses tableNum=1    (LAMH_D11*)
+      //  KNMI: HARMONIE model version 36 uses tableNum=1   (grib*)   (opreational NWP version)
+      //  KNMI: HARMONIE model version 38 uses tableNum=253 (grib,grib_md) and tableNum=1 (grib_sfx) (research version)
+	  else if ( tableNum == 1 || tableNum == 253 )
+	    {
+	      mode = HIRLAM_MODE;
+	      hirlam_harmonie_gribcodes(&gribcodes);
+	    }
 	  else
 	    mode = -1;
 	}
@@ -296,7 +303,11 @@ void *Vertintml(void *argument)
 	}
 
       if ( cdoVerbose )
-	cdoPrint("Mode = %d  Center = %d  Code = %d  Param = %s", mode, instNum, code, paramstr);
+        {
+          vlistInqVarName(vlistID1, varID, varname);
+	  cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s Varname = %s varID = %d",
+                   mode, instNum, tableNum,  code, paramstr, varname, varID);
+        }
 
       if ( code <= 0 || code == 255 )
 	{
@@ -329,7 +340,7 @@ void *Vertintml(void *argument)
 	  else if ( code == gribcodes.lsp     && nlevel == 1      ) lnpsID    = varID;
 	  else if ( code == gribcodes.gheight && nlevel == nhlevf ) gheightID = varID;
 	}
-      else if ( mode == WMO_MODE )
+      else if ( mode == WMO_MODE || mode == HIRLAM_MODE )
 	{
 	  if      ( code == gribcodes.geopot  && nlevel == 1      ) sgeopotID = varID;
 	  else if ( code == gribcodes.geopot  && nlevel == nhlevf ) geopotID  = varID;

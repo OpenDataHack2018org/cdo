@@ -28,6 +28,14 @@
 #include "pstream.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+int streamGrbInqDataScanningMode(void);
+#if defined (__cplusplus)
+}
+#endif
+
 void *Copy(void *argument)
 {
   bool lconstvars = true;
@@ -48,6 +56,14 @@ void *Copy(void *argument)
                 cdoOperatorAdd("copy",   0, 0, NULL);
   int SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
   int SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
+
+#ifdef HIRLAM_EXTENSIONS
+  // KEEP in mind the difference between copy and selall with respect to unpacking and repacking the GRIB information!
+  // Especially when setting the DataScanningMode.
+  printf("cdo copy/selall : UNCHANGED_RECORD=%d\n",UNCHANGED_RECORD);
+  //if (cdiGribDataScanningMode != -1) lcopy = false;
+  printf("cdo copy/selall : cdiGribDataScanningMode=%d; lcopy=%d\n", streamGrbInqDataScanningMode(), lcopy);
+#endif //#ifdef HIRLAM_EXTENSIONS
 
   int operatorID = cdoOperatorID();
 

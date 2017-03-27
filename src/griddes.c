@@ -104,6 +104,13 @@ void gridInit(griddes_t *grid)
   grid->xdimname[0]   = 0;
   grid->ydimname[0]   = 0;
   grid->vdimname[0]   = 0;
+  grid->scanningMode  = 64;
+  /* scanningMode  = 128 * iScansNegatively + 64 * jScansPositively + 32 * jPointsAreConsecutive;
+               64  = 128 * 0                + 64 *        1         + 32 * 0
+               00  = 128 * 0                + 64 *        0         + 32 * 0
+               96  = 128 * 0                + 64 *        1         + 32 * 1
+     Default / implicit scanning mode is 64:
+                        i and j scan positively, i points are consecutive (row-major)        */
 }
 
 

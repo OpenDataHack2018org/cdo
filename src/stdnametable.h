@@ -26,9 +26,15 @@ typedef struct
   int ps;
   int lsp;
   int gheight;
+  int wind;
+  int uwind;
+  int vwind;
 } gribcode_t;
+
+enum {ECHAM_MODE, WMO_MODE, HIRLAM_MODE};
 
 void echam_gribcodes(gribcode_t *gribcodes);
 void wmo_gribcodes(gribcode_t *gribcodes);
+void hirlam_harmonie_gribcodes(gribcode_t *gribcodes);
 
 #endif

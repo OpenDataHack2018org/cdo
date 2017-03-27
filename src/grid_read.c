@@ -108,6 +108,19 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
       else if ( STR_IS_EQ(key, "ni") )           { grid->ni = parameter2int(value); grid->nd = 10; }
       else if ( STR_IS_EQ(key, "position") )       grid->position = parameter2int(value);
       else if ( STR_IS_EQ(key, "number") )         grid->number = parameter2int(value);
+      else if ( STR_IS_EQ(key, "scanningMode") )
+        {
+          int scmode = parameter2int(value);
+          if ( (scmode==0) || (scmode==64) || (scmode==96) )
+            {
+              grid->scanningMode = scmode; // -1: not used; allowed modes: <0, 64, 96>; Default is 64
+            }
+          else
+            {
+              cdoWarning("Warning: %d not in allowed modes: <0, 64, 96>; Using default: 64\n", scmode);
+              grid->scanningMode = 64;
+            }
+        }
       else if ( STR_IS_EQ(key, "xname") )     strcpy(grid->xname, parameter2word(value));
       else if ( STR_IS_EQ(key, "yname") )     strcpy(grid->yname, parameter2word(value));
       else if ( STR_IS_EQ(key, "xdimname") )  strcpy(grid->xdimname, parameter2word(value));
