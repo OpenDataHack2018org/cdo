@@ -412,7 +412,14 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
         fprintf(fp, "uuid      = %s\n", uuidStr);
     }
 
-  if ( gridInqMask(gridID, NULL) )
+#ifdef HIRLAM_EXTENSIONS
+    {
+      int  scanningMode =  gridInqScanningMode(gridID);
+      fprintf(fp, "scanningMode = %d\n", scanningMode);
+    }
+#endif // HIRLAM_EXTENSIONS
+
+    if ( gridInqMask(gridID, NULL) )
     {
       int *mask = (gridsize>0) ? (int*) Malloc((size_t)gridsize*sizeof(int)) : NULL;
       gridInqMask(gridID, mask);

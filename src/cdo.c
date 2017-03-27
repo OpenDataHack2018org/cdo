@@ -1247,7 +1247,12 @@ int parse_options_long(int argc, char *argv[])
           else if ( ldebLevel )
             {
               int newDebLevelVal = parameter2int(CDO_optarg);
-              if ( newDebLevelVal > 0 ) cdoDebugExt = newDebLevelVal;
+              if ( newDebLevelVal > 0 )
+                {
+                  extern int cdiDebugExt;
+                  cdoDebugExt = newDebLevelVal;
+                  cdiDebugExt = newDebLevelVal;
+                }
             }
           else if ( lscmode )
             {
