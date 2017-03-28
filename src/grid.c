@@ -724,7 +724,7 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
                   else if ( strcmp(attname, "standard_parallel") == 0 )
                     {
                       *lat_1 = attflt[0];
-                      if ( attlen == 2 ) *lat_2 = attflt[1];
+                      *lat_2 = (attlen == 2) ? attflt[1] : attflt[0];
                     }
                 }
             }
