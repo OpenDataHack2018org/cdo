@@ -95,28 +95,25 @@ void *Rotuv(void *argument)
   int nch = operatorArgc();
   if ( nch%2 ) cdoAbort("Odd number of input arguments!");
 
-  bool lvar = false;
-  bool lcode = true;
+  bool lvar = false; // We have a list of codes
   int len = (int)strlen(operatorArgv()[0]);
   int ix = (operatorArgv()[0][0] == '-') ? 1 : 0;
   for ( int i = ix; i < len; ++i )
     if ( !isdigit(operatorArgv()[0][i]) )
       {
-        lcode = false;
+        lvar = true; // We have a list of variables
         break;
       }
 
-  if ( lcode )
+  if ( lvar )
     {
-      lvar = false;
       for ( int i = 0; i < nch; i++ )
-	chcodes[i] = parameter2int(operatorArgv()[i]);
+	chvars[i] = operatorArgv()[i];
     }
   else
     {
-      lvar = true;
       for ( int i = 0; i < nch; i++ )
-	chvars[i] = operatorArgv()[i];
+	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));

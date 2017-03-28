@@ -56,8 +56,6 @@ int PROJUVLATLON;
     VarIsU = 0;\
     if ( lvar ) {\
         if ( strcmp((char*)(varname), (char*)(chvars)[0]) == 0 ) VarIsU = 1;\
-        else \
-            if ( strcmp((char*)(varname), "10u") == 0 ) VarIsU = 1;\
     } else \
         if ( code == chcodes[0] ) VarIsU = 1;\
     }
@@ -65,8 +63,6 @@ int PROJUVLATLON;
     VarIsV = 0;\
     if ( lvar ) {\
         if ( strcmp((char*)(varname), (char*)(chvars)[1]) == 0 ) VarIsV = 1;\
-        else \
-            if ( strcmp((char*)(varname), "10v") == 0 ) VarIsV = 1;\
     } else \
         if ( code == chcodes[1] ) VarIsV = 1;\
     }
@@ -312,7 +308,6 @@ void *DestaggerUV()
       int nlevs   = zaxisInqSize(zaxisID);
       vlistInqVarName(vlistID1, varID, varname);
       int gridIDx = vlistInqVarGrid(vlistID1, varID);
-      strtolower(varname);
       if ( cdoDebugExt>=20 )
         cdoPrint("Var.id [%4d] with grib code:3%d and has name: %6s; level type: %3d; number of levels: %3d; gridID: %d; zaxisID: %d",
                  varID, code, varname, ltype, nlevs, gridIDx, zaxisID);
@@ -668,11 +663,7 @@ void rot_uv_north(int gridID, double *us, double *vs)
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
-  // TODO
-  /*
-    int  scanningMode =  gridInqScanningMode(gridID);
-  */
-  int scanningMode = 64;
+  int scanningMode = gridInqScanningMode(gridID);
   bool jScansPositively = (scanningMode == 64);
   if (scanningMode==64)
     {
@@ -895,11 +886,7 @@ void rot_uv_back_mode64(int gridID, double *us, double *vs)
   // This routine gives comparable (not numerically same) results as rot_uv_north().
   // rot_uv_back_mode64() is significantly slower than rot_uv_north().
 
-  // TODO
-  /*
-    int  scanningMode =  gridInqScanningMode(gridID);
-  */
-  int scanningMode = 64;
+  int scanningMode = gridInqScanningMode(gridID);
   if ( scanningMode==64 )
     {
       if ( cdoDebugExt>1 )
@@ -1095,18 +1082,25 @@ void *TransformUV(int operatorID)
   if ( nch != 2 ) cdoAbort("Number of input arguments != 2");
   if ( nch >= MAXARG ) cdoAbort("Number of input arguments >= %d", MAXARG);
 
-  bool lvar = false;
-  if ( isdigit(*operatorArgv()[0]) )
+  bool lvar = false; // We have a list of codes
+  int len = (int)strlen(operatorArgv()[0]);
+  int ix = (operatorArgv()[0][0] == '-') ? 1 : 0;
+  for ( int i = ix; i < len; ++i )
+    if ( !isdigit(operatorArgv()[0][i]) )
+      {
+        lvar = true; // We have a list of variables
+        break;
+      }
+
+  if ( lvar )
     {
-      lvar = false;  // We have a list of codes
       for ( int i = 0; i < nch; i++ )
-        chcodes[i] = parameter2int(operatorArgv()[i]);
+	chvars[i] = operatorArgv()[i];
     }
   else
     {
-      lvar = true;  // We have a list of variables
       for ( int i = 0; i < nch; i++ )
-        chvars[i] = operatorArgv()[i];
+	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
@@ -1123,8 +1117,34 @@ void *TransformUV(int operatorID)
   int **varnmiss   = (int **) Malloc(nvars*sizeof(int *));
   double **vardata = (double **) Malloc(nvars*sizeof(double *));
 
-  // -1: don't set; 0: set to '0'; 1: set to '1'
+  // 0: set to '0'; 1: set to '1'
   streamGrbChangeModeUvRelativeToGrid(0); // U & V are NOT grid relative
+
+  bool lfound[MAXARG];
+  for ( int i = 0; i < nch; i++ ) lfound[i] = false;
+
+  if ( lvar )
+    {
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  vlistInqVarName(vlistID2, varID, varname);
+	  for ( int i = 0; i < nch; i++ )
+	    if ( strcmp(varname, chvars[i]) == 0 ) lfound[i] = true;
+	}
+      for ( int i = 0; i < nch; i++ )
+	if ( ! lfound[i] ) cdoAbort("Variable %s not found!", chvars[i]);
+    }
+  else
+    {
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  code = vlistInqVarCode(vlistID2, varID);
+	  for ( int i = 0; i < nch; i++ )
+	    if ( code == chcodes[i] ) lfound[i] = true;
+	}
+      for ( int i = 0; i < nch; i++ )
+	if ( ! lfound[i] ) cdoAbort("Code %d not found!", chcodes[i]);
+    }
 
   int VarIsU,VarIsV;
 
@@ -1141,7 +1161,6 @@ void *TransformUV(int operatorID)
       ltype   = zaxis2ltype(zaxisID);
       nlevs   = zaxisInqSize(zaxisID);
       vlistInqVarName(vlistID1, varID, varname); /* vlistInqVarName(int vlistID, int varID, char *name): Get the name of a Variable */
-      strtolower(varname);
 
       gridID = vlistInqVarGrid(vlistID1, varID);
       if ( cdoDebugExt>=20 )
@@ -1241,9 +1260,8 @@ void *TransformUV(int operatorID)
             code1    = vlistInqVarCode(vlistID2, varID1);
             zaxisID1 = vlistInqVarZaxis(vlistID2, varID1);
             ltype1   = zaxis2ltype(zaxisID1);
-            nlevel1   = zaxisInqSize(zaxisID1);
+            nlevel1  = zaxisInqSize(zaxisID1);
             vlistInqVarName(vlistID2, varID1, varname);
-            strtolower(varname);
             CheckVarIsV(varID1,varname,code1);
             if (VarIsV) continue;
             if ( cdoDebugExt>=20 )
@@ -1263,12 +1281,11 @@ void *TransformUV(int operatorID)
                 }
               else // This means that it is U or V.
                 {
-                  code2   = vlistInqVarCode(vlistID2, varID2);
+                  code2    = vlistInqVarCode(vlistID2, varID2);
                   zaxisID2 = vlistInqVarZaxis(vlistID2, varID2);
                   ltype2   = zaxis2ltype(zaxisID2);
-                  nlevel2   = zaxisInqSize(zaxisID2);
+                  nlevel2  = zaxisInqSize(zaxisID2);
                   vlistInqVarName(vlistID2, varID2, varname);
-                  strtolower(varname);
                   CheckVarIsU(varID2,varname,code2);
                   if (VarIsU) continue;
                   if ( cdoDebugExt>=20 )
@@ -1354,7 +1371,7 @@ void *TransformUV(int operatorID)
 
                   if ( gridInqUvRelativeToGrid(gridID) != 1 )
                     {
-                      cdoPrint("NOTICE: grid with id:%d has NOT uv relative to grid.", gridID);
+                      cdoWarning("Grid with id:%d has NOT uv relative to grid. No transformation to north-pole takes place!", gridID);
                     }
                   else
                     {

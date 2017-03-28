@@ -414,7 +414,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
 
 #ifdef HIRLAM_EXTENSIONS
     {
-      int  scanningMode =  gridInqScanningMode(gridID);
+      int scanningMode = gridInqScanningMode(gridID);
       fprintf(fp, "scanningMode = %d\n", scanningMode);
     }
 #endif // HIRLAM_EXTENSIONS

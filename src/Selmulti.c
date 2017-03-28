@@ -659,7 +659,6 @@ char *findParamEnd(char *str)
   return ptrEnding;
 }
 
-
 static
 char *findTupleEnd(char *str)
 {
@@ -682,7 +681,7 @@ char *findTupleEnd(char *str)
   return ptrEnding;
 }
 
-
+static
 char *readlineForParsing(FILE *gfp, char *strToParsePtr, char *line)
 {
   if ( gfp != NULL ) // file is open => we parse text from a file

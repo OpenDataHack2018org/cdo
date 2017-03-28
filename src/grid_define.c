@@ -61,13 +61,6 @@ int cdo_define_destagered_grid(int gridID_u_stag, int gridID_v_stag, double *des
 
   int gridID_uv_destag = gridDuplicate(gridID_u_stag);
 
-  // TODO
-  /*
-    grid_uv_destag->scanningMode          = grid_u_stag->scanningMode;
-    grid_uv_destag->iScansNegatively      = grid_u_stag->iScansNegatively;
-    grid_uv_destag->jScansPositively      = grid_u_stag->jScansPositively;
-    grid_uv_destag->jPointsAreConsecutive = grid_u_stag->jPointsAreConsecutive;
-  */
   if ( cdoDebugExt )
     {
       cdo_print_grid(gridID_uv_destag, 1);
@@ -193,13 +186,6 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
   gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
   if ( gridInqUvRelativeToGrid(gridSrcID) ) gridDefUvRelativeToGrid(gridID_sampled, 1);
-  // TODO
-  /*
-    grid_sampled->scanningMode          = grid_src->scanningMode;
-    grid_sampled->iScansNegatively      = grid_src->iScansNegatively;
-    grid_sampled->jScansPositively      = grid_src->jScansPositively;
-    grid_sampled->jPointsAreConsecutive = grid_src->jPointsAreConsecutive;
-  */
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
   
@@ -372,13 +358,6 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
   gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
   if ( gridInqUvRelativeToGrid(gridSrcID) ) gridDefUvRelativeToGrid(gridID_sampled, 1);
-  // TODO
-  /*
-    grid_sampled->scanningMode          = grid_src->scanningMode;
-    grid_sampled->iScansNegatively      = grid_src->iScansNegatively;
-    grid_sampled->jScansPositively      = grid_src->jScansPositively;
-    grid_sampled->jPointsAreConsecutive = grid_src->jPointsAreConsecutive;
-  */
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
   
