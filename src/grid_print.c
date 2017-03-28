@@ -339,6 +339,13 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
         if ( uvRelativeToGrid > 0 )
           fprintf(fp, "uvRelativeToGrid = %d\n", uvRelativeToGrid);
 
+#ifdef HIRLAM_EXTENSIONS
+        {
+          int scanningMode = gridInqScanningMode(gridID);
+          fprintf(fp, "scanningMode = %d\n", scanningMode);
+        }
+#endif // HIRLAM_EXTENSIONS
+
         if ( type == GRID_PROJECTION )
           {
             attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_MAPPING, CDI_MAX_NAME, attstr);
@@ -374,6 +381,13 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
         int uvRelativeToGrid = gridInqUvRelativeToGrid(gridID);
         if ( uvRelativeToGrid > 0 )
           fprintf(fp, "uvRelativeToGrid = %d\n", uvRelativeToGrid);
+
+#ifdef HIRLAM_EXTENSIONS
+        {
+          int scanningMode = gridInqScanningMode(gridID);
+          fprintf(fp, "scanningMode = %d\n", scanningMode);
+        }
+#endif // HIRLAM_EXTENSIONS
 
         break;
       }
@@ -412,14 +426,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
         fprintf(fp, "uuid      = %s\n", uuidStr);
     }
 
-#ifdef HIRLAM_EXTENSIONS
-    {
-      int scanningMode = gridInqScanningMode(gridID);
-      fprintf(fp, "scanningMode = %d\n", scanningMode);
-    }
-#endif // HIRLAM_EXTENSIONS
-
-    if ( gridInqMask(gridID, NULL) )
+  if ( gridInqMask(gridID, NULL) )
     {
       int *mask = (gridsize>0) ? (int*) Malloc((size_t)gridsize*sizeof(int)) : NULL;
       gridInqMask(gridID, mask);
