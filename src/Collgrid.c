@@ -300,9 +300,8 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 void *Collgrid(void *argument)
 {
   int nxblocks = -1;
-  int varID;
+  int varID, levelID;
   int nrecs, nrecs0;
-  int levelID;
   int nmiss;
   double missval;
 
@@ -336,6 +335,7 @@ void *Collgrid(void *argument)
   for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = false;
 
   int nsel = operatorArgc();
+  int noff = 0;
 
   if ( nsel > 0 )
     {
@@ -345,6 +345,7 @@ void *Collgrid(void *argument)
       if ( len == -1 )
         {
           nsel--;
+          noff++;
           nxblocks = parameter2int(operatorArgv()[0]);
         }
     }
@@ -355,7 +356,7 @@ void *Collgrid(void *argument)
     }
   else
     {
-      char **argnames = operatorArgv();
+      char **argnames = operatorArgv() + noff;
 
       if ( cdoVerbose )
 	for ( int i = 0; i < nsel; i++ )
