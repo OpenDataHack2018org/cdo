@@ -1,3 +1,9 @@
+/*
+  original Fortran code from:
+
+  http://www.nco.ncep.noaa.gov/pmb/codes/nwprod/dgex.v3.1.5/sorc/dgex_nps.fd/metgrid/src/module_map_utils.f90
+*/
+
 #include <stdio.h>
 #include <math.h>
 #include "grid.h"
@@ -75,27 +81,19 @@ double lc_cone(double truelat1, double truelat2)
 static
 void set_lc(proj_info_t *proj)
 {
-  // Initialize the remaining items in the proj structure for a
-  // lambert conformal grid.
-
-  double  arg;
-  double  deltalon1;
-  double  tl1r;
-  double  ctl1r;
+  // Initialize the remaining items in the proj structure for a lambert conformal grid.
 
   // Compute cone factor
   proj->cone = lc_cone(proj->truelat1, proj->truelat2);
-  // fprintf(stdout, "Computed cone factor: %g\n", proj->cone);
 
-  // Compute longitude differences and ensure we stay out of the
-  // forbidden "cut zone"
-  deltalon1 = proj->lon1 - proj->stdlon;
+  // Compute longitude differences and ensure we stay out of the forbidden "cut zone"
+  double deltalon1 = proj->lon1 - proj->stdlon;
   if (deltalon1 > +180.) deltalon1 = deltalon1 - 360.;
   if (deltalon1 < -180.) deltalon1 = deltalon1 + 360.;
 
   // Convert truelat1 to radian and compute COS for later use
-  tl1r = proj->truelat1 * rad_per_deg;
-  ctl1r = cos(tl1r);
+  double tl1r = proj->truelat1 * rad_per_deg;
+  double ctl1r = cos(tl1r);
 
   // Compute the radius to our known lower-left (SW) corner
   proj->rsw = proj->rebydx * ctl1r/proj->cone *
@@ -103,10 +101,9 @@ void set_lc(proj_info_t *proj)
 	 tan((90.*proj->hemi-proj->truelat1)*rad_per_deg/2.)), proj->cone);
 
   // Find pole point
-  arg = proj->cone*(deltalon1*rad_per_deg);
+  double arg = proj->cone*(deltalon1*rad_per_deg);
   proj->polei = 1. - proj->hemi * proj->rsw * sin(arg);
   proj->polej = 1. + proj->rsw * cos(arg)  ;
-  // fprintf(stdout, "Computed pole (x,y) = %g %g\n", proj->polei, proj->polej);
 }
 
 
@@ -122,33 +119,7 @@ void map_set(int proj_code, double lat1, double lon1, double dx, double stdlon,
   // to be able to use the coordinate conversion routines, and it
   // will call the appropriate subroutines based on the 
   // proj->code which indicates which projection type  this is.
-    
-  // First, check for validity of mandatory variables in proj
-  /*
-  if ( fabs(lat1) > 90. ) {
-    PRINT '(A)', 'Latitude of origin corner required as follows:'
-      PRINT '(A)', '    -90N <= lat1 < = 90.N'
-      STOP 'MAP_INIT'
-    }
-    if ( fabs(lon1) > 180.) {
-      PRINT '(A)', 'Longitude of origin required as follows:'
-      PRINT '(A)', '   -180E <= lon1 <= 180W'
-      STOP 'MAP_INIT'
-    }
-    if ((dx <= 0.).AND.(proj_code .NE. PROJ_LATLON)) {
-      PRINT '(A)', 'Require grid spacing (dx) in meters be positive//'
-      STOP 'MAP_INIT'
-    }
-    if ((fabs(stdlon) > 180.).AND.(proj_code != PROJ_MERC)) {
-      PRINT '(A)', 'Need orientation longitude (stdlon) as: '
-      PRINT '(A)', '   -180E <= lon1 <= 180W' 
-      STOP 'MAP_INIT'
-    }
-    if (fabs(truelat1)>90.) {
-      PRINT '(A)', 'Set true latitude 1 for all projections//'
-      STOP 'MAP_INIT'
-    }
-  */
+
   map_init(proj);
 
   proj->code     = proj_code;
@@ -162,47 +133,16 @@ void map_set(int proj_code, double lat1, double lon1, double dx, double stdlon,
   if ( proj->code != PROJ_LATLON )
     {
       proj->dx = dx;
-      if (truelat1 < 0.)
-	proj->hemi = -1;
-      else
-	proj->hemi =  1;
-
+      proj->hemi = (truelat1 < 0.) ? -1 : 1;
       proj->rebydx = earth_radius_m / dx;
     }
-  /*
- pick_proj: SELECT CASE(proj->code)
 
-      CASE(PROJ_PS)
-        PRINT '(A)', 'Setting up POLAR STEREOGRAPHIC map...'
-        CALL set_ps(proj)
-
-      CASE(PROJ_LC)
-  */
-  // fprintf(stdout, "Setting up LAMBERT CONFORMAL map...\n");
-  if (fabs(proj->truelat2) > 90.)
+  if ( fabs(proj->truelat2) > 90. )
     {
-      // fprintf(stdout, "Second true latitude not set, assuming a tangent\n");
-      // fprintf(stdout, "projection at truelat1: %g\n", proj->truelat1);
       proj->truelat2 = proj->truelat1;
     }
 
   set_lc(proj);
-  /*
-      CASE (PROJ_MERC)
-        PRINT '(A)', 'Setting up MERCATOR map...'
-        CALL set_merc(proj)
-   
-      CASE (PROJ_LATLON)
-        PRINT '(A)', 'Setting up CYLINDRICAL EQUIDISTANT LATLON map...'
-        // Convert lon1 to 0->360 notation
-        if (proj->lon1 < 0.) proj->lon1 = proj->lon1 + 360.
-   
-      CASE DEFAULT
-        PRINT '(A,I2)', 'Unknown projection code: ', proj->code
-        STOP 'MAP_INIT'
-    
-    END SELECT pick_proj
-  */
 
   proj->init = 1;
 }
@@ -226,35 +166,18 @@ void ijll_lc(double i, double j, proj_info_t proj, double *lat, double *lon)
   // double, INTENT(OUT)             :: lat      // Latitude (-90->90 deg N)
   // double, INTENT(OUT)             :: lon      // Longitude (-180->180 E)
 
-  // Locals 
-  double  inew;
-  double  jnew;
-  double  r;
-  double  chi,chi1,chi2;
-  double  r2;
-  double  xx;
-  double  yy;
-
-  chi1 = (90. - proj.hemi*proj.truelat1)*rad_per_deg;
-  chi2 = (90. - proj.hemi*proj.truelat2)*rad_per_deg;
+  double chi1 = (90. - proj.hemi*proj.truelat1)*rad_per_deg;
+  double chi2 = (90. - proj.hemi*proj.truelat2)*rad_per_deg;
     
   // See if we are in the southern hemispere and flip the indices if we are. 
-  if ( proj.hemi == -1 )
-    { 
-      inew = -i + 2.;
-      jnew = -j + 2.;
-    }
-  else
-    {
-      inew = i;
-      jnew = j;
-    }
+  double  inew = (proj.hemi == -1) ? -i + 2. : i;
+  double  jnew = (proj.hemi == -1) ? -j + 2. : j;
 
   // Compute radius**2 to i/j location
-  xx = inew - proj.polei;
-  yy = proj.polej - jnew;
-  r2 = (xx*xx + yy*yy);
-  r  = sqrt(r2)/proj.rebydx;
+  double xx = inew - proj.polei;
+  double yy = proj.polej - jnew;
+  double r2 = (xx*xx + yy*yy);
+  double r  = sqrt(r2)/proj.rebydx;
    
   // Convert to lat/lon
   if ( IS_EQUAL(r2, 0.) )
@@ -273,6 +196,7 @@ void ijll_lc(double i, double j, proj_info_t proj, double *lat, double *lon)
       //  Maling, D.H., 1973: Coordinate Systems and Map Projections
       // Equations #20 in Appendix I.  
         
+      double chi;
       if ( IS_EQUAL(chi1, chi2) )
 	chi = 2.0*atan( pow( r/tan(chi1), (1./proj.cone) ) * tan(chi1*0.5) );
       else
@@ -285,35 +209,97 @@ void ijll_lc(double i, double j, proj_info_t proj, double *lat, double *lon)
   if ( *lon < -180. ) *lon = *lon + 360.;
 }
 
-/*
+void llij_lc(double lat, double lon, proj_info_t proj, double *ri, double *rj)
+{
+  /*
+   ! Subroutine to compute the geographical latitude and longitude values
+   ! to the cartesian x/y on a Lambert Conformal projection.
+       
+      ! Input Args
+      REAL, INTENT(IN)              :: lat      ! Latitude (-90->90 deg N)
+      REAL, INTENT(IN)              :: lon      ! Longitude (-180->180 E)
+      TYPE(proj_info),INTENT(IN)    :: proj     ! Projection info structure
+  
+      ! Output Args                 
+      REAL, INTENT(OUT)             :: ri       ! Cartesian X coordinate
+      REAL, INTENT(OUT)             :: rj       ! Cartesian Y coordinate
+  */
+
+  // Compute deltalon between known longitude and standard lon and ensure it is not in the cut zone
+  double deltalon = lon - proj.stdlon;
+  if ( deltalon > +180. ) deltalon = deltalon - 360.;
+  if ( deltalon < -180. ) deltalon = deltalon + 360.;
+      
+  // Convert truelat1 to radian and compute COS for later use
+  double tl1r = proj.truelat1 * rad_per_deg;
+  double ctl1r = cos(tl1r);
+     
+  // Radius to desired point
+  double rm = proj.rebydx * ctl1r/proj.cone *
+    pow((tan((90.*proj.hemi-lat)*rad_per_deg/2.) /
+         tan((90.*proj.hemi-proj.truelat1)*rad_per_deg/2.)), proj.cone);
+  
+  double arg = proj.cone*(deltalon*rad_per_deg);
+  double i = proj.polei + proj.hemi * rm * sin(arg);
+  double j = proj.polej - rm * cos(arg);
+  /*
+    Finally, if we are in the southern hemisphere, flip the i/j
+    values to a coordinate system where (1,1) is the SW corner
+    (what we assume) which is different than the original NCEP
+    algorithms which used the NE corner as the origin in the 
+    southern hemisphere (left-hand vs. right-hand coordinate?)
+  */
+  i = proj.hemi * i;
+  j = proj.hemi * j;
+
+  *ri = i;
+  *rj = j;
+}
+
+
+#ifdef TEST_LCC
 int main(void)
 {
-  int    status = 0;
+  /*
   int    nlon = 245;
   int    nlat = 277;
-  double xi, xj;
   double lat_ll_p   =  47.806;
   double lon_ll_p   = -10.063;
   double lat_tan_p  =  59.2;
   double dx_p       =  11000.0;
   double lon_xx_p   = -10.0;
+  */
+  int    nlon = 576;
+  int    nlat = 576;
+  double lat_ll_p   =  17.612;
+  double lon_ll_p   = -18.32;
+  double lat_tan_p  =  48;
+  double dx_p       =  11000.0;
+  double lon_xx_p   =  8.0;
+
+  double xi, xj;
   double zlat, zlon;
   proj_info_t proj;
 
-  map_set(PROJ_LC, lat_ll_p, 360.+lon_ll_p, dx_p, 360.+lon_xx_p, lat_tan_p, lat_tan_p, &proj);
+  if ( lon_ll_p < 0 ) lon_ll_p += 360;
+  if ( lon_xx_p < 0 ) lon_xx_p += 360;
+  map_set(PROJ_LC, lat_ll_p, lon_ll_p, dx_p, lon_xx_p, lat_tan_p, lat_tan_p, &proj);
 
   xi = 1;
   xj = 1;
   ijll_lc(xi, xj, proj, &zlat, &zlon);
-  printf("1 1 47.806 349.937 0\n");
-  printf("%g %g %g %g %d\n", xj, xi, zlat, zlon, status);
+  //printf("1 1 47.806 349.937\n");
+  printf("%g %g %g %g\n", xj, xi, zlat, zlon);
+  llij_lc(zlat, zlon, proj, &xi, &xj);
+  printf("%g %g %g %g\n", xj, xi, zlat, zlon);
 
   xi = nlon;
   xj = nlat;
   ijll_lc(xi, xj, proj, &zlat, &zlon);
-  printf("277 245 63.086 51.4192 0\n");
-  printf("%g %g %g %g %d\n", xj, xi, zlat, zlon, status);
-			  
+  //printf("277 245 63.086 51.4192\n");
+  printf("%g %g %g %g\n", xj, xi, zlat, zlon);
+  llij_lc(zlat, zlon, proj, &xi, &xj);
+  printf("%g %g %g %g\n", xj, xi, zlat, zlon);			  
 
   {
     int i, j;
@@ -323,10 +309,11 @@ int main(void)
 	  xi = i;
 	  xj = j;
 	  ijll_lc(xi, xj, proj, &zlat, &zlon);
-	  if ( zlon < 0 ) zlon+=360;
+	  if ( zlon < 0 ) zlon += 360;
 	}
   }
 			
   return 0;
 }
-*/
+#endif
+
