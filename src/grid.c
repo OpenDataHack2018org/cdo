@@ -646,6 +646,29 @@ void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
 }
 
 static
+bool cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int attlen, double *attflt)
+{
+  bool status = true;
+
+  if ( atttype == CDI_DATATYPE_INT32 )
+    {
+      int attint[attlen];
+      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, attint);
+      for ( int i = 0; i < attlen; ++i ) attflt[i] = (double)attint[i];
+    }
+  else if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
+    {
+      cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, attflt);
+    }
+  else
+    {
+      status = false;
+    }
+
+  return status;
+}
+
+static
 void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, double *x_0, double *y_0)
 {
   *a = 0; *lon_0 = 0; *lat_0 = 0, *x_0 = 0, *y_0 = 0;
@@ -667,13 +690,11 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
           for ( int iatt = 0; iatt < natts; ++iatt )
             {
               cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
-
               if ( attlen != 1 ) continue;
 
-              if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
+              double attflt;
+              if ( cdiInqAttConvertedToFloat(gridID, atttype, attname, attlen, &attflt) )
                 {
-                  double attflt;
-                  cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, &attflt);
                   if      ( strcmp(attname, "earth_radius") == 0 )                    *a     = attflt;
                   else if ( strcmp(attname, "longitude_of_projection_origin") == 0 )  *lon_0 = attflt;
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )   *lat_0 = attflt;
@@ -709,13 +730,11 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
           for ( int iatt = 0; iatt < natts; ++iatt )
             {
               cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
-
               if ( attlen > 2 ) continue;
 
-              if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
+              double attflt[2];
+              if ( cdiInqAttConvertedToFloat(gridID, atttype, attname, attlen, attflt) )
                 {
-                  double attflt[2];
-                  cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, attflt);
                   if      ( strcmp(attname, "earth_radius") == 0 )                   *a     = attflt[0];
                   else if ( strcmp(attname, "longitude_of_central_meridian") == 0 )  *lon_0 = attflt[0];
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )  *lat_0 = attflt[0];
