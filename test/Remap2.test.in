@@ -14,9 +14,7 @@ GRID=$DATAPATH/spain.grid
 IFILE=$DATAPATH/tsurf_spain.grb
 NTEST=1
 #
-# remaplaf: sort could give different results"
-RMODS="bil bic con ycon laf"
-if [ "$USER" = "m214003" ]; then RMODS="dis nn $RMODS"; fi
+RMODS="dis nn bil bic con ycon laf"
 for RMOD in $RMODS; do
   ABSLIM=$ABSLIMMAX
   if [ $RMOD = dis ];  then ABSLIM=$ABSLIMDIS; fi
