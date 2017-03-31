@@ -259,6 +259,51 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
     }
 }
 
+static void remove_space_and_comms(char **pline, char *line)
+{
+  while ( isspace((int) *(*pline)) ) *pline++;
+  char *tester = *pline;
+  int i = 0;
+  while ( *tester != 0 )
+    {
+      if ( *tester == '#' || *tester == '!' )
+        {
+          line[i] = '\0';
+          break;
+        }
+      i++; tester++;
+    }
+}
+
+static void add_lines(char *line, char **buffer, size_t *buffersize)
+{
+  char *tester = line;
+  while ( *tester != 0 ) tester++;
+  tester--;
+  while ( isspace((int) *tester) ) tester--;
+  if ( *tester == ',' )
+    {
+      int len = strlen(line);
+      char nextline[4096];
+      if ( (*buffer = readLineFromBuffer(*buffer, buffersize, nextline, sizeof(nextline))) )
+        {
+          char *nexttester = nextline;
+          remove_space_and_comms(&nexttester, nextline);
+          if ( *nexttester != '\0' && *nexttester != '&' )
+            {
+              if ( strlen(nexttester) + len > 4096 )
+                cdoAbort("Line too long!");
+              strcat(line, nextline);
+              add_lines(line, buffer, buffersize);          
+            }
+          else
+            cdoAbort("Found ',' at end of line.");
+        }
+      else
+        cdoAbort("Found ',' at end of line.");
+    }      
+}
+
 void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int checkpml, int lowprior)
 {
   char line[4096];
