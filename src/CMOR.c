@@ -317,8 +317,9 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
     {
       linenumber++;
       pline = line;
-      while ( isspace((int) *pline) ) pline++;
-      if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
+      remove_space_and_comms(&pline, line);
+      if ( *pline == '\0' ) continue;
+      add_lines(line, &buffer, &buffersize);
       //  len = (int) strlen(pline);
       if ( listtype == 0 && *pline == '&' ) listtype = 1;
 /* MAXNVALUES*/
@@ -1513,33 +1514,25 @@ static void get_zcell_bounds(int zaxisID, double *zcell_bounds, double *levels, 
   Free(ubounds);
 }
 
-static void get_zhybrid(int zaxisID, char *varname, double *p0, double *alev_val, double *alev_bnds, double *b_val, double *b_bnds, double *ap_val, double *ap_bnds)
+static void get_zhybrid(int zaxisID, double *p0, double *alev_val, double *alev_bnds, double *b_val, double *b_bnds, double *ap_val, double *ap_bnds)
 {
   int zsize = zaxisInqSize(zaxisID);
-
   int vctsize = zaxisInqVctSize(zaxisID);
   double *vct = Malloc(vctsize * sizeof(double) );
   zaxisInqVct(zaxisID, vct);
-  if ( strcmp(varname, "ps") != 0 )
+  for ( int i = 0; i<(zsize+1); i++)
     {
-      for ( int i = 0; i<(zsize+1); i++)
-        {
-          ap_bnds[i] = vct[i];
-          b_bnds[i] = vct[zsize+1+i];
-        }
-      for ( int i = 0; i<zsize; i++)
-        {
-          ap_val[i] = (ap_bnds[i]+ ap_bnds[i+1]) / 2.0;
-          b_val[i] = (b_bnds[i]+ b_bnds[i+1]) / 2.0;
-          alev_val[i] = ap_val[i]/p0[0] + b_val[i];
-          alev_bnds[i] = ap_bnds[i]/p0[0] + b_bnds[i];
-        }
-      alev_bnds[zsize] = ap_bnds[zsize]/p0[0] + b_bnds[zsize];
+      ap_bnds[i] = vct[i];
+      b_bnds[i] = vct[zsize+1+i];
     }
-  else
+  for ( int i = 0; i<zsize; i++)
     {
-      cdoAbort("Surface Pressure in hybrid z coordinate not yet enabled!");
+      ap_val[i] = (ap_bnds[i]+ ap_bnds[i+1]) / 2.0;
+      b_val[i] = (b_bnds[i]+ b_bnds[i+1]) / 2.0;
+      alev_val[i] = ap_val[i]/p0[0] + b_val[i];
+      alev_bnds[i] = ap_bnds[i]/p0[0] + b_bnds[i];
     }
+  alev_bnds[zsize] = ap_bnds[zsize]/p0[0] + b_bnds[zsize];
   Free(vct);
 }
 
@@ -1653,7 +1646,34 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           double *b_bnds = Malloc((zsize + 1) * sizeof(double));
           double *p0 = Malloc(sizeof(double));
           p0[0] = 101325.0;
-          get_zhybrid(zaxisID, varname, p0, alev_val, alev_bnds, b_val, b_bnds, ap_val, ap_bnds);
+
+          char *mtproof = kv_get_a_val(kvl, "mtproof", NULL);
+          if ( mtproof )
+            {
+              if ( cdoVerbose )
+                printf("Try to apply mapping table: '%s' for ps.\n", mtproof);
+              list_t *pml = cdo_parse_cmor_file(mtproof);
+              if ( pml == NULL )
+                cdoWarning("Mapping table: '%s' could not be parsed. Infile variable name needs to be 'ps'.", mtproof);
+              else
+                {
+                  char *tempo[] = {"ps"};
+                  maptab_via_cn(pml, tempo, vlistID, vlistNvars(vlistID), 1, kv_get_a_val(kvl, "miptab_freq", NULL)); 
+                  if ( cdoVerbose )
+                    printf("*******Succesfully applied mapping table: '%s' for ps.*******\n", mtproof);
+                  list_destroy(pml);
+                }
+            }
+          else
+            {
+              if ( cdoVerbose )
+                printf("Ps needs to be one infile variable name.");
+            }
+          int psID = getVarIDToMap(vlistID, vlistNvars(vlistID), "name", "ps");
+          if ( psID == CDI_UNDEFID )
+            cdoAbort("Could not find a surface pressure variable in infile. Cannot register a hybrid zaxis without surface pressure.");
+
+          get_zhybrid(zaxisID, p0, alev_val, alev_bnds, b_val, b_bnds, ap_val, ap_bnds);
 /*cmor_zfactor (int *zfactor_id,int zaxis_id, char *zfactor_name, char *units, int ndims, int axis_ids[], char type, void *zfactor_values, void *zfactor_bounds)*/
           cmor_axis(new_axis_id(axis_ids),
                         "alternate_hybrid_sigma",
@@ -2559,7 +2579,7 @@ static void register_all_dimensions(list_t *kvl, int streamID,
           if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
             {
               if ( cdoVerbose )
-                printf("Since the zaxis of variable '%s' is of type HYBRID, surface pressure is required from Ifile.\n It is required to have code nr. 134!\n", name);
+                printf("Since the zaxis of variable '%s' is of type HYBRID, surface pressure is required. An infile variable must have the name ps.\n", name);
               ps_required++;
             }
           foundName++;
@@ -3273,7 +3293,7 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                     cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
-                       NULL,
+                       chunk_files[i],
                        1,
                        &time_val,
                        time_bndsp,
@@ -3347,6 +3367,51 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
             }
           if ( kvn && kvn->nvalues > 1 )
             return kvlist;
+          if ( kvn && strstr(kvn->values[0], ",") && kvn->nvalues == 1 )
+            {
+              char *workchar = strdup(kvn->values[0]);
+              Free(kvn->values[0]); Free(kvn->values);
+              char *thepoint = workchar;
+              int i = 0, j = 0;
+              while ( *thepoint != '\0' )
+                {
+                  thepoint++;
+                  if ( *thepoint == ',' )
+                    j++;
+                }
+              j++;
+              kvn->nvalues = j;
+              kvn->values = (char **) malloc(kvn->nvalues*sizeof(char*)); 
+
+              j = 0; thepoint = workchar;             
+              while ( *thepoint != '\0' )
+                {
+                  if ( *thepoint == ',')
+                    {
+                      kvn->values[j] = Malloc( (i+1) * sizeof(char) );
+                      strncpy(kvn->values[j], workchar, i);
+                      kvn->values[j][i] = '\0';
+                      j++; thepoint++; workchar+=i+1; i = 0;
+                    }
+                  else
+                    {
+                      thepoint++; i++;
+                    }
+                }
+              if ( i > 0 )
+                {
+                  kvn->values[j] = Malloc( (i+1) * sizeof(char) );
+                  strncpy(kvn->values[j], workchar, i);
+                  kvn->values[j][i] = '\0';
+                  workchar+=i; i = 0; j++; 
+                }
+              else
+                {
+                  cdoWarning("Names in String for key '%s' could not be interpreted correctly due to a comma at end of line.");
+                  return NULL;
+                }
+              return kvlist;
+            }
         }
       node = node->next;
     } 
@@ -3455,6 +3520,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
               cdoWarning("Could not map variable with id '%d'.", varID);
             }
         }
+      kv_insert_a_val(kvl, "mtproof", maptab, 1);
       list_destroy(pml);
       if ( maptabbuild ) Free(maptabbuild);
     }
@@ -3465,7 +3531,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
 static char *check_short_key(char *key)
 {
   char *short_keys[]={"cn", "n", "c", "u", "cm", "vc", "p", "szc", "i", "ca", "gi", "rtu", "mt", "om", "ms", "dr", "d", "lc", NULL};
-  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "output_mode", "max_size", "drs_root", "drs", "last_chunks", NULL};
+  char *long_keys[]={"cmor_name", "name", "code", "units", "cell_methods", "variable_comment", "positive", "scalar_z_coordinate", "info", "character_axis", "grid_info", "required_time_units", "mapping_table", "output_mode", "max_size", "drs_root", "drs", "last_chunk", NULL};
 
   for ( int i = 0; short_keys[i]; i++ )
     if ( strcmp(key, short_keys[i]) == 0 || strcmp(key, long_keys[i]) == 0 )
@@ -3488,7 +3554,7 @@ static char *check_short_key(char *key)
   else if ( strcmp(key, "max_size") == 0 ) short_key = strdup("ms");
   else if ( strcmp(key, "drs_root") == 0 ) short_key = strdup("dr");
   else if ( strcmp(key, "no_drs") == 0 ) short_key = strdup("d");
-  else if ( strcmp(key, "last_chunks") == 0 ) short_key = strdup("lc"); */
+  else if ( strcmp(key, "last_chunk") == 0 ) short_key = strdup("lc"); */
   cdoWarning("Unknown commandline keyword: '%s'\n", key);
   return NULL;
 }
@@ -3678,6 +3744,9 @@ void *CMOR(void *argument)
     project_id = strdup(dummy);
   char *mip_table = get_mip_table(params[0], kvl, project_id);
   save_miptab_freq(kvl, mip_table, &miptab_freq);
+  char *miptab_freqptr = strdup(freq_from_path(mip_table));
+  kv_insert_a_val(kvl, "miptab_freq", miptab_freqptr, 1);
+
   if ( cdoVerbose )
     printf("*******Successfully checked MIP table, MIP table frequency and project_id.*******\n");
 
@@ -3701,7 +3770,7 @@ void *CMOR(void *argument)
  /* read mapping table */
   if ( cdoVerbose )
     printf("*******Start to read mapping table.*******\n");
-  read_maptab(kvl, streamID, params[0], vars);
+  read_maptab(kvl, streamID, miptab_freqptr, vars);
 
   if ( cdoVerbose )
     printf("*******Start to use cmor_setup.*******\n");
@@ -3714,7 +3783,6 @@ void *CMOR(void *argument)
   cmor_set_table(table_id);
 
   register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq, &time_axis);
-  char *miptab_freqptr = strdup(freq_from_path(mip_table));
   write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
 
   destruct_var_mapping(vars);
