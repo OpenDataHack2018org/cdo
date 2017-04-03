@@ -484,7 +484,7 @@ void *Collgrid(void *argument)
       
   streamDefVlist(streamID2, vlistID2);
 	  
-  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
+  double *array2 = (gridsize2 > 0) ? (double*) Malloc(gridsize2*sizeof(double)) : NULL;
 
   int tsID = 0;
   do
