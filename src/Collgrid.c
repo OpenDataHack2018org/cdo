@@ -83,7 +83,7 @@ int cmpxy_gt(const void *s1, const void *s2)
 }
 
 static
-int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks)
+int genGrid(int nfiles, ens_file_t *ef, bool ginit, int igrid, int nxblocks)
 {
   bool lsouthnorth = true;
   bool lregular = false;
@@ -238,7 +238,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
       yoff[j+1] = yoff[j] + ysize[idx];
     }
 
-  if ( gridindex != NULL )
+  if ( ginit == false )
     {
       for ( int fileID = 0; fileID < nfiles; fileID++ )
 	{
@@ -260,7 +260,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
                     xvals2[offset+j*xsize2+i] = xvals[idx][ij];
                     yvals2[offset+j*xsize2+i] = yvals[idx][ij];
                   }
-		gridindex[idx][ij++] = offset+j*xsize2+i;
+                ef[idx].gridindex[ij++] = offset+j*xsize2+i;
 	      }
 	}
     }
@@ -399,14 +399,12 @@ void *Collgrid(void *argument)
 	}
     }
 
-  int gridsizemax = 0;
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
       int gridsize = vlistGridsizeMax(ef[fileID].vlistID);
       ef[fileID].gridsize = gridsize;
       ef[fileID].gridindex = (int*) Malloc(gridsize*sizeof(int));
       ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
-      if ( gridsize > gridsizemax ) gridsizemax = gridsize;
     }
 
   int vlistID2 = vlistCreate();
@@ -427,9 +425,6 @@ void *Collgrid(void *argument)
   int ngrids2 = vlistNgrids(vlistID2);
 
   int *gridIDs = (int*) Malloc(ngrids2*sizeof(int));
-  int **gridindex = (int **) Malloc(nfiles*sizeof(int *));
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
-    gridindex[fileID] = (int*) Malloc(gridsizemax*sizeof(int));
 
   bool ginit = false;
   for ( int i2 = 0; i2 < ngrids2; ++i2 )
@@ -442,11 +437,11 @@ void *Collgrid(void *argument)
 
       if ( !ginit )
 	{
-	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1, nxblocks);
+	  gridIDs[i2] = genGrid(nfiles, ef, ginit, i1, nxblocks);
 	  if ( gridIDs[i2] != -1 ) ginit = true;
 	}
       else
-	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1, nxblocks);
+	gridIDs[i2] = genGrid(nfiles, ef, ginit, i1, nxblocks);
     }
 
 
@@ -529,10 +524,9 @@ void *Collgrid(void *argument)
 
 		  if ( vars[varID2] )
 		    {
-                      //int gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
                       int gridsize = ef[fileID].gridsize;
 		      for ( int i = 0; i < gridsize; ++i )
-			array2[gridindex[fileID][i]] = ef[fileID].array[i];
+			array2[ef[fileID].gridindex[i]] = ef[fileID].array[i];
 		    }
 		}
 
@@ -561,7 +555,10 @@ void *Collgrid(void *argument)
   streamClose(streamID2);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
-    if ( ef[fileID].array ) Free(ef[fileID].array);
+    {
+      if ( ef[fileID].gridindex ) Free(ef[fileID].gridindex);
+      if ( ef[fileID].array ) Free(ef[fileID].array);
+    }
 
   if ( ef ) Free(ef);
   if ( array2 ) Free(array2);
