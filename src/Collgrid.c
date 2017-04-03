@@ -30,6 +30,8 @@ typedef struct
   int vlistID;
   int gridID;
   int nmiss;
+  int gridsize;
+  int *gridindex;
   double *array;
 } ens_file_t;
 
@@ -397,17 +399,15 @@ void *Collgrid(void *argument)
 	}
     }
 
-  int gridsize;
   int gridsizemax = 0;
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      gridsize = vlistGridsizeMax(ef[fileID].vlistID);
+      int gridsize = vlistGridsizeMax(ef[fileID].vlistID);
+      ef[fileID].gridsize = gridsize;
+      ef[fileID].gridindex = (int*) Malloc(gridsize*sizeof(int));
+      ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
       if ( gridsize > gridsizemax ) gridsizemax = gridsize;
     }
-
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = (double*) Malloc(gridsizemax*sizeof(double));
-
 
   int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
@@ -427,7 +427,6 @@ void *Collgrid(void *argument)
   int ngrids2 = vlistNgrids(vlistID2);
 
   int *gridIDs = (int*) Malloc(ngrids2*sizeof(int));
-  int *sizeofgrid = (int *) Malloc(nfiles*sizeof(int));
   int **gridindex = (int **) Malloc(nfiles*sizeof(int *));
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int*) Malloc(gridsizemax*sizeof(int));
@@ -530,7 +529,8 @@ void *Collgrid(void *argument)
 
 		  if ( vars[varID2] )
 		    {
-		      gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
+                      //int gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
+                      int gridsize = ef[fileID].gridsize;
 		      for ( int i = 0; i < gridsize; ++i )
 			array2[gridindex[fileID][i]] = ef[fileID].array[i];
 		    }
@@ -567,7 +567,6 @@ void *Collgrid(void *argument)
   if ( array2 ) Free(array2);
 
   Free(gridIDs);
-  Free(sizeofgrid);
   if ( vars   ) Free(vars);
   if ( vars1  ) Free(vars1);
 
