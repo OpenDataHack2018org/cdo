@@ -500,10 +500,10 @@ void *Collgrid(void *argument)
 	  streamInqRecord(ef[0].streamID, &varID, &levelID);
 	  if ( cdoVerbose && tsID == 0 ) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
 
-	  for ( int fileID = 0; fileID < nfiles; fileID++ )
+	  for ( int fileID = 1; fileID < nfiles; fileID++ )
 	    {
 	      int varIDx, levelIDx;
-	      if ( fileID > 0 ) streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
+	      streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
 	    }
 
 	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
