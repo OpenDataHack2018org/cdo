@@ -29,7 +29,7 @@ typedef struct
   int streamID;
   int vlistID;
   int gridID;
-  int nmiss
+  int nmiss;
   double *array;
 } ens_file_t;
 
