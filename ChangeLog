@@ -1,7 +1,11 @@
-2017-03-14  Uwe Schulzweida
+2017-04-14  Uwe Schulzweida
 
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
+
+2017-04-03  Uwe Schulzweida
+
+	* Arith: set varID2 to varID (bug fix for variables with different grid size)
 
 2017-03-29  Uwe Schulzweida
 
