@@ -29,6 +29,7 @@ typedef struct
   int streamID;
   int vlistID;
   int gridID;
+  int nmiss
   double *array;
 } ens_file_t;
 
@@ -301,9 +302,7 @@ void *Collgrid(void *argument)
 {
   int nxblocks = -1;
   int varID, levelID;
-  int nrecs, nrecs0;
-  int nmiss;
-  double missval;
+  int nrecs0;
 
   cdoInitialize(argument);
     
@@ -428,6 +427,7 @@ void *Collgrid(void *argument)
   int ngrids2 = vlistNgrids(vlistID2);
 
   int *gridIDs = (int*) Malloc(ngrids2*sizeof(int));
+  int *sizeofgrid = (int *) Malloc(nfiles*sizeof(int));
   int **gridindex = (int **) Malloc(nfiles*sizeof(int *));
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int*) Malloc(gridsizemax*sizeof(int));
@@ -492,7 +492,7 @@ void *Collgrid(void *argument)
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
-	  nrecs = streamInqTimestep(ef[fileID].streamID, tsID);
+	  int nrecs = streamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
 	}
@@ -518,15 +518,15 @@ void *Collgrid(void *argument)
 	      int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 	      if ( cdoVerbose && tsID == 0 ) printf("varID %d %d levelID %d %d\n", varID, varID2, levelID, levelID2);
 
-	      missval = vlistInqVarMissval(vlistID2, varID2);
+	      double missval = vlistInqVarMissval(vlistID2, varID2);
 	      for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(nmiss)
+#pragma omp parallel for default(shared)
 #endif
 	      for ( int fileID = 0; fileID < nfiles; fileID++ )
 		{
-		  streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
+		  streamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
 
 		  if ( vars[varID2] )
 		    {
@@ -540,14 +540,14 @@ void *Collgrid(void *argument)
 
 	      if ( vars[varID2] )
 		{
-		  nmiss = 0;
+		  int nmiss = 0;
 		  for ( int i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
 		  streamWriteRecord(streamID2, array2, nmiss);
 		}
 	      else
-		streamWriteRecord(streamID2, ef[0].array, 0);
+		streamWriteRecord(streamID2, ef[0].array, ef[0].nmiss);
 	    }
 	}
 
@@ -567,6 +567,7 @@ void *Collgrid(void *argument)
   if ( array2 ) Free(array2);
 
   Free(gridIDs);
+  Free(sizeofgrid);
   if ( vars   ) Free(vars);
   if ( vars1  ) Free(vars1);
 
