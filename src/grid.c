@@ -33,6 +33,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 
+#define  PARAM_MISSVAL  -9.E33
 
 int nfc_to_nlat(int nfc, int ntr)
 {
@@ -698,8 +699,8 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
                   if      ( strcmp(attname, "earth_radius") == 0 )                    *a     = attflt;
                   else if ( strcmp(attname, "longitude_of_projection_origin") == 0 )  *lon_0 = attflt;
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )   *lat_0 = attflt;
-                  else if ( strcmp(attname, "false_easting")  == 0 )  *x_0 = attflt;
-                  else if ( strcmp(attname, "false_northing") == 0 )  *y_0 = attflt;
+                  else if ( strcmp(attname, "false_easting")  == 0 )                  *x_0   = attflt;
+                  else if ( strcmp(attname, "false_northing") == 0 )                  *y_0   = attflt;
                 }
             }
         }
@@ -708,10 +709,15 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
     }
 }
 
+#if defined(HAVE_LIBPROJ)
 static
-void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, double *lat_1, double *lat_2, double *x_0, double *y_0)
+bool grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, double *lat_1, double *lat_2, double *x_0, double *y_0)
 {
-  *a = 0; *lon_0 = 0; *lat_0 = 0; *lat_1 = 0, *lat_2 = 0, *x_0 = 0, *y_0 = 0;
+  bool status = false;
+  double xlon_0 = PARAM_MISSVAL, ylat_0 = PARAM_MISSVAL;
+  *a = PARAM_MISSVAL; *lon_0 = PARAM_MISSVAL; *lat_0 = PARAM_MISSVAL;
+  *lat_1 = PARAM_MISSVAL, *lat_2 = PARAM_MISSVAL;
+  *x_0 = PARAM_MISSVAL, *y_0 = PARAM_MISSVAL;
 
   int gridtype = gridInqType(gridID);
   if ( gridtype == GRID_PROJECTION )
@@ -735,11 +741,13 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
               double attflt[2];
               if ( cdiInqAttConvertedToFloat(gridID, atttype, attname, attlen, attflt) )
                 {
-                  if      ( strcmp(attname, "earth_radius") == 0 )                   *a     = attflt[0];
-                  else if ( strcmp(attname, "longitude_of_central_meridian") == 0 )  *lon_0 = attflt[0];
-                  else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )  *lat_0 = attflt[0];
-                  else if ( strcmp(attname, "false_easting")  == 0 )  *x_0 = attflt[0];
-                  else if ( strcmp(attname, "false_northing") == 0 )  *y_0 = attflt[0];
+                  if      ( strcmp(attname, "earth_radius") == 0 )                       *a     = attflt[0];
+                  else if ( strcmp(attname, "longitude_of_central_meridian") == 0 )      *lon_0 = attflt[0];
+                  else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )      *lat_0 = attflt[0];
+                  else if ( strcmp(attname, "false_easting")  == 0 )                     *x_0   = attflt[0];
+                  else if ( strcmp(attname, "false_northing") == 0 )                     *y_0   = attflt[0];
+                  else if ( strcmp(attname, "latitudeOfFirstGridPointInDegrees")  == 0 ) xlon_0 = attflt[0];
+                  else if ( strcmp(attname, "longitudeOfFirstGridPointInDegrees") == 0 ) ylat_0 = attflt[0];
                   else if ( strcmp(attname, "standard_parallel") == 0 )
                     {
                       *lat_1 = attflt[0];
@@ -747,11 +755,21 @@ void grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
                     }
                 }
             }
+
+          status = true;
+          if ( IS_EQUAL(*lon_0,PARAM_MISSVAL) ) { status = false; cdoWarning("%s mapping parameter %s missing!", projection, "longitude_of_central_meridian"); }
+          if ( IS_EQUAL(*lat_0,PARAM_MISSVAL) ) { status = false; cdoWarning("%s mapping parameter %s missing!", projection, "latitude_of_central_meridian"); }
+          if ( IS_EQUAL(*lat_1,PARAM_MISSVAL) ) { status = false; cdoWarning("%s mapping parameter %s missing!", projection, "standard_parallel"); }
+          if ( status && IS_EQUAL(*x_0,PARAM_MISSVAL) && IS_EQUAL(*y_0,PARAM_MISSVAL) && IS_NOT_EQUAL(xlon_0,PARAM_MISSVAL) && IS_NOT_EQUAL(ylat_0,PARAM_MISSVAL) )
+             { status = false; cdoWarning("%s mapping parameter %s missing!", projection, "false_easting and false_northing"); }
         }
       else
         cdoWarning("%s mapping parameter missing!", projection);
     }
+
+  return status;
 }
+#endif
 
 static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
@@ -807,17 +825,18 @@ void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   projUV data, res;
 
   double a, lon_0, lat_0, lat_1, lat_2, x_0, y_0;
-  grid_inq_param_lcc(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2, &x_0, &y_0);
+  bool status = grid_inq_param_lcc(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2, &x_0, &y_0);
+  if ( status == false ) cdoAbort("mapping parameter missing!");
 
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
-  if ( a > 0 ) params[nbpar++] = gen_param("a=%g", a);
+  if ( IS_NOT_EQUAL(a,PARAM_MISSVAL) && a > 0 ) params[nbpar++] = gen_param("a=%g", a);
   params[nbpar++] = gen_param("lon_0=%g", lon_0);
   params[nbpar++] = gen_param("lat_0=%g", lat_0);
   params[nbpar++] = gen_param("lat_1=%g", lat_1);
   params[nbpar++] = gen_param("lat_2=%g", lat_2);
-  if ( IS_NOT_EQUAL(x_0,0) ) params[nbpar++] = gen_param("x_0=%g", x_0);
-  if ( IS_NOT_EQUAL(y_0,0) ) params[nbpar++] = gen_param("y_0=%g", y_0);
+  if ( IS_NOT_EQUAL(x_0,PARAM_MISSVAL) ) params[nbpar++] = gen_param("x_0=%g", x_0);
+  if ( IS_NOT_EQUAL(y_0,PARAM_MISSVAL) ) params[nbpar++] = gen_param("y_0=%g", y_0);
 
   if ( cdoVerbose )
     for ( int i = 0; i < nbpar; ++i )
