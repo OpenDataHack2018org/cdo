@@ -547,6 +547,9 @@ char *gen_param(const char *fmt, ...)
   return rstr;
 }
 
+
+int lonlat_to_lcc(int gridID, int nvals, double *xvals, double *yvals);
+
 static
 void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
@@ -566,6 +569,11 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   if ( IS_NOT_EQUAL(lat1, lat2) )
     cdoWarning("Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
 	    lat1, lat2);
+  */
+  /*
+  double x_0 = originLon, y_0 = originLat;
+  lonlat_to_lcc(gridID, 1, &x_0, &y_0);
+  printf("x_0 = %g  y_0 = %g\n", x_0, y_0);
   */
   map_set(PROJ_LC, originLat, originLon, xincm, lonParY, lat1, lat2, &proj);
 
@@ -770,6 +778,59 @@ bool grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
   return status;
 }
 #endif
+
+
+int lonlat_to_lcc(int gridID, int nvals, double *xvals, double *yvals)
+{
+  double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
+  int projflag, scanflag;
+
+  gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm, &projflag, &scanflag);
+#if defined(HAVE_LIBPROJ)
+  char *params[20];
+  projUV data, res;
+
+  double a = PARAM_MISSVAL, lon_0 = lonParY, lat_0 = lat1, lat_1 = lat1, lat_2 = lat2;
+  a = 6367470;
+  // bool status = grid_inq_param_lcc(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2, &x_0, &y_0);
+  // if ( status == false ) cdoAbort("mapping parameter missing!");
+
+  int nbpar = 0;
+  params[nbpar++] = gen_param("proj=lcc");
+  if ( IS_NOT_EQUAL(a,PARAM_MISSVAL) && a > 0 ) params[nbpar++] = gen_param("a=%g", a);
+  params[nbpar++] = gen_param("lon_0=%g", lon_0);
+  params[nbpar++] = gen_param("lat_0=%g", lat_0);
+  params[nbpar++] = gen_param("lat_1=%g", lat_1);
+  params[nbpar++] = gen_param("lat_2=%g", lat_2);
+  params[nbpar++] = gen_param("units=m");
+  //  params[nbpar++] = gen_param("no_defs");
+
+  if ( cdoVerbose )
+    for ( int i = 0; i < nbpar; ++i )
+      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+  
+  projPJ proj = pj_init(nbpar, &params[0]);
+  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
+
+  /* proj->over = 1; */		/* allow longitude > 180 */
+  
+  for ( int i = 0; i < nvals; i++ )
+    {
+      data.u = xvals[i]*DEG2RAD;
+      data.v = yvals[i]*DEG2RAD;
+      res = pj_fwd(data, proj);
+      xvals[i] = res.u;
+      yvals[i] = res.v;
+    }
+
+  pj_free(proj);
+#else
+  cdoAbort("proj4 support not compiled in!");
+#endif
+  return 0;
+}
 
 static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
