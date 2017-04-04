@@ -120,18 +120,18 @@ void *Ensstat(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  int gridsizemax = vlistGridsizeMax(vlistID1);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
+    ef[fileID].array = (double*) Malloc(gridsizemax*sizeof(double));
 
-  double *array2 = (double *) Malloc(gridsize*sizeof(double));
+  double *array2 = (double *) Malloc(gridsizemax*sizeof(double));
 
   int nvars = vlistNvars(vlistID2);
   double *count2 = NULL;
   if ( count_data )
     {
-      count2 = (double *) Malloc(gridsize*sizeof(double));
+      count2 = (double *) Malloc(gridsizemax*sizeof(double));
       for ( int varID = 0; varID < nvars; ++varID )
 	{
 	  char name[CDI_MAX_NAME];
@@ -198,14 +198,13 @@ void *Ensstat(void *argument)
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
               int nmiss;
-	      int streamID = ef[fileID].streamID;
-	      streamInqRecord(streamID, &varID, &levelID);
-	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
+	      streamInqRecord(ef[fileID].streamID, &varID, &levelID);
+	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
               ef[fileID].missval = vlistInqVarMissval(ef[fileID].vlistID, varID);
 	    }
 
 	  int gridID = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
+	  int gridsize = gridInqSize(gridID);
 	  double missval = vlistInqVarMissval(vlistID1, varID);
 
 	  int nmiss = 0;
