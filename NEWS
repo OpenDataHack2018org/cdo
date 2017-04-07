@@ -1,17 +1,18 @@
 CDO NEWS
 --------
 
-Version 1.8.1 (24 March 2017):
+Version 1.8.1 (6 April 2017):
 
    New features:
      * selindexbox: added support for LCC grid
    New operators:
      * selgridcell - Select grid cells
      * delgridcell - Delete grid cells
-     * selmulti - Select multiple fields (KMNI extension)
-     * delmulti - Delete multiple fields (KMNI extension)
-     * changemulti - Change identication of multiple fields (KMNI extension)
-     * samplegrid - Resample grid (KMNI extension)
+   New operators (KMNI contribution):
+     * selmulti - Select multiple fields
+     * delmulti - Delete multiple fields
+     * changemulti - Change identication of multiple fields
+     * samplegrid - Resample grid
      * uvDestag - Destaggering of wind components
      * rotuvNorth - Rotate u/v wind to North pole
      * projuvLatLon - Cylindrical Equidistant projection

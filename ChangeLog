@@ -1,7 +1,11 @@
-2017-04-14  Uwe Schulzweida
+2017-04-06  Uwe Schulzweida
 
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
+
+2017-04-07  Uwe Schulzweida
+
+	* setpartab: added support for values in single quotes [Bug #7662]
 
 2017-04-03  Uwe Schulzweida
 
