@@ -549,6 +549,7 @@ char *gen_param(const char *fmt, ...)
 
 
 int lonlat_to_lcc(int gridID, int nvals, double *xvals, double *yvals);
+int lcc_to_lonlat(int gridID, int nvals, double *xvals, double *yvals);
 
 static
 void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
@@ -572,8 +573,11 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   */
   /*
   double x_0 = originLon, y_0 = originLat;
+  printf("in x_0 = %g  y_0 = %g\n", x_0, y_0);
+  printf("in x_0 = %20.10f  y_0 = %20.10f\n", x_0, y_0);
   lonlat_to_lcc(gridID, 1, &x_0, &y_0);
-  printf("x_0 = %g  y_0 = %g\n", x_0, y_0);
+  printf("out x_0 = %g  y_0 = %g\n", x_0, y_0);
+  printf("out x_0 = %20.10f  y_0 = %20.10f\n", x_0, y_0);
   */
   map_set(PROJ_LC, originLat, originLon, xincm, lonParY, lat1, lat2, &proj);
 
@@ -582,7 +586,6 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
     {
       double xi = xvals[i];
       double xj = yvals[i];
-      // status = W3FB12(xi, xj, originLat, originLon, xincm, lonParY, lat1, &zlat, &zlon);
       ijll_lc(xi, xj, proj, &zlat, &zlon);
       xvals[i] = zlon;
       yvals[i] = zlat;
@@ -719,11 +722,11 @@ void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, do
 
 #if defined(HAVE_LIBPROJ)
 static
-bool grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, double *lat_1, double *lat_2, double *x_0, double *y_0)
+bool grid_inq_param_lcc(int gridID, double *a, double *rf, double *lon_0, double *lat_0, double *lat_1, double *lat_2, double *x_0, double *y_0)
 {
   bool status = false;
   double xlon_0 = PARAM_MISSVAL, ylat_0 = PARAM_MISSVAL;
-  *a = PARAM_MISSVAL; *lon_0 = PARAM_MISSVAL; *lat_0 = PARAM_MISSVAL;
+  *a = PARAM_MISSVAL; *rf = PARAM_MISSVAL; *lon_0 = PARAM_MISSVAL; *lat_0 = PARAM_MISSVAL;
   *lat_1 = PARAM_MISSVAL, *lat_2 = PARAM_MISSVAL;
   *x_0 = PARAM_MISSVAL, *y_0 = PARAM_MISSVAL;
 
@@ -750,6 +753,7 @@ bool grid_inq_param_lcc(int gridID, double *a, double *lon_0, double *lat_0, dou
               if ( cdiInqAttConvertedToFloat(gridID, atttype, attname, attlen, attflt) )
                 {
                   if      ( strcmp(attname, "earth_radius") == 0 )                       *a     = attflt[0];
+                  else if ( strcmp(attname, "inverse_flattening") == 0 )                 *rf    = attflt[0];
                   else if ( strcmp(attname, "longitude_of_central_meridian") == 0 )      *lon_0 = attflt[0];
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )      *lat_0 = attflt[0];
                   else if ( strcmp(attname, "false_easting")  == 0 )                     *x_0   = attflt[0];
@@ -788,7 +792,6 @@ int lonlat_to_lcc(int gridID, int nvals, double *xvals, double *yvals)
   gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm, &projflag, &scanflag);
 #if defined(HAVE_LIBPROJ)
   char *params[20];
-  projUV data, res;
 
   double a = PARAM_MISSVAL, lon_0 = lonParY, lat_0 = lat1, lat_1 = lat1, lat_2 = lat2;
   a = 6367470;
@@ -816,13 +819,14 @@ int lonlat_to_lcc(int gridID, int nvals, double *xvals, double *yvals)
 
   /* proj->over = 1; */		/* allow longitude > 180 */
   
+  projUV p;
   for ( int i = 0; i < nvals; i++ )
     {
-      data.u = xvals[i]*DEG2RAD;
-      data.v = yvals[i]*DEG2RAD;
-      res = pj_fwd(data, proj);
-      xvals[i] = res.u;
-      yvals[i] = res.v;
+      p.u = xvals[i]*DEG_TO_RAD;
+      p.v = yvals[i]*DEG_TO_RAD;
+      p = pj_fwd(p, proj);
+      xvals[i] = p.u;
+      yvals[i] = p.v;
     }
 
   pj_free(proj);
@@ -837,7 +841,6 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
   char *params[20];
-  projUV data, res;
   
   double a, lon_0, lat_0, x_0, y_0;
   grid_inq_param_laea(gridID, &a, &lon_0, &lat_0, &x_0, &y_0);
@@ -861,13 +864,14 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 
   /* proj->over = 1; */		/* allow longitude > 180 */
 
+  projUV p;
   for ( int i = 0; i < gridsize; i++ )
     {
-      data.u = xvals[i];
-      data.v = yvals[i];
-      res = pj_inv(data, proj);
-      xvals[i] = res.u*RAD2DEG;
-      yvals[i] = res.v*RAD2DEG;
+      p.u = xvals[i];
+      p.v = yvals[i];
+      p = pj_inv(p, proj);
+      xvals[i] = p.u*RAD_TO_DEG;
+      yvals[i] = p.v*RAD_TO_DEG;
       if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
       if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
     }
@@ -878,20 +882,21 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 #endif
 }
 
-static
-void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
+
+int lcc_to_lonlat(int gridID, int gridsize, double *xvals, double *yvals)
 {
+  bool errstatus = false;
 #if defined(HAVE_LIBPROJ)
   char *params[20];
-  projUV data, res;
 
-  double a, lon_0, lat_0, lat_1, lat_2, x_0, y_0;
-  bool status = grid_inq_param_lcc(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2, &x_0, &y_0);
+  double a, rf, lon_0, lat_0, lat_1, lat_2, x_0, y_0;
+  bool status = grid_inq_param_lcc(gridID, &a, &rf, &lon_0, &lat_0, &lat_1, &lat_2, &x_0, &y_0);
   if ( status == false ) cdoAbort("mapping parameter missing!");
 
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
-  if ( IS_NOT_EQUAL(a,PARAM_MISSVAL) && a > 0 ) params[nbpar++] = gen_param("a=%g", a);
+  if ( IS_NOT_EQUAL(a,PARAM_MISSVAL)  && a  > 0 ) params[nbpar++] = gen_param("a=%g", a);
+  if ( IS_NOT_EQUAL(rf,PARAM_MISSVAL) && rf > 0 ) params[nbpar++] = gen_param("rf=%g", rf);
   params[nbpar++] = gen_param("lon_0=%g", lon_0);
   params[nbpar++] = gen_param("lat_0=%g", lat_0);
   params[nbpar++] = gen_param("lat_1=%g", lat_1);
@@ -910,19 +915,22 @@ void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 
   /* proj->over = 1; */		/* allow longitude > 180 */
   
+  projUV p;
   for ( int i = 0; i < gridsize; i++ )
     {
-      data.u = xvals[i];
-      data.v = yvals[i];
-      res = pj_inv(data, proj);
-      xvals[i] = res.u*RAD2DEG;
-      yvals[i] = res.v*RAD2DEG;
+      p.u = xvals[i];
+      p.v = yvals[i];
+      p = pj_inv(p, proj);
+      xvals[i] = p.u*RAD_TO_DEG;
+      yvals[i] = p.v*RAD_TO_DEG;
     }
 
   pj_free(proj);
 #else
+  errstatus = true;
   cdoAbort("proj4 support not compiled in!");
 #endif
+  return !errstatus;
 }
 
 static
@@ -930,7 +938,6 @@ void proj_to_geo(char *proj4param, int gridsize, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
   char *params[99];
-  projUV data, res;
 
   int nbpar;
   for ( nbpar = 0; nbpar < 99; ++nbpar )
@@ -957,13 +964,14 @@ void proj_to_geo(char *proj4param, int gridsize, double *xvals, double *yvals)
 
   for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
 
+  projUV p;
   for ( int i = 0; i < gridsize; i++ )
     {
-      data.u = xvals[i];
-      data.v = yvals[i];
-      res = pj_inv(data, proj);
-      xvals[i] = res.u*RAD2DEG;
-      yvals[i] = res.v*RAD2DEG;
+      p.u = xvals[i];
+      p.v = yvals[i];
+      p = pj_inv(p, proj);
+      xvals[i] = p.u*RAD_TO_DEG;
+      yvals[i] = p.v*RAD_TO_DEG;
       if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
       if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
     }
@@ -1432,7 +1440,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
 		if      ( lproj_sinu ) sinu_to_geo(gridsize, xvals2D, yvals2D);
 		else if ( lproj_laea ) laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
-		else if ( lproj_lcc  ) lcc2_to_geo(gridID1, gridsize, xvals2D, yvals2D);
+		else if ( lproj_lcc  ) lcc_to_lonlat(gridID1, gridsize, xvals2D, yvals2D);
 		else if ( lproj4     ) proj_to_geo(proj4param, gridsize, xvals2D, yvals2D);
 	      }
 	  }
@@ -1553,7 +1561,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 			
 			if      ( lproj_sinu ) sinu_to_geo(4*gridsize, xbounds2D, ybounds2D);
 			else if ( lproj_laea ) laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
-			else if ( lproj_lcc  ) lcc2_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
+			else if ( lproj_lcc  ) lcc_to_lonlat(gridID1, 4*gridsize, xbounds2D, ybounds2D);
                         else if ( lproj4     ) proj_to_geo(proj4param, 4*gridsize, xbounds2D, ybounds2D);
 		      }
 		    else
