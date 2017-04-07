@@ -758,8 +758,8 @@ bool grid_inq_param_lcc(int gridID, double *a, double *rf, double *lon_0, double
                   else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )      *lat_0 = attflt[0];
                   else if ( strcmp(attname, "false_easting")  == 0 )                     *x_0   = attflt[0];
                   else if ( strcmp(attname, "false_northing") == 0 )                     *y_0   = attflt[0];
-                  else if ( strcmp(attname, "latitudeOfFirstGridPointInDegrees")  == 0 ) xlon_0 = attflt[0];
-                  else if ( strcmp(attname, "longitudeOfFirstGridPointInDegrees") == 0 ) ylat_0 = attflt[0];
+                  else if ( strcmp(attname, "longitudeOfFirstGridPointInDegrees") == 0 ) xlon_0 = attflt[0];
+                  else if ( strcmp(attname, "latitudeOfFirstGridPointInDegrees")  == 0 ) ylat_0 = attflt[0];
                   else if ( strcmp(attname, "standard_parallel") == 0 )
                     {
                       *lat_1 = attflt[0];
