@@ -407,38 +407,38 @@ void dumpmap()
 static
 void ctl_xydef(FILE *gdp, int gridID, bool *yrev)
 {
-  int gridtype;
   int i, j;
-  int xsize, ysize;
   double xfirst, yfirst, xinc, yinc;
-  double *xvals, *yvals;
 
   *yrev = false;
 
-  xsize  = gridInqXsize(gridID);
-  ysize  = gridInqYsize(gridID);
+  int xsize  = gridInqXsize(gridID);
+  int ysize  = gridInqYsize(gridID);
 
-  gridtype = gridInqType(gridID);
+  int gridtype = gridInqType(gridID);
+  int projtype = gridInqProjType(gridID);
 
   /* XDEF */
 
-  if ( gridtype == GRID_LCC )
+  if ( gridtype == GRID_PROJECTION && projtype == CDI_PROJ_LCC )
     {
-      double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
       double xmin = 1.e10, xmax = -1.e10, ymin = 1.e10, ymax = -1.e10;
       double xrange, yrange;
-      int projflag, scanflag;
       int nx, ny, ni;
       double inc[] = { 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001 };
 
-      gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
-                 &projflag, &scanflag);
+      double xinc = gridInqXinc(gridID);
+      double yinc = gridInqYinc(gridID);
+
+      double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
+
+      gridInqParamLCC(gridID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
       fprintf(gdp, "PDEF %d %d LCCR %g %g 1 1 %g %g %g %g %g\n",
-              xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);
+              xsize, ysize, xval_0, yval_0, lat_1, lat_2, lon_0, xinc, yinc);
 
       gridID = gridToCurvilinear(gridID, 0);
-      xvals = (double*) Malloc(xsize*ysize*sizeof(double));
-      yvals = (double*) Malloc(xsize*ysize*sizeof(double));
+      double *xvals = (double*) Malloc(xsize*ysize*sizeof(double));
+      double *yvals = (double*) Malloc(xsize*ysize*sizeof(double));
       gridInqXvals(gridID, xvals);
       gridInqYvals(gridID, yvals);
       for ( i = 0; i < xsize*ysize; ++i )
@@ -479,7 +479,7 @@ void ctl_xydef(FILE *gdp, int gridID, bool *yrev)
       xinc   = gridInqXinc(gridID);
       if ( IS_EQUAL(xinc, 0) && gridInqXvals(gridID, NULL) )
         {
-          xvals = (double*) Malloc(xsize*sizeof(double));
+          double *xvals = (double*) Malloc(xsize*sizeof(double));
           gridInqXvals(gridID, xvals);
           fprintf(gdp ,"XDEF %d LEVELS ", xsize);
           j = 0;
@@ -507,7 +507,7 @@ void ctl_xydef(FILE *gdp, int gridID, bool *yrev)
 
   /* YDEF */
 
-  if ( gridtype != GRID_LCC )
+  if ( ! (gridtype == GRID_PROJECTION && projtype == CDI_PROJ_LCC) )
     {
       yfirst = gridInqYval(gridID, 0);
       yinc   = gridInqYinc(gridID);
@@ -515,7 +515,7 @@ void ctl_xydef(FILE *gdp, int gridID, bool *yrev)
 
       if ( IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL) )
         {
-          yvals = (double*) Malloc(ysize*sizeof(double));
+          double *yvals = (double*) Malloc(ysize*sizeof(double));
           gridInqYvals(gridID, yvals);
           fprintf(gdp ,"YDEF %d LEVELS ", ysize);
           j = 0;
@@ -1052,9 +1052,10 @@ void *Gradsdes(void *argument)
     {
       gridID = vlistGrid(vlistID, index);
       gridtype = gridInqType(gridID);
+      int projtype = gridInqProjType(gridID);
       if ( gridtype == GRID_LONLAT   ||
            gridtype == GRID_GAUSSIAN ||
-           gridtype == GRID_LCC  ) break;
+           (gridtype == GRID_PROJECTION && projtype == CDI_PROJ_LCC) ) break;
     }
 
   if ( index == ngrids )

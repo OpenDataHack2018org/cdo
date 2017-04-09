@@ -138,22 +138,8 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
       else if ( STR_IS_EQ(key, "ylast") )     { grid->ylast = parameter2double(value); grid->def_ylast = true; }
       else if ( STR_IS_EQ(key, "xinc") )      { grid->xinc = parameter2double(value); grid->def_xinc = true; }
       else if ( STR_IS_EQ(key, "yinc") )      { grid->yinc = parameter2double(value); grid->def_yinc = true; }
-      else if ( STR_IS_EQ(key, "originLon") ) { grid->originLon = parameter2double(value); grid->def_originLon = true; }
-      else if ( STR_IS_EQ(key, "originLat") ) { grid->originLat = parameter2double(value); grid->def_originLat = true; }
-      else if ( STR_IS_EQ(key, "lonParY") )   { grid->lonParY = parameter2double(value); grid->def_lonParY = true; }
-      else if ( STR_IS_EQ(key, "lat1") )      { grid->lat1 = parameter2double(value); grid->def_lat1 = true; }
-      else if ( STR_IS_EQ(key, "lat2") )      { grid->lat2 = parameter2double(value); grid->def_lat2 = true; }
-      else if ( STR_IS_EQ(key, "lat_0") )     { grid->lat_0 = parameter2double(value); grid->def_lat_0 = true; }
-      else if ( STR_IS_EQ(key, "lat_1") )     { grid->lat_1 = parameter2double(value); grid->def_lat_1 = true; }
-      else if ( STR_IS_EQ(key, "lat_2") )     { grid->lat_2 = parameter2double(value); grid->def_lat_2 = true; }
       else if ( STR_IS_EQ(key, "a") )                 grid->a = parameter2double(value);
       else if ( STR_IS_EQ(key, "uvRelativeToGrid") )  grid->uvRelativeToGrid = parameter2bool(value);
-      else if ( STR_IS_EQ(key, "projection") )
-        {
-          if      ( STR_IS_EQ(value, "northpole") ) { grid->projflag = 0;    grid->scanflag = 64; }
-	  else if ( STR_IS_EQ(value, "southpole") ) { grid->projflag = 128;  grid->scanflag = 64; }
-	  else cdoAbort("Invalid projection : %s (grid description file: %s)", value, dname);
-        }
       else if ( STR_IS_EQ(key, "xvals") )
         {
           size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->xsize;

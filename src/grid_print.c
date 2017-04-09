@@ -360,9 +360,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
     case GRID_LCC:
       {
 	double originLon = 0, originLat = 0, lonParY = 0, lat1 = 0, lat2 = 0, xincm = 0, yincm = 0;
-	int projflag = 0, scanflag = 0;
-	gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
-                        &projflag, &scanflag);
+	gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
 
 	fprintf(fp,
                 "originLon = %.*g\n"
@@ -371,12 +369,9 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
                 "lat1      = %.*g\n"
                 "lat2      = %.*g\n"
                 "xinc      = %.*g\n"
-                "yinc      = %.*g\n"
-                "projection = %s\n",
+                "yinc      = %.*g\n",
                 dig, originLon, dig, originLat, dig, lonParY,
-                dig, lat1, dig, lat2, dig, xincm, dig, yincm,
-                (projflag & 128) == 0 ? "northpole" : "southpole");
-
+                dig, lat1, dig, lat2, dig, xincm, dig, yincm);
 
         int uvRelativeToGrid = gridInqUvRelativeToGrid(gridID);
         if ( uvRelativeToGrid > 0 )

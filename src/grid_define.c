@@ -129,34 +129,44 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
             #
             # gridID 2
             #
-            gridtype  = lcc
+            gridtype  = projection
             gridsize  = 622521
             xsize     = 789
             ysize     = 789
-            originLon = -7.89
-            originLat = 42.935
-            lonParY   = 0
-            lat1      = 52.5
-            lat2      = 52.5
+            xunits    = "m"
+            yunits    = "m"
+            xfirst    = 0
             xinc      = 2500
+            yfirst    = 0
             yinc      = 2500
-            projection = northpole
+            grid_mapping = Lambert_Conformal
+            grid_mapping_name = lambert_conformal_conic
+            standard_parallel = 52.5
+            longitude_of_central_meridian = 0.
+            latitude_of_projection_origin = 52.5
+            longitudeOfFirstGridPointInDegrees = -7.89
+            latitudeOfFirstGridPointInDegrees = 42.935
 =>   RESULT:
             #
             # gridID 2
             #
-            gridtype  = lcc
+            gridtype  = projection
             gridsize  = 156025
             xsize     = 395
             ysize     = 395
-            originLon = -7.89
-            originLat = 42.935
-            lonParY   = 0
-            lat1      = 52.5
-            lat2      = 52.5
+            xunits    = "m"
+            yunits    = "m"
+            xfirst    = 0
             xinc      = 5000
+            yfirst    = 0
             yinc      = 5000
-            projection = northpole
+            grid_mapping = Lambert_Conformal
+            grid_mapping_name = lambert_conformal_conic
+            standard_parallel = 52.5
+            longitude_of_central_meridian = 0.
+            latitude_of_projection_origin = 52.5
+            longitudeOfFirstGridPointInDegrees = -7.89
+            latitudeOfFirstGridPointInDegrees = 42.935
 */
   if ( cdoDebugExt )
     cdoPrint("%s(gridSrcID=%d, sampleFactor=%d) ...", __func__, gridSrcID, sampleFactor);
@@ -191,19 +201,7 @@ int cdo_define_sample_grid(int gridSrcID, int sampleFactor)
   
   if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridSrcID, gridID_sampled);
 
-  if ( gridtype == GRID_LCC )
-    {
-      double originLon, originLat, lonParY, lat1, lat2, xinc, yinc;
-      int projflag, scanflag;
-
-      gridInqParamLCC(gridSrcID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xinc, &yinc, &projflag, &scanflag);
-
-      xinc *= sampleFactor;
-      yinc *= sampleFactor;
-        
-      gridDefParamLCC(gridID_sampled, originLon, originLat, lonParY, lat1, lat2, xinc, yinc, projflag, scanflag);
-    }
-  else if ( gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL) )
+  if ( gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL) )
     {
       if ( gridtype == GRID_CURVILINEAR )
         {
@@ -269,34 +267,44 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
             #
             # gridID 2
             #
-            gridtype  = lcc
+            gridtype  = projection
             gridsize  = 622521
             xsize     = 789
             ysize     = 789
-            originLon = -7.89
-            originLat = 42.935
-            lonParY   = 0
-            lat1      = 52.5
-            lat2      = 52.5
+            xunits    = "m"
+            yunits    = "m"
+            xfirst    = 0
             xinc      = 2500
+            yfirst    = 0
             yinc      = 2500
-            projection = northpole
+            grid_mapping = Lambert_Conformal
+            grid_mapping_name = lambert_conformal_conic
+            standard_parallel = 52.5
+            longitude_of_central_meridian = 0.
+            latitude_of_projection_origin = 52.5
+            longitudeOfFirstGridPointInDegrees = -7.89
+            latitudeOfFirstGridPointInDegrees = 42.935
 =>   RESULT:
             #
             # gridID 2
             #
-            gridtype  = lcc
+            gridtype  = projection
             gridsize  = 156025
             xsize     = 350
             ysize     = 350
-            originLon = ...
-            originLat = ...
-            lonParY   = 0
-            lat1      = 52.5
-            lat2      = 52.5do SampleGrid: define_subgrid_grid
+            xunits    = "m"
+            yunits    = "m"
+            xfirst    = 0
             xinc      = 2500
+            yfirst    = 0
             yinc      = 2500
-            projection = northpole
+            grid_mapping = Lambert_Conformal
+            grid_mapping_name = lambert_conformal_conic
+            standard_parallel = 52.5
+            longitude_of_central_meridian = 0.
+            latitude_of_projection_origin = 52.5
+            longitudeOfFirstGridPointInDegrees = ...
+            latitudeOfFirstGridPointInDegrees = ...
 */
   if ( cdoDebugExt )
     cdoPrint("%s(gridSrcID=%d, (subI0,subI1,subJ0,subJ1) = (%d,%d,%d,%d) ...",
@@ -307,20 +315,19 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
   int maxIndexI = gridXsize-1;
   int maxIndexJ = gridYsize-1;
 
-  if ( (subI0<0) || (subI0>maxIndexI) ||
+  if ( (subI0<0)      || (subI0>maxIndexI) ||
        (subI1<=subI0) || (subI1>maxIndexI) ||
-       (subJ0<0) || (subJ0>maxIndexJ) ||
+       (subJ0<0)      || (subJ0>maxIndexJ) ||
        (subJ1<=subJ0) || (subJ1>maxIndexJ) )
     cdoAbort("%s() Incorrect subgrid specified!  (subI0,subI1,subJ0,subJ1) =(%d,%d,%d,%d) Note that: gridXsize = %d, gridYsize = %d", __func__, subI0,subI1, subJ0, subJ1, gridXsize, gridYsize);
 
   int gridtype = gridInqType(gridSrcID);
-  if ( gridtype != GRID_LCC )
+  if ( !(gridtype == GRID_PROJECTION && gridInqProjType(gridSrcID) == CDI_PROJ_LCC) )
     cdoAbort("%s() Error; Only LCC grid is supported; use selindexbox!", __func__);
 
-  double originLon, originLat, lonParY, lat1, lat2, xinc, yinc;
-  int projflag, scanflag;
+  double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
 
-  gridInqParamLCC(gridSrcID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xinc, &yinc, &projflag, &scanflag);
+  gridInqParamLCC(gridSrcID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
 
   if ( cdoDebugExt>20 ) cdo_print_grid(gridSrcID, 1);
 
@@ -328,14 +335,13 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
     {
       cdoPrint("%s() Original LCC grid:", __func__);
       cdoPrint("grid Xsize   %d, grid Ysize   %d", gridXsize, gridYsize);
-      cdoPrint("originLon %4.3f, originLat %4.3f", originLon, originLat);
-      cdoPrint("grid Xinc   %4.3f, grid Yinc   %4.3f", xinc, yinc);
+      cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
     }
   
   int gridIDcurvl = gridToCurvilinear(gridSrcID, 1);
 
-  originLon = gridInqXval(gridIDcurvl, 0);
-  originLat = gridInqYval(gridIDcurvl, 0);
+  xval_0 = gridInqXval(gridIDcurvl, 0);
+  yval_0 = gridInqYval(gridIDcurvl, 0);
 
   if ( cdoDebugExt )
     {
@@ -343,9 +349,8 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
       cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridIDcurvl), gridInqYsize(gridIDcurvl));
       cdoPrint("grid Xfirst  %4.3f, grid Yfirst  %4.3f", gridInqXval(gridIDcurvl, 0), gridInqYval(gridIDcurvl, 0));
       cdoPrint("grid Xlast   %4.3f, grid Ylast   %4.3f", gridInqXval(gridIDcurvl, gridInqSize(gridIDcurvl) -1), gridInqYval(gridIDcurvl, gridInqSize(gridIDcurvl) -1));
-      cdoPrint("originLon %4.3f, originLat %4.3f", originLon, originLat);
+      cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
     }
-
 
   int xsize = subI1 - subI0 + 1;
   int ysize = subJ1 - subJ0 + 1;
@@ -354,26 +359,36 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
   
   gridDefXsize(gridID_sampled, xsize);
   gridDefYsize(gridID_sampled, ysize);
+  
+  if ( gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL) )
+    {
+      double *xvals = (double*) Malloc(xsize*sizeof(double));
+      double *yvals = (double*) Malloc(ysize*sizeof(double));
+      gridInqXvals(gridSrcID, xvals);
+      gridInqYvals(gridSrcID, yvals);
+      gridDefXvals(gridID_sampled, xvals);
+      gridDefYvals(gridID_sampled, yvals);
+      Free(xvals);
+      Free(yvals);
+    }
 
   gridDefNP(gridID_sampled, gridInqNP(gridSrcID));
   gridDefPrec(gridID_sampled, gridInqPrec(gridSrcID));
   if ( gridInqUvRelativeToGrid(gridSrcID) ) gridDefUvRelativeToGrid(gridID_sampled, 1);
 
   grid_copy_attributes(gridSrcID, gridID_sampled);
-  
-  if ( gridtype == GRID_PROJECTION ) grid_copy_mapping(gridSrcID, gridID_sampled);
 
-  originLon = gridInqXval(gridIDcurvl, subJ0*gridXsize + subI0 );
-  originLat = gridInqYval(gridIDcurvl, subJ0*gridXsize + subI0 );
+  xval_0 = gridInqXval(gridIDcurvl, subJ0*gridXsize + subI0);
+  yval_0 = gridInqYval(gridIDcurvl, subJ0*gridXsize + subI0);
 
   if ( cdoDebugExt )
     {
       cdoPrint("%s()  Sub-grid:", __func__);
       cdoPrint("grid Xsize   %d, grid Ysize   %d", gridInqXsize(gridID_sampled), gridInqYsize(gridID_sampled));
-      cdoPrint("originLon %4.3f, originLat %4.3f", originLon, originLat);
+      cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
     }
 
-  gridDefParamLCC(gridID_sampled, originLon, originLat, lonParY, lat1, lat2, xinc, yinc, projflag, scanflag);
+  gridDefParamLCC(gridID_sampled, a, rf, xval_0, yval_0, lon_0, lat_1, lat_2);
     
   gridDestroy(gridIDcurvl);
 

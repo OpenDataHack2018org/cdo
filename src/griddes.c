@@ -49,32 +49,6 @@ void gridInit(griddes_t *grid)
   grid->ntr           = 0;
   grid->nvertex       = 0;
   grid->genBounds     = false;
-
-  grid->originLon     = 0;
-  grid->originLat     = 0;
-  grid->lonParY       = 0;
-  grid->lat1          = 0;
-  grid->lat2          = 0;
-  grid->projflag      = 0;
-  grid->scanflag      = 64;
-  grid->def_originLon = false;
-  grid->def_originLat = false;
-  grid->def_lonParY   = false;
-  grid->def_lat1      = false;
-  grid->def_lat2      = false;
-
-  grid->uvRelativeToGrid = 0;
-
-  grid->a             = 0;
-  grid->lon_0         = 0;
-  grid->lat_0         = 0;
-  grid->lat_1         = 0;
-  grid->lat_2         = 0;
-  grid->def_lon_0     = false;
-  grid->def_lat_0     = false;
-  grid->def_lat_1     = false;
-  grid->def_lat_2     = false;
-
   grid->def_xfirst    = false;
   grid->def_yfirst    = false;
   grid->def_xlast     = false;
@@ -274,36 +248,6 @@ int gridDefine(griddes_t grid)
 	if ( grid.xbounds ) { gridDefXbounds(gridID, grid.xbounds); Free(grid.xbounds); }
 	if ( grid.ybounds ) { gridDefYbounds(gridID, grid.ybounds); Free(grid.ybounds); }
 	if ( grid.mask )    { gridDefMask(gridID, grid.mask); Free(grid.mask); }
-
-	break;
-      }
-    case GRID_LCC:
-      {
-	if ( grid.xsize == 0 ) Error("xsize undefined!");
-	if ( grid.ysize == 0 ) Error("ysize undefined!");
-
-	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
-
-	gridID = gridCreate(grid.type, grid.size);
-
-	gridDefPrec(gridID, grid.prec);
-	gridDefXsize(gridID, grid.xsize);
-	gridDefYsize(gridID, grid.ysize);
-
-	if ( grid.def_originLon == false ) Error("originLon undefined!");
-	if ( grid.def_originLat == false ) Error("originLat undefined!");
-	if ( grid.def_lonParY   == false ) Error("lonParY undefined!");
-	if ( grid.def_lat1      == false ) Error("lat1 undefined!");
-	if ( grid.def_lat2      == false ) Error("lat2 undefined!");
-	if ( grid.def_xinc      == false ) Error("xinc undefined!");
-	if ( grid.def_yinc      == false ) Error("yinc undefined!");
-
-	gridDefParamLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
-		   grid.lat1, grid.lat2, grid.xinc, grid.yinc, grid.projflag, grid.scanflag);
-
-        if ( grid.uvRelativeToGrid ) gridDefUvRelativeToGrid(gridID, 1);
-
-	if ( grid.mask ) { gridDefMask(gridID, grid.mask); Free(grid.mask); }
 
 	break;
       }

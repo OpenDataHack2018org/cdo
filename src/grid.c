@@ -554,22 +554,23 @@ int lcc_to_lonlat(int gridID, int nvals, double *xvals, double *yvals);
 static
 void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
-  double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
-  int projflag, scanflag;
   proj_info_t proj;
 
-  gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm, &projflag, &scanflag);
+  double xinc = gridInqXinc(gridID);
+  double yinc = gridInqYinc(gridID);
+
+  double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
+
+  gridInqParamLCC(gridID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
   /*
     while ( originLon < 0 ) originLon += 360;
     while ( lonParY   < 0 ) lonParY   += 360;
   */
-  if ( IS_NOT_EQUAL(xincm, yincm) )
-    cdoWarning("X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", 
-	    xincm, yincm);
+  if ( IS_NOT_EQUAL(xinc, yinc) )
+    cdoWarning("X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", xinc, yinc);
   /*
   if ( IS_NOT_EQUAL(lat1, lat2) )
-    cdoWarning("Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
-	    lat1, lat2);
+    cdoWarning("Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", lat1, lat2);
   */
   /*
   double x_0 = originLon, y_0 = originLat;
@@ -579,7 +580,7 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   printf("out x_0 = %g  y_0 = %g\n", x_0, y_0);
   printf("out x_0 = %20.10f  y_0 = %20.10f\n", x_0, y_0);
   */
-  map_set(PROJ_LC, originLat, originLon, xincm, lonParY, lat1, lat2, &proj);
+  map_set(PROJ_LC, yval_0, xval_0, xinc, lon_0, lat_1, lat_2, &proj);
 
   double zlat, zlon;
   for ( int i = 0; i < gridsize; i++ )
@@ -786,18 +787,16 @@ bool grid_inq_param_lcc(int gridID, double *a, double *rf, double *lon_0, double
 
 int lonlat_to_lcc(int gridID, int nvals, double *xvals, double *yvals)
 {
-  double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
-  int projflag, scanflag;
+  double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
 
-  gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm, &projflag, &scanflag);
+  gridInqParamLCC(gridID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
 #if defined(HAVE_LIBPROJ)
   char *params[20];
 
-  double a = PARAM_MISSVAL, lon_0 = lonParY, lat_0 = lat1, lat_1 = lat1, lat_2 = lat2;
-  a = 6367470;
   // bool status = grid_inq_param_lcc(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2, &x_0, &y_0);
   // if ( status == false ) cdoAbort("mapping parameter missing!");
 
+  double lat_0 = lat_2;
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
   if ( IS_NOT_EQUAL(a,PARAM_MISSVAL) && a > 0 ) params[nbpar++] = gen_param("a=%g", a);
