@@ -364,8 +364,8 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
   
   if ( gridInqXvals(gridSrcID, NULL) && gridInqYvals(gridSrcID, NULL) )
     {
-      double *xvals = (double*) Malloc(xsize*sizeof(double));
-      double *yvals = (double*) Malloc(ysize*sizeof(double));
+      double *xvals = (double*) Malloc(gridXsize*sizeof(double));
+      double *yvals = (double*) Malloc(gridYsize*sizeof(double));
       gridInqXvals(gridSrcID, xvals);
       gridInqYvals(gridSrcID, yvals);
       gridDefXvals(gridID_sampled, xvals);
