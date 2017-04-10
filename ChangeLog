@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.1
 	* Version 1.8.1 release
 
+2017-04-10  Uwe Schulzweida
+
+	* Use Proj4 to convert GRIB LCC grids to geographic coordinates
+
 2017-04-09  Uwe Schulzweida
 
 	* Refactor GRID_LCC to GRID_PROJECTION
