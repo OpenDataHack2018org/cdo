@@ -325,9 +325,11 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
   if ( !(gridtype == GRID_PROJECTION && gridInqProjType(gridSrcID) == CDI_PROJ_LCC) )
     cdoAbort("%s() Error; Only LCC grid is supported; use selindexbox!", __func__);
 
-  double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
+  double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
 
-  gridInqParamLCC(gridSrcID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
+  gridInqParamLCC(gridSrcID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
+  x_0 = grid_missval;
+  y_0 = grid_missval;
 
   if ( cdoDebugExt>20 ) cdo_print_grid(gridSrcID, 1);
 
@@ -388,7 +390,7 @@ int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int 
       cdoPrint("xval_0 %4.3f, yval_0 %4.3f", xval_0, yval_0);
     }
 
-  gridDefParamLCC(gridID_sampled, a, rf, xval_0, yval_0, lon_0, lat_1, lat_2);
+  gridDefParamLCC(gridID_sampled, grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0);
     
   gridDestroy(gridIDcurvl);
 

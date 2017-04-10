@@ -430,9 +430,9 @@ void ctl_xydef(FILE *gdp, int gridID, bool *yrev)
       double xinc = gridInqXinc(gridID);
       double yinc = gridInqYinc(gridID);
 
-      double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
+      double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
 
-      gridInqParamLCC(gridID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
+      gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
       fprintf(gdp, "PDEF %d %d LCCR %g %g 1 1 %g %g %g %g %g\n",
               xsize, ysize, xval_0, yval_0, lat_1, lat_2, lon_0, xinc, yinc);
 

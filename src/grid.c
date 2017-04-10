@@ -559,9 +559,9 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   double xinc = gridInqXinc(gridID);
   double yinc = gridInqYinc(gridID);
 
-  double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
+  double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
 
-  gridInqParamLCC(gridID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
+  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
   /*
     while ( originLon < 0 ) originLon += 360;
     while ( lonParY   < 0 ) lonParY   += 360;
@@ -787,16 +787,15 @@ bool grid_inq_param_lcc(int gridID, double *a, double *rf, double *lon_0, double
 
 int lonlat_to_lcc(int gridID, int nvals, double *xvals, double *yvals)
 {
-  double a, rf, xval_0, yval_0, lon_0, lat_1, lat_2;
+  double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
 
-  gridInqParamLCC(gridID, &a, &rf, &xval_0, &yval_0, &lon_0, &lat_1, &lat_2);
+  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
 #if defined(HAVE_LIBPROJ)
   char *params[20];
 
   // bool status = grid_inq_param_lcc(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2, &x_0, &y_0);
   // if ( status == false ) cdoAbort("mapping parameter missing!");
 
-  double lat_0 = lat_2;
   int nbpar = 0;
   params[nbpar++] = gen_param("proj=lcc");
   if ( IS_NOT_EQUAL(a,PARAM_MISSVAL) && a > 0 ) params[nbpar++] = gen_param("a=%g", a);

@@ -357,35 +357,6 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
 
 	break;
       }
-    case GRID_LCC:
-      {
-	double originLon = 0, originLat = 0, lonParY = 0, lat1 = 0, lat2 = 0, xincm = 0, yincm = 0;
-	gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
-
-	fprintf(fp,
-                "originLon = %.*g\n"
-                "originLat = %.*g\n"
-                "lonParY   = %.*g\n"
-                "lat1      = %.*g\n"
-                "lat2      = %.*g\n"
-                "xinc      = %.*g\n"
-                "yinc      = %.*g\n",
-                dig, originLon, dig, originLat, dig, lonParY,
-                dig, lat1, dig, lat2, dig, xincm, dig, yincm);
-
-        int uvRelativeToGrid = gridInqUvRelativeToGrid(gridID);
-        if ( uvRelativeToGrid > 0 )
-          fprintf(fp, "uvRelativeToGrid = %d\n", uvRelativeToGrid);
-
-#ifdef HIRLAM_EXTENSIONS
-        {
-          int scanningMode = gridInqScanningMode(gridID);
-          fprintf(fp, "scanningMode = %d\n", scanningMode);
-        }
-#endif // HIRLAM_EXTENSIONS
-
-        break;
-      }
     case GRID_SPECTRAL:
       {
         fprintf(fp, "truncation = %d\n"
