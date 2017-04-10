@@ -58,6 +58,7 @@
 
 #include "modules.h"
 #include "error.h"
+#include "grid.h"
 
 #if defined(_OPENMP)
 #  include <omp.h>
@@ -1558,6 +1559,9 @@ int main(int argc, char *argv[])
   if ( lstop ) return status;
 
   if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
+
+  extern int (*proj_lonlat_to_lcc_func)();
+  proj_lonlat_to_lcc_func = (int (*)()) proj_lonlat_to_lcc;
 
   const char *operatorName = getOperatorName(operatorArg);
 

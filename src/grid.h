@@ -142,4 +142,13 @@ int cdo_define_sample_grid(int gridID, int sampleFactor);
 // Define a sub-grid of another grid
 int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int subJ1);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+int proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2,
+                       double a, double rf, int nvals, double *xvals, double *yvals);
+#if defined (__cplusplus)
+}
+#endif
+
 #endif  /* _GRID_H */
