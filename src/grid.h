@@ -103,11 +103,16 @@ int cdo_define_sample_grid(int gridID, int sampleFactor);
 // Define a sub-grid of another grid
 int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int subJ1);
 
+
+int cdo_lonlat_to_lcc(int gridID, size_t nvals, double *xvals, double *yvals);
+int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals);
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 int proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2,
-                       double a, double rf, int nvals, double *xvals, double *yvals);
+                       double a, double rf, size_t nvals, double *xvals, double *yvals);
 #if defined (__cplusplus)
 }
 #endif

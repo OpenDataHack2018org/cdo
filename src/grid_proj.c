@@ -1,0 +1,236 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2017 Uwe Schulzweida, <uwe.schulzweida AT mpimet.mpg.de>
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
+
+#if defined(HAVE_LIBPROJ)
+#include "proj_api.h"
+#endif
+
+#include <stdio.h>
+#include <stdarg.h> /* va_list */
+
+#include <cdi.h>
+#include "cdo_int.h"
+#include "grid.h"
+
+
+
+static
+char *gen_param(const char *fmt, ...)
+{
+  va_list args;
+  char str[256];
+
+  va_start(args, fmt);
+
+  int len = vsprintf(str, fmt, args);
+
+  va_end(args);
+
+  len++;
+  char *rstr = (char*) Malloc(len*sizeof(char));
+  memcpy(rstr, str, len*sizeof(char));
+
+  return rstr;
+}
+
+
+int proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2,
+                       double a, double rf, size_t nvals, double *xvals, double *yvals)
+{
+  int status = 0;
+#if defined(HAVE_LIBPROJ)
+  char *params[20];
+
+  int nbpar = 0;
+  params[nbpar++] = gen_param("proj=lcc");
+  if ( IS_NOT_EQUAL(a, missval) && a > 0 ) params[nbpar++] = gen_param("a=%g", a);
+  if ( IS_NOT_EQUAL(rf, missval) && rf > 0 ) params[nbpar++] = gen_param("rf=%g", rf);
+  params[nbpar++] = gen_param("lon_0=%g", lon_0);
+  params[nbpar++] = gen_param("lat_0=%g", lat_0);
+  params[nbpar++] = gen_param("lat_1=%g", lat_1);
+  params[nbpar++] = gen_param("lat_2=%g", lat_2);
+  params[nbpar++] = gen_param("units=m");
+  //  params[nbpar++] = gen_param("no_defs");
+
+  if ( cdoVerbose )
+    for ( int i = 0; i < nbpar; ++i )
+      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+  
+  projPJ proj = pj_init(nbpar, &params[0]);
+  if ( !proj ) status = -1;
+
+  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
+
+  /* proj->over = 1; */		/* allow longitude > 180 */
+
+  if ( status == 0 )
+    {
+      projUV p;
+      for ( size_t i = 0; i < nvals; i++ )
+        {
+          p.u = xvals[i]*DEG_TO_RAD;
+          p.v = yvals[i]*DEG_TO_RAD;
+          p = pj_fwd(p, proj);
+          xvals[i] = p.u;
+          yvals[i] = p.v;
+        }
+
+      pj_free(proj);
+    }
+#else
+  status = -1;
+#endif
+
+  if ( status == -1 )
+    for ( size_t i = 0; i < nvals; i++ )
+      {
+        xvals[i] = missval;
+        yvals[i] = missval;
+      }
+
+  return status;
+}
+
+static
+void lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2,
+                   double a, double rf, size_t nvals, double *xvals, double *yvals)
+{
+  int status = proj_lonlat_to_lcc(missval, lon_0, lat_0, lat_1, lat_2, a, rf, nvals, xvals, yvals);
+#if defined(HAVE_LIBPROJ)
+  if ( status == -1 ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+#else
+  if ( status == -1 ) cdoAbort("proj4 support not compiled in!");
+#endif
+}
+
+
+int cdo_lonlat_to_lcc(int gridID, size_t nvals, double *xvals, double *yvals)
+{
+  double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
+  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
+
+  lonlat_to_lcc(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, nvals, xvals, yvals);
+
+  return 0;
+}
+
+
+int proj_lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, double lat_2,
+                       double a, double rf, double x_0, double y_0, size_t nvals, double *xvals, double *yvals)
+{
+  int status = 0;
+#if defined(HAVE_LIBPROJ)
+  char *params[20];
+
+  int nbpar = 0;
+  params[nbpar++] = gen_param("proj=lcc");
+  if ( IS_NOT_EQUAL(a, grid_missval)  && a  > 0 ) params[nbpar++] = gen_param("a=%g", a);
+  if ( IS_NOT_EQUAL(rf, grid_missval) && rf > 0 ) params[nbpar++] = gen_param("rf=%g", rf);
+  params[nbpar++] = gen_param("lon_0=%g", lon_0);
+  params[nbpar++] = gen_param("lat_0=%g", lat_0);
+  params[nbpar++] = gen_param("lat_1=%g", lat_1);
+  params[nbpar++] = gen_param("lat_2=%g", lat_2);
+  if ( IS_NOT_EQUAL(x_0, grid_missval) ) params[nbpar++] = gen_param("x_0=%g", x_0);
+  if ( IS_NOT_EQUAL(y_0, grid_missval) ) params[nbpar++] = gen_param("y_0=%g", y_0);
+
+  if ( cdoVerbose )
+    for ( int i = 0; i < nbpar; ++i )
+      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+  
+  projPJ proj = pj_init(nbpar, &params[0]);
+  if ( !proj ) status = -1;
+
+  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
+
+  /* proj->over = 1; */		/* allow longitude > 180 */
+  
+  if ( status == 0 )
+    {
+      projUV p;
+      for ( size_t i = 0; i < nvals; i++ )
+        {
+          p.u = xvals[i];
+          p.v = yvals[i];
+          p = pj_inv(p, proj);
+          xvals[i] = p.u*RAD_TO_DEG;
+          yvals[i] = p.v*RAD_TO_DEG;
+        }
+
+      pj_free(proj);
+    }
+#else
+  status = -1;
+#endif
+
+  if ( status == -1 )
+    for ( size_t i = 0; i < nvals; i++ )
+      {
+        xvals[i] = missval;
+        yvals[i] = missval;
+      }
+
+  return status;
+}
+
+static
+void lcc_to_lonlat(double missval, double lon_0, double lat_0, double lat_1, double lat_2,
+                   double a, double rf, double x_0, double y_0, size_t nvals, double *xvals, double *yvals)
+{
+  int status = proj_lcc_to_lonlat(missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
+#if defined(HAVE_LIBPROJ)
+  if ( status == -1 ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+#else
+  if ( status == -1 ) cdoAbort("proj4 support not compiled in!");
+#endif
+}
+
+
+int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
+{
+  const char *projection = "lambert_conformal_conic";
+
+  double lon_0, lat_0, lat_1, lat_2, a, rf, xval_0, yval_0, x_0, y_0;
+  gridInqParamLCC(gridID, grid_missval, &lon_0, &lat_0, &lat_1, &lat_2, &a, &rf, &xval_0, &yval_0, &x_0, &y_0);
+
+  int status = 0;
+  if ( !status && IS_EQUAL(lon_0, grid_missval) ) { status = 1; cdoWarning("%s mapping parameter %s missing!", projection, "longitude_of_central_meridian"); }
+  if ( !status && IS_EQUAL(lat_0, grid_missval) ) { status = 1; cdoWarning("%s mapping parameter %s missing!", projection, "latitude_of_central_meridian"); }
+  if ( !status && IS_EQUAL(lat_1, grid_missval) ) { status = 1; cdoWarning("%s mapping parameter %s missing!", projection, "standard_parallel"); }
+  if ( !status && IS_EQUAL(x_0, grid_missval) && IS_EQUAL(y_0, grid_missval) && IS_NOT_EQUAL(xval_0, grid_missval) && IS_NOT_EQUAL(yval_0, grid_missval) )
+    {
+#if defined(HAVE_LIBPROJ)
+      x_0 = xval_0; y_0 = yval_0;
+      lonlat_to_lcc(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, 1, &x_0, &y_0);
+      x_0 = -x_0; y_0 = -y_0;
+#else
+      status = 1; cdoWarning("%s mapping parameter %s missing!", projection, "false_easting and false_northing");
+#endif
+    }
+
+  if ( status ) cdoAbort("%s mapping parameter missing!", projection);
+
+  lcc_to_lonlat(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
+
+  return 0;
+}
