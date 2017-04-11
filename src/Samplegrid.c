@@ -122,7 +122,7 @@ void *Samplegrid(void *argument)
 
       int gridtype = gridInqType(gridSrcID);
       if ( ! (gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_PROJECTION ||
-              gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC || gridtype == GRID_LCC) )
+              gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC) )
         cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridtype));
 
       if ( operatorID == SAMPLEGRID )

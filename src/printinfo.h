@@ -422,7 +422,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
       my_reset_text_color(stdout);
     }
 
-  if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED || gridtype == GRID_LCC )
+  if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
     {
       if ( gridHasArea(gridID) ||
            gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )

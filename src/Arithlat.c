@@ -85,9 +85,10 @@ void *Arithlat(void *argument)
 	      gridID0 = gridID;
 
 	      gridtype = gridInqType(gridID);
+              int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
 	      if ( gridtype == GRID_LONLAT      ||
 		   gridtype == GRID_GAUSSIAN    ||
-		   gridtype == GRID_LCC )
+		   projtype == CDI_PROJ_LCC )
 		{
 		  gridID = gridToCurvilinear(gridID, 0);
 		}

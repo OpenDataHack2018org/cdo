@@ -86,8 +86,6 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           else if ( STR_IS_EQ(gridtype, "cell") )         grid->type = GRID_UNSTRUCTURED;
           else if ( STR_IS_EQ(gridtype, "spectral") )     grid->type = GRID_SPECTRAL;
           else if ( STR_IS_EQ(gridtype, "gme") )          grid->type = GRID_GME;
-          else if ( STR_IS_EQ(gridtype, "lcc") )          grid->type = GRID_LCC;
-          else if ( STR_IS_EQ(gridtype, "lambert") )      grid->type = GRID_LCC;
           else if ( STR_IS_EQ(gridtype, "projection") )   grid->type = GRID_PROJECTION;
           else if ( STR_IS_EQ(gridtype, "generic") )      grid->type = GRID_GENERIC;
 	  else cdoAbort("Invalid gridtype : %s (grid description file: %s)", gridtype, dname);

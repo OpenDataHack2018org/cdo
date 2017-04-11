@@ -862,7 +862,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
   size_t ny = gridInqYsize(gridID1);
 
   bool lxyvals = gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL);
-  if ( !lxyvals && gridtype != GRID_LCC ) cdoAbort("Grid coordinates missing!");
+  if ( !lxyvals ) cdoAbort("Grid coordinates missing!");
 
   size_t gridsize = gridInqSize(gridID1);
   int gridID2 = gridCreate(GRID_CURVILINEAR, gridsize);
@@ -898,7 +898,6 @@ int gridToCurvilinear(int gridID1, int lbounds)
     {
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
-    case GRID_LCC:
       {
         double xpole = 0, ypole = 0, angle = 0;
 	double xscale = 1, yscale = 1;
@@ -1618,7 +1617,6 @@ int gridWeights(int gridID, double *grid_wgts)
     {
       if ( gridtype == GRID_LONLAT      ||
 	   gridtype == GRID_GAUSSIAN    ||
-	   gridtype == GRID_LCC         ||
 	   projtype == CDI_PROJ_RLL     ||
 	   projtype == CDI_PROJ_LAEA    ||
 	   projtype == CDI_PROJ_LCC     ||

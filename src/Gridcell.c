@@ -49,7 +49,6 @@ void grid_cell_area(int gridID, double *array)
        projtype == CDI_PROJ_LAEA    ||
        projtype == CDI_PROJ_SINU    ||
        projtype == CDI_PROJ_LCC     ||
-       gridtype == GRID_LCC         ||
        gridtype == GRID_GME         ||
        gridtype == GRID_CURVILINEAR ||
        gridtype == GRID_UNSTRUCTURED )
@@ -193,9 +192,10 @@ void *Gridcell(void *argument)
   else if ( operatorID == GRIDDX || operatorID == GRIDDY )
     {
       int gridtype = gridInqType(gridID);
+      int projtype = (gridtype == GRID_PROJECTION) ? gridInqProjType(gridID) : -1;
       if ( gridtype == GRID_LONLAT      ||
 	   gridtype == GRID_GAUSSIAN    ||
-	   gridtype == GRID_LCC         ||
+           projtype == CDI_PROJ_LCC     ||
 	   gridtype == GRID_CURVILINEAR )
 	{
 	  double len1 = 0, len2 = 0;
