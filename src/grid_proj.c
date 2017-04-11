@@ -237,6 +237,32 @@ int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
 }
 
 
+void grid_def_param_sinu(int gridID)
+{
+  const char *projection = "sinusoidal";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
+  const char *mapvarname = "Sinusoidal";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
+
+  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
+}
+
+
+void grid_def_param_laea(int gridID, double a, double lon_0, double lat_0)
+{
+  const char *projection = "lambert_azimuthal_equal_area";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
+  const char *mapvarname = "Lambert_AEA";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
+
+  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
+  
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "earth_radius", CDI_DATATYPE_FLT64, 1, &a);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "longitude_of_projection_origin", CDI_DATATYPE_FLT64, 1, &lon_0);
+  cdiDefAttFlt(gridID, CDI_GLOBAL, "latitude_of_projection_origin", CDI_DATATYPE_FLT64, 1, &lat_0);
+}
+
+
 void cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
 {
 #if defined(HAVE_LIBPROJ)
@@ -275,13 +301,111 @@ void cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
 #endif
 }
 
-
-void grid_def_param_sinu(int gridID)
+static
+bool cdiInqAttConvertedToFloat(int gridID, int atttype, const char *attname, int attlen, double *attflt)
 {
-  const char *projection = "sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
-  const char *mapvarname = "Sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
+  bool status = true;
 
-  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
+  if ( atttype == CDI_DATATYPE_INT32 )
+    {
+      int attint[attlen];
+      cdiInqAttInt(gridID, CDI_GLOBAL, attname, attlen, attint);
+      for ( int i = 0; i < attlen; ++i ) attflt[i] = (double)attint[i];
+    }
+  else if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
+    {
+      cdiInqAttFlt(gridID, CDI_GLOBAL, attname, attlen, attflt);
+    }
+  else
+    {
+      status = false;
+    }
+
+  return status;
+}
+
+static
+void grid_inq_param_laea(int gridID, double *a, double *lon_0, double *lat_0, double *x_0, double *y_0)
+{
+  *a = 0; *lon_0 = 0; *lat_0 = 0, *x_0 = 0, *y_0 = 0;
+
+  int gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_PROJECTION )
+    {
+      const char *projection = "lambert_azimuthal_equal_area";
+      char mapping[CDI_MAX_NAME]; mapping[0] = 0;
+      cdiGridInqKeyStr(gridID, CDI_KEY_MAPNAME, CDI_MAX_NAME, mapping);
+      if ( mapping[0] && strcmp(mapping, projection) == 0 )
+        {
+          int atttype, attlen;
+          char attname[CDI_MAX_NAME+1];
+
+          int natts;
+          cdiInqNatts(gridID, CDI_GLOBAL, &natts);
+
+          for ( int iatt = 0; iatt < natts; ++iatt )
+            {
+              cdiInqAtt(gridID, CDI_GLOBAL, iatt, attname, &atttype, &attlen);
+              if ( attlen != 1 ) continue;
+
+              double attflt;
+              if ( cdiInqAttConvertedToFloat(gridID, atttype, attname, attlen, &attflt) )
+                {
+                  if      ( strcmp(attname, "earth_radius") == 0 )                    *a     = attflt;
+                  else if ( strcmp(attname, "longitude_of_projection_origin") == 0 )  *lon_0 = attflt;
+                  else if ( strcmp(attname, "latitude_of_projection_origin") == 0 )   *lat_0 = attflt;
+                  else if ( strcmp(attname, "false_easting")  == 0 )                  *x_0   = attflt;
+                  else if ( strcmp(attname, "false_northing") == 0 )                  *y_0   = attflt;
+                }
+            }
+        }
+      else
+        cdoWarning("%s mapping parameter missing!", projection);
+    }
+}
+
+
+void cdo_laea_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
+{
+#if defined(HAVE_LIBPROJ)
+  char *params[20];
+  
+  double a, lon_0, lat_0, x_0, y_0;
+  grid_inq_param_laea(gridID, &a, &lon_0, &lat_0, &x_0, &y_0);
+
+  int nbpar = 0;
+  params[nbpar++] = gen_param("proj=laea");
+  if ( a > 0 ) params[nbpar++] = gen_param("a=%g", a);
+  params[nbpar++] = gen_param("lon_0=%g", lon_0);
+  params[nbpar++] = gen_param("lat_0=%g", lat_0);
+  if ( IS_NOT_EQUAL(x_0,0) ) params[nbpar++] = gen_param("x_0=%g", x_0);
+  if ( IS_NOT_EQUAL(y_0,0) ) params[nbpar++] = gen_param("y_0=%g", y_0);
+
+  if ( cdoVerbose )
+    for ( int i = 0; i < nbpar; ++i )
+      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+  projPJ proj = pj_init(nbpar, &params[0]);
+  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
+
+  /* proj->over = 1; */		/* allow longitude > 180 */
+
+  projUV p;
+  for ( size_t i = 0; i < nvals; i++ )
+    {
+      p.u = xvals[i];
+      p.v = yvals[i];
+      p = pj_inv(p, proj);
+      xvals[i] = p.u*RAD_TO_DEG;
+      yvals[i] = p.v*RAD_TO_DEG;
+      if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
+      if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
+    }
+
+  pj_free(proj);
+#else
+  cdoAbort("proj4 support not compiled in!");
+#endif
 }
