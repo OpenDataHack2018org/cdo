@@ -67,6 +67,7 @@ libcdo_la_SOURCES =            \
                grid.c          \
                grid.h          \
                grid_proj.c     \
+               grid_proj.h     \
                grid_area.c     \
                grid_define.c   \
                grid_gme.c      \

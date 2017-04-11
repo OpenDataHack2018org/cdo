@@ -32,6 +32,7 @@
 #include <cdi.h>
 #include "cdo_int.h"
 #include "grid.h"
+#include "grid_proj.h"
 
 
 
@@ -233,4 +234,54 @@ int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
   lcc_to_lonlat(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
 
   return 0;
+}
+
+
+void cdo_sinu_to_lonlat(size_t nvals, double *xvals, double *yvals)
+{
+#if defined(HAVE_LIBPROJ)
+  char *params[20];
+
+  int nbpar = 0;
+  params[nbpar++] = gen_param("proj=sinu");
+  params[nbpar++] = gen_param("ellps=WGS84");
+
+  if ( cdoVerbose )
+    for ( int i = 0; i < nbpar; ++i )
+      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+  projPJ proj = pj_init(nbpar, params);
+  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
+
+  /* proj->over = 1; */		/* allow longitude > 180 */
+
+  projUV p;
+  for ( size_t i = 0; i < nvals; i++ )
+    {
+      p.u = xvals[i];
+      p.v = yvals[i];
+      p = pj_inv(p, proj);
+      xvals[i] = p.u*RAD_TO_DEG;
+      yvals[i] = p.v*RAD_TO_DEG;
+      if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
+      if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
+    }
+
+  pj_free(proj);
+#else
+  cdoAbort("proj4 support not compiled in!");
+#endif
+}
+
+
+void grid_def_param_sinu(int gridID)
+{
+  const char *projection = "sinusoidal";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
+  const char *mapvarname = "Sinusoidal";
+  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
+
+  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
 }

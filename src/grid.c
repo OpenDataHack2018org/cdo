@@ -32,8 +32,8 @@
 #include <cdi.h>
 #include "cdo_int.h"
 #include "grid.h"
+#include "grid_proj.h"
 
-#define  PARAM_MISSVAL  -9.E33
 
 int nfc_to_nlat(int nfc, int ntr)
 {
@@ -545,56 +545,6 @@ char *gen_param(const char *fmt, ...)
   memcpy(rstr, str, len*sizeof(char));
 
   return rstr;
-}
-
-static
-void sinu_to_geo(int gridsize, double *xvals, double *yvals)
-{
-#if defined(HAVE_LIBPROJ)
-  char *params[20];
-  projUV data, res;
-
-  int nbpar = 0;
-  params[nbpar++] = gen_param("proj=sinu");
-  params[nbpar++] = gen_param("ellps=WGS84");
-
-  if ( cdoVerbose )
-    for ( int i = 0; i < nbpar; ++i )
-      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
-
-  projPJ proj = pj_init(nbpar, params);
-  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
-
-  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
-
-  /* proj->over = 1; */		/* allow longitude > 180 */
-
-  for ( int i = 0; i < gridsize; i++ )
-    {
-      data.u = xvals[i];
-      data.v = yvals[i];
-      res = pj_inv(data, proj);
-      xvals[i] = res.u*RAD2DEG;
-      yvals[i] = res.v*RAD2DEG;
-      if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
-      if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
-    }
-
-  pj_free(proj);
-#else
-  cdoAbort("proj4 support not compiled in!");
-#endif
-}
-
-
-void grid_def_param_sinu(int gridID)
-{
-  const char *projection = "sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPNAME, (int)strlen(projection)+1, projection);
-  const char *mapvarname = "Sinusoidal";
-  cdiGridDefKeyStr(gridID, CDI_KEY_MAPPING, (int)strlen(mapvarname)+1, mapvarname);
-
-  cdiDefAttTxt(gridID, CDI_GLOBAL, "grid_mapping_name", (int)strlen(projection), projection);
 }
 
 
@@ -1213,7 +1163,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
                   yvals2D[j*nx+i] = yscale*yvals[j];
                 }
 
-            if      ( lproj_sinu ) sinu_to_geo(gridsize, xvals2D, yvals2D);
+            if      ( lproj_sinu ) cdo_sinu_to_lonlat(gridsize, xvals2D, yvals2D);
             else if ( lproj_laea ) laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
             else if ( lproj_lcc  ) cdo_lcc_to_lonlat(gridID1, gridsize, xvals2D, yvals2D);
             else if ( lproj4     ) proj_to_geo(proj4param, gridsize, xvals2D, yvals2D);
@@ -1300,7 +1250,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
                           ybounds2D[index+3] = yscale*ybounds[2*j];
                         }
 			
-                    if      ( lproj_sinu ) sinu_to_geo(4*gridsize, xbounds2D, ybounds2D);
+                    if      ( lproj_sinu ) cdo_sinu_to_lonlat(4*gridsize, xbounds2D, ybounds2D);
                     else if ( lproj_laea ) laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
                     else if ( lproj_lcc  ) cdo_lcc_to_lonlat(gridID1, 4*gridsize, xbounds2D, ybounds2D);
                     else if ( lproj4     ) proj_to_geo(proj4param, 4*gridsize, xbounds2D, ybounds2D);
