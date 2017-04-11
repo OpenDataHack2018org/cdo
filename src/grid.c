@@ -528,75 +528,6 @@ void grid_gen_ybounds2D(int nx, int ny, const double *restrict ybounds, double *
     }
 }
 
-static
-char *gen_param(const char *fmt, ...)
-{
-  va_list args;
-  char str[256];
-
-  va_start(args, fmt);
-
-  int len = vsprintf(str, fmt, args);
-
-  va_end(args);
-
-  len++;
-  char *rstr = (char*) Malloc(len*sizeof(char));
-  memcpy(rstr, str, len*sizeof(char));
-
-  return rstr;
-}
-
-
-static
-void proj_to_geo(char *proj4param, int gridsize, double *xvals, double *yvals)
-{
-#if defined(HAVE_LIBPROJ)
-  char *params[99];
-
-  int nbpar;
-  for ( nbpar = 0; nbpar < 99; ++nbpar )
-    {
-      while ( *proj4param == ' ' || *proj4param == '+' ) proj4param++;
-      if ( *proj4param == 0 ) break;
-      char *cstart = proj4param;
-      while ( *proj4param != ' ' && *proj4param != 0 ) proj4param++;
-      char *cend = proj4param;
-      size_t len = cend - cstart;
-      if ( len <= 0 ) break;
-      bool lend = *cend == 0;
-      if ( !lend ) *cend = 0;
-      params[nbpar] = strdup(cstart);
-      if ( !lend ) *cend = ' ';
-    }
-
-  if ( cdoVerbose )
-    for ( int i = 0; i < nbpar; ++i )
-      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
-
-  projPJ proj = pj_init(nbpar, &params[0]);
-  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
-
-  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
-
-  projUV p;
-  for ( int i = 0; i < gridsize; i++ )
-    {
-      p.u = xvals[i];
-      p.v = yvals[i];
-      p = pj_inv(p, proj);
-      xvals[i] = p.u*RAD_TO_DEG;
-      yvals[i] = p.v*RAD_TO_DEG;
-      if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
-      if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
-    }
-
-  pj_free(proj);
-#else
-  cdoAbort("proj4 support not compiled in!");
-#endif
-}
-
 /*
  * grib_get_reduced_row: code from GRIB_API 1.10.4
  *
@@ -1043,7 +974,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
             if      ( lproj_sinu ) cdo_sinu_to_lonlat(gridsize, xvals2D, yvals2D);
             else if ( lproj_laea ) cdo_laea_to_lonlat(gridID1, gridsize, xvals2D, yvals2D);
             else if ( lproj_lcc  ) cdo_lcc_to_lonlat(gridID1, gridsize, xvals2D, yvals2D);
-            else if ( lproj4     ) proj_to_geo(proj4param, gridsize, xvals2D, yvals2D);
+            else if ( lproj4     ) cdo_proj_to_lonlat(proj4param, gridsize, xvals2D, yvals2D);
           }
 
 	gridDefXvals(gridID2, xvals2D);
@@ -1130,7 +1061,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
                     if      ( lproj_sinu ) cdo_sinu_to_lonlat(4*gridsize, xbounds2D, ybounds2D);
                     else if ( lproj_laea ) cdo_laea_to_lonlat(gridID1, 4*gridsize, xbounds2D, ybounds2D);
                     else if ( lproj_lcc  ) cdo_lcc_to_lonlat(gridID1, 4*gridsize, xbounds2D, ybounds2D);
-                    else if ( lproj4     ) proj_to_geo(proj4param, 4*gridsize, xbounds2D, ybounds2D);
+                    else if ( lproj4     ) cdo_proj_to_lonlat(proj4param, 4*gridsize, xbounds2D, ybounds2D);
                   }
                 else
                   {

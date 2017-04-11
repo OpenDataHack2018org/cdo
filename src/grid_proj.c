@@ -409,3 +409,52 @@ void cdo_laea_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
   cdoAbort("proj4 support not compiled in!");
 #endif
 }
+
+
+void cdo_proj_to_lonlat(char *proj4param, size_t nvals, double *xvals, double *yvals)
+{
+#if defined(HAVE_LIBPROJ)
+  char *params[99];
+
+  int nbpar;
+  for ( nbpar = 0; nbpar < 99; ++nbpar )
+    {
+      while ( *proj4param == ' ' || *proj4param == '+' ) proj4param++;
+      if ( *proj4param == 0 ) break;
+      char *cstart = proj4param;
+      while ( *proj4param != ' ' && *proj4param != 0 ) proj4param++;
+      char *cend = proj4param;
+      size_t len = cend - cstart;
+      if ( len <= 0 ) break;
+      bool lend = *cend == 0;
+      if ( !lend ) *cend = 0;
+      params[nbpar] = strdup(cstart);
+      if ( !lend ) *cend = ' ';
+    }
+
+  if ( cdoVerbose )
+    for ( int i = 0; i < nbpar; ++i )
+      cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+  projPJ proj = pj_init(nbpar, &params[0]);
+  if ( !proj ) cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+  for ( int i = 0; i < nbpar; ++i ) Free(params[i]);
+
+  projUV p;
+  for ( size_t i = 0; i < nvals; i++ )
+    {
+      p.u = xvals[i];
+      p.v = yvals[i];
+      p = pj_inv(p, proj);
+      xvals[i] = p.u*RAD_TO_DEG;
+      yvals[i] = p.v*RAD_TO_DEG;
+      if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
+      if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
+    }
+
+  pj_free(proj);
+#else
+  cdoAbort("proj4 support not compiled in!");
+#endif
+}
