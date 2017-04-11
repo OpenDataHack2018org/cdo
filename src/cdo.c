@@ -58,7 +58,7 @@
 
 #include "modules.h"
 #include "error.h"
-#include "grid.h"
+#include "grid_proj.h"
 
 #if defined(_OPENMP)
 #  include <omp.h>
@@ -1562,6 +1562,8 @@ int main(int argc, char *argv[])
 
   extern int (*proj_lonlat_to_lcc_func)();
   proj_lonlat_to_lcc_func = (int (*)()) proj_lonlat_to_lcc;
+  extern int (*proj_lcc_to_lonlat_func)();
+  proj_lcc_to_lonlat_func = (int (*)()) proj_lcc_to_lonlat;
 
   const char *operatorName = getOperatorName(operatorArg);
 
