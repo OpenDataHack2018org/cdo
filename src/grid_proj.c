@@ -55,6 +55,21 @@ char *gen_param(const char *fmt, ...)
   return rstr;
 }
 
+static
+void verify_lcc_parameter(double missval, double lon_0, double lat_0, double lat_1, double lat_2, double a, double rf, double x_0, double y_0)
+{
+  const char *projection = "lambert_conformal_conic";
+
+  if ( IS_NOT_EQUAL(a, grid_missval)  && a > 1.e10 ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "earth_radius");
+  if ( IS_NOT_EQUAL(rf, grid_missval) && rf > 0 ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "inverse_flattening");
+  if ( lon_0 < -360 || lon_0 > 360 ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "longitude_of_central_meridian");
+  if ( lat_0 < -90 || lat_0 > 90 ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "latitude_of_central_meridian");
+  if ( lat_1 < -90 || lat_1 > 90 ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "standard_parallel");
+  if ( lat_2 < -90 || lat_2 > 90 ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "standard_parallel");
+  if ( IS_NOT_EQUAL(x_0, grid_missval) && (x_0 < -1.e20 || x_0 > 1.e20) ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "false_easting");
+  if ( IS_NOT_EQUAL(y_0, grid_missval) && (y_0 < -1.e20 || y_0 > 1.e20) ) cdoWarning("%s mapping parameter %s out of bounds!", projection, "false_northing");
+}
+
 
 int proj_lonlat_to_lcc(double missval, double lon_0, double lat_0, double lat_1, double lat_2,
                        double a, double rf, size_t nvals, double *xvals, double *yvals)
@@ -230,6 +245,8 @@ int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals)
     }
 
   if ( status ) cdoAbort("%s mapping parameter missing!", projection);
+
+  verify_lcc_parameter(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0);
 
   lcc_to_lonlat(grid_missval, lon_0, lat_0, lat_1, lat_2, a, rf, x_0, y_0, nvals, xvals, yvals);
 
