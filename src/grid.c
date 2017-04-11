@@ -127,12 +127,12 @@ int nlat_to_nlon(int nlat)
 
 
 static
-void scale_vec(double scalefactor, long nvals, double *restrict values)
+void scale_vec(double scalefactor, size_t nvals, double *restrict values)
 {
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nvals, scalefactor, values)
 #endif
-  for ( long n = 0; n < nvals; ++n )
+  for ( size_t n = 0; n < nvals; ++n )
     {
       values[n] *= scalefactor;
     }
@@ -175,7 +175,7 @@ void grid_copy_mapping(int gridID1, int gridID2)
 }
 
 
-void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description)
+void grid_to_radian(const char *units, size_t nvals, double *restrict values, const char *description)
 {
   if ( cmpstr(units, "degree") == 0 )
     {
@@ -192,11 +192,11 @@ void grid_to_radian(const char *units, long nvals, double *restrict values, cons
 }
 
 
-void grid_to_degree(const char *units, long nvals, double *restrict values, const char *description)
+void grid_to_degree(const char *units, size_t nvals, double *restrict values, const char *description)
 {
   if ( cmpstr(units, "radian") == 0 )
     {
-      for ( long n = 0; n < nvals; ++n ) values[n] *= RAD2DEG;
+      for ( size_t n = 0; n < nvals; ++n ) values[n] *= RAD2DEG;
     }
   else if ( cmpstr(units, "degree") == 0 )
     {
@@ -212,7 +212,7 @@ void grid_to_degree(const char *units, long nvals, double *restrict values, cons
 int gridToZonal(int gridID1)
 {
   int gridtype = gridInqType(gridID1);
-  int gridsize = gridInqYsize(gridID1);
+  size_t gridsize = gridInqYsize(gridID1);
   int gridID2  = gridCreate(gridtype, gridsize);
 	  
   if ( gridtype == GRID_LONLAT   ||
@@ -245,7 +245,7 @@ int gridToZonal(int gridID1)
 int gridToMeridional(int gridID1)
 {
   int gridtype = gridInqType(gridID1);
-  int gridsize = gridInqXsize(gridID1);
+  size_t gridsize = gridInqXsize(gridID1);
   int gridID2  = gridCreate(gridtype, gridsize);
 	  
   if ( gridtype == GRID_LONLAT   ||
@@ -275,7 +275,7 @@ int gridToMeridional(int gridID1)
 }
 
 
-void grid_gen_corners(int n, const double* restrict vals, double* restrict corners)
+void grid_gen_corners(size_t n, const double* restrict vals, double* restrict corners)
 {
   if ( n == 1 )
     {
@@ -284,7 +284,7 @@ void grid_gen_corners(int n, const double* restrict vals, double* restrict corne
     }
   else
     {
-      for ( int i = 0; i < n-1; ++i )
+      for ( size_t i = 0; i < n-1; ++i )
 	corners[i+1] = 0.5*(vals[i] + vals[i+1]);
 
       corners[0] = 2*vals[0] - corners[1];
@@ -293,9 +293,9 @@ void grid_gen_corners(int n, const double* restrict vals, double* restrict corne
 }
 
 
-void grid_gen_bounds(int n, const double *restrict vals, double *restrict bounds)
+void grid_gen_bounds(size_t n, const double *restrict vals, double *restrict bounds)
 {
-  for ( int i = 0; i < n-1; ++i )
+  for ( size_t i = 0; i < n-1; ++i )
     {
       bounds[2*i+1]   = 0.5*(vals[i] + vals[i+1]);
       bounds[2*(i+1)] = 0.5*(vals[i] + vals[i+1]);
@@ -321,7 +321,7 @@ void grid_check_lat_borders(int n, double *ybounds)
 }
 
 
-void grid_cell_center_to_bounds_X2D(const char* xunitstr, long xsize, long ysize, const double* restrict grid_center_lon, 
+void grid_cell_center_to_bounds_X2D(const char* xunitstr, size_t xsize, size_t ysize, const double* restrict grid_center_lon, 
 				    double* restrict grid_corner_lon, double dlon)
 {
   (void)xunitstr;
@@ -331,13 +331,13 @@ void grid_cell_center_to_bounds_X2D(const char* xunitstr, long xsize, long ysize
   if ( xsize == 1 || (grid_center_lon[xsize-1]-grid_center_lon[0]+dlon) < 359 )
     cdoAbort("Cannot calculate Xbounds for %d vals with dlon = %g", xsize, dlon);
   */
-  for ( int i = 0; i < xsize; ++i )
+  for ( size_t i = 0; i < xsize; ++i )
     {
       double minlon = grid_center_lon[i] - 0.5*dlon;
       double maxlon = grid_center_lon[i] + 0.5*dlon;
-      for ( int j = 0; j < ysize; ++j )
+      for ( size_t j = 0; j < ysize; ++j )
 	{
-	  int index = (j<<2)*xsize + (i<<2);
+	  size_t index = (j<<2)*xsize + (i<<2);
 	  grid_corner_lon[index  ] = minlon;
 	  grid_corner_lon[index+1] = maxlon;
 	  grid_corner_lon[index+2] = maxlon;
@@ -378,7 +378,7 @@ double genYmax(double y1, double y2)
 
 /*****************************************************************************/
 
-void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize, const double* restrict grid_center_lat, double* restrict grid_corner_lat)
+void grid_cell_center_to_bounds_Y2D(const char* yunitstr, size_t xsize, size_t ysize, const double *restrict grid_center_lat, double *restrict grid_corner_lat)
 {
   (void)yunitstr;
 
@@ -389,7 +389,7 @@ void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize
 
   // if ( ysize == 1 ) cdoAbort("Cannot calculate Ybounds for 1 value!");
 
-  for ( int j = 0; j < ysize; ++j )
+  for ( size_t j = 0; j < ysize; ++j )
     {
       if ( ysize == 1 )
 	{
@@ -398,7 +398,7 @@ void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize
 	}
       else
 	{
-	  int index = j*xsize;
+	  size_t index = j*xsize;
 	  if ( firstlat > lastlat )
 	    {
 	      if ( j == 0 )
@@ -425,9 +425,9 @@ void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize
 	    }
 	}
 
-      for ( int i = 0; i < xsize; ++i )
+      for ( size_t i = 0; i < xsize; ++i )
 	{
-	  int index = (j<<2)*xsize + (i<<2);
+	  size_t index = (j<<2)*xsize + (i<<2);
 	  grid_corner_lat[index  ] = minlat;
 	  grid_corner_lat[index+1] = minlat;
 	  grid_corner_lat[index+2] = maxlat;
@@ -437,13 +437,13 @@ void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize
 }
 
 static
-void gridGenRotBounds(double xpole, double ypole, double angle, int nx, int ny,
+void gridGenRotBounds(double xpole, double ypole, double angle, size_t nx, size_t ny,
 		      double *xbounds, double *ybounds, double *xbounds2D, double *ybounds2D)
 {
   double minlon, maxlon;
   double minlat, maxlat;
 
-  for ( int j = 0; j < ny; j++ )
+  for ( size_t j = 0; j < ny; j++ )
     {
       if ( ybounds[0] > ybounds[1] )
 	{
@@ -456,12 +456,12 @@ void gridGenRotBounds(double xpole, double ypole, double angle, int nx, int ny,
 	  minlat = ybounds[2*j];
 	}
 
-      for ( int i = 0; i < nx; i++ )
+      for ( size_t i = 0; i < nx; i++ )
 	{
 	  minlon = xbounds[2*i];
 	  maxlon = xbounds[2*i+1];
 
-	  int index = j*4*nx + 4*i;
+	  size_t index = j*4*nx + 4*i;
 	  xbounds2D[index+0] = lamrot_to_lam(minlat, minlon, ypole, xpole, angle);
 	  xbounds2D[index+1] = lamrot_to_lam(minlat, maxlon, ypole, xpole, angle);
 	  xbounds2D[index+2] = lamrot_to_lam(maxlat, maxlon, ypole, xpole, angle);
@@ -476,19 +476,19 @@ void gridGenRotBounds(double xpole, double ypole, double angle, int nx, int ny,
 }
 
 
-void grid_gen_xbounds2D(int nx, int ny, const double *restrict xbounds, double *restrict xbounds2D)
+void grid_gen_xbounds2D(size_t nx, size_t ny, const double *restrict xbounds, double *restrict xbounds2D)
 {
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nx, ny, xbounds, xbounds2D)
 #endif
-  for ( int i = 0; i < nx; ++i )
+  for ( size_t i = 0; i < nx; ++i )
     {
       double minlon = xbounds[2*i  ];
       double maxlon = xbounds[2*i+1];
 
-      for ( int j = 0; j < ny; ++j )
+      for ( size_t j = 0; j < ny; ++j )
 	{
-	  int index = j*4*nx + 4*i;
+	  size_t index = j*4*nx + 4*i;
 	  xbounds2D[index  ] = minlon;
 	  xbounds2D[index+1] = maxlon;
 	  xbounds2D[index+2] = maxlon;
@@ -498,12 +498,12 @@ void grid_gen_xbounds2D(int nx, int ny, const double *restrict xbounds, double *
 }
 
 
-void grid_gen_ybounds2D(int nx, int ny, const double *restrict ybounds, double *restrict ybounds2D)
+void grid_gen_ybounds2D(size_t nx, size_t ny, const double *restrict ybounds, double *restrict ybounds2D)
 {
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nx, ny, ybounds, ybounds2D)
 #endif
-  for ( int j = 0; j < ny; ++j )
+  for ( size_t j = 0; j < ny; ++j )
     {
       double minlat, maxlat;
       if ( ybounds[0] > ybounds[1] )
@@ -517,9 +517,9 @@ void grid_gen_ybounds2D(int nx, int ny, const double *restrict ybounds, double *
 	  minlat = ybounds[2*j  ];
 	}
 
-      for ( int i = 0; i < nx; ++i )
+      for ( size_t i = 0; i < nx; ++i )
 	{
-	  int index = j*4*nx + 4*i;
+	  size_t index = j*4*nx + 4*i;
 	  ybounds2D[index  ] = minlat;
 	  ybounds2D[index+1] = minlat;
 	  ybounds2D[index+2] = maxlat;
@@ -537,7 +537,7 @@ void grid_gen_ybounds2D(int nx, int ny, const double *restrict ybounds, double *
  *
  */
 static
-void grib_get_reduced_row(long pl,double lon_first,double lon_last,long* npoints,long* ilon_first, long* ilon_last )
+void grib_get_reduced_row(long pl, double lon_first, double lon_last, long *npoints, long *ilon_first, long *ilon_last )
 {
   double dlon_first=0, dlon_last=0;
 
@@ -592,7 +592,7 @@ void grib_get_reduced_row(long pl,double lon_first,double lon_last,long* npoints
 }
 
 static
-int qu2reg_subarea(int gridsize, int np, double xfirst, double xlast, 
+int qu2reg_subarea(size_t gridsize, int np, double xfirst, double xlast, 
 		   double *array, int *rowlon, int ny, double missval, int *iret, int lmiss, int lperio, int lveggy)
 {
   /* sub area (longitudes) */
@@ -602,7 +602,7 @@ int qu2reg_subarea(int gridsize, int np, double xfirst, double xlast,
   long row_count;
   int rlon, nwork = 0;
   int np4 = np*4;
-  int size = 0;
+  size_t size = 0;
   int wlen;
   int ii;
 
@@ -855,16 +855,16 @@ char *grid_get_proj4param(int gridID)
 
 int gridToCurvilinear(int gridID1, int lbounds)
 {
-  int index;
+  size_t index;
   int gridtype = gridInqType(gridID1);
 
-  int nx = gridInqXsize(gridID1);
-  int ny = gridInqYsize(gridID1);
+  size_t nx = gridInqXsize(gridID1);
+  size_t ny = gridInqYsize(gridID1);
 
   bool lxyvals = gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL);
   if ( !lxyvals && gridtype != GRID_LCC ) cdoAbort("Grid coordinates missing!");
 
-  int gridsize = gridInqSize(gridID1);
+  size_t gridsize = gridInqSize(gridID1);
   int gridID2 = gridCreate(GRID_CURVILINEAR, gridsize);
   gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
 
@@ -943,20 +943,20 @@ int gridToCurvilinear(int gridID1, int lbounds)
         if ( gridInqXvals(gridID1, NULL) )
           gridInqXvals(gridID1, xvals);
         else
-          for ( int i = 0; i < nx; ++i ) xvals[i] = 0;
+          for ( size_t i = 0; i < nx; ++i ) xvals[i] = 0;
             
         if ( gridInqYvals(gridID1, NULL) )
           gridInqYvals(gridID1, yvals);
         else
-          for ( int i = 0; i < ny; ++i ) yvals[i] = 0;
+          for ( size_t i = 0; i < ny; ++i ) yvals[i] = 0;
             
         if ( lproj_rll )
           {
             gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
             gridDefProj(gridID2, gridID1);
 
-            for ( int j = 0; j < ny; j++ )
-              for ( int i = 0; i < nx; i++ )
+            for ( size_t j = 0; j < ny; j++ )
+              for ( size_t i = 0; i < nx; i++ )
                 {
                   xvals2D[j*nx+i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
                   yvals2D[j*nx+i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
@@ -964,8 +964,8 @@ int gridToCurvilinear(int gridID1, int lbounds)
           }
         else
           {
-            for ( int j = 0; j < ny; j++ )
-              for ( int i = 0; i < nx; i++ )
+            for ( size_t j = 0; j < ny; j++ )
+              for ( size_t i = 0; i < nx; i++ )
                 {
                   xvals2D[j*nx+i] = xscale*xvals[i];
                   yvals2D[j*nx+i] = yscale*yvals[j];
@@ -1040,8 +1040,8 @@ int gridToCurvilinear(int gridID1, int lbounds)
               {
                 if ( lproj_sinu || lproj_laea || lproj_lcc || lproj4 )
                   {
-                    for ( int j = 0; j < ny; j++ )
-                      for ( int i = 0; i < nx; i++ )
+                    for ( size_t j = 0; j < ny; j++ )
+                      for ( size_t i = 0; i < nx; i++ )
                         {
                           index = j*4*nx + 4*i;
 
@@ -1101,7 +1101,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 }
 
 
-int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList, int nocoords, int nobounds)
+int gridToUnstructuredSelecton(int gridID1, size_t selectionSize, int *selectionIndexList, int nocoords, int nobounds)
 {
   /* transform input grid into a unstructured Version if necessary {{{ */
   int unstructuredGridID;
@@ -1110,7 +1110,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   else
     unstructuredGridID = gridToUnstructured(gridID1,!nobounds);
 
-  int unstructuredGridSize = gridInqSize(unstructuredGridID);
+  size_t unstructuredGridSize = gridInqSize(unstructuredGridID);
 
   int unstructuredSelectionGridID = gridCreate(GRID_UNSTRUCTURED,selectionSize);
 
@@ -1135,7 +1135,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   double *xvals   = (double*) Malloc(selectionSize*sizeof(double));
   double *yvals   = (double*) Malloc(selectionSize*sizeof(double));
 
-  for (int i = 0; i < selectionSize; i++)
+  for (size_t i = 0; i < selectionSize; i++)
   {
     xvals[i] = xvalsUnstructured[selectionIndexList[i]];
     yvals[i] = yvalsUnstructured[selectionIndexList[i]];
@@ -1151,16 +1151,16 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
   /* copy bounds if requested {{{ */
   if ( ! nobounds )
   {
-    int nvertex                 = gridInqNvertex(unstructuredGridID);
+    size_t nvertex              = gridInqNvertex(unstructuredGridID);
     double *xbounds             = (double*) Malloc(nvertex*selectionSize*sizeof(double));
     double *ybounds             = (double*) Malloc(nvertex*selectionSize*sizeof(double));
     double *xboundsUnstructured = (double*) Malloc(nvertex*unstructuredGridSize*sizeof(double));
     double *yboundsUnstructured = (double*) Malloc(nvertex*unstructuredGridSize*sizeof(double));
     gridInqXbounds(unstructuredGridID, xboundsUnstructured);
     gridInqYbounds(unstructuredGridID, yboundsUnstructured);
-    for (int i = 0; i < selectionSize; i++)
+    for (size_t i = 0; i < selectionSize; i++)
     {
-      for (int k = 0; k < nvertex; k++)
+      for (size_t k = 0; k < nvertex; k++)
       {
         xbounds[i*nvertex+k] = xboundsUnstructured[selectionIndexList[i]*nvertex+k];
         ybounds[i*nvertex+k] = yboundsUnstructured[selectionIndexList[i]*nvertex+k];
@@ -1189,7 +1189,7 @@ int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionInd
 int gridToUnstructured(int gridID1, int lbounds)
 {
   int gridtype = gridInqType(gridID1);
-  int gridsize = gridInqSize(gridID1);
+  size_t gridsize = gridInqSize(gridID1);
   int gridID2  = gridCreate(GRID_UNSTRUCTURED, gridsize);
   gridDefPrec(gridID2, CDI_DATATYPE_FLT32);
 	  
@@ -1215,8 +1215,8 @@ int gridToUnstructured(int gridID1, int lbounds)
 
 	gridDefNvertex(gridID2, 4);
 
-	int nx = gridInqXsize(gridID1);
-	int ny = gridInqYsize(gridID1);
+	size_t nx = gridInqXsize(gridID1);
+	size_t ny = gridInqYsize(gridID1);
 	 
 	gridDefXsize(gridID2, gridsize);
 	gridDefYsize(gridID2, gridsize);
@@ -1234,8 +1234,8 @@ int gridToUnstructured(int gridID1, int lbounds)
 	  {	    
             gridInqParamRLL(gridID1, &xpole, &ypole, &angle);
 		
-	    for ( int j = 0; j < ny; j++ )
-	      for ( int i = 0; i < nx; i++ )
+	    for ( size_t j = 0; j < ny; j++ )
+	      for ( size_t i = 0; i < nx; i++ )
 		{
 		  xvals2D[j*nx+i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
 		  yvals2D[j*nx+i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
@@ -1243,8 +1243,8 @@ int gridToUnstructured(int gridID1, int lbounds)
 	  }
 	else
 	  {
-	    for ( int j = 0; j < ny; j++ )
-	      for ( int i = 0; i < nx; i++ )
+	    for ( size_t j = 0; j < ny; j++ )
+	      for ( size_t i = 0; i < nx; i++ )
 		{
 		  xvals2D[j*nx+i] = xvals[i];
 		  yvals2D[j*nx+i] = yvals[j];
@@ -1327,7 +1327,7 @@ int gridToUnstructured(int gridID1, int lbounds)
       }
     case GRID_GME:
       {
-	int nv = 6;
+	size_t nv = 6;
 	double *xbounds = NULL, *ybounds = NULL;
 
         int nd, ni, ni2, ni3;
@@ -1344,13 +1344,13 @@ int gridToUnstructured(int gridID1, int lbounds)
 
 	gme_grid(lbounds, gridsize, xvals, yvals, xbounds, ybounds, imask, ni, nd, ni2, ni3);
 	
-	for ( int i = 0; i < gridsize; i++ )
+	for ( size_t i = 0; i < gridsize; i++ )
 	  {
 	    xvals[i] *= RAD2DEG;
 	    yvals[i] *= RAD2DEG;
 
 	    if ( lbounds )
-	      for ( int j = 0; j < nv; j++ )
+	      for ( size_t j = 0; j < nv; j++ )
 		{
 		  xbounds[i*nv + j] *= RAD2DEG;
 		  ybounds[i*nv + j] *= RAD2DEG;

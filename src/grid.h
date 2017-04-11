@@ -39,29 +39,29 @@ void grid_def_param_sinu(int gridID);
 
 bool grid_is_distance_generic(int gridID);
 
-void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description);
-void grid_to_degree(const char *units, long nvals, double *restrict values, const char *description);
+void grid_to_radian(const char *units, size_t nvals, double *restrict values, const char *description);
+void grid_to_degree(const char *units, size_t nvals, double *restrict values, const char *description);
 
-void grid_gen_corners(int n, const double* restrict vals, double* restrict corners);
-void grid_gen_bounds(int n, const double *restrict vals, double *restrict bounds);
+void grid_gen_corners(size_t n, const double* restrict vals, double* restrict corners);
+void grid_gen_bounds(size_t n, const double *restrict vals, double *restrict bounds);
 void grid_check_lat_borders(int n, double *ybounds);
 
-void grid_gen_xbounds2D(int nx, int ny, const double *restrict xbounds, double *restrict xbounds2D);
-void grid_gen_ybounds2D(int nx, int ny, const double *restrict ybounds, double *restrict ybounds2D);
+void grid_gen_xbounds2D(size_t nx, size_t ny, const double *restrict xbounds, double *restrict xbounds2D);
+void grid_gen_ybounds2D(size_t nx, size_t ny, const double *restrict ybounds, double *restrict ybounds2D);
 
-void grid_cell_center_to_bounds_X2D(const char* xunitstr, long xsize, long ysize,
-				    const double* restrict grid_center_lon, double* restrict grid_corner_lon, double dlon);
-void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize,
-				    const double* restrict grid_center_lat, double* restrict grid_corner_lat);
+void grid_cell_center_to_bounds_X2D(const char* xunitstr, size_t xsize, size_t ysize,
+				    const double *restrict grid_center_lon, double *restrict grid_corner_lon, double dlon);
+void grid_cell_center_to_bounds_Y2D(const char* yunitstr, size_t xsize, size_t ysize,
+				    const double *restrict grid_center_lat, double *restrict grid_corner_lat);
 
-int  gridWeights(int gridID, double *weights);
-int  gridGenArea(int gridID, double *area);
+int gridWeights(int gridID, double *weights);
+int gridGenArea(int gridID, double *area);
 
 int referenceToGrid(int gridID);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
 int gridToUnstructured(int gridID, int lbounds);
-int gridToUnstructuredSelecton(int gridID1, int selectionSize, int *selectionIndexList, int nocoords ,int nobounds);
+int gridToUnstructuredSelecton(int gridID1, size_t selectionSize, int *selectionIndexList, int nocoords ,int nobounds);
 int gridToCurvilinear(int gridID, int lbounds);
 int gridCurvilinearToRegular(int gridID);
 int gridToRegular(int gridID);
@@ -102,10 +102,6 @@ int cdo_define_sample_grid(int gridID, int sampleFactor);
 
 // Define a sub-grid of another grid
 int cdo_define_subgrid_grid(int gridSrcID, int subI0, int subI1, int subJ0, int subJ1);
-
-
-int cdo_lonlat_to_lcc(int gridID, size_t nvals, double *xvals, double *yvals);
-int cdo_lcc_to_lonlat(int gridID, size_t nvals, double *xvals, double *yvals);
 
 
 #ifdef __cplusplus
