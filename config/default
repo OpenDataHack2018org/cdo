@@ -86,7 +86,7 @@ case "${HOSTNAME}" in
         CDOLIBS="--enable-nearpt3 \
                  --with-fftw3 \
                  --with-szlib=$HOME/local \
-                 --with-grib_api=$HOME/local/gribapi-1.13.0 \
+                 --with-grib_api=$HOME/local/grib_api-1.21.0 \
                  --with-netcdf=$HOME/local/netcdf-c-4.4.1.1 \
                  --with-hdf5=$HOME/local/hdf5-1.8.18 \
                  --with-libxml2=/opt/local \
