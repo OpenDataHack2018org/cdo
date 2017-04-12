@@ -83,7 +83,7 @@ int cmpxy_gt(const void *s1, const void *s2)
 }
 
 static
-int genGrid(int nfiles, ens_file_t *ef, bool ginit, int igrid, int nxblocks)
+int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int nxblocks)
 {
   bool lsouthnorth = true;
   bool lregular = false;
@@ -96,7 +96,7 @@ int genGrid(int nfiles, ens_file_t *ef, bool ginit, int igrid, int nxblocks)
 
   int gridID   = vlistGrid(ef[0].vlistID, igrid);
   int gridtype = gridInqType(gridID);
-  if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
+  if ( ngrids > 1 && gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
     return gridID2;
 
   int *xsize = (int*) Malloc(nfiles*sizeof(int));
@@ -113,13 +113,15 @@ int genGrid(int nfiles, ens_file_t *ef, bool ginit, int igrid, int nxblocks)
         lregular = true;
       else if ( gridtype == GRID_CURVILINEAR )
         lcurvilinear = true;
-      else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 )
+      else if ( gridtype == GRID_GENERIC /*&& gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0*/ )
         ;
       else
 	cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
       xsize[fileID] = gridInqXsize(gridID);
       ysize[fileID] = gridInqYsize(gridID);
+      if ( xsize[fileID] == 0 ) xsize[fileID] = 1;
+      if ( ysize[fileID] == 0 ) ysize[fileID] = 1;
 
       if ( lregular )
         {
@@ -330,9 +332,9 @@ void *Collgrid(void *argument)
     vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
-  bool *vars1  = (bool*) Malloc(nvars*sizeof(bool));
+  bool *vars1 = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = false;
 
   int nsel = operatorArgc();
@@ -437,11 +439,11 @@ void *Collgrid(void *argument)
 
       if ( !ginit )
 	{
-	  gridIDs[i2] = genGrid(nfiles, ef, ginit, i1, nxblocks);
+	  gridIDs[i2] = genGrid(ngrids2, nfiles, ef, ginit, i1, nxblocks);
 	  if ( gridIDs[i2] != -1 ) ginit = true;
 	}
       else
-	gridIDs[i2] = genGrid(nfiles, ef, ginit, i1, nxblocks);
+	gridIDs[i2] = genGrid(ngrids2, nfiles, ef, ginit, i1, nxblocks);
     }
 
 
