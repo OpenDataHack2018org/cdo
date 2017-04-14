@@ -1,3 +1,7 @@
+2017-04-14  Uwe Schulzweida
+
+	* removed fpe handling (speedup of 50% for ensmean ...)
+
 2017-04-13  Uwe Schulzweida
 
 	* Using CDI library version 1.8.1
