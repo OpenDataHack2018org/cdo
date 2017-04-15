@@ -33,7 +33,8 @@ double fldfun(field_type field, int function)
     case func_min:    rval = fldmin(field);    break;
     case func_max:    rval = fldmax(field);    break;
     case func_sum:    rval = fldsum(field);    break;
-    case func_meanw:   rval = fldmean(field);   break;
+    case func_mean:   rval = fldmean(field);   break;
+    case func_meanw:  rval = fldmeanw(field);  break;
     case func_avg:    rval = fldavg(field);    break;
     case func_std:    rval = fldstd(field);    break;
     case func_std1:   rval = fldstd1(field);   break;
@@ -269,6 +270,39 @@ double fldsum(field_type field)
 
 
 double fldmean(field_type field)
+{
+  const int nmiss       = field.nmiss > 0;
+  const size_t len      = field.size;
+  const double missval1 = field.missval;
+  const double missval2 = field.missval;
+  const double *restrict array = field.ptr;
+  const double *restrict w     = field.weight;
+  double rsum = 0, rsumw = 0;
+  double ravg = 0;
+
+  assert(array!=NULL);
+  assert(w!=NULL);
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; i++ ) 
+	if ( !DBL_IS_EQUAL(array[i], missval1) && !DBL_IS_EQUAL(w[i], missval1) )
+	  {
+	    rsum  += array[i];
+	    rsumw += 1;
+	  }
+      ravg = DIVMN(rsum, rsumw);
+    }
+  else
+    {
+      int fpeRaised = array_mean_val(len, array, &ravg);
+    }
+
+  return ravg;
+}
+
+
+double fldmeanw(field_type field)
 {
   const int nmiss       = field.nmiss > 0;
   const size_t len      = field.size;

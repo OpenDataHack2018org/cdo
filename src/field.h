@@ -113,6 +113,7 @@ double fldmax(field_type field);
 double fldsum(field_type field);
 double fldavg(field_type field);
 double fldmean(field_type field);
+double fldmeanw(field_type field);
 double fldstd(field_type field);
 double fldstd1(field_type field);
 double fldvar(field_type field);

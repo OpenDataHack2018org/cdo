@@ -10,8 +10,8 @@
 #define  func_range    12
 #define  func_sum      13
 #define  func_avg      14
-//#define  func_mean     15
-#define  func_meanw    15
+#define  func_mean     15
+#define  func_meanw    16
 #define  func_std      17
 #define  func_std1     18
 #define  func_var      19
