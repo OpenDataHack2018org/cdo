@@ -44,6 +44,7 @@ void *Ensstat(void *argument)
   {
     int streamID;
     int vlistID;
+    int nmiss;
     double missval;
     double *array;
   } ens_file_t;
@@ -53,7 +54,7 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("ensmin",  func_min,  0, NULL);
   cdoOperatorAdd("ensmax",  func_max,  0, NULL);
   cdoOperatorAdd("enssum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ensmean", func_meanw, 0, NULL);
+  cdoOperatorAdd("ensmean", func_mean, 0, NULL);
   cdoOperatorAdd("ensavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ensstd",  func_std,  0, NULL);
   cdoOperatorAdd("ensstd1", func_std1, 0, NULL);
@@ -63,6 +64,8 @@ void *Ensstat(void *argument)
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
+
+  bool lpctl = operfunc == func_pctl;
 
   int argc = operatorArgc();
   int nargc = argc;
@@ -212,9 +215,11 @@ void *Ensstat(void *argument)
 #pragma omp parallel for default(none) shared(ef, nfiles)
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
-              int nmiss;
-	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
+	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
 	    }
+
+          bool lmiss = false;
+          for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( ef[fileID].nmiss > 0 ) lmiss = true;
 
 	  int gridID = vlistInqVarGrid(vlistID1, varID);
 	  int gridsize = gridInqSize(gridID);
@@ -233,17 +238,14 @@ void *Ensstat(void *argument)
 	      for ( int fileID = 0; fileID < nfiles; fileID++ )
 		{
 		  field[ompthID].ptr[fileID] = ef[fileID].array[i];
-		  if ( DBL_IS_EQUAL(field[ompthID].ptr[fileID], ef[fileID].missval) )
+		  if ( lmiss && DBL_IS_EQUAL(field[ompthID].ptr[fileID], ef[fileID].missval) )
                     {
                       field[ompthID].ptr[fileID] = missval;
                       field[ompthID].nmiss++;
                     }
                 }
 
-	      if ( operfunc == func_pctl )
-	        array2[i] = fldpctl(field[ompthID], pn);
-	      else  
-	        array2[i] = fldfun(field[ompthID], operfunc);
+              array2[i] = lpctl ? fldpctl(field[ompthID], pn) : fldfun(field[ompthID], operfunc);
 
 	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) )
 		{
