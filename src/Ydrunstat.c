@@ -73,7 +73,7 @@ void *Ydrunstat(void *argument)
   cdoOperatorAdd("ydrunmin",  func_min,  0, NULL);
   cdoOperatorAdd("ydrunmax",  func_max,  0, NULL);
   cdoOperatorAdd("ydrunsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ydrunmean", func_mean, 0, NULL);
+  cdoOperatorAdd("ydrunmean", func_meanw, 0, NULL);
   cdoOperatorAdd("ydrunavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ydrunvar",  func_var,  0, NULL);
   cdoOperatorAdd("ydrunvar1", func_var1, 0, NULL);
@@ -436,7 +436,7 @@ void ydstatFinalize(YDAY_STATS *stats, int operfunc)
       	switch ( operfunc )
       	  {
 	    case func_avg:
-	    case func_mean:
+	    case func_meanw:
 	      for ( varID = 0; varID < nvars; varID++ )
 	        {
 	          if ( vlistInqVarTsteptype(stats->vlist, varID) == TSTEP_CONSTANT ) continue;

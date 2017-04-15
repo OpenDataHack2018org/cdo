@@ -98,7 +98,7 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldmin",   func_min,   0, NULL);
   cdoOperatorAdd("fldmax",   func_max,   0, NULL);
   cdoOperatorAdd("fldsum",   func_sum,   0, NULL);
-  cdoOperatorAdd("fldmean",  func_mean,  1, NULL);
+  cdoOperatorAdd("fldmean",  func_meanw,  1, NULL);
   cdoOperatorAdd("fldavg",   func_avg,   1, NULL);
   cdoOperatorAdd("fldstd",   func_std,   1, NULL);
   cdoOperatorAdd("fldstd1",  func_std1,  1, NULL);

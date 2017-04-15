@@ -557,7 +557,7 @@ void *Gridboxstat(void *argument)
   cdoOperatorAdd("gridboxmin",  func_min,  0, NULL);
   cdoOperatorAdd("gridboxmax",  func_max,  0, NULL);
   cdoOperatorAdd("gridboxsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("gridboxmean", func_mean, 0, NULL);
+  cdoOperatorAdd("gridboxmean", func_meanw, 0, NULL);
   cdoOperatorAdd("gridboxavg",  func_avg,  0, NULL);
   cdoOperatorAdd("gridboxvar",  func_var,  0, NULL);
   cdoOperatorAdd("gridboxvar1", func_var1, 0, NULL);
@@ -567,7 +567,7 @@ void *Gridboxstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  bool needWeights = (operfunc == func_mean || operfunc == func_avg ||
+  bool needWeights = (operfunc == func_meanw || operfunc == func_avg ||
                       operfunc == func_var  || operfunc == func_std ||
                       operfunc == func_var1 || operfunc == func_std1);
 

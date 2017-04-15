@@ -176,7 +176,7 @@ void *XTimstat(void *argument)
   cdoOperatorAdd("xtimmin",    func_min,   DATE_LEN, NULL);
   cdoOperatorAdd("xtimmax",    func_max,   DATE_LEN, NULL);
   cdoOperatorAdd("xtimsum",    func_sum,   DATE_LEN, NULL);
-  cdoOperatorAdd("xtimmean",   func_mean,  DATE_LEN, NULL);
+  cdoOperatorAdd("xtimmean",   func_meanw,  DATE_LEN, NULL);
   cdoOperatorAdd("xtimavg",    func_avg,   DATE_LEN, NULL);
   cdoOperatorAdd("xtimvar",    func_var,   DATE_LEN, NULL);
   cdoOperatorAdd("xtimvar1",   func_var1,  DATE_LEN, NULL);
@@ -185,7 +185,7 @@ void *XTimstat(void *argument)
   cdoOperatorAdd("xyearmin",   func_min,   YEAR_LEN, NULL);
   cdoOperatorAdd("xyearmax",   func_max,   YEAR_LEN, NULL);
   cdoOperatorAdd("xyearsum",   func_sum,   YEAR_LEN, NULL);
-  cdoOperatorAdd("xyearmean",  func_mean,  YEAR_LEN, NULL);
+  cdoOperatorAdd("xyearmean",  func_meanw,  YEAR_LEN, NULL);
   cdoOperatorAdd("xyearavg",   func_avg,   YEAR_LEN, NULL);
   cdoOperatorAdd("xyearvar",   func_var,   YEAR_LEN, NULL);
   cdoOperatorAdd("xyearvar1",  func_var1,  YEAR_LEN, NULL);
@@ -194,7 +194,7 @@ void *XTimstat(void *argument)
   cdoOperatorAdd("xmonmin",    func_min,   MON_LEN, NULL);
   cdoOperatorAdd("xmonmax",    func_max,   MON_LEN, NULL);
   cdoOperatorAdd("xmonsum",    func_sum,   MON_LEN, NULL);
-  cdoOperatorAdd("xmonmean",   func_mean,  MON_LEN, NULL);
+  cdoOperatorAdd("xmonmean",   func_meanw,  MON_LEN, NULL);
   cdoOperatorAdd("xmonavg",    func_avg,   MON_LEN, NULL);
   cdoOperatorAdd("xmonvar",    func_var,   MON_LEN, NULL);
   cdoOperatorAdd("xmonvar1",   func_var1,  MON_LEN, NULL);
@@ -205,12 +205,12 @@ void *XTimstat(void *argument)
   int operfunc   = cdoOperatorF1(operatorID);
   int comparelen = cdoOperatorF2(operatorID);
 
-  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lmean   = operfunc == func_meanw || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor  = operfunc == func_std1 || operfunc == func_var1;
 
-  if ( operfunc == func_mean )
+  if ( operfunc == func_meanw )
     {
       int oargc = operatorArgc();
       char **oargv = operatorArgv();
@@ -511,7 +511,7 @@ void *XTimstat(void *argument)
 	  cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac, nsets);
 	}
 
-      if ( lvfrac && operfunc == func_mean )
+      if ( lvfrac && operfunc == func_meanw )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
             int varID   = recinfo[recID].varID;

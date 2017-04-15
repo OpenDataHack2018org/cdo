@@ -56,7 +56,7 @@ void *Seasstat(void *argument)
   cdoOperatorAdd("seasmin",  func_min,  0, NULL);
   cdoOperatorAdd("seasmax",  func_max,  0, NULL);
   cdoOperatorAdd("seassum",  func_sum,  0, NULL);
-  cdoOperatorAdd("seasmean", func_mean, 0, NULL);
+  cdoOperatorAdd("seasmean", func_meanw, 0, NULL);
   cdoOperatorAdd("seasavg",  func_avg,  0, NULL);
   cdoOperatorAdd("seasvar",  func_var,  0, NULL);
   cdoOperatorAdd("seasvar1", func_var1, 0, NULL);
@@ -69,7 +69,7 @@ void *Seasstat(void *argument)
   int season_start = get_season_start();
   get_season_name(seas_name);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
+  int lmean   = operfunc == func_meanw || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor = operfunc == func_std1 || operfunc == func_var1;

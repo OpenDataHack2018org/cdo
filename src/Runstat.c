@@ -55,7 +55,7 @@ void *Runstat(void *argument)
   cdoOperatorAdd("runmin",  func_min,  0, NULL);
   cdoOperatorAdd("runmax",  func_max,  0, NULL);
   cdoOperatorAdd("runsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("runmean", func_mean, 0, NULL);
+  cdoOperatorAdd("runmean", func_meanw, 0, NULL);
   cdoOperatorAdd("runavg",  func_avg,  0, NULL);
   cdoOperatorAdd("runvar",  func_var,  0, NULL);
   cdoOperatorAdd("runvar1", func_var1, 0, NULL);
@@ -68,7 +68,7 @@ void *Runstat(void *argument)
   operatorInputArg("number of timesteps");
   int ndates = parameter2int(operatorArgv()[0]);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
+  int lmean   = operfunc == func_meanw || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor = operfunc == func_std1 || operfunc == func_var1;

@@ -33,7 +33,7 @@ double fldfun(field_type field, int function)
     case func_min:    rval = fldmin(field);    break;
     case func_max:    rval = fldmax(field);    break;
     case func_sum:    rval = fldsum(field);    break;
-    case func_mean:   rval = fldmean(field);   break;
+    case func_meanw:   rval = fldmean(field);   break;
     case func_avg:    rval = fldavg(field);    break;
     case func_std:    rval = fldstd(field);    break;
     case func_std1:   rval = fldstd1(field);   break;

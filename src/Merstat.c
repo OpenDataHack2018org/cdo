@@ -54,7 +54,7 @@ void *Merstat(void *argument)
   cdoOperatorAdd("mermin",  func_min,  0, NULL);
   cdoOperatorAdd("mermax",  func_max,  0, NULL);
   cdoOperatorAdd("mersum",  func_sum,  0, NULL);
-  cdoOperatorAdd("mermean", func_mean, 0, NULL);
+  cdoOperatorAdd("mermean", func_meanw, 0, NULL);
   cdoOperatorAdd("meravg",  func_avg,  0, NULL);
   cdoOperatorAdd("mervar",  func_var,  0, NULL);
   cdoOperatorAdd("mervar1", func_var1, 0, NULL);
@@ -73,7 +73,7 @@ void *Merstat(void *argument)
       percentile_check_number(pn);
     }
 
-  if ( operfunc == func_mean || operfunc == func_avg ||
+  if ( operfunc == func_meanw || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std ||
        operfunc == func_var1 || operfunc == func_std1 )
     needWeights = true;
