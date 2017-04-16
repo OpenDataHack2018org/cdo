@@ -49,7 +49,7 @@ void *Yearmonstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("yearmonmean",  func_meanw, 0, NULL);
+  cdoOperatorAdd("yearmonmean",  func_mean, 0, NULL);
   cdoOperatorAdd("yearmonavg",   func_avg,  0, NULL);
 
   int operatorID = cdoOperatorID();

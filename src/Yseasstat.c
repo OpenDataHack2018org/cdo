@@ -77,7 +77,7 @@ void *Yseasstat(void *argument)
   cdoOperatorAdd("yseasmin",  func_min,  0, NULL);
   cdoOperatorAdd("yseasmax",  func_max,  0, NULL);
   cdoOperatorAdd("yseassum",  func_sum,  0, NULL);
-  cdoOperatorAdd("yseasmean", func_meanw, 0, NULL);
+  cdoOperatorAdd("yseasmean", func_mean, 0, NULL);
   cdoOperatorAdd("yseasavg",  func_avg,  0, NULL);
   cdoOperatorAdd("yseasvar",  func_var,  0, NULL);
   cdoOperatorAdd("yseasvar1", func_var1, 0, NULL);
@@ -97,7 +97,7 @@ void *Yseasstat(void *argument)
       datetime[seas].vtime = 0;
     }
 
-  bool lmean   = operfunc == func_meanw || operfunc == func_avg;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor  = operfunc == func_std1 || operfunc == func_var1;

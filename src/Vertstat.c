@@ -173,7 +173,7 @@ void *Vertstat(void *argument)
                  cdoOperatorAdd("vertmax",  func_max,  0, NULL);
                  cdoOperatorAdd("vertsum",  func_sum,  0, NULL);
   int VERTINT  = cdoOperatorAdd("vertint",  func_sum,  1, NULL);
-                 cdoOperatorAdd("vertmean", func_meanw, 1, NULL);
+                 cdoOperatorAdd("vertmean", func_mean, 1, NULL);
                  cdoOperatorAdd("vertavg",  func_avg,  1, NULL);
                  cdoOperatorAdd("vertvar",  func_var,  1, NULL);
                  cdoOperatorAdd("vertvar1", func_var1, 1, NULL);
@@ -184,7 +184,7 @@ void *Vertstat(void *argument)
   int operfunc     = cdoOperatorF1(operatorID);
   bool needWeights = cdoOperatorF2(operatorID);
 
-  bool lmean   = operfunc == func_meanw || operfunc == func_avg;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor  = operfunc == func_std1 || operfunc == func_var1;

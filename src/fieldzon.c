@@ -27,7 +27,7 @@ void zonfun(field_type field1, field_type *field2, int function)
   else if ( function == func_max   )  zonmax(field1, field2);  
   else if ( function == func_range )  zonrange(field1, field2);  
   else if ( function == func_sum   )  zonsum(field1, field2);  
-  else if ( function == func_meanw  )  zonmean(field1, field2);  
+  else if ( function == func_mean  )  zonmean(field1, field2);  
   else if ( function == func_avg   )  zonavg(field1, field2);  
   else if ( function == func_std   )  zonstd(field1, field2);  
   else if ( function == func_std1  )  zonstd1(field1, field2);  

@@ -54,7 +54,7 @@ void *Ydaystat(void *argument)
   cdoOperatorAdd("ydaymin",  func_min,  0, NULL);
   cdoOperatorAdd("ydaymax",  func_max,  0, NULL);
   cdoOperatorAdd("ydaysum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ydaymean", func_meanw, 0, NULL);
+  cdoOperatorAdd("ydaymean", func_mean, 0, NULL);
   cdoOperatorAdd("ydayavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ydayvar",  func_var,  0, NULL);
   cdoOperatorAdd("ydayvar1", func_var1, 0, NULL);
@@ -64,7 +64,7 @@ void *Ydaystat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  bool lmean   = operfunc == func_meanw || operfunc == func_avg;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor  = operfunc == func_std1 || operfunc == func_var1;

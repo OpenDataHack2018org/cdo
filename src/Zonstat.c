@@ -54,7 +54,7 @@ void *Zonstat(void *argument)
   cdoOperatorAdd("zonmax",   func_max,   0, NULL);
   cdoOperatorAdd("zonrange", func_range, 0, NULL);
   cdoOperatorAdd("zonsum",   func_sum,   0, NULL);
-  cdoOperatorAdd("zonmean",  func_meanw,  0, NULL);
+  cdoOperatorAdd("zonmean",  func_mean,  0, NULL);
   cdoOperatorAdd("zonavg",   func_avg,   0, NULL);
   cdoOperatorAdd("zonvar",   func_var,   0, NULL);
   cdoOperatorAdd("zonvar1",  func_var1,  0, NULL);

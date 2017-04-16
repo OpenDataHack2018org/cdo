@@ -51,7 +51,7 @@ void *Timselstat(void *argument)
   cdoOperatorAdd("timselmin",  func_min,  0, NULL);
   cdoOperatorAdd("timselmax",  func_max,  0, NULL);
   cdoOperatorAdd("timselsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("timselmean", func_meanw, 0, NULL);
+  cdoOperatorAdd("timselmean", func_mean, 0, NULL);
   cdoOperatorAdd("timselavg",  func_avg,  0, NULL);
   cdoOperatorAdd("timselvar",  func_var,  0, NULL);
   cdoOperatorAdd("timselvar1", func_var1, 0, NULL);
@@ -71,7 +71,7 @@ void *Timselstat(void *argument)
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 
-  int lmean   = operfunc == func_meanw || operfunc == func_avg;
+  int lmean   = operfunc == func_mean || operfunc == func_avg;
   int lstd    = operfunc == func_std || operfunc == func_std1;
   int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor = operfunc == func_std1 || operfunc == func_var1;

@@ -28,7 +28,7 @@ void farfun(field_type *field1, field_type field2, int function)
     case func_min:   farmin(field1, field2);   break;
     case func_max:   farmax(field1, field2);   break;
     case func_sum:   farsum(field1, field2);   break;
-    case func_meanw:  farsum(field1, field2);   break;
+    case func_mean:  farsum(field1, field2);   break;
     case func_avg:   faradd(field1, field2);   break;
     case func_sub:   farsub(field1, field2);   break;
     case func_mul:   farmul(field1, field2);   break;

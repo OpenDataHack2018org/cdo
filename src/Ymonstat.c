@@ -75,7 +75,7 @@ void *Ymonstat(void *argument)
   cdoOperatorAdd("ymonmin",  func_min,  0, NULL);
   cdoOperatorAdd("ymonmax",  func_max,  0, NULL);
   cdoOperatorAdd("ymonsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ymonmean", func_meanw, 0, NULL);
+  cdoOperatorAdd("ymonmean", func_mean, 0, NULL);
   cdoOperatorAdd("ymonavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ymonvar",  func_var,  0, NULL);
   cdoOperatorAdd("ymonvar1", func_var1, 0, NULL);
@@ -85,7 +85,7 @@ void *Ymonstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  bool lmean   = operfunc == func_meanw || operfunc == func_avg;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor  = operfunc == func_std1 || operfunc == func_var1;

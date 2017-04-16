@@ -105,7 +105,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("timmin",    func_min,   DATE_LEN, NULL);
   cdoOperatorAdd("timmax",    func_max,   DATE_LEN, NULL);
   cdoOperatorAdd("timsum",    func_sum,   DATE_LEN, NULL);
-  cdoOperatorAdd("timmean",   func_meanw,  DATE_LEN, NULL);
+  cdoOperatorAdd("timmean",   func_mean,  DATE_LEN, NULL);
   cdoOperatorAdd("timavg",    func_avg,   DATE_LEN, NULL);
   cdoOperatorAdd("timvar",    func_var,   DATE_LEN, NULL);
   cdoOperatorAdd("timvar1",   func_var1,  DATE_LEN, NULL);
@@ -115,7 +115,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("yearmin",   func_min,   YEAR_LEN, NULL);
   cdoOperatorAdd("yearmax",   func_max,   YEAR_LEN, NULL);
   cdoOperatorAdd("yearsum",   func_sum,   YEAR_LEN, NULL);
-  cdoOperatorAdd("yearmean",  func_meanw,  YEAR_LEN, NULL);
+  cdoOperatorAdd("yearmean",  func_mean,  YEAR_LEN, NULL);
   cdoOperatorAdd("yearavg",   func_avg,   YEAR_LEN, NULL);
   cdoOperatorAdd("yearvar",   func_var,   YEAR_LEN, NULL);
   cdoOperatorAdd("yearvar1",  func_var1,  YEAR_LEN, NULL);
@@ -125,7 +125,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("monmin",    func_min,   MON_LEN, NULL);
   cdoOperatorAdd("monmax",    func_max,   MON_LEN, NULL);
   cdoOperatorAdd("monsum",    func_sum,   MON_LEN, NULL);
-  cdoOperatorAdd("monmean",   func_meanw,  MON_LEN, NULL);
+  cdoOperatorAdd("monmean",   func_mean,  MON_LEN, NULL);
   cdoOperatorAdd("monavg",    func_avg,   MON_LEN, NULL);
   cdoOperatorAdd("monvar",    func_var,   MON_LEN, NULL);
   cdoOperatorAdd("monvar1",   func_var1,  MON_LEN, NULL);
@@ -135,7 +135,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("daymin",    func_min,   DAY_LEN, NULL);
   cdoOperatorAdd("daymax",    func_max,   DAY_LEN, NULL);
   cdoOperatorAdd("daysum",    func_sum,   DAY_LEN, NULL);
-  cdoOperatorAdd("daymean",   func_meanw,  DAY_LEN, NULL);
+  cdoOperatorAdd("daymean",   func_mean,  DAY_LEN, NULL);
   cdoOperatorAdd("dayavg",    func_avg,   DAY_LEN, NULL);
   cdoOperatorAdd("dayvar",    func_var,   DAY_LEN, NULL);
   cdoOperatorAdd("dayvar1",   func_var1,  DAY_LEN, NULL);
@@ -145,7 +145,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("hourmin",   func_min,   HOUR_LEN, NULL);
   cdoOperatorAdd("hourmax",   func_max,   HOUR_LEN, NULL);
   cdoOperatorAdd("hoursum",   func_sum,   HOUR_LEN, NULL);
-  cdoOperatorAdd("hourmean",  func_meanw,  HOUR_LEN, NULL);
+  cdoOperatorAdd("hourmean",  func_mean,  HOUR_LEN, NULL);
   cdoOperatorAdd("houravg",   func_avg,   HOUR_LEN, NULL);
   cdoOperatorAdd("hourvar",   func_var,   HOUR_LEN, NULL);
   cdoOperatorAdd("hourvar1",  func_var1,  HOUR_LEN, NULL);
@@ -157,12 +157,12 @@ void *Timstat(void *argument)
   int comparelen = cdoOperatorF2(operatorID);
 
   bool lrange  = operfunc == func_range;
-  bool lmean   = operfunc == func_meanw || operfunc == func_avg;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor  = operfunc == func_std1 || operfunc == func_var1;
 
-  if ( operfunc == func_meanw )
+  if ( operfunc == func_mean )
     {
       int oargc = operatorArgc();
       char **oargv = operatorArgv();
@@ -437,7 +437,7 @@ void *Timstat(void *argument)
 	  cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac, nsets);
 	}
 
-      if ( lvfrac && operfunc == func_meanw )
+      if ( lvfrac && operfunc == func_mean )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
             int varID   = recinfo[recID].varID;

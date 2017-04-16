@@ -82,7 +82,7 @@ void *Yhourstat(void *argument)
   cdoOperatorAdd("yhourmin",  func_min,  0, NULL);
   cdoOperatorAdd("yhourmax",  func_max,  0, NULL);
   cdoOperatorAdd("yhoursum",  func_sum,  0, NULL);
-  cdoOperatorAdd("yhourmean", func_meanw, 0, NULL);
+  cdoOperatorAdd("yhourmean", func_mean, 0, NULL);
   cdoOperatorAdd("yhouravg",  func_avg,  0, NULL);
   cdoOperatorAdd("yhourvar",  func_var,  0, NULL);
   cdoOperatorAdd("yhourvar1", func_var1, 0, NULL);
@@ -92,7 +92,7 @@ void *Yhourstat(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
-  bool lmean   = operfunc == func_meanw || operfunc == func_avg;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
   int divisor = operfunc == func_std1 || operfunc == func_var1;

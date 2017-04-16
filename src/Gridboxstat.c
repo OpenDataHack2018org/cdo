@@ -447,13 +447,12 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 static
 void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int statfunc)
 {
-  bool useWeight = false;
+  bool useWeight = (field1->weight != NULL);
   /*
   double findex = 0;
 
   progressInit();
   */
-  if ( field1->weight ) useWeight = true;
 
   int gridsize = xinc*yinc;
   field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
@@ -461,17 +460,15 @@ void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int
     {
       field[i].size    = gridsize;
       field[i].ptr     = (double*) Malloc(gridsize*sizeof(double));
-      field[i].weight  = NULL;
-      if ( useWeight )
-	field[i].weight  = (double*) Malloc(gridsize*sizeof(double));
+      field[i].weight  = (useWeight) ? (double*) Malloc(gridsize*sizeof(double)) : NULL;
       field[i].missval = field1->missval;
       field[i].nmiss   = 0;
     }
   
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
-  double *array1  = field1->ptr;
-  double *array2  = field2->ptr;
+  double *array1 = field1->ptr;
+  double *array2 = field2->ptr;
   double missval = field1->missval;
 
   int nlon1 = gridInqXsize(gridID1);
@@ -601,9 +598,7 @@ void *Gridboxstat(void *argument)
 
   int gridsize1 = gridInqSize(gridID1);
   field1.ptr    = (double*) Malloc(gridsize1*sizeof(double));
-  field1.weight = NULL;
-  if ( needWeights )
-    field1.weight = (double*) Malloc(gridsize1*sizeof(double));
+  field1.weight = needWeights ? (double*) Malloc(gridsize1*sizeof(double)) : NULL;
 
   int gridsize2 = gridInqSize(gridID2);
   field2.ptr    = (double*) Malloc(gridsize2*sizeof(double));
