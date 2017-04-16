@@ -195,24 +195,13 @@ void *Ensstat(void *argument)
       for ( int recID = 0; recID < nrecs0; recID++ )
 	{
           int varID = 0, levelID;
-          /*
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(ef, nfiles) lastprivate(varID, levelID)
-#endif
-	  for ( int fileID = 0; fileID < nfiles; fileID++ )
-	    {
-              int nmiss;
-	      streamInqRecord(ef[fileID].streamID, &varID, &levelID);
-	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
-              ef[fileID].missval = vlistInqVarMissval(ef[fileID].vlistID, varID);
-	    }
-          */
+
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
 	      streamInqRecord(ef[fileID].streamID, &varID, &levelID);
               ef[fileID].missval = vlistInqVarMissval(ef[fileID].vlistID, varID);
 	    }
-#pragma omp parallel for default(none) shared(ef, nfiles)
+          //#pragma omp parallel for default(none) shared(ef, nfiles)
 	  for ( int fileID = 0; fileID < nfiles; fileID++ )
 	    {
 	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);

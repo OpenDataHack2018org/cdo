@@ -341,31 +341,25 @@ double fldavg(field_type field)
   const double missval1 = field.missval;
   const double missval2 = field.missval;
   const double *restrict array = field.ptr;
-  const double *restrict w     = field.weight;
   double rsum = 0, rsumw = 0;
+  double ravg = 0;
 
   assert(array!=NULL);
-  assert(w!=NULL);
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; i++ ) 
-	if ( !DBL_IS_EQUAL(w[i], missval1) )
-	  {
-	    rsum  = ADDMN(rsum, MULMN(w[i], array[i]));
-	    rsumw = ADDMN(rsumw, w[i]);
-	  }
+      for ( size_t i = 0; i < len; ++i ) 
+        {
+          rsum  = ADDMN(rsum, array[i]);
+          rsumw += 1;
+        }
+
+      ravg = DIVMN(rsum, rsumw);
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ ) 
-	{
-	  rsum  += w[i] * array[i];
-	  rsumw += w[i];
-	}
+      int fpeRaised = array_mean_val(len, array, &ravg);
     }
-
-  double ravg = DIVMN(rsum, rsumw);
 
   return ravg;
 }
