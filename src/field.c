@@ -37,10 +37,10 @@ double fldfun(field_type field, int function)
     case func_meanw:  rval = fldmeanw(field);  break;
     case func_avg:    rval = fldavg(field);    break;
     case func_avgw:   rval = fldavgw(field);   break;
-    case func_std:    rval = fldstd(field);    break;
-    case func_std1:   rval = fldstd1(field);   break;
-    case func_var:    rval = fldvar(field);    break;
-    case func_var1:   rval = fldvar1(field);   break;
+    case func_stdw:   rval = fldstdw(field);   break;
+    case func_std1w:  rval = fldstd1w(field);  break;
+    case func_varw:   rval = fldvarw(field);   break;
+    case func_var1w:  rval = fldvar1w(field);  break;
     case func_crps:   rval = fldcrps(field);   break;
     case func_brs:    rval = fldbrs(field);    break;
     case func_rank:   rval = fldrank(field);   break;
@@ -440,7 +440,7 @@ void prevarsumw(const double *restrict array, const double *restrict w, size_t l
 }
 
 
-double fldvar(field_type field)
+double fldvarw(field_type field)
 {
   const int    nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
@@ -457,7 +457,7 @@ double fldvar(field_type field)
 }
 
 
-double fldvar1(field_type field)
+double fldvar1w(field_type field)
 {
   const int    nmiss   = field.nmiss > 0;
   const size_t len     = field.size;
@@ -490,15 +490,15 @@ double var_to_std(double rvar, double missval)
   return rstd;
 }
 
-double fldstd(field_type field)
+double fldstdw(field_type field)
 {
-  return var_to_std(fldvar(field), field.missval);
+  return var_to_std(fldvarw(field), field.missval);
 }
 
 
-double fldstd1(field_type field)
+double fldstd1w(field_type field)
 {
-  return var_to_std(fldvar1(field), field.missval);
+  return var_to_std(fldvar1w(field), field.missval);
 }
 
 

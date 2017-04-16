@@ -100,10 +100,10 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldsum",   func_sum,    0, NULL);
   cdoOperatorAdd("fldmean",  func_meanw,  1, NULL);
   cdoOperatorAdd("fldavg",   func_avgw,   1, NULL);
-  cdoOperatorAdd("fldstd",   func_std,    1, NULL);
-  cdoOperatorAdd("fldstd1",  func_std1,   1, NULL);
-  cdoOperatorAdd("fldvar",   func_var,    1, NULL);
-  cdoOperatorAdd("fldvar1",  func_var1,   1, NULL);
+  cdoOperatorAdd("fldstd",   func_stdw,   1, NULL);
+  cdoOperatorAdd("fldstd1",  func_std1w,  1, NULL);
+  cdoOperatorAdd("fldvar",   func_varw,   1, NULL);
+  cdoOperatorAdd("fldvar1",  func_var1w,  1, NULL);
   cdoOperatorAdd("fldpctl",  func_pctl,   0, NULL);
 
   int operatorID  = cdoOperatorID();

@@ -46,7 +46,6 @@ void *Merstat(void *argument)
   int nmiss;
   int nrecs;
   int varID, levelID;
-  bool needWeights = false;
   char varname[CDI_MAX_NAME];
 
   cdoInitialize(argument);
@@ -54,16 +53,17 @@ void *Merstat(void *argument)
   cdoOperatorAdd("mermin",  func_min,   0, NULL);
   cdoOperatorAdd("mermax",  func_max,   0, NULL);
   cdoOperatorAdd("mersum",  func_sum,   0, NULL);
-  cdoOperatorAdd("mermean", func_meanw, 0, NULL);
-  cdoOperatorAdd("meravg",  func_avgw,  0, NULL);
-  cdoOperatorAdd("mervar",  func_var,   0, NULL);
-  cdoOperatorAdd("mervar1", func_var1,  0, NULL);
-  cdoOperatorAdd("merstd",  func_std,   0, NULL);
-  cdoOperatorAdd("merstd1", func_std1,  0, NULL);
+  cdoOperatorAdd("mermean", func_meanw, 1, NULL);
+  cdoOperatorAdd("meravg",  func_avgw,  1, NULL);
+  cdoOperatorAdd("mervar",  func_varw,  1, NULL);
+  cdoOperatorAdd("mervar1", func_var1w, 1, NULL);
+  cdoOperatorAdd("merstd",  func_stdw,  1, NULL);
+  cdoOperatorAdd("merstd1", func_std1w, 1, NULL);
   cdoOperatorAdd("merpctl", func_pctl,  0, NULL);
  
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
+  bool needWeights = cdoOperatorF2(operatorID) != 0;
 
   double pn = 0;
   if ( operfunc == func_pctl )
@@ -72,11 +72,6 @@ void *Merstat(void *argument)
       pn = parameter2double(operatorArgv()[0]);
       percentile_check_number(pn);
     }
-
-  if ( operfunc == func_meanw || operfunc == func_avgw ||
-       operfunc == func_var  || operfunc == func_std ||
-       operfunc == func_var1 || operfunc == func_std1 )
-    needWeights = true;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

@@ -556,10 +556,10 @@ void *Gridboxstat(void *argument)
   cdoOperatorAdd("gridboxsum",  func_sum,   0, NULL);
   cdoOperatorAdd("gridboxmean", func_meanw, 1, NULL);
   cdoOperatorAdd("gridboxavg",  func_avgw,  1, NULL);
-  cdoOperatorAdd("gridboxvar",  func_var,   1, NULL);
-  cdoOperatorAdd("gridboxvar1", func_var1,  1, NULL);
-  cdoOperatorAdd("gridboxstd",  func_std,   1, NULL);
-  cdoOperatorAdd("gridboxstd1", func_std1,  1, NULL);
+  cdoOperatorAdd("gridboxvar",  func_varw,  1, NULL);
+  cdoOperatorAdd("gridboxvar1", func_var1w, 1, NULL);
+  cdoOperatorAdd("gridboxstd",  func_stdw,  1, NULL);
+  cdoOperatorAdd("gridboxstd1", func_std1w, 1, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);

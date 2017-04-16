@@ -20,6 +20,10 @@
 #define  func_covar    22
 #define  func_avgw     23
 #define  func_meanw    24
+#define  func_stdw     25
+#define  func_std1w    26
+#define  func_varw     27
+#define  func_var1w    28
 
 #define  func_crps     30
 #define  func_brs      31
