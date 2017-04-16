@@ -551,22 +551,19 @@ void *Gridboxstat(void *argument)
   int xinc = parameter2int(operatorArgv()[0]);
   int yinc = parameter2int(operatorArgv()[1]);
 
-  cdoOperatorAdd("gridboxmin",  func_min,  0, NULL);
-  cdoOperatorAdd("gridboxmax",  func_max,  0, NULL);
-  cdoOperatorAdd("gridboxsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("gridboxmean", func_meanw, 0, NULL);
-  cdoOperatorAdd("gridboxavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("gridboxvar",  func_var,  0, NULL);
-  cdoOperatorAdd("gridboxvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("gridboxstd",  func_std,  0, NULL);
-  cdoOperatorAdd("gridboxstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("gridboxmin",  func_min,   0, NULL);
+  cdoOperatorAdd("gridboxmax",  func_max,   0, NULL);
+  cdoOperatorAdd("gridboxsum",  func_sum,   0, NULL);
+  cdoOperatorAdd("gridboxmean", func_meanw, 1, NULL);
+  cdoOperatorAdd("gridboxavg",  func_avgw,  1, NULL);
+  cdoOperatorAdd("gridboxvar",  func_var,   1, NULL);
+  cdoOperatorAdd("gridboxvar1", func_var1,  1, NULL);
+  cdoOperatorAdd("gridboxstd",  func_std,   1, NULL);
+  cdoOperatorAdd("gridboxstd1", func_std1,  1, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
-
-  bool needWeights = (operfunc == func_meanw || operfunc == func_avg ||
-                      operfunc == func_var  || operfunc == func_std ||
-                      operfunc == func_var1 || operfunc == func_std1);
+  bool needWeights = cdoOperatorF2(operatorID) != 0;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

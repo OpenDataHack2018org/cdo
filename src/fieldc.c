@@ -22,12 +22,15 @@
 
 void farcfun(field_type *field, double rconst, int function)
 {
-  if      ( function == func_add ) farcadd(field, rconst);
-  else if ( function == func_sub ) farcsub(field, rconst);
-  else if ( function == func_mul ) farcmul(field, rconst);
-  else if ( function == func_div ) farcdiv(field, rconst);
-  else if ( function == func_mod ) farmod(field, rconst);
-  else    cdoAbort("%s: function %d not implemented!", __func__, function);
+  switch (function)
+    {
+    case func_add: farcadd(field, rconst);  break;
+    case func_sub: farcsub(field, rconst);  break;
+    case func_mul: farcmul(field, rconst);  break;
+    case func_div: farcdiv(field, rconst);  break;
+    case func_mod: farmod(field, rconst);   break;
+    default: cdoAbort("%s: function %d not implemented!", __func__, function);
+    }
 }
 
 void farcmul(field_type *field, double rconst)

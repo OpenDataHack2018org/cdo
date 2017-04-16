@@ -94,20 +94,20 @@ void *Fldstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("fldrange", func_range, 0, NULL);
-  cdoOperatorAdd("fldmin",   func_min,   0, NULL);
-  cdoOperatorAdd("fldmax",   func_max,   0, NULL);
-  cdoOperatorAdd("fldsum",   func_sum,   0, NULL);
+  cdoOperatorAdd("fldrange", func_range,  0, NULL);
+  cdoOperatorAdd("fldmin",   func_min,    0, NULL);
+  cdoOperatorAdd("fldmax",   func_max,    0, NULL);
+  cdoOperatorAdd("fldsum",   func_sum,    0, NULL);
   cdoOperatorAdd("fldmean",  func_meanw,  1, NULL);
-  cdoOperatorAdd("fldavg",   func_avg,   1, NULL);
-  cdoOperatorAdd("fldstd",   func_std,   1, NULL);
-  cdoOperatorAdd("fldstd1",  func_std1,  1, NULL);
-  cdoOperatorAdd("fldvar",   func_var,   1, NULL);
-  cdoOperatorAdd("fldvar1",  func_var1,  1, NULL);
-  cdoOperatorAdd("fldpctl",  func_pctl,  0, NULL);
+  cdoOperatorAdd("fldavg",   func_avgw,   1, NULL);
+  cdoOperatorAdd("fldstd",   func_std,    1, NULL);
+  cdoOperatorAdd("fldstd1",  func_std1,   1, NULL);
+  cdoOperatorAdd("fldvar",   func_var,    1, NULL);
+  cdoOperatorAdd("fldvar1",  func_var1,   1, NULL);
+  cdoOperatorAdd("fldpctl",  func_pctl,   0, NULL);
 
   int operatorID  = cdoOperatorID();
-  int operfunc    = cdoOperatorF1(operatorID);
+  int operfunc = cdoOperatorF1(operatorID);
   bool needWeights = cdoOperatorF2(operatorID) != 0;
 
   double pn = 0;

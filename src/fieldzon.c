@@ -23,17 +23,20 @@
 
 void zonfun(field_type field1, field_type *field2, int function)
 {
-  if      ( function == func_min   )  zonmin(field1, field2);
-  else if ( function == func_max   )  zonmax(field1, field2);  
-  else if ( function == func_range )  zonrange(field1, field2);  
-  else if ( function == func_sum   )  zonsum(field1, field2);  
-  else if ( function == func_mean  )  zonmean(field1, field2);  
-  else if ( function == func_avg   )  zonavg(field1, field2);  
-  else if ( function == func_std   )  zonstd(field1, field2);  
-  else if ( function == func_std1  )  zonstd1(field1, field2);  
-  else if ( function == func_var   )  zonvar(field1, field2);
-  else if ( function == func_var1  )  zonvar1(field1, field2);
-  else cdoAbort("function %d not implemented!", function);
+  switch (function)
+    {
+    case func_min:   zonmin(field1, field2);    break;
+    case func_max:   zonmax(field1, field2);    break;
+    case func_range: zonrange(field1, field2);  break;
+    case func_sum:   zonsum(field1, field2);    break;
+    case func_mean:  zonmean(field1, field2);   break;
+    case func_avg:   zonavg(field1, field2);    break;
+    case func_std:   zonstd(field1, field2);    break;
+    case func_std1:  zonstd1(field1, field2);   break;
+    case func_var:   zonvar(field1, field2);    break;
+    case func_var1:  zonvar1(field1, field2);   break;
+    default: cdoAbort("function %d not implemented!", function);
+    }
 }
 
 

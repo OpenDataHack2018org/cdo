@@ -23,16 +23,19 @@
 
 void merfun(field_type field1, field_type *field2, int function)
 {
-  if      ( function == func_min )  mermin(field1, field2);
-  else if ( function == func_max )  mermax(field1, field2);  
-  else if ( function == func_sum )  mersum(field1, field2);  
-  else if ( function == func_meanw ) mermean(field1, field2);  
-  else if ( function == func_avg )  meravg(field1, field2);  
-  else if ( function == func_std )  merstd(field1, field2);  
-  else if ( function == func_std1 ) merstd1(field1, field2);  
-  else if ( function == func_var )  mervar(field1, field2);
-  else if ( function == func_var1 ) mervar1(field1, field2);
-  else cdoAbort("function %d not implemented!", function);
+  switch (function)
+    {
+    case func_min:   mermin(field1, field2);    break;
+    case func_max:   mermax(field1, field2);    break;
+    case func_sum:   mersum(field1, field2);    break;
+    case func_meanw: mermeanw(field1, field2);  break;
+    case func_avgw:  meravgw(field1, field2);   break;
+    case func_std:   merstd(field1, field2);    break;
+    case func_std1:  merstd1(field1, field2);   break;
+    case func_var:   mervar(field1, field2);    break;
+    case func_var1:  mervar1(field1, field2);   break;
+    default: cdoAbort("function %d not implemented!", function);
+    }
 }
 
 
@@ -167,7 +170,7 @@ void mersum(field_type field1, field_type *field2)
 }
 
 
-void mermean(field_type field1, field_type *field2)
+void mermeanw(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -216,7 +219,7 @@ void mermean(field_type field1, field_type *field2)
 }
 
 
-void meravg(field_type field1, field_type *field2)
+void meravgw(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -265,7 +268,7 @@ void meravg(field_type field1, field_type *field2)
 
 static
 void prevarsum_mer(const double *restrict array, const double *restrict w, int nx, int ny, int nmiss, 
-	       double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
+                   double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
 { 
   *rsum   = 0;
   *rsumq  = 0;

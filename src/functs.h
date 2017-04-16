@@ -11,14 +11,15 @@
 #define  func_sum      13
 #define  func_avg      14
 #define  func_mean     15
-#define  func_meanw    16
-#define  func_std      17
-#define  func_std1     18
-#define  func_var      19
-#define  func_var1     20
-#define  func_pctl     21
-#define  func_cor      22
-#define  func_covar    23
+#define  func_std      16
+#define  func_std1     17
+#define  func_var      18
+#define  func_var1     19
+#define  func_pctl     20
+#define  func_cor      21
+#define  func_covar    22
+#define  func_avgw     23
+#define  func_meanw    24
 
 #define  func_crps     30
 #define  func_brs      31
