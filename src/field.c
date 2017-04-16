@@ -402,8 +402,8 @@ double fldavgw(field_type field)
 }
 
 static
-void prevarsum(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
-	       double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
+void prevarsumw(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
+                double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 { 
   assert(array!=NULL);
   assert(w!=NULL);
@@ -448,7 +448,7 @@ double fldvar(field_type field)
   double rsum, rsumw;
   double rsumq, rsumwq;
 
-  prevarsum(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
   double rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
@@ -465,7 +465,7 @@ double fldvar1(field_type field)
   double rsum, rsumw;
   double rsumq, rsumwq;
 
-  prevarsum(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
   double rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
