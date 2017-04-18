@@ -144,6 +144,7 @@ void *Rotuv(void *argument);
 void *Rhopot(void *argument);
 void *Runpctl(void *argument);
 void *Runstat(void *argument);
+void *Samplegridicon(void *argument);
 void *Seascount(void *argument);
 void *Seaspctl(void *argument);
 void *Seasstat(void *argument);
@@ -405,6 +406,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}
 #define  RunstatOperators       {"runmin", "runmax", "runsum", "runmean", "runavg", "runstd", "runstd1", "runvar", "runvar1"}
+#define  SamplegridiconOperators {"samplegridicon"}
 #define  SeascountOperators     {"seascount"}
 #define  SeaspctlOperators      {"seaspctl"}
 #define  SeasstatOperators      {"seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
@@ -697,6 +699,7 @@ static modules_t Modules[] =
   { Rotuv,          RotuvbHelp,        RotuvOperators,         1,   CDI_REAL,  1,  1 },
   { Runpctl,        RunpctlHelp,       RunpctlOperators,       1,   CDI_REAL,  1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,       1,   CDI_REAL,  1,  1 },
+  { Samplegridicon, NULL,              SamplegridiconOperators,1,   CDI_REAL,  1,  1 },
   { Seascount,      NULL,              SeascountOperators,     1,   CDI_BOTH,  1,  1 },
   { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,      1,   CDI_REAL,  3,  1 },
   { Seasstat,       SeasstatHelp,      SeasstatOperators,      1,   CDI_REAL,  1,  1 },

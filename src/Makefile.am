@@ -303,6 +303,7 @@ cdo_SOURCES += Adisit.c        \
                Runpctl.c       \
                Runstat.c       \
                Samplegrid.c    \
+               Samplegridicon.c \
                Seascount.c     \
                Seaspctl.c      \
                Seasstat.c      \

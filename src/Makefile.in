@@ -217,12 +217,12 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Replace.$(OBJEXT) cdo-Replacevalues.$(OBJEXT) \
 	cdo-Rhopot.$(OBJEXT) cdo-Rotuv.$(OBJEXT) cdo-Runpctl.$(OBJEXT) \
 	cdo-Runstat.$(OBJEXT) cdo-Samplegrid.$(OBJEXT) \
-	cdo-Seascount.$(OBJEXT) cdo-Seaspctl.$(OBJEXT) \
-	cdo-Seasstat.$(OBJEXT) cdo-Selbox.$(OBJEXT) \
-	cdo-Selgridcell.$(OBJEXT) cdo-Select.$(OBJEXT) \
-	cdo-Selmulti.$(OBJEXT) cdo-Seloperator.$(OBJEXT) \
-	cdo-Selrec.$(OBJEXT) cdo-Seltime.$(OBJEXT) \
-	cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) \
+	cdo-Samplegridicon.$(OBJEXT) cdo-Seascount.$(OBJEXT) \
+	cdo-Seaspctl.$(OBJEXT) cdo-Seasstat.$(OBJEXT) \
+	cdo-Selbox.$(OBJEXT) cdo-Selgridcell.$(OBJEXT) \
+	cdo-Select.$(OBJEXT) cdo-Selmulti.$(OBJEXT) \
+	cdo-Seloperator.$(OBJEXT) cdo-Selrec.$(OBJEXT) \
+	cdo-Seltime.$(OBJEXT) cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) \
 	cdo-Setattribute.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
 	cdo-Setgatt.$(OBJEXT) cdo-Setgrid.$(OBJEXT) \
 	cdo-Sethalo.$(OBJEXT) cdo-Setmiss.$(OBJEXT) \
@@ -584,16 +584,16 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Mrotuv.c Mrotuvb.c Ninfo.c Nmldump.c Output.c Outputgmt.c \
 	Pack.c Pardup.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
 	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
-	Samplegrid.c Seascount.c Seaspctl.c Seasstat.c Selbox.c \
-	Selgridcell.c Select.c Selmulti.c Seloperator.c Selrec.c \
-	Seltime.c Selvar.c Set.c Setattribute.c Setbox.c Setgatt.c \
-	Setgrid.c Sethalo.c Setmiss.c Setpartab.c Setrcaname.c \
-	Settime.c Setzaxis.c Shiftxy.c Showinfo.c Sinfo.c Smooth.c \
-	Sort.c Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c \
-	Split.c Splitrec.c Splitsel.c Splittime.c Splityear.c \
-	Subtrend.c Tee.c Templates.c Test.c Tests.c Timcount.c \
-	Timcumsum.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
-	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
+	Samplegrid.c Samplegridicon.c Seascount.c Seaspctl.c \
+	Seasstat.c Selbox.c Selgridcell.c Select.c Selmulti.c \
+	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setattribute.c \
+	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
+	Setrcaname.c Settime.c Setzaxis.c Shiftxy.c Showinfo.c Sinfo.c \
+	Smooth.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
+	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
+	Splityear.c Subtrend.c Tee.c Templates.c Test.c Tests.c \
+	Timcount.c Timcumsum.c Timpctl.c Timselpctl.c Timselstat.c \
+	Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
 	Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c Varrms.c \
 	Vertintml.c Vertintap.c Vertstat.c Vertcum.c Vertwind.c \
 	Verifygrid.c Wct.c Wind.c WindTrans.c Writegrid.c \
@@ -922,6 +922,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Samplegrid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Samplegridicon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seascount.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seaspctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seasstat.Po@am__quote@
@@ -3429,6 +3430,20 @@ cdo-Samplegrid.obj: Samplegrid.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Samplegrid.c' object='cdo-Samplegrid.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Samplegrid.obj `if test -f 'Samplegrid.c'; then $(CYGPATH_W) 'Samplegrid.c'; else $(CYGPATH_W) '$(srcdir)/Samplegrid.c'; fi`
+
+cdo-Samplegridicon.o: Samplegridicon.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Samplegridicon.o -MD -MP -MF $(DEPDIR)/cdo-Samplegridicon.Tpo -c -o cdo-Samplegridicon.o `test -f 'Samplegridicon.c' || echo '$(srcdir)/'`Samplegridicon.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Samplegridicon.Tpo $(DEPDIR)/cdo-Samplegridicon.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Samplegridicon.c' object='cdo-Samplegridicon.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Samplegridicon.o `test -f 'Samplegridicon.c' || echo '$(srcdir)/'`Samplegridicon.c
+
+cdo-Samplegridicon.obj: Samplegridicon.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Samplegridicon.obj -MD -MP -MF $(DEPDIR)/cdo-Samplegridicon.Tpo -c -o cdo-Samplegridicon.obj `if test -f 'Samplegridicon.c'; then $(CYGPATH_W) 'Samplegridicon.c'; else $(CYGPATH_W) '$(srcdir)/Samplegridicon.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Samplegridicon.Tpo $(DEPDIR)/cdo-Samplegridicon.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Samplegridicon.c' object='cdo-Samplegridicon.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Samplegridicon.obj `if test -f 'Samplegridicon.c'; then $(CYGPATH_W) 'Samplegridicon.c'; else $(CYGPATH_W) '$(srcdir)/Samplegridicon.c'; fi`
 
 cdo-Seascount.o: Seascount.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Seascount.o -MD -MP -MF $(DEPDIR)/cdo-Seascount.Tpo -c -o cdo-Seascount.o `test -f 'Seascount.c' || echo '$(srcdir)/'`Seascount.c
