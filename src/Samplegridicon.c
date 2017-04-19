@@ -7,6 +7,7 @@ typedef struct {
   int ncells;
   int *neighbor; // neighbor cell index
   int *parent;   // parent cell index
+  int *data;     // field data index for parent
   int *child;    // child cell index
   const char *filename;
 } cellindex_type;
@@ -24,6 +25,7 @@ void free_cellindex(cellindex_type *cellindex)
 {
   if ( cellindex->neighbor ) Free(cellindex->neighbor);
   if ( cellindex->parent ) Free(cellindex->parent);
+  if ( cellindex->data ) Free(cellindex->data);
   if ( cellindex->child ) Free(cellindex->child);
   Free(cellindex);
 }
@@ -72,6 +74,8 @@ cellindex_type *read_cellindex(const char *filename)
 
   cellindex->neighbor = (int*) Malloc(3*ncells*sizeof(int));
   cellindex->parent   = (int*) Malloc(  ncells*sizeof(int));
+  cellindex->data     = (int*) Malloc(  ncells*sizeof(int));
+  for ( int i = 0; i < ncells; ++i ) cellindex->data[i] = i;
   cellindex->child    = NULL;
   // cellindex->child    = (cid != CDI_UNDEFID) ? (int*) Malloc(4*ncells*sizeof(int)) : NULL;
   double *data = (double *) Malloc(ncells*sizeof(double));
@@ -166,6 +170,25 @@ int find_index(int search, int n, const int *restrict array)
   return -1;
 }
 
+typedef struct
+{
+  int p, d;
+}
+sinfo_t;
+
+static
+int cmpsinfo(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  const sinfo_t *x = (const sinfo_t *)s1;
+  const sinfo_t *y = (const sinfo_t *)s2;
+
+  if      ( x->p < y->p ) cmp = -1;
+  else if ( x->p > y->p ) cmp =  1;
+
+  return cmp;
+}
+
 static
 void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
@@ -174,7 +197,20 @@ void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
   for ( int i = 1; i < ncells1; ++i )
     if ( parent1[i] < parent1[i-1] )
       {
-        cdoWarning("Parent index not sorted in %s!", cellindex1->filename);
+        if ( cdoVerbose ) cdoPrint("Parent index not sorted in %s (index %d)!", cellindex1->filename, i);
+        sinfo_t *sinfo = (sinfo_t*)Malloc(ncells1*sizeof(sinfo_t));
+        for ( int j = 0; j < ncells1; ++j )
+          {
+            sinfo[j].p = parent1[j];
+            sinfo[j].d = cellindex1->data[j];
+          }
+        qsort(sinfo, ncells1, sizeof(sinfo_t), cmpsinfo);
+        for ( int j = 0; j < ncells1; ++j )
+          {
+            parent1[j] = sinfo[j].p;
+            cellindex1->data[j] = sinfo[j].d;
+          }
+        Free(sinfo);
         break;
       }
 
@@ -191,7 +227,7 @@ void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
           if ( i != parent1[j+k] ) break;
           child2[i*4+k] = j+k;
         }
-     // if ( i%10000 == 0 ) printf("%d %d %d %d %d %d\n", i, j, parent1[j], parent1[j+1], parent1[j+2], parent1[j+3]);
+      // if ( i%10000 == 0 ) printf("%d %d %d %d %d %d\n", i, j, parent1[j], parent1[j+1], parent1[j+2], parent1[j+3]);      
     }
 }
 
@@ -208,6 +244,7 @@ void compute_sum(int i, int *n, double *sum, double *sumq, int kci, cellindex_ty
       if ( index == -1 ) break;
       if ( kci == 1 )
         {
+          index = cellindex[0]->data[index];
           *sum += array[index];
           *sumq += array[index]*array[index];
           *n += 1;
