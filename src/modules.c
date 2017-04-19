@@ -699,7 +699,7 @@ static modules_t Modules[] =
   { Rotuv,          RotuvbHelp,        RotuvOperators,         1,   CDI_REAL,  1,  1 },
   { Runpctl,        RunpctlHelp,       RunpctlOperators,       1,   CDI_REAL,  1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,       1,   CDI_REAL,  1,  1 },
-  { Samplegridicon, NULL,              SamplegridiconOperators,1,   CDI_REAL,  1,  1 },
+  { Samplegridicon, NULL,              SamplegridiconOperators,1,   CDI_REAL,  1,  2 },
   { Seascount,      NULL,              SeascountOperators,     1,   CDI_BOTH,  1,  1 },
   { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,      1,   CDI_REAL,  3,  1 },
   { Seasstat,       SeasstatHelp,      SeasstatOperators,      1,   CDI_REAL,  1,  1 },
