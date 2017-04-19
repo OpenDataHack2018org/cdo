@@ -171,6 +171,13 @@ void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
 {
   int ncells1 = cellindex1->ncells;
   int *parent1 = cellindex1->parent;
+  for ( int i = 1; i < ncells1; ++i )
+    if ( parent1[i] < parent1[i-1] )
+      {
+        cdoWarning("Parent index not sorted in %s!", cellindex1->filename);
+        break;
+      }
+
   int ncells2 = cellindex2->ncells;
   int *child2 = (int*) Malloc(4*ncells2*sizeof(int));
   cellindex2->child = child2;
