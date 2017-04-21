@@ -232,7 +232,7 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
           keyValues_t *kv = *(keyValues_t **)kvnode->data;
           const char *key = kv->key;
           const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
-          if ( !value ) continue;
+          if ( !value || (value && !*value) ) continue;
 
           if ( STR_IS_EQ(key, "missing_value") )
             {
@@ -277,9 +277,9 @@ void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
               keyValues_t *kv = *(keyValues_t **)kvnode->data;
               const char *key = kv->key;
               const char *value = (kv->nvalues == 1) ? kv->values[0] : NULL;
-              if ( !value ) continue;
+              if ( !value || (value && !*value) ) continue;
               
-              //printf("key=%s  value=%s\n", key, value);
+              // printf("key=%s  value=>%s<\n", key, value);
 
               if      ( STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
               else if ( STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
