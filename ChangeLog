@@ -5,7 +5,8 @@
 
 2017-04-21  Uwe Schulzweida
 
-	* cmorlite: skipped empty key values
+	* setpartab: variable name does not change [Bug #7681]
+	* cmorlite: skipped empty key values [Bug #7681]
 
 2017-04-14  Uwe Schulzweida
 
