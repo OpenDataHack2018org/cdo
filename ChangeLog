@@ -1,3 +1,13 @@
+2017-05-26  Uwe Schulzweida
+
+	* Using CDI library version 1.8.2
+	* Version 1.8.2 release
+
+2017-04-21  Uwe Schulzweida
+
+	* setpartab: variable name does not change [Bug #7681]
+	* cmorlite: skipped empty key values [Bug #7681]
+
 2017-04-14  Uwe Schulzweida
 
 	* removed fpe handling (speedup of 50% for ensmean ...)
