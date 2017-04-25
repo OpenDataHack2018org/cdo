@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.2
 	* Version 1.8.2 release
 
+2017-04-25  Uwe Schulzweida
+
+	* setcalendar, settaxis memory error (bug introduce in 1.8.1) [Bug #7691]
+
 2017-04-21  Uwe Schulzweida
 
 	* setpartab: variable name does not change [Bug #7681]
