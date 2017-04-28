@@ -37,17 +37,94 @@
 #include "util.h"
 
 
+typedef struct
+{
+  int streamID;
+  int vlistID;
+  int nmiss;
+  double missval;
+  double *array;
+} ens_file_t;
+
+
+typedef struct
+{
+  int varID;
+  int levelID;
+  int vlistID1;
+  int streamID2;
+  int nfiles;
+  ens_file_t *ef;
+  double *array2;
+  double *count2;
+  field_type *field;
+  int operfunc;
+  double pn;
+  bool lpctl;
+  bool count_data;
+  int nvars;
+} ensstat_arg_t;
+
+
+static
+void ensstat_func(ensstat_arg_t *arg)
+{
+  int nfiles = arg->nfiles;
+  bool lmiss = false;
+  for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( arg->ef[fileID].nmiss > 0 ) lmiss = true;
+
+  int gridID = vlistInqVarGrid(arg->vlistID1, arg->varID);
+  int gridsize = gridInqSize(gridID);
+  double missval = vlistInqVarMissval(arg->vlistID1, arg->varID);
+
+  int nmiss = 0;
+#if defined(_OPENMP)
+#pragma omp parallel for default(shared)
+#endif
+  for ( int i = 0; i < gridsize; ++i )
+    {
+      int ompthID = cdo_omp_get_thread_num();
+
+      arg->field[ompthID].missval = missval;
+      arg->field[ompthID].nmiss = 0;
+      for ( int fileID = 0; fileID < nfiles; fileID++ )
+        {
+          arg->field[ompthID].ptr[fileID] = arg->ef[fileID].array[i];
+          if ( lmiss && DBL_IS_EQUAL(arg->field[ompthID].ptr[fileID], arg->ef[fileID].missval) )
+            {
+              arg->field[ompthID].ptr[fileID] = missval;
+              arg->field[ompthID].nmiss++;
+            }
+        }
+
+      arg->array2[i] = arg->lpctl ? fldpctl(arg->field[ompthID], arg->pn) : fldfun(arg->field[ompthID], arg->operfunc);
+
+      if ( DBL_IS_EQUAL(arg->array2[i], arg->field[ompthID].missval) )
+        {
+#if defined(_OPENMP)
+#include "pragma_omp_atomic_update.h"
+#endif
+          nmiss++;
+        }
+
+      if ( arg->count_data ) arg->count2[i] = nfiles - arg->field[ompthID].nmiss;
+    }
+
+  streamDefRecord(arg->streamID2, arg->varID, arg->levelID);
+  streamWriteRecord(arg->streamID2, arg->array2, nmiss);
+
+  if ( arg->count_data )
+    {
+      streamDefRecord(arg->streamID2, arg->varID+arg->nvars, arg->levelID);
+      streamWriteRecord(arg->streamID2, arg->count2, 0);
+    }
+}
+
+
 void *Ensstat(void *argument)
 {
+  ensstat_arg_t ensstat_arg;
   int nrecs0;
-  typedef struct
-  {
-    int streamID;
-    int vlistID;
-    int nmiss;
-    double missval;
-    double *array;
-  } ens_file_t;
 
   cdoInitialize(argument);
 
@@ -152,6 +229,19 @@ void *Ensstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  ensstat_arg.vlistID1 = vlistID1;
+  ensstat_arg.streamID2 = streamID2;
+  ensstat_arg.nfiles = nfiles;
+  ensstat_arg.ef = ef;
+  ensstat_arg.array2 = array2;
+  ensstat_arg.count2 = count2;
+  ensstat_arg.field = field;
+  ensstat_arg.operfunc = operfunc;
+  ensstat_arg.pn = pn;
+  ensstat_arg.lpctl = lpctl;
+  ensstat_arg.count_data = count_data;
+  ensstat_arg.nvars = nvars;
+
   bool lwarning = false;
   bool lerror = false;
   int tsID = 0;
@@ -205,55 +295,10 @@ void *Ensstat(void *argument)
 	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
 	    }
 
-          bool lmiss = false;
-          for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( ef[fileID].nmiss > 0 ) lmiss = true;
-
-	  int gridID = vlistInqVarGrid(vlistID1, varID);
-	  int gridsize = gridInqSize(gridID);
-	  double missval = vlistInqVarMissval(vlistID1, varID);
-
-	  int nmiss = 0;
-#if defined(_OPENMP)
-#pragma omp parallel for default(shared)
-#endif
-	  for ( int i = 0; i < gridsize; ++i )
-	    {
-	      int ompthID = cdo_omp_get_thread_num();
-
-	      field[ompthID].missval = missval;
-	      field[ompthID].nmiss = 0;
-	      for ( int fileID = 0; fileID < nfiles; fileID++ )
-		{
-		  field[ompthID].ptr[fileID] = ef[fileID].array[i];
-		  if ( lmiss && DBL_IS_EQUAL(field[ompthID].ptr[fileID], ef[fileID].missval) )
-                    {
-                      field[ompthID].ptr[fileID] = missval;
-                      field[ompthID].nmiss++;
-                    }
-                }
-
-              array2[i] = lpctl ? fldpctl(field[ompthID], pn) : fldfun(field[ompthID], operfunc);
-
-	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) )
-		{
-#if defined(_OPENMP)
-#include "pragma_omp_atomic_update.h"
-#endif
-		  nmiss++;
-		}
-
-	      if ( count_data ) count2[i] = nfiles - field[ompthID].nmiss;
-	    }
-
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, array2, nmiss);
-
-	  if ( count_data )
-	    {
-	      streamDefRecord(streamID2, varID+nvars, levelID);
-	      streamWriteRecord(streamID2, count2, 0);
-	    }
-	}
+          ensstat_arg.varID = varID;
+          ensstat_arg.levelID = levelID;
+          ensstat_func(&ensstat_arg);
+        }
 
       tsID++;
     }
