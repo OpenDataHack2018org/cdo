@@ -48,6 +48,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "cdo_task.h"
 
 #include "cdo_getopt.h"
 
@@ -1354,6 +1355,7 @@ int parse_options_long(int argc, char *argv[])
           break;
         case 'p':
           CDO_Parallel_Read = TRUE;
+          CDO_task = true;
           break;
         case 'Q':
           cdiDefGlobal("SORTNAME", TRUE);

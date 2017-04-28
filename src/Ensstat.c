@@ -232,7 +232,6 @@ void *Ensstat(void *argument)
   ensstat_arg.vlistID1 = vlistID1;
   ensstat_arg.streamID2 = streamID2;
   ensstat_arg.nfiles = nfiles;
-  ensstat_arg.ef = ef;
   ensstat_arg.array2 = array2;
   ensstat_arg.count2 = count2;
   ensstat_arg.field = field;
@@ -295,6 +294,7 @@ void *Ensstat(void *argument)
 	      streamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
 	    }
 
+          ensstat_arg.ef = ef;
           ensstat_arg.varID = varID;
           ensstat_arg.levelID = levelID;
           ensstat_func(&ensstat_arg);
