@@ -106,6 +106,9 @@ void cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
   task_info->routine = task_routine;
   task_info->arg = task_arg;
   task_info->state = JOB;
+#if !defined(HAVE_LIBPTHREAD)
+  task_info->result = task_info->routine(task_info->arg);
+#endif
 
   // wake-up signal
 #if defined(HAVE_LIBPTHREAD)
@@ -138,13 +141,13 @@ void *cdo_task_new()
 {
   cdo_task_t *task_info = NULL;
 
-#if defined(HAVE_LIBPTHREAD)
   task_info = (cdo_task_t *) malloc(sizeof(cdo_task_t));
   task_info->routine = NULL;
   task_info->arg = NULL;
   task_info->result = NULL;
   task_info->state = SETUP;
 
+#if defined(HAVE_LIBPTHREAD)
   pthread_attr_t attr;
   size_t stacksize;
   pthread_attr_init(&attr);
@@ -214,7 +217,7 @@ int main(int argc, char **argv)
   void *task = cdo_task_new();
 
   printf("Init done\n");
-  void *myarg;
+  void *myarg = NULL;
   void *myresult;
 
   cdo_task_start(task, mytask, myarg);
