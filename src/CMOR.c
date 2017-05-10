@@ -1340,8 +1340,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
     }
 
 #if defined(CMOR_VERSION_MAJOR)
-  int cmor_version_exists = 1;
-  if ( CMOR_VERSION_MAJOR == 2 && CMOR_VERSION_MINOR == 9 )
+#if ( CMOR_VERSION_MAJOR == 2 && CMOR_VERSION_MINOR == 9 )
     {
       double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
       cmor_dataset(kv_get_a_val(kvl, "dr", "./"),
@@ -1367,11 +1366,29 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
                &branch_time,
                kv_get_a_val(kvl, "parent_experiment_rip", ""));
     }
-  else
+#elif ( CMOR_VERSION_MAJOR == 3 )
+    {
+      int i = 0;
+ /*     char *allneeded[] = {"experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "forcing", "initialization_method", "physics_version", "institution_id", "parent_experiment_rip", NULL};
+      while ( allneeded[i] )
+        {
+          cmor_set_cur_dataset_attribute(allneeded[i], kv_get_a_val(kvl, allneeded[i], ""), 1);
+          i++;
+        }
+      cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
+      cmor_set_cur_dataset_attribute("branch_time", kv_get_a_val(kvl, "branchtime", "0.0"), 1); */
+      cmor_dataset_json("/home/dkrz/k204210/test.json");
+      char testoral[CMOR_MAX_STRING];
+      cmor_set_cur_dataset_attribute("outpath", kv_get_a_val(kvl, "dr", "./"), 1);
+      cmor_get_cur_dataset_attribute("outpath", testoral);
+      printf("Schau: %s\n", testoral);
+    }
+#else
     cdoAbort("Cmor version %d.%d not yet enabled!\n", (int) CMOR_VERSION_MAJOR, (int) CMOR_VERSION_MINOR);
 #endif
-  if ( !cmor_version_exists )
+#else
     cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
+#endif
   Free(calendarptr);
   if ( cdoVerbose )
     printf("*******Setup finished successfully.*******\n");
@@ -3270,7 +3287,8 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                       void *dataslice = Malloc(gridsize * zsize * sizeof(double));
                       for ( int j = 0; j < gridsize * zsize; j++ )
                         ((double *)dataslice)[j] = ((double *)vars[i].data)[(tsID-1)*gridsize*zsize+j];
-                      cmor_write(vars[i].cmor_varID,
+                      #if ( CMOR_VERSION_MAJOR == 2 )
+                        cmor_write(vars[i].cmor_varID,
                        dataslice,
                        vars[i].datatype,
                        chunk_files[i],
@@ -3279,9 +3297,21 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        time_bndsp,
                        NULL);
                       Free(dataslice);
+                      #elif ( CMOR_VERSION_MAJOR == 3 )
+                        cmor_write(vars[i].cmor_varID,
+                       dataslice,
+                       vars[i].datatype,
+                       1,
+                       &time_val,
+                       time_bndsp,
+                       NULL);
+                      Free(dataslice);
+                      #endif
                     } 
                   else
-                    cmor_write(vars[i].cmor_varID,
+                    {
+                      #if ( CMOR_VERSION_MAJOR == 2 )
+                        cmor_write(vars[i].cmor_varID,
                      vars[i].data,
                      vars[i].datatype,
                      chunk_files[i],
@@ -3289,8 +3319,20 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                      &time_val,
                      time_bndsp,
                      NULL); 
+                      #elif ( CMOR_VERSION_MAJOR == 3 )
+                        cmor_write(vars[i].cmor_varID,
+                     vars[i].data,
+                     vars[i].datatype,
+                     1,
+                     &time_val,
+                     time_bndsp,
+                     NULL); 
+                      #endif
+                    }
                   if ( vars[i].zfactor_id > 0 )
-                    cmor_write(vars[i].zfactor_id,
+                    {
+                      #if ( CMOR_VERSION_MAJOR == 2 )
+                        cmor_write(vars[i].zfactor_id,
                        vars[ps_index].data,
                        vars[ps_index].datatype,
                        chunk_files[i],
@@ -3298,12 +3340,31 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
                        &time_val,
                        time_bndsp,
                        &vars[i].cmor_varID);
+                     #elif ( CMOR_VERSION_MAJOR == 3 )
+                        cmor_write(vars[i].zfactor_id,
+                       vars[ps_index].data,
+                       vars[ps_index].datatype,
+                       1,
+                       &time_val,
+                       time_bndsp,
+                       &vars[i].cmor_varID);
+                     #endif
+                    }
                 }
               else
-                cmor_write(vars[i].cmor_varID,
+                {
+                  #if ( CMOR_VERSION_MAJOR == 2 )
+                    cmor_write(vars[i].cmor_varID,
                    vars[i].data,
                    vars[i].datatype,
                    chunk_files[i], 0, 0, 0, NULL);
+                  #elif ( CMOR_VERSION_MAJOR == 3 )
+                    cmor_write(vars[i].cmor_varID,
+                   vars[i].data,
+                   vars[i].datatype,
+                   0, 0, 0, NULL);
+                  #endif
+                }
             }
         }
     }
