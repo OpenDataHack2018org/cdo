@@ -220,6 +220,7 @@ int zaxisFromName(const char *zaxisname);
 
 /* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
+void cdo_omp_set_num_threads(int nthreads);
 void strtolower(char *str);
 void strtoupper(char *str);
 

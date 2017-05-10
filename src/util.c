@@ -182,6 +182,14 @@ int cdo_omp_get_thread_num(void)
 }
 
 
+void cdo_omp_set_num_threads(int nthreads)
+{
+#if defined(_OPENMP)
+  if (  omp_get_max_threads() != nthreads ) omp_set_num_threads(nthreads);
+#endif
+}
+
+
 char *getProgname(char *string)
 {
 #if defined(_WIN32)
