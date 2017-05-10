@@ -527,15 +527,16 @@ int expand_curvilinear_grid(int gridID)
 static
 void grid_check_lat_borders_rad(int n, double *ybounds)
 {
+#define  YLIM  (88*DEG2RAD)
   if ( ybounds[0] > ybounds[n-1] )
     {
-      if ( ybounds[0]   >  PIH ) ybounds[0]   =  PIH;
-      if ( ybounds[n-1] < -PIH ) ybounds[n-1] = -PIH;
+      if ( ybounds[0]   >  YLIM ) ybounds[0]   =  PIH;
+      if ( ybounds[n-1] < -YLIM ) ybounds[n-1] = -PIH;
     }
   else
     {
-      if ( ybounds[0]   < -PIH ) ybounds[0]   = -PIH;
-      if ( ybounds[n-1] >  PIH ) ybounds[n-1] =  PIH;
+      if ( ybounds[0]   < -YLIM ) ybounds[0]   = -PIH;
+      if ( ybounds[n-1] >  YLIM ) ybounds[n-1] =  PIH;
     }
 }
 
