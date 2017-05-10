@@ -275,7 +275,7 @@ int gridToMeridional(int gridID1)
 }
 
 
-void grid_gen_corners(size_t n, const double* restrict vals, double* restrict corners)
+void grid_gen_corners(size_t n, const double *restrict vals, double *restrict corners)
 {
   if ( n == 1 )
     {

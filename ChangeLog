@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.2
 	* Version 1.8.2 release
 
+2017-05-10  Uwe Schulzweida
+
+	* grid_check_lat_borders_rad: remove RAD2DEG (bug fix for remapycon with non global reg2d source grids)
+
 2017-04-25  Uwe Schulzweida
 
 	* setcalendar, settaxis memory error (bug introduce in 1.8.1) [Bug #7691]
