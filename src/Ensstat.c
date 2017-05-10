@@ -33,6 +33,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "cdo_task.h"
 #include "pstream.h"
 #include "util.h"
 
@@ -67,11 +68,17 @@ typedef struct
 
 
 static
-void ensstat_func(ensstat_arg_t *arg)
+void *ensstat_func(void *xarg)
 {
+  cdo_omp_set_num_threads(ompNumThreads);
+
+  ensstat_arg_t *arg = (ensstat_arg_t*) xarg;
   int nfiles = arg->nfiles;
+  ens_file_t *ef = arg->ef;
+  field_type *field = arg->field;
+
   bool lmiss = false;
-  for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( arg->ef[fileID].nmiss > 0 ) lmiss = true;
+  for ( int fileID = 0; fileID < nfiles; fileID++ ) if ( ef[fileID].nmiss > 0 ) lmiss = true;
 
   int gridID = vlistInqVarGrid(arg->vlistID1, arg->varID);
   int gridsize = gridInqSize(gridID);
@@ -85,21 +92,21 @@ void ensstat_func(ensstat_arg_t *arg)
     {
       int ompthID = cdo_omp_get_thread_num();
 
-      arg->field[ompthID].missval = missval;
-      arg->field[ompthID].nmiss = 0;
+      field[ompthID].missval = missval;
+      field[ompthID].nmiss = 0;
       for ( int fileID = 0; fileID < nfiles; fileID++ )
         {
-          arg->field[ompthID].ptr[fileID] = arg->ef[fileID].array[i];
-          if ( lmiss && DBL_IS_EQUAL(arg->field[ompthID].ptr[fileID], arg->ef[fileID].missval) )
+          field[ompthID].ptr[fileID] = ef[fileID].array[i];
+          if ( lmiss && DBL_IS_EQUAL(field[ompthID].ptr[fileID], ef[fileID].missval) )
             {
-              arg->field[ompthID].ptr[fileID] = missval;
-              arg->field[ompthID].nmiss++;
+              field[ompthID].ptr[fileID] = missval;
+              field[ompthID].nmiss++;
             }
         }
 
-      arg->array2[i] = arg->lpctl ? fldpctl(arg->field[ompthID], arg->pn) : fldfun(arg->field[ompthID], arg->operfunc);
+      arg->array2[i] = arg->lpctl ? fldpctl(field[ompthID], arg->pn) : fldfun(field[ompthID], arg->operfunc);
 
-      if ( DBL_IS_EQUAL(arg->array2[i], arg->field[ompthID].missval) )
+      if ( DBL_IS_EQUAL(arg->array2[i], field[ompthID].missval) )
         {
 #if defined(_OPENMP)
 #include "pragma_omp_atomic_update.h"
@@ -107,7 +114,7 @@ void ensstat_func(ensstat_arg_t *arg)
           nmiss++;
         }
 
-      if ( arg->count_data ) arg->count2[i] = nfiles - arg->field[ompthID].nmiss;
+      if ( arg->count_data ) arg->count2[i] = nfiles - field[ompthID].nmiss;
     }
 
   streamDefRecord(arg->streamID2, arg->varID, arg->levelID);
@@ -118,11 +125,14 @@ void ensstat_func(ensstat_arg_t *arg)
       streamDefRecord(arg->streamID2, arg->varID+arg->nvars, arg->levelID);
       streamWriteRecord(arg->streamID2, arg->count2, 0);
     }
+
+  return NULL;
 }
 
 
 void *Ensstat(void *argument)
 {
+  void *task = cdo_task_new();
   ensstat_arg_t ensstat_arg;
   int nrecs0;
 
@@ -178,8 +188,8 @@ void *Ensstat(void *argument)
   for ( int i = 0; i < ompNumThreads; i++ )
     {
       field_init(&field[i]);
-      field[i].size   = nfiles;
-      field[i].ptr    = (double*) Malloc(nfiles*sizeof(double));
+      field[i].size = nfiles;
+      field[i].ptr  = (double*) Malloc(nfiles*sizeof(double));
     }
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
@@ -298,6 +308,8 @@ void *Ensstat(void *argument)
           ensstat_arg.varID = varID;
           ensstat_arg.levelID = levelID;
           ensstat_func(&ensstat_arg);
+          //cdo_task_start(task, ensstat_func, &ensstat_arg);
+          //cdo_task_wait(task);
         }
 
       tsID++;
@@ -323,6 +335,8 @@ void *Ensstat(void *argument)
 
   for ( int i = 0; i < ompNumThreads; i++ ) if ( field[i].ptr ) Free(field[i].ptr);
   if ( field ) Free(field);
+
+  cdo_task_delete(task);
 
   cdoFinish();
 
