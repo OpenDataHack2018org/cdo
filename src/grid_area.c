@@ -29,9 +29,15 @@ void lonlat_to_xyz(double lon, double lat, double *xyz)
 }
 
 /*
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "clipping/grid.h"
 #include "clipping/grid_cell.h"
 #include "clipping/area.h"
+#ifdef __cplusplus
+}
+#endif
 
 static
 double yac_huiliers_area(int num_corners, double *cell_corner_lon, double *cell_corner_lat)

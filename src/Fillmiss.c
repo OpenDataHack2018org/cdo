@@ -29,7 +29,13 @@
 #include "grid.h"
 
 #include "grid_search.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "clipping/geometry.h"
+#ifdef __cplusplus
+}
+#endif
 
 
 void fillmiss(field_type *field1, field_type *field2, int nfill)

@@ -24,7 +24,13 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "clipping/geometry.h"
+#ifdef __cplusplus
+}
+#endif
 #include "time.h"
 
 /* Quicksort is called with a pointer to the array to be sorted and an integer indicating its length. */
