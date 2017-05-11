@@ -61,17 +61,9 @@ void *cdo_task(void *task)
     {
       pthread_cond_wait(&(task_info->work_cond), &(task_info->work_mtx));
 
-      if ( DIE == task_info->state )
-        {
-          // kill thread
-          break;
-        }
+      if ( DIE == task_info->state ) break; // kill thread
 
-      if ( IDLE == task_info->state )
-        {
-          // accidental wake-up
-          continue;
-        }
+      if ( IDLE == task_info->state ) continue; // accidental wake-up
       
       // do blocking task
       //printf("<worker> JOB start\n");
@@ -102,10 +94,7 @@ void cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
 
   // ensure worker is waiting
 #if defined(HAVE_LIBPTHREAD)
-  if ( CDO_task )
-    {
-      pthread_mutex_lock(&(task_info->work_mtx));
-    }
+  if ( CDO_task ) pthread_mutex_lock(&(task_info->work_mtx));
 #endif
 
   // set job information & state

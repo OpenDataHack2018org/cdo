@@ -68,11 +68,11 @@ typedef struct
 
 
 static
-void *ensstat_func(void *xarg)
+void *ensstat_func(void *ensarg)
 {
-  cdo_omp_set_num_threads(ompNumThreads);
+  if ( CDO_task ) cdo_omp_set_num_threads(ompNumThreads);
 
-  ensstat_arg_t *arg = (ensstat_arg_t*) xarg;
+  ensstat_arg_t *arg = (ensstat_arg_t*) ensarg;
   int nfiles = arg->nfiles;
   ens_file_t *ef = arg->ef;
   field_type *field = arg->field;
@@ -132,7 +132,7 @@ void *ensstat_func(void *xarg)
 
 void *Ensstat(void *argument)
 {
-  void *task = cdo_task_new();
+  void *task = CDO_task ? cdo_task_new() : NULL;
   ensstat_arg_t ensstat_arg;
   int nrecs0;
 
@@ -307,9 +307,15 @@ void *Ensstat(void *argument)
           ensstat_arg.ef = ef;
           ensstat_arg.varID = varID;
           ensstat_arg.levelID = levelID;
-          ensstat_func(&ensstat_arg);
-          //cdo_task_start(task, ensstat_func, &ensstat_arg);
-          //cdo_task_wait(task);
+          if ( task )
+            {
+              cdo_task_start(task, ensstat_func, &ensstat_arg);
+              cdo_task_wait(task);
+            }
+          else
+            {
+              ensstat_func(&ensstat_arg);
+            }
         }
 
       tsID++;
@@ -336,7 +342,7 @@ void *Ensstat(void *argument)
   for ( int i = 0; i < ompNumThreads; i++ ) if ( field[i].ptr ) Free(field[i].ptr);
   if ( field ) Free(field);
 
-  cdo_task_delete(task);
+  if ( task ) cdo_task_delete(task);
 
   cdoFinish();
 
