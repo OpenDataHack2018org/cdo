@@ -107,8 +107,14 @@ char *getElementName(char *pline, char *name)
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
   size_t pos = 0;
-  while ( pos < len && !isspace((int) *(pline+pos)) && *(pline+pos) != '=' && *(pline+pos) != ':' )
+  while ( pos < len && *(pline+pos) != '=' )
     {
+      if ( isspace((int) *(pline+pos)) )
+        cdoAbort("Cannot interpret key of keyvalue because a blank is in: ...'%s'.... Use quotes.\n", pline);
+      if ( *(pline+pos) == ',' )
+        cdoAbort("Unexpected separator sign ',' in key: ...'%s'.... Use quotes.\n", pline);
+      if ( *(pline+pos) == ':' )
+        cdoWarning("Separator sign ':' is not supported. Use '=' instead.\n...'%s'...\n", pline);
       name[pos] = tolower(*(pline+pos));
       pos++;
     }
@@ -155,12 +161,18 @@ char *getElementValues(char *pline, char **values, int *nvalues)
 {
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
+  while ( isspace((int) *(pline+(int)len)) ) len--;
+  *(pline+len) = 0;
+  if ( (int)len == 0 )
+    cdoAbort("No values found.\n");
   *nvalues = 0;
   int i = 0;
   while ( i < len && len )
     {
       if ( *(pline+i) == ',')
         {
+          if ( i == 0 )
+            cdoAbort("A value begins with ',': '%s'.\nCheck syntax.", pline);
           copy_value(pline, values, nvalues);
           if ( *(values[*nvalues-1]+i-1) == '"' || *(values[*nvalues-1]+i-1) == '\'' )
             quote_replace(values, *nvalues-1,i);
@@ -184,30 +196,18 @@ char *getElementValues(char *pline, char **values, int *nvalues)
           i++;
         }
       else if ( isspace((int) *(pline+i)) )
-        {
-          copy_value(pline, values, nvalues);
-          if ( *(values[*nvalues-1]+i-1) == '"' || *(values[*nvalues-1]+i-1) == '\'' )
-            quote_replace(values, *nvalues-1,i);
-          else
-            *(values[*nvalues-1]+i) = 0;
-          i++; 
-          pline+=i;
-          break;          
-        }
+        break;          
       else if ( *(pline+i) == '=' || *(pline+i) == ':' )
         cdoAbort("Found unexpected separator sign in value: '%c'.", *(pline+i) );
       else
         i++;
     }
-  if ( i == len && len )
-    {
-      copy_value(pline, values, nvalues);
-      if ( *(values[*nvalues-1]+i-1) == '"' )
-        quote_replace(values, *nvalues-1, i);
-      else
-        *(values[*nvalues-1]+i) = 0;
-      *pline = 0;
-    }
+  copy_value(pline, values, nvalues);
+  if ( *(values[*nvalues-1]+i-1) == '"' )
+    quote_replace(values, *nvalues-1, i);
+  else
+    *(values[*nvalues-1]+i) = 0;
+  pline+=i;
   return pline;
 }
 
@@ -261,7 +261,7 @@ static void parse_line_to_list(list_t *list, char *pline, char *kvlname, int che
 
 static void remove_space_and_comms(char **pline, char *line)
 {
-  while ( isspace((int) *(*pline)) ) *pline++;
+  while ( isspace((int) *(*pline)) ) (*pline)++;
   char *tester = *pline;
   int i = 0;
   while ( *tester != 0 )
@@ -275,34 +275,37 @@ static void remove_space_and_comms(char **pline, char *line)
     }
 }
 
-static void add_lines(char *line, char **buffer, size_t *buffersize)
+static int add_lines_tester(char *line)
 {
   char *tester = line;
   while ( *tester != 0 ) tester++;
   tester--;
   while ( isspace((int) *tester) ) tester--;
   if ( *tester == ',' )
+    return 1;
+  return 0;
+}
+
+static void add_lines(char *line, char **buffer, size_t *buffersize)
+{
+  int len = strlen(line);
+  char nextline[4096];
+  if ( (*buffer = readLineFromBuffer(*buffer, buffersize, nextline, sizeof(nextline))) )
     {
-      int len = strlen(line);
-      char nextline[4096];
-      if ( (*buffer = readLineFromBuffer(*buffer, buffersize, nextline, sizeof(nextline))) )
+      char *nexttester = nextline;
+      remove_space_and_comms(&nexttester, nextline);
+      if ( *nexttester != '\0' && *nexttester != '&' )
         {
-          char *nexttester = nextline;
-          remove_space_and_comms(&nexttester, nextline);
-          if ( *nexttester != '\0' && *nexttester != '&' )
-            {
-              if ( strlen(nexttester) + len > 4096 )
-                cdoAbort("Line too long!");
-              strcat(line, nextline);
-              add_lines(line, buffer, buffersize);          
-            }
-          else
-            cdoAbort("Found ',' at end of line.");
+          if ( strlen(nexttester) + len > 4096 )
+            cdoAbort("Line too long!");
+          strcat(line, nextline);
         }
       else
-        cdoAbort("Found ',' at end of line.");
-    }      
-}
+        cdoAbort("Found ',' at end of line without information in next line.");
+    }
+  else
+    cdoAbort("Found ',' at end of file.");
+}  
 
 void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int checkpml, int lowprior)
 {
@@ -319,7 +322,8 @@ void parse_buffer_to_list(list_t *list, size_t buffersize, char *buffer, int che
       pline = line;
       remove_space_and_comms(&pline, line);
       if ( *pline == '\0' ) continue;
-      add_lines(line, &buffer, &buffersize);
+      while ( add_lines_tester(line) )
+        add_lines(line, &buffer, &buffersize);
       //  len = (int) strlen(pline);
       if ( listtype == 0 && *pline == '&' ) listtype = 1;
 /* MAXNVALUES*/
@@ -1154,11 +1158,12 @@ static void read_config_files(list_t *kvl)
         i++;
       }
 
-  /* Config file in user's $HOME directory. */
-  char *home = getenv("HOME");
+  /* Config file in user's $cwd directory. */
+  char cwd[1024];
+  getcwd(cwd, sizeof(cwd));
   const char *dotconfig = ".cdocmorinfo";
-  char *workfile = Malloc(strlen(home) + strlen(dotconfig) + 2);
-  sprintf(workfile, "%s/%s", home, dotconfig);
+  char *workfile = Malloc(strlen(cwd) + strlen(dotconfig) + 2);
+  sprintf(workfile, "%s/%s", cwd, dotconfig);
   if ( cdoVerbose )
     printf("Try to parse default file: '%s'\n", workfile);
   parse_kv_file(kvl, workfile);
@@ -1597,7 +1602,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
           if ( numchar == zsize )
             cmor_axis(new_axis_id(axis_ids), chardim, "", numchar, (void *)charcmor, 'c',  NULL, maxlen, NULL); 
           else
-            cdoAbort("The number of registered character coordinates differ from the number of axis levels.");
+            cdoAbort("The number of registered character coordinates '%d' differ from the number of axis levels '%d'.", numchar, zsize);
           Free(charcmor);
         }
       else
@@ -2804,18 +2809,72 @@ static int get_tunitsec(int tunit)
     }
 }
 
-static double get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec, int calendar)
+static juldate_t get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec, int calendar, char *frequency, int ts_id)
 {
-  juldate_t juldate = juldate_encode(calendar, taxisInqVdate(taxisID),
-                                     taxisInqVtime(taxisID));
-  return juldate_to_seconds(juldate_sub(juldate, ref_date)) / tunitsec;
-}
-
-static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date, double time_val, int calendar, int tunitsec, double *time_bnds)
-{
-  int vdate0b, vdate1b, vtime0b, vtime1b;
   int year, month, day;
   cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);
+  juldate_t juldate = juldate_encode(calendar, taxisInqVdate(taxisID),
+                                     taxisInqVtime(taxisID));
+
+  if ( month == 0 || day == 0 || year == 0 )
+    {
+      int rdate, rtime;
+      int ryear, rmonth, rday, addseconds = 0;
+      juldate_decode(calendar, ref_date, &rdate, &rtime);
+      cdiDecodeDate(rdate, &ryear, &rmonth, &rday);
+      if ( ts_id < 4 )
+        cdoWarning("Your time axis is incorrect. It is tried to calculate time values with frequency.\nCONSIDER: These are only valid if\n - cm=m \n - a continous time axis exist according to the frequency \n- a correct calendar exist!\n\n This warning is generated for the first 3 time steps");
+      if ( strcmp(frequency, "yr") == 0 )
+        {
+          year = ryear+ts_id;
+          month = 6; /* Is set to mid point by CMOR */
+          day = 14; /* Is set to mid point by CMOR */
+        }
+      else if ( strcmp(frequency, "mon") == 0 )
+        {
+          year = ryear + floor(((double)(ts_id-1))/12);
+          month = (ts_id % 12);
+          if ( month == 0 )
+            month = 12;
+          day = 14; /* Is set to mid point by CMOR */
+        }
+      else if ( strcmp(frequency, "day") == 0 )
+        {
+          addseconds = ts_id * 24*60*60 + 60*60*12;
+          juldate = juldate_add_seconds(addseconds, ref_date);
+        }
+      else if ( strcmp(frequency, "6hr") == 0 )
+        {
+          addseconds = ts_id * 6*60*60;
+          juldate = juldate_add_seconds(addseconds, ref_date);
+        }
+      else if ( strcmp(frequency, "3hr") == 0 )
+        {
+          addseconds = ts_id * 3*60*60;
+          juldate = juldate_add_seconds(addseconds, ref_date);
+        }
+      if ( addseconds == 0 )
+        {
+          int vdate = cdiEncodeDate(year, month, 1);
+          int vtime = 0;
+          juldate = juldate_encode(calendar, vdate, vtime);
+        }
+    }
+
+  return juldate;
+}
+
+static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date, juldate_t jtime_val, int calendar, int tunitsec, double *time_bnds)
+{
+  double time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
+  int vdate0b, vdate1b, vtime0b, vtime1b, vdatecorr, vtimecorr;
+  int year, month, day;
+  cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);
+  if ( month == 0 || day == 0 )
+    {
+      juldate_decode(calendar, jtime_val, &vdatecorr, &vtimecorr);
+      cdiDecodeDate(vdatecorr, &year, &month, &day);
+    }
   if ( !taxisHasBounds(taxisID) )
     {
       if ( strcmp(frequency, "yr") == 0 )
@@ -3262,11 +3321,13 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
     { 
       double time_bnds[2];
       double *time_bndsp;
+      juldate_t jtime_val;
       double time_val;
       if ( time_axis != 3 )
         {
-          time_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar);
-          time_bndsp = ( time_axis != 1 ) ? get_time_bounds(taxisID, frequency, ref_date, time_val, calendar, tunitsec, time_bnds) : 0;
+          jtime_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar, frequency, tsID);
+          time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
+          time_bndsp = ( time_axis != 1 ) ? get_time_bounds(taxisID, frequency, ref_date, jtime_val, calendar, tunitsec, time_bnds) : 0;
         }
       while ( nrecs-- )
         read_record(*streamID, vars, vlistID);
