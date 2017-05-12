@@ -2792,18 +2792,72 @@ static int get_tunitsec(int tunit)
     }
 }
 
-static double get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec, int calendar)
+static juldate_t get_cmor_time_val(int taxisID, juldate_t ref_date, int tunitsec, int calendar, char *frequency, int ts_id)
 {
-  juldate_t juldate = juldate_encode(calendar, taxisInqVdate(taxisID),
-                                     taxisInqVtime(taxisID));
-  return juldate_to_seconds(juldate_sub(juldate, ref_date)) / tunitsec;
-}
-
-static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date, double time_val, int calendar, int tunitsec, double *time_bnds)
-{
-  int vdate0b, vdate1b, vtime0b, vtime1b;
   int year, month, day;
   cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);
+  juldate_t juldate = juldate_encode(calendar, taxisInqVdate(taxisID),
+                                     taxisInqVtime(taxisID));
+
+  if ( month == 0 || day == 0 || year == 0 )
+    {
+      int rdate, rtime;
+      int ryear, rmonth, rday, addseconds = 0;
+      juldate_decode(calendar, ref_date, &rdate, &rtime);
+      cdiDecodeDate(rdate, &ryear, &rmonth, &rday);
+      if ( ts_id < 4 )
+        cdoWarning("Your time axis is incorrect. It is tried to calculate time values with frequency.\nCONSIDER: These are only valid if\n - cm=m \n - a continous time axis exist according to the frequency \n- a correct calendar exist!\n\n This warning is generated for the first 3 time steps");
+      if ( strcmp(frequency, "yr") == 0 )
+        {
+          year = ryear+ts_id;
+          month = 6; /* Is set to mid point by CMOR */
+          day = 14; /* Is set to mid point by CMOR */
+        }
+      else if ( strcmp(frequency, "mon") == 0 )
+        {
+          year = ryear + floor(((double)(ts_id-1))/12);
+          month = (ts_id % 12);
+          if ( month == 0 )
+            month = 12;
+          day = 14; /* Is set to mid point by CMOR */
+        }
+      else if ( strcmp(frequency, "day") == 0 )
+        {
+          addseconds = ts_id * 24*60*60 + 60*60*12;
+          juldate = juldate_add_seconds(addseconds, ref_date);
+        }
+      else if ( strcmp(frequency, "6hr") == 0 )
+        {
+          addseconds = ts_id * 6*60*60;
+          juldate = juldate_add_seconds(addseconds, ref_date);
+        }
+      else if ( strcmp(frequency, "3hr") == 0 )
+        {
+          addseconds = ts_id * 3*60*60;
+          juldate = juldate_add_seconds(addseconds, ref_date);
+        }
+      if ( addseconds == 0 )
+        {
+          int vdate = cdiEncodeDate(year, month, 1);
+          int vtime = 0;
+          juldate = juldate_encode(calendar, vdate, vtime);
+        }
+    }
+
+  return juldate;
+}
+
+static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date, juldate_t jtime_val, int calendar, int tunitsec, double *time_bnds)
+{
+  double time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
+  int vdate0b, vdate1b, vtime0b, vtime1b, vdatecorr, vtimecorr;
+  int year, month, day;
+  cdiDecodeDate(taxisInqVdate(taxisID), &year, &month, &day);
+  if ( month == 0 || day == 0 )
+    {
+      juldate_decode(calendar, jtime_val, &vdatecorr, &vtimecorr);
+      cdiDecodeDate(vdatecorr, &year, &month, &day);
+    }
   if ( !taxisHasBounds(taxisID) )
     {
       if ( strcmp(frequency, "yr") == 0 )
@@ -3250,11 +3304,13 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
     { 
       double time_bnds[2];
       double *time_bndsp;
+      juldate_t jtime_val;
       double time_val;
       if ( time_axis != 3 )
         {
-          time_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar);
-          time_bndsp = ( time_axis != 1 ) ? get_time_bounds(taxisID, frequency, ref_date, time_val, calendar, tunitsec, time_bnds) : 0;
+          jtime_val = get_cmor_time_val(taxisID, ref_date, tunitsec, calendar, frequency, tsID);
+          time_val = juldate_to_seconds(juldate_sub(jtime_val, ref_date)) / tunitsec;
+          time_bndsp = ( time_axis != 1 ) ? get_time_bounds(taxisID, frequency, ref_date, jtime_val, calendar, tunitsec, time_bnds) : 0;
         }
       while ( nrecs-- )
         read_record(*streamID, vars, vlistID);
