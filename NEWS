@@ -1,6 +1,13 @@
 CDO NEWS
 --------
 
+Version 1.8.2 (15 May 2017):
+
+   Fixed bugs:
+     * setpartab: variable name does not change [Bug #7681]
+     * cmorlite: skipped empty key values [Bug #7681]
+     * setcalendar, settaxis memory error (bug introduce in 1.8.1) [Bug #7691]
+
 Version 1.8.1 (6 April 2017):
 
    New features:
