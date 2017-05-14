@@ -130,9 +130,11 @@ void *cdo_task_wait(void *task)
     {
       while (1)
         {
+          if ( IDLE == task_info->state ) break;
+
           pthread_cond_wait(&(task_info->boss_cond), &(task_info->boss_mtx));
 
-          if ( IDLE == task_info->state ) break;
+          // if ( IDLE == task_info->state ) break;
         }
     }
 #endif
