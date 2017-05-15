@@ -362,8 +362,7 @@ void after_legini_full(int ntr, int nlat, double *restrict poli, double *restric
 
 void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pold, double *restrict coslat)
 {
-  int jgl, jm, jn, is;
-  int isp, latn, lats;
+  int is, lats;
 
   int waves  =  ntr + 1;
   int dimpnm = (ntr + 1)*(ntr + 4)/2;
@@ -374,20 +373,20 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
   double *work = (double*) Malloc(3*waves * sizeof(double));
 
   gaussaw(gmu, gwt, nlat);
-  for ( jgl = 0; jgl < nlat; ++jgl ) gwt[jgl] *= 0.5;
+  for ( int jgl = 0; jgl < nlat; ++jgl ) gwt[jgl] *= 0.5;
 
-  for ( jgl = 0; jgl < nlat; ++jgl )
+  for ( int jgl = 0; jgl < nlat; ++jgl )
     coslat[jgl] = sqrt(1.0 - gmu[jgl]*gmu[jgl]);
 
-  for ( jgl = 0; jgl < nlat/2; jgl++ )
+  for ( int jgl = 0; jgl < nlat/2; jgl++ )
     {
       double zgwt = gwt[jgl];
 
       jspleg1(pnm, gmu[jgl], ntr, work);
 
-      latn = jgl;
-      isp = 0;
-      for ( jm = 0; jm < waves; jm++ )
+      int latn = jgl;
+      int isp = 0;
+      for ( int jm = 0; jm < waves; jm++ )
 	{
 #if defined(SX)
 #pragma vdir nodep
@@ -395,7 +394,7 @@ void after_legini(int ntr, int nlat, double *restrict poli, double *restrict pol
 #if defined(HAVE_OPENMP4)
 #pragma omp simd
 #endif
-	  for ( jn = 0; jn < waves - jm; jn++ )
+	  for ( int jn = 0; jn < waves - jm; jn++ )
 	    {
 	      is = (jn+1)%2 * 2 - 1;
 	      lats = latn - jgl + nlat - jgl - 1;

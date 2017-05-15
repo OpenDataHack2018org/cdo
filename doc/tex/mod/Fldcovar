@@ -18,6 +18,7 @@ for each timestep. With
 @IfMan
 
 S(t) = {x, i_1(t,x) != missval and i_2(t,x) != missval}
+
 @EndifMan
 @IfDoc
 @BeginDisplayMath
@@ -28,6 +29,7 @@ it is
 @IfMan
 
 o(t,1) = Covar{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}
+
 @EndifMan
 @IfDoc
 @BeginDisplayMath

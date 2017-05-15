@@ -39,6 +39,12 @@ double fldfun(field_type field, int function)
     case func_std1:   rval = fldstd1(field);   break;
     case func_var:    rval = fldvar(field);    break;
     case func_var1:   rval = fldvar1(field);   break;
+    case func_meanw:  rval = fldmeanw(field);  break;
+    case func_avgw:   rval = fldavgw(field);   break;
+    case func_stdw:   rval = fldstdw(field);   break;
+    case func_std1w:  rval = fldstd1w(field);  break;
+    case func_varw:   rval = fldvarw(field);   break;
+    case func_var1w:  rval = fldvar1w(field);  break;
     case func_crps:   rval = fldcrps(field);   break;
     case func_brs:    rval = fldbrs(field);    break;
     case func_rank:   rval = fldrank(field);   break;
@@ -275,6 +281,37 @@ double fldmean(field_type field)
   const double missval1 = field.missval;
   const double missval2 = field.missval;
   const double *restrict array = field.ptr;
+  double rsum = 0, rsumw = 0;
+  double ravg = 0;
+
+  assert(array!=NULL);
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; ++i ) 
+	if ( !DBL_IS_EQUAL(array[i], missval1) )
+	  {
+	    rsum  += array[i];
+	    rsumw += 1;
+	  }
+      ravg = DIVMN(rsum, rsumw);
+    }
+  else
+    {
+      int fpeRaised = array_mean_val(len, array, &ravg);
+    }
+
+  return ravg;
+}
+
+
+double fldmeanw(field_type field)
+{
+  const int nmiss       = field.nmiss > 0;
+  const size_t len      = field.size;
+  const double missval1 = field.missval;
+  const double missval2 = field.missval;
+  const double *restrict array = field.ptr;
   const double *restrict w     = field.weight;
   double rsum = 0, rsumw = 0;
   double ravg = 0;
@@ -284,7 +321,7 @@ double fldmean(field_type field)
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; ++i ) 
 	if ( !DBL_IS_EQUAL(array[i], missval1) && !DBL_IS_EQUAL(w[i], missval1) )
 	  {
 	    rsum  += w[i] * array[i];
@@ -302,6 +339,37 @@ double fldmean(field_type field)
 
 
 double fldavg(field_type field)
+{
+  const int nmiss       = field.nmiss > 0;
+  const size_t len      = field.size;
+  const double missval1 = field.missval;
+  const double missval2 = field.missval;
+  const double *restrict array = field.ptr;
+  double rsum = 0, rsumw = 0;
+  double ravg = 0;
+
+  assert(array!=NULL);
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; ++i ) 
+        {
+          rsum  = ADDMN(rsum, array[i]);
+          rsumw += 1;
+        }
+
+      ravg = DIVMN(rsum, rsumw);
+    }
+  else
+    {
+      int fpeRaised = array_mean_val(len, array, &ravg);
+    }
+
+  return ravg;
+}
+
+
+double fldavgw(field_type field)
 {
   const int nmiss       = field.nmiss > 0;
   const size_t len      = field.size;
@@ -338,35 +406,34 @@ double fldavg(field_type field)
 }
 
 static
-void prevarsum(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
-	       double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
+void prevarsum(const double *restrict array, size_t len, int nmiss, 
+               double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
 { 
   assert(array!=NULL);
-  assert(w!=NULL);
 
   double xsum = 0, xsumw = 0;
   double xsumq = 0, xsumwq = 0;
 
   if ( nmiss )
     {
-      for ( size_t i = 0; i < len; i++ ) 
-        if ( !DBL_IS_EQUAL(array[i], missval) && !DBL_IS_EQUAL(w[i], missval) )
+      for ( size_t i = 0; i < len; ++i ) 
+        if ( !DBL_IS_EQUAL(array[i], missval) )
           {
-            xsum   += w[i] * array[i];
-            xsumq  += w[i] * array[i] * array[i];
-            xsumw  += w[i];
-            xsumwq += w[i] * w[i];
+            xsum   += array[i];
+            xsumq  += array[i] * array[i];
+            xsumw  += 1;
+            xsumwq += 1;
           }
     }
   else
     {
-      for ( size_t i = 0; i < len; i++ ) 
+      for ( size_t i = 0; i < len; ++i ) 
         {
-          xsum   += w[i] * array[i];
-          xsumq  += w[i] * array[i] * array[i];
-          xsumw  += w[i];
-          xsumwq += w[i] * w[i];
+          xsum   += array[i];
+          xsumq  += array[i] * array[i];
         }
+      xsumw = len;
+      xsumwq = len;
     }
 
   *rsum   = xsum;
@@ -384,7 +451,7 @@ double fldvar(field_type field)
   double rsum, rsumw;
   double rsumq, rsumwq;
 
-  prevarsum(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+  prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
   double rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
@@ -401,7 +468,79 @@ double fldvar1(field_type field)
   double rsum, rsumw;
   double rsumq, rsumwq;
 
-  prevarsum(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+  prevarsum(field.ptr, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+
+  double rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
+  if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+
+  return rvar;
+}
+
+static
+void prevarsumw(const double *restrict array, const double *restrict w, size_t len, int nmiss, 
+                double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
+{ 
+  assert(array!=NULL);
+  assert(w!=NULL);
+
+  double xsum = 0, xsumw = 0;
+  double xsumq = 0, xsumwq = 0;
+
+  if ( nmiss )
+    {
+      for ( size_t i = 0; i < len; ++i ) 
+        if ( !DBL_IS_EQUAL(array[i], missval) && !DBL_IS_EQUAL(w[i], missval) )
+          {
+            xsum   += w[i] * array[i];
+            xsumq  += w[i] * array[i] * array[i];
+            xsumw  += w[i];
+            xsumwq += w[i] * w[i];
+          }
+    }
+  else
+    {
+      for ( size_t i = 0; i < len; ++i ) 
+        {
+          xsum   += w[i] * array[i];
+          xsumq  += w[i] * array[i] * array[i];
+          xsumw  += w[i];
+          xsumwq += w[i] * w[i];
+        }
+    }
+
+  *rsum   = xsum;
+  *rsumq  = xsumq;
+  *rsumw  = xsumw;
+  *rsumwq = xsumwq;
+}
+
+
+double fldvarw(field_type field)
+{
+  const int    nmiss   = field.nmiss > 0;
+  const size_t len     = field.size;
+  const double missval = field.missval;
+  double rsum, rsumw;
+  double rsumq, rsumwq;
+
+  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+
+  double rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
+  if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+
+  return rvar;
+}
+
+
+double fldvar1w(field_type field)
+{
+  const int    nmiss   = field.nmiss > 0;
+  const size_t len     = field.size;
+  const double missval = field.missval;
+  double rsum, rsumw;
+  double rsumq, rsumwq;
+
+  prevarsumw(field.ptr, field.weight, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
   double rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
@@ -426,6 +565,7 @@ double var_to_std(double rvar, double missval)
   return rstd;
 }
 
+
 double fldstd(field_type field)
 {
   return var_to_std(fldvar(field), field.missval);
@@ -435,6 +575,18 @@ double fldstd(field_type field)
 double fldstd1(field_type field)
 {
   return var_to_std(fldvar1(field), field.missval);
+}
+
+
+double fldstdw(field_type field)
+{
+  return var_to_std(fldvarw(field), field.missval);
+}
+
+
+double fldstd1w(field_type field)
+{
+  return var_to_std(fldvar1w(field), field.missval);
 }
 
 

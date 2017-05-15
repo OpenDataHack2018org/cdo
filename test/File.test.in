@@ -1,4 +1,4 @@
-#! @SHELL@
+#! @BASH@
 echo 1..16 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo

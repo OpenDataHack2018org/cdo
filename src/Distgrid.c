@@ -268,8 +268,8 @@ void *Distgrid(void *argument)
   int xinc = nx/nxblocks;
   int yinc = ny/nyblocks;
 
-  if ( nx%xinc != 0 ) xinc++;
-  if ( ny%yinc != 0 ) yinc++;
+  if ( nx%xinc && nx%(xinc+1) ) xinc++;
+  if ( ny%yinc && ny%(yinc+1) ) yinc++;
 
   int nsplit = nxblocks*nyblocks;
   if ( nsplit > MAX_BLOCKS ) cdoAbort("Too many blocks (max = %d)!", MAX_BLOCKS);

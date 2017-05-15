@@ -21,7 +21,6 @@
       Rotuv      rotuvb          Backward rotation
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"
@@ -64,11 +63,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
         double yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
 
 	usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
-	/*
-	if ( i%100 == 0 )
-	fprintf(stderr, "%d %d %g %g %g %g %g %g %g %g\n",
-		ilat, ilon, us[i], vs[i], yvals[ilat], xvals[ilon], ypole, xpole, u, v);
-	*/
+
 	us[i] = u;
 	vs[i] = v;
       }
@@ -90,6 +85,7 @@ void *Rotuv(void *argument)
   int chcodes[MAXARG];
   char *chvars[MAXARG];
   char varname[CDI_MAX_NAME];
+  char varname2[CDI_MAX_NAME];
   double *single, *usvar = NULL, *vsvar = NULL;
 
   cdoInitialize(argument);
@@ -99,27 +95,25 @@ void *Rotuv(void *argument)
   int nch = operatorArgc();
   if ( nch%2 ) cdoAbort("Odd number of input arguments!");
 
-  bool lvar = false;
-  bool lcode = true;
+  bool lvar = false; // We have a list of codes
   int len = (int)strlen(operatorArgv()[0]);
-  for ( int i = 0; i < len; ++i )
+  int ix = (operatorArgv()[0][0] == '-') ? 1 : 0;
+  for ( int i = ix; i < len; ++i )
     if ( !isdigit(operatorArgv()[0][i]) )
       {
-        lcode = false;
+        lvar = true; // We have a list of variables
         break;
       }
 
-  if ( lcode )
+  if ( lvar )
     {
-      lvar = false;
       for ( int i = 0; i < nch; i++ )
-	chcodes[i] = parameter2int(operatorArgv()[i]);
+	chvars[i] = operatorArgv()[i];
     }
   else
     {
-      lvar = true;
       for ( int i = 0; i < nch; i++ )
-	chvars[i] = operatorArgv()[i];
+	chcodes[i] = parameter2int(operatorArgv()[i]);
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
@@ -249,10 +243,21 @@ void *Rotuv(void *argument)
 	  varID2 = varID;
 
 	  if ( cdoVerbose )
-	    cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
-		     vlistInqVarCode(vlistID1, varID1), chcodes[i],
-		     vlistInqVarCode(vlistID1, varID2), chcodes[i+1]);
-	  
+            {
+              if ( lvar )
+                {
+                  vlistInqVarName(vlistID2, varID1, varname);
+                  vlistInqVarName(vlistID2, varID2, varname2);
+                  cdoPrint("Using var %s [%s](u) and var %s [%s](v)",
+                           varname, chvars[i],
+                           varname2, chvars[i+1]);
+                }
+              else
+                cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
+                         vlistInqVarCode(vlistID1, varID1), chcodes[i],
+                         vlistInqVarCode(vlistID1, varID2), chcodes[i+1]);
+            }
+
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
 	  nlevel1  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));

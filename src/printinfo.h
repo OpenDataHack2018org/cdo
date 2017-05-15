@@ -226,7 +226,7 @@ void print_xyvals2D(int gridID, int dig)
           int xsize = gridInqXsize(gridID);
           if ( xsize > 1 )
             {
-              double *xvals = (double*) malloc(xsize*sizeof(double));
+              double *xvals = (double*) malloc((size_t)xsize*sizeof(double));
               for ( int i = 0; i < xsize; ++i ) xvals[i] = xvals2D[i];
               xinc = fabs(xvals[xsize-1] - xvals[0])/(xsize-1);
               for ( int i = 2; i < xsize; i++ )
@@ -236,7 +236,7 @@ void print_xyvals2D(int gridID, int dig)
           int ysize = gridInqYsize(gridID);
           if ( ysize > 1 )
             {
-              double *yvals = (double*) malloc(ysize*sizeof(double));
+              double *yvals = (double*) malloc((size_t)ysize*sizeof(double));
               for ( int i = 0; i < ysize; ++i ) yvals[i] = yvals2D[i*xsize];
               yinc = fabs(yvals[ysize-1] - yvals[0])/(ysize-1);
               for ( int i = 2; i < ysize; i++ )
@@ -279,6 +279,10 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
   // int prec     = gridInqPrec(gridID);
   // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
   int dig = 7;
+#ifdef CDO
+  extern int CDO_flt_digits;
+  dig = CDO_flt_digits;
+#endif
 
   if ( !lproj )
     {
@@ -294,6 +298,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
   if ( gridtype == GRID_LONLAT     ||
        gridtype == GRID_PROJECTION ||
        gridtype == GRID_GENERIC    ||
+       gridtype == GRID_CHARXY    ||
        gridtype == GRID_GAUSSIAN   ||
        gridtype == GRID_GAUSSIAN_REDUCED )
     {
@@ -406,27 +411,6 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
 
       print_xyvals2D(gridID, dig);
     }
-  else if ( gridtype == GRID_LCC )
-    {
-      double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
-      int projflag, scanflag;
-
-      gridInqParamLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
-                 &projflag, &scanflag);
-
-#ifdef CDO
-      set_text_color(stdout, RESET, GREEN);
-#endif
-      fprintf(stdout, "points=%d (%dx%d)  ", gridsize, xsize, ysize);
-      if ( (projflag&128) == 0 )
-        fprintf(stdout, "North Pole\n");
-      else
-        fprintf(stdout, "South Pole\n");
-      my_reset_text_color(stdout);
-
-      fprintf(stdout, "%33s : originLon=%g  originLat=%g  lonParY=%g\n", " ", originLon, originLat, lonParY);
-      fprintf(stdout, "%33s : lat1=%g  lat2=%g  xinc=%g m  yinc=%g m\n", " ", lat1, lat2, xincm, yincm);
-    }
   else /* if ( gridtype == GRID_GENERIC ) */
     {
 #ifdef CDO
@@ -439,7 +423,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
       my_reset_text_color(stdout);
     }
 
-  if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED || gridtype == GRID_LCC )
+  if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
     {
       if ( gridHasArea(gridID) ||
            gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
@@ -495,6 +479,10 @@ void printZaxisInfo(int vlistID)
       // int prec      = zaxisInqPrec(zaxisID);
       // int dig = (prec == CDI_DATATYPE_FLT64) ? 15 : 7;
       int dig = 7;
+#ifdef CDO
+      extern int CDO_flt_digits;
+      dig = CDO_flt_digits;
+#endif
 
       zaxisName(zaxistype, zaxisname);
       zaxisInqName(zaxisID, zname);

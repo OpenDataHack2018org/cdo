@@ -444,14 +444,14 @@ void hetaeta_sc(bool ltq, int lpsmod, long ij, long ngp, long nlev1, long nlev2,
 
 
 void hetaeta(bool ltq, int ngp, const int *imiss,
-	     int nlev1, const double *restrict ah1, const double *restrict bh1,
-             const double *restrict fis1, const double *restrict ps1, 
-             const double *restrict t1, const double *restrict q1,
-             int nlev2, const double *restrict ah2, const double *restrict bh2, 
-             const double *restrict fis2, double *restrict ps2, 
-             double *restrict t2, double *restrict q2,
-	     int nvars, double *restrict *restrict vars1, double *restrict *restrict vars2,
-	     double *restrict tscor, double *restrict pscor, double *restrict secor)
+	     int nlev1, const double *ah1, const double *bh1,
+             const double *fis1, const double *ps1, 
+             const double *t1, const double *q1,
+             int nlev2, const double *ah2, const double *bh2, 
+             const double *fis2, double *ps2, 
+             double *t2, double *q2,
+	     int nvars, double **vars1, double **vars2,
+	     double *tscor, double *pscor, double *secor)
 {
   double epsm1i;
   long jblt;

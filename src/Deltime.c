@@ -15,7 +15,6 @@
   GNU General Public License for more details.
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

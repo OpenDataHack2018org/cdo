@@ -15,11 +15,8 @@
   GNU General Public License for more details.
 */
 
-#include <stdlib.h>
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
-#include "error.h"
 
 
 double cdoZaxisInqLevel(int zaxisID, int levelID)
@@ -259,6 +256,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
                     cdoWarning("Input parameters have different levels!");
                   else
                     cdoWarning("Z-axis orientation differ!");
+                  break;
                 }
               
               Free(lev1);
@@ -283,12 +281,13 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	vlistInqVarName(vlistID2, varID, names2[varID]);
 
       qsort(names1[0], nvars, CDI_MAX_NAME, cmpnames);
+      qsort(names2[0], nvars, CDI_MAX_NAME, cmpnames);
 
       for ( varID = 0; varID < nvars; varID++ )
 	if ( strcmp(names1[varID], names2[varID]) != 0 ) break;
 
       if ( varID == nvars )
-	cdoPrint("Use CDO option --sort to sort the parameter names (NetCDF only)!");
+	cdoPrint("Use CDO option --sortname to sort the parameter by name (NetCDF only)!");
     }
 }
 
@@ -414,6 +413,10 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
       int nlevel  = zaxisInqSize(zaxisID);
       int zaxistype = zaxisInqType(zaxisID);
 
+      if ( cdoVerbose )
+        cdoPrint("ZAXIS_HYBRID = %d ZAXIS_HYBRID_HALF=%d nlevel=%d mono_level=%d",
+                 zaxisInqType(zaxisID) == ZAXIS_HYBRID,  zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF, nlevel, mono_level);
+
       if ( (zaxistype == ZAXIS_HYBRID || zaxistype == ZAXIS_HYBRID_HALF) && nlevel > 1 && !mono_level )
 	{
 	  int l;
@@ -442,6 +445,9 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 	      
 		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
+                  if ( cdoVerbose )
+                    cdoPrint("Detected half-level model definition : nlevel == (nvct/2 - 1) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
+                             nlevel, nvct,nhlevf, nhlevh);  
 		}
 	    }
 	  else if ( nlevel == (nvct/2) )
@@ -456,6 +462,9 @@ double *vlist_read_vct(int vlistID, int *rzaxisIDh, int *rnvct, int *rnhlev, int
 	      
 		  vct = (double*) Malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
+                  if ( cdoVerbose )
+                    cdoPrint("Detected full-level model definition : nlevel == (nvct/2) (nlevel: %d, nvct: %d, nhlevf: %d, nhlevh: %d) ",
+                             nlevel, nvct,nhlevf, nhlevh);  
 		}
 	    }
 	  else if ( nlevel == (nvct - 4 - 1) )

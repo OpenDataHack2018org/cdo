@@ -4,9 +4,15 @@
 #include "remap.h"
 #include "remap_store_link.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "clipping/clipping.h"
 #include "clipping/area.h"
 #include "clipping/geometry.h"
+#ifdef __cplusplus
+}
+#endif
 
 //#define STIMER
 
@@ -106,32 +112,27 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 			  const double *restrict src_corner_lat, const double *restrict src_corner_lon,
 			  const double *restrict tgt_cell_bound_box, int *srch_add)
 {
+  int debug = 0;
   long nx = src_grid_dims[0];
   long ny = src_grid_dims[1];
-  long num_srch_cells;  /* num cells in restricted search arrays   */
-  int lfound;
-  long nxp1, nyp1;
-  double src_lon_min, src_lon_max;
-  int debug = 0;
+  long num_srch_cells = 0;  // num cells in restricted search arrays
 
-  nxp1 = nx+1;
-  nyp1 = ny+1;
+  long nxp1 = nx+1;
+  long nyp1 = ny+1;
 
-  src_lon_min = src_corner_lon[0];
-  src_lon_max = src_corner_lon[nx];
-
-  double bound_lon1, bound_lon2;
-
-  num_srch_cells = 0;
+  double src_lon_min = src_corner_lon[0];
+  double src_lon_max = src_corner_lon[nx];
 
   long imin = nxp1, imax = -1, jmin = nyp1, jmax = -1;
-  long im, jm;
 
-  lfound = rect_grid_search2(&jmin, &jmax, tgt_cell_bound_box[0], tgt_cell_bound_box[1], nyp1, src_corner_lat);
+  int lfound = rect_grid_search2(&jmin, &jmax, tgt_cell_bound_box[0], tgt_cell_bound_box[1], nyp1, src_corner_lat);
+  if ( !lfound ) return 0;
+  // printf("lfound, jmin, jmax %d %ld %ld\n", lfound, jmin, jmax);
   // if ( jmin > 0 ) jmin--;
   // if ( jmax < (ny-2) ) jmax++;
-  bound_lon1 = tgt_cell_bound_box[2];
-  bound_lon2 = tgt_cell_bound_box[3];
+
+  double bound_lon1 = tgt_cell_bound_box[2];
+  double bound_lon2 = tgt_cell_bound_box[3];
   if ( bound_lon1 <= src_lon_max && bound_lon2 >= src_lon_min )
     {
       if ( debug ) printf("  b1 %g %g\n", bound_lon1*RAD2DEG, bound_lon2*RAD2DEG);
@@ -142,8 +143,8 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 	{
 	  if ( debug )
 	    printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin], RAD2DEG*src_corner_lon[imax+1], imin, imax, jmin, jmax);
-	  for ( jm = jmin; jm <= jmax; ++jm )
-	    for ( im = imin; im <= imax; ++im )
+	  for ( long jm = jmin; jm <= jmax; ++jm )
+	    for ( long im = imin; im <= imax; ++im )
 	      srch_add[num_srch_cells++] = jm*nx + im;
 	}
     }
@@ -167,8 +168,8 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 	    {
 	      if ( debug )
 		printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin2], RAD2DEG*src_corner_lon[imax2+1], imin2, imax2, jmin, jmax);
-	      for ( jm = jmin; jm <= jmax; ++jm )
-		for ( im = imin2; im <= imax2; ++im )
+	      for ( long jm = jmin; jm <= jmax; ++jm )
+		for ( long im = imin2; im <= imax2; ++im )
 		  srch_add[num_srch_cells++] = jm*nx + im;
 	    }
 	}
@@ -193,8 +194,8 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 	    {
 	      if ( debug )
 		printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin3], RAD2DEG*src_corner_lon[imax3+1], imin3, imax3, jmin, jmax);
-	      for ( jm = jmin; jm <= jmax; ++jm )
-		for ( im = imin3; im <= imax3; ++im )
+	      for ( long jm = jmin; jm <= jmax; ++jm )
+		for ( long im = imin3; im <= imax3; ++im )
 		  srch_add[num_srch_cells++] = jm*nx + im;
 	    }
 	}
@@ -301,20 +302,17 @@ static
 void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon,
 			     const double *restrict corner_lat, restr_t *restrict bound_box)
 {
-  long inc, j;
-  restr_t clon, clat;
+  long inc = ic*nc;
 
-  inc = ic*nc;
-
-  clat = RESTR_SCALE(corner_lat[inc]);
-  clon = RESTR_SCALE(corner_lon[inc]);
+  restr_t clat = RESTR_SCALE(corner_lat[inc]);
+  restr_t clon = RESTR_SCALE(corner_lon[inc]);
 
   bound_box[0] = clat;
   bound_box[1] = clat;
   bound_box[2] = clon;
   bound_box[3] = clon;
 
-  for ( j = 1; j < nc; ++j )
+  for ( long j = 1; j < nc; ++j )
     {
       clat = RESTR_SCALE(corner_lat[inc+j]);
       clon = RESTR_SCALE(corner_lon[inc+j]);

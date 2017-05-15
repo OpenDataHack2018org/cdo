@@ -16,10 +16,7 @@ int find_ij_weights(double plon, double plat, double *restrict src_lats, double 
 {
   int lfound = 0;
   long iter;                     /*  iteration counters   */
-  double iguess, jguess;         /*  current guess for bilinear coordinate  */
   double deli, delj;             /*  corrections to iw,jw                   */
-  double dth1, dth2, dth3;       /*  some latitude  differences             */
-  double dph1, dph2, dph3;       /*  some longitude differences             */
   double dthp, dphp;             /*  difference between point and sw corner */
   double mat1, mat2, mat3, mat4; /*  matrix elements                        */
   double determinant;            /*  matrix determinant                     */
@@ -28,13 +25,15 @@ int find_ij_weights(double plon, double plat, double *restrict src_lats, double 
 
   /* Iterate to find iw,jw for bilinear approximation  */
 
-  dth1 = src_lats[1] - src_lats[0];
-  dth2 = src_lats[3] - src_lats[0];
-  dth3 = src_lats[2] - src_lats[1] - dth2;
+  // some latitude  differences 
+  double dth1 = src_lats[1] - src_lats[0];
+  double dth2 = src_lats[3] - src_lats[0];
+  double dth3 = src_lats[2] - src_lats[1] - dth2;
 
-  dph1 = src_lons[1] - src_lons[0];
-  dph2 = src_lons[3] - src_lons[0];
-  dph3 = src_lons[2] - src_lons[1];
+  // some longitude differences
+  double dph1 = src_lons[1] - src_lons[0];
+  double dph2 = src_lons[3] - src_lons[0];
+  double dph3 = src_lons[2] - src_lons[1];
 
   if ( dph1 >  THREE*PIH ) dph1 -= PI2;
   if ( dph2 >  THREE*PIH ) dph2 -= PI2;
@@ -45,8 +44,9 @@ int find_ij_weights(double plon, double plat, double *restrict src_lats, double 
 
   dph3 = dph3 - dph2;
 
-  iguess = HALF;
-  jguess = HALF;
+  // current guess for bilinear coordinate
+  double iguess = HALF;
+  double jguess = HALF;
 
   for ( iter = 0; iter < remap_max_iter; ++iter )
     {
@@ -110,17 +110,16 @@ int num_src_points(const int* restrict mask, const int src_add[4], double src_la
 static
 void renormalize_weights(const double src_lats[4], double wgts[4])
 {
-  int n;
   double sum_wgts = 0.0; /* sum of weights for normalization */
   /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
-  for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
-  for ( n = 0; n < 4; ++n ) wgts[n] = fabs(src_lats[n])/sum_wgts;
+  for ( int n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
+  for ( int n = 0; n < 4; ++n ) wgts[n] = fabs(src_lats[n])/sum_wgts;
 }
 
 static
 void bilinear_warning(double plon, double plat, double iw, double jw, int* src_add, double* src_lons, double* src_lats, remapgrid_t* src_grid)
 {
-  static int lwarn = TRUE;
+  static bool lwarn = true;
 
   if ( cdoVerbose )
     {
@@ -139,7 +138,7 @@ void bilinear_warning(double plon, double plat, double iw, double jw, int* src_a
 
   if ( cdoVerbose || lwarn )
     {
-      lwarn = FALSE;
+      lwarn = false;
       //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
       cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
     }

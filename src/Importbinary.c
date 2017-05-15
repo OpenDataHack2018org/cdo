@@ -23,7 +23,6 @@
 #define _XOPEN_SOURCE 600 /* fseeko */
 #endif
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

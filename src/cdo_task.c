@@ -4,12 +4,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #if defined(HAVE_LIBPTHREAD)
 #include <pthread.h>
 #endif
 
 #include "cdo_task.h"
+
+bool CDO_task = false;
 
 enum cdo_pt_state {
   SETUP,
@@ -58,17 +61,9 @@ void *cdo_task(void *task)
     {
       pthread_cond_wait(&(task_info->work_cond), &(task_info->work_mtx));
 
-      if ( DIE == task_info->state )
-        {
-          // kill thread
-          break;
-        }
+      if ( DIE == task_info->state ) break; // kill thread
 
-      if ( IDLE == task_info->state )
-        {
-          // accidental wake-up
-          continue;
-        }
+      if ( IDLE == task_info->state ) continue; // accidental wake-up
       
       // do blocking task
       //printf("<worker> JOB start\n");
@@ -99,7 +94,7 @@ void cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
 
   // ensure worker is waiting
 #if defined(HAVE_LIBPTHREAD)
-  pthread_mutex_lock(&(task_info->work_mtx));
+  if ( CDO_task ) pthread_mutex_lock(&(task_info->work_mtx));
 #endif
 
   // set job information & state
@@ -107,10 +102,19 @@ void cdo_task_start(void *task, void *(*task_routine)(void *), void *task_arg)
   task_info->arg = task_arg;
   task_info->state = JOB;
 
+  bool run_task = !CDO_task;
+#if !defined(HAVE_LIBPTHREAD)
+  run_task = true;
+#endif
+  if ( run_task ) task_info->result = task_info->routine(task_info->arg);
+
   // wake-up signal
 #if defined(HAVE_LIBPTHREAD)
-  pthread_cond_signal(&(task_info->work_cond));
-  pthread_mutex_unlock(&(task_info->work_mtx));
+  if ( CDO_task )
+    {
+      pthread_cond_signal(&(task_info->work_cond));
+      pthread_mutex_unlock(&(task_info->work_mtx));
+    }
 #endif
 }
 
@@ -122,11 +126,16 @@ void *cdo_task_wait(void *task)
   cdo_task_t *task_info = (cdo_task_t *) task;
 
 #if defined(HAVE_LIBPTHREAD)
-  while (1)
+  if ( CDO_task )
     {
-      pthread_cond_wait(&(task_info->boss_cond), &(task_info->boss_mtx));
+      while (1)
+        {
+          if ( IDLE == task_info->state ) break;
 
-      if ( IDLE == task_info->state ) break;
+          pthread_cond_wait(&(task_info->boss_cond), &(task_info->boss_mtx));
+
+          // if ( IDLE == task_info->state ) break;
+        }
     }
 #endif
 
@@ -138,34 +147,37 @@ void *cdo_task_new()
 {
   cdo_task_t *task_info = NULL;
 
-#if defined(HAVE_LIBPTHREAD)
   task_info = (cdo_task_t *) malloc(sizeof(cdo_task_t));
   task_info->routine = NULL;
   task_info->arg = NULL;
   task_info->result = NULL;
   task_info->state = SETUP;
 
-  pthread_attr_t attr;
-  size_t stacksize;
-  pthread_attr_init(&attr);
-  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-  pthread_attr_getstacksize(&attr, &stacksize);
-  if ( stacksize < 2097152 )
+#if defined(HAVE_LIBPTHREAD)
+  if ( CDO_task )
     {
-      stacksize = 2097152;
-      pthread_attr_setstacksize(&attr, stacksize);
+      pthread_attr_t attr;
+      size_t stacksize;
+      pthread_attr_init(&attr);
+      pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+      pthread_attr_getstacksize(&attr, &stacksize);
+      if ( stacksize < 2097152 )
+        {
+          stacksize = 2097152;
+          pthread_attr_setstacksize(&attr, stacksize);
+        }
+
+      pthread_cond_init(&(task_info->work_cond), NULL);
+      pthread_mutex_init(&(task_info->work_mtx), NULL);
+      pthread_cond_init(&(task_info->boss_cond), NULL);
+      pthread_mutex_init(&(task_info->boss_mtx), NULL);
+
+      pthread_mutex_lock(&(task_info->boss_mtx));
+
+      pthread_create(&(task_info->thread), &attr, cdo_task, (void *)task_info);
+
+      cdo_task_wait(task_info);
     }
-
-  pthread_cond_init(&(task_info->work_cond), NULL);
-  pthread_mutex_init(&(task_info->work_mtx), NULL);
-  pthread_cond_init(&(task_info->boss_cond), NULL);
-  pthread_mutex_init(&(task_info->boss_mtx), NULL);
-
-  pthread_mutex_lock(&(task_info->boss_mtx));
-
-  pthread_create(&(task_info->thread), &attr, cdo_task, (void *)task_info);
-
-  cdo_task_wait(task_info);
 #endif
 
   return (void *)task_info;
@@ -177,31 +189,35 @@ void cdo_task_delete(void *task)
   cdo_task_t *task_info = (cdo_task_t *) task;
 
 #if defined(HAVE_LIBPTHREAD)
-  // ensure the worker is waiting
-  pthread_mutex_lock(&(task_info->work_mtx));
+  if ( CDO_task )
+    {
+      // ensure the worker is waiting
+      pthread_mutex_lock(&(task_info->work_mtx));
 
-  //printf("cdo_task_delete: send DIE to <worker>\n");
-  task_info->state = DIE;
+      //printf("cdo_task_delete: send DIE to <worker>\n");
+      task_info->state = DIE;
 
-  // wake-up signal
-  pthread_cond_signal(&(task_info->work_cond));
-  pthread_mutex_unlock(&(task_info->work_mtx));
+      // wake-up signal
+      pthread_cond_signal(&(task_info->work_cond));
+      pthread_mutex_unlock(&(task_info->work_mtx));
 
-  // wait for thread to exit
-  pthread_join(task_info->thread, NULL);
+      // wait for thread to exit
+      pthread_join(task_info->thread, NULL);
 
-  pthread_mutex_destroy(&(task_info->work_mtx));
-  pthread_cond_destroy(&(task_info->work_cond));
+      pthread_mutex_destroy(&(task_info->work_mtx));
+      pthread_cond_destroy(&(task_info->work_cond));
 
-  pthread_mutex_unlock(&(task_info->boss_mtx));
-  pthread_mutex_destroy(&(task_info->boss_mtx));
-  pthread_cond_destroy(&(task_info->boss_cond));
+      pthread_mutex_unlock(&(task_info->boss_mtx));
+      pthread_mutex_destroy(&(task_info->boss_mtx));
+      pthread_cond_destroy(&(task_info->boss_cond));
+    }
 #endif
 
   if ( task_info ) free(task_info);
 }
 
 #ifdef TEST_CDO_TASK
+// gcc -DTEST_CDO_TASK -DHAVE_LIBPTHREAD cdo_task.c
 
 void *mytask(void *arg)
 {
@@ -211,10 +227,12 @@ void *mytask(void *arg)
 
 int main(int argc, char **argv)
 {
+  CDO_task = true;
+
   void *task = cdo_task_new();
 
   printf("Init done\n");
-  void *myarg;
+  void *myarg = NULL;
   void *myresult;
 
   cdo_task_start(task, mytask, myarg);
@@ -230,4 +248,3 @@ int main(int argc, char **argv)
   return 0;
 }
 #endif
-

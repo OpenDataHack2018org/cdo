@@ -1,6 +1,33 @@
 CDO NEWS
 --------
 
+Version 1.8.2 (15 May 2017):
+
+   Fixed bugs:
+     * setpartab: variable name does not change [Bug #7681]
+     * cmorlite: skipped empty key values [Bug #7681]
+     * setcalendar, settaxis memory error (bug introduce in 1.8.1) [Bug #7691]
+
+Version 1.8.1 (6 April 2017):
+
+   New features:
+     * selindexbox: added support for LCC grid
+   New operators:
+     * selgridcell - Select grid cells
+     * delgridcell - Delete grid cells
+   New operators (KMNI contribution):
+     * selmulti - Select multiple fields
+     * delmulti - Delete multiple fields
+     * changemulti - Change identication of multiple fields
+     * samplegrid - Resample grid
+     * uvDestag - Destaggering of wind components
+     * rotuvNorth - Rotate u/v wind to North pole
+     * projuvLatLon - Cylindrical Equidistant projection
+   Fixed bugs:
+     * collgrid: combination of nx and names does not work
+     * Remapping bug for non global grids [Bug #7625]
+     * remapdis and remapcon produces wrong results for some grid combinations [Bug #7626] (introduced in last revision)
+
 Version 1.8.0 (26 October 2016):
 
    New features:
@@ -10,11 +37,10 @@ Version 1.8.0 (26 October 2016):
      * setpartabn: added support for user defined attributes
      * Reverse: adjust date/time by -1 second (introduced in last revision)
    New operators:
-     * timcumsum: Cumulative sum over time.
+     * setattribute: Set attributes
      * cmorlite: Apply variable_entry of cmor tables
+     * timcumsum: Cumulative sum over time.
      * shiftx/shifty: Shift fields on rectilinear/curvilinear grids in x/y direction
-   Changed operators:
-     * Tim<STAT> (e.g. monmean): 
    Fixed bugs:
      * Cond: bug fix for ntsteps1 == 1 && ntsteps2 != 1
      * ml2pl: interpolation failed for data on hybrid half levels [Bug #7225]

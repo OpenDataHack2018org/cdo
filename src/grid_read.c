@@ -54,7 +54,7 @@ typedef struct {
 static
 void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, size_t *iproj, size_t *igmap, const char *dname)
 {
-  char uuidOfHGridStr[256];
+  char uuidStr[256];
 
   for ( size_t ik = ikv; ik < nkv; ++ik )
     {
@@ -86,8 +86,6 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
           else if ( STR_IS_EQ(gridtype, "cell") )         grid->type = GRID_UNSTRUCTURED;
           else if ( STR_IS_EQ(gridtype, "spectral") )     grid->type = GRID_SPECTRAL;
           else if ( STR_IS_EQ(gridtype, "gme") )          grid->type = GRID_GME;
-          else if ( STR_IS_EQ(gridtype, "lcc") )          grid->type = GRID_LCC;
-          else if ( STR_IS_EQ(gridtype, "lambert") )      grid->type = GRID_LCC;
           else if ( STR_IS_EQ(gridtype, "projection") )   grid->type = GRID_PROJECTION;
           else if ( STR_IS_EQ(gridtype, "generic") )      grid->type = GRID_GENERIC;
 	  else cdoAbort("Invalid gridtype : %s (grid description file: %s)", gridtype, dname);
@@ -108,6 +106,19 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
       else if ( STR_IS_EQ(key, "ni") )           { grid->ni = parameter2int(value); grid->nd = 10; }
       else if ( STR_IS_EQ(key, "position") )       grid->position = parameter2int(value);
       else if ( STR_IS_EQ(key, "number") )         grid->number = parameter2int(value);
+      else if ( STR_IS_EQ(key, "scanningMode") )
+        {
+          int scmode = parameter2int(value);
+          if ( (scmode==0) || (scmode==64) || (scmode==96) )
+            {
+              grid->scanningMode = scmode; // -1: not used; allowed modes: <0, 64, 96>; Default is 64
+            }
+          else
+            {
+              cdoWarning("Warning: %d not in allowed modes: <0, 64, 96>; Using default: 64\n", scmode);
+              grid->scanningMode = 64;
+            }
+        }
       else if ( STR_IS_EQ(key, "xname") )     strcpy(grid->xname, parameter2word(value));
       else if ( STR_IS_EQ(key, "yname") )     strcpy(grid->yname, parameter2word(value));
       else if ( STR_IS_EQ(key, "xdimname") )  strcpy(grid->xdimname, parameter2word(value));
@@ -118,28 +129,15 @@ void grid_read_data(size_t ikv, size_t nkv, kvmap_t *kvmap, griddes_t *grid, siz
       else if ( STR_IS_EQ(key, "xunits") )    strcpy(grid->xunits, value);
       else if ( STR_IS_EQ(key, "yunits") )    strcpy(grid->yunits, value);
       else if ( STR_IS_EQ(key, "path") )      strcpy(grid->path, value);
-      else if ( STR_IS_EQ(key, "uuid") )      { strcpy(uuidOfHGridStr, value); cdiStr2UUID(uuidOfHGridStr, grid->uuid); }
+      else if ( STR_IS_EQ(key, "uuid") )      { strcpy(uuidStr, value); cdiStr2UUID(uuidStr, grid->uuid); }
       else if ( STR_IS_EQ(key, "xfirst") )    { grid->xfirst = parameter2double(value); grid->def_xfirst = true; }
       else if ( STR_IS_EQ(key, "yfirst") )    { grid->yfirst = parameter2double(value); grid->def_yfirst = true; }
       else if ( STR_IS_EQ(key, "xlast") )     { grid->xlast = parameter2double(value); grid->def_xlast = true; }
       else if ( STR_IS_EQ(key, "ylast") )     { grid->ylast = parameter2double(value); grid->def_ylast = true; }
       else if ( STR_IS_EQ(key, "xinc") )      { grid->xinc = parameter2double(value); grid->def_xinc = true; }
       else if ( STR_IS_EQ(key, "yinc") )      { grid->yinc = parameter2double(value); grid->def_yinc = true; }
-      else if ( STR_IS_EQ(key, "originLon") ) { grid->originLon = parameter2double(value); grid->def_originLon = true; }
-      else if ( STR_IS_EQ(key, "originLat") ) { grid->originLat = parameter2double(value); grid->def_originLat = true; }
-      else if ( STR_IS_EQ(key, "lonParY") )   { grid->lonParY = parameter2double(value); grid->def_lonParY = true; }
-      else if ( STR_IS_EQ(key, "lat1") )      { grid->lat1 = parameter2double(value); grid->def_lat1 = true; }
-      else if ( STR_IS_EQ(key, "lat2") )      { grid->lat2 = parameter2double(value); grid->def_lat2 = true; }
-      else if ( STR_IS_EQ(key, "lat_0") )     { grid->lat_0 = parameter2double(value); grid->def_lat_0 = true; }
-      else if ( STR_IS_EQ(key, "lat_1") )     { grid->lat_1 = parameter2double(value); grid->def_lat_1 = true; }
-      else if ( STR_IS_EQ(key, "lat_2") )     { grid->lat_2 = parameter2double(value); grid->def_lat_2 = true; }
-      else if ( STR_IS_EQ(key, "a") )         grid->a = parameter2double(value);
-      else if ( STR_IS_EQ(key, "projection") )
-        {
-          if      ( STR_IS_EQ(value, "north") ) { grid->projflag = 0;    grid->scanflag = 64; }
-	  else if ( STR_IS_EQ(value, "south") ) { grid->projflag = 128;  grid->scanflag = 64; }
-	  else cdoAbort("Invalid projection : %s (grid description file: %s)", value, dname);
-        }
+      else if ( STR_IS_EQ(key, "a") )                 grid->a = parameter2double(value);
+      else if ( STR_IS_EQ(key, "uvRelativeToGrid") )  grid->uvRelativeToGrid = parameter2bool(value);
       else if ( STR_IS_EQ(key, "xvals") )
         {
           size_t size = (grid->type == GRID_CURVILINEAR || grid->type == GRID_UNSTRUCTURED) ? grid->size : grid->xsize;

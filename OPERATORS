@@ -69,6 +69,9 @@ Operator catalog:
 -------------------------------------------------------------
    Select        select          Select fields
    Select        delete          Delete fields
+   Selmulti      selmulti        Select multiple fields
+   Selmulti      delmulti        Delete multiple fields
+   Selmulti      changemulti     Change identication of multiple fields
    Selvar        selparam        Select parameters by identifier
    Selvar        delparam        Delete parameters by identifier
    Selvar        selcode         Select parameters by code number
@@ -94,6 +97,9 @@ Operator catalog:
    Seltime       selsmon         Select single month
    Selbox        sellonlatbox    Select a longitude/latitude box
    Selbox        selindexbox     Select an index box
+   Selgridcell   selgridcell     Select grid cells
+   Selgridcell   delgridcell     Delete grid cells
+   Samplegrid    samplegrid      Resample grid
 -------------------------------------------------------------
    Conditional selection
 -------------------------------------------------------------
@@ -121,6 +127,7 @@ Operator catalog:
 -------------------------------------------------------------
    Modification
 -------------------------------------------------------------
+   Setattribute  setattribute    Set attributes
    Setpartab     setpartabp      Set parameter table
    Setpartab     setpartabn      Set parameter table
    Set           setcodetab      Set parameter code table
@@ -153,8 +160,6 @@ Operator catalog:
    Setgrid       setgridarea     Set grid cell area
    Setzaxis      setzaxis        Set z-axis
    Setzaxis      genlevelbounds  Generate level bounds
-   Setgatt       setgatt         Set global attribute
-   Setgatt       setgatts        Set global attributes
    Invert        invertlat       Invert latitudes
    Invertlev     invertlev       Invert levels
    Shiftxy       shiftx          Shift x
@@ -533,6 +538,9 @@ Operator catalog:
    Vargen        topo            Create a field with topography
    Vargen        for             Create a time series
    Vargen        stdatm          Create values for pressure and temperature for hydrostatic atmosphere
+   WindTrans     uvDestag        Destaggering of u/v wind components
+   WindTrans     rotuvNorth      Rotate u/v wind to North pole.
+   WindTrans     projuvLatLon    Cylindrical Equidistant projection
    Rotuv         rotuvb          Backward rotation
    Mastrfu       mastrfu         Mass stream function
    Derivepar     sealevelpressure Sea level pressure

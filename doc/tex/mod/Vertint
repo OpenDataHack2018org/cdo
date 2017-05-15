@@ -37,7 +37,7 @@ Interpolates 3D variables on hybrid sigma pressure level to pressure level.
 
 @BeginDescription
 Interpolates 3D variables on hybrid sigma pressure level to height level.
-The procedure is the same as for the operator @oper{mh2pl} except for
+The procedure is the same as for the operator @oper{ml2pl} except for
 the pressure levels being calculated from the heights by:
 @math{plevel = 101325*exp(hlevel/-7000)}
 @EndDescription

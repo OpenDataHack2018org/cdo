@@ -105,21 +105,22 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
 	libcdo_la-cdo_vlist.lo libcdo_la-cdo_getopt.lo \
 	libcdo_la-cdo_task.lo libcdo_la-cdo_history.lo \
-	libcdo_la-cmortable_parser.lo libcdo_la-after_sptrans.lo \
-	libcdo_la-after_fctrans.lo libcdo_la-after_dvtrans.lo \
-	libcdo_la-after_vertint.lo libcdo_la-after_namelist.lo \
-	libcdo_la-afterburnerlib.lo libcdo_la-constants.lo \
-	libcdo_la-color.lo libcdo_la-commandline.lo \
-	libcdo_la-convert_units.lo libcdo_la-datetime.lo \
-	libcdo_la-ecacore.lo libcdo_la-ecautil.lo \
-	libcdo_la-exception.lo libcdo_la-expr.lo libcdo_la-expr_fun.lo \
-	libcdo_la-expr_lex.lo libcdo_la-expr_yacc.lo \
-	libcdo_la-features.lo libcdo_la-field.lo libcdo_la-field2.lo \
-	libcdo_la-fieldc.lo libcdo_la-fieldmem.lo \
-	libcdo_la-fieldmer.lo libcdo_la-fieldzon.lo \
-	libcdo_la-gradsdeslib.lo libcdo_la-grid.lo \
-	libcdo_la-grid_area.lo libcdo_la-grid_gme.lo \
-	libcdo_la-grid_lcc.lo libcdo_la-grid_rot.lo \
+	libcdo_la-cdo_read.lo libcdo_la-cmortable_parser.lo \
+	libcdo_la-after_sptrans.lo libcdo_la-after_fctrans.lo \
+	libcdo_la-after_dvtrans.lo libcdo_la-after_vertint.lo \
+	libcdo_la-after_namelist.lo libcdo_la-afterburnerlib.lo \
+	libcdo_la-constants.lo libcdo_la-color.lo \
+	libcdo_la-commandline.lo libcdo_la-convert_units.lo \
+	libcdo_la-datetime.lo libcdo_la-ecacore.lo \
+	libcdo_la-ecautil.lo libcdo_la-exception.lo libcdo_la-expr.lo \
+	libcdo_la-expr_fun.lo libcdo_la-expr_lex.lo \
+	libcdo_la-expr_yacc.lo libcdo_la-features.lo \
+	libcdo_la-field.lo libcdo_la-field2.lo libcdo_la-fieldc.lo \
+	libcdo_la-fieldmem.lo libcdo_la-fieldmer.lo \
+	libcdo_la-fieldzon.lo libcdo_la-gradsdeslib.lo \
+	libcdo_la-grid.lo libcdo_la-grid_proj.lo \
+	libcdo_la-grid_area.lo libcdo_la-grid_define.lo \
+	libcdo_la-grid_gme.lo libcdo_la-grid_rot.lo \
 	libcdo_la-grid_from_name.lo libcdo_la-grid_read.lo \
 	libcdo_la-grid_read_pingo.lo libcdo_la-grid_print.lo \
 	libcdo_la-gridreference.lo libcdo_la-griddes.lo \
@@ -147,7 +148,8 @@ am_libcdo_la_OBJECTS = libcdo_la-array.lo libcdo_la-cdo_pthread.lo \
 	libcdo_la-remap_bilinear_scrip.lo libcdo_la-stdnametable.lo \
 	libcdo_la-specspace.lo libcdo_la-statistic.lo \
 	libcdo_la-table.lo libcdo_la-text.lo libcdo_la-timer.lo \
-	libcdo_la-userlog.lo libcdo_la-util.lo libcdo_la-zaxis.lo \
+	libcdo_la-userlog.lo libcdo_la-util.lo \
+	libcdo_la-zaxis_print.lo libcdo_la-zaxis.lo \
 	json/libcdo_la-jsmn.lo kdtreelib/libcdo_la-kdtree_cartesian.lo \
 	kdtreelib/libcdo_la-kdtree_common.lo \
 	kdtreelib/libcdo_la-kdtree_spherical.lo \
@@ -214,12 +216,14 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Remap.$(OBJEXT) cdo-Remapeta.$(OBJEXT) \
 	cdo-Replace.$(OBJEXT) cdo-Replacevalues.$(OBJEXT) \
 	cdo-Rhopot.$(OBJEXT) cdo-Rotuv.$(OBJEXT) cdo-Runpctl.$(OBJEXT) \
-	cdo-Runstat.$(OBJEXT) cdo-Seascount.$(OBJEXT) \
+	cdo-Runstat.$(OBJEXT) cdo-Samplegrid.$(OBJEXT) \
+	cdo-Samplegridicon.$(OBJEXT) cdo-Seascount.$(OBJEXT) \
 	cdo-Seaspctl.$(OBJEXT) cdo-Seasstat.$(OBJEXT) \
-	cdo-Selbox.$(OBJEXT) cdo-Selindex.$(OBJEXT) \
-	cdo-Select.$(OBJEXT) cdo-Seloperator.$(OBJEXT) \
-	cdo-Selrec.$(OBJEXT) cdo-Seltime.$(OBJEXT) \
-	cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
+	cdo-Selbox.$(OBJEXT) cdo-Selgridcell.$(OBJEXT) \
+	cdo-Select.$(OBJEXT) cdo-Selmulti.$(OBJEXT) \
+	cdo-Seloperator.$(OBJEXT) cdo-Selrec.$(OBJEXT) \
+	cdo-Seltime.$(OBJEXT) cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) \
+	cdo-Setattribute.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
 	cdo-Setgatt.$(OBJEXT) cdo-Setgrid.$(OBJEXT) \
 	cdo-Sethalo.$(OBJEXT) cdo-Setmiss.$(OBJEXT) \
 	cdo-Setpartab.$(OBJEXT) cdo-Setrcaname.$(OBJEXT) \
@@ -244,17 +248,18 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Vertintap.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
 	cdo-Vertcum.$(OBJEXT) cdo-Vertwind.$(OBJEXT) \
 	cdo-Verifygrid.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) \
-	cdo-Writegrid.$(OBJEXT) cdo-Writerandom.$(OBJEXT) \
-	cdo-XTimstat.$(OBJEXT) cdo-YAR.$(OBJEXT) \
-	cdo-Yearmonstat.$(OBJEXT) cdo-Ydayarith.$(OBJEXT) \
-	cdo-Ydaypctl.$(OBJEXT) cdo-Ydaystat.$(OBJEXT) \
-	cdo-Ydrunpctl.$(OBJEXT) cdo-Ydrunstat.$(OBJEXT) \
-	cdo-Yhourarith.$(OBJEXT) cdo-Yhourstat.$(OBJEXT) \
-	cdo-Ymonarith.$(OBJEXT) cdo-Ymonpctl.$(OBJEXT) \
-	cdo-Ymonstat.$(OBJEXT) cdo-Yseaspctl.$(OBJEXT) \
-	cdo-Yseasstat.$(OBJEXT) cdo-Zonstat.$(OBJEXT) \
-	cdo-Magplot.$(OBJEXT) cdo-Magvector.$(OBJEXT) \
-	cdo-Maggraph.$(OBJEXT) cdo-template_parser.$(OBJEXT) \
+	cdo-WindTrans.$(OBJEXT) cdo-Writegrid.$(OBJEXT) \
+	cdo-Writerandom.$(OBJEXT) cdo-XTimstat.$(OBJEXT) \
+	cdo-YAR.$(OBJEXT) cdo-Yearmonstat.$(OBJEXT) \
+	cdo-Ydayarith.$(OBJEXT) cdo-Ydaypctl.$(OBJEXT) \
+	cdo-Ydaystat.$(OBJEXT) cdo-Ydrunpctl.$(OBJEXT) \
+	cdo-Ydrunstat.$(OBJEXT) cdo-Yhourarith.$(OBJEXT) \
+	cdo-Yhourstat.$(OBJEXT) cdo-Ymonarith.$(OBJEXT) \
+	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
+	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
+	cdo-Zonstat.$(OBJEXT) cdo-Magplot.$(OBJEXT) \
+	cdo-Magvector.$(OBJEXT) cdo-Maggraph.$(OBJEXT) \
+	cdo-template_parser.$(OBJEXT) \
 	cdo-results_template_parser.$(OBJEXT) \
 	cdo-magics_template_parser.$(OBJEXT) \
 	cdo-StringUtilities.$(OBJEXT) cdo-CdoMagicsMapper.$(OBJEXT)
@@ -341,6 +346,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BASH = @BASH@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -506,21 +512,22 @@ top_srcdir = @top_srcdir@
 noinst_LTLIBRARIES = libcdo.la
 libcdo_la_SOURCES = array.h array.c cdo_int.h compare.h cdo_pthread.c \
 	cdo_vlist.c cdo_getopt.c cdo_getopt.h cdo_task.c cdo_task.h \
-	cdo_history.c cdi_uuid.h cmortable_parser.c after_sptrans.c \
-	after_fctrans.c after_dvtrans.c after_vertint.c \
-	after_vertint.h after_namelist.c afterburnerlib.c \
-	afterburner.h vct_l191.h calendar.h constants.h constants.c \
-	color.c color.h commandline.c const.h convert_units.c \
-	convert_units.h counter.h datetime.c datetime.h dmemory.h \
-	ecacore.c ecacore.h ecautil.c ecautil.h error.h etopo.h temp.h \
-	mask.h exception.c expr.c expr.h expr_fun.c expr_fun.h \
-	expr_lex.c expr_yacc.c expr_yacc.h features.c field.c field.h \
-	field2.c fieldc.c fieldmem.c fieldmer.c fieldzon.c functs.h \
-	gradsdeslib.c gradsdeslib.h grid.c grid.h grid_area.c \
-	grid_gme.c grid_lcc.c grid_rot.c grid_from_name.c grid_read.c \
-	grid_read_pingo.c grid_print.c gridreference.c griddes.c \
-	griddes.h griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h \
-	institution.c interpol.c interpol.h job.c juldate.c \
+	cdo_history.c cdo_read.c cdi_uuid.h cmortable_parser.c \
+	after_sptrans.c after_fctrans.c after_dvtrans.c \
+	after_vertint.c after_vertint.h after_namelist.c \
+	afterburnerlib.c afterburner.h vct_l191.h calendar.h \
+	constants.h constants.c color.c color.h commandline.c const.h \
+	convert_units.c convert_units.h counter.h datetime.c \
+	datetime.h dmemory.h ecacore.c ecacore.h ecautil.c ecautil.h \
+	error.h etopo.h temp.h mask.h exception.c expr.c expr.h \
+	expr_fun.c expr_fun.h expr_lex.c expr_yacc.c expr_yacc.h \
+	features.c field.c field.h field2.c fieldc.c fieldmem.c \
+	fieldmer.c fieldzon.c functs.h gradsdeslib.c gradsdeslib.h \
+	grid.c grid.h grid_proj.c grid_proj.h grid_area.c \
+	grid_define.c grid_gme.c grid_rot.c grid_from_name.c \
+	grid_read.c grid_read_pingo.c grid_print.c gridreference.c \
+	griddes.c griddes.h griddes_h5.c griddes_nc.c hetaeta.c \
+	hetaeta.h institution.c interpol.c interpol.h job.c juldate.c \
 	grid_search.c grid_search.h listarray.c listarray.h list.c \
 	list.h listbuf.c listbuf.h merge_sort2.c merge_sort2.h \
 	modules.c modules.h namelist.c namelist.h namelist_parser.c \
@@ -537,12 +544,13 @@ libcdo_la_SOURCES = array.h array.c cdo_int.h compare.h cdo_pthread.c \
 	remap_distwgt.c remap_bicubic_scrip.c remap_bilinear_scrip.c \
 	stdnametable.c stdnametable.h specspace.c specspace.h \
 	statistic.c statistic.h table.c text.c text.h timebase.h \
-	timer.c userlog.c uthash.h util.c util.h zaxis.c json/jsmn.h \
-	json/jsmn.c kdtreelib/kdtree.h kdtreelib/kdtree_cartesian.c \
-	kdtreelib/kdtree_common.c kdtreelib/kdtree_spherical.c \
-	kdtreelib/qsort.c kdtreelib/pmergesort.c kdtreelib/pqueue.c \
-	kdtreelib/pqueue.h clipping/clipping.c clipping/clipping.h \
-	clipping/area.c clipping/area.h clipping/ensure_array_size.c \
+	timer.c userlog.c uthash.h util.c util.h zaxis_print.c zaxis.c \
+	json/jsmn.h json/jsmn.c kdtreelib/kdtree.h \
+	kdtreelib/kdtree_cartesian.c kdtreelib/kdtree_common.c \
+	kdtreelib/kdtree_spherical.c kdtreelib/qsort.c \
+	kdtreelib/pmergesort.c kdtreelib/pqueue.c kdtreelib/pqueue.h \
+	clipping/clipping.c clipping/clipping.h clipping/area.c \
+	clipping/area.h clipping/ensure_array_size.c \
 	clipping/ensure_array_size.h clipping/geometry.h \
 	clipping/grid.h clipping/points.h clipping/dep_list.h \
 	clipping/grid_cell.c clipping/grid_cell.h \
@@ -576,9 +584,10 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Mrotuv.c Mrotuvb.c Ninfo.c Nmldump.c Output.c Outputgmt.c \
 	Pack.c Pardup.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
 	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
-	Seascount.c Seaspctl.c Seasstat.c Selbox.c Selindex.c Select.c \
-	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
-	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
+	Samplegrid.c Samplegridicon.c Seascount.c Seaspctl.c \
+	Seasstat.c Selbox.c Selgridcell.c Select.c Selmulti.c \
+	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setattribute.c \
+	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setpartab.c \
 	Setrcaname.c Settime.c Setzaxis.c Shiftxy.c Showinfo.c Sinfo.c \
 	Smooth.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
 	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
@@ -587,15 +596,16 @@ cdo_SOURCES = cdo.c Adisit.c Afterburner.c Arith.c Arithc.c \
 	Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
 	Transpose.c Trend.c Trms.c Tstepcount.c Vargen.c Varrms.c \
 	Vertintml.c Vertintap.c Vertstat.c Vertcum.c Vertwind.c \
-	Verifygrid.c Wct.c Wind.c Writegrid.c Writerandom.c XTimstat.c \
-	YAR.c Yearmonstat.c Ydayarith.c Ydaypctl.c Ydaystat.c \
-	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
-	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
-	nearpt3c.h Magplot.c Magvector.c Maggraph.c template_parser.h \
-	template_parser.c results_template_parser.h \
-	results_template_parser.c magics_template_parser.h \
-	magics_template_parser.c StringUtilities.h StringUtilities.c \
-	CdoMagicsMapper.h CdoMagicsMapper.c
+	Verifygrid.c Wct.c Wind.c WindTrans.c Writegrid.c \
+	Writerandom.c XTimstat.c YAR.c Yearmonstat.c Ydayarith.c \
+	Ydaypctl.c Ydaystat.c Ydrunpctl.c Ydrunstat.c Yhourarith.c \
+	Yhourstat.c Ymonarith.c Ymonpctl.c Ymonstat.c Yseaspctl.c \
+	Yseasstat.c Zonstat.c cdo.h nearpt3c.h Magplot.c Magvector.c \
+	Maggraph.c template_parser.h template_parser.c \
+	results_template_parser.h results_template_parser.c \
+	magics_template_parser.h magics_template_parser.c \
+	StringUtilities.h StringUtilities.c CdoMagicsMapper.h \
+	CdoMagicsMapper.c
 #endif
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = libcdo.la $(top_builddir)/libcdi/src/libcdi.la
@@ -911,17 +921,21 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Rotuv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Samplegrid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Samplegridicon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seascount.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seaspctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seasstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Select.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selindex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selgridcell.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selmulti.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seloperator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selrec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seltime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Selvar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Set.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setattribute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setgatt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Setgrid.Po@am__quote@
@@ -976,6 +990,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Vertwind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Wct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Wind.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-WindTrans.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Writegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Writerandom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-XTimstat.Po@am__quote@
@@ -1009,6 +1024,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_getopt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_pthread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_task.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cdo_vlist.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-cmortable_parser.Plo@am__quote@
@@ -1034,10 +1050,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-gradsdeslib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_area.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_define.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_from_name.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_gme.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_lcc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_print.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_proj.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_read.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_read_pingo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-grid_rot.Plo@am__quote@
@@ -1093,6 +1110,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-userlog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcdo_la-zaxis_print.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-area.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-clipping.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@clipping/$(DEPDIR)/libcdo_la-ensure_array_size.Plo@am__quote@
@@ -1172,6 +1190,13 @@ libcdo_la-cdo_history.lo: cdo_history.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cdo_history.c' object='libcdo_la-cdo_history.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-cdo_history.lo `test -f 'cdo_history.c' || echo '$(srcdir)/'`cdo_history.c
+
+libcdo_la-cdo_read.lo: cdo_read.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-cdo_read.lo -MD -MP -MF $(DEPDIR)/libcdo_la-cdo_read.Tpo -c -o libcdo_la-cdo_read.lo `test -f 'cdo_read.c' || echo '$(srcdir)/'`cdo_read.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-cdo_read.Tpo $(DEPDIR)/libcdo_la-cdo_read.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cdo_read.c' object='libcdo_la-cdo_read.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-cdo_read.lo `test -f 'cdo_read.c' || echo '$(srcdir)/'`cdo_read.c
 
 libcdo_la-cmortable_parser.lo: cmortable_parser.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-cmortable_parser.lo -MD -MP -MF $(DEPDIR)/libcdo_la-cmortable_parser.Tpo -c -o libcdo_la-cmortable_parser.lo `test -f 'cmortable_parser.c' || echo '$(srcdir)/'`cmortable_parser.c
@@ -1369,6 +1394,13 @@ libcdo_la-grid.lo: grid.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid.lo `test -f 'grid.c' || echo '$(srcdir)/'`grid.c
 
+libcdo_la-grid_proj.lo: grid_proj.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_proj.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_proj.Tpo -c -o libcdo_la-grid_proj.lo `test -f 'grid_proj.c' || echo '$(srcdir)/'`grid_proj.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_proj.Tpo $(DEPDIR)/libcdo_la-grid_proj.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='grid_proj.c' object='libcdo_la-grid_proj.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid_proj.lo `test -f 'grid_proj.c' || echo '$(srcdir)/'`grid_proj.c
+
 libcdo_la-grid_area.lo: grid_area.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_area.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_area.Tpo -c -o libcdo_la-grid_area.lo `test -f 'grid_area.c' || echo '$(srcdir)/'`grid_area.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_area.Tpo $(DEPDIR)/libcdo_la-grid_area.Plo
@@ -1376,19 +1408,19 @@ libcdo_la-grid_area.lo: grid_area.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid_area.lo `test -f 'grid_area.c' || echo '$(srcdir)/'`grid_area.c
 
+libcdo_la-grid_define.lo: grid_define.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_define.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_define.Tpo -c -o libcdo_la-grid_define.lo `test -f 'grid_define.c' || echo '$(srcdir)/'`grid_define.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_define.Tpo $(DEPDIR)/libcdo_la-grid_define.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='grid_define.c' object='libcdo_la-grid_define.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid_define.lo `test -f 'grid_define.c' || echo '$(srcdir)/'`grid_define.c
+
 libcdo_la-grid_gme.lo: grid_gme.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_gme.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_gme.Tpo -c -o libcdo_la-grid_gme.lo `test -f 'grid_gme.c' || echo '$(srcdir)/'`grid_gme.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_gme.Tpo $(DEPDIR)/libcdo_la-grid_gme.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='grid_gme.c' object='libcdo_la-grid_gme.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid_gme.lo `test -f 'grid_gme.c' || echo '$(srcdir)/'`grid_gme.c
-
-libcdo_la-grid_lcc.lo: grid_lcc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_lcc.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_lcc.Tpo -c -o libcdo_la-grid_lcc.lo `test -f 'grid_lcc.c' || echo '$(srcdir)/'`grid_lcc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-grid_lcc.Tpo $(DEPDIR)/libcdo_la-grid_lcc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='grid_lcc.c' object='libcdo_la-grid_lcc.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-grid_lcc.lo `test -f 'grid_lcc.c' || echo '$(srcdir)/'`grid_lcc.c
 
 libcdo_la-grid_rot.lo: grid_rot.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-grid_rot.lo -MD -MP -MF $(DEPDIR)/libcdo_la-grid_rot.Tpo -c -o libcdo_la-grid_rot.lo `test -f 'grid_rot.c' || echo '$(srcdir)/'`grid_rot.c
@@ -1781,6 +1813,13 @@ libcdo_la-util.lo: util.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='util.c' object='libcdo_la-util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-util.lo `test -f 'util.c' || echo '$(srcdir)/'`util.c
+
+libcdo_la-zaxis_print.lo: zaxis_print.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-zaxis_print.lo -MD -MP -MF $(DEPDIR)/libcdo_la-zaxis_print.Tpo -c -o libcdo_la-zaxis_print.lo `test -f 'zaxis_print.c' || echo '$(srcdir)/'`zaxis_print.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcdo_la-zaxis_print.Tpo $(DEPDIR)/libcdo_la-zaxis_print.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='zaxis_print.c' object='libcdo_la-zaxis_print.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libcdo_la-zaxis_print.lo `test -f 'zaxis_print.c' || echo '$(srcdir)/'`zaxis_print.c
 
 libcdo_la-zaxis.lo: zaxis.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcdo_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libcdo_la-zaxis.lo -MD -MP -MF $(DEPDIR)/libcdo_la-zaxis.Tpo -c -o libcdo_la-zaxis.lo `test -f 'zaxis.c' || echo '$(srcdir)/'`zaxis.c
@@ -3378,6 +3417,34 @@ cdo-Runstat.obj: Runstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Runstat.obj `if test -f 'Runstat.c'; then $(CYGPATH_W) 'Runstat.c'; else $(CYGPATH_W) '$(srcdir)/Runstat.c'; fi`
 
+cdo-Samplegrid.o: Samplegrid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Samplegrid.o -MD -MP -MF $(DEPDIR)/cdo-Samplegrid.Tpo -c -o cdo-Samplegrid.o `test -f 'Samplegrid.c' || echo '$(srcdir)/'`Samplegrid.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Samplegrid.Tpo $(DEPDIR)/cdo-Samplegrid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Samplegrid.c' object='cdo-Samplegrid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Samplegrid.o `test -f 'Samplegrid.c' || echo '$(srcdir)/'`Samplegrid.c
+
+cdo-Samplegrid.obj: Samplegrid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Samplegrid.obj -MD -MP -MF $(DEPDIR)/cdo-Samplegrid.Tpo -c -o cdo-Samplegrid.obj `if test -f 'Samplegrid.c'; then $(CYGPATH_W) 'Samplegrid.c'; else $(CYGPATH_W) '$(srcdir)/Samplegrid.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Samplegrid.Tpo $(DEPDIR)/cdo-Samplegrid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Samplegrid.c' object='cdo-Samplegrid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Samplegrid.obj `if test -f 'Samplegrid.c'; then $(CYGPATH_W) 'Samplegrid.c'; else $(CYGPATH_W) '$(srcdir)/Samplegrid.c'; fi`
+
+cdo-Samplegridicon.o: Samplegridicon.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Samplegridicon.o -MD -MP -MF $(DEPDIR)/cdo-Samplegridicon.Tpo -c -o cdo-Samplegridicon.o `test -f 'Samplegridicon.c' || echo '$(srcdir)/'`Samplegridicon.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Samplegridicon.Tpo $(DEPDIR)/cdo-Samplegridicon.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Samplegridicon.c' object='cdo-Samplegridicon.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Samplegridicon.o `test -f 'Samplegridicon.c' || echo '$(srcdir)/'`Samplegridicon.c
+
+cdo-Samplegridicon.obj: Samplegridicon.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Samplegridicon.obj -MD -MP -MF $(DEPDIR)/cdo-Samplegridicon.Tpo -c -o cdo-Samplegridicon.obj `if test -f 'Samplegridicon.c'; then $(CYGPATH_W) 'Samplegridicon.c'; else $(CYGPATH_W) '$(srcdir)/Samplegridicon.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Samplegridicon.Tpo $(DEPDIR)/cdo-Samplegridicon.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Samplegridicon.c' object='cdo-Samplegridicon.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Samplegridicon.obj `if test -f 'Samplegridicon.c'; then $(CYGPATH_W) 'Samplegridicon.c'; else $(CYGPATH_W) '$(srcdir)/Samplegridicon.c'; fi`
+
 cdo-Seascount.o: Seascount.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Seascount.o -MD -MP -MF $(DEPDIR)/cdo-Seascount.Tpo -c -o cdo-Seascount.o `test -f 'Seascount.c' || echo '$(srcdir)/'`Seascount.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Seascount.Tpo $(DEPDIR)/cdo-Seascount.Po
@@ -3434,19 +3501,19 @@ cdo-Selbox.obj: Selbox.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selbox.obj `if test -f 'Selbox.c'; then $(CYGPATH_W) 'Selbox.c'; else $(CYGPATH_W) '$(srcdir)/Selbox.c'; fi`
 
-cdo-Selindex.o: Selindex.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selindex.o -MD -MP -MF $(DEPDIR)/cdo-Selindex.Tpo -c -o cdo-Selindex.o `test -f 'Selindex.c' || echo '$(srcdir)/'`Selindex.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selindex.Tpo $(DEPDIR)/cdo-Selindex.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selindex.c' object='cdo-Selindex.o' libtool=no @AMDEPBACKSLASH@
+cdo-Selgridcell.o: Selgridcell.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selgridcell.o -MD -MP -MF $(DEPDIR)/cdo-Selgridcell.Tpo -c -o cdo-Selgridcell.o `test -f 'Selgridcell.c' || echo '$(srcdir)/'`Selgridcell.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selgridcell.Tpo $(DEPDIR)/cdo-Selgridcell.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selgridcell.c' object='cdo-Selgridcell.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selindex.o `test -f 'Selindex.c' || echo '$(srcdir)/'`Selindex.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selgridcell.o `test -f 'Selgridcell.c' || echo '$(srcdir)/'`Selgridcell.c
 
-cdo-Selindex.obj: Selindex.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selindex.obj -MD -MP -MF $(DEPDIR)/cdo-Selindex.Tpo -c -o cdo-Selindex.obj `if test -f 'Selindex.c'; then $(CYGPATH_W) 'Selindex.c'; else $(CYGPATH_W) '$(srcdir)/Selindex.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selindex.Tpo $(DEPDIR)/cdo-Selindex.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selindex.c' object='cdo-Selindex.obj' libtool=no @AMDEPBACKSLASH@
+cdo-Selgridcell.obj: Selgridcell.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selgridcell.obj -MD -MP -MF $(DEPDIR)/cdo-Selgridcell.Tpo -c -o cdo-Selgridcell.obj `if test -f 'Selgridcell.c'; then $(CYGPATH_W) 'Selgridcell.c'; else $(CYGPATH_W) '$(srcdir)/Selgridcell.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selgridcell.Tpo $(DEPDIR)/cdo-Selgridcell.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selgridcell.c' object='cdo-Selgridcell.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selindex.obj `if test -f 'Selindex.c'; then $(CYGPATH_W) 'Selindex.c'; else $(CYGPATH_W) '$(srcdir)/Selindex.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selgridcell.obj `if test -f 'Selgridcell.c'; then $(CYGPATH_W) 'Selgridcell.c'; else $(CYGPATH_W) '$(srcdir)/Selgridcell.c'; fi`
 
 cdo-Select.o: Select.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Select.o -MD -MP -MF $(DEPDIR)/cdo-Select.Tpo -c -o cdo-Select.o `test -f 'Select.c' || echo '$(srcdir)/'`Select.c
@@ -3461,6 +3528,20 @@ cdo-Select.obj: Select.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Select.c' object='cdo-Select.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Select.obj `if test -f 'Select.c'; then $(CYGPATH_W) 'Select.c'; else $(CYGPATH_W) '$(srcdir)/Select.c'; fi`
+
+cdo-Selmulti.o: Selmulti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selmulti.o -MD -MP -MF $(DEPDIR)/cdo-Selmulti.Tpo -c -o cdo-Selmulti.o `test -f 'Selmulti.c' || echo '$(srcdir)/'`Selmulti.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selmulti.Tpo $(DEPDIR)/cdo-Selmulti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selmulti.c' object='cdo-Selmulti.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selmulti.o `test -f 'Selmulti.c' || echo '$(srcdir)/'`Selmulti.c
+
+cdo-Selmulti.obj: Selmulti.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selmulti.obj -MD -MP -MF $(DEPDIR)/cdo-Selmulti.Tpo -c -o cdo-Selmulti.obj `if test -f 'Selmulti.c'; then $(CYGPATH_W) 'Selmulti.c'; else $(CYGPATH_W) '$(srcdir)/Selmulti.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Selmulti.Tpo $(DEPDIR)/cdo-Selmulti.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Selmulti.c' object='cdo-Selmulti.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selmulti.obj `if test -f 'Selmulti.c'; then $(CYGPATH_W) 'Selmulti.c'; else $(CYGPATH_W) '$(srcdir)/Selmulti.c'; fi`
 
 cdo-Seloperator.o: Seloperator.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Seloperator.o -MD -MP -MF $(DEPDIR)/cdo-Seloperator.Tpo -c -o cdo-Seloperator.o `test -f 'Seloperator.c' || echo '$(srcdir)/'`Seloperator.c
@@ -3531,6 +3612,20 @@ cdo-Set.obj: Set.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Set.c' object='cdo-Set.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Set.obj `if test -f 'Set.c'; then $(CYGPATH_W) 'Set.c'; else $(CYGPATH_W) '$(srcdir)/Set.c'; fi`
+
+cdo-Setattribute.o: Setattribute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Setattribute.o -MD -MP -MF $(DEPDIR)/cdo-Setattribute.Tpo -c -o cdo-Setattribute.o `test -f 'Setattribute.c' || echo '$(srcdir)/'`Setattribute.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Setattribute.Tpo $(DEPDIR)/cdo-Setattribute.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Setattribute.c' object='cdo-Setattribute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Setattribute.o `test -f 'Setattribute.c' || echo '$(srcdir)/'`Setattribute.c
+
+cdo-Setattribute.obj: Setattribute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Setattribute.obj -MD -MP -MF $(DEPDIR)/cdo-Setattribute.Tpo -c -o cdo-Setattribute.obj `if test -f 'Setattribute.c'; then $(CYGPATH_W) 'Setattribute.c'; else $(CYGPATH_W) '$(srcdir)/Setattribute.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-Setattribute.Tpo $(DEPDIR)/cdo-Setattribute.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Setattribute.c' object='cdo-Setattribute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Setattribute.obj `if test -f 'Setattribute.c'; then $(CYGPATH_W) 'Setattribute.c'; else $(CYGPATH_W) '$(srcdir)/Setattribute.c'; fi`
 
 cdo-Setbox.o: Setbox.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Setbox.o -MD -MP -MF $(DEPDIR)/cdo-Setbox.Tpo -c -o cdo-Setbox.o `test -f 'Setbox.c' || echo '$(srcdir)/'`Setbox.c
@@ -4273,6 +4368,20 @@ cdo-Wind.obj: Wind.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Wind.c' object='cdo-Wind.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Wind.obj `if test -f 'Wind.c'; then $(CYGPATH_W) 'Wind.c'; else $(CYGPATH_W) '$(srcdir)/Wind.c'; fi`
+
+cdo-WindTrans.o: WindTrans.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-WindTrans.o -MD -MP -MF $(DEPDIR)/cdo-WindTrans.Tpo -c -o cdo-WindTrans.o `test -f 'WindTrans.c' || echo '$(srcdir)/'`WindTrans.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-WindTrans.Tpo $(DEPDIR)/cdo-WindTrans.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='WindTrans.c' object='cdo-WindTrans.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-WindTrans.o `test -f 'WindTrans.c' || echo '$(srcdir)/'`WindTrans.c
+
+cdo-WindTrans.obj: WindTrans.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-WindTrans.obj -MD -MP -MF $(DEPDIR)/cdo-WindTrans.Tpo -c -o cdo-WindTrans.obj `if test -f 'WindTrans.c'; then $(CYGPATH_W) 'WindTrans.c'; else $(CYGPATH_W) '$(srcdir)/WindTrans.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-WindTrans.Tpo $(DEPDIR)/cdo-WindTrans.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='WindTrans.c' object='cdo-WindTrans.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-WindTrans.obj `if test -f 'WindTrans.c'; then $(CYGPATH_W) 'WindTrans.c'; else $(CYGPATH_W) '$(srcdir)/WindTrans.c'; fi`
 
 cdo-Writegrid.o: Writegrid.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Writegrid.o -MD -MP -MF $(DEPDIR)/cdo-Writegrid.Tpo -c -o cdo-Writegrid.o `test -f 'Writegrid.c' || echo '$(srcdir)/'`Writegrid.c

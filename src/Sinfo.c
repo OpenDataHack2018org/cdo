@@ -78,18 +78,10 @@ void limit_string_length(char* string, size_t maxlen)
 void *Sinfo(void *argument)
 {
   enum {func_generic, func_param, func_name, func_code};
-  int varID;
-  int gridsize = 0;
-  int gridID, zaxisID, code, tabnum, param;
-  int vdate, vtime;
-  int ntsteps;
-  int levelsize;
-  int tsteptype, taxisID;
   char tmpname[CDI_MAX_NAME];
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  int datatype;
   char pstr[4];
 
   cdoInitialize(argument);
@@ -139,13 +131,13 @@ void *Sinfo(void *argument)
       reset_text_color(stdout);
       fprintf(stdout, "\n" );              
 
-      for ( varID = 0; varID < nvars; varID++ )
+      for ( int varID = 0; varID < nvars; varID++ )
 	{
-	  param   = vlistInqVarParam(vlistID, varID);
-	  code    = vlistInqVarCode(vlistID, varID);
-	  tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
-	  gridID  = vlistInqVarGrid(vlistID, varID);
-	  zaxisID = vlistInqVarZaxis(vlistID, varID);
+	  int param   = vlistInqVarParam(vlistID, varID);
+	  int code    = vlistInqVarCode(vlistID, varID);
+	  int tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
+	  int gridID  = vlistInqVarGrid(vlistID, varID);
+	  int zaxisID = vlistInqVarZaxis(vlistID, varID);
 
 	  set_text_color(stdout, BRIGHT, BLACK);
 	  fprintf(stdout, "%6d", varID+1);
@@ -170,7 +162,7 @@ void *Sinfo(void *argument)
 	  fprintf(stdout, "%-8s ", tmpname);
 
 	  /* tsteptype */
-	  tsteptype = vlistInqVarTsteptype(vlistID, varID);
+	  int tsteptype = vlistInqVarTsteptype(vlistID, varID);
 	  if      ( tsteptype == TSTEP_CONSTANT ) fprintf(stdout, "%-8s ", "constant");
 	  else if ( tsteptype == TSTEP_INSTANT  ) fprintf(stdout, "%-8s ", "instant");
 	  else if ( tsteptype == TSTEP_INSTANT2 ) fprintf(stdout, "%-8s ", "instant");
@@ -203,21 +195,21 @@ void *Sinfo(void *argument)
 	  reset_text_color(stdout);
 
 	  /* layer info */
-	  levelsize = zaxisInqSize(zaxisID);
+	  int levelsize = zaxisInqSize(zaxisID);
 	  set_text_color(stdout, RESET, GREEN);
 	  fprintf(stdout, "%6d ", levelsize);
 	  reset_text_color(stdout);
 	  fprintf(stdout, "%3d ", vlistZaxisIndex(vlistID, zaxisID) + 1);
 
 	  /* grid info */
-	  gridsize = gridInqSize(gridID);
+	  int gridsize = gridInqSize(gridID);
 	  set_text_color(stdout, RESET, GREEN);
 	  fprintf(stdout, "%9d ", gridsize);
 	  reset_text_color(stdout);
 	  fprintf(stdout, "%3d ", vlistGridIndex(vlistID, gridID) + 1);
 
 	  /* datatype */
-	  datatype = vlistInqVarDatatype(vlistID, varID);
+	  int datatype = vlistInqVarDatatype(vlistID, varID);
 	  datatype2str(datatype, pstr);
 
 	  set_text_color(stdout, RESET, BLUE);
@@ -252,7 +244,7 @@ void *Sinfo(void *argument)
 	    {
 	      char varextra[CDI_MAX_NAME];
 	      vlistInqVarExtra(vlistID, varID, varextra);
-	      fprintf(stdout, " : %s", varextra );              
+	      fprintf(stdout, " : %s", varextra);              
 	    }
 
 	  fprintf(stdout, "\n");
@@ -280,8 +272,8 @@ void *Sinfo(void *argument)
           printSubtypeInfo(vlistID);
         }
 
-      taxisID = vlistInqTaxis(vlistID);
-      ntsteps = vlistNtsteps(vlistID);
+      int taxisID = vlistInqTaxis(vlistID);
+      int ntsteps = vlistNtsteps(vlistID);
 
       if ( ntsteps != 0 )
 	{
@@ -297,8 +289,8 @@ void *Sinfo(void *argument)
 	    {
 	      if ( taxisInqType(taxisID) != TAXIS_ABSOLUTE )
 		{
-		  vdate = taxisInqRdate(taxisID);
-		  vtime = taxisInqRtime(taxisID);
+		  int vdate = taxisInqRdate(taxisID);
+		  int vtime = taxisInqRtime(taxisID);
 
 		  date2str(vdate, vdatestr, sizeof(vdatestr));
 		  time2str(vtime, vtimestr, sizeof(vtimestr));

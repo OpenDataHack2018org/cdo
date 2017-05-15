@@ -14,27 +14,15 @@ typedef struct {
   double  xlast, ylast;
   double  xinc, yinc;
   double  xpole, ypole, angle;    /* rotated north pole             */
-  double  originLon;              /* lambert                        */
-  double  originLat;
-  double  lonParY;
-  double  lat1;
-  double  lat2;
-  int     projflag;
-  int     scanflag;
-  bool    def_originLon;
-  bool    def_originLat;
-  bool    def_lonParY;
-  bool    def_lat1;
-  bool    def_lat2;
+  int     scanningMode;
+  /* scanningMode  = 128 * iScansNegatively + 64 * jScansPositively + 32 * jPointsAreConsecutive;
+               64  = 128 * 0                + 64 *        1         + 32 * 0  
+               00  = 128 * 0                + 64 *        0         + 32 * 0
+               96  = 128 * 0                + 64 *        1         + 32 * 1
+     Default / implicit scanning mode is 64:
+                        i and j scan positively, i points are consecutive (row-major)        */
+  bool    uvRelativeToGrid;
   double  a;
-  double  lon_0;
-  double  lat_0;
-  double  lat_1;
-  double  lat_2;
-  bool    def_lon_0;
-  bool    def_lat_0;
-  bool    def_lat_1;
-  bool    def_lat_2;
   int     prec;
   int     isRotated;              /* TRUE for rotated grids         */
   int     type;

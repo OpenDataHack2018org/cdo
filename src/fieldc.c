@@ -22,12 +22,15 @@
 
 void farcfun(field_type *field, double rconst, int function)
 {
-  if      ( function == func_add ) farcadd(field, rconst);
-  else if ( function == func_sub ) farcsub(field, rconst);
-  else if ( function == func_mul ) farcmul(field, rconst);
-  else if ( function == func_div ) farcdiv(field, rconst);
-  else if ( function == func_mod ) farmod(field, rconst);
-  else    cdoAbort("%s: function %d not implemented!", __func__, function);
+  switch (function)
+    {
+    case func_add: farcadd(field, rconst);  break;
+    case func_sub: farcsub(field, rconst);  break;
+    case func_mul: farcmul(field, rconst);  break;
+    case func_div: farcdiv(field, rconst);  break;
+    case func_mod: farmod(field, rconst);   break;
+    default: cdoAbort("%s: function %d not implemented!", __func__, function);
+    }
 }
 
 void farcmul(field_type *field, double rconst)
@@ -120,19 +123,18 @@ void farcsub(field_type *field, double rconst)
 
 void farinv(field_type *field)
 {
-  int i, len;
   int    grid     = field->grid;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array   = field->ptr;
 
-  len    = gridInqSize(grid);
+  int len = gridInqSize(grid);
 
-  for ( i = 0; i < len; i++ ) 
+  for ( int i = 0; i < len; i++ ) 
     array[i] = DIVMN(1.0, array[i]);
 
   field->nmiss = 0;
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array[i], missval1) ) field->nmiss++;
 }
 
@@ -146,7 +148,7 @@ void farround(field_type *field)
   int len = gridInqSize(grid);
 
   for ( int i = 0; i < len; i++ ) 
-    array[i] = (double)lround(array[i]);
+    array[i] = round(array[i]);
 
   field->nmiss = 0;
   for ( int i = 0; i < len; i++ )
@@ -156,14 +158,13 @@ void farround(field_type *field)
 
 void farmod(field_type *field, double divisor)
 {
-  int i, len;
   int    grid     = field->grid;
   double missval1 = field->missval;
   double *array   = field->ptr;
 
-  len    = gridInqSize(grid);
+  int len = gridInqSize(grid);
 
-  for ( i = 0; i < len; i++ )
+  for ( int i = 0; i < len; i++ )
     {
       array[i] = DBL_IS_EQUAL(array[i], missval1) ? missval1 : fmod(array[i], divisor);
     }

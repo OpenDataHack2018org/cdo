@@ -110,7 +110,7 @@ int namelist_parse_word(namelist_parser *parser, const char *buf, size_t len)
 
 // Fills next token with NAMELIST string.
 static
-int namelist_parse_string(namelist_parser *parser, const char *buf, size_t len)
+int namelist_parse_string(namelist_parser *parser, const char *buf, size_t len, char quote)
 {
   int start = parser->pos;
 
@@ -122,7 +122,7 @@ int namelist_parse_string(namelist_parser *parser, const char *buf, size_t len)
       char c = buf[parser->pos];
 
       /* Quote: end of string */
-      if ( c == '\"' )
+      if ( c == quote )
         {
           namelisttok_t *token = namelist_alloc_token(parser);
           namelist_fill_token(token, NAMELIST_STRING, start+1, parser->pos);
@@ -238,8 +238,8 @@ int namelist_parse(namelist_parser *parser, const char *buf, size_t len)
         case ':': case '=':
           status = namelist_check_keyname(buf, &parser->tokens[parser->toknext-1]);
           break;
-        case '\"':
-          status = namelist_parse_string(parser, buf, len);
+        case '\"': case '\'':
+          status = namelist_parse_string(parser, buf, len, c);
           break;
         default:
           status = namelist_parse_word(parser, buf, len);

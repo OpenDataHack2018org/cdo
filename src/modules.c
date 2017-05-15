@@ -144,17 +144,19 @@ void *Rotuv(void *argument);
 void *Rhopot(void *argument);
 void *Runpctl(void *argument);
 void *Runstat(void *argument);
+void *Samplegridicon(void *argument);
 void *Seascount(void *argument);
 void *Seaspctl(void *argument);
 void *Seasstat(void *argument);
 void *Selbox(void *argument);
-void *Selindex(void *argument);
+void *Selgridcell(void *argument);
 void *Select(void *argument);
 void *Selvar(void *argument);
 void *Seloperator(void *argument);
 void *Selrec(void *argument);
 void *Seltime(void *argument);
 void *Set(void *argument);
+void *Setattribute(void *argument);
 void *Setbox(void *argument);
 void *Setgatt(void *argument);
 void *Setgrid(void *argument);
@@ -278,6 +280,11 @@ void *Magplot(void *argument);
 void *Magvector(void *argument);
 void *Maggraph(void *argument);
 
+// HIRLAM_EXTENSIONS
+void *Selmulti(void *argument);   // "selmulti", "delmulti"
+void *WindTrans(void *argument);  // "uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"
+void *Samplegrid(void *argument); // "samplegrid", "subgrid"
+
 
 #define  AdisitOperators        {"adisit", "adipot"}
 #define  AfterburnerOperators   {"after"}
@@ -344,7 +351,7 @@ void *Maggraph(void *argument);
 #define  ImportbinaryOperators  {"import_binary"}
 #define  ImportcmsafOperators   {"import_cmsaf"}
 #define  ImportobsOperators     {"import_obs"}
-#define  InfoOperators          {"info", "infop", "infon", "infoc", "map"}
+#define  InfoOperators          {"info", "infop", "infon", "infoc", "xinfon", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}
@@ -399,11 +406,12 @@ void *Maggraph(void *argument);
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}
 #define  RunstatOperators       {"runmin", "runmax", "runsum", "runmean", "runavg", "runstd", "runstd1", "runvar", "runvar1"}
+#define  SamplegridiconOperators {"samplegridicon"}
 #define  SeascountOperators     {"seascount"}
 #define  SeaspctlOperators      {"seaspctl"}
 #define  SeasstatOperators      {"seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
-#define  SelindexOperators      {"selindex"}
+#define  SelgridcellOperators   {"selgridcell", "delgridcell"}
 #define  SelectOperators        {"select", "delete"}
 #define  SelvarOperators        {"selparam", "selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delparam", "delcode", "delname", "selltype"}
@@ -412,9 +420,10 @@ void *Maggraph(void *argument);
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseason", "selmonth", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
 #define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
+#define  SetattributeOperators  {"setattribute"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
-#define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber", "setgriduri"}
+#define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber", "setgriduri", "usegridnumber"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
 #define  SetmisstonnOperators   {"setmisstonn", "setmisstodis"}
@@ -426,7 +435,7 @@ void *Maggraph(void *argument);
 #define  SetzaxisOperators      {"setzaxis", "genlevelbounds"}
 #define  ShiftxyOperators       {"shiftx", "shifty"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", "showunit", \
-                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
+                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat", "showgrid"}
 #define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc", "seinfo", "seinfop", "seinfon", "seinfoc"}
 #define  SmoothOperators        {"smooth", "smooth9"}
 #define  SortOperators          {"sortcode", "sortparam", "sortname", "sortlevel"}
@@ -560,6 +569,12 @@ void *Maggraph(void *argument);
 #define  MagvectorOperators     {"vector"}
 #define  MaggraphOperators      {"graph"}
 
+// HIRLAM_EXTENSIONS
+#define  SelmultiOperators      {"selmulti", "delmulti", "changemulti"}
+#define  WindTransOperators     {"uvDestag", "rotuvN", "rotuvNorth", "projuvLatLon"}
+#define  SamplegridOperators    {"samplegrid", "subgrid"}
+
+
 static modules_t Modules[] =
 {
   // stream in  -1 means: unlimited number of input streams
@@ -684,19 +699,21 @@ static modules_t Modules[] =
   { Rotuv,          RotuvbHelp,        RotuvOperators,         1,   CDI_REAL,  1,  1 },
   { Runpctl,        RunpctlHelp,       RunpctlOperators,       1,   CDI_REAL,  1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,       1,   CDI_REAL,  1,  1 },
+  { Samplegridicon, NULL,              SamplegridiconOperators,1,   CDI_REAL,  1,  2 },
   { Seascount,      NULL,              SeascountOperators,     1,   CDI_BOTH,  1,  1 },
   { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,      1,   CDI_REAL,  3,  1 },
   { Seasstat,       SeasstatHelp,      SeasstatOperators,      1,   CDI_REAL,  1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,        1,   CDI_BOTH,  1,  1 },
-  { Selindex,       NULL,              SelindexOperators,      1,   CDI_BOTH,  1,  1 },
+  { Selgridcell,    SelgridcellHelp,   SelgridcellOperators,   1,   CDI_BOTH,  1,  1 },
   { Select,         SelectHelp,        SelectOperators,        1,   CDI_BOTH, -1,  1 },
   { Selvar,         SelvarHelp,        SelvarOperators,        1,   CDI_BOTH,  1,  1 },
   { Selrec,         SelvarHelp,        SelrecOperators,        1,   CDI_BOTH,  1,  1 },
   { Seloperator,    NULL,              SeloperatorOperators,   1,   CDI_REAL,  1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,       1,   CDI_BOTH,  1,  1 },
   { Set,            SetHelp,           SetOperators,           1,   CDI_BOTH,  1,  1 },
+  { Setattribute,   SetattributeHelp,  SetattributeOperators,  1,   CDI_BOTH,  1,  1 },
   { Setbox,         SetboxHelp,        SetboxOperators,        1,   CDI_REAL,  1,  1 },
-  { Setgatt,        SetgattHelp,       SetgattOperators,       1,   CDI_BOTH,  1,  1 },
+  { Setgatt,        NULL,              SetgattOperators,       1,   CDI_BOTH,  1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,       1,   CDI_BOTH,  1,  1 },
   { Sethalo,        SethaloHelp,       SethaloOperators,       1,   CDI_REAL,  1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,       1,   CDI_REAL,  1,  1 },
@@ -828,6 +845,10 @@ static modules_t Modules[] =
   { Magplot,        MagplotHelp,       MagplotOperators,       1,   CDI_REAL,  1,  1 },
   { Magvector,      MagvectorHelp,     MagvectorOperators,     1,   CDI_REAL,  1,  1 },
   { Maggraph,       MaggraphHelp,      MaggraphOperators,      1,   CDI_REAL, -1,  1 },
+  // HIRLAM_EXTENSIONS
+  { Samplegrid,     SamplegridHelp,    SamplegridOperators,    1,   CDI_REAL,  1,  1 },
+  { Selmulti,       SelmultiHelp,      SelmultiOperators,      1,   CDI_REAL,  1,  1 },
+  { WindTrans,      WindTransHelp,     WindTransOperators,     1,   CDI_REAL,  1,  1 },
 };							       
 							       
 static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
@@ -842,8 +863,6 @@ static const char *opalias[][2] =
   {"covar0r",             "fldcovar"},
   {"gather",              "collgrid"},
   {"geopotheight",        "gheight"},
-  {"ggstat",              "info"},
-  {"ggstats",             "sinfo"},
   {"globavg",             "fldavg"},
   {"import_grads",        "import_binary"},
   {"infos",               "sinfo"},
@@ -885,6 +904,8 @@ static const char *opalias[][2] =
   {"outputbounds",        "gmtcells"},
   {"selseas",             "selseason"},
   {"selmon",              "selmonth"},
+  {"selindex",            "selgridcell"},
+  {"delindex",            "delgridcell"},
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));

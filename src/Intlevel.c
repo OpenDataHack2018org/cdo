@@ -22,7 +22,6 @@
       Intlevel   intlevel3d      Linear level interpolation on a 3d vertical coordinates variable
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

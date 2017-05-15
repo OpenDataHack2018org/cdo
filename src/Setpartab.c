@@ -121,7 +121,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
       list_t *kvlist = NULL;
       if ( ptmode == CODE_NUMBER )
         {
-          codenum = vlistInqVarCode(vlistID2, varID);          
+          codenum = vlistInqVarCode(vlistID2, varID);
           snprintf(valstr, sizeof(valstr), "%d", codenum);
           kvlist = pmlist_search_kvlist_ventry(pmlist, "code", valstr, nventry, ventry);
           if ( kvlist )
@@ -176,7 +176,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               if      ( lv1 && STR_IS_EQ(key, "standard_name") ) vlistDefVarStdname(vlistID2, varID, value);
               else if ( lv1 && STR_IS_EQ(key, "long_name")     ) vlistDefVarLongname(vlistID2, varID, value);
               else if ( lv1 && STR_IS_EQ(key, "units")         ) cdo_define_var_units(var, vlistID2, varID, value);
-              else if ( lv1 && STR_IS_EQ(key, "name")          ) /*vlistDefVarName(vlistID2, varID, parameter2word(value))*/;
+              else if ( lv1 && STR_IS_EQ(key, "name") && ptmode != VARIABLE_NAME ) vlistDefVarName(vlistID2, varID, parameter2word(value));
               else if ( lv1 && STR_IS_EQ(key, "out_name")      )
                 {
                   const char *outname = parameter2word(value);
@@ -191,6 +191,7 @@ void apply_parameterlist(pt_mode_t ptmode, list_t *pmlist, int nvars, int vlistI
               else if ( lv1 && STR_IS_EQ(key, "code")          ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               else if ( lv1 && STR_IS_EQ(key, "out_code")      ) vlistDefVarParam(vlistID2, varID, cdiEncodeParam(parameter2int(value), ptab, 255));
               else if ( lv1 && STR_IS_EQ(key, "comment")       ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
+              else if ( lv1 && STR_IS_EQ(key, "chunktype")     ) ;
               else if ( lv1 && STR_IS_EQ(key, "cell_methods")  ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
               else if ( lv1 && STR_IS_EQ(key, "cell_measures") ) cdiDefAttTxt(vlistID2, varID, key, (int)strlen(value), value);
               else if ( lv1 && STR_IS_EQ(key, "delete")        ) var->remove = parameter2bool(value);
@@ -350,6 +351,8 @@ void *Setpartab(void *argument)
     {
       tableformat = 1;
     }
+
+  if ( cdoVerbose ) cdoPrint("Table format version %d", tableformat);
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 

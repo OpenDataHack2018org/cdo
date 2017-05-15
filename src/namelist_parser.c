@@ -5,6 +5,7 @@
 static
 void kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer, namelisttok_t *t, int nvalues)
 {
+  char vbuf[4096];
   keyValues_t *keyval = (keyValues_t *) malloc(sizeof(keyValues_t));
   keyval->key = strdup(key);
   keyval->nvalues = nvalues;
@@ -16,7 +17,14 @@ void kvlist_append_namelist(list_t *kvlist, const char *key, const char *buffer,
       size_t len = t[i].end - t[i].start;
       char *value = (char*) malloc((len+1)*sizeof(char));
       //printf(" value >%.*s<\n", len, buffer+t[i].start);
-      snprintf(value, len+1, "%.*s", (int)len, buffer+t[i].start);
+      const char *pval = buffer+t[i].start;
+      if ( len < sizeof(vbuf) ) // snprintf seems to call strlen(pval)
+        {
+          memcpy(vbuf, buffer+t[i].start, len);
+          vbuf[len] = 0;
+          pval = vbuf;
+        }
+      snprintf(value, len+1, "%.*s", (int)len, pval);
       value[len] = 0;
       keyval->values[i] = value;
     }

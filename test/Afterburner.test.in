@@ -1,4 +1,4 @@
-#! @SHELL@
+#! @BASH@
 #
 AFTERTESTFILE=ECHAM5_T42L19.grb
 if [ -f "$CDOTESTDATA/$AFTERTESTFILE" -a "@ENABLE_CGRIBEX@" = yes ]; then

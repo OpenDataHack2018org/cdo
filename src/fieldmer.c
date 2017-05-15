@@ -23,16 +23,19 @@
 
 void merfun(field_type field1, field_type *field2, int function)
 {
-  if      ( function == func_min )  mermin(field1, field2);
-  else if ( function == func_max )  mermax(field1, field2);  
-  else if ( function == func_sum )  mersum(field1, field2);  
-  else if ( function == func_mean ) mermean(field1, field2);  
-  else if ( function == func_avg )  meravg(field1, field2);  
-  else if ( function == func_std )  merstd(field1, field2);  
-  else if ( function == func_std1 ) merstd1(field1, field2);  
-  else if ( function == func_var )  mervar(field1, field2);
-  else if ( function == func_var1 ) mervar1(field1, field2);
-  else cdoAbort("function %d not implemented!", function);
+  switch (function)
+    {
+    case func_min:   mermin(field1, field2);    break;
+    case func_max:   mermax(field1, field2);    break;
+    case func_sum:   mersum(field1, field2);    break;
+    case func_meanw: mermeanw(field1, field2);  break;
+    case func_avgw:  meravgw(field1, field2);   break;
+    case func_stdw:  merstdw(field1, field2);   break;
+    case func_std1w: merstd1w(field1, field2);  break;
+    case func_varw:  mervarw(field1, field2);   break;
+    case func_var1w: mervar1w(field1, field2);  break;
+    default: cdoAbort("function %d not implemented!", function);
+    }
 }
 
 
@@ -167,7 +170,7 @@ void mersum(field_type field1, field_type *field2)
 }
 
 
-void mermean(field_type field1, field_type *field2)
+void mermeanw(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -216,7 +219,7 @@ void mermean(field_type field1, field_type *field2)
 }
 
 
-void meravg(field_type field1, field_type *field2)
+void meravgw(field_type field1, field_type *field2)
 {
   long   i, j, nx, ny;
   int    rnmiss = 0;
@@ -264,8 +267,8 @@ void meravg(field_type field1, field_type *field2)
 }
 
 static
-void prevarsum_mer(const double *restrict array, const double *restrict w, int nx, int ny, int nmiss, 
-	       double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
+void prevarsum_merw(const double *restrict array, const double *restrict w, int nx, int ny, int nmiss, 
+                    double missval, double *restrict rsum, double *restrict rsumw, double *restrict rsumq, double *restrict rsumwq)
 { 
   *rsum   = 0;
   *rsumq  = 0;
@@ -297,7 +300,7 @@ void prevarsum_mer(const double *restrict array, const double *restrict w, int n
 }
 
 
-void mervar(field_type field1, field_type *field2)
+void mervarw(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -313,7 +316,7 @@ void mervar(field_type field1, field_type *field2)
 
   for ( int i = 0; i < nx; i++ )
     {
-      prevarsum_mer(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+      prevarsum_merw(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
       rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
       if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
@@ -327,7 +330,7 @@ void mervar(field_type field1, field_type *field2)
 }
 
 
-void mervar1(field_type field1, field_type *field2)
+void mervar1w(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -343,7 +346,7 @@ void mervar1(field_type field1, field_type *field2)
 
   for ( int i = 0; i < nx; i++ )
     {
-      prevarsum_mer(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+      prevarsum_merw(array+i, w+i, nx, ny, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
       rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
       if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
@@ -357,7 +360,7 @@ void mervar1(field_type field1, field_type *field2)
 }
 
 
-void merstd(field_type field1, field_type *field2)
+void merstdw(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -366,7 +369,7 @@ void merstd(field_type field1, field_type *field2)
 
   int nx = gridInqXsize(grid);
 
-  mervar(field1, field2);
+  mervarw(field1, field2);
 
   for ( int i = 0; i < nx; i++ )
     {
@@ -381,7 +384,7 @@ void merstd(field_type field1, field_type *field2)
 }
 
 
-void merstd1(field_type field1, field_type *field2)
+void merstd1w(field_type field1, field_type *field2)
 {
   int    rnmiss = 0;
   int    grid    = field1.grid;
@@ -390,7 +393,7 @@ void merstd1(field_type field1, field_type *field2)
 
   int nx = gridInqXsize(grid);
 
-  mervar1(field1, field2);
+  mervar1w(field1, field2);
 
   for ( int i = 0; i < nx; i++ )
     {

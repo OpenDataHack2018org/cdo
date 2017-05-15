@@ -101,7 +101,7 @@ double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
 }
 
 static
-double rl_to_rls(double phi, double rla, double polphi, double pollam)
+double lam_to_lamrot(double phi, double rla, double polphi, double pollam)
 {
   /*
     Umrechnung von rla (geo. System) auf rlas (rot. System)
@@ -131,7 +131,7 @@ double rl_to_rls(double phi, double rla, double polphi, double pollam)
 }
 
 static
-double ph_to_phs(double phi, double rla, double polphi, double pollam)
+double phi_to_phirot(double phi, double rla, double polphi, double pollam)
 {
   /*
     Umrechnung von phi (geo. System) auf phis (rot. System)
@@ -183,7 +183,7 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   if ( pollamd < 0.0 ) pollamd += 360.0;
 
   /* laenge im rotierten system berechnen */
-  double zrlas = rl_to_rls(phi, rla, polphi, pollam)*DEG2RAD;
+  double zrlas = lam_to_lamrot(phi, rla, polphi, pollam)*DEG2RAD;
 
   /* winkel zbeta berechen (schnittwinkel der breitenkreise) */
   double zarg = - sin(zpolphi)*sin(zrla-zpollam)*sin(zrlas) - cos(zrla-zpollam)*cos(zrlas);
@@ -194,7 +194,7 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   zbeta = sign(zbeta, -(rla - (pollamd-180.0)));
   */
   double zbeta = fabs(acos(zarg));
-  /*  if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta;*/
+  /* if ( -(rla - (pollamd-180.0)) < 0 ) zbeta = -zbeta; */
   if ( (-(rla - (pollamd-180.0)) < 0) && (-(rla - (pollamd-180.0)) >= -180) ) zbeta = -zbeta;
 
   /* us - wind transformieren */
@@ -204,12 +204,12 @@ void usvs_to_uv(double us, double vs, double phi, double rla,
   *v = us*sin(zbeta) + vs*cos(zbeta);
 }
 
-/*
+#ifdef TEST_GRID_ROT
 int main(void)
 {
-  double polphi, pollam;
   double x0, y0, x1, y1, x2, y2;
-  int i;
+  double polphi, pollam;
+  double angle = 0;
 
   polphi = 90.0;
   pollam = 0.0;
@@ -220,25 +220,25 @@ int main(void)
   x0 = -20.0;
   y0 = 0.0;
 
-  for ( i = 0; i < 10; i++ )
+  for ( int i = 0; i < 10; i++ )
     {
       x0 = i *20.0;
-      printf("%g %g\n", x0, y0);
+      printf("rot in: %g %g\n", x0, y0);
 
-      x1 = rls_to_rl(y0, x0, polphi, pollam);
-      y1 = phs_to_ph(y0, x0, polphi);
+      x1 = lamrot_to_lam(y0, x0, polphi, pollam, angle);
+      y1 = phirot_to_phi(y0, x0, polphi, angle);
+      printf("geo: %g %g\n", x1, y1);
 
-      printf("%g %g\n", x1, y1);
-
-      x2 = rl_to_rls(y1, x1, polphi, pollam);
-      y2 = ph_to_phs(y1, x1, polphi, pollam);
-
-      printf("%g %g\n", x2, y2);
+      x2 = lam_to_lamrot(y1, x1, polphi, pollam);
+      y2 = phi_to_phirot(y1, x1, polphi, pollam);
+      printf("rot out:%g %g\n", x2, y2);
     }
 
   usvs_to_uv(30.0, 20.0, 30.0, 0.0, polphi, pollam, &x1, &x2);
-  printf("usvs_to_uv %g %g %g %g\n", polphi, pollam, x1, x2);
+  printf("usvs_to_uv: %g %g %g %g\n", polphi, pollam, x1, x2);
+  printf("usvs_to_uv: 32.5 -170 26.3124 24.6507 <-- reference\n");
 
   return 0;
 }
-*/
+#endif
+

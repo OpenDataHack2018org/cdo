@@ -21,7 +21,6 @@
       Rhopot      rhopot          potential density
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"
