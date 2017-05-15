@@ -1,22 +1,10 @@
 { "hosts": {
-    "thunder": {
-      "hostname": "thunder5.zmaw.de",
-      "dir": "/scratch/mpi/CC/mh0287/users/m300064/builds/remote",
-      "envConfigFiles": ["/etc/profile",".profile"],
-      "CC": ["icpc", "icc", "clang", "clang++", "gcc", "g++"]
-    },
     "luthien": {
       "hostname": "localhost",
       "dir": "/home/ram/builds/cdo/auto",
       "CC": ["gcc","g++","clang","clang++"]
     },
-    "mpipc": {
-      "hostname": "mpipc150.mpi.zmaw.de",
-      "dir": "/scratch/local1/m300064/builds/remote",
-      "envConfigFiles": ["/etc/profile",".profile"],
-      "CC": ["gcc"]
-    },
-    "jessie-mpi": {
+    "breeze": {
       "hostname": "breeze.mpimet.mpg.de",
       "dir": "/home/mpim/m300064/builds/remote",
       "envConfigFiles": ["/etc/profile",".profile"],
@@ -41,7 +29,7 @@
       "CC": ["icc","pgcc","cray","gcc"]
     },
     "wanglung": {
-      "hostname": "wanglung.mpi.zmaw.de",
+      "hostname": "wanglung.mpimet.mpg.de",
       "dir": "/home/zmaw/m300064/builds/remote"
     },
     "ubuntu-32bit": {
@@ -67,8 +55,14 @@
       "makeCall": "make -j 12",
       "sync": false
     },
+    "localGCC": {
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --enable-hirlam-extensions --with-grib_api --with-netcdf --with-magics --with-udunits2 CFLAGS='-g -O3 -std=gnu99 -Wall -fopenmp -march=native' CPPFLAGS='-I/usr/include/magics' LDFLAGS='-leccodes'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
     "mpipcCLANG": {
-      "hostname": "mpipc",
+      "hostname": "breeze",
       "configureCall": "./configure --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static --disable-openmp CC=clang CFLAGS='-g -O2'",
       "makeCall": "make -j 12",
       "sync": true
@@ -79,10 +73,24 @@
       "makeCall": "make -j 12",
       "sync": true
     },
+    "pgi": {
+      "hostname": "mistral",
+      "configureCall": "./configure CC=pgcc CXX=pgc++ FC=pgfortran",
+      "envConfigFiles": ["/etc/profile",".profile"],
+      "makeCall": "make -j 12",
+      "sync": true
+    },
     "localGCC_static": {
       "doc": "local builder with default GCC - VPATH build - As-Static-As-Possible",
       "hostname": "luthien",
-      "configureCall": "/home/ram/src/cdo/configure --enable-openmp --enable-all-static --with-grib_api --with-netcdf --with-hdf5 --with-proj --with-udunits2 CC=gcc CFLAGS='-g -O2'",
+      "configureCall": "/home/ram/src/cdo/configure --enable-openmp --enable-all-static --with-netcdf --with-hdf5 --with-proj --with-udunits2 CC=gcc CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": false
+    },
+    "AUR":{
+      "doc": "local buildder for testing AUR-package",
+      "hostname": "luthien",
+      "configureCall": "/home/ram/src/cdo/configure --prefix=/usr --with-netcdf=/usr --with-udunits2=/usr --with-hdf5=/usr --with-szlib=/usr --with-proj=/usr --with-fftw3 --with-curl=/usr --with-grib_api=/usr --with-magics=/usr --with-libxml2=/usr CFLAGS='-g -O3 -std=gnu99 -Wall -fopenmp -march=native'  LIBS='-lhdf5 -ljasper -lpng -lopenjpeg' CPPFLAGS='-I/usr/include/magics -I/usr/include/libxml2' LIBS='-leccodes -lhdf5'",
       "makeCall": "make -j 12",
       "sync": false
     },
@@ -107,6 +115,12 @@
     "macOSG++": {
       "hostname": "wanglung",
       "configureCall": "./configure --enable-cxx CC=gcc  CXX=g++ CFLAGS='-g -O2'",
+      "makeCall": "make -j 12",
+      "sync": true
+    },
+    "mistralHilram": {
+      "hostname": "mistral",
+      "configureCall": "./configure --enable-hirlam-extensions --with-grib_api=/sw/rhel6-x64/grib_api/grib_api-1.13.0-gcc48  --with-netcdf=/sw/rhel6-x64/netcdf/netcdf_c-4.3.2-gcc48 --with-hdf5=/sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-gcc48 --with-szlib=/sw/rhel6-x64/sys/libaec-0.3.2-gcc48 --with-udunits2=/sw/rhel6-x64/util/udunits-2.2.17-gcc48 --with-proj=/sw/rhel6-x64/graphics/proj4-4.9.1-gcc48 CC=gcc  CXX=g++ CFLAGS='-g -fopenmp -O2'",
       "makeCall": "make -j 12",
       "sync": true
     },
