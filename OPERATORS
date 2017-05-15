@@ -550,6 +550,13 @@ Operator catalog:
    Strbre        strbre          Strong breeze days index per time period
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
+-------------------------------------------------------------
+   CMOR
+-------------------------------------------------------------
+   CMOR          cmor            Climate Model Output Rewriting
+-------------------------------------------------------------
+   Miscellaneous
+-------------------------------------------------------------
    CMORlite      cmorlite        CMOR lite
 -------------------------------------------------------------
    Magics
