@@ -581,7 +581,7 @@ static modules_t Modules[] =
   { Change,         ChangeHelp,        ChangeOperators,        1,   CDI_REAL,  1,  1 },
   { Change_e5slm,   NULL,              Change_e5slmOperators,  0,   CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    1,   CDI_REAL,  1,  1 },
-  { CMOR,           NULL,              CMOROperators,          1,   CDI_REAL,  1,  0 },
+  { CMOR,           CMORHelp,          CMOROperators,          1,   CDI_REAL,  1,  0 },
   { CMOR_lite,      CMORliteHelp,      CMORliteOperators,      1,   CDI_REAL,  1,  1 },
   { CMOR_table,     NULL,              CMORtableOperators,     1,   CDI_REAL,  0,  0 },
   { Collgrid,       CollgridHelp,      CollgridOperators,      1,   CDI_REAL, -1,  1 },
