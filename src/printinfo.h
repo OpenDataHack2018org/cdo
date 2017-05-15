@@ -298,6 +298,7 @@ void printGridInfoKernel(int gridID, int index, bool lproj)
   if ( gridtype == GRID_LONLAT     ||
        gridtype == GRID_PROJECTION ||
        gridtype == GRID_GENERIC    ||
+       gridtype == GRID_CHARXY    ||
        gridtype == GRID_GAUSSIAN   ||
        gridtype == GRID_GAUSSIAN_REDUCED )
     {

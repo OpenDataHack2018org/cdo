@@ -153,6 +153,30 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
   int ysize    = gridInqYsize(gridID);
   int nvertex  = gridInqNvertex(gridID);
   int prec     = gridInqPrec(gridID);
+  int xstrlen  = gridInqXIsc(gridID);
+  int ystrlen  = gridInqYIsc(gridID);
+
+  char **xcvals = NULL;
+  if ( xstrlen )
+    {
+      xcvals = (char **) Malloc(xsize * sizeof(char *));
+      for ( int i = 0; i < xsize; i++ ) xcvals[i] = Malloc((xstrlen+1) * sizeof(char));
+      gridInqXCvals(gridID, xcvals);
+      for ( int i = 0; i < xsize; i++ ) xcvals[i][xstrlen] = 0;
+      for ( int i = 0; i < xsize; i++ ) 
+        for ( int k = xstrlen-1; k; k-- ) if ( xcvals[i][k] == ' ' ) xcvals[i][k] = 0; else break;
+    }
+
+  char **ycvals = NULL;
+  if ( ystrlen )
+    {
+      ycvals = (char **) Malloc(ysize * sizeof(char *));
+      for ( int i = 0; i < ysize; i++ ) ycvals[i] = Malloc((ystrlen+1) * sizeof(char));
+      gridInqYCvals(gridID, ycvals);
+      for ( int i = 0; i < ysize; i++ ) ycvals[i][ystrlen] = 0;
+      for ( int i = 0; i < ysize; i++ ) 
+        for ( int k = ystrlen-1; k; k-- ) if ( ycvals[i][k] == ' ' ) ycvals[i][k] = 0; else break;
+    }
 
   int dig = (prec == CDI_DATATYPE_FLT64) ? CDO_dbl_digits : CDO_flt_digits;
 
@@ -166,7 +190,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
           if ( ysize > 0 ) fprintf(fp, "ysize     = %d\n", ysize);
         }
 
-      if ( nxvals > 0 )
+      if ( nxvals > 0 || xcvals )
         {
           attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XNAME, CDI_MAX_NAME, attstr);
           if ( attstr[0] )  fprintf(fp, "xname     = %s\n", attstr);
@@ -178,7 +202,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
           if ( attstr[0] )  fprintf(fp, "xunits    = \"%s\"\n", attstr);
         }
 
-      if ( nyvals > 0 )
+      if ( nyvals > 0 || ycvals )
         {
           attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_YNAME, CDI_MAX_NAME, attstr);
           if ( attstr[0] )  fprintf(fp, "yname     = %s\n", attstr);
@@ -207,6 +231,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
     case GRID_PROJECTION:
     case GRID_CURVILINEAR:
     case GRID_UNSTRUCTURED:
+    case GRID_CHARXY:
       {
         if ( type == GRID_GAUSSIAN || type == GRID_GAUSSIAN_REDUCED ) fprintf(fp, "np        = %d\n", gridInqNP(gridID));
 
@@ -280,6 +305,21 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
             Free(xbounds);
 	  }
 
+        if ( xcvals )
+          {
+            attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_XNAME, CDI_MAX_NAME, attstr);
+            if ( attstr[0] )
+              fprintf(fp, "x%ss  = \"%.*s\"", attstr, xstrlen, xcvals[0]);
+            else
+              fprintf(fp, "xstrings  = \"%.*s\"", xstrlen, xcvals[0]);
+            for ( int i = 1; i < xsize; i++ )
+              fprintf(fp, ", \"%.*s\"", xstrlen, xcvals[i]);
+            fprintf(fp, "\n");
+
+            for ( int i = 0; i < xsize; i++ ) Free(xcvals[i]);
+            Free(xcvals);
+          }
+
 	if ( nyvals > 0 )
 	  {
 	    double yfirst = 0.0, yinc = 0.0;
@@ -314,6 +354,21 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
             printBounds(fp, dig, prefix, sizeof(prefix)-1, ydim, nvertex, ybounds);
             Free(ybounds);
 	  }
+
+        if ( ycvals )
+          {
+            attstr[0] = 0; cdiGridInqKeyStr(gridID, CDI_KEY_YNAME, CDI_MAX_NAME, attstr);
+            if ( attstr[0] )
+              fprintf(fp, "x%ss  = \"%.*s\"", attstr, ystrlen, ycvals[0]);
+            else
+              fprintf(fp, "ystrings  = \"%.*s\"", ystrlen, ycvals[0]);
+            for ( int i = 1; i < ysize; i++ )
+              fprintf(fp, ", \"%.*s\"", ystrlen, ycvals[i]);
+            fprintf(fp, "\n");
+
+            for ( int i = 0; i < ysize; i++ ) Free(ycvals[i]);
+            Free(ycvals);
+          }
 
 	if ( gridHasArea(gridID) )
 	  {
