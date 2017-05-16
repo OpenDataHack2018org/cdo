@@ -70,75 +70,28 @@ char *getElementName(char *pline, char *name)
 }
 
 static
-char *getElementValues(char *pline, char **values, int *nvalues)
+char *getElementValue(char *pline)
 {
-  char *restline;
   while ( isspace((int) *pline) ) pline++;
   size_t len = strlen(pline);
-
   if ( *pline != '"' && *pline != '\'' )
     for ( size_t i = 1; i < len; ++i )
       if ( pline[i] == '!' ) { pline[i] = 0; len = i; break; }
   while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--; }
 
-  *nvalues = 0;
-  int i = 0;
-  while ( i < len && len )
-    {
-      if ( *(pline+i) == ',')
-        {
-          char *value;
-          value = pline;
-          *(value+i) = 0;
-          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
-          strncpy(values[*nvalues], value, strlen(value)+1);
-          i++; (*nvalues)++;
-          pline+=i;
-        }
-      else if ( *(pline+i) == '"' )
-        {
-          i++;
-          pline++;
-          while ( *(pline+i) != '"' )
-            {
-              i++;
-              if ( *(pline+i) == 0 )
-                cdoAbort("Found a start quote sign for a value but no end quote sign.\n");
-            }
-          i++;
-        }
-      else if ( isspace((int) *(pline+i)) )
-        {
-          char *value;
-          value = pline;
-          if ( *(value+i-1) == '"' )
-            *(value+i-1) = 0;
-          else
-            *(value+i) = 0;
-          values[*nvalues] = malloc((strlen(value) + 1) * sizeof(values[*nvalues]));
-          strncpy(values[*nvalues], value, strlen(value)+1);
-          i++; (*nvalues)++;
-          pline+=i;
-          break;          
-        }
-      else if ( *(pline+i) == '=' || *(pline+i) == ':' )
-        cdoAbort("Found unexpected separator sign in value: '%c'.", *(pline+i) );
-      else
-        i++;
-    }
   return pline;
 }
 
 
-void cmortablebuf_to_pmlist(list_t *pml, size_t buffersize, char *buffer)
+void cmortablebuf_to_pmlist(list_t *pmlist, size_t buffersize, char *buffer)
 {
   char line[4096];
   char name[256];
   char *pline;
-  char *listkeys[] = {"axis_entry:", "variable_entry:", "&parameter"};
+  const char *listentry[] = {"axis_entry", "variable_entry"};
+  int nentry = sizeof(listentry)/sizeof(listentry[0]);
   int linenumber = 0;
-  int listtype = 0;
-  list_t *kvl = NULL;
+  list_t *kvlist = NULL;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
     {
@@ -147,36 +100,36 @@ void cmortablebuf_to_pmlist(list_t *pml, size_t buffersize, char *buffer)
       while ( isspace((int) *pline) ) pline++;
       if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
       //  len = (int) strlen(pline);
-      if ( listtype == 0 && *pline == '&' ) listtype = 1;
-/* MAXNVALUES*/
-      int nvalues;
 
-      int i = 0;
-      while ( listkeys[i] )
-        {
-          if ( strncmp(pline, listkeys[i], strlen(listkeys[i])) == 0 )
-            {
-	      pline += strlen(listkeys[i]);
- 	      listtype = 2;
-              kvl = list_new(sizeof(keyValues_t *), free_keyval, listkeys[i]);
-              list_append(pml, &kvl);
-              break;
-	    }
-          i++;
-        }
-      if ( listtype == 0 )
-        cdoAbort("No valid list key.\n");
+      int ientry = -1;
+      for ( ientry = 0; ientry < nentry; ++ientry )
+        if ( strncmp(pline, listentry[ientry], strlen(listentry[ientry])) == 0 ) break;
+      
+      if ( ientry < nentry )
+	{
+	  pline += strlen(listentry[ientry]);
 
-      while ( *pline != 0 )
-        {
-          char **values = malloc( 5 * sizeof(char *) );
-          pline = getElementName(pline, name);
+          kvlist = kvlist_new(listentry[ientry]);
+          list_append(pmlist, &kvlist);
+
 	  pline = skipSeparator(pline);
-	  pline = getElementValues(pline, values, &nvalues);
-          kvlist_append(kvl, name, (const char **)values, nvalues);
-          if ( *pline == '/' )
-            *pline = 0;
-          free(values);         
+	  pline = getElementValue(pline);
+
+	  if ( *pline ) kvlist_append(kvlist, "name", (const char **)&pline, 1);
+	}
+      else
+	{
+	  pline = getElementName(pline, name);
+	  pline = skipSeparator(pline);
+	  pline = getElementValue(pline);
+
+	  if ( kvlist == NULL )
+            {
+              kvlist = kvlist_new("Header");
+              list_append(pmlist, &kvlist);
+            }
+
+	  if ( *pline ) kvlist_append(kvlist, name, (const char **)&pline, 1);
 	}
     }
 }
