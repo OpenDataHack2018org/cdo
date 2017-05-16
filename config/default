@@ -46,15 +46,18 @@ case "${HOSTNAME}" in
         if  test "$COMP" = intel ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXXFLAGS=$CFLAGS
+	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
+	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CC=clang CXX=clang++ CFLAGS="-g -Wall -O3" CXXFLAGS=$CFLAGS
+	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
+	            CC=clang    CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CC=gcc CXX=g++ CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" CXXFLAGS=$CFLAGS
+	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" \
+                    CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native"
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
         else
