@@ -44,7 +44,7 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
   attstr[0] = 0; cdiZaxisInqKeyStr(zaxisID, CDI_KEY_UNITS, CDI_MAX_NAME, attstr);
   if ( attstr[0] )  fprintf(fp, "units     = \"%s\"\n", attstr);
 
-  double *vals = (double*) Malloc(nvals*sizeof(double));
+  double *vals = nvals ? (double*) Malloc(nvals*sizeof(double)) : NULL;
 
   if ( nvals )
     {                
@@ -68,7 +68,7 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
       }
     }
 
-  Free(vals);
+  if ( vals ) Free(vals);
 
   if ( type == ZAXIS_HYBRID || type == ZAXIS_HYBRID_HALF )
     {
