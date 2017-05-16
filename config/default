@@ -83,35 +83,27 @@ case "${HOSTNAME}" in
                  --with-libxml2=/opt/local \
                  --with-proj=/opt/local"
 
-        if  test "$COMP" = icpc ; then
-	  ${CONFPATH}configure --enable-cxx --prefix=$HOME/local \
+        if  test "$COMP" = intel ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
                     $CDOLIBS \
-	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXX=icpc
-        elif  test "$COMP" = icc ; then
+	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
+	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
+        elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
-        elif  test "$COMP" = clang++ ; then
-	  ${CONFPATH}configure --enable-cxx \
-                    $CDOLIBS \
-	            CC=clang CXX=clang++ CFLAGS="-g -Wall -O3"
-        elif  test "$COMP" = clang ; then
+	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
+	            CC=clang    CFLAGS="-g -Wall -O3"
+        elif  test "$COMP" = pgi ; then
 	  ${CONFPATH}configure  \
                     $CDOLIBS \
-	            CC=clang CFLAGS="-g -Wall -Wwrite-strings -Ofast -march=native"
-        elif  test "$COMP" = pgcc ; then
-	  ${CONFPATH}configure  \
-                    $CDOLIBS \
-	            CC=pgcc CFLAGS="-g -fast"
-        elif  test "$COMP" = g++ ; then
-	  ${CONFPATH}configure --enable-cxx \
-                    $CDOLIBS \
-	            CC=gcc CXX=g++ CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3"
+	            CXX=pgc++ CXXFLAGS="-g -fast" \
+	            CC=pgcc   CFLAGS="-g -fast"
         else
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CC=gcc CFLAGS="-g -std=c11 -pipe -Wall -Wpointer-arith -Wwrite-strings -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector -funsigned-char"
+	            CXX=g++ CXXFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector" \
+	            CC=gcc  CFLAGS="-g -pipe -Wall -W -Wfloat-equal -pedantic -O3 -march=native -Wa,-q -fstack-protector"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
         fi
