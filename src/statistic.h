@@ -32,7 +32,7 @@ double beta_distr_inv (double a, double b, double p, const char *prompt);
 void beta_distr_constants (double a, double b, double p, double *c1, double *c2, const char *prompt);
 double fisher (double m, double n, double x, const char *prompt);
 
-// make heap sort accessible for eigen value computation in EOFs.c
+// make heap sort accessible for eigen value computation in EOFs.cc
 void heap_sort (double *eig_val, double **a, int n);
 
 // make parallel eigen solution accessible for eigen value computation in EOF3d.c

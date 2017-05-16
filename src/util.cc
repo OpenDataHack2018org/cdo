@@ -50,12 +50,12 @@
 
 /* refactor: moved here from *.c */
 
-int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.c
-const char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.c
-int CDO_optind = 1;      // refactor: moved here from cdo_getopt.c
+int CDO_opterr = 0;      // refactor: moved here from cdo_getopt.cc
+const char *CDO_optarg = NULL; // refactor: moved here from cdo_getopt.cc
+int CDO_optind = 1;      // refactor: moved here from cdo_getopt.cc
 
 
-/* refactor: moved here from cdo.c */
+/* refactor: moved here from cdo.cc */
 
 char *Progname;
 const char *CDO_Version = "Climate Data Operators version " VERSION" (http://mpimet.mpg.de/cdo)";
@@ -72,7 +72,7 @@ int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultByteorder  = CDI_UNDEFID;
 int cdoDefaultTableID    = CDI_UNDEFID;
-int cdoDefaultInstID     = CDI_UNDEFID;     // moved here from institution.c, was UNDEFID
+int cdoDefaultInstID     = CDI_UNDEFID;     // moved here from institution.cc, was UNDEFID
 int cdoDefaultTimeType   = CDI_UNDEFID;
 
 int cdoLockIO            = FALSE;

@@ -380,7 +380,7 @@ void interp_Z(const double *restrict geop, const double *restrict gz, double *pz
 
 
 /*
- * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.c)
+ * 3d vertical interpolation routine (see vert_interp_lev() in src/Intlevel.cc)
  */
 void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *vardata2,
 		       int nlev2, int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
@@ -451,7 +451,7 @@ void vert_interp_lev3d(int gridsize, double missval, double *vardata1, double *v
  * wrt. the given gridsize. They can directly be used to read values from 3d
  * data fields.
  *
- * 3d version of vert_gen_weights() (src/Intlevel.c)
+ * 3d version of vert_gen_weights() (src/Intlevel.cc)
  */
 void vert_gen_weights3d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
@@ -543,7 +543,7 @@ void vert_gen_weights3d(bool expol, int nlev1, int gridsize, double *lev1, int n
  * wrt. the given gridsize. They can directly be used to read values from 3d
  * data fields.
  *
- * 3d1d version of vert_gen_weights() (src/Intlevel.c)
+ * 3d1d version of vert_gen_weights() (src/Intlevel.cc)
  */
 void vert_gen_weights3d1d(bool expol, int nlev1, int gridsize, double *lev1, int nlev2, double *lev2,
 			  int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
