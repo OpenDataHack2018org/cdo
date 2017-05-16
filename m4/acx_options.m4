@@ -17,6 +17,7 @@ AS_CASE([$with_threads],
                            ENABLE_THREADS=yes],[AC_MSG_ERROR([multithreaded settings NOT found])])
                LIBS="$PTHREAD_LIBS $LIBS"
                CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+               CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
                CC="$PTHREAD_CC"
                AS_ECHO(["CC:$CC CFLAGS:$CFLAGS LIBS:$LIBS"])],
         [*],[THREADS_ROOT=$with_threads

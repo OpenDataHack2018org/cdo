@@ -82,18 +82,32 @@ AC_CHECK_FUNCS(gethostname)
 
 # Check compiler version
 case "$CC" in
-  pgcc*)  COMP_VERSION=`$CC -V | head -2 | tail -n 1`;;
-  *gcc*)  COMP_VERSION=`$CC --version | head -n 1`;;
-  g++*)   COMP_VERSION=`$CC --version | head -n 1`;;
-  clang*) COMP_VERSION=`$CC --version | head -n 1`;;
-  icc*)   COMP_VERSION=`$CC --version | head -n 1`;;
-  sxc*)   COMP_VERSION=`$CC -V 2>&1   | tail -n 1`;;
-  xlc*)   COMP_VERSION=`$CC -qversion 2>&1   | head -n 1`;;
-  *)      COMP_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
+  pgcc*)  CXX_VERSION=`$CXX -V | head -2 | tail -n 1`;;
+  *gcc*)  CXX_VERSION=`$CXX --version | head -n 1`;;
+  g++*)   CXX_VERSION=`$CXX --version | head -n 1`;;
+  clang*) CXX_VERSION=`$CXX --version | head -n 1`;;
+  icpc*)   CXX_VERSION=`$CXX --version | head -n 1`;;
+  sxc*)   CXX_VERSION=`$CXX -V 2>&1   | tail -n 1`;;
+  xlc*)   CXX_VERSION=`$CXX -qversion 2>&1   | head -n 1`;;
+  *)      CXX_VERSION=`$CXX -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 
-if test -z "$COMP_VERSION" ; then COMP_VERSION="unknown"; fi;
-AC_DEFINE_UNQUOTED(COMP_VERSION, ["$COMP_VERSION"], [Compiler version])
+case "$CC" in
+  pgcc*)  C_VERSION=`$CC -V | head -2 | tail -n 1`;;
+  *gcc*)  C_VERSION=`$CC --version | head -n 1`;;
+  g++*)   C_VERSION=`$CC --version | head -n 1`;;
+  clang*) C_VERSION=`$CC --version | head -n 1`;;
+  icc*)   C_VERSION=`$CC --version | head -n 1`;;
+  sxc*)   C_VERSION=`$CC -V 2>&1   | tail -n 1`;;
+  xlc*)   C_VERSION=`$CC -qversion 2>&1   | head -n 1`;;
+  *)      C_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
+esac
+
+if test -z "$CXX_VERSION" ; then CXX_VERSION="unknown"; fi;
+AC_DEFINE_UNQUOTED(CXX_VERSION, ["$CXX_VERSION"], [CXX Compiler version])
+
+if test -z "$C_VERSION" ; then C_VERSION="unknown"; fi;
+AC_DEFINE_UNQUOTED(C_VERSION, ["$C_VERSION"], [C Compiler version])
 
 # Checks for username, hostname and system type
 USERNAME=$LOGNAME
@@ -144,6 +158,7 @@ AC_MSG_RESULT([$enable_data])
 AC_SUBST([ENABLE_DATA],[$enable_data])
 #  ----------------------------------------------------------------------
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
+CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
 #  ----------------------------------------------------------------------
 
 # Add configure options
@@ -244,8 +259,10 @@ AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([AR])
 
 # Checks for compiler
-COMPILER="$CC $CFLAGS"
-AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
+C_COMPILER="$CC $CFLAGS"
+AC_DEFINE_UNQUOTED(C_COMPILER, ["$C_COMPILER"], [C Compiler])
+CXX_COMPILER="$CXX $CXXFLAGS"
+AC_DEFINE_UNQUOTED(CXX_COMPILER, ["$CXX_COMPILER"], [CXX Compiler])
 
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_PROG_AWK

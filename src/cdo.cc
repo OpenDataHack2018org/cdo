@@ -194,11 +194,17 @@ void cdo_version(void)
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
   fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
-#if defined(COMPILER)
-  fprintf(stderr, "Compiler: %s\n", COMPILER);
+#if defined(CXX_COMPILER)
+  fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);
 #endif
-#if defined(COMP_VERSION)
-  fprintf(stderr, " version: %s\n", COMP_VERSION);
+#if defined(CXX_VERSION)
+  fprintf(stderr, "CXX version : %s\n", CXX_VERSION);
+#endif
+#if defined(C_COMPILER)
+  fprintf(stderr, "C Compiler: %s\n", C_COMPILER);
+#endif
+#if defined(C_VERSION)
+  fprintf(stderr, "C version : %s\n", C_VERSION);
 #endif
 
   printFeatures();

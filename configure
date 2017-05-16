@@ -17687,20 +17687,38 @@ done
 
 # Check compiler version
 case "$CC" in
-  pgcc*)  COMP_VERSION=`$CC -V | head -2 | tail -n 1`;;
-  *gcc*)  COMP_VERSION=`$CC --version | head -n 1`;;
-  g++*)   COMP_VERSION=`$CC --version | head -n 1`;;
-  clang*) COMP_VERSION=`$CC --version | head -n 1`;;
-  icc*)   COMP_VERSION=`$CC --version | head -n 1`;;
-  sxc*)   COMP_VERSION=`$CC -V 2>&1   | tail -n 1`;;
-  xlc*)   COMP_VERSION=`$CC -qversion 2>&1   | head -n 1`;;
-  *)      COMP_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
+  pgcc*)  CXX_VERSION=`$CXX -V | head -2 | tail -n 1`;;
+  *gcc*)  CXX_VERSION=`$CXX --version | head -n 1`;;
+  g++*)   CXX_VERSION=`$CXX --version | head -n 1`;;
+  clang*) CXX_VERSION=`$CXX --version | head -n 1`;;
+  icpc*)   CXX_VERSION=`$CXX --version | head -n 1`;;
+  sxc*)   CXX_VERSION=`$CXX -V 2>&1   | tail -n 1`;;
+  xlc*)   CXX_VERSION=`$CXX -qversion 2>&1   | head -n 1`;;
+  *)      CXX_VERSION=`$CXX -V 2>&1   | head -n 1 | grep -v error`;;
 esac
 
-if test -z "$COMP_VERSION" ; then COMP_VERSION="unknown"; fi;
+case "$CC" in
+  pgcc*)  C_VERSION=`$CC -V | head -2 | tail -n 1`;;
+  *gcc*)  C_VERSION=`$CC --version | head -n 1`;;
+  g++*)   C_VERSION=`$CC --version | head -n 1`;;
+  clang*) C_VERSION=`$CC --version | head -n 1`;;
+  icc*)   C_VERSION=`$CC --version | head -n 1`;;
+  sxc*)   C_VERSION=`$CC -V 2>&1   | tail -n 1`;;
+  xlc*)   C_VERSION=`$CC -qversion 2>&1   | head -n 1`;;
+  *)      C_VERSION=`$CC -V 2>&1   | head -n 1 | grep -v error`;;
+esac
+
+if test -z "$CXX_VERSION" ; then CXX_VERSION="unknown"; fi;
 
 cat >>confdefs.h <<_ACEOF
-#define COMP_VERSION "$COMP_VERSION"
+#define CXX_VERSION "$CXX_VERSION"
+_ACEOF
+
+
+if test -z "$C_VERSION" ; then C_VERSION="unknown"; fi;
+
+cat >>confdefs.h <<_ACEOF
+#define C_VERSION "$C_VERSION"
 _ACEOF
 
 
@@ -17879,6 +17897,7 @@ ENABLE_DATA=$enable_data
 
 #  ----------------------------------------------------------------------
 CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
+CXXFLAGS="$CXXFLAGS ${OPENMP_CFLAGS}"
 #  ----------------------------------------------------------------------
 
 # Add configure options
@@ -18350,6 +18369,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
                LIBS="$PTHREAD_LIBS $LIBS"
                CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+               CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
                CC="$PTHREAD_CC"
                $as_echo "CC:$CC CFLAGS:$CFLAGS LIBS:$LIBS" ;; #(
   *) :
@@ -21150,10 +21170,16 @@ ENABLE_CXX=$enable_cxx
 
 
 # Checks for compiler
-COMPILER="$CC $CFLAGS"
+C_COMPILER="$CC $CFLAGS"
 
 cat >>confdefs.h <<_ACEOF
-#define COMPILER "$COMPILER"
+#define C_COMPILER "$C_COMPILER"
+_ACEOF
+
+CXX_COMPILER="$CXX $CXXFLAGS"
+
+cat >>confdefs.h <<_ACEOF
+#define CXX_COMPILER "$CXX_COMPILER"
 _ACEOF
 
 

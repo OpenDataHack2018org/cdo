@@ -3,11 +3,17 @@
 /* CDO version */
 #undef CDO
 
-/* Compiler */
-#undef COMPILER
+/* CXX Compiler */
+#undef CXX_COMPILER
 
-/* Compiler version */
-#undef COMP_VERSION
+/* CXX Compiler version */
+#undef CXX_VERSION
+
+/* C Compiler */
+#undef C_COMPILER
+
+/* C Compiler version */
+#undef C_VERSION
 
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA

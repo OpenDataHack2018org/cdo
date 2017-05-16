@@ -24,7 +24,7 @@ do
   shift
 done
 #
-if test -z "$COMP" ; then COMP=gcc ; fi
+if test -z "$COMP" ; then COMP=gnu ; fi
 #
 set -x
 #
@@ -43,31 +43,18 @@ case "${HOSTNAME}" in
                  --with-proj=/opt/local \
                  --with-szlib=$HOME/local/libaec-0.3.2"
 
-        if  test "$COMP" = icpc ; then
-	  ${CONFPATH}configure --enable-cxx \
+        if  test "$COMP" = intel ; then
+	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CC=icc CXX="icpc --std=c++11" CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
-        elif  test "$COMP" = icc ; then
-	  ${CONFPATH}configure  \
-                    $CDOLIBS \
-	            CC=icc CFLAGS="-g -Wall -Wwrite-strings -O2 -qopt-report=5 -march=native"
-        elif  test "$COMP" = clang++ ; then
-	  ${CONFPATH}configure --enable-cxx \
-                    $CDOLIBS \
-	            CC=clang CXX="clang++ --std=c++11" CFLAGS="-g -Wall -O3"
+	            CC=icc CXX=icpc CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" CXXFLAGS=$CFLAGS
         elif  test "$COMP" = clang ; then
-	  ${CONFPATH}configure  \
+	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CC=clang CFLAGS="-g -Wall -Wwrite-strings -O3"
-        elif  test "$COMP" = g++ ; then
-	  ${CONFPATH}configure --enable-cxx \
+	            CC=clang CXX=clang++ CFLAGS="-g -Wall -O3" CXXFLAGS=$CFLAGS
+        elif  test "$COMP" = gnu ; then
+	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CC=gcc CXX="g++ --std=c++11" CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
-        elif  test "$COMP" = gcc ; then
-	  ${CONFPATH}configure --prefix=$HOME/local \
-                    --enable-maintainer-mode \
-                    $CDOLIBS \
-	            CC=gcc CFLAGS="-g -pipe -Wall -W -Wfloat-equal -Wwrite-strings -pedantic -O3 -march=native -fstack-protector"
+	            CC=gcc CXX=g++ CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" CXXFLAGS=$CFLAGS
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
         else
