@@ -216,7 +216,9 @@ static
 void apply_cmorlist(list_t *pmlist, int nvars, int vlistID2, var_t *vars)
 {
   const char *hentry[] = {"Header"};
-  const char *ventry[] = {"variable_entry", "parameter"};
+
+  const char *ventry[] = {"variable_entry", "&parameter"};
+
   int nventry = (int) sizeof(ventry)/sizeof(ventry[0]);
   int nhentry = (int) sizeof(hentry)/sizeof(hentry[0]);
   char varname[CDI_MAX_NAME];
