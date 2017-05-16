@@ -160,7 +160,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
   if ( xstrlen )
     {
       xcvals = (char **) Malloc(xsize * sizeof(char *));
-      for ( int i = 0; i < xsize; i++ ) xcvals[i] = Malloc((xstrlen+1) * sizeof(char));
+      for ( int i = 0; i < xsize; i++ ) xcvals[i] = (char*) Malloc((xstrlen+1) * sizeof(char));
       gridInqXCvals(gridID, xcvals);
       for ( int i = 0; i < xsize; i++ ) xcvals[i][xstrlen] = 0;
       for ( int i = 0; i < xsize; i++ ) 
@@ -171,7 +171,7 @@ void grid_print_kernel(int gridID, int opt, FILE *fp)
   if ( ystrlen )
     {
       ycvals = (char **) Malloc(ysize * sizeof(char *));
-      for ( int i = 0; i < ysize; i++ ) ycvals[i] = Malloc((ystrlen+1) * sizeof(char));
+      for ( int i = 0; i < ysize; i++ ) ycvals[i] = (char*) Malloc((ystrlen+1) * sizeof(char));
       gridInqYCvals(gridID, ycvals);
       for ( int i = 0; i < ysize; i++ ) ycvals[i][ystrlen] = 0;
       for ( int i = 0; i < ysize; i++ ) 
