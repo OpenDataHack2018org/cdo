@@ -81,12 +81,12 @@ AC_CHECK_FUNCS(getrlimit)
 AC_CHECK_FUNCS(gethostname)
 
 # Check compiler version
-case "$CC" in
+case "$CXX" in
   pgcc*)  CXX_VERSION=`$CXX -V | head -2 | tail -n 1`;;
   *gcc*)  CXX_VERSION=`$CXX --version | head -n 1`;;
   g++*)   CXX_VERSION=`$CXX --version | head -n 1`;;
   clang*) CXX_VERSION=`$CXX --version | head -n 1`;;
-  icpc*)   CXX_VERSION=`$CXX --version | head -n 1`;;
+  icpc*)  CXX_VERSION=`$CXX --version | head -n 1`;;
   sxc*)   CXX_VERSION=`$CXX -V 2>&1   | tail -n 1`;;
   xlc*)   CXX_VERSION=`$CXX -qversion 2>&1   | head -n 1`;;
   *)      CXX_VERSION=`$CXX -V 2>&1   | head -n 1 | grep -v error`;;
