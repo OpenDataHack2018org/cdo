@@ -84,7 +84,7 @@ case "${HOSTNAME}" in
                  --with-proj=/opt/local"
 
         if  test "$COMP" = intel ; then
-	  ${CONFPATH}configure --prefix=$HOME/local \
+	  ${CONFPATH}configure --prefix=$HOME/local --disable-openmp \
                     $CDOLIBS \
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
@@ -94,7 +94,7 @@ case "${HOSTNAME}" in
 	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
 	            CC=clang    CFLAGS="-g -Wall -O3"
         elif  test "$COMP" = pgi ; then
-	  ${CONFPATH}configure  \
+	  ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \
 	            CXX=pgc++ CXXFLAGS="-g -fast" \
 	            CC=pgcc   CFLAGS="-g -fast"
