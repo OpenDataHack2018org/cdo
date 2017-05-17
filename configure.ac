@@ -82,7 +82,7 @@ AC_CHECK_FUNCS(gethostname)
 
 # Check compiler version
 case "$CXX" in
-  pgcc*)  CXX_VERSION=`$CXX -V | head -2 | tail -n 1`;;
+  pgc*)   CXX_VERSION=`$CXX -V | head -2 | tail -n 1`;;
   *gcc*)  CXX_VERSION=`$CXX --version | head -n 1`;;
   g++*)   CXX_VERSION=`$CXX --version | head -n 1`;;
   clang*) CXX_VERSION=`$CXX --version | head -n 1`;;
@@ -93,7 +93,7 @@ case "$CXX" in
 esac
 
 case "$CC" in
-  pgcc*)  C_VERSION=`$CC -V | head -2 | tail -n 1`;;
+  pgc*)   C_VERSION=`$CC -V | head -2 | tail -n 1`;;
   *gcc*)  C_VERSION=`$CC --version | head -n 1`;;
   g++*)   C_VERSION=`$CC --version | head -n 1`;;
   clang*) C_VERSION=`$CC --version | head -n 1`;;
