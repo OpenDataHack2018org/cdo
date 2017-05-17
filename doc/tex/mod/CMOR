@@ -27,6 +27,8 @@ Global attributes must be collected in info files and can be specified via keywo
 @var{info}. All required and optional global attributes as well as information
 about table file formats are given in the 'cdo cmor manual'.
 
+If questions remain, do not hesitate to ask and send an email to wachsmannATdkrz.de.
+
 @EndDescription
 @EndModule
 
