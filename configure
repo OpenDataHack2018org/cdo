@@ -621,7 +621,6 @@ AM_CPPFLAGS
 CLIBS
 CLDFLAGS
 FCFLAGS
-ENABLE_CXX
 BUILD_AVX2_TESTS_FALSE
 BUILD_AVX2_TESTS_TRUE
 BUILD_AVX_TESTS_FALSE
@@ -843,7 +842,6 @@ with_libxml2
 enable_cdi_lib
 enable_all_static
 enable_hirlam_extensions
-enable_cxx
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1506,7 +1504,6 @@ Optional Features:
                           [default=no]
   --enable-hirlam-extensions
                           HIRLAM extensions [default=no]
-  --enable-cxx            Use CXX as default compiler [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -22127,23 +22124,6 @@ else
   BUILD_AVX2_TESTS_FALSE=
 fi
 
-
-# Check whether --enable-cxx was given.
-if test "${enable_cxx+set}" = set; then :
-  enableval=$enable_cxx; if test "x$enable_cxx" != 'xno'; then :
-  CC=$CXX
-                      CXXFLAGS=$CFLAGS
-                      enable_cxx=yes
-else
-  enable_cxx=no
-fi
-else
-  enable_cxx=no
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_cxx" >&5
-$as_echo "$enable_cxx" >&6; }
-ENABLE_CXX=$enable_cxx
 
 #  ----------------------------------------------------------------------
 
