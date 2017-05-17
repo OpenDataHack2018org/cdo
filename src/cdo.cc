@@ -930,6 +930,9 @@ void print_system_info()
 #if defined(_OPENMP)
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif
+#if defined(__cplusplus)
+  fprintf(stderr, "__cplusplus         = %ld\n", __cplusplus);
+#endif
 #if defined(__GNUC__)
   fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
 #endif

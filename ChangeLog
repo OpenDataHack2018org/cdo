@@ -9,7 +9,7 @@
 
 2017-05-16  Uwe Schulzweida
 
-	* Renamed all .c files to .cc, code needs to be compiled with a C++ compiler!!!
+	* Renamed all .c files to .cc, code needs to be compiled with an ISO C++11 compiler!!!
 
 2017-05-16  Uwe Schulzweida
 
