@@ -44,14 +44,31 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
   attstr[0] = 0; cdiZaxisInqKeyStr(zaxisID, CDI_KEY_UNITS, CDI_MAX_NAME, attstr);
   if ( attstr[0] )  fprintf(fp, "units     = \"%s\"\n", attstr);
 
-  double *vals = (double*) Malloc(nvals*sizeof(double));
-
-  if ( nvals )
-    {                
-      zaxisInqLevels(zaxisID, vals);
-      static const char prefix[] = "levels    = ";
-      printDblsPrefixAutoBrk(fp, dig, prefix, (int)sizeof(prefix)-1, nvals, vals, 0);
+  double *vals = 0;
+  char **cvals = NULL;
+  size_t clen = 0;
+  if ( type != ZAXIS_CHAR )
+    {
+      if ( nvals )
+        {
+          vals = (double*) Malloc(nvals*sizeof(double));
+          zaxisInqLevels(zaxisID, vals);
+          static const char prefix[] = "levels    = ";
+          printDblsPrefixAutoBrk(fp, dig, prefix, (int)sizeof(prefix)-1, nvals, vals, 0);
+        }
     }
+  else
+    {
+      zaxisInqCLevels(zaxisID, &cvals);
+          fprintf(fp, "levels    = \n");
+      for ( size_t i = 0; i < nlevels; i++ )
+        {
+          fprintf(fp, "     [%2d] = %s\n", i, cvals[i]);
+          Free(cvals[i]);
+        }
+    }
+  
+
 
   if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
     {
@@ -68,7 +85,8 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
       }
     }
 
-  Free(vals);
+  if ( vals ) Free(vals);
+  if ( cvals ) Free(cvals);
 
   if ( type == ZAXIS_HYBRID || type == ZAXIS_HYBRID_HALF )
     {
