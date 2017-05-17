@@ -1,4 +1,17 @@
-2017-05-15  Uwe Schulzweida
+2017-08-15  Uwe Schulzweida
+
+	* Using CDI library version 1.8.3
+	* Version 1.9.0 release
+
+2017-05-17  Uwe Schulzweida
+
+	* gridToCurvilinear: Check that nvertex of regular lonlat grid is 2 [Bug #7744]
+
+2017-05-16  Uwe Schulzweida
+
+	* Renamed all .c files to .cc, code needs to be compiled with a C++ compiler!!!
+
+2017-05-16  Uwe Schulzweida
 
 	* Using CDI library version 1.8.2
 	* Version 1.8.2 release
