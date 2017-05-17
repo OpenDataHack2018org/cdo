@@ -1345,7 +1345,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 
 #if defined(CMOR_VERSION_MAJOR)
   int cmor_version_exists = 1;
-  if ( CMOR_VERSION_MAJOR == 2 && CMOR_VERSION_MINOR == 9 )
+  if ( CMOR_VERSION_MAJOR == 2 )
     {
       double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
       cmor_dataset(kv_get_a_val(kvl, "dr", "./"),
@@ -1372,7 +1372,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
                kv_get_a_val(kvl, "parent_experiment_rip", ""));
     }
   else
-    cdoAbort("Cmor version %d.%d not yet enabled!\n", (int) CMOR_VERSION_MAJOR, (int) CMOR_VERSION_MINOR);
+    cdoAbort("Cmor version %d not yet enabled!\n", (int) CMOR_VERSION_MAJOR);
 #endif
   if ( !cmor_version_exists )
     cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
