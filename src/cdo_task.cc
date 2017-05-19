@@ -83,6 +83,8 @@ void *cdo_task(void *task)
 
   pthread_mutex_unlock(&(task_info->work_mtx));
   pthread_exit(NULL);
+
+  return NULL;
 }
 #endif
 

@@ -15,8 +15,6 @@ int fullyear = -999;
 
 void dsets_init(dsets_t *pfi)
 {
-  int i;
-
   pfi->name[0]    = 0;
   pfi->dnam[0]    = 0;
   pfi->title[0]   = 0;
@@ -41,7 +39,7 @@ void dsets_init(dsets_t *pfi)
 
   pfi->pchsub1    = NULL;
 
-  for ( i = 0; i < 5; ++i ) pfi->dnum[i]    = 0;
+  for ( int i = 0; i < 5; ++i ) pfi->dnum[i]    = 0;
 }
 
 /* Byte swap requested number of 4 byte elements */
@@ -1219,7 +1217,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   // gaint acumstride=0;
   gaint hdrb, trlb;
   gaint size=0,rc,len,flag,tim1,tim2;
-  gaint flgs[8],e,t;
+  gaint e,t;
   int BYTEORDER = IsBigendian();
   gadouble *vals;
   gadouble v1,v2,temp;
@@ -1238,9 +1236,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 
   /* Copy descriptor file name into gafile structure */
   getwrd (pfi->dnam,filename,MAX_NAMELEN);
-
-  /* initialize error flags */
-  for (i=0;i<8;i++) flgs[i] = 1;
 
   /* Parse the data descriptor file */
   while ( fgets(rec, MAX_RECLEN, descr) != NULL )
@@ -1458,7 +1453,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
           else
             {
               getstr (pfi->title,ch,MAX_NAMELEN);
-              flgs[7] = 0;
             }
         } 
       else if (cmpwrd("dset",rec))
@@ -1477,7 +1471,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
             {
               getwrd (pfi->name,ch,MAX_NAMELEN);
             }
-          flgs[5] = 0;
         }   
       else if (cmpwrd("undef",rec))
         {
@@ -1498,7 +1491,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
           pfi->ulow = fabs(pfi->undef/EPSILON);
           pfi->uhi  = pfi->undef + pfi->ulow;
           pfi->ulow = pfi->undef - pfi->ulow;
-          flgs[4] = 0;
         }
       else if (cmpwrd("xdef",rec))
         {
@@ -1531,7 +1523,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
               if (rc==-1)  goto err8; 
               if (rc) goto err9;
             } else goto err2;
-          flgs[0] = 0;
         } 
       else if (cmpwrd("ydef",rec))
         {
@@ -1559,7 +1550,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
               if (rc==-1) goto err8;
               if (rc) goto err9;
             }
-          flgs[1] = 0;
         }
       else if (cmpwrd("zdef",rec))
         {
@@ -1587,7 +1577,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
               if (rc==-1) goto err8; 
               if (rc) goto err9;
             } else goto err2;
-          flgs[2] = 0;
         }
       else if (cmpwrd("tdef",rec))
         {
@@ -1630,7 +1619,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
               pfi->abvals[3] = vals;
               pfi->linear[3] = 1;
             } else goto err2;
-          flgs[3] = 0;
         }
       else if (cmpwrd("vars",rec))
         {
@@ -1853,8 +1841,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
               lowcas(rec);
             }
           /* vars block parsed without error */
-          flgs[6] = 0;
-
         } 
       else
         {
@@ -1863,7 +1849,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
           goto err9;
         }
     }
-  (void) flgs;
   /* Done scanning!
      Check if scanned stuff makes sense, and then set things up correctly */
 

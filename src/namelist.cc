@@ -163,9 +163,8 @@ int namelist_parse_string(namelist_parser *parser, const char *buf, size_t len, 
     }
   
   parser->pos = start;
-  return NAMELIST_ERROR_PART;
 
-  return 0;
+  return NAMELIST_ERROR_PART;
 }
 
 static
@@ -184,7 +183,6 @@ int namelist_check_keyname(const char *buf, namelisttok_t *t)
       break;
     default:
       return NAMELIST_ERROR_INTYP;
-      break;
     }
   
   return 0;

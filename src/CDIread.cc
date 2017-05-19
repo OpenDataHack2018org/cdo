@@ -27,16 +27,16 @@ const char *filetypestr(int filetype)
 {
   switch ( filetype )
     {
-    case CDI_FILETYPE_GRB:  return ("GRIB");            break;
-    case CDI_FILETYPE_GRB2: return ("GRIB2");           break;
-    case CDI_FILETYPE_NC:   return ("NetCDF");          break;
-    case CDI_FILETYPE_NC2:  return ("NetCDF2");         break;
-    case CDI_FILETYPE_NC4:  return ("NetCDF4");         break;
-    case CDI_FILETYPE_NC4C: return ("NetCDF4 classic"); break;
-    case CDI_FILETYPE_SRV:  return ("SERVICE");         break;
-    case CDI_FILETYPE_EXT:  return ("EXTRA");           break;
-    case CDI_FILETYPE_IEG:  return ("IEG");             break;
-    default:            return ("");
+    case CDI_FILETYPE_GRB:  return ("GRIB");
+    case CDI_FILETYPE_GRB2: return ("GRIB2");
+    case CDI_FILETYPE_NC:   return ("NetCDF");
+    case CDI_FILETYPE_NC2:  return ("NetCDF2");
+    case CDI_FILETYPE_NC4:  return ("NetCDF4");
+    case CDI_FILETYPE_NC4C: return ("NetCDF4 classic");
+    case CDI_FILETYPE_SRV:  return ("SERVICE");
+    case CDI_FILETYPE_EXT:  return ("EXTRA");
+    case CDI_FILETYPE_IEG:  return ("IEG");
+    default:                return ("");
     }
 }
 
@@ -49,7 +49,7 @@ const char *datatypestr(int datatype)
   snprintf(str, sizeof(str), "%d bit packed", datatype);
 
   if      ( datatype == CDI_DATATYPE_PACK   ) return ("P0");
-  else if ( datatype > 0 && datatype <= 32 ) return (str);
+  else if ( datatype > 0 && datatype <= 32  ) return (str);
   else if ( datatype == CDI_DATATYPE_CPX32  ) return ("C32");
   else if ( datatype == CDI_DATATYPE_CPX64  ) return ("C64");
   else if ( datatype == CDI_DATATYPE_FLT32  ) return ("32 bit floats");
@@ -60,7 +60,7 @@ const char *datatypestr(int datatype)
   else if ( datatype == CDI_DATATYPE_UINT8  ) return ("U8");
   else if ( datatype == CDI_DATATYPE_UINT16 ) return ("U16");
   else if ( datatype == CDI_DATATYPE_UINT32 ) return ("U32");
-  else                                    return ("");
+  else                                        return ("");
 }
 
 static
