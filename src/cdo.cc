@@ -39,6 +39,8 @@
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
 
+#include <thread>
+
 #if defined(SX)
 #define RLIM_T  long long
 #else
@@ -1172,12 +1174,12 @@ int parse_options_long(int argc, char *argv[])
           //cdo_usage();
           //fprintf(stderr, "Illegal option!\n");
           return -1;
-          break;
+          // break;
         case ':':
           //cdo_usage();
           //fprintf(stderr, "Option requires an argument!\n");
           return -1;
-          break;
+          // break;
         case 0:
           if ( lnetcdf_hdr_pad )
             {
@@ -1499,6 +1501,11 @@ int main(int argc, char *argv[])
   check_stacksize();
 
   if ( Debug ) print_pthread_info();
+
+  if ( Debug )
+    {
+      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
+    }
 
 #if defined(_OPENMP)
   if ( numThreads <= 0 ) numThreads = 1;
