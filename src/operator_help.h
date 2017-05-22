@@ -1121,7 +1121,7 @@ static const char *SettimeHelp[] = {
     "    date       STRING   Date (format: YYYY-MM-DD)",
     "    time       STRING   Time (format: hh:mm:ss)",
     "    inc        STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 1hour]",
-    "    frequency  STRING   Frequency of the time series (day, month, year)",
+    "    frequency  STRING   Frequency of the time series (hour, day, month, year)",
     "    calendar   STRING   Calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)",
     "    sval       STRING   Shift value (e.g. -3hour)",
     NULL
@@ -3387,9 +3387,11 @@ static const char *FldcorHelp[] = {
     "    of two fields for each timestep. With",
     "    ",
     "    S(t) = {x, i_1(t,x) != missval and i_2(t,x) != missval}",
+    "    ",
     "    it is",
     "    ",
     "    o(t,1) = Cor{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}",
+    "    ",
     "    where w(x) are the area weights obtained by the input streams.",
     "    For every timestep t only those field elements x belong to the sample,",
     "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
@@ -3409,9 +3411,11 @@ static const char *TimcorHelp[] = {
     "    of two fields over all timesteps. With",
     "    ",
     "    S(x) = {t, i_1(t,x) != missval and i_2(t,x) != missval}",
+    "    ",
     "    it is",
     "    ",
     "    o(1,x) = Cor{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}",
+    "    ",
     "    For every gridpoint x only those timesteps t belong to the sample,",
     "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
     NULL
@@ -5349,9 +5353,6 @@ static const char *EcaCddHelp[] = {
     "    of consecutive days where RR is less than R is counted. R is an optional parameter with ",
     "    default R = 1 mm. A further output variable is the number of dry periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_dry_days_index_per_time_period",
-    "    - number_of_cdd_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT    Precipitation threshold (unit: mm; default: R = 1 mm)",
@@ -5371,9 +5372,6 @@ static const char *EcaCfdHelp[] = {
     "    consecutive days where TN < 0 °C is counted. Note that TN have to be given in units of Kelvin.",
     "    A further output variable is the number of frost periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_frost_days_index_per_time_period",
-    "    - number_of_cfd_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    N  INTEGER  Minimum number of days exceeded (default: N = 5)",
@@ -5393,9 +5391,6 @@ static const char *EcaCsuHelp[] = {
     "    Note that TN have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    A further output variable is the number of summer periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_summer_days_index_per_time_period",
-    "    - number_of_csu_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT    Temperature threshold (unit: °C; default: T = 25°C)",
@@ -5415,9 +5410,6 @@ static const char *EcaCwdHelp[] = {
     "    of consecutive days where RR is at least R is counted. R is an optional parameter with ",
     "    default R = 1 mm. A further output variable is the number of wet periods of more than N days.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - consecutive_wet_days_index_per_time_period",
-    "    - number_of_cwd_periods_with_more_than_<N>days_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT    Precipitation threshold (unit: mm; default: R = 1 mm)",
@@ -5441,9 +5433,6 @@ static const char *EcaCwdiHelp[] = {
     "    TNnorm is calculated as the mean of minimum temperatures of a five day window centred on each calendar day ",
     "    of a given climate reference period. Note that both TN and TNnorm have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_wave_duration_index_wrt_mean_of_reference_period",
-    "    - cold_waves_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -5468,9 +5457,6 @@ static const char *EcaCwfiHelp[] = {
     "    centred on each calendar day of a given climate reference period. Note that both TG and TGn10 ",
     "    have to be given in the same units. The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_spell_days_index_wrt_10th_percentile_of_reference_period",
-    "    - cold_spell_periods_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -5491,8 +5477,6 @@ static const char *EcaEtrHelp[] = {
     "    Note that TX and TN have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timesteps in infile1 and infile2.",
-    "    The following variables are created: ",
-    "    - intra_period_extreme_temperature_range",
     NULL
 };
 
@@ -5509,8 +5493,6 @@ static const char *EcaFdHelp[] = {
     "    that TN have to be given in units of Kelvin.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - frost_days_index_per_time_period",
     NULL
 };
 
@@ -5538,9 +5520,6 @@ static const char *EcaGslHelp[] = {
     "    have to be given in degrees Celsius.",
     "    ",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - thermal_growing_season_length",
-    "    - day_of_year_of_growing_season_start",
     "",
     "PARAMETER",
     "    nday   INTEGER  Number of consecutive days (default: nday = 6)",
@@ -5563,8 +5542,6 @@ static const char *EcaHdHelp[] = {
     "    If only T1 is given, T2 is set to T1. Note that TG have to be given in units ",
     "    of kelvin, whereas T1 and T2 have to be given in degrees Celsius.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - heating_degree_days_per_time_period",
     "",
     "PARAMETER",
     "    T1  FLOAT   Temperature limit (unit: °C; default: T1 = 17°C)",
@@ -5588,9 +5565,6 @@ static const char *EcaHwdiHelp[] = {
     "    TXnorm is calculated as the mean of maximum temperatures of a five day window centred on each calendar day",
     "    of a given climate reference period. Note that both TX and TXnorm have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - heat_wave_duration_index_wrt_mean_of_reference_period",
-    "    - heat_waves_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -5618,9 +5592,6 @@ static const char *EcaHwfiHelp[] = {
     "    Note that both TG and TGn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - warm_spell_days_index_wrt_90th_percentile_of_reference_period",
-    "    - warm_spell_periods_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -5640,8 +5611,6 @@ static const char *EcaIdHelp[] = {
     "    that TX have to be given in units of Kelvin.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - ice_days_index_per_time_period",
     NULL
 };
 
@@ -5659,8 +5628,6 @@ static const char *EcaR75pHelp[] = {
     "    RRn75 is calculated as the 75th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,75.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - moderate_wet_days_wrt_75th_percentile_of_reference_period",
     NULL
 };
 
@@ -5679,8 +5646,6 @@ static const char *EcaR75ptotHelp[] = {
     "    RRn75 is calculated as the 75th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,75.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R75p_days",
     NULL
 };
 
@@ -5698,8 +5663,6 @@ static const char *EcaR90pHelp[] = {
     "    RRn90 is calculated as the 90th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,90.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - wet_days_wrt_90th_percentile_of_reference_period",
     NULL
 };
 
@@ -5718,8 +5681,6 @@ static const char *EcaR90ptotHelp[] = {
     "    RRn90 is calculated as the 90th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,90.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R90p_days",
     NULL
 };
 
@@ -5737,8 +5698,6 @@ static const char *EcaR95pHelp[] = {
     "    RRn95 is calculated as the 95th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,95.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - very_wet_days_wrt_95th_percentile_of_reference_period",
     NULL
 };
 
@@ -5757,8 +5716,6 @@ static const char *EcaR95ptotHelp[] = {
     "    RRn95 is calculated as the 95th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,95.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R95p_days",
     NULL
 };
 
@@ -5776,8 +5733,6 @@ static const char *EcaR99pHelp[] = {
     "    RRn99 is calculated as the 99th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,99.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - extremely_wet_days_wrt_99th_percentile_of_reference_period",
     NULL
 };
 
@@ -5796,8 +5751,6 @@ static const char *EcaR99ptotHelp[] = {
     "    RRn99 is calculated as the 99th percentile of all wet days of a given climate reference period.",
     "    Usually infile2 is generated by the operator ydaypctl,99.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - precipitation_percent_due_to_R99p_days",
     NULL
 };
 
@@ -5815,8 +5768,6 @@ static const char *EcaPdHelp[] = {
     "    then the number of days where RR is at least x mm is counted. ",
     "    eca_r10mm and eca_r20mm are specific ECA operators with a daily precipitation amount of 10 and 20 mm respectively.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - precipitation_days_index_per_time_period",
     "",
     "OPERATORS",
     "    eca_pd     Precipitation days index per time period",
@@ -5846,8 +5797,6 @@ static const char *EcaRr1Help[] = {
     "    Let infile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]), then",
     "    the number of days where RR is at least R is counted. R is an optional parameter with default R = 1 mm. ",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - wet_days_index_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
@@ -5868,8 +5817,6 @@ static const char *EcaRx1dayHelp[] = {
     "    amounts are determined for each month. ",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - highest_one_day_precipitation_amount_per_time_period",
     "",
     "PARAMETER",
     "    mode  STRING   Operation mode (optional). If mode = 'm' then maximum daily precipitation amounts are determined for each month",
@@ -5888,9 +5835,6 @@ static const char *EcaRx5dayHelp[] = {
     "    A further output variable is the number of 5 day period with precipitation totals greater than x mm, where x ",
     "    is an optional parameter with default x = 50 mm.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - highest_five_day_precipitation_amount_per_time_period",
-    "    - number_of_5day_heavy_precipitation_periods_per_time_period",
     "",
     "PARAMETER",
     "    x  FLOAT   Precipitation threshold (unit: mm; default: x = 50 mm)",
@@ -5908,8 +5852,6 @@ static const char *EcaSdiiHelp[] = {
     "    Let infile be a time series of the daily precipitation amount RR, then the mean precipitation amount at ",
     "    wet days (RR > R) is written to outfile. R is an optional parameter with default R = 1 mm.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - simple_daily_intensity_index_per_time_period",
     "",
     "PARAMETER",
     "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
@@ -5928,8 +5870,6 @@ static const char *EcaSuHelp[] = {
     "    TX > T is counted. The number T is an optional parameter with default T = 25°C. ",
     "    Note that TX have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - summer_days_index_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT   Temperature threshold (unit: °C; default: T = 25°C)",
@@ -5953,8 +5893,6 @@ static const char *EcaTg10pHelp[] = {
     "    Note that both TG and TGn10 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_days_percent_wrt_10th_percentile_of_reference_period",
     NULL
 };
 
@@ -5975,8 +5913,6 @@ static const char *EcaTg90pHelp[] = {
     "    Note that both TG and TGn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - warm_days_percent_wrt_90th_percentile_of_reference_period",
     NULL
 };
 
@@ -5997,8 +5933,6 @@ static const char *EcaTn10pHelp[] = {
     "    Note that both TN and TNn10 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - cold_nights_percent_wrt_10th_percentile_of_reference_period",
     NULL
 };
 
@@ -6016,8 +5950,6 @@ static const char *EcaTn90pHelp[] = {
     "    of daily minimum temperatures of a five day window centred on each calendar day of a given climate",
     "    reference period. Note that both TN and TNn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - warm_nights_percent_wrt_90th_percentile_of_reference_period",
     NULL
 };
 
@@ -6033,8 +5965,6 @@ static const char *EcaTrHelp[] = {
     "    TN > T is counted. The number T is an optional parameter with default T = 20°C. ",
     "    Note that TN have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    The date information of a timestep in outfile is the date of the last contributing timestep in infile.",
-    "    The following variables are created: ",
-    "    - tropical_nights_index_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT   Temperature threshold (unit: °C; default: T = 20°C)",
@@ -6058,8 +5988,6 @@ static const char *EcaTx10pHelp[] = {
     "    Note that both TX and TXn10 have to be givenin the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - very_cold_days_percent_wrt_10th_percentile_of_reference_period",
     NULL
 };
 
@@ -6080,7 +6008,5 @@ static const char *EcaTx90pHelp[] = {
     "    Note that both TX and TXn90 have to be given in the same units.",
     "    The date information of a timestep in outfile is the date of",
     "    the last contributing timestep in infile1.",
-    "    The following variables are created: ",
-    "    - very_warm_days_percent_wrt_90th_percentile_of_reference_period",
     NULL
 };

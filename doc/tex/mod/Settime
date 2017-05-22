@@ -140,7 +140,7 @@ STRING   Time (format: hh:mm:ss)
 @Item = inc
 STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 1hour]
 @Item = frequency
-STRING   Frequency of the time series (day, month, year)
+STRING   Frequency of the time series (hour, day, month, year)
 @Item = calendar
 STRING   Calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
 @Item = sval
