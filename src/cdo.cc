@@ -1504,7 +1504,7 @@ int main(int argc, char *argv[])
 
   if ( Debug )
     {
-      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
+      //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
     }
 
 #if defined(_OPENMP)
