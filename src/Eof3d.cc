@@ -51,7 +51,7 @@ void *EOF3d(void * argument)
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
   size_t temp_size = 0, npack = 0;
-  int i, varID, levelID;
+  int varID, levelID;
   int missval_warning = 0;
   int nmiss, ngrids, n = 0, nlevs = 0;
   int offset;
@@ -456,7 +456,7 @@ void *EOF3d(void * argument)
                   streamWriteRecord(streamID3, &eigenvectors[varID][tsID][offset], nmiss);
                 }
 	    }
-	  if ( DBL_IS_EQUAL(eigenvalues[varID][tsID][i], missval) ) nmiss = 1;
+	  if ( DBL_IS_EQUAL(eigenvalues[varID][tsID][0], missval) ) nmiss = 1;
 	  else nmiss = 0;
 	  streamDefRecord(streamID2, varID, 0);
 	  streamWriteRecord(streamID2, eigenvalues[varID][tsID],nmiss);
