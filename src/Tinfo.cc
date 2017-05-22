@@ -218,7 +218,6 @@ void *Tinfo(void *argument)
   int vdate_first = 0, vtime_first = 0;
   int vdate0 = 0, vtime0 = 0;
   int vdate = 0, vtime = 0;
-  int nrecs;
   int tsID = 0, ntimeout;
   int calendar;
   int year0, month0, day0;
@@ -316,7 +315,7 @@ void *Tinfo(void *argument)
       fprintf(stdout, "\n");
 
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+      while ( streamInqTimestep(streamID, tsID) )
 	{  
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);

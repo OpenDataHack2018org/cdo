@@ -39,7 +39,6 @@ void *Ninfo(void *argument)
 {
   enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL, NGRIDPOINTS, NGRIDS};
   int varID;
-  int nrecs;
   int date0 = 0;
   int day, mon0 = 0, mon, year0 = 0, year;
 
@@ -73,7 +72,7 @@ void *Ninfo(void *argument)
       int nyear = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
@@ -94,7 +93,7 @@ void *Ninfo(void *argument)
       int nmon = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    cdiDecodeDate(vdate, &year, &mon, &day);
@@ -115,7 +114,7 @@ void *Ninfo(void *argument)
       int ndate = 0;
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    
@@ -134,7 +133,7 @@ void *Ninfo(void *argument)
       {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) ) tsID++;
+	while ( streamInqTimestep(streamID, tsID) ) tsID++;
       fprintf(stdout, "%d\n", tsID);
       break;
       }

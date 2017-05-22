@@ -2870,11 +2870,11 @@ static void read_record(int streamID, struct mapping vars[], int vlistID)
       streamReadRecord(streamID, buffer, &nmiss);
       for ( size_t i = 0; i < gridsize; i++ )
         {
-/* Wrong:  (lat x basin, lev ) gridsize * levelID + i */
-/* Wrong:  (basin x lat, lev) gridsize * levelID + i * chardim - ( int ) floor(i / latdim) * gridsize + ( int ) floor(i/latdim)
-/* Wrong:  (basin x lev, lat ) gridsize/latdim * levdim * ( i - ( int ) floor(i/latdim) * latdim ) + ( int ) floor(i/latdim) + gridsize/latdim * levelID; */
-/* Wrong:  (lat x lev, basin ) latdim * levdim * ( int ) floor(i/latdim) + ( i - ( int ) floor(i/latdim) * latdim ) + levelID * latdim*/
-/* (lev x lat, basin ) */
+// Wrong:  (lat x basin, lev ) gridsize * levelID + i
+// Wrong:  (basin x lat, lev) gridsize * levelID + i * chardim - ( int ) floor(i / latdim) * gridsize + ( int ) floor(i/latdim)
+// Wrong:  (basin x lev, lat ) gridsize/latdim * levdim * ( i - ( int ) floor(i/latdim) * latdim ) + ( int ) floor(i/latdim) + gridsize/latdim * levelID;
+// Wrong:  (lat x lev, basin ) latdim * levdim * ( int ) floor(i/latdim) + ( i - ( int ) floor(i/latdim) * latdim ) + levelID * latdim
+// (lev x lat, basin )
           int newIndex;
           if ( levdim > 1 && type == GRID_CURVILINEAR )
             newIndex = i + gridsize*levelID;

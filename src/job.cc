@@ -368,7 +368,7 @@ size_t my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
   if(out && !out->stream) {
     out->stream=fopen(out->filename, "wb");
     if(!out->stream)
-      return -1;
+      return 0;
   }
   return fwrite(buffer, size, nmemb, out->stream);
 }

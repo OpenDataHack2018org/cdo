@@ -41,7 +41,6 @@
 
 void *Showinfo(void *argument)
 {
-  int nrecs;
   int date0 = 0;
   int year, month, day;
   int month0 = 0, year0 = 0;
@@ -77,7 +76,7 @@ void *Showinfo(void *argument)
     {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 
@@ -97,7 +96,7 @@ void *Showinfo(void *argument)
     {
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 
@@ -118,7 +117,7 @@ void *Showinfo(void *argument)
       char vdatestr[32];
       int tsID  = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	 
@@ -139,7 +138,7 @@ void *Showinfo(void *argument)
       char vtimestr[32];
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vtime = taxisInqVtime(taxisID);
 
@@ -155,7 +154,7 @@ void *Showinfo(void *argument)
       char vdatetimestr[64];
       int tsID = 0;
       if ( ntsteps != 0 )
-	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	while ( streamInqTimestep(streamID, tsID) )
 	  {
 	    int vdate = taxisInqVdate(taxisID);
 	    int vtime = taxisInqVtime(taxisID);

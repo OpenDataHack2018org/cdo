@@ -3,11 +3,17 @@
 /* CDO version */
 #undef CDO
 
-/* Compiler */
-#undef COMPILER
+/* CXX Compiler */
+#undef CXX_COMPILER
 
-/* Compiler version */
-#undef COMP_VERSION
+/* CXX Compiler version */
+#undef CXX_VERSION
+
+/* C Compiler */
+#undef C_COMPILER
+
+/* C Compiler version */
+#undef C_VERSION
 
 /* Define to 1 for DATA support */
 #undef ENABLE_DATA
@@ -20,6 +26,9 @@
 
 /* Define to 1 if you have the <curl/curl.h> header file. */
 #undef HAVE_CURL_CURL_H
+
+/* define if the compiler supports basic C++11 syntax */
+#undef HAVE_CXX11
 
 /* Define to 1 if you have the declaration of `isnan', and to 0 if you don't.
    */

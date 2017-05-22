@@ -57,7 +57,7 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   int nsplit = NSPLIT;                      /* (only 2 allowed) number of segments to split 
 						the data */
   int nl[NSPLIT];                            /* number of links in each sub-array              */
-  int who_am_i,depth;                        /* current depth, depth of children and index
+  int who_am_i;                              /* current depth, depth of children and index
 						to be parent in next call to sort_par          */
   int add_srt[NSPLIT];                       /* array for start index of sub array    */
   double *add1s[NSPLIT];                     /* pointers to sub arrays for sort and merge step */
@@ -78,9 +78,9 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
   add1s[0]   = &add1[add_srt[0]];  add1s[1]   = &add1[add_srt[1]];
   nl[0]      = num_links/nsplit;   nl[1]      = num_links-nl[0];
 
-  depth = (int) (log(parent)/log(2));
-
 #if defined(_OPENMP)
+  int depth = (int) (log(parent)/log(2));
+
   /* Allow for nested parallelism */
   if ( omp_in_parallel() && depth<par_depth ) 
     {

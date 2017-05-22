@@ -36,7 +36,7 @@
 void *Pressure(void *argument)
 {
   int mode;
-  gribcode_t gribcodes = {0};
+  gribcode_t gribcodes = {};
   int nrecs;
   int i, k, offset;
   int varID, levelID;

@@ -729,14 +729,14 @@ const char *filetypeext(int filetype)
   switch ( filetype )
     {
     case CDI_FILETYPE_GRB:
-    case CDI_FILETYPE_GRB2: return ".grb";   break;
+    case CDI_FILETYPE_GRB2: return ".grb";
     case CDI_FILETYPE_NC:
     case CDI_FILETYPE_NC2:
     case CDI_FILETYPE_NC4:
-    case CDI_FILETYPE_NC4C: return ".nc";    break;
-    case CDI_FILETYPE_SRV:  return ".srv";   break;
-    case CDI_FILETYPE_EXT:  return ".ext";   break;
-    case CDI_FILETYPE_IEG:  return ".ieg";   break;
+    case CDI_FILETYPE_NC4C: return ".nc";
+    case CDI_FILETYPE_SRV:  return ".srv";
+    case CDI_FILETYPE_EXT:  return ".ext";
+    case CDI_FILETYPE_IEG:  return ".ieg";
     default:                return "";
     }
 }

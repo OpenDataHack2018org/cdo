@@ -905,6 +905,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	double *xbounds = NULL, *ybounds = NULL;
 	char xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
 
+        size_t nvertex = (size_t) gridInqNvertex(gridID1);
 	gridInqXunits(gridID1, xunits);
 	gridInqYunits(gridID1, yunits);
 
@@ -984,7 +985,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
 
 	if ( !lbounds ) goto NO_BOUNDS;
 
-        if ( gridInqXbounds(gridID1, NULL) )
+        if ( nvertex == 2 && gridInqXbounds(gridID1, NULL) )
           {
             xbounds = (double*) Malloc(2*nx*sizeof(double));
             gridInqXbounds(gridID1, xbounds);
@@ -1002,7 +1003,7 @@ int gridToCurvilinear(int gridID1, int lbounds)
             grid_gen_bounds(nx, xvals, xbounds);
           }
 
-        if ( gridInqYbounds(gridID1, NULL) )
+        if ( nvertex == 2 && gridInqYbounds(gridID1, NULL) )
           {
             ybounds = (double*) Malloc(2*ny*sizeof(double));
             gridInqYbounds(gridID1, ybounds);
@@ -1131,8 +1132,8 @@ int gridToUnstructuredSelecton(int gridID1, size_t selectionSize, int *selection
 
   gridDefXsize(unstructuredSelectionGridID, selectionSize);
   gridDefYsize(unstructuredSelectionGridID, selectionSize);
-  double *xvals   = (double*) Malloc(selectionSize*sizeof(double));
-  double *yvals   = (double*) Malloc(selectionSize*sizeof(double));
+  double *xvals = (double*) Malloc(selectionSize*sizeof(double));
+  double *yvals = (double*) Malloc(selectionSize*sizeof(double));
 
   for (size_t i = 0; i < selectionSize; i++)
   {
@@ -1258,9 +1259,10 @@ int gridToUnstructured(int gridID1, int lbounds)
 
 	if ( lbounds )
 	  {
+            size_t nvertex = (size_t) gridInqNvertex(gridID1);
 	    double *xbounds = NULL, *ybounds = NULL;
 
-	    if ( gridInqXbounds(gridID1, NULL) )
+	    if ( nvertex == 2 && gridInqXbounds(gridID1, NULL) )
 	      {
 		xbounds = (double*) Malloc(2*nx*sizeof(double));
 		gridInqXbounds(gridID1, xbounds);
@@ -1271,7 +1273,7 @@ int gridToUnstructured(int gridID1, int lbounds)
 		grid_gen_bounds(nx, xvals, xbounds);
 	      }
 
-	    if ( gridInqYbounds(gridID1, NULL) )
+	    if ( nvertex == 2 && gridInqYbounds(gridID1, NULL) )
 	      {
 		ybounds = (double*) Malloc(2*ny*sizeof(double));
 		gridInqYbounds(gridID1, ybounds);

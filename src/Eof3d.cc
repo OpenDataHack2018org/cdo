@@ -51,7 +51,7 @@ void *EOF3d(void * argument)
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
   size_t temp_size = 0, npack = 0;
-  int i, varID, levelID;
+  int varID, levelID;
   int missval_warning = 0;
   int nmiss, ngrids, n = 0, nlevs = 0;
   int offset;
@@ -169,7 +169,7 @@ void *EOF3d(void * argument)
       eigenvectors[varID] = (double **) Malloc(n_eig*sizeof(double *));
       eigenvalues[varID]  = (double **) Malloc(nts*sizeof(double *));
 
-      for ( i = 0; i < n; i++ )
+      for ( int i = 0; i < n; i++ )
 	{
 	  if ( i < n_eig )
 	    {
@@ -205,7 +205,7 @@ void *EOF3d(void * argument)
           streamReadRecord(streamID1, in, &nmiss);
 
 	  offset = gridsize * levelID;
-	  for ( i = 0; i < gridsize; ++i )
+	  for ( int i = 0; i < gridsize; ++i )
 	    {
 	      if ( ! DBL_IS_EQUAL(in[i], missval ) )
 		{
@@ -374,7 +374,7 @@ void *EOF3d(void * argument)
 	}     /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
 
       if ( eigv ) Free(eigv);
-      for ( i = 0; i < n; i++ )
+      for ( int i = 0; i < n; i++ )
 	if ( cov[i] ) Free(cov[i]);
     }         /* for ( varID = 0; varID < nvars; varID++ )    */
 
@@ -407,7 +407,7 @@ void *EOF3d(void * argument)
   for ( varID=0; varID<nvars; varID++ )
     varID2[varID] = vlistDefVar(vlistID2, gridID2, zaxisID2, TSTEP_INSTANT);
   ngrids = vlistNgrids(vlistID2);
-  for ( i = 0; i < ngrids; i++ )
+  for ( int i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID2, i, gridID2);
 
   int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
@@ -449,14 +449,14 @@ void *EOF3d(void * argument)
               if ( tsID < n_eig )
                 {
                   nmiss = 0;
-                  for ( i = 0; i < gridsize; i++ )
+                  for ( int i = 0; i < gridsize; i++ )
                     if ( DBL_IS_EQUAL(eigenvectors[varID][tsID][offset + i], missval) ) nmiss++;
 
                   streamDefRecord(streamID3, varID, levelID);
                   streamWriteRecord(streamID3, &eigenvectors[varID][tsID][offset], nmiss);
                 }
 	    }
-	  if ( DBL_IS_EQUAL(eigenvalues[varID][tsID][i], missval) ) nmiss = 1;
+	  if ( DBL_IS_EQUAL(eigenvalues[varID][tsID][0], missval) ) nmiss = 1;
 	  else nmiss = 0;
 	  streamDefRecord(streamID2, varID, 0);
 	  streamWriteRecord(streamID2, eigenvalues[varID][tsID],nmiss);
@@ -465,7 +465,7 @@ void *EOF3d(void * argument)
 
   for ( varID = 0; varID < nvars; varID++)
     {
-      for ( i = 0; i < nts; i++)
+      for ( int i = 0; i < nts; i++)
 	{
 	  Free(datafields[varID][i]);
 	  if ( i < n_eig )

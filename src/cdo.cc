@@ -39,6 +39,8 @@
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
 
+#include <thread>
+
 #if defined(SX)
 #define RLIM_T  long long
 #else
@@ -196,11 +198,17 @@ void cdo_version(void)
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
   fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
-#if defined(COMPILER)
-  fprintf(stderr, "Compiler: %s\n", COMPILER);
+#if defined(CXX_COMPILER)
+  fprintf(stderr, "CXX Compiler: %s\n", CXX_COMPILER);
 #endif
-#if defined(COMP_VERSION)
-  fprintf(stderr, " version: %s\n", COMP_VERSION);
+#if defined(CXX_VERSION)
+  fprintf(stderr, "CXX version : %s\n", CXX_VERSION);
+#endif
+#if defined(C_COMPILER)
+  fprintf(stderr, "C Compiler: %s\n", C_COMPILER);
+#endif
+#if defined(C_VERSION)
+  fprintf(stderr, "C version : %s\n", C_VERSION);
 #endif
 
   printFeatures();
@@ -923,6 +931,9 @@ void print_system_info()
 #if defined(_OPENMP)
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif
+#if defined(__cplusplus)
+  fprintf(stderr, "__cplusplus         = %ld\n", __cplusplus);
+#endif
 #if defined(__GNUC__)
   fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
 #endif
@@ -1162,12 +1173,12 @@ int parse_options_long(int argc, char *argv[])
           //cdo_usage();
           //fprintf(stderr, "Illegal option!\n");
           return -1;
-          break;
+          // break;
         case ':':
           //cdo_usage();
           //fprintf(stderr, "Option requires an argument!\n");
           return -1;
-          break;
+          // break;
         case 0:
           if ( lnetcdf_hdr_pad )
             {
@@ -1489,6 +1500,11 @@ int main(int argc, char *argv[])
   check_stacksize();
 
   if ( Debug ) print_pthread_info();
+
+  if ( Debug )
+    {
+      //      fprintf(stderr, "C++ max thread      = %u\n", std::thread::hardware_concurrency());
+    }
 
 #if defined(_OPENMP)
   if ( numThreads <= 0 ) numThreads = 1;

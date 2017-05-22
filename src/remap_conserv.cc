@@ -448,12 +448,12 @@ void cdo_compute_concave_overlap_areas(unsigned N, search_t *search, struct grid
   double coordinates_y[3] = {-1, -1, -1};
   double coordinates_xyz[9] = {-1, -1, -1};
   enum yac_edge_type edge_types[3] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
-  struct grid_cell target_partial_cell =
-    {.coordinates_x   = coordinates_x,
-     .coordinates_y   = coordinates_y,
-     .coordinates_xyz = coordinates_xyz,
-     .edge_type       = edge_types,
-     .num_corners     = 3};
+  struct grid_cell target_partial_cell;
+  target_partial_cell.coordinates_x   = coordinates_x;
+  target_partial_cell.coordinates_y   = coordinates_y;
+  target_partial_cell.coordinates_xyz = coordinates_xyz;
+  target_partial_cell.edge_type       = edge_types;
+  target_partial_cell.num_corners     = 3;
 
   /* Do the clipping and get the cell for the overlapping area */
 

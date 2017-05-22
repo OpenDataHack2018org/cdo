@@ -74,7 +74,7 @@ void *Vertintml(void *argument)
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double minval, maxval;
   double *sgeopot = NULL;
-  gribcode_t gribcodes = {0};
+  gribcode_t gribcodes = {};
   lista_t *flista = lista_new(FLT_LISTA);
 
   cdoInitialize(argument);
