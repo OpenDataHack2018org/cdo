@@ -100,12 +100,10 @@ void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
 }
 
 static
-void gen_bounds(int calendar, int tunit, int vdate, int vtime, int *vdateb, int *vtimeb)
+void gen_bounds(int calendar, int tunit, int incperiod, int vdate, int vtime, int *vdateb, int *vtimeb)
 {
   juldate_t juldate;
   int year, month, day;
-  //int hour, minute, second;
-  UNUSED(vtime);
   
   vdateb[0] = vdate;
   vdateb[1] = vdate;
@@ -131,6 +129,29 @@ void gen_bounds(int calendar, int tunit, int vdate, int vtime, int *vdateb, int 
       juldate = juldate_encode(calendar, vdateb[0], vtimeb[0]);
       juldate = juldate_add_seconds(86400, juldate);
       juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
+    }
+  else if ( tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS )
+    {
+      if ( incperiod == 0 ) incperiod = 1;
+      if ( incperiod > 24 ) cdoAbort("Time period must be less equal 24!");
+      if      ( tunit == TUNIT_3HOURS  ) incperiod = 3;
+      else if ( tunit == TUNIT_6HOURS  ) incperiod = 6;
+      else if ( tunit == TUNIT_12HOURS ) incperiod = 12;
+
+      int hour, minute, second;
+      cdiDecodeTime(vtime, &hour, &minute, &second);
+      int h0 = (hour/incperiod) * incperiod;
+      vtimeb[0] = cdiEncodeTime(h0, 0, 0);
+      int h1 = h0 + incperiod;
+      if ( h1 >= 24 )
+        {
+          vdateb[1] = cdiEncodeDate(year, month, day+1);
+          juldate = juldate_encode(calendar, vdateb[0], vtimeb[0]);
+          juldate = juldate_add_seconds(incperiod*3600, juldate);
+          juldate_decode(calendar, juldate, &vdateb[1], &vtimeb[1]);
+        }
+      else
+        vtimeb[1] = cdiEncodeTime(h1, 0, 0);
     }
 }
 
@@ -262,14 +283,17 @@ void *Settime(void *argument)
   else if ( operatorID == SETTUNITS || operatorID == SETTBOUNDS )
     {
       operatorCheckArgc(1);
-      int idum;
       const char *timeunits = operatorArgv()[0];
-      incperiod = 0;
-      get_tunits(timeunits, &incperiod, &idum, &tunit);
+      incperiod = (int)strtol(timeunits, NULL, 10);
+      if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
+      while ( isdigit((int) *timeunits) ) timeunits++;
+
+      get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       if ( operatorID == SETTBOUNDS &&
-           !(tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR) )
-        cdoAbort("Unsupported frequency %s! Use day, month or year.", timeunits);
+           !(tunit == TUNIT_HOUR || tunit == TUNIT_3HOURS || tunit == TUNIT_6HOURS || tunit == TUNIT_12HOURS ||
+             tunit == TUNIT_DAY || tunit == TUNIT_MONTH || tunit == TUNIT_YEAR) )
+        cdoAbort("Unsupported frequency %s! Use hour, 3hours, 6hours, day, month or year.", timeunits);
     }
   else if ( operatorID == SETCALENDAR )
     {
@@ -448,7 +472,7 @@ void *Settime(void *argument)
 	}
       else if ( operatorID == SETTBOUNDS )
 	{
-          gen_bounds(calendar, tunit, vdate, vtime, vdateb, vtimeb);
+          gen_bounds(calendar, tunit, incperiod, vdate, vtime, vdateb, vtimeb);
           
           if ( CDO_CMOR_Mode )
             {
