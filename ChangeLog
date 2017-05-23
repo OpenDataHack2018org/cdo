@@ -3,6 +3,10 @@
 	* Using CDI library version 1.8.3
 	* Version 1.9.0 release
 
+2017-05-23  Uwe Schulzweida
+
+	* expr: addeed support for variables starting with digits
+
 2017-05-22  Uwe Schulzweida
 
 	* settbounds: added support for hourly frequencies
