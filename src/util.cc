@@ -228,8 +228,10 @@ const char *getOperatorName(const char *operatorArg)
 
   if ( operatorArg )
     {
-      if ( operatorArg[0] == '-' ) operatorArg++;
-
+      if ( operatorArg[0] == '-' )
+      {
+          operatorArg++;
+      }
       char *commapos = (char *)strchr(operatorArg, ',');
       size_t len = (commapos != NULL) ? (size_t)(commapos - operatorArg) : strlen(operatorArg);
 
