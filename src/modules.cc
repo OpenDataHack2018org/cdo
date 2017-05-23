@@ -778,7 +778,7 @@ int add_alias(std::string alias, std::string original) {
         return -2;
     }
     if (modules_map.find(alias) != modules_map.end()) {
-        Error("alias %s could not be added: alias name already exists as an operator");
+      Error("alias %s could not be added: alias name already exists as an operator", alias.c_str());
     }
     aliases[alias] = original;
     NumAliases++;
@@ -1076,7 +1076,6 @@ void init_aliases()
   add_alias("covar0r"         , "fldcovar");
   add_alias("gather"          , "collgrid");
   add_alias("geopotheight"    , "gheight");
-  add_alias("ncode"           , "npar");
   add_alias("globavg"         , "fldavg");
   add_alias("import_grads"    , "import_binary");
   add_alias("infos"           , "sinfo");
