@@ -18,6 +18,9 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
+#include <sys/types.h> /* off_t */
+#include "util.h"
+
 constexpr int MAX_PROCESS  =   128;
 constexpr int MAX_STREAM   =    64;
 constexpr int MAX_OPERATOR =   128;
@@ -32,9 +35,6 @@ typedef struct {
   const char *enter;
 }
 oper_t;
-
-#include <sys/types.h> /* off_t */
-#include "util.h"
 
 typedef struct {
 #if defined(HAVE_LIBPTHREAD)
@@ -65,7 +65,6 @@ typedef struct {
   oper_t      oper[MAX_OPERATOR];
 }
 process_t;
-
 
 static process_t Process[MAX_PROCESS];
 

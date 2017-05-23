@@ -41,13 +41,9 @@
 #include "pstream_int.h"
 #include "dmemory.h"
 
-
-
-
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
-
 
 int processCreate(void)
 {
