@@ -53,6 +53,18 @@ case "${HOSTNAME}" in
                     $CDOLIBS \
 	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
 	            CC=clang    CFLAGS="-g -Wall -O3"
+        elif  test "$COMP" = gnu4.9 ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    $CDOLIBS \
+	            CXX=g++-mp-4.9 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" \
+                    CC=gcc-mp-4.9  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native"
+        elif  test "$COMP" = gnu5 ; then
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    $CDOLIBS \
+	            CXX=g++-mp-5 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" \
+                    CC=gcc-mp-5  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native"
         elif  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
