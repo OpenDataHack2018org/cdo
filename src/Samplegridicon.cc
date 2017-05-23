@@ -2,7 +2,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 
-#define MAX_CHILDS 9
+constexpr int MAX_CHILDS = 9;
 
 typedef struct {
   int ncells;
