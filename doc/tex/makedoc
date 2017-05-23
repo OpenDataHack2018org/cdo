@@ -305,7 +305,7 @@ while (<MOFILE>) {
     }
 
     print HELPFILE "\n";
-    print HELPFILE "static const char *${mname}Help[] = {\n";
+    print HELPFILE "std::vector<std::string> ${mname}Help = {\n";
 
     @hkeys = split(" ", $moperators);
 #    print "$#hkeys @hkeys \n";
@@ -1019,7 +1019,6 @@ while (<MOFILE>) {
 #      print HELPFILE "    \"\",\n";
 #      print HELPFILE "    \"\@End_${operator}\",\n";
 
-    print HELPFILE "    NULL\n";
     print HELPFILE "};\n";
 
     print TCFILE "\\end{tabular*}\n";
