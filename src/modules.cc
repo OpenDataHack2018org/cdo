@@ -154,6 +154,7 @@ void *Seloperator(void *argument);
 void *Selrec(void *argument);
 void *Seltime(void *argument);
 void *Set(void *argument);
+void *Setattribute(void *argument);
 void *Setbox(void *argument);
 void *Setgatt(void *argument);
 void *Setgrid(void *argument);
@@ -334,7 +335,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  FillmissOperators      {"fillmiss", "fillmiss2"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
-#define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
+#define  FldstatOperators       {"fldrange", "fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
 #define  FldcorOperators        {"fldcor"}
 #define  FldcovarOperators      {"fldcovar"}
 #define  FourierOperators       {"fourier"}
@@ -375,7 +376,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  MonarithOperators      {"monadd", "monsub", "monmul", "mondiv"}
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
-#define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "npar", "nlevel", "ngridpoints", "ngrids"}
+#define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel", "ngridpoints", "ngrids"}
 #define  NmldumpOperators       {"nmldump", "kvldump"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr", "outputxyz"}
@@ -418,6 +419,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseason", "selmonth", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
 #define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
+#define  SetattributeOperators  {"setattribute"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber", "setgriduri", "usegridnumber"}
@@ -470,11 +472,11 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  XTimstatOperators      {"xtimmin",  "xtimmax",  "xtimsum",  "xtimmean",  "xtimavg",  "xtimvar",  "xtimvar1",  "xtimstd",  "xtimstd1", \
                                  "xyearmin", "xyearmax", "xyearsum", "xyearmean", "xyearavg", "xyearvar", "xyearvar1", "xyearstd", "xyearstd1", \
                                  "xmonmin",  "xmonmax",  "xmonsum",  "xmonmean",  "xmonavg",  "xmonvar",  "xmonvar1",  "xmonstd",  "xmonstd1"}
-#define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timvar",  "timvar1",  "timstd",  "timstd1"}
-#define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearvar", "yearvar1", "yearstd", "yearstd1"}
-#define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monvar1",  "monstd",  "monstd1"}
-#define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "dayvar1",  "daystd",  "daystd1"}
-#define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourvar1", "hourstd", "hourstd1"}
+#define  TimstatOperators       {"timrange",  "timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timvar",  "timvar1",  "timstd",  "timstd1"}
+#define    YearstatOperators    {"yearrange", "yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearvar", "yearvar1", "yearstd", "yearstd1"}
+#define    MonstatOperators     {"monrange",  "monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monvar1",  "monstd",  "monstd1"}
+#define    DaystatOperators     {"dayrange",  "daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "dayvar1",  "daystd",  "daystd1"}
+#define    HourstatOperators    {"hourrange", "hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourvar1", "hourstd", "hourstd1"}
 #define  TimcorOperators        {"timcor"}
 #define  TimcovarOperators      {"timcovar"}
 #define  Timstat3Operators      {"meandiff2test", "varquot2test"}
@@ -907,18 +909,19 @@ void init_modules()
   add_module("Rotuv"         , {Rotuv         , RotuvbHelp        , RotuvOperators         , 1 , CDI_REAL , 1  , 1  });
   add_module("Runpctl"       , {Runpctl       , RunpctlHelp       , RunpctlOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Runstat"       , {Runstat       , RunstatHelp       , RunstatOperators       , 1 , CDI_REAL , 1  , 1  });
-  add_module("Samplegridicon", {Samplegridicon, {},              SamplegridiconOperators,1,   CDI_REAL,  1,  2 });
+  add_module("Samplegridicon", {Samplegridicon, {}                , SamplegridiconOperators, 1,  CDI_REAL,  1  , 2  });
   add_module("Seascount"     , {Seascount     , {}                , SeascountOperators     , 1 , CDI_BOTH , 1  , 1  });
   add_module("Seaspctl"      , {Seaspctl      , SeaspctlHelp      , SeaspctlOperators      , 1 , CDI_REAL , 3  , 1  });
   add_module("Seasstat"      , {Seasstat      , SeasstatHelp      , SeasstatOperators      , 1 , CDI_REAL , 1  , 1  });
   add_module("Selbox"        , {Selbox        , SelboxHelp        , SelboxOperators        , 1 , CDI_BOTH , 1  , 1  });
-  add_module("Selgridcell"      , {Selgridcell      , {}                , SelgridcellOperators      , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Selgridcell"   , {Selgridcell   , {}                , SelgridcellOperators   , 1 , CDI_BOTH , 1  , 1  });
   add_module("Select"        , {Select        , SelectHelp        , SelectOperators        , 1 , CDI_BOTH , -1 , 1  });
   add_module("Selvar"        , {Selvar        , SelvarHelp        , SelvarOperators        , 1 , CDI_BOTH , 1  , 1  });
   add_module("Selrec"        , {Selrec        , SelvarHelp        , SelrecOperators        , 1 , CDI_BOTH , 1  , 1  });
   add_module("Seloperator"   , {Seloperator   , {}                , SeloperatorOperators   , 1 , CDI_REAL , 1  , 1  });
   add_module("Seltime"       , {Seltime       , SeltimeHelp       , SeltimeOperators       , 1 , CDI_BOTH , 1  , 1  });
   add_module("Set"           , {Set           , SetHelp           , SetOperators           , 1 , CDI_BOTH , 1  , 1  });
+  add_module("Setattribute"  , {Setattribute  , SetattributeHelp  , SetattributeOperators  , 1 , CDI_REAL , 1  , 1  });
   add_module("Setbox"        , {Setbox        , SetboxHelp        , SetboxOperators        , 1 , CDI_REAL , 1  , 1  });
   //add_module("Setgatt"       , {Setgatt       , SetgattHelp       , SetgattOperators       , 1 , CDI_BOTH , 1  , 1  });  
   add_module("Setgrid"       , {Setgrid       , SetgridHelp       , SetgridOperators       , 1 , CDI_BOTH , 1  , 1  });
@@ -1053,9 +1056,9 @@ void init_modules()
   add_module("Magvector"     , {Magvector     , MagvectorHelp     , MagvectorOperators     , 1 , CDI_REAL , 1  , 1  });
   add_module("Maggraph"      , {Maggraph      , MaggraphHelp      , MaggraphOperators      , 1 , CDI_REAL , -1 , 1  });
   // HIRLAM_EXTENSIONS
-  add_module( "Samplegrid", { Samplegrid,     SamplegridHelp,    SamplegridOperators,    1,   CDI_REAL,  1,  1 });
-  add_module( "Selmulti " ,{ Selmulti,       SelmultiHelp,      SelmultiOperators,      1,   CDI_REAL,  1,  1 });
-  add_module( "WindTrans" ,{ WindTrans,      WindTransHelp,     WindTransOperators,     1,   CDI_REAL,  1,  1 });
+  add_module( "Samplegrid"   , { Samplegrid   , SamplegridHelp    , SamplegridOperators    , 1 , CDI_REAL , 1  , 1 });
+  add_module( "Selmulti "    , { Selmulti     , SelmultiHelp      , SelmultiOperators      , 1 , CDI_REAL , 1  , 1 });
+  add_module( "WindTrans"    , { WindTrans    , WindTransHelp     , WindTransOperators     , 1 , CDI_REAL , 1  , 1 });
 
   init_aliases();
 }
