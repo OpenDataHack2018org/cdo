@@ -2,6 +2,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 
+#define MAX_CHILDS 9
 
 typedef struct {
   int ncells;
@@ -74,7 +75,7 @@ cellindex_type *read_cellindex(const char *filename)
   // cellindex->neighbor = (int*) Malloc(3*ncells*sizeof(int));
   cellindex->parent   = (int*) Malloc(  ncells*sizeof(int));
   cellindex->child    = NULL;
-  // cellindex->child    = (cid != CDI_UNDEFID) ? (int*) Malloc(4*ncells*sizeof(int)) : NULL;
+  // cellindex->child    = (cid != CDI_UNDEFID) ? (int*) Malloc(MAX_CHILDS*ncells*sizeof(int)) : NULL;
   double *data = (double *) Malloc(ncells*sizeof(double));
 
   int nrecs = streamInqTimestep(streamID, 0);
@@ -214,18 +215,18 @@ void compute_child(cellindex_type *cellindex1, cellindex_type *cellindex2)
       }
 
   int ncells2 = cellindex2->ncells;
-  int *child2 = (int*) Malloc(4*ncells2*sizeof(int));
+  int *child2 = (int*) Malloc(MAX_CHILDS*ncells2*sizeof(int));
   cellindex2->child = child2;
   for ( int i = 0; i< ncells2; ++i )
     {
-      for ( int k = 0; k < 4; ++k ) child2[i*4+k] = -1;
+      for ( int k = 0; k < MAX_CHILDS; ++k ) child2[i*MAX_CHILDS+k] = -1;
       int j = find_index(i, ncells1, parent1);
       if ( j < 0 ) continue;
-      for ( int k = 0; k < 4; ++k )
+      for ( int k = 0; k < MAX_CHILDS; ++k )
         {
           if ( i != parent1[j+k] ) break;
-          //  child2[i*4+k] = j+k;
-          child2[i*4+k] = idx1[j+k];
+          //  child2[i*MAX_CHILDS+k] = j+k;
+          child2[i*MAX_CHILDS+k] = idx1[j+k];
         }
       // if ( i%10000 == 0 ) printf("%d %d %d %d %d %d\n", i, j, parent1[j], parent1[j+1], parent1[j+2], parent1[j+3]);      
     }
@@ -239,9 +240,9 @@ void compute_sum(int i, int *n, double *sum, double *sumq, int kci, cellindex_ty
   int ncells2 = cellindex[kci]->ncells;
   if ( i < 0 || i > ncells2 ) cdoAbort("Child grid cell index %d out of bounds %d!", i, ncells2);
 
-  for ( int k = 0; k < 4; ++k )
+  for ( int k = 0; k < MAX_CHILDS; ++k )
     {
-      int index = cellindex[kci]->child[i*4+k];
+      int index = cellindex[kci]->child[i*MAX_CHILDS+k];
       if ( index == -1 ) break;
       if ( kci == 1 )
         {
