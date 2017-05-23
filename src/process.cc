@@ -42,56 +42,7 @@
 #include "dmemory.h"
 
 
-#define  MAX_PROCESS    128
-#define  MAX_STREAM      64
-#define  MAX_OPERATOR   128
-#define  MAX_OARGC     4096
-#define  MAX_FILES    65536
 
-
-typedef struct {
-  int         f1;
-  int         f2;
-  const char *name;
-  const char *enter;
-}
-oper_t;
-
-typedef struct {
-#if defined(HAVE_LIBPTHREAD)
-  pthread_t   threadID;
-  int         l_threadID;
-#endif
-  short       nchild;
-  short       nstream;
-  short       streams[MAX_STREAM];
-  double      s_utime;
-  double      s_stime;
-  double      a_utime;
-  double      a_stime;
-  double      cputime;
-
-  off_t       nvals;
-  short       nvars;
-  int         ntimesteps;
-  short       streamCnt;
-  argument_t *streamNames;
-  char       *xoperator;
-  const char *operatorName;
-  char       *operatorArg;
-  int         oargc;
-  char       *oargv[MAX_OARGC];
-  char        prompt[64];
-  short       noper;
-  oper_t      oper[MAX_OPERATOR];
-}
-process_t;
-
-
-static process_t Process[MAX_PROCESS];
-
-static int NumProcess = 0;
-static int NumProcessActive = 0;
 
 #if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -157,7 +108,7 @@ int processSelf(void)
         processID = 0;
     }
 
-  pthread_mutex_unlock(&processMutex);  
+  pthread_mutex_unlock(&processMutex);
 
 #endif
 
