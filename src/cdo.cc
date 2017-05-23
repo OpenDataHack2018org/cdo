@@ -73,6 +73,8 @@
 
 #define MAX_NUM_VARNAMES 256
 
+#include <string>
+
 static int Debug = 0;
 static int Version = 0;
 static int Help = 0;
@@ -332,50 +334,47 @@ void cdo_init_is_tty(void)
 }
 
 static
-void cdoPrintHelp(const char *phelp[]/*, char *xoperator*/)
+void cdoPrintHelp(std::vector<std::string> help/*, char *xoperator*/)
 {
-  if ( phelp == NULL )
+  if (help.empty())
     fprintf(stderr, "No help available for this operator!\n");
   else
     {
       bool lprint;
-      while ( *phelp )
+      for(unsigned long i =  0; i < help.size(); i++)
         {
-          lprint = !(*phelp[0] == '\0' && *(phelp+1) && *(phelp+1)[0] == ' ');
+          lprint = !(help[i][0] == '\0'  && help[i+1][0] == ' ');
           
           if ( lprint )
             {
               if ( COLOR_STDOUT )
                 {
-                  if ( (strcmp(*phelp, "NAME")        == 0) ||
-                       (strcmp(*phelp, "SYNOPSIS")    == 0) ||
-                       (strcmp(*phelp, "DESCRIPTION") == 0) ||
-                       (strcmp(*phelp, "OPERATORS")   == 0) ||
-                       (strcmp(*phelp, "NAMELIST")    == 0) ||
-                       (strcmp(*phelp, "PARAMETER")   == 0) ||
-                       (strcmp(*phelp, "ENVIRONMENT") == 0) ||
-                       (strcmp(*phelp, "NOTE")        == 0) ||
-                       (strcmp(*phelp, "EXAMPLES")    == 0) )
+                  if ( (help[i].compare( "NAME")        == 0) ||
+                       (help[i].compare( "SYNOPSIS")    == 0) ||
+                       (help[i].compare( "DESCRIPTION") == 0) ||
+                       (help[i].compare( "OPERATORS")   == 0) ||
+                       (help[i].compare( "NAMELIST")    == 0) ||
+                       (help[i].compare( "PARAMETER")   == 0) ||
+                       (help[i].compare( "ENVIRONMENT") == 0) ||
+                       (help[i].compare( "NOTE")        == 0) ||
+                       (help[i].compare( "EXAMPLES")    == 0) )
                     {
                       set_text_color(stdout, BRIGHT, BLACK);
-                      fprintf(stdout, "%s", *phelp);
+                      fprintf(stdout, "%s", help[i].c_str());
                       reset_text_color(stdout);
                       fprintf(stdout, "\n");
                     }
                   else
-                    fprintf(stdout, "%s\n", *phelp);
+                    fprintf(stdout, "%s\n", help[i].c_str());
                 }
               else
                 {
-                  fprintf(stdout, "%s\n", *phelp);
+                  fprintf(stdout, "%s\n", help[i].c_str());
                 }
             }
-
-          phelp++;
         }
     }
 }
-
 static
 void cdoSetDebug(int level)
 {
@@ -1459,7 +1458,7 @@ int main(int argc, char *argv[])
   int lstop = FALSE;
   int noff = 0;
   int status = 0;
-  char *operatorArg = NULL;
+  const char *operatorArg = NULL;
   argument_t *argument = NULL;
 
   cdo_init_is_tty();
@@ -1480,7 +1479,7 @@ int main(int argc, char *argv[])
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
   get_env_vars();
-
+  init_modules();
   status = parse_options_long(argc, argv);
 
   if ( status != 0 ) return -1;
@@ -1607,7 +1606,14 @@ int main(int argc, char *argv[])
 
       timer_start(timer_total);
 
+#ifdef CUSTOM_MODULES
+      load_custom_modules("custom_modules");
       operatorModule(operatorName)(argument);
+      close_library_handles();
+#else
+      operatorModule(operatorName)(argument);
+
+#endif
 
       timer_stop(timer_total);
 

@@ -43,6 +43,7 @@
 
 #define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
+#include <string>
 extern char *Progname;
 extern char *cdoGridSearchDir;
 extern int CDO_Reduce_Dim;
@@ -221,6 +222,7 @@ int zaxisFromName(const char *zaxisname);
 /* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
 void cdo_omp_set_num_threads(int nthreads);
+std::string string2lower(std::string str);
 void strtolower(char *str);
 void strtoupper(char *str);
 

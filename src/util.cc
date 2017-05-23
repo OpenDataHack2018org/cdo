@@ -221,7 +221,6 @@ char *getOperator(const char *argument)
   return operatorArg;
 }
 
-const char *operatorAlias(const char *operatorName);
 
 const char *getOperatorName(const char *operatorArg)
 {
@@ -241,7 +240,10 @@ const char *getOperatorName(const char *operatorArg)
     }
 
   /*  return operatorName; */
-  return operatorAlias(operatorName);
+  std::string opName =  aliases[std::string(operatorName)];
+  memcpy(operatorName,opName.c_str(),opName.size() );
+
+  return operatorName;
 }
 
 
@@ -390,7 +392,15 @@ void input_int(char *arg, int intarr[], int maxint, int *nintfound)
   *nintfound = nint;
 }
 
-
+std::string string2lower(std::string str)
+{
+    std::string lower_case_string = str;
+    for(char c : str)
+    {
+       c = tolower(c); 
+    }
+    return lower_case_string;
+}
 void strtolower(char *str)
 {
   if ( str )
