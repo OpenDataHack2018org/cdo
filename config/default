@@ -57,20 +57,20 @@ case "${HOSTNAME}" in
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CXX=g++-mp-4.9 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" \
-                    CC=gcc-mp-4.9  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native"
+	            CXX=g++-mp-4.9 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
+                    CC=gcc-mp-4.9  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         elif  test "$COMP" = gnu5 ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CXX=g++-mp-5 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" \
-                    CC=gcc-mp-5  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native"
+	            CXX=g++-mp-5 CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
+                    CC=gcc-mp-5  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
         elif  test "$COMP" = gnu ; then
 	  ${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
                     $CDOLIBS \
-	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native" \
-                    CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native -march=native"
+	            CXX=g++ CXXFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
+                    CC=gcc  CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O3 -march=native"
 #                    --with-libxml2=/usr 
 #                    --with-magics=/Users/m214003/local/magics-2.14.9
         else
@@ -103,8 +103,13 @@ case "${HOSTNAME}" in
         elif  test "$COMP" = clang ; then
 	  ${CONFPATH}configure \
                     $CDOLIBS \
-	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
-	            CC=clang    CFLAGS="-g -Wall -O3"
+	            CXX=clang++ CXXFLAGS="-g -Wall -pedantic -O3" \
+	            CC=clang    CFLAGS="-g -Wall -pedantic -O3"
+        elif  test "$COMP" = clang4 ; then
+	  ${CONFPATH}configure \
+                    $CDOLIBS \
+	            CXX=clang++-mp-4.0 CXXFLAGS="-g -Wall -pedantic -O3" \
+	            CC=clang-mp-4.0    CFLAGS="-g -Wall -pedantic -O3"
         elif  test "$COMP" = pgi ; then
 	  ${CONFPATH}configure --disable-openmp \
                     $CDOLIBS \
