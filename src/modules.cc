@@ -1237,7 +1237,7 @@ void operatorPrintAll(void) {
     // using a set because it sorts the operators alphabetically on its own
     std::vector<std::string> sorted_operator_names = get_sorted_operator_name_list();
 
-    std::cout << tab << std::endl;
+    std::cout << tab;
     for (auto operatorName : sorted_operator_names) {
         if (number_of_chars > 85) {
             number_of_chars = tab_width;
