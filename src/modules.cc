@@ -34,7 +34,6 @@
 // for std::sort()
 #include <algorithm>
 
-int NumAliases;
 
 /* \cond */
 void *Adisit(void *argument);
@@ -779,7 +778,7 @@ int add_alias(std::string alias, std::string original) {
       Error("alias %s could not be added: alias name already exists as an operator", alias.c_str());
     }
     aliases[alias] = original;
-    NumAliases++;
+
     return 0;
 }
 /* clang-format off */

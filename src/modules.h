@@ -37,7 +37,6 @@ typedef struct {
     short streamOutCnt;                  // Number of output streams
 } modules_t;
 
-extern int NumAliases;
 
 /***
   vector for library handles for loaded custom modules
