@@ -18,10 +18,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-#ifndef register
-#define register
-#endif
 #ifndef fileno
 int fileno(FILE *stream);
 #endif
