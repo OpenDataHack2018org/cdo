@@ -14,9 +14,8 @@
    GNU General Public License for more details.
  */
 
-#ifndef _MODULES_H
-#define _MODULES_H
-#define MAX_MOD_OPERATORS 128 // maximum number of operators for a module
+#ifndef MODULES_H
+#define MODULES_H
 
 #include <iostream>
 #include <map>
@@ -30,7 +29,7 @@ typedef void (*dyn_oper_t)(void *arg);
 
 typedef struct {
     void *(*func)(void *);               // Module
-    std::vector<std::string> help;                   // Help
+    std::vector<std::string> help;       // Help
     std::vector<const char *> operators; // Operator names
     short mode;                          // Module mode: 0:intern 1:extern
     short number;                        // Allowed number type
@@ -46,18 +45,18 @@ extern int NumAliases;
   */
 static std::vector<void *> custom_modules_lib_handles;
 
-/**
- * Maps operator names to their module names
+/***
+  Maps operator names to their module names
  */
 static std::map<std::string, std::string> modules_map;
 
-/**
-* Contains added modules as values and their names as key
-*/
+/***
+  Contains added modules as values and their names as key
+  */
 static std::map<std::string, modules_t> modules;
 
 /***
- * Key: operator alias / Value: operator original name
+  Key: operator alias / Value: operator original name
  */
 static std::map<std::string, std::string> aliases;
 
@@ -83,4 +82,4 @@ void load_custom_modules(std::string folder_path);
 void close_library_handles();
 #endif
 
-#endif /* _MODULES_H */
+#endif /* MODULES_H */
