@@ -1249,44 +1249,6 @@ void operatorPrintAll(void) {
     }
 
     std::cerr << std::endl;
-    /* old implementation for comparison only
-
-    for(auto alias : opalias){}
-     //-0----------
-    int i, j, nbyte, nop = 0;
-    const char *opernames[4096];
-    FILE *pout = stderr;
-
-    for ( i = 0; i < NumModules; i++ )
-      {
-        if ( Modules[i].mode )
-          {
-            j = 0;
-            while ( Modules[i].operators[j] )
-              opernames[nop++] = Modules[i].operators[j++];
-    }
-      }
-
-    // Add operator aliases
-    for ( i = 0; i < nopalias; i++ )
-      {
-        opernames[nop++] = opalias[i][0];
-      }
-
-    qsort(opernames, nop, sizeof(char *), cmpname);
-
-    nbyte = fprintf(pout, "   ");
-    for ( i = 0; i < nop; i++ )
-      {
-        if ( nbyte > 85 )
-    {
-      fprintf(pout, "\n");
-      nbyte = fprintf(pout, "   ");
-    }
-        nbyte += fprintf(pout, " %s", opernames[i]);
-      }
-    fprintf(pout, "\n");
-    */
 }
 
 #ifdef CUSTOM_MODULES
