@@ -990,7 +990,7 @@ void init_modules()
   add_module("Vertwind"      , {Vertwind      , {}                , VertwindOperators      , 1 , CDI_REAL , 1  , 1  });
   add_module("Verifygrid"    , {Verifygrid    , {}                , VerifygridOperators    , 1 , CDI_REAL , 1  , 0  });
   add_module("Wind"          , {Wind          , WindHelp          , WindOperators          , 1 , CDI_REAL , 1  , 1  });
-  add_module("Writegrid"     , {Writegrid     , {}                , WritegridOperators     , 1 , CDI_REAL , 1  , 1  }); /* no cdi output */
+  add_module("Writegrid"     , {Writegrid     , {}                , WritegridOperators     , 1 , CDI_REAL , 1  , 1  }); // no cdi output
   add_module("Writerandom"   , {Writerandom   , {}                , WriterandomOperators   , 1 , CDI_REAL , 1  , 1  });
   add_module("YAR"           , {YAR           , {}                , YAROperators           , 0 , CDI_REAL , 1  , 1  });
   add_module("Yearmonstat"   , {Yearmonstat   , YearmonstatHelp   , YearmonstatOperators   , 1 , CDI_REAL , 1  , 1  });
@@ -1047,7 +1047,7 @@ void init_modules()
   add_module("Strbre"        , {Strbre        , StrbreHelp        , StrbreOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Strgal"        , {Strgal        , StrgalHelp        , StrgalOperators        , 1 , CDI_REAL , 1  , 1  });
   add_module("Hurr"          , {Hurr          , HurrHelp          , HurrOperators          , 1 , CDI_REAL , 1  , 1  });
-  // add_module("Hi"         , { Hi           , {}                , HiOperators            , 1 , CDI_REAL , 3  , 1   }); */
+  // add_module("Hi"         , { Hi           , {}                , HiOperators            , 1 , CDI_REAL , 3  , 1   });
   add_module("Wct"           , {Wct           , WctHelp           , WctOperators           , 1 , CDI_REAL , 2  , 1  });
   add_module("Magplot"       , {Magplot       , MagplotHelp       , MagplotOperators       , 1 , CDI_REAL , 1  , 1  });
   add_module("Magvector"     , {Magvector     , MagvectorHelp     , MagvectorOperators     , 1 , CDI_REAL , 1  , 1  });
@@ -1248,13 +1248,11 @@ void operatorPrintAll(void) {
 */
 #ifdef CUSTOM_MODULES
 void load_custom_modules(std::string folder_path) {
-    DIR *dir;
-    struct dirent *ent;
-    dir = opendir(folder_path.c_str());
+    DIR *dir = opendir(folder_path.c_str());
     std::string file_path;
     std::regex library_regex("(.*\\.so)");
     if (dir != NULL) {
-        ent = readdir(dir);
+        struct dirent *ent = readdir(dir);
         while (ent != NULL) {
             if (std::regex_match(ent->d_name, library_regex)) {
                 file_path = folder_path + "/" + ent->d_name;
@@ -1274,10 +1272,8 @@ void load_custom_modules(std::string folder_path) {
  * @param module file path
  */
 void load_custom_module(std::string file_path) {
-    const char *dlsym_error;
-    void *lib_handle;
     void (*init_custom_module)();
-    lib_handle = dlopen(file_path.c_str(), RTLD_LAZY);
+    void *lib_handle = dlopen(file_path.c_str(), RTLD_LAZY);
     custom_modules_lib_handles.push_back(lib_handle);
     if (!lib_handle) {
         std::cerr << "Cannot open library: " << dlerror() << std::endl;
@@ -1286,7 +1282,7 @@ void load_custom_module(std::string file_path) {
 
     dlerror();
     init_custom_module = (void (*)())dlsym(lib_handle, "init_custom_module");
-    dlsym_error = dlerror();
+    const char *dlsym_error = dlerror();
 
     if (dlsym_error) {
         std::cerr << "Cannot load symbol 'init_custom_module': " << dlsym_error << std::endl;
