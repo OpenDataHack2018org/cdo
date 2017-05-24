@@ -221,11 +221,11 @@ void *Vertintap(void *argument)
         }
     }
   
-  bool vars[nvars];
-  double *vardata1[nvars];
-  double *vardata2[nvars];
-  int *varnmiss[nvars];
-  bool varinterp[nvars];
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
+  bool *varinterp = (bool*) Malloc(nvars*sizeof(bool));
+  double **vardata1 = (double**) Malloc(nvars*sizeof(double*));
+  double **vardata2 = (double**) Malloc(nvars*sizeof(double*));
+  int **varnmiss = (int**) Malloc(nvars*sizeof(int*));
 
   int maxlev = nhlevh > nplev ? nhlevh : nplev;
 
@@ -237,7 +237,7 @@ void *Vertintap(void *argument)
     {
       int nlev = zaxisInqSize(zaxisIDh);
       if ( nlev != nhlev ) cdoAbort("Internal error, wrong number of height level!");
-      double levels[nlev];
+      double *levels = (double*) Malloc(nlev*sizeof(double));
       zaxisInqLevels(zaxisIDh, levels);
 
       for ( int ilev = 0; ilev < nlev; ++ilev )
@@ -248,6 +248,8 @@ void *Vertintap(void *argument)
 	      break;
 	    }
 	}
+
+      Free(levels);
     }
 
   if ( zaxisIDh != -1 && gridsize > 0 )
@@ -262,7 +264,7 @@ void *Vertintap(void *argument)
 
   if ( operfunc == func_hl )
     {
-      double phlev[nplev];
+      double *phlev =(double*) Malloc(nplev*sizeof(double));
       height2pressure(phlev, plev, nplev);
 
       if ( cdoVerbose )
@@ -270,6 +272,7 @@ void *Vertintap(void *argument)
 	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
 
       memcpy(plev, phlev, nplev*sizeof(double));
+      Free(phlev);
     }
 
   if ( opertype == type_log )
@@ -469,6 +472,12 @@ void *Vertintap(void *argument)
   if ( full_press ) Free(full_press);
   if ( dpress     ) Free(dpress);
   if ( vct        ) Free(vct);
+
+  Free(vars);
+  Free(varinterp);
+  Free(vardata1);
+  Free(vardata2);
+  Free(varnmiss);
 
   lista_destroy(flista);
 

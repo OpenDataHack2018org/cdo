@@ -90,7 +90,7 @@ static
 void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subarray_end)
 {
   int subarray_length = (subarray_end - subarray_start) / 2 + 1;     
-  double subarray[subarray_length];
+  double *subarray = (double*) Malloc(subarray_length*sizeof(double));
   int subarray_index = 0;
   
   for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){	 
@@ -105,7 +105,9 @@ void quick_sort_of_subarray_by_lat(double * array, int subarray_start, int subar
   for(int index = subarray_start + 1; index <= subarray_end + 1; index += 2){
     array[index] = subarray[subarray_index];
     subarray_index += 1;	  
-  }            
+  }
+
+  Free(subarray);
 }
 
 
@@ -311,7 +313,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   */
   
   double center_point_xyz[3];
-  double cell_corners_xyz_open_cell[ncorner * 3];
+  double *cell_corners_xyz_open_cell = (double*) Malloc(3*ncorner*sizeof(double));
   
   double corner_coordinates[3];
   double second_corner_coordinates[3];
@@ -329,7 +331,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   
   double *p_surface_normal_of_the_cell = &surface_normal_of_the_cell[0];
 
-  int no_cells_with_a_specific_no_of_corners[ncorner];
+  int *no_cells_with_a_specific_no_of_corners = (int*) Malloc(ncorner*sizeof(int));
 
   for ( int i = 0; i < ncorner; i++ )
     no_cells_with_a_specific_no_of_corners[i] = 0;
@@ -455,7 +457,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       
       /* Checks if there are any duplicate vertices in the list of corners. Note that the last (additional) corner has not been set yet. */
 
-      int marked_duplicate_indices[actual_number_of_corners];
+      int *marked_duplicate_indices = (int*) Malloc(actual_number_of_corners*sizeof(int));
       for ( int i = 0; i < actual_number_of_corners; i++ ) marked_duplicate_indices[i] = 0;
 
       int no_duplicates = 0;
@@ -476,7 +478,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
       /* Writes the unique corner vertices in a new array. */
 
-      double cell_corners_xyz_without_duplicates[(actual_number_of_corners - no_duplicates) * 3];
+      double *cell_corners_xyz_without_duplicates = (double*) Malloc(3*(actual_number_of_corners - no_duplicates)*sizeof(double));
       
       int unique_corner_number = 0;
       
@@ -509,7 +511,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
       /* We are creating a closed polygon/cell by setting the additional last corner to be the same as the first one. */
 
-      double cell_corners_xyz[(actual_number_of_corners + 1) * 3];
+      double *cell_corners_xyz = (double*) Malloc(3*(actual_number_of_corners + 1)*sizeof(double));
 
       for ( int corner_no = 0; corner_no < actual_number_of_corners; corner_no++ )
         {
@@ -555,7 +557,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
      
       /* The remaining two-dimensional coordinates are extracted into one array for all the cell's corners and into one array for the center point. */
 
-      double cell_corners_plane_projection[(actual_number_of_corners +1) * 2];
+      double *cell_corners_plane_projection = (double*) Malloc(2*(actual_number_of_corners +1)*sizeof(double));
       
       /* The following projection on the plane that two coordinate axes lie on changes the arrangement of the polygon vertices if the coordinate to be ignored along the third axis is smaller than 0.
 	 In this case, the result of the computation of the orientation of vertices needs to be inverted. Clockwise becomes counterclockwise and vice versa. */
@@ -630,6 +632,11 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
             printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no]);
           printf("\n");
         }
+
+      Free(cell_corners_plane_projection);
+      Free(cell_corners_xyz);
+      Free(cell_corners_xyz_without_duplicates);
+      Free(marked_duplicate_indices);
     }
 
   int no_nonunique_cells = gridsize - no_unique_center_points;
@@ -655,6 +662,9 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
     cdoPrintRed("%9d cells have their center points located outside their boundaries", no_of_cells_with_center_points_out_of_bounds);
 
   cdoPrint("");
+
+  Free(no_cells_with_a_specific_no_of_corners);
+  Free(cell_corners_xyz_open_cell);
 }
 
 

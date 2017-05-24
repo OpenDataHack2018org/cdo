@@ -212,7 +212,7 @@ void *Vertstat(void *argument)
 
   int nzaxis = vlistNzaxis(vlistID1);
   int nlev, zaxisID;
-  vert_t vert[nzaxis];
+  vert_t *vert = (vert_t*) Malloc(nzaxis*sizeof(vert_t));
   if ( needWeights )
     {
       bool genbounds = false;
@@ -460,6 +460,8 @@ void *Vertstat(void *argument)
   if ( needWeights )
     for ( int index = 0; index < nzaxis; ++index )
       if ( vert[index].numlevel > 1 )  Free(vert[index].weights);
+
+  Free(vert);
 
   streamClose(streamID2);
   streamClose(streamID1);
