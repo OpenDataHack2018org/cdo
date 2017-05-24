@@ -34,7 +34,6 @@
 // for std::sort()
 #include <algorithm>
 
-int NumModules;
 int NumAliases;
 
 /* \cond */
@@ -747,7 +746,6 @@ void add_module(std::string module_name, modules_t new_module) {
             // if the operator name is not already in the map or in the aliases
             if (!operator_name_exists(operatorName)) {
                 modules_map[operatorName] = module_name;
-                NumModules++;
             } else {
                 Error("Tried to add operator but the operator name already exists");
             }
