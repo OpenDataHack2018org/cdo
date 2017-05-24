@@ -1201,13 +1201,6 @@ int operatorStreamNumber(const char *operatorName) {
     return modules[get_module_name_to(operator_name)].number;
 }
 
-int cmpname(const void *s1, const void *s2) {
-    char **c1 = (char **)s1;
-    char **c2 = (char **)s2;
-
-    return strcmp((const char *)*c1, (const char *)*c2);
-}
-
 /***
  * Creates a sorted vector with all operator names and alisases excluding all modules that are
  * marked as internal
