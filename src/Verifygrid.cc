@@ -360,6 +360,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   double center_point_plane_projection[2];
 
   int no_of_cells_with_duplicates = 0;
+  int no_usable_cells = 0;
   int no_convex_cells = 0;
   int no_clockwise_cells = 0;
   int no_counterclockwise_cells = 0;
@@ -489,6 +490,8 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
           
           continue;
         }
+
+      no_usable_cells++;
       
       /* Checks if there are any duplicate vertices in the list of corners. Note that the last (additional) corner has not been set yet. */
 
@@ -532,6 +535,8 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       
       actual_number_of_corners = actual_number_of_corners - no_duplicates;
 
+      if ( no_duplicates != 0 ) no_of_cells_with_duplicates += 1;
+
       /* If there are less than three corners in the cell left after removing duplicates, it is unusable and considered degenerate. No area can be computed. */
       
       if ( actual_number_of_corners < 3 )
@@ -541,8 +546,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
           continue;
         }
-      
-      if ( no_duplicates != 0 ) no_of_cells_with_duplicates += 1;
 
       /* We are creating a closed polygon/cell by setting the additional last corner to be the same as the first one. */
 
@@ -649,7 +652,8 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
     }
 
   int no_nonunique_cells = gridsize - no_unique_center_points;
-  int no_nonconvex_cells =  (int) gridsize - no_convex_cells;
+  int no_nonconvex_cells = (int) gridsize - no_convex_cells;
+  int no_nonusable_cells = (int) gridsize - no_usable_cells;
 
   for ( int i = 2; i < ncorner; i++ )
     if ( no_cells_with_a_specific_no_of_corners[i] )
@@ -657,6 +661,9 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
 
   if ( no_of_cells_with_duplicates )
     cdoPrintBlue("%9d cells have duplicate vertices", no_of_cells_with_duplicates);
+
+  if ( no_nonusable_cells )
+    cdoPrintRed("%9d cells have unsable vertices", no_nonusable_cells);
 
   if ( no_nonunique_cells )
     cdoPrintRed("%9d cells are not unique", no_nonunique_cells);
