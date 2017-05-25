@@ -87,31 +87,25 @@ kd_printTree(struct kdNode *node)
 
 void *kd_doBuildTree(void *threadarg)
 {
-    int sortaxis;
-    unsigned long pivot;
     kdata_t tmpMinLeft[KD_MAX_DIM], tmpMaxLeft[KD_MAX_DIM], tmpMinRight[KD_MAX_DIM], tmpMaxRight[KD_MAX_DIM];
     struct kdNode *node;
-    struct kd_point *points;
-    unsigned long nPoints;
-    kdata_t *min, *max;
-    int depth, dim, max_threads;
     pthread_t threads[2];
     pthread_attr_t attr;
     struct kd_thread_data *argleft, *argright;
     struct kd_thread_data *my_data = (struct kd_thread_data *) threadarg;
 
-    points = my_data->points;
-    nPoints = my_data->nPoints;
-    min = my_data->min;
-    max = my_data->max;
-    depth = my_data->depth;
-    max_threads = my_data->max_threads;
-    dim = my_data->dim;
+    struct kd_point *points = my_data->points;
+    unsigned long nPoints = my_data->nPoints;
+    kdata_t *min = my_data->min;
+    kdata_t *max = my_data->max;
+    int depth = my_data->depth;
+    int max_threads = my_data->max_threads;
+    int dim = my_data->dim;
 
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-    sortaxis = depth % dim;
+    int sortaxis = depth % dim;
 
     if (nPoints == 1) {
         if ((node = kd_allocNode(points, 0, min, max, sortaxis, dim)) == NULL)
@@ -126,16 +120,15 @@ void *kd_doBuildTree(void *threadarg)
      */
     pmergesort(points, nPoints, sortaxis, max_threads);
 
-    pivot = nPoints / 2;
+    unsigned long pivot = nPoints / 2;
     if ((node = kd_allocNode(points, pivot, min, max, sortaxis, dim)) == NULL)
         return NULL;
 
     memcpy(tmpMinLeft, min, dim * sizeof(kdata_t));
     memcpy(tmpMaxLeft, max, dim * sizeof(kdata_t));
     tmpMaxLeft[sortaxis] = node->location[sortaxis];
-    argleft =
-        kd_buildArg(points, pivot, tmpMinLeft, tmpMaxLeft,
-                    depth + 1, max_threads / 2, dim);
+    argleft = kd_buildArg(points, pivot, tmpMinLeft, tmpMaxLeft,
+                          depth + 1, max_threads / 2, dim);
     if (!argleft) {
         kd_destroyTree(node);
         return NULL;
