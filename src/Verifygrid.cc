@@ -125,7 +125,7 @@ double determinant(double matrix[3][3])
 }
 
 static
-void find_unit_normal(double a[3], double b[3], double c[3], double * unit_normal)
+void find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal)
 {  
   /* Calculates the unit normal for a plane defined on three points a, b, c in Euclidean space. */
 
@@ -328,8 +328,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   int no_of_cells_with_center_points_out_of_bounds = 0;
   int coordinate_to_ignore = 0;
   int no_unique_center_points = 1;
-  
-  double *p_surface_normal_of_the_cell = &surface_normal_of_the_cell[0];
 
   int *no_cells_with_a_specific_no_of_corners = (int*) Malloc(ncorner*sizeof(int));
 
@@ -539,7 +537,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       third_corner_coordinates[1] = cell_corners_xyz[6 + 1];
       third_corner_coordinates[2] = cell_corners_xyz[6 + 2];
       
-      find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, p_surface_normal_of_the_cell);
+      find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, surface_normal_of_the_cell);
 
       /* The surface normal is used to choose the coordinate to ignore. */
 
