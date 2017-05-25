@@ -155,6 +155,47 @@ void find_unit_normal(double a[3], double b[3], double c[3], double *unit_normal
 }
 
 static
+int find_coordinate_to_ignore(double *cell_corners_xyz)
+{
+  double corner_coordinates[3];
+  double second_corner_coordinates[3];
+  double third_corner_coordinates[3];
+
+  /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
+      
+  corner_coordinates[0] = cell_corners_xyz[0];
+  corner_coordinates[1] = cell_corners_xyz[1];
+  corner_coordinates[2] = cell_corners_xyz[2];
+
+  second_corner_coordinates[0] = cell_corners_xyz[3 + 0];
+  second_corner_coordinates[1] = cell_corners_xyz[3 + 1];
+  second_corner_coordinates[2] = cell_corners_xyz[3 + 2];
+
+  third_corner_coordinates[0] = cell_corners_xyz[6 + 0];
+  third_corner_coordinates[1] = cell_corners_xyz[6 + 1];
+  third_corner_coordinates[2] = cell_corners_xyz[6 + 2];
+      
+  double surface_normal_of_the_cell[3];
+  find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, surface_normal_of_the_cell);
+
+  /* The surface normal is used to choose the coordinate to ignore. */
+
+  double abs_x = fabs(surface_normal_of_the_cell[0]);
+  double abs_y = fabs(surface_normal_of_the_cell[1]);
+  double abs_z = fabs(surface_normal_of_the_cell[2]);
+
+  int coordinate_to_ignore = 3;
+
+  if (abs_x > abs_y){
+    if (abs_x > abs_z) coordinate_to_ignore = 1;
+  } else {
+    if (abs_y > abs_z) coordinate_to_ignore = 2;
+  }
+
+  return coordinate_to_ignore;
+}
+
+static
 int no_of_duplicates_in_this_list_of_vertices(double cell_corners[], int array_length)
 {
   /* Returns the number of coordinate duplicates found in a list of Cartesian coordinates, the cell corners or vertices. */
@@ -316,9 +357,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   double *cell_corners_xyz_open_cell = (double*) Malloc(3*ncorner*sizeof(double));
   
   double corner_coordinates[3];
-  double second_corner_coordinates[3];
-  double third_corner_coordinates[3];
-  double surface_normal_of_the_cell[3];
   double center_point_plane_projection[2];
 
   int no_of_cells_with_duplicates = 0;
@@ -326,7 +364,6 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   int no_clockwise_cells = 0;
   int no_counterclockwise_cells = 0;
   int no_of_cells_with_center_points_out_of_bounds = 0;
-  int coordinate_to_ignore = 0;
   int no_unique_center_points = 1;
 
   int *no_cells_with_a_specific_no_of_corners = (int*) Malloc(ncorner*sizeof(int));
@@ -523,42 +560,16 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
       cell_corners_xyz[actual_number_of_corners * 3 + 1] = cell_corners_xyz[1];
       cell_corners_xyz[actual_number_of_corners * 3 + 2] = cell_corners_xyz[2];
 
-      /* Takes the first three corners/vertices of the cell and calculates the unit normal via determinants. */
-      
-      corner_coordinates[0] = cell_corners_xyz[0];
-      corner_coordinates[1] = cell_corners_xyz[1];
-      corner_coordinates[2] = cell_corners_xyz[2];
-
-      second_corner_coordinates[0] = cell_corners_xyz[3 + 0];
-      second_corner_coordinates[1] = cell_corners_xyz[3 + 1];
-      second_corner_coordinates[2] = cell_corners_xyz[3 + 2];
-
-      third_corner_coordinates[0] = cell_corners_xyz[6 + 0];
-      third_corner_coordinates[1] = cell_corners_xyz[6 + 1];
-      third_corner_coordinates[2] = cell_corners_xyz[6 + 2];
-      
-      find_unit_normal(corner_coordinates, second_corner_coordinates, third_corner_coordinates, surface_normal_of_the_cell);
-
-      /* The surface normal is used to choose the coordinate to ignore. */
-
-      double abs_x = fabs(surface_normal_of_the_cell[0]);
-      double abs_y = fabs(surface_normal_of_the_cell[1]);
-      double abs_z = fabs(surface_normal_of_the_cell[2]);
-
-      coordinate_to_ignore = 3;
-
-      if (abs_x > abs_y){
-	if (abs_x > abs_z) coordinate_to_ignore = 1;
-      } else {
-	if (abs_y > abs_z) coordinate_to_ignore = 2;
-      }
+      int coordinate_to_ignore = find_coordinate_to_ignore(cell_corners_xyz);
      
       /* The remaining two-dimensional coordinates are extracted into one array for all the cell's corners and into one array for the center point. */
 
       double *cell_corners_plane_projection = (double*) Malloc(2*(actual_number_of_corners +1)*sizeof(double));
       
-      /* The following projection on the plane that two coordinate axes lie on changes the arrangement of the polygon vertices if the coordinate to be ignored along the third axis is smaller than 0.
-	 In this case, the result of the computation of the orientation of vertices needs to be inverted. Clockwise becomes counterclockwise and vice versa. */
+      /* The following projection on the plane that two coordinate axes lie on changes the arrangement of
+         the polygon vertices if the coordinate to be ignored along the third axis is smaller than 0.
+	 In this case, the result of the computation of the orientation of vertices needs to be inverted.
+         Clockwise becomes counterclockwise and vice versa. */
 
       bool invert_result = false;
       if ( cell_corners_xyz[coordinate_to_ignore - 1] < 0 ) invert_result = true;
@@ -659,7 +670,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
   if ( no_of_cells_with_center_points_out_of_bounds )
     cdoPrintRed("%9d cells have their center points located outside their boundaries", no_of_cells_with_center_points_out_of_bounds);
 
-  cdoPrint("");
+  // cdoPrint("");
 
   Free(no_cells_with_a_specific_no_of_corners);
   Free(cell_corners_xyz_open_cell);
@@ -776,7 +787,7 @@ void *Verifygrid(void *argument)
             cdoPrintBlue("Grid consists of %d points (type: %s)", gridsize, gridNamePtr(gridtype));
           else
             cdoPrintBlue("Grid no %u (of %u) consists of %d points (type: %s)", gridno + 1, ngrids, gridsize, gridNamePtr(gridtype));
-          cdoPrint("");
+          // cdoPrint("");
         }
     }
 
