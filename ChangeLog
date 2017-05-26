@@ -1,7 +1,11 @@
 2017-08-15  Uwe Schulzweida
 
-	* Using CDI library version 1.8.3
+	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
+
+2017-05-26  Uwe Schulzweida
+
+	* eca_gsl: set default to northern himisphere
 
 2017-05-23  Uwe Schulzweida
 

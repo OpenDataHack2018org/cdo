@@ -1003,15 +1003,15 @@ void eca4(const ECA_REQUEST_4 *request)
   const int operatorID = cdoOperatorID();
 
   int nmiss;
-  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
-  int ivdate = 0, ivtime = 0;
-  int ovdate = 0, ovtime = 0;
   int yearcnt = 0;
   int nrecs;
   int varID, levelID;
-  field_type *startDateWithHist[2], *endDateWithHist[2];
   int resetAtJan = FALSE, resetAtJul = FALSE;
   int isFirstYear = TRUE;
+  int ivdate = 0, ivtime = 0;
+  int ovdate = 0, ovtime = 0;
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
+  field_type *startDateWithHist[2], *endDateWithHist[2];
 
   int cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
@@ -1023,7 +1023,8 @@ void eca4(const ECA_REQUEST_4 *request)
   int ovlistID = vlistCreate();
 
   int gridID = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
-  if ( gridID != vlistInqVarGrid(ivlistID2, FIRST_VAR_ID) ) cdoAbort("Grid sizes of the input fields do not match!");
+  if ( gridInqSize(gridID) != gridInqSize(vlistInqVarGrid(ivlistID2, FIRST_VAR_ID)) )
+    cdoAbort("Grid sizes of the input fields do not match!");
 
   int zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
   double missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
@@ -1060,18 +1061,34 @@ void eca4(const ECA_REQUEST_4 *request)
   streamDefVlist(ostreamID, ovlistID);
 
   int nrecords    = vlistNrecs(ivlistID1);
-  int *recVarID    = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID  = (int*) Malloc(nrecords*sizeof(int));
+  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
+  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
 
+  bool lyvals = true;
   int gridtype = gridInqType(gridID);
-  if ( gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR ) 
+  if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION )
     {
-      gridID = (gridtype == GRID_GME) ? gridToUnstructured(gridID, 1) : gridToCurvilinear(gridID, 1);
+      gridID = gridToCurvilinear(gridID, 1);
     }
-  int gridsize    = gridInqSize(gridID);
+  else if ( gridtype == GRID_GME )
+    {
+      gridID = gridToUnstructured(gridID, 1);
+    }
+  else
+    {
+      lyvals = false;
+    }
+  int gridsize  = gridInqSize(gridID);
   /* for later check on northern\southern hemisphere */
-  double *yvals   = (double*) Malloc(gridsize*sizeof(double));
-  gridInqYvals(gridID,yvals);
+  double *yvals = (double*) Malloc(gridsize*sizeof(double));
+  if ( lyvals )
+    {
+      gridInqYvals(gridID, yvals);
+    }
+  else
+    {
+      for ( int i = 0; i < gridsize; ++i ) yvals[i] = 20; // Northern himisphere
+    }
 
   /* Two fields are needed because of the definition of gsl for northern and
   * southern hemisphere                                                      */
@@ -1086,7 +1103,7 @@ void eca4(const ECA_REQUEST_4 *request)
   field_init(&mask);
   mask.ptr    = (double*) Malloc(gridsize*sizeof(double));
 
-  int nlevels     = zaxisInqSize(zaxisID);
+  int nlevels = zaxisInqSize(zaxisID);
 
   field_type *startCount  = (field_type*) Malloc(nlevels*sizeof(field_type));
   field_type *endCount    = (field_type*) Malloc(nlevels*sizeof(field_type));
@@ -1094,8 +1111,7 @@ void eca4(const ECA_REQUEST_4 *request)
   field_type *gslFirstDay = (field_type*) Malloc(nlevels*sizeof(field_type));
 
   /* because of the different definitions for northern and southern hemisphere,
-   * the values of the last year have to be present
-   * THE LAST YEAR HAS THE INDEX 1 */
+   * the values of the last year have to be present THE LAST YEAR HAS THE INDEX 1 */
   for ( int h = 0; h < 2; h++ )
   {
     startDateWithHist[h] = (field_type*) Malloc(nlevels*sizeof(field_type));

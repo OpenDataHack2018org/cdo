@@ -509,7 +509,6 @@ void *EcaFd(void *argument)
 */
 void *EcaGsl(void *argument)
 {
-  char *longname;
   int argN = 6; 
   double argT = 5.0;
   double minLandFraction = 0.5;
@@ -522,7 +521,7 @@ void *EcaGsl(void *argument)
   if ( operatorArgc() > 1 ) argT = parameter2double(operatorArgv()[1]);
   if ( operatorArgc() > 2 ) minLandFraction = parameter2double(operatorArgv()[2]);
 
-  longname = (char*) Malloc(strlen(GSL_LONGNAME) + 160);
+  char *longname = (char*) Malloc(strlen(GSL_LONGNAME) + 160);
   sprintf(longname, GSL_LONGNAME, argN, argT, argN, argT);
   
   request.name      = GSL_NAME;
