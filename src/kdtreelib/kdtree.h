@@ -27,7 +27,7 @@
 #define  KD_DOUBLE 3
 #define  KD_LONG   4
 
-#define  KD_TYPE  KD_DOUBLE
+#define  KD_TYPE  KD_FLOAT
 //#define  KD_TYPE  KD_INT
 
 #if KD_TYPE == KD_INT
