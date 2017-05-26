@@ -1087,7 +1087,7 @@ void eca4(const ECA_REQUEST_4 *request)
     }
   else
     {
-      for ( int i = 0; i < gridsize; ++i ) yvals[i] = 20; // Northern himisphere
+      for ( int i = 0; i < gridsize; ++i ) yvals[i] = 20; // Northern hemisphere
     }
 
   /* Two fields are needed because of the definition of gsl for northern and
