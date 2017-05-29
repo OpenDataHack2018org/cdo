@@ -272,8 +272,8 @@ void *Expr(void *argument)
 
   if ( cdoVerbose ) cdoPrint(exprs);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int vlistID1 = streamInqVlist(streamID1);
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int vlistID1 = pstreamInqVlist(streamID1);
   int nvars1 = vlistNvars(vlistID1);
   int ngrids = vlistNgrids(vlistID1);
   int nzaxis = vlistNzaxis(vlistID1);
@@ -490,18 +490,17 @@ void *Expr(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int nrecs;
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       params[vartsID].data[0] = tsID+1;
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int varID = 0; varID < nvars1; varID++ )
         if ( tsID == 0 || params[varID].steptype != TIME_CONSTANT )
@@ -510,13 +509,13 @@ void *Expr(void *argument)
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
           int varID, levelID;
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  if ( parse_arg.needed[varID] )
 	    {
 	      size_t offset = params[varID].ngp*levelID;
 	      double *vardata = params[varID].data + offset;
               int nmiss;
-	      streamReadRecord(streamID1, vardata, &nmiss);
+	      pstreamReadRecord(streamID1, vardata, &nmiss);
 	      params[varID].nmiss += nmiss;
 	    }
 	}
@@ -554,16 +553,16 @@ void *Expr(void *argument)
 	      for ( size_t i = 0; i < ngp; i++ )
 		if ( DBL_IS_EQUAL(vardata[i], missval) ) nmiss++;
 
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, vardata, nmiss);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, vardata, nmiss);
 	    }
 	}
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

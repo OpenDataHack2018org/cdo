@@ -1494,12 +1494,12 @@ void *Echam5ini(void *argument)
       if ( cdoDefaultFileType == CDI_UNDEFID )
 	cdoDefaultFileType = CDI_FILETYPE_NC;
 
-      streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+      streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-      streamDefVlist(streamID2, vlistID2);
+      pstreamDefVlist(streamID2, vlistID2);
 
       tsID = 0;
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -1508,12 +1508,12 @@ void *Echam5ini(void *argument)
 
 	  for ( levelID = 0; levelID < nlev; levelID++ )
 	    {
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, vars[varID].ptr+levelID*gridsize, 0);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, vars[varID].ptr+levelID*gridsize, 0);
 	    }
 	}
 
-      streamClose(streamID2);
+      pstreamClose(streamID2);
 
       vlistDestroy(vlistID2);
     }
@@ -1525,9 +1525,9 @@ void *Echam5ini(void *argument)
       int taxisID, vdate, vtime;
       int ntr = 0;
 
-      streamID1 = streamOpenRead(cdoStreamName(0));
+      streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-      vlistID1 = streamInqVlist(streamID1);
+      vlistID1 = pstreamInqVlist(streamID1);
       taxisID = vlistInqTaxis(vlistID1);
 
       nvars = vlistNvars(vlistID1);
@@ -1586,7 +1586,7 @@ void *Echam5ini(void *argument)
 	  vars[varID].ptr = (double*) Malloc(nlev*gridsize*sizeof(double));
 	}
 
-      nrecs = streamInqTimestep(streamID1, 0);
+      nrecs = pstreamInqTimestep(streamID1, 0);
       vdate = taxisInqVdate(taxisID);
       vtime = taxisInqVtime(taxisID);
 
@@ -1598,15 +1598,15 @@ void *Echam5ini(void *argument)
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  gridID = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
 
-	  streamReadRecord(streamID1, vars[varID].ptr+levelID*gridsize, &nmiss);
+	  pstreamReadRecord(streamID1, vars[varID].ptr+levelID*gridsize, &nmiss);
 	}
 
-      streamClose(streamID1);
+      pstreamClose(streamID1);
 
       if ( operatorID == EXPORT_E5ML )
 	export_e5ml(cdoStreamName(1)->args, vars, nvars, vdate, vtime, ntr);

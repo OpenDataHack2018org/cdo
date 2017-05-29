@@ -63,9 +63,9 @@ void *Derivepar(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int gridID = vlistGrid(vlistID1, 0);
   if ( gridInqType(gridID) == GRID_SPECTRAL )
@@ -288,24 +288,23 @@ void *Derivepar(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
 	  nlevel   = zaxisInqSize(zaxisID);
 	  offset   = gridsize*levelID;
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  if ( zaxisIDh != -1 )
 	    {
@@ -393,8 +392,8 @@ void *Derivepar(void *argument)
 	  nlevel = nhlevf;
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, gheight+levelID*gridsize, nmissout);
+	      pstreamDefRecord(streamID2, varID, levelID);
+	      pstreamWriteRecord(streamID2, gheight+levelID*gridsize, nmissout);
 	    }
 	}
       else if ( operatorID == SEALEVELPRESSURE )
@@ -403,8 +402,8 @@ void *Derivepar(void *argument)
 
 	  extra_P(sealevelpressure, half_press+gridsize*(nhlevf), full_press+gridsize*(nhlevf-1), sgeopot, temp+gridsize*(nhlevf-1), gridsize);
 
-	  streamDefRecord(streamID2, 0, 0);
-	  streamWriteRecord(streamID2, sealevelpressure, 0);
+	  pstreamDefRecord(streamID2, 0, 0);
+	  pstreamWriteRecord(streamID2, sealevelpressure, 0);
 	}
       else
 	cdoAbort("Internal error");
@@ -412,8 +411,8 @@ void *Derivepar(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

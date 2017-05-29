@@ -44,11 +44,11 @@ void *Eofcoeff3d(void * argument)
 
   cdoOperatorAdd("eofcoeff3d",  0,  0, NULL);
      
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
   
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
   
   //taxisID1 = vlistInqTaxis(vlistID1);  
   int taxisID2 = vlistInqTaxis(vlistID2); 
@@ -74,7 +74,7 @@ void *Eofcoeff3d(void * argument)
   
   const char *refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), pstreamInqFiletype(streamID1), vlistID1, refname);
  
   field_type ***eof = (field_type***) Malloc(nvars * sizeof(field_type**));
   for ( varID=0; varID<nvars; varID++ )
@@ -83,12 +83,12 @@ void *Eofcoeff3d(void * argument)
   int eofID = 0;
   while ( 1 )       
    {     
-     nrecs = streamInqTimestep(streamID1, eofID);
+     nrecs = pstreamInqTimestep(streamID1, eofID);
      if ( nrecs == 0) break;
 
      for ( int recID = 0; recID < nrecs; recID++ )
        {         
-         streamInqRecord(streamID1, &varID, &levelID);
+         pstreamInqRecord(streamID1, &varID, &levelID);
          missval1 = vlistInqVarMissval(vlistID1, varID);
          if ( eofID == 0 )
            eof[varID][levelID] = (field_type*) Malloc(1*sizeof(field_type));
@@ -105,7 +105,7 @@ void *Eofcoeff3d(void * argument)
          if ( levelID >= nlevs )
            cdoAbort("Internal error - too high levelID");
          
-         streamReadRecord(streamID1, eof[varID][levelID][eofID].ptr, &nmiss);
+         pstreamReadRecord(streamID1, eof[varID][levelID][eofID].ptr, &nmiss);
          eof[varID][levelID][eofID].nmiss = (size_t) nmiss;
        }
      eofID++;
@@ -149,13 +149,13 @@ void *Eofcoeff3d(void * argument)
         strcat(oname, filesuffix);
       
       argument_t *fileargument = file_argument_new(oname);
-      streamIDs[eofID] = streamOpenWrite(fileargument, cdoFiletype());
+      streamIDs[eofID] = pstreamOpenWrite(fileargument, cdoFiletype());
       file_argument_free(fileargument);
 
       if (cdoVerbose) 
         cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname, streamIDs[eofID], eofID+1);
       
-      streamDefVlist(streamIDs[eofID], vlistID3);
+      pstreamDefVlist(streamIDs[eofID], vlistID3);
     }
   
   // ALLOCATE temporary fields for data read and write
@@ -174,7 +174,7 @@ void *Eofcoeff3d(void * argument)
   int tsID = 0;
   while ( 1 )
     {      
-      nrecs = streamInqTimestep(streamID2, tsID);
+      nrecs = pstreamInqTimestep(streamID2, tsID);
       if ( nrecs == 0 ) break;
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -188,14 +188,14 @@ void *Eofcoeff3d(void * argument)
 
       for ( int recID = 0; recID< nrecs; recID++ )
         {
-          streamInqRecord(streamID2, &varID, &levelID);
+          pstreamInqRecord(streamID2, &varID, &levelID);
+          pstreamReadRecord(streamID2, in.ptr, &nmiss);  
           missval2 = vlistInqVarMissval(vlistID2, varID);
-          streamReadRecord(streamID2, in.ptr, &nmiss);  
           in.nmiss = (size_t) nmiss;
           
           for ( eofID = 0; eofID < neof; eofID++ )
             {
-              if ( recID == 0 ) streamDefTimestep(streamIDs[eofID],tsID);
+              if ( recID == 0 ) pstreamDefTimestep(streamIDs[eofID],tsID);
 
 	      nmiss = 0;
               for( i=0; i<gridsize; i++ )
@@ -225,18 +225,18 @@ void *Eofcoeff3d(void * argument)
 
       for ( eofID = 0; eofID < neof; eofID++ ) {
 	for ( varID = 0; varID < nvars; varID++ ) {
-	  streamDefRecord(streamIDs[eofID], varID, 0);
-	  streamWriteRecord(streamIDs[eofID], out[varID][eofID].ptr, (int)out[varID][eofID].nmiss);
+	  pstreamDefRecord(streamIDs[eofID], varID, 0);
+	  pstreamWriteRecord(streamIDs[eofID], out[varID][eofID].ptr, (int)out[varID][eofID].nmiss);
 	}
       }
 
       tsID++;
     }
   
-  for ( eofID = 0; eofID < neof; eofID++ ) streamClose(streamIDs[eofID]);
+  for ( eofID = 0; eofID < neof; eofID++ ) pstreamClose(streamIDs[eofID]);
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
   
   cdoFinish();
 
