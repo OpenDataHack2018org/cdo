@@ -92,7 +92,6 @@ void *CDIwrite(void *argument)
   int memtype = CDO_Memtype;
   int nvars = 10, nlevs = 0, ntimesteps = 30;
   const char *defaultgrid = "global_.2";
-  int streamID;
   int tsID, varID, levelID;
   int gridsize, i;
   int vlistID;
@@ -215,11 +214,11 @@ void *CDIwrite(void *argument)
       data_size = 0;
       nvalues = 0;
 
-      streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
+      int streamID = pstreamOpenWrite(cdoStreamName(0), cdoFiletype());
 
-      streamDefVlist(streamID, vlistID);
+      pstreamDefVlist(streamID, vlistID);
 
-      filetype = streamInqFiletype(streamID);
+      filetype = pstreamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);
       if ( datatype == CDI_UNDEFID ) datatype = CDI_DATATYPE_FLT32;
 	  
@@ -233,24 +232,24 @@ void *CDIwrite(void *argument)
 	  vtime = 0;
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
-	  streamDefTimestep(streamID, tsID);
+	  pstreamDefTimestep(streamID, tsID);
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      for ( levelID = 0; levelID < nlevs; levelID++ )
 		{
 		  nvalues += gridsize;
-		  streamDefRecord(streamID, varID, levelID);
+		  pstreamDefRecord(streamID, varID, levelID);
 		  if ( memtype == MEMTYPE_FLOAT )
 		    {
 		      double *darray = vars[varID][levelID];
 		      for ( i = 0; i < gridsize; ++i ) farray[i] = darray[i];
-		      streamWriteRecordF(streamID, farray, 0);
+		      pstreamWriteRecordF(streamID, farray, 0);
 		      data_size += gridsize*4;
 		    }
 		  else
 		    {
-		      streamWriteRecord(streamID, vars[varID][levelID], 0);
+		      pstreamWriteRecord(streamID, vars[varID][levelID], 0);
 		      data_size += gridsize*8;
 		    }
 		}
@@ -264,7 +263,7 @@ void *CDIwrite(void *argument)
 	    }
 	}
 
-      streamClose(streamID);
+      pstreamClose(streamID);
 
       tw = timer_val(timer_write) - tw0;
       twsum += tw;

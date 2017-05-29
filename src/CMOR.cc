@@ -715,12 +715,12 @@ static void addcharvar(keyValues_t *charvars, int vlistID, char *key, struct map
   if ( cdoStreamName(0)->args[0] == '-' )
     cdoAbort("No variables can be merged to one character axis since you piped several cdo operators.");
 
-  int streamID2 = streamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(0));
   if ( ntsteps == -1 )
     {
       ntsteps = 0;
       int dummy;
-      while ( ( dummy = streamInqTimestep(streamID2, ntsteps++) ) );
+      while ( ( dummy = pstreamInqTimestep(streamID2, ntsteps++) ) );
     }
 
   int axissize[3];
@@ -803,16 +803,16 @@ static void addcharvar(keyValues_t *charvars, int vlistID, char *key, struct map
 
   int tsID = 0, nrecs = 0;
 
-  while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
     {
       while ( nrecs-- )
         {
           int varIDrw, levelIDrw, nmiss;
-          streamInqRecord(streamID2, &varIDrw, &levelIDrw);
+          pstreamInqRecord(streamID2, &varIDrw, &levelIDrw);
           for ( int i = 0; i < charvars->nvalues; i++ )
             if ( varIDrw == varIDs[i] )
               {
-                streamReadRecord(streamID2, buffer_old, &nmiss);
+                pstreamReadRecord(streamID2, buffer_old, &nmiss);
                 int newIndex;
                 for ( int j = 0; j < oldgridsize; j++ )
                   {
@@ -832,7 +832,7 @@ static void addcharvar(keyValues_t *charvars, int vlistID, char *key, struct map
     }
   var->charvars = 1;
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
   Free(buffer_old);
 
   if ( cdoVerbose )
@@ -1057,7 +1057,7 @@ static int check_mem(list_t *kvl, char *project_id)
 static void dump_global_attributes(list_t *pml, int streamID)
 {
   int natts;
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   cdiInqNatts(vlistID, CDI_GLOBAL, &natts);
   for ( int i = 0; i < natts; i++ )
     {
@@ -1094,7 +1094,7 @@ static void dump_global_attributes(list_t *pml, int streamID)
 
 static void dump_special_attributes(list_t *kvl, int streamID)
 {
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   int fileID = pstreamFileID(streamID);
   size_t old_historysize;
   char *new_history = kv_get_a_val(kvl, "history", NULL);
@@ -1306,7 +1306,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       kv_insert_a_val(kvl, "d", "y", 1);
     }
 
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
 
   cmor_setup(kv_get_a_val(kvl, "inpath", "/usr/share/cmor/"),
              &netcdf_file_action,
@@ -1315,7 +1315,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
              kv_get_a_val(kvl, "logfile", NULL),
              &creat_subs);
 
-  int taxisID = vlistInqTaxis(streamInqVlist(streamID));
+  int taxisID = vlistInqTaxis(pstreamInqVlist(streamID));
 
 /*
   char *attcomment = kv_get_a_val(kvl, "comment", NULL);
@@ -1816,8 +1816,8 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
   if ( cdoVerbose )
     printf("You configured a grid_info file: '%s'. It is tested for a valid use as substitution.\n");
   argument_t *fileargument = file_argument_new(grid_file);
-  int streamID2 = streamOpenRead(fileargument); 
-  int vlistID2 = streamInqVlist(streamID2);
+  int streamID2 = pstreamOpenRead(fileargument); 
+  int vlistID2 = pstreamInqVlist(streamID2);
   int gridID2 = vlistInqVarGrid(vlistID2, 0); 
 
   if ( !gridID2 )
@@ -1842,7 +1842,7 @@ static void change_grid(char *grid_file, int gridID, int vlistID)
   vlistChangeGrid(vlistID, gridID, gridID2);
   printf("Succesfully substituted grid.\n");
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 }
 
 static void move_lons(double *xcoord_vals, double *xcell_bounds, int xsize, int xboundsize, int xnbounds)
@@ -2524,7 +2524,7 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
 static void register_all_dimensions(list_t *kvl, int streamID,
                              struct mapping vars[], int table_id, char *project_id, int miptab_freq, int *time_axis)
 {
-  int vlistID = streamInqVlist(streamID);
+  int vlistID = pstreamInqVlist(streamID);
   int taxisID = vlistInqTaxis(vlistID);
 
   if ( cdoVerbose )
@@ -2693,12 +2693,12 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
 */
         } 
       
-      int streamID2 = streamOpenRead(cdoStreamName(0));
-          int vlistID2 = streamInqVlist(streamID2);
+      int streamID2 = pstreamOpenRead(cdoStreamName(0));
+      int vlistID2 = pstreamInqVlist(streamID2);
       int taxisID2 = vlistInqTaxis(vlistID2);
       if ( ntsteps < 0 )
         {
-          while ( recdummy = streamInqTimestep(streamID2, reccounter++) );
+          while ( recdummy = pstreamInqTimestep(streamID2, reccounter++) );
           ntsteps = reccounter;
         }    
       ntsteps-=1;
@@ -2706,9 +2706,9 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
 
       if ( ntsteps > 2 )
         {
-          int recfirst = streamInqTimestep(streamID2, 0);
+          int recfirst = pstreamInqTimestep(streamID2, 0);
           cdiDecodeDate(taxisInqVdate(taxisID2), &fyear, &fmonth, &dummytwo);
-          int reclast = streamInqTimestep(streamID2, ntsteps);    
+          int reclast = pstreamInqTimestep(streamID2, ntsteps);    
           cdiDecodeDate(taxisInqVdate(taxisID2), &lyear, &lmonth, &dummytwo);
 
           double covered_years = lyear-fyear + 1.0;
@@ -2734,7 +2734,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
               reccounter = 0;
               if ( cdoVerbose )
                 printf("Frequency is calculated by counting all timesteps in year %d\nin order to calculate time bounds in case they are not given.\n", fyear, fmonth);
-              while ( recdummy = streamInqTimestep(streamID2, reccounter++) )
+              while ( recdummy = pstreamInqTimestep(streamID2, reccounter++) )
                 {
                   int reqyear;
                   cdiDecodeDate(taxisInqVdate(taxisID2), &reqyear, &lmonth, &dummytwo);
@@ -2769,7 +2769,7 @@ static char *get_frequency(list_t *kvl, int streamID, int vlistID, int taxisID, 
           else
             cdoWarning("For %d found timesteps no frequency can be computed - at least 3 timesteps are required.\nTime bounds of the rec are used.\n", ntsteps);
         }
-      streamClose(streamID2);
+      pstreamClose(streamID2);
     }
     }
   return frequency;
@@ -2852,7 +2852,7 @@ static double *get_time_bounds(int taxisID, char *frequency, juldate_t ref_date,
 static void read_record(int streamID, struct mapping vars[], int vlistID)
 {
   int varID, levelID;
-  streamInqRecord(streamID, &varID, &levelID);
+  pstreamInqRecord(streamID, &varID, &levelID);
 
   int gridID = vlistInqVarGrid(vlistID, varID);
   int type = gridInqType(gridID);
@@ -2867,7 +2867,7 @@ static void read_record(int streamID, struct mapping vars[], int vlistID)
       int levdim = zaxisInqSize(zaxisID);
       int chardim = gridsize/latdim;
       int nmiss;
-      streamReadRecord(streamID, buffer, &nmiss);
+      pstreamReadRecord(streamID, buffer, &nmiss);
       for ( size_t i = 0; i < gridsize; i++ )
         {
 // Wrong:  (lat x basin, lev ) gridsize * levelID + i
@@ -2990,8 +2990,8 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
       return 0;
     }
       
-  int streamID2 = streamOpenRead(cdoStreamName(0));
-  int vlistID2 = streamInqVlist(streamID2);
+  int streamID2 = pstreamOpenRead(cdoStreamName(0));
+  int vlistID2 = pstreamInqVlist(streamID2);
   int taxisID2 = vlistInqTaxis(vlistID2);
   juldate_t firstdate = juldate_encode(calendar, taxisInqVdate(taxisID2),
                                      taxisInqVtime(taxisID2));
@@ -3004,7 +3004,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
      ||( j == 4 && ( append_distance/24.0/30.5 > 24.0 || append_distance < 0 ) ) )
     {
       cdoWarning("A temporal gap is diagnosed between end date of chunk file and first date of working file of: '%f' hours. Maximal valid gaps are:\n48 hours for daily frequency\n62 days for monthly frequency\n24 month for yearly frequency.\nSwitched to replace mode.", append_distance);
-      streamClose(streamID2);
+      pstreamClose(streamID2);
       return 0;
     }
 
@@ -3021,11 +3021,11 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   if ( ntsteps < 0 )
     {
       ntsteps = 0;
-      while ( streamInqTimestep(streamID2, ntsteps++)) ;
+      while ( pstreamInqTimestep(streamID2, ntsteps++)) ;
       if ( ntsteps == 0 )
         {
           cdoWarning("A mistake occured during timesteps determination.\nSwitched to replace mode.");
-          streamClose(streamID2);
+          pstreamClose(streamID2);
           return 0;
         }
     }
@@ -3045,7 +3045,7 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
     default:
       {
         cdoWarning("Selected chunk to append data has subdaily frequency which is yet not enabled by cdo cmor.\nA new file will be written.");
-        streamClose(streamID2);
+        pstreamClose(streamID2);
         return 0;
       }
     }
@@ -3053,10 +3053,10 @@ static int check_append_and_size(list_t *kvl, int vlistID, char *testIn, int ifr
   if ( (unsigned int)estimated_size > (unsigned int) maxsizeb )
     {
       cdoWarning("Estimated file size of appended file is : '%f'gb and exceeds maximal allowed file size: '%d'gb.\nA new file will be written.", estimated_size/1024.0/1024.0/1024.0, maxsizegb);
-      streamClose(streamID2);
+      pstreamClose(streamID2);
       return 0;
     }
-  streamClose(streamID2);
+  pstreamClose(streamID2);
   if ( cdoVerbose) printf("*******Succesfully checked file size of chunk + working file.******\n");
   return 1;
 }
@@ -3187,7 +3187,7 @@ static char **get_chunk_files(list_t *kvl, struct mapping vars[], int vlistID, i
 
 static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], int miptab_freq, int time_axis, int calendar, char *miptab_freqptr)
 {
-  int vlistID = streamInqVlist(*streamID);
+  int vlistID = pstreamInqVlist(*streamID);
   int taxisID = vlistInqTaxis(vlistID);
   int tsID = 0;
   int nrecs;
@@ -3232,15 +3232,15 @@ static void write_variables(list_t *kvl, int *streamID, struct mapping vars[], i
         charname = Malloc(CDI_MAX_NAME * sizeof(char));
         vlistInqVarName(vlistID, vars[i].cdi_varID, charname);
         
-        streamClose(*streamID);
-        *streamID = streamOpenRead(cdoStreamName(0));
+        pstreamClose(*streamID);
+        *streamID = pstreamOpenRead(cdoStreamName(0));
         pscheck = 0;
         break;
       }
   if ( !pscheck )
     cdoWarning("Since you defined a variable with character coordinate axis you cannot write another variable with zaxis of type ZAXIS_HYBRID.");
 
-  while ( (nrecs = streamInqTimestep(*streamID, tsID++)) )
+  while ( (nrecs = pstreamInqTimestep(*streamID, tsID++)) )
     { 
       double time_bnds[2];
       double *time_bndsp;
@@ -3434,7 +3434,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
   if ( maptab )
     {
       if ( maptabbuild ) maptab = maptabbuild;
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
 
       if ( cdoVerbose )
         printf("*******Try to apply mapping table: '%s'*******\n", maptab);
@@ -3750,7 +3750,7 @@ void *CMOR(void *argument)
     printf("*******Successfully checked MIP table, MIP table frequency and project_id.*******\n");
 
 
-  int streamID = streamOpenRead(cdoStreamName(0));
+  int streamID = pstreamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
   dump_special_attributes(kvl, streamID);
 
@@ -3789,7 +3789,7 @@ void *CMOR(void *argument)
   Free(project_id); 
   list_destroy(pml); 
 
-  streamClose(streamID);
+  pstreamClose(streamID);
 #else
   cdoWarning("CMOR support not compiled in!");
 #endif

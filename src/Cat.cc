@@ -55,9 +55,9 @@ void *Cat(void *argument)
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
       if ( cdoTimer ) tw0 = timer_val(timer_cat);
 
-      int streamID1 = streamOpenRead(cdoStreamName(indf));
+      int streamID1 = pstreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = streamInqVlist(streamID1);
+      int vlistID1 = pstreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
@@ -75,9 +75,9 @@ void *Cat(void *argument)
 	  bool file_exists = (!cdoOverwriteMode) ? fileExists(cdoStreamName(nfiles)->args) : false;
 	  if ( file_exists )
 	    {
-	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
+	      streamID2 = pstreamOpenAppend(cdoStreamName(nfiles));
 
-	      vlistID2 = streamInqVlist(streamID2);
+	      vlistID2 = pstreamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
 
 	      vlistCompare(vlistID1, vlistID2, CMP_ALL);
@@ -92,7 +92,7 @@ void *Cat(void *argument)
 	      if ( cdoVerbose )
 		cdoPrint("Output file doesn't exist, creating: %s", cdoStreamName(nfiles)->args);
 
-	      streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+	      streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
 	      vlistID2 = vlistDuplicate(vlistID1);
 	      taxisID2 = taxisDuplicate(taxisID1);
@@ -105,7 +105,7 @@ void *Cat(void *argument)
 		    vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 		}
 
-	      streamDefVlist(streamID2, vlistID2);
+	      pstreamDefVlist(streamID2, vlistID2);
 	    }
 
 	  if ( ! lcopy )
@@ -122,33 +122,33 @@ void *Cat(void *argument)
       int ntsteps = vlistNtsteps(vlistID1);
 
       int tsID1 = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
+      while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
 	{          
           double fstatus = (ntsteps > 1) ? indf+(tsID1+1.)/ntsteps : indf+1.;
           if ( !cdoVerbose ) progressStatus(0, 1, fstatus/nfiles);
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
 
-	  streamDefTimestep(streamID2, tsID2);
+	  pstreamDefTimestep(streamID2, tsID2);
 	       
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
+	      pstreamInqRecord(streamID1, &varID, &levelID);
 
               if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
                 if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                   continue;
 
-	      streamDefRecord(streamID2, varID, levelID);
+	      pstreamDefRecord(streamID2, varID, levelID);
 
 	      if ( lcopy )
 		{
-		  streamCopyRecord(streamID2, streamID1); 
+		  pstreamCopyRecord(streamID2, streamID1); 
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamReadRecord(streamID1, array, &nmiss);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		}
 	    }
 
@@ -156,13 +156,13 @@ void *Cat(void *argument)
 	  tsID2++;
 	}
       
-      streamClose(streamID1);
+      pstreamClose(streamID1);
 
       if ( cdoTimer ) tw = timer_val(timer_cat) - tw0;
       if ( cdoTimer ) cdoPrint("Processed file: %s   %.2f seconds", cdoStreamName(indf)->args, tw);
     }
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
  
   if ( cdoTimer ) timer_stop(timer_cat);
 

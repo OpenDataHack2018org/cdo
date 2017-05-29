@@ -116,11 +116,11 @@ void *CDIread(void *argument)
       data_size = 0;
       nvalues = 0;
 
-      int streamID = streamOpenRead(cdoStreamName(0));
+      int streamID = pstreamOpenRead(cdoStreamName(0));
 
-      int vlistID = streamInqVlist(streamID);
+      int vlistID = pstreamInqVlist(streamID);
 
-      filetype = streamInqFiletype(streamID);
+      filetype = pstreamInqFiletype(streamID);
       datatype = vlistInqVarDatatype(vlistID, 0);
 	  
       int gridsize = vlistGridsizeMax(vlistID);
@@ -131,25 +131,25 @@ void *CDIread(void *argument)
       t0 = timer_val(timer_read);
 
       int tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+      while ( (nrecs = pstreamInqTimestep(streamID, tsID)) )
 	{
 
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    {
-	      streamInqRecord(streamID, &varID, &levelID);
+	      pstreamInqRecord(streamID, &varID, &levelID);
 
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
 	      nvalues += gridsize;
 
 	      if ( memtype == MEMTYPE_FLOAT )
 		{
-                  streamReadRecordF(streamID, farray, &nmiss);
+                  pstreamReadRecordF(streamID, farray, &nmiss);
                   //  for ( int i = 0; i < gridsize; ++i ) darray[i] = farray[i];
 		  data_size += gridsize*4;
 		}
 	      else
 		{
-		  streamReadRecord(streamID, darray, &nmiss);
+		  pstreamReadRecord(streamID, darray, &nmiss);
 		  data_size += gridsize*8;
 		}
 	    }
@@ -164,7 +164,7 @@ void *CDIread(void *argument)
 	  tsID++;
 	}
 
-      streamClose(streamID);
+      pstreamClose(streamID);
 
       tw = timer_val(timer_read) - tw0;
       twsum += tw;

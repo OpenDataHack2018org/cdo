@@ -91,9 +91,9 @@ void *Arithc(void *argument)
   operatorCheckArgc(1);
   double rconst = parameter2double(operatorArgv()[0]);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int *vars = fill_vars(vlistID1);
@@ -102,9 +102,8 @@ void *Arithc(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -114,16 +113,16 @@ void *Arithc(void *argument)
   field.weight = NULL;
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field.ptr, &nmiss);
           field.nmiss = (size_t) nmiss;
 
 	  if ( vars[varID] )
@@ -141,14 +140,14 @@ void *Arithc(void *argument)
 	    }
 
           nmiss = (int) field.nmiss;
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, field.ptr, nmiss);
+	  pstreamDefRecord(streamID2, varID, levelID);
+	  pstreamWriteRecord(streamID2, field.ptr, nmiss);
 	}
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( field.ptr ) Free(field.ptr);
   if ( vars ) Free(vars);

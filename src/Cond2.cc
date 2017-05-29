@@ -47,13 +47,13 @@ void *Cond2(void *argument)
 
   int operatorID = cdoOperatorID();
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
-  int streamID3 = streamOpenRead(cdoStreamName(2));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
+  int streamID3 = pstreamOpenRead(cdoStreamName(2));
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
-  int vlistID3 = streamInqVlist(streamID3);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
+  int vlistID3 = pstreamInqVlist(streamID3);
   int vlistID4 = vlistDuplicate(vlistID2);
 
   int taxisID2 = vlistInqTaxis(vlistID2);
@@ -80,9 +80,8 @@ void *Cond2(void *argument)
   nospec(vlistID2);
   nospec(vlistID3);
 
-  int streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
-
-  streamDefVlist(streamID4, vlistID4);
+  int streamID4 = pstreamOpenWrite(cdoStreamName(3), cdoFiletype());
+  pstreamDefVlist(streamID4, vlistID4);
 
   int gridsize = vlistGridsizeMax(vlistID1);
 
@@ -119,36 +118,36 @@ void *Cond2(void *argument)
     }
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID2, tsID)) )
     {
-      nrecs = streamInqTimestep(streamID3, tsID);
+      nrecs = pstreamInqTimestep(streamID3, tsID);
       if ( nrecs == 0 ) cdoAbort("Input streams have different number of timesteps!");
 
       if ( tsID == 0 || filltype == FILL_NONE )
 	{
-	  nrecs2 = streamInqTimestep(streamID1, tsID);
+	  nrecs2 = pstreamInqTimestep(streamID1, tsID);
 	  if ( nrecs2 == 0 )
 	    cdoAbort("Input streams have different number of timesteps!");
 	}
 
       taxisCopyTimestep(taxisID4, taxisID2);
 
-      streamDefTimestep(streamID4, tsID);
+      pstreamDefTimestep(streamID4, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID2, &varID, &levelID);
-	  streamReadRecord(streamID2, array2, &nmiss2);
+	  pstreamInqRecord(streamID2, &varID, &levelID);
+	  pstreamReadRecord(streamID2, array2, &nmiss2);
 
-	  streamInqRecord(streamID3, &varID, &levelID);
-	  streamReadRecord(streamID3, array3, &nmiss3);
+	  pstreamInqRecord(streamID3, &varID, &levelID);
+	  pstreamReadRecord(streamID3, array3, &nmiss3);
 
 	  if ( tsID == 0 || filltype == FILL_NONE )
 	    {
 	      if ( recID == 0 || filltype != FILL_REC )
 		{
-		  streamInqRecord(streamID1, &varID, &levelID);
-		  streamReadRecord(streamID1, array1, &nmiss1);
+		  pstreamInqRecord(streamID1, &varID, &levelID);
+		  pstreamReadRecord(streamID1, array1, &nmiss1);
 		}
 
 	      if ( filltype == FILL_TS )
@@ -190,17 +189,17 @@ void *Cond2(void *argument)
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array4[i], missval2) ) nmiss4++;
 
-	  streamDefRecord(streamID4, varID, levelID);
-	  streamWriteRecord(streamID4, array4, nmiss4);
+	  pstreamDefRecord(streamID4, varID, levelID);
+	  pstreamWriteRecord(streamID4, array4, nmiss4);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID4);
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID4);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( vardata1 )
     {

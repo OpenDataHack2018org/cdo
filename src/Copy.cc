@@ -81,14 +81,14 @@ void *Copy(void *argument)
     {
       if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
 
-      int streamID1 = streamOpenRead(cdoStreamName(indf));
+      int streamID1 = pstreamOpenRead(cdoStreamName(indf));
 
-      int vlistID1 = streamInqVlist(streamID1);
+      int vlistID1 = pstreamInqVlist(streamID1);
       int taxisID1 = vlistInqTaxis(vlistID1);
 
       if ( indf == 0 )
 	{
-	  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+	  streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
 	  vlistID2 = vlistDuplicate(vlistID1);
 	  taxisID2 = taxisDuplicate(taxisID1);
@@ -112,7 +112,7 @@ void *Copy(void *argument)
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 	    }
 
-	  streamDefVlist(streamID2, vlistID2);
+	  pstreamDefVlist(streamID2, vlistID2);
 
 	  int gridsize = vlistGridsizeMax(vlistID1);
 	  array = (double*) Malloc(gridsize*sizeof(double));
@@ -129,24 +129,24 @@ void *Copy(void *argument)
 	}
 
       int tsID1 = 0;
-      while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
+      while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
 	{
 	  taxisCopyTimestep(taxisID2, taxisID1);
 
-	  streamDefTimestep(streamID2, tsID2);
+	  pstreamDefTimestep(streamID2, tsID2);
 	       
 	  for ( int recID = 0; recID < nrecs; recID++ )
 	    { 
 	      if ( lcopy && (operatorID == SELALL || operatorID == SZIP) )
 		{
-		  streamInqRecord(streamID1, &varID, &levelID);
+		  pstreamInqRecord(streamID1, &varID, &levelID);
 
                   if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
                     if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                       continue;
                   
-		  streamDefRecord(streamID2,  varID,  levelID);
-		  streamCopyRecord(streamID2, streamID1);
+		  pstreamDefRecord(streamID2,  varID,  levelID);
+		  pstreamCopyRecord(streamID2, streamID1);
 		}
 	      else
 		{
@@ -159,34 +159,35 @@ void *Copy(void *argument)
 		    }
 		  else
 		    {
-		      streamInqRecord(streamID1, &varID, &levelID);
+		      pstreamInqRecord(streamID1, &varID, &levelID);
 
                       if ( lconstvars && tsID2 > 0 && tsID1 == 0 )
                         if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT )
                           continue;
 
-		      streamReadRecord(streamID1, array, &nmiss);
+		      pstreamReadRecord(streamID1, array, &nmiss);
 		    }
 		  /*
 		  if ( cdoParIO )
 		    fprintf(stderr, "out1 %d %d %d\n", streamID2,  varID,  levelID);
 		  */
-		  streamDefRecord(streamID2,  varID,  levelID);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  pstreamDefRecord(streamID2,  varID,  levelID);
+		  pstreamWriteRecord(streamID2, array, nmiss);
 		  /*
 		  if ( cdoParIO )
 		    fprintf(stderr, "out2 %d %d %d\n", streamID2,  varID,  levelID);
 		  */
 		}
 	    }
+
 	  tsID1++;
 	  tsID2++;
 	}
 
-      streamClose(streamID1);
+      pstreamClose(streamID1);
     }
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
   if ( array ) Free(array);
   if ( vlistID2 != CDI_UNDEFID ) vlistDestroy(vlistID2);

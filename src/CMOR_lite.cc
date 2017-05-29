@@ -390,9 +390,9 @@ void *CMOR_lite(void *argument)
 
   if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
   /* vlistPrint(vlistID2);*/
 
@@ -463,26 +463,25 @@ void *CMOR_lite(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   /* vlistPrint(vlistID2);*/
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   long gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   double *array = (double *) Malloc(gridsize*sizeof(double));
 
   int tsID1 = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID1)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID1);
+      pstreamDefTimestep(streamID2, tsID1);
 
       cmor_check_init(nvars, vars);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
           var_t *var = &vars[varID];
 	  int varID2 = varID;
@@ -499,9 +498,9 @@ void *CMOR_lite(void *argument)
 		}
 	    }
 
-	  streamDefRecord(streamID2,  varID2,  levelID2);
+	  pstreamDefRecord(streamID2,  varID2,  levelID2);
 
-	  streamReadRecord(streamID1, array, &nmiss);
+	  pstreamReadRecord(streamID1, array, &nmiss);
 
 	  missval = vlistInqVarMissval(vlistID2, varID2);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID2));
@@ -544,7 +543,7 @@ void *CMOR_lite(void *argument)
 	    }
 #endif
 	  
-	  streamWriteRecord(streamID2, array, nmiss);
+	  pstreamWriteRecord(streamID2, array, nmiss);
 
           cmor_check_prep(var, gridsize, missval, array);
 	}
@@ -554,8 +553,8 @@ void *CMOR_lite(void *argument)
       tsID1++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
 #if defined(HAVE_UDUNITS2)
   for ( int varID = 0; varID < nvars; varID++ )

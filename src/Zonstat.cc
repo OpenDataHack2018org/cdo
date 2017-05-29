@@ -73,9 +73,9 @@ void *Zonstat(void *argument)
       percentile_check_number(pn);
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
   int vlistID2 = vlistDuplicate(vlistID1);
 
   int taxisID1 = vlistInqTaxis(vlistID1);
@@ -128,9 +128,9 @@ void *Zonstat(void *argument)
   for ( index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   gridID1 = vlistInqVarGrid(vlistID1, 0);
   int nlatmax = gridInqYsize(gridID1); /* max nlat ? */
@@ -145,16 +145,16 @@ void *Zonstat(void *argument)
   field2.grid = gridID2;
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &nmiss);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
+	  pstreamReadRecord(streamID1, field1.ptr, &nmiss);
 
           field1.nmiss   = (size_t) nmiss;
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
@@ -174,14 +174,14 @@ void *Zonstat(void *argument)
 		zonfun(field1, &field2, operfunc);
 	    }
 
-	  streamDefRecord(streamID2, varID,  levelID);
-	  streamWriteRecord(streamID2, field2.ptr, (int)field2.nmiss);
+	  pstreamDefRecord(streamID2, varID,  levelID);
+	  pstreamWriteRecord(streamID2, field2.ptr, (int)field2.nmiss);
 	}
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   if ( field1.ptr ) Free(field1.ptr);
   if ( field2.ptr ) Free(field2.ptr);

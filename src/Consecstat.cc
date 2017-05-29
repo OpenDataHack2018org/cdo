@@ -138,9 +138,9 @@ void *Consecstat(void *argument)
   if ( operatorID == CONSECSUM )
     if ( operatorArgc() > 0 ) refval = parameter2double(operatorArgv()[0]);
 
-  int istreamID = streamOpenRead(cdoStreamName(0));
+  int istreamID = pstreamOpenRead(cdoStreamName(0));
 
-  int ivlistID = streamInqVlist(istreamID);
+  int ivlistID = pstreamInqVlist(istreamID);
   int itaxisID = vlistInqTaxis(ivlistID);
   int ovlistID = vlistDuplicate(ivlistID);
   int otaxisID = taxisDuplicate(itaxisID);
@@ -164,13 +164,12 @@ void *Consecstat(void *argument)
       vlistDefVarUnits(ovlistID, varID, "steps"); /* TODO */
     }
 
-  int ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(ostreamID, ovlistID);
+  int ostreamID = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(ostreamID, ovlistID);
 
   int itsID = 0;
   int otsID = 0;
-  while ( (nrecs = streamInqTimestep(istreamID, itsID)) )
+  while ( (nrecs = pstreamInqTimestep(istreamID, itsID)) )
   {
     vdate = taxisInqVdate(itaxisID);
     vtime = taxisInqVtime(itaxisID);
@@ -179,14 +178,14 @@ void *Consecstat(void *argument)
       case CONSECSUM:
         taxisDefVdate(otaxisID, vdate);
         taxisDefVtime(otaxisID, vtime);
-        streamDefTimestep(ostreamID, otsID);
+        pstreamDefTimestep(ostreamID, otsID);
         break;
       case CONSECTS:
         if (itsID != 0 )
         {
           taxisDefVdate(otaxisID, histvdate);
           taxisDefVtime(otaxisID, histvtime);
-          streamDefTimestep(ostreamID, otsID-1);
+          pstreamDefTimestep(ostreamID, otsID-1);
         }
         break;
       default:
@@ -196,8 +195,8 @@ void *Consecstat(void *argument)
 
     for ( int recID = 0; recID < nrecs; recID++ )
     {
-      streamInqRecord(istreamID, &varID, &levelID);
-      streamReadRecord(istreamID, field.ptr, &nmiss);
+      pstreamInqRecord(istreamID, &varID, &levelID);
+      pstreamReadRecord(istreamID, field.ptr, &nmiss);
       field.nmiss   = (size_t)nmiss;
       field.grid    = vlistInqVarGrid(ovlistID, varID);
       field.missval = vlistInqVarMissval(ovlistID, varID);
@@ -207,15 +206,15 @@ void *Consecstat(void *argument)
       switch (operatorID)
       {
         case CONSECSUM:
-          streamDefRecord(ostreamID, varID, levelID);
-          streamWriteRecord(ostreamID, vars[varID][levelID].ptr, (int)vars[varID][levelID].nmiss);
+          pstreamDefRecord(ostreamID, varID, levelID);
+          pstreamWriteRecord(ostreamID, vars[varID][levelID].ptr, (int)vars[varID][levelID].nmiss);
           break;
         case CONSECTS:
           if ( itsID != 0 )
           {
             selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID], vars[varID][levelID], FALSE);
-            streamDefRecord(ostreamID, varID, levelID);
-            streamWriteRecord(ostreamID, periods[varID][levelID].ptr, (int)periods[varID][levelID].nmiss);
+            pstreamDefRecord(ostreamID, varID, levelID);
+            pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, (int)periods[varID][levelID].nmiss);
           }
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) schedule(static)
@@ -242,15 +241,15 @@ void *Consecstat(void *argument)
   {
     taxisDefVdate(otaxisID, vdate);
     taxisDefVtime(otaxisID, vtime);
-    streamDefTimestep(ostreamID, otsID-1);
+    pstreamDefTimestep(ostreamID, otsID-1);
     for ( varID = 0; varID < nvars; varID++ )
     {
       nlevels = zaxisInqSize(vlistInqVarZaxis(ovlistID, varID));
       for ( levelID = 0; levelID < nlevels; levelID++ )
       {
         selEndOfPeriod(&periods[varID][levelID], hist[varID][levelID], vars[varID][levelID], TRUE);
-        streamDefRecord(ostreamID, varID, levelID);
-        streamWriteRecord(ostreamID, periods[varID][levelID].ptr, (int)periods[varID][levelID].nmiss);
+        pstreamDefRecord(ostreamID, varID, levelID);
+        pstreamWriteRecord(ostreamID, periods[varID][levelID].ptr, (int)periods[varID][levelID].nmiss);
       }
     }
   }
@@ -259,8 +258,8 @@ void *Consecstat(void *argument)
   if ( hist )    field_free(hist, ivlistID);
   if ( periods ) field_free(periods, ivlistID);
 
-  streamClose(istreamID);
-  streamClose(ostreamID);
+  pstreamClose(istreamID);
+  pstreamClose(ostreamID);
 
   cdoFinish();
 

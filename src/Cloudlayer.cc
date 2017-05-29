@@ -151,9 +151,9 @@ void *Cloudlayer(void *argument)
       nvars2 = NVARS;
     }
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int gridsize = vlist_check_gridsize(vlistID1);
 
@@ -307,20 +307,19 @@ void *Cloudlayer(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
      
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  if ( zrev )
 	    offset = (nlevel-1-levelID)*gridsize;
@@ -329,7 +328,7 @@ void *Cloudlayer(void *argument)
 
 	  if ( varID == aclcacID )
 	    {
-	      streamReadRecord(streamID1, aclcac+offset, &nmiss);
+	      pstreamReadRecord(streamID1, aclcac+offset, &nmiss);
 	      if ( nmiss != 0 ) cdoAbort("Missing values unsupported!");
 	    }
 	}
@@ -351,15 +350,15 @@ void *Cloudlayer(void *argument)
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(cloud[varID][i], missval) ) nmiss++;
 
-	  streamDefRecord(streamID2, varID, 0);
-	  streamWriteRecord(streamID2, cloud[varID], nmiss);
+	  pstreamDefRecord(streamID2, varID, 0);
+	  pstreamWriteRecord(streamID2, cloud[varID], nmiss);
 	}
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
  
   vlistDestroy(vlistID2);
 

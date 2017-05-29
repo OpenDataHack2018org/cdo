@@ -320,8 +320,8 @@ void *Collgrid(void *argument)
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      ef[fileID].streamID = streamOpenRead(cdoStreamName(fileID));
-      ef[fileID].vlistID  = streamInqVlist(ef[fileID].streamID);
+      ef[fileID].streamID = pstreamOpenRead(cdoStreamName(fileID));
+      ef[fileID].vlistID  = pstreamInqVlist(ef[fileID].streamID);
     }
 
   int vlistID1 = ef[0].vlistID;
@@ -476,36 +476,35 @@ void *Collgrid(void *argument)
 	}
     }
 
-  int streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-      
-  streamDefVlist(streamID2, vlistID2);
+  int streamID2 = pstreamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  pstreamDefVlist(streamID2, vlistID2);
 	  
   double *array2 = (gridsize2 > 0) ? (double*) Malloc(gridsize2*sizeof(double)) : NULL;
 
   int tsID = 0;
   do
     {
-      nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
+      nrecs0 = pstreamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
-	  int nrecs = streamInqTimestep(ef[fileID].streamID, tsID);
+	  int nrecs = pstreamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      if ( nrecs0 > 0 ) streamDefTimestep(streamID2, tsID);
+      if ( nrecs0 > 0 ) pstreamDefTimestep(streamID2, tsID);
       
       for ( int recID = 0; recID < nrecs0; recID++ )
 	{
-	  streamInqRecord(ef[0].streamID, &varID, &levelID);
+	  pstreamInqRecord(ef[0].streamID, &varID, &levelID);
 	  if ( cdoVerbose && tsID == 0 ) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
 
 	  for ( int fileID = 1; fileID < nfiles; fileID++ )
 	    {
 	      int varIDx, levelIDx;
-	      streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
+	      pstreamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
 	    }
 
 	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
@@ -522,7 +521,7 @@ void *Collgrid(void *argument)
 #endif
 	      for ( int fileID = 0; fileID < nfiles; fileID++ )
 		{
-		  streamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
+		  pstreamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
 
 		  if ( vars[varID2] )
 		    {
@@ -532,7 +531,7 @@ void *Collgrid(void *argument)
 		    }
 		}
 
-	      streamDefRecord(streamID2, varID2, levelID2);
+	      pstreamDefRecord(streamID2, varID2, levelID2);
 
 	      if ( vars[varID2] )
 		{
@@ -540,10 +539,10 @@ void *Collgrid(void *argument)
 		  for ( int i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
-		  streamWriteRecord(streamID2, array2, nmiss);
+		  pstreamWriteRecord(streamID2, array2, nmiss);
 		}
 	      else
-		streamWriteRecord(streamID2, ef[0].array, ef[0].nmiss);
+		pstreamWriteRecord(streamID2, ef[0].array, ef[0].nmiss);
 	    }
 	}
 
@@ -552,9 +551,9 @@ void *Collgrid(void *argument)
   while ( nrecs0 > 0 );
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
-    streamClose(ef[fileID].streamID);
+    pstreamClose(ef[fileID].streamID);
 
-  streamClose(streamID2);
+  pstreamClose(streamID2);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {

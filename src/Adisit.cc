@@ -176,9 +176,9 @@ void *Adisit(void *argument)
 
   if ( operatorArgc() == 1 ) pin = parameter2double(operatorArgv()[0]);
   
-  int streamID1 = streamOpenRead(cdoStreamName(0));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
 
-  int vlistID1 = streamInqVlist(streamID1);
+  int vlistID1 = pstreamInqVlist(streamID1);
 
   int nvars = vlistNvars(vlistID1);
 
@@ -294,31 +294,31 @@ void *Adisit(void *argument)
   int taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  int streamID2 = pstreamOpenWrite(cdoStreamName(1), cdoFiletype());
 
-  streamDefVlist(streamID2, vlistID2);
+  pstreamDefVlist(streamID2, vlistID2);
 
   int tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
 
-      streamDefTimestep(streamID2, tsID);
+      pstreamDefTimestep(streamID2, tsID);
 	       
       for ( int recID = 0; recID < nrecs; ++recID )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  pstreamInqRecord(streamID1, &varID, &levelID);
 
 	  offset = gridsize*levelID;
 
 	  if ( varID == thoID )
             {
-              streamReadRecord(streamID1, tho.ptr+offset, &nmiss);
+              pstreamReadRecord(streamID1, tho.ptr+offset, &nmiss);
               tho.nmiss = (size_t) nmiss;
             }
 	  if ( varID == saoID )
             {
-              streamReadRecord(streamID1, sao.ptr+offset, &nmiss);
+              pstreamReadRecord(streamID1, sao.ptr+offset, &nmiss);
               sao.nmiss = (size_t) nmiss;
             }
         }
@@ -339,8 +339,8 @@ void *Adisit(void *argument)
 	  for ( i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(single[i], tis.missval) ) nmiss++;
  
-	  streamDefRecord(streamID2, tisID2, levelID);
-	  streamWriteRecord(streamID2, single, nmiss);     
+	  pstreamDefRecord(streamID2, tisID2, levelID);
+	  pstreamWriteRecord(streamID2, single, nmiss);     
 
 	  single = sao.ptr+offset;
 
@@ -348,15 +348,15 @@ void *Adisit(void *argument)
 	  for ( i = 0; i < gridsize; ++i )
 	    if ( DBL_IS_EQUAL(single[i], sao.missval) ) nmiss++;
  
-	  streamDefRecord(streamID2, saoID2, levelID);
-	  streamWriteRecord(streamID2, single, nmiss);     
+	  pstreamDefRecord(streamID2, saoID2, levelID);
+	  pstreamWriteRecord(streamID2, single, nmiss);     
 	}
 
       tsID++;
     }
 
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID2);
 

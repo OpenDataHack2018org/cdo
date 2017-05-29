@@ -61,8 +61,8 @@ void *Arith(void *argument)
   int operfunc = cdoOperatorF1(operatorID);
   operatorCheckArgc(0);
 
-  int streamID1 = streamOpenRead(cdoStreamName(0));
-  int streamID2 = streamOpenRead(cdoStreamName(1));
+  int streamID1 = pstreamOpenRead(cdoStreamName(0));
+  int streamID2 = pstreamOpenRead(cdoStreamName(1));
 
   int streamIDx1 = streamID1;
   int streamIDx2 = streamID2;
@@ -71,8 +71,8 @@ void *Arith(void *argument)
   field_type *fieldx1 = &field1;
   field_type *fieldx2 = &field2;
 
-  int vlistID1 = streamInqVlist(streamID1);
-  int vlistID2 = streamInqVlist(streamID2);
+  int vlistID1 = pstreamInqVlist(streamID1);
+  int vlistID2 = pstreamInqVlist(streamID2);
   int vlistIDx1 = vlistID1;
   int vlistIDx2 = vlistID2;
 
@@ -200,17 +200,16 @@ void *Arith(void *argument)
   int taxisID3 = taxisDuplicate(taxisIDx1);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  int streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  streamDefVlist(streamID3, vlistID3);
+  int streamID3 = pstreamOpenWrite(cdoStreamName(2), cdoFiletype());
+  pstreamDefVlist(streamID3, vlistID3);
 
   int tsID = 0;
   int tsID2 = 0;
-  while ( (nrecs = streamInqTimestep(streamIDx1, tsID)) )
+  while ( (nrecs = pstreamInqTimestep(streamIDx1, tsID)) )
     {
       if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
 	{
-	  nrecs2 = streamInqTimestep(streamIDx2, tsID2);
+	  nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
 	  if ( nrecs2 == 0 )
 	    {
 	      if ( filltype == FILL_NONE && streamIDx2 == streamID2 )
@@ -222,16 +221,16 @@ void *Arith(void *argument)
 	      if ( filltype == FILL_FILE )
 		{
 		  tsID2 = 0;
-		  streamClose(streamID2);
-		  streamID2 = streamOpenRead(cdoStreamName(1));
+		  pstreamClose(streamID2);
+		  streamID2 = pstreamOpenRead(cdoStreamName(1));
 		  streamIDx2 = streamID2;
 
-		  vlistID2 = streamInqVlist(streamID2);
+		  vlistID2 = pstreamInqVlist(streamID2);
 		  vlistIDx2 = vlistID2;
 
 		  vlistCompare(vlistID1, vlistID2, CMP_DIM);
 
-		  nrecs2 = streamInqTimestep(streamIDx2, tsID2);
+		  nrecs2 = pstreamInqTimestep(streamIDx2, tsID2);
 		  if ( nrecs2 == 0 )
 		    cdoAbort("Empty input stream %s!", cdoStreamName(1)->args);
 		}
@@ -242,12 +241,12 @@ void *Arith(void *argument)
 
       taxisCopyTimestep(taxisID3, taxisIDx1);
 
-      streamDefTimestep(streamID3, tsID);
+      pstreamDefTimestep(streamID3, tsID);
 
       for ( int recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamIDx1, &varID, &levelID);
-	  streamReadRecord(streamIDx1, fieldx1->ptr, &nmiss);
+	  pstreamInqRecord(streamIDx1, &varID, &levelID);
+	  pstreamReadRecord(streamIDx1, fieldx1->ptr, &nmiss);
           fieldx1->nmiss = (size_t) nmiss;
           int varID2 = varID;
           
@@ -257,8 +256,8 @@ void *Arith(void *argument)
 
 	      if ( lstatus || (filltype != FILL_VAR && filltype != FILL_VARTS) )
 		{
-		  streamInqRecord(streamIDx2, &varID2, &levelID2);
-		  streamReadRecord(streamIDx2, fieldx2->ptr, &nmiss);
+		  pstreamInqRecord(streamIDx2, &varID2, &levelID2);
+		  pstreamReadRecord(streamIDx2, fieldx2->ptr, &nmiss);
                   fieldx2->nmiss = (size_t) nmiss;
                   if ( varID   != varID2 ) cdoAbort("Internal error, varIDs of input streams differ!");
                   if ( levelID != levelID2 ) cdoAbort("Internal error, levelIDs of input streams differ!");
@@ -309,17 +308,17 @@ void *Arith(void *argument)
 
 	  farfun(&field1, field2, operfunc);
 
-	  streamDefRecord(streamID3, varID, levelID);
-	  streamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
+	  pstreamDefRecord(streamID3, varID, levelID);
+	  pstreamWriteRecord(streamID3, field1.ptr, (int)field1.nmiss);
 	}
 
       tsID++;
       tsID2++;
     }
 
-  streamClose(streamID3);
-  streamClose(streamID2);
-  streamClose(streamID1);
+  pstreamClose(streamID3);
+  pstreamClose(streamID2);
+  pstreamClose(streamID1);
 
   vlistDestroy(vlistID3);
 
