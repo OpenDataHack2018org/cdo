@@ -6,6 +6,57 @@ FORMAT="-f srv -b F32"
 #
 ########################################################################
 #
+# Timstat Yearstat Monstat Daystat Runstat
+#
+IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
+OFILE=ts_6h_5years
+$CDO $FORMAT remapnn,lon=55_lat=10 $IFILE $OFILE
+#
+IFILE=$OFILE
+OFILE=ts_1d_5years
+$CDO $FORMAT daymean $IFILE $OFILE
+$CDO selmonth,1 -selyear,1991 $IFILE ts_6h_1mon
+#
+IFILE=$OFILE
+OFILE=ts_mm_5years
+$CDO $FORMAT -settime,12:00:00 -setday,15 -monmean $IFILE $OFILE
+$CDO selyear,1991 $IFILE ts_1d_1year
+#
+STATS="min max sum avg mean std std1 var var1 range"
+STATS="range"
+#
+IFILE=ts_mm_5years
+#for STAT in $STATS; do
+#  $CDO $FORMAT seas${STAT} $IFILE seas${STAT}_ref
+#done
+#
+IFILE=ts_mm_5years
+#for STAT in $STATS; do
+#  $CDO $FORMAT run${STAT},12 $IFILE run${STAT}_ref
+#done
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT tim$STAT $IFILE tim${STAT}_ref
+done
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT year$STAT $IFILE year${STAT}_ref
+done
+#
+IFILE=ts_1d_1year
+for STAT in $STATS; do
+  $CDO $FORMAT mon$STAT $IFILE mon${STAT}_ref
+done
+#
+IFILE=ts_6h_1mon
+for STAT in $STATS; do
+  $CDO $FORMAT day$STAT $IFILE day${STAT}_ref
+done
+exit
+########################################################################
+#
 # Remap regional grid
 #
 GRID=spain.grid
@@ -78,56 +129,6 @@ IFILE=ts_mm_5years
 for STAT in $STATS; do
   $CDO $FORMAT yseas$STAT $IFILE yseas${STAT}_ref
 done
-########################################################################
-#
-# Timstat Yearstat Monstat Daystat Runstat
-#
-IFILE=$HOME/data/cdt/cera/EH5_AMIP_1_TSURF_6H_1991-1995.grb
-OFILE=ts_6h_5years
-$CDO $FORMAT remapnn,lon=55_lat=10 $IFILE $OFILE
-#
-IFILE=$OFILE
-OFILE=ts_1d_5years
-$CDO $FORMAT daymean $IFILE $OFILE
-$CDO selmon,1 -selyear,1991 $IFILE ts_6h_1mon
-#
-IFILE=$OFILE
-OFILE=ts_mm_5years
-$CDO $FORMAT -settime,12:00:00 -setday,15 -monmean $IFILE $OFILE
-$CDO selyear,1991 $IFILE ts_1d_1year
-#
-STATS="min max sum avg mean std std1 var var1"
-#
-IFILE=ts_mm_5years
-for STAT in $STATS; do
-  $CDO $FORMAT seas${STAT} $IFILE seas${STAT}_ref
-done
-#
-IFILE=ts_mm_5years
-for STAT in $STATS; do
-  $CDO $FORMAT run${STAT},12 $IFILE run${STAT}_ref
-done
-#
-IFILE=ts_mm_5years
-for STAT in $STATS; do
-  $CDO $FORMAT tim$STAT $IFILE tim${STAT}_ref
-done
-#
-IFILE=ts_mm_5years
-for STAT in $STATS; do
-  $CDO $FORMAT year$STAT $IFILE year${STAT}_ref
-done
-#
-IFILE=ts_1d_1year
-for STAT in $STATS; do
-  $CDO $FORMAT mon$STAT $IFILE mon${STAT}_ref
-done
-#
-IFILE=ts_6h_1mon
-for STAT in $STATS; do
-  $CDO $FORMAT day$STAT $IFILE day${STAT}_ref
-done
-exit
 ########################################################################
 #
 # Zonstat

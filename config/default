@@ -49,7 +49,8 @@ case "${HOSTNAME}" in
 	            CXX=icpc CXXFLAGS="-g -Wall -O2 -qopt-report=5 -march=native" \
 	            CC=icc   CFLAGS="-g -Wall -O2 -qopt-report=5 -march=native"
         elif  test "$COMP" = clang ; then
-	  ${CONFPATH}configure \
+	  ${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
                     $CDOLIBS \
 	            CXX=clang++ CXXFLAGS="-g -Wall -O3" \
 	            CC=clang    CFLAGS="-g -Wall -O3"

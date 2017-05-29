@@ -1,6 +1,13 @@
 CDO NEWS
 --------
 
+Version 1.9.0 (15 September 2017):
+
+   New features:
+     * Added range operator to all statistic modules (e.g. yearrange, zonrange)
+   New operators:
+     *
+
 Version 1.8.2 (15 May 2017):
 
    Fixed bugs:
