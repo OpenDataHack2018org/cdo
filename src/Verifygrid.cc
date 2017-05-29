@@ -663,7 +663,7 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
     cdoPrintBlue("%9d cells have duplicate vertices", no_of_cells_with_duplicates);
 
   if ( no_nonusable_cells )
-    cdoPrintRed("%9d cells have unsable vertices", no_nonusable_cells);
+    cdoPrintRed("%9d cells have unusable vertices", no_nonusable_cells);
 
   if ( no_nonunique_cells )
     cdoPrintRed("%9d cells are not unique", no_nonunique_cells);
