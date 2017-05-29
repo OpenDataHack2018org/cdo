@@ -59,7 +59,7 @@ enum {FT_STD, FT_CONST, FT_FLD, FT_VERT, FT_COORD, FT_1C};
 #define  MVCOMPOR(x,y)  (DBL_IS_EQUAL((x),missval1) ? missval1 : COMPOR(x,y))
 
 static double f_int(double x)          { return (int)(x); }
-static double f_nint(double x)         { return (double)lround(x); }
+static double f_nint(double x)         { return round(x); }
 static double f_sqr(double x)          { return x*x;      }
 static double f_rad(double x)          { return x*M_PI/180.; }
 static double f_deg(double x)          { return x*180./M_PI; }
@@ -117,23 +117,23 @@ static func_t fun_sym_tbl[] =
   {FT_FLD, 0, "fldmin",  (double (*)()) fldmin},
   {FT_FLD, 0, "fldmax",  (double (*)()) fldmax},
   {FT_FLD, 0, "fldsum",  (double (*)()) fldsum},
-  {FT_FLD, 1, "fldmean", (double (*)()) fldmean},
-  {FT_FLD, 1, "fldavg",  (double (*)()) fldavg},
-  {FT_FLD, 1, "fldstd",  (double (*)()) fldstd},
-  {FT_FLD, 1, "fldstd1", (double (*)()) fldstd1},
-  {FT_FLD, 1, "fldvar",  (double (*)()) fldvar},
-  {FT_FLD, 1, "fldvar1", (double (*)()) fldvar1},
+  {FT_FLD, 1, "fldmean", (double (*)()) fldmeanw},
+  {FT_FLD, 1, "fldavg",  (double (*)()) fldavgw},
+  {FT_FLD, 1, "fldstd",  (double (*)()) fldstdw},
+  {FT_FLD, 1, "fldstd1", (double (*)()) fldstd1w},
+  {FT_FLD, 1, "fldvar",  (double (*)()) fldvarw},
+  {FT_FLD, 1, "fldvar1", (double (*)()) fldvar1w},
 
   // cdo field functions (Reduce level to point)
   {FT_VERT, 0, "vertmin",  (double (*)()) fldmin},
   {FT_VERT, 0, "vertmax",  (double (*)()) fldmax},
   {FT_VERT, 0, "vertsum",  (double (*)()) fldsum},
-  {FT_VERT, 1, "vertmean", (double (*)()) fldmean},
-  {FT_VERT, 1, "vertavg",  (double (*)()) fldavg},
-  {FT_VERT, 1, "vertstd",  (double (*)()) fldstd},
-  {FT_VERT, 1, "vertstd1", (double (*)()) fldstd1},
-  {FT_VERT, 1, "vertvar",  (double (*)()) fldvar},
-  {FT_VERT, 1, "vertvar1", (double (*)()) fldvar1},
+  {FT_VERT, 1, "vertmean", (double (*)()) fldmeanw},
+  {FT_VERT, 1, "vertavg",  (double (*)()) fldavgw},
+  {FT_VERT, 1, "vertstd",  (double (*)()) fldstdw},
+  {FT_VERT, 1, "vertstd1", (double (*)()) fldstd1w},
+  {FT_VERT, 1, "vertvar",  (double (*)()) fldvarw},
+  {FT_VERT, 1, "vertvar1", (double (*)()) fldvar1w},
   
   {FT_COORD, 0, "clon",       NULL},
   {FT_COORD, 0, "clat",       NULL},
@@ -178,6 +178,8 @@ int get_funcID(const char *fun)
       }
 
   if ( funcID == -1 ) cdoAbort("Function >%s< not available!", fun);
+
+  if ( strcmp(fun_sym_tbl[funcID].name, "nint") == 0 ) cdo_check_round();
 
   return funcID;
 }

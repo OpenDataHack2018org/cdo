@@ -27,10 +27,8 @@
 */
 
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "error.h"
 
 
 static
@@ -44,9 +42,9 @@ void invertLonDes(int vlistID)
 
       int gridtype = gridInqType(gridID1);
 
-      if ( gridtype != GRID_GENERIC && gridtype != GRID_GAUSSIAN &&
-	   gridtype != GRID_LONLAT  && gridtype != GRID_CURVILINEAR )
-	cdoAbort("Unsupported gridtype!");
+      if ( !(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION ||
+             gridtype == GRID_LONLAT  || gridtype == GRID_CURVILINEAR) )
+	cdoAbort("Unsupported gridtype: %s!", gridNamePtr(gridtype));
 
       if ( gridInqXvals(gridID1, NULL) )
 	{
@@ -116,6 +114,87 @@ void invertLonDes(int vlistID)
 }
 
 static
+void invertLatCoord(int gridID)
+{
+  int gridtype = gridInqType(gridID);
+
+  if ( gridInqYvals(gridID, NULL) )
+    {
+      int nlon = gridInqXsize(gridID);
+      int nlat = gridInqYsize(gridID);
+      int size = (gridtype == GRID_CURVILINEAR) ? nlon*nlat : nlat;
+
+      double *yv1 = (double*) Malloc(size*sizeof(double));
+      double *yv2 = (double*) Malloc(size*sizeof(double));
+
+      if ( gridtype == GRID_CURVILINEAR )
+        {
+          gridInqXvals(gridID, yv1);
+          
+          for ( int ilat = 0; ilat < nlat; ilat++ )
+            for ( int ilon = 0; ilon < nlon; ilon++ )
+              yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
+
+          gridDefXvals(gridID, yv2);
+          
+          gridInqYvals(gridID, yv1);
+
+          for ( int ilat = 0; ilat < nlat; ilat++ )
+            for ( int ilon = 0; ilon < nlon; ilon++ )
+              yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
+
+          gridDefYvals(gridID, yv2);
+        }
+      else
+        {
+          gridInqYvals(gridID, yv1);
+
+          for ( int ilat = 0; ilat < nlat; ilat++ )
+            yv2[nlat-ilat-1] = yv1[ilat];
+
+          gridDefYvals(gridID, yv2);
+        }
+
+      if ( yv2 ) Free(yv2);
+      if ( yv1 ) Free(yv1);
+    }
+
+  if ( gridInqYbounds(gridID, NULL) )
+    {
+      int nlon = gridInqXsize(gridID);
+      int nlat = gridInqYsize(gridID);
+      int nv   = gridInqNvertex(gridID);
+      int size = (gridtype == GRID_CURVILINEAR) ? nv*nlon*nlat : nv*nlat;
+
+      double *yb1 = (double*) Malloc(size*sizeof(double));
+      double *yb2 = (double*) Malloc(size*sizeof(double));
+
+      gridInqYbounds(gridID, yb1);
+
+      if ( gridtype == GRID_CURVILINEAR )
+        {
+          for ( int ilat = 0; ilat < nlat; ilat++ )
+            for ( int ilon = 0; ilon < nlon; ilon++ )
+              for ( int iv = 0; iv < nv; iv++ )
+                yb2[(nlat-ilat-1)*nlon*nv + ilon*nv + iv] = yb1[ilat*nlon*nv + ilon*nv + iv];
+        }
+      else
+        {
+          for ( int ilat = 0; ilat < nlat; ilat++ )
+            {
+              yb2[nlat*2-ilat*2-1] = yb1[ilat*2];
+              yb2[nlat*2-ilat*2-2] = yb1[ilat*2+1];
+            }
+        }
+
+      gridDefYbounds(gridID, yb2);
+
+      if ( yb2 ) Free(yb2);
+      if ( yb1 ) Free(yb1);
+    }
+}
+
+static
 void invertLatDes(int vlistID)
 {
   int ngrids = vlistNgrids(vlistID);
@@ -126,85 +205,14 @@ void invertLatDes(int vlistID)
 
       int gridtype = gridInqType(gridID1);
 
-      if ( gridtype != GRID_GENERIC && gridtype != GRID_GAUSSIAN &&
-	   gridtype != GRID_LONLAT  && gridtype != GRID_CURVILINEAR )
-	cdoAbort("Unsupported gridtype!");
+      if ( !(gridtype == GRID_GENERIC || gridtype == GRID_GAUSSIAN || gridtype == GRID_PROJECTION ||
+             gridtype == GRID_LONLAT  || gridtype == GRID_CURVILINEAR) )
+	cdoAbort("Unsupported gridtype: %s!", gridNamePtr(gridtype));
 
-      if ( gridInqYvals(gridID1, NULL) )
-	{
-	  int nlon = gridInqXsize(gridID1);
-	  int nlat = gridInqYsize(gridID1);
-	  int size = (gridtype == GRID_CURVILINEAR) ? nlon*nlat : nlat;
+      invertLatCoord(gridID2);
 
-	  double *yv1 = (double*) Malloc(size*sizeof(double));
-	  double *yv2 = (double*) Malloc(size*sizeof(double));
-
-
-	  if ( gridtype == GRID_CURVILINEAR )
-	    {
-	      gridInqXvals(gridID1, yv1);
-
-	      for ( int ilat = 0; ilat < nlat; ilat++ )
-		for ( int ilon = 0; ilon < nlon; ilon++ )
-		  yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
-
-	      gridDefXvals(gridID2, yv2);
-
-	      gridInqYvals(gridID1, yv1);
-
-	      for ( int ilat = 0; ilat < nlat; ilat++ )
-		for ( int ilon = 0; ilon < nlon; ilon++ )
-		  yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
-
-	      gridDefYvals(gridID2, yv2);
-	    }
-	  else
-	    {
-	      gridInqYvals(gridID1, yv1);
-
-	      for ( int ilat = 0; ilat < nlat; ilat++ )
-		yv2[nlat-ilat-1] = yv1[ilat];
-
-	      gridDefYvals(gridID2, yv2);
-	    }
-
-	  if ( yv2 ) Free(yv2);
-	  if ( yv1 ) Free(yv1);
-	}
-
-      if ( gridInqYbounds(gridID1, NULL) )
-	{
-	  int nlon = gridInqXsize(gridID1);
-	  int nlat = gridInqYsize(gridID1);
-	  int nv   = gridInqNvertex(gridID1);
-	  int size = (gridtype == GRID_CURVILINEAR) ? nv*nlon*nlat : nv*nlat;
-
-	  double *yb1 = (double*) Malloc(size*sizeof(double));
-	  double *yb2 = (double*) Malloc(size*sizeof(double));
-
-	  gridInqYbounds(gridID1, yb1);
-
-	  if ( gridtype == GRID_CURVILINEAR )
-	    {
-	      for ( int ilat = 0; ilat < nlat; ilat++ )
-		for ( int ilon = 0; ilon < nlon; ilon++ )
-		  for ( int iv = 0; iv < nv; iv++ )
-		    yb2[(nlat-ilat-1)*nlon*nv + ilon*nv + iv] = yb1[ilat*nlon*nv + ilon*nv + iv];
-	    }
-	  else
-	    {
-		for ( int ilat = 0; ilat < nlat; ilat++ )
-		  {
-		    yb2[nlat*2-ilat*2-1] = yb1[ilat*2];
-		    yb2[nlat*2-ilat*2-2] = yb1[ilat*2+1];
-		  }
-	    }
-
-	  gridDefYbounds(gridID2, yb2);
-
-	  if ( yb2 ) Free(yb2);
-	  if ( yb1 ) Free(yb1);
-	}
+      int projID = gridInqProj(gridID2);
+      if ( projID != CDI_UNDEFID ) invertLatCoord(projID);
 
       vlistChangeGrid(vlistID, gridID1, gridID2);
     }
@@ -301,10 +309,8 @@ void *Invert(void *argument)
 
   if ( operfunc1 == func_all || operfunc1 == func_hrd )
     {
-      if ( operfunc2 == func_lat )
-	invertLatDes(vlistID2);
-      else
-	invertLonDes(vlistID2);
+      if ( operfunc2 == func_lat ) invertLatDes(vlistID2);
+      else                         invertLonDes(vlistID2);
     }
 
   int streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

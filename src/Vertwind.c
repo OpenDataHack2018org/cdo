@@ -21,7 +21,6 @@
       Vertwind    vertwind      Convert the vertical velocity to [m/s]
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

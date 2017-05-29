@@ -71,6 +71,8 @@ void *Math(void *argument)
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
+  if ( operfunc == FNINT ) cdo_check_round();
+
   double rc = 0;
   if ( operfunc == POW )
     {
@@ -127,7 +129,7 @@ void *Math(void *argument)
                   break;
                 case FNINT:
                   for ( i = 0; i < gridsize; i++ )
-                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : (double)lround(array1[i]);
+                    array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : round(array1[i]);
                   break;
                 case SQR:
                   for ( i = 0; i < gridsize; i++ )

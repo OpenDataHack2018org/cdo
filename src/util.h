@@ -89,6 +89,7 @@ extern int cdoDebug;
 extern int cdoCompress;
 extern int cdoInteractive;
 extern int cdoParIO;
+extern int cdoDebugExt;
 
 extern int cdoCompType;
 extern int cdoCompLevel;
@@ -219,7 +220,9 @@ int zaxisFromName(const char *zaxisname);
 
 /* refactor: moved here from cdo.h */
 int cdo_omp_get_thread_num(void);
+void cdo_omp_set_num_threads(int nthreads);
 void strtolower(char *str);
+void strtoupper(char *str);
 
 /* refactor: moved here from cdo.c */
 void exp_run(int argc, char *argv[], const char *cdoExpName); // job.c
@@ -227,5 +230,7 @@ void printFeatures(void); // features.c
 void printLibraries(void);  // features.c  
 
 int wildcardmatch(const char *w, const char *s);
+
+void cdo_check_round(void);
 
 #endif  /* _UTIL_H */

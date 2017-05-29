@@ -1,0 +1,64 @@
+@BeginModule
+@NewPage
+@Name      = WindTrans
+@Title     = Wind Transformation
+@Section   = Miscellaneous
+@Arguments = infile outfile
+@Operators = uvDestag rotuvNorth projuvLatLon
+
+@BeginDescription
+This module contains special operators for datsets with wind components on a rotated lon/lat grid, 
+e.g. data from the regional model HIRLAM or REMO. 
+@EndDescription
+@EndModule
+
+
+@BeginOperator_uvDestag
+@Title     = Destaggering of u/v wind components
+@Parameter = u v [-/+0.5] [-/+0.5]
+
+@BeginDescription
+This is a special operator for destaggering of wind components.
+If the file contains a grid with temperature (name='t' or code=11)
+then grid_temp will be used for destaggered wind.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_rotuvNorth
+@Title     = Rotate u/v wind to North pole.
+@Parameter = u v
+
+@BeginDescription
+This is an operator for transformation of wind-vectors from grid-relative to north-pole
+relative for the whole file. (FAST implementation with JACOBIANS)
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_projuvLatLon
+@Title     = Cylindrical Equidistant projection
+@Parameter = u v
+
+@BeginDescription
+Thus is an operator for transformation of wind-vectors from the globe-spherical coordinate system
+into a flat Cylindrical Equidistant (lat-lon) projection. (FAST JACOBIAN implementation)
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = u,v
+STRING  Pair of u,v wind components (use variable names or code numbers)
+@Item = -/+0.5,-/+0.5
+STRING  Destaggered grid offsets are optional (default -0.5,-0.5)
+@EndParameter
+
+
+@BeginExample
+Typical operator sequence on HIRLAM NWP model output (LAMH_D11 files):
+@BeginVerbatim
+cdo uvDestag,33,34   inputfile inputfile_destag
+cdo rotuvNorth,33,34 inputfile_destag inputfile_rotuvN
+@EndVerbatim
+@EndExample

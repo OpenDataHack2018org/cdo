@@ -1,27 +1,44 @@
 Contributors
 
-CDO was initially written by Uwe Schulzweida.
-CDO was mainly written by Uwe Schulzweida.
+* History
 
-CDO has incorporated code from several sources. Users have contributed patches and suggestions over time. This work has been undertaken by MPIM and as been funded by MPIM.
-
-
-CDO was inspired by the PINGO package and the GRIB-Modules. 
+CDO was originally developed by Uwe Schulzweida at the Max Planck Institute for Meteorology (MPI-M).
+The MPI-M, together with the DKRZ, has a long history in the development of tools for processing climate data.
+CDO was inspired by some of these tools, such as the PINGO package and the GRIB-Modules. 
 PINGO was developed by Jürgen Waszkewitz, Peter Lenzen, and Nathan Gillet in 1995 at the DKRZ, Hamburg (Germany).
 CDO has a similar user interface and uses some of PINGO routines.
 The GRIB-Modules was developed by 
 
+* External sources
 
-* Procedural INterface for GRIB formatted Objects
+CDO has incorporated code from several sources:
 
+afterburner is a postprocessing program for ECHAM data and ECMWF analysis data,
+originally developed by Edilbert Kirk, Michael Ponater and Arno Hellbach.
+The afterburner code was modified for the CDO opertors after, sp2gp, gp2sp.
 
+SCRIP is a software package used to generate interpolation weights for remapping
+fields from one grid to another in spherical geometry.
+It was developed at the Los Alamos National Laboratory by Philip W. Jones.
+The SCRIP library was converted from Fortran to ANSI C and is used a
+the base for the remapping operators in CDO.
+
+YAC (Yet Another Coupler) was jointly developed by DKRZ and MPI-M by Moritz Hanke and Rene Redler.
+CDO is using the clipping routines for the conservative remapping with remapycon.
+
+CDO uses tools from the GNU project, including automake, and libtool. 
+
+* Contributors
+
+Users have contributed patches and suggestions over time.
 The primary contributors to the CDO development have been: 
 
 Uwe Schulweida
-Original implementation and continuing development
-Concept, design and implementation of CDO, project coordination/management, and releases.
+
+Concept, design and implementation of CDO, project coordination, and releases.
 
 Luis Kornblueh
+supported CDO from the beginning. His main contributions is performance optimization.
 
 Ralf Müller
 
@@ -32,12 +49,11 @@ Modified operators: eca_gsl
 Cedrick Ansorge
 
 He worked on the CDO software package as a student assistant at MPI-M from 2007-2011.
-Implemented operators: eof, eof3d, enscrps, ensbrs, maskregion,
-bandpass, lowpass, highpass, smooth9
+Implemented operators: eof, eof3d, enscrps, ensbrs, maskregion, bandpass, lowpass, highpass, smooth9
 
 Ralf Quast
 
-He worked on CDO on behalf of the Service Gruppe Anpassung (SGA) in 2006.
+He worked on CDO on behalf of the Service Gruppe Anpassung (SGA), DKRZ in 2006.
 Implemented operators: all ECA Indices of Daily Temperature and
 Precipitation Extremes, all percentile operators, module Ydrun<STAT>,
 wct, hi
@@ -71,7 +87,10 @@ Modali Kameswarrao
 
 Mathis Rosenhauer
 
+Implemented operators: cmor (initial version)
+
 Reinhard Budich
+
 
 Please let me know if your name was omitted!
 
@@ -89,4 +108,6 @@ I have probably omitted some important names here because of incomplete record k
 
 Acknowledgments
 
-CDO uses tools from the GNU project, including automake, and libtool. 
+
+
+* Procedural INterface for GRIB formatted Objects

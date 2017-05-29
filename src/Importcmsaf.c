@@ -25,7 +25,6 @@
 #  include "hdf5.h"
 #endif
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

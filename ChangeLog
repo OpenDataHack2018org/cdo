@@ -1,7 +1,119 @@
+2017-05-15  Uwe Schulzweida
+
+	* Using CDI library version 1.8.2
+	* Version 1.8.2 release
+
+2017-05-10  Uwe Schulzweida
+
+	* grid_check_lat_borders_rad: remove RAD2DEG (bug fix for remapycon with non global reg2d source grids)
+
+2017-04-25  Uwe Schulzweida
+
+	* setcalendar, settaxis memory error (bug introduce in 1.8.1) [Bug #7691]
+
+2017-04-21  Uwe Schulzweida
+
+	* setpartab: variable name does not change [Bug #7681]
+	* cmorlite: skipped empty key values [Bug #7681]
+
+2017-04-14  Uwe Schulzweida
+
+	* removed fpe handling (speedup of 50% for ensmean ...)
+
+2017-04-13  Uwe Schulzweida
+
+	* Using CDI library version 1.8.1
+	* Version 1.8.1 release
+
+2017-04-10  Uwe Schulzweida
+
+	* Use Proj4 to convert GRIB LCC grids to geographic coordinates
+
+2017-04-09  Uwe Schulzweida
+
+	* Refactor GRID_LCC to GRID_PROJECTION
+
+2017-04-07  Uwe Schulzweida
+
+	* setpartab: added support for values in single quotes [Bug #7662]
+
+2017-04-03  Uwe Schulzweida
+
+	* Arith: set varID2 to varID (bug fix for variables with different grid size)
+
+2017-03-29  Uwe Schulzweida
+
+	* collgrid: combination of nx and names does not work (bug fix)
+
+2017-03-24  Uwe Schulzweida
+
+	* remap_grids_init: bug fix for CDI_PROJ_LCC
+
+2017-03-21  Uwe Schulzweida
+
+	* remapdis: potentialy wrong results on non global grids [Bug #7626]  (bug was introduced in last revision)
+
+2017-03-13  Uwe Schulzweida
+
+	* selindexbox: added support for LCC grid
+
+2017-03-09  Uwe Schulzweida
+
+	* New operator delgridcell - Delete grid cells by indexes
+
+2017-03-06  Uwe Schulzweida
+
+	* New operator selmulti:  Select multiple fields (patch from Michal Koutek, KMNI)
+	* New operator delmulti:  Delete multiple fields (patch from Michal Koutek, KMNI)
+	* New operator changemulti:  Change identication of multiple fields (patch from Michal Koutek, KMNI)
+
+2017-03-03  Uwe Schulzweida
+
+	* New operator rotuvNorth: Rotate grid-relative wind(u,v) to North_pole-relative (patch from Michal Koutek, KMNI)
+	* New operator projuvLatLon: Cylindrical Equidistant projection (patch from Michal Koutek, KMNI)
+
+2017-02-28  Uwe Schulzweida
+
+	* New operator uvDestag: Destaggering of wind components (patch from Michal Koutek, KMNI)
+
+2017-02-27  Uwe Schulzweida
+
+	* Added support for grid flag uvRelativeToGrid
+
+2017-02-24  Uwe Schulzweida
+
+	* New operator usegridnumber (patch from Michal Koutek, KMNI)
+
+2017-02-23  Uwe Schulzweida
+
+	* New operator showgrid: show grids (patch from Michal Koutek, KMNI)
+
+2017-02-22  Uwe Schulzweida
+
+	* option -k auto: set chunk_size_max to 65536.
+
+2017-02-21  Uwe Schulzweida
+
+	* New operator xinfon:
+
+2017-02-20  Uwe Schulzweida
+
+	* New operator samplegrid: resample grid (patch from Michal Koutek, KMNI)
+	* New operator subgrid: selindexbox for LCC grids (patch from Michal Koutek, KMNI)
+	* setgridtype,curvilinear: bug fix for source gridtype GRID_LCC
+
+2017-02-16  Uwe Schulzweida
+
+	* invertlat: added support for gridtype projection
+
 2017-02-14  Uwe Schulzweida
 
 	* Using CDI library version 1.8.0
 	* Version 1.8.0 release
+
+2017-02-07  Uwe Schulzweida
+
+	* New operator setattribute: set attributes
 
 2017-02-03  Uwe Schulzweida
 
@@ -117,7 +229,7 @@
 
 2016-07-29  Uwe Schulzweida
 
-	* New operator selindex - Select grid indices
+	* New operator selindex - Select grid cells by indices
 
 2016-07-18  Uwe Schulzweida
 

@@ -109,7 +109,7 @@ int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
-
+int cdoDebugExt          = 0;     //  Debug level for the KNMI extensions
 int cdoNumVarnames       = 0;
 char **cdoVarnames       = NULL;
 
@@ -125,14 +125,13 @@ int timer_read, timer_write;
 const char *cdoComment(void)
 {
   static char comment[256];
-  static int init = 0;
+  static bool init = false;
 
   if ( ! init )
     {
-      init = 1;
+      init = true;
 
       int size = strlen(CDO_Version);
-
       strncat(comment, CDO_Version, size);
       comment[size] = 0;
     }
@@ -183,15 +182,21 @@ int cdo_omp_get_thread_num(void)
 }
 
 
+void cdo_omp_set_num_threads(int nthreads)
+{
+#if defined(_OPENMP)
+  if (  omp_get_max_threads() != nthreads ) omp_set_num_threads(nthreads);
+#endif
+}
+
+
 char *getProgname(char *string)
 {
-  char *progname;
-
 #if defined(_WIN32)
   /*  progname = strrchr(string, '\\'); */
-  progname = " cdo";
+  char *progname = " cdo";
 #else
-  progname = strrchr(string, '/');
+  char *progname = strrchr(string, '/');
 #endif
 
   if ( progname == NULL ) progname = string;
@@ -220,20 +225,14 @@ const char *operatorAlias(const char *operatorName);
 
 const char *getOperatorName(const char *operatorArg)
 {
-  char *commapos;
   char *operatorName = NULL;
-  size_t len;
 
   if ( operatorArg )
     {
       if ( operatorArg[0] == '-' ) operatorArg++;
 
-      commapos = (char *)strchr(operatorArg, ',');
-
-      if ( commapos )
-        len = commapos - operatorArg;
-      else
-        len = strlen(operatorArg);
+      char *commapos = (char *)strchr(operatorArg, ',');
+      size_t len = (commapos != NULL) ? (size_t)(commapos - operatorArg) : strlen(operatorArg);
 
       operatorName = (char*) Malloc(len+1);
 
@@ -324,11 +323,9 @@ void argument_free(argument_t *argument)
 
 void argument_fill(argument_t *argument, int argc, char *argv[])
 {
-  int iarg;
-
   assert(argument->argc == argc);
 
-  for ( iarg = 0; iarg < argc; ++iarg )
+  for ( int iarg = 0; iarg < argc; ++iarg )
     argument->argv[iarg] = strdup(argv[iarg]);
 }
 
@@ -336,18 +333,15 @@ void argument_fill(argument_t *argument, int argc, char *argv[])
 char *getFileArg(char *argument)
 {
   char *fileArg = NULL;
-  char *parg;
-  char *blankpos;
-  size_t len;
 
   if ( argument )
     {
-      blankpos = strchr(argument, ' ');
+      char *blankpos = strchr(argument, ' ');
 
       if ( blankpos )
         {
-          parg = blankpos + 1;
-          len = strlen(parg);
+          char *parg = blankpos + 1;
+          size_t len = strlen(parg);
           fileArg = (char*) Malloc(len+1);
           strcpy(fileArg, parg);
         }
@@ -402,6 +396,13 @@ void strtolower(char *str)
   if ( str )
     for ( size_t i = 0; str[i]; ++i )
       str[i] = (char)tolower((int)str[i]);
+}
+
+void strtoupper(char *str)
+{
+  if ( str )
+    for ( size_t i = 0; str[i]; ++i )
+      str[i] = (char)toupper((int)str[i]);
 }
 
 
@@ -511,12 +512,10 @@ int get_season_start(void)
 
 void get_season_name(const char *seas_name[])
 {
-  long i;
-
   if ( get_season_start() == START_DEC )
-    for ( i = 0; i < 4; ++i ) seas_name[i] = seas_name_dec[i];
+    for ( int i = 0; i < 4; ++i ) seas_name[i] = seas_name_dec[i];
   else
-    for ( i = 0; i < 4; ++i ) seas_name[i] = seas_name_jan[i];
+    for ( int i = 0; i < 4; ++i ) seas_name[i] = seas_name_jan[i];
 }
 
 
@@ -608,8 +607,6 @@ void progressInit(void)
 
 void progressStatus(double offset, double refval, double curval)
 {
-  int ival;
-
   if ( cdoSilentMode ) return;
   if ( !stdout_is_tty ) return;
 
@@ -620,7 +617,7 @@ void progressStatus(double offset, double refval, double curval)
   curval = curval < 0 ? 0: curval;
   curval = curval > 1 ? 1: curval;
 
-  ival = (offset + refval*curval)*100;
+  int ival = (offset + refval*curval)*100;
 
   if ( ps_cval == -1 )
     {
@@ -670,16 +667,14 @@ int datatype2str(int datatype, char *datatypestr)
 int str2datatype(const char *datatypestr)
 {
   int datatype = -1;
-  size_t len;
-
-  len = strlen(datatypestr);
+  size_t len = strlen(datatypestr);
 
   if ( len > 1 )
     {
       int ilen = atoi(datatypestr+1);
       if      ( strncmp(datatypestr, "P0",  len) == 0 ) datatype = CDI_DATATYPE_PACK;
       else if ( strncmp(datatypestr, "P",     1) == 0 &&
-                ilen > 0 && ilen <= 32 )               datatype = atoi(datatypestr+1);
+                ilen > 0 && ilen <= 32 )                datatype = atoi(datatypestr+1);
       else if ( strncmp(datatypestr, "C32", len) == 0 ) datatype = CDI_DATATYPE_CPX32;
       else if ( strncmp(datatypestr, "C64", len) == 0 ) datatype = CDI_DATATYPE_CPX64;
       else if ( strncmp(datatypestr, "F32", len) == 0 ) datatype = CDI_DATATYPE_FLT32;
@@ -716,8 +711,7 @@ off_t fileSize(const char *restrict filename)
 
 
 /* 
- * Return the filetype extension (const char)
- * for a given filetype (int)
+ * Return the filetype extension (const char) for a given filetype (int)
  * TODO: handle lists of extensions i.e. grb and grb2 for GRIB2-format
  */
 const char *filetypeext(int filetype)
@@ -733,7 +727,7 @@ const char *filetypeext(int filetype)
     case CDI_FILETYPE_SRV:  return ".srv";   break;
     case CDI_FILETYPE_EXT:  return ".ext";   break;
     case CDI_FILETYPE_IEG:  return ".ieg";   break;
-    default:            return "";
+    default:                return "";
     }
 }
 
@@ -872,13 +866,12 @@ void cdoSetNAN(double missval, size_t gridsize, double *array)
 
 void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval)
 {
-  long i;
   double xmin =  DBL_MAX;
   double xmax = -DBL_MAX;
 
   if ( imiss )
     {
-      for ( i = 0; i < nvals; ++i )
+      for ( long i = 0; i < nvals; ++i )
 	{
 	  if ( ! imiss[i] )
 	    {
@@ -891,7 +884,7 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
     {
       xmin = array[0];
       xmax = array[0];
-      for ( i = 1; i < nvals; ++i )
+      for ( long i = 1; i < nvals; ++i )
 	{
 	  if      ( array[i] > xmax ) xmax = array[i];
 	  else if ( array[i] < xmin ) xmin = array[i];
@@ -900,4 +893,24 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
 
   *minval = xmin;
   *maxval = xmax;
+}
+
+
+void cdo_check_round(void)
+{
+  static bool checked = false;
+  if ( !checked )
+    {
+      checked = true;
+#define NMAX 3
+      double vals2[NMAX];
+      double vals[NMAX] = {2783.333, 1.45678921, 1.54678921};
+      double rvals[NMAX] = {2783, 1, 2};
+      for ( int i = 0; i < NMAX; ++i )
+        {
+          vals2[i] = round(vals[i]);
+          if ( IS_NOT_EQUAL(vals2[i], rvals[i]) )
+            cdoAbort("Function round() produces wrong results!");
+        }
+    }
 }

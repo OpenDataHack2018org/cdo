@@ -518,6 +518,19 @@ AC_ARG_ENABLE([all-static],
               [enable_all_static=no])
 AC_MSG_RESULT([$enable_all_static])
 AM_CONDITIONAL([ENABLE_ALL_STATIC],[test x$enable_all_static = 'xyes'])
+#  ----------------------------------------------------------------------
+#  Build CDO with HIRLAM extensions
+AC_MSG_CHECKING([for HIRLAM extensions])
+AC_ARG_ENABLE([hirlam-extensions],
+              [AS_HELP_STRING([--enable-hirlam-extensions],[HIRLAM extensions [default=no]])],
+              [AS_IF([test "x$enable_hirlam_extensions" != "xno"],
+                    [AC_DEFINE(HIRLAM_EXTENSIONS,[1],[Define to 1 for HIRLAM extensions])
+                     enable_hirlam_extensions=yes],
+                    [enable_hirlam_extensions=no])],
+              [enable_hirlam_extensions=no])
+AC_MSG_RESULT([$enable_hirlam_extensions])
+AM_CONDITIONAL([ENABLE_HIRLAM_EXTENSIONS],[test x$enable_hirlam_extensions = 'xyes'])
+#
 ])
 dnl
 dnl Local Variables:

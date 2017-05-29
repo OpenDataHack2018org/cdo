@@ -15,22 +15,25 @@ Splitsel      File operations
 Distgrid      File operations
 Collgrid      File operations
 Select        Selection
+Selmulti      Selection
 Selvar        Selection
 Seltime       Selection
 Selbox        Selection
+Selgridcell   Selection
+Samplegrid    Selection
 Cond          Conditional selection
 Cond2         Conditional selection
 Condc         Conditional selection
 MapReduce     Conditional selection
 Comp	      Comparison
 Compc	      Comparison
+Setattribute  Modification
 Setpartab     Modification
 Set           Modification
 Settime       Modification
 Change        Modification
 Setgrid       Modification
 Setzaxis      Modification
-Setgatt       Modification
 Invert        Modification
 Invertlev     Modification
 Shiftxy       Modification
@@ -128,6 +131,7 @@ Smooth        Miscellaneous
 Replacevalues Miscellaneous
 Timsort       Miscellaneous
 Vargen        Miscellaneous
+WindTrans     Miscellaneous
 Rotuv         Miscellaneous
 Mastrfu       Miscellaneous
 Derivepar     Miscellaneous
@@ -141,6 +145,7 @@ Strwin        Miscellaneous
 Strbre        Miscellaneous
 Strgal        Miscellaneous
 Hurr          Miscellaneous
+CMOR          Miscellaneous
 CMORlite      Miscellaneous
 Magplot       Magics
 Magvector     Magics

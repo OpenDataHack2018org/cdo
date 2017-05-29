@@ -15,29 +15,19 @@
   GNU General Public License for more details.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
-#include "error.h"
 
-#ifndef UNDEFID
-#define UNDEFID  CDI_UNDEFID
-#endif
 
 static
 int readInstitution(const char *instfile)
 {
-  int instID = UNDEFID;
+  int instID = CDI_UNDEFID;
   char line[1024], *pline;
   int lnr = 0;
   int nvar = 0, maxvar = 4;
   char name[1024], longname[1024];
-  int center = UNDEFID, subcenter = UNDEFID;
+  int center = CDI_UNDEFID, subcenter = CDI_UNDEFID;
 
   FILE *instfp = fopen(instfile, "r");
 
@@ -69,7 +59,7 @@ int readInstitution(const char *instfile)
       if ( nvar == 2 && maxvar == 4 )
 	{
 	  if ( ! isdigit((int) pline[0]) )
-	    Error("wrong format in line %d. Missing subcenter!", lnr);
+	    cdoAbort("wrong format in line %d. Missing subcenter!", lnr);
 
 	  subcenter = atoi(pline);
 	}
@@ -88,7 +78,7 @@ int readInstitution(const char *instfile)
   fclose(instfp);
 
   instID = institutInq(center, subcenter, name, longname);
-  if ( instID == UNDEFID )
+  if ( instID == CDI_UNDEFID )
     instID = institutDef(center, subcenter, name, longname);
 
   return instID;
@@ -100,11 +90,11 @@ void defineInstitution(const char *instarg)
   const char *instname = instarg;
   int instID = readInstitution(instname);
 
-  if ( instID == UNDEFID )
+  if ( instID == CDI_UNDEFID )
     instID = institutInq(0, 0, instname, NULL);
 
-  if ( instID == UNDEFID )
-    Error("institution <%s> not found", instname);
+  if ( instID == CDI_UNDEFID )
+    cdoAbort("institution <%s> not found", instname);
 
   cdoDefaultInstID = instID;
 }

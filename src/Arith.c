@@ -38,12 +38,10 @@ void *Arith(void *argument)
   enum {FILL_NONE, FILL_TS, FILL_VAR, FILL_VARTS, FILL_FILE};
   int filltype = FILL_NONE;
   int nmiss;
-  int nrecs, nrecs2, nvars = 0, nlev;
+  int nrecs, nrecs2, nvars = 0;
   int nlevels2 = 1;
   int varID, levelID;
-  int varID2, levelID2;
-  int offset;
-  int lfill1, lfill2;
+  int levelID2;
   int *varnmiss2 = NULL;
   int **varnmiss = NULL;
   double *vardata2 = NULL;
@@ -90,6 +88,7 @@ void *Arith(void *argument)
   if ( ntsteps1 == 0 ) ntsteps1 = 1;
   if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
+  bool lfill1, lfill2;
   if ( vlistNvars(vlistID1) == 1 && vlistNvars(vlistID2) == 1 )
     {
       lfill2 = vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1;
@@ -182,8 +181,8 @@ void *Arith(void *argument)
 	  varnmiss = (int **) Malloc(nvars*sizeof(int *));
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
+	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+	      int nlev     = zaxisInqSize(vlistInqVarZaxis(vlistIDx2, varID));
 	      vardata[varID]  = (double*) Malloc(nlev*gridsize*sizeof(double));
 	      varnmiss[varID] = (int*) Malloc(nlev*sizeof(int));
 	    }
@@ -250,6 +249,7 @@ void *Arith(void *argument)
 	  streamInqRecord(streamIDx1, &varID, &levelID);
 	  streamReadRecord(streamIDx1, fieldx1->ptr, &nmiss);
           fieldx1->nmiss = (size_t) nmiss;
+          int varID2 = varID;
           
 	  if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_VARTS )
 	    {
@@ -266,23 +266,23 @@ void *Arith(void *argument)
 
 	      if ( filltype == FILL_TS )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
-		  offset   = gridsize*levelID;
+		  int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID));
+		  int offset   = gridsize*levelID;
 		  memcpy(vardata[varID]+offset, fieldx2->ptr, gridsize*sizeof(double));
 		  varnmiss[varID][levelID] = fieldx2->nmiss;
 		}
 	      else if ( lstatus && (filltype == FILL_VAR || filltype == FILL_VARTS) )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
-		  offset   = gridsize*levelID2;
+		  int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
+		  int offset   = gridsize*levelID2;
 		  memcpy(vardata2+offset, fieldx2->ptr, gridsize*sizeof(double));
 		  varnmiss2[levelID2] = fieldx2->nmiss;
 		}
 	    }
 	  else if ( filltype == FILL_TS )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
-	      offset   = gridsize*levelID;
+	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, varID2));
+	      int offset   = gridsize*levelID;
 	      memcpy(fieldx2->ptr, vardata[varID]+offset, gridsize*sizeof(double));
 	      fieldx2->nmiss = varnmiss[varID][levelID];
 	    }
@@ -292,10 +292,10 @@ void *Arith(void *argument)
 
 	  if ( filltype == FILL_VAR || filltype == FILL_VARTS )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
+	      int gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
 	      levelID2 = 0;
 	      if ( nlevels2 > 1 ) levelID2 = levelID;
-	      offset   = gridsize*levelID2;
+	      int offset   = gridsize*levelID2;
 	      memcpy(fieldx2->ptr, vardata2+offset, gridsize*sizeof(double));
 	      fieldx2->nmiss   = varnmiss2[levelID2];
 	      fieldx2->grid    = vlistInqVarGrid(vlistIDx2, 0);

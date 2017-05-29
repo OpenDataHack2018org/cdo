@@ -19,7 +19,6 @@
    This module contains the following operators:
 */
 
-#include <ctype.h>  /* isspace */
 
 #include <cdi.h>
 #include "cdo.h"

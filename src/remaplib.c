@@ -206,12 +206,8 @@ void remapgrid_alloc(int map_type, remapgrid_t *grid)
 
   if ( grid->lneed_cell_corners )
     {
-      if ( grid->num_cell_corners == 0 )
-	{
-	  cdoAbort("Grid cell corner missing!");
-	}
-      else
-	{
+      if ( grid->num_cell_corners > 0 )
+        {
 	  long nalloc = grid->num_cell_corners*grid->size;
 
 	  grid->cell_corner_lon = (double*) Malloc(nalloc*sizeof(double));
@@ -228,25 +224,20 @@ static
 void boundbox_from_corners(long size, long nc, const double *restrict corner_lon,
 			   const double *restrict corner_lat, restr_t *restrict bound_box)
 {
-  long i4, inc, j;
-  restr_t clon, clat;
-
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)        \
-  shared(bound_box, corner_lat, corner_lon, nc, size)	\
-  private(i4, inc, j, clon, clat)
+#pragma omp parallel for default(none)  shared(bound_box, corner_lat, corner_lon, nc, size)
 #endif
   for ( long i = 0; i < size; ++i )
     {
-      i4 = i<<2; // *4
-      inc = i*nc;
-      clat = RESTR_SCALE(corner_lat[inc]);
-      clon = RESTR_SCALE(corner_lon[inc]);
+      long i4 = i<<2; // *4
+      long inc = i*nc;
+      restr_t clat = RESTR_SCALE(corner_lat[inc]);
+      restr_t clon = RESTR_SCALE(corner_lon[inc]);
       bound_box[i4  ] = clat;
       bound_box[i4+1] = clat;
       bound_box[i4+2] = clon;
       bound_box[i4+3] = clon;
-      for ( j = 1; j < nc; ++j )
+      for ( long j = 1; j < nc; ++j )
 	{
 	  clat = RESTR_SCALE(corner_lat[inc+j]);
 	  clon = RESTR_SCALE(corner_lon[inc+j]);
@@ -346,7 +337,7 @@ void remapgrid_get_lonlat(remapgrid_t *grid, unsigned cell_add, double *plon, do
     }
 }
 
-static
+
 void check_lon_range(long nlons, double *lons)
 {
   assert(lons != NULL);
@@ -365,7 +356,7 @@ void check_lon_range(long nlons, double *lons)
     }
 }
 
-static
+
 void check_lat_range(long nlats, double *lats)
 {
   assert(lats != NULL);
@@ -521,17 +512,7 @@ int expand_curvilinear_grid(int gridID)
       yvals[(nyp4-2)*nxp4+i] = intlin(2.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
       yvals[(nyp4-1)*nxp4+i] = intlin(3.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
     }
-  /*
-    {
-    FILE *fp;
-    fp = fopen("xvals.asc", "w");
-    for ( i = 0; i < gridsize_new; i++ ) fprintf(fp, "%g\n", xvals[i]);
-    fclose(fp);
-    fp = fopen("yvals.asc", "w");
-    for ( i = 0; i < gridsize_new; i++ ) fprintf(fp, "%g\n", yvals[i]);
-    fclose(fp);
-    }
-  */
+
   gridDefXvals(gridIDnew, xvals);
   gridDefYvals(gridIDnew, yvals);
   
@@ -546,15 +527,16 @@ int expand_curvilinear_grid(int gridID)
 static
 void grid_check_lat_borders_rad(int n, double *ybounds)
 {
+#define  YLIM  (88*DEG2RAD)
   if ( ybounds[0] > ybounds[n-1] )
     {
-      if ( RAD2DEG*ybounds[0]   >  PIH ) ybounds[0]   =  PIH;
-      if ( RAD2DEG*ybounds[n-1] < -PIH ) ybounds[n-1] = -PIH;
+      if ( ybounds[0]   >  YLIM ) ybounds[0]   =  PIH;
+      if ( ybounds[n-1] < -YLIM ) ybounds[n-1] = -PIH;
     }
   else
     {
-      if ( RAD2DEG*ybounds[0]   < -PIH ) ybounds[0]   = -PIH;
-      if ( RAD2DEG*ybounds[n-1] >  PIH ) ybounds[n-1] =  PIH;
+      if ( ybounds[0]   < -YLIM ) ybounds[0]   = -PIH;
+      if ( ybounds[n-1] >  YLIM ) ybounds[n-1] =  PIH;
     }
 }
 
@@ -639,17 +621,11 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, const char *
 
   grid->is_cyclic = (gridIsCircular(gridID) > 0);
 
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
-    grid->rank = 1;
-  else
-    grid->rank = 2;
+  grid->rank = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? 1 : 2;
 
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
-    grid->num_cell_corners = gridInqNvertex(gridID);
-  else
-    grid->num_cell_corners = 4;
+  grid->num_cell_corners = (gridInqType(gridID) == GRID_UNSTRUCTURED) ? gridInqNvertex(gridID) : 4;
 
- remapgrid_alloc(map_type, grid);
+  remapgrid_alloc(map_type, grid);
 
   /* Initialize logical mask */
 
@@ -873,7 +849,7 @@ void remap_grids_init(int map_type, bool lextrapolate, int gridID1, remapgrid_t 
 
   int sgridID = src_grid->gridID;
   if ( gridInqSize(sgridID) > 1 && 
-       (gridInqType(sgridID) == GRID_LCC || 
+       ((gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LCC) || 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_LAEA) || 
 	(gridInqType(sgridID) == GRID_PROJECTION && gridInqProjType(sgridID) == CDI_PROJ_SINU)) )
     {
@@ -1186,7 +1162,7 @@ long get_max_add(long num_links, long size, const int *restrict add)
   for ( long i = 0; i < size; ++i ) if ( isum[i] > max_add ) max_add = isum[i];
   Free(isum);
 
-  return (max_add);
+  return max_add;
 }
 
 static 

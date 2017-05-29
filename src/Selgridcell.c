@@ -62,7 +62,7 @@ void sel_index(double *array1, double *array2, int nind, int *indarr)
 }
 
 
-void *Selindex(void *argument)
+void *Selgridcell(void *argument)
 {
   int nrecs;
   int varID, levelID;
@@ -77,9 +77,14 @@ void *Selindex(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("selindex", 0, 0, "grid cell indices (1-N)");
+  int SELGRIDCELL = cdoOperatorAdd("selgridcell", 0, 0, "grid cell indices (1-N)");
+  int DELGRIDCELL = cdoOperatorAdd("delgridcell", 0, 0, "grid cell indices (1-N)");
+
+  UNUSED(SELGRIDCELL);
 
   operatorInputArg(cdoOperatorEnter(0));
+
+  int operatorID = cdoOperatorID();
 
   int nind = args2int_lista(operatorArgc(), operatorArgv(), ilista);
   int *indarr = (int*) lista_dataptr(ilista);
@@ -111,11 +116,26 @@ void *Selindex(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
   sindex_t *sindex = (sindex_t *) Malloc(ngrids*sizeof(sindex_t));
+
+  int ncells = nind;
+  int *cellidx = indarr;
+  if ( operatorID == DELGRIDCELL )
+    {
+      int gridsize = vlistGridsizeMax(vlistID1);
+      ncells = gridsize - nind;
+      cellidx = (int*) Malloc(gridsize*sizeof(int));
+      for ( int i = 0; i < gridsize; ++i ) cellidx[i] = 1;
+      for ( int i = 0; i < nind; ++i ) cellidx[indarr[i]] = 0;
+      int j = 0;
+      for ( int i = 0; i < gridsize; ++i )
+        if ( cellidx[i] == 1 ) cellidx[j++] = i;
+      if ( j != ncells ) cdoAbort("Internal error; number of cells differ");
+    }
 
   for ( index = 0; index < ngrids; index++ )
     {
@@ -130,7 +150,7 @@ void *Selindex(void *argument)
           continue;
         }
 
-      gridID2 = genindexgrid(gridID1, nind, indarr);
+      gridID2 = genindexgrid(gridID1, ncells, cellidx);
 
       if ( gridID2 == -1 )
         {
@@ -191,7 +211,7 @@ void *Selindex(void *argument)
 
 	      gridsize2 = gridInqSize(sindex[index].gridID2);
 
-              sel_index(array1, array2, nind, indarr); 
+              sel_index(array1, array2, ncells, cellidx);
 
 	      if ( nmiss )
 		{
@@ -222,6 +242,8 @@ void *Selindex(void *argument)
   if ( sindex ) Free(sindex);
 
   lista_destroy(ilista);
+
+  if ( operatorID == DELGRIDCELL ) Free(cellidx);
 
   cdoFinish();
 

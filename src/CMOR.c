@@ -4,7 +4,6 @@
 #include "pstream.h"
 
 #if defined(HAVE_LIBCMOR)
-#include <ctype.h>
 #include <unistd.h>
 #include "uthash.h"
 #include "util.h"
@@ -905,14 +904,14 @@ static int parse_kv_file(list_t *kvl, const char *filename)
   return 0;
 }
 
-static void check_compare_set(char **finalset, char *attribute, char *attname, const char *returner)
+static void check_compare_set(char **finalset, char *attribute, char *attname, const char *defaultstr)
 {
   if ( !(*finalset) )
     {
       if ( !attribute )
         {
-          if ( returner )
-            *finalset = strdup(returner);
+          if ( defaultstr )
+            *finalset = strdup(defaultstr);
           else
             cdoAbort("Required value for attribute '%s' is neither found in input file nor in the configuration.", attname);
         }
@@ -924,7 +923,8 @@ static void check_compare_set(char **finalset, char *attribute, char *attname, c
       if ( strcmp(attribute, *finalset) != 0 )
         {
           cdoWarning("%s of variable in input file: '%s' does not agree with configuration attribute %s: '%s'.\nCmor libary is called with attribute unit '%s'.\n", attname, *finalset, attname, attribute, attribute);
-          strcpy(*finalset, attribute);
+          Free(*finalset);
+          *finalset = strdup(attribute);
         }
     }
 }
@@ -1017,7 +1017,8 @@ static int check_mem(list_t *kvl, char *project_id)
 {
   char *kv_member = kv_get_a_val(kvl, "member", "");
   char *ripchar[] = {"realization", "initialization", "physics_version"};
-  char *crealiz, *cinitial, *cphysics;
+  char crealiz[strlen(kv_member)];
+  char *cinitial, *cphysics;
   char workchar[CMOR_MAX_STRING]; 
   int realization, initialization_method, physics_version;
   int ipos=0, ppos=0;
@@ -1025,7 +1026,6 @@ static int check_mem(list_t *kvl, char *project_id)
 /* Test for the right member, else abort or warn */ 
   if ( strlen(kv_member) >= 6 && kv_member[0] == 'r' )
     {
-      crealiz = cinitial = cphysics = (char *) Malloc(strlen(kv_member));
       strcpy(crealiz, &kv_member[1]);
       if ( strtok_r(crealiz, "i", &cinitial) )
         {
@@ -1036,7 +1036,7 @@ static int check_mem(list_t *kvl, char *project_id)
         }
       else cphysics=NULL;
     }
-  else crealiz=cinitial=cphysics=NULL;
+  else {crealiz[0] = '\0'; cinitial[0] = '\0'; cphysics[0] = '\0';};
   if ( realization && initialization_method && physics_version)
     {
       char *ripvaluechar[] = {crealiz, cinitial, cphysics};
@@ -1345,7 +1345,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
     }
 
 #if defined(CMOR_VERSION_MAJOR)
-#if ( CMOR_VERSION_MAJOR == 2 && CMOR_VERSION_MINOR == 9 )
+#if ( CMOR_VERSION_MAJOR == 2 )
     {
       double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
       cmor_dataset(kv_get_a_val(kvl, "dr", "./"),
@@ -1389,7 +1389,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       printf("Schau: %s\n", testoral);
     }
 #else
-    cdoAbort("Cmor version %d.%d not yet enabled!\n", (int) CMOR_VERSION_MAJOR, (int) CMOR_VERSION_MINOR);
+    cdoAbort("Cmor version %d not yet enabled!\n", (int) CMOR_VERSION_MAJOR);
 #endif
 #else
     cdoAbort("It is not clear which CMOR version is installed since\nMakros CMOR_VERSION_MAJOR and CMOR_VERSION_MINOR are not available.\n");
@@ -1413,7 +1413,7 @@ static char *get_time_units(int taxisID)
        timeunit == TUNIT_12HOURS )
     timeunit = TUNIT_HOUR;
 
-  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d", tunitNamePtr(timeunit),
+  sprintf(units, "%s since %d-%d-%d %02d:%02d:%02d\0", tunitNamePtr(timeunit),
           year, month, day, hour, minute, second);
   return units;
 }
@@ -1588,7 +1588,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       if ( charvals )
         {
           int maxlen = get_strmaxlen(charvals, numchar);
-          void *charcmor = (void *) Malloc ( numchar * maxlen * sizeof(char));
+          void *charcmor = (void *) Malloc ( (numchar * maxlen + 1) * sizeof(char));
           sprintf((char *)charcmor, "%s", charvals[0]);
           char blanks[maxlen];
           for ( int i = 0; i < maxlen; i++)
@@ -1607,7 +1607,6 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
         }
       else
         cdoAbort("You configured a character coordinate '%s' but no values are found! Configure values via attribute 'char_dim_vals'!", chardim);
-      Free(chardim);
     }
   else
   {
@@ -1794,6 +1793,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       Free(levels);
     }
   }
+  Free(chardim);
 }
 
 /*
@@ -2377,7 +2377,6 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
         }
       if ( cdoVerbose )
         printf("*******Succesfully defined a character axis '%s' instead of a grid axis.******\n", chardim);
-      Free(chardim);
     }
 /*
       grid_ids[0] = 0;
@@ -2467,6 +2466,7 @@ static void register_grid(list_t *kvl, int vlistID, int varID, int *axis_ids, in
   }
   else
     grid_ids[0] = 0;
+  Free(chardim);
 }
 
 static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids,
@@ -2488,7 +2488,10 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
   check_compare_set(&units, attunits, "units", NULL);
   check_compare_set(&origname, attorigname, "original_name", "");
   if ( strcmp(origname, "") == 0 || strstr(origname, "var") )
-    origname = NULL;
+    {
+      Free(origname);
+      origname = NULL;
+    }
   if ( cdoVerbose )
     printf("*******Succesfully retrieved 'positive': '%s' and 'units' : '%s'.******\n", positive, units);
   char missing_value[sizeof(double)];
@@ -2541,6 +2544,8 @@ static void register_variable(list_t *kvl, int vlistID, int varID, int *axis_ids
   if ( cdoVerbose )
     printf("*******Succesfully called cmor_variable.******\n");
   if (positive) Free(positive); 
+  if (origname) Free(origname); 
+  if (history) Free(history); 
   if (units) Free(units);
 }
 
@@ -3147,8 +3152,11 @@ static char *use_chunk_des_files(list_t *kvl, int vlistID, int var_id, char *chu
       size_t filesize = fileSize(chunk_des_file);
       char *buffer = (char*) Malloc(filesize);
       size_t nitems = fread(buffer, 1, filesize, fp);
-      buffer = readLineFromBuffer(buffer, &filesize, chunk_file, 4096);
+      char *eof = readLineFromBuffer(buffer, &filesize, chunk_file, 4096);
+      if ( eof != NULL )
+        cdoWarning("Chunk description file contains more than one line.\n All lines after line 1 are ignored.");
       fclose(fp);
+      Free(buffer);
       if ( file_exist(chunk_file, 0) && check_append_and_size(kvl, vlistID, chunk_file, ifreq, calendar) )
         return chunk_file;
       else
@@ -3172,7 +3180,7 @@ static char **get_chunk_des_files(list_t *kvl, struct mapping vars[], char *mipt
   char **chunk_des_files = Malloc((nreq+1) * sizeof(char *));
   chunk_des_files[nreq] = NULL;
 
-  char *trunk = Malloc(CMOR_MAX_STRING * sizeof(char));
+  char trunk[CMOR_MAX_STRING];
   char *description_atts[] = {"model_id", "experiment_id", "member", NULL};
   strcpy(trunk, miptab_freqptr);
   for ( int i = 0; description_atts[i]; i++ )
@@ -3491,9 +3499,10 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
             return kvlist;
           if ( kvn && strstr(kvn->values[0], ",") && kvn->nvalues == 1 )
             {
-              char *workchar = strdup(kvn->values[0]);
+              char *workchar2 = strdup(kvn->values[0]);
               Free(kvn->values[0]); Free(kvn->values);
-              char *thepoint = workchar;
+              char *workchar = workchar2;
+              char *thepoint = workchar2;
               int i = 0, j = 0;
               while ( *thepoint != '\0' )
                 {
@@ -3529,9 +3538,11 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
                 }
               else
                 {
-                  cdoWarning("Names in String for key '%s' could not be interpreted correctly due to a comma at end of line.");
+                  Free(workchar2);
+                  cdoWarning("Names in String for key '%s' could not be interpreted correctly due to a comma at end of line.", key);
                   return NULL;
                 }
+              Free(workchar2);
               return kvlist;
             }
         }
@@ -3910,6 +3921,7 @@ void *CMOR(void *argument)
   destruct_var_mapping(vars);
   Free(mip_table);
   Free(project_id); 
+  Free(miptab_freqptr);
   list_destroy(pml); 
 
   streamClose(streamID);

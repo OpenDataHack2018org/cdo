@@ -26,7 +26,6 @@
       Spectral   spcut           Cut spectral wave number
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"

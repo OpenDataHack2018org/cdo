@@ -1,12 +1,6 @@
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
 #include "specspace.h"
-#include "error.h"
 #include "grid.h"
 
 
@@ -223,10 +217,10 @@ void trans_uv2dv(SPTRANS *sptrans, int nlev,
 		 int gridID2, double *sd, double *svo)
 {
   if ( gridInqType(gridID1) != GRID_GAUSSIAN )
-    Error("unexpected grid1 type: %s instead of Gaussian", gridNamePtr(gridInqType(gridID1)));
+    cdoAbort("unexpected grid1 type: %s instead of Gaussian", gridNamePtr(gridInqType(gridID1)));
 
   if ( gridInqType(gridID2) != GRID_SPECTRAL )
-    Error("unexpected grid2 type: %s instead of spectral", gridNamePtr(gridInqType(gridID2)));
+    cdoAbort("unexpected grid2 type: %s instead of spectral", gridNamePtr(gridInqType(gridID2)));
     
   int ntr   = gridInqTrunc(gridID2);
   int nlon  = gridInqXsize(gridID1);

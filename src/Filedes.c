@@ -27,56 +27,66 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 #include "util.h"
 
 
-void cdo_print_grid(int gridID, int opt);
+void cdo_print_zaxis(int zaxisID);
 
-static
-void printAtts(FILE *fp, int vlistID, int varID)
+void cdo_print_attributes(FILE *fp, int cdiID, int varID, int nblanks)
 {
 #define MAXATT 8192
   int natts;
-  char attname[1024];
+  char attname[CDI_MAX_NAME];
   int atttype, attlen;
   char atttxt[MAXATT];
   int attint[MAXATT];
   double attflt[MAXATT];
+  char fltstr[128];
 
-  cdiInqNatts(vlistID, varID, &natts);
+  cdiInqNatts(cdiID, varID, &natts);
 
   for ( int ia = 0; ia < natts; ++ia )
     {
-      cdiInqAtt(vlistID, varID, ia, attname, &atttype, &attlen);
-      if ( atttype == CDI_DATATYPE_INT )
-	{
+      cdiInqAtt(cdiID, varID, ia, attname, &atttype, &attlen);
+
+      if ( atttype == CDI_DATATYPE_INT8  || atttype == CDI_DATATYPE_UINT8  ||
+           atttype == CDI_DATATYPE_INT16 || atttype == CDI_DATATYPE_UINT16 ||
+           atttype == CDI_DATATYPE_INT32 || atttype == CDI_DATATYPE_UINT32 )
+        {
 	  if ( attlen > MAXATT ) attlen = MAXATT;
-	  cdiInqAttInt(vlistID, varID, attname, attlen, attint);
-	  fprintf(fp, "  %s=", attname);
-	  for ( int i = 0; i < attlen; ++i)
+	  cdiInqAttInt(cdiID, varID, attname, attlen, attint);
+          fprintf(fp, "%*s", nblanks, "");
+	  fprintf(fp, "%s = ", attname);
+	  for ( int i = 0; i < attlen; ++i )
 	    {
 	      if ( i > 0 ) fprintf(fp, ", ");
 	      fprintf(fp, "%d", attint[i]);
 	    }
 	  fprintf(fp, "\n");
 	}
-      else if ( atttype == CDI_DATATYPE_FLT )
+      else if ( atttype == CDI_DATATYPE_FLT32 || atttype == CDI_DATATYPE_FLT64 )
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
-	  cdiInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
-	  fprintf(fp, "  %s=", attname);
-	  for ( int i = 0; i < attlen; ++i)
+	  cdiInqAttFlt(cdiID, varID, attname, MAXATT, attflt);
+          fprintf(fp, "%*s", nblanks, "");
+	  fprintf(fp, "%s = ", attname);
+	  for ( int i = 0; i < attlen; ++i )
 	    {
 	      if ( i > 0 ) fprintf(fp, ", ");
-	      fprintf(fp, "%g", attflt[i]);
+              if ( atttype == CDI_DATATYPE_FLT32 )
+                fprintf(fp, "%sf", double_to_attstr(CDO_flt_digits, fltstr, sizeof(fltstr), attflt[i]));
+              else
+                fprintf(fp, "%s", double_to_attstr(CDO_dbl_digits, fltstr, sizeof(fltstr), attflt[i]));
 	    }
 	  fprintf(fp, "\n");
 	}
       else if ( atttype == CDI_DATATYPE_TXT )
 	{
-	  cdiInqAttTxt(vlistID, varID, attname, sizeof(atttxt), atttxt);
+	  cdiInqAttTxt(cdiID, varID, attname, sizeof(atttxt), atttxt);
 	  atttxt[attlen] = 0;
-	  fprintf(fp, "  %s=\"%s\"\n", attname, atttxt);
+          fprintf(fp, "%*s", nblanks, "");
+	  fprintf(fp, "%s = \"%s\"\n", attname, atttxt);
 	}
     }
 }
@@ -91,7 +101,7 @@ void printHistory(FILE *fp, int streamID)
       char *history = (char*) Malloc(historysize+1);
       history[historysize] = 0;
       streamInqHistoryString(fileID, history);
-      fprintf(fp, "  history=%s\n", history);
+      fprintf(fp, "  history = %s\n", history);
       Free(history);
     }
 }
@@ -101,11 +111,11 @@ void printSource(FILE *fp, int vlistID, int varID)
 {
   /* institute info */
   const char *instptr = institutInqLongnamePtr(vlistInqVarInstitut(vlistID, varID));
-  if ( instptr ) fprintf(fp, "  institution=%s\n", instptr);
+  if ( instptr ) fprintf(fp, "  institution = %s\n", instptr);
 
   /* source info */
   const char *modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
-  if ( modelptr ) fprintf(fp, "  source=%s\n", modelptr);
+  if ( modelptr ) fprintf(fp, "  source = %s\n", modelptr);
 }
 
 static
@@ -127,10 +137,10 @@ void partab(FILE *fp, int streamID, int option)
       if ( natts > 0 )
 	{
 	  fprintf(fp, "&parameter\n");
-	  fprintf(fp, "  name=_GLOBAL_\n");
+	  fprintf(fp, "  name = _GLOBAL_\n");
           printHistory(fp, streamID);
           printSource(fp, vlistID, 0);
-	  printAtts(fp, vlistID, CDI_GLOBAL);
+	  cdo_print_attributes(fp, vlistID, CDI_GLOBAL, 2);
 	  fprintf(fp, "/\n");
 	}
     }
@@ -151,11 +161,11 @@ void partab(FILE *fp, int streamID, int option)
 	{
 	  fprintf(fp, "&parameter");
 	  if ( linebreak ) fprintf(fp, "\n");
-	  fprintf(fp, "  name=_default_");
+	  fprintf(fp, "  name = _default_");
 	  if ( linebreak ) fprintf(fp, "\n");
 	  if ( datatype2str(datatype, pstr) == 0 )
 	    {
-	      fprintf(fp, "  datatype=%s", pstr);
+	      fprintf(fp, "  datatype = %s", pstr);
 	      if ( linebreak ) fprintf(fp, "\n");
 	    }
 	  fprintf(fp, "/\n");
@@ -177,7 +187,7 @@ void partab(FILE *fp, int streamID, int option)
       vlistInqVarLongname(vlistID, varID, varlongname);
       vlistInqVarUnits(vlistID, varID, varunits);
             
-      fprintf(fp, "  name=%s", varname);
+      fprintf(fp, "  name = %s", varname);
       if ( linebreak ) fprintf(fp, "\n");
       // if ( code   > 0 ) fprintf(fp, "  code=%d\n", code);
       // if ( tabnum > 0 ) fprintf(fp, "  table=%d\n", tabnum);
@@ -189,47 +199,47 @@ void partab(FILE *fp, int streamID, int option)
 	}
       if ( strlen(varstdname) )
 	{
-	  fprintf(fp, "  standard_name=%s", varstdname);
+	  fprintf(fp, "  standard_name = %s", varstdname);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( strlen(varlongname) )
 	{
-	  fprintf(fp, "  long_name=\"%s\"", varlongname);
+	  fprintf(fp, "  long_name = \"%s\"", varlongname);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( strlen(varunits) )
 	{
-	  fprintf(fp, "  units=\"%s\"", varunits);
+	  fprintf(fp, "  units = \"%s\"", varunits);
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
 
       if ( datatype == -1 )
 	if ( datatype2str(vlistInqVarDatatype(vlistID, varID), pstr) == 0 )
 	  {
-	    fprintf(fp, "  datatype=%s", pstr);
+	    fprintf(fp, "  datatype = %s", pstr);
 	    if ( linebreak ) fprintf(fp, "\n");
 	  }
 
       int chunktype = vlistInqVarChunkType(vlistID, varID);
       if ( chunktype == CDI_CHUNK_AUTO )
 	{
-	  fprintf(fp, "  chunktype=auto");
+	  fprintf(fp, "  chunktype = auto");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       else if ( chunktype == CDI_CHUNK_GRID )
 	{
-	  fprintf(fp, "  chunktype=grid");
+	  fprintf(fp, "  chunktype = grid");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       if ( chunktype == CDI_CHUNK_LINES )
 	{
-	  fprintf(fp, "  chunktype=lines");
+	  fprintf(fp, "  chunktype = lines");
 	  if ( linebreak ) fprintf(fp, "\n");
 	}
       
-      if ( option == 2 ) printAtts(fp, vlistID, varID);
+      if ( option == 2 ) cdo_print_attributes(fp, vlistID, varID, 2);
       if ( option == 2 ) 
-	fprintf(fp, "  missing_value=%g\n", missval);
+	fprintf(fp, "  missing_value = %g\n", missval);
       
       if ( !linebreak ) fprintf(fp, "  ");
       fprintf(fp, "/\n");
@@ -314,7 +324,7 @@ void *Filedes(void *argument)
       for ( int index = 0; index < nzaxis; index++ )
         {
           printf("#\n" "# zaxisID %d\n" "#\n", index+1);
-          zaxisPrint(vlistZaxis(vlistID, index));
+          cdo_print_zaxis(vlistZaxis(vlistID, index));
         }
     }
   else if ( operatorID == VCT || operatorID == VCT2 )

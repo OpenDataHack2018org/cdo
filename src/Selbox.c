@@ -135,6 +135,8 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   int nlon2 = nlon21 + nlon22;
   int nlat2 = lat2 - lat1 + 1;
 
+  if ( cdoVerbose ) cdoPrint("nlon=%d nlat=%d", nlon2, nlat2);
+
   int gridtype = gridInqType(gridID1);
 
   int gridID2 = gridCreate(gridtype, nlon2*nlat2);
@@ -373,8 +375,7 @@ void genlonlatbox_reg(int gridID, double xlon1, double xlon2, double xlat1, doub
   
   // (*lon12)--;
   if ( *lon12 >= nlon || xvals[*lon12] > xlon2 ) (*lon12)--;
-  if ( *lon12 >= 0 )
-    if ( IS_EQUAL(xvals[*lon12], xvals[*lon21]) ) (*lon12)--;
+  if ( *lon12 >= 0 && IS_EQUAL(xvals[*lon12], xvals[*lon21]) ) (*lon12)--;
 
   if ( *lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0 )
     cdoAbort("Longitudinal dimension is too small!");
@@ -440,30 +441,34 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
 
   if ( xlon1 > xlon2 ) 
     cdoAbort("The second longitude have to be greater than the first one!");
-
+  /*
+  if ( xlon2 < 180. )
+    {
+      xlon1 += 360;
+      xlon2 += 360;
+    }
+  */
   if ( xlat1 > xlat2 )
     {
       double xtemp = xlat1;
       xlat1 = xlat2;
       xlat2 = xtemp;
     }
-  /*
-  printf("xlon1, xlon2 %g %g\n",xlon1, xlon2);
-  double x0 = 0;
-  for ( int ilat = 0; ilat < nlat; ilat++ ) if ( xvals[ilat*nlon] < x0 ) x0 = xvals[ilat*nlon];
-  xlon2 -= 360 * floor ((xlon1 - x0) / 360);
-  xlon1 -= 360 * floor ((xlon1 - x0) / 360);
-  printf("xlon1, xlon2 %g %g\n",xlon1, xlon2);
-  */	  
+
   *lat1 = nlat-1;
   *lat2 = 0;
   *lon11 = 0;
   *lon12 = -1;
+  /*
+  *lon11 = nlon-1;
+  *lon12 = 0;
+  */
   *lon21 = nlon-1;
   *lon22 = 0;
 
   bool lp2 = false;
   double xfirst, xlast, ylast;
+
   if ( grid_is_circular )
     {
       for ( int ilat = 0; ilat < nlat; ilat++ )
@@ -482,52 +487,69 @@ void genlonlatbox_curv(int gridID, double xlon1, double xlon2, double xlat1, dou
     }
 
   for ( int ilat = 0; ilat < nlat; ilat++ )
-    {
-      for ( int ilon = 0; ilon < nlon; ilon++ )
-        {
-          double xval = xfact * xvals[ilat*nlon + ilon];
-          double yval = yfact * yvals[ilat*nlon + ilon];
-          if ( yval >= xlat1 && yval <= xlat2 )
-            {
-              if ( lp2 )
-                {
-                  xfirst = xfact * xvals[ilat*nlon];
-                  if ( xfirst < xlon1 ) xfirst = xlon1;
+    for ( int ilon = 0; ilon < nlon; ilon++ )
+      {
+        double xval = xfact * xvals[ilat*nlon + ilon];
+        double yval = yfact * yvals[ilat*nlon + ilon];
+        if ( yval >= xlat1 && yval <= xlat2 )
+          {
+            if ( lp2 )
+              {
+                xfirst = xfact * xvals[ilat*nlon];
+                if ( xfirst < xlon1 ) xfirst = xlon1;
                   
-                  xlast = xfact * xvals[ilat*nlon + nlon-1];
-                  if ( xlast > xlon2 ) xlast = xlon2;
+                xlast = xfact * xvals[ilat*nlon + nlon-1];
+                if ( xlast > xlon2 ) xlast = xlon2;
 
-                  if ( xval >= xlon1 && xval <= xlast )
-                    {
-                      if ( ilon < *lon21 ) *lon21 = ilon;
-                      if ( ilon > *lon22 ) *lon22 = ilon;
-                      if ( ilat < *lat1 ) *lat1 = ilat;
-                      if ( ilat > *lat2 ) *lat2 = ilat;
-                    }
-                  else if ( xval >= xfirst && xval <= xlon2 )
-                    {
-                      if ( ilon < *lon11 ) *lon11 = ilon;
-                      if ( ilon > *lon12 ) *lon12 = ilon;
-                      if ( ilat < *lat1 ) *lat1 = ilat;
-                      if ( ilat > *lat2 ) *lat2 = ilat;
-                    }
-                }
-              else
-                {
-                  if ( ((xval     >= xlon1 && xval     <= xlon2) ||
-                        (xval-360 >= xlon1 && xval-360 <= xlon2) ||
-                        (xval+360 >= xlon1 && xval+360 <= xlon2)) )
-                    {
-                      if ( ilon < *lon21 ) *lon21 = ilon;
-                      if ( ilon > *lon22 ) *lon22 = ilon;
-                      if ( ilat < *lat1 ) *lat1 = ilat;
-                      if ( ilat > *lat2 ) *lat2 = ilat;
-                    }
-                }
-            }
-        }
-    }
-
+                if ( xval >= xlon1 && xval <= xlast )
+                  {
+                    if ( ilon < *lon21 ) *lon21 = ilon;
+                    if ( ilon > *lon22 ) *lon22 = ilon;
+                    if ( ilat < *lat1 ) *lat1 = ilat;
+                    if ( ilat > *lat2 ) *lat2 = ilat;
+                  }
+                else if ( xval >= xfirst && xval <= xlon2 )
+                  {
+                    if ( ilon < *lon11 ) *lon11 = ilon;
+                    if ( ilon > *lon12 ) *lon12 = ilon;
+                    if ( ilat < *lat1 ) *lat1 = ilat;
+                    if ( ilat > *lat2 ) *lat2 = ilat;
+                  }
+              }
+            else
+              {
+                if ( ((xval     >= xlon1 && xval     <= xlon2) ||
+                      (xval-360 >= xlon1 && xval-360 <= xlon2) ||
+                      (xval+360 >= xlon1 && xval+360 <= xlon2)) )
+                  {
+                    if ( ilon < *lon21 ) *lon21 = ilon;
+                    if ( ilon > *lon22 ) *lon22 = ilon;
+                    if ( ilat < *lat1 ) *lat1 = ilat;
+                    if ( ilat > *lat2 ) *lat2 = ilat;
+                  }
+              }
+            /*
+            if ( xval >= xlon1 && xval <= xlon2 )
+              {
+                if ( ilon < *lon21 ) *lon21 = ilon;
+                if ( ilon > *lon22 ) *lon22 = ilon;
+                if ( ilat < *lat1 ) *lat1 = ilat;
+                if ( ilat > *lat2 ) *lat2 = ilat;
+              }
+            else if ( xval >= xlon1-360 && xval <= xlon2-360 )
+              {
+                if ( ilon < *lon11 ) *lon11 = ilon;
+                if ( ilon > *lon12 ) *lon12 = ilon;
+                if ( ilat < *lat1 ) *lat1 = ilat;
+                if ( ilat > *lat2 ) *lat2 = ilat;
+              }
+            */
+          }
+      }
+  /*
+  while ( *lon12 >= *lon21 ) (*lon12)--;
+  if ( *lon12 <= *lon11 ) { *lon11 = nlon-1; *lon12 = 0; }
+  */
   if ( *lon12 == 0 && *lon11 > 0 ) *lon11 = -1;
 
   if ( *lat2 - *lat1 + 1 <= 0 )
@@ -576,13 +598,9 @@ void genlonlatbox(int argc_offset, int gridID, int *lat1, int *lat2, int *lon11,
   int gridtype = gridInqType(gridID);
 
   if ( gridtype == GRID_CURVILINEAR )
-    {
-      genlonlatbox_curv(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
-    }
+    genlonlatbox_curv(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
   else
-    {
-      genlonlatbox_reg(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
-    }
+    genlonlatbox_reg(gridID, xlon1, xlon2, xlat1, xlat2, lat1, lat2, lon11, lon12, lon21, lon22);
 }
 
 static
@@ -669,9 +687,6 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
 void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int nlon, nlat;
-  int temp;
-
   operatorCheckArgc(argc_offset+4);
 
   *lon11 = parameter2int(operatorArgv()[argc_offset+0]);
@@ -681,20 +696,20 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
 
   if ( *lat1 > *lat2 )
     {
-      temp = *lat1;
+      int temp = *lat1;
       *lat1 = *lat2;
       *lat2 = temp;
     }
 
-  nlon = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
+  int nlon = gridInqXsize(gridID1);
+  int nlat = gridInqYsize(gridID1);
 
   if ( *lat1 < 1 )
     {
       cdoWarning("First latitude index out of range, set to 1!");
       *lat1 = 1;
     }
-  if ( *lat2 > nlat )
+  if ( *lat1 > nlat )
     {
       cdoWarning("First latitude index out of range, set to %d!", nlat);
       *lat1 = nlat;
@@ -713,6 +728,16 @@ void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11,
     {
       cdoWarning("First longitude index out of range, set to 1!");
       *lon11 = 1;
+    }
+  if ( *lon11 > nlon )
+    {
+      cdoWarning("First longitude index out of range, set to %d!", nlon);
+      *lon11 = nlon;
+    }
+  if ( *lon12 < 1 )
+    {
+      cdoWarning("Last longitude index out of range, set to 1!");
+      *lon12 = 1;
     }
   if ( *lon12 > nlon+1 )
     {
@@ -753,7 +778,11 @@ int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int 
 {
   genindexbox(0, gridID1, lat1, lat2, lon11, lon12, lon21, lon22);
 
-  int gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
+  int gridID2 = -1;
+  if ( gridInqType(gridID1) == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_LCC )
+    gridID2 = cdo_define_subgrid_grid(gridID1, *lon11, *lon12, *lat1, *lat2);
+  else
+    gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 
   return gridID2;
 }
@@ -845,7 +874,7 @@ void *Selbox(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
 
   int ngrids = vlistNgrids(vlistID1);
@@ -858,6 +887,7 @@ void *Selbox(void *argument)
 
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
            (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_RLL) ||
+           (gridtype == GRID_PROJECTION && gridInqProjType(gridID1) == CDI_PROJ_LCC) ||
 	   (operatorID == SELINDEXBOX && gridtype == GRID_GENERIC && 
 	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) ||
 	   (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED) )

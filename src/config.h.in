@@ -220,6 +220,9 @@
 /* Define to 1 if you have the <wordexp.h> header file. */
 #undef HAVE_WORDEXP_H
 
+/* Define to 1 for HIRLAM extensions */
+#undef HIRLAM_EXTENSIONS
+
 /* Host name */
 #undef HOST_NAME
 

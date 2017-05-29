@@ -333,6 +333,17 @@ void sellist_def_val(sellist_t *sellist, int idx, int vindex, void *val)
     }
 }
 
+static
+void sellist_print_val(int type, cvalues_t *cvalues, int i)
+{
+  switch (type)
+    {
+    case SELLIST_INT:  printf(" %d", ((int*)cvalues)[i]); break;
+    case SELLIST_FLT:  printf(" %g", ((double*)cvalues)[i]); break;
+    case SELLIST_WORD: printf(" %s", ((char**)cvalues)[i]); break;
+    }
+}
+
 
 void sellist_print(sellist_t *sellist)
 {
@@ -345,15 +356,10 @@ void sellist_print(sellist_t *sellist)
           selentry_t *e = &(sellist->entry[idx]);
           printf("%3d  %-16s %4d  %4d ", idx+1, e->key, e->type, e->nvalues);
           int nvalues = e->nvalues;
-          if ( nvalues > 12 ) nvalues = 12;
-          for ( int i = 0; i < nvalues; ++i )
-            switch (e->type)
-              {
-              case SELLIST_INT:  printf(" %d", ((int*)e->cvalues)[i]); break;
-              case SELLIST_FLT:  printf(" %g", ((double*)e->cvalues)[i]); break;
-              case SELLIST_WORD: printf(" %s", ((char**)e->cvalues)[i]); break;
-              }
+          if ( nvalues > 12 ) nvalues = 11;
+          for ( int i = 0; i < nvalues; ++i ) sellist_print_val(e->type, (cvalues_t *)e->cvalues, i);
           if ( nvalues < e->nvalues ) printf(" ...");
+          sellist_print_val(e->type, (cvalues_t *)e->cvalues, e->nvalues-1);
           printf("\n");
         }
     }

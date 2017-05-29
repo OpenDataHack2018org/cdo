@@ -8,7 +8,7 @@
 @Operators = sellonlatbox selindexbox
 
 @BeginDescription
-Selects a box of the rectangularly understood field. All input fields need to have the same horizontal grid.
+Selects a box of the rectangularly understood field.
 @EndDescription
 @EndModule
 
@@ -46,13 +46,13 @@ FLOAT    Southern or northern latitude
 @Item = lat2
 FLOAT    Northern or southern latitude
 @Item = idx1
-INTEGER  Index of first longitude
+INTEGER  Index of first longitude (1 - nlon)
 @Item = idx2
-INTEGER  Index of last longitude
+INTEGER  Index of last longitude (1 - nlon)
 @Item = idy1
-INTEGER  Index of first latitude
+INTEGER  Index of first latitude (1 - nlat)
 @Item = idy2
-INTEGER  Index of last latitude
+INTEGER  Index of last latitude (1 - nlat)
 @EndParameter
 
 

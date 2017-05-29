@@ -4,7 +4,7 @@
 #  autoconf 2.68
 #  libtool  2.4.2
 
-AC_INIT([cdo], [1.8.0], [http://mpimet.mpg.de/cdo])
+AC_INIT([cdo], [1.8.2], [http://mpimet.mpg.de/cdo])
 
 AC_DEFINE_UNQUOTED(CDO, ["$PACKAGE_VERSION"], [CDO version])
 
@@ -24,6 +24,9 @@ AM_PROG_AR
 #
 AC_MSG_NOTICE([setting up libtool])
 LT_INIT
+
+# bash
+AC_PATH_TOOL([BASH],[bash],[:])
 
 # Check building environment
 AC_CHECK_TOOL([CC],[gcc],[:])
@@ -249,7 +252,7 @@ AC_PROG_AWK
 
 AC_CONFIG_FILES([test/File.test test/Read_grib.test test/Read_netcdf.test test/Copy_netcdf.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Comp.test test/Compc.test],[chmod a+x "$ac_file"])
-AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test test/Remap2.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/EOF.test test/Select.test test/Spectral.test test/Vertint.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test test/Multiyearstat.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([test/Gridboxstat.test test/Vertstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test],[chmod a+x "$ac_file"])

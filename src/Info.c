@@ -239,32 +239,54 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 }
 
 
+typedef struct {
+  double min, max, sum, sumi;
+  long nvals, nmiss, nlevs;
+} infostat_type;
+
+static
+void infostat_init(infostat_type *infostat)
+{
+  infostat->nvals = 0;
+  infostat->nmiss = 0;
+  infostat->nlevs = 0;
+  infostat->min =  DBL_MAX;
+  infostat->max = -DBL_MAX;
+  infostat->sum = 0;
+  infostat->sumi = 0;
+}
+
+
 void *Info(void *argument)
 {
+  enum {E_NAME, E_CODE, E_PARAM};
   int fpeRaised = 0;
   int varID, levelID;
   int nrecs;
   int nmiss;
-  int ivals = 0, nvals = 0;
-  int imiss = 0;
+  long imiss = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  double arrmin = 0, arrmax = 0, arrmean = 0;
-  // double arrvar = 0;
 
   cdoInitialize(argument);
 
-  int INFO  = cdoOperatorAdd("info",  0, 0, NULL);
-  int INFOP = cdoOperatorAdd("infop", 0, 0, NULL);
-  int INFON = cdoOperatorAdd("infon", 0, 0, NULL);
-  int INFOC = cdoOperatorAdd("infoc", 0, 0, NULL);
-  int MAP   = cdoOperatorAdd("map",   0, 0, NULL);
+  int INFO   = cdoOperatorAdd("info",   E_PARAM,  0, NULL);
+  int INFOP  = cdoOperatorAdd("infop",  E_PARAM,  0, NULL);
+  int INFON  = cdoOperatorAdd("infon",  E_NAME,   0, NULL);
+  int INFOC  = cdoOperatorAdd("infoc",  E_CODE,   0, NULL);
+  int XINFON = cdoOperatorAdd("xinfon", E_NAME,   0, NULL);
+  int MAP    = cdoOperatorAdd("map",    E_PARAM,  0, NULL);
 
   UNUSED(INFO);
   UNUSED(INFOP);
+  UNUSED(INFON);
+  UNUSED(INFOC);
+  UNUSED(XINFON);
 
   int operatorID = cdoOperatorID();
+
+  int operfunc   = cdoOperatorF1(operatorID);
 
   dtlist_type *dtlist = dtlist_new();
 
@@ -275,8 +297,11 @@ void *Info(void *argument)
       int vlistID = streamInqVlist(streamID);
       int taxisID = vlistInqTaxis(vlistID);
 
-      if ( vlistNvars(vlistID) == 0 ) continue;
+      int nvars = vlistNvars(vlistID);
+      if ( nvars == 0 ) continue;
 
+      infostat_type *infostat = (infostat_type*) Malloc(nvars*sizeof(infostat_type));
+                  
       int gridsizemax = vlistGridsizeMax(vlistID);
       if ( vlistNumber(vlistID) != CDI_REAL ) gridsizemax *= 2;
 
@@ -293,159 +318,189 @@ void *Info(void *argument)
 	  date2str(vdate, vdatestr, sizeof(vdatestr));
 	  time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	  for ( int recID = 0; recID < nrecs; recID++ )
+          for ( varID = 0; varID < nvars; ++varID ) infostat_init(&infostat[varID]);
+
+	  for ( int recID = 0; recID < nrecs; ++recID )
 	    {
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{
 		  set_text_color(stdout, BRIGHT, BLACK);
-		  fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
-			  "     Minimum        Mean     Maximum : ",  -(indf+1));
+		  fprintf(stdout, "%6d :       Date     Time   %s Gridsize    Miss :"
+			  "     Minimum        Mean     Maximum : ",  -(indf+1), operatorID==XINFON?"Nlevs":"Level");
 
-		  if      ( operatorID == INFON ) fprintf(stdout, "Parameter name");
-		  else if ( operatorID == INFOC ) fprintf(stdout, "Code number");
-		  else                            fprintf(stdout, "Parameter ID");
+		  if      ( operfunc == E_NAME ) fprintf(stdout, "Parameter name");
+		  else if ( operfunc == E_CODE ) fprintf(stdout, "Code number");
+		  else                           fprintf(stdout, "Parameter ID");
 
 		  if ( cdoVerbose ) fprintf(stdout, " : Extra" );
 		  reset_text_color(stdout);
-		  fprintf(stdout, "\n" );
+		  fprintf(stdout, "\n" );  
 		}
 
 	      streamInqRecord(streamID, &varID, &levelID);
 	      streamReadRecord(streamID, array, &nmiss);
 
-	      indg += 1;
+              infostat_type *infostatp = &infostat[varID];
+              indg = (operatorID == XINFON) ? varID+1 : indg + 1;
+              
 	      int param    = vlistInqVarParam(vlistID, varID);
 	      int code     = vlistInqVarCode(vlistID, varID);
 	      int gridID   = vlistInqVarGrid(vlistID, varID);
 	      int zaxisID  = vlistInqVarZaxis(vlistID, varID);
-	      int gridsize = gridInqSize(gridID);
 	      int number   = vlistInqVarNumber(vlistID, varID);
+	      long gridsize = gridInqSize(gridID);
+              long nlevs    = zaxisInqSize(zaxisID);
 	      double level = cdoZaxisInqLevel(zaxisID, levelID);
 	      double missval = vlistInqVarMissval(vlistID, varID);
+              
+              bool loutput = (operatorID != XINFON);
+                
+              if ( loutput ) infostat_init(infostatp);
 
-	      cdiParamToString(param, paramstr, sizeof(paramstr));
+              infostatp->nlevs += 1;
+              infostatp->nmiss += nmiss;
 
-	      if ( operatorID == INFON ) vlistInqVarName(vlistID, varID, varname);
+              if ( nlevs == infostatp->nlevs ) loutput = true;
 
-	      set_text_color(stdout, BRIGHT, BLACK);
-	      fprintf(stdout, "%6d ", indg);
-	      reset_text_color(stdout);
-	      set_text_color(stdout, RESET, BLACK);
-	      fprintf(stdout, ":");
-	      reset_text_color(stdout);
+              if ( loutput )
+                {
+                  cdiParamToString(param, paramstr, sizeof(paramstr));
+
+                  if ( operfunc == E_NAME ) vlistInqVarName(vlistID, varID, varname);
+
+                  set_text_color(stdout, BRIGHT, BLACK);
+                  fprintf(stdout, "%6d ", indg);
+                  reset_text_color(stdout);
+                  set_text_color(stdout, RESET, BLACK);
+                  fprintf(stdout, ":");
+                  reset_text_color(stdout);
 	      
-              set_text_color(stdout, RESET, MAGENTA);
-	      fprintf(stdout, "%s %s ", vdatestr, vtimestr);
-	      reset_text_color(stdout);
+                  set_text_color(stdout, RESET, MAGENTA);
+                  fprintf(stdout, "%s %s ", vdatestr, vtimestr);
+                  reset_text_color(stdout);
 
-	      set_text_color(stdout, RESET, GREEN);
-	      fprintf(stdout, "%7g ", level);
-	      fprintf(stdout, "%8d %7d ", gridsize, nmiss);
+                  set_text_color(stdout, RESET, GREEN);
+                  if ( operatorID == XINFON )
+                    fprintf(stdout, "%7ld ", nlevs);
+                  else
+                    fprintf(stdout, "%7g ", level);
+                 
+                  fprintf(stdout, "%8ld %7ld ", gridsize, infostatp->nmiss);
 		
-	      set_text_color(stdout, RESET, BLACK);
-	      fprintf(stdout, ":");
-	      reset_text_color(stdout);
+                  set_text_color(stdout, RESET, BLACK);
+                  fprintf(stdout, ":");
+                  reset_text_color(stdout);
 
-              set_text_color(stdout, RESET, BLUE);
-	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
-		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
-		{
-                  //fpeRaised = array_minmaxmean_val(gridsize, array, NULL, NULL, NULL);
-		  fprintf(stdout, "            %#12.5g            ", array[0]);
-		}
-	      else
-		{
-		  if ( number == CDI_REAL )
-		    {
-		      if ( nmiss > 0 )
-			{
-			  ivals   = 0;
-			  arrmean = 0;
-			  //arrvar  = 0;
-			  arrmin  =  1.e300;
-			  arrmax  = -1.e300;
-			  for ( int i = 0; i < gridsize; ++i )
-			    {
-			      if ( !DBL_IS_EQUAL(array[i], missval) )
-				{
-				  if ( array[i] < arrmin ) arrmin = array[i];
-				  if ( array[i] > arrmax ) arrmax = array[i];
-				  arrmean += array[i];
-				  //arrvar  += array[i]*array[i];
-				  ivals++;
-				}
-			    }
-                          fpeRaised = 0;
-			  imiss = gridsize - ivals;
-			  nvals = ivals;
-                          if ( nvals ) arrmean /= nvals;
-			}
-		      else
-			{
-                          fpeRaised = array_minmaxmean_val(gridsize, array, &arrmin, &arrmax, &arrmean);
-			  nvals = gridsize;
-			}
+                  set_text_color(stdout, RESET, BLUE);
+                }
 
-		      if ( nvals )
-			{
-			  // arrvar  = arrvar/nvals - arrmean*arrmean;
-			  fprintf(stdout, "%#12.5g%#12.5g%#12.5g", arrmin, arrmean, arrmax);
-			}
-		      else
-			{
-			  fprintf(stdout, "                     nan            ");
-			}
-		    }
-		  else
-		    {
-		      int nvals_r = 0, nvals_i = 0;
-		      double arrsum_r, arrsum_i, arrmean_r = 0, arrmean_i = 0;
-		      arrsum_r = 0;
-		      arrsum_i = 0;
-		      
-		      for ( int i = 0; i < gridsize; i++ )
-			{
-			  if ( !DBL_IS_EQUAL(array[i*2],   missval) && 
-			       !DBL_IS_EQUAL(array[i*2+1], missval) )
-			    {
-			      arrsum_r += array[i*2];
-			      arrsum_i += array[i*2+1];
-			      nvals_r++;
-			      nvals_i++;
-			    }
-			}
-                      fpeRaised = 0;
+              if ( number == CDI_REAL )
+                {
+                  fpeRaised = 0;
 
-		      imiss = gridsize - nvals_r;
+                  if ( infostatp->nmiss > 0 )
+                    {
+                      long nvals   = 0;
+                      for ( long i = 0; i < gridsize; ++i )
+                        {
+                          if ( !DBL_IS_EQUAL(array[i], missval) )
+                            {
+                              if ( array[i] < infostatp->min ) infostatp->min = array[i];
+                              if ( array[i] > infostatp->max ) infostatp->max = array[i];
+                              infostatp->sum += array[i];
+                              nvals++;
+                            }
+                        }
+                      imiss = gridsize - nvals;
+                      infostatp->nvals += nvals;
+                    }
+                  else if ( gridsize == 1 )
+                    {
+                      if ( infostatp->nvals == 0 )
+                        infostatp->sum = array[0];
+                      else
+                        infostatp->sum += array[0];
+                      infostatp->nvals += 1;
+                    }
+                  else
+                    {
+                      array_minmaxsum_val(gridsize, array, &infostatp->min, &infostatp->max, &infostatp->sum);
+                      infostatp->nvals += gridsize;
+                    }
 
-		      if ( nvals_r > 0 ) arrmean_r = arrsum_r / nvals_r;
-		      if ( nvals_i > 0 ) arrmean_i = arrsum_i / nvals_i;
-		      fprintf(stdout, "   -  (%#12.5g,%#12.5g)  -", arrmean_r, arrmean_i);
-		    }
-		}
-	      reset_text_color(stdout);
+                  if ( loutput )
+                    {
+                      if ( infostatp->nvals )
+                        {
+                          if ( infostatp->nvals == 1 )
+                            {
+                              fprintf(stdout, "            %#12.5g            ", infostatp->sum);
+                            }
+                          else
+                            {
+                              double mean = infostatp->sum / (double)infostatp->nvals;
+                              fprintf(stdout, "%#12.5g%#12.5g%#12.5g", infostatp->min, mean, infostatp->max);
+                            }
+                        }
+                      else
+                        {
+                          fprintf(stdout, "                     nan            ");
+                        }
+                    }
+                }
+              else
+                {
+                  long nvals = 0;		      
+                  for ( long i = 0; i < gridsize; i++ )
+                    {
+                      if ( !DBL_IS_EQUAL(array[i*2],   missval) && 
+                           !DBL_IS_EQUAL(array[i*2+1], missval) )
+                        {
+                          infostatp->sum  += array[i*2];
+                          infostatp->sumi += array[i*2+1];
+                          nvals++;
+                        }
+                    }
+                  fpeRaised = 0;
+                  
+                  imiss = gridsize - nvals;
+                  infostatp->nvals += nvals;
+                          
+                  if ( loutput )
+                    {
+                      double arrmean_r = 0, arrmean_i = 0;
+                      if ( infostatp->nvals > 0 ) arrmean_r = infostatp->sum / infostatp->nvals;
+                      if ( infostatp->nvals > 0 ) arrmean_i = infostatp->sumi / infostatp->nvals;
+                      fprintf(stdout, "   -  (%#12.5g,%#12.5g)  -", arrmean_r, arrmean_i);
+                    }
+                }
 
-	      set_text_color(stdout, RESET, BLACK);
-	      fprintf(stdout, " : ");
-	      reset_text_color(stdout);
+              if ( loutput )
+                {
+                  reset_text_color(stdout);
 
-	      set_text_color(stdout, BRIGHT, GREEN);
-	      if ( operatorID == INFON )
-		fprintf(stdout, "%-14s", varname);
-	      else if ( operatorID == INFOC )
-		fprintf(stdout, "%4d   ", code);
-	      else
-		fprintf(stdout, "%-14s", paramstr);
-	      reset_text_color(stdout);
+                  set_text_color(stdout, RESET, BLACK);
+                  fprintf(stdout, " : ");
+                  reset_text_color(stdout);
 
-	      if ( cdoVerbose )
-		{
-		  char varextra[CDI_MAX_NAME];
-		  vlistInqVarExtra(vlistID, varID, varextra);
-		  fprintf(stdout, " : %s", varextra );              
-		}
+                  set_text_color(stdout, BRIGHT, GREEN);
+                  if ( operfunc == E_NAME )
+                    fprintf(stdout, "%-14s", varname);
+                  else if ( operfunc == E_CODE )
+                    fprintf(stdout, "%4d   ", code);
+                  else
+                    fprintf(stdout, "%-14s", paramstr);
+                  reset_text_color(stdout);
+                  
+                  if ( cdoVerbose )
+                    {
+                      char varextra[CDI_MAX_NAME];
+                      vlistInqVarExtra(vlistID, varID, varextra);
+                      fprintf(stdout, " : %s", varextra );              
+                    }
 
-	      fprintf(stdout, "\n");
+                  fprintf(stdout, "\n");
+                }
 
 	      if ( imiss != nmiss && nmiss > 0 )
 		cdoPrint("Found %d of %d missing values!", imiss, nmiss);
@@ -463,7 +518,7 @@ void *Info(void *argument)
 		       (gridInqType(gridID) == GRID_GENERIC && 
 			nlon*nlat == gridInqSize(gridID) && nlon < 1024) )
 		    {
-		      printMap(nlon, nlat, array, missval, arrmin, arrmax);
+		      printMap(nlon, nlat, array, missval, infostatp->min, infostatp->max);
 		    }
 		}
 	    }
@@ -473,6 +528,7 @@ void *Info(void *argument)
       streamClose(streamID);
 
       if ( array ) Free(array);
+      if ( infostat ) Free(infostat);
     }
 
   dtlist_delete(dtlist);

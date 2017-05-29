@@ -18,12 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include <cdi.h>
-#include "cdo.h"
 #include "util.h"
-#include "error.h"
 
 
 int defineTable(const char *tablearg)
@@ -48,7 +45,7 @@ int defineTable(const char *tablearg)
 
   if ( tableID == CDI_UNDEFID ) tableID = tableInq(-1, 0, tablename);
 
-  if ( tableID == CDI_UNDEFID ) Error("table <%s> not found", tablename);
+  if ( tableID == CDI_UNDEFID ) cdoAbort("table <%s> not found", tablename);
 
   return tableID;
 }

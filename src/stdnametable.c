@@ -87,6 +87,9 @@ void echam_gribcodes(gribcode_t *gribcodes)
   gribcodes->ps      =  134;
   gribcodes->lsp     =  152;
   gribcodes->gheight =  156;
+  gribcodes->wind    =    0;  
+  gribcodes->uwind   =  131;
+  gribcodes->vwind   =  132;
 }
 
 
@@ -98,4 +101,42 @@ void wmo_gribcodes(gribcode_t *gribcodes)
   gribcodes->ps      =   1;
   gribcodes->lsp     =   0;
   gribcodes->gheight =   7;
+  gribcodes->wind    =   10;  
+  gribcodes->uwind   =   131;
+  gribcodes->vwind   =   132;
+   /*  ECMWF (IFS) GLOBAL Model
+    * 
+    * http://old.ecmwf.int/publications/manuals/d/gribapi/param/filter=grib1/order=paramId/order_type=asc/p=1/search=wind/table=128/
+    Wind speed	ws	m s**-1	10	grib1	grib2	          
+    U component of wind	u	m s**-1	131	grib1	grib2	netcdf
+    V component of wind	v	m s**-1	132	grib1	grib2	netcdf
+    10 metre U wind component	10u	m s**-1	165	grib1	grib2	          
+    10 metre V wind component	10v	m s**-1	166	grib1	grib2	          
+    10 metre wind speed	10si	m s**-1	207	grib1	grib2	          
+   */
+}
+
+
+void hirlam_harmonie_gribcodes(gribcode_t *gribcodes)
+{
+  gribcodes->geopot  =   6; // Geopotential [m2/s2]
+  gribcodes->temp    =  11; // Temperature [K]
+  gribcodes->hum     =  51; // Specific humidity [kg/kg]
+  gribcodes->ps      =   1; // Pressure [Pa]
+  gribcodes->lsp     =   0; // - not available -
+  gribcodes->gheight =   7; // 	007 Geopotential height [Gpm]; 008 Geometric height [m]
+  gribcodes->wind    =   32;  
+  gribcodes->uwind   =   33;
+  gribcodes->vwind   =   34;  
+  /*
+   1/103/0 	"mean sea level pressure" pressure_msl   [Pa]
+   1/105/0 	"surface pressure"  pressure_surf  [Pa]
+   032	Wind speed          	m/s 	WIND
+   033	u-component of wind 	m/s 	UGRD
+   034	v-component of wind 	m/s 	VGRD
+   051	Specific humidity
+   052	Relative humidity
+   NOT AVAILABLE:
+      - Natural log of surface pressure 	ln(kPa) 	NLGSP 
+   */
 }

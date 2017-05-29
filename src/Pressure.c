@@ -23,7 +23,6 @@
       Pressure    deltap               Difference of two half hybrid levels
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"
@@ -37,8 +36,7 @@
 void *Pressure(void *argument)
 {
   int mode;
-  enum {ECHAM_MODE, WMO_MODE};
-  int ps_code = 0, lsp_code = 0;
+  gribcode_t gribcodes = {0};
   int nrecs;
   int i, k, offset;
   int varID, levelID;
@@ -50,7 +48,6 @@ void *Pressure(void *argument)
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   double minval, maxval;
-  double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap = NULL;
   double *pout = NULL;
 
   cdoInitialize(argument);
@@ -70,20 +67,24 @@ void *Pressure(void *argument)
   int nhlev;
   double *vct = vlist_read_vct(vlistID1, &zaxisIDh, &nvct, &nhlev, &nhlevf, &nhlevh);
 
-  if ( zaxisIDh != -1 && gridsize > 0 )
-    {
-      ps_prog    = (double*) Malloc(gridsize*sizeof(double));
-      deltap     = (double*) Malloc(gridsize*nhlevf*sizeof(double));
-      full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
-      half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
-    }
-  else
-    cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
+  bool l3Dvars = (zaxisIDh != -1 && gridsize > 0);
+  if ( !l3Dvars ) cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
+    
+  double *ps_prog    = (double*) Malloc(gridsize*sizeof(double));
+  double *deltap     = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  double *full_press = (double*) Malloc(gridsize*nhlevf*sizeof(double));
+  double *half_press = (double*) Malloc(gridsize*nhlevh*sizeof(double));
 
   if ( operatorID == PRESSURE_FL || operatorID == DELTAP )
-    zaxisIDp = zaxisCreate(ZAXIS_HYBRID, nhlevf);
+    {
+      if ( cdoVerbose ) cdoPrint("Creating ZAXIS_HYBRID .. (nhlevf=%d)", nhlevf);
+      zaxisIDp = zaxisCreate(ZAXIS_HYBRID, nhlevf);
+    }
   else
-    zaxisIDp = zaxisCreate(ZAXIS_HYBRID_HALF, nhlevh);
+    {
+      if ( cdoVerbose ) cdoPrint("Creating ZAXIS_HYBRID_HALF .. (nhlevh=%d)", nhlevh);
+      zaxisIDp = zaxisCreate(ZAXIS_HYBRID_HALF, nhlevh);
+    }
 
   double *level = (double*) Malloc(nhlevh*sizeof(double));
   for ( int l = 0; l < nhlevh; l++ ) level[l] = l+1;
@@ -124,13 +125,20 @@ void *Pressure(void *argument)
 	  if ( tableNum == 2 )
 	    {
 	      mode = WMO_MODE;
-	      ps_code    =   1;
+	      wmo_gribcodes(&gribcodes);
 	    }
 	  else if ( tableNum == 128 )
 	    {
 	      mode = ECHAM_MODE;
-	      ps_code    = 134;
-	      lsp_code   = 152;
+	      echam_gribcodes(&gribcodes);
+	    }
+          //  KNMI: HIRLAM model version 7.2 uses tableNum=1    (LAMH_D11*)
+          //  KNMI: HARMONIE model version 36 uses tableNum=1   (grib*)   (opreational NWP version)
+          //  KNMI: HARMONIE model version 38 uses tableNum=253 (grib,grib_md) and tableNum=1 (grib_sfx) (research version)
+	  else if ( tableNum == 1 || tableNum == 253 )
+	    {
+	      mode = HIRLAM_MODE;
+	      hirlam_harmonie_gribcodes(&gribcodes);
 	    }
 	  else
 	    mode = -1;
@@ -138,12 +146,15 @@ void *Pressure(void *argument)
       else
 	{
 	  mode = ECHAM_MODE;
-	  ps_code    = 134;
-	  lsp_code   = 152;
+	  echam_gribcodes(&gribcodes);
 	}
 
       if ( cdoVerbose )
-	cdoPrint("Mode = %d  Center = %d  Param = %s", mode, instNum, paramstr);
+        {
+	  vlistInqVarName(vlistID1, varID, varname);
+	  cdoPrint("Mode = %d  Center = %d TableNum =%d Code = %d Param = %s Varname = %s varID = %d",
+                   mode, instNum,tableNum,  code, paramstr, varname, varID);
+        }
 
       if ( code <= 0 )
 	{
@@ -162,14 +173,17 @@ void *Pressure(void *argument)
 
       if ( mode == ECHAM_MODE )
 	{
-	  if      ( code == ps_code    && nlevel == 1     ) psID    = varID;
-	  else if ( code == lsp_code   && nlevel == 1     ) lnpsID  = varID;
-	  /* else if ( code == 156 ) gheightID = varID; */
+	  if      ( code == gribcodes.ps   && nlevel == 1 ) psID    = varID;
+	  else if ( code == gribcodes.lsp  && nlevel == 1 ) lnpsID  = varID;
 	}
       else if ( mode == WMO_MODE )
 	{
-	  if ( code == ps_code    && nlevel == 1     ) psID    = varID;
+	  if ( code == gribcodes.ps        && nlevel == 1 ) psID    = varID;
 	}
+      else if ( mode == HIRLAM_MODE )
+	{
+	  if ( code == gribcodes.ps        && nlevel == 1 ) psID    = varID;
+        }
     }
 
   int pvarID = lnpsID;

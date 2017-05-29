@@ -99,7 +99,7 @@ void lista_set_flt(lista_t *lista, int num, double fval)
 }
 
 
-int listaGetInt(lista_t *lista, int num)
+int lista_get_int(lista_t *lista, int num)
 {
   int ival = ((int *) lista->array)[num];
 
@@ -107,7 +107,7 @@ int listaGetInt(lista_t *lista, int num)
 }
 
 
-double listaGetFlt(lista_t *lista, int num)
+double lista_get_flt(lista_t *lista, int num)
 {
   double fval = ((double *) lista->array)[num];
 

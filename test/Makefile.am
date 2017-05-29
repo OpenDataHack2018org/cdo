@@ -13,7 +13,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 # tests which should pass
 TESTS = threads.test tsformat.test wildcard.test File.test Comp.test Compc.test \
         Read_grib.test Read_netcdf.test Copy_netcdf.test Cat.test Gridarea.test  \
-        Detrend.test Genweights.test Remap.test Select.test Spectral.test \
+        Detrend.test Genweights.test Remap.test Remap2.test Select.test Spectral.test \
         Ensstat.test Enspctl.test Gridboxstat.test \
         Vertstat.test Fldstat.test Fldpctl.test Merstat.test Zonstat.test \
         Timstat.test Timselstat.test Seasstat.test \

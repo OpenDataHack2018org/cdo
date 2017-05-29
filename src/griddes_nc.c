@@ -6,21 +6,15 @@
 #  include "netcdf.h"
 #endif
 
-#include <stdio.h>
-
 #include <cdi.h>
-#include "cdo.h"
 #include "cdo_int.h"
 #include "griddes.h"
-#include "error.h"
 
 
 #if defined(HAVE_LIBNETCDF)
 static void nce(int istat)
 {
-  /*
-    This routine provides a simple interface to NetCDF error message routine.
-  */
+  // This routine provides a simple interface to NetCDF error message routine.
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
 }
 #endif
@@ -100,7 +94,7 @@ int gridFromNCfile(const char *gridfile)
 	{
 	  grid.type = GRID_CURVILINEAR;
 	  if ( grid.nvertex != 4 )
-	    Error("curvilinear grid with %d corners unsupported", grid.nvertex);
+	    cdoAbort("curvilinear grid with %d corners unsupported", grid.nvertex);
 
 	  grid.xsize = grid_dims[0];
 	  grid.ysize = grid_dims[1];
@@ -331,6 +325,6 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   nce(nc_close(nc_file_id));
 
 #else
-  Error("NetCDF support not compiled in!");
+  cdoAbort("NetCDF support not compiled in!");
 #endif
 }

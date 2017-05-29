@@ -1,3 +1,15 @@
+/* ============================================================= */
+/*                                                               */
+/* postprocessing program for ECHAM data and ECMWF analysis data */
+/*                                                               */
+/* Luis     Kornblueh   - MPI    Hamburg                         */
+/* Uwe      Schulzweida - MPI    Hamburg                         */
+/* Arno     Hellbach    - DKRZ   Hamburg                         */
+/* Edilbert Kirk        - MI Uni Hamburg                         */
+/* Michael  Ponater     - DLR    Oberpfaffenhofen                */
+/*                                                               */
+/* ============================================================= */
+
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -1792,19 +1804,20 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	    units    = vlistInqVarUnitsPtr(globs->ivlistID, ivarID);
 	  }
 
-	if ( globs->Mean != 2 )
+        int tsteptype = (globs->Mean) ? TSTEP_AVG : TSTEP_INSTANT;
+
+        if ( globs->Mean != 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID, globs->taxisID2);
-	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, TIME_VARIABLE);
+	    ovarID = vlistDefVar(globs->ovlistID, ogridID, ozaxisID, tsteptype);
 	    vlistDefVarCode(globs->ovlistID, ovarID, code);
 	    vars[code].ovarID = ovarID;
 	    vlistDefVarInstitut(globs->ovlistID, ovarID, instID);
 	    vlistDefVarModel(globs->ovlistID, ovarID, modelID);
 	    vlistDefVarTable(globs->ovlistID, ovarID, tableID);
-	    if ( globs->Mean ) vlistDefVarTimave(globs->ovlistID, ovarID, 1);
-	    if ( name )        vlistDefVarName(globs->ovlistID, ovarID, name);
-	    if ( longname )    vlistDefVarLongname(globs->ovlistID, ovarID, longname);
-	    if ( units )       vlistDefVarUnits(globs->ovlistID, ovarID, units);
+	    if ( name )     vlistDefVarName(globs->ovlistID, ovarID, name);
+	    if ( longname ) vlistDefVarLongname(globs->ovlistID, ovarID, longname);
+	    if ( units )    vlistDefVarUnits(globs->ovlistID, ovarID, units);
 	    vlistDefVarDatatype(globs->ovlistID, ovarID, datatype);
 	    vlistDefVarMissval(globs->ovlistID, ovarID, vars[code].missval);
 	  }
@@ -1812,16 +1825,15 @@ void after_postcntl(struct Control *globs, struct Variable *vars)
 	if ( globs->Mean >= 2 )
 	  {
 	    vlistDefTaxis(globs->ovlistID2, globs->taxisID2);
-	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, TIME_VARIABLE);
+	    ovarID2 = vlistDefVar(globs->ovlistID2, ogridID, ozaxisID, tsteptype);
 	    vlistDefVarCode(globs->ovlistID2, ovarID2, code);
 	    vars[code].ovarID2 = ovarID2;
 	    vlistDefVarInstitut(globs->ovlistID2, ovarID2, instID);
 	    vlistDefVarModel(globs->ovlistID2, ovarID2, modelID);
 	    vlistDefVarTable(globs->ovlistID2, ovarID2, tableID);
-	    if ( globs->Mean ) vlistDefVarTimave(globs->ovlistID2, ovarID2, 1);
-	    if ( name )        vlistDefVarName(globs->ovlistID2, ovarID2, name);
-	    if ( longname )    vlistDefVarLongname(globs->ovlistID2, ovarID2, longname);
-	    if ( units )       vlistDefVarUnits(globs->ovlistID2, ovarID2, units);
+	    if ( name )     vlistDefVarName(globs->ovlistID2, ovarID2, name);
+	    if ( longname ) vlistDefVarLongname(globs->ovlistID2, ovarID2, longname);
+	    if ( units )    vlistDefVarUnits(globs->ovlistID2, ovarID2, units);
 	    vlistDefVarDatatype(globs->ovlistID2, ovarID2, datatype);
 	    vlistDefVarMissval(globs->ovlistID2, ovarID2, vars[code].missval);
 	  }

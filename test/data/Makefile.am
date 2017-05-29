@@ -1,6 +1,6 @@
 INPUTDATA = ts_mm_5years ts_6h_1mon ts_1d_1year hl_l19.grb t21_geosp_tsurf.grb bathy4.grb pl_data pl_data.grb detrend_data \
             grib_testfile01.grb grib_testfile02.grb grib_testfile03.grb netcdf_testfile01.nc netcdf_testfile02.nc testfile01c.nc \
-            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.grb
+            datar.nc datac.nc datau.nc datag.nc arith1.srv expr1.srv arithmask.srv psl_DJF_anom.grb tsurf_spain.grb spain.grid
 
 FILE_REF     = file_F32_srv_ref
 GRIB_REF     = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile02_sinfo_ref grib_testfile02_info_ref grib_testfile03_sinfo_ref grib_testfile03_info_ref
@@ -25,6 +25,11 @@ SPECTRAL_REF = sp2gp_ref sp2gpl_ref gp2sp_ref gp2spl_ref
 VERTINT_REF  = ml2pl_ref
 REMAP_REF    = n16_bic_ref n16_bil_ref n16_con_ref n16_ycon_ref n16_laf_ref n16_nn_ref n16_dis_ref \
                n32_bic_ref n32_bil_ref n32_con_ref n32_ycon_ref n32_laf_ref n32_nn_ref n32_dis_ref
+REMAP2_REF   = tsurf_spain_bic_def_ref  tsurf_spain_bil_on_ref   tsurf_spain_dis_off_ref  tsurf_spain_nn_def_ref  tsurf_spain_ycon_on_ref \
+               tsurf_spain_bic_off_ref  tsurf_spain_con_def_ref  tsurf_spain_dis_on_ref   tsurf_spain_nn_off_ref \
+               tsurf_spain_bic_on_ref   tsurf_spain_con_off_ref  tsurf_spain_laf_def_ref  tsurf_spain_nn_on_ref \
+               tsurf_spain_bil_def_ref  tsurf_spain_con_on_ref   tsurf_spain_laf_off_ref  tsurf_spain_ycon_def_ref \
+               tsurf_spain_bil_off_ref  tsurf_spain_dis_def_ref  tsurf_spain_laf_on_ref   tsurf_spain_ycon_off_ref
 SELECT_REF   = select1_ref select2_ref select3_ref select4_ref select5_ref
 DETREND_REF  = detrend_ref
 EXPR_REF     = expr1_ref aexpr1_ref expr2_ref aexpr2_ref
@@ -33,4 +38,7 @@ GRADSDES_REF = pl_data.ctl pl_data.gmp
 ARITH_REF    = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
 MAPREDUCE    = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
 
-EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(EOF_REF) $(COMP_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) $(RUNSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(VERTSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(SELECT_REF) $(DETREND_REF) $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)
+EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(EOF_REF) $(COMP_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) \
+             $(RUNSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(VERTSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) \
+             $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(REMAP2_REF) $(SELECT_REF) $(DETREND_REF) \
+             $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)

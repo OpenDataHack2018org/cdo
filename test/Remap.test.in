@@ -1,4 +1,4 @@
-#! @SHELL@
+#! @BASH@
 if [ "$USER" = "m214003" ]; then
 echo 1..32 # Number of tests to be executed.
 else

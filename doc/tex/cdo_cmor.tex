@@ -163,12 +163,16 @@
 
 \setcounter{secnumdepth}{3}
 
+\usepackage{float}
+\floatstyle{plaintop}
+\restylefloat{table}
+
 \begin{document}
 
 
 \begin{titlepage}
 \vspace*{50mm}
-{\Huge\textbf{CMOR support in \CDO}}
+{\Huge\textbf{The CDO CMOR operator}}
 
 \setlength{\unitlength}{1cm}
 \begin{picture}(16,0.4)
@@ -177,16 +181,12 @@
 \put(0,0.1){\line(1,0){16.3}}
 \end{picture}
 \begin{flushright}
-\large\textbf{CMORizing of climate model data \\ February 2017}
+\large\textbf{Produce CMIP-compliant climate model output \\ April 2017}
 \end{flushright}
 
 \vfill
 
-\Large\textbf{Karl--Hermann Wieners, Uwe Schulzweida}
-
-\Large\textsl{Max Planck Institute for Meteorology}
-
-\Large\textbf{Mathis Rosenhauer}
+\Large\textbf{Fabian Wachsmann, Stephanie Legutke, Joerg Wegner}
 
 \Large\textsl{Deutsches Klimarechenzentrum (DKRZ)}
 
@@ -198,20 +198,13 @@
 \end{titlepage}
 
 \tableofcontents
+\input{cmor_intro}
 
-\input{cmor_int}
+\input{cmor_inst}
 
-%\input{cmor_ref}
-\chapter{\label{refman}CMOR operator reference manual}
+\input{cmor_manual}
 
-\hspace{3mm}
-
-%\input{ref_list_cmor}
-\input{ref_man_cmor_mod}
-
-\input{bibcmor}
-
-\input{cmor_example}
+\input{cmor_appen}
 
 \clearpage
 \ifpdfx

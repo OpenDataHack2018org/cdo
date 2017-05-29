@@ -1,0 +1,94 @@
+\chapter{Installation}
+
+\vspace{1mm}
+\noindent\hspace*{10mm}% 
+\fcolorbox{red}{white}{\textbf{Note}: Following instructions provide access to a {\CDO} test version!}
+
+The recent official CDO release does not contain the \textbf{cdo cmor} operator because it is still in a test phase within CMIP6. Therefore, the following instructions explains how to access and, if needed, how to install the CDO test version on a DKRZ system and locally on a unix computer. The operator is developped within the CMIP6 project and a release in the official CDOs is aimed. Users of the test version are informed when new updates are availiable.
+
+\section{CDOs with CMOR2 for CMIP5}
+
+A first tagged CDO test version with support for CMOR version 2.92 is provided at \url{https://svn.dkrz.de/mad/Model/cmor-support/tags/cdo_03-31-2017/} and can be downloaded after a registration on inquiry. The installation of CMOR support for CDO is complex because several packages used by CDO and CMOR need to be combined. It is highly recommended to use the operator on the DKRZ system (mistral) where active user support can be given.
+
+\subsection{DKRZ system}
+
+The provided test version of cdo is installed on mistral in work and the exe file is: \url{/work/bm0021/cdo_03-31-2017/cdo-git/src/cdo}. In \url{/work/bm0021/cdo_03-31-2017/}, a script for the installation in a user-defined directory is given.
+
+\subsection{Local installation}
+
+An example script how an installation of the downloaded test version can work on a lokal computer is given in Appendix \ref{chap:Script}. It requires downloading of other packages. Note that this way of installing the version results in full CDO support for GRIB and NETCDF file formats. 
+
+\section{CDOs with CMOR3 for CMIP6}
+
+CMOR version 3 can neither be used in the recent CDO release nor in the CDO test version. Therefore:
+
+\vspace{5mm}
+\noindent\hspace*{10mm}% 
+\fcolorbox{red}{white}{\textbf{Note}: Conversion for CMIP6 model output not yet enabled!}
+
+Once a stable CMOR version 3 is available, the implementation of CMOR version 3 will be developped. 
+%\subsection{Local installation}
+ 
+
+%CMOR version 3 needs to be installed before building {\CDO}.
+%The CMOR library depends on the following external libraries:
+%netCDF4, HDF5, UDUNITS2, zlib and uuid.
+%Make sure that you use exactly the same libraries for the {\CDO}
+%installation, otherwise the operator \textbf{cmor} will possibly not working correctly.
+%
+%\textbf{Compilation}
+%
+%First go to the {\CDO}  \href{https://code.zmaw.de/projects/cdo}{\texttt{download}} page
+%(\texttt{https://code.zmaw.de/projects/cdo}) to get the latest distribution,
+%if you do not have it yet.
+%Compilation is done by performing the following steps:
+%
+%\begin{enumerate}
+%\item Unpack the archive, if you haven't done that yet:
+%   
+%\begin{verbatim}
+%    gunzip cdo-$VERSION.tar.gz    # uncompress the archive
+%    tar xf cdo-$VERSION.tar       # unpack it
+%    cd cdo-$VERSION
+%\end{verbatim}
+%
+%\item Configure {\CDO} with CMOR support:
+%
+%The configuration depends on the location of the external libraries. Here is one example:
+%
+%\begin{verbatim}
+%./configure --with-cmor=<CMOR root directory> --with-netcdf=<NetCDFroot directory> \
+%            --with-uuid --with-udunits2 LIBS=-lossp-uuid                           \
+%            CPPFLAGS="-I<CMOR root dir>/include/cdTime -I<CMOR root dir>/include/json-c"
+%\end{verbatim}
+%
+%For an overview of other configuration options use
+%
+%\begin{verbatim}
+%    ./configure --help
+%\end{verbatim}
+%
+%\item Compile the program by running make:
+%
+%\begin{verbatim}
+%    make
+%\end{verbatim}
+%
+%\end{enumerate}
+%
+%The program should compile without problems and the binary (\texttt{cdo}) 
+%should be available in the \texttt{src} directory of the distribution.
+%
+%
+%\textbf{Installation}
+%
+%After the compilation of the source code do a \texttt{make install},
+%possibly as root if the destination permissions require that.
+%
+%\begin{verbatim}
+%    make install
+%\end{verbatim} 
+%
+%The binary is installed into the directory \texttt{$<$prefix$>$/bin}.
+%\texttt{$<$prefix$>$} defaults to \texttt{/usr/local} but can be changed with 
+%the \texttt{--prefix} option of the configure script. 

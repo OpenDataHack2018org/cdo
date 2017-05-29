@@ -82,6 +82,8 @@ INTEGER Comma separated list of years.
 INTEGER Comma separated list of timesteps. Negative values selects timesteps from the end (NetCDF only).
 @Item = timestep_of_year
 INTEGER Comma separated list of timesteps of year.
+@Item = timestepmask
+STRING  Read timesteps from a mask file.
 @EndParameter
 
 

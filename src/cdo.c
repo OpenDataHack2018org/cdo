@@ -29,7 +29,6 @@
 
 #include <signal.h>
 #include <fenv.h>
-#include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
 #include <sys/stat.h>
 #if defined(HAVE_GETRLIMIT)
@@ -49,6 +48,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "cdo_task.h"
 
 #include "cdo_getopt.h"
 
@@ -59,6 +59,7 @@
 
 #include "modules.h"
 #include "error.h"
+#include "grid_proj.h"
 
 #if defined(_OPENMP)
 #  include <omp.h>
@@ -79,6 +80,14 @@ static int timer_total;
 static int CDO_netcdf_hdr_pad = 0;
 static int CDO_Rusage = 0;
 static const char *username;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+void streamGrbDefDataScanningMode(int scanmode);
+#if defined (__cplusplus)
+}
+#endif
 
 void gridsearch_set_method(const char *methodstr);
 
@@ -254,7 +263,11 @@ void cdo_usage(void)
 #endif
   fprintf(stderr, "    --percentile <method>\n");
   fprintf(stderr, "                   Percentile method: nrank, nist, numpy, numpy_lower, numpy_higher, numpy_nearest\n");
+  fprintf(stderr, "    --precision <float_digits[,double_digits]>\n");
+  fprintf(stderr, "                   Precision to use in displaying floating-point data (default: 7,15)\n");
   fprintf(stderr, "    --reduce_dim   Reduce NetCDF dimensions (module: TIMSTAT, FLDSTAT)\n");
+  if ( ITSME )
+    fprintf(stderr, "    --remap_genweights\n");
   fprintf(stderr, "    -R, --regular  Convert GRIB1 data from reduced to regular grid (cgribex only)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
@@ -276,6 +289,10 @@ void cdo_usage(void)
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
   fprintf(stderr, "        zip[_1-9]  Deflate compression of NetCDF4 variables\n");
+#ifdef HIRLAM_EXTENSIONS
+  fprintf(stderr, "    --Dkext <debLev>   Setting debugLevel for extensions\n");
+  fprintf(stderr, "    --outputGribDataScanningMode <mode>   Setting grib scanning mode for data in output file <0, 64, 96>; Default is 64\n");
+#endif // HIRLAM_EXTENSIONS
   reset_text_color(stderr);
   fprintf(stderr, "\n");
 
@@ -1072,6 +1089,10 @@ int parse_options_long(int argc, char *argv[])
   int lenableexcept;
   int ltimestat_date;
   int ltimestat_bounds;
+  int lsortname;
+  int lsortparam;
+  int ldebLevel;
+  int lscmode;
 
   struct cdo_option opt_long[] =
     {
@@ -1102,9 +1123,13 @@ int parse_options_long(int argc, char *argv[])
       { "regular",                 no_argument,                NULL, 'R' },
       { "silent",                  no_argument,                NULL, 's' },
       { "sort",                    no_argument,                NULL, 'Q' },
+      { "sortname",                no_argument,          &lsortname,  1  },
+      { "sortparam",               no_argument,         &lsortparam,  1  },
       { "table",             required_argument,                NULL, 't' },
       { "verbose",                 no_argument,                NULL, 'v' },
       { "version",                 no_argument,                NULL, 'V' },
+      { "Dkext",             required_argument,          &ldebLevel,  1  },
+      { "outputGribDataScanningMode", required_argument,  &lscmode,   1  },
       { NULL,                                0,                NULL,  0  }
     };
 
@@ -1112,6 +1137,8 @@ int parse_options_long(int argc, char *argv[])
 
   while ( 1 )
     {
+      // IMPORTANT: BY EVERY OPTION that takes arguments you MUST set its trigger variable to ZERO;
+      // otherwise the parameters of other options get wrongly assigned.
       lprecision = 0;
       lpercentile = 0;
       lnetcdf_hdr_pad = 0;
@@ -1122,6 +1149,10 @@ int parse_options_long(int argc, char *argv[])
       lenableexcept = 0;
       ltimestat_date = 0;
       ltimestat_bounds = 0;
+      lsortname = 0;
+      lsortparam = 0;
+      ldebLevel = 0;
+      lscmode = 0;
 
       c = cdo_getopt_long(argc, argv, "f:b:e:P:g:i:k:l:m:n:t:D:z:aBCcdhLMOpQRrsSTuVvWXZ", opt_long, NULL);
       if ( c == -1 ) break;
@@ -1206,6 +1237,41 @@ int parse_options_long(int argc, char *argv[])
                 cdoAbort("Unsupported value for option --remap_genweights=%d [range: 0-1]", intarg);
               remap_genweights = intarg;
             }
+          else if ( lsortname )
+            {
+              cdiDefGlobal("SORTNAME", TRUE);
+            }
+          else if ( lsortparam )
+            {
+              cdiDefGlobal("SORTPARAM", TRUE);
+            }
+#ifdef HIRLAM_EXTENSIONS
+          else if ( ldebLevel )
+            {
+              int newDebLevelVal = parameter2int(CDO_optarg);
+              if ( newDebLevelVal > 0 )
+                {
+                  extern int cdiDebugExt;
+                  cdoDebugExt = newDebLevelVal;
+                  cdiDebugExt = newDebLevelVal;
+                }
+            }
+          else if ( lscmode )
+            {
+              int scanningModeValue = atoi(CDO_optarg);
+              if ( cdoDebugExt ) printf("scanningModeValue=%d\n", scanningModeValue);
+              
+              if ( (scanningModeValue==0) || (scanningModeValue==64) || (scanningModeValue==96) )
+                {
+                  streamGrbDefDataScanningMode(scanningModeValue); // -1: not used; allowed modes: <0, 64, 96>; Default is 64
+                }
+              else
+                {
+                  cdoAbort("Warning: %d not in allowed modes: <0, 64, 96>; Using default: 64\n", scanningModeValue);
+                  streamGrbDefDataScanningMode(64);
+                }
+            }
+#endif
           break;
         case 'a':
           cdoDefaultTimeType = TAXIS_ABSOLUTE;
@@ -1289,6 +1355,7 @@ int parse_options_long(int argc, char *argv[])
           break;
         case 'p':
           CDO_Parallel_Read = TRUE;
+          CDO_task = true;
           break;
         case 'Q':
           cdiDefGlobal("SORTNAME", TRUE);
@@ -1494,6 +1561,11 @@ int main(int argc, char *argv[])
   if ( lstop ) return status;
 
   if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
+
+  extern int (*proj_lonlat_to_lcc_func)();
+  proj_lonlat_to_lcc_func = (int (*)()) proj_lonlat_to_lcc;
+  extern int (*proj_lcc_to_lonlat_func)();
+  proj_lcc_to_lonlat_func = (int (*)()) proj_lcc_to_lonlat;
 
   const char *operatorName = getOperatorName(operatorArg);
 

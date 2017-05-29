@@ -125,15 +125,13 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm)
 {
   int lfound = 0;
-  int lascend = 0;
-  long i1, i2;
   *imin = nxm;
   *imax = -1;
   
-  if ( xm[0] < xm[nxm-1] ) lascend = 1;
+  bool lascend = (xm[0] < xm[nxm-1]);
 
-  i1 = find_element(xmin, nxm, xm);
-  i2 = find_element(xmax, nxm, xm);
+  long i1 = find_element(xmin, nxm, xm);
+  long i2 = find_element(xmax, nxm, xm);
       
   if ( i1 > 0 && i1 < nxm )
     {

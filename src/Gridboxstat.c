@@ -447,13 +447,12 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 static
 void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int statfunc)
 {
-  bool useWeight = false;
+  bool useWeight = (field1->weight != NULL);
   /*
   double findex = 0;
 
   progressInit();
   */
-  if ( field1->weight ) useWeight = true;
 
   int gridsize = xinc*yinc;
   field_type *field = (field_type*) Malloc(ompNumThreads*sizeof(field_type));
@@ -461,17 +460,15 @@ void gridboxstat(field_type *field1, field_type *field2, int xinc, int yinc, int
     {
       field[i].size    = gridsize;
       field[i].ptr     = (double*) Malloc(gridsize*sizeof(double));
-      field[i].weight  = NULL;
-      if ( useWeight )
-	field[i].weight  = (double*) Malloc(gridsize*sizeof(double));
+      field[i].weight  = (useWeight) ? (double*) Malloc(gridsize*sizeof(double)) : NULL;
       field[i].missval = field1->missval;
       field[i].nmiss   = 0;
     }
   
   int gridID1 = field1->grid;
   int gridID2 = field2->grid;
-  double *array1  = field1->ptr;
-  double *array2  = field2->ptr;
+  double *array1 = field1->ptr;
+  double *array2 = field2->ptr;
   double missval = field1->missval;
 
   int nlon1 = gridInqXsize(gridID1);
@@ -554,22 +551,19 @@ void *Gridboxstat(void *argument)
   int xinc = parameter2int(operatorArgv()[0]);
   int yinc = parameter2int(operatorArgv()[1]);
 
-  cdoOperatorAdd("gridboxmin",  func_min,  0, NULL);
-  cdoOperatorAdd("gridboxmax",  func_max,  0, NULL);
-  cdoOperatorAdd("gridboxsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("gridboxmean", func_mean, 0, NULL);
-  cdoOperatorAdd("gridboxavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("gridboxvar",  func_var,  0, NULL);
-  cdoOperatorAdd("gridboxvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("gridboxstd",  func_std,  0, NULL);
-  cdoOperatorAdd("gridboxstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("gridboxmin",  func_min,   0, NULL);
+  cdoOperatorAdd("gridboxmax",  func_max,   0, NULL);
+  cdoOperatorAdd("gridboxsum",  func_sum,   0, NULL);
+  cdoOperatorAdd("gridboxmean", func_meanw, 1, NULL);
+  cdoOperatorAdd("gridboxavg",  func_avgw,  1, NULL);
+  cdoOperatorAdd("gridboxvar",  func_varw,  1, NULL);
+  cdoOperatorAdd("gridboxvar1", func_var1w, 1, NULL);
+  cdoOperatorAdd("gridboxstd",  func_stdw,  1, NULL);
+  cdoOperatorAdd("gridboxstd1", func_std1w, 1, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
-
-  bool needWeights = (operfunc == func_mean || operfunc == func_avg ||
-                      operfunc == func_var  || operfunc == func_std ||
-                      operfunc == func_var1 || operfunc == func_std1);
+  bool needWeights = cdoOperatorF2(operatorID) != 0;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -601,9 +595,7 @@ void *Gridboxstat(void *argument)
 
   int gridsize1 = gridInqSize(gridID1);
   field1.ptr    = (double*) Malloc(gridsize1*sizeof(double));
-  field1.weight = NULL;
-  if ( needWeights )
-    field1.weight = (double*) Malloc(gridsize1*sizeof(double));
+  field1.weight = needWeights ? (double*) Malloc(gridsize1*sizeof(double)) : NULL;
 
   int gridsize2 = gridInqSize(gridID2);
   field2.ptr    = (double*) Malloc(gridsize2*sizeof(double));

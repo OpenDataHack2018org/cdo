@@ -15,7 +15,6 @@
   GNU General Public License for more details.
 */
 
-#include <ctype.h>
 
 #include <cdi.h>
 #include "cdo.h"
@@ -30,6 +29,9 @@ typedef struct
   int streamID;
   int vlistID;
   int gridID;
+  int nmiss;
+  int gridsize;
+  int *gridindex;
   double *array;
 } ens_file_t;
 
@@ -81,7 +83,7 @@ int cmpxy_gt(const void *s1, const void *s2)
 }
 
 static
-int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks)
+int genGrid(int ngrids, int nfiles, ens_file_t *ef, bool ginit, int igrid, int nxblocks)
 {
   bool lsouthnorth = true;
   bool lregular = false;
@@ -94,7 +96,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 
   int gridID   = vlistGrid(ef[0].vlistID, igrid);
   int gridtype = gridInqType(gridID);
-  if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
+  if ( ngrids > 1 && gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
     return gridID2;
 
   int *xsize = (int*) Malloc(nfiles*sizeof(int));
@@ -111,13 +113,15 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
         lregular = true;
       else if ( gridtype == GRID_CURVILINEAR )
         lcurvilinear = true;
-      else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 )
+      else if ( gridtype == GRID_GENERIC /*&& gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0*/ )
         ;
       else
 	cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
       xsize[fileID] = gridInqXsize(gridID);
       ysize[fileID] = gridInqYsize(gridID);
+      if ( xsize[fileID] == 0 ) xsize[fileID] = 1;
+      if ( ysize[fileID] == 0 ) ysize[fileID] = 1;
 
       if ( lregular )
         {
@@ -236,7 +240,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
       yoff[j+1] = yoff[j] + ysize[idx];
     }
 
-  if ( gridindex != NULL )
+  if ( ginit == false )
     {
       for ( int fileID = 0; fileID < nfiles; fileID++ )
 	{
@@ -258,7 +262,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
                     xvals2[offset+j*xsize2+i] = xvals[idx][ij];
                     yvals2[offset+j*xsize2+i] = yvals[idx][ij];
                   }
-		gridindex[idx][ij++] = offset+j*xsize2+i;
+                ef[idx].gridindex[ij++] = offset+j*xsize2+i;
 	      }
 	}
     }
@@ -301,11 +305,8 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid, int nxblocks
 void *Collgrid(void *argument)
 {
   int nxblocks = -1;
-  int varID;
-  int nrecs, nrecs0;
-  int levelID;
-  int nmiss;
-  double missval;
+  int varID, levelID;
+  int nrecs0;
 
   cdoInitialize(argument);
     
@@ -331,12 +332,13 @@ void *Collgrid(void *argument)
     vlistCompare(vlistID1, ef[fileID].vlistID, CMP_NAME | CMP_NLEVEL);
 
   int nvars = vlistNvars(vlistID1);
-  bool *vars  = (bool*) Malloc(nvars*sizeof(bool));
+  bool *vars = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = false;
-  bool *vars1  = (bool*) Malloc(nvars*sizeof(bool));
+  bool *vars1 = (bool*) Malloc(nvars*sizeof(bool));
   for ( varID = 0; varID < nvars; varID++ ) vars1[varID] = false;
 
   int nsel = operatorArgc();
+  int noff = 0;
 
   if ( nsel > 0 )
     {
@@ -346,6 +348,7 @@ void *Collgrid(void *argument)
       if ( len == -1 )
         {
           nsel--;
+          noff++;
           nxblocks = parameter2int(operatorArgv()[0]);
         }
     }
@@ -356,7 +359,7 @@ void *Collgrid(void *argument)
     }
   else
     {
-      char **argnames = operatorArgv();
+      char **argnames = operatorArgv() + noff;
 
       if ( cdoVerbose )
 	for ( int i = 0; i < nsel; i++ )
@@ -398,17 +401,13 @@ void *Collgrid(void *argument)
 	}
     }
 
-  int gridsize;
-  int gridsizemax = 0;
   for ( int fileID = 0; fileID < nfiles; fileID++ )
     {
-      gridsize = vlistGridsizeMax(ef[fileID].vlistID);
-      if ( gridsize > gridsizemax ) gridsizemax = gridsize;
+      int gridsize = vlistGridsizeMax(ef[fileID].vlistID);
+      ef[fileID].gridsize = gridsize;
+      ef[fileID].gridindex = (int*) Malloc(gridsize*sizeof(int));
+      ef[fileID].array = (double*) Malloc(gridsize*sizeof(double));
     }
-
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = (double*) Malloc(gridsizemax*sizeof(double));
-
 
   int vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
@@ -428,9 +427,6 @@ void *Collgrid(void *argument)
   int ngrids2 = vlistNgrids(vlistID2);
 
   int *gridIDs = (int*) Malloc(ngrids2*sizeof(int));
-  int **gridindex = (int **) Malloc(nfiles*sizeof(int *));
-  for ( int fileID = 0; fileID < nfiles; fileID++ )
-    gridindex[fileID] = (int*) Malloc(gridsizemax*sizeof(int));
 
   bool ginit = false;
   for ( int i2 = 0; i2 < ngrids2; ++i2 )
@@ -443,11 +439,11 @@ void *Collgrid(void *argument)
 
       if ( !ginit )
 	{
-	  gridIDs[i2] = genGrid(nfiles, ef, gridindex, i1, nxblocks);
+	  gridIDs[i2] = genGrid(ngrids2, nfiles, ef, ginit, i1, nxblocks);
 	  if ( gridIDs[i2] != -1 ) ginit = true;
 	}
       else
-	gridIDs[i2] = genGrid(nfiles, ef, NULL, i1, nxblocks);
+	gridIDs[i2] = genGrid(ngrids2, nfiles, ef, ginit, i1, nxblocks);
     }
 
 
@@ -484,7 +480,7 @@ void *Collgrid(void *argument)
       
   streamDefVlist(streamID2, vlistID2);
 	  
-  double *array2 = (double*) Malloc(gridsize2*sizeof(double));
+  double *array2 = (gridsize2 > 0) ? (double*) Malloc(gridsize2*sizeof(double)) : NULL;
 
   int tsID = 0;
   do
@@ -492,7 +488,7 @@ void *Collgrid(void *argument)
       nrecs0 = streamInqTimestep(ef[0].streamID, tsID);
       for ( int fileID = 1; fileID < nfiles; fileID++ )
 	{
-	  nrecs = streamInqTimestep(ef[fileID].streamID, tsID);
+	  int nrecs = streamInqTimestep(ef[fileID].streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
 	}
@@ -506,10 +502,10 @@ void *Collgrid(void *argument)
 	  streamInqRecord(ef[0].streamID, &varID, &levelID);
 	  if ( cdoVerbose && tsID == 0 ) printf(" tsID, recID, varID, levelID %d %d %d %d\n", tsID, recID, varID, levelID);
 
-	  for ( int fileID = 0; fileID < nfiles; fileID++ )
+	  for ( int fileID = 1; fileID < nfiles; fileID++ )
 	    {
 	      int varIDx, levelIDx;
-	      if ( fileID > 0 ) streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
+	      streamInqRecord(ef[fileID].streamID, &varIDx, &levelIDx);
 	    }
 
 	  if ( vlistInqFlag(vlistID1, varID, levelID) == TRUE )
@@ -518,21 +514,21 @@ void *Collgrid(void *argument)
 	      int levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 	      if ( cdoVerbose && tsID == 0 ) printf("varID %d %d levelID %d %d\n", varID, varID2, levelID, levelID2);
 
-	      missval = vlistInqVarMissval(vlistID2, varID2);
+	      double missval = vlistInqVarMissval(vlistID2, varID2);
 	      for ( int i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(shared) private(nmiss)
+#pragma omp parallel for default(shared)
 #endif
 	      for ( int fileID = 0; fileID < nfiles; fileID++ )
 		{
-		  streamReadRecord(ef[fileID].streamID, ef[fileID].array, &nmiss);
+		  streamReadRecord(ef[fileID].streamID, ef[fileID].array, &ef[fileID].nmiss);
 
 		  if ( vars[varID2] )
 		    {
-		      gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
+                      int gridsize = ef[fileID].gridsize;
 		      for ( int i = 0; i < gridsize; ++i )
-			array2[gridindex[fileID][i]] = ef[fileID].array[i];
+			array2[ef[fileID].gridindex[i]] = ef[fileID].array[i];
 		    }
 		}
 
@@ -540,14 +536,14 @@ void *Collgrid(void *argument)
 
 	      if ( vars[varID2] )
 		{
-		  nmiss = 0;
+		  int nmiss = 0;
 		  for ( int i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
 		  streamWriteRecord(streamID2, array2, nmiss);
 		}
 	      else
-		streamWriteRecord(streamID2, ef[0].array, 0);
+		streamWriteRecord(streamID2, ef[0].array, ef[0].nmiss);
 	    }
 	}
 
@@ -561,7 +557,10 @@ void *Collgrid(void *argument)
   streamClose(streamID2);
 
   for ( int fileID = 0; fileID < nfiles; fileID++ )
-    if ( ef[fileID].array ) Free(ef[fileID].array);
+    {
+      if ( ef[fileID].gridindex ) Free(ef[fileID].gridindex);
+      if ( ef[fileID].array ) Free(ef[fileID].array);
+    }
 
   if ( ef ) Free(ef);
   if ( array2 ) Free(array2);

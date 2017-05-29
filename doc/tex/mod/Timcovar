@@ -17,6 +17,7 @@ over all timesteps. With
 @IfMan
 
 S(x) = {t, i_1(t,x) != missval and i_2(t,x) != missval}
+
 @EndifMan
 @IfDoc
 @BeginDisplayMath
@@ -27,10 +28,11 @@ it is
 @IfMan
 
 o(1,x) = Covar{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}
+
 @EndifMan
 @IfDoc
 @BeginDisplayMath
-o(1,x) = n^{-1} \sum\limits_{t \in S(x)} \left(i_1(t,x) - \overline{i_1(t,x)} \right)^2 \left(i_2(t,x) - \overline{i_2(t,x)} \right)^2
+o(1,x) = n^{-1} \sum\limits_{t \in S(x)} \left(i_1(t,x) - \overline{i_1(t,x)} \right) \left(i_2(t,x) - \overline{i_2(t,x)} \right)
 @EndDisplayMath
 @EndifDoc
 For every gridpoint @math{x} only those timesteps @math{t} belong to the sample,

@@ -12,6 +12,7 @@ libcdo_la_SOURCES =            \
                cdo_task.c      \
                cdo_task.h      \
                cdo_history.c   \
+               cdo_read.c      \
                cdi_uuid.h      \
                cmortable_parser.c   \
                after_sptrans.c \
@@ -65,9 +66,11 @@ libcdo_la_SOURCES =            \
                gradsdeslib.h   \
                grid.c          \
                grid.h          \
+               grid_proj.c     \
+               grid_proj.h     \
                grid_area.c     \
+               grid_define.c   \
                grid_gme.c      \
-               grid_lcc.c      \
                grid_rot.c      \
                grid_from_name.c   \
                grid_read.c        \
@@ -159,6 +162,7 @@ libcdo_la_SOURCES =            \
                uthash.h        \
                util.c          \
                util.h          \
+               zaxis_print.c   \
                zaxis.c
 libcdo_la_SOURCES +=           \
                json/jsmn.h     \
@@ -298,17 +302,21 @@ cdo_SOURCES += Adisit.c        \
                Rotuv.c         \
                Runpctl.c       \
                Runstat.c       \
+               Samplegrid.c    \
+               Samplegridicon.c \
                Seascount.c     \
                Seaspctl.c      \
                Seasstat.c      \
                Selbox.c        \
-               Selindex.c      \
+               Selgridcell.c   \
                Select.c        \
+               Selmulti.c      \
                Seloperator.c   \
                Selrec.c        \
                Seltime.c       \
                Selvar.c        \
                Set.c           \
+               Setattribute.c  \
                Setbox.c        \
                Setgatt.c       \
                Setgrid.c       \
@@ -362,6 +370,7 @@ cdo_SOURCES += Adisit.c        \
                Verifygrid.c    \
                Wct.c           \
                Wind.c          \
+               WindTrans.c     \
                Writegrid.c     \
                Writerandom.c   \
                XTimstat.c      \

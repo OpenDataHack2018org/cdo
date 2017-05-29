@@ -24,7 +24,13 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "clipping/geometry.h"
+#ifdef __cplusplus
+}
+#endif
 #include "time.h"
 
 /* Quicksort is called with a pointer to the array to be sorted and an integer indicating its length. */
@@ -32,22 +38,19 @@ static
 void quick_sort(double * array, int array_length)
 {
   int i, j;
-  double p, temp;
+  double temp;
   
-  if (array_length < 2)
-    return;
-  p = array[array_length / 2];
-  for (i = 0, j = array_length - 1;; i++, j--) {
-    while (array[i] < p)
-      i++;
-    while (p < array[j])
-      j--;
-    if (i >= j)
-      break;
-    temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
-  }
+  if (array_length < 2) return;
+  double p = array[array_length / 2];
+  for (i = 0, j = array_length - 1;; i++, j--)
+    {
+      while (array[i] < p) i++;
+      while (p < array[j]) j--;
+      if (i >= j) break;
+      temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
   quick_sort(array, i);
   quick_sort(array + i, array_length - i);
 }
@@ -56,36 +59,28 @@ void quick_sort(double * array, int array_length)
 static
 void quick_sort_by_lon(double * array, int array_length)
 {
-  int i, j;
-  double p, temp_lon, temp_lat;
-  
-  if (array_length < 4)
-    return;
-  
-  if((array_length / 2) % 2 != 0){
-    p = array[(array_length / 2) + 1];
-  } else {
-    p = array[array_length / 2];
-  }
-      
-      
-  for (i = 0, j = array_length - 2;; i += 2, j -= 2) {
-    while (array[i] < p)
-      i += 2;
+  if ( array_length < 4 ) return;
 
-    while (p < array[j])
-      j -= 2;
+  double p = ((array_length / 2) % 2) ?  array[(array_length / 2) + 1] : array[array_length / 2];      
+      
+  double temp_lon, temp_lat;
+  int i, j;
+  for ( i = 0, j = array_length - 2;; i += 2, j -= 2 )
+    {
+      while (array[i] < p) i += 2;
+
+      while (p < array[j]) j -= 2;
     
-    if (i >= j)
-      break;
+      if ( i >= j ) break;
     
-    temp_lon = array[i];
-    temp_lat = array[i + 1];
-    array[i] = array[j];
-    array[i + 1] = array[j + 1];
-    array[j] = temp_lon;
-    array[j + 1] = temp_lat;
-  }
+      temp_lon = array[i];
+      temp_lat = array[i + 1];
+      array[i] = array[j];
+      array[i + 1] = array[j + 1];
+      array[j] = temp_lon;
+      array[j + 1] = temp_lat;
+    }
+
   quick_sort_by_lon(array, i);
   quick_sort_by_lon(array + i, array_length - i);
 }
@@ -186,7 +181,8 @@ static
 double is_point_left_of_edge(double point_on_line_1[2], double point_on_line_2[2], double point[2])
 {
   /* 
-     Computes whether a point is left of the line through point_on_line_1 and point_on_line_2. This is part of the solution to the point in polygon problem.
+     Computes whether a point is left of the line through point_on_line_1 and point_on_line_2.
+     This is part of the solution to the point in polygon problem.
      Returns 0 if the point is on the line, > 0 if the point is left of the line, and < 0 if the point is right of the line.
      This algorithm is by Dan Sunday (geomalgorithms.com) and is completely free for use and modification.
   */
@@ -208,26 +204,30 @@ int winding_numbers_algorithm(double cell_corners[], int number_corners, double 
   
   int winding_number = 0;
   
-  for (int i = 0;  i < number_corners - 1; i++){
-    if (cell_corners[i * 2 + 1] <= point[1]){
-      if (cell_corners[(i + 1) * 2 + 1] > point[1]){
-	
-	double point_on_edge_1[2] = {cell_corners[i * 2 + 0], cell_corners[i * 2 + 1]};
-	double point_on_edge_2[2] = {cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1]};
+  for ( int i = 0;  i < number_corners - 1; i++ )
+    {
+      if ( cell_corners[i * 2 + 1] <= point[1] )
+        {
+          if ( cell_corners[(i + 1) * 2 + 1] > point[1] )
+            {
+              double point_on_edge_1[2] = {cell_corners[i * 2 + 0], cell_corners[i * 2 + 1]};
+              double point_on_edge_2[2] = {cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1]};
 
-	if ( is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point) > 0) winding_number++;
-      }       
-    }
-    else { 
-      if (cell_corners[(i + 1) * 2 + 1] <= point[1]){
-	
-	double point_on_edge_1[2] = {cell_corners[i * 2 + 0], cell_corners[i * 2 + 1]};
-	double point_on_edge_2[2] = {cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1]};
+              if ( is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point) > 0 ) winding_number++;
+            }       
+        }
+      else
+        { 
+          if ( cell_corners[(i + 1) * 2 + 1] <= point[1] )
+            {
+              double point_on_edge_1[2] = {cell_corners[i * 2 + 0], cell_corners[i * 2 + 1]};
+              double point_on_edge_2[2] = {cell_corners[(i + 1) * 2 + 0], cell_corners[(i + 1) * 2 + 1]};
 
-	if ( is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point) < 0 ) winding_number--;
-      }
+              if ( is_point_left_of_edge(point_on_edge_1, point_on_edge_2, point) < 0 ) winding_number--;
+            }
+        }
     }
-  }
+
   return winding_number;
 }
 
@@ -618,8 +618,18 @@ void verify_grid(int gridtype, int gridsize, int gridno, int ngrids, int ncorner
         
       int winding_number = winding_numbers_algorithm(cell_corners_plane_projection, actual_number_of_corners + 1, center_point_plane_projection);
 
+      // if ( winding_number == 0 ) printf("%d,", cell_no+1);
       if ( winding_number == 0 )
 	no_of_cells_with_center_points_out_of_bounds += 1;
+
+      if ( cdoVerbose && winding_number == 0 )
+        {
+          printf("cell_no %d: ", cell_no+1);
+          printf(" lon=%g lat=%g : ", grid_center_lon[cell_no], grid_center_lat[cell_no]);
+          for ( int corner_no = 0; corner_no < ncorner; corner_no++ )
+            printf(" %g/%g ", grid_corner_lon[cell_no * ncorner + corner_no], grid_corner_lat[cell_no * ncorner + corner_no]);
+          printf("\n");
+        }
     }
 
   int no_nonunique_cells = gridsize - no_unique_center_points;
