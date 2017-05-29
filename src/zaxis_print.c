@@ -46,7 +46,6 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
 
   double *vals = 0;
   char **cvals = NULL;
-  size_t clen = 0;
   if ( type != ZAXIS_CHAR )
     {
       if ( nvals )
@@ -59,11 +58,12 @@ void zaxis_print_kernel(int zaxisID, FILE *fp)
     }
   else
     {
-      zaxisInqCLevels(zaxisID, &cvals);
+      size_t clen = zaxisInqCLen(zaxisID);
+      zaxisInqCVals(zaxisID, &cvals);
           fprintf(fp, "levels    = \n");
       for ( size_t i = 0; i < nlevels; i++ )
         {
-          fprintf(fp, "     [%2d] = %s\n", i, cvals[i]);
+          fprintf(fp, "     [%2d] = %.*s\n", i, clen, cvals[i]);
           Free(cvals[i]);
         }
     }

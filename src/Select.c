@@ -602,7 +602,6 @@ void *Select(void *argument)
 		  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 		  streamDefVlist(streamID2, vlistID2);
 		}
-
 	      taxisCopyTimestep(taxisID2, taxisID1);
 	      streamDefTimestep(streamID2, tsID2);
               
@@ -667,7 +666,6 @@ void *Select(void *argument)
 
 	  tsID1++;
 	}
-      
       streamClose(streamID1);
 
       if ( lstop ) break;
