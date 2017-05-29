@@ -5349,7 +5349,7 @@ std::vector<std::string> EcaGslHelp = {
     "    Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:",
     "    - first occurrence of at least nday consecutive days with TG > T",
     "    - first occurrence of at least nday consecutive days with TG < T within the last 6 months",
-    "    On northern hemispere, this period corresponds with the regular year, whereas on southern hemispere, it starts ",
+    "    On northern hemisphere, this period corresponds with the regular year, whereas on southern hemisphere, it starts ",
     "    at July 1st. Please note, that this definition may lead to weird results concerning values TG = T: ",
     "    In the first half of the period, these days do not contribute to the gsl, but they do within the second half.",
     "    Moreover this definition could lead to discontinuous values in equatorial regions.",
