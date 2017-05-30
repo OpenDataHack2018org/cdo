@@ -950,6 +950,7 @@ static int check_attr(list_t *kvl, char *project_id)
   const char *reqAtt[] = {"institute_id", "institution", "contact", "model_id", "source",
             "experiment_id", "required_time_units", NULL};
   const char *reqAttCMIP5[] = {"product", "member", NULL};
+  const char *reqAttCMIP5CMOR3[] = {"modeling_realm", NULL};
   const char *reqAttCORDEX[] = {"product", "member", "cordex_domain", "driving_model_id", NULL};
 /* In all Projects needed Attributes are tested first */
 
@@ -979,8 +980,6 @@ static int check_attr(list_t *kvl, char *project_id)
 
 /* Special check for CMIP5 or CORDEX projects */
   i=0;
-  if ( strcmp(project_id, "CMIP6") == 0 )
-    cdoAbort("Not yet possible to create data for project CMIP6 since cmor version 2.9 is used in this operator.\n");
   if ( strcmp(project_id, "CMIP5") == 0 )
     {
       if ( cdoVerbose )
@@ -994,6 +993,18 @@ static int check_attr(list_t *kvl, char *project_id)
             printf("Attribute '%s' is '%s' \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
           i++;
         }
+#if ( CMOR_VERSION_MAJOR == 3 )
+      i = 0;
+      while ( reqAttCMIP5CMOR3[i] != NULL )
+        {
+          keyValues_t *kv_reqattCMIP5 = kvlist_search(kvl, reqAttCMIP5[i]);
+          if ( !kv_reqattCMIP5 || strcmp(kv_reqattCMIP5->values[0], "notSet") == 0 )
+            cdoAbort("Attribute '%s' is required. Either it is missing or notSet", reqAttCMIP5[i]);
+          if ( cdoVerbose )
+            printf("Attribute '%s' is '%s' \n", reqAttCMIP5[i], kv_reqattCMIP5->values[0]);
+          i++;
+        }    
+#endif
     }
   else if (strcmp(project_id, "CORDEX") == 0 )
     {
@@ -1016,7 +1027,7 @@ static int check_attr(list_t *kvl, char *project_id)
 static int check_mem(list_t *kvl, char *project_id)
 {
   char *kv_member = kv_get_a_val(kvl, "member", "");
-  char *ripchar[] = {"realization", "initialization", "physics_version"};
+  char *ripchar[] = {"realization", "initialization_method", "physics_version"};
   char crealiz[strlen(kv_member)];
   char *cinitial, *cphysics;
   char workchar[CMOR_MAX_STRING]; 
@@ -1373,20 +1384,19 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
     }
 #elif ( CMOR_VERSION_MAJOR == 3 )
     {
+      cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
+      cmor_set_cur_dataset_attribute("branch_time", kv_get_a_val(kvl, "branchtime", "0.0"), 1); 
+      cmor_dataset_json("/home/dkrz/k204210/test.json");
+
       int i = 0;
- /*     char *allneeded[] = {"experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "forcing", "initialization_method", "physics_version", "institution_id", "parent_experiment_rip", NULL};
+      char *allneeded[] = {"project_id", "experiment_id", "institution", "source", "realization", "contact", "history", "comment", "references", "leap_year", "leap_month", "source_id", "model_id", "forcing", "initialization_method", "modeling_realm", "physics_version", "institution_id", "institute_id", "parent_experiment_rip", NULL};
       while ( allneeded[i] )
         {
-          cmor_set_cur_dataset_attribute(allneeded[i], kv_get_a_val(kvl, allneeded[i], ""), 1);
+          char *tmp = kv_get_a_val(kvl, allneeded[i], "notSet");
+          if ( strncmp(tmp, "notSet", 6) != 0 )
+            cmor_set_cur_dataset_attribute(allneeded[i], tmp, 1);
           i++;
         }
-      cmor_set_cur_dataset_attribute("calendar", calendarptr, 1);
-      cmor_set_cur_dataset_attribute("branch_time", kv_get_a_val(kvl, "branchtime", "0.0"), 1); */
-      cmor_dataset_json("/home/dkrz/k204210/test.json");
-      char testoral[CMOR_MAX_STRING];
-      cmor_set_cur_dataset_attribute("outpath", kv_get_a_val(kvl, "dr", "./"), 1);
-      cmor_get_cur_dataset_attribute("outpath", testoral);
-      printf("Schau: %s\n", testoral);
     }
 #else
     cdoAbort("Cmor version %d not yet enabled!\n", (int) CMOR_VERSION_MAJOR);
@@ -3769,8 +3779,18 @@ static char *get_mip_table(char *params, list_t *kvl, char *project_id)
       char *miptabdir = kv_get_a_val(kvl, "mip_table_dir", NULL);
       if ( miptabdir && project_id )
         {
-          char *miptab = Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
+          char *miptab;
+#if ( CMOR_VERSION_MAJOR == 2 )
+          {
+          miptab = Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+3) * sizeof(char));
           sprintf(miptab, "%s/%s_%s\0", miptabdir, project_id, params);
+          }
+#elif ( CMOR_VERSION_MAJOR == 3 )
+          {
+          miptab = Malloc((strlen(miptabdir)+strlen(project_id)+strlen(params)+8) * sizeof(char));
+          sprintf(miptab, "%s/%s_%s.json\0", miptabdir, project_id, params);
+          }
+#endif
           if ( file_exist(miptab, 0) )
             return miptab;
           else
@@ -3868,13 +3888,40 @@ void *CMOR(void *argument)
 
   /* check MIP table, MIP table frequency and project_id*/
   if ( cdoVerbose )
-    printf("*******Start to check MIP table, MIP table frequency and project_id.*******\n");
+    printf("*******Start to check MIP table, MIP table frequency and project_id / mip_era.*******\n");
   int miptab_freq = 0, time_axis = 0, calendar = 0;
-  char *project_id, *dummy;
-  if ( !(dummy = kv_get_a_val(kvl, "project_id", NULL) ) )
+  char *project_id, *dummy, *dummy2;
+  dummy = kv_get_a_val(kvl, "project_id", NULL);
+  dummy2 = kv_get_a_val(kvl, "mip_era", NULL);
+#if defined(CMOR_VERSION_MAJOR)
+#if ( CMOR_VERSION_MAJOR == 2 )
+{
+  if ( !dummy && !dummy2)
     cdoAbort("Value for attribute 'project_id' is required.");
+  else if ( !dummy )
+    {
+      cdoAbort("Cannot produce CMIP6 standard with CMOR2.\nValue for attribute 'project_id' is required.");
+      project_id = strdup(dummy2);
+    }
   else
     project_id = strdup(dummy);
+}
+#elif ( CMOR_VERSION_MAJOR == 3 )
+{
+  if ( !dummy && !dummy2)
+    cdoAbort("Value for attribute 'mip_era' is required.");
+  else if ( !dummy2 )
+    {
+      cdoWarning("You try to produce CMIP5 standard with CMOR3.\nIt is recommended to use CMOR2 for this job instead.");
+      project_id = strdup(dummy);
+    }
+  else
+    project_id = strdup(dummy2);
+}
+#endif
+#else
+  cdoAbort("Cannot check CMOR version: Missing makro CMOR_VERSION_MAJOR");
+#endif
   char *mip_table = get_mip_table(params[0], kvl, project_id);
   save_miptab_freq(kvl, mip_table, &miptab_freq);
   char *miptab_freqptr = strdup(freq_from_path(mip_table));
