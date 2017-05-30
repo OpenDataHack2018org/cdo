@@ -3,7 +3,6 @@
 CDO=cdo
 #
 FORMAT="-f srv -b F32"
-#
 ########################################################################
 #
 # Timstat Yearstat Monstat Daystat Runstat
@@ -133,7 +132,7 @@ done
 #
 # Zonstat
 #
-STATS="min max sum avg mean std std1 var var1"
+STATS="min max sum avg mean std std1 var var1 range"
 IFILE=t21_geosp_tsurf.grb
 for STAT in $STATS; do
   $CDO $FORMAT zon$STAT $IFILE zon${STAT}_ref
@@ -188,7 +187,7 @@ exit
 #
 # Fldstat
 #
-STATS="min max sum avg mean std std1 var var1"
+STATS="min max sum avg mean std std1 var var1 range"
 IFILE=t21_geosp_tsurf.grb
 for STAT in $STATS; do
   $CDO $FORMAT fld$STAT $IFILE fld${STAT}_ref
