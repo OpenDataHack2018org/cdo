@@ -6,6 +6,7 @@
 2017-05-30  Uwe Schulzweida
 
 	* New operator seasrange: seasonal range (seasmax-seasmin)
+	* New operator timselrange: time selection range (timmax-timmin)
 
 2017-05-26  Uwe Schulzweida
 

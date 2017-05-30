@@ -69,35 +69,35 @@ void *Timcumsum(void *argument)
         {
           streamInqRecord(streamID1, &varID, &levelID);
 
-          field_type *pvar1 = &vars1[varID][levelID];
+          field_type *pvars1 = &vars1[varID][levelID];
               
-          gridsize = gridInqSize(pvar1->grid);
+          gridsize = gridInqSize(pvars1->grid);
 
           if ( tsID == 0 )
             {
-              streamReadRecord(streamID1, pvar1->ptr, &nmiss);
-              // pvar1->nmiss = (size_t)nmiss;
+              streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+              // pvars1->nmiss = (size_t)nmiss;
               if ( nmiss )
                 for ( int i = 0; i < gridsize; ++i )
-                  if ( DBL_IS_EQUAL(pvar1->ptr[i], pvar1->missval) ) pvar1->ptr[i] = 0;
+                  if ( DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval) ) pvars1->ptr[i] = 0;
             }
           else
             {
               streamReadRecord(streamID1, field.ptr, &nmiss);
               // field.nmiss   = (size_t)nmiss;
               field.size    = gridsize;
-              field.grid    = pvar1->grid;
-              field.missval = pvar1->missval;
+              field.grid    = pvars1->grid;
+              field.missval = pvars1->missval;
 
               if ( nmiss )
                 for ( int i = 0; i < gridsize; ++i )
-                  if ( DBL_IS_EQUAL(field.ptr[i], pvar1->missval) ) field.ptr[i] = 0;
+                  if ( DBL_IS_EQUAL(field.ptr[i], pvars1->missval) ) field.ptr[i] = 0;
 
-              farfun(pvar1, field, func_sum);
+              farfun(pvars1, field, func_sum);
             }
           
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, pvar1->ptr, (int)pvar1->nmiss);
+	  streamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
         }
 
       tsID++;

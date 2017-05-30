@@ -373,22 +373,22 @@ void *XTimstat(void *argument)
                   int varID    = recinfo[recID].varID;
                   int levelID  = recinfo[recID].levelID;
 
-                  field_type *pvar1 = &vars1[varID][levelID];
+                  field_type *pvars1 = &vars1[varID][levelID];
                   field_type *pinput_var = &input_vars[varID][levelID];
 
-                  int nwpv     = pvar1->nwpv;
-                  int gridsize = pvar1->size;
+                  int nwpv     = pvars1->nwpv;
+                  int gridsize = pvars1->size;
                   int nmiss    = pinput_var->nmiss;
 
-                  farcpy(pvar1, *pinput_var);
-                  pvar1->nmiss = nmiss;
+                  farcpy(pvars1, *pinput_var);
+                  pvars1->nmiss = nmiss;
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
                     {
                       if ( samp1[varID][levelID].ptr == NULL )
                         samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
                       
                       for ( int i = 0; i < nwpv*gridsize; i++ )
-                        if ( DBL_IS_EQUAL(pvar1->ptr[i], pvar1->missval) )
+                        if ( DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval) )
                           samp1[varID][levelID].ptr[i] = 0;
                         else
                           samp1[varID][levelID].ptr[i] = 1;
@@ -405,11 +405,11 @@ void *XTimstat(void *argument)
                   int varID    = recinfo[recID].varID;
                   int levelID  = recinfo[recID].levelID;
                   
-                  field_type *pvar1 = &vars1[varID][levelID];
+                  field_type *pvars1 = &vars1[varID][levelID];
                   field_type *pinput_var = &input_vars[varID][levelID];
 
-                  int nwpv     = pvar1->nwpv;
-                  int gridsize = pvar1->size;
+                  int nwpv     = pvars1->nwpv;
+                  int gridsize = pvars1->size;
                   int nmiss    = pinput_var->nmiss;
 
                   if ( nmiss > 0 || samp1[varID][levelID].ptr )
@@ -422,19 +422,19 @@ void *XTimstat(void *argument)
                         }
                           
                       for ( int i = 0; i < nwpv*gridsize; i++ )
-                        if ( !DBL_IS_EQUAL(pinput_var->ptr[i], pvar1->missval) )
+                        if ( !DBL_IS_EQUAL(pinput_var->ptr[i], pvars1->missval) )
                           samp1[varID][levelID].ptr[i]++;
                     }
                   
 		  if ( lvarstd )
 		    {
-                      field_type *pvar2 = &vars2[varID][levelID];
-		      farsumq(pvar2, *pinput_var);
-		      farsum(pvar1, *pinput_var);
+                      field_type *pvars2 = &vars2[varID][levelID];
+		      farsumq(pvars2, *pinput_var);
+		      farsum(pvars1, *pinput_var);
 		    }
 		  else
 		    {
-		      farfun(pvar1, *pinput_var, operfunc);
+		      farfun(pvars1, *pinput_var, operfunc);
 		    }
                 }
             }
@@ -444,12 +444,12 @@ void *XTimstat(void *argument)
               {
                 int varID   = recinfo[recID].varID;
                 int levelID = recinfo[recID].levelID;
-                field_type *pvar1 = &vars1[varID][levelID];
-                field_type *pvar2 = &vars2[varID][levelID];
+                field_type *pvars1 = &vars1[varID][levelID];
+                field_type *pvars2 = &vars2[varID][levelID];
 
 		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-                farmoq(pvar2, *pvar1);
+                farmoq(pvars2, *pvars1);
 	      }
 
 	  vdate0 = vdate;
@@ -469,14 +469,14 @@ void *XTimstat(void *argument)
             {
               int varID   = recinfo[recID].varID;
               int levelID = recinfo[recID].levelID;
-              field_type *pvar1 = &vars1[varID][levelID];
+              field_type *pvars1 = &vars1[varID][levelID];
 
               if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
               if ( samp1[varID][levelID].ptr == NULL )
-                farcdiv(pvar1, (double)nsets);
+                farcdiv(pvars1, (double)nsets);
               else
-                fardiv(pvar1, samp1[varID][levelID]);
+                fardiv(pvars1, samp1[varID][levelID]);
             }
         }
       else if ( lvarstd )
@@ -485,20 +485,20 @@ void *XTimstat(void *argument)
             {
               int varID   = recinfo[recID].varID;
               int levelID = recinfo[recID].levelID;
-              field_type *pvar1 = &vars1[varID][levelID];
-              field_type *pvar2 = &vars2[varID][levelID];
+              field_type *pvars1 = &vars1[varID][levelID];
+              field_type *pvars2 = &vars2[varID][levelID];
 
               if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
               if ( samp1[varID][levelID].ptr == NULL )
                 {
-                  if ( lstd ) farcstd(pvar1, *pvar2, nsets, divisor);
-                  else        farcvar(pvar1, *pvar2, nsets, divisor);
+                  if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
+                  else        farcvar(pvars1, *pvars2, nsets, divisor);
                 }
               else
                 {
-                  if ( lstd ) farstd(pvar1, *pvar2, samp1[varID][levelID], divisor);
-                  else        farvar(pvar1, *pvar2, samp1[varID][levelID], divisor);
+                  if ( lstd ) farstd(pvars1, *pvars2, samp1[varID][levelID], divisor);
+                  else        farvar(pvars1, *pvars2, samp1[varID][levelID], divisor);
                 }
             }
         }
@@ -516,13 +516,13 @@ void *XTimstat(void *argument)
           {
             int varID   = recinfo[recID].varID;
             int levelID = recinfo[recID].levelID;
-            field_type *pvar1 = &vars1[varID][levelID];
+            field_type *pvars1 = &vars1[varID][levelID];
 
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-            nwpv     = pvar1->nwpv;
-            gridsize = gridInqSize(pvar1->grid);
-            missval  = pvar1->missval;
+            nwpv     = pvars1->nwpv;
+            gridsize = gridInqSize(pvars1->grid);
+            missval  = pvars1->missval;
             if ( samp1[varID][levelID].ptr )
               {
                 int irun = 0;
@@ -530,7 +530,7 @@ void *XTimstat(void *argument)
                   {
                     if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
                       {
-                        pvar1->ptr[i] = missval;
+                        pvars1->ptr[i] = missval;
                         irun++;
                       }
                   }
@@ -539,8 +539,8 @@ void *XTimstat(void *argument)
                   {
                     nmiss = 0;
                     for ( int i = 0; i < nwpv*gridsize; ++i )
-                      if ( DBL_IS_EQUAL(pvar1->ptr[i], missval) ) nmiss++;
-                    pvar1->nmiss = nmiss;
+                      if ( DBL_IS_EQUAL(pvars1->ptr[i], missval) ) nmiss++;
+                    pvars1->nmiss = nmiss;
                   }
 	      }
 	  }
@@ -558,12 +558,12 @@ void *XTimstat(void *argument)
 	{
           int varID   = recinfo[recID].varID;
           int levelID = recinfo[recID].levelID;
-          field_type *pvar1 = &vars1[varID][levelID];
+          field_type *pvars1 = &vars1[varID][levelID];
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
           streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, pvar1->ptr,  pvar1->nmiss);
+	  streamWriteRecord(streamID2, pvars1->ptr,  pvars1->nmiss);
               
           if ( cdoDiag )
             {

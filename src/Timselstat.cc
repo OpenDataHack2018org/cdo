@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Timselstat    timselrange        Time range range
       Timselstat    timselmin          Time range minimum
       Timselstat    timselmax          Time range maximum
       Timselstat    timselsum          Time range sum
@@ -36,6 +37,12 @@
 #include "pstream.h"
 
 
+typedef struct {
+  short varID;
+  short levelID;
+} recinfo_t;
+
+
 void *Timselstat(void *argument)
 {
   int timestat_date = TIMESTAT_MEAN;
@@ -44,19 +51,19 @@ void *Timselstat(void *argument)
   int tsID;
   int nsets;
   int nmiss;
-  int nlevel;
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timselmin",  func_min,  0, NULL);
-  cdoOperatorAdd("timselmax",  func_max,  0, NULL);
-  cdoOperatorAdd("timselsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("timselmean", func_mean, 0, NULL);
-  cdoOperatorAdd("timselavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("timselvar",  func_var,  0, NULL);
-  cdoOperatorAdd("timselvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("timselstd",  func_std,  0, NULL);
-  cdoOperatorAdd("timselstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("timselrange", func_range, 0, NULL);
+  cdoOperatorAdd("timselmin",   func_min,   0, NULL);
+  cdoOperatorAdd("timselmax",   func_max,   0, NULL);
+  cdoOperatorAdd("timselsum",   func_sum,   0, NULL);
+  cdoOperatorAdd("timselmean",  func_mean,  0, NULL);
+  cdoOperatorAdd("timselavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("timselvar",   func_var,   0, NULL);
+  cdoOperatorAdd("timselvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("timselstd",   func_std,   0, NULL);
+  cdoOperatorAdd("timselstd1",  func_std1,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -65,16 +72,16 @@ void *Timselstat(void *argument)
 
   int nargc  = operatorArgc();
   int ndates = parameter2int(operatorArgv()[0]);
-  int noffset = 0, nskip = 0;
-  if ( nargc > 1 ) noffset = parameter2int(operatorArgv()[1]);
-  if ( nargc > 2 ) nskip   = parameter2int(operatorArgv()[2]);
+  int noffset = (nargc > 1) ? parameter2int(operatorArgv()[1]) : 0;
+  int nskip   = (nargc > 2) ? parameter2int(operatorArgv()[2]) : 0;
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
-  int lstd    = operfunc == func_std || operfunc == func_std1;
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor = operfunc == func_std1 || operfunc == func_var1;
+  bool lrange  = operfunc == func_range;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -89,11 +96,9 @@ void *Timselstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  int nvars    = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
+  int maxrecs = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -108,7 +113,7 @@ void *Timselstat(void *argument)
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **vars2 = NULL;
-  if ( lvarstd ) vars2 = field_malloc(vlistID1, FIELD_PTR);
+  if ( lvarstd || lrange ) vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   for ( tsID = 0; tsID < noffset; tsID++ )
     {
@@ -121,13 +126,13 @@ void *Timselstat(void *argument)
 
 	  if ( tsID == 0 )
 	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
+              recinfo[recID].varID   = varID;
+              recinfo[recID].levelID = levelID;
 	    }
 	}
     }
 
-  int otsID   = 0;
+  int otsID = 0;
   if ( tsID < noffset )
     {
       cdoWarning("noffset is larger than number of timesteps!");
@@ -149,16 +154,25 @@ void *Timselstat(void *argument)
 
 	      if ( tsID == 0 )
 		{
-		  recVarID[recID]   = varID;
-		  recLevelID[recID] = levelID;
+                  recinfo[recID].varID   = varID;
+                  recinfo[recID].levelID = levelID;
 		}
+
+              field_type *pvars1 = &vars1[varID][levelID];
+              field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	      if ( nsets == 0 )
 		{
-		  streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
-		  vars1[varID][levelID].nmiss = (size_t)nmiss;
+		  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+		  pvars1->nmiss = (size_t)nmiss;
+                  if ( lrange )
+                    {
+                      pvars2->nmiss = (size_t)nmiss;
+		      for ( int i = 0; i < gridsize; i++ )
+                        pvars2->ptr[i] = pvars1->ptr[i];
+                    }
 
 		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
@@ -166,19 +180,15 @@ void *Timselstat(void *argument)
 			samp1[varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		      for ( int i = 0; i < gridsize; i++ )
-			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i],
-					  vars1[varID][levelID].missval) )
-			  samp1[varID][levelID].ptr[i] = 0;
-			else
-			  samp1[varID][levelID].ptr[i] = 1;
+                        samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		    }
 		}
 	      else
 		{
 		  streamReadRecord(streamID1, field.ptr, &nmiss);
                   field.nmiss   = (size_t)nmiss;
-		  field.grid    = vars1[varID][levelID].grid;
-		  field.missval = vars1[varID][levelID].missval;
+		  field.grid    = pvars1->grid;
+		  field.missval = pvars1->missval;
 
 		  if ( field.nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
@@ -190,29 +200,38 @@ void *Timselstat(void *argument)
 			}
 
 		      for ( int i = 0; i < gridsize; i++ )
-			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
+			if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 			  samp1[varID][levelID].ptr[i]++;
 		    }
 
 		  if ( lvarstd )
 		    {
-		      farsumq(&vars2[varID][levelID], field);
-		      farsum(&vars1[varID][levelID], field);
+		      farsumq(pvars2, field);
+		      farsum(pvars1, field);
 		    }
+                  else if ( lrange )
+                    {
+                      farmin(pvars2, field);
+                      farmax(pvars1, field);
+                    }
 		  else
 		    {
-		      farfun(&vars1[varID][levelID], field, operfunc);
+		      farfun(pvars1, field, operfunc);
 		    }
 		}
 	    }
 
 	  if ( nsets == 0 && lvarstd )
-	    for ( varID = 0; varID < nvars; varID++ )
-	      {
+            for ( int recID = 0; recID < maxrecs; recID++ )
+              {
+                int varID   = recinfo[recID].varID;
+                int levelID = recinfo[recID].levelID;
+                field_type *pvars1 = &vars1[varID][levelID];
+                field_type *pvars2 = &vars2[varID][levelID];
+
 		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-		nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-		for ( levelID = 0; levelID < nlevel; levelID++ )
-		  farmoq(&vars2[varID][levelID], vars1[varID][levelID]);
+
+                farmoq(pvars2, *pvars1);
 	      }
 
 	  tsID++;
@@ -221,54 +240,66 @@ void *Timselstat(void *argument)
       if ( nrecs == 0 && nsets == 0 ) break;
 
       if ( lmean )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[varID][levelID];
+
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      {
-		if ( samp1[varID][levelID].ptr == NULL )
-		  farcdiv(&vars1[varID][levelID], (double)nsets);
-		else
-		  fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
-	      }
+
+            if ( samp1[varID][levelID].ptr == NULL )
+              farcdiv(pvars1, (double)nsets);
+            else
+              fardiv(pvars1, samp1[varID][levelID]);
 	  }
       else if ( lvarstd )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      {
-		if ( samp1[varID][levelID].ptr == NULL )
-		  {
-		    if ( lstd )
-		      farcstd(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
-		    else
-		      farcvar(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
-		  }
-		else
-		  {
-		    if ( lstd )
-		      farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
-		    else
-		      farvar(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
-		  }
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[varID][levelID];
+            field_type *pvars2 = &vars2[varID][levelID];
+
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+            if ( samp1[varID][levelID].ptr == NULL )
+              {
+                if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
+                else        farcvar(pvars1, *pvars2, nsets, divisor);
+              }
+            else
+              {
+                if ( lstd ) farstd(pvars1, *pvars2, samp1[varID][levelID], divisor);
+                else        farvar(pvars1, *pvars2, samp1[varID][levelID], divisor);
 	      }
+	  }
+      else if ( lrange )
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[varID][levelID];
+            field_type *pvars2 = &vars2[varID][levelID];
+
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+            farsub(pvars1, *pvars2);
 	  }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, nsets);
       streamDefTimestep(streamID2, otsID);
 
-      for ( int recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < maxrecs; recID++ )
 	{
-	  varID   = recVarID[recID];
-	  levelID = recLevelID[recID];
+          int varID   = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
+          field_type *pvars1 = &vars1[varID][levelID];
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr, (int)vars1[varID][levelID].nmiss);
+	  streamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
 	}
 
       if ( nrecs == 0 ) break;
@@ -293,10 +324,9 @@ void *Timselstat(void *argument)
 
   dtlist_delete(dtlist);
 
-  if ( field.ptr ) Free(field.ptr);
+  Free(recinfo);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  if ( field.ptr ) Free(field.ptr);
 
   streamClose(streamID2);
   streamClose(streamID1);
