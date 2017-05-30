@@ -3909,7 +3909,7 @@ void *CMOR(void *argument)
 #elif ( CMOR_VERSION_MAJOR == 3 )
 {
   if ( !dummy && !dummy2)
-    cdoAbort("Value for attribute 'mip_era' is required.");
+    cdoAbort("Value for attribute 'mip_era' or 'project_id' is required.");
   else if ( !dummy2 )
     {
       cdoWarning("You try to produce CMIP5 standard with CMOR3.\nIt is recommended to use CMOR2 for this job instead.");
