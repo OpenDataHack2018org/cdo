@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = infile outfile
-@Operators = timmin timmax timsum timmean timavg timstd timstd1 timvar timvar1
+@Operators = timmin timmax timrange timsum timmean timavg timstd timstd1 timvar timvar1
 
 @BeginDescription
-This module computes statistical  values over all timesteps in @file{infile}. Depending on 
-the chosen operator the minimum, maximum, sum, average, variance or standard deviation of 
+This module computes statistical values over all timesteps in @file{infile}. Depending on 
+the chosen operator the minimum, maximum, range, sum, average, variance or standard deviation of 
 all timesteps read from @file{infile} is written to @file{outfile}.
 The time of @file{outfile} is determined by the time in the middle of all contributing timesteps of @file{infile}.
 @EndDescription
@@ -42,6 +42,22 @@ o(1,x) = max{i(t',x), t_1<t'<=t_n}
 @IfDoc
 @BeginMath
 o(1,x) = \mbox{\textbf{max}}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_timrange
+@Title     = Time range
+
+@BeginDescription
+@IfMan
+o(1,x) = range{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+@BeginMath
+o(1,x) = \mbox{\textbf{range}}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
