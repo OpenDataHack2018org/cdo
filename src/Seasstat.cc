@@ -162,7 +162,7 @@ void *Seasstat(void *argument)
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	      gridsize = pvars1->size;
 
 	      if ( nsets == 0 )
 		{
@@ -170,7 +170,7 @@ void *Seasstat(void *argument)
 		  pvars1->nmiss = (size_t)nmiss;
                   if ( lrange )
                     {
-                      pvars2->nmiss = (size_t)nmiss;
+                      pvars2->nmiss = pvars1->nmiss;
 		      for ( int i = 0; i < gridsize; i++ )
                         pvars2->ptr[i] = pvars1->ptr[i];
                     }

@@ -22,7 +22,6 @@ $CDO $FORMAT -settime,12:00:00 -setday,15 -monmean $IFILE $OFILE
 $CDO selyear,1991 $IFILE ts_1d_1year
 #
 STATS="min max sum avg mean std std1 var var1 range"
-STATS="range"
 #
 IFILE=ts_mm_5years
 for STAT in $STATS; do
@@ -30,9 +29,9 @@ for STAT in $STATS; do
 done
 #
 IFILE=ts_mm_5years
-#for STAT in $STATS; do
-#  $CDO $FORMAT run${STAT},12 $IFILE run${STAT}_ref
-#done
+for STAT in $STATS; do
+  $CDO $FORMAT run${STAT},12 $IFILE run${STAT}_ref
+done
 #
 IFILE=ts_mm_5years
 for STAT in $STATS; do

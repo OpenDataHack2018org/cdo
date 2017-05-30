@@ -402,7 +402,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  RhopotOperators        {"rhopot"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}
-#define  RunstatOperators       {"runmin", "runmax", "runsum", "runmean", "runavg", "runstd", "runstd1", "runvar", "runvar1"}
+#define  RunstatOperators       {"runrange", "runmin", "runmax", "runsum", "runmean", "runavg", "runstd", "runstd1", "runvar", "runvar1"}
 #define  SamplegridiconOperators {"samplegridicon"}
 #define  SeascountOperators     {"seascount"}
 #define  SeaspctlOperators      {"seaspctl"}

@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Runstat    runrange        Running range
       Runstat    runmin          Running minimum
       Runstat    runmax          Running maximum
       Runstat    runsum          Running sum
@@ -32,6 +33,12 @@
 #include <cdi.h>
 #include "cdo_int.h"
 #include "pstream.h"
+
+
+typedef struct {
+  short varID;
+  short levelID;
+} recinfo_t;
 
 
 void *Runstat(void *argument)
@@ -52,15 +59,16 @@ void *Runstat(void *argument)
       if ( envval == 1 ) runstat_nomiss = 1;
     }
 
-  cdoOperatorAdd("runmin",  func_min,  0, NULL);
-  cdoOperatorAdd("runmax",  func_max,  0, NULL);
-  cdoOperatorAdd("runsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("runmean", func_mean, 0, NULL);
-  cdoOperatorAdd("runavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("runvar",  func_var,  0, NULL);
-  cdoOperatorAdd("runvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("runstd",  func_std,  0, NULL);
-  cdoOperatorAdd("runstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("runrange", func_range, 0, NULL);
+  cdoOperatorAdd("runmin",   func_min,   0, NULL);
+  cdoOperatorAdd("runmax",   func_max,   0, NULL);
+  cdoOperatorAdd("runsum",   func_sum,   0, NULL);
+  cdoOperatorAdd("runmean",  func_mean,  0, NULL);
+  cdoOperatorAdd("runavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("runvar",   func_var,   0, NULL);
+  cdoOperatorAdd("runvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("runstd",   func_std,   0, NULL);
+  cdoOperatorAdd("runstd1",  func_std1,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
@@ -68,10 +76,11 @@ void *Runstat(void *argument)
   operatorInputArg("number of timesteps");
   int ndates = parameter2int(operatorArgv()[0]);
 
-  int lmean   = operfunc == func_mean || operfunc == func_avg;
-  int lstd    = operfunc == func_std || operfunc == func_std1;
-  int lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor = operfunc == func_std1 || operfunc == func_var1;
+  bool lrange  = operfunc == func_range;
+  bool lmean   = operfunc == func_mean || operfunc == func_avg;
+  bool lstd    = operfunc == func_std || operfunc == func_std1;
+  bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -94,11 +103,9 @@ void *Runstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  int nvars    = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
+  int maxrecs = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
 
   dtlist_type *dtlist = dtlist_new();
   dtlist_set_stat(dtlist, timestat_date);
@@ -108,7 +115,7 @@ void *Runstat(void *argument)
   field_type ***vars2 = NULL, ***samp1 = NULL;
   if ( !runstat_nomiss )
     samp1 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
-  if ( lvarstd )
+  if ( lvarstd || lrange )
     vars2 = (field_type ***) Malloc((ndates+1)*sizeof(field_type **));
 
   for ( int its = 0; its < ndates; its++ )
@@ -116,7 +123,7 @@ void *Runstat(void *argument)
       vars1[its] = field_malloc(vlistID1, FIELD_PTR);
       if ( !runstat_nomiss )
 	samp1[its] = field_malloc(vlistID1, FIELD_PTR);
-      if ( lvarstd )
+      if ( lvarstd || lrange )
 	vars2[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
@@ -137,25 +144,32 @@ void *Runstat(void *argument)
 
 	  if ( tsID == 0 )
 	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
+              recinfo[recID].varID   = varID;
+              recinfo[recID].levelID = levelID;
 	    }
 	  
-	  streamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
-	  vars1[tsID][varID][levelID].nmiss = nmiss;
+          field_type *pvars1 = &vars1[tsID][varID][levelID];
+          field_type *pvars2 = vars2 ? &vars2[tsID][varID][levelID] : NULL;
+
+          int gridsize = pvars1->size;
+
+          streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	  pvars1->nmiss = nmiss;
+          if ( lrange )
+            {
+              pvars2->nmiss = pvars1->nmiss;
+              for ( int i = 0; i < gridsize; i++ )
+                pvars2->ptr[i] = pvars1->ptr[i];
+            }
 
 	  if ( runstat_nomiss && nmiss > 0 ) cdoAbort("Missing values supported swichted off!");
 
 	  if ( !runstat_nomiss )
 	    {
-	      int gridsize = gridInqSize(vars1[0][varID][levelID].grid);
-	      double missval  = vars1[0][varID][levelID].missval;
+	      double missval = pvars1->missval;
 
 	      for ( int i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(vars1[tsID][varID][levelID].ptr[i], missval) )
-		  imask[i] = false;
-		else
-		  imask[i] = true;
+                imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
 	      for ( int i = 0; i < gridsize; i++ )
 		samp1[tsID][varID][levelID].ptr[i] = (double) imask[i];
@@ -173,24 +187,35 @@ void *Runstat(void *argument)
 
 	  if ( lvarstd )
 	    {
-	      farmoq(&vars2[tsID][varID][levelID], vars1[tsID][varID][levelID]);
+              farmoq(pvars2, *pvars1);
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(tsID,vars1,vars2,varID,levelID)
+#pragma omp parallel for default(none) shared(tsID,vars1,vars2,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < tsID; inp++ )
 		{
-		  farsumq(&vars2[inp][varID][levelID], vars1[tsID][varID][levelID]);
-		  farsum(&vars1[inp][varID][levelID], vars1[tsID][varID][levelID]);
+		  farsumq(&vars2[inp][varID][levelID], *pvars1);
+		  farsum(&vars1[inp][varID][levelID], *pvars1);
+		}
+	    }
+	  else if ( lrange )
+	    {
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(tsID,vars1,vars2,varID,levelID,pvars1)
+#endif
+	      for ( int inp = 0; inp < tsID; inp++ )
+		{
+		  farmin(&vars2[inp][varID][levelID], *pvars1);
+		  farmax(&vars1[inp][varID][levelID], *pvars1);
 		}
 	    }
 	  else
 	    {
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(tsID,vars1,operfunc,varID,levelID)
+#pragma omp parallel for default(none) shared(tsID,vars1,operfunc,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < tsID; inp++ )
 		{
-		  farfun(&vars1[inp][varID][levelID], vars1[tsID][varID][levelID], operfunc);
+		  farfun(&vars1[inp][varID][levelID], *pvars1, operfunc);
 		}
 	    }
 	}
@@ -200,54 +225,66 @@ void *Runstat(void *argument)
   while ( TRUE )
     {
       if ( lmean )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[0][varID][levelID];
+
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      {
-		if ( runstat_nomiss )
-		  farcdiv(&vars1[0][varID][levelID], (double)ndates);
-		else
-		  fardiv(&vars1[0][varID][levelID], samp1[0][varID][levelID]);
-	      }
+
+            if ( runstat_nomiss )
+              farcdiv(pvars1, (double)ndates);
+            else
+              fardiv(pvars1, samp1[0][varID][levelID]);
 	  }
       else if ( lvarstd )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    int nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      {
-		if ( runstat_nomiss )
-		  {
-		    if ( lstd )
-		      farcstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], ndates, divisor);
-		    else
-		      farcvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], ndates, divisor);
-		  }
-		else
-		  {
-		    if ( lstd )
-		      farstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID], divisor);
-		    else
-		      farvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID], divisor);
-		  }
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[0][varID][levelID];
+            field_type *pvars2 = &vars2[0][varID][levelID];
+
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+            if ( runstat_nomiss )
+              {
+                if ( lstd ) farcstd(pvars1, *pvars2, ndates, divisor);
+                else        farcvar(pvars1, *pvars2, ndates, divisor);
+              }
+            else
+              {
+                if ( lstd ) farstd(pvars1, *pvars2, samp1[0][varID][levelID], divisor);
+                else        farvar(pvars1, *pvars2, samp1[0][varID][levelID], divisor);
 	      }
+	  }
+      else if ( lrange )
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[0][varID][levelID];
+            field_type *pvars2 = &vars2[0][varID][levelID];
+
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+            farsub(pvars1, *pvars2);
 	  }
 
       dtlist_stat_taxisDefTimestep(dtlist, taxisID2, ndates);
       streamDefTimestep(streamID2, otsID);
 
-      for ( int recID = 0; recID < nrecords; recID++ )
+      for ( int recID = 0; recID < maxrecs; recID++ )
 	{
-	  varID    = recVarID[recID];
-	  levelID  = recLevelID[recID];
+          int varID   = recinfo[recID].varID;
+          int levelID = recinfo[recID].levelID;
+          field_type *pvars1 = &vars1[0][varID][levelID];
 
 	  if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);
+	  streamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	}
 
       otsID++;
@@ -257,7 +294,7 @@ void *Runstat(void *argument)
       vars1[ndates] = vars1[0];
       if ( !runstat_nomiss )
 	samp1[ndates] = samp1[0];
-      if ( lvarstd )
+      if ( lvarstd || lrange )
         vars2[ndates] = vars2[0];
 
       for ( int inp = 0; inp < ndates; inp++ )
@@ -265,7 +302,7 @@ void *Runstat(void *argument)
 	  vars1[inp] = vars1[inp+1];
 	  if ( !runstat_nomiss )
 	    samp1[inp] = samp1[inp+1];
-	  if ( lvarstd )
+	  if ( lvarstd || lrange )
 	    vars2[inp] = vars2[inp+1];
 	}
 
@@ -278,21 +315,28 @@ void *Runstat(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  
-	  streamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
-	  vars1[ndates-1][varID][levelID].nmiss = nmiss;
+          field_type *pvars1 = &vars1[ndates-1][varID][levelID];
+          field_type *pvars2 = vars2 ? &vars2[ndates-1][varID][levelID] : NULL;
+
+          int gridsize = pvars1->size;
+
+          streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	  pvars1->nmiss = nmiss;
+          if ( lrange )
+            {
+              pvars2->nmiss = pvars1->nmiss;
+              for ( int i = 0; i < gridsize; i++ )
+                pvars2->ptr[i] = pvars1->ptr[i];
+            }
 
 	  if ( runstat_nomiss && nmiss > 0 ) cdoAbort("Missing values supported swichted off!");
 
 	  if ( !runstat_nomiss )
 	    {
-	      int gridsize = gridInqSize(vars1[0][varID][levelID].grid);
-	      double missval  = vars1[0][varID][levelID].missval;
+	      double missval = pvars1->missval;
 
 	      for ( int i = 0; i < gridsize; i++ )
-		if ( DBL_IS_EQUAL(vars1[ndates-1][varID][levelID].ptr[i], missval) )
-		  imask[i] = false;
-		else
-		  imask[i] = true;
+                imask[i] = !DBL_IS_EQUAL(pvars1->ptr[i], missval);
 
 	      for ( int i = 0; i < gridsize; i++ )
 		samp1[ndates-1][varID][levelID].ptr[i] = (double) imask[i];
@@ -310,24 +354,35 @@ void *Runstat(void *argument)
 
 	  if ( lvarstd )
 	    {
-	      farmoq(&vars2[ndates-1][varID][levelID], vars1[ndates-1][varID][levelID]);
+	      farmoq(pvars2, *pvars1);
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(ndates,vars1,vars2,varID,levelID)
+#pragma omp parallel for default(none) shared(ndates,vars1,vars2,varID,levelID,pvars1)
 #endif
 	      for ( int inp = 0; inp < ndates-1; inp++ )
 		{
-		  farsumq(&vars2[inp][varID][levelID], vars1[ndates-1][varID][levelID]);
-		  farsum(&vars1[inp][varID][levelID], vars1[ndates-1][varID][levelID]);
+		  farsumq(&vars2[inp][varID][levelID], *pvars1);
+		  farsum(&vars1[inp][varID][levelID], *pvars1);
+		}
+	    }
+	  else if ( lrange )
+	    {
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(ndates,vars1,vars2,varID,levelID,pvars1)
+#endif
+	      for ( int inp = 0; inp < ndates-1; inp++ )
+		{
+		  farmin(&vars2[inp][varID][levelID], *pvars1);
+		  farmax(&vars1[inp][varID][levelID], *pvars1);
 		}
 	    }
 	  else
 	    {
 #if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(ndates,vars1,varID,levelID,operfunc)
+#pragma omp parallel for default(none) shared(ndates,vars1,varID,levelID,operfunc,pvars1)
 #endif
 	      for ( int inp = 0; inp < ndates-1; inp++ )
 		{
-		  farfun(&vars1[inp][varID][levelID], vars1[ndates-1][varID][levelID], operfunc);
+		  farfun(&vars1[inp][varID][levelID], *pvars1, operfunc);
 		}
 	    }
 	}
@@ -339,18 +394,18 @@ void *Runstat(void *argument)
     {
       field_free(vars1[its], vlistID1);
       if ( !runstat_nomiss ) field_free(samp1[its], vlistID1);
-      if ( lvarstd ) field_free(vars2[its], vlistID1);
+      if ( lvarstd || lrange ) field_free(vars2[its], vlistID1);
     }
 
   Free(vars1);
   if ( !runstat_nomiss ) Free(samp1);
-  if ( lvarstd ) Free(vars2);
+  if ( lvarstd || lrange ) Free(vars2);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
-  if ( imask )      Free(imask);
+  if ( imask ) Free(imask);
 
   dtlist_delete(dtlist);
+
+  Free(recinfo);
 
   streamClose(streamID2);
   streamClose(streamID1);

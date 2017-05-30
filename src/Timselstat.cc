@@ -104,11 +104,11 @@ void *Timselstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  int gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
 
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
@@ -161,7 +161,7 @@ void *Timselstat(void *argument)
               field_type *pvars1 = &vars1[varID][levelID];
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	      int gridsize = pvars1->size;
 
 	      if ( nsets == 0 )
 		{

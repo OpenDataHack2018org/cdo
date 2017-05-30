@@ -158,7 +158,6 @@ void *XTimstat(void *argument)
 {
   enum {HOUR_LEN=4, DAY_LEN=6, MON_LEN=8, YEAR_LEN=10};
   int timestat_date = TIMESTAT_MEAN;
-  int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
   int varID;
@@ -169,7 +168,6 @@ void *XTimstat(void *argument)
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
-  double missval;
 
   cdoInitialize(argument);
 
@@ -288,8 +286,8 @@ void *XTimstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
+  int gridsizemax = vlistGridsizeMax(vlistID1);
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
 
   int FIELD_MEMTYPE = 0;
   if ( CDO_Memtype == MEMTYPE_FLOAT ) FIELD_MEMTYPE = FIELD_FLT;
@@ -388,10 +386,7 @@ void *XTimstat(void *argument)
                         samp1[varID][levelID].ptr = (double*) malloc(nwpv*gridsize*sizeof(double));
                       
                       for ( int i = 0; i < nwpv*gridsize; i++ )
-                        if ( DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval) )
-                          samp1[varID][levelID].ptr[i] = 0;
-                        else
-                          samp1[varID][levelID].ptr[i] = 1;
+                        samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
                     }
                 }
             }
@@ -521,8 +516,8 @@ void *XTimstat(void *argument)
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
             nwpv     = pvars1->nwpv;
-            gridsize = gridInqSize(pvars1->grid);
-            missval  = pvars1->missval;
+            int gridsize = pvars1->size;
+            double missval = pvars1->missval;
             if ( samp1[varID][levelID].ptr )
               {
                 int irun = 0;

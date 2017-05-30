@@ -97,7 +97,6 @@ void *Timstat(void *argument)
   int nwpv; // number of words per value; real:1  complex:2
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   double vfrac = 1;
-  double missval;
 
   cdoInitialize(argument);
 
@@ -243,8 +242,8 @@ void *Timstat(void *argument)
   dtlist_set_stat(dtlist, timestat_date);
   dtlist_set_calendar(dtlist, taxisInqCalendar(taxisID1));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
-  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
+  int gridsizemax = vlistGridsizeMax(vlistID1);
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsizemax *= 2;
 
   int FIELD_MEMTYPE = 0;
   if ( CDO_Memtype == MEMTYPE_FLOAT ) FIELD_MEMTYPE = MEMTYPE_FLOAT;
@@ -253,9 +252,9 @@ void *Timstat(void *argument)
   field_init(&field);
   field.memtype = FIELD_MEMTYPE;
   if ( FIELD_MEMTYPE == MEMTYPE_FLOAT )
-    field.ptrf = (float*) Malloc(gridsize*sizeof(float));
+    field.ptrf = (float*) Malloc(gridsizemax*sizeof(float));
   else
-    field.ptr = (double*) Malloc(gridsize*sizeof(double));
+    field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
 
   field_type **vars1 = field_malloc(vlistID1, FIELD_PTR);
   field_type **samp1 = field_malloc(vlistID1, FIELD_NONE);
@@ -292,7 +291,7 @@ void *Timstat(void *argument)
               field_type *pvars2 = vars2 ? &vars2[varID][levelID] : NULL;
 
 	      nwpv     = pvars1->nwpv;
-	      gridsize = gridInqSize(pvars1->grid);
+	      int gridsize = pvars1->size;
 
 	      if ( nsets == 0 )
 		{
@@ -441,9 +440,9 @@ void *Timstat(void *argument)
 
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-            nwpv     = pvars1->nwpv;
-            gridsize = gridInqSize(pvars1->grid);
-            missval  = pvars1->missval;
+            int nwpv     = pvars1->nwpv;
+            int gridsize = gridInqSize(pvars1->grid);
+            double missval = pvars1->missval;
             if ( samp1[varID][levelID].ptr )
               {
                 int irun = 0;
@@ -492,7 +491,7 @@ void *Timstat(void *argument)
 	      if ( samp1[varID][levelID].ptr ) sampptr = samp1[varID][levelID].ptr;
               else
                 {
-                  gridsize = gridInqSize(pvars1->grid);
+                  int gridsize = pvars1->size;
                   for ( int i = 0; i < gridsize; ++i ) sampptr[i] = nsets;
                 }
 
