@@ -18,16 +18,16 @@
 /*
    This module contains the following operators:
 
-      Timselstat    timselrange        Time range range
-      Timselstat    timselmin          Time range minimum
-      Timselstat    timselmax          Time range maximum
-      Timselstat    timselsum          Time range sum
-      Timselstat    timselmean         Time range mean
-      Timselstat    timselavg          Time range average
-      Timselstat    timselvar          Time range variance
-      Timselstat    timselvar1         Time range variance [Normalize by (n-1)]
-      Timselstat    timselstd          Time range standard deviation
-      Timselstat    timselstd1         Time range standard deviation [Normalize by (n-1)]
+      Timselstat    timselrange        Time selection range
+      Timselstat    timselmin          Time selection minimum
+      Timselstat    timselmax          Time selection maximum
+      Timselstat    timselsum          Time selection sum
+      Timselstat    timselmean         Time selection mean
+      Timselstat    timselavg          Time selection average
+      Timselstat    timselvar          Time selection variance
+      Timselstat    timselvar1         Time selection variance [Normalize by (n-1)]
+      Timselstat    timselstd          Time selection standard deviation
+      Timselstat    timselstd1         Time selection standard deviation [Normalize by (n-1)]
 */
 
 
