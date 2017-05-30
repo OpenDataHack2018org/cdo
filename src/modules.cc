@@ -406,7 +406,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  SamplegridiconOperators {"samplegridicon"}
 #define  SeascountOperators     {"seascount"}
 #define  SeaspctlOperators      {"seaspctl"}
-#define  SeasstatOperators      {"seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
+#define  SeasstatOperators      {"seasrange", "seasmin", "seasmax", "seassum", "seasmean", "seasavg", "seasstd", "seasstd1", "seasvar", "seasvar1"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
 #define  SelgridcellOperators   {"selgridcell", "delgridcell"}
 #define  SelectOperators        {"select", "delete"}
@@ -510,7 +510,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
 #define  YseaspctlOperators     {"yseaspctl"}
 #define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd", "yseasstd1", "yseasvar", "yseasvar1"}
-#define  ZonstatOperators       {"zonmin", "zonmax", "zonrange", "zonsum", "zonmean", "zonavg", "zonstd", "zonstd1", "zonvar", "zonvar1", "zonpctl"}
+#define  ZonstatOperators       {"zonrange", "zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonstd1", "zonvar", "zonvar1", "zonpctl"}
 
 #define  EcaCfdOperators        {"eca_cfd"}
 #define  EcaCsuOperators        {"eca_csu"}

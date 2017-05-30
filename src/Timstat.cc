@@ -160,7 +160,7 @@ void *Timstat(void *argument)
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor  = operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   if ( operfunc == func_mean )
     {
@@ -311,10 +311,7 @@ void *Timstat(void *argument)
 			samp1[varID][levelID].ptr = (double*) Malloc(nwpv*gridsize*sizeof(double));
 
 		      for ( int i = 0; i < nwpv*gridsize; i++ )
-			if ( DBL_IS_EQUAL(pvar1->ptr[i], pvar1->missval) )
-			  samp1[varID][levelID].ptr[i] = 0;
-			else
-			  samp1[varID][levelID].ptr[i] = 1;
+                        samp1[varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvar1->ptr[i], pvar1->missval);
 		    }
 		}
 	      else

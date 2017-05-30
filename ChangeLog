@@ -3,6 +3,10 @@
 	* Using CDI library version 1.9.0
 	* Version 1.9.0 release
 
+2017-05-30  Uwe Schulzweida
+
+	* New operator seasrange: seasonal range (seasmax-seasmin)
+
 2017-05-26  Uwe Schulzweida
 
 	* eca_gsl: set default to northern hemisphere
