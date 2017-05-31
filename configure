@@ -22201,7 +22201,7 @@ ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweigh
 
 ac_config_files="$ac_config_files test/EOF.test test/Select.test test/Spectral.test test/Vertint.test"
 
-ac_config_files="$ac_config_files test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test test/Multiyearstat.test"
+ac_config_files="$ac_config_files test/Timstat.test test/Timselstat.test test/Seasstat.test test/Runstat.test test/Multiyearstat.test test/Ydrunstat.test"
 
 ac_config_files="$ac_config_files test/Gridboxstat.test test/Vertstat.test test/Fldstat.test test/Fldpctl.test test/Ensstat.test test/Enspctl.test"
 
@@ -23386,6 +23386,7 @@ do
     "test/Seasstat.test") CONFIG_FILES="$CONFIG_FILES test/Seasstat.test" ;;
     "test/Runstat.test") CONFIG_FILES="$CONFIG_FILES test/Runstat.test" ;;
     "test/Multiyearstat.test") CONFIG_FILES="$CONFIG_FILES test/Multiyearstat.test" ;;
+    "test/Ydrunstat.test") CONFIG_FILES="$CONFIG_FILES test/Ydrunstat.test" ;;
     "test/Gridboxstat.test") CONFIG_FILES="$CONFIG_FILES test/Gridboxstat.test" ;;
     "test/Vertstat.test") CONFIG_FILES="$CONFIG_FILES test/Vertstat.test" ;;
     "test/Fldstat.test") CONFIG_FILES="$CONFIG_FILES test/Fldstat.test" ;;
@@ -24918,6 +24919,7 @@ _LT_EOF
     "test/Seasstat.test":F) chmod a+x "$ac_file" ;;
     "test/Runstat.test":F) chmod a+x "$ac_file" ;;
     "test/Multiyearstat.test":F) chmod a+x "$ac_file" ;;
+    "test/Ydrunstat.test":F) chmod a+x "$ac_file" ;;
     "test/Gridboxstat.test":F) chmod a+x "$ac_file" ;;
     "test/Vertstat.test":F) chmod a+x "$ac_file" ;;
     "test/Fldstat.test":F) chmod a+x "$ac_file" ;;

@@ -58,7 +58,7 @@ YDAY_STATS;
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);
 static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
-  field_type **vars1, field_type **vars2, int nsets, int operfunc);
+                         field_type **vars1, field_type **vars2, int nsets, int operfunc);
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
 
@@ -147,7 +147,7 @@ void *Ydrunstat(void *argument)
 	    }
 	  
           field_type *pvars1 = &vars1[tsID][varID][levelID];
-          field_type *pvars2 = vars2[tsID] ? &vars2[tsID][varID][levelID] : NULL;
+          field_type *pvars2 = (vars2 && vars2[tsID]) ? &vars2[tsID][varID][levelID] : NULL;
 
 	  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
@@ -207,7 +207,7 @@ void *Ydrunstat(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  
           field_type *pvars1 = &vars1[ndates-1][varID][levelID];
-          field_type *pvars2 = vars2[ndates-1] ? &vars2[ndates-1][varID][levelID] : NULL;
+          field_type *pvars2 = (vars2 && vars2[ndates-1]) ? &vars2[ndates-1][varID][levelID] : NULL;
 
 	  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	  pvars1->nmiss = nmiss;
@@ -312,6 +312,7 @@ YDAY_STATS *ydstatCreate(int vlistID)
       stats->vars2[dayoy] = NULL;
       stats->nsets[dayoy] = 0;
     }
+
   stats->vlist = vlistID;
   
   return stats;
@@ -362,9 +363,8 @@ void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
   int varID, levelID, nvars, nlevels;
   int gridsize;
   int year, month, day, dayoy;
-  int lvarstd;
 
-  lvarstd = vars2 != NULL;
+  bool lvarstd = vars2 != NULL;
 
   nvars = vlistNvars(stats->vlist);
 
