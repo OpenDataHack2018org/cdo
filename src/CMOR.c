@@ -1157,6 +1157,8 @@ static void dump_special_attributes(list_t *kvl, int streamID)
 
 static void read_config_files(list_t *kvl)
 {
+  if ( cdoVerbose )
+    printf("*******Start to read configuration files.*******\n");
   /* Files from info key in command line. */
   keyValues_t *info = kvlist_search(kvl, "i");
   int i = 0;
@@ -1192,6 +1194,8 @@ static void read_config_files(list_t *kvl)
             i++;
           }
     }
+  if ( cdoVerbose )
+    printf("*******Successfully read configuration files.*******\n");
 }
 
 static int in_list(char **list, const char *needle, int num)
@@ -1354,11 +1358,12 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
       else
         *calendar = get_calendar_int(calendarptr);
     }
+  
+  double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
 
 #if defined(CMOR_VERSION_MAJOR)
 #if ( CMOR_VERSION_MAJOR == 2 )
     {
-      double branch_time = atof(kv_get_a_val(kvl, "branch_time", "0.0"));
       cmor_dataset(kv_get_a_val(kvl, "dr", "./"),
                kv_get_a_val(kvl, "experiment_id", ""),
                kv_get_a_val(kvl, "institution", ""),
@@ -1406,7 +1411,7 @@ static void setup_dataset(list_t *kvl, int streamID, int *calendar)
 #endif
   Free(calendarptr);
   if ( cdoVerbose )
-    printf("*******Setup finished successfully.*******\n");
+    printf("*******Successfully finished cmor_setup and cmor_dataset.*******\n");
 }
 
 
@@ -1477,7 +1482,7 @@ static void get_taxis(char *required_time_units, int *sdate, int *stime, int *ti
 
 static void get_time_method(list_t *kvl, int vlistID, int varID, char *cmor_time_name, char *project_id, int miptab_freq, int *time_axis)
 {
-  if (strcmp(project_id, "CMIP5") == 0 && miptab_freq )
+  if ( ( strcmp(project_id, "CMIP5") == 0 || strcmp(project_id, "CMIP6") == 0 ) && miptab_freq )
     switch ( miptab_freq )
       {
       case 1: strcpy(cmor_time_name, "time2"); break;
@@ -1629,7 +1634,7 @@ static void register_z_axis(list_t *kvl, int vlistID, int varID, int zaxisID, ch
       get_zcell_bounds(zaxisID, zcell_bounds, levels, zsize);
       if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
         {
-          if ( strcmp(project_id, "CMIP5") != 0 )
+          if ( strcmp(project_id, "CMIP5") != 0 && strcmp(project_id, "CMIP6") != 0 )
             cmor_axis(new_axis_id(axis_ids),
                         "plevs",
                         "Pa",
@@ -3563,6 +3568,8 @@ static list_t *check_for_charvars(list_t *maptab, char *key)
 
 static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapping vars[])
 {
+  if ( cdoVerbose )
+    printf("*******Start to read mapping table.*******\n");
   char *maptab = kv_get_a_val(kvl, "mt", NULL);
   char *maptabdir = kv_get_a_val(kvl, "mapping_table_dir", NULL);
   char *maptabbuild = NULL;
@@ -3606,7 +3613,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
             cdoWarning("Only the first value of variable selection key 'name' is processed.");
           maptab_via_cmd(pml, kvn->values[0], vlistID, vlistNvars(vlistID),  "name", kvcn->values[0], miptabfreq);
           if ( cdoVerbose )
-            printf("*******Successfully read mapping '%s' table.*******\n", maptab);
+            printf("*******Successfully read and applied mapping table '%s'.*******\n", maptab);
         }
       else if ( kvc )
         {
@@ -3622,7 +3629,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
             cdoWarning("Only the first value of variable selection key 'code' is processed.");
           maptab_via_cmd(pml, kvc->values[0], vlistID, vlistNvars(vlistID), "code", kvcn->values[0], miptabfreq);
           if ( cdoVerbose )
-            printf("*******Successfully read mapping '%s' table.*******\n", maptab);
+            printf("*******Successfully read and applied mapping table '%s'.*******\n", maptab);
         }
       else if ( kvcn )
         { 
@@ -3636,7 +3643,7 @@ static void read_maptab(list_t *kvl, int streamID, char *miptabfreq, struct mapp
             }
           maptab_via_cn(pml, kvcn->values, vlistID, vlistNvars(vlistID), kvcn->nvalues, miptabfreq); 
           if ( cdoVerbose )
-            printf("*******Successfully read mapping '%s' table.*******\n", maptab);
+            printf("*******Successfully read and applied mapping table '%s'.*******\n", maptab);
         }
       else
         {
@@ -3819,58 +3826,42 @@ static char *freq_from_path(char *mip_table)
   return freq;
 }
 
-static void save_miptab_freq(list_t *kvl, char *mip_table, int *miptab_freq)
+static int get_miptab_freq(list_t *kvl, char *mip_table, char *project_id)
 {
+  int miptab_freq = 0;
   char *freq = freq_from_path(mip_table);
   if ( freq != NULL )
     {
       if ( strstr(freq, "yr") || strstr(freq, "Yr") )
-        *miptab_freq = 11;
+        miptab_freq = 11;
       else if ( strstr(freq, "mon") || strstr(freq, "Mon") )
-        *miptab_freq = 12;
+        miptab_freq = 12;
       else if ( strstr(freq, "day") || strstr(freq, "Day") )
-        *miptab_freq = 13;
+        miptab_freq = 13;
       else if ( strstr(freq, "6hr") )
-        *miptab_freq = 14;
+        miptab_freq = 14;
       else if ( strstr(freq, "3hr") )
-        *miptab_freq = 15;
+        miptab_freq = 15;
 
       if ( strcmp(freq, "Oclim") == 0 )
-        *miptab_freq = 1;
+        miptab_freq = 1;
       else if ( strcmp(freq, "Oyr") == 0 )
-        *miptab_freq = 2;
+        miptab_freq = 2;
       else if ( strcmp(freq, "cfMon") == 0 )
-        *miptab_freq = 3;
+        miptab_freq = 3;
       else if ( strcmp(freq, "day") == 0 )
-        *miptab_freq = 4;
-      else if ( strcmp(freq, "6hrPlev") == 0 )
-        *miptab_freq = 5;
+        miptab_freq = 4;
+      else if ( strcmp(freq, "6hrPlev") == 0 && strcmp(project_id, "CMIP5") == 0 )
+        miptab_freq = 5;
+      else if ( strcmp(freq, "6hrPlevPt") == 0 )
+        miptab_freq = 5;
       else if ( strcmp(freq, "6hrLev") == 0 )
-        *miptab_freq = 6;
+        miptab_freq = 6;
     }
 }
 
-#endif
-
-void *CMOR(void *argument)
+static void check_cmdline_mapping(list_t *kvl)
 {
-  cdoInitialize(argument);
-
-#if defined(HAVE_LIBCMOR)
-  int nparams = operatorArgc();
-  char **params = operatorArgv();
-
-  /* Definition of pml: */
-  list_t *pml = list_new(sizeof(list_t *), free_kvlist, "pml");
-
-  if ( nparams < 1 ) cdoAbort("Too few arguments!");
-
-  /* Define kvl and read cmdline */
-  parse_cmdline(pml, params, nparams, "cmdline");
-  
-  const char *pmlistHelper[] = {"cmdline"};
-  /* Get kvl and use it from now on instead of pml */
-  list_t *kvl = pmlist_get_kvlist_ventry(pml, 1, pmlistHelper);
   char *name = kv_get_a_val(kvl, "n", NULL);
   char *code = kv_get_a_val(kvl, "c", NULL);
   char *cn = kv_get_a_val(kvl, "cn", NULL);
@@ -3878,18 +3869,13 @@ void *CMOR(void *argument)
     cdoAbort("Mapping via command line failed. Only one variable selector of 'name' and 'code' is allowed.");
   if ( ( name && !cn ) || ( code && !cn ) )
     cdoAbort("Mapping via command line failed. A corresponding 'cmor_name' is needed.");
+}
 
-  /* Config files are read with descending priority. */
-  if ( cdoVerbose )
-    printf("*******Start to read configuration files.*******\n");
-  read_config_files(kvl);
-  if ( cdoVerbose )
-    printf("*******Successfully read configuration files.*******\n");
-
-  /* check MIP table, MIP table frequency and project_id*/
+static char *get_project_id(list_t *kvl)
+{
   if ( cdoVerbose )
     printf("*******Start to check MIP table, MIP table frequency and project_id / mip_era.*******\n");
-  int miptab_freq = 0, time_axis = 0, calendar = 0;
+
   char *project_id, *dummy, *dummy2;
   dummy = kv_get_a_val(kvl, "project_id", NULL);
   dummy2 = kv_get_a_val(kvl, "mip_era", NULL);
@@ -3922,14 +3908,62 @@ void *CMOR(void *argument)
 #else
   cdoAbort("Cannot check CMOR version: Missing makro CMOR_VERSION_MAJOR");
 #endif
-  char *mip_table = get_mip_table(params[0], kvl, project_id);
-  save_miptab_freq(kvl, mip_table, &miptab_freq);
-  char *miptab_freqptr = strdup(freq_from_path(mip_table));
-  kv_insert_a_val(kvl, "miptab_freq", miptab_freqptr, 1);
 
   if ( cdoVerbose )
     printf("*******Successfully checked MIP table, MIP table frequency and project_id.*******\n");
+  return project_id;
+}
 
+static int cmor_load_and_set_table(list_t *kvl, char *param0, char *project_id, char *mip_table);
+{
+  int table_id = 0;
+#if ( CMOR_VERSION_MAJOR == 3 )
+  Free(mip_table);
+  printf("*******Need to get the mip_table once more.*******\n");
+  mip_table = get_mip_table(param0, kvl, project_id);
+#endif
+  cmor_load_table(mip_table, &table_id);
+  cmor_set_table(table_id);
+  return table_id;
+}
+#endif
+
+void *CMOR(void *argument)
+{
+  cdoInitialize(argument);
+
+#if defined(HAVE_LIBCMOR)
+  int nparams = operatorArgc();
+  char **params = operatorArgv();
+
+  /* Definition of pml: */
+  list_t *pml = list_new(sizeof(list_t *), free_kvlist, "pml");
+
+  if ( nparams < 1 ) cdoAbort("Too few arguments!");
+
+  /* Define kvl and read cmdline */
+  parse_cmdline(pml, params, nparams, "cmdline");
+  
+  const char *pmlistHelper[] = {"cmdline"};
+  /* Get kvl and use it from now on instead of pml */
+  list_t *kvl = pmlist_get_kvlist_ventry(pml, 1, pmlistHelper);
+
+  /* Check whether a command line mapping is active */
+  check_cmdline_mapping(kvl);
+
+  /* Config files are read with descending priority. */
+  read_config_files(kvl);
+
+  /* Get project_id, mip_table and mip_table frequency*/
+  char *project_id = get_project_id(kvl, &project_id);
+  char *mip_table  = get_mip_table(params[0], kvl, *project_id);
+#if ( CMOR_VERSION_MAJOR == 3 )
+  mip_table[strlen(mip_table)-5] = '\0';
+#endif
+  int miptab_freq  = get_miptab_freq(kvl, mip_table, *project_id);
+
+  char *miptab_freqptr = strdup(freq_from_path(mip_table));
+  kv_insert_a_val(kvl, "miptab_freq", miptab_freqptr, 1);
 
   int streamID = streamOpenRead(cdoStreamName(0));
   /* Existing attributes have lowest priority. */
@@ -3948,19 +3982,13 @@ void *CMOR(void *argument)
   struct mapping *vars = construct_var_mapping(streamID);
 
  /* read mapping table */
-  if ( cdoVerbose )
-    printf("*******Start to read mapping table.*******\n");
   read_maptab(kvl, streamID, miptab_freqptr, vars);
 
-  if ( cdoVerbose )
-    printf("*******Start to use cmor_setup.*******\n");
-  setup_dataset(kvl, streamID, &calendar);
-  if ( cdoVerbose )
-    printf("*******Succesfully used cmor_setup.*******\n");
+  int time_axis = 0, calendar = 0;
 
-  int table_id;
-  cmor_load_table(mip_table, &table_id);
-  cmor_set_table(table_id);
+  setup_dataset(kvl, streamID, &calendar);
+
+  int table_id = cmor_load_and_set_table(kvl, params[0], project_id, mip_table);
 
   register_all_dimensions(kvl, streamID, vars, table_id, project_id, miptab_freq, &time_axis);
   write_variables(kvl, &streamID, vars, miptab_freq, time_axis, calendar, miptab_freqptr);
