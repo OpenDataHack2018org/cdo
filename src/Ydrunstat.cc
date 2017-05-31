@@ -38,6 +38,11 @@
 
 #define NDAY 373
 
+typedef struct {
+  short varID;
+  short levelID;
+} recinfo_t;
+
 
 typedef struct {
   int       vdate[NDAY];
@@ -65,8 +70,6 @@ void *Ydrunstat(void *argument)
   int tsID;
   int inp, its;
   int nmiss;
-  int vdate, vtime;
-  int dayoy;
     
   cdoInitialize(argument);
 
@@ -105,10 +108,9 @@ void *Ydrunstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  int nrecords = vlistNrecs(vlistID1);
+  int maxrecs = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
 
   cdo_datetime_t *datetime = (cdo_datetime_t*) Malloc((ndates+1)*sizeof(cdo_datetime_t));
   
@@ -140,27 +142,30 @@ void *Ydrunstat(void *argument)
 
 	  if ( tsID == 0 )
 	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
+              recinfo[recID].varID   = varID;
+              recinfo[recID].levelID = levelID;
 	    }
 	  
-	  streamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
-	  vars1[tsID][varID][levelID].nmiss = nmiss;
+          field_type *pvars1 = &vars1[tsID][varID][levelID];
+          field_type *pvars2 = vars2[tsID] ? &vars2[tsID][varID][levelID] : NULL;
+
+	  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	  pvars1->nmiss = nmiss;
 
 	  if ( lvarstd )
 	    {
-	      farmoq(&vars2[tsID][varID][levelID], vars1[tsID][varID][levelID]);
+	      farmoq(pvars2, *pvars1);
 	      for ( inp = 0; inp < tsID; inp++ )
 		{
-		  farsumq(&vars2[inp][varID][levelID], vars1[tsID][varID][levelID]);
-		  farsum(&vars1[inp][varID][levelID], vars1[tsID][varID][levelID]);
+		  farsumq(&vars2[inp][varID][levelID], *pvars1);
+		  farsum(&vars1[inp][varID][levelID], *pvars1);
 		}
 	    }
 	  else
 	    {
 	      for ( inp = 0; inp < tsID; inp++ )
 		{
-		  farfun(&vars1[inp][varID][levelID], vars1[tsID][varID][levelID], operfunc);
+		  farfun(&vars1[inp][varID][levelID], *pvars1, operfunc);
 		}
 	    }
 	}
@@ -170,8 +175,8 @@ void *Ydrunstat(void *argument)
     {
       datetime_avg(dpy, ndates, datetime);
       
-      vdate = datetime[ndates].date;
-      vtime = datetime[ndates].time;
+      int vdate = datetime[ndates].date;
+      int vtime = datetime[ndates].time;
       
       if ( lvarstd )   
         ydstatUpdate(stats, vdate, vtime, vars1[0], vars2[0], ndates, operfunc);
@@ -201,23 +206,26 @@ void *Ydrunstat(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  
-	  streamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
-	  vars1[ndates-1][varID][levelID].nmiss = nmiss;
+          field_type *pvars1 = &vars1[ndates-1][varID][levelID];
+          field_type *pvars2 = vars2[ndates-1] ? &vars2[ndates-1][varID][levelID] : NULL;
+
+	  streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	  pvars1->nmiss = nmiss;
 
 	  if ( lvarstd )
 	    {
 	      for ( inp = 0; inp < ndates-1; inp++ )
 		{
-		  farsumq(&vars2[inp][varID][levelID], vars1[ndates-1][varID][levelID]);
-		  farsum(&vars1[inp][varID][levelID], vars1[ndates-1][varID][levelID]);
+		  farsumq(&vars2[inp][varID][levelID], *pvars1);
+		  farsum(&vars1[inp][varID][levelID], *pvars1);
 		}
-	      farmoq(&vars2[ndates-1][varID][levelID], vars1[ndates-1][varID][levelID]);
+	      farmoq(pvars2, *pvars1);
 	    }
 	  else
 	    {
 	      for ( inp = 0; inp < ndates-1; inp++ )
 		{
-		  farfun(&vars1[inp][varID][levelID], vars1[ndates-1][varID][levelID], operfunc);
+		  farfun(&vars1[inp][varID][levelID], *pvars1, operfunc);
 		}
 	    }
 	}
@@ -229,13 +237,13 @@ void *Ydrunstat(void *argument)
   // set the year to the minimum of years found on output timestep
   int outyear = 1e9;
   int year, month, day;
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( stats->nsets[dayoy] )
       {
 	cdiDecodeDate(stats->vdate[dayoy], &year, &month, &day);
 	if ( year < outyear ) outyear = year;
       }
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( stats->nsets[dayoy] )
       {
 	cdiDecodeDate(stats->vdate[dayoy], &year, &month, &day);
@@ -247,23 +255,23 @@ void *Ydrunstat(void *argument)
 
   int otsID = 0;
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < NDAY; dayoy++ )
     if ( stats->nsets[dayoy] )
       {
 	taxisDefVdate(taxisID2, stats->vdate[dayoy]);
 	taxisDefVtime(taxisID2, stats->vtime[dayoy]);
 	streamDefTimestep(streamID2, otsID);
 
-	for ( int recID = 0; recID < nrecords; recID++ )
-	  {
-	    varID   = recVarID[recID];
-	    levelID = recLevelID[recID];
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &stats->vars1[dayoy][varID][levelID];
 
 	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    streamDefRecord(streamID2, varID, levelID);
-	    streamWriteRecord(streamID2, stats->vars1[dayoy][varID][levelID].ptr,
-			      stats->vars1[dayoy][varID][levelID].nmiss);
+	    streamWriteRecord(streamID2, pvars1->ptr, pvars1->nmiss);
 	  }
 
 	otsID++;
@@ -281,8 +289,7 @@ void *Ydrunstat(void *argument)
 
   if ( datetime ) Free(datetime);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  Free(recinfo);
 
   streamClose(streamID2);
   streamClose(streamID1);
@@ -294,12 +301,10 @@ void *Ydrunstat(void *argument)
 
 static
 YDAY_STATS *ydstatCreate(int vlistID)
-{
-  int dayoy;
-  
+{  
   YDAY_STATS *stats = (YDAY_STATS*) Malloc(sizeof(YDAY_STATS));
   
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( int dayoy = 0; dayoy < NDAY; dayoy++ )
     {
       stats->vdate[dayoy] = 0;
       stats->vtime[dayoy] = 0;
@@ -315,13 +320,13 @@ YDAY_STATS *ydstatCreate(int vlistID)
 static
 void ydstatDestroy(YDAY_STATS *stats)
 {
-  int dayoy, varID, levelID, nvars, nlevels;
+  int varID, levelID, nlevels;
   
   if ( stats != NULL )
     {
-      nvars = vlistNvars(stats->vlist);
+      int nvars = vlistNvars(stats->vlist);
       
-      for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+      for ( int dayoy = 0; dayoy < NDAY; dayoy++ )
         {
           if ( stats->vars1[dayoy] != NULL )
             {
