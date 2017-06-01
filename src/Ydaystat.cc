@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Ydaystat   ydayrange       Multi-year daily range
       Ydaystat   ydaymin         Multi-year daily minimum
       Ydaystat   ydaymax         Multi-year daily maximum
       Ydaystat   ydaysum         Multi-year daily sum
@@ -48,37 +49,39 @@ void *Ydaystat(void *argument)
   int varID, levelID;
   int year, month, day;
   int nrecs;
-  int nsets[MAX_DOY];
+  int dayoy_nsets[MAX_DOY];
   int nmiss;
   int vdates[MAX_DOY], vtimes[MAX_DOY];
   field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ydaymin",  func_min,  0, NULL);
-  cdoOperatorAdd("ydaymax",  func_max,  0, NULL);
-  cdoOperatorAdd("ydaysum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ydaymean", func_mean, 0, NULL);
-  cdoOperatorAdd("ydayavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("ydayvar",  func_var,  0, NULL);
-  cdoOperatorAdd("ydayvar1", func_var1, 0, NULL);
-  cdoOperatorAdd("ydaystd",  func_std,  0, NULL);
-  cdoOperatorAdd("ydaystd1", func_std1, 0, NULL);
+  cdoOperatorAdd("ydayrange", func_range, 0, NULL);
+  cdoOperatorAdd("ydaymin",   func_min,   0, NULL);
+  cdoOperatorAdd("ydaymax",   func_max,   0, NULL);
+  cdoOperatorAdd("ydaysum",   func_sum,   0, NULL);
+  cdoOperatorAdd("ydaymean",  func_mean,  0, NULL);
+  cdoOperatorAdd("ydayavg",   func_avg,   0, NULL);
+  cdoOperatorAdd("ydayvar",   func_var,   0, NULL);
+  cdoOperatorAdd("ydayvar1",  func_var1,  0, NULL);
+  cdoOperatorAdd("ydaystd",   func_std,   0, NULL);
+  cdoOperatorAdd("ydaystd1",  func_std1,  0, NULL);
 
   int operatorID = cdoOperatorID();
   int operfunc = cdoOperatorF1(operatorID);
 
+  bool lrange  = operfunc == func_range;
   bool lmean   = operfunc == func_mean || operfunc == func_avg;
   bool lstd    = operfunc == func_std || operfunc == func_std1;
   bool lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
-  int divisor  = operfunc == func_std1 || operfunc == func_var1;
+  int  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
     {
       vars1[dayoy] = NULL;
       vars2[dayoy] = NULL;
       samp1[dayoy] = NULL;
-      nsets[dayoy] = 0;
+      dayoy_nsets[dayoy] = 0;
     }
 
   int streamID1 = streamOpenRead(cdoStreamName(0));
@@ -129,7 +132,7 @@ void *Ydaystat(void *argument)
 	{
 	  vars1[dayoy] = field_malloc(vlistID1, FIELD_PTR);
 	  samp1[dayoy] = field_malloc(vlistID1, FIELD_NONE);
-	  if ( lvarstd )
+	  if ( lvarstd || lrange )
 	    vars2[dayoy] = field_malloc(vlistID1, FIELD_PTR);
 	}
 
@@ -143,23 +146,31 @@ void *Ydaystat(void *argument)
               recinfo[recID].levelID = levelID;
 	    }
 
+          field_type *psamp1 = &samp1[dayoy][varID][levelID];
           field_type *pvars1 = &vars1[dayoy][varID][levelID];
           field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+          int nsets = dayoy_nsets[dayoy];
 
 	  int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  if ( nsets[dayoy] == 0 )
+	  if ( nsets == 0 )
 	    {
 	      streamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	      pvars1->nmiss = (size_t)nmiss;
+              if ( lrange )
+                {
+                  pvars2->nmiss = pvars1->nmiss;
+                  for ( int i = 0; i < gridsize; i++ )
+                    pvars2->ptr[i] = pvars1->ptr[i];
+                }
 
-	      if ( nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
+	      if ( nmiss > 0 || psamp1->ptr )
 		{
-		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
-		    samp1[dayoy][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+		  if ( psamp1->ptr == NULL )
+		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		  for ( int i = 0; i < gridsize; i++ )
-                    samp1[dayoy][varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		}
 	    }
 	  else
@@ -169,18 +180,18 @@ void *Ydaystat(void *argument)
 	      field.grid    = pvars1->grid;
 	      field.missval = pvars1->missval;
 
-	      if ( field.nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
+	      if ( field.nmiss > 0 || psamp1->ptr )
 		{
-		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
+		  if ( psamp1->ptr == NULL )
 		    {
-		      samp1[dayoy][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 		      for ( int i = 0; i < gridsize; i++ )
-			samp1[dayoy][varID][levelID].ptr[i] = nsets[dayoy];
+			psamp1->ptr[i] = nsets;
 		    }
 		  
 		  for ( int i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-		      samp1[dayoy][varID][levelID].ptr[i]++;
+		      psamp1->ptr[i]++;
 		}
 
 	      if ( lvarstd )
@@ -188,6 +199,11 @@ void *Ydaystat(void *argument)
 		  farsumq(pvars2, field);
 		  farsum(pvars1, field);
 		}
+              else if ( lrange )
+                {
+                  farmin(pvars2, field);
+                  farmax(pvars1, field);
+                }
 	      else
 		{
 		  farfun(pvars1, field, operfunc);
@@ -195,7 +211,7 @@ void *Ydaystat(void *argument)
 	    }
 	}
 
-      if ( nsets[dayoy] == 0 && lvarstd )
+      if ( dayoy_nsets[dayoy] == 0 && lvarstd )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
             int varID   = recinfo[recID].varID;
@@ -208,20 +224,20 @@ void *Ydaystat(void *argument)
             farmoq(pvars2, *pvars1);
 	  }
 
-      nsets[dayoy]++;
+      dayoy_nsets[dayoy]++;
       tsID++;
     }
 
   // set the year to the minimum of years found on output timestep
   int outyear = 1e9;
   for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-    if ( nsets[dayoy] )
+    if ( dayoy_nsets[dayoy] )
       {
         cdiDecodeDate(vdates[dayoy], &year, &month, &day);
         if ( year < outyear ) outyear = year;
       }
   for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-    if ( nsets[dayoy] )
+    if ( dayoy_nsets[dayoy] )
       {
         cdiDecodeDate(vdates[dayoy], &year, &month, &day);
         if ( year > outyear ) vdates[dayoy] = cdiEncodeDate(outyear, month, day);
@@ -229,43 +245,42 @@ void *Ydaystat(void *argument)
       }
 
   for ( int dayoy = 0; dayoy < MAX_DOY; dayoy++ )
-    if ( nsets[dayoy] )
+    if ( dayoy_nsets[dayoy] )
       {
-	if ( lmean )
-          for ( int recID = 0; recID < maxrecs; recID++ )
-            {
-              int varID   = recinfo[recID].varID;
-              int levelID = recinfo[recID].levelID;
-              field_type *pvars1 = &vars1[dayoy][varID][levelID];
+        int nsets = dayoy_nsets[dayoy];
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *psamp1 = &samp1[dayoy][varID][levelID];
+            field_type *pvars1 = &vars1[dayoy][varID][levelID];
+            field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
 
-              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-              if ( samp1[dayoy][varID][levelID].ptr == NULL )
-                farcdiv(pvars1, (double)nsets[dayoy]);
-              else
-                fardiv(pvars1, samp1[dayoy][varID][levelID]);
-	  }
-	else if ( lvarstd )
-          for ( int recID = 0; recID < maxrecs; recID++ )
-            {
-              int varID   = recinfo[recID].varID;
-              int levelID = recinfo[recID].levelID;
-              field_type *pvars1 = &vars1[dayoy][varID][levelID];
-              field_type *pvars2 = &vars2[dayoy][varID][levelID];
-
-              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-              if ( samp1[dayoy][varID][levelID].ptr == NULL )
-                {
-                  if ( lstd ) farcstd(pvars1, *pvars2, nsets[dayoy], divisor);
-                  else        farcvar(pvars1, *pvars2, nsets[dayoy], divisor);
-                }
-              else
-                {
-                  if ( lstd ) farstd(pvars1, *pvars2, samp1[dayoy][varID][levelID], divisor);
-                  else        farvar(pvars1, *pvars2, samp1[dayoy][varID][levelID], divisor);
-                }
-            }
+            if ( lmean )
+              {
+                if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
+                else               farcdiv(pvars1, (double)nsets);
+              }
+            else if ( lvarstd )
+              {
+                if ( psamp1->ptr )
+                  {
+                    if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
+                    else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                  }
+                else
+                  {
+                    if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
+                    else        farcvar(pvars1, *pvars2, nsets, divisor);
+                  }
+              }
+            else if ( lrange )
+              {
+                farsub(pvars1, *pvars2);
+              }
+          }
 
 	taxisDefVdate(taxisID2, vdates[dayoy]);
 	taxisDefVtime(taxisID2, vtimes[dayoy]);

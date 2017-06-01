@@ -6,6 +6,7 @@
 2017-06-01  Uwe Schulzweida
 
 	* New operator yhourrange: Multi-year hourly range (yhourmax-yhourmin)
+	* New operator ydayrange: Multi-year daily range (ydaymax-ydaymin)
 	* New operator ymonrange: Multi-year monthly range (ymonmax-ymonmin)
 	* New operator yseasrange: Multi-year seasonal range (yseasmax-yseasmin)
 
