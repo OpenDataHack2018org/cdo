@@ -37,6 +37,11 @@
 
 #define  MAX_DOY       373
 
+typedef struct {
+  short varID;
+  short levelID;
+} recinfo_t;
+
 
 void *Ydaystat(void *argument)
 {
@@ -45,7 +50,6 @@ void *Ydaystat(void *argument)
   int nrecs;
   int nsets[MAX_DOY];
   int nmiss;
-  int nlevel;
   int vdates[MAX_DOY], vtimes[MAX_DOY];
   field_type **vars1[MAX_DOY], **vars2[MAX_DOY], **samp1[MAX_DOY];
 
@@ -91,17 +95,15 @@ void *Ydaystat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  int nvars    = vlistNvars(vlistID1);
-  int nrecords = vlistNrecs(vlistID1);
+  int maxrecs = vlistNrecs(vlistID1);
 
-  int *recVarID   = (int*) Malloc(nrecords*sizeof(int));
-  int *recLevelID = (int*) Malloc(nrecords*sizeof(int));
+  recinfo_t *recinfo = (recinfo_t *) Malloc(maxrecs*sizeof(recinfo_t));
 
-  int gridsize = vlistGridsizeMax(vlistID1);
+  int gridsizemax = vlistGridsizeMax(vlistID1);
 
   field_type field;
   field_init(&field);
-  field.ptr = (double*) Malloc(gridsize*sizeof(double));
+  field.ptr = (double*) Malloc(gridsizemax*sizeof(double));
 
   int tsID = 0;
   int otsID = 0;
@@ -137,16 +139,19 @@ void *Ydaystat(void *argument)
 
 	  if ( tsID == 0 )
 	    {
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
+              recinfo[recID].varID   = varID;
+              recinfo[recID].levelID = levelID;
 	    }
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+          field_type *pvars1 = &vars1[dayoy][varID][levelID];
+          field_type *pvars2 = vars2[dayoy] ? &vars2[dayoy][varID][levelID] : NULL;
+
+	  int gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	  if ( nsets[dayoy] == 0 )
 	    {
-	      streamReadRecord(streamID1, vars1[dayoy][varID][levelID].ptr, &nmiss);
-	      vars1[dayoy][varID][levelID].nmiss = (size_t)nmiss;
+	      streamReadRecord(streamID1, pvars1->ptr, &nmiss);
+	      pvars1->nmiss = (size_t)nmiss;
 
 	      if ( nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
 		{
@@ -154,19 +159,15 @@ void *Ydaystat(void *argument)
 		    samp1[dayoy][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		  for ( int i = 0; i < gridsize; i++ )
-		    if ( DBL_IS_EQUAL(vars1[dayoy][varID][levelID].ptr[i],
-				      vars1[dayoy][varID][levelID].missval) )
-		      samp1[dayoy][varID][levelID].ptr[i] = 0;
-		    else
-		      samp1[dayoy][varID][levelID].ptr[i] = 1;
+                    samp1[dayoy][varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		}
 	    }
 	  else
 	    {
 	      streamReadRecord(streamID1, field.ptr, &nmiss);
               field.nmiss   = (size_t)nmiss;
-	      field.grid    = vars1[dayoy][varID][levelID].grid;
-	      field.missval = vars1[dayoy][varID][levelID].missval;
+	      field.grid    = pvars1->grid;
+	      field.missval = pvars1->missval;
 
 	      if ( field.nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
 		{
@@ -178,29 +179,33 @@ void *Ydaystat(void *argument)
 		    }
 		  
 		  for ( int i = 0; i < gridsize; i++ )
-		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[dayoy][varID][levelID].missval) )
+		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
 		      samp1[dayoy][varID][levelID].ptr[i]++;
 		}
 
 	      if ( lvarstd )
 		{
-		  farsumq(&vars2[dayoy][varID][levelID], field);
-		  farsum(&vars1[dayoy][varID][levelID], field);
+		  farsumq(pvars2, field);
+		  farsum(pvars1, field);
 		}
 	      else
 		{
-		  farfun(&vars1[dayoy][varID][levelID], field, operfunc);
+		  farfun(pvars1, field, operfunc);
 		}
 	    }
 	}
 
       if ( nsets[dayoy] == 0 && lvarstd )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[dayoy][varID][levelID];
+            field_type *pvars2 = &vars2[dayoy][varID][levelID];
+
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      farmoq(&vars2[dayoy][varID][levelID], vars1[dayoy][varID][levelID]);
+
+            farmoq(pvars2, *pvars1);
 	  }
 
       nsets[dayoy]++;
@@ -227,56 +232,55 @@ void *Ydaystat(void *argument)
     if ( nsets[dayoy] )
       {
 	if ( lmean )
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
-		    farcdiv(&vars1[dayoy][varID][levelID], (double)nsets[dayoy]);
-		  else
-		    fardiv(&vars1[dayoy][varID][levelID], samp1[dayoy][varID][levelID]);
-		}
-	    }
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_type *pvars1 = &vars1[dayoy][varID][levelID];
+
+              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+              if ( samp1[dayoy][varID][levelID].ptr == NULL )
+                farcdiv(pvars1, (double)nsets[dayoy]);
+              else
+                fardiv(pvars1, samp1[dayoy][varID][levelID]);
+	  }
 	else if ( lvarstd )
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
-		    {
-		      if ( lstd )
-			farcstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], nsets[dayoy], divisor);
-		      else
-			farcvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], nsets[dayoy], divisor);
-		    }
-		  else
-		    {
-		      if ( lstd )
-			farstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID], divisor);
-		      else
-			farvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID], divisor);
-		    }
-		}
-	    }
+          for ( int recID = 0; recID < maxrecs; recID++ )
+            {
+              int varID   = recinfo[recID].varID;
+              int levelID = recinfo[recID].levelID;
+              field_type *pvars1 = &vars1[dayoy][varID][levelID];
+              field_type *pvars2 = &vars2[dayoy][varID][levelID];
+
+              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
+
+              if ( samp1[dayoy][varID][levelID].ptr == NULL )
+                {
+                  if ( lstd ) farcstd(pvars1, *pvars2, nsets[dayoy], divisor);
+                  else        farcvar(pvars1, *pvars2, nsets[dayoy], divisor);
+                }
+              else
+                {
+                  if ( lstd ) farstd(pvars1, *pvars2, samp1[dayoy][varID][levelID], divisor);
+                  else        farvar(pvars1, *pvars2, samp1[dayoy][varID][levelID], divisor);
+                }
+            }
 
 	taxisDefVdate(taxisID2, vdates[dayoy]);
 	taxisDefVtime(taxisID2, vtimes[dayoy]);
 	streamDefTimestep(streamID2, otsID);
 
-	for ( int recID = 0; recID < nrecords; recID++ )
-	  {
-	    varID   = recVarID[recID];
-	    levelID = recLevelID[recID];
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *pvars1 = &vars1[dayoy][varID][levelID];
 
 	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    streamDefRecord(streamID2, varID, levelID);
-	    streamWriteRecord(streamID2, vars1[dayoy][varID][levelID].ptr,
-			      (int)vars1[dayoy][varID][levelID].nmiss);
+	    streamWriteRecord(streamID2, pvars1->ptr, (int)pvars1->nmiss);
 	  }
 
 	otsID++;
@@ -294,8 +298,7 @@ void *Ydaystat(void *argument)
 
   if ( field.ptr ) Free(field.ptr);
 
-  if ( recVarID   ) Free(recVarID);
-  if ( recLevelID ) Free(recLevelID);
+  Free(recinfo);
 
   streamClose(streamID2);
   streamClose(streamID1);

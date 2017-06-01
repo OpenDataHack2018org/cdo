@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Seaspctl
 @Title     = Seasonal percentile values
 @Section   = Statistical values

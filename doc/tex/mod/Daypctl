@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Daypctl
 @Title     = Daily percentile values
 @Section   = Statistical values

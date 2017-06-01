@@ -7,6 +7,7 @@ GRIB_REF     = grib_testfile01_sinfo_ref grib_testfile01_info_ref grib_testfile0
 NETCDF_REF   = netcdf_testfile01_sinfon_ref netcdf_testfile01_infon_ref netcdf_testfile02_sinfon_ref netcdf_testfile02_infon_ref
 COMP_REF     = comp_eqc_ref comp_gec_ref comp_gtc_ref comp_lec_ref comp_ltc_ref comp_nec_ref comptest.srv
 EOF_REF      = eval_ref eof_ref pcoeff00000
+YDRUNSTAT_REF = ydrunmin_ref ydrunmax_ref ydrunsum_ref ydrunavg_ref ydrunmean_ref ydrunstd_ref ydrunstd1_ref ydrunvar_ref ydrunvar1_ref
 YMONSTAT_REF = ymonmin_ref ymonmax_ref ymonsum_ref ymonavg_ref ymonmean_ref ymonstd_ref ymonstd1_ref ymonvar_ref ymonvar1_ref
 YSEASSTAT_REF = yseasmin_ref yseasmax_ref yseassum_ref yseasavg_ref yseasmean_ref yseasstd_ref yseasstd1_ref yseasvar_ref yseasvar1_ref
 SEASSTAT_REF = seasmin_ref seasmax_ref seassum_ref seasavg_ref seasmean_ref seasstd_ref seasstd1_ref seasvar_ref seasvar1_ref seasrange_ref
@@ -38,7 +39,7 @@ GRADSDES_REF = pl_data.ctl pl_data.gmp
 ARITH_REF    = arithadd_ref arithsub_ref arithmul_ref arithdiv_ref
 MAPREDUCE    = r18x9_grid icon_cell_grid griddes.r18x9 griddes.icon_cell
 
-EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(EOF_REF) $(COMP_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) \
+EXTRA_DIST = $(INPUTDATA) $(FILE_REF) $(GRIB_REF) $(NETCDF_REF) $(EOF_REF) $(COMP_REF) $(YDRUNSTAT_REF) $(YMONSTAT_REF) $(YSEASSTAT_REF) $(SEASSTAT_REF) \
              $(RUNSTAT_REF) $(TIMSTAT_REF) $(YEARSTAT_REF) $(MONSTAT_REF) $(DAYSTAT_REF) $(VERTSTAT_REF) $(FLDSTAT_REF) $(FLDPSTAT_REF) \
              $(MERSTAT_REF) $(ZONSTAT_REF) $(ENSPSTAT_REF) $(SPECTRAL_REF) $(VERTINT_REF) $(REMAP_REF) $(REMAP2_REF) $(SELECT_REF) $(DETREND_REF) \
              $(THREAD_REF) $(EXPR_REF) $(GRADSDES_REF) $(ARITH_REF) $(MAPREDUCE)

@@ -114,6 +114,16 @@ done
 exit
 ########################################################################
 #
+# Ydrunstat
+#
+STATS="min max sum avg mean std std1 var var1"
+#
+IFILE=ts_mm_5years
+for STAT in $STATS; do
+  $CDO $FORMAT ydrun$STAT,8 $IFILE ydrun${STAT}_ref
+done
+########################################################################
+#
 # Ymonstat
 #
 STATS="min max sum avg mean std std1 var var1"
