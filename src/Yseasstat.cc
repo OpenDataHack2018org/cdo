@@ -71,7 +71,7 @@ void *Yseasstat(void *argument)
   int year, month, day;
   int nrecs;
   int levelID;
-  int nsets[NSEAS];
+  int seas_nsets[NSEAS];
   int nmiss;
   date_time_t datetime[NSEAS];
   field_type **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
@@ -97,7 +97,7 @@ void *Yseasstat(void *argument)
       vars1[seas]  = NULL;
       vars2[seas]  = NULL;
       samp1[seas]  = NULL;
-      nsets[seas]  = 0;
+      seas_nsets[seas]  = 0;
       datetime[seas].vdate = 0;
       datetime[seas].vtime = 0;
     }
@@ -162,12 +162,14 @@ void *Yseasstat(void *argument)
               recinfo[recID].levelID = levelID;
 	    }
 
+          field_type *psamp1 = &samp1[seas][varID][levelID];
           field_type *pvars1 = &vars1[seas][varID][levelID];
           field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
+          int nsets = seas_nsets[seas];
 
 	  int gridsize = pvars1->size;
 
-	  if ( nsets[seas] == 0 )
+	  if ( nsets == 0 )
 	    {
 	      streamReadRecord(streamID1, pvars1->ptr, &nmiss);
 	      pvars1->nmiss = (size_t)nmiss;
@@ -178,13 +180,13 @@ void *Yseasstat(void *argument)
                     pvars2->ptr[i] = pvars1->ptr[i];
                 }
 
-	      if ( nmiss > 0 || samp1[seas][varID][levelID].ptr )
+	      if ( nmiss > 0 || psamp1->ptr )
 		{
-		  if ( samp1[seas][varID][levelID].ptr == NULL )
-		    samp1[seas][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+		  if ( psamp1->ptr == NULL )
+		    psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 
 		  for ( int i = 0; i < gridsize; i++ )
-                    samp1[seas][varID][levelID].ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
+                    psamp1->ptr[i] = !DBL_IS_EQUAL(pvars1->ptr[i], pvars1->missval);
 		}
 	    }
 	  else
@@ -194,18 +196,18 @@ void *Yseasstat(void *argument)
 	      field.grid    = pvars1->grid;
 	      field.missval = pvars1->missval;
 
-	      if ( field.nmiss > 0 || samp1[seas][varID][levelID].ptr )
+	      if ( field.nmiss > 0 || psamp1->ptr )
 		{
-		  if ( samp1[seas][varID][levelID].ptr == NULL )
+		  if ( psamp1->ptr == NULL )
 		    {
-		      samp1[seas][varID][levelID].ptr = (double*) Malloc(gridsize*sizeof(double));
+		      psamp1->ptr = (double*) Malloc(gridsize*sizeof(double));
 		      for ( int i = 0; i < gridsize; i++ )
-			samp1[seas][varID][levelID].ptr[i] = nsets[seas];
+			psamp1->ptr[i] = nsets;
 		    }
 		  
 		  for ( int i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(field.ptr[i], pvars1->missval) )
-		      samp1[seas][varID][levelID].ptr[i]++;
+		      psamp1->ptr[i]++;
 		}
 
 	      if ( lvarstd )
@@ -225,7 +227,7 @@ void *Yseasstat(void *argument)
 	    }
 	}
 
-      if ( nsets[seas] == 0 && lvarstd )
+      if ( seas_nsets[seas] == 0 && lvarstd )
         for ( int recID = 0; recID < maxrecs; recID++ )
           {
             int varID   = recinfo[recID].varID;
@@ -238,60 +240,47 @@ void *Yseasstat(void *argument)
             farmoq(pvars2, *pvars1);
 	  }
 
-      nsets[seas]++;
+      seas_nsets[seas]++;
       tsID++;
     }
 
   for ( int seas = 0; seas < NSEAS; seas++ )
-    if ( nsets[seas] )
+    if ( seas_nsets[seas] )
       {
-	if ( lmean )
-          for ( int recID = 0; recID < maxrecs; recID++ )
-            {
-              int varID   = recinfo[recID].varID;
-              int levelID = recinfo[recID].levelID;
-              field_type *pvars1 = &vars1[seas][varID][levelID];
+        int nsets = seas_nsets[seas];
+        for ( int recID = 0; recID < maxrecs; recID++ )
+          {
+            int varID   = recinfo[recID].varID;
+            int levelID = recinfo[recID].levelID;
+            field_type *psamp1 = &samp1[seas][varID][levelID];
+            field_type *pvars1 = &vars1[seas][varID][levelID];
+            field_type *pvars2 = vars2[seas] ? &vars2[seas][varID][levelID] : NULL;
 
-	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-              
-              if ( samp1[seas][varID][levelID].ptr == NULL )
-                farcdiv(pvars1, (double)nsets[seas]);
-              else
-                fardiv(pvars1, samp1[seas][varID][levelID]);
-	    }
-	else if ( lvarstd )
-          for ( int recID = 0; recID < maxrecs; recID++ )
-            {
-              int varID   = recinfo[recID].varID;
-              int levelID = recinfo[recID].levelID;
-              field_type *pvars1 = &vars1[seas][varID][levelID];
-              field_type *pvars2 = &vars2[seas][varID][levelID];
+            if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
-	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-              if ( samp1[seas][varID][levelID].ptr == NULL )
-                {
-                  if ( lstd ) farcstd(pvars1, *pvars2, nsets[seas], divisor);
-                  else        farcvar(pvars1, *pvars2, nsets[seas], divisor);
-                }
-              else
-                {
-                  if ( lstd ) farstd(pvars1, *pvars2, samp1[seas][varID][levelID], divisor);
-                  else        farvar(pvars1, *pvars2, samp1[seas][varID][levelID], divisor);
-		}
-	    }
-        else if ( lrange )
-          for ( int recID = 0; recID < maxrecs; recID++ )
-            {
-              int varID   = recinfo[recID].varID;
-              int levelID = recinfo[recID].levelID;
-              field_type *pvars1 = &vars1[seas][varID][levelID];
-              field_type *pvars2 = &vars2[seas][varID][levelID];
-
-              if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-
-              farsub(pvars1, *pvars2);
-            }
+            if ( lmean )
+              {
+                if ( psamp1->ptr ) fardiv(pvars1, *psamp1);
+                else               farcdiv(pvars1, (double)nsets);
+              }
+            else if ( lvarstd )
+              {
+                if ( psamp1->ptr )
+                  {
+                    if ( lstd ) farstd(pvars1, *pvars2, *psamp1, divisor);
+                    else        farvar(pvars1, *pvars2, *psamp1, divisor);
+                  }
+                else
+                  {
+                    if ( lstd ) farcstd(pvars1, *pvars2, nsets, divisor);
+                    else        farcvar(pvars1, *pvars2, nsets, divisor);
+                  }
+              }
+            else if ( lrange )
+              {
+                farsub(pvars1, *pvars2);
+              }
+          }
 
 	taxisDefVdate(taxisID2, datetime[seas].vdate);
 	taxisDefVtime(taxisID2, datetime[seas].vtime);
