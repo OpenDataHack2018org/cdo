@@ -290,7 +290,7 @@ static void createPipeName(char *pipename, int pnlen){
   snprintf(pipename, pnlen, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
 }
 
-static int pCreateReadThread(char *newarg, argument_t *argument, const char *operatorName){
+static pthread_t pCreateReadThread(char *newarg, argument_t *argument, const char *operatorName){
   pthread_attr_t attr;
   int status = pthread_attr_init(&attr);
   if ( status ) SysError("pthread_attr_init failed for '%s'", newarg+1);
