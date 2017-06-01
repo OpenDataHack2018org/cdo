@@ -6,7 +6,7 @@
 2017-06-01  Uwe Schulzweida
 
 	* New operator ymonrange: Multi-year monthly range (ymonmax-ymonmin)
-	* New operator yseasrange: Multi-year seasonally range (yseasmax-yseasmin)
+	* New operator yseasrange: Multi-year seasonal range (yseasmax-yseasmin)
 
 2017-05-30  Uwe Schulzweida
 

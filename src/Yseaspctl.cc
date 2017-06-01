@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Yseaspctl  yseaspctl       Multi-year seasonally percentiles
+      Yseaspctl  yseaspctl       Multi-year seasonal percentiles
 */
 
 #include <cdi.h>

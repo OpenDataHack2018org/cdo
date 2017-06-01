@@ -18,16 +18,16 @@
 /*
    This module contains the following operators:
 
-      Yseasstat  yseasrange      Multi-year seasonally range
-      Yseasstat  yseasmin        Multi-year seasonally minimum
-      Yseasstat  yseasmax        Multi-year seasonally maximum
-      Yseasstat  yseassum        Multi-year seasonally sum
-      Yseasstat  yseasmean       Multi-year seasonally mean
-      Yseasstat  yseasavg        Multi-year seasonally average
-      Yseasstat  yseasvar        Multi-year seasonally variance
-      Yseasstat  yseasvar1       Multi-year seasonally variance [Normalize by (n-1)]
-      Yseasstat  yseasstd        Multi-year seasonally standard deviation
-      Yseasstat  yseasstd1       Multi-year seasonally standard deviation [Normalize by (n-1)]
+      Yseasstat  yseasrange      Multi-year seasonal range
+      Yseasstat  yseasmin        Multi-year seasonal minimum
+      Yseasstat  yseasmax        Multi-year seasonal maximum
+      Yseasstat  yseassum        Multi-year seasonal sum
+      Yseasstat  yseasmean       Multi-year seasonal mean
+      Yseasstat  yseasavg        Multi-year seasonal average
+      Yseasstat  yseasvar        Multi-year seasonal variance
+      Yseasstat  yseasvar1       Multi-year seasonal variance [Normalize by (n-1)]
+      Yseasstat  yseasstd        Multi-year seasonal standard deviation
+      Yseasstat  yseasstd1       Multi-year seasonal standard deviation [Normalize by (n-1)]
 */
 
 #include <cdi.h>
