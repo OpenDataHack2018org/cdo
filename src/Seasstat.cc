@@ -18,16 +18,16 @@
 /*
    This module contains the following operators:
 
-      Seasstat   seasrange       Seasonal range
-      Seasstat   seasmin         Seasonal minimum
-      Seasstat   seasmax         Seasonal maximum
-      Seasstat   seassum         Seasonal sum
-      Seasstat   seasmean        Seasonal mean
-      Seasstat   seasavg         Seasonal average
-      Seasstat   seasvar         Seasonal variance
-      Seasstat   seasvar1        Seasonal variance [Normalize by (n-1)]
-      Seasstat   seasstd         Seasonal standard deviation
-      Seasstat   seasstd1        Seasonal standard deviation [Normalize by (n-1)]
+      Seasstat   seasrange       Seasonally range
+      Seasstat   seasmin         Seasonally minimum
+      Seasstat   seasmax         Seasonally maximum
+      Seasstat   seassum         Seasonally sum
+      Seasstat   seasmean        Seasonally mean
+      Seasstat   seasavg         Seasonally average
+      Seasstat   seasvar         Seasonally variance
+      Seasstat   seasvar1        Seasonally variance [Normalize by (n-1)]
+      Seasstat   seasstd         Seasonally standard deviation
+      Seasstat   seasstd1        Seasonally standard deviation [Normalize by (n-1)]
 */
 
 

@@ -507,7 +507,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
 #define  YseasarithOperators    {"yseasadd", "yseassub", "yseasmul", "yseasdiv"}
 #define  YmonpctlOperators      {"ymonpctl"}
-#define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
+#define  YmonstatOperators      {"ymonrange", "ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd", "ymonstd1", "ymonvar", "ymonvar1"}
 #define  YseaspctlOperators     {"yseaspctl"}
 #define  YseasstatOperators     {"yseasrange", "yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd", "yseasstd1", "yseasvar", "yseasvar1"}
 #define  ZonstatOperators       {"zonrange", "zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonstd1", "zonvar", "zonvar1", "zonpctl"}
