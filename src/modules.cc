@@ -503,7 +503,7 @@ void *Samplegrid(void *argument); // "samplegrid", "subgrid"
 #define  YdrunpctlOperators     {"ydrunpctl"}
 #define  YdrunstatOperators     {"ydrunmin", "ydrunmax", "ydrunsum", "ydrunmean", "ydrunavg", "ydrunstd", "ydrunstd1", "ydrunvar", "ydrunvar1"}
 #define  YhourarithOperators    {"yhouradd", "yhoursub", "yhourmul", "yhourdiv"}
-#define  YhourstatOperators     {"yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourstd", "yhourstd1", "yhourvar", "yhourvar1"}
+#define  YhourstatOperators     {"yhourrange", "yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourstd", "yhourstd1", "yhourvar", "yhourvar1"}
 #define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
 #define  YseasarithOperators    {"yseasadd", "yseassub", "yseasmul", "yseasdiv"}
 #define  YmonpctlOperators      {"ymonpctl"}
