@@ -45,6 +45,11 @@
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
+static process_t Process[MAX_PROCESS];
+
+static int NumProcess = 0;
+static int NumProcessActive = 0;
+
 int processCreate(void)
 {
 #if defined(HAVE_LIBPTHREAD)

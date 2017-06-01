@@ -68,10 +68,7 @@ typedef struct {
 }
 process_t;
 
-static process_t Process[MAX_PROCESS];
 
-static int NumProcess = 0;
-static int NumProcessActive = 0;
 
 int  processSelf(void);
 int  processCreate(void);
